@@ -266,7 +266,7 @@ inline void set_logger_level(const std::string& name, int level) {
     do {                                                                                       \
         if (!(expr)) {                                                                         \
             throw hku::exception(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr,               \
-                                             fmt::format(__VA_ARGS__), __FUNCTION__, __FILE__, \
+                                             fmt::format(__VA_ARGS__), HKU_FUNCTION, __FILE__, \
                                              __LINE__));                                       \
         }                                                                                      \
     } while (0)
@@ -279,7 +279,7 @@ inline void set_logger_level(const std::string& name, int level) {
     do {                                                                                           \
         if (!(expr)) {                                                                             \
             throw except(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr, fmt::format(__VA_ARGS__), \
-                                     __FUNCTION__, __FILE__, __LINE__));                           \
+                                     HKU_FUNCTION, __FILE__, __LINE__));                           \
         }                                                                                          \
     } while (0)
 
@@ -299,7 +299,7 @@ inline void set_logger_level(const std::string& name, int level) {
             std::string err_msg(fmt::format("ASSERT({})", #expr));                        \
             HKU_ERROR(err_msg);                                                           \
             throw hku::exception(                                                         \
-              fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__)); \
+              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__)); \
         }                                                                                 \
     } while (0)
 
@@ -313,7 +313,7 @@ inline void set_logger_level(const std::string& name, int level) {
             std::string err_msg(fmt::format("ASSERT({}) {}", #expr, fmt::format(__VA_ARGS__))); \
             HKU_ERROR(err_msg);                                                                 \
             throw hku::exception(                                                               \
-              fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__));       \
+              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__));       \
         }                                                                                       \
     } while (0)
 
@@ -323,14 +323,14 @@ inline void set_logger_level(const std::string& name, int level) {
 #define APP_THROW(...)                                                                           \
     do {                                                                                         \
         throw hku::exception(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
-                                         __FUNCTION__, __FILE__, __LINE__));                     \
+                                         HKU_FUNCTION, __FILE__, __LINE__));                     \
     } while (0)
 
 /** 抛出指定异常及传入信息 */
 #define APP_THROW_EXCEPTION(except, ...)                                                 \
     do {                                                                                 \
         throw except(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
-                                 __FUNCTION__, __FILE__, __LINE__));                     \
+                                 HKU_FUNCTION, __FILE__, __LINE__));                     \
     } while (0)
 
 //--------------------------------------------------------------
