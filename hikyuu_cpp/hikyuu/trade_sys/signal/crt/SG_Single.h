@@ -28,12 +28,10 @@ namespace hku {
  * @param ind
  * @param filter_n N日周期
  * @param filter_p 过滤器百分比
- * @param kpart KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
  * @return
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n = 20, double filter_p = 0.1,
-                            const string& kpart = "CLOSE");
+SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n = 20, double filter_p = 0.1);
 
 /**
  * 单线拐点信号指示器2
@@ -48,12 +46,10 @@ SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n = 20, double filt
  * @param ind
  * @param filter_n N日周期
  * @param filter_p 过滤器百分比
- * @param kpart KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
  * @return
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Single2(const Indicator& ind, int filter_n = 20, double filter_p = 0.1,
-                             const string& kpart = "CLOSE");
+SignalPtr HKU_API SG_Single2(const Indicator& ind, int filter_n = 20, double filter_p = 0.1);
 
 } /* namespace hku */
 

@@ -18,13 +18,11 @@ namespace hku {
 SingleSignal2::SingleSignal2() : SignalBase("SG_Single2") {
     setParam<int>("filter_n", 10);
     setParam<double>("filter_p", 0.1);
-    setParam<string>("kpart", "CLOSE");
 }
 
 SingleSignal2::SingleSignal2(const Indicator& ind) : SignalBase("SG_Single2"), m_ind(ind) {
     setParam<int>("filter_n", 10);
     setParam<double>("filter_p", 0.1);
-    setParam<string>("kpart", "CLOSE");
 }
 
 SingleSignal2::~SingleSignal2() {}
@@ -38,9 +36,8 @@ SignalPtr SingleSignal2::_clone() {
 void SingleSignal2::_calculate() {
     int filter_n = getParam<int>("filter_n");
     double filter_p = getParam<double>("filter_p");
-    string kpart(getParam<string>("kpart"));
 
-    Indicator ind = m_ind(KDATA_PART(m_kdata, kpart));
+    Indicator ind = m_ind(m_kdata);
     Indicator dev = REF(STDEV(DIFF(ind), filter_n), 1);
 
     size_t start = dev.discard();
@@ -59,12 +56,10 @@ void SingleSignal2::_calculate() {
     }
 }
 
-SignalPtr HKU_API SG_Single2(const Indicator& ind, int filter_n, double filter_p,
-                             const string& kpart) {
+SignalPtr HKU_API SG_Single2(const Indicator& ind, int filter_n, double filter_p) {
     SingleSignal2* p = new SingleSignal2(ind);
     p->setParam<int>("filter_n", filter_n);
     p->setParam<double>("filter_p", filter_p);
-    p->setParam<string>("kpart", kpart);
     return SignalPtr(p);
 }
 

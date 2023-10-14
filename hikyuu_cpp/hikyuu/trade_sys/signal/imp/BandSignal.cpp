@@ -9,13 +9,10 @@
 
 namespace hku {
 
-BandSignal::BandSignal() : SignalBase("SG_Band") {
-    setParam<string>("kpart", "CLOSE");
-}
+BandSignal::BandSignal() : SignalBase("SG_Band") {}
 
-BandSignal::BandSignal(const Indicator& ind, price_t lower, price_t upper, const string& kpart)
+BandSignal::BandSignal(const Indicator& ind, price_t lower, price_t upper)
 : SignalBase("SG_Band"), m_ind(ind), m_lower(lower), m_upper(upper) {
-    setParam<string>("kpart", kpart);
     HKU_ERROR_IF(m_lower > m_upper, "BandSignal: lower track is greater than upper track");
 }
 
@@ -30,10 +27,7 @@ SignalPtr BandSignal::_clone() {
 }
 
 void BandSignal::_calculate() {
-    string kpart = getParam<string>("kpart");
-    Indicator kdata = KDATA_PART(m_kdata, kpart);
-
-    Indicator ind = m_ind(kdata);
+    Indicator ind = m_ind(m_kdata);
     size_t discard = ind.discard();
     size_t total = ind.size();
 
@@ -46,9 +40,8 @@ void BandSignal::_calculate() {
     }
 }
 
-SignalPtr HKU_API SG_Band(const Indicator& sig, price_t lower, price_t upper,
-                          const string& kpart = "CLOSE") {
-    return SignalPtr(new BandSignal(sig, lower, upper, kpart));
+SignalPtr HKU_API SG_Band(const Indicator& sig, price_t lower, price_t upper) {
+    return SignalPtr(new BandSignal(sig, lower, upper));
 }
 
 }  // namespace hku

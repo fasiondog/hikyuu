@@ -17,7 +17,7 @@ namespace hku {
 class CrossGoldSignal : public SignalBase {
 public:
     CrossGoldSignal();
-    CrossGoldSignal(const Indicator& fast, const Indicator& slow, const string& kpart);
+    CrossGoldSignal(const Indicator& fast, const Indicator& slow);
     virtual ~CrossGoldSignal();
 
     virtual SignalPtr _clone() override;

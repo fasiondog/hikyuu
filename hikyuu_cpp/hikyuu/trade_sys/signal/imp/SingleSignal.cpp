@@ -15,13 +15,11 @@ namespace hku {
 SingleSignal::SingleSignal() : SignalBase("SG_Single") {
     setParam<int>("filter_n", 10);
     setParam<double>("filter_p", 0.1);
-    setParam<string>("kpart", "CLOSE");
 }
 
 SingleSignal::SingleSignal(const Indicator& ind) : SignalBase("SG_Single"), m_ind(ind) {
     setParam<int>("filter_n", 10);
     setParam<double>("filter_p", 0.1);
-    setParam<string>("kpart", "CLOSE");
 }
 
 SingleSignal::~SingleSignal() {}
@@ -35,9 +33,8 @@ SignalPtr SingleSignal::_clone() {
 void SingleSignal::_calculate() {
     int filter_n = getParam<int>("filter_n");
     double filter_p = getParam<double>("filter_p");
-    string kpart(getParam<string>("kpart"));
 
-    Indicator ind = m_ind(KDATA_PART(m_kdata, kpart));
+    Indicator ind = m_ind(m_kdata);
     Indicator dev = STDEV(DIFF(ind), filter_n);
 
     size_t start = dev.discard();
@@ -57,12 +54,10 @@ void SingleSignal::_calculate() {
     }
 }
 
-SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n, double filter_p,
-                            const string& kpart) {
+SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n, double filter_p) {
     SingleSignal* p = new SingleSignal(ind);
     p->setParam<int>("filter_n", filter_n);
     p->setParam<double>("filter_p", filter_p);
-    p->setParam<string>("kpart", kpart);
     return SignalPtr(p);
 }
 

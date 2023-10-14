@@ -17,7 +17,7 @@ namespace hku {
 class BoolSignal : public SignalBase {
 public:
     BoolSignal();
-    BoolSignal(const Indicator& buy, const Indicator& sell, const string& kpart);
+    BoolSignal(const Indicator& buy, const Indicator& sell);
     virtual ~BoolSignal();
 
     virtual SignalPtr _clone() override;

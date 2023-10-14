@@ -143,19 +143,17 @@ void export_Signal() {
 
     register_ptr_to_python<SignalPtr>();
 
-    def("SG_Bool", SG_Bool, (arg("buy"), arg("sell"), arg("kpart") = "CLOSE"),
-        R"(SG_Bool(buy, sell[, kpart='CLOSE'])
+    def("SG_Bool", SG_Bool, (arg("buy"), arg("sell")),
+        R"(SG_Bool(buy, sell)
 
     布尔信号指示器，使用运算结果为类似bool数组的Indicator分别作为买入、卖出指示。
 
     :param Indicator buy: 买入指示（结果Indicator中相应位置>0则代表买入）
     :param Indicator sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
-    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器)");
 
-    def("SG_Single", SG_Single,
-        (arg("ind"), arg("filter_n") = 10, arg("filter_p") = 0.1, arg("kpart") = "CLOSE"),
-        R"(SG_Single(ind[, filter_n = 10, filter_p = 0.1, kpart='CLOSE'])
+    def("SG_Single", SG_Single, (arg("ind"), arg("filter_n") = 10, arg("filter_p") = 0.1),
+        R"(SG_Single(ind[, filter_n = 10, filter_p = 0.1])
     
     生成单线拐点信号指示器。使用《精明交易者》 [BOOK1]_ 中给出的曲线拐点算法判断曲线趋势，公式见下::
 
@@ -168,12 +166,10 @@ void export_Signal() {
     :param Indicator ind:
     :param int filer_n: N日周期
     :param float filter_p: 过滤器百分比
-    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器)");
 
-    def("SG_Single2", SG_Single2,
-        (arg("ind"), arg("filter_n") = 10, arg("filter_p") = 0.1, arg("kpart") = "CLOSE"),
-        R"(SG_Single2(ind[, filter_n = 10, filter_p = 0.1, kpart='CLOSE'])
+    def("SG_Single2", SG_Single2, (arg("ind"), arg("filter_n") = 10, arg("filter_p") = 0.1),
+        R"(SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
     
     生成单线拐点信号指示器2 [BOOK1]_::
 
@@ -185,49 +181,45 @@ void export_Signal() {
     :param Indicator ind:
     :param int filer_n: N日周期
     :param float filter_p: 过滤器百分比
-    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器)");
 
-    def("SG_Cross", SG_Cross, (arg("fast"), arg("slow"), arg("kpart") = "CLOSE"),
-        R"(SG_Cross(fast, slow[, kpart = "CLOSE"])
+    def("SG_Cross", SG_Cross, (arg("fast"), arg("slow")),
+        R"(SG_Cross(fast, slow)
 
     双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。如：5日MA上穿10日MA时买入，5日MA线下穿MA10日线时卖出:: 
 
-        SG_Cross(OP(MA(n=10)), OP(MA(n=30)))
+        SG_Cross(MA(C, n=10), MA(C, n=30))
 
     :param Indicator fast: 快线
     :param Indicator slow: 慢线
-    :param string kpart: OPEN|HIGH|LOW|CLOSE|AMO|VOL|KDATA
     :return: 信号指示器)");
 
-    def("SG_CrossGold", SG_CrossGold, (arg("fast"), arg("slow"), arg("kpart") = "CLOSE"),
-        R"(SG_CrossGold(fast, slow[, kpart = "CLOSE"])
+    def("SG_CrossGold", SG_CrossGold, (arg("fast"), arg("slow")),
+        R"(SG_CrossGold(fast, slow)
 
     金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入；
     当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。::
 
-        SG_CrossGold(OP(MA(n=10)), OP(MA(n=30)))
+        SG_CrossGold(MA(C, n=10), MA(C, n=30))
 
     :param Indicator fast: 快线
     :param Indicator slow: 慢线
-    :param string kpart: OPEN|HIGH|LOW|CLOSE|AMO|VOL|KDATA
     :return: 信号指示器)");
 
-    def("SG_Flex", SG_Flex, (arg("op"), arg("slow_n"), arg("kpart") = "CLOSE"),
-        R"(SG_Flex(ind, slow_n[, kpart = 'CLOSE'])
+    def("SG_Flex", SG_Flex, (arg("op"), arg("slow_n")),
+        R"(SG_Flex(ind, slow_n)
 
     使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。
 
     :param Indicator ind:
     :param int slow_n: 慢线EMA周期
-    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器)");
 
-    def ("SG_Band", SG_Band, (arg("ind"), arg("lower"), arg("upper"), arg("kpart") = "CLOSE"),
-      R"(SG_Band(ind, lower, upper[, kpart = 'CLOSE'])
+    def("SG_Band", SG_Band, (arg("ind"), arg("lower"), arg("upper")),
+        R"(SG_Band(ind, lower, upper)
     指标区间指示器, 当指标超过上轨时，买入；
     当指标低于下轨时，卖出。::
 
-        SG_Band(OP(MA(n=10)), 100, 200)
+        SG_Band(MA(C, n=10), 100, 200)
       )");
 }

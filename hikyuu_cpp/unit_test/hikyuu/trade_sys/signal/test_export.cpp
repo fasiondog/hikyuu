@@ -14,6 +14,7 @@
 #include <boost/archive/xml_iarchive.hpp>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/signal/build_in.h>
+#include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/AMA.h>
 
 using namespace hku;
@@ -30,7 +31,7 @@ TEST_CASE("test_SG_AMA_export") {
     string filename(sm.tmpdir());
     filename += "/SG_AMA.xml";
 
-    SignalPtr sg1 = SG_Single(AMA());
+    SignalPtr sg1 = SG_Single(AMA(CLOSE()));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

@@ -41,7 +41,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
     my_tm = crtTM(init_cash = 300000)
 
     #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线，快线向上穿越慢线时买入，反之卖出）
-    my_sg = SG_Flex(OP(EMA(n=5)), slow_n=10)
+    my_sg = SG_Flex(EMA(CLOSE(), n=5), slow_n=10)
 
     #固定每次买入1000股
     my_mm = MM_FixedCount(1000)

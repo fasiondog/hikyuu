@@ -34,23 +34,14 @@
 """
 
 from hikyuu import (
-    Query, StockManager, AMA, STDEV, CVAL, PRICELIST, EMA, CLOSE, HIGH, LOW, OPEN, KDATA, POS,
-    SG_Single, SG_Cross, SG_Flex, BUSINESS
+    Query, StockManager, AMA, STDEV, CVAL, PRICELIST, EMA, CLOSE, HIGH, LOW, OPEN, KDATA, POS, SG_Single, SG_Cross,
+    SG_Flex, BUSINESS
 )
-from .drawplot import (
-    show_gcf, create_figure, ax_set_locator_formatter, adjust_axes_show, ax_draw_macd
-)
+from .drawplot import (show_gcf, create_figure, ax_set_locator_formatter, adjust_axes_show, ax_draw_macd)
 
 
 def draw(
-    stock,
-    query=Query(-130),
-    n=10,
-    filter_n=20,
-    filter_p=0.1,
-    sg_type="CROSS",
-    show_high_low=False,
-    arrow_style=1
+    stock, query=Query(-130), n=10, filter_n=20, filter_p=0.1, sg_type="CROSS", show_high_low=False, arrow_style=1
 ):
     """绘制佩里.J.考夫曼（Perry J.Kaufman） 自适应移动平均系统(AMA)"""
     kdata = stock.get_kdata(query)
@@ -77,7 +68,7 @@ def draw(
         lama.plot(axes=ax1, color='g', legend_on=True, kref=kdata)
 
     if sg_type == 'CROSS':
-        fast_op = AMA(n=n)
+        fast_op = AMA(CLOSE(), n=n)
         slow_op = EMA(n=2 * n)(fast_op)
         sg = SG_Cross(fast_op, slow_op)
         sg.plot(axes=ax1, kdata=kdata)
@@ -170,10 +161,10 @@ def draw2(
     else:
         print("sg_type only in ('CORSS', 'SINGLE')")
 
-    a = POS(block, query, SG_Flex(AMA(n=3), 6))
+    a = POS(block, query, SG_Flex(AMA(CLOSE(), n=3), 6))
     a.name = "POS(3)"
     a.plot(axes=ax2, color='b', marker='.', legend_on=True, kref=kdata)
-    a = POS(block, query, SG_Flex(AMA(n=30), 60))
+    a = POS(block, query, SG_Flex(AMA(CLOSE(), n=30), 60))
     a.name = "POS(30)"
     a.plot(axes=ax2, color='g', marker='.', legend_on=True, kref=kdata)
 
