@@ -7,8 +7,13 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/utilities/arithmetic.h>
+#include "pybind_utils.h"
 
 using namespace boost::python;
+using namespace hku;
+
+namespace py = boost::python;
+
 using namespace hku;
 
 void export_util() {
