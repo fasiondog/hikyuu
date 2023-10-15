@@ -26,12 +26,12 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SignalPtr& sg) {
 
 SignalBase::SignalBase() : m_name("SignalBase"), m_hold_long(false), m_hold_short(false) {
     setParam<bool>("alternate", true);       // 买入卖出信号交替出现
-    setParam<bool>("support-short", false);  // 支持发出空头信号
+    setParam<bool>("support_borrow_stock", false);  // 支持发出空头信号
 }
 
 SignalBase::SignalBase(const string& name) : m_name(name), m_hold_long(false), m_hold_short(false) {
     setParam<bool>("alternate", true);
-    setParam<bool>("support-short", false);
+    setParam<bool>("support_borrow_stock", false);
 }
 
 SignalBase::~SignalBase() {}
@@ -93,7 +93,7 @@ void SignalBase::_addBuySignal(const Datetime& datetime) {
     } else {
         if (!m_hold_long) {
             m_buySig.insert(datetime);
-            if (getParam<bool>("support-short") && m_hold_short) {
+            if (getParam<bool>("support_borrow_stock") && m_hold_short) {
                 m_hold_short = false;
             } else {
                 m_hold_long = true;
@@ -110,7 +110,7 @@ void SignalBase::_addSellSignal(const Datetime& datetime) {
             if (m_hold_long) {
                 m_sellSig.insert(datetime);
                 m_hold_long = false;
-            } else if (getParam<bool>("support-short")) {
+            } else if (getParam<bool>("support_borrow_stock")) {
                 m_sellSig.insert(datetime);
                 m_hold_short = true;
             }

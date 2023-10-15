@@ -917,8 +917,10 @@ void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_tod
 
 TradeRecord System::_sellShort(const KRecord& today, const KRecord& src_today, Part from) {
     TradeRecord result;
-    if (getParam<bool>("support_borrow_stock") == false)
+    if (getParam<bool>("support_borrow_stock") == false) {
+        HKU_WARN("set system param support_borrow_stock to true to short sell");
         return result;
+    }
 
     if (getParam<bool>("sell_delay")) {
         _submitSellShortRequest(today, src_today, from);
@@ -949,7 +951,7 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
 
     price_t goalPrice = _getShortGoalPrice(today.datetime, planPrice);
     price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
-    TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss, goalPrice,
+    TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss, goalPrice,
                                     planPrice, PART_SIGNAL);
     if (BUSINESS_SELL_SHORT != record.business) {
         m_sellShortRequest.clear();

@@ -134,7 +134,8 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_hold);
+        ar& BOOST_SERIALIZATION_NVP(m_hold_long);
+        ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
         // m_kdata都是系统运行时临时设置，不需要序列化
@@ -145,7 +146,8 @@ private:
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_hold);
+        ar& BOOST_SERIALIZATION_NVP(m_hold_long);
+        ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
         // m_kdata都是系统运行时临时设置，不需要序列化
