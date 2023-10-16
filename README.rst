@@ -19,11 +19,6 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 如果上述网站无法访问，请戳这里： `<http://fasiondog.gitee.io/hikyuu/>`_
 
-也可以下载 windows 虚拟机使用，感谢网友 老鼠跳龙门、傲骨 帮忙制作的 Vmware 虚拟机：
-
-链接： `<https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw>`_
-提取码：ht8j
-
 祝贺 HIKYUU 入选 GITEE 最有价值开源项目 GVP
 -----------------------------------------------
 
