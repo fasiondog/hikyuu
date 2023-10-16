@@ -23,6 +23,12 @@ public:
     Performance();
     virtual ~Performance();
 
+    Performance(const Performance& other) : m_result(other.m_result) {}
+    Performance(Performance&& other) : m_result(std::move(other.m_result)) {}
+
+    Performance& operator=(const Performance& other);
+    Performance& operator=(Performance&& other);
+
     /** 复位，清除已计算的结果 */
     void reset();
 
@@ -50,10 +56,8 @@ public:
      */
     void statistics(const TradeManagerPtr& tm, const Datetime& datetime = Datetime::now());
 
-    typedef map<string, double> map_type;
-
 private:
-    list<string> m_name_list;  //保存指标顺序
+    typedef map<string, double> map_type;
     map_type m_result;
 };
 

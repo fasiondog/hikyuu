@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/indicator/crt/EXIST.h"
+#include "hikyuu/trade_sys/signal/crt/SG_Bool.h"
 #include "combinate.h"
 
 namespace hku {
@@ -25,6 +26,31 @@ std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& 
         ret.emplace_back(tmp);
     }
     return ret;
+}
+
+Performance HKU_API combinateIndicatorAnalysis(const Stock& stk, const KQuery& query,
+                                               TradeManagerPtr tm, SystemPtr sys,
+                                               const std::vector<Indicator>& buy_inds,
+                                               const std::vector<Indicator>& sell_inds, int n) {
+    auto inds = combinateIndicator(buy_inds, n);
+    std::vector<SignalPtr> sgs;
+    for (const auto& buy_ind : inds) {
+        for (const auto& sell_ind : sell_inds) {
+            auto sg = SG_Bool(buy_ind, sell_ind);
+            sg->name(fmt::format("{} + {}", buy_ind.name(), sell_ind.name()));
+            sgs.emplace_back(sg);
+        }
+    }
+
+    Performance per;
+    for (const auto& sg : sgs) {
+        sys->setSG(sg);
+        sys->setTM(tm);
+        sys->run(stk, query);
+        per.statistics(tm, Datetime::now());
+    }
+
+    return per;
 }
 
 }  // namespace hku

@@ -8,6 +8,8 @@
 #pragma once
 
 #include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/trade_sys/system/System.h"
+#include "hikyuu/trade_manage/Performance.h"
 #include "../Log.h"
 
 namespace hku {
@@ -42,5 +44,10 @@ std::vector<std::vector<size_t>> combinateIndex(const std::vector<T>& inputs) {
 }
 
 std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& inputs, int n);
+
+Performance HKU_API combinateIndicatorAnalysis(const Stock& stk, const KQuery& query,
+                                               TradeManagerPtr tm, SystemPtr sys,
+                                               const std::vector<Indicator>& buy_inds,
+                                               const std::vector<Indicator>& sell_inds, int n);
 
 }  // namespace hku
