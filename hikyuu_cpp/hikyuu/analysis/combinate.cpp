@@ -28,10 +28,9 @@ std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& 
     return ret;
 }
 
-Performance HKU_API combinateIndicatorAnalysis(const Stock& stk, const KQuery& query,
-                                               TradeManagerPtr tm, SystemPtr sys,
-                                               const std::vector<Indicator>& buy_inds,
-                                               const std::vector<Indicator>& sell_inds, int n) {
+std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
+  const Stock& stk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
+  const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n) {
     auto inds = combinateIndicator(buy_inds, n);
     std::vector<SignalPtr> sgs;
     for (const auto& buy_ind : inds) {
@@ -42,15 +41,17 @@ Performance HKU_API combinateIndicatorAnalysis(const Stock& stk, const KQuery& q
         }
     }
 
-    Performance per;
+    std::map<std::string, Performance> result;
     for (const auto& sg : sgs) {
         sys->setSG(sg);
         sys->setTM(tm);
         sys->run(stk, query);
+        Performance per;
         per.statistics(tm, Datetime::now());
+        result[sg->name()] = std::move(per);
     }
 
-    return per;
+    return result;
 }
 
 }  // namespace hku

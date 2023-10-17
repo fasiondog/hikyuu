@@ -41,6 +41,26 @@ static py::list combinate_indicator(object seq, int n) {
     return vector_to_py_list(comb);
 }
 
+static py::dict combinate_ind_analysis(const Stock& stk, const KQuery& query, TradeManagerPtr tm,
+                                       SystemPtr sys, object buy_inds, object sell_inds, int n) {
+    std::vector<Indicator> c_buy_inds;
+    for (size_t i = 0, total = len(buy_inds); i < total; i++) {
+        c_buy_inds.emplace_back(py::extract<Indicator>(buy_inds[i])());
+    }
+
+    std::vector<Indicator> c_sell_inds;
+    for (size_t i = 0, total = len(sell_inds); i < total; i++) {
+        c_sell_inds.emplace_back(py::extract<Indicator>(sell_inds[i])());
+    }
+
+    py::dict result;
+    auto pers = combinateIndicatorAnalysis(stk, query, tm, sys, c_buy_inds, c_sell_inds, n);
+    for (auto iter = pers.begin(); iter != pers.end(); ++iter) {
+        result[iter->first] = std::move(iter->second);
+    }
+    return result;
+}
+
 void export_analysis() {
     def("combinate_index", combinate_index, R"(combinate_index(seq)
 
@@ -52,4 +72,5 @@ void export_analysis() {
     )");
 
     def("combinate_ind", combinate_indicator);
+    def("combinate_ind_analysis", combinate_ind_analysis);
 }

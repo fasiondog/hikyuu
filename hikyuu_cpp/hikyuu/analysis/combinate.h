@@ -45,9 +45,8 @@ std::vector<std::vector<size_t>> combinateIndex(const std::vector<T>& inputs) {
 
 std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& inputs, int n);
 
-Performance HKU_API combinateIndicatorAnalysis(const Stock& stk, const KQuery& query,
-                                               TradeManagerPtr tm, SystemPtr sys,
-                                               const std::vector<Indicator>& buy_inds,
-                                               const std::vector<Indicator>& sell_inds, int n);
+std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
+  const Stock& stk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
+  const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n);
 
 }  // namespace hku
