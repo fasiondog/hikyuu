@@ -49,8 +49,33 @@ std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
   const Stock& stk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
   const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n);
 
-// std::map<std::string, Performance> HKU_API combinateIndicatorAnalysisWithList(
-//   const Stock& stk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
-//   const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n);
+struct HKU_API CombinateAnalysisOutput {
+    string combinateName;
+    string code;
+    string name;
+    PriceList values;
+
+    CombinateAnalysisOutput() = default;
+    CombinateAnalysisOutput(const CombinateAnalysisOutput&) = default;
+    CombinateAnalysisOutput(CombinateAnalysisOutput&& rv)
+    : combinateName(std::move(rv.combinateName)),
+      code(std::move(rv.code)),
+      name(std::move(rv.name)),
+      values(std::move(rv.values)) {}
+
+    CombinateAnalysisOutput& operator=(const CombinateAnalysisOutput&) = default;
+    CombinateAnalysisOutput& operator=(CombinateAnalysisOutput&& rv) {
+        HKU_IF_RETURN(this == &rv, *this);
+        combinateName = std::move(rv.combinateName);
+        code = std::move(rv.code);
+        name = std::move(rv.name);
+        values = std::move(rv.values);
+        return *this;
+    }
+};
+
+vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
+  const Block& blk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
+  const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n);
 
 }  // namespace hku

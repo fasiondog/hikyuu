@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/utilities/thread/ThreadPool.h"
 #include "hikyuu/indicator/crt/EXIST.h"
 #include "hikyuu/trade_sys/signal/crt/SG_Bool.h"
 #include "combinate.h"
@@ -50,6 +51,68 @@ std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
         per.statistics(tm, Datetime::now());
         result[sg->name()] = std::move(per);
     }
+
+    return result;
+}
+
+vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
+  const Block& blk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
+  const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n) {
+    SPEND_TIME(combinateIndicatorAnalysisWithBlock);
+    HKU_INFO("combinateIndicatorAnalysisWithBlock");
+
+    auto inds = combinateIndicator(buy_inds, n);
+    std::vector<SignalPtr> sgs;
+    for (const auto& buy_ind : inds) {
+        for (const auto& sell_ind : sell_inds) {
+            auto sg = SG_Bool(buy_ind, sell_ind);
+            sg->name(fmt::format("{} + {}", buy_ind.name(), sell_ind.name()));
+            sgs.emplace_back(sg);
+        }
+    }
+
+    vector<CombinateAnalysisOutput> result;
+    HKU_INFO("combinateIndicatorAnalysisWithBlock create tasks");
+    ThreadPool tg;
+    vector<std::future<vector<CombinateAnalysisOutput>>> tasks;
+    int count = 0;
+    for (auto iter = blk.begin(); iter != blk.end(); ++iter) {
+        tasks.emplace_back(tg.submit([&sgs, id = count, n_query = query, n_stk = *iter,
+                                      n_tm = tm->clone(), n_sys = sys->clone()]() {
+            vector<CombinateAnalysisOutput> ret;
+            try {
+                Performance per;
+                for (const auto& sg : sgs) {
+                    auto n_sg = sg->clone();
+                    n_sys->setSG(n_sg);
+                    n_sys->setTM(n_tm);
+                    n_sys->run(n_stk, n_query);
+                    per.statistics(n_tm, Datetime::now());
+                    CombinateAnalysisOutput out;
+                    out.combinateName = n_sg->name();
+                    out.code = n_stk.code();
+                    out.name = n_stk.name();
+                    out.values = per.values();
+                    ret.emplace_back(out);
+                    //   HKU_INFO("id: {}", id);
+                }
+            } catch (...) {
+            }
+            printf(" | id: %d, stock: %s", id, n_stk.code().c_str());
+            return ret;
+        }));
+        count++;
+    }
+
+    for (auto& task : tasks) {
+        // result.emplace_back(std::move(task.get()));
+        auto records = task.get();
+        for (auto& record : records) {
+            result.emplace_back(record);
+        }
+    }
+
+    HKU_INFO("result size: {}", result.size());
 
     return result;
 }
