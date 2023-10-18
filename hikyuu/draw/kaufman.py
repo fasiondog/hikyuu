@@ -106,7 +106,7 @@ def draw(
 def draw2(
     block,
     query=Query(-130),
-    ama1=AMA(n=10, fast_n=2, slow_n=30),
+    ama1=AMA(CLOSE(), n=10, fast_n=2, slow_n=30),
     ama2=None,
     n=10,
     filter_n=20,
@@ -146,7 +146,7 @@ def draw2(
         lama.plot(axes=ax1, color='g', legend_on=True, kref=kdata)
 
     if sg_type == 'CROSS':
-        fast_op = AMA(n=n)
+        fast_op = AMA(CLOSE(), n=n)
         slow_op = EMA(n=2 * n)(fast_op)
         sg = SG_Cross(fast_op, slow_op)
         sg.plot(axes=ax1, kdata=kdata)
