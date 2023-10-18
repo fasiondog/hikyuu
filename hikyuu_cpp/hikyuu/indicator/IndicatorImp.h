@@ -99,7 +99,7 @@ public:
 
     size_t size() const;
 
-    price_t get(size_t pos, size_t num = 0);
+    price_t get(size_t pos, size_t num = 0) const;
 
     price_t getByDate(Datetime, size_t num = 0);
 

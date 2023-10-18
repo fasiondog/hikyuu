@@ -138,6 +138,17 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
         os << "}";
     }
     os << "\n  formula: " << imp.formula() << "\n}";
+    os << "\n  values: [";
+    size_t len = imp.size();
+    for (size_t i = 0; i < len; i++) {
+        if ((i < 3) || (i >= len - 3)) {
+            os << imp.get(i);
+            if (i != len - 1)
+                os << ", ";
+        } else if (i == 3)
+            os << "...,";
+    }
+    os << "]";
     return os;
 }
 
@@ -360,7 +371,7 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     return imp;
 }
 
-price_t IndicatorImp::get(size_t pos, size_t num) {
+price_t IndicatorImp::get(size_t pos, size_t num) const {
 #if CHECK_ACCESS_BOUND
     HKU_CHECK_THROW((m_pBuffer[num] != NULL) && pos < m_pBuffer[num]->size(), std::out_of_range,
                     "Try to access value ({}) out of bounds [0..{})! {}", pos,
