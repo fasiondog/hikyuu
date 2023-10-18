@@ -56,6 +56,12 @@ void init_hikyuu_test() {
 }
 
 int main(int argc, char** argv) {
+#if defined(_WIN32)
+    // Windows 下设置控制台程序输出代码页为 UTF8
+    auto old_cp = GetConsoleOutputCP();
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+
     doctest::Context context;
 
     // !!! THIS IS JUST AN EXAMPLE SHOWING HOW DEFAULTS/OVERRIDES ARE SET !!!
@@ -71,11 +77,6 @@ int main(int argc, char** argv) {
     // overrides
     context.setOption("no-breaks", true);  // don't break in the debugger when assertions fail
 
-#if defined(_WIN32)
-    // Windows 下设置控制台程序输出代码页为 UTF8
-    auto old_cp = GetConsoleOutputCP();
-    SetConsoleOutputCP(CP_UTF8);
-#endif
     init_hikyuu_test();
 
     int res = 0;
