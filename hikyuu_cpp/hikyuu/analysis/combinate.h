@@ -49,4 +49,8 @@ std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
   const Stock& stk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
   const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n);
 
+// std::map<std::string, Performance> HKU_API combinateIndicatorAnalysisWithList(
+//   const Stock& stk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
+//   const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n);
+
 }  // namespace hku

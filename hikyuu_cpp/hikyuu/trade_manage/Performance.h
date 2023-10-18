@@ -56,8 +56,10 @@ public:
      */
     void statistics(const TradeManagerPtr& tm, const Datetime& datetime = Datetime::now());
 
-    typedef map<string, double> map_type;
+    StringList names() const;
+    PriceList values() const;
 
+    typedef map<string, double> map_type;
     typedef map_type::iterator iterator;
     typedef map_type::const_iterator const_iterator;
 

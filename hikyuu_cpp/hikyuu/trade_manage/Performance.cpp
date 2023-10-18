@@ -91,6 +91,24 @@ double Performance::get(const string& name) const {
     return Null<double>();
 }
 
+StringList Performance::names() const {
+    StringList result(m_result.size());
+    size_t i = 0;
+    for (auto iter = m_result.cbegin(); iter != m_result.cend(); ++iter, i++) {
+        result[i] = iter->first;
+    }
+    return result;
+}
+
+PriceList Performance::values() const {
+    PriceList result(m_result.size());
+    size_t i = 0;
+    for (auto iter = m_result.cbegin(); iter != m_result.cend(); ++iter, i++) {
+        result[i] = iter->second;
+    }
+    return result;
+}
+
 string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) {
     std::stringstream buf;
     HKU_INFO_IF_RETURN(!tm, buf.str(), "TradeManagerPtr is Null!");
