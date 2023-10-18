@@ -1,5 +1,36 @@
 package("myboost")
     set_base("boost")
+    local libnames = {"fiber",
+                      "coroutine",
+                      "context",
+                      "regex",
+                      "system",
+                      "container",
+                      "exception",
+                      "timer",
+                      "atomic",
+                      "graph",
+                      "serialization",
+                      "random",
+                      "wave",
+                      "date_time",
+                      "locale",
+                      "iostreams",
+                      "program_options",
+                      "test",
+                      "chrono",
+                      "contract",
+                      "graph_parallel",
+                      "json",
+                      "log",
+                      "thread",
+                      "filesystem",
+                      "math",
+                      "mpi",
+                      "nowide",
+                      "python",
+                      "stacktrace",
+                      "type_erasure"}
 
     on_load(function (package)
         function get_linkname(package, libname)
