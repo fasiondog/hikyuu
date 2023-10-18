@@ -71,12 +71,12 @@ int main(int argc, char** argv) {
     // overrides
     context.setOption("no-breaks", true);  // don't break in the debugger when assertions fail
 
-    init_hikyuu_test();
 #if defined(_WIN32)
     // Windows 下设置控制台程序输出代码页为 UTF8
     auto old_cp = GetConsoleOutputCP();
     SetConsoleOutputCP(CP_UTF8);
 #endif
+    init_hikyuu_test();
 
     int res = 0;
     {
