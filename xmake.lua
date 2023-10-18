@@ -155,12 +155,12 @@ add_requires("myboost " .. boost_version, {
   debug = is_mode("debug"),
   configs = {
     shared = is_plat("windows") and true or false,
-    data_time = true,
+    date_time = true,
     filesystem = true,
     serialization = true,
     system = false,
     python = true,
-    nowide = is_plat("windows") and true or false,
+    nowide = true,
     pyver = get_config("pyver"),
   },
 })
