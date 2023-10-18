@@ -33,7 +33,7 @@ inline KQuery::KType getBaseKType(const KQuery::KType& ktype) {
     return base_ktype;
 }
 
-SQLiteKDataDriver::SQLiteKDataDriver() : KDataDriver("sqlite") {}
+SQLiteKDataDriver::SQLiteKDataDriver() : KDataDriver("sqlite3") {}
 
 SQLiteKDataDriver::~SQLiteKDataDriver() {}
 
