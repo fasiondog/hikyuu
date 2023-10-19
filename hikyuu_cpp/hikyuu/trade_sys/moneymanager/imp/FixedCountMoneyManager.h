@@ -23,6 +23,9 @@ namespace hku {
  */
 class FixedCountMoneyManager : public MoneyManagerBase {
     MONEY_MANAGER_IMP(FixedCountMoneyManager)
+
+    virtual double _getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                       price_t risk, SystemPart from) override;
     MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

@@ -8,9 +8,12 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <boost/nowide/fstream.hpp>
 
 #include "arithmetic.h"
 #include "IniParser.h"
+
+namespace nw = boost::nowide;
 
 namespace hku {
 
@@ -56,7 +59,7 @@ IniParser::~IniParser() {}
  * @param filename 指定文件名
  */
 void IniParser::read(const std::string& filename) {
-    std::ifstream inifile(filename.c_str(), std::ifstream::in);
+    nw::ifstream inifile(filename.c_str(), nw::ifstream::in);
     if (!inifile) {
         throw(std::invalid_argument("Can't read file(" + filename + ")!"));
     }

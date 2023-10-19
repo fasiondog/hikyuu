@@ -175,7 +175,8 @@ double MoneyManagerBase::_getSellShortNumber(const Datetime& datetime, const Sto
 
 double MoneyManagerBase::_getBuyShortNumber(const Datetime& datetime, const Stock& stock,
                                             price_t price, price_t risk, SystemPart from) {
-    return 0;
+    // 默认全部平仓
+    return MAX_DOUBLE;
 }
 
 } /* namespace hku */

@@ -115,7 +115,10 @@ public:
 protected:
     string m_name;
     KData m_kdata;
-    bool m_hold;
+    /* 多头持仓 */
+    bool m_hold_long;
+    /* 空头持仓 */
+    bool m_hold_short;
 
     // 用 set 保存，以便获取是能保持顺序
     std::set<Datetime> m_buySig;
@@ -131,7 +134,8 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_hold);
+        ar& BOOST_SERIALIZATION_NVP(m_hold_long);
+        ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
         // m_kdata都是系统运行时临时设置，不需要序列化
@@ -142,7 +146,8 @@ private:
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_hold);
+        ar& BOOST_SERIALIZATION_NVP(m_hold_long);
+        ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
         // m_kdata都是系统运行时临时设置，不需要序列化

@@ -33,6 +33,11 @@ Indicator RSI(int n = 14) {
     return rsi;
 }
 
+Indicator RSI(const Indicator& data, int n) {
+    return RSI(n)(data);
+}
+
 }  // namespace hku
 
-#endif /* INDICATOR_CRT_ABS_H_ */
+#endif /* INDICATOR_CRT_RSI_H_ */
+

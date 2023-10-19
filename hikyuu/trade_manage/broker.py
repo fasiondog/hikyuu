@@ -30,7 +30,6 @@
 #===============================================================================
 
 from hikyuu import OrderBrokerBase
-from hikyuu import Datetime
 
 
 class OrderBrokerWrap(OrderBrokerBase):

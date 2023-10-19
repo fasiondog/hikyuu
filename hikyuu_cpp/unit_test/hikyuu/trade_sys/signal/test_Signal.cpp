@@ -50,28 +50,48 @@ TEST_CASE("test_Signal") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
 
-    /** @arg 基本操作 */
     SignalPtr p(new SignalTest);
     SignalTest *p_src = (SignalTest *)p.get();
-    CHECK_EQ(p_src->getX(), 0);
-    CHECK_EQ(p->name(), "SignalBase");
-    p->name("SignalTest");
-    CHECK_EQ(p->name(), "SignalTest");
-    CHECK_EQ(p->shouldBuy(Datetime(200101010000)), false);
-    p->_addBuySignal(Datetime(200101010000));
-    CHECK_EQ(p->shouldBuy(Datetime(200101010000)), true);
-    CHECK_EQ(p->shouldSell(Datetime(200101030000)), false);
-    p->_addSellSignal(Datetime(200101030000));
-    CHECK_EQ(p->shouldSell(Datetime(200101030000)), true);
 
-    /** @arg 克隆操作 */
-    p_src->setX(10);
-    SignalPtr p_clone = p->clone();
-    CHECK_NE(p, p_clone);
-    p_src = (SignalTest *)p_clone.get();
-    CHECK_EQ(p_src->getX(), 10);
-    CHECK_EQ(p_clone->shouldBuy(Datetime(200101010000)), true);
-    CHECK_EQ(p_clone->shouldSell(Datetime(200101030000)), true);
+    SUBCASE("Basic operation") {
+        /** @arg 基本操作 */
+        CHECK_EQ(p_src->getX(), 0);
+        CHECK_EQ(p->name(), "SignalBase");
+        p->name("SignalTest");
+        CHECK_EQ(p->name(), "SignalTest");
+        CHECK_EQ(p->shouldBuy(Datetime(200101010000)), false);
+        p->_addBuySignal(Datetime(200101010000));
+        CHECK_EQ(p->shouldBuy(Datetime(200101010000)), true);
+        CHECK_EQ(p->shouldSell(Datetime(200101030000)), false);
+        p->_addSellSignal(Datetime(200101030000));
+        CHECK_EQ(p->shouldSell(Datetime(200101030000)), true);
+
+        /** @arg 克隆操作 */
+        p_src->setX(10);
+        SignalPtr p_clone = p->clone();
+        CHECK_NE(p, p_clone);
+        p_src = (SignalTest *)p_clone.get();
+        CHECK_EQ(p_src->getX(), 10);
+        CHECK_EQ(p_clone->shouldBuy(Datetime(200101010000)), true);
+        CHECK_EQ(p_clone->shouldSell(Datetime(200101030000)), true);
+    }
+
+    SUBCASE("Short sell") {
+        p->name("SignalTest");
+        p->setParam<bool>("support_borrow_stock", true);
+        p->_addSellSignal(Datetime(200101010000));
+        p->_addSellSignal(Datetime(200101030000));
+        CHECK_EQ(p->shouldSell(Datetime(200101010000)), true);
+        CHECK_EQ(p->shouldSell(Datetime(200101030000)), false);
+
+        p->reset();
+        p->setParam<bool>("support_borrow_stock", false);
+        p->_addSellSignal(Datetime(200101010000));
+        p->_addBuySignal(Datetime(200101030000));
+        p->_addSellSignal(Datetime(200101040000));
+        CHECK_EQ(p->shouldSell(Datetime(200101010000)), false);
+        CHECK_EQ(p->shouldSell(Datetime(200101040000)), true);
+    }
 }
 
 /** @} */
