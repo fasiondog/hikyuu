@@ -25,6 +25,7 @@ Indicator RSI(int n = 14) {
     Indicator d = IF(diff < 0, (-1) * diff, 0);
     Indicator ema_u = EMA(u, n);
     Indicator ema_d = EMA(d, n);
+    ema_d = IF(ema_d == 0.0, 1, ema_d);
     Indicator rs = ema_u / ema_d;
     Indicator _1 = CVAL(1);
     Indicator rsi = (_1 - _1 / (_1 + rs)) * CVAL(100);
