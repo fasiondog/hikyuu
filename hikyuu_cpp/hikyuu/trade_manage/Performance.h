@@ -56,10 +56,13 @@ public:
      */
     void statistics(const TradeManagerPtr& tm, const Datetime& datetime = Datetime::now());
 
+    /** 获取所有统计项名称，顺序与 values 相同 */
     StringList names() const;
+
+    /** 获取所有统计项值，顺序与 names 相同*/
     PriceList values() const;
 
-    typedef map<string, double> map_type;
+    typedef std::map<string, double> map_type;
     typedef map_type::iterator iterator;
     typedef map_type::const_iterator const_iterator;
 

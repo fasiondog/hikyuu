@@ -140,8 +140,6 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
         }
     }
 
-    HKU_INFO("result size: {}", result.size());
-
     return result;
 }
 

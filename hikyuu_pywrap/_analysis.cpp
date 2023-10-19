@@ -78,14 +78,16 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
       combinateIndicatorAnalysisWithBlock(blk, query, tm, sys, c_buy_inds, c_sell_inds, n);
 
     std::vector<py::list> tmp;
+
+    StringList names{"组合名称", "证券代码", "证券名称"};
     Performance per;
-    auto names = per.names();
-    names.emplace_back("组合名称");
-    names.emplace_back("证券代码");
-    names.emplace_back("证券名称");
+    auto keys = per.names();
+    for (const auto& key : keys) {
+        names.emplace_back(key);
+    }
+
     for (const auto& name : names) {
         tmp.emplace_back(py::list());
-        // result[name] = py::list();
     }
 
     for (size_t i = 0, total = records.size(); i < total; i++) {
@@ -93,8 +95,10 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
         tmp[0].append(record.combinateName);
         tmp[1].append(record.code);
         tmp[2].append(record.name);
+        HKU_INFO_IF(names.size() != record.values.size() + 3, "lenght invalid: {} {}", names.size(),
+                    record.values.size());
         for (size_t j = 3, len = names.size(); j < len; j++) {
-            tmp[j].append(record.values[j]);
+            tmp[j].append(record.values[j - 3]);
         }
     }
 
