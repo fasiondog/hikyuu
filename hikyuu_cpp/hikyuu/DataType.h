@@ -115,6 +115,22 @@ using std::isnan;
 
 using fmt::format;
 
+inline std::ostream &operator<<(std::ostream &os, const PriceList &p) {
+    size_t len = p.size();
+    const size_t print = 3;
+    os << "[";
+    for (size_t i = 0; i < len; i++) {
+        if ((i < print) || (i >= len - print)) {
+            os << p[i];
+            if (i != len - 1)
+                os << ", ";
+        } else if (i == 3)
+            os << "..., ";
+    }
+    os << "]";
+    return os;
+}
+
 /** @} */
 
 }  // namespace hku

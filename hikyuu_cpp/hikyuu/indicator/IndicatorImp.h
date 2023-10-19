@@ -56,7 +56,7 @@ class HKU_API IndParam;
  */
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
     PARAMETER_SUPPORT
-
+    friend HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp);
 public:
     enum OPType {
         LEAF,   ///< 叶子节点
