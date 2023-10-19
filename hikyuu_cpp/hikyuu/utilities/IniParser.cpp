@@ -8,17 +8,14 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <boost/nowide/fstream.hpp>
 
 #include "arithmetic.h"
 #include "IniParser.h"
 
-namespace nw = boost::nowide;
-
 namespace hku {
 
-//用于记录分析文件时的格式错误信息(行号、错误的行内容）
-//仅限IniParser内部使用
+// 用于记录分析文件时的格式错误信息(行号、错误的行内容）
+// 仅限IniParser内部使用
 class ParsingError {
 public:
     ParsingError() {
@@ -59,13 +56,13 @@ IniParser::~IniParser() {}
  * @param filename 指定文件名
  */
 void IniParser::read(const std::string& filename) {
-    nw::ifstream inifile(filename.c_str(), nw::ifstream::in);
+    std::ifstream inifile(HKU_PATH(filename), std::ifstream::in);
     if (!inifile) {
         throw(std::invalid_argument("Can't read file(" + filename + ")!"));
     }
 
-    size_t line_no = 0;          //当前行号，用于记录错误信息
-    ParsingError parsing_error;  //记录格式分析错误
+    size_t line_no = 0;          // 当前行号，用于记录错误信息
+    ParsingError parsing_error;  // 记录格式分析错误
 
     std::string section;
     std::string key;
@@ -76,12 +73,12 @@ void IniParser::read(const std::string& filename) {
         line_no++;
         trim(line_str);
 
-        //空行或注释行，跳过
+        // 空行或注释行，跳过
         if (line_str.empty() || line_str.at(0) == ';') {
             continue;
         }
 
-        //检查第一个出现的注释符，并将其及其之后的字符清除
+        // 检查第一个出现的注释符，并将其及其之后的字符清除
         size_t pos = line_str.find(';');
         if (pos != std::string::npos) {
             line_str.assign(line_str, 0, pos);
@@ -108,7 +105,7 @@ void IniParser::read(const std::string& filename) {
         } else {
             if (section.empty()) {
                 parsing_error.append(line_no, "Missing section header!");
-                break;  //缺少section定义，后续无须处理，直接跳出循环
+                break;  // 缺少section定义，后续无须处理，直接跳出循环
             }
 
             pos = line_str.find('=');
@@ -252,7 +249,7 @@ int IniParser::getInt(const std::string& section, const std::string& option,
     int result = 0;
     size_t remain = 0;
 
-    //先检查default_str是否可以转换为int
+    // 先检查default_str是否可以转换为int
     if (!default_str.empty()) {
         result = std::stoi(default_str, &remain);
         if (remain != default_str.size()) {
@@ -285,7 +282,7 @@ float IniParser::getFloat(const std::string& section, const std::string& option,
     float result;
     size_t remain = 0;
 
-    //先检查default_str是否可以转换为float
+    // 先检查default_str是否可以转换为float
     if (!default_str.empty()) {
         result = std::stof(default_str, &remain);
         if (remain != default_str.size()) {
@@ -318,7 +315,7 @@ double IniParser::getDouble(const std::string& section, const std::string& optio
     double result;
     size_t remain = 0;
 
-    //先检查default_str是否可以转换为float
+    // 先检查default_str是否可以转换为float
     if (!default_str.empty()) {
         result = std::stod(default_str, &remain);
         if (remain != default_str.size()) {
@@ -350,7 +347,7 @@ double IniParser::getDouble(const std::string& section, const std::string& optio
  */
 bool IniParser::getBool(const std::string& section, const std::string& option,
                         const std::string& default_str) const {
-    //先检查default_str是否可以转换为bool
+    // 先检查default_str是否可以转换为bool
     std::string new_default_str(default_str);
     if (!default_str.empty()) {
         if (new_default_str != "1" && new_default_str != "0") {

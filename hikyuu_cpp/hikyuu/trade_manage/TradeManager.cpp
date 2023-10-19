@@ -92,7 +92,7 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
     m_trade_list.push_back(TradeRecord(Null<Stock>(), m_init_datetime, BUSINESS_INIT, m_init_cash,
                                        m_init_cash, 0.0, 0, CostRecord(), 0.0, m_cash,
                                        PART_INVALID));
-    m_broker_last_datetime = Datetime(boost::posix_time::from_time_t(std::time_t(0)));
+    m_broker_last_datetime = Datetime::now();
     _saveAction(m_trade_list.back());
 }
 

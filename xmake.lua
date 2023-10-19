@@ -160,7 +160,6 @@ add_requires("myboost " .. boost_version, {
     serialization = true,
     system = false,
     python = true,
-    nowide = true,
     pyver = get_config("pyver"),
   },
 })
