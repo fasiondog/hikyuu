@@ -111,9 +111,9 @@ void export_analysis() {
 
     获取序列组合的下标索引, 输入序列的长度最大不超过15，否则抛出异常
 
-    :param seq: 可迭代的 python 对象
+    :param inds: list 或 tuple 等可使用索引的可迭代对象
+    :return: 返回组合的索引，可用于获取输入中相应索引位置的值
     :rtype: list
-
     )");
 
     def("combinate_ind", combinate_indicator);

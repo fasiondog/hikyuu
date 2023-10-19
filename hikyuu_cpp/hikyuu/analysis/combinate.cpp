@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/utilities/osdef.h"
 #include "hikyuu/utilities/thread/MQStealThreadPool.h"
 #include "hikyuu/indicator/crt/EXIST.h"
 #include "hikyuu/trade_sys/signal/crt/SG_Bool.h"
@@ -71,7 +72,15 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
     }
 
     vector<CombinateAnalysisOutput> result;
+    auto cpu_num = std::thread::hardware_concurrency();
+#if HKU_OS_WINDOWS
     size_t work_num = 5;
+    if (cpu_num < work_num) {
+        work_num = cpu_num;
+    }
+#else
+    size_t work_num = cpu_num;
+#endif
     MQStealThreadPool tg(work_num);
     vector<std::future<vector<CombinateAnalysisOutput>>> tasks;
 
@@ -95,11 +104,11 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
           tg.submit([sgs, stks = std::move(buf), n_query = query, start = i * per_num,
                      n_tm = tm->clone(), n_sys = sys->clone()]() {
               vector<CombinateAnalysisOutput> ret;
-              try {
-                  Performance per;
-                  for (size_t i = 0, len = stks.size(); i < len; i++) {
-                      const Stock& n_stk = stks[i];
-                      for (const auto& sg : sgs) {
+              Performance per;
+              for (size_t i = 0, len = stks.size(); i < len; i++) {
+                  const Stock& n_stk = stks[i];
+                  for (const auto& sg : sgs) {
+                      try {
                           auto n_sg = sg->clone();
                           n_sys->setSG(n_sg);
                           n_sys->setTM(n_tm);
@@ -111,11 +120,13 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
                           out.name = n_stk.name();
                           out.values = per.values();
                           ret.emplace_back(out);
-                          //   HKU_INFO("id: {}", id);
+                      } catch (const std::exception& e) {
+                          HKU_ERROR(e.what());
+                      } catch (...) {
+                          HKU_ERROR("Unknown error!");
                       }
-                      printf(" | id: %zd, stock: %s", start + i, n_stk.code().c_str());
                   }
-              } catch (...) {
+                  //   printf(" | id: %zd, stock: %s", start + i, n_stk.code().c_str());
               }
               return ret;
           }));
