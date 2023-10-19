@@ -5,9 +5,10 @@
  *      Author: fasiondog
  */
 
-#include "hikyuu/utilities/thread/ThreadPool.h"
+#include "hikyuu/utilities/thread/MQStealThreadPool.h"
 #include "hikyuu/indicator/crt/EXIST.h"
 #include "hikyuu/trade_sys/signal/crt/SG_Bool.h"
+#include "hikyuu/global/GlobalTaskGroup.h"
 #include "combinate.h"
 
 namespace hku {
@@ -59,8 +60,6 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
   const Block& blk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
   const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n) {
     SPEND_TIME(combinateIndicatorAnalysisWithBlock);
-    HKU_INFO("combinateIndicatorAnalysisWithBlock");
-
     auto inds = combinateIndicator(buy_inds, n);
     std::vector<SignalPtr> sgs;
     for (const auto& buy_ind : inds) {
@@ -72,36 +71,54 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
     }
 
     vector<CombinateAnalysisOutput> result;
-    HKU_INFO("combinateIndicatorAnalysisWithBlock create tasks");
-    ThreadPool tg;
+    size_t work_num = 5;
+    MQStealThreadPool tg(work_num);
     vector<std::future<vector<CombinateAnalysisOutput>>> tasks;
-    int count = 0;
-    for (auto iter = blk.begin(); iter != blk.end(); ++iter) {
-        tasks.emplace_back(tg.submit([&sgs, id = count, n_query = query, n_stk = *iter,
-                                      n_tm = tm->clone(), n_sys = sys->clone()]() {
-            vector<CombinateAnalysisOutput> ret;
-            try {
-                Performance per;
-                for (const auto& sg : sgs) {
-                    auto n_sg = sg->clone();
-                    n_sys->setSG(n_sg);
-                    n_sys->setTM(n_tm);
-                    n_sys->run(n_stk, n_query);
-                    per.statistics(n_tm, Datetime::now());
-                    CombinateAnalysisOutput out;
-                    out.combinateName = n_sg->name();
-                    out.code = n_stk.code();
-                    out.name = n_stk.name();
-                    out.values = per.values();
-                    ret.emplace_back(out);
-                    //   HKU_INFO("id: {}", id);
-                }
-            } catch (...) {
+
+    auto stocks = blk.getAllStocks();
+    size_t total = stocks.size();
+    HKU_IF_RETURN(total == 0, result);
+
+    size_t per_num = total > work_num ? total / (work_num * 10) : 1;
+    size_t count = total % per_num == 0 ? total / per_num : total / per_num + 1;
+
+    vector<Stock> buf;
+    for (size_t i = 0; i < count; i++) {
+        buf.clear();
+        for (size_t n = i * per_num, end = (i + 1) * per_num; n < end; n++) {
+            if (n >= stocks.size()) {
+                break;
             }
-            printf(" | id: %d, stock: %s", id, n_stk.code().c_str());
-            return ret;
-        }));
-        count++;
+            buf.emplace_back(stocks[n]);
+        }
+        tasks.emplace_back(
+          tg.submit([sgs, stks = std::move(buf), n_query = query, start = i * per_num,
+                     n_tm = tm->clone(), n_sys = sys->clone()]() {
+              vector<CombinateAnalysisOutput> ret;
+              try {
+                  Performance per;
+                  for (size_t i = 0, len = stks.size(); i < len; i++) {
+                      const Stock& n_stk = stks[i];
+                      for (const auto& sg : sgs) {
+                          auto n_sg = sg->clone();
+                          n_sys->setSG(n_sg);
+                          n_sys->setTM(n_tm);
+                          n_sys->run(n_stk, n_query);
+                          per.statistics(n_tm, Datetime::now());
+                          CombinateAnalysisOutput out;
+                          out.combinateName = n_sg->name();
+                          out.code = n_stk.code();
+                          out.name = n_stk.name();
+                          out.values = per.values();
+                          ret.emplace_back(out);
+                          //   HKU_INFO("id: {}", id);
+                      }
+                      printf(" | id: %zd, stock: %s", start + i, n_stk.code().c_str());
+                  }
+              } catch (...) {
+              }
+              return ret;
+          }));
     }
 
     for (auto& task : tasks) {

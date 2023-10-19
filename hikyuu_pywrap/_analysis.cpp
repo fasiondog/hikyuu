@@ -102,6 +102,7 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
     for (size_t i = 0, total = names.size(); i < total; i++) {
         result[names[i]] = tmp[i];
     }
+
     return result;
 }
 

@@ -63,6 +63,16 @@ Stock Block::get(const string& market_code) const {
     return result;
 }
 
+vector<Stock> Block::getAllStocks() const {
+    vector<Stock> ret;
+    ret.reserve(size());
+    auto iter = m_data->m_stockDict.begin();
+    for (; iter != m_data->m_stockDict.end(); ++iter) {
+        ret.emplace_back(iter->second);
+    }
+    return ret;
+}
+
 bool Block::add(const Stock& stock) {
     HKU_IF_RETURN(stock.isNull() || have(stock), false);
     if (!m_data)

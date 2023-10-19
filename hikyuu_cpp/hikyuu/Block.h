@@ -86,6 +86,9 @@ public:
         return get(market_code);
     }
 
+    /** 获取板块下所有证券 */
+    vector<Stock> getAllStocks() const;
+
     /** 加入指定证券 */
     bool add(const Stock& stock);
 
