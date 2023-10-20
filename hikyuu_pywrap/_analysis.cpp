@@ -95,7 +95,7 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
         tmp[0].append(record.combinateName);
         tmp[1].append(record.code);
         tmp[2].append(record.name);
-        HKU_INFO_IF(names.size() != record.values.size() + 3, "lenght invalid: {} {}", names.size(),
+        HKU_WARN_IF(names.size() != record.values.size() + 3, "lenght invalid: {} {}", names.size(),
                     record.values.size());
         for (size_t j = 3, len = names.size(); j < len; j++) {
             tmp[j].append(record.values[j - 3]);
@@ -117,10 +117,18 @@ void export_analysis() {
 
     :param inds: list 或 tuple 等可使用索引的可迭代对象
     :return: 返回组合的索引，可用于获取输入中相应索引位置的值
-    :rtype: list
-    )");
+    :rtype: list)");
 
-    def("combinate_ind", combinate_indicator);
-    def("combinate_ind_analysis", combinate_ind_analysis);
-    def("combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
+    def("combinate_ind", combinate_indicator, (arg("inds"), arg("n") = 7),
+        R"(combinate_ind(inds[, n=7])
+
+    对输入的指标序列进行组合, 如输入为 [ind1, ind2], 输出为 [EXIST(ind1,n), EXIST(ind2,n), EXIST(ind1,n)&EXIST(ind2,n)]
+
+    :param list|tuple|seq inds: 待组合的指标列表
+    :param int n: 指标在 n 周期内存在
+    :return: 组合后的指标列表
+    :rtype: list)");
+
+    def("_combinate_ind_analysis", combinate_ind_analysis);
+    def("_combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
 }

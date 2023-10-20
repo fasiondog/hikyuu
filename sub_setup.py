@@ -56,6 +56,7 @@ packages = [
     'hikyuu',
     'hikyuu/admin',
     'hikyuu/admin/language',
+    'hikyuu/analysis',
     'hikyuu/config',
     'hikyuu/config/block',
     'hikyuu/cpp',
