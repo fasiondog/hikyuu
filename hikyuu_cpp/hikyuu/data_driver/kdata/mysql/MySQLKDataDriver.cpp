@@ -23,7 +23,7 @@ MySQLKDataDriver::~MySQLKDataDriver() {
 bool MySQLKDataDriver::_init() {
     HKU_ASSERT_M(m_connect == nullptr, "Maybe repeat initialization!");
     Parameter connect_param;
-    connect_param.set<string>("db", "");  //数据库名称须在SQL语句中明确指定
+    connect_param.set<string>("db", "");  // 数据库名称须在SQL语句中明确指定
     connect_param.set<string>("host", getParamFromOther<string>(m_params, "host", "127.0.0.1"));
     connect_param.set<string>("usr", getParamFromOther<string>(m_params, "usr", "root"));
     connect_param.set<string>("pwd", getParamFromOther<string>(m_params, "pwd", ""));
@@ -127,7 +127,7 @@ size_t MySQLKDataDriver::getCount(const string& market, const string& code, KQue
 
     try {
         result = m_connect->queryInt(
-          fmt::format("select count(1) from {}", _getTableName(market, code, kType)));
+          fmt::format("select count(1) from {}", _getTableName(market, code, kType)), 0);
     } catch (...) {
         // 表可能不存在, 不打印异常信息
         result = 0;
@@ -149,9 +149,11 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
     string tablename = _getTableName(market, code, query.kType());
     try {
         out_start = m_connect->queryInt(fmt::format("select count(1) from {} where date<{}",
-                                                    tablename, query.startDatetime().number()));
+                                                    tablename, query.startDatetime().number()),
+                                        0);
         out_end = m_connect->queryInt(fmt::format("select count(1) from {} where date<{}",
-                                                  tablename, query.endDatetime().number()));
+                                                  tablename, query.endDatetime().number()),
+                                      0);
     } catch (...) {
         // 表可能不存在, 不打印异常信息
         out_start = 0;

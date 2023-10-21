@@ -28,9 +28,9 @@ class SignupHandle : public NoAuthRestHandle {
         user.setStatus(UserModel::STATUS::NORMAL);
         auto con = DB::getConnect();
         {
-            TransAction trans(con);
+            AutoTransAction trans(con);
             int count = con->queryInt(fmt::format(R"(select count(id) from {} where name="{}")",
-                                                  UserModel::getTableName(), user.getName()));
+                                                  UserModel::getTableName(), user.getName()), 0);
             REQ_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION,
                       _ctr("user", "Unavailable user name"));
             user.setUserId(DB::getNewUserId());
@@ -92,7 +92,7 @@ class LogoutHandle : public RestHandle {
         }
         try {
             auto con = DB::getConnect();
-            TransAction trans(con);
+            AutoTransAction trans(con);
             con->exec(
               fmt::format(R"(delete from {} where token="{}")", TokenModel::getTableName(), token));
         } catch (std::exception& e) {

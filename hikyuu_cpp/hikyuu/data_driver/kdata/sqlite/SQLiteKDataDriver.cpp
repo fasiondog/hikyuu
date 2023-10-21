@@ -209,7 +209,7 @@ size_t SQLiteKDataDriver::getCount(const string& market, const string& code, KQu
 
     size_t result = 0;
     result = connection->queryInt(
-      fmt::format("select count(1) from {}", _getTableName(market, code, kType)));
+      fmt::format("select count(1) from {}", _getTableName(market, code, kType)), 0);
 
     if (isBaseKType(kType))
         return result;
@@ -235,9 +235,11 @@ bool SQLiteKDataDriver::getIndexRangeByDate(const string& market, const string& 
     string tablename = _getTableName(market, code, query.kType());
     try {
         out_start = connection->queryInt(fmt::format("select count(1) from {} where date<{}",
-                                                     tablename, query.startDatetime().number()));
+                                                     tablename, query.startDatetime().number()),
+                                         0);
         out_end = connection->queryInt(fmt::format("select count(1) from {} where date<{}",
-                                                   tablename, query.endDatetime().number()));
+                                                   tablename, query.endDatetime().number()),
+                                       0);
     } catch (...) {
         // 表可能不存在, 不打印异常信息
         out_start = 0;

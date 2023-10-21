@@ -12,24 +12,27 @@
 
 namespace hku {
 
-/** SQL 数据库引擎处理异常 */
+/** SQL 处理异常, 主要用于封装具体数据库引擎内部错误 */
 class SQLException : public hku::exception {
 public:
-    SQLException() = delete;
+    /** 默认构造函数 */
+    SQLException() : SQLException(0, "Unknow error!") {}
 
     /**
      * 构造 SQLite 异常
      * @param errcode SQLite错误码
      * @param msg SQLite错误信息
      */
-    SQLException(int errcode, const std::string& msg) : hku::exception(msg), m_errcode(errcode) {}
+    SQLException(int errcode, const std::string& msg)
+    : hku::exception(fmt::format("{} (errcode: {})", msg, errcode)), m_errcode(errcode) {}
 
     /**
      * 构造 SQLite 异常
      * @param errcode SQLite错误码
      * @param msg SQLite错误信息
      */
-    SQLException(int errcode, const char* msg) : hku::exception(msg), m_errcode(errcode) {}
+    SQLException(int errcode, const char* msg)
+    : hku::exception(fmt::format("{} (errcode: {})", msg, errcode)), m_errcode(errcode) {}
 
     /** 获取 SQLite 错误码 */
     int errcode() const {
@@ -44,16 +47,16 @@ private:
     do {                                                                                         \
         if (!(expr)) {                                                                           \
             throw SQLException(                                                                  \
-              errcode, fmt::format("CHECK({}) {} [{}] ({}:{})", #expr, fmt::format(__VA_ARGS__), \
-                                   __FUNCTION__, __FILE__, __LINE__));                           \
+              errcode, fmt::format("SQL_CHECK({}) {} [{}] ({}:{})", #expr,                       \
+                                   fmt::format(__VA_ARGS__), __FUNCTION__, __FILE__, __LINE__)); \
         }                                                                                        \
     } while (0)
 
-#define SQL_THROW(errcode, ...)                                                                \
-    do {                                                                                       \
-        throw SQLException(errcode,                                                            \
-                           fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
-                                       __FUNCTION__, __FILE__, __LINE__));                     \
+#define SQL_THROW(errcode, ...)                                                                    \
+    do {                                                                                           \
+        throw SQLException(errcode,                                                                \
+                           fmt::format("SQL_EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
+                                       __FUNCTION__, __FILE__, __LINE__));                         \
     } while (0)
 
 }  // namespace hku

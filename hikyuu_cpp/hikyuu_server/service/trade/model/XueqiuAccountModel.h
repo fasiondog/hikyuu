@@ -15,13 +15,11 @@ namespace hku {
 class TradeDbBean;
 
 class XueqiuAccountModel {
-    TABLE_BIND4(td_account_xq, td_id, cookies, portfolio_code, portfolio_market)
+    TABLE_BIND4(XueqiuAccountModel, td_account_xq, td_id, cookies, portfolio_code, portfolio_market)
     friend class TradeDbBean;
 
 public:
     static constexpr const char* ACCOUNT_TYPE = "xq";
-
-    XueqiuAccountModel() : td_id(0) {}
 
     int64_t getTdId() const {
         return td_id;

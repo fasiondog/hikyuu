@@ -22,13 +22,20 @@
 namespace hku {
 
 struct ASC {
-    ASC(const std::string& name) : name(name) {}
+    explicit ASC(const char* name) : name(name) {}
+    explicit ASC(const std::string& name) : name(name) {}
     std::string name;
 };
 
 struct DESC {
-    DESC(const std::string& name) : name(name) {}
+    explicit DESC(const char* name) : name(name) {}
+    explicit DESC(const std::string& name) : name(name) {}
     std::string name;
+};
+
+struct LIMIT {
+    explicit LIMIT(int limit) : limit(limit) {}
+    int limit = 1;
 };
 
 class HKU_API DBCondition {
@@ -65,7 +72,12 @@ public:
     }
 
     DBCondition& operator+(const DESC& desc) {
-        orderBy(desc.name, ORDER_ASC);
+        orderBy(desc.name, ORDER_DESC);
+        return *this;
+    }
+
+    DBCondition& operator+(const LIMIT& limit) {
+        m_condition = fmt::format("{} limit {}", m_condition, limit.limit);
         return *this;
     }
 
@@ -78,7 +90,8 @@ private:
 };
 
 struct Field {
-    Field(const std::string& name) : name(name) {}
+    explicit Field(const char* name) : name(name) {}
+    explicit Field(const std::string& name) : name(name) {}
 
     // in 和 not_in 不支持 字符串，一般不会用到 in ("stra", "strb") 的 SQL 操作
     template <typename T>

@@ -42,16 +42,9 @@ TEST_CASE("test_sqlite") {
         }
 
         class T2019 {
-            TABLE_BIND5(t2019, name, data_int32_t, data_int64_t, data_double, data_float);
+            TABLE_BIND5(T2019, t2019, name, data_int32_t, data_int64_t, data_double, data_float);
 
         public:
-            T2019()
-            : name(Null<string>()),
-              data_int32_t(Null<int32_t>()),
-              data_int64_t(Null<int64_t>()),
-              data_double(Null<double>()),
-              data_float(Null<float>()) {}
-
             void reset() {
                 name = "";
                 data_int32_t = Null<int32_t>();
@@ -89,9 +82,8 @@ TEST_CASE("test_sqlite") {
 
     {
         class TTT {
-            TABLE_BIND4(ttt, name, age, email, other)
+            TABLE_BIND4(TTT, ttt, name, age, email, other)
         public:
-            TTT() {}
             TTT(const string& name, int age) : name(name), age(age) {}
             TTT(const string& name, int age, const string& email)
             : name(name), age(age), email(email) {}

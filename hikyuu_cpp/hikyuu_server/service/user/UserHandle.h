@@ -59,9 +59,10 @@ public:
         user.setStartTime(Datetime::now());
         user.setStatus(UserModel::STATUS::NORMAL);
         {
-            TransAction trans(con);
+            AutoTransAction trans(con);
             int count = con->queryInt(fmt::format(R"(select count(id) from {} where name="{}")",
-                                                  UserModel::getTableName(), user.getName()));
+                                                  UserModel::getTableName(), user.getName()),
+                                      0);
             REQ_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION,
                       _ctr("user", "Unavailable user name"));
             user.setUserId(DB::getNewUserId());
@@ -92,7 +93,7 @@ class RemoveUserHandle : public RestHandle {
                   _ctr("user", "The admin account cannot be deleted"));
         {
             UserModel user;
-            TransAction trans(con);
+            AutoTransAction trans(con);
             con->load(user, fmt::format(R"(userid="{}")", req["userid"].get<uint64_t>()));
             if (user.id() != 0 && user.getStatus() != UserModel::DELETED) {
                 TokenModel tm;
@@ -160,7 +161,7 @@ class ResetPasswordUserHandle : public RestHandle {
         check_missing_param("userid");
         {
             UserModel user;
-            TransAction trans(con);
+            AutoTransAction trans(con);
             con->load(user, fmt::format(R"(userid="{}")", req["userid"].get<uint64_t>()));
             if (user.id() != 0 && user.getStatus() != UserModel::DELETED) {
                 user.setPassword(

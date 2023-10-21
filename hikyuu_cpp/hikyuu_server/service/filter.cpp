@@ -55,7 +55,7 @@ void AuthorizeFilter(HttpHandle *handle) {
             {
                 TokenModel token_record;
                 auto con = DB::getConnect();
-                TransAction trans(con);
+                AutoTransAction trans(con);
                 con->load(token_record, fmt::format(R"(token="{}")", token));
                 con->exec(fmt::format(R"(delete from {} where token="{}")",
                                       TokenModel::getTableName(), token));

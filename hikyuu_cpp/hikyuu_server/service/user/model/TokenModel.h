@@ -13,11 +13,9 @@
 namespace hku {
 
 class TokenModel {
-    TABLE_BIND2(admin_token, userid, token)
+    TABLE_BIND2(TokenModel, admin_token, userid, token)
 
 public:
-    TokenModel() = default;
-
     uint64_t getUserId() const {
         return userid;
     }

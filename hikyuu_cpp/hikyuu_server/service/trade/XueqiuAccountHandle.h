@@ -58,7 +58,7 @@ class AddXueqiuAccountHandle : public RestHandle {
 
         auto con = TradeDbBean::getConnect();
         try {
-            TransAction trans(con);
+            AutoTransAction trans(con);
             TradeAccountModel td;
             td.setTdId(TradeDbBean::getNewTdId());
             td.setUserId(getCurrentUserId());
@@ -91,7 +91,7 @@ class RemoveXueqiuAccountHandle : public RestHandle {
         int64_t td_id = req["td_id"].get<int64_t>();
         auto con = TradeDbBean::getConnect();
         try {
-            TransAction trans(con);
+            AutoTransAction trans(con);
             con->exec(fmt::format("delete from {} where td_id={}",
                                   XueqiuAccountModel::getTableName(), td_id));
             con->exec(fmt::format("delete from {} where td_id={}",
@@ -111,7 +111,7 @@ class ModifyXueqiuAccountHandle : public RestHandle {
         int64_t td_id = req["td_id"].get<int64_t>();
         auto con = TradeDbBean::getConnect();
         try {
-            TransAction trans(con);
+            AutoTransAction trans(con);
             if (req.contains("name")) {
                 con->exec(fmt::format(R"(update {} set name={} where td_id={})",
                                       TradeAccountModel::getTableName(), req["name"], td_id));

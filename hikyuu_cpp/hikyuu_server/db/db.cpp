@@ -80,9 +80,11 @@ DBConnectPtr DB::getConnect() {
 
 bool DB::isValidEumValue(const std::string& table, const std::string& field,
                          const std::string& val) {
-    int count = getConnect()->queryInt(fmt::format(
-      R"(select count(1) from td_enum where table_name="{}" and field_name="{}" and value="{}")",
-      table, field, val));
+    int count = getConnect()->queryInt(
+      fmt::format(
+        R"(select count(1) from td_enum where table_name="{}" and field_name="{}" and value="{}")",
+        table, field, val),
+      0);
     return count > 0;
 }
 

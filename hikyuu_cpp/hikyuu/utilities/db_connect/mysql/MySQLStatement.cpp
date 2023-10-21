@@ -10,9 +10,19 @@
 #include "MySQLStatement.h"
 #include "MySQLConnect.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#endif
+
 namespace hku {
 
-MySQLStatement::MySQLStatement(DBConnectBase* driver, const string& sql_statement)
+MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_statement)
 : SQLStatementBase(driver, sql_statement),
   m_db((dynamic_cast<MySQLConnect*>(driver))->m_mysql),
   m_stmt(nullptr),
@@ -119,9 +129,9 @@ void MySQLStatement::_bindResult() {
                    field->type == MYSQL_TYPE_BLOB) {
             unsigned long length = field->length + 1;
             m_result_bind[idx].buffer_length = length;
-            m_result_buffer.emplace_back(vector<char>(length));
+            m_result_buffer.emplace_back(std::vector<char>(length));
             auto& buf = m_result_buffer.back();
-            vector<char>* p = boost::any_cast<vector<char>>(&buf);
+            std::vector<char>* p = boost::any_cast<std::vector<char>>(&buf);
             m_result_bind[idx].buffer = p->data();
         } else if (field->type == MYSQL_TYPE_TINY) {
             int8_t item = 0;
@@ -192,10 +202,22 @@ void MySQLStatement::sub_bindText(int idx, const string& item) {
               m_param_bind.size());
     m_param_buffer.push_back(item);
     auto& buf = m_param_buffer.back();
-    string* p = boost::any_cast<string>(&buf);
+    std::string* p = boost::any_cast<std::string>(&buf);
     m_param_bind[idx].buffer_type = MYSQL_TYPE_VAR_STRING;
     m_param_bind[idx].buffer = (void*)p->data();
     m_param_bind[idx].buffer_length = item.size();
+    m_param_bind[idx].is_null = 0;
+}
+
+void MySQLStatement::sub_bindText(int idx, const char* item, size_t len) {
+    HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
+              m_param_bind.size());
+    m_param_buffer.push_back(std::string(item));
+    auto& buf = m_param_buffer.back();
+    std::string* p = boost::any_cast<std::string>(&buf);
+    m_param_bind[idx].buffer_type = MYSQL_TYPE_VAR_STRING;
+    m_param_bind[idx].buffer = (void*)p->data();
+    m_param_bind[idx].buffer_length = p->size();
     m_param_bind[idx].is_null = 0;
 }
 
@@ -204,10 +226,22 @@ void MySQLStatement::sub_bindBlob(int idx, const string& item) {
               m_param_bind.size());
     m_param_buffer.push_back(item);
     auto& buf = m_param_buffer.back();
-    string* p = boost::any_cast<string>(&buf);
+    std::string* p = boost::any_cast<std::string>(&buf);
     m_param_bind[idx].buffer_type = MYSQL_TYPE_BLOB;
     m_param_bind[idx].buffer = (void*)p->data();
     m_param_bind[idx].buffer_length = item.size();
+    m_param_bind[idx].is_null = 0;
+}
+
+void MySQLStatement::sub_bindBlob(int idx, const char* item, size_t len) {
+    HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
+              m_param_bind.size());
+    m_param_buffer.push_back(std::string(item));
+    auto& buf = m_param_buffer.back();
+    std::string* p = boost::any_cast<std::string>(&buf);
+    m_param_bind[idx].buffer_type = MYSQL_TYPE_BLOB;
+    m_param_bind[idx].buffer = (void*)p->data();
+    m_param_bind[idx].buffer_length = p->size();
     m_param_bind[idx].is_null = 0;
 }
 
@@ -306,3 +340,11 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, string& item) {
 }
 
 }  // namespace hku
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif

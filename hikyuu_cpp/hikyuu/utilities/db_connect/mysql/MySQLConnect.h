@@ -32,9 +32,10 @@ public:
 
     virtual bool ping() override;
 
-    virtual void exec(const string& sql_string) override;
-    virtual SQLStatementPtr getStatement(const string& sql_statement) override;
-    virtual bool tableExist(const string& tablename) override;
+    virtual int64_t exec(const std::string& sql_string) override;
+    virtual SQLStatementPtr getStatement(const std::string& sql_statement) override;
+    virtual bool tableExist(const std::string& tablename) override;
+    virtual void resetAutoIncrement(const std::string& tablename) override;
 
     virtual void transaction() override;
     virtual void commit() override;

@@ -10,11 +10,10 @@
 #ifndef HIKYUU_DB_CONNECT_H
 #define HIKYUU_DB_CONNECT_H
 
+#include "SQLResultSet.h"
 #include "DBConnectBase.h"
-#include "SQLException.h"
-#include "DBCondition.h"
 #include "SQLStatementBase.h"
-#include "TransAction.h"
+#include "AutoTransAction.h"
 #include "TableMacro.h"
 #include "DBUpgrade.h"
 

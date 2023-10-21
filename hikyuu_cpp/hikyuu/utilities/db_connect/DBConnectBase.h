@@ -18,24 +18,31 @@
 
 namespace hku {
 
+template <class TableT, size_t page_size>
+class SQLResultSet;
+
 /**
  * 数据库连接基类
  * @ingroup DBConnect
  */
-class HKU_API DBConnectBase {
-    PARAMETER_SUPPORT
+class HKU_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase> {
+    PARAMETER_SUPPORT  // NOSONAR
 
 public:
     /**
      * 构造函数
      * @param param 数据库连接参数
      */
-    explicit DBConnectBase(const Parameter& param);
+    explicit DBConnectBase(const Parameter &param);
     virtual ~DBConnectBase() = default;
 
     //-------------------------------------------------------------------------
     // 子类接口
     //-------------------------------------------------------------------------
+
+    /** ping 操作，用于判断是否连接 */
+    virtual bool ping() = 0;
+
     /** 开始事务 */
     virtual void transaction() = 0;
 
@@ -45,17 +52,21 @@ public:
     /** 回滚事务 */
     virtual void rollback() = 0;
 
-    /** 检测连接是否可用 */
-    virtual bool ping() = 0;
-
     /** 执行无返回结果的 SQL */
-    virtual void exec(const string& sql_string) = 0;
+    virtual int64_t exec(const std::string &sql_string) = 0;
 
     /** 获取 SQLStatement */
-    virtual SQLStatementPtr getStatement(const string& sql_statement) = 0;
+    virtual SQLStatementPtr getStatement(const std::string &sql_statement) = 0;
 
     /** 判断表是否存在 */
-    virtual bool tableExist(const string& tablename) = 0;
+    virtual bool tableExist(const std::string &tablename) = 0;
+
+    /**
+     * 重置含自增 id 的表中的 id 从 1开始
+     * @param tablename 待重置id的表名
+     * @exception 表中仍旧含有数据时，抛出异常
+     */
+    virtual void resetAutoIncrement(const std::string &tablename) = 0;
 
     //-------------------------------------------------------------------------
     // 模板方法
@@ -64,10 +75,9 @@ public:
      * 保存或更新 通过 TABLE_BIND 绑定的表结构
      * 可由 driver 直接保存，示例如下：
      * @code
-     * class TTT {
+     * struct TTT {
      *   TABLE_BIND(TTT, ttt_table, age, name)
      *
-     *   public:
      *       int age;
      *       string name;
      *   public:
@@ -92,7 +102,7 @@ public:
      * @param autotrans 启动事务
      */
     template <typename T>
-    void save(T& item, bool autotrans = true);
+    void save(T &item, bool autotrans = true);
 
     /**
      * 批量保存
@@ -100,7 +110,7 @@ public:
      * @param autotrans 启动事务
      */
     template <class Container>
-    void batchSave(Container& container, bool autotrans = true);
+    void batchSave(Container &container, bool autotrans = true);
 
     /**
      * 批量保存，迭代器中的数据必须是通过 TABLE_BIND 绑定的表模型
@@ -118,7 +128,7 @@ public:
      * @param where 查询条件，如：“id=1"
      */
     template <typename T>
-    void load(T& item, const string& where = "");
+    void load(T &item, const std::string &where = "");
 
     /**
      * 加载模型数据至指定的模型实例
@@ -127,7 +137,7 @@ public:
      * @param cond 查询条件，如：“id=1"
      */
     template <typename T>
-    void load(T& item, const DBCondition& cond);
+    void load(T &item, const DBCondition &cond);
 
     /**
      * 批量加载模型数据至容器（vector，list 等支持 push_back 的容器）
@@ -135,7 +145,7 @@ public:
      * @param where 查询条件
      */
     template <typename Container>
-    void batchLoad(Container& container, const string& where = "");
+    void batchLoad(Container &container, const std::string &where = "");
 
     /**
      * 批量加载模型数据至容器（vector，list 等支持 push_back 的容器）
@@ -143,7 +153,7 @@ public:
      * @param cond 查询条件
      */
     template <typename Container>
-    void batchLoad(Container& container, const DBCondition& cond);
+    void batchLoad(Container &container, const DBCondition &cond);
 
     /**
      * 批量更新
@@ -151,7 +161,7 @@ public:
      * @param autotrans 启动事务
      */
     template <class Container>
-    void batchUpdate(Container& container, bool autotrans = true);
+    void batchUpdate(Container &container, bool autotrans = true);
 
     /**
      * 批量更新
@@ -168,7 +178,7 @@ public:
      * @param autotrans 启动事务
      */
     template <class Container>
-    void batchSaveOrUpdate(Container& container, bool autotrans = true);
+    void batchSaveOrUpdate(Container &container, bool autotrans = true);
 
     /**
      * 批量保存或更新
@@ -185,7 +195,7 @@ public:
      * @param where 删除条件
      * @param autotrans 启动事务
      */
-    void remove(const std::string& tablename, const std::string& where, bool autotrans = true);
+    void remove(const std::string &tablename, const std::string &where, bool autotrans = true);
 
     /**
      * 从指定表中删除符合条件的数据指定条件删除
@@ -193,15 +203,15 @@ public:
      * @param cond 删除条件
      * @param autotrans 启动事务
      */
-    void remove(const std::string& tablename, const DBCondition& cond, bool autotrans = true);
+    void remove(const std::string &tablename, const DBCondition &cond, bool autotrans = true);
 
     /**
      * 删除
-     * @param item 待删除的数据, 通过 item.id() 删除
+     * @param item 待删除的数据, 通过 item.rowid() 删除，删除后，rowid, 将被置为无效
      * @param autotrans 启动事务
      */
     template <typename T>
-    void remove(T& item, bool autotrans = true);
+    void remove(T &item, bool autotrans = true);
 
     /**
      * 批量删除
@@ -209,7 +219,7 @@ public:
      * @param autotrans 启动事务
      */
     template <class Container>
-    void batchRemove(Container& container, bool autotrans = true);
+    void batchRemove(Container &container, bool autotrans = true);
 
     /**
      * 批量删除，迭代器中的数据必须是通过 TABLE_BIND 绑定的表模型
@@ -224,8 +234,47 @@ public:
      * 查询单个整数，如：select count(*) from table
      * @note sql 语句应只返回单个元素，否则将抛出异常，如多条记录、多个列
      * @param query 查询语句
+     * @param default_val 当查询失败时，返回该默认值。如果该值为 Null<int>(), 则抛出异常。
      */
-    int queryInt(const string& query);
+    int queryInt(const std::string &query, int default_val);
+
+    /**
+     * 查询统计数据，如：select count(*) from table
+     * @note sql 语句应只返回单个元素，否则将抛出异常，如多条记录、多个列
+     * @param query 查询语句
+     * @param default_val 当查询失败时，返回该默认值。如果该值为 Null<NumberType>(), 则抛出异常。
+     */
+    template <typename NumberType>
+    NumberType queryNumber(const std::string &query, NumberType default_val = Null<NumberType>());
+
+    /**
+     * 分页查询
+     * @tparam TableT 查询数据结构
+     * @tparam page_size 每页数据记录数
+     * @return SQLResultSet<TableT, page_size>
+     */
+    template <typename TableT, size_t page_size = 50>
+    SQLResultSet<TableT, page_size> query();
+
+    /**
+     * 分页查询
+     * @tparam TableT 查询数据结构
+     * @tparam page_size 每页数据记录数
+     * @param query 查询条件
+     * @return SQLResultSet<TableT, page_size>
+     */
+    template <typename TableT, size_t page_size = 50>
+    SQLResultSet<TableT, page_size> query(const std::string &query);
+
+    /**
+     * 分页查询
+     * @tparam TableT 查询数据结构
+     * @tparam page_size 每页数据记录数
+     * @param cond 查询条件
+     * @return SQLResultSet<TableT, page_size>
+     */
+    template <typename TableT, size_t page_size = 50>
+    SQLResultSet<TableT, page_size> query(const DBCondition &cond);
 
 private:
     DBConnectBase() = delete;
@@ -238,16 +287,26 @@ typedef shared_ptr<DBConnectBase> DBConnectPtr;
 // inline方法实现
 //-------------------------------------------------------------------------
 
-inline DBConnectBase::DBConnectBase(const Parameter& param) : m_params(param) {}
+inline DBConnectBase::DBConnectBase(const Parameter &param) : m_params(param) {}
 
-inline int DBConnectBase::queryInt(const string& query) {
+inline int DBConnectBase::queryInt(const std::string &query, int default_val) {
+    return queryNumber<int>(query, default_val);
+}
+
+template <typename NumberType>
+NumberType DBConnectBase::queryNumber(const std::string &query, NumberType default_val) {
     SQLStatementPtr st = getStatement(query);
     st->exec();
-    HKU_CHECK((st->moveNext() && st->getNumColumns() == 1),
-              "query doesn't result in exactly 1 element");
-    int result = 0;
+    if (!(st->moveNext() && st->getNumColumns() == 1)) {
+        HKU_CHECK(default_val != Null<NumberType>(), "query doesn't result in exactly 1 element");
+        return default_val;
+    }
+    NumberType result = 0;
     st->getColumn(0, result);
-    HKU_CHECK(!st->moveNext(), "query doesn't result in exactly 1 element");
+    if (st->moveNext()) {
+        HKU_CHECK(default_val != Null<NumberType>(), "query doesn't result in exactly 1 element");
+        return default_val;
+    }
     return result;
 }
 
@@ -255,35 +314,50 @@ inline int DBConnectBase::queryInt(const string& query) {
 // 模板方法实现
 //-------------------------------------------------------------------------
 
+template <typename TableT, size_t page_size>
+SQLResultSet<TableT, page_size> DBConnectBase::query() {
+    return SQLResultSet<TableT, page_size>(shared_from_this(), "");
+}
+
+template <typename TableT, size_t page_size>
+SQLResultSet<TableT, page_size> DBConnectBase::query(const std::string &query) {
+    return SQLResultSet<TableT, page_size>(shared_from_this(), query);
+}
+
+template <typename TableT, size_t page_size>
+SQLResultSet<TableT, page_size> DBConnectBase::query(const DBCondition &cond) {
+    return SQLResultSet<TableT, page_size>(shared_from_this(), cond.str());
+}
+
 template <typename T>
-void DBConnectBase::save(T& item, bool autotrans) {
+void DBConnectBase::save(T &item, bool autotrans) {
     SQLStatementPtr st =
-      item.id() == 0 ? getStatement(T::getInsertSQL()) : getStatement(T::getUpdateSQL());
+      item.valid() ? getStatement(T::getUpdateSQL()) : getStatement(T::getInsertSQL());
     if (autotrans) {
         transaction();
     }
 
     try {
-        if (item.id() == 0) {
-            item.save(st);
-            st->exec();
-            item.id(st->getLastRowid());
-        } else {
+        if (item.valid()) {
             item.update(st);
             st->exec();
+        } else {
+            item.save(st);
+            st->exec();
+            item.rowid(st->getLastRowid());
         }
 
         if (autotrans) {
             commit();
         }
 
-    } catch (hku::SQLException& e) {
+    } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "failed save! sql: {}! {}", st->getSqlString(), e.what());
 
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
@@ -298,7 +372,7 @@ void DBConnectBase::save(T& item, bool autotrans) {
 }
 
 template <class Container>
-inline void DBConnectBase::batchSave(Container& container, bool autotrans) {
+inline void DBConnectBase::batchSave(Container &container, bool autotrans) {
     batchSave(container.begin(), container.end(), autotrans);
 }
 
@@ -313,20 +387,20 @@ void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool auto
         for (InputIterator iter = first; iter != last; ++iter) {
             iter->save(st);
             st->exec();
-            iter->id(st->getLastRowid());
+            iter->rowid(st->getLastRowid());
         }
 
         if (autotrans) {
             commit();
         }
 
-    } catch (hku::SQLException& e) {
+    } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "failed batch save! sql: {}! {}", st->getSqlString(), e.what());
 
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
@@ -341,7 +415,7 @@ void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool auto
 }
 
 template <typename T>
-void DBConnectBase::load(T& item, const string& where) {
+void DBConnectBase::load(T &item, const string &where) {
     std::ostringstream sql;
     if (where != "") {
         sql << T::getSelectSQL() << " where " << where << " limit 1";
@@ -356,12 +430,12 @@ void DBConnectBase::load(T& item, const string& where) {
 }
 
 template <typename T>
-void DBConnectBase::load(T& item, const DBCondition& cond) {
+void DBConnectBase::load(T &item, const DBCondition &cond) {
     load(item, cond.str());
 }
 
 template <typename Container>
-void DBConnectBase::batchLoad(Container& container, const string& where) {
+void DBConnectBase::batchLoad(Container &container, const string &where) {
     std::ostringstream sql;
     if (where != "") {
         sql << Container::value_type::getSelectSQL() << " where " << where;
@@ -378,12 +452,12 @@ void DBConnectBase::batchLoad(Container& container, const string& where) {
 }
 
 template <typename Container>
-void DBConnectBase::batchLoad(Container& container, const DBCondition& cond) {
+void DBConnectBase::batchLoad(Container &container, const DBCondition &cond) {
     batchLoad(container, cond.str());
 }
 
 template <class Container>
-inline void DBConnectBase::batchUpdate(Container& container, bool autotrans) {
+inline void DBConnectBase::batchUpdate(Container &container, bool autotrans) {
     batchUpdate(container.begin(), container.end(), autotrans);
 }
 
@@ -404,13 +478,13 @@ void DBConnectBase::batchUpdate(InputIterator first, InputIterator last, bool au
             commit();
         }
 
-    } catch (hku::SQLException& e) {
+    } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
-        SQL_THROW(e.errcode(), "failed batch update! sql: {}! {}", st->getSqlString(), e.what());
+        SQL_THROW(e.errcode(), "failed batch save! sql: {}! {}", st->getSqlString(), e.what());
 
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
@@ -426,13 +500,13 @@ void DBConnectBase::batchUpdate(InputIterator first, InputIterator last, bool au
 
 template <class InputIterator>
 void DBConnectBase::batchSaveOrUpdate(InputIterator first, InputIterator last, bool autotrans) {
-    vector<typename InputIterator::value_type> save_list;
-    vector<typename InputIterator::value_type> update_list;
+    std::vector<typename InputIterator::value_type> save_list;
+    std::vector<typename InputIterator::value_type> update_list;
     for (auto iter = first; iter != last; ++iter) {
-        if (iter->id() == 0) {
-            save_list.push_back(*iter);
-        } else {
+        if (iter->valid()) {
             update_list.push_back(*iter);
+        } else {
+            save_list.push_back(*iter);
         }
     }
 
@@ -441,15 +515,15 @@ void DBConnectBase::batchSaveOrUpdate(InputIterator first, InputIterator last, b
 }
 
 template <class Container>
-inline void DBConnectBase::batchSaveOrUpdate(Container& container, bool autotrans) {
+inline void DBConnectBase::batchSaveOrUpdate(Container &container, bool autotrans) {
     batchSaveOrUpdate(container.begin(), container.end(), autotrans);
 }
 
 template <typename T>
-void DBConnectBase::remove(T& item, bool autotrans) {
-    HKU_CHECK(item.id() != 0, "Invalid item, id is 0!");
+void DBConnectBase::remove(T &item, bool autotrans) {
+    HKU_CHECK(item.valid(), "Invalid item, id is 0!");
     SQLStatementPtr st =
-      getStatement(fmt::format("delete from `{}` where id={}", T::getTableName(), item.id()));
+      getStatement(fmt::format("delete from {} where id={}", T::getTableName(), item.rowid()));
     if (autotrans) {
         transaction();
     }
@@ -459,14 +533,15 @@ void DBConnectBase::remove(T& item, bool autotrans) {
         if (autotrans) {
             commit();
         }
+        item.rowid(0);
 
-    } catch (hku::SQLException& e) {
+    } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "failed delete! sql: {}! {}", st->getSqlString(), e.what());
 
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
@@ -481,7 +556,7 @@ void DBConnectBase::remove(T& item, bool autotrans) {
 }
 
 template <class Container>
-inline void DBConnectBase::batchRemove(Container& container, bool autotrans) {
+inline void DBConnectBase::batchRemove(Container &container, bool autotrans) {
     batchRemove(container.begin(), container.end(), autotrans);
 }
 
@@ -500,13 +575,13 @@ void DBConnectBase::batchRemove(InputIterator first, InputIterator last, bool au
             commit();
         }
 
-    } catch (hku::SQLException& e) {
+    } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "failed batch delete! {}", e.what());
 
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
@@ -520,25 +595,28 @@ void DBConnectBase::batchRemove(InputIterator first, InputIterator last, bool au
     }
 }
 
-inline void DBConnectBase::remove(const std::string& tablename, const std::string& where,
+inline void DBConnectBase::remove(const std::string &tablename, const std::string &where,
                                   bool autotrans) {
     if (autotrans) {
         transaction();
     }
 
-    std::string sql(fmt::format("delete from `{}` where {}", tablename, where));
+    std::string sql = (where == "" || where == "1=1")
+                        ? fmt::format("delete from {}", tablename, where)
+                        : (fmt::format("delete from {} where {}", tablename, where));
     try {
         exec(sql);
         if (autotrans) {
             commit();
         }
 
-    } catch (hku::SQLException& e) {
+    } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "Failed exec sql: {}! {}", sql, e.what());
-    } catch (std::exception& e) {
+
+    } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
@@ -551,7 +629,7 @@ inline void DBConnectBase::remove(const std::string& tablename, const std::strin
     }
 }
 
-inline void DBConnectBase::remove(const std::string& tablename, const DBCondition& cond,
+inline void DBConnectBase::remove(const std::string &tablename, const DBCondition &cond,
                                   bool autotrans) {
     remove(tablename, cond.str(), autotrans);
 }

@@ -12,7 +12,7 @@
 namespace hku {
 
 class TradeAccountModel {
-    TABLE_BIND4(td_account, td_id, userid, name, type)
+    TABLE_BIND4(TradeAccountModel, td_account, td_id, userid, name, type)
 
 public:
     int64_t getTdId() const {

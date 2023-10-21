@@ -16,31 +16,19 @@
 namespace hku {
 
 class StockWeightTable {
-    TABLE_BIND9(stkweight, stockid, date, countAsGift, countForSell, priceForSell, bonus,
-                countOfIncreasement, totalCount, freeCount)
+    TABLE_BIND9(StockWeightTable, stkweight, stockid, date, countAsGift, countForSell, priceForSell,
+                bonus, countOfIncreasement, totalCount, freeCount)
 
 public:
-    StockWeightTable()
-    : stockid(0),
-      date(0),
-      countAsGift(0),
-      countForSell(0),
-      priceForSell(0),
-      bonus(0),
-      countOfIncreasement(0),
-      totalCount(0),
-      freeCount(0) {}
-
-public:
-    uint64_t stockid;
-    uint64_t date;
-    double countAsGift;
-    double countForSell;
-    double priceForSell;
-    double bonus;
-    double countOfIncreasement;
-    double totalCount;
-    double freeCount;
+    uint64_t stockid{0};
+    uint64_t date{0};
+    double countAsGift{0.};
+    double countForSell{0.};
+    double priceForSell{0.};
+    double bonus{0.};
+    double countOfIncreasement{0.};
+    double totalCount{0.};
+    double freeCount{0.};
 };
 
 }  // namespace hku

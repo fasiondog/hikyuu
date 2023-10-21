@@ -31,9 +31,24 @@ SQLiteConnect::SQLiteConnect(const Parameter& param) : DBConnectBase(param), m_d
         if (haveParam("flags")) {
             flags = getParam<int>("flags");
         }
+
         int rc = sqlite3_open_v2(m_dbname.c_str(), &m_db, flags, NULL);
         SQL_CHECK(rc == SQLITE_OK, rc, sqlite3_errmsg(m_db));
-        sqlite3_busy_handler(m_db, sqlite_busy_call_back, (void*)m_db);
+
+#ifdef HKU_ENABLE_SQLCIPHER
+        if (haveParam("key")) {
+            std::string key = getParam<std::string>("key");
+            if (!key.empty()) {
+                rc = sqlite3_key(m_db, key.c_str(), static_cast<int>(key.size()));
+                SQL_CHECK(rc == SQLITE_OK, rc, sqlite3_errmsg(m_db));
+            }
+        }
+#endif
+
+        sqlite3_busy_handler(m_db, sqlite_busy_call_back, (void *)m_db);
+        if (sqlite3_libversion_number() >= 3003008) {
+            sqlite3_extended_result_codes(m_db, true);
+        }
 
     } catch (std::out_of_range& e) {
         HKU_FATAL("Can't get database name! {}", e.what());
@@ -59,6 +74,15 @@ SQLiteConnect::~SQLiteConnect() {
     close();
 }
 
+bool SQLiteConnect::ping() {
+    HKU_IF_RETURN(!m_db, false);
+
+    // sqlite打开时并不会对文件是否是有效sqlite文件进行检查，
+    // 只有执行 sql 语句时，才会报 SQLITE_NOTADB(26) 错误
+    int rc = sqlite3_exec(m_db, "PRAGMA synchronous;", NULL, NULL, NULL);
+    return rc == SQLITE_OK;
+}
+
 void SQLiteConnect::close() {
     if (m_db) {
         sqlite3_close(m_db);
@@ -66,17 +90,30 @@ void SQLiteConnect::close() {
     }
 }
 
-bool SQLiteConnect::ping() {
-    return m_db ? true : false;
-}
-
-void SQLiteConnect::exec(const string& sql_string) {
+int64_t SQLiteConnect::exec(const std::string &sql_string) {
+#ifdef HKU_SQL_TRACE
+    HKU_DEBUG(sql_string);
+#endif
     int rc = sqlite3_exec(m_db, sql_string.c_str(), NULL, NULL, NULL);
     SQL_CHECK(rc == SQLITE_OK, rc, "SQL error: {}! ({})", sqlite3_errmsg(m_db), sql_string);
+    int affect_rows = sqlite3_changes(m_db);
+    return affect_rows < 0 ? 0 : affect_rows;
 }
 
-SQLStatementPtr SQLiteConnect::getStatement(const string& sql_statement) {
-    return make_shared<SQLiteStatement>(this, sql_statement);
+void SQLiteConnect::transaction() {
+    exec("BEGIN IMMEDIATE");
+}
+
+void SQLiteConnect::commit() {
+    exec("COMMIT TRANSACTION");
+}
+
+void SQLiteConnect::rollback() {
+    exec("ROLLBACK TRANSACTION");
+}
+
+SQLStatementPtr SQLiteConnect::getStatement(const std::string &sql_statement) {
+    return std::make_shared<SQLiteStatement>(this, sql_statement);
 }
 
 bool SQLiteConnect::tableExist(const string& tablename) {
@@ -94,16 +131,56 @@ bool SQLiteConnect::tableExist(const string& tablename) {
     return result;
 }
 
-void SQLiteConnect::transaction() {
-    exec("BEGIN IMMEDIATE");
+void SQLiteConnect::resetAutoIncrement(const std::string &tablename) {
+    int64_t count = queryNumber<int64_t>(fmt::format("select count(1) from {}", tablename));
+    HKU_CHECK(count == 0, "The ID cannot be reset when data is present in table({})", tablename);
+    exec(fmt::format("UPDATE sqlite_sequence SET seq=0 WHERE name='{}'", tablename));
 }
 
-void SQLiteConnect::commit() {
-    exec("COMMIT TRANSACTION");
+bool SQLiteConnect::check(bool quick) noexcept {
+    bool good = false;
+    sqlite3_stmt *integrity = NULL;
+    std::string check_pragma(quick ? "PRAGMA quick_check;" : "PRAGMA integrity_check;");
+    if (sqlite3_prepare_v2(m_db, check_pragma.c_str(), -1, &integrity, NULL) == SQLITE_OK) {
+        while (sqlite3_step(integrity) == SQLITE_ROW) {
+            const unsigned char *result = sqlite3_column_text(integrity, 0);
+            if (result && strcmp((const char *)result, (const char *)"ok") == 0) {
+                good = true;
+                break;
+            }
+        }
+        sqlite3_finalize(integrity);
+    }
+    return good;
 }
 
-void SQLiteConnect::rollback() {
-    exec("ROLLBACK TRANSACTION");
+bool SQLiteConnect::backup(const char *zFilename, int n_page, int step_sleep) noexcept {
+    sqlite3 *pFile;
+    int rc = sqlite3_open(zFilename, &pFile);
+    if (rc == SQLITE_OK) {
+        /* Open the sqlite3_backup object used to accomplish the transfer */
+        sqlite3_backup *pBackup = sqlite3_backup_init(pFile, "main", m_db, "main");
+        if (pBackup) {
+            if (n_page <= 0) {
+                sqlite3_backup_step(pBackup, -1);
+
+            } else {
+                do {
+                    rc = sqlite3_backup_step(pBackup, n_page);
+                    if (step_sleep > 0 &&
+                        (rc == SQLITE_OK || rc == SQLITE_BUSY || rc == SQLITE_LOCKED)) {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(step_sleep));
+                    }
+                } while (rc == SQLITE_OK || rc == SQLITE_BUSY || rc == SQLITE_LOCKED);
+            }
+
+            sqlite3_backup_finish(pBackup);
+        }
+        rc = sqlite3_errcode(pFile);
+    }
+
+    sqlite3_close(pFile);
+    return rc == SQLITE_OK;
 }
 
 } /* namespace hku */

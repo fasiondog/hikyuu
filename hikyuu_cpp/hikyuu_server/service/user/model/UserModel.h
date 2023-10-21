@@ -14,7 +14,7 @@
 namespace hku {
 
 class UserModel {
-    TABLE_BIND6(admin_user, userid, name, password, start_time, end_time, status)
+    TABLE_BIND6(UserModel, admin_user, userid, name, password, start_time, end_time, status)
 
     enum STATUS {
         NORMAL = 1,    // 正常用户
@@ -22,8 +22,6 @@ class UserModel {
     };
 
 public:
-    UserModel() : userid(0), end_time(Datetime::max().number()), status(STATUS::NORMAL) {}
-
     uint64_t getUserId() const {
         return userid;
     }
@@ -78,12 +76,12 @@ public:
     }
 
 private:
-    uint64_t userid;       // 用户id
-    std::string name;      // 用户名
-    std::string password;  // 用户密码
-    uint64_t start_time;   // 用户创建时间，精确到分
-    uint64_t end_time;     // 用户失效时间，精确到分
-    int status;            // 用户状态
+    uint64_t userid{0};                           // 用户id
+    std::string name;                             // 用户名
+    std::string password;                         // 用户密码
+    uint64_t start_time;                          // 用户创建时间，精确到分
+    uint64_t end_time{Datetime::max().number()};  // 用户失效时间，精确到分
+    int status{STATUS::NORMAL};                   // 用户状态
 };
 
 }  // namespace hku
