@@ -8,9 +8,12 @@
 #pragma once
 
 #include <forward_list>
+#include <unordered_map>
+#include <functional>
 #include "../datetime/Datetime.h"
 #include "../Log.h"
 #include "thread/ThreadPool.h"
+#include "cppdef.h"
 
 namespace hku {
 
@@ -28,11 +31,13 @@ public:
     TimerManager& operator=(TimerManager&&) = delete;
 
     /**
-     * 构造函数，此时尚未启动运行，需调用 start 方法显示启动调度
+     * 构造函数
      * @param work_num 定时任务执行线程池线程数量
      */
-    TimerManager(size_t work_num = 1)
-    : m_stop(true), m_current_timer_id(-1), m_work_num(work_num) {}
+    explicit TimerManager(size_t work_num = 1)
+    : m_stop(true), m_current_timer_id(-1), m_work_num(work_num) {
+        start();
+    }
 
     /** 析构函数 */
     ~TimerManager() {
@@ -44,85 +49,92 @@ public:
 
     /** 启动调度, 可在停止后重新启动 */
     void start() {
+        // 已经在执行状态，直接返回
+        HKU_IF_RETURN(!m_stop, void());
+
+        // 设置执行状态
+        m_stop = false;
+
+        std::unique_lock<std::mutex> lock(m_mutex);
+
         std::priority_queue<IntervalS> new_queue;
         m_queue.swap(new_queue);
-        if (m_stop) {
-            m_stop = false;
-            if (!m_tg) {
-                m_tg = std::make_unique<ThreadPool>(m_work_num);
-            }
-
-            /*
-             * 根据已有 timer 重建执行队列，并删除已无效的 timer
-             */
-
-            std::forward_list<int> invalid_timers;  // 记录已无效的 timer
-            std::unique_lock<std::mutex> lock(m_mutex);
-            for (auto iter = m_timers.begin(); iter != m_timers.end(); ++iter) {
-                int time_id = iter->first;
-                Timer* timer = iter->second;
-                Datetime now = Datetime::now();
-
-                // 记录已失效的 timer id
-                if (timer->m_repeat_num <= 0 || (timer->m_end_date != Datetime::max() &&
-                                                 timer->m_end_date + timer->m_end_time < now)) {
-                    invalid_timers.push_front(time_id);
-                    continue;
-                }
-
-                IntervalS s;
-                s.m_timer_id = time_id;
-                if (timer->m_start_time < TimeDelta()) {
-                    Datetime first_start_time = timer->m_start_date + timer->m_end_time;
-                    if (first_start_time >= now) {
-                        s.m_time_point = first_start_time;
-                    } else {
-                        if (timer->m_repeat_num <= 1) {
-                            invalid_timers.push_front(time_id);
-                            continue;
-                        }
-                        s.m_time_point = now.startOfDay() + timer->m_end_time;
-                        if (s.m_time_point < now) {
-                            s.m_time_point = s.m_time_point + TimeDelta(1);
-                        }
-                    }
-
-                } else {
-                    s.m_time_point =
-                      timer->m_start_date >= now.startOfDay()
-                        ? timer->m_start_date + timer->m_start_time + timer->m_duration
-                        : now + timer->m_duration;
-                    if (timer->m_start_time != timer->m_end_time) {
-                        Datetime point_date = s.m_time_point.startOfDay();
-                        TimeDelta point = s.m_time_point - point_date;
-                        if (point < timer->m_start_time) {
-                            s.m_time_point = point_date + timer->m_start_time;
-                        } else if (point > timer->m_end_time) {
-                            s.m_time_point = point_date + timer->m_start_time + TimeDelta(1);
-                        } else {
-                            TimeDelta gap = point - timer->m_start_time;
-                            if (gap % timer->m_duration != TimeDelta()) {
-                                int x = int(gap / timer->m_duration) + 1;
-                                s.m_time_point =
-                                  point_date + timer->m_start_time + timer->m_duration * double(x);
-                            }
-                        }
-                    }
-                }
-
-                m_queue.push(s);
-            }
-
-            // 清除已无效的 timer
-            for (auto id : invalid_timers) {
-                _removeTimer(id);
-            }
-
-            lock.unlock();
-            m_cond.notify_all();
-
-            m_detect_thread = std::move(std::thread([this]() { detectThread(); }));
+        if (!m_tg) {
+#if CPP_STANDARD >= CPP_STANDARD_14
+            m_tg = std::make_unique<ThreadPool>(m_work_num);
+#else
+            m_tg = std::unique_ptr<ThreadPool>(new ThreadPool(m_work_num));
+#endif
         }
+
+        /*
+         * 根据已有 timer 重建执行队列，并删除已无效的 timer
+         */
+
+        std::forward_list<int> invalid_timers;  // 记录已无效的 timer
+        for (auto iter = m_timers.begin(); iter != m_timers.end(); ++iter) {
+            int time_id = iter->first;
+            Timer* timer = iter->second;
+            Datetime now = Datetime::now();
+
+            // 记录已失效的 timer id
+            if (timer->m_repeat_num <= 0 || (timer->m_end_date != Datetime::max() &&
+                                             timer->m_end_date + timer->m_end_time < now)) {
+                invalid_timers.push_front(time_id);
+                continue;
+            }
+
+            IntervalS s;
+            s.m_timer_id = time_id;
+            if (timer->m_start_time < TimeDelta()) {
+                Datetime first_start_time = timer->m_start_date + timer->m_end_time;
+                if (first_start_time >= now) {
+                    s.m_time_point = first_start_time;
+                } else {
+                    if (timer->m_repeat_num <= 1) {
+                        invalid_timers.push_front(time_id);
+                        continue;
+                    }
+                    s.m_time_point = now.startOfDay() + timer->m_end_time;
+                    if (s.m_time_point < now) {
+                        s.m_time_point = s.m_time_point + TimeDelta(1);
+                    }
+                }
+
+            } else {
+                s.m_time_point = timer->m_start_date >= now.startOfDay()
+                                   ? timer->m_start_date + timer->m_start_time + timer->m_duration
+                                   : now + timer->m_duration;
+                if (timer->m_start_time != timer->m_end_time) {
+                    Datetime point_date = s.m_time_point.startOfDay();
+                    TimeDelta point = s.m_time_point - point_date;
+                    if (point < timer->m_start_time) {
+                        s.m_time_point = point_date + timer->m_start_time;
+                    } else if (point > timer->m_end_time) {
+                        s.m_time_point = point_date + timer->m_start_time + TimeDelta(1);
+                    } else {
+                        TimeDelta gap = point - timer->m_start_time;
+                        if (gap % timer->m_duration != TimeDelta()) {
+                            int x = int(gap / timer->m_duration) + 1;
+                            s.m_time_point =
+                              point_date + timer->m_start_time + timer->m_duration * double(x);
+                        }
+                    }
+                }
+            }
+
+            m_queue.push(s);
+        }
+
+        // 清除已无效的 timer
+        for (auto id : invalid_timers) {
+            _removeTimer(id);
+        }
+
+        lock.unlock();
+        m_cond.notify_all();
+
+        m_detect_thread = std::thread([this]() { detectThread(); });
     }
 
     /** 终止调度 */
@@ -139,6 +151,27 @@ public:
         if (m_detect_thread.joinable()) {
             m_detect_thread.join();
         }
+
+        if (m_tg) {
+            m_tg->stop();
+            m_tg.reset();
+        }
+    }
+
+    /** 获取当前定时任务数量 */
+    size_t size() {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return m_timers.size();
+    }
+
+    /** 当前是否为空 */
+    bool empty() {
+        return size() == 0;
+    }
+
+    /** 返回当前停止状态 */
+    bool stopped() const {
+        return m_stop;
     }
 
     /**
@@ -500,6 +533,6 @@ private:
     int m_current_timer_id;
     size_t m_work_num;  // 任务执行线程池线程数量
     std::unique_ptr<ThreadPool> m_tg;
-};  // namespace hku
+};
 
 }  // namespace hku

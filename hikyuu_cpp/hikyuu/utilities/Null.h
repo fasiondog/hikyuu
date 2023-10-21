@@ -9,10 +9,10 @@
 #ifndef NULL_H_
 #define NULL_H_
 
-#include "../config.h"
 #include <cstddef>
 #include <limits>
 #include <type_traits>
+#include "osdef.h"
 
 namespace hku {
 
@@ -96,16 +96,17 @@ public:
     }
 };
 
-#if !defined(_MSC_VER)
+#if (HKU_OS_ANDROID && HKU_ARCH_ARM64) || (HKU_OS_LINUX && HKU_ARCH_ARM64) || HKU_OS_OSX || \
+  HKU_OS_IOS || (defined(__GNUC__) && __GNUC__ >= 8) || (defined(__clang__) && !HKU_OS_ANDROID)
 /**
  * 提供size_t的Null值
  */
 template <>
-class Null<size_t> {
+class Null<std::size_t> {
 public:
     Null() {}
-    operator size_t() const {
-        return (std::numeric_limits<size_t>::max)();
+    operator std::size_t() const {
+        return (std::numeric_limits<std::size_t>::max)();
     }
 };
 #endif
