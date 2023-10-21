@@ -52,9 +52,15 @@ public:
         return m_queue.empty();
     }
 
-    /** 队列大小，未加锁 */
+    /** 队列大小，！未加锁，谨慎使用 */
     size_t size() const {
         return m_queue.size();
+    }
+
+    void clear() {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        auto tmp = std::deque<data_type>();
+        m_queue.swap(tmp);
     }
 
     /**

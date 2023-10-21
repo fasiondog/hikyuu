@@ -33,8 +33,8 @@ public:
 
     /** 移动构造函数，实现对函数及函数对象等任务包装 */
     template <typename F>
-    FuncWrapper(F&& f)  // cppcheck-suppress noExplicitConstructor
-    : impl(new impl_type<F>(std::move(f))) {}
+    // cppcheck-suppress noExplicitConstructor ; 此处不能添加 explicit 修饰，需要使用转换复制
+    FuncWrapper(F&& f) : impl(new impl_type<F>(std::move(f))) {}
 
     /** 执行被包装的任务 */
     void operator()() {
@@ -68,8 +68,9 @@ private:
     template <typename F>
     struct impl_type : impl_base {
         F f;
+        // cppcheck-suppress noExplicitConstructor ; 此处不能添加 explicit 修饰，需要使用转换复制
         impl_type(F&& f_) : f(std::move(f_)) {}
-        void call() {
+        void call() override {
             f();
         }
     };
