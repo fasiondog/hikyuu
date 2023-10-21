@@ -258,10 +258,11 @@ def uninstall():
     print("Uninstall finished!")
 
 
+@click.option('-j', '--j', default=2, help="并行编译数量")
 @click.command()
-def install():
+def install(j):
     """ 编译并安装 Hikyuu python 库 """
-    start_build(False, 'release')
+    start_build(False, 'release', True, j)
     if sys.platform == 'win32':
         install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
     else:

@@ -55,6 +55,7 @@ from .deprecated import *
 from .indicator import *
 from .trade_manage import *
 from .trade_sys import *
+from .analysis import *
 from .hub import *
 
 # ==============================================================================

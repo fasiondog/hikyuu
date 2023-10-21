@@ -34,6 +34,14 @@ void export_Performance() {
         :param TradeManager tm: 指定的交易管理实例
         :param Datetime datetime: 统计截止时刻)")
 
+      .def("names", &Performance::names, R"(names(self)
+      
+      获取所有统计项名称)")
+
+      .def("values", &Performance::values, R"(values(self)
+      
+      获取所有统计项值，顺序与 names 相同)")
+
       .def("__getitem__", &Performance::get,
            R"(按指标名称获取指标值，必须在运行 statistics 或 report 之后生效
         

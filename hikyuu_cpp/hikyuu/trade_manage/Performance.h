@@ -23,6 +23,12 @@ public:
     Performance();
     virtual ~Performance();
 
+    Performance(const Performance& other) : m_result(other.m_result) {}
+    Performance(Performance&& other) : m_result(std::move(other.m_result)) {}
+
+    Performance& operator=(const Performance& other);
+    Performance& operator=(Performance&& other);
+
     /** 复位，清除已计算的结果 */
     void reset();
 
@@ -50,10 +56,17 @@ public:
      */
     void statistics(const TradeManagerPtr& tm, const Datetime& datetime = Datetime::now());
 
-    typedef map<string, double> map_type;
+    /** 获取所有统计项名称，顺序与 values 相同 */
+    StringList names() const;
+
+    /** 获取所有统计项值，顺序与 names 相同*/
+    PriceList values() const;
+
+    typedef std::map<string, double> map_type;
+    typedef map_type::iterator iterator;
+    typedef map_type::const_iterator const_iterator;
 
 private:
-    list<string> m_name_list;  //保存指标顺序
     map_type m_result;
 };
 

@@ -11,65 +11,71 @@
 
 namespace hku {
 
-Performance::Performance() {
-    m_name_list.push_back("帐户初始金额");
-    m_name_list.push_back("累计投入本金");
-    m_name_list.push_back("累计投入资产");
-    m_name_list.push_back("累计借入现金");
-    m_name_list.push_back("累计借入资产");
-    m_name_list.push_back("累计红利");
-    m_name_list.push_back("现金余额");
-    m_name_list.push_back("未平仓头寸净值");
-    m_name_list.push_back("当前总资产");
-    m_name_list.push_back("已平仓交易总成本");
-    m_name_list.push_back("已平仓净利润总额");
-    m_name_list.push_back("单笔交易最大占用现金比例%");
-    m_name_list.push_back("交易平均占用现金比例%");
-    m_name_list.push_back("已平仓帐户收益率%");
-    m_name_list.push_back("帐户年复合收益率%");
-    m_name_list.push_back("帐户平均年收益率%");
-    m_name_list.push_back("赢利交易赢利总额");
-    m_name_list.push_back("亏损交易亏损总额");
-    m_name_list.push_back("已平仓交易总数");
-    m_name_list.push_back("赢利交易数");
-    m_name_list.push_back("亏损交易数");
-    m_name_list.push_back("赢利交易比例%");
-    m_name_list.push_back("赢利期望值");
-    m_name_list.push_back("赢利交易平均赢利");
-    m_name_list.push_back("亏损交易平均亏损");
-    m_name_list.push_back("平均赢利/平均亏损比例");
-    m_name_list.push_back("净赢利/亏损比例");
-    m_name_list.push_back("最大单笔赢利");
-    m_name_list.push_back("最大单笔亏损");
-    m_name_list.push_back("赢利交易平均持仓时间");
-    m_name_list.push_back("赢利交易最大持仓时间");
-    m_name_list.push_back("亏损交易平均持仓时间");
-    m_name_list.push_back("亏损交易最大持仓时间");
-    m_name_list.push_back("空仓总时间");
-    m_name_list.push_back("空仓时间/总时间%");
-    m_name_list.push_back("平均空仓时间");
-    m_name_list.push_back("最长空仓时间");
-    m_name_list.push_back("最大连续赢利笔数");
-    m_name_list.push_back("最大连续亏损笔数");
-    m_name_list.push_back("最大连续赢利金额");
-    m_name_list.push_back("最大连续亏损金额");
-    m_name_list.push_back("R乘数期望值");
-    m_name_list.push_back("交易机会频率/年");
-    m_name_list.push_back("年度期望R乘数");
-    m_name_list.push_back("赢利交易平均R乘数");
-    m_name_list.push_back("亏损交易平均R乘数");
-    m_name_list.push_back("最大单笔赢利R乘数");
-    m_name_list.push_back("最大单笔亏损R乘数");
-    m_name_list.push_back("最大连续赢利R乘数");
-    m_name_list.push_back("最大连续亏损R乘数");
-
-    list<string>::iterator iter = m_name_list.begin();
-    for (; iter != m_name_list.end(); ++iter) {
-        m_result[*iter] = 0.0;
-    }
-}
+Performance::Performance()
+: m_result{{"帐户初始金额", 0.},
+           {"累计投入本金", 0.},
+           {"累计投入资产", 0.},
+           {"累计借入现金", 0.},
+           {"累计借入资产", 0.},
+           {"累计红利", 0.},
+           {"现金余额", 0.},
+           {"未平仓头寸净值", 0.},
+           {"当前总资产", 0.},
+           {"已平仓交易总成本", 0.},
+           {"已平仓净利润总额", 0.},
+           {"单笔交易最大占用现金比例%", 0.},
+           {"交易平均占用现金比例%", 0.},
+           {"已平仓帐户收益率%", 0.},
+           {"帐户年复合收益率%", 0.},
+           {"帐户平均年收益率%", 0.},
+           {"赢利交易赢利总额", 0.},
+           {"亏损交易亏损总额", 0.},
+           {"已平仓交易总数", 0.},
+           {"赢利交易数", 0.},
+           {"亏损交易数", 0.},
+           {"赢利交易比例%", 0.},
+           {"赢利期望值", 0.},
+           {"赢利交易平均赢利", 0.},
+           {"亏损交易平均亏损", 0.},
+           {"平均赢利/平均亏损比例", 0.},
+           {"净赢利/亏损比例", 0.},
+           {"最大单笔赢利", 0.},
+           {"最大单笔亏损", 0.},
+           {"赢利交易平均持仓时间", 0.},
+           {"赢利交易最大持仓时间", 0.},
+           {"亏损交易平均持仓时间", 0.},
+           {"亏损交易最大持仓时间", 0.},
+           {"空仓总时间", 0.},
+           {"空仓时间/总时间%", 0.},
+           {"平均空仓时间", 0.},
+           {"最长空仓时间", 0.},
+           {"最大连续赢利笔数", 0.},
+           {"最大连续亏损笔数", 0.},
+           {"最大连续赢利金额", 0.},
+           {"最大连续亏损金额", 0.},
+           {"R乘数期望值", 0.},
+           {"交易机会频率/年", 0.},
+           {"年度期望R乘数", 0.},
+           {"赢利交易平均R乘数", 0.},
+           {"亏损交易平均R乘数", 0.},
+           {"最大单笔赢利R乘数", 0.},
+           {"最大单笔亏损R乘数", 0.},
+           {"最大连续赢利R乘数", 0.},
+           {"最大连续亏损R乘数", 0.}} {}
 
 Performance::~Performance() {}
+
+Performance& Performance::operator=(const Performance& other) {
+    HKU_IF_RETURN(this == &other, *this);
+    m_result = other.m_result;
+    return *this;
+}
+
+Performance& Performance::operator=(Performance&& other) {
+    HKU_IF_RETURN(this == &other, *this);
+    m_result = std::move(other.m_result);
+    return *this;
+}
 
 void Performance::reset() {
     map_type::iterator iter = m_result.begin();
@@ -86,23 +92,37 @@ double Performance::get(const string& name) const {
     return Null<double>();
 }
 
+StringList Performance::names() const {
+    StringList result(m_result.size());
+    size_t i = 0;
+    for (auto iter = m_result.cbegin(); iter != m_result.cend(); ++iter, i++) {
+        result[i] = iter->first;
+    }
+    return result;
+}
+
+PriceList Performance::values() const {
+    PriceList result(m_result.size());
+    size_t i = 0;
+    for (auto iter = m_result.cbegin(); iter != m_result.cend(); ++iter, i++) {
+        result[i] = iter->second;
+    }
+    return result;
+}
+
 string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) {
     std::stringstream buf;
-    if (!tm) {
-        HKU_INFO("TradeManagerPtr is Null!");
-        return buf.str();
-    }
+    HKU_INFO_IF_RETURN(!tm, buf.str(), "TradeManagerPtr is Null!");
 
     statistics(tm, datetime);
 
     buf << std::fixed;
     buf.precision(2);
 
-    list<string>::iterator iter;
     buf.setf(std::ios_base::fixed);
     buf.precision(tm->precision());
-    for (iter = m_name_list.begin(); iter != m_name_list.end(); ++iter) {
-        buf << (*iter) << ": " << m_result[*iter] << std::endl;
+    for (auto iter = m_result.begin(); iter != m_result.end(); ++iter) {
+        buf << iter->first << ": " << iter->second << std::endl;
     }
 
     buf.unsetf(std::ostream::floatfield);
@@ -111,7 +131,7 @@ string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) 
 }
 
 void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetime) {
-    //清除上次统计结果
+    // 清除上次统计结果
     reset();
 
     if (!tm) {
@@ -155,13 +175,13 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
           total_r(0.0),
           max_continues_r(0.0) {}
 
-        int total_duration;           //总持仓时间
-        int continues;                //当前连续持仓时间
-        int max_continues;            //最大连续持仓数
-        price_t continues_money;      //当前连续持仓利润或损失
-        price_t max_continues_money;  //最大连续持仓利润或损失
-        price_t total_r;              //累计r乘数
-        price_t max_continues_r;      //最大连续盈利或损失的r乘数和
+        int total_duration;           // 总持仓时间
+        int continues;                // 当前连续持仓时间
+        int max_continues;            // 最大连续持仓数
+        price_t continues_money;      // 当前连续持仓利润或损失
+        price_t max_continues_money;  // 最大连续持仓利润或损失
+        price_t total_r;              // 累计r乘数
+        price_t max_continues_r;      // 最大连续盈利或损失的r乘数和
     };
 
     CalData earn, loss;
@@ -200,7 +220,7 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
                 m_result["最大单笔赢利R乘数"] = r;
             }
 
-            //上一笔交易是盈利交易
+            // 上一笔交易是盈利交易
             if (pre_earn) {
                 earn.continues++;
                 earn.continues_money = roundEx(profit + earn.continues_money, precision);
@@ -224,7 +244,7 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
             pre_earn = true;
 
         } else {
-            //没赚钱的，记为亏损交易
+            // 没赚钱的，记为亏损交易
             m_result["亏损交易数"]++;
             m_result["亏损交易亏损总额"] =
               roundEx(profit + m_result["亏损交易亏损总额"], precision);
@@ -243,7 +263,7 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
                 m_result["最大单笔亏损R乘数"] = r;
             }
 
-            //上一次是亏损交易
+            // 上一次是亏损交易
             if (!pre_earn) {
                 loss.continues++;
                 loss.continues_money = roundEx(profit + loss.continues_money, precision);
@@ -420,7 +440,7 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
                 continue;
             }
 
-            //当前是空仓
+            // 当前是空仓
             total_short_days++;
             if (pre_short) {
                 short_days++;
