@@ -95,6 +95,14 @@ void SQLiteStatement::sub_bindInt(int idx, int64_t value) {
     SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
+void SQLiteStatement::sub_bindDatetime(int idx, const Datetime &item) {
+    if (item == Null<Datetime>()) {
+        sub_bindNull(idx);
+    } else {
+        sub_bindText(idx, item.str());
+    }
+}
+
 void SQLiteStatement::sub_bindText(int idx, const string &item) {
     _reset();
     int status =
@@ -133,6 +141,12 @@ void SQLiteStatement::sub_getColumnAsInt64(int idx, int64_t &item) {
 
 void SQLiteStatement::sub_getColumnAsDouble(int idx, double &item) {
     item = sqlite3_column_double(m_stmt, idx);
+}
+
+void SQLiteStatement::sub_getColumnAsDatetime(int idx, Datetime &item) {
+    std::string date_str;
+    sub_getColumnAsText(idx, date_str);
+    item = date_str.empty() ? Datetime() : Datetime(date_str);
 }
 
 void SQLiteStatement::sub_getColumnAsText(int idx, std::string &item) {

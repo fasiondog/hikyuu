@@ -13,6 +13,7 @@
 #include <type_traits>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include "hikyuu/utilities/datetime/Datetime.h"
 #include "../../DataType.h"
 
 namespace hku {
@@ -40,15 +41,15 @@ public:
      * @param driver 数据库连接
      * @param sql_statement SQL语句
      */
-    SQLStatementBase(DBConnectBase* driver, const string& sql_statement);
+    SQLStatementBase(DBConnectBase *driver, const string &sql_statement);
 
     virtual ~SQLStatementBase() = default;
 
     /** 获取构建时传入的表达式SQL语句 */
-    const string& getSqlString() const;
+    const string &getSqlString() const;
 
     /** 获取数据驱动 */
-    DBConnectBase* getConnect() const;
+    DBConnectBase *getConnect() const;
 
     /** 执行 SQL */
     void exec();
@@ -70,6 +71,9 @@ public:
 
     /** 将字符串类型 item 绑定至 idx 指定的 SQL 参数中 */
     void bind(int idx, const char *item, size_t len);
+
+    /** 将 Datetime 类型 item 绑定至指定的 SQL 参数中 */
+    void bind(int idx, const Datetime &item);
 
     /** 将 item 的值绑定至 idx 指定的 SQL 参数中 */
     void bindBlob(int idx, const std::string &item);
@@ -110,6 +114,9 @@ public:
     void getColumn(int idx, std::string &item);
 
     /** 获取 idx 指定的数据至 item */
+    void getColumn(int idx, Datetime &item);
+
+    /** 获取 idx 指定的数据至 item */
     template <typename T>
     typename std::enable_if<std::numeric_limits<T>::is_integer>::type getColumn(int idx, T &);
 
@@ -128,10 +135,11 @@ public:
     virtual bool sub_moveNext() = 0;          ///< 子类接口 @see moveNext
     virtual uint64_t sub_getLastRowid() = 0;  ///< 子类接口 @see getLastRowid();
 
-    virtual void sub_bindNull(int idx) = 0;                           ///< 子类接口 @see bind
-    virtual void sub_bindInt(int idx, int64_t value) = 0;             ///< 子类接口 @see bind
-    virtual void sub_bindDouble(int idx, double item) = 0;            ///< 子类接口 @see bind
-    virtual void sub_bindText(int idx, const std::string &item) = 0;  ///< 子类接口 @see bind
+    virtual void sub_bindNull(int idx) = 0;                            ///< 子类接口 @see bind
+    virtual void sub_bindInt(int idx, int64_t value) = 0;              ///< 子类接口 @see bind
+    virtual void sub_bindDouble(int idx, double item) = 0;             ///< 子类接口 @see bind
+    virtual void sub_bindDatetime(int idx, const Datetime &item) = 0;  ///< 子类接口 @see bind
+    virtual void sub_bindText(int idx, const std::string &item) = 0;   ///< 子类接口 @see bind
     virtual void sub_bindText(int idx, const char *item, size_t len) = 0;  ///< 子类接口 @see bind
     virtual void sub_bindBlob(int idx, const std::string &item) = 0;  ///< 子类接口 @see bind
     virtual void sub_bindBlob(int idx, const char *item, size_t len) = 0;  ///< 子类接口 @see bind
@@ -139,8 +147,9 @@ public:
     virtual int sub_getNumColumns() const = 0;                  ///< 子类接口 @see getNumColumns
     virtual void sub_getColumnAsInt64(int idx, int64_t &) = 0;  ///< 子类接口 @see getColumn
     virtual void sub_getColumnAsDouble(int idx, double &) = 0;  ///< 子类接口 @see getColumn
-    virtual void sub_getColumnAsText(int idx, std::string &) = 0;  ///< 子类接口 @see getColumn
-    virtual void sub_getColumnAsBlob(int idx, std::string &) = 0;  ///< 子类接口 @see getColumn
+    virtual void sub_getColumnAsDatetime(int idx, Datetime &) = 0;  ///< 子类接口 @see getColumn
+    virtual void sub_getColumnAsText(int idx, std::string &) = 0;   ///< 子类接口 @see getColumn
+    virtual void sub_getColumnAsBlob(int idx, std::string &) = 0;   ///< 子类接口 @see getColumn
 
 private:
     SQLStatementBase() = delete;
@@ -162,7 +171,7 @@ inline const std::string &SQLStatementBase::getSqlString() const {
     return m_sql_string;
 }
 
-inline DBConnectBase* SQLStatementBase::getConnect() const {
+inline DBConnectBase *SQLStatementBase::getConnect() const {
     return m_driver;
 }
 
@@ -193,6 +202,10 @@ inline void SQLStatementBase::bind(int idx, double item) {
     sub_bindDouble(idx, item);
 }
 
+inline void SQLStatementBase::bind(int idx, const Datetime &item) {
+    sub_bindDatetime(idx, item);
+}
+
 inline void SQLStatementBase::bindBlob(int idx, const std::string &item) {
     sub_bindBlob(idx, item);
 }
@@ -219,6 +232,10 @@ inline void SQLStatementBase::getColumn(int idx, float &item) {
     item = (float)temp;
 }
 
+inline void SQLStatementBase::getColumn(int idx, Datetime &item) {
+    sub_getColumnAsDatetime(idx, item);
+}
+
 inline void SQLStatementBase::getColumn(int idx, std::string &item) {
     sub_getColumnAsText(idx, item);
 }
@@ -231,7 +248,7 @@ typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBa
 
 template <typename T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementBase::bind(
-  int idx, const T& item) {
+  int idx, const T &item) {
     std::ostringstream sout;
     boost::archive::binary_oarchive oa(sout);
     oa << BOOST_SERIALIZATION_NVP(item);
@@ -240,7 +257,7 @@ typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementB
 
 template <typename T>
 typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBase::getColumn(
-  int idx, T& item) {
+  int idx, T &item) {
     int64_t temp;
     sub_getColumnAsInt64(idx, temp);
     item = (T)temp;
@@ -248,11 +265,11 @@ typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBa
 
 template <typename T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementBase::getColumn(
-  int idx, T& item) {
+  int idx, T &item) {
     string tmp;
     try {
         sub_getColumnAsBlob(idx, tmp);
-    } catch (null_blob_exception&) {
+    } catch (null_blob_exception &) {
         return;
     }
     std::istringstream sin(tmp);
@@ -261,7 +278,7 @@ typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementB
 }
 
 template <typename T, typename... Args>
-void SQLStatementBase::bind(int idx, const T& item, const Args&... rest) {
+void SQLStatementBase::bind(int idx, const T &item, const Args &...rest) {
     bind(idx, item);
     bind(idx + 1, rest...);
 }

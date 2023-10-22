@@ -197,6 +197,10 @@ void MySQLStatement::sub_bindDouble(int idx, double item) {
     m_param_bind[idx].buffer = boost::any_cast<double>(&buf);
 }
 
+void MySQLStatement::sub_bindDatetime(int idx, const Datetime& item) {
+    HKU_THROW("Not yet implemented");
+}
+
 void MySQLStatement::sub_bindText(int idx, const string& item) {
     HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
               m_param_bind.size());
@@ -291,6 +295,10 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
             HKU_THROW("Field type mismatch! idx: {}", idx);
         }
     }
+}
+
+void MySQLStatement::sub_getColumnAsDatetime(int idx, Datetime& item) {
+    HKU_THROW("Not yet implemented");
 }
 
 void MySQLStatement::sub_getColumnAsText(int idx, string& item) {

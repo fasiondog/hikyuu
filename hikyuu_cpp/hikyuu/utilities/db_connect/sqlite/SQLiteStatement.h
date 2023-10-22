@@ -40,6 +40,7 @@ public:
     virtual void sub_bindNull(int idx) override;
     virtual void sub_bindInt(int idx, int64_t value) override;
     virtual void sub_bindDouble(int idx, double item) override;
+    virtual void sub_bindDatetime(int idx, const Datetime &item) override;
     virtual void sub_bindText(int idx, const std::string &item) override;
     virtual void sub_bindText(int idx, const char *item, size_t len) override;
     virtual void sub_bindBlob(int idx, const std::string &item) override;
@@ -48,6 +49,7 @@ public:
     virtual int sub_getNumColumns() const override;
     virtual void sub_getColumnAsInt64(int idx, int64_t &item) override;
     virtual void sub_getColumnAsDouble(int idx, double &item) override;
+    virtual void sub_getColumnAsDatetime(int idx, Datetime &item) override;
     virtual void sub_getColumnAsText(int idx, std::string &item) override;
     virtual void sub_getColumnAsBlob(int idx, std::string &item) override;
 
