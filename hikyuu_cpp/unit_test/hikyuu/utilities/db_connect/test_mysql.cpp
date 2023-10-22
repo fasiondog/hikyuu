@@ -43,26 +43,24 @@ TEST_CASE("test_mysql") {
             con->exec(
               "create table t2019 (id INTEGER PRIMARY KEY AUTO_INCREMENT, "
               "name VARCHAR(50), "
-              "data_int32_t INT, data_int64_t BIGINT, data_double DOUBLE, data_float FLOAT)");
+              "data_int32_t INT, data_int64_t BIGINT, data_double DOUBLE, data_float FLOAT, "
+              "create_at DATETIME(6), null_date DATETIME(6))");
         }
 
         class T2019 {
-            TABLE_BIND5(t2019, name, data_int32_t, data_int64_t, data_double, data_float);
+            TABLE_BIND7(T2019, t2019, name, data_int32_t, data_int64_t, data_double, data_float,
+                        create_at, null_date);
+            // TABLE_BIND5(T2019, t2019, name, data_int32_t, data_int64_t, data_double, data_float);
 
         public:
-            T2019()
-            : name(Null<string>()),
-              data_int32_t(Null<int32_t>()),
-              data_int64_t(Null<int64_t>()),
-              data_double(Null<double>()),
-              data_float(Null<float>()) {}
-
             void reset() {
                 name = "";
                 data_int32_t = Null<int32_t>();
                 data_int64_t = Null<int64_t>();
                 data_double = Null<double>();
                 data_float = Null<float>();
+                create_at = Null<Datetime>();
+                null_date = Null<Datetime>();
             }
 
         public:
@@ -71,6 +69,8 @@ TEST_CASE("test_mysql") {
             int64_t data_int64_t;
             double data_double;
             float data_float;
+            Datetime create_at;
+            Datetime null_date{Datetime::now()};
         };
 
         T2019 x;
@@ -79,6 +79,8 @@ TEST_CASE("test_mysql") {
         x.data_int64_t = 3147483647;
         x.data_double = 3.1415926;
         x.data_float = 3.14f;
+        x.create_at = Datetime::now();
+        x.null_date = Null<Datetime>();
         con->save(x);
 
         T2019 rx;
@@ -89,14 +91,16 @@ TEST_CASE("test_mysql") {
         CHECK(rx.data_int64_t == x.data_int64_t);
         CHECK(std::abs(rx.data_double - x.data_double) < 0.00001);
         CHECK(std::abs(rx.data_float - x.data_float) < 0.00001);
+        CHECK(rx.create_at == x.create_at);
+        CHECK(rx.null_date == x.null_date);
+        CHECK(rx.null_date == Null<Datetime>());
         con->exec("drop table t2019");
     }
 
     {
         class TTT {
-            TABLE_BIND4(ttt, name, age, email, other)
+            TABLE_BIND4(TTT, ttt, name, age, email, other)
         public:
-            TTT() {}
             TTT(const string& name, int age) : name(name), age(age) {}
             TTT(const string& name, int age, const string& email)
             : name(name), age(age), email(email) {}
@@ -159,7 +163,7 @@ TEST_CASE("test_mysql") {
           "CHAR(10), value DOUBLE)");
 
         class PerformancTest {
-            TABLE_BIND2(perf_test, name, value)
+            TABLE_BIND2(PerformancTest, perf_test, name, value)
 
         public:
             PerformancTest(const string& name, double value) : name(name), value(value) {}
