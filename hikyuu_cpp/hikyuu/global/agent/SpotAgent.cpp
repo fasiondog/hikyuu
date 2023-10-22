@@ -151,10 +151,10 @@ void SpotAgent::work_thread() {
     rv = -1;
     while (!m_stop && rv != 0) {
         rv = nng_dial(sock, ms_pubUrl, nullptr, 0);
-        HKU_WARN_IF(
-          rv != 0,
-          "Faied nng_dial, will retry after 5 seconds! You Maybe need start the collection service "
-          "first.");
+        // HKU_WARN_IF(
+        //   rv != 0,
+        //   "Faied nng_dial, will retry after 5 seconds! You Maybe need start the collection
+        //   service " "first.");
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
