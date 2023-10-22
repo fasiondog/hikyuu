@@ -20,14 +20,14 @@ class MQStealQueue {
 public:
     MQStealQueue() {}
 
-    void push(T item) {
+    void push(T&& item) {
         std::lock_guard<std::mutex> lk(m_mutex);
         m_queue.push_back(std::move(item));
         m_cond.notify_one();
     }
 
     /** 将数据插入队列头部 */
-    void push_front(T data) {
+    void push_front(T&& data) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_queue.push_front(std::move(data));
         m_cond.notify_one();
@@ -110,4 +110,3 @@ private:
 };
 
 } /* namespace hku */
-

@@ -22,7 +22,7 @@ thread_local InterruptFlag MQThreadPool::m_thread_need_stop;
 
 thread_local WorkStealQueue* StealThreadPool::m_local_work_queue = nullptr;
 thread_local int StealThreadPool::m_index = -1;
-thread_local bool StealThreadPool::m_thread_need_stop = false;
+thread_local InterruptFlag StealThreadPool::m_thread_need_stop;
 
 thread_local MQStealQueue<MQStealThreadPool::task_type>* MQStealThreadPool::m_local_work_queue =
   nullptr;

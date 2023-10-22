@@ -14,9 +14,7 @@
 #include <cstdio>
 #include <future>
 #include <thread>
-#include <chrono>
 #include <vector>
-#include <functional>
 #include "FuncWrapper.h"
 #include "ThreadSafeQueue.h"
 #include "InterruptFlag.h"
@@ -54,20 +52,15 @@ public:
      * 构造函数，创建指定数量的线程
      * @param n 指定的线程数
      * @param until_empty join时，等待任务队列为空后停止运行
-     * @param exit_thread_callback 工作线程结束时回调函数
      */
-    explicit ThreadPool(size_t n, bool until_empty = true,
-                        const std::function<void()>& exit_thread_callback = nullptr)
-    : m_done(false),
-      m_worker_num(n),
-      m_running_until_empty(until_empty),
-      m_exit_thread_callback(exit_thread_callback) {
+    explicit ThreadPool(size_t n, bool until_empty = true)
+    : m_done(false), m_worker_num(n), m_running_until_empty(until_empty) {
         try {
             m_interrupt_flags.resize(m_worker_num, nullptr);
             // 初始完毕所有线程资源后再启动线程
             for (int i = 0; i < m_worker_num; i++) {
                 // 创建工作线程及其任务队列
-                m_threads.push_back(std::thread(&ThreadPool::worker_thread, this, i));
+                m_threads.emplace_back(&ThreadPool::worker_thread, this, i);
             }
         } catch (...) {
             m_done = true;
@@ -129,6 +122,10 @@ public:
      * 等待各线程完成当前执行的任务后立即结束退出
      */
     void stop() {
+        if (m_done) {
+            return;
+        }
+
         m_done = true;
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
@@ -136,7 +133,7 @@ public:
             if (m_interrupt_flags[i]) {
                 m_interrupt_flags[i]->set();
             }
-            m_master_work_queue.push(FuncWrapper());
+            m_master_work_queue.push(std::move(FuncWrapper()));
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -153,6 +150,10 @@ public:
      * @note 至此线程池能工作线程结束不可再使用
      */
     void join() {
+        if (m_done) {
+            return;
+        }
+
         // 指示各工作线程在未获取到工作任务时，停止运行
         if (m_running_until_empty) {
             while (m_master_work_queue.size() > 0) {
@@ -183,10 +184,9 @@ public:
 
 private:
     typedef FuncWrapper task_type;
-    bool m_done;                                     // 线程池全局需终止指示
-    size_t m_worker_num;                             // 工作线程数量
-    bool m_running_until_empty;                      // 任务队列为空时，自动停止运行
-    std::function<void()> m_exit_thread_callback;    // 工作线程结束时回调函数
+    std::atomic_bool m_done;     // 线程池全局需终止指示
+    size_t m_worker_num;         // 工作线程数量
+    bool m_running_until_empty;  // 任务队列为空时，自动停止运行
 
     ThreadSafeQueue<task_type> m_master_work_queue;  // 主线程任务队列
     std::vector<std::thread> m_threads;              // 工作线程
@@ -201,16 +201,14 @@ private:
     static thread_local int m_index;                       // 在线程池中的序号
 #endif
 
-    void worker_thread(size_t index) {
-        m_index = (int)index;
+    void worker_thread(int index) {
+        m_index = index;
         m_interrupt_flags[index] = &m_thread_need_stop;
         while (!m_thread_need_stop.isSet() && !m_done) {
             run_pending_task();
+            // std::this_thread::yield();
         }
         m_interrupt_flags[index] = nullptr;
-        if (m_exit_thread_callback) {
-            m_exit_thread_callback();
-        }
     }
 
     void run_pending_task() {
@@ -218,10 +216,9 @@ private:
         m_master_work_queue.wait_and_pop(task);
         if (task.isNullTask()) {
             m_thread_need_stop.set();
-            return;
+        } else {
+            task();
         }
-
-        task();
     }
 };  // namespace hku
 

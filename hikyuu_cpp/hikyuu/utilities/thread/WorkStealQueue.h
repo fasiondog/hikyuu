@@ -35,13 +35,13 @@ public:
     WorkStealQueue& operator=(const WorkStealQueue& other) = delete;
 
     /** 将数据插入队列头部 */
-    void push_front(data_type data) {
+    void push_front(data_type&& data) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_queue.push_front(std::move(data));
     }
 
     /** 将数据插入队列尾部 */
-    void push_back(data_type data) {
+    void push_back(data_type&& data) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_queue.push_back(std::move(data));
     }
@@ -87,6 +87,10 @@ public:
     bool try_steal(data_type& res) {
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_queue.empty()) {
+            return false;
+        }
+
+        if (m_queue.back().isNullTask()) {
             return false;
         }
 

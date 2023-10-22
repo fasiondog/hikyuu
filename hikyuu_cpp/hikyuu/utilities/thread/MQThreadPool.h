@@ -44,20 +44,15 @@ public:
     /**
      * 默认构造函数，创建和当前系统CPU数一致的线程数
      */
-    MQThreadPool() : MQThreadPool(std::thread::hardware_concurrency(), true) {}
+    MQThreadPool() : MQThreadPool(std::thread::hardware_concurrency()) {}
 
     /**
      * 构造函数，创建指定数量的线程
      * @param n 指定的线程数
      * @param until_empty 任务队列为空时，自动停止运行
-     * @param exit_thread_callback 工作线程结束时回调函数
      */
-    explicit MQThreadPool(size_t n, bool until_empty = true,
-                          const std::function<void()>& exit_thread_callback = nullptr)
-    : m_done(false),
-      m_worker_num(n),
-      m_runnging_until_empty(until_empty),
-      m_exit_thread_callback(exit_thread_callback) {
+    explicit MQThreadPool(size_t n, bool until_empty = true)
+    : m_done(false), m_worker_num(n), m_runnging_until_empty(until_empty) {
         try {
             m_interrupt_flags.resize(m_worker_num, nullptr);
             for (int i = 0; i < m_worker_num; i++) {
@@ -151,6 +146,10 @@ public:
      * 等待各线程完成当前执行的任务后立即结束退出
      */
     void stop() {
+        if (m_done) {
+            return;
+        }
+
         m_done = true;
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
@@ -158,7 +157,7 @@ public:
             if (m_interrupt_flags[i]) {
                 m_interrupt_flags[i]->set();
             }
-            m_queues[i]->push(FuncWrapper());
+            m_queues[i]->push(std::move(FuncWrapper()));
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -177,13 +176,28 @@ public:
      * @note 至此线程池能工作线程结束不可再使用
      */
     void join() {
+        if (m_done) {
+            return;
+        }
+
         // 指示各工作线程在未获取到工作任务时，停止运行
         if (m_runnging_until_empty) {
-            for (size_t i = 0; i < m_worker_num; i++) {
-                while (m_queues[i]->size() > 0) {
-                    std::this_thread::yield();
+            while (true) {
+                bool can_quit = true;
+                for (size_t i = 0; i < m_worker_num; i++) {
+                    if (m_queues[i]->size() != 0) {
+                        can_quit = false;
+                        break;
+                    }
                 }
+
+                if (can_quit) {
+                    break;
+                }
+
+                std::this_thread::yield();
             }
+
             m_done = true;
             for (size_t i = 0; i < m_worker_num; i++) {
                 if (m_interrupt_flags[i]) {
@@ -212,10 +226,9 @@ public:
 
 private:
     typedef FuncWrapper task_type;
-    std::atomic_bool m_done;                       // 线程池全局需终止指示
-    size_t m_worker_num;                           // 工作线程数量
-    bool m_runnging_until_empty;                   // 运行直到队列空时停止
-    std::function<void()> m_exit_thread_callback;  // 工作线程结束时回调函数
+    std::atomic_bool m_done;      // 线程池全局需终止指示
+    size_t m_worker_num;          // 工作线程数量
+    bool m_runnging_until_empty;  // 运行直到队列空时停止
 
     std::vector<std::unique_ptr<ThreadSafeQueue<task_type>>> m_queues;  // 线程任务队列
     std::vector<InterruptFlag*> m_interrupt_flags;                      // 线程终止标志
@@ -242,9 +255,6 @@ private:
         }
         m_local_work_queue = nullptr;
         m_interrupt_flags[m_index] = nullptr;
-        if (m_exit_thread_callback) {
-            m_exit_thread_callback();
-        }
     }
 
     static void run_pending_task() {

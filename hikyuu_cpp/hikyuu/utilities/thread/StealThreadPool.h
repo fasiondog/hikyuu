@@ -13,10 +13,10 @@
 
 #include <future>
 #include <thread>
-#include <chrono>
 #include <vector>
 #include "ThreadSafeQueue.h"
 #include "WorkStealQueue.h"
+#include "InterruptFlag.h"
 #include "../cppdef.h"
 
 #ifdef __GNUC__
@@ -52,21 +52,17 @@ public:
      * @param n 指定的线程数
      * @param until_empty 任务队列为空时，自动停止运行
      */
-    explicit StealThreadPool(size_t n, bool until_empty = true,
-                             const std::function<void()>& exit_thread_callback = nullptr)
-    : m_done(false),
-      m_worker_num(n),
-      m_running_until_empty(until_empty),
-      m_exit_thread_callback(exit_thread_callback) {
+    explicit StealThreadPool(size_t n, bool until_empty = true)
+    : m_done(false), m_worker_num(n), m_running_until_empty(until_empty) {
         try {
-            m_threads_status.resize(m_worker_num, nullptr);
+            m_interrupt_flags.resize(m_worker_num, nullptr);
             for (int i = 0; i < m_worker_num; i++) {
                 // 创建工作线程及其任务队列
-                m_queues.push_back(std::unique_ptr<WorkStealQueue>(new WorkStealQueue));
+                m_queues.emplace_back(new WorkStealQueue);
             }
             // 初始完毕所有线程资源后再启动线程
             for (int i = 0; i < m_worker_num; i++) {
-                m_threads.push_back(std::thread(&StealThreadPool::worker_thread, this, i));
+                m_threads.emplace_back(&StealThreadPool::worker_thread, this, i);
             }
         } catch (...) {
             m_done = true;
@@ -90,6 +86,9 @@ public:
 
     /** 剩余任务数 */
     size_t remain_task_count() const {
+        if (m_done) {
+            return 0;
+        }
         size_t total = m_master_work_queue.size();
         for (size_t i = 0; i < m_worker_num; i++) {
             total += m_queues[i]->size();
@@ -109,7 +108,7 @@ public:
     /** 向线程池提交任务 */
     template <typename FunctionType>
     task_handle<typename std::result_of<FunctionType()>::type> submit(FunctionType f) {
-        if (m_thread_need_stop || m_done) {
+        if (m_thread_need_stop.isSet() || m_done) {
             throw std::logic_error("You can't submit a task to the stopped StealThreadPool!!");
         }
 
@@ -121,8 +120,8 @@ public:
             m_local_work_queue->push_front(std::move(task));
         } else {
             m_master_work_queue.push(std::move(task));
+            m_cv.notify_one();
         }
-        m_cv.notify_one();
         return res;
     }
 
@@ -139,15 +138,18 @@ public:
      * 等待各线程完成当前执行的任务后立即结束退出
      */
     void stop() {
+        if (m_done) {
+            return;
+        }
+
         m_done = true;
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
         for (size_t i = 0; i < m_worker_num; i++) {
-            if (m_threads_status[i]) {
-                // m_threads_status[i]->store(true);
-                *(m_threads_status[i]) = true;
+            if (m_interrupt_flags[i]) {
+                m_interrupt_flags[i]->set();
             }
-            m_queues[i]->push_front(FuncWrapper());
+            m_queues[i]->push_front(std::move(FuncWrapper()));
         }
 
         m_cv.notify_all();  // 唤醒所有工作线程
@@ -168,21 +170,35 @@ public:
      * @note 至此线程池能工作线程结束不可再使用
      */
     void join() {
+        if (m_done) {
+            return;
+        }
+
         // 指示各工作线程在未获取到工作任务时，停止运行
         if (m_running_until_empty) {
-            while (m_master_work_queue.size() > 0) {
-                std::this_thread::yield();
-            }
-            for (size_t i = 0; i < m_worker_num; i++) {
-                while (m_queues[i]->size() > 0) {
+            while (true) {
+                if (m_master_work_queue.size() != 0) {
                     std::this_thread::yield();
+                } else {
+                    bool can_quit = true;
+                    for (size_t i = 0; i < m_worker_num; i++) {
+                        if (m_queues[i]->size() != 0) {
+                            can_quit = false;
+                            break;
+                        }
+                    }
+                    if (can_quit) {
+                        break;
+                    } else {
+                        std::this_thread::yield();
+                    }
                 }
             }
+
             m_done = true;
             for (size_t i = 0; i < m_worker_num; i++) {
-                if (m_threads_status[i]) {
-                    // m_threads_status[i]->store(true);
-                    *(m_threads_status[i]) = true;
+                if (m_interrupt_flags[i]) {
+                    m_interrupt_flags[i]->set();
                 }
             }
         }
@@ -211,14 +227,13 @@ public:
 
 private:
     typedef FuncWrapper task_type;
-    std::atomic_bool m_done;                       // 线程池全局需终止指示
-    size_t m_worker_num;                           // 工作线程数量
-    bool m_running_until_empty;                    // 任务队列为空时，自动停止运行
-    std::function<void()> m_exit_thread_callback;  // 工作线程结束时回调函数
-    std::condition_variable m_cv;                  // 信号量，无任务时阻塞线程并等待
-    std::mutex m_cv_mutex;                         // 配合信号量的互斥量
+    std::atomic_bool m_done;       // 线程池全局需终止指示
+    size_t m_worker_num;           // 工作线程数量
+    bool m_running_until_empty;    // 任务队列为空时，自动停止运行
+    std::condition_variable m_cv;  // 信号量，无任务时阻塞线程并等待
+    std::mutex m_cv_mutex;         // 配合信号量的互斥量
 
-    std::vector<bool*> m_threads_status;           // 工作线程状态
+    std::vector<InterruptFlag*> m_interrupt_flags;           // 工作线程状态
     ThreadSafeQueue<task_type> m_master_work_queue;          // 主线程任务队列
     std::vector<std::unique_ptr<WorkStealQueue> > m_queues;  // 任务队列（每个工作线程一个）
     std::vector<std::thread> m_threads;                      // 工作线程
@@ -226,27 +241,23 @@ private:
     // 线程本地变量
 #if CPP_STANDARD >= CPP_STANDARD_17
     inline static thread_local WorkStealQueue* m_local_work_queue = nullptr;  // 本地任务队列
-    inline static thread_local int m_index = -1;                 // 在线程池中的序号
-    inline static thread_local bool m_thread_need_stop = false;  // 线程停止运行指示
+    inline static thread_local int m_index = -1;                  // 在线程池中的序号
+    inline static thread_local InterruptFlag m_thread_need_stop;  // 线程停止运行指示
 #else
     static thread_local WorkStealQueue* m_local_work_queue;  // 本地任务队列
     static thread_local int m_index;                         // 在线程池中的序号
-    static thread_local bool m_thread_need_stop;             // 线程停止运行指示
+    static thread_local InterruptFlag m_thread_need_stop;    // 线程停止运行指示
 #endif
 
     void worker_thread(int index) {
-        m_thread_need_stop = false;
-        m_threads_status[index] = &m_thread_need_stop;
+        m_interrupt_flags[index] = &m_thread_need_stop;
         m_index = index;
         m_local_work_queue = m_queues[m_index].get();
-        while (!m_thread_need_stop && !m_done) {
+        while (!m_thread_need_stop.isSet() && !m_done) {
             run_pending_task();
         }
         m_local_work_queue = nullptr;
-        m_threads_status[m_index] = nullptr;
-        if (m_exit_thread_callback) {
-            m_exit_thread_callback();
-        }
+        m_interrupt_flags[m_index] = nullptr;
     }
 
     void run_pending_task() {
@@ -254,20 +265,20 @@ private:
         // 如果主队列中提取的任务是空任务，则认为需结束本线程，否则从其他工作队列中偷取任务
         task_type task;
         if (pop_task_from_local_queue(task)) {
-            task();
-            // std::this_thread::yield();
+            if (!task.isNullTask()) {
+                task();
+            } else {
+                m_thread_need_stop.set();
+            }
         } else if (pop_task_from_master_queue(task)) {
             if (!task.isNullTask()) {
                 task();
-                // std::this_thread::yield();
             } else {
-                m_thread_need_stop = true;
+                m_thread_need_stop.set();
             }
         } else if (pop_task_from_other_thread_queue(task)) {
             task();
-            // std::this_thread::yield();
         } else {
-            // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
             m_cv.wait(lk, [=] { return this->m_done || !this->m_master_work_queue.empty(); });
         }
@@ -283,15 +294,15 @@ private:
     }
 
     bool pop_task_from_other_thread_queue(task_type& task) {
-        for (size_t i = 0; i < m_worker_num; ++i) {
-            size_t index = (m_index + i + 1) % m_worker_num;
-            if (int(index) != m_index && m_queues[index]->try_steal(task)) {
+        for (int i = 0; i < m_worker_num; ++i) {
+            int index = (m_index + i + 1) % m_worker_num;
+            if (index != m_index && m_queues[index]->try_steal(task)) {
                 return true;
             }
         }
         return false;
     }
-};  // namespace hku
+};
 
 } /* namespace hku */
 

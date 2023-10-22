@@ -41,7 +41,7 @@ public:
     /**
      * 默认构造函数，创建和当前系统CPU数一致的线程数
      */
-    MQStealThreadPool() : MQStealThreadPool(std::thread::hardware_concurrency(), true) {}
+    MQStealThreadPool() : MQStealThreadPool(std::thread::hardware_concurrency()) {}
 
     /**
      * 构造函数，创建指定数量的线程
@@ -49,22 +49,17 @@ public:
      * @param until_empty 任务队列为空时，自动停止运行
      * @param exit_thread_callback 工作线程结束时回调函数
      */
-    explicit MQStealThreadPool(size_t n, bool util_empty = true,
-                               const std::function<void()>& exit_thread_callback = nullptr)
-    : m_done(false),
-      m_worker_num(n),
-      m_runnging_util_empty(util_empty),
-      m_exit_thread_callback(exit_thread_callback) {
+    explicit MQStealThreadPool(size_t n, bool util_empty = true)
+    : m_done(false), m_worker_num(n), m_runnging_util_empty(util_empty) {
         try {
             m_interrupt_flags.resize(m_worker_num, nullptr);
             for (size_t i = 0; i < m_worker_num; i++) {
                 // 创建工作线程及其任务队列
-                m_queues.push_back(
-                  std::unique_ptr<MQStealQueue<task_type>>(new MQStealQueue<task_type>));
+                m_queues.emplace_back(new MQStealQueue<task_type>);
             }
             // 初始完毕所有线程资源后再启动线程
             for (size_t i = 0; i < m_worker_num; i++) {
-                m_threads.push_back(std::thread(&MQStealThreadPool::worker_thread, this, i));
+                m_threads.emplace_back(&MQStealThreadPool::worker_thread, this, i);
             }
         } catch (...) {
             m_done = true;
@@ -88,6 +83,10 @@ public:
 
     /** 剩余任务数 */
     size_t remain_task_count() const {
+        if (m_done) {
+            return 0;
+        }
+
         size_t total = 0;
         for (size_t i = 0; i < m_worker_num; i++) {
             total += m_queues[i]->size();
@@ -155,6 +154,10 @@ public:
      * 等待各线程完成当前执行的任务后立即结束退出
      */
     void stop() {
+        if (m_done) {
+            return;
+        }
+
         m_done = true;
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
@@ -162,7 +165,7 @@ public:
             if (m_interrupt_flags[i]) {
                 m_interrupt_flags[i]->set();
             }
-            m_queues[i]->push(FuncWrapper());
+            m_queues[i]->push(std::move(FuncWrapper()));
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -181,13 +184,28 @@ public:
      * @note 至此线程池能工作线程结束不可再使用
      */
     void join() {
+        if (m_done) {
+            return;
+        }
+
         // 指示各工作线程在未获取到工作任务时，停止运行
         if (m_runnging_util_empty) {
-            for (size_t i = 0; i < m_worker_num; i++) {
-                while (m_queues[i]->size() > 0) {
-                    std::this_thread::yield();
+            while (true) {
+                bool can_quit = true;
+                for (size_t i = 0; i < m_worker_num; i++) {
+                    if (m_queues[i]->size() != 0) {
+                        can_quit = false;
+                        break;
+                    }
                 }
+
+                if (can_quit) {
+                    break;
+                }
+
+                std::this_thread::yield();
             }
+
             m_done = true;
             for (size_t i = 0; i < m_worker_num; i++) {
                 if (m_interrupt_flags[i]) {
@@ -216,10 +234,9 @@ public:
 
 private:
     typedef FuncWrapper task_type;
-    std::atomic_bool m_done;                       // 线程池全局需终止指示
-    size_t m_worker_num;                           // 工作线程数量
-    bool m_runnging_util_empty;                    // 运行直到队列空时停止
-    std::function<void()> m_exit_thread_callback;  // 工作线程结束时回调函数
+    std::atomic_bool m_done;     // 线程池全局需终止指示
+    size_t m_worker_num;         // 工作线程数量
+    bool m_runnging_util_empty;  // 运行直到队列空时停止
 
     std::vector<std::unique_ptr<MQStealQueue<task_type>>> m_queues;  // 线程任务队列
     std::vector<InterruptFlag*> m_interrupt_flags;                   // 线程终止标志
@@ -237,8 +254,8 @@ private:
     static thread_local InterruptFlag m_thread_need_stop;             // 线程停止运行指示
 #endif
 
-    void worker_thread(size_t index) {
-        m_index = (int)index;
+    void worker_thread(int index) {
+        m_index = index;
         m_interrupt_flags[index] = &m_thread_need_stop;
         m_local_work_queue = m_queues[m_index].get();
         while (!m_thread_need_stop.isSet() && !m_done) {
@@ -246,9 +263,6 @@ private:
         }
         m_interrupt_flags[m_index] = nullptr;
         m_local_work_queue = nullptr;
-        if (m_exit_thread_callback) {
-            m_exit_thread_callback();
-        }
         // printf("%zu thread (%lld) finished!\n", m_index, std::this_thread::get_id());
     }
 

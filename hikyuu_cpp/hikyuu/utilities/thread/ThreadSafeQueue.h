@@ -27,7 +27,7 @@ public:
     ThreadSafeQueue() {}
 
     /** 将元素插入队列尾部 */
-    void push(T item) {
+    void push(T&& item) {
         std::lock_guard<std::mutex> lk(m_mutex);
         m_queue.push(std::move(item));
         m_cond.notify_one();
