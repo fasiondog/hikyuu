@@ -11,7 +11,7 @@
 #ifndef TIMEDELTA_SERIALIZATION_H_
 #define TIMEDELTA_SERIALIZATION_H_
 
-#include "../datetime/TimeDelta.h"
+#include "hikyuu/utilities/datetime/TimeDelta.h"
 #include "../config.h"
 
 #if HKU_SUPPORT_SERIALIZATION

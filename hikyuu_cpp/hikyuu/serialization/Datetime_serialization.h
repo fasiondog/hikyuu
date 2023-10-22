@@ -9,7 +9,7 @@
 #ifndef DATETIME_SERIALIZATION_H_
 #define DATETIME_SERIALIZATION_H_
 
-#include "../datetime/Datetime.h"
+#include "hikyuu/utilities/datetime/Datetime.h"
 #include "../config.h"
 
 #if HKU_SUPPORT_SERIALIZATION

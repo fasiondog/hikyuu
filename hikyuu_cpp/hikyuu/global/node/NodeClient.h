@@ -10,7 +10,7 @@
 #include <atomic>
 #include <nng/nng.h>
 #include <nng/protocol/reqrep0/req.h>
-#include "hikyuu/datetime/Datetime.h"
+#include "hikyuu/utilities/datetime/Datetime.h"
 #include "NodeMessage.h"
 
 namespace hku {

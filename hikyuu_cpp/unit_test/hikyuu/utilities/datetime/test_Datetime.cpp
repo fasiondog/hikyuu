@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 
-#include <hikyuu/datetime/Datetime.h>
+#include <hikyuu/utilities/datetime/Datetime.h>
 #include <hikyuu/utilities/Null.h>
 #include <hikyuu/Log.h>
 

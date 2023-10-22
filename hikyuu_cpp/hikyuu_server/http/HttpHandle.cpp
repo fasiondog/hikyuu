@@ -7,7 +7,7 @@
 
 #include <string_view>
 #include <hikyuu/utilities/arithmetic.h>
-#include <hikyuu/datetime/Datetime.h>
+#include <hikyuu/utilities/datetime/Datetime.h>
 #include "gzip/compress.hpp"
 #include "gzip/decompress.hpp"
 #include "gzip/utils.hpp"

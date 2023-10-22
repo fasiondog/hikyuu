@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
-#include <hikyuu/datetime/TimeDelta.h>
+#include <hikyuu/utilities/datetime/TimeDelta.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <fstream>
