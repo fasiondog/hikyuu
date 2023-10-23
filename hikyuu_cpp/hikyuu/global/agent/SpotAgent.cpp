@@ -158,7 +158,7 @@ void SpotAgent::work_thread() {
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
-    HKU_INFO("Ready to receive ...");
+    // HKU_INFO("Ready to receive ...");
 
     while (!m_stop) {
         char* buf = nullptr;
