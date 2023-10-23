@@ -143,7 +143,7 @@ void MySQLStatement::_bindResult() {
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
             m_result_bind[idx].buffer = boost::any_cast<short>(&buf);
-        } else if (field->type == MYSQL_TYPE_DATETIME) {
+        } else if (field->type == MYSQL_TYPE_DATETIME || field->type == MYSQL_TYPE_DATE) {
             MYSQL_TIME item;
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
@@ -337,10 +337,19 @@ void MySQLStatement::sub_getColumnAsDatetime(int idx, Datetime& item) {
 
     try {
         MYSQL_TIME* tm = boost::any_cast<MYSQL_TIME>(&(m_result_buffer[idx]));
-        long millisec = tm->second_part / 1000;
-        long microsec = tm->second_part - millisec * 1000;
-        item = Datetime(tm->year, tm->month, tm->day, tm->hour, tm->minute, tm->second, millisec,
-                        microsec);
+        if (tm->time_type == MYSQL_TIMESTAMP_DATETIME) {
+            long millisec = tm->second_part / 1000;
+            long microsec = tm->second_part - millisec * 1000;
+            item = Datetime(tm->year, tm->month, tm->day, tm->hour, tm->minute, tm->second,
+                            millisec, microsec);
+        } else if (tm->time_type == MYSQL_TIMESTAMP_DATE) {
+            item = Datetime(tm->year, tm->month, tm->day);
+        } else {
+            HKU_THROW("Unsupported type: {}, Field type mismatch! idx: {}", int(tm->time_type),
+                      idx);
+        }
+    } catch (const hku::exception&) {
+        throw;
     } catch (...) {
         HKU_THROW("Field type mismatch! idx: {}", idx);
     }
