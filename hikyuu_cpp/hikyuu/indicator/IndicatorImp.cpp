@@ -1445,15 +1445,6 @@ void IndicatorImp::_update_discard() {
 
 bool IndicatorImp::alike(const IndicatorImp &other) const {
     HKU_IF_RETURN(this == &other, true);
-
-    HKU_DEBUG("m_optype != other.m_optype: {}", m_optype != other.m_optype);
-    HKU_DEBUG("m_params != other.m_params: {}", m_params != other.m_params);
-    HKU_DEBUG("m_discard != other.m_discard: {}", m_discard != other.m_discard);
-    HKU_DEBUG("m_result_num != other.m_result_num: {}", m_result_num != other.m_result_num);
-
-    HKU_DEBUG("m_params: {}, other.m_params: {}", m_params.getNameValueList(),
-              other.m_params.getNameValueList());
-
     HKU_IF_RETURN(m_optype != other.m_optype || m_params != other.m_params ||
                     m_discard != other.m_discard || m_result_num != other.m_result_num,
                   false);

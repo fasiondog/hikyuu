@@ -149,7 +149,6 @@ HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
     auto iter1 = p1.begin();
     auto iter2 = p2.begin();
     for (; iter1 != p1.end() && iter2 != p2.end(); ++iter1, ++iter2) {
-        HKU_INFO("name: {}", iter1->first);
         HKU_IF_RETURN(iter1->first != iter2->first || iter1->second.type() != iter2->second.type(),
                       false);
         HKU_IF_RETURN(iter1->second.type() == typeid(int) &&
@@ -189,7 +188,6 @@ HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
         if (iter1->second.type() == typeid(KData)) {
             const KData* x1 = boost::any_cast<KData>(&iter1->second);
             const KData* x2 = boost::any_cast<KData>(&iter2->second);
-            HKU_INFO("*x1 != *x2: {}", *x1 != *x2);
             HKU_IF_RETURN(*x1 != *x2, false);
         }
 
@@ -198,7 +196,6 @@ HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
             const PriceList* x2 = boost::any_cast<PriceList>(&iter2->second);
             HKU_IF_RETURN(x1->size() != x2->size(), false);
             for (size_t i = 0, len = x1->size(); i < len; i++) {
-                HKU_DEBUG("{}: x1: {}, x2: {}", i, (*x1)[i], (*x2)[i]);
                 HKU_IF_RETURN((*x1)[i] != (*x2)[i], false);
             }
         }
@@ -213,7 +210,6 @@ HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
         }
     }
 
-    HKU_DEBUG("**************");
     return true;
     // return p1.size() == p2.size() && p1.getNameValueList() == p2.getNameValueList();
 }

@@ -22,7 +22,7 @@ using namespace hku;
 /** @par 检测点 */
 TEST_CASE("test_indicator_alike") {
     /** @arg 空 indicator 比较 */
-    // CHECK_UNARY(Indicator().alike(Indicator()));
+    CHECK_UNARY(Indicator().alike(Indicator()));
 
     PriceList d1, d2;
     for (size_t i = 0; i < 10; ++i) {
@@ -36,7 +36,7 @@ TEST_CASE("test_indicator_alike") {
         CHECK(data1[i] != data2[i]);
     }
 
-    // CHECK_UNARY(!data1.alike(data2));
+    CHECK_UNARY(!data1.alike(data2));
 
     for (size_t i = 0; i < 10; ++i) {
         d2[i] = i;
@@ -45,7 +45,6 @@ TEST_CASE("test_indicator_alike") {
     for (size_t i = 0, len = data1.size(); i < len; i++) {
         CHECK(data1[i] == data2[i]);
     }
-    HKU_INFO("---------------------");
     CHECK_UNARY(data1.alike(data2));
 }
 

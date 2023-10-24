@@ -35,7 +35,7 @@ public:
 
     bool operator==(const KData&) const;
     bool operator!=(const KData& other) const {
-        return *this == other;
+        return !(*this == other);
     }
 
     DatetimeList getDatetimeList() const;
