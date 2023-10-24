@@ -47,6 +47,11 @@ KData Indicator::getContext() const {
     return m_imp ? m_imp->getContext() : KData();
 }
 
+bool Indicator::alike(const Indicator& other) const {
+    HKU_IF_RETURN(m_imp == other.m_imp, true);
+    return m_imp->alike(*other.m_imp);
+}
+
 Indicator& Indicator::operator=(const Indicator& indicator) {
     HKU_IF_RETURN(this == &indicator, *this);
     m_imp = indicator.m_imp;

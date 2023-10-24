@@ -125,6 +125,9 @@ public:
         return m_params.find(name) != m_params.end();
     }
 
+    /** 获取参数个数 */
+    size_t size() const;
+
     /**
      * 获取指定参数的实际类型
      * @param name 指定参数名称
@@ -159,8 +162,18 @@ public:
     template <typename ValueType>
     ValueType tryGet(const string& name, const ValueType& val) const;
 
-private:
     typedef map<string, boost::any> param_map_t;
+    typedef param_map_t::const_iterator iterator;
+
+    iterator begin() const {
+        return m_params.begin();
+    }
+
+    iterator end() const {
+        return m_params.end();
+    }
+
+private:
     param_map_t m_params;
 
 //================================
@@ -334,6 +347,10 @@ public:                                                                     \
         }                                                                   \
         return getParam<ValueType>(name);                                   \
     }
+
+inline size_t Parameter::size() const {
+    return m_params.size();
+}
 
 template <typename ValueType>
 ValueType Parameter::get(const string& name) const {

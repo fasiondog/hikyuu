@@ -32,7 +32,7 @@ KData::KData(const Stock& stock, const KQuery& query) {
     }
 }
 
-bool KData::operator==(const KData& thr) {
+bool KData::operator==(const KData& thr) const {
     return this == &thr || m_imp == thr.m_imp ||
            (getStock() == thr.getStock() && getQuery() == thr.getQuery());
 }

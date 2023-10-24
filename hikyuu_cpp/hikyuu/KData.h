@@ -33,7 +33,10 @@ public:
     size_t size() const;
     bool empty() const;
 
-    bool operator==(const KData&);
+    bool operator==(const KData&) const;
+    bool operator!=(const KData& other) const {
+        return *this == other;
+    }
 
     DatetimeList getDatetimeList() const;
 

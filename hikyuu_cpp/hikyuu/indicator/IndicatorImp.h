@@ -115,6 +115,9 @@ public:
     /** 以Indicator的方式获取指定的输出集，该方式包含了discard的信息 */
     IndicatorImpPtr getResult(size_t result_num);
 
+    /** 判断是否和另一个指标等效，即计算效果相同 */
+    bool alike(const IndicatorImp& other) const;
+
     /**
      * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数,
      * 未做越界保护

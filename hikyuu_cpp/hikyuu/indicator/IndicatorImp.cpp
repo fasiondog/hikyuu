@@ -1443,4 +1443,38 @@ void IndicatorImp::_update_discard() {
     }
 }
 
+bool IndicatorImp::alike(const IndicatorImp &other) const {
+    HKU_IF_RETURN(this == &other, true);
+
+    HKU_DEBUG("m_optype != other.m_optype: {}", m_optype != other.m_optype);
+    HKU_DEBUG("m_params != other.m_params: {}", m_params != other.m_params);
+    HKU_DEBUG("m_discard != other.m_discard: {}", m_discard != other.m_discard);
+    HKU_DEBUG("m_result_num != other.m_result_num: {}", m_result_num != other.m_result_num);
+
+    HKU_DEBUG("m_params: {}, other.m_params: {}", m_params.getNameValueList(),
+              other.m_params.getNameValueList());
+
+    HKU_IF_RETURN(m_optype != other.m_optype || m_params != other.m_params ||
+                    m_discard != other.m_discard || m_result_num != other.m_result_num,
+                  false);
+
+    for (size_t i = 0, total = m_result_num; i < m_result_num; i++) {
+        if (m_pBuffer[i]) {
+            PriceList &data1 = *(m_pBuffer[i]);
+            PriceList &data2 = *(other.m_pBuffer[i]);
+            for (size_t j = 0, len = data1.size(); j < len; j++) {
+                HKU_IF_RETURN(data1[j] != data2[j], false);
+            }
+        }
+    }
+
+    HKU_IF_RETURN(isLeaf(), m_name == other.m_name);
+
+    HKU_IF_RETURN(m_three && other.m_three && !m_three->alike(*other.m_three), false);
+    HKU_IF_RETURN(m_left && other.m_left && !m_left->alike(*other.m_left), false);
+    HKU_IF_RETURN(m_right && other.m_right && !m_right->alike(*other.m_right), false);
+
+    return true;
+}
+
 } /* namespace hku */
