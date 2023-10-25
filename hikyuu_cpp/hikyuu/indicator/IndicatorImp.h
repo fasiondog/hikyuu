@@ -366,6 +366,9 @@ public:                                           \
         return true;                              \
     }
 
+/** 获取 OPType 名称字符串 */
+string HKU_API getOPTypeName(IndicatorImp::OPType);
+
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 
 HKU_API std::ostream& operator<<(std::ostream&, const IndicatorImp&);
