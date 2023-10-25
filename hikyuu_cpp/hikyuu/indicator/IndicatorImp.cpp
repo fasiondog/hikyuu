@@ -1476,4 +1476,31 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
     return true;
 }
 
+std::list<IndicatorImpPtr> IndicatorImp::getAllSubNodes() const {
+    std::list<IndicatorImpPtr> result;
+    if (m_left) {
+        result.push_back(m_left);
+        auto sub_nodes = m_left->getAllSubNodes();
+        result.splice(result.end(), sub_nodes);
+    }
+    if (m_right) {
+        result.push_back(m_right);
+        auto sub_nodes = m_right->getAllSubNodes();
+        result.splice(result.end(), sub_nodes);
+    }
+    if (m_three) {
+        result.push_back(m_three);
+        auto sub_nodes = m_three->getAllSubNodes();
+        result.splice(result.end(), sub_nodes);
+    }
+    for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
+        if (iter->second) {
+            result.push_back(iter->second);
+            auto sub_nodes = iter->second->getAllSubNodes();
+            result.splice(result.end(), sub_nodes);
+        }
+    }
+    return result;
+}
+
 } /* namespace hku */

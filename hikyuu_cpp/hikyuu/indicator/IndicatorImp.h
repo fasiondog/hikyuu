@@ -218,6 +218,8 @@ private:
     void execute_if();
     void execute_corr();
 
+    std::list<IndicatorImpPtr> getAllSubNodes() const;
+
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
 
