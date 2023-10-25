@@ -1446,7 +1446,8 @@ void IndicatorImp::_update_discard() {
 bool IndicatorImp::alike(const IndicatorImp &other) const {
     HKU_IF_RETURN(this == &other, true);
     HKU_IF_RETURN(m_optype != other.m_optype || m_params != other.m_params ||
-                    m_discard != other.m_discard || m_result_num != other.m_result_num,
+                    m_discard != other.m_discard || m_result_num != other.m_result_num ||
+                    m_ind_params.size() != other.m_ind_params.size(),
                   false);
 
     for (size_t i = 0, total = m_result_num; i < m_result_num; i++) {
@@ -1457,6 +1458,13 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
                 HKU_IF_RETURN(data1[j] != data2[j], false);
             }
         }
+    }
+
+    auto iter1 = m_ind_params.cbegin();
+    auto iter2 = other.m_ind_params.cend();
+    for (; iter1 != m_ind_params.cend() && iter2 != other.m_ind_params.cend(); ++iter1, ++iter2) {
+        HKU_IF_RETURN(iter1->first != iter2->first, false);
+        HKU_IF_RETURN(!iter1->second->alike(*(iter2->second)), false);
     }
 
     HKU_IF_RETURN(isLeaf(), m_name == other.m_name);
