@@ -39,7 +39,7 @@ public:
 
     virtual void transaction() override;
     virtual void commit() override;
-    virtual void rollback() override;
+    virtual void rollback() noexcept override;
 
 private:
     void close();

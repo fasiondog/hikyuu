@@ -47,7 +47,7 @@ public:
 
     virtual void transaction() override;
     virtual void commit() override;
-    virtual void rollback() override;
+    virtual void rollback() noexcept override;
     virtual int64_t exec(const std::string &sql_string) override;
     virtual SQLStatementPtr getStatement(const std::string &sql_statement) override;
     virtual bool tableExist(const std::string &tablename) override;
@@ -79,7 +79,7 @@ private:
 private:
     friend class SQLiteStatement;
     string m_dbname;
-    sqlite3* m_db;
+    sqlite3 *m_db;
 };
 
 typedef shared_ptr<SQLiteConnect> SQLiteConnectPtr;

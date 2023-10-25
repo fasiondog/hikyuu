@@ -43,6 +43,7 @@ public:
             m_driver->commit();
         } catch (...) {
             HKU_ERROR("Transaction commit failed!");
+            m_driver->rollback();
             m_driver.reset();
         }
     }

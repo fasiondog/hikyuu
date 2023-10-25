@@ -16,12 +16,12 @@
 namespace hku {
 
 // sqlite3 多线程处理时，等待其他锁释放回调处理
-static int sqlite_busy_call_back(void* ptr, int count) {
+static int sqlite_busy_call_back(void *ptr, int count) {
     std::this_thread::yield();
     return 1;
 }
 
-SQLiteConnect::SQLiteConnect(const Parameter& param) : DBConnectBase(param), m_db(nullptr) {
+SQLiteConnect::SQLiteConnect(const Parameter &param) : DBConnectBase(param), m_db(nullptr) {
     try {
         m_dbname = getParam<string>("db");
         int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
@@ -50,16 +50,16 @@ SQLiteConnect::SQLiteConnect(const Parameter& param) : DBConnectBase(param), m_d
             sqlite3_extended_result_codes(m_db, true);
         }
 
-    } catch (std::out_of_range& e) {
+    } catch (std::out_of_range &e) {
         HKU_FATAL("Can't get database name! {}", e.what());
         close();
         throw;
-    } catch (SQLException& e) {
+    } catch (SQLException &e) {
         HKU_FATAL("Failed open database: {})! SQLite3 errcode: {}, errmsg: {}", m_dbname,
                   e.errcode(), e.what());
         close();
         throw;
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         HKU_FATAL("Failed initialize data driver({})! exception: {}", m_dbname, e.what());
         close();
         throw;
@@ -108,15 +108,21 @@ void SQLiteConnect::commit() {
     exec("COMMIT TRANSACTION");
 }
 
-void SQLiteConnect::rollback() {
-    exec("ROLLBACK TRANSACTION");
+void SQLiteConnect::rollback() noexcept {
+    try {
+        exec("ROLLBACK TRANSACTION");
+    } catch (const std::exception &e) {
+        HKU_ERROR("rollback failed! {}", e.what());
+    } catch (...) {
+        HKU_ERROR("Unknown error!");
+    }
 }
 
 SQLStatementPtr SQLiteConnect::getStatement(const std::string &sql_statement) {
     return std::make_shared<SQLiteStatement>(this, sql_statement);
 }
 
-bool SQLiteConnect::tableExist(const string& tablename) {
+bool SQLiteConnect::tableExist(const string &tablename) {
     SQLStatementPtr st =
       getStatement(fmt::format("select count(1) from sqlite_master where name='{}'", tablename));
     st->exec();
