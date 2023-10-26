@@ -218,7 +218,8 @@ private:
     void execute_if();
     void execute_corr();
 
-    std::list<IndicatorImpPtr> getAllSubNodes() const;
+    std::vector<IndicatorImpPtr> getAllSubNodes();
+    void repeatALikeNodes();
 
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
@@ -238,6 +239,8 @@ protected:
     IndicatorImpPtr m_right;
     IndicatorImpPtr m_three;
     ind_param_map_t m_ind_params;  // don't use unordered_map
+
+    IndicatorImp* m_parent{nullptr};  // can't use shared_from_this in python, so not weak_ptr
 
 public:
     static void initDynEngine();
