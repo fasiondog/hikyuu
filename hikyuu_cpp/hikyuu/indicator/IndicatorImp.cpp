@@ -1504,6 +1504,12 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
 
 std::vector<IndicatorImpPtr> IndicatorImp::getAllSubNodes() {
     std::vector<IndicatorImpPtr> result;
+    // 需要按下面的顺序进行
+    if (m_three) {
+        result.push_back(m_three);
+        auto sub_nodes = m_three->getAllSubNodes();
+        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
+    }
     if (m_left) {
         result.push_back(m_left);
         auto sub_nodes = m_left->getAllSubNodes();
@@ -1514,18 +1520,12 @@ std::vector<IndicatorImpPtr> IndicatorImp::getAllSubNodes() {
         auto sub_nodes = m_right->getAllSubNodes();
         result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
     }
-    if (m_three) {
-        result.push_back(m_three);
-        auto sub_nodes = m_three->getAllSubNodes();
-        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
-    }
     return result;
 }
 
 void IndicatorImp::repeatALikeNodes() {
     auto sub_nodes = getAllSubNodes();
     size_t total = sub_nodes.size();
-    // size_t count = 0;
     for (size_t i = 0; i < total; i++) {
         const auto &cur = sub_nodes[i];
         if (!cur) {
@@ -1558,7 +1558,6 @@ void IndicatorImp::repeatALikeNodes() {
             }
         }
     }
-    // HKU_INFO("merged: {}", count);
 }
 
 } /* namespace hku */
