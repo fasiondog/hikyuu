@@ -154,4 +154,7 @@ void export_IndicatorImp() {
       .def("is_leaf", &IndicatorImp::isLeaf);
 
     register_ptr_to_python<IndicatorImpPtr>();
+
+    def("reset_tmp_count", reset_tmp_count);
+    def("read_tmp_count", read_tmp_count);
 }

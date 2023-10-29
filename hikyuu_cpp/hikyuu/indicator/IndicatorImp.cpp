@@ -224,12 +224,14 @@ void IndicatorImp::setContext(const KData &k) {
 
     // 上下文没变化的情况下根据自身标识进行计算
     if (old_k == k) {
+        HKU_INFO("old_k == k: {}", name());
         if (m_need_calculate) {
             calculate();
         }
         return;
     }
 
+    HKU_INFO("setContext: {}, {}", name(), int64_t(this));
     m_need_calculate = true;
 
     // 子节点设置上下文
@@ -293,7 +295,6 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_result_num = m_result_num;
     p->m_need_calculate = m_need_calculate;
     p->m_optype = m_optype;
-    // p->m_parent = m_parent;
 
     for (size_t i = 0; i < m_result_num; ++i) {
         if (m_pBuffer[i]) {
@@ -302,14 +303,17 @@ IndicatorImpPtr IndicatorImp::clone() {
     }
 
     if (m_left) {
+        m_left->m_parent = nullptr;
         p->m_left = m_left->clone();
         p->m_left->m_parent = this;
     }
     if (m_right) {
+        m_left->m_parent = nullptr;
         p->m_right = m_right->clone();
         p->m_right->m_parent = this;
     }
     if (m_three) {
+        m_left->m_parent = nullptr;
         p->m_three = m_three->clone();
         p->m_three->m_parent = this;
     }
@@ -317,6 +321,21 @@ IndicatorImpPtr IndicatorImp::clone() {
     for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
         p->m_ind_params[iter->first] = iter->second->clone();
     }
+
+    p->m_parent = m_parent;
+    if (m_parent) {
+        if (m_parent->m_three.get() == this) {
+            m_parent->m_three = p;
+        }
+        if (m_parent->m_left.get() == this) {
+            m_parent->m_left = p;
+        }
+        if (m_parent->m_right.get() == this) {
+            m_parent->m_right = p;
+        }
+        m_parent = nullptr;
+    }
+    p->repeatALikeNodes();
     return p;
 }
 
@@ -653,6 +672,8 @@ Indicator IndicatorImp::calculate() {
         }
         return Indicator(result);
     }
+
+    inc_tmp_count();
 
     if (!check()) {
         HKU_ERROR("Invalid param! {} : {}", formula(), long_name());
@@ -1560,10 +1581,18 @@ void IndicatorImp::_update_discard() {
 
 bool IndicatorImp::alike(const IndicatorImp &other) const {
     HKU_IF_RETURN(this == &other, true);
-    HKU_IF_RETURN(m_optype != other.m_optype || m_params != other.m_params ||
-                    m_discard != other.m_discard || m_result_num != other.m_result_num ||
+    HKU_IF_RETURN(m_optype != other.m_optype || typeid(*this).name() != typeid(other).name() ||
+                    m_params != other.m_params || m_discard != other.m_discard ||
+                    m_result_num != other.m_result_num ||
                     m_ind_params.size() != other.m_ind_params.size(),
                   false);
+
+    auto iter1 = m_ind_params.cbegin();
+    auto iter2 = other.m_ind_params.cend();
+    for (; iter1 != m_ind_params.cend() && iter2 != other.m_ind_params.cend(); ++iter1, ++iter2) {
+        HKU_IF_RETURN(iter1->first != iter2->first, false);
+        HKU_IF_RETURN(!iter1->second->alike(*(iter2->second)), false);
+    }
 
     for (size_t i = 0, total = m_result_num; i < m_result_num; i++) {
         if (m_pBuffer[i]) {
@@ -1575,14 +1604,7 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
         }
     }
 
-    auto iter1 = m_ind_params.cbegin();
-    auto iter2 = other.m_ind_params.cend();
-    for (; iter1 != m_ind_params.cend() && iter2 != other.m_ind_params.cend(); ++iter1, ++iter2) {
-        HKU_IF_RETURN(iter1->first != iter2->first, false);
-        HKU_IF_RETURN(!iter1->second->alike(*(iter2->second)), false);
-    }
-
-    HKU_IF_RETURN(isLeaf(), m_name == other.m_name);
+    HKU_IF_RETURN(isLeaf(), true);
 
     HKU_IF_RETURN(m_three && other.m_three && !m_three->alike(*other.m_three), false);
     HKU_IF_RETURN(m_left && other.m_left && !m_left->alike(*other.m_left), false);
@@ -1613,6 +1635,7 @@ std::vector<IndicatorImpPtr> IndicatorImp::getAllSubNodes() {
 }
 
 void IndicatorImp::repeatALikeNodes() {
+#if 1
     auto sub_nodes = getAllSubNodes();
     size_t total = sub_nodes.size();
     for (size_t i = 0; i < total; i++) {
@@ -1622,31 +1645,68 @@ void IndicatorImp::repeatALikeNodes() {
         }
         for (size_t j = i + 1; j < total; j++) {
             auto &node = sub_nodes[j];
-            if (!node) {
+            if (!node || cur == node) {
                 continue;
             }
 
             if (cur->alike(*node)) {
                 IndicatorImp *node_parent = node->m_parent;
                 if (node_parent) {
+                    HKU_INFO("merged: {}, {}, {},  {}, {}, {}", cur->name(), int64_t(cur.get()),
+                             int64_t(cur->m_parent), node->name(), int64_t(node.get()),
+                             int64_t(node->m_parent));
+                    HKU_INFO(
+                      "parent three: {}, left: {}, right: {}", int64_t(node_parent->m_three.get()),
+                      int64_t(node_parent->m_left.get()), int64_t(node_parent->m_right.get()));
+
                     if (node_parent->m_left == node) {
+                        HKU_INFO("merged: {}, {}, {}", cur->name(), int64_t(cur.get()),
+                                 int64_t(node_parent->m_left.get()));
                         node_parent->m_left = cur;
                     }
                     if (node_parent->m_right == node) {
+                        HKU_INFO("merged: {}, {}, {}", cur->name(), int64_t(cur.get()),
+                                 int64_t(node_parent->m_right.get()));
                         node_parent->m_right = cur;
                     }
                     if (node_parent->m_three == node) {
+                        HKU_INFO("merged: {}, {}, {}", cur->name(), int64_t(cur.get()),
+                                 int64_t(node_parent->m_three.get()));
                         node_parent->m_three = cur;
                     }
+                    HKU_INFO("left merged: {}, {}, {}, {}, {}, {}", cur->name(),
+                             node_parent->name(), int64_t(node_parent), int64_t(cur.get()),
+                             int64_t(node_parent->m_left.get()), int64_t(node.get()));
+                    HKU_INFO("right merged: {}, {}, {}, {}, {}, {}", cur->name(),
+                             node_parent->name(), int64_t(node_parent), int64_t(cur.get()),
+                             int64_t(node_parent->m_right.get()), int64_t(node.get()));
+                    HKU_INFO("three merged: {}, {}, {}, {}, {}, {}", cur->name(),
+                             node_parent->name(), int64_t(node_parent), int64_t(cur.get()),
+                             int64_t(node_parent->m_three.get()), int64_t(node.get()));
                     // count++;
                 } else {
                     HKU_WARN("Exist some errors! node: {}, cur: {}", node->name(), cur->name());
                 }
 
-                node = IndicatorImpPtr();
+                node->m_parent = nullptr;
+                node.reset();
             }
         }
     }
+#endif
+}
+
+static size_t g_tmp_count = 0;
+void HKU_API inc_tmp_count() {
+    g_tmp_count++;
+}
+
+void HKU_API reset_tmp_count() {
+    g_tmp_count = 0;
+}
+
+size_t HKU_API read_tmp_count() {
+    return g_tmp_count;
 }
 
 } /* namespace hku */
