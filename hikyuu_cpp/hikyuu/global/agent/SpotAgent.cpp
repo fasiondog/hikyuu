@@ -70,7 +70,7 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
         result->low = spot->low();
         result->close = spot->close();
         result->amount = spot->amount();
-        result->volumn = spot->volumn();
+        result->volumn = spot->volume();
         result->bid1 = spot->bid1();
         result->bid1_amount = spot->bid1_amount();
         result->bid2 = spot->bid2();

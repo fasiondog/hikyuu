@@ -6,6 +6,13 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+// Ensure the included flatbuffers.h is the same version as when this file was
+// generated, otherwise it may not be compatible.
+static_assert(FLATBUFFERS_VERSION_MAJOR == 2 &&
+              FLATBUFFERS_VERSION_MINOR == 0 &&
+              FLATBUFFERS_VERSION_REVISION == 8,
+             "Non-compatible flatbuffers version included");
+
 namespace hikyuu {
 namespace flat {
 
@@ -28,7 +35,7 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_LOW = 18,
     VT_CLOSE = 20,
     VT_AMOUNT = 22,
-    VT_VOLUMN = 24,
+    VT_VOLUME = 24,
     VT_BID1 = 26,
     VT_BID1_AMOUNT = 28,
     VT_BID2 = 30,
@@ -80,8 +87,8 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   double amount() const {
     return GetField<double>(VT_AMOUNT, 0.0);
   }
-  double volumn() const {
-    return GetField<double>(VT_VOLUMN, 0.0);
+  double volume() const {
+    return GetField<double>(VT_VOLUME, 0.0);
   }
   double bid1() const {
     return GetField<double>(VT_BID1, 0.0);
@@ -153,33 +160,33 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyString(name()) &&
            VerifyOffset(verifier, VT_DATETIME) &&
            verifier.VerifyString(datetime()) &&
-           VerifyField<double>(verifier, VT_YESTERDAY_CLOSE) &&
-           VerifyField<double>(verifier, VT_OPEN) &&
-           VerifyField<double>(verifier, VT_HIGH) &&
-           VerifyField<double>(verifier, VT_LOW) &&
-           VerifyField<double>(verifier, VT_CLOSE) &&
-           VerifyField<double>(verifier, VT_AMOUNT) &&
-           VerifyField<double>(verifier, VT_VOLUMN) &&
-           VerifyField<double>(verifier, VT_BID1) &&
-           VerifyField<double>(verifier, VT_BID1_AMOUNT) &&
-           VerifyField<double>(verifier, VT_BID2) &&
-           VerifyField<double>(verifier, VT_BID2_AMOUNT) &&
-           VerifyField<double>(verifier, VT_BID3) &&
-           VerifyField<double>(verifier, VT_BID3_AMOUNT) &&
-           VerifyField<double>(verifier, VT_BID4) &&
-           VerifyField<double>(verifier, VT_BID4_AMOUNT) &&
-           VerifyField<double>(verifier, VT_BID5) &&
-           VerifyField<double>(verifier, VT_BID5_AMOUNT) &&
-           VerifyField<double>(verifier, VT_ASK1) &&
-           VerifyField<double>(verifier, VT_ASK1_AMOUNT) &&
-           VerifyField<double>(verifier, VT_ASK2) &&
-           VerifyField<double>(verifier, VT_ASK2_AMOUNT) &&
-           VerifyField<double>(verifier, VT_ASK3) &&
-           VerifyField<double>(verifier, VT_ASK3_AMOUNT) &&
-           VerifyField<double>(verifier, VT_ASK4) &&
-           VerifyField<double>(verifier, VT_ASK4_AMOUNT) &&
-           VerifyField<double>(verifier, VT_ASK5) &&
-           VerifyField<double>(verifier, VT_ASK5_AMOUNT) &&
+           VerifyField<double>(verifier, VT_YESTERDAY_CLOSE, 8) &&
+           VerifyField<double>(verifier, VT_OPEN, 8) &&
+           VerifyField<double>(verifier, VT_HIGH, 8) &&
+           VerifyField<double>(verifier, VT_LOW, 8) &&
+           VerifyField<double>(verifier, VT_CLOSE, 8) &&
+           VerifyField<double>(verifier, VT_AMOUNT, 8) &&
+           VerifyField<double>(verifier, VT_VOLUME, 8) &&
+           VerifyField<double>(verifier, VT_BID1, 8) &&
+           VerifyField<double>(verifier, VT_BID1_AMOUNT, 8) &&
+           VerifyField<double>(verifier, VT_BID2, 8) &&
+           VerifyField<double>(verifier, VT_BID2_AMOUNT, 8) &&
+           VerifyField<double>(verifier, VT_BID3, 8) &&
+           VerifyField<double>(verifier, VT_BID3_AMOUNT, 8) &&
+           VerifyField<double>(verifier, VT_BID4, 8) &&
+           VerifyField<double>(verifier, VT_BID4_AMOUNT, 8) &&
+           VerifyField<double>(verifier, VT_BID5, 8) &&
+           VerifyField<double>(verifier, VT_BID5_AMOUNT, 8) &&
+           VerifyField<double>(verifier, VT_ASK1, 8) &&
+           VerifyField<double>(verifier, VT_ASK1_AMOUNT, 8) &&
+           VerifyField<double>(verifier, VT_ASK2, 8) &&
+           VerifyField<double>(verifier, VT_ASK2_AMOUNT, 8) &&
+           VerifyField<double>(verifier, VT_ASK3, 8) &&
+           VerifyField<double>(verifier, VT_ASK3_AMOUNT, 8) &&
+           VerifyField<double>(verifier, VT_ASK4, 8) &&
+           VerifyField<double>(verifier, VT_ASK4_AMOUNT, 8) &&
+           VerifyField<double>(verifier, VT_ASK5, 8) &&
+           VerifyField<double>(verifier, VT_ASK5_AMOUNT, 8) &&
            verifier.EndTable();
   }
 };
@@ -218,8 +225,8 @@ struct SpotBuilder {
   void add_amount(double amount) {
     fbb_.AddElement<double>(Spot::VT_AMOUNT, amount, 0.0);
   }
-  void add_volumn(double volumn) {
-    fbb_.AddElement<double>(Spot::VT_VOLUMN, volumn, 0.0);
+  void add_volume(double volume) {
+    fbb_.AddElement<double>(Spot::VT_VOLUME, volume, 0.0);
   }
   void add_bid1(double bid1) {
     fbb_.AddElement<double>(Spot::VT_BID1, bid1, 0.0);
@@ -285,7 +292,6 @@ struct SpotBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  SpotBuilder &operator=(const SpotBuilder &);
   flatbuffers::Offset<Spot> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Spot>(end);
@@ -305,7 +311,7 @@ inline flatbuffers::Offset<Spot> CreateSpot(
     double low = 0.0,
     double close = 0.0,
     double amount = 0.0,
-    double volumn = 0.0,
+    double volume = 0.0,
     double bid1 = 0.0,
     double bid1_amount = 0.0,
     double bid2 = 0.0,
@@ -347,7 +353,7 @@ inline flatbuffers::Offset<Spot> CreateSpot(
   builder_.add_bid2(bid2);
   builder_.add_bid1_amount(bid1_amount);
   builder_.add_bid1(bid1);
-  builder_.add_volumn(volumn);
+  builder_.add_volume(volume);
   builder_.add_amount(amount);
   builder_.add_close(close);
   builder_.add_low(low);
@@ -373,7 +379,7 @@ inline flatbuffers::Offset<Spot> CreateSpotDirect(
     double low = 0.0,
     double close = 0.0,
     double amount = 0.0,
-    double volumn = 0.0,
+    double volume = 0.0,
     double bid1 = 0.0,
     double bid1_amount = 0.0,
     double bid2 = 0.0,
@@ -410,7 +416,7 @@ inline flatbuffers::Offset<Spot> CreateSpotDirect(
       low,
       close,
       amount,
-      volumn,
+      volume,
       bid1,
       bid1_amount,
       bid2,
@@ -461,7 +467,6 @@ struct SpotListBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  SpotListBuilder &operator=(const SpotListBuilder &);
   flatbuffers::Offset<SpotList> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<SpotList>(end);
