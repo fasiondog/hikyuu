@@ -33,7 +33,8 @@ public:
     size_t size() const;
     bool empty() const;
 
-    bool operator==(const KData&);
+    bool operator==(const KData&) const;
+    bool operator!=(const KData&) const;
 
     DatetimeList getDatetimeList() const;
 
@@ -215,6 +216,10 @@ inline size_t KData::endPos() const {
 
 inline size_t KData::lastPos() const {
     return m_imp ? m_imp->lastPos() : 0;
+}
+
+inline bool KData::operator!=(const KData& other) const {
+    return !(*this == other);
 }
 
 } /* namespace hku */
