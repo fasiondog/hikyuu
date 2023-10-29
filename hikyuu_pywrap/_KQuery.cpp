@@ -15,6 +15,9 @@ using namespace hku;
 KQuery::RecoverType (KQuery::*get_recoverType)() const = &KQuery::recoverType;
 void (KQuery::*set_recoverType)(KQuery::RecoverType recoverType) = &KQuery::recoverType;
 
+bool (*kquery_eq)(const KQuery&, const KQuery&) = operator==;
+bool (*kquery_ne)(const KQuery&, const KQuery&) = operator!=;
+
 void export_KQuery() {
     scope in_Query =
       class_<KQuery>("Query", "K线数据查询条件", init<>())
@@ -36,6 +39,9 @@ void export_KQuery() {
         .add_property("ktype", &KQuery::kType, "查询的K线类型 Query.KType")
         .add_property("recover_type", get_recoverType, set_recoverType,
                       "查询的复权类型 Query.RecoverType")
+
+        .def("__eq__", kquery_eq)
+        .def("__ne__", kquery_ne)
 
 #if HKU_PYTHON_SUPPORT_PICKLE
         .def_pickle(normal_pickle_suite<KQuery>())

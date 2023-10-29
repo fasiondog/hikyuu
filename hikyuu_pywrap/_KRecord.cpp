@@ -18,6 +18,7 @@ using namespace hku;
 #endif
 
 bool (*krecord_eq)(const KRecord&, const KRecord&) = operator==;
+bool (*krecord_ne)(const KRecord&, const KRecord&) = operator!=;
 
 void export_KReord() {
     class_<KRecord>("KRecord", "K线记录，组成K线数据，属性可读写", init<>())
@@ -35,6 +36,8 @@ void export_KReord() {
       .def_readwrite("volume", &KRecord::transCount, "成交量")
 
       .def("__eq__", krecord_eq)
+      .def("__ne__", krecord_ne)
+
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<KRecord>())
 #endif

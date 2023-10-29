@@ -319,6 +319,7 @@ class HubManager(metaclass=SingletonType):
             'st': 'part/st',
             'prtflo': 'prtflo',
             'sys': 'sys',
+            'ind': 'ind',
         }
 
         # 检查仓库本地目录是否存在，不存在则给出告警信息并直接返回
@@ -340,7 +341,7 @@ class HubManager(metaclass=SingletonType):
                         if (not entry.name.startswith('.')) and entry.is_dir() and (entry.name != "__pycache__"):
                             # 计算实际的导入模块名
                             module_name = '{}.part.{}.{}.part'.format(base_local, part, entry.name) if part not in (
-                                'prtflo', 'sys'
+                                'prtflo', 'sys', 'ind'
                             ) else '{}.{}.{}.part'.format(base_local, part, entry.name)
 
                             # 导入模块
@@ -359,7 +360,7 @@ class HubManager(metaclass=SingletonType):
                                 continue
 
                             name = '{}.{}.{}'.format(hub_model.name, part, entry.name) if part not in (
-                                'prtflo', 'sys'
+                                'prtflo', 'sys', 'ind'
                             ) else '{}.{}.{}'.format(hub_model.name, part, entry.name)
 
                             try:
@@ -390,8 +391,8 @@ class HubManager(metaclass=SingletonType):
         name_parts = name.split('.')
         checkif(
             len(name_parts) < 2
-            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys')), name,
-            PartNameError
+            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys', 'ind')),
+            name, PartNameError
         )
 
         # 未指定仓库名，则默认使用 'default' 仓库
@@ -403,8 +404,11 @@ class HubManager(metaclass=SingletonType):
         except ModuleNotFoundError:
             raise PartNotFoundError(part_name, '请检查部件对应路径是否存在')
         part = part_module.part(**kwargs)
-        part.name = part_model.name
-        part.info = self.get_part_info(part.name)
+        try:
+            part.name = part_model.name
+            part.info = self.get_part_info(part.name)
+        except:
+            pass
         return part
 
     @dbsession
@@ -477,7 +481,7 @@ class HubManager(metaclass=SingletonType):
         """
         abs_path = os.path.abspath(filename)  #当前文件的绝对路径
         path_parts = pathlib.Path(abs_path).parts
-        local_base = path_parts[-4] if path_parts[-3] in ('prtflo', 'sys') else path_parts[5]
+        local_base = path_parts[-4] if path_parts[-3] in ('prtflo', 'sys', 'ind') else path_parts[5]
         hub_model = self._session.query(HubModel.name).filter_by(local_base=local_base).first()
         checkif(hub_model is None, local_base, HubNotFoundError)
         return hub_model.name
@@ -592,10 +596,13 @@ if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO, format='%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
     )
-    add_local_hub('dev', '/home/fasiondog/workspace/stockhouse')
+    # add_local_hub('dev', '/home/fasiondog/workspace/stockhouse')
+    remove_hub('dev')
+    add_local_hub('dev', r'D:\workspace\hikyuu_hub')
     #update_hub('test1')
     update_hub('default')
-    sg = get_part('dev.st.fixed_percent')
+    # sg = get_part('dev.st.fixed_percent')
+    sg = get_part('dev.ind.金叉')
     print(sg)
-    print_part_info('default.sp.fixed_value')
-    print(get_part_name_list(part_type='sg'))
+    # print_part_info('default.sp.fixed_value')
+    # print(get_part_name_list(part_type='sg'))

@@ -88,6 +88,10 @@ void export_KData() {
     :param str filename: 指定保存的文件名称)")
 
       .def("__len__", &KData::size)
+
+      .def(self == self)
+      .def(self != self)
+
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<KData>())
 #endif

@@ -233,14 +233,14 @@ private:
 };
 
 struct HKU_API Stock::Data {
-    string m_market;               // 所属的市场简称
-    string m_code;                 // 证券代码
-    string m_market_code;          // 市场简称证券代码
-    string m_name;                 // 证券名称
-    uint32_t m_type;               // 证券类型
-    bool m_valid;                  // 当前证券是否有效
-    Datetime m_startDate;          // 证券起始日期
-    Datetime m_lastDate;           // 证券最后日期
+    string m_market;       // 所属的市场简称
+    string m_code;         // 证券代码
+    string m_market_code;  // 市场简称证券代码
+    string m_name;         // 证券名称
+    uint32_t m_type;       // 证券类型
+    bool m_valid;          // 当前证券是否有效
+    Datetime m_startDate;  // 证券起始日期
+    Datetime m_lastDate;   // 证券最后日期
 
     StockWeightList m_weightList;  // 权息信息列表
     std::mutex m_weight_mutex;
@@ -291,8 +291,8 @@ inline uint64_t Stock::id() const {
     return isNull() ? 0 : (int64_t)m_data.get();
 }
 
-inline bool Stock::operator==(const Stock& stock) const {
-    return (*this != stock) ? false : true;
+inline bool Stock::operator!=(const Stock& stock) const {
+    return !(*this == stock);
 }
 
 }  // namespace hku

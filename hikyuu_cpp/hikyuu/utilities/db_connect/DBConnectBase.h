@@ -28,12 +28,12 @@ class SQLResultSet;
 class HKU_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase> {
     PARAMETER_SUPPORT  // NOSONAR
 
-public:
-    /**
-     * 构造函数
-     * @param param 数据库连接参数
-     */
-    explicit DBConnectBase(const Parameter &param);
+      public :
+      /**
+       * 构造函数
+       * @param param 数据库连接参数
+       */
+      explicit DBConnectBase(const Parameter &param);
     virtual ~DBConnectBase() = default;
 
     //-------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public:
     virtual void commit() = 0;
 
     /** 回滚事务 */
-    virtual void rollback() = 0;
+    virtual void rollback() noexcept = 0;
 
     /** 执行无返回结果的 SQL */
     virtual int64_t exec(const std::string &sql_string) = 0;

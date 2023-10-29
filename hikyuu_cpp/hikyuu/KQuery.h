@@ -244,18 +244,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const KQuery& query);
 // 关系比较函数, 不直接在类中定义是为了支持 Null<>() == d，Null可以放在左边
 //
 ///////////////////////////////////////////////////////////////////////////////
-bool operator==(const KQuery&, const KQuery&);
-bool operator!=(const KQuery&, const KQuery&);
-
-inline bool operator!=(const KQuery& q1, const KQuery& q2) {
-    // cppcheck-suppress [mismatchingContainerExpression]
-    return q1.start() != q2.start() || q1.end() != q2.end() || q1.queryType() != q2.queryType() ||
-           q1.kType() != q2.kType() || q1.recoverType() != q2.recoverType();
-}
-
-inline bool operator==(const KQuery& q1, const KQuery& q2) {
-    return !(q1 != q2);
-}
+bool HKU_API operator==(const KQuery&, const KQuery&);
+bool HKU_API operator!=(const KQuery&, const KQuery&);
 
 /**
  * 提供KQuery的Null值

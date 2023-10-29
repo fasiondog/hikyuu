@@ -157,8 +157,14 @@ void MySQLConnect::commit() {
     exec("COMMIT");
 }
 
-void MySQLConnect::rollback() {
-    exec("ROLLBACK");
+void MySQLConnect::rollback() noexcept {
+    try {
+        exec("ROLLBACK");
+    } catch (const std::exception& e) {
+        HKU_ERROR("rollback failed! {}", e.what());
+    } catch (...) {
+        HKU_ERROR("Unknonw error!");
+    }
 }
 
 }  // namespace hku

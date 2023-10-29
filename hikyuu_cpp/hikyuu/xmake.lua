@@ -51,6 +51,7 @@ target("hikyuu")
     end
 
     if is_plat("linux", "cross") then
+        add_cxflags("-fPIC")
         if get_config("hdf5") then
             add_packages("hdf5")
         end

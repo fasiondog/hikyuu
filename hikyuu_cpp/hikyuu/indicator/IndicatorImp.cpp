@@ -20,6 +20,88 @@ namespace hku {
 
 StealThreadPool *IndicatorImp::ms_tg = nullptr;
 
+string HKU_API getOPTypeName(IndicatorImp::OPType op) {
+    string name;
+    switch (op) {
+        case IndicatorImp::LEAF:
+            name = "LEAF";
+            break;
+
+        case IndicatorImp::OP:
+            name = "OP";
+            break;
+
+        case IndicatorImp::ADD:
+            name = "ADD";
+            break;
+
+        case IndicatorImp::SUB:
+            name = "SUB";
+            break;
+
+        case IndicatorImp::MUL:
+            name = "MUL";
+            break;
+
+        case IndicatorImp::DIV:
+            name = "DIV";
+            break;
+
+        case IndicatorImp::MOD:
+            name = "MOD";
+            break;
+
+        case IndicatorImp::EQ:
+            name = "EQ";
+            break;
+
+        case IndicatorImp::GT:
+            name = "GT";
+            break;
+
+        case IndicatorImp::LT:
+            name = "LT";
+            break;
+
+        case IndicatorImp::NE:
+            name = "NE";
+            break;
+
+        case IndicatorImp::GE:
+            name = "GE";
+            break;
+
+        case IndicatorImp::LE:
+            name = "LE";
+            break;
+
+        case IndicatorImp::AND:
+            name = "AND";
+            break;
+
+        case IndicatorImp::OR:
+            name = "OR";
+            break;
+
+        case IndicatorImp::WEAVE:
+            name = "WEAVE";
+            break;
+
+        case IndicatorImp::OP_IF:
+            name = "IF";
+            break;
+
+        case IndicatorImp::CORR:
+            name = "CORR";
+            break;
+
+        default:
+            name = "UNKNOWN";
+            break;
+    }
+    return name;
+}
+
 void IndicatorImp::initDynEngine() {
     auto cpu_num = std::thread::hardware_concurrency();
     if (cpu_num > 32) {
@@ -501,6 +583,10 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
         m_three->m_parent = this;
     }
 
+    if (m_name == "IndicatorImp") {
+        m_name = getOPTypeName(op);
+    }
+
     repeatALikeNodes();
 }
 
@@ -514,6 +600,9 @@ void IndicatorImp::add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorI
     m_three->m_parent = this;
     m_left->m_parent = this;
     m_right->m_parent = this;
+    if (m_name == "IndicatorImp") {
+        m_name = getOPTypeName(IndicatorImp::OP_IF);
+    }
     repeatALikeNodes();
 }
 

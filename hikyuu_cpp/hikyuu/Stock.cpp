@@ -158,12 +158,10 @@ Stock::Stock(const string& market, const string& code, const string& name, uint3
 : m_data(make_shared<Data>(market, code, name, type, valid, startDate, lastDate, tick, tickValue,
                            precision, minTradeNumber, maxTradeNumber)) {}
 
-bool Stock::operator!=(const Stock& stock) const {
-    HKU_IF_RETURN(this == &stock, false);
-    HKU_IF_RETURN(m_data == stock.m_data, false);
-    HKU_IF_RETURN(!m_data || !stock.m_data, true);
-    HKU_IF_RETURN(m_data->m_code != stock.code() || m_data->m_market != stock.market(), true);
-    return false;
+bool Stock::operator==(const Stock& stock) const {
+    return this == &stock || m_data == stock.m_data ||
+           (m_data && stock.m_data && (m_data->m_code == stock.m_data->m_code) &&
+            (m_data->m_market == stock.m_data->m_market));
 }
 
 const string& Stock::market() const {
