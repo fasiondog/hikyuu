@@ -78,6 +78,12 @@ HKU_API std::ostream& operator<<(std::ostream&, const KRecord&);
  */
 bool HKU_API operator==(const KRecord& d1, const KRecord& d2);
 
+/**
+ * 两个KRecord不等比较
+ * @ingroup StockManage
+ */
+bool HKU_API operator!=(const KRecord& d1, const KRecord& d2);
+
 }  // namespace hku
 
 #if FMT_VERSION >= 90000

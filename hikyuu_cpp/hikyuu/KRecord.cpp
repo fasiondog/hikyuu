@@ -30,4 +30,8 @@ bool HKU_API operator==(const KRecord& d1, const KRecord& d2) {
             (std::fabs(d1.transCount - d2.transCount) < 0.0001));
 }
 
+bool HKU_API operator!=(const KRecord& d1, const KRecord& d2) {
+    return !(d1 == d2);
+}
+
 }  // namespace hku
