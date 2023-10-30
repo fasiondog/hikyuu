@@ -6,6 +6,7 @@
  */
 #include <stdexcept>
 #include <algorithm>
+#include <forward_list>
 #include "Indicator.h"
 #include "IndParam.h"
 #include "../Stock.h"
@@ -224,14 +225,12 @@ void IndicatorImp::setContext(const KData &k) {
 
     // 上下文没变化的情况下根据自身标识进行计算
     if (old_k == k) {
-        HKU_INFO("old_k == k: {}", name());
         if (m_need_calculate) {
             calculate();
         }
         return;
     }
 
-    HKU_INFO("setContext: {}, {}", name(), int64_t(this));
     m_need_calculate = true;
 
     // 子节点设置上下文
@@ -303,38 +302,42 @@ IndicatorImpPtr IndicatorImp::clone() {
     }
 
     if (m_left) {
-        m_left->m_parent = nullptr;
         p->m_left = m_left->clone();
-        p->m_left->m_parent = this;
+        // p->m_left->m_parent = this;
     }
     if (m_right) {
-        m_left->m_parent = nullptr;
         p->m_right = m_right->clone();
-        p->m_right->m_parent = this;
+        // p->m_right->m_parent = this;
     }
     if (m_three) {
-        m_left->m_parent = nullptr;
         p->m_three = m_three->clone();
-        p->m_three->m_parent = this;
+        // p->m_three->m_parent = this;
     }
 
     for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
         p->m_ind_params[iter->first] = iter->second->clone();
     }
 
-    p->m_parent = m_parent;
-    if (m_parent) {
-        if (m_parent->m_three.get() == this) {
-            m_parent->m_three = p;
+    // 重构各子节点的父节点
+    std::forward_list<IndicatorImp *> stack;
+    stack.push_front(p.get());
+    while (!stack.empty()) {
+        IndicatorImp *node = stack.front();
+        stack.pop_front();
+        if (node->m_three) {
+            node->m_three->m_parent = node;
+            stack.push_front(node->m_three.get());
         }
-        if (m_parent->m_left.get() == this) {
-            m_parent->m_left = p;
+        if (node->m_left) {
+            node->m_left->m_parent = node;
+            stack.push_front(node->m_left.get());
         }
-        if (m_parent->m_right.get() == this) {
-            m_parent->m_right = p;
+        if (node->m_right) {
+            node->m_right->m_parent = node;
+            stack.push_front(node->m_right.get());
         }
-        m_parent = nullptr;
     }
+
     p->repeatALikeNodes();
     return p;
 }
@@ -1652,44 +1655,20 @@ void IndicatorImp::repeatALikeNodes() {
             if (cur->alike(*node)) {
                 IndicatorImp *node_parent = node->m_parent;
                 if (node_parent) {
-                    HKU_INFO("merged: {}, {}, {},  {}, {}, {}", cur->name(), int64_t(cur.get()),
-                             int64_t(cur->m_parent), node->name(), int64_t(node.get()),
-                             int64_t(node->m_parent));
-                    HKU_INFO(
-                      "parent three: {}, left: {}, right: {}", int64_t(node_parent->m_three.get()),
-                      int64_t(node_parent->m_left.get()), int64_t(node_parent->m_right.get()));
-
                     if (node_parent->m_left == node) {
-                        HKU_INFO("merged: {}, {}, {}", cur->name(), int64_t(cur.get()),
-                                 int64_t(node_parent->m_left.get()));
                         node_parent->m_left = cur;
                     }
                     if (node_parent->m_right == node) {
-                        HKU_INFO("merged: {}, {}, {}", cur->name(), int64_t(cur.get()),
-                                 int64_t(node_parent->m_right.get()));
                         node_parent->m_right = cur;
                     }
                     if (node_parent->m_three == node) {
-                        HKU_INFO("merged: {}, {}, {}", cur->name(), int64_t(cur.get()),
-                                 int64_t(node_parent->m_three.get()));
                         node_parent->m_three = cur;
                     }
-                    HKU_INFO("left merged: {}, {}, {}, {}, {}, {}", cur->name(),
-                             node_parent->name(), int64_t(node_parent), int64_t(cur.get()),
-                             int64_t(node_parent->m_left.get()), int64_t(node.get()));
-                    HKU_INFO("right merged: {}, {}, {}, {}, {}, {}", cur->name(),
-                             node_parent->name(), int64_t(node_parent), int64_t(cur.get()),
-                             int64_t(node_parent->m_right.get()), int64_t(node.get()));
-                    HKU_INFO("three merged: {}, {}, {}, {}, {}, {}", cur->name(),
-                             node_parent->name(), int64_t(node_parent), int64_t(cur.get()),
-                             int64_t(node_parent->m_three.get()), int64_t(node.get()));
-                    // count++;
                 } else {
-                    HKU_WARN("Exist some errors! node: {}, cur: {}", node->name(), cur->name());
+                    HKU_WARN("Exist some errors! node: {} cur: {}", node->name(), cur->name());
                 }
 
-                node->m_parent = nullptr;
-                node.reset();
+                // node.reset();
             }
         }
     }
