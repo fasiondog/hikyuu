@@ -15,6 +15,7 @@
 #include <string>
 #include "Null.h"
 #include "arithmetic.h"
+#include <cstdint>
 
 #ifndef HKU_API
 #define HKU_API
