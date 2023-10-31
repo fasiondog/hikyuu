@@ -294,6 +294,7 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_result_num = m_result_num;
     p->m_need_calculate = m_need_calculate;
     p->m_optype = m_optype;
+    p->m_parent = m_parent;
 
     for (size_t i = 0; i < m_result_num; ++i) {
         if (m_pBuffer[i]) {
@@ -303,42 +304,45 @@ IndicatorImpPtr IndicatorImp::clone() {
 
     if (m_left) {
         p->m_left = m_left->clone();
-        // p->m_left->m_parent = this;
+        p->m_left->m_parent = this;
     }
     if (m_right) {
         p->m_right = m_right->clone();
-        // p->m_right->m_parent = this;
+        p->m_right->m_parent = this;
     }
     if (m_three) {
         p->m_three = m_three->clone();
-        // p->m_three->m_parent = this;
+        p->m_three->m_parent = this;
     }
 
     for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
         p->m_ind_params[iter->first] = iter->second->clone();
     }
 
-    // 重构各子节点的父节点
-    std::forward_list<IndicatorImp *> stack;
-    stack.push_front(p.get());
-    while (!stack.empty()) {
-        IndicatorImp *node = stack.front();
-        stack.pop_front();
-        if (node->m_three) {
-            node->m_three->m_parent = node;
-            stack.push_front(node->m_three.get());
+    if (!m_parent) {
+        // 重构各子节点的父节点
+        std::forward_list<IndicatorImp *> stack;
+        stack.push_front(p.get());
+        while (!stack.empty()) {
+            IndicatorImp *node = stack.front();
+            stack.pop_front();
+            if (node->m_three) {
+                node->m_three->m_parent = node;
+                stack.push_front(node->m_three.get());
+            }
+            if (node->m_left) {
+                node->m_left->m_parent = node;
+                stack.push_front(node->m_left.get());
+            }
+            if (node->m_right) {
+                node->m_right->m_parent = node;
+                stack.push_front(node->m_right.get());
+            }
         }
-        if (node->m_left) {
-            node->m_left->m_parent = node;
-            stack.push_front(node->m_left.get());
-        }
-        if (node->m_right) {
-            node->m_right->m_parent = node;
-            stack.push_front(node->m_right.get());
-        }
+
+        p->repeatALikeNodes();
     }
 
-    p->repeatALikeNodes();
     return p;
 }
 
@@ -1638,7 +1642,6 @@ std::vector<IndicatorImpPtr> IndicatorImp::getAllSubNodes() {
 }
 
 void IndicatorImp::repeatALikeNodes() {
-#if 1
     auto sub_nodes = getAllSubNodes();
     size_t total = sub_nodes.size();
     for (size_t i = 0; i < total; i++) {
@@ -1672,7 +1675,6 @@ void IndicatorImp::repeatALikeNodes() {
             }
         }
     }
-#endif
 }
 
 static size_t g_tmp_count = 0;
