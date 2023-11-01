@@ -59,7 +59,7 @@ option("stacktrace")
 option_end()
 
 option("feedback")
-    set_default(false)
+    set_default(true)
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable send feedback.")
