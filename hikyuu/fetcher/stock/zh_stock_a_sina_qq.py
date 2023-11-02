@@ -29,7 +29,7 @@ def parse_one_result_sina(resultstr):
     result['low'] = float(a[5])  # 今日最低价
     result['bid'] = float(a[6])  # 竞买价，即“买一”报价
     result['ask'] = float(a[7])  # 竞卖价，即“卖一”报价
-    result['volumn'] = float(a[8]) / 100.0  # 成交的股票数，由于股票交易以一百股为基本单位，所以在使用时，通常把该值除以一百
+    result['volume'] = float(a[8]) / 100.0  # 成交的股票数，由于股票交易以一百股为基本单位，所以在使用时，通常把该值除以一百
     result['amount'] = round(float(a[9]) / 10000.0, 2)  # 成交金额，单位为“元”，若要以“万元”为成交金额的单位，需要把该值除以一万
     result['bid1_amount'] = float(a[10]) / 100.0  # “买一”申请4695股，即47手
     result['bid1'] = float(a[11])  # “买一”报价
@@ -103,7 +103,7 @@ def parse_one_result_qq(resultstr):
     result['high'] = float(a[33])  # 最高价
     result['low'] = float(a[34])  # 最低价
     # 35: 价格/成交量（手）/成交额
-    result['volumn'] = float(a[36])  # 成交量（手）
+    result['volume'] = float(a[36])  # 成交量（手）
     result['amount'] = float(a[37]) * 10.0  # 成交额（万）
     result['turnover_rate'] = float(a[38]) if a[38] else 0.0  #换手率
     result['pe'] = float(a[39]) if a[39] else 0.0  # 市盈率 Price Earnings Ratio，简称P/E或PER

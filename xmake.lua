@@ -59,7 +59,7 @@ option("stacktrace")
 option_end()
 
 option("feedback")
-    set_default(false)
+    set_default(true)
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable send feedback.")
@@ -113,7 +113,7 @@ set_languages("cxx17", "c99")
 local boost_version = "1.81.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "10.0.0"
-local flatbuffers_version = "23.1.21"
+local flatbuffers_version = "23.5.26"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
     mysql_version = "8.0.21" 

@@ -95,7 +95,7 @@ class Spot(object):
         return 0.0
 
     # Spot
-    def Volumn(self):
+    def Volume(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(24))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
@@ -241,105 +241,204 @@ class Spot(object):
             return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
         return 0.0
 
-def SpotStart(builder): builder.StartObject(31)
+def SpotStart(builder):
+    builder.StartObject(31)
+
 def Start(builder):
-    return SpotStart(builder)
-def SpotAddMarket(builder, market): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(market), 0)
+    SpotStart(builder)
+
+def SpotAddMarket(builder, market):
+    builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(market), 0)
+
 def AddMarket(builder, market):
-    return SpotAddMarket(builder, market)
-def SpotAddCode(builder, code): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(code), 0)
+    SpotAddMarket(builder, market)
+
+def SpotAddCode(builder, code):
+    builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(code), 0)
+
 def AddCode(builder, code):
-    return SpotAddCode(builder, code)
-def SpotAddName(builder, name): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
+    SpotAddCode(builder, code)
+
+def SpotAddName(builder, name):
+    builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
+
 def AddName(builder, name):
-    return SpotAddName(builder, name)
-def SpotAddDatetime(builder, datetime): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(datetime), 0)
+    SpotAddName(builder, name)
+
+def SpotAddDatetime(builder, datetime):
+    builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(datetime), 0)
+
 def AddDatetime(builder, datetime):
-    return SpotAddDatetime(builder, datetime)
-def SpotAddYesterdayClose(builder, yesterdayClose): builder.PrependFloat64Slot(4, yesterdayClose, 0.0)
+    SpotAddDatetime(builder, datetime)
+
+def SpotAddYesterdayClose(builder, yesterdayClose):
+    builder.PrependFloat64Slot(4, yesterdayClose, 0.0)
+
 def AddYesterdayClose(builder, yesterdayClose):
-    return SpotAddYesterdayClose(builder, yesterdayClose)
-def SpotAddOpen(builder, open): builder.PrependFloat64Slot(5, open, 0.0)
+    SpotAddYesterdayClose(builder, yesterdayClose)
+
+def SpotAddOpen(builder, open):
+    builder.PrependFloat64Slot(5, open, 0.0)
+
 def AddOpen(builder, open):
-    return SpotAddOpen(builder, open)
-def SpotAddHigh(builder, high): builder.PrependFloat64Slot(6, high, 0.0)
+    SpotAddOpen(builder, open)
+
+def SpotAddHigh(builder, high):
+    builder.PrependFloat64Slot(6, high, 0.0)
+
 def AddHigh(builder, high):
-    return SpotAddHigh(builder, high)
-def SpotAddLow(builder, low): builder.PrependFloat64Slot(7, low, 0.0)
+    SpotAddHigh(builder, high)
+
+def SpotAddLow(builder, low):
+    builder.PrependFloat64Slot(7, low, 0.0)
+
 def AddLow(builder, low):
-    return SpotAddLow(builder, low)
-def SpotAddClose(builder, close): builder.PrependFloat64Slot(8, close, 0.0)
+    SpotAddLow(builder, low)
+
+def SpotAddClose(builder, close):
+    builder.PrependFloat64Slot(8, close, 0.0)
+
 def AddClose(builder, close):
-    return SpotAddClose(builder, close)
-def SpotAddAmount(builder, amount): builder.PrependFloat64Slot(9, amount, 0.0)
+    SpotAddClose(builder, close)
+
+def SpotAddAmount(builder, amount):
+    builder.PrependFloat64Slot(9, amount, 0.0)
+
 def AddAmount(builder, amount):
-    return SpotAddAmount(builder, amount)
-def SpotAddVolumn(builder, volumn): builder.PrependFloat64Slot(10, volumn, 0.0)
-def AddVolumn(builder, volumn):
-    return SpotAddVolumn(builder, volumn)
-def SpotAddBid1(builder, bid1): builder.PrependFloat64Slot(11, bid1, 0.0)
+    SpotAddAmount(builder, amount)
+
+def SpotAddVolume(builder, volume):
+    builder.PrependFloat64Slot(10, volume, 0.0)
+
+def AddVolume(builder, volume):
+    SpotAddVolume(builder, volume)
+
+def SpotAddBid1(builder, bid1):
+    builder.PrependFloat64Slot(11, bid1, 0.0)
+
 def AddBid1(builder, bid1):
-    return SpotAddBid1(builder, bid1)
-def SpotAddBid1Amount(builder, bid1Amount): builder.PrependFloat64Slot(12, bid1Amount, 0.0)
+    SpotAddBid1(builder, bid1)
+
+def SpotAddBid1Amount(builder, bid1Amount):
+    builder.PrependFloat64Slot(12, bid1Amount, 0.0)
+
 def AddBid1Amount(builder, bid1Amount):
-    return SpotAddBid1Amount(builder, bid1Amount)
-def SpotAddBid2(builder, bid2): builder.PrependFloat64Slot(13, bid2, 0.0)
+    SpotAddBid1Amount(builder, bid1Amount)
+
+def SpotAddBid2(builder, bid2):
+    builder.PrependFloat64Slot(13, bid2, 0.0)
+
 def AddBid2(builder, bid2):
-    return SpotAddBid2(builder, bid2)
-def SpotAddBid2Amount(builder, bid2Amount): builder.PrependFloat64Slot(14, bid2Amount, 0.0)
+    SpotAddBid2(builder, bid2)
+
+def SpotAddBid2Amount(builder, bid2Amount):
+    builder.PrependFloat64Slot(14, bid2Amount, 0.0)
+
 def AddBid2Amount(builder, bid2Amount):
-    return SpotAddBid2Amount(builder, bid2Amount)
-def SpotAddBid3(builder, bid3): builder.PrependFloat64Slot(15, bid3, 0.0)
+    SpotAddBid2Amount(builder, bid2Amount)
+
+def SpotAddBid3(builder, bid3):
+    builder.PrependFloat64Slot(15, bid3, 0.0)
+
 def AddBid3(builder, bid3):
-    return SpotAddBid3(builder, bid3)
-def SpotAddBid3Amount(builder, bid3Amount): builder.PrependFloat64Slot(16, bid3Amount, 0.0)
+    SpotAddBid3(builder, bid3)
+
+def SpotAddBid3Amount(builder, bid3Amount):
+    builder.PrependFloat64Slot(16, bid3Amount, 0.0)
+
 def AddBid3Amount(builder, bid3Amount):
-    return SpotAddBid3Amount(builder, bid3Amount)
-def SpotAddBid4(builder, bid4): builder.PrependFloat64Slot(17, bid4, 0.0)
+    SpotAddBid3Amount(builder, bid3Amount)
+
+def SpotAddBid4(builder, bid4):
+    builder.PrependFloat64Slot(17, bid4, 0.0)
+
 def AddBid4(builder, bid4):
-    return SpotAddBid4(builder, bid4)
-def SpotAddBid4Amount(builder, bid4Amount): builder.PrependFloat64Slot(18, bid4Amount, 0.0)
+    SpotAddBid4(builder, bid4)
+
+def SpotAddBid4Amount(builder, bid4Amount):
+    builder.PrependFloat64Slot(18, bid4Amount, 0.0)
+
 def AddBid4Amount(builder, bid4Amount):
-    return SpotAddBid4Amount(builder, bid4Amount)
-def SpotAddBid5(builder, bid5): builder.PrependFloat64Slot(19, bid5, 0.0)
+    SpotAddBid4Amount(builder, bid4Amount)
+
+def SpotAddBid5(builder, bid5):
+    builder.PrependFloat64Slot(19, bid5, 0.0)
+
 def AddBid5(builder, bid5):
-    return SpotAddBid5(builder, bid5)
-def SpotAddBid5Amount(builder, bid5Amount): builder.PrependFloat64Slot(20, bid5Amount, 0.0)
+    SpotAddBid5(builder, bid5)
+
+def SpotAddBid5Amount(builder, bid5Amount):
+    builder.PrependFloat64Slot(20, bid5Amount, 0.0)
+
 def AddBid5Amount(builder, bid5Amount):
-    return SpotAddBid5Amount(builder, bid5Amount)
-def SpotAddAsk1(builder, ask1): builder.PrependFloat64Slot(21, ask1, 0.0)
+    SpotAddBid5Amount(builder, bid5Amount)
+
+def SpotAddAsk1(builder, ask1):
+    builder.PrependFloat64Slot(21, ask1, 0.0)
+
 def AddAsk1(builder, ask1):
-    return SpotAddAsk1(builder, ask1)
-def SpotAddAsk1Amount(builder, ask1Amount): builder.PrependFloat64Slot(22, ask1Amount, 0.0)
+    SpotAddAsk1(builder, ask1)
+
+def SpotAddAsk1Amount(builder, ask1Amount):
+    builder.PrependFloat64Slot(22, ask1Amount, 0.0)
+
 def AddAsk1Amount(builder, ask1Amount):
-    return SpotAddAsk1Amount(builder, ask1Amount)
-def SpotAddAsk2(builder, ask2): builder.PrependFloat64Slot(23, ask2, 0.0)
+    SpotAddAsk1Amount(builder, ask1Amount)
+
+def SpotAddAsk2(builder, ask2):
+    builder.PrependFloat64Slot(23, ask2, 0.0)
+
 def AddAsk2(builder, ask2):
-    return SpotAddAsk2(builder, ask2)
-def SpotAddAsk2Amount(builder, ask2Amount): builder.PrependFloat64Slot(24, ask2Amount, 0.0)
+    SpotAddAsk2(builder, ask2)
+
+def SpotAddAsk2Amount(builder, ask2Amount):
+    builder.PrependFloat64Slot(24, ask2Amount, 0.0)
+
 def AddAsk2Amount(builder, ask2Amount):
-    return SpotAddAsk2Amount(builder, ask2Amount)
-def SpotAddAsk3(builder, ask3): builder.PrependFloat64Slot(25, ask3, 0.0)
+    SpotAddAsk2Amount(builder, ask2Amount)
+
+def SpotAddAsk3(builder, ask3):
+    builder.PrependFloat64Slot(25, ask3, 0.0)
+
 def AddAsk3(builder, ask3):
-    return SpotAddAsk3(builder, ask3)
-def SpotAddAsk3Amount(builder, ask3Amount): builder.PrependFloat64Slot(26, ask3Amount, 0.0)
+    SpotAddAsk3(builder, ask3)
+
+def SpotAddAsk3Amount(builder, ask3Amount):
+    builder.PrependFloat64Slot(26, ask3Amount, 0.0)
+
 def AddAsk3Amount(builder, ask3Amount):
-    return SpotAddAsk3Amount(builder, ask3Amount)
-def SpotAddAsk4(builder, ask4): builder.PrependFloat64Slot(27, ask4, 0.0)
+    SpotAddAsk3Amount(builder, ask3Amount)
+
+def SpotAddAsk4(builder, ask4):
+    builder.PrependFloat64Slot(27, ask4, 0.0)
+
 def AddAsk4(builder, ask4):
-    return SpotAddAsk4(builder, ask4)
-def SpotAddAsk4Amount(builder, ask4Amount): builder.PrependFloat64Slot(28, ask4Amount, 0.0)
+    SpotAddAsk4(builder, ask4)
+
+def SpotAddAsk4Amount(builder, ask4Amount):
+    builder.PrependFloat64Slot(28, ask4Amount, 0.0)
+
 def AddAsk4Amount(builder, ask4Amount):
-    return SpotAddAsk4Amount(builder, ask4Amount)
-def SpotAddAsk5(builder, ask5): builder.PrependFloat64Slot(29, ask5, 0.0)
+    SpotAddAsk4Amount(builder, ask4Amount)
+
+def SpotAddAsk5(builder, ask5):
+    builder.PrependFloat64Slot(29, ask5, 0.0)
+
 def AddAsk5(builder, ask5):
-    return SpotAddAsk5(builder, ask5)
-def SpotAddAsk5Amount(builder, ask5Amount): builder.PrependFloat64Slot(30, ask5Amount, 0.0)
+    SpotAddAsk5(builder, ask5)
+
+def SpotAddAsk5Amount(builder, ask5Amount):
+    builder.PrependFloat64Slot(30, ask5Amount, 0.0)
+
 def AddAsk5Amount(builder, ask5Amount):
-    return SpotAddAsk5Amount(builder, ask5Amount)
-def SpotEnd(builder): return builder.EndObject()
+    SpotAddAsk5Amount(builder, ask5Amount)
+
+def SpotEnd(builder):
+    return builder.EndObject()
+
 def End(builder):
     return SpotEnd(builder)
+
 
 class SpotT(object):
 
@@ -355,7 +454,7 @@ class SpotT(object):
         self.low = 0.0  # type: float
         self.close = 0.0  # type: float
         self.amount = 0.0  # type: float
-        self.volumn = 0.0  # type: float
+        self.volume = 0.0  # type: float
         self.bid1 = 0.0  # type: float
         self.bid1Amount = 0.0  # type: float
         self.bid2 = 0.0  # type: float
@@ -408,7 +507,7 @@ class SpotT(object):
         self.low = spot.Low()
         self.close = spot.Close()
         self.amount = spot.Amount()
-        self.volumn = spot.Volumn()
+        self.volume = spot.Volume()
         self.bid1 = spot.Bid1()
         self.bid1Amount = spot.Bid1Amount()
         self.bid2 = spot.Bid2()
@@ -455,7 +554,7 @@ class SpotT(object):
         SpotAddLow(builder, self.low)
         SpotAddClose(builder, self.close)
         SpotAddAmount(builder, self.amount)
-        SpotAddVolumn(builder, self.volumn)
+        SpotAddVolume(builder, self.volume)
         SpotAddBid1(builder, self.bid1)
         SpotAddBid1Amount(builder, self.bid1Amount)
         SpotAddBid2(builder, self.bid2)

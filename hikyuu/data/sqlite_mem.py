@@ -63,13 +63,13 @@ class SqliteMemDriver:
 
         :param str market: 市场简称
         :param bar: 可通过键值方式取值，必须包含以下key：market, code, datetime, open, high
-                    low, close, amount, volumn, bid1,bid1_amount .. bid5, ask1, ask1_amount...
+                    low, close, amount, volume, bid1,bid1_amount .. bid5, ask1, ask1_amount...
         """
         kline = [
             (
                 bar['code'], Datetime(bar['datetime']).start_of_day().number if ktype == 'day' else
                 Datetime(bar['datetime']).number, bar['open'], bar['high'], bar['low'],
-                bar['close'], bar['amount'], bar['volumn'], bar['bid1'], bar['bid1_amount'],
+                bar['close'], bar['amount'], bar['volume'], bar['bid1'], bar['bid1_amount'],
                 bar['bid2'], bar['bid2_amount'], bar['bid3'], bar['bid3_amount'], bar['bid4'],
                 bar['bid4_amount'], bar['bid5'], bar['bid5_amount'], bar['ask1'],
                 bar['ask1_amount'], bar['ask2'], bar['ask2_amount'], bar['ask3'],
@@ -77,7 +77,7 @@ class SqliteMemDriver:
             ) for bar in bars if market.lower() == bar['market'].lower()
         ]
         sql = 'INSERT OR REPLACE INTO {}_{}(code, datetime, open, high, low, close, amount, \
-               volumn, bid1, bid1_amount, bid2, bid2_amount, bid3, bid3_amount, bid4, bid4_amount, \
+               volume, bid1, bid1_amount, bid2, bid2_amount, bid3, bid3_amount, bid4, bid4_amount, \
                bid5, bid5_amount, ask1, ask1_amount, ask2, ask2_amount, ask3, ask3_amount, \
                ask4, ask4_amount, ask5, ask5_amount) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,\
                ?,?,?,?,?,?,?,?,?,?)'.format(market, ktype)

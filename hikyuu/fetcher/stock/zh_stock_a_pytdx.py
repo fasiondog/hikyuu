@@ -27,7 +27,7 @@ def parse_one_result(quotes):
     result['low'] = quotes['low']  # 今日最低价
     result['bid'] = float(quotes['bid1'])  # 竞买价，即“买一”报价
     result['ask'] = float(quotes['ask1'])  # 竞卖价，即“卖一”报价
-    result['volumn'] = float(quotes['vol'])  # 成交的股票手数
+    result['volume'] = float(quotes['vol'])  # 成交的股票手数
     result['amount'] = round(quotes['amount'] / 1000.0, 2)  # 成交金额，单位为“元”，若要以“万元”为成交金额的单位，需要把该值除以一万
     result['bid1_amount'] = float(quotes['bid_vol1'])  # “买一”申请4695股，即47手
     result['bid1'] = float(quotes['bid1'])  # “买一”报价

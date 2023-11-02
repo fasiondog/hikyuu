@@ -49,18 +49,30 @@ class SpotList(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def SpotListStart(builder): builder.StartObject(1)
+def SpotListStart(builder):
+    builder.StartObject(1)
+
 def Start(builder):
-    return SpotListStart(builder)
-def SpotListAddSpot(builder, spot): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(spot), 0)
+    SpotListStart(builder)
+
+def SpotListAddSpot(builder, spot):
+    builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(spot), 0)
+
 def AddSpot(builder, spot):
-    return SpotListAddSpot(builder, spot)
-def SpotListStartSpotVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def StartSpotVector(builder, numElems):
+    SpotListAddSpot(builder, spot)
+
+def SpotListStartSpotVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+def StartSpotVector(builder, numElems: int) -> int:
     return SpotListStartSpotVector(builder, numElems)
-def SpotListEnd(builder): return builder.EndObject()
+
+def SpotListEnd(builder):
+    return builder.EndObject()
+
 def End(builder):
     return SpotListEnd(builder)
+
 import hikyuu.flat.Spot
 try:
     from typing import List

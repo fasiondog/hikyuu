@@ -11,7 +11,7 @@ table Spot {
     low: double;
     close: double;
     amount: double;
-    volumn: double;
+    volume: double;
     bid1: double;
     bid1_amount: double;
     bid2: double;

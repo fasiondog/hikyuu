@@ -9,8 +9,8 @@
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
 static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
-              FLATBUFFERS_VERSION_MINOR == 1 &&
-              FLATBUFFERS_VERSION_REVISION == 21,
+              FLATBUFFERS_VERSION_MINOR == 5 &&
+              FLATBUFFERS_VERSION_REVISION == 26,
              "Non-compatible flatbuffers version included");
 
 namespace hikyuu {
@@ -36,7 +36,7 @@ struct SpotT : public ::flatbuffers::NativeTable {
   double low = 0.0;
   double close = 0.0;
   double amount = 0.0;
-  double volumn = 0.0;
+  double volume = 0.0;
   double bid1 = 0.0;
   double bid1_amount = 0.0;
   double bid2 = 0.0;
@@ -73,7 +73,7 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_LOW = 18,
     VT_CLOSE = 20,
     VT_AMOUNT = 22,
-    VT_VOLUMN = 24,
+    VT_VOLUME = 24,
     VT_BID1 = 26,
     VT_BID1_AMOUNT = 28,
     VT_BID2 = 30,
@@ -125,8 +125,8 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   double amount() const {
     return GetField<double>(VT_AMOUNT, 0.0);
   }
-  double volumn() const {
-    return GetField<double>(VT_VOLUMN, 0.0);
+  double volume() const {
+    return GetField<double>(VT_VOLUME, 0.0);
   }
   double bid1() const {
     return GetField<double>(VT_BID1, 0.0);
@@ -204,7 +204,7 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<double>(verifier, VT_LOW, 8) &&
            VerifyField<double>(verifier, VT_CLOSE, 8) &&
            VerifyField<double>(verifier, VT_AMOUNT, 8) &&
-           VerifyField<double>(verifier, VT_VOLUMN, 8) &&
+           VerifyField<double>(verifier, VT_VOLUME, 8) &&
            VerifyField<double>(verifier, VT_BID1, 8) &&
            VerifyField<double>(verifier, VT_BID1_AMOUNT, 8) &&
            VerifyField<double>(verifier, VT_BID2, 8) &&
@@ -266,8 +266,8 @@ struct SpotBuilder {
   void add_amount(double amount) {
     fbb_.AddElement<double>(Spot::VT_AMOUNT, amount, 0.0);
   }
-  void add_volumn(double volumn) {
-    fbb_.AddElement<double>(Spot::VT_VOLUMN, volumn, 0.0);
+  void add_volume(double volume) {
+    fbb_.AddElement<double>(Spot::VT_VOLUME, volume, 0.0);
   }
   void add_bid1(double bid1) {
     fbb_.AddElement<double>(Spot::VT_BID1, bid1, 0.0);
@@ -352,7 +352,7 @@ inline ::flatbuffers::Offset<Spot> CreateSpot(
     double low = 0.0,
     double close = 0.0,
     double amount = 0.0,
-    double volumn = 0.0,
+    double volume = 0.0,
     double bid1 = 0.0,
     double bid1_amount = 0.0,
     double bid2 = 0.0,
@@ -394,7 +394,7 @@ inline ::flatbuffers::Offset<Spot> CreateSpot(
   builder_.add_bid2(bid2);
   builder_.add_bid1_amount(bid1_amount);
   builder_.add_bid1(bid1);
-  builder_.add_volumn(volumn);
+  builder_.add_volume(volume);
   builder_.add_amount(amount);
   builder_.add_close(close);
   builder_.add_low(low);
@@ -420,7 +420,7 @@ inline ::flatbuffers::Offset<Spot> CreateSpotDirect(
     double low = 0.0,
     double close = 0.0,
     double amount = 0.0,
-    double volumn = 0.0,
+    double volume = 0.0,
     double bid1 = 0.0,
     double bid1_amount = 0.0,
     double bid2 = 0.0,
@@ -457,7 +457,7 @@ inline ::flatbuffers::Offset<Spot> CreateSpotDirect(
       low,
       close,
       amount,
-      volumn,
+      volume,
       bid1,
       bid1_amount,
       bid2,
@@ -568,7 +568,7 @@ inline void Spot::UnPackTo(SpotT *_o, const ::flatbuffers::resolver_function_t *
   { auto _e = low(); _o->low = _e; }
   { auto _e = close(); _o->close = _e; }
   { auto _e = amount(); _o->amount = _e; }
-  { auto _e = volumn(); _o->volumn = _e; }
+  { auto _e = volume(); _o->volume = _e; }
   { auto _e = bid1(); _o->bid1 = _e; }
   { auto _e = bid1_amount(); _o->bid1_amount = _e; }
   { auto _e = bid2(); _o->bid2 = _e; }
@@ -609,7 +609,7 @@ inline ::flatbuffers::Offset<Spot> CreateSpot(::flatbuffers::FlatBufferBuilder &
   auto _low = _o->low;
   auto _close = _o->close;
   auto _amount = _o->amount;
-  auto _volumn = _o->volumn;
+  auto _volume = _o->volume;
   auto _bid1 = _o->bid1;
   auto _bid1_amount = _o->bid1_amount;
   auto _bid2 = _o->bid2;
@@ -642,7 +642,7 @@ inline ::flatbuffers::Offset<Spot> CreateSpot(::flatbuffers::FlatBufferBuilder &
       _low,
       _close,
       _amount,
-      _volumn,
+      _volume,
       _bid1,
       _bid1_amount,
       _bid2,

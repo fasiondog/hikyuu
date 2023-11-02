@@ -56,6 +56,7 @@ class HKU_API IndParam;
  */
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
     PARAMETER_SUPPORT
+    friend HKU_API std::ostream& operator<<(std::ostream& os, const IndicatorImp& imp);
 
 public:
     enum OPType {
@@ -99,7 +100,7 @@ public:
 
     size_t size() const;
 
-    price_t get(size_t pos, size_t num = 0);
+    price_t get(size_t pos, size_t num = 0) const;
 
     price_t getByDate(Datetime, size_t num = 0);
 
