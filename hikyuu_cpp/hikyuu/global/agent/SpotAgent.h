@@ -30,7 +30,7 @@ struct HKU_API SpotRecord {
     price_t low;              ///< 最低价
     price_t close;            ///< 收盘价
     price_t amount;           ///< 成交金额 （千元）
-    price_t volumn;           ///< 成交量（手）
+    price_t volume;           ///< 成交量（手）
     price_t bid1;             ///< 买一价
     price_t bid1_amount;      ///< 买一数量（手）
     price_t bid2;             ///< 买二价

@@ -70,7 +70,7 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
         result->low = spot->low();
         result->close = spot->close();
         result->amount = spot->amount();
-        result->volumn = spot->volumn();
+        result->volume = spot->volume();
         result->bid1 = spot->bid1();
         result->bid1_amount = spot->bid1_amount();
         result->bid2 = spot->bid2();
@@ -123,9 +123,9 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     m_batch_count += total;
     for (size_t i = 0; i < total; i++) {
         auto* spot = spots->Get(i);
-        for (auto& process : m_processList) {
-            auto spot_record = parseFlatSpot(spot);
-            if (spot_record) {
+        auto spot_record = parseFlatSpot(spot);
+        if (spot_record) {
+            for (auto& process : m_processList) {
                 m_process_task_list.push_back(m_tg.submit(ProcessTask(process, *spot_record)));
             }
         }
@@ -165,10 +165,10 @@ void SpotAgent::work_thread() {
         size_t length = 0;
         try {
             rv = nng_recv(sock, &buf, &length, NNG_FLAG_ALLOC);
+            HKU_CHECK(rv == 0 || rv == NNG_ETIMEDOUT, "Failed nng_recv! {} ", nng_strerror(rv));
             if (!buf || length == 0) {
                 continue;
             }
-            HKU_CHECK(rv == 0 || rv == NNG_ETIMEDOUT, "Failed nng_recv! {} ", nng_strerror(rv));
             switch (m_status) {
                 case WAITING:
                     if (memcmp(buf, ms_startTag, ms_startTagLength) == 0) {

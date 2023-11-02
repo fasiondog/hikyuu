@@ -115,7 +115,7 @@ class CollectToMySQLThread(QThread):
         self.logger.info("{} 数据采集同步线程终止!".format(self.market))
 
     def record_is_valid(self, record):
-        return record['amount'] > 0.0 and record['volumn'] > 0.0 \
+        return record['amount'] > 0.0 and record['volume'] > 0.0 \
             and record['high'] >= record['open'] >= record['low'] > 0.0 \
             and record['high'] >= record['close'] >= record['low']
 
@@ -129,7 +129,7 @@ class CollectToMySQLThread(QThread):
         sql = 'replace into {} (date, open, high, low, close, amount, count) \
              values ({}, {}, {}, {}, {}, {}, {})'.format(
             table, current_date, record['open'], record['high'], record['low'], record['close'], record['amount'],
-            record['volumn']
+            record['volume']
         )
         cur = connect.cursor()
         cur.execute(sql)

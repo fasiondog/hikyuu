@@ -10,12 +10,16 @@ class SpotList(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsSpotList(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = SpotList()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsSpotList(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # SpotList
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -45,7 +49,84 @@ class SpotList(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def SpotListStart(builder): builder.StartObject(1)
-def SpotListAddSpot(builder, spot): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(spot), 0)
-def SpotListStartSpotVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def SpotListEnd(builder): return builder.EndObject()
+def SpotListStart(builder):
+    builder.StartObject(1)
+
+def Start(builder):
+    SpotListStart(builder)
+
+def SpotListAddSpot(builder, spot):
+    builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(spot), 0)
+
+def AddSpot(builder, spot):
+    SpotListAddSpot(builder, spot)
+
+def SpotListStartSpotVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+def StartSpotVector(builder, numElems: int) -> int:
+    return SpotListStartSpotVector(builder, numElems)
+
+def SpotListEnd(builder):
+    return builder.EndObject()
+
+def End(builder):
+    return SpotListEnd(builder)
+
+import hikyuu.flat.Spot
+try:
+    from typing import List
+except:
+    pass
+
+class SpotListT(object):
+
+    # SpotListT
+    def __init__(self):
+        self.spot = None  # type: List[hikyuu.flat.Spot.SpotT]
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        spotList = SpotList()
+        spotList.Init(buf, pos)
+        return cls.InitFromObj(spotList)
+
+    @classmethod
+    def InitFromPackedBuf(cls, buf, pos=0):
+        n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, pos)
+        return cls.InitFromBuf(buf, pos+n)
+
+    @classmethod
+    def InitFromObj(cls, spotList):
+        x = SpotListT()
+        x._UnPack(spotList)
+        return x
+
+    # SpotListT
+    def _UnPack(self, spotList):
+        if spotList is None:
+            return
+        if not spotList.SpotIsNone():
+            self.spot = []
+            for i in range(spotList.SpotLength()):
+                if spotList.Spot(i) is None:
+                    self.spot.append(None)
+                else:
+                    spot_ = hikyuu.flat.Spot.SpotT.InitFromObj(spotList.Spot(i))
+                    self.spot.append(spot_)
+
+    # SpotListT
+    def Pack(self, builder):
+        if self.spot is not None:
+            spotlist = []
+            for i in range(len(self.spot)):
+                spotlist.append(self.spot[i].Pack(builder))
+            SpotListStartSpotVector(builder, len(self.spot))
+            for i in reversed(range(len(self.spot))):
+                builder.PrependUOffsetTRelative(spotlist[i])
+            spot = builder.EndVector()
+        SpotListStart(builder)
+        if self.spot is not None:
+            SpotListAddSpot(builder, spot)
+        spotList = SpotListEnd(builder)
+        return spotList

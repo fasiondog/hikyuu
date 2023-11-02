@@ -107,7 +107,7 @@ class CollectToMemThread(QThread):
         ]
 
     def record_is_valid(self, record):
-        return record['amount'] > 0.0 and record['volumn'] > 0.0 \
+        return record['amount'] > 0.0 and record['volume'] > 0.0 \
             and record['high'] >= record['open'] >= record['low'] > 0.0 \
             and record['high'] >= record['close'] >= record['low']
 

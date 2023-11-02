@@ -30,7 +30,7 @@ def parse_one_result_huatai(stk):
     result['low'] = stk['LowPx'] / 10000.0  # 今日最低价
     result['bid'] = bids[0]  # 竞买价，即“买一”报价
     result['ask'] = asks[0]  # 竞卖价，即“卖一”报价
-    result['volumn'] = stk['TotalVolumeTrade'] / 100.0  # 成交的股票数，由于股票交易以一百股为基本单位，所以在使用时，通常把该值除以一百
+    result['volume'] = stk['TotalVolumeTrade'] / 100.0  # 成交的股票数，由于股票交易以一百股为基本单位，所以在使用时，通常把该值除以一百
     result['amount'] = stk['TotalValueTrade']  # 成交金额，单位为“元”
 
     # 买入委托
