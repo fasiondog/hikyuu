@@ -11,7 +11,7 @@ mysql-connector-python
 pyperclip
 requests
 qdarkstyle
-flatbuffers
+flatbuffers>=23.5.6
 pynng
 akshare
 pyecharts
