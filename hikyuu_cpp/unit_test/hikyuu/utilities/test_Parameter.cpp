@@ -71,7 +71,32 @@ TEST_CASE("test_Parameter") {
     p2.set<string>("string", "test");
     p2.set<bool>("bool", true);
 
-    CHECK(p1 == p2);
+    CHECK_EQ(p1, p2);
+
+    p2.set<double>("double", 1.0);
+    CHECK(p1 != p2);
+
+    p2.set<double>("double", 0.01);
+    CHECK_EQ(p1, p2);
+    p2.set<string>("string", "n");
+    CHECK(p1 != p2);
+
+    p2.set<string>("string", "test");
+    CHECK_EQ(p1, p2);
+    p2.set<int>("new", 1);
+    CHECK(p1 != p2);
+
+    p1.set<int>("new", 1);
+    CHECK_EQ(p1, p2);
+    p1.set<PriceList>("ps", {1.0, 2.0});
+    CHECK(p1 != p2);
+    p2.set<PriceList>("ps", {1.0, 2.0});
+    CHECK_EQ(p1, p2);
+    p2.set<PriceList>("ps", {1.0, 3.0});
+    CHECK(p1 != p2);
+
+    p2.set<PriceList>("ps", {1.0, 2.0});
+    CHECK_EQ(p1, p2);
 
     /** @arg 测试使用 Stock 做为参数 */
     Stock stk = getStock("sh600000");

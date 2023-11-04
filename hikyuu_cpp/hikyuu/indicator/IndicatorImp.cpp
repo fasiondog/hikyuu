@@ -6,6 +6,7 @@
  */
 #include <stdexcept>
 #include <algorithm>
+#include <forward_list>
 #include "Indicator.h"
 #include "IndParam.h"
 #include "../Stock.h"
@@ -296,6 +297,7 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_result_num = m_result_num;
     p->m_need_calculate = m_need_calculate;
     p->m_optype = m_optype;
+    p->m_parent = m_parent;
 
     for (size_t i = 0; i < m_result_num; ++i) {
         if (m_pBuffer[i]) {
@@ -305,17 +307,45 @@ IndicatorImpPtr IndicatorImp::clone() {
 
     if (m_left) {
         p->m_left = m_left->clone();
+        p->m_left->m_parent = this;
     }
     if (m_right) {
         p->m_right = m_right->clone();
+        p->m_right->m_parent = this;
     }
     if (m_three) {
         p->m_three = m_three->clone();
+        p->m_three->m_parent = this;
     }
 
     for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
         p->m_ind_params[iter->first] = iter->second->clone();
     }
+
+    if (!m_parent) {
+        // 重构各子节点的父节点
+        std::forward_list<IndicatorImp *> stack;
+        stack.push_front(p.get());
+        while (!stack.empty()) {
+            IndicatorImp *node = stack.front();
+            stack.pop_front();
+            if (node->m_three) {
+                node->m_three->m_parent = node;
+                stack.push_front(node->m_three.get());
+            }
+            if (node->m_left) {
+                node->m_left->m_parent = node;
+                stack.push_front(node->m_left.get());
+            }
+            if (node->m_right) {
+                node->m_right->m_parent = node;
+                stack.push_front(node->m_right.get());
+            }
+        }
+
+        p->repeatALikeNodes();
+    }
+
     return p;
 }
 
@@ -569,8 +599,25 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
         m_left = left ? left->clone() : left;
         m_right = right->clone();
     }
+
+    if (m_left) {
+        m_left->m_parent = this;
+    }
+
+    if (m_right) {
+        m_right->m_parent = this;
+    }
+
+    if (m_three) {
+        m_three->m_parent = this;
+    }
+
     if (m_name == "IndicatorImp") {
         m_name = getOPTypeName(op);
+    }
+
+    if (!m_parent) {
+        repeatALikeNodes();
     }
 }
 
@@ -581,8 +628,14 @@ void IndicatorImp::add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorI
     m_three = cond->clone();
     m_left = left->clone();
     m_right = right->clone();
+    m_three->m_parent = this;
+    m_left->m_parent = this;
+    m_right->m_parent = this;
     if (m_name == "IndicatorImp") {
         m_name = getOPTypeName(IndicatorImp::OP_IF);
+    }
+    if (!m_parent) {
+        repeatALikeNodes();
     }
 }
 
@@ -625,6 +678,15 @@ bool IndicatorImp::needCalculate() {
 
 Indicator IndicatorImp::calculate() {
     IndicatorImpPtr result;
+    if (!needCalculate()) {
+        try {
+            result = shared_from_this();
+        } catch (...) {
+            result = clone();
+        }
+        return Indicator(result);
+    }
+
     if (!check()) {
         HKU_ERROR("Invalid param! {} : {}", formula(), long_name());
         if (m_right) {
@@ -639,15 +701,10 @@ Indicator IndicatorImp::calculate() {
             }
         }
 
-        return Indicator(result);
-    }
-
-    if (!needCalculate()) {
-        try {
-            result = shared_from_this();
-        } catch (...) {
-            result = clone();
+        if (size() != 0) {
+            m_need_calculate = false;
         }
+
         return Indicator(result);
     }
 
@@ -1530,6 +1587,109 @@ void IndicatorImp::_update_discard() {
         }
         if (discard > m_discard) {
             m_discard = discard;
+        }
+    }
+}
+
+bool IndicatorImp::alike(const IndicatorImp &other) const {
+    HKU_IF_RETURN(this == &other, true);
+    HKU_IF_RETURN(m_optype != other.m_optype || typeid(*this).name() != typeid(other).name() ||
+                    m_params != other.m_params || m_discard != other.m_discard ||
+                    m_result_num != other.m_result_num ||
+                    m_ind_params.size() != other.m_ind_params.size(),
+                  false);
+
+    auto iter1 = m_ind_params.cbegin();
+    auto iter2 = other.m_ind_params.cend();
+    for (; iter1 != m_ind_params.cend() && iter2 != other.m_ind_params.cend(); ++iter1, ++iter2) {
+        HKU_IF_RETURN(iter1->first != iter2->first, false);
+        HKU_IF_RETURN(!iter1->second->alike(*(iter2->second)), false);
+    }
+
+    for (size_t i = 0, total = m_result_num; i < m_result_num; i++) {
+        if (m_pBuffer[i]) {
+            PriceList &data1 = *(m_pBuffer[i]);
+            PriceList &data2 = *(other.m_pBuffer[i]);
+            for (size_t j = 0, len = data1.size(); j < len; j++) {
+                HKU_IF_RETURN(data1[j] != data2[j], false);
+            }
+        }
+    }
+
+    HKU_IF_RETURN(isLeaf(), true);
+
+    HKU_IF_RETURN(m_three && other.m_three && !m_three->alike(*other.m_three), false);
+    HKU_IF_RETURN(m_left && other.m_left && !m_left->alike(*other.m_left), false);
+    HKU_IF_RETURN(m_right && other.m_right && !m_right->alike(*other.m_right), false);
+
+    return true;
+}
+
+std::vector<IndicatorImpPtr> IndicatorImp::getAllSubNodes() {
+    std::vector<IndicatorImpPtr> result;
+    // 需要按下面的顺序进行
+    if (m_three) {
+        result.push_back(m_three);
+        auto sub_nodes = m_three->getAllSubNodes();
+        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
+    }
+    if (m_left) {
+        result.push_back(m_left);
+        auto sub_nodes = m_left->getAllSubNodes();
+        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
+    }
+    if (m_right) {
+        result.push_back(m_right);
+        auto sub_nodes = m_right->getAllSubNodes();
+        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
+    }
+    return result;
+}
+
+void IndicatorImp::repeatALikeNodes() {
+    auto sub_nodes = getAllSubNodes();
+    size_t total = sub_nodes.size();
+    for (size_t i = 0; i < total; i++) {
+        const auto &cur = sub_nodes[i];
+        if (!cur) {
+            continue;
+        }
+        for (size_t j = i + 1; j < total; j++) {
+            auto &node = sub_nodes[j];
+            if (!node || cur == node) {
+                continue;
+            }
+
+            if (cur->alike(*node)) {
+                IndicatorImp *node_parent = node->m_parent;
+                if (node_parent) {
+                    if (node_parent->m_left == node) {
+                        node_parent->m_left = cur;
+                    }
+
+                    if (node_parent->m_right == node) {
+                        node_parent->m_right = cur;
+                    }
+
+                    if (node_parent->m_three == node) {
+                        node_parent->m_three = cur;
+                    }
+
+                    auto tmp_nodes = node->getAllSubNodes();
+                    for (const auto &replace_node : tmp_nodes) {
+                        for (size_t k = j + 1; k < total; k++) {
+                            if (replace_node == sub_nodes[k]) {
+                                sub_nodes[k].reset();
+                            }
+                        }
+                    }
+
+                    node = cur;
+
+                } else {
+                    HKU_WARN("Exist some errors! node: {} cur: {}", node->name(), cur->name());
+                }
+            }
         }
     }
 }

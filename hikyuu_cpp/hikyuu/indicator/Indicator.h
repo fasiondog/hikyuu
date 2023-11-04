@@ -140,6 +140,9 @@ public:
      */
     DatetimeList getDatetimeList() const;
 
+    /** 判断是否和另一个指标等效，即计算效果相同 */
+    bool alike(const Indicator& other) const;
+
     bool haveParam(const string& name) const {
         return m_imp ? m_imp->haveParam(name) : false;
     }

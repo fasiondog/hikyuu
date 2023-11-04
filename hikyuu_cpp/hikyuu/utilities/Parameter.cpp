@@ -143,13 +143,80 @@ string Parameter::getNameValueList() const {
 }
 
 HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
-    //注意：参数大小写敏感
-    return p1.getNameValueList() == p2.getNameValueList();
+    // 注意：参数大小写敏感
+    HKU_IF_RETURN(p1.size() != p2.size(), false);
+
+    auto iter1 = p1.begin();
+    auto iter2 = p2.begin();
+    for (; iter1 != p1.end() && iter2 != p2.end(); ++iter1, ++iter2) {
+        HKU_IF_RETURN(iter1->first != iter2->first || iter1->second.type() != iter2->second.type(),
+                      false);
+        HKU_IF_RETURN(iter1->second.type() == typeid(int) &&
+                        boost::any_cast<int>(iter1->second) != boost::any_cast<int>(iter2->second),
+                      false);
+        HKU_IF_RETURN(
+          iter1->second.type() == typeid(int64_t) &&
+            boost::any_cast<int64_t>(iter1->second) != boost::any_cast<int64_t>(iter2->second),
+          false);
+        HKU_IF_RETURN(
+          iter1->second.type() == typeid(bool) &&
+            boost::any_cast<bool>(iter1->second) != boost::any_cast<bool>(iter2->second),
+          false);
+        HKU_IF_RETURN(
+          iter1->second.type() == typeid(double) &&
+            boost::any_cast<double>(iter1->second) != boost::any_cast<double>(iter2->second),
+          false);
+
+        if (iter1->second.type() == typeid(string)) {
+            const string* x1 = boost::any_cast<string>(&iter1->second);
+            const string* x2 = boost::any_cast<string>(&iter2->second);
+            HKU_IF_RETURN(*x1 != *x2, false);
+        }
+
+        if (iter1->second.type() == typeid(Stock)) {
+            const Stock* x1 = boost::any_cast<Stock>(&iter1->second);
+            const Stock* x2 = boost::any_cast<Stock>(&iter2->second);
+            HKU_IF_RETURN(*x1 != *x2, false);
+        }
+
+        if (iter1->second.type() == typeid(KQuery)) {
+            const KQuery* x1 = boost::any_cast<KQuery>(&iter1->second);
+            const KQuery* x2 = boost::any_cast<KQuery>(&iter2->second);
+            HKU_IF_RETURN(*x1 != *x2, false);
+        }
+
+        if (iter1->second.type() == typeid(KData)) {
+            const KData* x1 = boost::any_cast<KData>(&iter1->second);
+            const KData* x2 = boost::any_cast<KData>(&iter2->second);
+            HKU_IF_RETURN(*x1 != *x2, false);
+        }
+
+        if (iter1->second.type() == typeid(PriceList)) {
+            const PriceList* x1 = boost::any_cast<PriceList>(&iter1->second);
+            const PriceList* x2 = boost::any_cast<PriceList>(&iter2->second);
+            HKU_IF_RETURN(x1->size() != x2->size(), false);
+            for (size_t i = 0, len = x1->size(); i < len; i++) {
+                HKU_IF_RETURN((*x1)[i] != (*x2)[i], false);
+            }
+        }
+
+        if (iter1->second.type() == typeid(DatetimeList)) {
+            const DatetimeList* x1 = boost::any_cast<DatetimeList>(&iter1->second);
+            const DatetimeList* x2 = boost::any_cast<DatetimeList>(&iter2->second);
+            HKU_IF_RETURN(x1->size() != x2->size(), false);
+            for (size_t i = 0, len = x1->size(); i < len; i++) {
+                HKU_IF_RETURN((*x1)[i] != (*x2)[i], false);
+            }
+        }
+    }
+
+    return true;
+    // return p1.size() == p2.size() && p1.getNameValueList() == p2.getNameValueList();
 }
 
 HKU_API bool operator!=(const Parameter& p1, const Parameter& p2) {
-    //注意：参数大小写敏感
-    return p1.getNameValueList() != p2.getNameValueList();
+    // 注意：参数大小写敏感
+    return !(p1 == p2);
 }
 
 HKU_API bool operator<(const Parameter& p1, const Parameter& p2) {
