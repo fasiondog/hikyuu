@@ -616,7 +616,9 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
         m_name = getOPTypeName(op);
     }
 
-    repeatALikeNodes();
+    if (!m_parent) {
+        repeatALikeNodes();
+    }
 }
 
 void IndicatorImp::add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
@@ -632,7 +634,9 @@ void IndicatorImp::add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorI
     if (m_name == "IndicatorImp") {
         m_name = getOPTypeName(IndicatorImp::OP_IF);
     }
-    repeatALikeNodes();
+    if (!m_parent) {
+        repeatALikeNodes();
+    }
 }
 
 bool IndicatorImp::needCalculate() {
@@ -682,8 +686,6 @@ Indicator IndicatorImp::calculate() {
         }
         return Indicator(result);
     }
-
-    inc_tmp_count();
 
     if (!check()) {
         HKU_ERROR("Invalid param! {} : {}", formula(), long_name());
@@ -1664,33 +1666,32 @@ void IndicatorImp::repeatALikeNodes() {
                     if (node_parent->m_left == node) {
                         node_parent->m_left = cur;
                     }
+
                     if (node_parent->m_right == node) {
                         node_parent->m_right = cur;
                     }
+
                     if (node_parent->m_three == node) {
                         node_parent->m_three = cur;
                     }
+
+                    auto tmp_nodes = node->getAllSubNodes();
+                    for (const auto &replace_node : tmp_nodes) {
+                        for (size_t k = j + 1; k < total; k++) {
+                            if (replace_node == sub_nodes[k]) {
+                                sub_nodes[k].reset();
+                            }
+                        }
+                    }
+
+                    node = cur;
+
                 } else {
                     HKU_WARN("Exist some errors! node: {} cur: {}", node->name(), cur->name());
                 }
-
-                // node.reset();
             }
         }
     }
-}
-
-static size_t g_tmp_count = 0;
-void HKU_API inc_tmp_count() {
-    g_tmp_count++;
-}
-
-void HKU_API reset_tmp_count() {
-    g_tmp_count = 0;
-}
-
-size_t HKU_API read_tmp_count() {
-    return g_tmp_count;
 }
 
 } /* namespace hku */

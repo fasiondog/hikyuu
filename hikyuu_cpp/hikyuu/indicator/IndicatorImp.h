@@ -429,10 +429,6 @@ inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t disc
     return step == 0 || pos < discard + step ? discard : pos + 1 - step;
 }
 
-void HKU_API inc_tmp_count();
-void HKU_API reset_tmp_count();
-size_t HKU_API read_tmp_count();
-
 } /* namespace hku */
 
 #if FMT_VERSION >= 90000
