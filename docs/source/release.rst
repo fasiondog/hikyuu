@@ -1,6 +1,28 @@
 版本发布说明
 =======================
 
+1.3.0 - 
+
+1. TradeManager 引出买空/买空操作至 python
+2. Stock 引出 get_index_range 方法至 python
+3. 更新 SG 信号指示器系列方法，去除移除 OP 后的一些遗留问题
+4. 修复 TradeList 转 np 时使用了已废弃的方法
+5. 修复 SUM 存在访问越界的问题
+6. 编译选项增加 stacktrace 选项，方便异常时打印 C++ 堆栈
+7. 修复 IniParser 不支持 windows 中文路径的问题
+8. 完善 Performance
+9. 优化 TimerManager、线程池、数据驱动等基础设施
+10. MySQL/SQLite 数据引擎支持绑定 datetime
+11. 优化指标默认名称
+12. 修复 RSI 存在 NaN 值时计算错误
+13. 升级 flatbuffers 版本至 23.5.6
+14. 优化 Stock 的相等比较
+15. KQuery/KRecord/KData 相等/不等比较完善并引出至 python
+16. 修复 Ubuntu 23.10 下编译失败的问题
+17. 加速指标计算，对等效的指标进行融合替换
+18. 新增 combinate_ind_analysis, combinate_ind_analysis_multi 对指标组合进行综合测试
+
+
 1.2.9 - 2023年10月9日
 -------------------------
 
