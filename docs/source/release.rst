@@ -1,7 +1,7 @@
 版本发布说明
 =======================
 
-1.3.0 - 
+1.3.0 - 2023年11月5日
 
 1. TradeManager 引出买空/买空操作至 python
 2. Stock 引出 get_index_range 方法至 python
