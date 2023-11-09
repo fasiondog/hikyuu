@@ -11,6 +11,14 @@
 
 #include "../Indicator.h"
 
-namespace hku {}
+namespace hku {
+
+Indicator HKU_API SLOPE(int n = 22);
+
+inline Indicator SLOPE(const Indicator& ind, int n = 22) {
+    return SLOPE(n)(ind);
+}
+
+}  // namespace hku
 
 #endif

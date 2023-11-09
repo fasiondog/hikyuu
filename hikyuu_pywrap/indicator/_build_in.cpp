@@ -453,6 +453,9 @@ Indicator (*SLICE_3)(const Indicator&, int64_t, int64_t, int) = SLICE;
 Indicator (*RSI_1)(int) = RSI;
 Indicator (*RSI_2)(const Indicator&, int) = RSI;
 
+Indicator (*SLOPE1)(int) = SLOPE;
+Indicator (*SLOPE2)(const Indicator&, int) = SLOPE;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3, R"(KDATA([data])
@@ -1579,4 +1582,7 @@ void export_Indicator_build_in() {
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
+
+    def("SLOPE", SLOPE1, (arg("n") = 22));
+    def("SLOPE", SLOPE2, (arg("data"), arg("n") = 22));
 }
