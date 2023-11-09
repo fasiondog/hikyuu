@@ -86,6 +86,7 @@
 #include "crt/SUM.h"
 #include "crt/SUMBARS.h"
 #include "crt/TAN.h"
+#include "crt/TIME.h"
 #include "crt/TIMELINE.h"
 #include "crt/TIMELINEVOL.h"
 #include "crt/UPNDAY.h"
