@@ -11,6 +11,9 @@
 .. image:: https://github.com/fasiondog/hikyuu/workflows/ubuntu-build/badge.svg
     :target: https://github.com/fasiondog/hikyuu/actions
 
+.. image:: https://github.com/fasiondog/hikyuu/workflows/ubuntu-aarch64-build/badge.svg
+    :target: https://github.com/fasiondog/hikyuu/actions
+
 .. image:: https://img.shields.io/github/license/mashape/apistatus.svg
     :target: https://github.com/fasiondog/hikyuu/blob/master/LICENSE.txt
     :alt: GitHub
