@@ -263,6 +263,22 @@
     :rtype: Indicator
     
 
+.. py:function:: DATE([data])
+
+    取得该周期从1900以来的年月日。用法: DATE 例如函数返回1000101，表示2000年1月1日。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
+.. py:function:: DAY([data])
+
+    取得该周期的日期。用法: DAY 函数返回有效值范围为(1-31)。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
 .. py:function:: DECLINE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
 
     下跌家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
@@ -416,6 +432,14 @@
     :rtype: Indicator
     
     
+.. py:function:: HOUR([data])
+
+    取得该周期的小时数。用法：HOUR 函数返回有效值范围为(0-23)，对于日线及更长的分析周期值为0。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
 .. py:function:: HSL(kdata)
 
     获取换手率，等于 VOL(k) / CAPITAL(k)
@@ -597,6 +621,14 @@
     :rtype: Indicator
     
 
+.. py:function:: MINUTE([data])
+
+    取得该周期的分钟数。用法：MINUTE 函数返回有效值范围为(0-59)，对于日线及更长的分析周期值为0。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
 .. py:function:: MOD(ind1, ind2)
 
     取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符
@@ -607,6 +639,14 @@
 
     :param Indicator ind1:
     :param Indicator ind2:
+    :rtype: Indicator
+
+
+.. py:function:: MONTH([data])
+
+    取得该周期的月份。用法: MONTH 函数返回有效值范围为(1-12)。
+
+    :param data: 输入数据 KData
     :rtype: Indicator
 
 
@@ -872,6 +912,14 @@
     :rtype: Indicator
 
 
+.. py:function:: TIME([data])
+
+    取得该周期的时分秒。用法: TIME 函数返回有效值范围为(000000-235959)。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
 .. py:function:: TIMELINE([k])
 
     分时价格数据
@@ -942,3 +990,18 @@
     :param Indicator ind2: 指标2
     :rtype: Indicator
 
+
+.. py:function:: WEEK([data])
+
+    取得该周期的星期数。用法：WEEK 函数返回有效值范围为(0-6)，0表示星期天。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
+.. py:function:: YEAR([data])
+
+    取得该周期的年份。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
