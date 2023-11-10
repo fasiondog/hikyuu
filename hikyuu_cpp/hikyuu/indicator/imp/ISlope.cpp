@@ -7,6 +7,10 @@
 
 #include "ISlope.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::ISlope)
+#endif
+
 namespace hku {
 
 ISlope::ISlope() : IndicatorImp("SLOPE", 1) {
@@ -53,36 +57,35 @@ void ISlope::_calculate(const Indicator& ind) {
         x2sum += (2 * i - n) * n;
         _set((n * xysum - xsum * ysum) / (n * x2sum - xsum * xsum), i);
     }
+}
 
-    // for (size_t i = first_end; i < total; ++i) {
-    //     x_sum = x_sum + n;
-    //     y_sum = ind[i] + y_sum - ind[i - n];
-    //     xmean[i] = x_sum / n;
-    //     ymean[i] = y_sum / n;
-    // }
+void ISlope::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    double n = curPos - start + 1;
+    if (n <= 1) {
+        _set(0.0, curPos);
+        return;
+    }
 
-    // for (size_t i = startPos, count = 1; i < first_end; i++, count++) {
-    //     price_t tmp1 = 0.0, tmp2 = 0.0;
-    //     for (size_t j = 0; j < i; j++) {
-    //         tmp1 += (j - xmean[i]) * (ind[j] - ymean[i]);
-    //         tmp2 += std::pow(j - xmean[i], 2);
-    //     }
-    //     _set(tmp1 / tmp2, i);
-    // }
-
-    // for (size_t i = first_end; i < total; ++i) {
-    //     price_t tmp1 = 0.0, tmp2 = 0.0;
-    //     for (size_t j = i - n; j < i; j++) {
-    //         tmp1 += (j - xmean[i]) * (ind[j] - ymean[i]);
-    //         tmp2 += std::pow(j - xmean[i], 2);
-    //     }
-    //     _set(tmp1 / tmp2, i);
-    // }
+    price_t xsum = 0.0, ysum = 0.0, xxsum = 0.0, xysum = 0.0, x2sum = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        xsum += i;
+        ysum += ind[i];
+        xysum += ind[i] * i;
+        x2sum += std::pow(i, 2);
+    }
+    _set((n * xysum - xsum * ysum) / (n * x2sum - std::pow(xsum, 2)), curPos);
 }
 
 Indicator HKU_API SLOPE(int n) {
     IndicatorImpPtr p = make_shared<ISlope>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API SLOPE(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<ISlope>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

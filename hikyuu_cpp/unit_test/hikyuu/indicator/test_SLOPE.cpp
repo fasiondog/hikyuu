@@ -69,43 +69,42 @@ TEST_CASE("test_SLOPE") {
 }
 
 /** @par 检测点 */
-// TEST_CASE("test_MA_dyn") {
-//     Stock stock = StockManager::instance().getStock("sh000001");
-//     KData kdata = stock.getKData(KQuery(-30));
-//     // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
-//     Indicator c = CLOSE(kdata);
-//     Indicator expect = MA(c, 10);
-//     Indicator result = MA(c, CVAL(c, 10));
-//     CHECK_EQ(expect.size(), result.size());
-//     CHECK_EQ(expect.discard(), result.discard());
-//     for (size_t i = 0; i < result.discard(); i++) {
-//         CHECK_UNARY(std::isnan(result[i]));
-//     }
-//     for (size_t i = expect.discard(); i < expect.size(); i++) {
-//         CHECK_EQ(expect[i], doctest::Approx(result[i]));
-//     }
+TEST_CASE("test_SLOPE_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = SLOPE(c, 10);
+    Indicator result = SLOPE(c, CVAL(c, 10));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
 
-//     result = MA(c, IndParam(CVAL(c, 10)));
-//     CHECK_EQ(expect.size(), result.size());
-//     CHECK_EQ(expect.discard(), result.discard());
-//     for (size_t i = 0; i < result.discard(); i++) {
-//         CHECK_UNARY(std::isnan(result[i]));
-//     }
-//     for (size_t i = expect.discard(); i < expect.size(); i++) {
-//         CHECK_EQ(expect[i], doctest::Approx(result[i]));
-//     }
+    result = SLOPE(c, IndParam(CVAL(c, 10)));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
 
-//     expect = MA(c, 0);
-//     result = MA(c, CVAL(c, 0));
-//     CHECK_EQ(expect.size(), result.size());
-//     CHECK_EQ(expect.discard(), result.discard());
-//     for (size_t i = 0; i < result.discard(); i++) {
-//         CHECK_UNARY(std::isnan(result[i]));
-//     }
-//     for (size_t i = expect.discard(); i < expect.size(); i++) {
-//         CHECK_EQ(expect[i], doctest::Approx(result[i]));
-//     }
-// }
+    expect = SLOPE(c, 0);
+    result = SLOPE(c, CVAL(c, 0));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+}
 
 //-----------------------------------------------------------------------------
 // test export
@@ -134,11 +133,11 @@ TEST_CASE("test_SLOPE_export") {
         ia >> BOOST_SERIALIZATION_NVP(ma2);
     }
 
-    CHECK_EQ(ma2.name(), "MA");
+    CHECK_EQ(ma2.name(), "SLOPE");
     CHECK_EQ(ma1.size(), ma2.size());
     CHECK_EQ(ma1.discard(), ma2.discard());
     CHECK_EQ(ma1.getResultNumber(), ma2.getResultNumber());
-    for (size_t i = 0; i < ma1.size(); ++i) {
+    for (size_t i = ma1.discard(); i < ma1.size(); ++i) {
         CHECK_EQ(ma1[i], doctest::Approx(ma2[i]));
     }
 }
