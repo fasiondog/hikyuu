@@ -7,6 +7,10 @@
 
 #include "ISlice.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::ISlice)
+#endif
+
 namespace hku {
 
 ISlice::ISlice() : IndicatorImp("SLICE", 1) {
@@ -30,7 +34,7 @@ bool ISlice::check() {
 }
 
 void ISlice::_calculate(const Indicator& data) {
-    //如果在叶子节点，直接取自身的data参数
+    // 如果在叶子节点，直接取自身的data参数
     if (isLeaf()) {
         m_discard = 0;
         PriceList x = getParam<PriceList>("data");
@@ -57,7 +61,7 @@ void ISlice::_calculate(const Indicator& data) {
         return;
     }
 
-    //不在叶子节点上，则忽略本身的data参数，认为其输入实际为函数入参中的data
+    // 不在叶子节点上，则忽略本身的data参数，认为其输入实际为函数入参中的data
     int result_index = getParam<int>("result_index");
     HKU_ERROR_IF_RETURN(result_index < 0 || result_index >= data.getResultNumber(), void(),
                         "result_index out of range!");
@@ -83,7 +87,7 @@ void ISlice::_calculate(const Indicator& data) {
         _set(data.get(i, result_index), i - startix);
     }
 
-    //更新抛弃数量
+    // 更新抛弃数量
     m_discard = data.discard() <= size_t(startix) ? 0 : data.discard() - startix;
 }
 

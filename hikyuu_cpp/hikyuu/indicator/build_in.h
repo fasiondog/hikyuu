@@ -79,6 +79,7 @@
 #include "crt/SIN.h"
 #include "crt/SLICE.h"
 #include "crt/SGN.h"
+#include "crt/SLOPE.h"
 #include "crt/SMA.h"
 #include "crt/SQRT.h"
 #include "crt/STDEV.h"

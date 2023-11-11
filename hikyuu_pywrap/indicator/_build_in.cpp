@@ -453,6 +453,12 @@ Indicator (*SLICE_3)(const Indicator&, int64_t, int64_t, int) = SLICE;
 Indicator (*RSI_1)(int) = RSI;
 Indicator (*RSI_2)(const Indicator&, int) = RSI;
 
+Indicator (*SLOPE1)(int) = SLOPE;
+Indicator (*SLOPE2)(const IndParam&) = SLOPE;
+Indicator (*SLOPE3)(const Indicator&, int) = SLOPE;
+Indicator (*SLOPE4)(const Indicator&, const IndParam&) = SLOPE;
+Indicator (*SLOPE5)(const Indicator&, const Indicator&) = SLOPE;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3, R"(KDATA([data])
@@ -1575,6 +1581,18 @@ void export_Indicator_build_in() {
     def("RSI", RSI_2, (arg("data"), arg("n") = 14), R"(RSI([data, n=14])
 
     相对强弱指数
+
+    :param Indicator data: 输入数据
+    :param int|Indicator|IndParam n: 时间窗口
+    :rtype: Indicator)");
+
+    def("SLOPE", SLOPE1, (arg("n") = 22));
+    def("SLOPE", SLOPE2, (arg("n")));
+    def("SLOPE", SLOPE3, (arg("data"), arg("n") = 22));
+    def("SLOPE", SLOPE4, (arg("data"), arg("n")));
+    def("SLOPE", SLOPE5, (arg("data"), arg("n")), R"(SLOPE([data, n=22])
+
+    计算线性回归斜率，N支持变量
 
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口

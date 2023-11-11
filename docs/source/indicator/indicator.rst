@@ -831,6 +831,15 @@
     :param int result_index: 原输入数据中的结果集
 
 
+.. py:function:: SLOPE(data, n=22)
+
+    计算线性回归斜率，N支持变量
+
+    :param Indicator|PriceList data: 输入数据
+    :param int|Indicator|IndParam n: 时间窗口
+    :rtype: Indicator
+
+
 .. py:function:: SMA([data, n=22, m=2])
 
     求移动平均
