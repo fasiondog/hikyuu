@@ -74,6 +74,7 @@
 * :py:func:`ROUNDDOWN` - 向下截取，如10.1截取后为10
 * :py:func:`SIN` - 正弦值
 * :py:func:`SGN` - 求符号值
+* :py:func:`SLOPE` - 计算线性回归斜率
 * :py:func:`SQRT` - 开平方
 * :py:func:`TAN` - 正切值
 
@@ -116,6 +117,18 @@
 * :py:func:`SUM` - 求总和
 * :py:func:`SUMBARS` - 累加到指定周期数, 向前累加到指定值到现在的周期数
 * :py:func:`VIGOR` - 亚历山大.艾尔德力度指数
+
+
+**时间指标**
+
+* :py:func:`DATE` - 取得该周期从1900以来的年月日
+* :py:func:`TIME` - 取得该周期的时分秒
+* :py:func:`YEAR` - 取得该周期的年份
+* :py:func:`MONTH` - 取得该周期的月份
+* :py:func:`WEEK` - 取得该周期的星期数，函数返回有效值范围为(0-6)，0表示星期天
+* :py:func:`DAY` - 取得该周期的日期
+* :py:func:`HOUR` - 取得该周期的小时数
+* :py:func:`MINUTE` - 取得该周期的分钟数
 
 
 **Ta-lib指标**
