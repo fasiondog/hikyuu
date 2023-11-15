@@ -542,13 +542,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                       name(), right->name());
                 }
             } else {
-                if (m_left->isLeaf()) {
-                    m_left->m_need_calculate = true;
-                    m_left->m_optype = op;
-                    m_left->m_right = right->clone();
-                } else {
-                    m_left->add(OP, left, right);
-                }
+                m_left->add(OP, left, right);
             }
         }
         if (m_right) {
@@ -563,13 +557,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                       name(), right->name());
                 }
             } else {
-                if (m_right->isLeaf()) {
-                    m_right->m_need_calculate = true;
-                    m_right->m_optype = op;
-                    m_right->m_right = right->clone();
-                } else {
-                    m_right->add(OP, left, right);
-                }
+                m_right->add(OP, left, right);
             }
         }
         if (m_three) {
@@ -584,13 +572,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                       name(), right->name());
                 }
             } else {
-                if (m_three->isLeaf()) {
-                    m_three->m_need_calculate = true;
-                    m_three->m_optype = op;
-                    m_three->m_right = right->clone();
-                } else {
-                    m_three->add(OP, left, right);
-                }
+                m_three->add(OP, left, right);
             }
         }
     } else {
@@ -1593,6 +1575,7 @@ void IndicatorImp::_update_discard() {
 
 bool IndicatorImp::alike(const IndicatorImp &other) const {
     HKU_IF_RETURN(this == &other, true);
+    HKU_IF_RETURN(m_name == "CVAL" || other.m_name == "CVAL", false);
     HKU_IF_RETURN(m_optype != other.m_optype || typeid(*this).name() != typeid(other).name() ||
                     m_params != other.m_params || m_discard != other.m_discard ||
                     m_result_num != other.m_result_num ||

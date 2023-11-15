@@ -29,8 +29,7 @@ from hikyuu.util.check import checkif
 from hikyuu.util.singleton import SingletonType
 
 from sqlalchemy import (create_engine, Sequence, Column, Integer, String, and_, UniqueConstraint)
-from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, scoped_session, declarative_base
 
 Base = declarative_base()
 
