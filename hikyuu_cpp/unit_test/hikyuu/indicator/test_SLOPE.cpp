@@ -38,14 +38,18 @@ TEST_CASE("test_SLOPE") {
     slope = SLOPE(c, 0);
     CHECK_EQ(slope.size(), c.size());
     CHECK_EQ(slope.name(), "SLOPE");
-    for (size_t i = 0, len = slope.size(); i < len; i++) {
+    CHECK_EQ(slope.discard(), 1);
+    CHECK_UNARY(std::isnan(slope[0]));
+    for (size_t i = slope.discard(), len = slope.size(); i < len; i++) {
         CHECK_EQ(slope[i], 0.);
     }
 
     slope = SLOPE(c, 1);
     CHECK_EQ(slope.size(), c.size());
     CHECK_EQ(slope.name(), "SLOPE");
-    for (size_t i = 0, len = slope.size(); i < len; i++) {
+    CHECK_EQ(slope.discard(), 1);
+    CHECK_UNARY(std::isnan(slope[0]));
+    for (size_t i = slope.discard(), len = slope.size(); i < len; i++) {
         CHECK_EQ(slope[i], 0.0);
     }
 
