@@ -1575,12 +1575,16 @@ void IndicatorImp::_update_discard() {
 
 bool IndicatorImp::alike(const IndicatorImp &other) const {
     HKU_IF_RETURN(this == &other, true);
-    HKU_IF_RETURN(m_name == "CVAL" || other.m_name == "CVAL", false);
     HKU_IF_RETURN(m_optype != other.m_optype || typeid(*this).name() != typeid(other).name() ||
                     m_params != other.m_params || m_discard != other.m_discard ||
                     m_result_num != other.m_result_num ||
                     m_ind_params.size() != other.m_ind_params.size(),
                   false);
+
+    if (m_name == "CVAL" && other.m_name == "CVAL") {
+        HKU_IF_RETURN(isLeaf() && other.isLeaf(), true);
+        return m_right && m_right->alike(*other.m_right);
+    }
 
     auto iter1 = m_ind_params.cbegin();
     auto iter2 = other.m_ind_params.cend();
