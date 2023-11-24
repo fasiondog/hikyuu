@@ -7,7 +7,7 @@ Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建�
 
 绘图的详细示例：
 
-`<http://nbviewer.jupyter.org/github/fasiondog/hikyuu_examples/blob/master/005-Drawplot.ipynb?flush_cache=True>`_
+`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_
 
 
 绘制组合窗口
