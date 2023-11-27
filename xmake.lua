@@ -100,12 +100,7 @@ set_configvar("HKU_ENABLE_MYSQL_KDATA", get_config("mysql") and 1 or 0)
 set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
 set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
--- set warning all as error
-if is_plat("windows") then
-   set_warnings("all", "error")
-else
-    set_warnings("all")
-end
+set_warnings("all")
 
 -- set language: C99, c++ standard
 set_languages("cxx17", "c99")
