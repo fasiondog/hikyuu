@@ -35,7 +35,8 @@ from hikyuu.data.common_pytdx import search_best_tdx
 from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 from hikyuu.data.pytdx_weight_to_sqlite import pytdx_import_weight_to_sqlite
 from hikyuu.data.pytdx_weight_to_mysql import pytdx_import_weight_to_mysql
-from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance
+from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance_to_sqlite
+from hikyuu.data.pytdx_finance_to_mysql import pytdx_import_finance_to_mysql
 from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
 from hikyuu.util.check import hku_catch, hku_check
 
@@ -60,6 +61,7 @@ class ImportWeightToSqliteTask:
                 sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
                 connect = sqlite3.connect(sqlite_file, timeout=1800)
                 pytdx_import_weight = pytdx_import_weight_to_sqlite
+                pytdx_import_finance = pytdx_import_finance_to_sqlite
                 self.logger.debug('use sqlite import weight')
             else:
                 db_config = {
@@ -70,6 +72,7 @@ class ImportWeightToSqliteTask:
                 }
                 connect = mysql.connector.connect(**db_config)
                 pytdx_import_weight = pytdx_import_weight_to_mysql
+                pytdx_import_finance = pytdx_import_finance_to_mysql
                 self.logger.debug('use mysql import weight')
 
         except Exception as e:

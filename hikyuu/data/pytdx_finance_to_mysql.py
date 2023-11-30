@@ -23,17 +23,19 @@
 # SOFTWARE.
 
 from hikyuu.data.common import MARKETID, STOCKTYPE
-from hikyuu.data.common_sqlite3 import get_marketid, create_database
+from hikyuu.data.common_mysql import get_marketid
+from hikyuu.util import *
 
-
-def pytdx_import_finance_to_sqlite(db_connect, pytdx_connect, market):
+@hku_catch(trace=True)
+def pytdx_import_finance_to_mysql(db_connect, pytdx_connect, market):
     """导入公司财务信息"""
     marketid = get_marketid(db_connect, market)
-    sql = "select stockid, marketid, code, valid, type from stock where marketid={} and type = {} and valid=1"\
+    sql = "select `stockid`, `marketid`, `code`, `valid`, `type` from `hku_base`.`stock` where marketid={} and type = {} and valid=1"\
         .format(marketid, STOCKTYPE.A)
 
     cur = db_connect.cursor()
-    all_list = cur.execute(sql).fetchall()
+    a = cur.execute(sql)
+    all_list = cur.fetchall()
     db_connect.commit()
 
     records = []
@@ -42,7 +44,7 @@ def pytdx_import_finance_to_sqlite(db_connect, pytdx_connect, market):
         #print(stk[2])
         if x is not None and x['code'] == stk[2]:
             cur.execute(
-                "select updated_date from stkfinance where stockid={} and updated_date={}".format(
+                "select updated_date from `hku_base`.`stkfinance` where stockid={} and updated_date={}".format(
                     stk[0], x['updated_date']
                 )
             )
@@ -68,7 +70,7 @@ def pytdx_import_finance_to_sqlite(db_connect, pytdx_connect, market):
 
     if records:
         cur.executemany(
-            "INSERT INTO stkfinance(stockid, \
+            "INSERT INTO `hku_base`.`stkfinance`(stockid, \
                                                 updated_date, \
                                                 ipo_date, \
                                                 province, \
@@ -104,48 +106,12 @@ def pytdx_import_finance_to_sqlite(db_connect, pytdx_connect, market):
                                                 weifenpeilirun, \
                                                 meigujingzichan, \
                                                 baoliu2) \
-                        VALUES (?,?,?,?,?,?,?,?,?,?, \
-                                ?,?,?,?,?,?,?,?,?,?, \
-                                ?,?,?,?,?,?,?,?,?,?, \
-                                ?,?,?,?,?,?)", records
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, \
+                                %s,%s,%s,%s,%s,%s,%s,%s,%s,%s, \
+                                %s,%s,%s,%s,%s,%s,%s,%s,%s,%s, \
+                                %s,%s,%s,%s,%s,%s)", records
         )
         db_connect.commit()
 
     cur.close()
     return len(records)
-
-
-if __name__ == '__main__':
-    import os
-    import time
-    import sqlite3
-
-    starttime = time.time()
-
-    dest_dir = "d:\\stock"
-    tdx_server = '120.76.152.87'  #'119.147.212.81'
-    tdx_port = 7709
-
-    connect = sqlite3.connect(dest_dir + "\\stock.db")
-    create_database(connect)
-
-    from pytdx.hq import TdxHq_API, TDXParams
-    api = TdxHq_API()
-    api.connect(tdx_server, tdx_port)
-
-    x = pytdx_import_finance_to_sqlite(connect, api, "SZ")
-    print(x)
-
-    x = pytdx_import_finance_to_sqlite(connect, api, "SH")
-    print(x)
-
-    x = pytdx_import_finance_to_sqlite(connect, api, "BJ")
-    print(x)
-
-    api.disconnect()
-    connect.close()
-
-    endtime = time.time()
-    print("\nTotal time:")
-    print("%.2fs" % (endtime - starttime))
-    print("%.2fm" % ((endtime - starttime) / 60))
