@@ -302,7 +302,8 @@ def import_one_stock_data(connect, api, market, ktype, stock_record, startDate=1
 
             # 记录最新更新日期
             if (code == '000001' and marketid == MARKETID.SH) \
-                    or (code == '399001' and marketid == MARKETID.SZ):
+                    or (code == '399001' and marketid == MARKETID.SZ) \
+                    or (code == '830799' and marketid == MARKETID.BJ):
                 sql = "update `hku_base`.`market` set lastdate=(select max(date)/10000 from {table}) " \
                       "where marketid={marketid}".format(table=table, marketid=marketid)
                 try:
