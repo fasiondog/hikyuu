@@ -296,9 +296,9 @@ def import_one_stock_data(connect, api, market, ktype, stock_record, startDate=1
             # 更新基础信息数据库中股票对应的起止日期及其有效标志
             sql = "update `hku_base`.`stock` set valid=1, " \
                       "startdate=(select min(date)/10000 from {table}), " \
-                      "enddate=(select max(date)/10000 from {table}) " \
+                      "enddate=99999999 " \
                       "where stockid={stockid}".format(table=table, stockid=stockid)
-            cur.execute("sql")
+            cur.execute(sql)
 
             # 记录最新更新日期
             if (code == '000001' and marketid == MARKETID.SH) \
@@ -314,7 +314,7 @@ def import_one_stock_data(connect, api, market, ktype, stock_record, startDate=1
 
     return len(buf)
 
-
+@hku_catch(trace=True, re_raise=True)
 def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199012190000, progress=ProgressBar):
     """导入通达信指定盘后数据路径中的K线数据。注：只导入基础信息数据库中存在的股票。
 
