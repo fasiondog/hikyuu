@@ -252,6 +252,7 @@ def update_extern_data(connect, market, code, data_type):
             startdate = newdate + 1401
             enddate = newdate + 1500
         return (startdate, enddate)
+    
     def getHour2Date(olddate):
         mint = olddate - olddate // 10000 * 10000
         newdate = olddate // 10000 * 10000
@@ -262,6 +263,7 @@ def update_extern_data(connect, market, code, data_type):
             startdate = newdate + 1301
             enddate = newdate + 1500
         return (startdate, enddate)
+    
     def getMin15Date(olddate):
         mint = olddate - olddate // 10000 * 10000
         newdate = olddate // 10000 * 10000
@@ -367,8 +369,8 @@ def update_extern_data(connect, market, code, data_type):
             return None
 
     if data_type.lower() == 'day':
-        index_list = ('week', 'month', 'year')
-        #index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
+        # index_list = ('week', 'month', 'year')
+        index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
         base_table = get_table(connect, market, code, 'day')
     else:
         index_list = ('min15', 'min30', 'min60', 'hour2')

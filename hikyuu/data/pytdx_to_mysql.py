@@ -294,13 +294,11 @@ def import_one_stock_data(connect, api, market, ktype, stock_record, startDate=1
 
         if ktype == 'DAY':
             # 更新基础信息数据库中股票对应的起止日期及其有效标志
-            if valid == 0:
-                sql = "update `hku_base`.`stock` set valid=1, " \
+            sql = "update `hku_base`.`stock` set valid=1, " \
                       "startdate=(select min(date)/10000 from {table}), " \
                       "enddate=(select max(date)/10000 from {table}) " \
                       "where stockid={stockid}".format(table=table, stockid=stockid)
-                cur.execute("sql")
-                #connect.commit()
+            cur.execute("sql")
 
             # 记录最新更新日期
             if (code == '000001' and marketid == MARKETID.SH) \
