@@ -31,7 +31,7 @@ from pytdx.hq import TDXParams
 from hikyuu.util.mylog import get_default_logger, hku_error, hku_debug
 
 from hikyuu.data.common import *
-from hikyuu.data.common_pytdx import to_pytdx_market
+from hikyuu.data.common_pytdx import to_pytdx_market, pytdx_get_day_trans
 from hikyuu.data.common_sqlite3 import (
     get_codepre_list, create_database, get_marketid, get_last_date, get_stock_list, update_last_date
 )
@@ -360,17 +360,6 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
     connect.commit()
     h5file.close()
     return add_record_count
-
-
-def pytdx_get_day_trans(api, pymarket, code, date):
-    buf = []
-    for i in range(21):
-        x = api.get_history_transaction_data(pymarket, code, i * 2000, 2000, date)
-        #x = api.get_transaction_data(TDXParams.MARKET_SZ, '000001', (9-i)*800, 800)
-        if not x:
-            break
-        buf = x + buf
-    return buf
 
 
 def import_on_stock_trans(connect, api, h5file, market, stock_record, max_days):
