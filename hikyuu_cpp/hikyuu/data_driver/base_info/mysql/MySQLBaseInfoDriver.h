@@ -31,6 +31,7 @@ public:
     virtual vector<MarketInfo> getAllMarketInfo() override;
     virtual vector<StockTypeInfo> getAllStockTypeInfo() override;
 
+    virtual Parameter getFinanceInfo(const string& market, const string& code) override;
     virtual StockWeightList getStockWeightList(const string& market, const string& code,
                                                Datetime start, Datetime end) override;
     virtual MarketInfo getMarketInfo(const string& market) override;

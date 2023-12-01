@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS `hku_base`.`stkfinance` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`stockid` INT UNSIGNED NOT NULL, 
-	`updated_date` BIGINT(20) NOT NULL, 
-	`ipo_date` BIGINT(20) NOT NULL,       -- 42.上市日期
-	`province` INT NOT NULL, 
-    `industry` INT NOT NULL,
+	`updated_date` INT NOT NULL, 
+	`ipo_date` INT NOT NULL,       -- 42.上市日期
+	`province` DOUBLE NOT NULL, 
+    `industry` DOUBLE NOT NULL,
 	`zongguben` DOUBLE NOT NULL,      -- 1.总股本(股)
     `liutongguben` DOUBLE NOT NULL,   -- 7.流通A股（股）
 	`guojiagu` DOUBLE NOT NULL,       -- 2.国家股（股）
