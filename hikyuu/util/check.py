@@ -2,10 +2,10 @@
 # -*- coding: utf8 -*-
 # cp936
 
-#==========================================================
+# ==========================================================
 # History
 # 1. 20200821, Added by fasiondog
-#==========================================================
+# ==========================================================
 
 import sys
 import traceback
@@ -117,7 +117,8 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False, re_
                     errmsg = "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
                     hku_logger.error(errmsg)
                     if trace:
-                        traceback.print_exc()
+                        # traceback.print_exc()
+                        hku_logger.error(traceback.format_exc())
                     if i == (retry - 1):
                         if callback is not None:
                             callback(*args, **kargs)
@@ -127,7 +128,8 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False, re_
                     errmsg = "Unknown error! {} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
                     hku_logger.error(errmsg)
                     if trace:
-                        traceback.print_exc()
+                        # traceback.print_exc()
+                        hku_logger.error(traceback.format_exc())
                     if i == (retry - 1):
                         if callback is not None:
                             callback(*args, **kargs)
