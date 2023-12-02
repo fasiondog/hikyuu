@@ -479,7 +479,7 @@ def get_trans_table(connect, market, code):
     return "`{schema}`.`{name}`".format(schema=schema, name=tablename)
 
 
-@hku_catch(trace=True, re_raise=True)
+@hku_catch(trace=True)
 def import_on_stock_trans(connect, api, market, stock_record, max_days):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
@@ -615,7 +615,7 @@ def get_time_table(connect, market, code):
     return "`{schema}`.`{name}`".format(schema=schema, name=tablename)
 
 
-@hku_catch(trace=True, re_raise=True)
+@hku_catch(trace=True)
 def import_on_stock_time(connect, api, market, stock_record, max_days):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
@@ -627,10 +627,10 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
 
     today = datetime.date.today()
     if last_datetime is not None:
-        # yyyymmddHHMMSS
-        last_y = int(last_datetime // 10000000000)
-        last_m = int(last_datetime // 100000000 - last_y * 100)
-        last_d = int(last_datetime // 1000000 - (last_y * 10000 + last_m * 100))
+        # yyyymmddHHMM
+        last_y = int(last_datetime // 100000000)
+        last_m = int(last_datetime // 1000000 - last_y * 100)
+        last_d = int(last_datetime // 10000 - (last_y * 10000 + last_m*100))
         last_date = datetime.date(last_y, last_m, last_d)
         need_days = (today - last_date).days
     else:
