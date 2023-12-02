@@ -48,6 +48,9 @@ public:
     virtual KRecordList getKRecordList(const string& market, const string& code,
                                        const KQuery& query) override;
 
+    virtual TimeLineList getTimeLineList(const string& market, const string& code,
+                                         const KQuery& query) override;
+
 private:
     string _getTableName(const string& market, const string& code, KQuery::KType ktype);
     KRecordList _getKRecordList(const string& market, const string& code, KQuery::KType kType,

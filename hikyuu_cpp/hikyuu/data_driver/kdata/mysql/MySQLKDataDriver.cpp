@@ -126,7 +126,7 @@ size_t MySQLKDataDriver::getCount(const string& market, const string& code, KQue
     size_t result = 0;
 
     try {
-        result = m_connect->queryInt(
+        result = m_connect->queryNumber(
           fmt::format("select count(1) from {}", _getTableName(market, code, kType)), 0);
     } catch (...) {
         // 表可能不存在, 不打印异常信息
@@ -162,6 +162,66 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
     }
 
     return true;
+}
+
+TimeLineList MySQLKDataDriver::getTimeLineList(const string& market, const string& code,
+                                               const KQuery& query) {
+    TimeLineList result;
+    HKU_IF_RETURN(query.queryType() >= KQuery::INVALID, result);
+
+    string table = fmt::format("`{}_time`.`{}`", market, code);
+    to_lower(table);
+    HKU_INFO("getTimeLineList {}", table);
+
+    SQLStatementPtr st;
+    try {
+        if (query.queryType() == KQuery::DATE) {
+            st = m_connect->getStatement(fmt::format(
+              "select `date`, `price`, `vol` from {} where date >= {} and date < {} order by date",
+              table, query.startDatetime().number(), query.endDatetime().number()));
+        } else {
+            size_t total = m_connect->queryNumber(fmt::format("select count(1) from {}", table), 0);
+            size_t start = m_connect->queryNumber(
+              fmt::format("select count(1) from {} where date<{}", table, query.start()), 0);
+            size_t end = m_connect->queryNumber(
+              fmt::format("select count(1) from {} where date<{}", table, query.end()), 0);
+            st = m_connect->getStatement(
+              fmt::format("select `date`, `price`, `vol` from {} order by date limit {}, {}", table,
+                          start, end - start));
+        }
+    } catch (const std::exception& e) {
+        HKU_ERROR("Failed get {} timeline! {}", table, e.what());
+        return result;
+    } catch (...) {
+        HKU_ERROR("Failed get {} timeline!", table);
+        return result;
+    }
+
+    try {
+        m_connect->transaction();
+        st->exec();
+        while (st->moveNext()) {
+            uint64_t date = 0;
+            double price = 0.0, vol = 0.0;
+            try {
+                st->getColumn(0, date, price, vol);
+                result.emplace_back(Datetime(date), price, vol);
+            } catch (const std::exception& e) {
+                HKU_ERROR("Failed get {} timeline! {}", table, e.what());
+            } catch (...) {
+                HKU_ERROR("Failed get {} timeline!", table, code);
+            }
+        }
+
+        m_connect->commit();
+
+    } catch (const std::exception& e) {
+        m_connect->rollback();
+    } catch (...) {
+        m_connect->rollback();
+    }
+
+    return result;
 }
 
 } /* namespace hku */

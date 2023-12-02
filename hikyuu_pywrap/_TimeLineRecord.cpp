@@ -22,6 +22,7 @@ void export_TimeLineReord() {
     class_<TimeLineRecord>("TimeLineRecord", "分时线记录，属性可读写", init<>())
       .def(init<const Datetime&, price_t, price_t>())
       .def(self_ns::str(self))
+      .def(self_ns::repr(self))
       .def_readwrite("date", &TimeLineRecord::datetime, "日期时间")
       .def_readwrite("price", &TimeLineRecord::price, "价格")
       .def_readwrite("vol", &TimeLineRecord::vol, "成交量")
