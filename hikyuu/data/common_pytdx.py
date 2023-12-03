@@ -31,11 +31,19 @@ from pytdx.config.hosts import hq_hosts
 #     ('上海双线主站1', '47.103.48.45', 7709),
 #     ('上海双线主站2', '47.103.86.229', 7709),
 #     ('上海双线主站3', '47.103.88.146', 7709),
+#     ('上海电信主站z1', '180.153.18.170', 7709),
+#     ('上海电信主站z2', '180.153.18.171', 7709),
+#     ('上海电信主站z3', '180.153.39.51', 7709),
+#     ('上海电信主站z4', '58.34.106.207', 7709),
+#     ('上海移动主站z1', '120.253.221.207', 7709),
+#     ('上海电信主站z80', '180.153.18.172', 7709),
 #     ('深圳双线主站1', '120.79.60.82', 7709),
 #     ('深圳双线主站2', '47.112.129.66', 7709),
 #     ('北京双线主站1', '39.98.234.173', 7709),
 #     ('北京双线主站2', '39.98.198.249', 7709),
 #     ('北京双线主站3', '39.100.68.59', 7709),
+#     ('北京联通主站z1', '202.108.254.67', 7709),
+#     ('北京移动主站z1', '111.13.112.206', 7709),
 # ]
 
 
@@ -51,8 +59,8 @@ def ping(ip, port=7709, multithread=False):
     starttime = time.time()
     try:
         with api.connect(ip, port, time_out=1):
-            #x = api.get_security_count(0)
-            #x = api.get_index_bars(7, 1, '000001', 800, 100)
+            # x = api.get_security_count(0)
+            # x = api.get_index_bars(7, 1, '000001', 800, 100)
             x = api.get_security_bars(7, 0, '000001', 800, 100)
             if x:
                 success = True
@@ -74,6 +82,18 @@ def search_best_tdx():
     x = [i for i in res if i[0] == True]
     x.sort(key=lambda item: item[1])
     return x
+
+
+def pytdx_get_day_trans(api, pymarket, code, date):
+    buf = []
+    for i in range(21):
+        x = api.get_history_transaction_data(pymarket, code, i * 2000, 2000,
+                                             date)
+        # x = api.get_transaction_data(TDXParams.MARKET_SZ, '000001', (9-i)*800, 800)
+        if not x:
+            break
+        buf = x + buf
+    return buf
 
 
 if __name__ == '__main__':

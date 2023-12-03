@@ -20,7 +20,7 @@ void export_Datetime() {
                  Datetime("20010101")、Datetime("20010101T232359)
     - 通过 Python 的date：Datetime(date(2010,1,1))
     - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
-    - 通过 YYYYMMDDHHMM 或 YYYYMMDD 形式的整数：Datetime(201001011000)、Datetime(20010101)
+    - 通过 YYYYMMDDHHMMss 或 YYYYMMDDHHMM 或 YYYYMMDD 形式的整数：Datetime(201001011000)、Datetime(20010101)
     - Datetime(year, month, day, hour=0, minute=0, second=0, millisecond=0, microsecond=0))")
 
       .def(init<>())
@@ -44,6 +44,11 @@ void export_Datetime() {
       .add_property("number", &Datetime::number, "返回显示如 YYYYMMDDhhmm 的数字")
       .add_property("hex", &Datetime::hex,
                     "返回用后7个字节表示世纪、世纪年、月、日、时、分、秒的64位整数")
+      .add_property("ym", &Datetime::ym, "返回显示如 YYYYMM 的数字")
+      .add_property("ymd", &Datetime::ymd, "返回显示如 YYYYMMDD 的数字")
+      .add_property("ymdh", &Datetime::ymdh, "返回显示如 YYYYMMDDhh 的数字")
+      .add_property("ymdhm", &Datetime::ymdhm, "返回显示如 YYYYMMDDhhmm 的数字")
+      .add_property("ymdhms", &Datetime::ymdhms, "返回显示如 YYYYMMDDhhmms 的数字")
 
       .def("is_null", &Datetime::isNull, "\n是否是Null值，等于 Datetime() 直接创建的对象")
 

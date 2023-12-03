@@ -22,6 +22,7 @@ void export_TransRecord() {
     class_<TransRecord>("TransRecord", init<>())
       .def(init<const Datetime&, price_t, price_t, TransRecord::DIRECT>())
       .def(self_ns::str(self))
+      .def(self_ns::repr(self))
       .def_readwrite("date", &TransRecord::datetime, "时间")
       .def_readwrite("price", &TransRecord::price, "价格")
       .def_readwrite("vol", &TransRecord::vol, "成交量")

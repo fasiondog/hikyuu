@@ -13,7 +13,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const TransRecord& record) {
     string strip(", ");
     os << std::fixed;
     os.precision(4);
-    os << "TransRecord(Datetime(" << record.datetime.number() << ")" << strip << record.price
+    os << "TransRecord(Datetime(\"" << record.datetime.ymdhms() << "\")" << strip << record.price
        << strip << record.vol << strip << record.direct << ")";
     os.unsetf(std::ostream::floatfield);
     os.precision();

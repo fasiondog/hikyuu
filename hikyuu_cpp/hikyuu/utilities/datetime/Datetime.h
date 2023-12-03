@@ -147,6 +147,21 @@ public:
      */
     uint64_t number() const noexcept;
 
+    /** 返回如YYYYMMDD格式的数字*/
+    uint64_t ym() const noexcept;
+
+    /** 返回如YYYYMMDD格式的数字*/
+    uint64_t ymd() const noexcept;
+
+    /** 返回如YYYYMMDDHH格式的数字*/
+    uint64_t ymdh() const noexcept;
+
+    /** 返回如YYYYMMDDhhmm格式的数字*/
+    uint64_t ymdhm() const noexcept;
+
+    /** 返回如YYYYMMDDhhmmss格式的数字*/
+    uint64_t ymdhms() const noexcept;
+
     /**
      * 转化为 oracle datetime 方式的数字，后 7 个字节分别表示世纪、世纪中的年、月、日、时、分、秒
      * @note 精度到秒
