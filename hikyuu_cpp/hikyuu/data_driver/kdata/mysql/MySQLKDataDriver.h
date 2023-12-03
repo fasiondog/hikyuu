@@ -58,6 +58,11 @@ private:
     KRecordList _getKRecordList(const string& market, const string& code, KQuery::KType ktype,
                                 Datetime start_date, Datetime end_date);
 
+    TimeLineList _getTimeLineListByDate(const string& market, const string& code,
+                                        const KQuery& query);
+    TimeLineList _getTimeLineListByIndex(const string& market, const string& code,
+                                         const KQuery& query);
+
 private:
     MySQLConnect* m_connect;
 };
