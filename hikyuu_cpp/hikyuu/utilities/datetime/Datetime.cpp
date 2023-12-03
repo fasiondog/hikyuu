@@ -67,10 +67,24 @@ Datetime::Datetime(unsigned long long datetime) {
         HKU_CHECK_THROW(mm < 60, std::out_of_range, "Minute value is out of range 0..59");
         bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
         m_data = bt::ptime(d, bt::time_duration((unsigned short)hh, (unsigned short)mm, 0));
+    } else if (datetime <= 99999999999999LL) {
+        // YYYY MM DD hh mm ss
+        unsigned long long year, month, day, hh, mm, ss;
+        year = datetime / 10000000000ULL;
+        month = (datetime - year * 10000000000ULL) / 100000000ULL;
+        day = (datetime - datetime / 100000000ULL * 100000000ULL) / 1000000ULL;
+        hh = (datetime - datetime / 1000000ULL * 1000000ULL) / 10000ULL;
+        mm = (datetime - datetime / 10000ULL * 10000ULL) / 100ULL;
+        ss = (datetime - datetime / 100ULL * 100ULL);
+        HKU_CHECK_THROW(hh < 24, std::out_of_range, "Hour value is out of rang 0..23");
+        HKU_CHECK_THROW(mm < 60, std::out_of_range, "Minute value is out of range 0..59");
+        bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
+        m_data = bt::ptime(d, bt::time_duration((unsigned short)hh, (unsigned short)mm, ss));
     } else {
-        HKU_THROW_EXCEPTION(std::out_of_range,
-                            "Only support YYYYMMDDhhmm or YYYYMMDD, but current param is {}",
-                            datetime);
+        HKU_THROW_EXCEPTION(
+          std::out_of_range,
+          "Only support YYYYMMDDhhmmss or YYYYMMDDhhmm or YYYYMMDD, but current param is {}",
+          datetime);
     }
 }
 
@@ -137,10 +151,82 @@ std::string Datetime::repr() const {
 
 uint64_t Datetime::number() const noexcept {
     try {
-        HKU_IF_RETURN(m_data.date() == bd::date(bd::pos_infin), Null<unsigned long long>());
+        HKU_IF_RETURN(isNull(), Null<unsigned long long>());
+        return (unsigned long long)year() * 100000000ULL +
+               (unsigned long long)month() * 1000000ULL + (unsigned long long)day() * 10000ULL +
+               (unsigned long long)hour() * 100ULL + (unsigned long long)minute();
+    } catch (std::exception& e) {
+        HKU_ERROR(e.what());
+        return Null<unsigned long long>();
+    } catch (...) {
+        return Null<unsigned long long>();
+    }
+}
+
+/** 返回如YYYYMM格式的数字*/
+uint64_t Datetime::ym() const noexcept {
+    try {
+        HKU_IF_RETURN(isNull(), Null<unsigned long long>());
+        return (unsigned long long)year() * 100ULL + (unsigned long long)month();
+    } catch (std::exception& e) {
+        HKU_ERROR(e.what());
+        return Null<unsigned long long>();
+    } catch (...) {
+        return Null<unsigned long long>();
+    }
+}
+
+/** 返回如YYYYMMDD格式的数字*/
+uint64_t Datetime::ymd() const noexcept {
+    try {
+        HKU_IF_RETURN(isNull(), Null<unsigned long long>());
+        return (unsigned long long)year() * 10000ULL + (unsigned long long)month() * 100ULL +
+               (unsigned long long)day();
+    } catch (std::exception& e) {
+        HKU_ERROR(e.what());
+        return Null<unsigned long long>();
+    } catch (...) {
+        return Null<unsigned long long>();
+    }
+}
+
+/** 返回如YYYYMMDDHH格式的数字*/
+uint64_t Datetime::ymdh() const noexcept {
+    try {
+        HKU_IF_RETURN(isNull(), Null<unsigned long long>());
+        return (unsigned long long)year() * 1000000ULL + (unsigned long long)month() * 10000ULL +
+               (unsigned long long)day() * 100ULL + (unsigned long long)hour();
+    } catch (std::exception& e) {
+        HKU_ERROR(e.what());
+        return Null<unsigned long long>();
+    } catch (...) {
+        return Null<unsigned long long>();
+    }
+}
+
+/** 返回如YYYYMMDDhhmm格式的数字*/
+uint64_t Datetime::ymdhm() const noexcept {
+    try {
+        HKU_IF_RETURN(isNull(), Null<unsigned long long>());
         return (unsigned long long)year() * 100000000LL + (unsigned long long)month() * 1000000LL +
                (unsigned long long)day() * 10000LL + (unsigned long long)hour() * 100LL +
                (unsigned long long)minute();
+    } catch (std::exception& e) {
+        HKU_ERROR(e.what());
+        return Null<unsigned long long>();
+    } catch (...) {
+        return Null<unsigned long long>();
+    }
+}
+
+/** 返回如YYYYMMDDhhmmss格式的数字*/
+uint64_t Datetime::ymdhms() const noexcept {
+    try {
+        HKU_IF_RETURN(isNull(), Null<unsigned long long>());
+        return (unsigned long long)year() * 10000000000ULL +
+               (unsigned long long)month() * 100000000ULL + (unsigned long long)day() * 1000000ULL +
+               (unsigned long long)hour() * 10000ULL + (unsigned long long)minute() * 100ULL +
+               (unsigned long long)second();
     } catch (std::exception& e) {
         HKU_ERROR(e.what());
         return Null<unsigned long long>();

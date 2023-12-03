@@ -21,7 +21,7 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
     - 通过字符串：Datetime("2010-1-1 10:00:00")、Datetime("2001-1-1")、Datetime("20010101")、Datetime("20010101T232359)
     - 通过 Python 的date：Datetime(date(2010,1,1))
     - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
-    - 通过 YYYYMMDDHHMM 或 YYYYMMDD 形式的整数：Datetime(201001011000)、Datetime(20010101)
+    - 通过 YYYYMMDDHHMMSS 或 YYYYMMDDHHMM 或 YYYYMMDD 形式的整数：Datetime(201001011000)、Datetime(20010101)
     - Datetime(year, month, day, hour=0, minute=0, second=0, millisecond=0, microsecond=0)
     
     获取日期列表参见： :py:func:`getDateRange`
@@ -37,6 +37,12 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
     .. py:attribute:: millisecond 毫秒，如果是 Null 将抛出异常
     .. py:attribute:: microsecond 微秒，如果是 Null 将抛出异常
     .. py:attribute:: number YYYYMMDDHHMM 形式的整数，精度只到分钟
+    .. py:attribute:: ym YYYYMM 形式的整数
+    .. py:attribute:: ymd YYYYMMDD 形式的整数
+    .. py:attribute:: ymdh YYYYMMDDhh 形式的整数
+    .. py:attribute:: ymdhm YYYYMMDDhhmm 形式的整数
+    .. py:attribute:: ymdhms YYYYMMDDhhmmss 形式的整数
+    .. py:attribute:: hex 兼容oracle datetime 表示, 返回用后7个字节表示世纪、世纪年、月、日、时、分、秒的64位整数
 
     .. py:method:: date(self)
     

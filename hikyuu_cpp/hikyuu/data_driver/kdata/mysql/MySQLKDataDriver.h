@@ -51,6 +51,9 @@ public:
     virtual TimeLineList getTimeLineList(const string& market, const string& code,
                                          const KQuery& query) override;
 
+    virtual TransList getTransList(const string& market, const string& code,
+                                   const KQuery& query) override;
+
 private:
     string _getTableName(const string& market, const string& code, KQuery::KType ktype);
     KRecordList _getKRecordList(const string& market, const string& code, KQuery::KType kType,
@@ -62,6 +65,8 @@ private:
                                         const KQuery& query);
     TimeLineList _getTimeLineListByIndex(const string& market, const string& code,
                                          const KQuery& query);
+    TransList _getTransListByDate(const string& market, const string& code, const KQuery& query);
+    TransList _getTransListByIndex(const string& market, const string& code, const KQuery& query);
 
 private:
     MySQLConnect* m_connect;

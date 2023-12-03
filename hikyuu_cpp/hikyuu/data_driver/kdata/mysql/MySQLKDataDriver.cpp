@@ -269,4 +269,114 @@ TimeLineList MySQLKDataDriver::_getTimeLineListByIndex(const string& market, con
     return result;
 }
 
+TransList MySQLKDataDriver::getTransList(const string& market, const string& code,
+                                         const KQuery& query) {
+    TransList result;
+    HKU_ERROR_IF_RETURN(query.queryType() >= KQuery::INVALID, result, "Invalid queryType! {}{} {}",
+                        market, code, query);
+    if (query.queryType() == KQuery::INDEX) {
+        result = _getTransListByIndex(market, code, query);
+    } else {
+        result = _getTransListByDate(market, code, query);
+    }
+    return result;
+}
+
+TransList MySQLKDataDriver::_getTransListByDate(const string& market, const string& code,
+                                                const KQuery& query) {
+    string table = fmt::format("`{}_trans`.`{}`", market, code);
+    to_lower(table);
+
+    TransList result;
+    try {
+        SQLStatementPtr st = m_connect->getStatement(
+          fmt::format("select `date`, `price`, `vol`, `buyorsell` from {} where date >= {} and "
+                      "date < {} order by date",
+                      table, query.startDatetime().number(), query.endDatetime().number()));
+
+        m_connect->transaction();
+        st->exec();
+        while (st->moveNext()) {
+            uint64_t date = 0;
+            double price = 0.0, vol = 0.0;
+            int direct = 0;
+            try {
+                st->getColumn(0, date, price, vol, direct);
+                result.emplace_back(Datetime(date), price, vol,
+                                    static_cast<TransRecord::DIRECT>(direct));
+            } catch (const std::exception& e) {
+                HKU_ERROR("Failed get {} trans! {}", table, e.what());
+            } catch (...) {
+                HKU_ERROR("Failed get {} trans!", table, code);
+            }
+        }
+
+        m_connect->commit();
+
+    } catch (const std::exception& e) {
+        m_connect->rollback();
+    } catch (...) {
+        m_connect->rollback();
+    }
+
+    return result;
+}
+
+TransList MySQLKDataDriver::_getTransListByIndex(const string& market, const string& code,
+                                                 const KQuery& query) {
+    string table = fmt::format("`{}_trans`.`{}`", market, code);
+    to_lower(table);
+
+    TransList result;
+    try {
+        m_connect->transaction();
+
+        int64_t startix = query.start(), endix = query.end();
+        int64_t total = m_connect->queryNumber(fmt::format("select count(1) from {}", table), 0LL);
+
+        if (startix < 0) {
+            startix += total;
+            if (startix < 0)
+                startix = 0;
+        }
+
+        if (endix < 0) {
+            endix += total;
+            if (endix < 0)
+                endix = 0;
+        }
+
+        if (startix < endix) {
+            SQLStatementPtr st = m_connect->getStatement(fmt::format(
+              "select `date`, `price`, `vol`, `buyorsell` from {} order by date limit {}, {}",
+              table, startix, endix - startix));
+
+            st->exec();
+            while (st->moveNext()) {
+                uint64_t date = 0;
+                double price = 0.0, vol = 0.0;
+                int direct = 0;
+                try {
+                    st->getColumn(0, date, price, vol);
+                    result.emplace_back(Datetime(date), price, vol,
+                                        static_cast<TransRecord::DIRECT>(direct));
+                } catch (const std::exception& e) {
+                    HKU_ERROR("Failed get {} trans! {}", table, e.what());
+                } catch (...) {
+                    HKU_ERROR("Failed get {} trans!", table, code);
+                }
+            }
+        }
+
+        m_connect->commit();
+
+    } catch (const std::exception& e) {
+        m_connect->rollback();
+    } catch (...) {
+        m_connect->rollback();
+    }
+
+    return result;
+}
+
 } /* namespace hku */

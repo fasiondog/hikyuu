@@ -42,7 +42,8 @@ TEST_CASE("test_Datetime") {
     /** @arg 测试 unsigned long long 构造 */
     CHECK(Datetime(20010101) == Datetime(2001, 1, 1));
     CHECK(Datetime(20101231) == Datetime(2010, 12, 31));
-    CHECK(Datetime(200101010000) == Datetime(2001, 1, 1));
+    CHECK(Datetime(200101010102) == Datetime(2001, 1, 1, 1, 2));
+    CHECK(Datetime(20010101010205) == Datetime(2001, 1, 1, 1, 2, 5));
 
     /** @arg 测试 string 构造 */
     d = Datetime(200101010000L);
@@ -121,6 +122,20 @@ TEST_CASE("test_Datetime") {
     long long y = x;
     Datetime m(y);
     CHECK(m == d);
+
+    /** @arg ymdhs系列方法转换 unsigned long long*/
+    d = Datetime(20120806135249ULL);
+    CHECK(d.year() == 2012);
+    CHECK(d.month() == 8);
+    CHECK(d.day() == 6);
+    CHECK(d.hour() == 13);
+    CHECK(d.minute() == 52);
+    CHECK(d.second() == 49);
+    CHECK(d.ym() == 201208ULL);
+    CHECK(d.ymd() == 20120806ULL);
+    CHECK(d.ymdh() == 2012080613ULL);
+    CHECK(d.ymdhm() == 201208061352ULL);
+    CHECK(d.ymdhms() == 20120806135249ULL);
 
     /** @arg 兼容oracle datetime表示法 */
     d = Datetime(2021, 4, 25, 23, 16, 27);
