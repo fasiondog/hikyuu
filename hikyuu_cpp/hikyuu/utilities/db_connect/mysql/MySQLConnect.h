@@ -37,11 +37,13 @@ public:
     virtual bool tableExist(const std::string& tablename) override;
     virtual void resetAutoIncrement(const std::string& tablename) override;
 
-    virtual void transaction() override;
-    virtual void commit() override;
+    virtual void transaction() noexcept override;
+    virtual void commit() noexcept override;
     virtual void rollback() noexcept override;
 
 private:
+    bool tryConnect() noexcept;
+    void connect();
     void close();
 
 private:

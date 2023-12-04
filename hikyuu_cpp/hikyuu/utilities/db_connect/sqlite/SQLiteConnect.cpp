@@ -100,19 +100,31 @@ int64_t SQLiteConnect::exec(const std::string &sql_string) {
     return affect_rows < 0 ? 0 : affect_rows;
 }
 
-void SQLiteConnect::transaction() {
-    exec("BEGIN IMMEDIATE");
+void SQLiteConnect::transaction() noexcept {
+    try {
+        exec("BEGIN IMMEDIATE");
+    } catch (const std::exception &e) {
+        HKU_ERROR("Failed transaction! {}", e.what());
+    } catch (...) {
+        HKU_ERROR("Unknown error!");
+    }
 }
 
-void SQLiteConnect::commit() {
-    exec("COMMIT TRANSACTION");
+void SQLiteConnect::commit() noexcept {
+    try {
+        exec("COMMIT TRANSACTION");
+    } catch (const std::exception &e) {
+        HKU_ERROR("Failed commit! {}", e.what());
+    } catch (...) {
+        HKU_ERROR("Unknown error!");
+    }
 }
 
 void SQLiteConnect::rollback() noexcept {
     try {
         exec("ROLLBACK TRANSACTION");
     } catch (const std::exception &e) {
-        HKU_ERROR("rollback failed! {}", e.what());
+        HKU_ERROR("Failed rollback! {}", e.what());
     } catch (...) {
         HKU_ERROR("Unknown error!");
     }
