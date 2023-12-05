@@ -99,10 +99,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             if not os.path.lexists(data_dir + '/tmp'):
                 os.mkdir(data_dir + '/tmp')
             # 此处不能使用 utf-8 参数，否则导致Windows下getBlock无法找到板块分类
-            # with open(filename, 'w', encoding='utf-8') as f:
-
-            with open(filename, 'w') as f:
-
+            with open(filename, 'w', encoding='utf-8') as f:
                 f.write(
                     hku_config_template.hdf5_template.format(
                         dir=data_dir,
@@ -135,7 +132,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         else:
             data_dir = current_config['mysql']['tmpdir']
-            with open(filename, 'w') as f:
+            with open(filename, 'w', encoding="utf-8") as f:
                 f.write(
                     hku_config_template.mysql_template.format(
                         dir=data_dir,
