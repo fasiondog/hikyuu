@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import platform
 try:
@@ -34,7 +34,7 @@ py_version = platform.python_version_tuple()
 py_version = int(py_version[0]) * 10 + int(py_version[1])
 
 hku_name = "hikyuu"
-#hku_version = "1.0.9"
+# hku_version = "1.0.9"
 hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 
@@ -66,6 +66,9 @@ packages = [
     'hikyuu/data/sqlite_mem_sql',
     'hikyuu/data_driver',
     'hikyuu/examples',
+    'hikyuu/examples/notebook',
+    'hikyuu/examples/notebook/images',
+    'hikyuu/examples/notebook/Demo',
     'hikyuu/flat',
     'hikyuu/fetcher',
     'hikyuu/fetcher/proxy',
@@ -78,7 +81,7 @@ packages = [
     'hikyuu/shell',
     'hikyuu/strategy',
     'hikyuu/strategy/demo',
-    #'hikyuu/test',
+    'hikyuu/test',
     'hikyuu/tools',
     'hikyuu/trade_manage',
     'hikyuu/trade_sys',
@@ -97,12 +100,12 @@ setup(
     keywords=hku_keywords,
     platforms=hku_platforms,
     url=hku_url,
-    packages=packages,  #find_packages(),
+    packages=packages,  # find_packages(),
     zip_safe=False,
     include_package_data=True,
     package_data={
         '': [
-            '*.rst', '*.pyd', '*.ini', '*.sql', '*.properties', '*.xml',
+            '*.rst', '*.pyd', '*.png', '*.md', '*.ipynb', '*.ini', '*.sql', '*.properties', '*.xml',
             'LICENSE.txt', '*.dll', '*.exe', '*.ico', '*.so', '*.dylib',
             '*.so.*', '*.qm', 'libboost_serialization*',
             'libboost_python{}*'.format(py_version)
