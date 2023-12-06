@@ -22,7 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-hdf5_template = """
+hdf5_template = u"""
 [hikyuu]
 tmpdir = {dir}/tmp
 datadir = {dir}

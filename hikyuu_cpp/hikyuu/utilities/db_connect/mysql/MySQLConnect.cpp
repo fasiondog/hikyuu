@@ -17,18 +17,38 @@
 namespace hku {
 
 MySQLConnect::MySQLConnect(const Parameter& param) : DBConnectBase(param), m_mysql(nullptr) {
+    close();
+    connect();
+}
+
+MySQLConnect::~MySQLConnect() {
+    close();
+}
+
+bool MySQLConnect::tryConnect() noexcept {
+    bool success = false;
+    try {
+        connect();
+        success = true;
+    } catch (const std::exception& e) {
+        HKU_WARN(e.what());
+    }
+    return success;
+}
+
+void MySQLConnect::connect() {
     try {
         m_mysql = new MYSQL;
         HKU_CHECK(mysql_init(m_mysql) != NULL, "Initial MySQL handle error!");
 
-        string host = getParamFromOther<string>(param, "host", "127.0.0.1");
-        string usr = getParamFromOther<string>(param, "usr", "root");
-        string pwd = getParamFromOther<string>(param, "pwd", "");
-        string database = getParamFromOther<string>(param, "db", "");
-        unsigned int port = getParamFromOther<int>(param, "port", 3306);
-        HKU_TRACE("MYSQL host: {}", host);
-        HKU_TRACE("MYSQL port: {}", port);
-        HKU_TRACE("MYSQL database: {}", database);
+        std::string host = tryGetParam<std::string>("host", "127.0.0.1");
+        std::string usr = tryGetParam<std::string>("usr", "root");
+        std::string pwd = tryGetParam<std::string>("pwd", "");
+        std::string database = tryGetParam<std::string>("db", "");
+        unsigned int port = tryGetParam<int>("port", 3306);
+        // HKU_TRACE("MYSQL host: {}", host);
+        // HKU_TRACE("MYSQL port: {}", port);
+        // HKU_TRACE("MYSQL database: {}", database);
 
         my_bool reconnect = 1;
         SQL_CHECK(mysql_options(m_mysql, MYSQL_OPT_RECONNECT, &reconnect) == 0,
@@ -45,8 +65,8 @@ MySQLConnect::MySQLConnect(const Parameter& param) : DBConnectBase(param), m_mys
         SQL_CHECK(mysql_set_character_set(m_mysql, "utf8") == 0, mysql_errno(m_mysql),
                   "mysql_set_character_set error! {}", mysql_error(m_mysql));
 
-    } catch (const std::bad_alloc& e) {
-        HKU_THROW("Failed allocate MySQLConnect! {}", e.what());
+    } catch (std::bad_alloc& e) {
+        HKU_THROW("Failed alloc MySQLConnect! {}", e.what());
 
     } catch (const hku::exception& e) {
         close();
@@ -62,10 +82,6 @@ MySQLConnect::MySQLConnect(const Parameter& param) : DBConnectBase(param), m_mys
     }
 }
 
-MySQLConnect::~MySQLConnect() {
-    close();
-}
-
 void MySQLConnect::close() {
     if (m_mysql) {
         mysql_close(m_mysql);
@@ -75,9 +91,9 @@ void MySQLConnect::close() {
 }
 
 bool MySQLConnect::ping() {
-    HKU_IF_RETURN(!m_mysql, false);
+    HKU_ERROR_IF_RETURN(!m_mysql && !tryConnect(), false, "Failed connect to mysql!");
     auto ret = mysql_ping(m_mysql);
-    HKU_ERROR_IF_RETURN(ret, false, "mysql_ping error code: {}, msg: {}", ret,
+    HKU_ERROR_IF_RETURN(ret && !tryConnect(), false, "mysql_ping error code: {}, msg: {}", ret,
                         mysql_error(m_mysql));
     return true;
 }
@@ -86,6 +102,10 @@ int64_t MySQLConnect::exec(const std::string& sql_string) {
 #ifdef HKU_SQL_TRACE
     HKU_DEBUG(sql_string);
 #endif
+    if (!m_mysql) {
+        HKU_CHECK(!tryConnect(), "Failed connect to mysql!");
+    }
+
     int ret = mysql_query(m_mysql, sql_string.c_str());
     if (ret) {
         // 尝试重新连接
@@ -149,21 +169,33 @@ void MySQLConnect::resetAutoIncrement(const std::string& tablename) {
     exec(fmt::format("alter {} auto_increment=1", tablename));
 }
 
-void MySQLConnect::transaction() {
-    exec("BEGIN");
+void MySQLConnect::transaction() noexcept {
+    try {
+        exec("BEGIN");
+    } catch (const std::exception& e) {
+        HKU_ERROR("Failed transaction! {}", e.what());
+    } catch (...) {
+        HKU_ERROR("Unknown error!");
+    }
 }
 
-void MySQLConnect::commit() {
-    exec("COMMIT");
+void MySQLConnect::commit() noexcept {
+    try {
+        exec("COMMIT");
+    } catch (const std::exception& e) {
+        HKU_ERROR("Failed transaction! {}", e.what());
+    } catch (...) {
+        HKU_ERROR("Unknown error!");
+    }
 }
 
 void MySQLConnect::rollback() noexcept {
     try {
         exec("ROLLBACK");
     } catch (const std::exception& e) {
-        HKU_ERROR("rollback failed! {}", e.what());
+        HKU_ERROR("Failed transaction! {}", e.what());
     } catch (...) {
-        HKU_ERROR("Unknonw error!");
+        HKU_ERROR("Unknown error!");
     }
 }
 
