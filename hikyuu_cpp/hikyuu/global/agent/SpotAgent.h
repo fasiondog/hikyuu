@@ -59,8 +59,7 @@ struct HKU_API SpotRecord {
  */
 class HKU_API SpotAgent {
 public:
-    SpotAgent(const string& quotation_addr = "ipc:///hikyuu_quotation_addr.ipc")
-    : m_pubUrl(quotation_addr) {}
+    SpotAgent() = default;
 
     /** 析构函数 */
     virtual ~SpotAgent();
@@ -109,6 +108,7 @@ public:
     void clearPostProcessList();
 
 private:
+    static string ms_pubUrl;  // 数据发送服务地址
     static const char* ms_startTag;  // 批次数据接收起始标记，用于判断启动了新的批次数据接收
     static const char* ms_endTag;  // 批次数据接收接收标记，用于判断该批次数据更新结束
     static const char* ms_spotTopic;         // 向数据发送服务订阅的主题
@@ -141,8 +141,6 @@ private:
     list<std::function<void(const SpotRecord&)>> m_processList;  // 已注册的 spot 处理函数列表
     list<std::function<void(Datetime)>> m_postProcessList;  // 已注册的批次后处理函数列表
     vector<std::future<void>> m_process_task_list;
-
-    string m_pubUrl;  // 数据发送服务地址
 };
 
 }  // namespace hku

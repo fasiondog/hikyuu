@@ -14,6 +14,7 @@ using namespace hikyuu::flat;
 
 namespace hku {
 
+string SpotAgent::ms_pubUrl{"ipc:///hikyuu_quotation_addr.ipc"};  // 数据发送服务地址
 const char* SpotAgent::ms_startTag = ":spot:[start spot]";
 const char* SpotAgent::ms_endTag = ":spot:[end spot]";
 const char* SpotAgent::ms_spotTopic = ":spot:";
@@ -149,15 +150,16 @@ void SpotAgent::work_thread() {
 
     rv = -1;
     while (!m_stop && rv != 0) {
-        rv = nng_dial(sock, m_pubUrl.c_str(), nullptr, 0);
-        // HKU_WARN_IF(
-        //   rv != 0,
-        //   "Faied nng_dial, will retry after 5 seconds! You Maybe need start the collection
-        //   service " "first.");
+        rv = nng_dial(sock, ms_pubUrl.c_str(), nullptr, 0);
+        HKU_WARN_IF(
+          rv != 0,
+          "Faied connect quotation server {}, will retry after 5 seconds! You Maybe need start the "
+          "collection service first.",
+          ms_pubUrl);
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
-    // HKU_INFO("Ready to receive ...");
+    HKU_INFO("Ready to receive quotation ...");
 
     while (!m_stop) {
         char* buf = nullptr;

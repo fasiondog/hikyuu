@@ -15,7 +15,7 @@ SpotAgent* g_spot_agent = nullptr;
 
 SpotAgent* getGlobalSpotAgent() {
     if (!g_spot_agent) {
-        g_spot_agent = new SpotAgent;
+        g_spot_agent = new SpotAgent();
     }
     return g_spot_agent;
 }
@@ -160,7 +160,7 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     stk.realtimeUpdate(krecord, ktype);
 }
 
-void HKU_API startSpotAgent(const string& quotation_addr, bool print) {
+void HKU_API startSpotAgent(bool print) {
     auto& agent = *getGlobalSpotAgent();
     HKU_CHECK(!agent.isRunning(), "The agent is running, please stop first!");
 

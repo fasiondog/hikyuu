@@ -11,12 +11,10 @@ namespace hku {
 
 /**
  * 启动 Spot 数据接收代理，如果之前已经处于运行状态，将抛出异常
- * @param quotation_addr 实时行情采集服务地址
  * @param print 打印接收数据进展
  * @ingroup Agent
  */
-void HKU_API startSpotAgent(const string& quotation_addr = "ipc:///hikyuu_quotation_addr.ipc",
-                            bool print = true);
+void HKU_API startSpotAgent(bool print = true);
 
 /**
  * 终止 Spot 数据接收代理

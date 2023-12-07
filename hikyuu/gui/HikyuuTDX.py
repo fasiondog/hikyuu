@@ -27,7 +27,7 @@ from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 # from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
 from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
-from hikyuu.gui.spot_server import release_nng_sender
+from hikyuu.gui.spot_server import release_nng_senders
 
 from hikyuu.data import hku_config_template
 from hikyuu.util.mylog import add_class_logger_handler, class_logger, get_default_logger
@@ -66,7 +66,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.collect_spot_thread.wait()
 
         if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
-            release_nng_sender()
+            release_nng_senders()
             self.collect_spot_thread.terminate()
             self.collect_spot_thread.wait()
 
@@ -103,8 +103,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 f.write(
                     hku_config_template.hdf5_template.format(
                         dir=data_dir,
-                        quotation_address=current_config.get(
-                            'collect', 'quotation_address', fallback='ipc:///hikyuu_quotation_addr.ipc'),
+                        quotation_server=current_config.get(
+                            'collect', 'quotation_server', fallback='ipc:///hikyuu_quotation_addr.ipc'),
                         day=current_config.getboolean('preload', 'day', fallback=True),
                         week=current_config.getboolean('preload', 'week', fallback=False),
                         month=current_config.getboolean('preload', 'month', fallback=False),
@@ -138,8 +138,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 f.write(
                     hku_config_template.mysql_template.format(
                         dir=data_dir,
-                        quotation_address=current_config.get(
-                            'collect', 'quotation_address', fallback='ipc:///hikyuu_quotation_addr.ipc'),
+                        quotation_server=current_config.get(
+                            'collect', 'quotation_server', fallback='ipc:///hikyuu_quotation_addr.ipc'),
                         host=current_config['mysql']['host'],
                         port=current_config['mysql']['port'],
                         usr=current_config['mysql']['usr'],
@@ -341,8 +341,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         )
 
         # 初始化定时采集设置
-        quotation_address = import_config.get(
-            'collect', 'quotation_address', fallback='ipc:///hikyuu_quotation_addr.ipc')
+        self.quotation_server = import_config.get(
+            'collect', 'quotation_server', fallback='ipc:///hikyuu_quotation_addr.ipc')
         interval_time = import_config.getint('collect', 'interval', fallback=60 * 60)
         self.collect_sample_spinBox.setValue(interval_time)
         use_zhima_proxy = import_config.getboolean('collect', 'use_zhima_proxy', fallback=False)
@@ -431,7 +431,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'time': self.sched_import_timeEdit.time().toString(),
         }
         import_config['collect'] = {
-            'quotation_address': 'ipc:///hikyuu_quotation_addr.ipc',
+            'quotation_server': self.quotation_server,
             'interval': self.collect_sample_spinBox.value(),
             'source': self.collect_source_comboBox.currentText(),
             'use_zhima_proxy': self.collect_use_zhima_checkBox.isChecked(),
@@ -725,7 +725,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_collect_start_pushButton_clicked(self):
         if self._is_collect_running:
             if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
-                release_nng_sender()
+                release_nng_senders()
                 self.collect_spot_thread.terminate()
                 self.collect_spot_thread.wait()
                 self.collect_spot_thread = None
