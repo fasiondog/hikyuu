@@ -24,6 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from .draw import *
 __copyright__ = """
 MIT License
 
@@ -55,7 +56,7 @@ import configparser
 
 from hikyuu import *
 
-#重定向C++ stdout/stderr输出至python
+# 重定向C++ stdout/stderr输出至python
 iodog = OstreamRedirect()
 iodog.open()
 
@@ -73,7 +74,7 @@ if sys.platform == 'win32':
 # 读取配置信息，并初始化
 #
 # ==============================================================================
-#config_file = './test_data/hikyuu_win.ini'
+# config_file = './test_data/hikyuu_win.ini'
 config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
 if not os.path.exists(config_file):
     # 检查老版本配置是否存在，如果存在可继续使用，否则异常终止
@@ -91,7 +92,7 @@ if not os.path.exists(config_file):
         raise Exception("未找到配置文件，请先使用数据导入工具导入数据（将自动生成配置文件）！！!")
 
 ini = configparser.ConfigParser()
-ini.read(config_file)
+ini.read(config_file, encoding='utf-8')
 hku_param = Parameter()
 hku_param["tmpdir"] = ini.get('hikyuu', 'tmpdir')
 hku_param["datadir"] = ini.get('hikyuu', 'datadir')
@@ -124,8 +125,8 @@ for p in kdata_config:
         continue
     kdata_param[p] = ini.get('kdata', p)
 
-#set_log_level(LOG_LEVEL.INFO)
-#sm = StockManager.instance()
+# set_log_level(LOG_LEVEL.INFO)
+# sm = StockManager.instance()
 sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
 set_log_level(LOG_LEVEL.INFO)
 
@@ -215,7 +216,6 @@ set_global_context(sm['sh000001'], Query(-150))
 # 设置默认绘图引擎
 #
 # ==============================================================================
-from .draw import *
 
 use_draw_engine('matplotlib')
 
@@ -383,7 +383,7 @@ def realtime_update_from_sina_qq(source):
         return
 
     count = 0
-    #urls = []
+    # urls = []
     tmpstr = queryStr
     for stock in sm:
         if stock.valid and stock.type in (
@@ -402,9 +402,9 @@ def realtime_update_from_sina_qq(source):
         update_func(tmpstr)
 
     # 不用并行，防止过快，ip被网站屏蔽
-    #from multiprocessing import Pool
-    #from multiprocessing.dummy import Pool as ThreadPool
-    #pool = ThreadPool()
+    # from multiprocessing import Pool
+    # from multiprocessing.dummy import Pool as ThreadPool
+    # pool = ThreadPool()
     # if source == 'sina':
     #    pool.map(realtimePartUpdate_from_sina, urls)
     # else:
