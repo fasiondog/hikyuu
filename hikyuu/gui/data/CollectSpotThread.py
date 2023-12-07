@@ -20,6 +20,7 @@ class CollectSpotThread(QThread):
         self.working = True
         self._config = config
         self.hku_config_file = hku_config_file
+        self._addr = config.get("collect", "quotation_address", fallback="ipc:///hikyuu_quotation_addr.ipc")
         self._interval = config.getint('collect', 'interval', fallback=60 * 60)
         self._phase1_start_time = config.get('collect', 'phase1_start', fallback='09:00')
         self._phase1_end_time = config.get('collect', 'phase1_end', fallback='12:05')
@@ -35,11 +36,11 @@ class CollectSpotThread(QThread):
     @hku_catch(trace=True)
     def run(self):
         self.logger.info("current data source: {}".format(self._source))
-        collect(
-            self._use_zhima_proxy, self._source, self._interval,
-            '{}-{}'.format(self._phase1_start_time,
-                           self._phase1_end_time), '{}-{}'.format(self._phase2_start_time, self._phase2_end_time), True
-        )
+        collect(self._addr,
+                self._use_zhima_proxy, self._source, self._interval,
+                '{}-{}'.format(self._phase1_start_time,
+                               self._phase1_end_time), '{}-{}'.format(self._phase2_start_time, self._phase2_end_time), True
+                )
 
 
 class_logger(CollectSpotThread)

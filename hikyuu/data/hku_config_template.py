@@ -26,6 +26,7 @@ hdf5_template = """
 [hikyuu]
 tmpdir = {dir}/tmp
 datadir = {dir}
+quotation_address = {quotation_address}
 
 [block]
 type  = qianlong
@@ -91,6 +92,7 @@ mysql_template = """
 [hikyuu]
 tmpdir = {dir}
 datadir = {dir}
+quotation_address = {quotation_address}
 
 [block]
 type  = qianlong

@@ -169,15 +169,15 @@ def next_delta(start_time, interval, phase1_delta, phase2_delta, ignore_weekend)
 g_nng_sender_lock = threading.Lock()
 g_nng_sender = None
 g_spot_topic = ':spot:'
+g_quotation_addr = 'ipc:///hikyuu_quotation_addr.ipc'
 
 
 def get_nng_sender():
     global g_nng_sender
     g_nng_sender_lock.acquire()
     if g_nng_sender is None:
-        address = "ipc:///tmp/hikyuu_real_pub.ipc"
         g_nng_sender = pynng.Pub0()
-        g_nng_sender.listen(address)
+        g_nng_sender.listen(g_quotation_addr)
     g_nng_sender_lock.release()
     return g_nng_sender
 
@@ -207,7 +207,10 @@ def send_spot(records):
     get_nng_sender().send(bytes(spot))
 
 
-def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
+def collect(addr, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
+    global g_quotation_addr
+    g_quotation_addr = addr
+
     phase1_delta = parse_phase(phase1)
     if phase1_delta is None or len(phase1_delta) != 2:
         hku_error("无效参数 phase1: {}".format(phase1))
@@ -251,11 +254,11 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     #     spot.extend(buf)
     #     get_nng_sender().send(bytes(spot))
 
-    #pub_sock = get_nng_sender()
+    # pub_sock = get_nng_sender()
 
     today = Datetime.today()
-    #phase1_time = [today + x for x in phase1_delta]
-    #phase2_time = [today + x for x in phase2_delta]
+    # phase1_time = [today + x for x in phase1_delta]
+    # phase2_time = [today + x for x in phase2_delta]
     start_time = Datetime.now()
     delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
     next_time = start_time + delta
@@ -264,11 +267,11 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     while True:
         try:
             start_time = Datetime.now()
-            #pub_sock.send("{}{}".format(spot_topic, '[start spot]').encode('utf-8'))
+            # pub_sock.send("{}{}".format(spot_topic, '[start spot]').encode('utf-8'))
             start_send_spot()
             records = get_spot_parallel(stk_list, source, use_proxy, send_spot)
             hku_info("{}:{}:{} 采集数量: {}".format(start_time.hour, start_time.minute, start_time.second, len(records)))
-            #pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
+            # pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
             end_send_spot()
             delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
             hku_info("sleep {}'s".format(delta.total_seconds()))
@@ -286,14 +289,15 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
 
 @click.command()
+@click.option('-chan', '--chan', default='ipc:///hikyuu_quotation_addr.ipc')
 @click.option('-use_proxy', '--use_proxy', is_flag=True, help='是否使用代理，须自行申请芝麻http代理并加入ip白名单')
 @click.option('-source', '--source', default='qq', type=click.Choice(['sina', 'qq']), help='数据来源')
 @click.option('-seconds', '--seconds', default=10)
 @click.option('-phase1', '--phase1', default='9:00-12:00')
 @click.option('-phase2', '--phase2', default='13:00-15:00')
 @click.option('-ignore_weekend', '--ignore_weekend', is_flag=True)
-def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
-    collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend)
+def run(chan, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
+    collect(chan, use_proxy, source, seconds, phase1, phase2, ignore_weekend)
 
 
 if __name__ == '__main__':

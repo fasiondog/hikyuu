@@ -12,6 +12,7 @@ using namespace boost::python;
 using namespace hku;
 
 void export_SpotAgent() {
-    def("start_spot_agent", startSpotAgent, (arg("print") = false));
+    def("start_spot_agent", startSpotAgent,
+        (arg("quotation_addr") = "ipc:///hikyuu_quotation_addr.ipc", arg("print") = false));
     def("stop_spot_agent", stopSpotAgent);
 }

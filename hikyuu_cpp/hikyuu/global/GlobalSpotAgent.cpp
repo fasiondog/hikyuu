@@ -160,7 +160,7 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     stk.realtimeUpdate(krecord, ktype);
 }
 
-void HKU_API startSpotAgent(bool print) {
+void HKU_API startSpotAgent(const string& quotation_addr, bool print) {
     auto& agent = *getGlobalSpotAgent();
     HKU_CHECK(!agent.isRunning(), "The agent is running, please stop first!");
 

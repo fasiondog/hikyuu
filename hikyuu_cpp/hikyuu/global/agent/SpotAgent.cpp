@@ -14,7 +14,6 @@ using namespace hikyuu::flat;
 
 namespace hku {
 
-const char* SpotAgent::ms_pubUrl = "ipc:///tmp/hikyuu_real_pub.ipc";
 const char* SpotAgent::ms_startTag = ":spot:[start spot]";
 const char* SpotAgent::ms_endTag = ":spot:[end spot]";
 const char* SpotAgent::ms_spotTopic = ":spot:";
@@ -150,7 +149,7 @@ void SpotAgent::work_thread() {
 
     rv = -1;
     while (!m_stop && rv != 0) {
-        rv = nng_dial(sock, ms_pubUrl, nullptr, 0);
+        rv = nng_dial(sock, m_pubUrl.c_str(), nullptr, 0);
         // HKU_WARN_IF(
         //   rv != 0,
         //   "Faied nng_dial, will retry after 5 seconds! You Maybe need start the collection

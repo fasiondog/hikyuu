@@ -95,6 +95,8 @@ void StrategyBase::run() {
 
     hkuParam.set<string>("tmpdir", config.get("hikyuu", "tmpdir", "."));
     hkuParam.set<string>("datadir", config.get("hikyuu", "datadir", "."));
+    hkuParam.set<string>("quotation_address", config.get("hikyuu", "quotation_address",
+                                                         "ipc:///hikyuu_quotation_addr.ipc"));
 
     if (!config.hasSection("baseinfo")) {
         HKU_FATAL("Missing configure of baseinfo!");
@@ -168,7 +170,7 @@ void StrategyBase::run() {
     auto& agent = *getGlobalSpotAgent();
     agent.addProcess([this](const SpotRecord& spot) { this->receivedSpot(spot); });
     agent.addPostProcess([this](Datetime revTime) { this->finishReceivedSpot(revTime); });
-    startSpotAgent(false);
+    startSpotAgent(hkuParam.get<string>("quotation_address"), false);
 
     _addTimer();
 

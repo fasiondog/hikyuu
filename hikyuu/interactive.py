@@ -98,6 +98,8 @@ hku_param["tmpdir"] = ini.get('hikyuu', 'tmpdir')
 hku_param["datadir"] = ini.get('hikyuu', 'datadir')
 if ini.has_option('hikyuu', 'logger'):
     hku_param["logger"] = ini['hikyuu']['logger']
+if ini.has_option('hikyuu', 'quotation_address'):
+    hku_param["quotation_address"] = ini['hikyuu']['quotation_address']
 
 base_param = Parameter()
 base_info_config = ini.options('baseinfo')
@@ -131,7 +133,7 @@ sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
 set_log_level(LOG_LEVEL.INFO)
 
 # 启动行情接收代理
-start_spot_agent()
+start_spot_agent(hku_param["quotation_address"], True)
 
 # ==============================================================================
 #
