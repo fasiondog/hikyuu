@@ -107,6 +107,9 @@ public:
      */
     void clearPostProcessList();
 
+public:
+    static void setQuotationServer(const string& server);
+
 private:
     static string ms_pubUrl;  // 数据发送服务地址
     static const char* ms_startTag;  // 批次数据接收起始标记，用于判断启动了新的批次数据接收

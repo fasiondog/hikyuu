@@ -133,7 +133,7 @@ sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
 set_log_level(LOG_LEVEL.INFO)
 
 # 启动行情接收代理
-start_spot_agent(hku_param["quotation_server"], True)
+start_spot_agent(False)
 
 # ==============================================================================
 #

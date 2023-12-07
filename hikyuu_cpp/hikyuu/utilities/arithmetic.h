@@ -111,6 +111,8 @@ inline void trim(std::string& s) {
 
     s.erase(0, s.find_first_not_of(" "));
     s.erase(s.find_last_not_of(" ") + 1);
+    s.erase(s.find_last_not_of("\n") + 1);
+    s.erase(s.find_last_not_of("\r") + 1);
 }
 
 /**

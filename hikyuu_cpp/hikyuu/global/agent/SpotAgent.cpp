@@ -24,6 +24,10 @@ const size_t SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
 
 Datetime SpotAgent::ms_start_rev_time;
 
+void SpotAgent::setQuotationServer(const string& server) {
+    ms_pubUrl = server;
+}
+
 SpotAgent::~SpotAgent() {
     stop();
 }
