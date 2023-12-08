@@ -167,47 +167,78 @@ def next_delta(start_time, interval, phase1_delta, phase2_delta, ignore_weekend)
 
 # 多线程时锁住申请
 g_nng_sender_lock = threading.Lock()
-g_nng_sender = None
+g_nng_ipc_sender = None
+g_nng_tcp_sender = None
 g_spot_topic = ':spot:'
+g_ipc_addr = 'ipc:///hikyuu_quotation_addr.ipc'
+g_tcp_addr = 'tcp://*:9200'
 
 
-def get_nng_sender():
-    global g_nng_sender
+@hku_catch(trace=True)
+def get_nng_ipc_sender():
+    global g_nng_ipc_sender
+    if g_nng_ipc_sender is None:
+        g_nng_ipc_sender = pynng.Pub0()
+        g_nng_ipc_sender.listen(g_ipc_addr)
+    return g_nng_ipc_sender
+
+
+@hku_catch(trace=True)
+def get_nng_tcp_sender():
+    global g_nng_tcp_sender
+    if g_nng_tcp_sender is None:
+        g_nng_tcp_sender = pynng.Pub0()
+        g_nng_tcp_sender.listen(g_tcp_addr)
+    return g_nng_tcp_sender
+
+
+def get_nng_senders():
     g_nng_sender_lock.acquire()
-    if g_nng_sender is None:
-        address = "ipc:///tmp/hikyuu_real_pub.ipc"
-        g_nng_sender = pynng.Pub0()
-        g_nng_sender.listen(address)
+    ipc_sender = get_nng_ipc_sender()
+    tcp_sender = get_nng_tcp_sender()
     g_nng_sender_lock.release()
-    return g_nng_sender
+    return ipc_sender, tcp_sender
 
 
-def release_nng_sender():
-    global g_nng_sender
+def release_nng_senders():
+    global g_nng_ipc_sender, g_nng_tcp_sender
     g_nng_sender_lock.acquire()
-    if g_nng_sender is not None:
-        g_nng_sender.close()
-    g_nng_sender = None
+    if g_nng_ipc_sender is not None:
+        g_nng_ipc_sender.close()
+        g_nng_ipc_sender = None
+    if g_nng_tcp_sender is not None:
+        g_nng_tcp_sender.close()
+        g_nng_tcp_sender = None
     g_nng_sender_lock.release()
     hku_info("release pynng socket")
 
 
 def start_send_spot():
-    get_nng_sender().send("{}{}".format(g_spot_topic, '[start spot]').encode('utf-8'))
+    senders = get_nng_senders()
+    for sender in senders:
+        sender.send("{}{}".format(g_spot_topic, '[start spot]').encode('utf-8'))
 
 
 def end_send_spot():
-    get_nng_sender().send('{}{}'.format(g_spot_topic, '[end spot]').encode('utf-8'))
+    senders = get_nng_senders()
+    for sender in senders:
+        sender.send('{}{}'.format(g_spot_topic, '[end spot]').encode('utf-8'))
 
 
 def send_spot(records):
     spot = bytearray(g_spot_topic.encode('utf-8'))
     buf = create_fb_spot(records)
     spot.extend(buf)
-    get_nng_sender().send(bytes(spot))
+    senders = get_nng_senders()
+    for sender in senders:
+        sender.send(bytes(spot))
 
 
-def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
+def collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
+    global g_tcp_addr
+    if len(server) >= 3 and server[:3] == 'tcp':
+        g_tcp_addr = server
+
     phase1_delta = parse_phase(phase1)
     if phase1_delta is None or len(phase1_delta) != 2:
         hku_error("无效参数 phase1: {}".format(phase1))
@@ -243,19 +274,8 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
         (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM, constant.STOCKTYPE_START)
     ]
 
-    spot_topic = ':spot:'
+    _ = get_nng_senders()
 
-    # def batch_func(records):
-    #     spot = bytearray(spot_topic.encode('utf-8'))
-    #     buf = create_fb_spot(records)
-    #     spot.extend(buf)
-    #     get_nng_sender().send(bytes(spot))
-
-    #pub_sock = get_nng_sender()
-
-    today = Datetime.today()
-    #phase1_time = [today + x for x in phase1_delta]
-    #phase2_time = [today + x for x in phase2_delta]
     start_time = Datetime.now()
     delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
     next_time = start_time + delta
@@ -264,11 +284,10 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     while True:
         try:
             start_time = Datetime.now()
-            #pub_sock.send("{}{}".format(spot_topic, '[start spot]').encode('utf-8'))
             start_send_spot()
             records = get_spot_parallel(stk_list, source, use_proxy, send_spot)
             hku_info("{}:{}:{} 采集数量: {}".format(start_time.hour, start_time.minute, start_time.second, len(records)))
-            #pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
+            # pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
             end_send_spot()
             delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
             hku_info("sleep {}'s".format(delta.total_seconds()))
@@ -282,18 +301,19 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
         except Exception as e:
             hku_error(e)
             time.sleep(10)
-    release_nng_sender()
+    release_nng_senders()
 
 
 @click.command()
+@click.option('-server', '--server', default='tcp://*:9200')
 @click.option('-use_proxy', '--use_proxy', is_flag=True, help='是否使用代理，须自行申请芝麻http代理并加入ip白名单')
 @click.option('-source', '--source', default='qq', type=click.Choice(['sina', 'qq']), help='数据来源')
 @click.option('-seconds', '--seconds', default=10)
 @click.option('-phase1', '--phase1', default='9:00-12:00')
 @click.option('-phase2', '--phase2', default='13:00-15:00')
 @click.option('-ignore_weekend', '--ignore_weekend', is_flag=True)
-def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
-    collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend)
+def run(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
+    collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend)
 
 
 if __name__ == '__main__':

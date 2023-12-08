@@ -22,10 +22,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-hdf5_template = u"""
+hdf5_template = """
 [hikyuu]
 tmpdir = {dir}/tmp
 datadir = {dir}
+quotation_server = {quotation_server}
 
 [block]
 type  = qianlong
@@ -91,6 +92,7 @@ mysql_template = """
 [hikyuu]
 tmpdir = {dir}
 datadir = {dir}
+quotation_server = {quotation_server}
 
 [block]
 type  = qianlong

@@ -12,7 +12,7 @@ except Exception as e:
     exit(-1)
 
 from hikyuu.fetcher.stock.zh_stock_a_huatai import parse_one_result_huatai
-from hikyuu.gui.spot_server import release_nng_sender, start_send_spot, end_send_spot, send_spot
+from hikyuu.gui.spot_server import release_nng_senders, start_send_spot, end_send_spot, send_spot
 
 
 # ************************************用户登录************************************
@@ -58,7 +58,7 @@ class insightmarketservice(market_service):
     # 处理订阅的基金Tick数据，mdFund格式为json格式
     # 订阅的证券类型为ESecurityType.FundType
     def onSubscribe_FundType_MD_TICK(self, mdFund):
-        #print(mdFund)
+        # print(mdFund)
         pass
 
     # 处理订阅的逐笔成交，marketdatajson格式为json格式
@@ -506,5 +506,5 @@ if __name__ == "__main__":
         pass
 
     # 退出释放资源
-    release_nng_sender()
+    release_nng_senders()
     fini()
