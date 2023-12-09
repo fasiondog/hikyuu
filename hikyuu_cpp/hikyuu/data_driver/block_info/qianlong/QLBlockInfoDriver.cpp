@@ -6,7 +6,7 @@
  */
 
 #include <fstream>
-#include <boost/algorithm/string.hpp>
+#include "hikyuu/utilities/arithmetic.h"
 #include "QLBlockInfoDriver.h"
 
 namespace hku {
@@ -36,9 +36,9 @@ Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
     string line_str;
     string section, market, code;
     bool is_find = false;
-    string gb_name = utf8_to_gb(name);
+    // string gb_name = utf8_to_gb(name);
     while (std::getline(inifile, line_str)) {
-        boost::trim(line_str);
+        trim(line_str);
 
         // 空行或注释行，跳过
         if (line_str.empty() || line_str.at(0) == ';') {
@@ -49,7 +49,7 @@ Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
         size_t pos = line_str.find(';');
         if (pos != std::string::npos) {
             line_str.assign(line_str, 0, pos);
-            boost::trim(line_str);
+            trim(line_str);
         }
 
         // section行
@@ -63,12 +63,12 @@ Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
             }
 
             section.assign(line_str, 1, len - 2);
-            boost::trim(section);
+            trim(section);
             if (section.empty()) {
                 continue;
             }
 
-            if (section == gb_name) {
+            if (section == name) {
                 is_find = true;
             }
         }
@@ -78,8 +78,8 @@ Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
             if (pos != std::string::npos) {
                 market.assign(line_str, 0, pos);
                 code.assign(line_str, pos + 1, line_str.size());
-                boost::trim(market);
-                boost::trim(code);
+                trim(market);
+                trim(code);
                 if (market == "0") {
                     result.add("SH" + code);
                 } else {
@@ -115,7 +115,7 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
     std::string line_str;
     Block block;
     while (std::getline(inifile, line_str)) {
-        boost::trim(line_str);
+        trim(line_str);
 
         // 空行或注释行，跳过
         if (line_str.empty() || line_str.at(0) == ';')
@@ -125,7 +125,7 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
         size_t pos = line_str.find(';');
         if (pos != std::string::npos) {
             line_str.assign(line_str, 0, pos);
-            boost::trim(line_str);
+            trim(line_str);
         }
 
         // section行
@@ -135,11 +135,11 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
                 continue;
 
             section.assign(line_str, 1, len - 2);
-            boost::trim(section);
+            trim(section);
             if (section.empty())
                 continue;
 
-            block = Block(category, gb_to_utf8(section));
+            block = Block(category, section);
             result.push_back(block);
 
         } else {
@@ -151,12 +151,12 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
                 continue;
 
             key.assign(line_str, 0, pos);
-            boost::trim(key);
+            trim(key);
             if (key.empty())
                 continue;
 
             value.assign(line_str, pos + 1, std::string::npos);
-            boost::trim(value);
+            trim(value);
             if (value.empty())
                 continue;
 
