@@ -7,7 +7,6 @@
  *      Author: fasiondog
  */
 
-#include <boost/algorithm/string.hpp>
 #include "StockManager.h"
 
 namespace hku {
