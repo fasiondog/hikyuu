@@ -9,7 +9,7 @@ from PyQt5.QtCore import QThread, QWaitCondition, QMutex
 
 from hikyuu import Datetime, TimeDelta, hikyuu_init, StockManager, constant
 from hikyuu.util import *
-from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot_parallel
+from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot
 from hikyuu.data.sqlite_mem import SqliteMemDriver
 
 
@@ -113,7 +113,7 @@ class CollectToMemThread(QThread):
 
     @hku_catch()
     def collect(self, stk_list):
-        record_list = get_spot_parallel(stk_list, source='sina', use_proxy=self._use_zhima_proxy)
+        record_list = get_spot(stk_list, source='sina', use_proxy=self._use_zhima_proxy)
         hku_info("{} 网络获取数量：{}".format(self.market, len(record_list)))
         record_list = [r for r in record_list if self.record_is_valid(r)]
         self.db.insert_bars(self.market, record_list, 'day')
