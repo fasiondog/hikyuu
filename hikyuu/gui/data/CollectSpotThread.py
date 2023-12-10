@@ -8,9 +8,7 @@ import datetime
 from math import ceil
 from PyQt5.QtCore import QThread, QWaitCondition, QMutex
 
-from hikyuu import Datetime, TimeDelta, hikyuu_init, StockManager, constant
 from hikyuu.util import *
-from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot, get_spot_parallel
 from hikyuu.gui.spot_server import collect, release_nng_senders
 
 

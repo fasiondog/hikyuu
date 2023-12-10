@@ -9,7 +9,7 @@ from PyQt5.QtCore import QThread, QWaitCondition, QMutex
 
 from hikyuu import Datetime, TimeDelta, hikyuu_init, StockManager, constant
 from hikyuu.util import *
-from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot, get_spot_parallel
+from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot_parallel
 from hikyuu.data.sqlite_mem import SqliteMemDriver
 
 
@@ -92,7 +92,7 @@ class CollectToMemThread(QThread):
                 delta = self._interval - x - TimeDelta(seconds=1)
                 delta = int(delta.total_milliseconds())
                 self.logger.info("{} {:<.2f} 秒后重新采集".format(self.market, delta / 1000))
-                #self.sleep(delta)
+                # self.sleep(delta)
 
         self.db.close()
         self.logger.info("{} 数据采集同步线程终止!".format(self.market))
