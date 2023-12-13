@@ -30,7 +30,7 @@ from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
 
 from hikyuu.data import hku_config_template
-from hikyuu.util.mylog import add_class_logger_handler, class_logger, get_default_logger
+from hikyuu.util import *
 
 
 class EmittingStream(QObject):
@@ -343,6 +343,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         # 初始化定时采集设置
         self.quotation_server = import_config.get(
             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc')
+        hku_warn_if(len(self.quotation_server) < 3, "Invalid quotation server addr!")
+        if self.quotation_server[:3] == "ipc":
+            self.quotation_server = 'ipc:///tmp/hikyuu_real.ipc'
         interval_time = import_config.getint('collect', 'interval', fallback=60 * 60)
         self.collect_sample_spinBox.setValue(interval_time)
         use_zhima_proxy = import_config.getboolean('collect', 'use_zhima_proxy', fallback=False)

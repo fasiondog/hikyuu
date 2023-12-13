@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
         std::cout << k[i] << std::endl;
     }
 
-    startSpotAgent();
+    startSpotAgent(true);
 
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
