@@ -14,7 +14,7 @@ using namespace hikyuu::flat;
 
 namespace hku {
 
-string SpotAgent::ms_pubUrl{"ipc:///hikyuu_quotation_addr.ipc"};  // 数据发送服务地址
+string SpotAgent::ms_pubUrl{"ipc:///tmp/hikyuu_real.ipc"};  // 数据发送服务地址
 const char* SpotAgent::ms_startTag = ":spot:[start spot]";
 const char* SpotAgent::ms_endTag = ":spot:[end spot]";
 const char* SpotAgent::ms_spotTopic = ":spot:";

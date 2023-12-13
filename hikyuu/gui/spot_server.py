@@ -170,7 +170,7 @@ g_nng_sender_lock = threading.Lock()
 g_nng_ipc_sender = None
 g_nng_tcp_sender = None
 g_spot_topic = ':spot:'
-g_ipc_addr = 'ipc:///hikyuu_quotation_addr.ipc'
+g_ipc_addr = 'ipc:///tmp/hikyuu_real.ipc'
 g_tcp_addr = 'tcp://*:9200'
 
 

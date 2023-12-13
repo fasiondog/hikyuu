@@ -163,7 +163,7 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
 void HKU_API startSpotAgent(bool print) {
     StockManager& sm = StockManager::instance();
     SpotAgent::setQuotationServer(sm.getHikyuuParameter().tryGet<string>(
-      "quotation_server", "ipc:///hikyuu_quotation_addr.ipc"));
+      "quotation_server", "ipc:///tmp/hikyuu_real.ipc"));
     auto& agent = *getGlobalSpotAgent();
     HKU_CHECK(!agent.isRunning(), "The agent is running, please stop first!");
 
