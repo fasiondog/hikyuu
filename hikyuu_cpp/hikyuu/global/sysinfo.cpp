@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <hikyuu/GlobalInitializer.h>
 #include <stdio.h>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -20,6 +21,21 @@
 using json = nlohmann::json;
 
 namespace hku {
+
+std::atomic<int> g_latest_version{0};
+
+bool HKU_API CanUpgrade() {
+    int current_version =
+      HKU_VERSION_MAJOR * 1000000 + HKU_VERSION_MINOR * 1000 + HKU_VERSION_ALTER;
+    return g_latest_version > current_version;
+}
+
+std::string HKU_API getLatestVersion() {
+    int major = g_latest_version / 1000000;
+    int minor = g_latest_version / 1000 - major * 1000;
+    int alter = g_latest_version - (g_latest_version / 1000) * 1000;
+    return fmt::format("{}.{}.{}", major, minor, alter);
+}
 
 std::string getVersion() {
     return HKU_VERSION;
@@ -75,8 +91,7 @@ void sendFeedback() {
             client.post(req, res);
             std::string host = res["host"].get<std::string>();
             uint64_t port = res["port"].get<uint64_t>();
-            int last_version =
-              res.contains("last_version") ? res["last_version"].get<int>() : 1003000;
+            g_latest_version = res.contains("last_version") ? res["last_version"].get<int>() : 0;
             client.close();
 
             client.setServerAddr(fmt::format("tcp://{}:{}", host, port));
@@ -89,12 +104,6 @@ void sendFeedback() {
             req["platform"] = getPlatform();
             req["arch"] = getCpuArch();
             client.post(req, res);
-
-            int current_version =
-              HKU_VERSION_MAJOR * 1000000 + HKU_VERSION_MINOR * 1000 + HKU_VERSION_ALTER;
-            if (current_version < last_version) {
-                printf("*****************\n");
-            }
 
         } catch (...) {
             // do nothing

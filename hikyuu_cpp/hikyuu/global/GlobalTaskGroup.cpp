@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/GlobalInitializer.h"
 #include "GlobalTaskGroup.h"
 #include "../Log.h"
 

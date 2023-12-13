@@ -26,6 +26,17 @@ std::string HKU_API getVersion();
  */
 std::string HKU_API getVersionWithBuild();
 
+/**
+ * 判断是否有更新的版本可以升级
+ */
+bool HKU_API CanUpgrade();
+
+/**
+ * 获取当前最新的版本号，用于判断是否升级
+ * @return std::string
+ */
+std::string HKU_API getLatestVersion();
+
 /** 发送反馈信息 */
 void sendFeedback();
 
