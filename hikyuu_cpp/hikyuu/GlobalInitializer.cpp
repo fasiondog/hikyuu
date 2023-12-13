@@ -70,6 +70,14 @@ void GlobalInitializer::init() {
 }
 
 void GlobalInitializer::clean() {
+    if (CanUpgrade()) {
+        fmt::print(
+          "\n========================================================\n"
+          "A new version ({}) is available and can be upgraded.\n"
+          "========================================================\n\n",
+          getLatestVersion());
+    }
+
     releaseGlobalTaskGroup();
     releaseScheduler();
     releaseGlobalSpotAgent();

@@ -18,7 +18,7 @@ import threading
 import hikyuu.flat as fb
 
 from hikyuu.util import *
-from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot_parallel
+from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot
 from hikyuu import hikyuu_init, StockManager, constant, Datetime, TimeDelta
 
 
@@ -170,7 +170,7 @@ g_nng_sender_lock = threading.Lock()
 g_nng_ipc_sender = None
 g_nng_tcp_sender = None
 g_spot_topic = ':spot:'
-g_ipc_addr = 'ipc:///hikyuu_quotation_addr.ipc'
+g_ipc_addr = 'ipc:///tmp/hikyuu_real.ipc'
 g_tcp_addr = 'tcp://*:9200'
 
 
@@ -285,7 +285,7 @@ def collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
         try:
             start_time = Datetime.now()
             start_send_spot()
-            records = get_spot_parallel(stk_list, source, use_proxy, send_spot)
+            records = get_spot(stk_list, source, use_proxy, send_spot)
             hku_info("{}:{}:{} 采集数量: {}".format(start_time.hour, start_time.minute, start_time.second, len(records)))
             # pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
             end_send_spot()

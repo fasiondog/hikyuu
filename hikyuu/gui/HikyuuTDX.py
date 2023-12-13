@@ -30,7 +30,7 @@ from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
 
 from hikyuu.data import hku_config_template
-from hikyuu.util.mylog import add_class_logger_handler, class_logger, get_default_logger
+from hikyuu.util import *
 
 
 class EmittingStream(QObject):
@@ -104,7 +104,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                     hku_config_template.hdf5_template.format(
                         dir=data_dir,
                         quotation_server=current_config.get(
-                            'collect', 'quotation_server', fallback='ipc:///hikyuu_quotation_addr.ipc'),
+                            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         day=current_config.getboolean('preload', 'day', fallback=True),
                         week=current_config.getboolean('preload', 'week', fallback=False),
                         month=current_config.getboolean('preload', 'month', fallback=False),
@@ -139,7 +139,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                     hku_config_template.mysql_template.format(
                         dir=data_dir,
                         quotation_server=current_config.get(
-                            'collect', 'quotation_server', fallback='ipc:///hikyuu_quotation_addr.ipc'),
+                            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         host=current_config['mysql']['host'],
                         port=current_config['mysql']['port'],
                         usr=current_config['mysql']['usr'],
@@ -342,7 +342,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         # 初始化定时采集设置
         self.quotation_server = import_config.get(
-            'collect', 'quotation_server', fallback='ipc:///hikyuu_quotation_addr.ipc')
+            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc')
+        hku_warn_if(len(self.quotation_server) < 3, "Invalid quotation server addr!")
+        if self.quotation_server[:3] == "ipc":
+            self.quotation_server = 'ipc:///tmp/hikyuu_real.ipc'
         interval_time = import_config.getint('collect', 'interval', fallback=60 * 60)
         self.collect_sample_spinBox.setValue(interval_time)
         use_zhima_proxy = import_config.getboolean('collect', 'use_zhima_proxy', fallback=False)

@@ -42,7 +42,7 @@ def parse_one_result_sina(resultstr):
     result['bid5_amount'] = float(a[18]) / 100.0
     result['bid5'] = float(a[19])
     result['ask1_amount'] = float(a[20]) / 100.0  # “卖一”申报3100股，即31手
-    result['ask1'] = float(a[21])  #“卖一”报价
+    result['ask1'] = float(a[21])  # “卖一”报价
     result['ask2_amount'] = float(a[22]) / 100.0
     result['ask2'] = float(a[23])
     result['ask3_amount'] = float(a[24]) / 100.0
@@ -70,7 +70,7 @@ def parse_one_result_qq(resultstr):
     result['close'] = float(a[3])  # 当前价格
     result['yesterday_close'] = float(a[4])  # 昨日收盘价
     result['open'] = float(a[5])  # 今日开盘价
-    #result['amount'] = float(a[6])  # 成交量
+    # result['amount'] = float(a[6])  # 成交量
     # 7: 外盘 ？
     # 8：内盘 ？
     result['bid1'] = float(a[9])  # “买一”报价
@@ -83,7 +83,7 @@ def parse_one_result_qq(resultstr):
     result['bid4_amount'] = float(a[16])
     result['bid5'] = float(a[17])
     result['bid5_amount'] = float(a[18])
-    result['ask1'] = float(a[19])  #“卖一”报价
+    result['ask1'] = float(a[19])  # “卖一”报价
     result['ask1_amount'] = float(a[20])  # “卖一”申报3100股，即31手
     result['ask2'] = float(a[21])
     result['ask2_amount'] = float(a[22])
@@ -93,7 +93,7 @@ def parse_one_result_qq(resultstr):
     result['ask4_amount'] = float(a[26])
     result['ask5'] = float(a[27])
     result['ask5_amount'] = float(a[28])
-    #result['最近逐笔成交'] = float(a[29])
+    # result['最近逐笔成交'] = float(a[29])
     x = a[30]
     result['datetime'] = datetime.datetime(
         int(x[:4]), int(x[4:6]), int(x[6:8]), int(x[8:10]), int(x[10:12]), int(x[12:])
@@ -105,9 +105,9 @@ def parse_one_result_qq(resultstr):
     # 35: 价格/成交量（手）/成交额
     result['volume'] = float(a[36])  # 成交量（手）
     result['amount'] = float(a[37]) * 10.0  # 成交额（万）
-    result['turnover_rate'] = float(a[38]) if a[38] else 0.0  #换手率
+    result['turnover_rate'] = float(a[38]) if a[38] else 0.0  # 换手率
     result['pe'] = float(a[39]) if a[39] else 0.0  # 市盈率 Price Earnings Ratio，简称P/E或PER
-    result['amplitude'] = float(a[43]) if a[43] else 0.0  #振幅
+    result['amplitude'] = float(a[43]) if a[43] else 0.0  # 振幅
     result['circulation_market_value'] = float(a[44]) if a[44] else 0.0  # 流通市值
     result['total_value'] = float(a[45]) if a[45] else 0.0  # 总市值
     result['pb'] = float(a[46]) if a[46] else 0.0  # 市净率 PB:Price/Book value
@@ -129,7 +129,7 @@ def request_data(querystr, parse_one_result, use_proxy=False):
     return result
 
 
-def get_spot(stocklist, source='qq', use_proxy=False, batch_func=None):
+def get_spotV1(stocklist, source='qq', use_proxy=False, batch_func=None):
     """获取实时数据，获取失败时，抛出异常
 
     :param list stocklist: 股票名称列表，股票名称示例：sh000001, sz000001
@@ -169,7 +169,7 @@ def get_spot(stocklist, source='qq', use_proxy=False, batch_func=None):
     return result
 
 
-def get_spot_parallel(stocklist, source='sina', use_proxy=False, batch_func=None):
+def get_spot(stocklist, source='sina', use_proxy=False, batch_func=None):
     """并发网络请求获取实时数据，获取失败时，抛出异常
 
     :param list stocklist: 股票名称列表，股票名称示例：sh000001, sz000001
@@ -215,5 +215,5 @@ def get_spot_parallel(stocklist, source='sina', use_proxy=False, batch_func=None
 
 
 if __name__ == "__main__":
-    x = get_spot(['sh000001', 'sz000001'], use_proxy=False)
+    x = get_spot(['sh000001', 'sz000001'], source='qq', use_proxy=False)
     print(x)
