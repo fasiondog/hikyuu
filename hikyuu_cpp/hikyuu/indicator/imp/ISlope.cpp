@@ -40,7 +40,7 @@ void ISlope::_calculate(const Indicator& ind) {
     }
 
     size_t startPos = m_discard - 1;
-    price_t xsum = 0.0, ysum = 0.0, xxsum = 0.0, xysum = 0.0, x2sum = 0.0;
+    price_t xsum = 0.0, ysum = 0.0, xysum = 0.0, x2sum = 0.0;
     size_t first_end = startPos + n >= total ? total : startPos + n;
     for (size_t i = startPos; i < first_end; i++) {
         xsum += i;
@@ -72,7 +72,7 @@ void ISlope::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
     }
 
     double n = curPos - start + 1;
-    price_t xsum = 0.0, ysum = 0.0, xxsum = 0.0, xysum = 0.0, x2sum = 0.0;
+    price_t xsum = 0.0, ysum = 0.0, xysum = 0.0, x2sum = 0.0;
     for (size_t i = start; i <= curPos; i++) {
         xsum += i;
         ysum += ind[i];

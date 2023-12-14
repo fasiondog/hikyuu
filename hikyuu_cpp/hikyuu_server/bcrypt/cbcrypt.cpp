@@ -152,7 +152,15 @@ int bcrypt_hashpass(const char *key, const char *salt, char *encrypted, size_t e
         ciphertext[4 * i + 0] = cdata[i] & 0xff;
     }
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation="
+#endif
     snprintf(encrypted, 8, "$2%c$%2.2u$", minor, logr);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
     encode_base64(encrypted + 7, csalt, BCRYPT_MAXSALT);
     encode_base64(encrypted + 7 + 22, ciphertext, 4 * BCRYPT_WORDS - 1);
     explicit_bzero(&state, sizeof(state));

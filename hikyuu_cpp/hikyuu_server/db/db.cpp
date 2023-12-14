@@ -5,8 +5,6 @@
  *     Author: fasiondog
  */
 
-#pragma once
-
 #include <hikyuu/utilities/IniParser.h>
 #include "../common/log.h"
 #include "db.h"

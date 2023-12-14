@@ -86,7 +86,7 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
         names.emplace_back(key);
     }
 
-    for (const auto& name : names) {
+    for (int i = 0, len = names.size(); i < len; i++) {
         tmp.emplace_back(py::list());
     }
 

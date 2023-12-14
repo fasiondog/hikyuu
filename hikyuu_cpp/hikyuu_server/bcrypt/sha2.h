@@ -37,49 +37,55 @@
 #ifndef _SHA2_H
 #define _SHA2_H
 
-
 /*** SHA-256/384/512 Various Length Definitions ***********************/
-#define SHA256_BLOCK_LENGTH		64
-#define SHA256_DIGEST_LENGTH		32
-#define SHA256_DIGEST_STRING_LENGTH	(SHA256_DIGEST_LENGTH * 2 + 1)
-#define SHA384_BLOCK_LENGTH		128
-#define SHA384_DIGEST_LENGTH		48
-#define SHA384_DIGEST_STRING_LENGTH	(SHA384_DIGEST_LENGTH * 2 + 1)
-#define SHA512_BLOCK_LENGTH		128
-#define SHA512_DIGEST_LENGTH		64
-#define SHA512_DIGEST_STRING_LENGTH	(SHA512_DIGEST_LENGTH * 2 + 1)
-
+#define SHA256_BLOCK_LENGTH 64
+#define SHA256_DIGEST_LENGTH 32
+#define SHA256_DIGEST_STRING_LENGTH (SHA256_DIGEST_LENGTH * 2 + 1)
+#define SHA384_BLOCK_LENGTH 128
+#define SHA384_DIGEST_LENGTH 48
+#define SHA384_DIGEST_STRING_LENGTH (SHA384_DIGEST_LENGTH * 2 + 1)
+#define SHA512_BLOCK_LENGTH 128
+#define SHA512_DIGEST_LENGTH 64
+#define SHA512_DIGEST_STRING_LENGTH (SHA512_DIGEST_LENGTH * 2 + 1)
 
 /*** SHA-256/384/512 Context Structure *******************************/
 typedef struct _SHA2_CTX {
-	union {
-		u_int32_t	st32[8];
-		u_int64_t	st64[8];
-	} state;
-	u_int64_t	bitcount[2];
-	u_int8_t	buffer[SHA512_BLOCK_LENGTH];
+    union {
+        u_int32_t st32[8];
+        u_int64_t st64[8];
+    } state;
+    u_int64_t bitcount[2];
+    u_int8_t buffer[SHA512_BLOCK_LENGTH];
 } SHA2_CTX;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
+#endif
+
 void SHA256Init(SHA2_CTX *);
-void SHA256Update(SHA2_CTX *, const void *, size_t)
-	__attribute__((__bounded__(__string__,2,3)));
+void SHA256Update(SHA2_CTX *, const void *, size_t) __attribute__((__bounded__(__string__, 2, 3)));
 void SHA256Final(u_int8_t[SHA256_DIGEST_LENGTH], SHA2_CTX *)
-	__attribute__((__bounded__(__minbytes__,1,SHA256_DIGEST_LENGTH)));
+  __attribute__((__bounded__(__minbytes__, 1, SHA256_DIGEST_LENGTH)));
 
 void SHA384Init(SHA2_CTX *);
-void SHA384Update(SHA2_CTX *, const void *, size_t)
-	__attribute__((__bounded__(__string__,2,3)));
+void SHA384Update(SHA2_CTX *, const void *, size_t) __attribute__((__bounded__(__string__, 2, 3)));
 void SHA384Final(u_int8_t[SHA384_DIGEST_LENGTH], SHA2_CTX *)
-	__attribute__((__bounded__(__minbytes__,1,SHA384_DIGEST_LENGTH)));
+  __attribute__((__bounded__(__minbytes__, 1, SHA384_DIGEST_LENGTH)));
 
 void SHA512Init(SHA2_CTX *);
-void SHA512Update(SHA2_CTX *, const void *, size_t)
-	__attribute__((__bounded__(__string__,2,3)));
+void SHA512Update(SHA2_CTX *, const void *, size_t) __attribute__((__bounded__(__string__, 2, 3)));
 void SHA512Final(u_int8_t[SHA512_DIGEST_LENGTH], SHA2_CTX *)
-	__attribute__((__bounded__(__minbytes__,1,SHA512_DIGEST_LENGTH)));
+  __attribute__((__bounded__(__minbytes__, 1, SHA512_DIGEST_LENGTH)));
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
 #ifdef __cplusplus
 }
 #endif

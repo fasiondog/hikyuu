@@ -68,12 +68,21 @@ static void bcrypt_hash(uint8_t *sha2pass, uint8_t *sha2salt, uint8_t *out) {
         Blowfish_expand0state(&state, sha2pass, shalen);
     }
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsizeof-array-div"
+#endif
+
     /* encryption */
     j = 0;
     for (i = 0; i < BCRYPT_WORDS; i++)
         cdata[i] = Blowfish_stream2word(ciphertext, sizeof(ciphertext), &j);
     for (i = 0; i < 64; i++)
         blf_enc(&state, cdata, sizeof(cdata) / sizeof(uint64_t));
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
     /* copy out */
     for (i = 0; i < BCRYPT_WORDS; i++) {
