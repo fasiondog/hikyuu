@@ -205,7 +205,7 @@ TimeLineList MySQLKDataDriver::_getTimeLineListByDate(const string& market, cons
 
         m_connect->commit();
 
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         m_connect->rollback();
     } catch (...) {
         m_connect->rollback();
@@ -260,7 +260,7 @@ TimeLineList MySQLKDataDriver::_getTimeLineListByIndex(const string& market, con
 
         m_connect->commit();
 
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         m_connect->rollback();
     } catch (...) {
         m_connect->rollback();
@@ -313,7 +313,7 @@ TransList MySQLKDataDriver::_getTransListByDate(const string& market, const stri
 
         m_connect->commit();
 
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         m_connect->rollback();
     } catch (...) {
         m_connect->rollback();
@@ -370,7 +370,7 @@ TransList MySQLKDataDriver::_getTransListByIndex(const string& market, const str
 
         m_connect->commit();
 
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         m_connect->rollback();
     } catch (...) {
         m_connect->rollback();

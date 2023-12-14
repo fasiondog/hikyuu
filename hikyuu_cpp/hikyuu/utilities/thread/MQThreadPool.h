@@ -115,7 +115,7 @@ public:
 
         // 向空队列或任务数最小的队列中加入任务
         size_t min_count = std::numeric_limits<size_t>::max();
-        int index = -1;
+        int index = 0;
         for (int i = 0; i < m_worker_num; ++i) {
             size_t cur_count = m_queues[i]->size();
             if (cur_count == 0) {

@@ -95,14 +95,14 @@ public:
      * @param req 发送请求消息
      * @param res 返回响应
      */
-    bool post(json& req, json& res) noexcept {
+    bool post(const json& req, json& res) noexcept {
         // 保证和服务器的通信必须是 req/res 模式
         std::lock_guard<std::mutex> lock(m_mutex);
         return _send(req) && _recv(res);
     }
 
 private:
-    bool _send(json& req) const noexcept {
+    bool _send(const json& req) const noexcept {
         bool success = false;
         // HKU_ERROR_IF_RETURN(!m_connected, success, "Not connected!");
         HKU_IF_RETURN(!m_connected, success);

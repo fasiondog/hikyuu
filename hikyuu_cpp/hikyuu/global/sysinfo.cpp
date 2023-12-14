@@ -51,13 +51,13 @@ std::string HKU_API getVersionWithBuild() {
 #endif
 }
 
-static bool readUUID(boost::uuids::uuid& out) {
+static bool readUUID(const boost::uuids::uuid& out) {
     std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
     FILE* fp = fopen(filename.c_str(), "rb");
     HKU_IF_RETURN(!fp, false);
 
     bool ret = true;
-    if (16 != fread(out.data, 1, 16, fp)) {
+    if (16 != fread((void*)out.data, 1, 16, fp)) {
         ret = false;
     }
 
