@@ -568,7 +568,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
     }
 
     m_buy_days = 0;
-    m_lastTakeProfit = realPrice;
+    m_lastTakeProfit = 0;
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
     m_buyRequest.clear();
