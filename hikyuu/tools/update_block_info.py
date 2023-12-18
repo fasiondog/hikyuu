@@ -4,6 +4,7 @@
 # Create on: 2023-12-18
 #    Author: fasiondog
 
+import requests
 import akshare as ak
 from hikyuu.interactive import *
 
@@ -50,6 +51,63 @@ def get_all_gnbk_info():
     return ret
 
 
+def get_all_dybk_info():
+    url = "http://13.push2.eastmoney.com/api/qt/clist/get"
+    params = {
+        "pn": "1",
+        "pz": "50000",
+        "po": "1",
+        "np": "1",
+        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+        "fltt": "2",
+        "invt": "2",
+        "fid": "f3",
+        "fs": "m:90+t:1+f:!50",
+        "fields": "f12,f14",
+        # "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,"
+        #           "f136,f115,f152",
+        "_": "1623833739532",
+    }
+    r = requests.get(url, params=params)
+    data_json = r.json()
+    data_json = data_json["data"]["diff"]
+
+    params = {
+        "pn": "1",
+        "pz": "2000",
+        "po": "1",
+        "np": "1",
+        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+        "fltt": "2",
+        "invt": "2",
+        "fid": "f3",
+        # "fs": f"b:{stock_board_code} f:!50",
+        "fields": "f12",
+        "_": "1626081702127",
+    }
+
+    ret = {}
+    code_market = get_code_market_dict()
+    for v in data_json:
+        # print(v)
+        blk_code = v["f12"]
+        blk_name = v["f14"]
+        print(blk_name)
+        ret[blk_name] = []
+        params["fs"] = f"b:{blk_code} f:!50"
+        r = requests.get(url, params=params)
+        stk_json = r.json()
+        stk_json = stk_json["data"]["diff"]
+
+        for item in stk_json:
+            stk_code = item["f12"]
+            try:
+                ret[blk_name].append(f"{code_market[stk_code]},{stk_code}")
+            except:
+                print(stk_code)
+    return ret
+
+
 def write_blk_file(blk_info, filename):
     with open(filename, 'w', encoding='utf-8') as f:
         for k in blk_info:
@@ -61,12 +119,12 @@ def write_blk_file(blk_info, filename):
 
 
 if __name__ == "__main__":
-    # x = ak.stock_board_industry_name_em()
-    # y = ak.stock_board_industry_cons_em(symbol=x['板块名称'][0])
     x = get_all_hybk_info()
     write_blk_file(x, 'hikyuu/config/block/hybk.ini')
 
     x = get_all_gnbk_info()
     write_blk_file(x, 'hikyuu/config/block/gnbk.ini')
 
+    x = get_all_dybk_info()
+    write_blk_file(x, 'hikyuu/config/block/dybk.ini')
     # print(x)
