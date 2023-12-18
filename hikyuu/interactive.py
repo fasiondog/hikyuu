@@ -24,6 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from hikyuu.data.hku_config_template import generate_default_config
 from .draw import *
 __copyright__ = """
 MIT License
@@ -54,6 +55,7 @@ import sys
 import os
 import configparser
 
+from hikyuu.data.hku_config_template import generate_default_config
 from hikyuu import *
 
 # 重定向C++ stdout/stderr输出至python
@@ -71,123 +73,9 @@ if sys.platform == 'win32':
 
 # ==============================================================================
 #
-# 在没有执行 HikyuuTDX 的情况下，生成默认配置
-#
-# ==============================================================================
-import_config_template = """
-[quotation]
-stock = True
-fund = True
-future = False
-
-[ktype]
-day = True
-min = True
-min5 = True
-trans = True
-time = True
-day_start_date = 1990-12-19
-min_start_date = 2023-09-19
-min5_start_date = 2023-09-19
-trans_start_date = 2023-12-11
-time_start_date = 2023-12-11
-
-[weight]
-enable = True
-
-[tdx]
-enable = False
-;dir = d:\TdxW_HuaTai
-
-[pytdx]
-enable = False
-use_tdx_number = 10
-
-[hdf5]
-enable = True
-dir = {dir}
-
-[mysql]
-enable = False
-;tmpdir = D:/stock
-;host = 127.0.0.1
-;port = 3306
-;usr = root
-;pwd = 
-
-[sched]
-time = 18:00:00
-
-[collect]
-quotation_server = ipc:///tmp/hikyuu_real.ipc
-interval = 305
-source = qq
-use_zhima_proxy = False
-phase1_start = 00:00:00
-phase1_end = 11:35:00
-phase2_start = 12:00:00
-phase2_end = 15:05:00
-
-[preload]
-day = True
-week = True
-month = True
-quarter = False
-halfyear = False
-year = False
-min = False
-min5 = False
-min15 = False
-min30 = False
-min60 = False
-hour2 = False
-day_max = 100000
-week_max = 100000
-month_max = 100000
-quarter_max = 100000
-halfyear_max = 100000
-year_max = 100000
-min_max = 5120
-min5_max = 5120
-min15_max = 5120
-min30_max = 5120
-min60_max = 5120
-hour2_max = 5120
-"""
-
-
-def generate_default_config():
-    from hikyuu.data.hku_config_template import hdf5_template
-    user_dir = os.path.expanduser('~')
-    hdf5_config = hdf5_template.format(dir=user_dir, quotation_server='ipc:///tmp/hikyuu_real.ipc',
-                                       day=True, week=False,
-                                       month=False, quarter=False, halfyear=False, year=False,
-                                       min1=False, min5=False, min15=False, min30=False,
-                                       min60=False, hour2=False, day_max=100000, week_max=100000,
-                                       month_max=100000, quarter_max=100000, halfyear_max=100000,
-                                       year_max=100000, min1_max=5120, min5_max=5120, min15_max=5120,
-                                       min30_max=5120, min60_max=5120, hour2_max=5120)
-    config_dir = f"{user_dir}/.hikyuu"
-    if not os.path.lexists(config_dir):
-        os.makedirs(config_dir)
-    filename = f"{config_dir}/hikyuu.ini"
-    with open(filename, 'w', encoding='utf-8') as f:
-        f.write(hdf5_config)
-
-    data_dir = "c:\\stock" if sys.platform == 'win32' else f"{user_dir}/stock"
-    if not os.path.lexists(data_dir):
-        os.makedirs(data_dir)
-    filename = f"{config_dir}/importdata-gui.ini"
-    with open(filename, 'w', encoding='utf-8') as f:
-        f.write(import_config_template.format(dir=data_dir))
-
-
-# ==============================================================================
-#
 # 读取配置信息，并初始化
 #
 # ==============================================================================
-# config_file = './test_data/hikyuu_win.ini'
 config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
 if not os.path.exists(config_file):
     # 创建默认配置
