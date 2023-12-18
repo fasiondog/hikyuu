@@ -24,6 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from hikyuu.data.hku_config_template import generate_default_config
 from .draw import *
 __copyright__ = """
 MIT License
@@ -54,6 +55,7 @@ import sys
 import os
 import configparser
 
+from hikyuu.data.hku_config_template import generate_default_config
 from hikyuu import *
 
 # 重定向C++ stdout/stderr输出至python
@@ -74,22 +76,11 @@ if sys.platform == 'win32':
 # 读取配置信息，并初始化
 #
 # ==============================================================================
-# config_file = './test_data/hikyuu_win.ini'
 config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
 if not os.path.exists(config_file):
-    # 检查老版本配置是否存在，如果存在可继续使用，否则异常终止
-    data_config_file = os.path.expanduser('~') + "/.hikyuu/data_dir.ini"
-    if not os.path.exists(data_config_file):
-        raise Exception("未找到配置文件，请先使用数据导入工具导入数据（将自动生成配置文件）！！!")
-    data_config = configparser.ConfigParser()
-    data_config.read(data_config_file)
-    data_dir = data_config['data_dir']['data_dir']
-    if sys.platform == 'win32':
-        config_file = data_dir + "\\hikyuu_win.ini"
-    else:
-        config_file = data_dir + "/hikyuu_linux.ini"
-    if not os.path.exists(config_file):
-        raise Exception("未找到配置文件，请先使用数据导入工具导入数据（将自动生成配置文件）！！!")
+    # 创建默认配置
+    hku_info("创建默认配置文件")
+    generate_default_config()
 
 ini = configparser.ConfigParser()
 ini.read(config_file, encoding='utf-8')
@@ -184,7 +175,7 @@ zsbk_zxb = blockzxb
 zsbk_sz50 = sm.get_block("指数板块", "上证50")
 zsbk_sz180 = sm.get_block("指数板块", "上证180")
 zsbk_hs300 = sm.get_block("指数板块", "沪深300")
-zsbk_zz100 = sm.get_block("指数板块", "沪深300")
+zsbk_zz100 = sm.get_block("指数板块", "中证100")
 
 
 def set_global_context(stk, query):
