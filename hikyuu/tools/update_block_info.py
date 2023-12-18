@@ -108,6 +108,37 @@ def get_all_dybk_info():
     return ret
 
 
+def get_all_zsbk_info():
+    code_market = get_code_market_dict()
+    blk_info = ak.index_stock_info()
+    blk_codes = blk_info["index_code"]
+    blk_names = blk_info["display_name"]
+    ret = {}
+    total = len(blk_codes)
+    # for blk_name in blk_names:
+    for i in range(total):
+        blk_name = blk_names[i]
+        blk_code = blk_codes[i]
+        print(i, blk_name)
+        # 沪深指数有重复，避免深指覆盖
+        if blk_name in ret:
+            continue
+        try:
+            ret[blk_name] = []
+            stk_codes = ak.index_stock_cons_csindex(symbol=blk_code)
+            stk_codes = stk_codes['成分券代码'].to_list()
+            for stk_code in stk_codes:
+                try:
+                    ret[blk_name].append(f"{code_market[stk_code]},{stk_code}")
+                except:
+                    print(stk_code)
+        except KeyboardInterrupt:
+            exit(-1)
+        except:
+            print("Failed!", blk_code, blk_name)
+    return ret
+
+
 def write_blk_file(blk_info, filename):
     with open(filename, 'w', encoding='utf-8') as f:
         for k in blk_info:
@@ -119,12 +150,19 @@ def write_blk_file(blk_info, filename):
 
 
 if __name__ == "__main__":
+    # 更新行业板块
     x = get_all_hybk_info()
     write_blk_file(x, 'hikyuu/config/block/hybk.ini')
 
+    # 更新概念板块
     x = get_all_gnbk_info()
     write_blk_file(x, 'hikyuu/config/block/gnbk.ini')
 
+    # 更新地域板块
     x = get_all_dybk_info()
     write_blk_file(x, 'hikyuu/config/block/dybk.ini')
+
+    # 更新指数成分
+    x = get_all_zsbk_info()
+    write_blk_file(x, 'hikyuu/config/block/zsbk.ini')
     # print(x)

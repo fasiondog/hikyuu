@@ -31,6 +31,7 @@ quotation_server = {quotation_server}
 [block]
 type  = qianlong
 dir = {dir}/block
+指数板块 = zsbk.ini
 行业板块 = hybk.ini
 地域板块 = dybk.ini
 概念板块 = gnbk.ini
