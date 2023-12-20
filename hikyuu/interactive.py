@@ -482,7 +482,7 @@ def realtime_update_inner(source='sina'):
 def realtime_update_wrap():
     pre_update_time = None
 
-    def realtime_update_closure(source='sina', delta=60):
+    def realtime_update_closure(source='qq', delta=60):
         """
         更新实时日线数据
         参数：
