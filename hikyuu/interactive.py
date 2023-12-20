@@ -364,9 +364,11 @@ def realtimePartUpdate_from_qq(queryStr):
 
 def realtime_update_from_sina_qq(source):
     if source == 'sina':
-        queryStr = "http://hq.sinajs.cn/list="
-        update_func = realtimePartUpdate_from_sina
-        max_size = 140
+        hku_error("sina已不支持获取实时数据")
+        return
+        # queryStr = "http://hq.sinajs.cn/list="
+        # update_func = realtimePartUpdate_from_sina
+        # max_size = 140
     elif source == 'qq':
         queryStr = "http://qt.gtimg.cn/q="
         update_func = realtimePartUpdate_from_qq
