@@ -41,7 +41,7 @@ def set_mpl_params():
 
 def create_one_axes_figure(figsize=(10, 6)):
     """生成一个仅含有1个坐标轴的figure，并返回其坐标轴对象
-    
+
     :param figsize: (宽, 高)
     :return: ax
     """
@@ -53,7 +53,7 @@ def create_one_axes_figure(figsize=(10, 6)):
 
 def create_two_axes_figure(figsize=(10, 8)):
     """生成一个含有2个坐标轴的figure，并返回坐标轴列表
-    
+
     :param figsize: (宽, 高)
     :return: (ax1, ax2)    
     """
@@ -69,7 +69,7 @@ def create_two_axes_figure(figsize=(10, 8)):
 
 def create_three_axes_figure(figsize=(10, 8)):
     """生成一个含有3个坐标轴的figure，并返回坐标轴列表
-    
+
     :param figsize: (宽, 高)
     :return: (ax1, ax2, ax3)
     """
@@ -87,7 +87,7 @@ def create_three_axes_figure(figsize=(10, 8)):
 
 def create_four_axes_figure(figsize=(10, 8)):
     """生成一个含有4个坐标轴的figure，并返回坐标轴列表
-    
+
     :param figsize: (宽, 高)
     :return: (ax1, ax2, ax3, ax4)
     """
@@ -130,10 +130,11 @@ class StockFuncFormatter(object):
     关于matplotlib中FuncFormatter的使用方法，请参见：
     http://matplotlib.sourceforge.net/examples/api/date_index_formatter.html
     """
+
     def __init__(self, ix2date):
         self.__ix2date = ix2date
 
-    def __call__(self, x, pos=None):  #IGNORE:W0613
+    def __call__(self, x, pos=None):  # IGNORE:W0613
         result = ''
         ix = int(x)
         if ix in self.__ix2date:
@@ -171,7 +172,7 @@ def getMinLocatorAndFormatter(dates):
 
 def ax_set_locator_formatter(axes, dates, typ):
     """ 设置指定坐标轴的日期显示，根据指定的K线类型优化X轴坐标显示
-    
+
     :param axes: 指定的坐标轴
     :param dates: Datetime构成可迭代序列
     :param Query.KType typ: K线类型
@@ -199,7 +200,7 @@ def ax_set_locator_formatter(axes, dates, typ):
 def adjust_axes_show(axeslist):
     """用于调整上下紧密相连的坐标轴显示时，其上一坐标轴最小值刻度和下一坐标轴最大值刻度
     显示重叠的问题。
-    
+
     :param axeslist: 上下相连的坐标轴列表 (ax1,ax2,...)
     """
     for ax in axeslist[:-1]:
@@ -211,7 +212,7 @@ def adjust_axes_show(axeslist):
 
 def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     """绘制K线图
-    
+
     :param KData kdata: K线数据
     :param bool new:    是否在新窗口中显示，只在没有指定axes时生效
     :param axes:        指定的坐标轴
@@ -266,12 +267,12 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     axes.autoscale_view()
     axes.set_xlim(-1, len(kdata) + 1)
     ax_set_locator_formatter(axes, kdata.get_datetime_list(), kdata.get_query().ktype)
-    #draw()
+    # draw()
 
 
 def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     """绘制美式K线图
-    
+
     :param KData kdata: K线数据
     :param bool new:    是否在新窗口中显示，只在没有指定axes时生效
     :param axes:        指定的坐标轴
@@ -317,7 +318,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     axes.autoscale_view()
     axes.set_xlim(-1, len(kdata) + 1)
     ax_set_locator_formatter(axes, kdata.get_datetime_list(), kdata.get_query().ktype)
-    #draw()
+    # draw()
 
 
 def iplot(
@@ -334,7 +335,7 @@ def iplot(
     **kwargs
 ):
     """绘制indicator曲线
-    
+
     :param Indicator indicator: indicator实例
     :param axes:            指定的坐标轴
     :param new:             是否在新窗口中显示，只在没有指定axes时生效
@@ -390,7 +391,7 @@ def iplot(
     axes.set_xlim(-1, len(indicator) + 1)
     if kref:
         ax_set_locator_formatter(axes, kref.get_datetime_list(), kref.get_query().ktype)
-    #draw()
+    # draw()
 
 
 def ibar(
@@ -410,7 +411,7 @@ def ibar(
     **kwargs
 ):
     """绘制indicator柱状图
-    
+
     :param Indicator indicator: Indicator实例
     :param axes:       指定的坐标轴
     :param new:        是否在新窗口中显示，只在没有指定axes时生效
@@ -470,12 +471,12 @@ def ibar(
     axes.set_xlim(-1, len(indicator) + 1)
     if kref:
         ax_set_locator_formatter(axes, kref.get_datetime_list(), kref.get_query().ktype)
-    #draw()
+    # draw()
 
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
-    
+
     :param axes: 指定的坐标轴
     :param KData kdata: KData
     :param int n1: 指标 MACD 的参数1
@@ -634,21 +635,22 @@ def cnplot(cn, new=True, axes=None, kdata=None):
 
     if axes is None:
         if new:
-            axes = create_figure()
-            kplot(kdata, axes=axes)
+            axes = create_figure(2)
+            kplot(kdata, axes=axes[0])
+            axes = axes[1]
         else:
             axes = gca()
 
     x = np.array([i for i in range(len(refdates))])
-    y1 = np.array([1 if cn.isValid(d) else -1 for d in refdates])
-    y2 = np.array([-1 if cn.isValid(d) else 1 for d in refdates])
+    y1 = np.array([1 if cn.is_valid(d) else -1 for d in refdates])
+    y2 = np.array([-1 if cn.is_valid(d) else 1 for d in refdates])
     axes.fill_between(x, y1, y2, where=y2 > y1, facecolor='blue', alpha=0.6)
     axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
 
 
 def sysplot(sys, new=True, axes=None, style=1):
     """绘制系统实际买入/卖出信号
-    
+
     :param SystemBase sys: 系统实例
     :param new:   仅在未指定axes的情况下生效，当为True时，
                    创建新的窗口对象并在其中进行绘制
