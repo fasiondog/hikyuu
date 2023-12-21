@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/indicator/crt/PRICELIST.h"
 #include "ConditionBase.h"
 
 namespace hku {
@@ -62,7 +63,6 @@ ConditionPtr ConditionBase::clone() {
 void ConditionBase::setTO(const KData& kdata) {
     reset();
     m_kdata = kdata;
-    HKU_WARN_IF_RETURN(!m_sg, void(), "m_sg is NULL!");
     if (!kdata.empty()) {
         _calculate();
     }
@@ -74,6 +74,26 @@ void ConditionBase::_addValid(const Datetime& datetime) {
 
 bool ConditionBase::isValid(const Datetime& datetime) {
     return m_valid.count(datetime) != 0;
+}
+
+DatetimeList ConditionBase::getDatetimeList() const {
+    DatetimeList result;
+    HKU_IF_RETURN(m_valid.empty(), result);
+
+    for (const auto& d : m_valid) {
+        result.emplace_back(d);
+    }
+
+    return result;
+}
+
+Indicator ConditionBase::getValues() const {
+    PriceList values(m_kdata.size());
+    DatetimeList ds = m_kdata.getDatetimeList();
+    for (size_t i = 0, len = ds.size(); i < len; i++) {
+        values[i] = m_valid.count(ds[i]) != 0 ? 1.0 : 0.0;
+    }
+    return PRICELIST(values);
 }
 
 } /* namespace hku */

@@ -89,6 +89,14 @@ void export_Condition() {
       .def("reset", &ConditionBase::reset, "复位操作")
       .def("clone", &ConditionBase::clone, "克隆操作")
 
+      .def("get_datetime_list", &ConditionBase::getDatetimeList, R"(get_datetime_list(self)
+    
+    获取系统有效的日期。注意仅返回系统有效的日期列表，和交易对象不等长)")
+
+      .def("get_values", &ConditionBase::getValues, R"(get_values(self)
+           
+    以指标的形式获取实际值，与交易对象等长，0表示无效，1表示系统有效)")
+
       .def("_add_valid", &ConditionBase::_addValid, R"(_add_valid(self, datetime)
 
     加入有效时间，在_calculate中调用
@@ -109,6 +117,14 @@ void export_Condition() {
     固定使用股票最小交易量进行交易，计算权益曲线的ind值，当权益曲线高于ind时，系统有效，否则无效。
 
     :param Indicator ind: Indicator实例
+    :return: 系统有效条件实例
+    :rtype: ConditionBase)");
+
+    def("CN_Bool", CN_Bool, R"(CN_Bool(ind)
+
+    布尔信号指标系统有效条件, 指标中相应位置>0则代表系统有效，否则无效
+
+    :param Indicator ind: bool型指标，输入为 KData
     :return: 系统有效条件实例
     :rtype: ConditionBase)");
 }

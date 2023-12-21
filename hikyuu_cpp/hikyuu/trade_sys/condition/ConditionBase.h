@@ -64,6 +64,12 @@ public:
     /** 获取系统信号指示器 */
     SGPtr getSG() const;
 
+    /** 获取系统有效的日期列表，注意：和交易对象不等长 */
+    DatetimeList getDatetimeList() const;
+
+    /** 以指标的形式获取实际值，与交易对象等长，0表示无效，1表示系统有效 */
+    Indicator getValues() const;
+
     /**
      * 加入有效时间，在_calculate中调用
      * @param datetime 系统有效日期
