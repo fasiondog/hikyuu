@@ -14,21 +14,19 @@
 
 namespace hku {
 
-OPLineCondition::OPLineCondition() : ConditionBase("OPLine") {}
+OPLineCondition::OPLineCondition() : ConditionBase("CN_OPLine") {}
 
-OPLineCondition::OPLineCondition(const Indicator& op) : ConditionBase("OPLine"), m_op(op) {}
+OPLineCondition::OPLineCondition(const Indicator& op) : ConditionBase("CN_OPLine"), m_op(op) {}
 
 OPLineCondition::~OPLineCondition() {}
 
 ConditionPtr OPLineCondition::_clone() {
-    OPLineCondition* ptr = new OPLineCondition(m_op);
-    return ConditionPtr(ptr);
+    return make_shared<OPLineCondition>(m_op);
 }
 
 void OPLineCondition::_reset() {}
 
 void OPLineCondition::_calculate() {
-    HKU_IF_RETURN(m_kdata.size() == 0, void());
     Stock stock = m_kdata.getStock();
     KQuery query = m_kdata.getQuery();
     SYSPtr sys = SYS_Simple();
