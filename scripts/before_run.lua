@@ -3,11 +3,6 @@ import("core.project.config")
 function main(target)
   local targetname = target:name()
 
-  if "demo" == targetname then
-    local with_demo = config.get("with-demo")
-    if not with_demo then raise("You need to config first: xmake f --with-demo=y") end
-  end
-
   if "unit-test" == targetname or "small-test" == targetname or "prepare-test" == targetname then
     print("copying test_data ...")
     os.rm("$(buildir)/$(mode)/$(plat)/$(arch)/lib/test_data")
