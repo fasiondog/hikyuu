@@ -116,6 +116,7 @@ class UsePytdxImportToH5Thread(QThread):
             return
 
         if task_count == 0:
+            self.send_message(['INFO', '未选择需要导入的行情数据！'])
             return
 
         use_tdx_number = min(
