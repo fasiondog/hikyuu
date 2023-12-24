@@ -41,9 +41,12 @@ TEST_CASE("test_MA") {
     CHECK_EQ(ma.empty(), false);
     CHECK_EQ(ma.size(), kdata.size());
     CHECK_EQ(ma.discard(), 0);
+    std::vector<price_t> expects{
+      2415.197,  2397.1715, 2395.89,   2392.8908, 2394.1114,
+      2396.1477, 2395.6244, 2393.0338, 2389.7090, 2383.4041,
+    };
     for (size_t i = 0; i < kdata.size(); ++i) {
-        HKU_INFO("i: {}, ma: {}, open: {}", i, ma[i], open[i]);
-        // CHECK_UNARY(std::isnan(ma[i]));
+        CHECK_EQ(ma[i], doctest::Approx(expects[i]).epsilon(0.0001));
     }
 
     /** @arg n = 10 且数据大小刚好为10 时, 正常关联数据 */

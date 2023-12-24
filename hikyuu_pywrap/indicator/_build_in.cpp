@@ -459,6 +459,12 @@ Indicator (*SLOPE3)(const Indicator&, int) = SLOPE;
 Indicator (*SLOPE4)(const Indicator&, const IndParam&) = SLOPE;
 Indicator (*SLOPE5)(const Indicator&, const Indicator&) = SLOPE;
 
+Indicator (*MDD_1)() = MDD;
+Indicator (*MDD_2)(const Indicator&) = MDD;
+
+Indicator (*MRR_1)() = MRR;
+Indicator (*MRR_2)(const Indicator&) = MRR;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3, R"(KDATA([data])
@@ -1597,4 +1603,14 @@ void export_Indicator_build_in() {
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
+
+    def("MDD", MDD_1);
+    def("MDD", MDD_2, R"(MDD([data])
+    
+    当前价格相对历史最高值的回撤百分比，通常用于计算最大回撤)");
+
+    def("MRR", MRR_1);
+    def("MRR", MRR_2, R"(MRR([data])
+    
+    当前价格相对历史最低值的盈利百分比，可用于计算历史最高盈利比例)");
 }
