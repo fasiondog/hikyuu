@@ -612,6 +612,11 @@
     :rtype: Indicator
 
 
+.. py:function:: MDD([ind])
+
+    当前价格相对历史最高值的回撤百分比，通常用于计算最大回撤
+
+
 .. py:function:: MIN(ind1, ind2)
 
     求最小值, MIN(A,B)返回A和B中的较小值。
@@ -648,6 +653,11 @@
 
     :param data: 输入数据 KData
     :rtype: Indicator
+
+
+.. py:function:: MRR([ind])
+
+    当前价格相对历史最低值的盈利百分比
 
 
 .. py:function:: NDAY(x, y[, n=3])
