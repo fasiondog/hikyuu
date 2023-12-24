@@ -40,7 +40,9 @@ Performance::Performance()
            {"平均赢利/平均亏损比例", 0.},
            {"净赢利/亏损比例", 0.},
            {"最大单笔赢利", 0.},
+           {"最大单笔盈利百分比%", 0.},
            {"最大单笔亏损", 0.},
+           {"最大单笔亏损百分比%", 0.},
            {"赢利交易平均持仓时间", 0.},
            {"赢利交易最大持仓时间", 0.},
            {"亏损交易平均持仓时间", 0.},
@@ -198,6 +200,8 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
         price_t profit = roundEx(pos.sellMoney - pos.totalCost - pos.buyMoney, precision);
         m_result["已平仓净利润总额"] = roundEx(m_result["已平仓净利润总额"] + profit, precision);
 
+        price_t profit_percent = profit / (pos.buyMoney + pos.totalCost) * 100.;
+
         price_t r = roundEx(profit / pos.totalRisk, precision);
         total_r += r;
 
@@ -207,6 +211,10 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
               roundEx(profit + m_result["赢利交易赢利总额"], precision);
             if (profit > m_result["最大单笔赢利"]) {
                 m_result["最大单笔赢利"] = profit;
+            }
+
+            if (profit_percent > m_result["最大单笔盈利百分比%"]) {
+                m_result["最大单笔盈利百分比%"] = profit_percent;
             }
 
             int duration = (pos.cleanDatetime.date() - pos.takeDatetime.date()).days();
@@ -250,6 +258,10 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
               roundEx(profit + m_result["亏损交易亏损总额"], precision);
             if (profit < m_result["最大单笔亏损"]) {
                 m_result["最大单笔亏损"] = profit;
+            }
+
+            if (profit_percent < m_result["最大单笔亏损百分比%"]) {
+                m_result["最大单笔亏损百分比%"] = profit_percent;
             }
 
             int duration = (pos.cleanDatetime.date() - pos.takeDatetime.date()).days();
