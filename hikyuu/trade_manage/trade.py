@@ -24,10 +24,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-#===============================================================================
+# ===============================================================================
 # History:
 # 1. 20130213, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 from hikyuu.util.slice import list_getitem
 from hikyuu import *
@@ -110,6 +110,12 @@ try:
 
     PositionRecordList.to_np = PositionList_to_np
     PositionRecordList.to_df = PositionList_to_df
+
+    def Performance_to_df(per):
+        """将 Performance 统计结果转换为 DataFrame 格式"""
+        return pd.DataFrame(dict(name=per.names(), value=per.values()))
+
+    Performance.to_df = Performance_to_df
 
 except:
     pass
