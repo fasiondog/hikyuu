@@ -93,7 +93,7 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
     for (size_t i = 0, total = records.size(); i < total; i++) {
         CombinateAnalysisOutput& record = records[i];
         tmp[0].append(record.combinateName);
-        tmp[1].append(record.code);
+        tmp[1].append(record.market_code);
         tmp[2].append(record.name);
         HKU_WARN_IF(names.size() != record.values.size() + 3, "lenght invalid: {} {}", names.size(),
                     record.values.size());
