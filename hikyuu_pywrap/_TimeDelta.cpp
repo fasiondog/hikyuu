@@ -7,12 +7,13 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/serialization/TimeDelta_serialization.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/operators.h>
 #include "pickle_support.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
 double (TimeDelta::*TimeDelta_div_1)(TimeDelta) const = &TimeDelta::operator/;
 TimeDelta (TimeDelta::*TimeDelta_div_2)(double) const = &TimeDelta::operator/;
@@ -20,9 +21,9 @@ TimeDelta (TimeDelta::*TimeDelta_div_2)(double) const = &TimeDelta::operator/;
 TimeDelta (TimeDelta::*TimeDelta_pos)() const = &TimeDelta::operator+;
 TimeDelta (TimeDelta::*TimeDelta_neg)() const = &TimeDelta::operator-;
 
-void export_TimeDelta() {
-    class_<TimeDelta>("TimeDelta",
-                      R"(时间时长，用于时间计算。可通过以下方式构建：
+void export_TimeDelta(py::module& m) {
+    py::class_<TimeDelta>("TimeDelta",
+                          R"(时间时长，用于时间计算。可通过以下方式构建：
 
     - 通过 datetime.timedelta 构建。TimdeDelta(timedelta实例)
     - TimeDelta(days=0, hours=0, minutes=0, seconds=0, milliseconds=0, microseconds=0)

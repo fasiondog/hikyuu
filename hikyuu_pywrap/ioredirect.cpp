@@ -5,13 +5,14 @@
  *      Author: fasiondog
  */
 
+#include <pybind11/pybind11.h>
 #include "ioredirect.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_io_redirect() {
-    class_<OstreamRedirect>("OstreamRedirect",
-                            init<bool, bool>((arg("stdout") = true, arg("stderr") = true)))
+void export_io_redirect(py::module& m) {
+    py::class_<OstreamRedirect>(m, "OstreamRedirect")
+      .def(py::init<bool, bool>(), py::arg("stdout") = true, py::arg("stderr") = true)
       .def("__enter__", &OstreamRedirect::enter)
       .def("__exit__", &OstreamRedirect::exit)
       .def("open", &OstreamRedirect::enter)
