@@ -5,23 +5,20 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/trade_manage/LoanRecord.h>
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
-void export_LoanRecord() {
-    class_<LoanRecord>("LoanRecord", "借款记录（融资记录）", init<>())
-      .def(init<const Datetime&, price_t>())
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
+void export_LoanRecord(py::module& m) {
+    py::class_<LoanRecord>(m, "LoanRecord", "借款记录（融资记录）")
+      .def(py::init<>())
+      .def(py::init<const Datetime&, price_t>())
+      .def("__str__", to_py_str<LoanRecord>)
+      .def("__repr__", to_py_str<LoanRecord>)
       .def_readwrite("datetime", &LoanRecord::datetime, "借款时间")
       .def_readwrite("value", &LoanRecord::value, "借款金额")
 
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<LoanRecord>())
-#endif
-      ;
+        DEF_PICKLE(LoanRecord);
 }
