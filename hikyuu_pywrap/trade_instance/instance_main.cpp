@@ -5,12 +5,12 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_AmaInstance();
+void export_AmaInstance(py::module& m);
 
-void export_instance_main() {
-    export_AmaInstance();
+void export_instance_main(py::module& m) {
+    export_AmaInstance(m);
 }

@@ -5,13 +5,13 @@
  *     Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/global/GlobalSpotAgent.h>
+#include "../pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
-void export_SpotAgent() {
-    def("start_spot_agent", startSpotAgent, (arg("print") = false));
-    def("stop_spot_agent", stopSpotAgent);
+void export_SpotAgent(py::module& m) {
+    m.def("start_spot_agent", startSpotAgent, py::arg("print") = false);
+    m.def("stop_spot_agent", stopSpotAgent);
 }

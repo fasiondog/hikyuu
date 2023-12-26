@@ -5,14 +5,14 @@
  *      Author: fasiondog
  */
 
+#if 0  // 基本不会在Python中重载，取消引出
+
 #include <boost/python.hpp>
 #include <hikyuu/data_driver/BaseInfoDriver.h>
 #include "../_Parameter.h"
 
 using namespace hku;
 using namespace boost::python;
-
-#if 0  // 基本不会在Python中重载，取消引出
 
 class BaseInfoDriverWrap : public BaseInfoDriver, public wrapper<BaseInfoDriver> {
 public:

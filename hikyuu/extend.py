@@ -11,11 +11,6 @@ try:
 except:
     pass
 
-# ------------------------------------------------------------------
-# 常量定义，各种C++中Null值
-# ------------------------------------------------------------------
-
-constant = Constant()
 
 # ------------------------------------------------------------------
 # 增加Datetime、Stock的hash支持，以便可做为dict的key
@@ -250,26 +245,6 @@ KData.__iter__ = KData_iter
 KData.get_pos = KData_getPos
 KData.get_pos_in_stock = KData_getPosInStock
 
-# ------------------------------------------------------------------
-# 封装增强其他C++ vector打印
-# ------------------------------------------------------------------
-
-PriceList.__str__ = lambda self: str(list(self))
-PriceList.__repr__ = lambda self: repr(list(self))
-StringList.__str__ = lambda self: str(list(self))
-StringList.__repr__ = lambda self: repr(list(self))
-DatetimeList.__str__ = lambda self: str(list(self))
-DatetimeList.__repr__ = lambda self: repr(list(self))
-BlockList.__str__ = lambda self: str(list(self))
-BlockList.__repr__ = lambda self: repr(list(self))
-KRecordList.__str__ = lambda self: str(list(self))
-KRecordList.__repr__ = lambda self: repr(list(self))
-TransList.__str__ = lambda self: str(list(self))
-TransList.__repr__ = lambda self: repr(list(self))
-TimeLineList.__str__ = lambda self: str(list(self))
-TimeLineList.__repr__ = lambda self: repr(list(self))
-StockWeightList.__str__ = lambda self: str(list(self))
-StockWeightList.__repr__ = lambda self: repr(list(self))
 
 # ------------------------------------------------------------------
 # 重定义Query

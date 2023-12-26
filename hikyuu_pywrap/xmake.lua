@@ -39,10 +39,10 @@ target("core")
 
     add_includedirs("../hikyuu_cpp")
     -- add_files("./**.cpp")
-    add_files("./main.cpp")
-    add_files("./ioredirect.cpp")
-    add_files("./_StrategyContext.cpp")
-    add_files("./_Datetime.cpp")
+    add_files("./*.cpp")
+    add_files("./data_driver/*.cpp")
+    add_files("./global/*.cpp")
+    add_files("./trade_instance/*.cpp")
 
     add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
 

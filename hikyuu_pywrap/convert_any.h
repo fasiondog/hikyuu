@@ -12,6 +12,7 @@
 #include <string>
 #include <pybind11/pybind11.h>
 #include <hikyuu/utilities/Parameter.h>
+#include <hikyuu/Log.h>
 
 namespace pybind11 {
 namespace detail {
@@ -63,12 +64,12 @@ public:
             return true;
         }
 
-        try {
-            value = pydatetime_to_Datetime(source);
-            return true;
-        } catch (...) {
-            // do noting;
-        }
+        // try {
+        //     value = pydatetime_to_Datetime(source);
+        //     return true;
+        // } catch (...) {
+        //     // do noting;
+        // }
 
         HKU_THROW_EXCEPTION(std::logic_error,
                             "Faile convert this value to boost::any, it may be not supported!");

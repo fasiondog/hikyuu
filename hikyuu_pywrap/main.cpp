@@ -16,29 +16,29 @@
 using namespace hku;
 namespace py = pybind11;
 
-// void export_DataType();
-// void export_Constant();
-// void export_util();
+void export_DataType(py::module& m);
+void export_Constant(py::module& m);
+void export_util(py::module& m);
 // void export_analysis();
-// void export_log();
+void export_log(py::module& m);
 void export_Datetime(py::module& m);
-// void export_TimeDelta();
-// void export_StockManager();
-// void export_Stock();
-// void export_Block();
-// void export_MarketInfo();
-// void export_StockTypeInfo();
-// void export_StockWeight();
-// void export_KQuery();
-// void export_KReord();
-// void export_TimeLineReord();
-// void export_TransRecord();
-// void export_KData();
-// void export_Parameter();
+void export_TimeDelta(py::module& m);
+void export_StockManager(py::module& m);
+void export_Stock(py::module& m);
+void export_Block(py::module& m);
+void export_MarketInfo(py::module& m);
+void export_StockTypeInfo(py::module& m);
+void export_StockWeight(py::module& m);
+void export_KQuery(py::module& m);
+void export_KReord(py::module& m);
+void export_TimeLineReord(py::module& m);
+void export_TransRecord(py::module& m);
+void export_KData(py::module& m);
+void export_Parameter(py::module& m);
 // void export_save_load();
 void export_io_redirect(py::module& m);
 
-// void export_data_driver_main();
+void export_data_driver_main(py::module& m);
 // void export_indicator_main();
 // void export_instance_main();
 // void export_trade_manage_main();
@@ -102,29 +102,29 @@ void export_StrategeContext(py::module& m);
 //     py::docstring_options doc_options;
 //     doc_options.disable_signatures();
 PYBIND11_MODULE(core, m) {
-    //     export_DataType();
-    //     export_Constant();
-    //     export_util();
+    export_DataType(m);
+    export_Constant(m);
+    export_util(m);
     //     export_analysis();
-    //     export_log();
+    export_log(m);
     export_Datetime(m);
-    //     export_TimeDelta();
-    //     export_MarketInfo();
-    //     export_StockTypeInfo();
-    //     export_StockWeight();
+    export_TimeDelta(m);
+    export_MarketInfo(m);
+    export_StockTypeInfo(m);
+    export_StockWeight(m);
     export_StrategeContext(m);
-    //     export_StockManager();
-    //     export_KQuery();
-    //     export_KReord();
-    //     export_TimeLineReord();
-    //     export_TransRecord();
-    //     export_KData();
-    //     export_Stock();
-    //     export_Block();
-    //     export_Parameter();
+    export_StockManager(m);
+    export_KQuery(m);
+    export_KReord(m);
+    export_TimeLineReord(m);
+    export_TransRecord(m);
+    export_KData(m);
+    export_Stock(m);
+    export_Block(m);
+    export_Parameter(m);
     //     export_save_load();
 
-    //     export_data_driver_main();
+    export_data_driver_main(m);
     //     export_indicator_main();
     //     export_instance_main();
 
@@ -149,30 +149,41 @@ PYBIND11_MODULE(core, m) {
 
     m.def("get_version_with_build", getVersionWithBuild);
 
-    //     py::def("get_stock", getStock,
-    //             R"(get_stock(market_code)
+    m.def("get_stock", getStock,
+          R"(get_stock(market_code)
 
-    //     根据"市场简称证券代码"获取对应的证券实例
+        根据"市场简称证券代码"获取对应的证券实例
 
-    //     :param str market_code: 格式：“市场简称证券代码”，如"sh000001"
-    //     :return: 对应的证券实例，如果实例不存在，则返回空实例，即Stock()，不抛出异常
-    //     :rtype: Stock)");
+        :param str market_code: 格式：“市场简称证券代码”，如"sh000001"
+        :return: 对应的证券实例，如果实例不存在，则返回空实例，即Stock()，不抛出异常
+        :rtype: Stock)");
 
-    //     py::def("get_kdata", Py_GetKData,
-    //             (py::arg("market_code"), py::arg("start") = py::long_(0), py::arg("end") =
-    //             py::object(),
-    //              py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER),
-    //             R"(get_kdata(market_code[, start=0, end=None, ktype=Query.DAY,
-    //       recover_type=Query.NO_RECOVER])
+    int64_t null_int64 = Null<int64_t>();
+    Datetime null_date = Null<Datetime>();
 
-    //     or get_kdata(market_code, query)
+    m.def("get_kdata",
+          py::overload_cast<const string&, int64_t, int64_t, KQuery::KType, KQuery::RecoverType>(
+            getKData),
+          py::arg("market_code"), py::arg("start") = 0, py::arg("end") = null_int64,
+          py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER,
+          R"(根据证券代码及起止位置获取 [start, end) 范围的 K 线数据
 
-    //     获取K线数据，其中 start 和 end 需同时为 int 或 同时为 Datetime。
+    :param str market_code: 证券代码，如: 'sh000001'
+    :param int start: 起始索引
+    :param int end: 结束索引
+    :param Query.KType ktype: K 线类型, 'DAY'|'WEEK'|'MONTH'|'QUARTER'|'HALFYEAR'|'YEAR'|'MIN'|'MIN5'|'MIN15'|'MIN30'|'MIN60'
+    :param Query.RecoverType recover_type: 复权类型)");
 
-    //     :param str market_code: 格式：“市场简称证券代码”，如"sh000001"
-    //     :param int or Datetime start: 起始索引或起始日期
-    //     :param int or Datetime end: 终止索引或终止日期
-    //     :param Query query: 查询条件
-    //     :return: 满足查询条件的K线数据
-    //     :rtype: KData)");
+    m.def("get_kdata",
+          py::overload_cast<const string&, const Datetime&, const Datetime&, KQuery::KType,
+                            KQuery::RecoverType>(getKData),
+          py::arg("market_code"), py::arg("start") = Datetime::min(), py::arg("end") = null_date,
+          py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER,
+          R"(根据证券代码及起止日期获取 [start, end) 范围的 K 线数据
+
+    :param str market_code: 证券代码，如: 'sh000001'
+    :param int start: 起始日期
+    :param int end: 结束日期
+    :param Query.KType ktype: K 线类型, 'DAY'|'WEEK'|'MONTH'|'QUARTER'|'HALFYEAR'|'YEAR'|'MIN'|'MIN5'|'MIN15'|'MIN30'|'MIN60'
+    :param Query.RecoverType recover_type: 复权类型)");
 }

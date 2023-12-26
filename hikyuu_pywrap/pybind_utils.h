@@ -11,8 +11,12 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
+#include <pybind11/operators.h>
+#include <pybind11/stl.h>
 #include <vector>
 #include <string>
+#include "convert_any.h"
+#include "pickle_support.h"
 
 namespace py = pybind11;
 
@@ -44,7 +48,9 @@ void extend_vector_with_python_list(std::vector<T>& v, const py::list& l) {
 
 template <typename T>
 std::string to_py_str(const T& item) {
-    return fmt::format("{}", item);
+    std::stringstream out;
+    out << item;
+    return out.str();
 }
 
 // 直接使用 pybind11 重载 _clone，在 C++ 中会丢失 python 中的类型
