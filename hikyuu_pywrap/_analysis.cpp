@@ -7,6 +7,7 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/analysis/combinate.h>
+#include <hikyuu/analysis/analysis_sys.h>
 #include "pybind_utils.h"
 
 using namespace boost::python;
@@ -86,7 +87,7 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
         names.emplace_back(key);
     }
 
-    for (int i = 0, len = names.size(); i < len; i++) {
+    for (size_t i = 0, len = names.size(); i < len; i++) {
         tmp.emplace_back(py::list());
     }
 
@@ -107,6 +108,31 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
         result[names[i]] = tmp[i];
     }
 
+    return result;
+}
+
+static py::list analysis_sys_with_block(const Block& blk, const KQuery& query,
+                                        SystemPtr sys_proto) {
+    vector<AnalysisSystemWithBlockOut> records;
+
+    // clang-format off
+    // Py_BEGIN_ALLOW_THREADS
+    records = analysisSystemListWithBlock(blk, query, sys_proto);
+    // Py_END_ALLOW_THREADS
+    // clang-format on
+
+    HKU_INFO("analysis_sys_with_block");
+    py::list result;
+    for (size_t i = 0, total = records.size(); i < total; i++) {
+        const auto& record = records[i];
+        py::list tmp;
+        tmp.append(record.market_code);
+        tmp.append(record.name);
+        for (const auto& value : record.values) {
+            tmp.append(value);
+        }
+        result.append(tmp);
+    }
     return result;
 }
 
@@ -131,4 +157,6 @@ void export_analysis() {
 
     def("_combinate_ind_analysis", combinate_ind_analysis);
     def("_combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
+
+    def("analysis_sys_with_block", analysis_sys_with_block);
 }
