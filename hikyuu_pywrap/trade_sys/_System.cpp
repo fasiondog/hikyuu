@@ -15,6 +15,8 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
+PYBIND11_MAKE_OPAQUE(SystemList);
+
 void (System::*run_1)(const KQuery&, bool) = &System::run;
 void (System::*run_2)(const KData&, bool) = &System::run;
 void (System::*run_3)(const Stock&, const KQuery&, bool reset) = &System::run;

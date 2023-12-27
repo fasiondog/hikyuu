@@ -15,6 +15,8 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
+PYBIND11_MAKE_OPAQUE(SystemWeightList);
+
 class PyAllocateFundsBase : public AllocateFundsBase {
     PY_CLONE(PyAllocateFundsBase, AllocateFundsBase)
 

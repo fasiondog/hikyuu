@@ -56,7 +56,7 @@ class IndicatorTest(unittest.TestCase):
         b = toPriceList([1, 2, 3, 4])
         x = PRICELIST(b)
         m.get_imp()._calculate(m)
-        # m = m(x)
+        m = m(x)
         self.assertEqual(len(m), 4)
         self.assertEqual(m.empty(), False)
         self.assert_(abs(m[0] - 2) < 0.0001)

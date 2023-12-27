@@ -21,10 +21,6 @@ System.PROFITGOAL = System.Part.PROFITGOAL
 System.SLIPPAGE = System.Part.SLIPPAGE
 System.INVALID = System.Part.INVALID
 
-SystemList.__getitem__ = list_getitem
-SystemList.__str__ = lambda self: str(list(self))
-SystemList.__repr__ = lambda self: repr(list(self))
-
 
 def SYS_Simple(tm=None, mm=None, ev=None, cn=None, sg=None, st=None, tp=None, pg=None, sp=None):
     """
@@ -78,15 +74,6 @@ def SYS_Simple(tm=None, mm=None, ev=None, cn=None, sg=None, st=None, tp=None, pg
     if sp:
         sys_ins.sp = sp
     return sys_ins
-
-
-# ------------------------------------------------------------------
-# allocatefunds
-# ------------------------------------------------------------------
-
-SystemWeightList.__getitem__ = list_getitem
-SystemWeightList.__str__ = lambda self: str(list(self))
-SystemWeightList.__repr__ = lambda self: repr(list(self))
 
 
 # ------------------------------------------------------------------

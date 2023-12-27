@@ -13,8 +13,8 @@ namespace py = pybind11;
 
 void export_StockManager(py::module& m) {
     py::class_<StockManager>(m, "StockManager", "证券信息管理类")
-      .def("instance", &StockManager::instance, py::return_value_policy::reference,
-           "获取StockManager单例实例")
+      .def_static("instance", &StockManager::instance, py::return_value_policy::reference,
+                  "获取StockManager单例实例")
 
       .def(
         "init", &StockManager::init, py::arg("base_info_param"), py::arg("block_param"),

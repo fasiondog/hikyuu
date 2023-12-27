@@ -24,24 +24,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-#===============================================================================
+# ===============================================================================
 # History:
 # 1. 20130213, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 from hikyuu.util.slice import list_getitem
 from hikyuu import *
-
-BorrowRecordList.__getitem__ = list_getitem
-PositionRecordList.__getitem__ = list_getitem
-TradeRecordList.__getitem__ = list_getitem
-
-BorrowRecordList.__str__ = lambda self: str(list(self))
-BorrowRecordList.__repr__ = lambda self: repr(list(self))
-PositionRecordList.__str__ = lambda self: str(list(self))
-PositionRecordList.__repr__ = lambda self: repr(list(self))
-TradeRecordList.__str__ = lambda self: str(list(self))
-TradeRecordList.__repr__ = lambda self: repr(list(self))
 
 try:
     import numpy as np

@@ -11,6 +11,8 @@
 using namespace hku;
 namespace py = pybind11;
 
+PYBIND11_MAKE_OPAQUE(DatetimeList);
+
 void export_Datetime(py::module& m) {
     py::class_<Datetime>(m, "Datetime",
                          R"(日期时间类（精确到微秒），通过以下方式构建：
@@ -29,7 +31,7 @@ void export_Datetime(py::module& m) {
            py::arg("month"), py::arg("day"), py::arg("hour") = 0, py::arg("minute") = 0,
            py::arg("second") = 0, py::arg("millisecond") = 0, py::arg("microsecond") = 0)
 
-      .def("__str__", &Datetime::str)
+      .def("__str__", &Datetime::repr)
       .def("__repr__", &Datetime::repr)
 
       .def_property_readonly("year", &Datetime::year, "年")
@@ -103,6 +105,8 @@ void export_Datetime(py::module& m) {
       .def(py::self - TimeDelta())
 
         DEF_PICKLE(Datetime);
+
+    py::bind_vector<DatetimeList>(m, "DatetimeList");
 
     m.def("get_date_range", getDateRange, py::arg("start"), py::arg("end"));
 }

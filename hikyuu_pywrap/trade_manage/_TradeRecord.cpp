@@ -15,6 +15,8 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
+PYBIND11_MAKE_OPAQUE(TradeRecordList);
+
 void export_TradeRecord(py::module& m) {
     py::enum_<BUSINESS>(m, "BUSINESS")
       .value("INIT", BUSINESS_INIT)
