@@ -47,7 +47,8 @@ void export_Block(py::module& m) {
 
     :param Stock stock: 待加入的证券
     :return: 是否成功加入
-    :rtype: bool)")
+    :rtype: bool)",
+           py::keep_alive<1, 2>())
 
       .def("add", add_2, R"(add(self, market_code)
 
@@ -55,7 +56,8 @@ void export_Block(py::module& m) {
 
     :param str market_code: 市场简称证券代码
     :return: 是否成功加入
-    :rtype: bool)")
+    :rtype: bool)",
+           py::keep_alive<1, 2>())
 
       .def("remove", remove_1, R"(remove(self, stock)
 
