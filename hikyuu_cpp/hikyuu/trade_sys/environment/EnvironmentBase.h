@@ -38,7 +38,7 @@ public:
     virtual ~EnvironmentBase();
 
     /** 获取名称 */
-    string name() const {
+    const string& name() const {
         return m_name;
     }
 
@@ -54,7 +54,7 @@ public:
     void setQuery(const KQuery& query);
 
     /** 获取查询条件 */
-    KQuery getQuery() const {
+    const KQuery& getQuery() const {
         return m_query;
     }
 

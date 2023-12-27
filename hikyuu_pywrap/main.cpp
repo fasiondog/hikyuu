@@ -41,8 +41,8 @@ void export_io_redirect(py::module& m);
 void export_data_driver_main(py::module& m);
 // void export_indicator_main();
 // void export_instance_main();
-// void export_trade_manage_main();
-// void export_trade_sys_main();
+void export_trade_manage_main(py::module& m);
+void export_trade_sys_main(py::module& m);
 // void export_global_main();
 
 void export_StrategeContext(py::module& m);
@@ -128,8 +128,8 @@ PYBIND11_MODULE(core, m) {
     //     export_indicator_main();
     //     export_instance_main();
 
-    //     export_trade_sys_main();
-    //     export_trade_manage_main();  // must after export_trade_sys_main
+    export_trade_sys_main(m);
+    export_trade_manage_main(m);  // must after export_trade_sys_main
 
     //     export_strategy_main();
 
