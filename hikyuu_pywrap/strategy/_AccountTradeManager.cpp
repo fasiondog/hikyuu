@@ -11,6 +11,6 @@
 using namespace hku;
 namespace py = pybind11;
 
-void export_AccountTradeManger() {
+void export_AccountTradeManger(py::module& m) {
     m.def("crtAccountTM", crtAccountTM);
 }

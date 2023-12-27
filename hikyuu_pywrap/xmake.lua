@@ -18,7 +18,7 @@ target("core")
     add_options("stackstrace")
 
     add_deps("hikyuu")
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "cpp-httplib")
     if is_plat("windows") then
         set_filename("core.pyd")
         add_cxflags("-wd4251")
@@ -45,6 +45,7 @@ target("core")
     add_files("./trade_instance/*.cpp")
     add_files("./trade_manage/*.cpp")
     add_files("./trade_sys/*.cpp")
+    add_files("./strategy/*.cpp")
 
 
     add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")

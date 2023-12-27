@@ -22,11 +22,11 @@ public:
     using AllocateFundsBase::AllocateFundsBase;
 
     void _reset() override {
-        PYBIND11_OVERRIDE(void, AllocateFundsBase, _reset, );
+        PYBIND11_OVERLOAD(void, AllocateFundsBase, _reset, );
     }
 
     SystemWeightList _allocateWeight(const Datetime& date, const SystemList& se_list) override {
-        PYBIND11_OVERRIDE_PURE_NAME(SystemWeightList, AllocateFundsBase, "_allocate_weight",
+        PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, AllocateFundsBase, "_allocate_weight",
                                     _allocateWeight, date, se_list);
     }
 };
