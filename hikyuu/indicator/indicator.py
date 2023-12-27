@@ -25,7 +25,7 @@
 # SOFTWARE.
 
 from hikyuu.cpp.core import *
-from hikyuu import constant, toPriceList, Datetime
+from hikyuu import toPriceList, Datetime
 
 
 def indicator_iter(indicator):
@@ -64,7 +64,7 @@ Indicator.__iter__ = indicator_iter
 def PRICELIST(data, result_index=0, discard=0):
     """
     将 list、tuple、Indicator 转化为普通的 Indicator
-    
+
     :param data: 输入数据，可以为 list、tuple、Indicator
     :param int result_index: 当data为Indicator实例时，指示Indicator的第几个结果集
     :param int discard: 在 data 为 Indicator类型时无效。表示前端抛弃的数据点数，抛弃的值使用 constant.null_price 填充

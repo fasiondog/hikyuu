@@ -133,7 +133,7 @@ public:
      */
     void _readyBuffer(size_t len, size_t result_num);
 
-    string name() const;
+    const string& name() const;
     void name(const string& name);
 
     /** 返回形如：Name(param1=val,param2=val,...) */
@@ -397,7 +397,7 @@ inline size_t IndicatorImp::size() const {
     return m_pBuffer[0] ? m_pBuffer[0]->size() : 0;
 }
 
-inline string IndicatorImp::name() const {
+inline const string& IndicatorImp::name() const {
     return m_name;
 }
 

@@ -19,7 +19,7 @@ namespace py = pybind11;
 void export_DataType(py::module& m);
 void export_Constant(py::module& m);
 void export_util(py::module& m);
-// void export_analysis();
+// void export_analysis(py::module& m);
 void export_log(py::module& m);
 void export_Datetime(py::module& m);
 void export_TimeDelta(py::module& m);
@@ -35,80 +35,28 @@ void export_TimeLineReord(py::module& m);
 void export_TransRecord(py::module& m);
 void export_KData(py::module& m);
 void export_Parameter(py::module& m);
-// void export_save_load();
 void export_io_redirect(py::module& m);
 
 void export_data_driver_main(py::module& m);
-// void export_indicator_main();
-// void export_instance_main();
+void export_indicator_main(py::module& m);
+void export_instance_main(py::module& m);
+void export_SystemPart(py::module& m);
 void export_trade_manage_main(py::module& m);
 void export_trade_sys_main(py::module& m);
-// void export_global_main();
+void export_global_main(py::module& m);
 
 void export_StrategeContext(py::module& m);
-// void export_strategy_main();
+void export_strategy_main(py::module& m);
 
-// KData Py_GetKData(const string& market_code, py::object start = py::long_(0),
-//                   py::object end = py::long_(Null<int64_t>()), KQuery::KType ktype = KQuery::DAY,
-//                   KQuery::RecoverType recovertType = KQuery::NO_RECOVER) {
-//     py::extract<KQuery> query_x(start);
-//     if (query_x.check()) {
-//         return getKData(market_code, query_x());
-//     }
-
-//     py::extract<int64_t> int_x(start);
-//     if (int_x.check()) {
-//         int64_t start_ix = 0, end_ix = 0;
-//         if (end.is_none()) {
-//             end_ix = Null<int64_t>();
-//         } else {
-//             py::extract<int64_t> int_y(end);
-//             if (!int_y.check()) {
-//                 HKU_THROW_EXCEPTION(
-//                   std::invalid_argument,
-//                   "The input parameters start and end must be of the same type (Datetime or
-//                   int)!");
-//             }
-//             end_ix = int_y();
-//         }
-//         start_ix = int_x();
-//         return getKData(market_code, start_ix, end_ix, ktype, recovertType);
-//     }
-
-//     py::extract<Datetime> date_x(start);
-//     if (!date_x.check()) {
-//         HKU_THROW_EXCEPTION(std::invalid_argument,
-//                             "The type of input parameter start must be Datetime or int!");
-//     }
-
-//     Datetime start_date, end_date;
-//     if (end.is_none()) {
-//         end_date = Null<Datetime>();
-//     } else {
-//         py::extract<Datetime> date_y(end);
-//         if (!date_y.check()) {
-//             HKU_THROW_EXCEPTION(
-//               std::invalid_argument,
-//               "The input parameters start and end must be of the same type (Datetime or int)!");
-//         }
-//         end_date = date_y();
-//     }
-
-//     start_date = date_x();
-//     return getKData(market_code, start_date, end_date, ktype, recovertType);
-// }
-
-// BOOST_PYTHON_MODULE(core) {
-//     py::docstring_options doc_options;
-//     doc_options.disable_signatures();
 PYBIND11_MODULE(core, m) {
     export_DataType(m);
     export_Constant(m);
     export_util(m);
-    //     export_analysis();
+    //     export_analysis(m);
     export_log(m);
     export_Datetime(m);
     export_TimeDelta(m);
+
     export_MarketInfo(m);
     export_StockTypeInfo(m);
     export_StockWeight(m);
@@ -122,23 +70,22 @@ PYBIND11_MODULE(core, m) {
     export_Stock(m);
     export_Block(m);
     export_Parameter(m);
-    //     export_save_load();
 
     export_data_driver_main(m);
-    //     export_indicator_main();
-    //     export_instance_main();
+    export_indicator_main(m);
+    export_instance_main(m);
 
-    export_trade_sys_main(m);
-    export_trade_manage_main(m);  // must after export_trade_sys_main
+    export_SystemPart(m);
+    export_trade_manage_main(m);
+    export_trade_sys_main(m);  // must after export_trade_manage_main
 
-    //     export_strategy_main();
+    export_strategy_main(m);
 
-    //     export_global_main();
-
+    export_global_main(m);
     export_io_redirect(m);
 
-    //     py::def("close_spend_time", close_spend_time, "全局关闭 c++ 部分耗时打印");
-    //     py::def("open_spend_time", close_spend_time, "全局开启 c++ 部分耗时打印");
+    m.def("close_spend_time", close_spend_time, "全局关闭 c++ 部分耗时打印");
+    m.def("open_spend_time", close_spend_time, "全局开启 c++ 部分耗时打印");
 
     m.def("hikyuu_init", hikyuu_init, py::arg("filename"), py::arg("ignore_preload") = false,
           py::arg("context") = StrategyContext({"all"}));

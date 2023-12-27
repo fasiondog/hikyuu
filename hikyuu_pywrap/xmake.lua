@@ -38,15 +38,7 @@ target("core")
     end
 
     add_includedirs("../hikyuu_cpp")
-    -- add_files("./**.cpp")
-    add_files("./*.cpp")
-    add_files("./data_driver/*.cpp")
-    add_files("./global/*.cpp")
-    add_files("./trade_instance/*.cpp")
-    add_files("./trade_manage/*.cpp")
-    add_files("./trade_sys/*.cpp")
-    add_files("./strategy/*.cpp")
-
+    add_files("./**.cpp")
 
     add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
 

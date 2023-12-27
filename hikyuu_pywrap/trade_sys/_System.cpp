@@ -213,16 +213,4 @@ void export_System(py::module& m) {
       .def("ready", &System::readyForRun)
 
         DEF_PICKLE(System);
-
-    py::enum_<SystemPart>(m, "Part")
-      .value("ENVIRONMENT", PART_ENVIRONMENT)
-      .value("CONDITION", PART_CONDITION)
-      .value("SIGNAL", PART_SIGNAL)
-      .value("STOPLOSS", PART_STOPLOSS)
-      .value("TAKEPROFIT", PART_TAKEPROFIT)
-      .value("MONEYMANAGER", PART_MONEYMANAGER)
-      .value("PROFITGOAL", PART_PROFITGOAL)
-      .value("SLIPPAGE", PART_SLIPPAGE)
-      .value("ALLOCATEFUNDS", PART_ALLOCATEFUNDS)
-      .value("INVALID", PART_INVALID);
 }
