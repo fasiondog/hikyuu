@@ -29,4 +29,27 @@ void export_DataType(py::module& m) {
     m.def("isnan", isnan_func, "是否为非数字");
     m.def("isinf", isinf_func, "是否是无穷大或无穷小");
 #endif
+
+    py::bind_vector<DatetimeList>(m, "DatetimeList");  //, py::module_local(false));
+    py::bind_vector<PriceList>(m, "PriceList");        //, py::module_local(false));
+    py::bind_vector<StringList>(m, "StringList");      //, py::module_local(false));
+
+    m.def(
+      "toPriceList",
+      [](py::object obj) {
+          if (py::isinstance<py::list>(obj)) {
+              py::list x = obj.cast<py::list>();
+              return python_list_to_vector<price_t>(x);
+          } else {
+              py::tuple x = obj.cast<py::tuple>();
+              auto total = len(x);
+              std::vector<price_t> vect(total);
+              for (auto i = 0; i < total; ++i) {
+                  vect[i] = x[i].cast<price_t>();
+              }
+              return vect;
+          }
+          HKU_THROW("Only support list or tuple");
+      },
+      "将 python list/tuple/np.arry 对象转化为 PriceList 对象");
 }

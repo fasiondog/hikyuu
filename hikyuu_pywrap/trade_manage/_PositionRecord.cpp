@@ -38,4 +38,6 @@ void export_PositionRecord(py::module& m) {
                      "累计交易风险（float） = 各次 （买入价格-止损)*买入数量, 不包含交易成本")
       .def_readwrite("sell_money", &PositionRecord::sellMoney, "累计卖出资金（float）")
         DEF_PICKLE(PositionRecord);
+
+    py::bind_vector<PositionRecordList>(m, "PositionRecordList");
 }

@@ -46,6 +46,8 @@ void export_AllocateFunds(py::module& m) {
 
         DEF_PICKLE(SystemWeight);
 
+    py::bind_vector<SystemWeightList>(m, "SystemWeightList");
+
     py::class_<AllocateFundsBase, AFPtr, PyAllocateFundsBase>(
       m, "AllocateFundsBase",
       R"(资产分配算法基类, 子类接口：

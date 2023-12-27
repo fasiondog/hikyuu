@@ -2,10 +2,10 @@
 # -*- coding: utf8 -*-
 # gb18030
 
-#===============================================================================
+# ===============================================================================
 # 作者：fasiondog
 # 历史：1）20130220, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 import unittest
 
@@ -56,7 +56,7 @@ class IndicatorTest(unittest.TestCase):
         b = toPriceList([1, 2, 3, 4])
         x = PRICELIST(b)
         m.get_imp()._calculate(m)
-        m = m(x)
+        # m = m(x)
         self.assertEqual(len(m), 4)
         self.assertEqual(m.empty(), False)
         self.assert_(abs(m[0] - 2) < 0.0001)
@@ -147,7 +147,7 @@ class IndicatorTest(unittest.TestCase):
         if not constant.pickle_support:
             return
 
-        #TODO Python3出错，暂未解决
+        # TODO Python3出错，暂未解决
         """
         import pickle as pl
         filename = sm.tmpdir() + '/Indicator.plk'

@@ -19,7 +19,6 @@ namespace py = pybind11;
 void export_DataType(py::module& m);
 void export_Constant(py::module& m);
 void export_util(py::module& m);
-// void export_analysis(py::module& m);
 void export_log(py::module& m);
 void export_Datetime(py::module& m);
 void export_TimeDelta(py::module& m);
@@ -44,15 +43,17 @@ void export_SystemPart(py::module& m);
 void export_trade_manage_main(py::module& m);
 void export_trade_sys_main(py::module& m);
 void export_global_main(py::module& m);
+void export_analysis(py::module& m);
 
 void export_StrategeContext(py::module& m);
 void export_strategy_main(py::module& m);
 
 PYBIND11_MODULE(core, m) {
+    py::register_exception<hku::exception>(m, "HKUException");
+
     export_DataType(m);
     export_Constant(m);
     export_util(m);
-    //     export_analysis(m);
     export_log(m);
     export_Datetime(m);
     export_TimeDelta(m);
@@ -79,6 +80,7 @@ PYBIND11_MODULE(core, m) {
     export_trade_manage_main(m);
     export_trade_sys_main(m);  // must after export_trade_manage_main
 
+    export_analysis(m);
     export_strategy_main(m);
 
     export_global_main(m);

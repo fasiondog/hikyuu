@@ -22,4 +22,6 @@ void export_BorrowRecord(py::module& m) {
       .def_readwrite("value", &BorrowRecord::value, "借入总价值")
 
         DEF_PICKLE(BorrowRecord);
+
+    py::bind_vector<BorrowRecordList>(m, "BorrowRecordList");
 }

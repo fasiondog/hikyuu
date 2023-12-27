@@ -213,4 +213,6 @@ void export_System(py::module& m) {
       .def("ready", &System::readyForRun)
 
         DEF_PICKLE(System);
+
+    py::bind_vector<SystemList>(m, "SystemList");
 }

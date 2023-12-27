@@ -23,6 +23,7 @@ static std::string Parameter_to_str(const Parameter& param) {
 
 void export_Parameter(py::module& m) {
     py::class_<Parameter>(m, "Parameter", "参数类，供需要命名参数设定的类使用，类似于 dict")
+      .def(py::init<>())
       .def("__str__", Parameter_to_str)
       .def("__repr__", Parameter_to_str)
 
