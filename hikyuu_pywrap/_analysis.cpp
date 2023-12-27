@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/analysis/combinate.h>
+#include <hikyuu/analysis/analysis_sys.h>
 #include "pybind_utils.h"
 
 using namespace hku;
@@ -92,7 +93,7 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
     for (size_t i = 0, total = records.size(); i < total; i++) {
         CombinateAnalysisOutput& record = records[i];
         tmp[0].append(record.combinateName);
-        tmp[1].append(record.code);
+        tmp[1].append(record.market_code);
         tmp[2].append(record.name);
         HKU_WARN_IF(names.size() != record.values.size() + 3, "lenght invalid: {} {}", names.size(),
                     record.values.size());
@@ -106,6 +107,31 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
         result[names[i].c_str()] = tmp[i];
     }
 
+    return result;
+}
+
+static py::list analysis_sys_with_block(const Block& blk, const KQuery& query,
+                                        SystemPtr sys_proto) {
+    vector<AnalysisSystemWithBlockOut> records;
+
+    // clang-format off
+    // Py_BEGIN_ALLOW_THREADS
+    records = analysisSystemListWithBlock(blk, query, sys_proto);
+    // Py_END_ALLOW_THREADS
+    // clang-format on
+
+    HKU_INFO("analysis_sys_with_block");
+    py::list result;
+    for (size_t i = 0, total = records.size(); i < total; i++) {
+        const auto& record = records[i];
+        py::list tmp;
+        tmp.append(record.market_code);
+        tmp.append(record.name);
+        for (const auto& value : record.values) {
+            tmp.append(value);
+        }
+        result.append(tmp);
+    }
     return result;
 }
 
@@ -131,4 +157,6 @@ void export_analysis(py::module& m) {
 
     m.def("_combinate_ind_analysis", combinate_ind_analysis);
     m.def("_combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
+
+    m.def("analysis_sys_with_block", analysis_sys_with_block);
 }

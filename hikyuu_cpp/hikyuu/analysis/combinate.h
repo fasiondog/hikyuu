@@ -74,7 +74,7 @@ std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
  */
 struct HKU_API CombinateAnalysisOutput {
     string combinateName;  ///< 买入、卖出指标组合名称
-    string code;           ///< 证券代码
+    string market_code;    ///< 证券代码
     string name;           ///< 证券名称
     PriceList values;      ///< 统计各项指标值
 
@@ -82,7 +82,7 @@ struct HKU_API CombinateAnalysisOutput {
     CombinateAnalysisOutput(const CombinateAnalysisOutput&) = default;
     CombinateAnalysisOutput(CombinateAnalysisOutput&& rv)
     : combinateName(std::move(rv.combinateName)),
-      code(std::move(rv.code)),
+      market_code(std::move(rv.market_code)),
       name(std::move(rv.name)),
       values(std::move(rv.values)) {}
 
@@ -90,7 +90,7 @@ struct HKU_API CombinateAnalysisOutput {
     CombinateAnalysisOutput& operator=(CombinateAnalysisOutput&& rv) {
         HKU_IF_RETURN(this == &rv, *this);
         combinateName = std::move(rv.combinateName);
-        code = std::move(rv.code);
+        market_code = std::move(rv.market_code);
         name = std::move(rv.name);
         values = std::move(rv.values);
         return *this;

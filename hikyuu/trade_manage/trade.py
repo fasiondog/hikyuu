@@ -100,5 +100,11 @@ try:
     PositionRecordList.to_np = PositionList_to_np
     PositionRecordList.to_df = PositionList_to_df
 
+    def Performance_to_df(per):
+        """将 Performance 统计结果转换为 DataFrame 格式"""
+        return pd.DataFrame(dict(name=per.names(), value=per.values()))
+
+    Performance.to_df = Performance_to_df
+
 except:
     pass
