@@ -98,7 +98,7 @@ public:
     SignalPtr clone();
 
     /** 获取名称 */
-    string name() const;
+    const string& name() const;
 
     /** 设置名称 */
     void name(const string& name);
@@ -208,7 +208,7 @@ inline KData SignalBase::getTO() const {
     return m_kdata;
 }
 
-inline string SignalBase::name() const {
+inline const string& SignalBase::name() const {
     return m_name;
 }
 

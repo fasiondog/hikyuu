@@ -42,7 +42,8 @@ void export_OrderBroker(py::module& m) {
       .def("__repr__", to_py_str<OrderBrokerBase>)
 
       .def_property("name", py::overload_cast<void>(&OrderBrokerBase::name, py::const_),
-                    py::overload_cast<const string&>(&OrderBrokerBase::name), "名称（可读写）")
+                    py::overload_cast<const string&>(&OrderBrokerBase::name),
+                    py::return_value_policy::copy, "名称（可读写）")
 
       .def("buy", &OrderBrokerBase::buy, R"(buy(self, datetime, market, code, price, num)
 

@@ -39,7 +39,7 @@ public:
     KData getTO() const;
 
     /** 获取名称 */
-    string name() const;
+    const string& name() const;
 
     /** 设置名称 */
     void name(const string& name);
@@ -150,7 +150,7 @@ typedef shared_ptr<SlippageBase> SPPtr;
 HKU_API std::ostream& operator<<(std::ostream&, const SlippageBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const SlippagePtr&);
 
-inline string SlippageBase::name() const {
+inline const string& SlippageBase::name() const {
     return m_name;
 }
 

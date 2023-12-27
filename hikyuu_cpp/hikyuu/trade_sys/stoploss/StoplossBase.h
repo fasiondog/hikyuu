@@ -35,7 +35,7 @@ public:
     virtual ~StoplossBase();
 
     /** 获取名称 */
-    string name() const;
+    const string& name() const;
 
     /** 设置名称 */
     void name(const string& name);
@@ -171,7 +171,7 @@ typedef shared_ptr<StoplossBase> TPPtr;
 HKU_API std::ostream& operator<<(std::ostream& os, const StoplossBase&);
 HKU_API std::ostream& operator<<(std::ostream& os, const StoplossPtr&);
 
-inline string StoplossBase::name() const {
+inline const string& StoplossBase::name() const {
     return m_name;
 }
 

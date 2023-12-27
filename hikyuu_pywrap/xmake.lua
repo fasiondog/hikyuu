@@ -44,14 +44,8 @@ target("core")
     add_files("./global/*.cpp")
     add_files("./trade_instance/*.cpp")
     add_files("./trade_manage/*.cpp")
-    add_files("./trade_sys/trade_sys_main.cpp")
-    add_files("./trade_sys/_AllocateFunds.cpp")
-    add_files("./trade_sys/_Condition.cpp")
-    add_files("./trade_sys/_Environment.cpp")
-    add_files("./trade_sys/_MoneyManager.cpp")
-    add_files("./trade_sys/_Portfolio.cpp")
-    add_files("./trade_sys/_ProfitGoal.cpp")
-    -- add_files("./trade_sys/_ProfitGoal.cpp")
+    add_files("./trade_sys/*.cpp")
+
 
     add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
 

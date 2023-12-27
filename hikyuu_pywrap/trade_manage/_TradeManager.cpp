@@ -242,9 +242,6 @@ FundsRecord (TradeManagerBase::*getFunds_2)(const Datetime&,
 TradeCostPtr (TradeManagerBase::*get_costFunc)() const = &TradeManagerBase::costFunc;
 void (TradeManagerBase::*set_costFunc)(const TradeCostPtr&) = &TradeManagerBase::costFunc;
 
-const string& (TradeManagerBase::*tm_get_name)() const = &TradeManagerBase::name;
-void (TradeManagerBase::*tm_set_name)(const string&) = &TradeManagerBase::name;
-
 TradeRecordList (TradeManagerBase::*_getTradeList_1)() const = &TradeManagerBase::getTradeList;
 TradeRecordList (TradeManagerBase::*_getTradeList_2)(const Datetime&, const Datetime&) const =
   &TradeManagerBase::getTradeList;
@@ -269,9 +266,10 @@ void export_TradeManager(py::module& m) {
       .def("__str__", &TradeManagerBase::str)
       .def("__repr__", &TradeManagerBase::str)
 
-      // .def_property("name", make_function(tm_get_name,
-      // return_value_policy<copy_const_reference>()),
-      //               tm_set_name, "名称")
+      .def_property("name", py::overload_cast<>(&TradeManagerBase::name, py::const_),
+                    py::overload_cast<const string&>(&TradeManagerBase::name),
+                    py::return_value_policy::copy, "名称")
+
       .def_property_readonly("init_cash", &TradeManagerBase::initCash, "（只读）初始资金")
       .def_property_readonly("current_cash", &TradeManagerBase::currentCash, "（只读）当前资金")
       .def_property_readonly("init_datetime", &TradeManagerBase::initDatetime,
