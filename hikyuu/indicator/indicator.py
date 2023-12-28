@@ -48,10 +48,10 @@ def indicator_getitem(data, i):
         return [data.get(x) for x in range(*i.indices(len(data)))]
 
     elif isinstance(i, Datetime):
-        return data.get_by_date(i)
+        return data.get_by_datetime(i)
 
     elif isinstance(i, str):
-        return data.get_by_date(Datetime(i))
+        return data.get_by_datetime(Datetime(i))
 
     else:
         raise IndexError("Error index type")
@@ -72,9 +72,9 @@ def PRICELIST(data, result_index=0, discard=0):
     """
     import hikyuu.cpp.core as ind
     if isinstance(data, ind.Indicator):
-        return ind.PRICELIST(data, result_index)
+        return ind.PRICELIST(data, result_index=result_index)
     else:
-        return ind.PRICELIST(toPriceList(data), discard)
+        return ind.PRICELIST(toPriceList(data), discard=discard)
 
 
 VALUE = PRICELIST
