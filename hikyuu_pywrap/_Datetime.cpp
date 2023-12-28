@@ -31,7 +31,7 @@ void export_Datetime(py::module& m) {
            py::arg("month"), py::arg("day"), py::arg("hour") = 0, py::arg("minute") = 0,
            py::arg("second") = 0, py::arg("millisecond") = 0, py::arg("microsecond") = 0)
 
-      .def("__str__", &Datetime::repr)
+      .def("__str__", &Datetime::str)
       .def("__repr__", &Datetime::repr)
 
       .def_property_readonly("year", &Datetime::year, "年")

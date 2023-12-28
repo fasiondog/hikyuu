@@ -27,7 +27,7 @@ void (Indicator::*setIndParam2)(const string&, const IndParam&) = &Indicator::se
 void export_Indicator(py::module& m) {
     py::class_<Indicator>(m, "Indicator", "技术指标")
       .def(py::init<>())
-      .def(py::init<IndicatorImpPtr>())
+      .def(py::init<IndicatorImpPtr>(), py::keep_alive<1, 2>())
       .def("__str__", to_py_str<Indicator>)
       .def("__repr__", to_py_str<Indicator>)
 
