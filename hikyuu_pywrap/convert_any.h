@@ -11,8 +11,66 @@
 
 #include <string>
 #include <pybind11/pybind11.h>
+#include <pybind11/eval.h>
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/Log.h>
+#include <datetime.h>
+
+using namespace hku;
+
+inline Datetime pydatetime_to_Datetime(const pybind11::object& source) {
+    Datetime value;
+    if (source.is_none()) {
+        return value;
+    }
+
+    if (!PyDateTimeAPI) {
+        PyDateTime_IMPORT;
+    }
+
+    PyObject* src = source.ptr();
+
+    long year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0, microsecond = 0;
+    if (PyDateTime_Check(src)) {
+        second = PyDateTime_DATE_GET_SECOND(src);
+        minute = PyDateTime_DATE_GET_MINUTE(src);
+        hour = PyDateTime_DATE_GET_HOUR(src);
+        day = PyDateTime_GET_DAY(src);
+        month = PyDateTime_GET_MONTH(src);
+        year = PyDateTime_GET_YEAR(src);
+        microsecond = PyDateTime_DATE_GET_MICROSECOND(src);
+
+    } else if (PyDate_Check(src)) {
+        day = PyDateTime_GET_DAY(src);
+        month = PyDateTime_GET_MONTH(src);
+        year = PyDateTime_GET_YEAR(src);
+
+    } else if (PyTime_Check(src)) {
+        second = PyDateTime_TIME_GET_SECOND(src);
+        minute = PyDateTime_TIME_GET_MINUTE(src);
+        hour = PyDateTime_TIME_GET_HOUR(src);
+        day = 1;      // This date (day, month, year) = (1, 0, 70)
+        month = 1;    // represents 1-Jan-1940, which is the first
+        year = 1400;  // earliest available date for Datetime, not Python datetime
+        microsecond = PyDateTime_TIME_GET_MICROSECOND(src);
+
+    } else {
+        throw std::invalid_argument("Can't convert this python object to Datetime!");
+    }
+
+    // Datetime 最小只到 1400年 1 月 1日，最大只到 9999 年 12月 31 日 0点
+    if (year < 1400) {
+        value = Datetime::min();
+    } else if (Datetime(year, month, day) == Datetime::max()) {
+        value = Datetime::max();
+    } else {
+        long millisecond = microsecond / 1000;
+        microsecond = microsecond - millisecond * 1000;
+        value = Datetime(year, month, day, hour, minute, second, millisecond, microsecond);
+    }
+
+    return value;
+}
 
 namespace pybind11 {
 namespace detail {
@@ -38,13 +96,14 @@ public:
         }
 
         if (PyLong_Check(src)) {
-            long tmp = PyLong_AsLong(src);
-            if (tmp > std::numeric_limits<int>::max()) {
-                HKU_THROW_EXCEPTION(std::out_of_range,
-                                    "This number is over limit.Paramter only support int32!");
+            int overflow;
+            long tmp = PyLong_AsLongAndOverflow(src, &overflow);
+            if (overflow == 0) {
+                value = static_cast<int>(tmp);
+            } else {
+                value = PyLong_AsLongLong(src);
             }
-            value = int(tmp);
-            return !(tmp == -1 && !PyErr_Occurred());
+            return true;
         }
 
         if (PyFloat_Check(src)) {
@@ -64,12 +123,46 @@ public:
             return true;
         }
 
-        // try {
-        //     value = pydatetime_to_Datetime(source);
-        //     return true;
-        // } catch (...) {
-        //     // do noting;
-        // }
+        object obj = reinterpret_borrow<object>(source);
+        if (isinstance<Stock>(obj)) {
+            value = obj.cast<Stock>();
+            return true;
+
+        } else if (isinstance<KQuery>(obj)) {
+            value = obj.cast<KQuery>();
+            return true;
+
+        } else if (isinstance<KData>(obj)) {
+            value = obj.cast<KData>();
+            return true;
+
+        } else if (isinstance<sequence>(obj)) {
+            sequence pyseq = obj.cast<sequence>();
+            size_t total = pyseq.size();
+            HKU_CHECK(total > 0, "Can't support empty sequence!");
+            if (isinstance<Datetime>(pyseq[0])) {
+                std::vector<Datetime> vect(total);
+                for (size_t i = 0; i < total; i++) {
+                    vect[i] = pyseq[i].cast<Datetime>();
+                }
+                value = vect;
+
+            } else if (isinstance<price_t>(pyseq[0])) {
+                std::vector<price_t> vect(total);
+                for (size_t i = 0; i < total; i++) {
+                    vect[i] = pyseq[i].cast<price_t>();
+                }
+                value = vect;
+
+            } else {
+                std::vector<Datetime> vect(total);
+                for (size_t i = 0; i < total; i++) {
+                    vect[i] = pydatetime_to_Datetime(pyseq[i]);
+                }
+                value = vect;
+            }
+            return true;
+        }
 
         HKU_THROW_EXCEPTION(std::logic_error,
                             "Faile convert this value to boost::any, it may be not supported!");
@@ -83,21 +176,63 @@ public:
         if (x.type() == typeid(bool)) {
             bool tmp = boost::any_cast<bool>(x);
             return tmp ? Py_True : Py_False;
-
         } else if (x.type() == typeid(int)) {
             return Py_BuildValue("n", boost::any_cast<int>(x));
-
         } else if (x.type() == typeid(double)) {
             return Py_BuildValue("d", boost::any_cast<double>(x));
-
         } else if (x.type() == typeid(std::string)) {
             std::string s(boost::any_cast<std::string>(x));
             return Py_BuildValue("s", s.c_str());
 
-        } else {
-            HKU_ERROR("convert failed! Unkown type! Will return None!");
-            return Py_BuildValue("s", (char*)0);
+        } else if (x.type() == typeid(Stock)) {
+            const Stock& stk = boost::any_cast<Stock>(x);
+            std::stringstream cmd;
+            if (stk.isNull()) {
+                cmd << "Stock()";
+            } else {
+                cmd << "get_stock('" << stk.market_code() << "')";
+            }
+            object o = eval(cmd.str());
+            o.inc_ref();
+            return o;
+
+        } else if (x.type() == typeid(KQuery)) {
+            const KQuery& query = boost::any_cast<KQuery>(x);
+            std::stringstream cmd;
+            if (query.queryType() == KQuery::INDEX) {
+                cmd << "Query(" << query.start() << "," << query.end() << ", Query."
+                    << KQuery::getKTypeName(query.kType()) << ", Query."
+                    << KQuery::getRecoverTypeName(query.recoverType()) << ")";
+            } else {
+                cmd << "Query(Datetime(" << query.startDatetime() << "), Datetime("
+                    << query.endDatetime() << "), "
+                    << "Query." << KQuery::getKTypeName(query.kType()) << "Query."
+                    << KQuery::getRecoverTypeName(query.recoverType()) << ")";
+            }
+            object o = eval(cmd.str());
+            o.inc_ref();
+            return o;
+
+        } else if (x.type() == typeid(PriceList)) {
+            const PriceList& price_list = boost::any_cast<PriceList>(x);
+            list o;
+            for (auto iter = price_list.begin(); iter != price_list.end(); ++iter) {
+                o.append(*iter);
+            }
+            o.inc_ref();
+            return o;
+
+        } else if (x.type() == typeid(DatetimeList)) {
+            const DatetimeList& date_list = boost::any_cast<DatetimeList>(x);
+            list o;
+            for (auto iter = date_list.begin(); iter != date_list.end(); ++iter) {
+                o.append(*iter);
+            }
+            o.inc_ref();
+            return o;
         }
+
+        HKU_THROW_EXCEPTION(std::runtime_error, "convert failed! Unkown type!!");
     }
 };
 }  // namespace detail
