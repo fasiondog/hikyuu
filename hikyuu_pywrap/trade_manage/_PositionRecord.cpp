@@ -15,7 +15,7 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-PYBIND11_MAKE_OPAQUE(PositionRecordList);
+// PYBIND11_MAKE_OPAQUE(PositionRecordList);
 
 void export_PositionRecord(py::module& m) {
     py::class_<PositionRecord>(m, "PositionRecord", "持仓记录")
@@ -41,5 +41,5 @@ void export_PositionRecord(py::module& m) {
       .def_readwrite("sell_money", &PositionRecord::sellMoney, "累计卖出资金（float）")
         DEF_PICKLE(PositionRecord);
 
-    py::bind_vector<PositionRecordList>(m, "PositionRecordList");
+    // py::bind_vector<PositionRecordList>(m, "PositionRecordList");
 }

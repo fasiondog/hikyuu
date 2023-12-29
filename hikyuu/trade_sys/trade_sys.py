@@ -3,7 +3,7 @@
 from hikyuu.util.slice import list_getitem
 from hikyuu.cpp.core import SYS_Simple as cpp_SYS_Simple
 from hikyuu.cpp.core import (
-    System, SystemPart, SystemList, SystemWeightList, ConditionBase, EnvironmentBase, MoneyManagerBase,
+    System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
     ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase
 )
 

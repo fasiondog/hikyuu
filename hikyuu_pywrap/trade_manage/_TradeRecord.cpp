@@ -15,7 +15,7 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-PYBIND11_MAKE_OPAQUE(TradeRecordList);
+// PYBIND11_MAKE_OPAQUE(TradeRecordList);
 
 void export_TradeRecord(py::module& m) {
     py::enum_<BUSINESS>(m, "BUSINESS")
@@ -68,5 +68,5 @@ void export_TradeRecord(py::module& m) {
                      ":py:class:`System.Part`")  // python中不能用from关键字
       DEF_PICKLE(TradeRecord);
 
-    py::bind_vector<TradeRecordList>(m, "TradeRecordList");
+    // py::bind_vector<TradeRecordList>(m, "TradeRecordList");
 }

@@ -21,9 +21,6 @@ bool (*isinf_func)(price_t) = std::isinf;
 #pragma warning(disable : 4267)
 #endif
 
-PYBIND11_MAKE_OPAQUE(PriceList);
-PYBIND11_MAKE_OPAQUE(StringList);
-
 void export_DataType(py::module& m) {
 #if defined(_MSVC_VER)
     m.def("isnan", std::isnan<price_t>, "是否为非数字");
@@ -32,9 +29,6 @@ void export_DataType(py::module& m) {
     m.def("isnan", isnan_func, "是否为非数字");
     m.def("isinf", isinf_func, "是否是无穷大或无穷小");
 #endif
-
-    py::bind_vector<PriceList>(m, "PriceList");
-    py::bind_vector<StringList>(m, "StringList");
 
     m.def(
       "toPriceList",

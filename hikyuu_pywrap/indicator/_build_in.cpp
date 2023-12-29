@@ -595,9 +595,22 @@ void export_Indicator_build_in(py::module& m) {
     :param data: 输入数据 KData
     :rtype: Indicator)");
 
-    m.def("PRICELIST", PRICELIST2, py::arg("data"), py::arg("discard") = 0);
-    m.def("PRICELIST", PRICELIST3, py::arg("data"), py::arg("result_index") = 0);
-    m.def("PRICELIST", PRICELIST4, py::arg("result_index") = 0);
+    //     m.def("PRICELIST", PRICELIST2, py::arg("data"), py::arg("discard") = 0);
+    //     m.def("PRICELIST", PRICELIST3, py::arg("data"), py::arg("result_index") = 0);
+    //     m.def("PRICELIST", PRICELIST4, py::arg("result_index") = 0);
+    m.def(
+      "PRICELIST",
+      [](const py::object& obj, int result_index = 0, int discard = 0) {
+          if (py::isinstance<Indicator>(obj)) {
+              Indicator data = obj.cast<Indicator>();
+              return PRICELIST(data, result_index);
+          } else if (py::isinstance<py::list>(obj)) {
+              const auto& x = obj.cast<py::list>();
+              return PRICELIST(python_list_to_vector<price_t>(x), discard);
+          }
+          HKU_THROW("Invalid input data type!");
+      },
+      py::arg("data"), py::arg("result_index") = 0, py::arg("discard") = 0);
 
     m.def("SMA", SMA_1, py::arg("n") = 22, py::arg("m") = 2.0);
     m.def("SMA", SMA_2, py::arg("n"), py::arg("m"));
