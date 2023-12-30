@@ -40,11 +40,11 @@ vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const SystemList& 
                                                               const KQuery& query);
 
 template <class Container>
-inline vector<AnalysisSystemWithBlockOut> analysisSystemListWithBlock(const Container& blk,
-                                                                      const KQuery& query,
-                                                                      const SystemPtr sys_proto) {
+inline vector<AnalysisSystemWithBlockOut> analysisSystemListWith(const Container& blk,
+                                                                 const KQuery& query,
+                                                                 const SystemPtr sys_proto) {
     vector<AnalysisSystemWithBlockOut> result;
-    HKU_IF_RETURN(blk.empty() || !sys_proto, result);
+    HKU_IF_RETURN(blk.size() == 0 || !sys_proto, result);
 
     SystemList sys_list;
     StockList stk_list;
