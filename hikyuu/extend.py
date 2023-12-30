@@ -16,7 +16,7 @@ except:
 # 增加Datetime、Stock的hash支持，以便可做为dict的key
 # ------------------------------------------------------------------
 
-Datetime.__hash__ = lambda self: self.number * 1000000 + self.millisecond * 1000 + self.microsecond
+Datetime.__hash__ = lambda self: self.ticks
 TimeDelta.__hash__ = lambda self: self.ticks
 Stock.__hash__ = lambda self: self.id
 

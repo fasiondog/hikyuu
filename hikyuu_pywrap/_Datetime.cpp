@@ -50,6 +50,7 @@ void export_Datetime(py::module& m) {
       .def_property_readonly("ymdh", &Datetime::ymdh, "返回显示如 YYYYMMDDhh 的数字")
       .def_property_readonly("ymdhm", &Datetime::ymdhm, "返回显示如 YYYYMMDDhhmm 的数字")
       .def_property_readonly("ymdhms", &Datetime::ymdhms, "返回显示如 YYYYMMDDhhmms 的数字")
+      .def_property_readonly("ticks", &Datetime::ticks, "返回距离最小日期过去的微秒数")
 
       .def("is_null", &Datetime::isNull, "\n是否是Null值，等于 Datetime() 直接创建的对象")
 
