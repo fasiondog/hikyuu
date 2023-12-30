@@ -1,5 +1,5 @@
 #
-# 对 C++ 引出类和函数进行扩展
+# 对 C++ 引出类和函数进行扩展, pybind11 对小函数到导出效率不如 python 直接执行
 #
 
 from datetime import *
