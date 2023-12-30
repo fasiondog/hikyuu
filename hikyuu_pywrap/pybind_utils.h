@@ -23,7 +23,7 @@ namespace py = pybind11;
 namespace hku {
 
 template <typename T>
-std::vector<T> python_list_to_vector(const py::list& obj) {
+std::vector<T> python_list_to_vector(const py::sequence& obj) {
     auto total = len(obj);
     std::vector<T> vect(total);
     for (auto i = 0; i < total; ++i) {

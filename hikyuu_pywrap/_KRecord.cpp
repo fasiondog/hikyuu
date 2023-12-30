@@ -15,11 +15,7 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-static std::string KRecord_to_string(const KRecord& record) {
-    std::stringstream out;
-    out << record;
-    return out.str();
-}
+PYBIND11_MAKE_OPAQUE(KRecordList);
 
 bool (*krecord_eq)(const KRecord&, const KRecord&) = operator==;
 bool (*krecord_ne)(const KRecord&, const KRecord&) = operator!=;
@@ -30,8 +26,8 @@ void export_KReord(py::module& m) {
       .def(py::init<const Datetime&>())
       .def(py::init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t>())
 
-      .def("__str__", KRecord_to_string)
-      .def("__repr__", KRecord_to_string)
+      .def("__str__", to_py_str<KRecord>)
+      .def("__repr__", to_py_str<KRecord>)
 
       .def_readwrite("datetime", &KRecord::datetime, "时间")
       .def_readwrite("open", &KRecord::openPrice, "开盘价")
@@ -46,7 +42,5 @@ void export_KReord(py::module& m) {
 
         DEF_PICKLE(KRecord);
 
-    //     class_<KRecordList>("KRecordList").def(vector_indexing_suite<KRecordList>());
-
-    //   py::register_ptr_to_python<KRecordListPtr>();
+    py::bind_vector<KRecordList>(m, "KRecordList");
 }

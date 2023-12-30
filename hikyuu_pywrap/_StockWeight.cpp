@@ -15,11 +15,7 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-static std::string StockWeight_to_str(const StockWeight& record) {
-    std::stringstream out;
-    out << record;
-    return out.str();
-}
+PYBIND11_MAKE_OPAQUE(StockWeightList);
 
 void export_StockWeight(py::module& m) {
     py::class_<StockWeight>(m, "StockWeight", "权息记录")
@@ -28,8 +24,8 @@ void export_StockWeight(py::module& m) {
       .def(
         py::init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t, price_t>())
 
-      .def("__str__", StockWeight_to_str)
-      .def("__repr__", StockWeight_to_str)
+      .def("__str__", to_py_str<StockWeight>)
+      .def("__repr__", to_py_str<StockWeight>)
 
       .def_property_readonly("datetime", &StockWeight::datetime, "权息日期")
       .def_property_readonly("count_as_gift", &StockWeight::countAsGift, "每10股送X股")
@@ -41,4 +37,6 @@ void export_StockWeight(py::module& m) {
       .def_property_readonly("free_count", &StockWeight::freeCount, "流通股（万股）")
 
         DEF_PICKLE(StockWeight);
+
+    py::bind_vector<StockWeightList>(m, "StockWeightList");
 }

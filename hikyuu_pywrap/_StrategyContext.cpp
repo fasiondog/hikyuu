@@ -16,12 +16,12 @@ void (StrategyContext::*set_start_datetime)(const Datetime&) = &StrategyContext:
 
 void (StrategyContext::*set_stock_list)(const vector<string>&) = &StrategyContext::setStockCodeList;
 
-void setStockList(StrategyContext* self, const py::list& seq) {
+void setStockList(StrategyContext* self, const py::sequence& seq) {
     vector<string> stk_list = python_list_to_vector<string>(seq);
     self->setStockCodeList(std::move(stk_list));
 }
 
-void setKTypeList(StrategyContext* self, const py::list& seq) {
+void setKTypeList(StrategyContext* self, const py::sequence& seq) {
     vector<string> stk_list = python_list_to_vector<string>(seq);
     self->setKTypeList(stk_list);
 }

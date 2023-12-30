@@ -11,6 +11,8 @@
 using namespace hku;
 namespace py = pybind11;
 
+PYBIND11_MAKE_OPAQUE(LoanRecordList);
+
 void export_LoanRecord(py::module& m) {
     py::class_<LoanRecord>(m, "LoanRecord", "借款记录（融资记录）")
       .def(py::init<>())
@@ -21,4 +23,6 @@ void export_LoanRecord(py::module& m) {
       .def_readwrite("value", &LoanRecord::value, "借款金额")
 
         DEF_PICKLE(LoanRecord);
+
+    py::bind_vector<LoanRecordList>(m, "LoanRecordList");
 }

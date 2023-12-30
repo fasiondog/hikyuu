@@ -18,6 +18,7 @@ void export_MarketInfo(py::module& m) {
                     TimeDelta, TimeDelta, TimeDelta, TimeDelta>())
 
       .def("__str__", &MarketInfo::toString)
+      .def("__repr__", &MarketInfo::toString)
 
       .def_property_readonly("market", py::overload_cast<void>(&MarketInfo::market, py::const_),
                              "市场标识（如：沪市“SH”, 深市“SZ”）")

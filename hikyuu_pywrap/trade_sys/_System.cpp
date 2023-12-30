@@ -15,7 +15,7 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
-// PYBIND11_MAKE_OPAQUE(SystemList);
+PYBIND11_MAKE_OPAQUE(SystemList);
 
 void (System::*run_1)(const KQuery&, bool) = &System::run;
 void (System::*run_2)(const KData&, bool) = &System::run;
@@ -216,5 +216,5 @@ void export_System(py::module& m) {
 
         DEF_PICKLE(System);
 
-    // py::bind_vector<SystemList>(m, "SystemList");
+    py::bind_vector<SystemList>(m, "SystemList");
 }

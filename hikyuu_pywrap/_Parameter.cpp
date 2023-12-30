@@ -15,17 +15,11 @@ bool (*parameter_eq)(const Parameter&, const Parameter&) = &operator==;
 bool (*parameter_ne)(const Parameter&, const Parameter&) = &operator!=;
 bool (*parameter_lt)(const Parameter&, const Parameter&) = &operator<;
 
-static std::string Parameter_to_str(const Parameter& param) {
-    std::stringstream ss;
-    ss << param;
-    return ss.str();
-}
-
 void export_Parameter(py::module& m) {
     py::class_<Parameter>(m, "Parameter", "参数类，供需要命名参数设定的类使用，类似于 dict")
       .def(py::init<>())
-      .def("__str__", Parameter_to_str)
-      .def("__repr__", Parameter_to_str)
+      .def("__str__", to_py_str<Parameter>)
+      .def("__repr__", to_py_str<Parameter>)
 
       .def("__contains__", &Parameter::have)
       .def("__setitem__", &Parameter::set<boost::any>)

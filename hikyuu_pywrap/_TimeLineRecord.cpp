@@ -15,18 +15,14 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-static std::string TimeLineRecord_to_str(const TimeLineRecord& record) {
-    std::stringstream out;
-    out << record;
-    return out.str();
-}
+PYBIND11_MAKE_OPAQUE(TimeLineList);
 
 void export_TimeLineReord(py::module& m) {
     py::class_<TimeLineRecord>(m, "TimeLineRecord", "分时线记录，属性可读写")
       .def(py::init<>())
       .def(py::init<const Datetime&, price_t, price_t>())
-      .def("__str__", TimeLineRecord_to_str)
-      .def("__repr__", TimeLineRecord_to_str)
+      .def("__str__", to_py_str<TimeLineRecord>)
+      .def("__repr__", to_py_str<TimeLineRecord>)
       .def_readwrite("date", &TimeLineRecord::datetime, "日期时间")
       .def_readwrite("price", &TimeLineRecord::price, "价格")
       .def_readwrite("vol", &TimeLineRecord::vol, "成交量")
@@ -34,10 +30,5 @@ void export_TimeLineReord(py::module& m) {
 
         DEF_PICKLE(TimeLineRecord);
 
-    //     class_<TimeLineList>("TimeLineList")
-    //       .def(vector_indexing_suite<TimeLineList>())
-    // #if HKU_PYTHON_SUPPORT_PICKLE
-    //       .def_pickle(normal_pickle_suite<TimeLineList>())
-    // #endif
-    //       ;
+    py::bind_vector<TimeLineList>(m, "TimeLineList");
 }

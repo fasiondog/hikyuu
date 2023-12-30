@@ -21,6 +21,10 @@ bool (*isinf_func)(price_t) = std::isinf;
 #pragma warning(disable : 4267)
 #endif
 
+// 简单类型的 vector 不再导出，只导出复杂的 struct(影响性能)
+// PYBIND11_MAKE_OPAQUE(StringList);
+// PYBIND11_MAKE_OPAQUE(PriceList);
+
 void export_DataType(py::module& m) {
 #if defined(_MSVC_VER)
     m.def("isnan", std::isnan<price_t>, "是否为非数字");
@@ -30,22 +34,10 @@ void export_DataType(py::module& m) {
     m.def("isinf", isinf_func, "是否是无穷大或无穷小");
 #endif
 
+    // py::bind_vector<PriceList>(m, "PriceList");
+    // py::bind_vector<StringList>(m, "StringList");
+
     m.def(
-      "toPriceList",
-      [](py::object obj) {
-          if (py::isinstance<py::list>(obj)) {
-              py::list x = obj.cast<py::list>();
-              return python_list_to_vector<price_t>(x);
-          } else {
-              py::tuple x = obj.cast<py::tuple>();
-              auto total = len(x);
-              std::vector<price_t> vect(total);
-              for (auto i = 0; i < total; ++i) {
-                  vect[i] = x[i].cast<price_t>();
-              }
-              return vect;
-          }
-          HKU_THROW("Only support list or tuple");
-      },
+      "toPriceList", [](const py::sequence obj) { return python_list_to_vector<price_t>(obj); },
       "将 python list/tuple/np.arry 对象转化为 PriceList 对象");
 }

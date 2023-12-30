@@ -12,19 +12,13 @@
 using namespace hku;
 namespace py = pybind11;
 
-static string KQuery_to_str(const KQuery& q) {
-    std::stringstream out;
-    out << q;
-    return out.str();
-}
-
 void export_KQuery(py::module& m) {
     int64_t null_int = Null<int64_t>();
 
     py::class_<KQuery> kquery(m, "Query", "K线数据查询条件");
     kquery.def(py::init<>())
-      .def("__str__", KQuery_to_str)
-      .def("__repr__", KQuery_to_str)
+      .def("__str__", to_py_str<KQuery>)
+      .def("__repr__", to_py_str<KQuery>)
       .def_property_readonly("start", &KQuery::start, "起始索引，当按日期查询方式创建时无效")
       .def_property_readonly("end", &KQuery::end, "结束索引，当按日期查询方式创建时无效")
       .def_property_readonly("start_datetime", &KQuery::startDatetime,

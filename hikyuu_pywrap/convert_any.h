@@ -155,6 +155,7 @@ public:
                 value = vect;
 
             } else {
+                // 尝试 python 原生 datetime 的转换
                 std::vector<Datetime> vect(total);
                 for (size_t i = 0; i < total; i++) {
                     vect[i] = pydatetime_to_Datetime(pyseq[i]);

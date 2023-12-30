@@ -15,7 +15,7 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
-// PYBIND11_MAKE_OPAQUE(SystemWeightList);
+PYBIND11_MAKE_OPAQUE(SystemWeightList);
 
 class PyAllocateFundsBase : public AllocateFundsBase {
     PY_CLONE(PyAllocateFundsBase, AllocateFundsBase)
@@ -48,7 +48,7 @@ void export_AllocateFunds(py::module& m) {
 
         DEF_PICKLE(SystemWeight);
 
-    // py::bind_vector<SystemWeightList>(m, "SystemWeightList");
+    py::bind_vector<SystemWeightList>(m, "SystemWeightList");
 
     py::class_<AllocateFundsBase, AFPtr, PyAllocateFundsBase>(
       m, "AllocateFundsBase",

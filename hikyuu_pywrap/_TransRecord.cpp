@@ -15,18 +15,14 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-static std::string TransRecord_to_str(const TransRecord& record) {
-    std::stringstream out;
-    out << record;
-    return out.str();
-}
+PYBIND11_MAKE_OPAQUE(TransList);
 
 void export_TransRecord(py::module& m) {
     py::class_<TransRecord>(m, "TransRecord")
       .def(py::init<>())
       .def(py::init<const Datetime&, price_t, price_t, TransRecord::DIRECT>())
-      .def("__str__", TransRecord_to_str)
-      .def("__repr__", TransRecord_to_str)
+      .def("__str__", to_py_str<TransRecord>)
+      .def("__repr__", to_py_str<TransRecord>)
       .def_readwrite("date", &TransRecord::datetime, "时间")
       .def_readwrite("price", &TransRecord::price, "价格")
       .def_readwrite("vol", &TransRecord::vol, "成交量")
@@ -40,10 +36,5 @@ void export_TransRecord(py::module& m) {
       .value("SELL", TransRecord::SELL)
       .value("AUCTION", TransRecord::AUCTION);
 
-    //     class_<TransList>("TransList")
-    //       .def(vector_indexing_suite<TransList>())
-    // #if HKU_PYTHON_SUPPORT_PICKLE
-    //       .def_pickle(normal_pickle_suite<TransList>())
-    // #endif
-    //       ;
+    py::bind_vector<TransList>(m, "TransList");
 }
