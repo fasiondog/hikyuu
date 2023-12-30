@@ -61,22 +61,6 @@ Indicator.__getitem__ = indicator_getitem
 Indicator.__iter__ = indicator_iter
 
 
-# def PRICELIST(data, result_index=0, discard=0):
-#     """
-#     将 list、tuple、Indicator 转化为普通的 Indicator
-
-#     :param data: 输入数据，可以为 list、tuple、Indicator
-#     :param int result_index: 当data为Indicator实例时，指示Indicator的第几个结果集
-#     :param int discard: 在 data 为 Indicator类型时无效。表示前端抛弃的数据点数，抛弃的值使用 constant.null_price 填充
-#     :return: Indicator
-#     """
-#     import hikyuu.cpp.core as ind
-#     if isinstance(data, ind.Indicator):
-#         return ind.PRICELIST(data, result_index=result_index)
-#     else:
-#         return ind.PRICELIST(toPriceList(data), discard=discard)
-
-
 VALUE = PRICELIST
 
 try:

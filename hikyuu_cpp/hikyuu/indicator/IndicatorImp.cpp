@@ -1593,15 +1593,15 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
         HKU_IF_RETURN(!iter1->second->alike(*(iter2->second)), false);
     }
 
-    for (size_t i = 0; i < m_result_num; i++) {
-        if (m_pBuffer[i]) {
-            PriceList &data1 = *(m_pBuffer[i]);
-            PriceList &data2 = *(other.m_pBuffer[i]);
-            for (size_t j = 0, len = data1.size(); j < len; j++) {
-                HKU_IF_RETURN(data1[j] != data2[j], false);
-            }
-        }
-    }
+    // for (size_t i = 0; i < m_result_num; i++) {
+    //     if (m_pBuffer[i]) {
+    //         PriceList &data1 = *(m_pBuffer[i]);
+    //         PriceList &data2 = *(other.m_pBuffer[i]);
+    //         for (size_t j = 0, len = data1.size(); j < len; j++) {
+    //             HKU_IF_RETURN(data1[j] != data2[j], false);
+    //         }
+    //     }
+    // }
 
     HKU_IF_RETURN(isLeaf(), true);
 
