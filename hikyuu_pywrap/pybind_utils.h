@@ -13,6 +13,7 @@
 #include <pybind11/stl_bind.h>
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 #include <vector>
 #include <string>
 #include "convert_any.h"
@@ -21,6 +22,34 @@
 namespace py = pybind11;
 
 namespace hku {
+
+template <typename T>
+py::bytes vector_to_python_bytes(const std::vector<T>& vect) {
+    return py::bytes((char*)vect.data(), vect.size() * sizeof(T));
+}
+
+template <typename T>
+std::vector<T> python_bytes_to_vector(const py::bytes& obj) {
+    auto bytes_len = len(obj);
+    if (bytes_len % sizeof(T) != 0) {
+        throw std::runtime_error("The length bytes not match!");
+    }
+    auto vect_len = bytes_len / sizeof(T);
+    std::vector<T> result(vect_len);
+
+    char* buffer = nullptr;
+    ssize_t length = 0;
+    if (PyBytes_AsStringAndSize(obj.ptr(), &buffer, &length) != 0) {
+        throw std::runtime_error("trans bytes to vector failed!");
+    }
+
+    if (length != static_cast<ssize_t>(vect_len * sizeof(T))) {
+        throw std::runtime_error("The length bytes not match!");
+    }
+
+    memcpy(result.data(), buffer, length);
+    return result;
+}
 
 template <typename T>
 std::vector<T> python_list_to_vector(const py::sequence& obj) {
@@ -41,7 +70,7 @@ py::list vector_to_python_list(const std::vector<T>& vect) {
 }
 
 template <typename T>
-void extend_vector_with_python_list(std::vector<T>& v, const py::list& l) {
+void extend_vector_with_python_list(std::vector<T>& v, const py::sequence& l) {
     for (const auto& item : l)
         v.push_back(item.cast<T>());
 }

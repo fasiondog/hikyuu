@@ -25,7 +25,7 @@
 # SOFTWARE.
 
 from hikyuu.cpp.core import *
-from hikyuu import toPriceList, Datetime
+from hikyuu import Datetime
 
 
 def indicator_iter(indicator):
@@ -67,14 +67,10 @@ try:
     import numpy as np
     import pandas as pd
 
-    def indicator_to_np(indicator):
-        """转化为np.array，如果indicator存在多个值，只返回第一个"""
-        return np.array(indicator, dtype='d')
-
     def indicator_to_df(indicator):
         """转化为pandas.DataFrame"""
         if indicator.get_result_num() == 1:
-            return pd.DataFrame(indicator_to_np(indicator), columns=[indicator.name])
+            return pd.DataFrame(indicator.to_np(), columns=[indicator.name])
 
         data = {}
         name = indicator.name
@@ -84,7 +80,6 @@ try:
             columns.append(name + str(i + 1))
         return pd.DataFrame(data, columns=columns)
 
-    Indicator.to_np = indicator_to_np
     Indicator.to_df = indicator_to_df
 
 except:
