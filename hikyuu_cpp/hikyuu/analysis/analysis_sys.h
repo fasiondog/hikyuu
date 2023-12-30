@@ -35,8 +35,26 @@ struct HKU_API AnalysisSystemWithBlockOut {
     }
 };
 
-vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemListWithBlock(const Block& blk,
-                                                                       const KQuery& query,
-                                                                       const SystemPtr sys_proto);
+vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const SystemList& sys_list,
+                                                              const StockList& stk_list,
+                                                              const KQuery& query);
+
+template <class Container>
+inline vector<AnalysisSystemWithBlockOut> analysisSystemListWithBlock(const Container& blk,
+                                                                      const KQuery& query,
+                                                                      const SystemPtr sys_proto) {
+    vector<AnalysisSystemWithBlockOut> result;
+    HKU_IF_RETURN(blk.empty() || !sys_proto, result);
+
+    SystemList sys_list;
+    StockList stk_list;
+    for (const auto& stk : blk) {
+        sys_list.emplace_back(std::move(sys_proto->clone()));
+        stk_list.emplace_back(stk);
+    }
+
+    result = analysisSystemList(sys_list, stk_list, query);
+    return result;
+}
 
 }  // namespace hku

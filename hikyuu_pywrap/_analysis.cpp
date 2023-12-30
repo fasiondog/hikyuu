@@ -110,17 +110,37 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
     return result;
 }
 
-static py::list analysis_sys_with_block(const Block& blk, const KQuery& query,
-                                        SystemPtr sys_proto) {
+static py::list analysis_sys_list(const py::object& pystk_list, const KQuery& query,
+                                  SystemPtr sys_proto) {
+    SystemList sys_list;
+    StockList stk_list;
+
+    if (py::isinstance<Block>(pystk_list)) {
+        const auto& blk = pystk_list.cast<Block&>();
+        for (const auto& stk : blk) {
+            sys_list.emplace_back(std::move(sys_proto->clone()));
+            stk_list.emplace_back(stk);
+        }
+    } else if (py::isinstance<StockManager>(pystk_list)) {
+        const auto& blk = pystk_list.cast<StockManager&>();
+        for (const auto& stk : blk) {
+            sys_list.emplace_back(std::move(sys_proto->clone()));
+            stk_list.emplace_back(stk);
+        }
+    } else if (py::isinstance<py::sequence>(pystk_list)) {
+        const py::sequence& pyseq = pystk_list.cast<py::sequence&>();
+        for (const auto& obj : pyseq) {
+            sys_list.emplace_back(std::move(sys_proto->clone()));
+            stk_list.emplace_back(obj.cast<Stock&>());
+        }
+    }
+
     vector<AnalysisSystemWithBlockOut> records;
+    {
+        py::gil_scoped_release release;
+        records = analysisSystemList(sys_list, stk_list, query);
+    }
 
-    // clang-format off
-    // Py_BEGIN_ALLOW_THREADS
-    records = analysisSystemListWithBlock(blk, query, sys_proto);
-    // Py_END_ALLOW_THREADS
-    // clang-format on
-
-    HKU_INFO("analysis_sys_with_block");
     py::list result;
     for (size_t i = 0, total = records.size(); i < total; i++) {
         const auto& record = records[i];
@@ -158,5 +178,5 @@ void export_analysis(py::module& m) {
     m.def("_combinate_ind_analysis", combinate_ind_analysis);
     m.def("_combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
 
-    m.def("analysis_sys_with_block", analysis_sys_with_block);
+    m.def("analysis_sys_list", analysis_sys_list);
 }
