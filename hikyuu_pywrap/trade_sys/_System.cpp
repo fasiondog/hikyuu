@@ -126,7 +126,7 @@ void export_System(py::module& m) {
       .def("__str__", to_py_str<System>)
       .def("__repr__", to_py_str<System>)
 
-      .def_property("name", py::overload_cast<void>(&System::name, py::const_),
+      .def_property("name", py::overload_cast<>(&System::name, py::const_),
                     py::overload_cast<const string&>(&System::name), py::return_value_policy::copy,
                     "系统名称")
       .def_property("tm", &System::getTM, &System::setTM, "关联的交易管理实例")

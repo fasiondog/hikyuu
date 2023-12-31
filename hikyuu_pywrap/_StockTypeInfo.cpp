@@ -22,7 +22,7 @@ void export_StockTypeInfo(py::module& m) {
       .def_property_readonly("type", &StockTypeInfo::type, "证券类型")
 
       .def_property_readonly(
-        "description", py::overload_cast<void>(&StockTypeInfo::description, py::const_), "描述信息")
+        "description", py::overload_cast<>(&StockTypeInfo::description, py::const_), "描述信息")
 
       .def_property_readonly("tick", &StockTypeInfo::tick, "最小跳动量")
       .def_property_readonly("tick_value", &StockTypeInfo::tickValue, "每一个tick价格")

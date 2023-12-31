@@ -22,7 +22,7 @@ void export_Portfolio(py::module& m) {
       .def("__str__", to_py_str<Portfolio>)
       .def("__repr__", to_py_str<Portfolio>)
 
-      .def_property("name", py::overload_cast<void>(&Portfolio::name, py::const_),
+      .def_property("name", py::overload_cast<>(&Portfolio::name, py::const_),
                     py::overload_cast<const string&>(&Portfolio::name),
                     py::return_value_policy::copy, "名称")
       .def_property("query", &Portfolio::getQuery, &Portfolio::setQuery,

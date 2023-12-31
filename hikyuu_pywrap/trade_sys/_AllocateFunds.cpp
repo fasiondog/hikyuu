@@ -40,7 +40,7 @@ void export_AllocateFunds(py::module& m) {
       .def(py::init<const SystemPtr&, price_t>())
       .def("__str__", to_py_str<SystemWeight>)
       .def("__repr__", to_py_str<SystemWeight>)
-      .def_property("sys", py::overload_cast<void>(&SystemWeight::getSYS, py::const_),
+      .def_property("sys", py::overload_cast<>(&SystemWeight::getSYS, py::const_),
                     py::overload_cast<const SystemPtr&>(&SystemWeight::setSYS),
                     "对应的 System 实例")
       .def_property("weight", &SystemWeight::getWeight, &SystemWeight::setWeight,
@@ -61,10 +61,10 @@ void export_AllocateFunds(py::module& m) {
       .def(py::init<const string&>())
       .def("__str__", to_py_str<AllocateFundsBase>)
       .def("__repr__", to_py_str<AllocateFundsBase>)
-      .def_property("name", py::overload_cast<void>(&AllocateFundsBase::name, py::const_),
+      .def_property("name", py::overload_cast<>(&AllocateFundsBase::name, py::const_),
                     py::overload_cast<const string&>(&AllocateFundsBase::name),
                     py::return_value_policy::copy, "算法组件名称")
-      .def_property("query", py::overload_cast<void>(&AllocateFundsBase::getQuery, py::const_),
+      .def_property("query", py::overload_cast<>(&AllocateFundsBase::getQuery, py::const_),
                     py::overload_cast<const KQuery&>(&AllocateFundsBase::setQuery),
                     py::return_value_policy::copy, "设置或获取查询条件")
 

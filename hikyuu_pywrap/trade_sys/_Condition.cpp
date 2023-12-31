@@ -42,7 +42,7 @@ void export_Condition(py::module& m) {
       .def("__str__", to_py_str<ConditionBase>)
       .def("__repr__", to_py_str<ConditionBase>)
 
-      .def_property("name", py::overload_cast<void>(&ConditionBase::name, py::const_),
+      .def_property("name", py::overload_cast<>(&ConditionBase::name, py::const_),
                     py::overload_cast<const string&>(&ConditionBase::name),
                     py::return_value_policy::copy, "名称")
 

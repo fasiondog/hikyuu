@@ -56,7 +56,7 @@ void export_Slippage(py::module& m) {
       .def("__str__", to_py_str<SlippageBase>)
       .def("__repr__", to_py_str<SlippageBase>)
 
-      .def_property("name", py::overload_cast<void>(&SlippageBase::name, py::const_),
+      .def_property("name", py::overload_cast<>(&SlippageBase::name, py::const_),
                     py::overload_cast<const string&>(&SlippageBase::name),
                     py::return_value_policy::copy, "名称")
       .def_property("to", &SlippageBase::getTO, &SlippageBase::setTO, "关联交易对象")

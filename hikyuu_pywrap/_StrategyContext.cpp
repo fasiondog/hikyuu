@@ -31,9 +31,9 @@ void export_StrategeContext(py::module& m) {
       .def(py::init<>())
       .def_property("start_datetime", get_start_datetime, set_start_datetime, "起始日期")
       .def_property("stock_list",
-                    py::overload_cast<void>(&StrategyContext::getStockCodeList, py::const_),
+                    py::overload_cast<>(&StrategyContext::getStockCodeList, py::const_),
                     setStockList, "股票代码列表")
       .def_property("ktype_list",
-                    py::overload_cast<void>(&StrategyContext::getKTypeList, py::const_),
+                    py::overload_cast<>(&StrategyContext::getKTypeList, py::const_),
                     setKTypeList, "需要的K线类型");
 }

@@ -46,7 +46,7 @@ void export_Signal(py::module& m) {
       .def("__str__", to_py_str<SignalBase>)
       .def("__repr__", to_py_str<SignalBase>)
 
-      .def_property("name", py::overload_cast<void>(&SignalBase::name, py::const_),
+      .def_property("name", py::overload_cast<>(&SignalBase::name, py::const_),
                     py::overload_cast<const string&>(&SignalBase::name),
                     py::return_value_policy::copy, "名称")
       .def_property("to", &SignalBase::getTO, &SignalBase::setTO, "设置或获取交易对象")
