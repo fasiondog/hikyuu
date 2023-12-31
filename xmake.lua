@@ -144,7 +144,7 @@ elseif is_plat("macosx") then
     end
 end
 
-add_requires("boost " .. boost_version, {
+add_requires("myboost " .. boost_version, {
   system = false,
   alias = "boost",
   debug = is_mode("debug"),
