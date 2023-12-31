@@ -11,8 +11,6 @@
 namespace py = pybind11;
 using namespace hku;
 
-PYBIND11_MAKE_OPAQUE(BorrowRecordList);
-
 void export_BorrowRecord(py::module& m) {
     py::class_<BorrowRecord>(m, "BorrowRecord", "记录当前借入的股票信息")
       .def(py::init<>())
@@ -24,6 +22,4 @@ void export_BorrowRecord(py::module& m) {
       .def_readwrite("value", &BorrowRecord::value, "借入总价值")
 
         DEF_PICKLE(BorrowRecord);
-
-    py::bind_vector<BorrowRecordList>(m, "BorrowRecordList");
 }

@@ -15,8 +15,6 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-PYBIND11_MAKE_OPAQUE(KRecordList);
-
 bool (*krecord_eq)(const KRecord&, const KRecord&) = operator==;
 bool (*krecord_ne)(const KRecord&, const KRecord&) = operator!=;
 
@@ -41,6 +39,4 @@ void export_KReord(py::module& m) {
       .def("__ne__", krecord_ne)
 
         DEF_PICKLE(KRecord);
-
-    py::bind_vector<KRecordList>(m, "KRecordList");
 }

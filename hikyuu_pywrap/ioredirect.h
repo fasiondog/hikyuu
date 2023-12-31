@@ -11,6 +11,7 @@
  *      modified from https://github.com/pybind/pybind11/include/pybind11/iostream.h
  */
 
+#pragma once
 #ifndef IOREDIRECT_H_
 #define IOREDIRECT_H_
 

@@ -15,8 +15,6 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-PYBIND11_MAKE_OPAQUE(TimeLineList);
-
 void export_TimeLineReord(py::module& m) {
     py::class_<TimeLineRecord>(m, "TimeLineRecord", "分时线记录，属性可读写")
       .def(py::init<>())
@@ -29,6 +27,4 @@ void export_TimeLineReord(py::module& m) {
       .def(py::self == py::self)
 
         DEF_PICKLE(TimeLineRecord);
-
-    py::bind_vector<TimeLineList>(m, "TimeLineList");
 }

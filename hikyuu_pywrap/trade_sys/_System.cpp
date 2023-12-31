@@ -15,8 +15,6 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
-PYBIND11_MAKE_OPAQUE(SystemList);
-
 void (System::*run_1)(const KQuery&, bool) = &System::run;
 void (System::*run_2)(const KData&, bool) = &System::run;
 void (System::*run_3)(const Stock&, const KQuery&, bool reset) = &System::run;
@@ -102,9 +100,8 @@ void export_System(py::module& m) {
       .def_readwrite("count", &TradeRequest::count, "因操作失败，连续延迟的次数")
         DEF_PICKLE(TradeRequest);
 
-    py::class_<System, SystemPtr>(
-      m, "System",
-      R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
+    py::class_<System, SystemPtr>(m, "System",
+                                  R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
 
 系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
@@ -215,6 +212,4 @@ void export_System(py::module& m) {
       .def("ready", &System::readyForRun)
 
         DEF_PICKLE(System);
-
-    py::bind_vector<SystemList>(m, "SystemList");
 }

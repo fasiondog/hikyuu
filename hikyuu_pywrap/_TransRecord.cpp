@@ -15,8 +15,6 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-PYBIND11_MAKE_OPAQUE(TransList);
-
 void export_TransRecord(py::module& m) {
     py::class_<TransRecord>(m, "TransRecord")
       .def(py::init<>())
@@ -35,6 +33,4 @@ void export_TransRecord(py::module& m) {
       .value("BUY", TransRecord::BUY)
       .value("SELL", TransRecord::SELL)
       .value("AUCTION", TransRecord::AUCTION);
-
-    py::bind_vector<TransList>(m, "TransList");
 }

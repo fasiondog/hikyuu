@@ -12,9 +12,9 @@
 #include <string>
 #include <pybind11/pybind11.h>
 #include <pybind11/eval.h>
-#include <hikyuu/utilities/Parameter.h>
-#include <hikyuu/Log.h>
+#include <hikyuu/hikyuu.h>
 #include <datetime.h>
+#include "bind_stl.h"
 
 using namespace hku;
 

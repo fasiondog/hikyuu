@@ -15,8 +15,6 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-PYBIND11_MAKE_OPAQUE(StockWeightList);
-
 void export_StockWeight(py::module& m) {
     py::class_<StockWeight>(m, "StockWeight", "权息记录")
       .def(py::init<>())
@@ -37,6 +35,4 @@ void export_StockWeight(py::module& m) {
       .def_property_readonly("free_count", &StockWeight::freeCount, "流通股（万股）")
 
         DEF_PICKLE(StockWeight);
-
-    py::bind_vector<StockWeightList>(m, "StockWeightList");
 }

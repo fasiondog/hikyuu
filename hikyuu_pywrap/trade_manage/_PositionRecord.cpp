@@ -15,8 +15,6 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-PYBIND11_MAKE_OPAQUE(PositionRecordList);
-
 void export_PositionRecord(py::module& m) {
     py::class_<PositionRecord>(m, "PositionRecord", "持仓记录")
       .def(py::init<>())
@@ -40,6 +38,4 @@ void export_PositionRecord(py::module& m) {
                      "累计交易风险（float） = 各次 （买入价格-止损)*买入数量, 不包含交易成本")
       .def_readwrite("sell_money", &PositionRecord::sellMoney, "累计卖出资金（float）")
         DEF_PICKLE(PositionRecord);
-
-    py::bind_vector<PositionRecordList>(m, "PositionRecordList");
 }

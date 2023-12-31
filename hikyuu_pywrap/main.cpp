@@ -10,12 +10,12 @@
 #include <pybind11/stl.h>
 #include <hikyuu/hikyuu.h>
 #include <hikyuu/global/sysinfo.h>
-
 #include "pybind_utils.h"
 
 using namespace hku;
 namespace py = pybind11;
 
+void export_bind_stl(py::module& m);
 void export_DataType(py::module& m);
 void export_Constant(py::module& m);
 void export_util(py::module& m);
@@ -51,6 +51,7 @@ void export_strategy_main(py::module& m);
 PYBIND11_MODULE(core, m) {
     py::register_exception<hku::exception>(m, "HKUException");
 
+    export_bind_stl(m);
     export_DataType(m);
     export_Constant(m);
     export_util(m);

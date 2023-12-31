@@ -11,6 +11,50 @@
 using namespace hku;
 namespace py = pybind11;
 
+#ifdef STOCKTYPE_BLOCK
+#undef STOCKTYPE_BLOCK
+#endif
+
+#ifdef STOCKTYPE_A
+#undef STOCKTYPE_A
+#endif
+
+#ifdef STOCKTYPE_INDEX
+#undef STOCKTYPE_INDEX
+#endif
+
+#ifdef STOCKTYPE_B
+#undef STOCKTYPE_B
+#endif
+
+#ifdef STOCKTYPE_FUND
+#undef STOCKTYPE_FUND
+#endif
+
+#ifdef STOCKTYPE_ETF
+#undef STOCKTYPE_ETF
+#endif
+
+#ifdef STOCKTYPE_ND
+#undef STOCKTYPE_ND
+#endif
+
+#ifdef STOCKTYPE_BOND
+#undef STOCKTYPE_BOND
+#endif
+
+#ifdef STOCKTYPE_GEM
+#undef STOCKTYPE_GEM
+#endif
+
+#ifdef STOCKTYPE_START
+#undef STOCKTYPE_START
+#endif
+
+#ifdef STOCKTYPE_TMP
+#undef STOCKTYPE_TMP
+#endif
+
 struct Constant {
     Constant()
     : null_datetime(Null<Datetime>()),

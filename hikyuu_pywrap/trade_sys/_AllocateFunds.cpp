@@ -15,8 +15,6 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
-PYBIND11_MAKE_OPAQUE(SystemWeightList);
-
 class PyAllocateFundsBase : public AllocateFundsBase {
     PY_CLONE(PyAllocateFundsBase, AllocateFundsBase)
 
@@ -48,11 +46,8 @@ void export_AllocateFunds(py::module& m) {
 
         DEF_PICKLE(SystemWeight);
 
-    py::bind_vector<SystemWeightList>(m, "SystemWeightList");
-
-    py::class_<AllocateFundsBase, AFPtr, PyAllocateFundsBase>(
-      m, "AllocateFundsBase",
-      R"(资产分配算法基类, 子类接口：
+    py::class_<AllocateFundsBase, AFPtr, PyAllocateFundsBase>(m, "AllocateFundsBase",
+                                                              R"(资产分配算法基类, 子类接口：
 
     - _allocateWeight : 【必须】子类资产分配调整实现
     - _clone : 【必须】克隆接口
