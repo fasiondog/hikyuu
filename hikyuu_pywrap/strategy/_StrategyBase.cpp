@@ -43,21 +43,19 @@ public:
 void export_Strategy(py::module& m) {
     py::class_<StrategyBase, PyStrategyBase>(m, "StrategyBase")
       .def(py::init<>())
-      .def_property("name", py::overload_cast<void>(&StrategyBase::name, py::const_),
+      .def_property("name", py::overload_cast<>(&StrategyBase::name, py::const_),
                     py::overload_cast<const string&>(&StrategyBase::name),
                     py::return_value_policy::copy, "策略名称")
 
       .def_property_readonly("sm", &StrategyBase::getSM, py::return_value_policy::reference,
                              "获取 StockManager 实例")
       .def_property("tm", &StrategyBase::getTM, &StrategyBase::setTM, "账户管理")
-      .def_property("start_datetime",
-                    py::overload_cast<void>(&StrategyBase::startDatetime, py::const_),
+      .def_property("start_datetime", py::overload_cast<>(&StrategyBase::startDatetime, py::const_),
                     py::overload_cast<const Datetime&>(&StrategyBase::startDatetime), "起始日期")
-      .def_property("stock_list",
-                    py::overload_cast<void>(&StrategyBase::getStockCodeList, py::const_),
+      .def_property("stock_list", py::overload_cast<>(&StrategyBase::getStockCodeList, py::const_),
                     py::overload_cast<const vector<string>&>(&StrategyBase::setStockCodeList),
                     py::return_value_policy::copy, "股票代码列表")
-      .def_property("ktype_list", py::overload_cast<void>(&StrategyBase::getKTypeList, py::const_),
+      .def_property("ktype_list", py::overload_cast<>(&StrategyBase::getKTypeList, py::const_),
                     py::overload_cast<const vector<KQuery::KType>&>(&StrategyBase::setKTypeList),
                     py::return_value_policy::copy, "需要的K线类型")
 

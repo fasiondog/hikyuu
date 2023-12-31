@@ -81,7 +81,7 @@ void export_MoneyManager(py::module& m) {
       .def("__str__", to_py_str<MoneyManagerBase>)
       .def("__repr__", to_py_str<MoneyManagerBase>)
 
-      .def_property("name", py::overload_cast<void>(&MoneyManagerBase::name, py::const_),
+      .def_property("name", py::overload_cast<>(&MoneyManagerBase::name, py::const_),
                     py::overload_cast<const string&>(&MoneyManagerBase::name),
                     py::return_value_policy::copy, "名称")
       .def_property("tm", &MoneyManagerBase::getTM, &MoneyManagerBase::setTM,

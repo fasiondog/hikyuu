@@ -92,7 +92,7 @@ void export_StockManager(py::module& m) {
     :return: 板块，如找不到返回空Block
     :rtype: Block)")
 
-      .def("get_block_list", py::overload_cast<void>(&StockManager::getBlockList))
+      .def("get_block_list", py::overload_cast<>(&StockManager::getBlockList))
       .def("get_block_list", py::overload_cast<const string&>(&StockManager::getBlockList),
            R"(get_block_list(self[, category])
 

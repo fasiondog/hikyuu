@@ -35,9 +35,8 @@ public:
 };
 
 void export_Environment(py::module& m) {
-    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(
-      m, "EnvironmentBase",
-      R"(市场环境判定策略基类
+    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(m, "EnvironmentBase",
+                                                                   R"(市场环境判定策略基类
 
 自定义市场环境判定策略接口：
 
@@ -50,7 +49,7 @@ void export_Environment(py::module& m) {
       .def("__str__", to_py_str<EnvironmentBase>)
       .def("__repr__", to_py_str<EnvironmentBase>)
 
-      .def_property("name", py::overload_cast<void>(&EnvironmentBase::name, py::const_),
+      .def_property("name", py::overload_cast<>(&EnvironmentBase::name, py::const_),
                     py::overload_cast<const string&>(&EnvironmentBase::name),
                     py::return_value_policy::copy, "名称")
       .def_property("query", &EnvironmentBase::getQuery, &EnvironmentBase::setQuery,

@@ -128,7 +128,7 @@ static py::list analysis_sys_list(const py::object& pystk_list, const KQuery& qu
             stk_list.emplace_back(stk);
         }
     } else if (py::isinstance<py::sequence>(pystk_list)) {
-        const py::sequence& pyseq = pystk_list.cast<py::sequence&>();
+        auto pyseq = pystk_list.cast<py::sequence>();
         for (const auto& obj : pyseq) {
             sys_list.emplace_back(std::move(sys_proto->clone()));
             stk_list.emplace_back(obj.cast<Stock&>());

@@ -28,7 +28,7 @@ void export_KQuery(py::module& m) {
       .def_property_readonly("query_type", &KQuery::queryType, "查询方式")
       .def_property_readonly("ktype", &KQuery::kType, "查询的K线类型")
       .def_property_readonly("recover_type",
-                             py::overload_cast<void>(&KQuery::recoverType, py::const_), "复权类别")
+                             py::overload_cast<>(&KQuery::recoverType, py::const_), "复权类别")
 
         DEF_PICKLE(KQuery);
 

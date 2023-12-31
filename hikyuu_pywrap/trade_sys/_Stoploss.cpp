@@ -51,7 +51,7 @@ void export_Stoploss(py::module& m) {
       .def("__str__", to_py_str<StoplossBase>)
       .def("__repr__", to_py_str<StoplossBase>)
 
-      .def_property("name", py::overload_cast<void>(&StoplossBase::name, py::const_),
+      .def_property("name", py::overload_cast<>(&StoplossBase::name, py::const_),
                     py::overload_cast<const string&>(&StoplossBase::name),
                     py::return_value_policy::copy, "名称")
       .def_property("tm", &StoplossBase::getTM, &StoplossBase::setTM, "关联交易管理实例")

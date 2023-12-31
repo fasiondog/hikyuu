@@ -59,7 +59,7 @@ void export_Selector(py::module& m) {
       .def("__str__", to_py_str<SelectorBase>)
       .def("__repr__", to_py_str<SelectorBase>)
 
-      .def_property("name", py::overload_cast<void>(&SelectorBase::name, py::const_),
+      .def_property("name", py::overload_cast<>(&SelectorBase::name, py::const_),
                     py::overload_cast<const string&>(&SelectorBase::name),
                     py::return_value_policy::copy, "算法名称")
       .def_property_readonly("proto_sys_list", &SelectorBase::getProtoSystemList,
@@ -134,7 +134,7 @@ void export_Selector(py::module& m) {
 
         DEF_PICKLE(SEPtr);
 
-    m.def("SE_Fixed", py::overload_cast<void>(SE_Fixed));
+    m.def("SE_Fixed", py::overload_cast<>(SE_Fixed));
     m.def("SE_Fixed", py::overload_cast<const StockList&, const SystemPtr&>(SE_Fixed),
           R"(SE_Fixed([stk_list, sys])
 
@@ -144,7 +144,7 @@ void export_Selector(py::module& m) {
     :param System sys: 系统策略原型
     :return: SE选择器实例)");
 
-    m.def("SE_Signal", py::overload_cast<void>(SE_Signal));
+    m.def("SE_Signal", py::overload_cast<>(SE_Signal));
     m.def("SE_Signal", py::overload_cast<const StockList&, const SystemPtr&>(SE_Signal),
           R"(SE_Signal([stk_list, sys])
 

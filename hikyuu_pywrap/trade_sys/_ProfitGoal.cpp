@@ -64,7 +64,7 @@ void export_ProfitGoal(py::module& m) {
       .def("__str__", to_py_str<ProfitGoalBase>)
       .def("__repr__", to_py_str<ProfitGoalBase>)
 
-      .def_property("name", py::overload_cast<void>(&ProfitGoalBase::name, py::const_),
+      .def_property("name", py::overload_cast<>(&ProfitGoalBase::name, py::const_),
                     py::overload_cast<const string&>(&ProfitGoalBase::name),
                     py::return_value_policy::copy, "名称")
       .def_property("to", &ProfitGoalBase::getTO, &ProfitGoalBase::setTO, "设置或获取交易对象")

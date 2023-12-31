@@ -28,13 +28,13 @@ void export_Stock(py::module& m) {
       .def("__repr__", &Stock::toString)
 
       .def_property_readonly("id", &Stock::id, "内部id")
-      .def_property_readonly("market", py::overload_cast<void>(&Stock::market, py::const_),
+      .def_property_readonly("market", py::overload_cast<>(&Stock::market, py::const_),
                              "所属市场简称，市场简称是市场的唯一标识")
-      .def_property_readonly("code", py::overload_cast<void>(&Stock::code, py::const_), "证券代码")
+      .def_property_readonly("code", py::overload_cast<>(&Stock::code, py::const_), "证券代码")
       .def_property_readonly("market_code",
-                             py::overload_cast<void>(&Stock::market_code, py::const_),
+                             py::overload_cast<>(&Stock::market_code, py::const_),
                              "市场简称+证券代码，如: sh000001")
-      .def_property_readonly("name", py::overload_cast<void>(&Stock::name, py::const_), "证券名称")
+      .def_property_readonly("name", py::overload_cast<>(&Stock::name, py::const_), "证券名称")
       .def_property_readonly("type", &Stock::type, "证券类型，参见：constant")
       .def_property_readonly("valid", &Stock::valid, "该证券当前是否有效")
       .def_property_readonly("start_datetime", &Stock::startDatetime, "证券起始日期")
