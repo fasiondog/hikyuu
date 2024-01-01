@@ -162,8 +162,6 @@ add_requires("myboost " .. boost_version, {
 --   add_requireconfs("myboost.python", {override = true, system=false})
 -- end
 
-
-
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true, vs_runtime = "MD"}})
 add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
 add_requires("sqlite3", {system = false, configs = {shared = true, vs_runtime = "MD", cxflags = "-fPIC"}})

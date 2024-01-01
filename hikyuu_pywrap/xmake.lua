@@ -5,7 +5,7 @@ option("pyver")
     set_description("Use python version xy")
 option_end()
 
-add_requires("mypybind11", {system = false, alias = "pybind11"})
+add_requires("pybind11", {system = false, alias = "pybind11"})
 add_requireconfs("pybind11.python", {override = true, system = false, version = get_config("pyver")})
 
 target("core")
