@@ -5,16 +5,15 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/serialization/Datetime_serialization.h>
-#include "pickle_support.h"
+#include "pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
-void export_Datetime() {
-    class_<Datetime>("Datetime",
-                     R"(日期时间类（精确到微秒），通过以下方式构建：
+void export_Datetime(py::module& m) {
+    py::class_<Datetime>(m, "Datetime",
+                         R"(日期时间类（精确到微秒），通过以下方式构建：
     
     - 通过字符串：Datetime("2010-1-1 10:00:00")、Datetime("2001-1-1")、
                  Datetime("20010101")、Datetime("20010101T232359)
@@ -23,32 +22,33 @@ void export_Datetime() {
     - 通过 YYYYMMDDHHMMss 或 YYYYMMDDHHMM 或 YYYYMMDD 形式的整数：Datetime(201001011000)、Datetime(20010101)
     - Datetime(year, month, day, hour=0, minute=0, second=0, millisecond=0, microsecond=0))")
 
-      .def(init<>())
-      .def(init<const std::string&>())
-      .def(init<unsigned long long>())
-      .def(init<long, long, long, long, long, long, long, long>(
-        (arg("year"), arg("month"), arg("day"), arg("hour") = 0, arg("minute") = 0,
-         arg("second") = 0, arg("millisecond") = 0, arg("microsecond") = 0)))
+      .def(py::init<>())
+      .def(py::init<const std::string&>())
+      .def(py::init<unsigned long long>())
+      .def(py::init<long, long, long, long, long, long, long, long>(), py::arg("year"),
+           py::arg("month"), py::arg("day"), py::arg("hour") = 0, py::arg("minute") = 0,
+           py::arg("second") = 0, py::arg("millisecond") = 0, py::arg("microsecond") = 0)
 
       .def("__str__", &Datetime::str)
       .def("__repr__", &Datetime::repr)
 
-      .add_property("year", &Datetime::year, "年")
-      .add_property("month", &Datetime::month, "月")
-      .add_property("day", &Datetime::day, "日")
-      .add_property("hour", &Datetime::hour, "时")
-      .add_property("minute", &Datetime::minute, "分")
-      .add_property("second", &Datetime::second, "秒")
-      .add_property("millisecond", &Datetime::millisecond, "毫秒")
-      .add_property("microsecond", &Datetime::microsecond, "微秒")
-      .add_property("number", &Datetime::number, "返回显示如 YYYYMMDDhhmm 的数字")
-      .add_property("hex", &Datetime::hex,
-                    "返回用后7个字节表示世纪、世纪年、月、日、时、分、秒的64位整数")
-      .add_property("ym", &Datetime::ym, "返回显示如 YYYYMM 的数字")
-      .add_property("ymd", &Datetime::ymd, "返回显示如 YYYYMMDD 的数字")
-      .add_property("ymdh", &Datetime::ymdh, "返回显示如 YYYYMMDDhh 的数字")
-      .add_property("ymdhm", &Datetime::ymdhm, "返回显示如 YYYYMMDDhhmm 的数字")
-      .add_property("ymdhms", &Datetime::ymdhms, "返回显示如 YYYYMMDDhhmms 的数字")
+      .def_property_readonly("year", &Datetime::year, "年")
+      .def_property_readonly("month", &Datetime::month, "月")
+      .def_property_readonly("day", &Datetime::day, "日")
+      .def_property_readonly("hour", &Datetime::hour, "时")
+      .def_property_readonly("minute", &Datetime::minute, "分")
+      .def_property_readonly("second", &Datetime::second, "秒")
+      .def_property_readonly("millisecond", &Datetime::millisecond, "毫秒")
+      .def_property_readonly("microsecond", &Datetime::microsecond, "微秒")
+      .def_property_readonly("number", &Datetime::number, "返回显示如 YYYYMMDDhhmm 的数字")
+      .def_property_readonly("hex", &Datetime::hex,
+                             "返回用后7个字节表示世纪、世纪年、月、日、时、分、秒的64位整数")
+      .def_property_readonly("ym", &Datetime::ym, "返回显示如 YYYYMM 的数字")
+      .def_property_readonly("ymd", &Datetime::ymd, "返回显示如 YYYYMMDD 的数字")
+      .def_property_readonly("ymdh", &Datetime::ymdh, "返回显示如 YYYYMMDDhh 的数字")
+      .def_property_readonly("ymdhm", &Datetime::ymdhm, "返回显示如 YYYYMMDDhhmm 的数字")
+      .def_property_readonly("ymdhms", &Datetime::ymdhms, "返回显示如 YYYYMMDDhhmms 的数字")
+      .def_property_readonly("ticks", &Datetime::ticks, "返回距离最小日期过去的微秒数")
 
       .def("is_null", &Datetime::isNull, "\n是否是Null值，等于 Datetime() 直接创建的对象")
 
@@ -70,9 +70,9 @@ void export_Datetime() {
       .def("pre_year", &Datetime::preYear, "\n返回上一年度首日日期")
       .def("date_of_week", &Datetime::dateOfWeek,
            R"(
-返回指定的本周中第几天的日期，周日为0天，周六为第6天
-        
-:param int day: 指明本周的第几天，如小于则认为为第0天，如大于6则认为为第6天)")
+    返回指定的本周中第几天的日期，周日为0天，周六为第6天
+
+    :param int day: 指明本周的第几天，如小于则认为为第0天，如大于6则认为为第6天)")
 
       .def("start_of_week", &Datetime::startOfWeek, "\n返回周起始日期（周一）")
       .def("end_of_week", &Datetime::endOfWeek, "\n返回周结束日期（周日）")
@@ -84,33 +84,26 @@ void export_Datetime() {
       .def("end_of_halfyear", &Datetime::endOfHalfyear, "\n返回半年度结束日期")
       .def("start_of_year", &Datetime::startOfYear, "\n返回年度起始日期")
       .def("endOfYear", &Datetime::endOfYear, "\n返回年度结束日期")
-      .def("min", &Datetime::min, "\n获取支持的最小日期, Datetime(1400, 1, 1)")
-      .staticmethod("min")
-      .def("max", &Datetime::max, "\n获取支持的最大日期, Datetime(9999, 12, 31)")
-      .staticmethod("max")
-      .def("now", &Datetime::now, "\n获取系统当前日期时间")
-      .staticmethod("now")
-      .def("today", &Datetime::today, "\n获取当前的日期")
-      .staticmethod("today")
-      .def("from_hex", &Datetime::fromHex, "\n兼容oracle用后7个字节表示的datetime")
-      .staticmethod("from_hex")
+      .def_static("min", &Datetime::min, "\n获取支持的最小日期, Datetime(1400, 1, 1)")
+      .def_static("max", &Datetime::max, "\n获取支持的最大日期, Datetime(9999, 12, 31)")
+      .def_static("now", &Datetime::now, "\n获取系统当前日期时间")
+      .def_static("today", &Datetime::today, "\n获取当前的日期")
+      .def_static("from_hex", &Datetime::fromHex, "\n兼容oracle用后7个字节表示的datetime")
 
-      .def(self == self)
-      .def(self != self)
-      .def(self >= self)
-      .def(self <= self)
-      .def(self > self)
-      .def(self < self)
+      .def(py::self == py::self)
+      .def(py::self != py::self)
+      .def(py::self >= py::self)
+      .def(py::self <= py::self)
+      .def(py::self > py::self)
+      .def(py::self < py::self)
 
-      .def(self + other<TimeDelta>())
+      .def(py::self - py::self)
+
+      .def(py::self + TimeDelta())
       //.def(other<TimeDelta>() + self) 在python里扩展支持
-      .def(self - self)
-      .def(self - other<TimeDelta>())
+      .def(py::self - TimeDelta())
 
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<Datetime>())
-#endif
-      ;
+        DEF_PICKLE(Datetime);
 
-    def("get_date_range", getDateRange, (arg("start"), arg("end")));
+    m.def("get_date_range", getDateRange, py::arg("start"), py::arg("end"));
 }

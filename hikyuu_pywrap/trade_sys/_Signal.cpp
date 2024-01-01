@@ -5,45 +5,29 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/trade_sys/signal/build_in.h>
-#include "../_Parameter.h"
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 using namespace hku;
 
-class SignalWrap : public SignalBase, public wrapper<SignalBase> {
+class PySignalBase : public SignalBase {
+    PY_CLONE(PySignalBase, SignalBase)
+
 public:
-    SignalWrap() : SignalBase() {}
-    SignalWrap(const string& name) : SignalBase(name) {}
+    using SignalBase::SignalBase;
 
-    void _reset() {
-        if (override func = this->get_override("_reset")) {
-            func();
-        } else {
-            SignalBase::_reset();
-        }
+    void _calculate() override {
+        PYBIND11_OVERLOAD_PURE(void, SignalBase, _calculate, );
     }
 
-    void default_reset() {
-        this->SignalBase::_reset();
-    }
-
-    SignalPtr _clone() {
-        return this->get_override("_clone")();
-    }
-
-    void _calculate() {
-        this->get_override("_calculate")();
+    void _reset() override {
+        PYBIND11_OVERLOAD(void, SignalBase, _reset, );
     }
 };
 
-string (SignalBase::*sg_get_name)() const = &SignalBase::name;
-void (SignalBase::*sg_set_name)(const string&) = &SignalBase::name;
-
-void export_Signal() {
-    class_<SignalWrap, boost::noncopyable>("SignalBase", R"(信号指示器基类
+void export_Signal(py::module& m) {
+    py::class_<SignalBase, SGPtr, PySignalBase>(m, "SignalBase", R"(信号指示器基类
     信号指示器负责产生买入、卖出信号。
 
 公共参数：
@@ -54,15 +38,18 @@ void export_Signal() {
 
     - _calculate : 【必须】子类计算接口
     - _clone : 【必须】克隆接口
-    - _reset : 【可选】重载私有变量)",
-                                           init<>())
-      .def(init<const string&>())
+    - _reset : 【可选】重载私有变量)")
 
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
+      .def(py::init<>())
+      .def(py::init<const string&>())
 
-      .add_property("name", sg_get_name, sg_set_name, "名称")
-      .add_property("to", &SignalBase::getTO, &SignalBase::setTO, "设置或获取交易对象")
+      .def("__str__", to_py_str<SignalBase>)
+      .def("__repr__", to_py_str<SignalBase>)
+
+      .def_property("name", py::overload_cast<>(&SignalBase::name, py::const_),
+                    py::overload_cast<const string&>(&SignalBase::name),
+                    py::return_value_policy::copy, "名称")
+      .def_property("to", &SignalBase::getTO, &SignalBase::setTO, "设置或获取交易对象")
 
       .def("get_param", &SignalBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -72,7 +59,7 @@ void export_Signal() {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &SignalBase::setParam<object>, R"(set_param(self, name, value)
+      .def("set_param", &SignalBase::setParam<boost::any>, R"(set_param(self, name, value)
 
     设置参数
 
@@ -131,20 +118,13 @@ void export_Signal() {
 
       .def("reset", &SignalBase::reset, "复位操作")
       .def("clone", &SignalBase::clone, "克隆操作")
-      .def("_calculate", pure_virtual(&SignalBase::_calculate), "【重载接口】子类计算接口")
-      .def("_reset", &SignalBase::_reset, &SignalWrap::default_reset,
-           "【重载接口】子类复位接口，复位内部私有变量")
-      .def("_clone", pure_virtual(&SignalBase::_clone), "【重载接口】子类克隆接口")
+      .def("_calculate", &SignalBase::_calculate, "【重载接口】子类计算接口")
+      .def("_reset", &SignalBase::_reset, "【重载接口】子类复位接口，复位内部私有变量")
 
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(name_init_pickle_suite<SignalBase>())
-#endif
-      ;
+        DEF_PICKLE(SGPtr);
 
-    register_ptr_to_python<SignalPtr>();
-
-    def("SG_Bool", SG_Bool, (arg("buy"), arg("sell")),
-        R"(SG_Bool(buy, sell)
+    m.def("SG_Bool", SG_Bool, py::arg("buy"), py::arg("sell"),
+          R"(SG_Bool(buy, sell)
 
     布尔信号指示器，使用运算结果为类似bool数组的Indicator分别作为买入、卖出指示。
 
@@ -152,8 +132,9 @@ void export_Signal() {
     :param Indicator sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
     :return: 信号指示器)");
 
-    def("SG_Single", SG_Single, (arg("ind"), arg("filter_n") = 10, arg("filter_p") = 0.1),
-        R"(SG_Single(ind[, filter_n = 10, filter_p = 0.1])
+    m.def("SG_Single", SG_Single, py::arg("ind"), py::arg("filter_n") = 10,
+          py::arg("filter_p") = 0.1,
+          R"(SG_Single(ind[, filter_n = 10, filter_p = 0.1])
     
     生成单线拐点信号指示器。使用《精明交易者》 [BOOK1]_ 中给出的曲线拐点算法判断曲线趋势，公式见下::
 
@@ -168,8 +149,9 @@ void export_Signal() {
     :param float filter_p: 过滤器百分比
     :return: 信号指示器)");
 
-    def("SG_Single2", SG_Single2, (arg("ind"), arg("filter_n") = 10, arg("filter_p") = 0.1),
-        R"(SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
+    m.def("SG_Single2", SG_Single2, py::arg("ind"), py::arg("filter_n") = 10,
+          py::arg("filter_p") = 0.1,
+          R"(SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
     
     生成单线拐点信号指示器2 [BOOK1]_::
 
@@ -183,8 +165,8 @@ void export_Signal() {
     :param float filter_p: 过滤器百分比
     :return: 信号指示器)");
 
-    def("SG_Cross", SG_Cross, (arg("fast"), arg("slow")),
-        R"(SG_Cross(fast, slow)
+    m.def("SG_Cross", SG_Cross, py::arg("fast"), py::arg("slow"),
+          R"(SG_Cross(fast, slow)
 
     双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。如：5日MA上穿10日MA时买入，5日MA线下穿MA10日线时卖出:: 
 
@@ -194,8 +176,8 @@ void export_Signal() {
     :param Indicator slow: 慢线
     :return: 信号指示器)");
 
-    def("SG_CrossGold", SG_CrossGold, (arg("fast"), arg("slow")),
-        R"(SG_CrossGold(fast, slow)
+    m.def("SG_CrossGold", SG_CrossGold, py::arg("fast"), py::arg("slow"),
+          R"(SG_CrossGold(fast, slow)
 
     金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入；
     当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。::
@@ -206,8 +188,8 @@ void export_Signal() {
     :param Indicator slow: 慢线
     :return: 信号指示器)");
 
-    def("SG_Flex", SG_Flex, (arg("op"), arg("slow_n")),
-        R"(SG_Flex(ind, slow_n)
+    m.def("SG_Flex", SG_Flex, py::arg("op"), py::arg("slow_n"),
+          R"(SG_Flex(ind, slow_n)
 
     使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。
 
@@ -215,8 +197,8 @@ void export_Signal() {
     :param int slow_n: 慢线EMA周期
     :return: 信号指示器)");
 
-    def("SG_Band", SG_Band, (arg("ind"), arg("lower"), arg("upper")),
-        R"(SG_Band(ind, lower, upper)
+    m.def("SG_Band", SG_Band, py::arg("ind"), py::arg("lower"), py::arg("upper"),
+          R"(SG_Band(ind, lower, upper)
     指标区间指示器, 当指标超过上轨时，买入；
     当指标低于下轨时，卖出。::
 

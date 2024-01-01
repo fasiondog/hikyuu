@@ -5,61 +5,50 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/trade_sys/condition/build_in.h>
-#include "../_Parameter.h"
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 using namespace hku;
 
-class ConditionWrap : public ConditionBase, public wrapper<ConditionBase> {
+class PyConditionBase : public ConditionBase {
+    PY_CLONE(PyConditionBase, ConditionBase)
+
 public:
-    ConditionWrap() : ConditionBase() {}
-    ConditionWrap(const string& name) : ConditionBase(name) {}
+    using ConditionBase::ConditionBase;
 
-    void _reset() {
-        if (override func = get_override("_reset")) {
-            func();
-        } else {
-            ConditionBase::_reset();
-        }
+    void _calculate() override {
+        PYBIND11_OVERLOAD_PURE(void, ConditionBase, _calculate, );
     }
 
-    void default_reset() {
-        this->ConditionBase::_reset();
-    }
-
-    void _calculate() {
-        this->get_override("_calculate")();
-    }
-
-    ConditionPtr _clone() {
-        return this->get_override("_clone")();
+    void _reset() override {
+        PYBIND11_OVERLOAD(void, ConditionBase, _reset, );
     }
 };
 
-string (ConditionBase::*cn_get_name)() const = &ConditionBase::name;
-void (ConditionBase::*cn_set_name)(const string&) = &ConditionBase::name;
-
-void export_Condition() {
-    class_<ConditionWrap, boost::noncopyable>("ConditionBase", R"(系统有效条件基类
-
-自定义系统有效条件接口：
+void export_Condition(py::module& m) {
+    py::class_<ConditionBase, ConditionPtr, PyConditionBase>(
+      m, "ConditionBase",
+      R"(系统有效条件基类自定义系统有效条件接口：
 
     - _calculate : 【必须】子类计算接口
     - _clone : 【必须】克隆接口
-    - _reset : 【可选】重载私有变量)",
-                                              init<>())
+    - _reset : 【可选】重载私有变量)")
+      .def(py::init<>())
+      .def(py::init<const string&>(), R"(初始化构造函数
+        
+    :param str name: 名称)")
 
-      .def(init<const string&>())
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
+      .def("__str__", to_py_str<ConditionBase>)
+      .def("__repr__", to_py_str<ConditionBase>)
 
-      .add_property("name", cn_get_name, cn_set_name, "名称")
-      .add_property("to", &ConditionBase::getTO, &ConditionBase::setTO, "设置或获取交易对象")
-      .add_property("tm", &ConditionBase::getTM, &ConditionBase::setTM, "设置或获取交易管理账户")
-      .add_property("sg", &ConditionBase::getSG, &ConditionBase::setSG, "设置或获取交易信号指示器")
+      .def_property("name", py::overload_cast<>(&ConditionBase::name, py::const_),
+                    py::overload_cast<const string&>(&ConditionBase::name),
+                    py::return_value_policy::copy, "名称")
+
+      .def_property("to", &ConditionBase::getTO, &ConditionBase::setTO, "设置或获取交易对象")
+      .def_property("tm", &ConditionBase::getTM, &ConditionBase::setTM, "设置或获取交易管理账户")
+      .def_property("sg", &ConditionBase::getSG, &ConditionBase::setSG, "设置或获取交易信号指示器")
 
       .def("get_param", &ConditionBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -69,7 +58,7 @@ void export_Condition() {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &ConditionBase::setParam<object>, R"(set_param(self, name, value)
+      .def("set_param", &ConditionBase::setParam<boost::any>, R"(set_param(self, name, value)
 
     设置参数
 
@@ -103,16 +92,12 @@ void export_Condition() {
 
     :param Datetime datetime: 有效时间)")
 
-      .def("_calculate", pure_virtual(&ConditionBase::_calculate), "【重载接口】子类计算接口")
+      .def("_calculate", &ConditionBase::_calculate, "【重载接口】子类计算接口")
+      .def("_reset", &ConditionBase::_reset, "【重载接口】子类复位接口，复位内部私有变量")
 
-      .def("_reset", &ConditionBase::_reset, &ConditionWrap::default_reset,
-           "【重载接口】子类复位接口，复位内部私有变量")
+        DEF_PICKLE(ConditionPtr);
 
-      .def("_clone", pure_virtual(&ConditionBase::_clone), R"(【重载接口】子类克隆接口)");
-
-    register_ptr_to_python<ConditionPtr>();
-
-    def("CN_OPLine", CN_OPLine, R"(CN_OPLine(ind)
+    m.def("CN_OPLine", CN_OPLine, R"(CN_OPLine(ind)
 
     固定使用股票最小交易量进行交易，计算权益曲线的ind值，当权益曲线高于ind时，系统有效，否则无效。
 
@@ -120,7 +105,7 @@ void export_Condition() {
     :return: 系统有效条件实例
     :rtype: ConditionBase)");
 
-    def("CN_Bool", CN_Bool, R"(CN_Bool(ind)
+    m.def("CN_Bool", CN_Bool, R"(CN_Bool(ind)
 
     布尔信号指标系统有效条件, 指标中相应位置>0则代表系统有效，否则无效
 

@@ -5,12 +5,55 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/DataType.h>
-#include "pickle_support.h"
+#include "pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
+
+#ifdef STOCKTYPE_BLOCK
+#undef STOCKTYPE_BLOCK
+#endif
+
+#ifdef STOCKTYPE_A
+#undef STOCKTYPE_A
+#endif
+
+#ifdef STOCKTYPE_INDEX
+#undef STOCKTYPE_INDEX
+#endif
+
+#ifdef STOCKTYPE_B
+#undef STOCKTYPE_B
+#endif
+
+#ifdef STOCKTYPE_FUND
+#undef STOCKTYPE_FUND
+#endif
+
+#ifdef STOCKTYPE_ETF
+#undef STOCKTYPE_ETF
+#endif
+
+#ifdef STOCKTYPE_ND
+#undef STOCKTYPE_ND
+#endif
+
+#ifdef STOCKTYPE_BOND
+#undef STOCKTYPE_BOND
+#endif
+
+#ifdef STOCKTYPE_GEM
+#undef STOCKTYPE_GEM
+#endif
+
+#ifdef STOCKTYPE_START
+#undef STOCKTYPE_START
+#endif
+
+#ifdef STOCKTYPE_TMP
+#undef STOCKTYPE_TMP
+#endif
 
 struct Constant {
     Constant()
@@ -50,7 +93,7 @@ struct Constant {
     int null_int;
     size_t null_size;
     int64_t null_int64;
-    bool pickle_support;  //是否支持pickle
+    bool pickle_support;  // 是否支持pickle
 
     int STOCKTYPE_BLOCK;  /// 板块
     int STOCKTYPE_A;      /// A股
@@ -65,8 +108,8 @@ struct Constant {
     int STOCKTYPE_TMP;    /// 临时Stock
 };
 
-void export_Constant() {
-    class_<Constant>("Constant")
+void export_Constant(py::module& m) {
+    py::class_<Constant>(m, "Constant")
       .def_readonly("null_datetime", &Constant::null_datetime, "无效Datetime")
       .def_readonly("inf", &Constant::inf, "无穷大或无穷小")
       .def_readonly("nan", &Constant::nan, "非数字")
@@ -89,4 +132,6 @@ void export_Constant() {
       .def_readonly("STOCKTYPE_GEM", &Constant::STOCKTYPE_GEM, "创业板")
       .def_readonly("STOCKTYPE_START", &Constant::STOCKTYPE_START, "科创板")
       .def_readonly("STOCKTYPE_TMP", &Constant::STOCKTYPE_TMP, "临时Stock");
+
+    m.attr("constant") = Constant();
 }

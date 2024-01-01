@@ -12,61 +12,48 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 #include <hikyuu/trade_sys/environment/build_in.h>
-#include "../_Parameter.h"
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 using namespace hku;
 
-class EnvironmentWrap : public EnvironmentBase, public wrapper<EnvironmentBase> {
+class PyEnvironmentBase : public EnvironmentBase {
+    PY_CLONE(PyEnvironmentBase, EnvironmentBase)
+
 public:
-    EnvironmentWrap() : EnvironmentBase() {}
-    EnvironmentWrap(const string& name) : EnvironmentBase(name) {}
+    using EnvironmentBase::EnvironmentBase;
 
-    void _reset() {
-        if (override func = get_override("_reset")) {
-            func();
-        } else {
-            EnvironmentBase::_reset();
-        }
+    void _calculate() override {
+        PYBIND11_OVERLOAD_PURE(void, EnvironmentBase, _calculate, );
     }
 
-    void default_reset() {
-        this->EnvironmentBase::_reset();
-    }
-
-    EnvironmentPtr _clone() {
-        return this->get_override("_clone")();
-    }
-
-    void _calculate() {
-        this->get_override("_calculate")();
+    void _reset() override {
+        PYBIND11_OVERLOAD(void, EnvironmentBase, _reset, );
     }
 };
 
-string (EnvironmentBase::*ev_get_name)() const = &EnvironmentBase::name;
-void (EnvironmentBase::*ev_set_name)(const string&) = &EnvironmentBase::name;
-
-void export_Environment() {
-    class_<EnvironmentWrap, boost::noncopyable>("EnvironmentBase",
-                                                R"(市场环境判定策略基类
+void export_Environment(py::module& m) {
+    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(m, "EnvironmentBase",
+                                                                   R"(市场环境判定策略基类
 
 自定义市场环境判定策略接口：
 
     - _calculate : 【必须】子类计算接口
     - _clone : 【必须】克隆接口
-    - _reset : 【可选】重载私有变量)",
-                                                init<>())
-      .def(init<const string&>())
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
+    - _reset : 【可选】重载私有变量)")
+      .def(py::init<>())
+      .def(py::init<const string&>())
 
-      .add_property("name", ev_get_name, ev_set_name, "名称")
-      .add_property("query", &EnvironmentBase::getQuery, &EnvironmentBase::setQuery,
-                    "设置或获取查询条件")
+      .def("__str__", to_py_str<EnvironmentBase>)
+      .def("__repr__", to_py_str<EnvironmentBase>)
+
+      .def_property("name", py::overload_cast<>(&EnvironmentBase::name, py::const_),
+                    py::overload_cast<const string&>(&EnvironmentBase::name),
+                    py::return_value_policy::copy, "名称")
+      .def_property("query", &EnvironmentBase::getQuery, &EnvironmentBase::setQuery,
+                    py::return_value_policy::copy, "设置或获取查询条件")
 
       .def("get_param", &EnvironmentBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -76,7 +63,7 @@ void export_Environment() {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &EnvironmentBase::setParam<object>, R"(set_param(self, name, value)
+      .def("set_param", &EnvironmentBase::setParam<boost::any>, R"(set_param(self, name, value)
 
     设置参数
 
@@ -101,15 +88,13 @@ void export_Environment() {
 
       .def("reset", &EnvironmentBase::reset, "复位操作")
       .def("clone", &EnvironmentBase::clone, "克隆操作")
-      .def("_reset", &EnvironmentBase::_reset, &EnvironmentWrap::default_reset,
-           "【重载接口】子类复位接口，用于复位内部私有变量")
-      .def("_clone", pure_virtual(&EnvironmentBase::_clone), "【重载接口】子类克隆接口")
-      .def("_calculate", pure_virtual(&EnvironmentBase::_calculate), "【重载接口】子类计算接口");
+      .def("_reset", &EnvironmentBase::_reset, "【重载接口】子类复位接口，用于复位内部私有变量")
+      .def("_calculate", &EnvironmentBase::_calculate, "【重载接口】子类计算接口")
 
-    register_ptr_to_python<EnvironmentPtr>();
+        DEF_PICKLE(EnvironmentPtr);
 
-    def("EV_TwoLine", EV_TwoLine, (arg("fast"), arg("slow"), arg("market") = "SH"),
-        R"(EV_TwoLine(fast, slow[, market = 'SH'])
+    m.def("EV_TwoLine", EV_TwoLine, py::arg("fast"), py::arg("slow"), py::arg("market") = "SH",
+          R"(EV_TwoLine(fast, slow[, market = 'SH'])
 
     快慢线判断策略，市场指数的快线大于慢线时，市场有效，否则无效。
 

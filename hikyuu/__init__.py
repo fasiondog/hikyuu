@@ -51,7 +51,7 @@ SOFTWARE.
 from .util import *
 
 from .extend import *
-from .deprecated import *
+# from .deprecated import *  # pybind getattr 会被递归，无法使用
 from .indicator import *
 from .trade_manage import *
 from .trade_sys import *

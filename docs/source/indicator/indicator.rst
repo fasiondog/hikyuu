@@ -835,7 +835,7 @@
 
     获取某指标中指定范围 [start, end) 的数据，生成新的指标
 
-    :param Indicator|PriceList data: 输入数据
+    :param Indicator|sequence data: 输入数据
     :param int start: 起始位置
     :param int end: 终止位置（不包含本身）
     :param int result_index: 原输入数据中的结果集
@@ -845,7 +845,7 @@
 
     计算线性回归斜率，N支持变量
 
-    :param Indicator|PriceList data: 输入数据
+    :param Indicator|sequence data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 

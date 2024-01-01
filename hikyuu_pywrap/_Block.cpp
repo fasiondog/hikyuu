@@ -5,13 +5,11 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/serialization/Block_serialization.h>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include "pickle_support.h"
+#include "pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
@@ -27,16 +25,17 @@ bool (Block::*add_2)(const string&) = &Block::add;
 bool (Block::*remove_1)(const Stock&) = &Block::remove;
 bool (Block::*remove_2)(const string&) = &Block::remove;
 
-void export_Block() {
-    class_<Block>("Block", "板块类，可视为证券的容器", init<>())
-      .def(init<const string&, const string&>())
-      .def(init<const Block&>())
+void export_Block(py::module& m) {
+    py::class_<Block>(m, "Block", "板块类，可视为证券的容器")
+      .def(py::init<>())
+      .def(py::init<const string&, const string&>())
+      .def(py::init<const Block&>())
 
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
+      .def("__str__", to_py_str<Block>)
+      .def("__repr__", to_py_str<Block>)
 
-      .add_property("category", getCategory, setCategory, "板块所属分类")
-      .add_property("name", getName, setName, "板块名称")
+      .def_property("category", setCategory, getCategory, "板块所属分类")
+      .def_property("name", getName, setName, "板块名称")
 
       .def("empty", &Block::empty, R"(empty(self)
     
@@ -48,7 +47,8 @@ void export_Block() {
 
     :param Stock stock: 待加入的证券
     :return: 是否成功加入
-    :rtype: bool)")
+    :rtype: bool)",
+           py::keep_alive<1, 2>())
 
       .def("add", add_2, R"(add(self, market_code)
 
@@ -56,7 +56,8 @@ void export_Block() {
 
     :param str market_code: 市场简称证券代码
     :return: 是否成功加入
-    :rtype: bool)")
+    :rtype: bool)",
+           py::keep_alive<1, 2>())
 
       .def("remove", remove_1, R"(remove(self, stock)
 
@@ -83,17 +84,13 @@ void export_Block() {
     :param str market_code: 证券代码
     :return: Stock 实例)")
 
-      .def("__iter__", iterator<const Block>())
+      .def(
+        "__iter__",
+        [](const Block& blk) {
+            return py::make_iterator<py::return_value_policy::reference_internal, StockMapIterator,
+                                     StockMapIterator, const Stock&>(blk.begin(), blk.end());
+        },
+        py::keep_alive<0, 1>())
 
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<Block>())
-#endif
-      ;
-
-    class_<BlockList>("BlockList")
-      .def(vector_indexing_suite<BlockList>())
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<BlockList>())
-#endif
-      ;
+        DEF_PICKLE(Block);
 }

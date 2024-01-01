@@ -37,7 +37,7 @@ public:
     virtual ~OrderBrokerBase();
 
     /** 获取名称 */
-    string name() const;
+    const string& name() const;
 
     /** 设置名称 */
     void name(const string& name);
@@ -106,7 +106,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const OrderBrokerBase&);
 /** @ingroup OrderBroker */
 HKU_API std::ostream& operator<<(std::ostream& os, const OrderBrokerPtr&);
 
-inline string OrderBrokerBase::name() const {
+inline const string& OrderBrokerBase::name() const {
     return m_name;
 }
 

@@ -38,7 +38,7 @@ public:
     virtual ~ConditionBase();
 
     /** 获取名称 */
-    string name() const;
+    const string& name() const;
 
     /** 设置名称 */
     void name(const string& name);
@@ -175,7 +175,7 @@ public:                                       \
 HKU_API std::ostream& operator<<(std::ostream&, const ConditionPtr&);
 HKU_API std::ostream& operator<<(std::ostream&, const ConditionBase&);
 
-inline string ConditionBase::name() const {
+inline const string& ConditionBase::name() const {
     return m_name;
 }
 

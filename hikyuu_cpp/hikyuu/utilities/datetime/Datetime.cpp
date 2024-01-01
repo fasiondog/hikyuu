@@ -155,11 +155,12 @@ uint64_t Datetime::number() const noexcept {
         return (unsigned long long)year() * 100000000ULL +
                (unsigned long long)month() * 1000000ULL + (unsigned long long)day() * 10000ULL +
                (unsigned long long)hour() * 100ULL + (unsigned long long)minute();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         HKU_ERROR(e.what());
-        return Null<unsigned long long>();
+        return Null<uint64_t>();
     } catch (...) {
-        return Null<unsigned long long>();
+        HKU_ERROR("Unknown error!");
+        return Null<uint64_t>();
     }
 }
 
@@ -168,11 +169,12 @@ uint64_t Datetime::ym() const noexcept {
     try {
         HKU_IF_RETURN(isNull(), Null<unsigned long long>());
         return (unsigned long long)year() * 100ULL + (unsigned long long)month();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         HKU_ERROR(e.what());
-        return Null<unsigned long long>();
+        return Null<uint64_t>();
     } catch (...) {
-        return Null<unsigned long long>();
+        HKU_ERROR("Unknown error!");
+        return Null<uint64_t>();
     }
 }
 
@@ -182,11 +184,12 @@ uint64_t Datetime::ymd() const noexcept {
         HKU_IF_RETURN(isNull(), Null<unsigned long long>());
         return (unsigned long long)year() * 10000ULL + (unsigned long long)month() * 100ULL +
                (unsigned long long)day();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         HKU_ERROR(e.what());
-        return Null<unsigned long long>();
+        return Null<uint64_t>();
     } catch (...) {
-        return Null<unsigned long long>();
+        HKU_ERROR("Unknown error!");
+        return Null<uint64_t>();
     }
 }
 
@@ -196,11 +199,12 @@ uint64_t Datetime::ymdh() const noexcept {
         HKU_IF_RETURN(isNull(), Null<unsigned long long>());
         return (unsigned long long)year() * 1000000ULL + (unsigned long long)month() * 10000ULL +
                (unsigned long long)day() * 100ULL + (unsigned long long)hour();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         HKU_ERROR(e.what());
-        return Null<unsigned long long>();
+        return Null<uint64_t>();
     } catch (...) {
-        return Null<unsigned long long>();
+        HKU_ERROR("Unknown error!");
+        return Null<uint64_t>();
     }
 }
 
@@ -211,11 +215,12 @@ uint64_t Datetime::ymdhm() const noexcept {
         return (unsigned long long)year() * 100000000LL + (unsigned long long)month() * 1000000LL +
                (unsigned long long)day() * 10000LL + (unsigned long long)hour() * 100LL +
                (unsigned long long)minute();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         HKU_ERROR(e.what());
-        return Null<unsigned long long>();
+        return Null<uint64_t>();
     } catch (...) {
-        return Null<unsigned long long>();
+        HKU_ERROR("Unknown error!");
+        return Null<uint64_t>();
     }
 }
 
@@ -227,11 +232,12 @@ uint64_t Datetime::ymdhms() const noexcept {
                (unsigned long long)month() * 100000000ULL + (unsigned long long)day() * 1000000ULL +
                (unsigned long long)hour() * 10000ULL + (unsigned long long)minute() * 100ULL +
                (unsigned long long)second();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         HKU_ERROR(e.what());
-        return Null<unsigned long long>();
+        return Null<uint64_t>();
     } catch (...) {
-        return Null<unsigned long long>();
+        HKU_ERROR("Unknown error!");
+        return Null<uint64_t>();
     }
 }
 
@@ -249,11 +255,26 @@ uint64_t Datetime::hex() const noexcept {
         ret |= (low_y << 40);
         ret |= (high_y << 48);
         return ret;
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         HKU_ERROR(e.what());
-        return Null<unsigned long long>();
+        return Null<uint64_t>();
     } catch (...) {
-        return Null<unsigned long long>();
+        HKU_ERROR("Unknown error!");
+        return Null<uint64_t>();
+    }
+}
+
+uint64_t Datetime::ticks() const noexcept {
+    try {
+        HKU_IF_RETURN(isNull(), Null<uint64_t>());
+        TimeDelta d = (*this) - Datetime::min();
+        return d.ticks();
+    } catch (const std::exception& e) {
+        HKU_ERROR(e.what());
+        return Null<uint64_t>();
+    } catch (...) {
+        HKU_ERROR("Unknown error!");
+        return Null<uint64_t>();
     }
 }
 

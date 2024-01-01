@@ -5,13 +5,12 @@
  *      Author: fasiondog
  */
 
-
-#include <boost/python.hpp>
 #include <hikyuu/trade_instance/ama_sys/AmaInstance.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 using namespace hku;
 
-void export_AmaInstance() {
-    def("AmaSpecial", AmaSpecial);
+void export_AmaInstance(py::module& m) {
+    m.def("AmaSpecial", AmaSpecial);
 }

@@ -5,20 +5,18 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/trade_manage/TradeRecord.h>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #endif
 
-void export_TradeRecord() {
-    enum_<BUSINESS>("BUSINESS")
+void export_TradeRecord(py::module& m) {
+    py::enum_<BUSINESS>(m, "BUSINESS")
       .value("INIT", BUSINESS_INIT)
       .value("BUY", BUSINESS_BUY)
       .value("SELL", BUSINESS_SELL)
@@ -36,15 +34,16 @@ void export_TradeRecord() {
       .value("RETURN_STOCK", BUSINESS_RETURN_STOCK)
       .value("INVALID", BUSINESS_INVALID);
 
-    def("get_business_name", getBusinessName, R"(get_business_name(business)
+    m.def("get_business_name", getBusinessName, R"(get_business_name(business)
 
     :param BUSINESS business: 交易业务类型
     :return: 交易业务类型名称("INIT"|"BUY"|"SELL"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"UNKNOWN"
     :rtype: string)");
 
-    class_<TradeRecord>("TradeRecord", "交易记录", init<>())
-      .def(init<const Stock&, const Datetime&, BUSINESS, price_t, price_t, price_t, double,
-                const CostRecord&, price_t, price_t, SystemPart>())
+    py::class_<TradeRecord>(m, "TradeRecord", "交易记录")
+      .def(py::init<>())
+      .def(py::init<const Stock&, const Datetime&, BUSINESS, price_t, price_t, price_t, double,
+                    const CostRecord&, price_t, price_t, SystemPart>())
 
       .def("__str__", &TradeRecord::toString)
       .def("__repr__", &TradeRecord::toString)
@@ -65,16 +64,5 @@ void export_TradeRecord() {
       .def_readwrite("part", &TradeRecord::from,
                      "交易指示来源，区别是交易系统哪个部件发出的指示，参见： "
                      ":py:class:`System.Part`")  // python中不能用from关键字
-
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<TradeRecord>())
-#endif
-      ;
-
-    class_<TradeRecordList>("TradeRecordList")
-      .def(vector_indexing_suite<TradeRecordList>())
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<TradeRecordList>())
-#endif
-      ;
+      DEF_PICKLE(TradeRecord);
 }

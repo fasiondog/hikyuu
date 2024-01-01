@@ -440,6 +440,12 @@ TEST_CASE("test_Datetime") {
     CHECK(Datetime(201912310000).preYear() == Datetime(201801010000));
     CHECK(Datetime(201601010000).preYear() == Datetime(201501010000));
     CHECK(Datetime(201612310000).preYear() == Datetime(201501010000));
+
+    /** @arg 测试 ticks */
+    CHECK(null_datetime.ticks() == Null<uint64_t>());
+    CHECK_EQ(Datetime::min().ticks(), 0ULL);
+    CHECK_EQ(Datetime::max().ticks(), 271389657600000000ULL);
+    CHECK_EQ(Datetime::max().ticks(), (Datetime::max() - Datetime::min()).ticks());
 }
 
 /** @par 检测点 */

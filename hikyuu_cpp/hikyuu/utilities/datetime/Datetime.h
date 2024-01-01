@@ -168,6 +168,9 @@ public:
      */
     uint64_t hex() const noexcept;
 
+    /** 距离最小日期过去的微秒数 */
+    uint64_t ticks() const noexcept;
+
     /**
      * 转化为字符串，供打印阅读，格式：
      * <pre>
@@ -402,7 +405,7 @@ template <>
 class hash<hku::Datetime> {
 public:
     size_t operator()(hku::Datetime const& d) const noexcept {
-        return d.number();  // or use boost::hash_combine
+        return d.ticks();  // or use boost::hash_combine
     }
 };
 }  // namespace std

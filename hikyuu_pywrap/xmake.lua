@@ -5,6 +5,9 @@ option("pyver")
     set_description("Use python version xy")
 option_end()
 
+add_requires("pybind11", {system = false, alias = "pybind11"})
+add_requireconfs("pybind11.python", {override = true, system = false, version = get_config("pyver")})
+
 target("core")
     set_kind("shared")
     if is_mode("debug") then 
@@ -15,7 +18,7 @@ target("core")
     add_options("stackstrace")
 
     add_deps("hikyuu")
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "cpp-httplib")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "cpp-httplib")
     if is_plat("windows") then
         set_filename("core.pyd")
         add_cxflags("-wd4251")

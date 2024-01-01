@@ -5,13 +5,235 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/trade_manage/build_in.h>
-#include "../_Parameter.h"
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 using namespace hku;
+
+class PyTradeManagerBase : public TradeManagerBase {
+    PY_CLONE(PyTradeManagerBase, TradeManagerBase)
+
+public:
+    using TradeManagerBase::TradeManagerBase;
+
+    void _reset() override {
+        PYBIND11_OVERLOAD(void, TradeManagerBase, _reset, );
+    }
+
+    void updateWithWeight(const Datetime& datetime) override {
+        PYBIND11_OVERRIDE_NAME(void, TradeManagerBase, "update_with_weight", updateWithWeight,
+                               datetime);
+    }
+
+    double getMarginRate(const Datetime& datetime, const Stock& stock) override {
+        PYBIND11_OVERRIDE_NAME(double, TradeManagerBase, "get_margin_rate", getMarginRate, datetime,
+                               stock);
+    }
+
+    price_t initCash() const override {
+        PYBIND11_OVERRIDE_NAME(price_t, TradeManagerBase, "init_cash", initCash);
+    }
+
+    Datetime initDatetime() const override {
+        PYBIND11_OVERRIDE_NAME(Datetime, TradeManagerBase, "init_datetime", initDatetime);
+    }
+
+    Datetime firstDatetime() const override {
+        PYBIND11_OVERRIDE_NAME(Datetime, TradeManagerBase, "first_datetime", firstDatetime);
+    }
+
+    Datetime lastDatetime() const override {
+        PYBIND11_OVERRIDE_NAME(Datetime, TradeManagerBase, "last_datetime", lastDatetime);
+    }
+
+    price_t currentCash() const override {
+        PYBIND11_OVERRIDE_NAME(price_t, TradeManagerBase, "current_cash", currentCash);
+    }
+
+    price_t cash(const Datetime& datetime, KQuery::KType ktype) override {
+        PYBIND11_OVERLOAD(price_t, TradeManagerBase, cash, datetime, ktype);
+    }
+
+    bool have(const Stock& stock) const override {
+        PYBIND11_OVERLOAD(bool, TradeManagerBase, have, stock);
+    }
+
+    bool haveShort(const Stock& stock) const {
+        PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "have_short", haveShort, stock);
+    }
+
+    size_t getStockNumber() const override {
+        PYBIND11_OVERRIDE_NAME(size_t, TradeManagerBase, "get_stock_num", getStockNumber, );
+    }
+
+    size_t getShortStockNumber() const override {
+        PYBIND11_OVERRIDE_NAME(size_t, TradeManagerBase, "get_short_stock_num",
+                               getShortStockNumber, );
+    }
+
+    double getHoldNumber(const Datetime& datetime, const Stock& stock) override {
+        PYBIND11_OVERRIDE_NAME(double, TradeManagerBase, "get_hold_num", getHoldNumber, datetime,
+                               stock);
+    }
+
+    double getShortHoldNumber(const Datetime& datetime, const Stock& stock) override {
+        PYBIND11_OVERRIDE_NAME(double, TradeManagerBase, "get_short_hold_num", getShortHoldNumber,
+                               datetime, stock);
+    }
+
+    double getDebtNumber(const Datetime& datetime, const Stock& stock) override {
+        PYBIND11_OVERRIDE_NAME(double, TradeManagerBase, "get_debt_num", getDebtNumber, datetime,
+                               stock);
+    }
+
+    price_t getDebtCash(const Datetime& datetime) override {
+        PYBIND11_OVERRIDE_NAME(price_t, TradeManagerBase, "get_debt_cash", getDebtCash, datetime);
+    }
+
+    TradeRecordList getTradeList() const override {
+        PYBIND11_OVERRIDE_NAME(TradeRecordList, TradeManagerBase, "get_trade_list", getTradeList, );
+    }
+
+    TradeRecordList getTradeList(const Datetime& start, const Datetime& end) const override {
+        PYBIND11_OVERRIDE_NAME(TradeRecordList, TradeManagerBase, "get_trade_list", getTradeList,
+                               start, end);
+    }
+
+    PositionRecordList getPositionList() const override {
+        PYBIND11_OVERRIDE_NAME(PositionRecordList, TradeManagerBase, "get_position_list",
+                               getPositionList, );
+    }
+
+    PositionRecordList getHistoryPositionList() const override {
+        PYBIND11_OVERRIDE_NAME(PositionRecordList, TradeManagerBase, "get_history_position_list",
+                               getHistoryPositionList, );
+    }
+
+    PositionRecordList getShortPositionList() const override {
+        PYBIND11_OVERRIDE_NAME(PositionRecordList, TradeManagerBase, "get_short_position_list",
+                               getShortPositionList, );
+    }
+
+    PositionRecordList getShortHistoryPositionList() const override {
+        PYBIND11_OVERRIDE_NAME(PositionRecordList, TradeManagerBase,
+                               "get_short_history_position_list", getShortHistoryPositionList, );
+    }
+
+    PositionRecord getPosition(const Datetime& date, const Stock& stock) override {
+        PYBIND11_OVERRIDE_NAME(PositionRecord, TradeManagerBase, "get_position", getPosition, date,
+                               stock);
+    }
+
+    PositionRecord getShortPosition(const Stock& stock) const override {
+        PYBIND11_OVERRIDE_NAME(PositionRecord, TradeManagerBase, "get_short_position",
+                               getShortPosition, stock);
+    }
+
+    BorrowRecordList getBorrowStockList() const override {
+        PYBIND11_OVERRIDE_NAME(BorrowRecordList, TradeManagerBase, "get_borrow_stock_list",
+                               getBorrowStockList, );
+    }
+
+    bool checkin(const Datetime& datetime, price_t cash) override {
+        PYBIND11_OVERLOAD(bool, TradeManagerBase, checkin, datetime, cash);
+    }
+
+    bool checkout(const Datetime& datetime, price_t cash) override {
+        PYBIND11_OVERLOAD(bool, TradeManagerBase, checkout, datetime, cash);
+    }
+
+    bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
+                      double number) override {
+        PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "checkin_stock", checkinStock, datetime,
+                               stock, price, number);
+    }
+
+    bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
+                       double number) override {
+        PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "checkout_stock", checkoutStock, datetime,
+                               stock, price, number);
+    }
+
+    TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice, double number,
+                    price_t stoploss, price_t goalPrice, price_t planPrice,
+                    SystemPart from) override {
+        PYBIND11_OVERLOAD(TradeRecord, TradeManagerBase, buy, datetime, stock, realPrice, number,
+                          stoploss, goalPrice, planPrice, from);
+    }
+
+    TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice, double number,
+                     price_t stoploss, price_t goalPrice, price_t planPrice,
+                     SystemPart from) override {
+        PYBIND11_OVERLOAD(TradeRecord, TradeManagerBase, sell, datetime, stock, realPrice, number,
+                          stoploss, goalPrice, planPrice, from);
+    }
+
+    TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
+                          double number, price_t stoploss, price_t goalPrice, price_t planPrice,
+                          SystemPart from) override {
+        PYBIND11_OVERRIDE_NAME(TradeRecord, TradeManagerBase, "sell_short", sellShort, datetime,
+                               stock, realPrice, number, stoploss, goalPrice, planPrice, from);
+    }
+
+    TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
+                         double number, price_t stoploss, price_t goalPrice, price_t planPrice,
+                         SystemPart from) override {
+        PYBIND11_OVERRIDE_NAME(TradeRecord, TradeManagerBase, "buy_short", buyShort, datetime,
+                               stock, realPrice, number, stoploss, goalPrice, planPrice, from);
+    }
+
+    bool borrowCash(const Datetime& datetime, price_t cash) override {
+        PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "borrow_cash", borrowCash, datetime, cash);
+    }
+
+    bool returnCash(const Datetime& datetime, price_t cash) override {
+        PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "return_cash", returnCash, datetime, cash);
+    }
+
+    bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
+                     double number) override {
+        PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "borrow_stock", borrowStock, datetime, stock,
+                               price, number);
+    }
+
+    bool returnStock(const Datetime& datetime, const Stock& stock, price_t price,
+                     double number) override {
+        PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "return_stock", returnStock, datetime, stock,
+                               price, number);
+    }
+
+    FundsRecord getFunds(KQuery::KType ktype) const override {
+        PYBIND11_OVERRIDE_NAME(FundsRecord, TradeManagerBase, "get_funds", getFunds, ktype);
+    }
+
+    FundsRecord getFunds(const Datetime& datetime, KQuery::KType ktype) override {
+        PYBIND11_OVERRIDE_NAME(FundsRecord, TradeManagerBase, "get_funds", getFunds, datetime,
+                               ktype);
+    }
+
+    PriceList getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) override {
+        PYBIND11_OVERRIDE_NAME(PriceList, TradeManagerBase, "get_funds_curve", getFundsCurve, dates,
+                               ktype);
+    }
+
+    PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) override {
+        PYBIND11_OVERRIDE_NAME(PriceList, TradeManagerBase, "get_profit_curve", getProfitCurve,
+                               dates, ktype);
+    }
+
+    bool addTradeRecord(const TradeRecord& tr) override {
+        PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "add_trade_record", addTradeRecord, tr);
+    }
+
+    string str() const override {
+        PYBIND11_OVERRIDE_NAME(string, TradeManagerBase, "__str__", str, );
+    }
+
+    void tocsv(const string& path) override {
+        PYBIND11_OVERLOAD(void, TradeManagerBase, tocsv, path);
+    }
+};
 
 FundsRecord (TradeManagerBase::*getFunds_1)(KQuery::KType) const = &TradeManagerBase::getFunds;
 FundsRecord (TradeManagerBase::*getFunds_2)(const Datetime&,
@@ -20,16 +242,13 @@ FundsRecord (TradeManagerBase::*getFunds_2)(const Datetime&,
 TradeCostPtr (TradeManagerBase::*get_costFunc)() const = &TradeManagerBase::costFunc;
 void (TradeManagerBase::*set_costFunc)(const TradeCostPtr&) = &TradeManagerBase::costFunc;
 
-const string& (TradeManagerBase::*tm_get_name)() const = &TradeManagerBase::name;
-void (TradeManagerBase::*tm_set_name)(const string&) = &TradeManagerBase::name;
-
 TradeRecordList (TradeManagerBase::*_getTradeList_1)() const = &TradeManagerBase::getTradeList;
 TradeRecordList (TradeManagerBase::*_getTradeList_2)(const Datetime&, const Datetime&) const =
   &TradeManagerBase::getTradeList;
 
-void export_TradeManager() {
-    class_<TradeManagerBase>(
-      "TradeManager",
+void export_TradeManager(py::module& m) {
+    py::class_<TradeManagerBase, TradeManagerPtr, PyTradeManagerBase>(
+      m, "TradeManager",
       R"(交易管理类，可理解为一个模拟账户进行模拟交易。一般使用 crtTM 创建交易管理实例。
 
 交易管理可理解为一个模拟账户进行模拟交易。一般使用 crtTM 创建交易管理实例。
@@ -40,26 +259,33 @@ void export_TradeManager() {
     - precision=2 (int) : 价格计算精度
     - support_borrow_cash=False (bool) : 是否自动融资
     - support_borrow_stock=False (bool) : 是否自动融券
-    - save_action=True (bool) : 是否保存Python命令序列)",
-      // init<const Datetime&, price_t, const TradeCostPtr&, const string&>())
-      init<>())
+    - save_action=True (bool) : 是否保存Python命令序列)")
+      .def(py::init<>())
+      .def(py::init<const string&, const TradeCostPtr&>())
 
       .def("__str__", &TradeManagerBase::str)
       .def("__repr__", &TradeManagerBase::str)
 
-      .add_property("name", make_function(tm_get_name, return_value_policy<copy_const_reference>()),
-                    tm_set_name, "名称")
-      .add_property("init_cash", &TradeManagerBase::initCash, "（只读）初始资金")
-      .add_property("current_cash", &TradeManagerBase::currentCash, "（只读）当前资金")
-      .add_property("init_datetime", &TradeManagerBase::initDatetime, "（只读）账户建立日期")
-      .add_property("first_datetime", &TradeManagerBase::firstDatetime,
-                    "（只读）第一笔买入交易发生日期，如未发生交易返回 Datetime>()")
-      .add_property("last_datetime", &TradeManagerBase::lastDatetime,
-                    "（只读）最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期")
-      .add_property("precision", &TradeManagerBase::precision,
-                    "（只读）价格精度，同公共参数“precision”")
-      .add_property("cost_func", get_costFunc, set_costFunc, "交易成本算法")
-      .add_property("broker_last_datetime", &TradeManagerBase::getBrokerLastDatetime,
+      .def_property("name", py::overload_cast<>(&TradeManagerBase::name, py::const_),
+                    py::overload_cast<const string&>(&TradeManagerBase::name),
+                    py::return_value_policy::copy, "名称")
+
+      .def_property_readonly("init_cash", &TradeManagerBase::initCash, "（只读）初始资金")
+      .def_property_readonly("current_cash", &TradeManagerBase::currentCash, "（只读）当前资金")
+      .def_property_readonly("init_datetime", &TradeManagerBase::initDatetime,
+                             "（只读）账户建立日期")
+
+      .def_property_readonly("first_datetime", &TradeManagerBase::firstDatetime,
+                             "（只读）第一笔买入交易发生日期，如未发生交易返回 Datetime>()")
+      .def_property_readonly(
+        "last_datetime", &TradeManagerBase::lastDatetime,
+        "（只读）最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期")
+      .def_property_readonly("precision", &TradeManagerBase::precision,
+                             "（只读）价格精度，同公共参数“precision”")
+
+      .def_property("cost_func", get_costFunc, set_costFunc, "交易成本算法")
+
+      .def_property("broker_last_datetime", &TradeManagerBase::getBrokerLastDatetime,
                     &TradeManagerBase::setBrokerLastDatetime,
                     R"(实际开始订单代理操作的时刻。
         
@@ -73,7 +299,7 @@ void export_TradeManager() {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &TradeManagerBase::setParam<object>, R"(set_param(self, name, value)
+      .def("set_param", &TradeManagerBase::setParam<boost::any>, R"(set_param(self, name, value)
 
     设置参数
 
@@ -97,7 +323,7 @@ void export_TradeManager() {
 
     清空所有已注册订单代理)")
 
-      //.def("getMarginRate", &TradeManager::getMarginRate)
+      .def("get_margin_rate", &TradeManagerBase::getMarginRate)
 
       .def("have", &TradeManagerBase::have, R"(have(self, stock)
 
@@ -146,10 +372,11 @@ void export_TradeManager() {
 
     :rtype: PositionRecordList)")
 
-      .def("get_position", &TradeManagerBase::getPosition, R"(get_position(self, stock)
+      .def("get_position", &TradeManagerBase::getPosition, R"(get_position(self, date, stock)
 
-    获取指定证券的当前持仓记录，如当前未持有该票，返回PositionRecord()
+    获取指定日期指定证券的持仓记录，如当前未持有该票，返回PositionRecord()
 
+    :param Datetime date: 指定日期
     :param Stock stock: 指定的证券
     :rtype: PositionRecord)")
 
@@ -180,7 +407,7 @@ void export_TradeManager() {
       .def("get_borrow_stock_cost", &TradeManagerBase::getBorrowStockCost)
       .def("get_return_stock_cost", &TradeManagerBase::getReturnStockCost)
 
-      .def("cash", &TradeManagerBase::cash, (arg("datetime"), arg("ktype") = KQuery::DAY),
+      .def("cash", &TradeManagerBase::cash, py::arg("datetime"), py::arg("ktype") = KQuery::DAY,
            R"(cash(self, datetime[, ktype=Query.KType.DAY])
 
     获取指定时刻的现金。（注：如果不带日期参数，无法根据权息信息调整持仓。）
@@ -189,8 +416,8 @@ void export_TradeManager() {
     :param ktype: K线类型
     :rtype: float)")
 
-      .def("get_funds", getFunds_1, (arg("ktype")))
-      .def("get_funds", getFunds_2, (arg("datetime"), arg("ktype") = KQuery::DAY),
+      .def("get_funds", getFunds_1, py::arg("ktype"))
+      .def("get_funds", getFunds_2, py::arg("datetime"), py::arg("ktype") = KQuery::DAY,
            R"(get_funds(self, [datetime, ktype = Query.DAY])
 
     获取指定时刻的资产市值详情
@@ -199,8 +426,8 @@ void export_TradeManager() {
     :param Query.KType ktype: K线类型
     :rtype: FundsRecord)")
 
-      .def("get_funds_curve", &TradeManagerBase::getFundsCurve,
-           (arg("dates"), arg("ktype") = KQuery::DAY),
+      .def("get_funds_curve", &TradeManagerBase::getFundsCurve, py::arg("dates"),
+           py::arg("ktype") = KQuery::DAY,
            R"(get_funds_curve(self, dates[, ktype = Query.DAY])
 
     获取资产净值曲线
@@ -210,8 +437,8 @@ void export_TradeManager() {
     :return: 资产净值列表
     :rtype: PriceList)")
 
-      .def("get_profit_curve", &TradeManagerBase::getProfitCurve,
-           (arg("dates"), arg("ktype") = KQuery::DAY),
+      .def("get_profit_curve", &TradeManagerBase::getProfitCurve, py::arg("dates"),
+           py::arg("ktype") = KQuery::DAY,
            R"(get_profit_curve(self, dates[, ktype = Query.DAY])
 
     获取收益曲线，即扣除历次存入资金后的资产净值曲线
@@ -245,9 +472,9 @@ void export_TradeManager() {
       .def("return_stock", &TradeManagerBase::returnStock)
 
       .def(
-        "buy", &TradeManagerBase::buy,
-        (arg("datetime"), arg("stock"), arg("real_price"), arg("num"), arg("stoploss") = 0.0,
-         arg("goal_price") = 0.0, arg("plan_price") = 0.0, arg("part") = PART_INVALID),
+        "buy", &TradeManagerBase::buy, py::arg("datetime"), py::arg("stock"), py::arg("real_price"),
+        py::arg("num"), py::arg("stoploss") = 0.0, py::arg("goal_price") = 0.0,
+        py::arg("plan_price") = 0.0, py::arg("part") = PART_INVALID,
         R"(buy(self, datetime, stock, real_price, number[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID])
 
     买入操作
@@ -263,10 +490,9 @@ void export_TradeManager() {
     :rtype: TradeRecord)")
 
       .def(
-        "sell", &TradeManagerBase::sell,
-        (arg("datetime"), arg("stock"), arg("real_price"), arg("num") = MAX_DOUBLE,
-         arg("stoploss") = 0.0, arg("goal_price") = 0.0, arg("plan_price") = 0.0,
-         arg("part") = PART_INVALID),
+        "sell", &TradeManagerBase::sell, py::arg("datetime"), py::arg("stock"),
+        py::arg("real_price"), py::arg("num") = MAX_DOUBLE, py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("plan_price") = 0.0, py::arg("part") = PART_INVALID,
         R"(sell(self, datetime, stock, realPrice[, number=constant.max_double, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID])
 
     卖出操作
@@ -298,16 +524,12 @@ void export_TradeManager() {
 
     :param str path: 输出文件所在目录)")
 
-      .def("update_with_weight", &TradeManager::updateWithWeight, R"(update_with_weight(self, date)
+      .def("update_with_weight", &TradeManagerBase::updateWithWeight,
+           R"(update_with_weight(self, date)
 
-    根据权息信息更新当前持仓及交易记录，必须按时间顺序被调用
+      根据权息信息更新当前持仓及交易记录，必须按时间顺序被调用
 
-    :param Datetime date: 当前时刻)")
+      :param Datetime date: 当前时刻)")
 
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(name_init_pickle_suite<TradeManagerBase>())
-#endif
-      ;
-
-    register_ptr_to_python<TradeManagerPtr>();
+        DEF_PICKLE(TradeManagerPtr);
 }

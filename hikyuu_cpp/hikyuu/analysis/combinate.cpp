@@ -115,7 +115,7 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
                         per.statistics(n_tm, Datetime::now());
                         CombinateAnalysisOutput out;
                         out.combinateName = n_sg->name();
-                        out.code = n_stk.code();
+                        out.market_code = n_stk.market_code();
                         out.name = n_stk.name();
                         out.values = per.values();
                         ret.emplace_back(out);

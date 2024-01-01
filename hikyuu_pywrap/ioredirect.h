@@ -11,10 +11,10 @@
  *      modified from https://github.com/pybind/pybind11/include/pybind11/iostream.h
  */
 
+#pragma once
 #ifndef IOREDIRECT_H_
 #define IOREDIRECT_H_
 
-#include <boost/python.hpp>
 #include <streambuf>
 #include <ostream>
 #include <string>
@@ -22,7 +22,7 @@
 #include <iostream>
 #include <hikyuu/Log.h>
 
-using namespace boost::python;
+using namespace pybind11;
 
 // Buffer that writes to Python instead of C++
 class pythonbuf : public std::streambuf {
@@ -74,7 +74,7 @@ protected:
 
 public:
     scoped_ostream_redirect(std::ostream &costream = std::cout,
-                            object pyostream = import("sys").attr("stdout"))
+                            object pyostream = module::import("sys").attr("stdout"))
     : costream(costream), buffer(pyostream) {
         old = costream.rdbuf(&buffer);
     }
@@ -92,7 +92,7 @@ public:
 class scoped_estream_redirect : public scoped_ostream_redirect {
 public:
     scoped_estream_redirect(std::ostream &costream = std::cerr,
-                            object pyostream = import("sys").attr("stderr"))
+                            object pyostream = module::import("sys").attr("stderr"))
     : scoped_ostream_redirect(costream, pyostream) {}
 };
 

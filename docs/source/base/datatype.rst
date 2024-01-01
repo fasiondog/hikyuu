@@ -42,6 +42,7 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
     .. py:attribute:: ymdh YYYYMMDDhh 形式的整数
     .. py:attribute:: ymdhm YYYYMMDDhhmm 形式的整数
     .. py:attribute:: ymdhms YYYYMMDDhhmmss 形式的整数
+    .. py:attribute:: ticks 距离最小日期过去的微秒数
     .. py:attribute:: hex 兼容oracle datetime 表示, 返回用后7个字节表示世纪、世纪年、月、日、时、分、秒的64位整数
 
     .. py:method:: date(self)

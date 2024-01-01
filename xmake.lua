@@ -154,13 +154,13 @@ add_requires("myboost " .. boost_version, {
     filesystem = true,
     serialization = true,
     system = false,
-    python = true,
-    pyver = get_config("pyver"),
+    -- python = false,
+    -- pyver = get_config("pyver"),
   },
 })
-if is_plat("windows") then
-  add_requireconfs("myboost.python", {override = true, system=false})
-end
+-- if is_plat("windows") then
+--   add_requireconfs("myboost.python", {override = true, system=false})
+-- end
 
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true, vs_runtime = "MD"}})
 add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})

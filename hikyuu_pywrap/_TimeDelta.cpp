@@ -7,12 +7,11 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/serialization/TimeDelta_serialization.h>
-#include "pickle_support.h"
+#include "pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
 double (TimeDelta::*TimeDelta_div_1)(TimeDelta) const = &TimeDelta::operator/;
 TimeDelta (TimeDelta::*TimeDelta_div_2)(double) const = &TimeDelta::operator/;
@@ -20,9 +19,9 @@ TimeDelta (TimeDelta::*TimeDelta_div_2)(double) const = &TimeDelta::operator/;
 TimeDelta (TimeDelta::*TimeDelta_pos)() const = &TimeDelta::operator+;
 TimeDelta (TimeDelta::*TimeDelta_neg)() const = &TimeDelta::operator-;
 
-void export_TimeDelta() {
-    class_<TimeDelta>("TimeDelta",
-                      R"(时间时长，用于时间计算。可通过以下方式构建：
+void export_TimeDelta(py::module& m) {
+    py::class_<TimeDelta>(m, "TimeDelta",
+                          R"(时间时长，用于时间计算。可通过以下方式构建：
 
     - 通过 datetime.timedelta 构建。TimdeDelta(timedelta实例)
     - TimeDelta(days=0, hours=0, minutes=0, seconds=0, milliseconds=0, microseconds=0)
@@ -37,21 +36,21 @@ void export_TimeDelta() {
     以上参数限制，主要为防止求总微秒数时可能出现溢出的情况。如只使用一个参数不希望存在上述限制时，可使用快捷函数：
     Days, Hours, Minutes, Seconds, Milliseconds, Microseconds)")
 
-      .def(init<>())
-      .def(init<int64_t, int64_t, int64_t, int64_t, int64_t, int64_t>(
-        (arg("days") = 0, arg("hours") = 0, arg("minutes") = 0, arg("seconds") = 0,
-         arg("milliseconds") = 0, arg("microseconds") = 0)))
+      .def(py::init<>())
+      .def(py::init<int64_t, int64_t, int64_t, int64_t, int64_t, int64_t>(), py::arg("days") = 0,
+           py::arg("hours") = 0, py::arg("minutes") = 0, py::arg("seconds") = 0,
+           py::arg("milliseconds") = 0, py::arg("microseconds") = 0)
 
       .def("__str__", &TimeDelta::str)
       .def("__repr__", &TimeDelta::repr)
 
-      .add_property("days", &TimeDelta::days, "天数 [-99999999, 99999999]")
-      .add_property("hours", &TimeDelta::hours, "小时数 [0, 23]")
-      .add_property("minutes", &TimeDelta::minutes, "分钟数 [0, 59]")
-      .add_property("seconds", &TimeDelta::seconds, "秒数 [0, 59]")
-      .add_property("milliseconds", &TimeDelta::milliseconds, "毫秒数 [0, 999]")
-      .add_property("microseconds", &TimeDelta::microseconds, "微秒数 [0, 999]")
-      .add_property("ticks", &TimeDelta::ticks, "同总微秒数")
+      .def_property_readonly("days", &TimeDelta::days, "天数 [-99999999, 99999999]")
+      .def_property_readonly("hours", &TimeDelta::hours, "小时数 [0, 23]")
+      .def_property_readonly("minutes", &TimeDelta::minutes, "分钟数 [0, 59]")
+      .def_property_readonly("seconds", &TimeDelta::seconds, "秒数 [0, 59]")
+      .def_property_readonly("milliseconds", &TimeDelta::milliseconds, "毫秒数 [0, 999]")
+      .def_property_readonly("microseconds", &TimeDelta::microseconds, "微秒数 [0, 999]")
+      .def_property_readonly("ticks", &TimeDelta::ticks, "同总微秒数")
 
       .def("isNegative", &TimeDelta::isNegative, R"(isNegative(self)
 
@@ -94,35 +93,30 @@ void export_TimeDelta() {
     支持的最大时长
 
     :return: TimeDelta(99999999, 23, 59, 59, 999, 999))")
-      .staticmethod("max")
 
       .def("min", &TimeDelta::min, R"(min()
 
     支持的最小时长
 
     :return: TimeDelta(-99999999, 0, 0, 0, 0, 0))")
-      .staticmethod("min")
 
       .def("resolution", &TimeDelta::resolution, R"(resolution()
 
     支持的最小精度
         
     :return: TimeDelta(0, 0, 0, 0, 0, 1))")
-      .staticmethod("resolution")
 
       .def("max_ticks", &TimeDelta::maxTicks, R"(max_ticks()
 
     支持的最大 ticks （即微秒数）
 
     :rtype: int)")
-      .staticmethod("max_ticks")
 
       .def("min_ticks", &TimeDelta::minTicks, R"(min_ticks()
 
     支持的最小 ticks （即微秒数）
 
     :rtype: int)")
-      .staticmethod("min_ticks")
 
       .def("from_ticks", &TimeDelta::fromTicks, R"(from_ticks(ticks)
 
@@ -130,20 +124,19 @@ void export_TimeDelta() {
 
     :param int ticks: 微秒数
     :rtype: TimeDelta)")
-      .staticmethod("from_ticks")
 
-      .def(self == self)
-      .def(self != self)
-      .def(self >= self)
-      .def(self <= self)
-      .def(self > self)
-      .def(self < self)
-      .def(-self)
-      .def(+self)
-      .def(self + self)
-      .def(self - self)
-      .def(self % self)
-      .def(self * float())
+      .def(py::self == py::self)
+      .def(py::self != py::self)
+      .def(py::self >= py::self)
+      .def(py::self <= py::self)
+      .def(py::self > py::self)
+      .def(py::self < py::self)
+      .def(-py::self)
+      .def(+py::self)
+      .def(py::self + py::self)
+      .def(py::self - py::self)
+      .def(py::self % py::self)
+      .def(py::self * float())
 
       .def("__abs__", &TimeDelta::abs)
       .def("__rmul__", &TimeDelta::operator*)
@@ -151,47 +144,44 @@ void export_TimeDelta() {
       .def("__truediv__", TimeDelta_div_2)
       .def("__floordiv__", &TimeDelta::floorDiv)
 
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<TimeDelta>())
-#endif
-      ;
+        DEF_PICKLE(TimeDelta);
 
-    def("Days", Days, R"(Days(days)
+    m.def("Days", Days, R"(Days(days)
 
       TimeDelta 快捷创建函数
 
       :param int days: 天数 [-99999999, 99999999]
       :rtype: TimeDelta)");
 
-    def("Hours", Hours, R"(Hours(hours)
+    m.def("Hours", Hours, R"(Hours(hours)
 
       TimeDelta 快捷创建函数
 
       :param int hours: 小时数
       :rtype: TimeDelta)");
 
-    def("Minutes", Minutes, R"(Minutes(mins)
+    m.def("Minutes", Minutes, R"(Minutes(mins)
 
       TimeDelta 快捷创建函数
 
       :param int mins: 分钟数
       :rtype: TimeDelta)");
 
-    def("Seconds", Seconds, R"(Seconds(secs)
+    m.def("Seconds", Seconds, R"(Seconds(secs)
 
       TimeDelta 快捷创建函数
 
       :param int secs: 秒数
       :rtype: TimeDelta)");
 
-    def("Milliseconds", Milliseconds, R"(Milliseconds(milliseconds)
+    m.def("Milliseconds", Milliseconds, R"(Milliseconds(milliseconds)
 
       TimeDelta 快捷创建函数
 
       :param int milliseconds: 毫秒数
       :rtype: TimeDelta)");
 
-    def("Microseconds", Microseconds, R"(Microseconds(microsecs)
+    m.def("Microseconds", Microseconds, R"(Microseconds(microsecs)
 
       TimeDelta 快捷创建函数
 

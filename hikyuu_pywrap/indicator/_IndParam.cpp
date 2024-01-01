@@ -5,19 +5,19 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/indicator/Indicator.h>
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 using namespace hku;
 
-void export_IndParam() {
-    class_<IndParam>("IndParam", "技术指标", init<>())
-      .def(init<IndicatorImpPtr>())
-      .def(init<Indicator>())
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
+void export_IndParam(py::module& m) {
+    py::class_<IndParam>(m, "IndParam", "技术指标")
+      .def(py::init<>())
+      .def(py::init<IndicatorImpPtr>())
+      .def(py::init<Indicator>())
+      .def("__str__", to_py_str<IndParam>)
+      .def("__repr__", to_py_str<IndParam>)
 
       .def("get", &IndParam::get)
       .def("get_imp", &IndParam::getImp);

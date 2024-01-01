@@ -5,22 +5,21 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/trade_manage/PositionRecord.h>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #endif
 
-void export_PositionRecord() {
-    class_<PositionRecord>("PositionRecord", "持仓记录", init<>())
-      .def(init<const Stock&, const Datetime&, const Datetime&, double, price_t, price_t, double,
-                price_t, price_t, price_t, price_t>())
+void export_PositionRecord(py::module& m) {
+    py::class_<PositionRecord>(m, "PositionRecord", "持仓记录")
+      .def(py::init<>())
+      .def(py::init<const Stock&, const Datetime&, const Datetime&, double, price_t, price_t,
+                    double, price_t, price_t, price_t, price_t>())
 
       .def("__str__", &PositionRecord::toString)
       .def("__repr__", &PositionRecord::toString)
@@ -38,17 +37,5 @@ void export_PositionRecord() {
       .def_readwrite("total_risk", &PositionRecord::totalRisk,
                      "累计交易风险（float） = 各次 （买入价格-止损)*买入数量, 不包含交易成本")
       .def_readwrite("sell_money", &PositionRecord::sellMoney, "累计卖出资金（float）")
-
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<PositionRecord>())
-#endif
-      ;
-
-    class_<PositionRecordList>("PositionRecordList",
-                               "持仓记录列表，C++ std::vector<PositionRecord>包装")
-      .def(vector_indexing_suite<PositionRecordList>())
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<PositionRecordList>())
-#endif
-      ;
+        DEF_PICKLE(PositionRecord);
 }

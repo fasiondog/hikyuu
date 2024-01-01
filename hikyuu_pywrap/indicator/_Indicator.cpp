@@ -5,12 +5,10 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/indicator/Indicator.h>
-#include "../_Parameter.h"
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 using namespace hku;
 
 string (Indicator::*ind_read_name)() const = &Indicator::name;
@@ -26,15 +24,17 @@ Indicator (Indicator::*ind_call_3)() = &Indicator::operator();
 void (Indicator::*setIndParam1)(const string&, const Indicator&) = &Indicator::setIndParam;
 void (Indicator::*setIndParam2)(const string&, const IndParam&) = &Indicator::setIndParam;
 
-void export_Indicator() {
-    class_<Indicator>("Indicator", "技术指标", init<>())
-      .def(init<IndicatorImpPtr>())
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
+void export_Indicator(py::module& m) {
+    py::class_<Indicator>(m, "Indicator", "技术指标")
+      .def(py::init<>())
+      .def(py::init<IndicatorImpPtr>(), py::keep_alive<1, 2>())
+      .def("__str__", to_py_str<Indicator>)
+      .def("__repr__", to_py_str<Indicator>)
 
-      .add_property("name", ind_read_name, ind_write_name, "指标名称")
-      .add_property("long_name", &Indicator::long_name, "返回形如：Name(param1_val,param2_val,...)")
-      .add_property("discard", &Indicator::discard, "结果中需抛弃的个数")
+      .def_property("name", ind_read_name, ind_write_name, "指标名称")
+      .def_property_readonly("long_name", &Indicator::long_name,
+                             "返回形如：Name(param1_val,param2_val,...)")
+      .def_property_readonly("discard", &Indicator::discard, "结果中需抛弃的个数")
 
       .def("set_discard", &Indicator::setDiscard, R"(set_discard(self, discard)
     
@@ -49,7 +49,7 @@ void export_Indicator() {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &Indicator::setParam<object>, R"(set_param(self, name, value)
+      .def("set_param", &Indicator::setParam<boost::any>, R"(set_param(self, name, value)
 
     设置参数
 
@@ -93,7 +93,7 @@ void export_Indicator() {
 
     :rtype: int)")
 
-      .def("get", &Indicator::get, (arg("pos"), arg("result_index") = 0),
+      .def("get", &Indicator::get, py::arg("pos"), py::arg("result_index") = 0,
            R"(get(self, pos[, result_index=0])
 
     获取指定位置的值
@@ -116,7 +116,8 @@ void export_Indicator() {
     :param int pos: 指定的位置索引
     :rtype: float)")
 
-      .def("get_by_datetime", &Indicator::getByDate, (arg("datetime"), arg("result_index") = 0),
+      .def("get_by_datetime", &Indicator::getByDate, py::arg("datetime"),
+           py::arg("result_index") = 0,
            R"(get_by_datetime(self, date[, result_index=0])
 
     获取指定日期数值。如果对应日期无结果，返回 constant.null_price
@@ -173,60 +174,68 @@ set_context(self, stock, query)
       .def("__call__", ind_call_2)
       .def("__call__", ind_call_3)
 
-      .def(self + self)
-      .def(self + other<price_t>())
-      .def(other<price_t>() + self)
+      .def(
+        "to_np",
+        [](const Indicator& self) {
+            py::array_t<price_t> ret;
+            auto imp = self.getImp();
+            HKU_IF_RETURN(!imp, ret);
+            ret = py::array_t<price_t>(self.size(), imp->data(0));
+            return ret;
+        },
+        "转化为np.array，如果indicator存在多个值，只返回第一个")
 
-      .def(self - self)
-      .def(self - other<price_t>())
-      .def(other<price_t>() - self)
+      .def(py::self + py::self)
+      .def(py::self + price_t())
+      .def(price_t() + py::self)
 
-      .def(self * self)
-      .def(self * other<price_t>())
-      .def(other<price_t>() * self)
+      .def(py::self - py::self)
+      .def(py::self - price_t())
+      .def(price_t() - py::self)
 
-      .def(self / self)
-      .def(self / other<price_t>())
-      .def(other<price_t>() / self)
+      .def(py::self * py::self)
+      .def(py::self * price_t())
+      .def(price_t() * py::self)
 
-      .def(self == self)
-      .def(self == other<price_t>())
-      .def(other<price_t>() == self)
+      .def(py::self / py::self)
+      .def(py::self / price_t())
+      .def(price_t() / py::self)
 
-      .def(self != self)
-      .def(self != other<price_t>())
-      .def(other<price_t>() != self)
+      .def(py::self == py::self)
+      .def(py::self == price_t())
+      .def(price_t() == py::self)
 
-      .def(self >= self)
-      .def(self >= other<price_t>())
-      .def(other<price_t>() >= self)
+      .def(py::self != py::self)
+      .def(py::self != price_t())
+      .def(price_t() != py::self)
 
-      .def(self <= self)
-      .def(self <= other<price_t>())
-      .def(other<price_t>() <= self)
+      .def(py::self >= py::self)
+      .def(py::self >= price_t())
+      .def(price_t() >= py::self)
 
-      .def(self > self)
-      .def(self > other<price_t>())
-      .def(other<price_t>() > self)
+      .def(py::self <= py::self)
+      .def(py::self <= price_t())
+      .def(price_t() <= py::self)
 
-      .def(self < self)
-      .def(self < other<price_t>())
-      .def(other<price_t>() < self)
+      .def(py::self > py::self)
+      .def(py::self > price_t())
+      .def(price_t() > py::self)
 
-      .def(self % self)
-      .def(self % other<price_t>())
-      .def(other<price_t>() % self)
+      .def(py::self < py::self)
+      .def(py::self < price_t())
+      .def(price_t() < py::self)
 
-      .def(self & self)
-      .def(self & other<price_t>())
-      .def(other<price_t>() & self)
+      .def(py::self % py::self)
+      .def(py::self % price_t())
+      .def(price_t() % py::self)
 
-      .def(self | self)
-      .def(self | other<price_t>())
-      .def(other<price_t>() | self)
+      .def(py::self & py::self)
+      .def(py::self & price_t())
+      .def(price_t() & py::self)
 
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<Indicator>())
-#endif
-      ;
+      .def(py::self | py::self)
+      .def(py::self | price_t())
+      .def(price_t() | py::self)
+
+        DEF_PICKLE(Indicator);
 }

@@ -5,13 +5,11 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/serialization/KRecord_serialization.h>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include "pickle_support.h"
+#include "pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
@@ -20,12 +18,14 @@ using namespace hku;
 bool (*krecord_eq)(const KRecord&, const KRecord&) = operator==;
 bool (*krecord_ne)(const KRecord&, const KRecord&) = operator!=;
 
-void export_KReord() {
-    class_<KRecord>("KRecord", "K线记录，组成K线数据，属性可读写", init<>())
-      .def(init<const Datetime&>())
-      .def(init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t>())
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
+void export_KReord(py::module& m) {
+    py::class_<KRecord>(m, "KRecord", "K线记录，组成K线数据，属性可读写")
+      .def(py::init<>())
+      .def(py::init<const Datetime&>())
+      .def(py::init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t>())
+
+      .def("__str__", to_py_str<KRecord>)
+      .def("__repr__", to_py_str<KRecord>)
 
       .def_readwrite("datetime", &KRecord::datetime, "时间")
       .def_readwrite("open", &KRecord::openPrice, "开盘价")
@@ -38,12 +38,5 @@ void export_KReord() {
       .def("__eq__", krecord_eq)
       .def("__ne__", krecord_ne)
 
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<KRecord>())
-#endif
-      ;
-
-    class_<KRecordList>("KRecordList").def(vector_indexing_suite<KRecordList>());
-
-    register_ptr_to_python<KRecordListPtr>();
+        DEF_PICKLE(KRecord);
 }

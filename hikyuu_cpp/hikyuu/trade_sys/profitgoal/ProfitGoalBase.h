@@ -47,7 +47,7 @@ public:
     KData getTO() const;
 
     /** 获取名称 */
-    string name() const;
+    const string& name() const;
 
     /** 设置名称 */
     void name(const string& name);
@@ -173,7 +173,7 @@ inline KData ProfitGoalBase::getTO() const {
     return m_kdata;
 }
 
-inline string ProfitGoalBase::name() const {
+inline const string& ProfitGoalBase::name() const {
     return m_name;
 }
 
