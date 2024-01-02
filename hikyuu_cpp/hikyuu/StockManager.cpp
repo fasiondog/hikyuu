@@ -254,7 +254,7 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
         }
     }
 
-    initInnerTasek();
+    initInnerTask();
 }
 
 void StockManager::reload() {
