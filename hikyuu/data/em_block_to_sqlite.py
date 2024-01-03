@@ -69,7 +69,8 @@ if __name__ == "__main__":
     import sqlite3
     from hikyuu.data.common_sqlite3 import create_database
 
-    dest_dir = "/home/fasiondog/stock"
+    # dest_dir = "/home/fasiondog/stock"
+    dest_dir = "d:\\stock"
 
     connect = sqlite3.connect(dest_dir + "/stock.db")
     create_database(connect)

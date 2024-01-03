@@ -36,6 +36,11 @@ public:
     bool init(const Parameter& params);
 
     /**
+     * 子类如果需要缓存，可实现该方法将数据加载至自身的缓存
+     */
+    virtual void load() {}
+
+    /**
      * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
      */
     virtual bool _init() = 0;

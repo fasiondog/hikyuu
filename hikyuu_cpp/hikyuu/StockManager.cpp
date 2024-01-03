@@ -136,6 +136,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     setKDataDriver(DataDriverFactory::getKDataDriverPool(m_kdataDriverParam));
 
+    // 加载 block，须在 stock 的 kdatadriver 被设置之后调用
+    m_blockDriver->load();
+
     // add special Market, for temp csv file
     m_marketInfoDict["TMP"] =
       MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>(),
