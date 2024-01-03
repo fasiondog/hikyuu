@@ -73,7 +73,7 @@ if __name__ == "__main__":
     host = '192.168.5.7'
     port = 30006
     usr = 'root'
-    pwd = '#^qCWM!17Yt_x06z'
+    pwd = ''
 
     src_dir = "D:\\TdxW_HuaTai"
     quotations = ['stock', 'fund']  # 通达信盘后数据没有债券
