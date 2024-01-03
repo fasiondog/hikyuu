@@ -23,6 +23,7 @@
 
 #if HKU_ENABLE_MYSQL_KDATA
 #include "base_info/mysql/MySQLBaseInfoDriver.h"
+#include "block_info/mysql/MySQLBlockInfoDriver.h"
 #include "kdata/mysql/MySQLKDataDriver.h"
 #endif
 
@@ -54,6 +55,7 @@ void DataDriverFactory::init() {
 
 #if HKU_ENABLE_MYSQL_KDATA
     DataDriverFactory::regBaseInfoDriver(make_shared<MySQLBaseInfoDriver>());
+    DataDriverFactory::regBlockDriver(make_shared<MySQLBlockInfoDriver>());
 #endif
 
     m_kdataPrototypeDrivers = new map<string, KDataDriverPtr>();

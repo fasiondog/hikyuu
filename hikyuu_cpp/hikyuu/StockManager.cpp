@@ -268,6 +268,8 @@ void StockManager::reload() {
     loadAllStocks();
     loadAllStockWeights();
 
+    m_blockDriver->load();
+
     HKU_INFO("start reload kdata to buffer");
     std::vector<Stock> can_not_parallel_stk_list;  // 记录不支持并行加载的Stock
     {
