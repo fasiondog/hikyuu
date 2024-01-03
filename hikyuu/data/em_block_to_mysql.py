@@ -11,7 +11,7 @@ from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_block_em import *
 
 
-def em_import_block_to_sqlite(connect, code_market_dict):
+def em_import_block_to_mysql(connect, code_market_dict):
     all_block_info = {}
     hku_info("获取行业板块信息")
 
@@ -36,8 +36,9 @@ def em_import_block_to_sqlite(connect, code_market_dict):
 
     hku_info("更新数据库")
     cur = connect.cursor()
-    sql = "select category from block"
-    all_block_in_db = cur.execute(sql).fetchall()
+    sql = "select category from hku_base.block"
+    cur.execute(sql)
+    all_block_in_db = cur.fetchall()
     all_block_in_db = [v[0] for v in all_block_in_db]
 
     update_records = []
@@ -54,10 +55,10 @@ def em_import_block_to_sqlite(connect, code_market_dict):
             insert_records.append((category, json.dumps(all_block_info[category], ensure_ascii=False)))
 
     if update_records:
-        sql = "update block set content=? where category=?"
+        sql = "update hku_base.block set content=%s where category=%s"
         cur.executemany(sql, update_records)
     if insert_records:
-        sql = "insert into block (category, content) values (?,?)"
+        sql = "insert into hku_base.block (category, content) values (%s,%s)"
         cur.executemany(sql, insert_records)
 
     connect.commit()
@@ -66,13 +67,18 @@ def em_import_block_to_sqlite(connect, code_market_dict):
 
 
 if __name__ == "__main__":
-    import sqlite3
-    from hikyuu.data.common_sqlite3 import create_database
+    import mysql
+    from hikyuu.data.common_mysql import create_database
 
-    # dest_dir = "/home/fasiondog/stock"
-    dest_dir = "d:\\stock"
+    host = '192.168.5.7'
+    port = 30006
+    usr = 'root'
+    pwd = '#^qCWM!17Yt_x06z'
 
-    connect = sqlite3.connect(dest_dir + "/stock.db")
+    src_dir = "D:\\TdxW_HuaTai"
+    quotations = ['stock', 'fund']  # 通达信盘后数据没有债券
+
+    connect = mysql.connector.connect(user=usr, password=pwd, host=host, port=port)
     create_database(connect)
 
     x = get_stk_code_name_list(MARKET.SH)
@@ -81,6 +87,5 @@ if __name__ == "__main__":
         code_market_dict[v["code"]] = MARKET.SH
     # print(code_market_dict)
 
-    em_import_block_to_sqlite(connect, code_market_dict)
-
+    em_import_block_to_mysql(connect, code_market_dict)
     connect.close()

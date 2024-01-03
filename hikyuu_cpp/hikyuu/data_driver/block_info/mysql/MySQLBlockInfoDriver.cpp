@@ -26,7 +26,14 @@ bool MySQLBlockInfoDriver::_init() {
     return true;
 }
 
+struct StockTypeInfoTable {
+    TABLE_BIND2(StockTypeInfoTable, stocktypeinfo, type, tick)
+    int64_t type;
+    double tick;
+};
+
 void MySQLBlockInfoDriver::load() {
+    SPEND_TIME(MySQLBlockInfoDriver_load);
     Parameter connect_param;
     connect_param.set<string>("host", getParamFromOther<string>(m_params, "host", "127.0.0.1"));
     connect_param.set<string>("usr", getParamFromOther<string>(m_params, "usr", "root"));
@@ -40,18 +47,18 @@ void MySQLBlockInfoDriver::load() {
     vector<MySQLBlockTable> records;
     connect.batchLoad(records);
 
-    unordered_map<string, Block> tmp;
     for (const auto& record : records) {
+        unordered_map<string, Block> tmp;
         json blks = json::parse(record.content);
         for (json::iterator it = blks.begin(); it != blks.end(); ++it) {
             Block blk(record.category, it.key());
             for (const auto& codes : it.value()) {
+                std::cout << codes << std::endl;
                 blk.add(codes);
             }
             tmp[it.key()] = blk;
         }
         m_buffer[record.category] = std::move(tmp);
-        tmp.clear();
     }
 }
 
