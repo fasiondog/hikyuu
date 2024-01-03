@@ -70,8 +70,8 @@ if __name__ == "__main__":
     import mysql
     from hikyuu.data.common_mysql import create_database
 
-    host = '192.168.5.7'
-    port = 30006
+    host = '127.0.0.1'
+    port = 3306
     usr = 'root'
     pwd = ''
 
