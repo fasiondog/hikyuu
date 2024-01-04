@@ -44,7 +44,7 @@ class ImportBlockInfoTask:
             for market in (MARKET.SH, MARKET.SZ, MARKET.BJ):
                 x = get_stk_code_name_list(market)
                 for v in x:
-                    code_market_dict[v["code"]] = MARKET.SH
+                    code_market_dict[v["code"]] = market
             import_block(connect, code_market_dict, self.categorys)
         except Exception as e:
             hku_error(str(e))
