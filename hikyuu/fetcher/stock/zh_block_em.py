@@ -117,7 +117,8 @@ def get_all_zsbk_info(code_market_dict, sep=""):
     for i in range(total):
         blk_name = blk_names[i]
         blk_code = blk_codes[i]
-        print(i, blk_name)
+        hku_info("{} 获取指数板块 {} 详情", i, blk_name)
+        # print(i, blk_name)
         # 沪深指数有重复，避免深指覆盖
         if blk_name in ret:
             continue

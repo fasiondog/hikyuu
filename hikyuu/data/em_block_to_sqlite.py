@@ -11,28 +11,32 @@ from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_block_em import *
 
 
-def em_import_block_to_sqlite(connect, code_market_dict):
+def em_import_block_to_sqlite(connect, code_market_dict, categorys=('行业板块', '概念板块', '地域板块', '指数板块')):
     all_block_info = {}
-    hku_info("获取行业板块信息")
 
-    x = get_all_hybk_info(code_market_dict)
-    if x:
-        all_block_info["行业板块"] = x
+    if '行业板块' in categorys:
+        hku_info("获取行业板块信息")
+        x = get_all_hybk_info(code_market_dict)
+        if x:
+            all_block_info["行业板块"] = x
 
-    hku_info("获取概念板块信息")
-    x = get_all_gnbk_info(code_market_dict)
-    if x:
-        all_block_info["概念板块"] = x
+    if '概念板块' in categorys:
+        hku_info("获取概念板块信息")
+        x = get_all_gnbk_info(code_market_dict)
+        if x:
+            all_block_info["概念板块"] = x
 
-    hku_info("获取地域板块信息")
-    x = get_all_dybk_info(code_market_dict)
-    if x:
-        all_block_info["地域板块"] = x
+    if '地域板块' in categorys:
+        hku_info("获取地域板块信息")
+        x = get_all_dybk_info(code_market_dict)
+        if x:
+            all_block_info["地域板块"] = x
 
-    hku_info("获取指数板块信息")
-    x = get_all_zsbk_info(code_market_dict)
-    if x:
-        all_block_info["指数板块"] = x
+    if '指数板块' in categorys:
+        hku_info("获取指数板块信息")
+        x = get_all_zsbk_info(code_market_dict)
+        if x:
+            all_block_info["指数板块"] = x
 
     hku_info("更新数据库")
     cur = connect.cursor()

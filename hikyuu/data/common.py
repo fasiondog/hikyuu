@@ -46,16 +46,16 @@ class MARKETID:
 
 
 class STOCKTYPE:
-    BLOCK = 0  #板块
-    A = 1  #A股
-    INDEX = 2  #指数
-    B = 3  #B股
-    FUND = 4  #基金（非ETF）
-    ETF = 5  #ETF
-    ND = 6  #国债
-    BOND = 7  #其他债券
-    GEM = 8  #创业板
-    START = 9  #科创板
+    BLOCK = 0  # 板块
+    A = 1  # A股
+    INDEX = 2  # 指数
+    B = 3  # B股
+    FUND = 4  # 基金（非ETF）
+    ETF = 5  # ETF
+    ND = 6  # 国债
+    BOND = 7  # 其他债券
+    GEM = 8  # 创业板
+    START = 9  # 科创板
 
 
 def get_stktype_list(quotations=None):
@@ -127,10 +127,10 @@ def get_index_code_name_list() -> list:
     """
     获取所有股票指数代码名称列表
     从新浪获取，多次频繁调用会被封禁IP，需10分钟后再试
-    
+
     :return: [{'market_code': 'SHxxx'}, ...]
     """
-    df = ak.stock_zh_index_spot()
+    df = ak.stock_zh_index_spot_em()
     return [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
 
 

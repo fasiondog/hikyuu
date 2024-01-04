@@ -231,6 +231,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             logger = logging.getLogger(name)
             logger.addHandler(self.log_handler)
             logger.setLevel(logging.DEBUG)
+            # logger.setLevel(logging.INFO)
 
         # 多进程日志队列
         self.mp_log_q = multiprocessing.Queue()
@@ -657,6 +658,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 # self.finance_progressBar.setValue(msg[2])
                 self.logger.info(f"财务数据下载: {msg[2]}%")
 
+            elif msg_task_name == 'IMPORT_BLOCKINFO':
+                if msg[2] != 'FINISHED':
+                    self.import_detail_textEdit.append(msg[2])
+
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
         config = self.getCurrentConfig()
@@ -773,6 +778,7 @@ if __name__ == "__main__":
     import urllib
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("pytdx").setLevel(logging.WARNING)
 
     # 自适应分辨率，防止字体显示不全
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
