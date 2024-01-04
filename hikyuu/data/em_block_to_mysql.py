@@ -36,29 +36,18 @@ def em_import_block_to_mysql(connect, code_market_dict):
 
     hku_info("更新数据库")
     cur = connect.cursor()
-    sql = "select category from hku_base.block"
+    sql = "delete from hku_base.block where category in ('行业板块', '概念板块', '地域板块', '指数板块')"
     cur.execute(sql)
-    all_block_in_db = cur.fetchall()
-    all_block_in_db = [v[0] for v in all_block_in_db]
 
-    update_records = []
     insert_records = []
 
-    if all_block_in_db:
-        for category in all_block_info:
-            if category in all_block_in_db:
-                update_records.append((json.dumps(all_block_info[category], ensure_ascii=False), category))
-            else:
-                insert_records.append((category, json.dumps(all_block_info[category], ensure_ascii=False)))
-    else:
-        for category in all_block_info:
-            insert_records.append((category, json.dumps(all_block_info[category], ensure_ascii=False)))
+    for category in all_block_info:
+        for name in all_block_info[category]:
+            for code in all_block_info[category][name]:
+                insert_records.append((category, name, code))
 
-    if update_records:
-        sql = "update hku_base.block set content=%s where category=%s"
-        cur.executemany(sql, update_records)
     if insert_records:
-        sql = "insert into hku_base.block (category, content) values (%s,%s)"
+        sql = "insert into hku_base.block (category, name, market_code) values (%s,%s,%s)"
         cur.executemany(sql, insert_records)
 
     connect.commit()

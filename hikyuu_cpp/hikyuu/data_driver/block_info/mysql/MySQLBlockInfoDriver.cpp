@@ -5,19 +5,17 @@
  *    1. 20240102 added by fasiondog
  */
 
-#include <nlohmann/json.hpp>
 #include "hikyuu/utilities/db_connect/mysql/MySQLConnect.h"
 #include "hikyuu/utilities/db_connect/TableMacro.h"
 #include "MySQLBlockInfoDriver.h"
 
-using json = nlohmann::json;
-
 namespace hku {
 
 struct MySQLBlockTable {
-    TABLE_BIND2(MySQLBlockTable, block, category, content)
+    TABLE_BIND3(MySQLBlockTable, block, category, name, market_code)
     string category;
-    string content;
+    string name;
+    string market_code;
 };
 
 MySQLBlockInfoDriver::~MySQLBlockInfoDriver() {}
@@ -33,7 +31,6 @@ struct StockTypeInfoTable {
 };
 
 void MySQLBlockInfoDriver::load() {
-    SPEND_TIME(MySQLBlockInfoDriver_load);
     Parameter connect_param;
     connect_param.set<string>("host", getParamFromOther<string>(m_params, "host", "127.0.0.1"));
     connect_param.set<string>("usr", getParamFromOther<string>(m_params, "usr", "root"));
@@ -47,18 +44,17 @@ void MySQLBlockInfoDriver::load() {
     vector<MySQLBlockTable> records;
     connect.batchLoad(records);
 
-    for (const auto& record : records) {
-        unordered_map<string, Block> tmp;
-        json blks = json::parse(record.content);
-        for (json::iterator it = blks.begin(); it != blks.end(); ++it) {
-            Block blk(record.category, it.key());
-            for (const auto& codes : it.value()) {
-                std::cout << codes << std::endl;
-                blk.add(codes);
-            }
-            tmp[it.key()] = blk;
+    for (auto& record : records) {
+        auto category_iter = m_buffer.find(record.category);
+        if (category_iter == m_buffer.end()) {
+            m_buffer[record.category] = {};
         }
-        m_buffer[record.category] = std::move(tmp);
+        auto& name_dict = m_buffer[record.category];
+        auto name_iter = name_dict.find(record.name);
+        if (name_iter == name_dict.end()) {
+            name_dict[record.name] = {Block(record.category, record.name)};
+        }
+        name_dict[record.name].add(record.market_code);
     }
 }
 

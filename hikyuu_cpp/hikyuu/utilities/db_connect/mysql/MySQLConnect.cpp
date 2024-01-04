@@ -66,19 +66,25 @@ void MySQLConnect::connect() {
                   "mysql_set_character_set error! {}", mysql_error(m_mysql));
 
     } catch (std::bad_alloc& e) {
+        close();
+        HKU_ERROR(e.what());
         HKU_THROW("Failed alloc MySQLConnect! {}", e.what());
 
     } catch (const hku::exception& e) {
         close();
+        HKU_ERROR(e.what());
         HKU_THROW("Failed create MySQLConnect! {}", e.what());
 
     } catch (const std::exception& e) {
         close();
+        HKU_ERROR(e.what());
         HKU_THROW("Failed create MySQLConnent instance! {}", e.what());
 
     } catch (...) {
         close();
-        HKU_THROW("Failed create MySQLConnect instance! Unknown error");
+        const char* errmsg = "Failed create MySQLConnect instance! Unknown error";
+        HKU_ERROR(errmsg);
+        HKU_THROW(errmsg);
     }
 }
 

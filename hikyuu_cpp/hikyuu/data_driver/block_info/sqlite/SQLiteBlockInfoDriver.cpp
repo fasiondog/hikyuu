@@ -36,8 +36,8 @@ void SQLiteBlockInfoDriver::load() {
     vector<SQLiteBlockTable> records;
     connect.batchLoad(records);
 
+    unordered_map<string, Block> tmp;
     for (const auto& record : records) {
-        unordered_map<string, Block> tmp;
         json blks = json::parse(record.content);
         for (json::iterator it = blks.begin(); it != blks.end(); ++it) {
             Block blk(record.category, it.key());
@@ -47,6 +47,7 @@ void SQLiteBlockInfoDriver::load() {
             tmp[it.key()] = blk;
         }
         m_buffer[record.category] = std::move(tmp);
+        tmp.clear();
     }
 }
 
