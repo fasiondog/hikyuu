@@ -24,12 +24,6 @@ bool MySQLBlockInfoDriver::_init() {
     return true;
 }
 
-struct StockTypeInfoTable {
-    TABLE_BIND2(StockTypeInfoTable, stocktypeinfo, type, tick)
-    int64_t type;
-    double tick;
-};
-
 void MySQLBlockInfoDriver::load() {
     Parameter connect_param;
     connect_param.set<string>("host", getParamFromOther<string>(m_params, "host", "127.0.0.1"));

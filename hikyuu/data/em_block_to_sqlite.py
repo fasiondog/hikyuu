@@ -36,28 +36,18 @@ def em_import_block_to_sqlite(connect, code_market_dict):
 
     hku_info("更新数据库")
     cur = connect.cursor()
-    sql = "select category from block"
-    all_block_in_db = cur.execute(sql).fetchall()
-    all_block_in_db = [v[0] for v in all_block_in_db]
+    sql = "delete from block where category in ('行业板块', '概念板块', '地域板块', '指数板块')"
+    cur.execute(sql)
 
-    update_records = []
     insert_records = []
 
-    if all_block_in_db:
-        for category in all_block_info:
-            if category in all_block_in_db:
-                update_records.append((json.dumps(all_block_info[category], ensure_ascii=False), category))
-            else:
-                insert_records.append((category, json.dumps(all_block_info[category], ensure_ascii=False)))
-    else:
-        for category in all_block_info:
-            insert_records.append((category, json.dumps(all_block_info[category], ensure_ascii=False)))
+    for category in all_block_info:
+        for name in all_block_info[category]:
+            for code in all_block_info[category][name]:
+                insert_records.append((category, name, code))
 
-    if update_records:
-        sql = "update block set content=? where category=?"
-        cur.executemany(sql, update_records)
     if insert_records:
-        sql = "insert into block (category, content) values (?,?)"
+        sql = "insert into block (category, name, market_code) values (?,?,?)"
         cur.executemany(sql, insert_records)
 
     connect.commit()
@@ -69,8 +59,8 @@ if __name__ == "__main__":
     import sqlite3
     from hikyuu.data.common_sqlite3 import create_database
 
-    # dest_dir = "/home/fasiondog/stock"
-    dest_dir = "d:\\stock"
+    dest_dir = "/home/fasiondog/stock"
+    # dest_dir = "d:\\stock"
 
     connect = sqlite3.connect(dest_dir + "/stock.db")
     create_database(connect)

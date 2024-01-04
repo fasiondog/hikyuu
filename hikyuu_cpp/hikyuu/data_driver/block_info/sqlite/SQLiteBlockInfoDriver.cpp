@@ -5,19 +5,17 @@
  *      Author: fasiondog
  */
 
-#include <nlohmann/json.hpp>
 #include "hikyuu/utilities/db_connect/sqlite/SQLiteConnect.h"
 #include "hikyuu/utilities/db_connect/TableMacro.h"
 #include "SQLiteBlockInfoDriver.h"
 
-using json = nlohmann::json;
-
 namespace hku {
 
 struct SQLiteBlockTable {
-    TABLE_BIND2(SQLiteBlockTable, block, category, content)
+    TABLE_BIND3(SQLiteBlockTable, block, category, name, market_code)
     string category;
-    string content;
+    string name;
+    string market_code;
 };
 
 SQLiteBlockInfoDriver::~SQLiteBlockInfoDriver() {}
@@ -36,18 +34,17 @@ void SQLiteBlockInfoDriver::load() {
     vector<SQLiteBlockTable> records;
     connect.batchLoad(records);
 
-    unordered_map<string, Block> tmp;
-    for (const auto& record : records) {
-        json blks = json::parse(record.content);
-        for (json::iterator it = blks.begin(); it != blks.end(); ++it) {
-            Block blk(record.category, it.key());
-            for (const auto& codes : it.value()) {
-                blk.add(codes);
-            }
-            tmp[it.key()] = blk;
+    for (auto& record : records) {
+        auto category_iter = m_buffer.find(record.category);
+        if (category_iter == m_buffer.end()) {
+            m_buffer[record.category] = {};
         }
-        m_buffer[record.category] = std::move(tmp);
-        tmp.clear();
+        auto& name_dict = m_buffer[record.category];
+        auto name_iter = name_dict.find(record.name);
+        if (name_iter == name_dict.end()) {
+            name_dict[record.name] = {Block(record.category, record.name)};
+        }
+        name_dict[record.name].add(record.market_code);
     }
 }
 
