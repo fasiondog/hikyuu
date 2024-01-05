@@ -130,7 +130,12 @@ def get_index_code_name_list() -> list:
 
     :return: [{'market_code': 'SHxxx'}, ...]
     """
-    df = ak.stock_zh_index_spot_em()
+    if hasattr(ak, 'stock_zh_index_spot_em'):
+        df = ak.stock_zh_index_spot_em()
+    elif hasattr(ak, 'stock_zh_index_spot_sina'):
+        df = ak.stock_zh_index_spot_sina()
+    else:
+        df = ak.stock_zh_index_spot()
     return [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
 
 
