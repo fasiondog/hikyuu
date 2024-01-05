@@ -135,7 +135,7 @@ public:
      */
     BlockList getBlockList();
 
-    //目前支持"SH"
+    // 目前支持"SH"
     DatetimeList getTradingCalendar(const KQuery& query, const string& market = "SH");
 
     /**
@@ -194,6 +194,9 @@ public:
 private:
     /* 设置K线驱动 */
     void setKDataDriver(const KDataDriverConnectPoolPtr&);
+
+    /* 加载 K线数据至缓存 */
+    void loadAllKData();
 
     /* 加载节假日信息 */
     void loadAllHolidays();

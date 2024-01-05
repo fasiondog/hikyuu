@@ -126,7 +126,9 @@ void MySQLStatement::_bindResult() {
             auto& buf = m_result_buffer.back();
             m_result_bind[idx].buffer = boost::any_cast<float>(&buf);
         } else if (field->type == MYSQL_TYPE_VAR_STRING || field->type == MYSQL_TYPE_STRING ||
-                   field->type == MYSQL_TYPE_BLOB) {
+                   field->type == MYSQL_TYPE_BLOB || field->type == MYSQL_TYPE_TINY_BLOB ||
+                   field->type == MYSQL_TYPE_VARCHAR) {
+            // mysql stmt 不支持 LONGTEXT 等字段
             unsigned long length = field->length + 1;
             m_result_bind[idx].buffer_length = length;
             m_result_buffer.emplace_back(std::vector<char>(length));

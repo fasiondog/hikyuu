@@ -29,13 +29,15 @@ datadir = {dir}
 quotation_server = {quotation_server}
 
 [block]
-type  = qianlong
-dir = {dir}/block
-指数板块 = zsbk.ini
-行业板块 = hybk.ini
-地域板块 = dybk.ini
-概念板块 = gnbk.ini
-self = self.ini
+type = sqlite3
+db = {dir}/stock.db
+;type  = qianlong
+;dir = {dir}/block
+;指数板块 = zsbk.ini
+;行业板块 = hybk.ini
+;地域板块 = dybk.ini
+;概念板块 = gnbk.ini
+;self = self.ini
 
 [preload]
 day = {day}
@@ -95,13 +97,11 @@ datadir = {dir}
 quotation_server = {quotation_server}
 
 [block]
-type  = qianlong
-dir = {dir}/block
-指数板块 = zsbk.ini
-行业板块 = hybk.ini
-地域板块 = dybk.ini
-概念板块 = gnbk.ini
-self = self.ini
+type = mysql
+host = {host}
+port = {port}
+usr = {usr}
+pwd = {pwd}
 
 [preload]
 day = {day}

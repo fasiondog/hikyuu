@@ -136,6 +136,12 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     setKDataDriver(DataDriverFactory::getKDataDriverPool(m_kdataDriverParam));
 
+    // 加载 block，须在 stock 的 kdatadriver 被设置之后调用
+    m_blockDriver->load();
+
+    // 加载 K 线至缓存
+    loadAllKData();
+
     // add special Market, for temp csv file
     m_marketInfoDict["TMP"] =
       MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>(),
@@ -147,6 +153,15 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 }
 
 void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
+    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+        if (iter->second.market() == "TMP")
+            continue;
+        iter->second.setKDataDriver(driver);
+    }
+}
+
+void StockManager::loadAllKData() {
+    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
     HKU_ERROR_IF_RETURN(!driver, void(), "kdata driver is null!");
 
     if (m_kdataDriverParam != driver->getPrototype()->getParameter()) {
@@ -191,9 +206,6 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
 
     if (!driver->getPrototype()->canParallelLoad()) {
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-            if (iter->second.market() == "TMP")
-                continue;
-            iter->second.setKDataDriver(driver);
             if (preload_day)
                 iter->second.loadKDataToBuffer(KQuery::DAY);
             if (preload_week)
@@ -224,9 +236,6 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
         // 异步并行加载
         auto& tg = *getGlobalTaskGroup();
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-            if (iter->second.market() == "TMP")
-                continue;
-            iter->second.setKDataDriver(driver);
             if (preload_day)
                 tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::DAY); });
             if (preload_week)
@@ -254,7 +263,7 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
         }
     }
 
-    initInnerTasek();
+    initInnerTask();
 }
 
 void StockManager::reload() {
@@ -264,6 +273,8 @@ void StockManager::reload() {
     loadAllStockTypeInfo();
     loadAllStocks();
     loadAllStockWeights();
+
+    m_blockDriver->load();
 
     HKU_INFO("start reload kdata to buffer");
     std::vector<Stock> can_not_parallel_stk_list;  // 记录不支持并行加载的Stock
@@ -527,23 +538,15 @@ void StockManager::loadAllHolidays() {
 
 void StockManager::loadAllStockWeights() {
     HKU_INFO("Loading stock weight...");
-    ThreadPool tg;  // 这里不用全局的线程池，可以避免在初始化后立即reload导致过长的等待
-    std::vector<std::future<void>> task_list;
+    auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
     std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
     for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-        task_list.push_back(tg.submit([=]() mutable {
+        auto weight_iter = all_stkweight_dict.find(iter->first);
+        if (weight_iter != all_stkweight_dict.end()) {
             Stock& stock = iter->second;
-            StockWeightList weightList = m_baseInfoDriver->getStockWeightList(
-              stock.market(), stock.code(), Datetime::min(), Null<Datetime>());
-            if (stock.m_data) {
-                std::lock_guard<std::mutex> lock(stock.m_data->m_weight_mutex);
-                stock.m_data->m_weightList.swap(weightList);
-            }
-        }));
-    }
-    // 权息信息如果不等待加载完毕，在数据加载期间进行计算可能导致复权错误，所以这里需要等待
-    for (auto& task : task_list) {
-        task.get();
+            std::lock_guard<std::mutex> lock(stock.m_data->m_weight_mutex);
+            stock.m_data->m_weightList.swap(weight_iter->second);
+        }
     }
 }
 
