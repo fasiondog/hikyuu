@@ -1,6 +1,38 @@
 版本发布说明
 =======================
 
+1.3.2 - 2024年1月6日
+-------------------------
+
+1. 整体调整与优化
+    - 整体从 boost.python 切换至 pybind11，以便在 C++ 部分中可以方便的进行 GIL 解锁，并行调用 python 代码
+    - 优化权息数据加载速度，尤其是使用 MYSQL 引擎时，缩短初始化加载周期从 6s 至 1s
+    - Block信息改为使用 MySQL/SQLite 方式，原有钱龙ini格式支持保留，但需要自行修改配置文件，
+      且使用 HikyuuTdx 进行配置时，使用 hdf5 存储时，配置文件会被自动更新为使用 SQLite 方式。
+      如果想继续使用钱龙格式，需使用 importdata 进行导入，且需自行调用 tools/update_block_info.py 更新板块信息。
+
+2. 功能增强
+    - 优化行情采集服务支持网络内发送和接收数据
+    - 新增技术指标 MDD/MRR 相对历史最高值回撤百分比/相对历史最低值盈利比例
+    - 支持版本升级提示
+    - 创建默认配置文件，用于没有gui的环境
+    - Performance 增加单笔最大盈利/亏损比例统计
+    - add CN_Bool 布尔信号指标系统有效条件
+    - 增强Condiciton, 增加get_datetime_list, get_valuse方法
+    - hikyuutdx未选择数据时添加提示
+    - add Performance.to_df in python
+    - Datetime 增加 ticks 方法，获取距最小日期过去的微秒数
+
+3. 缺陷修复
+    - fixed 调整止盈初始值，使其在未发生盈利前不生效
+    - fixed BandSignal 缺失序列化
+    - fixed Condiciton在未设置SG时无法生效
+
+4. 其他修改
+    - 兼容 akshare 新旧版本
+    - 屏蔽 talib 导入告警
+
+
 1.3.1 - 2023年12月6日
 -------------------------
 
