@@ -140,6 +140,14 @@ class HKU_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase>
     void load(T &item, const DBCondition &cond);
 
     /**
+     * 加载模型数据至指定的模型实例, 仅供查询
+     * @param item 指定的模型实例
+     * @param sql 查询条件 select 的 sql 语句
+     */
+    template <typename T>
+    void loadView(T &item, const std::string &sql);
+
+    /**
      * 批量加载模型数据至容器（vector，list 等支持 push_back 的容器）
      * @param container 指定容器
      * @param where 查询条件
@@ -154,6 +162,14 @@ class HKU_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase>
      */
     template <typename Container>
     void batchLoad(Container &container, const DBCondition &cond);
+
+    /**
+     * 批量加载模型数据至容器（vector，list 等支持 push_back 的容器）
+     * @param container 指定容器
+     * @param sql select 的查询语句
+     */
+    template <typename Container>
+    void batchLoadView(Container &container, const std::string &sql);
 
     /**
      * 批量更新
@@ -454,6 +470,26 @@ void DBConnectBase::batchLoad(Container &container, const string &where) {
 template <typename Container>
 void DBConnectBase::batchLoad(Container &container, const DBCondition &cond) {
     batchLoad(container, cond.str());
+}
+
+template <typename T>
+void DBConnectBase::loadView(T &item, const std::string &sql) {
+    SQLStatementPtr st = getStatement(sql);
+    st->exec();
+    if (st->moveNext()) {
+        item.load(st);
+    }
+}
+
+template <typename Container>
+void DBConnectBase::batchLoadView(Container &container, const std::string &sql) {
+    SQLStatementPtr st = getStatement(sql);
+    st->exec();
+    while (st->moveNext()) {
+        typename Container::value_type tmp;
+        tmp.load(st);
+        container.push_back(tmp);
+    }
 }
 
 template <class Container>

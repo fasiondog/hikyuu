@@ -138,6 +138,48 @@ StockWeightList MySQLBaseInfoDriver::getStockWeightList(const string &market, co
     return result;
 }
 
+unordered_map<string, StockWeightList> MySQLBaseInfoDriver::getAllStockWeightList() {
+    unordered_map<string, StockWeightList> result;
+    HKU_ASSERT(m_pool);
+
+    try {
+        auto con = m_pool->getConnect();
+        HKU_CHECK(con, "Failed fetch connect!");
+
+        vector<StockWeightTableView> view;
+        con->batchLoadView(
+          view,
+          "SELECT a.id AS id, concat(market.market, stock.code) AS market_code, a.date, "
+          "a.countAsGift*0.0001 AS countAsGift, a.countForSell*0.0001 AS countForSell, "
+          "a.priceForSell*0.001 AS priceForSell, a.bonus*0.001,a.countOfIncreasement*0.0001 AS "
+          "countOfIncreasement, a.totalCount AS totalCount, a.freeCount AS freeCount FROM "
+          "stkweight AS a, stock, market WHERE a.stockid=stock.stockid AND "
+          "market.marketid=stock.marketid ORDER BY a.stockid, a.date");
+
+        for (const auto &record : view) {
+            auto iter = result.find(record.market_code);
+            if (iter == result.end()) {
+                auto in_iter = result.insert(std::make_pair(record.market_code, StockWeightList()));
+                if (in_iter.second) {
+                    iter = in_iter.first;
+                }
+            }
+            iter->second.emplace_back(StockWeight(
+              Datetime(record.date), record.countAsGift, record.countForSell, record.priceForSell,
+              record.bonus, record.countOfIncreasement, record.totalCount, record.freeCount));
+        }
+
+    } catch (std::exception &e) {
+        HKU_FATAL("load StockWeight table failed! {}", e.what());
+        return result;
+    } catch (...) {
+        HKU_FATAL("load StockWeight table failed!");
+        return result;
+    }
+
+    return result;
+}
+
 vector<StockInfo> MySQLBaseInfoDriver::getAllStockInfo() {
     vector<StockInfo> result;
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");

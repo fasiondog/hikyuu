@@ -31,6 +31,20 @@ public:
     double freeCount{0.};
 };
 
+struct StockWeightTableView {
+    TABLE_BIND9(StockWeightTableView, stkweight, market_code, date, countAsGift, countForSell,
+                priceForSell, bonus, countOfIncreasement, totalCount, freeCount)
+    string market_code;
+    uint64_t date{0};
+    double countAsGift{0.};
+    double countForSell{0.};
+    double priceForSell{0.};
+    double bonus{0.};
+    double countOfIncreasement{0.};
+    double totalCount{0.};
+    double freeCount{0.};
+};
+
 }  // namespace hku
 
 #endif /* HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_STOCKWEIGHTTABLE_H */

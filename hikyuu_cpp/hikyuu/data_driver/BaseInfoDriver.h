@@ -111,6 +111,11 @@ public:
     virtual StockWeightList getStockWeightList(const string& market, const string& code,
                                                Datetime start, Datetime end);
 
+    virtual unordered_map<string, StockWeightList> getAllStockWeightList() {
+        unordered_map<string, StockWeightList> ret;
+        return ret;
+    }
+
     /**
      * 获取当前财务信息
      * @param market 市场标识
