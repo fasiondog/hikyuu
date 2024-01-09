@@ -1,12 +1,5 @@
-option("pyver")
-    set_default("3.9")
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Use python version xy")
-option_end()
 
 add_requires("pybind11", {system = false, alias = "pybind11"})
-add_requireconfs("pybind11.python", {override = true, system = false, version = get_config("pyver")})
 
 target("core")
     set_kind("shared")
@@ -42,19 +35,25 @@ target("core")
 
     add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
 
-    -- on_load(function(target)
-    --     import("lib.detect.find_tool")
-    --     import("lib.detect.find_path")
-    --     local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
-    --     local exepath = path.directory(python.program)
-    --     if is_host("windows") then
-    --         includepath = find_path("Python.h", {exepath}, {suffixes = {"include"}})
-    --     else
-    --         local pyver = python.version:match("%d+.%d+")
-    --         includepath = find_path("Python.h", {path.directory(exepath)}, {suffixes = {"include/python" .. pyver}})
-    --     end
-    --     target:add("includedirs", includepath)        
-    -- end)
+    on_load("windows", "linux", "macosx", function(target)
+        import("lib.detect.find_tool")
+        if is_plat("windows") then
+            -- detect installed python3
+            local python = assert(find_tool("python", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+            assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
+            -- find python include and libs directory
+            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            pydir = path.directory(pydir)
+            target:add("includedirs", pydir .. "/include")
+            target:add("linkdirs", pydir .. "/libs")
+            return
+        end
+    
+        -- get python include directory.
+        local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
+        assert(pydir, "python3-config not found!")
+        target:add("cxflags", pydir)   
+    end)
 
     after_build(function(target)
         if is_plat("macosx") then

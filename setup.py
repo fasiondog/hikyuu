@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 from setuptools import setup, find_packages
 import sys
@@ -10,9 +10,9 @@ import platform
 import click
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # 前置检查
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def check_xmake():
     """检查是否按照了编译工具 xmake"""
     print("checking xmake ...")
@@ -25,7 +25,7 @@ def get_python_version():
     py_version = platform.python_version_tuple()
     min_version = int(py_version[1])
     main_version = int(py_version[0])
-    #py_version = main_version * 10 + min_version if min_version < 10 else main_version * 100 + min_version
+    # py_version = main_version * 10 + min_version if min_version < 10 else main_version * 100 + min_version
     py_version = f"{main_version}.{min_version}"
     print(f'current python version: {py_version}')
     return py_version
@@ -102,9 +102,9 @@ def clear_with_python_changed(mode):
         shutil.rmtree(build_pywrap_dir)
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # 执行构建
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
     """ 执行编译 """
     global g_verbose
@@ -118,13 +118,13 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
 
     py_version = current_compile_info['py_version']
 
-    #如果 python版本或者编译模式发生变化，则编译依赖的 boost 库（boost.python)
+    # 如果 python版本或者编译模式发生变化，则编译依赖的 boost 库（boost.python)
     history_compile_info = get_history_compile_info()
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
-        cmd = "xmake f {} -c -y -m {} --pyver={} --feedback={}".format(
-            "-v -D" if verbose else "", mode, py_version, feedback)
+        cmd = "xmake f {} -c -y -m {} --feedback={}".format(
+            "-v -D" if verbose else "", mode, feedback)
         print(cmd)
         os.system(cmd)
 
@@ -143,9 +143,9 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
     save_current_compile_info(current_compile_info)
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # 控制台命令
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 @click.group()
@@ -341,9 +341,9 @@ def upload():
         os.system("twine upload dist/*")
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # 添加 click 命令
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 cli.add_command(build)
 cli.add_command(test)
 cli.add_command(clear)
