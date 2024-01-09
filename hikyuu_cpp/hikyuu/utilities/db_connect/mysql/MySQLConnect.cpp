@@ -28,6 +28,7 @@ MySQLConnect::~MySQLConnect() {
 bool MySQLConnect::tryConnect() noexcept {
     bool success = false;
     try {
+        close();
         connect();
         success = true;
     } catch (const std::exception& e) {
