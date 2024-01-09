@@ -44,15 +44,15 @@ target("core")
             -- find python include and libs directory
             local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
             pydir = path.directory(pydir)
-            package:add("includedirs", pydir .. "/include")
-            package:add("linkdirs", pydir .. "/libs")
+            target:add("includedirs", pydir .. "/include")
+            target:add("linkdirs", pydir .. "/libs")
             return
         end
     
         -- get python include directory.
         local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
         assert(pydir, "python3-config not found!")
-        package:add("cxflags", pydir)   
+        target:add("cxflags", pydir)   
     end)
 
     after_build(function(target)
