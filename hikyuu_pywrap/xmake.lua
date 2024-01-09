@@ -37,16 +37,22 @@ target("core")
 
     on_load("windows", "linux", "macosx", function(target)
         import("lib.detect.find_tool")
-        import("lib.detect.find_path")
-        local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
-        local exepath = path.directory(python.program)
-        if is_host("windows") then
-            includepath = find_path("Python.h", {exepath}, {suffixes = {"include"}})
-        else
-            local pyver = python.version:match("%d+.%d+")
-            includepath = find_path("Python.h", {path.directory(exepath)}, {suffixes = {"include/python" .. pyver}})
+        if is_plat("windows") then
+            -- detect installed python3
+            local python = assert(find_tool("python", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+            assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
+            -- find python include and libs directory
+            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            pydir = path.directory(pydir)
+            package:add("includedirs", pydir .. "/include")
+            package:add("linkdirs", pydir .. "/libs")
+            return
         end
-        target:add("includedirs", includepath)        
+    
+        -- get python include directory.
+        local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
+        assert(pydir, "python3-config not found!")
+        package:add("cxflags", pydir)   
     end)
 
     after_build(function(target)
