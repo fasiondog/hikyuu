@@ -105,9 +105,9 @@ set_warnings("all")
 -- set language: C99, c++ standard
 set_languages("cxx17", "c99")
 
-local boost_version = "1.81.0"
+local boost_version = "1.84.0"
 local hdf5_version = "1.12.2"
-local fmt_version = "10.0.0"
+local fmt_version = "10.2.1"
 local flatbuffers_version = "23.5.26"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
@@ -144,9 +144,8 @@ elseif is_plat("macosx") then
     end
 end
 
-add_requires("myboost " .. boost_version, {
+add_requires("boost " .. boost_version, {
   system = false,
-  alias = "boost",
   debug = is_mode("debug"),
   configs = {
     shared = is_plat("windows") and true or false,
