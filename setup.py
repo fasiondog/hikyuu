@@ -231,7 +231,6 @@ def clear_build():
         if file not in ("__init__.py", "__pycache__"):
             os.remove(f'hikyuu/cpp/{file}')
     print('clear finished!')
-    os.system("xmake clean")
 
 
 @click.command()
