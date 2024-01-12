@@ -38,6 +38,11 @@ jobs:
         actions-cache-folder: '.xmake-cache'
         actions-cache-key: 'ubuntu'
 
+    - name: install
+      run: |
+        sudo apt update
+        sudo apt upgrade
+
     - name: config
       run: |
         xmake f --feedback=n -y
