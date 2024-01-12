@@ -36,11 +36,7 @@ jobs:
       with:
         xmake-version: branch@master
         actions-cache-folder: '.xmake-cache'
-
-    - name: Installation
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc g++        
+        actions-cache-key: 'ubuntu'
 
     - name: config
       run: |
