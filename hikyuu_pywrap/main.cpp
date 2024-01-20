@@ -111,6 +111,8 @@ PYBIND11_MODULE(core, m) {
     int64_t null_int64 = Null<int64_t>();
     Datetime null_date = Null<Datetime>();
 
+    m.def("get_kdata", py::overload_cast<const string&, const KQuery&>(getKData));
+
     m.def("get_kdata",
           py::overload_cast<const string&, int64_t, int64_t, KQuery::KType, KQuery::RecoverType>(
             getKData),
