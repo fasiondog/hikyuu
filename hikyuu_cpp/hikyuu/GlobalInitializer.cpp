@@ -54,9 +54,9 @@ void GlobalInitializer::init() {
 
     initLogger();
 #if defined(_DEBUG) || defined(DEBUG)
-    set_log_level(TRACE);
+    set_log_level(LOG_LEVEL::LOG_TRACE);
 #else
-    set_log_level(INFO);
+    set_log_level(LOG_LEVEL::LOG_INFO);
 #endif
 
 #if HKU_ENABLE_SEND_FEEDBACK
