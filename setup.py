@@ -258,22 +258,26 @@ def uninstall():
 
 
 @click.option('-j', '--j', default=2, help="并行编译数量")
+@click.option('-o', '--o', help="指定的安装目录")
 @click.command()
-def install(j):
+def install(j, o):
     """ 编译并安装 Hikyuu python 库 """
+    install_dir = o
+    if install_dir is None:
+        if sys.platform == 'win32':
+            install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
+        else:
+            usr_dir = os.path.expanduser('~')
+            install_dir = '{}/.local/lib/python{}/site-packages/hikyuu'.format(
+                usr_dir, get_python_version())
+            try:
+                shutil.rmtree(install_dir)
+            except:
+                pass
+
     start_build(False, 'release', True, j)
-    if sys.platform == 'win32':
-        install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
-    else:
-        usr_dir = os.path.expanduser('~')
-        install_dir = '{}/.local/lib/python{}/site-packages/hikyuu'.format(
-            usr_dir, get_python_version())
-        try:
-            shutil.rmtree(install_dir)
-        except:
-            pass
-        os.makedirs(install_dir)
-    os.system('xmake install -o "{}"'.format(install_dir))
+
+    shutil.copytree("./hikyuu", install_dir)
 
 
 @click.command()

@@ -217,6 +217,3 @@ includes("./hikyuu_cpp/unit_test")
 includes("./hikyuu_cpp/demo")
 includes("./hikyuu_cpp/hikyuu_server")
 
-before_install("scripts.before_install")
-on_install("scripts.on_install")
-before_run("scripts.before_run")
