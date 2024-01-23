@@ -216,7 +216,9 @@ def clear_build():
     """ 清除当前编译设置及结果 """
     if os.path.lexists('.xmake'):
         print('delete .xmake')
-        shutil.rmtree('.xmake')
+        shutil.rmtree('.xmake', True)
+        if sys.platform == 'win32':
+            os.system("rmdir .xmake /s /q")
     if os.path.lexists('build'):
         print('delete build')
         shutil.rmtree('build')
