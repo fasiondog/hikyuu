@@ -3,10 +3,11 @@ add_requires("pybind11", {system = false, alias = "pybind11"})
 
 target("core")
     set_kind("shared")
-    if is_mode("debug") then 
-        set_default(false) --会默认禁用这个target的编译，除非显示指定xmake build _hikyuu才会去编译，但是target还存在，里面的files会保留到vcproj
-        --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
-    end
+    set_default(false)
+    -- if is_mode("debug") then 
+    --     set_default(false) --会默认禁用这个target的编译，除非显示指定xmake build _hikyuu才会去编译，但是target还存在，里面的files会保留到vcproj
+    --     --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
+    -- end
 
     add_options("stackstrace")
 

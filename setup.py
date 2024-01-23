@@ -118,7 +118,7 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
 
     py_version = current_compile_info['py_version']
 
-    # 如果 python版本或者编译模式发生变化，则编译依赖的 boost 库（boost.python)
+    # 如果 python版本或者编译模式发生变化，则重新编译
     history_compile_info = get_history_compile_info()
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
