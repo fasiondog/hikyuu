@@ -22,7 +22,7 @@ target("hkuserver")
     end
     
     if is_plat("windows") then 
-        if is_mode("release") then
+        if get_config("kind") == "shared" then
             add_defines("HKU_API=__declspec(dllimport)")
         end
         add_packages("mysql")

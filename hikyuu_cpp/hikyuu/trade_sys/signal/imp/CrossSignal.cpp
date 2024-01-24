@@ -8,6 +8,10 @@
 #include "../../../indicator/crt/KDATA.h"
 #include "CrossSignal.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::CrossSignal)
+#endif
+
 namespace hku {
 
 CrossSignal::CrossSignal() : SignalBase("SG_Cross") {}

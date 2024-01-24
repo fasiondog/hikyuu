@@ -148,7 +148,9 @@ add_requires("boost " .. boost_version, {
   system = false,
   debug = is_mode("debug"),
   configs = {
-    shared = is_plat("windows") and true or false,
+    shared = get_config("kind") == "shared", --is_plat("windows") and true or false,
+    vs_runtime = 'MD',
+    multi = true,
     date_time = true,
     filesystem = true,
     serialization = true,
@@ -172,7 +174,9 @@ set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
 -- modifed to use boost static library, except boost.python, serialization
-if is_plat("windows") then add_defines("BOOST_ALL_DYN_LINK") end
+if is_plat("windows") and get_config("kind") == "shared" then 
+    add_defines("BOOST_ALL_DYN_LINK") 
+end
 
 -- is release now
 if is_mode("release") then

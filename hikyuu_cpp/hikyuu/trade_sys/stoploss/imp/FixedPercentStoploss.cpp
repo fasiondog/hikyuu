@@ -7,6 +7,10 @@
 
 #include "FixedPercentStoploss.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedPercentStoploss)
+#endif
+
 namespace hku {
 
 FixedPercentStoploss::FixedPercentStoploss() : StoplossBase("ST_FixedPercent") {

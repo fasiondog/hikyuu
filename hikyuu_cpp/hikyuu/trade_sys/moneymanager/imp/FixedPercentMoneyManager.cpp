@@ -7,10 +7,14 @@
 
 #include "FixedPercentMoneyManager.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedPercentMoneyManager)
+#endif
+
 namespace hku {
 
 FixedPercentMoneyManager::FixedPercentMoneyManager() : MoneyManagerBase("MM_FixedPercent") {
-    setParam<double>("p", 0.02);  //总资产百分比
+    setParam<double>("p", 0.02);  // 总资产百分比
 }
 
 FixedPercentMoneyManager::~FixedPercentMoneyManager() {}

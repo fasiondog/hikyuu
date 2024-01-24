@@ -7,6 +7,10 @@
 
 #include "BoolCondition.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::BoolCondition)
+#endif
+
 namespace hku {
 
 BoolCondition::BoolCondition() : ConditionBase("CN_Bool") {}

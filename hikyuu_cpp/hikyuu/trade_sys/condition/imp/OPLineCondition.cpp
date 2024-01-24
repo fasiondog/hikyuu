@@ -12,6 +12,10 @@
 #include "../../system/crt/SYS_Simple.h"
 #include "../../moneymanager/crt/MM_FixedCount.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::OPLineCondition)
+#endif
+
 namespace hku {
 
 OPLineCondition::OPLineCondition() : ConditionBase("CN_OPLine") {}

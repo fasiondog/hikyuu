@@ -8,6 +8,10 @@
 #include "../../../indicator/crt/KDATA.h"
 #include "BoolSignal.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::BoolSignal)
+#endif
+
 namespace hku {
 
 BoolSignal::BoolSignal() : SignalBase("SG_Bool") {}

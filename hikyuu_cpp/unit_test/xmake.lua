@@ -79,7 +79,7 @@ target("unit-test")
         add_cxflags("-Wno-sign-compare")
     end
     
-    if is_plat("windows") and is_mode("release") then
+    if is_plat("windows") and get_config("kind") == "shared" then
         add_defines("HKU_API=__declspec(dllimport)")
     end
 
@@ -99,7 +99,7 @@ target("unit-test")
 
     -- add files
     add_files("**.cpp")
-    
+
     before_run(prepare_run)
     after_run(coverage_report)
 target_end()

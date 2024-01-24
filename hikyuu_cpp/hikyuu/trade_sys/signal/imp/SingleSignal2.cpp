@@ -13,6 +13,10 @@
 #include "../../../indicator/crt/REF.h"
 #include "SingleSignal2.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::SingleSignal2)
+#endif
+
 namespace hku {
 
 SingleSignal2::SingleSignal2() : SignalBase("SG_Single2") {

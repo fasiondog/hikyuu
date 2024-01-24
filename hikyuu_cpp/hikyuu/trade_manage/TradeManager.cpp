@@ -14,6 +14,10 @@
 #include "../trade_sys/system/SystemPart.h"
 #include "../KData.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::TradeManager)
+#endif
+
 namespace hku {
 
 string TradeManager::str() const {
