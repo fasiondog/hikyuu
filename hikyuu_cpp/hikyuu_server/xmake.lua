@@ -1,5 +1,6 @@
 target("hkuserver")
     set_kind("binary")
+    set_default(false)
     
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "sqlite3", "zlib")
     add_deps("hikyuu")

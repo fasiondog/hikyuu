@@ -118,7 +118,7 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
 
     py_version = current_compile_info['py_version']
 
-    # 如果 python版本或者编译模式发生变化，则编译依赖的 boost 库（boost.python)
+    # 如果 python版本或者编译模式发生变化，则重新编译
     history_compile_info = get_history_compile_info()
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
@@ -216,7 +216,9 @@ def clear_build():
     """ 清除当前编译设置及结果 """
     if os.path.lexists('.xmake'):
         print('delete .xmake')
-        shutil.rmtree('.xmake')
+        shutil.rmtree('.xmake', True)
+        if sys.platform == 'win32':
+            os.system("rmdir .xmake /s /q")
     if os.path.lexists('build'):
         print('delete build')
         shutil.rmtree('build')
@@ -258,22 +260,26 @@ def uninstall():
 
 
 @click.option('-j', '--j', default=2, help="并行编译数量")
+@click.option('-o', '--o', help="指定的安装目录")
 @click.command()
-def install(j):
+def install(j, o):
     """ 编译并安装 Hikyuu python 库 """
+    install_dir = o
+    if install_dir is None:
+        if sys.platform == 'win32':
+            install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
+        else:
+            usr_dir = os.path.expanduser('~')
+            install_dir = '{}/.local/lib/python{}/site-packages/hikyuu'.format(
+                usr_dir, get_python_version())
+            try:
+                shutil.rmtree(install_dir)
+            except:
+                pass
+
     start_build(False, 'release', True, j)
-    if sys.platform == 'win32':
-        install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
-    else:
-        usr_dir = os.path.expanduser('~')
-        install_dir = '{}/.local/lib/python{}/site-packages/hikyuu'.format(
-            usr_dir, get_python_version())
-        try:
-            shutil.rmtree(install_dir)
-        except:
-            pass
-        os.makedirs(install_dir)
-    os.system('xmake install -o "{}"'.format(install_dir))
+
+    shutil.copytree("./hikyuu", install_dir)
 
 
 @click.command()
