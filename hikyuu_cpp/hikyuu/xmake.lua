@@ -36,7 +36,7 @@ target("hikyuu")
     end
 
     if is_plat("windows") then
-        if is_mode("release") then
+        if is_kind("shared") then
             add_defines("HKU_API=__declspec(dllexport)")
         end
         if get_config("hdf5") then
