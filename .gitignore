@@ -22,6 +22,7 @@
 .project
 .pyproject
 .vscode
+.clangd
 .vs
 .ipynb_checkpoints
 nohup.out
