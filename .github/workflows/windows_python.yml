@@ -45,7 +45,7 @@ jobs:
     - name: configure
       shell: cmd
       run: |
-        xmake f -y
+        xmake f -k shared -y
 
     - name: build
       shell: cmd

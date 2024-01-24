@@ -9,6 +9,10 @@
 #include "../../StockTypeInfo.h"
 #include "../../Log.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedATradeCost)
+#endif
+
 namespace hku {
 
 FixedATradeCost::FixedATradeCost() : TradeCostBase("TC_FixedA") {
@@ -42,7 +46,7 @@ CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime, const Stock& st
         result.commission = lowestCommission;
     }
 
-    //上证买入时，有过户费
+    // 上证买入时，有过户费
     if (stock.market() == "SH") {
         result.transferfee = num > 1000 ? roundEx(getParam<price_t>("transferfee") * num, precision)
                                         : getParam<price_t>("lowest_transferfee");

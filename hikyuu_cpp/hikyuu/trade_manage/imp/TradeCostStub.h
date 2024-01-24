@@ -17,45 +17,31 @@ class HKU_API TradeCostStub : public TradeCostBase {
     TRADE_COST_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    TradeCostStub() : TradeCostBase("TestStub") {}
+    TradeCostStub();
 
-    virtual ~TradeCostStub() {}
+    virtual ~TradeCostStub();
 
     virtual CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                  double num) const override {
-        return CostRecord(0, 0, 0, 10, 10);
-    }
+                                  double num) const override;
 
     virtual CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                   double num) const override {
-        return CostRecord(0, 0, 0, 20, 20);
-    }
+                                   double num) const override;
 
-    virtual CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) const override {
-        return CostRecord(0, 0, 0, 30, 30);
-    }
+    virtual CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) const override;
 
     virtual CostRecord getReturnCashCost(const Datetime& borrow_datetime,
                                          const Datetime& return_datetime,
-                                         price_t cash) const override {
-        return CostRecord(0, 0, 0, 40, 40);
-    }
+                                         price_t cash) const override;
 
     virtual CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock,
-                                          price_t price, double num) const override {
-        return CostRecord(0, 0, 0, 50, 50);
-    }
+                                          price_t price, double num) const override;
 
     virtual CostRecord getReturnStockCost(const Datetime& borrow_datetime,
                                           const Datetime& return_datetime, const Stock& stock,
-                                          price_t price, double num) const override {
-        return CostRecord(0, 0, 0, 60, 60);
-    }
+                                          price_t price, double num) const override;
 
     /** 子类私有变量克隆接口 */
-    virtual TradeCostPtr _clone() override {
-        return TradeCostPtr(new TradeCostStub);
-    }
+    virtual TradeCostPtr _clone() override;
 };
 
 } /* namespace hku */

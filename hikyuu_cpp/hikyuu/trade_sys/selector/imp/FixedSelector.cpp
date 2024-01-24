@@ -7,6 +7,10 @@
 
 #include "FixedSelector.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedSelector)
+#endif
+
 namespace hku {
 
 FixedSelector::FixedSelector() : SelectorBase("SE_Fixed") {}
