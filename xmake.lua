@@ -105,6 +105,14 @@ set_warnings("all")
 -- set language: C99, c++ standard
 set_languages("cxx17", "c99")
 
+if is_plat("windows") then
+    if is_mode("release") then
+        set_runtimes("MD")
+    else
+        set_runtimes("MDd")
+    end
+end
+
 local boost_version = "1.84.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "10.2.1"
@@ -149,7 +157,6 @@ add_requires("boost " .. boost_version, {
   debug = is_mode("debug"),
   configs = {
     shared = get_config("kind") == "shared", --is_plat("windows") and true or false,
-    vs_runtime = 'MD',
     multi = true,
     date_time = true,
     filesystem = true,
@@ -159,11 +166,11 @@ add_requires("boost " .. boost_version, {
   },
 })
 
-add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true, vs_runtime = "MD"}})
+add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
 add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
-add_requires("sqlite3", {system = false, configs = {shared = true, vs_runtime = "MD", cxflags = "-fPIC"}})
-add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs = {vs_runtime = "MD"}})
-add_requires("nng", {system = false, configs = {vs_runtime = "MD", cxflags = "-fPIC"}})
+add_requires("sqlite3", {system = false, configs = {shared = true, cxflags = "-fPIC"}})
+add_requires("flatbuffers v" .. flatbuffers_version, {system = false})
+add_requires("nng", {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib", {system = false, configs = {zlib = true, ssl = true}})
 add_requires("zlib", {system = false})
@@ -193,11 +200,8 @@ if is_plat("windows") then
   add_cxflags("-EHsc", "/Zc:__cplusplus", "/utf-8")
   add_cxflags("-wd4819") -- template dll export warning
   add_defines("WIN32_LEAN_AND_MEAN")
-  if is_mode("release") then
-    add_cxflags("-MD")
-  elseif is_mode("debug") then
+  if is_mode("debug") then
     add_cxflags("-Gs", "-RTC1", "/bigobj")
-    add_cxflags("-MDd")
   end
 end
 
