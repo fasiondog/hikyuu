@@ -40,7 +40,7 @@ jobs:
 
     - name: config
       run: |
-        xmake f --feedback=n -y
+        xmake f --feedback=n -k shared -y
 
     - name: build
       run: |

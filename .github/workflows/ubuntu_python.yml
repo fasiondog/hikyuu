@@ -40,7 +40,7 @@ jobs:
 
     - name: configure
       run: |
-        xmake f -y
+        xmake f -y -k shared
 
     - name: build
       run: |
