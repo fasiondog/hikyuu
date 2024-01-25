@@ -5,7 +5,7 @@
 #    Author: fasiondog
 
 import pandas as pd
-from hikyuu.cpp.core import Block, Performance, _combinate_ind_analysis, _combinate_ind_analysis_with_block
+from hikyuu.core import Block, Performance, inner_combinate_ind_analysis, inner_combinate_ind_analysis_with_block
 
 
 def combinate_ind_analysis(
@@ -20,7 +20,7 @@ def combinate_ind_analysis(
 ):
     '''
     对单只股票进行指标组合测试
-    
+
     :param Stock stk: 指定股票
     :param Query query: 指定的查询条件
     :param TradeManager tm: 交易管理实例
@@ -31,7 +31,7 @@ def combinate_ind_analysis(
     :param list keys: 输出 Performance 统计项
     :rtype: pd.DataFrame
     '''
-    pers = _combinate_ind_analysis(stk, query, tm, sys, buy_inds, sell_inds, n)
+    pers = inner_combinate_ind_analysis(stk, query, tm, sys, buy_inds, sell_inds, n)
 
     if not keys:
         per = Performance()
@@ -82,7 +82,7 @@ def combinate_ind_analysis_multi(
         for stk in stks:
             blks.add(stk)
 
-    out = _combinate_ind_analysis_with_block(blks, query, tm, sys, buy_inds, sell_inds, n)
+    out = inner_combinate_ind_analysis_with_block(blks, query, tm, sys, buy_inds, sell_inds, n)
     if not keys:
         ret = out
     else:

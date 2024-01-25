@@ -61,16 +61,26 @@ target("core")
             os.run(format("install_name_tool -change @rpath/libhikyuu.dylib @loader_path/libhikyuu.dylib %s/%s", target:targetdir(), "core.so"))
         end
 
+        import("lib.detect.find_tool")
+        local python = assert(find_tool("python", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+        local tmp = string.split(python.version, "%.")
+
         local dst_dir = "$(projectdir)/hikyuu/cpp/"
+        local dst_obj = dst_dir .. "core" .. tmp[1] .. tmp[2]
+        print(dst_obj)
+
         if is_plat("windows") then
             os.cp(target:targetdir() .. '/core.pyd', dst_dir)
             os.cp(target:targetdir() .. '/*.dll', dst_dir)
+            os.mv(dst_dir .. 'core.pyd', dst_obj .. ".pyd")
         elseif is_plat("macosx") then
             os.cp(target:targetdir() .. '/core.so', dst_dir)
             os.cp(target:targetdir() .. '/libhikyuu.dylib', dst_dir)
+            os.mv(dst_dir .. 'core.so', dst_obj .. ".so")
         else
             os.trycp(target:targetdir() .. '/*.so', dst_dir)
             os.trycp(target:targetdir() .. '/*.so.*', dst_dir)
+            os.mv(dst_dir .. 'core.so', dst_obj .. ".so")
         end
     end)
 

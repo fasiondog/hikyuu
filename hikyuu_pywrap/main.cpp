@@ -48,7 +48,19 @@ void export_analysis(py::module& m);
 void export_StrategeContext(py::module& m);
 void export_strategy_main(py::module& m);
 
+#if PY_MINOR_VERSION == 8
+PYBIND11_MODULE(core38, m) {
+#elif PY_MINOR_VERSION == 9
+PYBIND11_MODULE(core39, m) {
+#elif PY_MINOR_VERSION == 10
+PYBIND11_MODULE(core310, m) {
+#elif PY_MINOR_VERSION == 11
+PYBIND11_MODULE(core311, m) {
+#elif PY_MINOR_VERSION == 12
+PYBIND11_MODULE(core312, m) {
+#else
 PYBIND11_MODULE(core, m) {
+#endif
     py::register_exception<hku::exception>(m, "HKUException");
 
     export_bind_stl(m);
