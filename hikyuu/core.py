@@ -5,15 +5,19 @@
 #    Author: fasiondog
 
 import sys
-if sys.version_info[1] == 8:
-    from .cpp.core38 import *
-elif sys.version_info[1] == 9:
-    from .cpp.core39 import *
-elif sys.version_info[1] == 10:
-    from .cpp.core310 import *
-elif sys.version_info[1] == 11:
-    from .cpp.core311 import *
-elif sys.version_info[1] == 12:
-    from .cpp.core312 import *
-else:
+
+try:
+    if sys.version_info[1] == 8:
+        from .cpp.core38 import *
+    elif sys.version_info[1] == 9:
+        from .cpp.core39 import *
+    elif sys.version_info[1] == 10:
+        from .cpp.core310 import *
+    elif sys.version_info[1] == 11:
+        from .cpp.core311 import *
+    elif sys.version_info[1] == 12:
+        from .cpp.core312 import *
+    else:
+        from .cpp.core import *
+except:
     from .cpp.core import *
