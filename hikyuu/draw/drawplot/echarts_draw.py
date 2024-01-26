@@ -5,7 +5,7 @@ from pyecharts.charts import Kline, Scatter, Line, Bar, Grid
 from pyecharts.charts.base import Base as ChartBase
 from pyecharts.commons.utils import JsCode
 
-from hikyuu.cpp.core import KData, System
+from hikyuu.core import KData, System
 from .common import get_draw_title
 from hikyuu import *
 
