@@ -296,7 +296,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         # 初始化通道信目录配置
         tdx_enable = import_config.getboolean('tdx', 'enable', fallback=False)
-        tdx_dir = import_config.get('tdx', 'dir', fallback='d:\TdxW_HuaTai')
+        tdx_dir = import_config.get('tdx', 'dir', fallback='d:/TdxW_HuaTai')
         self.tdx_radioButton.setChecked(tdx_enable)
         self.tdx_dir_lineEdit.setEnabled(tdx_enable)
         self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
@@ -312,7 +312,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         hdf5_enable = import_config.getboolean('hdf5', 'enable', fallback=True)
         self.enable_hdf55_radioButton.setChecked(hdf5_enable)
         hdf5_dir = import_config.get(
-            'hdf5', 'dir', fallback="c:\stock" if sys.platform == "win32" else os.path.expanduser('~') + "/stock"
+            'hdf5', 'dir', fallback="c:/stock" if sys.platform == "win32" else os.path.expanduser('~') + "/stock"
         )
         self.hdf5_dir_lineEdit.setText(hdf5_dir)
         self.hdf5_dir_lineEdit.setEnabled(hdf5_enable)
@@ -322,7 +322,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if hdf5_enable:
             mysql_enable = False
         self.enable_mysql_radioButton.setChecked(mysql_enable)
-        self.mysql_tmpdir_lineEdit.setText(import_config.get('mysql', 'tmpdir', fallback='c:\stock'))
+        self.mysql_tmpdir_lineEdit.setText(import_config.get('mysql', 'tmpdir', fallback='c:/stock'))
         mysql_ip = import_config.get('mysql', 'host', fallback='127.0.0.1')
         self.mysql_ip_lineEdit.setText(mysql_ip)
         self.mysql_ip_lineEdit.setEnabled(mysql_enable)
