@@ -45,6 +45,19 @@ target("core")
             -- find python include and libs directory
             local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
             pydir = path.directory(pydir)
+            if pydir:endswith("Scripts") then
+                -- if venv is activated, find the real python directory
+                file = io.open(pydir .. "/../pyvenv.cfg", "r")
+                for line in file:lines() do
+                    if string.find(line, "home =") then
+                        -- 使用 string.gmatch 函数抽取路径
+                        for path in string.gmatch(line, "home = (.*)") do
+                            pydir = path
+                        end
+                    end
+                end
+                file:close()
+            end            
             target:add("includedirs", pydir .. "/include")
             target:add("linkdirs", pydir .. "/libs")
             return
