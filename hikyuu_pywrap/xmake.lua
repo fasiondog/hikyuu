@@ -98,9 +98,10 @@ target("core")
             os.cp(target:targetdir() .. '/core.so', dst_obj .. ".so")
             os.cp(target:targetdir() .. '/libhikyuu.dylib', dst_dir)
         else
+            os.trycp(target:targetdir() .. '/*.so', dst_dir)
             os.trycp(target:targetdir() .. '/*.so.*', dst_dir)
             if not is_plat("cross") then
-                os.trycp(target:targetdir() .. '/*.so', dst_obj .. ".so")
+                os.trymv(target:targetdir() .. '/core.so', dst_obj .. ".so")
             end
         end
     end)
