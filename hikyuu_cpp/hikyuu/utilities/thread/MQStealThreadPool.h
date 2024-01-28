@@ -58,7 +58,7 @@ public:
                 m_queues.emplace_back(new MQStealQueue<task_type>);
             }
             // 初始完毕所有线程资源后再启动线程
-            for (size_t i = 0; i < m_worker_num; i++) {
+            for (int i = 0; i < m_worker_num; i++) {
                 m_threads.emplace_back(&MQStealThreadPool::worker_thread, this, i);
             }
         } catch (...) {

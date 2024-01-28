@@ -68,7 +68,7 @@ bool KDataDriver::init(const Parameter& params) {
     return _init();
 }
 
-size_t KDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
+size_t KDataDriver::getCount(const string& market, const string& code, const KQuery::KType& kType) {
     HKU_INFO("The getCount method has not been implemented! (KDataDriver: {})", m_name);
     return 0;
 }

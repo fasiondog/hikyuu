@@ -19,8 +19,6 @@ BoolCondition::BoolCondition(const Indicator& ind) : ConditionBase("CN_Bool"), m
 
 BoolCondition::~BoolCondition() {}
 
-void BoolCondition::_reset() {}
-
 ConditionPtr BoolCondition::_clone() {
     return make_shared<BoolCondition>(m_ind);
 }

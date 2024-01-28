@@ -14,8 +14,9 @@ namespace py = pybind11;
 
 // BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getIndex_overloads, getIndex, 1, 2)
 
-KRecord (Stock::*getKRecord1)(size_t pos, KQuery::KType kType) const = &Stock::getKRecord;
-KRecord (Stock::*getKRecord2)(const Datetime&, KQuery::KType kType) const = &Stock::getKRecord;
+KRecord (Stock::*getKRecord1)(size_t pos, const KQuery::KType& kType) const = &Stock::getKRecord;
+KRecord (Stock::*getKRecord2)(const Datetime&,
+                              const KQuery::KType& kType) const = &Stock::getKRecord;
 
 void export_Stock(py::module& m) {
     py::class_<Stock>(m, "Stock", "证券对象")
@@ -31,8 +32,7 @@ void export_Stock(py::module& m) {
       .def_property_readonly("market", py::overload_cast<>(&Stock::market, py::const_),
                              "所属市场简称，市场简称是市场的唯一标识")
       .def_property_readonly("code", py::overload_cast<>(&Stock::code, py::const_), "证券代码")
-      .def_property_readonly("market_code",
-                             py::overload_cast<>(&Stock::market_code, py::const_),
+      .def_property_readonly("market_code", py::overload_cast<>(&Stock::market_code, py::const_),
                              "市场简称+证券代码，如: sh000001")
       .def_property_readonly("name", py::overload_cast<>(&Stock::name, py::const_), "证券名称")
       .def_property_readonly("type", &Stock::type, "证券类型，参见：constant")

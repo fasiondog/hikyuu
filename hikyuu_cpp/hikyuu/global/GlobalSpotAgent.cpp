@@ -99,7 +99,7 @@ static void updateStockDayUpData(const SpotRecord& spot, KQuery::KType ktype) {
         KRecordList klist =
           stk.getKRecordList(KQuery(spot_start_of_phase, spot_end_of_phase + TimeDelta(1), ktype));
         price_t amount = 0.0, volume = 0.0;
-        for (auto& k : klist) {
+        for (const auto& k : klist) {
             amount += k.transAmount;
             volume += k.transCount;
         }
@@ -150,7 +150,7 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     minute = minute - (minute - minute.startOfDay()) % gap;
     KRecordList klist = stk.getKRecordList(KQuery(minute, minute + gap, ktype));
     price_t sum_amount = 0.0, sum_volume = 0.0;
-    for (auto& k : klist) {
+    for (const auto& k : klist) {
         sum_amount += k.transAmount;
         sum_volume += k.transCount;
     }

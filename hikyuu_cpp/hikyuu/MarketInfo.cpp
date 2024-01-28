@@ -15,9 +15,9 @@ HKU_API std::ostream& operator<<(std::ostream& os, const MarketInfo& market) {
         return os;
     }
 
-    string split(", ");
-    os << "MarketInfo(" << market.market() << split << market.name() << split
-       << market.description() << split << market.code() << split << market.lastDate() << ")";
+    string sp(", ");
+    os << "MarketInfo(" << market.market() << sp << market.name() << sp << market.description()
+       << sp << market.code() << sp << market.lastDate() << ")";
     return os;
 }
 
@@ -28,10 +28,10 @@ string MarketInfo::toString() const {
         return os.str();
     }
 
-    string split(", ");
-    os << "MarketInfo(" << m_market << split << m_name << split << m_description << split << m_code
-       << split << m_lastDate << split << m_openTime1.minutes() << split << m_closeTime1.minutes()
-       << split << m_openTime2.minutes() << split << m_closeTime2.minutes() << ")";
+    string sp(", ");
+    os << "MarketInfo(" << m_market << sp << m_name << sp << m_description << sp << m_code << sp
+       << m_lastDate << sp << m_openTime1.minutes() << sp << m_closeTime1.minutes() << sp
+       << m_openTime2.minutes() << sp << m_closeTime2.minutes() << ")";
     return os.str();
 }
 

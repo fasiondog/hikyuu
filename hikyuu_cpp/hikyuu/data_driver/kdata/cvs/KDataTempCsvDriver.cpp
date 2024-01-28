@@ -80,7 +80,8 @@ void KDataTempCsvDriver::_get_title_column(const string& line) {
     }
 }
 
-size_t KDataTempCsvDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
+size_t KDataTempCsvDriver::getCount(const string& market, const string& code,
+                                    const KQuery::KType& kType) {
     return getKRecordList(market, code, KQuery(0, Null<int64_t>(), kType)).size();
 }
 
@@ -138,7 +139,7 @@ KRecordList KDataTempCsvDriver::getKRecordList(const string& market, const strin
 
 KRecordList KDataTempCsvDriver::_getKRecordListByIndex(const string& market, const string& code,
                                                        int64_t start_ix, int64_t end_ix,
-                                                       KQuery::KType kType) {
+                                                       const KQuery::KType& kType) {
     KRecordList result;
 
     string filename;

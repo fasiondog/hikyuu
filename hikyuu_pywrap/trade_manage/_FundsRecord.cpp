@@ -26,5 +26,8 @@ void export_FundsRecord(py::module& m) {
       .def_readwrite("borrow_cash", &FundsRecord::borrow_cash, "当前借入的资金（float），即负债")
       .def_readwrite("borrow_asset", &FundsRecord::borrow_asset, "当前借入证券资产价值（float）")
 
+      .def(py::self + py::self)
+      .def(py::self += py::self)
+
         DEF_PICKLE(FundsRecord);
 }

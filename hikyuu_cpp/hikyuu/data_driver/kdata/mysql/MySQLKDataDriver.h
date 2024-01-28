@@ -40,7 +40,8 @@ public:
         return true;
     }
 
-    virtual size_t getCount(const string& market, const string& code, KQuery::KType kType) override;
+    virtual size_t getCount(const string& market, const string& code,
+                            const KQuery::KType& kType) override;
 
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                                      size_t& out_start, size_t& out_end) override;
@@ -55,11 +56,11 @@ public:
                                    const KQuery& query) override;
 
 private:
-    string _getTableName(const string& market, const string& code, KQuery::KType ktype);
-    KRecordList _getKRecordList(const string& market, const string& code, KQuery::KType kType,
-                                size_t start_ix, size_t end_ix);
-    KRecordList _getKRecordList(const string& market, const string& code, KQuery::KType ktype,
-                                Datetime start_date, Datetime end_date);
+    string _getTableName(const string& market, const string& code, const KQuery::KType& ktype);
+    KRecordList _getKRecordList(const string& market, const string& code,
+                                const KQuery::KType& kType, size_t start_ix, size_t end_ix);
+    KRecordList _getKRecordList(const string& market, const string& code,
+                                const KQuery::KType& ktype, Datetime start_date, Datetime end_date);
 
     TimeLineList _getTimeLineListByDate(const string& market, const string& code,
                                         const KQuery& query);

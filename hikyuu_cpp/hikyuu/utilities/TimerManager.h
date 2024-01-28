@@ -74,7 +74,7 @@ public:
         std::forward_list<int> invalid_timers;  // 记录已无效的 timer
         for (auto iter = m_timers.begin(); iter != m_timers.end(); ++iter) {
             int time_id = iter->first;
-            Timer* timer = iter->second;
+            const Timer* timer = iter->second;
             Datetime now = Datetime::now();
 
             // 记录已失效的 timer id

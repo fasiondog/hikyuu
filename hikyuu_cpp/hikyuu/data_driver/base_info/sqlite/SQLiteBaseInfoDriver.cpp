@@ -325,7 +325,7 @@ std::unordered_set<Datetime> SQLiteBaseInfoDriver::getAllHolidays() {
         auto con = m_pool->getConnect();
         std::vector<HolidayTable> holidays;
         con->batchLoad(holidays);
-        for (auto& holiday : holidays) {
+        for (const auto& holiday : holidays) {
             try {
                 result.insert(holiday.datetime());
             } catch (std::exception& e) {

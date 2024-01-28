@@ -104,7 +104,7 @@ public:
      * @param queryType 默认按索引方式查询
      */
     KQuery(int64_t start,  // cppcheck-suppress [noExplicitConstructor]
-           int64_t end = Null<int64_t>(), KType dataType = DAY,
+           int64_t end = Null<int64_t>(), const KType& dataType = DAY,
            RecoverType recoverType = NO_RECOVER, QueryType queryType = INDEX)
     : m_start(start),
       m_end(end),
@@ -122,7 +122,7 @@ public:
      * @param recoverType 复权类型
      */
     KQuery(Datetime start,  // cppcheck-suppress [noExplicitConstructor]
-           Datetime end = Null<Datetime>(), KType ktype = DAY,
+           Datetime end = Null<Datetime>(), const KType& ktype = DAY,
            RecoverType recoverType = NO_RECOVER);
 
     /**
@@ -206,10 +206,10 @@ private:
  * @ingroup StockManage*
  */
 KQuery HKU_API KQueryByIndex(int64_t start = 0, int64_t end = Null<int64_t>(),
-                             KQuery::KType dataType = KQuery::DAY,
+                             const KQuery::KType& dataType = KQuery::DAY,
                              KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
-inline KQuery KQueryByIndex(int64_t start, int64_t end, KQuery::KType dataType,
+inline KQuery KQueryByIndex(int64_t start, int64_t end, const KQuery::KType& dataType,
                             KQuery::RecoverType recoverType) {
     return KQuery(start, end, dataType, recoverType, KQuery::INDEX);
 }
@@ -225,11 +225,11 @@ inline KQuery KQueryByIndex(int64_t start, int64_t end, KQuery::KType dataType,
  */
 KQuery HKU_API KQueryByDate(const Datetime& start = Datetime::min(),
                             const Datetime& end = Null<Datetime>(),
-                            KQuery::KType dataType = KQuery::DAY,
+                            const KQuery::KType& dataType = KQuery::DAY,
                             KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
-inline KQuery KQueryByDate(const Datetime& start, const Datetime& end, KQuery::KType dataType,
-                           KQuery::RecoverType recoverType) {
+inline KQuery KQueryByDate(const Datetime& start, const Datetime& end,
+                           const KQuery::KType& dataType, KQuery::RecoverType recoverType) {
     return KQuery(start, end, dataType, recoverType);
 }
 
