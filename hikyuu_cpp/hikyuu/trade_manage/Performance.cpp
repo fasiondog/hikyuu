@@ -402,13 +402,13 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
 
     PositionRecordList cur_position = tm->getPositionList();
     PositionRecordList::const_iterator cur_iter;
-    int short_number = 0;
-    int short_days = 0;
     int total_short_days = 0;
-    int max_short_days = 0;
-    bool pre_short = false;
 
     if (tm->firstDatetime() != Null<Datetime>()) {
+        int short_number = 0;
+        int short_days = 0;
+        int max_short_days = 0;
+        bool pre_short = false;
         Datetime end_day;
         if (datetime == Null<Datetime>()) {
             end_day = Datetime(tm->lastDatetime().date() + bd::days(1));

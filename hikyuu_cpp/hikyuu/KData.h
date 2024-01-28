@@ -134,7 +134,8 @@ KData HKU_API getKData(const string& market_code, const KQuery& query);
  * @ingroup StockManage
  */
 KData HKU_API getKData(const string& market_code, const Datetime& start = Datetime::min(),
-                       const Datetime& end = Null<Datetime>(), KQuery::KType ktype = KQuery::DAY,
+                       const Datetime& end = Null<Datetime>(),
+                       const KQuery::KType& ktype = KQuery::DAY,
                        KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
 /**
@@ -147,7 +148,7 @@ KData HKU_API getKData(const string& market_code, const Datetime& start = Dateti
  * @ingroup StockManage
  */
 KData HKU_API getKData(const string& market_code, int64_t start = 0, int64_t end = Null<int64_t>(),
-                       KQuery::KType ktype = KQuery::DAY,
+                       const KQuery::KType& ktype = KQuery::DAY,
                        KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
 inline KData::KData(const KData& x) : m_imp(x.m_imp) {}

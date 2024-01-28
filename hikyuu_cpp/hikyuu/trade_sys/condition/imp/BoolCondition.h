@@ -19,7 +19,6 @@ public:
     virtual ~BoolCondition();
 
     virtual void _calculate() override;
-    virtual void _reset() override;
     virtual ConditionPtr _clone() override;
 
 private:

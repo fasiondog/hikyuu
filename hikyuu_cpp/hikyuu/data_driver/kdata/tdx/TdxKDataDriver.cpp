@@ -34,7 +34,7 @@ struct TdxDayData {
         record.closePrice = price_t(close) * 0.01;
         record.transAmount = price_t(amount) * 0.0001;
         record.transCount = price_t(vol);
-        //注：指数的成交量单位是股，和HDF5数据不同，HDF是手
+        // 注：指数的成交量单位是股，和HDF5数据不同，HDF是手
     }
 };
 
@@ -107,7 +107,7 @@ KRecordList TdxKDataDriver::getKRecordList(const string& market, const string& c
 }
 
 KRecordList TdxKDataDriver::_getDayKRecordList(const string& market, const string& code,
-                                               KQuery::KType ktype, size_t start_ix,
+                                               const KQuery::KType& ktype, size_t start_ix,
                                                size_t end_ix) {
     KRecordList result;
     size_t total = getCount(market, code, ktype);
@@ -135,7 +135,7 @@ KRecordList TdxKDataDriver::_getDayKRecordList(const string& market, const strin
 }
 
 KRecordList TdxKDataDriver::_getMinKRecordList(const string& market, const string& code,
-                                               KQuery::KType ktype, size_t start_ix,
+                                               const KQuery::KType& ktype, size_t start_ix,
                                                size_t end_ix) {
     assert(KQuery::MIN == ktype || KQuery::MIN5 == ktype);
     KRecordList result;
@@ -381,7 +381,8 @@ bool TdxKDataDriver::_getMinIndexRangeByDate(const string& market, const string&
     return true;
 }
 
-string TdxKDataDriver::_getFileName(const string& market, const string& code, KQuery::KType ktype) {
+string TdxKDataDriver::_getFileName(const string& market, const string& code,
+                                    const KQuery::KType& ktype) {
     string filename;
     if (ktype == KQuery::MIN) {
         filename = m_dirname + "\\" + market + "\\minline\\" + market + code + ".lc1";
@@ -398,7 +399,8 @@ string TdxKDataDriver::_getFileName(const string& market, const string& code, KQ
     return filename;
 }
 
-size_t TdxKDataDriver::getCount(const string& market, const string& code, KQuery::KType ktype) {
+size_t TdxKDataDriver::getCount(const string& market, const string& code,
+                                const KQuery::KType& ktype) {
     size_t count = 0;
     if (KQuery::DAY == ktype || KQuery::MIN5 == ktype || KQuery::MIN == ktype) {
         count = _getBaseCount(market, code, ktype);
@@ -408,7 +410,7 @@ size_t TdxKDataDriver::getCount(const string& market, const string& code, KQuery
 }
 
 size_t TdxKDataDriver::_getBaseCount(const string& market, const string& code,
-                                     KQuery::KType ktype) {
+                                     const KQuery::KType& ktype) {
     assert(KQuery::DAY == ktype || KQuery::MIN5 == ktype || KQuery::MIN == ktype);
     string filename = _getFileName(market, code, ktype);
     HKU_IF_RETURN(filename.empty(), 0);

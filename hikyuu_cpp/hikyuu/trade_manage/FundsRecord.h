@@ -47,9 +47,9 @@ public:
     // 当前收益 = 当前净资产 - 当前投入本值资产
     //         = cash + market_value - short_market_value - borrow_cash - base_cash - base_asset
 
-    FundsRecord operator+(const FundsRecord other);
+    FundsRecord operator+(const FundsRecord& other) const;
 
-    FundsRecord& operator+=(const FundsRecord other);
+    FundsRecord& operator+=(const FundsRecord& other);
 
     // 序列化支持
 #if HKU_SUPPORT_SERIALIZATION

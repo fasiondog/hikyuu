@@ -31,7 +31,7 @@ void HttpHandle::operator()() {
         m_nng_req = (nng_http_req*)nng_aio_get_input(m_http_aio, 0);
         m_nng_conn = (nng_http_conn*)nng_aio_get_input(m_http_aio, 2);
 
-        for (auto& filter : m_filters) {
+        for (const auto& filter : m_filters) {
             filter(this);
         }
 

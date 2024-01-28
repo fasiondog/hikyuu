@@ -125,12 +125,13 @@ PYBIND11_MODULE(core, m) {
 
     m.def("get_kdata", py::overload_cast<const string&, const KQuery&>(getKData));
 
-    m.def("get_kdata",
-          py::overload_cast<const string&, int64_t, int64_t, KQuery::KType, KQuery::RecoverType>(
-            getKData),
-          py::arg("market_code"), py::arg("start") = 0, py::arg("end") = null_int64,
-          py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER,
-          R"(根据证券代码及起止位置获取 [start, end) 范围的 K 线数据
+    m.def(
+      "get_kdata",
+      py::overload_cast<const string&, int64_t, int64_t, const KQuery::KType&, KQuery::RecoverType>(
+        getKData),
+      py::arg("market_code"), py::arg("start") = 0, py::arg("end") = null_int64,
+      py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER,
+      R"(根据证券代码及起止位置获取 [start, end) 范围的 K 线数据
 
     :param str market_code: 证券代码，如: 'sh000001'
     :param int start: 起始索引
@@ -139,7 +140,7 @@ PYBIND11_MODULE(core, m) {
     :param Query.RecoverType recover_type: 复权类型)");
 
     m.def("get_kdata",
-          py::overload_cast<const string&, const Datetime&, const Datetime&, KQuery::KType,
+          py::overload_cast<const string&, const Datetime&, const Datetime&, const KQuery::KType&,
                             KQuery::RecoverType>(getKData),
           py::arg("market_code"), py::arg("start") = Datetime::min(), py::arg("end") = null_date,
           py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER,

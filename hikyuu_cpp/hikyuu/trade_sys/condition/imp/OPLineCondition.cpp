@@ -28,8 +28,6 @@ ConditionPtr OPLineCondition::_clone() {
     return make_shared<OPLineCondition>(m_op);
 }
 
-void OPLineCondition::_reset() {}
-
 void OPLineCondition::_calculate() {
     Stock stock = m_kdata.getStock();
     KQuery query = m_kdata.getQuery();
