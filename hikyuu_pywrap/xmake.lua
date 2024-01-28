@@ -65,15 +65,8 @@ target("core")
         end
     
         -- get python include directory.
-        local pydir = nil;
-        if os.getenv("CONDA_PREFIX") ~= nil then
-          local py3config = os.getenv("CONDA_PREFIX") .. "/bin/python3-config"
-          pydir = try { function () return os.iorun(py3config .. " --includes"):trim() end }
-        else
-          pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
-        end
-        assert(pydir, "python3-config not found!")
-        target:add("cxflags", pydir)   
+        local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
+        target:add("cxflags", pydir)
     end)
 
     after_build(function(target)
