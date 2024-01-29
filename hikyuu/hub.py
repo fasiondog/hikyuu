@@ -2,11 +2,15 @@
 # -*- coding: utf8 -*-
 # cp936
 #
-#===============================================================================
+# ===============================================================================
 # History
 # 1. 20200816, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
+from sqlalchemy.orm import sessionmaker, scoped_session, declarative_base
+from sqlalchemy import (create_engine, Sequence, Column, Integer, String, and_, UniqueConstraint)
+from hikyuu.util.singleton import SingletonType
+from hikyuu.util.check import checkif
 import os
 import stat
 import errno
@@ -25,11 +29,6 @@ except Exception as e:
     print(e)
     print("You need install git! see: https://git-scm.com/downloads")
 
-from hikyuu.util.check import checkif
-from hikyuu.util.singleton import SingletonType
-
-from sqlalchemy import (create_engine, Sequence, Column, Integer, String, and_, UniqueConstraint)
-from sqlalchemy.orm import sessionmaker, scoped_session, declarative_base
 
 Base = declarative_base()
 
@@ -73,7 +72,7 @@ class HubModel(Base):
 class PartModel(Base):
     __tablename__ = 'hub_part'
     id = Column(Integer, Sequence('part_id_seq'), primary_key=True)
-    hub_name = Column(String)  #所属仓库标识
+    hub_name = Column(String)  # 所属仓库标识
     part = Column(String)  # 部件类型
     name = Column(String)  # 策略名称
     author = Column(String)  # 策略作者
@@ -164,6 +163,7 @@ def dbsession(func):
 
 class HubManager(metaclass=SingletonType):
     """策略库管理"""
+
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
         usr_dir = os.path.expanduser('~')
@@ -294,6 +294,17 @@ class HubManager(metaclass=SingletonType):
         if hub_model.hub_type == 'remote':
             self.download_remote_hub(hub_model.local, hub_model.url, hub_model.branch)
         self.import_part_to_db(hub_model)
+
+    @dbsession
+    def build_hub(self, name, cmd='buildall'):
+        """构建 cpp 部分 part
+
+        :param str name: 仓库名称
+        :param str cmd: 同仓库下 python setup.py 后的命令参数，如: build -t ind -n cpp_example
+        """
+        hub_model = self._session.query(HubModel).filter_by(name=name).first()
+        checkif(hub_model is None, '指定的仓库（{}）不存在！'.format(name))
+        os.system(f"python3 {hub_model.local}/setup.py {cmd}")
 
     @dbsession
     def remove_hub(self, name):
@@ -434,15 +445,15 @@ class HubManager(metaclass=SingletonType):
         print('+---------+------------------------------------------------')
         print('| version | ', info['version'])
         print('+---------+------------------------------------------------')
-        #print('\n')
+        # print('\n')
         print(info['doc'])
-        #print('\n')
-        #print('----------------------------------------------------------')
+        # print('\n')
+        # print('----------------------------------------------------------')
 
     @dbsession
     def get_hub_path(self, name):
         """获取仓库所在的本地路径
-        
+
         :param str name: 仓库名
         """
         path = self._session.query(HubModel.local).filter_by(name=name).first()
@@ -478,7 +489,7 @@ class HubManager(metaclass=SingletonType):
 
         示例： get_current_hub(__file__)
         """
-        abs_path = os.path.abspath(filename)  #当前文件的绝对路径
+        abs_path = os.path.abspath(filename)  # 当前文件的绝对路径
         path_parts = pathlib.Path(abs_path).parts
         local_base = path_parts[-4] if path_parts[-3] in ('prtflo', 'sys', 'ind') else path_parts[5]
         hub_model = self._session.query(HubModel.name).filter_by(local_base=local_base).first()
@@ -513,6 +524,15 @@ def update_hub(name):
     HubManager().update_hub(name)
 
 
+def build_hub(name, cmd='buildall'):
+    """构建 cpp 部分 part
+
+    :param str name: 仓库名称
+    :param str cmd: 同仓库下 python setup.py 后的命令参数，如: build -t ind -n cpp_example
+    """
+    HubManager().build_hub(name, cmd)
+
+
 def remove_hub(name):
     """删除指定的仓库
 
@@ -532,7 +552,7 @@ def get_part(name, **kwargs):
 
 def get_hub_path(name):
     """获取仓库所在的本地路径
-    
+
     :param str name: 仓库名
     """
     return HubManager().get_hub_path(name)
@@ -540,7 +560,7 @@ def get_hub_path(name):
 
 def get_part_info(name):
     """获取策略部件信息
-    
+
     :param str name: 部件名称
     """
     return HubManager().get_part_info(name)
@@ -598,10 +618,10 @@ if __name__ == "__main__":
     # add_local_hub('dev', '/home/fasiondog/workspace/stockhouse')
     remove_hub('dev')
     add_local_hub('dev', r'D:\workspace\hikyuu_hub')
-    #update_hub('test1')
-    update_hub('default')
+    # update_hub('test1')
+    # update_hub('default')
+    # build_hub('dev', 'buildall')
     # sg = get_part('dev.st.fixed_percent')
-    sg = get_part('dev.ind.金叉')
-    print(sg)
+    # print(sg)
     # print_part_info('default.sp.fixed_value')
     # print(get_part_name_list(part_type='sg'))
