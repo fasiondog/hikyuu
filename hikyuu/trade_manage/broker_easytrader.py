@@ -1,4 +1,4 @@
-/#!/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf8 -*-
 #
 # Create on: 2024-01-30
