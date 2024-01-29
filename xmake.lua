@@ -156,7 +156,7 @@ add_requires("boost " .. boost_version, {
   system = false,
   debug = is_mode("debug"),
   configs = {
-    shared = is_plat("windows") and true or false,
+    shared = is_plat("windows"),
     multi = true,
     date_time = true,
     filesystem = true,
