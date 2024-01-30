@@ -322,7 +322,7 @@ def install(j, o):
 def wheel(feedback, j):
     """ 生成 python 的 wheel 安装包 """
     # 清理之前遗留的打包产物
-    # clear_build()
+    clear_build()
 
     # 尝试编译
     start_build(False, 'release', feedback, j)
