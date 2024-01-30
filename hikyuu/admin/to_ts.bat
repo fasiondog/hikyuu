@@ -1,1 +1,0 @@
-C:\Anaconda3\Scripts\pylupdate5 admin.pro

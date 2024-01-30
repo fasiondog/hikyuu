@@ -223,5 +223,3 @@ includes("./hikyuu_cpp/hikyuu")
 includes("./hikyuu_pywrap")
 includes("./hikyuu_cpp/unit_test")
 includes("./hikyuu_cpp/demo")
-includes("./hikyuu_cpp/hikyuu_server")
-
