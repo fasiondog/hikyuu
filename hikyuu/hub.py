@@ -304,7 +304,10 @@ class HubManager(metaclass=SingletonType):
         """
         hub_model = self._session.query(HubModel).filter_by(name=name).first()
         checkif(hub_model is None, '指定的仓库（{}）不存在！'.format(name))
-        os.system(f"python3 {hub_model.local}/setup.py {cmd}")
+        if sys.platform == 'win32':
+            os.system(f"python {hub_model.local}/setup.py {cmd}")
+        else:
+            os.system(f"python3 {hub_model.local}/setup.py {cmd}")
 
     @dbsession
     def remove_hub(self, name):
@@ -358,10 +361,10 @@ class HubManager(metaclass=SingletonType):
                             try:
                                 part_module = importlib.import_module(module_name)
                             except ModuleNotFoundError:
-                                self.logger.error('缺失 part.py 文件, 位置："{}"！'.format(entry.path))
+                                self.logger.error('{} 缺失 part.py 文件, 位置："{}"！'.format(module_name, entry.path))
                                 continue
                             except:
-                                self.logger.error('无法导入该文件: {}'.format(entry.path))
+                                self.logger.error('{} 无法导入该文件: {}'.format(module_name, entry.path))
                                 continue
 
                             module_vars = vars(part_module)
@@ -602,6 +605,7 @@ __all__ = [
     'add_local_hub',
     'update_hub',
     'remove_hub',
+    'build_hub',
     'get_part',
     'get_hub_path',
     'get_part_info',
