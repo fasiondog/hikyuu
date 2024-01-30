@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import platform
+import os
 try:
     from setuptools import find_packages, setup
 except ImportError:
@@ -52,41 +53,46 @@ with open("./hikyuu/README.rst", encoding='utf-8') as f:
 
 hku_data_files = []
 
-packages = [
-    'hikyuu',
-    'hikyuu/admin',
-    'hikyuu/admin/language',
-    'hikyuu/analysis',
-    'hikyuu/config',
-    'hikyuu/config/block',
-    'hikyuu/cpp',
-    'hikyuu/data',
-    'hikyuu/data/mysql_upgrade',
-    'hikyuu/data/sqlite_upgrade',
-    'hikyuu/data/sqlite_mem_sql',
-    'hikyuu/data_driver',
-    'hikyuu/examples',
-    'hikyuu/examples/notebook',
-    'hikyuu/examples/notebook/images',
-    'hikyuu/examples/notebook/Demo',
-    'hikyuu/flat',
-    'hikyuu/fetcher',
-    'hikyuu/fetcher/proxy',
-    'hikyuu/fetcher/stock',
-    'hikyuu/gui',
-    'hikyuu/gui/data',
-    'hikyuu/indicator',
-    'hikyuu/draw',
-    'hikyuu/draw/drawplot',
-    'hikyuu/shell',
-    'hikyuu/strategy',
-    'hikyuu/strategy/demo',
-    'hikyuu/test',
-    'hikyuu/tools',
-    'hikyuu/trade_manage',
-    'hikyuu/trade_sys',
-    'hikyuu/util',
-]
+# packages = [
+#     'hikyuu',
+#     'hikyuu/analysis',
+#     'hikyuu/config',
+#     'hikyuu/config/block',
+#     'hikyuu/cpp',
+#     'hikyuu/data',
+#     'hikyuu/data/mysql_upgrade',
+#     'hikyuu/data/sqlite_upgrade',
+#     'hikyuu/data/sqlite_mem_sql',
+#     'hikyuu/data_driver',
+#     'hikyuu/examples',
+#     'hikyuu/examples/notebook',
+#     'hikyuu/examples/notebook/images',
+#     'hikyuu/examples/notebook/Demo',
+#     'hikyuu/flat',
+#     'hikyuu/fetcher',
+#     'hikyuu/fetcher/proxy',
+#     'hikyuu/fetcher/stock',
+#     'hikyuu/gui',
+#     'hikyuu/gui/data',
+#     'hikyuu/indicator',
+#     'hikyuu/draw',
+#     'hikyuu/draw/drawplot',
+#     'hikyuu/shell',
+#     'hikyuu/strategy',
+#     'hikyuu/strategy/demo',
+#     'hikyuu/test',
+#     'hikyuu/tools',
+#     'hikyuu/trade_manage',
+#     'hikyuu/trade_sys',
+#     'hikyuu/util',
+#     'hikyuu/include',
+# ]
+
+packages = ['hikyuu']
+for root, dirs, files in os.walk('hikyuu'):
+    for p in dirs:
+        if p.find('__pycache__') < 0 and p.find('ipynb_checkpoints') < 0 and p.find('.virtual_documents') < 0:
+            packages.append(f'{root}/{p}')
 
 setup(
     name=hku_name,
@@ -106,7 +112,7 @@ setup(
     package_data={
         '': [
             '*.rst', '*.pyd', '*.png', '*.md', '*.ipynb', '*.ini', '*.sql', '*.properties', '*.xml',
-            'LICENSE.txt', '*.dll', '*.exe', '*.ico', '*.so', '*.dylib',
+            'LICENSE.txt', '*.dll', '*.exe', '*.ico', '*.so', '*.dylib', '*.h',
             '*.so.*', '*.qm', 'libboost_serialization*',
             'libboost_python{}*'.format(py_version)
         ],

@@ -126,4 +126,10 @@ target("hikyuu")
         end
     end)
 
+    after_install(function(target)
+        local dst_path = target:installdir() .. "/include/hikyuu/python/"
+        os.cp("$(projectdir)/hikyuu_pywrap/pybind_utils.h", dst_path)
+        os.cp("$(projectdir)/hikyuu_pywrap/pickle_support.h", dst_path)
+    end)
+
 target_end()
