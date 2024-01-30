@@ -259,6 +259,34 @@ def uninstall():
     print("Uninstall finished!")
 
 
+def copy_include(install_dir):
+    src_path = 'hikyuu_cpp/hikyuu'
+    dst_path = f'{install_dir}/include'
+
+    for root, dirs, files in os.walk(src_path):
+        for p in dirs:
+            dst_p = f'{dst_path}/{root[11:]}/{p}'
+            if not os.path.lexists(dst_p):
+                os.makedirs(dst_p)
+            shutil.copy('hikyuu/cpp/__init__.py', dst_p)
+
+        for fname in files:
+            if len(fname) > 2 and fname[-2:] == ".h":
+                dst_p = f'{dst_path}/{root[11:]}'
+                if not os.path.lexists(dst_p):
+                    os.makedirs(dst_p)
+                shutil.copy(f'{root}/{fname}', dst_p)
+
+    dst_path = f'{install_dir}/include/hikyuu/python'
+    if not os.path.lexists(dst_path):
+        os.makedirs(dst_path)
+    shutil.copy('hikyuu_pywrap/pybind_utils.h', dst_path)
+    shutil.copy('hikyuu_pywrap/pickle_support.h', dst_path)
+    shutil.copy('hikyuu/cpp/__init__.py', dst_path)
+    shutil.copy('hikyuu/cpp/__init__.py', f'{install_dir}/include')
+    shutil.copy('hikyuu/cpp/__init__.py', f'{install_dir}/include/hikyuu')
+
+
 @click.option('-j', '--j', default=2, help="并行编译数量")
 @click.option('-o', '--o', help="指定的安装目录")
 @click.command()
@@ -281,6 +309,8 @@ def install(j, o):
 
     shutil.copytree("./hikyuu", install_dir)
 
+    copy_include(install_dir)
+
 
 @click.command()
 @click.option('-j', '--j', default=2, help="并行编译数量")
@@ -296,6 +326,8 @@ def wheel(feedback, j):
 
     # 尝试编译
     start_build(False, 'release', feedback, j)
+
+    copy_include('hikyuu')
 
     # 构建打包命令
     print("start pacakaging bdist_wheel ...")
@@ -329,6 +361,8 @@ def wheel(feedback, j):
             main_ver, min_ver, plat)
         print(cmd)
         os.system(cmd)
+
+    shutil.rmtree('hikyuu/include', True)
 
 
 @click.command()
