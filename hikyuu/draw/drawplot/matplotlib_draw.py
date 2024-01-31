@@ -5,10 +5,12 @@
 """
 import sys
 import datetime
+import logging
 import numpy as np
 import matplotlib
 from pylab import Rectangle, gca, figure, ylabel, axes, draw
 from matplotlib import rcParams
+from matplotlib.font_manager import FontManager, _log as fm_logger
 from matplotlib.lines import Line2D, TICKLEFT, TICKRIGHT
 from matplotlib.ticker import FuncFormatter, FixedLocator
 
@@ -25,13 +27,14 @@ def set_mpl_params():
     rcParams['font.family'] = 'sans-serif'
     rcParams['axes.unicode_minus'] = False
 
-    expected_fonts = ['Microsoft YaHei', 'SimSun', 'SimHei', 'Noto Sans CJK JP']
+    expected_fonts = ['Microsoft YaHei', 'SimSun', 'SimHei', 'Source Han Sans CN', 'Noto Sans CJK JP']
     current_fonts = matplotlib.rcParams['font.sans-serif']
     for font in expected_fonts:
         if font in current_fonts:
             return
 
-    all_fonts = [f.name for f in matplotlib.font_manager.FontManager().ttflist]
+    with LoggingContext(fm_logger, level=logging.WARNING):
+        all_fonts = [f.name for f in FontManager().ttflist]
     for font in expected_fonts:
         if font in all_fonts:
             current_fonts.insert(0, font)
