@@ -16,7 +16,6 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Parameter& param) {
     // os.precision(4);
     os << "params[";
     string strip(", ");
-    string colon(": ");
     Parameter::param_map_t::const_iterator iter = param.m_params.begin();
     for (; iter != param.m_params.end(); ++iter) {
         os << iter->first;

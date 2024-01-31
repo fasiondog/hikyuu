@@ -8,6 +8,10 @@
 #include "../../StockTypeInfo.h"
 #include "FixedA2017TradeCost.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedA2017TradeCost)
+#endif
+
 namespace hku {
 
 FixedA2017TradeCost::FixedA2017TradeCost() : TradeCostBase("TC_FixedA2017") {

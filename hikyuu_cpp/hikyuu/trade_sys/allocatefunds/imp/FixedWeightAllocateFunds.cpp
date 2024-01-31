@@ -7,6 +7,10 @@
 
 #include "FixedWeightAllocateFunds.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedWeightAllocateFunds)
+#endif
+
 namespace hku {
 
 FixedWeightAllocateFunds::FixedWeightAllocateFunds() : AllocateFundsBase("AF_FixedWeight") {

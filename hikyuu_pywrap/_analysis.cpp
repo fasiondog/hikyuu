@@ -175,8 +175,8 @@ void export_analysis(py::module& m) {
     :return: 组合后的指标列表
     :rtype: list)");
 
-    m.def("_combinate_ind_analysis", combinate_ind_analysis);
-    m.def("_combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
+    m.def("inner_combinate_ind_analysis", combinate_ind_analysis);
+    m.def("inner_combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
 
     m.def("analysis_sys_list", analysis_sys_list);
 }

@@ -45,7 +45,7 @@ jobs:
     - name: configure
       shell: cmd
       run: |
-        xmake f -y --pyver=3.11
+        xmake f -k shared -y
 
     - name: build
       shell: cmd

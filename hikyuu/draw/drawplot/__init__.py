@@ -24,12 +24,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-#===============================================================================
+# ===============================================================================
 # history:
 # 1. 20171122, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
-from hikyuu.cpp.core import KData, Indicator, SignalBase, ConditionBase, System
+from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, System
 
 import matplotlib
 from matplotlib.pylab import gca as mpl_gca
@@ -121,6 +121,7 @@ def use_draw_with_matplotlib():
 
     System.plot = mpl_sysplot
 
+
 def use_draw_with_echarts():
     set_current_draw_engine('echarts')
 
@@ -132,6 +133,7 @@ def use_draw_with_echarts():
     Indicator.bar = ec_ibar
 
     System.plot = ec_sysplot
+
 
 def create_figure(n=1, figsize=None):
     """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
@@ -181,7 +183,7 @@ def show_gcf():
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
-    
+
     :param axes: 指定的坐标轴
     :param KData kdata: KData
     :param int n1: 指标 MACD 的参数1
@@ -199,7 +201,7 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
-    
+
     :param axes: 指定的坐标轴
     :param KData kdata: KData
     :param int n1: 指标 MACD 的参数1
@@ -240,7 +242,7 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
 def adjust_axes_show(axeslist):
     """用于调整上下紧密相连的坐标轴显示时，其上一坐标轴最小值刻度和下一坐标轴最大值刻度
     显示重叠的问题。
-    
+
     :param axeslist: 上下相连的坐标轴列表 (ax1,ax2,...)
     """
     engine = get_current_draw_engine()
@@ -254,7 +256,7 @@ def adjust_axes_show(axeslist):
 
 def ax_set_locator_formatter(axes, dates, typ):
     """ 设置指定坐标轴的日期显示，根据指定的K线类型优化X轴坐标显示
-    
+
     :param axes: 指定的坐标轴
     :param dates: Datetime构成可迭代序列
     :param Query.KType typ: K线类型

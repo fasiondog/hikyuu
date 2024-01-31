@@ -22,10 +22,12 @@
 .project
 .pyproject
 .vscode
+.clangd
 .vs
 .ipynb_checkpoints
 nohup.out
 temp
+tmp
 file
 temp.txt
 compile_info
@@ -74,3 +76,4 @@ hikyuu/cpp/libhku_hdf5_hl.so.200
 hikyuu/cpp/libhku_hdf5_hl.so.200.1.0
 hikyuu/cpp/libhku_hdf5.so.200
 hikyuu/cpp/libhku_hdf5.so.200.2.0
+hikyuu/include

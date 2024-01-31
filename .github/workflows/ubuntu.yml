@@ -36,10 +36,11 @@ jobs:
       with:
         xmake-version: branch@master
         actions-cache-folder: '.xmake-cache'
+        actions-cache-key: 'ubuntu'
 
     - name: config
       run: |
-        xmake f --feedback=n -y
+        xmake f --feedback=n -k shared -y
 
     - name: build
       run: |

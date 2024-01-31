@@ -25,7 +25,7 @@ public:
 
 private:
     Indicator m_ind;
-    price_t m_lower, m_upper;
+    price_t m_lower = 0.0, m_upper = 0.0;
 
 //============================================
 // 序列化支持

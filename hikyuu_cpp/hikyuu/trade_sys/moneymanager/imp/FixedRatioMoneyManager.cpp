@@ -7,6 +7,10 @@
 
 #include "FixedRatioMoneyManager.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedRatioMoneyManager)
+#endif
+
 namespace hku {
 
 FixedRatioMoneyManager::FixedRatioMoneyManager()

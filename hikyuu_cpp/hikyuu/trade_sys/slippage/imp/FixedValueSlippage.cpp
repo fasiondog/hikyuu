@@ -7,6 +7,10 @@
 
 #include "FixedValueSlippage.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedValueSlippage)
+#endif
+
 namespace hku {
 
 FixedValueSlippage::FixedValueSlippage() {

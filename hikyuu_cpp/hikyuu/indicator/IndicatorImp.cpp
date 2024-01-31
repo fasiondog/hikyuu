@@ -806,7 +806,7 @@ void IndicatorImp::execute_weave() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -859,7 +859,7 @@ void IndicatorImp::execute_add() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -889,7 +889,7 @@ void IndicatorImp::execute_sub() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -927,7 +927,7 @@ void IndicatorImp::execute_mul() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -957,7 +957,7 @@ void IndicatorImp::execute_div() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1003,7 +1003,7 @@ void IndicatorImp::execute_mod() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1049,7 +1049,7 @@ void IndicatorImp::execute_eq() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1083,7 +1083,7 @@ void IndicatorImp::execute_ne() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1117,7 +1117,7 @@ void IndicatorImp::execute_gt() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1163,7 +1163,7 @@ void IndicatorImp::execute_lt() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1209,7 +1209,7 @@ void IndicatorImp::execute_ge() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1255,7 +1255,7 @@ void IndicatorImp::execute_le() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1301,7 +1301,7 @@ void IndicatorImp::execute_and() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1335,7 +1335,7 @@ void IndicatorImp::execute_or() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1370,7 +1370,7 @@ void IndicatorImp::execute_if() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1414,7 +1414,7 @@ void IndicatorImp::execute_corr() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1525,9 +1525,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     // HKU_INFO("multi_thread");
     size_t circleLength = minCircleLength;
-    if (minCircleLength * workerNum >= total) {
-        circleLength = minCircleLength;
-    } else {
+    if (minCircleLength * workerNum < total) {
         size_t tailCount = total % workerNum;
         circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
     }

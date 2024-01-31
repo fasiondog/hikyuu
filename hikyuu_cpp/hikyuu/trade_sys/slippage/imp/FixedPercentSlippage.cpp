@@ -7,6 +7,10 @@
 
 #include "FixedPercentSlippage.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedPercentSlippage)
+#endif
+
 namespace hku {
 
 FixedPercentSlippage::FixedPercentSlippage() : SlippageBase("FixedPercent") {

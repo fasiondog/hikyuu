@@ -43,11 +43,9 @@ void ISaftyLoss::_calculate(const Indicator& data) {
         return;
     }
 
-    price_t result(0.0);
-
     size_t start = discard();
     for (size_t i = start; i < total; ++i) {
-        result = 0.0;
+        price_t result = 0.0;
         for (size_t j = i + 1 - n2; j <= i; ++j) {
             price_t sum = 0.0;
             size_t num = 0;
@@ -118,9 +116,7 @@ void ISaftyLoss::_dyn_calculate(const Indicator& ind) {
     }
 
     size_t circleLength = minCircleLength;
-    if (minCircleLength * workerNum >= total) {
-        circleLength = minCircleLength;
-    } else {
+    if (minCircleLength * workerNum < total) {
         size_t tailCount = total % workerNum;
         circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
     }

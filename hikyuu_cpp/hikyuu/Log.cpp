@@ -12,10 +12,10 @@
 
 #if USE_SPDLOG_LOGGER
 // 使用 stdout_color 将无法将日志输出重定向至 python
-//#include <spdlog/sinks/stdout_color_sinks.h>
+// #include <spdlog/sinks/stdout_color_sinks.h>
 #include <iostream>
 #include "spdlog/sinks/ostream_sink.h"
-//#include "spdlog/sinks/rotating_file_sink.h"
+// #include "spdlog/sinks/rotating_file_sink.h"
 
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
 #include <spdlog/async.h>
@@ -43,7 +43,7 @@ void decreaseIORedicrectToPythonCount() {
     g_ioredirect_to_python_count--;
 }
 
-static LOG_LEVEL g_log_level = TRACE;
+static LOG_LEVEL g_log_level = LOG_LEVEL::LOG_TRACE;
 
 std::string g_unknown_error_msg{"Unknown error!"};
 

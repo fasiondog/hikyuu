@@ -40,7 +40,7 @@ def parse_one_result(quotes):
     result['bid5_amount'] = float(quotes['bid_vol5'])
     result['bid5'] = float(quotes['bid5'])
     result['ask1_amount'] = float(quotes['ask_vol1'])  # “卖一”申报3100股，即31手
-    result['ask1'] = float(quotes['ask1'])  #“卖一”报价
+    result['ask1'] = float(quotes['ask1'])  # “卖一”报价
     result['ask2_amount'] = float(quotes['ask_vol2'])
     result['ask2'] = float(quotes['ask2'])
     result['ask3_amount'] = float(quotes['ask_vol3'])
@@ -56,25 +56,26 @@ def parse_one_result(quotes):
 
 
 @hku_catch(ret=[])
-def request_data(stklist, parse_one_result, ip, port):
+def request_data(api, stklist, parse_one_result):
     """请求失败将抛出异常"""
-    api = TdxHq_API()
-    hku_check(api.connect(ip, port), 'Failed connect tdx ({}:{})!'.format(ip, port))
     quotes_list = api.get_security_quotes(stklist)
     result = [parse_one_result(q) for q in quotes_list] if quotes_list is not None else []
     return [r for r in result if r is not None]
 
 
 def get_spot(stocklist, ip, port, batch_func=None):
+    api = TdxHq_API()
+    hku_check(api.connect(ip, port), 'Failed connect tdx ({}:{})!'.format(ip, port))
+
     count = 0
     tmplist = []
     result = []
-    max_size = 100
+    max_size = 80
     for stk in stocklist:
         tmplist.append((1 if stk.market == 'SH' else 0, stk.code))
         count += 1
-        if count > max_size:
-            phase_result = request_data(tmplist, parse_one_result, ip, port)
+        if count >= max_size:
+            phase_result = request_data(api, tmplist, parse_one_result)
             if phase_result:
                 result.extend(phase_result)
                 if batch_func:
@@ -82,7 +83,7 @@ def get_spot(stocklist, ip, port, batch_func=None):
             count = 0
             tmplist = []
     if tmplist:
-        phase_result = request_data(tmplist, parse_one_result, ip, port)
+        phase_result = request_data(api, tmplist, parse_one_result)
         if phase_result:
             result.extend(phase_result)
             if batch_func:

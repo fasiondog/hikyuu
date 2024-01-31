@@ -7,6 +7,10 @@
 
 #include "BoolCondition.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::BoolCondition)
+#endif
+
 namespace hku {
 
 BoolCondition::BoolCondition() : ConditionBase("CN_Bool") {}
@@ -14,8 +18,6 @@ BoolCondition::BoolCondition() : ConditionBase("CN_Bool") {}
 BoolCondition::BoolCondition(const Indicator& ind) : ConditionBase("CN_Bool"), m_ind(ind) {}
 
 BoolCondition::~BoolCondition() {}
-
-void BoolCondition::_reset() {}
 
 ConditionPtr BoolCondition::_clone() {
     return make_shared<BoolCondition>(m_ind);

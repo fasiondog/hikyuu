@@ -27,4 +27,4 @@
 from .trade import *
 from .broker import OrderBrokerBase, OrderBrokerWrap, TestOrderBroker, crtOB
 from .broker_mail import MailOrderBroker
-
+from .broker_easytrader import EasyTraderOrderBroker

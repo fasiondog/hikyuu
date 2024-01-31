@@ -36,6 +36,25 @@ function coverage_report(target)
     end
 end
 
+function prepare_run(target)
+    local targetname = target:name()
+  
+    if "unit-test" == targetname or "small-test" == targetname or "prepare-test" == targetname then
+      print("copying test_data ...")
+      os.rm("$(buildir)/$(mode)/$(plat)/$(arch)/lib/test_data")
+      os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+    end
+  
+    if is_plat("windows") then os.cp("$(env BOOST_LIB)/boost_*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/") end
+  
+    -- if is_plat("linux") and os.getenv(BOOST_LIB) > "" then
+    --   -- 不确定是否需要加入这段才能在fedora下使用
+    --   os.cp("$(env BOOST_LIB)/libboost_*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+    -- end
+  
+    if is_plat("macosx") then os.cp("$(env BOOST_LIB)/libboost_*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/") end
+  end
+
 target("unit-test")
     set_kind("binary")
     set_default(false)
@@ -60,7 +79,7 @@ target("unit-test")
         add_cxflags("-Wno-sign-compare")
     end
     
-    if is_plat("windows") and is_mode("release") then
+    if is_plat("windows") and get_config("kind") == "shared" then
         add_defines("HKU_API=__declspec(dllimport)")
     end
 
@@ -80,7 +99,8 @@ target("unit-test")
 
     -- add files
     add_files("**.cpp")
-    
+
+    before_run(prepare_run)
     after_run(coverage_report)
 target_end()
 
@@ -128,10 +148,6 @@ target("small-test")
     add_files("./hikyuu/hikyuu/**.cpp");
     add_files("./hikyuu/test_main.cpp")
 
+    before_run(prepare_run)
     after_run(coverage_report)
-target_end()
-
-target("prepare-test")
-    set_kind("phony")
-    set_default(false)
 target_end()

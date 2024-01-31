@@ -19,7 +19,7 @@ public:
     SignalSelector();
     virtual ~SignalSelector();
 
-    virtual void _reset() {
+    virtual void _reset() override {
         m_sys_dict_on_open.clear();
         m_sys_dict_on_close.clear();
     }

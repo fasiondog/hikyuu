@@ -77,7 +77,7 @@ public:
      * @param kType  K线类型
      * @return
      */
-    virtual size_t getCount(const string& market, const string& code, KQuery::KType kType);
+    virtual size_t getCount(const string& market, const string& code, const KQuery::KType& kType);
 
     /**
      * 获取指定日期范围对应的K线记录索引

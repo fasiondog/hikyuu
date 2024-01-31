@@ -7,6 +7,10 @@
 
 #include "NotMoneyManager.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::NotMoneyManager)
+#endif
+
 namespace hku {
 
 NotMoneyManager::NotMoneyManager() : MoneyManagerBase("MM_Nothing") {}

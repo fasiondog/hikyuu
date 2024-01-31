@@ -85,9 +85,7 @@ void ISma::_dyn_calculate(const Indicator& ind) {
     }
 
     size_t circleLength = minCircleLength;
-    if (minCircleLength * workerNum >= total) {
-        circleLength = minCircleLength;
-    } else {
+    if (minCircleLength * workerNum < total) {
         size_t tailCount = total % workerNum;
         circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
     }

@@ -282,7 +282,7 @@ void Portfolio::run(const KQuery& query, bool force) {
                         "AllocateFunds instance have been specified.");
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
-    for (auto& date : datelist) {
+    for (const auto& date : datelist) {
         _runMoment(date);
     }
     m_need_calculate = false;

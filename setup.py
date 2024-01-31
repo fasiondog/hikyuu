@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 from setuptools import setup, find_packages
 import sys
@@ -10,9 +10,9 @@ import platform
 import click
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # 前置检查
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def check_xmake():
     """检查是否按照了编译工具 xmake"""
     print("checking xmake ...")
@@ -25,7 +25,7 @@ def get_python_version():
     py_version = platform.python_version_tuple()
     min_version = int(py_version[1])
     main_version = int(py_version[0])
-    #py_version = main_version * 10 + min_version if min_version < 10 else main_version * 100 + min_version
+    # py_version = main_version * 10 + min_version if min_version < 10 else main_version * 100 + min_version
     py_version = f"{main_version}.{min_version}"
     print(f'current python version: {py_version}')
     return py_version
@@ -102,9 +102,9 @@ def clear_with_python_changed(mode):
         shutil.rmtree(build_pywrap_dir)
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # 执行构建
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
     """ 执行编译 """
     global g_verbose
@@ -118,13 +118,13 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
 
     py_version = current_compile_info['py_version']
 
-    #如果 python版本或者编译模式发生变化，则编译依赖的 boost 库（boost.python)
+    # 如果 python版本或者编译模式发生变化，则重新编译
     history_compile_info = get_history_compile_info()
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
-        cmd = "xmake f {} -c -y -m {} --pyver={} --feedback={}".format(
-            "-v -D" if verbose else "", mode, py_version, feedback)
+        cmd = "xmake f {} -c -y -m {} --feedback={} -k {}".format(
+            "-v -D" if verbose else "", mode, feedback, "shared" if mode == 'release' else "static")
         print(cmd)
         os.system(cmd)
 
@@ -143,9 +143,9 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
     save_current_compile_info(current_compile_info)
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # 控制台命令
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 @click.group()
@@ -216,7 +216,9 @@ def clear_build():
     """ 清除当前编译设置及结果 """
     if os.path.lexists('.xmake'):
         print('delete .xmake')
-        shutil.rmtree('.xmake')
+        shutil.rmtree('.xmake', True)
+        if sys.platform == 'win32':
+            os.system("rmdir .xmake /s /q")
     if os.path.lexists('build'):
         print('delete build')
         shutil.rmtree('build')
@@ -231,7 +233,6 @@ def clear_build():
         if file not in ("__init__.py", "__pycache__"):
             os.remove(f'hikyuu/cpp/{file}')
     print('clear finished!')
-    os.system("xmake clean")
 
 
 @click.command()
@@ -258,23 +259,57 @@ def uninstall():
     print("Uninstall finished!")
 
 
+def copy_include(install_dir):
+    src_path = 'hikyuu_cpp/hikyuu'
+    dst_path = f'{install_dir}/include'
+
+    for root, dirs, files in os.walk(src_path):
+        for p in dirs:
+            dst_p = f'{dst_path}/{root[11:]}/{p}'
+            if not os.path.lexists(dst_p):
+                os.makedirs(dst_p)
+            shutil.copy('hikyuu/cpp/__init__.py', dst_p)
+
+        for fname in files:
+            if len(fname) > 2 and fname[-2:] == ".h":
+                dst_p = f'{dst_path}/{root[11:]}'
+                if not os.path.lexists(dst_p):
+                    os.makedirs(dst_p)
+                shutil.copy(f'{root}/{fname}', dst_p)
+
+    dst_path = f'{install_dir}/include/hikyuu/python'
+    if not os.path.lexists(dst_path):
+        os.makedirs(dst_path)
+    shutil.copy('hikyuu_pywrap/pybind_utils.h', dst_path)
+    shutil.copy('hikyuu_pywrap/pickle_support.h', dst_path)
+    shutil.copy('hikyuu/cpp/__init__.py', dst_path)
+    shutil.copy('hikyuu/cpp/__init__.py', f'{install_dir}/include')
+    shutil.copy('hikyuu/cpp/__init__.py', f'{install_dir}/include/hikyuu')
+
+
 @click.option('-j', '--j', default=2, help="并行编译数量")
+@click.option('-o', '--o', help="指定的安装目录")
 @click.command()
-def install(j):
+def install(j, o):
     """ 编译并安装 Hikyuu python 库 """
+    install_dir = o
+    if install_dir is None:
+        if sys.platform == 'win32':
+            install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
+        else:
+            usr_dir = os.path.expanduser('~')
+            install_dir = '{}/.local/lib/python{}/site-packages/hikyuu'.format(
+                usr_dir, get_python_version())
+            try:
+                shutil.rmtree(install_dir)
+            except:
+                pass
+
     start_build(False, 'release', True, j)
-    if sys.platform == 'win32':
-        install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
-    else:
-        usr_dir = os.path.expanduser('~')
-        install_dir = '{}/.local/lib/python{}/site-packages/hikyuu'.format(
-            usr_dir, get_python_version())
-        try:
-            shutil.rmtree(install_dir)
-        except:
-            pass
-        os.makedirs(install_dir)
-    os.system('xmake install -o "{}"'.format(install_dir))
+
+    shutil.copytree("./hikyuu", install_dir)
+
+    copy_include(install_dir)
 
 
 @click.command()
@@ -291,6 +326,8 @@ def wheel(feedback, j):
 
     # 尝试编译
     start_build(False, 'release', feedback, j)
+
+    copy_include('hikyuu')
 
     # 构建打包命令
     print("start pacakaging bdist_wheel ...")
@@ -325,6 +362,8 @@ def wheel(feedback, j):
         print(cmd)
         os.system(cmd)
 
+    shutil.rmtree('hikyuu/include', True)
+
 
 @click.command()
 def upload():
@@ -341,9 +380,9 @@ def upload():
         os.system("twine upload dist/*")
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # 添加 click 命令
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 cli.add_command(build)
 cli.add_command(test)
 cli.add_command(clear)

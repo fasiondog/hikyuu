@@ -1,0 +1,58 @@
+name: ubuntu-aarch64-build
+
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        cross: [aarch64-linux-musl]
+
+    concurrency:
+        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Cross-Musl-${{ matrix.cross }}
+        cancel-in-progress: true
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Cache xmake aarch64 packages
+      id: cache-xmake-ubuntu-aarch64
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-ubuntu-aarch64-modules
+      with:
+        path: |
+          ~/.xmake
+          ./${{ matrix.cross }}-cross.linux
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
+    - uses: xmake-io/github-action-setup-xmake@v1
+      with:
+        xmake-version: branch@master
+        actions-cache-folder: '.xmake-cache'
+
+    - name: Installation musl
+      run: |
+        wget https://github.com/xmake-mirror/musl.cc/releases/download/20210202/${{ matrix.cross }}-cross.linux.tgz
+        tar -xvf ${{ matrix.cross }}-cross.linux.tgz
+
+    - name: configure
+      run: |
+        xmake f -p cross -a aarch64 --sdk=`pwd`/${{ matrix.cross }}-cross -k shared -y
+
+    - name: build
+      run: |
+        xmake -b hikyuu

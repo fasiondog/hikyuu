@@ -8,6 +8,10 @@
 #include "../../../indicator/crt/KDATA.h"
 #include "IndicatorStoploss.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::IndicatorStoploss)
+#endif
+
 namespace hku {
 
 IndicatorStoploss::IndicatorStoploss() : StoplossBase("IndicatorStoploss") {
