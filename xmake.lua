@@ -73,7 +73,7 @@ add_rules("mode.debug", "mode.release")
 if not is_plat("windows") then add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan") end
 
 -- version
-set_version("1.3.2", {build = "%Y%m%d%H%M"})
+set_version("1.3.3", {build = "%Y%m%d%H%M"})
 set_configvar("LOG_ACTIVE_LEVEL", 0) -- 激活的日志级别
 -- if is_mode("debug") then
 --    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别
