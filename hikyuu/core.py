@@ -21,3 +21,5 @@ try:
         from .cpp.core import *
 except:
     from .cpp.core import *
+
+__version__ = get_version()

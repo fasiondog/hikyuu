@@ -51,6 +51,10 @@ std::string HKU_API getVersionWithBuild() {
 #endif
 }
 
+std::string getVersionWithGit() {
+    return HKU_VERSION_GIT;
+}
+
 static bool readUUID(const boost::uuids::uuid& out) {
     std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
     FILE* fp = fopen(filename.c_str(), "rb");
