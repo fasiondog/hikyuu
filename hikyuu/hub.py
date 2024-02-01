@@ -333,6 +333,7 @@ class HubManager(metaclass=SingletonType):
             'prtflo': 'prtflo',
             'sys': 'sys',
             'ind': 'ind',
+            'other': 'other',
         }
 
         # 检查仓库本地目录是否存在，不存在则给出告警信息并直接返回
@@ -354,7 +355,7 @@ class HubManager(metaclass=SingletonType):
                         if (not entry.name.startswith('.')) and entry.is_dir() and (entry.name != "__pycache__"):
                             # 计算实际的导入模块名
                             module_name = '{}.part.{}.{}.part'.format(base_local, part, entry.name) if part not in (
-                                'prtflo', 'sys', 'ind'
+                                'prtflo', 'sys', 'ind', 'other'
                             ) else '{}.{}.{}.part'.format(base_local, part, entry.name)
 
                             # 导入模块
@@ -373,7 +374,7 @@ class HubManager(metaclass=SingletonType):
                                 continue
 
                             name = '{}.{}.{}'.format(hub_model.name, part, entry.name) if part not in (
-                                'prtflo', 'sys', 'ind'
+                                'prtflo', 'sys', 'ind', 'other'
                             ) else '{}.{}.{}'.format(hub_model.name, part, entry.name)
 
                             try:
@@ -404,7 +405,7 @@ class HubManager(metaclass=SingletonType):
         name_parts = name.split('.')
         checkif(
             len(name_parts) < 2
-            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys', 'ind')),
+            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys', 'ind', 'other')),
             name, PartNameError
         )
 
@@ -494,7 +495,7 @@ class HubManager(metaclass=SingletonType):
         """
         abs_path = os.path.abspath(filename)  # 当前文件的绝对路径
         path_parts = pathlib.Path(abs_path).parts
-        local_base = path_parts[-4] if path_parts[-3] in ('prtflo', 'sys', 'ind') else path_parts[5]
+        local_base = path_parts[-4] if path_parts[-3] in ('prtflo', 'sys', 'ind', 'other') else path_parts[5]
         hub_model = self._session.query(HubModel.name).filter_by(local_base=local_base).first()
         checkif(hub_model is None, local_base, HubNotFoundError)
         return hub_model.name
