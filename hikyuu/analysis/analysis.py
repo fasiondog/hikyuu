@@ -5,7 +5,7 @@
 #    Author: fasiondog
 
 import pandas as pd
-from hikyuu.core import Block, Performance, inner_combinate_ind_analysis, inner_combinate_ind_analysis_with_block
+from hikyuu.core import *
 
 
 def combinate_ind_analysis(
@@ -88,6 +88,19 @@ def combinate_ind_analysis_multi(
     else:
         ret = {}
         names = ["组合名称", "证券代码", "证券名称"]
+        names.extend(keys)
+        for name in names:
+            ret[name] = out[name]
+    return pd.DataFrame(ret)
+
+
+def analysis_sys_list(stks, query, sys_proto, keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]):
+    out = inner_analysis_sys_list(stks, query, sys_proto)
+    if not keys:
+        ret = out
+    else:
+        ret = {}
+        names = ["证券代码", "证券名称"]
         names.extend(keys)
         for name in names:
             ret[name] = out[name]
