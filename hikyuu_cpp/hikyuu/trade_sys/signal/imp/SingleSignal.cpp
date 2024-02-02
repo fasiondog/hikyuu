@@ -30,7 +30,7 @@ SingleSignal::~SingleSignal() {}
 
 SignalPtr SingleSignal::_clone() {
     SingleSignal* p = new SingleSignal();
-    p->m_ind = m_ind;
+    p->m_ind = m_ind.clone();
     return SignalPtr(p);
 }
 

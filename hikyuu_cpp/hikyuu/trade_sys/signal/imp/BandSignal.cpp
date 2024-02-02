@@ -26,7 +26,7 @@ SignalPtr BandSignal::_clone() {
     BandSignal* p = new BandSignal();
     p->m_upper = m_upper;
     p->m_lower = m_lower;
-    p->m_ind = m_ind;
+    p->m_ind = m_ind.clone();
     return SignalPtr(p);
 }
 

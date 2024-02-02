@@ -146,6 +146,9 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
     std::vector<py::list> tmp(keys.size() + 2);
     for (size_t i = 0, total = records.size(); i < total; i++) {
         const auto& record = records[i];
+        if (record.values.size() != keys.size()) {
+            continue;
+        }
         tmp[0].append(record.market_code);
         tmp[1].append(record.name);
         for (size_t j = 0, len = keys.size(); j < len; j++) {
@@ -157,7 +160,9 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
     result["证券代码"] = tmp[0];
     result["证券名称"] = tmp[1];
     for (size_t i = 0, total = keys.size(); i < total; i++) {
-        result[keys[i].c_str()] = tmp[i + 2];
+        if (!tmp[i + 2].empty()) {
+            result[keys[i].c_str()] = tmp[i + 2];
+        }
     }
     return result;
 }

@@ -23,8 +23,8 @@ CrossGoldSignal::~CrossGoldSignal() {}
 
 SignalPtr CrossGoldSignal::_clone() {
     CrossGoldSignal* p = new CrossGoldSignal();
-    p->m_fast = m_fast;
-    p->m_slow = m_slow;
+    p->m_fast = m_fast.clone();
+    p->m_slow = m_slow.clone();
     return SignalPtr(p);
 }
 

@@ -34,7 +34,7 @@ void IndicatorStoploss::_reset() {
 }
 
 StoplossPtr IndicatorStoploss::_clone() {
-    IndicatorStoploss* p = new IndicatorStoploss(m_op, getParam<string>("kpart"));
+    IndicatorStoploss* p = new IndicatorStoploss(m_op.clone(), getParam<string>("kpart"));
     p->m_result = m_result;
     return StoplossPtr(p);
 }

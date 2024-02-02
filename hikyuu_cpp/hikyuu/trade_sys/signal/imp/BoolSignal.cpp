@@ -23,8 +23,8 @@ BoolSignal::~BoolSignal() {}
 
 SignalPtr BoolSignal::_clone() {
     BoolSignal* p = new BoolSignal();
-    p->m_bool_buy = m_bool_buy;
-    p->m_bool_sell = m_bool_sell;
+    p->m_bool_buy = m_bool_buy.clone();
+    p->m_bool_sell = m_bool_sell.clone();
     return SignalPtr(p);
 }
 
