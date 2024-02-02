@@ -41,7 +41,7 @@ std::string getVersion() {
     return HKU_VERSION;
 }
 
-std::string HKU_API getVersionWithBuild() {
+std::string getVersionWithBuild() {
     return fmt::format("{}_{}_{}_{}_{}",
             HKU_VERSION,
             HKU_VERSION_BUILD,
