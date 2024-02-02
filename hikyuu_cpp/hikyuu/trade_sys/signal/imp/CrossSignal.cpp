@@ -23,8 +23,8 @@ CrossSignal::~CrossSignal() {}
 
 SignalPtr CrossSignal::_clone() {
     CrossSignal* p = new CrossSignal();
-    p->m_fast = m_fast;
-    p->m_slow = m_slow;
+    p->m_fast = m_fast.clone();
+    p->m_slow = m_slow.clone();
     return SignalPtr(p);
 }
 

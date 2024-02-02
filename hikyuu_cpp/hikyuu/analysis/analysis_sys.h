@@ -9,7 +9,7 @@
 
 #include "hikyuu/trade_sys/system/System.h"
 #include "hikyuu/trade_manage/Performance.h"
-#include "hikyuu/utilities/thread/MQStealThreadPool.h"
+#include "hikyuu/utilities/thread/thread.h"
 
 namespace hku {
 
@@ -49,8 +49,10 @@ inline vector<AnalysisSystemWithBlockOut> analysisSystemListWith(const Container
     SystemList sys_list;
     StockList stk_list;
     for (const auto& stk : blk) {
-        sys_list.emplace_back(std::move(sys_proto->clone()));
-        stk_list.emplace_back(stk);
+        if (!stk.isNull()) {
+            sys_list.emplace_back(std::move(sys_proto->clone()));
+            stk_list.emplace_back(stk);
+        }
     }
 
     result = analysisSystemList(sys_list, stk_list, query);

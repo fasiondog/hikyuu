@@ -28,8 +28,8 @@ TwoLineEnvironment::~TwoLineEnvironment() {}
 
 EnvironmentPtr TwoLineEnvironment::_clone() {
     TwoLineEnvironment* ptr = new TwoLineEnvironment;
-    ptr->m_fast = m_fast;
-    ptr->m_slow = m_slow;
+    ptr->m_fast = m_fast.clone();
+    ptr->m_slow = m_slow.clone();
     return EnvironmentPtr(ptr);
 }
 
