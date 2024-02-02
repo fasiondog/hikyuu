@@ -93,13 +93,19 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
     }
 
     to_upper(m_market);
-    m_market_code = m_market + m_code;
+    m_market_code = marketCode();
 
     const auto& ktype_list = KQuery::getAllKType();
     for (const auto& ktype : ktype_list) {
         pMutex[ktype] = new std::shared_mutex();
         pKData[ktype] = nullptr;
     }
+}
+
+string Stock::Data::marketCode() const {
+    if (m_type == STOCKTYPE_CRYPTO)
+        return  m_market + "/" + m_code;
+    return m_market + m_code;
 }
 
 Stock::Data::~Data() {

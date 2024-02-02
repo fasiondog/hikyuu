@@ -469,16 +469,14 @@ void StockManager::loadAllStocks() {
         } catch (...) {
             endDate = Null<Datetime>();
         }
-
-        string market_code = format("{}{}", info.market, info.code);
+        Stock _stock(info.market, info.code, info.name, info.type, info.valid, startDate,
+                    endDate, info.tick, info.tickValue, info.precision, info.minTradeNumber,
+                    info.maxTradeNumber);
+        string market_code = _stock.market_code();;
         to_upper(market_code);
         auto iter = m_stockDict.find(market_code);
         if (iter == m_stockDict.end()) {
-            Stock stock(info.market, info.code, info.name, info.type, info.valid, startDate,
-                        endDate, info.tick, info.tickValue, info.precision, info.minTradeNumber,
-                        info.maxTradeNumber);
-            m_stockDict[market_code] = stock;
-
+            m_stockDict[market_code] = _stock;
         } else {
             Stock& stock = iter->second;
             if (!stock.m_data) {
