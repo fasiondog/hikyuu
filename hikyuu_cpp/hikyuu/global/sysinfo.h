@@ -26,6 +26,10 @@ std::string HKU_API getVersion();
  */
 std::string HKU_API getVersionWithBuild();
 
+
+/* 获取包括Git commit信息的版本号 */
+std::string HKU_API getVersionWithGit();
+
 /**
  * 判断是否有更新的版本可以升级
  */

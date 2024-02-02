@@ -41,14 +41,17 @@ std::string getVersion() {
     return HKU_VERSION;
 }
 
-std::string HKU_API getVersionWithBuild() {
-#if defined(_DEBUG) || defined(DEBUG)
-    return fmt::format("{}_{}_debug_{}_{}", HKU_VERSION, HKU_VERSION_BUILD, getPlatform(),
-                       getCpuArch());
-#else
-    return fmt::format("{}_{}_release_{}_{}", HKU_VERSION, HKU_VERSION_BUILD, getPlatform(),
-                       getCpuArch());
-#endif
+std::string getVersionWithBuild() {
+    return fmt::format("{}_{}_{}_{}_{}",
+            HKU_VERSION,
+            HKU_VERSION_BUILD,
+            HKU_VERSION_MODE,
+            getPlatform(),
+            getCpuArch());
+}
+
+std::string getVersionWithGit() {
+    return HKU_VERSION_GIT;
 }
 
 static bool readUUID(const boost::uuids::uuid& out) {
