@@ -42,13 +42,12 @@ std::string getVersion() {
 }
 
 std::string HKU_API getVersionWithBuild() {
-#if defined(_DEBUG) || defined(DEBUG)
-    return fmt::format("{}_{}_debug_{}_{}", HKU_VERSION, HKU_VERSION_BUILD, getPlatform(),
-                       getCpuArch());
-#else
-    return fmt::format("{}_{}_release_{}_{}", HKU_VERSION, HKU_VERSION_BUILD, getPlatform(),
-                       getCpuArch());
-#endif
+    return fmt::format("{}_{}_{}_{}_{}",
+            HKU_VERSION,
+            HKU_VERSION_BUILD,
+            HKU_VERSION_MODE,
+            getPlatform(),
+            getCpuArch());
 }
 
 std::string getVersionWithGit() {
