@@ -93,7 +93,10 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
     }
 
     to_upper(m_market);
-    m_market_code = m_market + m_code;
+    if (m_type == STOCKTYPE_CRYPTO)
+        m_market_code = m_market + "/" + m_code;
+    else
+        m_market_code = m_market + m_code;
 
     const auto& ktype_list = KQuery::getAllKType();
     for (const auto& ktype : ktype_list) {

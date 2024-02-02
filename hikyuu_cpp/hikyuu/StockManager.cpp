@@ -469,8 +469,11 @@ void StockManager::loadAllStocks() {
         } catch (...) {
             endDate = Null<Datetime>();
         }
-
-        string market_code = format("{}{}", info.market, info.code);
+        string market_code;
+        if (info.type == STOCKTYPE_CRYPTO)
+            market_code = format("{}/{}", info.market, info.code);
+        else
+            market_code = format("{}{}", info.market, info.code);
         to_upper(market_code);
         auto iter = m_stockDict.find(market_code);
         if (iter == m_stockDict.end()) {
