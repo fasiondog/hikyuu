@@ -259,7 +259,7 @@ struct HKU_API Stock::Data {
     Data(const string& market, const string& code, const string& name, uint32_t type, bool valid,
          const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
          int precision, double minTradeNumber, double maxTradeNumber);
-
+    string marketCode() const;
     virtual ~Data();
 };
 

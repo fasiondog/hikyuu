@@ -110,6 +110,7 @@ PYBIND11_MODULE(core, m) {
         :rtype: str)");
 
     m.def("get_version_with_build", getVersionWithBuild);
+    m.def("get_version_git", getVersionWithGit);
 
     m.def("get_stock", getStock,
           R"(get_stock(market_code)
