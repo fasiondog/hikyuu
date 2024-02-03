@@ -619,6 +619,30 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
         )
 
 
+def evplot(ev, ref_kdata, new=True, axes=None):
+    """绘制市场有效判断
+
+    :param EnvironmentBase cn: 系统有效条件
+    :param KData ref_kdata: 用于日期参考
+    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+    :param axes: 指定在那个轴对象中进行绘制
+    """
+    refdates = ref_kdata.get_datetime_list()
+    if axes is None:
+        if new:
+            axes = create_figure(2)
+            kplot(ref_kdata, axes=axes[0])
+            axes = axes[1]
+        else:
+            axes = gca()
+
+    x = np.array([i for i in range(len(refdates))])
+    y1 = np.array([1 if ev.is_valid(d) else -1 for d in refdates])
+    y2 = np.array([-1 if ev.is_valid(d) else 1 for d in refdates])
+    axes.fill_between(x, y1, y2, where=y2 > y1, facecolor='blue', alpha=0.6)
+    axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
+
+
 def cnplot(cn, new=True, axes=None, kdata=None):
     """绘制系统有效条件
 
@@ -634,8 +658,6 @@ def cnplot(cn, new=True, axes=None, kdata=None):
         cn.to = kdata
 
     refdates = kdata.get_datetime_list()
-    date_index = dict([(d, i) for i, d in enumerate(refdates)])
-
     if axes is None:
         if new:
             axes = create_figure(2)

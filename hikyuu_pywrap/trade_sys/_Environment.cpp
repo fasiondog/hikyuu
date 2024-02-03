@@ -35,8 +35,9 @@ public:
 };
 
 void export_Environment(py::module& m) {
-    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(m, "EnvironmentBase",
-                                                                   R"(市场环境判定策略基类
+    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(
+      m, "EnvironmentBase",
+      R"(市场环境判定策略基类
 
 自定义市场环境判定策略接口：
 
@@ -101,4 +102,12 @@ void export_Environment(py::module& m) {
     :param Indicator fast: 快线指标
     :param Indicator slow: 慢线指标
     :param string market: 市场名称)");
+
+    m.def("EV_Bool", EV_Bool, py::arg("ind"), py::arg("market") = "SH",
+          R"(EV_Bool(ind, market='SH')
+
+    布尔信号指标市场环境
+
+    :param Indicator ind: bool类型的指标，指标中相应位置>0则代表市场有效，否则无效
+    :param str market: 指定的市场，用于获取相应的交易日历)");
 }

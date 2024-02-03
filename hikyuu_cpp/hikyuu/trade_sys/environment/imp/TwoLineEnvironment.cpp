@@ -15,12 +15,12 @@ BOOST_CLASS_EXPORT(hku::TwoLineEnvironment)
 
 namespace hku {
 
-TwoLineEnvironment::TwoLineEnvironment() : EnvironmentBase("TwoLine") {
+TwoLineEnvironment::TwoLineEnvironment() : EnvironmentBase("EV_TwoLine") {
     setParam<string>("market", "SH");
 }
 
 TwoLineEnvironment::TwoLineEnvironment(const Indicator& fast, const Indicator& slow)
-: EnvironmentBase("TwoLine"), m_fast(fast), m_slow(slow) {
+: EnvironmentBase("EV_TwoLine"), m_fast(fast), m_slow(slow) {
     setParam<string>("market", "SH");
 }
 

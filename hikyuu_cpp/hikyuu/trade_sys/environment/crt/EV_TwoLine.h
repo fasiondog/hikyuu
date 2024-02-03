@@ -21,7 +21,7 @@ namespace hku {
  * @param market 市场名称，默认为"SH"
  * @return
  */
-EVPtr HKU_API EV_TwoLine(const Indicator& fast, const Indicator& slow, const string& market);
+EVPtr HKU_API EV_TwoLine(const Indicator& fast, const Indicator& slow, const string& market = "SH");
 
 } /* namespace hku */
 
