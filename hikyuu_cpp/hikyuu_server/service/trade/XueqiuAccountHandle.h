@@ -114,7 +114,7 @@ class ModifyXueqiuAccountHandle : public RestHandle {
             AutoTransAction trans(con);
             if (req.contains("name")) {
                 con->exec(fmt::format(R"(update {} set name={} where td_id={})",
-                                      TradeAccountModel::getTableName(), req["name"], td_id));
+                                      TradeAccountModel::getTableName(), std::string(req["name"]), td_id));
             }
 
             std::ostringstream buf;
