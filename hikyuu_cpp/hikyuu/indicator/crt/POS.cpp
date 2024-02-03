@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/utilities/thread/thread.h"
 #include "PRICELIST.h"
 #include "POS.h"
 
@@ -14,7 +15,7 @@ Indicator HKU_API POS(const Block& block, KQuery query, SignalPtr sg) {
     Indicator result;
     StockManager& sm = StockManager::instance();
 
-    //计算每日股票总数
+    // 计算每日股票总数
     DatetimeList dateList = sm.getTradingCalendar(query, "SH");
 
     size_t dayTotal = dateList.size();
@@ -35,25 +36,32 @@ Indicator HKU_API POS(const Block& block, KQuery query, SignalPtr sg) {
         }
     }
 
-    //计算每日持仓的股票数
-    vector<size_t> position(dayTotal);
+    ThreadPool tg;
+    vector<SGPtr> sgs;
     for (auto stk_iter = block.begin(); stk_iter != block.end(); ++stk_iter) {
+        auto tmpsg = sg->clone();
+        sgs.push_back(tmpsg);
         KData kdata = stk_iter->getKData(query);
-        if (kdata.empty())
-            continue;
-        sg->setTO(kdata);
+        tg.submit([tmpsg, k = std::move(kdata)]() { tmpsg->setTO(k); });
+    }
+    tg.join();
+
+    // 计算每日持仓的股票数
+    vector<size_t> position(dayTotal);
+    for (size_t i = 0, total = block.size(); i < total; i++) {
+        const auto& xsg = sgs[i];
         bool isHold = false;
-        for (size_t i = 0; i < dayTotal; ++i) {
+        for (size_t j = 0; j < dayTotal; ++j) {
             if (isHold) {
-                if (sg->shouldSell(dateList[i])) {
+                if (xsg->shouldSell(dateList[j])) {
                     isHold = false;
                 } else {
-                    position[i]++;
+                    position[j]++;
                 }
 
             } else {
-                if (sg->shouldBuy(dateList[i])) {
-                    position[i]++;
+                if (xsg->shouldBuy(dateList[j])) {
+                    position[j]++;
                     isHold = true;
                 }
             }
