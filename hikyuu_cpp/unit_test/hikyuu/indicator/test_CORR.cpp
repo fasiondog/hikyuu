@@ -49,26 +49,23 @@ TEST_CASE("test_CORR") {
     // 正常情况
     result = CORR(x, y, a.size());
     CHECK_EQ(result.name(), "CORR");
-    CHECK_EQ(result.discard(), 1);
+    CHECK_EQ(result.discard(), 2);
     CHECK_EQ(result.size(), a.size());
 
-    PriceList expect_corr{Null<price_t>(),       -1.0,
-                          -0.034448470909388934, 0.19152710373544807,
-                          0.015928970392743255,  0.294828565718092,
-                          0.3313041022900902,    0.37968156626405264,
-                          0.3883899922978828,    0.3855526143087499};
-    PriceList expect_cov{Null<price_t>(),     -0.014178098871419218, -0.005213202069357936,
-                         0.08610594456567466, 0.006922422657103244,  0.14431515213669424,
-                         0.14697313262129488, 0.15714354567421635,   0.18327891743111874,
-                         0.1628944213834996};
+    PriceList expect_corr{Null<price_t>(), Null<price_t>(), -0.39631,  -0.27821,  -0.452627,
+                          -0.338777,       -0.298335,       -0.268853, -0.148295, -0.180677};
+    PriceList expect_cov{Null<price_t>(), Null<price_t>(), -0.159915, -0.258501, -0.481946,
+                         -0.377705,       -0.296786,       -0.243565, -0.128369, -0.146947};
 
     CHECK_UNARY(std::isnan(result[0]));
+    CHECK_UNARY(std::isnan(result[1]));
     for (int i = result.discard(); i < expect_corr.size(); ++i) {
         CHECK_EQ(result[i], doctest::Approx(expect_corr[i]).epsilon(0.00001));
     }
 
     Indicator cov = result.getResult(1);
     CHECK_UNARY(std::isnan(cov[0]));
+    CHECK_UNARY(std::isnan(cov[1]));
     for (int i = cov.discard(); i < expect_cov.size(); ++i) {
         CHECK_EQ(cov[i], doctest::Approx(expect_cov[i]).epsilon(0.00001));
     }
