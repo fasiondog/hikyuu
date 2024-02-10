@@ -10,6 +10,10 @@
 #include "../../../indicator/crt/STDEV.h"
 #include "SingleSignal.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::SingleSignal)
+#endif
+
 namespace hku {
 
 SingleSignal::SingleSignal() : SignalBase("SG_Single") {
@@ -26,7 +30,7 @@ SingleSignal::~SingleSignal() {}
 
 SignalPtr SingleSignal::_clone() {
     SingleSignal* p = new SingleSignal();
-    p->m_ind = m_ind;
+    p->m_ind = m_ind.clone();
     return SignalPtr(p);
 }
 

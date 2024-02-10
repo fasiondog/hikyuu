@@ -129,7 +129,7 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
         auto* spot = spots->Get(i);
         auto spot_record = parseFlatSpot(spot);
         if (spot_record) {
-            for (auto& process : m_processList) {
+            for (const auto& process : m_processList) {
                 m_process_task_list.push_back(m_tg.submit(ProcessTask(process, *spot_record)));
             }
         }
@@ -189,7 +189,7 @@ void SpotAgent::work_thread() {
                         HKU_INFO_IF(m_print, "received count: {}", m_batch_count);
                         m_batch_count = 0;
                         // 执行后处理
-                        for (auto& postProcess : m_postProcessList) {
+                        for (const auto& postProcess : m_postProcessList) {
                             postProcess(ms_start_rev_time);
                         }
                         m_process_task_list.clear();

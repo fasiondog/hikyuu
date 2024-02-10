@@ -280,14 +280,14 @@ private:
             size_t count = size();
             ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
             PriceList& values = *m_pBuffer[i];
-            for (size_t i = 0; i < count; i++) {
-                if (std::isnan(values[i])) {
+            for (size_t j = 0; j < count; j++) {
+                if (std::isnan(values[j])) {
                     ar& boost::serialization::make_nvp<string>("item", nan);
-                } else if (std::isinf(values[i])) {
-                    inf = values[i] > 0 ? "+inf" : "-inf";
+                } else if (std::isinf(values[j])) {
+                    inf = values[j] > 0 ? "+inf" : "-inf";
                     ar& boost::serialization::make_nvp<string>("item", inf);
                 } else {
-                    ar& boost::serialization::make_nvp<price_t>("item", values[i]);
+                    ar& boost::serialization::make_nvp<price_t>("item", values[j]);
                 }
             }
         }

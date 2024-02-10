@@ -7,6 +7,10 @@
 
 #include "NoGoalProfitGoal.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::NoGoalProfitGoal)
+#endif
+
 namespace hku {
 
 NoGoalProfitGoal::NoGoalProfitGoal() : ProfitGoalBase("PG_NoGoal") {}

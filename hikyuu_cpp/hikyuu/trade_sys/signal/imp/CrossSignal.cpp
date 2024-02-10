@@ -8,6 +8,10 @@
 #include "../../../indicator/crt/KDATA.h"
 #include "CrossSignal.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::CrossSignal)
+#endif
+
 namespace hku {
 
 CrossSignal::CrossSignal() : SignalBase("SG_Cross") {}
@@ -19,8 +23,8 @@ CrossSignal::~CrossSignal() {}
 
 SignalPtr CrossSignal::_clone() {
     CrossSignal* p = new CrossSignal();
-    p->m_fast = m_fast;
-    p->m_slow = m_slow;
+    p->m_fast = m_fast.clone();
+    p->m_slow = m_slow.clone();
     return SignalPtr(p);
 }
 

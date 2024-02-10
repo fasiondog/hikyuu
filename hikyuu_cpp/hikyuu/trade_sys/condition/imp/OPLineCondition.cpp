@@ -12,6 +12,10 @@
 #include "../../system/crt/SYS_Simple.h"
 #include "../../moneymanager/crt/MM_FixedCount.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::OPLineCondition)
+#endif
+
 namespace hku {
 
 OPLineCondition::OPLineCondition() : ConditionBase("CN_OPLine") {}
@@ -21,10 +25,8 @@ OPLineCondition::OPLineCondition(const Indicator& op) : ConditionBase("CN_OPLine
 OPLineCondition::~OPLineCondition() {}
 
 ConditionPtr OPLineCondition::_clone() {
-    return make_shared<OPLineCondition>(m_op);
+    return make_shared<OPLineCondition>(m_op.clone());
 }
-
-void OPLineCondition::_reset() {}
 
 void OPLineCondition::_calculate() {
     Stock stock = m_kdata.getStock();

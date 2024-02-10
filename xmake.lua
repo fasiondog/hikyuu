@@ -73,7 +73,7 @@ add_rules("mode.debug", "mode.release")
 if not is_plat("windows") then add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan") end
 
 -- version
-set_version("1.3.2", {build = "%Y%m%d%H%M"})
+set_version("1.3.4", {build = "%Y%m%d%H%M"})
 set_configvar("LOG_ACTIVE_LEVEL", 0) -- 激活的日志级别
 -- if is_mode("debug") then
 --    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别
@@ -105,6 +105,14 @@ set_warnings("all")
 -- set language: C99, c++ standard
 set_languages("cxx17", "c99")
 
+if is_plat("windows") then
+    if is_mode("release") then
+        set_runtimes("MD")
+    else
+        set_runtimes("MDd")
+    end
+end
+
 local boost_version = "1.84.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "10.2.1"
@@ -114,7 +122,7 @@ if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm6
     mysql_version = "8.0.21" 
 end
 
-add_repositories("project-repo hikyuu_extern_libs")
+add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.git")
 if is_plat("windows") then
     if get_config("hdf5") then
         if is_mode("release") then
@@ -148,7 +156,8 @@ add_requires("boost " .. boost_version, {
   system = false,
   debug = is_mode("debug"),
   configs = {
-    shared = is_plat("windows") and true or false,
+    shared = is_plat("windows"),
+    multi = true,
     date_time = true,
     filesystem = true,
     serialization = true,
@@ -157,22 +166,24 @@ add_requires("boost " .. boost_version, {
   },
 })
 
-add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true, vs_runtime = "MD"}})
+add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
 add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
-add_requires("sqlite3", {system = false, configs = {shared = true, vs_runtime = "MD", cxflags = "-fPIC"}})
-add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs = {vs_runtime = "MD"}})
-add_requires("nng", {system = false, configs = {vs_runtime = "MD", cxflags = "-fPIC"}})
+add_requires("sqlite3", {system = false, configs = {shared = true, cxflags = "-fPIC"}})
+add_requires("flatbuffers v" .. flatbuffers_version, {system = false})
+add_requires("nng", {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib", {system = false, configs = {zlib = true, ssl = true}})
 add_requires("zlib", {system = false})
 
-add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
+add_defines("SPDLOG_DISABLExm_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
 -- modifed to use boost static library, except boost.python, serialization
-if is_plat("windows") then add_defines("BOOST_ALL_DYN_LINK") end
+if is_plat("windows") and get_config("kind") == "shared" then 
+    add_defines("BOOST_ALL_DYN_LINK") 
+end
 
 -- is release now
 if is_mode("release") then
@@ -189,11 +200,8 @@ if is_plat("windows") then
   add_cxflags("-EHsc", "/Zc:__cplusplus", "/utf-8")
   add_cxflags("-wd4819") -- template dll export warning
   add_defines("WIN32_LEAN_AND_MEAN")
-  if is_mode("release") then
-    add_cxflags("-MD")
-  elseif is_mode("debug") then
+  if is_mode("debug") then
     add_cxflags("-Gs", "-RTC1", "/bigobj")
-    add_cxflags("-MDd")
   end
 end
 
@@ -215,8 +223,3 @@ includes("./hikyuu_cpp/hikyuu")
 includes("./hikyuu_pywrap")
 includes("./hikyuu_cpp/unit_test")
 includes("./hikyuu_cpp/demo")
-includes("./hikyuu_cpp/hikyuu_server")
-
-before_install("scripts.before_install")
-on_install("scripts.on_install")
-before_run("scripts.before_run")

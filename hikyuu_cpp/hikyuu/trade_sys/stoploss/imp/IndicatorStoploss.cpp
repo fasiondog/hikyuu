@@ -8,6 +8,10 @@
 #include "../../../indicator/crt/KDATA.h"
 #include "IndicatorStoploss.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::IndicatorStoploss)
+#endif
+
 namespace hku {
 
 IndicatorStoploss::IndicatorStoploss() : StoplossBase("IndicatorStoploss") {
@@ -30,7 +34,7 @@ void IndicatorStoploss::_reset() {
 }
 
 StoplossPtr IndicatorStoploss::_clone() {
-    IndicatorStoploss* p = new IndicatorStoploss(m_op, getParam<string>("kpart"));
+    IndicatorStoploss* p = new IndicatorStoploss(m_op.clone(), getParam<string>("kpart"));
     p->m_result = m_result;
     return StoplossPtr(p);
 }

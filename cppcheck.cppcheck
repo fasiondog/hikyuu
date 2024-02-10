@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="1">
     <builddir>cppcheck-cppcheck-build-dir</builddir>
-    <platform>Unspecified</platform>
     <analyze-all-vs-configs>false</analyze-all-vs-configs>
     <check-headers>true</check-headers>
     <check-unused-templates>false</check-unused-templates>
     <max-ctu-depth>10</max-ctu-depth>
-    <max-template-recursion>100</max-template-recursion>
+    <max-template-recursion>1000</max-template-recursion>
+    <defines>
+        <define name="BOOST_SERIALIZATION_ASSUME_ABSTRACT"/>
+        <define name="TABLE_BIND6"/>
+        <define name="TABLE_BIND3"/>
+        <define name="TABLE_BIND4"/>
+    </defines>
+    <undefines>
+        <undefine>int64_t</undefine>
+        <undefine>int32_t</undefine>
+        <undefine>uint64_t</undefine>
+        <undefine>uint32_t</undefine>
+        <undefine>uint8_t</undefine>
+        <undefine>int8_t</undefine>
+    </undefines>
     <paths>
         <dir name="hikyuu_cpp/hikyuu"/>
+        <dir name="hikyuu_cpp/hikyuu_server"/>
     </paths>
     <libraries>
         <library>boost</library>
@@ -18,5 +32,9 @@
         <suppression>ConfigurationNotChecked</suppression>
         <suppression>toomanyconfigs</suppression>
         <suppression>unknownMacro</suppression>
+        <suppression>useStlAlgorithm</suppression>
+        <suppression>shadowFunction</suppression>
+        <suppression>missingIncludeSystem</suppression>
+        <suppression>missingInclude</suppression>
     </suppressions>
 </project>

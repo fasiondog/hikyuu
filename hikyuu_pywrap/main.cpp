@@ -48,7 +48,19 @@ void export_analysis(py::module& m);
 void export_StrategeContext(py::module& m);
 void export_strategy_main(py::module& m);
 
+#if PY_MINOR_VERSION == 8
+PYBIND11_MODULE(core38, m) {
+#elif PY_MINOR_VERSION == 9
+PYBIND11_MODULE(core39, m) {
+#elif PY_MINOR_VERSION == 10
+PYBIND11_MODULE(core310, m) {
+#elif PY_MINOR_VERSION == 11
+PYBIND11_MODULE(core311, m) {
+#elif PY_MINOR_VERSION == 12
+PYBIND11_MODULE(core312, m) {
+#else
 PYBIND11_MODULE(core, m) {
+#endif
     py::register_exception<hku::exception>(m, "HKUException");
 
     export_bind_stl(m);
@@ -98,6 +110,7 @@ PYBIND11_MODULE(core, m) {
         :rtype: str)");
 
     m.def("get_version_with_build", getVersionWithBuild);
+    m.def("get_version_git", getVersionWithGit);
 
     m.def("get_stock", getStock,
           R"(get_stock(market_code)
@@ -111,12 +124,15 @@ PYBIND11_MODULE(core, m) {
     int64_t null_int64 = Null<int64_t>();
     Datetime null_date = Null<Datetime>();
 
-    m.def("get_kdata",
-          py::overload_cast<const string&, int64_t, int64_t, KQuery::KType, KQuery::RecoverType>(
-            getKData),
-          py::arg("market_code"), py::arg("start") = 0, py::arg("end") = null_int64,
-          py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER,
-          R"(根据证券代码及起止位置获取 [start, end) 范围的 K 线数据
+    m.def("get_kdata", py::overload_cast<const string&, const KQuery&>(getKData));
+
+    m.def(
+      "get_kdata",
+      py::overload_cast<const string&, int64_t, int64_t, const KQuery::KType&, KQuery::RecoverType>(
+        getKData),
+      py::arg("market_code"), py::arg("start") = 0, py::arg("end") = null_int64,
+      py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER,
+      R"(根据证券代码及起止位置获取 [start, end) 范围的 K 线数据
 
     :param str market_code: 证券代码，如: 'sh000001'
     :param int start: 起始索引
@@ -125,7 +141,7 @@ PYBIND11_MODULE(core, m) {
     :param Query.RecoverType recover_type: 复权类型)");
 
     m.def("get_kdata",
-          py::overload_cast<const string&, const Datetime&, const Datetime&, KQuery::KType,
+          py::overload_cast<const string&, const Datetime&, const Datetime&, const KQuery::KType&,
                             KQuery::RecoverType>(getKData),
           py::arg("market_code"), py::arg("start") = Datetime::min(), py::arg("end") = null_date,
           py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER,

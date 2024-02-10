@@ -60,13 +60,13 @@ int HKU_API getIORedirectToPythonCount();
 #if USE_SPDLOG_LOGGER
 /** 日志级别 */
 enum LOG_LEVEL {
-    TRACE = SPDLOG_LEVEL_TRACE,     ///< 跟踪
-    DEBUG = SPDLOG_LEVEL_DEBUG,     ///< 调试
-    INFO = SPDLOG_LEVEL_INFO,       ///< 一般信息
-    WARN = SPDLOG_LEVEL_WARN,       ///< 告警
-    ERROR = SPDLOG_LEVEL_ERROR,     ///< 错误
-    FATAL = SPDLOG_LEVEL_CRITICAL,  ///< 致命
-    OFF = SPDLOG_LEVEL_OFF,         ///< 关闭日志打印
+    LOG_TRACE = SPDLOG_LEVEL_TRACE,     ///< 跟踪
+    LOG_DEBUG = SPDLOG_LEVEL_DEBUG,     ///< 调试
+    LOG_INFO = SPDLOG_LEVEL_INFO,       ///< 一般信息
+    LOG_WARN = SPDLOG_LEVEL_WARN,       ///< 告警
+    LOG_ERROR = SPDLOG_LEVEL_ERROR,     ///< 错误
+    LOG_FATAL = SPDLOG_LEVEL_CRITICAL,  ///< 致命
+    LOG_OFF = SPDLOG_LEVEL_OFF,         ///< 关闭日志打印
 };
 
 /**
@@ -140,13 +140,13 @@ void initLogger();
 
 #else
 enum LOG_LEVEL {
-    TRACE = 0,
-    DEBUG = 1,
-    INFO = 2,
-    WARN = 3,
-    ERROR = 4,
-    FATAL = 5,
-    OFF = 6,
+    LOG_TRACE = 0,
+    LOG_DEBUG = 1,
+    LOG_INFO = 2,
+    LOG_WARN = 3,
+    LOG_ERROR = 4,
+    LOG_FATAL = 5,
+    LOG_OFF = 6,
 };
 
 LOG_LEVEL HKU_API get_log_level();

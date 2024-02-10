@@ -8,6 +8,10 @@
 #include "../../../indicator/crt/KDATA.h"
 #include "BoolSignal.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::BoolSignal)
+#endif
+
 namespace hku {
 
 BoolSignal::BoolSignal() : SignalBase("SG_Bool") {}
@@ -19,8 +23,8 @@ BoolSignal::~BoolSignal() {}
 
 SignalPtr BoolSignal::_clone() {
     BoolSignal* p = new BoolSignal();
-    p->m_bool_buy = m_bool_buy;
-    p->m_bool_sell = m_bool_sell;
+    p->m_bool_buy = m_bool_buy.clone();
+    p->m_bool_sell = m_bool_sell.clone();
     return SignalPtr(p);
 }
 

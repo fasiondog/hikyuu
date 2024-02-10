@@ -115,8 +115,6 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_marketInfoDict.clear();
     m_stockTypeInfo.clear();
 
-    string funcname(" [StockManager::init]");
-
     // 加载证券基本信息
     m_baseInfoDriver = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
     HKU_CHECK(m_baseInfoDriver, "Failed get base info driver!");
@@ -301,8 +299,8 @@ void StockManager::reload() {
     }
 
     for (auto& stk : can_not_parallel_stk_list) {
-        auto& ktype_list = KQuery::getAllKType();
-        for (auto& ktype : ktype_list) {
+        const auto& ktype_list = KQuery::getAllKType();
+        for (const auto& ktype : ktype_list) {
             if (stk.isBuffer(ktype)) {
                 stk.loadKDataToBuffer(ktype);
             }
@@ -471,16 +469,14 @@ void StockManager::loadAllStocks() {
         } catch (...) {
             endDate = Null<Datetime>();
         }
-
-        string market_code = format("{}{}", info.market, info.code);
+        Stock _stock(info.market, info.code, info.name, info.type, info.valid, startDate,
+                    endDate, info.tick, info.tickValue, info.precision, info.minTradeNumber,
+                    info.maxTradeNumber);
+        string market_code = _stock.market_code();;
         to_upper(market_code);
         auto iter = m_stockDict.find(market_code);
         if (iter == m_stockDict.end()) {
-            Stock stock(info.market, info.code, info.name, info.type, info.valid, startDate,
-                        endDate, info.tick, info.tickValue, info.precision, info.minTradeNumber,
-                        info.maxTradeNumber);
-            m_stockDict[market_code] = stock;
-
+            m_stockDict[market_code] = _stock;
         } else {
             Stock& stock = iter->second;
             if (!stock.m_data) {
@@ -539,12 +535,12 @@ void StockManager::loadAllHolidays() {
 void StockManager::loadAllStockWeights() {
     HKU_INFO("Loading stock weight...");
     auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
-    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+    std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
     for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
         auto weight_iter = all_stkweight_dict.find(iter->first);
         if (weight_iter != all_stkweight_dict.end()) {
             Stock& stock = iter->second;
-            std::lock_guard<std::mutex> lock(stock.m_data->m_weight_mutex);
+            std::lock_guard<std::mutex> lock2(stock.m_data->m_weight_mutex);
             stock.m_data->m_weightList.swap(weight_iter->second);
         }
     }

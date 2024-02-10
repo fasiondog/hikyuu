@@ -5,7 +5,7 @@
 #    Author: fasiondog
 
 import pandas as pd
-from hikyuu.cpp.core import Block, Performance, _combinate_ind_analysis, _combinate_ind_analysis_with_block
+from hikyuu.core import *
 
 
 def combinate_ind_analysis(
@@ -20,7 +20,7 @@ def combinate_ind_analysis(
 ):
     '''
     对单只股票进行指标组合测试
-    
+
     :param Stock stk: 指定股票
     :param Query query: 指定的查询条件
     :param TradeManager tm: 交易管理实例
@@ -31,7 +31,7 @@ def combinate_ind_analysis(
     :param list keys: 输出 Performance 统计项
     :rtype: pd.DataFrame
     '''
-    pers = _combinate_ind_analysis(stk, query, tm, sys, buy_inds, sell_inds, n)
+    pers = inner_combinate_ind_analysis(stk, query, tm, sys, buy_inds, sell_inds, n)
 
     if not keys:
         per = Performance()
@@ -82,12 +82,25 @@ def combinate_ind_analysis_multi(
         for stk in stks:
             blks.add(stk)
 
-    out = _combinate_ind_analysis_with_block(blks, query, tm, sys, buy_inds, sell_inds, n)
+    out = inner_combinate_ind_analysis_with_block(blks, query, tm, sys, buy_inds, sell_inds, n)
     if not keys:
         ret = out
     else:
         ret = {}
         names = ["组合名称", "证券代码", "证券名称"]
+        names.extend(keys)
+        for name in names:
+            ret[name] = out[name]
+    return pd.DataFrame(ret)
+
+
+def analysis_sys_list(stks, query, sys_proto, keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]):
+    out = inner_analysis_sys_list(stks, query, sys_proto)
+    if not keys:
+        ret = out
+    else:
+        ret = {}
+        names = ["证券代码", "证券名称"]
         names.extend(keys)
         for name in names:
             ret[name] = out[name]

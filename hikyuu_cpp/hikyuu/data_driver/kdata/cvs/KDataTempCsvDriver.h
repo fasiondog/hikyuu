@@ -50,7 +50,8 @@ public:
      * @param kType  K线类型
      * @return
      */
-    virtual size_t getCount(const string& market, const string& code, KQuery::KType kType) override;
+    virtual size_t getCount(const string& market, const string& code,
+                            const KQuery::KType& kType) override;
 
     /**
      * 获取指定日期范围对应的K线记录索引
@@ -79,7 +80,7 @@ private:
     string _get_filename();
 
     KRecordList _getKRecordListByIndex(const string& market, const string& code, int64_t start_ix,
-                                       int64_t end_ix, KQuery::KType kType);
+                                       int64_t end_ix, const KQuery::KType& kType);
 
 private:
     string m_day_filename;

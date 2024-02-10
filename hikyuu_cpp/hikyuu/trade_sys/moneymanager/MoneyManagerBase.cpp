@@ -80,7 +80,9 @@ double MoneyManagerBase ::getSellNumber(const Datetime& datetime, const Stock& s
         HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
     }
 
-    HKU_IF_RETURN(risk <= 0.0, 0.0);
+    HKU_ERROR_IF_RETURN(risk <= 0.0, 0.0,
+      "risk is negative! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f}) Part({})", datetime,
+      stock.market_code(), price, risk, getSystemPartName(from));
     return _getSellNumber(datetime, stock, price, risk, from);
 }
 
@@ -93,7 +95,7 @@ double MoneyManagerBase ::getBuyNumber(const Datetime& datetime, const Stock& st
 
     HKU_ERROR_IF_RETURN(
       risk <= 0.0, 0.0,
-      "risk is zero! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f}) Part({})", datetime,
+      "risk is negative! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f}) Part({})", datetime,
       stock.market_code(), price, risk, getSystemPartName(from));
 
     HKU_TRACE_IF_RETURN(m_tm->getStockNumber() >= getParam<int>("max-stock"), 0.0,
@@ -145,8 +147,8 @@ double MoneyManagerBase ::getSellShortNumber(const Datetime& datetime, const Sto
     HKU_ERROR_IF_RETURN(!m_tm, 0.0,
                         "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
-    HKU_ERROR_IF_RETURN(risk <= 0.0, 0.0,
-                        "risk is zero! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+    HKU_ERROR_IF_RETURN(risk >= 0.0, 0.0,
+                        "risk is positive! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
     return _getSellShortNumber(datetime, stock, price, risk, from);
 }
@@ -156,8 +158,8 @@ double MoneyManagerBase ::getBuyShortNumber(const Datetime& datetime, const Stoc
     HKU_ERROR_IF_RETURN(!m_tm, 0.0,
                         "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
-    HKU_ERROR_IF_RETURN(risk <= 0.0, 0.0,
-                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+    HKU_ERROR_IF_RETURN(risk >= 0.0, 0.0,
+                        "risk is positive! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
     return _getBuyShortNumber(datetime, stock, price, risk, from);
 }

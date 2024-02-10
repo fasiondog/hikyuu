@@ -1,25 +1,25 @@
 /*
- *  Copyright (c) 2023 hikyuu.org
+ *  Copyright (c) 2024 hikyuu.org
  *
- *  Created on: 2023-12-21
+ *  Created on: 2024-02-03
  *      Author: fasiondog
  */
 
 #pragma once
 
 #include "hikyuu/indicator/Indicator.h"
-#include "../ConditionBase.h"
+#include "hikyuu/trade_sys/environment/EnvironmentBase.h"
 
 namespace hku {
 
-class BoolCondition : public ConditionBase {
+class BoolEnvironment : public EnvironmentBase {
 public:
-    BoolCondition();
-    BoolCondition(const Indicator&);
-    virtual ~BoolCondition();
+    BoolEnvironment();
+    BoolEnvironment(const Indicator& ind);
+    virtual ~BoolEnvironment();
 
     virtual void _calculate() override;
-    virtual ConditionPtr _clone() override;
+    virtual EnvironmentPtr _clone() override;
 
 private:
     Indicator m_ind;
@@ -31,7 +31,7 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
-        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(ConditionBase);
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(EnvironmentBase);
         ar& BOOST_SERIALIZATION_NVP(m_ind);
     }
 #endif

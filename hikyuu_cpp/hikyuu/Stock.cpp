@@ -64,7 +64,7 @@ Stock::Data::Data()
   m_minTradeNumber(default_minTradeNumber),
   m_maxTradeNumber(default_maxTradeNumber) {
     const auto& ktype_list = KQuery::getAllKType();
-    for (auto& ktype : ktype_list) {
+    for (const auto& ktype : ktype_list) {
         pKData[ktype] = nullptr;
         pMutex[ktype] = nullptr;
     }
@@ -93,13 +93,19 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
     }
 
     to_upper(m_market);
-    m_market_code = m_market + m_code;
+    m_market_code = marketCode();
 
     const auto& ktype_list = KQuery::getAllKType();
-    for (auto& ktype : ktype_list) {
+    for (const auto& ktype : ktype_list) {
         pMutex[ktype] = new std::shared_mutex();
         pKData[ktype] = nullptr;
     }
+}
+
+string Stock::Data::marketCode() const {
+    if (m_type == STOCKTYPE_CRYPTO)
+        return  m_market + "/" + m_code;
+    return m_market + m_code;
 }
 
 Stock::Data::~Data() {
@@ -543,12 +549,12 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
     return true;
 }
 
-KRecord Stock::_getKRecordFromBuffer(size_t pos, KQuery::KType ktype) const {
+KRecord Stock::_getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const {
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     return m_data->pKData[ktype]->at(pos);
 }
 
-KRecord Stock::getKRecord(size_t pos, KQuery::KType kType) const {
+KRecord Stock::getKRecord(size_t pos, const KQuery::KType& kType) const {
     HKU_IF_RETURN(!m_data, Null<KRecord>());
     if (isBuffer(kType)) {
         return _getKRecordFromBuffer(pos, kType);
@@ -560,7 +566,7 @@ KRecord Stock::getKRecord(size_t pos, KQuery::KType kType) const {
     return klist.size() > 0 ? klist[0] : Null<KRecord>();
 }
 
-KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType ktype) const {
+KRecord Stock::getKRecord(const Datetime& datetime, const KQuery::KType& ktype) const {
     KRecord result;
     HKU_IF_RETURN(isNull(), result);
 

@@ -1,8 +1,8 @@
 # -*- coding: utf8 -*-
 
 from hikyuu.util.slice import list_getitem
-from hikyuu.cpp.core import SYS_Simple as cpp_SYS_Simple
-from hikyuu.cpp.core import (
+from hikyuu.core import SYS_Simple as cpp_SYS_Simple
+from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
     ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase
 )

@@ -95,8 +95,8 @@ void StrategyBase::run() {
 
     hkuParam.set<string>("tmpdir", config.get("hikyuu", "tmpdir", "."));
     hkuParam.set<string>("datadir", config.get("hikyuu", "datadir", "."));
-    hkuParam.set<string>("quotation_server", config.get("hikyuu", "quotation_server",
-                                                        "ipc:///tmp/hikyuu_real.ipc"));
+    hkuParam.set<string>("quotation_server",
+                         config.get("hikyuu", "quotation_server", "ipc:///tmp/hikyuu_real.ipc"));
 
     if (!config.hasSection("baseinfo")) {
         HKU_FATAL("Missing configure of baseinfo!");
@@ -153,8 +153,8 @@ void StrategyBase::run() {
     HKU_WARN_IF(m_stock_list.empty(), "[Strategy {}] stock list is empty!", m_name);
 
     if (m_stock_list.size() > 0) {
-        Stock& ref_stk = m_stock_list[0];
-        for (auto& ktype : ktype_list) {
+        const Stock& ref_stk = m_stock_list[0];
+        for (const auto& ktype : ktype_list) {
             // 由于异步初始化，此处不用通过先getCount再getKRecord的方式获取最后的KRecord
             KRecordList klist = ref_stk.getKRecordList(KQueryByIndex(0, Null<int64_t>(), ktype));
             size_t count = klist.size();
@@ -208,9 +208,9 @@ void StrategyBase::_addTimer() {
         market_set.insert(stk.market());
     }
 
-    auto& sm = StockManager::instance();
+    const auto& sm = StockManager::instance();
     TimeDelta openTime(0, 23, 59, 59, 999, 999), closeTime(0);
-    for (auto& market : market_set) {
+    for (const auto& market : market_set) {
         auto market_info = sm.getMarketInfo(market);
         if (market_info.openTime1() < market_info.closeTime1()) {
             if (market_info.openTime1() < openTime) {

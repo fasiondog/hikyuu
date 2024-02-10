@@ -7,6 +7,10 @@
 
 #include "FixedRiskMoneyManager.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedRiskMoneyManager)
+#endif
+
 namespace hku {
 
 FixedRiskMoneyManager::FixedRiskMoneyManager() : MoneyManagerBase("MM_FixedRisk") {

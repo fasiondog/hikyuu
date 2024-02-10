@@ -338,7 +338,7 @@ void MySQLStatement::sub_getColumnAsDatetime(int idx, Datetime& item) {
     }
 
     try {
-        MYSQL_TIME* tm = boost::any_cast<MYSQL_TIME>(&(m_result_buffer[idx]));
+        const MYSQL_TIME* tm = boost::any_cast<MYSQL_TIME>(&(m_result_buffer[idx]));
         if (tm->time_type == MYSQL_TIMESTAMP_DATETIME) {
             long millisec = tm->second_part / 1000;
             long microsec = tm->second_part - millisec * 1000;

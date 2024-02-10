@@ -15,6 +15,13 @@
     :param Indicator slow: 慢线指标
     :param string market: 市场名称
 
+.. py:function:: EV_Bool(ind[, market = 'SH'])
+
+    布尔信号指标市场环境
+
+    :param Indicator ind: bool类型的指标, 指标中相应位置大于0则代表市场有效, 否则无效
+    :param str market: 指定的市场，用于获取相应的交易日历
+
 
 自定义市场环境判定策略
 ----------------------

@@ -5,8 +5,8 @@
  *     Author: fasiondog
  */
 
-#include <hikyuu/strategy/AccountTradeManager.h>
 #include "../pybind_utils.h"
+#include <hikyuu/strategy/AccountTradeManager.h>
 
 using namespace hku;
 namespace py = pybind11;

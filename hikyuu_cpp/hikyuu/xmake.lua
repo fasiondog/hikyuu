@@ -1,12 +1,13 @@
 
 target("hikyuu")
-    if is_mode("debug", "coverage", "asan", "msan", "tsan", "lsan") then
-        set_kind("static")
-    else
-        set_kind("shared")
-    end
+    set_kind("$(kind)")
+    -- if is_mode("debug", "coverage", "asan", "msan", "tsan", "lsan") then
+    --     set_kind("static")
+    -- else
+    --     set_kind("shared")
+    -- end
 
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stackstrace")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace")
 
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
     if is_plat("windows", "linux", "cross") then
@@ -35,7 +36,7 @@ target("hikyuu")
     end
 
     if is_plat("windows") then
-        if is_mode("release") then
+        if is_kind("shared") then
             add_defines("HKU_API=__declspec(dllexport)")
         end
         if get_config("hdf5") then
@@ -123,6 +124,12 @@ target("hikyuu")
                 os.trycp(pkg_path .. "/lib/*.so.*", libdir)
             end
         end
+    end)
+
+    after_install(function(target)
+        local dst_path = target:installdir() .. "/include/hikyuu/python/"
+        os.cp("$(projectdir)/hikyuu_pywrap/pybind_utils.h", dst_path)
+        os.cp("$(projectdir)/hikyuu_pywrap/pickle_support.h", dst_path)
     end)
 
 target_end()

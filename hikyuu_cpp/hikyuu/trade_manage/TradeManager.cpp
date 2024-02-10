@@ -14,6 +14,10 @@
 #include "../trade_sys/system/SystemPart.h"
 #include "../KData.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::TradeManager)
+#endif
+
 namespace hku {
 
 string TradeManager::str() const {
@@ -368,8 +372,7 @@ PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& 
 
     // 在历史交易记录中，重新计算在指定的查询日期时，该交易对象的持仓数量
     double number = 0.0;
-    TradeRecordList::const_iterator iter = m_trade_list.begin();
-    for (; iter != m_trade_list.end(); ++iter) {
+    for (auto iter = m_trade_list.begin(); iter != m_trade_list.end(); ++iter) {
         // 交易记录中的交易日期已经大于查询日期，则跳出循环
         if (iter->datetime > datetime) {
             break;

@@ -125,7 +125,7 @@ KRecordList SQLiteKDataDriver::getKRecordList(const string& market, const string
 }
 
 KRecordList SQLiteKDataDriver::_getKRecordList(const string& market, const string& code,
-                                               KQuery::KType kType, size_t start_ix,
+                                               const KQuery::KType& kType, size_t start_ix,
                                                size_t end_ix) {
     KRecordList result;
     HKU_IF_RETURN(start_ix >= end_ix, result);
@@ -163,7 +163,7 @@ KRecordList SQLiteKDataDriver::_getKRecordList(const string& market, const strin
     return result;
 }
 KRecordList SQLiteKDataDriver::_getKRecordList(const string& market, const string& code,
-                                               KQuery::KType kType, Datetime start_date,
+                                               const KQuery::KType& kType, Datetime start_date,
                                                Datetime end_date) {
     KRecordList result;
     HKU_IF_RETURN(start_date >= end_date, result);
@@ -202,7 +202,8 @@ KRecordList SQLiteKDataDriver::_getKRecordList(const string& market, const strin
     return result;
 }
 
-size_t SQLiteKDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
+size_t SQLiteKDataDriver::getCount(const string& market, const string& code,
+                                   const KQuery::KType& kType) {
     string key(format("{}_{}", market, kType));
     SQLiteConnectPtr connection = m_sqlite_connection_map[key];
     HKU_IF_RETURN(!connection, 0);
@@ -251,8 +252,8 @@ bool SQLiteKDataDriver::getIndexRangeByDate(const string& market, const string& 
 }
 
 KRecordList SQLiteKDataDriver::convertToNewInterval(const KRecordList& candles,
-                                                    KQuery::KType from_ktype,
-                                                    KQuery::KType to_ktype) {
+                                                    const KQuery::KType& from_ktype,
+                                                    const KQuery::KType& to_ktype) {
     int32_t old_intervals_per_new_candle =
       KQuery::getKTypeInMin(to_ktype) / KQuery::getKTypeInMin(from_ktype);
     KRecordList result(candles.size() / old_intervals_per_new_candle);

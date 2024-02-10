@@ -35,8 +35,8 @@ Indicator (*VOL3)() = VOL;
 Indicator (*KDATA_PART1)(const KData& kdata, const string& part) = KDATA_PART;
 Indicator (*KDATA_PART3)(const string& part) = KDATA_PART;
 
-Indicator (*DATE1)() = DATE;
-Indicator (*DATE2)(const KData&) = DATE;
+Indicator (*DATE1)() = hku::DATE;
+Indicator (*DATE2)(const KData&) = hku::DATE;
 
 Indicator (*TIME1)() = TIME;
 Indicator (*TIME2)(const KData&) = TIME;

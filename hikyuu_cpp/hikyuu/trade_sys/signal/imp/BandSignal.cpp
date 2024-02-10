@@ -7,6 +7,10 @@
 #include "../../../indicator/crt/KDATA.h"
 #include "BandSignal.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::BandSignal)
+#endif
+
 namespace hku {
 
 BandSignal::BandSignal() : SignalBase("SG_Band") {}
@@ -22,7 +26,7 @@ SignalPtr BandSignal::_clone() {
     BandSignal* p = new BandSignal();
     p->m_upper = m_upper;
     p->m_lower = m_lower;
-    p->m_ind = m_ind;
+    p->m_ind = m_ind.clone();
     return SignalPtr(p);
 }
 

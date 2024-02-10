@@ -7,6 +7,10 @@
 
 #include "WilliamsFixedRiskMoneyManager.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::WilliamsFixedRiskMoneyManager)
+#endif
+
 namespace hku {
 
 WilliamsFixedRiskMoneyManager::WilliamsFixedRiskMoneyManager()

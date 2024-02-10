@@ -37,7 +37,7 @@ void init_hikyuu_test() {
         current /= "test_data";
     }
 
-    set_log_level(TRACE);
+    set_log_level(LOG_LEVEL::LOG_TRACE);
 
     std::cout << "current path  : " << current << std::endl;
 #if defined(_MSC_VER)

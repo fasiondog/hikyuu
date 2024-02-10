@@ -145,10 +145,10 @@ public:
     bool getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end) const;
 
     /** 获取指定索引的K线数据记录，未作越界检查 */
-    KRecord getKRecord(size_t pos, KQuery::KType dataType = KQuery::DAY) const;
+    KRecord getKRecord(size_t pos, const KQuery::KType& dataType = KQuery::DAY) const;
 
     /** 根据数据类型（日线/周线等），获取指定日期的KRecord */
-    KRecord getKRecord(const Datetime&, KQuery::KType ktype = KQuery::DAY) const;
+    KRecord getKRecord(const Datetime&, const KQuery::KType& ktype = KQuery::DAY) const;
 
     /** 获取K线数据 */
     KData getKData(const KQuery&) const;
@@ -221,7 +221,7 @@ private:
 
     // 以下函数属于基础操作添加了读锁
     size_t _getCountFromBuffer(KQuery::KType ktype) const;
-    KRecord _getKRecordFromBuffer(size_t pos, KQuery::KType ktype) const;
+    KRecord _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
     KRecordList _getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                                           KQuery::KType ktype) const;
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;
@@ -259,7 +259,7 @@ struct HKU_API Stock::Data {
     Data(const string& market, const string& code, const string& name, uint32_t type, bool valid,
          const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
          int precision, double minTradeNumber, double maxTradeNumber);
-
+    string marketCode() const;
     virtual ~Data();
 };
 

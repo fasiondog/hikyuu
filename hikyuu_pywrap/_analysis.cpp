@@ -110,7 +110,7 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
     return result;
 }
 
-static py::list analysis_sys_list(const py::object& pystk_list, const KQuery& query,
+static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& query,
                                   SystemPtr sys_proto) {
     SystemList sys_list;
     StockList stk_list;
@@ -141,16 +141,28 @@ static py::list analysis_sys_list(const py::object& pystk_list, const KQuery& qu
         records = analysisSystemList(sys_list, stk_list, query);
     }
 
-    py::list result;
+    Performance per;
+    auto keys = per.names();
+    std::vector<py::list> tmp(keys.size() + 2);
     for (size_t i = 0, total = records.size(); i < total; i++) {
         const auto& record = records[i];
-        py::list tmp;
-        tmp.append(record.market_code);
-        tmp.append(record.name);
-        for (const auto& value : record.values) {
-            tmp.append(value);
+        if (record.values.size() != keys.size()) {
+            continue;
         }
-        result.append(tmp);
+        tmp[0].append(record.market_code);
+        tmp[1].append(record.name);
+        for (size_t j = 0, len = keys.size(); j < len; j++) {
+            tmp[j + 2].append(record.values[j]);
+        }
+    }
+
+    py::dict result;
+    result["证券代码"] = tmp[0];
+    result["证券名称"] = tmp[1];
+    for (size_t i = 0, total = keys.size(); i < total; i++) {
+        if (!tmp[i + 2].empty()) {
+            result[keys[i].c_str()] = tmp[i + 2];
+        }
     }
     return result;
 }
@@ -175,8 +187,8 @@ void export_analysis(py::module& m) {
     :return: 组合后的指标列表
     :rtype: list)");
 
-    m.def("_combinate_ind_analysis", combinate_ind_analysis);
-    m.def("_combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
+    m.def("inner_combinate_ind_analysis", combinate_ind_analysis);
+    m.def("inner_combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
 
-    m.def("analysis_sys_list", analysis_sys_list);
+    m.def("inner_analysis_sys_list", analysis_sys_list);
 }

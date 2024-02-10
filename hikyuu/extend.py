@@ -3,14 +3,8 @@
 #
 
 from datetime import *
-from .cpp.core import *
 from .util.slice import list_getitem
-
-try:
-    from .cpp.core_pro import *
-except:
-    pass
-
+from .core import *
 
 # ------------------------------------------------------------------
 # 增加Datetime、Stock的hash支持，以便可做为dict的key

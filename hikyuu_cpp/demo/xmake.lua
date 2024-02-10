@@ -10,7 +10,7 @@ target("demo")
         add_cxflags("-wd4251")
     end
 
-    if is_plat("windows") and is_mode("release") then
+    if is_plat("windows") and get_config("kind") == "shared" then
         add_defines("HKU_API=__declspec(dllimport)")
         add_defines("SQLITE_API=__declspec(dllimport)")
     end

@@ -94,11 +94,11 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
     vector<Stock> buf;
     for (size_t i = 0; i < count; i++) {
         buf.clear();
-        for (size_t n = i * per_num, end = (i + 1) * per_num; n < end; n++) {
-            if (n >= stocks.size()) {
+        for (size_t j = i * per_num, end = (i + 1) * per_num; j < end; j++) {
+            if (j >= stocks.size()) {
                 break;
             }
-            buf.emplace_back(stocks[n]);
+            buf.emplace_back(stocks[j]);
         }
         tasks.emplace_back(tg.submit([sgs, stks = std::move(buf), n_query = query,
                                       n_tm = tm->clone(), n_sys = sys->clone()]() {

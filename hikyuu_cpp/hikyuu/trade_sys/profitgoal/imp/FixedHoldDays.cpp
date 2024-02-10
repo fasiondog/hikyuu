@@ -7,6 +7,10 @@
 
 #include "FixedHoldDays.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedHoldDays)
+#endif
+
 namespace hku {
 
 FixedHoldDays::FixedHoldDays() : ProfitGoalBase("PG_FixedHoldDays") {

@@ -7,6 +7,10 @@
 
 #include "FixedPercentProfitGoal.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedPercentProfitGoal)
+#endif
+
 namespace hku {
 
 FixedPercentProfitGoal::FixedPercentProfitGoal() : ProfitGoalBase("PG_FixedPercent") {
