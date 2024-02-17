@@ -60,6 +60,14 @@ public:
     /** 设置名称 */
     void name(const string& name);
 
+    size_t size() const;
+
+    price_t operator[](size_t pos) const;
+
+    price_t at(size_t pos) const;
+
+    price_t* data();
+
     /** 复位操作 */
     void reset();
 
@@ -118,7 +126,8 @@ protected:
     KData m_kdata;
     TMPtr m_tm;
     SGPtr m_sg;
-    std::set<Datetime> m_valid;
+    map<Datetime, size_t> m_date_index;
+    vector<price_t> m_values;
 
 //============================================
 // 序列化支持
@@ -130,7 +139,8 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_date_index);
+        ar& BOOST_SERIALIZATION_NVP(m_values);
         // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
     }
 
@@ -138,7 +148,8 @@ private:
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_date_index);
+        ar& BOOST_SERIALIZATION_NVP(m_values);
         // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
     }
 
@@ -198,6 +209,24 @@ inline const string& ConditionBase::name() const {
 
 inline void ConditionBase::name(const string& name) {
     m_name = name;
+}
+
+inline size_t ConditionBase::size() const {
+    return m_values.size();
+}
+
+inline price_t* ConditionBase::data() {
+    return m_values.data();
+}
+
+inline price_t ConditionBase::operator[](size_t pos) const {
+    return m_values[pos];
+}
+
+inline price_t ConditionBase::at(size_t pos) const {
+    size_t total = m_values.size();
+    HKU_CHECK_THROW(pos < total, std::out_of_range, "pos({}) out of range 0..{}", pos, total);
+    return m_values[pos];
 }
 
 inline KData ConditionBase::getTO() const {

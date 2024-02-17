@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/trade_sys/condition/build_in.h>
+#include <hikyuu/trade_sys/condition/imp/AndCondition.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -94,6 +95,18 @@ void export_Condition(py::module& m) {
 
       .def("_calculate", &ConditionBase::_calculate, "【重载接口】子类计算接口")
       .def("_reset", &ConditionBase::_reset, "【重载接口】子类复位接口，复位内部私有变量")
+
+      .def("__len__", &ConditionBase::size)
+
+      .def("__getitem__",
+           [](const ConditionPtr& self, int i) {
+               size_t total = self->size();
+               int pos = i < 0 ? total + i : i;
+               return (*self)[pos];
+           })
+
+      .def("__and__",
+           [](const ConditionPtr& self, const ConditionPtr& other) { return self & other; })
 
         DEF_PICKLE(ConditionPtr);
 
