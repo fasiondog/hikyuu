@@ -34,12 +34,6 @@ void AndCondition::_calculate() {
     for (size_t i = 0; i < total; i++) {
         m_values[i] = (data1[i] > 0.0 && data2[i] > 0.0) ? 1.0 : 0.0;
     }
-    // auto ds = m_kdata.getDatetimeList();
-    // for (const auto& date : ds) {
-    //     if (m_cond1->isValid(date) && m_cond2->isValid(date)) {
-    //         _addValid(date);
-    //     }
-    // }
 }
 
 void AndCondition::_reset() {
