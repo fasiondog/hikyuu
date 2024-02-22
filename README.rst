@@ -5,13 +5,13 @@
 
 -----------
 
+.. image:: https://static.pepy.tech/badge/hikyuu
+    :target: https://pepy.tech/project/hikyuu
+
 .. image:: https://static.pepy.tech/badge/hikyuu/month
     :target: https://pepy.tech/project/hikyuu
 
 .. image:: https://static.pepy.tech/badge/hikyuu/week
-    :target: https://pepy.tech/project/hikyuu
-
-.. image:: https://static.pepy.tech/badge/hikyuu
     :target: https://pepy.tech/project/hikyuu
 
 .. image:: https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg
