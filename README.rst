@@ -5,6 +5,15 @@
 
 -----------
 
+.. image:: https://static.pepy.tech/badge/hikyuu
+    :target: https://pepy.tech/project/hikyuu
+
+.. image:: https://static.pepy.tech/badge/hikyuu/month
+    :target: https://pepy.tech/project/hikyuu
+
+.. image:: https://static.pepy.tech/badge/hikyuu/week
+    :target: https://pepy.tech/project/hikyuu
+
 .. image:: https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg
     :target: https://github.com/fasiondog/hikyuu/actions
 
@@ -17,7 +26,6 @@
 .. image:: https://img.shields.io/github/license/mashape/apistatus.svg
     :target: https://github.com/fasiondog/hikyuu/blob/master/LICENSE.txt
     :alt: GitHub
-
 
 Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测（目前主要用于国内A股市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。
 
