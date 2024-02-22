@@ -99,7 +99,7 @@ public:
      * 加入有效时间，在_calculate中调用
      * @param datetime 系统有效日期
      */
-    void _addValid(const Datetime& datetime);
+    void _addValid(const Datetime& datetime, price_t value = 1.0);
 
     typedef shared_ptr<ConditionBase> ConditionPtr;
     /** 克隆操作 */

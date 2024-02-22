@@ -87,7 +87,8 @@ void export_Condition(py::module& m) {
            
     以指标的形式获取实际值，与交易对象等长，0表示无效，1表示系统有效)")
 
-      .def("_add_valid", &ConditionBase::_addValid, R"(_add_valid(self, datetime)
+      .def("_add_valid", &ConditionBase::_addValid, py::arg("datetime"), py::arg("value") = 1.0,
+           R"(_add_valid(self, datetime)
 
     加入有效时间，在_calculate中调用
 

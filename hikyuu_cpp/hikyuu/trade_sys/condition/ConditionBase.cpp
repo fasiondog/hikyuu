@@ -77,10 +77,10 @@ void ConditionBase::setTO(const KData& kdata) {
     }
 }
 
-void ConditionBase::_addValid(const Datetime& datetime) {
+void ConditionBase::_addValid(const Datetime& datetime, price_t value) {
     auto iter = m_date_index.find(datetime);
     HKU_IF_RETURN(iter == m_date_index.end(), void());
-    m_values[iter->second] += 1.;
+    m_values[iter->second] += value;
 }
 
 bool ConditionBase::isValid(const Datetime& datetime) {
