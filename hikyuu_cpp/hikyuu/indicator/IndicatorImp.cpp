@@ -1445,7 +1445,7 @@ void IndicatorImp::execute_corr() {
     price_t kx = maxp->get(discard);
     price_t ky = minp->get(discard);
     price_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
-    price_t ex2 = 0.0, ey2 = 0.0, exy2 = 0.0;
+    price_t ex2 = 0.0, ey2 = 0.0;
     price_t ix, iy;
 
     for (size_t i = startPos + 1; i < first_end; i++) {
