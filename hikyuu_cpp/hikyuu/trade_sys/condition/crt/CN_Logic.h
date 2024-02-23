@@ -30,5 +30,6 @@ HKU_API ConditionPtr operator|(const ConditionPtr& cond1, const ConditionPtr& co
 HKU_API ConditionPtr operator+(const ConditionPtr& cond1, const ConditionPtr& cond2);
 HKU_API ConditionPtr operator-(const ConditionPtr& cond1, const ConditionPtr& cond2);
 HKU_API ConditionPtr operator*(const ConditionPtr& cond1, const ConditionPtr& cond2);
+HKU_API ConditionPtr operator/(const ConditionPtr& cond1, const ConditionPtr& cond2);
 
 }  // namespace hku
