@@ -24,6 +24,11 @@
 
 using namespace pybind11;
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
+#endif
+
 // Buffer that writes to Python instead of C++
 class pythonbuf : public std::streambuf {
 private:
@@ -162,5 +167,9 @@ public:
         }
     }
 };
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #endif /** IOREDIRECT_H_ **/
