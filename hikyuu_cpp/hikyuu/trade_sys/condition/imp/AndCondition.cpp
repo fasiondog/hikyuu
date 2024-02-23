@@ -60,7 +60,7 @@ ConditionPtr AndCondition::_clone() {
 }
 
 HKU_API ConditionPtr operator&(const ConditionPtr& cond1, const ConditionPtr& cond2) {
-    return ConditionPtr(new AndCondition(cond1, cond2));
+    return make_shared<AndCondition>(cond1, cond2);
 }
 
 }  // namespace hku

@@ -112,6 +112,9 @@ void export_Condition(py::module& m) {
       .def("__or__",
            [](const ConditionPtr& self, const ConditionPtr& other) { return self | other; })
 
+      .def("__add__",
+           [](const ConditionPtr& self, const ConditionPtr& other) { return self + other; })
+
         DEF_PICKLE(ConditionPtr);
 
     m.def("CN_OPLine", CN_OPLine, R"(CN_OPLine(ind)
