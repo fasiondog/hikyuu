@@ -154,11 +154,6 @@
 #include <immintrin.h>
 #endif
 
-#ifdef DLIB_HAVE_AVX2
-#include <immintrin.h>  // AVX
-//    #include <avx2intrin.h>
-#endif
-
 #ifdef HKU_ENABLE_NEON
 #include <arm_neon.h>
 #endif

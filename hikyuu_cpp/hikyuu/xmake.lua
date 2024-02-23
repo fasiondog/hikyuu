@@ -9,7 +9,7 @@ target("hikyuu")
 
     add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time")
 
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib", "cpu-features")
     if is_plat("windows", "linux", "cross") then
         add_packages("sqlite3")
     end

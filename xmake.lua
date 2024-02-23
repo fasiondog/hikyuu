@@ -182,6 +182,7 @@ add_requires("nng", {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib", {system = false, configs = {zlib = true, ssl = true}})
 add_requires("zlib", {system = false})
+add_requires("cpu-features", {system = false})
 
 add_defines("SPDLOG_DISABLExm_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
@@ -220,11 +221,12 @@ if not is_plat("windows") then
   add_shflags("-pthread")
   add_ldflags("-pthread")
 end
---
+
 -- add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "avx")
 if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
   -- fedora或者ubuntu，并且不是交叉编译
   add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")
+  add_defines("HKU_ENABLE_SSE2", "HKU_ENABLE_SSE3", "HKU_ENABLE_SSE41", "HKU_ENABLE_AVX", "HKU_ENABLE_AVX2")
 end
 
 includes("./hikyuu_cpp/hikyuu")
