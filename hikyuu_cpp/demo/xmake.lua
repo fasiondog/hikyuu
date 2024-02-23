@@ -2,6 +2,8 @@ target("demo")
     set_kind("binary")
     set_default(false)
     
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time")
+    
     add_packages("boost", "spdlog", "fmt", "flatbuffers")
     add_includedirs("..")
 
