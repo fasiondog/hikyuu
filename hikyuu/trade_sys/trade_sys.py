@@ -7,6 +7,15 @@ from hikyuu.core import (
     ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase
 )
 
+
+def part_iter(self):
+    for i in range(len(self)):
+        yield self[i]
+
+
+ConditionBase.__iter__ = part_iter
+
+
 # ------------------------------------------------------------------
 # System
 # ------------------------------------------------------------------
