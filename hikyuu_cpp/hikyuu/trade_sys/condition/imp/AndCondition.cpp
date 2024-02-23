@@ -28,29 +28,39 @@ void AndCondition::_calculate() {
     m_cond2->setSG(m_sg);
     m_cond1->setTO(m_kdata);
     m_cond2->setTO(m_kdata);
+
+    size_t total = m_kdata.size();
+    HKU_ASSERT(m_cond1->size() == total && m_cond2->size() == total);
+
     price_t* data1 = m_cond1->data();
     price_t* data2 = m_cond2->data();
-    size_t total = m_kdata.size();
     for (size_t i = 0; i < total; i++) {
         m_values[i] = (data1[i] > 0.0 && data2[i] > 0.0) ? 1.0 : 0.0;
     }
 }
 
 void AndCondition::_reset() {
-    m_cond1->reset();
-    m_cond2->reset();
+    if (m_cond1) {
+        m_cond1->reset();
+    }
+    if (m_cond2) {
+        m_cond2->reset();
+    }
 }
 
 ConditionPtr AndCondition::_clone() {
     AndCondition* p = new AndCondition();
-    p->m_cond1 = m_cond1->clone();
-    p->m_cond2 = m_cond2->clone();
+    if (m_cond1) {
+        p->m_cond1 = m_cond1->clone();
+    }
+    if (m_cond2) {
+        p->m_cond2 = m_cond2->clone();
+    }
     return ConditionPtr(p);
 }
 
 HKU_API ConditionPtr operator&(const ConditionPtr& cond1, const ConditionPtr& cond2) {
-    AndCondition* p = new AndCondition(cond1, cond2);
-    return ConditionPtr(p);
+    return ConditionPtr(new AndCondition(cond1, cond2));
 }
 
 }  // namespace hku
