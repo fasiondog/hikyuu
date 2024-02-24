@@ -885,7 +885,6 @@ void IndicatorImp::execute_add() {
     setDiscard(discard);
 #ifdef HKU_ENABLE_SIMD
     constexpr std::size_t simd_size = xsimd::simd_type<double>::size;
-    HKU_INFO("simd size: {}", simd_size);
     for (size_t r = 0; r < result_number; ++r) {
         price_t *data1 = maxp->data(r);
         price_t *data2 = minp->data(r);
@@ -898,7 +897,7 @@ void IndicatorImp::execute_add() {
             bres.store_aligned(&result[i]);
         }
         for (std::size_t i = vec_size; i < size; ++i) {
-            result[i] = data1[i] + data2[i];
+            result[i] = data1[i] + data2[i - diff];
         }
     }
 #else
@@ -918,7 +917,7 @@ void IndicatorImp::execute_sub() {
     m_right->calculate();
     m_left->calculate();
 
-    const IndicatorImp *maxp, *minp;
+    IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -939,14 +938,22 @@ void IndicatorImp::execute_sub() {
     setDiscard(discard);
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
+            auto *data1 = m_left->data(r);
+            auto *data2 = m_right->data(r);
+            auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                _set(m_left->get(i, r) - m_right->get(i - diff, r), i, r);
+                // _set(m_left->get(i, r) - m_right->get(i - diff, r), i, r);
+                result[i] = data1[i] - data2[i - diff];
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
+            auto *data1 = m_left->data(r);
+            auto *data2 = m_right->data(r);
+            auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                _set(m_left->get(i - diff, r) - m_right->get(i, r), i, r);
+                // _set(m_left->get(i - diff, r) - m_right->get(i, r), i, r);
+                result[i] = data1[i - diff] - data2[i];
             }
         }
     }
@@ -956,7 +963,7 @@ void IndicatorImp::execute_mul() {
     m_right->calculate();
     m_left->calculate();
 
-    const IndicatorImp *maxp, *minp;
+    IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -976,8 +983,12 @@ void IndicatorImp::execute_mul() {
     _readyBuffer(total, result_number);
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
+        auto *data1 = maxp->data(r);
+        auto *data2 = minp->data(r);
+        auto *result = this->data(r);
         for (size_t i = discard; i < total; ++i) {
-            _set(maxp->get(i, r) * minp->get(i - diff, r), i, r);
+            // _set(maxp->get(i, r) * minp->get(i - diff, r), i, r);
+            result[i] = data1[i] * data2[i - diff];
         }
     }
 }
@@ -986,7 +997,7 @@ void IndicatorImp::execute_div() {
     m_right->calculate();
     m_left->calculate();
 
-    const IndicatorImp *maxp, *minp;
+    IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1005,24 +1016,41 @@ void IndicatorImp::execute_div() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
+    price_t null_price = Null<price_t>();
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
+            auto *data1 = m_left->data(r);
+            auto *data2 = m_right->data(r);
+            auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i - diff, r) == 0.0) {
-                    _set(Null<price_t>(), i, r);
+                if (data2[i - diff] == 0.0) {
+                    result[i] = null_price;
                 } else {
-                    _set(m_left->get(i, r) / m_right->get(i - diff, r), i, r);
+                    result[i] = data1[i] / data2[i - diff];
                 }
+                // if (m_right->get(i - diff, r) == 0.0) {
+                //     _set(Null<price_t>(), i, r);
+                // } else {
+                //     _set(m_left->get(i, r) / m_right->get(i - diff, r), i, r);
+                // }
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
+            auto *data1 = m_left->data(r);
+            auto *data2 = m_right->data(r);
+            auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i, r) == 0.0) {
-                    _set(Null<price_t>(), i, r);
+                if (data2[i] == 0.0) {
+                    result[i] = null_price;
                 } else {
-                    _set(m_left->get(i - diff, r) / m_right->get(i, r), i, r);
+                    result[i] = data1[i - diff] / data2[i];
                 }
+                // if (m_right->get(i, r) == 0.0) {
+                //     _set(Null<price_t>(), i, r);
+                // } else {
+                //     _set(m_left->get(i - diff, r) / m_right->get(i, r), i, r);
+                // }
             }
         }
     }
