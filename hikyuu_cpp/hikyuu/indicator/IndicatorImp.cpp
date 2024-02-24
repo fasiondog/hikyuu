@@ -1559,7 +1559,7 @@ void IndicatorImp::_update_discard() {
 
 bool IndicatorImp::alike(const IndicatorImp &other) const {
     HKU_IF_RETURN(this == &other, true);
-    HKU_IF_RETURN(m_optype != other.m_optype || typeid(*this).name() != typeid(other).name() ||
+    HKU_IF_RETURN(m_optype != other.m_optype || typeid(*this) != typeid(other) ||
                     m_params != other.m_params || m_discard != other.m_discard ||
                     m_result_num != other.m_result_num ||
                     m_ind_params.size() != other.m_ind_params.size(),
