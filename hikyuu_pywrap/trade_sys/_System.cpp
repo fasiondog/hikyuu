@@ -288,7 +288,6 @@ void export_System(py::module& m) {
       [](py::object tm = py::none(), py::object mm = py::none(), py::object ev = py::none(),
          py::object cn = py::none(), py::object sg = py::none(), py::object st = py::none(),
          py::object tp = py::none(), py::object pg = py::none(), py::object sp = py::none()) {
-          SPEND_TIME(SYS_Simple);
           TradeManagerPtr ctm;
           if (!tm.is_none()) {
               ctm = tm.cast<TradeManagerPtr>();
