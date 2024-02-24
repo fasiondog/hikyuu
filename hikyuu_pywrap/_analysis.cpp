@@ -112,6 +112,9 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
 
 static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& query,
                                   SystemPtr sys_proto) {
+    HKU_CHECK(sys_proto, "sys_proto is null!");
+
+    sys_proto->reset(true, true);
     SystemList sys_list;
     StockList stk_list;
 
