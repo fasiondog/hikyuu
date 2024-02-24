@@ -100,8 +100,9 @@ void export_System(py::module& m) {
       .def_readwrite("count", &TradeRequest::count, "因操作失败，连续延迟的次数")
         DEF_PICKLE(TradeRequest);
 
-    py::class_<System, SystemPtr>(m, "System",
-                                  R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
+    py::class_<System, SystemPtr>(
+      m, "System",
+      R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
 
 系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
@@ -286,14 +287,16 @@ void export_System(py::module& m) {
       .def("get_buy_short_trade_request", &System::getBuyShortTradeRequest,
            py::return_value_policy::copy)
 
-      .def("reset", &System::reset, R"(reset(self, with_tm, with_ev)
+      .def("reset", &System::reset, py::arg("with_tm"), py::arg("with_ev"),
+           R"(reset(self, with_tm, with_ev)
 
     复位操作。TM、EV是和具体系统无关的策略组件，可以在不同的系统中进行共享，复位将引起系统运行时被重新清空并计算。尤其是在共享TM时需要注意！
 
     :param bool with_tm: 是否复位TM组件
     :param bool with_ev: 是否复位EV组件)")
 
-      .def("clone", &System::clone, R"(clone(self)
+      .def("clone", &System::clone, py::arg("with_tm") = true, py::arg("with_ev") = false,
+           R"(clone(self)
 
     克隆操作。)")
 

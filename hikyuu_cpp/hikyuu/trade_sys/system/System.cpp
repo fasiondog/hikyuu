@@ -185,13 +185,15 @@ void System::setTO(const KData& kdata) {
         m_mm->setQuery(query);
 }
 
-SystemPtr System::clone() {
+SystemPtr System::clone(bool with_tm, bool with_ev) {
     SystemPtr p = make_shared<System>();
-    if (m_tm)
-        p->m_tm = m_tm->clone();
-    // ev 通常作为公共组件不进行克隆
-    // if (m_ev)
-    //     p->m_ev = m_ev->clone();
+    if (m_tm) {
+        p->m_tm = with_tm ? m_tm->clone() : m_tm;
+    }
+    if (m_ev) {
+        // ev 通常作为公共组件不进行克隆，使用同一实例
+        p->m_ev = with_ev ? m_ev->clone() : m_ev;
+    }
     if (m_mm)
         p->m_mm = m_mm->clone();
     if (m_cn)
