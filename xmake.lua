@@ -133,6 +133,7 @@ local boost_version = "1.84.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "10.2.1"
 local flatbuffers_version = "23.5.26"
+local sqlite_version = "3.43.0+200"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
     mysql_version = "8.0.21" 
@@ -184,7 +185,7 @@ add_requires("boost " .. boost_version, {
 
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
 add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
-add_requires("sqlite3", {system = false, configs = {shared = true, cxflags = "-fPIC"}})
+add_requires("sqlite3 " .. sqlite_version, {system = false, configs = {shared = true, cxflags = "-fPIC"}})
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false})
 add_requires("nng", {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
@@ -234,7 +235,10 @@ if not is_plat("windows") then
   add_ldflags("-pthread")
 end
 
--- add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "avx")
+if get_config("simd") and is_arch("x86_64", "x64", "x86", "i386") then
+    add_vectorexts("sse", "sse2", "sse3", "ssse3", "sse4.2", "avx", "avx2")
+end
+
 if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
   -- fedora或者ubuntu，并且不是交叉编译
   add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")

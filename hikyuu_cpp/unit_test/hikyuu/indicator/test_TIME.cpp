@@ -25,7 +25,7 @@ TEST_CASE("test_TIME") {
     KData kdata;
 
     /** @arg 无输入参数 */
-    Indicator date = DATE(), time = TIME(), year = YEAR(), month = MONTH(), week = WEEK(),
+    Indicator date = hku::DATE(), time = TIME(), year = YEAR(), month = MONTH(), week = WEEK(),
               day = DAY(), hour = HOUR(), minute = MINUTE();
     CHECK_EQ(date.size(), 0);
     CHECK_EQ(date.empty(), true);
@@ -62,7 +62,7 @@ TEST_CASE("test_TIME") {
     /** @arg 对应的KData为空 */
     CHECK_EQ(kdata.empty(), true);
 
-    date = DATE(kdata);
+    date = hku::DATE(kdata);
     CHECK_EQ(date.size(), 0);
     CHECK_EQ(date.empty(), true);
     CHECK_EQ(date.name(), "DATE");
@@ -107,7 +107,7 @@ TEST_CASE("test_TIME") {
     kdata = stock.getKData(query);
     size_t total = kdata.size();
 
-    date = DATE(kdata);
+    date = hku::DATE(kdata);
     CHECK_EQ(date.name(), "DATE");
     CHECK_EQ(date.size(), kdata.size());
 
@@ -152,7 +152,7 @@ TEST_CASE("test_TIME") {
     }
 
     /** @arg 非空的KData */
-    date = DATE();
+    date = hku::DATE();
     time = TIME();
     year = YEAR();
     month = MONTH();
@@ -220,7 +220,7 @@ TEST_CASE("test_TIME_export") {
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator ma1 = DATE(kdata);
+    Indicator ma1 = hku::DATE(kdata);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
