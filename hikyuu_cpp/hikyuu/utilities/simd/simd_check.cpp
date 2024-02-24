@@ -85,7 +85,7 @@ void HKU_API checkUnavailableButEnabledCpuInstructions() {
 #endif
 
 #if HKU_ARCH_ARM
-    ArmInfo arm = GetArmInfo();  // NOSONAR
+    ArmInfo arm = GetArmInfo();
 #ifdef HKU_ENABLE_NEON
     HKU_TRACE("enable neon: {}", arm.features.neon ? 1 : 0);
     HKU_CHECK(

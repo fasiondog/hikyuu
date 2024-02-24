@@ -59,9 +59,9 @@ target("unit-test")
     set_kind("binary")
     set_default(false)
 
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time", "simd")
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "xsimd")
     if get_config("mysql") then
         if is_plat("macosx") then
             add_packages("mysqlclient")
@@ -82,8 +82,6 @@ target("unit-test")
     if is_plat("windows") and get_config("kind") == "shared" then
         add_defines("HKU_API=__declspec(dllimport)")
     end
-
-    add_defines("TEST_ALL_IN_ONE")
 
     add_deps("hikyuu")
 
@@ -108,9 +106,9 @@ target("small-test")
     set_kind("binary")
     set_default(false)
     
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time", "simd")
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "xsimd")
     if get_config("mysql") then
         if is_plat("macosx") then
             add_packages("mysqlclient")
@@ -135,8 +133,6 @@ target("small-test")
     if is_plat("windows") and is_mode("release") then
         add_defines("HKU_API=__declspec(dllimport)")
     end
-
-    add_defines("TEST_ALL_IN_ONE")
 
     add_deps("hikyuu")
 
