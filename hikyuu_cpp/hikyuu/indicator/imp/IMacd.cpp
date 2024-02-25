@@ -45,27 +45,32 @@ void IMacd::_calculate(const Indicator& data) {
         return;
     }
 
+    auto const* src = data.data();
+    auto* dst0 = this->data(0);
+    auto* dst1 = this->data(1);
+    auto* dst2 = this->data(2);
+
     price_t m1 = 2.0 / (n1 + 1);
     price_t m2 = 2.0 / (n2 + 1);
     price_t m3 = 2.0 / (n3 + 1);
-    price_t ema1 = data[0];
-    price_t ema2 = data[0];
+    price_t ema1 = src[0];
+    price_t ema2 = src[0];
     price_t diff = 0.0;
     price_t dea = 0.0;
     price_t bar = 0.0;
-    _set(bar, 0, 0);
-    _set(diff, 0, 1);
-    _set(dea, 0, 2);
+    dst0[0] = bar;
+    dst1[0] = diff;
+    dst2[0] = dea;
 
     for (size_t i = 1; i < total; ++i) {
-        ema1 = (data[i] - ema1) * m1 + ema1;
-        ema2 = (data[i] - ema2) * m2 + ema2;
+        ema1 = (src[i] - ema1) * m1 + ema1;
+        ema2 = (src[i] - ema2) * m2 + ema2;
         diff = ema1 - ema2;
         dea = diff * m3 + dea - dea * m3;
         bar = diff - dea;
-        _set(bar, i, 0);
-        _set(diff, i, 1);
-        _set(dea, i, 2);
+        dst0[i] = bar;
+        dst1[i] = diff;
+        dst2[i] = dea;
     }
 }
 
