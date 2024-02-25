@@ -48,8 +48,9 @@ void OPLineCondition::_calculate() {
     Indicator op = m_op(profit);
 
     Indicator x = profit - op;
+    auto const* xdata = x.data();
     for (size_t i = 0; i < x.size(); i++) {
-        if (x[i] > 0) {
+        if (xdata[i] > 0) {
             _addValid(dates[i]);
         }
     }

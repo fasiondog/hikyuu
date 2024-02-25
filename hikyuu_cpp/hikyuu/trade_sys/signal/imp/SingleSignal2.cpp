@@ -50,11 +50,14 @@ void SingleSignal2::_calculate() {
     Indicator buy = ind - REF(LLV(ind, filter_n), 1);
     Indicator sell = REF(HHV(ind, filter_n), 1) - ind;
     size_t total = dev.size();
+    auto const* buydata = buy.data();
+    auto const* selldata = sell.data();
+    auto const* devdata = dev.data();
     for (size_t i = start; i < total; ++i) {
-        double filter = filter_p * dev[i];
-        if (buy[i] > filter) {
+        double filter = filter_p * devdata[i];
+        if (buydata[i] > filter) {
             _addBuySignal(m_kdata[i].datetime);
-        } else if (sell[i] > filter) {
+        } else if (selldata[i] > filter) {
             _addSellSignal(m_kdata[i].datetime);
         }
     }

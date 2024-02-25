@@ -35,10 +35,11 @@ void BandSignal::_calculate() {
     size_t discard = ind.discard();
     size_t total = ind.size();
 
+    auto const* inddata = ind.data();
     for (size_t i = discard; i < total; ++i) {
-        if (ind[i] > m_upper) {
+        if (inddata[i] > m_upper) {
             _addBuySignal(m_kdata[i].datetime);
-        } else if (ind[i] < m_lower) {
+        } else if (inddata[i] < m_lower) {
             _addSellSignal(m_kdata[i].datetime);
         }
     }
