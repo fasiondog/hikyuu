@@ -49,6 +49,28 @@ public:
         return m_buffer.data();
     }
 
+    DatetimeList getDatetimeList() const;
+
+public:
+    typedef KRecordList::iterator iterator;
+    typedef KRecordList::const_iterator const_iterator;
+
+    iterator begin() {
+        return m_buffer.begin();
+    }
+
+    iterator end() {
+        return m_buffer.end();
+    }
+
+    const_iterator cbegin() const {
+        return m_buffer.cbegin();
+    }
+
+    const_iterator cend() const {
+        return m_buffer.cend();
+    }
+
 private:
     void _getPosInStock();
     void _recoverForward();

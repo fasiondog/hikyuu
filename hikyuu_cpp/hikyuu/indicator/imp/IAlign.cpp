@@ -48,7 +48,6 @@ void IAlign::_calculate(const Indicator& ind) {
                 auto* dst = this->data(r);
                 for (size_t i = m_discard; i < total; i++) {
                     dst[i] = src[i - offset];
-                    // _set(ind.get(i - offset, r), i, r);
                 }
             }
             return;
@@ -66,7 +65,6 @@ void IAlign::_calculate(const Indicator& ind) {
                 auto* dst = this->data(r);
                 for (size_t i = m_discard; i < total; i++) {
                     dst[i] = src[i + offset];
-                    // _set(ind.get(i + offset, r), i, r);
                 }
             }
             return;

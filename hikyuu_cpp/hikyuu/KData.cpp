@@ -13,6 +13,8 @@
 
 namespace hku {
 
+KRecord KData::ms_null_krecord;
+
 HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata) {
     os << "KData{\n  size : " << kdata.size() << "\n  stock: " << kdata.getStock()
        << "\n  query: " << kdata.getQuery() << "\n}";
