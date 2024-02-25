@@ -44,12 +44,14 @@ void SingleSignal::_calculate() {
     size_t start = dev.discard();
     HKU_IF_RETURN(start < 3, void());
 
+    auto const* inddata = ind.data();
+    auto const* devdata = dev.data();
     size_t total = dev.size();
     for (size_t i = start; i < total; ++i) {
-        double dama = ind[i] - ind[i - 1];
-        double dama2 = ind[i] - ind[i - 2];
-        double dama3 = ind[i] - ind[i - 3];
-        double sdama = dev[i] * filter_p;
+        double dama = inddata[i] - inddata[i - 1];
+        double dama2 = inddata[i] - inddata[i - 2];
+        double dama3 = inddata[i] - inddata[i - 3];
+        double sdama = devdata[i] * filter_p;
         if (dama > 0 && (dama > sdama || dama2 > sdama || dama3 > sdama)) {
             _addBuySignal(m_kdata[i].datetime);
         } else if (dama < 0 && (dama < sdama || dama2 < sdama || dama3 < sdama)) {

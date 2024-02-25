@@ -47,8 +47,10 @@ void TwoLineEnvironment::_calculate() {
 
     size_t total = close.size();
     size_t start = fast.discard() > slow.discard() ? fast.discard() : slow.discard();
+    auto const* fast_data = fast.data();
+    auto const* slow_data = slow.data();
     for (size_t i = start; i < total; i++) {
-        if (fast[i] > slow[i]) {
+        if (fast_data[i] > slow_data[i]) {
             _addValid(kdata[i].datetime);
         }
     }
