@@ -23,7 +23,7 @@ bool ISqrt::check() {
     return true;
 }
 
-void ISqrt::_calculate(const Indicator& data) {
+void ISqrt::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();
     if (m_discard >= total) {
@@ -31,8 +31,10 @@ void ISqrt::_calculate(const Indicator& data) {
         return;
     }
 
+    auto const *src = data.data();
+    auto *dst = this->data();
     for (size_t i = m_discard; i < total; ++i) {
-        _set(std::sqrt(data[i]), i);
+        dst[i] = std::sqrt(src[i]);
     }
 }
 
