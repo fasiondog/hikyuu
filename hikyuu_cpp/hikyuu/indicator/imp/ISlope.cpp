@@ -31,10 +31,13 @@ void ISlope::_calculate(const Indicator& ind) {
         return;
     }
 
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
     int n = getParam<int>("n");
     if (n <= 1) {
         for (size_t i = m_discard; i < total; i++) {
-            _set(0.0, i);
+            dst[i] = 0.0;
         }
         return;
     }
@@ -44,18 +47,18 @@ void ISlope::_calculate(const Indicator& ind) {
     size_t first_end = startPos + n >= total ? total : startPos + n;
     for (size_t i = startPos; i < first_end; i++) {
         xsum += i;
-        ysum += ind[i];
-        xysum += i * ind[i];
+        ysum += src[i];
+        xysum += i * src[i];
         x2sum += std::pow(i, 2);
-        _set(((i + 1) * xysum - xsum * ysum) / ((i + 1) * x2sum - xsum * xsum), i);
+        dst[i] = ((i + 1) * xysum - xsum * ysum) / ((i + 1) * x2sum - xsum * xsum);
     }
 
     for (size_t i = first_end; i < total; i++) {
         xsum += n;
-        ysum += ind[i] - ind[i - n];
-        xysum += ind[i] * i - ind[i - n] * (i - n);
+        ysum += src[i] - src[i - n];
+        xysum += src[i] * i - src[i - n] * (i - n);
         x2sum += (2 * i - n) * n;
-        _set((n * xysum - xsum * ysum) / (n * x2sum - xsum * xsum), i);
+        dst[i] = (n * xysum - xsum * ysum) / (n * x2sum - xsum * xsum);
     }
 }
 

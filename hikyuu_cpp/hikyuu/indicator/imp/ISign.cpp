@@ -31,13 +31,15 @@ void ISign::_calculate(const Indicator& ind) {
         return;
     }
 
+    auto const* src = ind.data();
+    auto* dst = this->data();
     for (size_t i = m_discard; i < total; i++) {
-        if (ind[i] > 0) {
-            _set(1, i);
-        } else if (ind[i] < 0) {
-            _set(-1, i);
+        if (src[i] > 0) {
+            dst[i] = 1.0;
+        } else if (src[i] < 0) {
+            dst[i] = -1.0;
         } else {
-            _set(0, i);
+            dst[i] = 0.0;
         }
     }
 

@@ -52,8 +52,10 @@ void IVigor::_calculate(const Indicator& ind) {
     }
 
     Indicator ema = EMA(PRICELIST(tmp, 1), n);
+    auto const* src = ema.data();
+    auto* dst = this->data();
     for (size_t i = 0; i < total; ++i) {
-        _set(ema[i], i);
+        dst[i] = src[i];
     }
 }
 

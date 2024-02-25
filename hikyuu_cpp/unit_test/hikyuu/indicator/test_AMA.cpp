@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/AMA.h>
@@ -111,6 +111,27 @@ TEST_CASE("test_AMA_dyn") {
         CHECK_EQ(expect.get(i, 1), doctest::Approx(result.get(i, 1)));
     }
 }
+
+//-----------------------------------------------------------------------------
+// benchmark
+//-----------------------------------------------------------------------------
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_AMA_benchmark") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    Indicator c = kdata.close();
+    int cycle = 1000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(test_AMA_benchmark, cycle, fmt::format("data len: {}", c.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator ind = AMA();
+            Indicator result = ind(c);
+        }
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // test export

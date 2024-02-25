@@ -37,6 +37,10 @@ void IAma::_calculate(const Indicator& data) {
         return;
     }
 
+    auto const* src = data.data();
+    auto* dst0 = this->data(0);
+    auto* dst1 = this->data(1);
+
     int n = getParam<int>("n");
     int fast_n = getParam<int>("fast_n");
     int slow_n = getParam<int>("slow_n");
@@ -48,34 +52,34 @@ void IAma::_calculate(const Indicator& data) {
     price_t delta = fastest - slowest;
 
     price_t prevol = 0.0, vol = 0.0, er = 1.0, c = 0.0;
-    price_t ama = data[start];
+    price_t ama = src[start];
     size_t first_end = start + n + 1 >= total ? total : start + n + 1;
     _set(ama, start, 0);
     _set(er, start, 1);
     for (size_t i = start + 1; i < first_end; ++i) {
-        vol += std::fabs(data[i] - data[i - 1]);
-        er = (vol == 0.0) ? 1.0 : (data[i] - data[start]) / vol;
+        vol += std::fabs(src[i] - src[i - 1]);
+        er = (vol == 0.0) ? 1.0 : (src[i] - src[start]) / vol;
         if (er > 1.0)
             er = 1.0;
         c = std::pow((std::fabs(er) * delta + slowest), 2);
-        ama += c * (data[i] - ama);
-        _set(ama, i, 0);
-        _set(er, i, 1);
+        ama += c * (src[i] - ama);
+        dst0[i] = ama;
+        dst1[i] = er;
     }
 
     prevol = vol;
     for (size_t i = first_end; i < total; ++i) {
-        vol = prevol + std::fabs(data[i] - data[i - 1]) - std::fabs(data[i + 1 - n] - data[i - n]);
-        er = (vol == 0.0) ? 1.0 : (data[i] - data[i - n]) / vol;
+        vol = prevol + std::fabs(src[i] - src[i - 1]) - std::fabs(src[i + 1 - n] - src[i - n]);
+        er = (vol == 0.0) ? 1.0 : (src[i] - src[i - n]) / vol;
         if (er > 1.0)
             er = 1.0;
         if (er < -1.0)
             er = -1.0;
         c = std::pow((std::fabs(er) * delta + slowest), 2);
-        ama += c * (data[i] - ama);
+        ama += c * (src[i] - ama);
         prevol = vol;
-        _set(ama, i, 0);
-        _set(er, i, 1);
+        dst0[i] = ama;
+        dst1[i] = er;
     }
 }
 

@@ -31,9 +31,12 @@ void IBarsLast::_calculate(const Indicator& ind) {
         return;
     }
 
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
     if (total == m_discard + 1) {
-        if (ind[m_discard] != 0.0) {
-            _set(0, m_discard);
+        if (src[m_discard] != 0.0) {
+            dst[m_discard] = 0.0;
         } else {
             m_discard = total;
         }
@@ -42,17 +45,17 @@ void IBarsLast::_calculate(const Indicator& ind) {
 
     size_t pos = total;
     for (size_t i = total - 1; i != m_discard; i--) {
-        if (ind[i] != 0.0) {
+        if (src[i] != 0.0) {
             for (size_t j = i; j < pos; j++) {
-                _set(j - i, j);
+                dst[j] = j - i;
             }
             pos = i;
         }
     }
 
-    if (ind[m_discard] != 0.0) {
+    if (src[m_discard] != 0.0) {
         for (size_t i = m_discard; i < pos; i++) {
-            _set(i - m_discard, i);
+            dst[i] = i - m_discard;
         }
     } else {
         m_discard = pos;

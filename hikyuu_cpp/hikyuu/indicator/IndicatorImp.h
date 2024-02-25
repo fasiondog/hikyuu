@@ -81,6 +81,8 @@ public:
         INVALID
     };
 
+    typedef price_t value_type;
+
 public:
     /** 默认构造函数   */
     IndicatorImp();
@@ -166,7 +168,8 @@ public:
     typedef std::map<string, IndicatorImpPtr> ind_param_map_t;
     const ind_param_map_t& getIndParams() const;
 
-    price_t* data(size_t result_num = 0);
+    value_type* data(size_t result_num = 0);
+    value_type const* data(size_t result_num = 0) const;
 
     // ===================
     //  子类接口
@@ -421,7 +424,11 @@ inline bool IndicatorImp::haveIndParam(const string& name) const {
     return m_ind_params.find(name) != m_ind_params.end();
 }
 
-inline price_t* IndicatorImp::data(size_t result_num) {
+inline IndicatorImp::value_type* IndicatorImp::data(size_t result_num) {
+    return m_pBuffer[result_num] ? m_pBuffer[result_num]->data() : nullptr;
+}
+
+inline IndicatorImp::value_type const* IndicatorImp::data(size_t result_num) const {
     return m_pBuffer[result_num] ? m_pBuffer[result_num]->data() : nullptr;
 }
 

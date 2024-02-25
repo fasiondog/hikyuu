@@ -29,8 +29,10 @@ void IExp::_calculate(const Indicator& data) {
         return;
     }
 
+    auto const* src = data.data();
+    auto* dst = this->data();
     for (size_t i = m_discard; i < total; ++i) {
-        _set(std::exp(data[i]), i);
+        dst[i] = std::exp(src[i]);
     }
 }
 

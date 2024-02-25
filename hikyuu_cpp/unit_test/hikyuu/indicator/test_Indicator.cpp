@@ -5,13 +5,11 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <hikyuu/indicator/Indicator.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/StockManager.h>
-
-using namespace hku;
 
 /**
  * @defgroup test_indicator_Indicator test_indicator_Indicator
@@ -108,8 +106,31 @@ TEST_CASE("test_operator_add") {
     }
 }
 
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_operator_add") {
+    PriceList d1, d2;
+    for (size_t i = 0; i < 10000; ++i) {
+        d1.push_back(i);
+        d2.push_back(i + 1);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+
+    int cycle = 10000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(Indicator_add, cycle, HKU_CSTR(""));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator result = data1 + data2;
+        }
+    }
+}
+#endif
+
 /** @par 检测点 */
-TEST_CASE("test_operator_reduce") {
+TEST_CASE("test_operator_sub") {
     /** @arg 正常相减*/
     PriceList d1, d2;
     for (size_t i = 0; i < 10; ++i) {
@@ -146,6 +167,29 @@ TEST_CASE("test_operator_reduce") {
         CHECK_EQ(result[i], (k[i] - data1[i]));
     }
 }
+
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_operator_sub_benchmark") {
+    PriceList d1, d2;
+    for (size_t i = 0; i < 10000; ++i) {
+        d1.push_back(i);
+        d2.push_back(i + 1);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+
+    int cycle = 10000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(Indicator_sub, cycle, HKU_CSTR(""));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator result = data1 - data2;
+        }
+    }
+}
+#endif
 
 /** @par 检测点 */
 TEST_CASE("test_operator_multi") {
@@ -185,6 +229,29 @@ TEST_CASE("test_operator_multi") {
         CHECK_EQ(result[i], (k[i] * data1[i]));
     }
 }
+
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_operator_multi_benchmark") {
+    PriceList d1, d2;
+    for (size_t i = 0; i < 10000; ++i) {
+        d1.push_back(i);
+        d2.push_back(i + 1);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+
+    int cycle = 10000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(Indicator_multi, cycle, HKU_CSTR(""));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator result = data1 * data2;
+        }
+    }
+}
+#endif
 
 /** @par 检测点 */
 TEST_CASE("test_operator_division") {
@@ -232,6 +299,29 @@ TEST_CASE("test_operator_division") {
         }
     }
 }
+
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_operator_division_benchmark") {
+    PriceList d1, d2;
+    for (size_t i = 0; i < 10000; ++i) {
+        d1.push_back(i);
+        d2.push_back(i + 1);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+
+    int cycle = 10000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(Indicator_div, cycle, HKU_CSTR(""));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator result = data1 / data2;
+        }
+    }
+}
+#endif
 
 /** @par 检测点 */
 TEST_CASE("test_operator_mod") {

@@ -35,28 +35,27 @@ void IRocr100::_calculate(const Indicator& ind) {
         return;
     }
 
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
     if (0 == n) {
-        price_t pre_price = ind[m_discard];
+        price_t pre_price = src[m_discard];
         if (pre_price != 0.0) {
-            _set(100.0, m_discard);
+            dst[m_discard] = 100.0;
             for (size_t i = m_discard + 1; i < total; i++) {
-                _set(ind[i] / pre_price * 100.0, i);
+                dst[i] = src[i] / pre_price * 100.0;
             }
         } else {
             for (size_t i = m_discard; i < total; i++) {
-                _set(0.0, i);
+                dst[i] = 0.0;
             }
         }
         return;
     }
 
     for (size_t i = m_discard; i < total; i++) {
-        price_t pre_price = ind[i - n];
-        if (pre_price != 0.0) {
-            _set((ind[i] / pre_price) * 100.0, i);
-        } else {
-            _set(0.0, i);
-        }
+        price_t pre_price = src[i - n];
+        dst[i] = (pre_price != 0.0) ? (src[i] / pre_price) * 100.0 : 0.0;
     }
 }
 

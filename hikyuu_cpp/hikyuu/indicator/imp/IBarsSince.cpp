@@ -23,7 +23,7 @@ bool IBarsSince::check() {
     return true;
 }
 
-void IBarsSince::_calculate(const Indicator& ind) {
+void IBarsSince::_calculate(const Indicator &ind) {
     size_t total = ind.size();
     m_discard = ind.discard();
     if (m_discard >= total) {
@@ -31,16 +31,19 @@ void IBarsSince::_calculate(const Indicator& ind) {
         return;
     }
 
+    auto const *src = ind.data();
+    auto *dst = this->data();
+
     bool found = false;
     size_t pos = m_discard;
     for (size_t i = m_discard; i < total; ++i) {
         if (found) {
-            _set(i - pos, i);
+            dst[i] = i - pos;
         } else {
-            if (ind[i] != 0.0) {
+            if (src[i] != 0.0) {
                 found = true;
                 pos = i;
-                _set(0, i);
+                dst[i] = 0.0;
             }
         }
     }

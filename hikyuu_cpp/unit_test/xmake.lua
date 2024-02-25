@@ -83,8 +83,6 @@ target("unit-test")
         add_defines("HKU_API=__declspec(dllimport)")
     end
 
-    add_defines("TEST_ALL_IN_ONE")
-
     add_deps("hikyuu")
 
     if is_plat("linux") or is_plat("macosx") then
@@ -135,8 +133,6 @@ target("small-test")
     if is_plat("windows") and is_mode("release") then
         add_defines("HKU_API=__declspec(dllimport)")
     end
-
-    add_defines("TEST_ALL_IN_ONE")
 
     add_deps("hikyuu")
 
