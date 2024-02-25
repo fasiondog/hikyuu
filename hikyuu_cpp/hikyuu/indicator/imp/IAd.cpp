@@ -43,7 +43,7 @@ void IAd::_calculate(const Indicator& data) {
     auto* dst = this->data();
     dst[m_discard] = 0.0;
     for (size_t i = m_discard + 1; i < total; i++) {
-        KRecord r = k[i];
+        const KRecord& r = k[i];
         price_t tmp = r.highPrice - r.lowPrice;
         if (tmp != 0.0) {
             // 多空对比 = [（收盘价- 最低价） - （最高价 - 收盘价）] / （最高价 - 最低价）

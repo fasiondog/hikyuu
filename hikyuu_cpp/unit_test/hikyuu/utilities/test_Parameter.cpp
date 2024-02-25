@@ -144,6 +144,22 @@ TEST_CASE("test_Parameter") {
     }
 }
 
+/** @par 验证对 KData 的获取 */
+TEST_CASE("test_Parameter_KData") {
+    KData k = getKData("sh000001", KQuery(-10));
+    CHECK_EQ(k.size(), 10);
+
+    Parameter param;
+    param.set<KData>("k", k);
+
+    /** @arg 验证是否可以多次读取 KData，防止移动语义影响 */
+    auto ek = param.get<KData>("k");
+    CHECK_EQ(ek, k);
+
+    auto ek2 = param.get<KData>("k");
+    CHECK_EQ(ek2, k);
+}
+
 #if HKU_SUPPORT_SERIALIZATION
 /** @par 检测点 */
 TEST_CASE("test_Parameter_serialize") {
