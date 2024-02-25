@@ -34,16 +34,18 @@ void IBarsCount::_calculate(const Indicator& ind) {
         return;
     }
 
-    //如果没有上下文，直接取该指标的discard进行计算
+    auto* dst = this->data();
+
+    // 如果没有上下文，直接取该指标的discard进行计算
     if (stk.isNull()) {
         for (size_t i = m_discard; i < total; i++) {
-            _set(i + 1 - m_discard, i);
+            dst[i] = i + 1 - m_discard;
         }
 
         return;
     }
 
-    //对于1分钟线取得当日交易分钟数
+    // 对于1分钟线取得当日交易分钟数
     KQuery q = k.getQuery();
     if (q.kType() == KQuery::MIN) {
         Datetime pre_d = k[m_discard].datetime.startOfDay();
@@ -54,17 +56,17 @@ void IBarsCount::_calculate(const Indicator& ind) {
                 pre_d = d;
                 count = 0;
             }
-            _set(++count, i);
+            dst[i] = ++count;
         }
 
         return;
     }
 
-    //取得上市以来总交易日数
+    // 取得上市以来总交易日数
     size_t k_start_pos = k.startPos();
     if (k_start_pos != Null<size_t>()) {
         for (size_t i = m_discard; i < total; i++) {
-            _set(1 + k_start_pos + i, i);
+            dst[i] = 1 + k_start_pos + i;
         }
     }
 

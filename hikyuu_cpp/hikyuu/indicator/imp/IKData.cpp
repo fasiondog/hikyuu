@@ -34,7 +34,7 @@ bool IKData::check() {
             "CLOSE" == part || "AMO" == part || "VOL" == part);
 }
 
-//支持KDATA Indicator作为参数
+// 支持KDATA Indicator作为参数
 void IKData::_calculate(const Indicator& ind) {
     HKU_WARN_IF(!isLeaf() && !ind.empty(),
                 "The input is ignored because {} depends on the context!",
@@ -49,54 +49,66 @@ void IKData::_calculate(const Indicator& ind) {
     if ("KDATA" == part_name) {
         m_name = "KDATA";
         _readyBuffer(total, 6);
+        auto* dst0 = this->data(0);
+        auto* dst1 = this->data(1);
+        auto* dst2 = this->data(2);
+        auto* dst3 = this->data(3);
+        auto* dst4 = this->data(4);
+        auto* dst5 = this->data(5);
         for (size_t i = 0; i < total; ++i) {
-            _set(kdata[i].openPrice, i, 0);
-            _set(kdata[i].highPrice, i, 1);
-            _set(kdata[i].lowPrice, i, 2);
-            _set(kdata[i].closePrice, i, 3);
-            _set(kdata[i].transAmount, i, 4);
-            _set(kdata[i].transCount, i, 5);
+            dst0[i] = kdata[i].openPrice;
+            dst1[i] = kdata[i].highPrice;
+            dst2[i] = kdata[i].lowPrice;
+            dst3[i] = kdata[i].closePrice;
+            dst4[i] = kdata[i].transAmount;
+            dst5[i] = kdata[i].transCount;
         }
 
     } else if ("OPEN" == part_name) {
         m_name = "OPEN";
         _readyBuffer(total, 1);
+        auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            _set(kdata[i].openPrice, i);
+            dst[i] = kdata[i].openPrice;
         }
 
     } else if ("HIGH" == part_name) {
         m_name = "HIGH";
         _readyBuffer(total, 1);
+        auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            _set(kdata[i].highPrice, i);
+            dst[i] = kdata[i].highPrice;
         }
     } else if ("LOW" == part_name) {
         m_name = "LOW";
         _readyBuffer(total, 1);
+        auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            _set(kdata[i].lowPrice, i);
+            dst[i] = kdata[i].lowPrice;
         }
 
     } else if ("CLOSE" == part_name) {
         m_name = "CLOSE";
         _readyBuffer(total, 1);
+        auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            _set(kdata[i].closePrice, i);
+            dst[i] = kdata[i].closePrice;
         }
 
     } else if ("AMO" == part_name) {
         m_name = "AMO";
         _readyBuffer(total, 1);
+        auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            _set(kdata[i].transAmount, i);
+            dst[i] = kdata[i].transAmount;
         }
 
     } else if ("VOL" == part_name) {
         m_name = "VOL";
         _readyBuffer(total, 1);
+        auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            _set(kdata[i].transCount, i);
+            dst[i] = kdata[i].transCount;
         }
 
     } else {

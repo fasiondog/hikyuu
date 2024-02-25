@@ -4,7 +4,7 @@
  *  Created on: 2013-2-12
  *      Author: fasiondog
  */
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
@@ -174,6 +174,27 @@ TEST_CASE("test_MA_dyn") {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 }
+
+//-----------------------------------------------------------------------------
+// benchmark
+//-----------------------------------------------------------------------------
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_MA_benchmark") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    Indicator c = kdata.close();
+    int cycle = 1000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(test_MA_benchmark, cycle, fmt::format("data len: {}", c.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator ind = MA();
+            Indicator result = ind(c);
+        }
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // test export

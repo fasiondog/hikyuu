@@ -41,6 +41,9 @@ class HKU_API Indicator {
     HKU_API friend std::ostream& operator<<(std::ostream&, const Indicator&);
 
 public:
+    typedef IndicatorImp::value_type value_type;
+
+public:
     Indicator() {}
     Indicator(const IndicatorImpPtr& imp);
     Indicator(const Indicator& ind);
@@ -171,6 +174,14 @@ public:
 
     IndicatorImpPtr getImp() const {
         return m_imp;
+    }
+
+    value_type* data(size_t result_num = 0) {
+        return m_imp ? m_imp->data(result_num) : nullptr;
+    }
+
+    value_type const* data(size_t result_num = 0) const {
+        return m_imp ? m_imp->data(result_num) : nullptr;
     }
 
 protected:

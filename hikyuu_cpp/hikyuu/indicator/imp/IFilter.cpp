@@ -33,27 +33,30 @@ void IFilter::_calculate(const Indicator& ind) {
         return;
     }
 
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
     int n = getParam<int>("n");
     if (0 == n) {
         for (size_t i = m_discard; i < total; i++) {
-            _set(ind[i] != 0.0 ? 1.0 : 0.0, i);
+            dst[i] = src[i] != 0.0 ? 1.0 : 0.0;
         }
         return;
     }
 
     size_t i = m_discard;
     while (i < total) {
-        if (ind[i] == 0.0) {
-            _set(0.0, i);
+        if (src[i] == 0.0) {
+            dst[i] = 0.0;
             i++;
         } else {
-            _set(1.0, i);
+            dst[i] = 1.0;
             size_t end = i + n + 1;
             if (end > total) {
                 end = total;
             }
             for (size_t j = i + 1; j < end; j++) {
-                _set(0, j);
+                dst[j] = 0.0;
             }
             i = end;
         }

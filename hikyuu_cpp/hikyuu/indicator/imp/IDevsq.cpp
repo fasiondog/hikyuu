@@ -32,14 +32,16 @@ void IDevsq::_calculate(const Indicator& data) {
 
     m_discard = data.discard();
     Indicator ma = MA(data, n);
+    auto const* src = data.data();
+    auto const* mean = ma.data();
+    auto* dst = this->data();
     for (size_t i = discard(); i < total; ++i) {
-        price_t mean = ma[i];
         price_t sum = 0.0;
         size_t start = i < data.discard() + n ? data.discard() : i + 1 - n;
         for (size_t j = start; j <= i; ++j) {
-            sum += std::pow(data[j] - mean, 2);
+            sum += std::pow(src[j] - mean[i], 2);
         }
-        _set(sum, i);
+        dst[i] = sum;
     }
 }
 

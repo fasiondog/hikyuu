@@ -5,11 +5,7 @@
  *      Author: fasiondog
  */
 
-#ifdef HKU_ENBALE_SIMD
-#include <xsimd/xsimd.hpp>
-#endif
 #include "../test_config.h"
-
 #include <hikyuu/indicator/Indicator.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/indicator/crt/KDATA.h>
@@ -122,11 +118,6 @@ TEST_CASE("test_operator_add") {
     Indicator data2 = PRICELIST(d2);
 
     int cycle = 10000;  // 测试循环次数
-
-#ifdef HKU_ENBALE_SIMD
-    constexpr std::size_t simd_size = xsimd::simd_type<double>::size;
-    HKU_INFO("simd size: {}", simd_size);
-#endif
 
     {
         BENCHMARK_TIME_MSG(Indicator_add, cycle, HKU_CSTR(""));
