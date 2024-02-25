@@ -2,10 +2,10 @@
 # -*- coding: utf8 -*-
 # gb18030
 
-#===============================================================================
+# ===============================================================================
 # 作者：fasiondog
 # 历史：1）20130311, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 import unittest
 
@@ -57,8 +57,8 @@ class ConditionTest(unittest.TestCase):
 
 
 def testCondition(self):
-    self._add_valid(Datetime(200101010000))
-    self._add_valid(Datetime(200101020000))
+    self._add_valid(Datetime(201108120000))
+    self._add_valid(Datetime(201108250000))
 
 
 class TestCrtCN(unittest.TestCase):
@@ -70,16 +70,16 @@ class TestCrtCN(unittest.TestCase):
 
         k = sm['sh000001'].get_kdata(Query(-100))
         self.assertEqual(k.empty(), False)
-        p.sg = SignalBase()  #cn设置交易对象时，必须已经指定了信号指示器
-        p.to = k  #cn在设置交易对象时才会调用_caculate函数
-        self.assertEqual(p.is_valid(Datetime(200101010000)), True)
-        self.assertEqual(p.is_valid(Datetime(200101020000)), True)
+        p.sg = SignalBase()  # cn设置交易对象时，必须已经指定了信号指示器
+        p.to = k  # cn在设置交易对象时才会调用_caculate函数
+        self.assertEqual(p.is_valid(Datetime(201108120000)), True)
+        self.assertEqual(p.is_valid(Datetime(201108250000)), True)
         self.assertEqual(p.is_valid(Datetime(200101030000)), False)
 
         p_clone = p.clone()
         self.assertEqual(p_clone.name, "ConditionPython")
         self.assertEqual(p_clone.get_param("n"), 20)
-        self.assertEqual(p_clone.is_valid(Datetime(200101010000)), True)
+        self.assertEqual(p_clone.is_valid(Datetime(201108120000)), True)
 
         p.set_param("n", 1)
         p_clone.set_param("n", 3)
