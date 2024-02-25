@@ -81,6 +81,8 @@ public:
         INVALID
     };
 
+    typedef price_t value_type;
+
 public:
     /** 默认构造函数   */
     IndicatorImp();
@@ -166,7 +168,7 @@ public:
     typedef std::map<string, IndicatorImpPtr> ind_param_map_t;
     const ind_param_map_t& getIndParams() const;
 
-    price_t* data(size_t result_num = 0);
+    value_type* data(size_t result_num = 0);
 
     // ===================
     //  子类接口
