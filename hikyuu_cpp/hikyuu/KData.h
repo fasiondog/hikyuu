@@ -21,13 +21,16 @@ class HKU_API Indicator;
  */
 class HKU_API KData {
 public:
-    KData() {}
+    KData();
     KData(const KData&);
-    KData(KData&&);
     KData(const Stock& stock, const KQuery& query);
     virtual ~KData() {}
 
     KData& operator=(const KData&);
+
+    // 移动语义对 KData 没有实际用处，而且会导致 KData 可能存在空 imp 的情况
+    // 主要是 boost::any_cast 需要，予以保留，但使用时不要到 KData 执行 std::move
+    KData(KData&&);
     KData& operator=(KData&&);
 
     size_t size() const;
@@ -188,35 +191,35 @@ inline KRecord KData::getKRecord(Datetime datetime) const {
 }
 
 inline size_t KData::getPos(const Datetime& datetime) const {
-    return m_imp ? m_imp->getPos(datetime) : Null<size_t>();
+    return m_imp->getPos(datetime);
 }
 
 inline size_t KData::size() const {
-    return m_imp ? m_imp->size() : 0;
+    return m_imp->size();
 }
 
 inline bool KData::empty() const {
-    return m_imp ? m_imp->empty() : true;
+    return m_imp->empty();
 }
 
 inline KQuery KData::getQuery() const {
-    return m_imp ? m_imp->getQuery() : Null<KQuery>();
+    return m_imp->getQuery();
 }
 
 inline Stock KData::getStock() const {
-    return m_imp ? m_imp->getStock() : Null<Stock>();
+    return m_imp->getStock();
 }
 
 inline size_t KData::startPos() const {
-    return m_imp ? m_imp->startPos() : 0;
+    return m_imp->startPos();
 }
 
 inline size_t KData::endPos() const {
-    return m_imp ? m_imp->endPos() : 0;
+    return m_imp->endPos();
 }
 
 inline size_t KData::lastPos() const {
-    return m_imp ? m_imp->lastPos() : 0;
+    return m_imp->lastPos();
 }
 
 inline bool KData::operator!=(const KData& other) const {

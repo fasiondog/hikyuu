@@ -19,15 +19,15 @@ public:
     KDataImp(const Stock& stock, const KQuery& query);
     virtual ~KDataImp();
 
-    KQuery getQuery() const {
+    const KQuery& getQuery() const {
         return m_query;
     }
 
-    Stock getStock() const {
+    const Stock& getStock() const {
         return m_stock;
     }
 
-    KRecord getKRecord(size_t pos) const {
+    const KRecord& getKRecord(size_t pos) const {
         return m_buffer[pos];
     }
 
@@ -44,6 +44,10 @@ public:
     size_t lastPos();
 
     size_t getPos(const Datetime& datetime);
+
+    const KRecord* data() const {
+        return m_buffer.data();
+    }
 
 private:
     void _getPosInStock();
