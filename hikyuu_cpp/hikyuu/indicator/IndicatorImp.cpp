@@ -400,8 +400,8 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
 
 price_t IndicatorImp::get(size_t pos, size_t num) const {
 #if CHECK_ACCESS_BOUND
-    HKU_CHECK_THROW((m_pBuffer[num] != NULL) && pos < m_pBuffer[num]->size(), std::out_of_range,
-                    "Try to access value ({}) out of bounds [0..{})! {}", pos,
+    HKU_CHECK_THROW((num < MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()),
+                    std::out_of_range, "Try to access value ({}) out of bounds [0..{})! {}", pos,
                     m_pBuffer[num]->size(), name());
 #endif
     return (*m_pBuffer[num])[pos];
@@ -409,8 +409,9 @@ price_t IndicatorImp::get(size_t pos, size_t num) const {
 
 void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
-    HKU_CHECK_THROW((m_pBuffer[num] != NULL) && pos < m_pBuffer[num]->size(), std::out_of_range,
-                    "Try to access value out of bounds! (pos={}) {}", pos, name());
+    HKU_CHECK_THROW((num < MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()),
+                    std::out_of_range, "Try to access value out of bounds! (pos={}) {}", pos,
+                    name());
 #endif
     (*m_pBuffer[num])[pos] = val;
 }
