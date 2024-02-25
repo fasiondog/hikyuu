@@ -73,14 +73,6 @@ option("feedback")
     set_description("Enable send feedback.")
 option_end()
 
-option("simd")
-    set_default(false)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable cpu simd.")
-    add_defines("HKU_ENBALE_SIMD")
-option_end()
-
 
 -- project
 set_project("hikyuu")
@@ -191,11 +183,6 @@ add_requires("nng", {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib", {system = false, configs = {zlib = true, ssl = true}})
 add_requires("zlib", {system = false})
-add_requires("cpu-features", {system = false})
-
-if get_config("simd") then
-    add_requires("xsimd", {system = false})
-end
 
 add_defines("SPDLOG_DISABLExm_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
@@ -235,15 +222,11 @@ if not is_plat("windows") then
   add_ldflags("-pthread")
 end
 
-if get_config("simd") and is_arch("x86_64", "x64", "x86", "i386") then
-    add_vectorexts("sse", "sse2", "sse3", "ssse3", "sse4.2", "avx", "avx2")
-end
-
-if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
-  -- fedora或者ubuntu，并且不是交叉编译
-  add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")
---   add_defines("HKU_ENABLE_SSE2", "HKU_ENABLE_SSE3", "HKU_ENABLE_SSE41", "HKU_ENABLE_AVX", "HKU_ENABLE_AVX2")
-end
+-- if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
+--   -- fedora或者ubuntu，并且不是交叉编译
+--   add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")
+-- --   add_defines("HKU_ENABLE_SSE2", "HKU_ENABLE_SSE3", "HKU_ENABLE_SSE41", "HKU_ENABLE_AVX", "HKU_ENABLE_AVX2")
+-- end
 
 includes("./hikyuu_cpp/hikyuu")
 includes("./hikyuu_pywrap")

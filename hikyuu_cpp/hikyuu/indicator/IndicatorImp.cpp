@@ -7,11 +7,6 @@
 #include <stdexcept>
 #include <algorithm>
 #include <forward_list>
-
-#ifdef HKU_ENABLE_SIMD
-#include <xsimd/xsimd.hpp>
-#endif
-
 #include "Indicator.h"
 #include "IndParam.h"
 #include "../Stock.h"
@@ -883,24 +878,6 @@ void IndicatorImp::execute_add() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
-#ifdef HKU_ENABLE_SIMD
-    constexpr std::size_t simd_size = xsimd::simd_type<double>::size;
-    for (size_t r = 0; r < result_number; ++r) {
-        price_t *data1 = maxp->data(r);
-        price_t *data2 = minp->data(r);
-        price_t *result = this->data(r);
-        std::size_t vec_size = size - size % simd_size;
-        for (std::size_t i = discard; i < vec_size; i += simd_size) {
-            auto ba = xs::load_aligned(&data1[i]);
-            auto bb = xs::load_aligned(&data2[i - diff]);
-            auto bres = ba + bb;
-            bres.store_aligned(&result[i]);
-        }
-        for (std::size_t i = vec_size; i < size; ++i) {
-            result[i] = data1[i] + data2[i - diff];
-        }
-    }
-#else
     for (size_t r = 0; r < result_number; ++r) {
         price_t *data1 = maxp->data(r);
         price_t *data2 = minp->data(r);
@@ -910,7 +887,6 @@ void IndicatorImp::execute_add() {
             result[i] = data1[i] + data2[i - diff];
         }
     }
-#endif
 }
 
 void IndicatorImp::execute_sub() {

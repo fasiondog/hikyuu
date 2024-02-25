@@ -29,7 +29,6 @@
 #include "global/schedule/scheduler.h"
 #include "indicator/IndicatorImp.h"
 #include "global/sysinfo.h"
-#include "utilities/simd/simd_check.h"
 #include "debug.h"
 
 namespace hku {
@@ -63,8 +62,6 @@ void GlobalInitializer::init() {
 #if HKU_ENABLE_SEND_FEEDBACK
     sendFeedback();
 #endif
-
-    checkUnavailableButEnabledCpuInstructions();
 
     DataDriverFactory::init();
     StockManager::instance();
