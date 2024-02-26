@@ -62,8 +62,6 @@ public:
 
     size_t size() const;
 
-    price_t operator[](size_t pos) const;
-
     price_t at(size_t pos) const;
 
     price_t* data();
@@ -120,6 +118,16 @@ public:
 
     /** 子类克隆接口 */
     virtual ConditionPtr _clone() = 0;
+
+public:
+    typedef vector<price_t>::const_iterator const_iterator;
+    const_iterator cbegin() const {
+        return m_values.cbegin();
+    }
+
+    const_iterator cend() const {
+        return m_values.cend();
+    }
 
 protected:
     string m_name;
@@ -219,14 +227,8 @@ inline price_t* ConditionBase::data() {
     return m_values.data();
 }
 
-inline price_t ConditionBase::operator[](size_t pos) const {
-    return m_values[pos];
-}
-
 inline price_t ConditionBase::at(size_t pos) const {
-    size_t total = m_values.size();
-    HKU_CHECK_THROW(pos < total, std::out_of_range, "pos({}) out of range 0..{}", pos, total);
-    return m_values[pos];
+    return m_values.at(pos);
 }
 
 inline KData ConditionBase::getTO() const {
