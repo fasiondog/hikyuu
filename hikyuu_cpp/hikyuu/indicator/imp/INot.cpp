@@ -32,7 +32,7 @@ void INot::_calculate(const Indicator &data) {
     auto const *src = data.data();
     auto *dst = this->data();
     for (size_t i = m_discard; i < total; ++i) {
-        dst[i] = (src[i] == 0.0) ? 1.0 : 0.0;
+        dst[i] = (src[i] <= 0.0) ? 1.0 : 0.0;
     }
 }
 

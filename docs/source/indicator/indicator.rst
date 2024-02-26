@@ -672,7 +672,7 @@
 
 .. py:function:: NOT([data])
 
-    求逻辑非。NOT(X)返回非X,即当X=0时返回1，否则返回0。
+    求逻辑非。NOT(X)返回非X,即当X<=0时返回1，否则返回0。
     
     :param Indicator data: 输入数据
     :rtype: Indicator
