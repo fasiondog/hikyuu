@@ -1004,7 +1004,6 @@ void IndicatorImp::execute_div() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
-    price_t null_price = Null<price_t>();
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             auto const *data1 = m_left->data(r);
