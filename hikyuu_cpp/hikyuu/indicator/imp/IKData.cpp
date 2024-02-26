@@ -45,6 +45,7 @@ void IKData::_calculate(const Indicator& ind) {
     HKU_IF_RETURN(total == 0, void());
 
     string part_name = getParam<string>("kpart");
+    auto const* ks = kdata.data();
 
     if ("KDATA" == part_name) {
         m_name = "KDATA";
@@ -56,12 +57,12 @@ void IKData::_calculate(const Indicator& ind) {
         auto* dst4 = this->data(4);
         auto* dst5 = this->data(5);
         for (size_t i = 0; i < total; ++i) {
-            dst0[i] = kdata[i].openPrice;
-            dst1[i] = kdata[i].highPrice;
-            dst2[i] = kdata[i].lowPrice;
-            dst3[i] = kdata[i].closePrice;
-            dst4[i] = kdata[i].transAmount;
-            dst5[i] = kdata[i].transCount;
+            dst0[i] = ks[i].openPrice;
+            dst1[i] = ks[i].highPrice;
+            dst2[i] = ks[i].lowPrice;
+            dst3[i] = ks[i].closePrice;
+            dst4[i] = ks[i].transAmount;
+            dst5[i] = ks[i].transCount;
         }
 
     } else if ("OPEN" == part_name) {
@@ -69,7 +70,7 @@ void IKData::_calculate(const Indicator& ind) {
         _readyBuffer(total, 1);
         auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            dst[i] = kdata[i].openPrice;
+            dst[i] = ks[i].openPrice;
         }
 
     } else if ("HIGH" == part_name) {
@@ -77,14 +78,14 @@ void IKData::_calculate(const Indicator& ind) {
         _readyBuffer(total, 1);
         auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            dst[i] = kdata[i].highPrice;
+            dst[i] = ks[i].highPrice;
         }
     } else if ("LOW" == part_name) {
         m_name = "LOW";
         _readyBuffer(total, 1);
         auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            dst[i] = kdata[i].lowPrice;
+            dst[i] = ks[i].lowPrice;
         }
 
     } else if ("CLOSE" == part_name) {
@@ -92,7 +93,7 @@ void IKData::_calculate(const Indicator& ind) {
         _readyBuffer(total, 1);
         auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            dst[i] = kdata[i].closePrice;
+            dst[i] = ks[i].closePrice;
         }
 
     } else if ("AMO" == part_name) {
@@ -100,7 +101,7 @@ void IKData::_calculate(const Indicator& ind) {
         _readyBuffer(total, 1);
         auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            dst[i] = kdata[i].transAmount;
+            dst[i] = ks[i].transAmount;
         }
 
     } else if ("VOL" == part_name) {
@@ -108,7 +109,7 @@ void IKData::_calculate(const Indicator& ind) {
         _readyBuffer(total, 1);
         auto* dst = this->data();
         for (size_t i = 0; i < total; ++i) {
-            dst[i] = kdata[i].transCount;
+            dst[i] = ks[i].transCount;
         }
 
     } else {

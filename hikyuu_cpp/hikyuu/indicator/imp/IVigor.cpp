@@ -46,9 +46,10 @@ void IVigor::_calculate(const Indicator& ind) {
         return;
     }
 
+    auto const* ks = kdata.data();
     PriceList tmp(total, Null<price_t>());
     for (size_t i = 1; i < total; ++i) {
-        tmp[i] = (kdata[i].closePrice - kdata[i - 1].closePrice) * kdata[i].transCount;
+        tmp[i] = (ks[i].closePrice - ks[i - 1].closePrice) * ks[i].transCount;
     }
 
     Indicator ema = EMA(PRICELIST(tmp, 1), n);
