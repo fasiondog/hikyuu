@@ -50,6 +50,7 @@ std::string getVersionWithGit() {
     return HKU_VERSION_GIT;
 }
 
+// cppcheck-suppress constParameterReference
 static bool readUUID(boost::uuids::uuid& out) {
     std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
     FILE* fp = fopen(filename.c_str(), "rb");

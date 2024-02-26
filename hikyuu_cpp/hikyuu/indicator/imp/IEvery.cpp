@@ -34,7 +34,6 @@ void IEvery::_calculate(const Indicator& ind) {
 
     int n = getParam<int>("n");
     if (0 == n) {
-        n = total;
         m_discard = ind.discard();
         for (size_t i = m_discard; i < total; i++) {
             price_t every = 1.0;

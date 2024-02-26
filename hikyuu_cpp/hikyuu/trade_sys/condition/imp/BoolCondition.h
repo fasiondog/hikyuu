@@ -15,7 +15,7 @@ namespace hku {
 class BoolCondition : public ConditionBase {
 public:
     BoolCondition();
-    BoolCondition(const Indicator&);
+    explicit BoolCondition(const Indicator&);
     virtual ~BoolCondition();
 
     virtual void _calculate() override;

@@ -39,9 +39,7 @@ private:
 
 void ParsingError::append(size_t lineno, const std::string& line) {
     m_info << "\n\t[line " << lineno << "] " << line;
-    if (!m_haveError) {
-        m_haveError = true;
-    }
+    m_haveError = true;
 }
 
 IniParser::IniParser() {}

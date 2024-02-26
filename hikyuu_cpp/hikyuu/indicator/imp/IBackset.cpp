@@ -48,9 +48,7 @@ void IBackset::_calculate(const Indicator& ind) {
             size_t j = i;
             size_t end_j = i - n + 1;
             while (j-- > end_j) {
-                if (dst[j] != 1.0) {
-                    dst[j] = 1.0;
-                }
+                dst[j] = 1.0;
             }
         } else {
             if (dst[i] != 1.0) {

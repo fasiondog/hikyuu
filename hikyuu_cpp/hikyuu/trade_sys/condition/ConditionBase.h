@@ -64,7 +64,7 @@ public:
 
     price_t at(size_t pos) const;
 
-    price_t* data();
+    price_t const* data() const;
 
     /** 复位操作 */
     void reset();
@@ -223,7 +223,7 @@ inline size_t ConditionBase::size() const {
     return m_values.size();
 }
 
-inline price_t* ConditionBase::data() {
+inline price_t const* ConditionBase::data() const {
     return m_values.data();
 }
 

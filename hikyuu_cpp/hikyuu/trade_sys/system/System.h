@@ -37,7 +37,7 @@ public:
     System();
 
     /** 指定系统名称的构造函数 */
-    System(const string& name);
+    explicit System(const string& name);
 
     /**
      * @brief 构造函数
