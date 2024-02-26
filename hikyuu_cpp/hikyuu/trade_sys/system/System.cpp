@@ -292,9 +292,11 @@ void System::run(const KQuery& query, bool reset) {
 
     setTO(kdata);
     size_t total = kdata.size();
+    auto const* ks = kdata.data();
+    auto const* src_ks = m_src_kdata.data();
     for (size_t i = 0; i < total; ++i) {
-        if (kdata[i].datetime >= m_tm->initDatetime()) {
-            _runMoment(kdata[i], m_src_kdata[i]);
+        if (ks[i].datetime >= m_tm->initDatetime()) {
+            _runMoment(ks[i], src_ks[i]);
         }
     }
 }
@@ -315,9 +317,11 @@ void System::run(const KData& kdata, bool reset) {
 
     setTO(kdata);
     size_t total = kdata.size();
+    auto const* ks = kdata.data();
+    auto const* src_ks = m_src_kdata.data();
     for (size_t i = 0; i < total; ++i) {
-        if (kdata[i].datetime >= m_tm->initDatetime()) {
-            _runMoment(kdata[i], m_src_kdata[i]);
+        if (ks[i].datetime >= m_tm->initDatetime()) {
+            _runMoment(ks[i], src_ks[i]);
         }
     }
 }

@@ -53,12 +53,13 @@ void SingleSignal2::_calculate() {
     auto const* buydata = buy.data();
     auto const* selldata = sell.data();
     auto const* devdata = dev.data();
+    auto const* ks = m_kdata.data();
     for (size_t i = start; i < total; ++i) {
         double filter = filter_p * devdata[i];
         if (buydata[i] > filter) {
-            _addBuySignal(m_kdata[i].datetime);
+            _addBuySignal(ks[i].datetime);
         } else if (selldata[i] > filter) {
-            _addSellSignal(m_kdata[i].datetime);
+            _addSellSignal(ks[i].datetime);
         }
     }
 }

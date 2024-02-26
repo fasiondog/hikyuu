@@ -69,9 +69,10 @@ void ConditionBase::setTO(const KData& kdata) {
         m_date_index.clear();
         size_t total = kdata.size();
         m_values.resize(total);
+        auto const* ks = m_kdata.data();
         for (size_t i = 0; i < total; i++) {
             m_values[i] = 0.0;
-            m_date_index[m_kdata[i].datetime] = i;
+            m_date_index[ks[i].datetime] = i;
         }
         _calculate();
     }

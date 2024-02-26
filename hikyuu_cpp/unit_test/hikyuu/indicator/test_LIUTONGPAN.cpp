@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/LIUTONGPAN.h>
@@ -32,13 +32,35 @@ TEST_CASE("test_LIUTONGPAN") {
     for (int i = 0; i < total; i++) {
         if (k[i].datetime < Datetime(200512200000)) {
             CHECK_EQ(liutong[i], 40000);
-        } else if (k[i].datetime >= Datetime(200512200000) && k[i].datetime < Datetime(200612200000)) {
+        } else if (k[i].datetime >= Datetime(200512200000) &&
+                   k[i].datetime < Datetime(200612200000)) {
             CHECK_EQ(liutong[i], 47600);
         } else {
             CHECK_EQ(liutong[i], 49696);
         }
     }
 }
+
+//-----------------------------------------------------------------------------
+// benchmark
+//-----------------------------------------------------------------------------
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_LIUTONGPAN_benchmark") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    Indicator c = kdata.close();
+    int cycle = 1000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(test_LIUTONGPAN_benchmark, cycle, fmt::format("data len: {}", c.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator ind = LIUTONGPAN();
+            Indicator result = ind(kdata);
+        }
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // test export

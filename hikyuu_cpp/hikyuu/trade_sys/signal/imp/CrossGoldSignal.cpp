@@ -37,13 +37,14 @@ void CrossGoldSignal::_calculate() {
     size_t total = fast.size();
     auto const* fastdata = fast.data();
     auto const* slowdata = slow.data();
+    auto const* ks = m_kdata.data();
     for (size_t i = discard + 1; i < total; ++i) {
         if (fastdata[i - 1] < slowdata[i - 1] && fastdata[i] > slowdata[i] &&
             fastdata[i - 1] < fastdata[i] && slowdata[i - 1] < slowdata[i]) {
-            _addBuySignal(m_kdata[i].datetime);
+            _addBuySignal(ks[i].datetime);
         } else if (fastdata[i - 1] > slowdata[i - 1] && fastdata[i] < slowdata[i] &&
                    fastdata[i - 1] > fastdata[i] && slowdata[i - 1] > slowdata[i]) {
-            _addSellSignal(m_kdata[i].datetime);
+            _addSellSignal(ks[i].datetime);
         }
     }
 }

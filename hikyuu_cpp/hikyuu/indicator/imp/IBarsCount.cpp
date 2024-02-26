@@ -47,11 +47,12 @@ void IBarsCount::_calculate(const Indicator& ind) {
 
     // 对于1分钟线取得当日交易分钟数
     KQuery q = k.getQuery();
+    auto const* krecords = k.data();
     if (q.kType() == KQuery::MIN) {
-        Datetime pre_d = k[m_discard].datetime.startOfDay();
+        Datetime pre_d = krecords[m_discard].datetime.startOfDay();
         size_t count = 0;
         for (size_t i = m_discard; i < total; i++) {
-            Datetime d = k[i].datetime.startOfDay();
+            Datetime d = krecords[i].datetime.startOfDay();
             if (d != pre_d) {
                 pre_d = d;
                 count = 0;

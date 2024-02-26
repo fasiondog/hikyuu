@@ -37,11 +37,12 @@ void BoolSignal::_calculate() {
     size_t total = buy.size();
     auto const* buydata = buy.data();
     auto const* selldata = sell.data();
+    auto const* ks = m_kdata.data();
     for (size_t i = discard; i < total; ++i) {
         if (buydata[i] > 0.0)
-            _addBuySignal(m_kdata[i].datetime);
+            _addBuySignal(ks[i].datetime);
         if (selldata[i] > 0.0)
-            _addSellSignal(m_kdata[i].datetime);
+            _addSellSignal(ks[i].datetime);
     }
 }
 

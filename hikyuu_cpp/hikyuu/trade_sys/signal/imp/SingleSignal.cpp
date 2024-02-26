@@ -46,6 +46,7 @@ void SingleSignal::_calculate() {
 
     auto const* inddata = ind.data();
     auto const* devdata = dev.data();
+    auto const* ks = m_kdata.data();
     size_t total = dev.size();
     for (size_t i = start; i < total; ++i) {
         double dama = inddata[i] - inddata[i - 1];
@@ -53,9 +54,9 @@ void SingleSignal::_calculate() {
         double dama3 = inddata[i] - inddata[i - 3];
         double sdama = devdata[i] * filter_p;
         if (dama > 0 && (dama > sdama || dama2 > sdama || dama3 > sdama)) {
-            _addBuySignal(m_kdata[i].datetime);
+            _addBuySignal(ks[i].datetime);
         } else if (dama < 0 && (dama < sdama || dama2 < sdama || dama3 < sdama)) {
-            _addSellSignal(m_kdata[i].datetime);
+            _addSellSignal(ks[i].datetime);
         }
     }
 }

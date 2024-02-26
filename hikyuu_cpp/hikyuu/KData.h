@@ -108,6 +108,7 @@ public:
     iterator end();
     const_iterator cbegin() const;
     const_iterator cend() const;
+    const KRecord* data() const;
 
 private:
     static KRecord ms_null_krecord;
@@ -246,6 +247,10 @@ inline KData::const_iterator KData::cbegin() const {
 
 inline KData::const_iterator KData::cend() const {
     return m_imp->cend();
+}
+
+inline const KRecord* KData::data() const {
+    return m_imp->data();
 }
 
 } /* namespace hku */
