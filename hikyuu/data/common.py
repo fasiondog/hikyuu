@@ -138,7 +138,9 @@ def get_index_code_name_list() -> list:
         df = ak.stock_zh_index_daily_tx()
     else:
         df = ak.stock_zh_index_spot()
-    return [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
+    res = [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
+    ret = [v for v in res if len(v['market_code']) == 8]
+    return ret
 
 
 g_fund_code_name_list = {}
