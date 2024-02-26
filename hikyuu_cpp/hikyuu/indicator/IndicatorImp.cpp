@@ -842,7 +842,6 @@ void IndicatorImp::execute_weave() {
             src = m_left->data(r);
             dst = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                // _set(m_left->get(i, r), i, r);
                 dst[i] = src[i];
             }
         }
@@ -850,7 +849,6 @@ void IndicatorImp::execute_weave() {
             src = m_right->data(r - num);
             dst = this->data(r);
             for (size_t i = discard; i < total; i++) {
-                // _set(m_right->get(i - diff, r - num), i, r);
                 dst[i] = src[i - diff];
             }
         }
@@ -860,7 +858,6 @@ void IndicatorImp::execute_weave() {
             src = m_left->data(r);
             dst = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                // _set(m_left->get(i - diff, r), i, r);
                 dst[i] = src[i - diff];
             }
         }
@@ -868,7 +865,6 @@ void IndicatorImp::execute_weave() {
             src = m_right->data(r - num);
             dst = this->data(r);
             for (size_t i = discard; i < total; i++) {
-                // _set(m_right->get(i, r - num), i, r);
                 dst[i] = src[i];
             }
         }
@@ -903,7 +899,6 @@ void IndicatorImp::execute_add() {
         auto const *data2 = minp->data(r);
         auto *result = this->data(r);
         for (size_t i = discard; i < total; ++i) {
-            // _set(maxp->get(i, r) + minp->get(i - diff, r), i, r);
             result[i] = data1[i] + data2[i - diff];
         }
     }
@@ -938,7 +933,6 @@ void IndicatorImp::execute_sub() {
             auto *data2 = m_right->data(r);
             auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                // _set(m_left->get(i, r) - m_right->get(i - diff, r), i, r);
                 result[i] = data1[i] - data2[i - diff];
             }
         }
@@ -948,7 +942,6 @@ void IndicatorImp::execute_sub() {
             auto *data2 = m_right->data(r);
             auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                // _set(m_left->get(i - diff, r) - m_right->get(i, r), i, r);
                 result[i] = data1[i - diff] - data2[i];
             }
         }
@@ -983,7 +976,6 @@ void IndicatorImp::execute_mul() {
         auto const *data2 = minp->data(r);
         auto *result = this->data(r);
         for (size_t i = discard; i < total; ++i) {
-            // _set(maxp->get(i, r) * minp->get(i - diff, r), i, r);
             result[i] = data1[i] * data2[i - diff];
         }
     }
@@ -1012,41 +1004,22 @@ void IndicatorImp::execute_div() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
-    price_t null_price = Null<price_t>();
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
-            auto *data1 = m_left->data(r);
-            auto *data2 = m_right->data(r);
+            auto const *data1 = m_left->data(r);
+            auto const *data2 = m_right->data(r);
             auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (data2[i - diff] == 0.0) {
-                    result[i] = null_price;
-                } else {
-                    result[i] = data1[i] / data2[i - diff];
-                }
-                // if (m_right->get(i - diff, r) == 0.0) {
-                //     _set(Null<price_t>(), i, r);
-                // } else {
-                //     _set(m_left->get(i, r) / m_right->get(i - diff, r), i, r);
-                // }
+                result[i] = data1[i] / data2[i - diff];
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
-            auto *data1 = m_left->data(r);
-            auto *data2 = m_right->data(r);
+            auto const *data1 = m_left->data(r);
+            auto const *data2 = m_right->data(r);
             auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (data2[i] == 0.0) {
-                    result[i] = null_price;
-                } else {
-                    result[i] = data1[i - diff] / data2[i];
-                }
-                // if (m_right->get(i, r) == 0.0) {
-                //     _set(Null<price_t>(), i, r);
-                // } else {
-                //     _set(m_left->get(i - diff, r) / m_right->get(i, r), i, r);
-                // }
+                result[i] = data1[i - diff] / data2[i];
             }
         }
     }
@@ -1090,11 +1063,6 @@ void IndicatorImp::execute_mod() {
                 } else {
                     dst[i] = int64_t(left[i]) % int64_t(right[i - diff]);
                 }
-                // if (m_right->get(i - diff, r) == 0.0) {
-                //     _set(Null<price_t>(), i, r);
-                // } else {
-                //     _set(int64_t(m_left->get(i, r)) % int64_t(m_right->get(i - diff, r)), i, r);
-                // }
             }
         }
     } else {
@@ -1108,11 +1076,6 @@ void IndicatorImp::execute_mod() {
                 } else {
                     dst[i] = int64_t(left[i - diff]) % int64_t(right[i]);
                 }
-                // if (m_right->get(i, r) == 0.0) {
-                //     _set(Null<price_t>(), i, r);
-                // } else {
-                //     _set(int64_t(m_left->get(i - diff, r)) % int64_t(m_right->get(i, r)), i, r);
-                // }
             }
         }
     }
@@ -1146,16 +1109,7 @@ void IndicatorImp::execute_eq() {
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            if (std::abs(maxdata[i] - mindata[i - diff]) < IND_EQ_THRESHOLD) {
-                dst[i] = 1.0;
-            } else {
-                dst[i] = 0.0;
-            }
-            // if (std::fabs(maxp->get(i, r) - minp->get(i - diff, r)) < IND_EQ_THRESHOLD) {
-            //     _set(1, i, r);
-            // } else {
-            //     _set(0, i, r);
-            // }
+            dst[i] = maxdata[i] == mindata[i - diff];
         }
     }
 }
@@ -1188,16 +1142,7 @@ void IndicatorImp::execute_ne() {
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            if (std::abs(maxdata[i] - mindata[i - diff]) < IND_EQ_THRESHOLD) {
-                dst[i] = 0.0;
-            } else {
-                dst[i] = 1.0;
-            }
-            // if (std::fabs(maxp->get(i, r) - minp->get(i - diff, r)) < IND_EQ_THRESHOLD) {
-            //     _set(0, i, r);
-            // } else {
-            //     _set(1, i, r);
-            // }
+            dst[i] = maxdata[i] != mindata[i - diff];
         }
     }
 }
@@ -1234,16 +1179,7 @@ void IndicatorImp::execute_gt() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (left[i] - right[i - diff] >= IND_EQ_THRESHOLD) {
-                    dst[i] = 1.0;
-                } else {
-                    dst[i] = 0.0;
-                }
-                // if (m_left->get(i, r) - m_right->get(i - diff, r) >= IND_EQ_THRESHOLD) {
-                //     _set(1, i, r);
-                // } else {
-                //     _set(0, i, r);
-                // }
+                dst[i] = left[i] > right[i - diff];
             }
         }
     } else {
@@ -1252,16 +1188,7 @@ void IndicatorImp::execute_gt() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (left[i - diff] - right[i] >= IND_EQ_THRESHOLD) {
-                    dst[i] = 1.0;
-                } else {
-                    dst[i] = 0.0;
-                }
-                // if (m_left->get(i - diff, r) - m_right->get(i, r) >= IND_EQ_THRESHOLD) {
-                //     _set(1, i, r);
-                // } else {
-                //     _set(0, i, r);
-                // }
+                dst[i] = left[i - diff] > right[i];
             }
         }
     }
@@ -1299,16 +1226,7 @@ void IndicatorImp::execute_lt() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (right[i - diff] - left[i] >= IND_EQ_THRESHOLD) {
-                    dst[i] = 1.0;
-                } else {
-                    dst[i] = 0.0;
-                }
-                // if (m_right->get(i - diff, r) - m_left->get(i, r) >= IND_EQ_THRESHOLD) {
-                //     _set(1, i, r);
-                // } else {
-                //     _set(0, i, r);
-                // }
+                dst[i] = left[i] < right[i - diff];
             }
         }
     } else {
@@ -1317,16 +1235,7 @@ void IndicatorImp::execute_lt() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (right[i] - left[i - diff] >= IND_EQ_THRESHOLD) {
-                    dst[i] = 1.0;
-                } else {
-                    dst[i] = 0.0;
-                }
-                // if (m_right->get(i, r) - m_left->get(i - diff, r) >= IND_EQ_THRESHOLD) {
-                //     _set(1, i, r);
-                // } else {
-                //     _set(0, i, r);
-                // }
+                dst[i] = left[i - diff] < right[i];
             }
         }
     }
@@ -1364,16 +1273,7 @@ void IndicatorImp::execute_ge() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (left[i] > right[i - diff] - IND_EQ_THRESHOLD) {
-                    dst[i] = 1.0;
-                } else {
-                    dst[i] = 0.0;
-                }
-                // if (m_left->get(i, r) > m_right->get(i - diff, r) - IND_EQ_THRESHOLD) {
-                //     _set(1, i, r);
-                // } else {
-                //     _set(0, i, r);
-                // }
+                dst[i] = left[i] >= right[i - diff];
             }
         }
     } else {
@@ -1382,16 +1282,7 @@ void IndicatorImp::execute_ge() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (left[i - diff] > right[i] - IND_EQ_THRESHOLD) {
-                    dst[i] = 1.0;
-                } else {
-                    dst[i] = 0.0;
-                }
-                // if (m_left->get(i - diff, r) > m_right->get(i, r) - IND_EQ_THRESHOLD) {
-                //     _set(1, i, r);
-                // } else {
-                //     _set(0, i, r);
-                // }
+                dst[i] = left[i - diff] >= right[i];
             }
         }
     }
@@ -1429,16 +1320,7 @@ void IndicatorImp::execute_le() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (left[i] < right[i - diff] + IND_EQ_THRESHOLD) {
-                    dst[i] = 1.0;
-                } else {
-                    dst[i] = 0.0;
-                }
-                // if (m_left->get(i, r) < m_right->get(i - diff, r) + IND_EQ_THRESHOLD) {
-                //     _set(1, i, r);
-                // } else {
-                //     _set(0, i, r);
-                // }
+                dst[i] = left[i] <= right[i - diff];
             }
         }
     } else {
@@ -1447,16 +1329,7 @@ void IndicatorImp::execute_le() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (left[i - diff] < right[i] + IND_EQ_THRESHOLD) {
-                    dst[i] = 1.0;
-                } else {
-                    dst[i] = 0.0;
-                }
-                // if (m_left->get(i - diff, r) < m_right->get(i, r) + IND_EQ_THRESHOLD) {
-                //     _set(1, i, r);
-                // } else {
-                //     _set(0, i, r);
-                // }
+                dst[i] = left[i - diff] <= right[i];
             }
         }
     }
@@ -1490,17 +1363,7 @@ void IndicatorImp::execute_and() {
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            if (maxdata[i] >= IND_EQ_THRESHOLD && mindata[i - diff] >= IND_EQ_THRESHOLD) {
-                dst[i] = 1.0;
-            } else {
-                dst[i] = 0.0;
-            }
-            // if (maxp->get(i, r) >= IND_EQ_THRESHOLD && minp->get(i - diff, r) >=
-            // IND_EQ_THRESHOLD) {
-            //     _set(1, i, r);
-            // } else {
-            //     _set(0, i, r);
-            // }
+            dst[i] = (maxdata[i] > 0.0) && (mindata[i - diff] > 0.0);
         }
     }
 }
@@ -1533,17 +1396,7 @@ void IndicatorImp::execute_or() {
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            if (maxdata[i] >= IND_EQ_THRESHOLD || mindata[i - diff] >= IND_EQ_THRESHOLD) {
-                dst[i] = 1.0;
-            } else {
-                dst[i] = 0.0;
-            }
-            // if (maxp->get(i, r) >= IND_EQ_THRESHOLD || minp->get(i - diff, r) >=
-            // IND_EQ_THRESHOLD) {
-            //     _set(1, i, r);
-            // } else {
-            //     _set(0, i, r);
-            // }
+            dst[i] = (maxdata[i] > 0.0) || (mindata[i - diff] > 0.0);
         }
     }
 }
@@ -1593,11 +1446,6 @@ void IndicatorImp::execute_if() {
             } else {
                 dst[i] = right[i - diff_right];
             }
-            // if (m_three->get(i - diff_cond) > 0.0) {
-            //     _set(m_left->get(i - diff_left), i, r);
-            // } else {
-            //     _set(m_right->get(i - diff_right), i, r);
-            // }
         }
     }
 }
@@ -1647,8 +1495,6 @@ void IndicatorImp::execute_corr() {
     for (size_t i = startPos + 1; i < first_end; i++) {
         ix = maxdata[i] - kx;
         iy = mindata[i] - ky;
-        // ix = maxp->get(i) - kx;
-        // iy = minp->get(i) - ky;
         ex += ix;
         ey += iy;
         price_t powx2 = ix * ix;
@@ -1663,8 +1509,6 @@ void IndicatorImp::execute_corr() {
         cov = exy - powxy / nobs;
         dst0[i] = cov / std::sqrt(varx * vary);
         dst1[i] = cov / (nobs - 1);
-        // _set(cov / std::sqrt(varx * vary), i, 0);
-        // _set(cov / (nobs - 1), i, 1);
     }
 
     for (size_t i = first_end; i < total; i++) {
@@ -1674,12 +1518,6 @@ void IndicatorImp::execute_corr() {
         ey += mindata[i] - mindata[i - n];
         price_t preix = maxdata[i - n] - kx;
         price_t preiy = mindata[i - n] - ky;
-        // ix = maxp->get(i) - kx;
-        // iy = minp->get(i) - ky;
-        // ex += maxp->get(i) - maxp->get(i - n);
-        // ey += minp->get(i) - minp->get(i - n);
-        // price_t preix = maxp->get(i - n) - kx;
-        // price_t preiy = minp->get(i - n) - ky;
         ex2 += ix * ix - preix * preix;
         ey2 += iy * iy - preiy * preiy;
         exy += ix * iy - preix * preiy;
@@ -1688,8 +1526,6 @@ void IndicatorImp::execute_corr() {
         cov = (exy - ex * ey / n);
         dst0[i] = cov / std::sqrt(varx * vary);
         dst1[i] = cov / (n - 1);
-        // _set(cov / std::sqrt(varx * vary), i, 0);
-        // _set(cov / (n - 1), i, 1);
     }
 
     // 修正 discard
@@ -1784,16 +1620,6 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
         HKU_IF_RETURN(iter1->first != iter2->first, false);
         HKU_IF_RETURN(!iter1->second->alike(*(iter2->second)), false);
     }
-
-    // for (size_t i = 0; i < m_result_num; i++) {
-    //     if (m_pBuffer[i]) {
-    //         PriceList &data1 = *(m_pBuffer[i]);
-    //         PriceList &data2 = *(other.m_pBuffer[i]);
-    //         for (size_t j = 0, len = data1.size(); j < len; j++) {
-    //             HKU_IF_RETURN(data1[j] != data2[j], false);
-    //         }
-    //     }
-    // }
 
     HKU_IF_RETURN(isLeaf(), true);
 

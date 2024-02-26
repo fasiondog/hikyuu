@@ -270,7 +270,7 @@ TEST_CASE("test_operator_division") {
     CHECK_EQ(result.discard(), 0);
     for (size_t i = 0; i < 10; ++i) {
         if (data1[i] == 0.0) {
-            CHECK_UNARY(std::isnan(result[i]));
+            CHECK_UNARY(std::isinf(result[i]));
         } else {
             CHECK_EQ(result[i], data2[i] / data1[i]);
         }
@@ -293,7 +293,7 @@ TEST_CASE("test_operator_division") {
     CHECK_EQ(result.size(), k.size());
     for (size_t i = 0; i < result.size(); ++i) {
         if (data1[i] == 0.0) {
-            CHECK_UNARY(std::isnan(result[i]));
+            CHECK_UNARY(std::isinf(result[i]));
         } else {
             CHECK_EQ(result[i], (k[i] / data1[i]));
         }
@@ -376,6 +376,29 @@ TEST_CASE("test_operator_mod") {
     CHECK_EQ(result[9], 8);
 }
 
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_operator_mod_benchmark") {
+    PriceList d1, d2;
+    for (size_t i = 0; i < 10000; ++i) {
+        d1.push_back(i);
+        d2.push_back(i + 1);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+
+    int cycle = 10000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(Indicator_mod, cycle, HKU_CSTR(""));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator result = data1 % data2;
+        }
+    }
+}
+#endif
+
 /** @par 检测点 */
 TEST_CASE("test_operator_eq") {
     /** @arg 正常相等*/
@@ -414,6 +437,29 @@ TEST_CASE("test_operator_eq") {
         CHECK_EQ(result[i], false);
     }
 }
+
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_operator_eq_benchmark") {
+    PriceList d1, d2;
+    for (size_t i = 0; i < 10000; ++i) {
+        d1.push_back(i);
+        d2.push_back(i + 1);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+
+    int cycle = 10000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(Indicator_eq, cycle, HKU_CSTR(""));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator result = data1 == data2;
+        }
+    }
+}
+#endif
 
 /** @par 检测点 */
 TEST_CASE("test_operator_ne") {
