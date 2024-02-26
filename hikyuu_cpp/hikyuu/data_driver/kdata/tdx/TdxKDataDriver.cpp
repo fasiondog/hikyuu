@@ -47,7 +47,7 @@ struct TdxMinData {
     float close;
     float amount;
     uint32_t vol;
-    uint32_t other;
+    uint32_t other;  // cppcheck-suppress unusedStructMember
 
     Datetime getDatetime() {
         int tmp_date = date >> 11;

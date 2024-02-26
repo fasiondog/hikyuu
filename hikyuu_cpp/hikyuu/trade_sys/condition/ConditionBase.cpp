@@ -91,9 +91,10 @@ bool ConditionBase::isValid(const Datetime& datetime) {
 
 DatetimeList ConditionBase::getDatetimeList() const {
     DatetimeList result;
-    HKU_IF_RETURN(m_date_index.empty(), result);
     for (const auto& d : m_date_index) {
-        result.emplace_back(d.second);
+        if (m_values[d.second] > 0.0) {
+            result.emplace_back(d.first);
+        }
     }
     return result;
 }

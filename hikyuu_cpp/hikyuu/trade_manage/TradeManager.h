@@ -42,8 +42,9 @@ class HKU_API TradeManager : public TradeManagerBase {
     // PARAMETER_SUPPORT
 
 public:
-    TradeManager(const Datetime& datetime = Datetime(199001010000LL), price_t initcash = 100000.0,
-                 const TradeCostPtr& costfunc = TC_Zero(), const string& name = "SYS");
+    explicit TradeManager(const Datetime& datetime = Datetime(199001010000LL),
+                          price_t initcash = 100000.0, const TradeCostPtr& costfunc = TC_Zero(),
+                          const string& name = "SYS");
     virtual ~TradeManager();
 
     /** 复位，清空交易、持仓记录 */

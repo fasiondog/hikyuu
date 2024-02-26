@@ -23,7 +23,7 @@ class HKU_API StrategyBase {
 
 public:
     StrategyBase();
-    StrategyBase(const string& name);
+    explicit StrategyBase(const string& name);
     StrategyBase(const string& name, const string& config_file);
 
     virtual ~StrategyBase();

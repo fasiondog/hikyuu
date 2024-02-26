@@ -86,7 +86,7 @@ public:
 public:
     /** 默认构造函数   */
     IndicatorImp();
-    IndicatorImp(const string& name);
+    explicit IndicatorImp(const string& name);
     IndicatorImp(const string& name, size_t result_num);
 
     virtual ~IndicatorImp();

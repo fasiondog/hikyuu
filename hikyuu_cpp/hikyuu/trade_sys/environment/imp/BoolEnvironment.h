@@ -15,7 +15,7 @@ namespace hku {
 class BoolEnvironment : public EnvironmentBase {
 public:
     BoolEnvironment();
-    BoolEnvironment(const Indicator& ind);
+    explicit BoolEnvironment(const Indicator& ind);
     virtual ~BoolEnvironment();
 
     virtual void _calculate() override;

@@ -32,7 +32,7 @@ void AddCondition::_calculate() {
     }
 
     if (m_cond1 && !m_cond2) {
-        price_t* data = m_cond1->data();
+        price_t const* data = m_cond1->data();
         for (size_t i = 0, total = m_cond1->size(); i < total; i++) {
             m_values[i] = data[i];
         }
@@ -40,7 +40,7 @@ void AddCondition::_calculate() {
     }
 
     if (!m_cond1 && m_cond2) {
-        price_t* data = m_cond2->data();
+        auto const* data = m_cond2->data();
         for (size_t i = 0, total = m_cond2->size(); i < total; i++) {
             m_values[i] = data[i];
         }
@@ -50,8 +50,8 @@ void AddCondition::_calculate() {
     size_t total = m_kdata.size();
     HKU_ASSERT(m_cond1->size() == total && m_cond2->size() == total);
 
-    price_t* data1 = m_cond1->data();
-    price_t* data2 = m_cond2->data();
+    auto const* data1 = m_cond1->data();
+    auto const* data2 = m_cond2->data();
     for (size_t i = 0; i < total; i++) {
         m_values[i] = data1[i] + data2[i];
     }

@@ -32,9 +32,10 @@
         <suppression>ConfigurationNotChecked</suppression>
         <suppression>toomanyconfigs</suppression>
         <suppression>unknownMacro</suppression>
-        <suppression>useStlAlgorithm</suppression>
-        <suppression>shadowFunction</suppression>
         <suppression>missingIncludeSystem</suppression>
         <suppression>missingInclude</suppression>
+        <suppression>cstyleCast</suppression>
+        <suppression>shadowFunction</suppression>
+        <suppression>useStlAlgorithm</suppression>
     </suppressions>
 </project>

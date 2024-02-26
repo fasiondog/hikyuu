@@ -100,10 +100,10 @@ void export_Condition(py::module& m) {
       .def("__len__", &ConditionBase::size)
 
       .def("__getitem__",
-           [](const ConditionPtr& self, int i) {
+           [](const ConditionPtr& self, int64_t i) {
                size_t total = self->size();
-               int pos = i < 0 ? total + i : i;
-               return (*self)[pos];
+               int64_t pos = i < 0 ? total + i : i;
+               return self->at(pos);
            })
 
       .def("__and__",

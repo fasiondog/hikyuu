@@ -34,6 +34,9 @@ public:
     static StockManager& instance();
     virtual ~StockManager();
 
+    StockManager(const StockManager&) = delete;
+    StockManager& operator=(const StockManager&) = delete;
+
     /**
      * 初始化函数，必须在程序入口调用
      * @param baseInfoParam 基础信息驱动参数

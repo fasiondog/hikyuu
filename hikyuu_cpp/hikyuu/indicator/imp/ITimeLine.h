@@ -22,7 +22,7 @@ class ITimeLine : public IndicatorImp {
 
 public:
     ITimeLine();
-    ITimeLine(const KData&);
+    explicit ITimeLine(const KData&);
     virtual ~ITimeLine();
 };
 

@@ -24,7 +24,11 @@ public:
         return m_kdata;
     }
 
-    virtual void _calculate() {}
+    virtual void _calculate() {
+        _addValid(m_kdata[2].datetime, 2.0);
+        _addValid(m_kdata[3].datetime, 1.5);
+    }
+
     virtual void _reset() {
         if (m_flag) {
             m_flag = false;
@@ -60,16 +64,21 @@ TEST_CASE("test_Condition") {
     /** @arg 基本操作 */
     ConditionPtr p(new ConditionTest);
     p_src = (ConditionTest *)p.get();
-    CHECK_EQ(p_src->getKData().getStock(), Null<Stock>());
-    p->setTO(kdata);
-    CHECK_EQ(p_src->getKData().getStock(), stock);
-    p->reset();
-
     CHECK_EQ(p->name(), "TEST");
     CHECK_EQ(p->getParam<int>("n"), 10);
-    CHECK_EQ(p->isValid(Datetime(200001010000)), false);
-    p->reset();
-    // CHECK_EQ(p->isValid(Datetime(200001010000)) == true);
+    CHECK_EQ(p_src->getKData().getStock(), Null<Stock>());
+    REQUIRE(p->size() == 0);
+    p->setTO(kdata);
+    CHECK_EQ(p->size(), kdata.size());
+    CHECK_EQ(p_src->getKData().getStock(), stock);
+    CHECK_UNARY(p->isValid(Datetime(19901221)));
+    CHECK_UNARY(p->isValid(Datetime(19901224)));
+    CHECK_UNARY_FALSE(p->isValid(Datetime(19901219)));
+
+    auto ds = p->getDatetimeList();
+    CHECK_EQ(ds.size(), 2);
+    CHECK_EQ(ds[0], Datetime(19901221));
+    CHECK_EQ(ds[1], Datetime(19901224));
 
     /** @arg 克隆操作 */
     p->setParam<int>("n", 20);
