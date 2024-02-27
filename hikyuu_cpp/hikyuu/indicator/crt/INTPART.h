@@ -22,14 +22,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API INTPART();
-Indicator INTPART(Indicator::value_type);
+Indicator INTPART(Indicator::value_t);
 Indicator INTPART(const Indicator& ind);
 
 inline Indicator INTPART(const Indicator& ind) {
     return INTPART()(ind);
 }
 
-inline Indicator INTPART(Indicator::value_type val) {
+inline Indicator INTPART(Indicator::value_t val) {
     return INTPART(CVAL(val));
 }
 

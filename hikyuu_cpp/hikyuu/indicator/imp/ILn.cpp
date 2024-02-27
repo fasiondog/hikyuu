@@ -31,7 +31,7 @@ void ILn::_calculate(const Indicator& data) {
 
     auto const* src = data.data();
     auto* dst = this->data();
-    value_type null_value = Null<value_type>();
+    value_t null_value = Null<value_t>();
     for (size_t i = m_discard; i < total; ++i) {
         if (data[i] <= 0.0) {
             dst[i] = null_value;

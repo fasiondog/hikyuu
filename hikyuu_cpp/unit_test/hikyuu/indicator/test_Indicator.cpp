@@ -107,7 +107,7 @@ TEST_CASE("test_operator_add") {
 }
 
 #if ENABLE_BENCHMARK_TEST
-TEST_CASE("test_operator_add") {
+TEST_CASE("test_operator_add_benchmark") {
     PriceList d1, d2;
     for (size_t i = 0; i < 10000; ++i) {
         d1.push_back(i);

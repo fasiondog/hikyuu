@@ -157,19 +157,19 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
 IndicatorImp::IndicatorImp()
 : m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
     initContext();
-    memset(m_pBuffer, 0, sizeof(vector<value_type> *) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string &name)
 : m_name(name), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
     initContext();
-    memset(m_pBuffer, 0, sizeof(vector<value_type> *) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string &name, size_t result_num)
 : m_name(name), m_discard(0), m_need_calculate(true), m_optype(LEAF) {
     initContext();
-    memset(m_pBuffer, 0, sizeof(vector<value_type> *) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
 }
 
@@ -261,10 +261,10 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
                     "result_num oiverload MAX_RESULT_NUM! {}", name());
     HKU_IF_RETURN(result_num == 0, void());
 
-    value_type null_price = Null<value_type>();
+    value_t null_price = Null<value_t>();
     for (size_t i = 0; i < result_num; ++i) {
         if (!m_pBuffer[i]) {
-            m_pBuffer[i] = new vector<value_type>(len, null_price);
+            m_pBuffer[i] = new vector<value_t>(len, null_price);
 
         } else {
             m_pBuffer[i]->clear();
@@ -301,7 +301,7 @@ IndicatorImpPtr IndicatorImp::clone() {
 
     for (size_t i = 0; i < m_result_num; ++i) {
         if (m_pBuffer[i]) {
-            p->m_pBuffer[i] = new vector<value_type>(m_pBuffer[i]->begin(), m_pBuffer[i]->end());
+            p->m_pBuffer[i] = new vector<value_t>(m_pBuffer[i]->begin(), m_pBuffer[i]->end());
         }
     }
 
@@ -362,7 +362,7 @@ IndicatorImpPtr IndicatorImp::operator()(const Indicator &ind) {
 void IndicatorImp::setDiscard(size_t discard) {
     size_t tmp_discard = discard > size() ? size() : discard;
     if (tmp_discard > m_discard) {
-        value_type null_price = Null<value_type>();
+        value_t null_price = Null<value_t>();
         for (size_t i = 0; i < m_result_num; ++i) {
             auto *dst = this->data(i);
             for (size_t j = m_discard; j < tmp_discard; ++j) {
@@ -405,7 +405,7 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     return imp;
 }
 
-IndicatorImp::value_type IndicatorImp::get(size_t pos, size_t num) const {
+IndicatorImp::value_t IndicatorImp::get(size_t pos, size_t num) const {
 #if CHECK_ACCESS_BOUND
     HKU_CHECK_THROW(
       (num <= MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()), std::out_of_range,
@@ -414,7 +414,7 @@ IndicatorImp::value_type IndicatorImp::get(size_t pos, size_t num) const {
     return (*m_pBuffer[num])[pos];
 }
 
-void IndicatorImp::_set(value_type val, size_t pos, size_t num) {
+void IndicatorImp::_set(value_t val, size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
     HKU_CHECK_THROW(
       (num <= MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()), std::out_of_range,
@@ -437,9 +437,9 @@ Datetime IndicatorImp::getDatetime(size_t pos) const {
     return pos < k.size() ? k[pos].datetime : Null<Datetime>();
 }
 
-IndicatorImp::value_type IndicatorImp::getByDate(Datetime date, size_t num) {
+IndicatorImp::value_t IndicatorImp::getByDate(Datetime date, size_t num) {
     size_t pos = getPos(date);
-    return (pos != Null<size_t>()) ? get(pos, num) : Null<value_type>();
+    return (pos != Null<size_t>()) ? get(pos, num) : Null<value_t>();
 }
 
 size_t IndicatorImp::getPos(Datetime date) const {
@@ -841,8 +841,8 @@ void IndicatorImp::execute_weave() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
-    value_type const *src = nullptr;
-    value_type *dst = nullptr;
+    value_t const *src = nullptr;
+    value_t *dst = nullptr;
     if (m_left->size() >= m_right->size()) {
         size_t num = m_left->getResultNumber();
         for (size_t r = 0; r < num; ++r) {
@@ -1055,10 +1055,10 @@ void IndicatorImp::execute_mod() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
-    value_type *dst = nullptr;
-    value_type const *left = nullptr;
-    value_type const *right = nullptr;
-    value_type null_value = Null<value_type>();
+    value_t *dst = nullptr;
+    value_t const *left = nullptr;
+    value_t const *right = nullptr;
+    value_t null_value = Null<value_t>();
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             dst = this->data(r);
@@ -1177,9 +1177,9 @@ void IndicatorImp::execute_gt() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
-    value_type *dst = nullptr;
-    value_type const *left = nullptr;
-    value_type const *right = nullptr;
+    value_t *dst = nullptr;
+    value_t const *left = nullptr;
+    value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             dst = this->data(r);
@@ -1224,9 +1224,9 @@ void IndicatorImp::execute_lt() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
-    value_type *dst = nullptr;
-    value_type const *left = nullptr;
-    value_type const *right = nullptr;
+    value_t *dst = nullptr;
+    value_t const *left = nullptr;
+    value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             dst = this->data(r);
@@ -1271,9 +1271,9 @@ void IndicatorImp::execute_ge() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
-    value_type *dst = nullptr;
-    value_type const *left = nullptr;
-    value_type const *right = nullptr;
+    value_t *dst = nullptr;
+    value_t const *left = nullptr;
+    value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             dst = this->data(r);
@@ -1318,9 +1318,9 @@ void IndicatorImp::execute_le() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
-    value_type *dst = nullptr;
-    value_type const *left = nullptr;
-    value_type const *right = nullptr;
+    value_t *dst = nullptr;
+    value_t const *left = nullptr;
+    value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             dst = this->data(r);
@@ -1489,11 +1489,11 @@ void IndicatorImp::execute_corr() {
     size_t startPos = discard;
     size_t first_end = startPos + n >= total ? total : startPos + n;
 
-    value_type kx = maxp->get(discard);
-    value_type ky = minp->get(discard);
-    value_type ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
-    value_type ex2 = 0.0, ey2 = 0.0;
-    value_type ix, iy;
+    value_t kx = maxp->get(discard);
+    value_t ky = minp->get(discard);
+    value_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
+    value_t ex2 = 0.0, ey2 = 0.0;
+    value_t ix, iy;
 
     auto *dst0 = this->data(0);
     auto *dst1 = this->data(1);
@@ -1504,9 +1504,9 @@ void IndicatorImp::execute_corr() {
         iy = mindata[i] - ky;
         ex += ix;
         ey += iy;
-        value_type powx2 = ix * ix;
-        value_type powy2 = iy * iy;
-        value_type powxy = ix * iy;
+        value_t powx2 = ix * ix;
+        value_t powy2 = iy * iy;
+        value_t powxy = ix * iy;
         exy += powxy;
         ex2 += powx2;
         ey2 += powy2;
@@ -1523,8 +1523,8 @@ void IndicatorImp::execute_corr() {
         iy = mindata[i] - ky;
         ex += maxdata[i] - maxdata[i - n];
         ey += mindata[i] - mindata[i - n];
-        value_type preix = maxdata[i - n] - kx;
-        value_type preiy = mindata[i - n] - ky;
+        value_t preix = maxdata[i - n] - kx;
+        value_t preiy = mindata[i - n] - ky;
         ex2 += ix * ix - preix * preix;
         ey2 += iy * iy - preiy * preiy;
         exy += ix * iy - preix * preiy;

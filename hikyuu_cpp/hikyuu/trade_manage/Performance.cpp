@@ -444,14 +444,6 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
                 }
             }
 
-            if (hold) {
-                if (pre_short) {
-                    short_days = 0;
-                    pre_short = false;
-                }
-                continue;
-            }
-
             // 当前是空仓
             total_short_days++;
             if (pre_short) {

@@ -39,7 +39,7 @@ void IAtr::_calculate(const Indicator& indicator) {
     auto const* src = indicator.data();
     auto* dst = this->data();
     dst[startPos] = src[startPos];
-    price_t multiplier = 2.0 / (n + 1);
+    value_t multiplier = 2.0 / (n + 1);
     for (size_t i = startPos + 1; i < total; ++i) {
         dst[i] = (src[i] - dst[i - 1]) * multiplier + dst[i - 1];
     }

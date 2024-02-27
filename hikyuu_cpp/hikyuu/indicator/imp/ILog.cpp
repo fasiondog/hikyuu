@@ -31,7 +31,7 @@ void ILog::_calculate(const Indicator &data) {
 
     auto const *src = data.data();
     auto *dst = this->data();
-    value_type null_price = Null<value_type>();
+    value_t null_price = Null<value_t>();
     for (size_t i = m_discard; i < total; ++i) {
         dst[i] = (src[i] <= 0.0) ? null_price : std::log10(data[i]);
     }
