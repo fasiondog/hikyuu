@@ -39,12 +39,19 @@ Indicator HKU_API PRICELIST(const Indicator& ind, int result_index = 0);
 Indicator HKU_API PRICELIST(int result_index = 0);
 
 /**
- * 包装 price_t 数组成Indicator，用于计算其他指标
+ * 包装数组成Indicator，用于计算其他指标
  * @param data price_t[]
  * @param total 数组大小
  * @ingroup Indicator
  */
-Indicator HKU_API PRICELIST(price_t* data, size_t total);
+// Indicator HKU_API PRICELIST(double* data, size_t total);
+template <typename ValueT>
+Indicator PRICELIST(ValueT* data, size_t total) {
+    HKU_IF_RETURN(!data || total == 0, PRICELIST(PriceList()));
+    PriceList tmp(total);
+    std::copy(data, data + total, tmp.begin());
+    return PRICELIST(tmp);
+}
 
 }  // namespace hku
 

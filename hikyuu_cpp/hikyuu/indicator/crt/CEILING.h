@@ -22,14 +22,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API CEILING();
-Indicator CEILING(price_t);
+Indicator CEILING(Indicator::value_type);
 Indicator CEILING(const Indicator& ind);
 
 inline Indicator CEILING(const Indicator& ind) {
     return CEILING()(ind);
 }
 
-inline Indicator CEILING(price_t val) {
+inline Indicator CEILING(Indicator::value_type val) {
     return CEILING(CVAL(val));
 }
 

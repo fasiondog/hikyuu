@@ -89,9 +89,4 @@ Indicator HKU_API PRICELIST(int result_index) {
     return Indicator(p);
 }
 
-Indicator HKU_API PRICELIST(price_t* data, size_t total) {
-    return data ? PRICELIST(PriceList(data, data + total), 0)
-                : Indicator(make_shared<IPriceList>());
-}
-
 } /* namespace hku */

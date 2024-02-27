@@ -43,7 +43,7 @@ TEST_CASE("test_ACOS") {
     result = ACOS(-0.1);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result[0], std::acos(-0.1));
+    CHECK_EQ(result[0], doctest::Approx(std::acos(-0.1)));
 }
 
 //-----------------------------------------------------------------------------

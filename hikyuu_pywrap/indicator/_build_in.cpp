@@ -161,9 +161,9 @@ Indicator (*HSL_1)() = HSL;
 Indicator (*HSL_2)(const KData&) = HSL;
 
 Indicator (*IF_1)(const Indicator&, const Indicator&, const Indicator&) = IF;
-Indicator (*IF_2)(const Indicator&, price_t, const Indicator&) = IF;
-Indicator (*IF_3)(const Indicator&, const Indicator&, price_t) = IF;
-Indicator (*IF_4)(const Indicator&, price_t, price_t) = IF;
+Indicator (*IF_2)(const Indicator&, Indicator::value_type, const Indicator&) = IF;
+Indicator (*IF_3)(const Indicator&, const Indicator&, Indicator::value_type) = IF;
+Indicator (*IF_4)(const Indicator&, Indicator::value_type, Indicator::value_type) = IF;
 
 Indicator (*COUNT_1)(int) = COUNT;
 Indicator (*COUNT_2)(const IndParam&) = COUNT;
@@ -178,43 +178,44 @@ Indicator (*SUM_4)(const Indicator&, const Indicator&) = SUM;
 Indicator (*SUM_5)(const Indicator&, int) = SUM;
 
 Indicator (*ABS_1)() = ABS;
-Indicator (*ABS_2)(price_t) = ABS;
+Indicator (*ABS_2)(Indicator::value_type) = ABS;
 Indicator (*ABS_3)(const Indicator&) = ABS;
 
 Indicator (*NOT_1)() = NOT;
 Indicator (*NOT_2)(const Indicator&) = NOT;
 
 Indicator (*SGN_1)() = SGN;
-Indicator (*SGN_2)(price_t) = SGN;
+Indicator (*SGN_2)(Indicator::value_type) = SGN;
 Indicator (*SGN_3)(const Indicator&) = SGN;
 
 Indicator (*EXP_1)() = EXP;
-Indicator (*EXP_2)(price_t) = EXP;
+Indicator (*EXP_2)(Indicator::value_type) = EXP;
 Indicator (*EXP_3)(const Indicator&) = EXP;
 
 Indicator (*MAX_1)(const Indicator&, const Indicator&) = MAX;
-Indicator (*MAX_2)(const Indicator&, price_t) = MAX;
-Indicator (*MAX_3)(price_t, const Indicator&) = MAX;
+Indicator (*MAX_2)(const Indicator&, Indicator::value_type) = MAX;
+Indicator (*MAX_3)(Indicator::value_type, const Indicator&) = MAX;
 
 Indicator (*MIN_1)(const Indicator&, const Indicator&) = MIN;
-Indicator (*MIN_2)(const Indicator&, price_t) = MIN;
-Indicator (*MIN_3)(price_t, const Indicator&) = MIN;
+Indicator (*MIN_2)(const Indicator&, Indicator::value_type) = MIN;
+Indicator (*MIN_3)(Indicator::value_type, const Indicator&) = MIN;
 
 Indicator (*BETWEEN_1)(const Indicator&, const Indicator&, const Indicator&) = BETWEEN;
-Indicator (*BETWEEN_2)(const Indicator&, const Indicator&, price_t) = BETWEEN;
-Indicator (*BETWEEN_3)(const Indicator&, price_t, const Indicator&) = BETWEEN;
-Indicator (*BETWEEN_4)(const Indicator&, price_t, price_t) = BETWEEN;
-Indicator (*BETWEEN_5)(price_t, const Indicator&, const Indicator&) = BETWEEN;
-Indicator (*BETWEEN_6)(price_t, const Indicator&, price_t) = BETWEEN;
-Indicator (*BETWEEN_7)(price_t, price_t, const Indicator&) = BETWEEN;
-Indicator (*BETWEEN_8)(price_t, price_t, price_t) = BETWEEN;
+Indicator (*BETWEEN_2)(const Indicator&, const Indicator&, Indicator::value_type) = BETWEEN;
+Indicator (*BETWEEN_3)(const Indicator&, Indicator::value_type, const Indicator&) = BETWEEN;
+Indicator (*BETWEEN_4)(const Indicator&, Indicator::value_type, Indicator::value_type) = BETWEEN;
+Indicator (*BETWEEN_5)(Indicator::value_type, const Indicator&, const Indicator&) = BETWEEN;
+Indicator (*BETWEEN_6)(Indicator::value_type, const Indicator&, Indicator::value_type) = BETWEEN;
+Indicator (*BETWEEN_7)(Indicator::value_type, Indicator::value_type, const Indicator&) = BETWEEN;
+Indicator (*BETWEEN_8)(Indicator::value_type, Indicator::value_type,
+                       Indicator::value_type) = BETWEEN;
 
 Indicator (*LN_1)() = LN;
-Indicator (*LN_2)(price_t) = LN;
+Indicator (*LN_2)(Indicator::value_type) = LN;
 Indicator (*LN_3)(const Indicator&) = LN;
 
 Indicator (*LOG_1)() = LOG;
-Indicator (*LOG_2)(price_t) = LOG;
+Indicator (*LOG_2)(Indicator::value_type) = LOG;
 Indicator (*LOG_3)(const Indicator&) = LOG;
 
 Indicator (*HHVBARS_1)(int) = HHVBARS;
@@ -234,35 +235,35 @@ Indicator (*POW_2)(const IndParam&) = POW;
 Indicator (*POW_3)(const Indicator&, int) = POW;
 Indicator (*POW_4)(const Indicator&, const IndParam&) = POW;
 Indicator (*POW_5)(const Indicator&, const Indicator&) = POW;
-Indicator (*POW_6)(price_t, int) = POW;
+Indicator (*POW_6)(Indicator::value_type, int) = POW;
 
 Indicator (*SQRT_1)() = SQRT;
 Indicator (*SQRT_2)(const Indicator&) = SQRT;
-Indicator (*SQRT_3)(price_t) = SQRT;
+Indicator (*SQRT_3)(Indicator::value_type) = SQRT;
 
 Indicator (*ROUND_1)(int) = ROUND;
 Indicator (*ROUND_2)(const Indicator&, int) = ROUND;
-Indicator (*ROUND_3)(price_t, int) = ROUND;
+Indicator (*ROUND_3)(Indicator::value_type, int) = ROUND;
 
 Indicator (*ROUNDUP_1)(int) = ROUNDUP;
 Indicator (*ROUNDUP_2)(const Indicator&, int) = ROUNDUP;
-Indicator (*ROUNDUP_3)(price_t, int) = ROUNDUP;
+Indicator (*ROUNDUP_3)(Indicator::value_type, int) = ROUNDUP;
 
 Indicator (*ROUNDDOWN_1)(int) = ROUNDDOWN;
 Indicator (*ROUNDDOWN_2)(const Indicator&, int) = ROUNDDOWN;
-Indicator (*ROUNDDOWN_3)(price_t, int) = ROUNDDOWN;
+Indicator (*ROUNDDOWN_3)(Indicator::value_type, int) = ROUNDDOWN;
 
 Indicator (*FLOOR_1)() = FLOOR;
 Indicator (*FLOOR_2)(const Indicator&) = FLOOR;
-Indicator (*FLOOR_3)(price_t) = FLOOR;
+Indicator (*FLOOR_3)(Indicator::value_type) = FLOOR;
 
 Indicator (*CEILING_1)() = CEILING;
 Indicator (*CEILING_2)(const Indicator&) = CEILING;
-Indicator (*CEILING_3)(price_t) = CEILING;
+Indicator (*CEILING_3)(Indicator::value_type) = CEILING;
 
 Indicator (*INTPART_1)() = INTPART;
 Indicator (*INTPART_2)(const Indicator&) = INTPART;
-Indicator (*INTPART_3)(price_t) = INTPART;
+Indicator (*INTPART_3)(Indicator::value_type) = INTPART;
 
 Indicator (*EXIST_1)(int) = EXIST;
 Indicator (*EXIST_2)(const IndParam&) = EXIST;
@@ -290,36 +291,36 @@ Indicator (*LAST_11)(const Indicator&, const Indicator&, const Indicator&) = LAS
 
 Indicator (*SIN_1)() = SIN;
 Indicator (*SIN_2)(const Indicator&) = SIN;
-Indicator (*SIN_3)(price_t) = SIN;
+Indicator (*SIN_3)(Indicator::value_type) = SIN;
 
 Indicator (*ASIN_1)() = ASIN;
 Indicator (*ASIN_2)(const Indicator&) = ASIN;
-Indicator (*ASIN_3)(price_t) = ASIN;
+Indicator (*ASIN_3)(Indicator::value_type) = ASIN;
 
 Indicator (*COS_1)() = COS;
 Indicator (*COS_2)(const Indicator&) = COS;
-Indicator (*COS_3)(price_t) = COS;
+Indicator (*COS_3)(Indicator::value_type) = COS;
 
 Indicator (*ACOS_1)() = ACOS;
 Indicator (*ACOS_2)(const Indicator&) = ACOS;
-Indicator (*ACOS_3)(price_t) = ACOS;
+Indicator (*ACOS_3)(Indicator::value_type) = ACOS;
 
 Indicator (*TAN_1)() = TAN;
 Indicator (*TAN_2)(const Indicator&) = TAN;
-Indicator (*TAN_3)(price_t) = TAN;
+Indicator (*TAN_3)(Indicator::value_type) = TAN;
 
 Indicator (*ATAN_1)() = ATAN;
 Indicator (*ATAN_2)(const Indicator&) = ATAN;
-Indicator (*ATAN_3)(price_t) = ATAN;
+Indicator (*ATAN_3)(Indicator::value_type) = ATAN;
 
 Indicator (*REVERSE_1)() = REVERSE;
 Indicator (*REVERSE_2)(const Indicator&) = REVERSE;
-Indicator (*REVERSE_3)(price_t) = REVERSE;
+Indicator (*REVERSE_3)(Indicator::value_type) = REVERSE;
 
 Indicator (*MOD_1)(const Indicator&, const Indicator&) = MOD;
-Indicator (*MOD_2)(const Indicator&, price_t) = MOD;
-Indicator (*MOD_3)(price_t, const Indicator&) = MOD;
-Indicator (*MOD_4)(price_t, price_t) = MOD;
+Indicator (*MOD_2)(const Indicator&, Indicator::value_type) = MOD;
+Indicator (*MOD_3)(Indicator::value_type, const Indicator&) = MOD;
+Indicator (*MOD_4)(Indicator::value_type, Indicator::value_type) = MOD;
 
 Indicator (*VAR_1)(int) = VAR;
 Indicator (*VAR_2)(const IndParam&) = VAR;
@@ -334,18 +335,19 @@ Indicator (*VARP_4)(const Indicator&, const Indicator&) = VARP;
 Indicator (*VARP_5)(const Indicator&, int) = VARP;
 
 Indicator (*CROSS_1)(const Indicator&, const Indicator&) = CROSS;
-Indicator (*CROSS_2)(const Indicator&, price_t) = CROSS;
-Indicator (*CROSS_3)(price_t, const Indicator&) = CROSS;
-Indicator (*CROSS_4)(price_t, price_t) = CROSS;
+Indicator (*CROSS_2)(const Indicator&, Indicator::value_type) = CROSS;
+Indicator (*CROSS_3)(Indicator::value_type, const Indicator&) = CROSS;
+Indicator (*CROSS_4)(Indicator::value_type, Indicator::value_type) = CROSS;
 
 Indicator (*LONGCROSS_1)(const Indicator&, const Indicator&, int) = LONGCROSS;
 Indicator (*LONGCROSS_2)(const Indicator&, const Indicator&, const Indicator&) = LONGCROSS;
-Indicator (*LONGCROSS_3)(const Indicator&, price_t, int) = LONGCROSS;
-Indicator (*LONGCROSS_4)(const Indicator&, price_t, const Indicator&) = LONGCROSS;
-Indicator (*LONGCROSS_5)(price_t, const Indicator&, int) = LONGCROSS;
-Indicator (*LONGCROSS_6)(price_t, const Indicator&, const Indicator&) = LONGCROSS;
-Indicator (*LONGCROSS_7)(price_t, price_t, int) = LONGCROSS;
-Indicator (*LONGCROSS_8)(price_t, price_t, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_3)(const Indicator&, Indicator::value_type, int) = LONGCROSS;
+Indicator (*LONGCROSS_4)(const Indicator&, Indicator::value_type, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_5)(Indicator::value_type, const Indicator&, int) = LONGCROSS;
+Indicator (*LONGCROSS_6)(Indicator::value_type, const Indicator&, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_7)(Indicator::value_type, Indicator::value_type, int) = LONGCROSS;
+Indicator (*LONGCROSS_8)(Indicator::value_type, Indicator::value_type,
+                         const Indicator&) = LONGCROSS;
 
 Indicator (*FILTER_1)(int) = FILTER;
 Indicator (*FILTER_2)(const IndParam&) = FILTER;
@@ -355,11 +357,11 @@ Indicator (*FILTER_5)(const Indicator&, int) = FILTER;
 
 Indicator (*BARSSINCE_1)() = BARSSINCE;
 Indicator (*BARSSINCE_2)(const Indicator&) = BARSSINCE;
-Indicator (*BARSSINCE_3)(price_t) = BARSSINCE;
+Indicator (*BARSSINCE_3)(Indicator::value_type) = BARSSINCE;
 
 Indicator (*BARSLAST_1)() = BARSLAST;
 Indicator (*BARSLAST_2)(const Indicator&) = BARSLAST;
-Indicator (*BARSLAST_3)(price_t) = BARSLAST;
+Indicator (*BARSLAST_3)(Indicator::value_type) = BARSLAST;
 
 Indicator (*SUMBARS_1)(double) = SUMBARS;
 Indicator (*SUMBARS_2)(const IndParam&) = SUMBARS;

@@ -124,6 +124,18 @@ public:
     }
 };
 
+/**
+ * 提供double的Null值
+ */
+template <>
+class Null<float> {
+public:
+    Null() {}
+    operator float() const {
+        return (std::numeric_limits<float>::quiet_NaN)();
+    }
+};
+
 /** @} */
 }  // namespace hku
 

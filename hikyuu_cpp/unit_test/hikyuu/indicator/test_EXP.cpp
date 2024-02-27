@@ -41,7 +41,7 @@ TEST_CASE("test_EXP") {
     result = EXP(1);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result[0], std::exp(1));
+    CHECK_EQ(result[0], doctest::Approx(std::exp(1)));
 }
 
 //-----------------------------------------------------------------------------

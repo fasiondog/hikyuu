@@ -25,7 +25,7 @@ TEST_CASE("test_round") {
     CHECK(roundEx(x) == 10.0);
     CHECK(roundDown(x) == 10.0);
     CHECK(roundUp(x) == 11.0);
-    CHECK(roundEx(x, 1) == 10.1);
+    CHECK_EQ(roundEx(x, 1), doctest::Approx(10.1));
     CHECK(roundDown(x, 1) == 10.1);
     CHECK(roundUp(x, 1) == 10.2);
 
@@ -33,7 +33,7 @@ TEST_CASE("test_round") {
     CHECK(roundEx(x) == 11);
     CHECK(roundDown(x) == 10);
     CHECK(roundUp(x) == 11.0);
-    CHECK(roundEx(x, 1) == 10.6);
+    CHECK_EQ(roundEx(x, 1), doctest::Approx(10.6));
     CHECK(roundDown(x, 1) == 10.5);
     CHECK(roundUp(x, 1) == 10.6);
 
@@ -41,7 +41,7 @@ TEST_CASE("test_round") {
     CHECK(roundEx(x) == -10);
     CHECK(roundDown(x) == -10);
     CHECK(roundUp(x) == -11.0);
-    CHECK(roundEx(x, 1) == -10.1);
+    CHECK_EQ(roundEx(x, 1), doctest::Approx(-10.1));
     CHECK(roundDown(x, 1) == -10.1);
     CHECK(roundUp(x, 1) == -10.2);
 
@@ -49,9 +49,9 @@ TEST_CASE("test_round") {
     CHECK(roundEx(x) == -11);
     CHECK(roundDown(x) == -10);
     CHECK(roundUp(x) == -11.0);
-    CHECK(roundEx(x, 1) == -10.6);
+    CHECK_EQ(roundEx(x, 1), doctest::Approx(-10.6));
     CHECK(roundDown(x, 1) == -10.5);
-    CHECK(roundUp(x, 1) == -10.6);
+    CHECK_EQ(roundUp(x, 1), doctest::Approx(-10.6));
 }
 
 TEST_CASE("test_string_to_upper") {

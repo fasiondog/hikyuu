@@ -270,9 +270,9 @@ TEST_CASE("test_operator_division") {
     CHECK_EQ(result.discard(), 0);
     for (size_t i = 0; i < 10; ++i) {
         if (data1[i] == 0.0) {
-            CHECK_UNARY(std::isinf(result[i]));
+            CHECK_UNARY((std::isinf(result[i]) || std::isnan(result[i])));
         } else {
-            CHECK_EQ(result[i], data2[i] / data1[i]);
+            CHECK_EQ(result[i], doctest::Approx(data2[i] / data1[i]));
         }
     }
 
@@ -293,9 +293,9 @@ TEST_CASE("test_operator_division") {
     CHECK_EQ(result.size(), k.size());
     for (size_t i = 0; i < result.size(); ++i) {
         if (data1[i] == 0.0) {
-            CHECK_UNARY(std::isinf(result[i]));
+            CHECK_UNARY(std::isinf(result[i]) || std::isnan(result[i]));
         } else {
-            CHECK_EQ(result[i], (k[i] / data1[i]));
+            CHECK_EQ(result[i], doctest::Approx(k[i] / data1[i]));
         }
     }
 }
@@ -749,11 +749,11 @@ TEST_CASE("test_getResult_getResultAsPriceList") {
     CHECK_EQ(result2.size(), 10);
     CHECK_EQ(result1[0], 29.5);
     CHECK_LT(std::fabs(result1[1] - 27.58), 0.0001);
-    CHECK_EQ(result1[9], 26.45);
+    CHECK_EQ(result1[9], doctest::Approx(26.45));
 
-    CHECK_EQ(result2[0], 29.8);
-    CHECK_EQ(result2[1], 28.38);
-    CHECK_EQ(result2[9], 26.55);
+    CHECK_EQ(result2[0], doctest::Approx(29.8));
+    CHECK_EQ(result2[1], doctest::Approx(28.38));
+    CHECK_EQ(result2[9], doctest::Approx(26.55));
 }
 
 /** @par 检测点 */
