@@ -20,14 +20,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ACOS();
-Indicator ACOS(Indicator::value_type);
+Indicator ACOS(Indicator::value_t);
 Indicator ACOS(const Indicator& ind);
 
 inline Indicator ACOS(const Indicator& ind) {
     return ACOS()(ind);
 }
 
-inline Indicator ACOS(Indicator::value_type val) {
+inline Indicator ACOS(Indicator::value_t val) {
     return ACOS(CVAL(val));
 }
 

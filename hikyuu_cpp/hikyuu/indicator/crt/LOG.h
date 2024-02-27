@@ -19,14 +19,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API LOG();
-Indicator LOG(Indicator::value_type);
+Indicator LOG(Indicator::value_t);
 Indicator LOG(const Indicator& ind);
 
 inline Indicator LOG(const Indicator& ind) {
     return LOG()(ind);
 }
 
-inline Indicator LOG(Indicator::value_type val) {
+inline Indicator LOG(Indicator::value_t val) {
     return LOG(CVAL(val));
 }
 

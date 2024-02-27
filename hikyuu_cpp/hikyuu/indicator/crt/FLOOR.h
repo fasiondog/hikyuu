@@ -22,14 +22,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API FLOOR();
-Indicator FLOOR(Indicator::value_type);
+Indicator FLOOR(Indicator::value_t);
 Indicator FLOOR(const Indicator& ind);
 
 inline Indicator FLOOR(const Indicator& ind) {
     return FLOOR()(ind);
 }
 
-inline Indicator FLOOR(Indicator::value_type val) {
+inline Indicator FLOOR(Indicator::value_t val) {
     return FLOOR(CVAL(val));
 }
 

@@ -40,10 +40,13 @@ void ISma::_calculate(const Indicator& ind) {
     double n = getParam<int>("n");
     double m = getParam<double>("m");
 
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
     double p = n - m;
-    _set(ind[m_discard], m_discard);
+    dst[m_discard] = src[m_discard];
     for (size_t i = m_discard + 1; i < total; i++) {
-        _set((m * ind[i] + p * get(i - 1)) / n, i);
+        dst[i] = (m * src[i] + p * dst[i - 1]) / n;
     }
 }
 

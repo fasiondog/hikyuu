@@ -25,14 +25,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API BARSLAST();
-Indicator BARSLAST(Indicator::value_type);
+Indicator BARSLAST(Indicator::value_t);
 Indicator BARSLAST(const Indicator& ind);
 
 inline Indicator BARSLAST(const Indicator& ind) {
     return BARSLAST()(ind);
 }
 
-inline Indicator BARSLAST(Indicator::value_type val) {
+inline Indicator BARSLAST(Indicator::value_t val) {
     return BARSLAST(CVAL(val));
 }
 

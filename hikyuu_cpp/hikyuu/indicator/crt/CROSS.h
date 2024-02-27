@@ -21,9 +21,9 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator CROSS(const Indicator& x, const Indicator& y);
-Indicator CROSS(const Indicator& x, Indicator::value_type);
-Indicator CROSS(Indicator::value_type, const Indicator& y);
-Indicator CROSS(Indicator::value_type, Indicator::value_type);
+Indicator CROSS(const Indicator& x, Indicator::value_t);
+Indicator CROSS(Indicator::value_t, const Indicator& y);
+Indicator CROSS(Indicator::value_t, Indicator::value_t);
 
 inline Indicator CROSS(const Indicator& x, const Indicator& y) {
     Indicator result = (REF(x, 1) < REF(y, 1)) & (x > y);
@@ -31,15 +31,15 @@ inline Indicator CROSS(const Indicator& x, const Indicator& y) {
     return result;
 }
 
-inline Indicator CROSS(const Indicator& x, Indicator::value_type y) {
+inline Indicator CROSS(const Indicator& x, Indicator::value_t y) {
     return CROSS(x, CVAL(x, y));
 }
 
-inline Indicator CROSS(Indicator::value_type x, const Indicator& y) {
+inline Indicator CROSS(Indicator::value_t x, const Indicator& y) {
     return CROSS(CVAL(y, x), y);
 }
 
-inline Indicator CROSS(Indicator::value_type x, Indicator::value_type y) {
+inline Indicator CROSS(Indicator::value_t x, Indicator::value_t y) {
     return CROSS(CVAL(x), CVAL(y));
 }
 
