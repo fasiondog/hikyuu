@@ -74,7 +74,7 @@ TEST_CASE("test_SMA") {
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.size(), data.size());
     CHECK_EQ(result[0], 0);
-    CHECK_EQ(result[1], 0.05);
+    CHECK_EQ(result[1], doctest::Approx(0.05));
     CHECK_EQ(result[5], doctest::Approx(0.4031).epsilon(0.01));
     CHECK_EQ(result[9], doctest::Approx(0.8002).epsilon(0.01));
 }

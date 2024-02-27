@@ -39,7 +39,7 @@ TEST_CASE("test_VIGOR") {
     CHECK_EQ(vigor.size(), 10);
     CHECK_UNARY_FALSE(vigor.empty());
     CHECK_UNARY(std::isnan(vigor[0]));
-    CHECK_LT(std::fabs(vigor[1] + 11761.36), 0.0001);
+    CHECK_EQ(vigor[1], doctest::Approx(-11761.36));
 
     vigor = VIGOR(kdata, 2);
     CHECK_EQ(vigor.discard(), 1);

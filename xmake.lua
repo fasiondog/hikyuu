@@ -73,6 +73,12 @@ option("feedback")
     set_description("Enable send feedback.")
 option_end()
 
+option("low_precision")
+    set_default(false)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable send feedback.")
+option_end()
 
 -- project
 set_project("hikyuu")
@@ -107,6 +113,8 @@ set_configvar("HKU_ENABLE_HDF5_KDATA", get_config("hdf5") and 1 or 0)
 set_configvar("HKU_ENABLE_MYSQL_KDATA", get_config("mysql") and 1 or 0)
 set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
 set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
+
+set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
 
 set_warnings("all")
 

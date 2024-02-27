@@ -20,14 +20,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API LN();
-Indicator LN(price_t);
+Indicator LN(Indicator::value_type);
 Indicator LN(const Indicator& ind);
 
 inline Indicator LN(const Indicator& ind) {
     return LN()(ind);
 }
 
-inline Indicator LN(price_t val) {
+inline Indicator LN(Indicator::value_type val) {
     return LN(CVAL(val));
 }
 

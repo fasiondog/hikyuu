@@ -4,7 +4,7 @@
  *  Created on: 2009-11-20
  *      Author: fasiondog
  */
-#include <cmath>
+
 #include "arithmetic.h"
 
 #if defined(_MSC_VER)
@@ -17,32 +17,32 @@
 
 namespace hku {
 
-double HKU_API roundEx(double number, int ndigits) {
-    // 切换至：ROUND_HALF_EVEN 银行家舍入法
-    double pow1, pow2, y, z;
-    double x = number;
-    if (ndigits >= 0) {
-        pow1 = pow(10.0, (double)ndigits);
-        pow2 = 1.0;
-        y = (x * pow1) * pow2;
-    } else {
-        pow1 = pow(10.0, (double)-ndigits);
-        pow2 = 1.0;
-        y = x / pow1;
-    }
+// double HKU_API roundEx(double number, int ndigits) {
+//     // 切换至：ROUND_HALF_EVEN 银行家舍入法
+//     double pow1, pow2, y, z;
+//     double x = number;
+//     if (ndigits >= 0) {
+//         pow1 = pow(10.0, (double)ndigits);
+//         pow2 = 1.0;
+//         y = (x * pow1) * pow2;
+//     } else {
+//         pow1 = pow(10.0, (double)-ndigits);
+//         pow2 = 1.0;
+//         y = x / pow1;
+//     }
 
-    z = round(y);
-    if (fabs(y - z) == 0.5)
-        /* halfway between two integers; use round-half-even */
-        z = 2.0 * round(y / 2.0);
+//     z = round(y);
+//     if (fabs(y - z) == 0.5)
+//         /* halfway between two integers; use round-half-even */
+//         z = 2.0 * round(y / 2.0);
 
-    if (ndigits >= 0)
-        z = (z / pow2) / pow1;
-    else
-        z *= pow1;
+//     if (ndigits >= 0)
+//         z = (z / pow2) / pow1;
+//     else
+//         z *= pow1;
 
-    return z;
-}
+//     return z;
+// }
 
 double HKU_API roundUp(double number, int ndigits) {
     double f;

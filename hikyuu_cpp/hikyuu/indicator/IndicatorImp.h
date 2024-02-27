@@ -81,7 +81,11 @@ public:
         INVALID
     };
 
-    typedef price_t value_type;
+#if HKU_USE_LOW_PRECISION
+    typedef float value_type;
+#else
+    typedef double value_type;
+#endif
 
 public:
     /** 默认构造函数   */
@@ -102,9 +106,9 @@ public:
 
     size_t size() const;
 
-    price_t get(size_t pos, size_t num = 0) const;
+    value_type get(size_t pos, size_t num = 0) const;
 
-    price_t getByDate(Datetime, size_t num = 0);
+    value_type getByDate(Datetime, size_t num = 0);
 
     Datetime getDatetime(size_t pos) const;
 
@@ -125,7 +129,7 @@ public:
      * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数,
      * 未做越界保护
      */
-    void _set(price_t val, size_t pos, size_t num = 0);
+    void _set(value_type val, size_t pos, size_t num = 0);
 
     /**
      * 准备内存
@@ -235,7 +239,7 @@ protected:
     string m_name;
     size_t m_discard;
     size_t m_result_num;
-    PriceList* m_pBuffer[MAX_RESULT_NUM];
+    vector<value_type>* m_pBuffer[MAX_RESULT_NUM];
 
     bool m_need_calculate;
     OPType m_optype;
@@ -282,7 +286,7 @@ private:
         for (size_t i = 0; i < act_result_num; ++i) {
             size_t count = size();
             ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
-            PriceList& values = *m_pBuffer[i];
+            vector<value_type>& values = *m_pBuffer[i];
             for (size_t j = 0; j < count; j++) {
                 if (std::isnan(values[j])) {
                     ar& boost::serialization::make_nvp<string>("item", nan);
@@ -290,7 +294,7 @@ private:
                     inf = values[j] > 0 ? "+inf" : "-inf";
                     ar& boost::serialization::make_nvp<string>("item", inf);
                 } else {
-                    ar& boost::serialization::make_nvp<price_t>("item", values[j]);
+                    ar& boost::serialization::make_nvp<value_type>("item", values[j]);
                 }
             }
         }
@@ -313,10 +317,10 @@ private:
         size_t act_result_num = 0;
         ar& BOOST_SERIALIZATION_NVP(act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
-            m_pBuffer[i] = new PriceList();
+            m_pBuffer[i] = new vector<value_type>();
             size_t count = 0;
             ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
-            PriceList& values = *m_pBuffer[i];
+            vector<value_type>& values = *m_pBuffer[i];
             values.resize(count);
             for (size_t i = 0; i < count; i++) {
                 std::string vstr;

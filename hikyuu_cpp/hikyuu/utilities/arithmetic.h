@@ -11,6 +11,7 @@
 #ifndef HIKYUU_UTILITIES_ARITHMETIC_H
 #define HIKYUU_UTILITIES_ARITHMETIC_H
 
+#include <cmath>
 #include <cctype>
 #include <vector>
 #include <string>
@@ -75,7 +76,34 @@ std::string HKU_API gb_to_utf8(const std::string& szinput);
  * @param ndigits 保留小数位数
  * @return 处理过的数据
  */
-double HKU_API roundEx(double number, int ndigits = 0);
+// double HKU_API roundEx(double number, int ndigits = 0);
+template <typename ValueT>
+ValueT roundEx(ValueT number, int ndigits = 0) {
+    // 切换至：ROUND_HALF_EVEN 银行家舍入法
+    ValueT pow1, pow2, y, z;
+    ValueT x = number;
+    if (ndigits >= 0) {
+        pow1 = std::pow<ValueT>(10.0, (ValueT)ndigits);
+        pow2 = 1.0;
+        y = (x * pow1) * pow2;
+    } else {
+        pow1 = std::pow<ValueT>(10.0, (ValueT)-ndigits);
+        pow2 = 1.0;
+        y = x / pow1;
+    }
+
+    z = std::round(y);
+    if (std::fabs(y - z) == 0.5)
+        /* halfway between two integers; use round-half-even */
+        z = 2.0 * std::round(y / 2.0);
+
+    if (ndigits >= 0)
+        z = (z / pow2) / pow1;
+    else
+        z *= pow1;
+
+    return z;
+}
 
 /**
  * 向上截取，如10.1截取后为11
