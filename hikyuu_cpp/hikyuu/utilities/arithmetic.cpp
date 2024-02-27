@@ -4,7 +4,7 @@
  *  Created on: 2009-11-20
  *      Author: fasiondog
  */
-#include <cmath>
+
 #include "arithmetic.h"
 
 #if defined(_MSC_VER)

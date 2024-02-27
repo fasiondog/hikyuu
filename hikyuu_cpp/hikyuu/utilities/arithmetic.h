@@ -11,6 +11,7 @@
 #ifndef HIKYUU_UTILITIES_ARITHMETIC_H
 #define HIKYUU_UTILITIES_ARITHMETIC_H
 
+#include <cmath>
 #include <cctype>
 #include <vector>
 #include <string>
