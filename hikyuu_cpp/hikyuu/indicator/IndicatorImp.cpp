@@ -379,8 +379,8 @@ string IndicatorImp::long_name() const {
 }
 
 PriceList IndicatorImp::getResultAsPriceList(size_t result_num) {
-#if HKU_USE_LOW_PRECISION
     HKU_IF_RETURN(result_num >= m_result_num || m_pBuffer[result_num] == NULL, PriceList());
+#if HKU_USE_LOW_PRECISION
     size_t total = size();
     PriceList result(total);
     const auto &src = (*m_pBuffer[result_num]);
