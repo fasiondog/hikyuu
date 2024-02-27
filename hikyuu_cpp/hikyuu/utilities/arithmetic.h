@@ -70,6 +70,11 @@ std::string HKU_API gb_to_utf8(const std::string& szinput);
 #define HKU_CPATH(s) (s)
 #endif
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4244)
+#endif
+
 /**
  * 四舍五入，ROUND_HALF_EVEN 银行家舍入法
  * @param number  待四舍五入的数据
@@ -111,7 +116,36 @@ ValueT roundEx(ValueT number, int ndigits = 0) {
  * @param ndigits 保留小数位数
  * @return 处理过的数据
  */
-double HKU_API roundUp(double number, int ndigits = 0);
+template <typename ValueT>
+ValueT roundUp(ValueT number, int ndigits = 0) {
+    ValueT f;
+    int i;
+    f = 1.0;
+    i = std::abs(ndigits);
+    while (--i >= 0) {
+        f = f * 10.0;
+    }
+
+    if (ndigits < 0) {
+        number /= f;
+    } else {
+        number *= f;
+    }
+
+    if (number >= 0.0) {
+        number = std::floor(number + 1.0);
+    } else {
+        number = std::ceil(number - 1.0);
+    }
+
+    if (ndigits < 0) {
+        number *= f;
+    } else {
+        number /= f;
+    }
+
+    return number;
+}
 
 /**
  * 向下截取，如10.1截取后为10
@@ -119,7 +153,40 @@ double HKU_API roundUp(double number, int ndigits = 0);
  * @param ndigits 保留小数位数
  * @return 处理过的数据
  */
-double HKU_API roundDown(double number, int ndigits = 0);
+template <typename ValueT>
+ValueT roundDown(ValueT number, int ndigits = 0) {
+    ValueT f;
+    int i;
+    f = 1.0;
+    i = std::abs(ndigits);
+    while (--i >= 0) {
+        f = f * 10.0;
+    }
+
+    if (ndigits < 0) {
+        number /= f;
+    } else {
+        number *= f;
+    }
+
+    if (number >= 0.0) {
+        number = std::floor(number);
+    } else {
+        number = std::ceil(number);
+    }
+
+    if (ndigits < 0) {
+        number *= f;
+    } else {
+        number /= f;
+    }
+
+    return number;
+}
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 /** 转小写字符串 */
 inline void to_lower(std::string& s) {

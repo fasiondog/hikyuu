@@ -407,6 +407,7 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
 
 IndicatorImp::value_t IndicatorImp::get(size_t pos, size_t num) const {
 #if CHECK_ACCESS_BOUND
+    // cppcheck-suppress [arrayIndexOutOfBoundsCond]
     HKU_CHECK_THROW(
       (num <= MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()), std::out_of_range,
       "Try to access value out of bounds! num: {}, pos: {}, name: {}", num, pos, name());
@@ -416,6 +417,7 @@ IndicatorImp::value_t IndicatorImp::get(size_t pos, size_t num) const {
 
 void IndicatorImp::_set(value_t val, size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
+    // cppcheck-suppress [arrayIndexOutOfBoundsCond]
     HKU_CHECK_THROW(
       (num <= MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()), std::out_of_range,
       "Try to access value out of bounds! num: {}, pos: {}, name: {}", num, pos, name());
@@ -1116,7 +1118,7 @@ void IndicatorImp::execute_eq() {
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            dst[i] = maxdata[i] == mindata[i - diff];
+            dst[i] = (maxdata[i] == mindata[i - diff]) ? 1.0 : 0.0;
         }
     }
 }
@@ -1149,7 +1151,7 @@ void IndicatorImp::execute_ne() {
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            dst[i] = maxdata[i] != mindata[i - diff];
+            dst[i] = (maxdata[i] != mindata[i - diff]) ? 1.0 : 0.0;
         }
     }
 }
@@ -1186,7 +1188,7 @@ void IndicatorImp::execute_gt() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                dst[i] = left[i] > right[i - diff];
+                dst[i] = (left[i] > right[i - diff]) ? 1.0 : 0.0;
             }
         }
     } else {
@@ -1195,7 +1197,7 @@ void IndicatorImp::execute_gt() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                dst[i] = left[i - diff] > right[i];
+                dst[i] = (left[i - diff] > right[i]) ? 1.0 : 0.0;
             }
         }
     }
@@ -1233,7 +1235,7 @@ void IndicatorImp::execute_lt() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                dst[i] = left[i] < right[i - diff];
+                dst[i] = (left[i] < right[i - diff]) ? 1.0 : 0.0;
             }
         }
     } else {
@@ -1242,7 +1244,7 @@ void IndicatorImp::execute_lt() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                dst[i] = left[i - diff] < right[i];
+                dst[i] = left[i - diff] < right[i] ? 1.0 : 0.0;
             }
         }
     }
@@ -1280,7 +1282,7 @@ void IndicatorImp::execute_ge() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                dst[i] = left[i] >= right[i - diff];
+                dst[i] = left[i] >= right[i - diff] ? 1.0 : 0.0;
             }
         }
     } else {
@@ -1289,7 +1291,7 @@ void IndicatorImp::execute_ge() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                dst[i] = left[i - diff] >= right[i];
+                dst[i] = left[i - diff] >= right[i] ? 1.0 : 0.0;
             }
         }
     }
@@ -1327,7 +1329,7 @@ void IndicatorImp::execute_le() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                dst[i] = left[i] <= right[i - diff];
+                dst[i] = left[i] <= right[i - diff] ? 1.0 : 0.0;
             }
         }
     } else {
@@ -1336,7 +1338,7 @@ void IndicatorImp::execute_le() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                dst[i] = left[i - diff] <= right[i];
+                dst[i] = left[i - diff] <= right[i] ? 1.0 : 0.0;
             }
         }
     }
@@ -1370,7 +1372,7 @@ void IndicatorImp::execute_and() {
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            dst[i] = (maxdata[i] > 0.0) && (mindata[i - diff] > 0.0);
+            dst[i] = (maxdata[i] > 0.0) && (mindata[i - diff] > 0.0) ? 1.0 : 0.0;
         }
     }
 }
@@ -1403,7 +1405,7 @@ void IndicatorImp::execute_or() {
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            dst[i] = (maxdata[i] > 0.0) || (mindata[i - diff] > 0.0);
+            dst[i] = (maxdata[i] > 0.0) || (mindata[i - diff] > 0.0) ? 1.0 : 0.0;
         }
     }
 }
