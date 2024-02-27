@@ -26,7 +26,7 @@ jobs:
 
     - name: Cache xmake aarch64 packages
       id: cache-xmake-ubuntu-aarch64
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       env:
         cache-name: cache-ubuntu-aarch64-modules
       with:
