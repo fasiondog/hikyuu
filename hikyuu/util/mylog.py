@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 # cp936
 
+import os
 import logging
 import traceback
 import time
@@ -25,9 +26,17 @@ def spend_time(func):
 
 FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s [%(name)s::%(funcName)s]'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
-
 hku_logger_name = 'hikyuu'
 hku_logger = logging.getLogger(hku_logger_name)
+
+_usrdir = os.path.expanduser("~")
+if not os.path.lexists(_usrdir):
+    os.makedirs(_usrdir)
+_logfile = logging.handlers.RotatingFileHandler(
+    f"{_usrdir}/.hikyuu/hikyuu_py.log", maxBytes=10240, backupCount=3, encoding="utf-8")
+_logfile.setFormatter(logging.Formatter(FORMAT))
+_logfile.setLevel(logging.WARN)
+hku_logger.addHandler(_logfile)
 
 
 def get_default_logger():
@@ -35,7 +44,7 @@ def get_default_logger():
 
 
 def class_logger(cls, enable=False):
-    #logger = logging.getLogger("{}.{}".format(cls.__module__, cls.__name__))
+    # logger = logging.getLogger("{}.{}".format(cls.__module__, cls.__name__))
     logger = logging.getLogger("{}".format(cls.__name__))
     if enable == 'debug':
         logger.setLevel(logging.DEBUG)
@@ -54,7 +63,7 @@ def add_class_logger_handler(class_list, level=logging.INFO, handler=None):
     :param handler: logging handler
     """
     for cls in class_list:
-        #logger = logging.getLogger("{}.{}".format(cls.__module__, cls.__name__))
+        # logger = logging.getLogger("{}.{}".format(cls.__module__, cls.__name__))
         logger = logging.getLogger("{}".format(cls.__name__))
         if handler:
             logger.addHandler(handler)
@@ -194,7 +203,7 @@ def with_trace(level=logging.INFO):
 
 def capture_multiprocess_all_logger(queue, level=None):
     """重设所有子进程中的 logger 输出指定的 queue，并重设level
-    
+
     @param multiprocessing.Queue queue 指定的 mp Queue
     @param level 日志输出等级, None为保持原有等级
     """
@@ -209,6 +218,8 @@ def capture_multiprocess_all_logger(queue, level=None):
 
 # Temporary change logger level
 # https://docs.python.org/3/howto/logging-cookbook.html
+
+
 class LoggingContext:
     def __init__(self, logger, level=None, handler=None, close=True):
         self.logger = logger

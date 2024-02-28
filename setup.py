@@ -105,7 +105,7 @@ def clear_with_python_changed(mode):
 # ------------------------------------------------------------------------------
 # 执行构建
 # ------------------------------------------------------------------------------
-def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
+def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_precision=False):
     """ 执行编译 """
     global g_verbose
     g_verbose = verbose
@@ -123,8 +123,8 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
-        cmd = "xmake f {} -c -y -m {} --feedback={} -k {}".format(
-            "-v -D" if verbose else "", mode, feedback, "shared" if mode == 'release' else "static")
+        cmd = "xmake f {} -c -y -m {} --feedback={} -k {} --low_precision={}".format(
+            "-v -D" if verbose else "", mode, feedback, "shared" if mode == 'release' else "static", low_precision)
         print(cmd)
         os.system(cmd)
 
@@ -169,9 +169,14 @@ def cli():
                   'lsan'
               ]),
               help='编译模式')
-def build(verbose, mode, feedback, j):
+@click.option('-low_precision',
+              '--low_precision',
+              default=False,
+              type=bool,
+              help='使用低精度版本')
+def build(verbose, mode, feedback, j, low_precision):
     """ 执行编译 """
-    start_build(verbose, mode, feedback, j)
+    start_build(verbose, mode, feedback, j, low_precision)
 
 
 @click.command()
@@ -193,13 +198,18 @@ def build(verbose, mode, feedback, j):
               ]),
               help='编译模式')
 @click.option('-case', '--case', default='', help="执行指定的 TestCase")
-def test(all, compile, verbose, mode, case, feedback, j):
+@click.option('-low_precision',
+              '--low_precision',
+              default=False,
+              type=bool,
+              help='使用低精度版本')
+def test(all, compile, verbose, mode, case, feedback, j, low_precision):
     """ 执行单元测试 """
     current_compile_info = get_current_compile_info()
     current_compile_info['mode'] = mode
     history_compile_info = get_history_compile_info()
     if compile or current_compile_info != history_compile_info:
-        start_build(verbose, mode, feedback, j)
+        start_build(verbose, mode, feedback, j, low_precision)
     if all:
         os.system("xmake -j {} -b {} unit-test".format(
             j, "-v -D" if verbose else ""))
@@ -287,10 +297,15 @@ def copy_include(install_dir):
     shutil.copy('hikyuu/cpp/__init__.py', f'{install_dir}/include/hikyuu')
 
 
+@click.command()
 @click.option('-j', '--j', default=2, help="并行编译数量")
 @click.option('-o', '--o', help="指定的安装目录")
-@click.command()
-def install(j, o):
+@click.option('-low_precision',
+              '--low_precision',
+              default=False,
+              type=bool,
+              help='使用低精度版本')
+def install(j, o, low_precision):
     """ 编译并安装 Hikyuu python 库 """
     install_dir = o
     if install_dir is None:
@@ -305,7 +320,7 @@ def install(j, o):
             except:
                 pass
 
-    start_build(False, 'release', True, j)
+    start_build(False, 'release', True, j, low_precision)
 
     shutil.copytree("./hikyuu", install_dir)
 
@@ -319,28 +334,34 @@ def install(j, o):
               default=True,
               type=bool,
               help='允许发送反馈信息')
-def wheel(feedback, j):
+@click.option('-low_precision',
+              '--low_precision',
+              default=False,
+              type=bool,
+              help='使用低精度版本')
+def wheel(feedback, j, low_precision):
     """ 生成 python 的 wheel 安装包 """
     # 清理之前遗留的打包产物
     clear_build()
 
     # 尝试编译
-    start_build(False, 'release', feedback, j)
+    start_build(False, 'release', feedback, j, low_precision)
 
     copy_include('hikyuu')
 
     # 构建打包命令
     print("start pacakaging bdist_wheel ...")
     current_plat = sys.platform
+    cpu_arch = platform.machine()
     current_bits = 64 if sys.maxsize > 2**32 else 32
     if current_plat == 'win32' and current_bits == 64:
-        plat = "win-amd64"
+        plat = "win_amd64"
     elif current_plat == 'win32' and current_bits == 32:
         plat = "win32"
     elif current_plat == 'linux' and current_bits == 64:
-        plat = "manylinux1_x86_64"
+        plat = f"manylinux1_{cpu_arch}"
     elif current_plat == 'linux' and current_bits == 32:
-        plat = "manylinux1_i386"
+        plat = f"manylinux1_{cpu_arch}"
     elif current_plat == 'darwin' and current_bits == 32:
         plat = "macosx_i686"
     elif current_plat == 'darwin' and current_bits == 64:
@@ -348,6 +369,9 @@ def wheel(feedback, j):
     else:
         print("*********尚未实现该平台的支持*******")
         return
+
+    if low_precision:
+        plat = f"{plat}_low_precision"
 
     py_version = get_python_version()
     main_ver, min_ver = py_version.split('.')
