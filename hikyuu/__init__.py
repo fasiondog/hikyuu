@@ -48,15 +48,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+import traceback
+import sys
 from .util import *
 
-from .extend import *
-# from .deprecated import *  # pybind getattr 会被递归，无法使用
-from .indicator import *
-from .trade_manage import *
-from .trade_sys import *
-from .analysis import *
-from .hub import *
+try:
+    from .extend import *
+    # from .deprecated import *  # pybind getattr 会被递归，无法使用
+    from .indicator import *
+    from .trade_manage import *
+    from .trade_sys import *
+    from .analysis import *
+    from .hub import *
+except Exception as e:
+    info = sys.exc_info()
+    hku_fatal("{}: {}".format(info[0].__name__, info[1]))
+    hku_fatal(traceback.format_exc())
+    print("""请使用 pipdeptree -p hikyuu 检查是否存在缺失的依赖包。
+如果没有问题可以在 https://gitee.com/fasiondog/hikyuu 或 https://github.com/fasiondog/hikyuu 
+上提交 issue，同时附上 "用户目录/.hikyuu" 下的 hikyuu_py.log 和 hikyuu.log 日志文件 """)
+    raise e
+
 
 # ==============================================================================
 #
