@@ -55,6 +55,9 @@ public:
     explicit TimeDelta(int64_t days = 0, int64_t hours = 0, int64_t minutes = 0,
                        int64_t seconds = 0, int64_t milliseconds = 0, int64_t microseconds = 0);
 
+    /** 从字符串构造，格式：-1 days, hh:mm:ss.000000) */
+    explicit TimeDelta(const std::string& delta);
+
     /** 通过 boost::posix_time::time_duration 构造 */
     explicit TimeDelta(bt::time_duration td);
 

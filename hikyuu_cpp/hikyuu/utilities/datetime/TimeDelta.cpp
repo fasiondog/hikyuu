@@ -33,6 +33,23 @@ TimeDelta::TimeDelta(int64_t days, int64_t hours, int64_t minutes, int64_t secon
     m_duration = bt::time_duration(0, 0, 0, total);
 }
 
+TimeDelta::TimeDelta(const std::string& delta) {
+    std::string val(delta);
+    std::string errmsg(fmt::format("Invalid format: {}", delta));
+    to_lower(val);
+    auto vals = split(val, ' ');
+    HKU_CHECK(vals.size() == 3, errmsg);
+    int64_t days = std::stoll(vals[0]);
+    vals = split(vals[2], ':');
+    HKU_CHECK(vals.size() == 3, errmsg);
+    int64_t hours = std::stoll(vals[0]);
+    int64_t minutes = std::stoll(vals[1]);
+    int64_t microseconds = static_cast<int64_t>(std::stod(vals[2]) * 1000000.0);
+    int64_t total = (((days * 24) + hours) * 60 + minutes) * 60000000LL + microseconds;
+    HKU_CHECK(total >= m_min_micro_seconds && total <= m_max_micro_seconds, "Out of total range!");
+    m_duration = bt::time_duration(0, 0, 0, total);
+}
+
 TimeDelta::TimeDelta(bt::time_duration td) {
     int64_t total = td.total_microseconds();
     HKU_CHECK(total >= m_min_micro_seconds && total <= m_max_micro_seconds, "Out of total range!");

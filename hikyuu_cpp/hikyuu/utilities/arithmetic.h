@@ -215,8 +215,8 @@ inline void trim(std::string& s) {
  * @param str 待封的字符串
  * @param c 分割符
  */
-inline std::vector<std::string_view> split(const std::string& str, char c) {
-    std::vector<std::string_view> result;
+inline std::vector<std::string> split(const std::string& str, char c) {
+    std::vector<std::string> result;
     std::string_view view(str);
     size_t prepos = 0;
     size_t pos = view.find_first_of(c);
@@ -239,8 +239,8 @@ inline std::vector<std::string_view> split(const std::string& str, char c) {
  * @return string_view 组成的 vector
  * @note 注意返回结果的生命周期应小于输入的字符串相同！
  */
-inline std::vector<std::string_view> split(const std::string_view& view, char c) {
-    std::vector<std::string_view> result;
+inline std::vector<std::string> split(const std::string_view& view, char c) {
+    std::vector<std::string> result;
     size_t prepos = 0;
     size_t pos = view.find_first_of(c);
     while (pos != std::string::npos) {
@@ -255,9 +255,8 @@ inline std::vector<std::string_view> split(const std::string_view& view, char c)
     return result;
 }
 
-inline std::vector<std::string_view> split(const std::string_view& str,
-                                           const std::string& split_str) {
-    std::vector<std::string_view> result;
+inline std::vector<std::string> split(const std::string_view& str, const std::string& split_str) {
+    std::vector<std::string> result;
     size_t split_str_len = split_str.size();
     if (split_str_len == 0) {
         result.emplace_back(str);
