@@ -12,6 +12,7 @@
 #include "../Stock.h"
 #include "../Log.h"
 #include "../GlobalInitializer.h"
+#include "imp/ICval.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IndicatorImp)
@@ -1618,7 +1619,9 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
                     m_ind_params.size() != other.m_ind_params.size(),
                   false);
 
-    if (m_name == "CVAL" && other.m_name == "CVAL") {
+    auto &self_id = typeid(*this);
+    auto &cval_id = typeid(ICval);
+    if (self_id == cval_id) {
         HKU_IF_RETURN(isLeaf() && other.isLeaf(), true);
         return m_right && m_right->alike(*other.m_right);
     }
