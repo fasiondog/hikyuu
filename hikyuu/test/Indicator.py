@@ -88,7 +88,7 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[3], 12)
 
         a = x2 / x1
-        self.assert_(isnan(a[0]))
+        self.assert_(isinf(a[0]))
         self.assertEqual(a[1], 2)
         self.assertEqual(a[2], 1.5)
         self.assertEqual(a[3], 4.0 / 3.0)
