@@ -139,10 +139,13 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
         }
         os << "}";
     }
-    os << "\n  formula: " << imp.formula() << "\n}";
+    os << "\n  formula: " << imp.formula();
+#if !HKU_USE_LOW_PRECISION
     if (imp.m_pBuffer[0]) {
         os << "\n  values: " << *imp.m_pBuffer[0];
     }
+#endif
+    os << "\n}";
     return os;
 }
 
