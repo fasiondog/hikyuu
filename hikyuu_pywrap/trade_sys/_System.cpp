@@ -94,115 +94,16 @@ void export_System(py::module& m) {
       .def_property("name", py::overload_cast<>(&System::name, py::const_),
                     py::overload_cast<const string&>(&System::name), py::return_value_policy::copy,
                     "系统名称")
-      .def_property(
-        "tm", &System::getTM,
-        [](SystemPtr& self, py::object pg) {
-            TradeManagerPtr x;
-            if (!pg.is_none()) {
-                x = pg.cast<TradeManagerPtr>();
-            }
-            self->setTM(x);
-        },
-        "关联的交易管理实例")
-
-      .def_property(
-        "to", &System::getTO,
-        [](SystemPtr& self, py::object pg) {
-            KData x;
-            if (!pg.is_none()) {
-                x = pg.cast<KData>();
-            }
-            self->setTO(x);
-        },
-        "交易对象 KData")
-
-      .def_property(
-        "mm", &System::getMM,
-        [](SystemPtr& self, py::object pg) {
-            MoneyManagerPtr x;
-            if (!pg.is_none()) {
-                x = pg.cast<MoneyManagerPtr>();
-            }
-            self->setMM(x);
-        },
-        "资金管理策略")
-
-      .def_property(
-        "ev", &System::getEV,
-        [](SystemPtr& self, py::object pg) {
-            EnvironmentPtr x;
-            if (!pg.is_none()) {
-                x = pg.cast<EnvironmentPtr>();
-            }
-            self->setEV(x);
-        },
-        "市场环境判断策略")
-
-      .def_property(
-        "cn", &System::getCN,
-        [](SystemPtr& self, py::object pg) {
-            ConditionPtr x;
-            if (!pg.is_none()) {
-                x = pg.cast<ConditionPtr>();
-            }
-            self->setCN(x);
-        },
-        "系统有效条件")
-
-      .def_property(
-        "sg", &System::getSG,
-        [](SystemPtr& self, py::object pg) {
-            SignalPtr x;
-            if (!pg.is_none()) {
-                x = pg.cast<SignalPtr>();
-            }
-            self->setSG(x);
-        },
-        "信号指示器")
-
-      .def_property(
-        "st", &System::getST,
-        [](SystemPtr& self, py::object pg) {
-            StoplossPtr x;
-            if (!pg.is_none()) {
-                x = pg.cast<StoplossPtr>();
-            }
-            self->setST(x);
-        },
-        "止损策略")
-
-      .def_property(
-        "tp", &System::getTP,
-        [](SystemPtr& self, py::object pg) {
-            StoplossPtr x;
-            if (!pg.is_none()) {
-                x = pg.cast<StoplossPtr>();
-            }
-            self->setTP(x);
-        },
-        "止盈策略")
-
-      .def_property(
-        "pg", &System::getPG,
-        [](SystemPtr& self, py::object pg) {
-            ProfitGoalPtr x;
-            if (!pg.is_none()) {
-                x = pg.cast<ProfitGoalPtr>();
-            }
-            self->setPG(x);
-        },
-        "盈利目标策略")
-
-      .def_property(
-        "sp", &System::getSP,
-        [](SystemPtr& self, py::object pg) {
-            SlippagePtr x;
-            if (!pg.is_none()) {
-                x = pg.cast<SlippagePtr>();
-            }
-            self->setSP(x);
-        },
-        "移滑价差算法")
+      .def_property("tm", &System::getTM, &System::setTM, "关联的交易管理实例")
+      .def_property("to", &System::getTO, &System::setTO, "交易对象 KData")
+      .def_property("mm", &System::getMM, &System::setMM, "资金管理策略")
+      .def_property("ev", &System::getEV, &System::setEV, "市场环境判断策略")
+      .def_property("cn", &System::getCN, &System::setCN, "系统有效条件")
+      .def_property("sg", &System::getSG, &System::setSG, "信号指示器")
+      .def_property("st", &System::getST, &System::setST, "止损策略")
+      .def_property("tp", &System::getTP, &System::setTP, "止盈策略")
+      .def_property("pg", &System::getPG, &System::setPG, "盈利目标策略")
+      .def_property("sp", &System::getSP, &System::setSP, "移滑价差算法")
 
       .def("get_param", &System::getParam<boost::any>, R"(get_param(self, name)
 

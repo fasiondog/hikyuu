@@ -140,9 +140,9 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
         os << "}";
     }
     os << "\n  formula: " << imp.formula() << "\n}";
-    // if (imp.m_pBuffer[0]) {
-    //     os << "\n  values: " << *imp.m_pBuffer[0];
-    // }
+    if (imp.m_pBuffer[0]) {
+        os << "\n  values: " << *imp.m_pBuffer[0];
+    }
     return os;
 }
 
@@ -1613,10 +1613,10 @@ void IndicatorImp::_update_discard() {
 
 bool IndicatorImp::alike(const IndicatorImp &other) const {
     HKU_IF_RETURN(this == &other, true);
-    HKU_IF_RETURN(m_optype != other.m_optype || typeid(*this) != typeid(other) ||
-                    m_params != other.m_params || m_discard != other.m_discard ||
-                    m_result_num != other.m_result_num ||
-                    m_ind_params.size() != other.m_ind_params.size(),
+    HKU_IF_RETURN(m_optype != other.m_optype || m_discard != other.m_discard ||
+                    m_result_num != other.m_result_num || (isLeaf() && !other.isLeaf()) ||
+                    (!isLeaf() && other.isLeaf()) || typeid(*this) != typeid(other) ||
+                    m_ind_params.size() != other.m_ind_params.size() || m_params != other.m_params,
                   false);
 
     auto &self_id = typeid(*this);
@@ -1633,7 +1633,18 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
         HKU_IF_RETURN(!iter1->second->alike(*(iter2->second)), false);
     }
 
-    HKU_IF_RETURN(isLeaf(), true);
+    if (isLeaf() && other.isLeaf()) {
+        HKU_IF_RETURN(this->size() != other.size(), false);
+        auto const *d1 = this->data();
+        auto const *d2 = other.data();
+        bool eq = true;
+        for (size_t i = 0, len = this->size(); i < len; i++) {
+            if (d1[i] != d2[i]) {
+                eq = false;
+            }
+        }
+        return eq;
+    }
 
     HKU_IF_RETURN(m_three && other.m_three && !m_three->alike(*other.m_three), false);
     HKU_IF_RETURN(m_left && other.m_left && !m_left->alike(*other.m_left), false);
