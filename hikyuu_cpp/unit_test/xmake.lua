@@ -142,6 +142,7 @@ target("small-test")
 
     -- add files
     add_files("./hikyuu/hikyuu/**.cpp");
+    add_files("./hikyuu/test_bench.cpp")
     add_files("./hikyuu/test_main.cpp")
 
     before_run(prepare_run)
