@@ -1,4 +1,4 @@
-name: ubuntu-aarch64-build
+name: ubuntu-aarch64-low-precision-build
 
 on: 
   push:

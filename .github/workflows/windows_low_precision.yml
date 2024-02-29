@@ -1,4 +1,4 @@
-name: win-build
+name: win-low-precision-build
 
 on: 
   push:

@@ -1,4 +1,4 @@
-name: ubuntu-build
+name: ubuntu-low-precision-build
 
 on: 
   push:
