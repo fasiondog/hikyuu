@@ -20,14 +20,15 @@ BoolCondition::BoolCondition(const Indicator& ind) : ConditionBase("CN_Bool"), m
 BoolCondition::~BoolCondition() {}
 
 ConditionPtr BoolCondition::_clone() {
-    return make_shared<BoolCondition>(m_ind);
+    return make_shared<BoolCondition>(m_ind.clone());
 }
 
 void BoolCondition::_calculate() {
     auto ds = m_kdata.getDatetimeList();
     m_ind.setContext(m_kdata);
+    auto const* ind_data = m_ind.data();
     for (size_t i = m_ind.discard(), len = m_ind.size(); i < len; i++) {
-        if (m_ind[i] > 0.) {
+        if (!std::isnan(ind_data[i]) && ind_data[i] > 0.) {
             _addValid(ds[i]);
         }
     }

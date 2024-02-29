@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 
 #include <hikyuu/analysis/combinate.h>
 

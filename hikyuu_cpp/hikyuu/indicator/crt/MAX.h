@@ -28,13 +28,13 @@ inline Indicator MAX(const Indicator& ind1, const Indicator& ind2) {
     return result;
 }
 
-inline Indicator MAX(const Indicator& ind, price_t val) {
+inline Indicator MAX(const Indicator& ind, Indicator::value_t val) {
     Indicator result = IF(ind > val, ind, val);
     result.name("MAX");
     return result;
 }
 
-inline Indicator MAX(price_t val, const Indicator& ind) {
+inline Indicator MAX(Indicator::value_t val, const Indicator& ind) {
     Indicator result = IF(val > ind, val, ind);
     result.name("MAX");
     return result;

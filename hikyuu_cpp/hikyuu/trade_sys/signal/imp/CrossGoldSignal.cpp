@@ -23,8 +23,8 @@ CrossGoldSignal::~CrossGoldSignal() {}
 
 SignalPtr CrossGoldSignal::_clone() {
     CrossGoldSignal* p = new CrossGoldSignal();
-    p->m_fast = m_fast;
-    p->m_slow = m_slow;
+    p->m_fast = m_fast.clone();
+    p->m_slow = m_slow.clone();
     return SignalPtr(p);
 }
 
@@ -35,13 +35,16 @@ void CrossGoldSignal::_calculate() {
 
     size_t discard = fast.discard() > slow.discard() ? fast.discard() : slow.discard();
     size_t total = fast.size();
+    auto const* fastdata = fast.data();
+    auto const* slowdata = slow.data();
+    auto const* ks = m_kdata.data();
     for (size_t i = discard + 1; i < total; ++i) {
-        if (fast[i - 1] < slow[i - 1] && fast[i] > slow[i] && fast[i - 1] < fast[i] &&
-            slow[i - 1] < slow[i]) {
-            _addBuySignal(m_kdata[i].datetime);
-        } else if (fast[i - 1] > slow[i - 1] && fast[i] < slow[i] && fast[i - 1] > fast[i] &&
-                   slow[i - 1] > slow[i]) {
-            _addSellSignal(m_kdata[i].datetime);
+        if (fastdata[i - 1] < slowdata[i - 1] && fastdata[i] > slowdata[i] &&
+            fastdata[i - 1] < fastdata[i] && slowdata[i - 1] < slowdata[i]) {
+            _addBuySignal(ks[i].datetime);
+        } else if (fastdata[i - 1] > slowdata[i - 1] && fastdata[i] < slowdata[i] &&
+                   fastdata[i - 1] > fastdata[i] && slowdata[i - 1] > slowdata[i]) {
+            _addSellSignal(ks[i].datetime);
         }
     }
 }

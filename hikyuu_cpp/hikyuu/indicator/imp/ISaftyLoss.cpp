@@ -43,6 +43,9 @@ void ISaftyLoss::_calculate(const Indicator& data) {
         return;
     }
 
+    auto const* src = data.data();
+    auto* dst = this->data();
+
     size_t start = discard();
     for (size_t i = start; i < total; ++i) {
         price_t result = 0.0;
@@ -50,15 +53,15 @@ void ISaftyLoss::_calculate(const Indicator& data) {
             price_t sum = 0.0;
             size_t num = 0;
             for (size_t k = j + 2 - n1; k <= j; ++k) {
-                price_t pre = data[k - 1];
-                price_t cur = data[k];
+                price_t pre = src[k - 1];
+                price_t cur = src[k];
                 if (pre > cur) {
                     sum += pre - cur;
                     ++num;
                 }
             }
 
-            price_t temp = data[j];
+            price_t temp = src[j];
             if (num != 0) {
                 temp = temp - (p * sum / num);
             }
@@ -68,7 +71,7 @@ void ISaftyLoss::_calculate(const Indicator& data) {
             }
         }
 
-        _set(result, i);
+        dst[i] = result;
     }
 }
 

@@ -13,6 +13,8 @@
 
 namespace hku {
 
+KRecord KData::ms_null_krecord;
+
 HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata) {
     os << "KData{\n  size : " << kdata.size() << "\n  stock: " << kdata.getStock()
        << "\n  query: " << kdata.getQuery() << "\n}";
@@ -26,11 +28,10 @@ string KData::toString() const {
     return os.str();
 }
 
-KData::KData(const Stock& stock, const KQuery& query) {
-    if (!stock.isNull()) {
-        m_imp = KDataImpPtr(new KDataImp(stock, query));
-    }
-}
+KData::KData() : m_imp(make_shared<KDataImp>()) {}
+
+KData::KData(const Stock& stock, const KQuery& query)
+: m_imp(make_shared<KDataImp>(stock, query)) {}
 
 bool KData::operator==(const KData& thr) const {
     return this == &thr || m_imp == thr.m_imp ||

@@ -76,17 +76,17 @@ TEST_CASE("test_MACD") {
     CHECK_EQ(diff.size(), 20);
     CHECK_EQ(dea.size(), 20);
 
-    CHECK_EQ(diff[0], fast[0]);
-    CHECK_EQ(diff[1], fast[1]);
-    CHECK_EQ(diff[19], fast[19]);
+    CHECK_EQ(diff[0], doctest::Approx(fast[0]));
+    CHECK_EQ(diff[1], doctest::Approx(fast[1]));
+    CHECK_EQ(diff[19], doctest::Approx(fast[19]));
 
     CHECK_EQ(dea[0], slow[0]);
     CHECK_LT(std::fabs(dea[1] - slow[1]), 0.0001);
     CHECK_EQ(dea[19], slow[19]);
 
-    CHECK_EQ(bar[0], bmacd[0]);
-    CHECK_EQ(bar[1], bmacd[1]);
-    CHECK_EQ(bar[19], bmacd[19]);
+    CHECK_EQ(bar[0], doctest::Approx(bmacd[0]));
+    CHECK_EQ(bar[1], doctest::Approx(bmacd[1]));
+    CHECK_EQ(bar[19], doctest::Approx(bmacd[19]));
 
     /** @arg n1 = 3 n2 = 2 n3 = 1*/
     macd = MACD(ind, 3, 2, 1);
@@ -104,17 +104,17 @@ TEST_CASE("test_MACD") {
     CHECK_EQ(diff.size(), 20);
     CHECK_EQ(dea.size(), 20);
 
-    CHECK_EQ(diff[0], fast[0]);
-    CHECK_EQ(diff[1], fast[1]);
-    CHECK_EQ(diff[19], fast[19]);
+    CHECK_EQ(diff[0], doctest::Approx(fast[0]));
+    CHECK_EQ(diff[1], doctest::Approx(fast[1]));
+    CHECK_EQ(diff[19], doctest::Approx(fast[19]));
 
-    CHECK_EQ(dea[0], slow[0]);
-    CHECK_EQ(dea[1], slow[1]);
-    CHECK_EQ(dea[19], slow[19]);
+    CHECK_EQ(dea[0], doctest::Approx(slow[0]));
+    CHECK_EQ(dea[1], doctest::Approx(slow[1]));
+    CHECK_EQ(dea[19], doctest::Approx(slow[19]));
 
-    CHECK_EQ(bar[0], bmacd[0]);
-    CHECK_EQ(bar[1], bmacd[1]);
-    CHECK_EQ(bar[19], bmacd[19]);
+    CHECK_EQ(bar[0], doctest::Approx(bmacd[0]));
+    CHECK_EQ(bar[1], doctest::Approx(bmacd[1]));
+    CHECK_EQ(bar[19], doctest::Approx(bmacd[19]));
 
     /** @arg n1 = 3 n2 = 5 n3 = 2*/
     macd = MACD(ind, 3, 5, 2);
@@ -132,17 +132,17 @@ TEST_CASE("test_MACD") {
     CHECK_EQ(diff.size(), 20);
     CHECK_EQ(dea.size(), 20);
 
-    CHECK_EQ(diff[0], fast[0]);
-    CHECK_EQ(diff[1], fast[1]);
-    CHECK_EQ(diff[19], fast[19]);
+    CHECK_EQ(diff[0], doctest::Approx(fast[0]));
+    CHECK_EQ(diff[1], doctest::Approx(fast[1]));
+    CHECK_EQ(diff[19], doctest::Approx(fast[19]));
 
-    CHECK_EQ(dea[0], slow[0]);
-    CHECK_EQ(dea[1], slow[1]);
-    CHECK_EQ(dea[19], slow[19]);
+    CHECK_EQ(dea[0], doctest::Approx(slow[0]));
+    CHECK_EQ(dea[1], doctest::Approx(slow[1]));
+    CHECK_EQ(dea[19], doctest::Approx(slow[19]));
 
-    CHECK_EQ(bar[0], bmacd[0]);
-    CHECK_EQ(bar[1], bmacd[1]);
-    CHECK_EQ(bar[19], bmacd[19]);
+    CHECK_EQ(bar[0], doctest::Approx(bmacd[0]));
+    CHECK_EQ(bar[1], doctest::Approx(bmacd[1]));
+    CHECK_EQ(bar[19], doctest::Approx(bmacd[19]));
 
     /** @arg operator() */
     Indicator expect = MACD(ind, 3, 5, 2);

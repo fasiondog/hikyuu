@@ -31,8 +31,10 @@ void IAtan::_calculate(const Indicator& data) {
         return;
     }
 
+    auto const* src = data.data();
+    auto* dst = this->data();
     for (size_t i = m_discard; i < total; ++i) {
-        _set(std::atan(data[i]), i);
+        dst[i] = std::atan(src[i]);
     }
 }
 

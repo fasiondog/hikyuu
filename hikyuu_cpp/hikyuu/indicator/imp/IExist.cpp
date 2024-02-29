@@ -29,19 +29,21 @@ void IExist::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(total == 0, void());
 
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
     int n = getParam<int>("n");
     if (n == 0) {
-        n = total;
         m_discard = ind.discard();
         for (size_t i = m_discard; i < total; i++) {
             price_t exist = 0.0;
             for (size_t j = m_discard; j <= i; j++) {
-                if (ind[j] != 0.0) {
+                if (src[j] != 0.0) {
                     exist = 1.0;
                     break;
                 }
             }
-            _set(exist, i);
+            dst[i] = exist;
         }
         return;
     }
@@ -55,36 +57,36 @@ void IExist::_calculate(const Indicator& ind) {
     price_t exist = 0;
     size_t pre_pos = m_discard;
     for (size_t i = ind.discard(); i <= m_discard; i++) {
-        if (ind[i] != 0) {
+        if (src[i] != 0) {
             pre_pos = i;
-            exist = 1;
+            exist = 1.0;
         }
     }
 
-    _set(exist, m_discard);
+    dst[m_discard] = exist;
 
     for (size_t i = m_discard + 1; i < total - 1; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
-            exist = ind[j] != 0 ? 1 : 0;
+            exist = src[j] != 0 ? 1 : 0;
         }
-        if (ind[i] != 0) {
+        if (src[i] != 0) {
             pre_pos = i;
             exist = 1;
         }
-        _set(exist, i);
+        dst[i] = exist;
     }
 
     size_t start_pos = total - n;
     exist = 0;
     for (size_t i = start_pos; i < total; i++) {
-        if (ind[i] != 0) {
+        if (src[i] != 0) {
             exist = 1;
             break;
         }
     }
-    _set(exist, total - 1);
+    dst[total - 1] = exist;
 }
 
 void IExist::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {

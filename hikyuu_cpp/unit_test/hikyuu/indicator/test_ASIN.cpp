@@ -43,7 +43,7 @@ TEST_CASE("test_ASIN") {
     result = ASIN(-0.1);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result[0], std::asin(-0.1));
+    CHECK_EQ(result[0], doctest::Approx(std::asin(-0.1)));
 
     result = ASIN(1.01);
     CHECK_EQ(result.size(), 1);

@@ -29,7 +29,7 @@
 # 1. 20171122, Added by fasiondog
 # ===============================================================================
 
-from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, System
+from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, EnvironmentBase, System
 
 import matplotlib
 from matplotlib.pylab import gca as mpl_gca
@@ -42,6 +42,7 @@ from .matplotlib_draw import iplot as mpl_iplot
 from .matplotlib_draw import ibar as mpl_ibar
 from .matplotlib_draw import sgplot as mpl_sgplot
 from .matplotlib_draw import cnplot as mpl_cnplot
+from .matplotlib_draw import evplot as mpl_evplot
 from .matplotlib_draw import sysplot as mpl_sysplot
 from .matplotlib_draw import ax_draw_macd as mpl_ax_draw_macd
 from .matplotlib_draw import ax_draw_macd2 as mpl_ax_draw_macd2
@@ -117,6 +118,8 @@ def use_draw_with_matplotlib():
     Indicator.bar = mpl_ibar
 
     SignalBase.plot = mpl_sgplot
+
+    EnvironmentBase.plot = mpl_evplot
     ConditionBase.plot = mpl_cnplot
 
     System.plot = mpl_sysplot

@@ -29,19 +29,21 @@ void IEvery::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(0 == total, void());
 
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
     int n = getParam<int>("n");
     if (0 == n) {
-        n = total;
         m_discard = ind.discard();
         for (size_t i = m_discard; i < total; i++) {
             price_t every = 1.0;
             for (size_t j = m_discard; j <= i; j++) {
-                if (ind[j] == 0.0) {
+                if (src[j] == 0.0) {
                     every = 0.0;
                     break;
                 }
             }
-            _set(every, i);
+            dst[i] = every;
         }
         return;
     }
@@ -55,36 +57,35 @@ void IEvery::_calculate(const Indicator& ind) {
     price_t every = 1;
     size_t pre_pos = m_discard;
     for (size_t i = ind.discard(); i <= m_discard; i++) {
-        if (ind[i] == 0) {
+        if (src[i] == 0) {
             pre_pos = i;
             every = 0;
         }
     }
 
-    _set(every, m_discard);
-
+    dst[m_discard] = every;
     for (size_t i = m_discard + 1; i < total - 1; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
-            every = ind[j] == 0 ? 0 : 1;
+            every = src[j] == 0 ? 0 : 1;
         }
-        if (ind[i] == 0) {
+        if (src[i] == 0) {
             pre_pos = i;
             every = 0;
         }
-        _set(every, i);
+        dst[i] = every;
     }
 
     size_t start_pos = total - n;
     every = 1;
     for (size_t i = start_pos; i < total; i++) {
-        if (ind[i] == 0) {
+        if (src[i] == 0) {
             every = 0;
             break;
         }
     }
-    _set(every, total - 1);
+    dst[total - 1] = every;
 }
 
 void IEvery::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {

@@ -43,7 +43,7 @@ TEST_CASE("test_COS") {
     result = COS(-11);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result[0], std::cos(-11));
+    CHECK_EQ(result[0], doctest::Approx(std::cos(-11)));
 }
 
 //-----------------------------------------------------------------------------

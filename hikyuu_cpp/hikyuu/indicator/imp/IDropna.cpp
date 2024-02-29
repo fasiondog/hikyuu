@@ -66,9 +66,10 @@ void IDropna::_calculate(const Indicator& ind) {
     _readyBuffer(pos / m_result_num, m_result_num);
 
     for (size_t r = 0; r < m_result_num; r++) {
+        auto* dst = this->data(r);
         int start = r * m_result_num;
         for (size_t i = 0; i < pos; i++) {
-            _set(buf[start + i], i, r);
+            dst[i] = buf[start + i];
         }
     }
 

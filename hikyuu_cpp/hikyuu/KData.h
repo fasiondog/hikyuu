@@ -21,13 +21,16 @@ class HKU_API Indicator;
  */
 class HKU_API KData {
 public:
-    KData() {}
+    KData();
     KData(const KData&);
-    KData(KData&&);
     KData(const Stock& stock, const KQuery& query);
     virtual ~KData() {}
 
     KData& operator=(const KData&);
+
+    // 移动语义对 KData 没有实际用处，而且会导致 KData 可能存在空 imp 的情况
+    // 主要是 boost::any_cast 需要，予以保留，但使用时不要到 KData 执行 std::move
+    KData(KData&&);
     KData& operator=(KData&&);
 
     size_t size() const;
@@ -39,18 +42,18 @@ public:
     DatetimeList getDatetimeList() const;
 
     /** 获取指定位置的KRecord，未作越界检查 */
-    KRecord getKRecord(size_t pos) const;
+    const KRecord& getKRecord(size_t pos) const;
 
     /** 按日期查询KRecord */
-    KRecord getKRecord(Datetime datetime) const;
+    const KRecord& getKRecord(Datetime datetime) const;
 
     /** 同getKRecord @see getKRecord */
-    KRecord operator[](size_t pos) const {
+    const KRecord& operator[](size_t pos) const {
         return getKRecord(pos);
     }
 
     /** 同getKRecord @see getKRecord */
-    KRecord operator[](Datetime datetime) const {
+    const KRecord& operator[](Datetime datetime) const {
         return getKRecord(datetime);
     }
 
@@ -61,10 +64,10 @@ public:
     size_t getPosInStock(Datetime datetime) const;
 
     /** 获取关联的KQuery */
-    KQuery getQuery() const;
+    const KQuery& getQuery() const;
 
     /** 获取关联的Stock，如果没有关联返回Null<Stock> */
-    Stock getStock() const;
+    const Stock& getStock() const;
 
     /** 获取在原始K线记录中对应的起始位置，如果为空返回0 */
     size_t startPos() const;
@@ -97,6 +100,18 @@ public:
 
     /** 成交金额 */
     Indicator amo() const;
+
+public:
+    typedef KRecordList::iterator iterator;
+    typedef KRecordList::const_iterator const_iterator;
+    iterator begin();
+    iterator end();
+    const_iterator cbegin() const;
+    const_iterator cend() const;
+    const KRecord* data() const;
+
+private:
+    static KRecord ms_null_krecord;
 
 private:
     KDataImpPtr m_imp;
@@ -170,57 +185,72 @@ inline KData& KData::operator=(KData&& x) {
 }
 
 inline DatetimeList KData::getDatetimeList() const {
-    DatetimeList result;
-    if (empty()) {
-        return result;
-    }
-    result = getStock().getDatetimeList(KQuery(startPos(), lastPos() + 1, getQuery().kType()));
-    return result;
+    return m_imp->getDatetimeList();
 }
 
-inline KRecord KData::getKRecord(size_t pos) const {
-    return m_imp->getKRecord(pos);  // 如果为空，将抛出异常
+inline const KRecord& KData::getKRecord(size_t pos) const {
+    return m_imp->getKRecord(pos);  // 不会抛出异常
 }
 
-inline KRecord KData::getKRecord(Datetime datetime) const {
+inline const KRecord& KData::getKRecord(Datetime datetime) const {
     size_t pos = getPos(datetime);
-    return pos != Null<size_t>() ? getKRecord(pos) : Null<KRecord>();
+    return pos != Null<size_t>() ? getKRecord(pos) : ms_null_krecord;
 }
 
 inline size_t KData::getPos(const Datetime& datetime) const {
-    return m_imp ? m_imp->getPos(datetime) : Null<size_t>();
+    return m_imp->getPos(datetime);
 }
 
 inline size_t KData::size() const {
-    return m_imp ? m_imp->size() : 0;
+    return m_imp->size();
 }
 
 inline bool KData::empty() const {
-    return m_imp ? m_imp->empty() : true;
+    return m_imp->empty();
 }
 
-inline KQuery KData::getQuery() const {
-    return m_imp ? m_imp->getQuery() : Null<KQuery>();
+inline const KQuery& KData::getQuery() const {
+    return m_imp->getQuery();
 }
 
-inline Stock KData::getStock() const {
-    return m_imp ? m_imp->getStock() : Null<Stock>();
+inline const Stock& KData::getStock() const {
+    return m_imp->getStock();
 }
 
 inline size_t KData::startPos() const {
-    return m_imp ? m_imp->startPos() : 0;
+    return m_imp->startPos();
 }
 
 inline size_t KData::endPos() const {
-    return m_imp ? m_imp->endPos() : 0;
+    return m_imp->endPos();
 }
 
 inline size_t KData::lastPos() const {
-    return m_imp ? m_imp->lastPos() : 0;
+    return m_imp->lastPos();
 }
 
 inline bool KData::operator!=(const KData& other) const {
     return !(*this == other);
+}
+
+inline KData::iterator KData::begin() {
+    return m_imp->begin();
+}
+
+inline KData::iterator KData::end() {
+    return m_imp->end();
+}
+
+inline KData::const_iterator KData::cbegin() const {
+    return m_imp->cbegin();
+}
+
+inline KData::const_iterator KData::cend() const {
+    return m_imp->cend();
+}
+
+inline const KRecord* KData::data() const {
+    return m_imp->data();
 }
 
 } /* namespace hku */

@@ -60,7 +60,7 @@ public:
         if (pos != std::string::npos) {
             m_orderby_inner = fmt::format("{}, id ASC", m_where.substr(pos));
             m_orderby_outer = m_orderby_inner;
-            m_where = m_where.substr(0, pos);
+            m_where = m_where.erase(pos, std::string::npos);
         } else {
             m_orderby_inner = "ORDER BY id";
         }

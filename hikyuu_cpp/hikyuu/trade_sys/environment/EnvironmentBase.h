@@ -10,6 +10,7 @@
 #define ENVIRONMENT_H_
 
 #include <set>
+#include <shared_mutex>
 #include "../../KQuery.h"
 #include "../../utilities/Parameter.h"
 
@@ -109,6 +110,7 @@ protected:
     string m_name;
     KQuery m_query;
     std::set<Datetime> m_valid;
+    std::shared_mutex m_mutex;
 
 //============================================
 // 序列化支持

@@ -17,7 +17,7 @@ namespace hku {
 class SingleSignal : public SignalBase {
 public:
     SingleSignal();
-    SingleSignal(const Indicator& ind);
+    explicit SingleSignal(const Indicator& ind);
     virtual ~SingleSignal();
 
     virtual SignalPtr _clone() override;

@@ -30,8 +30,10 @@ void IDiff::_calculate(const Indicator& data) {
         return;
     }
 
+    auto const* src = data.data();
+    auto* dst = this->data();
     for (size_t i = discard(); i < total; ++i) {
-        _set(data[i] - data[i - 1], i);
+        dst[i] = src[i] - src[i - 1];
     }
 }
 

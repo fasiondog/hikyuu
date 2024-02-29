@@ -55,34 +55,37 @@ void IHighLine::_calculate(const Indicator& ind) {
     size_t startPos = m_discard;
     size_t first_end = startPos + n >= total ? total : startPos + n;
 
-    price_t max = ind[startPos];
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
+    price_t max = src[startPos];
     size_t pre_pos = startPos;
     for (size_t i = startPos; i < first_end; i++) {
-        if (ind[i] >= max) {
-            max = ind[i];
+        if (src[i] >= max) {
+            max = src[i];
             pre_pos = i;
         }
-        _set(max, i);
+        dst[i] = max;
     }
 
     for (size_t i = first_end; i < total; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
-            max = ind[j];
+            max = src[j];
             for (size_t k = pre_pos + 1; k <= i; k++) {
-                if (ind[k] >= max) {
-                    max = ind[k];
+                if (src[k] >= max) {
+                    max = src[k];
                     pre_pos = k;
                 }
             }
         } else {
-            if (ind[i] >= max) {
-                max = ind[i];
+            if (src[i] >= max) {
+                max = src[i];
                 pre_pos = i;
             }
         }
-        _set(max, i);
+        dst[i] = max;
     }
 }
 

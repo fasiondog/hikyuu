@@ -18,14 +18,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ABS();
-Indicator ABS(price_t);
+Indicator ABS(Indicator::value_t);
 Indicator ABS(const Indicator& ind);
 
 inline Indicator ABS(const Indicator& ind) {
     return ABS()(ind);
 }
 
-inline Indicator ABS(price_t val) {
+inline Indicator ABS(Indicator::value_t val) {
     return ABS(CVAL(val));
 }
 

@@ -21,7 +21,7 @@ bool INot::check() {
     return true;
 }
 
-void INot::_calculate(const Indicator& data) {
+void INot::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();
     if (m_discard >= total) {
@@ -29,12 +29,10 @@ void INot::_calculate(const Indicator& data) {
         return;
     }
 
+    auto const *src = data.data();
+    auto *dst = this->data();
     for (size_t i = m_discard; i < total; ++i) {
-        if (data[i] == 0.0) {
-            _set(1.0, i);
-        } else {
-            _set(0.0, i);
-        }
+        dst[i] = (src[i] <= 0.0) ? 1.0 : 0.0;
     }
 }
 

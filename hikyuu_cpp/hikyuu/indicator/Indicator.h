@@ -41,6 +41,9 @@ class HKU_API Indicator {
     HKU_API friend std::ostream& operator<<(std::ostream&, const Indicator&);
 
 public:
+    typedef IndicatorImp::value_t value_t;
+
+public:
     Indicator() {}
     Indicator(const IndicatorImpPtr& imp);
     Indicator(const Indicator& ind);
@@ -95,17 +98,17 @@ public:
     size_t size() const;
 
     /** 只获取第一个结果集中相应位置输出，等同于get(pos, 0) */
-    price_t operator[](size_t pos) const;
+    value_t operator[](size_t pos) const;
 
     /** 只获取第一个结果集中相应位置输出，等同于getByDate(date, 0) */
-    price_t operator[](Datetime) const;
+    value_t operator[](Datetime) const;
 
     /**
      * 获取第num个结果集中指定位置的数据
      * @param pos 结果集中的位置
      * @param num 第几个结果集
      */
-    price_t get(size_t pos, size_t num = 0) const;
+    value_t get(size_t pos, size_t num = 0) const;
 
     /**
      * 获取指定位置的日期
@@ -118,7 +121,7 @@ public:
      * @param date 指定日期
      * @param num 第几个结果集
      */
-    price_t getByDate(Datetime date, size_t num = 0) const;
+    value_t getByDate(Datetime date, size_t num = 0) const;
 
     /** 获取指定日期相应的索引位置 */
     size_t getPos(Datetime) const;
@@ -171,6 +174,14 @@ public:
 
     IndicatorImpPtr getImp() const {
         return m_imp;
+    }
+
+    value_t* data(size_t result_num = 0) {
+        return m_imp ? m_imp->data(result_num) : nullptr;
+    }
+
+    value_t const* data(size_t result_num = 0) const {
+        return m_imp ? m_imp->data(result_num) : nullptr;
     }
 
 protected:
@@ -234,15 +245,15 @@ inline DatetimeList Indicator::getDatetimeList() const {
     return m_imp ? m_imp->getDatetimeList() : DatetimeList();
 }
 
-inline price_t Indicator::getByDate(Datetime date, size_t num) const {
-    return m_imp ? m_imp->getByDate(date, num) : Null<price_t>();
+inline Indicator::value_t Indicator::getByDate(Datetime date, size_t num) const {
+    return m_imp ? m_imp->getByDate(date, num) : Null<Indicator::value_t>();
 }
 
-inline price_t Indicator::operator[](size_t pos) const {
+inline Indicator::value_t Indicator::operator[](size_t pos) const {
     return get(pos, 0);
 }
 
-inline price_t Indicator::get(size_t pos, size_t num) const {
+inline Indicator::value_t Indicator::get(size_t pos, size_t num) const {
     return m_imp->get(pos, num);
 }
 
@@ -254,7 +265,7 @@ inline size_t Indicator::getPos(Datetime date) const {
     return m_imp ? m_imp->getPos(date) : Null<size_t>();
 }
 
-inline price_t Indicator::operator[](Datetime date) const {
+inline Indicator::value_t Indicator::operator[](Datetime date) const {
     return getByDate(date);
 }
 
@@ -303,44 +314,44 @@ HKU_API Indicator operator<=(const Indicator&, const Indicator&);
 HKU_API Indicator operator&(const Indicator&, const Indicator&);
 HKU_API Indicator operator|(const Indicator&, const Indicator&);
 
-HKU_API Indicator operator+(const Indicator&, price_t);
-HKU_API Indicator operator+(price_t, const Indicator&);
+HKU_API Indicator operator+(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator+(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator-(const Indicator&, price_t);
-HKU_API Indicator operator-(price_t, const Indicator&);
+HKU_API Indicator operator-(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator-(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator*(const Indicator&, price_t);
-HKU_API Indicator operator*(price_t, const Indicator&);
+HKU_API Indicator operator*(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator*(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator/(const Indicator&, price_t);
-HKU_API Indicator operator/(price_t, const Indicator&);
+HKU_API Indicator operator/(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator/(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator%(const Indicator&, price_t);
-HKU_API Indicator operator%(price_t, const Indicator&);
+HKU_API Indicator operator%(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator%(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator==(const Indicator&, price_t);
-HKU_API Indicator operator==(price_t, const Indicator&);
+HKU_API Indicator operator==(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator==(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator!=(const Indicator&, price_t);
-HKU_API Indicator operator!=(price_t, const Indicator&);
+HKU_API Indicator operator!=(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator!=(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator>(const Indicator&, price_t);
-HKU_API Indicator operator>(price_t, const Indicator&);
+HKU_API Indicator operator>(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator>(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator<(const Indicator&, price_t);
-HKU_API Indicator operator<(price_t, const Indicator&);
+HKU_API Indicator operator<(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator<(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator>=(const Indicator&, price_t);
-HKU_API Indicator operator>=(price_t, const Indicator&);
+HKU_API Indicator operator>=(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator>=(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator<=(const Indicator&, price_t);
-HKU_API Indicator operator<=(price_t, const Indicator&);
+HKU_API Indicator operator<=(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator<=(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator&(const Indicator&, price_t);
-HKU_API Indicator operator&(price_t, const Indicator&);
+HKU_API Indicator operator&(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator&(Indicator::value_t, const Indicator&);
 
-HKU_API Indicator operator|(const Indicator&, price_t);
-HKU_API Indicator operator|(price_t, const Indicator&);
+HKU_API Indicator operator|(const Indicator&, Indicator::value_t);
+HKU_API Indicator operator|(Indicator::value_t, const Indicator&);
 
 /**
  * 将ind1和ind2的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2)
@@ -364,9 +375,9 @@ Indicator HKU_API WEAVE(const Indicator& ind1, const Indicator& ind2);
  * @ingroup Indicator
  */
 Indicator HKU_API IF(const Indicator& x, const Indicator& a, const Indicator& b);
-Indicator HKU_API IF(const Indicator& x, price_t a, const Indicator& b);
-Indicator HKU_API IF(const Indicator& x, const Indicator& a, price_t b);
-Indicator HKU_API IF(const Indicator& x, price_t a, price_t b);
+Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, const Indicator& b);
+Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t b);
+Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b);
 
 /**
  * 计算样本相关系数与协方差。返回的结果集中，第一个为相关系数，第二个为协方差

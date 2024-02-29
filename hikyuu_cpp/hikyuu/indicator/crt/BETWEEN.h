@@ -23,13 +23,13 @@ namespace hku {
  * </pre>
  */
 Indicator BETWEEN(const Indicator&, const Indicator&, const Indicator&);
-Indicator BETWEEN(const Indicator&, const Indicator&, price_t);
-Indicator BETWEEN(const Indicator&, price_t, const Indicator&);
-Indicator BETWEEN(const Indicator&, price_t, price_t);
-Indicator BETWEEN(price_t, const Indicator&, const Indicator&);
-Indicator BETWEEN(price_t, const Indicator&, price_t);
-Indicator BETWEEN(price_t, price_t, const Indicator&);
-Indicator BETWEEN(price_t, price_t, price_t);
+Indicator BETWEEN(const Indicator&, const Indicator&, Indicator::value_t);
+Indicator BETWEEN(const Indicator&, Indicator::value_t, const Indicator&);
+Indicator BETWEEN(const Indicator&, Indicator::value_t, Indicator::value_t);
+Indicator BETWEEN(Indicator::value_t, const Indicator&, const Indicator&);
+Indicator BETWEEN(Indicator::value_t, const Indicator&, Indicator::value_t);
+Indicator BETWEEN(Indicator::value_t, Indicator::value_t, const Indicator&);
+Indicator BETWEEN(Indicator::value_t, Indicator::value_t, Indicator::value_t);
 
 inline Indicator BETWEEN(const Indicator& a, const Indicator& b, const Indicator& c) {
     Indicator result = IF(((b > c) & (a < b) & (a > c)) | ((b < c) & (a > b) & (a < c)), 1, 0);
@@ -37,43 +37,43 @@ inline Indicator BETWEEN(const Indicator& a, const Indicator& b, const Indicator
     return result;
 }
 
-inline Indicator BETWEEN(const Indicator& a, const Indicator& b, price_t c) {
+inline Indicator BETWEEN(const Indicator& a, const Indicator& b, Indicator::value_t c) {
     Indicator result = IF(((b > c) & (a < b) & (a > c)) | ((b < c) & (a > b) & (a < c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
-inline Indicator BETWEEN(const Indicator& a, price_t b, const Indicator& c) {
+inline Indicator BETWEEN(const Indicator& a, Indicator::value_t b, const Indicator& c) {
     Indicator result = IF(((b > c) & (a < b) & (a > c)) | ((b < c) & (a > b) & (a < c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
-inline Indicator BETWEEN(const Indicator& a, price_t b, price_t c) {
+inline Indicator BETWEEN(const Indicator& a, Indicator::value_t b, Indicator::value_t c) {
     Indicator result = IF(((b > c) & (a < b) & (a > c)) | ((b < c) & (a > b) & (a < c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
-inline Indicator BETWEEN(price_t a, const Indicator& b, const Indicator& c) {
+inline Indicator BETWEEN(Indicator::value_t a, const Indicator& b, const Indicator& c) {
     Indicator result = IF(((b > c) & (a < b) & (a > c)) | ((b < c) & (a > b) & (a < c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
-inline Indicator BETWEEN(price_t a, const Indicator& b, price_t c) {
+inline Indicator BETWEEN(Indicator::value_t a, const Indicator& b, Indicator::value_t c) {
     Indicator result = IF(((b > c) & (a < b) & (a > c)) | ((b < c) & (a > b) & (a < c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
-inline Indicator BETWEEN(price_t a, price_t b, const Indicator& c) {
+inline Indicator BETWEEN(Indicator::value_t a, Indicator::value_t b, const Indicator& c) {
     Indicator result = IF(((b > c) & (a < b) & (a > c)) | ((b < c) & (a > b) & (a < c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
-inline Indicator BETWEEN(price_t a, price_t b, price_t c) {
+inline Indicator BETWEEN(Indicator::value_t a, Indicator::value_t b, Indicator::value_t c) {
     Indicator result =
       CVAL((((b > c) && (a < b) && (a > c)) || ((b < c) && (a > b) && (a < c))) ? 1 : 0);
     result.name("BETWEEN");

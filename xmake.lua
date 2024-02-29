@@ -58,6 +58,14 @@ option("stacktrace")
     add_defines("HKU_ENABLE_STACK_TRACE")
 option_end()
 
+option("spend_time")
+    set_default(true)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable spend time.")
+    add_defines("HKU_CLOSE_SPEND_TIME=0")
+option_end()
+
 option("feedback")
     set_default(true)
     set_showmenu(true)
@@ -65,6 +73,12 @@ option("feedback")
     set_description("Enable send feedback.")
 option_end()
 
+option("low_precision")
+    set_default(false)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable send feedback.")
+option_end()
 
 -- project
 set_project("hikyuu")
@@ -73,7 +87,7 @@ add_rules("mode.debug", "mode.release")
 if not is_plat("windows") then add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan") end
 
 -- version
-set_version("1.3.3", {build = "%Y%m%d%H%M"})
+set_version("1.3.4", {build = "%Y%m%d%H%M"})
 set_configvar("LOG_ACTIVE_LEVEL", 0) -- 激活的日志级别
 -- if is_mode("debug") then
 --    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别
@@ -100,6 +114,8 @@ set_configvar("HKU_ENABLE_MYSQL_KDATA", get_config("mysql") and 1 or 0)
 set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
 set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
+set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
+
 set_warnings("all")
 
 -- set language: C99, c++ standard
@@ -117,6 +133,7 @@ local boost_version = "1.84.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "10.2.1"
 local flatbuffers_version = "23.5.26"
+local sqlite_version = "3.43.0+200"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
     mysql_version = "8.0.21" 
@@ -168,7 +185,7 @@ add_requires("boost " .. boost_version, {
 
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
 add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
-add_requires("sqlite3", {system = false, configs = {shared = true, cxflags = "-fPIC"}})
+add_requires("sqlite3 " .. sqlite_version, {system = false, configs = {shared = true, cxflags = "-fPIC"}})
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false})
 add_requires("nng", {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
@@ -212,12 +229,12 @@ if not is_plat("windows") then
   add_shflags("-pthread")
   add_ldflags("-pthread")
 end
---
--- add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "avx")
-if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
-  -- fedora或者ubuntu，并且不是交叉编译
-  add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")
-end
+
+-- if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
+--   -- fedora或者ubuntu，并且不是交叉编译
+--   add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")
+-- --   add_defines("HKU_ENABLE_SSE2", "HKU_ENABLE_SSE3", "HKU_ENABLE_SSE41", "HKU_ENABLE_AVX", "HKU_ENABLE_AVX2")
+-- end
 
 includes("./hikyuu_cpp/hikyuu")
 includes("./hikyuu_pywrap")

@@ -45,15 +45,16 @@ void ITimeLine::_calculate(const Indicator& data) {
     HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
+    auto* dst = this->data();
 
     m_discard = 0;
     if (getParam<string>("part") == "price") {
         for (size_t i = m_discard; i < total; i++) {
-            _set(time_line[i].price, i);
+            dst[i] = time_line[i].price;
         }
     } else {
         for (size_t i = m_discard; i < total; i++) {
-            _set(time_line[i].vol, i);
+            dst[i] = time_line[i].vol;
         }
     }
 }

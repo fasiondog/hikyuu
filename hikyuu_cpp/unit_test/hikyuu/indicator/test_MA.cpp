@@ -4,7 +4,7 @@
  *  Created on: 2013-2-12
  *      Author: fasiondog
  */
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
@@ -56,16 +56,16 @@ TEST_CASE("test_MA") {
     CHECK_EQ(ma.empty(), false);
     CHECK_EQ(ma.size(), kdata.size());
     CHECK_EQ(ma.discard(), 0);
-    CHECK_LT(std::fabs(ma[0] - 2415.197), 0.00001);
-    CHECK_LT(std::fabs(ma[1] - 2397.1715), 0.00001);
-    CHECK_LT(std::fabs(ma[2] - 2395.890), 0.00001);
-    CHECK_LT(std::fabs(ma[3] - 2392.89075), 0.00001);
-    CHECK_LT(std::fabs(ma[4] - 2394.1114), 0.00001);
-    CHECK_LT(std::fabs(ma[5] - 2396.14767), 0.00001);
-    CHECK_LT(std::fabs(ma[6] - 2395.62443), 0.00001);
-    CHECK_LT(std::fabs(ma[7] - 2393.03375), 0.00001);
-    CHECK_LT(std::fabs(ma[8] - 2389.709), 0.00001);
-    CHECK_LT(std::fabs(ma[9] - 2383.4041), 0.00001);
+    CHECK_EQ(ma[0], doctest::Approx(2415.197));
+    CHECK_EQ(ma[1], doctest::Approx(2397.1715));
+    CHECK_EQ(ma[2], doctest::Approx(2395.890));
+    CHECK_EQ(ma[3], doctest::Approx(2392.89075));
+    CHECK_EQ(ma[4], doctest::Approx(2394.1114));
+    CHECK_EQ(ma[5], doctest::Approx(2396.14767));
+    CHECK_EQ(ma[6], doctest::Approx(2395.62443));
+    CHECK_EQ(ma[7], doctest::Approx(2393.03375));
+    CHECK_EQ(ma[8], doctest::Approx(2389.709));
+    CHECK_EQ(ma[9], doctest::Approx(2383.4041));
 
     /** @arg n = 10 且数据大小刚好为9 时, 正常关联数据 */
     kdata = stock.getKData(KQuery(-9));
@@ -74,12 +74,12 @@ TEST_CASE("test_MA") {
     CHECK_EQ(ma.empty(), false);
     CHECK_EQ(ma.size(), kdata.size());
     CHECK_EQ(ma.discard(), 0);
-    CHECK_LT(std::fabs(ma[0] - 2379.146), 0.00001);
-    CHECK_LT(std::fabs(ma[1] - 2386.2365), 0.00001);
-    CHECK_LT(std::fabs(ma[2] - 2385.45533), 0.00001);
-    CHECK_LT(std::fabs(ma[3] - 2388.84), 0.00001);
-    CHECK_LT(std::fabs(ma[7] - 2386.523), 0.00001);
-    CHECK_LT(std::fabs(ma[8] - 2379.87156), 0.00001);
+    CHECK_EQ(ma[0], doctest::Approx(2379.146));
+    CHECK_EQ(ma[1], doctest::Approx(2386.2365));
+    CHECK_EQ(ma[2], doctest::Approx(2385.45533));
+    CHECK_EQ(ma[3], doctest::Approx(2388.84));
+    CHECK_EQ(ma[7], doctest::Approx(2386.523));
+    CHECK_EQ(ma[8], doctest::Approx(2379.87156));
 
     /** @arg n = 10 且数据大小为11 时, 正常关联数据 */
     kdata = stock.getKData(KQuery(-11));
@@ -88,10 +88,10 @@ TEST_CASE("test_MA") {
     CHECK_EQ(ma.empty(), false);
     CHECK_EQ(ma.size(), kdata.size());
     CHECK_EQ(ma.discard(), 0);
-    CHECK_LT(std::fabs(ma[0] - 2400.984), 0.00001);
-    CHECK_LT(std::fabs(ma[8] - 2393.91711), 0.00001);
-    CHECK_LT(std::fabs(ma[9] - 2390.8365), 0.00001);
-    CHECK_LT(std::fabs(ma[10] - 2383.4041), 0.00001);
+    CHECK_EQ(ma[0], doctest::Approx(2400.984));
+    CHECK_EQ(ma[8], doctest::Approx(2393.91711));
+    CHECK_EQ(ma[9], doctest::Approx(2390.8365));
+    CHECK_EQ(ma[10], doctest::Approx(2383.4041));
 
     /** @arg n = 1 */
     kdata = stock.getKData(KQuery(-11));
@@ -174,6 +174,27 @@ TEST_CASE("test_MA_dyn") {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 }
+
+//-----------------------------------------------------------------------------
+// benchmark
+//-----------------------------------------------------------------------------
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_MA_benchmark") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    Indicator c = kdata.close();
+    int cycle = 1000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(test_MA_benchmark, cycle, fmt::format("data len: {}", c.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator ind = MA();
+            Indicator result = ind(c);
+        }
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // test export

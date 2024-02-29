@@ -52,35 +52,38 @@ void ILowLineBars::_calculate(const Indicator& ind) {
         n = total;
     }
 
-    price_t min = ind[m_discard];
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
+    price_t min = src[m_discard];
     size_t pre_pos = m_discard;
     size_t start_pos = m_discard + n < total ? m_discard + n : total;
     for (size_t i = m_discard; i < start_pos; i++) {
-        if (ind[i] <= min) {
-            min = ind[i];
+        if (src[i] <= min) {
+            min = src[i];
             pre_pos = i;
         }
-        _set(i - pre_pos, i);
+        dst[i] = i - pre_pos;
     }
 
     for (size_t i = start_pos; i < total; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
-            min = ind[j];
+            min = src[j];
             for (size_t k = pre_pos + 1; k <= i; k++) {
-                if (ind[k] <= min) {
-                    min = ind[k];
+                if (src[k] <= min) {
+                    min = src[k];
                     pre_pos = k;
                 }
             }
         } else {
-            if (ind[i] <= min) {
-                min = ind[i];
+            if (src[i] <= min) {
+                min = src[i];
                 pre_pos = i;
             }
         }
-        _set(i - pre_pos, i);
+        dst[i] = i - pre_pos;
     }
 }
 

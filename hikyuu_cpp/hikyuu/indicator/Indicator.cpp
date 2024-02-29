@@ -173,107 +173,107 @@ HKU_API Indicator operator|(const Indicator& ind1, const Indicator& ind2) {
     return p->calculate();
 }
 
-HKU_API Indicator operator+(const Indicator& ind, price_t val) {
+HKU_API Indicator operator+(const Indicator& ind, Indicator::value_t val) {
     return ind + CVAL(ind, val);
 }
 
-HKU_API Indicator operator+(price_t val, const Indicator& ind) {
+HKU_API Indicator operator+(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) + ind;
 }
 
-HKU_API Indicator operator-(const Indicator& ind, price_t val) {
+HKU_API Indicator operator-(const Indicator& ind, Indicator::value_t val) {
     return ind - CVAL(ind, val);
 }
 
-HKU_API Indicator operator-(price_t val, const Indicator& ind) {
+HKU_API Indicator operator-(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) - ind;
 }
 
-HKU_API Indicator operator*(const Indicator& ind, price_t val) {
+HKU_API Indicator operator*(const Indicator& ind, Indicator::value_t val) {
     return ind * CVAL(ind, val);
 }
 
-HKU_API Indicator operator*(price_t val, const Indicator& ind) {
+HKU_API Indicator operator*(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) * ind;
 }
 
-HKU_API Indicator operator/(const Indicator& ind, price_t val) {
+HKU_API Indicator operator/(const Indicator& ind, Indicator::value_t val) {
     return ind / CVAL(ind, val);
 }
 
-HKU_API Indicator operator/(price_t val, const Indicator& ind) {
+HKU_API Indicator operator/(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) / ind;
 }
 
-HKU_API Indicator operator%(const Indicator& ind, price_t val) {
+HKU_API Indicator operator%(const Indicator& ind, Indicator::value_t val) {
     return ind % CVAL(ind, val);
 }
 
-HKU_API Indicator operator%(price_t val, const Indicator& ind) {
+HKU_API Indicator operator%(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) % ind;
 }
 
-HKU_API Indicator operator==(const Indicator& ind, price_t val) {
+HKU_API Indicator operator==(const Indicator& ind, Indicator::value_t val) {
     return ind == CVAL(ind, val);
 }
 
-HKU_API Indicator operator==(price_t val, const Indicator& ind) {
+HKU_API Indicator operator==(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) == ind;
 }
 
-HKU_API Indicator operator!=(const Indicator& ind, price_t val) {
+HKU_API Indicator operator!=(const Indicator& ind, Indicator::value_t val) {
     return ind != CVAL(ind, val);
 }
 
-HKU_API Indicator operator!=(price_t val, const Indicator& ind) {
+HKU_API Indicator operator!=(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) != ind;
 }
 
-HKU_API Indicator operator>(const Indicator& ind, price_t val) {
+HKU_API Indicator operator>(const Indicator& ind, Indicator::value_t val) {
     return ind > CVAL(ind, val);
 }
 
-HKU_API Indicator operator>(price_t val, const Indicator& ind) {
+HKU_API Indicator operator>(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) > ind;
 }
 
-HKU_API Indicator operator<(const Indicator& ind, price_t val) {
+HKU_API Indicator operator<(const Indicator& ind, Indicator::value_t val) {
     return ind < CVAL(ind, val);
 }
 
-HKU_API Indicator operator<(price_t val, const Indicator& ind) {
+HKU_API Indicator operator<(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) < ind;
 }
 
-HKU_API Indicator operator>=(const Indicator& ind, price_t val) {
+HKU_API Indicator operator>=(const Indicator& ind, Indicator::value_t val) {
     return ind >= CVAL(ind, val);
 }
 
-HKU_API Indicator operator>=(price_t val, const Indicator& ind) {
+HKU_API Indicator operator>=(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) >= ind;
 }
 
-HKU_API Indicator operator<=(const Indicator& ind, price_t val) {
+HKU_API Indicator operator<=(const Indicator& ind, Indicator::value_t val) {
     return ind <= CVAL(ind, val);
 }
 
-HKU_API Indicator operator<=(price_t val, const Indicator& ind) {
+HKU_API Indicator operator<=(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) <= ind;
 }
 
-HKU_API Indicator operator&(const Indicator& ind, price_t val) {
+HKU_API Indicator operator&(const Indicator& ind, Indicator::value_t val) {
     return ind & CVAL(ind, val);
 }
 
-HKU_API Indicator operator&(price_t val, const Indicator& ind) {
+HKU_API Indicator operator&(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) & ind;
 }
 
-HKU_API Indicator operator|(const Indicator& ind, price_t val) {
+HKU_API Indicator operator|(const Indicator& ind, Indicator::value_t val) {
     return ind | CVAL(ind, val);
 }
 
-HKU_API Indicator operator|(price_t val, const Indicator& ind) {
+HKU_API Indicator operator|(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) | ind;
 }
 
@@ -293,15 +293,15 @@ Indicator HKU_API IF(const Indicator& ind1, const Indicator& ind2, const Indicat
     return p->calculate();
 }
 
-Indicator HKU_API IF(const Indicator& x, price_t a, const Indicator& b) {
+Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, const Indicator& b) {
     return IF(x, CVAL(b, a), b);
 }
 
-Indicator HKU_API IF(const Indicator& x, const Indicator& a, price_t b) {
+Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t b) {
     return IF(x, a, CVAL(a, b));
 }
 
-Indicator HKU_API IF(const Indicator& x, price_t a, price_t b) {
+Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b) {
     return IF(x, CVAL(x, a), CVAL(x, b));
 }
 

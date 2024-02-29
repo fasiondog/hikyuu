@@ -24,23 +24,23 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator MOD(const Indicator& ind1, const Indicator& ind2);
-Indicator MOD(const Indicator& ind1, price_t ind2);
-Indicator MOD(price_t ind1, const Indicator& ind2);
-Indicator MOD(price_t ind1, price_t ind2);
+Indicator MOD(const Indicator& ind1, Indicator::value_t ind2);
+Indicator MOD(Indicator::value_t ind1, const Indicator& ind2);
+Indicator MOD(Indicator::value_t ind1, Indicator::value_t ind2);
 
 inline Indicator MOD(const Indicator& ind1, const Indicator& ind2) {
     return (ind1 % ind2);
 }
 
-inline Indicator MOD(const Indicator& ind1, price_t ind2) {
+inline Indicator MOD(const Indicator& ind1, Indicator::value_t ind2) {
     return ind1 % CVAL(ind1, ind2);
 }
 
-inline Indicator MOD(price_t ind1, const Indicator& ind2) {
+inline Indicator MOD(Indicator::value_t ind1, const Indicator& ind2) {
     return CVAL(ind2, ind1) % ind2;
 }
 
-inline Indicator MOD(price_t ind1, price_t ind2) {
+inline Indicator MOD(Indicator::value_t ind1, Indicator::value_t ind2) {
     return CVAL(ind1) % CVAL(ind2);
 }
 

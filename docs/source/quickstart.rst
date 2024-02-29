@@ -176,4 +176,10 @@ matplotlib 默认每次绘图后，都要调用 plt.show() 显示图形，这在
 
     #interactive  : False
     interactive  : True
+
+
+Ubuntu wayland 平台上 QT 不可用
+-----------------------------------
+
+使用 wayland 的 ubuntu, 可能需要设置 QT_QPA_PLATFORM=wayland 环境变量，通常可以在 .bashrc 中 添加 export QT_QPA_PLATFORM=wayland 进行设置
         

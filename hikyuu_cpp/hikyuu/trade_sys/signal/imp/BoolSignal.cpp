@@ -23,8 +23,8 @@ BoolSignal::~BoolSignal() {}
 
 SignalPtr BoolSignal::_clone() {
     BoolSignal* p = new BoolSignal();
-    p->m_bool_buy = m_bool_buy;
-    p->m_bool_sell = m_bool_sell;
+    p->m_bool_buy = m_bool_buy.clone();
+    p->m_bool_sell = m_bool_sell.clone();
     return SignalPtr(p);
 }
 
@@ -35,11 +35,14 @@ void BoolSignal::_calculate() {
 
     size_t discard = buy.discard() > sell.discard() ? buy.discard() : sell.discard();
     size_t total = buy.size();
+    auto const* buydata = buy.data();
+    auto const* selldata = sell.data();
+    auto const* ks = m_kdata.data();
     for (size_t i = discard; i < total; ++i) {
-        if (buy[i] > 0.0)
-            _addBuySignal(m_kdata[i].datetime);
-        if (sell[i] > 0.0)
-            _addSellSignal(m_kdata[i].datetime);
+        if (buydata[i] > 0.0)
+            _addBuySignal(ks[i].datetime);
+        if (selldata[i] > 0.0)
+            _addSellSignal(ks[i].datetime);
     }
 }
 

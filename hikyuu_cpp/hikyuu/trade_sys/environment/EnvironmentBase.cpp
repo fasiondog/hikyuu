@@ -30,6 +30,7 @@ EnvironmentBase::EnvironmentBase(const string& name) : m_name(name) {}
 EnvironmentBase::~EnvironmentBase() {}
 
 void EnvironmentBase::reset() {
+    std::unique_lock<std::shared_mutex> lock(m_mutex);
     m_query = Null<KQuery>();
     m_valid.clear();
     _reset();
@@ -57,6 +58,7 @@ EnvironmentPtr EnvironmentBase::clone() {
 }
 
 void EnvironmentBase::setQuery(const KQuery& query) {
+    std::unique_lock<std::shared_mutex> lock(m_mutex);
     if (m_query != query) {
         m_valid.clear();
         _reset();
@@ -70,6 +72,7 @@ void EnvironmentBase::_addValid(const Datetime& datetime) {
 }
 
 bool EnvironmentBase::isValid(const Datetime& datetime) {
+    std::shared_lock<std::shared_mutex> lock(m_mutex);
     return m_valid.count(datetime) != 0;
 }
 

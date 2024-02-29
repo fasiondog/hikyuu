@@ -34,37 +34,38 @@ void IBackset::_calculate(const Indicator& ind) {
         return;
     }
 
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
     size_t i = total;
     size_t end_i = m_discard + n;
     if (end_i > total) {
         end_i = total;
     }
     while (i-- > end_i) {
-        if (ind[i] != 0.0) {
-            _set(1.0, i);
+        if (src[i] != 0.0) {
+            dst[i] = 1.0;
             size_t j = i;
             size_t end_j = i - n + 1;
             while (j-- > end_j) {
-                if (get(j) != 1.0) {
-                    _set(1.0, j);
-                }
+                dst[j] = 1.0;
             }
         } else {
-            if (get(i) != 1.0) {
-                _set(0.0, i);
+            if (dst[i] != 1.0) {
+                dst[i] = 0.0;
             }
         }
     }
 
     // i = end_i - 1;
     while (true) {
-        if (ind[i] != 0.0) {
+        if (src[i] != 0.0) {
             for (size_t j = m_discard; j <= i; j++) {
-                _set(1.0, j);
+                dst[j] = 1.0;
             }
             break;
         } else {
-            _set(0.0, i);
+            dst[i] = 0.0;
             if (i == m_discard) {
                 break;
             }

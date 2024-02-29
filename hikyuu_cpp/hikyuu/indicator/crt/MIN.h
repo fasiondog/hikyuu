@@ -28,13 +28,13 @@ inline Indicator MIN(const Indicator& ind1, const Indicator& ind2) {
     return result;
 }
 
-inline Indicator MIN(const Indicator& ind, price_t val) {
+inline Indicator MIN(const Indicator& ind, Indicator::value_t val) {
     Indicator result = IF(ind < val, ind, val);
     result.name("MIN");
     return result;
 }
 
-inline Indicator MIN(price_t val, const Indicator& ind) {
+inline Indicator MIN(Indicator::value_t val, const Indicator& ind) {
     Indicator result = IF(val < ind, val, ind);
     result.name("MIN");
     return result;

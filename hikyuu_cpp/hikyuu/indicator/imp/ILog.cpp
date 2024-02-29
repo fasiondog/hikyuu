@@ -21,7 +21,7 @@ bool ILog::check() {
     return true;
 }
 
-void ILog::_calculate(const Indicator& data) {
+void ILog::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();
     if (m_discard >= total) {
@@ -29,13 +29,11 @@ void ILog::_calculate(const Indicator& data) {
         return;
     }
 
-    price_t null_price = Null<price_t>();
+    auto const *src = data.data();
+    auto *dst = this->data();
+    value_t null_price = Null<value_t>();
     for (size_t i = m_discard; i < total; ++i) {
-        if (data[i] <= 0.0) {
-            _set(null_price, i);
-        } else {
-            _set(std::log10(data[i]), i);
-        }
+        dst[i] = (src[i] <= 0.0) ? null_price : std::log10(data[i]);
     }
 }
 

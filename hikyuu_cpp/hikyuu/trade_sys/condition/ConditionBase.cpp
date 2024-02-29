@@ -31,7 +31,8 @@ ConditionBase::ConditionBase(const string& name) : m_name(name) {}
 ConditionBase::~ConditionBase() {}
 
 void ConditionBase::reset() {
-    m_valid.clear();
+    m_date_index.clear();
+    m_values.clear();
     _reset();
 }
 
@@ -52,7 +53,8 @@ ConditionPtr ConditionBase::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_kdata = m_kdata;
-    p->m_valid = m_valid;
+    p->m_date_index = m_date_index;
+    p->m_values = m_values;
 
     // tm、sg由系统运行时进行设定，不作clone
     // p->m_tm = m_tm->clone();
@@ -64,36 +66,42 @@ void ConditionBase::setTO(const KData& kdata) {
     reset();
     m_kdata = kdata;
     if (!kdata.empty()) {
+        m_date_index.clear();
+        size_t total = kdata.size();
+        m_values.resize(total);
+        auto const* ks = m_kdata.data();
+        for (size_t i = 0; i < total; i++) {
+            m_values[i] = 0.0;
+            m_date_index[ks[i].datetime] = i;
+        }
         _calculate();
     }
 }
 
-void ConditionBase::_addValid(const Datetime& datetime) {
-    m_valid.insert(datetime);
+void ConditionBase::_addValid(const Datetime& datetime, price_t value) {
+    auto iter = m_date_index.find(datetime);
+    HKU_IF_RETURN(iter == m_date_index.end(), void());
+    m_values[iter->second] += value;
 }
 
 bool ConditionBase::isValid(const Datetime& datetime) {
-    return m_valid.count(datetime) != 0;
+    auto iter = m_date_index.find(datetime);
+    HKU_IF_RETURN(iter == m_date_index.end(), false);
+    return m_values[iter->second] > 0.;
 }
 
 DatetimeList ConditionBase::getDatetimeList() const {
     DatetimeList result;
-    HKU_IF_RETURN(m_valid.empty(), result);
-
-    for (const auto& d : m_valid) {
-        result.emplace_back(d);
+    for (const auto& d : m_date_index) {
+        if (m_values[d.second] > 0.0) {
+            result.emplace_back(d.first);
+        }
     }
-
     return result;
 }
 
 Indicator ConditionBase::getValues() const {
-    PriceList values(m_kdata.size());
-    DatetimeList ds = m_kdata.getDatetimeList();
-    for (size_t i = 0, len = ds.size(); i < len; i++) {
-        values[i] = m_valid.count(ds[i]) != 0 ? 1.0 : 0.0;
-    }
-    return PRICELIST(values);
+    return PRICELIST(m_values);
 }
 
 } /* namespace hku */

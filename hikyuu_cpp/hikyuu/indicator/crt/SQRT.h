@@ -25,14 +25,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API SQRT();
-Indicator SQRT(price_t);
+Indicator SQRT(Indicator::value_t);
 Indicator SQRT(const Indicator& ind);
 
 inline Indicator SQRT(const Indicator& ind) {
     return SQRT()(ind);
 }
 
-inline Indicator SQRT(price_t val) {
+inline Indicator SQRT(Indicator::value_t val) {
     return SQRT(CVAL(val));
 }
 

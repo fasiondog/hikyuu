@@ -33,60 +33,64 @@ void ISumBars::_calculate(const Indicator& ind) {
         return;
     }
 
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
     double a = getParam<double>("a");
     if (total == m_discard + 1) {
-        if (ind[m_discard] >= a) {
-            _set(0, m_discard);
+        if (src[m_discard] >= a) {
+            dst[m_discard] = 0.0;
         } else {
             m_discard = total;
         }
         return;
     }
 
+    size_t null_pos = Null<size_t>();
     size_t start = total - 1;
     size_t pos = start;
     size_t last_pos = start;
-    double sum = ind[pos];
+    double sum = src[pos];
     for (size_t i = start; i >= m_discard; i--) {
         if (i != start) {
-            sum = sum - ind[i + 1];
+            sum = sum - src[i + 1];
         }
 
         if (i < pos) {
-            sum = ind[i];
+            sum = src[i];
             pos = i;
         }
 
         if (sum < a) {
             if (pos >= 1) {
                 for (size_t j = pos - 1; j >= m_discard; j--) {
-                    sum += ind[j];
+                    sum += src[j];
                     if (sum >= a) {
                         pos = j;
                         break;
                     }
 
                     if (j == m_discard) {
-                        pos = Null<size_t>();
+                        pos = null_pos;
                         break;
                     }
                 }
             } else {
-                pos = Null<size_t>();
+                pos = null_pos;
             }
         }
 
-        if (pos != Null<size_t>()) {
-            _set(i - pos, i);
+        if (pos != null_pos) {
+            dst[i] = i - pos;
         }
 
-        if (i == m_discard || pos == Null<size_t>()) {
+        if (i == m_discard || pos == null_pos) {
             last_pos = i;
             break;
         }
     }
 
-    m_discard = pos == Null<size_t>() ? last_pos + 1 : last_pos;
+    m_discard = pos == null_pos ? last_pos + 1 : last_pos;
 }
 
 void ISumBars::_dyn_calculate(const Indicator& ind) {

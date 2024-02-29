@@ -39,7 +39,7 @@ inline Indicator POW(const Indicator& ind, const Indicator& n) {
     return POW(IndParam(n))(ind);
 }
 
-inline Indicator POW(price_t val, int n) {
+inline Indicator POW(Indicator::value_t val, int n) {
     return POW(CVAL(val), n);
 }
 

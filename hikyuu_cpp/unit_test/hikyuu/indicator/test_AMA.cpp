@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/AMA.h>
@@ -58,17 +58,17 @@ TEST_CASE("test_AMA") {
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.getResultNumber(), 2);
     CHECK_EQ(result[0], 6063);
-    CHECK_LT(std::fabs(result[9] - 6103.6781), 0.000001);
-    CHECK_LT(std::fabs(result[10] - 6120.760197), 0.000001);
-    CHECK_LT(std::fabs(result[18] - 6216.376893), 0.000001);
-    CHECK_LT(std::fabs(result[19] - 6239.100742), 0.000001);
+    CHECK_EQ(result[9], doctest::Approx(6103.6781));
+    CHECK_EQ(result[10], doctest::Approx(6120.760197));
+    CHECK_EQ(result[18], doctest::Approx(6216.376893));
+    CHECK_EQ(result[19], doctest::Approx(6239.100742));
 
     CHECK_EQ(result.get(0, 1), 1.0);
-    CHECK_LT(std::fabs(result.get(9, 1) - 0.557895), 0.000001);
-    CHECK_LT(std::fabs(result.get(10, 1) - 0.611111), 0.000001);
-    CHECK_LT(std::fabs(result.get(11, 1) - 0.826484), 0.000001);
-    CHECK_LT(std::fabs(result.get(18, 1) - 0.517799), 0.000001);
-    CHECK_LT(std::fabs(result.get(19, 1) - 0.585526), 0.000001);
+    CHECK_EQ(result.get(9, 1), doctest::Approx(0.557895));
+    CHECK_EQ(result.get(10, 1), doctest::Approx(0.611111));
+    CHECK_EQ(result.get(11, 1), doctest::Approx(0.826484));
+    CHECK_EQ(result.get(18, 1), doctest::Approx(0.517799));
+    CHECK_EQ(result.get(19, 1), doctest::Approx(0.585526));
 
     /** @arg operator() */
     Indicator ama = AMA(10, 2, 30);
@@ -111,6 +111,27 @@ TEST_CASE("test_AMA_dyn") {
         CHECK_EQ(expect.get(i, 1), doctest::Approx(result.get(i, 1)));
     }
 }
+
+//-----------------------------------------------------------------------------
+// benchmark
+//-----------------------------------------------------------------------------
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_AMA_benchmark") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    Indicator c = kdata.close();
+    int cycle = 1000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(test_AMA_benchmark, cycle, fmt::format("data len: {}", c.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator ind = AMA();
+            Indicator result = ind(c);
+        }
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // test export

@@ -39,27 +39,27 @@ inline Indicator LONGCROSS(const Indicator& x, const Indicator& y, const Indicat
     return result;
 }
 
-inline Indicator LONGCROSS(const Indicator& x, price_t y, int n = 3) {
+inline Indicator LONGCROSS(const Indicator& x, Indicator::value_t y, int n = 3) {
     return LONGCROSS(x, CVAL(x, y), n);
 }
 
-inline Indicator LONGCROSS(const Indicator& x, price_t y, const Indicator& n) {
+inline Indicator LONGCROSS(const Indicator& x, Indicator::value_t y, const Indicator& n) {
     return LONGCROSS(x, CVAL(x, y), n);
 }
 
-inline Indicator LONGCROSS(price_t x, const Indicator& y, int n = 3) {
+inline Indicator LONGCROSS(Indicator::value_t x, const Indicator& y, int n = 3) {
     return LONGCROSS(CVAL(y, x), y, n);
 }
 
-inline Indicator LONGCROSS(price_t x, const Indicator& y, const Indicator& n) {
+inline Indicator LONGCROSS(Indicator::value_t x, const Indicator& y, const Indicator& n) {
     return LONGCROSS(CVAL(y, x), y, n);
 }
 
-inline Indicator LONGCROSS(price_t x, price_t y, int n = 3) {
+inline Indicator LONGCROSS(Indicator::value_t x, Indicator::value_t y, int n = 3) {
     return LONGCROSS(CVAL(x), CVAL(y), n);
 }
 
-inline Indicator LONGCROSS(price_t x, price_t y, const Indicator& n) {
+inline Indicator LONGCROSS(Indicator::value_t x, Indicator::value_t y, const Indicator& n) {
     return LONGCROSS(CVAL(x), CVAL(y), n);
 }
 

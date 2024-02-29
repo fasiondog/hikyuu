@@ -65,9 +65,9 @@ class IndicatorTest(unittest.TestCase):
         self.assert_(abs(m[3] - 5) < 0.0001)
 
     def test_operator(self):
-        a = toPriceList([0, 1, 2, 3])
+        a = toPriceList([0, 1, 2, 3, 5])
         x1 = PRICELIST(a)
-        a = toPriceList([1, 2, 3, 4])
+        a = toPriceList([1, 2, 3, 4, 5])
         x2 = PRICELIST(a)
         a = x1 + x2
         self.assertEqual(a[0], 1)
@@ -75,11 +75,35 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[2], 5)
         self.assertEqual(a[3], 7)
 
+        a = x1 + 1.1
+        self.assertEqual(a[0], 1.1)
+        self.assertEqual(a[1], 2.1)
+        self.assertEqual(a[2], 3.1)
+        self.assertEqual(a[3], 4.1)
+
+        a = 2.1 + x1
+        self.assertEqual(a[0], 2.1)
+        self.assertEqual(a[1], 3.1)
+        self.assertEqual(a[2], 4.1)
+        self.assertEqual(a[3], 5.1)
+
         a = x2 - x1
         self.assertEqual(a[0], 1)
         self.assertEqual(a[1], 1)
         self.assertEqual(a[2], 1)
         self.assertEqual(a[3], 1)
+
+        a = x1 - 1.5
+        self.assertEqual(a[0], -1.5)
+        self.assertEqual(a[1], -0.5)
+        self.assertEqual(a[2], 0.5)
+        self.assertEqual(a[3], 1.5)
+
+        a = 1.5 - x1
+        self.assertEqual(a[0], 1.5)
+        self.assertEqual(a[1], 0.5)
+        self.assertEqual(a[2], -0.5)
+        self.assertEqual(a[3], -1.5)
 
         a = x1 * x2
         self.assertEqual(a[0], 0)
@@ -87,11 +111,49 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[2], 6)
         self.assertEqual(a[3], 12)
 
+        a = x1 * 2.0
+        self.assertEqual(a[0], 0)
+        self.assertEqual(a[1], 2)
+        self.assertEqual(a[2], 4)
+        self.assertEqual(a[3], 6)
+
+        a = 2.0 * x1
+        self.assertEqual(a[0], 0)
+        self.assertEqual(a[1], 2)
+        self.assertEqual(a[2], 4)
+        self.assertEqual(a[3], 6)
+
         a = x2 / x1
-        self.assert_(isnan(a[0]))
+        self.assert_(isinf(a[0]))
         self.assertEqual(a[1], 2)
         self.assertEqual(a[2], 1.5)
         self.assertEqual(a[3], 4.0 / 3.0)
+
+        a = x1 / 0.5
+        self.assertEqual(a[0], 0)
+        self.assertEqual(a[1], 2)
+        self.assertEqual(a[2], 4)
+        self.assertEqual(a[3], 6)
+
+        a = 2. / x1
+        self.assert_(isinf(a[0]))
+        self.assertEqual(a[1], 2.0)
+        self.assertEqual(a[2], 1.)
+        self.assertEqual(a[3], 2.0/3.0)
+
+        a = x1 > x2
+        self.assertEqual(a[0], 0 > 1)
+        self.assertEqual(a[1], 1 > 2)
+        self.assertEqual(a[2], 2 > 3)
+        self.assertEqual(a[3], 3 > 4)
+        self.assertEqual(a[4], 5 > 5)
+
+        a = x2 > x1
+        self.assertEqual(a[0], 0 < 1)
+        self.assertEqual(a[1], 1 < 2)
+        self.assertEqual(a[2], 2 < 3)
+        self.assertEqual(a[3], 3 < 4)
+        self.assertEqual(a[4], 5 < 5)
 
     def test_IKDATA(self):
         s = sm['sh000001']

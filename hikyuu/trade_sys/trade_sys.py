@@ -1,11 +1,19 @@
 # -*- coding: utf8 -*-
 
 from hikyuu.util.slice import list_getitem
-from hikyuu.core import SYS_Simple as cpp_SYS_Simple
 from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
     ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase
 )
+
+
+def part_iter(self):
+    for i in range(len(self)):
+        yield self[i]
+
+
+ConditionBase.__iter__ = part_iter
+
 
 # ------------------------------------------------------------------
 # System
@@ -20,60 +28,6 @@ System.MONEYMANAGER = System.Part.MONEYMANAGER
 System.PROFITGOAL = System.Part.PROFITGOAL
 System.SLIPPAGE = System.Part.SLIPPAGE
 System.INVALID = System.Part.INVALID
-
-
-def SYS_Simple(tm=None, mm=None, ev=None, cn=None, sg=None, st=None, tp=None, pg=None, sp=None):
-    """
-    创建简单系统实例（每次交易不进行多次加仓或减仓，即每次买入后在卖出时全部卖出）， 
-     系统实例在运行时(调用run方法），至少需要一个配套的交易管理实例、一个资金管理策略
-    和一个信号指示器），可以在创建系统实例后进行指定。如果出现调用run时没有任何输出，
-    且没有正确结果的时候，可能是未设置tm、sg、mm。进行回测时，使用 run 方法，如::
-
-        #创建模拟交易账户进行回测，初始资金30万
-        my_tm = crtTM(init_cash = 300000)
-
-        #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线，快线向上穿越
-        #慢线时买入，反之卖出）
-        my_sg = SG_Flex(EMA(C, n=5), slow_n=10)
-
-        #固定每次买入1000股
-        my_mm = MM_FixedCount(1000)
-
-        #创建交易系统并运行
-        sys = SYS_Simple(tm = my_tm, sg = my_sg, mm = my_mm)
-        sys.run(sm['sz000001'], Query(-150))
-
-    :param TradeManager tm: 交易管理实例 
-    :param MoneyManager mm: 资金管理策略
-    :param EnvironmentBase ev: 市场环境判断策略
-    :param ConditionBase cn: 系统有效条件
-    :param SignalBase sg: 信号指示器
-    :param StoplossBase st: 止损策略
-    :param StoplossBase tp: 止盈策略
-    :param ProfitGoalBase pg: 盈利目标策略
-    :param SlippageBase sp: 移滑价差算法
-    :return: system实例    
-    """
-    sys_ins = cpp_SYS_Simple()
-    if tm:
-        sys_ins.tm = tm
-    if mm:
-        sys_ins.mm = mm
-    if ev:
-        sys_ins.ev = ev
-    if cn:
-        sys_ins.cn = cn
-    if sg:
-        sys_ins.sg = sg
-    if st:
-        sys_ins.st = st
-    if tp:
-        sys_ins.tp = tp
-    if pg:
-        sys_ins.pg = pg
-    if sp:
-        sys_ins.sp = sp
-    return sys_ins
 
 
 # ------------------------------------------------------------------

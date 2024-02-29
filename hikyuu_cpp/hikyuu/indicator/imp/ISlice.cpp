@@ -55,8 +55,9 @@ void ISlice::_calculate(const Indicator& data) {
         HKU_IF_RETURN(endix < 0 || size_t(endix) > total || startix == endix, void());
 
         _readyBuffer(endix - startix, 1);
+        auto* dst = this->data();
         for (int64_t i = startix; i < endix; ++i) {
-            _set(x[i], i - startix);
+            dst[i - startix] = x[i];
         }
         return;
     }
@@ -83,8 +84,10 @@ void ISlice::_calculate(const Indicator& data) {
 
     _readyBuffer(endix - startix, 1);
 
+    auto const* src = data.data(result_index);
+    auto* dst = this->data();
     for (int64_t i = startix; i < endix; ++i) {
-        _set(data.get(i, result_index), i - startix);
+        dst[i - startix] = src[i];
     }
 
     // 更新抛弃数量

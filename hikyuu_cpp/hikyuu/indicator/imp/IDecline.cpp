@@ -62,6 +62,7 @@ void IDecline::_calculate(const Indicator& ind) {
 
     m_discard = 1;
     _readyBuffer(total, 1);
+    auto* dst = this->data();
     Indicator x = ALIGN(CLOSE() < REF(CLOSE(), 1), dates);
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
         if ((stk_type <= STOCKTYPE_TMP && iter->type() != stk_type) ||
@@ -69,14 +70,14 @@ void IDecline::_calculate(const Indicator& ind) {
             continue;
         }
         x.setContext(*iter, q);
+        auto const* xdata = x.data();
         for (size_t i = x.discard(); i < total; i++) {
             if (x.getDatetime(i) > iter->lastDatetime()) {
                 break;
             }
 
-            if (x[i]) {
-                price_t val = get(i);
-                _set(std::isnan(val) ? 1 : val + 1, i);
+            if (xdata[i]) {
+                dst[i] = std::isnan(dst[i]) ? 1 : dst[i] + 1;
             }
         }
     }

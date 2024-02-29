@@ -20,14 +20,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API REVERSE();
-Indicator REVERSE(price_t);
+Indicator REVERSE(Indicator::value_t);
 Indicator REVERSE(const Indicator& ind);
 
 inline Indicator REVERSE(const Indicator& ind) {
     return REVERSE()(ind);
 }
 
-inline Indicator REVERSE(price_t val) {
+inline Indicator REVERSE(Indicator::value_t val) {
     return REVERSE(CVAL(val));
 }
 

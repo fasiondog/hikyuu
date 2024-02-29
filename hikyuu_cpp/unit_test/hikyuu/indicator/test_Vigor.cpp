@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/VIGOR.h>
@@ -39,11 +39,32 @@ TEST_CASE("test_VIGOR") {
     CHECK_EQ(vigor.size(), 10);
     CHECK_UNARY_FALSE(vigor.empty());
     CHECK_UNARY(std::isnan(vigor[0]));
-    CHECK_LT(std::fabs(vigor[1] + 11761.36), 0.0001);
+    CHECK_EQ(vigor[1], doctest::Approx(-11761.36));
 
     vigor = VIGOR(kdata, 2);
     CHECK_EQ(vigor.discard(), 1);
 }
+
+//-----------------------------------------------------------------------------
+// benchmark
+//-----------------------------------------------------------------------------
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_VIGOR_benchemark") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    Indicator c = kdata.close();
+    int cycle = 1000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(test_VIGOR_benchemark, cycle, fmt::format("data len: {}", c.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator ind = VIGOR();
+            Indicator result = ind(kdata);
+        }
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // test export

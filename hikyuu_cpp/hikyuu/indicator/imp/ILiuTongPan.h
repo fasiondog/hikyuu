@@ -20,7 +20,7 @@ class ILiuTongPan : public IndicatorImp {
 
 public:
     ILiuTongPan();
-    ILiuTongPan(const KData&);
+    explicit ILiuTongPan(const KData&);
     virtual ~ILiuTongPan();
 };
 

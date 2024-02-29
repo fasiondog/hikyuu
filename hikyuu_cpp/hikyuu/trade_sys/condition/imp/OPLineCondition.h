@@ -17,7 +17,7 @@ namespace hku {
 class OPLineCondition : public ConditionBase {
 public:
     OPLineCondition();
-    OPLineCondition(const Indicator&);
+    explicit OPLineCondition(const Indicator&);
     virtual ~OPLineCondition();
 
     virtual void _calculate() override;

@@ -7,6 +7,7 @@
 
 #include <thread>
 #include "config.h"
+#include "utilities/os.h"
 #include "GlobalInitializer.h"
 #include "Log.h"
 
@@ -15,7 +16,7 @@
 // #include <spdlog/sinks/stdout_color_sinks.h>
 #include <iostream>
 #include "spdlog/sinks/ostream_sink.h"
-// #include "spdlog/sinks/rotating_file_sink.h"
+#include "spdlog/sinks/rotating_file_sink.h"
 
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
 #include <spdlog/async.h>
@@ -83,7 +84,12 @@ void initLogger() {
     auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
     // auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     stdout_sink->set_level(spdlog::level::trace);
-    auto logger = std::make_shared<spdlog::logger>("hikyuu", stdout_sink);
+    std::string log_filename = fmt::format("{}/.hikyuu/hikyuu.log", getUserDir());
+    auto rotating_sink =
+      std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_filename, 1024 * 1024 * 10, 3);
+    rotating_sink->set_level(spdlog::level::warn);
+    std::vector<spdlog::sink_ptr> sinks{stdout_sink, rotating_sink};
+    auto logger = std::make_shared<spdlog::logger>("hikyuu", sinks.begin(), sinks.end());
     logger->set_level(spdlog::level::trace);
     logger->flush_on(spdlog::level::trace);
     // logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!] (%@)");

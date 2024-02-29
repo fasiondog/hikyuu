@@ -50,7 +50,11 @@ void GlobalInitializer::init() {
     _CrtSetBreakAlloc(-1);
 #endif
 
+#if HKU_USE_LOW_PRECISION
+    fmt::print("Initialize hikyuu_{}_low_precision ...\n", getVersionWithBuild());
+#else
     fmt::print("Initialize hikyuu_{} ...\n", getVersionWithBuild());
+#endif
 
     initLogger();
 #if defined(_DEBUG) || defined(DEBUG)

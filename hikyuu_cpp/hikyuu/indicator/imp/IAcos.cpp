@@ -23,7 +23,7 @@ bool IAcos::check() {
     return true;
 }
 
-void IAcos::_calculate(const Indicator& data) {
+void IAcos::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();
     if (m_discard >= total) {
@@ -31,8 +31,11 @@ void IAcos::_calculate(const Indicator& data) {
         return;
     }
 
+    auto const *src = data.data();
+    auto *dst = this->data();
+    value_t null_value = Null<value_t>();
     for (size_t i = m_discard; i < total; ++i) {
-        _set(data[i] > -1 && data[i] < 1 ? std::acos(data[i]) : Null<price_t>(), i);
+        dst[i] = (src[i] > -1. && src[i] < 1.0) ? std::acos(src[i]) : null_value;
     }
 }
 
