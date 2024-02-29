@@ -1,6 +1,28 @@
 版本发布说明
 =======================
 
+1.3.5 - 2024年2月29日
+-------------------------
+
+1. 整体性能优化
+    - 整体性能优化，Indicator 计算速度再次提升 10% ~ 20%
+    - 编译支持 low_precision 参数，Indicator 可以使用 float 进行计算，在前述基础上可以再次提升计算速度，尤其是指支持 float neon 的 arm 芯片。（需自行编译）
+
+2. 功能增强
+    - 增加 STOCKTYPE_CRYPTO 数字货币类型，及其相关修改支持
+    - 系统有效条件组件 Condition 支持逻辑操作（+,-,*,/,&,|），及支持 _addValid 时附带额外数值（后续版本会在其他系统部件中增加此功能）
+    - 增加 EV_bool 系统环境组件，python 中增加 ev.plot 绘制 ev
+    - ev 增加线程保护，ev 通常作为公用组件，只计算一次，需要增加线程保护
+    - hikyuutdx 导入工具过滤长度非 6 位的证券代码，防止导入速度严重变慢
+
+3. 缺陷修复
+    - fixed 相关系数指标 CORR
+    - fixed Indicator 动态优化错误，部分使用 getResult 后再使用的场景执行失败
+    - fixed 系统策略组件 clone 操作中未对引用的 Indicator clone，导致崩溃
+    - fxied strategy的绑定string list到vector<string>出错的问题，和python TestStrategy中的type
+    - fixed python 中 SYS_Simple 中 cn 等函数参数不生效
+
+
 1.3.4 - 2024年2月1日
 -------------------------
 
