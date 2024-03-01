@@ -662,6 +662,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 if msg[2] != 'FINISHED':
                     self.import_detail_textEdit.append(msg[2])
 
+            elif msg_task_name == 'IMPORT_ZH_BOND10':
+                if msg[2] != 'FINISHED':
+                    self.import_detail_textEdit.append(msg[2])
+
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
         config = self.getCurrentConfig()

@@ -295,6 +295,8 @@ class UsePytdxImportToH5Thread(QThread):
                             [taskname, 'FINISHED', market, ktype, total])
                     elif taskname == 'IMPORT_BLOCKINFO':
                         self.send_message([taskname, ktype])
+                    elif taskname == 'IMPORT_ZH_BOND10':
+                        self.send_message([taskname, ktype])
                     else:
                         self.send_message([taskname, 'FINISHED'])
                     continue

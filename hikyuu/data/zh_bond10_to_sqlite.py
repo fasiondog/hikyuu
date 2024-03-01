@@ -10,7 +10,7 @@ from hikyuu.util import *
 
 
 @hku_catch(trace=True)
-def import_zh_bond10(connect):
+def import_zh_bond10_to_sqlite(connect):
     sql = "select max(date) from zh_bond10"
     cur = connect.cursor()
     cur.execute(sql)
