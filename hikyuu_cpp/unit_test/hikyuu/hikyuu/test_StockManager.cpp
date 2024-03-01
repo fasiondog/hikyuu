@@ -248,24 +248,14 @@ TEST_CASE("test_StockManager_isHoliday") {
 /** @par 检测点 */
 TEST_CASE("test_StockManager_getZhBond10") {
     auto& sm = StockManager::instance();
-    ZhBond10List result;
-    result = sm.getZhBond10(KQueryByIndex(0));
+    const auto& result = sm.getZhBond10();
     CHECK_EQ(result.size(), 5536);
     CHECK_EQ(result[0].date, Datetime(20020104));
     CHECK_EQ(result[0].value, doctest::Approx(3.2096));
-    CHECK_EQ(result[5].date, Datetime(20020111));
-    CHECK_EQ(result[5].value, doctest::Approx(3.4532));
+    CHECK_EQ(result[10].date, Datetime(20020118));
+    CHECK_EQ(result[10].value, doctest::Approx(3.2968));
     CHECK_EQ(result[5535].date, Datetime(20240229));
     CHECK_EQ(result[5535].value, doctest::Approx(2.3375));
-
-    result = sm.getZhBond10(KQueryByIndex(10, 20));
-    CHECK_EQ(result.size(), 10);
-    CHECK_EQ(result[0].date, Datetime(20020118));
-    CHECK_EQ(result[0].value, doctest::Approx(3.2968));
-    CHECK_EQ(result[9].date, Datetime(20020131));
-    CHECK_EQ(result[9].value, doctest::Approx(3.2186));
-    HKU_INFO("result size: {}", result.size());
-    HKU_INFO("{}", result[9]);
 }
 
 /** @} */

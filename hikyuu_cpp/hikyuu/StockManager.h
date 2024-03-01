@@ -149,10 +149,8 @@ public:
 
     /**
      * 获取10年期中国国债收益率
-     * @param query
-     * @return ZhBond10List
      */
-    ZhBond10List getZhBond10(const KQuery& query);
+    const ZhBond10List& getZhBond10() const;
 
     /**
      * 判断指定日期是否为节假日
@@ -259,7 +257,6 @@ private:
     std::mutex* m_holidays_mutex;
 
     ZhBond10List m_zh_bond10;  // 10年期中国国债收益率数据
-    std::mutex* m_zh_bond10_mutex;
 
     Parameter m_baseInfoDriverParam;
     Parameter m_blockDriverParam;
