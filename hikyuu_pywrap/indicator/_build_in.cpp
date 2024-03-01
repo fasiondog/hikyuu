@@ -1633,7 +1633,14 @@ void export_Indicator_build_in(py::module& m) {
     当前价格相对历史最低值的盈利百分比，可用于计算历史最高盈利比例)");
 
     m.def("ZHBOND10", ZHBOND10_1, py::arg("default_val") = 0.4);
-    m.def("ZHBOND10", ZHBOND10_2, py::arg("dates"), py::arg("default_val") = 0.4);
-    m.def("ZHBOND10", ZHBOND10_3, py::arg("k"), py::arg("default_val") = 0.4);
-    m.def("ZHBOND10", ZHBOND10_4, py::arg("ind"), py::arg("default_val") = 0.4);
+    m.def("ZHBOND10", ZHBOND10_2, py::arg("data"), py::arg("default_val") = 0.4);
+    m.def("ZHBOND10", ZHBOND10_3, py::arg("data"), py::arg("default_val") = 0.4);
+    m.def("ZHBOND10", ZHBOND10_4, py::arg("data"), py::arg("default_val") = 0.4,
+          R"(ZHBOND10([data, defaut_val])
+
+    获取10年期中国国债收益率
+
+    :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
+    :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值
+    )");
 }

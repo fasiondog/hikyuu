@@ -1024,3 +1024,11 @@
 
     :param data: 输入数据 KData
     :rtype: Indicator
+
+
+.. py:function:: ZHBOND10([data, default_val])
+
+    获取10年期中国国债收益率
+
+    :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
+    :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值
