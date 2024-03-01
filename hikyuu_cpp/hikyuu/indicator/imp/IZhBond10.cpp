@@ -20,9 +20,9 @@ IZhBond10::IZhBond10() : IndicatorImp("ZHBOND10") {
     setParam<double>("default", 4.0);
 }
 
-IZhBond10::IZhBond10(const DatetimeList& dates, double default) : IndicatorImp("ZHBOND10") {
+IZhBond10::IZhBond10(const DatetimeList& dates, double default_val) : IndicatorImp("ZHBOND10") {
     setParam<DatetimeList>("dates", dates);
-    setParam<double>("default", default);
+    setParam<double>("default", default_val);
 }
 
 IZhBond10::~IZhBond10() {}
@@ -65,7 +65,6 @@ void IZhBond10::_calculate(const Indicator& data) {
 
     size_t bondix = 0;
     for (size_t i = 0; i < total; i++) {
-        const auto& curdate = dates[i];
         bool found = false;
         for (size_t j = bondix; j < bonds_size; j++) {
             if (bonds[j].date > dates[i]) {

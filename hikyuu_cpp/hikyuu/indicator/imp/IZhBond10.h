@@ -23,7 +23,7 @@ class IZhBond10 : public IndicatorImp {
 
 public:
     IZhBond10();
-    IZhBond10(const DatetimeList& dates, double default = 4.0);
+    IZhBond10(const DatetimeList& dates, double default_val = 4.0);
     virtual ~IZhBond10();
 };
 
