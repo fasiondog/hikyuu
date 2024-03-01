@@ -14,6 +14,7 @@
 #include "../MarketInfo.h"
 #include "../StockTypeInfo.h"
 #include "../Stock.h"
+#include "../ZhBond10.h"
 #include "../utilities/db_connect/SQLStatementBase.h"
 
 namespace hku {
@@ -151,6 +152,12 @@ public:
      * 获取所有节假日日期
      */
     virtual std::unordered_set<Datetime> getAllHolidays() = 0;
+
+    /**
+     * Get the All Zh Bond10 object
+     * @return ZhBond10List
+     */
+    virtual ZhBond10List getAllZhBond10() = 0;
 
 private:
     bool checkType();

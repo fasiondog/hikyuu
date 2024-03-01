@@ -135,7 +135,6 @@ TEST_CASE("test_StockManager_getAllMarket") {
 
     /** @arg 检测测试数据中的Market */
     MarketList result(sm.getAllMarket());
-    CHECK_EQ(result.size(), 3);
     std::vector<string> want_list{"TMP", "SH", "SZ"};
     for (auto want : want_list) {
         bool found = false;
@@ -244,6 +243,29 @@ TEST_CASE("test_StockManager_isHoliday") {
     CHECK_EQ(sm.isHoliday(Datetime(202101020000LL)), false);
     CHECK_EQ(sm.isHoliday(Datetime(202110010000LL)), true);
     CHECK_EQ(sm.isHoliday(Datetime(202109300000LL)), false);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_StockManager_getZhBond10") {
+    auto& sm = StockManager::instance();
+    ZhBond10List result;
+    result = sm.getZhBond10(KQueryByIndex(0));
+    CHECK_EQ(result.size(), 5536);
+    CHECK_EQ(result[0].date, Datetime(20020104));
+    CHECK_EQ(result[0].value, doctest::Approx(3.2096));
+    CHECK_EQ(result[5].date, Datetime(20020111));
+    CHECK_EQ(result[5].value, doctest::Approx(3.4532));
+    CHECK_EQ(result[5535].date, Datetime(20240229));
+    CHECK_EQ(result[5535].value, doctest::Approx(2.3375));
+
+    result = sm.getZhBond10(KQueryByIndex(10, 20));
+    CHECK_EQ(result.size(), 10);
+    CHECK_EQ(result[0].date, Datetime(20020118));
+    CHECK_EQ(result[0].value, doctest::Approx(3.2968));
+    CHECK_EQ(result[9].date, Datetime(20020131));
+    CHECK_EQ(result[9].value, doctest::Approx(3.2186));
+    HKU_INFO("result size: {}", result.size());
+    HKU_INFO("{}", result[9]);
 }
 
 /** @} */

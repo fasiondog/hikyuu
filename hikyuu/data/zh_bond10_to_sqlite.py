@@ -35,8 +35,8 @@ if __name__ == '__main__':
     import sqlite3
     from hikyuu.data.common_sqlite3 import create_database
 
-    db = "d:\\tmp\\stock.db"
+    db = "d:\\workspace\\hikyuu\\test_data\\stock.db"
     connect = sqlite3.connect(db)
     create_database(connect)
-    import_zh_bond10(connect)
+    import_zh_bond10_to_sqlite(connect)
     connect.close()

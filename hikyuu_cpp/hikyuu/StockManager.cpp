@@ -38,6 +38,7 @@ StockManager::StockManager() : m_initializing(false) {
     m_marketInfoDict_mutex = new std::mutex;
     m_stockTypeInfo_mutex = new std::mutex;
     m_holidays_mutex = new std::mutex;
+    m_zh_bond10_mutex = new std::mutex;
 }
 
 StockManager::~StockManager() {
@@ -45,6 +46,7 @@ StockManager::~StockManager() {
     delete m_marketInfoDict_mutex;
     delete m_stockTypeInfo_mutex;
     delete m_holidays_mutex;
+    delete m_zh_bond10_mutex;
     fmt::print("Quit Hikyuu system!\n\n");
 }
 
@@ -124,6 +126,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     loadAllStockTypeInfo();
     loadAllStocks();
     loadAllStockWeights();
+    loadAllZhBond10();
 
     // 获取板块驱动
     m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
@@ -271,6 +274,7 @@ void StockManager::reload() {
     loadAllStockTypeInfo();
     loadAllStocks();
     loadAllStockWeights();
+    loadAllZhBond10();
 
     m_blockDriver->load();
 
@@ -386,6 +390,40 @@ DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string&
       .getDatetimeList(query);
 }
 
+ZhBond10List StockManager::getZhBond10(const KQuery& query) {
+    std::lock_guard<std::mutex> lock(*m_zh_bond10_mutex);
+    ZhBond10List result;
+    if (query.queryType() == KQuery::INDEX) {
+        size_t total = m_zh_bond10.size();
+        int64_t start = query.start();
+        int64_t end = query.end();
+        HKU_IF_RETURN(
+          start >= end || start == Null<int64_t>() || start >= static_cast<int64_t>(total), result);
+        if (end == Null<int64_t>()) {
+            end = total;
+        }
+        for (int64_t i = start; i < end; i++) {
+            result.emplace_back(m_zh_bond10[i]);
+        }
+
+    } else if (query.queryType() == KQuery::DATE) {
+        Datetime start = query.startDatetime();
+        Datetime end = query.endDatetime();
+        auto start_it = std::find_if(m_zh_bond10.begin(), m_zh_bond10.end(),
+                                     [start](const ZhBond10& r) { return r.date >= start; });
+        auto end_it = std::find_if(m_zh_bond10.begin(), m_zh_bond10.end(),
+                                   [end](const ZhBond10& r) { return r.date >= end; });
+        for (auto it = start_it; it < end_it; ++it) {
+            result.emplace_back(*it);
+        }
+
+    } else {
+        HKU_ERROR("Invalid query type");
+    }
+
+    return result;
+}
+
 Stock StockManager::addTempCsvStock(const string& code, const string& day_filename,
                                     const string& min_filename, price_t tick, price_t tickValue,
                                     int precision, size_t minTradeNumber, size_t maxTradeNumber) {
@@ -469,10 +507,11 @@ void StockManager::loadAllStocks() {
         } catch (...) {
             endDate = Null<Datetime>();
         }
-        Stock _stock(info.market, info.code, info.name, info.type, info.valid, startDate,
-                    endDate, info.tick, info.tickValue, info.precision, info.minTradeNumber,
-                    info.maxTradeNumber);
-        string market_code = _stock.market_code();;
+        Stock _stock(info.market, info.code, info.name, info.type, info.valid, startDate, endDate,
+                     info.tick, info.tickValue, info.precision, info.minTradeNumber,
+                     info.maxTradeNumber);
+        string market_code = _stock.market_code();
+        ;
         to_upper(market_code);
         auto iter = m_stockDict.find(market_code);
         if (iter == m_stockDict.end()) {
@@ -544,6 +583,11 @@ void StockManager::loadAllStockWeights() {
             stock.m_data->m_weightList.swap(weight_iter->second);
         }
     }
+}
+
+void StockManager::loadAllZhBond10() {
+    std::lock_guard<std::mutex> lock(*m_zh_bond10_mutex);
+    m_zh_bond10 = m_baseInfoDriver->getAllZhBond10();
 }
 
 }  // namespace hku

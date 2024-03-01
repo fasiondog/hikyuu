@@ -15,6 +15,7 @@
 #include "../table/StockWeightTable.h"
 #include "../table/StockTable.h"
 #include "../table/HolidayTable.h"
+#include "../table/ZhBond10Table.h"
 
 namespace hku {
 
@@ -333,6 +334,24 @@ std::unordered_set<Datetime> SQLiteBaseInfoDriver::getAllHolidays() {
             } catch (...) {
                 HKU_ERROR_UNKNOWN;
             }
+        }
+    } catch (...) {
+    }
+    return result;
+}
+
+ZhBond10List SQLiteBaseInfoDriver::getAllZhBond10() {
+    ZhBond10List result;
+    auto con = m_pool->getConnect();
+    try {
+        vector<ZhBond10Table> records;
+        con->batchLoad(records, "1=1 order by date asc");
+        size_t total = records.size();
+        HKU_IF_RETURN(total == 0, result);
+        result.resize(records.size());
+        for (size_t i = 0; i < total; i++) {
+            result[i].date = Datetime(records[i].date);
+            result[i].value = double(records[i].value) * 0.0001;
         }
     } catch (...) {
     }
