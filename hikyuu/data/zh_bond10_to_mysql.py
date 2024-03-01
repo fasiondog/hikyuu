@@ -11,7 +11,7 @@ from hikyuu.util import *
 
 @hku_catch(trace=True)
 def import_zh_bond10_to_mysql(connect):
-    sql = "select max(date) from zh_bond10"
+    sql = "select max(date) from hku_base.zh_bond10"
     cur = connect.cursor()
     cur.execute(sql)
     a = cur.fetchall()
@@ -25,6 +25,6 @@ def import_zh_bond10_to_mysql(connect):
         start_date = (datetime.date(year, month, day) + datetime.timedelta(1)).strftime('%Y%m%d')
     rates = get_china_bond10_rate(start_date)
     if rates:
-        cur.executemany("INSERT INTO zh_bond10(date, value) VALUES (%s, %s)", rates)
+        cur.executemany("INSERT INTO hku_base.zh_bond10(date, value) VALUES (%s, %s)", rates)
         connect.commit()
         cur.close()
