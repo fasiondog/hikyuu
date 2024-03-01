@@ -35,6 +35,7 @@ from hikyuu.gui.data.ImportPytdxTransToH5Task import ImportPytdxTransToH5
 from hikyuu.gui.data.ImportPytdxTimeToH5Task import ImportPytdxTimeToH5
 from hikyuu.gui.data.ImportHistoryFinanceTask import ImportHistoryFinanceTask
 from hikyuu.gui.data.ImportBlockInfoTask import ImportBlockInfoTask
+from hikyuu.gui.data.ImportZhBond10Task import ImportZhBond10Task
 from pytdx.hq import TdxHq_API
 from hikyuu.data.common_pytdx import search_best_tdx
 
@@ -97,7 +98,7 @@ class UsePytdxImportToH5Thread(QThread):
 
         self.tasks.append(ImportBlockInfoTask(self.log_queue, self.queue,
                           self.config, ('行业板块', '概念板块', '地域板块', '指数板块')))
-        # self.tasks.append(ImportBlockInfoTask(self.log_queue, self.queue, self.config, ('指数板块',)))
+        self.tasks.append(ImportZhBond10Task(self.log_queue, self.queue, self.config))
 
         task_count = 0
         market_count = len(g_market_list)
@@ -294,6 +295,8 @@ class UsePytdxImportToH5Thread(QThread):
                         self.send_message(
                             [taskname, 'FINISHED', market, ktype, total])
                     elif taskname == 'IMPORT_BLOCKINFO':
+                        self.send_message([taskname, ktype])
+                    elif taskname == 'IMPORT_ZH_BOND10':
                         self.send_message([taskname, ktype])
                     else:
                         self.send_message([taskname, 'FINISHED'])

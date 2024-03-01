@@ -139,7 +139,18 @@ public:
     BlockList getBlockList();
 
     // 目前支持"SH"
+    /**
+     * 获取交易日历，目前支持"SH"
+     * @param query
+     * @param market
+     * @return DatetimeList
+     */
     DatetimeList getTradingCalendar(const KQuery& query, const string& market = "SH");
+
+    /**
+     * 获取10年期中国国债收益率
+     */
+    const ZhBond10List& getZhBond10() const;
 
     /**
      * 判断指定日期是否为节假日
@@ -216,6 +227,9 @@ private:
     /* 加载所有权息数据 */
     void loadAllStockWeights();
 
+    /** 加载10年期中国国债收益率数据 */
+    void loadAllZhBond10();
+
 private:
     StockManager();
 
@@ -241,6 +255,8 @@ private:
 
     std::unordered_set<Datetime> m_holidays;  // 节假日
     std::mutex* m_holidays_mutex;
+
+    ZhBond10List m_zh_bond10;  // 10年期中国国债收益率数据
 
     Parameter m_baseInfoDriverParam;
     Parameter m_blockDriverParam;

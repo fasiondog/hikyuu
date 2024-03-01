@@ -27,6 +27,7 @@
 * :py:func:`CAPITAL` - 流通盘，同名：LIUTONGPAN
 * :py:func:`TIMELINE`   - 分时价格
 * :py:func:`TIMELINEVOL`   - 分时成交量
+* :py:func:`ZHBOND10` - 10年期中国国债收益率
     
 
 **大盘指标**

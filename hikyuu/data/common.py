@@ -182,3 +182,12 @@ def get_new_holidays():
     ret = re.findall(r'<textarea id="data" style="display:none;">([\s\w\d\W]+)</textarea>', res.text, re.M)[0].strip()
     day = [d.split('|')[:4] for d in ret.split('\n')]
     return [v[0] for v in day if v[2] == '中国']
+
+
+@hku_catch(ret=[], trace=True)
+@timeout(120)
+def get_china_bond10_rate(start_date="19901219"):
+    """获取中国国债收益率10年"""
+    bond_zh_us_rate_df = ak.bond_zh_us_rate(start_date)
+    df = bond_zh_us_rate_df[['中国国债收益率10年', '日期']].dropna()
+    return [(v[1].strftime('%Y%m%d'), int(v[0]*10000)) for v in df.values]
