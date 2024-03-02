@@ -36,7 +36,7 @@ void export_Performance(py::module& m) {
         :param TradeManager tm: 指定的交易管理实例
         :param Datetime datetime: 统计截止时刻)")
 
-      .def("names", &Performance::names, R"(names(self)
+      .def("names", &Performance::names, py::return_value_policy::copy, R"(names(self)
       
       获取所有统计项名称)")
 

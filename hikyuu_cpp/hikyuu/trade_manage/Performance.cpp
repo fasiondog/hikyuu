@@ -12,70 +12,76 @@
 namespace hku {
 
 Performance::Performance()
-: m_result{{"帐户初始金额", 0.},
-           {"累计投入本金", 0.},
-           {"累计投入资产", 0.},
-           {"累计借入现金", 0.},
-           {"累计借入资产", 0.},
-           {"累计红利", 0.},
-           {"现金余额", 0.},
-           {"未平仓头寸净值", 0.},
-           {"当前总资产", 0.},
-           {"已平仓交易总成本", 0.},
-           {"已平仓净利润总额", 0.},
-           {"单笔交易最大占用现金比例%", 0.},
-           {"交易平均占用现金比例%", 0.},
-           {"已平仓帐户收益率%", 0.},
-           {"帐户年复合收益率%", 0.},
-           {"帐户平均年收益率%", 0.},
-           {"赢利交易赢利总额", 0.},
-           {"亏损交易亏损总额", 0.},
-           {"已平仓交易总数", 0.},
-           {"赢利交易数", 0.},
-           {"亏损交易数", 0.},
-           {"赢利交易比例%", 0.},
-           {"赢利期望值", 0.},
-           {"赢利交易平均赢利", 0.},
-           {"亏损交易平均亏损", 0.},
-           {"平均赢利/平均亏损比例", 0.},
-           {"净赢利/亏损比例", 0.},
-           {"最大单笔赢利", 0.},
-           {"最大单笔盈利百分比%", 0.},
-           {"最大单笔亏损", 0.},
-           {"最大单笔亏损百分比%", 0.},
-           {"赢利交易平均持仓时间", 0.},
-           {"赢利交易最大持仓时间", 0.},
-           {"亏损交易平均持仓时间", 0.},
-           {"亏损交易最大持仓时间", 0.},
-           {"空仓总时间", 0.},
-           {"空仓时间/总时间%", 0.},
-           {"平均空仓时间", 0.},
-           {"最长空仓时间", 0.},
-           {"最大连续赢利笔数", 0.},
-           {"最大连续亏损笔数", 0.},
-           {"最大连续赢利金额", 0.},
-           {"最大连续亏损金额", 0.},
-           {"R乘数期望值", 0.},
-           {"交易机会频率/年", 0.},
-           {"年度期望R乘数", 0.},
-           {"赢利交易平均R乘数", 0.},
-           {"亏损交易平均R乘数", 0.},
-           {"最大单笔赢利R乘数", 0.},
-           {"最大单笔亏损R乘数", 0.},
-           {"最大连续赢利R乘数", 0.},
-           {"最大连续亏损R乘数", 0.}} {}
+: m_keys({"帐户初始金额",
+          "累计投入本金",
+          "累计投入资产",
+          "累计借入现金",
+          "累计借入资产",
+          "累计红利",
+          "现金余额",
+          "未平仓头寸净值",
+          "当前总资产",
+          "已平仓交易总成本",
+          "已平仓净利润总额",
+          "单笔交易最大占用现金比例%",
+          "交易平均占用现金比例%",
+          "已平仓帐户收益率%",
+          "帐户年复合收益率%",
+          "帐户平均年收益率%",
+          "赢利交易赢利总额",
+          "亏损交易亏损总额",
+          "已平仓交易总数",
+          "赢利交易数",
+          "亏损交易数",
+          "赢利交易比例%",
+          "赢利期望值",
+          "赢利交易平均赢利",
+          "亏损交易平均亏损",
+          "平均赢利/平均亏损比例",
+          "净赢利/亏损比例",
+          "最大单笔赢利",
+          "最大单笔盈利百分比%",
+          "最大单笔亏损",
+          "最大单笔亏损百分比%",
+          "赢利交易平均持仓时间",
+          "赢利交易最大持仓时间",
+          "亏损交易平均持仓时间",
+          "亏损交易最大持仓时间",
+          "空仓总时间",
+          "空仓时间/总时间%",
+          "平均空仓时间",
+          "最长空仓时间",
+          "最大连续赢利笔数",
+          "最大连续亏损笔数",
+          "最大连续赢利金额",
+          "最大连续亏损金额",
+          "R乘数期望值",
+          "交易机会频率/年",
+          "年度期望R乘数",
+          "赢利交易平均R乘数",
+          "亏损交易平均R乘数",
+          "最大单笔赢利R乘数",
+          "最大单笔亏损R乘数",
+          "最大连续赢利R乘数",
+          "最大连续亏损R乘数"}) {
+    for (const auto& key : m_keys) {
+        m_result[key] = 0.0;
+    }
+}
 
 Performance::~Performance() {}
 
 Performance& Performance::operator=(const Performance& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_result = other.m_result;
+    m_keys = m_keys;
     return *this;
 }
 
 Performance& Performance::operator=(Performance&& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_result = std::move(other.m_result);
+    m_keys = std::move(other.m_keys);
     return *this;
 }
 
@@ -94,20 +100,11 @@ double Performance::get(const string& name) const {
     return Null<double>();
 }
 
-StringList Performance::names() const {
-    StringList result(m_result.size());
-    size_t i = 0;
-    for (auto iter = m_result.cbegin(); iter != m_result.cend(); ++iter, i++) {
-        result[i] = iter->first;
-    }
-    return result;
-}
-
 PriceList Performance::values() const {
     PriceList result(m_result.size());
     size_t i = 0;
-    for (auto iter = m_result.cbegin(); iter != m_result.cend(); ++iter, i++) {
-        result[i] = iter->second;
+    for (const auto& key : m_keys) {
+        result[i] = m_result.at(key);
     }
     return result;
 }
@@ -123,8 +120,8 @@ string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) 
 
     buf.setf(std::ios_base::fixed);
     buf.precision(tm->precision());
-    for (auto iter = m_result.begin(); iter != m_result.end(); ++iter) {
-        buf << iter->first << ": " << iter->second << std::endl;
+    for (const auto& key : m_keys) {
+        buf << key << ": " << m_result.at(key) << std::endl;
     }
 
     buf.unsetf(std::ostream::floatfield);
