@@ -1641,6 +1641,14 @@ void export_Indicator_build_in(py::module& m) {
     获取10年期中国国债收益率
 
     :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
-    :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值
-    )");
+    :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值)");
+
+    m.def("SPEARMAN", SPEARMAN, py::arg("ind1"), py::arg("ind2"), py::arg("n"),
+          R"(SPEARMAN(ind1, ind2, n)
+
+    Spearman 相关系数
+
+    :param Indicator ind1: 输入参数1
+    :param Indicator ind2: 输入参数2
+    :param int n: 指定窗口)");
 }

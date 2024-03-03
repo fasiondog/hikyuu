@@ -862,6 +862,15 @@
     :rtype: Indicator
 
 
+.. py:function:: SPEARMAN(ind1, ind2, n)
+
+    Spearman 相关系数
+
+    :param Indicator ind1: 输入参数1
+    :param Indicator ind2: 输入参数2
+    :param int n: 指定窗口    
+
+
 .. py:function:: SQRT([data])
 
     开平方
