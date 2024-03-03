@@ -7,7 +7,7 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
@@ -70,6 +70,27 @@ TEST_CASE("test_CORR") {
         CHECK_EQ(cov[i], doctest::Approx(expect_cov[i]).epsilon(0.00001));
     }
 }
+
+//-----------------------------------------------------------------------------
+// benchmark
+//-----------------------------------------------------------------------------
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_CORR_benchmark") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    Indicator c = kdata.close();
+    Indicator h = kdata.close();
+    int cycle = 1000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(test_CORR_benchmark, cycle, fmt::format("data len: {}", c.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator result = CORR(c, h, 200);
+        }
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // test export
