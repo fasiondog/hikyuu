@@ -104,17 +104,20 @@ TEST_CASE("test_SPEARMAN") {
     PriceList expect{Null<price_t>(), 1., 1., 0.95, 0.875};
     result = SPEARMAN(x, y, a.size());
     CHECK_EQ(result.name(), "SPEARMAN");
-    CHECK_EQ(result.discard(), 1);
+    CHECK_EQ(result.discard(), 4);
     CHECK_EQ(result.size(), a.size());
-
     for (size_t i = result.discard(); i < result.size(); i++) {
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
 
-    result = SPEARMAN(x, y, 4);
+    expect = {Null<price_t>(), Null<price_t>(), 1., 0.875, 1.};
+    result = SPEARMAN(x, y, 3);
     CHECK_EQ(result.name(), "SPEARMAN");
-    CHECK_EQ(result.discard(), 1);
+    CHECK_EQ(result.discard(), 2);
     CHECK_EQ(result.size(), a.size());
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(result[i], doctest::Approx(expect[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -122,18 +125,19 @@ TEST_CASE("test_SPEARMAN") {
 //-----------------------------------------------------------------------------
 #if ENABLE_BENCHMARK_TEST
 TEST_CASE("test_SPEARMAN_benchmark") {
-    // Stock stock = getStock("sh000001");
-    // KData kdata = stock.getKData(KQuery(0));
-    // Indicator c = kdata.close();
-    // int cycle = 1000;  // 测试循环次数
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    Indicator c = kdata.close();
+    Indicator h = kdata.close();
+    int cycle = 10;  // 测试循环次数
 
-    // {
-    //     BENCHMARK_TIME_MSG(test_SPEARMAN_benchmark, cycle, fmt::format("data len: {}",
-    //     c.size())); SPEND_TIME_CONTROL(false); for (int i = 0; i < cycle; i++) {
-    //         Indicator ind = ABS();
-    //         Indicator result = ind(c);
-    //     }
-    // }
+    {
+        BENCHMARK_TIME_MSG(test_SPEARMAN_benchmark, cycle, fmt::format("data len: {}", c.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator result = SPEARMAN(c, h, 200);
+        }
+    }
 }
 #endif
 
@@ -143,14 +147,14 @@ TEST_CASE("test_SPEARMAN_benchmark") {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-TEST_CASE("test_CORR_export") {
+TEST_CASE("test_SPEARMAN_export") {
     StockManager &sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/COS.xml";
+    filename += "/SPEARMAN.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = CORR(CLOSE(kdata), OPEN(kdata), 10);
+    Indicator x1 = SPEARMAN(CLOSE(kdata), OPEN(kdata), 10);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -164,7 +168,7 @@ TEST_CASE("test_CORR_export") {
         ia >> BOOST_SERIALIZATION_NVP(x2);
     }
 
-    CHECK_EQ(x2.name(), "CORR");
+    CHECK_EQ(x2.name(), "SPEARMAN");
     CHECK_EQ(x1.size(), x2.size());
     CHECK_EQ(x1.discard(), x2.discard());
     CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());

@@ -1620,40 +1620,23 @@ void IndicatorImp::execute_spearman() {
         return;
     }
 
-    discard++;
+    discard += n - 1;
     setDiscard(discard);
-
-    size_t startPos = discard;
-    size_t first_end = startPos + n - 1 >= total ? total : startPos + n - 1;
 
     auto levela = std::make_unique<value_t[]>(n);
     auto levelb = std::make_unique<value_t[]>(n);
     auto *ptra = levela.get();
     auto *ptrb = levelb.get();
 
+    // 不处理 n 不足的情况，防止只需要计算全部序列时，过于耗时
     value_t back = std::pow(value_t(n), 3) - n;
     for (size_t r = 0; r < result_number; ++r) {
         auto *dst = this->data(r);
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
-
-        size_t n1 = 2;
-        auto const *a = maxdata + startPos + 1 - n1;
-        auto const *b = mindata + startPos + 1 - diff - n1;
-        for (size_t i = startPos; i < first_end; i++) {
-            spearmanLevel(a, ptra, n1);
-            spearmanLevel(b, ptrb, n1);
-            value_t sum = 0.0;
-            for (size_t j = 0; j < n1; j++) {
-                sum += std::pow(ptra[j] - ptrb[j], 2);
-            }
-            dst[i] = 1 - 6.0 * sum / (std::pow(value_t(n1), 3) - n1);
-            n1++;
-        }
-
-        a++;
-        b++;
-        for (size_t i = first_end; i < total; ++i) {
+        auto const *a = maxdata + discard + 1 - n;
+        auto const *b = mindata + discard + 1 - diff - n;
+        for (size_t i = discard; i < total; ++i) {
             spearmanLevel(a, ptra, n);
             spearmanLevel(b, ptrb, n);
             value_t sum = 0.0;
