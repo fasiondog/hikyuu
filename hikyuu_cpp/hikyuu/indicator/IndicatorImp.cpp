@@ -1568,7 +1568,7 @@ static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value
     std::sort(
       data_index.begin(), data_index.end(),
       std::bind(
-        std::greater<IndicatorImp::value_t>(),
+        std::less<IndicatorImp::value_t>(),
         std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_1),
         std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_2)));
 
@@ -1620,8 +1620,11 @@ void IndicatorImp::execute_spearman() {
         return;
     }
 
+    discard++;
+    setDiscard(discard);
+
     size_t startPos = discard;
-    size_t first_end = startPos + n >= total ? total : startPos + n;
+    size_t first_end = startPos + n - 1 >= total ? total : startPos + n - 1;
 
     auto levela = std::make_unique<value_t[]>(n);
     auto levelb = std::make_unique<value_t[]>(n);
@@ -1636,8 +1639,8 @@ void IndicatorImp::execute_spearman() {
 
         size_t n1 = 2;
         auto const *a = maxdata + startPos + 1 - n1;
-        auto const *b = mindata + startPos + startPos + 2 - diff - n1;
-        for (size_t i = startPos + 1; i < first_end; i++) {
+        auto const *b = mindata + startPos + 1 - diff - n1;
+        for (size_t i = startPos; i < first_end; i++) {
             spearmanLevel(a, ptra, n1);
             spearmanLevel(b, ptrb, n1);
             value_t sum = 0.0;
@@ -1645,16 +1648,12 @@ void IndicatorImp::execute_spearman() {
                 sum += std::pow(ptra[j] - ptrb[j], 2);
             }
             dst[i] = 1 - 6.0 * sum / (std::pow(value_t(n1), 3) - n1);
-            a++;
-            b++;
             n1++;
         }
 
-        // auto const *a = maxdata + discard - n;
-        // auto const *b = mindata + discard + discard - diff - n;
-        for (size_t i = discard; i < total; ++i) {
-            // auto *ptra = levela.get();
-            // auto *ptrb = levelb.get();
+        a++;
+        b++;
+        for (size_t i = first_end; i < total; ++i) {
             spearmanLevel(a, ptra, n);
             spearmanLevel(b, ptrb, n);
             value_t sum = 0.0;
@@ -1666,8 +1665,6 @@ void IndicatorImp::execute_spearman() {
             b++;
         }
     }
-
-    setDiscard(discard + 2);
 }
 
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {
