@@ -740,3 +740,70 @@ def sysplot(sys, new=True, axes=None, style=1):
             verticalalignment='top',
             color='blue'
         )
+
+
+def sys_performance(sys, ref_stk=None):
+    k = sys.to
+    if k is None or k.empty():
+        hku_info("sys.to is None or empty!")
+        return
+
+    query = Query(k[0].datetime.start_of_day(), k[-1].datetime.start_of_day() + TimeDelta(1), Query.DAY)
+
+    if ref_stk is None:
+        ref_stk = get_stock('sh000300')
+    ref_k = ref_stk.get_kdata(query)
+    ref_dates = ref_k.get_datetime_list()
+
+    profit = sys.tm.get_profit_curve(ref_dates)
+    profit = VALUE(profit)
+    funds = sys.tm.get_funds_curve(ref_dates)
+    funds = VALUE(funds)
+    funds_return = profit / REF(funds, 1) + 1
+    # funds_return = cum_return(funds)
+    funds_return.name = "系统累积收益率"
+    cum_return = get_part("default.ind.累积收益率")
+    ref_return = cum_return(ref_k.close)
+    ref_return.name = ref_stk.name
+    ref_return.plot(legend_on=True)
+    funds_return.plot(legend_on=True, new=False)
+
+    per = Performance()
+    text = per.report(sys.tm, Datetime(datetime.today()))
+
+    # 计算最大回撤
+    max_pullback = min(MDD(funds).to_np())
+
+    # 计算 sharp
+    bond = ZHBOND10(ref_dates)
+    sigma = STDEV(ROCP(funds), len(ref_dates))
+    sigma = 15.874507866387544 * sigma[-1]  # 15.874 = sqrt(252)
+    sharp = (per['帐户平均年收益率%'] - bond[-1]) * 0.01 / sigma
+
+    axis = gca()
+    axis.text(-0.05,
+              0.97,
+              text,
+              horizontalalignment='right',
+              verticalalignment='top',
+              transform=axis.transAxes,
+              # color=text_color
+              )
+
+    invest_total = per['累计投入本金'] + per['累计投入资产']
+    cur_fund = per['当前总资产']
+    t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
+        invest_total, cur_fund, cur_fund - invest_total)
+    t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2}%    最大回撤: {:<.2f}%'.format(
+        funds_return[-1], per["帐户平均年收益率%"], max_pullback)
+    t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
+        per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
+    label = t1 + '\n\n' + t2 + '\n\n' + t3
+    axis.text(0.05,
+              -0.06,
+              label,
+              horizontalalignment='left',
+              verticalalignment='top',
+              transform=axis.transAxes,
+              # color=text_color
+              )

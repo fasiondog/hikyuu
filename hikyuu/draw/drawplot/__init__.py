@@ -48,6 +48,7 @@ from .matplotlib_draw import ax_draw_macd as mpl_ax_draw_macd
 from .matplotlib_draw import ax_draw_macd2 as mpl_ax_draw_macd2
 from .matplotlib_draw import ax_set_locator_formatter as mpl_ax_set_locator_formatter
 from .matplotlib_draw import adjust_axes_show as mpl_adjust_axes_show
+from .matplotlib_draw import sys_performance as mpl_sys_performance
 
 from .bokeh_draw import gcf as bk_gcf
 from .bokeh_draw import gca as bk_gca
@@ -123,6 +124,7 @@ def use_draw_with_matplotlib():
     ConditionBase.plot = mpl_cnplot
 
     System.plot = mpl_sysplot
+    System.performance = mpl_sys_performance
 
 
 def use_draw_with_echarts():
