@@ -45,7 +45,7 @@ TEST_CASE("test_ZHBOND10") {
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.discard(), 0);
     for (size_t i = 0; i < result.size(); i++) {
-        CHECK_EQ(result[i], 2.3375);
+        CHECK_EQ(result[i], doctest::Approx(2.3375));
     }
 
     /** @arg 输入日期列表, 指定日期列表中对应日期断续不在收益率列表中 */
