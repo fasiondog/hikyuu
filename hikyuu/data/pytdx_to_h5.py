@@ -111,6 +111,17 @@ def import_stock_name(connect, api, market, quotations=None):
         stk_list.extend(get_fund_code_name_list(market))
     for stock in stk_list:
         newStockDict[str(stock['code'])] = stock['name']
+    if market == MARKET.SH:
+        df = ak.stock_info_sh_delist()
+        l = df[['公司代码', '公司简称']].to_dict(orient='records') if not df .empty else []
+        for stock in l:
+            newStockDict[str(stock['公司代码'])] = stock['公司简称']
+    elif market == MARKET.SZ:
+        for t in ['暂停上市公司', '终止上市公司']:
+            df = ak.stock_info_sz_delist(t)
+            l = df[['证券代码', '证券简称']].to_dict(orient='records') if not df.empty else []
+            for stock in l:
+                newStockDict[str(stock['证券代码'])] = stock['证券简称']
 
     marketid = get_marketid(connect, market)
 
