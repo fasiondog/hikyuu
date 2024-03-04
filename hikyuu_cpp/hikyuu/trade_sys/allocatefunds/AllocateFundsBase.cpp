@@ -27,7 +27,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AFPtr& af) {
 }
 
 AllocateFundsBase::AllocateFundsBase() : m_name("AllocateMoneyBase"), m_reserve_percent(0) {
-    //是否调整之前已经持仓策略的持仓。不调整时，仅使用总账户当前剩余资金进行分配，否则将使用总市值进行分配
+    // 是否调整之前已经持仓策略的持仓。不调整时，仅使用总账户当前剩余资金进行分配，否则将使用总市值进行分配
     setParam<bool>("adjust_running_sys", false);
     setParam<int>("max_sys_num", 1000000);             // 允许运行的最大系统实例数
     setParam<double>("weight_unit", 0.0001);           // 最小权重单位
@@ -219,7 +219,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     // 账户资金精度
     int precision = m_shadow_tm->getParam<int>("precision");
 
-    //获取当前总账户资产净值，并计算每单位权重代表的资金
+    // 获取当前总账户资产净值，并计算每单位权重代表的资金
     price_t total_funds = _getTotalFunds(date, running_list);
 
     // 计算需保留的资产
@@ -302,7 +302,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
             }
 
         } else {
-            //如果当前资产大于期望分配的资产，则子账户是否有现金可以取出抵扣，否则卖掉部分股票
+            // 如果当前资产大于期望分配的资产，则子账户是否有现金可以取出抵扣，否则卖掉部分股票
             price_t will_return_cash = roundDown(funds_value - will_funds_value, precision);
             if (will_return_cash <= 0.0) {
                 continue;
@@ -391,7 +391,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
                                                 const std::list<SYSPtr>& running_list) {
     HKU_IF_RETURN(se_list.size() == 0, void());
 
-    //如果运行中的系统数已大于等于允许的最大系统数，直接返回
+    // 如果运行中的系统数已大于等于允许的最大系统数，直接返回
     int max_num = getParam<int>("max_sys_num");
     HKU_IF_RETURN(running_list.size() >= max_num, void());
 
@@ -409,26 +409,26 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
         }
     }
 
-    //获取计划分配的资产权重
+    // 获取计划分配的资产权重
     SystemWeightList sw_list = _allocateWeight(date, pure_se_list);
     HKU_IF_RETURN(sw_list.size() == 0, void());
 
-    //按权重升序排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
+    // 按权重升序排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
     std::sort(
       sw_list.begin(), sw_list.end(),
       std::bind(std::less<double>(), std::bind(&SystemWeight::m_weight, std::placeholders::_1),
                 std::bind(&SystemWeight::m_weight, std::placeholders::_2)));
 
-    //倒序遍历，在遇到权重为0或等于运行的最大运行时系统数时结束遍历
-    size_t count = 0;
+    // 检测是否有信号发生，过滤掉没有发生信号的系统 以及 权重为 0 的系统
+    SystemWeightList new_sw_list;
     auto sw_iter = sw_list.rbegin();
     for (; sw_iter != sw_list.rend(); ++sw_iter) {
-        if (sw_iter->getWeight() <= 0.0 || count >= max_num)
+        if (sw_iter->getWeight() <= 0.0)
             break;
-        count++;
+        if (sw_iter->getSYS()->getSG()->shouldBuy(date)) {
+            new_sw_list.emplace_back(*sw_iter);
+        }
     }
-
-    auto end_iter = sw_iter;  // 记录结束位置
 
     // 总账号资金精度
     int precision = m_shadow_tm->getParam<int>("precision");
@@ -455,8 +455,9 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
     // 再次遍历选中子系统列表，并将剩余现金按权重比例转入子账户
     double weight_unit = getParam<double>("weight_unit");
     price_t per_cash = total_funds * weight_unit;  // 每单位权重资金
-    sw_iter = sw_list.rbegin();
-    for (; sw_iter != end_iter; ++sw_iter) {
+    size_t can_run_count = 0;
+    for (auto sw_iter = new_sw_list.begin(), end_iter = new_sw_list.end(); sw_iter != end_iter;
+         ++sw_iter) {
         // 该系统期望分配的资金
         price_t will_cash = roundUp(per_cash * (sw_iter->getWeight() / weight_unit), precision);
         if (will_cash <= 0.0) {
@@ -466,12 +467,24 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
         // 计算实际可分配的资金
         price_t need_cash = will_cash <= can_allocate_cash ? will_cash : can_allocate_cash;
 
+        // 检测是否可以发生交易，不能的话，忽略
+        auto krecord = sw_iter->getSYS()->getTO().getKRecord(date);
+        if (krecord.closePrice < need_cash) {
+            continue;
+        }
+
         // 尝试从总账户中取出资金存入子账户
         TMPtr sub_tm = sw_iter->getSYS()->getTM();
         if (m_shadow_tm->checkout(date, need_cash)) {
             sub_tm->checkin(date, need_cash);
             can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
             if (can_allocate_cash <= 0.0) {
+                continue;
+            }
+
+            // 如果超出允许运行的最大系统数，跳出循环
+            can_run_count++;
+            if (can_run_count > max_num) {
                 break;
             }
         }
