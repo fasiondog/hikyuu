@@ -26,7 +26,6 @@ std::string HKU_API getVersion();
  */
 std::string HKU_API getVersionWithBuild();
 
-
 /* 获取包括Git commit信息的版本号 */
 std::string HKU_API getVersionWithGit();
 
@@ -42,6 +41,9 @@ bool HKU_API CanUpgrade();
 std::string HKU_API getLatestVersion();
 
 /** 发送反馈信息 */
-void sendFeedback();
+void HKU_API sendFeedback();
+
+/** 用于发送 python 版本信息 */
+void HKU_API sendPythonVersionFeedBack(int major, int minor, int micro);
 
 }  // namespace hku
