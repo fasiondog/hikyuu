@@ -776,7 +776,7 @@ def sys_performance(sys, ref_stk=None):
     bond = ZHBOND10(ref_dates)
     sigma = STDEV(ROCP(funds), len(ref_dates))
     sigma = 15.874507866387544 * sigma[-1]  # 15.874 = sqrt(252)
-    sharp = (per['帐户平均年收益率%'] - bond[-1]) * 0.01 / sigma
+    sharp = (per['帐户平均年收益率%'] - bond[-1]) * 0.01 / sigma if sigma != 0.0 else 0.0
 
     invest_total = per['累计投入本金'] + per['累计投入资产']
     cur_fund = per['当前总资产']
