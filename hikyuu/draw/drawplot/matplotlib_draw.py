@@ -765,8 +765,6 @@ def sys_performance(sys, ref_stk=None):
     cum_return = get_part("default.ind.累积收益率")
     ref_return = cum_return(ref_k.close)
     ref_return.name = ref_stk.name
-    ref_return.plot(legend_on=True)
-    funds_return.plot(legend_on=True, new=False)
 
     per = Performance()
     text = per.report(sys.tm, Datetime(datetime.today()))
@@ -780,16 +778,6 @@ def sys_performance(sys, ref_stk=None):
     sigma = 15.874507866387544 * sigma[-1]  # 15.874 = sqrt(252)
     sharp = (per['帐户平均年收益率%'] - bond[-1]) * 0.01 / sigma
 
-    axis = gca()
-    axis.text(-0.05,
-              0.97,
-              text,
-              horizontalalignment='right',
-              verticalalignment='top',
-              transform=axis.transAxes,
-              # color=text_color
-              )
-
     invest_total = per['累计投入本金'] + per['累计投入资产']
     cur_fund = per['当前总资产']
     t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
@@ -798,12 +786,57 @@ def sys_performance(sys, ref_stk=None):
         funds_return[-1], per["帐户平均年收益率%"], max_pullback)
     t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
         per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
-    label = t1 + '\n\n' + t2 + '\n\n' + t3
-    axis.text(0.05,
-              -0.06,
-              label,
-              horizontalalignment='left',
-              verticalalignment='top',
-              transform=axis.transAxes,
-              # color=text_color
-              )
+
+    mp_back = matplotlib.get_backend()
+    if "nbagg" in mp_back:
+        fg = figure(figsize=(13, 10))
+        ax1 = fg.add_axes([0.05, 0.35, 0.65, 0.6])
+        ax2 = fg.add_axes([0.05, 0.05, 0.65, 0.25], sharex=ax1)
+
+        ref_return.plot(axes=ax1, legend_on=True)
+        funds_return.plot(axes=ax1, legend_on=True)
+
+        label = t1 + '\n\n' + t2 + '\n\n' + t3
+        ax1.text(1.01,
+                 1,
+                 text,
+                 horizontalalignment='left',
+                 verticalalignment='top',
+                 transform=ax1.transAxes,
+                 # color='r'
+                 )
+        ax2.text(0.02,
+                 1.0,
+                 label,
+                 horizontalalignment='left',
+                 verticalalignment='top',
+                 transform=ax2.transAxes,
+                 # color='r'
+                 )
+        # ax2.set_visible(False)
+        ax2.xaxis.set_visible(False)
+        ax2.yaxis.set_visible(False)
+        ax2.set_frame_on(False)
+
+    else:
+        ref_return.plot(legend_on=True)
+        funds_return.plot(legend_on=True, new=False)
+        axis = gca()
+        axis.text(-0.05,
+                  0.97,
+                  text,
+                  horizontalalignment='right',
+                  verticalalignment='top',
+                  transform=axis.transAxes,
+                  # color=text_color
+                  )
+
+        label = t1 + '\n\n' + t2 + '\n\n' + t3
+        axis.text(0.05,
+                  -0.06,
+                  label,
+                  horizontalalignment='left',
+                  verticalalignment='top',
+                  transform=axis.transAxes,
+                  # color=text_color
+                  )

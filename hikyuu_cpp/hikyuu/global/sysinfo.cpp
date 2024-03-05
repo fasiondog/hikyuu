@@ -20,6 +20,8 @@
 
 using json = nlohmann::json;
 
+#define FEEDBACK_SERVER_ADDR "tcp://1.tcp.cpolar.cn:20981"
+
 namespace hku {
 
 std::atomic<int> g_latest_version{0};
@@ -83,7 +85,7 @@ void sendFeedback() {
                 saveUUID(uid);
             }
 
-            NodeClient client("tcp://1.tcp.cpolar.cn:20981");
+            NodeClient client(FEEDBACK_SERVER_ADDR);
             client.dial();
 
             json req, res;
@@ -111,6 +113,34 @@ void sendFeedback() {
     });
     t.detach();
     // t.join();
+}
+
+void sendPythonVersionFeedBack(int major, int minor, int micro) {
+    std::thread t([=]() {
+        try {
+            NodeClient client(FEEDBACK_SERVER_ADDR);
+            client.dial();
+
+            json req, res;
+            req["cmd"] = 2;
+            client.post(req, res);
+            std::string host = res["host"].get<std::string>();
+            uint64_t port = res["port"].get<uint64_t>();
+            g_latest_version = res.contains("last_version") ? res["last_version"].get<int>() : 0;
+            client.close();
+
+            client.setServerAddr(fmt::format("tcp://{}:{}", host, port));
+            client.dial();
+            req["cmd"] = 3;
+            req["major"] = major;
+            req["minor"] = minor;
+            req["micro"] = micro;
+            client.post(req, res);
+        } catch (...) {
+            // do nothing
+        }
+    });
+    t.detach();
 }
 
 }  // namespace hku
