@@ -418,10 +418,10 @@ Indicator (*AD_2)(const KData&) = AD;
 Indicator (*COST_1)(double x) = COST;
 Indicator (*COST_2)(const KData&, double x) = COST;
 
-Indicator (*ALIGN_1)(const DatetimeList&) = ALIGN;
-Indicator (*ALIGN_2)(const Indicator&, const DatetimeList&) = ALIGN;
-Indicator (*ALIGN_3)(const Indicator&, const Indicator&) = ALIGN;
-Indicator (*ALIGN_4)(const Indicator&, const KData&) = ALIGN;
+Indicator (*ALIGN_1)(const DatetimeList&, bool use_null) = ALIGN;
+Indicator (*ALIGN_2)(const Indicator&, const DatetimeList&, bool use_null) = ALIGN;
+Indicator (*ALIGN_3)(const Indicator&, const Indicator&, bool use_null) = ALIGN;
+Indicator (*ALIGN_4)(const Indicator&, const KData&, bool use_null) = ALIGN;
 
 Indicator (*DROPNA_1)() = DROPNA;
 Indicator (*DROPNA_2)(const Indicator&) = DROPNA;
@@ -1545,15 +1545,17 @@ void export_Indicator_build_in(py::module& m) {
     :param float x: x%获利价格, 0~100
     :rtype: Indicator)");
 
-    m.def("ALIGN", ALIGN_1);
-    m.def("ALIGN", ALIGN_2);
-    m.def("ALIGN", ALIGN_3);
-    m.def("ALIGN", ALIGN_4, R"(ALIGN(data, ref):
+    m.def("ALIGN", ALIGN_1, py::arg("ref"), py::arg("use_null") = false);
+    m.def("ALIGN", ALIGN_2, py::arg("data"), py::arg("ref"), py::arg("use_null") = false);
+    m.def("ALIGN", ALIGN_3, py::arg("data"), py::arg("ref"), py::arg("use_null") = false);
+    m.def("ALIGN", ALIGN_4, py::arg("data"), py::arg("ref"), py::arg("use_null") = false,
+          R"(ALIGN(data, ref):
 
     按指定的参考日期对齐
 
     :param Indicator data: 输入数据
-    :param ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
+    :param DatetimeList|Indicator|KData ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
+    :param bool use_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据
     :retype: Indicator)");
 
     m.def("DROPNA", DROPNA_1);
