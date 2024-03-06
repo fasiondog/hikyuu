@@ -49,6 +49,9 @@
 // 启用通达信本地 K线数据引擎
 #define HKU_ENABLE_TDX_KDATA ${HKU_ENABLE_TDX_KDATA}
 
+// 使用低精度版本，Indicator 使用 float 类型进行计算
+#define HKU_USE_LOW_PRECISION ${HKU_USE_LOW_PRECISION}
+
 // clang-format on
 
 #endif /* HIKYUU_CONFIG_H_ */

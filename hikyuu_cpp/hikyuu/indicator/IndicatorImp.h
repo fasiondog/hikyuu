@@ -30,7 +30,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #endif /* HKU_SUPPORT_BINARY_ARCHIVE */
 
-#include <boost/serialization/unordered_map.hpp>
+#include <boost/serialization/map.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/shared_ptr.hpp>
@@ -56,34 +56,42 @@ class HKU_API IndParam;
  */
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
     PARAMETER_SUPPORT
+    friend HKU_API std::ostream& operator<<(std::ostream& os, const IndicatorImp& imp);
 
 public:
     enum OPType {
-        LEAF,   ///< 叶子节点
-        OP,     /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
-        ADD,    ///< 加
-        SUB,    ///< 减
-        MUL,    ///< 乘
-        DIV,    ///< 除
-        MOD,    ///< 取模
-        EQ,     ///< 等于
-        GT,     ///< 大于
-        LT,     ///< 小于
-        NE,     ///< 不等于
-        GE,     ///< 大于等于
-        LE,     ///< 小于等于
-        AND,    ///< 与
-        OR,     ///< 或
-        WEAVE,  ///< 特殊的，需要两个指标作为参数的指标
-        OP_IF,  /// if操作
-        CORR,   ///< 相关系数，需要两个指标作为参数
+        LEAF,      ///< 叶子节点
+        OP,        /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
+        ADD,       ///< 加
+        SUB,       ///< 减
+        MUL,       ///< 乘
+        DIV,       ///< 除
+        MOD,       ///< 取模
+        EQ,        ///< 等于
+        GT,        ///< 大于
+        LT,        ///< 小于
+        NE,        ///< 不等于
+        GE,        ///< 大于等于
+        LE,        ///< 小于等于
+        AND,       ///< 与
+        OR,        ///< 或
+        WEAVE,     ///< 特殊的，需要两个指标作为参数的指标
+        OP_IF,     /// if操作
+        CORR,      ///< 相关系数，需要两个指标作为参数
+        SPEARMAN,  ///< spearman 相关系数
         INVALID
     };
+
+#if HKU_USE_LOW_PRECISION
+    typedef float value_t;
+#else
+    typedef double value_t;
+#endif
 
 public:
     /** 默认构造函数   */
     IndicatorImp();
-    IndicatorImp(const string& name);
+    explicit IndicatorImp(const string& name);
     IndicatorImp(const string& name, size_t result_num);
 
     virtual ~IndicatorImp();
@@ -99,9 +107,9 @@ public:
 
     size_t size() const;
 
-    price_t get(size_t pos, size_t num = 0);
+    value_t get(size_t pos, size_t num = 0) const;
 
-    price_t getByDate(Datetime, size_t num = 0);
+    value_t getByDate(Datetime, size_t num = 0);
 
     Datetime getDatetime(size_t pos) const;
 
@@ -115,11 +123,14 @@ public:
     /** 以Indicator的方式获取指定的输出集，该方式包含了discard的信息 */
     IndicatorImpPtr getResult(size_t result_num);
 
+    /** 判断是否和另一个指标等效，即计算效果相同 */
+    bool alike(const IndicatorImp& other) const;
+
     /**
      * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数,
      * 未做越界保护
      */
-    void _set(price_t val, size_t pos, size_t num = 0);
+    void _set(value_t val, size_t pos, size_t num = 0);
 
     /**
      * 准备内存
@@ -129,7 +140,7 @@ public:
      */
     void _readyBuffer(size_t len, size_t result_num);
 
-    string name() const;
+    const string& name() const;
     void name(const string& name);
 
     /** 返回形如：Name(param1=val,param2=val,...) */
@@ -158,9 +169,12 @@ public:
     void setIndParam(const string& name, const IndParam& ind);
     IndParam getIndParam(const string& name) const;
     const IndicatorImpPtr& getIndParamImp(const string& name) const;
-    const unordered_map<string, IndicatorImpPtr>& getIndParams() const;
 
-    price_t* data(size_t result_num = 0);
+    typedef std::map<string, IndicatorImpPtr> ind_param_map_t;
+    const ind_param_map_t& getIndParams() const;
+
+    value_t* data(size_t result_num = 0);
+    value_t const* data(size_t result_num = 0) const;
 
     // ===================
     //  子类接口
@@ -212,6 +226,10 @@ private:
     void execute_weave();
     void execute_if();
     void execute_corr();
+    void execute_spearman();
+
+    std::vector<IndicatorImpPtr> getAllSubNodes();
+    void repeatALikeNodes();
 
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
@@ -223,14 +241,16 @@ protected:
     string m_name;
     size_t m_discard;
     size_t m_result_num;
-    PriceList* m_pBuffer[MAX_RESULT_NUM];
+    vector<value_t>* m_pBuffer[MAX_RESULT_NUM];
 
     bool m_need_calculate;
     OPType m_optype;
     IndicatorImpPtr m_left;
     IndicatorImpPtr m_right;
     IndicatorImpPtr m_three;
-    unordered_map<string, IndicatorImpPtr> m_ind_params;
+    ind_param_map_t m_ind_params;  // don't use unordered_map
+
+    IndicatorImp* m_parent{nullptr};  // can't use shared_from_this in python, so not weak_ptr
 
 public:
     static void initDynEngine();
@@ -268,15 +288,15 @@ private:
         for (size_t i = 0; i < act_result_num; ++i) {
             size_t count = size();
             ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
-            PriceList& values = *m_pBuffer[i];
-            for (size_t i = 0; i < count; i++) {
-                if (std::isnan(values[i])) {
+            vector<value_t>& values = *m_pBuffer[i];
+            for (size_t j = 0; j < count; j++) {
+                if (std::isnan(values[j])) {
                     ar& boost::serialization::make_nvp<string>("item", nan);
-                } else if (std::isinf(values[i])) {
-                    inf = values[i] > 0 ? "+inf" : "-inf";
+                } else if (std::isinf(values[j])) {
+                    inf = values[j] > 0 ? "+inf" : "-inf";
                     ar& boost::serialization::make_nvp<string>("item", inf);
                 } else {
-                    ar& boost::serialization::make_nvp<price_t>("item", values[i]);
+                    ar& boost::serialization::make_nvp<value_t>("item", values[j]);
                 }
             }
         }
@@ -299,10 +319,10 @@ private:
         size_t act_result_num = 0;
         ar& BOOST_SERIALIZATION_NVP(act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
-            m_pBuffer[i] = new PriceList();
+            m_pBuffer[i] = new vector<value_t>();
             size_t count = 0;
             ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
-            PriceList& values = *m_pBuffer[i];
+            vector<value_t>& values = *m_pBuffer[i];
             values.resize(count);
             for (size_t i = 0; i < count; i++) {
                 std::string vstr;
@@ -366,6 +386,9 @@ public:                                           \
         return true;                              \
     }
 
+/** 获取 OPType 名称字符串 */
+string HKU_API getOPTypeName(IndicatorImp::OPType);
+
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 
 HKU_API std::ostream& operator<<(std::ostream&, const IndicatorImp&);
@@ -383,7 +406,7 @@ inline size_t IndicatorImp::size() const {
     return m_pBuffer[0] ? m_pBuffer[0]->size() : 0;
 }
 
-inline string IndicatorImp::name() const {
+inline const string& IndicatorImp::name() const {
     return m_name;
 }
 
@@ -399,7 +422,7 @@ inline KData IndicatorImp::getContext() const {
     return getParam<KData>("kdata");
 }
 
-inline const unordered_map<string, IndicatorImpPtr>& IndicatorImp::getIndParams() const {
+inline const IndicatorImp::ind_param_map_t& IndicatorImp::getIndParams() const {
     return m_ind_params;
 }
 
@@ -407,7 +430,11 @@ inline bool IndicatorImp::haveIndParam(const string& name) const {
     return m_ind_params.find(name) != m_ind_params.end();
 }
 
-inline price_t* IndicatorImp::data(size_t result_num) {
+inline IndicatorImp::value_t* IndicatorImp::data(size_t result_num) {
+    return m_pBuffer[result_num] ? m_pBuffer[result_num]->data() : nullptr;
+}
+
+inline IndicatorImp::value_t const* IndicatorImp::data(size_t result_num) const {
     return m_pBuffer[result_num] ? m_pBuffer[result_num]->data() : nullptr;
 }
 

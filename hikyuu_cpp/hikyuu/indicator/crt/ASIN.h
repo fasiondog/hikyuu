@@ -20,14 +20,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ASIN();
-Indicator ASIN(price_t);
+Indicator ASIN(Indicator::value_t);
 Indicator ASIN(const Indicator& ind);
 
 inline Indicator ASIN(const Indicator& ind) {
     return ASIN()(ind);
 }
 
-inline Indicator ASIN(price_t val) {
+inline Indicator ASIN(Indicator::value_t val) {
     return ASIN(CVAL(val));
 }
 

@@ -79,32 +79,32 @@ System::System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const Envir
 System::~System() {}
 
 void System::initParam() {
-    //连续延迟交易请求的限制次数，需大于等于0，0表示只允许延迟1次
+    // 连续延迟交易请求的限制次数，需大于等于0，0表示只允许延迟1次
     setParam<int>("max_delay_count", 3);
 
-    //是否延迟到下一个bar开盘时进行交易
-    setParam<bool>("buy_delay", true);  //非延迟操作取当前Bar的收盘价操作；延迟取下一BAR开盘价
+    // 是否延迟到下一个bar开盘时进行交易
+    setParam<bool>("buy_delay", true);  // 非延迟操作取当前Bar的收盘价操作；延迟取下一BAR开盘价
     setParam<bool>("sell_delay", true);
 
-    //延迟操作的情况下，是使用当前的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
+    // 延迟操作的情况下，是使用当前的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
     setParam<bool>("delay_use_current_price", true);
-    setParam<bool>("tp_monotonic", true);  //止赢单调递增
-    setParam<int>("tp_delay_n", 3);        //止赢延迟判断天数
-    setParam<bool>("ignore_sell_sg", false);  //忽略卖出信号，只使用止损/止赢等其他方式卖出
+    setParam<bool>("tp_monotonic", true);  // 止赢单调递增
+    setParam<int>("tp_delay_n", 3);        // 止赢延迟判断天数
+    setParam<bool>("ignore_sell_sg", false);  // 忽略卖出信号，只使用止损/止赢等其他方式卖出
 
-    //最高价等于最低价时，是否可进行交易
+    // 最高价等于最低价时，是否可进行交易
     setParam<bool>("can_trade_when_high_eq_low", false);
 
-    //是否使用市场环境判定进行初始建仓
+    // 是否使用市场环境判定进行初始建仓
     setParam<bool>("ev_open_position", false);
 
-    //是否使用系统有效性条件进行初始建仓
+    // 是否使用系统有效性条件进行初始建仓
     setParam<bool>("cn_open_position", false);
 
-    //在现金不足时，是否支持借入现金，融资
+    // 在现金不足时，是否支持借入现金，融资
     setParam<bool>("support_borrow_cash", false);
 
-    //在没有持仓时，是否支持借入证券，融券
+    // 在没有持仓时，是否支持借入证券，融券
     setParam<bool>("support_borrow_stock", false);
 }
 
@@ -128,10 +128,10 @@ void System::reset(bool with_tm, bool with_ev) {
     if (m_sp)
         m_sp->reset();
 
-    //不能复位m_stock / m_kdata/
-    // m_src_kdata，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
-    //一个sys实例绑定stock后，除非主动改变，否则不应该被reset
-    // m_stock
+    // 不能复位m_stock / m_kdata/
+    //  m_src_kdata，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
+    // 一个sys实例绑定stock后，除非主动改变，否则不应该被reset
+    //  m_stock
 
     m_pre_ev_valid = false;  // true;
     m_pre_cn_valid = false;  // true;
@@ -185,13 +185,15 @@ void System::setTO(const KData& kdata) {
         m_mm->setQuery(query);
 }
 
-SystemPtr System::clone() {
+SystemPtr System::clone(bool with_tm, bool with_ev) {
     SystemPtr p = make_shared<System>();
-    if (m_tm)
-        p->m_tm = m_tm->clone();
-    // ev 通常作为公共组件不进行克隆
-    // if (m_ev)
-    //     p->m_ev = m_ev->clone();
+    if (m_tm) {
+        p->m_tm = with_tm ? m_tm->clone() : m_tm;
+    }
+    if (m_ev) {
+        // ev 通常作为公共组件不进行克隆，使用同一实例
+        p->m_ev = with_ev ? m_ev->clone() : m_ev;
+    }
     if (m_mm)
         p->m_mm = m_mm->clone();
     if (m_cn)
@@ -249,15 +251,15 @@ bool System::readyForRun() {
     HKU_ERROR_IF_RETURN(!m_mm, false, "Not setMoneyManager!");
     HKU_ERROR_IF_RETURN(!m_sg, false, "Not setSignal!");
 
-    //如果存在市场环境判断策略，则需要将默认的前一日市场有效标志置为false
-    //因为需要由市场环境判断策略全权判定市场是否有效
+    // 如果存在市场环境判断策略，则需要将默认的前一日市场有效标志置为false
+    // 因为需要由市场环境判断策略全权判定市场是否有效
     if (m_ev)
         m_pre_ev_valid = false;
 
     if (m_cn) {
         m_cn->setTM(m_tm);
         m_cn->setSG(m_sg);
-        m_pre_cn_valid = false;  //默认的前一日市场有效标志置为false
+        m_pre_cn_valid = false;  // 默认的前一日市场有效标志置为false
     }
 
     if (m_mm)
@@ -290,9 +292,11 @@ void System::run(const KQuery& query, bool reset) {
 
     setTO(kdata);
     size_t total = kdata.size();
+    auto const* ks = kdata.data();
+    auto const* src_ks = m_src_kdata.data();
     for (size_t i = 0; i < total; ++i) {
-        if (kdata[i].datetime >= m_tm->initDatetime()) {
-            _runMoment(kdata[i], m_src_kdata[i]);
+        if (ks[i].datetime >= m_tm->initDatetime()) {
+            _runMoment(ks[i], src_ks[i]);
         }
     }
 }
@@ -313,9 +317,11 @@ void System::run(const KData& kdata, bool reset) {
 
     setTO(kdata);
     size_t total = kdata.size();
+    auto const* ks = kdata.data();
+    auto const* src_ks = m_src_kdata.data();
     for (size_t i = 0; i < total; ++i) {
-        if (kdata[i].datetime >= m_tm->initDatetime()) {
-            _runMoment(kdata[i], m_src_kdata[i]);
+        if (ks[i].datetime >= m_tm->initDatetime()) {
+            _runMoment(ks[i], src_ks[i]);
         }
     }
 }
@@ -346,7 +352,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
         return result;
     }
 
-    //处理当前已有的交易请求
+    // 处理当前已有的交易请求
     result = _processRequest(today, src_today);
 
     //----------------------------------------------------------
@@ -355,10 +361,10 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     bool current_ev_valid = _environmentIsValid(today.datetime);
 
-    //如果当前环境无效
+    // 如果当前环境无效
     if (!current_ev_valid) {
         TradeRecord tr;
-        //如果持有多头仓位，则立即清仓卖出
+        // 如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
             tr = _sell(today, src_today, PART_ENVIRONMENT);
         }
@@ -367,9 +373,9 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
         return tr.isNull() ? result : tr;
     }
 
-    //环境是从无效变为有效时
+    // 环境是从无效变为有效时
     if (!m_pre_ev_valid) {
-        //如果使用环境判定策略进行初始建仓
+        // 如果使用环境判定策略进行初始建仓
         if (getParam<bool>("ev_open_position")) {
             TradeRecord tr = _buy(today, src_today, PART_ENVIRONMENT);
             m_pre_ev_valid = current_ev_valid;
@@ -385,10 +391,10 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     bool current_cn_valid = _conditionIsValid(today.datetime);
 
-    //如果系统当前无效
+    // 如果系统当前无效
     if (!current_cn_valid) {
         TradeRecord tr;
-        //如果持有多头仓位，则立即清仓卖出
+        // 如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
             tr = _sell(today, src_today, PART_CONDITION);
         }
@@ -397,9 +403,9 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
         return tr.isNull() ? result : tr;
     }
 
-    //如果系统从无效变为有效
+    // 如果系统从无效变为有效
     if (!m_pre_cn_valid) {
-        //如果使用环境判定策略进行初始建仓
+        // 如果使用环境判定策略进行初始建仓
         if (getParam<bool>("cn_open_position")) {
             TradeRecord tr = _buy(today, src_today, PART_CONDITION);
             m_pre_cn_valid = current_cn_valid;
@@ -413,19 +419,23 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     // 处理买入、卖出信号
     //----------------------------------------------------------
 
-    //如果有买入信号
+    // 如果有买入信号
     if (m_sg->shouldBuy(today.datetime)) {
-        TradeRecord tr = _buy(today, src_today, PART_SIGNAL);
-        // if (m_tm->haveShort(m_stock)) _sellShort(today);
+        TradeRecord tr;
+        if (m_tm->haveShort(m_stock))
+            tr = _buyShort(today, src_today, PART_SIGNAL);
+        else
+            tr = _buy(today, src_today, PART_SIGNAL);
         return tr.isNull() ? result : tr;
     }
 
-    //发出卖出信号
+    // 发出卖出信号
     if (m_sg->shouldSell(today.datetime)) {
         TradeRecord tr;
         if (m_tm->have(m_stock))
             tr = _sell(today, src_today, PART_SIGNAL);
-        //_buyShort(today, PART_SIGNAL);
+        else
+            tr = _sellShort(today, src_today, PART_SIGNAL);
         return tr.isNull() ? result : tr;
     }
 
@@ -479,18 +489,18 @@ TradeRecord System::_buy(const KRecord& today, const KRecord& src_today, Part fr
 TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part from) {
     TradeRecord result;
 
-    //以当前收盘价为计划价格
+    // 以当前收盘价为计划价格
     price_t planPrice = src_today.closePrice;
 
-    //计算止损价
+    // 计算止损价
     price_t stoploss = _getStoplossPrice(today, src_today, today.closePrice);
 
-    //如果计划的价格已经小于等于止损价，放弃交易
+    // 如果计划的价格已经小于等于止损价，放弃交易
     if (planPrice <= stoploss) {
         return result;
     }
 
-    //获取可买入数量
+    // 获取可买入数量
     double number = _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, from);
     if (number == 0 || number > m_stock.maxTradeNumber()) {
         return result;
@@ -518,20 +528,20 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
 TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
     TradeRecord result;
     if (today.highPrice == today.lowPrice && !getParam<bool>("can_trade_when_high_eq_low")) {
-        //无法实际执行，延迟至下一时刻
+        // 无法实际执行，延迟至下一时刻
         _submitBuyRequest(KRecord(today.datetime), KRecord(today.datetime), m_buyRequest.from);
         return result;
     }
 
-    //延迟操作，取当前时刻开盘价
-    price_t planPrice = src_today.openPrice;  //取当前时刻的开盘价
+    // 延迟操作，取当前时刻开盘价
+    price_t planPrice = src_today.openPrice;  // 取当前时刻的开盘价
 
-    //计算止损价和可买入数量
+    // 计算止损价和可买入数量
     price_t stoploss = 0.0;
     double number = 0.0;
     price_t goalPrice = 0.0;
     if (getParam<bool>("delay_use_current_price")) {
-        //使用当前计划价格计算止损价和可买入数量
+        // 使用当前计划价格计算止损价和可买入数量
         stoploss = _getStoplossPrice(today, src_today, today.openPrice);
         number = planPrice <= stoploss ? 0.0
                                        : _getBuyNumber(today.datetime, planPrice,
@@ -544,7 +554,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
         goalPrice = m_buyRequest.goal;
     }
 
-    //如果计划买入的价格已经小于等于止损价或者买入数量等于0
+    // 如果计划买入的价格已经小于等于止损价或者买入数量等于0
     if (planPrice <= stoploss || number == 0) {
         m_buyRequest.clear();
         return result;
@@ -564,7 +574,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
     }
 
     m_buy_days = 0;
-    m_lastTakeProfit = realPrice;
+    m_lastTakeProfit = 0;
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
     m_buyRequest.clear();
@@ -574,7 +584,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
 void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, Part from) {
     if (m_buyRequest.valid) {
         if (m_buyRequest.count > getParam<int>("max_delay_count")) {
-            //超出最大延迟次数，清除买入请求
+            // 超出最大延迟次数，清除买入请求
             m_buyRequest.clear();
             return;
         }
@@ -603,7 +613,7 @@ TradeRecord System::sellForce(const KRecord& today, const KRecord& src_today, do
     if (getParam<bool>("sell_delay")) {
         if (m_sellRequest.valid) {
             if (m_sellRequest.count > getParam<int>("max_delay_count")) {
-                //超出最大延迟次数，清除买入请求
+                // 超出最大延迟次数，清除买入请求
                 m_sellRequest.clear();
                 return result;
             }
@@ -649,14 +659,14 @@ TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Par
     price_t planPrice = src_today.closePrice;
     double number = 0;
 
-    //计算新的止损价
+    // 计算新的止损价
     price_t stoploss = _getStoplossPrice(today, src_today, today.closePrice);
 
-    //如果新的计划价格已经小于等于新的止损价，则认为需全部卖出
+    // 如果新的计划价格已经小于等于新的止损价，则认为需全部卖出
     if (planPrice <= stoploss) {
         number = m_tm->getHoldNumber(today.datetime, m_stock);
 
-        //否则，认为可能只是进行减仓操作
+        // 否则，认为可能只是进行减仓操作
     } else {
         number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss, from);
         if (number == 0) {
@@ -669,10 +679,10 @@ TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Par
     TradeRecord record =
       m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_SELL != record.business) {
-        return result;  //卖出操作失败
+        return result;  // 卖出操作失败
     }
 
-    //如果已未持仓，最后的止赢价初始为0
+    // 如果已未持仓，最后的止赢价初始为0
     if (!m_tm->have(m_stock)) {
         m_lastTakeProfit = 0.0;
     } else {
@@ -687,14 +697,14 @@ TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Par
 TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
     TradeRecord result;
     if (today.highPrice == today.lowPrice && !getParam<bool>("can_trade_when_high_eq_low")) {
-        //无法执行，保留卖出请求，继续延迟至下一时刻
+        // 无法执行，保留卖出请求，继续延迟至下一时刻
         _submitSellRequest(KRecord(today.datetime), KRecord(today.datetime), m_sellRequest.from);
         return result;
     }
 
-    price_t planPrice = src_today.openPrice;  //取当前时刻的开盘价
+    price_t planPrice = src_today.openPrice;  // 取当前时刻的开盘价
 
-    //发出卖出请求时刻的止损价
+    // 发出卖出请求时刻的止损价
     price_t stoploss = 0.0;
     double number = 0.0;
     price_t goalPrice = 0.0;
@@ -725,10 +735,10 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
                                     planPrice, m_sellRequest.from);
     if (BUSINESS_SELL != record.business) {
         m_sellRequest.clear();
-        return result;  //卖出操作失败
+        return result;  // 卖出操作失败
     }
 
-    //如果已未持仓，最后的止赢价初始为0
+    // 如果已未持仓，最后的止赢价初始为0
     if (!m_tm->have(m_stock)) {
         m_lastTakeProfit = 0.0;
     }
@@ -742,7 +752,7 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
 void System::_submitSellRequest(const KRecord& today, const KRecord& src_today, Part from) {
     if (m_sellRequest.valid) {
         if (m_sellRequest.count > getParam<int>("max_delay_count")) {
-            //超出最大延迟次数，清除买入请求
+            // 超出最大延迟次数，清除买入请求
             m_sellRequest.clear();
             return;
         }
@@ -783,24 +793,24 @@ TradeRecord System::_buyShort(const KRecord& today, const KRecord& src_today, Pa
 TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today, Part from) {
     TradeRecord result;
     if (today.highPrice == today.lowPrice) {
-        //无法实际执行，延迟至下一时刻
+        // 无法实际执行，延迟至下一时刻
         //_submitBuyRequest(m_buyRequest.datetime);
         return result;
     }
 
-    price_t planPrice = src_today.closePrice;  //取当前时刻的收盘价
+    price_t planPrice = src_today.closePrice;  // 取当前时刻的收盘价
 
-    //取当前时刻的收盘价对应的止损价
+    // 取当前时刻的收盘价对应的止损价
     price_t stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
 
-    //确定数量
+    // 确定数量
     double number = _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice, from);
     if (number == 0) {
         m_buyShortRequest.clear();
         return result;
     }
 
-    //获取当前空头仓位持有情况
+    // 获取当前空头仓位持有情况
     PositionRecord pos = m_tm->getShortPosition(m_stock);
     if (pos.number == 0) {
         m_buyShortRequest.clear();
@@ -822,7 +832,7 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
     }
 
     m_sell_short_days = 0;
-    m_lastTakeProfit = realPrice;  //止赢赋值给买入价格
+    m_lastTakeProfit = realPrice;  // 止赢赋值给买入价格
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
     m_buyShortRequest.clear();
@@ -832,18 +842,18 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
 TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_today) {
     TradeRecord result;
     if (today.highPrice == today.lowPrice) {
-        //无法实际执行，延迟至下一时刻
+        // 无法实际执行，延迟至下一时刻
         //_submitBuyRequest(m_buyRequest.datetime);
         return result;
     }
 
-    price_t planPrice = src_today.openPrice;  //取当前时刻的收盘价
+    price_t planPrice = src_today.openPrice;  // 取当前时刻的收盘价
 
     price_t stoploss = 0.0;
     double number = 0.0;
     price_t goalPrice = 0.0;
     if (getParam<bool>("delay_use_current_price")) {
-        //取当前时刻的收盘价对应的止损价
+        // 取当前时刻的收盘价对应的止损价
         stoploss = _getShortStoplossPrice(today, src_today, today.openPrice);
         number =
           _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice, m_buyRequest.from);
@@ -860,7 +870,7 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
         return result;
     }
 
-    //获取当前空头仓位持有情况
+    // 获取当前空头仓位持有情况
     PositionRecord pos = m_tm->getShortPosition(m_stock);
     if (pos.number == 0) {
         m_buyShortRequest.clear();
@@ -880,7 +890,7 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
     }
 
     m_sell_short_days = 0;
-    m_lastTakeProfit = realPrice;  //止赢赋值给买入价格
+    m_lastTakeProfit = realPrice;  // 止赢赋值给买入价格
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
     m_buyShortRequest.clear();
@@ -890,7 +900,7 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
 void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from) {
     if (m_buyShortRequest.valid) {
         if (m_buyShortRequest.count > getParam<int>("max_delay_count")) {
-            //超出最大延迟次数，清除买入请求
+            // 超出最大延迟次数，清除买入请求
             m_buyRequest.clear();
             return;
         }
@@ -913,8 +923,10 @@ void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_tod
 
 TradeRecord System::_sellShort(const KRecord& today, const KRecord& src_today, Part from) {
     TradeRecord result;
-    if (getParam<bool>("support_borrow_stock") == false)
+    if (getParam<bool>("support_borrow_stock") == false) {
+        // HKU_WARN("set system param support_borrow_stock to true to short sell");
         return result;
+    }
 
     if (getParam<bool>("sell_delay")) {
         _submitSellShortRequest(today, src_today, from);
@@ -927,14 +939,14 @@ TradeRecord System::_sellShort(const KRecord& today, const KRecord& src_today, P
 TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today, Part from) {
     TradeRecord result;
     if (today.highPrice == today.lowPrice) {
-        //当前无法卖出，延迟至下一时刻卖出
+        // 当前无法卖出，延迟至下一时刻卖出
         _submitSellShortRequest(today, src_today, from);
         return result;
     }
 
     price_t planPrice = src_today.closePrice;
 
-    //计算止损价
+    // 计算止损价
     price_t stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
 
     double number = _getSellShortNumber(today.datetime, planPrice, stoploss - planPrice, from);
@@ -945,11 +957,11 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
 
     price_t goalPrice = _getShortGoalPrice(today.datetime, planPrice);
     price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
-    TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss, goalPrice,
-                                    planPrice, PART_SIGNAL);
+    TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
+                                         goalPrice, planPrice, PART_SIGNAL);
     if (BUSINESS_SELL_SHORT != record.business) {
         m_sellShortRequest.clear();
-        return result;  //卖出操作失败
+        return result;  // 卖出操作失败
     }
 
     m_sell_short_days = 0;
@@ -963,14 +975,14 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
 TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_today) {
     TradeRecord result;
     if (today.highPrice == today.lowPrice) {
-        //无法执行，保留卖出请求，继续延迟至下一时刻
+        // 无法执行，保留卖出请求，继续延迟至下一时刻
         _submitSellShortRequest(today, src_today, m_sellShortRequest.from);
         return result;
     }
 
-    price_t planPrice = src_today.openPrice;  //取当前时刻的开盘价
+    price_t planPrice = src_today.openPrice;  // 取当前时刻的开盘价
 
-    //发出卖出请求时刻的止损价
+    // 发出卖出请求时刻的止损价
     price_t stoploss = 0.0;
     double number = 0;
     price_t goalPrice = 0.0;
@@ -992,11 +1004,11 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
 
     price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
 
-    TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss, goalPrice,
-                                    planPrice, m_sellShortRequest.from);
+    TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
+                                         goalPrice, planPrice, m_sellShortRequest.from);
     if (BUSINESS_SELL_SHORT != record.business) {
         m_sellShortRequest.clear();
-        return result;  //卖出操作失败
+        return result;  // 卖出操作失败
     }
 
     m_sell_short_days = 0;
@@ -1010,7 +1022,7 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
 void System::_submitSellShortRequest(const KRecord& today, const KRecord& src_today, Part from) {
     if (m_sellShortRequest.valid) {
         if (m_sellShortRequest.count > getParam<int>("max_delay_count")) {
-            //超出最大延迟次数，清除买入请求
+            // 超出最大延迟次数，清除买入请求
             m_sellShortRequest.clear();
             return;
         }

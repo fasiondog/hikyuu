@@ -46,16 +46,16 @@ class MARKETID:
 
 
 class STOCKTYPE:
-    BLOCK = 0  #板块
-    A = 1  #A股
-    INDEX = 2  #指数
-    B = 3  #B股
-    FUND = 4  #基金（非ETF）
-    ETF = 5  #ETF
-    ND = 6  #国债
-    BOND = 7  #其他债券
-    GEM = 8  #创业板
-    START = 9  #科创板
+    BLOCK = 0  # 板块
+    A = 1  # A股
+    INDEX = 2  # 指数
+    B = 3  # B股
+    FUND = 4  # 基金（非ETF）
+    ETF = 5  # ETF
+    ND = 6  # 国债
+    BOND = 7  # 其他债券
+    GEM = 8  # 创业板
+    START = 9  # 科创板
 
 
 def get_stktype_list(quotations=None):
@@ -127,11 +127,18 @@ def get_index_code_name_list() -> list:
     """
     获取所有股票指数代码名称列表
     从新浪获取，多次频繁调用会被封禁IP，需10分钟后再试
-    
+
     :return: [{'market_code': 'SHxxx'}, ...]
     """
-    df = ak.stock_zh_index_spot()
-    return [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
+    if hasattr(ak, 'stock_zh_index_spot_sina'):
+        df = ak.stock_zh_index_spot_sina()
+    elif hasattr(ak, 'stock_zh_index_spot_em'):
+        df = ak.stock_zh_index_spot_em()
+    else:
+        df = ak.stock_zh_index_spot()
+    res = [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
+    ret = [v for v in res if len(v['market_code']) == 8]
+    return ret
 
 
 g_fund_code_name_list = {}
@@ -175,3 +182,12 @@ def get_new_holidays():
     ret = re.findall(r'<textarea id="data" style="display:none;">([\s\w\d\W]+)</textarea>', res.text, re.M)[0].strip()
     day = [d.split('|')[:4] for d in ret.split('\n')]
     return [v[0] for v in day if v[2] == '中国']
+
+
+@hku_catch(ret=[], trace=True)
+@timeout(120)
+def get_china_bond10_rate(start_date="19901219"):
+    """获取中国国债收益率10年"""
+    bond_zh_us_rate_df = ak.bond_zh_us_rate(start_date)
+    df = bond_zh_us_rate_df[['中国国债收益率10年', '日期']].dropna()
+    return [(v[1].strftime('%Y%m%d'), int(v[0]*10000)) for v in df.values]

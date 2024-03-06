@@ -34,8 +34,10 @@ void IPow::_calculate(const Indicator& data) {
     }
 
     int n = getParam<int>("n");
+    auto const* src = data.data();
+    auto* dst = this->data();
     for (size_t i = m_discard; i < total; ++i) {
-        _set(std::pow(data[i], n), i);
+        dst[i] = std::pow(src[i], n);
     }
 }
 

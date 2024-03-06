@@ -7,6 +7,10 @@
 
 #include "ZeroTradeCost.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::ZeroTradeCost)
+#endif
+
 namespace hku {
 
 ZeroTradeCost::ZeroTradeCost() : TradeCostBase("TC_Zero") {}

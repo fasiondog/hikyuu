@@ -5,27 +5,21 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/StockManager.h>
+#include "pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getTradingCalendar_overloads, getTradingCalendar, 1, 2)
-
-BlockList (StockManager::*getBlockList_1)(const string&) = &StockManager::getBlockList;
-BlockList (StockManager::*getBlockList_2)() = &StockManager::getBlockList;
-
-void export_StockManager() {
-    class_<StockManager>("StockManager", "证券信息管理类", no_init)
-      .def("instance", &StockManager::instance, return_value_policy<reference_existing_object>(),
-           "获取StockManager单例实例")
-      .staticmethod("instance")
+void export_StockManager(py::module& m) {
+    py::class_<StockManager>(m, "StockManager", "证券信息管理类")
+      .def_static("instance", &StockManager::instance, py::return_value_policy::reference,
+                  "获取StockManager单例实例")
 
       .def(
-        "init", &StockManager::init,
-        (arg("base_info_param"), arg("block_param"), arg("kdata_param"), arg("preload_param"),
-         arg("hikyuu_param"), arg("context") = StrategyContext({"all"})),
+        "init", &StockManager::init, py::arg("base_info_param"), py::arg("block_param"),
+        py::arg("kdata_param"), py::arg("preload_param"), py::arg("hikyuu_param"),
+        py::arg("context") = StrategyContext({"all"}),
         R"(init(self, base_info_param, block_param, kdata_param, preload_param, hikyuu_param, context)
               
     初始化函数，必须在程序入口调用
@@ -48,15 +42,15 @@ void export_StockManager() {
     获取财务数据存放路径)")
 
       .def("get_base_info_parameter", &StockManager::getBaseInfoDriverParameter,
-           return_value_policy<copy_const_reference>(), "获取当前基础信息驱动参数")
+           py::return_value_policy::copy, "获取当前基础信息驱动参数")
       .def("get_block_parameter", &StockManager::getBlockDriverParameter,
-           return_value_policy<copy_const_reference>(), "获取当前板块信息驱动参数")
+           py::return_value_policy::copy, "获取当前板块信息驱动参数")
       .def("get_kdata_parameter", &StockManager::getKDataDriverParameter,
-           return_value_policy<copy_const_reference>(), "获取当前K线数据驱动参数")
+           py::return_value_policy::copy, "获取当前K线数据驱动参数")
       .def("get_preload_parameter", &StockManager::getPreloadParameter,
-           return_value_policy<copy_const_reference>(), "获取当前预加载参数")
-      .def("get_hikyuu_parameter", &StockManager::getHikyuuParameter,
-           return_value_policy<copy_const_reference>(), "获取当前其他参数")
+           py::return_value_policy::copy, "获取当前预加载参数")
+      .def("get_hikyuu_parameter", &StockManager::getHikyuuParameter, py::return_value_policy::copy,
+           "获取当前其他参数")
 
       .def("get_market_list", &StockManager::getAllMarket, R"(get_market_list(self)
 
@@ -98,8 +92,9 @@ void export_StockManager() {
     :return: 板块，如找不到返回空Block
     :rtype: Block)")
 
-      .def("get_block_list", getBlockList_1)
-      .def("get_block_list", getBlockList_2, R"(get_block_list(self[, category])
+      .def("get_block_list", py::overload_cast<>(&StockManager::getBlockList))
+      .def("get_block_list", py::overload_cast<const string&>(&StockManager::getBlockList),
+           R"(get_block_list(self[, category])
 
     获取指定分类的板块列表
 
@@ -107,8 +102,8 @@ void export_StockManager() {
     :return: 板块列表
     :rtype: BlockList)")
 
-      .def("get_trading_calendar", &StockManager::getTradingCalendar,
-           (arg("query"), arg("market") = "SH"),
+      .def("get_trading_calendar", &StockManager::getTradingCalendar, py::arg("query"),
+           py::arg("market") = "SH",
            R"(get_trading_calendar(self, query[, market='SH'])
 
     获取指定市场的交易日日历
@@ -118,19 +113,20 @@ void export_StockManager() {
     :return: 日期列表
     :rtype: DatetimeList)")
 
-      .def(
-        "add_temp_csv_stock", &StockManager::addTempCsvStock,
-        (arg("code"), arg("day_filename"), arg("min_filename"), arg("tick") = 0.01,
-         arg("tick_value") = 0.01, arg("precision") = 2, arg("min_trade_num") = 1,
-         arg("max_trade_num") = 1000000),
-        R"(add_temp_csv_stock(code, day_filename, min_filename[, tick=0.01, tick_value=0.01, precision=2, min_trade_num = 1, max_trade_num=1000000])
+      .def("add_temp_csv_stock", &StockManager::addTempCsvStock, py::arg("code"),
+           py::arg("day_filename"), py::arg("min_filename"), py::arg("tick") = 0.01,
+           py::arg("tick_value") = 0.01, py::arg("precision") = 2, py::arg("min_trade_num") = 1,
+           py::arg("max_trade_num") = 1000000,
+           R"(add_temp_csv_stock(code, day_filename, min_filename[, tick=0.01, tick_value=0.01,
+        precision=2, min_trade_num = 1, max_trade_num=1000000])
 
     从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试。
 
-    添加的 stock 对应的 market 为 "TMP", 如需通过 sm 获取，需加入 tmp，如：sm['tmp0001']    
-        
-    CSV文件第一行为标题，需含有 Datetime（或Date、日期）、OPEN（或开盘价）、HIGH（或最高价）、LOW（或最低价）、CLOSE（或收盘价）、AMOUNT（或成交金额）、VOLUME（或VOL、COUNT、成交量）。
-        
+    添加的 stock 对应的 market 为 "TMP", 如需通过 sm 获取，需加入 tmp，如：sm['tmp0001']
+
+    CSV文件第一行为标题，需含有
+    Datetime（或Date、日期）、OPEN（或开盘价）、HIGH（或最高价）、LOW（或最低价）、CLOSE（或收盘价）、AMOUNT（或成交金额）、VOLUME（或VOL、COUNT、成交量）。
+
     :param str code: 自行编号的证券代码，不能和已有的Stock相同，否则将返回Null<Stock>
     :param str day_filename: 日线CSV文件名
     :param str min_filename: 分钟线CSV文件名
@@ -140,7 +136,8 @@ void export_StockManager() {
     :param int min_trade_num: 单笔最小交易量，默认1
     :param int max_trade_num: 单笔最大交易量，默认1000000
     :return: 加入的Stock
-    :rtype: Stock)")
+    :rtype: Stock)",
+           py::keep_alive<1, 2>())
 
       .def("remove_temp_csv_stock", &StockManager::removeTempCsvStock,
            R"(remove_temp_csv_stock(self, code)
@@ -157,5 +154,11 @@ void export_StockManager() {
 
       .def("__len__", &StockManager::size, "返回证券数量")
       .def("__getitem__", &StockManager::getStock, "同 get_stock")
-      .def("__iter__", iterator<const StockManager>());
+      .def(
+        "__iter__",
+        [](const StockManager& sm) {
+            return py::make_iterator<py::return_value_policy::reference_internal, StockMapIterator,
+                                     StockMapIterator, const Stock&>(sm.begin(), sm.end());
+        },
+        py::keep_alive<0, 1>());
 }

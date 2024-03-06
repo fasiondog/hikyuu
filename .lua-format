@@ -21,9 +21,9 @@ break_before_table_rb: true
 chop_down_table: true
 chop_down_kv_table: true
 table_sep: ","
-column_table_limit: 0
+column_table_limit: 120
 extra_sep_at_table_end: true
-spaces_inside_table_braces: true 
+spaces_inside_table_braces: true
 break_after_operator: true
 double_quote_to_single_quote: false
 single_quote_to_double_quote: false

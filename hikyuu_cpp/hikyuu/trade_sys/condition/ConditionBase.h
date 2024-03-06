@@ -20,7 +20,24 @@
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/set.hpp>
-#endif
+
+#if HKU_SUPPORT_XML_ARCHIVE
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#endif /* HKU_SUPPORT_XML_ARCHIVE */
+
+#if HKU_SUPPORT_TEXT_ARCHIVE
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#endif /* HKU_SUPPORT_TEXT_ARCHIVE */
+
+#if HKU_SUPPORT_BINARY_ARCHIVE
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#endif /* HKU_SUPPORT_BINARY_ARCHIVE */
+
+#include <boost/serialization/export.hpp>
+#endif /* HKU_SUPPORT_SERIALIZATION */
 
 namespace hku {
 
@@ -38,10 +55,16 @@ public:
     virtual ~ConditionBase();
 
     /** 获取名称 */
-    string name() const;
+    const string& name() const;
 
     /** 设置名称 */
     void name(const string& name);
+
+    size_t size() const;
+
+    price_t at(size_t pos) const;
+
+    price_t const* data() const;
 
     /** 复位操作 */
     void reset();
@@ -64,11 +87,17 @@ public:
     /** 获取系统信号指示器 */
     SGPtr getSG() const;
 
+    /** 获取系统有效的日期列表，注意：和交易对象不等长 */
+    DatetimeList getDatetimeList() const;
+
+    /** 以指标的形式获取实际值，与交易对象等长，0表示无效，1表示系统有效 */
+    Indicator getValues() const;
+
     /**
      * 加入有效时间，在_calculate中调用
      * @param datetime 系统有效日期
      */
-    void _addValid(const Datetime& datetime);
+    void _addValid(const Datetime& datetime, price_t value = 1.0);
 
     typedef shared_ptr<ConditionBase> ConditionPtr;
     /** 克隆操作 */
@@ -90,12 +119,23 @@ public:
     /** 子类克隆接口 */
     virtual ConditionPtr _clone() = 0;
 
+public:
+    typedef vector<price_t>::const_iterator const_iterator;
+    const_iterator cbegin() const {
+        return m_values.cbegin();
+    }
+
+    const_iterator cend() const {
+        return m_values.cend();
+    }
+
 protected:
     string m_name;
     KData m_kdata;
     TMPtr m_tm;
     SGPtr m_sg;
-    std::set<Datetime> m_valid;
+    map<Datetime, size_t> m_date_index;
+    vector<price_t> m_values;
 
 //============================================
 // 序列化支持
@@ -107,7 +147,8 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_date_index);
+        ar& BOOST_SERIALIZATION_NVP(m_values);
         // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
     }
 
@@ -115,7 +156,8 @@ private:
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_date_index);
+        ar& BOOST_SERIALIZATION_NVP(m_values);
         // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
     }
 
@@ -169,12 +211,24 @@ public:                                       \
 HKU_API std::ostream& operator<<(std::ostream&, const ConditionPtr&);
 HKU_API std::ostream& operator<<(std::ostream&, const ConditionBase&);
 
-inline string ConditionBase::name() const {
+inline const string& ConditionBase::name() const {
     return m_name;
 }
 
 inline void ConditionBase::name(const string& name) {
     m_name = name;
+}
+
+inline size_t ConditionBase::size() const {
+    return m_values.size();
+}
+
+inline price_t const* ConditionBase::data() const {
+    return m_values.data();
+}
+
+inline price_t ConditionBase::at(size_t pos) const {
+    return m_values.at(pos);
 }
 
 inline KData ConditionBase::getTO() const {

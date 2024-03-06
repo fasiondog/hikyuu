@@ -6,11 +6,13 @@
  */
 #include <stdexcept>
 #include <algorithm>
+#include <forward_list>
 #include "Indicator.h"
 #include "IndParam.h"
 #include "../Stock.h"
 #include "../Log.h"
 #include "../GlobalInitializer.h"
+#include "imp/ICval.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IndicatorImp)
@@ -19,6 +21,92 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 namespace hku {
 
 StealThreadPool *IndicatorImp::ms_tg = nullptr;
+
+string HKU_API getOPTypeName(IndicatorImp::OPType op) {
+    string name;
+    switch (op) {
+        case IndicatorImp::LEAF:
+            name = "LEAF";
+            break;
+
+        case IndicatorImp::OP:
+            name = "OP";
+            break;
+
+        case IndicatorImp::ADD:
+            name = "ADD";
+            break;
+
+        case IndicatorImp::SUB:
+            name = "SUB";
+            break;
+
+        case IndicatorImp::MUL:
+            name = "MUL";
+            break;
+
+        case IndicatorImp::DIV:
+            name = "DIV";
+            break;
+
+        case IndicatorImp::MOD:
+            name = "MOD";
+            break;
+
+        case IndicatorImp::EQ:
+            name = "EQ";
+            break;
+
+        case IndicatorImp::GT:
+            name = "GT";
+            break;
+
+        case IndicatorImp::LT:
+            name = "LT";
+            break;
+
+        case IndicatorImp::NE:
+            name = "NE";
+            break;
+
+        case IndicatorImp::GE:
+            name = "GE";
+            break;
+
+        case IndicatorImp::LE:
+            name = "LE";
+            break;
+
+        case IndicatorImp::AND:
+            name = "AND";
+            break;
+
+        case IndicatorImp::OR:
+            name = "OR";
+            break;
+
+        case IndicatorImp::WEAVE:
+            name = "WEAVE";
+            break;
+
+        case IndicatorImp::OP_IF:
+            name = "IF";
+            break;
+
+        case IndicatorImp::CORR:
+            name = "CORR";
+            break;
+
+        case IndicatorImp::SPEARMAN:
+            name = "SPEARMAN";
+            break;
+
+        default:
+            name = "UNKNOWN";
+            break;
+    }
+    return name;
+}
 
 void IndicatorImp::initDynEngine() {
     auto cpu_num = std::thread::hardware_concurrency();
@@ -55,7 +143,13 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
         }
         os << "}";
     }
-    os << "\n  formula: " << imp.formula() << "\n}";
+    os << "\n  formula: " << imp.formula();
+#if !HKU_USE_LOW_PRECISION
+    if (imp.m_pBuffer[0]) {
+        os << "\n  values: " << *imp.m_pBuffer[0];
+    }
+#endif
+    os << "\n}";
     return os;
 }
 
@@ -71,19 +165,19 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
 IndicatorImp::IndicatorImp()
 : m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
     initContext();
-    memset(m_pBuffer, 0, sizeof(PriceList *) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string &name)
 : m_name(name), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
     initContext();
-    memset(m_pBuffer, 0, sizeof(PriceList *) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string &name, size_t result_num)
 : m_name(name), m_discard(0), m_need_calculate(true), m_optype(LEAF) {
     initContext();
-    memset(m_pBuffer, 0, sizeof(PriceList *) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
 }
 
@@ -175,10 +269,10 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
                     "result_num oiverload MAX_RESULT_NUM! {}", name());
     HKU_IF_RETURN(result_num == 0, void());
 
-    price_t null_price = Null<price_t>();
+    value_t null_price = Null<value_t>();
     for (size_t i = 0; i < result_num; ++i) {
         if (!m_pBuffer[i]) {
-            m_pBuffer[i] = new PriceList(len, null_price);
+            m_pBuffer[i] = new vector<value_t>(len, null_price);
 
         } else {
             m_pBuffer[i]->clear();
@@ -211,26 +305,55 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_result_num = m_result_num;
     p->m_need_calculate = m_need_calculate;
     p->m_optype = m_optype;
+    p->m_parent = m_parent;
 
     for (size_t i = 0; i < m_result_num; ++i) {
         if (m_pBuffer[i]) {
-            p->m_pBuffer[i] = new PriceList(m_pBuffer[i]->begin(), m_pBuffer[i]->end());
+            p->m_pBuffer[i] = new vector<value_t>(m_pBuffer[i]->begin(), m_pBuffer[i]->end());
         }
     }
 
     if (m_left) {
         p->m_left = m_left->clone();
+        p->m_left->m_parent = this;
     }
     if (m_right) {
         p->m_right = m_right->clone();
+        p->m_right->m_parent = this;
     }
     if (m_three) {
         p->m_three = m_three->clone();
+        p->m_three->m_parent = this;
     }
 
     for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
         p->m_ind_params[iter->first] = iter->second->clone();
     }
+
+    if (!m_parent) {
+        // 重构各子节点的父节点
+        std::forward_list<IndicatorImp *> stack;
+        stack.push_front(p.get());
+        while (!stack.empty()) {
+            IndicatorImp *node = stack.front();
+            stack.pop_front();
+            if (node->m_three) {
+                node->m_three->m_parent = node;
+                stack.push_front(node->m_three.get());
+            }
+            if (node->m_left) {
+                node->m_left->m_parent = node;
+                stack.push_front(node->m_left.get());
+            }
+            if (node->m_right) {
+                node->m_right->m_parent = node;
+                stack.push_front(node->m_right.get());
+            }
+        }
+
+        p->repeatALikeNodes();
+    }
+
     return p;
 }
 
@@ -247,10 +370,12 @@ IndicatorImpPtr IndicatorImp::operator()(const Indicator &ind) {
 void IndicatorImp::setDiscard(size_t discard) {
     size_t tmp_discard = discard > size() ? size() : discard;
     if (tmp_discard > m_discard) {
-        price_t null_price = Null<price_t>();
+        value_t null_price = Null<value_t>();
         for (size_t i = 0; i < m_result_num; ++i) {
+            auto *dst = this->data(i);
             for (size_t j = m_discard; j < tmp_discard; ++j) {
-                _set(null_price, j, i);
+                // _set(null_price, j, i);
+                dst[j] = null_price;
             }
         }
     }
@@ -263,7 +388,15 @@ string IndicatorImp::long_name() const {
 
 PriceList IndicatorImp::getResultAsPriceList(size_t result_num) {
     HKU_IF_RETURN(result_num >= m_result_num || m_pBuffer[result_num] == NULL, PriceList());
+#if HKU_USE_LOW_PRECISION
+    size_t total = size();
+    PriceList result(total);
+    const auto &src = (*m_pBuffer[result_num]);
+    std::copy(src.begin(), src.end(), result.begin());
+    return result;
+#else
     return (*m_pBuffer[result_num]);
+#endif
 }
 
 IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
@@ -272,25 +405,30 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     size_t total = size();
     imp->_readyBuffer(total, 1);
     imp->setDiscard(discard());
+    auto const *src = this->data(result_num);
+    auto *dst = imp->data(0);
     for (size_t i = discard(); i < total; ++i) {
-        imp->_set(get(i, result_num), i);
+        dst[i] = src[i];
     }
     return imp;
 }
 
-price_t IndicatorImp::get(size_t pos, size_t num) {
+IndicatorImp::value_t IndicatorImp::get(size_t pos, size_t num) const {
 #if CHECK_ACCESS_BOUND
-    HKU_CHECK_THROW((m_pBuffer[num] != NULL) && pos < m_pBuffer[num]->size(), std::out_of_range,
-                    "Try to access value ({}) out of bounds [0..{})! {}", pos,
-                    m_pBuffer[num]->size(), name());
+    // cppcheck-suppress [arrayIndexOutOfBoundsCond]
+    HKU_CHECK_THROW(
+      (num <= MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()), std::out_of_range,
+      "Try to access value out of bounds! num: {}, pos: {}, name: {}", num, pos, name());
 #endif
     return (*m_pBuffer[num])[pos];
 }
 
-void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
+void IndicatorImp::_set(value_t val, size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
-    HKU_CHECK_THROW((m_pBuffer[num] != NULL) && pos < m_pBuffer[num]->size(), std::out_of_range,
-                    "Try to access value out of bounds! (pos={}) {}", pos, name());
+    // cppcheck-suppress [arrayIndexOutOfBoundsCond]
+    HKU_CHECK_THROW(
+      (num <= MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()), std::out_of_range,
+      "Try to access value out of bounds! num: {}, pos: {}, name: {}", num, pos, name());
 #endif
     (*m_pBuffer[num])[pos] = val;
 }
@@ -309,9 +447,9 @@ Datetime IndicatorImp::getDatetime(size_t pos) const {
     return pos < k.size() ? k[pos].datetime : Null<Datetime>();
 }
 
-price_t IndicatorImp::getByDate(Datetime date, size_t num) {
+IndicatorImp::value_t IndicatorImp::getByDate(Datetime date, size_t num) {
     size_t pos = getPos(date);
-    return (pos != Null<size_t>()) ? get(pos, num) : Null<price_t>();
+    return (pos != Null<size_t>()) ? get(pos, num) : Null<value_t>();
 }
 
 size_t IndicatorImp::getPos(Datetime date) const {
@@ -404,6 +542,10 @@ string IndicatorImp::formula() const {
             buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
             break;
 
+        case SPEARMAN:
+            buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
+            break;
+
         default:
             HKU_ERROR("Wrong optype! {}", int(m_optype));
             break;
@@ -427,13 +569,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                       name(), right->name());
                 }
             } else {
-                if (m_left->isLeaf()) {
-                    m_left->m_need_calculate = true;
-                    m_left->m_optype = op;
-                    m_left->m_right = right->clone();
-                } else {
-                    m_left->add(OP, left, right);
-                }
+                m_left->add(OP, left, right);
             }
         }
         if (m_right) {
@@ -448,13 +584,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                       name(), right->name());
                 }
             } else {
-                if (m_right->isLeaf()) {
-                    m_right->m_need_calculate = true;
-                    m_right->m_optype = op;
-                    m_right->m_right = right->clone();
-                } else {
-                    m_right->add(OP, left, right);
-                }
+                m_right->add(OP, left, right);
             }
         }
         if (m_three) {
@@ -469,13 +599,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                       name(), right->name());
                 }
             } else {
-                if (m_three->isLeaf()) {
-                    m_three->m_need_calculate = true;
-                    m_three->m_optype = op;
-                    m_three->m_right = right->clone();
-                } else {
-                    m_three->add(OP, left, right);
-                }
+                m_three->add(OP, left, right);
             }
         }
     } else {
@@ -483,6 +607,26 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
         m_optype = op;
         m_left = left ? left->clone() : left;
         m_right = right->clone();
+    }
+
+    if (m_left) {
+        m_left->m_parent = this;
+    }
+
+    if (m_right) {
+        m_right->m_parent = this;
+    }
+
+    if (m_three) {
+        m_three->m_parent = this;
+    }
+
+    if (m_name == "IndicatorImp") {
+        m_name = getOPTypeName(op);
+    }
+
+    if (!m_parent) {
+        repeatALikeNodes();
     }
 }
 
@@ -493,6 +637,15 @@ void IndicatorImp::add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorI
     m_three = cond->clone();
     m_left = left->clone();
     m_right = right->clone();
+    m_three->m_parent = this;
+    m_left->m_parent = this;
+    m_right->m_parent = this;
+    if (m_name == "IndicatorImp") {
+        m_name = getOPTypeName(IndicatorImp::OP_IF);
+    }
+    if (!m_parent) {
+        repeatALikeNodes();
+    }
 }
 
 bool IndicatorImp::needCalculate() {
@@ -534,6 +687,15 @@ bool IndicatorImp::needCalculate() {
 
 Indicator IndicatorImp::calculate() {
     IndicatorImpPtr result;
+    if (!needCalculate()) {
+        try {
+            result = shared_from_this();
+        } catch (...) {
+            result = clone();
+        }
+        return Indicator(result);
+    }
+
     if (!check()) {
         HKU_ERROR("Invalid param! {} : {}", formula(), long_name());
         if (m_right) {
@@ -548,15 +710,10 @@ Indicator IndicatorImp::calculate() {
             }
         }
 
-        return Indicator(result);
-    }
-
-    if (!needCalculate()) {
-        try {
-            result = shared_from_this();
-        } catch (...) {
-            result = clone();
+        if (size() != 0) {
+            m_need_calculate = false;
         }
+
         return Indicator(result);
     }
 
@@ -652,6 +809,10 @@ Indicator IndicatorImp::calculate() {
             execute_corr();
             break;
 
+        case SPEARMAN:
+            execute_spearman();
+            break;
+
         default:
             HKU_ERROR("Unkown Indicator::OPType! {}", int(m_optype));
             break;
@@ -676,7 +837,7 @@ void IndicatorImp::execute_weave() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -698,28 +859,38 @@ void IndicatorImp::execute_weave() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
+    value_t const *src = nullptr;
+    value_t *dst = nullptr;
     if (m_left->size() >= m_right->size()) {
         size_t num = m_left->getResultNumber();
         for (size_t r = 0; r < num; ++r) {
+            src = m_left->data(r);
+            dst = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                _set(m_left->get(i, r), i, r);
+                dst[i] = src[i];
             }
         }
         for (size_t r = num; r < result_number; r++) {
+            src = m_right->data(r - num);
+            dst = this->data(r);
             for (size_t i = discard; i < total; i++) {
-                _set(m_right->get(i - diff, r - num), i, r);
+                dst[i] = src[i - diff];
             }
         }
     } else {
         size_t num = m_left->getResultNumber();
         for (size_t r = 0; r < num; ++r) {
+            src = m_left->data(r);
+            dst = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                _set(m_left->get(i - diff, r), i, r);
+                dst[i] = src[i - diff];
             }
         }
         for (size_t r = num; r < result_number; r++) {
+            src = m_right->data(r - num);
+            dst = this->data(r);
             for (size_t i = discard; i < total; i++) {
-                _set(m_right->get(i, r - num), i, r);
+                dst[i] = src[i];
             }
         }
     }
@@ -749,8 +920,11 @@ void IndicatorImp::execute_add() {
     _readyBuffer(total, result_number);
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
+        auto const *data1 = maxp->data(r);
+        auto const *data2 = minp->data(r);
+        auto *result = this->data(r);
         for (size_t i = discard; i < total; ++i) {
-            _set(maxp->get(i, r) + minp->get(i - diff, r), i, r);
+            result[i] = data1[i] + data2[i - diff];
         }
     }
 }
@@ -759,7 +933,7 @@ void IndicatorImp::execute_sub() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -780,14 +954,20 @@ void IndicatorImp::execute_sub() {
     setDiscard(discard);
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
+            auto *data1 = m_left->data(r);
+            auto *data2 = m_right->data(r);
+            auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                _set(m_left->get(i, r) - m_right->get(i - diff, r), i, r);
+                result[i] = data1[i] - data2[i - diff];
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
+            auto *data1 = m_left->data(r);
+            auto *data2 = m_right->data(r);
+            auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                _set(m_left->get(i - diff, r) - m_right->get(i, r), i, r);
+                result[i] = data1[i - diff] - data2[i];
             }
         }
     }
@@ -817,8 +997,11 @@ void IndicatorImp::execute_mul() {
     _readyBuffer(total, result_number);
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
+        auto const *data1 = maxp->data(r);
+        auto const *data2 = minp->data(r);
+        auto *result = this->data(r);
         for (size_t i = discard; i < total; ++i) {
-            _set(maxp->get(i, r) * minp->get(i - diff, r), i, r);
+            result[i] = data1[i] * data2[i - diff];
         }
     }
 }
@@ -827,7 +1010,7 @@ void IndicatorImp::execute_div() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -848,22 +1031,20 @@ void IndicatorImp::execute_div() {
     setDiscard(discard);
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
+            auto const *data1 = m_left->data(r);
+            auto const *data2 = m_right->data(r);
+            auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i - diff, r) == 0.0) {
-                    _set(Null<price_t>(), i, r);
-                } else {
-                    _set(m_left->get(i, r) / m_right->get(i - diff, r), i, r);
-                }
+                result[i] = data1[i] / data2[i - diff];
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
+            auto const *data1 = m_left->data(r);
+            auto const *data2 = m_right->data(r);
+            auto *result = this->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i, r) == 0.0) {
-                    _set(Null<price_t>(), i, r);
-                } else {
-                    _set(m_left->get(i - diff, r) / m_right->get(i, r), i, r);
-                }
+                result[i] = data1[i - diff] / data2[i];
             }
         }
     }
@@ -873,7 +1054,7 @@ void IndicatorImp::execute_mod() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -892,23 +1073,33 @@ void IndicatorImp::execute_mod() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
+    value_t *dst = nullptr;
+    value_t const *left = nullptr;
+    value_t const *right = nullptr;
+    value_t null_value = Null<value_t>();
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
+            dst = this->data(r);
+            left = m_left->data(r);
+            right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i - diff, r) == 0.0) {
-                    _set(Null<price_t>(), i, r);
+                if (right[i - diff] == 0.0) {
+                    dst[i] = null_value;
                 } else {
-                    _set(int64_t(m_left->get(i, r)) % int64_t(m_right->get(i - diff, r)), i, r);
+                    dst[i] = int64_t(left[i]) % int64_t(right[i - diff]);
                 }
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
+            dst = this->data(r);
+            left = m_left->data(r);
+            right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i, r) == 0.0) {
-                    _set(Null<price_t>(), i, r);
+                if (right[i] == 0.0) {
+                    dst[i] = null_value;
                 } else {
-                    _set(int64_t(m_left->get(i - diff, r)) % int64_t(m_right->get(i, r)), i, r);
+                    dst[i] = int64_t(left[i - diff]) % int64_t(right[i]);
                 }
             }
         }
@@ -939,12 +1130,11 @@ void IndicatorImp::execute_eq() {
     _readyBuffer(total, result_number);
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
+        auto *dst = this->data(r);
+        auto const *maxdata = maxp->data(r);
+        auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            if (std::fabs(maxp->get(i, r) - minp->get(i - diff, r)) < IND_EQ_THRESHOLD) {
-                _set(1, i, r);
-            } else {
-                _set(0, i, r);
-            }
+            dst[i] = (maxdata[i] == mindata[i - diff]) ? 1.0 : 0.0;
         }
     }
 }
@@ -973,12 +1163,11 @@ void IndicatorImp::execute_ne() {
     _readyBuffer(total, result_number);
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
+        auto *dst = this->data(r);
+        auto const *maxdata = maxp->data(r);
+        auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            if (std::fabs(maxp->get(i, r) - minp->get(i - diff, r)) < IND_EQ_THRESHOLD) {
-                _set(0, i, r);
-            } else {
-                _set(1, i, r);
-            }
+            dst[i] = (maxdata[i] != mindata[i - diff]) ? 1.0 : 0.0;
         }
     }
 }
@@ -987,7 +1176,7 @@ void IndicatorImp::execute_gt() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1006,24 +1195,25 @@ void IndicatorImp::execute_gt() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
+    value_t *dst = nullptr;
+    value_t const *left = nullptr;
+    value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
+            dst = this->data(r);
+            left = m_left->data(r);
+            right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i, r) - m_right->get(i - diff, r) >= IND_EQ_THRESHOLD) {
-                    _set(1, i, r);
-                } else {
-                    _set(0, i, r);
-                }
+                dst[i] = (left[i] > right[i - diff]) ? 1.0 : 0.0;
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
+            dst = this->data(r);
+            left = m_left->data(r);
+            right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i - diff, r) - m_right->get(i, r) >= IND_EQ_THRESHOLD) {
-                    _set(1, i, r);
-                } else {
-                    _set(0, i, r);
-                }
+                dst[i] = (left[i - diff] > right[i]) ? 1.0 : 0.0;
             }
         }
     }
@@ -1033,7 +1223,7 @@ void IndicatorImp::execute_lt() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1052,24 +1242,25 @@ void IndicatorImp::execute_lt() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
+    value_t *dst = nullptr;
+    value_t const *left = nullptr;
+    value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
+            dst = this->data(r);
+            left = m_left->data(r);
+            right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i - diff, r) - m_left->get(i, r) >= IND_EQ_THRESHOLD) {
-                    _set(1, i, r);
-                } else {
-                    _set(0, i, r);
-                }
+                dst[i] = (left[i] < right[i - diff]) ? 1.0 : 0.0;
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
+            dst = this->data(r);
+            left = m_left->data(r);
+            right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i, r) - m_left->get(i - diff, r) >= IND_EQ_THRESHOLD) {
-                    _set(1, i, r);
-                } else {
-                    _set(0, i, r);
-                }
+                dst[i] = left[i - diff] < right[i] ? 1.0 : 0.0;
             }
         }
     }
@@ -1079,7 +1270,7 @@ void IndicatorImp::execute_ge() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1098,24 +1289,25 @@ void IndicatorImp::execute_ge() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
+    value_t *dst = nullptr;
+    value_t const *left = nullptr;
+    value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
+            dst = this->data(r);
+            left = m_left->data(r);
+            right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i, r) > m_right->get(i - diff, r) - IND_EQ_THRESHOLD) {
-                    _set(1, i, r);
-                } else {
-                    _set(0, i, r);
-                }
+                dst[i] = left[i] >= right[i - diff] ? 1.0 : 0.0;
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
+            dst = this->data(r);
+            left = m_left->data(r);
+            right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i - diff, r) > m_right->get(i, r) - IND_EQ_THRESHOLD) {
-                    _set(1, i, r);
-                } else {
-                    _set(0, i, r);
-                }
+                dst[i] = left[i - diff] >= right[i] ? 1.0 : 0.0;
             }
         }
     }
@@ -1125,7 +1317,7 @@ void IndicatorImp::execute_le() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_left->size() > m_right->size()) {
         maxp = m_left.get();
         minp = m_right.get();
@@ -1144,24 +1336,25 @@ void IndicatorImp::execute_le() {
     size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
+    value_t *dst = nullptr;
+    value_t const *left = nullptr;
+    value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
+            dst = this->data(r);
+            left = m_left->data(r);
+            right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i, r) < m_right->get(i - diff, r) + IND_EQ_THRESHOLD) {
-                    _set(1, i, r);
-                } else {
-                    _set(0, i, r);
-                }
+                dst[i] = left[i] <= right[i - diff] ? 1.0 : 0.0;
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
+            dst = this->data(r);
+            left = m_left->data(r);
+            right = m_right->data(r);
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i - diff, r) < m_right->get(i, r) + IND_EQ_THRESHOLD) {
-                    _set(1, i, r);
-                } else {
-                    _set(0, i, r);
-                }
+                dst[i] = left[i - diff] <= right[i] ? 1.0 : 0.0;
             }
         }
     }
@@ -1171,7 +1364,7 @@ void IndicatorImp::execute_and() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1191,12 +1384,11 @@ void IndicatorImp::execute_and() {
     _readyBuffer(total, result_number);
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
+        auto *dst = this->data(r);
+        auto const *maxdata = maxp->data(r);
+        auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            if (maxp->get(i, r) >= IND_EQ_THRESHOLD && minp->get(i - diff, r) >= IND_EQ_THRESHOLD) {
-                _set(1, i, r);
-            } else {
-                _set(0, i, r);
-            }
+            dst[i] = (maxdata[i] > 0.0) && (mindata[i - diff] > 0.0) ? 1.0 : 0.0;
         }
     }
 }
@@ -1205,7 +1397,7 @@ void IndicatorImp::execute_or() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1225,12 +1417,11 @@ void IndicatorImp::execute_or() {
     _readyBuffer(total, result_number);
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
+        auto *dst = this->data(r);
+        auto const *maxdata = maxp->data(r);
+        auto const *mindata = minp->data(r);
         for (size_t i = discard; i < total; ++i) {
-            if (maxp->get(i, r) >= IND_EQ_THRESHOLD || minp->get(i - diff, r) >= IND_EQ_THRESHOLD) {
-                _set(1, i, r);
-            } else {
-                _set(0, i, r);
-            }
+            dst[i] = (maxdata[i] > 0.0) || (mindata[i - diff] > 0.0) ? 1.0 : 0.0;
         }
     }
 }
@@ -1240,7 +1431,7 @@ void IndicatorImp::execute_if() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1269,12 +1460,16 @@ void IndicatorImp::execute_if() {
     size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
     _readyBuffer(total, result_number);
     setDiscard(discard);
+    auto *left = m_left->data(0);
+    auto *right = m_right->data(0);
+    auto *three = m_three->data(0);
     for (size_t r = 0; r < result_number; ++r) {
+        auto *dst = this->data(r);
         for (size_t i = discard; i < total; ++i) {
-            if (m_three->get(i - diff_cond) > 0.0) {
-                _set(m_left->get(i - diff_left), i, r);
+            if (three[i - diff_cond] > 0.0) {
+                dst[i] = left[i - diff_left];
             } else {
-                _set(m_right->get(i - diff_right), i, r);
+                dst[i] = right[i - diff_right];
             }
         }
     }
@@ -1284,7 +1479,7 @@ void IndicatorImp::execute_corr() {
     m_right->calculate();
     m_left->calculate();
 
-    IndicatorImp *maxp, *minp;
+    const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1309,67 +1504,150 @@ void IndicatorImp::execute_corr() {
         return;
     }
 
-    price_t null_price = Null<price_t>();
-    vector<price_t> prebufx(total, null_price);
-    vector<price_t> prebufy(total, null_price);
-    vector<price_t> prepowx(total, null_price);
-    vector<price_t> prepowy(total, null_price);
-    vector<price_t> prepowxy(total, null_price);
-    price_t kx = maxp->get(discard);
-    price_t ky = minp->get(discard);
-    price_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
-    price_t ex2 = 0.0, ey2 = 0.0, exy2 = 0.0;
-    prebufx[discard] = 0.0;
-    prebufy[discard] = 0.0;
-    prepowx[discard] = 0.0;
-    prepowy[discard] = 0.0;
-    prepowxy[discard] = 0.0;
+    size_t startPos = discard;
+    size_t first_end = startPos + n >= total ? total : startPos + n;
 
-    for (size_t i = discard, nobs = 0; i < total; ++i) {
-        price_t ix = maxp->get(i) - kx;
-        price_t iy = minp->get(i) - ky;
-        price_t preix = prebufx[i - nobs];
-        price_t preiy = prebufy[i - nobs];
-        price_t prepowix = prepowx[i - nobs];
-        price_t prepowiy = prepowy[i - nobs];
-        price_t prepowixy = prepowxy[i - nobs];
-        HKU_INFO_IF(i % 100 == 0, "{}: ix: {}, iy: {}, preix: {}, preiy: {}", i, ix, iy, preix,
-                    preiy);
-        if (!std::isnan(preix) && !std::isnan(preiy) && !std::isnan(ix) && !std::isnan(iy)) {
-            if (nobs < n) {
-                nobs++;
-                ex += ix;
-                ey += iy;
-                exy += ix * iy;
-                ex2 += std::pow(ix, 2);
-                ey2 += std::pow(iy, 2);
-                varx = nobs == 1 ? 0. : (ex2 - std::pow(ex, 2) / nobs) / (nobs - 1);
-                vary = nobs == 1 ? 0. : (ey2 - std::pow(ey, 2) / nobs) / (nobs - 1);
-                cov = nobs == 1 ? 0. : (exy - ex * ey / nobs) / (nobs - 1);
-                _set(cov / std::sqrt(varx * vary), i, 0);
-                _set(cov, i, 1);
-            } else {
-                ex += ix - preix;
-                ey += iy - preiy;
-                ex2 = ex2 - prepowix + std::pow(ix, 2);
-                ey2 = ey2 - prepowiy + std::pow(iy, 2);
-                exy = exy + ix * iy - prepowixy;
-                varx = (ex2 - std::pow(ex, 2) / n) / (n - 1);
-                vary = (ey2 - std::pow(ey, 2) / n) / (n - 1);
-                cov = (exy - ex * ey / n) / (n - 1);
-                _set(cov / std::sqrt(varx * vary), i, 0);
-                _set(cov, i, 1);
-            }
-            prebufx[i] = ix;
-            prebufy[i] = iy;
-            prepowx[i] = ex2;
-            prepowy[i] = ey2;
-            prepowxy[i] = exy2;
-        }
+    value_t kx = maxp->get(discard);
+    value_t ky = minp->get(discard);
+    value_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
+    value_t ex2 = 0.0, ey2 = 0.0;
+    value_t ix, iy;
+
+    auto *dst0 = this->data(0);
+    auto *dst1 = this->data(1);
+    auto const *maxdata = maxp->data(0);
+    auto const *mindata = minp->data(0);
+    for (size_t i = startPos + 1; i < first_end; i++) {
+        ix = maxdata[i] - kx;
+        iy = mindata[i] - ky;
+        ex += ix;
+        ey += iy;
+        value_t powx2 = ix * ix;
+        value_t powy2 = iy * iy;
+        value_t powxy = ix * iy;
+        exy += powxy;
+        ex2 += powx2;
+        ey2 += powy2;
+        size_t nobs = i - startPos;
+        varx = ex2 - powx2 / nobs;
+        vary = ey2 - powy2 / nobs;
+        cov = exy - powxy / nobs;
+        dst0[i] = cov / std::sqrt(varx * vary);
+        dst1[i] = cov / (nobs - 1);
+    }
+
+    for (size_t i = first_end; i < total; i++) {
+        ix = maxdata[i] - kx;
+        iy = mindata[i] - ky;
+        ex += maxdata[i] - maxdata[i - n];
+        ey += mindata[i] - mindata[i - n];
+        value_t preix = maxdata[i - n] - kx;
+        value_t preiy = mindata[i - n] - ky;
+        ex2 += ix * ix - preix * preix;
+        ey2 += iy * iy - preiy * preiy;
+        exy += ix * iy - preix * preiy;
+        varx = (ex2 - ex * ex / n);
+        vary = (ey2 - ey * ey / n);
+        cov = (exy - ex * ey / n);
+        dst0[i] = cov / std::sqrt(varx * vary);
+        dst1[i] = cov / (n - 1);
     }
 
     // 修正 discard
-    setDiscard(++discard);
+    setDiscard(discard + 2);
+}
+
+static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value_t *level,
+                          size_t total) {
+    std::vector<std::pair<IndicatorImp::value_t, size_t>> data_index(total);
+    for (size_t i = 0; i < total; i++) {
+        data_index[i].first = data[i];
+        data_index[i].second = i;
+    }
+
+    std::sort(
+      data_index.begin(), data_index.end(),
+      std::bind(
+        std::less<IndicatorImp::value_t>(),
+        std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_1),
+        std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_2)));
+
+    size_t i = 0;
+    while (i < total) {
+        size_t count = 1;
+        IndicatorImp::value_t score = i + 1.0;
+        for (size_t j = i + 1; j < total; j++) {
+            if (data_index[i].first != data_index[j].first) {
+                break;
+            }
+            count++;
+            score += j + 1;
+        }
+        score = score / count;
+        for (size_t j = 0; j < count; j++) {
+            level[data_index[i + j].second] = score;
+        }
+        i += count;
+    }
+}
+
+void IndicatorImp::execute_spearman() {
+    m_right->calculate();
+    m_left->calculate();
+
+    const IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
+        maxp = m_right.get();
+        minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+
+    int n = getParam<int>("n");
+    if (n < 2 || discard + 2 > total) {
+        setDiscard(total);
+        return;
+    }
+
+    discard += n - 1;
+    setDiscard(discard);
+
+    auto levela = std::make_unique<value_t[]>(n);
+    auto levelb = std::make_unique<value_t[]>(n);
+    auto *ptra = levela.get();
+    auto *ptrb = levelb.get();
+
+    // 不处理 n 不足的情况，防止只需要计算全部序列时，过于耗时
+    value_t back = std::pow(value_t(n), 3) - n;
+    for (size_t r = 0; r < result_number; ++r) {
+        auto *dst = this->data(r);
+        auto const *maxdata = maxp->data(r);
+        auto const *mindata = minp->data(r);
+        auto const *a = maxdata + discard + 1 - n;
+        auto const *b = mindata + discard + 1 - diff - n;
+        for (size_t i = discard; i < total; ++i) {
+            spearmanLevel(a, ptra, n);
+            spearmanLevel(b, ptrb, n);
+            value_t sum = 0.0;
+            for (size_t j = 0; j < n; j++) {
+                sum += std::pow(ptra[j] - ptrb[j], 2);
+            }
+            dst[i] = 1 - 6.0 * sum / back;
+            a++;
+            b++;
+        }
+    }
 }
 
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {
@@ -1395,9 +1673,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     // HKU_INFO("multi_thread");
     size_t circleLength = minCircleLength;
-    if (minCircleLength * workerNum >= total) {
-        circleLength = minCircleLength;
-    } else {
+    if (minCircleLength * workerNum < total) {
         size_t tailCount = total % workerNum;
         circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
     }
@@ -1439,6 +1715,117 @@ void IndicatorImp::_update_discard() {
         }
         if (discard > m_discard) {
             m_discard = discard;
+        }
+    }
+}
+
+bool IndicatorImp::alike(const IndicatorImp &other) const {
+    HKU_IF_RETURN(this == &other, true);
+    HKU_IF_RETURN(m_optype != other.m_optype || m_discard != other.m_discard ||
+                    m_result_num != other.m_result_num || (isLeaf() && !other.isLeaf()) ||
+                    (!isLeaf() && other.isLeaf()) || typeid(*this) != typeid(other) ||
+                    m_ind_params.size() != other.m_ind_params.size() || m_params != other.m_params,
+                  false);
+
+    auto &self_id = typeid(*this);
+    auto &cval_id = typeid(ICval);
+    if (self_id == cval_id) {
+        HKU_IF_RETURN(isLeaf() && other.isLeaf(), true);
+        return m_right && m_right->alike(*other.m_right);
+    }
+
+    auto iter1 = m_ind_params.cbegin();
+    auto iter2 = other.m_ind_params.cend();
+    for (; iter1 != m_ind_params.cend() && iter2 != other.m_ind_params.cend(); ++iter1, ++iter2) {
+        HKU_IF_RETURN(iter1->first != iter2->first, false);
+        HKU_IF_RETURN(!iter1->second->alike(*(iter2->second)), false);
+    }
+
+    if (isLeaf() && other.isLeaf()) {
+        HKU_IF_RETURN(this->size() != other.size(), false);
+        auto const *d1 = this->data();
+        auto const *d2 = other.data();
+        bool eq = true;
+        for (size_t i = 0, len = this->size(); i < len; i++) {
+            if (d1[i] != d2[i]) {
+                eq = false;
+            }
+        }
+        return eq;
+    }
+
+    HKU_IF_RETURN(m_three && other.m_three && !m_three->alike(*other.m_three), false);
+    HKU_IF_RETURN(m_left && other.m_left && !m_left->alike(*other.m_left), false);
+    HKU_IF_RETURN(m_right && other.m_right && !m_right->alike(*other.m_right), false);
+
+    return true;
+}
+
+std::vector<IndicatorImpPtr> IndicatorImp::getAllSubNodes() {
+    std::vector<IndicatorImpPtr> result;
+    // 需要按下面的顺序进行
+    if (m_three) {
+        result.push_back(m_three);
+        auto sub_nodes = m_three->getAllSubNodes();
+        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
+    }
+    if (m_left) {
+        result.push_back(m_left);
+        auto sub_nodes = m_left->getAllSubNodes();
+        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
+    }
+    if (m_right) {
+        result.push_back(m_right);
+        auto sub_nodes = m_right->getAllSubNodes();
+        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
+    }
+    return result;
+}
+
+void IndicatorImp::repeatALikeNodes() {
+    auto sub_nodes = getAllSubNodes();
+    size_t total = sub_nodes.size();
+    for (size_t i = 0; i < total; i++) {
+        const auto &cur = sub_nodes[i];
+        if (!cur) {
+            continue;
+        }
+        for (size_t j = i + 1; j < total; j++) {
+            auto &node = sub_nodes[j];
+            if (!node || cur == node) {
+                continue;
+            }
+
+            if (cur->alike(*node)) {
+                IndicatorImp *node_parent = node->m_parent;
+                if (node_parent) {
+                    if (node_parent->m_left == node) {
+                        node_parent->m_left = cur;
+                    }
+
+                    if (node_parent->m_right == node) {
+                        node_parent->m_right = cur;
+                    }
+
+                    if (node_parent->m_three == node) {
+                        node_parent->m_three = cur;
+                    }
+
+                    auto tmp_nodes = node->getAllSubNodes();
+                    for (const auto &replace_node : tmp_nodes) {
+                        for (size_t k = j + 1; k < total; k++) {
+                            if (replace_node == sub_nodes[k]) {
+                                sub_nodes[k].reset();
+                            }
+                        }
+                    }
+
+                    node = cur;
+
+                } else {
+                    HKU_WARN("Exist some errors! node: {} cur: {}", node->name(), cur->name());
+                }
+            }
         }
     }
 }

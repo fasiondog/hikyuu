@@ -29,12 +29,14 @@ void ILn::_calculate(const Indicator& data) {
         return;
     }
 
-    price_t null_price = Null<price_t>();
+    auto const* src = data.data();
+    auto* dst = this->data();
+    value_t null_value = Null<value_t>();
     for (size_t i = m_discard; i < total; ++i) {
         if (data[i] <= 0.0) {
-            _set(null_price, i);
+            dst[i] = null_value;
         } else {
-            _set(std::log(data[i]), i);
+            dst[i] = std::log(src[i]);
         }
     }
 }

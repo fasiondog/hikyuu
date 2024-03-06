@@ -26,15 +26,18 @@ hdf5_template = """
 [hikyuu]
 tmpdir = {dir}/tmp
 datadir = {dir}
+quotation_server = {quotation_server}
 
 [block]
-type  = qianlong
-dir = {dir}/block
-指数板块 = zsbk.ini
-行业板块 = hybk.ini
-地域板块 = dybk.ini
-概念板块 = gnbk.ini
-self = self.ini
+type = sqlite3
+db = {dir}/stock.db
+;type  = qianlong
+;dir = {dir}/block
+;指数板块 = zsbk.ini
+;行业板块 = hybk.ini
+;地域板块 = dybk.ini
+;概念板块 = gnbk.ini
+;self = self.ini
 
 [preload]
 day = {day}
@@ -91,15 +94,14 @@ mysql_template = """
 [hikyuu]
 tmpdir = {dir}
 datadir = {dir}
+quotation_server = {quotation_server}
 
 [block]
-type  = qianlong
-dir = {dir}/block
-指数板块 = zsbk.ini
-行业板块 = hybk.ini
-地域板块 = dybk.ini
-概念板块 = gnbk.ini
-self = self.ini
+type = mysql
+host = {host}
+port = {port}
+usr = {usr}
+pwd = {pwd}
 
 [preload]
 day = {day}
@@ -142,3 +144,123 @@ usr = {usr}
 pwd = {pwd}
 
 """
+
+
+import_config_template = """
+[quotation]
+stock = True
+fund = True
+future = False
+
+[ktype]
+day = True
+min = True
+min5 = True
+trans = True
+time = True
+day_start_date = 1990-12-19
+min_start_date = 2023-09-19
+min5_start_date = 2023-09-19
+trans_start_date = 2023-12-11
+time_start_date = 2023-12-11
+
+[weight]
+enable = True
+
+[tdx]
+enable = False
+;dir = d:\TdxW_HuaTai
+
+[pytdx]
+enable = False
+use_tdx_number = 10
+
+[hdf5]
+enable = True
+dir = {dir}
+
+[mysql]
+enable = False
+;tmpdir = D:/stock
+;host = 127.0.0.1
+;port = 3306
+;usr = root
+;pwd = 
+
+[sched]
+time = 18:00:00
+
+[collect]
+quotation_server = ipc:///tmp/hikyuu_real.ipc
+interval = 305
+source = qq
+use_zhima_proxy = False
+phase1_start = 00:00:00
+phase1_end = 11:35:00
+phase2_start = 12:00:00
+phase2_end = 15:05:00
+
+[preload]
+day = True
+week = True
+month = True
+quarter = False
+halfyear = False
+year = False
+min = False
+min5 = False
+min15 = False
+min30 = False
+min60 = False
+hour2 = False
+day_max = 100000
+week_max = 100000
+month_max = 100000
+quarter_max = 100000
+halfyear_max = 100000
+year_max = 100000
+min_max = 5120
+min5_max = 5120
+min15_max = 5120
+min30_max = 5120
+min60_max = 5120
+hour2_max = 5120
+"""
+
+
+def generate_default_config():
+    import os
+    import sys
+    import shutil
+    from hikyuu.data.hku_config_template import hdf5_template
+    user_dir = os.path.expanduser('~')
+    data_dir = "c:\\stock" if sys.platform == 'win32' else f"{user_dir}/stock"
+    hdf5_config = hdf5_template.format(dir=data_dir, quotation_server='ipc:///tmp/hikyuu_real.ipc',
+                                       day=True, week=False,
+                                       month=False, quarter=False, halfyear=False, year=False,
+                                       min1=False, min5=False, min15=False, min30=False,
+                                       min60=False, hour2=False, day_max=100000, week_max=100000,
+                                       month_max=100000, quarter_max=100000, halfyear_max=100000,
+                                       year_max=100000, min1_max=5120, min5_max=5120, min15_max=5120,
+                                       min30_max=5120, min60_max=5120, hour2_max=5120)
+    config_dir = f"{user_dir}/.hikyuu"
+    if not os.path.lexists(config_dir):
+        os.makedirs(config_dir)
+    filename = f"{config_dir}/hikyuu.ini"
+    if not os.path.exists(filename):
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(hdf5_config)
+
+    if not os.path.lexists(data_dir):
+        os.makedirs(data_dir)
+    filename = f"{config_dir}/importdata-gui.ini"
+    if not os.path.exists(filename):
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(import_config_template.format(dir=data_dir))
+
+    if not os.path.lexists(data_dir + '/block'):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        dirname, _ = os.path.split(current_dir)
+        dirname = os.path.join(dirname, 'config/block')
+        shutil.copytree(dirname, data_dir + '/block')
+        os.remove(data_dir + '/block/__init__.py')

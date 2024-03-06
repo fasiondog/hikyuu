@@ -15,11 +15,11 @@ HKU_API std::ostream& operator<<(std::ostream& os, const StockTypeInfo& stockTyp
         return os;
     }
 
-    string split(", ");
-    os << "StockTypeInfo(" << stockTypeInfo.type() << split << stockTypeInfo.description() << split
-       << stockTypeInfo.tick() << split << stockTypeInfo.tickValue() << split
-       << stockTypeInfo.unit() << split << stockTypeInfo.precision() << split
-       << stockTypeInfo.minTradeNumber() << split << stockTypeInfo.maxTradeNumber() << ")";
+    string sp(", ");
+    os << "StockTypeInfo(" << stockTypeInfo.type() << sp << stockTypeInfo.description() << sp
+       << stockTypeInfo.tick() << sp << stockTypeInfo.tickValue() << sp << stockTypeInfo.unit()
+       << sp << stockTypeInfo.precision() << sp << stockTypeInfo.minTradeNumber() << sp
+       << stockTypeInfo.maxTradeNumber() << ")";
     return os;
 }
 
@@ -30,10 +30,10 @@ string StockTypeInfo::toString() const {
         return os.str();
     }
 
-    string split(", ");
-    os << "StockTypeInfo(" << m_type << split << m_description << split << m_tick << split
-       << m_tickValue << split << m_unit << split << m_precision << split << m_minTradeNumber
-       << split << m_maxTradeNumber << ")";
+    string sp(", ");
+    os << "StockTypeInfo(" << m_type << sp << m_description << sp << m_tick << sp << m_tickValue
+       << sp << m_unit << sp << m_precision << sp << m_minTradeNumber << sp << m_maxTradeNumber
+       << ")";
     return os.str();
 }
 

@@ -24,9 +24,10 @@
 
 from pytdx.hq import TDXParams
 import mysql.connector
+from hikyuu.util import *
 from .common_pytdx import to_pytdx_market
 
-
+@hku_catch(trace=True)
 def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
     """导入钱龙格式的权息数据"""
     cur = connect.cursor()

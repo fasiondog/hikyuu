@@ -25,14 +25,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API BARSSINCE();
-Indicator BARSSINCE(price_t);
+Indicator BARSSINCE(Indicator::value_t);
 Indicator BARSSINCE(const Indicator& ind);
 
 inline Indicator BARSSINCE(const Indicator& ind) {
     return BARSSINCE()(ind);
 }
 
-inline Indicator BARSSINCE(price_t val) {
+inline Indicator BARSSINCE(Indicator::value_t val) {
     return BARSSINCE(CVAL(val));
 }
 

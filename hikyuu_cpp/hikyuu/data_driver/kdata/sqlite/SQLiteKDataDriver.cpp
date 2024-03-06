@@ -33,7 +33,7 @@ inline KQuery::KType getBaseKType(const KQuery::KType& ktype) {
     return base_ktype;
 }
 
-SQLiteKDataDriver::SQLiteKDataDriver() : KDataDriver("sqlite") {}
+SQLiteKDataDriver::SQLiteKDataDriver() : KDataDriver("sqlite3") {}
 
 SQLiteKDataDriver::~SQLiteKDataDriver() {}
 
@@ -125,7 +125,7 @@ KRecordList SQLiteKDataDriver::getKRecordList(const string& market, const string
 }
 
 KRecordList SQLiteKDataDriver::_getKRecordList(const string& market, const string& code,
-                                               KQuery::KType kType, size_t start_ix,
+                                               const KQuery::KType& kType, size_t start_ix,
                                                size_t end_ix) {
     KRecordList result;
     HKU_IF_RETURN(start_ix >= end_ix, result);
@@ -163,7 +163,7 @@ KRecordList SQLiteKDataDriver::_getKRecordList(const string& market, const strin
     return result;
 }
 KRecordList SQLiteKDataDriver::_getKRecordList(const string& market, const string& code,
-                                               KQuery::KType kType, Datetime start_date,
+                                               const KQuery::KType& kType, Datetime start_date,
                                                Datetime end_date) {
     KRecordList result;
     HKU_IF_RETURN(start_date >= end_date, result);
@@ -202,14 +202,15 @@ KRecordList SQLiteKDataDriver::_getKRecordList(const string& market, const strin
     return result;
 }
 
-size_t SQLiteKDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
+size_t SQLiteKDataDriver::getCount(const string& market, const string& code,
+                                   const KQuery::KType& kType) {
     string key(format("{}_{}", market, kType));
     SQLiteConnectPtr connection = m_sqlite_connection_map[key];
     HKU_IF_RETURN(!connection, 0);
 
     size_t result = 0;
     result = connection->queryInt(
-      fmt::format("select count(1) from {}", _getTableName(market, code, kType)));
+      fmt::format("select count(1) from {}", _getTableName(market, code, kType)), 0);
 
     if (isBaseKType(kType))
         return result;
@@ -235,9 +236,11 @@ bool SQLiteKDataDriver::getIndexRangeByDate(const string& market, const string& 
     string tablename = _getTableName(market, code, query.kType());
     try {
         out_start = connection->queryInt(fmt::format("select count(1) from {} where date<{}",
-                                                     tablename, query.startDatetime().number()));
+                                                     tablename, query.startDatetime().number()),
+                                         0);
         out_end = connection->queryInt(fmt::format("select count(1) from {} where date<{}",
-                                                   tablename, query.endDatetime().number()));
+                                                   tablename, query.endDatetime().number()),
+                                       0);
     } catch (...) {
         // 表可能不存在, 不打印异常信息
         out_start = 0;
@@ -249,8 +252,8 @@ bool SQLiteKDataDriver::getIndexRangeByDate(const string& market, const string& 
 }
 
 KRecordList SQLiteKDataDriver::convertToNewInterval(const KRecordList& candles,
-                                                    KQuery::KType from_ktype,
-                                                    KQuery::KType to_ktype) {
+                                                    const KQuery::KType& from_ktype,
+                                                    const KQuery::KType& to_ktype) {
     int32_t old_intervals_per_new_candle =
       KQuery::getKTypeInMin(to_ktype) / KQuery::getKTypeInMin(from_ktype);
     KRecordList result(candles.size() / old_intervals_per_new_candle);

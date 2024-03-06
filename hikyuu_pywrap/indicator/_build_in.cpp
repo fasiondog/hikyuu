@@ -5,15 +5,11 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/indicator/build_in.h>
+#include "../pybind_utils.h"
 
+namespace py = pybind11;
 using namespace hku;
-using namespace boost::python;
-
-Indicator (*PRICELIST2)(const PriceList&, int) = PRICELIST;
-Indicator (*PRICELIST3)(const Indicator&, int) = PRICELIST;
-Indicator (*PRICELIST4)(int) = PRICELIST;
 
 Indicator (*KDATA1)(const KData&) = KDATA;
 Indicator (*KDATA3)() = KDATA;
@@ -38,6 +34,30 @@ Indicator (*VOL3)() = VOL;
 
 Indicator (*KDATA_PART1)(const KData& kdata, const string& part) = KDATA_PART;
 Indicator (*KDATA_PART3)(const string& part) = KDATA_PART;
+
+Indicator (*DATE1)() = hku::DATE;
+Indicator (*DATE2)(const KData&) = hku::DATE;
+
+Indicator (*TIME1)() = TIME;
+Indicator (*TIME2)(const KData&) = TIME;
+
+Indicator (*YEAR1)() = YEAR;
+Indicator (*YEAR2)(const KData&) = YEAR;
+
+Indicator (*MONTH1)() = MONTH;
+Indicator (*MONTH2)(const KData&) = MONTH;
+
+Indicator (*WEEK1)() = WEEK;
+Indicator (*WEEK2)(const KData&) = WEEK;
+
+Indicator (*DAY1)() = DAY;
+Indicator (*DAY2)(const KData&) = DAY;
+
+Indicator (*HOUR1)() = HOUR;
+Indicator (*HOUR2)(const KData&) = HOUR;
+
+Indicator (*MINUTE1)() = MINUTE;
+Indicator (*MINUTE2)(const KData&) = MINUTE;
 
 // 太多选项选择的话，python中无法加载
 Indicator (*AMA_1)(int, int, int) = AMA;
@@ -141,9 +161,9 @@ Indicator (*HSL_1)() = HSL;
 Indicator (*HSL_2)(const KData&) = HSL;
 
 Indicator (*IF_1)(const Indicator&, const Indicator&, const Indicator&) = IF;
-Indicator (*IF_2)(const Indicator&, price_t, const Indicator&) = IF;
-Indicator (*IF_3)(const Indicator&, const Indicator&, price_t) = IF;
-Indicator (*IF_4)(const Indicator&, price_t, price_t) = IF;
+Indicator (*IF_2)(const Indicator&, Indicator::value_t, const Indicator&) = IF;
+Indicator (*IF_3)(const Indicator&, const Indicator&, Indicator::value_t) = IF;
+Indicator (*IF_4)(const Indicator&, Indicator::value_t, Indicator::value_t) = IF;
 
 Indicator (*COUNT_1)(int) = COUNT;
 Indicator (*COUNT_2)(const IndParam&) = COUNT;
@@ -158,43 +178,43 @@ Indicator (*SUM_4)(const Indicator&, const Indicator&) = SUM;
 Indicator (*SUM_5)(const Indicator&, int) = SUM;
 
 Indicator (*ABS_1)() = ABS;
-Indicator (*ABS_2)(price_t) = ABS;
+Indicator (*ABS_2)(Indicator::value_t) = ABS;
 Indicator (*ABS_3)(const Indicator&) = ABS;
 
 Indicator (*NOT_1)() = NOT;
 Indicator (*NOT_2)(const Indicator&) = NOT;
 
 Indicator (*SGN_1)() = SGN;
-Indicator (*SGN_2)(price_t) = SGN;
+Indicator (*SGN_2)(Indicator::value_t) = SGN;
 Indicator (*SGN_3)(const Indicator&) = SGN;
 
 Indicator (*EXP_1)() = EXP;
-Indicator (*EXP_2)(price_t) = EXP;
+Indicator (*EXP_2)(Indicator::value_t) = EXP;
 Indicator (*EXP_3)(const Indicator&) = EXP;
 
 Indicator (*MAX_1)(const Indicator&, const Indicator&) = MAX;
-Indicator (*MAX_2)(const Indicator&, price_t) = MAX;
-Indicator (*MAX_3)(price_t, const Indicator&) = MAX;
+Indicator (*MAX_2)(const Indicator&, Indicator::value_t) = MAX;
+Indicator (*MAX_3)(Indicator::value_t, const Indicator&) = MAX;
 
 Indicator (*MIN_1)(const Indicator&, const Indicator&) = MIN;
-Indicator (*MIN_2)(const Indicator&, price_t) = MIN;
-Indicator (*MIN_3)(price_t, const Indicator&) = MIN;
+Indicator (*MIN_2)(const Indicator&, Indicator::value_t) = MIN;
+Indicator (*MIN_3)(Indicator::value_t, const Indicator&) = MIN;
 
 Indicator (*BETWEEN_1)(const Indicator&, const Indicator&, const Indicator&) = BETWEEN;
-Indicator (*BETWEEN_2)(const Indicator&, const Indicator&, price_t) = BETWEEN;
-Indicator (*BETWEEN_3)(const Indicator&, price_t, const Indicator&) = BETWEEN;
-Indicator (*BETWEEN_4)(const Indicator&, price_t, price_t) = BETWEEN;
-Indicator (*BETWEEN_5)(price_t, const Indicator&, const Indicator&) = BETWEEN;
-Indicator (*BETWEEN_6)(price_t, const Indicator&, price_t) = BETWEEN;
-Indicator (*BETWEEN_7)(price_t, price_t, const Indicator&) = BETWEEN;
-Indicator (*BETWEEN_8)(price_t, price_t, price_t) = BETWEEN;
+Indicator (*BETWEEN_2)(const Indicator&, const Indicator&, Indicator::value_t) = BETWEEN;
+Indicator (*BETWEEN_3)(const Indicator&, Indicator::value_t, const Indicator&) = BETWEEN;
+Indicator (*BETWEEN_4)(const Indicator&, Indicator::value_t, Indicator::value_t) = BETWEEN;
+Indicator (*BETWEEN_5)(Indicator::value_t, const Indicator&, const Indicator&) = BETWEEN;
+Indicator (*BETWEEN_6)(Indicator::value_t, const Indicator&, Indicator::value_t) = BETWEEN;
+Indicator (*BETWEEN_7)(Indicator::value_t, Indicator::value_t, const Indicator&) = BETWEEN;
+Indicator (*BETWEEN_8)(Indicator::value_t, Indicator::value_t, Indicator::value_t) = BETWEEN;
 
 Indicator (*LN_1)() = LN;
-Indicator (*LN_2)(price_t) = LN;
+Indicator (*LN_2)(Indicator::value_t) = LN;
 Indicator (*LN_3)(const Indicator&) = LN;
 
 Indicator (*LOG_1)() = LOG;
-Indicator (*LOG_2)(price_t) = LOG;
+Indicator (*LOG_2)(Indicator::value_t) = LOG;
 Indicator (*LOG_3)(const Indicator&) = LOG;
 
 Indicator (*HHVBARS_1)(int) = HHVBARS;
@@ -214,35 +234,35 @@ Indicator (*POW_2)(const IndParam&) = POW;
 Indicator (*POW_3)(const Indicator&, int) = POW;
 Indicator (*POW_4)(const Indicator&, const IndParam&) = POW;
 Indicator (*POW_5)(const Indicator&, const Indicator&) = POW;
-Indicator (*POW_6)(price_t, int) = POW;
+Indicator (*POW_6)(Indicator::value_t, int) = POW;
 
 Indicator (*SQRT_1)() = SQRT;
 Indicator (*SQRT_2)(const Indicator&) = SQRT;
-Indicator (*SQRT_3)(price_t) = SQRT;
+Indicator (*SQRT_3)(Indicator::value_t) = SQRT;
 
 Indicator (*ROUND_1)(int) = ROUND;
 Indicator (*ROUND_2)(const Indicator&, int) = ROUND;
-Indicator (*ROUND_3)(price_t, int) = ROUND;
+Indicator (*ROUND_3)(Indicator::value_t, int) = ROUND;
 
 Indicator (*ROUNDUP_1)(int) = ROUNDUP;
 Indicator (*ROUNDUP_2)(const Indicator&, int) = ROUNDUP;
-Indicator (*ROUNDUP_3)(price_t, int) = ROUNDUP;
+Indicator (*ROUNDUP_3)(Indicator::value_t, int) = ROUNDUP;
 
 Indicator (*ROUNDDOWN_1)(int) = ROUNDDOWN;
 Indicator (*ROUNDDOWN_2)(const Indicator&, int) = ROUNDDOWN;
-Indicator (*ROUNDDOWN_3)(price_t, int) = ROUNDDOWN;
+Indicator (*ROUNDDOWN_3)(Indicator::value_t, int) = ROUNDDOWN;
 
 Indicator (*FLOOR_1)() = FLOOR;
 Indicator (*FLOOR_2)(const Indicator&) = FLOOR;
-Indicator (*FLOOR_3)(price_t) = FLOOR;
+Indicator (*FLOOR_3)(Indicator::value_t) = FLOOR;
 
 Indicator (*CEILING_1)() = CEILING;
 Indicator (*CEILING_2)(const Indicator&) = CEILING;
-Indicator (*CEILING_3)(price_t) = CEILING;
+Indicator (*CEILING_3)(Indicator::value_t) = CEILING;
 
 Indicator (*INTPART_1)() = INTPART;
 Indicator (*INTPART_2)(const Indicator&) = INTPART;
-Indicator (*INTPART_3)(price_t) = INTPART;
+Indicator (*INTPART_3)(Indicator::value_t) = INTPART;
 
 Indicator (*EXIST_1)(int) = EXIST;
 Indicator (*EXIST_2)(const IndParam&) = EXIST;
@@ -270,36 +290,36 @@ Indicator (*LAST_11)(const Indicator&, const Indicator&, const Indicator&) = LAS
 
 Indicator (*SIN_1)() = SIN;
 Indicator (*SIN_2)(const Indicator&) = SIN;
-Indicator (*SIN_3)(price_t) = SIN;
+Indicator (*SIN_3)(Indicator::value_t) = SIN;
 
 Indicator (*ASIN_1)() = ASIN;
 Indicator (*ASIN_2)(const Indicator&) = ASIN;
-Indicator (*ASIN_3)(price_t) = ASIN;
+Indicator (*ASIN_3)(Indicator::value_t) = ASIN;
 
 Indicator (*COS_1)() = COS;
 Indicator (*COS_2)(const Indicator&) = COS;
-Indicator (*COS_3)(price_t) = COS;
+Indicator (*COS_3)(Indicator::value_t) = COS;
 
 Indicator (*ACOS_1)() = ACOS;
 Indicator (*ACOS_2)(const Indicator&) = ACOS;
-Indicator (*ACOS_3)(price_t) = ACOS;
+Indicator (*ACOS_3)(Indicator::value_t) = ACOS;
 
 Indicator (*TAN_1)() = TAN;
 Indicator (*TAN_2)(const Indicator&) = TAN;
-Indicator (*TAN_3)(price_t) = TAN;
+Indicator (*TAN_3)(Indicator::value_t) = TAN;
 
 Indicator (*ATAN_1)() = ATAN;
 Indicator (*ATAN_2)(const Indicator&) = ATAN;
-Indicator (*ATAN_3)(price_t) = ATAN;
+Indicator (*ATAN_3)(Indicator::value_t) = ATAN;
 
 Indicator (*REVERSE_1)() = REVERSE;
 Indicator (*REVERSE_2)(const Indicator&) = REVERSE;
-Indicator (*REVERSE_3)(price_t) = REVERSE;
+Indicator (*REVERSE_3)(Indicator::value_t) = REVERSE;
 
 Indicator (*MOD_1)(const Indicator&, const Indicator&) = MOD;
-Indicator (*MOD_2)(const Indicator&, price_t) = MOD;
-Indicator (*MOD_3)(price_t, const Indicator&) = MOD;
-Indicator (*MOD_4)(price_t, price_t) = MOD;
+Indicator (*MOD_2)(const Indicator&, Indicator::value_t) = MOD;
+Indicator (*MOD_3)(Indicator::value_t, const Indicator&) = MOD;
+Indicator (*MOD_4)(Indicator::value_t, Indicator::value_t) = MOD;
 
 Indicator (*VAR_1)(int) = VAR;
 Indicator (*VAR_2)(const IndParam&) = VAR;
@@ -314,18 +334,18 @@ Indicator (*VARP_4)(const Indicator&, const Indicator&) = VARP;
 Indicator (*VARP_5)(const Indicator&, int) = VARP;
 
 Indicator (*CROSS_1)(const Indicator&, const Indicator&) = CROSS;
-Indicator (*CROSS_2)(const Indicator&, price_t) = CROSS;
-Indicator (*CROSS_3)(price_t, const Indicator&) = CROSS;
-Indicator (*CROSS_4)(price_t, price_t) = CROSS;
+Indicator (*CROSS_2)(const Indicator&, Indicator::value_t) = CROSS;
+Indicator (*CROSS_3)(Indicator::value_t, const Indicator&) = CROSS;
+Indicator (*CROSS_4)(Indicator::value_t, Indicator::value_t) = CROSS;
 
 Indicator (*LONGCROSS_1)(const Indicator&, const Indicator&, int) = LONGCROSS;
 Indicator (*LONGCROSS_2)(const Indicator&, const Indicator&, const Indicator&) = LONGCROSS;
-Indicator (*LONGCROSS_3)(const Indicator&, price_t, int) = LONGCROSS;
-Indicator (*LONGCROSS_4)(const Indicator&, price_t, const Indicator&) = LONGCROSS;
-Indicator (*LONGCROSS_5)(price_t, const Indicator&, int) = LONGCROSS;
-Indicator (*LONGCROSS_6)(price_t, const Indicator&, const Indicator&) = LONGCROSS;
-Indicator (*LONGCROSS_7)(price_t, price_t, int) = LONGCROSS;
-Indicator (*LONGCROSS_8)(price_t, price_t, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_3)(const Indicator&, Indicator::value_t, int) = LONGCROSS;
+Indicator (*LONGCROSS_4)(const Indicator&, Indicator::value_t, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_5)(Indicator::value_t, const Indicator&, int) = LONGCROSS;
+Indicator (*LONGCROSS_6)(Indicator::value_t, const Indicator&, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_7)(Indicator::value_t, Indicator::value_t, int) = LONGCROSS;
+Indicator (*LONGCROSS_8)(Indicator::value_t, Indicator::value_t, const Indicator&) = LONGCROSS;
 
 Indicator (*FILTER_1)(int) = FILTER;
 Indicator (*FILTER_2)(const IndParam&) = FILTER;
@@ -335,11 +355,11 @@ Indicator (*FILTER_5)(const Indicator&, int) = FILTER;
 
 Indicator (*BARSSINCE_1)() = BARSSINCE;
 Indicator (*BARSSINCE_2)(const Indicator&) = BARSSINCE;
-Indicator (*BARSSINCE_3)(price_t) = BARSSINCE;
+Indicator (*BARSSINCE_3)(Indicator::value_t) = BARSSINCE;
 
 Indicator (*BARSLAST_1)() = BARSLAST;
 Indicator (*BARSLAST_2)(const Indicator&) = BARSLAST;
-Indicator (*BARSLAST_3)(price_t) = BARSLAST;
+Indicator (*BARSLAST_3)(Indicator::value_t) = BARSLAST;
 
 Indicator (*SUMBARS_1)(double) = SUMBARS;
 Indicator (*SUMBARS_2)(const IndParam&) = SUMBARS;
@@ -426,65 +446,85 @@ Indicator (*SLICE_1)(const PriceList&, int64_t, int64_t) = SLICE;
 Indicator (*SLICE_2)(int64_t, int64_t, int) = SLICE;
 Indicator (*SLICE_3)(const Indicator&, int64_t, int64_t, int) = SLICE;
 
-void export_Indicator_build_in() {
-    def("KDATA", KDATA1);
-    def("KDATA", KDATA3, R"(KDATA([data])
+Indicator (*RSI_1)(int) = RSI;
+Indicator (*RSI_2)(const Indicator&, int) = RSI;
+
+Indicator (*SLOPE1)(int) = SLOPE;
+Indicator (*SLOPE2)(const IndParam&) = SLOPE;
+Indicator (*SLOPE3)(const Indicator&, int) = SLOPE;
+Indicator (*SLOPE4)(const Indicator&, const IndParam&) = SLOPE;
+Indicator (*SLOPE5)(const Indicator&, const Indicator&) = SLOPE;
+
+Indicator (*MDD_1)() = MDD;
+Indicator (*MDD_2)(const Indicator&) = MDD;
+
+Indicator (*MRR_1)() = MRR;
+Indicator (*MRR_2)(const Indicator&) = MRR;
+
+Indicator (*ZHBOND10_1)(double) = ZHBOND10;
+Indicator (*ZHBOND10_2)(const DatetimeList&, double) = ZHBOND10;
+Indicator (*ZHBOND10_3)(const KData& k, double) = ZHBOND10;
+Indicator (*ZHBOND10_4)(const Indicator&, double) = ZHBOND10;
+
+void export_Indicator_build_in(py::module& m) {
+    m.def("KDATA", KDATA1);
+    m.def("KDATA", KDATA3, R"(KDATA([data])
 
     包装KData成Indicator，用于其他指标计算
 
     :param data: KData 或 具有6个返回结果的Indicator（如KDATA生成的Indicator）
     :rtype: Indicator)");
 
-    def("CLOSE", CLOSE1);
-    def("CLOSE", CLOSE3, R"(CLOSE([data])
+    m.def("CLOSE", CLOSE1);
+    m.def("CLOSE", CLOSE3, R"(CLOSE([data])
 
     获取收盘价，包装KData的收盘价成Indicator
 
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator)");
 
-    def("OPEN", OPEN1);
-    def("OPEN", OPEN3, R"(OPEN([data])
+    m.def("OPEN", OPEN1);
+    m.def("OPEN", OPEN3, R"(OPEN([data])
 
     获取开盘价，包装KData的开盘价成Indicator
 
     :param data: 输入数据（KData 或 Indicator） 
     :rtype: Indicator)");
 
-    def("HIGH", HIGH1);
-    def("HIGH", HIGH3, R"(HIGH([data])
+    m.def("HIGH", HIGH1);
+    m.def("HIGH", HIGH3, R"(HIGH([data])
 
     获取最高价，包装KData的最高价成Indicator
 
     :param data: 输入数据（KData 或 Indicator） 
     :rtype: Indicator)");
 
-    def("LOW", LOW1);
-    def("LOW", LOW3, R"(LOW([data])
+    m.def("LOW", LOW1);
+    m.def("LOW", LOW3, R"(LOW([data])
 
     获取最低价，包装KData的最低价成Indicator
 
     :param data: 输入数据（KData 或 Indicator） 
     :rtype: Indicator)");
 
-    def("AMO", AMO1);
-    def("AMO", AMO3, R"(AMO([data])
+    m.def("AMO", AMO1);
+    m.def("AMO", AMO3, R"(AMO([data])
 
     获取成交金额，包装KData的成交金额成Indicator
     
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator)");
 
-    def("VOL", VOL1);
-    def("VOL", VOL3, R"(VOL([data])
+    m.def("VOL", VOL1);
+    m.def("VOL", VOL3, R"(VOL([data])
 
     获取成交量，包装KData的成交量成Indicator
 
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator)");
 
-    def("KDATA_PART", KDATA_PART1, (arg("data"), arg("kpart")));
-    def("KDATA_PART", KDATA_PART3, (arg("kpart")), R"(KDATA_PART([data, kpart])
+    m.def("KDATA_PART", KDATA_PART1, py::arg("data"), py::arg("kpart"));
+    m.def("KDATA_PART", KDATA_PART3, py::arg("kpart"), R"(KDATA_PART([data, kpart])
 
     根据字符串选择返回指标KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL，如:KDATA_PART("CLOSE")等同于CLOSE()
 
@@ -492,21 +532,95 @@ void export_Indicator_build_in() {
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :rtype: Indicator)");
 
-    def("PRICELIST", PRICELIST2, (arg("data"), arg("discard") = 0));
-    def("PRICELIST", PRICELIST3, (arg("data"), arg("result_index") = 0));
-    def("PRICELIST", PRICELIST4, (arg("result_index") = 0));
+    m.def("DATE", DATE1);
+    m.def("DATE", DATE2, R"(DATE([data])
 
-    def("SMA", SMA_1, (arg("n") = 22, arg("m") = 2.0));
-    def("SMA", SMA_2, (arg("n"), arg("m")));
-    def("SMA", SMA_3, (arg("n"), arg("m") = 2.0));
-    def("SMA", SMA_4, (arg("n"), arg("m")));
-    def("SMA", SMA_5, (arg("data"), arg("n") = 22, arg("m") = 2.0));
-    def("SMA", SMA_6, (arg("data"), arg("n"), arg("m")));
-    def("SMA", SMA_7, (arg("data"), arg("n"), arg("m") = 2.0));
-    def("SMA", SMA_8, (arg("data"), arg("n"), arg("m")));
-    def("SMA", SMA_9, (arg("data"), arg("n"), arg("m")));
-    def("SMA", SMA_10, (arg("data"), arg("n"), arg("m") = 2.0));
-    def("SMA", SMA_11, (arg("data"), arg("n"), arg("m")), R"(SMA([data, n=22, m=2])
+    取得该周期从1900以来的年月日。用法: DATE 例如函数返回1000101，表示2000年1月1日。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator)");
+
+    m.def("TIME", TIME1);
+    m.def("TIME", TIME2, R"(TIME([data])
+
+    取得该周期的时分秒。用法: TIME 函数返回有效值范围为(000000-235959)。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator)");
+
+    m.def("YEAR", YEAR1);
+    m.def("YEAR", YEAR2, R"(YEAR([data])
+
+    取得该周期的年份。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator)");
+
+    m.def("MONTH", MONTH1);
+    m.def("MONTH", MONTH2, R"(MONTH([data])
+
+    取得该周期的月份。用法: MONTH 函数返回有效值范围为(1-12)。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator)");
+
+    m.def("WEEK", WEEK1);
+    m.def("WEEK", WEEK2, R"(WEEK([data])
+
+    取得该周期的星期数。用法：WEEK 函数返回有效值范围为(0-6)，0表示星期天。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator)");
+
+    m.def("DAY", DAY1);
+    m.def("DAY", DAY2, R"(DAY([data])
+
+    取得该周期的日期。用法: DAY 函数返回有效值范围为(1-31)。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator)");
+
+    m.def("HOUR", HOUR1);
+    m.def("HOUR", HOUR2, R"(HOUR([data])
+
+    取得该周期的小时数。用法：HOUR 函数返回有效值范围为(0-23)，对于日线及更长的分析周期值为0。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator)");
+
+    m.def("MINUTE", MINUTE1);
+    m.def("MINUTE", MINUTE2, R"(MINUTE([data])
+
+    取得该周期的分钟数。用法：MINUTE 函数返回有效值范围为(0-59)，对于日线及更长的分析周期值为0。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator)");
+
+    m.def(
+      "PRICELIST",
+      [](const py::object& obj, int result_index = 0, int discard = 0) {
+          if (py::isinstance<Indicator>(obj)) {
+              Indicator data = obj.cast<Indicator>();
+              return PRICELIST(data, result_index);
+          } else if (py::isinstance<py::sequence>(obj)) {
+              const auto& x = obj.cast<py::sequence>();
+              return PRICELIST(python_list_to_vector<price_t>(x), discard);
+          }
+          HKU_THROW("Invalid input data type!");
+      },
+      py::arg("data"), py::arg("result_index") = 0, py::arg("discard") = 0);
+
+    m.def("SMA", SMA_1, py::arg("n") = 22, py::arg("m") = 2.0);
+    m.def("SMA", SMA_2, py::arg("n"), py::arg("m"));
+    m.def("SMA", SMA_3, py::arg("n"), py::arg("m") = 2.0);
+    m.def("SMA", SMA_4, py::arg("n"), py::arg("m"));
+    m.def("SMA", SMA_5, py::arg("data"), py::arg("n") = 22, py::arg("m") = 2.0);
+    m.def("SMA", SMA_6, py::arg("data"), py::arg("n"), py::arg("m"));
+    m.def("SMA", SMA_7, py::arg("data"), py::arg("n"), py::arg("m") = 2.0);
+    m.def("SMA", SMA_8, py::arg("data"), py::arg("n"), py::arg("m"));
+    m.def("SMA", SMA_9, py::arg("data"), py::arg("n"), py::arg("m"));
+    m.def("SMA", SMA_10, py::arg("data"), py::arg("n"), py::arg("m") = 2.0);
+    m.def("SMA", SMA_11, py::arg("data"), py::arg("n"), py::arg("m"), R"(SMA([data, n=22, m=2])
 
     求移动平均
 
@@ -517,11 +631,11 @@ void export_Indicator_build_in() {
     :param float|Indicator|IndParam m: 系数
     :rtype: Indicator)");
 
-    def("EMA", EMA_1, (arg("n") = 22));
-    def("EMA", EMA_2, (arg("n")));
-    def("EMA", EMA_3, (arg("data"), arg("n")));
-    def("EMA", EMA_4, (arg("data"), arg("n")));
-    def("EMA", EMA_5, (arg("data"), arg("n") = 22), R"(EMA([data, n=22])
+    m.def("EMA", EMA_1, py::arg("n") = 22);
+    m.def("EMA", EMA_2, py::arg("n"));
+    m.def("EMA", EMA_3, py::arg("data"), py::arg("n"));
+    m.def("EMA", EMA_4, py::arg("data"), py::arg("n"));
+    m.def("EMA", EMA_5, py::arg("data"), py::arg("n") = 22, R"(EMA([data, n=22])
 
     指数移动平均线(Exponential Moving Average)
 
@@ -529,11 +643,11 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator)");
 
-    def("MA", MA_1, (arg("n") = 22));
-    def("MA", MA_2, (arg("n")));
-    def("MA", MA_3, (arg("data"), arg("n")));
-    def("MA", MA_4, (arg("data"), arg("n")));
-    def("MA", MA_5, (arg("data"), arg("n") = 22), R"(MA([data, n=22])
+    m.def("MA", MA_1, py::arg("n") = 22);
+    m.def("MA", MA_2, py::arg("n"));
+    m.def("MA", MA_3, py::arg("data"), py::arg("n"));
+    m.def("MA", MA_4, py::arg("data"), py::arg("n"));
+    m.def("MA", MA_5, py::arg("data"), py::arg("n") = 22, R"(MA([data, n=22])
 
     简单移动平均
 
@@ -541,12 +655,13 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("AMA", AMA_1, (arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30));
-    def("AMA", AMA_2, (arg("n"), arg("fast_n"), arg("slow_n")));
-    def("AMA", AMA_4, (arg("n"), arg("fast_n"), arg("slow_n")));
-    def("AMA", AMA_5, (arg("n"), arg("fast_n"), arg("slow_n")));
-    def("AMA", AMA_3, (arg("data"), arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30),
-        R"(AMA([data, n=10, fast_n=2, slow_n=30])
+    m.def("AMA", AMA_1, py::arg("n") = 10, py::arg("fast_n") = 2, py::arg("slow_n") = 30);
+    m.def("AMA", AMA_2, py::arg("n"), py::arg("fast_n"), py::arg("slow_n"));
+    m.def("AMA", AMA_4, py::arg("data"), py::arg("n"), py::arg("fast_n"), py::arg("slow_n"));
+    m.def("AMA", AMA_5, py::arg("data"), py::arg("n"), py::arg("fast_n"), py::arg("slow_n"));
+    m.def("AMA", AMA_3, py::arg("data"), py::arg("n") = 10, py::arg("fast_n") = 2,
+          py::arg("slow_n") = 30,
+          R"(AMA([data, n=10, fast_n=2, slow_n=30])
 
     佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
 
@@ -559,11 +674,11 @@ void export_Indicator_build_in() {
     * result(0): AMA
     * result(1): ER)");
 
-    def("ATR", ATR_1, (arg("n") = 14));
-    def("ATR", ATR_2, (arg("n")));
-    def("ATR", ATR_3, (arg("data"), arg("n")));
-    def("ATR", ATR_4, (arg("data"), arg("n")));
-    def("ATR", ATR_5, (arg("data"), arg("n") = 14), R"(ATR([data, n=14])
+    m.def("ATR", ATR_1, py::arg("n") = 14);
+    m.def("ATR", ATR_2, py::arg("n"));
+    m.def("ATR", ATR_3, py::arg("data"), py::arg("n"));
+    m.def("ATR", ATR_4, py::arg("data"), py::arg("n"));
+    m.def("ATR", ATR_5, py::arg("data"), py::arg("n") = 14, R"(ATR([data, n=14])
 
     平均真实波幅(Average True Range)
 
@@ -571,12 +686,13 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于1的整数
     :rtype: Indicator)");
 
-    def("MACD", MACD_1, (arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));
-    def("MACD", MACD_2, (arg("n1"), arg("n2"), arg("n3")));
-    def("MACD", MACD_3, (arg("data"), arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));
-    def("MACD", MACD_4, (arg("data"), arg("n1"), arg("n2"), arg("n3")));
-    def("MACD", MACD_5, (arg("data"), arg("n1"), arg("n2"), arg("n3")),
-        R"(MACD([data, n1=12, n2=26, n3=9])
+    m.def("MACD", MACD_1, py::arg("n1") = 12, py::arg("n2") = 26, py::arg("n3") = 9);
+    m.def("MACD", MACD_2, py::arg("n1"), py::arg("n2"), py::arg("n3"));
+    m.def("MACD", MACD_3, py::arg("data"), py::arg("n1") = 12, py::arg("n2") = 26,
+          py::arg("n3") = 9);
+    m.def("MACD", MACD_4, py::arg("data"), py::arg("n1"), py::arg("n2"), py::arg("n3"));
+    m.def("MACD", MACD_5, py::arg("data"), py::arg("n1"), py::arg("n2"), py::arg("n3"),
+          R"(MACD([data, n1=12, n2=26, n3=9])
 
     平滑异同移动平均线
 
@@ -590,8 +706,8 @@ void export_Indicator_build_in() {
     * result(1): DIFF: 快线,即（短期EMA-长期EMA）
     * result(2): DEA: 慢线，即快线的n3周期EMA平滑)");
 
-    def("VIGOR", VIGOR_1, (arg("kdata"), arg("n") = 2));
-    def("VIGOR", VIGOR_2, (arg("n") = 2), R"(VIGOR([kdata, n=2])
+    m.def("VIGOR", VIGOR_1, py::arg("kdata"), py::arg("n") = 2);
+    m.def("VIGOR", VIGOR_2, py::arg("n") = 2, R"(VIGOR([kdata, n=2])
 
     亚历山大.艾尔德力度指数 [BOOK2]_
 
@@ -601,15 +717,18 @@ void export_Indicator_build_in() {
     :param int n: EMA平滑窗口
     :rtype: Indicator)");
 
-    def("SAFTYLOSS", SAFTYLOSS_1, (arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
-    def("SAFTYLOSS", SAFTYLOSS_2, (arg("n1"), arg("n2"), arg("p") = 2.0));
-    def("SAFTYLOSS", SAFTYLOSS_3, (arg("n1"), arg("n2"), arg("p")));
-    def("SAFTYLOSS", SAFTYLOSS_4, (arg("data"), arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
-    def("SAFTYLOSS", SAFTYLOSS_5, (arg("data"), arg("n1"), arg("n2"), arg("p") = 2.0));
-    def("SAFTYLOSS", SAFTYLOSS_6, (arg("data"), arg("n1"), arg("n2"), arg("p")));
-    def("SAFTYLOSS", SAFTYLOSS_7, (arg("data"), arg("n1"), arg("n2"), arg("p") = 2.0));
-    def("SAFTYLOSS", SAFTYLOSS_8, (arg("data"), arg("n1"), arg("n2"), arg("p")),
-        R"(SAFTYLOSS([data, n1=10, n2=3, p=2.0])
+    m.def("SAFTYLOSS", SAFTYLOSS_1, py::arg("n1") = 10, py::arg("n2") = 3, py::arg("p") = 2.0);
+    m.def("SAFTYLOSS", SAFTYLOSS_2, py::arg("n1"), py::arg("n2"), py::arg("p") = 2.0);
+    m.def("SAFTYLOSS", SAFTYLOSS_3, py::arg("n1"), py::arg("n2"), py::arg("p"));
+    m.def("SAFTYLOSS", SAFTYLOSS_4, py::arg("data"), py::arg("n1") = 10, py::arg("n2") = 3,
+          py::arg("p") = 2.0);
+    m.def("SAFTYLOSS", SAFTYLOSS_5, py::arg("data"), py::arg("n1"), py::arg("n2"),
+          py::arg("p") = 2.0);
+    m.def("SAFTYLOSS", SAFTYLOSS_6, py::arg("data"), py::arg("n1"), py::arg("n2"), py::arg("p"));
+    m.def("SAFTYLOSS", SAFTYLOSS_7, py::arg("data"), py::arg("n1"), py::arg("n2"),
+          py::arg("p") = 2.0);
+    m.def("SAFTYLOSS", SAFTYLOSS_8, py::arg("data"), py::arg("n1"), py::arg("n2"), py::arg("p"),
+          R"(SAFTYLOSS([data, n1=10, n2=3, p=2.0])
 
     亚历山大 艾尔德安全地带止损线，参见 [BOOK2]_
 
@@ -621,19 +740,19 @@ void export_Indicator_build_in() {
     :param float|Indicator|IndParam p: 噪音系数
     :rtype: Indicator)");
 
-    def("DIFF", DIFF_1);
-    def("DIFF", DIFF_2, R"(DIFF([data])
+    m.def("DIFF", DIFF_1);
+    m.def("DIFF", DIFF_2, R"(DIFF([data])
 
     差分指标，即data[i] - data[i-1]
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("REF", REF_1, (arg("n")));
-    def("REF", REF_2, (arg("n")));
-    def("REF", REF_3, (arg("data"), arg("n")));
-    def("REF", REF_4, (arg("data"), arg("n")));
-    def("REF", REF_5, (arg("data"), arg("n")), R"(REF([data, n])
+    m.def("REF", REF_1, py::arg("n"));
+    m.def("REF", REF_2, py::arg("n"));
+    m.def("REF", REF_3, py::arg("data"), py::arg("n"));
+    m.def("REF", REF_4, py::arg("data"), py::arg("n"));
+    m.def("REF", REF_5, py::arg("data"), py::arg("n"), R"(REF([data, n])
 
     向前引用 （即右移），引用若干周期前的数据。
 
@@ -643,11 +762,11 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 引用n周期前的值，即右移n位
     :rtype: Indicator)");
 
-    def("STDEV", STDEV_1, (arg("n") = 10));
-    def("STDEV", STDEV_2, (arg("n")));
-    def("STDEV", STDEV_3, (arg("data"), arg("n")));
-    def("STDEV", STDEV_4, (arg("data"), arg("n")));
-    def("STDEV", STDEV_5, (arg("data"), arg("n") = 10), R"(STDEV([data, n=10])
+    m.def("STDEV", STDEV_1, py::arg("n") = 10);
+    m.def("STDEV", STDEV_2, py::arg("n"));
+    m.def("STDEV", STDEV_3, py::arg("data"), py::arg("n"));
+    m.def("STDEV", STDEV_4, py::arg("data"), py::arg("n"));
+    m.def("STDEV", STDEV_5, py::arg("data"), py::arg("n") = 10, R"(STDEV([data, n=10])
 
     计算N周期内样本标准差
 
@@ -655,11 +774,11 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("STDP", STDP_1, (arg("n") = 10));
-    def("STDP", STDP_2, (arg("n")));
-    def("STDP", STDP_3, (arg("data"), arg("n")));
-    def("STDP", STDP_4, (arg("data"), arg("n")));
-    def("STDP", STDP_5, (arg("data"), arg("n") = 10), R"(STDP([data, n=10])
+    m.def("STDP", STDP_1, py::arg("n") = 10);
+    m.def("STDP", STDP_2, py::arg("n"));
+    m.def("STDP", STDP_3, py::arg("data"), py::arg("n"));
+    m.def("STDP", STDP_4, py::arg("data"), py::arg("n"));
+    m.def("STDP", STDP_5, py::arg("data"), py::arg("n") = 10, R"(STDP([data, n=10])
 
     总体标准差，STDP(X,N)为X的N日总体标准差
 
@@ -667,13 +786,13 @@ void export_Indicator_build_in() {
     :param int n: 时间窗口
     :rtype: Indicator)");
 
-    def("POS", POS, (arg("block"), arg("query"), arg("sg")));
+    m.def("POS", POS, py::arg("block"), py::arg("query"), py::arg("sg"));
 
-    def("HHV", HHV_1, (arg("n") = 20));
-    def("HHV", HHV_2, (arg("n")));
-    def("HHV", HHV_3, (arg("data"), arg("n")));
-    def("HHV", HHV_4, (arg("data"), arg("n")));
-    def("HHV", HHV_5, (arg("data"), arg("n") = 20), R"(HHV([data, n=20])
+    m.def("HHV", HHV_1, py::arg("n") = 20);
+    m.def("HHV", HHV_2, py::arg("n"));
+    m.def("HHV", HHV_3, py::arg("data"), py::arg("n"));
+    m.def("HHV", HHV_4, py::arg("data"), py::arg("n"));
+    m.def("HHV", HHV_5, py::arg("data"), py::arg("n") = 20, R"(HHV([data, n=20])
 
     N日内最高价，N=0则从第一个有效值开始。
 
@@ -681,11 +800,11 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
-    def("LLV", LLV_1, (arg("n") = 20));
-    def("LLV", LLV_2, (arg("n")));
-    def("LLV", LLV_3, (arg("data"), arg("n")));
-    def("LLV", LLV_4, (arg("data"), arg("n")));
-    def("LLV", LLV_5, (arg("data"), arg("n") = 20), R"(LLV([data, n=20])
+    m.def("LLV", LLV_1, py::arg("n") = 20);
+    m.def("LLV", LLV_2, py::arg("n"));
+    m.def("LLV", LLV_3, py::arg("data"), py::arg("n"));
+    m.def("LLV", LLV_4, py::arg("data"), py::arg("n"));
+    m.def("LLV", LLV_5, py::arg("data"), py::arg("n") = 20, R"(LLV([data, n=20])
 
     N日内最低价，N=0则从第一个有效值开始。
 
@@ -693,9 +812,9 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
-    def("CVAL", CVAL_1, (arg("value") = 0.0, arg("discard") = 0));
-    def("CVAL", CVAL_2, (arg("data"), arg("value") = 0.0, arg("discard") = 0),
-        R"(CVAL([data, value=0.0, discard=0])
+    m.def("CVAL", CVAL_1, py::arg("value") = 0.0, py::arg("discard") = 0);
+    m.def("CVAL", CVAL_2, py::arg("data"), py::arg("value") = 0.0, py::arg("discard") = 0,
+          R"(CVAL([data, value=0.0, discard=0])
 
     data 为 Indicator 实例，创建和 data 等长的常量指标，其值和为value，抛弃长度discard和data一样
 
@@ -704,23 +823,23 @@ void export_Indicator_build_in() {
     :param int discard: 抛弃数量
     :rtype: Indicator)");
 
-    def("LIUTONGPAN", LIUTONGPAN_1);
-    def("LIUTONGPAN", LIUTONGPAN_2, R"(LIUTONGPAN(kdata)
+    m.def("LIUTONGPAN", LIUTONGPAN_1);
+    m.def("LIUTONGPAN", LIUTONGPAN_2, R"(LIUTONGPAN(kdata)
 
    获取流通盘（单位：万股），同 CAPITAL
 
    :param KData kdata: k线数据
    :rtype: Indicator)");
 
-    def("HSL", HSL_1);
-    def("HSL", HSL_2, R"(HSL(kdata)
+    m.def("HSL", HSL_1);
+    m.def("HSL", HSL_2, R"(HSL(kdata)
 
     获取换手率，等于 VOL(k) / CAPITAL(k)
 
     :param KData kdata: k线数据
     :rtype: Indicator)");
 
-    def("WEAVE", WEAVE, R"(WEAVE(ind1, ind2)
+    m.def("WEAVE", WEAVE, R"(WEAVE(ind1, ind2)
 
     将ind1和ind2的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
     
@@ -728,7 +847,7 @@ void export_Indicator_build_in() {
     :param Indicator ind2: 指标2
     :rtype: Indicator)");
 
-    def("CORR", CORR, R"(CORR(ind1, ind2, n)
+    m.def("CORR", CORR, R"(CORR(ind1, ind2, n)
 
     计算 ind1 和 ind2 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
 
@@ -737,10 +856,10 @@ void export_Indicator_build_in() {
     :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数
     :rtype: Indicator)");
 
-    def("IF", IF_1);
-    def("IF", IF_2);
-    def("IF", IF_3);
-    def("IF", IF_4, R"(IF(x, a, b)
+    m.def("IF", IF_1);
+    m.def("IF", IF_2);
+    m.def("IF", IF_3);
+    m.def("IF", IF_4, R"(IF(x, a, b)
 
     条件函数, 根据条件求不同的值。
 
@@ -753,11 +872,11 @@ void export_Indicator_build_in() {
     :param Indicator b: 待选指标 b
     :rtype: Indicator)");
 
-    def("COUNT", COUNT_1, (arg("n") = 20));
-    def("COUNT", COUNT_2, (arg("n")));
-    def("COUNT", COUNT_3, (arg("data"), arg("n")));
-    def("COUNT", COUNT_4, (arg("data"), arg("n")));
-    def("COUNT", COUNT_5, (arg("data"), arg("n") = 20), R"(COUNT([data, n=20])
+    m.def("COUNT", COUNT_1, py::arg("n") = 20);
+    m.def("COUNT", COUNT_2, py::arg("n"));
+    m.def("COUNT", COUNT_3, py::arg("data"), py::arg("n"));
+    m.def("COUNT", COUNT_4, py::arg("data"), py::arg("n"));
+    m.def("COUNT", COUNT_5, py::arg("data"), py::arg("n") = 20, R"(COUNT([data, n=20])
 
     统计满足条件的周期数。
 
@@ -769,11 +888,11 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 周期
     :rtype: Indicator)");
 
-    def("SUM", SUM_1, (arg("n") = 20));
-    def("SUM", SUM_2, (arg("n")));
-    def("SUM", SUM_3, (arg("data"), arg("n")));
-    def("SUM", SUM_4, (arg("data"), arg("n")));
-    def("SUM", SUM_5, (arg("data"), arg("n") = 20), R"(SUM([data, n=20])
+    m.def("SUM", SUM_1, py::arg("n") = 20);
+    m.def("SUM", SUM_2, py::arg("n"));
+    m.def("SUM", SUM_3, py::arg("data"), py::arg("n"));
+    m.def("SUM", SUM_4, py::arg("data"), py::arg("n"));
+    m.def("SUM", SUM_5, py::arg("data"), py::arg("n") = 20, R"(SUM([data, n=20])
 
     求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
 
@@ -781,44 +900,44 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("ABS", ABS_1);
-    def("ABS", ABS_2);
-    def("ABS", ABS_3, R"(ABS([data])
+    m.def("ABS", ABS_1);
+    m.def("ABS", ABS_2);
+    m.def("ABS", ABS_3, R"(ABS([data])
 
     求绝对值
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("NOT", NOT_1);
-    def("NOT", NOT_2, R"(NOT([data])
+    m.def("NOT", NOT_1);
+    m.def("NOT", NOT_2, R"(NOT([data])
 
     求逻辑非。NOT(X)返回非X,即当X=0时返回1，否则返回0。
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("SGN", SGN_1);
-    def("SGN", SGN_2);
-    def("SGN", SGN_3, R"(SGN([data])
+    m.def("SGN", SGN_1);
+    m.def("SGN", SGN_2);
+    m.def("SGN", SGN_3, R"(SGN([data])
 
     求符号值, SGN(X)，当 X>0, X=0, X<0分别返回 1, 0, -1。
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("EXP", EXP_1);
-    def("EXP", EXP_2);
-    def("EXP", EXP_3, R"(EXP([data])
+    m.def("EXP", EXP_1);
+    m.def("EXP", EXP_2);
+    m.def("EXP", EXP_3, R"(EXP([data])
 
     EXP(X)为e的X次幂
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("MAX", MAX_1);
-    def("MAX", MAX_2);
-    def("MAX", MAX_3, R"(MAX(ind1, ind2)
+    m.def("MAX", MAX_1);
+    m.def("MAX", MAX_2);
+    m.def("MAX", MAX_3, R"(MAX(ind1, ind2)
 
     求最大值, MAX(A,B)返回A和B中的较大值。
 
@@ -826,9 +945,9 @@ void export_Indicator_build_in() {
     :param Indicator ind2: B
     :rtype: Indicator)");
 
-    def("MIN", MIN_1);
-    def("MIN", MIN_2);
-    def("MIN", MIN_3, R"(MIN(ind1, ind2)
+    m.def("MIN", MIN_1);
+    m.def("MIN", MIN_2);
+    m.def("MIN", MIN_3, R"(MIN(ind1, ind2)
 
     求最小值, MIN(A,B)返回A和B中的较小值。
 
@@ -836,14 +955,14 @@ void export_Indicator_build_in() {
     :param Indicator ind2: B
     :rtype: Indicator)");
 
-    def("BETWEEN", BETWEEN_1);
-    def("BETWEEN", BETWEEN_2);
-    def("BETWEEN", BETWEEN_3);
-    def("BETWEEN", BETWEEN_4);
-    def("BETWEEN", BETWEEN_5);
-    def("BETWEEN", BETWEEN_6);
-    def("BETWEEN", BETWEEN_7);
-    def("BETWEEN", BETWEEN_8, R"(BETWEEN(a, b, c)
+    m.def("BETWEEN", BETWEEN_1);
+    m.def("BETWEEN", BETWEEN_2);
+    m.def("BETWEEN", BETWEEN_3);
+    m.def("BETWEEN", BETWEEN_4);
+    m.def("BETWEEN", BETWEEN_5);
+    m.def("BETWEEN", BETWEEN_6);
+    m.def("BETWEEN", BETWEEN_7);
+    m.def("BETWEEN", BETWEEN_8, R"(BETWEEN(a, b, c)
 
     介于(介于两个数之间)
 
@@ -856,29 +975,29 @@ void export_Indicator_build_in() {
     :param Indicator c: C
     :rtype: Indicator)");
 
-    def("LN", LN_1);
-    def("LN", LN_2);
-    def("LN", LN_3, R"(LN([data])
+    m.def("LN", LN_1);
+    m.def("LN", LN_2);
+    m.def("LN", LN_3, R"(LN([data])
 
     求自然对数, LN(X)以e为底的对数
 
     :param data: 输入数据
     :rtype: Indicator)");
 
-    def("LOG", LOG_1);
-    def("LOG", LOG_2);
-    def("LOG", LOG_3, R"(LOG([data])
+    m.def("LOG", LOG_1);
+    m.def("LOG", LOG_2);
+    m.def("LOG", LOG_3, R"(LOG([data])
 
     以10为底的对数
 
     :param data: 输入数据
     :rtype: Indicator)");
 
-    def("HHVBARS", HHVBARS_1, (arg("n") = 20));
-    def("HHVBARS", HHVBARS_2, (arg("n")));
-    def("HHVBARS", HHVBARS_3, (arg("data"), arg("n")));
-    def("HHVBARS", HHVBARS_4, (arg("data"), arg("n")));
-    def("HHVBARS", HHVBARS_5, (arg("data"), arg("n") = 20), R"(HHVBARS([data, n=20])
+    m.def("HHVBARS", HHVBARS_1, py::arg("n") = 20);
+    m.def("HHVBARS", HHVBARS_2, py::arg("n"));
+    m.def("HHVBARS", HHVBARS_3, py::arg("data"), py::arg("n"));
+    m.def("HHVBARS", HHVBARS_4, py::arg("data"), py::arg("n"));
+    m.def("HHVBARS", HHVBARS_5, py::arg("data"), py::arg("n") = 20, R"(HHVBARS([data, n=20])
 
     上一高点位置 求上一高点到当前的周期数。
 
@@ -890,11 +1009,11 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
-    def("LLVBARS", LLVBARS_1, (arg("n") = 20));
-    def("LLVBARS", LLVBARS_2, (arg("n")));
-    def("LLVBARS", LLVBARS_3, (arg("data"), arg("n")));
-    def("LLVBARS", LLVBARS_4, (arg("data"), arg("n")));
-    def("LLVBARS", LLVBARS_5, (arg("data"), arg("n") = 20), R"(LLVBARS([data, n=20])
+    m.def("LLVBARS", LLVBARS_1, py::arg("n") = 20);
+    m.def("LLVBARS", LLVBARS_2, py::arg("n"));
+    m.def("LLVBARS", LLVBARS_3, py::arg("data"), py::arg("n"));
+    m.def("LLVBARS", LLVBARS_4, py::arg("data"), py::arg("n"));
+    m.def("LLVBARS", LLVBARS_5, py::arg("data"), py::arg("n") = 20, R"(LLVBARS([data, n=20])
 
     上一低点位置 求上一低点到当前的周期数。
 
@@ -906,12 +1025,12 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
-    def("POW", POW_1, (arg("n")));
-    def("POW", POW_2, (arg("n")));
-    def("POW", POW_3, (arg("data"), arg("n")));
-    def("POW", POW_4, (arg("data"), arg("n")));
-    def("POW", POW_5, (arg("data"), arg("n")));
-    def("POW", POW_6), (arg("data"), arg("n"), R"(POW(data, n)
+    m.def("POW", POW_1, py::arg("n"));
+    m.def("POW", POW_2, py::arg("n"));
+    m.def("POW", POW_3, py::arg("data"), py::arg("n"));
+    m.def("POW", POW_4, py::arg("data"), py::arg("n"));
+    m.def("POW", POW_5, py::arg("data"), py::arg("n"));
+    m.def("POW", POW_6, py::arg("data"), py::arg("n"), R"(POW(data, n)
 
     乘幂
 
@@ -923,9 +1042,9 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 幂
     :rtype: Indicator)");
 
-    def("SQRT", SQRT_1);
-    def("SQRT", SQRT_2);
-    def("SQRT", SQRT_3, R"(SQRT([data])
+    m.def("SQRT", SQRT_1);
+    m.def("SQRT", SQRT_2);
+    m.def("SQRT", SQRT_3, R"(SQRT([data])
 
     开平方
 
@@ -936,9 +1055,9 @@ void export_Indicator_build_in() {
     :param data: 输入数据
     :rtype: Indicator)");
 
-    def("ROUND", ROUND_1, (arg("ndigits") = 2));
-    def("ROUND", ROUND_2, (arg("data"), arg("ndigits") = 2));
-    def("ROUND", ROUND_3, (arg("data"), arg("ndigits") = 2), R"(ROUND([data, ndigits=2])
+    m.def("ROUND", ROUND_1, py::arg("ndigits") = 2);
+    m.def("ROUND", ROUND_2, py::arg("data"), py::arg("ndigits") = 2);
+    m.def("ROUND", ROUND_3, py::arg("data"), py::arg("ndigits") = 2, R"(ROUND([data, ndigits=2])
 
     四舍五入
 
@@ -946,9 +1065,10 @@ void export_Indicator_build_in() {
     :param int ndigits: 保留的小数点后位数
     :rtype: Indicator)");
 
-    def("ROUNDUP", ROUNDUP_1, (arg("ndigits") = 2));
-    def("ROUNDUP", ROUNDUP_2, (arg("data"), arg("ndigits") = 2));
-    def("ROUNDUP", ROUNDUP_3, (arg("data"), arg("ndigits") = 2), R"(ROUNDUP([data, ndigits=2])
+    m.def("ROUNDUP", ROUNDUP_1, py::arg("ndigits") = 2);
+    m.def("ROUNDUP", ROUNDUP_2, py::arg("data"), py::arg("ndigits") = 2);
+    m.def("ROUNDUP", ROUNDUP_3, py::arg("data"), py::arg("ndigits") = 2,
+          R"(ROUNDUP([data, ndigits=2])
 
     向上截取，如10.1截取后为11
 
@@ -956,9 +1076,10 @@ void export_Indicator_build_in() {
     :param int ndigits: 保留的小数点后位数
     :rtype: Indicator)");
 
-    def("ROUNDDOWN", ROUNDDOWN_1, (arg("ndigits") = 2));
-    def("ROUNDDOWN", ROUNDDOWN_2, (arg("data"), arg("ndigits") = 2));
-    def("ROUNDDOWN", ROUNDDOWN_3, (arg("data"), arg("ndigits") = 2), R"(ROUND([data, ndigits=2])
+    m.def("ROUNDDOWN", ROUNDDOWN_1, py::arg("ndigits") = 2);
+    m.def("ROUNDDOWN", ROUNDDOWN_2, py::arg("data"), py::arg("ndigits") = 2);
+    m.def("ROUNDDOWN", ROUNDDOWN_3, py::arg("data"), py::arg("ndigits") = 2,
+          R"(ROUND([data, ndigits=2])
 
     四舍五入
 
@@ -966,9 +1087,9 @@ void export_Indicator_build_in() {
     :param int ndigits: 保留的小数点后位数
     :rtype: Indicator)");
 
-    def("FLOOR", FLOOR_1);
-    def("FLOOR", FLOOR_2);
-    def("FLOOR", FLOOR_3, R"(FLOOR([data])
+    m.def("FLOOR", FLOOR_1);
+    m.def("FLOOR", FLOOR_2);
+    m.def("FLOOR", FLOOR_3, R"(FLOOR([data])
 
     向下舍入(向数值减小方向舍入)取整
 
@@ -979,9 +1100,9 @@ void export_Indicator_build_in() {
     :param data: 输入数据
     :rtype: Indicator)");
 
-    def("CEILING", CEILING_1);
-    def("CEILING", CEILING_2);
-    def("CEILING", CEILING_3, R"(CEILING([data])
+    m.def("CEILING", CEILING_1);
+    m.def("CEILING", CEILING_2);
+    m.def("CEILING", CEILING_3, R"(CEILING([data])
 
     向上舍入(向数值增大方向舍入)取整
    
@@ -992,20 +1113,20 @@ void export_Indicator_build_in() {
     :param data: 输入数据
     :rtype: Indicator)");
 
-    def("INTPART", INTPART_1);
-    def("INTPART", INTPART_2);
-    def("INTPART", INTPART_3, R"(INTPART([data])
+    m.def("INTPART", INTPART_1);
+    m.def("INTPART", INTPART_2);
+    m.def("INTPART", INTPART_3, R"(INTPART([data])
 
     取整(绝对值减小取整，即取得数据的整数部分)
 
     :param data: 输入数据
     :rtype: Indicator)");
 
-    def("EXIST", EXIST_1, (arg("n") = 20));
-    def("EXIST", EXIST_2, (arg("n")));
-    def("EXIST", EXIST_3, (arg("data"), arg("n")));
-    def("EXIST", EXIST_4, (arg("data"), arg("n")));
-    def("EXIST", EXIST_5, (arg("data"), arg("n") = 20), R"(EXIST([data, n=20])
+    m.def("EXIST", EXIST_1, py::arg("n") = 20);
+    m.def("EXIST", EXIST_2, py::arg("n"));
+    m.def("EXIST", EXIST_3, py::arg("data"), py::arg("n"));
+    m.def("EXIST", EXIST_4, py::arg("data"), py::arg("n"));
+    m.def("EXIST", EXIST_5, py::arg("data"), py::arg("n") = 20, R"(EXIST([data, n=20])
 
     存在, EXIST(X,N) 表示条件X在N周期有存在
 
@@ -1013,11 +1134,11 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator)");
 
-    def("EVERY", EVERY_1, (arg("n") = 20));
-    def("EVERY", EVERY_2, (arg("n")));
-    def("EVERY", EVERY_3, (arg("data"), arg("n")));
-    def("EVERY", EVERY_4, (arg("data"), arg("n")));
-    def("EVERY", EVERY_5, (arg("data"), arg("n") = 20), R"(EVERY([data, n=20])
+    m.def("EVERY", EVERY_1, py::arg("n") = 20);
+    m.def("EVERY", EVERY_2, py::arg("n"));
+    m.def("EVERY", EVERY_3, py::arg("data"), py::arg("n"));
+    m.def("EVERY", EVERY_4, py::arg("data"), py::arg("n"));
+    m.def("EVERY", EVERY_5, py::arg("data"), py::arg("n") = 20, R"(EVERY([data, n=20])
 
     一直存在
 
@@ -1029,17 +1150,17 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator)");
 
-    def("LAST", LAST_1, (arg("m") = 10, arg("n") = 5));
-    def("LAST", LAST_2, (arg("m"), arg("n")));
-    def("LAST", LAST_3, (arg("m"), arg("n") = 5));
-    def("LAST", LAST_4, (arg("m"), arg("n")));
-    def("LAST", LAST_5, (arg("data"), arg("m") = 10, arg("n") = 5));
-    def("LAST", LAST_6, (arg("data"), arg("m"), arg("n")));
-    def("LAST", LAST_7, (arg("data"), arg("m"), arg("n") = 5));
-    def("LAST", LAST_8, (arg("data"), arg("m"), arg("n")));
-    def("LAST", LAST_9, (arg("data"), arg("m"), arg("n")));
-    def("LAST", LAST_10, (arg("data"), arg("m"), arg("n") = 5));
-    def("LAST", LAST_11, (arg("data"), arg("m"), arg("n")), R"(LAST([data, m=10, n=5])
+    m.def("LAST", LAST_1, py::arg("m") = 10, py::arg("n") = 5);
+    m.def("LAST", LAST_2, py::arg("m"), py::arg("n"));
+    m.def("LAST", LAST_3, py::arg("m"), py::arg("n") = 5);
+    m.def("LAST", LAST_4, py::arg("m"), py::arg("n"));
+    m.def("LAST", LAST_5, py::arg("data"), py::arg("m") = 10, py::arg("n") = 5);
+    m.def("LAST", LAST_6, py::arg("data"), py::arg("m"), py::arg("n"));
+    m.def("LAST", LAST_7, py::arg("data"), py::arg("m"), py::arg("n") = 5);
+    m.def("LAST", LAST_8, py::arg("data"), py::arg("m"), py::arg("n"));
+    m.def("LAST", LAST_9, py::arg("data"), py::arg("m"), py::arg("n"));
+    m.def("LAST", LAST_10, py::arg("data"), py::arg("m"), py::arg("n") = 5);
+    m.def("LAST", LAST_11, py::arg("data"), py::arg("m"), py::arg("n"), R"(LAST([data, m=10, n=5])
 
     区间存在。
 
@@ -1052,73 +1173,73 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: n周期
     :rtype: Indicator)");
 
-    def("SIN", SIN_1);
-    def("SIN", SIN_2);
-    def("SIN", SIN_3, R"(SIN([data])
+    m.def("SIN", SIN_1);
+    m.def("SIN", SIN_2);
+    m.def("SIN", SIN_3, R"(SIN([data])
 
     正弦值
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("ASIN", ASIN_1);
-    def("ASIN", ASIN_2);
-    def("ASIN", ASIN_3, R"(ASIN([data])
+    m.def("ASIN", ASIN_1);
+    m.def("ASIN", ASIN_2);
+    m.def("ASIN", ASIN_3, R"(ASIN([data])
 
     反正弦值
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("COS", COS_1);
-    def("COS", COS_2);
-    def("COS", COS_3, R"(COS([data])
+    m.def("COS", COS_1);
+    m.def("COS", COS_2);
+    m.def("COS", COS_3, R"(COS([data])
 
     余弦值
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("ACOS", ACOS_1);
-    def("ACOS", ACOS_2);
-    def("ACOS", ACOS_3, R"(ACOS([data])
+    m.def("ACOS", ACOS_1);
+    m.def("ACOS", ACOS_2);
+    m.def("ACOS", ACOS_3, R"(ACOS([data])
 
     反余弦值
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("TAN", TAN_1);
-    def("TAN", TAN_2);
-    def("TAN", TAN_3, R"(TAN([data])
+    m.def("TAN", TAN_1);
+    m.def("TAN", TAN_2);
+    m.def("TAN", TAN_3, R"(TAN([data])
 
     正切值
 
     :param Indicator data: 输入数据
     :rtype: Indicato)");
 
-    def("ATAN", ATAN_1);
-    def("ATAN", ATAN_2);
-    def("ATAN", ATAN_3, R"(ATAN([data])
+    m.def("ATAN", ATAN_1);
+    m.def("ATAN", ATAN_2);
+    m.def("ATAN", ATAN_3, R"(ATAN([data])
 
     反正切值
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("REVERSE", REVERSE_1);
-    def("REVERSE", REVERSE_2);
-    def("REVERSE", REVERSE_3, R"(REVERSE([data])
+    m.def("REVERSE", REVERSE_1);
+    m.def("REVERSE", REVERSE_2);
+    m.def("REVERSE", REVERSE_3, R"(REVERSE([data])
 
     求相反数，REVERSE(X)返回-X
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("MOD", MOD_1);
-    def("MOD", MOD_2);
-    def("MOD", MOD_3);
-    def("MOD", MOD_4, R"(MOD(ind1, ind2)
+    m.def("MOD", MOD_1);
+    m.def("MOD", MOD_2);
+    m.def("MOD", MOD_3);
+    m.def("MOD", MOD_4, R"(MOD(ind1, ind2)
 
     取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符
 
@@ -1130,11 +1251,11 @@ void export_Indicator_build_in() {
     :param Indicator ind2:
     :rtype: Indicator)");
 
-    def("VAR", VAR_1, (arg("n") = 10));
-    def("VAR", VAR_2, (arg("n")));
-    def("VAR", VAR_3, (arg("data"), arg("n")));
-    def("VAR", VAR_4, (arg("data"), arg("n")));
-    def("VAR", VAR_5, (arg("data"), arg("n") = 10), R"(VAR([data, n=10])
+    m.def("VAR", VAR_1, py::arg("n") = 10);
+    m.def("VAR", VAR_2, py::arg("n"));
+    m.def("VAR", VAR_3, py::arg("data"), py::arg("n"));
+    m.def("VAR", VAR_4, py::arg("data"), py::arg("n"));
+    m.def("VAR", VAR_5, py::arg("data"), py::arg("n") = 10, R"(VAR([data, n=10])
 
     估算样本方差, VAR(X,N)为X的N日估算样本方差
 
@@ -1142,11 +1263,11 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("VARP", VARP_1, (arg("n") = 10));
-    def("VARP", VARP_2, (arg("n")));
-    def("VARP", VARP_3, (arg("data"), arg("n")));
-    def("VARP", VARP_4, (arg("data"), arg("n")));
-    def("VARP", VARP_5, (arg("data"), arg("n") = 10), R"(VARP([data, n=10])
+    m.def("VARP", VARP_1, py::arg("n") = 10);
+    m.def("VARP", VARP_2, py::arg("n"));
+    m.def("VARP", VARP_3, py::arg("data"), py::arg("n"));
+    m.def("VARP", VARP_4, py::arg("data"), py::arg("n"));
+    m.def("VARP", VARP_5, py::arg("data"), py::arg("n") = 10, R"(VARP([data, n=10])
 
     总体样本方差, VARP(X,N)为X的N日总体样本方差
 
@@ -1154,9 +1275,9 @@ void export_Indicator_build_in() {
     :param int n|Indicator|IndParam: 时间窗口
     :rtype: Indicator)");
 
-    def("UPNDAY", UPNDAY_1, (arg("data"), arg("n") = 3));
-    def("UPNDAY", UPNDAY_2, (arg("data"), arg("n")));
-    def("UPNDAY", UPNDAY_3, (arg("data"), arg("n")), R"(UPNDAY(data[, n=3])
+    m.def("UPNDAY", UPNDAY_1, py::arg("data"), py::arg("n") = 3);
+    m.def("UPNDAY", UPNDAY_2, py::arg("data"), py::arg("n"));
+    m.def("UPNDAY", UPNDAY_3, py::arg("data"), py::arg("n"), R"(UPNDAY(data[, n=3])
 
     连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期
 
@@ -1164,9 +1285,9 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("DOWNNDAY", DOWNNDAY_1, (arg("data"), arg("n") = 3));
-    def("DOWNNDAY", DOWNNDAY_2, (arg("data"), arg("n")));
-    def("DOWNNDAY", DOWNNDAY_3, (arg("data"), arg("n")), R"(DOWNNDAY(data[, n=3])
+    m.def("DOWNNDAY", DOWNNDAY_1, py::arg("data"), py::arg("n") = 3);
+    m.def("DOWNNDAY", DOWNNDAY_2, py::arg("data"), py::arg("n"));
+    m.def("DOWNNDAY", DOWNNDAY_3, py::arg("data"), py::arg("n"), R"(DOWNNDAY(data[, n=3])
 
     连跌周期数, DOWNNDAY(CLOSE,M)表示连涨M个周期
 
@@ -1174,9 +1295,9 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("NDAY", NDAY_1, (arg("x"), arg("y"), arg("n") = 3));
-    def("NDAY", NDAY_1, (arg("x"), arg("y"), arg("n")));
-    def("NDAY", NDAY_3, (arg("x"), arg("y"), arg("n")), R"(NDAY(x, y[, n=3])
+    m.def("NDAY", NDAY_1, py::arg("x"), py::arg("y"), py::arg("n") = 3);
+    m.def("NDAY", NDAY_1, py::arg("x"), py::arg("y"), py::arg("n"));
+    m.def("NDAY", NDAY_3, py::arg("x"), py::arg("y"), py::arg("n"), R"(NDAY(x, y[, n=3])
 
     连大, NDAY(X,Y,N)表示条件X>Y持续存在N个周期
 
@@ -1185,10 +1306,10 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("CROSS", CROSS_1);
-    def("CROSS", CROSS_2);
-    def("CROSS", CROSS_3);
-    def("CROSS", CROSS_4, R"(CROSS(x, y)
+    m.def("CROSS", CROSS_1);
+    m.def("CROSS", CROSS_2);
+    m.def("CROSS", CROSS_3);
+    m.def("CROSS", CROSS_4, R"(CROSS(x, y)
 
     交叉函数
 
@@ -1196,14 +1317,15 @@ void export_Indicator_build_in() {
     :param y: 变量或常量，判断交叉的第二条线
     :rtype: Indicator)");
 
-    def("LONGCROSS", LONGCROSS_1, (arg("a"), arg("b"), arg("n") = 3));
-    def("LONGCROSS", LONGCROSS_2, (arg("a"), arg("b"), arg("n")));
-    def("LONGCROSS", LONGCROSS_3, (arg("a"), arg("b"), arg("n") = 3));
-    def("LONGCROSS", LONGCROSS_4, (arg("a"), arg("b"), arg("n")));
-    def("LONGCROSS", LONGCROSS_5, (arg("a"), arg("b"), arg("n") = 3));
-    def("LONGCROSS", LONGCROSS_6, (arg("a"), arg("b"), arg("n")));
-    def("LONGCROSS", LONGCROSS_7, (arg("a"), arg("b"), arg("n") = 3));
-    def("LONGCROSS", LONGCROSS_8, (arg("a"), arg("b"), arg("n")), R"(LONGCROSS(a, b[, n=3])
+    m.def("LONGCROSS", LONGCROSS_1, py::arg("a"), py::arg("b"), py::arg("n") = 3);
+    m.def("LONGCROSS", LONGCROSS_2, py::arg("a"), py::arg("b"), py::arg("n"));
+    m.def("LONGCROSS", LONGCROSS_3, py::arg("a"), py::arg("b"), py::arg("n") = 3);
+    m.def("LONGCROSS", LONGCROSS_4, py::arg("a"), py::arg("b"), py::arg("n"));
+    m.def("LONGCROSS", LONGCROSS_5, py::arg("a"), py::arg("b"), py::arg("n") = 3);
+    m.def("LONGCROSS", LONGCROSS_6, py::arg("a"), py::arg("b"), py::arg("n"));
+    m.def("LONGCROSS", LONGCROSS_7, py::arg("a"), py::arg("b"), py::arg("n") = 3);
+    m.def("LONGCROSS", LONGCROSS_8, py::arg("a"), py::arg("b"), py::arg("n"),
+          R"(LONGCROSS(a, b[, n=3])
 
     两条线维持一定周期后交叉
 
@@ -1216,11 +1338,11 @@ void export_Indicator_build_in() {
     :param int|Indicator n:
     :rtype: Indicator)");
 
-    def("FILTER", FILTER_1, (arg("n") = 5));
-    def("FILTER", FILTER_2, (arg("n")));
-    def("FILTER", FILTER_3, (arg("data"), arg("n")));
-    def("FILTER", FILTER_4, (arg("data"), arg("n")));
-    def("FILTER", FILTER_5, (arg("data"), arg("n") = 5), R"(FILTER([data, n=5])
+    m.def("FILTER", FILTER_1, py::arg("n") = 5);
+    m.def("FILTER", FILTER_2, py::arg("n"));
+    m.def("FILTER", FILTER_3, py::arg("data"), py::arg("n"));
+    m.def("FILTER", FILTER_4, py::arg("data"), py::arg("n"));
+    m.def("FILTER", FILTER_5, py::arg("data"), py::arg("n") = 5, R"(FILTER([data, n=5])
 
     信号过滤, 过滤连续出现的信号。
 
@@ -1232,9 +1354,9 @@ void export_Indicator_build_in() {
     :param int|Indicaot|IndParam n: 过滤周期
     :rtype: Indicator)");
 
-    def("BARSSINCE", BARSSINCE_1);
-    def("BARSSINCE", BARSSINCE_2);
-    def("BARSSINCE", BARSSINCE_3, R"(BARSSINCE([data])
+    m.def("BARSSINCE", BARSSINCE_1);
+    m.def("BARSSINCE", BARSSINCE_2);
+    m.def("BARSSINCE", BARSSINCE_3, R"(BARSSINCE([data])
 
     第一个条件成立位置到当前的周期数。
 
@@ -1245,9 +1367,9 @@ void export_Indicator_build_in() {
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("BARSLAST", BARSLAST_1);
-    def("BARSLAST", BARSLAST_2);
-    def("BARSLAST", BARSLAST_3, R"(BARSLAST([data])
+    m.def("BARSLAST", BARSLAST_1);
+    m.def("BARSLAST", BARSLAST_2);
+    m.def("BARSLAST", BARSLAST_3, R"(BARSLAST([data])
 
     上一次条件成立位置 上一次条件成立到当前的周期数。
 
@@ -1258,11 +1380,11 @@ void export_Indicator_build_in() {
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("SUMBARS", SUMBARS_1, (arg("a")));
-    def("SUMBARS", SUMBARS_2, (arg("a")));
-    def("SUMBARS", SUMBARS_3, (arg("data"), arg("a")));
-    def("SUMBARS", SUMBARS_4, (arg("data"), arg("a")));
-    def("SUMBARS", SUMBARS_5, (arg("data"), arg("a")), R"(SUMBARS([data,] a)
+    m.def("SUMBARS", SUMBARS_1, py::arg("a"));
+    m.def("SUMBARS", SUMBARS_2, py::arg("a"));
+    m.def("SUMBARS", SUMBARS_3, py::arg("data"), py::arg("a"));
+    m.def("SUMBARS", SUMBARS_4, py::arg("data"), py::arg("a"));
+    m.def("SUMBARS", SUMBARS_5, py::arg("data"), py::arg("a"), R"(SUMBARS([data,] a)
 
     累加到指定周期数, 向前累加到指定值到现在的周期数
 
@@ -1274,8 +1396,8 @@ void export_Indicator_build_in() {
     :param float a|Indicator|IndParam: 指定累加和
     :rtype: Indicator)");
 
-    def("BARSCOUNT", BARSCOUNT_1);
-    def("BARSCOUNT", BARSCOUNT_2, R"(BARSCOUNT([data])
+    m.def("BARSCOUNT", BARSCOUNT_1);
+    m.def("BARSCOUNT", BARSCOUNT_2, R"(BARSCOUNT([data])
 
     有效值周期数, 求总的周期数。
 
@@ -1286,11 +1408,11 @@ void export_Indicator_build_in() {
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("BACKSET", BACKSET_1, (arg("n") = 2));
-    def("BACKSET", BACKSET_2, (arg("n")));
-    def("BACKSET", BACKSET_3, (arg("data"), arg("n")));
-    def("BACKSET", BACKSET_4, (arg("data"), arg("n")));
-    def("BACKSET", BACKSET_5, (arg("data"), arg("n") = 2), R"(BACKSET([data, n=2])
+    m.def("BACKSET", BACKSET_1, py::arg("n") = 2);
+    m.def("BACKSET", BACKSET_2, py::arg("n"));
+    m.def("BACKSET", BACKSET_3, py::arg("data"), py::arg("n"));
+    m.def("BACKSET", BACKSET_4, py::arg("data"), py::arg("n"));
+    m.def("BACKSET", BACKSET_5, py::arg("data"), py::arg("n") = 2, R"(BACKSET([data, n=2])
 
     向前赋值将当前位置到若干周期前的数据设为1。
 
@@ -1302,23 +1424,23 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: N周期
     :rtype: Indicator)");
 
-    def("TIMELINE", TIMELINE_1);
-    def("TIMELINE", TIMELINE_2, R"(TIMELINE([k])
+    m.def("TIMELINE", TIMELINE_1);
+    m.def("TIMELINE", TIMELINE_2, R"(TIMELINE([k])
 
     分时价格数据
 
     :param KData k: 上下文
     :rtype: Indicator)");
 
-    def("TIMELINEVOL", TIMELINEVOL_1);
-    def("TIMELINEVOL", TIMELINEVOL_2, R"(TIMELINEVOL([k])
+    m.def("TIMELINEVOL", TIMELINEVOL_1);
+    m.def("TIMELINEVOL", TIMELINEVOL_2, R"(TIMELINEVOL([k])
 
     分时成交量数据
 
     :param KData k: 上下文
     :rtype: Indicator)");
 
-    def("DMA", DMA, R"(DMA(ind, a)
+    m.def("DMA", DMA, R"(DMA(ind, a)
 
     动态移动平均
 
@@ -1332,9 +1454,9 @@ void export_Indicator_build_in() {
     :param Indicator a: 动态系数
     :rtype: Indicator)");
 
-    def("AVEDEV", AVEDEV_1, (arg("data"), arg("n") = 22));
-    def("AVEDEV", AVEDEV_2, (arg("data"), arg("n")));
-    def("AVEDEV", AVEDEV_3, (arg("data"), arg("n")), R"(AVEDEV(data[, n=22])
+    m.def("AVEDEV", AVEDEV_1, py::arg("data"), py::arg("n") = 22);
+    m.def("AVEDEV", AVEDEV_2, py::arg("data"), py::arg("n"));
+    m.def("AVEDEV", AVEDEV_3, py::arg("data"), py::arg("n"), R"(AVEDEV(data[, n=22])
 
     平均绝对偏差，求X的N日平均绝对偏差
 
@@ -1342,11 +1464,11 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("DEVSQ", DEVSQ_1, (arg("n") = 10));
-    def("DEVSQ", DEVSQ_2, (arg("n")));
-    def("DEVSQ", DEVSQ_3, (arg("data"), arg("n")));
-    def("DEVSQ", DEVSQ_4, (arg("data"), arg("n")));
-    def("DEVSQ", DEVSQ_5, (arg("data"), arg("n") = 10), R"(DEVSQ([data, n=10])
+    m.def("DEVSQ", DEVSQ_1, py::arg("n") = 10);
+    m.def("DEVSQ", DEVSQ_2, py::arg("n"));
+    m.def("DEVSQ", DEVSQ_3, py::arg("data"), py::arg("n"));
+    m.def("DEVSQ", DEVSQ_4, py::arg("data"), py::arg("n"));
+    m.def("DEVSQ", DEVSQ_5, py::arg("data"), py::arg("n") = 10, R"(DEVSQ([data, n=10])
 
     数据偏差平方和，求X的N日数据偏差平方和
 
@@ -1354,11 +1476,11 @@ void export_Indicator_build_in() {
     :param int|Indicator n: 时间窗口
     :rtype: Indicator)");
 
-    def("ROC", ROC_1, (arg("n") = 10));
-    def("ROC", ROC_2, (arg("n")));
-    def("ROC", ROC_3, (arg("data"), arg("n")));
-    def("ROC", ROC_4, (arg("data"), arg("n")));
-    def("ROC", ROC_5, (arg("data"), arg("n") = 10), R"(ROC([data, n=10])
+    m.def("ROC", ROC_1, py::arg("n") = 10);
+    m.def("ROC", ROC_2, py::arg("n"));
+    m.def("ROC", ROC_3, py::arg("data"), py::arg("n"));
+    m.def("ROC", ROC_4, py::arg("data"), py::arg("n"));
+    m.def("ROC", ROC_5, py::arg("data"), py::arg("n") = 10, R"(ROC([data, n=10])
 
     变动率指标: ((price / prevPrice)-1)*100
 
@@ -1366,11 +1488,11 @@ void export_Indicator_build_in() {
     :param int n: 时间窗口
     :rtype: Indicator)");
 
-    def("ROCP", ROCP_1, (arg("n") = 10));
-    def("ROCP", ROCP_2, (arg("n")));
-    def("ROCP", ROCP_3, (arg("data"), arg("n")));
-    def("ROCP", ROCP_4, (arg("data"), arg("n")));
-    def("ROCP", ROCP_5, (arg("data"), arg("n") = 10), R"(ROCP([data, n=10])
+    m.def("ROCP", ROCP_1, py::arg("n") = 10);
+    m.def("ROCP", ROCP_2, py::arg("n"));
+    m.def("ROCP", ROCP_3, py::arg("data"), py::arg("n"));
+    m.def("ROCP", ROCP_4, py::arg("data"), py::arg("n"));
+    m.def("ROCP", ROCP_5, py::arg("data"), py::arg("n") = 10, R"(ROCP([data, n=10])
 
     变动率指标: (price - prevPrice) / prevPrice
 
@@ -1378,11 +1500,11 @@ void export_Indicator_build_in() {
     :param int n: 时间窗口
     :rtype: Indicator)");
 
-    def("ROCR", ROCR_1, (arg("n") = 10));
-    def("ROCR", ROCR_2, (arg("n")));
-    def("ROCR", ROCR_3, (arg("data"), arg("n")));
-    def("ROCR", ROCR_4, (arg("data"), arg("n")));
-    def("ROCR", ROCR_5, (arg("data"), arg("n") = 10), R"(ROCR([data, n=10])
+    m.def("ROCR", ROCR_1, py::arg("n") = 10);
+    m.def("ROCR", ROCR_2, py::arg("n"));
+    m.def("ROCR", ROCR_3, py::arg("data"), py::arg("n"));
+    m.def("ROCR", ROCR_4, py::arg("data"), py::arg("n"));
+    m.def("ROCR", ROCR_5, py::arg("data"), py::arg("n") = 10, R"(ROCR([data, n=10])
 
     变动率指标: (price / prevPrice)
 
@@ -1390,11 +1512,11 @@ void export_Indicator_build_in() {
     :param int n|Indicator|IndParam: 时间窗口
     :rtype: Indicator)");
 
-    def("ROCR100", ROCR100_1, (arg("n") = 10));
-    def("ROCR100", ROCR100_2, (arg("n")));
-    def("ROCR100", ROCR100_3, (arg("data"), arg("n")));
-    def("ROCR100", ROCR100_4, (arg("data"), arg("n")));
-    def("ROCR100", ROCR100_5, (arg("data"), arg("n") = 10), R"(ROCR100([data, n=10])
+    m.def("ROCR100", ROCR100_1, py::arg("n") = 10);
+    m.def("ROCR100", ROCR100_2, py::arg("n"));
+    m.def("ROCR100", ROCR100_3, py::arg("data"), py::arg("n"));
+    m.def("ROCR100", ROCR100_4, py::arg("data"), py::arg("n"));
+    m.def("ROCR100", ROCR100_5, py::arg("data"), py::arg("n") = 10, R"(ROCR100([data, n=10])
 
     变动率指标: (price / prevPrice) * 100
 
@@ -1402,16 +1524,16 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("AD", AD_1);
-    def("AD", AD_2, R"(AD(kdata)
+    m.def("AD", AD_1);
+    m.def("AD", AD_2, R"(AD(kdata)
 
    累积/派发线
 
    :param KData kdata: k线数据
    :rtype: Indicator)");
 
-    def("COST", COST_1, (arg("x") = 10.0));
-    def("COST", COST_2, (arg("k"), arg("x") = 10.0), R"(COST(k[, x=10.0])
+    m.def("COST", COST_1, py::arg("x") = 10.0);
+    m.def("COST", COST_2, py::arg("k"), py::arg("x") = 10.0, R"(COST(k[, x=10.0])
 
     成本分布
 
@@ -1423,10 +1545,10 @@ void export_Indicator_build_in() {
     :param float x: x%获利价格, 0~100
     :rtype: Indicator)");
 
-    def("ALIGN", ALIGN_1);
-    def("ALIGN", ALIGN_2);
-    def("ALIGN", ALIGN_3);
-    def("ALIGN", ALIGN_4, R"(ALIGN(data, ref):
+    m.def("ALIGN", ALIGN_1);
+    m.def("ALIGN", ALIGN_2);
+    m.def("ALIGN", ALIGN_3);
+    m.def("ALIGN", ALIGN_4, R"(ALIGN(data, ref):
 
     按指定的参考日期对齐
 
@@ -1434,18 +1556,17 @@ void export_Indicator_build_in() {
     :param ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
     :retype: Indicator)");
 
-    def("DROPNA", DROPNA_1);
-    def("DROPNA", DROPNA_2, R"(DROPNA([data])
+    m.def("DROPNA", DROPNA_1);
+    m.def("DROPNA", DROPNA_2, R"(DROPNA([data])
 
     删除 nan 值
 
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("ADVANCE", ADVANCE,
-        (arg("query") = KQueryByIndex(-100), arg("market") = "SH", arg("stk_type") = STOCKTYPE_A,
-         arg("ignore_context") = false),
-        R"(ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
+    m.def("ADVANCE", ADVANCE, py::arg("query") = KQueryByIndex(-100), py::arg("market") = "SH",
+          py::arg("stk_type") = STOCKTYPE_A, py::arg("ignore_context") = false,
+          R"(ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
 
     上涨家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
 
@@ -1455,10 +1576,9 @@ void export_Indicator_build_in() {
     :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
     :rtype: Indicator)");
 
-    def("DECLINE", DECLINE,
-        (arg("query") = KQueryByIndex(-100), arg("market") = "SH", arg("stk_type") = STOCKTYPE_A,
-         arg("ignore_context") = false),
-        R"(DECLINE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
+    m.def("DECLINE", DECLINE, py::arg("query") = KQueryByIndex(-100), py::arg("market") = "SH",
+          py::arg("stk_type") = STOCKTYPE_A, py::arg("ignore_context") = false,
+          R"(DECLINE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
 
     下跌家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
 
@@ -1468,10 +1588,11 @@ void export_Indicator_build_in() {
     :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
     :rtype: Indicator)");
 
-    def("SLICE", SLICE_1, (arg("data"), arg("start"), arg("end")));
-    def("SLICE", SLICE_2, (arg("start"), arg("end"), arg("result_index") = 0));
-    def("SLICE", SLICE_3, (arg("data"), arg("start"), arg("end"), arg("result_index") = 0),
-        R"(SLICE(data, start, end, result_index=0)
+    m.def("SLICE", SLICE_1, py::arg("data"), py::arg("start"), py::arg("end"));
+    m.def("SLICE", SLICE_2, py::arg("start"), py::arg("end"), py::arg("result_index") = 0);
+    m.def("SLICE", SLICE_3, py::arg("data"), py::arg("start"), py::arg("end"),
+          py::arg("result_index") = 0,
+          R"(SLICE(data, start, end, result_index=0)
 
     获取某指标中指定范围 [start, end) 的数据，生成新的指标
 
@@ -1480,11 +1601,54 @@ void export_Indicator_build_in() {
     :param int end: 终止位置（不包含本身）
     :param int result_index: 原输入数据中的结果集)");
 
-    def("RSI", RSI, (arg("n") = 14), R"(RSI([data, n=14])
+    m.def("RSI", RSI_1, py::arg("n") = 14);
+    m.def("RSI", RSI_2, py::arg("data"), py::arg("n") = 14, R"(RSI([data, n=14])
 
     相对强弱指数
 
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
+
+    m.def("SLOPE", SLOPE1, py::arg("n") = 22);
+    m.def("SLOPE", SLOPE2, py::arg("n"));
+    m.def("SLOPE", SLOPE3, py::arg("data"), py::arg("n") = 22);
+    m.def("SLOPE", SLOPE4, py::arg("data"), py::arg("n"));
+    m.def("SLOPE", SLOPE5, py::arg("data"), py::arg("n"), R"(SLOPE([data, n=22])
+
+    计算线性回归斜率，N支持变量
+
+    :param Indicator data: 输入数据
+    :param int|Indicator|IndParam n: 时间窗口
+    :rtype: Indicator)");
+
+    m.def("MDD", MDD_1);
+    m.def("MDD", MDD_2, R"(MDD([data])
+    
+    当前价格相对历史最高值的回撤百分比，通常用于计算最大回撤)");
+
+    m.def("MRR", MRR_1);
+    m.def("MRR", MRR_2, R"(MRR([data])
+    
+    当前价格相对历史最低值的盈利百分比，可用于计算历史最高盈利比例)");
+
+    m.def("ZHBOND10", ZHBOND10_1, py::arg("default_val") = 0.4);
+    m.def("ZHBOND10", ZHBOND10_2, py::arg("data"), py::arg("default_val") = 0.4);
+    m.def("ZHBOND10", ZHBOND10_3, py::arg("data"), py::arg("default_val") = 0.4);
+    m.def("ZHBOND10", ZHBOND10_4, py::arg("data"), py::arg("default_val") = 0.4,
+          R"(ZHBOND10([data, defaut_val])
+
+    获取10年期中国国债收益率
+
+    :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
+    :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值)");
+
+    m.def("SPEARMAN", SPEARMAN, py::arg("ind1"), py::arg("ind2"), py::arg("n"),
+          R"(SPEARMAN(ind1, ind2, n)
+
+    Spearman 相关系数
+
+    :param Indicator ind1: 输入参数1
+    :param Indicator ind2: 输入参数2
+    :param int n: 指定窗口)");
 }

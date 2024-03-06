@@ -15,6 +15,14 @@
     :return: 系统有效条件实例
     :rtype: ConditionBase
 
+.. py:function:: CN_Bool(ind)
+
+    布尔信号指标系统有效条件, 指标中相应位置>0则代表系统有效，否则无效
+
+    :param Indicator ind: bool型指标，输入为 KData
+    :return: 系统有效条件实例
+    :rtype: ConditionBase
+
 
 自定义系统有效条件
 ------------------
@@ -78,7 +86,15 @@
         
         :param Datetime datetime: 指定时间
         :return: True 有效 | False 无效
-    
+
+    .. py:method:: get_datetime_list(self)
+
+        获取系统有效的日期。注意仅返回系统有效的日期列表，和交易对象不等长
+
+    .. py:method:: get_values(self)
+
+        以指标的形式获取实际值，与交易对象等长，0表示无效，1表示系统有效
+
     .. py:method:: _add_valid(self, datetime)
     
         加入有效时间，在_calculate中调用

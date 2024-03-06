@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
     // 配置文件的位置自行修改
     hikyuu_init("C:\\Users\\admin\\.hikyuu\\hikyuu.ini");
-    // hikyuu_init("/home/fasiondog/.hikyuu/hikyuu.ini");
+    // hikyuu_init("/home/fsd/.hikyuu/hikyuu.ini");
 
     StockManager& sm = StockManager::instance();
 
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
         std::cout << k[i] << std::endl;
     }
 
-    startSpotAgent();
+    startSpotAgent(true);
 
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(1));

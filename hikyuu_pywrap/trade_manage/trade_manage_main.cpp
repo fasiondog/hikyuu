@@ -5,32 +5,32 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_CostRecord();
-void export_TradeCost();
-void export_build_in();
-void export_PositionRecord();
-void export_TradeRecord();
-void export_FundsRecord();
-void export_BorrowRecord();
-void export_LoanRecord();
-void export_TradeManager();
-void export_Performance();
-void export_OrderBroker();
+void export_CostRecord(py::module& m);
+void export_TradeCost(py::module& m);
+void export_build_in(py::module& m);
+void export_PositionRecord(py::module& m);
+void export_TradeRecord(py::module& m);
+void export_FundsRecord(py::module& m);
+void export_BorrowRecord(py::module& m);
+void export_LoanRecord(py::module& m);
+void export_TradeManager(py::module& m);
+void export_Performance(py::module& m);
+void export_OrderBroker(py::module& m);
 
-void export_trade_manage_main() {
-    export_CostRecord();
-    export_PositionRecord();
-    export_TradeCost();
-    export_TradeRecord();
-    export_FundsRecord();
-    export_BorrowRecord();
-    export_LoanRecord();
-    export_OrderBroker();
-    export_TradeManager();
-    export_Performance();
-    export_build_in();
+void export_trade_manage_main(py::module& m) {
+    export_CostRecord(m);
+    export_PositionRecord(m);
+    export_TradeCost(m);
+    export_TradeRecord(m);
+    export_FundsRecord(m);
+    export_BorrowRecord(m);
+    export_LoanRecord(m);
+    export_OrderBroker(m);
+    export_TradeManager(m);
+    export_Performance(m);
+    export_build_in(m);
 }

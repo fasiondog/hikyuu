@@ -19,12 +19,13 @@ namespace hku {
  * 相对强弱指数
  * @ingroup Indicator
  */
-Indicator RSI(int n = 14) {
+inline Indicator RSI(int n = 14) {
     Indicator diff = REF(0) - REF(1);
     Indicator u = IF(diff > 0, diff, 0);
     Indicator d = IF(diff < 0, (-1) * diff, 0);
     Indicator ema_u = EMA(u, n);
     Indicator ema_d = EMA(d, n);
+    ema_d = IF(ema_d == 0.0, 1, ema_d);
     Indicator rs = ema_u / ema_d;
     Indicator _1 = CVAL(1);
     Indicator rsi = (_1 - _1 / (_1 + rs)) * CVAL(100);
@@ -33,6 +34,10 @@ Indicator RSI(int n = 14) {
     return rsi;
 }
 
+inline Indicator RSI(const Indicator& data, int n) {
+    return RSI(n)(data);
+}
+
 }  // namespace hku
 
-#endif /* INDICATOR_CRT_ABS_H_ */
+#endif /* INDICATOR_CRT_RSI_H_ */

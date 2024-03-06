@@ -5,12 +5,12 @@
  *     Author: fasiondog
  */
 
-#include <boost/python.hpp>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_SpotAgent();
+void export_SpotAgent(py::module& m);
 
-void export_global_main() {
-    export_SpotAgent();
+void export_global_main(py::module& m) {
+    export_SpotAgent(m);
 }

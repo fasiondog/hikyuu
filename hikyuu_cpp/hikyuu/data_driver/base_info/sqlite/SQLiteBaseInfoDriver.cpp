@@ -15,6 +15,7 @@
 #include "../table/StockWeightTable.h"
 #include "../table/StockTable.h"
 #include "../table/HolidayTable.h"
+#include "../table/ZhBond10Table.h"
 
 namespace hku {
 
@@ -157,6 +158,48 @@ StockWeightList SQLiteBaseInfoDriver::getStockWeightList(const string& market, c
     return result;
 }
 
+unordered_map<string, StockWeightList> SQLiteBaseInfoDriver::getAllStockWeightList() {
+    unordered_map<string, StockWeightList> result;
+    HKU_ASSERT(m_pool);
+
+    try {
+        auto con = m_pool->getConnect();
+        HKU_CHECK(con, "Failed fetch connect!");
+
+        vector<StockWeightTableView> view;
+        con->batchLoadView(
+          view,
+          "SELECT a.id AS id, (market.market || stock.code) AS market_code, a.date, "
+          "a.countAsGift*0.0001 AS countAsGift, a.countForSell*0.0001 AS countForSell, "
+          "a.priceForSell*0.001 AS priceForSell, a.bonus*0.001,a.countOfIncreasement*0.0001 AS "
+          "countOfIncreasement, a.totalCount AS totalCount, a.freeCount AS freeCount FROM "
+          "stkweight AS a, stock, market WHERE a.stockid=stock.stockid AND "
+          "market.marketid=stock.marketid ORDER BY a.stockid, a.date");
+
+        for (const auto& record : view) {
+            auto iter = result.find(record.market_code);
+            if (iter == result.end()) {
+                auto in_iter = result.insert(std::make_pair(record.market_code, StockWeightList()));
+                if (in_iter.second) {
+                    iter = in_iter.first;
+                }
+            }
+            iter->second.emplace_back(StockWeight(
+              Datetime(record.date), record.countAsGift, record.countForSell, record.priceForSell,
+              record.bonus, record.countOfIncreasement, record.totalCount, record.freeCount));
+        }
+
+    } catch (std::exception& e) {
+        HKU_FATAL("load StockWeight table failed! {}", e.what());
+        return result;
+    } catch (...) {
+        HKU_FATAL("load StockWeight table failed!");
+        return result;
+    }
+
+    return result;
+}
+
 Parameter SQLiteBaseInfoDriver ::getFinanceInfo(const string& market, const string& code) {
     Parameter result;
     HKU_IF_RETURN(!m_pool, result);
@@ -283,7 +326,7 @@ std::unordered_set<Datetime> SQLiteBaseInfoDriver::getAllHolidays() {
         auto con = m_pool->getConnect();
         std::vector<HolidayTable> holidays;
         con->batchLoad(holidays);
-        for (auto& holiday : holidays) {
+        for (const auto& holiday : holidays) {
             try {
                 result.insert(holiday.datetime());
             } catch (std::exception& e) {
@@ -291,6 +334,24 @@ std::unordered_set<Datetime> SQLiteBaseInfoDriver::getAllHolidays() {
             } catch (...) {
                 HKU_ERROR_UNKNOWN;
             }
+        }
+    } catch (...) {
+    }
+    return result;
+}
+
+ZhBond10List SQLiteBaseInfoDriver::getAllZhBond10() {
+    ZhBond10List result;
+    auto con = m_pool->getConnect();
+    try {
+        vector<ZhBond10Table> records;
+        con->batchLoad(records, "1=1 order by date asc");
+        size_t total = records.size();
+        HKU_IF_RETURN(total == 0, result);
+        result.resize(records.size());
+        for (size_t i = 0; i < total; i++) {
+            result[i].date = Datetime(records[i].date);
+            result[i].value = double(records[i].value) * 0.0001;
         }
     } catch (...) {
     }

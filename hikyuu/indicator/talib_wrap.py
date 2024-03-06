@@ -24,10 +24,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-##===============================================================================
+# ===============================================================================
 # 作者：fasiondog
 # 历史：1）20170923, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 from .indicator import Indicator, IndicatorImp
 
@@ -197,7 +197,7 @@ try:
             ta.AVGPRICE,
             'TA_AVGPRICE',
             result_num=1,
-            #params={'timeperiod': timeperiod},
+            # params={'timeperiod': timeperiod},
             prices=['open', 'high', 'low', 'close']
         )
         return Indicator(imp)(ind) if ind else Indicator(imp)
@@ -959,7 +959,7 @@ try:
             ta.CDLHARAMI,
             'TA_CDLHARAMI',
             result_num=1,
-            #params={'penetration': penetration},
+            # params={'penetration': penetration},
             prices=['open', 'high', 'low', 'close']
         )
         return Indicator(imp)(ind) if ind else Indicator(imp)
@@ -1257,7 +1257,8 @@ try:
     TA_OBV.__doc__ = talib.OBV.__doc__
 
 except:
-    print(
-        "warning: can't import TA-Lib, will be ignored! You can fetch ta-lib "
-        "from https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib"
-    )
+    pass  # 非必须的，talib，不再打印告警，以免误解提问
+    # print(
+    #     "warning: can't import TA-Lib, will be ignored! You can fetch ta-lib "
+    #     "from https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib"
+    # )

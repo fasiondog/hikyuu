@@ -269,11 +269,11 @@ std::string HKU_API getPlatform() {
     ret = "windows";
 #elif HKU_OS_LINUX
     ret = "linux";
-#elif HKU_OS_ANDROID:
+#elif HKU_OS_ANDROID
     ret = "android";
 #elif HKU_OS_OSX
     ret = "macosx";
-#elif TARGET_OS_SIMULATOR:
+#elif TARGET_OS_SIMULATOR
     ret = "iphoneos_simulator";
 #elif HKU_OS_IOS
     ret = "iphoneos";

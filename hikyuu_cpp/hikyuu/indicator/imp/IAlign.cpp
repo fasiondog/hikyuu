@@ -38,14 +38,16 @@ void IAlign::_calculate(const Indicator& ind) {
         return;
     }
 
-    //处理本身没有上下文日期的指标
+    // 处理本身没有上下文日期的指标
     if (ind.getDatetimeList().size() == 0) {
         if (ind_total <= total) {
             size_t offset = total - ind_total;
             m_discard = offset + ind.discard();
             for (size_t r = 0; r < m_result_num; r++) {
+                auto const* src = ind.data(r);
+                auto* dst = this->data(r);
                 for (size_t i = m_discard; i < total; i++) {
-                    _set(ind.get(i - offset, r), i, r);
+                    dst[i] = src[i - offset];
                 }
             }
             return;
@@ -59,15 +61,17 @@ void IAlign::_calculate(const Indicator& ind) {
             }
 
             for (size_t r = 0; r < m_result_num; r++) {
+                auto const* src = ind.data(r);
+                auto* dst = this->data(r);
                 for (size_t i = m_discard; i < total; i++) {
-                    _set(ind.get(i + offset, r), i, r);
+                    dst[i] = src[i + offset];
                 }
             }
             return;
         }
     }
 
-    //其它有上下文日期对应的指标数据
+    // 其它有上下文日期对应的指标数据
     size_t ind_idx = 0;
     for (size_t i = 0; i < total; i++) {
         if (ind_idx >= ind_total) {

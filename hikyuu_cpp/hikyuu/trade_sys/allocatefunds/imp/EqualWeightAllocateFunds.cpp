@@ -7,6 +7,10 @@
 
 #include "EqualWeightAllocateFunds.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::EqualWeightAllocateFunds)
+#endif
+
 namespace hku {
 
 EqualWeightAllocateFunds::EqualWeightAllocateFunds() : AllocateFundsBase("AF_EqualWeight") {}

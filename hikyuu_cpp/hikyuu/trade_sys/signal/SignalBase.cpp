@@ -24,12 +24,14 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SignalPtr& sg) {
     return os;
 }
 
-SignalBase::SignalBase() : m_name("SignalBase"), m_hold(false) {
-    setParam<bool>("alternate", true);  //买入卖出信号交替出现
+SignalBase::SignalBase() : m_name("SignalBase"), m_hold_long(false), m_hold_short(false) {
+    setParam<bool>("alternate", true);       // 买入卖出信号交替出现
+    setParam<bool>("support_borrow_stock", false);  // 支持发出空头信号
 }
 
-SignalBase::SignalBase(const string& name) : m_name(name), m_hold(false) {
+SignalBase::SignalBase(const string& name) : m_name(name), m_hold_long(false), m_hold_short(false) {
     setParam<bool>("alternate", true);
+    setParam<bool>("support_borrow_stock", false);
 }
 
 SignalBase::~SignalBase() {}
@@ -51,7 +53,7 @@ SignalPtr SignalBase::clone() {
     p->m_name = m_name;
     p->m_params = m_params;
     p->m_kdata = m_kdata;
-    p->m_hold = m_hold;
+    p->m_hold_long = m_hold_long;
     p->m_buySig = m_buySig;
     p->m_sellSig = m_sellSig;
     return p;
@@ -68,7 +70,8 @@ void SignalBase::setTO(const KData& kdata) {
 void SignalBase::reset() {
     m_buySig.clear();
     m_sellSig.clear();
-    m_hold = false;
+    m_hold_long = false;
+    m_hold_short = false;
     _reset();
 }
 
@@ -88,9 +91,13 @@ void SignalBase::_addBuySignal(const Datetime& datetime) {
     if (!getParam<bool>("alternate")) {
         m_buySig.insert(datetime);
     } else {
-        if (!m_hold) {
+        if (!m_hold_long) {
             m_buySig.insert(datetime);
-            m_hold = true;
+            if (getParam<bool>("support_borrow_stock") && m_hold_short) {
+                m_hold_short = false;
+            } else {
+                m_hold_long = true;
+            }
         }
     }
 }
@@ -99,9 +106,14 @@ void SignalBase::_addSellSignal(const Datetime& datetime) {
     if (!getParam<bool>("alternate")) {
         m_sellSig.insert(datetime);
     } else {
-        if (m_hold) {
-            m_sellSig.insert(datetime);
-            m_hold = false;
+        if (!m_hold_short) {
+            if (m_hold_long) {
+                m_sellSig.insert(datetime);
+                m_hold_long = false;
+            } else if (getParam<bool>("support_borrow_stock")) {
+                m_sellSig.insert(datetime);
+                m_hold_short = true;
+            }
         }
     }
 }

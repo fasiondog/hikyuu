@@ -77,7 +77,7 @@ TEST_CASE("test_HHV") {
                      16302.7, 16302.7, 16302.7, 16302.7, 16302.7, 16302.7, 16302.7,
                      16302.7, 16302.7, 8211.5,  8107.4,  8107.4,  8107.4,  9430.0};
     for (size_t i = 0; i < 20; i++) {
-        CHECK_EQ(result[i], expect[i]);
+        CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
 }
 

@@ -24,24 +24,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-#===============================================================================
+# ===============================================================================
 # History:
 # 1. 20130213, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 from hikyuu.util.slice import list_getitem
 from hikyuu import *
-
-BorrowRecordList.__getitem__ = list_getitem
-PositionRecordList.__getitem__ = list_getitem
-TradeRecordList.__getitem__ = list_getitem
-
-BorrowRecordList.__str__ = lambda self: str(list(self))
-BorrowRecordList.__repr__ = lambda self: repr(list(self))
-PositionRecordList.__str__ = lambda self: str(list(self))
-PositionRecordList.__repr__ = lambda self: repr(list(self))
-TradeRecordList.__str__ = lambda self: str(list(self))
-TradeRecordList.__repr__ = lambda self: repr(list(self))
 
 try:
     import numpy as np
@@ -52,22 +41,19 @@ try:
         t_type = np.dtype(
             {
                 'names': [
-                    '交易日期', '证券代码', '证券名称', '业务名称', '计划交易价格', '实际成交价格', '目标价格', '成交数量', '佣金', '印花税',
-                    '过户费', '其它成本', '交易总成本', '止损价', '现金余额', '信号来源'
+                    '交易日期', '证券代码', '证券名称', '业务名称', '计划交易价格', '实际成交价格', '目标价格', '成交数量', '佣金', '印花税', '过户费', '其它成本',
+                    '交易总成本', '止损价', '现金余额', '信号来源'
                 ],
-                'formats': [
-                    'datetime64[D]', 'U10', 'U20', 'U10', 'd', 'd', 'd', 'i', 'd', 'd', 'd', 'd',
-                    'd', 'd', 'd', 'U5'
-                ]
+                'formats':
+                ['datetime64[D]', 'U10', 'U20', 'U10', 'd', 'd', 'd', 'i', 'd', 'd', 'd', 'd', 'd', 'd', 'd', 'U5']
             }
         )
         return np.array(
             [
                 (
-                    t.datetime, t.stock.market_code, t.stock.name, get_business_name(t.business),
-                    t.planPrice, t.realPrice, t.goalPrice, t.number, t.cost.commission,
-                    t.cost.stamptax, t.cost.transferfee, t.cost.others, t.cost.total, t.stoploss,
-                    t.cash, get_system_part_name(t.part)
+                    t.datetime, t.stock.market_code, t.stock.name, get_business_name(t.business), t.plan_price,
+                    t.real_price, t.goal_price, t.number, t.cost.commission, t.cost.stamptax, t.cost.transferfee,
+                    t.cost.others, t.cost.total, t.stoploss, t.cash, get_system_part_name(t.part)
                 ) for t in t_list
             ],
             dtype=t_type
@@ -100,8 +86,8 @@ try:
             date_list = sm.get_trading_calendar(Query(Datetime(pos.take_datetime.date())))
             data.append(
                 (
-                    pos.stock.market_code, pos.stock.name, pos.take_datetime, len(date_list),
-                    pos.number, invest, cur_val, bonus, 100 * bonus / invest
+                    pos.stock.market_code, pos.stock.name, pos.take_datetime, len(date_list), pos.number, invest,
+                    cur_val, bonus, 100 * bonus / invest
                 )
             )
 
@@ -113,6 +99,12 @@ try:
 
     PositionRecordList.to_np = PositionList_to_np
     PositionRecordList.to_df = PositionList_to_df
+
+    def Performance_to_df(per):
+        """将 Performance 统计结果转换为 DataFrame 格式"""
+        return pd.DataFrame(dict(name=per.names(), value=per.values()))
+
+    Performance.to_df = Performance_to_df
 
 except:
     pass

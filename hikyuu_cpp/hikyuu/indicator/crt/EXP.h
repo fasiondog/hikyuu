@@ -18,14 +18,14 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API EXP();
-Indicator EXP(price_t);
+Indicator EXP(Indicator::value_t);
 Indicator EXP(const Indicator& ind);
 
 inline Indicator EXP(const Indicator& ind) {
     return EXP()(ind);
 }
 
-inline Indicator EXP(price_t val) {
+inline Indicator EXP(Indicator::value_t val) {
     return EXP(CVAL(val));
 }
 

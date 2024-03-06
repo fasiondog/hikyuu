@@ -14,6 +14,7 @@
 
 #if HKU_ENABLE_SQLITE_KDATA || HKU_ENABLE_HDF5_KDATA
 #include "base_info/sqlite/SQLiteBaseInfoDriver.h"
+#include "block_info/sqlite/SQLiteBlockInfoDriver.h"
 #endif
 
 #if HKU_ENABLE_HDF5_KDATA
@@ -22,6 +23,7 @@
 
 #if HKU_ENABLE_MYSQL_KDATA
 #include "base_info/mysql/MySQLBaseInfoDriver.h"
+#include "block_info/mysql/MySQLBlockInfoDriver.h"
 #include "kdata/mysql/MySQLKDataDriver.h"
 #endif
 
@@ -43,17 +45,18 @@ map<string, KDataDriverConnectPoolPtr>* DataDriverFactory::m_kdataDriverPools{nu
 
 void DataDriverFactory::init() {
     m_baseInfoDrivers = new map<string, BaseInfoDriverPtr>();
+    m_blockDrivers = new map<string, BlockInfoDriverPtr>();
+    DataDriverFactory::regBlockDriver(make_shared<QLBlockInfoDriver>());
 
 #if HKU_ENABLE_SQLITE_KDATA || HKU_ENABLE_HDF5_KDATA
     DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriver>());
+    DataDriverFactory::regBlockDriver(make_shared<SQLiteBlockInfoDriver>());
 #endif
 
 #if HKU_ENABLE_MYSQL_KDATA
     DataDriverFactory::regBaseInfoDriver(make_shared<MySQLBaseInfoDriver>());
+    DataDriverFactory::regBlockDriver(make_shared<MySQLBlockInfoDriver>());
 #endif
-
-    m_blockDrivers = new map<string, BlockInfoDriverPtr>();
-    DataDriverFactory::regBlockDriver(make_shared<QLBlockInfoDriver>());
 
     m_kdataPrototypeDrivers = new map<string, KDataDriverPtr>();
     m_kdataDriverPools = new map<string, KDataDriverConnectPoolPtr>();

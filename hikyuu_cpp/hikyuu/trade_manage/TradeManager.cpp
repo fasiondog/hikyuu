@@ -14,6 +14,10 @@
 #include "../trade_sys/system/SystemPart.h"
 #include "../KData.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::TradeManager)
+#endif
+
 namespace hku {
 
 string TradeManager::str() const {
@@ -368,8 +372,7 @@ PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& 
 
     // 在历史交易记录中，重新计算在指定的查询日期时，该交易对象的持仓数量
     double number = 0.0;
-    TradeRecordList::const_iterator iter = m_trade_list.begin();
-    for (; iter != m_trade_list.end(); ++iter) {
+    for (auto iter = m_trade_list.begin(); iter != m_trade_list.end(); ++iter) {
         // 交易记录中的交易日期已经大于查询日期，则跳出循环
         if (iter->datetime > datetime) {
             break;
@@ -1065,6 +1068,20 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         position.sellMoney = roundEx(position.sellMoney + money, precision);
     }
 
+    if (result.datetime > m_broker_last_datetime) {
+        list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+        Datetime realtime, nulltime;
+        for (; broker_iter != m_broker_list.end(); ++broker_iter) {
+            realtime =
+              (*broker_iter)->sell(datetime, stock.market(), stock.code(), realPrice, number);
+            if (realtime != nulltime && realtime > m_broker_last_datetime) {
+                m_broker_last_datetime = realtime;
+            }
+        }
+    }
+
+    _saveAction(result);
+
     return result;
 }
 
@@ -1125,9 +1142,23 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
         m_short_position.erase(stock.id());
     }
 
+    if (result.datetime > m_broker_last_datetime) {
+        list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+        Datetime realtime, nulltime;
+        for (; broker_iter != m_broker_list.end(); ++broker_iter) {
+            realtime =
+              (*broker_iter)->buy(datetime, stock.market(), stock.code(), realPrice, number);
+            if (realtime != nulltime && realtime > m_broker_last_datetime) {
+                m_broker_last_datetime = realtime;
+            }
+        }
+    }
+
     if (getParam<bool>("support_borrow_stock")) {
         returnStock(datetime, stock, realPrice, real_number);
     }
+
+    _saveAction(result);
 
     return result;
 }

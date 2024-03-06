@@ -21,15 +21,23 @@ void HKU_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
     // 如果模块版本表不存在，则创建该表
     if (!driver->tableExist("module_version")) {
         driver->exec(
-          "CREATE TABLE `module_version` (`id` INTEGER PRIMARY KEY AUTOINCREMENT,`module` TEXT NOT "
-          "NULL, `version` INTEGER NOT NULL);");
+          "CREATE TABLE `module_version` (`id` INTEGER PRIMARY KEY AUTOINCREMENT,`module` TEXT, "
+          "`version` INTEGER NOT NULL);");
+    }
+
+    // 如果没有升级脚本，也没有创建脚本，则直接返回
+    if (upgrade_scripts.empty() && !create_script) {
+        // Do nothing
+        return;
     }
 
     // 尝试获取模板数据库版本
     int version = 0;
     try {
-        version = driver->queryInt(format(
-          "select `version` from `module_version` where module=\"{}\" limit 1", module_name));
+        version = driver->queryInt(
+          fmt::format("select `version` from `module_version` where module=\"{}\" limit 1",
+                      module_name),
+          0);
     } catch (...) {
         // Do noting
     }
@@ -42,18 +50,18 @@ void HKU_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
 
         // 创建数据库，并将模块数据库版本设为1
         driver->exec(create_script);
-        driver->exec(format("INSERT INTO `module_version` (module, version) VALUES (\"{}\", 1);",
-                            module_name));
+        driver->exec(fmt::format(
+          "INSERT INTO `module_version` (module, version) VALUES (\"{}\", 1);", module_name));
         version = 1;
     }
 
-    // 缺失中间版本的升级脚本
+    // 当前版本号小于升级脚步对应的起始版本号还少1，说明缺失中间版本的升级脚本，无法升级
     if (version < start_version - 1) {
         HKU_ERROR("THe {} database is too old, can't upgrade!", module_name);
         return;
     }
 
-    size_t upgrade_scripts_count = upgrade_scripts.size();
+    int upgrade_scripts_count = static_cast<int>(upgrade_scripts.size());
 
     // 不存在升级脚本，直接返回
     if (0 == upgrade_scripts_count) {
@@ -64,18 +72,23 @@ void HKU_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
     int to_version = start_version + upgrade_scripts_count - 1;
     HKU_TRACE("current {} database version: {}", module_name, version);
 
+    // 当前版本已经大于等于待升至的版本，无需升级，直接返回
     if (version >= to_version) {
+        HKU_TRACE("current version({}) greater the upgrade version({}), ignored!", version,
+                 to_version);
         return;
     }
 
-    int start_index = start_version - version - 1;
-    HKU_TRACE("update {} database ...", module_name);
+    // 如果当前的版本号小于脚步对应的起始版本号，则从脚步索引从0开始；
+    // 否则应从 (当前版本后 - 0号脚步对应的起始版本号) + 1 对应的升级脚步开始执行
+    int start_index = version < start_version ? 0 : version - start_version + 1;
+    HKU_TRACE("update {} database ..., update script index: {}", module_name, start_index);
     for (int i = start_index; i < upgrade_scripts_count; i++) {
         driver->exec(upgrade_scripts[i]);
     }
 
-    driver->exec(format("UPDATE module_version SET `version`={} where `module`=\"{}\"", to_version,
-                        module_name));
+    driver->exec(fmt::format("UPDATE module_version SET `version`={} where `module`=\"{}\"",
+                             to_version, module_name));
 }
 
 }  // namespace hku

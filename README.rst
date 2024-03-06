@@ -5,19 +5,35 @@
 
 -----------
 
+.. image:: https://static.pepy.tech/badge/hikyuu
+    :target: https://pepy.tech/project/hikyuu
+
+.. image:: https://static.pepy.tech/badge/hikyuu/month
+    :target: https://pepy.tech/project/hikyuu
+
+.. image:: https://static.pepy.tech/badge/hikyuu/week
+    :target: https://pepy.tech/project/hikyuu
+
 .. image:: https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg
+    :target: https://github.com/fasiondog/hikyuu/actions
+
+.. image:: https://github.com/fasiondog/hikyuu/workflows/ubuntu-build/badge.svg
+    :target: https://github.com/fasiondog/hikyuu/actions
+
+.. image:: https://github.com/fasiondog/hikyuu/workflows/ubuntu-aarch64-build/badge.svg
     :target: https://github.com/fasiondog/hikyuu/actions
 
 .. image:: https://img.shields.io/github/license/mashape/apistatus.svg
     :target: https://github.com/fasiondog/hikyuu/blob/master/LICENSE.txt
     :alt: GitHub
 
-
 Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测（目前主要用于国内A股市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。
 
 详细文档： `<https://hikyuu.org/>`_
 
 如果上述网站无法访问，请戳这里： `<http://fasiondog.gitee.io/hikyuu/>`_
+
+感谢网友提供的 Hikyuu Ubuntu虚拟机环境, 百度网盘下载(提取码: ht8j): `<https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw?pwd=ht8j>`_
 
 祝贺 HIKYUU 入选 GITEE 最有价值开源项目 GVP
 -----------------------------------------------
@@ -40,7 +56,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
     my_tm = crtTM(init_cash = 300000)
 
     #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线，快线向上穿越慢线时买入，反之卖出）
-    my_sg = SG_Flex(OP(EMA(n=5)), slow_n=10)
+    my_sg = SG_Flex(EMA(CLOSE(), n=5), slow_n=10)
 
     #固定每次买入1000股
     my_mm = MM_FixedCount(1000)

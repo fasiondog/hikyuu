@@ -10,9 +10,19 @@
 #include "MySQLStatement.h"
 #include "MySQLConnect.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#endif
+
 namespace hku {
 
-MySQLStatement::MySQLStatement(DBConnectBase* driver, const string& sql_statement)
+MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_statement)
 : SQLStatementBase(driver, sql_statement),
   m_db((dynamic_cast<MySQLConnect*>(driver))->m_mysql),
   m_stmt(nullptr),
@@ -116,12 +126,14 @@ void MySQLStatement::_bindResult() {
             auto& buf = m_result_buffer.back();
             m_result_bind[idx].buffer = boost::any_cast<float>(&buf);
         } else if (field->type == MYSQL_TYPE_VAR_STRING || field->type == MYSQL_TYPE_STRING ||
-                   field->type == MYSQL_TYPE_BLOB) {
+                   field->type == MYSQL_TYPE_BLOB || field->type == MYSQL_TYPE_TINY_BLOB ||
+                   field->type == MYSQL_TYPE_VARCHAR) {
+            // mysql stmt 不支持 LONGTEXT 等字段
             unsigned long length = field->length + 1;
             m_result_bind[idx].buffer_length = length;
-            m_result_buffer.emplace_back(vector<char>(length));
+            m_result_buffer.emplace_back(std::vector<char>(length));
             auto& buf = m_result_buffer.back();
-            vector<char>* p = boost::any_cast<vector<char>>(&buf);
+            std::vector<char>* p = boost::any_cast<std::vector<char>>(&buf);
             m_result_bind[idx].buffer = p->data();
         } else if (field->type == MYSQL_TYPE_TINY) {
             int8_t item = 0;
@@ -133,6 +145,11 @@ void MySQLStatement::_bindResult() {
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
             m_result_bind[idx].buffer = boost::any_cast<short>(&buf);
+        } else if (field->type == MYSQL_TYPE_DATETIME || field->type == MYSQL_TYPE_DATE) {
+            MYSQL_TIME item;
+            m_result_buffer.push_back(item);
+            auto& buf = m_result_buffer.back();
+            m_result_bind[idx].buffer = boost::any_cast<MYSQL_TIME>(&buf);
         } else {
             HKU_THROW("Unsupport field type: {}, field name: {}", int(field->type), field->name);
         }
@@ -187,15 +204,53 @@ void MySQLStatement::sub_bindDouble(int idx, double item) {
     m_param_bind[idx].buffer = boost::any_cast<double>(&buf);
 }
 
+void MySQLStatement::sub_bindDatetime(int idx, const Datetime& item) {
+    if (item == Null<Datetime>()) {
+        sub_bindNull(idx);
+        return;
+    }
+
+    HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
+              m_param_bind.size());
+    MYSQL_TIME tm;
+    tm.year = static_cast<unsigned int>(item.year());
+    tm.month = static_cast<unsigned int>(item.month());
+    tm.day = static_cast<unsigned int>(item.day());
+    tm.hour = static_cast<unsigned int>(item.hour());
+    tm.minute = static_cast<unsigned int>(item.minute());
+    tm.second = static_cast<unsigned int>(item.second());
+    tm.second_part = static_cast<unsigned long>(item.millisecond() * 1000 + item.microsecond());
+    tm.time_type = MYSQL_TIMESTAMP_DATETIME;
+    m_param_buffer.push_back(tm);
+    auto& buf = m_param_buffer.back();
+    MYSQL_TIME* p = boost::any_cast<MYSQL_TIME>(&buf);
+    m_param_bind[idx].buffer_type = MYSQL_TYPE_DATETIME;
+    m_param_bind[idx].buffer = p;
+    m_param_bind[idx].buffer_length = sizeof(MYSQL_TIME);
+    m_param_bind[idx].is_null = 0;
+}
+
 void MySQLStatement::sub_bindText(int idx, const string& item) {
     HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
               m_param_bind.size());
     m_param_buffer.push_back(item);
     auto& buf = m_param_buffer.back();
-    string* p = boost::any_cast<string>(&buf);
+    std::string* p = boost::any_cast<std::string>(&buf);
     m_param_bind[idx].buffer_type = MYSQL_TYPE_VAR_STRING;
     m_param_bind[idx].buffer = (void*)p->data();
     m_param_bind[idx].buffer_length = item.size();
+    m_param_bind[idx].is_null = 0;
+}
+
+void MySQLStatement::sub_bindText(int idx, const char* item, size_t len) {
+    HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
+              m_param_bind.size());
+    m_param_buffer.push_back(std::string(item));
+    auto& buf = m_param_buffer.back();
+    std::string* p = boost::any_cast<std::string>(&buf);
+    m_param_bind[idx].buffer_type = MYSQL_TYPE_VAR_STRING;
+    m_param_bind[idx].buffer = (void*)p->data();
+    m_param_bind[idx].buffer_length = p->size();
     m_param_bind[idx].is_null = 0;
 }
 
@@ -204,10 +259,22 @@ void MySQLStatement::sub_bindBlob(int idx, const string& item) {
               m_param_bind.size());
     m_param_buffer.push_back(item);
     auto& buf = m_param_buffer.back();
-    string* p = boost::any_cast<string>(&buf);
+    std::string* p = boost::any_cast<std::string>(&buf);
     m_param_bind[idx].buffer_type = MYSQL_TYPE_BLOB;
     m_param_bind[idx].buffer = (void*)p->data();
     m_param_bind[idx].buffer_length = item.size();
+    m_param_bind[idx].is_null = 0;
+}
+
+void MySQLStatement::sub_bindBlob(int idx, const char* item, size_t len) {
+    HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
+              m_param_bind.size());
+    m_param_buffer.push_back(std::string(item));
+    auto& buf = m_param_buffer.back();
+    std::string* p = boost::any_cast<std::string>(&buf);
+    m_param_bind[idx].buffer_type = MYSQL_TYPE_BLOB;
+    m_param_bind[idx].buffer = (void*)p->data();
+    m_param_bind[idx].buffer_length = p->size();
     m_param_bind[idx].is_null = 0;
 }
 
@@ -259,6 +326,37 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
     }
 }
 
+void MySQLStatement::sub_getColumnAsDatetime(int idx, Datetime& item) {
+    HKU_CHECK(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
+              m_result_buffer.size());
+
+    HKU_CHECK(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsDatetime! idx: {}", idx);
+
+    if (m_result_is_null[idx]) {
+        item = Null<Datetime>();
+        return;
+    }
+
+    try {
+        const MYSQL_TIME* tm = boost::any_cast<MYSQL_TIME>(&(m_result_buffer[idx]));
+        if (tm->time_type == MYSQL_TIMESTAMP_DATETIME) {
+            long millisec = tm->second_part / 1000;
+            long microsec = tm->second_part - millisec * 1000;
+            item = Datetime(tm->year, tm->month, tm->day, tm->hour, tm->minute, tm->second,
+                            millisec, microsec);
+        } else if (tm->time_type == MYSQL_TIMESTAMP_DATE) {
+            item = Datetime(tm->year, tm->month, tm->day);
+        } else {
+            HKU_THROW("Unsupported type: {}, Field type mismatch! idx: {}", int(tm->time_type),
+                      idx);
+        }
+    } catch (const hku::exception&) {
+        throw;
+    } catch (...) {
+        HKU_THROW("Field type mismatch! idx: {}", idx);
+    }
+}
+
 void MySQLStatement::sub_getColumnAsText(int idx, string& item) {
     HKU_CHECK(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
               m_result_buffer.size());
@@ -306,3 +404,11 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, string& item) {
 }
 
 }  // namespace hku
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif

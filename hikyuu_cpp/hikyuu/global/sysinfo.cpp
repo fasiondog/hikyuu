@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <hikyuu/GlobalInitializer.h>
 #include <stdio.h>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -19,29 +20,46 @@
 
 using json = nlohmann::json;
 
+#define FEEDBACK_SERVER_ADDR "tcp://1.tcp.cpolar.cn:20981"
+
 namespace hku {
+
+std::atomic<int> g_latest_version{0};
+
+bool HKU_API CanUpgrade() {
+    int current_version =
+      HKU_VERSION_MAJOR * 1000000 + HKU_VERSION_MINOR * 1000 + HKU_VERSION_ALTER;
+    return g_latest_version > current_version;
+}
+
+std::string HKU_API getLatestVersion() {
+    int major = g_latest_version / 1000000;
+    int minor = g_latest_version / 1000 - major * 1000;
+    int alter = g_latest_version - (g_latest_version / 1000) * 1000;
+    return fmt::format("{}.{}.{}", major, minor, alter);
+}
 
 std::string getVersion() {
     return HKU_VERSION;
 }
 
-std::string HKU_API getVersionWithBuild() {
-#if defined(_DEBUG) || defined(DEBUG)
-    return fmt::format("{}_{}_debug_{}_{}", HKU_VERSION, HKU_VERSION_BUILD, getPlatform(),
-                       getCpuArch());
-#else
-    return fmt::format("{}_{}_release_{}_{}", HKU_VERSION, HKU_VERSION_BUILD, getPlatform(),
-                       getCpuArch());
-#endif
+std::string getVersionWithBuild() {
+    return fmt::format("{}_{}_{}_{}_{}", HKU_VERSION, HKU_VERSION_BUILD, HKU_VERSION_MODE,
+                       getPlatform(), getCpuArch());
 }
 
+std::string getVersionWithGit() {
+    return HKU_VERSION_GIT;
+}
+
+// cppcheck-suppress constParameterReference
 static bool readUUID(boost::uuids::uuid& out) {
     std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
     FILE* fp = fopen(filename.c_str(), "rb");
     HKU_IF_RETURN(!fp, false);
 
     bool ret = true;
-    if (16 != fread(out.data, 1, 16, fp)) {
+    if (16 != fread((void*)out.data, 1, 16, fp)) {
         ret = false;
     }
 
@@ -67,7 +85,7 @@ void sendFeedback() {
                 saveUUID(uid);
             }
 
-            NodeClient client("tcp://1.tcp.cpolar.cn:20981");
+            NodeClient client(FEEDBACK_SERVER_ADDR);
             client.dial();
 
             json req, res;
@@ -75,6 +93,7 @@ void sendFeedback() {
             client.post(req, res);
             std::string host = res["host"].get<std::string>();
             uint64_t port = res["port"].get<uint64_t>();
+            g_latest_version = res.contains("last_version") ? res["last_version"].get<int>() : 0;
             client.close();
 
             client.setServerAddr(fmt::format("tcp://{}:{}", host, port));
@@ -94,6 +113,34 @@ void sendFeedback() {
     });
     t.detach();
     // t.join();
+}
+
+void sendPythonVersionFeedBack(int major, int minor, int micro) {
+    std::thread t([=]() {
+        try {
+            NodeClient client(FEEDBACK_SERVER_ADDR);
+            client.dial();
+
+            json req, res;
+            req["cmd"] = 2;
+            client.post(req, res);
+            std::string host = res["host"].get<std::string>();
+            uint64_t port = res["port"].get<uint64_t>();
+            g_latest_version = res.contains("last_version") ? res["last_version"].get<int>() : 0;
+            client.close();
+
+            client.setServerAddr(fmt::format("tcp://{}:{}", host, port));
+            client.dial();
+            req["cmd"] = 3;
+            req["major"] = major;
+            req["minor"] = minor;
+            req["micro"] = micro;
+            client.post(req, res);
+        } catch (...) {
+            // do nothing
+        }
+    });
+    t.detach();
 }
 
 }  // namespace hku

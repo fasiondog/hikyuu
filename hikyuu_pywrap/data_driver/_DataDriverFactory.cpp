@@ -5,26 +5,44 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/data_driver/DataDriverFactory.h>
+#include "_BlockInfoDriver.h"
 
 using namespace hku;
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_DataDriverFactory() {
-    class_<DataDriverFactory>("DataDriverFactory", no_init)
-      //.def("getBaseInfoDriver", &DataDriverFactory::getBaseInfoDriver)
-      //.def("regBaseInfoDriver", &DataDriverFactory::regBaseInfoDriver)
-      //.def("removeBaseInfoDriver", &DataDriverFactory::removeBaseInfoDriver)
-      .def("regKDataDriver", &DataDriverFactory::regKDataDriver)
-      .def("removeKDataDriver", &DataDriverFactory::removeKDataDriver)
-      .def("getBlockDriver", &DataDriverFactory::getBlockDriver)
-      .def("regBlockDriver", &DataDriverFactory::regBlockDriver)
-      .def("removeBlockDriver", &DataDriverFactory::removeBlockDriver)
-      //.staticmethod("getBaseInfoDriver")
-      //.staticmethod("regBaseInfoDriver")
-      //.staticmethod("removeBaseInfoDriver")
-      .staticmethod("getBlockDriver")
-      .staticmethod("regBlockDriver")
-      .staticmethod("removeBlockDriver");
+void export_DataDriverFactory(py::module& m) {
+    py::class_<DataDriverFactory>(m, "DataDriverFactory", "数据驱动工厂类")
+      .def_static("getBaseInfoDriver", &DataDriverFactory::getBaseInfoDriver)
+      .def_static("removeBaseInfoDriver", &DataDriverFactory::removeBaseInfoDriver)
+      .def_static("getKDataDriverPool", &DataDriverFactory::getKDataDriverPool)
+      .def_static("removeKDataDriver", &DataDriverFactory::removeKDataDriver)
+      .def_static("getBlockDriver", &DataDriverFactory::getBlockDriver)
+      .def_static("removeBlockDriver", &DataDriverFactory::removeBlockDriver)
+
+      // .def_static("regBaseInfoDriver",
+      //             [](py::object pydriver) {
+      //                 auto keep_python_state_alive = std::make_shared<py::object>(pydriver);
+      //                 auto ptr = pydriver.cast<PyBaseInfoDriver*>();
+      //                 auto driver = BaseInfoDriverPtr(keep_python_state_alive, ptr);
+      //                 DataDriverFactory::regBaseInfoDriver(driver);
+      //             })
+
+      .def_static("regBlockDriver",
+                  [](py::object pydriver) {
+                      auto keep_python_state_alive = std::make_shared<py::object>(pydriver);
+                      auto ptr = pydriver.cast<PyBlockInfoDriver*>();
+                      auto driver = BlockInfoDriverPtr(keep_python_state_alive, ptr);
+                      DataDriverFactory::regBlockDriver(driver);
+                  })
+
+      // .def_static("regKDataDriver",
+      //             [](py::object pydriver) {
+      //                 auto keep_python_state_alive = std::make_shared<py::object>(pydriver);
+      //                 auto ptr = pydriver.cast<PyKDataDriver*>();
+      //                 auto driver = KDataDriverPtr(keep_python_state_alive, ptr);
+      //                 DataDriverFactory::regKDataDriver(driver);
+      //             })
+
+      ;
 }

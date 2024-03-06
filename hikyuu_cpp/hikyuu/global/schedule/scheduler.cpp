@@ -5,6 +5,7 @@
  *     Author: fasiondog
  */
 
+#include <hikyuu/GlobalInitializer.h>
 #include <mutex>
 #include "scheduler.h"
 #include "../../Log.h"

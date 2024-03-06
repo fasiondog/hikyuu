@@ -41,7 +41,7 @@ public:
 
     TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
     : m_name(name), m_costfunc(costFunc), m_broker_last_datetime(Datetime::now()) {
-        setParam<int>("precision", 2);  //计算精度
+        setParam<int>("precision", 2);  // 计算精度
     }
 
     virtual ~TradeManagerBase() {}
@@ -366,7 +366,11 @@ public:
         return PositionRecord();
     }
 
-    /** 获取指定证券的当前空头仓位持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
+    /**
+     * 获取指定证券的空头持仓记录
+     * @param date 指定日期
+     * @param stock 指定的证券
+     */
     virtual PositionRecord getShortPosition(const Stock&) const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();

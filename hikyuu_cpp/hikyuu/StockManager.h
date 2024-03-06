@@ -34,6 +34,9 @@ public:
     static StockManager& instance();
     virtual ~StockManager();
 
+    StockManager(const StockManager&) = delete;
+    StockManager& operator=(const StockManager&) = delete;
+
     /**
      * 初始化函数，必须在程序入口调用
      * @param baseInfoParam 基础信息驱动参数
@@ -135,8 +138,19 @@ public:
      */
     BlockList getBlockList();
 
-    //目前支持"SH"
+    // 目前支持"SH"
+    /**
+     * 获取交易日历，目前支持"SH"
+     * @param query
+     * @param market
+     * @return DatetimeList
+     */
     DatetimeList getTradingCalendar(const KQuery& query, const string& market = "SH");
+
+    /**
+     * 获取10年期中国国债收益率
+     */
+    const ZhBond10List& getZhBond10() const;
 
     /**
      * 判断指定日期是否为节假日
@@ -195,6 +209,9 @@ private:
     /* 设置K线驱动 */
     void setKDataDriver(const KDataDriverConnectPoolPtr&);
 
+    /* 加载 K线数据至缓存 */
+    void loadAllKData();
+
     /* 加载节假日信息 */
     void loadAllHolidays();
 
@@ -209,6 +226,9 @@ private:
 
     /* 加载所有权息数据 */
     void loadAllStockWeights();
+
+    /** 加载10年期中国国债收益率数据 */
+    void loadAllZhBond10();
 
 private:
     StockManager();
@@ -235,6 +255,8 @@ private:
 
     std::unordered_set<Datetime> m_holidays;  // 节假日
     std::mutex* m_holidays_mutex;
+
+    ZhBond10List m_zh_bond10;  // 10年期中国国债收益率数据
 
     Parameter m_baseInfoDriverParam;
     Parameter m_blockDriverParam;

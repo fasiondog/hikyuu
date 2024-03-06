@@ -76,10 +76,10 @@
     
 .. py:function:: toPriceList(arg)
 
-    将Python的可迭代对象如 list、tuple 转化为 PriceList
+    将Python的可迭代对象如 list、tuple 转化为 PriceList（该函数实际已废弃，可以不再使用）
     
     :param arg: 待转化的Python序列
-    :rtype: PriceList
+    :rtype: list
     
 
 .. py:function:: set_global_context(stk, query)

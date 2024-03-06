@@ -7,6 +7,10 @@
 
 #include "SignalSelector.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::SignalSelector)
+#endif
+
 namespace hku {
 
 SignalSelector::SignalSelector() : SelectorBase("SE_Sigal") {}

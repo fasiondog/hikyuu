@@ -29,14 +29,16 @@ public:
     virtual Parameter getFinanceInfo(const string& market, const string& code) override;
     virtual StockWeightList getStockWeightList(const string& market, const string& code,
                                                Datetime start, Datetime end) override;
+    virtual unordered_map<string, StockWeightList> getAllStockWeightList() override;
     virtual MarketInfo getMarketInfo(const string& market) override;
     virtual StockTypeInfo getStockTypeInfo(uint32_t type) override;
     virtual StockInfo getStockInfo(string market, const string& code) override;
     virtual vector<StockInfo> getAllStockInfo() override;
     virtual std::unordered_set<Datetime> getAllHolidays() override;
+    virtual ZhBond10List getAllZhBond10() override;
 
 private:
-    //股票基本信息数据库实例
+    // 股票基本信息数据库实例
     ConnectPool<SQLiteConnect>* m_pool;
 };
 

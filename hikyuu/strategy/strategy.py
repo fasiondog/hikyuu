@@ -9,7 +9,7 @@ from hikyuu import StrategyContext, StockManager
 class TestStrategy(StrategyBase):
     def __init__(self):
         super(self.__class__, self).__init__()
-        self.stock_list = ['sh000001', 'sz000001']
+        self.stock_list = ['sh600000', 'sz000001']
         self.ktype_list = [Query.MIN, Query.DAY]
 
     def init(self):
@@ -23,5 +23,5 @@ class TestStrategy(StrategyBase):
 
 
 if __name__ == '__main__':
-    s = TestStratege()
+    s = TestStrategy()
     s.run()

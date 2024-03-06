@@ -17,7 +17,24 @@
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/base_object.hpp>
-#endif
+
+#if HKU_SUPPORT_XML_ARCHIVE
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#endif /* HKU_SUPPORT_XML_ARCHIVE */
+
+#if HKU_SUPPORT_TEXT_ARCHIVE
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#endif /* HKU_SUPPORT_TEXT_ARCHIVE */
+
+#if HKU_SUPPORT_BINARY_ARCHIVE
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#endif /* HKU_SUPPORT_BINARY_ARCHIVE */
+
+#include <boost/serialization/export.hpp>
+#endif /* HKU_SUPPORT_SERIALIZATION */
 
 namespace hku {
 
@@ -47,7 +64,7 @@ public:
     KData getTO() const;
 
     /** 获取名称 */
-    string name() const;
+    const string& name() const;
 
     /** 设置名称 */
     void name(const string& name);
@@ -173,7 +190,7 @@ inline KData ProfitGoalBase::getTO() const {
     return m_kdata;
 }
 
-inline string ProfitGoalBase::name() const {
+inline const string& ProfitGoalBase::name() const {
     return m_name;
 }
 

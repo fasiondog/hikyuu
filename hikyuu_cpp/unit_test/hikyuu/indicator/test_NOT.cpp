@@ -25,17 +25,19 @@ TEST_CASE("test_NOT") {
 
     PriceList a;
     for (int i = 0; i < 10; ++i) {
-        a.push_back(-i);
+        a.push_back(5 - i);
     }
+
+    vector<price_t> expect = {0., 0., 0., 0., 0., 1., 1., 1., 1., 1.};
 
     Indicator data = PRICELIST(a);
 
     result = NOT(data);
     CHECK_EQ(result.name(), "NOT");
     CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result[0], 1.0);
+    CHECK_EQ(result[0], 0.0);
     for (int i = 1; i < 10; ++i) {
-        CHECK_EQ(result[i], 0.0);
+        CHECK_EQ(result[i], expect[i]);
     }
 }
 

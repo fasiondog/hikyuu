@@ -5,109 +5,58 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/trade_sys/moneymanager/build_in.h>
-#include "../_Parameter.h"
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 using namespace hku;
 
-class MoneyManagerWrap : public MoneyManagerBase, public wrapper<MoneyManagerBase> {
+class PyMoneyManagerBase : public MoneyManagerBase {
+    PY_CLONE(PyMoneyManagerBase, MoneyManagerBase)
+
 public:
-    MoneyManagerWrap() : MoneyManagerBase() {}
-    MoneyManagerWrap(const string& name) : MoneyManagerBase(name) {}
+    using MoneyManagerBase::MoneyManagerBase;
 
-    void buyNotify(const TradeRecord& record) {
-        if (override buyNotify = this->get_override("buy_notify")) {
-            buyNotify(record);
-            return;
-        }
-        MoneyManagerBase::buyNotify(record);
+    void _reset() override {
+        PYBIND11_OVERLOAD(void, MoneyManagerBase, _reset, );
     }
 
-    void default_buyNotify(const TradeRecord& record) {
-        MoneyManagerBase::buyNotify(record);
+    void buyNotify(const TradeRecord& tr) override {
+        PYBIND11_OVERLOAD_NAME(void, MoneyManagerBase, "buy_notify", buyNotify, tr);
     }
 
-    void sellNotify(const TradeRecord& record) {
-        if (override sellNotify = this->get_override("sell_notify")) {
-            sellNotify(record);
-            return;
-        }
-        MoneyManagerBase::sellNotify(record);
-    }
-
-    void default_sellNotify(const TradeRecord& record) {
-        MoneyManagerBase::sellNotify(record);
-    }
-
-    double _getSellNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
-                          SystemPart from) {
-        if (override _getSellNumber = this->get_override("_get_sell_num")) {
-            return _getSellNumber(datetime, stock, price, risk, from);
-        }
-        return MoneyManagerBase::_getSellNumber(datetime, stock, price, risk, from);
-    }
-
-    double default_getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                                 price_t risk, SystemPart from) {
-        return MoneyManagerBase::_getSellNumber(datetime, stock, price, risk, from);
+    void sellNotify(const TradeRecord& tr) override {
+        PYBIND11_OVERLOAD_NAME(void, MoneyManagerBase, "sell_notify", sellNotify, tr);
     }
 
     double _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
-                         SystemPart from) {
-        return this->get_override("_get_buy_num")(datetime, stock, price, risk, from);
+                         SystemPart from) override {
+        PYBIND11_OVERLOAD_PURE_NAME(double, MoneyManagerBase, "_get_buy_num", _getBuyNumber,
+                                    datetime, stock, price, risk, from);
+    }
+
+    double _getSellNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
+                          SystemPart from) override {
+        PYBIND11_OVERLOAD_NAME(double, MoneyManagerBase, "_get_sell_num", _getSellNumber, datetime,
+                               stock, price, risk, from);
     }
 
     double _getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                               price_t risk, SystemPart from) {
-        if (override _getSellShortNumber = this->get_override("_get_sell_short_num")) {
-            return _getSellShortNumber(datetime, stock, price, risk, from);
-        }
-        return MoneyManagerBase::_getSellShortNumber(datetime, stock, price, risk, from);
+                               price_t risk, SystemPart from) override {
+        PYBIND11_OVERLOAD_NAME(double, MoneyManagerBase, "_get_sell_short_num", _getSellShortNumber,
+                               datetime, stock, price, risk, from);
     }
 
-    double default_getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                                      price_t risk, SystemPart from) {
-        return MoneyManagerBase::_getSellShortNumber(datetime, stock, price, risk, from);
-    }
-
-    double getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                             price_t risk, SystemPart from) {
-        if (override _getBuyShortNumber = this->get_override("_get_buy_short_number")) {
-            return _getBuyShortNumber(datetime, stock, price, risk, from);
-        }
-        return MoneyManagerBase::_getBuyShortNumber(datetime, stock, price, risk, from);
-    }
-
-    double default_getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                                     price_t risk, SystemPart from) {
-        return MoneyManagerBase::_getBuyShortNumber(datetime, stock, price, risk, from);
-    }
-
-    void _reset() {
-        if (override func = get_override("_reset")) {
-            func();
-        } else {
-            MoneyManagerBase::_reset();
-        }
-    }
-
-    void default_reset() {
-        this->MoneyManagerBase::_reset();
-    }
-
-    MoneyManagerPtr _clone() {
-        return this->get_override("_clone")();
+    double _getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                              price_t risk, SystemPart from) override {
+        PYBIND11_OVERLOAD_NAME(double, MoneyManagerBase, "_get_buy_short_num", _getBuyShortNumber,
+                               datetime, stock, price, risk, from);
     }
 };
 
-string (MoneyManagerBase::*mm_get_name)() const = &MoneyManagerBase::name;
-void (MoneyManagerBase::*mm_set_name)(const string&) = &MoneyManagerBase::name;
-
-void export_MoneyManager() {
-    class_<MoneyManagerWrap, boost::noncopyable>("MoneyManagerBase", R"(资金管理策略基类
+void export_MoneyManager(py::module& m) {
+    py::class_<MoneyManagerBase, MMPtr, PyMoneyManagerBase>(m, "MoneyManagerBase",
+                                                            R"(资金管理策略基类
 
 公共参数：
 
@@ -123,17 +72,22 @@ void export_MoneyManager() {
     - _getBuyNumber : 【必须】获取指定交易对象可买入的数量
     - _getSellNumber : 【可选】获取指定交易对象可卖出的数量，如未重载，默认为卖出全部已持仓数量
     - _reset : 【可选】重置私有属性
-    - _clone : 【必须】克隆接口)",
-                                                 init<>())
-      .def(init<const string&>())
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
+    - _clone : 【必须】克隆接口)")
+      .def(py::init<>())
+      .def(py::init<const string&>(), R"(初始化构造函数
+        
+    :param str name: 名称)")
 
-      .add_property("name", mm_get_name, mm_set_name, "名称")
-      .add_property("tm", &MoneyManagerBase::getTM, &MoneyManagerBase::setTM,
+      .def("__str__", to_py_str<MoneyManagerBase>)
+      .def("__repr__", to_py_str<MoneyManagerBase>)
+
+      .def_property("name", py::overload_cast<>(&MoneyManagerBase::name, py::const_),
+                    py::overload_cast<const string&>(&MoneyManagerBase::name),
+                    py::return_value_policy::copy, "名称")
+      .def_property("tm", &MoneyManagerBase::getTM, &MoneyManagerBase::setTM,
                     "设置或获取交易管理对象")
-      .add_property("query", &MoneyManagerBase::getQuery, &MoneyManagerBase::setQuery,
-                    "设置或获取查询条件")
+      .def_property("query", &MoneyManagerBase::getQuery, &MoneyManagerBase::setQuery,
+                    py::return_value_policy::copy, "设置或获取查询条件")
 
       .def("get_param", &MoneyManagerBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -143,7 +97,7 @@ void export_MoneyManager() {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &MoneyManagerBase::setParam<object>, R"(set_param(self, name, value)
+      .def("set_param", &MoneyManagerBase::setParam<boost::any>, R"(set_param(self, name, value)
 
     设置参数
 
@@ -156,14 +110,14 @@ void export_MoneyManager() {
       .def("reset", &MoneyManagerBase::reset, "复位操作")
       .def("clone", &MoneyManagerBase::clone, "克隆操作")
 
-      .def("buy_notify", &MoneyManagerBase::buyNotify, &MoneyManagerWrap::default_buyNotify,
+      .def("buy_notify", &MoneyManagerBase::buyNotify,
            R"(buy_notify(self, trade_record)
 
     【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
 
     :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录)")
 
-      .def("sell_notify", &MoneyManagerBase::sellNotify, &MoneyManagerWrap::default_sellNotify,
+      .def("sell_notify", &MoneyManagerBase::sellNotify,
            R"(sell_notify(self, trade_record)
 
     【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
@@ -196,7 +150,7 @@ void export_MoneyManager() {
     :return: 可卖出数量
     :rtype: float)")
 
-      .def("_get_buy_num", pure_virtual(&MoneyManagerBase::_getBuyNumber),
+      .def("_get_buy_num", &MoneyManagerBase::_getBuyNumber,
            R"(_get_buy_num(self, datetime, stock, price, risk, part_from)
 
     【重载接口】获取指定交易对象可买入的数量
@@ -210,7 +164,6 @@ void export_MoneyManager() {
     :rtype: float)")
 
       .def("_get_sell_num", &MoneyManagerBase::_getSellNumber,
-           &MoneyManagerWrap::default_getSellNumber,
            R"(_get_sell_num(self, datetime, stock, price, risk, part_from)
 
     【重载接口】获取指定交易对象可卖出的数量。如未重载，默认为卖出全部已持仓数量。
@@ -223,66 +176,59 @@ void export_MoneyManager() {
     :return: 可卖出数量
     :rtype: float)")
 
-      /*.def("getSellShortNumber", &MoneyManagerBase::getSellShortNumber)
-      .def("getBuyShortNumber", &MoneyManagerBase::getBuyShortNumber)
-      .def("_getSellShortNumber", &MoneyManagerBase::_getSellShortNumber,
-           &MoneyManagerWrap::default_getSellShortNumber)
-      .def("_getBuyShortNumber", &MoneyManagerBase::_getBuyShortNumber,
-           &MoneyManagerWrap::default_getBuyShortNumber)*/
+      .def("get_sell_short_num", &MoneyManagerBase::getSellShortNumber)
+      .def("get_buy_short_num", &MoneyManagerBase::getBuyShortNumber)
+      .def("_get_sell_short_num", &MoneyManagerBase::_getSellShortNumber)
+      .def("_get_buy_short_num", &MoneyManagerBase::_getBuyShortNumber)
 
-      .def("_reset", &MoneyManagerBase::_reset, &MoneyManagerWrap::default_reset,
-           R"(【重载接口】子类复位接口，复位内部私有变量)")
-      .def("_clone", pure_virtual(&MoneyManagerBase::_clone), "【重载接口】子类克隆接口")
+      .def("_reset", &MoneyManagerBase::_reset, R"(【重载接口】子类复位接口，复位内部私有变量)")
 
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(name_init_pickle_suite<MoneyManagerBase>())
-#endif
-      ;
+        DEF_PICKLE(MMPtr);
 
-    register_ptr_to_python<MoneyManagerPtr>();
-
-    def("MM_Nothing", MM_Nothing, R"(MM_Nothing()
+    m.def("MM_Nothing", MM_Nothing, R"(MM_Nothing()
 
     特殊的资金管理策略，相当于不做资金管理，有多少钱买多少。)");
 
-    def("MM_FixedRisk", MM_FixedRisk, (arg("risk") = 1000.00), R"(MM_FixedRisk([risk = 1000.00])
+    m.def("MM_FixedRisk", MM_FixedRisk, py::arg("risk") = 1000.00,
+          R"(MM_FixedRisk([risk = 1000.00])
 
     固定风险资金管理策略对每笔交易限定一个预先确定的或者固定的资金风险，如每笔交易固定风险1000元。公式：交易数量 = 固定风险 / 交易风险。
 
     :param float risk: 固定风险
     :return: 资金管理策略实例)");
 
-    def("MM_FixedCapital", MM_FixedCapital, (arg("capital") = 10000.00),
-        R"(MM_FixedCapital([capital = 10000.0])
+    m.def("MM_FixedCapital", MM_FixedCapital, py::arg("capital") = 10000.00,
+          R"(MM_FixedCapital([capital = 10000.0])
 
     固定资本资金管理策略
 
     :param float capital: 固定资本单位
     :return: 资金管理策略实例)");
 
-    def("MM_FixedCount", MM_FixedCount, (arg("n") = 100), R"(MM_FixedCount([n = 100])
+    m.def("MM_FixedCount", MM_FixedCount, py::arg("n") = 100, R"(MM_FixedCount([n = 100])
 
     固定交易数量资金管理策略。每次买入固定的数量。
     
     :param float n: 每次买入的数量（应该是交易对象最小交易数量的整数，此处程序没有此进行判断）
     :return: 资金管理策略实例)");
 
-    def("MM_FixedPercent", MM_FixedPercent, (arg("p") = 0.03), R"(MM_FixedPercent([p = 0.03])
+    m.def("MM_FixedPercent", MM_FixedPercent, py::arg("p") = 0.03, R"(MM_FixedPercent([p = 0.03])
 
     固定百分比风险模型。公式：P（头寸规模）＝ 账户余额 * 百分比 / R（每股的交易风险）。[BOOK3]_, [BOOK4]_ .
     
     :param float p: 百分比
     :return: 资金管理策略实例)");
 
-    def("MM_FixedUnits", MM_FixedUnits, (arg("n") = 33), R"(MM_FixedUnits([n = 33])
+    m.def("MM_FixedUnits", MM_FixedUnits, py::arg("n") = 33, R"(MM_FixedUnits([n = 33])
 
     固定单位资金管理策略
 
     :param int n: n个资金单位
     :return: 资金管理策略实例)");
 
-    def("MM_WilliamsFixedRisk", MM_WilliamsFixedRisk, (arg("p") = 0.1, arg("max_loss") = 1000.0),
-        R"( MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
+    m.def("MM_WilliamsFixedRisk", MM_WilliamsFixedRisk, py::arg("p") = 0.1,
+          py::arg("max_loss") = 1000.0,
+          R"( MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
     威廉斯固定风险资金管理策略)");
 }

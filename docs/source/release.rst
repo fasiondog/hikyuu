@@ -1,6 +1,117 @@
 版本发布说明
 =======================
 
+1.3.5 - 2024年2月29日
+-------------------------
+
+1. 整体性能优化
+    - 整体性能优化，Indicator 计算速度再次提升 10% ~ 20%
+    - 编译支持 low_precision 参数，Indicator 可以使用 float 进行计算，在前述基础上可以再次提升计算速度，尤其是指支持 float neon 的 arm 芯片。（需自行编译）
+
+2. 功能增强
+    - 增加 STOCKTYPE_CRYPTO 数字货币类型，及其相关修改支持
+    - 系统有效条件组件 Condition 支持逻辑操作（+,-,*,/,&,|），及支持 _addValid 时附带额外数值（后续版本会在其他系统部件中增加此功能）
+    - 增加 EV_bool 系统环境组件，python 中增加 ev.plot 绘制 ev
+    - ev 增加线程保护，ev 通常作为公用组件，只计算一次，需要增加线程保护
+    - hikyuutdx 导入工具过滤长度非 6 位的证券代码，防止导入速度严重变慢
+
+3. 缺陷修复
+    - fixed 相关系数指标 CORR
+    - fixed Indicator 动态优化错误，部分使用 getResult 后再使用的场景执行失败
+    - fixed 系统策略组件 clone 操作中未对引用的 Indicator clone，导致崩溃
+    - fxied strategy的绑定string list到vector<string>出错的问题，和python TestStrategy中的type
+    - fixed python 中 SYS_Simple 中 cn 等函数参数不生效
+
+
+1.3.4 - 2024年2月1日
+-------------------------
+
+1. fixed windows 下第三方依赖 hikyuu 的 C++ 代码中无法使用 KData
+2. 调整 matplotlib font manager 日志级别
+
+
+1.3.3 - 2024年1月31日
+-------------------------
+
+1. 配合 hub （策略组件仓库） 使用 C++ 部件更新，参见 `<https://gitee.com/fasiondog/hikyuu_hub>`_
+2. 尝试获取用户目录下的 hosts.py，方便修改相关 pytdx 服务器设置
+3. 调整log级别宏定义避免windows下冲突
+4. 清理优化 cppcheck 告警提示信息
+
+
+1.3.2 - 2024年1月6日
+-------------------------
+
+1. 整体调整与优化
+    - 整体从 boost.python 切换至 pybind11，以便在 C++ 部分中可以方便的进行 GIL 解锁，并行调用 python 代码
+    - 优化权息数据加载速度，尤其是使用 MYSQL 引擎时，缩短初始化加载周期从 6s 至 1s
+    - Block信息改为使用 MySQL/SQLite 方式，原有钱龙ini格式支持保留，但需要自行修改配置文件，
+      且使用 HikyuuTdx 进行配置时，使用 hdf5 存储时，配置文件会被自动更新为使用 SQLite 方式。
+      如果想继续使用钱龙格式，需使用 importdata 进行导入，且需自行调用 tools/update_block_info.py 更新板块信息。
+
+2. 功能增强
+    - 优化行情采集服务支持网络内发送和接收数据
+    - 新增技术指标 MDD/MRR 相对历史最高值回撤百分比/相对历史最低值盈利比例
+    - 支持版本升级提示
+    - 创建默认配置文件，用于没有gui的环境
+    - Performance 增加单笔最大盈利/亏损比例统计
+    - add CN_Bool 布尔信号指标系统有效条件
+    - 增强Condiciton, 增加get_datetime_list, get_valuse方法
+    - hikyuutdx未选择数据时添加提示
+    - add Performance.to_df in python
+    - Datetime 增加 ticks 方法，获取距最小日期过去的微秒数
+
+3. 缺陷修复
+    - fixed 调整止盈初始值，使其在未发生盈利前不生效
+    - fixed BandSignal 缺失序列化
+    - fixed Condiciton在未设置SG时无法生效
+
+4. 其他修改
+    - 兼容 akshare 新旧版本
+    - 屏蔽 talib 导入告警
+
+
+1.3.1 - 2023年12月6日
+-------------------------
+
+1. 增加通达信时间指标(DATE/TIME/YEAR/MONTH/WEEK/DAY/HOUR/MINUTE)
+2. 增加 SLOPE 计算线性回归斜率指标
+3. 优化 MYSQL 引擎数据存储，支持分时/分笔数据导入，财务数据导入
+4. Datetime增加支持到秒级整数构建及ymdhms系列返回整数方法
+5. fixed 北交所数据导入未更新最后更新日期
+6. fixed CVAL 指标等效时可能造成的崩溃
+7. fixed windows下配置文件utf-8错误
+
+
+1.3.0 - 2023年11月5日
+-------------------------
+
+1. 性能优化
+
+    `#125 <https://github.com/fasiondog/hikyuu/pull/125>`_ 指标融合优化，计算速度提升了8~10倍左右。
+
+2. 功能增强
+
+    - TradeManager 引出买空/买空操作至 python
+    - Stock 引出 get_index_range 方法至 python
+    - 编译选项增加 stacktrace 选项，方便异常时打印 C++ 堆栈
+    - 优化 TimerManager、线程池、数据驱动等基础设施
+    - MySQL/SQLite 数据引擎支持绑定 datetime
+    - 优化指标默认名称
+    - 升级 flatbuffers 版本至 23.5.6
+    - 优化 Stock 的相等比较
+    - KQuery/KRecord/KData 相等/不等比较完善并引出至 python
+    - 完善 Performance
+
+3. 其他错误修复
+    - 更新 SG 信号指示器系列方法，去除移除 OP 后的一些遗留问题
+    - 修复 TradeList 转 np 时使用了已废弃的方法
+    - 修复 SUM 存在访问越界的问题
+    - 修复 IniParser 不支持 windows 中文路径的问题
+    - 修复 RSI 存在 NaN 值时计算错误
+    - 修复 Ubuntu 23.10 下编译失败的问题
+
+
 1.2.9 - 2023年10月9日
 -------------------------
 

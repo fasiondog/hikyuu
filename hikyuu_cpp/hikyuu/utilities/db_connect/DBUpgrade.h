@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <vector>
 #include "DBConnectBase.h"
 
 namespace hku {
@@ -21,7 +22,7 @@ namespace hku {
  * @ingroup DataDriver
  */
 void HKU_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
-                       const std::vector<string> &upgrade_scripts, int start_version = 2,
+                            const std::vector<std::string> &upgrade_scripts, int start_version = 2,
                        const char *create_script = nullptr);
 
 }  // namespace hku

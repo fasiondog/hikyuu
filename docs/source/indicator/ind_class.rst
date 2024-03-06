@@ -124,7 +124,7 @@ Indicator
         获取指定结果集
 
         :param int result_index: 指定的结果集
-        :rtype: PriceList
+        :rtype: list
 
     .. py:method:: get_datetime_list(self)
 

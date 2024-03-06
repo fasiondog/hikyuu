@@ -24,8 +24,10 @@
 
 import logging
 import sqlite3
+import mysql.connector
 from pytdx.hq import TdxHq_API
-from hikyuu.data.pytdx_to_h5 import import_data, import_trans
+from hikyuu.data.pytdx_to_h5 import import_trans as h5_import_trans
+from hikyuu.data.pytdx_to_mysql import import_trans as mysql_import_trans
 from hikyuu.util import *
 
 
@@ -40,12 +42,12 @@ class ProgressBar:
 
 
 class ImportPytdxTransToH5:
-    def __init__(self, log_queue, queue, sqlitefile, market, quotations, ip, port, dest_dir, max_days):
+    def __init__(self, log_queue, queue, config, market, quotations, ip, port, dest_dir, max_days):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.task_name = 'IMPORT_TRANS'
         self.log_queue = log_queue
         self.queue = queue
-        self.sqlitefile = sqlitefile
+        self.config = config
         self.market = market
         self.quotations = quotations
         self.ip = ip
@@ -58,8 +60,21 @@ class ImportPytdxTransToH5:
     def __call__(self):
         self.status = "running"
         capture_multiprocess_all_logger(self.log_queue)
+        if self.config.getboolean('hdf5', 'enable', fallback=True):
+            sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
+            connect = sqlite3.connect(sqlite_file, timeout=1800)
+            import_trans = h5_import_trans
+        else:
+            db_config = {
+                'user': self.config['mysql']['usr'],
+                'password': self.config['mysql']['pwd'],
+                'host': self.config['mysql']['host'],
+                'port': self.config['mysql']['port']
+            }
+            connect = mysql.connector.connect(**db_config)
+            import_trans = mysql_import_trans
+
         count = 0
-        connect = sqlite3.connect(self.sqlitefile, timeout=1800)
         try:
             progress = ProgressBar(self)
             api = TdxHq_API()

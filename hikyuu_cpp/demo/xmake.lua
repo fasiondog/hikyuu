@@ -1,15 +1,8 @@
-option("with-demo")
-    set_default(false)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Complie with demo")
-option_end()
-
 target("demo")
     set_kind("binary")
-    if is_mode("debug") then
-        set_default(false)
-    end
+    set_default(false)
+    
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time")
     
     add_packages("boost", "spdlog", "fmt", "flatbuffers")
     add_includedirs("..")
@@ -19,7 +12,7 @@ target("demo")
         add_cxflags("-wd4251")
     end
 
-    if is_plat("windows") and is_mode("release") then
+    if is_plat("windows") and get_config("kind") == "shared" then
         add_defines("HKU_API=__declspec(dllimport)")
         add_defines("SQLITE_API=__declspec(dllimport)")
     end

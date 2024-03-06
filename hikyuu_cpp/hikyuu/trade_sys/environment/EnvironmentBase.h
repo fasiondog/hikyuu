@@ -10,6 +10,7 @@
 #define ENVIRONMENT_H_
 
 #include <set>
+#include <shared_mutex>
 #include "../../KQuery.h"
 #include "../../utilities/Parameter.h"
 
@@ -20,7 +21,24 @@
 #include <boost/serialization/set.hpp>
 #include "../../serialization/Datetime_serialization.h"
 #include "../../serialization/KQuery_serialization.h"
-#endif
+
+#if HKU_SUPPORT_XML_ARCHIVE
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#endif /* HKU_SUPPORT_XML_ARCHIVE */
+
+#if HKU_SUPPORT_TEXT_ARCHIVE
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#endif /* HKU_SUPPORT_TEXT_ARCHIVE */
+
+#if HKU_SUPPORT_BINARY_ARCHIVE
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#endif /* HKU_SUPPORT_BINARY_ARCHIVE */
+
+#include <boost/serialization/export.hpp>
+#endif /* HKU_SUPPORT_SERIALIZATION */
 
 namespace hku {
 
@@ -38,7 +56,7 @@ public:
     virtual ~EnvironmentBase();
 
     /** 获取名称 */
-    string name() const {
+    const string& name() const {
         return m_name;
     }
 
@@ -54,7 +72,7 @@ public:
     void setQuery(const KQuery& query);
 
     /** 获取查询条件 */
-    KQuery getQuery() const {
+    const KQuery& getQuery() const {
         return m_query;
     }
 
@@ -92,6 +110,7 @@ protected:
     string m_name;
     KQuery m_query;
     std::set<Datetime> m_valid;
+    std::shared_mutex m_mutex;
 
 //============================================
 // 序列化支持

@@ -38,7 +38,8 @@ public:
 #endif
     }
 
-    virtual size_t getCount(const string& market, const string& code, KQuery::KType kType) override;
+    virtual size_t getCount(const string& market, const string& code,
+                            const KQuery::KType& kType) override;
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                                      size_t& out_start, size_t& out_end) override;
     virtual KRecordList getKRecordList(const string& market, const string& code,
@@ -62,10 +63,10 @@ private:
     bool _getOtherIndexRangeByDate(const string&, const string&, const KQuery&, size_t& out_start,
                                    size_t& out_end);
 
-    KRecordList _getBaseKRecordList(const string& market, const string& code, KQuery::KType kType,
-                                    size_t start_ix, size_t end_ix);
-    KRecordList _getIndexKRecordList(const string& market, const string& code, KQuery::KType kType,
-                                     size_t start_ix, size_t end_ix);
+    KRecordList _getBaseKRecordList(const string& market, const string& code,
+                                    const KQuery::KType& kType, size_t start_ix, size_t end_ix);
+    KRecordList _getIndexKRecordList(const string& market, const string& code,
+                                     const KQuery::KType& kType, size_t start_ix, size_t end_ix);
 
     TimeLineList _getTimeLine(const string& market, const string& code, int64_t start, int64_t end);
     TimeLineList _getTimeLine(const string& market, const string& code, const Datetime& start,

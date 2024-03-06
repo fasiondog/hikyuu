@@ -12,12 +12,12 @@
 
 namespace hku {
 
-SQLiteStatement::SQLiteStatement(DBConnectBase* driver, const string& sql_statement)
+SQLiteStatement::SQLiteStatement(DBConnectBase *driver, const string &sql_statement)
 : SQLStatementBase(driver, sql_statement),
   m_needs_reset(false),
   m_step_status(SQLITE_DONE),
   m_at_first_step(true),
-  m_db((dynamic_cast<SQLiteConnect*>(driver))->m_db),
+  m_db((dynamic_cast<SQLiteConnect *>(driver))->m_db),
   m_stmt(NULL) {
     int status =
       sqlite3_prepare_v2(m_db, m_sql_string.c_str(), m_sql_string.size() + 1, &m_stmt, NULL);
@@ -32,6 +32,7 @@ SQLiteStatement::SQLiteStatement(DBConnectBase* driver, const string& sql_statem
 
 SQLiteStatement::~SQLiteStatement() {
     sqlite3_finalize(m_stmt);
+    // m_db 来自 Connect，其生命周期有 Connect 管理，不能在这里释放
 }
 
 void SQLiteStatement::_reset() {
@@ -94,9 +95,24 @@ void SQLiteStatement::sub_bindInt(int idx, int64_t value) {
     SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
-void SQLiteStatement::sub_bindText(int idx, const string& item) {
+void SQLiteStatement::sub_bindDatetime(int idx, const Datetime &item) {
+    if (item == Null<Datetime>()) {
+        sub_bindNull(idx);
+    } else {
+        sub_bindText(idx, item.str());
+    }
+}
+
+void SQLiteStatement::sub_bindText(int idx, const string &item) {
     _reset();
-    int status = sqlite3_bind_text(m_stmt, idx + 1, item.c_str(), -1, SQLITE_TRANSIENT);
+    int status =
+      sqlite3_bind_text(m_stmt, idx + 1, item.c_str(), (int)item.size(), SQLITE_TRANSIENT);
+    SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
+}
+
+void SQLiteStatement::sub_bindText(int idx, const char *item, size_t len) {
+    _reset();
+    int status = sqlite3_bind_text(m_stmt, idx + 1, item, (int)len, SQLITE_TRANSIENT);
     SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
@@ -106,32 +122,49 @@ void SQLiteStatement::sub_bindDouble(int idx, double item) {
     SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
-void SQLiteStatement::sub_bindBlob(int idx, const string& item) {
+void SQLiteStatement::sub_bindBlob(int idx, const string &item) {
     _reset();
-    int status = sqlite3_bind_blob(m_stmt, idx + 1, item.data(), item.size(), SQLITE_TRANSIENT);
+    int status =
+      sqlite3_bind_blob(m_stmt, idx + 1, item.data(), (int)item.size(), SQLITE_TRANSIENT);
     SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
-void SQLiteStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
+void SQLiteStatement::sub_bindBlob(int idx, const char *item, size_t len) {
+    _reset();
+    int status = sqlite3_bind_blob(m_stmt, idx + 1, item, (int)len, SQLITE_TRANSIENT);
+    SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
+}
+
+void SQLiteStatement::sub_getColumnAsInt64(int idx, int64_t &item) {
     item = sqlite3_column_int64(m_stmt, idx);
 }
 
-void SQLiteStatement::sub_getColumnAsDouble(int idx, double& item) {
+void SQLiteStatement::sub_getColumnAsDouble(int idx, double &item) {
     item = sqlite3_column_double(m_stmt, idx);
 }
 
-void SQLiteStatement::sub_getColumnAsText(int idx, string& item) {
-    const char* data = reinterpret_cast<const char*>(sqlite3_column_text(m_stmt, idx));
-    item = (data != 0) ? string(data) : string();
+void SQLiteStatement::sub_getColumnAsDatetime(int idx, Datetime &item) {
+    std::string date_str;
+    sub_getColumnAsText(idx, date_str);
+    item = date_str.empty() ? Datetime() : Datetime(date_str);
 }
 
-void SQLiteStatement::sub_getColumnAsBlob(int idx, string& item) {
-    const char* data = static_cast<const char*>(sqlite3_column_blob(m_stmt, idx));
+void SQLiteStatement::sub_getColumnAsText(int idx, std::string &item) {
+    const char *data = reinterpret_cast<const char *>(sqlite3_column_text(m_stmt, idx));
+    item = (data != 0) ? std::string(data) : std::string();
+}
+
+void SQLiteStatement::sub_getColumnAsBlob(int idx, std::string &item) {
+    const char *data = static_cast<const char *>(sqlite3_column_blob(m_stmt, idx));
     if (data == NULL) {
         throw null_blob_exception();
     }
     const int size = sqlite3_column_bytes(m_stmt, idx);
     item = std::string(data, size);
+}
+
+uint64_t SQLiteStatement::sub_getLastRowid() {
+    return sqlite3_last_insert_rowid(m_db);
 }
 
 }  // namespace hku

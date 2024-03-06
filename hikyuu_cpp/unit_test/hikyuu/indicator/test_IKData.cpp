@@ -66,48 +66,48 @@ TEST_CASE("test_IKData") {
     ki = KDATA(kdata);
     CHECK_EQ(ki.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(ki.get(i, 0), kdata[i].openPrice);
-        CHECK_EQ(ki.get(i, 1), kdata[i].highPrice);
-        CHECK_EQ(ki.get(i, 2), kdata[i].lowPrice);
-        CHECK_EQ(ki.get(i, 3), kdata[i].closePrice);
-        CHECK_EQ(ki.get(i, 4), kdata[i].transAmount);
-        CHECK_EQ(ki.get(i, 5), kdata[i].transCount);
+        CHECK_EQ(ki.get(i, 0), doctest::Approx(kdata[i].openPrice));
+        CHECK_EQ(ki.get(i, 1), doctest::Approx(kdata[i].highPrice));
+        CHECK_EQ(ki.get(i, 2), doctest::Approx(kdata[i].lowPrice));
+        CHECK_EQ(ki.get(i, 3), doctest::Approx(kdata[i].closePrice));
+        CHECK_EQ(ki.get(i, 4), doctest::Approx(kdata[i].transAmount));
+        CHECK_EQ(ki.get(i, 5), doctest::Approx(kdata[i].transCount));
     }
 
     open = OPEN(kdata);
     CHECK_EQ(open.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(open[i], kdata[i].openPrice);
+        CHECK_EQ(open[i], doctest::Approx(kdata[i].openPrice));
     }
 
     high = HIGH(kdata);
     CHECK_EQ(high.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(high[i], kdata[i].highPrice);
+        CHECK_EQ(high[i], doctest::Approx(kdata[i].highPrice));
     }
 
     low = LOW(kdata);
     CHECK_EQ(low.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(low[i], kdata[i].lowPrice);
+        CHECK_EQ(low[i], doctest::Approx(kdata[i].lowPrice));
     }
 
     close = CLOSE(kdata);
     CHECK_EQ(close.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(close[i], kdata[i].closePrice);
+        CHECK_EQ(close[i], doctest::Approx(kdata[i].closePrice));
     }
 
     amount = AMO(kdata);
     CHECK_EQ(amount.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(amount[i], kdata[i].transAmount);
+        CHECK_EQ(amount[i], doctest::Approx(kdata[i].transAmount));
     }
 
     count = VOL(kdata);
     CHECK_EQ(count.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(count[i], kdata[i].transCount);
+        CHECK_EQ(count[i], doctest::Approx(kdata[i].transCount));
     }
 }
 
@@ -126,54 +126,54 @@ TEST_CASE("test_IKData_setContext") {
     ki.setContext(stock, query);
     CHECK_EQ(ki.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(ki.get(i, 0), kdata[i].openPrice);
-        CHECK_EQ(ki.get(i, 1), kdata[i].highPrice);
-        CHECK_EQ(ki.get(i, 2), kdata[i].lowPrice);
-        CHECK_EQ(ki.get(i, 3), kdata[i].closePrice);
-        CHECK_EQ(ki.get(i, 4), kdata[i].transAmount);
-        CHECK_EQ(ki.get(i, 5), kdata[i].transCount);
+        CHECK_EQ(ki.get(i, 0), doctest::Approx(kdata[i].openPrice));
+        CHECK_EQ(ki.get(i, 1), doctest::Approx(kdata[i].highPrice));
+        CHECK_EQ(ki.get(i, 2), doctest::Approx(kdata[i].lowPrice));
+        CHECK_EQ(ki.get(i, 3), doctest::Approx(kdata[i].closePrice));
+        CHECK_EQ(ki.get(i, 4), doctest::Approx(kdata[i].transAmount));
+        CHECK_EQ(ki.get(i, 5), doctest::Approx(kdata[i].transCount));
     }
 
     open = OPEN();
     open.setContext(stock, query);
     CHECK_EQ(open.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(open[i], kdata[i].openPrice);
+        CHECK_EQ(open[i], doctest::Approx(kdata[i].openPrice));
     }
 
     high = HIGH();
     high.setContext(stock, query);
     CHECK_EQ(high.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(high[i], kdata[i].highPrice);
+        CHECK_EQ(high[i], doctest::Approx(kdata[i].highPrice));
     }
 
     low = LOW();
     low.setContext(stock, query);
     CHECK_EQ(low.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(low[i], kdata[i].lowPrice);
+        CHECK_EQ(low[i], doctest::Approx(kdata[i].lowPrice));
     }
 
     close = CLOSE();
     close.setContext(stock, query);
     CHECK_EQ(close.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(close[i], kdata[i].closePrice);
+        CHECK_EQ(close[i], doctest::Approx(kdata[i].closePrice));
     }
 
     amount = AMO();
     amount.setContext(stock, query);
     CHECK_EQ(amount.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(amount[i], kdata[i].transAmount);
+        CHECK_EQ(amount[i], doctest::Approx(kdata[i].transAmount));
     }
 
     count = VOL();
     count.setContext(stock, query);
     CHECK_EQ(count.size(), kdata.size());
     for (size_t i = 0; i < total; ++i) {
-        CHECK_EQ(count[i], kdata[i].transCount);
+        CHECK_EQ(count[i], doctest::Approx(kdata[i].transCount));
     }
 }
 

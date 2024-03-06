@@ -40,4 +40,5 @@ __all__ = [
     'hku_fatal_if',
     'with_trace',
     'capture_multiprocess_all_logger',
+    'LoggingContext',
 ]

@@ -7,6 +7,10 @@
 
 #include "FixedUnitsMoneyManager.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::FixedUnitsMoneyManager)
+#endif
+
 namespace hku {
 
 FixedUnitsMoneyManager::FixedUnitsMoneyManager() : MoneyManagerBase("MM_FixedUnits") {

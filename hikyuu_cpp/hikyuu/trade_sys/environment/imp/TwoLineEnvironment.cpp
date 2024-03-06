@@ -9,14 +9,18 @@
 #include "../../../indicator/crt/KDATA.h"
 #include "TwoLineEnvironment.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::TwoLineEnvironment)
+#endif
+
 namespace hku {
 
-TwoLineEnvironment::TwoLineEnvironment() : EnvironmentBase("TwoLine") {
+TwoLineEnvironment::TwoLineEnvironment() : EnvironmentBase("EV_TwoLine") {
     setParam<string>("market", "SH");
 }
 
 TwoLineEnvironment::TwoLineEnvironment(const Indicator& fast, const Indicator& slow)
-: EnvironmentBase("TwoLine"), m_fast(fast), m_slow(slow) {
+: EnvironmentBase("EV_TwoLine"), m_fast(fast), m_slow(slow) {
     setParam<string>("market", "SH");
 }
 
@@ -24,8 +28,8 @@ TwoLineEnvironment::~TwoLineEnvironment() {}
 
 EnvironmentPtr TwoLineEnvironment::_clone() {
     TwoLineEnvironment* ptr = new TwoLineEnvironment;
-    ptr->m_fast = m_fast;
-    ptr->m_slow = m_slow;
+    ptr->m_fast = m_fast.clone();
+    ptr->m_slow = m_slow.clone();
     return EnvironmentPtr(ptr);
 }
 
@@ -43,9 +47,12 @@ void TwoLineEnvironment::_calculate() {
 
     size_t total = close.size();
     size_t start = fast.discard() > slow.discard() ? fast.discard() : slow.discard();
+    auto const* fast_data = fast.data();
+    auto const* slow_data = slow.data();
+    auto const* ks = kdata.data();
     for (size_t i = start; i < total; i++) {
-        if (fast[i] > slow[i]) {
-            _addValid(kdata[i].datetime);
+        if (fast_data[i] > slow_data[i]) {
+            _addValid(ks[i].datetime);
         }
     }
 }

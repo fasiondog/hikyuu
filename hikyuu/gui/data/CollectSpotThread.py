@@ -8,10 +8,8 @@ import datetime
 from math import ceil
 from PyQt5.QtCore import QThread, QWaitCondition, QMutex
 
-from hikyuu import Datetime, TimeDelta, hikyuu_init, StockManager, constant
 from hikyuu.util import *
-from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot, get_spot_parallel
-from hikyuu.gui.spot_server import collect, release_nng_sender
+from hikyuu.gui.spot_server import collect, release_nng_senders
 
 
 class CollectSpotThread(QThread):
@@ -20,6 +18,7 @@ class CollectSpotThread(QThread):
         self.working = True
         self._config = config
         self.hku_config_file = hku_config_file
+        self._quotation_server = config.get('collect', 'quotation_server')
         self._interval = config.getint('collect', 'interval', fallback=60 * 60)
         self._phase1_start_time = config.get('collect', 'phase1_start', fallback='09:00')
         self._phase1_end_time = config.get('collect', 'phase1_end', fallback='12:05')
@@ -29,17 +28,16 @@ class CollectSpotThread(QThread):
         self._source = config.get('collect', 'source', fallback='qq')
 
     def __del__(self):
-        release_nng_sender()
+        release_nng_senders()
         hku_info("Quit CollectSpotThread")
 
     @hku_catch(trace=True)
     def run(self):
         self.logger.info("current data source: {}".format(self._source))
-        collect(
-            self._use_zhima_proxy, self._source, self._interval,
-            '{}-{}'.format(self._phase1_start_time,
-                           self._phase1_end_time), '{}-{}'.format(self._phase2_start_time, self._phase2_end_time), True
-        )
+        collect(self._quotation_server, self._use_zhima_proxy, self._source, self._interval,
+                '{}-{}'.format(self._phase1_start_time,
+                               self._phase1_end_time), '{}-{}'.format(self._phase2_start_time, self._phase2_end_time), True
+                )
 
 
 class_logger(CollectSpotThread)

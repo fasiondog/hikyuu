@@ -43,24 +43,25 @@ void ISaftyLoss::_calculate(const Indicator& data) {
         return;
     }
 
-    price_t result(0.0);
+    auto const* src = data.data();
+    auto* dst = this->data();
 
     size_t start = discard();
     for (size_t i = start; i < total; ++i) {
-        result = 0.0;
+        price_t result = 0.0;
         for (size_t j = i + 1 - n2; j <= i; ++j) {
             price_t sum = 0.0;
             size_t num = 0;
             for (size_t k = j + 2 - n1; k <= j; ++k) {
-                price_t pre = data[k - 1];
-                price_t cur = data[k];
+                price_t pre = src[k - 1];
+                price_t cur = src[k];
                 if (pre > cur) {
                     sum += pre - cur;
                     ++num;
                 }
             }
 
-            price_t temp = data[j];
+            price_t temp = src[j];
             if (num != 0) {
                 temp = temp - (p * sum / num);
             }
@@ -70,7 +71,7 @@ void ISaftyLoss::_calculate(const Indicator& data) {
             }
         }
 
-        _set(result, i);
+        dst[i] = result;
     }
 }
 
@@ -118,9 +119,7 @@ void ISaftyLoss::_dyn_calculate(const Indicator& ind) {
     }
 
     size_t circleLength = minCircleLength;
-    if (minCircleLength * workerNum >= total) {
-        circleLength = minCircleLength;
-    } else {
+    if (minCircleLength * workerNum < total) {
         size_t tailCount = total % workerNum;
         circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
     }

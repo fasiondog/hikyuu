@@ -15,6 +15,7 @@
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/signal/crt/SG_CrossGold.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
+#include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/EMA.h>
 
 using namespace hku;
@@ -30,13 +31,13 @@ TEST_CASE("test_PF_for_delay_and_no_adjust") {
     StockManager& sm = StockManager::instance();
 
     SYSPtr sys = SYS_Simple();
-    sys->setSG(SG_CrossGold(EMA(12), EMA(26)));
+    sys->setSG(SG_CrossGold(EMA(CLOSE(), 12), EMA(CLOSE(), 26)));
     sys->setMM(MM_FixedCount(100));
     SYSPtr pro_sys = sys->clone();
 
     TMPtr tm = crtTM(Datetime(199001010000L), 500000);
     SEPtr se = SE_Fixed();
-    se->addStockList({sm["sz000001"], sm["sz000063"],sm["sz000651"]}, sys);
+    se->addStockList({sm["sz000001"], sm["sz000063"], sm["sz000651"]}, sys);
     AFPtr af = AF_EqualWeight();
     PFPtr pf = PF_Simple(tm, se, af);
 

@@ -50,6 +50,22 @@ option("tdx")
     set_description("Enable tdx kdata engine.")
 option_end()
 
+option("stacktrace")
+    set_default(true)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable check/assert with stack trace info.")
+    add_defines("HKU_ENABLE_STACK_TRACE")
+option_end()
+
+option("spend_time")
+    set_default(true)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable spend time.")
+    add_defines("HKU_CLOSE_SPEND_TIME=0")
+option_end()
+
 option("feedback")
     set_default(true)
     set_showmenu(true)
@@ -57,6 +73,12 @@ option("feedback")
     set_description("Enable send feedback.")
 option_end()
 
+option("low_precision")
+    set_default(false)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable send feedback.")
+option_end()
 
 -- project
 set_project("hikyuu")
@@ -65,7 +87,7 @@ add_rules("mode.debug", "mode.release")
 if not is_plat("windows") then add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan") end
 
 -- version
-set_version("1.2.9", {build = "%Y%m%d%H%M"})
+set_version("1.3.5", {build = "%Y%m%d%H%M"})
 set_configvar("LOG_ACTIVE_LEVEL", 0) -- 激活的日志级别
 -- if is_mode("debug") then
 --    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别
@@ -92,26 +114,32 @@ set_configvar("HKU_ENABLE_MYSQL_KDATA", get_config("mysql") and 1 or 0)
 set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
 set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
--- set warning all as error
-if is_plat("windows") then
-   set_warnings("all", "error")
-else
-    set_warnings("all")
-end
+set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
+
+set_warnings("all")
 
 -- set language: C99, c++ standard
 set_languages("cxx17", "c99")
 
-local boost_version = "1.81.0"
+if is_plat("windows") then
+    if is_mode("release") then
+        set_runtimes("MD")
+    else
+        set_runtimes("MDd")
+    end
+end
+
+local boost_version = "1.84.0"
 local hdf5_version = "1.12.2"
-local fmt_version = "10.0.0"
-local flatbuffers_version = "2.0.0"
+local fmt_version = "10.2.1"
+local flatbuffers_version = "23.5.26"
+local sqlite_version = "3.43.0+200"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
     mysql_version = "8.0.21" 
 end
 
-add_repositories("project-repo hikyuu_extern_libs")
+add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.git")
 if is_plat("windows") then
     if get_config("hdf5") then
         if is_mode("release") then
@@ -141,40 +169,38 @@ elseif is_plat("macosx") then
     end
 end
 
-add_requires("myboost " .. boost_version, {
+add_requires("boost " .. boost_version, {
   system = false,
-  alias = "boost",
   debug = is_mode("debug"),
   configs = {
-    shared = is_plat("windows") and true or false,
-    data_time = true,
+    shared = is_plat("windows"),
+    multi = true,
+    date_time = true,
     filesystem = true,
     serialization = true,
     system = false,
-    python = true,
-    pyver = get_config("pyver"),
+    python = false,
   },
 })
-if is_plat("windows") then
-  add_requireconfs("myboost.python", {override = true, system=false})
-end
 
-add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true, vs_runtime = "MD"}})
+add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
 add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
-add_requires("sqlite3", {system = false, configs = {shared = true, vs_runtime = "MD", cxflags = "-fPIC"}})
-add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs = {vs_runtime = "MD"}})
-add_requires("nng", {system = false, configs = {vs_runtime = "MD", cxflags = "-fPIC"}})
+add_requires("sqlite3 " .. sqlite_version, {system = false, configs = {shared = true, cxflags = "-fPIC"}})
+add_requires("flatbuffers v" .. flatbuffers_version, {system = false})
+add_requires("nng", {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib", {system = false, configs = {zlib = true, ssl = true}})
 add_requires("zlib", {system = false})
 
-add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
+add_defines("SPDLOG_DISABLExm_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
 -- modifed to use boost static library, except boost.python, serialization
-if is_plat("windows") then add_defines("BOOST_ALL_DYN_LINK") end
+if is_plat("windows") and get_config("kind") == "shared" then 
+    add_defines("BOOST_ALL_DYN_LINK") 
+end
 
 -- is release now
 if is_mode("release") then
@@ -191,11 +217,8 @@ if is_plat("windows") then
   add_cxflags("-EHsc", "/Zc:__cplusplus", "/utf-8")
   add_cxflags("-wd4819") -- template dll export warning
   add_defines("WIN32_LEAN_AND_MEAN")
-  if is_mode("release") then
-    add_cxflags("-MD")
-  elseif is_mode("debug") then
+  if is_mode("debug") then
     add_cxflags("-Gs", "-RTC1", "/bigobj")
-    add_cxflags("-MDd")
   end
 end
 
@@ -206,19 +229,14 @@ if not is_plat("windows") then
   add_shflags("-pthread")
   add_ldflags("-pthread")
 end
---
--- add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "avx")
-if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
-  -- fedora或者ubuntu，并且不是交叉编译
-  add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")
-end
+
+-- if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
+--   -- fedora或者ubuntu，并且不是交叉编译
+--   add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")
+-- --   add_defines("HKU_ENABLE_SSE2", "HKU_ENABLE_SSE3", "HKU_ENABLE_SSE41", "HKU_ENABLE_AVX", "HKU_ENABLE_AVX2")
+-- end
 
 includes("./hikyuu_cpp/hikyuu")
 includes("./hikyuu_pywrap")
 includes("./hikyuu_cpp/unit_test")
 includes("./hikyuu_cpp/demo")
-includes("./hikyuu_cpp/hikyuu_server")
-
-before_install("scripts.before_install")
-on_install("scripts.on_install")
-before_run("scripts.before_run")

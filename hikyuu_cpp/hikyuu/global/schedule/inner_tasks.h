@@ -9,7 +9,7 @@
 
 namespace hku {
 
-void initInnerTasek();
+void initInnerTask();
 
 void reloadHikyuuTask();
 

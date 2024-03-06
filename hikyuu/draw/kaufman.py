@@ -24,33 +24,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-#===============================================================================
+# ===============================================================================
 # History:
 # 1. 20100224, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 """
 绘制佩里.J.考夫曼（Perry J.Kaufman） 自适应移动平均系统(AMA)
 参见：《精明交易者》（2006年 广东经济出版社） 
 """
 
 from hikyuu import (
-    Query, StockManager, AMA, STDEV, CVAL, PRICELIST, EMA, CLOSE, HIGH, LOW, OPEN, KDATA, POS,
-    SG_Single, SG_Cross, SG_Flex, BUSINESS
+    Query, StockManager, AMA, STDEV, CVAL, PRICELIST, EMA, CLOSE, HIGH, LOW, OPEN, KDATA, POS, SG_Single, SG_Cross,
+    SG_Flex, BUSINESS
 )
-from .drawplot import (
-    show_gcf, create_figure, ax_set_locator_formatter, adjust_axes_show, ax_draw_macd
-)
+from .drawplot import (show_gcf, create_figure, ax_set_locator_formatter, adjust_axes_show, ax_draw_macd)
 
 
 def draw(
-    stock,
-    query=Query(-130),
-    n=10,
-    filter_n=20,
-    filter_p=0.1,
-    sg_type="CROSS",
-    show_high_low=False,
-    arrow_style=1
+    stock, query=Query(-130), n=10, filter_n=20, filter_p=0.1, sg_type="CROSS", show_high_low=False, arrow_style=1
 ):
     """绘制佩里.J.考夫曼（Perry J.Kaufman） 自适应移动平均系统(AMA)"""
     kdata = stock.get_kdata(query)
@@ -77,7 +68,7 @@ def draw(
         lama.plot(axes=ax1, color='g', legend_on=True, kref=kdata)
 
     if sg_type == 'CROSS':
-        fast_op = AMA(n=n)
+        fast_op = AMA(CLOSE(), n=n)
         slow_op = EMA(n=2 * n)(fast_op)
         sg = SG_Cross(fast_op, slow_op)
         sg.plot(axes=ax1, kdata=kdata)
@@ -101,10 +92,10 @@ def draw(
     CVAL(c, -0.6).plot(axes=ax2, color='r', linestyle='--', kref=kdata)
     CVAL(c, -0.8).plot(axes=ax2, color='r', linestyle='--', kref=kdata)
     CVAL(c, 0).plot(axes=ax2, color='k', linestyle='-', kref=kdata)
-    #ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')
-    #ax2.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
-    #ax2.hlines(-0.8,0,len(kdata),color='r',linestyle='--')
-    #ax2.hlines(0,0,len(kdata))
+    # ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')
+    # ax2.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
+    # ax2.hlines(-0.8,0,len(kdata),color='r',linestyle='--')
+    # ax2.hlines(0,0,len(kdata))
 
     ax1.set_xlim((0, len(kdata)))
     ax_set_locator_formatter(ax1, kdata.get_datetime_list(), query.ktype)
@@ -115,7 +106,7 @@ def draw(
 def draw2(
     block,
     query=Query(-130),
-    ama1=AMA(n=10, fast_n=2, slow_n=30),
+    ama1=None,
     ama2=None,
     n=10,
     filter_n=20,
@@ -125,6 +116,8 @@ def draw2(
     arrow_style=1
 ):
     """绘制佩里.J.考夫曼（Perry J.Kaufman） 自适应移动平均系统(AMA)"""
+    if ama1 is None:
+        ama1 = AMA(CLOSE(), n=10, fast_n=2, slow_n=30)
     sm = StockManager.instance()
     if block.name == 'SZ':
         kdata = sm['sz000001'].get_kdata(query)
@@ -155,7 +148,7 @@ def draw2(
         lama.plot(axes=ax1, color='g', legend_on=True, kref=kdata)
 
     if sg_type == 'CROSS':
-        fast_op = AMA(n=n)
+        fast_op = AMA(CLOSE(), n=n)
         slow_op = EMA(n=2 * n)(fast_op)
         sg = SG_Cross(fast_op, slow_op)
         sg.plot(axes=ax1, kdata=kdata)
@@ -170,10 +163,10 @@ def draw2(
     else:
         print("sg_type only in ('CORSS', 'SINGLE')")
 
-    a = POS(block, query, SG_Flex(AMA(n=3), 6))
+    a = POS(block, query, SG_Flex(AMA(CLOSE(), n=3), 6))
     a.name = "POS(3)"
     a.plot(axes=ax2, color='b', marker='.', legend_on=True, kref=kdata)
-    a = POS(block, query, SG_Flex(AMA(n=30), 60))
+    a = POS(block, query, SG_Flex(AMA(CLOSE(), n=30), 60))
     a.name = "POS(30)"
     a.plot(axes=ax2, color='g', marker='.', legend_on=True, kref=kdata)
 
@@ -191,7 +184,7 @@ def draw2(
         CVAL(c, 0).plot(axes=ax3, color='k', linestyle='-', kref=kdata)
     else:
         ax_draw_macd(ax2, kdata)
-    #ax2.set_ylim(-1, 1)
+    # ax2.set_ylim(-1, 1)
 
     ax1.set_xlim((0, len(kdata)))
     ax_set_locator_formatter(ax1, kdata.get_datetime_list(), query.ktype)

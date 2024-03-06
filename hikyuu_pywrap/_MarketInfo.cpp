@@ -5,45 +5,34 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/serialization/MarketInfo_serialization.h>
-#include "pickle_support.h"
+#include "pybind_utils.h"
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
-void export_MarketInfo() {
-    class_<MarketInfo>("MarketInfo", "市场信息记录", init<>())
-      .def(init<const string&, const string&, const string&, const string&, const Datetime&,
-                TimeDelta, TimeDelta, TimeDelta, TimeDelta>())
-      //.def(self_ns::str(self))
+void export_MarketInfo(py::module& m) {
+    py::class_<MarketInfo>(m, "MarketInfo", "市场信息记录")
+      .def(py::init<>())
+      .def(py::init<const string&, const string&, const string&, const string&, const Datetime&,
+                    TimeDelta, TimeDelta, TimeDelta, TimeDelta>())
+
       .def("__str__", &MarketInfo::toString)
+      .def("__repr__", &MarketInfo::toString)
 
-      .add_property("market",
-                    make_function(&MarketInfo::market, return_value_policy<copy_const_reference>()),
-                    "市场标识（如：沪市“SH”, 深市“SZ”）")
+      .def_property_readonly("market", py::overload_cast<>(&MarketInfo::market, py::const_),
+                             "市场标识（如：沪市“SH”, 深市“SZ”）")
+      .def_property_readonly("name", py::overload_cast<>(&MarketInfo::name, py::const_), "市场全称")
+      .def_property_readonly("description",
+                             py::overload_cast<>(&MarketInfo::description, py::const_), "描述说明")
+      .def_property_readonly("code", py::overload_cast<>(&MarketInfo::code, py::const_),
+                             "该市场对应的主要指数代码，用于获取交易日历")
 
-      .add_property("name",
-                    make_function(&MarketInfo::name, return_value_policy<copy_const_reference>()),
-                    "市场全称")
+      .def_property_readonly("last_datetime", &MarketInfo::lastDate, "该市场K线数据最后交易日期")
+      .def_property_readonly("open_time1", &MarketInfo::openTime1, "开市时间1")
+      .def_property_readonly("close_time1", &MarketInfo::closeTime1, "闭市时间1")
+      .def_property_readonly("open_time2", &MarketInfo::openTime2, "开市时间2")
+      .def_property_readonly("close_time2", &MarketInfo::closeTime2, "闭市时间2")
 
-      .add_property(
-        "description",
-        make_function(&MarketInfo::description, return_value_policy<copy_const_reference>()),
-        "描述说明")
-
-      .add_property("code",
-                    make_function(&MarketInfo::code, return_value_policy<copy_const_reference>()),
-                    "该市场对应的主要指数代码，用于获取交易日历")
-
-      .add_property("last_datetime", &MarketInfo::lastDate, "该市场K线数据最后交易日期")
-      .add_property("open_time1", &MarketInfo::openTime1, "开市时间1")
-      .add_property("close_time1", &MarketInfo::closeTime1, "闭市时间1")
-      .add_property("open_time2", &MarketInfo::openTime2, "开市时间2")
-      .add_property("close_time2", &MarketInfo::closeTime2, "闭市时间2")
-
-#if HKU_PYTHON_SUPPORT_PICKLE
-      .def_pickle(normal_pickle_suite<MarketInfo>())
-#endif
-      ;
+        DEF_PICKLE(MarketInfo);
 }

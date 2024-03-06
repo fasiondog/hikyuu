@@ -14,7 +14,7 @@ using namespace hikyuu::flat;
 
 namespace hku {
 
-const char* SpotAgent::ms_pubUrl = "ipc:///tmp/hikyuu_real_pub.ipc";
+string SpotAgent::ms_pubUrl{"ipc:///tmp/hikyuu_real.ipc"};  // 数据发送服务地址
 const char* SpotAgent::ms_startTag = ":spot:[start spot]";
 const char* SpotAgent::ms_endTag = ":spot:[end spot]";
 const char* SpotAgent::ms_spotTopic = ":spot:";
@@ -23,6 +23,10 @@ const size_t SpotAgent::ms_startTagLength = strlen(SpotAgent::ms_startTag);
 const size_t SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
 
 Datetime SpotAgent::ms_start_rev_time;
+
+void SpotAgent::setQuotationServer(const string& server) {
+    ms_pubUrl = server;
+}
 
 SpotAgent::~SpotAgent() {
     stop();
@@ -70,7 +74,7 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
         result->low = spot->low();
         result->close = spot->close();
         result->amount = spot->amount();
-        result->volumn = spot->volumn();
+        result->volume = spot->volume();
         result->bid1 = spot->bid1();
         result->bid1_amount = spot->bid1_amount();
         result->bid2 = spot->bid2();
@@ -123,9 +127,9 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     m_batch_count += total;
     for (size_t i = 0; i < total; i++) {
         auto* spot = spots->Get(i);
-        for (auto& process : m_processList) {
-            auto spot_record = parseFlatSpot(spot);
-            if (spot_record) {
+        auto spot_record = parseFlatSpot(spot);
+        if (spot_record) {
+            for (const auto& process : m_processList) {
                 m_process_task_list.push_back(m_tg.submit(ProcessTask(process, *spot_record)));
             }
         }
@@ -150,25 +154,25 @@ void SpotAgent::work_thread() {
 
     rv = -1;
     while (!m_stop && rv != 0) {
-        rv = nng_dial(sock, ms_pubUrl, nullptr, 0);
-        HKU_WARN_IF(
-          rv != 0,
-          "Faied nng_dial, will retry after 5 seconds! You Maybe need start the collection service "
-          "first.");
+        rv = nng_dial(sock, ms_pubUrl.c_str(), nullptr, 0);
+        HKU_WARN_IF(m_print && rv != 0,
+                    "Faied connect quotation server {}, will retry after 5 seconds! You Maybe need "
+                    "start  the collection service first.",
+                    ms_pubUrl);
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
-    HKU_INFO("Ready to receive ...");
+    HKU_INFO_IF(m_print, "Ready to receive quotation ...");
 
     while (!m_stop) {
         char* buf = nullptr;
         size_t length = 0;
         try {
             rv = nng_recv(sock, &buf, &length, NNG_FLAG_ALLOC);
+            HKU_CHECK(rv == 0 || rv == NNG_ETIMEDOUT, "Failed nng_recv! {} ", nng_strerror(rv));
             if (!buf || length == 0) {
                 continue;
             }
-            HKU_CHECK(rv == 0 || rv == NNG_ETIMEDOUT, "Failed nng_recv! {} ", nng_strerror(rv));
             switch (m_status) {
                 case WAITING:
                     if (memcmp(buf, ms_startTag, ms_startTagLength) == 0) {
@@ -185,7 +189,7 @@ void SpotAgent::work_thread() {
                         HKU_INFO_IF(m_print, "received count: {}", m_batch_count);
                         m_batch_count = 0;
                         // 执行后处理
-                        for (auto& postProcess : m_postProcessList) {
+                        for (const auto& postProcess : m_postProcessList) {
                             postProcess(ms_start_rev_time);
                         }
                         m_process_task_list.clear();

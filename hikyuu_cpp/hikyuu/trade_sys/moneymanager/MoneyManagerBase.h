@@ -17,7 +17,24 @@
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/base_object.hpp>
-#endif
+
+#if HKU_SUPPORT_XML_ARCHIVE
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#endif /* HKU_SUPPORT_XML_ARCHIVE */
+
+#if HKU_SUPPORT_TEXT_ARCHIVE
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#endif /* HKU_SUPPORT_TEXT_ARCHIVE */
+
+#if HKU_SUPPORT_BINARY_ARCHIVE
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#endif /* HKU_SUPPORT_BINARY_ARCHIVE */
+
+#include <boost/serialization/export.hpp>
+#endif /* HKU_SUPPORT_SERIALIZATION */
 
 namespace hku {
 
@@ -34,7 +51,7 @@ public:
     virtual ~MoneyManagerBase();
 
     /** 获取名称 */
-    string name() const {
+    const string& name() const {
         return m_name;
     }
 
@@ -70,7 +87,7 @@ public:
     }
 
     /** 获取交易的K线类型 */
-    KQuery getQuery() const {
+    const KQuery& getQuery() const {
         return m_query;
     }
 

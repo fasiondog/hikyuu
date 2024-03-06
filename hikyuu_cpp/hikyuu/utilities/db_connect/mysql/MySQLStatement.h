@@ -11,6 +11,8 @@
 #ifndef HIYUU_DB_CONNECT_MYSQL_MYSQLSTATEMENT_H
 #define HIYUU_DB_CONNECT_MYSQL_MYSQLSTATEMENT_H
 
+#include <string>
+#include <vector>
 #include <boost/any.hpp>
 #include "../SQLStatementBase.h"
 
@@ -24,12 +26,16 @@
 typedef bool my_bool;
 #endif
 
+#ifndef HKU_API
+#define HKU_API
+#endif
+
 namespace hku {
 
 class HKU_API MySQLStatement : public SQLStatementBase {
 public:
     MySQLStatement() = delete;
-    MySQLStatement(DBConnectBase* driver, const string& sql_statement);
+    MySQLStatement(DBConnectBase* driver, const std::string& sql_statement);
     virtual ~MySQLStatement();
 
     virtual void sub_exec() override;
@@ -39,14 +45,18 @@ public:
     virtual void sub_bindNull(int idx) override;
     virtual void sub_bindInt(int idx, int64_t value) override;
     virtual void sub_bindDouble(int idx, double item) override;
-    virtual void sub_bindText(int idx, const string& item) override;
-    virtual void sub_bindBlob(int idx, const string& item) override;
+    virtual void sub_bindDatetime(int idx, const Datetime& item) override;
+    virtual void sub_bindText(int idx, const std::string& item) override;
+    virtual void sub_bindText(int idx, const char* item, size_t len) override;
+    virtual void sub_bindBlob(int idx, const std::string& item) override;
+    virtual void sub_bindBlob(int idx, const char* item, size_t len) override;
 
     virtual int sub_getNumColumns() const override;
     virtual void sub_getColumnAsInt64(int idx, int64_t& item) override;
     virtual void sub_getColumnAsDouble(int idx, double& item) override;
-    virtual void sub_getColumnAsText(int idx, string& item) override;
-    virtual void sub_getColumnAsBlob(int idx, string& item) override;
+    virtual void sub_getColumnAsDatetime(int idx, Datetime& item) override;
+    virtual void sub_getColumnAsText(int idx, std::string& item) override;
+    virtual void sub_getColumnAsBlob(int idx, std::string& item) override;
 
 private:
     void _reset();
@@ -58,13 +68,13 @@ private:
     MYSQL_RES* m_meta_result;
     bool m_needs_reset;
     bool m_has_bind_result;
-    vector<MYSQL_BIND> m_param_bind;
-    vector<MYSQL_BIND> m_result_bind;
-    vector<boost::any> m_param_buffer;
-    vector<boost::any> m_result_buffer;
-    vector<unsigned long> m_result_length;
-    vector<char> m_result_is_null;
-    vector<char> m_result_error;
+    std::vector<MYSQL_BIND> m_param_bind;
+    std::vector<MYSQL_BIND> m_result_bind;
+    std::vector<boost::any> m_param_buffer;
+    std::vector<boost::any> m_result_buffer;
+    std::vector<unsigned long> m_result_length;
+    std::vector<char> m_result_is_null;
+    std::vector<char> m_result_error;
 };
 
 inline uint64_t MySQLStatement::sub_getLastRowid() {

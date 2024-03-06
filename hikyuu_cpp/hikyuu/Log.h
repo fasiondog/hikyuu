@@ -30,6 +30,10 @@
 #include <fmt/format.h>
 #include <fmt/chrono.h>
 
+#ifdef HKU_ENABLE_STACK_TRACE
+#include <boost/stacktrace.hpp>
+#endif
+
 #ifndef HKU_API
 #define HKU_API
 #endif
@@ -56,13 +60,13 @@ int HKU_API getIORedirectToPythonCount();
 #if USE_SPDLOG_LOGGER
 /** 日志级别 */
 enum LOG_LEVEL {
-    TRACE = SPDLOG_LEVEL_TRACE,     ///< 跟踪
-    DEBUG = SPDLOG_LEVEL_DEBUG,     ///< 调试
-    INFO = SPDLOG_LEVEL_INFO,       ///< 一般信息
-    WARN = SPDLOG_LEVEL_WARN,       ///< 告警
-    ERROR = SPDLOG_LEVEL_ERROR,     ///< 错误
-    FATAL = SPDLOG_LEVEL_CRITICAL,  ///< 致命
-    OFF = SPDLOG_LEVEL_OFF,         ///< 关闭日志打印
+    LOG_TRACE = SPDLOG_LEVEL_TRACE,     ///< 跟踪
+    LOG_DEBUG = SPDLOG_LEVEL_DEBUG,     ///< 调试
+    LOG_INFO = SPDLOG_LEVEL_INFO,       ///< 一般信息
+    LOG_WARN = SPDLOG_LEVEL_WARN,       ///< 告警
+    LOG_ERROR = SPDLOG_LEVEL_ERROR,     ///< 错误
+    LOG_FATAL = SPDLOG_LEVEL_CRITICAL,  ///< 致命
+    LOG_OFF = SPDLOG_LEVEL_OFF,         ///< 关闭日志打印
 };
 
 /**
@@ -86,46 +90,46 @@ std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
 #define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)*/
 
-#define HKU_TRACE(...)                                                  \
-    do {                                                                \
-        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__);   \
-        }                                                               \
+#define HKU_TRACE(...)                                                            \
+    do {                                                                          \
+        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__);             \
+        }                                                                         \
     } while (0)
 
-#define HKU_DEBUG(...)                                                  \
-    do {                                                                \
-        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_DEBUG(hku::getHikyuuLogger(), __VA_ARGS__);   \
-        }                                                               \
+#define HKU_DEBUG(...)                                                            \
+    do {                                                                          \
+        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_DEBUG(hku::getHikyuuLogger(), __VA_ARGS__);             \
+        }                                                                         \
     } while (0)
 
-#define HKU_INFO(...)                                                   \
-    do {                                                                \
-        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_INFO(hku::getHikyuuLogger(), __VA_ARGS__);    \
-        }                                                               \
+#define HKU_INFO(...)                                                             \
+    do {                                                                          \
+        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_INFO(hku::getHikyuuLogger(), __VA_ARGS__);              \
+        }                                                                         \
     } while (0)
 
-#define HKU_WARN(...)                                                   \
-    do {                                                                \
-        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_WARN(hku::getHikyuuLogger(), __VA_ARGS__);    \
-        }                                                               \
+#define HKU_WARN(...)                                                             \
+    do {                                                                          \
+        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_WARN(hku::getHikyuuLogger(), __VA_ARGS__);              \
+        }                                                                         \
     } while (0)
 
-#define HKU_ERROR(...)                                                  \
-    do {                                                                \
-        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__);   \
-        }                                                               \
+#define HKU_ERROR(...)                                                            \
+    do {                                                                          \
+        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__);             \
+        }                                                                         \
     } while (0)
 
-#define HKU_FATAL(...)                                                   \
-    do {                                                                 \
-        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) {  \
-            SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__); \
-        }                                                                \
+#define HKU_FATAL(...)                                                            \
+    do {                                                                          \
+        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__);          \
+        }                                                                         \
     } while (0)
 
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
@@ -136,13 +140,13 @@ void initLogger();
 
 #else
 enum LOG_LEVEL {
-    TRACE = 0,
-    DEBUG = 1,
-    INFO = 2,
-    WARN = 3,
-    ERROR = 4,
-    FATAL = 5,
-    OFF = 6,
+    LOG_TRACE = 0,
+    LOG_DEBUG = 1,
+    LOG_INFO = 2,
+    LOG_WARN = 3,
+    LOG_ERROR = 4,
+    LOG_FATAL = 5,
+    LOG_OFF = 6,
 };
 
 LOG_LEVEL HKU_API get_log_level();
@@ -212,6 +216,7 @@ std::string HKU_API getLocalTime();
 #define HKU_FUNCTION __FUNCTION__
 #endif
 
+#ifndef HKU_ENABLE_STACK_TRACE
 /**
  * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
  * @note 用于外部入参及结果检查
@@ -220,7 +225,7 @@ std::string HKU_API getLocalTime();
     do {                                                                                       \
         if (!(expr)) {                                                                         \
             throw hku::exception(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr,               \
-                                             fmt::format(__VA_ARGS__), __FUNCTION__, __FILE__, \
+                                             fmt::format(__VA_ARGS__), HKU_FUNCTION, __FILE__, \
                                              __LINE__));                                       \
         }                                                                                      \
     } while (0)
@@ -233,9 +238,31 @@ std::string HKU_API getLocalTime();
     do {                                                                                           \
         if (!(expr)) {                                                                             \
             throw except(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr, fmt::format(__VA_ARGS__), \
-                                     __FUNCTION__, __FILE__, __LINE__));                           \
+                                     HKU_FUNCTION, __FILE__, __LINE__));                           \
         }                                                                                          \
     } while (0)
+
+#else
+#define HKU_CHECK(expr, ...)                                                                     \
+    do {                                                                                         \
+        if (!(expr)) {                                                                           \
+            std::string errmsg = fmt::format(__VA_ARGS__);                                       \
+            errmsg = fmt::format("{}\n {}", errmsg, to_string(boost::stacktrace::stacktrace())); \
+            throw hku::exception(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr, errmsg,         \
+                                             HKU_FUNCTION, __FILE__, __LINE__));                 \
+        }                                                                                        \
+    } while (0)
+
+#define HKU_CHECK_THROW(expr, except, ...)                                                       \
+    do {                                                                                         \
+        if (!(expr)) {                                                                           \
+            std::string errmsg = fmt::format(__VA_ARGS__);                                       \
+            errmsg = fmt::format("{}\n {}", errmsg, to_string(boost::stacktrace::stacktrace())); \
+            throw except(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr, errmsg, HKU_FUNCTION,   \
+                                     __FILE__, __LINE__));                                       \
+        }                                                                                        \
+    } while (0)
+#endif  // #ifndef HKU_ENABLE_STACK_TRACE
 
 #if HKU_DISABLE_ASSERT
 #define HKU_ASSERT(expr)
@@ -243,17 +270,42 @@ std::string HKU_API getLocalTime();
 
 #else /* #if HKU_DISABLE_ASSERT */
 
+#ifdef HKU_ENABLE_STACK_TRACE
 /**
  * 若表达式为 false，将抛出 hku::exception 异常
  * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
  */
+#define HKU_ASSERT(expr)                                                                         \
+    do {                                                                                         \
+        if (!(expr)) {                                                                           \
+            std::string err_msg(                                                                 \
+              fmt::format("ASSERT({})\n{}", #expr, to_string(boost::stacktrace::stacktrace()))); \
+            throw hku::exception(                                                                \
+              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__));        \
+        }                                                                                        \
+    } while (0)
+
+/**
+ * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
+ * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
+ */
+#define HKU_ASSERT_M(expr, ...)                                                                   \
+    do {                                                                                          \
+        if (!(expr)) {                                                                            \
+            std::string err_msg(fmt::format("ASSERT({}) {}\n{}", #expr, fmt::format(__VA_ARGS__), \
+                                            to_string(boost::stacktrace::stacktrace())));         \
+            throw hku::exception(                                                                 \
+              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__));         \
+        }                                                                                         \
+    } while (0)
+
+#else
 #define HKU_ASSERT(expr)                                                                  \
     do {                                                                                  \
         if (!(expr)) {                                                                    \
             std::string err_msg(fmt::format("ASSERT({})", #expr));                        \
-            HKU_ERROR(err_msg);                                                           \
             throw hku::exception(                                                         \
-              fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__)); \
+              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__)); \
         }                                                                                 \
     } while (0)
 
@@ -265,27 +317,45 @@ std::string HKU_API getLocalTime();
     do {                                                                                        \
         if (!(expr)) {                                                                          \
             std::string err_msg(fmt::format("ASSERT({}) {}", #expr, fmt::format(__VA_ARGS__))); \
-            HKU_ERROR(err_msg);                                                                 \
             throw hku::exception(                                                               \
-              fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__));       \
+              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__));       \
         }                                                                                       \
     } while (0)
+#endif  // #ifndef HKU_ENABLE_STACK_TRACE
+#endif  /* #if HKU_DISABLE_ASSERT */
 
-#endif /* #if HKU_DISABLE_ASSERT */
-
+#ifndef HKU_ENABLE_STACK_TRACE
 /** 抛出 hku::exception 及传入信息 */
 #define HKU_THROW(...)                                                                           \
     do {                                                                                         \
         throw hku::exception(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
-                                         __FUNCTION__, __FILE__, __LINE__));                     \
+                                         HKU_FUNCTION, __FILE__, __LINE__));                     \
     } while (0)
 
 /** 抛出指定异常及传入信息 */
 #define HKU_THROW_EXCEPTION(except, ...)                                                 \
     do {                                                                                 \
         throw except(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
-                                 __FUNCTION__, __FILE__, __LINE__));                     \
+                                 HKU_FUNCTION, __FILE__, __LINE__));                     \
     } while (0)
+
+#else
+#define HKU_THROW(...)                                                                          \
+    do {                                                                                        \
+        std::string errmsg(fmt::format("{}\n {}", fmt::format(__VA_ARGS__),                     \
+                                       to_string(boost::stacktrace::stacktrace())));            \
+        throw hku::exception(                                                                   \
+          fmt::format("EXCEPTION: {} [{}] ({}:{})", errmsg, HKU_FUNCTION, __FILE__, __LINE__)); \
+    } while (0)
+
+#define HKU_THROW_EXCEPTION(except, ...)                                                        \
+    do {                                                                                        \
+        std::string errmsg(fmt::format("{}\n {}", fmt::format(__VA_ARGS__),                     \
+                                       to_string(boost::stacktrace::stacktrace())));            \
+        throw except(                                                                           \
+          fmt::format("EXCEPTION: {} [{}] ({}:{})", errmsg, HKU_FUNCTION, __FILE__, __LINE__)); \
+    } while (0)
+#endif  // #ifndef HKU_ENABLE_STACK_TRACE
 
 /**
  * 满足指定条件时，打印 TRACE 信息

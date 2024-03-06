@@ -43,7 +43,7 @@ TEST_CASE("test_ATAN") {
     result = ATAN(-11);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result[0], std::atan(-11));
+    CHECK_EQ(result[0], doctest::Approx(std::atan(-11)));
 }
 
 //-----------------------------------------------------------------------------

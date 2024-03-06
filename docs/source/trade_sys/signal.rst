@@ -19,38 +19,36 @@
 双线交叉信号指示器
 ^^^^^^^^^^^^^^^^^^
 
-.. py:function:: SG_Cross(fast, slow[, kpart = "CLOSE"])
+.. py:function:: SG_Cross(fast, slow)
     
     双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。如：5日MA上穿10日MA时买入，5日MA线下穿MA10日线时卖出:: 
 
-        SG_Cross(OP(MA(n=10)), OP(MA(n=30)))
+        SG_Cross(MA(CLOSE(), n=10), OP(MA(n=30)))
 
     :param Indicator fast: 快线
     :param Indicator slow: 慢线
-    :param string kpart: OPEN|HIGH|LOW|CLOSE|AMO|VOL|KDATA
     :return: 信号指示器
         
         
 金叉信号指示器
 ^^^^^^^^^^^^^^^
 
-.. py:function:: SG_CrossGold(fast, slow[, kpart = "CLOSE"])
+.. py:function:: SG_CrossGold(fast, slow)
 
     金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入；
     当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。::
     
-        SG_CrossGold(OP(MA(n=10)), OP(MA(n=30)))
+        SG_CrossGold(MA(CLOSE(), n=10), MA(CLOSE(), n=30))
     
     :param Indicator fast: 快线
     :param Indicator slow: 慢线
-    :param string kpart: OPEN|HIGH|LOW|CLOSE|AMO|VOL|KDATA
     :return: 信号指示器    
         
 
 单线拐点信号指示器
 ^^^^^^^^^^^^^^^^^^
 
-.. py:function:: SG_Single(ind[, filter_n = 10, filter_p = 0.1, kpart='CLOSE'])
+.. py:function:: SG_Single(ind[, filter_n = 10, filter_p = 0.1])
     
     生成单线拐点信号指示器。使用《精明交易者》 [BOOK1]_ 中给出的曲线拐点算法判断曲线趋势，公式见下::
 
@@ -63,10 +61,9 @@
     :param Indicator ind:
     :param int filer_n: N日周期
     :param float filter_p: 过滤器百分比
-    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器
     
-.. py:function:: SG_Single2(ind[, filter_n = 10, filter_p = 0.1, kpart='CLOSE'])
+.. py:function:: SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
     
     生成单线拐点信号指示器2 [BOOK1]_::
 
@@ -78,31 +75,28 @@
     :param Indicator ind:
     :param int filer_n: N日周期
     :param float filter_p: 过滤器百分比
-    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器
    
 自交叉单线拐点指示器
 ^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: SG_Flex(ind, slow_n[, kpart = 'CLOSE'])
+.. py:function:: SG_Flex(ind, slow_n)
 
     使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。
 
     :param Indicator ind:
     :param int slow_n: 慢线EMA周期
-    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器
     
 布尔信号指示器
 ^^^^^^^^^^^^^^^^
 
-.. py:function:: SG_Bool(buy, sell[, kpart='CLOSE'])
+.. py:function:: SG_Bool(buy, sell)
 
     布尔信号指示器，使用运算结果为类似bool数组的Indicator分别作为买入、卖出指示。
     
     :param Indicator buy: 买入指示（结果Indicator中相应位置>0则代表买入）
     :param Indicator sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
-    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器
 
 

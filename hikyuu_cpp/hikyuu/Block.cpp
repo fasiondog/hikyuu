@@ -7,7 +7,6 @@
  *      Author: fasiondog
  */
 
-#include <boost/algorithm/string.hpp>
 #include "StockManager.h"
 
 namespace hku {
@@ -61,6 +60,16 @@ Stock Block::get(const string& market_code) const {
         result = iter->second;
     }
     return result;
+}
+
+vector<Stock> Block::getAllStocks() const {
+    vector<Stock> ret;
+    ret.reserve(size());
+    auto iter = m_data->m_stockDict.begin();
+    for (; iter != m_data->m_stockDict.end(); ++iter) {
+        ret.emplace_back(iter->second);
+    }
+    return ret;
 }
 
 bool Block::add(const Stock& stock) {

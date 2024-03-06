@@ -5,12 +5,12 @@
  *     Author: fasiondog
  */
 
-#include <boost/python.hpp>
+#include "../pybind_utils.h"
 #include <hikyuu/strategy/AccountTradeManager.h>
 
-using namespace boost::python;
 using namespace hku;
+namespace py = pybind11;
 
-void export_AccountTradeManger() {
-    def("crtAccountTM", crtAccountTM);
+void export_AccountTradeManger(py::module& m) {
+    m.def("crtAccountTM", crtAccountTM);
 }

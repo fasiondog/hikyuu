@@ -17,7 +17,7 @@ namespace hku {
 class BandSignal : public SignalBase {
 public:
     BandSignal();
-    BandSignal(const Indicator& sig, price_t lower, price_t upper, const string& kpart); 
+    BandSignal(const Indicator& sig, price_t lower, price_t upper);
     virtual ~BandSignal();
 
     virtual SignalPtr _clone() override;
@@ -25,7 +25,21 @@ public:
 
 private:
     Indicator m_ind;
-    price_t m_lower, m_upper;
+    price_t m_lower = 0.0, m_upper = 0.0;
+
+//============================================
+// 序列化支持
+//============================================
+#if HKU_SUPPORT_SERIALIZATION
+    friend class boost::serialization::access;
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SignalBase);
+        ar& BOOST_SERIALIZATION_NVP(m_ind);
+        ar& BOOST_SERIALIZATION_NVP(m_lower);
+        ar& BOOST_SERIALIZATION_NVP(m_upper);
+    }
+#endif
 };
 }  // namespace hku
 

@@ -20,15 +20,14 @@ class MQStealQueue {
 public:
     MQStealQueue() {}
 
-    void push(T item) {
+    void push(T&& item) {
         std::lock_guard<std::mutex> lk(m_mutex);
-        // m_queue.push(std::move(item));
         m_queue.push_back(std::move(item));
         m_cond.notify_one();
     }
 
     /** 将数据插入队列头部 */
-    void push_front(T data) {
+    void push_front(T&& data) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_queue.push_front(std::move(data));
         m_cond.notify_one();
@@ -38,7 +37,6 @@ public:
         std::unique_lock<std::mutex> lk(m_mutex);
         m_cond.wait(lk, [this] { return !m_queue.empty(); });
         value = std::move(m_queue.front());
-        // m_queue.pop();
         m_queue.pop_front();
     }
 
@@ -46,7 +44,6 @@ public:
         std::unique_lock<std::mutex> lk(m_mutex);
         m_cond.wait(lk, [this] { return !m_queue.empty(); });
         std::shared_ptr<T> res(std::make_shared<T>(std::move(m_queue.front())));
-        // m_queue.pop();
         m_queue.pop_front();
         return res;
     }
@@ -57,7 +54,6 @@ public:
             return false;
         }
         value = std::move(m_queue.front());
-        // m_queue.pop();
         m_queue.pop_front();
         return true;
     }
@@ -101,12 +97,16 @@ public:
         return m_queue.size();
     }
 
+    void clear() {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        auto tmp = std::deque<T>();
+        m_queue.swap(tmp);
+    }
+
 private:
     mutable std::mutex m_mutex;
-    // std::queue<T> m_queue;
     std::deque<T> m_queue;
     std::condition_variable m_cond;
 };
 
 } /* namespace hku */
-

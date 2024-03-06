@@ -13,6 +13,9 @@
 #include "Stock.h"
 #include "StockManager.h"
 #include "utilities/Parameter.h"
+#include "indicator/build_in.h"
+#include "trade_manage/build_in.h"
+#include "trade_sys/all.h"
 
 namespace hku {
 

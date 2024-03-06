@@ -62,9 +62,9 @@ TEST_CASE("test_SAFTYLOSS") {
     CHECK_EQ(result.size(), close.size());
     CHECK_EQ(result.discard(), 1);
     CHECK_UNARY(std::isnan(result[0]));
-    CHECK_EQ(result[1], 27.67);
-    CHECK_EQ(result[2], 28.05);
-    CHECK_EQ(result[3], 27.45);
+    CHECK_EQ(result[1], doctest::Approx(27.67));
+    CHECK_EQ(result[2], doctest::Approx(28.05));
+    CHECK_EQ(result[3], doctest::Approx(27.45));
     CHECK_LT(std::fabs(result[19] - 25.54), 0.0001);
 
     result = SAFTYLOSS(close, 2, 2, 1.0);
@@ -73,9 +73,9 @@ TEST_CASE("test_SAFTYLOSS") {
     CHECK_EQ(result.discard(), 2);
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
-    CHECK_EQ(result[2], 28.05);
-    CHECK_EQ(result[3], 28.05);
-    CHECK_EQ(result[4], 27.45);
+    CHECK_EQ(result[2], doctest::Approx(28.05));
+    CHECK_EQ(result[3], doctest::Approx(28.05));
+    CHECK_EQ(result[4], doctest::Approx(27.45));
     CHECK_LT(std::fabs(result[19] - 25.54), 0.0001);
 
     result = SAFTYLOSS(close, 3, 2, 2.0);

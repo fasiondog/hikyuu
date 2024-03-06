@@ -5,87 +5,47 @@
  *      Author: fasiondog
  */
 
-#include <boost/python.hpp>
 #include <hikyuu/trade_sys/profitgoal/build_in.h>
-#include "../_Parameter.h"
-#include "../pickle_support.h"
+#include "../pybind_utils.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 using namespace hku;
 
-class ProfitGoalWrap : public ProfitGoalBase, public wrapper<ProfitGoalBase> {
+class PyProfitGoalBase : public ProfitGoalBase {
+    PY_CLONE(PyProfitGoalBase, ProfitGoalBase)
+
 public:
-    ProfitGoalWrap() : ProfitGoalBase() {}
-    ProfitGoalWrap(const string& name) : ProfitGoalBase(name) {}
-    virtual ~ProfitGoalWrap() {}
+    using ProfitGoalBase::ProfitGoalBase;
 
-    void _reset() {
-        if (override func = get_override("_reset")) {
-            func();
-        } else {
-            ProfitGoalBase::_reset();
-        }
+    void buyNotify(const TradeRecord& tr) override {
+        PYBIND11_OVERLOAD_NAME(void, ProfitGoalBase, "buy_notify", buyNotify, tr);
     }
 
-    void default_reset() {
-        this->ProfitGoalBase::_reset();
+    void sellNotify(const TradeRecord& tr) override {
+        PYBIND11_OVERLOAD_NAME(void, ProfitGoalBase, "sell_notify", sellNotify, tr);
     }
 
-    ProfitGoalPtr _clone() {
-        return this->get_override("_clone")();
+    price_t getGoal(const Datetime& datetime, price_t price) override {
+        PYBIND11_OVERLOAD_PURE_NAME(price_t, ProfitGoalBase, "get_goal", getGoal, datetime, price);
     }
 
-    void _calculate() {
-        this->get_override("_calculate")();
+    price_t getShortGoal(const Datetime& date, price_t price) override {
+        PYBIND11_OVERLOAD_NAME(price_t, ProfitGoalBase, "get_short_goal", getShortGoal, date,
+                               price);
     }
 
-    void buyNotify(const TradeRecord& tr) {
-        if (override buy_notify = this->get_override("buy_notify")) {
-            buy_notify(tr);
-            return;
-        }
-
-        this->ProfitGoalBase::buyNotify(tr);
+    void _reset() override {
+        PYBIND11_OVERLOAD(void, ProfitGoalBase, _reset, );
     }
 
-    void default_buyNotify(const TradeRecord& tr) {
-        this->ProfitGoalBase::buyNotify(tr);
-    }
-
-    void sellNotify(const TradeRecord& tr) {
-        if (override sell_notify = this->get_override("sell_notify")) {
-            sell_notify(tr);
-            return;
-        }
-
-        this->ProfitGoalBase::sellNotify(tr);
-    }
-
-    void default_sellNotify(const TradeRecord& tr) {
-        this->ProfitGoalBase::sellNotify(tr);
-    }
-
-    price_t getGoal(const Datetime& datetime, price_t price) {
-        return this->get_override("get_goal")(datetime, price);
-    }
-
-    price_t getShortGoal(const Datetime& datetime, price_t price) {
-        if (override getShortGoal = get_override("get_short_goal")) {
-            return getShortGoal(datetime, price);
-        }
-        return ProfitGoalBase::getShortGoal(datetime, price);
-    }
-
-    price_t default_getShortGoal(const Datetime& datetime, price_t price) {
-        return this->ProfitGoalBase::getShortGoal(datetime, price);
-    }
+    void _calculate() override {
+        PYBIND11_OVERLOAD_PURE(void, ProfitGoalBase, _calculate, );
+    };
 };
 
-string (ProfitGoalBase::*pg_get_name)() const = &ProfitGoalBase::name;
-void (ProfitGoalBase::*pg_set_name)(const string&) = &ProfitGoalBase::name;
-
-void export_ProfitGoal() {
-    class_<ProfitGoalWrap, boost::noncopyable>("ProfitGoalBase", R"(盈利目标策略基类
+void export_ProfitGoal(py::module& m) {
+    py::class_<ProfitGoalBase, PGPtr, PyProfitGoalBase>(m, "ProfitGoalBase",
+                                                        R"(盈利目标策略基类
     
 自定义盈利目标策略接口：
 
@@ -94,16 +54,21 @@ void export_ProfitGoal() {
 - _clone : 【必须】克隆接口
 - _reset : 【可选】重载私有变量
 - buyNotify : 【可选】接收实际买入通知，预留用于多次增减仓处理
-- sellNotify : 【可选】接收实际卖出通知，预留用于多次增减仓处理)",
-                                               init<>())
+- sellNotify : 【可选】接收实际卖出通知，预留用于多次增减仓处理)")
 
-      .def(init<const string&>())
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
+      .def(py::init<>())
+      .def(py::init<const string&>(), R"(初始化构造函数
+        
+    :param str name: 名称)")
 
-      .add_property("name", pg_get_name, pg_set_name, "名称")
-      .add_property("to", &ProfitGoalBase::getTO, &ProfitGoalBase::setTO, "设置或获取交易对象")
-      .add_property("tm", &ProfitGoalBase::getTM, &ProfitGoalBase::setTM, "设置或获取交易管理账户")
+      .def("__str__", to_py_str<ProfitGoalBase>)
+      .def("__repr__", to_py_str<ProfitGoalBase>)
+
+      .def_property("name", py::overload_cast<>(&ProfitGoalBase::name, py::const_),
+                    py::overload_cast<const string&>(&ProfitGoalBase::name),
+                    py::return_value_policy::copy, "名称")
+      .def_property("to", &ProfitGoalBase::getTO, &ProfitGoalBase::setTO, "设置或获取交易对象")
+      .def_property("tm", &ProfitGoalBase::getTM, &ProfitGoalBase::setTM, "设置或获取交易管理账户")
 
       .def("get_param", &ProfitGoalBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -113,7 +78,7 @@ void export_ProfitGoal() {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &ProfitGoalBase::setParam<object>, R"(set_param(self, name, value)
+      .def("set_param", &ProfitGoalBase::setParam<boost::any>, R"(set_param(self, name, value)
 
     设置参数
 
@@ -123,21 +88,21 @@ void export_ProfitGoal() {
 
       .def("have_param", &ProfitGoalBase::haveParam, "是否存在指定参数")
 
-      .def("buy_notify", &ProfitGoalBase::buyNotify, &ProfitGoalWrap::default_buyNotify,
+      .def("buy_notify", &ProfitGoalBase::buyNotify,
            R"(buy_notify(self, trade_record)
     
     【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
 
     :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录)")
 
-      .def("sell_notify", &ProfitGoalBase::sellNotify, &ProfitGoalWrap::default_sellNotify,
+      .def("sell_notify", &ProfitGoalBase::sellNotify,
            R"(sell_notify(self, trade_record)
     
     【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
         
     :param TradeRecord trade_record: 发生实际卖出时的实际卖出交易记录)")
 
-      .def("get_goal", pure_virtual(&ProfitGoalBase::getGoal), R"(get_goal(self, datetime, price)
+      .def("get_goal", &ProfitGoalBase::getGoal, R"(get_goal(self, datetime, price)
 
     【重载接口】获取盈利目标价格，返回constant.null_price时，表示未限定目标；返回0意味着需要卖出
 
@@ -150,27 +115,25 @@ void export_ProfitGoal() {
 
       .def("reset", &ProfitGoalBase::reset, "复位操作")
       .def("clone", &ProfitGoalBase::clone, "克隆操作")
-      .def("_calculate", pure_virtual(&ProfitGoalBase::_calculate), "【重载接口】子类计算接口")
-      .def("_reset", &ProfitGoalBase::_reset, &ProfitGoalWrap::default_reset,
-           "【重载接口】子类复位接口，复位内部私有变量")
-      .def("_clone", pure_virtual(&ProfitGoalBase::_clone), "【重载接口】子类克隆接口");
+      .def("_calculate", &ProfitGoalBase::_calculate, "【重载接口】子类计算接口")
+      .def("_reset", &ProfitGoalBase::_reset, "【重载接口】子类复位接口，复位内部私有变量")
 
-    register_ptr_to_python<ProfitGoalPtr>();
+        DEF_PICKLE(PGPtr);
 
-    def("PG_NoGoal", PG_NoGoal, R"(PG_NoGoal()
+    m.def("PG_NoGoal", PG_NoGoal, R"(PG_NoGoal()
 
     无盈利目标策略，通常为了进行测试或对比。
     
     :return: 盈利目标策略实例)");
 
-    def("PG_FixedPercent", PG_FixedPercent, (arg("p") = 0.2), R"(PG_FixedPercent([p = 0.2])
+    m.def("PG_FixedPercent", PG_FixedPercent, py::arg("p") = 0.2, R"(PG_FixedPercent([p = 0.2])
 
     固定百分比盈利目标，目标价格 = 买入价格 * (1 + p)
     
     :param float p: 百分比
     :return: 盈利目标策略实例)");
 
-    def("PG_FixedHoldDays", PG_FixedHoldDays, (arg("days") = 5), R"(PG_FixedHoldDays([days=5])
+    m.def("PG_FixedHoldDays", PG_FixedHoldDays, py::arg("days") = 5, R"(PG_FixedHoldDays([days=5])
 
     固定持仓天数盈利目标策略
     

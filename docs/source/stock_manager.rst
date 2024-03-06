@@ -366,7 +366,7 @@ StockManager/Block/Stock
         获取历史财务信息, 字段含义参见：`<https://hikyuu.org/finance_fields.html>`_
         
         :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
-        :rtype: PriceList
+        :rtype: list
     
     .. py:method:: realtime_update(self, krecord)
     

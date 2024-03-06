@@ -16,21 +16,21 @@ from PyQt5.QtGui import QIcon, QTextCursor, QFont
 
 import mysql.connector
 from mysql.connector import errorcode
-from mysql.connector.locales.eng import client_error  #此句仅为pyinstaller打包时能够自动引入
+from mysql.connector.locales.eng import client_error  # 此句仅为pyinstaller打包时能够自动引入
 
 from hikyuu.gui.data.MainWindow import *
 from hikyuu.gui.data.EscapetimeThread import EscapetimeThread
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from hikyuu.gui.data.ImportTdxToH5Task import ImportTdxToH5Task
 from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
-#from hikyuu.gui.data.CollectToMySQLThread import CollectToMySQLThread
-#from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
+# from hikyuu.gui.data.CollectToMySQLThread import CollectToMySQLThread
+# from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
 from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
-from hikyuu.gui.spot_server import release_nng_sender
+from hikyuu.gui.spot_server import release_nng_senders
 
 from hikyuu.data import hku_config_template
-from hikyuu.util.mylog import add_class_logger_handler, class_logger, get_default_logger
+from hikyuu.util import *
 
 
 class EmittingStream(QObject):
@@ -66,7 +66,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.collect_spot_thread.wait()
 
         if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
-            release_nng_sender()
+            release_nng_senders()
             self.collect_spot_thread.terminate()
             self.collect_spot_thread.wait()
 
@@ -99,13 +99,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             if not os.path.lexists(data_dir + '/tmp'):
                 os.mkdir(data_dir + '/tmp')
             # 此处不能使用 utf-8 参数，否则导致Windows下getBlock无法找到板块分类
-            # with open(filename, 'w', encoding='utf-8') as f:
-
-            with open(filename, 'w') as f:
-
+            with open(filename, 'w', encoding='utf-8') as f:
                 f.write(
                     hku_config_template.hdf5_template.format(
                         dir=data_dir,
+                        quotation_server=current_config.get(
+                            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         day=current_config.getboolean('preload', 'day', fallback=True),
                         week=current_config.getboolean('preload', 'week', fallback=False),
                         month=current_config.getboolean('preload', 'month', fallback=False),
@@ -135,10 +134,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         else:
             data_dir = current_config['mysql']['tmpdir']
-            with open(filename, 'w') as f:
+            with open(filename, 'w', encoding="utf-8") as f:
                 f.write(
                     hku_config_template.mysql_template.format(
                         dir=data_dir,
+                        quotation_server=current_config.get(
+                            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         host=current_config['mysql']['host'],
                         port=current_config['mysql']['port'],
                         usr=current_config['mysql']['usr'],
@@ -209,7 +210,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if not self._capture_output:
             return
 
-        #普通日志输出控制台
+        # 普通日志输出控制台
         if self._stream is None:
             self._stream = EmittingStream(textWritten=self.normalOutputWritten)
         self.log_handler = logging.StreamHandler(self._stream)
@@ -218,7 +219,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         add_class_logger_handler(
             [
                 MyMainWindow,
-                CollectSpotThread,  #CollectToMySQLThread, CollectToMemThread,
+                CollectSpotThread,  # CollectToMySQLThread, CollectToMemThread,
                 UsePytdxImportToH5Thread,
                 UseTdxImportToH5Thread,
                 ImportTdxToH5Task,
@@ -230,6 +231,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             logger = logging.getLogger(name)
             logger.addHandler(self.log_handler)
             logger.setLevel(logging.DEBUG)
+            # logger.setLevel(logging.INFO)
 
         # 多进程日志队列
         self.mp_log_q = multiprocessing.Queue()
@@ -252,7 +254,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         current_dir = os.path.dirname(__file__)
         self.setWindowIcon(QIcon("{}/hikyuu.ico".format(current_dir)))
-        #self.setFixedSize(self.width(), self.height())
+        # self.setFixedSize(self.width(), self.height())
         self.import_status_label.setText('')
         self.import_detail_textEdit.clear()
         self.reset_progress_bar()
@@ -269,58 +271,58 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.time_start_dateEdit.setMinimumDate(today - datetime.timedelta(300))
         self.collect_status_label.setText("已停止")
 
-        #读取保存的配置文件信息，如果不存在，则使用默认配置
+        # 读取保存的配置文件信息，如果不存在，则使用默认配置
         this_dir = self.getUserConfigDir()
         import_config = ConfigParser()
         if os.path.exists(this_dir + '/importdata-gui.ini'):
             import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
 
-        #初始化导入行情数据类型配置
+        # 初始化导入行情数据类型配置
         self.import_stock_checkBox.setChecked(import_config.getboolean('quotation', 'stock', fallback=True))
         self.import_fund_checkBox.setChecked(import_config.getboolean('quotation', 'fund', fallback=True))
         self.import_future_checkBox.setChecked(import_config.getboolean('quotation', 'future', fallback=False))
 
-        #初始化导入K线类型配置
+        # 初始化导入K线类型配置
         self.import_day_checkBox.setChecked(import_config.getboolean('ktype', 'day', fallback=True))
         self.import_min_checkBox.setChecked(import_config.getboolean('ktype', 'min', fallback=True))
         self.import_min5_checkBox.setChecked(import_config.getboolean('ktype', 'min5', fallback=True))
         self.import_trans_checkBox.setChecked(import_config.getboolean('ktype', 'trans', fallback=False))
         self.import_time_checkBox.setChecked(import_config.getboolean('ktype', 'time', fallback=False))
-        #self.trans_max_days_spinBox.setValue(import_config.getint('ktype', 'trans_max_days', fallback=70))
-        #self.time_max_days_spinBox.setValue(import_config.getint('ktype', 'time_max_days', fallback=70))
+        # self.trans_max_days_spinBox.setValue(import_config.getint('ktype', 'trans_max_days', fallback=70))
+        # self.time_max_days_spinBox.setValue(import_config.getint('ktype', 'time_max_days', fallback=70))
 
-        #初始化权息与财务数据设置
+        # 初始化权息与财务数据设置
         self.import_weight_checkBox.setChecked(import_config.getboolean('weight', 'enable', fallback=True))
 
-        #初始化通道信目录配置
+        # 初始化通道信目录配置
         tdx_enable = import_config.getboolean('tdx', 'enable', fallback=False)
-        tdx_dir = import_config.get('tdx', 'dir', fallback='d:\TdxW_HuaTai')
+        tdx_dir = import_config.get('tdx', 'dir', fallback='d:/TdxW_HuaTai')
         self.tdx_radioButton.setChecked(tdx_enable)
         self.tdx_dir_lineEdit.setEnabled(tdx_enable)
         self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
         self.tdx_dir_lineEdit.setText(tdx_dir)
 
-        #初始化pytdx配置及显示
+        # 初始化pytdx配置及显示
         self.pytdx_radioButton.setChecked(import_config.getboolean('pytdx', 'enable', fallback=True))
         self.use_tdx_number_spinBox.setValue(import_config.getint('pytdx', 'use_tdx_number', fallback=10))
 
         self.on_tdx_or_pytdx_toggled()
 
-        #初始化hdf5设置
+        # 初始化hdf5设置
         hdf5_enable = import_config.getboolean('hdf5', 'enable', fallback=True)
         self.enable_hdf55_radioButton.setChecked(hdf5_enable)
         hdf5_dir = import_config.get(
-            'hdf5', 'dir', fallback="c:\stock" if sys.platform == "win32" else os.path.expanduser('~') + "/stock"
+            'hdf5', 'dir', fallback="c:/stock" if sys.platform == "win32" else os.path.expanduser('~') + "/stock"
         )
         self.hdf5_dir_lineEdit.setText(hdf5_dir)
         self.hdf5_dir_lineEdit.setEnabled(hdf5_enable)
 
-        #初始化MYSQL设置
+        # 初始化MYSQL设置
         mysql_enable = import_config.getboolean('mysql', 'enable', fallback=False)
         if hdf5_enable:
             mysql_enable = False
         self.enable_mysql_radioButton.setChecked(mysql_enable)
-        self.mysql_tmpdir_lineEdit.setText(import_config.get('mysql', 'tmpdir', fallback='c:\stock'))
+        self.mysql_tmpdir_lineEdit.setText(import_config.get('mysql', 'tmpdir', fallback='c:/stock'))
         mysql_ip = import_config.get('mysql', 'host', fallback='127.0.0.1')
         self.mysql_ip_lineEdit.setText(mysql_ip)
         self.mysql_ip_lineEdit.setEnabled(mysql_enable)
@@ -340,6 +342,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         )
 
         # 初始化定时采集设置
+        self.quotation_server = import_config.get(
+            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc')
+        hku_warn_if(len(self.quotation_server) < 3, "Invalid quotation server addr!")
+        if self.quotation_server[:3] == "ipc":
+            self.quotation_server = 'ipc:///tmp/hikyuu_real.ipc'
         interval_time = import_config.getint('collect', 'interval', fallback=60 * 60)
         self.collect_sample_spinBox.setValue(interval_time)
         use_zhima_proxy = import_config.getboolean('collect', 'use_zhima_proxy', fallback=False)
@@ -428,6 +435,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'time': self.sched_import_timeEdit.time().toString(),
         }
         import_config['collect'] = {
+            'quotation_server': self.quotation_server,
             'interval': self.collect_sample_spinBox.value(),
             'source': self.collect_source_comboBox.currentText(),
             'use_zhima_proxy': self.collect_use_zhima_checkBox.isChecked(),
@@ -583,7 +591,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.hdf5_5min_progressBar.setValue(0)
         self.hdf5_trans_progressBar.setValue(0)
         self.hdf5_time_progressBar.setValue(0)
-        #self.finance_progressBar.setValue(0)
+        # self.finance_progressBar.setValue(0)
         self.import_detail_textEdit.clear()
 
     def on_escapte_time(self, escape):
@@ -650,11 +658,19 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 # self.finance_progressBar.setValue(msg[2])
                 self.logger.info(f"财务数据下载: {msg[2]}%")
 
+            elif msg_task_name == 'IMPORT_BLOCKINFO':
+                if msg[2] != 'FINISHED':
+                    self.import_detail_textEdit.append(msg[2])
+
+            elif msg_task_name == 'IMPORT_ZH_BOND10':
+                if msg[2] != 'FINISHED':
+                    self.import_detail_textEdit.append(msg[2])
+
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
         config = self.getCurrentConfig()
         if config.getboolean('hdf5', 'enable') \
-            and (not os.path.lexists(config['hdf5']['dir']) or not os.path.isdir(config['hdf5']['dir'])):
+                and (not os.path.lexists(config['hdf5']['dir']) or not os.path.isdir(config['hdf5']['dir'])):
             QMessageBox.about(self, "错误", '指定的目标数据存放目录不存在！')
             return
 
@@ -721,7 +737,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_collect_start_pushButton_clicked(self):
         if self._is_collect_running:
             if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
-                release_nng_sender()
+                release_nng_senders()
                 self.collect_spot_thread.terminate()
                 self.collect_spot_thread.wait()
                 self.collect_spot_thread = None
@@ -766,6 +782,7 @@ if __name__ == "__main__":
     import urllib
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("pytdx").setLevel(logging.WARNING)
 
     # 自适应分辨率，防止字体显示不全
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)

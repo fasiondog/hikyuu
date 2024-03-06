@@ -104,7 +104,7 @@ public:
      * @param queryType 默认按索引方式查询
      */
     KQuery(int64_t start,  // cppcheck-suppress [noExplicitConstructor]
-           int64_t end = Null<int64_t>(), KType dataType = DAY,
+           int64_t end = Null<int64_t>(), const KType& dataType = DAY,
            RecoverType recoverType = NO_RECOVER, QueryType queryType = INDEX)
     : m_start(start),
       m_end(end),
@@ -122,7 +122,7 @@ public:
      * @param recoverType 复权类型
      */
     KQuery(Datetime start,  // cppcheck-suppress [noExplicitConstructor]
-           Datetime end = Null<Datetime>(), KType ktype = DAY,
+           Datetime end = Null<Datetime>(), const KType& ktype = DAY,
            RecoverType recoverType = NO_RECOVER);
 
     /**
@@ -206,10 +206,10 @@ private:
  * @ingroup StockManage*
  */
 KQuery HKU_API KQueryByIndex(int64_t start = 0, int64_t end = Null<int64_t>(),
-                             KQuery::KType dataType = KQuery::DAY,
+                             const KQuery::KType& dataType = KQuery::DAY,
                              KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
-inline KQuery KQueryByIndex(int64_t start, int64_t end, KQuery::KType dataType,
+inline KQuery KQueryByIndex(int64_t start, int64_t end, const KQuery::KType& dataType,
                             KQuery::RecoverType recoverType) {
     return KQuery(start, end, dataType, recoverType, KQuery::INDEX);
 }
@@ -225,11 +225,11 @@ inline KQuery KQueryByIndex(int64_t start, int64_t end, KQuery::KType dataType,
  */
 KQuery HKU_API KQueryByDate(const Datetime& start = Datetime::min(),
                             const Datetime& end = Null<Datetime>(),
-                            KQuery::KType dataType = KQuery::DAY,
+                            const KQuery::KType& dataType = KQuery::DAY,
                             KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
-inline KQuery KQueryByDate(const Datetime& start, const Datetime& end, KQuery::KType dataType,
-                           KQuery::RecoverType recoverType) {
+inline KQuery KQueryByDate(const Datetime& start, const Datetime& end,
+                           const KQuery::KType& dataType, KQuery::RecoverType recoverType) {
     return KQuery(start, end, dataType, recoverType);
 }
 
@@ -244,18 +244,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const KQuery& query);
 // 关系比较函数, 不直接在类中定义是为了支持 Null<>() == d，Null可以放在左边
 //
 ///////////////////////////////////////////////////////////////////////////////
-bool operator==(const KQuery&, const KQuery&);
-bool operator!=(const KQuery&, const KQuery&);
-
-inline bool operator!=(const KQuery& q1, const KQuery& q2) {
-    // cppcheck-suppress [mismatchingContainerExpression]
-    return q1.start() != q2.start() || q1.end() != q2.end() || q1.queryType() != q2.queryType() ||
-           q1.kType() != q2.kType() || q1.recoverType() != q2.recoverType();
-}
-
-inline bool operator==(const KQuery& q1, const KQuery& q2) {
-    return !(q1 != q2);
-}
+bool HKU_API operator==(const KQuery&, const KQuery&);
+bool HKU_API operator!=(const KQuery&, const KQuery&);
 
 /**
  * 提供KQuery的Null值

@@ -33,15 +33,16 @@ void IEma::_calculate(const Indicator& indicator) {
         return;
     }
 
+    auto const* src = indicator.data();
+    auto* dst = this->data();
+
     int n = getParam<int>("n");
     size_t startPos = discard();
-    price_t ema = indicator[startPos];
-    _set(ema, startPos);
+    dst[startPos] = src[startPos];
 
     price_t multiplier = 2.0 / (n + 1);
     for (size_t i = startPos + 1; i < total; ++i) {
-        ema = (indicator[i] - ema) * multiplier + ema;
-        _set(ema, i);
+        dst[i] = (src[i] - dst[i - 1]) * multiplier + dst[i - 1];
     }
 }
 

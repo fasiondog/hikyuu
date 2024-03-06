@@ -26,7 +26,7 @@ from hikyuu.data.common import MARKETID, STOCKTYPE
 from hikyuu.data.common_sqlite3 import get_marketid, create_database
 
 
-def pytdx_import_finance(db_connect, pytdx_connect, market):
+def pytdx_import_finance_to_sqlite(db_connect, pytdx_connect, market):
     """导入公司财务信息"""
     marketid = get_marketid(db_connect, market)
     sql = "select stockid, marketid, code, valid, type from stock where marketid={} and type = {} and valid=1"\
@@ -133,13 +133,13 @@ if __name__ == '__main__':
     api = TdxHq_API()
     api.connect(tdx_server, tdx_port)
 
-    x = pytdx_import_finance(connect, api, "SZ")
+    x = pytdx_import_finance_to_sqlite(connect, api, "SZ")
     print(x)
 
-    x = pytdx_import_finance(connect, api, "SH")
+    x = pytdx_import_finance_to_sqlite(connect, api, "SH")
     print(x)
 
-    x = pytdx_import_finance(connect, api, "BJ")
+    x = pytdx_import_finance_to_sqlite(connect, api, "BJ")
     print(x)
 
     api.disconnect()

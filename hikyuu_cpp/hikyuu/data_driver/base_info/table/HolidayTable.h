@@ -14,18 +14,16 @@
 namespace hku {
 
 class HolidayTable {
-    TABLE_BIND1(holiday, date)
+    TABLE_BIND1(HolidayTable, holiday, date)
 
 public:
-    HolidayTable() : date(Datetime().number()) {}
-
     Datetime datetime() const {
         HKU_CHECK(date <= 99999999, "Invalid holiday date: {}!", date);
         return Datetime(date * 10000LL);
     }
 
 private:
-    uint64_t date;
+    uint64_t date{Datetime().number()};
 };
 
 }  // namespace hku

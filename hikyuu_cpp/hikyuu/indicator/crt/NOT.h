@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 求逻辑非。NOT(X)返回非X,即当X=0时返回1，否则返回0。
+ * 求逻辑非。NOT(X)返回非X,即当X<=0时返回1，否则返回0。
  * @ingroup Indicator
  */
 Indicator HKU_API NOT();

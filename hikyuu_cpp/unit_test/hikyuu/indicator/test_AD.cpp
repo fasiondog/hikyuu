@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/AD.h>
@@ -35,6 +35,26 @@ TEST_CASE("test_AD") {
     CHECK_EQ(ad[2], doctest::Approx(63.99).epsilon(0.1));
     CHECK_EQ(ad[5], doctest::Approx(30.77).epsilon(0.1));
 }
+
+//-----------------------------------------------------------------------------
+// benchmark
+//-----------------------------------------------------------------------------
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_AD_benchmark") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    int cycle = 1000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(test_AD_benchmark, cycle, fmt::format("data len: {}", kdata.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator ind = AD();
+            Indicator result = ind(kdata);
+        }
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // test export

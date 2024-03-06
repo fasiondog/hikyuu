@@ -14,6 +14,7 @@
 #include "../MarketInfo.h"
 #include "../StockTypeInfo.h"
 #include "../Stock.h"
+#include "../ZhBond10.h"
 #include "../utilities/db_connect/SQLStatementBase.h"
 
 namespace hku {
@@ -111,6 +112,11 @@ public:
     virtual StockWeightList getStockWeightList(const string& market, const string& code,
                                                Datetime start, Datetime end);
 
+    virtual unordered_map<string, StockWeightList> getAllStockWeightList() {
+        unordered_map<string, StockWeightList> ret;
+        return ret;
+    }
+
     /**
      * 获取当前财务信息
      * @param market 市场标识
@@ -146,6 +152,12 @@ public:
      * 获取所有节假日日期
      */
     virtual std::unordered_set<Datetime> getAllHolidays() = 0;
+
+    /**
+     * Get the All Zh Bond10 object
+     * @return ZhBond10List
+     */
+    virtual ZhBond10List getAllZhBond10() = 0;
 
 private:
     bool checkType();

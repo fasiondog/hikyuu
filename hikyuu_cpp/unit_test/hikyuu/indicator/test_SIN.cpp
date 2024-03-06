@@ -43,7 +43,7 @@ TEST_CASE("test_SIN") {
     result = SIN(-11);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result[0], std::sin(-11));
+    CHECK_EQ(result[0], doctest::Approx(std::sin(-11)));
 }
 
 //-----------------------------------------------------------------------------

@@ -47,6 +47,11 @@ KData Indicator::getContext() const {
     return m_imp ? m_imp->getContext() : KData();
 }
 
+bool Indicator::alike(const Indicator& other) const {
+    HKU_IF_RETURN(m_imp == other.m_imp, true);
+    return m_imp->alike(*other.m_imp);
+}
+
 Indicator& Indicator::operator=(const Indicator& indicator) {
     HKU_IF_RETURN(this == &indicator, *this);
     m_imp = indicator.m_imp;
@@ -168,107 +173,107 @@ HKU_API Indicator operator|(const Indicator& ind1, const Indicator& ind2) {
     return p->calculate();
 }
 
-HKU_API Indicator operator+(const Indicator& ind, price_t val) {
+HKU_API Indicator operator+(const Indicator& ind, Indicator::value_t val) {
     return ind + CVAL(ind, val);
 }
 
-HKU_API Indicator operator+(price_t val, const Indicator& ind) {
+HKU_API Indicator operator+(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) + ind;
 }
 
-HKU_API Indicator operator-(const Indicator& ind, price_t val) {
+HKU_API Indicator operator-(const Indicator& ind, Indicator::value_t val) {
     return ind - CVAL(ind, val);
 }
 
-HKU_API Indicator operator-(price_t val, const Indicator& ind) {
+HKU_API Indicator operator-(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) - ind;
 }
 
-HKU_API Indicator operator*(const Indicator& ind, price_t val) {
+HKU_API Indicator operator*(const Indicator& ind, Indicator::value_t val) {
     return ind * CVAL(ind, val);
 }
 
-HKU_API Indicator operator*(price_t val, const Indicator& ind) {
+HKU_API Indicator operator*(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) * ind;
 }
 
-HKU_API Indicator operator/(const Indicator& ind, price_t val) {
+HKU_API Indicator operator/(const Indicator& ind, Indicator::value_t val) {
     return ind / CVAL(ind, val);
 }
 
-HKU_API Indicator operator/(price_t val, const Indicator& ind) {
+HKU_API Indicator operator/(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) / ind;
 }
 
-HKU_API Indicator operator%(const Indicator& ind, price_t val) {
+HKU_API Indicator operator%(const Indicator& ind, Indicator::value_t val) {
     return ind % CVAL(ind, val);
 }
 
-HKU_API Indicator operator%(price_t val, const Indicator& ind) {
+HKU_API Indicator operator%(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) % ind;
 }
 
-HKU_API Indicator operator==(const Indicator& ind, price_t val) {
+HKU_API Indicator operator==(const Indicator& ind, Indicator::value_t val) {
     return ind == CVAL(ind, val);
 }
 
-HKU_API Indicator operator==(price_t val, const Indicator& ind) {
+HKU_API Indicator operator==(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) == ind;
 }
 
-HKU_API Indicator operator!=(const Indicator& ind, price_t val) {
+HKU_API Indicator operator!=(const Indicator& ind, Indicator::value_t val) {
     return ind != CVAL(ind, val);
 }
 
-HKU_API Indicator operator!=(price_t val, const Indicator& ind) {
+HKU_API Indicator operator!=(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) != ind;
 }
 
-HKU_API Indicator operator>(const Indicator& ind, price_t val) {
+HKU_API Indicator operator>(const Indicator& ind, Indicator::value_t val) {
     return ind > CVAL(ind, val);
 }
 
-HKU_API Indicator operator>(price_t val, const Indicator& ind) {
+HKU_API Indicator operator>(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) > ind;
 }
 
-HKU_API Indicator operator<(const Indicator& ind, price_t val) {
+HKU_API Indicator operator<(const Indicator& ind, Indicator::value_t val) {
     return ind < CVAL(ind, val);
 }
 
-HKU_API Indicator operator<(price_t val, const Indicator& ind) {
+HKU_API Indicator operator<(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) < ind;
 }
 
-HKU_API Indicator operator>=(const Indicator& ind, price_t val) {
+HKU_API Indicator operator>=(const Indicator& ind, Indicator::value_t val) {
     return ind >= CVAL(ind, val);
 }
 
-HKU_API Indicator operator>=(price_t val, const Indicator& ind) {
+HKU_API Indicator operator>=(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) >= ind;
 }
 
-HKU_API Indicator operator<=(const Indicator& ind, price_t val) {
+HKU_API Indicator operator<=(const Indicator& ind, Indicator::value_t val) {
     return ind <= CVAL(ind, val);
 }
 
-HKU_API Indicator operator<=(price_t val, const Indicator& ind) {
+HKU_API Indicator operator<=(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) <= ind;
 }
 
-HKU_API Indicator operator&(const Indicator& ind, price_t val) {
+HKU_API Indicator operator&(const Indicator& ind, Indicator::value_t val) {
     return ind & CVAL(ind, val);
 }
 
-HKU_API Indicator operator&(price_t val, const Indicator& ind) {
+HKU_API Indicator operator&(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) & ind;
 }
 
-HKU_API Indicator operator|(const Indicator& ind, price_t val) {
+HKU_API Indicator operator|(const Indicator& ind, Indicator::value_t val) {
     return ind | CVAL(ind, val);
 }
 
-HKU_API Indicator operator|(price_t val, const Indicator& ind) {
+HKU_API Indicator operator|(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) | ind;
 }
 
@@ -288,15 +293,15 @@ Indicator HKU_API IF(const Indicator& ind1, const Indicator& ind2, const Indicat
     return p->calculate();
 }
 
-Indicator HKU_API IF(const Indicator& x, price_t a, const Indicator& b) {
+Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, const Indicator& b) {
     return IF(x, CVAL(b, a), b);
 }
 
-Indicator HKU_API IF(const Indicator& x, const Indicator& a, price_t b) {
+Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t b) {
     return IF(x, a, CVAL(a, b));
 }
 
-Indicator HKU_API IF(const Indicator& x, price_t a, price_t b) {
+Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b) {
     return IF(x, CVAL(x, a), CVAL(x, b));
 }
 
@@ -307,6 +312,16 @@ Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n) {
     IndicatorImpPtr p = make_shared<IndicatorImp>("CORR");
     p->setParam<int>("n", n);
     p->add(IndicatorImp::CORR, ind1.getImp(), ind2.getImp());
+    return p->calculate();
+}
+
+Indicator HKU_API SPEARMAN(const Indicator& ind1, const Indicator& ind2, int n) {
+    HKU_ERROR_IF_RETURN(!ind1.getImp() || !ind2.getImp(), Indicator(),
+                        "ind1 or ind2 is Null Indicator!");
+    HKU_ERROR_IF_RETURN(n < 2, Indicator(), "Invalid param n: {} (need >= 2)", n);
+    IndicatorImpPtr p = make_shared<IndicatorImp>("SPEARMAN");
+    p->setParam<int>("n", n);
+    p->add(IndicatorImp::SPEARMAN, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 

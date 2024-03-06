@@ -34,8 +34,10 @@ void IRoundUp::_calculate(const Indicator& data) {
     }
 
     int n = getParam<int>("ndigits");
+    auto const* src = data.data();
+    auto* dst = this->data();
     for (size_t i = m_discard; i < total; ++i) {
-        _set(roundUp(data[i], n), i);
+        dst[i] = roundUp(src[i], n);
     }
 }
 

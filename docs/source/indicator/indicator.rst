@@ -263,6 +263,22 @@
     :rtype: Indicator
     
 
+.. py:function:: DATE([data])
+
+    取得该周期从1900以来的年月日。用法: DATE 例如函数返回1000101，表示2000年1月1日。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
+.. py:function:: DAY([data])
+
+    取得该周期的日期。用法: DAY 函数返回有效值范围为(1-31)。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
 .. py:function:: DECLINE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
 
     下跌家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
@@ -416,6 +432,14 @@
     :rtype: Indicator
     
     
+.. py:function:: HOUR([data])
+
+    取得该周期的小时数。用法：HOUR 函数返回有效值范围为(0-23)，对于日线及更长的分析周期值为0。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
 .. py:function:: HSL(kdata)
 
     获取换手率，等于 VOL(k) / CAPITAL(k)
@@ -588,6 +612,11 @@
     :rtype: Indicator
 
 
+.. py:function:: MDD([ind])
+
+    当前价格相对历史最高值的回撤百分比，通常用于计算最大回撤
+
+
 .. py:function:: MIN(ind1, ind2)
 
     求最小值, MIN(A,B)返回A和B中的较小值。
@@ -596,6 +625,14 @@
     :param Indicator ind2: B
     :rtype: Indicator
     
+
+.. py:function:: MINUTE([data])
+
+    取得该周期的分钟数。用法：MINUTE 函数返回有效值范围为(0-59)，对于日线及更长的分析周期值为0。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
 
 .. py:function:: MOD(ind1, ind2)
 
@@ -610,6 +647,19 @@
     :rtype: Indicator
 
 
+.. py:function:: MONTH([data])
+
+    取得该周期的月份。用法: MONTH 函数返回有效值范围为(1-12)。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
+.. py:function:: MRR([ind])
+
+    当前价格相对历史最低值的盈利百分比
+
+
 .. py:function:: NDAY(x, y[, n=3])
 
     连大, NDAY(X,Y,N)表示条件X>Y持续存在N个周期
@@ -622,7 +672,7 @@
 
 .. py:function:: NOT([data])
 
-    求逻辑非。NOT(X)返回非X,即当X=0时返回1，否则返回0。
+    求逻辑非。NOT(X)返回非X,即当X<=0时返回1，否则返回0。
     
     :param Indicator data: 输入数据
     :rtype: Indicator
@@ -785,10 +835,19 @@
 
     获取某指标中指定范围 [start, end) 的数据，生成新的指标
 
-    :param Indicator|PriceList data: 输入数据
+    :param Indicator|sequence data: 输入数据
     :param int start: 起始位置
     :param int end: 终止位置（不包含本身）
     :param int result_index: 原输入数据中的结果集
+
+
+.. py:function:: SLOPE(data, n=22)
+
+    计算线性回归斜率，N支持变量
+
+    :param Indicator|sequence data: 输入数据
+    :param int|Indicator|IndParam n: 时间窗口
+    :rtype: Indicator
 
 
 .. py:function:: SMA([data, n=22, m=2])
@@ -801,6 +860,15 @@
     :param int n: 时间窗口
     :param float m: 系数
     :rtype: Indicator
+
+
+.. py:function:: SPEARMAN(ind1, ind2, n)
+
+    Spearman 相关系数
+
+    :param Indicator ind1: 输入参数1
+    :param Indicator ind2: 输入参数2
+    :param int n: 指定窗口    
 
 
 .. py:function:: SQRT([data])
@@ -869,6 +937,14 @@
     正切值
 
     :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
+.. py:function:: TIME([data])
+
+    取得该周期的时分秒。用法: TIME 函数返回有效值范围为(000000-235959)。
+
+    :param data: 输入数据 KData
     :rtype: Indicator
 
 
@@ -942,3 +1018,26 @@
     :param Indicator ind2: 指标2
     :rtype: Indicator
 
+
+.. py:function:: WEEK([data])
+
+    取得该周期的星期数。用法：WEEK 函数返回有效值范围为(0-6)，0表示星期天。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
+.. py:function:: YEAR([data])
+
+    取得该周期的年份。
+
+    :param data: 输入数据 KData
+    :rtype: Indicator
+
+
+.. py:function:: ZHBOND10([data, default_val])
+
+    获取10年期中国国债收益率
+
+    :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
+    :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值
