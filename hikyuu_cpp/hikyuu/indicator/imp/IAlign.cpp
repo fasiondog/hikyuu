@@ -92,9 +92,17 @@ void IAlign::_calculate(const Indicator& ind) {
     // 其它有上下文日期对应的指标数据
     // 1. 如果没有刚好相等的日期，则取小于对应日期且最靠近对应日期的数据
     // 2. 如果有对应的日期，取对应日期的数据
-    size_t ind_idx = 0;
+    size_t ind_idx = ind.discard();
     for (size_t i = 0; i < total; i++) {
         if (ind_idx >= ind_total) {
+            if (!use_null) {
+                size_t pos = ind_total - 1;
+                for (size_t r = 0; r < m_result_num; r++) {
+                    for (size_t j = i; j < total; j++) {
+                        _set(ind.get(pos, r), j, r);
+                    }
+                }
+            }
             break;
         }
 
@@ -112,7 +120,7 @@ void IAlign::_calculate(const Indicator& ind) {
             }
 
             if (j >= ind_total) {
-                if (!use_null && i >= 1) {
+                if (!use_null) {
                     for (size_t r = 0; r < m_result_num; r++) {
                         price_t val = ind.get(j - 1, r);
                         for (; i < total; i++) {
@@ -127,26 +135,35 @@ void IAlign::_calculate(const Indicator& ind) {
                 for (size_t r = 0; r < m_result_num; r++) {
                     _set(ind.get(j, r), i, r);
                 }
+            } else if (!use_null && j < ind_total) {
+                for (size_t r = 0; r < m_result_num; r++) {
+                    _set(ind.get(j - 1, r), i, r);
+                }
             }
 
             ind_idx = j + 1;
         }
     }
 
-    m_discard = total;
-    for (size_t i = 0; i < total; i++) {
-        bool all_not_null = true;
+    if (use_null) {
+        m_discard = total;
+    }
+    size_t i = 0;
+    while (i < total) {
+        size_t not_null_count = 0;
         for (size_t r = 0; r < m_result_num; r++) {
-            if (std::isnan(get(i, r))) {
-                all_not_null = false;
-                break;
+            if (!std::isnan(get(i, r))) {
+                not_null_count++;
             }
         }
-
-        if (all_not_null) {
+        if (not_null_count == m_result_num) {
             m_discard = i;
             break;
         }
+        i++;
+    }
+    if (i == total) {
+        m_discard = total;
     }
 }
 

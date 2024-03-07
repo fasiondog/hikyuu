@@ -79,23 +79,7 @@ TEST_CASE("test_ALIGN_use_null") {
     a.clear();
     data = PRICELIST(a);
     result = ALIGN(data, ref);
-    CHECK_EQ(result.name(), "ALIGN");
-    CHECK_EQ(result.size(), ref.size());
-    CHECK_EQ(result.discard(), ref.size());
-    result_dates = result.getDatetimeList();
-    for (int i = 0; i < result.discard(); i++) {
-        CHECK_UNARY(std::isnan(result[i]));
-        CHECK_EQ(result_dates[i], ref[i]);
-    }
-
-    /** @arg ind对应日期全部大于参考日期 */
-    KData k = stk.getKData(KQuery(-10));
-    ref.clear();
-    ref.push_back(Datetime(201901010000));
-    ref.push_back(Datetime(201901020000));
-    ref.push_back(Datetime(201901030000));
-    data = CLOSE(k);
-    result = ALIGN(data, ref);
+    REQUIRE(result.getParam<bool>("use_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -106,12 +90,31 @@ TEST_CASE("test_ALIGN_use_null") {
     }
 
     /** @arg ind对应日期全部小于参考日期 */
+    KData k = stk.getKData(KQuery(-10));
+    ref.clear();
+    ref.push_back(Datetime(201901010000));
+    ref.push_back(Datetime(201901020000));
+    ref.push_back(Datetime(201901030000));
+    data = CLOSE(k);
+    result = ALIGN(data, ref);
+    REQUIRE(result.getParam<bool>("use_null"));
+    CHECK_EQ(result.name(), "ALIGN");
+    CHECK_EQ(result.size(), ref.size());
+    CHECK_EQ(result.discard(), ref.size());
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+        CHECK_EQ(result_dates[i], ref[i]);
+    }
+
+    /** @arg ind对应日期全部大于参考日期 */
     ref.clear();
     ref.push_back(Datetime(191901010000));
     ref.push_back(Datetime(191901020000));
     ref.push_back(Datetime(191901030000));
     data = CLOSE(k);
     result = ALIGN(data, ref);
+    REQUIRE(result.getParam<bool>("use_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -125,6 +128,7 @@ TEST_CASE("test_ALIGN_use_null") {
     ref = k.getDatetimeList();
     data = CLOSE(k);
     result = ALIGN(data, ref);
+    REQUIRE(result.getParam<bool>("use_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 0);
@@ -145,6 +149,7 @@ TEST_CASE("test_ALIGN_use_null") {
     ref.push_back(Datetime(201112100000));
     data = CLOSE(k);
     result = ALIGN(data, ref);
+    REQUIRE(result.getParam<bool>("use_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 1);
@@ -184,6 +189,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     ref = stk.getDatetimeList(KQuery(-10));
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("use_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 0);
@@ -197,6 +203,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     a.push_back(11);
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("use_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 0);
@@ -211,6 +218,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     a.push_back(1);
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("use_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 9);
@@ -226,6 +234,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     a.clear();
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("use_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -235,76 +244,78 @@ TEST_CASE("test_ALIGN_not_use_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    // /** @arg ind对应日期全部大于参考日期 */
-    // KData k = stk.getKData(KQuery(-10));
-    // ref.clear();
-    // ref.push_back(Datetime(201901010000));
-    // ref.push_back(Datetime(201901020000));
-    // ref.push_back(Datetime(201901030000));
-    // data = CLOSE(k);
-    // result = ALIGN(data, ref);
-    // CHECK_EQ(result.name(), "ALIGN");
-    // CHECK_EQ(result.size(), ref.size());
-    // CHECK_EQ(result.discard(), ref.size());
-    // result_dates = result.getDatetimeList();
-    // for (int i = 0; i < result.discard(); i++) {
-    //     CHECK_UNARY(std::isnan(result[i]));
-    //     CHECK_EQ(result_dates[i], ref[i]);
-    // }
+    /** @arg ind对应日期全部小于参考日期 */
+    KData k = stk.getKData(KQuery(-10));
+    ref.clear();
+    ref.push_back(Datetime(201901010000));
+    ref.push_back(Datetime(201901020000));
+    ref.push_back(Datetime(201901030000));
+    data = CLOSE(k);
+    result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("use_null"));
+    CHECK_EQ(result.name(), "ALIGN");
+    CHECK_EQ(result.size(), ref.size());
+    CHECK_EQ(result.discard(), 0);
+    result_dates = result.getDatetimeList();
+    Indicator::value_t expect_val = data[data.size() - 1];
+    for (int i = result.discard(), len = result.size(); i < len; i++) {
+        CHECK_EQ(result[i], doctest::Approx(expect_val));
+        CHECK_EQ(result_dates[i], ref[i]);
+    }
 
-    // /** @arg ind对应日期全部小于参考日期 */
-    // ref.clear();
-    // ref.push_back(Datetime(191901010000));
-    // ref.push_back(Datetime(191901020000));
-    // ref.push_back(Datetime(191901030000));
-    // data = CLOSE(k);
-    // result = ALIGN(data, ref);
-    // CHECK_EQ(result.name(), "ALIGN");
-    // CHECK_EQ(result.size(), ref.size());
-    // CHECK_EQ(result.discard(), ref.size());
-    // result_dates = result.getDatetimeList();
-    // for (int i = 0; i < result.discard(); i++) {
-    //     CHECK_UNARY(std::isnan(result[i]));
-    //     CHECK_EQ(result_dates[i], ref[i]);
-    // }
+    /** @arg ind对应日期全部大于参考日期 */
+    ref.clear();
+    ref.push_back(Datetime(191901010000));
+    ref.push_back(Datetime(191901020000));
+    ref.push_back(Datetime(191901030000));
+    data = CLOSE(k);
+    result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("use_null"));
+    CHECK_EQ(result.name(), "ALIGN");
+    CHECK_EQ(result.size(), ref.size());
+    CHECK_EQ(result.discard(), ref.size());
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+        CHECK_EQ(result_dates[i], ref[i]);
+    }
 
-    // /** @arg ind对应日期等于参考日期 */
-    // ref = k.getDatetimeList();
-    // data = CLOSE(k);
-    // result = ALIGN(data, ref);
-    // CHECK_EQ(result.name(), "ALIGN");
-    // CHECK_EQ(result.size(), ref.size());
-    // CHECK_EQ(result.discard(), 0);
-    // result_dates = result.getDatetimeList();
-    // for (int i = 0; i < result.size(); i++) {
-    //     CHECK_EQ(result[i], data[i]);
-    //     CHECK_EQ(result_dates[i], ref[i]);
-    // }
+    /** @arg ind对应日期等于参考日期 */
+    ref = k.getDatetimeList();
+    data = CLOSE(k);
+    result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("use_null"));
+    CHECK_EQ(result.name(), "ALIGN");
+    CHECK_EQ(result.size(), ref.size());
+    CHECK_EQ(result.discard(), 0);
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.size(); i++) {
+        CHECK_EQ(result[i], data[i]);
+        CHECK_EQ(result_dates[i], ref[i]);
+    }
 
     // /** @arg ind对应部分日期 */
-    // ref.clear();
-    // ref.push_back(Datetime(201111220000));
-    // ref.push_back(Datetime(201111230000));
-    // ref.push_back(Datetime(201111240000));
-    // ref.push_back(Datetime(201111260000));
-    // ref.push_back(Datetime(201112060000));
-    // ref.push_back(Datetime(201112070000));
-    // ref.push_back(Datetime(201112100000));
-    // data = CLOSE(k);
-    // result = ALIGN(data, ref);
-    // CHECK_EQ(result.name(), "ALIGN");
-    // CHECK_EQ(result.size(), ref.size());
-    // CHECK_EQ(result.discard(), 1);
-    // CHECK_UNARY(std::isnan(result[0]));
-    // CHECK_EQ(result[1], doctest::Approx(2395.07));
-    // CHECK_EQ(result[2], doctest::Approx(2397.55));
-    // CHECK_UNARY(std::isnan(result[3]));
-    // CHECK_EQ(result[4], doctest::Approx(2325.91));
-    // CHECK_UNARY(std::isnan(result[5]));
-    // CHECK_UNARY(std::isnan(result[6]));
-    // for (int i = 0; i < result.size(); i++) {
-    //     CHECK_EQ(result.getDatetime(i), ref[i]);
-    // }
+    ref.clear();
+    ref.push_back(Datetime(201111220000));
+    ref.push_back(Datetime(201111230000));
+    ref.push_back(Datetime(201111240000));
+    ref.push_back(Datetime(201111260000));
+    ref.push_back(Datetime(201112060000));
+    ref.push_back(Datetime(201112070000));
+    ref.push_back(Datetime(201112100000));
+    data = CLOSE(k);
+    result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("use_null"));
+    CHECK_EQ(result.name(), "ALIGN");
+    CHECK_EQ(result.size(), ref.size());
+    CHECK_EQ(result.discard(), 1);
+    std::vector<Indicator::value_t> expect{
+      Null<Indicator::value_t>(), 2395.0650, 2397.5540, 2380.2240, 2325.9050, 2325.9050, 2325.9050,
+    };
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(result.getDatetime(i), ref[i]);
+        CHECK_EQ(result[i], doctest::Approx(expect[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------

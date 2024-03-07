@@ -1545,10 +1545,10 @@ void export_Indicator_build_in(py::module& m) {
     :param float x: x%获利价格, 0~100
     :rtype: Indicator)");
 
-    m.def("ALIGN", ALIGN_1, py::arg("ref"), py::arg("use_null") = false);
-    m.def("ALIGN", ALIGN_2, py::arg("data"), py::arg("ref"), py::arg("use_null") = false);
-    m.def("ALIGN", ALIGN_3, py::arg("data"), py::arg("ref"), py::arg("use_null") = false);
-    m.def("ALIGN", ALIGN_4, py::arg("data"), py::arg("ref"), py::arg("use_null") = false,
+    m.def("ALIGN", ALIGN_1, py::arg("ref"), py::arg("use_null") = true);
+    m.def("ALIGN", ALIGN_2, py::arg("data"), py::arg("ref"), py::arg("use_null") = true);
+    m.def("ALIGN", ALIGN_3, py::arg("data"), py::arg("ref"), py::arg("use_null") = true);
+    m.def("ALIGN", ALIGN_4, py::arg("data"), py::arg("ref"), py::arg("use_null") = true,
           R"(ALIGN(data, ref):
 
     按指定的参考日期对齐
