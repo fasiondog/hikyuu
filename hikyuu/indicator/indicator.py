@@ -26,6 +26,7 @@
 
 from hikyuu.core import *
 from hikyuu import Datetime
+import pandas as pd
 
 
 def indicator_iter(indicator):
@@ -89,3 +90,46 @@ except:
     )
 
 VALUE = PRICELIST
+
+
+def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
+    """将列表中的指标至合并在一张 pandas DataFrame 中
+
+    :param DatetimeList dates: 指定的日期列表
+    :param sequence ind_list: 已计算的指标列表
+    :param bool head_ind_name: 表标题是否使用指标名称
+    :param bool head_stock_code: 表标题是否使用证券代码
+    :return: 合并后的 DataFrame, 以 dates 为 index（注: dates列 为 Datetime 类型）
+
+    示例:
+        query = Query(-200)
+        k_list = [stk.get_kdata(query) for stk in [sm['sz000001'], sm['sz000002']]]
+        ma_list = [MA(k) for k in k_list]
+        concat_to_df(sm.get_trading_calendar(query), ma_list, head_stock_code=True, head_ind_name=False)
+
+    输出：
+                date	SZ000001	SZ000002
+        0	2023-05-12 00:00:00	12.620000	15.060000
+        1	2023-05-15 00:00:00	12.725000	15.060000
+        2	2023-05-16 00:00:00	12.690000	15.010000
+        3	2023-05-17 00:00:00	12.640000	14.952500
+        4	2023-05-18 00:00:00	12.610000	14.886000
+        ...	...	...	...
+        195	2024-03-01 00:00:00	9.950455	9.837273
+        196	2024-03-04 00:00:00	9.995909	9.838182
+        197	2024-03-05 00:00:00	10.038182	9.816364
+        198	2024-03-06 00:00:00	10.070455	9.776818
+        199	2024-03-07 00:00:00	10.101364	9.738182
+    """
+    df = pd.DataFrame(dates, columns=['date'])
+    for ind in ind_list:
+        x = ALIGN(ind, dates)
+        if head_ind_name and head_stock_code:
+            x.name = f"{ind.name}/{ind.get_context().get_stock().market_code}"
+        elif head_ind_name:
+            x.name = ind.name
+        else:
+            x.name = ind.get_context().get_stock().market_code
+        df = pd.concat([df, x.to_df()], axis=1)
+    df.set_index('date')
+    return df

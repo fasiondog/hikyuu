@@ -40,7 +40,7 @@
     :rtype: Indicator
 
 
-.. py:function:: ALIGN(data, ref[, use_null=True]):
+.. py:function:: ALIGN(data, ref[, use_null=True])
 
     按指定的参考日期对齐
 
@@ -201,7 +201,7 @@
     :rtype: Indicator
    
 
-.. py::function:: CORR(ind1, ind2, n)
+.. py:function:: CORR(ind1, ind2, n)
 
     计算 ind1 和 ind2 的样本相关系数与协方差。返回中存在两个结果，第一个为相关系数，第二个为协方差。
 
