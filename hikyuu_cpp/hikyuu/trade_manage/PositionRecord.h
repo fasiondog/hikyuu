@@ -12,10 +12,6 @@
 #include "../StockManager.h"
 #include "../serialization/Stock_serialization.h"
 
-#if HKU_SUPPORT_SERIALIZATION
-#include <boost/serialization/split_member.hpp>
-#endif
-
 namespace hku {
 
 /**

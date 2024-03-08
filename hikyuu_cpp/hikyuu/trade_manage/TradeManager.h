@@ -19,12 +19,6 @@
 #include "OrderBrokerBase.h"
 #include "crt/TC_Zero.h"
 
-#if HKU_SUPPORT_SERIALIZATION
-#include <boost/serialization/map.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/list.hpp>
-#endif
-
 namespace hku {
 
 /**

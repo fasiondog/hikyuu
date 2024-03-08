@@ -14,8 +14,6 @@
 
 #if HKU_SUPPORT_SERIALIZATION
 #if HKU_SUPPORT_XML_ARCHIVE
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/split_free.hpp>
 
 namespace boost {
 namespace serialization {
