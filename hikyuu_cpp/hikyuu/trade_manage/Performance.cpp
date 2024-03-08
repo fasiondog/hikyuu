@@ -104,7 +104,7 @@ PriceList Performance::values() const {
     PriceList result(m_result.size());
     size_t i = 0;
     for (const auto& key : m_keys) {
-        result[i] = m_result.at(key);
+        result[i++] = m_result.at(key);
     }
     return result;
 }
