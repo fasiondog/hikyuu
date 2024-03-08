@@ -66,7 +66,6 @@ void ConditionBase::setTO(const KData& kdata) {
     reset();
     m_kdata = kdata;
     if (!kdata.empty()) {
-        m_date_index.clear();
         size_t total = kdata.size();
         m_values.resize(total);
         auto const* ks = m_kdata.data();

@@ -24,22 +24,12 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SignalPtr& sg) {
     return os;
 }
 
-SignalBase::SignalBase()
-: m_name("SignalBase"),
-  m_hold_long(false),
-  m_hold_short(false),
-  m_last_buy_pos(Null<size_t>()),
-  m_last_sell_pos(Null<size_t>()) {
+SignalBase::SignalBase() : m_name("SignalBase"), m_hold_long(false), m_hold_short(false) {
     setParam<bool>("alternate", true);              // 买入卖出信号交替出现
     setParam<bool>("support_borrow_stock", false);  // 支持发出空头信号
 }
 
-SignalBase::SignalBase(const string& name)
-: m_name(name),
-  m_hold_long(false),
-  m_hold_short(false),
-  m_last_buy_pos(Null<size_t>()),
-  m_last_sell_pos(Null<size_t>()) {
+SignalBase::SignalBase(const string& name) : m_name(name), m_hold_long(false), m_hold_short(false) {
     setParam<bool>("alternate", true);
     setParam<bool>("support_borrow_stock", false);
 }
@@ -67,12 +57,8 @@ SignalPtr SignalBase::clone() {
     p->m_hold_short = m_hold_short;
     p->m_buySig = m_buySig;
     p->m_sellSig = m_sellSig;
-
     p->m_date_index = m_date_index;
-    p->m_dates = m_dates;
     p->m_values = m_values;
-    p->m_last_buy_pos = m_last_buy_pos;
-    p->m_last_sell_pos = m_last_sell_pos;
     return p;
 }
 
@@ -80,6 +66,13 @@ void SignalBase::setTO(const KData& kdata) {
     reset();
     m_kdata = kdata;
     if (!kdata.empty()) {
+        size_t total = kdata.size();
+        m_values.resize(total);
+        memset(m_values.data(), 0, sizeof(price_t) * total);
+        auto const* ks = m_kdata.data();
+        for (size_t i = 0; i < total; i++) {
+            m_date_index[ks[i].datetime] = i;
+        }
         _calculate();
     }
 }
@@ -90,20 +83,25 @@ void SignalBase::reset() {
     m_hold_long = false;
     m_hold_short = false;
     m_date_index.clear();
-    m_dates.clear();
     m_values.clear();
     _reset();
 }
 
 DatetimeList SignalBase::getBuySignal() const {
-    DatetimeList result(m_buySig.size());
-    std::copy(m_buySig.begin(), m_buySig.end(), result.begin());
+    DatetimeList result;
+    result.reserve(m_buySig.size());
+    for (auto iter = m_buySig.begin(), end = m_buySig.end(); iter != end; ++iter) {
+        result.push_back(iter->first);
+    }
     return result;
 }
 
 DatetimeList SignalBase::getSellSignal() const {
     DatetimeList result(m_sellSig.size());
-    std::copy(m_sellSig.begin(), m_sellSig.end(), result.begin());
+    result.reserve(m_sellSig.size());
+    for (auto iter = m_sellSig.begin(), end = m_sellSig.end(); iter != end; ++iter) {
+        result.push_back(iter->first);
+    }
     return result;
 }
 
@@ -115,12 +113,29 @@ bool SignalBase::shouldSell(const Datetime& datetime) const {
     return m_sellSig.count(datetime) ? true : false;
 }
 
+void SignalBase::_addSignal(const Datetime& datetime, price_t value) {
+    if (value > 0.0) {
+        _addBuySignal(datetime, value);
+    } else if (value < 0.0) {
+        _addSellSignal(datetime, value);
+    } else {
+        // 已经初始化为0
+    }
+}
+
 void SignalBase::_addBuySignal(const Datetime& datetime, price_t value) {
+    auto iter = m_date_index.find(datetime);
+    HKU_IF_RETURN(iter == m_date_index.end(), void());
+
+    size_t pos = iter->second;
+    m_values[pos] += value;
+
     if (!getParam<bool>("alternate")) {
-        m_buySig.insert(datetime);
+        m_buySig[datetime] = pos;
+
     } else {
         if (!m_hold_long) {
-            m_buySig.insert(datetime);
+            m_buySig[datetime] = pos;
             if (getParam<bool>("support_borrow_stock") && m_hold_short) {
                 m_hold_short = false;
             } else {
@@ -128,48 +143,26 @@ void SignalBase::_addBuySignal(const Datetime& datetime, price_t value) {
             }
         }
     }
-
-    HKU_WARN_IF(!m_dates.empty() && datetime > m_dates.back(), "Please join in ascending order!");
-    if (!getParam<bool>("alternate")) {
-        m_date_index[datetime] = m_values.size();
-        m_dates.emplace_back(datetime);
-        m_values.push_back(value);
-        m_last_buy_pos = m_values.size();
-
-    } else {
-        if (m_last_sell_pos > m_last_buy_pos || m_last_sell_pos == Null<size_t>()) {
-            m_values.push_back(value);
-            m_last_buy_pos = m_values.size();
-            m_date_index[datetime] = m_last_buy_pos;
-        }
-    }
 }
 
 void SignalBase::_addSellSignal(const Datetime& datetime, price_t value) {
+    auto iter = m_date_index.find(datetime);
+    HKU_IF_RETURN(iter == m_date_index.end(), void());
+
+    size_t pos = iter->second;
+    m_values[pos] += value;
+
     if (!getParam<bool>("alternate")) {
-        m_sellSig.insert(datetime);
+        m_sellSig[datetime] = pos;
     } else {
         if (!m_hold_short) {
             if (m_hold_long) {
-                m_sellSig.insert(datetime);
+                m_sellSig[datetime] = pos;
                 m_hold_long = false;
             } else if (getParam<bool>("support_borrow_stock")) {
-                m_sellSig.insert(datetime);
+                m_sellSig[datetime] = pos;
                 m_hold_short = true;
             }
-        }
-    }
-
-    if (!getParam<bool>("alternate")) {
-        m_date_index[datetime] = m_values.size();
-        m_dates.emplace_back(datetime);
-        m_values.push_back(value);
-        m_last_sell_pos = m_values.size();
-    } else {
-        if (m_last_buy_pos > m_last_sell_pos || m_last_buy_pos == Null<size_t>()) {
-            m_values.push_back(value);
-            m_last_buy_pos = m_values.size();
-            m_date_index[datetime] = m_last_buy_pos;
         }
     }
 }

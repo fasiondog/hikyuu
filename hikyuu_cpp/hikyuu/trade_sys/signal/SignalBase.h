@@ -59,6 +59,8 @@ public:
     /** 获取所有卖出指示日期列表 */
     DatetimeList getSellSignal() const;
 
+    void _addSignal(const Datetime& datetime, price_t value = 1.0);
+
     /**
      * 加入买入信号，在_calculate中调用
      * @param datetime 发生买入信号的日期
@@ -113,15 +115,10 @@ protected:
     /* 空头持仓 */
     bool m_hold_short;
 
-    // 用 set 保存，以便获取是能保持顺序
-    std::set<Datetime> m_buySig;
-    std::set<Datetime> m_sellSig;
-
-    unordered_map<Datetime, size_t> m_date_index;
-    vector<Datetime> m_dates;
-    vector<price_t> m_values;
-    size_t m_last_buy_pos;
-    size_t m_last_sell_pos;
+    map<Datetime, size_t> m_buySig;
+    map<Datetime, size_t> m_sellSig;
+    map<Datetime, size_t> m_date_index;
+    vector<price_t> m_values;  // 和交易对象等长
 
 //============================================
 // 序列化支持
@@ -138,10 +135,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
-        ar& BOOST_SERIALIZATION_NVP(m_dates);
         ar& BOOST_SERIALIZATION_NVP(m_values);
-        ar& BOOST_SERIALIZATION_NVP(m_last_buy_pos);
-        ar& BOOST_SERIALIZATION_NVP(m_last_sell_pos);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
@@ -155,10 +149,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
-        ar& BOOST_SERIALIZATION_NVP(m_dates);
         ar& BOOST_SERIALIZATION_NVP(m_values);
-        ar& BOOST_SERIALIZATION_NVP(m_last_buy_pos);
-        ar& BOOST_SERIALIZATION_NVP(m_last_sell_pos);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
