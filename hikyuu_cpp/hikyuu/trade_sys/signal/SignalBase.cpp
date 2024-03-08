@@ -25,7 +25,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SignalPtr& sg) {
 }
 
 SignalBase::SignalBase() : m_name("SignalBase"), m_hold_long(false), m_hold_short(false) {
-    setParam<bool>("alternate", true);       // 买入卖出信号交替出现
+    setParam<bool>("alternate", true);              // 买入卖出信号交替出现
     setParam<bool>("support_borrow_stock", false);  // 支持发出空头信号
 }
 
@@ -54,6 +54,7 @@ SignalPtr SignalBase::clone() {
     p->m_params = m_params;
     p->m_kdata = m_kdata;
     p->m_hold_long = m_hold_long;
+    p->m_hold_short = m_hold_short;
     p->m_buySig = m_buySig;
     p->m_sellSig = m_sellSig;
     return p;
