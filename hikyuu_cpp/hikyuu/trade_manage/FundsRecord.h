@@ -12,10 +12,6 @@
 #include "../DataType.h"
 #include "../config.h"
 
-#if HKU_SUPPORT_SERIALIZATION
-#include <boost/serialization/nvp.hpp>
-#endif
-
 namespace hku {
 
 /**

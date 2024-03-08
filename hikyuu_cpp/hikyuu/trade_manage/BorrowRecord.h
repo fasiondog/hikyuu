@@ -13,10 +13,6 @@
 #include "../serialization/Stock_serialization.h"
 #include "../serialization/Datetime_serialization.h"
 
-#if HKU_SUPPORT_SERIALIZATION
-#include <boost/serialization/list.hpp>
-#endif
-
 namespace hku {
 
 /**

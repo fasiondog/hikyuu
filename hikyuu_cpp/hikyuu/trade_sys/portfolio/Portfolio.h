@@ -12,12 +12,6 @@
 #include "../allocatefunds/AllocateFundsBase.h"
 #include "../selector/SelectorBase.h"
 
-#if HKU_SUPPORT_SERIALIZATION
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/assume_abstract.hpp>
-#include <boost/serialization/base_object.hpp>
-#endif
-
 namespace hku {
 
 /*
