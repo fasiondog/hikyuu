@@ -24,12 +24,22 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SignalPtr& sg) {
     return os;
 }
 
-SignalBase::SignalBase() : m_name("SignalBase"), m_hold_long(false), m_hold_short(false) {
+SignalBase::SignalBase()
+: m_name("SignalBase"),
+  m_hold_long(false),
+  m_hold_short(false),
+  m_last_buy_pos(Null<size_t>()),
+  m_last_sell_pos(Null<size_t>()) {
     setParam<bool>("alternate", true);              // 买入卖出信号交替出现
     setParam<bool>("support_borrow_stock", false);  // 支持发出空头信号
 }
 
-SignalBase::SignalBase(const string& name) : m_name(name), m_hold_long(false), m_hold_short(false) {
+SignalBase::SignalBase(const string& name)
+: m_name(name),
+  m_hold_long(false),
+  m_hold_short(false),
+  m_last_buy_pos(Null<size_t>()),
+  m_last_sell_pos(Null<size_t>()) {
     setParam<bool>("alternate", true);
     setParam<bool>("support_borrow_stock", false);
 }
@@ -57,6 +67,12 @@ SignalPtr SignalBase::clone() {
     p->m_hold_short = m_hold_short;
     p->m_buySig = m_buySig;
     p->m_sellSig = m_sellSig;
+
+    p->m_date_index = m_date_index;
+    p->m_dates = m_dates;
+    p->m_values = m_values;
+    p->m_last_buy_pos = m_last_buy_pos;
+    p->m_last_sell_pos = m_last_sell_pos;
     return p;
 }
 
@@ -73,6 +89,9 @@ void SignalBase::reset() {
     m_sellSig.clear();
     m_hold_long = false;
     m_hold_short = false;
+    m_date_index.clear();
+    m_dates.clear();
+    m_values.clear();
     _reset();
 }
 
@@ -88,7 +107,15 @@ DatetimeList SignalBase::getSellSignal() const {
     return result;
 }
 
-void SignalBase::_addBuySignal(const Datetime& datetime) {
+bool SignalBase::shouldBuy(const Datetime& datetime) const {
+    return m_buySig.count(datetime) ? true : false;
+}
+
+bool SignalBase::shouldSell(const Datetime& datetime) const {
+    return m_sellSig.count(datetime) ? true : false;
+}
+
+void SignalBase::_addBuySignal(const Datetime& datetime, price_t value) {
     if (!getParam<bool>("alternate")) {
         m_buySig.insert(datetime);
     } else {
@@ -101,9 +128,24 @@ void SignalBase::_addBuySignal(const Datetime& datetime) {
             }
         }
     }
+
+    HKU_WARN_IF(!m_dates.empty() && datetime > m_dates.back(), "Please join in ascending order!");
+    if (!getParam<bool>("alternate")) {
+        m_date_index[datetime] = m_values.size();
+        m_dates.emplace_back(datetime);
+        m_values.push_back(value);
+        m_last_buy_pos = m_values.size();
+
+    } else {
+        if (m_last_sell_pos > m_last_buy_pos || m_last_sell_pos == Null<size_t>()) {
+            m_values.push_back(value);
+            m_last_buy_pos = m_values.size();
+            m_date_index[datetime] = m_last_buy_pos;
+        }
+    }
 }
 
-void SignalBase::_addSellSignal(const Datetime& datetime) {
+void SignalBase::_addSellSignal(const Datetime& datetime, price_t value) {
     if (!getParam<bool>("alternate")) {
         m_sellSig.insert(datetime);
     } else {
@@ -115,6 +157,19 @@ void SignalBase::_addSellSignal(const Datetime& datetime) {
                 m_sellSig.insert(datetime);
                 m_hold_short = true;
             }
+        }
+    }
+
+    if (!getParam<bool>("alternate")) {
+        m_date_index[datetime] = m_values.size();
+        m_dates.emplace_back(datetime);
+        m_values.push_back(value);
+        m_last_sell_pos = m_values.size();
+    } else {
+        if (m_last_buy_pos > m_last_sell_pos || m_last_buy_pos == Null<size_t>()) {
+            m_values.push_back(value);
+            m_last_buy_pos = m_values.size();
+            m_date_index[datetime] = m_last_buy_pos;
         }
     }
 }

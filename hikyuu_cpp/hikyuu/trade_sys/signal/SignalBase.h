@@ -63,13 +63,13 @@ public:
      * 加入买入信号，在_calculate中调用
      * @param datetime 发生买入信号的日期
      */
-    void _addBuySignal(const Datetime& datetime);
+    void _addBuySignal(const Datetime& datetime, price_t value = 1.0);
 
     /**
      * 加入卖出信号，在_calculate中调用
      * @param datetime
      */
-    void _addSellSignal(const Datetime& datetime);
+    void _addSellSignal(const Datetime& datetime, price_t value = -1.0);
 
     /**
      * 指定交易对象，指K线数据
@@ -117,6 +117,12 @@ protected:
     std::set<Datetime> m_buySig;
     std::set<Datetime> m_sellSig;
 
+    unordered_map<Datetime, size_t> m_date_index;
+    vector<Datetime> m_dates;
+    vector<price_t> m_values;
+    size_t m_last_buy_pos;
+    size_t m_last_sell_pos;
+
 //============================================
 // 序列化支持
 //============================================
@@ -131,6 +137,11 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
+        ar& BOOST_SERIALIZATION_NVP(m_date_index);
+        ar& BOOST_SERIALIZATION_NVP(m_dates);
+        ar& BOOST_SERIALIZATION_NVP(m_values);
+        ar& BOOST_SERIALIZATION_NVP(m_last_buy_pos);
+        ar& BOOST_SERIALIZATION_NVP(m_last_sell_pos);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
@@ -143,6 +154,11 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
+        ar& BOOST_SERIALIZATION_NVP(m_date_index);
+        ar& BOOST_SERIALIZATION_NVP(m_dates);
+        ar& BOOST_SERIALIZATION_NVP(m_values);
+        ar& BOOST_SERIALIZATION_NVP(m_last_buy_pos);
+        ar& BOOST_SERIALIZATION_NVP(m_last_sell_pos);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
@@ -207,14 +223,6 @@ inline const string& SignalBase::name() const {
 
 inline void SignalBase::name(const string& name) {
     m_name = name;
-}
-
-inline bool SignalBase::shouldBuy(const Datetime& datetime) const {
-    return m_buySig.count(datetime) ? true : false;
-}
-
-inline bool SignalBase::shouldSell(const Datetime& datetime) const {
-    return m_sellSig.count(datetime) ? true : false;
 }
 
 } /* namespace hku */
