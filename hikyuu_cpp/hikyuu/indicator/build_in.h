@@ -47,6 +47,7 @@
 #include "crt/HHV.h"
 #include "crt/HHVBARS.h"
 #include "crt/HSL.h"
+#include "crt/IC.h"
 #include "crt/INTPART.h"
 #include "crt/LAST.h"
 #include "crt/LIUTONGPAN.h"
