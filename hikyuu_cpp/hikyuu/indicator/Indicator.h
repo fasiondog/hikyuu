@@ -393,7 +393,7 @@ Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n);
  * @param ind2 指标2
  * @ingroup Indicator
  */
-Indicator HKU_API SPEARMAN(const Indicator& ind1, const Indicator& ind2, int n);
+// Indicator HKU_API SPEARMAN(const Indicator& ind1, const Indicator& ind2, int n);
 
 } /* namespace hku */
 

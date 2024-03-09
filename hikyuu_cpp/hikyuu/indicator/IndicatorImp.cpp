@@ -1629,7 +1629,11 @@ void IndicatorImp::execute_spearman() {
     auto *ptrb = levelb.get();
 
     // 不处理 n 不足的情况，防止只需要计算全部序列时，过于耗时
-    value_t back = std::pow(value_t(n), 3) - n;
+    double back = std::pow(n, 3) - n;
+    vector<IndicatorImp::value_t> tmpa;
+    vector<IndicatorImp::value_t> tmpb;
+    tmpa.reserve(n);
+    tmpa.reserve(n);
     for (size_t r = 0; r < result_number; ++r) {
         auto *dst = this->data(r);
         auto const *maxdata = maxp->data(r);
@@ -1637,13 +1641,26 @@ void IndicatorImp::execute_spearman() {
         auto const *a = maxdata + discard + 1 - n;
         auto const *b = mindata + discard + 1 - diff - n;
         for (size_t i = discard; i < total; ++i) {
-            spearmanLevel(a, ptra, n);
-            spearmanLevel(b, ptrb, n);
+            tmpa.clear();
+            tmpb.clear();
+            for (int j = 0; j < n; j++) {
+                if (!std::isnan(a[j]) && !std::isnan(b[j])) {
+                    tmpa.push_back(a[j]);
+                    tmpb.push_back(b[j]);
+                }
+            }
+            int act_count = tmpa.size();
+            if (act_count < 2) {
+                continue;
+            }
+            spearmanLevel(tmpa.data(), ptra, act_count);
+            spearmanLevel(tmpb.data(), ptrb, act_count);
             value_t sum = 0.0;
-            for (size_t j = 0; j < n; j++) {
+            for (int j = 0; j < act_count; j++) {
                 sum += std::pow(ptra[j] - ptrb[j], 2);
             }
-            dst[i] = 1 - 6.0 * sum / back;
+            dst[i] = act_count == n ? 1.0 - 6.0 * sum / back
+                                    : 1.0 - 6.0 * sum / (std::pow(act_count, 3) - act_count);
             a++;
             b++;
         }

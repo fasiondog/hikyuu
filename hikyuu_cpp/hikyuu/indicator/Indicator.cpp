@@ -315,14 +315,14 @@ Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n) {
     return p->calculate();
 }
 
-Indicator HKU_API SPEARMAN(const Indicator& ind1, const Indicator& ind2, int n) {
-    HKU_ERROR_IF_RETURN(!ind1.getImp() || !ind2.getImp(), Indicator(),
-                        "ind1 or ind2 is Null Indicator!");
-    HKU_ERROR_IF_RETURN(n < 2, Indicator(), "Invalid param n: {} (need >= 2)", n);
-    IndicatorImpPtr p = make_shared<IndicatorImp>("SPEARMAN");
-    p->setParam<int>("n", n);
-    p->add(IndicatorImp::SPEARMAN, ind1.getImp(), ind2.getImp());
-    return p->calculate();
-}
+// Indicator HKU_API SPEARMAN(const Indicator& ind1, const Indicator& ind2, int n) {
+//     HKU_ERROR_IF_RETURN(!ind1.getImp() || !ind2.getImp(), Indicator(),
+//                         "ind1 or ind2 is Null Indicator!");
+//     HKU_ERROR_IF_RETURN(n < 2, Indicator(), "Invalid param n: {} (need >= 2)", n);
+//     IndicatorImpPtr p = make_shared<IndicatorImp>("SPEARMAN");
+//     p->setParam<int>("n", n);
+//     p->add(IndicatorImp::SPEARMAN, ind1.getImp(), ind2.getImp());
+//     return p->calculate();
+// }
 
 } /* namespace hku */
