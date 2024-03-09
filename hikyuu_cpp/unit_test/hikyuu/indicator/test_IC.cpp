@@ -29,7 +29,10 @@ TEST_CASE("test_IC") {
 
     KQuery query = KQuery(-200);
     Indicator result = IC(stks, query, 1, ref_stk)(MA(CLOSE()));
-    HKU_INFO("{}", result);
+    // HKU_INFO("{}", result);
+    // for (size_t i = 0, total = result.size(); i < total; i++) {
+    //     HKU_INFO("{}: {}", i, result[i]);
+    // }
 
     // PriceList a;
     // for (int i = 0; i < 10; ++i) {

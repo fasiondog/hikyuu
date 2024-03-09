@@ -65,21 +65,20 @@ void IIc::_calculate(const Indicator& inputInd) {
     for (const auto& stk : m_stks) {
         auto k = stk.getKData(m_query);
         all_inds.push_back(ALIGN(ind(k), ref_dates));
-        HKU_INFO("{} {}", stk.market_code(), ALIGN(ind(k), ref_dates));
         all_returns.push_back(ROCP(k.close(), n));
     }
 
-    PriceList tmp(total, Null<price_t>());
-    PriceList tmp_return(total, Null<price_t>());
     size_t ind_count = all_inds.size();
+    PriceList tmp(ind_count, Null<price_t>());
+    PriceList tmp_return(ind_count, Null<price_t>());
     auto* dst = this->data();
     for (size_t i = 0; i < total; i++) {
         for (size_t j = 0; j < ind_count; j++) {
             if (i >= all_inds[j].size() || i >= all_returns[j].size()) {
                 continue;
             }
-            tmp[i] = all_inds[j][i];
-            tmp_return[i] = all_returns[j][i];
+            tmp[j] = all_inds[j][i];
+            tmp_return[j] = all_returns[j][i];
         }
         auto a = PRICELIST(tmp);
         auto b = PRICELIST(tmp_return);
