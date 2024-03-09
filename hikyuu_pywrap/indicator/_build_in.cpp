@@ -466,6 +466,9 @@ Indicator (*ZHBOND10_2)(const DatetimeList&, double) = ZHBOND10;
 Indicator (*ZHBOND10_3)(const KData& k, double) = ZHBOND10;
 Indicator (*ZHBOND10_4)(const Indicator&, double) = ZHBOND10;
 
+Indicator (*CORR_1)(int) = CORR;
+Indicator (*CORR_2)(const Indicator&, const Indicator&, int) = CORR;
+
 Indicator (*SPEARMAN_1)(int) = SPEARMAN;
 Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int) = SPEARMAN;
 
@@ -850,13 +853,15 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind2: 指标2
     :rtype: Indicator)");
 
-    m.def("CORR", CORR, R"(CORR(ind1, ind2, n)
+    m.def("CORR", CORR_1, py::arg("n") = 10);
+    m.def("CORR", CORR_2, py::arg("ind1"), py::arg("ind2"), py::arg("n") = 10,
+          R"(CORR(ind1, ind2, n)
 
     计算 ind1 和 ind2 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
 
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
-    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数
+    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
     :rtype: Indicator)");
 
     m.def("IF", IF_1);

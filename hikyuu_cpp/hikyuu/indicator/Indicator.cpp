@@ -305,14 +305,4 @@ Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_
     return IF(x, CVAL(x, a), CVAL(x, b));
 }
 
-Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n) {
-    HKU_ERROR_IF_RETURN(!ind1.getImp() || !ind2.getImp(), Indicator(),
-                        "ind1 or ind2 is Null Indicator!");
-    HKU_ERROR_IF_RETURN(n < 2, Indicator(), "Invalid param n: {} (need >= 2)", n);
-    IndicatorImpPtr p = make_shared<IndicatorImp>("CORR");
-    p->setParam<int>("n", n);
-    p->add(IndicatorImp::CORR, ind1.getImp(), ind2.getImp());
-    return p->calculate();
-}
-
 } /* namespace hku */

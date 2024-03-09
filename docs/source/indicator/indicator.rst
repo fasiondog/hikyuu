@@ -207,7 +207,7 @@
 
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
-    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数
+    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
     :rtype: Indicator    
 
 

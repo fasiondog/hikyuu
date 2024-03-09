@@ -76,7 +76,6 @@ static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value
 
 void ISpearman::_calculate(const Indicator &ind) {
     auto k = getContext();
-
     m_ref_ind.setContext(k);
     Indicator ref = m_ref_ind;
     if (m_ref_ind.size() != ind.size()) {

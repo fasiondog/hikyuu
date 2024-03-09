@@ -165,21 +165,14 @@ TEST_CASE("test_SPEARMAN") {
     price_t null_value = Null<price_t>();
     x = PRICELIST({3., 8., null_value, 4., 7., 2., null_value, null_value});
     y = PRICELIST({null_value, 5., 10., 8., null_value, 10., 6., null_value});
-    // expect = {null_value, , 1., 0.875, 1.};
-    // nan, 8, nan, 4, nan,   2, nan
-    // nan, 5, nan, 8, nan, 10, nan,
     result = SPEARMAN(x, y, 4);
-    HKU_INFO("{}", result);
-    for (size_t i = result.discard(); i < result.size(); i++) {
-        HKU_INFO("{}: {}", i, result[i]);
-    }
-
-    x = PRICELIST({8., 4., 2.});
-    y = PRICELIST({5., 8., 10.});
-    result = SPEARMAN(x, y, x.size());
-    HKU_INFO("{}", result);
-    HKU_INFO("{}", std::pow(null_value, 2));
-    HKU_INFO("{}", 1.0 * 6.0 * null_value / (std::pow(x.size(), 3) - x.size()));
+    CHECK_EQ(result.name(), "SPEARMAN");
+    CHECK_EQ(result.discard(), 3);
+    CHECK_EQ(result.size(), x.size());
+    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_EQ(result[5], doctest::Approx(-1.));
+    CHECK_EQ(result[6], doctest::Approx(-1.));
+    CHECK_UNARY(std::isnan(result[7]));
 }
 
 //-----------------------------------------------------------------------------

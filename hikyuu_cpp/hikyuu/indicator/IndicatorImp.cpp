@@ -93,10 +93,6 @@ string HKU_API getOPTypeName(IndicatorImp::OPType op) {
             name = "IF";
             break;
 
-        case IndicatorImp::CORR:
-            name = "CORR";
-            break;
-
         default:
             name = "UNKNOWN";
             break;
@@ -534,10 +530,6 @@ string IndicatorImp::formula() const {
                 << m_right->formula() << ")";
             break;
 
-        case CORR:
-            buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
-            break;
-
         default:
             HKU_ERROR("Wrong optype! {}", int(m_optype));
             break;
@@ -795,10 +787,6 @@ Indicator IndicatorImp::calculate() {
 
         case OP_IF:
             execute_if();
-            break;
-
-        case CORR:
-            execute_corr();
             break;
 
         default:
@@ -1461,88 +1449,6 @@ void IndicatorImp::execute_if() {
             }
         }
     }
-}
-
-void IndicatorImp::execute_corr() {
-    m_right->calculate();
-    m_left->calculate();
-
-    const IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    // 结果 0 存放相关系数结果
-    // 结果 1 存放协方差（COV）结果
-    _readyBuffer(total, 2);
-
-    int n = getParam<int>("n");
-    if (n < 2 || discard + 2 > total) {
-        setDiscard(total);
-        return;
-    }
-
-    size_t startPos = discard;
-    size_t first_end = startPos + n >= total ? total : startPos + n;
-
-    value_t kx = maxp->get(discard);
-    value_t ky = minp->get(discard);
-    value_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
-    value_t ex2 = 0.0, ey2 = 0.0;
-    value_t ix, iy;
-
-    auto *dst0 = this->data(0);
-    auto *dst1 = this->data(1);
-    auto const *maxdata = maxp->data(0);
-    auto const *mindata = minp->data(0);
-    for (size_t i = startPos + 1; i < first_end; i++) {
-        ix = maxdata[i] - kx;
-        iy = mindata[i] - ky;
-        ex += ix;
-        ey += iy;
-        value_t powx2 = ix * ix;
-        value_t powy2 = iy * iy;
-        value_t powxy = ix * iy;
-        exy += powxy;
-        ex2 += powx2;
-        ey2 += powy2;
-        size_t nobs = i - startPos;
-        varx = ex2 - powx2 / nobs;
-        vary = ey2 - powy2 / nobs;
-        cov = exy - powxy / nobs;
-        dst0[i] = cov / std::sqrt(varx * vary);
-        dst1[i] = cov / (nobs - 1);
-    }
-
-    for (size_t i = first_end; i < total; i++) {
-        ix = maxdata[i] - kx;
-        iy = mindata[i] - ky;
-        ex += maxdata[i] - maxdata[i - n];
-        ey += mindata[i] - mindata[i - n];
-        value_t preix = maxdata[i - n] - kx;
-        value_t preiy = mindata[i - n] - ky;
-        ex2 += ix * ix - preix * preix;
-        ey2 += iy * iy - preiy * preiy;
-        exy += ix * iy - preix * preiy;
-        varx = (ex2 - ex * ex / n);
-        vary = (ey2 - ey * ey / n);
-        cov = (exy - ex * ey / n);
-        dst0[i] = cov / std::sqrt(varx * vary);
-        dst1[i] = cov / (n - 1);
-    }
-
-    // 修正 discard
-    setDiscard(discard + 2);
 }
 
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {

@@ -27,6 +27,7 @@
 #include "crt/BARSSINCE.h"
 #include "crt/BETWEEN.h"
 #include "crt/CEILING.h"
+#include "crt/CORR.h"
 #include "crt/COS.h"
 #include "crt/COST.h"
 #include "crt/COUNT.h"
