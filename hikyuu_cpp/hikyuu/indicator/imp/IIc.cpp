@@ -9,6 +9,7 @@
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/ROCP.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
+#include "hikyuu/indicator/crt/SPEARMAN.h"
 #include "IIc.h"
 
 #if HKU_SUPPORT_SERIALIZATION
