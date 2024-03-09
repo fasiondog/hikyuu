@@ -18,8 +18,13 @@ ISpearman::ISpearman() : IndicatorImp("SPEARMAN") {
     setParam<int>("n", 0);
 }
 
-ISpearman::ISpearman(const Indicator &ref_ind) : IndicatorImp("SPEARMAN"), m_ref_ind(ref_ind) {
-    setParam<int>("n", 0);
+ISpearman::ISpearman(int n) : IndicatorImp("SPEARMAN") {
+    setParam<int>("n", n);
+}
+
+ISpearman::ISpearman(const Indicator &ref_ind, int n)
+: IndicatorImp("SPEARMAN"), m_ref_ind(ref_ind) {
+    setParam<int>("n", n);
 }
 
 ISpearman::~ISpearman() {}
@@ -135,10 +140,14 @@ void ISpearman::_calculate(const Indicator &ind) {
     }
 }
 
+Indicator HKU_API SPEARMAN(int n) {
+    return make_shared<ISpearman>(n);
+}
+
 Indicator HKU_API SPEARMAN(const Indicator &ind1, const Indicator &ind2, int n) {
-    ISpearman *p = new ISpearman(ind2);
-    p->setParam<int>("n", n);
-    return IndicatorImpPtr(p);
+    auto p = make_shared<ISpearman>(ind2, n);
+    Indicator result(p);
+    return result(ind1);
 }
 
 }  // namespace hku

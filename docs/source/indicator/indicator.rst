@@ -869,7 +869,7 @@
 
     :param Indicator ind1: 输入参数1
     :param Indicator ind2: 输入参数2
-    :param int n: 指定窗口    
+    :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度
 
 
 .. py:function:: SQRT([data])

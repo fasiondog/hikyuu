@@ -387,14 +387,6 @@ Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_
  */
 Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n);
 
-/**
- * Spearman 相关系数
- * @param ind1 指标1
- * @param ind2 指标2
- * @ingroup Indicator
- */
-// Indicator HKU_API SPEARMAN(const Indicator& ind1, const Indicator& ind2, int n);
-
 } /* namespace hku */
 
 #if FMT_VERSION >= 90000

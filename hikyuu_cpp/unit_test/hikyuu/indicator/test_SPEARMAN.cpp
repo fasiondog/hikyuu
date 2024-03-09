@@ -152,34 +152,34 @@ TEST_CASE("test_SPEARMAN") {
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
 
-    // expect = {Null<price_t>(), Null<price_t>(), 1., 0.875, 1.};
-    // result = SPEARMAN(x, y, 3);
-    // CHECK_EQ(result.name(), "SPEARMAN");
-    // CHECK_EQ(result.discard(), 2);
-    // CHECK_EQ(result.size(), a.size());
-    // for (size_t i = result.discard(); i < result.size(); i++) {
-    //     CHECK_EQ(result[i], doctest::Approx(expect[i]));
-    // }
+    expect = {Null<price_t>(), Null<price_t>(), 1., 0.875, 1.};
+    result = SPEARMAN(x, y, 3);
+    CHECK_EQ(result.name(), "SPEARMAN");
+    CHECK_EQ(result.discard(), 2);
+    CHECK_EQ(result.size(), a.size());
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(result[i], doctest::Approx(expect[i]));
+    }
 
-    // /** @arg 包含 nan 值 */
-    // price_t null_value = Null<price_t>();
-    // auto x = PRICELIST({3., 8., null_value, 4., 7., 2., null_value, null_value});
-    // auto y = PRICELIST({null_value, 5., 10., 8., null_value, 10., 6., null_value});
-    // // expect = {null_value, , 1., 0.875, 1.};
-    // // nan, 8, nan, 4, nan,   2, nan
-    // // nan, 5, nan, 8, nan, 10, nan,
-    // result = SPEARMAN(x, y, 4);
-    // HKU_INFO("{}", result);
-    // for (size_t i = result.discard(); i < result.size(); i++) {
-    //     HKU_INFO("{}: {}", i, result[i]);
-    // }
+    /** @arg 包含 nan 值 */
+    price_t null_value = Null<price_t>();
+    x = PRICELIST({3., 8., null_value, 4., 7., 2., null_value, null_value});
+    y = PRICELIST({null_value, 5., 10., 8., null_value, 10., 6., null_value});
+    // expect = {null_value, , 1., 0.875, 1.};
+    // nan, 8, nan, 4, nan,   2, nan
+    // nan, 5, nan, 8, nan, 10, nan,
+    result = SPEARMAN(x, y, 4);
+    HKU_INFO("{}", result);
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        HKU_INFO("{}: {}", i, result[i]);
+    }
 
-    // x = PRICELIST({8., 4., 2.});
-    // y = PRICELIST({5., 8., 10.});
-    // result = SPEARMAN(x, y, x.size());
-    // HKU_INFO("{}", result);
-    // HKU_INFO("{}", std::pow(null_value, 2));
-    // HKU_INFO("{}", 1.0 * 6.0 * null_value / (std::pow(x.size(), 3) - x.size()));
+    x = PRICELIST({8., 4., 2.});
+    y = PRICELIST({5., 8., 10.});
+    result = SPEARMAN(x, y, x.size());
+    HKU_INFO("{}", result);
+    HKU_INFO("{}", std::pow(null_value, 2));
+    HKU_INFO("{}", 1.0 * 6.0 * null_value / (std::pow(x.size(), 3) - x.size()));
 }
 
 //-----------------------------------------------------------------------------
@@ -210,50 +210,50 @@ TEST_CASE("test_SPEARMAN_benchmark") {
 
 /** @par 检测点 */
 TEST_CASE("test_SPEARMAN_export") {
-    // StockManager &sm = StockManager::instance();
-    // string filename(sm.tmpdir());
-    // filename += "/SPEARMAN.xml";
+    StockManager &sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/SPEARMAN.xml";
 
-    // Stock stock = sm.getStock("sh000001");
-    // KData kdata = stock.getKData(KQuery(-20));
-    // Indicator x1 = SPEARMAN(CLOSE(kdata), OPEN(kdata), 10);
-    // {
-    //     std::ofstream ofs(filename);
-    //     boost::archive::xml_oarchive oa(ofs);
-    //     oa << BOOST_SERIALIZATION_NVP(x1);
-    // }
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-20));
+    Indicator x1 = SPEARMAN(CLOSE(kdata), OPEN(kdata), 10);
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(x1);
+    }
 
-    // Indicator x2;
-    // {
-    //     std::ifstream ifs(filename);
-    //     boost::archive::xml_iarchive ia(ifs);
-    //     ia >> BOOST_SERIALIZATION_NVP(x2);
-    // }
+    Indicator x2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(x2);
+    }
 
-    // CHECK_EQ(x2.name(), "SPEARMAN");
-    // CHECK_EQ(x1.size(), x2.size());
-    // CHECK_EQ(x1.discard(), x2.discard());
-    // CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
-    // for (size_t i = x1.discard(); i < x1.size(); ++i) {
-    //     if (std::isnan(x1[i])) {
-    //         CHECK_UNARY(std::isnan(x2[i]));
-    //     } else {
-    //         CHECK_EQ(x1[i], doctest::Approx(x2[i]));
-    //     }
-    // }
+    CHECK_EQ(x2.name(), "SPEARMAN");
+    CHECK_EQ(x1.size(), x2.size());
+    CHECK_EQ(x1.discard(), x2.discard());
+    CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
+    for (size_t i = x1.discard(); i < x1.size(); ++i) {
+        if (std::isnan(x1[i])) {
+            CHECK_UNARY(std::isnan(x2[i]));
+        } else {
+            CHECK_EQ(x1[i], doctest::Approx(x2[i]));
+        }
+    }
 
-    // Indicator x11 = x1.getResult(1);
-    // Indicator x21 = x2.getResult(1);
-    // CHECK_EQ(x11.size(), x21.size());
-    // CHECK_EQ(x11.discard(), x21.discard());
-    // CHECK_EQ(x11.getResultNumber(), x21.getResultNumber());
-    // for (size_t i = x11.discard(); i < x21.size(); ++i) {
-    //     if (std::isnan(x11[i])) {
-    //         CHECK_UNARY(std::isnan(x21[i]));
-    //     } else {
-    //         CHECK_EQ(x11[i], doctest::Approx(x21[i]));
-    //     }
-    // }
+    Indicator x11 = x1.getResult(1);
+    Indicator x21 = x2.getResult(1);
+    CHECK_EQ(x11.size(), x21.size());
+    CHECK_EQ(x11.discard(), x21.discard());
+    CHECK_EQ(x11.getResultNumber(), x21.getResultNumber());
+    for (size_t i = x11.discard(); i < x21.size(); ++i) {
+        if (std::isnan(x11[i])) {
+            CHECK_UNARY(std::isnan(x21[i]));
+        } else {
+            CHECK_EQ(x11[i], doctest::Approx(x21[i]));
+        }
+    }
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 

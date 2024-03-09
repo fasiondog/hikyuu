@@ -466,6 +466,9 @@ Indicator (*ZHBOND10_2)(const DatetimeList&, double) = ZHBOND10;
 Indicator (*ZHBOND10_3)(const KData& k, double) = ZHBOND10;
 Indicator (*ZHBOND10_4)(const Indicator&, double) = ZHBOND10;
 
+Indicator (*SPEARMAN_1)(int) = SPEARMAN;
+Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int) = SPEARMAN;
+
 void export_Indicator_build_in(py::module& m) {
     m.def("KDATA", KDATA1);
     m.def("KDATA", KDATA3, R"(KDATA([data])
@@ -1645,12 +1648,13 @@ void export_Indicator_build_in(py::module& m) {
     :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
     :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值)");
 
-    m.def("SPEARMAN", SPEARMAN, py::arg("ind1"), py::arg("ind2"), py::arg("n"),
-          R"(SPEARMAN(ind1, ind2, n)
+    m.def("SPEARMAN", SPEARMAN_1, py::arg("n") = 0);
+    m.def("SPEARMAN", SPEARMAN_2, py::arg("ind1"), py::arg("ind2"), py::arg("n") = 0,
+          R"(SPEARMAN(ind1, ind2[, n])
 
     Spearman 相关系数
 
     :param Indicator ind1: 输入参数1
     :param Indicator ind2: 输入参数2
-    :param int n: 指定窗口)");
+    :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度)");
 }

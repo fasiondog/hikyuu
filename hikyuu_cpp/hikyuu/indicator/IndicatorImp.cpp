@@ -97,10 +97,6 @@ string HKU_API getOPTypeName(IndicatorImp::OPType op) {
             name = "CORR";
             break;
 
-        case IndicatorImp::SPEARMAN:
-            name = "SPEARMAN";
-            break;
-
         default:
             name = "UNKNOWN";
             break;
@@ -542,10 +538,6 @@ string IndicatorImp::formula() const {
             buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
             break;
 
-        case SPEARMAN:
-            buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
-            break;
-
         default:
             HKU_ERROR("Wrong optype! {}", int(m_optype));
             break;
@@ -807,10 +799,6 @@ Indicator IndicatorImp::calculate() {
 
         case CORR:
             execute_corr();
-            break;
-
-        case SPEARMAN:
-            execute_spearman();
             break;
 
         default:
@@ -1555,116 +1543,6 @@ void IndicatorImp::execute_corr() {
 
     // 修正 discard
     setDiscard(discard + 2);
-}
-
-static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value_t *level,
-                          size_t total) {
-    std::vector<std::pair<IndicatorImp::value_t, size_t>> data_index(total);
-    for (size_t i = 0; i < total; i++) {
-        data_index[i].first = data[i];
-        data_index[i].second = i;
-    }
-
-    std::sort(
-      data_index.begin(), data_index.end(),
-      std::bind(
-        std::less<IndicatorImp::value_t>(),
-        std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_1),
-        std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_2)));
-
-    size_t i = 0;
-    while (i < total) {
-        size_t count = 1;
-        IndicatorImp::value_t score = i + 1.0;
-        for (size_t j = i + 1; j < total; j++) {
-            if (data_index[i].first != data_index[j].first) {
-                break;
-            }
-            count++;
-            score += j + 1;
-        }
-        score = score / count;
-        for (size_t j = 0; j < count; j++) {
-            level[data_index[i + j].second] = score;
-        }
-        i += count;
-    }
-}
-
-void IndicatorImp::execute_spearman() {
-    m_right->calculate();
-    m_left->calculate();
-
-    const IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
-
-    int n = getParam<int>("n");
-    if (n < 2 || discard + 2 > total) {
-        setDiscard(total);
-        return;
-    }
-
-    discard += n - 1;
-    setDiscard(discard);
-
-    auto levela = std::make_unique<value_t[]>(n);
-    auto levelb = std::make_unique<value_t[]>(n);
-    auto *ptra = levela.get();
-    auto *ptrb = levelb.get();
-
-    // 不处理 n 不足的情况，防止只需要计算全部序列时，过于耗时
-    double back = std::pow(n, 3) - n;
-    vector<IndicatorImp::value_t> tmpa;
-    vector<IndicatorImp::value_t> tmpb;
-    tmpa.reserve(n);
-    tmpa.reserve(n);
-    for (size_t r = 0; r < result_number; ++r) {
-        auto *dst = this->data(r);
-        auto const *maxdata = maxp->data(r);
-        auto const *mindata = minp->data(r);
-        auto const *a = maxdata + discard + 1 - n;
-        auto const *b = mindata + discard + 1 - diff - n;
-        for (size_t i = discard; i < total; ++i) {
-            tmpa.clear();
-            tmpb.clear();
-            for (int j = 0; j < n; j++) {
-                if (!std::isnan(a[j]) && !std::isnan(b[j])) {
-                    tmpa.push_back(a[j]);
-                    tmpb.push_back(b[j]);
-                }
-            }
-            int act_count = tmpa.size();
-            if (act_count < 2) {
-                continue;
-            }
-            spearmanLevel(tmpa.data(), ptra, act_count);
-            spearmanLevel(tmpb.data(), ptrb, act_count);
-            value_t sum = 0.0;
-            for (int j = 0; j < act_count; j++) {
-                sum += std::pow(ptra[j] - ptrb[j], 2);
-            }
-            dst[i] = act_count == n ? 1.0 - 6.0 * sum / back
-                                    : 1.0 - 6.0 * sum / (std::pow(act_count, 3) - act_count);
-            a++;
-            b++;
-        }
-    }
 }
 
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {
