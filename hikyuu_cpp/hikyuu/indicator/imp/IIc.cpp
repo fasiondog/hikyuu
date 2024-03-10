@@ -20,11 +20,13 @@ namespace hku {
 
 IIc::IIc() : IndicatorImp("IC") {
     setParam<int>("n", 1);
+    setParam<bool>("fill_null", true);
 }
 
 IIc::IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk)
 : IndicatorImp("IC"), m_query(query), m_stks(stks), m_ref_stk(ref_stk) {
     setParam<int>("n", n);
+    setParam<bool>("fill_null", true);
 }
 
 IIc::~IIc() {}
@@ -56,6 +58,7 @@ void IIc::_calculate(const Indicator& inputInd) {
     HKU_WARN_IF_RETURN(total < 2, void(), "Insufficient data length! current lenght: {}", total);
 
     int n = getParam<int>("n");
+    bool fill_null = getParam<bool>("fill_null");
 
     vector<Indicator> all_inds;
     all_inds.reserve(m_stks.size());
@@ -64,8 +67,8 @@ void IIc::_calculate(const Indicator& inputInd) {
     Indicator ind = inputInd;
     for (const auto& stk : m_stks) {
         auto k = stk.getKData(m_query);
-        all_inds.push_back(ALIGN(ind(k), ref_dates));
-        all_returns.push_back(ROCP(k.close(), n));
+        all_inds.push_back(ALIGN(ind(k), ref_dates, fill_null));
+        all_returns.push_back(ALIGN(ROCP(k.close(), n), ref_dates, fill_null));
     }
 
     size_t ind_count = all_inds.size();
