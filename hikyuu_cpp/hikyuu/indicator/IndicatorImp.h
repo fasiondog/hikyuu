@@ -31,25 +31,23 @@ class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
 
 public:
     enum OPType {
-        LEAF,      ///< 叶子节点
-        OP,        /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
-        ADD,       ///< 加
-        SUB,       ///< 减
-        MUL,       ///< 乘
-        DIV,       ///< 除
-        MOD,       ///< 取模
-        EQ,        ///< 等于
-        GT,        ///< 大于
-        LT,        ///< 小于
-        NE,        ///< 不等于
-        GE,        ///< 大于等于
-        LE,        ///< 小于等于
-        AND,       ///< 与
-        OR,        ///< 或
-        WEAVE,     ///< 特殊的，需要两个指标作为参数的指标
-        OP_IF,     /// if操作
-        CORR,      ///< 相关系数，需要两个指标作为参数
-        SPEARMAN,  ///< spearman 相关系数
+        LEAF,   ///< 叶子节点
+        OP,     /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
+        ADD,    ///< 加
+        SUB,    ///< 减
+        MUL,    ///< 乘
+        DIV,    ///< 除
+        MOD,    ///< 取模
+        EQ,     ///< 等于
+        GT,     ///< 大于
+        LT,     ///< 小于
+        NE,     ///< 不等于
+        GE,     ///< 大于等于
+        LE,     ///< 小于等于
+        AND,    ///< 与
+        OR,     ///< 或
+        WEAVE,  ///< 特殊的，需要两个指标作为参数的指标
+        OP_IF,  /// if操作
         INVALID
     };
 
@@ -196,8 +194,6 @@ private:
     void execute_or();
     void execute_weave();
     void execute_if();
-    void execute_corr();
-    void execute_spearman();
 
     std::vector<IndicatorImpPtr> getAllSubNodes();
     void repeatALikeNodes();

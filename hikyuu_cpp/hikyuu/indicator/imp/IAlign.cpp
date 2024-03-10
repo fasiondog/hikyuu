@@ -17,7 +17,7 @@ namespace hku {
 
 IAlign::IAlign() : IndicatorImp("ALIGN") {
     setParam<DatetimeList>("align_date_list", DatetimeList());  // 要对齐的日期序列（须已升序排列）
-    setParam<bool>("use_null", true);  // 缺失的数据是否使用 nan 填充
+    setParam<bool>("fill_null", true);  // 缺失的数据是否使用 nan 填充
 }
 
 IAlign::~IAlign() {}
@@ -46,15 +46,15 @@ void IAlign::_calculate(const Indicator& ind) {
         return;
     }
 
-    bool use_null = getParam<bool>("use_null");
+    bool fill_null = getParam<bool>("fill_null");
 
     // 处理传入的数据本身没有上下文日期的指标，无法对标的情况:
-    // 1.如果 use_null, 则直接返回，m_discard 标记全部
+    // 1.如果 fill_null, 则直接返回，m_discard 标记全部
     // 2.数据长度小于等于日期序列长度，则按右对齐，即最后的数据对应最后的日期，前面缺失的数据做抛弃处理
     // 3.数据长度大于日期序列长度，按右对其，前面超出日期序列的数据丢弃
     DatetimeList ind_dates = ind.getDatetimeList();
     if (ind_dates.size() == 0) {
-        if (use_null) {
+        if (fill_null) {
             m_discard = total;
             return;
         }
@@ -95,7 +95,7 @@ void IAlign::_calculate(const Indicator& ind) {
     size_t ind_idx = ind.discard();
     for (size_t i = 0; i < total; i++) {
         if (ind_idx >= ind_total) {
-            if (!use_null) {
+            if (!fill_null) {
                 size_t pos = ind_total - 1;
                 for (size_t r = 0; r < m_result_num; r++) {
                     for (size_t j = i; j < total; j++) {
@@ -120,7 +120,7 @@ void IAlign::_calculate(const Indicator& ind) {
             }
 
             if (j >= ind_total) {
-                if (!use_null) {
+                if (!fill_null) {
                     for (size_t r = 0; r < m_result_num; r++) {
                         price_t val = ind.get(j - 1, r);
                         for (; i < total; i++) {
@@ -135,7 +135,7 @@ void IAlign::_calculate(const Indicator& ind) {
                 for (size_t r = 0; r < m_result_num; r++) {
                     _set(ind.get(j, r), i, r);
                 }
-            } else if (!use_null && j < ind_total) {
+            } else if (!fill_null && j < ind_total) {
                 for (size_t r = 0; r < m_result_num; r++) {
                     _set(ind.get(j - 1, r), i, r);
                 }
@@ -145,7 +145,7 @@ void IAlign::_calculate(const Indicator& ind) {
         }
     }
 
-    if (use_null) {
+    if (fill_null) {
         m_discard = total;
     }
     size_t i = 0;
@@ -167,16 +167,16 @@ void IAlign::_calculate(const Indicator& ind) {
     }
 }
 
-Indicator HKU_API ALIGN(bool use_null) {
+Indicator HKU_API ALIGN(bool fill_null) {
     IndicatorImpPtr p = make_shared<IAlign>();
-    p->setParam<bool>("use_null", use_null);
+    p->setParam<bool>("fill_null", fill_null);
     return Indicator(p);
 }
 
-Indicator HKU_API ALIGN(const DatetimeList& ref, bool use_null) {
+Indicator HKU_API ALIGN(const DatetimeList& ref, bool fill_null) {
     IndicatorImpPtr p = make_shared<IAlign>();
     p->setParam<DatetimeList>("align_date_list", ref);
-    p->setParam<bool>("use_null", use_null);
+    p->setParam<bool>("fill_null", fill_null);
     return Indicator(p);
 }
 

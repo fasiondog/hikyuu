@@ -21,7 +21,8 @@ IStdev::IStdev() : IndicatorImp("STDEV", 1) {
 IStdev::~IStdev() {}
 
 bool IStdev::check() {
-    return getParam<int>("n") >= 2;
+    int n = getParam<int>("n");
+    return n == 0 || n >= 2;
 }
 
 void IStdev::_calculate(const Indicator& data) {
@@ -33,6 +34,9 @@ void IStdev::_calculate(const Indicator& data) {
     }
 
     int n = getParam<int>("n");
+    if (0 == n) {
+        n = total;
+    }
 
     auto const* src = data.data();
     auto* dst = this->data();

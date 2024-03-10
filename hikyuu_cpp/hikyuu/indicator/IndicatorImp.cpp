@@ -93,14 +93,6 @@ string HKU_API getOPTypeName(IndicatorImp::OPType op) {
             name = "IF";
             break;
 
-        case IndicatorImp::CORR:
-            name = "CORR";
-            break;
-
-        case IndicatorImp::SPEARMAN:
-            name = "SPEARMAN";
-            break;
-
         default:
             name = "UNKNOWN";
             break;
@@ -284,7 +276,8 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
     }
 
     for (size_t i = result_num; i < m_result_num; ++i) {
-        delete m_pBuffer[i];
+        if (m_pBuffer[i])
+            delete m_pBuffer[i];
         m_pBuffer[i] = NULL;
     }
 
@@ -536,14 +529,6 @@ string IndicatorImp::formula() const {
         case OP_IF:
             buf << "IF(" << m_three->formula() << ", " << m_left->formula() << ", "
                 << m_right->formula() << ")";
-            break;
-
-        case CORR:
-            buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
-            break;
-
-        case SPEARMAN:
-            buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
             break;
 
         default:
@@ -803,14 +788,6 @@ Indicator IndicatorImp::calculate() {
 
         case OP_IF:
             execute_if();
-            break;
-
-        case CORR:
-            execute_corr();
-            break;
-
-        case SPEARMAN:
-            execute_spearman();
             break;
 
         default:
@@ -1471,181 +1448,6 @@ void IndicatorImp::execute_if() {
             } else {
                 dst[i] = right[i - diff_right];
             }
-        }
-    }
-}
-
-void IndicatorImp::execute_corr() {
-    m_right->calculate();
-    m_left->calculate();
-
-    const IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    // 结果 0 存放相关系数结果
-    // 结果 1 存放协方差（COV）结果
-    _readyBuffer(total, 2);
-
-    int n = getParam<int>("n");
-    if (n < 2 || discard + 2 > total) {
-        setDiscard(total);
-        return;
-    }
-
-    size_t startPos = discard;
-    size_t first_end = startPos + n >= total ? total : startPos + n;
-
-    value_t kx = maxp->get(discard);
-    value_t ky = minp->get(discard);
-    value_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
-    value_t ex2 = 0.0, ey2 = 0.0;
-    value_t ix, iy;
-
-    auto *dst0 = this->data(0);
-    auto *dst1 = this->data(1);
-    auto const *maxdata = maxp->data(0);
-    auto const *mindata = minp->data(0);
-    for (size_t i = startPos + 1; i < first_end; i++) {
-        ix = maxdata[i] - kx;
-        iy = mindata[i] - ky;
-        ex += ix;
-        ey += iy;
-        value_t powx2 = ix * ix;
-        value_t powy2 = iy * iy;
-        value_t powxy = ix * iy;
-        exy += powxy;
-        ex2 += powx2;
-        ey2 += powy2;
-        size_t nobs = i - startPos;
-        varx = ex2 - powx2 / nobs;
-        vary = ey2 - powy2 / nobs;
-        cov = exy - powxy / nobs;
-        dst0[i] = cov / std::sqrt(varx * vary);
-        dst1[i] = cov / (nobs - 1);
-    }
-
-    for (size_t i = first_end; i < total; i++) {
-        ix = maxdata[i] - kx;
-        iy = mindata[i] - ky;
-        ex += maxdata[i] - maxdata[i - n];
-        ey += mindata[i] - mindata[i - n];
-        value_t preix = maxdata[i - n] - kx;
-        value_t preiy = mindata[i - n] - ky;
-        ex2 += ix * ix - preix * preix;
-        ey2 += iy * iy - preiy * preiy;
-        exy += ix * iy - preix * preiy;
-        varx = (ex2 - ex * ex / n);
-        vary = (ey2 - ey * ey / n);
-        cov = (exy - ex * ey / n);
-        dst0[i] = cov / std::sqrt(varx * vary);
-        dst1[i] = cov / (n - 1);
-    }
-
-    // 修正 discard
-    setDiscard(discard + 2);
-}
-
-static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value_t *level,
-                          size_t total) {
-    std::vector<std::pair<IndicatorImp::value_t, size_t>> data_index(total);
-    for (size_t i = 0; i < total; i++) {
-        data_index[i].first = data[i];
-        data_index[i].second = i;
-    }
-
-    std::sort(
-      data_index.begin(), data_index.end(),
-      std::bind(
-        std::less<IndicatorImp::value_t>(),
-        std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_1),
-        std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_2)));
-
-    size_t i = 0;
-    while (i < total) {
-        size_t count = 1;
-        IndicatorImp::value_t score = i + 1.0;
-        for (size_t j = i + 1; j < total; j++) {
-            if (data_index[i].first != data_index[j].first) {
-                break;
-            }
-            count++;
-            score += j + 1;
-        }
-        score = score / count;
-        for (size_t j = 0; j < count; j++) {
-            level[data_index[i + j].second] = score;
-        }
-        i += count;
-    }
-}
-
-void IndicatorImp::execute_spearman() {
-    m_right->calculate();
-    m_left->calculate();
-
-    const IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
-
-    int n = getParam<int>("n");
-    if (n < 2 || discard + 2 > total) {
-        setDiscard(total);
-        return;
-    }
-
-    discard += n - 1;
-    setDiscard(discard);
-
-    auto levela = std::make_unique<value_t[]>(n);
-    auto levelb = std::make_unique<value_t[]>(n);
-    auto *ptra = levela.get();
-    auto *ptrb = levelb.get();
-
-    // 不处理 n 不足的情况，防止只需要计算全部序列时，过于耗时
-    value_t back = std::pow(value_t(n), 3) - n;
-    for (size_t r = 0; r < result_number; ++r) {
-        auto *dst = this->data(r);
-        auto const *maxdata = maxp->data(r);
-        auto const *mindata = minp->data(r);
-        auto const *a = maxdata + discard + 1 - n;
-        auto const *b = mindata + discard + 1 - diff - n;
-        for (size_t i = discard; i < total; ++i) {
-            spearmanLevel(a, ptra, n);
-            spearmanLevel(b, ptrb, n);
-            value_t sum = 0.0;
-            for (size_t j = 0; j < n; j++) {
-                sum += std::pow(ptra[j] - ptrb[j], 2);
-            }
-            dst[i] = 1 - 6.0 * sum / back;
-            a++;
-            b++;
         }
     }
 }

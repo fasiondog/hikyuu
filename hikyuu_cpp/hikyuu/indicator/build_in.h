@@ -27,6 +27,7 @@
 #include "crt/BARSSINCE.h"
 #include "crt/BETWEEN.h"
 #include "crt/CEILING.h"
+#include "crt/CORR.h"
 #include "crt/COS.h"
 #include "crt/COST.h"
 #include "crt/COUNT.h"
@@ -47,6 +48,9 @@
 #include "crt/HHV.h"
 #include "crt/HHVBARS.h"
 #include "crt/HSL.h"
+#include "crt/IC.h"
+#include "crt/ICIR.h"
+#include "crt/IR.h"
 #include "crt/INTPART.h"
 #include "crt/LAST.h"
 #include "crt/LIUTONGPAN.h"
@@ -83,6 +87,7 @@
 #include "crt/SGN.h"
 #include "crt/SLOPE.h"
 #include "crt/SMA.h"
+#include "crt/SPEARMAN.h"
 #include "crt/SQRT.h"
 #include "crt/STDEV.h"
 #include "crt/STDP.h"
@@ -97,5 +102,6 @@
 #include "crt/VARP.h"
 #include "crt/VIGOR.h"
 #include "crt/ZHBOND10.h"
+#include "crt/ZSCORE.h"
 
 #endif /* INDICATOR_BUILD_IN_H_ */

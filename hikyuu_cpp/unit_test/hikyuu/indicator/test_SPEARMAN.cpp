@@ -10,6 +10,7 @@
 #include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
+#include <hikyuu/indicator/crt/SPEARMAN.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
@@ -29,18 +30,34 @@ static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value
         data_index[i].second = i;
     }
 
-    std::sort(
-      data_index.begin(), data_index.end(),
-      std::bind(
-        std::less<IndicatorImp::value_t>(),
-        std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_1),
-        std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_2)));
+    std::sort(data_index.begin(), data_index.end(),
+              [](const std::pair<IndicatorImp::value_t, size_t> &a,
+                 const std::pair<IndicatorImp::value_t, size_t> &b) {
+                  if (std::isnan(a.first)) {
+                      return false;
+                  }
+                  if (std::isnan(b.first) && !std::isnan(a.first)) {
+                      return true;
+                  }
+                  return a.first < b.first;
+              });
 
-    size_t i = 0;
-    while (i < total) {
+    IndicatorImp::value_t null_value = Null<IndicatorImp::value_t>();
+    int64_t pos = (int64_t)total - 1;
+    while (pos > 0) {
+        if (!std::isnan(data_index[pos].first)) {
+            break;
+        }
+        level[data_index[pos].second] = null_value;
+        pos--;
+    }
+
+    int64_t len = pos + 1;
+    int64_t i = 0;
+    while (i < len) {
         size_t count = 1;
         IndicatorImp::value_t score = i + 1.0;
-        for (size_t j = i + 1; j < total; j++) {
+        for (int64_t j = i + 1; j < len; j++) {
             if (data_index[i].first != data_index[j].first) {
                 break;
             }
@@ -57,6 +74,7 @@ static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value
 
 /** @par 检测点 */
 TEST_CASE("test_spearmanLevel") {
+    /** @arg 无重复值排序 */
     std::vector<IndicatorImp::value_t> a{3., 8., 4., 7., 2.};
     size_t totala = a.size();
     auto levela = std::make_unique<IndicatorImp::value_t[]>(totala);
@@ -68,6 +86,7 @@ TEST_CASE("test_spearmanLevel") {
         CHECK_EQ(ptra[i], doctest::Approx(expecta[i]));
     }
 
+    /** @arg 存在重复值 */
     std::vector<IndicatorImp::value_t> b{5., 10., 8., 10., 6.};
     size_t totalb = b.size();
     auto levelb = std::make_unique<IndicatorImp::value_t[]>(totalb);
@@ -78,13 +97,36 @@ TEST_CASE("test_spearmanLevel") {
     for (size_t i = 0; i < totalb; i++) {
         CHECK_EQ(ptrb[i], doctest::Approx(expectb[i]));
     }
+
+    /** @arg 存在nan值*/
+    IndicatorImp::value_t null_value = Null<IndicatorImp::value_t>();
+    std::vector<IndicatorImp::value_t> c{
+      null_value, null_value, 5., 10., null_value, null_value, 8., 10., 6., null_value, null_value};
+    size_t totalc = c.size();
+    auto levelc = std::make_unique<IndicatorImp::value_t[]>(totalc);
+    auto *ptrc = levelc.get();
+    spearmanLevel(c.data(), levelc.get(), totalc);
+
+    std::vector<IndicatorImp::value_t> expectc = {null_value, 1.,  4.5, null_value,
+                                                  3.,         4.5, 2.,  null_value};
+    CHECK_UNARY(std::isnan(ptrc[0]));
+    CHECK_UNARY(std::isnan(ptrc[1]));
+    CHECK_EQ(ptrc[2], doctest::Approx(1.));
+    CHECK_EQ(ptrc[3], doctest::Approx(4.5));
+    CHECK_UNARY(std::isnan(ptrc[4]));
+    CHECK_UNARY(std::isnan(ptrc[5]));
+    CHECK_EQ(ptrc[6], doctest::Approx(3.));
+    CHECK_EQ(ptrc[7], doctest::Approx(4.5));
+    CHECK_EQ(ptrc[8], doctest::Approx(2.));
+    CHECK_UNARY(std::isnan(ptrc[9]));
+    CHECK_UNARY(std::isnan(ptrc[10]));
 }
 
 /** @par 检测点 */
 TEST_CASE("test_SPEARMAN") {
     Indicator result;
 
-    // 空指标
+    /** @arg 空指标 */
     result = SPEARMAN(Indicator(), Indicator(), 10);
     CHECK_UNARY(result.empty());
 
@@ -94,13 +136,13 @@ TEST_CASE("test_SPEARMAN") {
     Indicator x = PRICELIST(a);
     Indicator y = PRICELIST(b);
 
-    // 非法参数 n
-    result = SPEARMAN(x, y, 0);
+    /** @arg 非法参数 n */
+    result = SPEARMAN(x, y, -1);
     CHECK_UNARY(result.empty());
     result = SPEARMAN(x, y, 1);
     CHECK_UNARY(result.empty());
 
-    // 正常情况
+    /** @arg 正常情况 n */
     PriceList expect{Null<price_t>(), 1., 1., 0.95, 0.875};
     result = SPEARMAN(x, y, a.size());
     CHECK_EQ(result.name(), "SPEARMAN");
@@ -118,6 +160,19 @@ TEST_CASE("test_SPEARMAN") {
     for (size_t i = result.discard(); i < result.size(); i++) {
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
+
+    /** @arg 包含 nan 值 */
+    price_t null_value = Null<price_t>();
+    x = PRICELIST({3., 8., null_value, 4., 7., 2., null_value, null_value});
+    y = PRICELIST({null_value, 5., 10., 8., null_value, 10., 6., null_value});
+    result = SPEARMAN(x, y, 4);
+    CHECK_EQ(result.name(), "SPEARMAN");
+    CHECK_EQ(result.discard(), 3);
+    CHECK_EQ(result.size(), x.size());
+    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_EQ(result[5], doctest::Approx(-1.));
+    CHECK_EQ(result[6], doctest::Approx(-1.));
+    CHECK_UNARY(std::isnan(result[7]));
 }
 
 //-----------------------------------------------------------------------------

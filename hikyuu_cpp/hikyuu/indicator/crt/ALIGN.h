@@ -19,22 +19,22 @@ namespace hku {
  * 按指定日期对齐
  * @ingroup Indicator
  */
-Indicator HKU_API ALIGN(bool use_null = true);
-Indicator HKU_API ALIGN(const DatetimeList&, bool use_null = true);
-Indicator ALIGN(const Indicator& ind, const DatetimeList& ref, bool use_null = true);
-Indicator ALIGN(const Indicator& ind, const Indicator& ref, bool use_null = true);
-Indicator ALIGN(const Indicator& ind, const KData& ref, bool use_null = true);
+Indicator HKU_API ALIGN(bool fill_null = true);
+Indicator HKU_API ALIGN(const DatetimeList&, bool fill_null = true);
+Indicator ALIGN(const Indicator& ind, const DatetimeList& ref, bool fill_null = true);
+Indicator ALIGN(const Indicator& ind, const Indicator& ref, bool fill_null = true);
+Indicator ALIGN(const Indicator& ind, const KData& ref, bool fill_null = true);
 
-inline Indicator ALIGN(const Indicator& ind, const DatetimeList& ref, bool use_null) {
-    return ALIGN(ref, use_null)(ind);
+inline Indicator ALIGN(const Indicator& ind, const DatetimeList& ref, bool fill_null) {
+    return ALIGN(ref, fill_null)(ind);
 }
 
-inline Indicator ALIGN(const Indicator& ind, const Indicator& ref, bool use_null) {
-    return ALIGN(ref.getDatetimeList(), use_null)(ind);
+inline Indicator ALIGN(const Indicator& ind, const Indicator& ref, bool fill_null) {
+    return ALIGN(ref.getDatetimeList(), fill_null)(ind);
 }
 
-inline Indicator ALIGN(const Indicator& ind, const KData& ref, bool use_null) {
-    return ALIGN(ref.getDatetimeList(), use_null)(ind);
+inline Indicator ALIGN(const Indicator& ind, const KData& ref, bool fill_null) {
+    return ALIGN(ref.getDatetimeList(), fill_null)(ind);
 }
 
 }  // namespace hku

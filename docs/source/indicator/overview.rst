@@ -11,6 +11,7 @@
 * :py:func:`DROPNA` - 删除 nan 值
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
+* :py:func:`ZSCORE` - ZScore 标准化
 
 
 **行情指标**
@@ -131,6 +132,12 @@
 * :py:func:`DAY` - 取得该周期的日期
 * :py:func:`HOUR` - 取得该周期的小时数
 * :py:func:`MINUTE` - 取得该周期的分钟数
+
+**因子类指标**
+
+* :py:func:`IC` - 计算因子 IC 值
+* :py:func:`IR` - 用于计算账户收益与参照收益的IR
+* :py:func:`ICIR` - 计算因子 IC 的 IR 值
 
 
 **Ta-lib指标**
