@@ -11,6 +11,7 @@
 * :py:func:`DROPNA` - 删除 nan 值
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
+* :py:func:`ZSCORE` - ZScore 标准化
 
 
 **行情指标**

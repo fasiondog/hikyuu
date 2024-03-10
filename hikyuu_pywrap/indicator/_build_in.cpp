@@ -472,6 +472,9 @@ Indicator (*CORR_2)(const Indicator&, const Indicator&, int) = CORR;
 Indicator (*SPEARMAN_1)(int) = SPEARMAN;
 Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int) = SPEARMAN;
 
+Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
+Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
+
 void export_Indicator_build_in(py::module& m) {
     m.def("KDATA", KDATA1);
     m.def("KDATA", KDATA3, R"(KDATA([data])
@@ -1714,4 +1717,18 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator: ic 已经计算出的 ic 值
     :param int n: 时间窗口)");
+
+    m.def("ZSCORE", ZSCORE_1, py::arg("out_extreme") = false, py::arg("nsigma") = 3.0,
+          py::arg("recursive") = false);
+    m.def("ZSCORE", ZSCORE_2, py::arg("data"), py::arg("out_extreme") = false,
+          py::arg("nsigma") = 3.0, py::arg("recursive") = false,
+          R"(ZSCORE(data[, out_extreme, nsigma, recursive])
+
+    对数据进行标准化（归一），可选进行极值排除
+    
+    :param Indicator data: 待剔除异常值的数据
+    :param bool outExtreme: 指示剔除极值，默认 False
+    :param float nsigma: 剔除极值时使用的 nsigma 倍 sigma，默认 3.0
+    :param bool recursive: 是否进行递归剔除极值，默认 False
+    :rtype: Indicator)");
 }

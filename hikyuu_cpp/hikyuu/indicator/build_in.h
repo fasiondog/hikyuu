@@ -102,5 +102,6 @@
 #include "crt/VARP.h"
 #include "crt/VIGOR.h"
 #include "crt/ZHBOND10.h"
+#include "crt/ZSCORE.h"
 
 #endif /* INDICATOR_BUILD_IN_H_ */

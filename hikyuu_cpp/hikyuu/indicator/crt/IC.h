@@ -19,6 +19,7 @@ namespace hku {
  * @param n 时间窗口
  * @param ref_stk 参照证券，默认 sh000300 沪深300
  * @return Indicator
+ * @ingroup Indicator
  */
 Indicator HKU_API IC(const StockList& stks, const KQuery& query, int n = 1,
                      const Stock& ref_stk = getStock("sh000300"));

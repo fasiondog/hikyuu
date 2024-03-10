@@ -19,6 +19,7 @@ namespace hku {
  * @param ic 已经计算出的 ic 值
  * @param n 时间窗口
  * @return Indicator
+ * @ingroup Indicator
  */
 inline Indicator ICIR(const Indicator& ic, int n = 10) {
     Indicator x = MA(ic, n) / STDEV(ic, n);

@@ -1082,3 +1082,14 @@
 
     :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
     :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值
+
+
+.. py:function:: ZSCORE([data, out_extreme, nsigma, recursive])
+
+    对数据进行标准化（归一），可选进行极值排除
+    
+    :param Indicator data: 待剔除异常值的数据
+    :param bool outExtreme: 指示剔除极值，默认 False
+    :param float nsigma: 剔除极值时使用的 nsigma 倍 sigma ,默认 3.0
+    :param bool recursive: 是否进行递归剔除极值, 默认 False
+    :rtype: Indicator
