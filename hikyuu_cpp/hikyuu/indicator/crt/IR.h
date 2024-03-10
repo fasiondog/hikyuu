@@ -35,7 +35,10 @@ inline Indicator IR(const Indicator& p, const Indicator& b, int n = 100) {
     Indicator p_return = ROCP(p, n);
     Indicator b_return = ROCP(b, n);
     Indicator x = (p_return - b_return);
-    return x / STDEV(x, n);
+    Indicator ret = x / STDEV(x, n);
+    ret.name("IR");
+    ret.setParam<int>("n", n);
+    return ret;
 }
 
 }  // namespace hku

@@ -21,7 +21,10 @@ namespace hku {
  * @return Indicator
  */
 inline Indicator ICIR(const Indicator& ic, int n = 10) {
-    return MA(ic, n) / STDEV(ic, n);
+    Indicator x = MA(ic, n) / STDEV(ic, n);
+    x.name("IR");
+    x.setParam<int>("n", n);
+    return x;
 }
 
 }  // namespace hku
