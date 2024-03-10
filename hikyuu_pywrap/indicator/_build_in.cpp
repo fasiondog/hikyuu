@@ -1725,6 +1725,8 @@ void export_Indicator_build_in(py::module& m) {
           R"(ZSCORE(data[, out_extreme, nsigma, recursive])
 
     对数据进行标准化（归一），可选进行极值排除
+
+    注：非窗口滚动，如需窗口滚动的标准化，直接 (x - MA(x, n)) / STDEV(x, n) 即可。
     
     :param Indicator data: 待剔除异常值的数据
     :param bool outExtreme: 指示剔除极值，默认 False

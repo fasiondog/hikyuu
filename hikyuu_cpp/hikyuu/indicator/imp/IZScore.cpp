@@ -46,7 +46,6 @@ static void normalize(IndicatorImp::value_t *dst, Indicator::value_t const *src,
         sum += tmp[i] * tmp[i];
     }
     IndicatorImp::value_t sigma = std::sqrt(sum / (total - 1));
-    HKU_INFO("sigma: {}", sigma);
     for (size_t i = 0; i < total; i++) {
         dst[i] = (src[i] - mean) / sigma;
     }

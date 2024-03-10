@@ -21,24 +21,35 @@ using namespace hku;
 
 /** @par 检测点 */
 TEST_CASE("test_ZSCORE") {
-    // Indicator result;
+    /** @arg 只有一条有效数据 */
+    PriceList a{0.3};
+    Indicator data = PRICELIST(a);
+    REQUIRE(data.size() == 1);
+    Indicator result = ZSCORE(data);
+    CHECK_EQ(result.name(), "ZSCORE");
+    CHECK_EQ(result.size(), 1);
+    CHECK_EQ(result.discard(), 1);
+    CHECK_UNARY(std::isnan(result[0]));
 
-    // PriceList a;
-    // for (int i = 0; i < 10; ++i) {
-    //     a.push_back(5 - i);
-    // }
+    /** @arg 输入的 nsigma < 0 */
+    KData k = getKData("SH000001", KQuery(-5));
+    result = ZSCORE(k.close(), true, -0.5);
+    CHECK_EQ(result.name(), "ZSCORE");
+    CHECK_UNARY(!result.empty());
+    CHECK_EQ(result.size(), k.size());
+    CHECK_EQ(result.discard(), result.size());
 
-    // vector<price_t> expect = {0., 0., 0., 0., 0., 1., 1., 1., 1., 1.};
+    /** @arg 正常计算，不剔除异常值 */
+    result = ZSCORE(k.close());
+    CHECK_EQ(result.name(), "ZSCORE");
+    CHECK_UNARY(!result.empty());
+    CHECK_EQ(result.size(), k.size());
+    CHECK_EQ(result.discard(), 0);
 
-    // Indicator data = PRICELIST(a);
-
-    // result = NOT(data);
-    // CHECK_EQ(result.name(), "NOT");
-    // CHECK_EQ(result.discard(), 0);
-    // CHECK_EQ(result[0], 0.0);
-    // for (int i = 1; i < 10; ++i) {
-    //     CHECK_EQ(result[i], expect[i]);
-    // }
+    PriceList expect{-0.573824, 1.52671, 0.497154, -0.581095, -0.868942};
+    for (size_t i = result.discard(), total = result.size(); i < total; i++) {
+        CHECK_EQ(result[i], doctest::Approx(expect[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -55,7 +66,7 @@ TEST_CASE("test_ZSCORE_benchmark") {
         BENCHMARK_TIME_MSG(test_ZSCORE_benchmark, cycle, fmt::format("data len: {}", c.size()));
         SPEND_TIME_CONTROL(false);
         for (int i = 0; i < cycle; i++) {
-            Indicator ind = EMA();
+            Indicator ind = ZSCORE();
             Indicator result = ind(c);
         }
     }
@@ -69,33 +80,33 @@ TEST_CASE("test_ZSCORE_benchmark") {
 
 /** @par 检测点 */
 TEST_CASE("test_ZSCORE_export") {
-    // StockManager& sm = StockManager::instance();
-    // string filename(sm.tmpdir());
-    // filename += "/NOT.xml";
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/ZSCORE.xml";
 
-    // Stock stock = sm.getStock("sh000001");
-    // KData kdata = stock.getKData(KQuery(-20));
-    // Indicator x1 = NOT(CLOSE(kdata));
-    // {
-    //     std::ofstream ofs(filename);
-    //     boost::archive::xml_oarchive oa(ofs);
-    //     oa << BOOST_SERIALIZATION_NVP(x1);
-    // }
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-20));
+    Indicator x1 = ZSCORE(CLOSE(kdata));
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(x1);
+    }
 
-    // Indicator x2;
-    // {
-    //     std::ifstream ifs(filename);
-    //     boost::archive::xml_iarchive ia(ifs);
-    //     ia >> BOOST_SERIALIZATION_NVP(x2);
-    // }
+    Indicator x2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(x2);
+    }
 
-    // CHECK_EQ(x1.name(), x2.name());
-    // CHECK_EQ(x1.size(), x2.size());
-    // CHECK_EQ(x1.discard(), x2.discard());
-    // CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
-    // for (size_t i = 0; i < x1.size(); ++i) {
-    //     CHECK_EQ(x1[i], doctest::Approx(x2[i]));
-    // }
+    CHECK_EQ(x1.name(), x2.name());
+    CHECK_EQ(x1.size(), x2.size());
+    CHECK_EQ(x1.discard(), x2.discard());
+    CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
+    for (size_t i = 0; i < x1.size(); ++i) {
+        CHECK_EQ(x1[i], doctest::Approx(x2[i]));
+    }
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
