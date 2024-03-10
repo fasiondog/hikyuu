@@ -24,7 +24,7 @@ IIc::IIc() : IndicatorImp("IC") {
 }
 
 IIc::IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk)
-: IndicatorImp("IC"), m_query(query), m_stks(stks), m_ref_stk(ref_stk) {
+: IndicatorImp("IC"), m_query(query), m_ref_stk(ref_stk), m_stks(stks) {
     setParam<int>("n", n);
     setParam<bool>("fill_null", true);
 }
@@ -101,8 +101,7 @@ void IIc::_calculate(const Indicator& inputInd) {
 }
 
 Indicator HKU_API IC(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk) {
-    IndicatorImpPtr p = make_shared<IIc>(stks, query, n, ref_stk);
-    return p;
+    return Indicator(make_shared<IIc>(stks, query, n, ref_stk));
 }
 
 Indicator HKU_API IC(const Block& blk, const KQuery& query, int n, const Stock& ref_stk) {

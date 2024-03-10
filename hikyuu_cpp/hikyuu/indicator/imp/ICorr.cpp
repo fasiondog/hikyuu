@@ -111,7 +111,7 @@ void ICorr::_calculate(const Indicator& ind) {
 }
 
 Indicator HKU_API CORR(int n) {
-    return make_shared<ICorr>(n);
+    return Indicator(make_shared<ICorr>(n));
 }
 
 Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n) {

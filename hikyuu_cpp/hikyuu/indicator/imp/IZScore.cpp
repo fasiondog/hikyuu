@@ -87,7 +87,7 @@ void IZScore::_calculate(const Indicator &data) {
 }
 
 Indicator HKU_API ZSCORE(bool outExtreme, double nsigma, bool recursive) {
-    return make_shared<IZScore>(outExtreme, nsigma, recursive);
+    return Indicator(make_shared<IZScore>(outExtreme, nsigma, recursive));
 }
 
 }  // namespace hku

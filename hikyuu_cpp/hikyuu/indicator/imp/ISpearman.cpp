@@ -140,7 +140,7 @@ void ISpearman::_calculate(const Indicator &ind) {
 }
 
 Indicator HKU_API SPEARMAN(int n) {
-    return make_shared<ISpearman>(n);
+    return Indicator(make_shared<ISpearman>(n));
 }
 
 Indicator HKU_API SPEARMAN(const Indicator &ind1, const Indicator &ind2, int n) {
