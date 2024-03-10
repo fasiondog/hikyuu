@@ -448,6 +448,46 @@
     :param KData kdata: k线数据
     :rtype: Indicator
     
+.. py:function:: IC(ind, stks, query, n, ref_stk)
+
+    计算指定的因子相对于参考证券的 IC （实际为 RankIC）
+    
+    :param sequence(stock)|Block stks 证券组合
+    :param Query query: 查询条件
+    :param int n: 时间窗口
+    :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
+    :rtype: Indicator
+
+
+.. py:function:: ICIR(ic[,n])
+
+    计算 IC 因子 IR = IC的多周期均值/IC的标准方差
+
+    :param Indicator: ic 已经计算出的 ic 值
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
+.. py:function:: IR(p, b[, n=100])
+
+    信息比率（Information Ratio，IR）
+
+    公式: (P-B) / TE
+    P: 组合收益率
+    B: 比较基准收益率
+    TE: 投资周期中每天的 p 和 b 之间的标准差
+    实际使用时，P 一般为 TM 的资产曲线，B 为沪深 3000 收盘价，如:
+    ref_k = sm["sh000300"].get_kdata(query)
+    funds = my_tm.get_funds_curve(ref_k.get_datetime.list())
+    ir = IR(PRICELIST(funds), ref_k.close, 0)
+
+    如果希望计算因子 IC 的 IR 值，请使用 ICIR 指标
+
+    :param Indicator p:
+    :param Indicator b:
+    :param int n: 时间窗口（默认100），如果只想使用最后的值，可以使用 0, 或 len(p),len(b) 指定
+    :rtype: Indicator
+
     
 .. py:function:: IF(x, a, b)
 

@@ -132,6 +132,12 @@
 * :py:func:`HOUR` - 取得该周期的小时数
 * :py:func:`MINUTE` - 取得该周期的分钟数
 
+**因子类指标**
+
+* :py:func:`IC` - 计算因子 IC 值
+* :py:func:`IR` - 用于计算账户收益与参照收益的IR
+* :py:func:`ICIR` - 计算因子 IC 的 IR 值
+
 
 **Ta-lib指标**
 

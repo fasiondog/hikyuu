@@ -1663,6 +1663,25 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind2: 输入参数2
     :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度)");
 
+    // IR(const Indicator& p, const Indicator& b, int n = 100)
+    m.def("IR", IR, py::arg("p"), py::arg("b"), py::arg("n") = 100, R"(IR(p, b[, n])
+
+    信息比率（Information Ratio，IR）
+
+    公式: (P-B) / TE
+    P: 组合收益率
+    B: 比较基准收益率
+    TE: 投资周期中每天的 p 和 b 之间的标准差
+    实际使用时，P 一般为 TM 的资产曲线，B 为沪深 3000 收盘价，如:
+    ref_k = sm["sh000300"].get_kdata(query)
+    funds = my_tm.get_funds_curve(ref_k.get_datetime.list())
+    ir = IR(PRICELIST(funds), ref_k.close, 0)
+
+    :param Indicator p:
+    :param Indicator b:
+    :param int n: 时间窗口，如果只想使用最后的值，可以使用 0, 或 len(p),len(b) 指定
+    )");
+
     m.def(
       "IC",
       [](const Indicator& ind, const py::object& stks, const KQuery& query, int n,
@@ -1679,5 +1698,20 @@ void export_Indicator_build_in(py::module& m) {
 
           HKU_THROW("Input stks must be Block or sequenc(Stock)!");
       },
-      py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("n"), py::arg("ref_stk"));
+      py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("n"), py::arg("ref_stk"),
+      R"(IC(ind, stks, query, n, ref_stk)
+
+    计算指定的因子相对于参考证券的 IC （实际为 RankIC）
+    
+    :param sequence(stock)|Block stks 证券组合
+    :param Query query: 查询条件
+    :param int n: 时间窗口
+    :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300)");
+
+    m.def("ICIR", ICIR, py::arg("ic"), py::arg("n") = 10, R"(ICIR(ic[,n])
+
+    计算 IC 因子 IR = IC的多周期均值/IC的标准方差
+
+    :param Indicator: ic 已经计算出的 ic 值
+    :param int n: 时间窗口)");
 }

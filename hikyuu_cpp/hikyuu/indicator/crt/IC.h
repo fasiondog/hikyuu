@@ -12,6 +12,14 @@
 
 namespace hku {
 
+/**
+ * @brief 计算指定的因子相对于参考证券的 IC （实际为 RankIC）
+ * @param stks 证券组合
+ * @param query 查询条件
+ * @param n 时间窗口
+ * @param ref_stk 参照证券，默认 sh000300 沪深300
+ * @return Indicator
+ */
 Indicator HKU_API IC(const StockList& stks, const KQuery& query, int n = 1,
                      const Stock& ref_stk = getStock("sh000300"));
 
