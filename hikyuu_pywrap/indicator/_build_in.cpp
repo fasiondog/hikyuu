@@ -418,10 +418,10 @@ Indicator (*AD_2)(const KData&) = AD;
 Indicator (*COST_1)(double x) = COST;
 Indicator (*COST_2)(const KData&, double x) = COST;
 
-Indicator (*ALIGN_1)(const DatetimeList&, bool use_null) = ALIGN;
-Indicator (*ALIGN_2)(const Indicator&, const DatetimeList&, bool use_null) = ALIGN;
-Indicator (*ALIGN_3)(const Indicator&, const Indicator&, bool use_null) = ALIGN;
-Indicator (*ALIGN_4)(const Indicator&, const KData&, bool use_null) = ALIGN;
+Indicator (*ALIGN_1)(const DatetimeList&, bool fill_null) = ALIGN;
+Indicator (*ALIGN_2)(const Indicator&, const DatetimeList&, bool fill_null) = ALIGN;
+Indicator (*ALIGN_3)(const Indicator&, const Indicator&, bool fill_null) = ALIGN;
+Indicator (*ALIGN_4)(const Indicator&, const KData&, bool fill_null) = ALIGN;
 
 Indicator (*DROPNA_1)() = DROPNA;
 Indicator (*DROPNA_2)(const Indicator&) = DROPNA;
@@ -1553,17 +1553,17 @@ void export_Indicator_build_in(py::module& m) {
     :param float x: x%获利价格, 0~100
     :rtype: Indicator)");
 
-    m.def("ALIGN", ALIGN_1, py::arg("ref"), py::arg("use_null") = true);
-    m.def("ALIGN", ALIGN_2, py::arg("data"), py::arg("ref"), py::arg("use_null") = true);
-    m.def("ALIGN", ALIGN_3, py::arg("data"), py::arg("ref"), py::arg("use_null") = true);
-    m.def("ALIGN", ALIGN_4, py::arg("data"), py::arg("ref"), py::arg("use_null") = true,
+    m.def("ALIGN", ALIGN_1, py::arg("ref"), py::arg("fill_null") = true);
+    m.def("ALIGN", ALIGN_2, py::arg("data"), py::arg("ref"), py::arg("fill_null") = true);
+    m.def("ALIGN", ALIGN_3, py::arg("data"), py::arg("ref"), py::arg("fill_null") = true);
+    m.def("ALIGN", ALIGN_4, py::arg("data"), py::arg("ref"), py::arg("fill_null") = true,
           R"(ALIGN(data, ref):
 
     按指定的参考日期对齐
 
     :param Indicator data: 输入数据
     :param DatetimeList|Indicator|KData ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
-    :param bool use_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据
+    :param bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据
     :retype: Indicator)");
 
     m.def("DROPNA", DROPNA_1);
@@ -1662,4 +1662,22 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind1: 输入参数1
     :param Indicator ind2: 输入参数2
     :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度)");
+
+    m.def(
+      "IC",
+      [](const Indicator& ind, const py::object& stks, const KQuery& query, int n,
+         const Stock& ref_stk) {
+          if (py::isinstance<Block>(stks)) {
+              const auto& blk = stks.cast<Block&>();
+              return IC(ind, blk, query, n, ref_stk);
+          }
+
+          if (py::isinstance<py::sequence>(stks)) {
+              StockList c_stks = python_list_to_vector<Stock>(stks);
+              return IC(ind, c_stks, query, n, ref_stk);
+          }
+
+          HKU_THROW("Input stks must be Block or sequenc(Stock)!");
+      },
+      py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("n"), py::arg("ref_stk"));
 }

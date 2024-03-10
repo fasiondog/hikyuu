@@ -40,13 +40,13 @@
     :rtype: Indicator
 
 
-.. py:function:: ALIGN(data, ref[, use_null=True])
+.. py:function:: ALIGN(data, ref[, fill_null=True])
 
     按指定的参考日期对齐
 
     :param Indicator data: 输入数据
     :param DatetimeList|Indicator|KData ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
-    :param bool use_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据
+    :param bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据
     :retype: Indicator
 
 .. py:function:: AMA([data, n=10, fast_n=2, slow_n=30])

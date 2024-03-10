@@ -23,7 +23,7 @@ using namespace hku;
  */
 
 /** @par 检测点 */
-TEST_CASE("test_ALIGN_use_null") {
+TEST_CASE("test_ALIGN_fill_null") {
     Indicator result;
     Stock stk = getStock("sh000001");
 
@@ -36,7 +36,7 @@ TEST_CASE("test_ALIGN_use_null") {
     DatetimeList ref;
     Indicator data = PRICELIST(a);
     result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("use_null"));
+    REQUIRE(result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(ref.size(), 0);
     CHECK_EQ(result.size(), 0);
@@ -46,7 +46,7 @@ TEST_CASE("test_ALIGN_use_null") {
     ref = stk.getDatetimeList(KQuery(-10));
     data = PRICELIST(a);
     result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("use_null"));
+    REQUIRE(result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -60,7 +60,7 @@ TEST_CASE("test_ALIGN_use_null") {
     a.push_back(11);
     data = PRICELIST(a);
     result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("use_null"));
+    REQUIRE(result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -70,7 +70,7 @@ TEST_CASE("test_ALIGN_use_null") {
     a.push_back(1);
     data = PRICELIST(a);
     result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("use_null"));
+    REQUIRE(result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -79,7 +79,7 @@ TEST_CASE("test_ALIGN_use_null") {
     a.clear();
     data = PRICELIST(a);
     result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("use_null"));
+    REQUIRE(result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -97,7 +97,7 @@ TEST_CASE("test_ALIGN_use_null") {
     ref.push_back(Datetime(201901030000));
     data = CLOSE(k);
     result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("use_null"));
+    REQUIRE(result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -114,7 +114,7 @@ TEST_CASE("test_ALIGN_use_null") {
     ref.push_back(Datetime(191901030000));
     data = CLOSE(k);
     result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("use_null"));
+    REQUIRE(result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -128,7 +128,7 @@ TEST_CASE("test_ALIGN_use_null") {
     ref = k.getDatetimeList();
     data = CLOSE(k);
     result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("use_null"));
+    REQUIRE(result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 0);
@@ -149,7 +149,7 @@ TEST_CASE("test_ALIGN_use_null") {
     ref.push_back(Datetime(201112100000));
     data = CLOSE(k);
     result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("use_null"));
+    REQUIRE(result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 1);
@@ -166,7 +166,7 @@ TEST_CASE("test_ALIGN_use_null") {
 }
 
 /** @par 检测点 */
-TEST_CASE("test_ALIGN_not_use_null") {
+TEST_CASE("test_ALIGN_not_fill_null") {
     Indicator result;
     Stock stk = getStock("sh000001");
 
@@ -179,7 +179,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     DatetimeList ref;
     Indicator data = PRICELIST(a);
     result = ALIGN(data, ref, false);
-    REQUIRE(!result.getParam<bool>("use_null"));
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(ref.size(), 0);
     CHECK_EQ(result.size(), 0);
@@ -189,7 +189,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     ref = stk.getDatetimeList(KQuery(-10));
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
-    REQUIRE(!result.getParam<bool>("use_null"));
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 0);
@@ -203,7 +203,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     a.push_back(11);
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
-    REQUIRE(!result.getParam<bool>("use_null"));
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 0);
@@ -218,7 +218,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     a.push_back(1);
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
-    REQUIRE(!result.getParam<bool>("use_null"));
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 9);
@@ -234,7 +234,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     a.clear();
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
-    REQUIRE(!result.getParam<bool>("use_null"));
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -252,7 +252,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     ref.push_back(Datetime(201901030000));
     data = CLOSE(k);
     result = ALIGN(data, ref, false);
-    REQUIRE(!result.getParam<bool>("use_null"));
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 0);
@@ -270,7 +270,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     ref.push_back(Datetime(191901030000));
     data = CLOSE(k);
     result = ALIGN(data, ref, false);
-    REQUIRE(!result.getParam<bool>("use_null"));
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());
@@ -284,7 +284,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     ref = k.getDatetimeList();
     data = CLOSE(k);
     result = ALIGN(data, ref, false);
-    REQUIRE(!result.getParam<bool>("use_null"));
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 0);
@@ -305,7 +305,7 @@ TEST_CASE("test_ALIGN_not_use_null") {
     ref.push_back(Datetime(201112100000));
     data = CLOSE(k);
     result = ALIGN(data, ref, false);
-    REQUIRE(!result.getParam<bool>("use_null"));
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 1);
