@@ -276,7 +276,8 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
     }
 
     for (size_t i = result_num; i < m_result_num; ++i) {
-        delete m_pBuffer[i];
+        if (m_pBuffer[i])
+            delete m_pBuffer[i];
         m_pBuffer[i] = NULL;
     }
 

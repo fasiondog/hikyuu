@@ -44,18 +44,18 @@ IndicatorImpPtr IIc::_clone() {
 }
 
 void IIc::_calculate(const Indicator& inputInd) {
-    HKU_ERROR_IF_RETURN(m_ref_stk.isNull(), void(), "No ref_stk was specified!");
-    HKU_ERROR_IF_RETURN(m_stks.size() < 2, void(),
-                        "The number of stock is insufficient, need > 2! current: {}",
-                        m_stks.size());
-    for (const auto& stk : m_stks) {
-        HKU_ERROR_IF_RETURN(stk.isNull(), void(), "exist null stock!");
-    }
-
+    HKU_ERROR_IF_RETURN(m_ref_stk.isNull(), void(), "ref_stk is null!");
     auto ref_dates = m_ref_stk.getDatetimeList(m_query);
     size_t total = ref_dates.size();
     _readyBuffer(total, 1);
-    HKU_WARN_IF_RETURN(total < 2, void(), "Insufficient data length! current lenght: {}", total);
+
+    if (total < 2 || m_stks.size() < 2) {
+        HKU_WARN(
+          "The number(>=2) of stock or data length(>=2) is insufficient! current data len: {}, "
+          "current stock number: {}",
+          total, m_stks.size());
+        m_discard = total;
+    }
 
     int n = getParam<int>("n");
     bool fill_null = getParam<bool>("fill_null");
@@ -66,12 +66,22 @@ void IIc::_calculate(const Indicator& inputInd) {
     all_returns.reserve(m_stks.size());
     Indicator ind = inputInd;
     for (const auto& stk : m_stks) {
-        auto k = stk.getKData(m_query);
-        all_inds.push_back(ALIGN(ind(k), ref_dates, fill_null));
-        all_returns.push_back(ALIGN(ROCP(k.close(), n), ref_dates, fill_null));
+        if (stk.isNull()) {
+            HKU_WARN("Exist null stock, it was ignored!");
+        } else {
+            auto k = stk.getKData(m_query);
+            all_inds.push_back(ALIGN(ind(k), ref_dates, fill_null));
+            all_returns.push_back(ALIGN(ROCP(k.close(), n), ref_dates, fill_null));
+        }
     }
 
     size_t ind_count = all_inds.size();
+    if (all_inds.size() < 2) {
+        HKU_WARN("The number of exist stock is insufficient!");
+        m_discard = total;
+        return;
+    }
+
     PriceList tmp(ind_count, Null<price_t>());
     PriceList tmp_return(ind_count, Null<price_t>());
     auto* dst = this->data();
