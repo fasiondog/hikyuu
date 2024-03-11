@@ -106,12 +106,64 @@ void System::initParam() {
 
     // 在没有持仓时，是否支持借入证券，融券
     setParam<bool>("support_borrow_stock", false);
+
+    // 以下参数控制各个部件的共享策略，影响 clone 和 reset 操作
+    // 当为共享组件时，不会 clone 和 reset 相应的组件
+    setParam<bool>("shared_tm", false);
+    setParam<bool>("shared_ev", true);
+    setParam<bool>("shared_cn", false);
+    setParam<bool>("shared_sg", false);
+    setParam<bool>("shared_mm", false);
+    setParam<bool>("shared_st", false);
+    setParam<bool>("shared_tp", false);
+    setParam<bool>("shared_pg", false);
+    setParam<bool>("shared_sp", false);
 }
 
-void System::reset(bool with_tm, bool with_ev) {
-    if (with_tm && m_tm)
+void System::reset() {
+    if (m_tm && !getParam<bool>("shared_tm"))
         m_tm->reset();
-    if (with_ev && m_ev)
+    if (m_ev && !getParam<bool>("shared_ev"))
+        m_ev->reset();
+    if (m_cn && !getParam<bool>("shared_cn"))
+        m_cn->reset();
+    if (m_mm && !getParam<bool>("shared_mm"))
+        m_mm->reset();
+    if (m_sg && !getParam<bool>("shared_sg"))
+        m_sg->reset();
+    if (m_st && !getParam<bool>("shared_st"))
+        m_st->reset();
+    if (m_tp && !getParam<bool>("shared_tp"))
+        m_tp->reset();
+    if (m_pg && !getParam<bool>("shared_pg"))
+        m_pg->reset();
+    if (m_sp && !getParam<bool>("shared_sp"))
+        m_sp->reset();
+
+    // 不能复位m_stock / m_kdata/
+    //  m_src_kdata，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
+    // 一个sys实例绑定stock后，除非主动改变，否则不应该被reset
+    //  m_stock
+
+    m_pre_ev_valid = false;  // true;
+    m_pre_cn_valid = false;  // true;
+
+    m_buy_days = 0;
+    m_sell_short_days = 0;
+    m_trade_list.clear();
+    m_lastTakeProfit = 0.0;
+    m_lastShortTakeProfit = 0.0;
+
+    m_buyRequest.clear();
+    m_sellRequest.clear();
+    m_sellShortRequest.clear();
+    m_buyShortRequest.clear();
+}
+
+void System::forceResetAll() {
+    if (m_tm)
+        m_tm->reset();
+    if (m_ev)
         m_ev->reset();
     if (m_cn)
         m_cn->reset();
@@ -127,11 +179,6 @@ void System::reset(bool with_tm, bool with_ev) {
         m_pg->reset();
     if (m_sp)
         m_sp->reset();
-
-    // 不能复位m_stock / m_kdata/
-    //  m_src_kdata，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
-    // 一个sys实例绑定stock后，除非主动改变，否则不应该被reset
-    //  m_stock
 
     m_pre_ev_valid = false;  // true;
     m_pre_cn_valid = false;  // true;
@@ -185,29 +232,26 @@ void System::setTO(const KData& kdata) {
         m_mm->setQuery(query);
 }
 
-SystemPtr System::clone(bool with_tm, bool with_ev) {
+SystemPtr System::clone() {
     SystemPtr p = make_shared<System>();
-    if (m_tm) {
-        p->m_tm = with_tm ? m_tm->clone() : m_tm;
-    }
-    if (m_ev) {
-        // ev 通常作为公共组件不进行克隆，使用同一实例
-        p->m_ev = with_ev ? m_ev->clone() : m_ev;
-    }
+    if (m_tm)
+        p->m_tm = getParam<bool>("shared_tm") ? m_tm : m_tm->clone();
+    if (m_ev)
+        p->m_ev = getParam<bool>("shared_ev") ? m_ev : m_ev->clone();
     if (m_mm)
-        p->m_mm = m_mm->clone();
+        p->m_mm = getParam<bool>("shared_mm") ? m_mm : m_mm->clone();
     if (m_cn)
-        p->m_cn = m_cn->clone();
+        p->m_cn = getParam<bool>("shared_cn") ? m_cn : m_cn->clone();
     if (m_sg)
-        p->m_sg = m_sg->clone();
+        p->m_sg = getParam<bool>("shared_sg") ? m_sg : m_sg->clone();
     if (m_st)
-        p->m_st = m_st->clone();
+        p->m_st = getParam<bool>("shared_st") ? m_st : m_st->clone();
     if (m_tp)
-        p->m_tp = m_tp->clone();
+        p->m_tp = getParam<bool>("shared_tp") ? m_tp : m_tp->clone();
     if (m_pg)
-        p->m_pg = m_pg->clone();
+        p->m_pg = getParam<bool>("shared_pg") ? m_pg : m_pg->clone();
     if (m_sp)
-        p->m_sp = m_sp->clone();
+        p->m_sp = getParam<bool>("shared_sp") ? m_sp : m_sp->clone();
 
     p->m_params = m_params;
     p->m_name = m_name;
@@ -281,8 +325,9 @@ void System::run(const KQuery& query, bool reset) {
     HKU_ERROR_IF_RETURN(m_stock.isNull(), void(), "m_stock is NULL!");
 
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
+    // System::run 供单体系统进行回测，需要强制复位所有的组件，忽略组件的共享属性
     if (reset)
-        this->reset(true, true);
+        this->forceResetAll();
 
     HKU_IF_RETURN(!readyForRun(), void());
 
@@ -310,8 +355,10 @@ void System::run(const KData& kdata, bool reset) {
     HKU_INFO_IF_RETURN(kdata.empty(), void(), "Input kdata is empty!");
 
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
-    if (reset)
-        this->reset(true, true);
+    if (reset) {
+        // System::run 供单体系统进行回测，需要强制复位所有的组件，忽略组件的共享属性
+        this->forceResetAll();
+    }
 
     HKU_IF_RETURN(!readyForRun(), void());
 

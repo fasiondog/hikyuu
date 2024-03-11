@@ -146,21 +146,19 @@ public:
 
     /**
      * 复位
-     * @param with_tm 是否复位TM组件
-     * @param with_ev 是否复位EV组件
-     * @note TM、EV都是和具体系统无关的策略组件，可以在不同的系统中进行共享，复位将引起系统
-     * 运行时被重新清空并计算。尤其是在共享TM时需要注意！
+     * @note 实际复位操作依赖于系统中各个部件的共享参数
      */
-    void reset(bool with_tm, bool with_ev);
+    void reset();
+
+    /** 强制复位所有组件，忽略组件的共享属性 */
+    void forceResetAll();
 
     typedef shared_ptr<System> SystemPtr;
 
     /**
      * 克隆操作，会依次调用所有部件的clone操作
-     * @param with_tm 是否克隆 tm，默认为 true
-     * @param with_ev 是否克隆 ev，默认为 false，ev 通常作为公共组件不进行克隆，使用同一实例
      */
-    SystemPtr clone(bool with_tm = true, bool with_ev = false);
+    SystemPtr clone();
 
     /**
      * 设置交易对象

@@ -45,8 +45,7 @@ void SelectorBase::removeAll() {
 void SelectorBase::reset() {
     SystemList::const_iterator iter = m_pro_sys_list.begin();
     for (; iter != m_pro_sys_list.end(); ++iter) {
-        // 复位账户但不复位ev
-        (*iter)->reset(true, false);
+        (*iter)->reset();
     }
 
     m_real_sys_list.clear();
@@ -90,7 +89,9 @@ bool SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     HKU_ERROR_IF_RETURN(!protoSys->getMM(), false, "protoSys has not MoneyManager!");
     HKU_ERROR_IF_RETURN(!protoSys->getSG(), false, "protoSys has not Siganl!");
     SYSPtr sys = protoSys->clone();
-    sys->reset(true, false);
+    // 每个系统独立，不共享 tm
+    sys->setParam<bool>("shared_tm", false);
+    sys->reset();
     sys->setStock(stock);
     m_pro_sys_list.emplace_back(sys);
     return true;
@@ -102,7 +103,9 @@ bool SelectorBase::addStockList(const StockList& stkList, const SystemPtr& proto
     HKU_ERROR_IF_RETURN(!protoSys->getSG(), false, "protoSys has not Siganl!");
     SYSPtr newProtoSys = protoSys->clone();
     // 复位清除之前的数据，避免因原有数据过多导致下面循环时速度过慢
-    newProtoSys->reset(true, false);
+    // 每个系统独立，不共享 tm
+    newProtoSys->setParam<bool>("shared_tm", false);
+    newProtoSys->reset();
     StockList::const_iterator iter = stkList.begin();
     for (; iter != stkList.end(); ++iter) {
         if (iter->isNull()) {

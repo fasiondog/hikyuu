@@ -155,18 +155,20 @@ void export_System(py::module& m) {
       .def("get_buy_short_trade_request", &System::getBuyShortTradeRequest,
            py::return_value_policy::copy)
 
-      .def("reset", &System::reset, py::arg("with_tm"), py::arg("with_ev"),
-           R"(reset(self, with_tm, with_ev)
+      .def("reset", &System::reset,
+           R"(reset(self)
 
-    复位操作。TM、EV是和具体系统无关的策略组件，可以在不同的系统中进行共享，复位将引起系统运行时被重新清空并计算。尤其是在共享TM时需要注意！
+    依据各个部件的共享属性进行复位操作。)")
 
-    :param bool with_tm: 是否复位TM组件
-    :param bool with_ev: 是否复位EV组件)")
+      .def("force_reset_all", &System::forceResetAll,
+           R"(force_reset_all(self)
 
-      .def("clone", &System::clone, py::arg("with_tm") = true, py::arg("with_ev") = false,
+    忽略各个部件的共享属性，强制复位所有部件。)")
+
+      .def("clone", &System::clone,
            R"(clone(self)
 
-    克隆操作。)")
+    克隆操作，会依据部件的共享特性进行克隆，共享部件不进行实际的克隆操作，保持共享。)")
 
       .def("run", run_1, py::arg("query"), py::arg("reset") = true)
       .def("run", run_2, py::arg("kdata"), py::arg("reset") = true)

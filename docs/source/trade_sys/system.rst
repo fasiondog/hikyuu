@@ -18,6 +18,16 @@
     * **ev_open_position=False** *(bool)*: 是否使用市场环境判定进行初始建仓
     * **cn_open_position=False** *(bool)*: 是否使用系统有效性条件进行初始建仓
     
+    * **shared_tm=False** *(bool)*: tm 部件是否为共享部件
+    * **shared_ev=True** *(bool)*: ev 部件是否为共享部件
+    * **shared_cn=False** *(bool)*: cv 部件是否为共享部件    
+    * **shared_mm=False** *(bool)*: mm 部件是否为共享部件
+    * **shared_sg=False** *(bool)*: sg 部件是否为共享部件
+    * **shared_st=False** *(bool)*: st 部件是否为共享部件
+    * **shared_tp=False** *(bool)*: tp 部件是否为共享部件
+    * **shared_pg=False** *(bool)*: pg 部件是否为共享部件
+    * **shared_sp=False** *(bool)*: sp 部件是否为共享部件
+    
     
 创建系统并执行回测
 -----------------------
@@ -197,16 +207,17 @@
         :param Query query: K线数据查询条件
         :param bool reset: 是否同时复位所有组件，尤其是tm实例
         
-    .. py:method:: reset(self, with_tm, with_ev)
+    .. py:method:: reset(self)
     
-        复位操作。TM、EV是和具体系统无关的策略组件，可以在不同的系统中进行共享，复位将引起系统运行时被重新清空并计算。尤其是在共享TM时需要注意！
+        复位操作，依据各个部件的共享属性进行复位，共享的部件不进行复位。
         
-        :param bool with_tm: 是否复位TM组件
-        :param bool with_ev: 是否复位EV组件
-        
+    .. py:methon:: force_reset_all(self)
+
+        忽略部件的共享属性，强制复位，包括所有部件。
+
     .. py:method:: clone(self)
     
-        克隆操作。
+        克隆操作，会依据部件的共享特性进行克隆，共享部件不进行实际的克隆操作，保持共享
 
         
         
