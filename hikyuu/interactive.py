@@ -58,9 +58,14 @@ import configparser
 from hikyuu.data.hku_config_template import generate_default_config
 from hikyuu import *
 
-# 重定向C++ stdout/stderr输出至python
-iodog = OstreamRedirect()
-iodog.open()
+if in_interactive_session():
+    sm.python_in_interactive = True
+
+# 如果是在 jupyter 环境中运行，重定向C++ stdout/stderr输出至python
+if in_ipython_frontend():
+    hku_info("hikyuu version: {}", get_version_with_build())
+    iodog = OstreamRedirect()
+    iodog.open()
 
 # ==============================================================================
 # 引入扯线木偶

@@ -31,6 +31,13 @@ void export_StockManager(py::module& m) {
      param hikyuu_param 其他参数
      param StrategyContext context 策略上下文, 默认加载全部证券)")
 
+      .def_property("running_in_python",
+                    py::overload_cast<>(&StockManager::runningInPython, py::const_),
+                    py::overload_cast<bool>(&StockManager::runningInPython))
+      .def_property("python_in_interactive",
+                    py::overload_cast<>(&StockManager::pythonInteractive, py::const_),
+                    py::overload_cast<bool>(&StockManager::pythonInteractive))
+
       .def("reload", &StockManager::reload, "重新加载所有证券数据")
 
       .def("tmpdir", &StockManager::tmpdir, R"(tmpdir(self) -> str

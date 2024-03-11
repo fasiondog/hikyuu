@@ -26,7 +26,7 @@
 namespace hku {
 
 static std::thread::id g_main_thread_id = std::this_thread::get_id();
-static int g_ioredirect_to_python_count = 0;
+static std::atomic<int> g_ioredirect_to_python_count = 0;
 
 bool isLogInMainThread() {
     return std::this_thread::get_id() == g_main_thread_id;

@@ -80,6 +80,14 @@ option("low_precision")
     set_description("Enable send feedback.")
 option_end()
 
+option("log_level")
+    set_default("info")
+    set_values("trace", "debug", "info", "warn", "error", "fatal", "off")
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("set log level")
+option_end()
+
 -- project
 set_project("hikyuu")
 
@@ -88,12 +96,27 @@ if not is_plat("windows") then add_rules("mode.coverage", "mode.asan", "mode.msa
 
 -- version
 set_version("1.3.5", {build = "%Y%m%d%H%M"})
-set_configvar("LOG_ACTIVE_LEVEL", 0) -- 激活的日志级别
--- if is_mode("debug") then
---    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别
--- else
---    set_configvar("LOG_ACTIVE_LEVEL", 2)  -- 激活的日志级别
--- end
+
+local level = get_config("log_level")
+if is_mode("debug") then
+    level = "trace"
+end
+if level == "trace" then
+    set_configvar("LOG_ACTIVE_LEVEL", 0)
+elseif level == "debug" then
+    set_configvar("LOG_ACTIVE_LEVEL", 1)
+elseif level == "info" then
+    set_configvar("LOG_ACTIVE_LEVEL", 2)
+elseif level == "warn" then
+    set_configvar("LOG_ACTIVE_LEVEL", 3)
+elseif level == "error" then
+    set_configvar("LOG_ACTIVE_LEVEL", 4)
+elseif level == "fatal" then
+    set_configvar("LOG_ACTIVE_LEVEL", 5)
+else
+    set_configvar("LOG_ACTIVE_LEVEL", 6)
+end
+
 set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)

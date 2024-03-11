@@ -33,7 +33,8 @@ void StockManager::quit() {
     }
 }
 
-StockManager::StockManager() : m_initializing(false) {
+StockManager::StockManager()
+: m_initializing(false), m_runningInPython(false), m_pythonIsInteractive(false) {
     m_stockDict_mutex = new std::mutex;
     m_marketInfoDict_mutex = new std::mutex;
     m_stockTypeInfo_mutex = new std::mutex;

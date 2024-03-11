@@ -62,6 +62,8 @@ PYBIND11_MODULE(core312, m) {
 PYBIND11_MODULE(core, m) {
 #endif
 
+    StockManager::instance().runningInPython(true);
+
 #if HKU_ENABLE_SEND_FEEDBACK
     sendPythonVersionFeedBack(PY_MAJOR_VERSION, PY_MINOR_VERSION, PY_MICRO_VERSION);
 #endif
