@@ -185,10 +185,6 @@ inline KData StoplossBase::getTO() const {
     return m_kdata;
 }
 
-inline void StoplossBase::reset() {
-    _reset();
-}
-
 } /* namespace hku */
 
 #if FMT_VERSION >= 90000

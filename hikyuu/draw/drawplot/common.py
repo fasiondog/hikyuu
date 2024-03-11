@@ -24,10 +24,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-#===============================================================================
+# ===============================================================================
 # history:
 # 1. 20171122, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 from hikyuu import Query
 
@@ -87,44 +87,3 @@ def get_draw_title(kdata):
         stitle = stock.market + "/" + stock.code + ' ' + name + s1
 
     return stitle
-
-
-def in_interactive_session() -> bool:
-    """
-    Check if we're running in an interactive shell.
-
-    Returns
-    -------
-    bool
-        True if running under python/ipython interactive shell.
-    """
-    def check_main():
-        try:
-            import __main__ as main
-        except ModuleNotFoundError:
-            return False
-        return not hasattr(main, "__file__")
-
-    try:
-        # error: Name '__IPYTHON__' is not defined
-        return __IPYTHON__ or check_main()  # type: ignore[name-defined]
-    except NameError:
-        return check_main()
-
-
-def in_ipython_frontend() -> bool:
-    """
-    Check if we're inside an IPython zmq frontend.
-
-    Returns
-    -------
-    bool
-    """
-    try:
-        # error: Name 'get_ipython' is not defined
-        ip = get_ipython()  # type: ignore[name-defined]
-        return "zmq" in str(type(ip)).lower()
-    except NameError:
-        pass
-
-    return False

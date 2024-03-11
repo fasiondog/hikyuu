@@ -83,60 +83,14 @@ void HKU_API set_log_level(LOG_LEVEL level);
 
 std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
 
-/*#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__)
+#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_DEBUG(...) SPDLOG_LOGGER_DEBUG(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_INFO(...) SPDLOG_LOGGER_INFO(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_WARN(...) SPDLOG_LOGGER_WARN(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__)
-#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)*/
+#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)
 
-#define HKU_TRACE(...)                                                            \
-    do {                                                                          \
-        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__);             \
-        }                                                                         \
-    } while (0)
-
-#define HKU_DEBUG(...)                                                            \
-    do {                                                                          \
-        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_DEBUG(hku::getHikyuuLogger(), __VA_ARGS__);             \
-        }                                                                         \
-    } while (0)
-
-#define HKU_INFO(...)                                                             \
-    do {                                                                          \
-        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_INFO(hku::getHikyuuLogger(), __VA_ARGS__);              \
-        }                                                                         \
-    } while (0)
-
-#define HKU_WARN(...)                                                             \
-    do {                                                                          \
-        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_WARN(hku::getHikyuuLogger(), __VA_ARGS__);              \
-        }                                                                         \
-    } while (0)
-
-#define HKU_ERROR(...)                                                            \
-    do {                                                                          \
-        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__);             \
-        }                                                                         \
-    } while (0)
-
-#define HKU_FATAL(...)                                                            \
-    do {                                                                          \
-        if (hku::isLogInMainThread() || hku::getIORedirectToPythonCount() <= 0) { \
-            SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__);          \
-        }                                                                         \
-    } while (0)
-
-#if HKU_USE_SPDLOG_ASYNC_LOGGER
-void initLogger();
-#else
-void initLogger();
-#endif
+void initLogger(bool inJupyter = false);
 
 #else
 enum LOG_LEVEL {
@@ -151,7 +105,7 @@ enum LOG_LEVEL {
 
 LOG_LEVEL HKU_API get_log_level();
 void HKU_API set_log_level(LOG_LEVEL level);
-void initLogger();
+void initLogger(bool inJupyter = false);
 
 /** 获取系统当前时间，精确到毫秒，如：2001-01-02 13:01:02.001 */
 std::string HKU_API getLocalTime();
@@ -487,9 +441,13 @@ std::string HKU_API getLocalTime();
         return ret;                         \
     }
 
+/** 用于 catch (...) 中打印，减少编译后代码大小 */
 extern std::string g_unknown_error_msg;
+#define HKU_TRACE_UNKNOWN HKU_TRACE(g_unknown_error_msg)
+#define HKU_DEBUG_UNKNOWN HKU_DEBUG(g_unknown_error_msg)
+#define HKU_INFO_UNKNOWN HKU_INFO(g_unknown_error_msg)
 #define HKU_ERROR_UNKNOWN HKU_ERROR(g_unknown_error_msg)
-#define HKU_FATAL_UNKNOWN HKU_ERROR(g_unknown_error_msg)
+#define HKU_FATAL_UNKNOWN HKU_FATAL(g_unknown_error_msg)
 
 /** @} */
 

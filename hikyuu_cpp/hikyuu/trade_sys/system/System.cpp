@@ -33,6 +33,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SystemPtr& sys) {
 
 System::System()
 : m_name("SYS_Simple"),
+  m_part_changed(true),
   m_pre_ev_valid(true),  // must true
   m_pre_cn_valid(true),  // must true
   m_buy_days(0),
@@ -44,6 +45,7 @@ System::System()
 
 System::System(const string& name)
 : m_name(name),
+  m_part_changed(true),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
   m_buy_days(0),
@@ -67,6 +69,7 @@ System::System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const Envir
   m_pg(pg),
   m_sp(sp),
   m_name(name),
+  m_part_changed(true),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
   m_buy_days(0),
@@ -106,12 +109,65 @@ void System::initParam() {
 
     // 在没有持仓时，是否支持借入证券，融券
     setParam<bool>("support_borrow_stock", false);
+
+    // 以下参数控制各个部件的共享策略，影响 clone 和 reset 操作
+    // 当为共享组件时，不会 clone 和 reset 相应的组件
+    setParam<bool>("shared_tm", false);
+    setParam<bool>("shared_ev", true);
+    setParam<bool>("shared_cn", false);
+    setParam<bool>("shared_sg", false);
+    setParam<bool>("shared_mm", false);
+    setParam<bool>("shared_st", false);
+    setParam<bool>("shared_tp", false);
+    setParam<bool>("shared_pg", false);
+    setParam<bool>("shared_sp", false);
 }
 
-void System::reset(bool with_tm, bool with_ev) {
-    if (with_tm && m_tm)
+void System::reset() {
+    if (m_tm && !getParam<bool>("shared_tm"))
         m_tm->reset();
-    if (with_ev && m_ev)
+    if (m_ev && !getParam<bool>("shared_ev"))
+        m_ev->reset();
+    if (m_cn && !getParam<bool>("shared_cn"))
+        m_cn->reset();
+    if (m_mm && !getParam<bool>("shared_mm"))
+        m_mm->reset();
+    if (m_sg && !getParam<bool>("shared_sg"))
+        m_sg->reset();
+    if (m_st && !getParam<bool>("shared_st"))
+        m_st->reset();
+    if (m_tp && !getParam<bool>("shared_tp"))
+        m_tp->reset();
+    if (m_pg && !getParam<bool>("shared_pg"))
+        m_pg->reset();
+    if (m_sp && !getParam<bool>("shared_sp"))
+        m_sp->reset();
+
+    // 不能复位m_stock / m_kdata/
+    //  m_src_kdata，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
+    // 一个sys实例绑定stock后，除非主动改变，否则不应该被reset
+    //  m_stock
+
+    m_part_changed = true;
+    m_pre_ev_valid = false;  // true;
+    m_pre_cn_valid = false;  // true;
+
+    m_buy_days = 0;
+    m_sell_short_days = 0;
+    m_trade_list.clear();
+    m_lastTakeProfit = 0.0;
+    m_lastShortTakeProfit = 0.0;
+
+    m_buyRequest.clear();
+    m_sellRequest.clear();
+    m_sellShortRequest.clear();
+    m_buyShortRequest.clear();
+}
+
+void System::forceResetAll() {
+    if (m_tm)
+        m_tm->reset();
+    if (m_ev)
         m_ev->reset();
     if (m_cn)
         m_cn->reset();
@@ -128,11 +184,12 @@ void System::reset(bool with_tm, bool with_ev) {
     if (m_sp)
         m_sp->reset();
 
-    // 不能复位m_stock / m_kdata/
-    //  m_src_kdata，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
-    // 一个sys实例绑定stock后，除非主动改变，否则不应该被reset
-    //  m_stock
+    // 清理交易对象
+    m_stock = Null<Stock>();
+    m_src_kdata = Null<KData>();
+    m_kdata = Null<KData>();
 
+    m_part_changed = true;
     m_pre_ev_valid = false;  // true;
     m_pre_cn_valid = false;  // true;
 
@@ -149,6 +206,7 @@ void System::reset(bool with_tm, bool with_ev) {
 }
 
 void System::setTO(const KData& kdata) {
+    HKU_TRACE_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "No need to calcule!");
     m_kdata = kdata;
     m_stock = kdata.getStock();
 
@@ -185,29 +243,26 @@ void System::setTO(const KData& kdata) {
         m_mm->setQuery(query);
 }
 
-SystemPtr System::clone(bool with_tm, bool with_ev) {
+SystemPtr System::clone() {
     SystemPtr p = make_shared<System>();
-    if (m_tm) {
-        p->m_tm = with_tm ? m_tm->clone() : m_tm;
-    }
-    if (m_ev) {
-        // ev 通常作为公共组件不进行克隆，使用同一实例
-        p->m_ev = with_ev ? m_ev->clone() : m_ev;
-    }
+    if (m_tm)
+        p->m_tm = getParam<bool>("shared_tm") ? m_tm : m_tm->clone();
+    if (m_ev)
+        p->m_ev = getParam<bool>("shared_ev") ? m_ev : m_ev->clone();
     if (m_mm)
-        p->m_mm = m_mm->clone();
+        p->m_mm = getParam<bool>("shared_mm") ? m_mm : m_mm->clone();
     if (m_cn)
-        p->m_cn = m_cn->clone();
+        p->m_cn = getParam<bool>("shared_cn") ? m_cn : m_cn->clone();
     if (m_sg)
-        p->m_sg = m_sg->clone();
+        p->m_sg = getParam<bool>("shared_sg") ? m_sg : m_sg->clone();
     if (m_st)
-        p->m_st = m_st->clone();
+        p->m_st = getParam<bool>("shared_st") ? m_st : m_st->clone();
     if (m_tp)
-        p->m_tp = m_tp->clone();
+        p->m_tp = getParam<bool>("shared_tp") ? m_tp : m_tp->clone();
     if (m_pg)
-        p->m_pg = m_pg->clone();
+        p->m_pg = getParam<bool>("shared_pg") ? m_pg : m_pg->clone();
     if (m_sp)
-        p->m_sp = m_sp->clone();
+        p->m_sp = getParam<bool>("shared_sp") ? m_sp : m_sp->clone();
 
     p->m_params = m_params;
     p->m_name = m_name;
@@ -215,6 +270,7 @@ SystemPtr System::clone(bool with_tm, bool with_ev) {
     p->m_kdata = m_kdata;
     p->m_src_kdata = m_src_kdata;
 
+    p->m_part_changed = m_part_changed;
     p->m_pre_ev_valid = m_pre_ev_valid;
     p->m_pre_cn_valid = m_pre_cn_valid;
 
@@ -277,18 +333,21 @@ bool System::readyForRun() {
     return true;
 }
 
-void System::run(const KQuery& query, bool reset) {
+void System::run(const KQuery& query, bool reset, bool resetAll) {
     HKU_ERROR_IF_RETURN(m_stock.isNull(), void(), "m_stock is NULL!");
 
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
-    if (reset)
-        this->reset(true, true);
+    if (resetAll) {
+        this->forceResetAll();
+    } else if (reset) {
+        this->reset();
+    }
 
     HKU_IF_RETURN(!readyForRun(), void());
 
-    // m_stock = stock; 在setTO里赋值
     KData kdata = m_stock.getKData(query);
     HKU_IF_RETURN(kdata.empty(), void());
+    HKU_DEBUG_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "Not need calculate.");
 
     setTO(kdata);
     size_t total = kdata.size();
@@ -299,19 +358,25 @@ void System::run(const KQuery& query, bool reset) {
             _runMoment(ks[i], src_ks[i]);
         }
     }
+    m_part_changed = false;
 }
 
-void System::run(const Stock& stock, const KQuery& query, bool reset) {
+void System::run(const Stock& stock, const KQuery& query, bool reset, bool resetAll) {
     m_stock = stock;
-    run(query, reset);
+    run(query, reset, resetAll);
 }
 
-void System::run(const KData& kdata, bool reset) {
+void System::run(const KData& kdata, bool reset, bool resetAll) {
     HKU_INFO_IF_RETURN(kdata.empty(), void(), "Input kdata is empty!");
+    HKU_DEBUG_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "Not need calculate.");
 
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
-    if (reset)
-        this->reset(true, true);
+    if (resetAll) {
+        this->forceResetAll();
+    } else if (reset) {
+        // System::run 供单体系统进行回测，需要强制复位所有的组件，忽略组件的共享属性
+        this->reset();
+    }
 
     HKU_IF_RETURN(!readyForRun(), void());
 
@@ -324,6 +389,7 @@ void System::run(const KData& kdata, bool reset) {
             _runMoment(ks[i], src_ks[i]);
         }
     }
+    m_part_changed = false;
 }
 
 void System::clearDelayRequest() {

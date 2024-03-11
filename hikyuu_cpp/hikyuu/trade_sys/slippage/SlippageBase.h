@@ -156,10 +156,6 @@ inline KData SlippageBase::getTO() const {
     return m_kdata;
 }
 
-inline void SlippageBase::reset() {
-    _reset();
-}
-
 } /* namespace hku */
 
 #if FMT_VERSION >= 90000

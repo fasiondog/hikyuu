@@ -67,8 +67,6 @@ from .echarts_draw import iplot as ec_iplot
 from .echarts_draw import ibar as ec_ibar
 from .echarts_draw import kplot as ec_kplot
 
-from .common import in_ipython_frontend
-
 g_draw_engine = 'matplotlib'
 
 

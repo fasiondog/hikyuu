@@ -29,6 +29,12 @@ StoplossBase::StoplossBase(const string& name) : m_name(name) {}
 
 StoplossBase::~StoplossBase() {}
 
+void StoplossBase::reset() {
+    m_kdata = Null<KData>();
+    m_tm.reset();
+    _reset();
+}
+
 StoplossPtr StoplossBase::clone() {
     StoplossPtr p;
     try {
@@ -50,7 +56,7 @@ StoplossPtr StoplossBase::clone() {
 }
 
 void StoplossBase::setTO(const KData& kdata) {
-    reset();
+    HKU_IF_RETURN(m_kdata == kdata, void());
     m_kdata = kdata;
     if (!kdata.empty()) {
         _calculate();

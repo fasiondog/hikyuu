@@ -16,7 +16,7 @@ from matplotlib.ticker import FuncFormatter, FixedLocator
 
 from hikyuu import *
 
-from .common import get_draw_title, in_interactive_session
+from .common import get_draw_title
 
 
 def set_mpl_params():

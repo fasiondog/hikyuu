@@ -46,7 +46,7 @@ inline vector<AnalysisSystemWithBlockOut> analysisSystemListWith(const Container
     vector<AnalysisSystemWithBlockOut> result;
     HKU_IF_RETURN(blk.size() == 0 || !sys_proto, result);
 
-    sys_proto->reset(true, true);
+    sys_proto->reset();
     SystemList sys_list;
     StockList stk_list;
     for (const auto& stk : blk) {
