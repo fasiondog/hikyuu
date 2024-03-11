@@ -61,7 +61,7 @@ SignalPtr SignalBase::clone() {
 }
 
 void SignalBase::setTO(const KData& kdata) {
-    HKU_IF_RETURN(m_kdata == kdata, void(), "No need to calculate.");
+    HKU_IF_RETURN(m_kdata == kdata, void());
     m_kdata = kdata;
     if (!kdata.empty()) {
         _calculate();
