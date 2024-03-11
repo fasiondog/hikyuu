@@ -204,13 +204,11 @@ public:
         m_runningInPython = inpython;
     }
 
-    bool pythonInteractive() const {
-        return m_pythonIsInteractive;
+    bool pythonInJupyter() const {
+        return m_pythonInJupyter;
     }
 
-    void pythonInteractive(bool isInteractive) {
-        m_pythonIsInteractive = isInteractive;
-    }
+    void pythonInJupyter(bool inJupyter);
 
 public:
     typedef StockMapIterator const_iterator;
@@ -252,8 +250,8 @@ private:
 private:
     static StockManager* m_sm;
     std::atomic_bool m_initializing;
-    std::atomic_bool m_runningInPython;      // 是否是在 python 中运行
-    std::atomic_bool m_pythonIsInteractive;  // python 是否为交互模式
+    std::atomic_bool m_runningInPython;  // 是否是在 python 中运行
+    std::atomic_bool m_pythonInJupyter;  // python 是否为交互模式
     std::thread::id m_thread_id;  // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
     string m_tmpdir;
     string m_datadir;

@@ -34,9 +34,9 @@ void export_StockManager(py::module& m) {
       .def_property("running_in_python",
                     py::overload_cast<>(&StockManager::runningInPython, py::const_),
                     py::overload_cast<bool>(&StockManager::runningInPython))
-      .def_property("python_in_interactive",
-                    py::overload_cast<>(&StockManager::pythonInteractive, py::const_),
-                    py::overload_cast<bool>(&StockManager::pythonInteractive))
+      .def_property("python_in_jupyter",
+                    py::overload_cast<>(&StockManager::pythonInJupyter, py::const_),
+                    py::overload_cast<bool>(&StockManager::pythonInJupyter))
 
       .def("reload", &StockManager::reload, "重新加载所有证券数据")
 

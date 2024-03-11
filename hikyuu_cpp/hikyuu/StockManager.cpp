@@ -34,7 +34,7 @@ void StockManager::quit() {
 }
 
 StockManager::StockManager()
-: m_initializing(false), m_runningInPython(false), m_pythonIsInteractive(false) {
+: m_initializing(false), m_runningInPython(false), m_pythonInJupyter(false) {
     m_stockDict_mutex = new std::mutex;
     m_marketInfoDict_mutex = new std::mutex;
     m_stockTypeInfo_mutex = new std::mutex;
@@ -54,6 +54,11 @@ StockManager& StockManager::instance() {
         m_sm = new StockManager();
     }
     return (*m_sm);
+}
+
+void StockManager::pythonInJupyter(bool inJupyter) {
+    m_pythonInJupyter = inJupyter;
+    initLogger(inJupyter);
 }
 
 Parameter default_preload_param() {
