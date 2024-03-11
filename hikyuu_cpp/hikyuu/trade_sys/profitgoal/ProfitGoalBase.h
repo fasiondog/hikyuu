@@ -175,10 +175,6 @@ inline void ProfitGoalBase::name(const string& name) {
     m_name = name;
 }
 
-inline void ProfitGoalBase::reset() {
-    _reset();
-}
-
 } /* namespace hku */
 
 #if FMT_VERSION >= 90000

@@ -205,15 +205,16 @@
         
         :param Stock stock: 交易的证券
         :param Query query: K线数据查询条件
-        :param bool reset: 是否同时复位所有组件，尤其是tm实例
-        
+        :param bool reset: 执行前是否依据系统部件共享属性复位
+        :param bool reset_all: 强制复位所有部件
+
     .. py:method:: reset(self)
     
-        复位操作，依据各个部件的共享属性进行复位，共享的部件不进行复位。
+        复位，但不包括已有的交易对象，以及共享的部件
         
     .. py:methon:: force_reset_all(self)
 
-        忽略部件的共享属性，强制复位，包括所有部件。
+        强制复位所有组件以及清空已有的交易对象，忽略组件的共享属性
 
     .. py:method:: clone(self)
     

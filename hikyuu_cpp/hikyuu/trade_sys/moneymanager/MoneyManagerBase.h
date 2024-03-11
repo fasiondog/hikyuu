@@ -38,9 +38,7 @@ public:
     }
 
     /** 复位 */
-    void reset() {
-        _reset();
-    }
+    void reset();
 
     /**
      * 设定交易账户

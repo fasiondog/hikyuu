@@ -33,6 +33,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SystemPtr& sys) {
 
 System::System()
 : m_name("SYS_Simple"),
+  m_part_changed(true),
   m_pre_ev_valid(true),  // must true
   m_pre_cn_valid(true),  // must true
   m_buy_days(0),
@@ -44,6 +45,7 @@ System::System()
 
 System::System(const string& name)
 : m_name(name),
+  m_part_changed(true),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
   m_buy_days(0),
@@ -67,6 +69,7 @@ System::System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const Envir
   m_pg(pg),
   m_sp(sp),
   m_name(name),
+  m_part_changed(true),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
   m_buy_days(0),
@@ -145,6 +148,7 @@ void System::reset() {
     // 一个sys实例绑定stock后，除非主动改变，否则不应该被reset
     //  m_stock
 
+    m_part_changed = true;
     m_pre_ev_valid = false;  // true;
     m_pre_cn_valid = false;  // true;
 
@@ -180,6 +184,12 @@ void System::forceResetAll() {
     if (m_sp)
         m_sp->reset();
 
+    // 清理交易对象
+    m_stock = Null<Stock>();
+    m_src_kdata = Null<KData>();
+    m_kdata = Null<KData>();
+
+    m_part_changed = true;
     m_pre_ev_valid = false;  // true;
     m_pre_cn_valid = false;  // true;
 
@@ -196,6 +206,7 @@ void System::forceResetAll() {
 }
 
 void System::setTO(const KData& kdata) {
+    HKU_TRACE_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "No need to calcule!");
     m_kdata = kdata;
     m_stock = kdata.getStock();
 
@@ -259,6 +270,7 @@ SystemPtr System::clone() {
     p->m_kdata = m_kdata;
     p->m_src_kdata = m_src_kdata;
 
+    p->m_part_changed = m_part_changed;
     p->m_pre_ev_valid = m_pre_ev_valid;
     p->m_pre_cn_valid = m_pre_cn_valid;
 
@@ -321,19 +333,21 @@ bool System::readyForRun() {
     return true;
 }
 
-void System::run(const KQuery& query, bool reset) {
+void System::run(const KQuery& query, bool reset, bool resetAll) {
     HKU_ERROR_IF_RETURN(m_stock.isNull(), void(), "m_stock is NULL!");
 
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
-    // System::run 供单体系统进行回测，需要强制复位所有的组件，忽略组件的共享属性
-    if (reset)
+    if (resetAll) {
         this->forceResetAll();
+    } else if (reset) {
+        this->reset();
+    }
 
     HKU_IF_RETURN(!readyForRun(), void());
 
-    // m_stock = stock; 在setTO里赋值
     KData kdata = m_stock.getKData(query);
     HKU_IF_RETURN(kdata.empty(), void());
+    HKU_DEBUG_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "Not need calculate.");
 
     setTO(kdata);
     size_t total = kdata.size();
@@ -344,20 +358,24 @@ void System::run(const KQuery& query, bool reset) {
             _runMoment(ks[i], src_ks[i]);
         }
     }
+    m_part_changed = false;
 }
 
-void System::run(const Stock& stock, const KQuery& query, bool reset) {
+void System::run(const Stock& stock, const KQuery& query, bool reset, bool resetAll) {
     m_stock = stock;
-    run(query, reset);
+    run(query, reset, resetAll);
 }
 
-void System::run(const KData& kdata, bool reset) {
+void System::run(const KData& kdata, bool reset, bool resetAll) {
     HKU_INFO_IF_RETURN(kdata.empty(), void(), "Input kdata is empty!");
+    HKU_DEBUG_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "Not need calculate.");
 
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
-    if (reset) {
-        // System::run 供单体系统进行回测，需要强制复位所有的组件，忽略组件的共享属性
+    if (resetAll) {
         this->forceResetAll();
+    } else if (reset) {
+        // System::run 供单体系统进行回测，需要强制复位所有的组件，忽略组件的共享属性
+        this->reset();
     }
 
     HKU_IF_RETURN(!readyForRun(), void());
@@ -371,6 +389,7 @@ void System::run(const KData& kdata, bool reset) {
             _runMoment(ks[i], src_ks[i]);
         }
     }
+    m_part_changed = false;
 }
 
 void System::clearDelayRequest() {

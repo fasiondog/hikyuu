@@ -29,6 +29,12 @@ ProfitGoalBase::ProfitGoalBase(const string& name) : m_name(name) {}
 
 ProfitGoalBase::~ProfitGoalBase() {}
 
+void ProfitGoalBase::reset() {
+    m_kdata = Null<KData>();
+    m_tm.reset();
+    _reset();
+}
+
 ProfitGoalPtr ProfitGoalBase::clone() {
     ProfitGoalPtr p;
     try {
@@ -51,7 +57,7 @@ ProfitGoalPtr ProfitGoalBase::clone() {
 }
 
 void ProfitGoalBase::setTO(const KData& kdata) {
-    reset();
+    HKU_IF_RETURN(m_kdata == kdata, void());
     m_kdata = kdata;
     if (!kdata.empty()) {
         _calculate();

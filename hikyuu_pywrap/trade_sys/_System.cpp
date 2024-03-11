@@ -15,9 +15,9 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
-void (System::*run_1)(const KQuery&, bool) = &System::run;
-void (System::*run_2)(const KData&, bool) = &System::run;
-void (System::*run_3)(const Stock&, const KQuery&, bool reset) = &System::run;
+void (System::*run_1)(const KQuery&, bool, bool) = &System::run;
+void (System::*run_2)(const KData&, bool, bool) = &System::run;
+void (System::*run_3)(const Stock&, const KQuery&, bool, bool) = &System::run;
 
 TradeRecord (System::*runMoment_1)(const Datetime&) = &System::runMoment;
 
@@ -158,28 +158,30 @@ void export_System(py::module& m) {
       .def("reset", &System::reset,
            R"(reset(self)
 
-    依据各个部件的共享属性进行复位操作。)")
+    复位，但不包括已有的交易对象，以及共享的部件。)")
 
       .def("force_reset_all", &System::forceResetAll,
            R"(force_reset_all(self)
 
-    忽略各个部件的共享属性，强制复位所有部件。)")
+    强制复位所有组件以及清空已有的交易对象，忽略组件的共享属性。)")
 
       .def("clone", &System::clone,
            R"(clone(self)
 
     克隆操作，会依据部件的共享特性进行克隆，共享部件不进行实际的克隆操作，保持共享。)")
 
-      .def("run", run_1, py::arg("query"), py::arg("reset") = true)
-      .def("run", run_2, py::arg("kdata"), py::arg("reset") = true)
+      .def("run", run_1, py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false)
+      .def("run", run_2, py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false)
       .def("run", run_3, py::arg("stock"), py::arg("query"), py::arg("reset") = true,
+           py::arg("reset_all") = false,
            R"(run(self, stock, query[, reset=True])
   
     运行系统，执行回测
 
     :param Stock stock: 交易的证券
     :param Query query: K线数据查询条件
-    :param bool reset: 是否同时复位所有组件，尤其是tm实例)")
+    :param bool reset: 执行前是否依据系统部件共享属性复位
+    :param bool reset_all: 强制复位所有部件)")
 
       .def("ready", &System::readyForRun)
 

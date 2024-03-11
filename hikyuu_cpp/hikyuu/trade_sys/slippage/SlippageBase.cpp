@@ -27,6 +27,11 @@ SlippageBase::SlippageBase() : m_name("SlippageBase") {}
 
 SlippageBase::SlippageBase(const string& name) : m_name(name) {}
 
+void SlippageBase::reset() {
+    m_kdata = Null<KData>();
+    _reset();
+}
+
 SlippagePtr SlippageBase::clone() {
     SlippagePtr p;
     try {
@@ -48,7 +53,7 @@ SlippagePtr SlippageBase::clone() {
 }
 
 void SlippageBase::setTO(const KData& kdata) {
-    reset();
+    HKU_IF_RETURN(m_kdata == kdata, void());
     m_kdata = kdata;
     if (!kdata.empty()) {
         _calculate();
