@@ -215,7 +215,7 @@ add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib", {system = false, configs = {zlib = true, ssl = true}})
 add_requires("zlib", {system = false})
 
-add_defines("SPDLOG_DISABLExm_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
+add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
