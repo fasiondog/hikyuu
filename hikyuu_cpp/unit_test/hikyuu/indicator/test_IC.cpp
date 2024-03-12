@@ -147,7 +147,11 @@ TEST_CASE("test_IC_export") {
     CHECK_EQ(x1.discard(), x2.discard());
     CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
     for (size_t i = 0; i < x1.size(); ++i) {
-        CHECK_EQ(x1[i], doctest::Approx(x2[i]).epsilon(0.00001));
+        if (std::isnan(x1[i])) {
+            CHECK_UNARY(std::isnan(x2[i]));
+        } else {
+            CHECK_EQ(x1[i], doctest::Approx(x2[i]).epsilon(0.00001));
+        }
     }
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
