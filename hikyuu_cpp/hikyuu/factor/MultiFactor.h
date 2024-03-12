@@ -20,7 +20,7 @@ public:
     typedef Indicator::value_t value_t;
 
 public:
-    MultiFactor();
+    MultiFactor() = delete;
     MultiFactor(const vector<Indicator>& inds, const StockList& stks, const KQuery& query,
                 const Stock& ref_stk);
 
@@ -32,17 +32,21 @@ public:
     /** 获取指定日期截面的所有因子值 */
     const vector<std::pair<Stock, value_t>>& get(const Datetime&) const;
 
+    /** 获取合成因子的IC */
     Indicator getIC(int ndays) const;
+
+    /** 获取合成因子的 ICIR */
     Indicator getICIR(int ic_n, int ir_n) const;
 
 private:
-    void _alignAllInds();
+    vector<vector<Indicator>> _alignAllInds();
     vector<Indicator> _getAllReturns(int ndays) const;
-    void _calculateAllFactorsByEqualWeight();
-    void _calculateAllFactorsByIC();
-    void _calculateAllFactorsByICIR();
+    void _calculateAllFactorsByEqualWeight(const vector<vector<Indicator>>&);
+    void _calculateAllFactorsByIC(const vector<vector<Indicator>>&);
+    void _calculateAllFactorsByICIR(const vector<vector<Indicator>>&);
 
 private:
+    std::mutex m_mutex;
     vector<Indicator> m_inds;
     StockList m_stks;
     Stock m_ref_stk;
@@ -53,7 +57,6 @@ private:
     unordered_map<Datetime, size_t> m_date_index;
     vector<vector<std::pair<Stock, value_t>>> m_stk_factor_by_date;
 
-    vector<vector<Indicator>> m_all_stk_inds;  // stock * inds
     DatetimeList m_ref_dates;
 };
 

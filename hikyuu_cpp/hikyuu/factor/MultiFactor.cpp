@@ -7,6 +7,7 @@
 
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/ROCP.h"
+#include "hikyuu/indicator/crt/REF.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "hikyuu/indicator/crt/IC.h"
 #include "hikyuu/indicator/crt/ICIR.h"
@@ -15,9 +16,12 @@
 
 namespace hku {
 
-MultiFactor::MultiFactor() {
-    setParam<bool>("fill_null", true);
-}
+// MultiFactor::MultiFactor() {
+//     setParam<bool>("fill_null", true);
+//     setParam<int>("ic_n", 1);
+//     setParam<int>("ir_n", 10);
+//     setParam<string>("mode", "icir");
+// }
 
 MultiFactor::MultiFactor(const vector<Indicator>& inds, const StockList& stks, const KQuery& query,
                          const Stock& ref_stk)
@@ -25,6 +29,13 @@ MultiFactor::MultiFactor(const vector<Indicator>& inds, const StockList& stks, c
     setParam<bool>("fill_null", true);
     setParam<int>("ic_n", 1);
     setParam<int>("ir_n", 10);
+    setParam<string>("mode", "icir");
+
+    HKU_CHECK(!m_ref_stk.isNull(), "The reference stock must be set!");
+    HKU_CHECK(!m_inds.empty(), "The reference stock must be set!");
+    for (const auto& stk : m_stks) {
+        HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
+    }
 }
 
 const Indicator& MultiFactor::get(const Stock& stk) const {
@@ -45,7 +56,7 @@ vector<Indicator> MultiFactor::_getAllReturns(int ndays) const {
     all_returns.reserve(m_stks.size());
     for (const auto& stk : m_stks) {
         auto k = stk.getKData(m_query);
-        all_returns.push_back(ALIGN(ROCP(k.close(), ndays), m_ref_dates, fill_null));
+        all_returns.push_back(ALIGN(REF(ROCP(k.close(), ndays), ndays), m_ref_dates, fill_null));
     }
     return all_returns;
 }
@@ -79,7 +90,7 @@ Indicator MultiFactor::getICIR(int ic_n, int ir_n) const {
     return ICIR(getIC(ic_n), ir_n);
 }
 
-void MultiFactor::_calculateAllFactorsByEqualWeight() {
+void MultiFactor::_calculateAllFactorsByEqualWeight(const vector<vector<Indicator>>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
@@ -91,7 +102,7 @@ void MultiFactor::_calculateAllFactorsByEqualWeight() {
 
         for (size_t di = 0; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
-                auto value = m_all_stk_inds[si][ii][di];
+                auto value = all_stk_inds[si][ii][di];
                 if (!std::isnan(value)) {
                     sumByDate[di] += value;
                     countByDate[di] += 1;
@@ -112,7 +123,7 @@ void MultiFactor::_calculateAllFactorsByEqualWeight() {
     }
 }
 
-void MultiFactor::_calculateAllFactorsByIC() {
+void MultiFactor::_calculateAllFactorsByIC(const vector<vector<Indicator>>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
@@ -152,7 +163,7 @@ void MultiFactor::_calculateAllFactorsByIC() {
         PriceList new_values(days_total);
         for (size_t di = 0; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
-                auto value = m_all_stk_inds[si][ii][di];
+                auto value = all_stk_inds[si][ii][di];
                 new_values[di] = value * sumByDate[di];
             }
         }
@@ -160,7 +171,7 @@ void MultiFactor::_calculateAllFactorsByIC() {
     }
 }
 
-void MultiFactor::_calculateAllFactorsByICIR() {
+void MultiFactor::_calculateAllFactorsByICIR(const vector<vector<Indicator>>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
@@ -201,7 +212,7 @@ void MultiFactor::_calculateAllFactorsByICIR() {
         PriceList new_values(days_total);
         for (size_t di = 0; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
-                auto value = m_all_stk_inds[si][ii][di];
+                auto value = all_stk_inds[si][ii][di];
                 new_values[di] = value * sumByDate[di];
             }
         }
@@ -209,41 +220,45 @@ void MultiFactor::_calculateAllFactorsByICIR() {
     }
 }
 
-void MultiFactor::_alignAllInds() {
+vector<vector<Indicator>> MultiFactor::_alignAllInds() {
     size_t days_total = m_ref_dates.size();
     bool fill_null = getParam<bool>("fill_null");
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
 
-    m_all_stk_inds.resize(stk_count);
+    vector<vector<Indicator>> all_stk_inds;
+    all_stk_inds.resize(stk_count);
     for (size_t i = 0; i < stk_count; i++) {
         const auto& stk = m_stks[i];
         auto kdata = stk.getKData(m_query);
-        m_all_stk_inds[i].resize(ind_count);
+        all_stk_inds[i].resize(ind_count);
         for (size_t j = 0; j < ind_count; j++) {
-            m_all_stk_inds[i][j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
+            all_stk_inds[i][j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
         }
     }
+
+    return all_stk_inds;
 }
 
 void MultiFactor::calculate() {
-    HKU_ERROR_IF_RETURN(m_ref_stk.isNull(), void(), "ref_stk is null!");
-    auto m_ref_dates = m_ref_stk.getDatetimeList(m_query);
-    size_t days_total = m_ref_dates.size();
-
-    HKU_WARN_IF_RETURN(
-      days_total < 2 || m_stks.size() < 2, void(),
-      "The number(>=2) of stock or data length(>=2) is insufficient! current data len: {}, "
-      "current stock number: {}",
-      days_total, m_stks.size());
-
-    bool fill_null = getParam<bool>("fill_null");
+    HKU_CHECK(!m_ref_stk.isNull(), "ref_stk is null!");
 
     size_t stk_count = m_stks.size();
+    HKU_CHECK(stk_count >= 2, "The number of stock is insufficient! current stock number: {}",
+              stk_count);
 
-    _alignAllInds();
-    _calculateAllFactorsByEqualWeight();
+    // 获取对齐的参考日期
+    auto m_ref_dates = m_ref_stk.getDatetimeList(m_query);
+    size_t days_total = m_ref_dates.size();
+    HKU_CHECK(days_total >= 2, "The dates len is insufficient! current len: {}", days_total);
 
+    // 获取所有证券所有对齐后的因子
+    vector<vector<Indicator>> all_stk_inds = _alignAllInds();
+
+    // 计算每支证券调整后的合成因子
+    _calculateAllFactorsByEqualWeight(all_stk_inds);
+
+    // 建立每日截面的索引，并每日降序排序
     m_stk_factor_by_date.resize(days_total);
     vector<std::pair<Stock, value_t>> one_day(stk_count);
     for (size_t i = 0; i < days_total; i++) {
