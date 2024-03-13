@@ -84,8 +84,9 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
-    CHECK_EQ(result.discard(), 1);
-    CHECK_EQ(result[1], doctest::Approx(-1.0));
+    CHECK_EQ(result.discard(), 2);
+    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_UNARY(std::isnan(result[1]));
     CHECK_EQ(result[2], doctest::Approx(0.8));
     CHECK_EQ(result[99], doctest::Approx(-1));
 }

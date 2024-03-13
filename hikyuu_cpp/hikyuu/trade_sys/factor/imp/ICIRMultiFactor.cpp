@@ -23,8 +23,8 @@ ICIRMultiFactor::ICIRMultiFactor() : MultiFactorBase("MF_ICIRWeight") {
 }
 
 ICIRMultiFactor::ICIRMultiFactor(const vector<Indicator>& inds, const StockList& stks,
-                                 const KQuery& query, const Stock& ref_stk)
-: MultiFactorBase(inds, stks, query, ref_stk, "MF_ICIRWeight") {
+                                 const KQuery& query, const Stock& ref_stk, int ic_n)
+: MultiFactorBase(inds, stks, query, ref_stk, "MF_ICIRWeight", ic_n) {
     setParam<int>("ic_n", 1);
     setParam<int>("ir_n", 10);
 }

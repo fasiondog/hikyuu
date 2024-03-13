@@ -18,7 +18,7 @@ class ICIRMultiFactor : public MultiFactorBase {
 public:
     ICIRMultiFactor();
     ICIRMultiFactor(const IndicatorList& inds, const StockList& stks, const KQuery& query,
-                    const Stock& ref_stk);
+                    const Stock& ref_stk, int ic_n);
 };
 
 }  // namespace hku

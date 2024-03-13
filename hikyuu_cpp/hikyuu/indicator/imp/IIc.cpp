@@ -76,14 +76,23 @@ void IIc::_calculate(const Indicator& inputInd) {
     vector<Indicator> all_inds(stk_count);     // 保存每支证券对齐后的因子值
     vector<Indicator> all_returns(stk_count);  // 保存每支证券对齐后的 n 日收益率
     Indicator ind = inputInd;
+    size_t discard = n;
     for (size_t i = 0; i < stk_count; i++) {
         auto k = m_stks[i].getKData(m_query);
         all_inds[i] = ALIGN(ind(k), ref_dates, fill_null);
+        if (all_inds[i].discard() > discard) {
+            discard = all_inds[i].discard();
+        }
         // 计算 n 日收益率，同时需要右移 n 位，即第 i 日的因子值和第 i + n 的收益率对应
         all_returns[i] = ALIGN(REF(ROCP(k.close(), n), n), ref_dates, fill_null);
+        if (all_returns[i].discard() > discard) {
+            discard = all_returns[i].discard();
+        }
     }
 
-    m_discard = n;
+    m_discard = discard;
+    HKU_IF_RETURN(m_discard >= days_total, void());
+
     PriceList tmp(stk_count, Null<price_t>());
     PriceList tmp_return(stk_count, Null<price_t>());
     auto* dst = this->data();

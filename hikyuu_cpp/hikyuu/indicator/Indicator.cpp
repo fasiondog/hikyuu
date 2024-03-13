@@ -54,11 +54,15 @@ bool Indicator::alike(const Indicator& other) const {
 
 bool Indicator::equal(const Indicator& other) const {
     HKU_IF_RETURN(this == &other || m_imp == other.m_imp, true);
-    HKU_IF_RETURN(size() != other.size(), false);
+    HKU_IF_RETURN(size() != other.size() || discard() != other.discard(), false);
     auto const* d1 = this->data();
     auto const* d2 = other.data();
     for (size_t i = 0, total = size(); i < total; i++) {
-        HKU_IF_RETURN(std::fabs(d1[i] - d2[2]) >= 0.0001, false);
+        HKU_IF_RETURN(
+          (std::isnan(d1[i]) && !std::isnan(d2[i])) || (!std::isnan(d1[i]) && std::isnan(d2[i])),
+          false);
+        HKU_IF_RETURN(
+          (!std::isnan(d1[i]) && !std::isnan(d2[i])) && (std::abs(d1[i] - d2[i]) >= 0.0001), false);
     }
     return true;
 }

@@ -17,15 +17,11 @@ BOOST_CLASS_EXPORT(hku::ICMultiFactor)
 
 namespace hku {
 
-ICMultiFactor::ICMultiFactor() : MultiFactorBase("MF_ICWeight") {
-    setParam<int>("ic_n", 1);
-}
+ICMultiFactor::ICMultiFactor() : MultiFactorBase("MF_ICWeight") {}
 
 ICMultiFactor::ICMultiFactor(const IndicatorList& inds, const StockList& stks, const KQuery& query,
-                             const Stock& ref_stk)
-: MultiFactorBase(inds, stks, query, ref_stk, "MF_ICWeight") {
-    setParam<int>("ic_n", 1);
-}
+                             const Stock& ref_stk, int ic_n)
+: MultiFactorBase(inds, stks, query, ref_stk, "MF_ICWeight", ic_n) {}
 
 IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
@@ -77,8 +73,8 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
 }
 
 MultiFactorPtr HKU_API MF_ICWeight(const IndicatorList& inds, const StockList& stks,
-                                   const KQuery& query, const Stock& ref_stk) {
-    return std::make_shared<ICMultiFactor>(inds, stks, query, ref_stk);
+                                   const KQuery& query, const Stock& ref_stk, int ic_n) {
+    return std::make_shared<ICMultiFactor>(inds, stks, query, ref_stk, ic_n);
 }
 
 }  // namespace hku

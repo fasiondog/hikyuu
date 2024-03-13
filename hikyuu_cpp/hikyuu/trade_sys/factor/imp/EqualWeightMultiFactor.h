@@ -18,7 +18,7 @@ class EqualWeightMultiFactor : public MultiFactorBase {
 public:
     EqualWeightMultiFactor();
     EqualWeightMultiFactor(const vector<Indicator>& inds, const StockList& stks,
-                           const KQuery& query, const Stock& ref_stk);
+                           const KQuery& query, const Stock& ref_stk, int ic_n);
 };
 
 }  // namespace hku

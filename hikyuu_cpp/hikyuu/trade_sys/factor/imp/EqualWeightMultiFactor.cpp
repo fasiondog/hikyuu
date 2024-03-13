@@ -17,11 +17,11 @@ BOOST_CLASS_EXPORT(hku::EqualWeightMultiFactor)
 
 namespace hku {
 
-EqualWeightMultiFactor::EqualWeightMultiFactor() : MultiFactorBase("MF_ICWeight") {}
+EqualWeightMultiFactor::EqualWeightMultiFactor() : MultiFactorBase("MF_EqualWeight") {}
 
 EqualWeightMultiFactor::EqualWeightMultiFactor(const vector<Indicator>& inds, const StockList& stks,
-                                               const KQuery& query, const Stock& ref_stk)
-: MultiFactorBase(inds, stks, query, ref_stk, "MF_ICWeight") {}
+                                               const KQuery& query, const Stock& ref_stk, int ic_n)
+: MultiFactorBase(inds, stks, query, ref_stk, "MF_EqualWeight", ic_n) {}
 
 vector<Indicator> EqualWeightMultiFactor::_calculate(
   const vector<vector<Indicator>>& all_stk_inds) {
@@ -56,6 +56,11 @@ vector<Indicator> EqualWeightMultiFactor::_calculate(
         all_factors[si] = PRICELIST(sumByDate);
     }
     return all_factors;
+}
+
+MultiFactorPtr HKU_API MF_EqualWeight(const IndicatorList& inds, const StockList& stks,
+                                      const KQuery& query, const Stock& ref_stk, int ic_n) {
+    return make_shared<EqualWeightMultiFactor>(inds, stks, query, ref_stk, ic_n);
 }
 
 }  // namespace hku
