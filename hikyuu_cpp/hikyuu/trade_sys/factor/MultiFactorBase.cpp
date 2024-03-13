@@ -121,6 +121,9 @@ Indicator MultiFactorBase::getIC(int ndays) {
     result.name("IC");
     if (ndays + 1 >= days_total) {
         result.setDiscard(days_total);
+        if (ic_n == ndays) {
+            m_ic = result;
+        }
         return result;
     }
 
@@ -139,6 +142,9 @@ Indicator MultiFactorBase::getIC(int ndays) {
 
     if (discard >= days_total) {
         result.setDiscard(days_total);
+        if (ic_n == ndays) {
+            m_ic = result;
+        }
         return result;
     }
 
@@ -224,7 +230,6 @@ void MultiFactorBase::_buildCrossSession() {
 }
 
 void MultiFactorBase::calculate() {
-    SPEND_TIME(MultiFactorBase_calculate);
     std::lock_guard<std::mutex> lock(m_mutex);
     HKU_IF_RETURN(m_calculated, void());
 
