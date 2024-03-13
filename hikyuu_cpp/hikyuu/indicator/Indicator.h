@@ -197,6 +197,9 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
+/** @ingroup Indicator */
+typedef vector<Indicator> IndicatorList;
+
 inline string Indicator::name() const {
     return m_imp ? m_imp->name() : "IndicatorImp";
 }
