@@ -704,6 +704,8 @@ Indicator IndicatorImp::calculate() {
 
     switch (m_optype) {
         case LEAF:
+            HKU_WARN_IF(!isNeedContext(),
+                        "The indicator({}) is missing a leaf node that requires context!", name());
             if (m_ind_params.empty()) {
                 _calculate(Indicator());
             } else {
