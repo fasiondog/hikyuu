@@ -34,7 +34,6 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
 
-    bool fill_null = getParam<bool>("fill_null");
     int ic_n = getParam<int>("ic_n");
     int ir_n = getParam<int>("ir_n");
 

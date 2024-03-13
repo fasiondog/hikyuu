@@ -87,12 +87,8 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
 }
 
 Indicator MultiFactorBase::getIC(int ndays) const {
-    size_t days_total = m_ref_dates.size();
-
-    bool fill_null = getParam<bool>("fill_null");
-
     vector<Indicator> all_returns = _getAllReturns(ndays);
-
+    size_t days_total = m_ref_dates.size();
     size_t ind_count = m_all_factors.size();
     PriceList tmp(ind_count, Null<price_t>());
     PriceList tmp_return(ind_count, Null<price_t>());
@@ -116,7 +112,6 @@ Indicator MultiFactorBase::getICIR(int ic_n, int ir_n) const {
 }
 
 vector<IndicatorList> MultiFactorBase::_alignAllInds() {
-    size_t days_total = m_ref_dates.size();
     bool fill_null = getParam<bool>("fill_null");
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();

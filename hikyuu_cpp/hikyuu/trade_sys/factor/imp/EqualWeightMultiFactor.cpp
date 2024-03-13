@@ -31,7 +31,7 @@ vector<Indicator> EqualWeightMultiFactor::_calculate(
 
     vector<Indicator> all_factors(stk_count);
     for (size_t si = 0; si < stk_count; si++) {
-        vector<value_t> sumByDate(days_total, 0.0);
+        vector<price_t> sumByDate(days_total, 0.0);
         vector<size_t> countByDate(days_total, 0);
 
         for (size_t di = 0; di < days_total; di++) {

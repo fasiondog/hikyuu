@@ -32,7 +32,6 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
 
-    bool fill_null = getParam<bool>("fill_null");
     int ic_n = getParam<int>("ic_n");
 
     IndicatorList all_factors(stk_count);
