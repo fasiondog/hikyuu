@@ -79,4 +79,9 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
     return all_factors;
 }
 
+MultiFactorPtr HKU_API MF_ICIRWeight(const IndicatorList& inds, const StockList& stks,
+                                     const KQuery& query, const Stock& ref_stk, int ic_n) {
+    return make_shared<ICIRMultiFactor>(inds, stks, query, ref_stk, ic_n);
+}
+
 }  // namespace hku

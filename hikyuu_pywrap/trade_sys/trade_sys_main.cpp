@@ -20,6 +20,7 @@ void export_System(py::module& m);
 void export_Selector(py::module& m);
 void export_Portfolio(py::module& m);
 void export_AllocateFunds(py::module& m);
+void export_MultiFactor(py::module& m);
 
 void export_trade_sys_main(py::module& m) {
     export_Environment(m);
@@ -33,4 +34,5 @@ void export_trade_sys_main(py::module& m) {
     export_Selector(m);
     export_AllocateFunds(m);
     export_Portfolio(m);
+    export_MultiFactor(m);
 }

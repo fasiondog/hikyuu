@@ -38,11 +38,10 @@ void export_MultiFactor(py::module& m) {
       //   .def("__str__", to_py_str<EnvironmentBase>)
       //   .def("__repr__", to_py_str<EnvironmentBase>)
 
-      //   .def_property("name", py::overload_cast<>(&EnvironmentBase::name, py::const_),
-      //                 py::overload_cast<const string&>(&EnvironmentBase::name),
-      //                 py::return_value_policy::copy, "名称")
-      //   .def_property("query", &EnvironmentBase::getQuery, &EnvironmentBase::setQuery,
-      //                 py::return_value_policy::copy, "设置或获取查询条件")
+      .def_property("name", py::overload_cast<>(&MultiFactorBase::name, py::const_),
+                    py::overload_cast<const string&>(&MultiFactorBase::name),
+                    py::return_value_policy::copy, "名称")
+      .def("get_query", &MultiFactorBase::getQuery, py::return_value_policy::copy)
 
       .def("get_param", &MultiFactorBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -82,4 +81,15 @@ void export_MultiFactor(py::module& m) {
       //   &EnvironmentBase::_calculate, "【重载接口】子类计算接口")
 
       DEF_PICKLE(MultiFactorPtr);
+
+    m.def(
+      "MF_EqualWeight",
+      [](const py::sequence& inds, const py::sequence& stks, const KQuery& query,
+         const Stock& ref_stk, int ic_n) {
+          // MF_EqualWeight
+          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
+          StockList c_stks = python_list_to_vector<Stock>(stks);
+          return MF_EqualWeight(c_inds, c_stks, query, ref_stk, ic_n);
+      },
+      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("ic_n") = 5);
 }

@@ -43,6 +43,10 @@ public:
         return m_ref_dates;
     }
 
+    const KQuery& getQuery() const {
+        return m_query;
+    }
+
     /** 获取指定证券合成因子 */
     const Indicator& getFactor(const Stock&);
 
