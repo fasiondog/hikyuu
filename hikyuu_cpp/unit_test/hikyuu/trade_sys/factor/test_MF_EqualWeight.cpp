@@ -12,7 +12,9 @@
 #include <hikyuu/indicator/crt/AMA.h>
 #include <hikyuu/indicator/crt/EMA.h>
 #include <hikyuu/indicator/crt/IC.h>
+#include <hikyuu/indicator/crt/ROCR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/trade_sys/factor/crt/MF_EqualWeight.h>
 
 using namespace hku;
@@ -49,25 +51,62 @@ TEST_CASE("test_MF_EqualWeight") {
     CHECK_THROWS_AS(MF_EqualWeight(src_inds, {sm["sh600004"]}, KQuery(-2), ref_stk),
                     std::exception);
 
-    /** @arg 临界状态, 原始因子数量为1, 数据长度为2 */
-    auto mf = MF_EqualWeight({MA(CLOSE())}, {sm["sh600004"], sm["sh600005"]}, KQuery(-2), ref_stk);
+    /** @arg 临界状态, 原始因子数量为1, 证券数量2, 数据长度为2 */
+    src_inds = {MA(CLOSE())};
+    stks = {sm["sh600005"], sm["sh600004"]};
+    query = KQuery(-2);
+    ref_k = ref_stk.getKData(query);
+    ref_dates = ref_k.getDatetimeList();
+    auto mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
     CHECK_EQ(mf->name(), "MF_EqualWeight");
-    CHECK_THROWS_AS(mf->get(sm["sz000001"]), std::exception);
-    auto dates = ref_stk.getKData(KQuery(-2)).getDatetimeList();
-    CHECK_EQ(mf->getDatetimeList(), dates);
-    auto ind1 = mf->get(sm["sh600004"]);
-    auto ind2 = MA(CLOSE(sm["sh600004"].getKData(KQuery(-2))));
+    CHECK_THROWS_AS(mf->getFactor(sm["sz000001"]), std::exception);
+    CHECK_EQ(mf->getDatetimeList(), ref_dates);
+
+    const auto& all_factors = mf->getAllFactors();
+    CHECK_EQ(all_factors.size(), 2);
+    auto ind1 = mf->getFactor(sm["sh600004"]);
+    HKU_INFO("{}", ind1);
+    auto ind2 = MA(CLOSE(sm["sh600004"].getKData(query)));
     CHECK_UNARY(ind1.equal(ind2));
-    ind1 = mf->get(sm["sh600005"]);
-    ind2 = MA(CLOSE(sm["sh600005"].getKData(KQuery(-2))));
+    CHECK_UNARY(all_factors[1].equal(ind2));
+    ind1 = mf->getFactor(sm["sh600005"]);
+    ind2 = MA(CLOSE(sm["sh600005"].getKData(query)));
     CHECK_UNARY(ind1.equal(ind2));
+    CHECK_UNARY(all_factors[0].equal(ind2));
     auto ic1 = mf->getIC(1);
-    auto ic2 = IC(MA(CLOSE()), {sm["sh600004"], sm["sh600005"]}, KQuery(-2), 1, ref_stk);
+    auto ic2 = IC(MA(CLOSE()), stks, query, 1, ref_stk);
     CHECK_UNARY(ic1.equal(ic2));
 
-    mf = MF_EqualWeight({MA(CLOSE())}, {sm["sh600004"], sm["sh600005"]}, KQuery(-3), ref_stk);
+    CHECK_THROWS_AS(mf->getCross(Datetime(20111204)), std::exception);
+    auto cross = mf->getCross(Datetime(20111205));
+    cross = mf->getCross(Datetime(20111206));
+    for (size_t i = 0; i < cross.size(); i++) {
+        HKU_INFO("{}: {}, {}", i, cross[i].first.market_code(), cross[i].second);
+    }
+    for (size_t i = 0; i < ref_dates.size(); i++) {
+        HKU_INFO("{}: {}", i, ref_dates[i]);
+    }
+
+    /** @arg 原始因子数量为3, 证券数量4, 数据长度为20, 指定比较收益率 3 日 */
+    int ndays = 3;
+    src_inds = {MA(ROCR(CLOSE(), ndays)), AMA(ROCR(CLOSE(), ndays), EMA(ROCR(CLOSE(), ndays)))};
+    stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
+    query = KQuery(-20);
+    ref_k = ref_stk.getKData(query);
+    ref_dates = ref_k.getDatetimeList();
+    mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
     CHECK_EQ(mf->name(), "MF_EqualWeight");
-    CHECK_THROWS_AS(mf->get(sm["sz000001"]), std::exception);
+    CHECK_THROWS_AS(mf->getFactor(sm["sh600000"]), std::exception);
+    ind1 = mf->getFactor(sm["sh600005"]);
+    ind2 = MA(ROCR(CLOSE(sm["sh600005"].getKData(query)), ndays));
+    HKU_INFO("{}", ind1);
+    HKU_INFO("{}", ind2);
+
+    ind1 = mf->getFactor(sm["sh600004"]);
+    ind2 = MA(ROCR(CLOSE(sm["sh600004"].getKData(query)), ndays));
+    HKU_INFO("{}", ind1);
+    HKU_INFO("{}", ind2);
+
     // dates = ref_stk.getKData(KQuery(-3)).getDatetimeList();
     // CHECK_EQ(mf->getDatetimeList(), dates);
     // ind1 = mf->get(sm["sh600004"]);

@@ -75,6 +75,7 @@ MultiFactorPtr MultiFactorBase::clone() {
     p->m_stk_factor_by_date = m_stk_factor_by_date;
     p->m_ref_dates = m_ref_dates;
     p->m_ic = m_ic.clone();
+    p->m_calculated = m_calculated;
 
     p->m_inds.reserve(m_inds.size());
     for (const auto& ind : m_inds) {
@@ -88,21 +89,29 @@ MultiFactorPtr MultiFactorBase::clone() {
     return p;
 }
 
-const Indicator& MultiFactorBase::get(const Stock& stk) {
+const Indicator& MultiFactorBase::getFactor(const Stock& stk) {
     calculate();
-    std::lock_guard<std::mutex> lock(m_mutex);
     const auto iter = m_stk_map.find(stk);
     HKU_CHECK(iter != m_stk_map.cend(), "Could not find this stock: {}", stk);
-    HKU_CHECK(iter->second <= m_all_factors.size(), "存在错误");
     return m_all_factors[iter->second];
 }
 
-const vector<std::pair<Stock, MultiFactorBase::value_t>>& MultiFactorBase::get(const Datetime& d) {
+const IndicatorList& MultiFactorBase::getAllFactors() {
     calculate();
-    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_all_factors;
+}
+
+const vector<std::pair<Stock, MultiFactorBase::value_t>>& MultiFactorBase::getCross(
+  const Datetime& d) {
+    calculate();
     const auto iter = m_date_index.find(d);
     HKU_CHECK(iter != m_date_index.cend(), "Could not find this date: {}", d);
     return m_stk_factor_by_date[iter->second];
+}
+
+const vector<vector<std::pair<Stock, MultiFactorBase::value_t>>>& MultiFactorBase::getAllCross() {
+    calculate();
+    return m_stk_factor_by_date;
 }
 
 Indicator MultiFactorBase::getIC(int ndays) {
@@ -206,9 +215,9 @@ vector<IndicatorList> MultiFactorBase::_alignAllInds() {
     return all_stk_inds;
 }
 
-void MultiFactorBase::_buildCrossSession() {
+void MultiFactorBase::_buildIndex() {
     size_t stk_count = m_stks.size();
-    HKU_TRACE_IF(stk_count != m_all_factors.size(), "some errors");
+    HKU_ASSERT(stk_count == m_all_factors.size());
     for (size_t i = 0; i < stk_count; i++) {
         m_stk_map[m_stks[i]] = i;
     }
@@ -216,21 +225,30 @@ void MultiFactorBase::_buildCrossSession() {
     // 建立每日截面的索引，并每日降序排序
     size_t days_total = m_ref_dates.size();
     m_stk_factor_by_date.resize(days_total);
-    vector<std::pair<Stock, value_t>> one_day(stk_count);
+    vector<std::pair<Stock, value_t>> one_day;
     for (size_t i = 0; i < days_total; i++) {
+        one_day.resize(stk_count);
         for (size_t j = 0; j < stk_count; j++) {
-            one_day[i] = std::make_pair(m_stks[j], m_all_factors[j][i]);
+            one_day[j] = std::make_pair(m_stks[j], m_all_factors[j][i]);
         }
         std::sort(one_day.begin(), one_day.end(),
                   [](const std::pair<Stock, value_t>& a, const std::pair<Stock, value_t>& b) {
+                      if (std::isnan(a.second) && std::isnan(b.second)) {
+                          return false;
+                      } else if (!std::isnan(a.second) && std::isnan(b.second)) {
+                          return true;
+                      } else if (std::isnan(a.second) && !std::isnan(b.second)) {
+                          return false;
+                      }
                       return a.second > b.second;
                   });
-        m_stk_factor_by_date[i] = one_day;
+        m_stk_factor_by_date[i] = std::move(one_day);
         m_date_index[m_ref_dates[i]] = i;
     }
 }
 
 void MultiFactorBase::calculate() {
+    SPEND_TIME(MultiFactorBase_calculate);
     std::lock_guard<std::mutex> lock(m_mutex);
     HKU_IF_RETURN(m_calculated, void());
 
@@ -252,7 +270,7 @@ void MultiFactorBase::calculate() {
         }
 
         // 计算完成后创建截面索引
-        _buildCrossSession();
+        _buildIndex();
 
     } catch (const std::exception& e) {
         HKU_ERROR(e.what());

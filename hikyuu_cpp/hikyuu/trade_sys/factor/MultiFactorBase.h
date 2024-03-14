@@ -44,17 +44,18 @@ public:
     }
 
     /** 获取指定证券合成因子 */
-    const Indicator& get(const Stock&);
+    const Indicator& getFactor(const Stock&);
 
     /**
      * 获取所有证券合成后的新因子，顺序与传入的证券组合相同
      */
-    const IndicatorList& getAll() const {
-        return m_all_factors;
-    }
+    const IndicatorList& getAllFactors();
 
-    /** 获取指定日期截面的所有因子值 */
-    const vector<std::pair<Stock, value_t>>& get(const Datetime&);
+    /** 获取指定日期截面的所有因子值，已经降序排列 */
+    const vector<std::pair<Stock, value_t>>& getCross(const Datetime&);
+
+    /** 获取所有截面数据，已按降序排列 */
+    const vector<vector<std::pair<Stock, value_t>>>& getAllCross();
 
     /** 获取合成因子的IC */
     Indicator getIC(int ndays);
@@ -73,7 +74,7 @@ public:
 
 protected:
     vector<IndicatorList> _alignAllInds();
-    void _buildCrossSession();  // 计算完成后创建截面索引
+    void _buildIndex();  // 计算完成后创建截面索引
     IndicatorList _getAllReturns(int ndays) const;
 
 protected:
@@ -114,6 +115,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_stk_factor_by_date);
         ar& BOOST_SERIALIZATION_NVP(m_ic);
+        ar& BOOST_SERIALIZATION_NVP(m_calculated);
     }
 
     template <class Archive>
@@ -129,6 +131,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_stk_factor_by_date);
         ar& BOOST_SERIALIZATION_NVP(m_ic);
+        ar& BOOST_SERIALIZATION_NVP(m_calculated);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

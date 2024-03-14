@@ -12,4 +12,4 @@
 
 using namespace hku;
 
-#define ENABLE_BENCHMARK_TEST 0  // 是否开启性能测试相关用例执行，默认不开启
+#define ENABLE_BENCHMARK_TEST 1  // 是否开启性能测试相关用例执行，默认不开启
