@@ -294,7 +294,7 @@ TransList MySQLKDataDriver::_getTransListByDate(const string& market, const stri
         SQLStatementPtr st = m_connect->getStatement(
           fmt::format("select `date`, `price`, `vol`, `buyorsell` from {} where date >= {} and "
                       "date < {} order by date",
-                      table, query.startDatetime().number(), query.endDatetime().number()));
+                      table, query.startDatetime().ymdhms(), query.endDatetime().ymdhms()));
 
         m_connect->transaction();
         st->exec();
