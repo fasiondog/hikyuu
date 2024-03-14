@@ -16,6 +16,63 @@
 
 namespace hku {
 
+HKU_API std::ostream& operator<<(std::ostream& out,
+                                 const std::pair<Stock, MultiFactorBase::value_t>& td) {
+    out << std::fixed;
+    out.precision(4);
+    out << "(" << td.first.market_code() << ", " << td.second << ")" << std::endl;
+    out.unsetf(std::ostream::floatfield);
+    out.precision();
+    return out;
+}
+
+HKU_API std::ostream& operator<<(std::ostream& out,
+                                 const vector<std::pair<Stock, MultiFactorBase::value_t>>& td) {
+    out << std::fixed;
+    out.precision(4);
+    size_t total = td.size();
+    if (total < 10) {
+        for (size_t i = 0; i < total; i++) {
+            out << i << ": " << td[i];
+        }
+    } else {
+        for (size_t i = 0; i < 5; i++) {
+            out << i << ": " << td[i];
+        }
+        out << "......" << std::endl;
+        for (size_t i = total - 5; i < total; i++) {
+            out << i << ": " << td[i];
+        }
+    }
+    out.unsetf(std::ostream::floatfield);
+    out.precision();
+    return out;
+}
+
+HKU_API std::ostream& operator<<(
+  std::ostream& out, const vector<vector<std::pair<Stock, MultiFactorBase::value_t>>>& td) {
+    out << std::fixed;
+    out.precision(4);
+    size_t total = td.size();
+    if (total <= 2) {
+        for (size_t i = 0; i < total; i++) {
+            out << "========= " << i << " =========" << std::endl;
+            out << td[i];
+        }
+    } else {
+        out << "========= 0 =========" << std::endl;
+        out << td[0];
+        out << "......" << std::endl;
+        out << "......" << std::endl;
+        out << "========= " << total - 1 << " =========" << std::endl;
+        out << td[total - 1];
+    }
+
+    out.unsetf(std::ostream::floatfield);
+    out.precision();
+    return out;
+}
+
 MultiFactorBase::MultiFactorBase() {
     setParam<bool>("fill_null", true);
     setParam<int>("ic_n", 1);
@@ -124,12 +181,15 @@ Indicator MultiFactorBase::getIC(int ndays) {
     // 通过IC/ICIR计算权重的情况较多，所以这里直接缓存一份，减少重复计算
     // 实际使用时，最好保证 getIC(ndays) 中的 ndays 和 ic_n 一致
     int ic_n = getParam<int>("ic_n");
+    if (ndays == 0) {
+        ndays = ic_n;
+    }
     HKU_IF_RETURN(ic_n == ndays && !m_ic.empty(), m_ic.clone());
 
     size_t days_total = m_ref_dates.size();
     Indicator result = PRICELIST(PriceList(days_total, Null<price_t>()));
     result.name("IC");
-    if (ndays + 1 >= days_total) {
+    if (ndays + 1 >= days_total || ndays < 0) {
         result.setDiscard(days_total);
         if (ic_n == ndays) {
             m_ic = result;
@@ -206,9 +266,10 @@ vector<IndicatorList> MultiFactorBase::_alignAllInds() {
     for (size_t i = 0; i < stk_count; i++) {
         const auto& stk = m_stks[i];
         auto kdata = stk.getKData(m_query);
-        all_stk_inds[i].resize(ind_count);
+        auto& cur_stk_inds = all_stk_inds[i];
+        cur_stk_inds.resize(ind_count);
         for (size_t j = 0; j < ind_count; j++) {
-            all_stk_inds[i][j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
+            cur_stk_inds[j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
         }
     }
 
@@ -248,7 +309,7 @@ void MultiFactorBase::_buildIndex() {
 }
 
 void MultiFactorBase::calculate() {
-    SPEND_TIME(MultiFactorBase_calculate);
+    // SPEND_TIME(MultiFactorBase_calculate);
     std::lock_guard<std::mutex> lock(m_mutex);
     HKU_IF_RETURN(m_calculated, void());
 

@@ -29,14 +29,18 @@ vector<Indicator> EqualWeightMultiFactor::_calculate(
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
 
+    value_t null_value = Null<value_t>();
+    vector<price_t> sumByDate(days_total);
+    vector<size_t> countByDate(days_total);
     vector<Indicator> all_factors(stk_count);
     for (size_t si = 0; si < stk_count; si++) {
-        vector<price_t> sumByDate(days_total, 0.0);
-        vector<size_t> countByDate(days_total, 0);
+        memset(sumByDate.data(), 0, sizeof(price_t) * days_total);
+        memset(countByDate.data(), 0, sizeof(size_t) * days_total);
 
+        const auto& curStkInds = all_stk_inds[si];
         for (size_t di = 0; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
-                auto value = all_stk_inds[si][ii][di];
+                const auto& value = curStkInds[ii][di];
                 if (!std::isnan(value)) {
                     sumByDate[di] += value;
                     countByDate[di] += 1;
@@ -46,15 +50,23 @@ vector<Indicator> EqualWeightMultiFactor::_calculate(
 
         // 均值权重
         for (size_t di = 0; di < days_total; di++) {
-            if (countByDate[di] == 0) {
-                sumByDate[di] = Null<value_t>();
-            } else {
-                sumByDate[di] = sumByDate[di] / countByDate[di];
-            }
+            sumByDate[di] = (countByDate[di] == 0) ? null_value : sumByDate[di] / countByDate[di];
         }
 
         all_factors[si] = PRICELIST(sumByDate);
+
+        // 更新 discard
+        for (size_t di = 0; di < days_total; di++) {
+            if (!std::isnan(all_factors[si][di])) {
+                all_factors[si].setDiscard(di);
+                break;
+            }
+            if (di == days_total - 1 && std::isnan(all_factors[si][di])) {
+                all_factors[si].setDiscard(di);
+            }
+        }
     }
+
     return all_factors;
 }
 

@@ -93,7 +93,6 @@ TEST_CASE("test_MF_EqualWeight") {
     const auto& all_factors = mf->getAllFactors();
     CHECK_EQ(all_factors.size(), 2);
     auto ind1 = mf->getFactor(sm["sh600004"]);
-    HKU_INFO("{}", ind1);
     auto ind2 = MA(CLOSE(sm["sh600004"].getKData(query)));
     CHECK_UNARY(ind1.equal(ind2));
     CHECK_UNARY(all_factors[1].equal(ind2));
@@ -101,23 +100,29 @@ TEST_CASE("test_MF_EqualWeight") {
     ind2 = MA(CLOSE(sm["sh600005"].getKData(query)));
     CHECK_UNARY(ind1.equal(ind2));
     CHECK_UNARY(all_factors[0].equal(ind2));
-    auto ic1 = mf->getIC(1);
+    auto ic1 = mf->getIC();
     auto ic2 = IC(MA(CLOSE()), stks, query, 1, ref_stk);
     CHECK_UNARY(ic1.equal(ic2));
 
     CHECK_THROWS_AS(mf->getCross(Datetime(20111204)), std::exception);
     auto cross = mf->getCross(Datetime(20111205));
+    CHECK_EQ(cross.size(), 2);
+    CHECK_EQ(cross[0].first, sm["sh600004"]);
+    CHECK_EQ(cross[0].second, doctest::Approx(6.85));
+    CHECK_EQ(cross[1].first, sm["sh600005"]);
+    CHECK_EQ(cross[1].second, doctest::Approx(3.13));
+
     cross = mf->getCross(Datetime(20111206));
-    for (size_t i = 0; i < cross.size(); i++) {
-        HKU_INFO("{}: {}, {}", i, cross[i].first.market_code(), cross[i].second);
-    }
-    for (size_t i = 0; i < ref_dates.size(); i++) {
-        HKU_INFO("{}: {}", i, ref_dates[i]);
-    }
+    CHECK_EQ(cross.size(), 2);
+    CHECK_EQ(cross[0].first, sm["sh600004"]);
+    CHECK_EQ(cross[0].second, doctest::Approx(6.855));
+    CHECK_EQ(cross[1].first, sm["sh600005"]);
+    CHECK_EQ(cross[1].second, doctest::Approx(3.14));
+    // HKU_INFO("\n{}", mf->getAllCross());
 
     /** @arg 原始因子数量为3, 证券数量4, 数据长度为20, 指定比较收益率 3 日 */
     int ndays = 3;
-    src_inds = {MA(ROCR(CLOSE(), ndays)), AMA(ROCR(CLOSE(), ndays), EMA(ROCR(CLOSE(), ndays)))};
+    src_inds = {MA(ROCR(CLOSE(), ndays)), AMA(ROCR(CLOSE(), ndays)), EMA(ROCR(CLOSE(), ndays))};
     stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
     query = KQuery(-20);
     ref_k = ref_stk.getKData(query);
@@ -125,34 +130,19 @@ TEST_CASE("test_MF_EqualWeight") {
     mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
     CHECK_EQ(mf->name(), "MF_EqualWeight");
     CHECK_THROWS_AS(mf->getFactor(sm["sh600000"]), std::exception);
-    ind1 = mf->getFactor(sm["sh600005"]);
-    ind2 = MA(ROCR(CLOSE(sm["sh600005"].getKData(query)), ndays));
-    HKU_INFO("{}", ind1);
-    HKU_INFO("{}", ind2);
 
-    ind1 = mf->getFactor(sm["sh600004"]);
-    ind2 = MA(ROCR(CLOSE(sm["sh600004"].getKData(query)), ndays));
-    HKU_INFO("{}", ind1);
-    HKU_INFO("{}", ind2);
-
-    // dates = ref_stk.getKData(KQuery(-3)).getDatetimeList();
-    // CHECK_EQ(mf->getDatetimeList(), dates);
-    // ind1 = mf->get(sm["sh600004"]);
-    // ind2 = MA(CLOSE(sm["sh600004"].getKData(KQuery(-3))));
-    // CHECK_UNARY(ind1.equal(ind2));
-    // ind1 = mf->get(sm["sh600005"]);
-    // ind2 = MA(CLOSE(sm["sh600005"].getKData(KQuery(-3))));
-    // CHECK_UNARY(ind1.equal(ind2));
-    // ic1 = mf->getIC(1);
-    // ic2 = IC(MA(CLOSE()), {sm["sh600004"], sm["sh600005"]}, KQuery(-3), 1, ref_stk);
-    // CHECK_UNARY(ic1.equal(ic2));
-
-    // HKU_INFO("{}", mf->getDatetimeList());
-
-    // CHECK_EQ(mf->name(), "MF_EqualWeight");
-    // CHECK(mf->get(sm["sh600004"]).empty());
-    // MFPtr mf = MF_EqualWeight(src_inds, stks,
-    // query, ref_stk); mf->calculate();
+    auto stk = sm["sh600004"];
+    ind1 = MA(ROCR(CLOSE(stk.getKData(query)), ndays));
+    ind2 = AMA(ROCR(CLOSE(stk.getKData(query)), ndays));
+    auto ind3 = EMA(ROCR(CLOSE(stk.getKData(query)), ndays));
+    auto ind4 = mf->getFactor(stk);
+    CHECK_EQ(ind4.discard(), 3);
+    for (size_t i = 0; i < ind4.discard(); i++) {
+        CHECK_UNARY(std::isnan(ind4[i]));
+    }
+    for (size_t i = ind4.discard(), len = ref_dates.size(); i < len; i++) {
+        CHECK_EQ(ind4[i], doctest::Approx((ind1[i] + ind2[i] + ind3[i]) / 3.0));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -160,19 +150,27 @@ TEST_CASE("test_MF_EqualWeight") {
 //-----------------------------------------------------------------------------
 #if ENABLE_BENCHMARK_TEST
 TEST_CASE("test_MF_EqualWeight_benchmark") {
-    // Stock stock = getStock("sh000001");
-    // KData kdata = stock.getKData(KQuery(0));
-    // Indicator c = kdata.close();
-    // int cycle = 1000;  // 测试循环次数
+    StockManager& sm = StockManager::instance();
+    int ndays = 3;
+    IndicatorList src_inds = {MA(ROCR(CLOSE(), ndays)), AMA(ROCR(CLOSE(), ndays)),
+                              EMA(ROCR(CLOSE(), ndays))};
+    StockList stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
+    KQuery query = KQuery(0);
+    Stock ref_stk = sm["sh000001"];
+    auto ref_k = ref_stk.getKData(query);
+    auto ref_dates = ref_k.getDatetimeList();
 
-    // {
-    //     BENCHMARK_TIME_MSG(test_ABS_benchmark, cycle, fmt::format("data len: {}", c.size()));
-    //     SPEND_TIME_CONTROL(false);
-    //     for (int i = 0; i < cycle; i++) {
-    //         Indicator ind = ABS();
-    //         Indicator result = ind(c);
-    //     }
-    // }
+    int cycle = 10;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(test_MF_EqualWeight_benchmark, cycle,
+                           fmt::format("data len: {}", ref_k.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            auto mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
+            auto ic = mf->getIC();
+        }
+    }
 }
 #endif
 
@@ -183,32 +181,39 @@ TEST_CASE("test_MF_EqualWeight_benchmark") {
 
 /** @par 检测点 */
 TEST_CASE("test_MF_EqualWeight_export") {
-    // StockManager& sm = StockManager::instance();
-    // string filename(sm.tmpdir());
-    // filename += "/ABS.xml";
+    StockManager& sm = StockManager::instance();
+    int ndays = 3;
+    IndicatorList src_inds = {MA(ROCR(CLOSE(), ndays)), AMA(ROCR(CLOSE(), ndays)),
+                              EMA(ROCR(CLOSE(), ndays))};
+    StockList stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
+    KQuery query = KQuery(0);
+    Stock ref_stk = sm["sh000001"];
+    auto ref_k = ref_stk.getKData(query);
+    auto ref_dates = ref_k.getDatetimeList();
 
-    // Stock stock = sm.getStock("sh000001");
-    // KData kdata = stock.getKData(KQuery(-20));
-    // Indicator x1 = ABS(CLOSE(kdata));
-    // {
-    //     std::ofstream ofs(filename);
-    //     boost::archive::xml_oarchive oa(ofs);
-    //     oa << BOOST_SERIALIZATION_NVP(x1);
-    // }
+    string filename(sm.tmpdir());
+    filename += "/MF_EqualWeight.xml";
 
-    // Indicator x2;
-    // {
-    //     std::ifstream ifs(filename);
-    //     boost::archive::xml_iarchive ia(ifs);
-    //     ia >> BOOST_SERIALIZATION_NVP(x2);
-    // }
+    auto mf1 = MF_EqualWeight(src_inds, stks, query, ref_stk);
+    auto ic1 = mf1->getIC();
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(mf1);
+    }
 
-    // CHECK_UNARY(x1.size() == x2.size());
-    // CHECK_UNARY(x1.discard() == x2.discard());
-    // CHECK_UNARY(x1.getResultNumber() == x2.getResultNumber());
-    // for (size_t i = 0; i < x1.size(); ++i) {
-    //     CHECK_EQ(x1[i], doctest::Approx(x2[i]).epsilon(0.00001));
-    // }
+    MFPtr mf2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(mf2);
+    }
+
+    CHECK_EQ(mf2->name(), mf1->name());
+    auto ic2 = mf2->getIC();
+    CHECK_EQ(ic1.size(), ic2.size());
+    CHECK_EQ(ic1.discard(), ic2.discard());
+    CHECK_UNARY(ic1.equal(ic2));
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
