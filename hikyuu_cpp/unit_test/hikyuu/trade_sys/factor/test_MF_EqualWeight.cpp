@@ -65,6 +65,21 @@ TEST_CASE("test_MF_EqualWeight") {
     auto ic2 = IC(MA(CLOSE()), {sm["sh600004"], sm["sh600005"]}, KQuery(-2), 1, ref_stk);
     CHECK_UNARY(ic1.equal(ic2));
 
+    mf = MF_EqualWeight({MA(CLOSE())}, {sm["sh600004"], sm["sh600005"]}, KQuery(-3), ref_stk);
+    CHECK_EQ(mf->name(), "MF_EqualWeight");
+    CHECK_THROWS_AS(mf->get(sm["sz000001"]), std::exception);
+    // dates = ref_stk.getKData(KQuery(-3)).getDatetimeList();
+    // CHECK_EQ(mf->getDatetimeList(), dates);
+    // ind1 = mf->get(sm["sh600004"]);
+    // ind2 = MA(CLOSE(sm["sh600004"].getKData(KQuery(-3))));
+    // CHECK_UNARY(ind1.equal(ind2));
+    // ind1 = mf->get(sm["sh600005"]);
+    // ind2 = MA(CLOSE(sm["sh600005"].getKData(KQuery(-3))));
+    // CHECK_UNARY(ind1.equal(ind2));
+    // ic1 = mf->getIC(1);
+    // ic2 = IC(MA(CLOSE()), {sm["sh600004"], sm["sh600005"]}, KQuery(-3), 1, ref_stk);
+    // CHECK_UNARY(ic1.equal(ic2));
+
     // HKU_INFO("{}", mf->getDatetimeList());
 
     // CHECK_EQ(mf->name(), "MF_EqualWeight");

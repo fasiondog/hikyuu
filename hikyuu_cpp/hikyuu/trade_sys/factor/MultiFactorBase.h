@@ -46,6 +46,13 @@ public:
     /** 获取指定证券合成因子 */
     const Indicator& get(const Stock&);
 
+    /**
+     * 获取所有证券合成后的新因子，顺序与传入的证券组合相同
+     */
+    const IndicatorList& getAll() const {
+        return m_all_factors;
+    }
+
     /** 获取指定日期截面的所有因子值 */
     const vector<std::pair<Stock, value_t>>& get(const Datetime&);
 

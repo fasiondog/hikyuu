@@ -93,6 +93,7 @@ const Indicator& MultiFactorBase::get(const Stock& stk) {
     std::lock_guard<std::mutex> lock(m_mutex);
     const auto iter = m_stk_map.find(stk);
     HKU_CHECK(iter != m_stk_map.cend(), "Could not find this stock: {}", stk);
+    HKU_CHECK(iter->second <= m_all_factors.size(), "存在错误");
     return m_all_factors[iter->second];
 }
 
