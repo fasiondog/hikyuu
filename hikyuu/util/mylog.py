@@ -31,8 +31,8 @@ hku_logger_name = 'hikyuu'
 hku_logger = logging.getLogger(hku_logger_name)
 
 _usrdir = os.path.expanduser("~")
-if not os.path.lexists(_usrdir):
-    os.makedirs(_usrdir)
+if not os.path.lexists(f"{_usrdir}/.hikyuu"):
+    os.makedirs(f"{_usrdir}/.hikyuu")
 _logfile = logging.handlers.RotatingFileHandler(
     f"{_usrdir}/.hikyuu/hikyuu_py.log", maxBytes=10240, backupCount=3, encoding="utf-8")
 _logfile.setFormatter(logging.Formatter(FORMAT))
