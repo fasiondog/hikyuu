@@ -25,6 +25,34 @@ using namespace hku;
  * @{
  */
 
+TEST_CASE("test_nan_sort_in_MF") {
+    PriceList t(10, Null<price_t>());
+    t[0] = 1;
+    t[2] = 3;
+    t[3] = 4;
+    t[8] = 5;
+
+    std::sort(t.begin(), t.end(), [](price_t a, price_t b) {
+        if (std::isnan(a) && std::isnan(b)) {
+            return false;
+        } else if (!std::isnan(a) && std::isnan(b)) {
+            return true;
+        } else if (std::isnan(a) && !std::isnan(b)) {
+            return false;
+        }
+        return a > b;
+    });
+
+    PriceList expect(10, Null<price_t>());
+    CHECK_EQ(t[0], 5);
+    CHECK_EQ(t[1], 4);
+    CHECK_EQ(t[2], 3);
+    CHECK_EQ(t[3], 1);
+    for (size_t i = 4, len = t.size(); i < len; i++) {
+        CHECK_UNARY(std::isnan(t[i]));
+    }
+}
+
 /** @par 检测点 */
 TEST_CASE("test_MF_EqualWeight") {
     StockManager& sm = StockManager::instance();
