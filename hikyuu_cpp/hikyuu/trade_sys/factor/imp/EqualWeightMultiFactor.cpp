@@ -54,6 +54,7 @@ vector<Indicator> EqualWeightMultiFactor::_calculate(
         }
 
         all_factors[si] = PRICELIST(sumByDate);
+        all_factors[si].name("IC");
 
         // 更新 discard
         for (size_t di = 0; di < days_total; di++) {

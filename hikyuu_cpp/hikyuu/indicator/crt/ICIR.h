@@ -21,7 +21,7 @@ namespace hku {
  * @return Indicator
  * @ingroup Indicator
  */
-inline Indicator ICIR(const Indicator& ic, int n = 10) {
+inline Indicator ICIR(const Indicator& ic, int n = 120) {
     Indicator x = MA(ic, n) / STDEV(ic, n);
     x.name("IR");
     x.setParam<int>("n", n);

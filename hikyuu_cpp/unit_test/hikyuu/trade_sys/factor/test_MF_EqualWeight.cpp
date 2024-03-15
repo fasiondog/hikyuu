@@ -126,7 +126,7 @@ TEST_CASE("test_MF_EqualWeight") {
     query = KQuery(-20);
     ref_k = ref_stk.getKData(query);
     ref_dates = ref_k.getDatetimeList();
-    mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
+    mf = MF_EqualWeight(src_inds, stks, query, ref_stk, ndays);
     CHECK_EQ(mf->name(), "MF_EqualWeight");
     CHECK_THROWS_AS(mf->getFactor(sm["sh600000"]), std::exception);
 

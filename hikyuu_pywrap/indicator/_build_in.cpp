@@ -1711,7 +1711,7 @@ void export_Indicator_build_in(py::module& m) {
     :param int n: 时间窗口
     :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300)");
 
-    m.def("ICIR", ICIR, py::arg("ic"), py::arg("n") = 10, R"(ICIR(ic[,n])
+    m.def("ICIR", ICIR, py::arg("ic"), py::arg("n") = 120, R"(ICIR(ic[,n])
 
     计算 IC 因子 IR = IC的多周期均值/IC的标准方差
 

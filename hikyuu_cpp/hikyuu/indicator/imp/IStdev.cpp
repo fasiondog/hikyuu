@@ -67,6 +67,12 @@ void IStdev::_calculate(const Indicator& data) {
         ex2 += d_pow;
         dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / n) / (n - 1));
     }
+
+    // 排除第一位的0值
+    if (m_discard < total) {
+        dst[0] = Null<value_t>();
+        m_discard += 1;
+    }
 }
 
 void IStdev::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
