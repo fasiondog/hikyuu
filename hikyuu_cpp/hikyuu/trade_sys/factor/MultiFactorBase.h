@@ -22,6 +22,7 @@ class HKU_API MultiFactorBase : public enable_shared_from_this<MultiFactorBase> 
 
 public:
     typedef Indicator::value_t value_t;
+    friend HKU_API std::ostream& operator<<(std::ostream&, const MultiFactorBase&);
 
 public:
     MultiFactorBase();
@@ -196,6 +197,9 @@ public:                                        \
     }                                          \
     virtual IndicatorList _calculate(const vector<IndicatorList>&) override;
 
+HKU_API std::ostream& operator<<(std::ostream&, const MultiFactorBase&);
+HKU_API std::ostream& operator<<(std::ostream&, const MultiFactorPtr&);
+
 HKU_API std::ostream& operator<<(std::ostream& out,
                                  const std::pair<Stock, MultiFactorBase::value_t>& td);
 
@@ -208,6 +212,12 @@ HKU_API std::ostream& operator<<(
 }  // namespace hku
 
 #if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::MultiFactorBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::MultiFactorPtr> : ostream_formatter {};
+
 template <>
 struct fmt::formatter<std::pair<hku::Stock, hku::MultiFactorBase::value_t>> : ostream_formatter {};
 

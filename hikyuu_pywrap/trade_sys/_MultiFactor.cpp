@@ -33,10 +33,9 @@ void export_MultiFactor(py::module& m) {
     - _clone : 【必须】克隆接口
     - _reset : 【可选】重载私有变量)")
       .def(py::init<>())
-      //   .def(py::init<const string&>())
 
-      //   .def("__str__", to_py_str<EnvironmentBase>)
-      //   .def("__repr__", to_py_str<EnvironmentBase>)
+      .def("__str__", to_py_str<MultiFactorBase>)
+      .def("__repr__", to_py_str<MultiFactorBase>)
 
       .def_property("name", py::overload_cast<>(&MultiFactorBase::name, py::const_),
                     py::overload_cast<const string&>(&MultiFactorBase::name),
@@ -59,28 +58,51 @@ void export_MultiFactor(py::module& m) {
     :param value: 参数值
     :raises logic_error: Unsupported type! 不支持的参数类型)")
 
-      .def("haveParam", &MultiFactorBase::haveParam, "是否存在指定参数")
+      .def("have_param", &MultiFactorBase::haveParam, "是否存在指定参数")
 
-      //   .def("is_valid", &EnvironmentBase::isValid, R"(is_valid(self, datetime)
+      .def("get_factor", &MultiFactorBase::getFactor, py::return_value_policy::copy)
 
-      // 指定时间系统是否有效
+      .def("get_all_factors",
+           [](MultiFactorBase& self) {
+               // return vector_to_python_list<Indicator>()
+               auto factors = self.getAllFactors();
+               IndicatorList copy_factors;
+               copy_factors.reserve(factors.size());
+               for (const auto& factor : factors) {
+                   copy_factors.emplace_back(factor.clone());
+               }
+               return vector_to_python_list<Indicator>(copy_factors);
+           })
 
-      // :param Datetime datetime: 指定时间
-      // :return: True 有效 | False 无效)")
+      .def("get_ic", &MultiFactorBase::getIC, py::arg("ndays") = 0)
+      .def("get_icir", &MultiFactorBase::getICIR, py::arg("ir_n"), py::arg("ic_n") = 0)
+      .def("clone", &MultiFactorBase::clone)
 
-      //   .def("_add_valid", &EnvironmentBase::_addValid, R"(_add_valid(self, datetime)
+      .def("get_cross",
+           [](MultiFactorBase& self, const Datetime& date) {
+               py::list ret;
+               auto cross = self.getCross(date);
+               for (const auto& item : cross) {
+                   ret.append(py::make_tuple(item.first, item.second));
+               }
+               return ret;
+           })
 
-      // 加入有效时间，在_calculate中调用
+      .def("get_all_cross",
+           [](MultiFactorBase& self) {
+               py::list ret;
+               auto all_cross = self.getAllCross();
+               for (const auto& one_day : all_cross) {
+                   py::list one;
+                   for (const auto& item : one_day) {
+                       one.append(py::make_tuple(item.first, item.second));
+                   }
+                   ret.append(std::move(one));
+               }
+               return ret;
+           })
 
-      // :param Datetime datetime: 有效时间)")
-
-      //   .def("reset", &EnvironmentBase::reset, "复位操作")
-      //   .def("clone", &EnvironmentBase::clone, "克隆操作")
-      //   .def("_reset", &EnvironmentBase::_reset,
-      //   "【重载接口】子类复位接口，用于复位内部私有变量") .def("_calculate",
-      //   &EnvironmentBase::_calculate, "【重载接口】子类计算接口")
-
-      DEF_PICKLE(MultiFactorPtr);
+        DEF_PICKLE(MultiFactorPtr);
 
     m.def(
       "MF_EqualWeight",

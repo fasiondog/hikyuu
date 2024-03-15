@@ -14,7 +14,6 @@
 #include <hikyuu/indicator/crt/IC.h>
 #include <hikyuu/indicator/crt/ROCR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
-#include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/trade_sys/factor/crt/MF_EqualWeight.h>
 
 using namespace hku;
@@ -143,6 +142,7 @@ TEST_CASE("test_MF_EqualWeight") {
     for (size_t i = ind4.discard(), len = ref_dates.size(); i < len; i++) {
         CHECK_EQ(ind4[i], doctest::Approx((ind1[i] + ind2[i] + ind3[i]) / 3.0));
     }
+    HKU_INFO("\n{}", mf);
 }
 
 //-----------------------------------------------------------------------------

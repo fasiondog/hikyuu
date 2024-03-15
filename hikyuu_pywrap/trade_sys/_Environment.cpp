@@ -72,7 +72,7 @@ void export_Environment(py::module& m) {
     :param value: 参数值
     :raises logic_error: Unsupported type! 不支持的参数类型)")
 
-      .def("haveParam", &EnvironmentBase::haveParam, "是否存在指定参数")
+      .def("have_param", &EnvironmentBase::haveParam, "是否存在指定参数")
 
       .def("is_valid", &EnvironmentBase::isValid, R"(is_valid(self, datetime)
 

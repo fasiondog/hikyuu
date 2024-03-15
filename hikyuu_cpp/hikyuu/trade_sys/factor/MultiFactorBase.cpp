@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/ROCP.h"
 #include "hikyuu/indicator/crt/REF.h"
@@ -15,6 +16,47 @@
 #include "MultiFactorBase.h"
 
 namespace hku {
+
+HKU_API std::ostream& operator<<(std::ostream& out, const MultiFactorBase& mf) {
+    out << "MultiFactor{"
+        << "\n  name: " << mf.name() << "\n  params: " << mf.getParameter()
+        << "\n  query: " << mf.getQuery() << "\n  ref stock: " << mf.m_ref_stk;
+
+    out << "\n  src inds count: " << mf.m_inds.size() << " [";
+    if (mf.m_inds.size() <= 5) {
+        for (const auto& ind : mf.m_inds) {
+            out << ind.name() << ", ";
+        }
+    } else {
+        for (size_t i = 0; i < 5; i++) {
+            out << mf.m_inds[i].name() << ", ";
+        }
+        out << "......";
+    }
+    out << "]";
+
+    out << "\n  stocks count: " << mf.m_stks.size() << " [";
+    size_t print_stk_len = std::min<size_t>(5, mf.m_stks.size());
+    for (size_t i = 0; i < print_stk_len; i++) {
+        out << mf.m_stks[i].market_code() << ", ";
+    }
+    if (mf.m_stks.size() > 5) {
+        out << "......";
+    }
+    out << "]";
+
+    out << "\n}";
+    return out;
+}
+
+HKU_API std::ostream& operator<<(std::ostream& out, const MultiFactorPtr& mf) {
+    if (mf) {
+        out << *mf;
+    } else {
+        out << "MultiFactor(NULL)";
+    }
+    return out;
+}
 
 HKU_API std::ostream& operator<<(std::ostream& out,
                                  const std::pair<Stock, MultiFactorBase::value_t>& td) {
@@ -270,6 +312,7 @@ vector<IndicatorList> MultiFactorBase::_alignAllInds() {
         cur_stk_inds.resize(ind_count);
         for (size_t j = 0; j < ind_count; j++) {
             cur_stk_inds[j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
+            cur_stk_inds[j].name(m_inds[j].name());
         }
     }
 
