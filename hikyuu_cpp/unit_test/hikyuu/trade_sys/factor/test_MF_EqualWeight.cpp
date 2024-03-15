@@ -142,7 +142,6 @@ TEST_CASE("test_MF_EqualWeight") {
     for (size_t i = ind4.discard(), len = ref_dates.size(); i < len; i++) {
         CHECK_EQ(ind4[i], doctest::Approx((ind1[i] + ind2[i] + ind3[i]) / 3.0));
     }
-    HKU_INFO("\n{}", mf);
 }
 
 //-----------------------------------------------------------------------------
