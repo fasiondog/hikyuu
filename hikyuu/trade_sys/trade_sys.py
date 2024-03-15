@@ -3,7 +3,7 @@
 from hikyuu.util.slice import list_getitem
 from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
-    ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase
+    ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase, AllocateFundsBase
 )
 
 
@@ -13,6 +13,14 @@ def part_iter(self):
 
 
 ConditionBase.__iter__ = part_iter
+
+
+def part_init(self, name, params):
+    super(self.__class__, self).__init__(name)
+    self._name = name
+    self._params = params
+    for k, v in params.items():
+        self.set_param(k, v)
 
 
 # ------------------------------------------------------------------
@@ -33,14 +41,6 @@ System.INVALID = System.Part.INVALID
 # ------------------------------------------------------------------
 # condition
 # ------------------------------------------------------------------
-def cn_init(self, name, params):
-    super(self.__class__, self).__init__(name)
-    self._name = name
-    self._params = params
-    for k, v in params.items():
-        self.set_param(k, v)
-
-
 def crtCN(func, params={}, name='crtCN'):
     """
     快速创建自定义不带私有属性的系统有效条件
@@ -50,7 +50,7 @@ def crtCN(func, params={}, name='crtCN'):
     :param str name: 自定义名称
     :return: 自定义系统有效条件实例
     """
-    meta_x = type(name, (ConditionBase, ), {'__init__': cn_init})
+    meta_x = type(name, (ConditionBase, ), {'__init__': part_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
@@ -59,14 +59,6 @@ def crtCN(func, params={}, name='crtCN'):
 # ------------------------------------------------------------------
 # environment
 # ------------------------------------------------------------------
-def ev_init(self, name, params):
-    super(self.__class__, self).__init__(name)
-    self._name = name
-    self._params = params
-    for k, v in params.items():
-        self.set_param(k, v)
-
-
 def crtEV(func, params={}, name='crtEV'):
     """
     快速创建自定义不带私有属性的市场环境判断策略
@@ -76,7 +68,7 @@ def crtEV(func, params={}, name='crtEV'):
     :param str name: 自定义名称
     :return: 自定义市场环境判断策略实例
     """
-    meta_x = type(name, (EnvironmentBase, ), {'__init__': ev_init})
+    meta_x = type(name, (EnvironmentBase, ), {'__init__': part_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
@@ -85,14 +77,6 @@ def crtEV(func, params={}, name='crtEV'):
 # ------------------------------------------------------------------
 # moneymanager
 # ------------------------------------------------------------------
-def mm_init(self, name, params):
-    super(self.__class__, self).__init__(name)
-    self._name = name
-    self._params = params
-    for k, v in params.items():
-        self.set_param(k, v)
-
-
 def crtMM(func, params={}, name='crtMM'):
     """
     快速创建自定义不带私有属性的资金管理策略
@@ -102,7 +86,7 @@ def crtMM(func, params={}, name='crtMM'):
     :param str name: 自定义名称
     :return: 自定义资金管理策略实例
     """
-    meta_x = type(name, (MoneyManagerBase, ), {'__init__': mm_init})
+    meta_x = type(name, (MoneyManagerBase, ), {'__init__': part_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
@@ -111,14 +95,6 @@ def crtMM(func, params={}, name='crtMM'):
 # ------------------------------------------------------------------
 # profitgoal
 # ------------------------------------------------------------------
-def pg_init(self, name, params):
-    super(self.__class__, self).__init__(name)
-    self._name = name
-    self._params = params
-    for k, v in params.items():
-        self.set_param(k, v)
-
-
 def crtPG(func, params={}, name='crtPG'):
     """
     快速创建自定义不带私有属性的盈利目标策略
@@ -128,7 +104,7 @@ def crtPG(func, params={}, name='crtPG'):
     :param str name: 自定义名称
     :return: 盈利目标策略实例
     """
-    meta_x = type(name, (ProfitGoalBase, ), {'__init__': pg_init})
+    meta_x = type(name, (ProfitGoalBase, ), {'__init__': part_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
@@ -137,14 +113,6 @@ def crtPG(func, params={}, name='crtPG'):
 # ------------------------------------------------------------------
 # signal
 # ------------------------------------------------------------------
-def sig_init(self, name, params):
-    super(self.__class__, self).__init__(name)
-    self._name = name
-    self._params = params
-    for k, v in params.items():
-        self.set_param(k, v)
-
-
 def crtSG(func, params={}, name='crtSG'):
     """
     快速创建自定义不带私有属性的信号指示器
@@ -154,7 +122,7 @@ def crtSG(func, params={}, name='crtSG'):
     :param str name: 自定义名称
     :return: 自定义信号指示器实例
     """
-    meta_x = type(name, (SignalBase, ), {'__init__': sig_init})
+    meta_x = type(name, (SignalBase, ), {'__init__': part_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
@@ -175,11 +143,43 @@ def se_add_stock_list(self, stk_list, proto_sys):
 
 SelectorBase.add_stock_list = se_add_stock_list
 
+
+def crtSE(func, params={}, name='crtSE'):
+    """
+    快速创建自定义不带私有属性的交易对象选择算法
+
+    :param func: 交易对象选择算法
+    :param {} params: 参数字典
+    :param str name: 自定义名称
+    :return: 自定义交易对象选择算法实例
+    """
+    meta_x = type(name, (SelectorBase, ), {'__init__': part_init})
+    meta_x._clone = lambda self: meta_x(self._name, self._params)
+    meta_x._calculate = func
+    return meta_x(name, params)
+
+
+# ------------------------------------------------------------------
+# allocatefunds
+# ------------------------------------------------------------------
+def crtAF(func, params={}, name='crtAF'):
+    """
+    快速创建自定义不带私有属性的资产分配算法
+
+    :param func: 资产分配算法
+    :param {} params: 参数字典
+    :param str name: 自定义名称
+    :return: 自定义资产分配算法实例
+    """
+    meta_x = type(name, (AllocateFundsBase, ), {'__init__': part_init})
+    meta_x._clone = lambda self: meta_x(self._name, self._params)
+    meta_x._calculate = func
+    return meta_x(name, params)
+
+
 # ------------------------------------------------------------------
 # slippage
 # ------------------------------------------------------------------
-
-
 def sl_init(self, name, params):
     super(self.__class__, self).__init__(name)
     self._name = name
@@ -197,7 +197,7 @@ def crtSL(func, params={}, name='crtSL'):
     :param str name: 自定义名称
     :return: 移滑价差算法实例
     """
-    meta_x = type(name, (SlippageBase, ), {'__init__': sl_init})
+    meta_x = type(name, (SlippageBase, ), {'__init__': part_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
