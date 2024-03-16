@@ -40,12 +40,34 @@ public:
         m_name = name;
     }
 
+    /** 获取参考日期列表 */
     const DatetimeList& getDatetimeList() const {
         return m_ref_dates;
     }
 
+    /** 获取查询范围 */
     const KQuery& getQuery() const {
         return m_query;
+    }
+
+    /** 获取参考证券 */
+    const Stock& getRefStock() const {
+        return m_ref_stk;
+    }
+
+    /** 获取证券列表 */
+    const StockList& getStockList() const {
+        return m_stks;
+    }
+
+    /** 获取证券列表当前证券数量 */
+    size_t getStockListNumber() const {
+        return m_stks.size();
+    }
+
+    /** 获取原始因子公式列表 */
+    const IndicatorList& getRefIndicators() const {
+        return m_inds;
     }
 
     /** 获取指定证券合成因子 */
@@ -58,6 +80,9 @@ public:
 
     /** 获取指定日期截面的所有因子值，已经降序排列 */
     const vector<std::pair<Stock, value_t>>& getCross(const Datetime&);
+
+    vector<std::pair<Stock, value_t>> getCross(const Datetime& date, size_t start,
+                                               size_t end = Null<size_t>());
 
     /** 获取所有截面数据，已按降序排列 */
     const vector<vector<std::pair<Stock, value_t>>>& getAllCross();
