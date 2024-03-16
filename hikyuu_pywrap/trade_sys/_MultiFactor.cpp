@@ -24,6 +24,7 @@ public:
 };
 
 void export_MultiFactor(py::module& m) {
+    size_t null_size = Null<size_t>();
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactor",
                                                                R"(市场环境判定策略基类
 
@@ -60,6 +61,12 @@ void export_MultiFactor(py::module& m) {
 
       .def("have_param", &MultiFactorBase::haveParam, "是否存在指定参数")
 
+      .def("get_ref_stock", &MultiFactorBase::getRefStock, py::return_value_policy::copy)
+      .def("get_datetime_list", &MultiFactorBase::getDatetimeList, py::return_value_policy::copy)
+      .def("get_stock_list", &MultiFactorBase::getStockList, py::return_value_policy::copy)
+      .def("get_stock_list_num", &MultiFactorBase::getStockListNumber)
+      .def("get_ref_indicators", &MultiFactorBase::getRefIndicators, py::return_value_policy::copy)
+
       .def("get_factor", &MultiFactorBase::getFactor, py::return_value_policy::copy)
 
       .def("get_all_factors",
@@ -78,15 +85,17 @@ void export_MultiFactor(py::module& m) {
       .def("get_icir", &MultiFactorBase::getICIR, py::arg("ir_n"), py::arg("ic_n") = 0)
       .def("clone", &MultiFactorBase::clone)
 
-      .def("get_cross",
-           [](MultiFactorBase& self, const Datetime& date) {
-               py::list ret;
-               auto cross = self.getCross(date);
-               for (const auto& item : cross) {
-                   ret.append(py::make_tuple(item.first, item.second));
-               }
-               return ret;
-           })
+      .def(
+        "get_cross",
+        [](MultiFactorBase& self, const Datetime& date, size_t start, size_t end) {
+            py::list ret;
+            auto cross = self.getCross(date, start, end);
+            for (const auto& item : cross) {
+                ret.append(py::make_tuple(item.first, item.second));
+            }
+            return ret;
+        },
+        py::arg("date"), py::arg("start") = 0, py::arg("end") = null_size)
 
       .def("get_all_cross",
            [](MultiFactorBase& self) {

@@ -208,6 +208,25 @@ const vector<std::pair<Stock, MultiFactorBase::value_t>>& MultiFactorBase::getCr
     return m_stk_factor_by_date[iter->second];
 }
 
+vector<std::pair<Stock, MultiFactorBase::value_t>> MultiFactorBase::getCross(const Datetime& date,
+                                                                             size_t start,
+                                                                             size_t end) {
+    vector<std::pair<Stock, MultiFactorBase::value_t>> ret;
+    HKU_IF_RETURN(start >= end, ret);
+
+    const auto& cross = getCross(date);
+    if (end == Null<size_t>() || end > cross.size()) {
+        end = cross.size();
+    }
+
+    ret.resize(end - start);
+    for (size_t i = start; i < end; i++) {
+        ret[i] = cross[i];
+    }
+
+    return ret;
+}
+
 const vector<vector<std::pair<Stock, MultiFactorBase::value_t>>>& MultiFactorBase::getAllCross() {
     calculate();
     return m_stk_factor_by_date;
