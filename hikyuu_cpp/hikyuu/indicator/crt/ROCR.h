@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 变动率指标 (price / prevPrice)
+ * 变动率指标 (price / prevPrice),  N 日累积收益率 （包含本金）
  * @ingroup Indicator
  */
 Indicator HKU_API ROCR(int n = 10);

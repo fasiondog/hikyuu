@@ -133,6 +133,10 @@
  * @details 交易系统框架
  * @ingroup TradeSystem
  *
+ * @defgroup MultiFactor MultiFactor 合成多因子
+ * @details 合成多因子
+ * @ingroup TradeSystem
+ *
  * @defgroup SystemInstance SystemInstance 系统实例
  * @details 系统实例
  * @ingroup Hikyuu

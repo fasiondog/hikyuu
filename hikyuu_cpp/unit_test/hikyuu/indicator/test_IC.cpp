@@ -75,19 +75,20 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), 2);
-    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result.discard(), result.size());
     CHECK_UNARY(std::isnan(result[0]));
-    CHECK_EQ(result[1], doctest::Approx(-1.0));
+    CHECK_UNARY(std::isnan(result[1]));
 
     /** @arg 正常执行 */
     result = IC(MA(CLOSE()), stks, query, 1, ref_stk);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
-    CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result[0], doctest::Approx(-1.0));
-    CHECK_EQ(result[1], doctest::Approx(0.8));
-    CHECK_EQ(result[99], doctest::Approx(0.5));
+    CHECK_EQ(result.discard(), 2);
+    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_UNARY(std::isnan(result[1]));
+    CHECK_EQ(result[2], doctest::Approx(0.8));
+    CHECK_EQ(result[99], doctest::Approx(-1));
 }
 
 //-----------------------------------------------------------------------------
@@ -147,7 +148,11 @@ TEST_CASE("test_IC_export") {
     CHECK_EQ(x1.discard(), x2.discard());
     CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
     for (size_t i = 0; i < x1.size(); ++i) {
-        CHECK_EQ(x1[i], doctest::Approx(x2[i]).epsilon(0.00001));
+        if (std::isnan(x1[i])) {
+            CHECK_UNARY(std::isnan(x2[i]));
+        } else {
+            CHECK_EQ(x1[i], doctest::Approx(x2[i]).epsilon(0.00001));
+        }
     }
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */

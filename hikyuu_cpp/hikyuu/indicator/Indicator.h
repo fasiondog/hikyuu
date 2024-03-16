@@ -184,6 +184,17 @@ public:
         return m_imp ? m_imp->data(result_num) : nullptr;
     }
 
+    /**
+     * 判断两个ind的值是否相等
+     * @note operator==重载生成新的新的Indicator，此函数用于对两个ind进行值比较
+     */
+    bool equal(const Indicator& other) const;
+
+    /** 判断是否是同一个实例 */
+    bool isSame(const Indicator& other) const {
+        return !m_imp && m_imp == other.m_imp;
+    }
+
 protected:
     IndicatorImpPtr m_imp;
 
@@ -196,6 +207,9 @@ private:
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
+
+/** @ingroup Indicator */
+typedef vector<Indicator> IndicatorList;
 
 inline string Indicator::name() const {
     return m_imp ? m_imp->name() : "IndicatorImp";
