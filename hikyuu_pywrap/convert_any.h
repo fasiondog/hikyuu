@@ -90,8 +90,11 @@ public:
         /* Extract PyObject from handle */
         PyObject* src = source.ptr();
 
+        object obj = reinterpret_borrow<object>(source);
         if (PyBool_Check(src)) {
-            value = bool(PyLong_AsLong(src));
+            // value = bool(PyLong_AsLong(src));
+            bool tmp = obj.cast<bool>();
+            value = tmp;
             return true;
         }
 
@@ -123,7 +126,6 @@ public:
             return true;
         }
 
-        object obj = reinterpret_borrow<object>(source);
         if (isinstance<Stock>(obj)) {
             value = obj.cast<Stock>();
             return true;
@@ -176,7 +178,11 @@ public:
     static handle cast(boost::any x, return_value_policy /* policy */, handle /* parent */) {
         if (x.type() == typeid(bool)) {
             bool tmp = boost::any_cast<bool>(x);
-            return tmp ? Py_True : Py_False;
+            if (tmp) {
+                Py_RETURN_TRUE;
+            } else {
+                Py_RETURN_FALSE;
+            }
         } else if (x.type() == typeid(int)) {
             return Py_BuildValue("n", boost::any_cast<int>(x));
         } else if (x.type() == typeid(double)) {
