@@ -71,6 +71,7 @@
 #include "crt/POS.h"
 #include "crt/POW.h"
 #include "crt/PRICELIST.h"
+#include "crt/RECOVER.h"
 #include "crt/REF.h"
 #include "crt/REVERSE.h"
 #include "crt/ROC.h"
