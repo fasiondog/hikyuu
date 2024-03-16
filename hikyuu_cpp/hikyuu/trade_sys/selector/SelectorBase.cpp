@@ -68,14 +68,23 @@ SelectorPtr SelectorBase::clone() {
 
     p->m_params = m_params;
     p->m_name = m_name;
-    p->m_real_sys_list = m_real_sys_list;
-    p->m_pro_sys_list = m_pro_sys_list;
+
+    p->m_real_sys_list.reserve(m_real_sys_list.size());
+    for (const auto& sys : m_real_sys_list) {
+        p->m_real_sys_list.emplace_back(sys->clone());
+    }
+
+    p->m_pro_sys_list.reserve(m_pro_sys_list.size());
+    for (const auto& sys : m_real_sys_list) {
+        p->m_pro_sys_list.emplace_back(sys->clone());
+    }
     return p;
 }
 
 void SelectorBase::calculate(const SystemList& sysList, const KQuery& query) {
     m_real_sys_list = sysList;
     if (getParam<bool>("run_proto_sys")) {
+        // 用于手工测试
         for (auto& sys : m_pro_sys_list) {
             sys->run(query);
         }

@@ -105,6 +105,10 @@ void export_Selector(py::module& m) {
     :param StockList stk_list: 加入的初始标的列表
     :param System sys: 系统策略原型)")
 
+      .def("get_proto_sys_list", &SelectorBase::getProtoSystemList, py::return_value_policy::copy)
+      .def("get_real_sys_list", &SelectorBase::getRealSystemList, py::return_value_policy::copy)
+      .def("calculate", &SelectorBase::calculate)
+
       .def("_reset", &SelectorBase::_reset, "子类复位操作实现")
       .def("_calculate", &SelectorBase::_calculate, "【重载接口】子类计算接口")
 
