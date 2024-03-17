@@ -24,14 +24,14 @@ bool SignalSelector::isMatchAF(const AFPtr& af) {
     return true;
 }
 
-SystemList SignalSelector::getSelectedOnOpen(Datetime date) {
+SystemWeightList SignalSelector::getSelectedOnOpen(Datetime date) {
     auto iter = m_sys_dict_on_open.find(date);
-    return iter != m_sys_dict_on_open.end() ? iter->second : SystemList();
+    return iter != m_sys_dict_on_open.end() ? iter->second : SystemWeightList();
 }
 
-SystemList SignalSelector::getSelectedOnClose(Datetime date) {
+SystemWeightList SignalSelector::getSelectedOnClose(Datetime date) {
     auto iter = m_sys_dict_on_close.find(date);
-    return iter != m_sys_dict_on_close.end() ? iter->second : SystemList();
+    return iter != m_sys_dict_on_close.end() ? iter->second : SystemWeightList();
 }
 
 void SignalSelector::_calculate() {
@@ -40,14 +40,14 @@ void SignalSelector::_calculate() {
         auto& sys = m_real_sys_list[i];
         auto sg = sys->getSG();
         auto dates = sg->getBuySignal();
-        unordered_map<Datetime, SystemList>* date_dict;
+        unordered_map<Datetime, SystemWeightList>* date_dict;
         date_dict = sys->getParam<bool>("buy_delay") ? &m_sys_dict_on_close : &m_sys_dict_on_open;
         for (auto& date : dates) {
             auto iter = date_dict->find(date);
             if (iter != date_dict->end()) {
-                iter->second.emplace_back(sys);
+                iter->second.emplace_back(sys, 1.0);
             } else {
-                (*date_dict)[date] = {sys};
+                (*date_dict)[date] = {SystemWeight(sys, 1.0)};
             }
         }
     }

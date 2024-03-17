@@ -10,7 +10,7 @@
 #define TRADE_SYS_ALLOCATEFUNDS_ALLOCATEFUNDSBASE_H_
 
 #include "../../utilities/Parameter.h"
-#include "../allocatefunds/SystemWeight.h"
+#include "../selector/SystemWeight.h"
 
 namespace hku {
 
@@ -49,8 +49,8 @@ public:
      * @param ignore_list 忽略不进行调仓的运行中系统
      * @return
      */
-    void adjustFunds(const Datetime& date, const SystemList& se_list,
-                     const std::list<SYSPtr>& running_list, const SystemList& ignore_list);
+    void adjustFunds(const Datetime& date, const SystemWeightList& se_list,
+                     const std::list<SYSPtr>& running_list, const SystemWeightList& ignore_list);
 
     /** 获取交易账户 */
     const TMPtr& getTM() const;
@@ -101,15 +101,17 @@ public:
      * @param se_list 系统实例选择器选出的系统实例
      * @return
      */
-    virtual SystemWeightList _allocateWeight(const Datetime& date, const SystemList& se_list) = 0;
+    virtual SystemWeightList _allocateWeight(const Datetime& date,
+                                             const SystemWeightList& se_list) = 0;
 
 private:
     /* 同时调整已运行中的子系统（已分配资金或已持仓） */
-    void _adjust_with_running(const Datetime& date, const SystemList& se_list,
-                              const std::list<SYSPtr>& running_list, const SystemList& ignore_list);
+    void _adjust_with_running(const Datetime& date, const SystemWeightList& se_list,
+                              const std::list<SYSPtr>& running_list,
+                              const SystemWeightList& ignore_list);
 
     /* 不调整已在运行中的子系统 */
-    void _adjust_without_running(const Datetime& date, const SystemList& se_list,
+    void _adjust_without_running(const Datetime& date, const SystemWeightList& se_list,
                                  const std::list<SYSPtr>& running_list);
 
     /* 计算当前的资产总值 */
@@ -187,7 +189,7 @@ public:                                \
     virtual AFPtr _clone() override {  \
         return AFPtr(new classname()); \
     }                                  \
-    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemList&) override;
+    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemWeightList&) override;
 
 typedef shared_ptr<AllocateFundsBase> AllocateFundsPtr;
 typedef shared_ptr<AllocateFundsBase> AFPtr;

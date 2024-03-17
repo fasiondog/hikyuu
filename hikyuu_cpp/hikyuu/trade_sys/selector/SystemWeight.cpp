@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "../allocatefunds/SystemWeight.h"
+#include "SystemWeight.h"
 
 namespace hku {
 
@@ -15,16 +15,16 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SystemWeight& sw) {
 
     string name("NULL");
     string stk_name("(Stock(NULL))");
-    if (sw.getSYS()) {
-        name = sw.getSYS()->name();
+    if (sw.sys) {
+        name = sw.sys->name();
 
-        Stock stk = sw.getSYS()->getStock();
+        Stock stk = sw.sys->getStock();
         if (!stk.isNull()) {
             stk_name = "(Stock(" + stk.market_code() + "))";
         }
     }
 
-    os << "SystemWeight(sys: " << name << stk_name << ",  weight: " << sw.getWeight() << ")";
+    os << "SystemWeight(sys: " << name << stk_name << ",  weight: " << sw.weight << ")";
 
     os.unsetf(std::ostream::floatfield);
     os.precision();
@@ -33,8 +33,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SystemWeight& sw) {
 
 SystemWeight& SystemWeight::operator=(SystemWeight&& other) {
     if (this != &other) {
-        m_sys = std::move(other.m_sys);
-        m_weight = other.m_weight;
+        sys = std::move(other.sys);
+        weight = other.weight;
     }
     return *this;
 }

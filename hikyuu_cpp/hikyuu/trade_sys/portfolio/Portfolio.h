@@ -120,9 +120,9 @@ protected:
     // 用于中间计算的临时数据
     std::unordered_set<System*> m_running_sys_set;  // 当前仍在运行的子系统集合
     std::list<SYSPtr> m_running_sys_list;           // 当前仍在运行的子系统列表
-    SystemList m_tmp_selected_list_on_open;
-    SystemList m_tmp_selected_list_on_close;
-    SystemList m_tmp_will_remove_sys;
+    SystemWeightList m_tmp_selected_list_on_open;
+    SystemWeightList m_tmp_selected_list_on_close;
+    SystemWeightList m_tmp_will_remove_sys;
 
 //============================================
 // 序列化支持

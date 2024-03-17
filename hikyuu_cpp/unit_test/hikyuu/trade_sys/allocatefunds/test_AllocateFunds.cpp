@@ -30,7 +30,7 @@ TEST_CASE("test_AllocateFunds") {
     TMPtr subtm = crtTM(Datetime(200101010000L), 0);
     SYSPtr sys = SYS_Simple(subtm->clone());
 
-    SystemList se_list;
+    SystemWeightList se_list;
     SystemList hold_list;
     SystemList ac_list;
     SystemWeightList sw_list;

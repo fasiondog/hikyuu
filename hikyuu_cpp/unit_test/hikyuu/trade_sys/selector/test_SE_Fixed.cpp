@@ -31,7 +31,7 @@ TEST_CASE("test_SE_Fixed") {
 
     /** @arg 试图加入一个不存在的stock */
     se->addStock(Stock(), sys);
-    SystemList result = se->getSelectedOnOpen(Datetime(200001010000L));
+    SystemWeightList result = se->getSelectedOnOpen(Datetime(200001010000L));
     CHECK_EQ(result.size(), 0);
 
     /** @arg 试图加入一个空的系统策略原型 */

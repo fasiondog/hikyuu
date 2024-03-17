@@ -25,8 +25,8 @@ public:
     }
 
 private:
-    unordered_map<Datetime, SystemList> m_sys_dict_on_open;
-    unordered_map<Datetime, SystemList> m_sys_dict_on_close;
+    unordered_map<Datetime, SystemWeightList> m_sys_dict_on_open;
+    unordered_map<Datetime, SystemWeightList> m_sys_dict_on_close;
 };
 
 }  // namespace hku

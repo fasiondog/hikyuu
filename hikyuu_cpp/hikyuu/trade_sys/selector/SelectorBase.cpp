@@ -6,7 +6,6 @@
  */
 
 #include "SelectorBase.h"
-#include "../portfolio/Portfolio.h"
 
 namespace hku {
 

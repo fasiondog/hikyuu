@@ -170,9 +170,9 @@ void Portfolio::_runMoment(const Datetime& date) {
     // 释放掉临时数据占用的内存
     m_running_sys_set = std::unordered_set<System*>();
     m_running_sys_list = std::list<SYSPtr>();
-    m_tmp_selected_list_on_open = SystemList();
-    m_tmp_selected_list_on_close = SystemList();
-    m_tmp_will_remove_sys = SystemList();
+    m_tmp_selected_list_on_open = SystemWeightList();
+    m_tmp_selected_list_on_close = SystemWeightList();
+    m_tmp_will_remove_sys = SystemWeightList();
 }
 
 void Portfolio::_runMomentOnOpen(const Datetime& date) {
@@ -199,22 +199,22 @@ void Portfolio::_runMomentOnOpen(const Datetime& date) {
                 sub_tm->checkout(date, cash);
                 m_shadow_tm->checkin(date, cash);
             }
-            m_tmp_will_remove_sys.push_back(running_sys);
+            m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
         }
     }
 
     // 依据待移除列表将系统从运行中系统列表里删除
     for (auto& sub_sys : m_tmp_will_remove_sys) {
-        m_running_sys_list.remove(sub_sys);
-        m_running_sys_set.erase(sub_sys.get());
+        m_running_sys_list.remove(sub_sys.sys);
+        m_running_sys_set.erase(sub_sys.sys.get());
     }
 
     // 遍历本次选择的系统列表，如果存在分配资金且不在运行中列表内，则加入运行列表
     for (auto& sub_sys : m_tmp_selected_list_on_open) {
-        price_t cash = sub_sys->getTM()->cash(date, m_query.kType());
-        if (cash > 0.0 && m_running_sys_set.find(sub_sys.get()) == m_running_sys_set.end()) {
-            m_running_sys_list.push_back(sub_sys);
-            m_running_sys_set.insert(sub_sys.get());
+        price_t cash = sub_sys.sys->getTM()->cash(date, m_query.kType());
+        if (cash > 0.0 && m_running_sys_set.find(sub_sys.sys.get()) == m_running_sys_set.end()) {
+            m_running_sys_list.push_back(sub_sys.sys);
+            m_running_sys_set.insert(sub_sys.sys.get());
         }
     }
 
@@ -240,22 +240,22 @@ void Portfolio::_runMomentOnClose(const Datetime& date) {
         (!m_tmp_selected_list_on_open.empty() || !m_tmp_selected_list_on_close.empty())) {
         HKU_INFO("{} ===========================================================", date);
         for (auto& sys : m_tmp_selected_list_on_open) {
-            HKU_INFO("select on open: {}, cash: {}", sys->getTO().getStock(),
-                     sys->getTM()->cash(date, m_query.kType()));
+            HKU_INFO("select on open: {}, cash: {}", sys.sys->getTO().getStock(),
+                     sys.sys->getTM()->cash(date, m_query.kType()));
         }
         for (auto& sys : m_tmp_selected_list_on_close) {
-            HKU_INFO("select on close: {}, cash: {}", sys->getTO().getStock(),
-                     sys->getTM()->cash(date, m_query.kType()));
+            HKU_INFO("select on close: {}, cash: {}", sys.sys->getTO().getStock(),
+                     sys.sys->getTM()->cash(date, m_query.kType()));
         }
     }
 
     // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统，并执行
     for (auto& sys : m_tmp_selected_list_on_close) {
-        if (m_running_sys_set.find(sys.get()) == m_running_sys_set.end()) {
-            TMPtr tm = sys->getTM();
+        if (m_running_sys_set.find(sys.sys.get()) == m_running_sys_set.end()) {
+            TMPtr tm = sys.sys->getTM();
             if (tm->cash(date, m_query.kType()) > 0.0) {
-                m_running_sys_list.push_back(sys);
-                m_running_sys_set.insert(sys.get());
+                m_running_sys_list.push_back(sys.sys);
+                m_running_sys_set.insert(sys.sys.get());
             }
         }
     }
