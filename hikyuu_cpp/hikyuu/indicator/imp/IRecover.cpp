@@ -43,29 +43,17 @@ void IRecover::checkInputIndicator(const Indicator& ind) {
 }
 
 void IRecover::_calculate(const Indicator& ind) {
-    auto kdata = getContext();
+    auto kdata = ind.getContext();
     auto query = kdata.getQuery();
-
-    auto ktype = query.kType();
-    // 日线以下数据，不执行复权
-    if (!(ktype == KQuery::WEEK || ktype == KQuery::MONTH || ktype == KQuery::QUARTER ||
-          ktype == KQuery::HALFYEAR || ktype == KQuery::YEAR)) {
-        size_t total = ind.size();
-        _readyBuffer(total, 1);
-        const auto* src = ind.data();
-        auto* dst = this->data();
-        memcpy(dst, src, sizeof(value_t) * total);
-        return;
-    }
 
     KQuery::RecoverType recover_type =
       static_cast<KQuery::RecoverType>(getParam<int>("recover_type"));
-    query.recoverType(recover_type);
+    m_name = fmt::format("RECOVER_{}", KQuery::getRecoverTypeName(recover_type));
 
+    query.recoverType(recover_type);
     KData new_k = kdata.getStock().getKData(query);
     HKU_ASSERT(new_k.size() == ind.size());
 
-    m_name = KQuery::getRecoverTypeName(recover_type);
     size_t total = new_k.size();
     _readyBuffer(total, 1);
 
