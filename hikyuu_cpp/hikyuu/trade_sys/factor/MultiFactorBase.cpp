@@ -58,63 +58,6 @@ HKU_API std::ostream& operator<<(std::ostream& out, const MultiFactorPtr& mf) {
     return out;
 }
 
-HKU_API std::ostream& operator<<(std::ostream& out,
-                                 const std::pair<Stock, MultiFactorBase::value_t>& td) {
-    out << std::fixed;
-    out.precision(4);
-    out << "(" << td.first.market_code() << ", " << td.second << ")" << std::endl;
-    out.unsetf(std::ostream::floatfield);
-    out.precision();
-    return out;
-}
-
-HKU_API std::ostream& operator<<(std::ostream& out,
-                                 const vector<std::pair<Stock, MultiFactorBase::value_t>>& td) {
-    out << std::fixed;
-    out.precision(4);
-    size_t total = td.size();
-    if (total < 10) {
-        for (size_t i = 0; i < total; i++) {
-            out << i << ": " << td[i];
-        }
-    } else {
-        for (size_t i = 0; i < 5; i++) {
-            out << i << ": " << td[i];
-        }
-        out << "......" << std::endl;
-        for (size_t i = total - 5; i < total; i++) {
-            out << i << ": " << td[i];
-        }
-    }
-    out.unsetf(std::ostream::floatfield);
-    out.precision();
-    return out;
-}
-
-HKU_API std::ostream& operator<<(
-  std::ostream& out, const vector<vector<std::pair<Stock, MultiFactorBase::value_t>>>& td) {
-    out << std::fixed;
-    out.precision(4);
-    size_t total = td.size();
-    if (total <= 2) {
-        for (size_t i = 0; i < total; i++) {
-            out << "========= " << i << " =========" << std::endl;
-            out << td[i];
-        }
-    } else {
-        out << "========= 0 =========" << std::endl;
-        out << td[0];
-        out << "......" << std::endl;
-        out << "......" << std::endl;
-        out << "========= " << total - 1 << " =========" << std::endl;
-        out << td[total - 1];
-    }
-
-    out.unsetf(std::ostream::floatfield);
-    out.precision();
-    return out;
-}
-
 MultiFactorBase::MultiFactorBase() {
     setParam<bool>("fill_null", true);
     setParam<int>("ic_n", 1);
@@ -200,21 +143,18 @@ const IndicatorList& MultiFactorBase::getAllFactors() {
     return m_all_factors;
 }
 
-const vector<std::pair<Stock, MultiFactorBase::value_t>>& MultiFactorBase::getCross(
-  const Datetime& d) {
+const ScoreRecordList& MultiFactorBase::getScore(const Datetime& d) {
     calculate();
     const auto iter = m_date_index.find(d);
     HKU_CHECK(iter != m_date_index.cend(), "Could not find this date: {}", d);
     return m_stk_factor_by_date[iter->second];
 }
 
-vector<std::pair<Stock, MultiFactorBase::value_t>> MultiFactorBase::getCross(const Datetime& date,
-                                                                             size_t start,
-                                                                             size_t end) {
-    vector<std::pair<Stock, MultiFactorBase::value_t>> ret;
+ScoreRecordList MultiFactorBase::getScore(const Datetime& date, size_t start, size_t end) {
+    ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    const auto& cross = getCross(date);
+    const auto& cross = getScore(date);
     if (end == Null<size_t>() || end > cross.size()) {
         end = cross.size();
     }
@@ -227,7 +167,7 @@ vector<std::pair<Stock, MultiFactorBase::value_t>> MultiFactorBase::getCross(con
     return ret;
 }
 
-const vector<vector<std::pair<Stock, MultiFactorBase::value_t>>>& MultiFactorBase::getAllCross() {
+const vector<ScoreRecordList>& MultiFactorBase::getAllScores() {
     calculate();
     return m_stk_factor_by_date;
 }
@@ -348,23 +288,22 @@ void MultiFactorBase::_buildIndex() {
     // 建立每日截面的索引，并每日降序排序
     size_t days_total = m_ref_dates.size();
     m_stk_factor_by_date.resize(days_total);
-    vector<std::pair<Stock, value_t>> one_day;
+    ScoreRecordList one_day;
     for (size_t i = 0; i < days_total; i++) {
         one_day.resize(stk_count);
         for (size_t j = 0; j < stk_count; j++) {
-            one_day[j] = std::make_pair(m_stks[j], m_all_factors[j][i]);
+            one_day[j] = ScoreRecord(m_stks[j], m_all_factors[j][i]);
         }
-        std::sort(one_day.begin(), one_day.end(),
-                  [](const std::pair<Stock, value_t>& a, const std::pair<Stock, value_t>& b) {
-                      if (std::isnan(a.second) && std::isnan(b.second)) {
-                          return false;
-                      } else if (!std::isnan(a.second) && std::isnan(b.second)) {
-                          return true;
-                      } else if (std::isnan(a.second) && !std::isnan(b.second)) {
-                          return false;
-                      }
-                      return a.second > b.second;
-                  });
+        std::sort(one_day.begin(), one_day.end(), [](const ScoreRecord& a, const ScoreRecord& b) {
+            if (std::isnan(a.value) && std::isnan(b.value)) {
+                return false;
+            } else if (!std::isnan(a.value) && std::isnan(b.value)) {
+                return true;
+            } else if (std::isnan(a.value) && !std::isnan(b.value)) {
+                return false;
+            }
+            return a.value > b.value;
+        });
         m_stk_factor_by_date[i] = std::move(one_day);
         m_date_index[m_ref_dates[i]] = i;
     }

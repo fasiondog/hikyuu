@@ -28,4 +28,5 @@ void export_bind_stl(py::module& m) {
     py::bind_vector<TradeRecordList>(m, "TradeRecordList");
     py::bind_vector<SystemWeightList>(m, "SystemWeightList");
     py::bind_vector<SystemList>(m, "SystemList");
+    py::bind_vector<ScoreRecordList>(m, "ScoreRecordList");
 }

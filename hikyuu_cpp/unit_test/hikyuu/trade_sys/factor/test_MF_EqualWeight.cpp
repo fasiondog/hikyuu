@@ -103,20 +103,20 @@ TEST_CASE("test_MF_EqualWeight") {
     auto ic2 = IC(MA(CLOSE()), stks, query, 1, ref_stk);
     CHECK_UNARY(ic1.equal(ic2));
 
-    CHECK_THROWS_AS(mf->getCross(Datetime(20111204)), std::exception);
-    auto cross = mf->getCross(Datetime(20111205));
+    CHECK_THROWS_AS(mf->getScore(Datetime(20111204)), std::exception);
+    auto cross = mf->getScore(Datetime(20111205));
     CHECK_EQ(cross.size(), 2);
-    CHECK_EQ(cross[0].first, sm["sh600004"]);
-    CHECK_EQ(cross[0].second, doctest::Approx(6.85));
-    CHECK_EQ(cross[1].first, sm["sh600005"]);
-    CHECK_EQ(cross[1].second, doctest::Approx(3.13));
+    CHECK_EQ(cross[0].stock, sm["sh600004"]);
+    CHECK_EQ(cross[0].value, doctest::Approx(6.85));
+    CHECK_EQ(cross[1].stock, sm["sh600005"]);
+    CHECK_EQ(cross[1].value, doctest::Approx(3.13));
 
-    cross = mf->getCross(Datetime(20111206));
+    cross = mf->getScore(Datetime(20111206));
     CHECK_EQ(cross.size(), 2);
-    CHECK_EQ(cross[0].first, sm["sh600004"]);
-    CHECK_EQ(cross[0].second, doctest::Approx(6.855));
-    CHECK_EQ(cross[1].first, sm["sh600005"]);
-    CHECK_EQ(cross[1].second, doctest::Approx(3.14));
+    CHECK_EQ(cross[0].stock, sm["sh600004"]);
+    CHECK_EQ(cross[0].value, doctest::Approx(6.855));
+    CHECK_EQ(cross[1].stock, sm["sh600005"]);
+    CHECK_EQ(cross[1].value, doctest::Approx(3.14));
     // HKU_INFO("\n{}", mf->getAllCross());
 
     /** @arg 原始因子数量为3, 证券数量4, 数据长度为20, 指定比较收益率 3 日 */

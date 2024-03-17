@@ -24,6 +24,14 @@ public:
 };
 
 void export_MultiFactor(py::module& m) {
+    py::class_<ScoreRecord>(m, "ScoreRecord", "")
+      .def(py::init<>())
+      .def(py::init<const Stock&, ScoreRecord::value_t>())
+      .def("__str__", to_py_str<ScoreRecord>)
+      .def("__repr__", to_py_str<ScoreRecord>)
+      .def_readwrite("stock", &ScoreRecord::stock, "时间")
+      .def_readwrite("value", &ScoreRecord::value, "时间");
+
     size_t null_size = Null<size_t>();
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactor",
                                                                R"(市场环境判定策略基类
@@ -75,30 +83,13 @@ void export_MultiFactor(py::module& m) {
       .def("clone", &MultiFactorBase::clone)
 
       .def(
-        "get_cross",
+        "get_score",
         [](MultiFactorBase& self, const Datetime& date, size_t start, size_t end) {
-            py::list ret;
-            auto cross = self.getCross(date, start, end);
-            for (const auto& item : cross) {
-                ret.append(py::make_tuple(item.first, item.second));
-            }
-            return ret;
+            return self.getScore(date, start, end);
         },
         py::arg("date"), py::arg("start") = 0, py::arg("end") = null_size)
 
-      .def("get_all_cross",
-           [](MultiFactorBase& self) {
-               py::list ret;
-               auto all_cross = self.getAllCross();
-               for (const auto& one_day : all_cross) {
-                   py::list one;
-                   for (const auto& item : one_day) {
-                       one.append(py::make_tuple(item.first, item.second));
-                   }
-                   ret.append(std::move(one));
-               }
-               return ret;
-           })
+      .def("get_all_scores", &MultiFactorBase::getAllScores, py::return_value_policy::copy)
 
         DEF_PICKLE(MultiFactorPtr);
 
