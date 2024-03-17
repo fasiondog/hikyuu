@@ -109,7 +109,7 @@ bool SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
 bool SelectorBase::addStockList(const StockList& stkList, const SystemPtr& protoSys) {
     HKU_ERROR_IF_RETURN(!protoSys, false, "Try add Null protoSys, will be discard!");
     HKU_ERROR_IF_RETURN(!protoSys->getMM(), false, "protoSys has not MoneyManager!");
-    HKU_ERROR_IF_RETURN(!protoSys->getSG(), false, "protoSys has not Siganl!");
+    HKU_ERROR_IF_RETURN(!protoSys->getSG(), false, "protoSys has not Signal!");
     SYSPtr newProtoSys = protoSys->clone();
     // 复位清除之前的数据，避免因原有数据过多导致下面循环时速度过慢
     // 每个系统独立，不共享 tm

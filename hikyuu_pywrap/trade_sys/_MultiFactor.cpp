@@ -68,18 +68,7 @@ void export_MultiFactor(py::module& m) {
       .def("get_ref_indicators", &MultiFactorBase::getRefIndicators, py::return_value_policy::copy)
 
       .def("get_factor", &MultiFactorBase::getFactor, py::return_value_policy::copy)
-
-      .def("get_all_factors",
-           [](MultiFactorBase& self) {
-               // return vector_to_python_list<Indicator>()
-               auto factors = self.getAllFactors();
-               IndicatorList copy_factors;
-               copy_factors.reserve(factors.size());
-               for (const auto& factor : factors) {
-                   copy_factors.emplace_back(factor.clone());
-               }
-               return vector_to_python_list<Indicator>(copy_factors);
-           })
+      .def("get_all_factors", &MultiFactorBase::getAllFactors, py::return_value_policy::copy)
 
       .def("get_ic", &MultiFactorBase::getIC, py::arg("ndays") = 0)
       .def("get_icir", &MultiFactorBase::getICIR, py::arg("ir_n"), py::arg("ic_n") = 0)
