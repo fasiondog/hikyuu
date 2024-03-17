@@ -25,13 +25,13 @@ public:
         PYBIND11_OVERLOAD_PURE(void, SelectorBase, _calculate, );
     }
 
-    SystemList getSelectedOnOpen(Datetime date) override {
-        PYBIND11_OVERLOAD_PURE_NAME(SystemList, SelectorBase, "get_selected_on_open",
+    SystemWeightList getSelectedOnOpen(Datetime date) override {
+        PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected_on_open",
                                     getSelectedOnOpen, date);
     }
 
-    SystemList getSelectedOnClose(Datetime date) override {
-        PYBIND11_OVERLOAD_PURE_NAME(SystemList, SelectorBase, "get_selected_on_close",
+    SystemWeightList getSelectedOnClose(Datetime date) override {
+        PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected_on_close",
                                     getSelectedOnClose, date);
     }
 
@@ -41,6 +41,17 @@ public:
 };
 
 void export_Selector(py::module& m) {
+    py::class_<SystemWeight>(m, "SystemWeight",
+                             "系统权重系数结构，在资产分配时，指定对应系统的资产占比系数")
+      .def(py::init<>())
+      .def(py::init<const SystemPtr&, price_t>())
+      .def("__str__", to_py_str<SystemWeight>)
+      .def("__repr__", to_py_str<SystemWeight>)
+      .def_readwrite("sys", &SystemWeight::sys, "对应的 System 实例")
+      .def_readwrite("weight", &SystemWeight::weight)
+
+        DEF_PICKLE(SystemWeight);
+
     py::class_<SelectorBase, SEPtr, PySelectorBase>(
       m, "SelectorBase",
       R"(选择器策略基类，实现标的、系统策略的评估和选取算法，自定义选择器策略子类接口：
