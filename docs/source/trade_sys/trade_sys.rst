@@ -14,3 +14,4 @@
    money_manager
    profitgoal
    slippage
+   multifactor
