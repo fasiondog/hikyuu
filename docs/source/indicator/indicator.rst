@@ -761,6 +761,38 @@
     :rtype: Indicator
 
 
+.. py:function:: RECOVER_BACKWARD([data])
+
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行后向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator
+
+
+.. py:function:: RECOVER_FORWARD([data])
+
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行前向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator
+
+
+.. py:function:: RECOVER_EQUAL_BACKWARD([data])
+
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比后向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator
+
+
+.. py:function:: RECOVER_EQUAL_FORWARD([data])
+
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比前向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator
+
+
 .. py:function:: REVERSE([data])
 
     求相反数，REVERSE(X)返回-X

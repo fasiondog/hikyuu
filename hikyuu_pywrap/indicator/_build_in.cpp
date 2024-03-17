@@ -35,6 +35,22 @@ Indicator (*VOL3)() = VOL;
 Indicator (*KDATA_PART1)(const KData& kdata, const string& part) = KDATA_PART;
 Indicator (*KDATA_PART3)(const string& part) = KDATA_PART;
 
+Indicator (*RECOVER_FORWARD_1)() = RECOVER_FORWARD;
+Indicator (*RECOVER_FORWARD_2)(const Indicator&) = RECOVER_FORWARD;
+Indicator (*RECOVER_FORWARD_3)(const KData&) = RECOVER_FORWARD;
+
+Indicator (*RECOVER_BACKWARD_1)() = RECOVER_BACKWARD;
+Indicator (*RECOVER_BACKWARD_2)(const Indicator&) = RECOVER_BACKWARD;
+Indicator (*RECOVER_BACKWARD_3)(const KData&) = RECOVER_BACKWARD;
+
+Indicator (*RECOVER_EQUAL_FORWARD_1)() = RECOVER_EQUAL_FORWARD;
+Indicator (*RECOVER_EQUAL_FORWARD_2)(const Indicator&) = RECOVER_EQUAL_FORWARD;
+Indicator (*RECOVER_EQUAL_FORWARD_3)(const KData&) = RECOVER_EQUAL_FORWARD;
+
+Indicator (*RECOVER_EQUAL_BACKWARD_1)() = RECOVER_EQUAL_BACKWARD;
+Indicator (*RECOVER_EQUAL_BACKWARD_2)(const Indicator&) = RECOVER_EQUAL_BACKWARD;
+Indicator (*RECOVER_EQUAL_BACKWARD_3)(const KData&) = RECOVER_EQUAL_BACKWARD;
+
 Indicator (*DATE1)() = hku::DATE;
 Indicator (*DATE2)(const KData&) = hku::DATE;
 
@@ -539,6 +555,42 @@ void export_Indicator_build_in(py::module& m) {
 
     :param data: 输入数据（KData 或 Indicator） 
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
+    :rtype: Indicator)");
+
+    m.def("RECOVER_FORWARD", RECOVER_FORWARD_1);
+    m.def("RECOVER_FORWARD", RECOVER_FORWARD_2);
+    m.def("RECOVER_FORWARD", RECOVER_FORWARD_3, R"(RECOVER_FORWARD([data])
+    
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行前向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator)");
+
+    m.def("RECOVER_BACKWARD", RECOVER_BACKWARD_1);
+    m.def("RECOVER_BACKWARD", RECOVER_BACKWARD_2);
+    m.def("RECOVER_BACKWARD", RECOVER_BACKWARD_3, R"(RECOVER_BACKWARD([data])
+    
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行后向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator)");
+
+    m.def("RECOVER_EQUAL_FORWARD", RECOVER_EQUAL_FORWARD_1);
+    m.def("RECOVER_EQUAL_FORWARD", RECOVER_EQUAL_FORWARD_2);
+    m.def("RECOVER_EQUAL_FORWARD", RECOVER_EQUAL_FORWARD_3, R"(RECOVER_EQUAL_FORWARD([data])
+    
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比前向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator)");
+
+    m.def("RECOVER_EQUAL_BACKWARD", RECOVER_EQUAL_BACKWARD_1);
+    m.def("RECOVER_EQUAL_BACKWARD", RECOVER_EQUAL_BACKWARD_2);
+    m.def("RECOVER_EQUAL_BACKWARD", RECOVER_EQUAL_BACKWARD_3, R"(RECOVER_EQUAL_BACKWARD([data])
+    
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比后向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
     :rtype: Indicator)");
 
     m.def("DATE", DATE1);
