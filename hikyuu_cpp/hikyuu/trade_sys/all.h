@@ -19,5 +19,6 @@
 #include "system/build_in.h"
 #include "allocatefunds/build_in.h"
 #include "selector/build_in.h"
+#include "factor/build_in.h"
 
 #endif /* ALL_TRADE_SYS_H_ */

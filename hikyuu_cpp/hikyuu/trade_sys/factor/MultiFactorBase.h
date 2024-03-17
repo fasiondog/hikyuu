@@ -8,8 +8,7 @@
 #pragma once
 
 #include "hikyuu/KData.h"
-#include "hikyuu/indicator/Indicator.h"
-#include "hikyuu/utilities/Parameter.h"
+#include "ScoreRecord.h"
 
 namespace hku {
 
@@ -79,16 +78,15 @@ public:
     const IndicatorList& getAllFactors();
 
     /** 获取指定日期截面的所有因子值，已经降序排列 */
-    const vector<std::pair<Stock, value_t>>& getCross(const Datetime&);
+    const ScoreRecordList& getScore(const Datetime&);
 
-    vector<std::pair<Stock, value_t>> getCross(const Datetime& date, size_t start,
-                                               size_t end = Null<size_t>());
+    ScoreRecordList getScore(const Datetime& date, size_t start, size_t end = Null<size_t>());
 
     /** 获取所有截面数据，已按降序排列 */
-    const vector<vector<std::pair<Stock, value_t>>>& getAllCross();
+    const vector<ScoreRecordList>& getAllScores();
 
     /**
-     * 获取合成因子的IC
+     * 获取合成因子的IC, 长度与参考日期同
      * @note ndays 对于使用 IC/ICIR 加权的新因子，最好保持好 ic_n 一致，
      *       但对于等权计算的新因子，不一定非要使用 ic_n 计算。
      *       所以，ndays 增加了一个特殊值 0, 表示直接使用 ic_n 参数计算 IC
@@ -130,7 +128,7 @@ protected:
     unordered_map<Stock, size_t> m_stk_map;  // 证券->合成后因子位置索引
     IndicatorList m_all_factors;             // 保存所有证券合成后的新因子
     unordered_map<Datetime, size_t> m_date_index;
-    vector<vector<std::pair<Stock, value_t>>> m_stk_factor_by_date;
+    vector<ScoreRecordList> m_stk_factor_by_date;
     Indicator m_ic;
 
 private:
@@ -225,15 +223,6 @@ public:                                        \
 HKU_API std::ostream& operator<<(std::ostream&, const MultiFactorBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const MultiFactorPtr&);
 
-HKU_API std::ostream& operator<<(std::ostream& out,
-                                 const std::pair<Stock, MultiFactorBase::value_t>& td);
-
-HKU_API std::ostream& operator<<(std::ostream& out,
-                                 const vector<std::pair<Stock, MultiFactorBase::value_t>>& td);
-
-HKU_API std::ostream& operator<<(
-  std::ostream& out, const vector<vector<std::pair<Stock, MultiFactorBase::value_t>>>& td);
-
 }  // namespace hku
 
 #if FMT_VERSION >= 90000
@@ -242,16 +231,4 @@ struct fmt::formatter<hku::MultiFactorBase> : ostream_formatter {};
 
 template <>
 struct fmt::formatter<hku::MultiFactorPtr> : ostream_formatter {};
-
-template <>
-struct fmt::formatter<std::pair<hku::Stock, hku::MultiFactorBase::value_t>> : ostream_formatter {};
-
-template <>
-struct fmt::formatter<std::vector<std::pair<hku::Stock, hku::MultiFactorBase::value_t>>>
-: ostream_formatter {};
-
-template <>
-struct fmt::formatter<
-  std::vector<std::vector<std::pair<hku::Stock, hku::MultiFactorBase::value_t>>>>
-: ostream_formatter {};
 #endif
