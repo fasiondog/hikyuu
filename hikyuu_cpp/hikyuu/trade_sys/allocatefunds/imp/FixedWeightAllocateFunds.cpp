@@ -22,7 +22,7 @@ FixedWeightAllocateFunds::~FixedWeightAllocateFunds() {}
 SystemWeightList FixedWeightAllocateFunds ::_allocateWeight(const Datetime& date,
                                                             const SystemWeightList& se_list) {
     SystemWeightList result;
-    double weight = getParam<double>("weight");
+    price_t weight = getParam<double>("weight");
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
         result.emplace_back(iter->sys, weight);
     }
