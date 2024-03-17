@@ -11,6 +11,11 @@
 
 namespace hku {
 
+/**
+ * 复权类指标，可接收 CLOSE/OPEN/HIGH/LOW 指标，或 KData(默认使用 close) 作为输入参数
+ * @return Indicator
+ * @ingroup Indicator
+ */
 Indicator HKU_API RECOVER_FORWARD();
 Indicator HKU_API RECOVER_BACKWARD();
 Indicator HKU_API RECOVER_EQUAL_FORWARD();
