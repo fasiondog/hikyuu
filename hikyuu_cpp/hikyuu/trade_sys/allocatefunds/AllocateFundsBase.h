@@ -120,6 +120,9 @@ private:
     /* 回收系统资产 */
     bool _returnAssets(const SYSPtr& sys, const Datetime& date);
 
+    /* 检查分配的权重是否在 0 和 1 之间，如果存在错误，抛出异常，仅在 trace 时生效*/
+    void _check_weight(const SystemWeightList&);
+
 private:
     string m_name;      // 组件名称
     KQuery m_query;     // 查询条件

@@ -28,10 +28,14 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AFPtr& af) {
 
 AllocateFundsBase::AllocateFundsBase() : m_name("AllocateMoneyBase"), m_reserve_percent(0) {
     // 是否调整之前已经持仓策略的持仓。不调整时，仅使用总账户当前剩余资金进行分配，否则将使用总市值进行分配
+    // 注意：无论是否调整已持仓策略，权重比例都是相对于总资产，不是针对剩余现金余额
+    //  adjust_running_sys: True - 主动根据资产分配对已持仓策略进行增减仓
+    //  adjust_running_sys: False - 不会根据当前分配权重对已持仓策略进行强制加减仓
     setParam<bool>("adjust_running_sys", false);
     setParam<int>("max_sys_num", 1000000);             // 允许运行的最大系统实例数
     setParam<double>("weight_unit", 0.0001);           // 最小权重单位
     setParam<double>("default_reserve_percent", 0.0);  // 默认保留不参与重分配的资产比例
+    setParam<bool>("trace", false);                    // 打印跟踪
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name)
@@ -40,23 +44,25 @@ AllocateFundsBase::AllocateFundsBase(const string& name)
     setParam<int>("max_sys_num", 100000);              // 最大系统实例数
     setParam<double>("weight_unit", 0.0001);           // 最小权重单位
     setParam<double>("default_reserve_percent", 0.0);  // 默认保留不参与重分配的资产比例
+    setParam<bool>("trace", false);                    // 打印跟踪
 }
 
 AllocateFundsBase::~AllocateFundsBase() {}
 
 void AllocateFundsBase::reset() {
-    m_reserve_percent = getParam<double>("default_reserve_percent");
-    _reset();
-
     // 参数检查
-    HKU_ERROR_IF(getParam<int>("max_sys_num") <= 0, R"(AF param["max_sys_num"]({}) need > 0!)",
-                 getParam<int>("max_sys_num"));
-    HKU_ERROR_IF(
-      getParam<double>("default_reserve_percent") >= 1.0,
-      R"(AF param(default_reserve_percent)({}) >= 1.0, No asset adjustments will be made!)");
-    HKU_CHECK(getParam<double>("default_reserve_percent") >= 0.0,
-              R"(Invalid AF param["default_reserve_percent"] ({}))",
-              getParam<double>("default_reserve_percent"));
+    HKU_CHECK(getParam<int>("max_sys_num") > 0, R"(AF param["max_sys_num"]({}) need > 0!)",
+              getParam<int>("max_sys_num"));
+    HKU_CHECK(getParam<double>("weight_unit") > 0.0, R"(AF param[{}]) need > 0!)",
+              getParam<double>("weight_unit"));
+
+    double default_reserve_percent = getParam<double>("default_reserve_percent");
+    HKU_CHECK(default_reserve_percent >= 0.0 && default_reserve_percent < 1.0,
+              R"(AF param(default_reserve_percent)({}) >= 1.0, No asset adjustments will be made!)",
+              default_reserve_percent);
+
+    m_reserve_percent = default_reserve_percent;
+    _reset();
 }
 
 AFPtr AllocateFundsBase::clone() {
@@ -149,13 +155,25 @@ bool AllocateFundsBase::_returnAssets(const SYSPtr& sys, const Datetime& date) {
     return true;
 }
 
+void AllocateFundsBase::_check_weight(const SystemWeightList& sw_list) {
+    for (const auto& sw : sw_list) {
+        HKU_CHECK(!std::isnan(sw.weight) && sw.weight >= 0.0 && sw.weight <= 1.0,
+                  "Invalid weight ({}, {})", sw.sys->name(), sw.weight);
+    }
+}
+
 // 调整运行中子系统持仓
 void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemWeightList& se_list,
                                              const std::list<SYSPtr>& running_list,
                                              const SystemWeightList& ignore_list) {
+    bool trace = getParam<bool>("trace");
+
     // 计算当前选中系统列表的权重
     SystemWeightList sw_list = _allocateWeight(date, se_list);
     HKU_IF_RETURN(sw_list.size() == 0, void());
+    if (trace) {
+        _check_weight(sw_list);
+    }
 
     // 构建实际分配权重大于零的的系统集合，权重小于等于0的将被忽略
     std::unordered_set<System*> selected_sets;
@@ -392,9 +410,8 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
                                                 const std::list<SYSPtr>& running_list) {
     HKU_IF_RETURN(se_list.size() == 0, void());
 
-    // 如果运行中的系统数已大于等于允许的最大系统数，直接返回
-    int max_num = getParam<int>("max_sys_num");
-    HKU_IF_RETURN(running_list.size() >= max_num, void());
+    bool trace = getParam<bool>("trace");
+    HKU_INFO_IF(trace, "[AF] {} _adjust_without_running", date);
 
     // 计算选中系统中当前正在运行中的子系统
     std::unordered_set<System*> hold_sets;
@@ -413,6 +430,9 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
     // 获取计划分配的资产权重
     SystemWeightList sw_list = _allocateWeight(date, pure_se_list);
     HKU_IF_RETURN(sw_list.size() == 0, void());
+    if (trace) {
+        _check_weight(sw_list);
+    }
 
     // 按权重升序排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
     std::sort(
@@ -420,75 +440,101 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
       std::bind(std::less<double>(), std::bind(&SystemWeight::weight, std::placeholders::_1),
                 std::bind(&SystemWeight::weight, std::placeholders::_2)));
 
-    // 检测是否有信号发生，过滤掉没有发生信号的系统 以及 权重为 0 的系统
+    // 总账号资金精度
+    int precision = m_shadow_tm->getParam<int>("precision");
+
+    // 获取当前总资产市值，计算需保留的资产
+    price_t total_funds = _getTotalFunds(date, running_list);
+    HKU_ERROR_IF(m_reserve_percent < 0.0,
+                 "Invalid reserve_percent({}) in AF, Calculations that will cause errors!",
+                 m_reserve_percent);
+    price_t reserve_funds = roundDown(total_funds * m_reserve_percent, precision);
+
+    // 检测是否有信号发生，过滤掉：
+    //  1. 没有发生信号的系统
+    //  2. 权重小于等于 0 的系统
+    //  2. 累积权重>可分配的总权重之后的系统
+    price_t can_allocate_sum_weight = 1.0 - m_reserve_percent;
+    price_t sum_weight = 0.0;
     SystemWeightList new_sw_list;
     auto sw_iter = sw_list.rbegin();
     for (; sw_iter != sw_list.rend(); ++sw_iter) {
-        if (sw_iter->weight <= 0.0)
+        // 如果当前系统权重小于等于0 或者 累积权重以及大于等于1 终止循环
+        if (sw_iter->weight <= 0.0 || sum_weight >= can_allocate_sum_weight) {
             break;
+        }
+
         if (sw_iter->sys->getSG()->shouldBuy(date)) {
+            sum_weight += sw_iter->weight;
+            // 如果累积权重大于1，则调整最后的系统权重
+            if (sum_weight > can_allocate_sum_weight) {
+                sw_iter->weight = sum_weight - can_allocate_sum_weight;
+                sum_weight = can_allocate_sum_weight;
+            }
             new_sw_list.emplace_back(*sw_iter);
         }
     }
 
-    // 总账号资金精度
-    int precision = m_shadow_tm->getParam<int>("precision");
+    if (trace) {
+        for (auto iter = new_sw_list.begin(); iter != new_sw_list.end(); ++iter) {
+            HKU_INFO("[AF] ({}, {}, weight: {:<.4f}) ", iter->sys->name(),
+                     iter->sys->getStock().market_code(), iter->weight);
+        }
+    }
 
-    // 获取当前总资产市值
-    price_t total_funds = _getTotalFunds(date, running_list);
-
-    // 计算需保留的资产
-    HKU_ERROR_IF(m_reserve_percent < 0.0,
-                 "Invalid reserve_percent({}) in AF, Calculations that will cause errors!",
-                 m_reserve_percent);
-    price_t reserve_funds = total_funds * m_reserve_percent;
-
-    // 如果当前现金小于等于需保留的资产，则直接返回
-    HKU_IF_RETURN(m_shadow_tm->cash(date, m_query.kType()) <= reserve_funds, void());
-
-    // 计算可用于分配的现金
-    price_t can_allocate_cash =
-      roundDown(m_shadow_tm->cash(date, m_query.kType()) - reserve_funds, precision);
+    // 计算可用于分配的现金, 小于等于需保留的资产，则直接返回
+    price_t current_cash = m_shadow_tm->cash(date, m_query.kType());
+    price_t can_allocate_cash = roundDown(current_cash - reserve_funds, precision);
     if (can_allocate_cash <= 0.0) {
+        HKU_WARN_IF(
+          trace,
+          "Insufficient available cash! can_allocate_cash: {}, current_cash: {}, reserve_funds: {}",
+          can_allocate_cash, current_cash, reserve_funds);
         return;
     }
 
-    // 再次遍历选中子系统列表，并将剩余现金按权重比例转入子账户
     double weight_unit = getParam<double>("weight_unit");
-    price_t per_cash = total_funds * weight_unit;  // 每单位权重资金
+    // 根据账户精度微调总资产，尽可能消除由于四舍五入后导致的精度问题
+    total_funds = total_funds - std::pow(0.1, precision) * 0.5 * new_sw_list.size();
+
+    // 再次遍历选中子系统列表，并将剩余现金按权重比例转入子账户
+    int max_num = getParam<int>("max_sys_num");
     size_t can_run_count = 0;
-    for (auto sw_iter = new_sw_list.begin(), end_iter = new_sw_list.end(); sw_iter != end_iter;
-         ++sw_iter) {
+    for (auto iter = new_sw_list.begin(), end_iter = new_sw_list.end(); iter != end_iter; ++iter) {
         // 该系统期望分配的资金
-        price_t will_cash = roundUp(per_cash * (sw_iter->weight / weight_unit), precision);
+        price_t will_cash = roundUp(total_funds * iter->weight, precision);
         if (will_cash <= 0.0) {
             continue;
         }
 
-        // 计算实际可分配的资金
+        // 计算子账户实际可获取的的资金
         price_t need_cash = will_cash <= can_allocate_cash ? will_cash : can_allocate_cash;
 
-        // 检测是否可以发生交易，不能的话，忽略
-
-        auto krecord = sw_iter->sys->getTO().getKRecord(date);
-        if (krecord.closePrice < need_cash) {
-            continue;
-        }
-
         // 尝试从总账户中取出资金存入子账户
-        TMPtr sub_tm = sw_iter->sys->getTM();
+        TMPtr sub_tm = iter->sys->getTM();
         if (m_shadow_tm->checkout(date, need_cash)) {
             sub_tm->checkin(date, need_cash);
-            can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
-            if (can_allocate_cash <= 0.0) {
-                continue;
-            }
+            HKU_INFO_IF(trace, "[AF] {} fetched cash: {}", iter->sys->name(), need_cash);
 
             // 如果超出允许运行的最大系统数，跳出循环
             can_run_count++;
             if (can_run_count > max_num) {
                 break;
             }
+
+            // 计算剩余的可用于分配的资金，如果小于1，退出循环
+            // (不需要小于0，小于一个特定的值即可，这里用1)
+            can_allocate_cash = roundUp(can_allocate_cash - need_cash, precision);
+            if (can_allocate_cash <= 1.0) {
+                HKU_DEBUG_IF(trace,
+                             "[AF] {} could't fetch need cash {}, current can_allocate_cash: {}!",
+                             iter->sys->name(), need_cash, can_allocate_cash);
+                break;
+            }
+
+        } else {
+            HKU_DEBUG_IF(trace, "[AF] {} failed to fetch cash from total account!",
+                         iter->sys->name());
         }
     }
 }

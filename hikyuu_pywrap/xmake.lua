@@ -10,7 +10,7 @@ target("core")
     -- end
 
     -- add_options("stacktrace")
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time", "log_level")
 
     add_deps("hikyuu")
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "cpp-httplib")

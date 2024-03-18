@@ -144,7 +144,7 @@ bool Portfolio::_readyForRun() {
         // 为内部实际执行的系统创建初始资金为0的子账户
         sys->setTM(pro_tm->clone());
         sys->getTM()->name(fmt::format("TM_SUB{}", i));
-        sys->name(fmt::format("PF_Real_{}_{}", i, sys->name()));
+        sys->name(fmt::format("PF_Real_{}_{}_{}", i, sys->name(), sys->getStock().market_code()));
 
         HKU_CHECK(sys->readyForRun() && pro_sys->readyForRun(),
                   "Exist invalid system, it could not ready for run!");
@@ -164,26 +164,22 @@ void Portfolio::_runMoment(const Datetime& date) {
     // 当前日期小于账户建立日期，直接忽略
     HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
 
-    _runMomentOnOpen(date);
-    _runMomentOnClose(date);
+    bool trace = getParam<bool>("trace");
+    HKU_INFO_IF(trace, "{} ===========================================================", date);
+    HKU_INFO_IF(trace, "[PF] current running system size: {}", m_running_sys_list.size());
 
-    // 释放掉临时数据占用的内存
-    m_running_sys_set = std::unordered_set<System*>();
-    m_running_sys_list = std::list<SYSPtr>();
-    m_tmp_selected_list_on_open = SystemWeightList();
-    m_tmp_selected_list_on_close = SystemWeightList();
-    m_tmp_will_remove_sys = SystemWeightList();
-}
+    // 在开盘时执行上一周期中所有运行中的延迟交易系统系统
+    // 在不需要调整已持仓系统时，不需要执行，只要每天执行一次系统即可
+    // for (auto& sub_sys : m_running_sys_list) {
+    //     if (sub_sys->getParam<bool>("buy_delay")) {
+    //         auto tr = sub_sys->runMoment(date);
+    //         if (!tr.isNull()) {
+    //             HKU_INFO_IF(trace, "[PF] on open: {}", tr);
+    //             m_tm->addTradeRecord(tr);
+    //         }
+    //     }
+    // }
 
-void Portfolio::_runMomentOnOpen(const Datetime& date) {
-    // 从选股策略获取当前选中的系统列表
-    m_tmp_selected_list_on_open = m_se->getSelectedOnOpen(date);
-
-    // 资产分配算法调整各子系统资产分配，忽略上一周期收盘时选中的系统
-    m_af->adjustFunds(date, m_tmp_selected_list_on_open, m_running_sys_list,
-                      m_tmp_selected_list_on_close);
-
-    // 由于系统的交易指令可能被延迟执行，需要保存并判断
     // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则放入待移除列表
     m_tmp_will_remove_sys.clear();
     int precision = m_shadow_tm->getParam<int>("precision");
@@ -209,6 +205,42 @@ void Portfolio::_runMomentOnOpen(const Datetime& date) {
         m_running_sys_set.erase(sub_sys.sys.get());
     }
 
+    _runMomentOnOpen(date);
+    _runMomentOnClose(date);
+
+    // 收盘时执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
+    for (auto& sub_sys : m_running_sys_list) {
+        auto tr = sub_sys->runMoment(date);
+        if (!tr.isNull()) {
+            HKU_INFO_IF(trace, "[PF] on close: {}", tr);
+            m_tm->addTradeRecord(tr);
+        }
+    }
+
+    // 释放掉临时数据占用的内存
+    // m_running_sys_set = std::unordered_set<System*>();
+    // m_running_sys_list = std::list<SYSPtr>();
+    m_tmp_selected_list_on_open = SystemWeightList();
+    m_tmp_selected_list_on_close = SystemWeightList();
+    m_tmp_will_remove_sys = SystemWeightList();
+}
+
+void Portfolio::_runMomentOnOpen(const Datetime& date) {
+    // 从选股策略获取当前选中的系统列表
+    m_tmp_selected_list_on_open = m_se->getSelectedOnOpen(date);
+
+    bool trace = getParam<bool>("trace");
+    if (trace && !m_tmp_selected_list_on_open.empty()) {
+        for (auto& sys : m_tmp_selected_list_on_open) {
+            HKU_INFO("[PF] select on open: {}, score: {:<.4f}, cash: {}", sys.sys->name(),
+                     sys.weight, sys.sys->getTM()->cash(date, m_query.kType()));
+        }
+    }
+
+    // 资产分配算法调整各子系统资产分配，忽略上一周期收盘时选中的系统
+    m_af->adjustFunds(date, m_tmp_selected_list_on_open, m_running_sys_list,
+                      m_tmp_selected_list_on_close);
+
     // 遍历本次选择的系统列表，如果存在分配资金且不在运行中列表内，则加入运行列表
     for (auto& sub_sys : m_tmp_selected_list_on_open) {
         price_t cash = sub_sys.sys->getTM()->cash(date, m_query.kType());
@@ -217,37 +249,23 @@ void Portfolio::_runMomentOnOpen(const Datetime& date) {
             m_running_sys_set.insert(sub_sys.sys.get());
         }
     }
-
-    // 在开盘时执行所有运行中的非延迟交易系统系统
-    for (auto& sub_sys : m_running_sys_list) {
-        if (!sub_sys->getParam<bool>("buy_delay")) {
-            auto tr = sub_sys->runMoment(date);
-            if (!tr.isNull()) {
-                m_tm->addTradeRecord(tr);
-            }
-        }
-    }
 }
 
 void Portfolio::_runMomentOnClose(const Datetime& date) {
     // 从选股策略获取当前选中的系统列表
     m_tmp_selected_list_on_close = m_se->getSelectedOnClose(date);
 
+    bool trace = getParam<bool>("trace");
+    if (trace && !m_tmp_selected_list_on_close.empty()) {
+        for (auto& sys : m_tmp_selected_list_on_close) {
+            HKU_INFO("[PF] select on close: {}, score: {:<.4f}, cash: {}", sys.sys->name(),
+                     sys.weight, sys.sys->getTM()->cash(date, m_query.kType()));
+        }
+    }
+
     // 资产分配算法调整各子系统资产分配，忽略开盘时选中的系统
     m_af->adjustFunds(date, m_tmp_selected_list_on_close, m_running_sys_list,
                       m_tmp_selected_list_on_open);
-    if (getParam<bool>("trace") &&
-        (!m_tmp_selected_list_on_open.empty() || !m_tmp_selected_list_on_close.empty())) {
-        HKU_INFO("{} ===========================================================", date);
-        for (auto& sys : m_tmp_selected_list_on_open) {
-            HKU_INFO("select on open: {}, cash: {}", sys.sys->getTO().getStock(),
-                     sys.sys->getTM()->cash(date, m_query.kType()));
-        }
-        for (auto& sys : m_tmp_selected_list_on_close) {
-            HKU_INFO("select on close: {}, cash: {}", sys.sys->getTO().getStock(),
-                     sys.sys->getTM()->cash(date, m_query.kType()));
-        }
-    }
 
     // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统，并执行
     for (auto& sys : m_tmp_selected_list_on_close) {
@@ -256,16 +274,6 @@ void Portfolio::_runMomentOnClose(const Datetime& date) {
             if (tm->cash(date, m_query.kType()) > 0.0) {
                 m_running_sys_list.push_back(sys.sys);
                 m_running_sys_set.insert(sys.sys.get());
-            }
-        }
-    }
-
-    // 执行所有非延迟运行中系统
-    for (auto& sub_sys : m_running_sys_list) {
-        if (sub_sys->getParam<bool>("buy_delay")) {
-            auto tr = sub_sys->runMoment(date);
-            if (!tr.isNull()) {
-                m_tm->addTradeRecord(tr);
             }
         }
     }

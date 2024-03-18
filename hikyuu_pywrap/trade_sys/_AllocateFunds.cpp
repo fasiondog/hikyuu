@@ -50,6 +50,8 @@ void export_AllocateFunds(py::module& m) {
       .def_property("query", py::overload_cast<>(&AllocateFundsBase::getQuery, py::const_),
                     py::overload_cast<const KQuery&>(&AllocateFundsBase::setQuery),
                     py::return_value_policy::copy, "设置或获取查询条件")
+      .def_property_readonly("tm", py::overload_cast<>(&AllocateFundsBase::getTM, py::const_),
+                             py::return_value_policy::copy)
 
       .def("get_param", &AllocateFundsBase::getParam<boost::any>, R"(get_param(self, name)
 
