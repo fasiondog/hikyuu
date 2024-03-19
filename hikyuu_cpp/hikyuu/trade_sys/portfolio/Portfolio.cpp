@@ -251,18 +251,21 @@ void Portfolio::_runMoment(const Datetime& date) {
             min_cash = krecord.openPrice * stock.minTradeNumber();
         }
 
-        // 已没有持仓且没有现金（一手都买不起），则放入待移除列表
-        if (position.number == 0 && cash <= min_cash) {
-            if (cash != 0) {
-                sub_tm->checkout(date, cash);
-                m_shadow_tm->checkin(date, cash);
+        // 如果系统的剩余资金小于交易一手的资金，则回收资金
+        if (cash != 0 && cash <= min_cash) {
+            sub_tm->checkout(date, cash);
+            m_shadow_tm->checkin(date, cash);
+            HKU_INFO_IF(trace, "Collect the scraps cash ({:<.2f}) from {}", cash,
+                        running_sys->name());
+            if (position.number == 0) {
+                m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
             }
-            m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
         }
     }
 
     // 依据待移除列表将系统从运行中系统列表里删除
     for (auto& sub_sys : m_tmp_will_remove_sys) {
+        HKU_INFO_IF(trace, "Recycling system {}", sub_sys.sys->name());
         m_running_sys_set.erase(sub_sys.sys);
     }
 
