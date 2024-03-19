@@ -20,7 +20,9 @@ FixedWeightAllocateFunds::FixedWeightAllocateFunds() : AllocateFundsBase("AF_Fix
 FixedWeightAllocateFunds::~FixedWeightAllocateFunds() {}
 
 SystemWeightList FixedWeightAllocateFunds ::_allocateWeight(const Datetime& date,
-                                                            const SystemWeightList& se_list) {
+                                                            const SystemWeightList& se_list,
+                                                            size_t running_count,
+                                                            double can_allocate_weight) {
     SystemWeightList result;
     price_t weight = getParam<double>("weight");
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {

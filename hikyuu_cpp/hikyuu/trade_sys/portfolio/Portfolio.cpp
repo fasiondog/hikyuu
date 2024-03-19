@@ -59,9 +59,8 @@ void Portfolio::reset() {
     m_pro_sys_list.clear();
     m_real_sys_list.clear();
     m_running_sys_set.clear();
-    m_running_sys_list.clear();
-    m_tmp_selected_list_on_open.clear();
-    m_tmp_selected_list_on_close.clear();
+    m_delay_adjust_sys_list.clear();
+    m_tmp_selected_list.clear();
     m_tmp_will_remove_sys.clear();
     if (m_tm)
         m_tm->reset();
@@ -160,125 +159,6 @@ bool Portfolio::_readyForRun() {
     return true;
 }
 
-void Portfolio::_runMoment(const Datetime& date) {
-    // 当前日期小于账户建立日期，直接忽略
-    HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
-
-    bool trace = getParam<bool>("trace");
-    HKU_INFO_IF(trace, "{} ===========================================================", date);
-    HKU_INFO_IF(trace, "[PF] current running system size: {}", m_running_sys_list.size());
-
-    // 在开盘时执行上一周期中所有运行中的延迟交易系统系统
-    // 在不需要调整已持仓系统时，不需要执行，只要每天执行一次系统即可
-    // for (auto& sub_sys : m_running_sys_list) {
-    //     if (sub_sys->getParam<bool>("buy_delay")) {
-    //         auto tr = sub_sys->runMoment(date);
-    //         if (!tr.isNull()) {
-    //             HKU_INFO_IF(trace, "[PF] on open: {}", tr);
-    //             m_tm->addTradeRecord(tr);
-    //         }
-    //     }
-    // }
-
-    // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则放入待移除列表
-    m_tmp_will_remove_sys.clear();
-    int precision = m_shadow_tm->getParam<int>("precision");
-    for (auto& running_sys : m_running_sys_list) {
-        Stock stock = running_sys->getStock();
-        TMPtr sub_tm = running_sys->getTM();
-        PositionRecord position = sub_tm->getPosition(date, stock);
-        price_t cash = sub_tm->cash(date, m_query.kType());
-
-        // 已没有持仓且没有现金，则放入待移除列表
-        if (position.number == 0 && cash <= precision) {
-            if (cash != 0) {
-                sub_tm->checkout(date, cash);
-                m_shadow_tm->checkin(date, cash);
-            }
-            m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
-        }
-    }
-
-    // 依据待移除列表将系统从运行中系统列表里删除
-    for (auto& sub_sys : m_tmp_will_remove_sys) {
-        m_running_sys_list.remove(sub_sys.sys);
-        m_running_sys_set.erase(sub_sys.sys.get());
-    }
-
-    _runMomentOnOpen(date);
-    _runMomentOnClose(date);
-
-    // 收盘时执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
-    for (auto& sub_sys : m_running_sys_list) {
-        auto tr = sub_sys->runMoment(date);
-        if (!tr.isNull()) {
-            HKU_INFO_IF(trace, "[PF] on close: {}", tr);
-            m_tm->addTradeRecord(tr);
-        }
-    }
-
-    // 释放掉临时数据占用的内存
-    // m_running_sys_set = std::unordered_set<System*>();
-    // m_running_sys_list = std::list<SYSPtr>();
-    m_tmp_selected_list_on_open = SystemWeightList();
-    m_tmp_selected_list_on_close = SystemWeightList();
-    m_tmp_will_remove_sys = SystemWeightList();
-}
-
-void Portfolio::_runMomentOnOpen(const Datetime& date) {
-    // 从选股策略获取当前选中的系统列表
-    m_tmp_selected_list_on_open = m_se->getSelectedOnOpen(date);
-
-    bool trace = getParam<bool>("trace");
-    if (trace && !m_tmp_selected_list_on_open.empty()) {
-        for (auto& sys : m_tmp_selected_list_on_open) {
-            HKU_INFO("[PF] select on open: {}, score: {:<.4f}, cash: {}", sys.sys->name(),
-                     sys.weight, sys.sys->getTM()->cash(date, m_query.kType()));
-        }
-    }
-
-    // 资产分配算法调整各子系统资产分配，忽略上一周期收盘时选中的系统
-    m_af->adjustFunds(date, m_tmp_selected_list_on_open, m_running_sys_list,
-                      m_tmp_selected_list_on_close);
-
-    // 遍历本次选择的系统列表，如果存在分配资金且不在运行中列表内，则加入运行列表
-    for (auto& sub_sys : m_tmp_selected_list_on_open) {
-        price_t cash = sub_sys.sys->getTM()->cash(date, m_query.kType());
-        if (cash > 0.0 && m_running_sys_set.find(sub_sys.sys.get()) == m_running_sys_set.end()) {
-            m_running_sys_list.push_back(sub_sys.sys);
-            m_running_sys_set.insert(sub_sys.sys.get());
-        }
-    }
-}
-
-void Portfolio::_runMomentOnClose(const Datetime& date) {
-    // 从选股策略获取当前选中的系统列表
-    m_tmp_selected_list_on_close = m_se->getSelectedOnClose(date);
-
-    bool trace = getParam<bool>("trace");
-    if (trace && !m_tmp_selected_list_on_close.empty()) {
-        for (auto& sys : m_tmp_selected_list_on_close) {
-            HKU_INFO("[PF] select on close: {}, score: {:<.4f}, cash: {}", sys.sys->name(),
-                     sys.weight, sys.sys->getTM()->cash(date, m_query.kType()));
-        }
-    }
-
-    // 资产分配算法调整各子系统资产分配，忽略开盘时选中的系统
-    m_af->adjustFunds(date, m_tmp_selected_list_on_close, m_running_sys_list,
-                      m_tmp_selected_list_on_open);
-
-    // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统，并执行
-    for (auto& sys : m_tmp_selected_list_on_close) {
-        if (m_running_sys_set.find(sys.sys.get()) == m_running_sys_set.end()) {
-            TMPtr tm = sys.sys->getTM();
-            if (tm->cash(date, m_query.kType()) > 0.0) {
-                m_running_sys_list.push_back(sys.sys);
-                m_running_sys_set.insert(sys.sys.get());
-            }
-        }
-    }
-}
-
 void Portfolio::run(const KQuery& query, bool force) {
     setQuery(query);
     if (force) {
@@ -294,6 +174,132 @@ void Portfolio::run(const KQuery& query, bool force) {
         _runMoment(date);
     }
     m_need_calculate = false;
+
+    // 释放掉临时数据占用的内存
+    m_tmp_selected_list = SystemWeightList();
+    m_tmp_will_remove_sys = SystemWeightList();
+}
+
+void Portfolio::_runMoment(const Datetime& date) {
+    // 当前日期小于账户建立日期，直接忽略
+    HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
+
+    bool trace = getParam<bool>("trace");
+    HKU_INFO_IF(trace, "{} ===========================================================", date);
+    HKU_INFO_IF(trace, "[PF] current running system size: {}", m_running_sys_set.size());
+
+    //---------------------------------------------------
+    // 开盘前处理
+    //---------------------------------------------------
+    int precision = m_tm->getParam<int>("precision");
+
+    // 更新所有运行中系统的权息
+    price_t sum_cash = 0.0;
+    for (auto& running_sys : m_running_sys_set) {
+        TMPtr sub_tm = running_sys->getTM();
+        sub_tm->updateWithWeight(date);
+        sum_cash += sub_tm->currentCash();
+    }
+
+    // 开盘前，调整账户权息，并进行轧差处理
+    m_tm->updateWithWeight(date);
+
+    HKU_INFO_IF(trace, "The sum cash of sub_tm: {}, cash tm: {}, tm cash: {}", sum_cash,
+                m_shadow_tm->currentCash(), m_tm->currentCash());
+    sum_cash += m_shadow_tm->currentCash();
+
+    price_t limit = m_tm->currentCash() * precision;
+    price_t diff = roundEx(std::abs(m_tm->currentCash() - sum_cash), precision);
+    if (diff > limit) {
+        if (m_tm->currentCash() > sum_cash) {
+            m_shadow_tm->checkin(date, diff);
+        } else if (m_tm->currentCash() < sum_cash) {
+            if (!m_shadow_tm->checkout(date, diff)) {
+                m_tm->checkin(date, diff);
+            }
+        }
+        HKU_INFO_IF(trace, "After compensate: the sum cash of sub_tm: {}, cash tm: {}, tm cash: {}",
+                    sum_cash, m_shadow_tm->currentCash(), m_tm->currentCash());
+    }
+
+    // 处理需延迟调仓卖出的系统，在开盘时先卖出调整
+    for (auto& sys : m_delay_adjust_sys_list) {
+        auto tr = sys.sys->sellForce(date, sys.weight, PART_PORTFOLIO);
+        if (!tr.isNull()) {
+            m_tm->addTradeRecord(tr);
+
+            // 卖出后，尝试将资金取出转移至影子总账户
+            TMPtr sub_tm = sys.sys->getTM();
+            auto sub_cash = sub_tm->currentCash();
+            if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
+                m_shadow_tm->checkin(date, sub_cash);
+            }
+        }
+    }
+
+    // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则放入待移除列表
+    m_tmp_will_remove_sys.clear();
+    for (auto& running_sys : m_running_sys_set) {
+        Stock stock = running_sys->getStock();
+        TMPtr sub_tm = running_sys->getTM();
+        PositionRecord position = sub_tm->getPosition(date, stock);
+        price_t cash = sub_tm->currentCash();
+
+        price_t min_cash = 1.0;
+        KRecord krecord = stock.getKRecord(date);
+        if (krecord.isValid()) {
+            min_cash = krecord.openPrice * stock.minTradeNumber();
+        }
+
+        // 已没有持仓且没有现金（一手都买不起），则放入待移除列表
+        if (position.number == 0 && cash <= min_cash) {
+            if (cash != 0) {
+                sub_tm->checkout(date, cash);
+                m_shadow_tm->checkin(date, cash);
+            }
+            m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
+        }
+    }
+
+    // 依据待移除列表将系统从运行中系统列表里删除
+    for (auto& sub_sys : m_tmp_will_remove_sys) {
+        m_running_sys_set.erase(sub_sys.sys);
+    }
+
+    //---------------------------------------------------
+    // 收盘时处理
+    //---------------------------------------------------
+
+    // 从选股策略获取选中的系统列表
+    m_tmp_selected_list = m_se->getSelectedOnClose(date);
+
+    if (trace && !m_tmp_selected_list.empty()) {
+        for (auto& sys : m_tmp_selected_list) {
+            HKU_INFO("[PF] select: {}, score: {:<.4f}, cash: {}", sys.sys->name(), sys.weight,
+                     sys.sys->getTM()->cash(date, m_query.kType()));
+        }
+    }
+
+    // 资产分配算法调整各子系统资产分配
+    m_delay_adjust_sys_list = m_af->adjustFunds(date, m_tmp_selected_list, m_running_sys_set);
+
+    // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统，并执行
+    for (auto& sys : m_tmp_selected_list) {
+        if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
+            if (sys.sys->getTM()->cash(date, m_query.kType()) > 0.0) {
+                m_running_sys_set.insert(sys.sys);
+            }
+        }
+    }
+
+    // 收盘时执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
+    for (auto& sub_sys : m_running_sys_set) {
+        auto tr = sub_sys->runMoment(date);
+        if (!tr.isNull()) {
+            HKU_INFO_IF(trace, "[PF] on close: {}", tr);
+            m_tm->addTradeRecord(tr);
+        }
+    }
 }
 
 } /* namespace hku */

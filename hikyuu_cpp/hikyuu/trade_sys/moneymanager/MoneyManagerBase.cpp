@@ -112,7 +112,8 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
     double min_trade = stock.minTradeNumber();
 
     if (n < min_trade) {
-        HKU_TRACE("Ignore! Is less than the minimum number of transactions({})", min_trade);
+        HKU_TRACE("Ignore! Is less than the minimum number of transactions({}<{}) {}", n, min_trade,
+                  stock.market_code());
         return 0;
     }
 

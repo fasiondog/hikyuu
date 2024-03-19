@@ -710,6 +710,40 @@ TradeRecord System::sellForce(const KRecord& today, const KRecord& src_today, do
     }
 }
 
+TradeRecord System::sellForce(const Datetime& date, double num, Part from) {
+    HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
+
+    TradeRecord record;
+    size_t pos = m_kdata.getPos(date);
+    HKU_IF_RETURN(pos == Null<size_t>(), record);
+
+    const auto& krecord = m_kdata.getKRecord(pos);
+    const auto& src_krecord =
+      m_stock.getKRecord(m_kdata.startPos() + pos, m_kdata.getQuery().kType());
+
+    PositionRecord position = m_tm->getPosition(date, m_stock);
+    price_t realPrice = _getRealSellPrice(krecord.datetime, src_krecord.openPrice);
+
+    double min_num = m_stock.minTradeNumber();
+    double real_sell_num = num;
+    if (real_sell_num >= position.number) {
+        real_sell_num = position.number;
+    } else if (min_num > 1) {
+        real_sell_num = static_cast<int64_t>(num / min_num) * min_num;
+    }
+    // double real_sell_num = min_num > 1 ? static_cast<int64_t>(num / min_num) * min_num : num;
+    // if ((position.number - real_sell_num) <= min_num) {
+    //     real_sell_num = position.number;
+    // }
+
+    // 以开盘价卖出
+    record = m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss,
+                        position.goalPrice, src_krecord.openPrice, from);
+    m_trade_list.push_back(record);
+    _sellNotifyAll(record);
+    return record;
+}
+
 TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part from) {
     TradeRecord result;
     if (getParam<bool>("sell_delay")) {

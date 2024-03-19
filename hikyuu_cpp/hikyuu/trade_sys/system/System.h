@@ -214,6 +214,9 @@ public:
     // 强制卖出，用于资金分配管理器和资产组合指示系统进行强制卖出操作
     TradeRecord sellForce(const KRecord& today, const KRecord& src_today, double num, Part from);
 
+    // Portfolio 指示开盘时立即进行强制卖出，以便对 buy_delay 的系统进行资金调整
+    TradeRecord sellForce(const Datetime& date, double num, Part from);
+
 private:
     bool _environmentIsValid(const Datetime& datetime);
     bool _conditionIsValid(const Datetime& datetime);

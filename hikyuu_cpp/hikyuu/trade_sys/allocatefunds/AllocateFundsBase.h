@@ -42,15 +42,15 @@ public:
     void name(const string& name);
 
     /**
-     * 执行资产分配调整
+     * 执行资产分配调整，仅供 PF 调用
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
      * @param running_list 当前运行中的系统实例
      * @param ignore_list 忽略不进行调仓的运行中系统
-     * @return
+     * @return 需延迟执行卖出操作的系统列表，其中权重为相应需卖出的数量
      */
-    void adjustFunds(const Datetime& date, const SystemWeightList& se_list,
-                     const std::list<SYSPtr>& running_list, const SystemWeightList& ignore_list);
+    SystemWeightList adjustFunds(const Datetime& date, const SystemWeightList& se_list,
+                                 const std::unordered_set<SYSPtr>& running_list);
 
     /** 获取交易账户 */
     const TMPtr& getTM() const;
@@ -101,24 +101,17 @@ public:
      * @param se_list 系统实例选择器选出的系统实例
      * @return
      */
-    virtual SystemWeightList _allocateWeight(const Datetime& date,
-                                             const SystemWeightList& se_list) = 0;
+    virtual SystemWeightList _allocateWeight(const Datetime& date, const SystemWeightList& se_list,
+                                             size_t running_count, double can_allocate_weight) = 0;
 
 private:
     /* 同时调整已运行中的子系统（已分配资金或已持仓） */
-    void _adjust_with_running(const Datetime& date, const SystemWeightList& se_list,
-                              const std::list<SYSPtr>& running_list,
-                              const SystemWeightList& ignore_list);
+    SystemWeightList _adjust_with_running(const Datetime& date, const SystemWeightList& se_list,
+                                          const std::unordered_set<SYSPtr>& running_list);
 
     /* 不调整已在运行中的子系统 */
     void _adjust_without_running(const Datetime& date, const SystemWeightList& se_list,
-                                 const std::list<SYSPtr>& running_list);
-
-    /* 计算当前的资产总值 */
-    price_t _getTotalFunds(const Datetime& date, const std::list<SYSPtr>& running_list);
-
-    /* 回收系统资产 */
-    bool _returnAssets(const SYSPtr& sys, const Datetime& date);
+                                 const std::unordered_set<SYSPtr>& running_list);
 
     /* 检查分配的权重是否在 0 和 1 之间，如果存在错误，抛出异常，仅在 trace 时生效*/
     void _check_weight(const SystemWeightList&);
@@ -187,12 +180,14 @@ private:                                                            \
 #define ALLOCATEFUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define ALLOCATEFUNDS_IMP(classname)   \
-public:                                \
-    virtual AFPtr _clone() override {  \
-        return AFPtr(new classname()); \
-    }                                  \
-    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemWeightList&) override;
+#define ALLOCATEFUNDS_IMP(classname)                                                           \
+public:                                                                                        \
+    virtual AFPtr _clone() override {                                                          \
+        return AFPtr(new classname());                                                         \
+    }                                                                                          \
+    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemWeightList&,         \
+                                             size_t running_count, double can_allocate_weight) \
+      override;
 
 typedef shared_ptr<AllocateFundsBase> AllocateFundsPtr;
 typedef shared_ptr<AllocateFundsBase> AFPtr;

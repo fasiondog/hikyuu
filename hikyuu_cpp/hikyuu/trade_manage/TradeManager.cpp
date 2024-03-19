@@ -1831,7 +1831,8 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
 
     HKU_WARN_IF_RETURN(m_cash < roundEx(money + tr.cost.total, precision), false,
-                       "Don't have enough money!");
+                       "Don't have enough money! {} < {}, {}", m_cash,
+                       roundEx(money + tr.cost.total, precision), tr);
 
     m_cash = roundEx(m_cash - money - tr.cost.total, precision);
     new_tr.cash = m_cash;
