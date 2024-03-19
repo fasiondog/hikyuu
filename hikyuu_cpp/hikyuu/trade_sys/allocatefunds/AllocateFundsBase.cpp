@@ -163,37 +163,6 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
       std::bind(std::less<double>(), std::bind(&SystemWeight::weight, std::placeholders::_1),
                 std::bind(&SystemWeight::weight, std::placeholders::_2)));
 
-    // 检测是否有信号发生，过滤掉：
-    //  1. 没有发生信号的系统
-    //  2. 权重小于等于 0 的系统
-    //  2. 累积权重>可分配的总权重之后的系统
-    // price_t can_allocate_sum_weight = 1.0 - m_reserve_percent;
-    // price_t sum_weight = 0.0;
-    // SystemWeightList new_sw_list;
-    // for (auto sw_iter = sw_list.rbegin(); sw_iter != sw_list.rend(); ++sw_iter) {
-    //     // 如果当前系统权重小于等于0 或者 累积权重以及大于等于1 终止循环
-    //     if (sw_iter->weight <= 0.0 || sum_weight >= can_allocate_sum_weight) {
-    //         break;
-    //     }
-
-    //     if (sw_iter->sys->getSG()->shouldBuy(date)) {
-    //         sum_weight += sw_iter->weight;
-    //         // 如果累积权重大于1，则调整最后的系统权重
-    //         if (sum_weight > can_allocate_sum_weight) {
-    //             sw_iter->weight = sum_weight - can_allocate_sum_weight;
-    //             sum_weight = can_allocate_sum_weight;
-    //         }
-    //         new_sw_list.emplace_back(*sw_iter);
-    //     }
-    // }
-
-    // if (trace) {
-    //     for (auto iter = new_sw_list.begin(); iter != new_sw_list.end(); ++iter) {
-    //         HKU_INFO("[AF] ({}, {}, weight: {:<.4f}) ", iter->sys->name(),
-    //                  iter->sys->getStock().market_code(), iter->weight);
-    //     }
-    // }
-
     // 计算可用于分配的现金, 小于等于需保留的资产，则直接返回
     price_t current_cash = m_shadow_tm->cash(date, m_query.kType());
     price_t can_allocate_cash = roundDown(current_cash - reserve_funds, precision);
@@ -213,8 +182,6 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
     size_t can_run_count = 0;
     price_t can_allocate_sum_weight = 1.0 - m_reserve_percent;
     price_t sum_weight = 0.0;
-    // for (auto iter = new_sw_list.begin(), end_iter = new_sw_list.end(); iter != end_iter; ++iter)
-    // {
     for (auto iter = sw_list.begin(), end_iter = sw_list.end(); iter != end_iter; ++iter) {
         if (iter->weight <= 0.0 || sum_weight >= can_allocate_weight || can_run_count >= max_num) {
             break;
@@ -246,7 +213,6 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
             sub_tm->checkin(date, need_cash);
             HKU_INFO_IF(trace, "[AF] ({}, {}, weight: {:<.4f}) fetched cash: {}", iter->sys->name(),
                         iter->sys->getStock().market_code(), iter->weight, need_cash);
-            // HKU_INFO_IF(trace, "[AF] {} fetched cash: {}", iter->sys->name(), need_cash);
 
             // 当前累积权重
             sum_weight += iter->weight;
