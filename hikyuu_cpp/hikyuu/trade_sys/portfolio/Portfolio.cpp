@@ -271,7 +271,7 @@ void Portfolio::_runMoment(const Datetime& date) {
     //---------------------------------------------------
 
     // 从选股策略获取选中的系统列表
-    m_tmp_selected_list = m_se->getSelectedOnClose(date);
+    m_tmp_selected_list = m_se->getSelected(date);
 
     if (trace && !m_tmp_selected_list.empty()) {
         for (auto& sys : m_tmp_selected_list) {

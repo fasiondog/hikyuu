@@ -97,11 +97,8 @@ public:
     /** 子类计算接口 */
     virtual void _calculate() = 0;
 
-    /** 子类获取指定时刻开盘时选中的标的 */
-    virtual SystemWeightList getSelectedOnOpen(Datetime date) = 0;
-
     /** 子类获取指定时刻收盘时选中的标的 */
-    virtual SystemWeightList getSelectedOnClose(Datetime date) = 0;
+    virtual SystemWeightList getSelected(Datetime date) = 0;
 
     virtual bool isMatchAF(const AFPtr& af) = 0;
 
@@ -167,14 +164,13 @@ private:                                                       \
 #define SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define SELECTOR_IMP(classname)                                          \
-public:                                                                  \
-    virtual SelectorPtr _clone() override {                              \
-        return SelectorPtr(new classname());                             \
-    }                                                                    \
-    virtual SystemWeightList getSelectedOnOpen(Datetime date) override;  \
-    virtual SystemWeightList getSelectedOnClose(Datetime date) override; \
-    virtual bool isMatchAF(const AFPtr& af) override;                    \
+#define SELECTOR_IMP(classname)                                   \
+public:                                                           \
+    virtual SelectorPtr _clone() override {                       \
+        return SelectorPtr(new classname());                      \
+    }                                                             \
+    virtual SystemWeightList getSelected(Datetime date) override; \
+    virtual bool isMatchAF(const AFPtr& af) override;             \
     virtual void _calculate() override;
 
 /**

@@ -25,14 +25,9 @@ public:
         PYBIND11_OVERLOAD_PURE(void, SelectorBase, _calculate, );
     }
 
-    SystemWeightList getSelectedOnOpen(Datetime date) override {
-        PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected_on_open",
-                                    getSelectedOnOpen, date);
-    }
-
-    SystemWeightList getSelectedOnClose(Datetime date) override {
-        PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected_on_close",
-                                    getSelectedOnClose, date);
+    SystemWeightList getSelected(Datetime date) override {
+        PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected", getSelected,
+                                    date);
     }
 
     bool isMatchAF(const AFPtr& af) override {
@@ -129,19 +124,10 @@ void export_Selector(py::module& m) {
 
     :param AllocateFundsBase af: 资产分配算法)")
 
-      .def("get_selected_on_open", &SelectorBase::getSelectedOnOpen,
-           R"(get_selected_on_open(self, datetime)
+      .def("get_selected", &SelectorBase::getSelected,
+           R"(get_selected(self, datetime)
 
-    【重载接口】获取指定时刻开盘时选取的系统实例
-
-    :param Datetime datetime: 指定时刻
-    :return: 选取的系统实例列表
-    :rtype: SystemList)")
-
-      .def("get_selected_on_close", &SelectorBase::getSelectedOnClose,
-           R"(get_selected_on_close(self, datetime)
-
-    【重载接口】获取指定时刻收盘时选取的系统实例
+    【重载接口】获取指定时刻选取的系统实例
 
     :param Datetime datetime: 指定时刻
     :return: 选取的系统实例列表

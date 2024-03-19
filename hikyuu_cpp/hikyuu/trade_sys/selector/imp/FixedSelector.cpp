@@ -21,22 +21,10 @@ bool FixedSelector::isMatchAF(const AFPtr& af) {
     return true;
 }
 
-SystemWeightList FixedSelector::getSelectedOnOpen(Datetime date) {
+SystemWeightList FixedSelector::getSelected(Datetime date) {
     SystemWeightList result;
     for (auto& sys : m_real_sys_list) {
-        if (!sys->getParam<bool>("buy_delay")) {
-            result.emplace_back(sys, 1.0);
-        }
-    }
-    return result;
-}
-
-SystemWeightList FixedSelector::getSelectedOnClose(Datetime date) {
-    SystemWeightList result;
-    for (auto& sys : m_real_sys_list) {
-        if (sys->getParam<bool>("buy_delay")) {
-            result.emplace_back(sys, 1.0);
-        }
+        result.emplace_back(sys, 1.0);
     }
     return result;
 }
