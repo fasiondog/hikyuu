@@ -57,7 +57,8 @@ void export_Portfolio(py::module& m) {
       .def("reset", &Portfolio::reset, "复位操作")
       .def("clone", &Portfolio::clone, "克隆操作")
 
-      .def("run", &Portfolio::run, py::arg("query"), py::arg("force") = false, R"(run(self, query)
+      .def("run", &Portfolio::run, py::arg("query"), py::arg("force") = false,
+           R"(run(self, query, force)
     
     运行投资组合策略。在查询条件及各组件没有变化时，PF在第二次执行时，默认不会实际进行计算。
     但由于各个组件的参数可能改变，此种情况无法自动判断是否需要重计算，可以手工指定进行强制计算。
