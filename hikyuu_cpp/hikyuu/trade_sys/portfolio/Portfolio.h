@@ -55,7 +55,7 @@ public:
      * @param query 查询条件
      * @param force 是否强制重计算
      */
-    void run(const KQuery& query, bool force = false);
+    void run(const KQuery& query, int adjust_cycle = 1, bool force = false);
 
     /** 修改查询条件 */
     void setQuery(const KQuery& query);
@@ -99,7 +99,7 @@ private:
     /** 运行前准备 */
     bool _readyForRun();
 
-    void _runMoment(const Datetime& datetime);
+    void _runMoment(const Datetime& date, bool adjust);
 
 protected:
     string m_name;

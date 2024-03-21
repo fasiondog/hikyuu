@@ -33,11 +33,13 @@ HKU_API std::ostream& operator<<(std::ostream& os, const PortfolioPtr& pf) {
 
 Portfolio::Portfolio()
 : m_name("Portfolio"), m_query(Null<KQuery>()), m_is_ready(false), m_need_calculate(true) {
-    setParam<bool>("trace", false);  // 打印跟踪
+    setParam<int>("adjust_cycle", 1);  // 调仓周期
+    setParam<bool>("trace", false);    // 打印跟踪
 }
 
 Portfolio::Portfolio(const string& name)
 : m_name(name), m_query(Null<KQuery>()), m_is_ready(false), m_need_calculate(true) {
+    setParam<int>("adjust_cycle", 1);  // 调仓周期
     setParam<bool>("trace", false);
 }
 
@@ -49,6 +51,7 @@ Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFP
   m_query(Null<KQuery>()),
   m_is_ready(false),
   m_need_calculate(true) {
+    setParam<int>("adjust_cycle", 1);  // 调仓周期
     setParam<bool>("trace", false);
 }
 
@@ -159,20 +162,34 @@ bool Portfolio::_readyForRun() {
     return true;
 }
 
-void Portfolio::run(const KQuery& query, bool force) {
+void Portfolio::run(const KQuery& query, int adjust_cycle, bool force) {
+    HKU_CHECK(adjust_cycle > 0, "Invalid param adjust_cycle! {}", adjust_cycle);
+    setParam<int>("adjust_cycle", adjust_cycle);
+
     setQuery(query);
     if (force) {
         m_need_calculate = true;
     }
     HKU_IF_RETURN(!m_need_calculate, void());
-    HKU_ERROR_IF_RETURN(!_readyForRun(), void(),
-                        "readyForRun fails, check to see if a valid TradeManager, Selector, or "
-                        "AllocateFunds instance have been specified.");
+    HKU_CHECK(_readyForRun(),
+              "readyForRun fails, check to see if a valid TradeManager, Selector, or "
+              "AllocateFunds instance have been specified.");
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
-    for (const auto& date : datelist) {
-        _runMoment(date);
+    HKU_IF_RETURN(datelist.empty(), void());
+
+    size_t cur_adjust_ix = 0;
+    for (size_t i = 0, total = datelist.size(); i < total; i++) {
+        bool adjust = false;
+        if (i == cur_adjust_ix) {
+            adjust = true;
+            cur_adjust_ix += adjust_cycle;
+        }
+
+        const auto& date = datelist[i];
+        _runMoment(date, adjust);
     }
+
     m_need_calculate = false;
 
     // 释放掉临时数据占用的内存
@@ -180,12 +197,13 @@ void Portfolio::run(const KQuery& query, bool force) {
     m_tmp_will_remove_sys = SystemWeightList();
 }
 
-void Portfolio::_runMoment(const Datetime& date) {
+void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     // 当前日期小于账户建立日期，直接忽略
     HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
 
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "{} ===========================================================", date);
+    HKU_INFO_IF(trace && adjust, "[PF] Position adjustment will be made today.");
     HKU_INFO_IF(trace, "[PF] current running system size: {}", m_running_sys_set.size());
 
     //---------------------------------------------------
@@ -204,13 +222,12 @@ void Portfolio::_runMoment(const Datetime& date) {
     // 开盘前，调整账户权息，并进行轧差处理
     m_tm->updateWithWeight(date);
 
-    HKU_INFO_IF(trace, "The sum cash of sub_tm: {}, cash tm: {}, tm cash: {}", sum_cash,
+    HKU_INFO_IF(trace, "[PF] The sum cash of sub_tm: {}, cash tm: {}, tm cash: {}", sum_cash,
                 m_shadow_tm->currentCash(), m_tm->currentCash());
     sum_cash += m_shadow_tm->currentCash();
 
-    price_t limit = m_tm->currentCash() * precision;
     price_t diff = roundEx(std::abs(m_tm->currentCash() - sum_cash), precision);
-    if (diff > limit) {
+    if (diff > 0.) {
         if (m_tm->currentCash() > sum_cash) {
             m_shadow_tm->checkin(date, diff);
         } else if (m_tm->currentCash() < sum_cash) {
@@ -237,6 +254,9 @@ void Portfolio::_runMoment(const Datetime& date) {
         }
     }
 
+    // 清空，避免非调仓日重复处理
+    m_delay_adjust_sys_list.clear();
+
     // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则放入待移除列表
     m_tmp_will_remove_sys.clear();
     for (auto& running_sys : m_running_sys_set) {
@@ -255,8 +275,8 @@ void Portfolio::_runMoment(const Datetime& date) {
         if (cash != 0 && cash <= min_cash) {
             sub_tm->checkout(date, cash);
             m_shadow_tm->checkin(date, cash);
-            HKU_INFO_IF(trace, "Collect the scraps cash ({:<.2f}) from {}", cash,
-                        running_sys->name());
+            HKU_INFO_IF(trace, "Collect the scraps cash ({:<.2f}) from {}, current cash: {}", cash,
+                        running_sys->name(), m_shadow_tm->currentCash());
             if (position.number == 0) {
                 m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
             }
@@ -272,25 +292,25 @@ void Portfolio::_runMoment(const Datetime& date) {
     //---------------------------------------------------
     // 收盘时处理
     //---------------------------------------------------
+    if (adjust) {
+        // 从选股策略获取选中的系统列表
+        m_tmp_selected_list = m_se->getSelected(date);
 
-    // 从选股策略获取选中的系统列表
-    m_tmp_selected_list = m_se->getSelected(date);
-
-    if (trace && !m_tmp_selected_list.empty()) {
-        for (auto& sys : m_tmp_selected_list) {
-            HKU_INFO("[PF] select: {}, score: {:<.4f}, cash: {}", sys.sys->name(), sys.weight,
-                     sys.sys->getTM()->cash(date, m_query.kType()));
+        if (trace && !m_tmp_selected_list.empty()) {
+            for (auto& sys : m_tmp_selected_list) {
+                HKU_INFO("[PF] select: {}, score: {:<.4f}", sys.sys->name(), sys.weight);
+            }
         }
-    }
 
-    // 资产分配算法调整各子系统资产分配
-    m_delay_adjust_sys_list = m_af->adjustFunds(date, m_tmp_selected_list, m_running_sys_set);
+        // 资产分配算法调整各子系统资产分配
+        m_delay_adjust_sys_list = m_af->adjustFunds(date, m_tmp_selected_list, m_running_sys_set);
 
-    // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统，并执行
-    for (auto& sys : m_tmp_selected_list) {
-        if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
-            if (sys.sys->getTM()->cash(date, m_query.kType()) > 0.0) {
-                m_running_sys_set.insert(sys.sys);
+        // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统，并执行
+        for (auto& sys : m_tmp_selected_list) {
+            if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
+                if (sys.sys->getTM()->cash(date, m_query.kType()) > 0.0) {
+                    m_running_sys_set.insert(sys.sys);
+                }
             }
         }
     }
@@ -299,7 +319,7 @@ void Portfolio::_runMoment(const Datetime& date) {
     for (auto& sub_sys : m_running_sys_set) {
         auto tr = sub_sys->runMoment(date);
         if (!tr.isNull()) {
-            HKU_INFO_IF(trace, "[PF] on close: {}", tr);
+            HKU_INFO_IF(trace, "[PF] {}", tr);
             m_tm->addTradeRecord(tr);
         }
     }

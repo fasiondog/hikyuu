@@ -95,14 +95,13 @@ public:
 
     /**
      * 子类分配权重接口，获取实际分配资产的系统实例及其权重
-     * @details 实际调用子类接口 _allocateWeight，并根据允许的最大持仓系统数参数对子类返回的
-     *          系统实例及权重列表进行了截断处理
+     * @details 实际调用子类接口 _allocateWeight
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
-     * @return
+     * @return 子类只需要返回每个系统的相对比例即可
      */
-    virtual SystemWeightList _allocateWeight(const Datetime& date, const SystemWeightList& se_list,
-                                             size_t running_count, double can_allocate_weight) = 0;
+    virtual SystemWeightList _allocateWeight(const Datetime& date,
+                                             const SystemWeightList& se_list) = 0;
 
 private:
     /* 同时调整已运行中的子系统（已分配资金或已持仓） */
@@ -135,7 +134,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_reserve_percent);
-        ar& BOOST_SERIALIZATION_NVP(m_tm);
     }
 
     template <class Archive>
@@ -144,7 +142,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_reserve_percent);
-        ar& BOOST_SERIALIZATION_NVP(m_tm);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -180,14 +177,12 @@ private:                                                            \
 #define ALLOCATEFUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define ALLOCATEFUNDS_IMP(classname)                                                           \
-public:                                                                                        \
-    virtual AFPtr _clone() override {                                                          \
-        return AFPtr(new classname());                                                         \
-    }                                                                                          \
-    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemWeightList&,         \
-                                             size_t running_count, double can_allocate_weight) \
-      override;
+#define ALLOCATEFUNDS_IMP(classname)   \
+public:                                \
+    virtual AFPtr _clone() override {  \
+        return AFPtr(new classname()); \
+    }                                  \
+    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemWeightList&) override;
 
 typedef shared_ptr<AllocateFundsBase> AllocateFundsPtr;
 typedef shared_ptr<AllocateFundsBase> AFPtr;

@@ -25,11 +25,10 @@ public:
         PYBIND11_OVERLOAD(void, AllocateFundsBase, _reset, );
     }
 
-    SystemWeightList _allocateWeight(const Datetime& date, const SystemWeightList& se_list,
-                                     size_t running_count, double can_allocate_weight) override {
+    SystemWeightList _allocateWeight(const Datetime& date,
+                                     const SystemWeightList& se_list) override {
         PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, AllocateFundsBase, "_allocate_weight",
-                                    _allocateWeight, date, se_list, running_count,
-                                    can_allocate_weight);
+                                    _allocateWeight, date, se_list);
     }
 };
 
@@ -76,7 +75,7 @@ void export_AllocateFunds(py::module& m) {
       .def("clone", &AllocateFundsBase::clone, "克隆操作")
       .def("_reset", &AllocateFundsBase::_reset, "子类复位操作实现")
       .def("_allocate_weight", &AllocateFundsBase::_allocateWeight, py::arg("date"),
-           py::arg("se_list"), py::arg("running_count"), py::arg("can_allocate_weight"),
+           py::arg("se_list"),
            R"(_allocate_weight(self, date, se_list)
 
         【重载接口】子类分配权重接口，获取实际分配资产的系统实例及其权重

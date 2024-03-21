@@ -51,8 +51,7 @@ void export_Selector(py::module& m) {
       m, "SelectorBase",
       R"(选择器策略基类，实现标的、系统策略的评估和选取算法，自定义选择器策略子类接口：
 
-    - get_selected_on_open - 【必须】获取指定时刻开盘时选择的系统实例列表
-    - get_selected_on_close - 【必须】获取指定时刻收盘时选择的系统实例列表
+    - get_selected - 【必须】获取指定时刻选择的系统实例列表
     - _calculate - 【必须】计算接口
     - _reset - 【可选】重置私有属性
     - _clone - 【必须】克隆接口)")
