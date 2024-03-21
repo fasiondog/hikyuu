@@ -86,11 +86,11 @@ AFPtr AllocateFundsBase::clone() {
     p->m_query = m_query;
     p->m_reserve_percent = m_reserve_percent;
 
-    /* m_tm, m_shadow_tm 由 PF 运行时指定，不需要 clone
+    /* m_tm, m_cash_tm 由 PF 运行时指定，不需要 clone
     if (m_tm)
         p->m_tm = m_tm->clone();
-    if (m_shadow_tm)
-        p->m_shadow_tm = m_shadow_tm->clone();*/
+    if (m_cash_tm)
+        p->m_cash_tm = m_cash_tm->clone();*/
     return p;
 }
 
@@ -189,7 +189,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
     price_t total_funds =
       funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
     price_t reserve_funds = total_funds * m_reserve_percent;
-    price_t can_allocate_cash = m_shadow_tm->currentCash();  // 可分配资金从资金账户中获取
+    price_t can_allocate_cash = m_cash_tm->currentCash();  // 可分配资金从资金账户中获取
     if (can_allocate_cash + reserve_funds > total_funds) {
         can_allocate_cash = roundDown(total_funds - reserve_funds, precision);
     }
@@ -243,7 +243,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
 
         // 尝试从总账户中取出资金存入子账户
         TMPtr sub_tm = iter->sys->getTM();
-        if (m_shadow_tm->checkout(date, need_cash)) {
+        if (m_cash_tm->checkout(date, need_cash)) {
             sub_tm->checkin(date, need_cash);
             HKU_INFO_IF(trace, "[AF] ({}, {}, weight: {:<.4f}) fetched cash: {}", iter->sys->name(),
                         iter->sys->getStock().market_code(), current_weight, need_cash);
@@ -254,7 +254,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
 
         } else {
             HKU_DEBUG_IF(trace, "[AF] {} failed to fetch cash from total account ({})!",
-                         iter->sys->name(), m_shadow_tm->currentCash());
+                         iter->sys->name(), m_cash_tm->currentCash());
         }
     }
 }
@@ -296,13 +296,16 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                 delay_list.emplace_back(sys, MAX_DOUBLE);
             } else {
                 // 非延迟卖出的系统，立即强制卖出并回收资金
-                auto tr = sys->sellForce(date, MAX_DOUBLE, PART_ALLOCATEFUNDS);
+                auto tr = sys->sellForceOnClose(date, MAX_DOUBLE, PART_ALLOCATEFUNDS);
+                HKU_DEBUG_IF(trace && tr.isNull(), "[AF] failed to sell: {}", sys->name());
                 if (!tr.isNull()) {
                     auto sub_tm = sys->getTM();
                     auto sub_cash = sub_tm->currentCash();
                     if (sub_tm->checkout(date, sub_cash)) {
-                        m_shadow_tm->checkin(date, sub_cash);
+                        m_cash_tm->checkin(date, sub_cash);
                         m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
+                        HKU_INFO_IF(trace, "[AF] Adjust sell: {}, recycle cash: {:<.2f}",
+                                    sys->name(), sub_cash);
                     }
                 }
             }
@@ -313,7 +316,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     // 对于仍在选中系统中的运行系统，根据其权重进行减仓处理，回收可分配资金
     //-----------------------------------------------------------------
     // 获取当前总资产市值，计算需保留的资产
-    int precision = m_shadow_tm->getParam<int>("precision");
+    int precision = m_cash_tm->getParam<int>("precision");
     FundsRecord funds = m_tm->getFunds(date, m_query.kType());
     price_t total_funds =
       funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
@@ -345,12 +348,13 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                     if (iter->sys->getParam<bool>("buy_delay")) {
                         delay_list.emplace_back(iter->sys, need_back_num);
                     } else {
-                        auto tr = iter->sys->sellForce(date, need_back_num, PART_ALLOCATEFUNDS);
+                        auto tr =
+                          iter->sys->sellForceOnClose(date, need_back_num, PART_ALLOCATEFUNDS);
                         if (!tr.isNull()) {
                             auto sub_tm = iter->sys->getTM();
                             auto sub_cash = sub_tm->currentCash();
                             if (sub_tm->checkout(date, sub_cash)) {
-                                m_shadow_tm->checkin(date, sub_cash);
+                                m_cash_tm->checkin(date, sub_cash);
                                 m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
                             }
                         }
@@ -364,7 +368,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     // 遍历当前选中系统，按指定权重分配资金
     //-----------------------------------------------------------------
     // 计算可用于分配的现金, 小于等于需保留的资产，则直接返回
-    price_t current_cash = m_shadow_tm->currentCash();
+    price_t current_cash = m_cash_tm->currentCash();
     price_t can_allocate_cash = roundDown(current_cash - reserve_funds, precision);
 
     HKU_INFO_IF(trace,
@@ -420,7 +424,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                         continue;
                     }
 
-                    if (m_shadow_tm->checkout(date, need_cash)) {
+                    if (m_cash_tm->checkout(date, need_cash)) {
                         sub_tm->checkin(date, need_cash);
                         can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
                         // 更新已分配的累积权重
@@ -444,7 +448,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
 
             // 尝试从资金账户中取出资金存入子账户
             TMPtr sub_tm = iter->sys->getTM();
-            if (m_shadow_tm->checkout(date, need_cash)) {
+            if (m_cash_tm->checkout(date, need_cash)) {
                 sub_tm->checkin(date, need_cash);
                 HKU_INFO_IF(trace, "[AF] {} fetched cash: {}", iter->sys->name(), need_cash);
 

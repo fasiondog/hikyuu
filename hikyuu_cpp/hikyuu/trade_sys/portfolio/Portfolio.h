@@ -104,7 +104,7 @@ private:
 protected:
     string m_name;
     TMPtr m_tm;
-    TMPtr m_shadow_tm;  // 仅仅负责内部资金的管理（即只需要 checkout 到子账号, 从账户checkin现金）
+    TMPtr m_cash_tm;  // 仅仅负责内部资金的管理（即只需要 checkout 到子账号, 从账户checkin现金）
     SEPtr m_se;
     AFPtr m_af;
 
@@ -132,7 +132,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_tm);
-        ar& BOOST_SERIALIZATION_NVP(m_shadow_tm);
+        ar& BOOST_SERIALIZATION_NVP(m_cash_tm);
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_query);
@@ -145,7 +145,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_tm);
-        ar& BOOST_SERIALIZATION_NVP(m_shadow_tm);
+        ar& BOOST_SERIALIZATION_NVP(m_cash_tm);
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_query);

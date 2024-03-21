@@ -211,11 +211,17 @@ public:
         return _sell(today, src_today, from);
     }
 
-    // 强制卖出，用于资金分配管理器和资产组合指示系统进行强制卖出操作
-    TradeRecord sellForce(const KRecord& today, const KRecord& src_today, double num, Part from);
+    // 强制以开盘价卖出，仅供 PF/AF 内部调用
+    TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) {
+        HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
+        return _sellForce(date, num, from, true);
+    }
 
-    // Portfolio 指示开盘时立即进行强制卖出，以便对 buy_delay 的系统进行资金调整
-    TradeRecord sellForce(const Datetime& date, double num, Part from);
+    // 强制以收盘价卖出，仅供 PF/AF 内部调用
+    TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) {
+        HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
+        return _sellForce(date, num, from, false);
+    }
 
 private:
     bool _environmentIsValid(const Datetime& datetime);
@@ -266,6 +272,9 @@ private:
     TradeRecord _processRequest(const KRecord& today, const KRecord& src_today);
 
     TradeRecord _runMoment(const KRecord& record, const KRecord& src_record);
+
+    // Portfolio | AllocateFunds 指示立即进行强制卖出，以便对 buy_delay 的系统进行资金调整
+    TradeRecord _sellForce(const Datetime& date, double num, Part from, bool on_open);
 
 protected:
     TradeManagerPtr m_tm;

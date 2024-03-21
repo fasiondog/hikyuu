@@ -59,9 +59,9 @@ public:
     void setTM(const TMPtr&);
 
     /** 设置 Portfolio 的影子账户, 仅由 Portfolio 调用 */
-    void setShadowTM(const TMPtr&);
+    void setCashTM(const TMPtr&);
 
-    const TMPtr& getShadowTM(const TMPtr&) const;
+    const TMPtr& getCashTM(const TMPtr&) const;
 
     /** 获取关联查询条件 */
     const KQuery& getQuery() const;
@@ -116,10 +116,10 @@ private:
     void _check_weight(const SystemWeightList&);
 
 private:
-    string m_name;      // 组件名称
-    KQuery m_query;     // 查询条件
-    TMPtr m_tm;         // 运行期由PF设定，PF的实际账户
-    TMPtr m_shadow_tm;  // 运行期由PF设定，tm 的影子账户，由于协调分配资金
+    string m_name;    // 组件名称
+    KQuery m_query;   // 查询条件
+    TMPtr m_tm;       // 运行期由PF设定，PF的实际账户
+    TMPtr m_cash_tm;  // 运行期由PF设定，tm 的影子账户，由于协调分配资金
     double m_reserve_percent;  // 保留资产比例，不参与资产分配
 
 //============================================
@@ -206,12 +206,12 @@ inline void AllocateFundsBase::setTM(const TMPtr& tm) {
     m_tm = tm;
 }
 
-inline void AllocateFundsBase::setShadowTM(const TMPtr& tm) {
-    m_shadow_tm = tm;
+inline void AllocateFundsBase::setCashTM(const TMPtr& tm) {
+    m_cash_tm = tm;
 }
 
-inline const TMPtr& AllocateFundsBase::getShadowTM(const TMPtr&) const {
-    return m_shadow_tm;
+inline const TMPtr& AllocateFundsBase::getCashTM(const TMPtr&) const {
+    return m_cash_tm;
 }
 
 inline const KQuery& AllocateFundsBase::getQuery() const {

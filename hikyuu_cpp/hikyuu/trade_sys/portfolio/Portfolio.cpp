@@ -67,8 +67,8 @@ void Portfolio::reset() {
     m_tmp_will_remove_sys.clear();
     if (m_tm)
         m_tm->reset();
-    if (m_shadow_tm)
-        m_shadow_tm->reset();
+    if (m_cash_tm)
+        m_cash_tm->reset();
     if (m_se)
         m_se->reset();
     if (m_af)
@@ -90,8 +90,8 @@ PortfolioPtr Portfolio::clone() {
         p->m_af = m_af->clone();
     if (m_tm)
         p->m_tm = m_tm->clone();
-    if (m_shadow_tm)
-        p->m_shadow_tm = m_shadow_tm->clone();
+    if (m_cash_tm)
+        p->m_cash_tm = m_cash_tm->clone();
     return p;
 }
 
@@ -120,9 +120,9 @@ bool Portfolio::_readyForRun() {
     reset();
 
     // 将影子账户指定给资产分配器
-    m_shadow_tm = m_tm->clone();
+    m_cash_tm = m_tm->clone();
     m_af->setTM(m_tm);
-    m_af->setShadowTM(m_shadow_tm);
+    m_af->setCashTM(m_cash_tm);
 
     // 为资金分配器设置关联查询条件
     m_af->setQuery(m_query);
@@ -199,7 +199,7 @@ void Portfolio::run(const KQuery& query, int adjust_cycle, bool force) {
 
 void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     // 当前日期小于账户建立日期，直接忽略
-    HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
+    HKU_IF_RETURN(date < m_cash_tm->initDatetime(), void());
 
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "{} ===========================================================", date);
@@ -207,7 +207,7 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     HKU_INFO_IF(trace, "[PF] current running system size: {}", m_running_sys_set.size());
 
     //---------------------------------------------------
-    // 开盘前处理
+    // 开盘前处理各个子账户、资金账户、总账户之间可能的误差
     //---------------------------------------------------
     int precision = m_tm->getParam<int>("precision");
 
@@ -219,29 +219,41 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
         sum_cash += sub_tm->currentCash();
     }
 
-    // 开盘前，调整账户权息，并进行轧差处理
+    // 开盘前，调整账户权息，并进行轧差处理（平衡 sub_sys, cash_tm, tm 之间的误差）
     m_tm->updateWithWeight(date);
 
     HKU_INFO_IF(trace, "[PF] The sum cash of sub_tm: {}, cash tm: {}, tm cash: {}", sum_cash,
-                m_shadow_tm->currentCash(), m_tm->currentCash());
-    sum_cash += m_shadow_tm->currentCash();
+                m_cash_tm->currentCash(), m_tm->currentCash());
+    sum_cash += m_cash_tm->currentCash();
 
     price_t diff = roundEx(std::abs(m_tm->currentCash() - sum_cash), precision);
     if (diff > 0.) {
         if (m_tm->currentCash() > sum_cash) {
-            m_shadow_tm->checkin(date, diff);
+            m_cash_tm->checkin(date, diff);
         } else if (m_tm->currentCash() < sum_cash) {
-            if (!m_shadow_tm->checkout(date, diff)) {
+            if (!m_cash_tm->checkout(date, diff)) {
                 m_tm->checkin(date, diff);
             }
         }
         HKU_INFO_IF(trace, "After compensate: the sum cash of sub_tm: {}, cash tm: {}, tm cash: {}",
-                    sum_cash, m_shadow_tm->currentCash(), m_tm->currentCash());
+                    sum_cash, m_cash_tm->currentCash(), m_tm->currentCash());
     }
 
-    // 处理需延迟调仓卖出的系统，在开盘时先卖出调整
+    //----------------------------------------------------------------------
+    // 跟踪打印执行调仓前的资产情况
+    //----------------------------------------------------------------------
+    if (trace) {
+        auto funds = m_tm->getFunds(date, m_query.kType());
+        HKU_INFO("[PF] [beforce adjust] - total funds: {},  cash: {}, market_value: {}",
+                 funds.cash + funds.market_value, funds.cash, funds.market_value);
+    }
+
+    //----------------------------------------------------------------------
+    // 开盘时，优先处理上一交易日确定的需延迟调仓卖出的系统，在开盘时先卖出调整
+    //----------------------------------------------------------------------
     for (auto& sys : m_delay_adjust_sys_list) {
-        auto tr = sys.sys->sellForce(date, sys.weight, PART_PORTFOLIO);
+        auto tr = sys.sys->sellForceOnOpen(date, sys.weight, PART_PORTFOLIO);
+        HKU_DEBUG_IF(trace && tr.isNull(), "[PF] Failed to force sell: {}", sys.sys->name());
         if (!tr.isNull()) {
             HKU_INFO_IF(trace, "[PF] Delay adjust sell: {}", tr);
             m_tm->addTradeRecord(tr);
@@ -250,15 +262,17 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             TMPtr sub_tm = sys.sys->getTM();
             auto sub_cash = sub_tm->currentCash();
             if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
-                m_shadow_tm->checkin(date, sub_cash);
+                m_cash_tm->checkin(date, sub_cash);
             }
         }
     }
 
-    // 清空，避免非调仓日重复处理
+    // 清空，避免循环至下一个非调仓日时被重复处理
     m_delay_adjust_sys_list.clear();
 
-    // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则放入待移除列表
+    //---------------------------------------------------------------
+    // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则回收
+    //---------------------------------------------------------------
     m_tmp_will_remove_sys.clear();
     for (auto& running_sys : m_running_sys_set) {
         Stock stock = running_sys->getStock();
@@ -275,21 +289,15 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
         // 如果系统的剩余资金小于交易一手的资金，则回收资金
         if (cash != 0 && cash <= min_cash) {
             sub_tm->checkout(date, cash);
-            m_shadow_tm->checkin(date, cash);
-            HKU_INFO_IF(trace, "Collect the scraps cash ({:<.2f}) from {}, current cash: {}", cash,
-                        running_sys->name(), m_shadow_tm->currentCash());
+            m_cash_tm->checkin(date, cash);
+            HKU_INFO_IF(trace, "Recycle cash ({:<.2f}) from {}, current cash: {}", cash,
+                        running_sys->name(), m_cash_tm->currentCash());
+            // 如果已经没有持仓，则回收
+            if (position.number == 0) {
+                m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
+                HKU_INFO_IF(trace, "[PF] Recycle running sys: {}", running_sys->name());
+            }
         }
-
-        if (position.number == 0) {
-            m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
-            HKU_INFO_IF(trace, "[PF] Recycle running sys: {}", running_sys->name());
-        }
-    }
-
-    if (trace) {
-        auto funds = m_tm->getFunds(date, m_query.kType());
-        HKU_INFO("[PF] total funds: {},  cash: {}, market_value: {}",
-                 funds.cash + funds.market_value, funds.cash, funds.market_value);
     }
 
     // 依据待移除列表将系统从运行中系统列表里删除
@@ -299,7 +307,7 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     }
 
     //---------------------------------------------------
-    // 收盘时处理
+    // 调仓日，进行资金分配调整
     //---------------------------------------------------
     if (adjust) {
         // 从选股策略获取选中的系统列表
@@ -322,14 +330,78 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
                 }
             }
         }
+
+        // 从已运行系统列表中立即移除已没有持仓且没有资金的非延迟买入的系统
+        m_tmp_will_remove_sys.clear();
+        for (auto& sys : m_running_sys_set) {
+            auto sub_tm = sys->getTM();
+            if (!sys->getParam<bool>("buy_delay") && sub_tm->currentCash() < 1.0 &&
+                0 == sub_tm->getHoldNumber(date, sys->getStock())) {
+                m_tmp_will_remove_sys.emplace_back(sys, 0.0);
+            }
+        }
+
+        for (auto& sw : m_tmp_will_remove_sys) {
+            m_running_sys_set.erase(sw.sys);
+        }
     }
 
-    // 收盘时执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
+    //----------------------------------------------------------------------
+    // 跟踪打印执行调仓后的资产情况
+    //----------------------------------------------------------------------
+    if (trace) {
+        auto funds = m_tm->getFunds(date, m_query.kType());
+        HKU_INFO("[PF] [after adjust] - total funds: {},  cash: {}, market_value: {}",
+                 funds.cash + funds.market_value, funds.cash, funds.market_value);
+    }
+
+    //----------------------------------------------------------------------------
+    // 执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
+    //----------------------------------------------------------------------------
     for (auto& sub_sys : m_running_sys_set) {
         auto tr = sub_sys->runMoment(date);
         if (!tr.isNull()) {
             HKU_INFO_IF(trace, "[PF] {}", tr);
             m_tm->addTradeRecord(tr);
+        }
+    }
+
+    //----------------------------------------------------------------------
+    // 跟踪各个子系统执行后的资产情况
+    //----------------------------------------------------------------------
+    if (trace) {
+        auto funds = m_tm->getFunds(date, m_query.kType());
+        HKU_INFO("[PF] [after run] - total funds: {},  cash: {}, market_value: {}",
+                 funds.cash + funds.market_value, funds.cash, funds.market_value);
+    }
+
+    //----------------------------------------------------------------------
+    // 跟踪打印持仓情况
+    //----------------------------------------------------------------------
+    if (trace) {
+        HKU_INFO("+------------+------------+------------+--------------+--------------+");
+        HKU_INFO("| code       | name       | position   | market value | remain cash  |");
+        HKU_INFO("+------------+------------+------------+--------------+--------------+");
+        size_t count = 0;
+        for (const auto& sys : m_running_sys_set) {
+            Stock stk = sys->getStock();
+            auto stk_name = StockManager::instance().runningInPython() &&
+                                StockManager::instance().pythonInJupyter()
+                              ? stk.name()
+                              : UTF8ToGB(stk.name());
+            if (stk_name.size() < 11) {
+                for (size_t i = 0, total = 11 - stk_name.size(); i < total; i++) {
+                    stk_name.push_back(' ');
+                }
+            }
+            auto funds = sys->getTM()->getFunds(date, m_query.kType());
+            size_t position = sys->getTM()->getHoldNumber(date, stk);
+            HKU_INFO("| {:<11}| {}| {:<11}| {:<13.2f}| {:<13.2f}|", stk.market_code(), stk_name,
+                     position, funds.market_value, funds.cash);
+            HKU_INFO("+------------+------------+------------+--------------+--------------+");
+            if (++count >= 10) {
+                break;
+            }
         }
     }
 }

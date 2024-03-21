@@ -113,33 +113,7 @@ TradeRecord::TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS 
   from(from) {}
 
 HKU_API std::ostream& operator<<(std::ostream& os, const TradeRecord& record) {
-    Stock stock = record.stock;
-    string market_code(""), name("");
-    if (!stock.isNull()) {
-        market_code = stock.market_code();
-        name = stock.name();
-    }
-
-    string strip(", ");
-    os << std::fixed;
-    os.precision(4);
-    os << "Trade(" << record.datetime << strip << market_code << strip << name << strip
-       << getBusinessName(record.business) << strip << record.planPrice << strip
-       << record.realPrice;
-
-    if (std::isnan(record.goalPrice)) {
-        os << strip << "NULL";
-    } else {
-        os << strip << record.goalPrice;
-    }
-
-    os << strip << record.number << strip << record.cost.commission << strip << record.cost.stamptax
-       << strip << record.cost.transferfee << strip << record.cost.others << strip
-       << record.cost.total << strip << record.stoploss << strip << record.cash << strip
-       << getSystemPartName(record.from) << ")";
-
-    os.unsetf(std::ostream::floatfield);
-    os.precision();
+    os << record.toString();
     return os;
 }
 
@@ -150,27 +124,20 @@ string TradeRecord::toString() const {
         name = stock.name();
     }
 
-    string strip(", ");
-    std::stringstream os;
-    os << std::fixed;
-    os.precision(4);
-    os << "Trade(" << datetime << strip << market_code << strip << name << strip
-       << getBusinessName(business) << strip << planPrice << strip << realPrice;
-
-    // if (goalPrice == Null<price_t>()) {
-    if (std::isnan(goalPrice)) {
-        os << strip << "nan";
-    } else {
-        os << strip << goalPrice;
-    }
-
-    os << strip << goalPrice << strip << number << strip << cost.commission << strip
-       << cost.stamptax << strip << cost.transferfee << strip << cost.others << strip << cost.total
-       << strip << stoploss << strip << cash << strip << getSystemPartName(from) << ")";
-
-    os.unsetf(std::ostream::floatfield);
-    os.precision();
-    return os.str();
+#if HKU_OS_WINDOWS
+    return fmt::format(
+      "Trade({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", datetime, market_code,
+      StockManager::instance().runningInPython() && StockManager::instance().pythonInJupyter()
+        ? name
+        : UTF8ToGB(name),
+      getBusinessName(business), planPrice, realPrice, goalPrice, number, cost.commission,
+      cost.stamptax, cost.transferfee, cost.others, getSystemPartName(from));
+#else
+    return fmt::format("Trade({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", datetime,
+                       market_code, name, getBusinessName(business), planPrice, realPrice,
+                       goalPrice, number, cost.commission, cost.stamptax, cost.transferfee,
+                       cost.others, getSystemPartName(from));
+#endif
 }
 
 bool TradeRecord::isNull() const {
