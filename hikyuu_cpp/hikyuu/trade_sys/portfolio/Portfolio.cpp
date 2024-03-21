@@ -243,6 +243,7 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     for (auto& sys : m_delay_adjust_sys_list) {
         auto tr = sys.sys->sellForce(date, sys.weight, PART_PORTFOLIO);
         if (!tr.isNull()) {
+            HKU_INFO_IF(trace, "[PF] Delay adjust sell: {}", tr);
             m_tm->addTradeRecord(tr);
 
             // 卖出后，尝试将资金取出转移至影子总账户
@@ -277,10 +278,18 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             m_shadow_tm->checkin(date, cash);
             HKU_INFO_IF(trace, "Collect the scraps cash ({:<.2f}) from {}, current cash: {}", cash,
                         running_sys->name(), m_shadow_tm->currentCash());
-            if (position.number == 0) {
-                m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
-            }
         }
+
+        if (position.number == 0) {
+            m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
+            HKU_INFO_IF(trace, "[PF] Recycle running sys: {}", running_sys->name());
+        }
+    }
+
+    if (trace) {
+        auto funds = m_tm->getFunds(date, m_query.kType());
+        HKU_INFO("[PF] total funds: {},  cash: {}, market_value: {}",
+                 funds.cash + funds.market_value, funds.cash, funds.market_value);
     }
 
     // 依据待移除列表将系统从运行中系统列表里删除

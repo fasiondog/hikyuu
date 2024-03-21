@@ -213,7 +213,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
 
         // 如果是运行中系统，不使用计算的权重，更新累积权重和
         if (running_set.find(iter->sys) != running_set.cend()) {
-            FundsRecord sub_funds = m_tm->getFunds(m_query.kType());
+            FundsRecord sub_funds = m_tm->getFunds(date, m_query.kType());
             price_t sub_total_funds =
               funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
             sum_weight += sub_total_funds / total_funds;
@@ -314,7 +314,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     //-----------------------------------------------------------------
     // 获取当前总资产市值，计算需保留的资产
     int precision = m_shadow_tm->getParam<int>("precision");
-    FundsRecord funds = m_tm->getFunds(m_query.kType());
+    FundsRecord funds = m_tm->getFunds(date, m_query.kType());
     price_t total_funds =
       funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
     price_t reserve_funds = roundEx(total_funds * m_reserve_percent, precision);
@@ -325,7 +325,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
         if (running_set.find(iter->sys) != running_set.cend()) {
             TMPtr sub_tm = iter->sys->getTM();
             const KQuery& query = iter->sys->getTO().getQuery();
-            FundsRecord sub_funds = sub_tm->getFunds(query.kType());
+            FundsRecord sub_funds = sub_tm->getFunds(date, query.kType());
             price_t sub_total_funds = sub_funds.cash + sub_funds.market_value +
                                       sub_funds.borrow_asset - sub_funds.short_market_value;
             price_t sub_will_funds = total_funds * iter->weight;
@@ -394,7 +394,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
         if (running_set.find(iter->sys) != running_set.cend()) {
             auto sub_tm = iter->sys->getTM();
             const KQuery& query = iter->sys->getTO().getQuery();
-            FundsRecord sub_funds = sub_tm->getFunds(query.kType());
+            FundsRecord sub_funds = sub_tm->getFunds(date, query.kType());
             price_t sub_total_funds = sub_funds.cash + sub_funds.market_value +
                                       sub_funds.borrow_asset - sub_funds.short_market_value;
 
