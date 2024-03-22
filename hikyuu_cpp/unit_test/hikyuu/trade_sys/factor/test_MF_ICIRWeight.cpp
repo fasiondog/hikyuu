@@ -63,7 +63,7 @@ TEST_CASE("test_MF_ICIRWeight") {
     for (size_t i = ind4.discard(), len = ref_dates.size(); i < len; i++) {
         Indicator::value_t w = (ind1[i] * ic1[i] + ind2[i] * ic2[i] + ind3[i] * ic3[i]) /
                                (std::abs(ic1[i]) + std::abs(ic2[i]) + std::abs(ic3[i]));
-        HKU_INFO("{}: {}, {}, {}, {}, {}", i, w, ind4[i], ind1[i], ma_ic1[i], stdev_ic1[i]);
+        // HKU_INFO("{}: {}, {}, {}, {}, {}", i, w, ind4[i], ind1[i], ma_ic1[i], stdev_ic1[i]);
         // HKU_INFO("{}: {}, {}", i, w, ind4[i]);
         if (!std::isnan(ind4[i]) && !std::isnan(w)) {
             CHECK_EQ(ind4[i], doctest::Approx(w));
