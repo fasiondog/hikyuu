@@ -46,7 +46,7 @@ TEST_CASE("test_MF_ICIRWeight") {
     auto ind1 = MA(ROCR(CLOSE(stk.getKData(query)), ndays));
     auto ic1 = ICIR(IC(MA(ROCR(CLOSE(), ndays)), stks, query, ndays, ref_stk), ic_rolling_n);
     auto ma_ic1 = MA(IC(MA(ROCR(CLOSE(), ndays)), stks, query, ndays, ref_stk), ic_rolling_n);
-    auto stdev_ic1 = STDEV(ma_ic1, ic_rolling_n);
+    auto stdev_ic1 = STDEV(IC(MA(ROCR(CLOSE(), ndays)), stks, query, ndays, ref_stk), ic_rolling_n);
     auto ind2 = AMA(ROCR(CLOSE(stk.getKData(query)), ndays));
     auto ic2 = ICIR(IC(AMA(ROCR(CLOSE(), ndays)), stks, query, ndays, ref_stk), ic_rolling_n);
     auto ind3 = EMA(ROCR(CLOSE(stk.getKData(query)), ndays));
@@ -56,19 +56,20 @@ TEST_CASE("test_MF_ICIRWeight") {
     for (size_t i = 0; i < ind4.discard(); i++) {
         CHECK_UNARY(std::isnan(ind4[i]));
     }
-    CHECK_EQ(4, std::max(ic1.discard(), std::max(ic2.discard(), ic3.discard())));
-    for (size_t i = 0; i < 4; i++) {
+    CHECK_EQ(ind4.discard(), std::max(ic1.discard(), std::max(ic2.discard(), ic3.discard())));
+    for (size_t i = 0; i < ind4.discard(); i++) {
         CHECK_UNARY(std::isnan(ind4[i]));
     }
     for (size_t i = ind4.discard(), len = ref_dates.size(); i < len; i++) {
-        Indicator::value_t w = ind1[i] * ic1[i] + ind2[i] * ic2[i] + ind3[i] * ic3[i];
-        HKU_INFO("{}: {}, {}, {}, {}, {}", i, w, ind1[i], ma_ic1[i], ma_ic1.discard(),
-                 stdev_ic1[i]);
+        Indicator::value_t w = (ind1[i] * ic1[i] + ind2[i] * ic2[i] + ind3[i] * ic3[i]) /
+                               (std::abs(ic1[i]) + std::abs(ic2[i]) + std::abs(ic3[i]));
+        HKU_INFO("{}: {}, {}, {}, {}, {}", i, w, ind4[i], ind1[i], ma_ic1[i], stdev_ic1[i]);
+        // HKU_INFO("{}: {}, {}", i, w, ind4[i]);
         if (!std::isnan(ind4[i]) && !std::isnan(w)) {
             CHECK_EQ(ind4[i], doctest::Approx(w));
         }
     }
-    HKU_INFO("{}", ind4);
+    // HKU_INFO("{}", ind4);
 }
 
 //-----------------------------------------------------------------------------
