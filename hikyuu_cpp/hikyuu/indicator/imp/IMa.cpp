@@ -38,8 +38,10 @@ void IMa::_calculate(const Indicator& indicator) {
     if (n <= 0) {
         price_t sum = 0.0;
         for (size_t i = m_discard; i < total; i++) {
-            sum += src[i];
-            dst[i] = sum / (i - m_discard + 1);
+            if (!std::isnan(src[i])) {
+                sum += src[i];
+                dst[i] = sum / (i - m_discard + 1);
+            }
         }
         return;
     }
@@ -49,13 +51,17 @@ void IMa::_calculate(const Indicator& indicator) {
     size_t count = 1;
     size_t first_end = startPos + n >= total ? total : startPos + n;
     for (size_t i = startPos; i < first_end; ++i) {
-        sum += src[i];
-        dst[i] = sum / count++;
+        if (!std::isnan(src[i])) {
+            sum += src[i];
+            dst[i] = sum / count++;
+        }
     }
 
     for (size_t i = first_end; i < total; ++i) {
-        sum = src[i] + sum - src[i - n];
-        dst[i] = sum / n;
+        if (!std::isnan(src[i]) && !std::isnan(src[i - n])) {
+            sum = src[i] + sum - src[i - n];
+            dst[i] = sum / n;
+        }
     }
 }
 

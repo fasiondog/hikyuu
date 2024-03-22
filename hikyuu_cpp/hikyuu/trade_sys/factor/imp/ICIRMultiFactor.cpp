@@ -45,50 +45,21 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
         }
     }
 
-    // 计算 IC 权重
-    vector<value_t> sumByDate(days_total, 0.0);
-    vector<size_t> countByDate(days_total, 0);
-    for (size_t di = discard; di < days_total; di++) {
-        for (size_t ii = 0; ii < ind_count; ii++) {
-            const auto& value = icir[ii][di];
-            if (!std::isnan(value)) {
-                sumByDate[di] += value;
-                countByDate[di] += 1;
-            }
-        }
-    }
-
-    for (size_t di = discard; di < days_total; di++) {
-        sumByDate[di] = (countByDate[di] == 0) ? Null<value_t>() : sumByDate[di] / countByDate[di];
-    }
-
-    vector<Indicator> all_factors(stk_count);
-    PriceList new_values(days_total);
+    // 以 ICIR 为权重，计算加权后的合成因子
+    IndicatorList all_factors(stk_count);
+    PriceList new_values(days_total, 0);
     for (size_t si = 0; si < stk_count; si++) {
         memset(new_values.data(), 0, sizeof(price_t) * days_total);
         for (size_t di = discard; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
-                const auto& value = all_stk_inds[si][ii][di];
-                new_values[di] += value * sumByDate[di];
+                if (!std::isnan(all_stk_inds[si][ii][di]) && !std::isnan(icir[ii][di])) {
+                    new_values[di] += all_stk_inds[si][ii][di] * icir[ii][di];
+                }
             }
-        }
-        for (size_t di = discard; di < days_total; di++) {
-            new_values[di] =
-              (countByDate[di] == 0) ? Null<value_t>() : new_values[di] / countByDate[di];
         }
         all_factors[si] = PRICELIST(new_values);
-        all_factors[si].name("IC");
-
-        // 更新 discard
-        for (size_t di = discard; di < days_total; di++) {
-            if (!std::isnan(all_factors[si][di])) {
-                all_factors[si].setDiscard(di);
-                break;
-            }
-            if (di == days_total - 1 && std::isnan(all_factors[si][di])) {
-                all_factors[si].setDiscard(di);
-            }
-        }
+        all_factors[si].name("ICIR");
+        all_factors[si].setDiscard(discard);
     }
 
     return all_factors;

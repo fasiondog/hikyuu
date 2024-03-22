@@ -80,14 +80,8 @@ void IIc::_calculate(const Indicator& inputInd) {
     for (size_t i = 0; i < stk_count; i++) {
         auto k = m_stks[i].getKData(m_query);
         all_inds[i] = ALIGN(ind(k), ref_dates, fill_null);
-        if (all_inds[i].discard() > discard) {
-            discard = all_inds[i].discard();
-        }
         // 计算 n 日收益率，同时需要右移 n 位，即第 i 日的因子值和第 i + n 的收益率对应
         all_returns[i] = ALIGN(REF(ROCP(k.close(), n), n), ref_dates, fill_null);
-        if (all_returns[i].discard() > discard) {
-            discard = all_returns[i].discard();
-        }
     }
 
     m_discard = discard;

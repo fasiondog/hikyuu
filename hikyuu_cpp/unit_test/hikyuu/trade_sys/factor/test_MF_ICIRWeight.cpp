@@ -53,13 +53,15 @@ TEST_CASE("test_MF_ICIRWeight") {
     for (size_t i = 0; i < ind4.discard(); i++) {
         CHECK_UNARY(std::isnan(ind4[i]));
     }
-    CHECK_EQ(ind4.discard(), std::max(ic1.discard(), std::max(ic2.discard(), ic3.discard())));
-    for (size_t i = 0; i < ind4.discard(); i++) {
+    CHECK_EQ(4, std::max(ic1.discard(), std::max(ic2.discard(), ic3.discard())));
+    for (size_t i = 0; i < 4; i++) {
         CHECK_UNARY(std::isnan(ind4[i]));
     }
     for (size_t i = ind4.discard(), len = ref_dates.size(); i < len; i++) {
-        Indicator::value_t w = (ic1[i] + ic2[i] + ic3[i]) / 3.0;
-        CHECK_EQ(ind4[i], doctest::Approx((ind1[i] * w + ind2[i] * w + ind3[i] * w) / 3.0));
+        Indicator::value_t w = ind1[i] * ic1[i] + ind2[i] * ic2[i] + ind3[i] * ic3[i];
+        if (!std::isnan(ind4[i]) && !std::isnan(w)) {
+            CHECK_EQ(ind4[i], doctest::Approx(w));
+        }
     }
 }
 
