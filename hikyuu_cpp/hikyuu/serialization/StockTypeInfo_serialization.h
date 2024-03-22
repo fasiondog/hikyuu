@@ -13,8 +13,6 @@
 #include "../StockTypeInfo.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/split_free.hpp>
 
 namespace boost {
 namespace serialization {

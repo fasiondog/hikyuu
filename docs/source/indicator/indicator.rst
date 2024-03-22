@@ -40,12 +40,13 @@
     :rtype: Indicator
 
 
-.. py:function:: ALIGN(data, ref):
+.. py:function:: ALIGN(data, ref[, fill_null=True])
 
     按指定的参考日期对齐
 
     :param Indicator data: 输入数据
-    :param ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
+    :param DatetimeList|Indicator|KData ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
+    :param bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据
     :retype: Indicator
 
 .. py:function:: AMA([data, n=10, fast_n=2, slow_n=30])
@@ -200,13 +201,13 @@
     :rtype: Indicator
    
 
-.. py::function:: CORR(ind1, ind2, n)
+.. py:function:: CORR(ind1, ind2, n)
 
     计算 ind1 和 ind2 的样本相关系数与协方差。返回中存在两个结果，第一个为相关系数，第二个为协方差。
 
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
-    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数
+    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
     :rtype: Indicator    
 
 
@@ -447,6 +448,46 @@
     :param KData kdata: k线数据
     :rtype: Indicator
     
+.. py:function:: IC(ind, stks, query, n, ref_stk)
+
+    计算指定的因子相对于参考证券的 IC （实际为 RankIC）
+    
+    :param sequence(stock)|Block stks 证券组合
+    :param Query query: 查询条件
+    :param int n: 时间窗口
+    :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
+    :rtype: Indicator
+
+
+.. py:function:: ICIR(ic[,n])
+
+    计算 IC 因子 IR = IC的多周期均值/IC的标准方差
+
+    :param Indicator: ic 已经计算出的 ic 值
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
+.. py:function:: IR(p, b[, n=100])
+
+    信息比率（Information Ratio，IR）
+
+    公式: (P-B) / TE
+    P: 组合收益率
+    B: 比较基准收益率
+    TE: 投资周期中每天的 p 和 b 之间的标准差
+    实际使用时，P 一般为 TM 的资产曲线，B 为沪深 3000 收盘价，如:
+    ref_k = sm["sh000300"].get_kdata(query)
+    funds = my_tm.get_funds_curve(ref_k.get_datetime.list())
+    ir = IR(PRICELIST(funds), ref_k.close, 0)
+
+    如果希望计算因子 IC 的 IR 值，请使用 ICIR 指标
+
+    :param Indicator p:
+    :param Indicator b:
+    :param int n: 时间窗口（默认100），如果只想使用最后的值，可以使用 0, 或 len(p),len(b) 指定
+    :rtype: Indicator
+
     
 .. py:function:: IF(x, a, b)
 
@@ -720,6 +761,38 @@
     :rtype: Indicator
 
 
+.. py:function:: RECOVER_BACKWARD([data])
+
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行后向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator
+
+
+.. py:function:: RECOVER_FORWARD([data])
+
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行前向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator
+
+
+.. py:function:: RECOVER_EQUAL_BACKWARD([data])
+
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比后向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator
+
+
+.. py:function:: RECOVER_EQUAL_FORWARD([data])
+
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比前向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator
+
+
 .. py:function:: REVERSE([data])
 
     求相反数，REVERSE(X)返回-X
@@ -868,7 +941,7 @@
 
     :param Indicator ind1: 输入参数1
     :param Indicator ind2: 输入参数2
-    :param int n: 指定窗口    
+    :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度
 
 
 .. py:function:: SQRT([data])
@@ -1041,3 +1114,16 @@
 
     :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
     :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值
+
+
+.. py:function:: ZSCORE([data, out_extreme, nsigma, recursive])
+
+    对数据进行标准化（归一），可选进行极值排除
+
+    注：非窗口滚动，如需窗口滚动的标准化，直接 (x - MA(x, n)) / STDEV(x, n) 即可。
+    
+    :param Indicator data: 待剔除异常值的数据
+    :param bool outExtreme: 指示剔除极值，默认 False
+    :param float nsigma: 剔除极值时使用的 nsigma 倍 sigma ,默认 3.0
+    :param bool recursive: 是否进行递归剔除极值, 默认 False
+    :rtype: Indicator

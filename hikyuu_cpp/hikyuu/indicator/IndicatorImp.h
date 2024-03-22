@@ -14,35 +14,6 @@
 #include "../utilities/Parameter.h"
 #include "../utilities/thread/StealThreadPool.h"
 
-#if HKU_SUPPORT_SERIALIZATION
-#if HKU_SUPPORT_XML_ARCHIVE
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#endif /* HKU_SUPPORT_XML_ARCHIVE */
-
-#if HKU_SUPPORT_TEXT_ARCHIVE
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#endif /* HKU_SUPPORT_TEXT_ARCHIVE */
-
-#if HKU_SUPPORT_BINARY_ARCHIVE
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#endif /* HKU_SUPPORT_BINARY_ARCHIVE */
-
-#include <boost/serialization/map.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/string.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/assume_abstract.hpp>
-#include <boost/serialization/base_object.hpp>
-
-// linux 下，PriceList_serialization 始终无法特化（及时拷贝到本文件内也一样），取消引用
-// #if HKU_SUPPORT_XML_ARCHIVE || HKU_SUPPORT_TEXT_ARCHIVE
-// #include "../serialization/PriceList_serialization.h"
-// #endif
-#endif /* HKU_SUPPORT_SERIALIZATION */
-
 namespace hku {
 
 #define MAX_RESULT_NUM 6
@@ -60,25 +31,23 @@ class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
 
 public:
     enum OPType {
-        LEAF,      ///< 叶子节点
-        OP,        /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
-        ADD,       ///< 加
-        SUB,       ///< 减
-        MUL,       ///< 乘
-        DIV,       ///< 除
-        MOD,       ///< 取模
-        EQ,        ///< 等于
-        GT,        ///< 大于
-        LT,        ///< 小于
-        NE,        ///< 不等于
-        GE,        ///< 大于等于
-        LE,        ///< 小于等于
-        AND,       ///< 与
-        OR,        ///< 或
-        WEAVE,     ///< 特殊的，需要两个指标作为参数的指标
-        OP_IF,     /// if操作
-        CORR,      ///< 相关系数，需要两个指标作为参数
-        SPEARMAN,  ///< spearman 相关系数
+        LEAF,   ///< 叶子节点
+        OP,     /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
+        ADD,    ///< 加
+        SUB,    ///< 减
+        MUL,    ///< 乘
+        DIV,    ///< 除
+        MOD,    ///< 取模
+        EQ,     ///< 等于
+        GT,     ///< 大于
+        LT,     ///< 小于
+        NE,     ///< 不等于
+        GE,     ///< 大于等于
+        LE,     ///< 小于等于
+        AND,    ///< 与
+        OR,     ///< 或
+        WEAVE,  ///< 特殊的，需要两个指标作为参数的指标
+        OP_IF,  /// if操作
         INVALID
     };
 
@@ -225,8 +194,6 @@ private:
     void execute_or();
     void execute_weave();
     void execute_if();
-    void execute_corr();
-    void execute_spearman();
 
     std::vector<IndicatorImpPtr> getAllSubNodes();
     void repeatALikeNodes();

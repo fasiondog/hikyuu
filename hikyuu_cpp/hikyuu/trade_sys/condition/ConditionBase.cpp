@@ -31,6 +31,9 @@ ConditionBase::ConditionBase(const string& name) : m_name(name) {}
 ConditionBase::~ConditionBase() {}
 
 void ConditionBase::reset() {
+    m_kdata = Null<KData>();
+    m_tm.reset();
+    m_sg.reset();
     m_date_index.clear();
     m_values.clear();
     _reset();
@@ -63,7 +66,7 @@ ConditionPtr ConditionBase::clone() {
 }
 
 void ConditionBase::setTO(const KData& kdata) {
-    reset();
+    HKU_IF_RETURN(kdata == m_kdata, void());
     m_kdata = kdata;
     if (!kdata.empty()) {
         m_date_index.clear();

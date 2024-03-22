@@ -167,6 +167,8 @@ set_context(self, stock, query)
 
     :rtype: KData)")
 
+      .def("equal", &Indicator::equal)
+      .def("is_same", &Indicator::isSame)
       .def("get_imp", &Indicator::getImp)
       .def("__len__", &Indicator::size)
 

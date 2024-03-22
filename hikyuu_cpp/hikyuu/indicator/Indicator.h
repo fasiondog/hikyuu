@@ -184,6 +184,17 @@ public:
         return m_imp ? m_imp->data(result_num) : nullptr;
     }
 
+    /**
+     * 判断两个ind的值是否相等
+     * @note operator==重载生成新的新的Indicator，此函数用于对两个ind进行值比较
+     */
+    bool equal(const Indicator& other) const;
+
+    /** 判断是否是同一个实例 */
+    bool isSame(const Indicator& other) const {
+        return !m_imp && m_imp == other.m_imp;
+    }
+
 protected:
     IndicatorImpPtr m_imp;
 
@@ -196,6 +207,9 @@ private:
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
+
+/** @ingroup Indicator */
+typedef vector<Indicator> IndicatorList;
 
 inline string Indicator::name() const {
     return m_imp ? m_imp->name() : "IndicatorImp";
@@ -378,22 +392,6 @@ Indicator HKU_API IF(const Indicator& x, const Indicator& a, const Indicator& b)
 Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, const Indicator& b);
 Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t b);
 Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b);
-
-/**
- * 计算样本相关系数与协方差。返回的结果集中，第一个为相关系数，第二个为协方差
- * @param ind1 指标1
- * @param ind2 指标2
- * @ingroup Indicator
- */
-Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n);
-
-/**
- * Spearman 相关系数
- * @param ind1 指标1
- * @param ind2 指标2
- * @ingroup Indicator
- */
-Indicator HKU_API SPEARMAN(const Indicator& ind1, const Indicator& ind2, int n);
 
 } /* namespace hku */
 

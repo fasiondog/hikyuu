@@ -2,16 +2,17 @@
 # -*- coding: utf8 -*-
 # cp936
 
-#===============================================================================
+# ===============================================================================
 # 作者：fasiondog
 # 历史：1）20090527, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
-#from singleton import Singleton
+# from singleton import Singleton
 
 from .mylog import *
 from .check import *
 from .timeout import *
+from .notebook import *
 
 __all__ = [
     'spend_time',
@@ -41,4 +42,6 @@ __all__ = [
     'with_trace',
     'capture_multiprocess_all_logger',
     'LoggingContext',
+    'in_interactive_session',
+    'in_ipython_frontend',
 ]

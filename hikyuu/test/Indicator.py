@@ -76,16 +76,16 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[3], 7)
 
         a = x1 + 1.1
-        self.assertEqual(a[0], 1.1)
-        self.assertEqual(a[1], 2.1)
-        self.assertEqual(a[2], 3.1)
-        self.assertEqual(a[3], 4.1)
+        self.assert_(abs(a[0] - 1.1) < 0.0001)
+        self.assert_(abs(a[1] - 2.1) < 0.0001)
+        self.assert_(abs(a[2] - 3.1) < 0.0001)
+        self.assert_(abs(a[3] - 4.1) < 0.0001)
 
         a = 2.1 + x1
-        self.assertEqual(a[0], 2.1)
-        self.assertEqual(a[1], 3.1)
-        self.assertEqual(a[2], 4.1)
-        self.assertEqual(a[3], 5.1)
+        self.assert_(abs(a[0] - 2.1) < 0.0001)
+        self.assert_(abs(a[1] - 3.1) < 0.0001)
+        self.assert_(abs(a[2] - 4.1) < 0.0001)
+        self.assert_(abs(a[3] - 5.1) < 0.0001)
 
         a = x2 - x1
         self.assertEqual(a[0], 1)
@@ -127,7 +127,7 @@ class IndicatorTest(unittest.TestCase):
         self.assert_(isinf(a[0]))
         self.assertEqual(a[1], 2)
         self.assertEqual(a[2], 1.5)
-        self.assertEqual(a[3], 4.0 / 3.0)
+        self.assert_(abs(a[3] - 4.0 / 3.0) < 0.0001)
 
         a = x1 / 0.5
         self.assertEqual(a[0], 0)
@@ -139,7 +139,7 @@ class IndicatorTest(unittest.TestCase):
         self.assert_(isinf(a[0]))
         self.assertEqual(a[1], 2.0)
         self.assertEqual(a[2], 1.)
-        self.assertEqual(a[3], 2.0/3.0)
+        self.assert_(abs(a[3] - 2.0/3.0) < 0.0001)
 
         a = x1 > x2
         self.assertEqual(a[0], 0 > 1)

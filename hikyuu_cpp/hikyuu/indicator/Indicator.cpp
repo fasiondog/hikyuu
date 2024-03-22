@@ -52,6 +52,27 @@ bool Indicator::alike(const Indicator& other) const {
     return m_imp->alike(*other.m_imp);
 }
 
+bool Indicator::equal(const Indicator& other) const {
+    HKU_IF_RETURN(this == &other || m_imp == other.m_imp, true);
+    HKU_IF_RETURN(size() != other.size() || discard() != other.discard() ||
+                    getResultNumber() != other.getResultNumber(),
+                  false);
+
+    for (size_t r = 0, result_num = getResultNumber(); r < result_num; r++) {
+        auto const* d1 = this->data(r);
+        auto const* d2 = other.data(r);
+        for (size_t i = 0, total = size(); i < total; i++) {
+            HKU_IF_RETURN((std::isnan(d1[i]) && !std::isnan(d2[i])) ||
+                            (!std::isnan(d1[i]) && std::isnan(d2[i])),
+                          false);
+            HKU_IF_RETURN(
+              (!std::isnan(d1[i]) && !std::isnan(d2[i])) && (std::abs(d1[i] - d2[i]) >= 0.0001),
+              false);
+        }
+    }
+    return true;
+}
+
 Indicator& Indicator::operator=(const Indicator& indicator) {
     HKU_IF_RETURN(this == &indicator, *this);
     m_imp = indicator.m_imp;
@@ -303,26 +324,6 @@ Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t 
 
 Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b) {
     return IF(x, CVAL(x, a), CVAL(x, b));
-}
-
-Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n) {
-    HKU_ERROR_IF_RETURN(!ind1.getImp() || !ind2.getImp(), Indicator(),
-                        "ind1 or ind2 is Null Indicator!");
-    HKU_ERROR_IF_RETURN(n < 2, Indicator(), "Invalid param n: {} (need >= 2)", n);
-    IndicatorImpPtr p = make_shared<IndicatorImp>("CORR");
-    p->setParam<int>("n", n);
-    p->add(IndicatorImp::CORR, ind1.getImp(), ind2.getImp());
-    return p->calculate();
-}
-
-Indicator HKU_API SPEARMAN(const Indicator& ind1, const Indicator& ind2, int n) {
-    HKU_ERROR_IF_RETURN(!ind1.getImp() || !ind2.getImp(), Indicator(),
-                        "ind1 or ind2 is Null Indicator!");
-    HKU_ERROR_IF_RETURN(n < 2, Indicator(), "Invalid param n: {} (need >= 2)", n);
-    IndicatorImpPtr p = make_shared<IndicatorImp>("SPEARMAN");
-    p->setParam<int>("n", n);
-    p->add(IndicatorImp::SPEARMAN, ind1.getImp(), ind2.getImp());
-    return p->calculate();
 }
 
 } /* namespace hku */

@@ -44,6 +44,12 @@ void MoneyManagerBase::buyNotify(const TradeRecord&) {}
 
 void MoneyManagerBase::sellNotify(const TradeRecord&) {}
 
+void MoneyManagerBase::reset() {
+    m_query = Null<KQuery>();
+    m_tm.reset();
+    _reset();
+}
+
 MoneyManagerPtr MoneyManagerBase::clone() {
     MoneyManagerPtr p;
     try {
@@ -65,14 +71,14 @@ MoneyManagerPtr MoneyManagerBase::clone() {
     return p;
 }
 
-double MoneyManagerBase ::getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                                        price_t risk, SystemPart from) {
+double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                       price_t risk, SystemPart from) {
     HKU_ERROR_IF_RETURN(!m_tm, 0.0,
                         "m_tm is null! Datetime({}) Stock({}) price({:<.4f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
 
     if (PART_ENVIRONMENT == from) {
-        //强制全部卖出
+        // 强制全部卖出
         HKU_IF_RETURN(!getParam<bool>("disable_ev_force_clean_position"), MAX_DOUBLE);
     }
 
@@ -80,14 +86,15 @@ double MoneyManagerBase ::getSellNumber(const Datetime& datetime, const Stock& s
         HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
     }
 
-    HKU_ERROR_IF_RETURN(risk <= 0.0, 0.0,
+    HKU_ERROR_IF_RETURN(
+      risk <= 0.0, 0.0,
       "risk is negative! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f}) Part({})", datetime,
       stock.market_code(), price, risk, getSystemPartName(from));
     return _getSellNumber(datetime, stock, price, risk, from);
 }
 
-double MoneyManagerBase ::getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                                       price_t risk, SystemPart from) {
+double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                      price_t risk, SystemPart from) {
     HKU_ERROR_IF_RETURN(!m_tm, 0.0,
                         "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
@@ -109,7 +116,7 @@ double MoneyManagerBase ::getBuyNumber(const Datetime& datetime, const Stock& st
         return 0;
     }
 
-    //转换为最小交易量的整数倍
+    // 转换为最小交易量的整数倍
     n = long(n / min_trade) * min_trade;
     double max_trade = stock.maxTradeNumber();
 
@@ -118,7 +125,7 @@ double MoneyManagerBase ::getBuyNumber(const Datetime& datetime, const Stock& st
         HKU_INFO("Over stock.maxTradeNumber({})!", max_trade);
     }
 
-    //在现金不足时，自动补充存入现金
+    // 在现金不足时，自动补充存入现金
     if (getParam<bool>("auto-checkin")) {
         price_t cash = m_tm->cash(datetime, m_query.kType());
         CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
@@ -142,8 +149,8 @@ double MoneyManagerBase ::getBuyNumber(const Datetime& datetime, const Stock& st
     return n;
 }
 
-double MoneyManagerBase ::getSellShortNumber(const Datetime& datetime, const Stock& stock,
-                                             price_t price, price_t risk, SystemPart from) {
+double MoneyManagerBase::getSellShortNumber(const Datetime& datetime, const Stock& stock,
+                                            price_t price, price_t risk, SystemPart from) {
     HKU_ERROR_IF_RETURN(!m_tm, 0.0,
                         "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
@@ -166,7 +173,7 @@ double MoneyManagerBase ::getBuyShortNumber(const Datetime& datetime, const Stoc
 
 double MoneyManagerBase::_getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                         price_t risk, SystemPart from) {
-    //默认卖出全部
+    // 默认卖出全部
     return MAX_DOUBLE;
 }
 

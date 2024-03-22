@@ -13,9 +13,6 @@
 #include "../config.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/split_free.hpp>
-#include <boost/serialization/base_object.hpp>
 
 namespace boost {
 namespace serialization {
@@ -41,7 +38,7 @@ void save(Archive& ar, const hku::KQuery& query, unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(start);
         ar& BOOST_SERIALIZATION_NVP(end);
     } else {
-        //非法忽略
+        // 非法忽略
     }
 }
 
@@ -68,7 +65,7 @@ void load(Archive& ar, hku::KQuery& query, unsigned int version) {
         query =
           hku::KQueryByDate(hku::Datetime(start), hku::Datetime(end), enmu_ktype, enum_recover);
     } else {
-        //非法忽略
+        // 非法忽略
     }
 }
 

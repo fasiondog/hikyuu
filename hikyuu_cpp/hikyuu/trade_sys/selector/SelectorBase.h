@@ -14,29 +14,6 @@
 #include "../../KData.h"
 #include "../../utilities/Parameter.h"
 
-#if HKU_SUPPORT_SERIALIZATION
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/assume_abstract.hpp>
-#include <boost/serialization/base_object.hpp>
-
-#if HKU_SUPPORT_XML_ARCHIVE
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#endif /* HKU_SUPPORT_XML_ARCHIVE */
-
-#if HKU_SUPPORT_TEXT_ARCHIVE
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#endif /* HKU_SUPPORT_TEXT_ARCHIVE */
-
-#if HKU_SUPPORT_BINARY_ARCHIVE
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#endif /* HKU_SUPPORT_BINARY_ARCHIVE */
-
-#include <boost/serialization/export.hpp>
-#endif /* HKU_SUPPORT_SERIALIZATION */
-
 namespace hku {
 
 class HKU_API Portfolio;
@@ -127,9 +104,7 @@ public:
 
     virtual bool isMatchAF(const AFPtr& af) = 0;
 
-private:
     friend class HKU_API Portfolio;
-
     /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
     void calculate(const SystemList& sysList, const KQuery& query);
 

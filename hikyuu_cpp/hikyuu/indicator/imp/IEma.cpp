@@ -15,7 +15,7 @@ BOOST_CLASS_EXPORT(hku::IEma)
 
 namespace hku {
 
-IEma::IEma() : IndicatorImp("IEma", 1) {
+IEma::IEma() : IndicatorImp("EMA", 1) {
     setParam<int>("n", 22);
 }
 

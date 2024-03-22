@@ -11,6 +11,7 @@
 * :py:func:`DROPNA` - 删除 nan 值
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
+* :py:func:`ZSCORE` - ZScore 标准化
 
 
 **行情指标**
@@ -23,6 +24,10 @@
 * :py:func:`CLOSE` - 包装KData的收盘价成Indicator
 * :py:func:`AMO`   - 包装KData的成交金额成Indicator
 * :py:func:`VOL`   - 包装KData的成交量成Indicator
+* :py:func:`RECOVER_FORWARD` - 前向复权
+* :py:func:`RECOVER_BACKWARD` - 后向复权
+* :py:func:`RECOVER_EQUAL_FORWARD` - 等比前向复权
+* :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后向复权
 * :py:func:`HSL` - 换手率
 * :py:func:`CAPITAL` - 流通盘，同名：LIUTONGPAN
 * :py:func:`TIMELINE`   - 分时价格
@@ -132,6 +137,12 @@
 * :py:func:`HOUR` - 取得该周期的小时数
 * :py:func:`MINUTE` - 取得该周期的分钟数
 
+**因子类指标**
+
+* :py:func:`IC` - 计算因子 IC 值
+* :py:func:`IR` - 用于计算账户收益与参照收益的IR
+* :py:func:`ICIR` - 计算因子 IC 的 IR 值
+
 
 **Ta-lib指标**
 
@@ -142,3 +153,39 @@
 * :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
 * :py:func:`ROCR` - 变动率指标: (price / prevPrice)
 * :py:func:`ROCR100` - 变动率指标: (price / prevPrice) * 100
+
+**其他转换辅助**
+
+* :py:func:`concat_to_df` - 合并指标列表为 DateFrame
+
+
+.. py:function:: concat_to_df(dates, ind_list[, head_stock_code=True, head_ind_name=False])
+    将列表中的指标至合并在一张 pandas DataFrame 中
+
+    :param DatetimeList dates: 指定的日期列表
+    :param sequence ind_list: 已计算的指标列表
+    :param bool head_ind_name: 表标题是否使用指标名称
+    :param bool head_stock_code: 表标题是否使用证券代码
+    :return: 合并后的 DataFrame, 以 dates 为 index（注: dates列 为 Datetime 类型）
+
+::
+
+    示例:
+        query = Query(-200)
+        k_list = [stk.get_kdata(query) for stk in [sm['sz000001'], sm['sz000002']]]
+        ma_list = [MA(k) for k in k_list]
+        concat_to_df(sm.get_trading_calendar(query), ma_list, head_stock_code=True, head_ind_name=False)
+        df
+
+                date	SZ000001	SZ000002
+        0	2023-05-12 00:00:00	12.620000	15.060000
+        1	2023-05-15 00:00:00	12.725000	15.060000
+        2	2023-05-16 00:00:00	12.690000	15.010000
+        3	2023-05-17 00:00:00	12.640000	14.952500
+        4	2023-05-18 00:00:00	12.610000	14.886000
+        ...	...	...	...
+        195	2024-03-01 00:00:00	9.950455	9.837273
+        196	2024-03-04 00:00:00	9.995909	9.838182
+        197	2024-03-05 00:00:00	10.038182	9.816364
+        198	2024-03-06 00:00:00	10.070455	9.776818
+        199	2024-03-07 00:00:00	10.101364	9.738182

@@ -18,9 +18,6 @@
 // TODO 实现非StockManager管理的Stock的序列化
 //===========================================================================
 #if HKU_SUPPORT_SERIALIZATION
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/split_free.hpp>
-#include <boost/serialization/vector.hpp>
 
 namespace boost {
 namespace serialization {

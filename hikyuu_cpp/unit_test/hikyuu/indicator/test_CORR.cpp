@@ -10,6 +10,7 @@
 #include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
+#include <hikyuu/indicator/crt/CORR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
@@ -41,13 +42,13 @@ TEST_CASE("test_CORR") {
     Indicator y = PRICELIST(b);
 
     // 非法参数 n
-    result = CORR(x, y, 0);
+    result = CORR(x, y, -1);
     CHECK_UNARY(result.empty());
     result = CORR(x, y, 1);
     CHECK_UNARY(result.empty());
 
     // 正常情况
-    result = CORR(x, y, a.size());
+    result = CORR(x, y, 0);
     CHECK_EQ(result.name(), "CORR");
     CHECK_EQ(result.discard(), 2);
     CHECK_EQ(result.size(), a.size());

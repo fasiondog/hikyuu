@@ -35,6 +35,22 @@ Indicator (*VOL3)() = VOL;
 Indicator (*KDATA_PART1)(const KData& kdata, const string& part) = KDATA_PART;
 Indicator (*KDATA_PART3)(const string& part) = KDATA_PART;
 
+Indicator (*RECOVER_FORWARD_1)() = RECOVER_FORWARD;
+Indicator (*RECOVER_FORWARD_2)(const Indicator&) = RECOVER_FORWARD;
+Indicator (*RECOVER_FORWARD_3)(const KData&) = RECOVER_FORWARD;
+
+Indicator (*RECOVER_BACKWARD_1)() = RECOVER_BACKWARD;
+Indicator (*RECOVER_BACKWARD_2)(const Indicator&) = RECOVER_BACKWARD;
+Indicator (*RECOVER_BACKWARD_3)(const KData&) = RECOVER_BACKWARD;
+
+Indicator (*RECOVER_EQUAL_FORWARD_1)() = RECOVER_EQUAL_FORWARD;
+Indicator (*RECOVER_EQUAL_FORWARD_2)(const Indicator&) = RECOVER_EQUAL_FORWARD;
+Indicator (*RECOVER_EQUAL_FORWARD_3)(const KData&) = RECOVER_EQUAL_FORWARD;
+
+Indicator (*RECOVER_EQUAL_BACKWARD_1)() = RECOVER_EQUAL_BACKWARD;
+Indicator (*RECOVER_EQUAL_BACKWARD_2)(const Indicator&) = RECOVER_EQUAL_BACKWARD;
+Indicator (*RECOVER_EQUAL_BACKWARD_3)(const KData&) = RECOVER_EQUAL_BACKWARD;
+
 Indicator (*DATE1)() = hku::DATE;
 Indicator (*DATE2)(const KData&) = hku::DATE;
 
@@ -418,10 +434,10 @@ Indicator (*AD_2)(const KData&) = AD;
 Indicator (*COST_1)(double x) = COST;
 Indicator (*COST_2)(const KData&, double x) = COST;
 
-Indicator (*ALIGN_1)(const DatetimeList&) = ALIGN;
-Indicator (*ALIGN_2)(const Indicator&, const DatetimeList&) = ALIGN;
-Indicator (*ALIGN_3)(const Indicator&, const Indicator&) = ALIGN;
-Indicator (*ALIGN_4)(const Indicator&, const KData&) = ALIGN;
+Indicator (*ALIGN_1)(const DatetimeList&, bool fill_null) = ALIGN;
+Indicator (*ALIGN_2)(const Indicator&, const DatetimeList&, bool fill_null) = ALIGN;
+Indicator (*ALIGN_3)(const Indicator&, const Indicator&, bool fill_null) = ALIGN;
+Indicator (*ALIGN_4)(const Indicator&, const KData&, bool fill_null) = ALIGN;
 
 Indicator (*DROPNA_1)() = DROPNA;
 Indicator (*DROPNA_2)(const Indicator&) = DROPNA;
@@ -465,6 +481,15 @@ Indicator (*ZHBOND10_1)(double) = ZHBOND10;
 Indicator (*ZHBOND10_2)(const DatetimeList&, double) = ZHBOND10;
 Indicator (*ZHBOND10_3)(const KData& k, double) = ZHBOND10;
 Indicator (*ZHBOND10_4)(const Indicator&, double) = ZHBOND10;
+
+Indicator (*CORR_1)(int) = CORR;
+Indicator (*CORR_2)(const Indicator&, const Indicator&, int) = CORR;
+
+Indicator (*SPEARMAN_1)(int) = SPEARMAN;
+Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int) = SPEARMAN;
+
+Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
+Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
 
 void export_Indicator_build_in(py::module& m) {
     m.def("KDATA", KDATA1);
@@ -530,6 +555,42 @@ void export_Indicator_build_in(py::module& m) {
 
     :param data: 输入数据（KData 或 Indicator） 
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
+    :rtype: Indicator)");
+
+    m.def("RECOVER_FORWARD", RECOVER_FORWARD_1);
+    m.def("RECOVER_FORWARD", RECOVER_FORWARD_2);
+    m.def("RECOVER_FORWARD", RECOVER_FORWARD_3, R"(RECOVER_FORWARD([data])
+    
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行前向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator)");
+
+    m.def("RECOVER_BACKWARD", RECOVER_BACKWARD_1);
+    m.def("RECOVER_BACKWARD", RECOVER_BACKWARD_2);
+    m.def("RECOVER_BACKWARD", RECOVER_BACKWARD_3, R"(RECOVER_BACKWARD([data])
+    
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行后向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator)");
+
+    m.def("RECOVER_EQUAL_FORWARD", RECOVER_EQUAL_FORWARD_1);
+    m.def("RECOVER_EQUAL_FORWARD", RECOVER_EQUAL_FORWARD_2);
+    m.def("RECOVER_EQUAL_FORWARD", RECOVER_EQUAL_FORWARD_3, R"(RECOVER_EQUAL_FORWARD([data])
+    
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比前向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator)");
+
+    m.def("RECOVER_EQUAL_BACKWARD", RECOVER_EQUAL_BACKWARD_1);
+    m.def("RECOVER_EQUAL_BACKWARD", RECOVER_EQUAL_BACKWARD_2);
+    m.def("RECOVER_EQUAL_BACKWARD", RECOVER_EQUAL_BACKWARD_3, R"(RECOVER_EQUAL_BACKWARD([data])
+    
+    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比后向复权
+
+    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
     :rtype: Indicator)");
 
     m.def("DATE", DATE1);
@@ -847,13 +908,15 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind2: 指标2
     :rtype: Indicator)");
 
-    m.def("CORR", CORR, R"(CORR(ind1, ind2, n)
+    m.def("CORR", CORR_1, py::arg("n") = 10);
+    m.def("CORR", CORR_2, py::arg("ind1"), py::arg("ind2"), py::arg("n") = 10,
+          R"(CORR(ind1, ind2, n)
 
     计算 ind1 和 ind2 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
 
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
-    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数
+    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
     :rtype: Indicator)");
 
     m.def("IF", IF_1);
@@ -1545,15 +1608,17 @@ void export_Indicator_build_in(py::module& m) {
     :param float x: x%获利价格, 0~100
     :rtype: Indicator)");
 
-    m.def("ALIGN", ALIGN_1);
-    m.def("ALIGN", ALIGN_2);
-    m.def("ALIGN", ALIGN_3);
-    m.def("ALIGN", ALIGN_4, R"(ALIGN(data, ref):
+    m.def("ALIGN", ALIGN_1, py::arg("ref"), py::arg("fill_null") = true);
+    m.def("ALIGN", ALIGN_2, py::arg("data"), py::arg("ref"), py::arg("fill_null") = true);
+    m.def("ALIGN", ALIGN_3, py::arg("data"), py::arg("ref"), py::arg("fill_null") = true);
+    m.def("ALIGN", ALIGN_4, py::arg("data"), py::arg("ref"), py::arg("fill_null") = true,
+          R"(ALIGN(data, ref):
 
     按指定的参考日期对齐
 
     :param Indicator data: 输入数据
-    :param ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
+    :param DatetimeList|Indicator|KData ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
+    :param bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据
     :retype: Indicator)");
 
     m.def("DROPNA", DROPNA_1);
@@ -1643,12 +1708,81 @@ void export_Indicator_build_in(py::module& m) {
     :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
     :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值)");
 
-    m.def("SPEARMAN", SPEARMAN, py::arg("ind1"), py::arg("ind2"), py::arg("n"),
-          R"(SPEARMAN(ind1, ind2, n)
+    m.def("SPEARMAN", SPEARMAN_1, py::arg("n") = 0);
+    m.def("SPEARMAN", SPEARMAN_2, py::arg("ind1"), py::arg("ind2"), py::arg("n") = 0,
+          R"(SPEARMAN(ind1, ind2[, n])
 
     Spearman 相关系数
 
     :param Indicator ind1: 输入参数1
     :param Indicator ind2: 输入参数2
-    :param int n: 指定窗口)");
+    :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度)");
+
+    // IR(const Indicator& p, const Indicator& b, int n = 100)
+    m.def("IR", IR, py::arg("p"), py::arg("b"), py::arg("n") = 100, R"(IR(p, b[, n])
+
+    信息比率（Information Ratio，IR）
+
+    公式: (P-B) / TE
+    P: 组合收益率
+    B: 比较基准收益率
+    TE: 投资周期中每天的 p 和 b 之间的标准差
+    实际使用时，P 一般为 TM 的资产曲线，B 为沪深 3000 收盘价，如:
+    ref_k = sm["sh000300"].get_kdata(query)
+    funds = my_tm.get_funds_curve(ref_k.get_datetime.list())
+    ir = IR(PRICELIST(funds), ref_k.close, 0)
+
+    :param Indicator p:
+    :param Indicator b:
+    :param int n: 时间窗口，如果只想使用最后的值，可以使用 0, 或 len(p),len(b) 指定
+    )");
+
+    m.def(
+      "IC",
+      [](const Indicator& ind, const py::object& stks, const KQuery& query, int n,
+         const Stock& ref_stk) {
+          if (py::isinstance<Block>(stks)) {
+              const auto& blk = stks.cast<Block&>();
+              return IC(ind, blk, query, n, ref_stk);
+          }
+
+          if (py::isinstance<py::sequence>(stks)) {
+              StockList c_stks = python_list_to_vector<Stock>(stks);
+              return IC(ind, c_stks, query, n, ref_stk);
+          }
+
+          HKU_THROW("Input stks must be Block or sequenc(Stock)!");
+      },
+      py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("n"), py::arg("ref_stk"),
+      R"(IC(ind, stks, query, n, ref_stk)
+
+    计算指定的因子相对于参考证券的 IC （实际为 RankIC）
+    
+    :param sequence(stock)|Block stks 证券组合
+    :param Query query: 查询条件
+    :param int n: 时间窗口
+    :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300)");
+
+    m.def("ICIR", ICIR, py::arg("ic"), py::arg("n") = 120, R"(ICIR(ic[,n])
+
+    计算 IC 因子 IR = IC的多周期均值/IC的标准方差
+
+    :param Indicator: ic 已经计算出的 ic 值
+    :param int n: 时间窗口)");
+
+    m.def("ZSCORE", ZSCORE_1, py::arg("out_extreme") = false, py::arg("nsigma") = 3.0,
+          py::arg("recursive") = false);
+    m.def("ZSCORE", ZSCORE_2, py::arg("data"), py::arg("out_extreme") = false,
+          py::arg("nsigma") = 3.0, py::arg("recursive") = false,
+          R"(ZSCORE(data[, out_extreme, nsigma, recursive])
+
+    对数据进行标准化（归一），可选进行极值排除
+
+    注：非窗口滚动，如需窗口滚动的标准化，直接 (x - MA(x, n)) / STDEV(x, n) 即可。
+    
+    :param Indicator data: 待剔除异常值的数据
+    :param bool outExtreme: 指示剔除极值，默认 False
+    :param float nsigma: 剔除极值时使用的 nsigma 倍 sigma，默认 3.0
+    :param bool recursive: 是否进行递归剔除极值，默认 False
+    :rtype: Indicator)");
 }

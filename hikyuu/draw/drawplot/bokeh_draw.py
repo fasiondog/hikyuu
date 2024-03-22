@@ -5,7 +5,6 @@
 """
 
 from hikyuu import *
-from .common import in_ipython_frontend
 
 from bokeh.plotting import figure, ColumnDataSource
 from bokeh.models import DatetimeTickFormatter, HoverTool, Title, Label
@@ -65,7 +64,7 @@ def show_gcf():
 
 def create_one_axes_figure(figsize=(800, 450)):
     """生成一个仅含有1个坐标轴的figure，并返回其坐标轴对象
-    
+
     :param figsize: (宽, 高)
     :return: ax
     """
@@ -78,7 +77,7 @@ def create_one_axes_figure(figsize=(800, 450)):
 
 def create_two_axes_figure(figsize=(800, 450)):
     """生成一个含有2个坐标轴的figure，并返回坐标轴列表
-    
+
     :param figsize: (宽, 高)
     :return: (ax1, ax2)    
     """
@@ -93,7 +92,7 @@ def create_two_axes_figure(figsize=(800, 450)):
 
 def create_three_axes_figure(figsize=(800, 450)):
     """生成一个含有2个坐标轴的figure，并返回坐标轴列表
-    
+
     :param figsize: (宽, 高)
     :return: (ax1, ax2)    
     """
@@ -132,7 +131,7 @@ def get_date_format(kdata):
 
 def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     """绘制K线图
-    
+
     :param KData kdata: K线数据
     :param bool new:    是否在新窗口中显示，只在没有指定axes时生效
     :param axes:        指定的坐标轴
@@ -226,7 +225,7 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
 
 def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     """绘制美式K线图
-    
+
     :param KData kdata: K线数据
     :param bool new:    是否在新窗口中显示，只在没有指定axes时生效
     :param axes:        指定的坐标轴
@@ -258,7 +257,7 @@ def iplot(
     **kwargs
 ):
     """绘制indicator曲线
-    
+
     :param Indicator indicator: indicator实例
     :param axes:            指定的坐标轴
     :param new:             是否在新窗口中显示，只在没有指定axes时生效
@@ -357,7 +356,7 @@ def ibar(
     **kwargs
 ):
     """绘制indicator柱状图
-    
+
     :param Indicator indicator: Indicator实例
     :param axes:       指定的坐标轴
     :param new:        是否在新窗口中显示，只在没有指定axes时生效
@@ -436,7 +435,7 @@ def ibar(
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
-    
+
     :param axes: 指定的坐标轴
     :param KData kdata: KData
     :param int n1: 指标 MACD 的参数1

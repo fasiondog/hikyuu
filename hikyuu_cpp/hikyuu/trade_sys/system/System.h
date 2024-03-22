@@ -145,22 +145,20 @@ public:
     const TradeRequest& getBuyShortTradeRequest() const;
 
     /**
-     * 复位
-     * @param with_tm 是否复位TM组件
-     * @param with_ev 是否复位EV组件
-     * @note TM、EV都是和具体系统无关的策略组件，可以在不同的系统中进行共享，复位将引起系统
-     * 运行时被重新清空并计算。尤其是在共享TM时需要注意！
+     * 复位，但不包括已有的交易对象，以及共享的部件
+     * @note 实际复位操作依赖于系统中各个部件的共享参数
      */
-    void reset(bool with_tm, bool with_ev);
+    void reset();
+
+    /** 强制复位所有组件以及清空已有的交易对象，忽略组件的共享属性 */
+    void forceResetAll();
 
     typedef shared_ptr<System> SystemPtr;
 
     /**
      * 克隆操作，会依次调用所有部件的clone操作
-     * @param with_tm 是否克隆 tm，默认为 true
-     * @param with_ev 是否克隆 ev，默认为 false，ev 通常作为公共组件不进行克隆，使用同一实例
      */
-    SystemPtr clone(bool with_tm = true, bool with_ev = false);
+    SystemPtr clone();
 
     /**
      * 设置交易对象
@@ -171,24 +169,27 @@ public:
     /**
      * @brief 不指定stock的方式下run，需要事先通过setStock设定stock
      * @param query 查询条件
-     * @param reset 执行前是否先复位
+     * @param reset 执行前是否依据系统部件共享属性复位
+     * @param resetAll 强制复位所有部件
      */
-    void run(const KQuery& query, bool reset = true);
+    void run(const KQuery& query, bool reset = true, bool resetAll = false);
 
     /**
      * @brief 运行系统策略
      * @param stock 指定的证券
      * @param query 指定查询条件
-     * @param reset 执行前是否复位
+     * @param reset 执行前是否依据系统部件共享属性复位
+     * @param resetAll 强制复位所有部件
      */
-    void run(const Stock& stock, const KQuery& query, bool reset = true);
+    void run(const Stock& stock, const KQuery& query, bool reset = true, bool resetAll = false);
 
     /**
      * @brief 运行系统
      * @param kdata 指定的交易对象
-     * @param reset 执行前是否复位
+     * @param reset 执行前是否依据系统部件共享属性复位
+     * @param resetAll 强制复位所有部件
      */
-    void run(const KData& kdata, bool reset = true);
+    void run(const KData& kdata, bool reset = true, bool resetAll = false);
 
     /**
      * @brief 在指定的日期执行一步，仅由 PF 调用
@@ -279,6 +280,7 @@ protected:
     KData m_kdata;
     KData m_src_kdata;  // 未复权的原始 K 线数据
 
+    bool m_part_changed;  // 记录部件是否发生变化，控制是否需要重新计算
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
 
@@ -320,6 +322,7 @@ private:
         // m_kdata中包含了stock和query的信息，不用保存m_stock
         ar& BOOST_SERIALIZATION_NVP(m_kdata);
 
+        ar& BOOST_SERIALIZATION_NVP(m_part_changed);
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
@@ -354,6 +357,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_kdata);
         m_stock = m_kdata.getStock();
 
+        ar& BOOST_SERIALIZATION_NVP(m_part_changed);
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
@@ -433,39 +437,66 @@ inline SlippagePtr System::getSP() const {
 }
 
 inline void System::setTM(const TradeManagerPtr& tm) {
-    m_tm = tm;
+    if (m_tm != tm) {
+        m_tm = tm;
+        m_part_changed = true;
+    }
 }
 
 inline void System::setMM(const MoneyManagerPtr& mm) {
-    m_mm = mm;
+    if (m_mm != mm) {
+        m_mm = mm;
+        m_part_changed = true;
+    }
 }
 
 inline void System::setEV(const EnvironmentPtr& ev) {
-    m_ev = ev;
+    if (m_ev != ev) {
+        m_ev = ev;
+        m_part_changed = true;
+    }
 }
 
 inline void System::setCN(const ConditionPtr& cn) {
-    m_cn = cn;
+    if (m_cn != cn) {
+        m_cn = cn;
+        m_part_changed = true;
+    }
 }
 
 inline void System::setSG(const SignalPtr& sg) {
-    m_sg = sg;
+    if (m_sg != sg) {
+        m_sg = sg;
+        m_part_changed = true;
+    }
 }
 
 inline void System::setST(const StoplossPtr& st) {
-    m_st = st;
+    if (m_st != st) {
+        m_st = st;
+        m_part_changed = true;
+    }
 }
 
 inline void System::setTP(const StoplossPtr& tp) {
-    m_tp = tp;
+    if (m_tp != tp) {
+        m_tp = tp;
+        m_part_changed = true;
+    }
 }
 
 inline void System::setPG(const ProfitGoalPtr& pg) {
-    m_pg = pg;
+    if (m_pg != pg) {
+        m_pg = pg;
+        m_part_changed = true;
+    }
 }
 
 inline void System::setSP(const SlippagePtr& sp) {
-    m_sp = sp;
+    if (m_sp != sp) {
+        m_sp = sp;
+        m_part_changed = true;
+    }
 }
 
 inline Stock System::getStock() const {

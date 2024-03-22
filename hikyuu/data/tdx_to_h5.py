@@ -251,7 +251,7 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
         def get_date(pos):
             src_file.seek(pos * 32, SEEK_SET)
             data = src_file.read(4)
-            a = struct.unpack('hh', data)
+            a = struct.unpack('HH', data)
             return trans_date(a[0], a[1])
 
         def find_pos():
@@ -290,7 +290,7 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
 
             data = src_file.read(32)
             while data:
-                record = struct.unpack('hhfffffii', data)
+                record = struct.unpack('HHfffffii', data)
                 if 0 not in record[2:6]:
                     if record[3] >= record[2] >= record[4] \
                             and record[3] >= record[5] >= record[4]:
