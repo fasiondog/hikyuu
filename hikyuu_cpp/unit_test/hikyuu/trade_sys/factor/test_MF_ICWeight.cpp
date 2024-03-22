@@ -53,16 +53,19 @@ TEST_CASE("test_MF_ICWeight") {
     for (size_t i = 0; i < ind4.discard(); i++) {
         CHECK_UNARY(std::isnan(ind4[i]));
     }
-    CHECK_EQ(ndays, std::max(ic1.discard(), std::max(ic2.discard(), ic3.discard())));
+    CHECK_EQ(ind4.discard(), std::max(ic1.discard(), std::max(ic2.discard(), ic3.discard())));
     for (size_t i = 0; i < ind4.discard(); i++) {
         CHECK_UNARY(std::isnan(ind4[i]));
     }
     for (size_t i = ind4.discard(), len = ref_dates.size(); i < len; i++) {
-        Indicator::value_t w = ind1[i] * ic1[i] + ind2[i] * ic2[i] + ind3[i] * ic3[i];
+        Indicator::value_t w = (ind1[i] * ic1[i] + ind2[i] * ic2[i] + ind3[i] * ic3[i]) /
+                               std::abs(ic1[i] + ic2[i] + ic3[i]);
+        HKU_INFO("{}: {}, {}", i, w, ind4[i]);
         if (!std::isnan(ind4[i]) && !std::isnan(w)) {
             CHECK_EQ(ind4[i], doctest::Approx(w));
         }
     }
+    HKU_INFO("{}", ind4);
 }
 
 //-----------------------------------------------------------------------------

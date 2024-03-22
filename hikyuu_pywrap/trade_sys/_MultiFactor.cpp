@@ -170,7 +170,7 @@ void export_MultiFactor(py::module& m) {
           // MF_EqualWeight
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = python_list_to_vector<Stock>(stks);
-          return MF_ICWeight(c_inds, c_stks, query, ref_stk, ic_n);
+          return MF_ICWeight(c_inds, c_stks, query, ref_stk, ic_n, ic_rolling_n);
       },
       py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("ic_n") = 5,
       py::arg("ic_rolling_n") = 120,
@@ -193,7 +193,7 @@ void export_MultiFactor(py::module& m) {
           // MF_EqualWeight
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = python_list_to_vector<Stock>(stks);
-          return MF_ICIRWeight(c_inds, c_stks, query, ref_stk, ic_n);
+          return MF_ICIRWeight(c_inds, c_stks, query, ref_stk, ic_n, ic_rolling_n);
       },
       py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("ic_n") = 5,
       py::arg("ic_rolling_n") = 120,

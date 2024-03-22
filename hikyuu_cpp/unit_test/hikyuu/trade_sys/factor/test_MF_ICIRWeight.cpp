@@ -16,6 +16,7 @@
 #include <hikyuu/indicator/crt/ICIR.h>
 #include <hikyuu/indicator/crt/ROCR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/STDEV.h>
 #include <hikyuu/trade_sys/factor/crt/MF_ICIRWeight.h>
 
 using namespace hku;
@@ -44,6 +45,8 @@ TEST_CASE("test_MF_ICIRWeight") {
     auto stk = sm["sh600004"];
     auto ind1 = MA(ROCR(CLOSE(stk.getKData(query)), ndays));
     auto ic1 = ICIR(IC(MA(ROCR(CLOSE(), ndays)), stks, query, ndays, ref_stk), ic_rolling_n);
+    auto ma_ic1 = MA(IC(MA(ROCR(CLOSE(), ndays)), stks, query, ndays, ref_stk), ic_rolling_n);
+    auto stdev_ic1 = STDEV(ma_ic1, ic_rolling_n);
     auto ind2 = AMA(ROCR(CLOSE(stk.getKData(query)), ndays));
     auto ic2 = ICIR(IC(AMA(ROCR(CLOSE(), ndays)), stks, query, ndays, ref_stk), ic_rolling_n);
     auto ind3 = EMA(ROCR(CLOSE(stk.getKData(query)), ndays));
@@ -59,10 +62,13 @@ TEST_CASE("test_MF_ICIRWeight") {
     }
     for (size_t i = ind4.discard(), len = ref_dates.size(); i < len; i++) {
         Indicator::value_t w = ind1[i] * ic1[i] + ind2[i] * ic2[i] + ind3[i] * ic3[i];
+        HKU_INFO("{}: {}, {}, {}, {}, {}", i, w, ind1[i], ma_ic1[i], ma_ic1.discard(),
+                 stdev_ic1[i]);
         if (!std::isnan(ind4[i]) && !std::isnan(w)) {
             CHECK_EQ(ind4[i], doctest::Approx(w));
         }
     }
+    HKU_INFO("{}", ind4);
 }
 
 //-----------------------------------------------------------------------------

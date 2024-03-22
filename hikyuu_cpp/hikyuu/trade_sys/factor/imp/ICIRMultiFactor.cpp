@@ -47,19 +47,34 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
 
     // 以 ICIR 为权重，计算加权后的合成因子
     IndicatorList all_factors(stk_count);
-    PriceList new_values(days_total, 0);
+    PriceList new_values(days_total, 0.0);
+    PriceList sum_weight(days_total, 0.0);
     for (size_t si = 0; si < stk_count; si++) {
         memset(new_values.data(), 0, sizeof(price_t) * days_total);
         for (size_t di = discard; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
                 if (!std::isnan(all_stk_inds[si][ii][di]) && !std::isnan(icir[ii][di])) {
                     new_values[di] += all_stk_inds[si][ii][di] * icir[ii][di];
+                    sum_weight[di] += std::abs(icir[ii][di]);
                 }
             }
         }
+
+        for (size_t di = discard; di < days_total; di++) {
+            if (!std::isnan(new_values[di]) && sum_weight[di] != 0.0) {
+                new_values[di] = new_values[di] / sum_weight[di];
+            }
+        }
+
         all_factors[si] = PRICELIST(new_values);
         all_factors[si].name("ICIR");
-        all_factors[si].setDiscard(discard);
+
+        const auto* data = all_factors[si].data();
+        for (size_t di = discard; di < days_total; di++) {
+            if (!std::isnan(data[di])) {
+                all_factors[si].setDiscard(discard);
+            }
+        }
     }
 
     return all_factors;

@@ -378,13 +378,19 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     //----------------------------------------------------------------------
     // 跟踪打印持仓情况
     //----------------------------------------------------------------------
-    if (trace) {
-        HKU_INFO("+------------+------------+------------+--------------+--------------+");
-        HKU_INFO("| code       | name       | position   | market value | remain cash  |");
-        HKU_INFO("+------------+------------+------------+--------------+--------------+");
+    if (trace && !m_running_sys_set.empty()) {
+        HKU_INFO(
+          "+------------+------------+------------+--------------+--------------+-------------+");
+        HKU_INFO(
+          "| code       | name       | position   | market value | remain cash  | close price |");
+        HKU_INFO(
+          "+------------+------------+------------+--------------+--------------+-------------+");
+
         size_t count = 0;
         for (const auto& sys : m_running_sys_set) {
             Stock stk = sys->getStock();
+            auto funds = sys->getTM()->getFunds(date, m_query.kType());
+            size_t position = sys->getTM()->getHoldNumber(date, stk);
 #if HKU_OS_WINDOWS
             auto stk_name = StockManager::instance().runningInPython() &&
                                 StockManager::instance().pythonInJupyter()
@@ -395,14 +401,18 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
                     stk_name.push_back(' ');
                 }
             }
+            HKU_INFO("| {:<11}| {}| {:<11}| {:<13.2f}| {:<13.2f}| {:<12.2f}|", stk.market_code(),
+                     stk_name, position, funds.market_value, funds.cash,
+                     stk.getKRecord(date, m_query.kType()).closePrice);
 #else
             auto stk_name = stk.name();
+            HKU_INFO("| {:<11}| {:<11}| {:<11}| {:<13.2f}| {:<13.2f}| {:<12.2f}|",
+                     stk.market_code(), stk_name, position, funds.market_value, funds.cash,
+                     stk.getKRecord(date, m_query.kType()).closePrice);
 #endif
-            auto funds = sys->getTM()->getFunds(date, m_query.kType());
-            size_t position = sys->getTM()->getHoldNumber(date, stk);
-            HKU_INFO("| {:<11}| {:<11}| {:<11}| {:<13.2f}| {:<13.2f}|", stk.market_code(), stk_name,
-                     position, funds.market_value, funds.cash);
-            HKU_INFO("+------------+------------+------------+--------------+--------------+");
+            HKU_INFO(
+              "+------------+------------+------------+--------------+--------------+-------------"
+              "+");
             if (++count >= 10) {
                 break;
             }

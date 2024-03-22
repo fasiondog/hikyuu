@@ -101,6 +101,13 @@ void IIc::_calculate(const Indicator& inputInd) {
         auto ic = hku::SPEARMAN(a, b, stk_count);
         dst[i] = ic[ic.size() - 1];
     }
+
+    for (size_t i = m_discard; i < days_total; i++) {
+        if (!std::isnan(dst[i])) {
+            m_discard = i;
+            break;
+        }
+    }
 }
 
 Indicator HKU_API IC(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk) {
