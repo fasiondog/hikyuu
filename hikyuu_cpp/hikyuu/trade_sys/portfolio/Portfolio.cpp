@@ -385,6 +385,7 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
         size_t count = 0;
         for (const auto& sys : m_running_sys_set) {
             Stock stk = sys->getStock();
+#if HKU_OS_WINDOWS
             auto stk_name = StockManager::instance().runningInPython() &&
                                 StockManager::instance().pythonInJupyter()
                               ? stk.name()
@@ -394,9 +395,12 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
                     stk_name.push_back(' ');
                 }
             }
+#else
+            auto stk_name = stk.name();
+#endif
             auto funds = sys->getTM()->getFunds(date, m_query.kType());
             size_t position = sys->getTM()->getHoldNumber(date, stk);
-            HKU_INFO("| {:<11}| {}| {:<11}| {:<13.2f}| {:<13.2f}|", stk.market_code(), stk_name,
+            HKU_INFO("| {:<11}| {:<11}| {:<11}| {:<13.2f}| {:<13.2f}|", stk.market_code(), stk_name,
                      position, funds.market_value, funds.cash);
             HKU_INFO("+------------+------------+------------+--------------+--------------+");
             if (++count >= 10) {
