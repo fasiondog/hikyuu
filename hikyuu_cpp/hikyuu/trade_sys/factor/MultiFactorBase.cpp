@@ -13,6 +13,7 @@
 #include "hikyuu/indicator/crt/IC.h"
 #include "hikyuu/indicator/crt/ICIR.h"
 #include "hikyuu/indicator/crt/SPEARMAN.h"
+#include "hikyuu/indicator/crt/ZSCORE.h"
 #include "MultiFactorBase.h"
 
 namespace hku {
@@ -61,11 +62,21 @@ HKU_API std::ostream& operator<<(std::ostream& out, const MultiFactorPtr& mf) {
 MultiFactorBase::MultiFactorBase() {
     setParam<bool>("fill_null", true);
     setParam<int>("ic_n", 1);
+    setParam<bool>("enable_min_max_normalize", false);
+    setParam<bool>("enable_zscore", false);
+    setParam<bool>("zscore_out_extreme", false);
+    setParam<bool>("zscore_recursive", false);
+    setParam<double>("zscore_nsigma", 3.0);
 }
 
 MultiFactorBase::MultiFactorBase(const string& name) {
     setParam<bool>("fill_null", true);
     setParam<int>("ic_n", 1);
+    setParam<bool>("enable_min_max_normalize", false);
+    setParam<bool>("enable_zscore", false);
+    setParam<bool>("zscore_out_extreme", false);
+    setParam<bool>("zscore_recursive", false);
+    setParam<double>("zscore_nsigma", 3.0);
 }
 
 MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stks,
@@ -74,6 +85,11 @@ MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stk
 : m_name(name), m_inds(inds), m_stks(stks), m_ref_stk(ref_stk), m_query(query) {
     setParam<bool>("fill_null", true);
     setParam<int>("ic_n", ic_n);
+    setParam<bool>("enable_min_max_normalize", false);
+    setParam<bool>("enable_zscore", false);
+    setParam<bool>("zscore_out_extreme", false);
+    setParam<bool>("zscore_recursive", false);
+    setParam<double>("zscore_nsigma", 3.0);
 
     HKU_CHECK(!m_ref_stk.isNull(), "The reference stock must be set!");
     HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
@@ -262,13 +278,14 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     return all_returns;
 }
 
-vector<IndicatorList> MultiFactorBase::_alignAllInds() {
-    bool fill_null = getParam<bool>("fill_null");
-    size_t stk_count = m_stks.size();
-    size_t ind_count = m_inds.size();
-
+vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     vector<IndicatorList> all_stk_inds;
+    size_t stk_count = m_stks.size();
+    HKU_IF_RETURN(stk_count == 0, all_stk_inds);
     all_stk_inds.resize(stk_count);
+
+    bool fill_null = getParam<bool>("fill_null");
+    size_t ind_count = m_inds.size();
     for (size_t i = 0; i < stk_count; i++) {
         const auto& stk = m_stks[i];
         auto kdata = stk.getKData(m_query);
@@ -277,6 +294,64 @@ vector<IndicatorList> MultiFactorBase::_alignAllInds() {
         for (size_t j = 0; j < ind_count; j++) {
             cur_stk_inds[j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
             cur_stk_inds[j].name(m_inds[j].name());
+        }
+    }
+
+    // 每日截面归一化
+    if (getParam<bool>("enable_min_max_normalize")) {
+        vector<Indicator::value_t> one_day(stk_count, Null<Indicator::value_t>());
+        for (size_t di = 0, days_total = m_ref_dates.size(); di < days_total; di++) {
+            for (size_t ii = 0; ii < ind_count; ii++) {
+                auto* one_day_data = one_day.data();
+                Indicator::value_t min_value = std::numeric_limits<Indicator::value_t>::max();
+                Indicator::value_t max_value = std::numeric_limits<Indicator::value_t>::min();
+                for (size_t si = 0; si < stk_count; si++) {
+                    auto value = all_stk_inds[si][ii][di];
+                    if (!std::isnan(value)) {
+                        if (value > max_value) {
+                            max_value = value;
+                        } else if (value < min_value) {
+                            min_value = value;
+                        }
+                    }
+                }
+
+                if (max_value == min_value ||
+                    max_value == std::numeric_limits<Indicator::value_t>::max()) {
+                    for (size_t si = 0; si < stk_count; si++) {
+                        auto* dst = all_stk_inds[si][ii].data();
+                        dst[di] = Null<Indicator::value_t>();
+                    }
+                } else {
+                    Indicator::value_t diff = max_value - min_value;
+                    for (size_t si = 0; si < stk_count; si++) {
+                        auto* dst = all_stk_inds[si][ii].data();
+                        dst[di] = (dst[di] - min_value) / diff;
+                    }
+                }
+            }
+        }
+    }
+
+    // 每日截面标准化
+    if (getParam<bool>("enable_zscore")) {
+        Indicator one_day = PRICELIST(PriceList(stk_count, Null<price_t>()));
+        for (size_t di = 0, days_total = m_ref_dates.size(); di < days_total; di++) {
+            for (size_t ii = 0; ii < ind_count; ii++) {
+                auto* one_day_data = one_day.data();
+                for (size_t si = 0; si < stk_count; si++) {
+                    one_day_data[si] = all_stk_inds[si][ii][di];
+                }
+
+                auto new_value =
+                  ZSCORE(one_day, getParam<bool>("zscore_out_extreme"),
+                         getParam<double>("zscore_nsigma"), getParam<bool>("zscore_recursive"));
+
+                for (size_t si = 0; si < stk_count; si++) {
+                    auto* dst = all_stk_inds[si][ii].data();
+                    dst[di] = new_value[si];
+                }
+            }
         }
     }
 
@@ -320,7 +395,7 @@ void MultiFactorBase::calculate() {
     HKU_IF_RETURN(m_calculated, void());
 
     // 获取所有证券所有对齐后的原始因子
-    vector<vector<Indicator>> all_stk_inds = _alignAllInds();
+    vector<vector<Indicator>> all_stk_inds = getAllSrcFactors();
 
     try {
         if (m_inds.size() == 1) {
