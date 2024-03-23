@@ -141,6 +141,8 @@ void export_MultiFactor(py::module& m) {
 
     :return: 每日 ScoreRecordList 结果的 list)")
 
+      .def("get_all_src_factors", &MultiFactorBase::getAllSrcFactors)
+
         DEF_PICKLE(MultiFactorPtr);
 
     m.def(

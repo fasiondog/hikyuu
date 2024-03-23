@@ -101,6 +101,14 @@ public:
      */
     Indicator getICIR(int ir_n, int ic_n = 0);
 
+    /**
+     * 获取所有处理过的原始因子值（归一化、标准化）
+     * @note 考虑到内存占用，该数据没有缓存，一般用与测试或者想查看处理过的原始因子值
+     * @return vector<IndicatorList>  stks x inds
+     */
+    vector<IndicatorList> getAllSrcFactors();
+
+
     typedef std::shared_ptr<MultiFactorBase> MultiFactorPtr;
     MultiFactorPtr clone();
 
@@ -112,7 +120,6 @@ private:
     void calculate();
 
 protected:
-    vector<IndicatorList> _alignAllInds();
     void _buildIndex();  // 计算完成后创建截面索引
     IndicatorList _getAllReturns(int ndays) const;
 
