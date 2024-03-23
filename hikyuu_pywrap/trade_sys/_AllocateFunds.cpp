@@ -25,29 +25,17 @@ public:
         PYBIND11_OVERLOAD(void, AllocateFundsBase, _reset, );
     }
 
-    SystemWeightList _allocateWeight(const Datetime& date, const SystemList& se_list) override {
+    SystemWeightList _allocateWeight(const Datetime& date,
+                                     const SystemWeightList& se_list) override {
         PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, AllocateFundsBase, "_allocate_weight",
                                     _allocateWeight, date, se_list);
     }
 };
 
 void export_AllocateFunds(py::module& m) {
-    py::class_<SystemWeight>(m, "SystemWeight",
-                             "系统权重系数结构，在资产分配时，指定对应系统的资产占比系数")
-      .def(py::init<>())
-      .def(py::init<const SystemPtr&, price_t>())
-      .def("__str__", to_py_str<SystemWeight>)
-      .def("__repr__", to_py_str<SystemWeight>)
-      .def_property("sys", py::overload_cast<>(&SystemWeight::getSYS, py::const_),
-                    py::overload_cast<const SystemPtr&>(&SystemWeight::setSYS),
-                    "对应的 System 实例")
-      .def_property("weight", &SystemWeight::getWeight, &SystemWeight::setWeight,
-                    "对应的权重系数，有效范围为 [0, 1]")
-
-        DEF_PICKLE(SystemWeight);
-
-    py::class_<AllocateFundsBase, AFPtr, PyAllocateFundsBase>(m, "AllocateFundsBase",
-                                                              R"(资产分配算法基类, 子类接口：
+    py::class_<AllocateFundsBase, AFPtr, PyAllocateFundsBase>(
+      m, "AllocateFundsBase",
+      R"(资产分配算法基类, 子类接口：
 
     - _allocateWeight : 【必须】子类资产分配调整实现
     - _clone : 【必须】克隆接口
@@ -62,6 +50,8 @@ void export_AllocateFunds(py::module& m) {
       .def_property("query", py::overload_cast<>(&AllocateFundsBase::getQuery, py::const_),
                     py::overload_cast<const KQuery&>(&AllocateFundsBase::setQuery),
                     py::return_value_policy::copy, "设置或获取查询条件")
+      .def_property_readonly("tm", py::overload_cast<>(&AllocateFundsBase::getTM, py::const_),
+                             py::return_value_policy::copy)
 
       .def("get_param", &AllocateFundsBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -85,7 +75,8 @@ void export_AllocateFunds(py::module& m) {
       .def("clone", &AllocateFundsBase::clone, "克隆操作")
       .def("_reset", &AllocateFundsBase::_reset, "子类复位操作实现")
       .def("_allocate_weight", &AllocateFundsBase::_allocateWeight, py::arg("date"),
-           py::arg("se_list"), R"(_allocate_weight(self, date, se_list)
+           py::arg("se_list"),
+           R"(_allocate_weight(self, date, se_list)
 
         【重载接口】子类分配权重接口，获取实际分配资产的系统实例及其权重
 

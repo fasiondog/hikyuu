@@ -18,11 +18,11 @@ EqualWeightAllocateFunds::EqualWeightAllocateFunds() : AllocateFundsBase("AF_Equ
 EqualWeightAllocateFunds::~EqualWeightAllocateFunds() {}
 
 SystemWeightList EqualWeightAllocateFunds ::_allocateWeight(const Datetime& date,
-                                                            const SystemList& se_list) {
+                                                            const SystemWeightList& se_list) {
     SystemWeightList result;
-    double weight = 1.0 / se_list.size();
+    price_t weight = 1 / se_list.size();
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
-        result.emplace_back(*iter, weight);
+        result.emplace_back(iter->sys, weight);
     }
 
     return result;

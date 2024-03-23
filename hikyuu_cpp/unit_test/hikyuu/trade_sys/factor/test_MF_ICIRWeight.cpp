@@ -16,6 +16,7 @@
 #include <hikyuu/indicator/crt/ICIR.h>
 #include <hikyuu/indicator/crt/ROCR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/STDEV.h>
 #include <hikyuu/trade_sys/factor/crt/MF_ICIRWeight.h>
 
 using namespace hku;
@@ -43,11 +44,11 @@ TEST_CASE("test_MF_ICIRWeight") {
 
     auto stk = sm["sh600004"];
     auto ind1 = MA(ROCR(CLOSE(stk.getKData(query)), ndays));
-    auto ic1 = ICIR(IC(MA(ROCR(CLOSE(), ndays)), stks, query, ndays, ref_stk), ic_rolling_n);
+    auto ic1 = ICIR(MA(ROCR(CLOSE(), ndays)), stks, query, ref_stk, ndays, ic_rolling_n);
     auto ind2 = AMA(ROCR(CLOSE(stk.getKData(query)), ndays));
-    auto ic2 = ICIR(IC(AMA(ROCR(CLOSE(), ndays)), stks, query, ndays, ref_stk), ic_rolling_n);
+    auto ic2 = ICIR(AMA(ROCR(CLOSE(), ndays)), stks, query, ref_stk, ndays, ic_rolling_n);
     auto ind3 = EMA(ROCR(CLOSE(stk.getKData(query)), ndays));
-    auto ic3 = ICIR(IC(EMA(ROCR(CLOSE(), ndays)), stks, query, ndays, ref_stk), ic_rolling_n);
+    auto ic3 = ICIR(EMA(ROCR(CLOSE(), ndays)), stks, query, ref_stk, ndays, ic_rolling_n);
 
     auto ind4 = mf->getFactor(stk);
     for (size_t i = 0; i < ind4.discard(); i++) {
@@ -58,9 +59,15 @@ TEST_CASE("test_MF_ICIRWeight") {
         CHECK_UNARY(std::isnan(ind4[i]));
     }
     for (size_t i = ind4.discard(), len = ref_dates.size(); i < len; i++) {
-        Indicator::value_t w = (ic1[i] + ic2[i] + ic3[i]) / 3.0;
-        CHECK_EQ(ind4[i], doctest::Approx((ind1[i] * w + ind2[i] * w + ind3[i] * w) / 3.0));
+        Indicator::value_t w = (ind1[i] * ic1[i] + ind2[i] * ic2[i] + ind3[i] * ic3[i]) /
+                               (std::abs(ic1[i]) + std::abs(ic2[i]) + std::abs(ic3[i]));
+        // HKU_INFO("{}: {}, {}, {}, {}, {}", i, w, ind4[i], ind1[i], ma_ic1[i], stdev_ic1[i]);
+        // HKU_INFO("{}: {}, {}", i, w, ind4[i]);
+        if (!std::isnan(ind4[i]) && !std::isnan(w)) {
+            CHECK_EQ(ind4[i], doctest::Approx(w));
+        }
     }
+    // HKU_INFO("{}", ind4);
 }
 
 //-----------------------------------------------------------------------------

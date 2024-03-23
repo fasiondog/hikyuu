@@ -31,8 +31,10 @@ string TradeManager::str() const {
        << "  params: " << getParameter() << strip << "  name: " << name() << strip
        << "  init_date: " << initDatetime() << strip << "  init_cash: " << initCash() << strip
        << "  firstDatetime: " << firstDatetime() << strip << "  lastDatetime: " << lastDatetime()
-       << strip << "  TradeCostFunc: " << costFunc() << strip << "  current cash: " << currentCash()
-       << strip << "  current market_value: " << funds.market_value << strip
+       << strip << "  TradeCostFunc: " << costFunc() << strip << "  current total funds: "
+       << funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value << strip
+       << "  current cash: " << currentCash() << strip
+       << "  current market_value: " << funds.market_value << strip
        << "  current short_market_value: " << funds.short_market_value << strip
        << "  current base_cash: " << funds.base_cash << strip
        << "  current base_asset: " << funds.base_asset << strip
@@ -1831,7 +1833,8 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
 
     HKU_WARN_IF_RETURN(m_cash < roundEx(money + tr.cost.total, precision), false,
-                       "Don't have enough money!");
+                       "Don't have enough money! {} < {}, {}", m_cash,
+                       roundEx(money + tr.cost.total, precision), tr);
 
     m_cash = roundEx(m_cash - money - tr.cost.total, precision);
     new_tr.cash = m_cash;

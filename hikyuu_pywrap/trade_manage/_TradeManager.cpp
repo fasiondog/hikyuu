@@ -416,7 +416,7 @@ void export_TradeManager(py::module& m) {
     :param ktype: K线类型
     :rtype: float)")
 
-      .def("get_funds", getFunds_1, py::arg("ktype"))
+      .def("get_funds", getFunds_1, py::arg("ktype") = KQuery::DAY)
       .def("get_funds", getFunds_2, py::arg("datetime"), py::arg("ktype") = KQuery::DAY,
            R"(get_funds(self, [datetime, ktype = Query.DAY])
 

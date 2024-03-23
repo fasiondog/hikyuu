@@ -39,54 +39,42 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
     size_t discard = 0;
     vector<Indicator> icir(ind_count);
     for (size_t ii = 0; ii < ind_count; ii++) {
-        icir[ii] = ICIR(IC(m_inds[ii], m_stks, m_query, ic_n, m_ref_stk), ir_n);
+        icir[ii] = ICIR(m_inds[ii], m_stks, m_query, m_ref_stk, ic_n, ir_n);
         if (icir[ii].discard() > discard) {
             discard = icir[ii].discard();
         }
     }
 
-    // 计算 IC 权重
-    vector<value_t> sumByDate(days_total, 0.0);
-    vector<size_t> countByDate(days_total, 0);
-    for (size_t di = discard; di < days_total; di++) {
-        for (size_t ii = 0; ii < ind_count; ii++) {
-            const auto& value = icir[ii][di];
-            if (!std::isnan(value)) {
-                sumByDate[di] += value;
-                countByDate[di] += 1;
-            }
-        }
-    }
-
-    for (size_t di = discard; di < days_total; di++) {
-        sumByDate[di] = (countByDate[di] == 0) ? Null<value_t>() : sumByDate[di] / countByDate[di];
-    }
-
-    vector<Indicator> all_factors(stk_count);
-    PriceList new_values(days_total);
+    // 以 ICIR 为权重，计算加权后的合成因子
+    IndicatorList all_factors(stk_count);
+    PriceList new_values(days_total, 0.0);
+    PriceList sum_weight(days_total, 0.0);
     for (size_t si = 0; si < stk_count; si++) {
         memset(new_values.data(), 0, sizeof(price_t) * days_total);
+        memset(sum_weight.data(), 0, sizeof(price_t) * days_total);
+        for (size_t di = 0; di < discard; di++) {
+            new_values[di] = Null<price_t>();
+        }
         for (size_t di = discard; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
-                const auto& value = all_stk_inds[si][ii][di];
-                new_values[di] += value * sumByDate[di];
+                new_values[di] += all_stk_inds[si][ii][di] * icir[ii][di];
+                sum_weight[di] += std::abs(icir[ii][di]);
             }
         }
-        for (size_t di = discard; di < days_total; di++) {
-            new_values[di] =
-              (countByDate[di] == 0) ? Null<value_t>() : new_values[di] / countByDate[di];
-        }
-        all_factors[si] = PRICELIST(new_values);
-        all_factors[si].name("IC");
 
-        // 更新 discard
         for (size_t di = discard; di < days_total; di++) {
-            if (!std::isnan(all_factors[si][di])) {
-                all_factors[si].setDiscard(di);
-                break;
+            if (!std::isnan(new_values[di]) && sum_weight[di] != 0.0) {
+                new_values[di] = new_values[di] / sum_weight[di];
             }
-            if (di == days_total - 1 && std::isnan(all_factors[si][di])) {
-                all_factors[si].setDiscard(di);
+        }
+
+        all_factors[si] = PRICELIST(new_values);
+        all_factors[si].name("ICIR");
+
+        const auto* data = all_factors[si].data();
+        for (size_t di = discard; di < days_total; di++) {
+            if (!std::isnan(data[di])) {
+                all_factors[si].setDiscard(discard);
             }
         }
     }

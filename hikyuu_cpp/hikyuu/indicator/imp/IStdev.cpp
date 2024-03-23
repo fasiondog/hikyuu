@@ -48,24 +48,46 @@ void IStdev::_calculate(const Indicator& data) {
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
     price_t k = src[start_pos];
     for (size_t i = start_pos; i < first_end; i++) {
-        num++;
-        price_t d = src[i] - k;
-        ex += d;
-        price_t d_pow = std::pow(d, 2);
-        pow_buf[i] = d_pow;
-        ex2 += d_pow;
-        dst[i] = num == 1 ? 0. : std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1));
+        if (!std::isnan(src[i])) {
+            num++;
+            price_t d = src[i] - k;
+            ex += d;
+            price_t d_pow = std::pow(d, 2);
+            pow_buf[i] = d_pow;
+            ex2 += d_pow;
+            // dst[i] = num == 1 ? 0. : std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1));
+            if (num > 1) {
+                dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1));
+            }
+        }
     }
 
     for (size_t i = first_end; i < total; i++) {
-        ex -= src[i - n] - k;
-        ex2 -= pow_buf[i - n];
-        price_t d = src[i] - k;
-        ex += d;
-        price_t d_pow = std::pow(d, 2);
-        pow_buf[i] = d_pow;
-        ex2 += d_pow;
-        dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / n) / (n - 1));
+        if (!std::isnan(src[i])) {
+            size_t j = i - n;
+            for (; j < i; j++) {
+                if (!std::isnan(src[j])) {
+                    break;
+                }
+            }
+            if (j == i) {
+                continue;
+            }
+            // ex -= src[i - n] - k;
+            // ex2 -= pow_buf[i - n];
+            ex -= src[j] - k;
+            ex2 -= pow_buf[j];
+            price_t d = src[i] - k;
+            ex += d;
+            price_t d_pow = std::pow(d, 2);
+            pow_buf[i] = d_pow;
+            ex2 += d_pow;
+            size_t num = i - j;
+            if (num != 1) {
+                dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1));
+            }
+            // dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / n) / (n - 1));
+        }
     }
 
     // 排除第一位的0值

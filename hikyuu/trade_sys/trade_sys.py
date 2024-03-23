@@ -149,7 +149,7 @@ def se_add_stock_list(self, stk_list, proto_sys):
 SelectorBase.add_stock_list = se_add_stock_list
 
 
-def crtSE(calculate, get_selected_on_close, get_selected_on_open, is_match_af=None, params={}, name='crtSE', clone=None):
+def crtSE(calculate, get_selected, is_match_af=None, params={}, name='crtSE', clone=None):
     """
     快速创建交易对象选择算法
 
@@ -163,8 +163,7 @@ def crtSE(calculate, get_selected_on_close, get_selected_on_open, is_match_af=No
     """
     meta_x = type(name, (SelectorBase, ), {'__init__': part_init})
     meta_x._calculate = calculate
-    meta_x.get_selected_on_close = get_selected_on_close
-    meta_x.get_selected_on_open = get_selected_on_open
+    meta_x.get_selected = get_selected
     meta_x.is_match_af = lambda self, af: True if is_match_af is None else is_match_af
     meta_x._clone = lambda self: meta_x(self._name, self._params) if clone is None else clone
     return meta_x(name, params)

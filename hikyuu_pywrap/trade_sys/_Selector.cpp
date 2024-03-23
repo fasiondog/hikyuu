@@ -25,14 +25,9 @@ public:
         PYBIND11_OVERLOAD_PURE(void, SelectorBase, _calculate, );
     }
 
-    SystemList getSelectedOnOpen(Datetime date) override {
-        PYBIND11_OVERLOAD_PURE_NAME(SystemList, SelectorBase, "get_selected_on_open",
-                                    getSelectedOnOpen, date);
-    }
-
-    SystemList getSelectedOnClose(Datetime date) override {
-        PYBIND11_OVERLOAD_PURE_NAME(SystemList, SelectorBase, "get_selected_on_close",
-                                    getSelectedOnClose, date);
+    SystemWeightList getSelected(Datetime date) override {
+        PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected", getSelected,
+                                    date);
     }
 
     bool isMatchAF(const AFPtr& af) override {
@@ -41,12 +36,22 @@ public:
 };
 
 void export_Selector(py::module& m) {
+    py::class_<SystemWeight>(m, "SystemWeight",
+                             "系统权重系数结构，在资产分配时，指定对应系统的资产占比系数")
+      .def(py::init<>())
+      .def(py::init<const SystemPtr&, price_t>())
+      .def("__str__", to_py_str<SystemWeight>)
+      .def("__repr__", to_py_str<SystemWeight>)
+      .def_readwrite("sys", &SystemWeight::sys, "对应的 System 实例")
+      .def_readwrite("weight", &SystemWeight::weight)
+
+        DEF_PICKLE(SystemWeight);
+
     py::class_<SelectorBase, SEPtr, PySelectorBase>(
       m, "SelectorBase",
       R"(选择器策略基类，实现标的、系统策略的评估和选取算法，自定义选择器策略子类接口：
 
-    - get_selected_on_open - 【必须】获取指定时刻开盘时选择的系统实例列表
-    - get_selected_on_close - 【必须】获取指定时刻收盘时选择的系统实例列表
+    - get_selected - 【必须】获取指定时刻选择的系统实例列表
     - _calculate - 【必须】计算接口
     - _reset - 【可选】重置私有属性
     - _clone - 【必须】克隆接口)")
@@ -118,19 +123,10 @@ void export_Selector(py::module& m) {
 
     :param AllocateFundsBase af: 资产分配算法)")
 
-      .def("get_selected_on_open", &SelectorBase::getSelectedOnOpen,
-           R"(get_selected_on_open(self, datetime)
+      .def("get_selected", &SelectorBase::getSelected,
+           R"(get_selected(self, datetime)
 
-    【重载接口】获取指定时刻开盘时选取的系统实例
-
-    :param Datetime datetime: 指定时刻
-    :return: 选取的系统实例列表
-    :rtype: SystemList)")
-
-      .def("get_selected_on_close", &SelectorBase::getSelectedOnClose,
-           R"(get_selected_on_close(self, datetime)
-
-    【重载接口】获取指定时刻收盘时选取的系统实例
+    【重载接口】获取指定时刻选取的系统实例
 
     :param Datetime datetime: 指定时刻
     :return: 选取的系统实例列表

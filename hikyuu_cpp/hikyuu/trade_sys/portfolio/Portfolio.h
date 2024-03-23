@@ -55,7 +55,7 @@ public:
      * @param query 查询条件
      * @param force 是否强制重计算
      */
-    void run(const KQuery& query, bool force = false);
+    void run(const KQuery& query, int adjust_cycle = 1, bool force = false);
 
     /** 修改查询条件 */
     void setQuery(const KQuery& query);
@@ -99,14 +99,12 @@ private:
     /** 运行前准备 */
     bool _readyForRun();
 
-    void _runMoment(const Datetime& datetime);
-    void _runMomentOnOpen(const Datetime& datetime);
-    void _runMomentOnClose(const Datetime& datetime);
+    void _runMoment(const Datetime& date, bool adjust);
 
 protected:
     string m_name;
     TMPtr m_tm;
-    TMPtr m_shadow_tm;
+    TMPtr m_cash_tm;  // 仅仅负责内部资金的管理（即只需要 checkout 到子账号, 从账户checkin现金）
     SEPtr m_se;
     AFPtr m_af;
 
@@ -118,11 +116,10 @@ protected:
     SystemList m_real_sys_list;  // 所有实际运行的子系统列表
 
     // 用于中间计算的临时数据
-    std::unordered_set<System*> m_running_sys_set;  // 当前仍在运行的子系统集合
-    std::list<SYSPtr> m_running_sys_list;           // 当前仍在运行的子系统列表
-    SystemList m_tmp_selected_list_on_open;
-    SystemList m_tmp_selected_list_on_close;
-    SystemList m_tmp_will_remove_sys;
+    std::unordered_set<SYSPtr> m_running_sys_set;
+    SystemWeightList m_delay_adjust_sys_list;  // 延迟调仓卖出的系统列表
+    SystemWeightList m_tmp_selected_list;
+    SystemWeightList m_tmp_will_remove_sys;
 
 //============================================
 // 序列化支持
@@ -135,7 +132,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_tm);
-        ar& BOOST_SERIALIZATION_NVP(m_shadow_tm);
+        ar& BOOST_SERIALIZATION_NVP(m_cash_tm);
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_query);
@@ -148,7 +145,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_tm);
-        ar& BOOST_SERIALIZATION_NVP(m_shadow_tm);
+        ar& BOOST_SERIALIZATION_NVP(m_cash_tm);
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_query);

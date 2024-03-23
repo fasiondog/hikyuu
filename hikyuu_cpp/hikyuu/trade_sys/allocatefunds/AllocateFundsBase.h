@@ -10,7 +10,7 @@
 #define TRADE_SYS_ALLOCATEFUNDS_ALLOCATEFUNDSBASE_H_
 
 #include "../../utilities/Parameter.h"
-#include "../allocatefunds/SystemWeight.h"
+#include "../selector/SystemWeight.h"
 
 namespace hku {
 
@@ -42,15 +42,15 @@ public:
     void name(const string& name);
 
     /**
-     * 执行资产分配调整
+     * 执行资产分配调整，仅供 PF 调用
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
      * @param running_list 当前运行中的系统实例
      * @param ignore_list 忽略不进行调仓的运行中系统
-     * @return
+     * @return 需延迟执行卖出操作的系统列表，其中权重为相应需卖出的数量
      */
-    void adjustFunds(const Datetime& date, const SystemList& se_list,
-                     const std::list<SYSPtr>& running_list, const SystemList& ignore_list);
+    SystemWeightList adjustFunds(const Datetime& date, const SystemWeightList& se_list,
+                                 const std::unordered_set<SYSPtr>& running_list);
 
     /** 获取交易账户 */
     const TMPtr& getTM() const;
@@ -59,9 +59,9 @@ public:
     void setTM(const TMPtr&);
 
     /** 设置 Portfolio 的影子账户, 仅由 Portfolio 调用 */
-    void setShadowTM(const TMPtr&);
+    void setCashTM(const TMPtr&);
 
-    const TMPtr& getShadowTM(const TMPtr&) const;
+    const TMPtr& getCashTM(const TMPtr&) const;
 
     /** 获取关联查询条件 */
     const KQuery& getQuery() const;
@@ -95,34 +95,31 @@ public:
 
     /**
      * 子类分配权重接口，获取实际分配资产的系统实例及其权重
-     * @details 实际调用子类接口 _allocateWeight，并根据允许的最大持仓系统数参数对子类返回的
-     *          系统实例及权重列表进行了截断处理
+     * @details 实际调用子类接口 _allocateWeight
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
-     * @return
+     * @return 子类只需要返回每个系统的相对比例即可
      */
-    virtual SystemWeightList _allocateWeight(const Datetime& date, const SystemList& se_list) = 0;
+    virtual SystemWeightList _allocateWeight(const Datetime& date,
+                                             const SystemWeightList& se_list) = 0;
 
 private:
     /* 同时调整已运行中的子系统（已分配资金或已持仓） */
-    void _adjust_with_running(const Datetime& date, const SystemList& se_list,
-                              const std::list<SYSPtr>& running_list, const SystemList& ignore_list);
+    SystemWeightList _adjust_with_running(const Datetime& date, const SystemWeightList& se_list,
+                                          const std::unordered_set<SYSPtr>& running_list);
 
     /* 不调整已在运行中的子系统 */
-    void _adjust_without_running(const Datetime& date, const SystemList& se_list,
-                                 const std::list<SYSPtr>& running_list);
+    void _adjust_without_running(const Datetime& date, const SystemWeightList& se_list,
+                                 const std::unordered_set<SYSPtr>& running_list);
 
-    /* 计算当前的资产总值 */
-    price_t _getTotalFunds(const Datetime& date, const std::list<SYSPtr>& running_list);
-
-    /* 回收系统资产 */
-    bool _returnAssets(const SYSPtr& sys, const Datetime& date);
+    /* 检查分配的权重是否在 0 和 1 之间，如果存在错误，抛出异常，仅在 trace 时生效*/
+    void _check_weight(const SystemWeightList&);
 
 private:
-    string m_name;      // 组件名称
-    KQuery m_query;     // 查询条件
-    TMPtr m_tm;         // 运行期由PF设定，PF的实际账户
-    TMPtr m_shadow_tm;  // 运行期由PF设定，tm 的影子账户，由于协调分配资金
+    string m_name;    // 组件名称
+    KQuery m_query;   // 查询条件
+    TMPtr m_tm;       // 运行期由PF设定，PF的实际账户
+    TMPtr m_cash_tm;  // 运行期由PF设定，tm 的影子账户，由于协调分配资金
     double m_reserve_percent;  // 保留资产比例，不参与资产分配
 
 //============================================
@@ -137,7 +134,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_reserve_percent);
-        ar& BOOST_SERIALIZATION_NVP(m_tm);
     }
 
     template <class Archive>
@@ -146,7 +142,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_reserve_percent);
-        ar& BOOST_SERIALIZATION_NVP(m_tm);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -187,7 +182,7 @@ public:                                \
     virtual AFPtr _clone() override {  \
         return AFPtr(new classname()); \
     }                                  \
-    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemList&) override;
+    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemWeightList&) override;
 
 typedef shared_ptr<AllocateFundsBase> AllocateFundsPtr;
 typedef shared_ptr<AllocateFundsBase> AFPtr;
@@ -211,12 +206,12 @@ inline void AllocateFundsBase::setTM(const TMPtr& tm) {
     m_tm = tm;
 }
 
-inline void AllocateFundsBase::setShadowTM(const TMPtr& tm) {
-    m_shadow_tm = tm;
+inline void AllocateFundsBase::setCashTM(const TMPtr& tm) {
+    m_cash_tm = tm;
 }
 
-inline const TMPtr& AllocateFundsBase::getShadowTM(const TMPtr&) const {
-    return m_shadow_tm;
+inline const TMPtr& AllocateFundsBase::getCashTM(const TMPtr&) const {
+    return m_cash_tm;
 }
 
 inline const KQuery& AllocateFundsBase::getQuery() const {

@@ -243,7 +243,12 @@ Indicator MultiFactorBase::getIC(int ndays) {
 }
 
 Indicator MultiFactorBase::getICIR(int ic_n, int ir_n) {
-    return ICIR(getIC(ic_n), ir_n);
+    Indicator ic = getIC(ic_n);
+    Indicator x = MA(ic, ir_n) / STDEV(ic, ir_n);
+    x.name("ICIR");
+    x.setParam<int>("n", ic_n);
+    x.setParam<int>("rolling_n", ir_n);
+    return x;
 }
 
 IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {

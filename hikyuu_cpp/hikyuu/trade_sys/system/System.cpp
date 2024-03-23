@@ -671,43 +671,35 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
                     src_today.closePrice - m_buyRequest.stoploss, m_buyRequest.from);
 }
 
-TradeRecord System::sellForce(const KRecord& today, const KRecord& src_today, double num,
-                              Part from) {
-    HKU_ASSERT_M(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO,
-                 "Only Allocator or Portfolis can perform this operation!");
-    TradeRecord result;
-    if (getParam<bool>("sell_delay")) {
-        if (m_sellRequest.valid) {
-            if (m_sellRequest.count > getParam<int>("max_delay_count")) {
-                // 超出最大延迟次数，清除买入请求
-                m_sellRequest.clear();
-                return result;
-            }
-            m_sellRequest.count++;
+TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool on_open) {
+    TradeRecord record;
+    size_t pos = m_kdata.getPos(date);
+    HKU_TRACE_IF_RETURN(pos == Null<size_t>(), record,
+                        "Failed to sellForce {}, the day {} could'nt sell!", m_stock.market_code(),
+                        date);
 
-        } else {
-            m_sellRequest.valid = true;
-            m_sellRequest.business = BUSINESS_SELL;
-            m_sellRequest.count = 1;
-        }
+    const auto& krecord = m_kdata.getKRecord(pos);
+    const auto& src_krecord =
+      m_stock.getKRecord(m_kdata.startPos() + pos, m_kdata.getQuery().kType());
 
-        PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
-        m_sellRequest.from = from;
-        m_sellRequest.datetime = today.datetime;
-        m_sellRequest.stoploss = position.stoploss;
-        m_sellRequest.goal = position.goalPrice;
-        m_sellRequest.number = num;
-        return result;
+    PositionRecord position = m_tm->getPosition(date, m_stock);
+    price_t realPrice =
+      _getRealSellPrice(krecord.datetime, on_open ? src_krecord.openPrice : src_krecord.closePrice);
 
-    } else {
-        PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
-        price_t realPrice = _getRealSellPrice(today.datetime, src_today.closePrice);
-        TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, num, position.stoploss,
-                                        position.goalPrice, src_today.closePrice, from);
-        m_trade_list.push_back(record);
-        _sellNotifyAll(record);
-        return record;
+    double min_num = m_stock.minTradeNumber();
+    double real_sell_num = num;
+    if (real_sell_num >= position.number) {
+        real_sell_num = position.number;
+    } else if (min_num > 1) {
+        real_sell_num = static_cast<int64_t>(num / min_num) * min_num;
     }
+
+    record =
+      m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss, position.goalPrice,
+                 on_open ? src_krecord.openPrice : src_krecord.closePrice, from);
+    m_trade_list.push_back(record);
+    _sellNotifyAll(record);
+    return record;
 }
 
 TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part from) {

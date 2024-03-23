@@ -31,38 +31,38 @@ TEST_CASE("test_IC") {
     Indicator result;
 
     /** @arg 传入非法 n */
-    result = IC(MA(CLOSE()), stks, query, -1, ref_stk);
+    result = IC(MA(CLOSE()), stks, query, ref_stk, -1);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(result.empty());
 
     /** @arg 传入的 ref_stk 为 null */
-    result = IC(stks, query, 1, Stock())(MA(CLOSE()));
+    result = IC(stks, query, Stock(), 1)(MA(CLOSE()));
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(result.empty());
 
     /** @arg 传入空的 stks */
-    result = IC(MA(CLOSE()), StockList(), query, 1, ref_stk);
+    result = IC(MA(CLOSE()), StockList(), query, ref_stk, 1);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
     CHECK_EQ(result.discard(), result.size());
 
     /** @arg 传入的 stks 数量不足，需要大于等于2 */
-    result = IC(MA(CLOSE()), {sm["sh600004"]}, query, 1, ref_stk);
+    result = IC(MA(CLOSE()), {sm["sh600004"]}, query, ref_stk, 1);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
     CHECK_EQ(result.discard(), result.size());
 
     /** @arg ref_stk 数据长度不足 */
-    result = IC(MA(CLOSE()), stks, KQuery(-1), 1, ref_stk);
+    result = IC(MA(CLOSE()), stks, KQuery(-1), ref_stk, 1);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), result.size());
 
     /** @arg 传入的 stks 中夹杂有 null stock，实际的 stks 长度小于2 */
-    result = IC(MA(CLOSE()), {sm["sh600004"], Stock()}, KQuery(-2), 1, ref_stk);
+    result = IC(MA(CLOSE()), {sm["sh600004"], Stock()}, KQuery(-2), ref_stk, 1);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), 2);
@@ -71,7 +71,7 @@ TEST_CASE("test_IC") {
     CHECK_UNARY(std::isnan(result[1]));
 
     /** @arg 传入的 stks 长度为2，query 的长度为2*/
-    result = IC(MA(CLOSE()), {sm["sh600004"], sm["sh600005"]}, KQuery(-2), 1, ref_stk);
+    result = IC(MA(CLOSE()), {sm["sh600004"], sm["sh600005"]}, KQuery(-2), ref_stk, 1);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), 2);
@@ -80,13 +80,12 @@ TEST_CASE("test_IC") {
     CHECK_UNARY(std::isnan(result[1]));
 
     /** @arg 正常执行 */
-    result = IC(MA(CLOSE()), stks, query, 1, ref_stk);
+    result = IC(MA(CLOSE()), stks, query, ref_stk, 1);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
-    CHECK_EQ(result.discard(), 2);
+    CHECK_EQ(result.discard(), 1);
     CHECK_UNARY(std::isnan(result[0]));
-    CHECK_UNARY(std::isnan(result[1]));
     CHECK_EQ(result[2], doctest::Approx(0.8));
     CHECK_EQ(result[99], doctest::Approx(-1));
 }
@@ -108,7 +107,7 @@ TEST_CASE("test_IC_benchmark") {
         BENCHMARK_TIME_MSG(test_IC_benchmark, cycle, fmt::format("data len: {}", ref_k.size()));
         SPEND_TIME_CONTROL(false);
         for (int i = 0; i < cycle; i++) {
-            Indicator ind = IC(MA(CLOSE()), stks, query, 1, ref_stk);
+            Indicator ind = IC(MA(CLOSE()), stks, query, ref_stk, 1);
         }
     }
 }
@@ -128,7 +127,7 @@ TEST_CASE("test_IC_export") {
     Stock ref_stk = sm["sh000001"];
 
     KQuery query = KQuery(-200);
-    Indicator x1 = IC(stks, query, 1, ref_stk)(MA(CLOSE()));
+    Indicator x1 = IC(stks, query, ref_stk, 1)(MA(CLOSE()));
 
     {
         std::ofstream ofs(filename);

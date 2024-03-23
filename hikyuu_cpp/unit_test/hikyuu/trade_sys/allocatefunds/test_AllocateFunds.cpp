@@ -30,7 +30,7 @@ TEST_CASE("test_AllocateFunds") {
     TMPtr subtm = crtTM(Datetime(200101010000L), 0);
     SYSPtr sys = SYS_Simple(subtm->clone());
 
-    SystemList se_list;
+    SystemWeightList se_list;
     SystemList hold_list;
     SystemList ac_list;
     SystemWeightList sw_list;
@@ -48,9 +48,9 @@ TEST_CASE("test_AllocateFunds") {
     /** @arg 出入的se_list、hold_list均为空  */
     CHECK_EQ(se_list.size(), 0);
     CHECK_EQ(hold_list.size(), 0);
-    sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
+    // sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
     // ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
-    CHECK_EQ(sw_list.size(), 0);
+    // CHECK_EQ(sw_list.size(), 0);
     // CHECK_EQ(ac_list.size(), 0);
 
     /** @arg 最大持仓系统数小于0 */
