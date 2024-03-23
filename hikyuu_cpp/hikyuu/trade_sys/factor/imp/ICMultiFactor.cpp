@@ -55,10 +55,12 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
         for (size_t di = 0; di < discard; di++) {
             new_values[di] = Null<price_t>();
         }
-        for (size_t di = discard; di < days_total; di++) {
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                new_values[di] += all_stk_inds[si][ii][di] * ic[ii][di];
-                sum_weight[di] += std::abs(ic[ii][di]);
+        for (size_t ii = 0; ii < ind_count; ii++) {
+            const auto* ind_data = all_stk_inds[si][ii].data(); 
+            const auto* ic_data = ic[ii].data();
+            for (size_t di = discard; di < days_total; di++) {
+                new_values[di] += ind_data[di] * ic_data[di];
+                sum_weight[di] += std::abs(ic_data[di]);
             }
         }
 
