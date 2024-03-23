@@ -110,13 +110,13 @@ void IIc::_calculate(const Indicator& inputInd) {
     }
 }
 
-Indicator HKU_API IC(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk) {
+Indicator HKU_API IC(const StockList& stks, const KQuery& query, const Stock& ref_stk, int n) {
     return Indicator(make_shared<IIc>(stks, query, n, ref_stk));
 }
 
-Indicator HKU_API IC(const Block& blk, const KQuery& query, int n, const Stock& ref_stk) {
+Indicator HKU_API IC(const Block& blk, const KQuery& query, const Stock& ref_stk, int n) {
     StockList stks = blk.getAllStocks();
-    return IC(stks, query, n, ref_stk);
+    return IC(stks, query, ref_stk, n);
 }
 
 }  // namespace hku

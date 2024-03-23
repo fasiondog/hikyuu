@@ -39,7 +39,7 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
     size_t discard = 0;
     IndicatorList ic(ind_count);
     for (size_t ii = 0; ii < ind_count; ii++) {
-        ic[ii] = MA(IC(m_inds[ii], m_stks, m_query, ic_n, m_ref_stk), ic_rolling_n);
+        ic[ii] = MA(IC(m_inds[ii], m_stks, m_query, m_ref_stk, ic_n), ic_rolling_n);
         if (ic[ii].discard() > discard) {
             discard = ic[ii].discard();
         }

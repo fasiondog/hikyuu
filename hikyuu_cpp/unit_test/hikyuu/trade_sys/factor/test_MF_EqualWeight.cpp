@@ -100,7 +100,7 @@ TEST_CASE("test_MF_EqualWeight") {
     CHECK_UNARY(ind1.equal(ind2));
     CHECK_UNARY(all_factors[0].equal(ind2));
     auto ic1 = mf->getIC();
-    auto ic2 = IC(MA(CLOSE()), stks, query, 1, ref_stk);
+    auto ic2 = IC(MA(CLOSE()), stks, query, ref_stk, 1);
     CHECK_UNARY(ic1.equal(ic2));
 
     CHECK_THROWS_AS(mf->getScore(Datetime(20111204)), std::exception);

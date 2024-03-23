@@ -39,7 +39,7 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
     size_t discard = 0;
     vector<Indicator> icir(ind_count);
     for (size_t ii = 0; ii < ind_count; ii++) {
-        icir[ii] = ICIR(IC(m_inds[ii], m_stks, m_query, ic_n, m_ref_stk), ir_n);
+        icir[ii] = ICIR(m_inds[ii], m_stks, m_query, m_ref_stk, ic_n, ir_n);
         if (icir[ii].discard() > discard) {
             discard = icir[ii].discard();
         }

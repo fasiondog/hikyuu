@@ -448,23 +448,26 @@
     :param KData kdata: k线数据
     :rtype: Indicator
     
-.. py:function:: IC(ind, stks, query, n, ref_stk)
+.. py:function:: IC(ind, stks, query, ref_stk[, n=1])
 
     计算指定的因子相对于参考证券的 IC （实际为 RankIC）
     
-    :param sequence(stock)|Block stks 证券组合
+    :param sequence | Block stks 证券组合
     :param Query query: 查询条件
-    :param int n: 时间窗口
     :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
+    :param int n: 时间窗口(对应的 n 日收益率)
     :rtype: Indicator
 
 
-.. py:function:: ICIR(ic[,n])
+.. py:function:: ICIR(ind, stks, query, ref_stk[, n=1, rolling_n=120])
 
     计算 IC 因子 IR = IC的多周期均值/IC的标准方差
 
-    :param Indicator: ic 已经计算出的 ic 值
-    :param int n: 时间窗口
+    :param sequence | Block stks 证券组合
+    :param Query query: 查询条件
+    :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
+    :param int n: 时间窗口(对应的 n 日收益率)
+    :param int rolling_n: 滚动周期
     :rtype: Indicator
 
 
