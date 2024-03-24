@@ -218,12 +218,20 @@ std::string HKU_API getLocalTime();
     } while (0)
 #endif  // #ifndef HKU_ENABLE_STACK_TRACE
 
-#if HKU_DISABLE_ASSERT
-#define HKU_ASSERT(expr)
-#define HKU_ASSERT_M(expr, ...)
+#if HKU_DEBUG_MODE
+#define HKU_ASSERT_DEBUG(expr)
+#else
+/** 仅在 debug 模式下生效 */
+#define HKU_ASSERT_DEBUG(expr)                                                            \
+    do {                                                                                  \
+        if (!(expr)) {                                                                    \
+            std::string err_msg(fmt::format("HKU_ASSERT({})", #expr));                    \
+            throw hku::exception(                                                         \
+              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__)); \
+        }                                                                                 \
+    } while (0)
 
-#else /* #if HKU_DISABLE_ASSERT */
-
+#endif /* #if HKU_DEBUG_MODE */
 #ifdef HKU_ENABLE_STACK_TRACE
 /**
  * 若表达式为 false，将抛出 hku::exception 异常
@@ -233,21 +241,6 @@ std::string HKU_API getLocalTime();
     do {                                                                                  \
         if (!(expr)) {                                                                    \
             std::string err_msg(fmt::format("HKU_ASSERT({})\n{}", #expr,                  \
-                                            to_string(boost::stacktrace::stacktrace()))); \
-            throw hku::exception(                                                         \
-              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__)); \
-        }                                                                                 \
-    } while (0)
-
-/**
- * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
- * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
- */
-#define HKU_ASSERT_M(expr, ...)                                                           \
-    do {                                                                                  \
-        if (!(expr)) {                                                                    \
-            std::string err_msg(fmt::format("HKU_ASSERT({}) {}\n{}", #expr,               \
-                                            fmt::format(__VA_ARGS__),                     \
                                             to_string(boost::stacktrace::stacktrace()))); \
             throw hku::exception(                                                         \
               fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__)); \
@@ -264,21 +257,7 @@ std::string HKU_API getLocalTime();
         }                                                                                 \
     } while (0)
 
-/**
- * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
- * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
- */
-#define HKU_ASSERT_M(expr, ...)                                                           \
-    do {                                                                                  \
-        if (!(expr)) {                                                                    \
-            std::string err_msg(                                                          \
-              fmt::format("HKU_ASSERT({}) {}", #expr, fmt::format(__VA_ARGS__)));         \
-            throw hku::exception(                                                         \
-              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__)); \
-        }                                                                                 \
-    } while (0)
 #endif  // #ifndef HKU_ENABLE_STACK_TRACE
-#endif  /* #if HKU_DISABLE_ASSERT */
 
 #ifndef HKU_ENABLE_STACK_TRACE
 /** 抛出 hku::exception 及传入信息 */
