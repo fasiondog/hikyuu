@@ -20,6 +20,8 @@ public:
     ICIRMultiFactor(const IndicatorList& inds, const StockList& stks, const KQuery& query,
                     const Stock& ref_stk, int ic_n, int ic_rolling_n);
     virtual ~ICIRMultiFactor() = default;
+
+    virtual void checkParam(const string& name) const override;
 };
 
 }  // namespace hku

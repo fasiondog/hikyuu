@@ -25,6 +25,14 @@ ICMultiFactor::ICMultiFactor(const IndicatorList& inds, const StockList& stks, c
                              const Stock& ref_stk, int ic_n, int ic_rolling_n)
 : MultiFactorBase(inds, stks, query, ref_stk, "MF_ICWeight", ic_n) {
     setParam<int>("ic_rolling_n", ic_rolling_n);
+    checkParam("ic_rolling_n");
+}
+
+void ICMultiFactor::checkParam(const string& name) const {
+    MultiFactorBase::checkParam(name);
+    if ("ic_rolling_n" == name) {
+        HKU_ASSERT(getParam<int>("ic_rolling_n") >= 1);
+    }
 }
 
 IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_inds) {
@@ -56,7 +64,7 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
             new_values[di] = Null<price_t>();
         }
         for (size_t ii = 0; ii < ind_count; ii++) {
-            const auto* ind_data = all_stk_inds[si][ii].data(); 
+            const auto* ind_data = all_stk_inds[si][ii].data();
             const auto* ic_data = ic[ii].data();
             for (size_t di = discard; di < days_total; di++) {
                 new_values[di] += ind_data[di] * ic_data[di];

@@ -17,7 +17,7 @@ namespace hku {
  * @ingroup MultiFactor
  */
 class HKU_API MultiFactorBase : public enable_shared_from_this<MultiFactorBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     typedef Indicator::value_t value_t;
@@ -118,6 +118,8 @@ public:
 private:
     /** 执行计算 */
     void calculate();
+
+    void initParam();
 
 protected:
     void _buildIndex();  // 计算完成后创建截面索引

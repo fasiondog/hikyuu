@@ -78,6 +78,9 @@ TEST_CASE("test_MF_EqualWeight") {
     CHECK_THROWS_AS(MF_EqualWeight(src_inds, {sm["sh600004"]}, KQuery(-2), ref_stk),
                     std::exception);
 
+    /** @arg 输入非法 ic_n */
+    CHECK_THROWS_AS(MF_EqualWeight(src_inds, stks, KQuery(-2), ref_stk, 0), std::exception);
+
     /** @arg 临界状态, 原始因子数量为1, 证券数量2, 数据长度为2 */
     src_inds = {MA(CLOSE())};
     stks = {sm["sh600005"], sm["sh600004"]};
