@@ -17,7 +17,7 @@ namespace hku {
  * @ingroup MultiFactor
  */
 class HKU_API MultiFactorBase : public enable_shared_from_this<MultiFactorBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     typedef Indicator::value_t value_t;
@@ -28,6 +28,7 @@ public:
     MultiFactorBase(const string& name);
     MultiFactorBase(const IndicatorList& inds, const StockList& stks, const KQuery& query,
                     const Stock& ref_stk, const string& name, int ic_n);
+    virtual ~MultiFactorBase() = default;
 
     /** 获取名称 */
     const string& name() const {
@@ -108,7 +109,6 @@ public:
      */
     vector<IndicatorList> getAllSrcFactors();
 
-
     typedef std::shared_ptr<MultiFactorBase> MultiFactorPtr;
     MultiFactorPtr clone();
 
@@ -118,6 +118,8 @@ public:
 private:
     /** 执行计算 */
     void calculate();
+
+    void initParam();
 
 protected:
     void _buildIndex();  // 计算完成后创建截面索引

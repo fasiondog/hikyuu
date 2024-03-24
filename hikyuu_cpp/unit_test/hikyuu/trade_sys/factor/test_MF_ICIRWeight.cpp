@@ -38,9 +38,19 @@ TEST_CASE("test_MF_ICIRWeight") {
     KQuery query = KQuery(-20);
     KData ref_k = ref_stk.getKData(query);
     DatetimeList ref_dates = ref_k.getDatetimeList();
+
+    /** @arg 输入非法 ic_n, ic_rolling_n */
+    CHECK_THROWS_AS(MF_ICIRWeight(src_inds, stks, query, ref_stk, 0), std::exception);
+    CHECK_THROWS_AS(MF_ICIRWeight(src_inds, stks, query, ref_stk, 1, -1), std::exception);
+
+    /** @arg 正常计算 */
     auto mf = MF_ICIRWeight(src_inds, stks, query, ref_stk, ndays, ic_rolling_n);
     CHECK_EQ(mf->name(), "MF_ICIRWeight");
     CHECK_THROWS_AS(mf->getFactor(sm["sh600000"]), std::exception);
+    CHECK_THROWS_AS(mf->setParam<int>("ic_n", -1), std::exception);
+    mf->setParam<int>("ic_n", ndays);
+    CHECK_THROWS_AS(mf->setParam<int>("ic_rolling_n", -1), std::exception);
+    mf->setParam<int>("ic_rolling_n", ic_rolling_n);
 
     auto stk = sm["sh600004"];
     auto ind1 = MA(ROCR(CLOSE(stk.getKData(query)), ndays));

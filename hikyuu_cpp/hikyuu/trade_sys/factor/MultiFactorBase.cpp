@@ -60,36 +60,20 @@ HKU_API std::ostream& operator<<(std::ostream& out, const MultiFactorPtr& mf) {
 }
 
 MultiFactorBase::MultiFactorBase() {
-    setParam<bool>("fill_null", true);
-    setParam<int>("ic_n", 1);
-    setParam<bool>("enable_min_max_normalize", false);
-    setParam<bool>("enable_zscore", false);
-    setParam<bool>("zscore_out_extreme", false);
-    setParam<bool>("zscore_recursive", false);
-    setParam<double>("zscore_nsigma", 3.0);
+    initParam();
 }
 
 MultiFactorBase::MultiFactorBase(const string& name) {
-    setParam<bool>("fill_null", true);
-    setParam<int>("ic_n", 1);
-    setParam<bool>("enable_min_max_normalize", false);
-    setParam<bool>("enable_zscore", false);
-    setParam<bool>("zscore_out_extreme", false);
-    setParam<bool>("zscore_recursive", false);
-    setParam<double>("zscore_nsigma", 3.0);
+    initParam();
 }
 
 MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stks,
                                  const KQuery& query, const Stock& ref_stk, const string& name,
                                  int ic_n)
 : m_name(name), m_inds(inds), m_stks(stks), m_ref_stk(ref_stk), m_query(query) {
-    setParam<bool>("fill_null", true);
+    initParam();
     setParam<int>("ic_n", ic_n);
-    setParam<bool>("enable_min_max_normalize", false);
-    setParam<bool>("enable_zscore", false);
-    setParam<bool>("zscore_out_extreme", false);
-    setParam<bool>("zscore_recursive", false);
-    setParam<double>("zscore_nsigma", 3.0);
+    checkParam("ic_n");
 
     HKU_CHECK(!m_ref_stk.isNull(), "The reference stock must be set!");
     HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
@@ -106,6 +90,29 @@ MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stk
 
     HKU_CHECK(m_stks.size() >= 2, "The number of stock is insufficient! current stock number: {}",
               m_stks.size());
+}
+
+void MultiFactorBase::initParam() {
+    setParam<bool>("fill_null", true);
+    setParam<int>("ic_n", 1);
+    setParam<bool>("enable_min_max_normalize", false);
+    setParam<bool>("enable_zscore", false);
+    setParam<bool>("zscore_out_extreme", false);
+    setParam<bool>("zscore_recursive", false);
+    setParam<double>("zscore_nsigma", 3.0);
+}
+
+void MultiFactorBase::checkParam(const string& name) const {
+    if ("ic_n" == name) {
+        HKU_ASSERT(getParam<int>("ic_n") >= 1);
+    } else if ("zscore_nsigma" == name) {
+        HKU_ASSERT(getParam<double>("zscore_nsigma") > 0.0);
+    }
+}
+
+void MultiFactorBase::paramChanged() {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_calculated = false;
 }
 
 MultiFactorPtr MultiFactorBase::clone() {

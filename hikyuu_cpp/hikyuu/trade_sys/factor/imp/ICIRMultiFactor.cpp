@@ -26,6 +26,14 @@ ICIRMultiFactor::ICIRMultiFactor(const vector<Indicator>& inds, const StockList&
                                  int ic_rolling_n)
 : MultiFactorBase(inds, stks, query, ref_stk, "MF_ICIRWeight", ic_n) {
     setParam<int>("ic_rolling_n", ic_rolling_n);
+    checkParam("ic_rolling_n");
+}
+
+void ICIRMultiFactor::checkParam(const string& name) const {
+    MultiFactorBase::checkParam(name);
+    if ("ic_rolling_n" == name) {
+        HKU_ASSERT(getParam<int>("ic_rolling_n") >= 1);
+    }
 }
 
 IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_inds) {
@@ -56,8 +64,8 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
             new_values[di] = Null<price_t>();
         }
         for (size_t ii = 0; ii < ind_count; ii++) {
-            const auto *ind_data = all_stk_inds[si][ii].data();
-            const auto *icir_data = icir[ii].data();
+            const auto* ind_data = all_stk_inds[si][ii].data();
+            const auto* icir_data = icir[ii].data();
             for (size_t di = discard; di < days_total; di++) {
                 new_values[di] += ind_data[di] * icir_data[di];
                 sum_weight[di] += std::abs(icir_data[di]);
