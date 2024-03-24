@@ -50,6 +50,7 @@ option("tdx")
     set_description("Enable tdx kdata engine.")
 option_end()
 
+-- 注意：stacktrace 在 windows 下会严重影响性能
 option("stacktrace")
     set_default(false)
     set_showmenu(true)
