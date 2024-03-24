@@ -28,6 +28,7 @@ public:
     MultiFactorBase(const string& name);
     MultiFactorBase(const IndicatorList& inds, const StockList& stks, const KQuery& query,
                     const Stock& ref_stk, const string& name, int ic_n);
+    virtual ~MultiFactorBase() = default;
 
     /** 获取名称 */
     const string& name() const {
@@ -107,7 +108,6 @@ public:
      * @return vector<IndicatorList>  stks x inds
      */
     vector<IndicatorList> getAllSrcFactors();
-
 
     typedef std::shared_ptr<MultiFactorBase> MultiFactorPtr;
     MultiFactorPtr clone();
