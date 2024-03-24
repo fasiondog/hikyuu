@@ -51,7 +51,7 @@ option("tdx")
 option_end()
 
 option("stacktrace")
-    set_default(true)
+    set_default(false)
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable check/assert with stack trace info.")
@@ -117,6 +117,11 @@ else
     set_configvar("LOG_ACTIVE_LEVEL", 6)
 end
 
+if is_mode("debug") then
+    set_configvar("HKU_DEBUG_MODE", 1)
+else
+    set_configvar("HKU_DEBUG_MODE", 0)
+end
 set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
@@ -128,7 +133,6 @@ end
 set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
-set_configvar("HKU_DISABLE_ASSERT", 0)
 set_configvar("ENABLE_MSVC_LEAK_DETECT", 0)
 set_configvar("HKU_ENABLE_SEND_FEEDBACK", get_config("feedback") and 1 or 0)
 

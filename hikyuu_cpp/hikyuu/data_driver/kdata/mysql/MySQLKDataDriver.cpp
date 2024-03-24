@@ -21,7 +21,7 @@ MySQLKDataDriver::~MySQLKDataDriver() {
 }
 
 bool MySQLKDataDriver::_init() {
-    HKU_ASSERT_M(m_connect == nullptr, "Maybe repeat initialization!");
+    HKU_CHECK(m_connect == nullptr, "Maybe repeat initialization!");
     Parameter connect_param;
     connect_param.set<string>("db", "");  // 数据库名称须在SQL语句中明确指定
     connect_param.set<string>("host", getParamFromOther<string>(m_params, "host", "127.0.0.1"));

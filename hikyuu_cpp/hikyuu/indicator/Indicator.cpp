@@ -99,6 +99,9 @@ Indicator Indicator::operator()(const Indicator& ind) {
     HKU_IF_RETURN(!m_imp, Indicator());
     HKU_IF_RETURN(!ind.getImp(), Indicator(m_imp));
     IndicatorImpPtr p = m_imp->clone();
+    if (m_imp->alike(*ind.getImp())) {
+        return Indicator(p);
+    }
     p->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp());
     return p->calculate();
 }

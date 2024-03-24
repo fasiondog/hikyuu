@@ -29,7 +29,7 @@ MySQLBaseInfoDriver::~MySQLBaseInfoDriver() {
 }
 
 bool MySQLBaseInfoDriver::_init() {
-    HKU_ASSERT_M(m_pool == nullptr, "Maybe repeat initialization!");
+    HKU_CHECK(m_pool == nullptr, "Maybe repeat initialization!");
     Parameter connect_param;
     connect_param.set<string>("host", getParamFromOther<string>(m_params, "host", "127.0.0.1"));
     connect_param.set<string>("usr", getParamFromOther<string>(m_params, "usr", "root"));
