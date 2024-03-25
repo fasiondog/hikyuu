@@ -17,7 +17,7 @@ class IRecover : public IndicatorImp {
 
 public:
     IRecover();
-    IRecover(int recoverType);
+    explicit IRecover(int recoverType);
     IRecover(const KData&, int recoverType);
     virtual ~IRecover();
 

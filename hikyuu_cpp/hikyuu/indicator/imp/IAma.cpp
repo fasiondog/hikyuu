@@ -57,7 +57,7 @@ void IAma::_calculate(const Indicator& data) {
     price_t slowest = 2.0 / (slow_n + 1);
     price_t delta = fastest - slowest;
 
-    price_t prevol = 0.0, vol = 0.0, er = 1.0, c = 0.0;
+    price_t prevol = 0.0, vol = 0.0, er = 1.0;
     price_t ama = src[start];
     size_t first_end = start + n + 1 >= total ? total : start + n + 1;
     _set(ama, start, 0);
@@ -67,7 +67,7 @@ void IAma::_calculate(const Indicator& data) {
         er = (vol == 0.0) ? 1.0 : (src[i] - src[start]) / vol;
         if (er > 1.0)
             er = 1.0;
-        c = std::pow((std::fabs(er) * delta + slowest), 2);
+        price_t c = std::pow((std::fabs(er) * delta + slowest), 2);
         ama += c * (src[i] - ama);
         dst0[i] = ama;
         dst1[i] = er;
@@ -81,7 +81,7 @@ void IAma::_calculate(const Indicator& data) {
             er = 1.0;
         if (er < -1.0)
             er = -1.0;
-        c = std::pow((std::fabs(er) * delta + slowest), 2);
+        price_t c = std::pow((std::fabs(er) * delta + slowest), 2);
         ama += c * (src[i] - ama);
         prevol = vol;
         dst0[i] = ama;

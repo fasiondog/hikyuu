@@ -334,8 +334,7 @@ bool System::readyForRun() {
         m_pre_cn_valid = false;  // 默认的前一日市场有效标志置为false
     }
 
-    if (m_mm)
-        m_mm->setTM(m_tm);
+    m_mm->setTM(m_tm);
     if (m_pg)
         m_pg->setTM(m_tm);
     if (m_st)

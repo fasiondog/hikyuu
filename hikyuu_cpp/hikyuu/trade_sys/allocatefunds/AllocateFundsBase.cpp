@@ -354,7 +354,6 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                         auto tr =
                           iter->sys->sellForceOnClose(date, need_back_num, PART_ALLOCATEFUNDS);
                         if (!tr.isNull()) {
-                            auto sub_tm = iter->sys->getTM();
                             auto sub_cash = sub_tm->currentCash();
                             if (sub_tm->checkout(date, sub_cash)) {
                                 m_cash_tm->checkin(date, sub_cash);
@@ -420,7 +419,6 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                         need_cash = can_allocate_cash;
                     }
                     // 如果期望的资金连一手都买不起，则跳过
-                    const KQuery& query = iter->sys->getTO().getQuery();
                     auto krecord = iter->sys->getStock().getKRecord(date, query.kType());
                     if (krecord.isValid() &&
                         need_cash < krecord.closePrice * iter->sys->getStock().minTradeNumber()) {

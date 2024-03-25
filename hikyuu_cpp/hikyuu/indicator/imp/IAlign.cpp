@@ -131,7 +131,7 @@ void IAlign::_calculate(const Indicator& ind) {
                 for (size_t r = 0; r < m_result_num; r++) {
                     _set(ind.get(j, r), i, r);
                 }
-            } else if (!fill_null && j < ind_total) {
+            } else if (!fill_null) {
                 for (size_t r = 0; r < m_result_num; r++) {
                     _set(ind.get(j - 1, r), i, r);
                 }

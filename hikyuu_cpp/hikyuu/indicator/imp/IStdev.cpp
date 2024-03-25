@@ -84,7 +84,7 @@ void IStdev::_calculate(const Indicator& data) {
             price_t d_pow = std::pow(d, 2);
             pow_buf[i] = d_pow;
             ex2 += d_pow;
-            size_t num = i - j;
+            num = i - j;
             if (num != 1) {
                 dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1));
             }

@@ -265,7 +265,7 @@ Indicator MultiFactorBase::getIC(int ndays) {
     return result;
 }
 
-Indicator MultiFactorBase::getICIR(int ic_n, int ir_n) {
+Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
     Indicator ic = getIC(ic_n);
     Indicator x = MA(ic, ir_n) / STDEV(ic, ir_n);
     x.name("ICIR");
@@ -306,10 +306,8 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
     // 每日截面归一化
     if (getParam<bool>("enable_min_max_normalize")) {
-        vector<Indicator::value_t> one_day(stk_count, Null<Indicator::value_t>());
         for (size_t di = 0, days_total = m_ref_dates.size(); di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
-                auto* one_day_data = one_day.data();
                 Indicator::value_t min_value = std::numeric_limits<Indicator::value_t>::max();
                 Indicator::value_t max_value = std::numeric_limits<Indicator::value_t>::min();
                 for (size_t si = 0; si < stk_count; si++) {

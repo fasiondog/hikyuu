@@ -14,7 +14,7 @@ namespace hku {
 class ICorr : public IndicatorImp {
 public:
     ICorr();
-    ICorr(int n);
+    explicit ICorr(int n);
     ICorr(const Indicator& ref_ind, int n);
     virtual ~ICorr();
 
