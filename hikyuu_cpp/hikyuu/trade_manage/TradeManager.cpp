@@ -1187,12 +1187,11 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     string ktype(inktype);
     to_upper(ktype);
 
-    price_t price(0.0);
-    price_t value(0.0);  // 当前市值
+    price_t value{0.0};  // 当前市值
     position_map_type::const_iterator iter = m_position.begin();
     for (; iter != m_position.end(); ++iter) {
         const PositionRecord& record = iter->second;
-        price = record.stock.getMarketValue(lastDatetime(), ktype);
+        auto price = record.stock.getMarketValue(lastDatetime(), ktype);
         value = roundEx((value + record.number * price * record.stock.unit()), precision);
     }
 
@@ -1200,7 +1199,7 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     iter = m_short_position.begin();
     for (; iter != m_short_position.end(); ++iter) {
         const PositionRecord& record = iter->second;
-        price = record.stock.getMarketValue(lastDatetime(), ktype);
+        auto price = record.stock.getMarketValue(lastDatetime(), ktype);
         short_value =
           roundEx((short_value + record.number * price * record.stock.unit()), precision);
     }

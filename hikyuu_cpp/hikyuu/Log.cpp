@@ -63,6 +63,7 @@ std::shared_ptr<spdlog::logger> getHikyuuLogger() {
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
 void initLogger(bool inJupyter) {
     std::string logname = "hikyuu";
+    spdlog::drop(logname);
     std::shared_ptr<spdlog::logger> logger = spdlog::get(logname);
     if (logger) {
         spdlog::drop(logname);
@@ -91,6 +92,7 @@ void initLogger(bool inJupyter) {
 
 void initLogger(bool inJupyter) {
     std::string logname = "hikyuu";
+    spdlog::drop(logname);
     std::shared_ptr<spdlog::logger> logger = spdlog::get(logname);
     if (logger) {
         spdlog::drop(logname);

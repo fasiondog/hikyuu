@@ -1514,8 +1514,8 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
                     m_ind_params.size() != other.m_ind_params.size() || m_params != other.m_params,
                   false);
 
-    auto &self_id = typeid(*this);
-    auto &cval_id = typeid(ICval);
+    const auto &self_id = typeid(*this);
+    const auto &cval_id = typeid(ICval);
     if (self_id == cval_id) {
         HKU_IF_RETURN(isLeaf() && other.isLeaf(), true);
         return m_right && m_right->alike(*other.m_right);
