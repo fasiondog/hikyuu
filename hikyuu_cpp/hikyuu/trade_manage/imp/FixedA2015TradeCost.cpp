@@ -23,7 +23,7 @@ FixedA2015TradeCost::FixedA2015TradeCost() : TradeCostBase("TC_FixedA2015") {
 
 FixedA2015TradeCost::~FixedA2015TradeCost() {}
 
-void FixedA2015TradeCost::checkParam(const string& name) const {
+void FixedA2015TradeCost::_checkParam(const string& name) const {
     if ("commission" == name) {
         HKU_ASSERT(getParam<price_t>("commission") >= 0.0);
     } else if ("lowest_commission" == name) {

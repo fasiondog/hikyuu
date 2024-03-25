@@ -22,7 +22,7 @@ namespace hku {
  * @ingroup Condition
  */
 class HKU_API ConditionBase : public enable_shared_from_this<ConditionBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     ConditionBase();

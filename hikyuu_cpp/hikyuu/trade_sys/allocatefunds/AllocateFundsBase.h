@@ -20,7 +20,7 @@ namespace hku {
  * @ingroup AllocateFunds
  */
 class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     /** 默认构造函数 */

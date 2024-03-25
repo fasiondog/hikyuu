@@ -36,8 +36,7 @@ SelectorBase::SelectorBase(const string& name) : m_name(name) {
 
 SelectorBase::~SelectorBase() {}
 
-void SelectorBase::checkParam(const string& name) const {}
-
+void SelectorBase::baseCheckParam(const string& name) const {}
 void SelectorBase::paramChanged() {}
 
 void SelectorBase::removeAll() {

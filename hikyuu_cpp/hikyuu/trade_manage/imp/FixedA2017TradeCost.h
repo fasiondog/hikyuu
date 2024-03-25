@@ -23,7 +23,7 @@ public:
     FixedA2017TradeCost();
     virtual ~FixedA2017TradeCost();
 
-    virtual void checkParam(const string& name) const override;
+    virtual void _checkParam(const string& name) const override;
 
     /**
      * 计算买入成本

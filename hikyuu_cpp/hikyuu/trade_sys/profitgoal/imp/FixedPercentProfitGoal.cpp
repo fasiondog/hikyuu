@@ -21,7 +21,7 @@ FixedPercentProfitGoal::~FixedPercentProfitGoal() {}
 
 void FixedPercentProfitGoal::_calculate() {}
 
-void FixedPercentProfitGoal::checkParam(const string& name) const {
+void FixedPercentProfitGoal::_checkParam(const string& name) const {
     if ("p" == name) {
         double p = getParam<double>(name);
         HKU_ASSERT(p > 0.0);

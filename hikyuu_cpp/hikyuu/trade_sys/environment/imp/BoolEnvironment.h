@@ -18,6 +18,7 @@ public:
     explicit BoolEnvironment(const Indicator& ind);
     virtual ~BoolEnvironment();
 
+    virtual void _checkParam(const string& name) const override;
     virtual void _calculate() override;
     virtual EnvironmentPtr _clone() override;
 

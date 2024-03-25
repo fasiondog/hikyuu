@@ -19,7 +19,7 @@ public:
     IndicatorStoploss();  // 仅用于序列化默认构造函数
     IndicatorStoploss(const Indicator& op, const string& kdata_part);
     virtual ~IndicatorStoploss();
-    virtual void checkParam(const string& name) const;
+    virtual void _checkParam(const string& name) const;
 
     virtual price_t getPrice(const Datetime& datetime, price_t price) override;
     virtual void _reset() override;

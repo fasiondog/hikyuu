@@ -56,6 +56,9 @@ AllocateFundsBase::AllocateFundsBase(const string& name)
 
 AllocateFundsBase::~AllocateFundsBase() {}
 
+void AllocateFundsBase::baseCheckParam(const string& name) const {}
+void AllocateFundsBase::paramChanged() {}
+
 void AllocateFundsBase::reset() {
     // 参数检查
     double default_reserve_percent = getParam<double>("default_reserve_percent");

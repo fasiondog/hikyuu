@@ -20,6 +20,7 @@ class FixedUnitsMoneyManager : public MoneyManagerBase {
 public:
     FixedUnitsMoneyManager();
     virtual ~FixedUnitsMoneyManager();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

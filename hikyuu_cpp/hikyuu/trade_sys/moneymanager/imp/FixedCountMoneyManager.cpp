@@ -19,6 +19,13 @@ FixedCountMoneyManager::FixedCountMoneyManager() : MoneyManagerBase("MM_FixedCou
 
 FixedCountMoneyManager::~FixedCountMoneyManager() {}
 
+void FixedCountMoneyManager::_checkParam(const string& name) const {
+    if ("n" == name) {
+        double n = getParam<double>("n");
+        HKU_ASSERT(n > 0.0);
+    }
+}
+
 double FixedCountMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
                                               price_t price, price_t risk, SystemPart from) {
     return getParam<double>("n");

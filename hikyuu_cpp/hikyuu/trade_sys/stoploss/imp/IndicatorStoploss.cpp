@@ -26,7 +26,7 @@ IndicatorStoploss::IndicatorStoploss(const Indicator& op, const string& kdata_pa
 
 IndicatorStoploss::~IndicatorStoploss() {}
 
-void IndicatorStoploss::checkParam(const string& name) const {
+void IndicatorStoploss::_checkParam(const string& name) const {
     if ("kpart" == name) {
         string kpart = getParam<string>("kpart");
         HKU_ASSERT("CLOSE" == kpart || "OPEN" == kpart || "HIGH" == kpart || "LOW" == kpart ||

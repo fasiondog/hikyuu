@@ -20,6 +20,7 @@ class WilliamsFixedRiskMoneyManager : public MoneyManagerBase {
 public:
     WilliamsFixedRiskMoneyManager();
     virtual ~WilliamsFixedRiskMoneyManager();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

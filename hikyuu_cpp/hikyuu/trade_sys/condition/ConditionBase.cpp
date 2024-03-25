@@ -30,6 +30,9 @@ ConditionBase::ConditionBase(const string& name) : m_name(name) {}
 
 ConditionBase::~ConditionBase() {}
 
+void ConditionBase::baseCheckParam(const string& name) const {}
+void ConditionBase::paramChanged() {}
+
 void ConditionBase::reset() {
     m_kdata = Null<KData>();
     m_tm.reset();

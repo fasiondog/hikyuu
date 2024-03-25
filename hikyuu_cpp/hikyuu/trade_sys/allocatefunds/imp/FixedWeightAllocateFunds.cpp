@@ -19,6 +19,13 @@ FixedWeightAllocateFunds::FixedWeightAllocateFunds() : AllocateFundsBase("AF_Fix
 
 FixedWeightAllocateFunds::~FixedWeightAllocateFunds() {}
 
+void FixedWeightAllocateFunds::_checkParam(const string& name) const {
+    if ("weight" == name) {
+        double weight = getParam<double>("weight");
+        HKU_ASSERT(weight > 0.0 && weight <= 1.);
+    }
+}
+
 SystemWeightList FixedWeightAllocateFunds ::_allocateWeight(const Datetime& date,
                                                             const SystemWeightList& se_list) {
     SystemWeightList result;

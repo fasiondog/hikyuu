@@ -28,7 +28,7 @@ SingleSignal::SingleSignal(const Indicator& ind) : SignalBase("SG_Single"), m_in
 
 SingleSignal::~SingleSignal() {}
 
-void SingleSignal::checkParam(const string& name) const {
+void SingleSignal::_checkParam(const string& name) const {
     if ("filter_n" == name) {
         HKU_ASSERT(getParam<int>("filter_n") >= 3);
     } else if ("filter_p" == name) {

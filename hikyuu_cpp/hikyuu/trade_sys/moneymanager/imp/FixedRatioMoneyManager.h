@@ -18,6 +18,7 @@ public:
     FixedRatioMoneyManager();
     virtual ~FixedRatioMoneyManager();
 
+    virtual void _checkParam(const string& name) const override;
     virtual void _reset() override;
     virtual MoneyManagerPtr _clone() override;
     virtual double _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,

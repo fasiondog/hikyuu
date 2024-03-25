@@ -123,7 +123,7 @@ void System::initParam() {
     setParam<bool>("shared_sp", false);
 }
 
-void System::checkParam(const string& name) const {
+void System::baseCheckParam(const string& name) const {
     if ("max_delay_count" == name) {
         HKU_ASSERT(getParam<int>("max_delay_count") >= 0);
     } else if ("tp_delay_n" == name) {

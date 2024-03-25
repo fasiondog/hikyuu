@@ -29,8 +29,7 @@ StoplossBase::StoplossBase(const string& name) : m_name(name) {}
 
 StoplossBase::~StoplossBase() {}
 
-void StoplossBase::checkParam(const string& name) const {}
-
+void StoplossBase::baseCheckParam(const string& name) const {}
 void StoplossBase::paramChanged() {}
 
 void StoplossBase::reset() {

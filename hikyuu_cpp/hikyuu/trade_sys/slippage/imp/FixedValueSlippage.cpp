@@ -19,7 +19,7 @@ FixedValueSlippage::FixedValueSlippage() {
 
 FixedValueSlippage::~FixedValueSlippage() {}
 
-void FixedValueSlippage::checkParam(const string& name) const {
+void FixedValueSlippage::_checkParam(const string& name) const {
     if ("p" == name) {
         HKU_ASSERT(getParam<double>(name) >= 0.0);
     }

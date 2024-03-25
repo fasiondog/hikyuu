@@ -19,7 +19,7 @@ FixedPercentSlippage::FixedPercentSlippage() : SlippageBase("FixedPercent") {
 
 FixedPercentSlippage::~FixedPercentSlippage() {}
 
-void FixedPercentSlippage::checkParam(const string& name) const {
+void FixedPercentSlippage::_checkParam(const string& name) const {
     if ("p" == name) {
         double p = getParam<double>(name);
         HKU_ASSERT(p >= 0.0 && p < 1.0);

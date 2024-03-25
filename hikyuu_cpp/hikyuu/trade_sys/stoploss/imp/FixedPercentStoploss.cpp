@@ -19,7 +19,7 @@ FixedPercentStoploss::FixedPercentStoploss() : StoplossBase("ST_FixedPercent") {
 
 FixedPercentStoploss::~FixedPercentStoploss() {}
 
-void FixedPercentStoploss::checkParam(const string& name) const {
+void FixedPercentStoploss::_checkParam(const string& name) const {
     if ("p" == name) {
         double p = getParam<double>("p");
         HKU_ASSERT(p > 0.0 && p <= 1.0);

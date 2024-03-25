@@ -35,7 +35,7 @@ FixedATradeCost::FixedATradeCost(price_t commission, price_t lowestCommission, p
 
 FixedATradeCost::~FixedATradeCost() {}
 
-void FixedATradeCost::checkParam(const string& name) const {
+void FixedATradeCost::_checkParam(const string& name) const {
     if ("commission" == name) {
         HKU_ASSERT(getParam<price_t>("commission") >= 0.0);
     } else if ("lowest_commission" == name) {

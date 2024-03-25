@@ -40,6 +40,14 @@ MoneyManagerBase::MoneyManagerBase(const string& name) : m_name(name) {
 
 MoneyManagerBase::~MoneyManagerBase() {}
 
+void MoneyManagerBase::baseCheckParam(const string& name) const {
+    if ("max-stock" == name) {
+        HKU_ASSERT(getParam<int>("max-stock") >= 1);
+    }
+}
+
+void MoneyManagerBase::paramChanged() {}
+
 void MoneyManagerBase::buyNotify(const TradeRecord&) {}
 
 void MoneyManagerBase::sellNotify(const TradeRecord&) {}
@@ -110,21 +118,16 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
 
     double n = _getBuyNumber(datetime, stock, price, risk, from);
     double min_trade = stock.minTradeNumber();
-
-    if (n < min_trade) {
-        HKU_TRACE("Ignore! Is less than the minimum number of transactions({}<{}) {}", n, min_trade,
-                  stock.market_code());
-        return 0;
-    }
+    HKU_TRACE_IF_RETURN(n < min_trade, 0.0,
+                        "Ignore! Is less than the minimum number of transactions({}<{}) {}", n,
+                        min_trade, stock.market_code());
 
     // 转换为最小交易量的整数倍
-    n = long(n / min_trade) * min_trade;
-    double max_trade = stock.maxTradeNumber();
+    n = int64_t(n / min_trade) * min_trade;
 
-    if (n > max_trade) {
-        n = max_trade;
-        HKU_INFO("Over stock.maxTradeNumber({})!", max_trade);
-    }
+    double max_trade = stock.maxTradeNumber();
+    HKU_WARN_IF_RETURN(n > max_trade, max_trade,
+                       "Over stock.maxTradeNumber({}), will use maxTradeNumber", max_trade);
 
     // 在现金不足时，自动补充存入现金
     if (getParam<bool>("auto-checkin")) {

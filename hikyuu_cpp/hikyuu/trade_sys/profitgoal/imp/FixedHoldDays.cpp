@@ -19,7 +19,7 @@ FixedHoldDays::FixedHoldDays() : ProfitGoalBase("PG_FixedHoldDays") {
 
 FixedHoldDays::~FixedHoldDays() {}
 
-void FixedHoldDays::checkParam(const string& name) const {
+void FixedHoldDays::_checkParam(const string& name) const {
     if ("days" == name) {
         int days = getParam<int>(name);
         HKU_ASSERT(days > 0);
