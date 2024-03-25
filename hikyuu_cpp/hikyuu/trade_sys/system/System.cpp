@@ -33,7 +33,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SystemPtr& sys) {
 
 System::System()
 : m_name("SYS_Simple"),
-  m_part_changed(true),
+  m_calculated(false),
   m_pre_ev_valid(true),  // must true
   m_pre_cn_valid(true),  // must true
   m_buy_days(0),
@@ -45,7 +45,7 @@ System::System()
 
 System::System(const string& name)
 : m_name(name),
-  m_part_changed(true),
+  m_calculated(false),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
   m_buy_days(0),
@@ -69,7 +69,7 @@ System::System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const Envir
   m_pg(pg),
   m_sp(sp),
   m_name(name),
-  m_part_changed(true),
+  m_calculated(false),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
   m_buy_days(0),
@@ -123,6 +123,18 @@ void System::initParam() {
     setParam<bool>("shared_sp", false);
 }
 
+void System::checkParam(const string& name) const {
+    if ("max_delay_count" == name) {
+        HKU_ASSERT(getParam<int>("max_delay_count") >= 0);
+    } else if ("tp_delay_n" == name) {
+        HKU_ASSERT(getParam<int>("tp_delay_n") >= 0);
+    }
+}
+
+void System::paramChanged() {
+    m_calculated = false;
+}
+
 void System::reset() {
     if (m_tm && !getParam<bool>("shared_tm"))
         m_tm->reset();
@@ -148,7 +160,7 @@ void System::reset() {
     // 一个sys实例绑定stock后，除非主动改变，否则不应该被reset
     //  m_stock
 
-    m_part_changed = true;
+    m_calculated = false;
     m_pre_ev_valid = false;  // true;
     m_pre_cn_valid = false;  // true;
 
@@ -189,7 +201,7 @@ void System::forceResetAll() {
     m_src_kdata = Null<KData>();
     m_kdata = Null<KData>();
 
-    m_part_changed = true;
+    m_calculated = false;
     m_pre_ev_valid = false;  // true;
     m_pre_cn_valid = false;  // true;
 
@@ -206,10 +218,14 @@ void System::forceResetAll() {
 }
 
 void System::setTO(const KData& kdata) {
-    HKU_TRACE_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "No need to calcule!");
-    m_kdata = kdata;
-    m_stock = kdata.getStock();
+    if (m_kdata != kdata) {
+        m_calculated = false;
+        m_kdata = kdata;
+    }
 
+    HKU_TRACE_IF_RETURN(m_calculated, void(), "No need to calcule!");
+
+    m_stock = kdata.getStock();
     KQuery query = kdata.getQuery();
     if (m_stock.isNull() || query.recoverType() == KQuery::NO_RECOVER) {
         m_src_kdata = m_kdata;
@@ -270,7 +286,7 @@ SystemPtr System::clone() {
     p->m_kdata = m_kdata;
     p->m_src_kdata = m_src_kdata;
 
-    p->m_part_changed = m_part_changed;
+    p->m_calculated = m_calculated;
     p->m_pre_ev_valid = m_pre_ev_valid;
     p->m_pre_cn_valid = m_pre_cn_valid;
 
@@ -334,7 +350,7 @@ bool System::readyForRun() {
 }
 
 void System::run(const KQuery& query, bool reset, bool resetAll) {
-    HKU_ERROR_IF_RETURN(m_stock.isNull(), void(), "m_stock is NULL!");
+    HKU_CHECK(!m_stock.isNull(), "m_stock is NULL!");
 
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
     if (resetAll) {
@@ -343,11 +359,10 @@ void System::run(const KQuery& query, bool reset, bool resetAll) {
         this->reset();
     }
 
-    HKU_IF_RETURN(!readyForRun(), void());
-
     KData kdata = m_stock.getKData(query);
-    HKU_IF_RETURN(kdata.empty(), void());
-    HKU_DEBUG_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "Not need calculate.");
+    HKU_DEBUG_IF_RETURN(m_calculated && m_kdata == kdata, void(), "Not need calculate.");
+
+    HKU_IF_RETURN(!readyForRun(), void());
 
     setTO(kdata);
     size_t total = kdata.size();
@@ -358,7 +373,7 @@ void System::run(const KQuery& query, bool reset, bool resetAll) {
             _runMoment(ks[i], src_ks[i]);
         }
     }
-    m_part_changed = false;
+    m_calculated = true;
 }
 
 void System::run(const Stock& stock, const KQuery& query, bool reset, bool resetAll) {
@@ -367,9 +382,6 @@ void System::run(const Stock& stock, const KQuery& query, bool reset, bool reset
 }
 
 void System::run(const KData& kdata, bool reset, bool resetAll) {
-    HKU_INFO_IF_RETURN(kdata.empty(), void(), "Input kdata is empty!");
-    HKU_DEBUG_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "Not need calculate.");
-
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
     if (resetAll) {
         this->forceResetAll();
@@ -377,6 +389,8 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
         // System::run 供单体系统进行回测，需要强制复位所有的组件，忽略组件的共享属性
         this->reset();
     }
+
+    HKU_DEBUG_IF_RETURN(m_calculated && m_kdata == kdata, void(), "Not need calculate.");
 
     HKU_IF_RETURN(!readyForRun(), void());
 
@@ -389,7 +403,7 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
             _runMoment(ks[i], src_ks[i]);
         }
     }
-    m_part_changed = false;
+    m_calculated = true;
 }
 
 void System::clearDelayRequest() {
@@ -530,7 +544,12 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
                 } else {
                     m_lastTakeProfit = current_take_profile;
                 }
-                if (current_price <= current_take_profile) {
+
+                int tp_delay_n = getParam<int>("tp_delay_n");
+                size_t pos = m_kdata.getPos(today.datetime);
+                size_t position_pos = m_kdata.getPos(position.takeDatetime);
+                // 如果当前价格小于等于止盈价，且满足止盈延迟条件则卖出
+                if (pos - position_pos >= tp_delay_n && current_price <= current_take_profile) {
                     tr = _sell(today, src_today, PART_TAKEPROFIT);
                 }
             }
