@@ -25,6 +25,7 @@ public:
     ITime();
     ITime(const KData&, const string& type);
     virtual ~ITime();
+    virtual void _checkParam(const string& name) const override;
 };
 
 }  // namespace hku

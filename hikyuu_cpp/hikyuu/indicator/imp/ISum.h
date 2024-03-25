@@ -20,6 +20,7 @@ class ISum : public IndicatorImp {
 public:
     ISum();
     virtual ~ISum();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

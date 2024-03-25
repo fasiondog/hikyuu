@@ -19,10 +19,6 @@ IBarsSince::IBarsSince() : IndicatorImp("BARSSINCE", 1) {}
 
 IBarsSince::~IBarsSince() {}
 
-bool IBarsSince::check() {
-    return true;
-}
-
 void IBarsSince::_calculate(const Indicator &ind) {
     size_t total = ind.size();
     m_discard = ind.discard();

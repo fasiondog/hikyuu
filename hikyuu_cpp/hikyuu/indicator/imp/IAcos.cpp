@@ -19,10 +19,6 @@ IAcos::IAcos() : IndicatorImp("ACOS", 1) {}
 
 IAcos::~IAcos() {}
 
-bool IAcos::check() {
-    return true;
-}
-
 void IAcos::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

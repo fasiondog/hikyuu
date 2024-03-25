@@ -17,10 +17,6 @@ ILn::ILn() : IndicatorImp("LN", 1) {}
 
 ILn::~ILn() {}
 
-bool ILn::check() {
-    return true;
-}
-
 void ILn::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();

@@ -19,10 +19,6 @@ IIntpart::IIntpart() : IndicatorImp("INTPART", 1) {}
 
 IIntpart::~IIntpart() {}
 
-bool IIntpart::check() {
-    return true;
-}
-
 void IIntpart::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

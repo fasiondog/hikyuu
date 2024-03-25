@@ -22,8 +22,10 @@ IVarp::IVarp() : IndicatorImp("VARP", 1) {
 
 IVarp::~IVarp() {}
 
-bool IVarp::check() {
-    return getParam<int>("n") >= 2;
+void IVarp::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 2);
+    }
 }
 
 void IVarp::_calculate(const Indicator& data) {

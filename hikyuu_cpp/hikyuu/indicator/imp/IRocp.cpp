@@ -21,8 +21,10 @@ IRocp::IRocp() : IndicatorImp("ROCP", 1) {
 
 IRocp::~IRocp() {}
 
-bool IRocp::check() {
-    return getParam<int>("n") >= 0;
+void IRocp::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
 }
 
 void IRocp::_calculate(const Indicator& ind) {

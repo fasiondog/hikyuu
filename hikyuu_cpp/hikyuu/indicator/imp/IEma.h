@@ -23,6 +23,7 @@ class IEma : public IndicatorImp {
 public:
     IEma();
     virtual ~IEma();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

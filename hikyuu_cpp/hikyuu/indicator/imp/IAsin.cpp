@@ -19,10 +19,6 @@ IAsin::IAsin() : IndicatorImp("ASIN", 1) {}
 
 IAsin::~IAsin() {}
 
-bool IAsin::check() {
-    return true;
-}
-
 void IAsin::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

@@ -19,10 +19,6 @@ ITan::ITan() : IndicatorImp("TAN", 1) {}
 
 ITan::~ITan() {}
 
-bool ITan::check() {
-    return true;
-}
-
 void ITan::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

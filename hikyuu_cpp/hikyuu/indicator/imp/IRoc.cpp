@@ -21,8 +21,10 @@ IRoc::IRoc() : IndicatorImp("ROC", 1) {
 
 IRoc::~IRoc() {}
 
-bool IRoc::check() {
-    return getParam<int>("n") >= 0;
+void IRoc::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
 }
 
 void IRoc::_calculate(const Indicator& ind) {

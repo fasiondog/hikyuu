@@ -22,6 +22,7 @@ class ILowLineBars : public IndicatorImp {
 public:
     ILowLineBars();
     virtual ~ILowLineBars();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

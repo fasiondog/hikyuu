@@ -28,6 +28,7 @@ public:
     IVigor();
     explicit IVigor(int n);
     virtual ~IVigor();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

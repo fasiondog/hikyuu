@@ -19,10 +19,6 @@ IReverse::IReverse() : IndicatorImp("REVERSE", 1) {}
 
 IReverse::~IReverse() {}
 
-bool IReverse::check() {
-    return true;
-}
-
 void IReverse::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();

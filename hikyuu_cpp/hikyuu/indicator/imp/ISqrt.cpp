@@ -19,10 +19,6 @@ ISqrt::ISqrt() : IndicatorImp("SQRT", 1) {}
 
 ISqrt::~ISqrt() {}
 
-bool ISqrt::check() {
-    return true;
-}
-
 void ISqrt::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

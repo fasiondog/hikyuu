@@ -22,6 +22,7 @@ class IHhvbars : public IndicatorImp {
 public:
     IHhvbars();
     virtual ~IHhvbars();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

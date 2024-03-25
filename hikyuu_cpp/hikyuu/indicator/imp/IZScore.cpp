@@ -27,8 +27,10 @@ IZScore::IZScore(bool outExtreme, double nsigma, bool recursive) : IndicatorImp(
 
 IZScore::~IZScore() {}
 
-bool IZScore::check() {
-    return getParam<double>("nsigma") > 0.;
+void IZScore::_checkParam(const string &name) const {
+    if ("nsigma" == name) {
+        HKU_ASSERT(getParam<double>("nsigma") > 0.);
+    }
 }
 
 static void normalize(IndicatorImp::value_t *dst, Indicator::value_t const *src, size_t total,
@@ -61,7 +63,6 @@ static void normalize(IndicatorImp::value_t *dst, Indicator::value_t const *src,
             dst[i] = (src[i] - mean) / sigma;
         }
     }
-
 
     if (outExtreme) {
         IndicatorImp::value_t ulimit = nsigma;
@@ -100,7 +101,7 @@ void IZScore::_calculate(const Indicator &data) {
     auto const *src = data.data() + m_discard;
     auto *dst = this->data() + m_discard;
     normalize(dst, src, total - m_discard, outExtreme, nsigma, recursive);
-    
+
     for (size_t i = m_discard; i < total; i++) {
         if (!std::isnan(dst[i])) {
             m_discard = i;

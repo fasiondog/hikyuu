@@ -21,10 +21,6 @@ ISumBars::ISumBars() : IndicatorImp("SUMBARS", 1) {
 
 ISumBars::~ISumBars() {}
 
-bool ISumBars::check() {
-    return true;
-}
-
 void ISumBars::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     m_discard = ind.discard();

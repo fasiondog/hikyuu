@@ -19,10 +19,6 @@ IFloor::IFloor() : IndicatorImp("FLOOR", 1) {}
 
 IFloor::~IFloor() {}
 
-bool IFloor::check() {
-    return true;
-}
-
 void IFloor::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

@@ -21,8 +21,10 @@ IExist::IExist() : IndicatorImp("EXIST", 1) {
 
 IExist::~IExist() {}
 
-bool IExist::check() {
-    return getParam<int>("n") >= 0;
+void IExist::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
 }
 
 void IExist::_calculate(const Indicator& ind) {

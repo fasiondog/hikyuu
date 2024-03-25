@@ -19,10 +19,6 @@ ISign::ISign() : IndicatorImp("SGN", 1) {}
 
 ISign::~ISign() {}
 
-bool ISign::check() {
-    return true;
-}
-
 void ISign::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     m_discard = ind.discard();

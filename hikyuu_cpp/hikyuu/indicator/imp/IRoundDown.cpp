@@ -21,8 +21,10 @@ IRoundDown::IRoundDown() : IndicatorImp("ROUNDDOWN", 1) {
 
 IRoundDown::~IRoundDown() {}
 
-bool IRoundDown::check() {
-    return getParam<int>("ndigits") >= 0;
+void IRoundDown::_checkParam(const string& name) const {
+    if ("ndigits" == name) {
+        HKU_ASSERT(getParam<int>("ndigits") >= 0);
+    }
 }
 
 void IRoundDown::_calculate(const Indicator& data) {

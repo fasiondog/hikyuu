@@ -25,6 +25,7 @@ class IRoundDown : public IndicatorImp {
 public:
     IRoundDown();
     virtual ~IRoundDown();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

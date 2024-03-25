@@ -17,10 +17,6 @@ IMrr::IMrr() : IndicatorImp("MRR", 1) {}
 
 IMrr::~IMrr() {}
 
-bool IMrr::check() {
-    return true;
-}
-
 void IMrr::_calculate(const Indicator& ind) {
     m_discard = 0;
     for (size_t i = 0, len = ind.discard(); i < len; i++) {

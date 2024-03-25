@@ -19,10 +19,6 @@ ICeil::ICeil() : IndicatorImp("CEILING", 1) {}
 
 ICeil::~ICeil() {}
 
-bool ICeil::check() {
-    return true;
-}
-
 void ICeil::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

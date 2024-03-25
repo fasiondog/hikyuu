@@ -33,11 +33,7 @@ TEST_CASE("test_ZSCORE") {
 
     /** @arg 输入的 nsigma < 0 */
     KData k = getKData("SH000001", KQuery(-5));
-    result = ZSCORE(k.close(), true, -0.5);
-    CHECK_EQ(result.name(), "ZSCORE");
-    CHECK_UNARY(!result.empty());
-    CHECK_EQ(result.size(), k.size());
-    CHECK_EQ(result.discard(), result.size());
+    CHECK_THROWS_AS(ZSCORE(k.close(), true, -0.5), std::exception);
 
     /** @arg 正常计算，不剔除异常值 */
     result = ZSCORE(k.close());
@@ -60,7 +56,7 @@ TEST_CASE("test_ZSCORE") {
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
 
-        /** @arg 过滤异常值，递归*/
+    /** @arg 过滤异常值，递归*/
     k = getKData("SH000001", KQuery(3600, 4000));
     c = k.close();
     auto result2 = ZSCORE(c, true, 3.0, true);

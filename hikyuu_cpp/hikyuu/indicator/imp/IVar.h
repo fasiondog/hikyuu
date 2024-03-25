@@ -25,6 +25,7 @@ class IVar : public hku::IndicatorImp {
 public:
     IVar();
     virtual ~IVar();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

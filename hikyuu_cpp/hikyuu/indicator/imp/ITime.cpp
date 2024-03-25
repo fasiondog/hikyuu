@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::ITime)
 namespace hku {
 
 ITime::ITime() : IndicatorImp("TIME") {
-    setParam<string>("type", "time");
+    setParam<string>("type", "TIME");
 }
 
 ITime::~ITime() {}
@@ -28,10 +28,14 @@ ITime::ITime(const KData& k, const string& type) : IndicatorImp() {
     ITime::_calculate(Indicator());
 }
 
-bool ITime::check() {
-    string part = getParam<string>("type");
-    return "TIME" == part || "DATE" == part || "YEAR" == part || "MONTH" == part ||
-           "WEEK" == part || "DAY" == part || "HOUR" == part || "MINUTE" == part;
+void ITime::_checkParam(const string& name) const {
+    if ("type" == name) {
+        string param_type = getParam<string>("type");
+        HKU_CHECK("TIME" == param_type || "DATE" == param_type || "YEAR" == param_type ||
+                    "MONTH" == param_type || "WEEK" == param_type || "DAY" == param_type ||
+                    "HOUR" == param_type || "MINUTE" == param_type,
+                  "Invalid param type: {}", param_type);
+    }
 }
 
 void ITime::_calculate(const Indicator& data) {

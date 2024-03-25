@@ -17,10 +17,6 @@ IAbs::IAbs() : IndicatorImp("ABS", 1) {}
 
 IAbs::~IAbs() {}
 
-bool IAbs::check() {
-    return true;
-}
-
 void IAbs::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

@@ -21,8 +21,10 @@ ILowLine::ILowLine() : IndicatorImp("LLV", 1) {
 
 ILowLine::~ILowLine() {}
 
-bool ILowLine::check() {
-    return haveIndParam("n") || getParam<int>("n") >= 0;
+void ILowLine::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
 }
 
 void ILowLine::_calculate(const Indicator& ind) {

@@ -27,8 +27,10 @@ IVigor::IVigor(int n) : IndicatorImp("VIGOR") {
 
 IVigor::~IVigor() {}
 
-bool IVigor::check() {
-    return getParam<int>("n") >= 1;
+void IVigor::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 1);
+    }
 }
 
 void IVigor::_calculate(const Indicator& ind) {

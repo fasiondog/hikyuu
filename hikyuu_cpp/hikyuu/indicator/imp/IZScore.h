@@ -19,6 +19,7 @@ public:
     IZScore();
     IZScore(bool outExtreme, double nsigma, bool recursive);
     virtual ~IZScore();
+    virtual void _checkParam(const string& name) const override;
 };
 
 }  // namespace hku

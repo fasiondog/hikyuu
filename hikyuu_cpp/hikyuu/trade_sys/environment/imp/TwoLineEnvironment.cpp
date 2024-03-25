@@ -30,7 +30,7 @@ void TwoLineEnvironment::_checkParam(const string& name) const {
     if ("market" == name) {
         string market = getParam<string>(name);
         auto market_info = StockManager::instance().getMarketInfo(name);
-        HKU_CHECK(market_info == Null<MarketInfo>(), "Invalid market: {}", market);
+        HKU_CHECK(market_info != Null<MarketInfo>(), "Invalid market: {}", market);
     }
 }
 

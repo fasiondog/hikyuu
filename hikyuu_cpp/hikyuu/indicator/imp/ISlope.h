@@ -19,6 +19,7 @@ class ISlope : public IndicatorImp {
 public:
     ISlope();
     virtual ~ISlope();
+    virtual void _checkParam(const string& name) const override;
 };
 
 }  // namespace hku

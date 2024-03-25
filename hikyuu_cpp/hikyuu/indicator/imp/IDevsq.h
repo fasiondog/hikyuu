@@ -22,6 +22,7 @@ class IDevsq : public hku::IndicatorImp {
 public:
     IDevsq();
     virtual ~IDevsq();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

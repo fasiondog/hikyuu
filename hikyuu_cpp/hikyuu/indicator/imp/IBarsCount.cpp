@@ -19,10 +19,6 @@ IBarsCount::IBarsCount() : IndicatorImp("BARSCOUNT", 1) {}
 
 IBarsCount::~IBarsCount() {}
 
-bool IBarsCount::check() {
-    return true;
-}
-
 void IBarsCount::_calculate(const Indicator& ind) {
     KData k = ind.getContext();
     Stock stk = k.getStock();

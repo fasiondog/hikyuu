@@ -173,6 +173,12 @@ IndicatorImp::IndicatorImp(const string &name, size_t result_num)
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
 }
 
+void IndicatorImp::baseCheckParam(const string &name) const {}
+
+void IndicatorImp::paramChanged() {
+    m_need_calculate = true;
+}
+
 void IndicatorImp::setIndParam(const string &name, const Indicator &ind) {
     IndicatorImpPtr imp = ind.getImp();
     HKU_CHECK(imp, "Invalid input ind, no concrete implementation!");
@@ -678,27 +684,6 @@ Indicator IndicatorImp::calculate() {
         } catch (...) {
             result = clone();
         }
-        return Indicator(result);
-    }
-
-    if (!check()) {
-        HKU_ERROR("Invalid param! {} : {}", formula(), long_name());
-        if (m_right) {
-            m_right->calculate();
-            _readyBuffer(m_right->size(), m_result_num);
-            m_discard = m_right->size();
-            try {
-                result = shared_from_this();
-            } catch (...) {
-                // Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
-                result = clone();
-            }
-        }
-
-        if (size() != 0) {
-            m_need_calculate = false;
-        }
-
         return Indicator(result);
     }
 

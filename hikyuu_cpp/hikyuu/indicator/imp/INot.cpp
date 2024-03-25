@@ -17,10 +17,6 @@ INot::INot() : IndicatorImp("NOT", 1) {}
 
 INot::~INot() {}
 
-bool INot::check() {
-    return true;
-}
-
 void INot::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

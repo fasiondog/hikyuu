@@ -17,10 +17,6 @@ class PyIndicatorImp : public IndicatorImp {
 public:
     using IndicatorImp::IndicatorImp;
 
-    bool check() override {
-        PYBIND11_OVERLOAD(bool, IndicatorImp, check, );
-    }
-
     void _calculate(const Indicator& ind) override {
         PYBIND11_OVERLOAD(void, IndicatorImp, _calculate, ind);
     }
@@ -93,7 +89,6 @@ void export_IndicatorImp(py::module& m) {
       .def("get_result_num", &IndicatorImp::getResultNumber)
       .def("get_result_as_price_list", &IndicatorImp::getResultAsPriceList)
       .def("calculate", &IndicatorImp::calculate)
-      .def("check", &IndicatorImp::check)
       .def("clone", &IndicatorImp::clone)
       .def("_calculate", &IndicatorImp::_calculate)
       .def("_dyn_run_one_step", &IndicatorImp::_dyn_run_one_step)

@@ -27,9 +27,11 @@ ITimeLine::ITimeLine(const KData& k) : IndicatorImp("TIMELINE", 1) {
     ITimeLine::_calculate(Indicator());
 }
 
-bool ITimeLine::check() {
-    string part = getParam<string>("part");
-    return part == "price" || part == "vol";
+void ITimeLine::_checkParam(const string& name) const {
+    if ("part" == name) {
+        string part = getParam<string>("part");
+        HKU_ASSERT(part == "price" || part == "vol");
+    }
 }
 
 void ITimeLine::_calculate(const Indicator& data) {
