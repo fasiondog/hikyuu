@@ -19,7 +19,6 @@ public:
     virtual ~ISpearman();
 
     virtual void _checkParam(const string& name) const override;
-    virtual bool check() override;
     virtual void _calculate(const Indicator& data) override;
     virtual IndicatorImpPtr _clone() override;
 

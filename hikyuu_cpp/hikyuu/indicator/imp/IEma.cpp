@@ -21,10 +21,6 @@ IEma::IEma() : IndicatorImp("EMA", 1) {
 
 IEma::~IEma() {}
 
-bool IEma::check() {
-    return getParam<int>("n") > 0;
-}
-
 void IEma::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") > 0);

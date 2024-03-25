@@ -21,10 +21,6 @@ IHighLine::IHighLine() : IndicatorImp("HHV", 1) {
 
 IHighLine::~IHighLine() {}
 
-bool IHighLine::check() {
-    return getParam<int>("n") >= 0;
-}
-
 void IHighLine::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 0);

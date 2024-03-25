@@ -17,10 +17,6 @@ IDiff::IDiff() : IndicatorImp("DIFF", 1) {}
 
 IDiff::~IDiff() {}
 
-bool IDiff::check() {
-    return true;
-}
-
 void IDiff::_calculate(const Indicator& data) {
     size_t total = data.size();
 

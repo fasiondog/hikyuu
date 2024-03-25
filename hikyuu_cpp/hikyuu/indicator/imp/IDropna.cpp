@@ -21,10 +21,6 @@ IDropna::IDropna() : IndicatorImp("DROPNA", 1) {
 
 IDropna::~IDropna() {}
 
-bool IDropna::check() {
-    return true;
-}
-
 void IDropna::_calculate(const Indicator& ind) {
     // ref_date_list 参数会影响 IndicatorImp 全局，勿随意修改
     size_t total = ind.size();

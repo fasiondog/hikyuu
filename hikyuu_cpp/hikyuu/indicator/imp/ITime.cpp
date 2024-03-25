@@ -28,12 +28,6 @@ ITime::ITime(const KData& k, const string& type) : IndicatorImp() {
     ITime::_calculate(Indicator());
 }
 
-bool ITime::check() {
-    string part = getParam<string>("type");
-    return "TIME" == part || "DATE" == part || "YEAR" == part || "MONTH" == part ||
-           "WEEK" == part || "DAY" == part || "HOUR" == part || "MINUTE" == part;
-}
-
 void ITime::_checkParam(const string& name) const {
     if ("type" == name) {
         string param_type = getParam<string>("type");

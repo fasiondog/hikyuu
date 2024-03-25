@@ -21,10 +21,6 @@ IAtr::IAtr() : IndicatorImp("ATR", 1) {
 
 IAtr::~IAtr() {}
 
-bool IAtr::check() {
-    return getParam<int>("n") >= 1;
-}
-
 void IAtr::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 1);

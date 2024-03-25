@@ -21,10 +21,6 @@ IRocr::IRocr() : IndicatorImp("ROCR", 1) {
 
 IRocr::~IRocr() {}
 
-bool IRocr::check() {
-    return getParam<int>("n") >= 0;
-}
-
 void IRocr::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 0);

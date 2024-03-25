@@ -21,10 +21,6 @@ IHhvbars::IHhvbars() : IndicatorImp("HHVBARS", 1) {
 
 IHhvbars::~IHhvbars() {}
 
-bool IHhvbars::check() {
-    return getParam<int>("n") >= 0;
-}
-
 void IHhvbars::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 0);

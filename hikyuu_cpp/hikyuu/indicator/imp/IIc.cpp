@@ -33,10 +33,6 @@ IIc::IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk
 
 IIc::~IIc() {}
 
-bool IIc::check() {
-    return getParam<int>("n") >= 1;
-}
-
 void IIc::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 1);

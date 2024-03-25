@@ -22,10 +22,6 @@ IDevsq::IDevsq() : IndicatorImp("DEVSQ", 1) {
 
 IDevsq::~IDevsq() {}
 
-bool IDevsq::check() {
-    return getParam<int>("n") >= 2;
-}
-
 void IDevsq::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 2);

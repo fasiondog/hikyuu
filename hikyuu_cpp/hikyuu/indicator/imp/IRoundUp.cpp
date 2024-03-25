@@ -21,10 +21,6 @@ IRoundUp::IRoundUp() : IndicatorImp("ROUNDUP", 1) {
 
 IRoundUp::~IRoundUp() {}
 
-bool IRoundUp::check() {
-    return getParam<int>("ndigits") >= 0;
-}
-
 void IRoundUp::_checkParam(const string& name) const {
     if ("ndigits" == name) {
         HKU_ASSERT(getParam<int>("ndigits") >= 0);

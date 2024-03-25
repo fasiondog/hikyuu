@@ -28,11 +28,6 @@ ICorr::ICorr(const Indicator& ref_ind, int n) : IndicatorImp("CORR"), m_ref_ind(
 
 ICorr::~ICorr() {}
 
-bool ICorr::check() {
-    int n = getParam<int>("n");
-    return n == 0 || n >= 2;
-}
-
 void ICorr::_checkParam(const string& name) const {
     if ("n" == name) {
         int n = getParam<int>("n");

@@ -687,27 +687,6 @@ Indicator IndicatorImp::calculate() {
         return Indicator(result);
     }
 
-    if (!check()) {
-        HKU_ERROR("Invalid param! {} : {}", formula(), long_name());
-        if (m_right) {
-            m_right->calculate();
-            _readyBuffer(m_right->size(), m_result_num);
-            m_discard = m_right->size();
-            try {
-                result = shared_from_this();
-            } catch (...) {
-                // Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
-                result = clone();
-            }
-        }
-
-        if (size() != 0) {
-            m_need_calculate = false;
-        }
-
-        return Indicator(result);
-    }
-
     switch (m_optype) {
         case LEAF:
             if (m_ind_params.empty()) {

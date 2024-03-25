@@ -25,10 +25,6 @@ ICval::ICval(double value, size_t discard) : IndicatorImp("CVAL", 1) {
 
 ICval::~ICval() {}
 
-bool ICval::check() {
-    return getParam<int>("discard") < 0 ? false : true;
-}
-
 void ICval::_checkParam(const string& name) const {
     if ("discard" == name) {
         HKU_ASSERT(getParam<int>("discard") >= 0);

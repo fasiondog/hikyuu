@@ -19,10 +19,6 @@ IRef::IRef() : IndicatorImp("REF", 1) {
 
 IRef::~IRef() {}
 
-bool IRef::check() {
-    return getParam<int>("n") >= 0;
-}
-
 void IRef::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 0);

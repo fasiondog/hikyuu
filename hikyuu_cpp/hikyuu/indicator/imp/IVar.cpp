@@ -22,10 +22,6 @@ IVar::IVar() : IndicatorImp("VAR", 1) {
 
 IVar::~IVar() {}
 
-bool IVar::check() {
-    return getParam<int>("n") >= 2;
-}
-
 void IVar::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 2);

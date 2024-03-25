@@ -29,11 +29,6 @@ ISpearman::ISpearman(const Indicator &ref_ind, int n)
 
 ISpearman::~ISpearman() {}
 
-bool ISpearman::check() {
-    int n = getParam<int>("n");
-    return n == 0 || n >= 2;
-}
-
 void ISpearman::_checkParam(const string &name) const {
     if ("n" == name) {
         int n = getParam<int>("n");

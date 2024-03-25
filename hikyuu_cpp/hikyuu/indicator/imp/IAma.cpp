@@ -25,10 +25,6 @@ IAma::IAma() : IndicatorImp("AMA", 2) {
 
 IAma::~IAma() {}
 
-bool IAma::check() {
-    return getParam<int>("n") >= 1 && getParam<int>("fast_n") >= 0 && getParam<int>("slow_n") >= 0;
-}
-
 void IAma::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 1);

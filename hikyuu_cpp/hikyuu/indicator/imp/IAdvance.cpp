@@ -29,10 +29,6 @@ IAdvance::IAdvance() : IndicatorImp("ADVANCE", 1) {
 
 IAdvance::~IAdvance() {}
 
-bool IAdvance::check() {
-    return true;
-}
-
 void IAdvance::_checkParam(const string& name) const {
     if ("market" == name) {
         string market = getParam<string>(name);

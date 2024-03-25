@@ -19,10 +19,6 @@ IBarsLast::IBarsLast() : IndicatorImp("BARSLAST", 1) {}
 
 IBarsLast::~IBarsLast() {}
 
-bool IBarsLast::check() {
-    return true;
-}
-
 void IBarsLast::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     m_discard = ind.discard();

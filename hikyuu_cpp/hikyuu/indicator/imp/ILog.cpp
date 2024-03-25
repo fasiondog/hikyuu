@@ -17,10 +17,6 @@ ILog::ILog() : IndicatorImp("LOG", 1) {}
 
 ILog::~ILog() {}
 
-bool ILog::check() {
-    return true;
-}
-
 void ILog::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

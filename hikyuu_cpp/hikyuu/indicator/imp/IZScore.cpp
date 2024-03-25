@@ -27,13 +27,9 @@ IZScore::IZScore(bool outExtreme, double nsigma, bool recursive) : IndicatorImp(
 
 IZScore::~IZScore() {}
 
-bool IZScore::check() {
-    return getParam<double>("nsigma") > 0.;
-}
-
 void IZScore::_checkParam(const string &name) const {
     if ("nsigma" == name) {
-        HKU_ASSERT(getParam<double>("nsigma") > 0);
+        HKU_ASSERT(getParam<double>("nsigma") > 0.);
     }
 }
 

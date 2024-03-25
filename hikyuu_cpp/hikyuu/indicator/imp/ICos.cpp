@@ -19,10 +19,6 @@ ICos::ICos() : IndicatorImp("COS", 1) {}
 
 ICos::~ICos() {}
 
-bool ICos::check() {
-    return true;
-}
-
 void ICos::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

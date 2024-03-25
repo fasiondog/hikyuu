@@ -28,12 +28,6 @@ IKData::IKData(const KData& kdata, const string& part) : IndicatorImp() {
 
 IKData::~IKData() {}
 
-bool IKData::check() {
-    string part = getParam<string>("kpart");
-    return ("KDATA" == part || "OPEN" == part || "HIGH" == part || "LOW" == part ||
-            "CLOSE" == part || "AMO" == part || "VOL" == part);
-}
-
 void IKData::_checkParam(const string& name) const {
     if ("kpart" == name) {
         string part = getParam<string>("kpart");

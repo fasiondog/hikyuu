@@ -19,10 +19,6 @@ ISlope::ISlope() : IndicatorImp("SLOPE", 1) {
 
 ISlope::~ISlope() {}
 
-bool ISlope::check() {
-    return getParam<int>("n") >= 0;
-}
-
 void ISlope::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 0);

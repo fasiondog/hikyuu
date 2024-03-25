@@ -22,11 +22,6 @@ IStdp::IStdp() : IndicatorImp("STDP", 1) {
 
 IStdp::~IStdp() {}
 
-bool IStdp::check() {
-    int n = getParam<int>("n");
-    return n == 0 || n >= 2;
-}
-
 void IStdp::_checkParam(const string& name) const {
     if ("n" == name) {
         int n = getParam<int>("n");

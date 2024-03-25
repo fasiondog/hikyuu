@@ -29,10 +29,6 @@ IDecline::IDecline() : IndicatorImp("DECLINE", 1) {
 
 IDecline::~IDecline() {}
 
-bool IDecline::check() {
-    return true;
-}
-
 void IDecline::_checkParam(const string& name) const {
     if ("market" == name) {
         string market = getParam<string>(name);

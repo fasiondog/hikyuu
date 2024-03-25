@@ -19,10 +19,6 @@ IMa::IMa() : IndicatorImp("MA", 1) {
 
 IMa::~IMa() {}
 
-bool IMa::check() {
-    return getParam<int>("n") >= 0;
-}
-
 void IMa::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 0);

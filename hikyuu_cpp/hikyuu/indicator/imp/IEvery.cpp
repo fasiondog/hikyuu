@@ -21,10 +21,6 @@ IEvery::IEvery() : IndicatorImp("EVERY", 1) {
 
 IEvery::~IEvery() {}
 
-bool IEvery::check() {
-    return getParam<int>("n") >= 0;
-}
-
 void IEvery::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 0);

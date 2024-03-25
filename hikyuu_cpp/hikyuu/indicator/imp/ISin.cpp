@@ -19,10 +19,6 @@ ISin::ISin() : IndicatorImp("SIN", 1) {}
 
 ISin::~ISin() {}
 
-bool ISin::check() {
-    return true;
-}
-
 void ISin::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();

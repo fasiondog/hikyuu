@@ -148,10 +148,6 @@ public:
     // ===================
     //  子类接口
     // ===================
-    virtual bool check() {
-        return true;
-    }
-
     virtual void _calculate(const Indicator&) {}
 
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
@@ -329,7 +325,6 @@ private:                                                       \
 
 #define INDICATOR_IMP(classname)                             \
 public:                                                      \
-    virtual bool check() override;                           \
     virtual void _calculate(const Indicator& data) override; \
     virtual IndicatorImpPtr _clone() override {              \
         return make_shared<classname>();                     \
@@ -337,7 +332,6 @@ public:                                                      \
 
 #define INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(classname)                                          \
 public:                                                                                        \
-    virtual bool check() override;                                                             \
     virtual void _calculate(const Indicator& ind) override;                                    \
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override; \
     virtual bool supportIndParam() const override {                                            \
