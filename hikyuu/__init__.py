@@ -69,6 +69,17 @@ except Exception as e:
 上提交 issue，同时附上 "用户目录/.hikyuu" 下的 hikyuu_py.log 和 hikyuu.log 日志文件 """)
     raise e
 
+__version__ = get_version()
+
+sm = StockManager.instance()
+
+# 如果是在 jupyter 环境中运行，重定向C++ stdout/stderr输出至python
+if in_ipython_frontend():
+    sm.python_in_jupyter = True
+    hku_info("hikyuu version: {}", get_version_with_build())
+    iodog = OstreamRedirect()
+    iodog.open()
+
 
 # ==============================================================================
 #
@@ -84,7 +95,3 @@ V = VOL()
 D = Datetime
 K = None
 Q = Query
-
-sm = StockManager.instance()
-
-__version__ = get_version()
