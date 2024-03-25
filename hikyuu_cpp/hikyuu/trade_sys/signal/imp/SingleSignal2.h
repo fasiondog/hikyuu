@@ -20,6 +20,7 @@ public:
     explicit SingleSignal2(const Indicator&);
     virtual ~SingleSignal2();
 
+    virtual void _checkParam(const string& name) const override;
     virtual SignalPtr _clone() override;
     virtual void _calculate() override;
 

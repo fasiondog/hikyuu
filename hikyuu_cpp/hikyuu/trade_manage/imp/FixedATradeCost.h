@@ -56,6 +56,8 @@ public:
                     price_t transferfee, price_t lowestTransferfee);
     virtual ~FixedATradeCost();
 
+    virtual void _checkParam(const string& name) const override;
+
     /**
      * 计算买入成本
      * @param datetime 交易日期

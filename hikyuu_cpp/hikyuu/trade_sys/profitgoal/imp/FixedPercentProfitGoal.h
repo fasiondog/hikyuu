@@ -20,6 +20,7 @@ class FixedPercentProfitGoal : public ProfitGoalBase {
 public:
     FixedPercentProfitGoal();
     virtual ~FixedPercentProfitGoal();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

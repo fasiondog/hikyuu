@@ -31,6 +31,7 @@ class FixedCountMoneyManager : public MoneyManagerBase {
 public:
     FixedCountMoneyManager();
     virtual ~FixedCountMoneyManager();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

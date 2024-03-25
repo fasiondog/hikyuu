@@ -20,6 +20,13 @@ FixedRatioMoneyManager::FixedRatioMoneyManager()
 
 FixedRatioMoneyManager::~FixedRatioMoneyManager() {}
 
+void FixedRatioMoneyManager::_checkParam(const string& name) const {
+    if ("delta" == name) {
+        double delta = getParam<double>("delta");
+        HKU_ASSERT(delta > 0.0);
+    }
+}
+
 void FixedRatioMoneyManager::_reset() {
     m_current_num = 1;
     m_pre_cash = 0.0;

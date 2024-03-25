@@ -352,21 +352,23 @@ public:                                                                     \
 
 /**
  * 支持自定义类参数检查及变化通知
- * 需要实现重载以下虚函数接口:
- *    virtual void checkParam(const string& name) -- 内部实现对应参数的检查,如果不合法需抛出异常
- *    virtual void paramChanged() -- 参数变化时调用该函数
- * 注意：由于默认参数一般在类的构造函数中设置，此时由于 checkParam 和 paramChanged
- *       均为虚函数，实际上是调用的是基类的虚函数。一般构造函数设置初始的默认参数时，
- *       子类的 checkParam 和 paramChanged 即使没有被调用也没有影响。但如果需要用到
- *       构造函数中带入的参数值，则需要在 setParam 执行后，自行调用 checkParam, 或者
- *       在 setParam 执行之前，直接对构造函数传入的参数进行检查（子类和基类均是如此）
- * 另：python 中一般不用引出这里个函数，python 类继承时可以自己进行检查
+ * 子类需要实现重载以下虚函数接口:
+ *    virtual void _checkParam(const string& name) -- 内部实现对应参数的检查,如果不合法需抛出异常
+ * 另：python 中一般不需要引出 paramChanged/checkParam/_checkParam，python
+ * 类继承时可以自己在初始化时进行检查
  */
 #define PARAMETER_SUPPORT_WITH_CHECK                                         \
 protected:                                                                   \
     Parameter m_params;                                                      \
-    virtual void checkParam(const string& name) const;                       \
-    virtual void paramChanged();                                             \
+    void paramChanged();                                                     \
+    void checkParam(const string& name) const {                              \
+        baseCheckParam(name);                                                \
+        _checkParam(name);                                                   \
+    }                                                                        \
+    virtual void _checkParam(const string& name) const {}                    \
+                                                                             \
+private:                                                                     \
+    void baseCheckParam(const string& name) const;                           \
                                                                              \
 public:                                                                      \
     const Parameter& getParameter() const {                                  \

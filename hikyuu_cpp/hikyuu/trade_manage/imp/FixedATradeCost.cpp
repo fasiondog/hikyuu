@@ -35,6 +35,20 @@ FixedATradeCost::FixedATradeCost(price_t commission, price_t lowestCommission, p
 
 FixedATradeCost::~FixedATradeCost() {}
 
+void FixedATradeCost::_checkParam(const string& name) const {
+    if ("commission" == name) {
+        HKU_ASSERT(getParam<price_t>("commission") >= 0.0);
+    } else if ("lowest_commission" == name) {
+        HKU_ASSERT(getParam<price_t>("lowest_commission") >= 0.0);
+    } else if ("stamptax" == name) {
+        HKU_ASSERT(getParam<price_t>("stamptax") >= 0.0);
+    } else if ("transferfee" == name) {
+        HKU_ASSERT(getParam<price_t>("transferfee") >= 0.0);
+    } else if ("lowest_transferfee" == name) {
+        HKU_ASSERT(getParam<price_t>("lowest_transferfee") >= 0.0);
+    }
+}
+
 CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
                                        double num) const {
     CostRecord result;

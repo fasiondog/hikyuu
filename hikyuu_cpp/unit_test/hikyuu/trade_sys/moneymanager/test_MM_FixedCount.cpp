@@ -26,15 +26,12 @@ TEST_CASE("test_MM_FixedCount") {
     TradeManagerPtr tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedA());
 
     /** @arg n < 1 */
-    MoneyManagerPtr mm = MM_FixedCount(0);
-    mm->setTM(tm);
-    int result = mm->getBuyNumber(Datetime(200101010000), stock, 10.0, 10.0, PART_SIGNAL);
-    CHECK_EQ(result, 0);
+    CHECK_THROWS_AS(MM_FixedCount(0), std::exception);
 
     /** @arg n = 100, 一个初始资金为0的交易账户，能够执行买入操作 */
     tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedA());
     CHECK_EQ(tm->initCash(), 0.0);
-    mm = MM_FixedCount(100);
+    auto mm = MM_FixedCount(100);
     mm->setTM(tm);
     mm->setParam<bool>("auto-checkin", true);
     mm->getBuyNumber(Datetime(200001200000), stock, 24.11, 24.11, PART_SIGNAL);

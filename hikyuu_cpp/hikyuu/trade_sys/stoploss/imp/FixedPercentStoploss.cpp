@@ -19,6 +19,13 @@ FixedPercentStoploss::FixedPercentStoploss() : StoplossBase("ST_FixedPercent") {
 
 FixedPercentStoploss::~FixedPercentStoploss() {}
 
+void FixedPercentStoploss::_checkParam(const string& name) const {
+    if ("p" == name) {
+        double p = getParam<double>("p");
+        HKU_ASSERT(p > 0.0 && p <= 1.0);
+    }
+}
+
 price_t FixedPercentStoploss ::getPrice(const Datetime& datetime, price_t price) {
     Stock stock = m_kdata.getStock();
     int precision = stock.isNull() ? 2 : stock.precision();

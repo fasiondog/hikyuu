@@ -29,6 +29,9 @@ StoplossBase::StoplossBase(const string& name) : m_name(name) {}
 
 StoplossBase::~StoplossBase() {}
 
+void StoplossBase::baseCheckParam(const string& name) const {}
+void StoplossBase::paramChanged() {}
+
 void StoplossBase::reset() {
     m_kdata = Null<KData>();
     m_tm.reset();

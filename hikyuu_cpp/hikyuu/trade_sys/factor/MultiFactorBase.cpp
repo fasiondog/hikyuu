@@ -102,7 +102,7 @@ void MultiFactorBase::initParam() {
     setParam<double>("zscore_nsigma", 3.0);
 }
 
-void MultiFactorBase::checkParam(const string& name) const {
+void MultiFactorBase::baseCheckParam(const string& name) const {
     if ("ic_n" == name) {
         HKU_ASSERT(getParam<int>("ic_n") >= 1);
     } else if ("zscore_nsigma" == name) {

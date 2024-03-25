@@ -21,9 +21,18 @@ IndicatorStoploss::IndicatorStoploss() : StoplossBase("IndicatorStoploss") {
 IndicatorStoploss::IndicatorStoploss(const Indicator& op, const string& kdata_part)
 : StoplossBase("IndicatorStoploss"), m_op(op) {
     setParam<string>("kpart", "CLOSE");
+    checkParam("kpart");
 }
 
 IndicatorStoploss::~IndicatorStoploss() {}
+
+void IndicatorStoploss::_checkParam(const string& name) const {
+    if ("kpart" == name) {
+        string kpart = getParam<string>("kpart");
+        HKU_ASSERT("CLOSE" == kpart || "OPEN" == kpart || "HIGH" == kpart || "LOW" == kpart ||
+                   "AMO" == kpart || "VOL" == kpart);
+    }
+}
 
 price_t IndicatorStoploss::getPrice(const Datetime& datetime, price_t price) {
     return m_result.count(datetime) ? m_result[datetime] : 0.0;

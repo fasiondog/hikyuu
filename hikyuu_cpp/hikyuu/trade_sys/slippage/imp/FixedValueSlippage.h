@@ -20,6 +20,7 @@ class FixedValueSlippage : public SlippageBase {
 public:
     FixedValueSlippage();
     virtual ~FixedValueSlippage();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

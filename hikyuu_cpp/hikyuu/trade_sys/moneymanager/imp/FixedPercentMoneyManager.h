@@ -26,6 +26,7 @@ class HKU_API FixedPercentMoneyManager : public MoneyManagerBase {
 public:
     FixedPercentMoneyManager();
     virtual ~FixedPercentMoneyManager();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

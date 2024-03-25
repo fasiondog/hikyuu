@@ -36,6 +36,9 @@ SignalBase::SignalBase(const string& name) : m_name(name), m_hold_long(false), m
 
 SignalBase::~SignalBase() {}
 
+void SignalBase::baseCheckParam(const string& name) const {}
+void SignalBase::paramChanged() {}
+
 SignalPtr SignalBase::clone() {
     SignalPtr p;
     try {

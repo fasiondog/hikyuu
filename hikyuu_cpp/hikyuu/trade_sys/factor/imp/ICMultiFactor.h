@@ -21,7 +21,7 @@ public:
                   const Stock& ref_stk, int ic_n, int ic_rolling_n);
     virtual ~ICMultiFactor() = default;
 
-    virtual void checkParam(const string& name) const override;
+    virtual void _checkParam(const string& name) const override;
 };
 
 }  // namespace hku

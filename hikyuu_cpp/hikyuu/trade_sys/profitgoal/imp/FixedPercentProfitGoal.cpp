@@ -21,6 +21,13 @@ FixedPercentProfitGoal::~FixedPercentProfitGoal() {}
 
 void FixedPercentProfitGoal::_calculate() {}
 
+void FixedPercentProfitGoal::_checkParam(const string& name) const {
+    if ("p" == name) {
+        double p = getParam<double>(name);
+        HKU_ASSERT(p > 0.0);
+    }
+}
+
 price_t FixedPercentProfitGoal::getGoal(const Datetime& datetime, price_t price) {
     Stock stock = getTO().getStock();
     PositionRecord position = getTM()->getPosition(datetime, stock);

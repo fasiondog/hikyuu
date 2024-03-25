@@ -20,6 +20,7 @@ public:
     TwoLineEnvironment(const Indicator& fast, const Indicator& slow);
     virtual ~TwoLineEnvironment();
 
+    virtual void _checkParam(const string& name) const override;
     virtual void _calculate() override;
     virtual EnvironmentPtr _clone() override;
 

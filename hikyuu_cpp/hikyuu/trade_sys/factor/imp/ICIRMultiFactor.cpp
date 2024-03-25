@@ -29,8 +29,7 @@ ICIRMultiFactor::ICIRMultiFactor(const vector<Indicator>& inds, const StockList&
     checkParam("ic_rolling_n");
 }
 
-void ICIRMultiFactor::checkParam(const string& name) const {
-    MultiFactorBase::checkParam(name);
+void ICIRMultiFactor::_checkParam(const string& name) const {
     if ("ic_rolling_n" == name) {
         HKU_ASSERT(getParam<int>("ic_rolling_n") >= 1);
     }

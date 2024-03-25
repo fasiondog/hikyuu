@@ -22,7 +22,7 @@ namespace hku {
  * @ingroup Environment
  */
 class HKU_API EnvironmentBase : public enable_shared_from_this<EnvironmentBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     EnvironmentBase();

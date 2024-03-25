@@ -31,6 +31,15 @@ SingleSignal2::SingleSignal2(const Indicator& ind) : SignalBase("SG_Single2"), m
 
 SingleSignal2::~SingleSignal2() {}
 
+void SingleSignal2::_checkParam(const string& name) const {
+    if ("filter_n" == name) {
+        HKU_ASSERT(getParam<int>("filter_n") >= 3);
+    } else if ("filter_p" == name) {
+        double filter_p = getParam<double>(name);
+        HKU_ASSERT(filter_p > 0.0 && filter_p < 1.0);
+    }
+}
+
 SignalPtr SingleSignal2::_clone() {
     SingleSignal2* p = new SingleSignal2();
     p->m_ind = m_ind.clone();

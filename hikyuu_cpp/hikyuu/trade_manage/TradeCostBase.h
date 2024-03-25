@@ -20,7 +20,7 @@ namespace hku {
  * @ingroup TradeCost
  */
 class HKU_API TradeCostBase {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     TradeCostBase(const string& name);

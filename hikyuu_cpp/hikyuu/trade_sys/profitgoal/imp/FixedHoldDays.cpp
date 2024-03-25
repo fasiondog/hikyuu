@@ -19,11 +19,16 @@ FixedHoldDays::FixedHoldDays() : ProfitGoalBase("PG_FixedHoldDays") {
 
 FixedHoldDays::~FixedHoldDays() {}
 
+void FixedHoldDays::_checkParam(const string& name) const {
+    if ("days" == name) {
+        int days = getParam<int>(name);
+        HKU_ASSERT(days > 0);
+    }
+}
+
 void FixedHoldDays::_calculate() {}
 
 price_t FixedHoldDays::getGoal(const Datetime& datetime, price_t price) {
-    HKU_WARN_IF_RETURN(getParam<int>("days") <= 0, 0.0, "param days <= 0! Are you sure?");
-
     Stock stk = m_kdata.getStock();
     PositionRecord position = m_tm->getPosition(datetime, stk);
     Datetime take_date = position.takeDatetime;

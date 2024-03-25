@@ -29,6 +29,9 @@ EnvironmentBase::EnvironmentBase(const string& name) : m_name(name) {}
 
 EnvironmentBase::~EnvironmentBase() {}
 
+void EnvironmentBase::baseCheckParam(const string& name) const {}
+void EnvironmentBase::paramChanged() {}
+
 void EnvironmentBase::reset() {
     std::unique_lock<std::shared_mutex> lock(m_mutex);
     m_query = Null<KQuery>();
