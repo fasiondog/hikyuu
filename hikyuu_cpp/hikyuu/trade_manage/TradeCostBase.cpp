@@ -31,6 +31,10 @@ TradeCostBase::TradeCostBase(const string& name) : m_name(name) {}
 
 TradeCostBase::~TradeCostBase() {}
 
+void TradeCostBase::checkParam(const string& name) const {}
+
+void TradeCostBase::paramChanged() {}
+
 TradeCostPtr TradeCostBase::clone() {
     TradeCostPtr result = _clone();
     TradeCostBase* p = result.get();

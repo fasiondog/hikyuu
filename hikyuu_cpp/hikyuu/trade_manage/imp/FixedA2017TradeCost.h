@@ -23,6 +23,8 @@ public:
     FixedA2017TradeCost();
     virtual ~FixedA2017TradeCost();
 
+    virtual void checkParam(const string& name) const override;
+
     /**
      * 计算买入成本
      * @param datetime 交易日期
