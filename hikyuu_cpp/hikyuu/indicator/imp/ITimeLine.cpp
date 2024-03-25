@@ -32,6 +32,13 @@ bool ITimeLine::check() {
     return part == "price" || part == "vol";
 }
 
+void ITimeLine::_checkParam(const string& name) const {
+    if ("part" == name) {
+        string part = getParam<string>("part");
+        HKU_ASSERT(part == "price" || part == "vol");
+    }
+}
+
 void ITimeLine::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);

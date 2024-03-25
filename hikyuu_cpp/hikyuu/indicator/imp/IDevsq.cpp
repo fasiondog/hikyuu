@@ -26,6 +26,12 @@ bool IDevsq::check() {
     return getParam<int>("n") >= 2;
 }
 
+void IDevsq::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 2);
+    }
+}
+
 void IDevsq::_calculate(const Indicator& data) {
     size_t total = data.size();
     int n = getParam<int>("n");

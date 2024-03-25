@@ -25,6 +25,12 @@ bool IRocr100::check() {
     return getParam<int>("n") >= 0;
 }
 
+void IRocr100::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
+}
+
 void IRocr100::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     int n = getParam<int>("n");

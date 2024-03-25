@@ -25,6 +25,12 @@ bool IEvery::check() {
     return getParam<int>("n") >= 0;
 }
 
+void IEvery::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
+}
+
 void IEvery::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(0 == total, void());

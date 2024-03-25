@@ -44,12 +44,7 @@ TEST_CASE("test_STDP") {
     }
 
     /** @arg n = 1时 */
-    dev = STDP(ind, 1);
-    CHECK_EQ(dev.name(), "STDP");
-    CHECK_EQ(dev.size(), 15);
-    for (size_t i = 0; i < dev.size(); ++i) {
-        CHECK_UNARY(std::isnan(dev[i]));
-    }
+    CHECK_THROWS_AS(STDP(ind, 1), std::exception);
 
     /** @arg operator() */
     Indicator expect = STDP(ind, 10);

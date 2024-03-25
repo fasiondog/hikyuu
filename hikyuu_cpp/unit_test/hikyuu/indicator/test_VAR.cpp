@@ -46,12 +46,7 @@ TEST_CASE("test_VAR") {
     }
 
     /** @arg n = 1时 */
-    dev = VAR(ind, 1);
-    CHECK_EQ(dev.name(), "VAR");
-    CHECK_EQ(dev.size(), 15);
-    for (size_t i = 0; i < dev.size(); ++i) {
-        CHECK_UNARY(std::isnan(dev[i]));
-    }
+    CHECK_THROWS_AS(VAR(ind, 1), std::exception);
 
     /** @arg operator() */
     Indicator expect = VAR(ind, 10);

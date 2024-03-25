@@ -25,6 +25,7 @@ class IExist : public IndicatorImp {
 public:
     IExist();
     virtual ~IExist();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

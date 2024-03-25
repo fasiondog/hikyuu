@@ -25,6 +25,12 @@ bool IExist::check() {
     return getParam<int>("n") >= 0;
 }
 
+void IExist::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
+}
+
 void IExist::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(total == 0, void());

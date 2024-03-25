@@ -25,6 +25,7 @@ class IStdev : public hku::IndicatorImp {
 public:
     IStdev();
     virtual ~IStdev();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

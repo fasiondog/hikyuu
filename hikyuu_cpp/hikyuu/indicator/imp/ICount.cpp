@@ -23,6 +23,12 @@ bool ICount::check() {
     return getParam<int>("n") >= 0;
 }
 
+void ICount::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
+}
+
 void ICount::_calculate(const Indicator& data) {
     size_t total = data.size();
     if (0 == total) {

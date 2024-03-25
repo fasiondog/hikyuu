@@ -31,6 +31,12 @@ bool IVigor::check() {
     return getParam<int>("n") >= 1;
 }
 
+void IVigor::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 1);
+    }
+}
+
 void IVigor::_calculate(const Indicator& ind) {
     HKU_WARN_IF(!isLeaf() && !ind.empty(),
                 "The input is ignored because {} depends on the context!", m_name);

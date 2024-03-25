@@ -22,6 +22,7 @@ class IAdvance : public IndicatorImp {
 public:
     IAdvance();
     virtual ~IAdvance();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

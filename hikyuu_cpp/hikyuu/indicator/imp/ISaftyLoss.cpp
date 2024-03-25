@@ -28,6 +28,14 @@ bool ISaftyLoss::check() {
     return getParam<int>("n1") >= 2 && getParam<int>("n2") >= 1;
 }
 
+void ISaftyLoss::_checkParam(const string& name) const {
+    if ("n1" == name) {
+        HKU_ASSERT(getParam<int>("n1") >= 2);
+    } else if ("n2" == name) {
+        HKU_ASSERT(getParam<int>("n2") >= 1);
+    }
+}
+
 void ISaftyLoss::_calculate(const Indicator& data) {
     size_t total = data.size();
     HKU_IF_RETURN(total == 0, void());

@@ -21,6 +21,8 @@ public:
     IRecover(const KData&, int recoverType);
     virtual ~IRecover();
 
+    virtual void _checkParam(const string& name) const override;
+
     static void checkInputIndicator(const Indicator& ind);
 };
 

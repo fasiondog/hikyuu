@@ -29,7 +29,7 @@ namespace hku {
  * @ingroup TradeManagerClass
  */
 class HKU_API TradeManagerBase {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     TradeManagerBase() : TradeManagerBase("", TC_Zero()) {}
@@ -663,6 +663,15 @@ private:
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(TradeManagerBase)
 #endif
+
+inline void TradeManagerBase::baseCheckParam(const string& name) const {
+    if ("precision" == name) {
+        int precision = getParam<int>("precision");
+        HKU_ASSERT(precision > 0);
+    }
+}
+
+inline void TradeManagerBase::paramChanged() {}
 
 /**
  * 客户程序应使用此类型进行实际操作

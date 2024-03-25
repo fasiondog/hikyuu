@@ -29,6 +29,12 @@ bool ICval::check() {
     return getParam<int>("discard") < 0 ? false : true;
 }
 
+void ICval::_checkParam(const string& name) const {
+    if ("discard" == name) {
+        HKU_ASSERT(getParam<int>("discard") >= 0);
+    }
+}
+
 void ICval::_calculate(const Indicator& data) {
     double value = getParam<double>("value");
     int discard = getParam<int>("discard");

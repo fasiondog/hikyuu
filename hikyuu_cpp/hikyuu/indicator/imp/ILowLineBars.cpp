@@ -25,6 +25,12 @@ bool ILowLineBars::check() {
     return getParam<int>("n") >= 0;
 }
 
+void ILowLineBars::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
+}
+
 void ILowLineBars::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     if (0 == total) {

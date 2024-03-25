@@ -26,7 +26,7 @@ class HKU_API IndParam;
  * @ingroup Indicator
  */
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
     friend HKU_API std::ostream& operator<<(std::ostream& os, const IndicatorImp& imp);
 
 public:

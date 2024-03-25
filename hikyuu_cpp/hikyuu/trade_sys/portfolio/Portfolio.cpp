@@ -57,6 +57,17 @@ Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFP
 
 Portfolio::~Portfolio() {}
 
+void Portfolio::baseCheckParam(const string& name) const {
+    if ("adjust_cycle" == name) {
+        int adjust_cycle = getParam<int>("adjust_cycle");
+        HKU_ASSERT(adjust_cycle >= 1);
+    }
+}
+
+void Portfolio::paramChanged() {
+    m_need_calculate = true;
+}
+
 void Portfolio::reset() {
     m_is_ready = false;
     m_pro_sys_list.clear();

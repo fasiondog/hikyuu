@@ -24,6 +24,7 @@ public:
     ITimeLine();
     explicit ITimeLine(const KData&);
     virtual ~ITimeLine();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

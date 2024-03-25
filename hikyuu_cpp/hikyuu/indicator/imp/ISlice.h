@@ -19,6 +19,7 @@ public:
     ISlice();
     ISlice(const PriceList&, int64_t start, int64_t end);
     virtual ~ISlice();
+    virtual void _checkParam(const string& name) const override;
 };
 
 }  // namespace hku

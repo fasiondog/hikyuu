@@ -173,6 +173,12 @@ IndicatorImp::IndicatorImp(const string &name, size_t result_num)
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
 }
 
+void IndicatorImp::baseCheckParam(const string &name) const {}
+
+void IndicatorImp::paramChanged() {
+    m_need_calculate = true;
+}
+
 void IndicatorImp::setIndParam(const string &name, const Indicator &ind) {
     IndicatorImpPtr imp = ind.getImp();
     HKU_CHECK(imp, "Invalid input ind, no concrete implementation!");

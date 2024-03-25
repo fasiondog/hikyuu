@@ -25,6 +25,7 @@ class IRound : public IndicatorImp {
 public:
     IRound();
     virtual ~IRound();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

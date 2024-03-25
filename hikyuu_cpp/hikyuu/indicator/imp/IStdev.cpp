@@ -25,6 +25,13 @@ bool IStdev::check() {
     return n == 0 || n >= 2;
 }
 
+void IStdev::_checkParam(const string& name) const {
+    if ("n" == name) {
+        int n = getParam<int>("n");
+        HKU_ASSERT(n == 0 || n >= 2);
+    }
+}
+
 void IStdev::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();

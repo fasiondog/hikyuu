@@ -25,6 +25,8 @@ bool IPow::check() {
     return true;
 }
 
+void IPow::_checkParam(const string& name) const {}
+
 void IPow::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();

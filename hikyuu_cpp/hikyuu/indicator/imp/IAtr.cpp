@@ -25,6 +25,12 @@ bool IAtr::check() {
     return getParam<int>("n") >= 1;
 }
 
+void IAtr::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 1);
+    }
+}
+
 void IAtr::_calculate(const Indicator& indicator) {
     size_t total = indicator.size();
     m_discard = indicator.discard();

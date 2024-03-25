@@ -34,6 +34,14 @@ bool IKData::check() {
             "CLOSE" == part || "AMO" == part || "VOL" == part);
 }
 
+void IKData::_checkParam(const string& name) const {
+    if ("kpart" == name) {
+        string part = getParam<string>("kpart");
+        HKU_ASSERT("KDATA" == part || "OPEN" == part || "HIGH" == part || "LOW" == part ||
+                   "CLOSE" == part || "AMO" == part || "VOL" == part);
+    }
+}
+
 // 支持KDATA Indicator作为参数
 void IKData::_calculate(const Indicator& ind) {
     HKU_WARN_IF(!isLeaf() && !ind.empty(),

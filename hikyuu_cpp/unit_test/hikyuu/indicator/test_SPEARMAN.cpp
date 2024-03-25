@@ -137,10 +137,8 @@ TEST_CASE("test_SPEARMAN") {
     Indicator y = PRICELIST(b);
 
     /** @arg 非法参数 n */
-    result = SPEARMAN(x, y, -1);
-    CHECK_UNARY(result.empty());
-    result = SPEARMAN(x, y, 1);
-    CHECK_UNARY(result.empty());
+    CHECK_THROWS_AS(SPEARMAN(x, y, -1), std::exception);
+    CHECK_THROWS_AS(SPEARMAN(x, y, 1), std::exception);
 
     /** @arg 正常情况 n */
     PriceList expect{Null<price_t>(), 1., 1., 0.95, 0.875};

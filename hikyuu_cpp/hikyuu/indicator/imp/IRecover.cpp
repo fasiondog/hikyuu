@@ -34,6 +34,14 @@ bool IRecover::check() {
     return recover_type >= KQuery::NO_RECOVER && recover_type < KQuery::INVALID_RECOVER_TYPE;
 }
 
+void IRecover::_checkParam(const string& name) const {
+    if ("recover_type" == name) {
+        int recover_type = getParam<int>("recover_type");
+        HKU_ASSERT(recover_type >= KQuery::NO_RECOVER &&
+                   recover_type < KQuery::INVALID_RECOVER_TYPE);
+    }
+}
+
 void IRecover::checkInputIndicator(const Indicator& ind) {
     HKU_CHECK(typeid(*(ind.getImp())) == typeid(IKData),
               "Only the following indicators are accepted: OPEN|HIGH|CLOSE|LOW");

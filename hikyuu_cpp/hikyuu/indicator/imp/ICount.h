@@ -25,6 +25,7 @@ class ICount : public IndicatorImp {
 public:
     ICount();
     virtual ~ICount();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

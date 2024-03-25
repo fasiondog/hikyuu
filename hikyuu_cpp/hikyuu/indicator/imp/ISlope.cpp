@@ -23,6 +23,12 @@ bool ISlope::check() {
     return getParam<int>("n") >= 0;
 }
 
+void ISlope::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
+}
+
 void ISlope::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     m_discard = ind.discard() + 1;

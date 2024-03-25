@@ -25,6 +25,7 @@ class IPow : public IndicatorImp {
 public:
     IPow();
     virtual ~IPow();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

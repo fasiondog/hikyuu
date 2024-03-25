@@ -353,7 +353,10 @@ public:                                                                     \
 /**
  * 支持自定义类参数检查及变化通知
  * 子类需要实现重载以下虚函数接口:
- *    virtual void _checkParam(const string& name) -- 内部实现对应参数的检查,如果不合法需抛出异常
+ *    virtual void _checkParam(const string& name) const
+ * 基类需要实现以下接口:
+ *    void baseCheckParam(const string& name)
+ *    void paramChanged()
  * 另：python 中一般不需要引出 paramChanged/checkParam/_checkParam，python
  * 类继承时可以自己在初始化时进行检查
  */

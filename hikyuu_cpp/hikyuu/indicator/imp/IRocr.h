@@ -22,6 +22,7 @@ class IRocr : public hku::IndicatorImp {
 public:
     IRocr();
     virtual ~IRocr();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

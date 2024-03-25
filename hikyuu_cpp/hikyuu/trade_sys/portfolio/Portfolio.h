@@ -19,7 +19,7 @@ namespace hku {
  * @ingroup Portfolio
  */
 class HKU_API Portfolio : public enable_shared_from_this<Portfolio> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     /** 默认构造函数 */

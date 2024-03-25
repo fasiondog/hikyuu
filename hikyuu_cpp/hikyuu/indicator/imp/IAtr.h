@@ -20,6 +20,7 @@ class IAtr : public IndicatorImp {
 public:
     IAtr();
     virtual ~IAtr();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

@@ -31,9 +31,7 @@ TEST_CASE("test_IC") {
     Indicator result;
 
     /** @arg 传入非法 n */
-    result = IC(MA(CLOSE()), stks, query, ref_stk, -1);
-    CHECK_EQ(result.name(), "IC");
-    CHECK_UNARY(result.empty());
+    CHECK_THROWS_AS(IC(MA(CLOSE()), stks, query, ref_stk, -1), std::exception);
 
     /** @arg 传入的 ref_stk 为 null */
     result = IC(stks, query, Stock(), 1)(MA(CLOSE()));

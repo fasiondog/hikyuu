@@ -37,6 +37,12 @@ bool IIc::check() {
     return getParam<int>("n") >= 1;
 }
 
+void IIc::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 1);
+    }
+}
+
 IndicatorImpPtr IIc::_clone() {
     IIc* p = new IIc();
     p->m_stks = m_stks;

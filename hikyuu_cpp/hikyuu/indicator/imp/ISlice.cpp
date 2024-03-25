@@ -33,6 +33,12 @@ bool ISlice::check() {
     return getParam<int>("result_index") >= 0;
 }
 
+void ISlice::_checkParam(const string& name) const {
+    if ("result_index" == name) {
+        HKU_ASSERT(getParam<int>("result_index") >= 0);
+    }
+}
+
 void ISlice::_calculate(const Indicator& data) {
     // 如果在叶子节点，直接取自身的data参数
     if (isLeaf()) {

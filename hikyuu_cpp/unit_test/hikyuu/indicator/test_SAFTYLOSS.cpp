@@ -38,23 +38,9 @@ TEST_CASE("test_SAFTYLOSS") {
     query = KQuery(0, 20);
     kdata = stock.getKData(query);
     close = CLOSE(kdata);
-    result = SAFTYLOSS(close, 1, 1);
-    CHECK_EQ(result.empty(), false);
-    CHECK_EQ(result.size(), close.size());
-    CHECK_EQ(result.discard(), close.size());
-    for (size_t i = 0; i < result.size(); ++i) {
-        CHECK_UNARY(std::isnan(result[i]));
-    }
-
-    result = SAFTYLOSS(close, 0, 0);
-    CHECK_EQ(result.empty(), false);
-    CHECK_EQ(result.size(), close.size());
-    CHECK_EQ(result.discard(), close.size());
-
-    result = SAFTYLOSS(close, 2, 0);
-    CHECK_EQ(result.empty(), false);
-    CHECK_EQ(result.size(), close.size());
-    CHECK_EQ(result.discard(), close.size());
+    CHECK_THROWS_AS(SAFTYLOSS(close, 1, 1), std::exception);
+    CHECK_THROWS_AS(SAFTYLOSS(close, 0, 0), std::exception);
+    CHECK_THROWS_AS(SAFTYLOSS(close, 2, 0), std::exception);
 
     /** @arg 正常参数 */
     result = SAFTYLOSS(close, 2, 1, 1.0);

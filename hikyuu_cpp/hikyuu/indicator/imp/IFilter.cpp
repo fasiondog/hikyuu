@@ -25,6 +25,12 @@ bool IFilter::check() {
     return getParam<int>("n") >= 0;
 }
 
+void IFilter::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
+}
+
 void IFilter::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     m_discard = ind.discard();
