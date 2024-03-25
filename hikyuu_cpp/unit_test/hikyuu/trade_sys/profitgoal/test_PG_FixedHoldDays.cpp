@@ -23,8 +23,8 @@ TEST_CASE("test_PG_FixedHoldDays") {
     StockManager& sm = StockManager::instance();
     TMPtr tm = crtTM(Datetime(199001010000LL), 100000);
 
-    Datetime start_date(199911100000LL);  //测试起始日期
-    Datetime end_date(200002250000LL);    //测试结束日期
+    Datetime start_date(199911100000LL);  // 测试起始日期
+    Datetime end_date(200002250000LL);    // 测试结束日期
     KQuery query = KQueryByDate(start_date, end_date, KQuery::DAY);
 
     Stock stk = sm.getStock("sh600000");
@@ -40,10 +40,7 @@ TEST_CASE("test_PG_FixedHoldDays") {
     CHECK_EQ(pg->getParam<int>("days"), 5);
 
     /** @arg days = 0 */
-    pg->setParam<int>("days", 0);
-    CHECK_EQ(pg->getGoal(Datetime(199911100000LL), 0.0), 0.0);
-    CHECK_EQ(pg->getGoal(Datetime(199911110000LL), 0.0), 0.0);
-    CHECK_EQ(pg->getGoal(Datetime(199911120000LL), 0.0), 0.0);
+    CHECK_THROWS_AS(pg->setParam<int>("days", 0), std::exception);
 
     /** @arg days = 1 */
     pg->setParam<int>("days", 1);

@@ -21,7 +21,7 @@ namespace hku {
  * @ingroup Stoploss
  */
 class HKU_API StoplossBase : public enable_shared_from_this<StoplossBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     StoplossBase();

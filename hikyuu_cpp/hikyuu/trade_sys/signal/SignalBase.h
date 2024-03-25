@@ -22,7 +22,7 @@ namespace hku {
  * @ingroup Signal
  */
 class HKU_API SignalBase : public enable_shared_from_this<SignalBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     SignalBase();

@@ -23,6 +23,7 @@ class FixedPercentStoploss : public StoplossBase {
 public:
     FixedPercentStoploss();
     virtual ~FixedPercentStoploss();
+    virtual void checkParam(const string& name) const;
 };
 
 } /* namespace hku */

@@ -27,6 +27,10 @@ SlippageBase::SlippageBase() : m_name("SlippageBase") {}
 
 SlippageBase::SlippageBase(const string& name) : m_name(name) {}
 
+void SlippageBase::checkParam(const string& name) const {}
+
+void SlippageBase::paramChanged() {}
+
 void SlippageBase::reset() {
     m_kdata = Null<KData>();
     _reset();

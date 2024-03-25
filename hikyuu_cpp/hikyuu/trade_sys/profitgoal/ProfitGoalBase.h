@@ -21,7 +21,7 @@ namespace hku {
  * @ingroup ProfitGoal
  */
 class HKU_API ProfitGoalBase : public enable_shared_from_this<ProfitGoalBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     ProfitGoalBase();

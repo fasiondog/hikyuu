@@ -223,6 +223,11 @@ public:
         return _sellForce(date, num, from, false);
     }
 
+    // 由各个相关组件调用，用于组件参数变化时通知 sys，以便重算
+    void partChangedNotify() {
+        m_calculated = false;
+    }
+
 private:
     bool _environmentIsValid(const Datetime& datetime);
     bool _conditionIsValid(const Datetime& datetime);

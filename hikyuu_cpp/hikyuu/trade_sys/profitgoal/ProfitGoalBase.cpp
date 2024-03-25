@@ -29,6 +29,10 @@ ProfitGoalBase::ProfitGoalBase(const string& name) : m_name(name) {}
 
 ProfitGoalBase::~ProfitGoalBase() {}
 
+void ProfitGoalBase::checkParam(const string& name) const {}
+
+void ProfitGoalBase::paramChanged() {}
+
 void ProfitGoalBase::reset() {
     m_kdata = Null<KData>();
     m_tm.reset();

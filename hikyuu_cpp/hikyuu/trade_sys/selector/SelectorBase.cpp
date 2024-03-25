@@ -36,6 +36,10 @@ SelectorBase::SelectorBase(const string& name) : m_name(name) {
 
 SelectorBase::~SelectorBase() {}
 
+void SelectorBase::checkParam(const string& name) const {}
+
+void SelectorBase::paramChanged() {}
+
 void SelectorBase::removeAll() {
     m_pro_sys_list = SystemList();
     m_real_sys_list = SystemList();
