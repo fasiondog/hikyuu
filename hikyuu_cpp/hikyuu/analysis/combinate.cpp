@@ -5,9 +5,6 @@
  *      Author: fasiondog
  */
 
-#include <taskflow/taskflow.hpp>
-#include <taskflow/algorithm/for_each.hpp>
-
 #include "hikyuu/utilities/osdef.h"
 #include "hikyuu/utilities/thread/thread.h"
 #include "hikyuu/indicator/crt/EXIST.h"
@@ -125,10 +122,11 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
         }));
     }
 
+    result.reserve(sgs.size() * stocks.size());
     for (auto& task : tasks) {
         auto records = task.get();
         for (auto& record : records) {
-            result.emplace_back(record);
+            result.emplace_back(std::move(record));
         }
     }
     return result;
