@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../../test_config.h"
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
@@ -66,9 +66,33 @@ TEST_CASE("test_AF_EqualWeight_not_adjust_hold") {
     */
 }
 
-/** @par 检测点，自动调仓 */
-// TEST_CASE( test_AF_EqualWeight_adjust_hold) {
-// TODO test_AF_EqualWeight_adjust_hold
-//}
+//-----------------------------------------------------------------------------
+// test export
+//-----------------------------------------------------------------------------
+#if HKU_SUPPORT_SERIALIZATION
+
+/** @par 检测点 */
+TEST_CASE("test_AF_EqualWeight_export") {
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/AF_EQUALWEIGHT.xml";
+
+    AFPtr af1 = AF_EqualWeight();
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(af1);
+    }
+
+    AFPtr af2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(af2);
+    }
+
+    CHECK_EQ(af1->name(), af2->name());
+}
+#endif /* HKU_SUPPORT_SERIALIZATION */
 
 /** @} */

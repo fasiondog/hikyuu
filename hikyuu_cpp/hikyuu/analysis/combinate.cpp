@@ -72,21 +72,13 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
     }
 
     vector<CombinateAnalysisOutput> result;
-    auto cpu_num = std::thread::hardware_concurrency();
-#if HKU_OS_WINDOWS
-    size_t work_num = 5;
-    if (cpu_num < work_num) {
-        work_num = cpu_num;
-    }
-#else
-    size_t work_num = cpu_num;
-#endif
-    MQStealThreadPool tg(work_num);
-    vector<std::future<vector<CombinateAnalysisOutput>>> tasks;
-
     auto stocks = blk.getAllStocks();
     size_t total = stocks.size();
     HKU_IF_RETURN(total == 0, result);
+
+    auto work_num = std::thread::hardware_concurrency();
+    MQStealThreadPool tg(work_num);
+    vector<std::future<vector<CombinateAnalysisOutput>>> tasks;
 
     size_t per_num = total > work_num ? total / (work_num * 10) : 1;
     size_t count = total % per_num == 0 ? total / per_num : total / per_num + 1;
@@ -130,14 +122,13 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
         }));
     }
 
+    result.reserve(sgs.size() * stocks.size());
     for (auto& task : tasks) {
-        // result.emplace_back(std::move(task.get()));
         auto records = task.get();
         for (auto& record : records) {
-            result.emplace_back(record);
+            result.emplace_back(std::move(record));
         }
     }
-
     return result;
 }
 

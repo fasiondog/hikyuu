@@ -45,17 +45,52 @@ TEST_CASE("test_AllocateFunds") {
     CHECK_NE(af2.get(), af.get());
     CHECK_EQ(af2->name(), af->name());
 
-    /** @arg 出入的se_list、hold_list均为空  */
-    CHECK_EQ(se_list.size(), 0);
-    CHECK_EQ(hold_list.size(), 0);
-    // sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
-    // ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
-    // CHECK_EQ(sw_list.size(), 0);
-    // CHECK_EQ(ac_list.size(), 0);
+    //----------------------------------------------------
+    // 测试对计划权重的调整
+    //----------------------------------------------------
+    /** @arg 不自动调整 auto_adjust = false  */
+    SystemWeightList sw(10);
+    SystemWeightList expect_sw(10);
+    for (size_t i = 0; i < 10; i++) {
+        sw[i].weight = i;
+        expect_sw[i].weight = 9 - i;
+    }
 
-    /** @arg 最大持仓系统数小于0 */
+    AllocateFundsBase::adjustWeight(sw, 1.0, false, false);
+    CHECK_EQ(sw.size(), 9);
+    for (size_t i = 0; i < 9; i++) {
+        CHECK_EQ(sw[i].weight, expect_sw[i].weight);
+    }
 
-    /** @arg 最大持仓系统数为0 */
+    /** @arg auto_adjust = true, ignore_zero = true*/
+    sw.clear();
+    sw.emplace_back(SYSPtr(), 0.0);
+    sw.emplace_back(SYSPtr(), 2.0);
+    sw.emplace_back(SYSPtr(), Null<price_t>());
+    sw.emplace_back(SYSPtr(), 3.0);
+    expect_sw.clear();
+    expect_sw.emplace_back(SYSPtr(), 3.0 / 5.0 * 0.8);
+    expect_sw.emplace_back(SYSPtr(), 2.0 / 5.0 * 0.8);
+
+    AllocateFundsBase::adjustWeight(sw, 0.8, true, true);
+    CHECK_EQ(sw.size(), expect_sw.size());
+    CHECK_EQ(sw[0].weight, doctest::Approx(expect_sw[0].weight));
+    CHECK_EQ(sw[1].weight, doctest::Approx(expect_sw[1].weight));
+
+    /** @arg auto_adjust = true, ignore_zero = false*/
+    sw.clear();
+    sw.emplace_back(SYSPtr(), 0.0);
+    sw.emplace_back(SYSPtr(), 2.0);
+    sw.emplace_back(SYSPtr(), Null<price_t>());
+    sw.emplace_back(SYSPtr(), 3.0);
+    expect_sw.clear();
+    expect_sw.emplace_back(SYSPtr(), 3.0 / 5.0 * (2.0 / 4.0) * 0.8);
+    expect_sw.emplace_back(SYSPtr(), 2.0 / 5.0 * (2.0 / 4.0) * 0.8);
+
+    AllocateFundsBase::adjustWeight(sw, 0.8, true, false);
+    CHECK_EQ(sw.size(), expect_sw.size());
+    CHECK_EQ(sw[0].weight, doctest::Approx(expect_sw[0].weight));
+    CHECK_EQ(sw[1].weight, doctest::Approx(expect_sw[1].weight));
 }
 
 /** @} */

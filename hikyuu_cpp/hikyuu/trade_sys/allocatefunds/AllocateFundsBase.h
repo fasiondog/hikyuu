@@ -69,16 +69,6 @@ public:
     /** 设置查询条件， 由 PF 设定 */
     void setQuery(const KQuery& query);
 
-    /** 获取当前不参与资产分配的保留比例 */
-    double getReservePercent();
-
-    /**
-     * 设置不参与资产分配的保留比例，该比例在执行reset时会被置为参数 default_reserve_percent 的值
-     * @note 主要用分配算法动态控制不参与分配的资产比例
-     * @param p 取值范围[0,1]，小于0将被强制置为0， 大于1将被置为1
-     */
-    void setReservePercent(double p);
-
     /** 复位 */
     void reset();
 
@@ -103,7 +93,17 @@ public:
     virtual SystemWeightList _allocateWeight(const Datetime& date,
                                              const SystemWeightList& se_list) = 0;
 
+public:
+    /*
+     * 内部函数，仅为测试需要设置为 public。
+     * 对由子类分配的计划权重根据内部参数设置进行调整
+     */
+    static void adjustWeight(SystemWeightList& sw_list, double can_allocate_weight,
+                             bool auto_adjust, bool ignore_zero);
+
 private:
+    void initParam();
+
     /* 同时调整已运行中的子系统（已分配资金或已持仓） */
     SystemWeightList _adjust_with_running(const Datetime& date, const SystemWeightList& se_list,
                                           const std::unordered_set<SYSPtr>& running_list);
@@ -120,7 +120,6 @@ private:
     KQuery m_query;   // 查询条件
     TMPtr m_tm;       // 运行期由PF设定，PF的实际账户
     TMPtr m_cash_tm;  // 运行期由PF设定，tm 的影子账户，由于协调分配资金
-    double m_reserve_percent;  // 保留资产比例，不参与资产分配
 
 //============================================
 // 序列化支持
@@ -133,7 +132,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_reserve_percent);
     }
 
     template <class Archive>
@@ -141,7 +139,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_reserve_percent);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -220,10 +217,6 @@ inline const KQuery& AllocateFundsBase::getQuery() const {
 
 inline void AllocateFundsBase::setQuery(const KQuery& query) {
     m_query = query;
-}
-
-inline double AllocateFundsBase::getReservePercent() {
-    return m_reserve_percent;
 }
 
 } /* namespace hku */

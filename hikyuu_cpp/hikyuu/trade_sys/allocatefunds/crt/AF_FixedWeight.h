@@ -15,7 +15,7 @@ namespace hku {
 
 /**
  * @brief 固定比例资产分配，每个选中的资产都只占总资产固定的比例
- * @param weight 指定的资产比例 [0, 1]
+ * @param weight 指定的资产比例 (0, 1]
  * @return AFPtr
  * @ingroup AllocateFunds
  */
