@@ -25,7 +25,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SelectorPtr& st) {
 }
 
 SelectorBase::SelectorBase() : m_name("SelectorBase") {
-    // 是否单独执行原型系统
+    // 是否单独执行原型系统，仅限用于测试目的
     setParam<bool>("run_proto_sys", false);
 }
 

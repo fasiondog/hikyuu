@@ -26,7 +26,17 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AFPtr& af) {
     return os;
 }
 
-AllocateFundsBase::AllocateFundsBase() : m_name("AllocateMoneyBase"), m_reserve_percent(0) {
+AllocateFundsBase::AllocateFundsBase() : m_name("AllocateMoneyBase") {
+    initParam();
+}
+
+AllocateFundsBase::AllocateFundsBase(const string& name) : m_name("AllocateMoneyBase") {
+    initParam();
+}
+
+AllocateFundsBase::~AllocateFundsBase() {}
+
+void AllocateFundsBase::initParam() {
     // 是否调整之前已经持仓策略的持仓。不调整时，仅使用总账户当前剩余资金进行分配，否则将使用总市值进行分配
     // 注意：无论是否调整已持仓策略，权重比例都是相对于总资产，不是针对剩余现金余额
     //       仅针对剩余现金比例调整没有意义，即使分配由于交易成本原因可能也无法完成实际交易
@@ -34,39 +44,33 @@ AllocateFundsBase::AllocateFundsBase() : m_name("AllocateMoneyBase"), m_reserve_
     //  adjust_running_sys: False - 不会根据当前分配权重对已持仓策略进行强制加减仓
     setParam<bool>("adjust_running_sys", false);
 
+    // 自动调整权重，此时认为传入的权重为各证券的相互比例（详见ignore_zero_weight说明）
+    // 否则，以传入的权重为指定权重不做调整（此时传入的各个权重需要小于1）
+    setParam<bool>("auto_adjust_weight", true);
+
+    // 该参数在 auto_adjust_weight 时生效
     // 是否过滤子类返回的比例权重列表中的 0 值（包含小于0）和 nan 值
     // 如：子类返回权重比例列表 [6, 2, 0, 0, 0], 则
     //   过滤 0 值，则实际调整后的权重为 Xi / sum(Xi)：[6/8, 2/8]
     //   不过滤，m 设为非零元素个数，n为总元素个数，(Xi / Sum(Xi)) * (m / n)：
     //           [(6/8)*(2/5), (2/8)*(2/5), 0, 0, 0]
     //          即，保留分为5份后，仅在2份中保持相对比例
-    setParam<bool>("filter_zero_weight", false);
+    setParam<bool>("ignore_zero_weight", false);
 
-    setParam<double>("default_reserve_percent", 0.0);  // 默认保留不参与重分配的资产比例
-    setParam<bool>("trace", false);                    // 打印跟踪
+    setParam<double>("reserve_percent", 0.0);  // 保留不参与重分配的资产比例
+    setParam<bool>("trace", false);            // 打印跟踪
 }
 
-AllocateFundsBase::AllocateFundsBase(const string& name)
-: m_name("AllocateMoneyBase"), m_reserve_percent(0) {
-    setParam<bool>("adjust_running_sys", false);
-    setParam<bool>("filter_zero_weight", false);
-    setParam<double>("default_reserve_percent", 0.0);  // 默认保留不参与重分配的资产比例
-    setParam<bool>("trace", false);                    // 打印跟踪
+void AllocateFundsBase::baseCheckParam(const string& name) const {
+    if ("reserve_percent" == name) {
+        double reserve_percent = getParam<double>(name);
+        HKU_ASSERT(reserve_percent >= 0.0 && reserve_percent < 1.0);
+    }
 }
 
-AllocateFundsBase::~AllocateFundsBase() {}
-
-void AllocateFundsBase::baseCheckParam(const string& name) const {}
 void AllocateFundsBase::paramChanged() {}
 
 void AllocateFundsBase::reset() {
-    // 参数检查
-    double default_reserve_percent = getParam<double>("default_reserve_percent");
-    HKU_CHECK(default_reserve_percent >= 0.0 && default_reserve_percent < 1.0,
-              R"(AF param(default_reserve_percent)({}) >= 1.0, No asset adjustments will be made!)",
-              default_reserve_percent);
-
-    m_reserve_percent = default_reserve_percent;
     _reset();
 }
 
@@ -87,7 +91,6 @@ AFPtr AllocateFundsBase::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_query = m_query;
-    p->m_reserve_percent = m_reserve_percent;
 
     /* m_tm, m_cash_tm 由 PF 运行时指定，不需要 clone
     if (m_tm)
@@ -95,12 +98,6 @@ AFPtr AllocateFundsBase::clone() {
     if (m_cash_tm)
         p->m_cash_tm = m_cash_tm->clone();*/
     return p;
-}
-
-void AllocateFundsBase::setReservePercent(double percent) {
-    HKU_CHECK_THROW(percent >= 0.0 && percent <= 1.0, std::out_of_range,
-                    "percent ({}) is out of range [0, 1]!");
-    m_reserve_percent = percent;
 }
 
 void AllocateFundsBase::_check_weight(const SystemWeightList& sw_list) {
@@ -125,8 +122,14 @@ SystemWeightList AllocateFundsBase::adjustFunds(const Datetime& date,
     return result;
 }
 
-// 降序排列 SystemWeightList，并将权重调整为总权重为 1
-static void adjustWeight(SystemWeightList& sw_list, double can_allocate_weight, bool filter_zero) {
+/*
+ * 降序排列 SystemWeightList
+ * can_allocate_weight - 剩余可用于分配的总权重
+ * auto_adjust - 是否自动按比例调整，根据权重调整为总权重为 1
+ */
+void AllocateFundsBase::adjustWeight(SystemWeightList& sw_list, double can_allocate_weight,
+                                     bool auto_adjust, bool ignore_zero) {
+    // 降序排列，同时保证 nan 排在最后
     std::sort(sw_list.begin(), sw_list.end(), [](const SystemWeight& a, const SystemWeight& b) {
         if (std::isnan(a.weight) && std::isnan(b.weight)) {
             return false;
@@ -150,40 +153,32 @@ static void adjustWeight(SystemWeightList& sw_list, double can_allocate_weight, 
         new_list.emplace_back(item);
     }
 
-    double per_weight =
-      filter_zero ? 1.0 / sum : (new_list.size() * can_allocate_weight) / (sum * sw_list.size());
-    for (size_t i = 0, total = new_list.size(); i < total; i++) {
-        new_list[i].weight = new_list[i].weight * per_weight;
+    if (auto_adjust) {
+        //   过滤 0 值，则实际调整后的权重为 Xi / sum(Xi)：[6/8, 2/8]
+        //   不过滤，m 设为非零元素个数，n为总元素个数，(Xi / Sum(Xi)) * (m / n)：
+        //           [(6/8)*(2/5), (2/8)*(2/5), 0, 0, 0]
+        //          即，保留分为5份后，仅在2份中保持相对比例
+        double per_weight = ignore_zero
+                              ? 1.0 / sum * can_allocate_weight
+                              : (new_list.size() * can_allocate_weight) / (sum * sw_list.size());
+        for (size_t i = 0, total = new_list.size(); i < total; i++) {
+            new_list[i].weight = new_list[i].weight * per_weight;
+        }
     }
 
     sw_list.swap(new_list);
 }
 
-// 只对现金余额进行分配，此时的权重是针对余额的
+// 所有的权重分配都是针对总资产的，不针对剩余现金
+// 不会根据当前分配权重对已持仓策略进行强制加减仓
 void AllocateFundsBase::_adjust_without_running(const Datetime& date,
                                                 const SystemWeightList& se_list,
                                                 const std::unordered_set<SYSPtr>& running_set) {
-    HKU_CHECK(m_reserve_percent >= 0.0 && m_reserve_percent < 1.0,
-              "Invalid reserve_percent({}) in AF, Calculations that will cause errors!",
-              m_reserve_percent);
-
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "[AF] {} _adjust_without_running", date);
 
-    // 获取计划分配的资产权重，因为不调整已运行系统实现占位，将所有运行中的系统以0比例权重加在选中系统之前
-    SystemWeightList new_se_list;
-    for (const auto& running_sw : running_set) {
-        new_se_list.emplace_back(running_sw, 0.0);
-    }
-
-    for (const auto& sw : se_list) {
-        if (running_set.find(sw.sys) == running_set.end()) {
-            new_se_list.emplace_back(sw);
-        }
-    }
-
-    HKU_IF_RETURN(new_se_list.size() == 0, void());
-    SystemWeightList sw_list = _allocateWeight(date, new_se_list);
+    // 从分配算法获取计划的资产分配权重
+    SystemWeightList sw_list = _allocateWeight(date, se_list);
     HKU_IF_RETURN(sw_list.size() == 0, void());
 
     // 获取当前总资产市值，计算剩余可分配权重与现金
@@ -191,12 +186,13 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
     FundsRecord funds = m_tm->getFunds(date, m_query.kType());  // 总资产从总账户获取
     price_t total_funds =
       funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
-    price_t reserve_funds = total_funds * m_reserve_percent;
+    double reserve_percent = getParam<double>("reserve_percent");
+    price_t reserve_funds = total_funds * reserve_percent;
     price_t can_allocate_cash = m_cash_tm->currentCash();  // 可分配资金从资金账户中获取
     if (can_allocate_cash + reserve_funds > total_funds) {
         can_allocate_cash = roundDown(total_funds - reserve_funds, precision);
     }
-    double can_allocate_weight = 1.0 - m_reserve_percent;
+    double can_allocate_weight = 1.0 - reserve_percent;
     HKU_INFO_IF(trace,
                 "can_allocate_weight: {:<.4f}, can_allocate_cash: {:<.2f}, current cash: {:<.2f}, "
                 "total funds: {:<.2f}, "
@@ -205,7 +201,8 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
     HKU_IF_RETURN(can_allocate_cash <= 1.0, void());
 
     // 调整权重（累积权重和归一）并按降序排列, 并过滤掉 0 值和 Nan 值
-    adjustWeight(sw_list, can_allocate_weight, getParam<bool>("filter_zero_weight"));
+    adjustWeight(sw_list, can_allocate_weight, getParam<bool>("auto_adjust_weight"),
+                 getParam<bool>("ignore_zero_weight"));
 
     // 遍历选中子系统列表，并将剩余现金按权重比例转入子账户
     double sum_weight = 0.0;  // 由于不调整已运行系统，已运行系统实际占用比例可能和要求的比例不一致
@@ -265,10 +262,6 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
 SystemWeightList AllocateFundsBase::_adjust_with_running(
   const Datetime& date, const SystemWeightList& se_list,
   const std::unordered_set<SYSPtr>& running_set) {
-    HKU_CHECK(m_reserve_percent >= 0.0 && m_reserve_percent < 1.0,
-              "Invalid reserve_percent({}) in AF, Calculations that will cause errors!",
-              m_reserve_percent);
-
     SystemWeightList delay_list;
 
     bool trace = getParam<bool>("trace");
@@ -280,8 +273,10 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     HKU_IF_RETURN(sw_list.size() == 0, delay_list);
 
     // 按权重降序排列
-    double can_allocate_weight = 1.0 - m_reserve_percent;
-    adjustWeight(sw_list, can_allocate_weight, getParam<bool>("filter_zero_weight"));
+    double reserve_percent = getParam<double>("reserve_percent");
+    double can_allocate_weight = 1.0 - reserve_percent;
+    adjustWeight(sw_list, can_allocate_weight, getParam<bool>("auto_adjust_weight"),
+                 getParam<bool>("ignore_zero_weight"));
 
     //-----------------------------------------------------------------
     // 先将已不在 sw_list 中的运行系统进行清仓，回收可分配资金
@@ -323,7 +318,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     FundsRecord funds = m_tm->getFunds(date, m_query.kType());
     price_t total_funds =
       funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
-    price_t reserve_funds = roundEx(total_funds * m_reserve_percent, precision);
+    price_t reserve_funds = roundEx(total_funds * reserve_percent, precision);
 
     std::unordered_set<SYSPtr> reduced_running_set;  // 缓存已执行过减仓的运行中系统
     for (auto iter = sw_list.begin(), end_iter = sw_list.end(); iter != end_iter; ++iter) {
