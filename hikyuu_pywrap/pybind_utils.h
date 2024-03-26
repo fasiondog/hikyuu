@@ -18,6 +18,7 @@
 #include <string>
 #include "convert_any.h"
 #include "pickle_support.h"
+#include "ioredirect.h"
 
 namespace py = pybind11;
 

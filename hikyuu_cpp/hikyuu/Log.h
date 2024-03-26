@@ -50,10 +50,6 @@ namespace hku {
 
 bool HKU_API isLogInMainThread();
 
-void HKU_API increaseIORedicrectToPythonCount();
-void HKU_API decreaseIORedicrectToPythonCount();
-int HKU_API getIORedirectToPythonCount();
-
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
