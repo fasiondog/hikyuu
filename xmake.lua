@@ -124,7 +124,7 @@ else
     set_configvar("HKU_DEBUG_MODE", 0)
 end
 set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
-set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
+set_configvar("USE_SPDLOG_ASYNC_LOGGER", 1) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
 if is_plat("macosx") then
     set_configvar("SUPPORT_SERIALIZATION", 0)

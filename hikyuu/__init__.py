@@ -73,11 +73,22 @@ __version__ = get_version()
 
 sm = StockManager.instance()
 
+
+class iodog:
+    # Only for compatibility with old code
+    @staticmethod
+    def open():
+        open_ostream_to_python()
+
+    @staticmethod
+    def close():
+        close_ostream_to_python()
+
+
 # 如果是在 jupyter 环境中运行，重定向C++ stdout/stderr输出至python
 if in_ipython_frontend():
     sm.python_in_jupyter = True
     hku_info("hikyuu version: {}", get_version_with_build())
-    iodog = OstreamRedirect()
     iodog.open()
 
 
