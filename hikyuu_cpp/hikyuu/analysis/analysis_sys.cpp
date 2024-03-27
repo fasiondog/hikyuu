@@ -19,37 +19,30 @@ vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const SystemList& 
     size_t total = sys_list.size();
     HKU_IF_RETURN(0 == total, result);
 
-    MQStealThreadPool tg;
-    vector<std::future<AnalysisSystemWithBlockOut>> tasks;
-
-    for (size_t i = 0; i < total; i++) {
+    result = parallel_for_index(0, total, [&](size_t i) {
         const auto& sys = sys_list[i];
         const auto& stk = stk_list[i];
+
+        AnalysisSystemWithBlockOut ret;
         if (!sys || stk.isNull()) {
-            continue;
+            return ret;
         }
 
-        tasks.emplace_back(tg.submit([&sys, &stk, &query]() {
-            AnalysisSystemWithBlockOut ret;
-            try {
-                sys->run(stk, query);
-                Performance per;
-                per.statistics(sys->getTM());
-                ret.market_code = stk.market_code();
-                ret.name = stk.name();
-                ret.values = per.values();
-            } catch (const std::exception& e) {
-                HKU_ERROR(e.what());
-            } catch (...) {
-                HKU_ERROR("Unknown error!");
-            }
-            return ret;
-        }));
-    }
+        try {
+            sys->run(stk, query);
+            Performance per;
+            per.statistics(sys->getTM());
+            ret.market_code = stk.market_code();
+            ret.name = stk.name();
+            ret.values = per.values();
+        } catch (const std::exception& e) {
+            HKU_ERROR(e.what());
+        } catch (...) {
+            HKU_ERROR("Unknown error!");
+        }
+        return ret;
+    });
 
-    for (auto& task : tasks) {
-        result.emplace_back(task.get());
-    }
     return result;
 }
 

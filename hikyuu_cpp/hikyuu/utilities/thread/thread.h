@@ -7,7 +7,4 @@
 
 #pragma once
 
-#include "ThreadPool.h"
-#include "StealThreadPool.h"
-#include "MQThreadPool.h"
-#include "MQStealThreadPool.h"
+#include "algorithm.h"
