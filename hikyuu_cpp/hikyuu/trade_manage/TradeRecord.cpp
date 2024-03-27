@@ -6,6 +6,7 @@
  */
 
 #include <boost/algorithm/string.hpp>
+#include "hikyuu/global/sysinfo.h"
 #include "TradeRecord.h"
 
 namespace hku {
@@ -125,13 +126,11 @@ string TradeRecord::toString() const {
     }
 
 #if HKU_OS_WINDOWS
-    return fmt::format(
-      "Trade({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", datetime, market_code,
-      StockManager::instance().runningInPython() && StockManager::instance().pythonInJupyter()
-        ? name
-        : UTF8ToGB(name),
-      getBusinessName(business), planPrice, realPrice, goalPrice, number, cost.commission,
-      cost.stamptax, cost.transferfee, cost.others, getSystemPartName(from));
+    return fmt::format("Trade({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", datetime,
+                       market_code, runningInPython() && pythonInJupyter() ? name : UTF8ToGB(name),
+                       getBusinessName(business), planPrice, realPrice, goalPrice, number,
+                       cost.commission, cost.stamptax, cost.transferfee, cost.others,
+                       getSystemPartName(from));
 #else
     return fmt::format("Trade({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", datetime,
                        market_code, name, getBusinessName(business), planPrice, realPrice,

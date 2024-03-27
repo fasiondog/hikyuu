@@ -46,4 +46,15 @@ void HKU_API sendFeedback();
 /** 用于发送 python 版本信息 */
 void HKU_API sendPythonVersionFeedBack(int major, int minor, int micro);
 
+/** 当前是否运行在 python 环境中 */
+bool HKU_API runningInPython();
+
+/** 当前是否运行在 Jupyter 环境中 */
+bool HKU_API pythonInJupyter();
+
+void HKU_API setRunningInPython(bool inpython);
+
+/** 当前是否运行在 Jupyter 环境中 */
+void HKU_API setPythonInJupyter(bool injupyter);
+
 }  // namespace hku
