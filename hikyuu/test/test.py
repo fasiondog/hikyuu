@@ -2,10 +2,10 @@
 # -*- coding: utf8 -*-
 # cp936
 
-#===============================================================================
+# ===============================================================================
 # 作者：fasiondog
 # 历史：1）20120927, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 import unittest
 
@@ -48,6 +48,8 @@ if __name__ == "__main__":
     suite.addTest(MoneyManager.suiteTestCrtMM())
     suite.addTest(Signal.suite())
     suite.addTest(Signal.suiteTestCrtSG())
+    suite.addTest(Signal.suiteTestCrtSGWithClone())
+
     suite.addTest(Stoploss.suite())
     suite.addTest(Stoploss.suiteTestCrtST())
     suite.addTest(ProfitGoal.suite())
@@ -58,4 +60,4 @@ if __name__ == "__main__":
     suite.addTest(AllocateFunds.suite())
 
     unittest.TextTestRunner(verbosity=2).run(suite)
-    #unittest.main()
+    # unittest.main()

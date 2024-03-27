@@ -1,6 +1,5 @@
 # -*- coding: utf8 -*-
 
-from hikyuu.util.slice import list_getitem
 from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
     ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase, AllocateFundsBase
@@ -52,7 +51,7 @@ def crtCN(func, params={}, name='crtCN', clone=None):
     :return: 自定义系统有效条件实例
     """
     meta_x = type(name, (ConditionBase, ), {'__init__': part_init})
-    meta_x._clone = lambda self: meta_x(self._name, self._params) if clone is None else clone
+    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -71,7 +70,7 @@ def crtEV(func, params={}, name='crtEV', clone=None):
     :return: 自定义市场环境判断策略实例
     """
     meta_x = type(name, (EnvironmentBase, ), {'__init__': part_init})
-    meta_x._clone = lambda self: meta_x(self._name, self._params) if clone is None else clone
+    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -90,7 +89,7 @@ def crtMM(func, params={}, name='crtMM', clone=None):
     :return: 自定义资金管理策略实例
     """
     meta_x = type(name, (MoneyManagerBase, ), {'__init__': part_init})
-    meta_x._clone = lambda self: meta_x(self._name, self._params) if clone is None else clone
+    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -109,7 +108,7 @@ def crtPG(func, params={}, name='crtPG', clone=None):
     :return: 盈利目标策略实例
     """
     meta_x = type(name, (ProfitGoalBase, ), {'__init__': part_init})
-    meta_x._clone = lambda self: meta_x(self._name, self._params) if clone is None else clone
+    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -128,7 +127,7 @@ def crtSG(func, params={}, name='crtSG', clone=None):
     :return: 自定义信号指示器实例
     """
     meta_x = type(name, (SignalBase, ), {'__init__': part_init})
-    meta_x._clone = lambda self: meta_x(self._name, self._params) if clone is None else clone
+    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -164,8 +163,8 @@ def crtSE(calculate, get_selected, is_match_af=None, params={}, name='crtSE', cl
     meta_x = type(name, (SelectorBase, ), {'__init__': part_init})
     meta_x._calculate = calculate
     meta_x.get_selected = get_selected
-    meta_x.is_match_af = lambda self, af: True if is_match_af is None else is_match_af
-    meta_x._clone = lambda self: meta_x(self._name, self._params) if clone is None else clone
+    meta_x.is_match_af = (lambda self, af: True) if is_match_af is None else is_match_af
+    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
     return meta_x(name, params)
 
 
@@ -183,7 +182,7 @@ def crtAF(allocate_weight_func, params={}, name='crtAF', clone=None):
     :return: 自定义资产分配算法实例
     """
     meta_x = type(name, (AllocateFundsBase, ), {'__init__': part_init})
-    meta_x._clone = lambda self: meta_x(self._name, self._params) if clone is None else clone
+    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
     meta_x._allocate_weight = allocate_weight_func
     return meta_x(name, params)
 
@@ -202,7 +201,7 @@ def crtSL(func, params={}, name='crtSL', clone=None):
     :return: 移滑价差算法实例
     """
     meta_x = type(name, (SlippageBase, ), {'__init__': part_init})
-    meta_x._clone = lambda self: meta_x(self._name, self._params) if clone is None else clone
+    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -221,6 +220,6 @@ def crtST(func, params={}, name='crtST', clone=None):
     :return: 止损/止盈策略实例
     """
     meta_x = type(name, (StoplossBase, ), {'__init__': part_init})
-    meta_x._clone = lambda self: meta_x(self._name, self._params) if clone is None else clone
+    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
     meta_x._calculate = func
     return meta_x(name, params)
