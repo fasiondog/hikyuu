@@ -31,8 +31,6 @@ void export_Portfolio(py::module& m) {
       .def_property("tm", &Portfolio::getTM, &Portfolio::setTM, "设置或获取交易管理对象")
       .def_property("se", &Portfolio::getSE, &Portfolio::setSE, "设置或获取交易对象选择算法")
       .def_property("af", &Portfolio::getAF, &Portfolio::setAF, "设置或获取资产分配算法")
-      .def_property_readonly("proto_sys_list", &Portfolio::getProtoSystemList,
-                             py::return_value_policy::copy, "获取原型系统列")
       .def_property_readonly("real_sys_list", &Portfolio::getRealSystemList,
                              py::return_value_policy::copy, "由 PF 运行时设定的实际运行系统列表")
 
