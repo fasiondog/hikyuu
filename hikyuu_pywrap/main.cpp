@@ -64,7 +64,8 @@ PYBIND11_MODULE(core, m) {
 
     py::register_exception<hku::exception>(m, "HKUException");
 
-    StockManager::instance().runningInPython(true);
+    // 设置系统运行状态
+    setRunningInPython(true);
 
 #if HKU_ENABLE_SEND_FEEDBACK
     sendPythonVersionFeedBack(PY_MAJOR_VERSION, PY_MINOR_VERSION, PY_MICRO_VERSION);
@@ -105,6 +106,8 @@ PYBIND11_MODULE(core, m) {
 
     export_global_main(m);
     export_io_redirect(m);
+
+    m.def("set_python_in_jupyter", setPythonInJupyter);
 
     m.def("close_spend_time", close_spend_time, "全局关闭 c++ 部分耗时打印");
     m.def("open_spend_time", close_spend_time, "全局开启 c++ 部分耗时打印");

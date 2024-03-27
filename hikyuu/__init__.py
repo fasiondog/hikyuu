@@ -87,7 +87,7 @@ class iodog:
 
 # 如果是在 jupyter 环境中运行，重定向C++ stdout/stderr输出至python
 if in_ipython_frontend():
-    sm.python_in_jupyter = True
+    set_python_in_jupyter(True)
     hku_info("hikyuu version: {}", get_version_with_build())
     iodog.open()
 

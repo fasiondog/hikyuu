@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/global/sysinfo.h"
 #include "../../trade_manage/crt/crtTM.h"
 
 #include "Portfolio.h"
@@ -403,10 +404,8 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             auto funds = sys->getTM()->getFunds(date, m_query.kType());
             size_t position = sys->getTM()->getHoldNumber(date, stk);
 #if HKU_OS_WINDOWS
-            auto stk_name = StockManager::instance().runningInPython() &&
-                                StockManager::instance().pythonInJupyter()
-                              ? stk.name()
-                              : UTF8ToGB(stk.name());
+            auto stk_name =
+              runningInPython() && pythonInJupyter() ? stk.name() : UTF8ToGB(stk.name());
             if (stk_name.size() < 11) {
                 for (size_t i = 0, total = 11 - stk_name.size(); i < total; i++) {
                     stk_name.push_back(' ');

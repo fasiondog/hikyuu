@@ -2,10 +2,10 @@
 # -*- coding: utf8 -*-
 # gb18030
 
-#===============================================================================
+# ===============================================================================
 # 作者：fasiondog
 # 历史：1）20130321, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 import unittest
 
@@ -128,6 +128,7 @@ class TestCrtSG(unittest.TestCase):
             self.assertIn(d[i], [Datetime(201201300000), Datetime(200101030000)])
 
         p_clone = p.clone()
+        self.assertFalse(p_clone is p)
         d = p_clone.get_buy_signal()
         for i in range(len(d)):
             self.assertIn(d[i], [Datetime(201201210000), Datetime(200101010000)])
@@ -137,9 +138,29 @@ class TestCrtSG(unittest.TestCase):
             self.assertIn(d[i], [Datetime(201201300000), Datetime(200101030000)])
 
 
+def testSignalClone(self):
+    new_object = crtSG(testSignal, self._params, self._name)
+    new_object.x = self.x
+    return new_object
+
+
+class TestCrtSGWithClone(unittest.TestCase):
+    def test_crtSG(self):
+        p = crtSG(testSignal, params={'test': 30}, name='SG_TEST', clone=testSignalClone)
+        p.x = 10
+        p2 = p.clone()
+        self.assertFalse(p2 is p)
+        self.assertEqual(p2.name, "SG_TEST")
+        self.assertEqual(p2.x, p.x)
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(SignalTest)
 
 
 def suiteTestCrtSG():
     return unittest.TestLoader().loadTestsFromTestCase(TestCrtSG)
+
+
+def suiteTestCrtSGWithClone():
+    return unittest.TestLoader().loadTestsFromTestCase(TestCrtSGWithClone)
