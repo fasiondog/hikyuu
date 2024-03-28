@@ -25,9 +25,10 @@ public:
 
 public:
     MultiFactorBase();
-    MultiFactorBase(const string& name);
+    explicit MultiFactorBase(const string& name);
     MultiFactorBase(const IndicatorList& inds, const StockList& stks, const KQuery& query,
                     const Stock& ref_stk, const string& name, int ic_n);
+    MultiFactorBase(const MultiFactorBase&);
     virtual ~MultiFactorBase() = default;
 
     /** 获取名称 */

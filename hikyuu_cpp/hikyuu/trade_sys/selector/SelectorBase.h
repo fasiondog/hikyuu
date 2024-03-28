@@ -27,12 +27,13 @@ class HKU_API SelectorBase : public enable_shared_from_this<SelectorBase> {
 public:
     /** 默认构造函数 */
     SelectorBase();
+    SelectorBase(const SelectorBase&) = default;
 
     /**
      * 构造函数，同时指定算法名称
      * @param name 指定名称
      */
-    SelectorBase(const string& name);
+    explicit SelectorBase(const string& name);
 
     /** 析构函数 */
     virtual ~SelectorBase();

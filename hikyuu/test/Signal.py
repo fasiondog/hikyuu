@@ -138,15 +138,9 @@ class TestCrtSG(unittest.TestCase):
             self.assertIn(d[i], [Datetime(201201300000), Datetime(200101030000)])
 
 
-def testSignalClone(self):
-    new_object = crtSG(testSignal, self._params, self._name)
-    new_object.x = self.x
-    return new_object
-
-
 class TestCrtSGWithClone(unittest.TestCase):
     def test_crtSG(self):
-        p = crtSG(testSignal, params={'test': 30}, name='SG_TEST', clone=testSignalClone)
+        p = crtSG(testSignal, params={'test': 30}, name='SG_TEST')
         p.x = 10
         p2 = p.clone()
         self.assertFalse(p2 is p)

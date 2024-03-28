@@ -14,12 +14,19 @@ def part_iter(self):
 ConditionBase.__iter__ = part_iter
 
 
-def part_init(self, name, params):
+def part_init(self, name='', params={}):
     super(self.__class__, self).__init__(name)
     self._name = name
     self._params = params
     for k, v in params.items():
         self.set_param(k, v)
+
+
+def part_clone(self):
+    cloned = self.__class__.__new__(self.__class__)
+    self.__class__.__init__(cloned, self)
+    cloned.__dict__.update(self.__dict__)
+    return cloned
 
 
 # ------------------------------------------------------------------
@@ -40,18 +47,16 @@ System.INVALID = System.Part.INVALID
 # ------------------------------------------------------------------
 # condition
 # ------------------------------------------------------------------
-def crtCN(func, params={}, name='crtCN', clone=None):
+def crtCN(func, params={}, name='crtCN'):
     """
     快速创建系统有效条件
 
     :param func: 系统有效条件函数
     :param {} params: 参数字典
     :param str name: 自定义名称
-    :param clone: 带有私有属性时自定义的clone函数
     :return: 自定义系统有效条件实例
     """
-    meta_x = type(name, (ConditionBase, ), {'__init__': part_init})
-    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
+    meta_x = type(name, (ConditionBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -59,18 +64,16 @@ def crtCN(func, params={}, name='crtCN', clone=None):
 # ------------------------------------------------------------------
 # environment
 # ------------------------------------------------------------------
-def crtEV(func, params={}, name='crtEV', clone=None):
+def crtEV(func, params={}, name='crtEV'):
     """
     快速创建市场环境判断策略
 
     :param func: 市场环境判断策略函数
     :param {} params: 参数字典
     :param str name: 自定义名称
-    :param clone: 带有私有属性时自定义的clone函数
     :return: 自定义市场环境判断策略实例
     """
-    meta_x = type(name, (EnvironmentBase, ), {'__init__': part_init})
-    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
+    meta_x = type(name, (EnvironmentBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -78,18 +81,16 @@ def crtEV(func, params={}, name='crtEV', clone=None):
 # ------------------------------------------------------------------
 # moneymanager
 # ------------------------------------------------------------------
-def crtMM(func, params={}, name='crtMM', clone=None):
+def crtMM(func, params={}, name='crtMM'):
     """
     快速创建资金管理策略
 
     :param func: 资金管理策略计算函数
     :param {} params: 参数字典
     :param str name: 自定义名称
-    :param clone: 带有私有属性时自定义的clone函数
     :return: 自定义资金管理策略实例
     """
-    meta_x = type(name, (MoneyManagerBase, ), {'__init__': part_init})
-    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
+    meta_x = type(name, (MoneyManagerBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -97,18 +98,16 @@ def crtMM(func, params={}, name='crtMM', clone=None):
 # ------------------------------------------------------------------
 # profitgoal
 # ------------------------------------------------------------------
-def crtPG(func, params={}, name='crtPG', clone=None):
+def crtPG(func, params={}, name='crtPG'):
     """
     快速创建盈利目标策略
 
     :param func: 盈利目标策略函数
     :param {} params: 参数字典
     :param str name: 自定义名称
-    :param clone: 带有私有属性时自定义的clone函数
     :return: 盈利目标策略实例
     """
-    meta_x = type(name, (ProfitGoalBase, ), {'__init__': part_init})
-    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
+    meta_x = type(name, (ProfitGoalBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -116,18 +115,16 @@ def crtPG(func, params={}, name='crtPG', clone=None):
 # ------------------------------------------------------------------
 # signal
 # ------------------------------------------------------------------
-def crtSG(func, params={}, name='crtSG', clone=None):
+def crtSG(func, params={}, name='crtSG'):
     """
     快速创建信号指示器
 
     :param func: 信号策略函数
     :param {} params: 参数字典
     :param str name: 自定义名称
-    :param clone: 带有私有属性时自定义的clone函数
     :return: 自定义信号指示器实例
     """
-    meta_x = type(name, (SignalBase, ), {'__init__': part_init})
-    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
+    meta_x = type(name, (SignalBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -148,7 +145,7 @@ def se_add_stock_list(self, stk_list, proto_sys):
 SelectorBase.add_stock_list = se_add_stock_list
 
 
-def crtSE(calculate, get_selected, is_match_af=None, params={}, name='crtSE', clone=None):
+def crtSE(calculate, get_selected, is_match_af=None, params={}, name='crtSE'):
     """
     快速创建交易对象选择算法
 
@@ -157,32 +154,28 @@ def crtSE(calculate, get_selected, is_match_af=None, params={}, name='crtSE', cl
     :param get_selected_on_open function: 开盘时刻选择算法
     :param {} params: 参数字典
     :param str name: 自定义名称
-    :param clone: 带有私有属性时自定义的clone函数
     :return: 自定义交易对象选择算法实例
     """
-    meta_x = type(name, (SelectorBase, ), {'__init__': part_init})
+    meta_x = type(name, (SelectorBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = calculate
     meta_x.get_selected = get_selected
     meta_x.is_match_af = (lambda self, af: True) if is_match_af is None else is_match_af
-    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
     return meta_x(name, params)
 
 
 # ------------------------------------------------------------------
 # allocatefunds
 # ------------------------------------------------------------------
-def crtAF(allocate_weight_func, params={}, name='crtAF', clone=None):
+def crtAF(allocate_weight_func, params={}, name='crtAF'):
     """
     快速创建资产分配算法
 
     :param allocate_weight_func: 资产分配算法
     :param {} params: 参数字典
     :param str name: 自定义名称
-    :param clone: 带有私有属性时自定义的clone函数
     :return: 自定义资产分配算法实例
     """
-    meta_x = type(name, (AllocateFundsBase, ), {'__init__': part_init})
-    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
+    meta_x = type(name, (AllocateFundsBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._allocate_weight = allocate_weight_func
     return meta_x(name, params)
 
@@ -190,18 +183,16 @@ def crtAF(allocate_weight_func, params={}, name='crtAF', clone=None):
 # ------------------------------------------------------------------
 # slippage
 # ------------------------------------------------------------------
-def crtSL(func, params={}, name='crtSL', clone=None):
+def crtSL(func, params={}, name='crtSL'):
     """
     快速创建移滑价差算法
 
     :param func: 移滑价差算法函数
     :param {} params: 参数字典
     :param str name: 自定义名称
-    :param clone: 带有私有属性时自定义的clone函数
     :return: 移滑价差算法实例
     """
-    meta_x = type(name, (SlippageBase, ), {'__init__': part_init})
-    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
+    meta_x = type(name, (SlippageBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
     return meta_x(name, params)
 
@@ -209,17 +200,15 @@ def crtSL(func, params={}, name='crtSL', clone=None):
 # ------------------------------------------------------------------
 # stoploss
 # ------------------------------------------------------------------
-def crtST(func, params={}, name='crtST', clone=None):
+def crtST(func, params={}, name='crtST'):
     """
     快速创建止损/止盈策略
 
     :param func: 止损/止盈策略函数
     :param {} params: 参数字典
     :param str name: 自定义名称
-    :param clone: 带有私有属性时自定义的clone函数
     :return: 止损/止盈策略实例
     """
-    meta_x = type(name, (StoplossBase, ), {'__init__': part_init})
-    meta_x._clone = (lambda self: meta_x(self._name, self._params)) if clone is None else clone
+    meta_x = type(name, (StoplossBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
     return meta_x(name, params)

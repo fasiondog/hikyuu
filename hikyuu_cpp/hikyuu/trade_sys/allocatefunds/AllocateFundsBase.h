@@ -25,12 +25,13 @@ class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBa
 public:
     /** 默认构造函数 */
     AllocateFundsBase();
+    AllocateFundsBase(const AllocateFundsBase&) = default;
 
     /**
      * 构造函数
      * @param name 算法名称
      */
-    AllocateFundsBase(const string& name);
+    explicit AllocateFundsBase(const string& name);
 
     /** 析构函数 */
     virtual ~AllocateFundsBase();

@@ -25,7 +25,8 @@ class HKU_API StoplossBase : public enable_shared_from_this<StoplossBase> {
 
 public:
     StoplossBase();
-    StoplossBase(const string& name);
+    explicit StoplossBase(const string& name);
+    StoplossBase(const StoplossBase&) = default;
     virtual ~StoplossBase();
 
     /** 获取名称 */

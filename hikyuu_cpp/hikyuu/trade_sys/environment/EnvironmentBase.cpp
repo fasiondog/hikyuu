@@ -25,6 +25,9 @@ HKU_API std::ostream& operator<<(std::ostream& os, const EnvironmentPtr& en) {
 
 EnvironmentBase::EnvironmentBase() : m_name("EnvironmentBase") {}
 
+EnvironmentBase::EnvironmentBase(const EnvironmentBase& base)
+: m_params(base.m_params), m_name(base.m_name), m_valid(base.m_valid) {}
+
 EnvironmentBase::EnvironmentBase(const string& name) : m_name(name) {}
 
 EnvironmentBase::~EnvironmentBase() {}

@@ -26,8 +26,11 @@ class HKU_API EnvironmentBase : public enable_shared_from_this<EnvironmentBase> 
 
 public:
     EnvironmentBase();
-    EnvironmentBase(const string& name);
+    explicit EnvironmentBase(const string& name);
     virtual ~EnvironmentBase();
+
+    // 用于 python clone, 但由于 mutex, 是非线程安全的
+    EnvironmentBase(const EnvironmentBase&);
 
     /** 获取名称 */
     const string& name() const {

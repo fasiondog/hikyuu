@@ -23,7 +23,8 @@ class HKU_API SlippageBase : public enable_shared_from_this<SlippageBase> {
 
 public:
     SlippageBase();
-    SlippageBase(const string& name);
+    explicit SlippageBase(const string& name);
+    SlippageBase(const SlippageBase&) = default;
     virtual ~SlippageBase() {}
 
     /** 设置交易对象 */
