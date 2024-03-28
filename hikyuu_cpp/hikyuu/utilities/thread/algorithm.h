@@ -43,8 +43,8 @@ inline std::vector<std::pair<size_t, size_t>> parallelIndexRange(size_t start, s
     return ret;
 }
 
-template <typename U = void_t, typename FunctionType, class TaskGroup = MQStealThreadPool>
-void parallel_for_index(size_t start, size_t end, FunctionType f) {
+template <typename FunctionType, class TaskGroup = MQStealThreadPool>
+void parallel_for_index_void(size_t start, size_t end, FunctionType f) {
     auto ranges = parallelIndexRange(start, end);
     TaskGroup tg;
     for (size_t i = 0, total = ranges.size(); i < total; i++) {

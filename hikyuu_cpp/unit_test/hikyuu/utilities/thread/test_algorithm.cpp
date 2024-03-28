@@ -47,10 +47,7 @@ TEST_CASE("test_parallel_for_index") {
         values[i] = i;
     }
 
-    auto result = parallel_for_index(0, values.size(), [](size_t i) {
-        // HKU_INFO("i: {}", i);
-        return i + 1;
-    });
+    auto result = parallel_for_index(0, values.size(), [](size_t i) { return i + 1; });
 
     std::vector<int> expect(100);
     for (size_t i = 0, len = expect.size(); i < len; i++) {
