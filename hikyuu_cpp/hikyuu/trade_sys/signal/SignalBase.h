@@ -26,7 +26,8 @@ class HKU_API SignalBase : public enable_shared_from_this<SignalBase> {
 
 public:
     SignalBase();
-    SignalBase(const string& name);
+    explicit SignalBase(const string& name);
+    SignalBase(const SignalBase&) = default;
     virtual ~SignalBase();
 
     /**

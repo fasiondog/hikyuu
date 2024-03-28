@@ -16,6 +16,7 @@ class PyMultiFactor : public MultiFactorBase {
 
 public:
     using MultiFactorBase::MultiFactorBase;
+    PyMultiFactor(const MultiFactorBase& base) : MultiFactorBase(base) {}
 
     IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) {
         // PYBIND11_OVERLOAD_PURE_NAME(IndicatorList, MultiFactorBase, "_calculate", _calculate,
@@ -47,6 +48,7 @@ void export_MultiFactor(py::module& m) {
     - _clone : 【必须】克隆接口
     - _reset : 【可选】重载私有变量)")
       .def(py::init<>())
+      .def(py::init<const MultiFactorBase&>())
 
       .def("__str__", to_py_str<MultiFactorBase>)
       .def("__repr__", to_py_str<MultiFactorBase>)

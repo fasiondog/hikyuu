@@ -25,7 +25,8 @@ class HKU_API ProfitGoalBase : public enable_shared_from_this<ProfitGoalBase> {
 
 public:
     ProfitGoalBase();
-    ProfitGoalBase(const string& name);
+    explicit ProfitGoalBase(const string& name);
+    ProfitGoalBase(const ProfitGoalBase&) = default;
     virtual ~ProfitGoalBase();
 
     /** 设置账户 */

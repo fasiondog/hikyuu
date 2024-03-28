@@ -16,6 +16,7 @@ class PyProfitGoalBase : public ProfitGoalBase {
 
 public:
     using ProfitGoalBase::ProfitGoalBase;
+    PyProfitGoalBase(const ProfitGoalBase& base) : ProfitGoalBase(base) {}
 
     void buyNotify(const TradeRecord& tr) override {
         PYBIND11_OVERLOAD_NAME(void, ProfitGoalBase, "buy_notify", buyNotify, tr);
@@ -57,6 +58,7 @@ void export_ProfitGoal(py::module& m) {
 - sellNotify : 【可选】接收实际卖出通知，预留用于多次增减仓处理)")
 
       .def(py::init<>())
+      .def(py::init<const ProfitGoalBase&>())
       .def(py::init<const string&>(), R"(初始化构造函数
         
     :param str name: 名称)")

@@ -67,6 +67,14 @@ MultiFactorBase::MultiFactorBase(const string& name) {
     initParam();
 }
 
+MultiFactorBase::MultiFactorBase(const MultiFactorBase& base)
+: m_params(base.m_params),
+  m_name(base.m_name),
+  m_inds(base.m_inds),
+  m_stks(base.m_stks),
+  m_ref_stk(base.m_ref_stk),
+  m_query(base.m_query) {}
+
 MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stks,
                                  const KQuery& query, const Stock& ref_stk, const string& name,
                                  int ic_n)

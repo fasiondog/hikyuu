@@ -16,6 +16,7 @@ class PySignalBase : public SignalBase {
 
 public:
     using SignalBase::SignalBase;
+    PySignalBase(const SignalBase& base) : SignalBase(base) {}
 
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, SignalBase, _calculate, );
@@ -42,6 +43,7 @@ void export_Signal(py::module& m) {
 
       .def(py::init<>())
       .def(py::init<const string&>())
+      .def(py::init<const SignalBase&>())
 
       .def("__str__", to_py_str<SignalBase>)
       .def("__repr__", to_py_str<SignalBase>)

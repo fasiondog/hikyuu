@@ -24,7 +24,8 @@ class HKU_API MoneyManagerBase : public enable_shared_from_this<MoneyManagerBase
 
 public:
     MoneyManagerBase();
-    MoneyManagerBase(const string& name);
+    explicit MoneyManagerBase(const string& name);
+    MoneyManagerBase(const MoneyManagerBase&) = default;
     virtual ~MoneyManagerBase();
 
     /** 获取名称 */

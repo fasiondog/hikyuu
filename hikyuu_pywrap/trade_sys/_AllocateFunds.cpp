@@ -20,6 +20,7 @@ class PyAllocateFundsBase : public AllocateFundsBase {
 
 public:
     using AllocateFundsBase::AllocateFundsBase;
+    PyAllocateFundsBase(const AllocateFundsBase& base) : AllocateFundsBase(base) {}
 
     void _reset() override {
         PYBIND11_OVERLOAD(void, AllocateFundsBase, _reset, );
@@ -42,6 +43,7 @@ void export_AllocateFunds(py::module& m) {
     - _reset : 【可选】重载私有变量)")
       .def(py::init<>())
       .def(py::init<const string&>())
+      .def(py::init<const AllocateFundsBase&>())
       .def("__str__", to_py_str<AllocateFundsBase>)
       .def("__repr__", to_py_str<AllocateFundsBase>)
       .def_property("name", py::overload_cast<>(&AllocateFundsBase::name, py::const_),

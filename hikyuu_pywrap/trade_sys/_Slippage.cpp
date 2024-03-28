@@ -17,6 +17,7 @@ class PySlippageBase : public SlippageBase {
 
 public:
     using SlippageBase::SlippageBase;
+    PySlippageBase(const SlippageBase& base) : SlippageBase(base) {}
 
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, SlippageBase, _calculate, );
@@ -49,6 +50,7 @@ void export_Slippage(py::module& m) {
     - _reset : 【可选】重载私有变量)")
 
       .def(py::init<>())
+      .def(py::init<const SlippageBase&>())
       .def(py::init<const string&>(), R"(初始化构造函数
         
     :param str name: 名称)")
