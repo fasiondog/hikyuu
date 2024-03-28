@@ -9,7 +9,6 @@
 #include "hikyuu/utilities/thread/thread.h"
 #include "hikyuu/indicator/crt/EXIST.h"
 #include "hikyuu/trade_sys/signal/crt/SG_Bool.h"
-#include "hikyuu/global/GlobalTaskGroup.h"
 #include "combinate.h"
 
 namespace hku {
@@ -80,22 +79,18 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
     MQStealThreadPool tg(work_num);
     vector<std::future<vector<CombinateAnalysisOutput>>> tasks;
 
-    size_t per_num = total > work_num ? total / (work_num * 10) : 1;
-    size_t count = total % per_num == 0 ? total / per_num : total / per_num + 1;
-
     vector<Stock> buf;
-    for (size_t i = 0; i < count; i++) {
+    auto ranges = parallelIndexRange(0, total);
+    for (const auto& range : ranges) {
         buf.clear();
-        for (size_t j = i * per_num, end = (i + 1) * per_num; j < end; j++) {
-            if (j >= stocks.size()) {
-                break;
-            }
-            buf.emplace_back(stocks[j]);
+        for (size_t i = range.first; i < range.second; i++) {
+            buf.emplace_back(stocks[i]);
         }
         tasks.emplace_back(tg.submit([sgs, stks = std::move(buf), n_query = query,
                                       n_tm = tm->clone(), n_sys = sys->clone()]() {
             vector<CombinateAnalysisOutput> ret;
             Performance per;
+            CombinateAnalysisOutput out;
             for (size_t i = 0, len = stks.size(); i < len; i++) {
                 const Stock& n_stk = stks[i];
                 for (const auto& sg : sgs) {
@@ -105,7 +100,6 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
                         n_sys->setTM(n_tm);
                         n_sys->run(n_stk, n_query);
                         per.statistics(n_tm, Datetime::now());
-                        CombinateAnalysisOutput out;
                         out.combinateName = n_sg->name();
                         out.market_code = n_stk.market_code();
                         out.name = n_stk.name();
