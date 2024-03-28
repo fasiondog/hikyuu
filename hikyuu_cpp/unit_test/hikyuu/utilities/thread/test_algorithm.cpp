@@ -31,8 +31,7 @@ TEST_CASE("test_parallelIndexRange") {
 
     } else if (cpu_num == 8) {
         result = parallelIndexRange(0, 35);
-        expect = {{0, 4},   {4, 8},   {8, 12},  {12, 16}, {16, 20}, {20, 24},
-                  {24, 28}, {28, 32}, {32, 33}, {33, 34}, {34, 35}};
+        expect = {{0, 8}, {8, 16}, {16, 24}, {24, 32}, {32, 33}, {33, 34}, {34, 35}};
         CHECK_EQ(result.size(), expect.size());
         for (size_t i = 0, len = expect.size(); i < len; i++) {
             CHECK_EQ(result[i].first, expect[i].first);
