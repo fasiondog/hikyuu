@@ -32,16 +32,13 @@ HKU_API std::ostream& operator<<(std::ostream& os, const PortfolioPtr& pf) {
     return os;
 }
 
-Portfolio::Portfolio()
-: m_name("Portfolio"), m_query(Null<KQuery>()), m_is_ready(false), m_need_calculate(true) {
-    setParam<int>("adjust_cycle", 1);  // 调仓周期
-    setParam<bool>("trace", false);    // 打印跟踪
+Portfolio::Portfolio() : m_name("Portfolio"), m_query(Null<KQuery>()), m_need_calculate(true) {
+    initParam();
 }
 
 Portfolio::Portfolio(const string& name)
-: m_name(name), m_query(Null<KQuery>()), m_is_ready(false), m_need_calculate(true) {
-    setParam<int>("adjust_cycle", 1);  // 调仓周期
-    setParam<bool>("trace", false);
+: m_name(name), m_query(Null<KQuery>()), m_need_calculate(true) {
+    initParam();
 }
 
 Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFPtr& af)
@@ -50,13 +47,16 @@ Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFP
   m_se(se),
   m_af(af),
   m_query(Null<KQuery>()),
-  m_is_ready(false),
   m_need_calculate(true) {
-    setParam<int>("adjust_cycle", 1);  // 调仓周期
-    setParam<bool>("trace", false);
+    initParam();
 }
 
 Portfolio::~Portfolio() {}
+
+void Portfolio::initParam() {
+    setParam<int>("adjust_cycle", 1);  // 调仓周期
+    setParam<bool>("trace", false);    // 打印跟踪
+}
 
 void Portfolio::baseCheckParam(const string& name) const {
     if ("adjust_cycle" == name) {
@@ -70,8 +70,6 @@ void Portfolio::paramChanged() {
 }
 
 void Portfolio::reset() {
-    m_is_ready = false;
-    m_pro_sys_list.clear();
     m_real_sys_list.clear();
     m_running_sys_set.clear();
     m_delay_adjust_sys_list.clear();
@@ -85,6 +83,7 @@ void Portfolio::reset() {
         m_se->reset();
     if (m_af)
         m_af->reset();
+    m_need_calculate = true;
 }
 
 PortfolioPtr Portfolio::clone() {
@@ -92,9 +91,7 @@ PortfolioPtr Portfolio::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_query = m_query;
-    p->m_pro_sys_list = m_pro_sys_list;
     p->m_real_sys_list = m_real_sys_list;
-    p->m_is_ready = m_is_ready;
     p->m_need_calculate = m_need_calculate;
     if (m_se)
         p->m_se = m_se->clone();
@@ -107,85 +104,67 @@ PortfolioPtr Portfolio::clone() {
     return p;
 }
 
-bool Portfolio::_readyForRun() {
-    if (!m_se) {
-        HKU_WARN("m_se is null!");
-        m_is_ready = false;
-        return false;
-    }
+void Portfolio::_readyForRun() {
+    SPEND_TIME(Portfolio_readyForRun);
+    HKU_CHECK(m_se, "m_se is null!");
+    HKU_CHECK(m_tm, "m_tm is null!");
+    HKU_CHECK(m_af, "m_am is null!");
 
-    if (!m_tm) {
-        HKU_WARN("m_tm is null!");
-        m_is_ready = false;
-        return false;
-    }
+    // se算法和af算法不匹配
+    HKU_CHECK(m_se->isMatchAF(m_af), "The current SE and AF do not match!");
 
-    if (!m_af) {
-        HKU_WARN("m_am is null!");
-        m_is_ready = false;
-        return false;
-    }
-
-    // se算法和af算法不匹配时，给出告警
-    HKU_WARN_IF(!m_se->isMatchAF(m_af), "The current SE and AF do not match!");
+    // 检查账户是否存在初始资产
+    FundsRecord funds = m_tm->getFunds();
+    HKU_CHECK(funds.total_assets() > 0.0, "The current tm is zero assets!");
 
     reset();
 
-    // 将影子账户指定给资产分配器
+    // 生成资金账户
     m_cash_tm = m_tm->clone();
+
+    // 配置资产分配器
     m_af->setTM(m_tm);
     m_af->setCashTM(m_cash_tm);
-
-    // 为资金分配器设置关联查询条件
     m_af->setQuery(m_query);
 
     // 从 se 获取原型系统列表
-    m_pro_sys_list = m_se->getProtoSystemList();
+    auto pro_sys_list = m_se->getProtoSystemList();
 
     // 获取所有备选子系统，为无关联账户的子系统分配子账号，对所有子系统做好启动准备
     TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "TM_SUB");
-    size_t total = m_pro_sys_list.size();
+    size_t total = pro_sys_list.size();
+    m_real_sys_list.reserve(total);
     for (size_t i = 0; i < total; i++) {
-        SystemPtr& pro_sys = m_pro_sys_list[i];
+        SystemPtr& pro_sys = pro_sys_list[i];
         SystemPtr sys = pro_sys->clone();
         m_real_sys_list.emplace_back(sys);
 
-        // 如果原型子系统没有关联账户，则为其创建一个和总资金金额相同的账户，以便能够运行
-        if (!pro_sys->getTM()) {
-            pro_sys->setTM(m_tm->clone());
-        }
-
         // 为内部实际执行的系统创建初始资金为0的子账户
         sys->setTM(pro_tm->clone());
-        sys->getTM()->name(fmt::format("TM_SUB{}", i));
-        sys->name(fmt::format("PF_Real_{}_{}_{}", i, sys->name(), sys->getStock().market_code()));
+        string sys_name = fmt::format("{}_{}", sys->name(), sys->getStock().market_code());
+        sys->getTM()->name(fmt::format("TM_SUB_{}", sys_name));
+        sys->name(fmt::format("PF_{}", sys_name));
 
-        HKU_CHECK(sys->readyForRun() && pro_sys->readyForRun(),
-                  "Exist invalid system, it could not ready for run!");
+        HKU_CHECK(sys->readyForRun(), "Exist invalid system, it could not ready for run!");
         KData k = sys->getStock().getKData(m_query);
         sys->setTO(k);
-        pro_sys->setTO(k);
     }
 
     // 告知 se 当前实际运行的系统列表
     m_se->calculate(m_real_sys_list, m_query);
-
-    m_is_ready = true;
-    return true;
 }
 
 void Portfolio::run(const KQuery& query, int adjust_cycle, bool force) {
-    HKU_CHECK(adjust_cycle > 0, "Invalid param adjust_cycle! {}", adjust_cycle);
+    SPEND_TIME(Portfolio_run);
     setParam<int>("adjust_cycle", adjust_cycle);
-
     setQuery(query);
+
     if (force) {
         m_need_calculate = true;
     }
     HKU_IF_RETURN(!m_need_calculate, void());
-    HKU_CHECK(_readyForRun(),
-              "readyForRun fails, check to see if a valid TradeManager, Selector, or "
-              "AllocateFunds instance have been specified.");
+
+    _readyForRun();
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     HKU_IF_RETURN(datelist.empty(), void());

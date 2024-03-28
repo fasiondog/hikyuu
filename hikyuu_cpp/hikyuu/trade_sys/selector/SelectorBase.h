@@ -17,8 +17,6 @@
 
 namespace hku {
 
-class HKU_API Portfolio;
-
 /**
  * 交易对象选择模块
  * @ingroup Selector
@@ -102,7 +100,6 @@ public:
 
     virtual bool isMatchAF(const AFPtr& af) = 0;
 
-    friend class HKU_API Portfolio;
     /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
     void calculate(const SystemList& sysList, const KQuery& query);
 
