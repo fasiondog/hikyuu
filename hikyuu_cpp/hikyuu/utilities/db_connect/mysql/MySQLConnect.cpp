@@ -51,9 +51,13 @@ void MySQLConnect::connect() {
         // HKU_TRACE("MYSQL port: {}", port);
         // HKU_TRACE("MYSQL database: {}", database);
 
+#if MYSQL_VERSION_ID < 80034
+        // mysql 后续不再支持自动重连选项
+        // see: https://dev.mysql.com/doc/c-api/8.2/en/c-api-auto-reconnect.html
         my_bool reconnect = 1;
         SQL_CHECK(mysql_options(m_mysql, MYSQL_OPT_RECONNECT, &reconnect) == 0,
                   mysql_errno(m_mysql), "Failed set reconnect options, {}", mysql_error(m_mysql));
+#endif
 
         // 20220314: 新版 mysqlclient 默认 ssl 可能被开启，这里强制设为关闭
         unsigned int ssl_mode = SSL_MODE_DISABLED;
