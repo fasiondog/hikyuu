@@ -154,6 +154,7 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
         OStreamToPython guard(false);
         py::gil_scoped_release release;
         records = analysisSystemList(sys_list, stk_list, query);
+        // records = analysisSystemList(stk_list, query, sys_proto);
     }
 
     Performance per;

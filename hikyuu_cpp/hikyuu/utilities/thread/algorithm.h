@@ -17,7 +17,9 @@
 
 namespace hku {
 
-inline std::vector<std::pair<size_t, size_t>> parallelIndexRange(size_t start, size_t end) {
+typedef std::pair<size_t, size_t> range_t;
+
+inline std::vector<range_t> parallelIndexRange(size_t start, size_t end) {
     std::vector<std::pair<size_t, size_t>> ret;
     if (start >= end) {
         return ret;
@@ -65,15 +67,36 @@ auto parallel_for_index(size_t start, size_t end, FunctionType f) {
     std::vector<std::future<std::vector<typename std::result_of<FunctionType(size_t)>::type>>>
       tasks;
     for (size_t i = 0, total = ranges.size(); i < total; i++) {
-        tasks.emplace_back(tg.submit([&, range = ranges[i]]() {
+        tasks.emplace_back(tg.submit([func = f, range = ranges[i]]() {
             std::vector<typename std::result_of<FunctionType(size_t)>::type> one_ret;
             for (size_t ix = range.first; ix < range.second; ix++) {
-                one_ret.emplace_back(f(ix));
+                one_ret.emplace_back(func(ix));
             }
             return one_ret;
         }));
     }
+
     std::vector<typename std::result_of<FunctionType(size_t)>::type> ret;
+    for (auto& task : tasks) {
+        auto one = task.get();
+        for (auto&& value : one) {
+            ret.emplace_back(std::move(value));
+        }
+    }
+
+    return ret;
+}
+
+template <typename FunctionType, class TaskGroup = MQStealThreadPool>
+auto parallel_for_range(size_t start, size_t end, FunctionType f) {
+    auto ranges = parallelIndexRange(start, end);
+    TaskGroup tg;
+    std::vector<std::future<typename std::result_of<FunctionType(range_t)>::type>> tasks;
+    for (size_t i = 0, total = ranges.size(); i < total; i++) {
+        tasks.emplace_back(tg.submit([func = f, range = ranges[i]]() { return func(range); }));
+    }
+
+    typename std::result_of<FunctionType(range_t)>::type ret;
     for (auto& task : tasks) {
         auto one = task.get();
         for (auto&& value : one) {

@@ -46,4 +46,31 @@ vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const SystemList& 
     return result;
 }
 
+vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const StockList& stk_list,
+                                                              const KQuery& query,
+                                                              const SystemPtr& pro_sys) {
+    HKU_CHECK(pro_sys, "pro_sys is null!");
+
+    return parallel_for_range(0, stk_list.size(), [=](const range_t& range) {
+        vector<AnalysisSystemWithBlockOut> ret;
+        auto sys = pro_sys->clone();
+        Performance per;
+        AnalysisSystemWithBlockOut out;
+        for (size_t i = range.first; i < range.second; i++) {
+            try {
+                auto stk = stk_list[i];
+                sys->run(stk, query);
+                per.statistics(sys->getTM());
+                out.market_code = stk.market_code();
+                out.name = stk.name();
+                out.values = per.values();
+                ret.emplace_back(std::move(out));
+            } catch (const std::exception& e) {
+                HKU_ERROR(e.what());
+            }
+        }
+        return ret;
+    });
+}
+
 }  // namespace hku
