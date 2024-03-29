@@ -92,5 +92,25 @@ void export_Block(py::module& m) {
         },
         py::keep_alive<0, 1>())
 
+      .def(
+        "get_stock_list",
+        [](const Block& self, py::object filter) {
+            StockList ret;
+            if (filter.is_none()) {
+                ret = self.getStockList();
+            } else {
+                HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
+                py::object filter_func = filter.attr("__call__");
+                ret = self.getStockList(
+                  [&](const Stock& stk) { return filter_func(stk).cast<bool>(); });
+            }
+            return ret;
+        },
+        py::arg("filter") = py::none(), R"(get_stock_list(self[, filter=None])
+        
+    获取证券列表
+
+    :param func filter: 输入参数为 stock, 返回 True | False 的过滤函数)")
+
         DEF_PICKLE(Block);
 }

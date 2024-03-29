@@ -71,7 +71,7 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
     }
 
     vector<CombinateAnalysisOutput> result;
-    auto stocks = blk.getAllStocks();
+    auto stocks = blk.getStockList();
     size_t total = stocks.size();
     HKU_IF_RETURN(total == 0, result);
 

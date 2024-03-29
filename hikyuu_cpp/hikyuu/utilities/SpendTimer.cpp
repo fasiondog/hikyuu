@@ -66,7 +66,10 @@ SpendTimer::~SpendTimer() {
 #endif
 
 #else
-            printf("%5zu keep: %7.3f %s - %s\n", i, duration, unit.c_str(), m_keep_desc[i].c_str());
+            // printf("%5zu keep: %7.3f %s - %s\n", i, duration, unit.c_str(),
+            // m_keep_desc[i].c_str());
+            std::cout << std::setw(5) << " keep: " << i << std::setw(7) << std::setprecision(3)
+                      << duration << " " << unit << " - " << m_keep_desc[i] << std::endl;
 #endif /* __ANDROID__ */
         }
     }
@@ -113,7 +116,8 @@ void SpendTimer::show() const {
 #endif
 
 #else
-    printf("%s", outmsg);
+    // printf("%s", outmsg);
+    std::cout << outmsg;
 #endif /* __ANDROID__ */
 }
 

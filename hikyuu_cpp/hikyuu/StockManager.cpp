@@ -327,6 +327,25 @@ Stock StockManager::getStock(const string& querystr) const {
     return (iter != m_stockDict.end()) ? iter->second : result;
 }
 
+StockList StockManager::getStockList(std::function<bool(const Stock&)>&& filter) const {
+    StockList ret;
+    ret.reserve(m_stockDict.size());
+    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+    auto iter = m_stockDict.begin();
+    if (filter) {
+        for (; iter != m_stockDict.end(); ++iter) {
+            if (filter(iter->second)) {
+                ret.emplace_back(iter->second);
+            }
+        }
+    } else {
+        for (; iter != m_stockDict.end(); ++iter) {
+            ret.emplace_back(iter->second);
+        }
+    }
+    return ret;
+}
+
 MarketInfo StockManager::getMarketInfo(const string& market) const {
     MarketInfo result;
     string market_tmp = market;

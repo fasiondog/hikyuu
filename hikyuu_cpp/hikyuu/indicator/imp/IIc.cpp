@@ -117,7 +117,7 @@ Indicator HKU_API IC(const StockList& stks, const KQuery& query, const Stock& re
 }
 
 Indicator HKU_API IC(const Block& blk, const KQuery& query, const Stock& ref_stk, int n) {
-    StockList stks = blk.getAllStocks();
+    StockList stks = blk.getStockList();
     return IC(stks, query, ref_stk, n);
 }
 

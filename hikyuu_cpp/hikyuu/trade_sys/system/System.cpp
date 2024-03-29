@@ -696,11 +696,13 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
                         "Failed to sellForce {}, the day {} could'nt sell!", m_stock.market_code(),
                         date);
 
+    PositionRecord position = m_tm->getPosition(date, m_stock);
+    HKU_IF_RETURN(position.number <= 0.0, record);
+
     const auto& krecord = m_kdata.getKRecord(pos);
     const auto& src_krecord =
       m_stock.getKRecord(m_kdata.startPos() + pos, m_kdata.getQuery().kType());
 
-    PositionRecord position = m_tm->getPosition(date, m_stock);
     price_t realPrice =
       _getRealSellPrice(krecord.datetime, on_open ? src_krecord.openPrice : src_krecord.closePrice);
 

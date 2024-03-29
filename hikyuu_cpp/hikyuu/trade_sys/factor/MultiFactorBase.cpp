@@ -198,6 +198,18 @@ ScoreRecordList MultiFactorBase::getScore(const Datetime& date, size_t start, si
     return ret;
 }
 
+ScoreRecordList MultiFactorBase::getScore(const Datetime& date,
+                                          std::function<bool(const ScoreRecord&)> filter) {
+    ScoreRecordList ret;
+    const auto& all_scores = getScore(date);
+    for (const auto& score : all_scores) {
+        if (filter(score)) {
+            ret.emplace_back(score);
+        }
+    }
+    return ret;
+}
+
 const vector<ScoreRecordList>& MultiFactorBase::getAllScores() {
     calculate();
     return m_stk_factor_by_date;

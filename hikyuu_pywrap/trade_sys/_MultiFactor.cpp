@@ -136,6 +136,14 @@ void export_MultiFactor(py::module& m) {
     :param int end: 取当日排名结束(不包含本身)
     :rtype: ScoreRecordList)")
 
+      .def("get_score",
+           [](MultiFactorBase& self, const Datetime& date, py::object filter) {
+               HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
+               py::object filter_func = filter.attr("__call__");
+               return self.getScore(
+                 date, [&](const ScoreRecord& score) { return filter_func(score).cast<bool>(); });
+           })
+
       .def("get_all_scores", &MultiFactorBase::getAllScores, py::return_value_policy::copy,
            R"(get_all_scores(self)
 
