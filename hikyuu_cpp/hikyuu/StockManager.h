@@ -100,6 +100,9 @@ public:
     /** 同 getStock @see getStock */
     Stock operator[](const string&) const;
 
+    StockList getStockList(
+      std::function<bool(const Stock&)>&& filter = std::function<bool(const Stock&)>()) const;
+
     /**
      * 获取相应的市场信息
      * @param market 指定的市场标识

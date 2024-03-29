@@ -83,6 +83,26 @@ void export_StockManager(py::module& m) {
     :return: 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
     :rtype: Stock)")
 
+      .def(
+        "get_stock_list",
+        [](const StockManager& self, py::object filter) {
+            StockList ret;
+            if (filter.is_none()) {
+                ret = self.getStockList();
+            } else {
+                HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
+                py::object filter_func = filter.attr("__call__");
+                ret = self.getStockList(
+                  [&](const Stock& stk) { return filter_func(stk).cast<bool>(); });
+            }
+            return ret;
+        },
+        py::arg("filter") = py::none(), R"(get_stock_list(self[, filter=None])
+        
+    获取证券列表
+
+    :param func filter: 输入参数为 stock, 返回 True | False 的过滤函数)")
+
       .def("get_block", &StockManager::getBlock, R"(get_block(self, category, name)
 
     获取预定义的板块

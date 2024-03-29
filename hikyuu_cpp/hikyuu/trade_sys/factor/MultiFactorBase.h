@@ -13,7 +13,7 @@
 namespace hku {
 
 /**
- * 合成多因子
+ * 合成多因子，当只有一个因子时相当于简易的评分板
  * @ingroup MultiFactor
  */
 class HKU_API MultiFactorBase : public enable_shared_from_this<MultiFactorBase> {
@@ -83,6 +83,9 @@ public:
     const ScoreRecordList& getScore(const Datetime&);
 
     ScoreRecordList getScore(const Datetime& date, size_t start, size_t end = Null<size_t>());
+
+    /** 获取指定日期截面的所有因子值, 并通过指定的filer进行过滤 */
+    ScoreRecordList getScore(const Datetime& date, std::function<bool(const ScoreRecord&)> filter);
 
     /** 获取所有截面数据，已按降序排列 */
     const vector<ScoreRecordList>& getAllScores();

@@ -29,6 +29,7 @@ struct HKU_API ScoreRecord {
 };
 
 typedef vector<ScoreRecord> ScoreRecordList;
+typedef vector<ScoreRecord> ScoreList;
 
 HKU_API std::ostream& operator<<(std::ostream& out, const ScoreRecord& td);
 
