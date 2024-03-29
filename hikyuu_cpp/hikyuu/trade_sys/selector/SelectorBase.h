@@ -50,7 +50,7 @@ public:
      * @param protoSys 交易系统策略原型
      * @return 如果 protoSys 无效 或 stock 无效，则返回 false， 否则返回 true
      */
-    bool addStock(const Stock& stock, const SystemPtr& protoSys);
+    void addStock(const Stock& stock, const SystemPtr& protoSys);
 
     /**
      * 加入一组相同交易策略的股票
@@ -59,7 +59,7 @@ public:
      * @param protoSys 交易系统策略原型
      * @return 如果 protoSys 无效则返回false，否则返回 true
      */
-    bool addStockList(const StockList& stkList, const SystemPtr& protoSys);
+    void addStockList(const StockList& stkList, const SystemPtr& protoSys);
 
     /**
      * @brief 获取原型系统列表
@@ -102,10 +102,14 @@ public:
     virtual bool isMatchAF(const AFPtr& af) = 0;
 
     /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
-    void calculate(const SystemList& sysList, const KQuery& query);
+    void calculate(const SystemList& pf_realSysList, const KQuery& query);
+
+private:
+    void initParam();
 
 protected:
     string m_name;
+    bool m_calculated{false};   // 是否已计算过
     SystemList m_pro_sys_list;  // 原型系统列表
     SystemList m_real_sys_list;  // PF组合中实际运行的系统，有PF执行时设定，顺序与原型列表一一对应
 
