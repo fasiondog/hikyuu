@@ -82,10 +82,20 @@ public:
     /** 获取指定日期截面的所有因子值，已经降序排列 */
     const ScoreRecordList& getScore(const Datetime&);
 
-    ScoreRecordList getScore(const Datetime& date, size_t start, size_t end = Null<size_t>());
+    /**
+     * 获取指定日期截面 [start, end] 范围内的因子值（评分）, 并通过filer进行过滤
+     * @param date 指定日期
+     * @param start 排序起始点
+     * @param end 排序起始点(不含该点)
+     * @param filter 过滤函数
+     */
+    ScoreRecordList getScore(
+      const Datetime& date, size_t start, size_t end = Null<size_t>(),
+      std::function<bool(const ScoreRecord&)>&& filter = std::function<bool(const ScoreRecord&)>());
 
-    /** 获取指定日期截面的所有因子值, 并通过指定的filer进行过滤 */
-    ScoreRecordList getScore(const Datetime& date, std::function<bool(const ScoreRecord&)> filter);
+    ScoreRecordList getScore(const Datetime& date, size_t start, size_t end = Null<size_t>(),
+                             std::function<bool(const Datetime&, const ScoreRecord&)>&& filter =
+                               std::function<bool(const Datetime&, const ScoreRecord&)>());
 
     /** 获取所有截面数据，已按降序排列 */
     const vector<ScoreRecordList>& getAllScores();

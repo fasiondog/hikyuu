@@ -123,10 +123,29 @@ void export_MultiFactor(py::module& m) {
 
       .def(
         "get_score",
-        [](MultiFactorBase& self, const Datetime& date, size_t start, size_t end) {
-            return self.getScore(date, start, end);
+        [](MultiFactorBase& self, const Datetime& date, size_t start, size_t end,
+           py::object filter) {
+            if (filter.is_none()) {
+                return self.getScore(date, start, end, std::function<bool(const ScoreRecord&)>());
+            }
+            HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
+            py::object filter_func = filter.attr("__call__");
+            ScoreRecord sc;
+            try {
+                filter_func(sc);
+                return self.getScore(date, start, end, [&](const ScoreRecord& score_) {
+                    return filter_func(score_).cast<bool>();
+                });
+            } catch (...) {
+                filter_func(date, sc);
+                return self.getScore(date, start, end,
+                                     [&](const Datetime& date_, const ScoreRecord& score_) {
+                                         return filter_func(date_, score_).cast<bool>();
+                                     });
+            }
         },
         py::arg("datet"), py::arg("start") = 0, py::arg("end") = null_size,
+        py::arg("filter") = py::none(),
         R"(get_score(self, date[, start=0, end=Null])
 
     获取指定日期截面的所有因子值，已经降序排列，相当于各证券日期截面评分。
@@ -134,22 +153,15 @@ void export_MultiFactor(py::module& m) {
     :param Datetime date: 指定日期
     :param int start: 取当日排名开始
     :param int end: 取当日排名结束(不包含本身)
+    :param function func: (ScoreRecord)->bool 或 (Datetime, ScoreRecord)->bool 为原型的可调用对象
     :rtype: ScoreRecordList)")
-
-      .def("get_score",
-           [](MultiFactorBase& self, const Datetime& date, py::object filter) {
-               HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
-               py::object filter_func = filter.attr("__call__");
-               return self.getScore(
-                 date, [&](const ScoreRecord& score) { return filter_func(score).cast<bool>(); });
-           })
 
       .def("get_all_scores", &MultiFactorBase::getAllScores, py::return_value_policy::copy,
            R"(get_all_scores(self)
 
     获取所有日期的所有评分，长度与参考日期相同
 
-    :return: 每日 ScoreRecordList 结果的 list)")
+    :return: ScoreRecordList)")
 
       .def("get_all_src_factors", &MultiFactorBase::getAllSrcFactors)
 
