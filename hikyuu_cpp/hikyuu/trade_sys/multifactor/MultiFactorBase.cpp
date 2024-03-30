@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/utilities/thread/algorithm.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/ROCP.h"
 #include "hikyuu/indicator/crt/REF.h"
@@ -342,13 +343,21 @@ Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
 
 IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     bool fill_null = getParam<bool>("fill_null");
+#if 0
     vector<Indicator> all_returns;
     all_returns.reserve(m_stks.size());
     for (const auto& stk : m_stks) {
         auto k = stk.getKData(m_query);
-        all_returns.push_back(ALIGN(REF(ROCP(k.close(), ndays), ndays), m_ref_dates, fill_null));
+        all_returns.emplace_back(ALIGN(REF(ROCP(k.close(), ndays), ndays), m_ref_dates,
+        fill_null));
     }
     return all_returns;
+#else
+    return parallel_for_index(0, m_stks.size(), [this, ndays, fill_null](size_t i) {
+        auto k = m_stks[i].getKData(m_query);
+        return ALIGN(REF(ROCP(k.close(), ndays), ndays), m_ref_dates, fill_null);
+    });
+#endif
 }
 
 vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
