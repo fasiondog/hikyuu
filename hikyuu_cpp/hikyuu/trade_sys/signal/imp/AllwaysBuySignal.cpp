@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::AllwaysBuySignal)
 
 namespace hku {
 
-AllwaysBuySignal::AllwaysBuySignal() : SignalBase("SG_Allways_buy") {
+AllwaysBuySignal::AllwaysBuySignal() : SignalBase("SG_AllwaysBuy") {
     setParam<bool>("alternate", false);
 }
 
@@ -31,7 +31,7 @@ void AllwaysBuySignal::_calculate() {
     }
 }
 
-SignalPtr HKU_API SG_Allways_buy() {
+SignalPtr HKU_API SG_AllwaysBuy() {
     return SignalPtr(new AllwaysBuySignal);
 }
 

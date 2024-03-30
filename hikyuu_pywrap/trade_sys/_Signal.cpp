@@ -207,4 +207,6 @@ void export_Signal(py::module& m) {
 
         SG_Band(MA(C, n=10), 100, 200)
       )");
+
+    m.def("SG_AllwaysBuy", SG_AllwaysBuy);
 }
