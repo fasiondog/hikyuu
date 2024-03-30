@@ -120,6 +120,7 @@ void SelectorBase::calculate(const SystemList& pf_realSysList, const KQuery& que
 
 void SelectorBase::calculate_proto(const KQuery& query) {
     if (m_proto_query != query && !m_proto_calculated) {
+        HKU_WARN_IF_RETURN(m_pro_sys_list.empty(), void(), "m_pro_sys_list is empty!");
         for (auto& sys : m_pro_sys_list) {
             sys->run(query);
         }

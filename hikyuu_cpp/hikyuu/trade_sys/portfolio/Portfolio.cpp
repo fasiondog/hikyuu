@@ -117,6 +117,10 @@ void Portfolio::_readyForRun() {
     FundsRecord funds = m_tm->getFunds();
     HKU_CHECK(funds.total_assets() > 0.0, "The current tm is zero assets!");
 
+    // 从 se 获取原型系统列表
+    auto pro_sys_list = m_se->getProtoSystemList();
+    HKU_CHECK(!pro_sys_list.empty(), "Can't fetch proto_sys_lsit from Selector!");
+
     reset();
 
     // 生成资金账户
@@ -126,9 +130,6 @@ void Portfolio::_readyForRun() {
     m_af->setTM(m_tm);
     m_af->setCashTM(m_cash_tm);
     m_af->setQuery(m_query);
-
-    // 从 se 获取原型系统列表
-    auto pro_sys_list = m_se->getProtoSystemList();
 
     // 获取所有备选子系统，为无关联账户的子系统分配子账号，对所有子系统做好启动准备
     TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "TM_SUB");
