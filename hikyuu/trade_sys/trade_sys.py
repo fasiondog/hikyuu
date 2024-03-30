@@ -133,19 +133,6 @@ def crtSG(func, params={}, name='crtSG'):
 # ------------------------------------------------------------------
 # Selector
 # ------------------------------------------------------------------
-def se_add_stock_list(self, stk_list, proto_sys):
-    result = True
-    for stk in stk_list:
-        success = self.add_stock(stk, proto_sys)
-        if not success:
-            result = False
-            break
-    return result
-
-
-SelectorBase.add_stock_list = se_add_stock_list
-
-
 def crtSE(calculate, get_selected, is_match_af=None, params={}, name='crtSE'):
     """
     快速创建交易对象选择算法

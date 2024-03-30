@@ -102,8 +102,13 @@ void export_Selector(py::module& m) {
     :param Stock stock: 加入的初始标的
     :param System sys: 系统策略原型)")
 
-      .def("add_stock_list", &SelectorBase::addStockList, py::arg("stk_list"), py::arg("sys"),
-           R"(add_stock_list(self, stk_list, sys)
+      .def(
+        "add_stock_list",
+        [](SelectorBase& self, py::sequence stk_list, const SYSPtr& sys) {
+            self.addStockList(python_list_to_vector<Stock>(stk_list), sys);
+        },
+        py::arg("stk_list"), py::arg("sys"),
+        R"(add_stock_list(self, stk_list, sys)
 
     加入初始标的列表及其系统策略原型
 
