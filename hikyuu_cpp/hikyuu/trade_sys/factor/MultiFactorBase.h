@@ -89,13 +89,13 @@ public:
      * @param end 排序起始点(不含该点)
      * @param filter 过滤函数
      */
-    ScoreRecordList getScore(
+    ScoreRecordList getScores(
       const Datetime& date, size_t start, size_t end = Null<size_t>(),
       std::function<bool(const ScoreRecord&)>&& filter = std::function<bool(const ScoreRecord&)>());
 
-    ScoreRecordList getScore(const Datetime& date, size_t start, size_t end = Null<size_t>(),
-                             std::function<bool(const Datetime&, const ScoreRecord&)>&& filter =
-                               std::function<bool(const Datetime&, const ScoreRecord&)>());
+    ScoreRecordList getScores(const Datetime& date, size_t start, size_t end = Null<size_t>(),
+                              std::function<bool(const Datetime&, const ScoreRecord&)>&& filter =
+                                std::function<bool(const Datetime&, const ScoreRecord&)>());
 
     /** 获取所有截面数据，已按降序排列 */
     const vector<ScoreRecordList>& getAllScores();

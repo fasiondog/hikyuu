@@ -38,7 +38,6 @@ void export_MultiFactor(py::module& m) {
       .def_readwrite("stock", &ScoreRecord::stock, "时间")
       .def_readwrite("value", &ScoreRecord::value, "时间");
 
-    size_t null_size = Null<size_t>();
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",
                                                                R"(市场环境判定策略基类
 
@@ -122,29 +121,30 @@ void export_MultiFactor(py::module& m) {
       .def("clone", &MultiFactorBase::clone, "克隆操作")
 
       .def(
-        "get_score",
-        [](MultiFactorBase& self, const Datetime& date, size_t start, size_t end,
+        "get_scores",
+        [](MultiFactorBase& self, const Datetime& date, size_t start, py::object end,
            py::object filter) {
+            size_t cend = end.is_none() ? Null<size_t>() : end.cast<size_t>();
             if (filter.is_none()) {
-                return self.getScore(date, start, end, std::function<bool(const ScoreRecord&)>());
+                return self.getScores(date, start, cend, std::function<bool(const ScoreRecord&)>());
             }
             HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
             py::object filter_func = filter.attr("__call__");
             ScoreRecord sc;
             try {
                 filter_func(sc);
-                return self.getScore(date, start, end, [&](const ScoreRecord& score_) {
+                return self.getScores(date, start, cend, [&](const ScoreRecord& score_) {
                     return filter_func(score_).cast<bool>();
                 });
             } catch (...) {
                 filter_func(date, sc);
-                return self.getScore(date, start, end,
-                                     [&](const Datetime& date_, const ScoreRecord& score_) {
-                                         return filter_func(date_, score_).cast<bool>();
-                                     });
+                return self.getScores(date, start, cend,
+                                      [&](const Datetime& date_, const ScoreRecord& score_) {
+                                          return filter_func(date_, score_).cast<bool>();
+                                      });
             }
         },
-        py::arg("datet"), py::arg("start") = 0, py::arg("end") = null_size,
+        py::arg("datet"), py::arg("start") = 0, py::arg("end") = py::none(),
         py::arg("filter") = py::none(),
         R"(get_score(self, date[, start=0, end=Null])
 
