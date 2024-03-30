@@ -104,12 +104,18 @@ public:
     /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
     void calculate(const SystemList& pf_realSysList, const KQuery& query);
 
+    void calculate_proto(const KQuery& query);
+
 private:
     void initParam();
 
 protected:
     string m_name;
-    bool m_calculated{false};   // 是否已计算过
+    bool m_calculated{false};  // 是否已计算过
+    bool m_proto_calculated{false};
+    KQuery m_query;
+    KQuery m_proto_query;
+
     SystemList m_pro_sys_list;  // 原型系统列表
     SystemList m_real_sys_list;  // PF组合中实际运行的系统，有PF执行时设定，顺序与原型列表一一对应
 

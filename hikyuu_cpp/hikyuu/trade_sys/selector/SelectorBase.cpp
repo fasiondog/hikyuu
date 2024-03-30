@@ -47,15 +47,17 @@ void SelectorBase::baseCheckParam(const string& name) const {}
 
 void SelectorBase::paramChanged() {
     m_calculated = false;
+    m_proto_calculated = false;
 }
 
 void SelectorBase::removeAll() {
-    m_pro_sys_list.swap(SystemList());
-    m_real_sys_list.swap(SystemList());
+    m_pro_sys_list.clear();
+    m_real_sys_list.clear();
+    m_calculated = false;
+    m_proto_calculated = false;
 }
 
 void SelectorBase::reset() {
-    m_calculated = false;
     SystemList::const_iterator iter = m_pro_sys_list.begin();
     for (; iter != m_pro_sys_list.end(); ++iter) {
         (*iter)->reset();
@@ -63,6 +65,9 @@ void SelectorBase::reset() {
 
     m_real_sys_list.clear();
     _reset();
+
+    m_calculated = false;
+    m_proto_calculated = false;
 }
 
 SelectorPtr SelectorBase::clone() {
@@ -81,6 +86,10 @@ SelectorPtr SelectorBase::clone() {
 
     p->m_params = m_params;
     p->m_name = m_name;
+    p->m_query = m_query;
+    p->m_proto_query = m_proto_query;
+    p->m_calculated = m_calculated;
+    p->m_proto_calculated = m_proto_calculated;
 
     p->m_real_sys_list.reserve(m_real_sys_list.size());
     for (const auto& sys : m_real_sys_list) {
@@ -95,17 +104,28 @@ SelectorPtr SelectorBase::clone() {
 }
 
 void SelectorBase::calculate(const SystemList& pf_realSysList, const KQuery& query) {
+    HKU_IF_RETURN(m_calculated && m_query == query, void());
+
+    m_query = query;
     m_real_sys_list = pf_realSysList;
 
     // 需要依赖于运行系统，在自身运算之前完成计算
     if (getParam<bool>("depend_on_proto_sys")) {
-        for (auto& sys : m_pro_sys_list) {
-            sys->run(query);
-        }
+        calculate_proto(query);
     }
 
     _calculate();
     m_calculated = true;
+}
+
+void SelectorBase::calculate_proto(const KQuery& query) {
+    if (m_proto_query != query && !m_proto_calculated) {
+        for (auto& sys : m_pro_sys_list) {
+            sys->run(query);
+        }
+        m_proto_calculated = true;
+        m_proto_query = query;
+    }
 }
 
 void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
@@ -125,6 +145,9 @@ void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     sys->reset();
     sys->setStock(stock);
     m_pro_sys_list.emplace_back(sys);
+
+    m_calculated = false;
+    m_proto_calculated = false;
 }
 
 void SelectorBase::addStockList(const StockList& stkList, const SystemPtr& protoSys) {
