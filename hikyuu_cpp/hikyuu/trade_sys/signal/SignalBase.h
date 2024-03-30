@@ -82,7 +82,7 @@ public:
      * 获取交易对象
      * @return 交易对象(KData)
      */
-    KData getTO() const;
+    const KData& getTO() const;
 
     /** 复位操作 */
     void reset();
@@ -198,7 +198,7 @@ typedef shared_ptr<SignalBase> SGPtr;
 HKU_API std::ostream& operator<<(std::ostream&, const SignalBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const SignalPtr&);
 
-inline KData SignalBase::getTO() const {
+inline const KData& SignalBase::getTO() const {
     return m_kdata;
 }
 

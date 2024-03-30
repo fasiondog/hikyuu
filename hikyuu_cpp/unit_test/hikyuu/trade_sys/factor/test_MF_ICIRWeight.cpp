@@ -17,7 +17,7 @@
 #include <hikyuu/indicator/crt/ROCR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/STDEV.h>
-#include <hikyuu/trade_sys/factor/crt/MF_ICIRWeight.h>
+#include <hikyuu/trade_sys/multifactor/crt/MF_ICIRWeight.h>
 
 using namespace hku;
 

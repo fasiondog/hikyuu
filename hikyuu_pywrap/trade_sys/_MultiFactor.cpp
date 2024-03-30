@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/trade_sys/factor/build_in.h>
+#include <hikyuu/trade_sys/multifactor/build_in.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
