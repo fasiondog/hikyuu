@@ -9,6 +9,7 @@
 #ifndef SIGNAL_BUILD_IN_H_
 #define SIGNAL_BUILD_IN_H_
 
+#include "crt/SG_Allways_buy.h"
 #include "crt/SG_Cross.h"
 #include "crt/SG_CrossGold.h"
 #include "crt/SG_Flex.h"

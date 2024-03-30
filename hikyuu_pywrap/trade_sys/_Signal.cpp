@@ -51,7 +51,8 @@ void export_Signal(py::module& m) {
       .def_property("name", py::overload_cast<>(&SignalBase::name, py::const_),
                     py::overload_cast<const string&>(&SignalBase::name),
                     py::return_value_policy::copy, "名称")
-      .def_property("to", &SignalBase::getTO, &SignalBase::setTO, "设置或获取交易对象")
+      .def_property("to", &SignalBase::getTO, &SignalBase::setTO, py::return_value_policy::copy,
+                    "设置或获取交易对象")
 
       .def("get_param", &SignalBase::getParam<boost::any>, R"(get_param(self, name)
 

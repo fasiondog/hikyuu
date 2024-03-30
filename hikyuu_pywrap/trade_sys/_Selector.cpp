@@ -102,8 +102,13 @@ void export_Selector(py::module& m) {
     :param Stock stock: 加入的初始标的
     :param System sys: 系统策略原型)")
 
-      .def("add_stock_list", &SelectorBase::addStockList, py::arg("stk_list"), py::arg("sys"),
-           R"(add_stock_list(self, stk_list, sys)
+      .def(
+        "add_stock_list",
+        [](SelectorBase& self, py::sequence stk_list, const SYSPtr& sys) {
+            self.addStockList(python_list_to_vector<Stock>(stk_list), sys);
+        },
+        py::arg("stk_list"), py::arg("sys"),
+        R"(add_stock_list(self, stk_list, sys)
 
     加入初始标的列表及其系统策略原型
 
@@ -153,4 +158,36 @@ void export_Selector(py::module& m) {
     :param list stk_list: 初始划定的标的
     :param System sys: 系统策略原型
     :return: SE选择器实例)");
+
+    m.def("SE_MultiFactor", py::overload_cast<const MFPtr&, int>(SE_MultiFactor), py::arg("mf"),
+          py::arg("topn") = 10);
+    m.def(
+      "SE_MultiFactor",
+      [](const py::sequence& inds, const py::sequence& stks, const KQuery& query, int topn,
+         int ic_n, int ic_rolling_n, const py::object& ref_stk, const string& mode) {
+          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
+          StockList c_stks = python_list_to_vector<Stock>(stks);
+          Stock c_ref_stk = ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>();
+          return SE_MultiFactor(c_inds, c_stks, query, topn, ic_n, ic_rolling_n, c_ref_stk, mode);
+      },
+      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("topn") = 10, py::arg("ic_n") = 5,
+      py::arg("ic_rolling_n") = 120, py::arg("ref_stk") = py::none(),
+      py::arg("mode") = "MF_ICIRWeight",
+      R"(SE_MultiFactor
+
+    创建基于多因子评分的选择器，两种创建方式
+
+    - 直接指定 MF:
+      :param MultiFactorBase mf: 直接指定的多因子合成算法
+      :param int topn: 只选取时间截面中前 topn 个系统
+
+    - 参数直接创建:
+      :param sequense(Indicator) inds: 原始因子列表
+      :param sequense(stock) stks: 计算证券列表
+      :param Query query: 日期范围
+      :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+      :param int ic_n: 默认 IC 对应的 N 日收益率
+      :param int ic_rolling_n: IC 滚动周期
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
+      )");
 }

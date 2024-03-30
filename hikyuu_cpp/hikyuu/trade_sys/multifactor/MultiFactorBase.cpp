@@ -123,6 +123,14 @@ void MultiFactorBase::paramChanged() {
     m_calculated = false;
 }
 
+void MultiFactorBase::reset() {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    _reset();
+
+    // 仅重置 m_calculated，其他缓存不重置，否则线程不安全
+    m_calculated = false;
+}
+
 MultiFactorPtr MultiFactorBase::clone() {
     std::lock_guard<std::mutex> lock(m_mutex);
     MultiFactorPtr p;
@@ -142,23 +150,23 @@ MultiFactorPtr MultiFactorBase::clone() {
     p->m_stks = m_stks;
     p->m_ref_stk = m_ref_stk;
     p->m_query = m_query;
-    p->m_stk_map = m_stk_map;
-    p->m_all_factors = m_all_factors;
-    p->m_date_index = m_date_index;
-    p->m_stk_factor_by_date = m_stk_factor_by_date;
     p->m_ref_dates = m_ref_dates;
-    p->m_ic = m_ic.clone();
-    p->m_calculated = m_calculated;
 
     p->m_inds.reserve(m_inds.size());
     for (const auto& ind : m_inds) {
         p->m_inds.emplace_back(ind.clone());
     }
 
-    p->m_all_factors.reserve(m_all_factors.size());
-    for (const auto& ind : m_all_factors) {
-        p->m_all_factors.emplace_back(ind.clone());
-    }
+    p->m_calculated = false;
+    // 强制重算，不克隆以下缓存，避免非线程安全
+    // p->m_stk_map = m_stk_map;
+    // p->m_date_index = m_date_index;
+    // p->m_stk_factor_by_date = m_stk_factor_by_date;
+    // p->m_ic = m_ic.clone();
+    // p->m_all_factors.reserve(m_all_factors.size());
+    // for (const auto& ind : m_all_factors) {
+    //     p->m_all_factors.emplace_back(ind.clone());
+    // }
     return p;
 }
 
@@ -179,6 +187,22 @@ const ScoreRecordList& MultiFactorBase::getScore(const Datetime& d) {
     const auto iter = m_date_index.find(d);
     HKU_CHECK(iter != m_date_index.cend(), "Could not find this date: {}", d);
     return m_stk_factor_by_date[iter->second];
+}
+
+ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, size_t end) {
+    ScoreRecordList ret;
+    HKU_IF_RETURN(start >= end, ret);
+
+    const auto& cross = getScore(date);
+    if (end == Null<size_t>() || end > cross.size()) {
+        end = cross.size();
+    }
+
+    for (size_t i = start; i < end; i++) {
+        ret.emplace_back(cross[i]);
+    }
+
+    return ret;
 }
 
 ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, size_t end,

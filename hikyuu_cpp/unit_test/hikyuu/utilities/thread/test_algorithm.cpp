@@ -56,6 +56,4 @@ TEST_CASE("test_parallel_for_index") {
     for (size_t i = 0, len = expect.size(); i < len; i++) {
         CHECK_EQ(result[i], expect[i]);
     }
-
-    // parallel_for_index<void>(0, values.size(), [](size_t i) { HKU_INFO("i: {}", i); });
 }
