@@ -295,7 +295,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
             } else {
                 // 非延迟卖出的系统，立即强制卖出并回收资金
                 auto tr = sys->sellForceOnClose(date, MAX_DOUBLE, PART_ALLOCATEFUNDS);
-                HKU_DEBUG_IF(trace && tr.isNull(), "[AF] failed to sell: {}", sys->name());
+                // HKU_DEBUG_IF(trace && tr.isNull(), "[AF] failed to sell: {}", sys->name());
                 if (!tr.isNull()) {
                     auto sub_tm = sys->getTM();
                     auto sub_cash = sub_tm->currentCash();

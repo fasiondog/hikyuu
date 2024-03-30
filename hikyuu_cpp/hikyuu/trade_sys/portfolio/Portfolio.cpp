@@ -244,7 +244,7 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     //----------------------------------------------------------------------
     for (auto& sys : m_delay_adjust_sys_list) {
         auto tr = sys.sys->sellForceOnOpen(date, sys.weight, PART_PORTFOLIO);
-        HKU_DEBUG_IF(trace && tr.isNull(), "[PF] Failed to force sell: {}", sys.sys->name());
+        // HKU_DEBUG_IF(trace && tr.isNull(), "[PF] Failed to force sell: {}", sys.sys->name());
         if (!tr.isNull()) {
             HKU_INFO_IF(trace, "[PF] Delay adjust sell: {}", tr);
             m_tm->addTradeRecord(tr);

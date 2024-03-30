@@ -545,13 +545,14 @@ def remove_hub(name):
     HubManager().remove_hub(name)
 
 
-def get_part(name, **kwargs):
+def get_part(name, *args, **kwargs):
     """获取指定策略部件
 
     :param str name: 策略部件名称
+    :param args: 其他部件相关参数
     :param kwargs: 其他部件相关参数
     """
-    return HubManager().get_part(name, **kwargs)
+    return HubManager().get_part(name, *args, **kwargs)
 
 
 def get_hub_path(name):

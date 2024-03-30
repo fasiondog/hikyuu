@@ -2,7 +2,8 @@
 
 from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
-    ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase, AllocateFundsBase
+    ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase, AllocateFundsBase,
+    MultiFactorBase
 )
 
 
@@ -177,6 +178,23 @@ def crtAF(allocate_weight_func, params={}, name='crtAF'):
     """
     meta_x = type(name, (AllocateFundsBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._allocate_weight = allocate_weight_func
+    return meta_x(name, params)
+
+
+# ------------------------------------------------------------------
+# multi_factor
+# ------------------------------------------------------------------
+def crtMF(calculate_func, params={}, name='crtMF'):
+    """
+    快速多因子合成算法
+
+    :param calculate_func: 合成算法
+    :param {} params: 参数字典
+    :param str name: 自定义名称
+    :return: 自定义多因子合成算法实例
+    """
+    meta_x = type(name, (MultiFactorBase, ), {'__init__': part_init, '_clone': part_clone})
+    meta_x._calculate = calculate_func
     return meta_x(name, params)
 
 
