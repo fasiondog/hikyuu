@@ -170,12 +170,15 @@ void export_MultiFactor(py::module& m) {
     m.def(
       "MF_EqualWeight",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query,
-         const Stock& ref_stk, int ic_n) {
+         const py::object& ref_stk, int ic_n) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = python_list_to_vector<Stock>(stks);
-          return MF_EqualWeight(c_inds, c_stks, query, ref_stk, ic_n);
+          return MF_EqualWeight(c_inds, c_stks, query,
+                                ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(),
+                                ic_n);
       },
-      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("ic_n") = 5,
+      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
+      py::arg("ic_n") = 5,
       R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5])
 
     等权重合成因子
@@ -183,21 +186,22 @@ void export_MultiFactor(py::module& m) {
     :param sequense(Indicator) inds: 原始因子列表
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :rtype: MultiFactor)");
 
     m.def(
       "MF_ICWeight",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query,
-         const Stock& ref_stk, int ic_n, int ic_rolling_n) {
-          // MF_EqualWeight
+         const py::object& ref_stk, int ic_n, int ic_rolling_n) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = python_list_to_vector<Stock>(stks);
-          return MF_ICWeight(c_inds, c_stks, query, ref_stk, ic_n, ic_rolling_n);
+          return MF_ICWeight(c_inds, c_stks, query,
+                             ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(), ic_n,
+                             ic_rolling_n);
       },
-      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("ic_n") = 5,
-      py::arg("ic_rolling_n") = 120,
+      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
+      py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
       R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
     滚动IC权重合成因子
@@ -205,7 +209,7 @@ void export_MultiFactor(py::module& m) {
     :param sequense(Indicator) inds: 原始因子列表
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券
+    :param Stock ref_stk:  (未指定时，默认为 sh000300 沪深300)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :rtype: MultiFactor)");
@@ -213,14 +217,15 @@ void export_MultiFactor(py::module& m) {
     m.def(
       "MF_ICIRWeight",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query,
-         const Stock& ref_stk, int ic_n, int ic_rolling_n) {
-          // MF_EqualWeight
+         const py::object& ref_stk, int ic_n, int ic_rolling_n) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = python_list_to_vector<Stock>(stks);
-          return MF_ICIRWeight(c_inds, c_stks, query, ref_stk, ic_n, ic_rolling_n);
+          return MF_ICIRWeight(c_inds, c_stks, query,
+                               ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(),
+                               ic_n, ic_rolling_n);
       },
-      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("ic_n") = 5,
-      py::arg("ic_rolling_n") = 120,
+      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
+      py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
       R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
     滚动ICIR权重合成因子
@@ -228,7 +233,7 @@ void export_MultiFactor(py::module& m) {
     :param sequense(Indicator) inds: 原始因子列表
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :rtype: MultiFactor)");
