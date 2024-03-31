@@ -65,15 +65,8 @@ target("core")
         end
     
         -- get python include directory.
-        local pydir = nil;
-        if os.getenv("CONDA_PREFIX") ~= nil then
-          local py3config = os.getenv("CONDA_PREFIX") .. "/bin/python3-config"
-          pydir = try { function () return os.iorun(py3config .. " --includes"):trim() end }
-        else
-          pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
-        end
-        assert(pydir, "python3-config not found!")
-        target:add("cxflags", pydir)   
+        local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
+        target:add("cxflags", pydir)
     end)
 
     after_build(function(target)
@@ -83,13 +76,13 @@ target("core")
 
         local dst_dir = "$(projectdir)/hikyuu/cpp/"
         local dst_obj = dst_dir .. "core.so"
+
+        -- need xmake 445e43b40846b29b9abb1293b32b27b7104f54fa
         if not is_plat("cross") then
-            import("lib.detect.find_tool")
-            local python = assert(find_tool("python", {version = true}), "python not found, please install it first! note: python version must > 3.0")
-            local tmp = string.split(python.version, "%.")
-            dst_obj = dst_dir .. "core" .. tmp[1] .. tmp[2]
+          local stmt = [[python -c 'import sys; v = sys.version_info; print(str(v.major)+str(v.minor))']]
+          local python_version = os.iorun(stmt):trim()
+          dst_obj = dst_dir .. "core" ..  python_version
         end
-        -- print(dst_obj)
 
         if is_plat("windows") then
             os.cp(target:targetdir() .. '/core.pyd', dst_obj .. ".pyd")
