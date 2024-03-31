@@ -132,6 +132,8 @@ public:
     /** 设定交易的证券 */
     void setStock(const Stock& stk);
 
+    const KQuery& getQuery() const;
+
     /** 获取实际执行的交易记录，和 TM 的区别是不包含权息调整带来的交易记录 */
     const TradeRecordList& getTradeRecordList() const;
 
@@ -525,6 +527,10 @@ inline void System::setStock(const Stock& stk) {
         m_stock = stk;
         m_calculated = false;
     }
+}
+
+inline const KQuery& System::getQuery() const {
+    return m_kdata.getQuery();
 }
 
 inline const TradeRecordList& System::getTradeRecordList() const {
