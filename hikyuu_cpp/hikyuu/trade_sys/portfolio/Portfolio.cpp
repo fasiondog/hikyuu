@@ -409,12 +409,11 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             }
         }
 
-        // 从已运行系统列表中立即移除已没有持仓且没有资金的非延迟买入的系统
+        // 从已运行系统列表中立即移除已没有持仓且没有资金的系统
         m_tmp_will_remove_sys.clear();
         for (auto& sys : m_running_sys_set) {
             auto sub_tm = sys->getTM();
-            if (!sys->getParam<bool>("buy_delay") && sub_tm->currentCash() < 1.0 &&
-                0 == sub_tm->getHoldNumber(date, sys->getStock())) {
+            if (sub_tm->currentCash() < 1.0 && 0 == sub_tm->getHoldNumber(date, sys->getStock())) {
                 m_tmp_will_remove_sys.emplace_back(sys, 0.0);
             }
         }
@@ -437,6 +436,7 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     // 执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
     //----------------------------------------------------------------------------
     for (auto& sub_sys : m_running_sys_set) {
+        HKU_TRACE_IF(trace, "run: {}", sub_sys->name());
         auto tr = sub_sys->runMoment(date);
         if (!tr.isNull()) {
             HKU_INFO_IF(trace, "[PF] {}", tr);
@@ -492,7 +492,7 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             HKU_INFO(
               "+------------+------------+------------+--------------+--------------+-------------"
               "+-------------+");
-            if (++count >= 10) {
+            if (++count >= 100) {
                 break;
             }
         }

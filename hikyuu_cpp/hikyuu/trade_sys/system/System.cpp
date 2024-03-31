@@ -586,13 +586,10 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
 
     // 获取可买入数量
     double number = _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, from);
+    double min_num = m_stock.minTradeNumber();
+    number = int64_t(number / min_num) * min_num;
     if (number == 0 || number > m_stock.maxTradeNumber()) {
         return result;
-    }
-
-    double min_num = m_stock.minTradeNumber();
-    if (min_num > 1) {
-        number = number / min_num * min_num;
     }
 
     price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
@@ -645,9 +642,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
     }
 
     double min_num = m_stock.minTradeNumber();
-    if (min_num > 1) {
-        number = number / min_num * min_num;
-    }
+    number = int64_t(number / min_num) * min_num;
 
     price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
     TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss, goalPrice,
