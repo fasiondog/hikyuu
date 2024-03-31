@@ -293,7 +293,8 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                  getParam<bool>("ignore_zero_weight"));
 
     //-----------------------------------------------------------------
-    // 先将已不在 sw_list 中的运行系统进行清仓，回收可分配资金
+    // 先将已不在 sw_list 中的运行系统进行强制清仓，回收可分配资金
+    // 不需要区分延迟买入系统，不管什么类型的系统，都是立刻使用收盘价进行清仓
     //-----------------------------------------------------------------
     std::unordered_set<SYSPtr> running_in_sw_set;
     for (const auto& sw : sw_list) {
@@ -305,30 +306,22 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     for (const auto& sys : running_set) {
         if (running_in_sw_set.find(sys) == running_in_sw_set.cend()) {
             PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
-            if (sys->getParam<bool>("buy_delay")) {
-                // 延迟买入的系统，上一调仓日指示买入，可能尚未被执行，需要放入延迟列表中
-                delay_list.emplace_back(sys, position.number);
-                HKU_INFO_IF(trace, "[AF] Clean delay {}", sys->name());
-
+            auto tr = sys->sellForceOnClose(date, position.number, PART_ALLOCATEFUNDS);
+            if (!tr.isNull()) {
+                auto sub_tm = sys->getTM();
+                auto sub_cash = sub_tm->currentCash();
+                if (sub_tm->checkout(date, sub_cash)) {
+                    m_cash_tm->checkin(date, sub_cash);
+                    m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
+                    HKU_INFO_IF(trace, "[AF] Clean position sell: {}, recycle cash: {:<.2f}",
+                                sys->name(), sub_cash);
+                }
             } else {
-                // 非延迟卖出的系统，立即强制卖出并回收资金
-                auto tr = sys->sellForceOnClose(date, position.number, PART_ALLOCATEFUNDS);
-                if (!tr.isNull()) {
-                    auto sub_tm = sys->getTM();
-                    auto sub_cash = sub_tm->currentCash();
-                    if (sub_tm->checkout(date, sub_cash)) {
-                        m_cash_tm->checkin(date, sub_cash);
-                        m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
-                        HKU_INFO_IF(trace, "[AF] Clean position sell: {}, recycle cash: {:<.2f}",
-                                    sys->name(), sub_cash);
-                    }
-                } else {
-                    // 清仓卖出失败情况，也加入到延迟卖出列表中，以便下一交易日可执行
-                    PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
-                    if (position.number > 0.0) {
-                        delay_list.emplace_back(sys, position.number);
-                        HKU_INFO_IF(trace, "[AF] Clean delay {}", sys->name());
-                    }
+                // 清仓卖出失败情况，也加入到延迟卖出列表中，以便下一交易日可执行
+                PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
+                if (position.number > 0.0) {
+                    delay_list.emplace_back(sys, position.number);
+                    HKU_INFO_IF(trace, "[AF] Clean delay {}", sys->name());
                 }
             }
         }
@@ -385,28 +378,21 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                     continue;
                 }
 
-                if (iter->sys->getParam<bool>("buy_delay")) {
-                    delay_list.emplace_back(iter->sys, need_back_num);
-                    HKU_INFO_IF(trace, "[AF] Deduce delay {}, num: {}", iter->sys->name(),
-                                need_back_num);
-
-                } else {
-                    auto tr = iter->sys->sellForceOnClose(date, need_back_num, PART_ALLOCATEFUNDS);
-                    if (!tr.isNull()) {
-                        auto sub_cash = sub_tm->currentCash();
-                        if (sub_tm->checkout(date, sub_cash)) {
-                            m_cash_tm->checkin(date, sub_cash);
-                            m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
-                            HKU_INFO_IF(trace,
-                                        "[AF] Deduce position {}, sell num: {}, recycle cash: {}",
-                                        iter->sys->name(), need_back_num, sub_cash);
-                        }
-                    } else {
-                        // 卖出失败的情况，也加入到延迟交易列表中
-                        delay_list.emplace_back(iter->sys, need_back_num);
-                        HKU_INFO_IF(trace, "[AF] Delay deduce position {}, need sell num: {}",
-                                    iter->sys->name(), need_back_num);
+                auto tr = iter->sys->sellForceOnClose(date, need_back_num, PART_ALLOCATEFUNDS);
+                if (!tr.isNull()) {
+                    auto sub_cash = sub_tm->currentCash();
+                    if (sub_tm->checkout(date, sub_cash)) {
+                        m_cash_tm->checkin(date, sub_cash);
+                        m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
+                        HKU_INFO_IF(trace,
+                                    "[AF] Deduce position {}, sell num: {}, recycle cash: {}",
+                                    iter->sys->name(), need_back_num, sub_cash);
                     }
+                } else {
+                    // 卖出失败的情况，也加入到延迟交易列表中
+                    delay_list.emplace_back(iter->sys, need_back_num);
+                    HKU_INFO_IF(trace, "[AF] Delay deduce position {}, need sell num: {}",
+                                iter->sys->name(), need_back_num);
                 }
             }
         }
