@@ -20,7 +20,7 @@ namespace hku {
  */
 struct HKU_API SystemWeight {
     SystemPtr sys;
-    price_t weight{1.0};
+    double weight{1.0};
 
     SystemWeight() = default;
     SystemWeight(const SystemPtr& sys_, double weight_) : sys(sys_), weight(weight_) {}

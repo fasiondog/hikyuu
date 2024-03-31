@@ -707,11 +707,10 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
       _getRealSellPrice(krecord.datetime, on_open ? src_krecord.openPrice : src_krecord.closePrice);
 
     double min_num = m_stock.minTradeNumber();
-    double real_sell_num = num;
-    if (real_sell_num >= position.number) {
+    // 对待卖出的数量进行最小交易单位取整数倍，如果剩余不足最小交易单位，则一次全部卖出
+    double real_sell_num = static_cast<int64_t>(num / min_num) * min_num;
+    if (position.number - real_sell_num < min_num) {
         real_sell_num = position.number;
-    } else if (min_num > 1) {
-        real_sell_num = static_cast<int64_t>(num / min_num) * min_num;
     }
 
     record =
