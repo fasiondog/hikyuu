@@ -85,7 +85,7 @@ target("core")
         local dst_obj = dst_dir .. "core.so"
         if not is_plat("cross") then
             import("lib.detect.find_tool")
-            local python = assert(find_tool("python", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+            local python = assert(find_tool("python", {version = true, force = true}), "python not found, please install it first! note: python version must > 3.0")
             local tmp = string.split(python.version, "%.")
             dst_obj = dst_dir .. "core" .. tmp[1] .. tmp[2]
         end
