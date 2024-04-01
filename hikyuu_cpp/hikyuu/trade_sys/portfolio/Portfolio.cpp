@@ -73,7 +73,6 @@ void Portfolio::paramChanged() {
 void Portfolio::reset() {
     m_real_sys_list.clear();
     m_running_sys_set.clear();
-    m_failed_sys_map.clear();
     m_dlist_sys_list.clear();
     m_delay_adjust_sys_list.clear();
     m_tmp_selected_list.clear();
@@ -268,47 +267,6 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     }
 
     //----------------------------------------------------------------------
-    // 开盘时，优先处理上一交易日强制清、减仓失败的系统
-    //----------------------------------------------------------------------
-    // for (auto iter = m_failed_sys_map.begin(); iter != m_failed_sys_map.end();) {
-    //     const auto& sys = iter->first;
-    //     Stock stk = sys->getStock();
-    //     if (date > stk.lastDatetime()) {
-    //         // 已退市
-    //         HKU_WARN_IF(trace, "{} has been delisted!", sys->name());
-    //         m_dlist_sys_list.emplace_back(sys);
-    //         m_failed_sys_map.erase(iter++);
-    //         continue;
-    //     }
-
-    //     auto tr = sys->sellForceOnOpen(date, iter->second, PART_PORTFOLIO);
-    //     if (!tr.isNull()) {
-    //         HKU_INFO_IF(trace, "[PF] Process pre-failed sys: {}", tr);
-    //         m_tm->addTradeRecord(tr);
-
-    //         // 卖出后，尝试将资金取出转移至影子总账户
-    //         TMPtr sub_tm = sys->getTM();
-    //         auto sub_cash = sub_tm->currentCash();
-    //         if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
-    //             m_cash_tm->checkin(date, sub_cash);
-    //         }
-
-    //         m_failed_sys_map.erase(iter++);
-    //         continue;
-
-    //     } else {
-    //         // 如果实际已没有持仓，则将其从失败列表中移除
-    //         PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
-    //         if (position.number <= 0.0) {
-    //             m_failed_sys_map.erase(iter++);
-    //             continue;
-    //         }
-    //     }
-
-    //     ++iter;
-    // }
-
-    //----------------------------------------------------------------------
     // 开盘时，优先处理上一交易日遗留的延迟调仓卖出的系统
     //----------------------------------------------------------------------
     HKU_INFO_IF(trace, "[PF] process delay adjust sys, size: {}", m_delay_adjust_sys_list.size());
@@ -331,7 +289,6 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             PositionRecord position = sys.sys->getTM()->getPosition(date, sys.sys->getStock());
             if (position.number > 0.0) {
                 tmp_continue_adjust_sys_list.emplace_back(sys);
-                // m_failed_sys_map[sys.sys] = sys.weight;
             }
         }
     }
