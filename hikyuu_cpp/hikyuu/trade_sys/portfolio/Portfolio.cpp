@@ -54,8 +54,9 @@ Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFP
 Portfolio::~Portfolio() {}
 
 void Portfolio::initParam() {
-    setParam<int>("adjust_cycle", 1);  // 调仓周期
-    setParam<bool>("trace", false);    // 打印跟踪
+    setParam<int>("adjust_cycle", 1);    // 调仓周期
+    setParam<bool>("trace", false);      // 打印跟踪
+    setParam<int>("trace_max_num", 10);  // 打印跟踪时，显示当前持仓证券最大数量
 }
 
 void Portfolio::baseCheckParam(const string& name) const {
@@ -489,12 +490,14 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
                      stk.market_code(), stk_name, position, funds.market_value, funds.cash,
                      krecord.openPrice, krecord.closePrice);
 #endif
-            HKU_INFO(
-              "+------------+------------+------------+--------------+--------------+-------------"
-              "+-------------+");
-            if (++count >= 100) {
+            // clang-format off
+            HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
+            if (++count >= getParam<int>("trace_max_num")) {
+                HKU_INFO("+ ... ... more                                                                                   +");
+                HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
                 break;
             }
+            // clang-format on
         }
     }
 }
