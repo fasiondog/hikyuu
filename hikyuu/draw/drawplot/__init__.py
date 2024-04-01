@@ -29,7 +29,7 @@
 # 1. 20171122, Added by fasiondog
 # ===============================================================================
 
-from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, EnvironmentBase, System
+from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, EnvironmentBase, System, Portfolio
 
 import matplotlib
 from matplotlib.pylab import gca as mpl_gca
@@ -123,6 +123,7 @@ def use_draw_with_matplotlib():
 
     System.plot = mpl_sysplot
     System.performance = mpl_sys_performance
+    Portfolio.performance = mpl_sys_performance
 
 
 def use_draw_with_echarts():

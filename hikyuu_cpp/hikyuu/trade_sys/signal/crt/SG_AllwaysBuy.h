@@ -15,6 +15,6 @@ namespace hku {
  * @return SignalPtr
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Allways_buy();
+SignalPtr HKU_API SG_AllwaysBuy();
 
 }  // namespace hku

@@ -132,7 +132,7 @@ public:
     /** 获取不同类型K线数据量 */
     size_t getCount(KQuery::KType dataType = KQuery::DAY) const;
 
-    /** 获取指定日期时刻的市值，即小于等于指定日期的最后一条记录的收盘价 */
+    /** 获取指定日期时刻的市值，即小于等于指定日期的最后一条记录的收盘价, 如果证券已失效，则为0 */
     price_t getMarketValue(const Datetime&, KQuery::KType) const;
 
     /**

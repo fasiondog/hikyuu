@@ -266,7 +266,21 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
 
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "[AF] {} _adjust_with_running", date);
-    HKU_IF_RETURN(se_list.size() == 0, delay_list);
+
+    // 如果选中列表为空，则需要全部执行清仓，这里不能返回
+    // HKU_IF_RETURN(se_list.size() == 0, delay_list);
+
+    //-----------------------------------------------------------------
+    // 回收所有运行中系统剩余资金，用于重新分配
+    //-----------------------------------------------------------------
+    for (const auto& sys : running_set) {
+        auto sub_tm = sys->getTM();
+        auto sub_cash = sub_tm->currentCash();
+        if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
+            m_cash_tm->checkin(date, sub_cash);
+            HKU_INFO_IF(trace, "[AF] Recycle cash: {:<.2f} from {}", sub_cash, sys->name());
+        }
+    }
 
     // 获取计划分配的资产权重
     SystemWeightList sw_list = _allocateWeight(date, se_list);
@@ -279,32 +293,35 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                  getParam<bool>("ignore_zero_weight"));
 
     //-----------------------------------------------------------------
-    // 先将已不在 sw_list 中的运行系统进行清仓，回收可分配资金
+    // 先将已不在 sw_list 中的运行系统进行强制清仓，回收可分配资金
+    // 不需要区分延迟买入系统，不管什么类型的系统，都是立刻使用收盘价进行清仓
     //-----------------------------------------------------------------
-    std::unordered_set<SYSPtr> running_in_sw_list;
+    std::unordered_set<SYSPtr> running_in_sw_set;
     for (const auto& sw : sw_list) {
         if (running_set.find(sw.sys) != running_set.cend()) {
-            running_in_sw_list.insert(sw.sys);
+            running_in_sw_set.insert(sw.sys);
         }
     }
 
     for (const auto& sys : running_set) {
-        if (running_in_sw_list.find(sys) == running_in_sw_list.cend()) {
-            if (sys->getParam<bool>("buy_delay")) {
-                delay_list.emplace_back(sys, MAX_DOUBLE);
+        if (running_in_sw_set.find(sys) == running_in_sw_set.cend()) {
+            PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
+            auto tr = sys->sellForceOnClose(date, position.number, PART_ALLOCATEFUNDS);
+            if (!tr.isNull()) {
+                auto sub_tm = sys->getTM();
+                auto sub_cash = sub_tm->currentCash();
+                if (sub_tm->checkout(date, sub_cash)) {
+                    m_cash_tm->checkin(date, sub_cash);
+                    m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
+                    HKU_INFO_IF(trace, "[AF] Clean position sell: {}, recycle cash: {:<.2f}",
+                                sys->name(), sub_cash);
+                }
             } else {
-                // 非延迟卖出的系统，立即强制卖出并回收资金
-                auto tr = sys->sellForceOnClose(date, MAX_DOUBLE, PART_ALLOCATEFUNDS);
-                // HKU_DEBUG_IF(trace && tr.isNull(), "[AF] failed to sell: {}", sys->name());
-                if (!tr.isNull()) {
-                    auto sub_tm = sys->getTM();
-                    auto sub_cash = sub_tm->currentCash();
-                    if (sub_tm->checkout(date, sub_cash)) {
-                        m_cash_tm->checkin(date, sub_cash);
-                        m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
-                        HKU_INFO_IF(trace, "[AF] Adjust sell: {}, recycle cash: {:<.2f}",
-                                    sys->name(), sub_cash);
-                    }
+                // 清仓卖出失败情况，也加入到延迟卖出列表中，以便下一交易日可执行
+                PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
+                if (position.number > 0.0) {
+                    delay_list.emplace_back(sys, position.number);
+                    HKU_INFO_IF(trace, "[AF] Clean delay {}", sys->name());
                 }
             }
         }
@@ -316,8 +333,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     // 获取当前总资产市值，计算需保留的资产
     int precision = m_cash_tm->getParam<int>("precision");
     FundsRecord funds = m_tm->getFunds(date, m_query.kType());
-    price_t total_funds =
-      funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
+    price_t total_funds = funds.total_assets();
     price_t reserve_funds = roundEx(total_funds * reserve_percent, precision);
 
     std::unordered_set<SYSPtr> reduced_running_set;  // 缓存已执行过减仓的运行中系统
@@ -327,35 +343,56 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
             TMPtr sub_tm = iter->sys->getTM();
             const KQuery& query = iter->sys->getTO().getQuery();
             FundsRecord sub_funds = sub_tm->getFunds(date, query.kType());
-            price_t sub_total_funds = sub_funds.cash + sub_funds.market_value +
-                                      sub_funds.borrow_asset - sub_funds.short_market_value;
+            price_t sub_total_funds = sub_funds.total_assets();
             price_t sub_will_funds = total_funds * iter->weight;
+
+            // 如果需要执行减仓
             if (sub_total_funds > sub_will_funds) {
                 reduced_running_set.insert(iter->sys);  // 缓存执行了减仓的系统
                 price_t need_back_funds = sub_total_funds - sub_will_funds;
                 Stock stock = iter->sys->getStock();
-                KRecord krecord = stock.getKRecord(date, query.kType());
-                size_t need_back_shou =
-                  size_t(need_back_funds / krecord.closePrice / stock.minTradeNumber());
-                if (need_back_shou > 0) {
-                    size_t need_back_num = need_back_shou * stock.minTradeNumber();
-                    size_t hold_num = sub_tm->getHoldNumber(date, stock);
-                    if (hold_num - need_back_num < stock.minTradeNumber()) {
-                        need_back_num = hold_num;
+
+                // 获取当前最后的收盘价
+                price_t last_close_price = stock.getMarketValue(date, query.kType());
+                if (last_close_price <= 0.0) {
+                    // 证券已失效，无法处理，资产全部损失
+                    HKU_WARN_IF(trace, "{} has been delisted!", iter->sys->name());
+                    continue;
+                }
+
+                double hold_num = sub_tm->getHoldNumber(date, stock);
+                if (hold_num <= 0.0) {
+                    // 实际无持仓
+                    continue;
+                }
+
+                // 预期需要卖出的数量
+                double min_num = stock.minTradeNumber();
+                double need_back_num =
+                  static_cast<int64_t>(need_back_funds / last_close_price / min_num) * min_num;
+                if (hold_num - need_back_num < min_num) {
+                    need_back_num = hold_num;
+                }
+
+                if (need_back_num == 0.0) {
+                    continue;
+                }
+
+                auto tr = iter->sys->sellForceOnClose(date, need_back_num, PART_ALLOCATEFUNDS);
+                if (!tr.isNull()) {
+                    auto sub_cash = sub_tm->currentCash();
+                    if (sub_tm->checkout(date, sub_cash)) {
+                        m_cash_tm->checkin(date, sub_cash);
+                        m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
+                        HKU_INFO_IF(trace,
+                                    "[AF] Deduce position {}, sell num: {}, recycle cash: {}",
+                                    iter->sys->name(), need_back_num, sub_cash);
                     }
-                    if (iter->sys->getParam<bool>("buy_delay")) {
-                        delay_list.emplace_back(iter->sys, need_back_num);
-                    } else {
-                        auto tr =
-                          iter->sys->sellForceOnClose(date, need_back_num, PART_ALLOCATEFUNDS);
-                        if (!tr.isNull()) {
-                            auto sub_cash = sub_tm->currentCash();
-                            if (sub_tm->checkout(date, sub_cash)) {
-                                m_cash_tm->checkin(date, sub_cash);
-                                m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
-                            }
-                        }
-                    }
+                } else {
+                    // 卖出失败的情况，也加入到延迟交易列表中
+                    delay_list.emplace_back(iter->sys, need_back_num);
+                    HKU_INFO_IF(trace, "[AF] Delay deduce position {}, need sell num: {}",
+                                iter->sys->name(), need_back_num);
                 }
             }
         }
@@ -383,13 +420,8 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
             break;
         }
 
-        // 计算实际可用的权重
-        price_t current_weight = iter->weight + sum_weight > can_allocate_weight
-                                   ? iter->weight + sum_weight - can_allocate_weight
-                                   : iter->weight;
-
         // 系统期望分配的资产额
-        price_t will_funds = roundUp(total_funds * current_weight, precision);
+        price_t will_funds = roundUp(total_funds * iter->weight, precision);
 
         // 如果该系统是当前运行中系统
         if (running_set.find(iter->sys) != running_set.cend()) {
@@ -408,39 +440,34 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                 // 未执行过减仓的系统，需要予以相应资金分配
                 if (sub_total_funds >= will_funds) {
                     sum_weight += sub_total_funds / total_funds;
+
                 } else {
                     price_t need_cash = will_funds - sub_total_funds;
                     if (need_cash > can_allocate_cash) {
                         need_cash = can_allocate_cash;
                     }
-                    // 如果期望的资金连一手都买不起，则跳过
-                    auto krecord = iter->sys->getStock().getKRecord(date, query.kType());
-                    if (krecord.isValid() &&
-                        need_cash < krecord.closePrice * iter->sys->getStock().minTradeNumber()) {
+
+                    // 如果期望的资金连一手都买不起(含退市），则跳过
+                    auto last_price = iter->sys->getStock().getMarketValue(date, query.kType());
+                    if (need_cash < last_price * iter->sys->getStock().minTradeNumber()) {
                         continue;
                     }
 
                     if (m_cash_tm->checkout(date, need_cash)) {
                         sub_tm->checkin(date, need_cash);
+                        HKU_INFO_IF(trace, "[AF] {} fetched cash: {}", iter->sys->name(),
+                                    need_cash);
+
                         can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
                         // 更新已分配的累积权重
                         sum_weight += (sub_total_funds + need_cash) / total_funds;
                     }
                 }
             }
-
         } else {
             // 非运行中的系统
             // 计算子账户实际可获取的的资金
             price_t need_cash = will_funds <= can_allocate_cash ? will_funds : can_allocate_cash;
-
-            // 如果期望的资金连一手都买不起，则跳过
-            const KQuery& query = iter->sys->getTO().getQuery();
-            auto krecord = iter->sys->getStock().getKRecord(date, query.kType());
-            if (krecord.isValid() &&
-                need_cash < krecord.closePrice * iter->sys->getStock().minTradeNumber()) {
-                continue;
-            }
 
             // 尝试从资金账户中取出资金存入子账户
             TMPtr sub_tm = iter->sys->getTM();

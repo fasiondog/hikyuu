@@ -72,6 +72,8 @@ void Portfolio::paramChanged() {
 void Portfolio::reset() {
     m_real_sys_list.clear();
     m_running_sys_set.clear();
+    m_failed_sys_map.clear();
+    m_dlist_sys_list.clear();
     m_delay_adjust_sys_list.clear();
     m_tmp_selected_list.clear();
     m_tmp_will_remove_sys.clear();
@@ -92,7 +94,7 @@ PortfolioPtr Portfolio::clone() {
     p->m_name = m_name;
     p->m_query = m_query;
     p->m_real_sys_list = m_real_sys_list;
-    p->m_need_calculate = m_need_calculate;
+    p->m_need_calculate = true;
     if (m_se)
         p->m_se = m_se->clone();
     if (m_af)
@@ -195,8 +197,32 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
 
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "{} ===========================================================", date);
-    HKU_INFO_IF(trace && adjust, "[PF] Position adjustment will be made today.");
+    if (trace && adjust) {
+        HKU_INFO("****************************************************");
+        HKU_INFO("**                                                **");
+        HKU_INFO("**  [PF] Position adjustment will be made today.  **");
+        HKU_INFO("**                                                **");
+        HKU_INFO("****************************************************");
+    }
     HKU_INFO_IF(trace, "[PF] current running system size: {}", m_running_sys_set.size());
+
+    //---------------------------------------------------
+    // 检测运行系统中是否存在已退市的证券
+    //---------------------------------------------------
+    for (auto iter = m_running_sys_set.begin(); iter != m_running_sys_set.end(); /*++iter*/) {
+        auto& sys = *iter;
+        if (sys->getStock().getMarketValue(date, m_query.kType()) == 0.0) {
+            auto sub_tm = sys->getTM();
+            auto sub_cash = sub_tm->currentCash();
+            if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
+                m_cash_tm->checkin(date, sub_cash);
+            }
+            m_dlist_sys_list.emplace_back(sys);
+            m_running_sys_set.erase(iter++);
+        } else {
+            ++iter;
+        }
+    }
 
     //---------------------------------------------------
     // 开盘前处理各个子账户、资金账户、总账户之间可能的误差
@@ -241,11 +267,53 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     }
 
     //----------------------------------------------------------------------
-    // 开盘时，优先处理上一交易日确定的需延迟调仓卖出的系统，在开盘时先卖出调整
+    // 开盘时，优先处理上一交易日强制清、减仓失败的系统
     //----------------------------------------------------------------------
+    // for (auto iter = m_failed_sys_map.begin(); iter != m_failed_sys_map.end();) {
+    //     const auto& sys = iter->first;
+    //     Stock stk = sys->getStock();
+    //     if (date > stk.lastDatetime()) {
+    //         // 已退市
+    //         HKU_WARN_IF(trace, "{} has been delisted!", sys->name());
+    //         m_dlist_sys_list.emplace_back(sys);
+    //         m_failed_sys_map.erase(iter++);
+    //         continue;
+    //     }
+
+    //     auto tr = sys->sellForceOnOpen(date, iter->second, PART_PORTFOLIO);
+    //     if (!tr.isNull()) {
+    //         HKU_INFO_IF(trace, "[PF] Process pre-failed sys: {}", tr);
+    //         m_tm->addTradeRecord(tr);
+
+    //         // 卖出后，尝试将资金取出转移至影子总账户
+    //         TMPtr sub_tm = sys->getTM();
+    //         auto sub_cash = sub_tm->currentCash();
+    //         if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
+    //             m_cash_tm->checkin(date, sub_cash);
+    //         }
+
+    //         m_failed_sys_map.erase(iter++);
+    //         continue;
+
+    //     } else {
+    //         // 如果实际已没有持仓，则将其从失败列表中移除
+    //         PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
+    //         if (position.number <= 0.0) {
+    //             m_failed_sys_map.erase(iter++);
+    //             continue;
+    //         }
+    //     }
+
+    //     ++iter;
+    // }
+
+    //----------------------------------------------------------------------
+    // 开盘时，优先处理上一交易日遗留的延迟调仓卖出的系统
+    //----------------------------------------------------------------------
+    HKU_INFO_IF(trace, "[PF] process delay adjust sys, size: {}", m_delay_adjust_sys_list.size());
+    SystemWeightList tmp_continue_adjust_sys_list;
     for (auto& sys : m_delay_adjust_sys_list) {
         auto tr = sys.sys->sellForceOnOpen(date, sys.weight, PART_PORTFOLIO);
-        // HKU_DEBUG_IF(trace && tr.isNull(), "[PF] Failed to force sell: {}", sys.sys->name());
         if (!tr.isNull()) {
             HKU_INFO_IF(trace, "[PF] Delay adjust sell: {}", tr);
             m_tm->addTradeRecord(tr);
@@ -256,15 +324,23 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
                 m_cash_tm->checkin(date, sub_cash);
             }
+
+        } else {
+            // 强制卖出失败的情况下，如果当前仍有持仓，则需要下一交易日继续进行处理
+            PositionRecord position = sys.sys->getTM()->getPosition(date, sys.sys->getStock());
+            if (position.number > 0.0) {
+                tmp_continue_adjust_sys_list.emplace_back(sys);
+                // m_failed_sys_map[sys.sys] = sys.weight;
+            }
         }
     }
 
-    // 清空，避免循环至下一个非调仓日时被重复处理
-    m_delay_adjust_sys_list.clear();
+    m_delay_adjust_sys_list.swap(tmp_continue_adjust_sys_list);
 
-    //---------------------------------------------------------------
-    // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则回收
-    //---------------------------------------------------------------
+//---------------------------------------------------------------
+// 遍历当前运行中的子系统，如果已没有分配资金和持仓，则回收
+//---------------------------------------------------------------
+#if 0
     m_tmp_will_remove_sys.clear();
     for (auto& running_sys : m_running_sys_set) {
         Stock stock = running_sys->getStock();
@@ -278,14 +354,14 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             min_cash = krecord.openPrice * stock.minTradeNumber();
         }
 
-        // 如果系统的剩余资金小于交易一手的资金，则回收资金
+        // 如果系统的剩余资金小于交易一手的资金，则回收资金??? TODO 放到 AF 中进行处理不足一手的
         if (cash != 0 && cash <= min_cash) {
             sub_tm->checkout(date, cash);
             m_cash_tm->checkin(date, cash);
             HKU_INFO_IF(trace, "Recycle cash ({:<.2f}) from {}, current cash: {}", cash,
                         running_sys->name(), m_cash_tm->currentCash());
             // 如果已经没有持仓，则回收
-            if (position.number == 0) {
+            if (position.number <= 0.0) {
                 m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
                 HKU_INFO_IF(trace, "[PF] Recycle running sys: {}", running_sys->name());
             }
@@ -297,6 +373,7 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
         HKU_INFO_IF(trace, "Recycling system {}", sub_sys.sys->name());
         m_running_sys_set.erase(sub_sys.sys);
     }
+#endif
 
     //---------------------------------------------------
     // 调仓日，进行资金分配调整
@@ -312,9 +389,18 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
         }
 
         // 资产分配算法调整各子系统资产分配
-        m_delay_adjust_sys_list = m_af->adjustFunds(date, m_tmp_selected_list, m_running_sys_set);
+        tmp_continue_adjust_sys_list =
+          m_af->adjustFunds(date, m_tmp_selected_list, m_running_sys_set);
 
-        // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统，并执行
+        if (m_delay_adjust_sys_list.empty()) {
+            m_delay_adjust_sys_list.swap(tmp_continue_adjust_sys_list);
+        } else {
+            for (auto& sw : tmp_continue_adjust_sys_list) {
+                m_delay_adjust_sys_list.emplace_back(sw);
+            }
+        }
+
+        // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统列表
         for (auto& sys : m_tmp_selected_list) {
             if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
                 if (sys.sys->getTM()->cash(date, m_query.kType()) > 0.0) {
@@ -323,12 +409,11 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             }
         }
 
-        // 从已运行系统列表中立即移除已没有持仓且没有资金的非延迟买入的系统
+        // 从已运行系统列表中立即移除已没有持仓且没有资金的系统
         m_tmp_will_remove_sys.clear();
         for (auto& sys : m_running_sys_set) {
             auto sub_tm = sys->getTM();
-            if (!sys->getParam<bool>("buy_delay") && sub_tm->currentCash() < 1.0 &&
-                0 == sub_tm->getHoldNumber(date, sys->getStock())) {
+            if (sub_tm->currentCash() < 1.0 && 0 == sub_tm->getHoldNumber(date, sys->getStock())) {
                 m_tmp_will_remove_sys.emplace_back(sys, 0.0);
             }
         }
@@ -351,6 +436,7 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     // 执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
     //----------------------------------------------------------------------------
     for (auto& sub_sys : m_running_sys_set) {
+        HKU_TRACE_IF(trace, "run: {}", sub_sys->name());
         auto tr = sub_sys->runMoment(date);
         if (!tr.isNull()) {
             HKU_INFO_IF(trace, "[PF] {}", tr);
@@ -406,7 +492,7 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             HKU_INFO(
               "+------------+------------+------------+--------------+--------------+-------------"
               "+-------------+");
-            if (++count >= 10) {
+            if (++count >= 100) {
                 break;
             }
         }
