@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/global/sysinfo.h"
 #include "System.h"
 
 namespace hku {
@@ -130,6 +131,10 @@ void System::baseCheckParam(const string& name) const {
         HKU_ASSERT(getParam<int>("max_delay_count") >= 0);
     } else if ("tp_delay_n" == name) {
         HKU_ASSERT(getParam<int>("tp_delay_n") >= 0);
+    } else if ("trace" == name) {
+        if (getParam<bool>("trace") && pythonInJupyter()) {
+            HKU_THROW("You can't trace in jupyter!");
+        }
     }
 }
 

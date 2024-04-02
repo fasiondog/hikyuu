@@ -63,6 +63,10 @@ void Portfolio::baseCheckParam(const string& name) const {
     if ("adjust_cycle" == name) {
         int adjust_cycle = getParam<int>("adjust_cycle");
         HKU_ASSERT(adjust_cycle >= 1);
+    } else if ("trace" == name) {
+        if (getParam<bool>("trace") && pythonInJupyter()) {
+            HKU_THROW("You can't trace in jupyter!");
+        }
     }
 }
 
