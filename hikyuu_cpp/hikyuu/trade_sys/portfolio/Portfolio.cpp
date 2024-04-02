@@ -54,8 +54,9 @@ Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFP
 Portfolio::~Portfolio() {}
 
 void Portfolio::initParam() {
-    setParam<int>("adjust_cycle", 1);  // 调仓周期
-    setParam<bool>("trace", false);    // 打印跟踪
+    setParam<int>("adjust_cycle", 1);    // 调仓周期
+    setParam<bool>("trace", false);      // 打印跟踪
+    setParam<int>("trace_max_num", 10);  // 打印跟踪时，显示当前持仓证券最大数量
 }
 
 void Portfolio::baseCheckParam(const string& name) const {
@@ -72,7 +73,6 @@ void Portfolio::paramChanged() {
 void Portfolio::reset() {
     m_real_sys_list.clear();
     m_running_sys_set.clear();
-    m_failed_sys_map.clear();
     m_dlist_sys_list.clear();
     m_delay_adjust_sys_list.clear();
     m_tmp_selected_list.clear();
@@ -173,15 +173,18 @@ void Portfolio::run(const KQuery& query, int adjust_cycle, bool force) {
     HKU_IF_RETURN(datelist.empty(), void());
 
     size_t cur_adjust_ix = 0;
+    Datetime cur_cycle_end;
     for (size_t i = 0, total = datelist.size(); i < total; i++) {
         bool adjust = false;
         if (i == cur_adjust_ix) {
             adjust = true;
             cur_adjust_ix += adjust_cycle;
+            cur_cycle_end =
+              cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Seconds(1);
         }
 
         const auto& date = datelist[i];
-        _runMoment(date, adjust);
+        _runMoment(date, cur_cycle_end, adjust);
     }
 
     m_need_calculate = false;
@@ -191,7 +194,7 @@ void Portfolio::run(const KQuery& query, int adjust_cycle, bool force) {
     m_tmp_will_remove_sys = SystemWeightList();
 }
 
-void Portfolio::_runMoment(const Datetime& date, bool adjust) {
+void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
     // 当前日期小于账户建立日期，直接忽略
     HKU_IF_RETURN(date < m_cash_tm->initDatetime(), void());
 
@@ -267,47 +270,6 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     }
 
     //----------------------------------------------------------------------
-    // 开盘时，优先处理上一交易日强制清、减仓失败的系统
-    //----------------------------------------------------------------------
-    // for (auto iter = m_failed_sys_map.begin(); iter != m_failed_sys_map.end();) {
-    //     const auto& sys = iter->first;
-    //     Stock stk = sys->getStock();
-    //     if (date > stk.lastDatetime()) {
-    //         // 已退市
-    //         HKU_WARN_IF(trace, "{} has been delisted!", sys->name());
-    //         m_dlist_sys_list.emplace_back(sys);
-    //         m_failed_sys_map.erase(iter++);
-    //         continue;
-    //     }
-
-    //     auto tr = sys->sellForceOnOpen(date, iter->second, PART_PORTFOLIO);
-    //     if (!tr.isNull()) {
-    //         HKU_INFO_IF(trace, "[PF] Process pre-failed sys: {}", tr);
-    //         m_tm->addTradeRecord(tr);
-
-    //         // 卖出后，尝试将资金取出转移至影子总账户
-    //         TMPtr sub_tm = sys->getTM();
-    //         auto sub_cash = sub_tm->currentCash();
-    //         if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
-    //             m_cash_tm->checkin(date, sub_cash);
-    //         }
-
-    //         m_failed_sys_map.erase(iter++);
-    //         continue;
-
-    //     } else {
-    //         // 如果实际已没有持仓，则将其从失败列表中移除
-    //         PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
-    //         if (position.number <= 0.0) {
-    //             m_failed_sys_map.erase(iter++);
-    //             continue;
-    //         }
-    //     }
-
-    //     ++iter;
-    // }
-
-    //----------------------------------------------------------------------
     // 开盘时，优先处理上一交易日遗留的延迟调仓卖出的系统
     //----------------------------------------------------------------------
     HKU_INFO_IF(trace, "[PF] process delay adjust sys, size: {}", m_delay_adjust_sys_list.size());
@@ -330,50 +292,11 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
             PositionRecord position = sys.sys->getTM()->getPosition(date, sys.sys->getStock());
             if (position.number > 0.0) {
                 tmp_continue_adjust_sys_list.emplace_back(sys);
-                // m_failed_sys_map[sys.sys] = sys.weight;
             }
         }
     }
 
     m_delay_adjust_sys_list.swap(tmp_continue_adjust_sys_list);
-
-//---------------------------------------------------------------
-// 遍历当前运行中的子系统，如果已没有分配资金和持仓，则回收
-//---------------------------------------------------------------
-#if 0
-    m_tmp_will_remove_sys.clear();
-    for (auto& running_sys : m_running_sys_set) {
-        Stock stock = running_sys->getStock();
-        TMPtr sub_tm = running_sys->getTM();
-        PositionRecord position = sub_tm->getPosition(date, stock);
-        price_t cash = sub_tm->currentCash();
-
-        price_t min_cash = 1.0;
-        KRecord krecord = stock.getKRecord(date);
-        if (krecord.isValid()) {
-            min_cash = krecord.openPrice * stock.minTradeNumber();
-        }
-
-        // 如果系统的剩余资金小于交易一手的资金，则回收资金??? TODO 放到 AF 中进行处理不足一手的
-        if (cash != 0 && cash <= min_cash) {
-            sub_tm->checkout(date, cash);
-            m_cash_tm->checkin(date, cash);
-            HKU_INFO_IF(trace, "Recycle cash ({:<.2f}) from {}, current cash: {}", cash,
-                        running_sys->name(), m_cash_tm->currentCash());
-            // 如果已经没有持仓，则回收
-            if (position.number <= 0.0) {
-                m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
-                HKU_INFO_IF(trace, "[PF] Recycle running sys: {}", running_sys->name());
-            }
-        }
-    }
-
-    // 依据待移除列表将系统从运行中系统列表里删除
-    for (auto& sub_sys : m_tmp_will_remove_sys) {
-        HKU_INFO_IF(trace, "Recycling system {}", sub_sys.sys->name());
-        m_running_sys_set.erase(sub_sys.sys);
-    }
-#endif
 
     //---------------------------------------------------
     // 调仓日，进行资金分配调整
@@ -437,6 +360,11 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     //----------------------------------------------------------------------------
     for (auto& sub_sys : m_running_sys_set) {
         HKU_TRACE_IF(trace, "run: {}", sub_sys->name());
+        if (adjust) {
+            auto sg = sub_sys->getSG();
+            sg->startCycle(date, nextCycle);
+        }
+
         auto tr = sub_sys->runMoment(date);
         if (!tr.isNull()) {
             HKU_INFO_IF(trace, "[PF] {}", tr);
@@ -489,12 +417,18 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
                      stk.market_code(), stk_name, position, funds.market_value, funds.cash,
                      krecord.openPrice, krecord.closePrice);
 #endif
-            HKU_INFO(
-              "+------------+------------+------------+--------------+--------------+-------------"
-              "+-------------+");
-            if (++count >= 100) {
+            // clang-format off
+            HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
+            count++;
+            int trace_max_num = getParam<int>("trace_max_num");
+            if (count >= trace_max_num) {
+                if (count > trace_max_num) {
+                    HKU_INFO("+ ... ... more                                                                                   +");
+                    HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
+                }
                 break;
             }
+            // clang-format on
         }
     }
 }

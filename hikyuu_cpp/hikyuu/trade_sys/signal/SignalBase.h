@@ -84,6 +84,10 @@ public:
      */
     const KData& getTO() const;
 
+    void startCycle(const Datetime& start, const Datetime& end);
+    const Datetime& getCycleStart() const;
+    const Datetime& getCycleEnd() const;
+
     /** 复位操作 */
     void reset();
 
@@ -104,7 +108,10 @@ public:
     virtual SignalPtr _clone() = 0;
 
     /** 子类计算接口，在setTO中调用 */
-    virtual void _calculate() = 0;
+    virtual void _calculate(const KData&) = 0;
+
+private:
+    void initParam();
 
 protected:
     string m_name;
@@ -117,6 +124,9 @@ protected:
     // 用 set 保存，以便获取是能保持顺序
     std::set<Datetime> m_buySig;
     std::set<Datetime> m_sellSig;
+
+    Datetime m_cycle_start;
+    Datetime m_cycle_end;
 
 //============================================
 // 序列化支持
@@ -186,7 +196,7 @@ public:                                    \
     virtual SignalPtr _clone() override {  \
         return SignalPtr(new classname()); \
     }                                      \
-    virtual void _calculate() override;
+    virtual void _calculate(const KData&) override;
 
 /**
  * 客户程序都应使用该指针类型，操作信号指示器
@@ -216,6 +226,14 @@ inline bool SignalBase::shouldBuy(const Datetime& datetime) const {
 
 inline bool SignalBase::shouldSell(const Datetime& datetime) const {
     return m_sellSig.count(datetime) ? true : false;
+}
+
+inline const Datetime& SignalBase::getCycleStart() const {
+    return m_cycle_start;
+}
+
+inline const Datetime& SignalBase::getCycleEnd() const {
+    return m_cycle_end;
 }
 
 } /* namespace hku */

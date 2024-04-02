@@ -101,7 +101,7 @@ private:
     /** 运行前准备 */
     void _readyForRun();
 
-    void _runMoment(const Datetime& date, bool adjust);
+    void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust);
 
 protected:
     string m_name;
@@ -117,7 +117,6 @@ protected:
 
     // 用于中间计算的临时数据
     std::unordered_set<SYSPtr> m_running_sys_set;
-    std::unordered_map<SYSPtr, double> m_failed_sys_map;  // 强制卖出失败的系统集合
     SystemList m_dlist_sys_list;  // 因证券退市，无法执行买入的系统（资产全部损失）
     SystemWeightList m_delay_adjust_sys_list;  // 延迟调仓卖出的系统列表
     SystemWeightList m_tmp_selected_list;

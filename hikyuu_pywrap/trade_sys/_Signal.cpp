@@ -18,8 +18,8 @@ public:
     using SignalBase::SignalBase;
     PySignalBase(const SignalBase& base) : SignalBase(base) {}
 
-    void _calculate() override {
-        PYBIND11_OVERLOAD_PURE(void, SignalBase, _calculate, );
+    void _calculate(const KData& kdata) override {
+        PYBIND11_OVERLOAD_PURE(void, SignalBase, _calculate, kdata);
     }
 
     void _reset() override {
@@ -209,4 +209,5 @@ void export_Signal(py::module& m) {
       )");
 
     m.def("SG_AllwaysBuy", SG_AllwaysBuy);
+    m.def("SG_Cycle", SG_Cycle);
 }

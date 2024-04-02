@@ -43,11 +43,11 @@ SignalPtr SingleSignal::_clone() {
     return SignalPtr(p);
 }
 
-void SingleSignal::_calculate() {
+void SingleSignal::_calculate(const KData& kdata) {
     int filter_n = getParam<int>("filter_n");
     double filter_p = getParam<double>("filter_p");
 
-    Indicator ind = m_ind(m_kdata);
+    Indicator ind = m_ind(kdata);
     Indicator dev = STDEV(DIFF(ind), filter_n);
 
     size_t start = dev.discard();
@@ -55,7 +55,7 @@ void SingleSignal::_calculate() {
 
     auto const* inddata = ind.data();
     auto const* devdata = dev.data();
-    auto const* ks = m_kdata.data();
+    auto const* ks = kdata.data();
     size_t total = dev.size();
     for (size_t i = start; i < total; ++i) {
         double dama = inddata[i] - inddata[i - 1];
