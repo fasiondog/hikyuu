@@ -63,6 +63,10 @@ void Portfolio::baseCheckParam(const string& name) const {
     if ("adjust_cycle" == name) {
         int adjust_cycle = getParam<int>("adjust_cycle");
         HKU_ASSERT(adjust_cycle >= 1);
+    } else if ("trace" == name) {
+        if (getParam<bool>("trace") && pythonInJupyter()) {
+            HKU_THROW("You can't trace in jupyter!");
+        }
     }
 }
 
@@ -148,7 +152,7 @@ void Portfolio::_readyForRun() {
         sys->getTM()->name(fmt::format("TM_SUB_{}", sys_name));
         sys->name(fmt::format("PF_{}", sys_name));
 
-        HKU_CHECK(sys->readyForRun(), "Exist invalid system, it could not ready for run!");
+        sys->readyForRun();
         KData k = sys->getStock().getKData(m_query);
         sys->setTO(k);
     }

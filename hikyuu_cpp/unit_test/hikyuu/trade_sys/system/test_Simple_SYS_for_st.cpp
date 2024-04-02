@@ -57,7 +57,6 @@ TEST_CASE("test_SYS_Simple_for_st") {
     sys->setSG(sg->clone());
     sys->setMM(mm->clone());
     sys->setST(st->clone());
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -111,7 +110,6 @@ TEST_CASE("test_SYS_Simple_for_st") {
     sys->setSG(sg->clone());
     sys->setMM(mm->clone());
     sys->setST(st->clone());
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
