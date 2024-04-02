@@ -8,6 +8,7 @@
 #pragma once
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl_bind.h>
 #include <hikyuu/hikyuu.h>
 
 using namespace hku;
@@ -20,15 +21,16 @@ using namespace hku;
 // PYBIND11_MAKE_OPAQUE(PriceList);
 PYBIND11_MAKE_OPAQUE(DatetimeList);
 PYBIND11_MAKE_OPAQUE(KRecordList);
-PYBIND11_MAKE_OPAQUE(StockList);
+// PYBIND11_MAKE_OPAQUE(StockList); // StockList 数据量不大，让 pybind 自动从 list 互转比较方便
 PYBIND11_MAKE_OPAQUE(StockWeightList);
 // PYBIND11_MAKE_OPAQUE(IndicatorList); // 无法编译
 PYBIND11_MAKE_OPAQUE(TimeLineList);
 PYBIND11_MAKE_OPAQUE(TransList);
-PYBIND11_MAKE_OPAQUE(BorrowRecordList);
-PYBIND11_MAKE_OPAQUE(LoanRecordList);
-PYBIND11_MAKE_OPAQUE(PositionRecordList);
-PYBIND11_MAKE_OPAQUE(TradeRecordList);
+// PYBIND11_MAKE_OPAQUE(BorrowRecordList);
+// PYBIND11_MAKE_OPAQUE(LoanRecordList);
+// PYBIND11_MAKE_OPAQUE(PositionRecordList);
+// PYBIND11_MAKE_OPAQUE(FundsList);
+// PYBIND11_MAKE_OPAQUE(TradeRecordList);
 PYBIND11_MAKE_OPAQUE(SystemWeightList);
-PYBIND11_MAKE_OPAQUE(SystemList);
+// PYBIND11_MAKE_OPAQUE(SystemList);
 PYBIND11_MAKE_OPAQUE(ScoreRecordList);

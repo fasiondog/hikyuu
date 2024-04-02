@@ -422,7 +422,7 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
             count++;
             int trace_max_num = getParam<int>("trace_max_num");
             if (count >= trace_max_num) {
-                if (count > trace_max_num) {
+                if (m_running_sys_set.size() > trace_max_num) {
                     HKU_INFO("+ ... ... more                                                                                   +");
                     HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
                 }

@@ -228,7 +228,15 @@
         :param Datetime datetime:  指定时刻
         :param Query.KType ktype: K线类型
         :rtype: FundsRecord
+
+    .. py:method:: get_funds_list(self, datetime, [ktype = Query.DAY])
+    
+        获取指定日期列表每日资产记录
         
+        :param Datetime datetime:  指定时刻
+        :param Query.KType ktype: K线类型
+        :rtype: FundsList
+
     .. py:method:: get_funds_curve(self, dates[, ktype = Query.DAY])
     
         获取资产净值曲线

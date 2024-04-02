@@ -192,6 +192,85 @@ public:
     }
 
     /**
+     * 获取指定日期列表中的所有日资产记录
+     * @param dates 日期列表
+     * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
+     * @return 日资产记录列表
+     */
+    FundsList getFundsList(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
+        size_t total = dates.size();
+        FundsList result(total);
+        HKU_IF_RETURN(total == 0, result);
+        for (size_t i = 0; i < total; ++i) {
+            result[i] = getFunds(dates[i], ktype);
+        }
+        return result;
+    }
+
+    /**
+     * 获取资产净值曲线，含借入的资产
+     * @param dates 日期列表，根据该日期列表获取其对应的资产净值曲线
+     * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
+     * @return 资产净值列表
+     */
+    PriceList getFundsCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
+        FundsList funds_list = getFundsList(dates, ktype);
+        PriceList ret(funds_list.size());
+        int precision = getParam<int>("precision");
+        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
+            ret[i] = roundEx(funds_list[i].total_assets(), precision);
+        }
+        return ret;
+    }
+
+    /**
+     * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
+     * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
+     * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
+     * @return 收益曲线
+     */
+    PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
+        FundsList funds_list = getFundsList(dates, ktype);
+        PriceList ret(funds_list.size());
+        int precision = getParam<int>("precision");
+        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
+            ret[i] = roundEx(funds_list[i].profit(), precision);
+        }
+        return ret;
+    }
+
+    /**
+     * 获取累积收益率曲线
+     * @param dates 日期列表
+     * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
+     * @return 收益率曲线
+     */
+    PriceList getProfitCumChangeCurve(const DatetimeList& dates,
+                                      KQuery::KType ktype = KQuery::DAY) {
+        FundsList funds_list = getFundsList(dates, ktype);
+        PriceList ret(funds_list.size());
+        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
+            ret[i] = funds_list[i].total_assets() / funds_list[i].total_base();
+        }
+        return ret;
+    }
+
+    /**
+     * 获取投入本值资产曲线
+     * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
+     * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
+     * @return 价格曲线
+     */
+    PriceList getBaseAssetsCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
+        FundsList funds_list = getFundsList(dates, ktype);
+        PriceList ret(funds_list.size());
+        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
+            ret[i] = funds_list[i].total_base();
+        }
+        return ret;
+    }
+
+    /**
      * 根据权息信息更新当前持仓与交易情况
      * @note 必须按时间顺序调用
      * @param datetime 当前时刻
@@ -576,28 +655,6 @@ public:
     virtual FundsRecord getFunds(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
         HKU_WARN("The subclass does not implement this method");
         return FundsRecord();
-    }
-
-    /**
-     * 获取资产净值曲线，含借入的资产
-     * @param dates 日期列表，根据该日期列表获取其对应的资产净值曲线
-     * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
-     * @return 资产净值列表
-     */
-    virtual PriceList getFundsCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
-        HKU_WARN("The subclass does not implement this method");
-        return PriceList();
-    }
-
-    /**
-     * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
-     * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
-     * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
-     * @return 收益曲线
-     */
-    virtual PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
-        HKU_WARN("The subclass does not implement this method");
-        return PriceList();
     }
 
     /**

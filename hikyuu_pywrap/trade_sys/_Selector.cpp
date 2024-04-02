@@ -26,8 +26,12 @@ public:
     }
 
     SystemWeightList getSelected(Datetime date) override {
-        PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected", getSelected,
-                                    date);
+        // PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected", getSelected,
+        //                             date);
+        auto self = py::cast(this);
+        py::sequence py_ret = self.attr("get_selected")(date);
+        auto c_ret = python_list_to_vector<SystemWeight>(py_ret);
+        return c_ret;
     }
 
     bool isMatchAF(const AFPtr& af) override {

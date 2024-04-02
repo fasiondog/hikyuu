@@ -1471,40 +1471,6 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     return funds;
 }
 
-PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
-    size_t total = dates.size();
-    PriceList result(total);
-    int precision = getParam<int>("precision");
-    for (size_t i = 0; i < total; ++i) {
-        FundsRecord funds = getFunds(dates[i], ktype);
-        result[i] = roundEx(
-          funds.cash + funds.market_value - funds.borrow_cash - funds.borrow_asset, precision);
-    }
-    return result;
-}
-
-PriceList TradeManager::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
-    size_t total = dates.size();
-    PriceList result(total);
-    if (total == 0)
-        return result;
-
-    size_t i = 0;
-    while (i < total && dates[i] < m_init_datetime) {
-        result[i] = 0;
-        i++;
-    }
-    int precision = getParam<int>("precision");
-    for (; i < total; ++i) {
-        FundsRecord funds = getFunds(dates[i], ktype);
-        result[i] = roundEx(funds.cash + funds.market_value - funds.borrow_cash -
-                              funds.borrow_asset - funds.base_cash - funds.base_asset,
-                            precision);
-    }
-
-    return result;
-}
-
 /******************************************************************************
  *  每次执行交易操作时，先根据权息信息调整持有仓位及现金记录
  *  采用滞后更新的策略，即只在需要获取当前持仓情况及卖出时更新当前的持仓及资产情况

@@ -89,6 +89,9 @@ private:
 #endif
 };
 
+typedef vector<FundsRecord> FundsList;
+typedef vector<FundsRecord> FundsRecordList;
+
 /**
  * 输出TradeRecord信息
  * @ingroup TradeManagerClass
