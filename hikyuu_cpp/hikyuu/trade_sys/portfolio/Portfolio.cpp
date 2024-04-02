@@ -148,7 +148,7 @@ void Portfolio::_readyForRun() {
         sys->getTM()->name(fmt::format("TM_SUB_{}", sys_name));
         sys->name(fmt::format("PF_{}", sys_name));
 
-        HKU_CHECK(sys->readyForRun(), "Exist invalid system, it could not ready for run!");
+        sys->readyForRun();
         KData k = sys->getStock().getKData(m_query);
         sys->setTO(k);
     }

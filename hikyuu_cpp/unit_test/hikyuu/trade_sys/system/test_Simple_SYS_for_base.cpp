@@ -50,30 +50,18 @@ TEST_CASE("test_SYS_Simple_for_base") {
 
     /** @arg 未指定账户运行    */
     sys = SYS_Simple();
-    CHECK_EQ(sys->readyForRun(), false);
-    sys->run(stk, query);
-    CHECK_UNARY(!sys->getTM());
+    CHECK_THROWS_AS(sys->readyForRun(), std::exception);
 
     /** @arg 指定了账户，但未指定其他策略组件 */
     sys = SYS_Simple();
     sys->setTM(tm->clone());
-    CHECK_EQ(sys->readyForRun(), false);
-    sys->run(stk, query);
-    CHECK_EQ(sys->getTM()->currentCash(), init_cash);
-    tr_list = sys->getTM()->getTradeList();
-    CHECK_EQ(tr_list.size(), 1);
-    CHECK_EQ(tr_list[0].business, BUSINESS_INIT);
+    CHECK_THROWS_AS(sys->readyForRun(), std::exception);
 
     /** @arg 指定了TM和SG，但未指定其他策略组件 */
     sys = SYS_Simple();
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
-    CHECK_EQ(sys->readyForRun(), false);
-    sys->run(stk, query);
-    CHECK_EQ(sys->getTM()->currentCash(), init_cash);
-    tr_list = sys->getTM()->getTradeList();
-    CHECK_EQ(tr_list.size(), 1);
-    CHECK_EQ(tr_list[0].business, BUSINESS_INIT);
+    CHECK_THROWS_AS(sys->readyForRun(), std::exception);
 
     /** @arg 指定了TM、SG、MM，但未指定其他策略组件，非延迟操作 */
     sys = SYS_Simple();
@@ -82,7 +70,6 @@ TEST_CASE("test_SYS_Simple_for_base") {
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
     sys->setMM(mm->clone());
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -135,7 +122,6 @@ TEST_CASE("test_SYS_Simple_for_base") {
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
     sys->setMM(mm->clone());
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();

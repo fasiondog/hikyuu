@@ -206,8 +206,8 @@ public:
     // 当前是否存在延迟的操作请求，供Portfolio
     bool haveDelayRequest() const;
 
-    // 运行前准备工作
-    bool readyForRun();
+    // 运行前准备工作, 失败将抛出异常
+    void readyForRun();
 
     TradeRecord sell(const KRecord& today, const KRecord& src_today, Part from) {
         return _sell(today, src_today, from);

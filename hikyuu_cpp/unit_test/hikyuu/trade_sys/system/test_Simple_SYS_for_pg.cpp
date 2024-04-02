@@ -62,7 +62,6 @@ TEST_CASE("test_SYS_Simple_for_pg") {
     sys->setST(st->clone());
     sys->setTP(tp->clone());
     sys->setPG(pg->clone());
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();

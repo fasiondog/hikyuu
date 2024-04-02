@@ -71,7 +71,6 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     sys->setTP(tp->clone());
     sys->setEV(ev1);
 
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -116,7 +115,6 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     sys->setTP(tp->clone());
     sys->setEV(ev1);
 
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -173,8 +171,6 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     sys->setST(st->clone());
     sys->setTP(tp->clone());
     sys->setEV(ev1);
-
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -218,8 +214,6 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     sys->setST(st->clone());
     sys->setTP(tp->clone());
     sys->setEV(ev1);
-
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -276,8 +270,6 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     sys->setSG(sg->clone());
     sys->setMM(mm->clone());
     sys->setEV(ev2);
-
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -321,8 +313,6 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     sys->setSG(sg->clone());
     sys->setMM(mm->clone());
     sys->setEV(ev2);
-
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -365,7 +355,6 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     sys->setMM(mm->clone());
     sys->setEV(ev3);
 
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
