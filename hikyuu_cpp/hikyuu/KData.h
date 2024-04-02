@@ -57,6 +57,14 @@ public:
         return getKRecord(datetime);
     }
 
+    /**
+     * 通过当前 KData 获取一个保持数据类型、复权类型不变的新的 KData
+     * @note 新的 KData 并不一定是原 KData 的子集
+     * @param start 起始日期
+     * @param end 结束日期
+     */
+    KData getKData(const Datetime& start, const Datetime& end) const;
+
     /** 按日期查询对应的索引位置，注：是 KData 中的位置，不是在 Stock 中原始K记录的位置 */
     size_t getPos(const Datetime& datetime) const;
 

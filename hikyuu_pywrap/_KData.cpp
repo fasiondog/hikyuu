@@ -85,6 +85,14 @@ void export_KData(py::module& m) {
 
         :rtype: Stock)")
 
+      .def("get_kdata", &KData::getKData, R"(get_kdata(self, start_date, end_date)
+      
+        通过当前 KData 获取一个保持数据类型、复权类型不变的新的 KData（注意，不是原 KData 的子集）
+
+        :param Datetime start: 新的起始日期
+        :param Datetime end: 新的结束日期
+        :rtype: KData)")
+
       .def("tocsv", &KData::tocsv, R"(tocsv(self, filename)
 
         将数据保存至CSV文件
