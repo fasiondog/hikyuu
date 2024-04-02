@@ -125,8 +125,8 @@ protected:
     std::set<Datetime> m_buySig;
     std::set<Datetime> m_sellSig;
 
-    Datetime m_cycle_start{Datetime::min()};
-    Datetime m_cycle_end{Datetime::min()};
+    Datetime m_cycle_start;
+    Datetime m_cycle_end;
 
 //============================================
 // 序列化支持

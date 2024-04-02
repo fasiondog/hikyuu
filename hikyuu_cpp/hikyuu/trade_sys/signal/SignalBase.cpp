@@ -64,6 +64,8 @@ SignalPtr SignalBase::clone() {
     p->m_hold_short = m_hold_short;
     p->m_buySig = m_buySig;
     p->m_sellSig = m_sellSig;
+    p->m_cycle_start = m_cycle_start;
+    p->m_cycle_end = m_cycle_start;
     return p;
 }
 
@@ -71,10 +73,8 @@ void SignalBase::setTO(const KData& kdata) {
     HKU_IF_RETURN(m_kdata == kdata, void());
     m_kdata = kdata;
     bool cycle = getParam<bool>("cycle");
-    if (!cycle) {
-        m_cycle_start = Datetime::min();
-        m_cycle_end = Datetime::max();
-    }
+    m_cycle_start = Datetime::min();
+    m_cycle_end = cycle ? Datetime::min() : Datetime::max();
     if (!cycle && !kdata.empty()) {
         _calculate();
     }
