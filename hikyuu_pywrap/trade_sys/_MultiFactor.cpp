@@ -144,7 +144,7 @@ void export_MultiFactor(py::module& m) {
                                       });
             }
         },
-        py::arg("datet"), py::arg("start") = 0, py::arg("end") = py::none(),
+        py::arg("date"), py::arg("start") = 0, py::arg("end") = py::none(),
         py::arg("filter") = py::none(),
         R"(get_score(self, date[, start=0, end=Null])
 

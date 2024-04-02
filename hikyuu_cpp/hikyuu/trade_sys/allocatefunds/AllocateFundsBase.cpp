@@ -42,7 +42,7 @@ void AllocateFundsBase::initParam() {
     //       仅针对剩余现金比例调整没有意义，即使分配由于交易成本原因可能也无法完成实际交易
     //  adjust_running_sys: True - 主动根据资产分配对已持仓策略进行增减仓
     //  adjust_running_sys: False - 不会根据当前分配权重对已持仓策略进行强制加减仓
-    setParam<bool>("adjust_running_sys", false);
+    setParam<bool>("adjust_running_sys", true);
 
     // 自动调整权重，此时认为传入的权重为各证券的相互比例（详见ignore_zero_weight说明）
     // 否则，以传入的权重为指定权重不做调整（此时传入的各个权重需要小于1）

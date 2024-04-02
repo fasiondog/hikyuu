@@ -109,7 +109,8 @@ void SignalBase::reset() {
 void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
     HKU_IF_RETURN(!getParam<bool>("cycle"), void());
     HKU_ASSERT(start != Null<Datetime>() && close != Null<Datetime>() && start < close);
-    HKU_CHECK(start >= m_cycle_end, "curretn start: {}, pre cycle end: {}", start, m_cycle_end);
+    HKU_CHECK(start >= m_cycle_end || m_cycle_end == Null<Datetime>(),
+              "curretn start: {}, pre cycle end: {}", start, m_cycle_end);
     m_cycle_start = start;
     m_cycle_end = close;
     KData kdata = m_kdata.getKData(start, close);

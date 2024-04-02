@@ -388,30 +388,6 @@ public:
     }
 
     /**
-     * 获取资产净值曲线，含借入的资产
-     * @param dates 日期列表，根据该日期列表获取其对应的资产净值曲线
-     * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
-     * @return 资产净值列表
-     */
-    virtual PriceList getFundsCurve(const DatetimeList& dates,
-                                    KQuery::KType ktype = KQuery::DAY) override {
-        HKU_WARN("The subclass does not implement this method");
-        return PriceList();
-    }
-
-    /**
-     * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
-     * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
-     * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
-     * @return 收益曲线
-     */
-    virtual PriceList getProfitCurve(const DatetimeList& dates,
-                                     KQuery::KType ktype = KQuery::DAY) override {
-        HKU_WARN("The subclass does not implement this method");
-        return PriceList();
-    }
-
-    /**
      * 直接加入交易记录
      * @note 如果加入初始化账户记录，将清除全部已有交易及持仓记录
      * @param tr 待加入的交易记录

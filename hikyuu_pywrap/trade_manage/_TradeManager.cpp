@@ -212,16 +212,6 @@ public:
                                ktype);
     }
 
-    PriceList getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) override {
-        PYBIND11_OVERRIDE_NAME(PriceList, TradeManagerBase, "get_funds_curve", getFundsCurve, dates,
-                               ktype);
-    }
-
-    PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) override {
-        PYBIND11_OVERRIDE_NAME(PriceList, TradeManagerBase, "get_profit_curve", getProfitCurve,
-                               dates, ktype);
-    }
-
     bool addTradeRecord(const TradeRecord& tr) override {
         PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "add_trade_record", addTradeRecord, tr);
     }
@@ -426,6 +416,14 @@ void export_TradeManager(py::module& m) {
     :param Query.KType ktype: K线类型
     :rtype: FundsRecord)")
 
+      .def("get_funds_list", &TradeManagerBase::getFundsList, py::arg("dates"),
+           py::arg("ktype") = KQuery::DAY, R"(get_funds_list(self, dates[, ktype = Query.DAY])
+    
+    获取指定日期列表的每日资产记录
+    :param Datetime datetime:  指定时刻
+    :param Query.KType ktype: K线类型
+    :rtype: FundsList)")
+
       .def("get_funds_curve", &TradeManagerBase::getFundsCurve, py::arg("dates"),
            py::arg("ktype") = KQuery::DAY,
            R"(get_funds_curve(self, dates[, ktype = Query.DAY])
@@ -446,6 +444,26 @@ void export_TradeManager(py::module& m) {
     :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
     :param Query.KType ktype: K线类型，必须与日期列表匹配
     :return: 收益曲线
+    :rtype: PriceList)")
+
+      .def("get_profit_cum_change_curve", &TradeManagerBase::getProfitCumChangeCurve,
+           py::arg("dates"), py::arg("ktype") = KQuery::DAY,
+           R"(get_profit_cum_change_curve(self, dates[, ktype = Query.DAY])
+
+    获取累积收益率曲线
+
+    :param DatetimeList dates: 日期列表
+    :param Query.KType ktype: K线类型，必须与日期列表匹配
+    :rtype: PriceList)")
+
+      .def("get_base_assets_curve", &TradeManagerBase::getBaseAssetsCurve, py::arg("dates"),
+           py::arg("ktype") = KQuery::DAY,
+           R"(get_profit_curve(self, dates[, ktype = Query.DAY])
+
+    获取投入本值资产曲线（投入本钱）
+
+    :param DatetimeList dates: 日期列表
+    :param Query.KType ktype: K线类型，必须与日期列表匹配
     :rtype: PriceList)")
 
       .def("checkin", &TradeManagerBase::checkin, R"(checkin(self, datetime, cash)

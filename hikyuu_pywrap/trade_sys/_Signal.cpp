@@ -121,7 +121,10 @@ void export_Signal(py::module& m) {
 
       .def("reset", &SignalBase::reset, "复位操作")
       .def("clone", &SignalBase::clone, "克隆操作")
-      .def("_calculate", &SignalBase::_calculate, "【重载接口】子类计算接口")
+      .def("_calculate", &SignalBase::_calculate, R"(_calculate(self, kdata)
+      
+    【重载接口】子类计算接口)")
+
       .def("_reset", &SignalBase::_reset, "【重载接口】子类复位接口，复位内部私有变量")
 
         DEF_PICKLE(SGPtr);
