@@ -492,56 +492,56 @@ Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
 Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
 
 void export_Indicator_build_in(py::module& m) {
-    m.def("KDATA", KDATA1);
-    m.def("KDATA", KDATA3, R"(KDATA([data])
+    m.def("C_KDATA", KDATA1);
+    m.def("C_KDATA", KDATA3, R"(KDATA([data])
 
     包装KData成Indicator，用于其他指标计算
 
     :param data: KData 或 具有6个返回结果的Indicator（如KDATA生成的Indicator）
     :rtype: Indicator)");
 
-    m.def("CLOSE", CLOSE1);
-    m.def("CLOSE", CLOSE3, R"(CLOSE([data])
+    m.def("C_CLOSE", CLOSE1);
+    m.def("C_CLOSE", CLOSE3, R"(CLOSE([data])
 
     获取收盘价，包装KData的收盘价成Indicator
 
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator)");
 
-    m.def("OPEN", OPEN1);
-    m.def("OPEN", OPEN3, R"(OPEN([data])
+    m.def("C_OPEN", OPEN1);
+    m.def("C_OPEN", OPEN3, R"(OPEN([data])
 
     获取开盘价，包装KData的开盘价成Indicator
 
     :param data: 输入数据（KData 或 Indicator） 
     :rtype: Indicator)");
 
-    m.def("HIGH", HIGH1);
-    m.def("HIGH", HIGH3, R"(HIGH([data])
+    m.def("C_HIGH", HIGH1);
+    m.def("C_HIGH", HIGH3, R"(HIGH([data])
 
     获取最高价，包装KData的最高价成Indicator
 
     :param data: 输入数据（KData 或 Indicator） 
     :rtype: Indicator)");
 
-    m.def("LOW", LOW1);
-    m.def("LOW", LOW3, R"(LOW([data])
+    m.def("C_LOW", LOW1);
+    m.def("C_LOW", LOW3, R"(LOW([data])
 
     获取最低价，包装KData的最低价成Indicator
 
     :param data: 输入数据（KData 或 Indicator） 
     :rtype: Indicator)");
 
-    m.def("AMO", AMO1);
-    m.def("AMO", AMO3, R"(AMO([data])
+    m.def("C_AMO", AMO1);
+    m.def("C_AMO", AMO3, R"(AMO([data])
 
     获取成交金额，包装KData的成交金额成Indicator
     
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator)");
 
-    m.def("VOL", VOL1);
-    m.def("VOL", VOL3, R"(VOL([data])
+    m.def("C_VOL", VOL1);
+    m.def("C_VOL", VOL3, R"(VOL([data])
 
     获取成交量，包装KData的成交量成Indicator
 
