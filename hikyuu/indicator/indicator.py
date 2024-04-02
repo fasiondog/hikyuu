@@ -133,3 +133,13 @@ def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
         df = pd.concat([df, x.to_df()], axis=1)
     df.set_index('date')
     return df
+
+
+# 避免 python 中公式原型必须加括号
+KDATA = C_KDATA()
+CLOSE = C_CLOSE()
+OPEN = C_OPEN()
+HIGH = C_HIGH()
+LOW = C_LOW()
+AMO = C_AMO()
+VOL = C_VOL()
