@@ -235,7 +235,7 @@
     
         克隆操作
     
-    .. py:method:: _calculate(self)
+    .. py:method:: _calculate(self, kdata)
     
         【重载接口】子类计算接口
     

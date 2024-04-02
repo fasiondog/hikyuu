@@ -752,14 +752,12 @@ def sys_performance(sys, ref_stk=None):
 
     ref_dates = ref_k.get_datetime_list()
 
-    profit = sys.tm.get_profit_curve(ref_dates)
-    profit = VALUE(profit)
-    funds = sys.tm.get_funds_curve(ref_dates)
+    funds_list = sys.tm.get_funds_list(ref_dates)
+    funds = [f.total_assets for f in funds_list]
     funds = VALUE(funds)
-    funds_return = profit / REF(funds, 1) + 1
-    # funds_return = cum_return(funds)
+    funds_return = [f.total_assets / f.total_base for f in funds_list]
+    funds_return = VALUE(funds_return)
     funds_return.name = "系统累积收益率"
-    # cum_return = get_part("default.ind.累积收益率")
     ref_return = ROCR(ref_k.close, 0)
     ref_return.name = ref_stk.name
 
