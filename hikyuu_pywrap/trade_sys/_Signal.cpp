@@ -209,4 +209,5 @@ void export_Signal(py::module& m) {
       )");
 
     m.def("SG_AllwaysBuy", SG_AllwaysBuy);
+    m.def("SG_Cycle", SG_Cycle);
 }

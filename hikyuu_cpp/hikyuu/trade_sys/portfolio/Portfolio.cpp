@@ -173,15 +173,18 @@ void Portfolio::run(const KQuery& query, int adjust_cycle, bool force) {
     HKU_IF_RETURN(datelist.empty(), void());
 
     size_t cur_adjust_ix = 0;
+    Datetime cur_cycle_end;
     for (size_t i = 0, total = datelist.size(); i < total; i++) {
         bool adjust = false;
         if (i == cur_adjust_ix) {
             adjust = true;
             cur_adjust_ix += adjust_cycle;
+            cur_cycle_end =
+              cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Seconds(1);
         }
 
         const auto& date = datelist[i];
-        _runMoment(date, adjust);
+        _runMoment(date, cur_cycle_end, adjust);
     }
 
     m_need_calculate = false;
@@ -191,7 +194,7 @@ void Portfolio::run(const KQuery& query, int adjust_cycle, bool force) {
     m_tmp_will_remove_sys = SystemWeightList();
 }
 
-void Portfolio::_runMoment(const Datetime& date, bool adjust) {
+void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
     // 当前日期小于账户建立日期，直接忽略
     HKU_IF_RETURN(date < m_cash_tm->initDatetime(), void());
 
@@ -295,44 +298,6 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
 
     m_delay_adjust_sys_list.swap(tmp_continue_adjust_sys_list);
 
-//---------------------------------------------------------------
-// 遍历当前运行中的子系统，如果已没有分配资金和持仓，则回收
-//---------------------------------------------------------------
-#if 0
-    m_tmp_will_remove_sys.clear();
-    for (auto& running_sys : m_running_sys_set) {
-        Stock stock = running_sys->getStock();
-        TMPtr sub_tm = running_sys->getTM();
-        PositionRecord position = sub_tm->getPosition(date, stock);
-        price_t cash = sub_tm->currentCash();
-
-        price_t min_cash = 1.0;
-        KRecord krecord = stock.getKRecord(date);
-        if (krecord.isValid()) {
-            min_cash = krecord.openPrice * stock.minTradeNumber();
-        }
-
-        // 如果系统的剩余资金小于交易一手的资金，则回收资金??? TODO 放到 AF 中进行处理不足一手的
-        if (cash != 0 && cash <= min_cash) {
-            sub_tm->checkout(date, cash);
-            m_cash_tm->checkin(date, cash);
-            HKU_INFO_IF(trace, "Recycle cash ({:<.2f}) from {}, current cash: {}", cash,
-                        running_sys->name(), m_cash_tm->currentCash());
-            // 如果已经没有持仓，则回收
-            if (position.number <= 0.0) {
-                m_tmp_will_remove_sys.emplace_back(running_sys, 0.);
-                HKU_INFO_IF(trace, "[PF] Recycle running sys: {}", running_sys->name());
-            }
-        }
-    }
-
-    // 依据待移除列表将系统从运行中系统列表里删除
-    for (auto& sub_sys : m_tmp_will_remove_sys) {
-        HKU_INFO_IF(trace, "Recycling system {}", sub_sys.sys->name());
-        m_running_sys_set.erase(sub_sys.sys);
-    }
-#endif
-
     //---------------------------------------------------
     // 调仓日，进行资金分配调整
     //---------------------------------------------------
@@ -395,6 +360,11 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
     //----------------------------------------------------------------------------
     for (auto& sub_sys : m_running_sys_set) {
         HKU_TRACE_IF(trace, "run: {}", sub_sys->name());
+        if (adjust) {
+            auto sg = sub_sys->getSG();
+            sg->startCycle(date, nextCycle);
+        }
+
         auto tr = sub_sys->runMoment(date);
         if (!tr.isNull()) {
             HKU_INFO_IF(trace, "[PF] {}", tr);
@@ -449,9 +419,13 @@ void Portfolio::_runMoment(const Datetime& date, bool adjust) {
 #endif
             // clang-format off
             HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
-            if (++count >= getParam<int>("trace_max_num")) {
-                HKU_INFO("+ ... ... more                                                                                   +");
-                HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
+            count++;
+            int trace_max_num = getParam<int>("trace_max_num");
+            if (count >= trace_max_num) {
+                if (count > trace_max_num) {
+                    HKU_INFO("+ ... ... more                                                                                   +");
+                    HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
+                }
                 break;
             }
             // clang-format on

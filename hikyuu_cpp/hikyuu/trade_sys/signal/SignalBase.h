@@ -84,6 +84,10 @@ public:
      */
     const KData& getTO() const;
 
+    void startCycle(const Datetime& start, const Datetime& end);
+    const Datetime& getCycleStart() const;
+    const Datetime& getCycleEnd() const;
+
     /** 复位操作 */
     void reset();
 
@@ -106,6 +110,9 @@ public:
     /** 子类计算接口，在setTO中调用 */
     virtual void _calculate() = 0;
 
+private:
+    void initParam();
+
 protected:
     string m_name;
     KData m_kdata;
@@ -117,6 +124,9 @@ protected:
     // 用 set 保存，以便获取是能保持顺序
     std::set<Datetime> m_buySig;
     std::set<Datetime> m_sellSig;
+
+    Datetime m_cycle_start{Datetime::min()};
+    Datetime m_cycle_end{Datetime::min()};
 
 //============================================
 // 序列化支持
@@ -216,6 +226,14 @@ inline bool SignalBase::shouldBuy(const Datetime& datetime) const {
 
 inline bool SignalBase::shouldSell(const Datetime& datetime) const {
     return m_sellSig.count(datetime) ? true : false;
+}
+
+inline const Datetime& SignalBase::getCycleStart() const {
+    return m_cycle_start;
+}
+
+inline const Datetime& SignalBase::getCycleEnd() const {
+    return m_cycle_end;
 }
 
 } /* namespace hku */

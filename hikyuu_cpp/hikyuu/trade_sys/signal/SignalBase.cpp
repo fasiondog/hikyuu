@@ -25,16 +25,20 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SignalPtr& sg) {
 }
 
 SignalBase::SignalBase() : m_name("SignalBase"), m_hold_long(false), m_hold_short(false) {
-    setParam<bool>("alternate", true);              // 买入卖出信号交替出现
-    setParam<bool>("support_borrow_stock", false);  // 支持发出空头信号
+    initParam();
 }
 
 SignalBase::SignalBase(const string& name) : m_name(name), m_hold_long(false), m_hold_short(false) {
-    setParam<bool>("alternate", true);
-    setParam<bool>("support_borrow_stock", false);
+    initParam();
 }
 
 SignalBase::~SignalBase() {}
+
+void SignalBase::initParam() {
+    setParam<bool>("cycle", false);                 // 仅在指定周期范围内计算
+    setParam<bool>("alternate", true);              // 买入卖出信号交替出现
+    setParam<bool>("support_borrow_stock", false);  // 支持发出空头信号
+}
 
 void SignalBase::baseCheckParam(const string& name) const {}
 void SignalBase::paramChanged() {}
@@ -66,7 +70,12 @@ SignalPtr SignalBase::clone() {
 void SignalBase::setTO(const KData& kdata) {
     HKU_IF_RETURN(m_kdata == kdata, void());
     m_kdata = kdata;
-    if (!kdata.empty()) {
+    bool cycle = getParam<bool>("cycle");
+    if (!cycle) {
+        m_cycle_start = Datetime::min();
+        m_cycle_end = Datetime::max();
+    }
+    if (!cycle && !kdata.empty()) {
         _calculate();
     }
 }
@@ -78,6 +87,17 @@ void SignalBase::reset() {
     m_hold_long = false;
     m_hold_short = false;
     _reset();
+}
+
+void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
+    HKU_IF_RETURN(!getParam<bool>("cycle"), void());
+    HKU_ASSERT(start != Null<Datetime>() && close != Null<Datetime>() && start < close);
+    HKU_CHECK(start >= m_cycle_end, "curretn start: {}, pre cycle end: {}", start, m_cycle_end);
+    m_cycle_start = start;
+    m_cycle_end = close;
+    if (!m_kdata.empty()) {
+        _calculate();
+    }
 }
 
 DatetimeList SignalBase::getBuySignal() const {

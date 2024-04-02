@@ -101,7 +101,7 @@ private:
     /** 运行前准备 */
     void _readyForRun();
 
-    void _runMoment(const Datetime& date, bool adjust);
+    void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust);
 
 protected:
     string m_name;
