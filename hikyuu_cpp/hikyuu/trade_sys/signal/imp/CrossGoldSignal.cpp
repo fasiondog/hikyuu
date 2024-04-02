@@ -28,16 +28,16 @@ SignalPtr CrossGoldSignal::_clone() {
     return SignalPtr(p);
 }
 
-void CrossGoldSignal::_calculate() {
-    Indicator fast = m_fast(m_kdata);
-    Indicator slow = m_slow(m_kdata);
+void CrossGoldSignal::_calculate(const KData& kdata) {
+    Indicator fast = m_fast(kdata);
+    Indicator slow = m_slow(kdata);
     HKU_ERROR_IF_RETURN(fast.size() != slow.size(), void(), "fast.size() != slow.size()");
 
     size_t discard = fast.discard() > slow.discard() ? fast.discard() : slow.discard();
     size_t total = fast.size();
     auto const* fastdata = fast.data();
     auto const* slowdata = slow.data();
-    auto const* ks = m_kdata.data();
+    auto const* ks = kdata.data();
     for (size_t i = discard + 1; i < total; ++i) {
         if (fastdata[i - 1] < slowdata[i - 1] && fastdata[i] > slowdata[i] &&
             fastdata[i - 1] < fastdata[i] && slowdata[i - 1] < slowdata[i]) {

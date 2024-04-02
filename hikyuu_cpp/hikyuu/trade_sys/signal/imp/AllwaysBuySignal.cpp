@@ -24,8 +24,7 @@ void AllwaysBuySignal::_checkParam(const string& name) const {
     }
 }
 
-void AllwaysBuySignal::_calculate() {
-    const auto& kdata = getTO();
+void AllwaysBuySignal::_calculate(const KData& kdata) {
     for (auto iter = kdata.cbegin(); iter != kdata.cend(); ++iter) {
         _addBuySignal(iter->datetime);
     }

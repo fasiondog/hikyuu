@@ -108,7 +108,7 @@ public:
     virtual SignalPtr _clone() = 0;
 
     /** 子类计算接口，在setTO中调用 */
-    virtual void _calculate() = 0;
+    virtual void _calculate(const KData&) = 0;
 
 private:
     void initParam();
@@ -196,7 +196,7 @@ public:                                    \
     virtual SignalPtr _clone() override {  \
         return SignalPtr(new classname()); \
     }                                      \
-    virtual void _calculate() override;
+    virtual void _calculate(const KData&) override;
 
 /**
  * 客户程序都应使用该指针类型，操作信号指示器

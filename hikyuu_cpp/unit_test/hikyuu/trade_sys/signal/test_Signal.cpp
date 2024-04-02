@@ -33,7 +33,7 @@ public:
         return SignalPtr(p);
     }
 
-    virtual void _calculate() {}
+    virtual void _calculate(const KData &) override {}
 
 private:
     int m_x;

@@ -26,7 +26,7 @@ class SignalPython(SignalBase):
         p._x = self._x
         return p
 
-    def _calculate(self):
+    def _calculate(self, kdata):
         self._add_buy_signal(Datetime(201201210000))
         self._add_sell_signal(Datetime(201201300000))
 
@@ -91,7 +91,7 @@ class SignalTest(unittest.TestCase):
         self.assertEqual(p_clone.get_param("test"), 30)
 
 
-def testSignal(self):
+def testSignal(self, kdata):
     self._add_buy_signal(Datetime(201201210000))
     self._add_sell_signal(Datetime(201201300000))
 

@@ -72,11 +72,28 @@ SignalPtr SignalBase::clone() {
 void SignalBase::setTO(const KData& kdata) {
     HKU_IF_RETURN(m_kdata == kdata, void());
     m_kdata = kdata;
+    HKU_IF_RETURN(kdata.empty(), void());
+
     bool cycle = getParam<bool>("cycle");
-    m_cycle_start = Datetime::min();
-    m_cycle_end = cycle ? Datetime::min() : Datetime::max();
-    if (!cycle && !kdata.empty()) {
-        _calculate();
+    m_cycle_start = kdata[0].datetime;
+
+    const KQuery& query = kdata.getQuery();
+    if (query.queryType() == KQuery::DATE) {
+        m_cycle_end = query.endDatetime();
+    } else {
+        size_t last_pos = kdata.lastPos();
+        const Stock& stk = kdata.getStock();
+        if (last_pos + 1 >= stk.getCount(query.kType())) {
+            m_cycle_end = Null<Datetime>();
+        } else {
+            KRecord krecord = stk.getKRecord(last_pos + 1, query.kType());
+            m_cycle_end = krecord.datetime;
+        }
+    }
+
+    KData cycle_kdata = kdata.getKData(m_cycle_start, m_cycle_end);
+    if (!cycle) {
+        _calculate(cycle_kdata);
     }
 }
 
@@ -95,8 +112,9 @@ void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
     HKU_CHECK(start >= m_cycle_end, "curretn start: {}, pre cycle end: {}", start, m_cycle_end);
     m_cycle_start = start;
     m_cycle_end = close;
-    if (!m_kdata.empty()) {
-        _calculate();
+    KData kdata = m_kdata.getKData(start, close);
+    if (!kdata.empty()) {
+        _calculate(kdata);
     }
 }
 
