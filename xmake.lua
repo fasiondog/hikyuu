@@ -96,7 +96,7 @@ add_rules("mode.debug", "mode.release")
 if not is_plat("windows") then add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan") end
 
 -- version
-set_version("1.3.5", {build = "%Y%m%d%H%M"})
+set_version("2.0.0", {build = "%Y%m%d%H%M"})
 
 local level = get_config("log_level")
 if is_mode("debug") then

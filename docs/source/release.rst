@@ -1,6 +1,42 @@
 版本发布说明
 =======================
 
+2.0.0 - 2024年4月3日
+-------------------------
+
+1. 新增特性
+    - 新增 MF 多因子组件，用于时间截面对各标的排序评分，重新整理 PF(投资组合)、SE(选股算法)。从投资组合(PF)--截面评分(MF)--选股过滤(SE)--系统策略(SYS)--择时(SG)--资金管理(MM)--止损(ST)/止盈(TP)--盈利目标(PG) 全链条的交易组件化。
+    - 新增指标 ZBOND10（10年期国债收益率用于计算夏普比例）、SPEARMAN（秩相关系数）、IC（信息系数）、ICIR（信息比率）
+    - 新增复权类指标（EQUAL_FORWARD 等）, 方便需要复权数据的指标计算
+    - python 中 PF、SYS 增加 performance 方法，直接查看系统绩效
+    - 新增 concat_to_df 将多个指标数据合并为 pandas DataFrame，方便其他使用 pandas 的工具包进一步处理
+    - 所有系统部件及指标支持参数变更时的动态检查
+
+2. 其他优化与调整
+    - python 中增强系统部件快速创建方法直接支持带有私有属性的 python 继承实例进行 clone，从而在 c++ 中调用
+    - ALIGN 指标 增加 “fill_null” 参数，控制对齐填充（填充 nan 值 或使用最近数据进行填充）
+    - System reset/clone 改为依据部件共享属性进行实际操作
+    - 优化 C++ log 输出到 python 环境的交互
+    - StockManager、Block、MF 可以直接通过过滤函数进行过滤获取相关证券
+    - python 中改进 CLOSE/OPEN/HIGH/LOW/AMO/VOL，使其在公式中不再必须要括号
+    - Indicator 增加 equal/isSame 方法，简化一些测试代码
+    - Performance 统计结果按顺序输出
+    - 获取仓库组件的 get_part 方法，不用必须指定参数名
+    - 优化 TradeManager 获取资金曲线相关方法及其他 python 引入调整
+    - 清理 C++ serialization 头文件包含及 cppcheck 静态检查信息
+    - MYSQL_OPT_RECONNECT 兼容
+    - SpendTimer 改输出到 std::cout ，以便 jupyter 可以捕获输出
+
+SpendTimer 改输出到 std::cout ，以便 jupyter 可以捕获输出
+
+3. 缺陷修复
+    - fixed 建stock.db时候没包括历史退市的股票
+    - fixed tdx本地数据导入问题
+    - fixed low_precision 下python部分测试用例
+    - fixed python 日志目录创建
+    - fixed get_trans_list 数据错误
+
+
 1.3.5 - 2024年2月29日
 -------------------------
 

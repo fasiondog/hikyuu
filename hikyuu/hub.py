@@ -324,6 +324,7 @@ class HubManager(metaclass=SingletonType):
             'af': 'part/af',
             'cn': 'part/cn',
             'ev': 'part/ev',
+            'mf': 'part/mf',
             'mm': 'part/mm',
             'pg': 'part/pg',
             'se': 'part/se',
@@ -405,7 +406,7 @@ class HubManager(metaclass=SingletonType):
         name_parts = name.split('.')
         checkif(
             len(name_parts) < 2
-            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys', 'ind', 'other')),
+            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mf', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys', 'ind', 'other')),
             name, PartNameError
         )
 
