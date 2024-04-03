@@ -16,7 +16,7 @@ pip 安装 Hikyuu 后，可在命令行终端中执行 hikyuutdx 命令，启动
 
 .. note::
 
-    如在命令行终端中无法执行 hikyuutdx 命令，请到 python 安装目录下的 Scripts 子目录中选择该执行文件（HikyuuTDX.exe）。
+    如在命令行终端中无法执行 hikyuutdx 命令，请到 python 安装目录下的 Scripts （通常是安装python时没有将该路径放入系统 PATH 路径中）子目录中选择该执行文件（HikyuuTDX.exe）。如果还是不行，可以到 python/Lib/site-packages 下找到 hikyuu 的安装目录，在其下的 gui 目录中有 HikyuuTdx.py, 可以从命令行终端中直接执行 python HikyuuTdx.py 执行观察报错信息。
 
 如不希望使用 GUI 图形界面下载，可在命令行终端中执行 importdata 命令，如下图所示：
 
