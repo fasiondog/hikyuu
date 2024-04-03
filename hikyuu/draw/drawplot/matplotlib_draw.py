@@ -755,7 +755,7 @@ def sys_performance(sys, ref_stk=None):
     funds_list = sys.tm.get_funds_list(ref_dates)
     funds = [f.total_assets for f in funds_list]
     funds = VALUE(funds)
-    funds_return = [f.total_assets / f.total_base for f in funds_list]
+    funds_return = [f.total_assets / f.total_base if f.total_base != 0.0 else None for f in funds_list]
     funds_return = VALUE(funds_return)
     funds_return.name = "系统累积收益率"
     ref_return = ROCR(ref_k.close, 0)
