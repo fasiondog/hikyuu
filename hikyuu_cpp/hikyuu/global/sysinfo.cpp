@@ -28,10 +28,6 @@ std::atomic<int> g_latest_version{0};
 std::atomic_bool g_runningInPython{false};  // 是否是在 python 中运行
 std::atomic_bool g_pythonInJupyter{false};  // python 是否为交互模式
 
-boost::uuids::uuid g_uid;
-std::string g_feedback_host;
-uint64_t g_feedback_port;
-
 bool HKU_API runningInPython() {
     return g_runningInPython;
 }
@@ -76,13 +72,13 @@ std::string getVersionWithGit() {
 }
 
 // cppcheck-suppress constParameterReference
-static bool readUUID() {
+static bool readUUID(boost::uuids::uuid& out) {
     std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
     FILE* fp = fopen(filename.c_str(), "rb");
     HKU_IF_RETURN(!fp, false);
 
     bool ret = true;
-    if (16 != fread((void*)g_uid.data, 1, 16, fp)) {
+    if (16 != fread((void*)out.data, 1, 16, fp)) {
         ret = false;
     }
 
@@ -90,21 +86,22 @@ static bool readUUID() {
     return ret;
 }
 
-static void saveUUID() {
+static void saveUUID(const boost::uuids::uuid& uid) {
     std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
     FILE* fp = fopen(filename.c_str(), "wb");
     HKU_IF_RETURN(!fp, void());
 
-    g_uid = boost::uuids::random_generator()();
-    fwrite(g_uid.data, 16, 1, fp);
+    fwrite(uid.data, 16, 1, fp);
     fclose(fp);
 }
 
 void sendFeedback() {
     std::thread t([] {
         try {
-            if (!readUUID()) {
-                saveUUID();
+            boost::uuids::uuid uid;
+            if (!readUUID(uid)) {
+                uid = boost::uuids::random_generator()();
+                saveUUID(uid);
             }
 
             NodeClient client(FEEDBACK_SERVER_ADDR);
@@ -113,15 +110,15 @@ void sendFeedback() {
             json req, res;
             req["cmd"] = 2;
             client.post(req, res);
-            g_feedback_host = res["host"].get<std::string>();
-            g_feedback_port = res["port"].get<uint64_t>();
+            std::string host = res["host"].get<std::string>();
+            uint64_t port = res["port"].get<uint64_t>();
             g_latest_version = res.contains("last_version") ? res["last_version"].get<int>() : 0;
             client.close();
 
-            client.setServerAddr(fmt::format("tcp://{}:{}", g_feedback_host, g_feedback_port));
+            client.setServerAddr(fmt::format("tcp://{}:{}", host, port));
             client.dial();
             req["cmd"] = 1;
-            req["uid"] = boost::uuids::to_string(g_uid);
+            req["uid"] = boost::uuids::to_string(uid);
             req["part"] = "hikyuu";
             req["version"] = HKU_VERSION;
             req["build"] = fmt::format("{}", HKU_VERSION_BUILD);
@@ -140,9 +137,19 @@ void sendFeedback() {
 void sendPythonVersionFeedBack(int major, int minor, int micro) {
     std::thread t([=]() {
         try {
-            NodeClient client(fmt::format("tcp://{}:{}", g_feedback_host, g_feedback_port));
+            NodeClient client(FEEDBACK_SERVER_ADDR);
             client.dial();
+
             json req, res;
+            req["cmd"] = 2;
+            client.post(req, res);
+            std::string host = res["host"].get<std::string>();
+            uint64_t port = res["port"].get<uint64_t>();
+            g_latest_version = res.contains("last_version") ? res["last_version"].get<int>() : 0;
+            client.close();
+
+            client.setServerAddr(fmt::format("tcp://{}:{}", host, port));
+            client.dial();
             req["cmd"] = 3;
             req["major"] = major;
             req["minor"] = minor;
