@@ -183,18 +183,20 @@ const IndicatorList& MultiFactorBase::getAllFactors() {
     return m_all_factors;
 }
 
-const ScoreRecordList& MultiFactorBase::getScore(const Datetime& d) {
+ScoreRecordList MultiFactorBase::getScores(const Datetime& d) {
     calculate();
+    ScoreRecordList ret;
     const auto iter = m_date_index.find(d);
-    HKU_CHECK(iter != m_date_index.cend(), "Could not find this date: {}", d);
-    return m_stk_factor_by_date[iter->second];
+    HKU_IF_RETURN(iter == m_date_index.cend(), ret);
+    ret = m_stk_factor_by_date[iter->second];
+    return ret;
 }
 
 ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, size_t end) {
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    const auto& cross = getScore(date);
+    const auto& cross = getScores(date);
     if (end == Null<size_t>() || end > cross.size()) {
         end = cross.size();
     }
@@ -211,7 +213,9 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    const auto& cross = getScore(date);
+    const auto& cross = getScores(date);
+    HKU_IF_RETURN(cross.empty(), ret);
+
     if (end == Null<size_t>() || end > cross.size()) {
         end = cross.size();
     }
@@ -237,7 +241,9 @@ ScoreRecordList MultiFactorBase::getScores(
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    const auto& cross = getScore(date);
+    const auto& cross = getScores(date);
+    HKU_IF_RETURN(cross.empty(), ret);
+
     if (end == Null<size_t>() || end > cross.size()) {
         end = cross.size();
     }

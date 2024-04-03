@@ -106,15 +106,15 @@ TEST_CASE("test_MF_EqualWeight") {
     auto ic2 = IC(MA(CLOSE()), stks, query, ref_stk, 1);
     CHECK_UNARY(ic1.equal(ic2));
 
-    CHECK_THROWS_AS(mf->getScore(Datetime(20111204)), std::exception);
-    auto cross = mf->getScore(Datetime(20111205));
+    CHECK_UNARY(mf->getScores(Datetime(20111204)).empty());
+    auto cross = mf->getScores(Datetime(20111205));
     CHECK_EQ(cross.size(), 2);
     CHECK_EQ(cross[0].stock, sm["sh600004"]);
     CHECK_EQ(cross[0].value, doctest::Approx(6.85));
     CHECK_EQ(cross[1].stock, sm["sh600005"]);
     CHECK_EQ(cross[1].value, doctest::Approx(3.13));
 
-    cross = mf->getScore(Datetime(20111206));
+    cross = mf->getScores(Datetime(20111206));
     CHECK_EQ(cross.size(), 2);
     CHECK_EQ(cross[0].stock, sm["sh600004"]);
     CHECK_EQ(cross[0].value, doctest::Approx(6.855));

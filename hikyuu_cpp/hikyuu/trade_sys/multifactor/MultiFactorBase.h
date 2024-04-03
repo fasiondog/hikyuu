@@ -80,7 +80,7 @@ public:
     const IndicatorList& getAllFactors();
 
     /** 获取指定日期截面的所有因子值，已经降序排列 */
-    const ScoreRecordList& getScore(const Datetime&);
+    ScoreRecordList getScores(const Datetime&);
 
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end = Null<size_t>());
 
