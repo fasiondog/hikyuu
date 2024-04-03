@@ -91,7 +91,8 @@ hku_data_files = []
 packages = ['hikyuu']
 for root, dirs, files in os.walk('hikyuu'):
     for p in dirs:
-        if p.find('__pycache__') < 0 and p.find('ipynb_checkpoints') < 0 and p.find('.virtual_documents') < 0:
+        if p.find('__pycache__') < 0 and p.find('ipynb_checkpoints') < 0 \
+                and p.find('virtual_documents') < 0 and p.find('idea') < 0 and p.find('venv') < 0:
             packages.append(f'{root}/{p}')
 
 setup(
