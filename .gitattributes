@@ -1,6 +1,6 @@
 *.h linguist-language=C++
 *.cpp linguist-language=C++
-*.py linguist-language=C++
+*.py linguist-language=python
 *.html linguist-language=C++
 *.mod linguist-language=C++
 *.ipynb linguist-language=C++
