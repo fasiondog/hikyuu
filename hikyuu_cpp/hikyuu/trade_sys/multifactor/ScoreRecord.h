@@ -16,7 +16,7 @@ struct HKU_API ScoreRecord {
     typedef Indicator::value_t value_t;
 
     Stock stock;
-    value_t value;
+    value_t value{0.0};
 
     ScoreRecord() = default;
     ScoreRecord(const Stock& stock_, value_t value_);
@@ -29,6 +29,7 @@ struct HKU_API ScoreRecord {
 };
 
 typedef vector<ScoreRecord> ScoreRecordList;
+typedef vector<ScoreRecord> ScoreList;
 
 HKU_API std::ostream& operator<<(std::ostream& out, const ScoreRecord& td);
 

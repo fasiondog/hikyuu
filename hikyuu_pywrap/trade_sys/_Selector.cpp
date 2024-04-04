@@ -25,14 +25,13 @@ public:
         PYBIND11_OVERLOAD_PURE(void, SelectorBase, _calculate, );
     }
 
-    SystemList getSelectedOnOpen(Datetime date) override {
-        PYBIND11_OVERLOAD_PURE_NAME(SystemList, SelectorBase, "get_selected_on_open",
-                                    getSelectedOnOpen, date);
-    }
-
-    SystemList getSelectedOnClose(Datetime date) override {
-        PYBIND11_OVERLOAD_PURE_NAME(SystemList, SelectorBase, "get_selected_on_close",
-                                    getSelectedOnClose, date);
+    SystemWeightList getSelected(Datetime date) override {
+        // PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected", getSelected,
+        //                             date);
+        auto self = py::cast(this);
+        py::sequence py_ret = self.attr("get_selected")(date);
+        auto c_ret = python_list_to_vector<SystemWeight>(py_ret);
+        return c_ret;
     }
 
     bool isMatchAF(const AFPtr& af) override {
@@ -41,12 +40,22 @@ public:
 };
 
 void export_Selector(py::module& m) {
+    py::class_<SystemWeight>(m, "SystemWeight",
+                             "系统权重系数结构，在资产分配时，指定对应系统的资产占比系数")
+      .def(py::init<>())
+      .def(py::init<const SystemPtr&, price_t>())
+      .def("__str__", to_py_str<SystemWeight>)
+      .def("__repr__", to_py_str<SystemWeight>)
+      .def_readwrite("sys", &SystemWeight::sys, "对应的 System 实例")
+      .def_readwrite("weight", &SystemWeight::weight)
+
+        DEF_PICKLE(SystemWeight);
+
     py::class_<SelectorBase, SEPtr, PySelectorBase>(
       m, "SelectorBase",
       R"(选择器策略基类，实现标的、系统策略的评估和选取算法，自定义选择器策略子类接口：
 
-    - get_selected_on_open - 【必须】获取指定时刻开盘时选择的系统实例列表
-    - get_selected_on_close - 【必须】获取指定时刻收盘时选择的系统实例列表
+    - get_selected - 【必须】获取指定时刻选择的系统实例列表
     - _calculate - 【必须】计算接口
     - _reset - 【可选】重置私有属性
     - _clone - 【必须】克隆接口)")
@@ -97,8 +106,13 @@ void export_Selector(py::module& m) {
     :param Stock stock: 加入的初始标的
     :param System sys: 系统策略原型)")
 
-      .def("add_stock_list", &SelectorBase::addStockList, py::arg("stk_list"), py::arg("sys"),
-           R"(add_stock_list(self, stk_list, sys)
+      .def(
+        "add_stock_list",
+        [](SelectorBase& self, py::sequence stk_list, const SYSPtr& sys) {
+            self.addStockList(python_list_to_vector<Stock>(stk_list), sys);
+        },
+        py::arg("stk_list"), py::arg("sys"),
+        R"(add_stock_list(self, stk_list, sys)
 
     加入初始标的列表及其系统策略原型
 
@@ -118,19 +132,10 @@ void export_Selector(py::module& m) {
 
     :param AllocateFundsBase af: 资产分配算法)")
 
-      .def("get_selected_on_open", &SelectorBase::getSelectedOnOpen,
-           R"(get_selected_on_open(self, datetime)
+      .def("get_selected", &SelectorBase::getSelected,
+           R"(get_selected(self, datetime)
 
-    【重载接口】获取指定时刻开盘时选取的系统实例
-
-    :param Datetime datetime: 指定时刻
-    :return: 选取的系统实例列表
-    :rtype: SystemList)")
-
-      .def("get_selected_on_close", &SelectorBase::getSelectedOnClose,
-           R"(get_selected_on_close(self, datetime)
-
-    【重载接口】获取指定时刻收盘时选取的系统实例
+    【重载接口】获取指定时刻选取的系统实例
 
     :param Datetime datetime: 指定时刻
     :return: 选取的系统实例列表
@@ -157,4 +162,36 @@ void export_Selector(py::module& m) {
     :param list stk_list: 初始划定的标的
     :param System sys: 系统策略原型
     :return: SE选择器实例)");
+
+    m.def("SE_MultiFactor", py::overload_cast<const MFPtr&, int>(SE_MultiFactor), py::arg("mf"),
+          py::arg("topn") = 10);
+    m.def(
+      "SE_MultiFactor",
+      [](const py::sequence& inds, const py::sequence& stks, const KQuery& query, int topn,
+         int ic_n, int ic_rolling_n, const py::object& ref_stk, const string& mode) {
+          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
+          StockList c_stks = python_list_to_vector<Stock>(stks);
+          Stock c_ref_stk = ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>();
+          return SE_MultiFactor(c_inds, c_stks, query, topn, ic_n, ic_rolling_n, c_ref_stk, mode);
+      },
+      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("topn") = 10, py::arg("ic_n") = 5,
+      py::arg("ic_rolling_n") = 120, py::arg("ref_stk") = py::none(),
+      py::arg("mode") = "MF_ICIRWeight",
+      R"(SE_MultiFactor
+
+    创建基于多因子评分的选择器，两种创建方式
+
+    - 直接指定 MF:
+      :param MultiFactorBase mf: 直接指定的多因子合成算法
+      :param int topn: 只选取时间截面中前 topn 个系统
+
+    - 参数直接创建:
+      :param sequense(Indicator) inds: 原始因子列表
+      :param sequense(stock) stks: 计算证券列表
+      :param Query query: 日期范围
+      :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+      :param int ic_n: 默认 IC 对应的 N 日收益率
+      :param int ic_rolling_n: IC 滚动周期
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
+      )");
 }

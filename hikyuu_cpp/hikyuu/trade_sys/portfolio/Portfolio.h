@@ -19,7 +19,7 @@ namespace hku {
  * @ingroup Portfolio
  */
 class HKU_API Portfolio : public enable_shared_from_this<Portfolio> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     /** 默认构造函数 */
@@ -55,7 +55,7 @@ public:
      * @param query 查询条件
      * @param force 是否强制重计算
      */
-    void run(const KQuery& query, bool force = false);
+    void run(const KQuery& query, int adjust_cycle = 1, bool force = false);
 
     /** 修改查询条件 */
     void setQuery(const KQuery& query);
@@ -90,39 +90,37 @@ public:
     PortfolioPtr clone();
 
     /** 获取所有原型系统列表，与 SE 同 */
-    const SystemList& getProtoSystemList() const;
+    const SystemList& getSystemList() const;
 
     /** 获取所有实际运行的系统列表，与 SE 同 */
     const SystemList& getRealSystemList() const;
 
 private:
-    /** 运行前准备 */
-    bool _readyForRun();
+    void initParam();
 
-    void _runMoment(const Datetime& datetime);
-    void _runMomentOnOpen(const Datetime& datetime);
-    void _runMomentOnClose(const Datetime& datetime);
+    /** 运行前准备 */
+    void _readyForRun();
+
+    void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust);
 
 protected:
     string m_name;
     TMPtr m_tm;
-    TMPtr m_shadow_tm;
+    TMPtr m_cash_tm;  // 仅仅负责内部资金的管理（即只需要 checkout 到子账号, 从账户checkin现金）
     SEPtr m_se;
     AFPtr m_af;
 
     KQuery m_query;         // 关联的查询条件
-    bool m_is_ready;        // 是否已做好运行准备
     bool m_need_calculate;  // 是否需要计算标志
 
-    SystemList m_pro_sys_list;   // 所有原型系统列表，来自 SE
     SystemList m_real_sys_list;  // 所有实际运行的子系统列表
 
     // 用于中间计算的临时数据
-    std::unordered_set<System*> m_running_sys_set;  // 当前仍在运行的子系统集合
-    std::list<SYSPtr> m_running_sys_list;           // 当前仍在运行的子系统列表
-    SystemList m_tmp_selected_list_on_open;
-    SystemList m_tmp_selected_list_on_close;
-    SystemList m_tmp_will_remove_sys;
+    std::unordered_set<SYSPtr> m_running_sys_set;
+    SystemList m_dlist_sys_list;  // 因证券退市，无法执行买入的系统（资产全部损失）
+    SystemWeightList m_delay_adjust_sys_list;  // 延迟调仓卖出的系统列表
+    SystemWeightList m_tmp_selected_list;
+    SystemWeightList m_tmp_will_remove_sys;
 
 //============================================
 // 序列化支持
@@ -135,11 +133,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_tm);
-        ar& BOOST_SERIALIZATION_NVP(m_shadow_tm);
+        ar& BOOST_SERIALIZATION_NVP(m_cash_tm);
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_is_ready);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
     }
 
@@ -148,11 +145,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_tm);
-        ar& BOOST_SERIALIZATION_NVP(m_shadow_tm);
+        ar& BOOST_SERIALIZATION_NVP(m_cash_tm);
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_is_ready);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
     }
 
@@ -220,10 +216,6 @@ inline void Portfolio::setAF(const AFPtr& af) {
         m_af = af;
         m_need_calculate = true;
     }
-}
-
-inline const SystemList& Portfolio::getProtoSystemList() const {
-    return m_pro_sys_list;
 }
 
 inline const SystemList& Portfolio::getRealSystemList() const {

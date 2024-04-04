@@ -19,38 +19,58 @@ vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const SystemList& 
     size_t total = sys_list.size();
     HKU_IF_RETURN(0 == total, result);
 
-    MQStealThreadPool tg;
-    vector<std::future<AnalysisSystemWithBlockOut>> tasks;
-
-    for (size_t i = 0; i < total; i++) {
+    result = parallel_for_index(0, total, [&](size_t i) {
         const auto& sys = sys_list[i];
         const auto& stk = stk_list[i];
+
+        AnalysisSystemWithBlockOut ret;
         if (!sys || stk.isNull()) {
-            continue;
+            return ret;
         }
 
-        tasks.emplace_back(tg.submit([&sys, &stk, &query]() {
-            AnalysisSystemWithBlockOut ret;
+        try {
+            sys->run(stk, query);
+            Performance per;
+            per.statistics(sys->getTM());
+            ret.market_code = stk.market_code();
+            ret.name = stk.name();
+            ret.values = per.values();
+        } catch (const std::exception& e) {
+            HKU_ERROR(e.what());
+        } catch (...) {
+            HKU_ERROR("Unknown error!");
+        }
+        return ret;
+    });
+
+    return result;
+}
+
+vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const StockList& stk_list,
+                                                              const KQuery& query,
+                                                              const SystemPtr& pro_sys) {
+    HKU_CHECK(pro_sys, "pro_sys is null!");
+
+    return parallel_for_range(0, stk_list.size(), [=](const range_t& range) {
+        vector<AnalysisSystemWithBlockOut> ret;
+        auto sys = pro_sys->clone();
+        Performance per;
+        AnalysisSystemWithBlockOut out;
+        for (size_t i = range.first; i < range.second; i++) {
             try {
+                auto stk = stk_list[i];
                 sys->run(stk, query);
-                Performance per;
                 per.statistics(sys->getTM());
-                ret.market_code = stk.market_code();
-                ret.name = stk.name();
-                ret.values = per.values();
+                out.market_code = stk.market_code();
+                out.name = stk.name();
+                out.values = per.values();
+                ret.emplace_back(std::move(out));
             } catch (const std::exception& e) {
                 HKU_ERROR(e.what());
-            } catch (...) {
-                HKU_ERROR("Unknown error!");
             }
-            return ret;
-        }));
-    }
-
-    for (auto& task : tasks) {
-        result.emplace_back(task.get());
-    }
-    return result;
+        }
+        return ret;
+    });
 }
 
 }  // namespace hku

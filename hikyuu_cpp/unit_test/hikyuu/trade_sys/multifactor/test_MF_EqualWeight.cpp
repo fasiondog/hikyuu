@@ -14,7 +14,7 @@
 #include <hikyuu/indicator/crt/IC.h>
 #include <hikyuu/indicator/crt/ROCR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
-#include <hikyuu/trade_sys/factor/crt/MF_EqualWeight.h>
+#include <hikyuu/trade_sys/multifactor/crt/MF_EqualWeight.h>
 
 using namespace hku;
 
@@ -78,6 +78,9 @@ TEST_CASE("test_MF_EqualWeight") {
     CHECK_THROWS_AS(MF_EqualWeight(src_inds, {sm["sh600004"]}, KQuery(-2), ref_stk),
                     std::exception);
 
+    /** @arg 输入非法 ic_n */
+    CHECK_THROWS_AS(MF_EqualWeight(src_inds, stks, KQuery(-2), ref_stk, 0), std::exception);
+
     /** @arg 临界状态, 原始因子数量为1, 证券数量2, 数据长度为2 */
     src_inds = {MA(CLOSE())};
     stks = {sm["sh600005"], sm["sh600004"]};
@@ -100,18 +103,18 @@ TEST_CASE("test_MF_EqualWeight") {
     CHECK_UNARY(ind1.equal(ind2));
     CHECK_UNARY(all_factors[0].equal(ind2));
     auto ic1 = mf->getIC();
-    auto ic2 = IC(MA(CLOSE()), stks, query, 1, ref_stk);
+    auto ic2 = IC(MA(CLOSE()), stks, query, ref_stk, 1);
     CHECK_UNARY(ic1.equal(ic2));
 
-    CHECK_THROWS_AS(mf->getScore(Datetime(20111204)), std::exception);
-    auto cross = mf->getScore(Datetime(20111205));
+    CHECK_UNARY(mf->getScores(Datetime(20111204)).empty());
+    auto cross = mf->getScores(Datetime(20111205));
     CHECK_EQ(cross.size(), 2);
     CHECK_EQ(cross[0].stock, sm["sh600004"]);
     CHECK_EQ(cross[0].value, doctest::Approx(6.85));
     CHECK_EQ(cross[1].stock, sm["sh600005"]);
     CHECK_EQ(cross[1].value, doctest::Approx(3.13));
 
-    cross = mf->getScore(Datetime(20111206));
+    cross = mf->getScores(Datetime(20111206));
     CHECK_EQ(cross.size(), 2);
     CHECK_EQ(cross[0].stock, sm["sh600004"]);
     CHECK_EQ(cross[0].value, doctest::Approx(6.855));

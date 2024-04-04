@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/trade_sys/factor/build_in.h>
+#include <hikyuu/trade_sys/multifactor/build_in.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -16,6 +16,7 @@ class PyMultiFactor : public MultiFactorBase {
 
 public:
     using MultiFactorBase::MultiFactorBase;
+    PyMultiFactor(const MultiFactorBase& base) : MultiFactorBase(base) {}
 
     IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) {
         // PYBIND11_OVERLOAD_PURE_NAME(IndicatorList, MultiFactorBase, "_calculate", _calculate,
@@ -37,7 +38,6 @@ void export_MultiFactor(py::module& m) {
       .def_readwrite("stock", &ScoreRecord::stock, "时间")
       .def_readwrite("value", &ScoreRecord::value, "时间");
 
-    size_t null_size = Null<size_t>();
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",
                                                                R"(市场环境判定策略基类
 
@@ -47,6 +47,7 @@ void export_MultiFactor(py::module& m) {
     - _clone : 【必须】克隆接口
     - _reset : 【可选】重载私有变量)")
       .def(py::init<>())
+      .def(py::init<const MultiFactorBase&>())
 
       .def("__str__", to_py_str<MultiFactorBase>)
       .def("__repr__", to_py_str<MultiFactorBase>)
@@ -120,11 +121,31 @@ void export_MultiFactor(py::module& m) {
       .def("clone", &MultiFactorBase::clone, "克隆操作")
 
       .def(
-        "get_score",
-        [](MultiFactorBase& self, const Datetime& date, size_t start, size_t end) {
-            return self.getScore(date, start, end);
+        "get_scores",
+        [](MultiFactorBase& self, const Datetime& date, size_t start, py::object end,
+           py::object filter) {
+            size_t cend = end.is_none() ? Null<size_t>() : end.cast<size_t>();
+            if (filter.is_none()) {
+                return self.getScores(date, start, cend, std::function<bool(const ScoreRecord&)>());
+            }
+            HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
+            py::object filter_func = filter.attr("__call__");
+            ScoreRecord sc;
+            try {
+                filter_func(sc);
+                return self.getScores(date, start, cend, [&](const ScoreRecord& score_) {
+                    return filter_func(score_).cast<bool>();
+                });
+            } catch (...) {
+                filter_func(date, sc);
+                return self.getScores(date, start, cend,
+                                      [&](const Datetime& date_, const ScoreRecord& score_) {
+                                          return filter_func(date_, score_).cast<bool>();
+                                      });
+            }
         },
-        py::arg("datet"), py::arg("start") = 0, py::arg("end") = null_size,
+        py::arg("date"), py::arg("start") = 0, py::arg("end") = py::none(),
+        py::arg("filter") = py::none(),
         R"(get_score(self, date[, start=0, end=Null])
 
     获取指定日期截面的所有因子值，已经降序排列，相当于各证券日期截面评分。
@@ -132,6 +153,7 @@ void export_MultiFactor(py::module& m) {
     :param Datetime date: 指定日期
     :param int start: 取当日排名开始
     :param int end: 取当日排名结束(不包含本身)
+    :param function func: (ScoreRecord)->bool 或 (Datetime, ScoreRecord)->bool 为原型的可调用对象
     :rtype: ScoreRecordList)")
 
       .def("get_all_scores", &MultiFactorBase::getAllScores, py::return_value_policy::copy,
@@ -139,19 +161,24 @@ void export_MultiFactor(py::module& m) {
 
     获取所有日期的所有评分，长度与参考日期相同
 
-    :return: 每日 ScoreRecordList 结果的 list)")
+    :return: ScoreRecordList)")
+
+      .def("get_all_src_factors", &MultiFactorBase::getAllSrcFactors)
 
         DEF_PICKLE(MultiFactorPtr);
 
     m.def(
       "MF_EqualWeight",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query,
-         const Stock& ref_stk, int ic_n) {
+         const py::object& ref_stk, int ic_n) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = python_list_to_vector<Stock>(stks);
-          return MF_EqualWeight(c_inds, c_stks, query, ref_stk, ic_n);
+          return MF_EqualWeight(c_inds, c_stks, query,
+                                ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(),
+                                ic_n);
       },
-      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("ic_n") = 5,
+      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
+      py::arg("ic_n") = 5,
       R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5])
 
     等权重合成因子
@@ -159,21 +186,22 @@ void export_MultiFactor(py::module& m) {
     :param sequense(Indicator) inds: 原始因子列表
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :rtype: MultiFactor)");
 
     m.def(
       "MF_ICWeight",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query,
-         const Stock& ref_stk, int ic_n, int ic_rolling_n) {
-          // MF_EqualWeight
+         const py::object& ref_stk, int ic_n, int ic_rolling_n) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = python_list_to_vector<Stock>(stks);
-          return MF_ICWeight(c_inds, c_stks, query, ref_stk, ic_n);
+          return MF_ICWeight(c_inds, c_stks, query,
+                             ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(), ic_n,
+                             ic_rolling_n);
       },
-      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("ic_n") = 5,
-      py::arg("ic_rolling_n") = 120,
+      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
+      py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
       R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
     滚动IC权重合成因子
@@ -181,7 +209,7 @@ void export_MultiFactor(py::module& m) {
     :param sequense(Indicator) inds: 原始因子列表
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券
+    :param Stock ref_stk:  (未指定时，默认为 sh000300 沪深300)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :rtype: MultiFactor)");
@@ -189,14 +217,15 @@ void export_MultiFactor(py::module& m) {
     m.def(
       "MF_ICIRWeight",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query,
-         const Stock& ref_stk, int ic_n, int ic_rolling_n) {
-          // MF_EqualWeight
+         const py::object& ref_stk, int ic_n, int ic_rolling_n) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = python_list_to_vector<Stock>(stks);
-          return MF_ICIRWeight(c_inds, c_stks, query, ref_stk, ic_n);
+          return MF_ICIRWeight(c_inds, c_stks, query,
+                               ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(),
+                               ic_n, ic_rolling_n);
       },
-      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("ic_n") = 5,
-      py::arg("ic_rolling_n") = 120,
+      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
+      py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
       R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
     滚动ICIR权重合成因子
@@ -204,7 +233,7 @@ void export_MultiFactor(py::module& m) {
     :param sequense(Indicator) inds: 原始因子列表
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :rtype: MultiFactor)");

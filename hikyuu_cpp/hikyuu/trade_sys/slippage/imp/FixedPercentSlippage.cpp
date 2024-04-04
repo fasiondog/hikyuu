@@ -19,6 +19,13 @@ FixedPercentSlippage::FixedPercentSlippage() : SlippageBase("FixedPercent") {
 
 FixedPercentSlippage::~FixedPercentSlippage() {}
 
+void FixedPercentSlippage::_checkParam(const string& name) const {
+    if ("p" == name) {
+        double p = getParam<double>(name);
+        HKU_ASSERT(p >= 0.0 && p < 1.0);
+    }
+}
+
 price_t FixedPercentSlippage ::getRealBuyPrice(const Datetime& datetime, price_t price) {
     return price * (1 + getParam<double>("p"));
 }

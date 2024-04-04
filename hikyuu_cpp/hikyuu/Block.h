@@ -87,7 +87,8 @@ public:
     }
 
     /** 获取板块下所有证券 */
-    vector<Stock> getAllStocks() const;
+    StockList getStockList(
+      std::function<bool(const Stock&)>&& filter = std::function<bool(const Stock&)>()) const;
 
     /** 加入指定证券 */
     bool add(const Stock& stock);

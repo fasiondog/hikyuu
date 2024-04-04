@@ -52,8 +52,14 @@ static py::dict combinate_ind_analysis(const Stock& stk, const KQuery& query, Tr
         c_sell_inds.emplace_back(sell_inds[i].cast<Indicator>());
     }
 
+    std::map<std::string, Performance> pers;
+    {
+        OStreamToPython guard(false);
+        py::gil_scoped_release release;
+        pers = combinateIndicatorAnalysis(stk, query, tm, sys, c_buy_inds, c_sell_inds, n);
+    }
+
     py::dict result;
-    auto pers = combinateIndicatorAnalysis(stk, query, tm, sys, c_buy_inds, c_sell_inds, n);
     for (auto iter = pers.begin(); iter != pers.end(); ++iter) {
         result[iter->first.c_str()] = std::move(iter->second);
     }
@@ -74,8 +80,13 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
         c_sell_inds.emplace_back(sell_inds[i].cast<Indicator>());
     }
 
-    auto records =
-      combinateIndicatorAnalysisWithBlock(blk, query, tm, sys, c_buy_inds, c_sell_inds, n);
+    vector<CombinateAnalysisOutput> records;
+    {
+        OStreamToPython guard(false);
+        py::gil_scoped_release release;
+        records =
+          combinateIndicatorAnalysisWithBlock(blk, query, tm, sys, c_buy_inds, c_sell_inds, n);
+    }
 
     std::vector<py::list> tmp;
 
@@ -140,8 +151,10 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
 
     vector<AnalysisSystemWithBlockOut> records;
     {
+        OStreamToPython guard(false);
         py::gil_scoped_release release;
         records = analysisSystemList(sys_list, stk_list, query);
+        // records = analysisSystemList(stk_list, query, sys_proto);
     }
 
     Performance per;

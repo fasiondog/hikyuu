@@ -62,6 +62,16 @@ void KData::tocsv(const string& filename) {
     file.close();
 }
 
+KData KData::getKData(const Datetime& start, const Datetime& end) const {
+    const Stock& stk = getStock();
+    if (stk.isNull()) {
+        return KData();
+    }
+
+    const KQuery& query = getQuery();
+    return KData(stk, KQueryByDate(start, end, query.kType(), query.recoverType()));
+}
+
 Indicator KData::open() const {
     return OPEN(*this);
 }

@@ -17,9 +17,11 @@ class IRecover : public IndicatorImp {
 
 public:
     IRecover();
-    IRecover(int recoverType);
+    explicit IRecover(int recoverType);
     IRecover(const KData&, int recoverType);
     virtual ~IRecover();
+
+    virtual void _checkParam(const string& name) const override;
 
     static void checkInputIndicator(const Indicator& ind);
 };

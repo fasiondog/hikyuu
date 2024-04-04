@@ -33,8 +33,10 @@ IIc::IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk
 
 IIc::~IIc() {}
 
-bool IIc::check() {
-    return getParam<int>("n") >= 1;
+void IIc::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 1);
+    }
 }
 
 IndicatorImpPtr IIc::_clone() {
@@ -80,14 +82,8 @@ void IIc::_calculate(const Indicator& inputInd) {
     for (size_t i = 0; i < stk_count; i++) {
         auto k = m_stks[i].getKData(m_query);
         all_inds[i] = ALIGN(ind(k), ref_dates, fill_null);
-        if (all_inds[i].discard() > discard) {
-            discard = all_inds[i].discard();
-        }
         // 计算 n 日收益率，同时需要右移 n 位，即第 i 日的因子值和第 i + n 的收益率对应
         all_returns[i] = ALIGN(REF(ROCP(k.close(), n), n), ref_dates, fill_null);
-        if (all_returns[i].discard() > discard) {
-            discard = all_returns[i].discard();
-        }
     }
 
     m_discard = discard;
@@ -107,15 +103,22 @@ void IIc::_calculate(const Indicator& inputInd) {
         auto ic = hku::SPEARMAN(a, b, stk_count);
         dst[i] = ic[ic.size() - 1];
     }
+
+    for (size_t i = m_discard; i < days_total; i++) {
+        if (!std::isnan(dst[i])) {
+            m_discard = i;
+            break;
+        }
+    }
 }
 
-Indicator HKU_API IC(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk) {
+Indicator HKU_API IC(const StockList& stks, const KQuery& query, const Stock& ref_stk, int n) {
     return Indicator(make_shared<IIc>(stks, query, n, ref_stk));
 }
 
-Indicator HKU_API IC(const Block& blk, const KQuery& query, int n, const Stock& ref_stk) {
-    StockList stks = blk.getAllStocks();
-    return IC(stks, query, n, ref_stk);
+Indicator HKU_API IC(const Block& blk, const KQuery& query, const Stock& ref_stk, int n) {
+    StockList stks = blk.getStockList();
+    return IC(stks, query, ref_stk, n);
 }
 
 }  // namespace hku

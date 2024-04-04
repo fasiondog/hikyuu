@@ -50,7 +50,7 @@
 
 .. py:function:: MM_FixedCapital([capital = 10000.0])
 
-    固定资本资金管理策略
+    固定资本资金管理策略, 即控制每次买入投入的总资金
 
     :param float capital: 固定资本单位
     :return: 资金管理策略实例

@@ -435,6 +435,14 @@ K线数据
         获取关联的Stock
     
         :rtype: Stock
+
+    .. py:method:: get_kdata()
+
+        通过当前 KData 获取一个保持数据类型、复权类型不变的新的 KData（注意，不是原 KData 的子集）
+
+        :param Datetime start: 新的起始日期
+        :param Datetime end: 新的结束日期
+        :rtype: KData
     
     .. py:method:: tocsv(filename)
     

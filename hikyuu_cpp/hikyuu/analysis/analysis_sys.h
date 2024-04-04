@@ -39,25 +39,8 @@ vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const SystemList& 
                                                               const StockList& stk_list,
                                                               const KQuery& query);
 
-template <class Container>
-inline vector<AnalysisSystemWithBlockOut> analysisSystemListWith(const Container& blk,
-                                                                 const KQuery& query,
-                                                                 const SystemPtr sys_proto) {
-    vector<AnalysisSystemWithBlockOut> result;
-    HKU_IF_RETURN(blk.size() == 0 || !sys_proto, result);
-
-    sys_proto->reset();
-    SystemList sys_list;
-    StockList stk_list;
-    for (const auto& stk : blk) {
-        if (!stk.isNull()) {
-            sys_list.emplace_back(std::move(sys_proto->clone()));
-            stk_list.emplace_back(stk);
-        }
-    }
-
-    result = analysisSystemList(sys_list, stk_list, query);
-    return result;
-}
+vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const StockList& stk_list,
+                                                              const KQuery& query,
+                                                              const SystemPtr& pro_sys);
 
 }  // namespace hku

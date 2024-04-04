@@ -76,7 +76,6 @@ TEST_CASE("test_SYS_Simple_for_cn") {
     sys->setEV(ev1);
     sys->setCN(cn1);
 
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -135,7 +134,6 @@ TEST_CASE("test_SYS_Simple_for_cn") {
     sys->setEV(ev1);
     sys->setCN(cn2);
 
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -193,7 +191,6 @@ TEST_CASE("test_SYS_Simple_for_cn") {
     sys->setEV(ev1);
     sys->setCN(cn3);
 
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();
@@ -251,7 +248,6 @@ TEST_CASE("test_SYS_Simple_for_cn") {
     sys->setEV(ev1);
     sys->setCN(cn3);
 
-    CHECK_EQ(sys->readyForRun(), true);
     sys->run(stk, query);
     CHECK_NE(sys->getTM()->currentCash(), init_cash);
     tr_list = sys->getTM()->getTradeList();

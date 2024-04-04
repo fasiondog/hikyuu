@@ -47,12 +47,7 @@ TEST_CASE("test_VARP") {
     }
 
     /** @arg n = 1时 */
-    dev = VARP(ind, 1);
-    CHECK_EQ(dev.name(), "VARP");
-    CHECK_EQ(dev.size(), 15);
-    for (size_t i = 0; i < dev.size(); ++i) {
-        CHECK_UNARY(std::isnan(dev[i]));
-    }
+    CHECK_THROWS_AS(VARP(ind, 1), std::exception);
 
     /** @arg operator() */
     Indicator expect = VARP(ind, 10);

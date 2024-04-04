@@ -26,6 +26,14 @@ TwoLineEnvironment::TwoLineEnvironment(const Indicator& fast, const Indicator& s
 
 TwoLineEnvironment::~TwoLineEnvironment() {}
 
+void TwoLineEnvironment::_checkParam(const string& name) const {
+    if ("market" == name) {
+        string market = getParam<string>(name);
+        auto market_info = StockManager::instance().getMarketInfo(market);
+        HKU_CHECK(market_info != Null<MarketInfo>(), "Invalid market: {}", market);
+    }
+}
+
 EnvironmentPtr TwoLineEnvironment::_clone() {
     TwoLineEnvironment* ptr = new TwoLineEnvironment;
     ptr->m_fast = m_fast.clone();

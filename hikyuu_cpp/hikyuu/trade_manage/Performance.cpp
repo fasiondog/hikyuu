@@ -432,14 +432,6 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
                 continue;
             }
 
-            cur_iter = cur_position.begin();
-            for (; cur_iter != cur_position.end(); ++cur_iter) {
-                if (cur_iter->takeDatetime <= *day_iter) {
-                    hold = false;
-                    break;
-                }
-            }
-
             // 当前是空仓
             total_short_days++;
             if (pre_short) {

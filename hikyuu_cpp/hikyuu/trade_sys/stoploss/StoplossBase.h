@@ -21,11 +21,12 @@ namespace hku {
  * @ingroup Stoploss
  */
 class HKU_API StoplossBase : public enable_shared_from_this<StoplossBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     StoplossBase();
-    StoplossBase(const string& name);
+    explicit StoplossBase(const string& name);
+    StoplossBase(const StoplossBase&) = default;
     virtual ~StoplossBase();
 
     /** 获取名称 */

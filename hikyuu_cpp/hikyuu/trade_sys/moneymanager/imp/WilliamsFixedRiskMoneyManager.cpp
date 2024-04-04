@@ -21,8 +21,18 @@ WilliamsFixedRiskMoneyManager::WilliamsFixedRiskMoneyManager()
 
 WilliamsFixedRiskMoneyManager::~WilliamsFixedRiskMoneyManager() {}
 
-double WilliamsFixedRiskMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-                                                     price_t price, price_t risk, SystemPart from) {
+void WilliamsFixedRiskMoneyManager::_checkParam(const string& name) const {
+    if ("p" == name) {
+        double p = getParam<double>("p");
+        HKU_ASSERT(p > 0.0);
+    } else if ("max_loss" == name) {
+        price_t max_loss = getParam<price_t>("max_loss");
+        HKU_ASSERT(max_loss > 0.0);
+    }
+}
+
+double WilliamsFixedRiskMoneyManager::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+                                                    price_t price, price_t risk, SystemPart from) {
     price_t max_loss = getParam<price_t>("max_loss");
     HKU_WARN_IF_RETURN(max_loss <= 0.0, 0.0, "max_loss is zero!");
     return m_tm->cash(datetime, m_query.kType()) * getParam<double>("p") / max_loss;

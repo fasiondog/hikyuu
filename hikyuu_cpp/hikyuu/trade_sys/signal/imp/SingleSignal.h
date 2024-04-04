@@ -20,8 +20,9 @@ public:
     explicit SingleSignal(const Indicator& ind);
     virtual ~SingleSignal();
 
+    virtual void _checkParam(const string& name) const override;
     virtual SignalPtr _clone() override;
-    virtual void _calculate() override;
+    virtual void _calculate(const KData& kdata) override;
 
 private:
     Indicator m_ind;

@@ -29,6 +29,7 @@ from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
 
+from hikyuu import can_upgrade, get_last_version
 from hikyuu.data import hku_config_template
 from hikyuu.util import *
 
@@ -624,6 +625,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 self.escape_time_thread = None
                 self.start_import_pushButton.setEnabled(True)
                 self.import_detail_textEdit.append("导入完毕！")
+                if can_upgrade():
+                    self.import_detail_textEdit.append("========================================================")
+                    self.import_detail_textEdit.append(
+                        "新版本 ({}) 已发布，建议更新".format(get_last_version()))
+                    self.import_detail_textEdit.append("========================================================")
                 self.import_running = False
 
             elif msg_task_name == 'IMPORT_KDATA':

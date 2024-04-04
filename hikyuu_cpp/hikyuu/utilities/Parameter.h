@@ -126,7 +126,9 @@ public:
     }
 
     /** 获取参数个数 */
-    size_t size() const;
+    size_t size() const {
+        return m_params.size();
+    }
 
     /**
      * 获取指定参数的实际类型
@@ -348,9 +350,73 @@ public:                                                                     \
         return getParam<ValueType>(name);                                   \
     }
 
-inline size_t Parameter::size() const {
-    return m_params.size();
-}
+/**
+ * 支持自定义类参数检查及变化通知
+ * 子类需要实现重载以下虚函数接口:
+ *    virtual void _checkParam(const string& name) const
+ * 基类需要实现以下接口:
+ *    void baseCheckParam(const string& name)
+ *    void paramChanged()
+ * 另：python 中一般不需要引出 paramChanged/checkParam/_checkParam，python
+ * 类继承时可以自己在初始化时进行检查
+ */
+#define PARAMETER_SUPPORT_WITH_CHECK                                         \
+protected:                                                                   \
+    Parameter m_params;                                                      \
+    void paramChanged();                                                     \
+    void checkParam(const string& name) const {                              \
+        baseCheckParam(name);                                                \
+        _checkParam(name);                                                   \
+    }                                                                        \
+    virtual void _checkParam(const string& name) const {}                    \
+                                                                             \
+private:                                                                     \
+    void baseCheckParam(const string& name) const;                           \
+                                                                             \
+public:                                                                      \
+    const Parameter& getParameter() const {                                  \
+        return m_params;                                                     \
+    }                                                                        \
+                                                                             \
+    void setParameter(const Parameter& param) {                              \
+        m_params = param;                                                    \
+        for (auto iter = m_params.begin(); iter != m_params.end(); ++iter) { \
+            checkParam(iter->first);                                         \
+        }                                                                    \
+        paramChanged();                                                      \
+    }                                                                        \
+                                                                             \
+    bool haveParam(const string& name) const noexcept {                      \
+        return m_params.have(name);                                          \
+    }                                                                        \
+                                                                             \
+    template <typename ValueType>                                            \
+    void setParam(const string& name, const ValueType& value) {              \
+        m_params.set<ValueType>(name, value);                                \
+        checkParam(name);                                                    \
+        paramChanged();                                                      \
+    }                                                                        \
+                                                                             \
+    template <typename ValueType>                                            \
+    ValueType getParam(const string& name) const {                           \
+        return m_params.get<ValueType>(name);                                \
+    }                                                                        \
+                                                                             \
+    template <typename ValueType>                                            \
+    ValueType tryGetParam(const string& name, const ValueType& val) const {  \
+        return m_params.tryGet<ValueType>(name, val);                        \
+    }                                                                        \
+                                                                             \
+    template <typename ValueType>                                            \
+    ValueType getParamFromOther(const Parameter& other, const string& name,  \
+                                const ValueType& default_value) {            \
+        if (other.have(name)) {                                              \
+            setParam<ValueType>(name, other.get<ValueType>(name));           \
+        } else {                                                             \
+            setParam<ValueType>(name, default_value);                        \
+        }                                                                    \
+        return getParam<ValueType>(name);                                    \
+    }
 
 template <typename ValueType>
 ValueType Parameter::get(const string& name) const {

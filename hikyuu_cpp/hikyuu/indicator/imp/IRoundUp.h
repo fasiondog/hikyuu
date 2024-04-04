@@ -25,6 +25,7 @@ class IRoundUp : public IndicatorImp {
 public:
     IRoundUp();
     virtual ~IRoundUp();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

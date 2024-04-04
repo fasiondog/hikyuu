@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2024 hikyuu.org
  *
- *  Created on: 2024-03-12
+ *  Created on: 2024-04-01
  *      Author: fasiondog
  */
 
@@ -9,4 +9,8 @@
 
 #include "../SignalBase.h"
 
-namespace hku {}
+namespace hku {
+
+SignalPtr HKU_API SG_Cycle();
+
+}

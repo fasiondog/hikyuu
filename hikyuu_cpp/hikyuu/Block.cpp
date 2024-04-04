@@ -62,12 +62,20 @@ Stock Block::get(const string& market_code) const {
     return result;
 }
 
-vector<Stock> Block::getAllStocks() const {
-    vector<Stock> ret;
+StockList Block::getStockList(std::function<bool(const Stock&)>&& filter) const {
+    StockList ret;
     ret.reserve(size());
     auto iter = m_data->m_stockDict.begin();
-    for (; iter != m_data->m_stockDict.end(); ++iter) {
-        ret.emplace_back(iter->second);
+    if (filter) {
+        for (; iter != m_data->m_stockDict.end(); ++iter) {
+            if (filter(iter->second)) {
+                ret.emplace_back(iter->second);
+            }
+        }
+    } else {
+        for (; iter != m_data->m_stockDict.end(); ++iter) {
+            ret.emplace_back(iter->second);
+        }
     }
     return ret;
 }

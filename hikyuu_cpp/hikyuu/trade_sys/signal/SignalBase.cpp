@@ -25,16 +25,23 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SignalPtr& sg) {
 }
 
 SignalBase::SignalBase() : m_name("SignalBase"), m_hold_long(false), m_hold_short(false) {
+    initParam();
+}
+
+SignalBase::SignalBase(const string& name) : m_name(name), m_hold_long(false), m_hold_short(false) {
+    initParam();
+}
+
+SignalBase::~SignalBase() {}
+
+void SignalBase::initParam() {
+    setParam<bool>("cycle", false);                 // 仅在指定周期范围内计算
     setParam<bool>("alternate", true);              // 买入卖出信号交替出现
     setParam<bool>("support_borrow_stock", false);  // 支持发出空头信号
 }
 
-SignalBase::SignalBase(const string& name) : m_name(name), m_hold_long(false), m_hold_short(false) {
-    setParam<bool>("alternate", true);
-    setParam<bool>("support_borrow_stock", false);
-}
-
-SignalBase::~SignalBase() {}
+void SignalBase::baseCheckParam(const string& name) const {}
+void SignalBase::paramChanged() {}
 
 SignalPtr SignalBase::clone() {
     SignalPtr p;
@@ -57,14 +64,36 @@ SignalPtr SignalBase::clone() {
     p->m_hold_short = m_hold_short;
     p->m_buySig = m_buySig;
     p->m_sellSig = m_sellSig;
+    p->m_cycle_start = m_cycle_start;
+    p->m_cycle_end = m_cycle_start;
     return p;
 }
 
 void SignalBase::setTO(const KData& kdata) {
     HKU_IF_RETURN(m_kdata == kdata, void());
     m_kdata = kdata;
-    if (!kdata.empty()) {
-        _calculate();
+    HKU_IF_RETURN(kdata.empty(), void());
+
+    bool cycle = getParam<bool>("cycle");
+    m_cycle_start = kdata[0].datetime;
+
+    const KQuery& query = kdata.getQuery();
+    if (query.queryType() == KQuery::DATE) {
+        m_cycle_end = query.endDatetime();
+    } else {
+        size_t last_pos = kdata.lastPos();
+        const Stock& stk = kdata.getStock();
+        if (last_pos + 1 >= stk.getCount(query.kType())) {
+            m_cycle_end = Null<Datetime>();
+        } else {
+            KRecord krecord = stk.getKRecord(last_pos + 1, query.kType());
+            m_cycle_end = krecord.datetime;
+        }
+    }
+
+    KData cycle_kdata = kdata.getKData(m_cycle_start, m_cycle_end);
+    if (!cycle) {
+        _calculate(cycle_kdata);
     }
 }
 
@@ -75,6 +104,19 @@ void SignalBase::reset() {
     m_hold_long = false;
     m_hold_short = false;
     _reset();
+}
+
+void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
+    HKU_IF_RETURN(!getParam<bool>("cycle"), void());
+    HKU_ASSERT(start != Null<Datetime>() && close != Null<Datetime>() && start < close);
+    HKU_CHECK(start >= m_cycle_end || m_cycle_end == Null<Datetime>(),
+              "curretn start: {}, pre cycle end: {}", start, m_cycle_end);
+    m_cycle_start = start;
+    m_cycle_end = close;
+    KData kdata = m_kdata.getKData(start, close);
+    if (!kdata.empty()) {
+        _calculate(kdata);
+    }
 }
 
 DatetimeList SignalBase::getBuySignal() const {

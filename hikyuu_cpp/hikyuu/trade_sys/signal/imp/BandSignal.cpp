@@ -17,7 +17,7 @@ BandSignal::BandSignal() : SignalBase("SG_Band") {}
 
 BandSignal::BandSignal(const Indicator& ind, price_t lower, price_t upper)
 : SignalBase("SG_Band"), m_ind(ind), m_lower(lower), m_upper(upper) {
-    HKU_ERROR_IF(lower > upper, "BandSignal: lower track is greater than upper track");
+    HKU_CHECK(lower > upper, "BandSignal: lower track is greater than upper track");
 }
 
 BandSignal::~BandSignal() {}
@@ -30,13 +30,13 @@ SignalPtr BandSignal::_clone() {
     return SignalPtr(p);
 }
 
-void BandSignal::_calculate() {
-    Indicator ind = m_ind(m_kdata);
+void BandSignal::_calculate(const KData& kdata) {
+    Indicator ind = m_ind(kdata);
     size_t discard = ind.discard();
     size_t total = ind.size();
 
     auto const* inddata = ind.data();
-    auto const* ks = m_kdata.data();
+    auto const* ks = kdata.data();
     for (size_t i = discard; i < total; ++i) {
         if (inddata[i] > m_upper) {
             _addBuySignal(ks[i].datetime);

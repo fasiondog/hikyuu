@@ -24,8 +24,12 @@ ISaftyLoss::ISaftyLoss() : IndicatorImp("SAFTYLOSS", 1) {
 
 ISaftyLoss::~ISaftyLoss() {}
 
-bool ISaftyLoss::check() {
-    return getParam<int>("n1") >= 2 && getParam<int>("n2") >= 1;
+void ISaftyLoss::_checkParam(const string& name) const {
+    if ("n1" == name) {
+        HKU_ASSERT(getParam<int>("n1") >= 2);
+    } else if ("n2" == name) {
+        HKU_ASSERT(getParam<int>("n2") >= 1);
+    }
 }
 
 void ISaftyLoss::_calculate(const Indicator& data) {

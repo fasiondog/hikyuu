@@ -31,8 +31,6 @@ void export_Portfolio(py::module& m) {
       .def_property("tm", &Portfolio::getTM, &Portfolio::setTM, "设置或获取交易管理对象")
       .def_property("se", &Portfolio::getSE, &Portfolio::setSE, "设置或获取交易对象选择算法")
       .def_property("af", &Portfolio::getAF, &Portfolio::setAF, "设置或获取资产分配算法")
-      .def_property_readonly("proto_sys_list", &Portfolio::getProtoSystemList,
-                             py::return_value_policy::copy, "获取原型系统列")
       .def_property_readonly("real_sys_list", &Portfolio::getRealSystemList,
                              py::return_value_policy::copy, "由 PF 运行时设定的实际运行系统列表")
 
@@ -57,12 +55,15 @@ void export_Portfolio(py::module& m) {
       .def("reset", &Portfolio::reset, "复位操作")
       .def("clone", &Portfolio::clone, "克隆操作")
 
-      .def("run", &Portfolio::run, py::arg("query"), py::arg("force") = false, R"(run(self, query)
+      .def("run", &Portfolio::run, py::arg("query"), py::arg("adjust_cycle") = 1,
+           py::arg("force") = false,
+           R"(run(self, query[, adjust_cycle=1, force=false])
     
     运行投资组合策略。在查询条件及各组件没有变化时，PF在第二次执行时，默认不会实际进行计算。
     但由于各个组件的参数可能改变，此种情况无法自动判断是否需要重计算，可以手工指定进行强制计算。
         
     :param Query query: 查询条件
+    :param int adjust_cycle: 调仓周期
     :param bool force: 强制重新计算)")
 
         DEF_PICKLE(Portfolio);

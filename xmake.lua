@@ -50,8 +50,9 @@ option("tdx")
     set_description("Enable tdx kdata engine.")
 option_end()
 
+-- 注意：stacktrace 在 windows 下会严重影响性能
 option("stacktrace")
-    set_default(true)
+    set_default(false)
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable check/assert with stack trace info.")
@@ -95,7 +96,7 @@ add_rules("mode.debug", "mode.release")
 if not is_plat("windows") then add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan") end
 
 -- version
-set_version("1.3.5", {build = "%Y%m%d%H%M"})
+set_version("2.0.0", {build = "%Y%m%d%H%M"})
 
 local level = get_config("log_level")
 if is_mode("debug") then
@@ -117,6 +118,11 @@ else
     set_configvar("LOG_ACTIVE_LEVEL", 6)
 end
 
+if is_mode("debug") then
+    set_configvar("HKU_DEBUG_MODE", 1)
+else
+    set_configvar("HKU_DEBUG_MODE", 0)
+end
 set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
@@ -128,7 +134,6 @@ end
 set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
-set_configvar("HKU_DISABLE_ASSERT", 0)
 set_configvar("ENABLE_MSVC_LEAK_DETECT", 0)
 set_configvar("HKU_ENABLE_SEND_FEEDBACK", get_config("feedback") and 1 or 0)
 

@@ -20,11 +20,12 @@ namespace hku {
  * @ingroup MoneyManager
  */
 class HKU_API MoneyManagerBase : public enable_shared_from_this<MoneyManagerBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     MoneyManagerBase();
-    MoneyManagerBase(const string& name);
+    explicit MoneyManagerBase(const string& name);
+    MoneyManagerBase(const MoneyManagerBase&) = default;
     virtual ~MoneyManagerBase();
 
     /** 获取名称 */

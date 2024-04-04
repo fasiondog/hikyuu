@@ -31,13 +31,6 @@ void export_StockManager(py::module& m) {
      param hikyuu_param 其他参数
      param StrategyContext context 策略上下文, 默认加载全部证券)")
 
-      .def_property("running_in_python",
-                    py::overload_cast<>(&StockManager::runningInPython, py::const_),
-                    py::overload_cast<bool>(&StockManager::runningInPython))
-      .def_property("python_in_jupyter",
-                    py::overload_cast<>(&StockManager::pythonInJupyter, py::const_),
-                    py::overload_cast<bool>(&StockManager::pythonInJupyter))
-
       .def("reload", &StockManager::reload, "重新加载所有证券数据")
 
       .def("tmpdir", &StockManager::tmpdir, R"(tmpdir(self) -> str
@@ -89,6 +82,26 @@ void export_StockManager(py::module& m) {
     :param str querystr: 格式：“市场简称证券代码”，如"sh000001"
     :return: 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
     :rtype: Stock)")
+
+      .def(
+        "get_stock_list",
+        [](const StockManager& self, py::object filter) {
+            StockList ret;
+            if (filter.is_none()) {
+                ret = self.getStockList();
+            } else {
+                HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
+                py::object filter_func = filter.attr("__call__");
+                ret = self.getStockList(
+                  [&](const Stock& stk) { return filter_func(stk).cast<bool>(); });
+            }
+            return ret;
+        },
+        py::arg("filter") = py::none(), R"(get_stock_list(self[, filter=None])
+        
+    获取证券列表
+
+    :param func filter: 输入参数为 stock, 返回 True | False 的过滤函数)")
 
       .def("get_block", &StockManager::getBlock, R"(get_block(self, category, name)
 

@@ -30,7 +30,7 @@ namespace hku {
  * @ingroup System
  */
 class HKU_API System {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     /** 默认构造函数 */
@@ -132,6 +132,8 @@ public:
     /** 设定交易的证券 */
     void setStock(const Stock& stk);
 
+    const KQuery& getQuery() const;
+
     /** 获取实际执行的交易记录，和 TM 的区别是不包含权息调整带来的交易记录 */
     const TradeRecordList& getTradeRecordList() const;
 
@@ -204,15 +206,29 @@ public:
     // 当前是否存在延迟的操作请求，供Portfolio
     bool haveDelayRequest() const;
 
-    // 运行前准备工作
-    bool readyForRun();
+    // 运行前准备工作, 失败将抛出异常
+    void readyForRun();
 
     TradeRecord sell(const KRecord& today, const KRecord& src_today, Part from) {
         return _sell(today, src_today, from);
     }
 
-    // 强制卖出，用于资金分配管理器和资产组合指示系统进行强制卖出操作
-    TradeRecord sellForce(const KRecord& today, const KRecord& src_today, double num, Part from);
+    // 强制以开盘价卖出，仅供 PF/AF 内部调用
+    TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) {
+        HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
+        return _sellForce(date, num, from, true);
+    }
+
+    // 强制以收盘价卖出，仅供 PF/AF 内部调用
+    TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) {
+        HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
+        return _sellForce(date, num, from, false);
+    }
+
+    // 由各个相关组件调用，用于组件参数变化时通知 sys，以便重算
+    void partChangedNotify() {
+        m_calculated = false;
+    }
 
 private:
     bool _environmentIsValid(const Datetime& datetime);
@@ -264,6 +280,9 @@ private:
 
     TradeRecord _runMoment(const KRecord& record, const KRecord& src_record);
 
+    // Portfolio | AllocateFunds 指示立即进行强制卖出，以便对 buy_delay 的系统进行资金调整
+    TradeRecord _sellForce(const Datetime& date, double num, Part from, bool on_open);
+
 protected:
     TradeManagerPtr m_tm;
     MoneyManagerPtr m_mm;
@@ -280,7 +299,7 @@ protected:
     KData m_kdata;
     KData m_src_kdata;  // 未复权的原始 K 线数据
 
-    bool m_part_changed;  // 记录部件是否发生变化，控制是否需要重新计算
+    bool m_calculated;  // 控制是否需要重新计算
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
 
@@ -322,7 +341,7 @@ private:
         // m_kdata中包含了stock和query的信息，不用保存m_stock
         ar& BOOST_SERIALIZATION_NVP(m_kdata);
 
-        ar& BOOST_SERIALIZATION_NVP(m_part_changed);
+        ar& BOOST_SERIALIZATION_NVP(m_calculated);
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
@@ -357,7 +376,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_kdata);
         m_stock = m_kdata.getStock();
 
-        ar& BOOST_SERIALIZATION_NVP(m_part_changed);
+        ar& BOOST_SERIALIZATION_NVP(m_calculated);
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
@@ -439,63 +458,63 @@ inline SlippagePtr System::getSP() const {
 inline void System::setTM(const TradeManagerPtr& tm) {
     if (m_tm != tm) {
         m_tm = tm;
-        m_part_changed = true;
+        m_calculated = false;
     }
 }
 
 inline void System::setMM(const MoneyManagerPtr& mm) {
     if (m_mm != mm) {
         m_mm = mm;
-        m_part_changed = true;
+        m_calculated = false;
     }
 }
 
 inline void System::setEV(const EnvironmentPtr& ev) {
     if (m_ev != ev) {
         m_ev = ev;
-        m_part_changed = true;
+        m_calculated = false;
     }
 }
 
 inline void System::setCN(const ConditionPtr& cn) {
     if (m_cn != cn) {
         m_cn = cn;
-        m_part_changed = true;
+        m_calculated = false;
     }
 }
 
 inline void System::setSG(const SignalPtr& sg) {
     if (m_sg != sg) {
         m_sg = sg;
-        m_part_changed = true;
+        m_calculated = false;
     }
 }
 
 inline void System::setST(const StoplossPtr& st) {
     if (m_st != st) {
         m_st = st;
-        m_part_changed = true;
+        m_calculated = false;
     }
 }
 
 inline void System::setTP(const StoplossPtr& tp) {
     if (m_tp != tp) {
         m_tp = tp;
-        m_part_changed = true;
+        m_calculated = false;
     }
 }
 
 inline void System::setPG(const ProfitGoalPtr& pg) {
     if (m_pg != pg) {
         m_pg = pg;
-        m_part_changed = true;
+        m_calculated = false;
     }
 }
 
 inline void System::setSP(const SlippagePtr& sp) {
     if (m_sp != sp) {
         m_sp = sp;
-        m_part_changed = true;
+        m_calculated = false;
     }
 }
 
@@ -504,7 +523,14 @@ inline Stock System::getStock() const {
 }
 
 inline void System::setStock(const Stock& stk) {
-    m_stock = stk;
+    if (m_stock != stk) {
+        m_stock = stk;
+        m_calculated = false;
+    }
+}
+
+inline const KQuery& System::getQuery() const {
+    return m_kdata.getQuery();
 }
 
 inline const TradeRecordList& System::getTradeRecordList() const {

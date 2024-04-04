@@ -19,6 +19,13 @@ FixedCapitalMoneyManager::FixedCapitalMoneyManager() : MoneyManagerBase("MM_Fixe
 
 FixedCapitalMoneyManager::~FixedCapitalMoneyManager() {}
 
+void FixedCapitalMoneyManager::_checkParam(const string& name) const {
+    if ("capital" == name) {
+        double capital = getParam<double>("capital");
+        HKU_ASSERT(capital > 0.0);
+    }
+}
+
 double FixedCapitalMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
                                                 price_t price, price_t risk, SystemPart from) {
     double capital = getParam<double>("capital");

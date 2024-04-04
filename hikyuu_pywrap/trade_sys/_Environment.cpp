@@ -24,6 +24,7 @@ class PyEnvironmentBase : public EnvironmentBase {
 
 public:
     using EnvironmentBase::EnvironmentBase;
+    PyEnvironmentBase(const EnvironmentBase& base) : EnvironmentBase(base) {}
 
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, EnvironmentBase, _calculate, );
@@ -45,6 +46,7 @@ void export_Environment(py::module& m) {
     - _clone : 【必须】克隆接口
     - _reset : 【可选】重载私有变量)")
       .def(py::init<>())
+      .def(py::init<const EnvironmentBase&>())
       .def(py::init<const string&>())
 
       .def("__str__", to_py_str<EnvironmentBase>)

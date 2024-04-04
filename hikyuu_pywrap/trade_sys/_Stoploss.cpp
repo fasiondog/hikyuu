@@ -16,6 +16,7 @@ class PyStoplossBase : public StoplossBase {
 
 public:
     using StoplossBase::StoplossBase;
+    PyStoplossBase(const StoplossBase& base) : StoplossBase(base) {}
 
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, StoplossBase, _calculate, );
@@ -44,6 +45,7 @@ void export_Stoploss(py::module& m) {
     - _clone : 【必须】克隆接口
     - _reset : 【可选】重载私有变量)")
       .def(py::init<>())
+      .def(py::init<const StoplossBase&>())
       .def(py::init<const string&>(), R"(初始化构造函数
         
     :param str name: 名称)")

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/global/sysinfo.h"
 #include "System.h"
 
 namespace hku {
@@ -33,7 +34,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SystemPtr& sys) {
 
 System::System()
 : m_name("SYS_Simple"),
-  m_part_changed(true),
+  m_calculated(false),
   m_pre_ev_valid(true),  // must true
   m_pre_cn_valid(true),  // must true
   m_buy_days(0),
@@ -45,7 +46,7 @@ System::System()
 
 System::System(const string& name)
 : m_name(name),
-  m_part_changed(true),
+  m_calculated(false),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
   m_buy_days(0),
@@ -69,7 +70,7 @@ System::System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const Envir
   m_pg(pg),
   m_sp(sp),
   m_name(name),
-  m_part_changed(true),
+  m_calculated(false),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
   m_buy_days(0),
@@ -82,6 +83,8 @@ System::System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const Envir
 System::~System() {}
 
 void System::initParam() {
+    setParam<bool>("trace", false);
+
     // 连续延迟交易请求的限制次数，需大于等于0，0表示只允许延迟1次
     setParam<int>("max_delay_count", 3);
 
@@ -92,7 +95,7 @@ void System::initParam() {
     // 延迟操作的情况下，是使用当前的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
     setParam<bool>("delay_use_current_price", true);
     setParam<bool>("tp_monotonic", true);  // 止赢单调递增
-    setParam<int>("tp_delay_n", 3);        // 止赢延迟判断天数
+    setParam<int>("tp_delay_n", 1);        // 止赢延迟判断天数
     setParam<bool>("ignore_sell_sg", false);  // 忽略卖出信号，只使用止损/止赢等其他方式卖出
 
     // 最高价等于最低价时，是否可进行交易
@@ -123,6 +126,22 @@ void System::initParam() {
     setParam<bool>("shared_sp", false);
 }
 
+void System::baseCheckParam(const string& name) const {
+    if ("max_delay_count" == name) {
+        HKU_ASSERT(getParam<int>("max_delay_count") >= 0);
+    } else if ("tp_delay_n" == name) {
+        HKU_ASSERT(getParam<int>("tp_delay_n") >= 0);
+    } else if ("trace" == name) {
+        if (getParam<bool>("trace") && pythonInJupyter()) {
+            HKU_THROW("You can't trace in jupyter!");
+        }
+    }
+}
+
+void System::paramChanged() {
+    m_calculated = false;
+}
+
 void System::reset() {
     if (m_tm && !getParam<bool>("shared_tm"))
         m_tm->reset();
@@ -148,7 +167,7 @@ void System::reset() {
     // 一个sys实例绑定stock后，除非主动改变，否则不应该被reset
     //  m_stock
 
-    m_part_changed = true;
+    m_calculated = false;
     m_pre_ev_valid = false;  // true;
     m_pre_cn_valid = false;  // true;
 
@@ -189,7 +208,7 @@ void System::forceResetAll() {
     m_src_kdata = Null<KData>();
     m_kdata = Null<KData>();
 
-    m_part_changed = true;
+    m_calculated = false;
     m_pre_ev_valid = false;  // true;
     m_pre_cn_valid = false;  // true;
 
@@ -206,10 +225,14 @@ void System::forceResetAll() {
 }
 
 void System::setTO(const KData& kdata) {
-    HKU_TRACE_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "No need to calcule!");
-    m_kdata = kdata;
-    m_stock = kdata.getStock();
+    if (m_kdata != kdata) {
+        m_calculated = false;
+        m_kdata = kdata;
+    }
 
+    HKU_TRACE_IF_RETURN(m_calculated, void(), "No need to calcule!");
+
+    m_stock = kdata.getStock();
     KQuery query = kdata.getQuery();
     if (m_stock.isNull() || query.recoverType() == KQuery::NO_RECOVER) {
         m_src_kdata = m_kdata;
@@ -270,7 +293,7 @@ SystemPtr System::clone() {
     p->m_kdata = m_kdata;
     p->m_src_kdata = m_src_kdata;
 
-    p->m_part_changed = m_part_changed;
+    p->m_calculated = m_calculated;
     p->m_pre_ev_valid = m_pre_ev_valid;
     p->m_pre_cn_valid = m_pre_cn_valid;
 
@@ -302,10 +325,10 @@ void System::_sellNotifyAll(const TradeRecord& record) {
         m_pg->sellNotify(record);
 }
 
-bool System::readyForRun() {
-    HKU_ERROR_IF_RETURN(!m_tm, false, "Not setTradeManager!");
-    HKU_ERROR_IF_RETURN(!m_mm, false, "Not setMoneyManager!");
-    HKU_ERROR_IF_RETURN(!m_sg, false, "Not setSignal!");
+void System::readyForRun() {
+    HKU_CHECK(m_tm, "Not setTradeManager! {}", name());
+    HKU_CHECK(m_mm, "Not setMoneyManager! {}", name());
+    HKU_CHECK(m_sg, "Not setSignal! {}", name());
 
     // 如果存在市场环境判断策略，则需要将默认的前一日市场有效标志置为false
     // 因为需要由市场环境判断策略全权判定市场是否有效
@@ -318,8 +341,7 @@ bool System::readyForRun() {
         m_pre_cn_valid = false;  // 默认的前一日市场有效标志置为false
     }
 
-    if (m_mm)
-        m_mm->setTM(m_tm);
+    m_mm->setTM(m_tm);
     if (m_pg)
         m_pg->setTM(m_tm);
     if (m_st)
@@ -329,67 +351,59 @@ bool System::readyForRun() {
 
     m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
     m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
-
-    return true;
 }
 
 void System::run(const KQuery& query, bool reset, bool resetAll) {
-    HKU_ERROR_IF_RETURN(m_stock.isNull(), void(), "m_stock is NULL!");
-
-    // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
-    if (resetAll) {
-        this->forceResetAll();
-    } else if (reset) {
-        this->reset();
-    }
-
-    HKU_IF_RETURN(!readyForRun(), void());
-
+    HKU_CHECK(!m_stock.isNull(), "m_stock is NULL!");
     KData kdata = m_stock.getKData(query);
-    HKU_IF_RETURN(kdata.empty(), void());
-    HKU_DEBUG_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "Not need calculate.");
-
-    setTO(kdata);
-    size_t total = kdata.size();
-    auto const* ks = kdata.data();
-    auto const* src_ks = m_src_kdata.data();
-    for (size_t i = 0; i < total; ++i) {
-        if (ks[i].datetime >= m_tm->initDatetime()) {
-            _runMoment(ks[i], src_ks[i]);
-        }
-    }
-    m_part_changed = false;
+    run(kdata, reset, resetAll);
 }
 
 void System::run(const Stock& stock, const KQuery& query, bool reset, bool resetAll) {
-    m_stock = stock;
-    run(query, reset, resetAll);
+    HKU_CHECK(!stock.isNull(), "stock is NULL!");
+    KData kdata = stock.getKData(query);
+    run(kdata, reset, resetAll);
 }
 
 void System::run(const KData& kdata, bool reset, bool resetAll) {
-    HKU_INFO_IF_RETURN(kdata.empty(), void(), "Input kdata is empty!");
-    HKU_DEBUG_IF_RETURN(!m_part_changed && m_kdata == kdata, void(), "Not need calculate.");
-
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
     if (resetAll) {
         this->forceResetAll();
     } else if (reset) {
-        // System::run 供单体系统进行回测，需要强制复位所有的组件，忽略组件的共享属性
         this->reset();
     }
 
-    HKU_IF_RETURN(!readyForRun(), void());
+    HKU_DEBUG_IF_RETURN(m_calculated && m_kdata == kdata, void(), "Not need calculate.");
 
+    readyForRun();
+
+    bool trace = getParam<bool>("trace");
     setTO(kdata);
     size_t total = kdata.size();
     auto const* ks = kdata.data();
     auto const* src_ks = m_src_kdata.data();
     for (size_t i = 0; i < total; ++i) {
         if (ks[i].datetime >= m_tm->initDatetime()) {
-            _runMoment(ks[i], src_ks[i]);
+            auto tr = _runMoment(ks[i], src_ks[i]);
+            if (trace) {
+                HKU_INFO_IF(!tr.isNull(), "{}", tr);
+                PositionRecord position = m_tm->getPosition(ks[i].datetime, m_stock);
+                FundsRecord funds = m_tm->getFunds(kdata.getQuery().kType());
+                if (position.number > 0.0) {
+                    // clang-format off
+                    HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
+                    HKU_INFO("| total       | cash        | profit      | market      | position    | close price | stoploss    | goal price  | total cost  |");
+                    HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
+                    HKU_INFO("| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}|", 
+                        funds.total_assets(), funds.cash, funds.profit(), funds.market_value, position.number, src_ks[i].closePrice, 
+                        position.stoploss, position.goalPrice, position.totalCost);
+                    HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
+                    // clang-format on
+                }
+            }
         }
     }
-    m_part_changed = false;
+    m_calculated = true;
 }
 
 void System::clearDelayRequest() {
@@ -409,12 +423,21 @@ TradeRecord System::runMoment(const Datetime& datetime) {
 }
 
 TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
+    bool trace = getParam<bool>("trace");
+    if (trace) {
+        HKU_INFO("{} ------------------------------------------------------", today.datetime);
+        HKU_INFO("[{}] source {} ", name(), src_today);
+        HKU_INFO_IF(m_kdata.getQuery().recoverType() != KQuery::NO_RECOVER, "[{}] Restitution {} ",
+                    name(), src_today);
+    }
+
     m_buy_days++;
     m_sell_short_days++;
     TradeRecord result;
     if ((today.highPrice == today.lowPrice || today.closePrice > today.highPrice ||
          today.closePrice < today.lowPrice) &&
         !getParam<bool>("can_trade_when_high_eq_low")) {
+        HKU_INFO_IF(trace, "[{}] ignore current highPrice == lowPrice", name());
         return result;
     }
 
@@ -433,6 +456,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
         // 如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
             tr = _sell(today, src_today, PART_ENVIRONMENT);
+            HKU_INFO_IF(trace, "[{}] EV to sell", name());
         }
 
         m_pre_ev_valid = current_ev_valid;
@@ -443,6 +467,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     if (!m_pre_ev_valid) {
         // 如果使用环境判定策略进行初始建仓
         if (getParam<bool>("ev_open_position")) {
+            HKU_INFO_IF(trace, "[{}] EV to buy", name());
             TradeRecord tr = _buy(today, src_today, PART_ENVIRONMENT);
             m_pre_ev_valid = current_ev_valid;
             return tr.isNull() ? result : tr;
@@ -463,6 +488,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
         // 如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
             tr = _sell(today, src_today, PART_CONDITION);
+            HKU_INFO_IF(trace, "[{}] CN to sell", name());
         }
 
         m_pre_cn_valid = current_cn_valid;
@@ -473,6 +499,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     if (!m_pre_cn_valid) {
         // 如果使用环境判定策略进行初始建仓
         if (getParam<bool>("cn_open_position")) {
+            HKU_INFO_IF(trace, "[{}] CN to buy", name());
             TradeRecord tr = _buy(today, src_today, PART_CONDITION);
             m_pre_cn_valid = current_cn_valid;
             return tr.isNull() ? result : tr;
@@ -488,20 +515,28 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     // 如果有买入信号
     if (m_sg->shouldBuy(today.datetime)) {
         TradeRecord tr;
-        if (m_tm->haveShort(m_stock))
+        if (m_tm->haveShort(m_stock)) {
+            HKU_INFO_IF(trace, "[{}] SG to buy short", name());
             tr = _buyShort(today, src_today, PART_SIGNAL);
-        else
+
+        } else {
+            HKU_INFO_IF(trace, "[{}] SG to buy", name());
             tr = _buy(today, src_today, PART_SIGNAL);
+        }
         return tr.isNull() ? result : tr;
     }
 
     // 发出卖出信号
     if (m_sg->shouldSell(today.datetime)) {
         TradeRecord tr;
-        if (m_tm->have(m_stock))
+        if (m_tm->have(m_stock)) {
+            HKU_INFO_IF(trace, "[{}] SG to sell", name());
             tr = _sell(today, src_today, PART_SIGNAL);
-        else
+
+        } else {
+            HKU_INFO_IF(trace, "[{}] SG to sell short", name());
             tr = _sellShort(today, src_today, PART_SIGNAL);
+        }
         return tr.isNull() ? result : tr;
     }
 
@@ -518,10 +553,15 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     if (position.number != 0) {
         TradeRecord tr;
         if (src_current_price <= position.stoploss) {
+            HKU_INFO_IF(trace, "[{}] ST to sell, current price: {}, stoploss: {}", name(),
+                        src_current_price, position.stoploss);
             tr = _sell(today, src_today, PART_STOPLOSS);
-            //} else if (current_price >= position.goalPrice) {
+
         } else if (src_current_price >= _getGoalPrice(today.datetime, src_current_price)) {
+            HKU_INFO_IF(trace, "[{}] PG to sell, current price: {}, goal: {} ", name(),
+                        src_current_price, _getGoalPrice(today.datetime, src_current_price));
             tr = _sell(today, src_today, PART_PROFITGOAL);
+
         } else {
             price_t current_take_profile = _getTakeProfitPrice(today.datetime);
             if (current_take_profile != 0.0) {
@@ -530,7 +570,16 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
                 } else {
                     m_lastTakeProfit = current_take_profile;
                 }
-                if (current_price <= current_take_profile) {
+
+                int tp_delay_n = getParam<int>("tp_delay_n");
+                size_t pos = m_kdata.getPos(today.datetime);
+                size_t position_pos = m_kdata.getPos(position.takeDatetime);
+                // 如果当前价格小于等于止盈价，且满足止盈延迟条件则卖出
+                if (pos - position_pos >= tp_delay_n && current_price <= current_take_profile) {
+                    HKU_INFO_IF(
+                      trace,
+                      "[{}] TP to sell, current price after restoration: {}, take_profit: {}",
+                      name(), current_price, current_take_profile);
                     tr = _sell(today, src_today, PART_TAKEPROFIT);
                 }
             }
@@ -568,13 +617,10 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
 
     // 获取可买入数量
     double number = _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, from);
+    double min_num = m_stock.minTradeNumber();
+    number = int64_t(number / min_num) * min_num;
     if (number == 0 || number > m_stock.maxTradeNumber()) {
         return result;
-    }
-
-    double min_num = m_stock.minTradeNumber();
-    if (min_num > 1) {
-        number = number / min_num * min_num;
     }
 
     price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
@@ -627,9 +673,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
     }
 
     double min_num = m_stock.minTradeNumber();
-    if (min_num > 1) {
-        number = number / min_num * min_num;
-    }
+    number = int64_t(number / min_num) * min_num;
 
     price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
     TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss, goalPrice,
@@ -671,43 +715,36 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
                     src_today.closePrice - m_buyRequest.stoploss, m_buyRequest.from);
 }
 
-TradeRecord System::sellForce(const KRecord& today, const KRecord& src_today, double num,
-                              Part from) {
-    HKU_ASSERT_M(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO,
-                 "Only Allocator or Portfolis can perform this operation!");
-    TradeRecord result;
-    if (getParam<bool>("sell_delay")) {
-        if (m_sellRequest.valid) {
-            if (m_sellRequest.count > getParam<int>("max_delay_count")) {
-                // 超出最大延迟次数，清除买入请求
-                m_sellRequest.clear();
-                return result;
-            }
-            m_sellRequest.count++;
+TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool on_open) {
+    TradeRecord record;
+    size_t pos = m_kdata.getPos(date);
+    HKU_TRACE_IF_RETURN(pos == Null<size_t>(), record,
+                        "Failed to sellForce {}, the day {} could'nt sell!", m_stock.market_code(),
+                        date);
 
-        } else {
-            m_sellRequest.valid = true;
-            m_sellRequest.business = BUSINESS_SELL;
-            m_sellRequest.count = 1;
-        }
+    PositionRecord position = m_tm->getPosition(date, m_stock);
+    HKU_IF_RETURN(position.number <= 0.0, record);
 
-        PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
-        m_sellRequest.from = from;
-        m_sellRequest.datetime = today.datetime;
-        m_sellRequest.stoploss = position.stoploss;
-        m_sellRequest.goal = position.goalPrice;
-        m_sellRequest.number = num;
-        return result;
+    const auto& krecord = m_kdata.getKRecord(pos);
+    const auto& src_krecord =
+      m_stock.getKRecord(m_kdata.startPos() + pos, m_kdata.getQuery().kType());
 
-    } else {
-        PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
-        price_t realPrice = _getRealSellPrice(today.datetime, src_today.closePrice);
-        TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, num, position.stoploss,
-                                        position.goalPrice, src_today.closePrice, from);
-        m_trade_list.push_back(record);
-        _sellNotifyAll(record);
-        return record;
+    price_t realPrice =
+      _getRealSellPrice(krecord.datetime, on_open ? src_krecord.openPrice : src_krecord.closePrice);
+
+    double min_num = m_stock.minTradeNumber();
+    // 对待卖出的数量进行最小交易单位取整数倍，如果剩余不足最小交易单位，则一次全部卖出
+    double real_sell_num = static_cast<int64_t>(num / min_num) * min_num;
+    if (position.number - real_sell_num < min_num) {
+        real_sell_num = position.number;
     }
+
+    record =
+      m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss, position.goalPrice,
+                 on_open ? src_krecord.openPrice : src_krecord.closePrice, from);
+    m_trade_list.push_back(record);
+    _sellNotifyAll(record);
+    return record;
 }
 
 TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part from) {

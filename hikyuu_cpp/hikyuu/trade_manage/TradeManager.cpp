@@ -31,8 +31,10 @@ string TradeManager::str() const {
        << "  params: " << getParameter() << strip << "  name: " << name() << strip
        << "  init_date: " << initDatetime() << strip << "  init_cash: " << initCash() << strip
        << "  firstDatetime: " << firstDatetime() << strip << "  lastDatetime: " << lastDatetime()
-       << strip << "  TradeCostFunc: " << costFunc() << strip << "  current cash: " << currentCash()
-       << strip << "  current market_value: " << funds.market_value << strip
+       << strip << "  TradeCostFunc: " << costFunc() << strip << "  current total funds: "
+       << funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value << strip
+       << "  current cash: " << currentCash() << strip
+       << "  current market_value: " << funds.market_value << strip
        << "  current short_market_value: " << funds.short_market_value << strip
        << "  current base_cash: " << funds.base_cash << strip
        << "  current base_asset: " << funds.base_asset << strip
@@ -1185,12 +1187,11 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     string ktype(inktype);
     to_upper(ktype);
 
-    price_t price(0.0);
-    price_t value(0.0);  // 当前市值
+    price_t value{0.0};  // 当前市值
     position_map_type::const_iterator iter = m_position.begin();
     for (; iter != m_position.end(); ++iter) {
         const PositionRecord& record = iter->second;
-        price = record.stock.getMarketValue(lastDatetime(), ktype);
+        auto price = record.stock.getMarketValue(lastDatetime(), ktype);
         value = roundEx((value + record.number * price * record.stock.unit()), precision);
     }
 
@@ -1198,7 +1199,7 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     iter = m_short_position.begin();
     for (; iter != m_short_position.end(); ++iter) {
         const PositionRecord& record = iter->second;
-        price = record.stock.getMarketValue(lastDatetime(), ktype);
+        auto price = record.stock.getMarketValue(lastDatetime(), ktype);
         short_value =
           roundEx((short_value + record.number * price * record.stock.unit()), precision);
     }
@@ -1468,40 +1469,6 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     funds.base_cash = checkin_cash - checkout_cash;
     funds.base_asset = checkin_stock - checkout_stock;
     return funds;
-}
-
-PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
-    size_t total = dates.size();
-    PriceList result(total);
-    int precision = getParam<int>("precision");
-    for (size_t i = 0; i < total; ++i) {
-        FundsRecord funds = getFunds(dates[i], ktype);
-        result[i] = roundEx(
-          funds.cash + funds.market_value - funds.borrow_cash - funds.borrow_asset, precision);
-    }
-    return result;
-}
-
-PriceList TradeManager::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
-    size_t total = dates.size();
-    PriceList result(total);
-    if (total == 0)
-        return result;
-
-    size_t i = 0;
-    while (i < total && dates[i] < m_init_datetime) {
-        result[i] = 0;
-        i++;
-    }
-    int precision = getParam<int>("precision");
-    for (; i < total; ++i) {
-        FundsRecord funds = getFunds(dates[i], ktype);
-        result[i] = roundEx(funds.cash + funds.market_value - funds.borrow_cash -
-                              funds.borrow_asset - funds.base_cash - funds.base_asset,
-                            precision);
-    }
-
-    return result;
 }
 
 /******************************************************************************
@@ -1831,7 +1798,8 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
 
     HKU_WARN_IF_RETURN(m_cash < roundEx(money + tr.cost.total, precision), false,
-                       "Don't have enough money!");
+                       "Don't have enough money! {} < {}, {}", m_cash,
+                       roundEx(money + tr.cost.total, precision), tr);
 
     m_cash = roundEx(m_cash - money - tr.cost.total, precision);
     new_tr.cash = m_cash;

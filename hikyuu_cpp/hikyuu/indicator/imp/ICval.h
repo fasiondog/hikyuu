@@ -21,6 +21,7 @@ public:
     ICval();
     ICval(double value, size_t discard);
     virtual ~ICval();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

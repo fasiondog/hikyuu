@@ -22,10 +22,6 @@ ILiuTongPan::ILiuTongPan(const KData& k) : IndicatorImp("LIUTONGPAN", 1) {
     ILiuTongPan::_calculate(Indicator());
 }
 
-bool ILiuTongPan::check() {
-    return true;
-}
-
 void ILiuTongPan::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);

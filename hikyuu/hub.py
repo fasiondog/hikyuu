@@ -324,13 +324,14 @@ class HubManager(metaclass=SingletonType):
             'af': 'part/af',
             'cn': 'part/cn',
             'ev': 'part/ev',
+            'mf': 'part/mf',
             'mm': 'part/mm',
             'pg': 'part/pg',
             'se': 'part/se',
             'sg': 'part/sg',
             'sp': 'part/sp',
             'st': 'part/st',
-            'prtflo': 'prtflo',
+            'pf': 'pf',
             'sys': 'sys',
             'ind': 'ind',
             'other': 'other',
@@ -355,7 +356,7 @@ class HubManager(metaclass=SingletonType):
                         if (not entry.name.startswith('.')) and entry.is_dir() and (entry.name != "__pycache__"):
                             # 计算实际的导入模块名
                             module_name = '{}.part.{}.{}.part'.format(base_local, part, entry.name) if part not in (
-                                'prtflo', 'sys', 'ind', 'other'
+                                'pf', 'sys', 'ind', 'other'
                             ) else '{}.{}.{}.part'.format(base_local, part, entry.name)
 
                             # 导入模块
@@ -374,7 +375,7 @@ class HubManager(metaclass=SingletonType):
                                 continue
 
                             name = '{}.{}.{}'.format(hub_model.name, part, entry.name) if part not in (
-                                'prtflo', 'sys', 'ind', 'other'
+                                'pf', 'sys', 'ind', 'other'
                             ) else '{}.{}.{}'.format(hub_model.name, part, entry.name)
 
                             try:
@@ -405,7 +406,7 @@ class HubManager(metaclass=SingletonType):
         name_parts = name.split('.')
         checkif(
             len(name_parts) < 2
-            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys', 'ind', 'other')),
+            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mf', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'pf', 'sys', 'ind', 'other')),
             name, PartNameError
         )
 
@@ -495,7 +496,7 @@ class HubManager(metaclass=SingletonType):
         """
         abs_path = os.path.abspath(filename)  # 当前文件的绝对路径
         path_parts = pathlib.Path(abs_path).parts
-        local_base = path_parts[-4] if path_parts[-3] in ('prtflo', 'sys', 'ind', 'other') else path_parts[5]
+        local_base = path_parts[-4] if path_parts[-3] in ('pf', 'sys', 'ind', 'other') else path_parts[5]
         hub_model = self._session.query(HubModel.name).filter_by(local_base=local_base).first()
         checkif(hub_model is None, local_base, HubNotFoundError)
         return hub_model.name
@@ -545,13 +546,14 @@ def remove_hub(name):
     HubManager().remove_hub(name)
 
 
-def get_part(name, **kwargs):
+def get_part(name, *args, **kwargs):
     """获取指定策略部件
 
     :param str name: 策略部件名称
+    :param args: 其他部件相关参数
     :param kwargs: 其他部件相关参数
     """
-    return HubManager().get_part(name, **kwargs)
+    return HubManager().get_part(name, *args, **kwargs)
 
 
 def get_hub_path(name):

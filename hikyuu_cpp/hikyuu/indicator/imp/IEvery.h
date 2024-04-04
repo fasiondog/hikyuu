@@ -25,6 +25,7 @@ class IEvery : public IndicatorImp {
 public:
     IEvery();
     virtual ~IEvery();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

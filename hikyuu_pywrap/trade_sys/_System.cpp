@@ -94,6 +94,7 @@ void export_System(py::module& m) {
       .def_property("name", py::overload_cast<>(&System::name, py::const_),
                     py::overload_cast<const string&>(&System::name), py::return_value_policy::copy,
                     "系统名称")
+      .def_property_readonly("query", &System::getQuery, py::return_value_policy::copy, "查询条件")
       .def_property("tm", &System::getTM, &System::setTM, "关联的交易管理实例")
       .def_property("to", &System::getTO, &System::setTO, "交易对象 KData")
       .def_property("mm", &System::getMM, &System::setMM, "资金管理策略")

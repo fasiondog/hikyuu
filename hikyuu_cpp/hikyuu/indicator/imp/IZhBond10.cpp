@@ -27,10 +27,6 @@ IZhBond10::IZhBond10(const DatetimeList& dates, double default_val) : IndicatorI
 
 IZhBond10::~IZhBond10() {}
 
-bool IZhBond10::check() {
-    return true;
-}
-
 void IZhBond10::_calculate(const Indicator& data) {
     DatetimeList dates;
     auto k = data.getContext();

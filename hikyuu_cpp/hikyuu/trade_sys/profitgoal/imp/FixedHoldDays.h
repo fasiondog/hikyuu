@@ -20,6 +20,8 @@ class FixedHoldDays : public ProfitGoalBase {
 public:
     FixedHoldDays();
     virtual ~FixedHoldDays();
+
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

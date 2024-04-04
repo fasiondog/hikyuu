@@ -22,6 +22,7 @@ class IDecline : public IndicatorImp {
 public:
     IDecline();
     virtual ~IDecline();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

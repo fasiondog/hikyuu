@@ -492,56 +492,56 @@ Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
 Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
 
 void export_Indicator_build_in(py::module& m) {
-    m.def("KDATA", KDATA1);
-    m.def("KDATA", KDATA3, R"(KDATA([data])
+    m.def("C_KDATA", KDATA1);
+    m.def("C_KDATA", KDATA3, R"(KDATA([data])
 
     包装KData成Indicator，用于其他指标计算
 
     :param data: KData 或 具有6个返回结果的Indicator（如KDATA生成的Indicator）
     :rtype: Indicator)");
 
-    m.def("CLOSE", CLOSE1);
-    m.def("CLOSE", CLOSE3, R"(CLOSE([data])
+    m.def("C_CLOSE", CLOSE1);
+    m.def("C_CLOSE", CLOSE3, R"(CLOSE([data])
 
     获取收盘价，包装KData的收盘价成Indicator
 
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator)");
 
-    m.def("OPEN", OPEN1);
-    m.def("OPEN", OPEN3, R"(OPEN([data])
+    m.def("C_OPEN", OPEN1);
+    m.def("C_OPEN", OPEN3, R"(OPEN([data])
 
     获取开盘价，包装KData的开盘价成Indicator
 
     :param data: 输入数据（KData 或 Indicator） 
     :rtype: Indicator)");
 
-    m.def("HIGH", HIGH1);
-    m.def("HIGH", HIGH3, R"(HIGH([data])
+    m.def("C_HIGH", HIGH1);
+    m.def("C_HIGH", HIGH3, R"(HIGH([data])
 
     获取最高价，包装KData的最高价成Indicator
 
     :param data: 输入数据（KData 或 Indicator） 
     :rtype: Indicator)");
 
-    m.def("LOW", LOW1);
-    m.def("LOW", LOW3, R"(LOW([data])
+    m.def("C_LOW", LOW1);
+    m.def("C_LOW", LOW3, R"(LOW([data])
 
     获取最低价，包装KData的最低价成Indicator
 
     :param data: 输入数据（KData 或 Indicator） 
     :rtype: Indicator)");
 
-    m.def("AMO", AMO1);
-    m.def("AMO", AMO3, R"(AMO([data])
+    m.def("C_AMO", AMO1);
+    m.def("C_AMO", AMO3, R"(AMO([data])
 
     获取成交金额，包装KData的成交金额成Indicator
     
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator)");
 
-    m.def("VOL", VOL1);
-    m.def("VOL", VOL3, R"(VOL([data])
+    m.def("C_VOL", VOL1);
+    m.def("C_VOL", VOL3, R"(VOL([data])
 
     获取成交量，包装KData的成交量成Indicator
 
@@ -1739,36 +1739,59 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def(
       "IC",
-      [](const Indicator& ind, const py::object& stks, const KQuery& query, int n,
-         const Stock& ref_stk) {
+      [](const Indicator& ind, const py::object& stks, const KQuery& query, const Stock& ref_stk,
+         int n) {
           if (py::isinstance<Block>(stks)) {
               const auto& blk = stks.cast<Block&>();
-              return IC(ind, blk, query, n, ref_stk);
+              return IC(ind, blk, query, ref_stk, n);
           }
 
           if (py::isinstance<py::sequence>(stks)) {
               StockList c_stks = python_list_to_vector<Stock>(stks);
-              return IC(ind, c_stks, query, n, ref_stk);
+              return IC(ind, c_stks, query, ref_stk, n);
           }
 
           HKU_THROW("Input stks must be Block or sequenc(Stock)!");
       },
-      py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("n"), py::arg("ref_stk"),
-      R"(IC(ind, stks, query, n, ref_stk)
+      py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("n") = 1,
+      R"(IC(ind, stks, query, ref_stk[, n=1])
 
     计算指定的因子相对于参考证券的 IC （实际为 RankIC）
     
+    :param Indicator ind: 输入因子
     :param sequence(stock)|Block stks 证券组合
     :param Query query: 查询条件
-    :param int n: 时间窗口
-    :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300)");
+    :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
+    :param int n: 时间窗口)");
 
-    m.def("ICIR", ICIR, py::arg("ic"), py::arg("n") = 120, R"(ICIR(ic[,n])
+    m.def(
+      "ICIR",
+      [](const Indicator& ind, const py::object& stks, const KQuery& query, const Stock& ref_stk,
+         int n, int rolling_n) {
+          if (py::isinstance<Block>(stks)) {
+              const auto& blk = stks.cast<Block&>();
+              return ICIR(ind, blk, query, ref_stk, n, rolling_n);
+          }
+
+          if (py::isinstance<py::sequence>(stks)) {
+              StockList c_stks = python_list_to_vector<Stock>(stks);
+              return ICIR(ind, c_stks, query, ref_stk, n, rolling_n);
+          }
+
+          HKU_THROW("Input stks must be Block or sequenc(Stock)!");
+      },
+      py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("n") = 1,
+      py::arg("rolling_n") = 120,
+      R"(ICIR(ind, stks, query, ref_stk[, n=1, rolling_n=120])
 
     计算 IC 因子 IR = IC的多周期均值/IC的标准方差
 
-    :param Indicator: ic 已经计算出的 ic 值
-    :param int n: 时间窗口)");
+    :param Indicator ind: 输入因子
+    :param sequence(stock)|Block stks 证券组合
+    :param Query query: 查询条件
+    :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
+    :param int n: 计算IC时对应的 n 日收益率
+    :param int rolling_n: 滚动周期)");
 
     m.def("ZSCORE", ZSCORE_1, py::arg("out_extreme") = false, py::arg("nsigma") = 3.0,
           py::arg("recursive") = false);

@@ -17,10 +17,6 @@ IExp::IExp() : IndicatorImp("EXP", 1) {}
 
 IExp::~IExp() {}
 
-bool IExp::check() {
-    return true;
-}
-
 void IExp::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();

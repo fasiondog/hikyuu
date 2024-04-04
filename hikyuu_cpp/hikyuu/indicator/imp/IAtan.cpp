@@ -19,10 +19,6 @@ IAtan::IAtan() : IndicatorImp("ATAN", 1) {}
 
 IAtan::~IAtan() {}
 
-bool IAtan::check() {
-    return true;
-}
-
 void IAtan::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();

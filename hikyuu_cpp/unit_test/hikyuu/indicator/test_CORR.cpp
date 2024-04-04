@@ -42,10 +42,8 @@ TEST_CASE("test_CORR") {
     Indicator y = PRICELIST(b);
 
     // 非法参数 n
-    result = CORR(x, y, -1);
-    CHECK_UNARY(result.empty());
-    result = CORR(x, y, 1);
-    CHECK_UNARY(result.empty());
+    CHECK_THROWS_AS(CORR(x, y, -1), std::exception);
+    CHECK_THROWS_AS(CORR(x, y, 1), std::exception);
 
     // 正常情况
     result = CORR(x, y, 0);

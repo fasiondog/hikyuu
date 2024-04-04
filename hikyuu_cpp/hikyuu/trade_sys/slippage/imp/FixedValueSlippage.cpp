@@ -19,6 +19,12 @@ FixedValueSlippage::FixedValueSlippage() {
 
 FixedValueSlippage::~FixedValueSlippage() {}
 
+void FixedValueSlippage::_checkParam(const string& name) const {
+    if ("p" == name) {
+        HKU_ASSERT(getParam<double>(name) >= 0.0);
+    }
+}
+
 price_t FixedValueSlippage ::getRealBuyPrice(const Datetime& datetime, price_t price) {
     return price + getParam<double>("value");
 }

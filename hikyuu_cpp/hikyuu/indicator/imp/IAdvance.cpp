@@ -29,8 +29,15 @@ IAdvance::IAdvance() : IndicatorImp("ADVANCE", 1) {
 
 IAdvance::~IAdvance() {}
 
-bool IAdvance::check() {
-    return true;
+void IAdvance::_checkParam(const string& name) const {
+    if ("market" == name) {
+        string market = getParam<string>(name);
+        auto market_info = StockManager::instance().getMarketInfo(market);
+        HKU_CHECK(market_info != Null<MarketInfo>(), "Invalid market: {}", market);
+    } else if ("stk_type" == name) {
+        int stk_type = getParam<int>("stk_type");
+        HKU_ASSERT(stk_type >= 0);
+    }
 }
 
 void IAdvance::_calculate(const Indicator& ind) {

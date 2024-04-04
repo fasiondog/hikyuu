@@ -17,6 +17,7 @@ class PyConditionBase : public ConditionBase {
 
 public:
     using ConditionBase::ConditionBase;
+    PyConditionBase(const ConditionBase& base) : ConditionBase(base) {}
 
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, ConditionBase, _calculate, );
@@ -36,6 +37,7 @@ void export_Condition(py::module& m) {
     - _clone : 【必须】克隆接口
     - _reset : 【可选】重载私有变量)")
       .def(py::init<>())
+      .def(py::init<const ConditionBase&>())
       .def(py::init<const string&>(), R"(初始化构造函数
         
     :param str name: 名称)")

@@ -24,10 +24,6 @@ IAd::IAd(const KData& k) : IndicatorImp("AD", 1) {
 
 IAd::~IAd() {}
 
-bool IAd::check() {
-    return true;
-}
-
 void IAd::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);

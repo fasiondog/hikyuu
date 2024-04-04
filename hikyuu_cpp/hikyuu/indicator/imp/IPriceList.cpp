@@ -27,8 +27,12 @@ IPriceList::IPriceList(const PriceList& data, int in_discard) : IndicatorImp("PR
 
 IPriceList::~IPriceList() {}
 
-bool IPriceList::check() {
-    return (getParam<int>("discard") >= 0 && getParam<int>("result_index") >= 0);
+void IPriceList::_checkParam(const string& name) const {
+    if ("discard" == name) {
+        HKU_ASSERT(getParam<int>("discard") >= 0);
+    } else if ("result_index" == name) {
+        HKU_ASSERT(getParam<int>("result_index") >= 0);
+    }
 }
 
 void IPriceList::_calculate(const Indicator& data) {

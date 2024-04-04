@@ -20,13 +20,11 @@ public:
     virtual ~SignalSelector();
 
     virtual void _reset() override {
-        m_sys_dict_on_open.clear();
-        m_sys_dict_on_close.clear();
+        m_sys_dict.clear();
     }
 
 private:
-    unordered_map<Datetime, SystemList> m_sys_dict_on_open;
-    unordered_map<Datetime, SystemList> m_sys_dict_on_close;
+    unordered_map<Datetime, SystemWeightList> m_sys_dict;
 };
 
 }  // namespace hku

@@ -32,15 +32,20 @@ TEST_CASE("test_FixedPercent_SL") {
     result = sp->getPrice(Datetime(199101030000), 66.4);
     CHECK_LT(std::fabs(result - 53.12), 0.01);
 
-    /** @arg p = 0.0 */
-    sp = ST_FixedPercent(0.0);
+    /** @arg p = 0.99 */
+    sp = ST_FixedPercent(0.99);
     result = sp->getPrice(Datetime(199101030000), 66.397);
-    CHECK_LT(std::fabs(result - 66.4), 0.01);
+    CHECK_EQ(result, doctest::Approx(roundEx(66.397 * 0.01, 2)));
 
     /** @arg p = 1.0 */
     sp = ST_FixedPercent(1.0);
     result = sp->getPrice(Datetime(199101030000), 66.397);
-    CHECK_LT(std::fabs(result - 0), 0.01);
+    CHECK_EQ(result, doctest::Approx(0.0));
+
+    /** @arg 非法参数 */
+    CHECK_THROWS_AS(ST_FixedPercent(0.0), std::exception);
+    CHECK_THROWS_AS(ST_FixedPercent(1.01), std::exception);
+    CHECK_THROWS_AS(ST_FixedPercent(-1.0), std::exception);
 }
 
 /** @} */

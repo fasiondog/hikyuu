@@ -130,3 +130,12 @@
     .. py:attribute:: base_asset         当前投入的资产价值（float）
     .. py:attribute:: borrow_cash        当前借入的资金（float），即负债
     .. py:attribute:: borrow_asset       当前借入证券资产价值（float）
+
+    只读属性，自动根据上面的属性计算得到的结果:
+
+    .. py:attribute:: total_assets  总资产
+    .. py:attribute:: net_assets  净资产
+    .. py:attribute:: total_borrow  总负债
+    .. py:attribute:: total_base  投入本值资产（本钱）
+    .. py:attribute:: profit  收益
+

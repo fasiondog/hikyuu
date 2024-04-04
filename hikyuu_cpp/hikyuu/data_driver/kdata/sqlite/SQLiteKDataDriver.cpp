@@ -38,7 +38,7 @@ SQLiteKDataDriver::SQLiteKDataDriver() : KDataDriver("sqlite3") {}
 SQLiteKDataDriver::~SQLiteKDataDriver() {}
 
 bool SQLiteKDataDriver::_init() {
-    HKU_ASSERT_M(m_sqlite_connection_map.empty(), "Maybe repeat initialization!");
+    HKU_CHECK(m_sqlite_connection_map.empty(), "Maybe repeat initialization!");
     // read param from config
     StringList keys = m_params.getNameList();
     string db_filename;

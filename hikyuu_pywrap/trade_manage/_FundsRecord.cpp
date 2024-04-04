@@ -26,6 +26,12 @@ void export_FundsRecord(py::module& m) {
       .def_readwrite("borrow_cash", &FundsRecord::borrow_cash, "当前借入的资金（float），即负债")
       .def_readwrite("borrow_asset", &FundsRecord::borrow_asset, "当前借入证券资产价值（float）")
 
+      .def_property_readonly("total_assets", &FundsRecord::total_assets, "总资产")
+      .def_property_readonly("net_assets", &FundsRecord::net_assets, "净资产")
+      .def_property_readonly("total_borrow", &FundsRecord::total_borrow, "总负债")
+      .def_property_readonly("total_base", &FundsRecord::total_base, "投入本值资产")
+      .def_property_readonly("profit", &FundsRecord::profit, "当前收益")
+
       .def(py::self + py::self)
       .def(py::self += py::self)
 

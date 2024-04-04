@@ -33,11 +33,7 @@ TEST_CASE("test_ZSCORE") {
 
     /** @arg 输入的 nsigma < 0 */
     KData k = getKData("SH000001", KQuery(-5));
-    result = ZSCORE(k.close(), true, -0.5);
-    CHECK_EQ(result.name(), "ZSCORE");
-    CHECK_UNARY(!result.empty());
-    CHECK_EQ(result.size(), k.size());
-    CHECK_EQ(result.discard(), result.size());
+    CHECK_THROWS_AS(ZSCORE(k.close(), true, -0.5), std::exception);
 
     /** @arg 正常计算，不剔除异常值 */
     result = ZSCORE(k.close());
@@ -50,6 +46,26 @@ TEST_CASE("test_ZSCORE") {
     for (size_t i = result.discard(), total = result.size(); i < total; i++) {
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
+
+    /** @arg 过滤异常值，不递归*/
+    k = getKData("SH000001", KQuery(3600, 4000));
+    Indicator c = k.close();
+    result = ZSCORE(c, true, 3.0, false);
+    expect = {-0.87128, -0.90351, -0.87397, -0.87383};
+    for (size_t i = 0; i < expect.size(); i++) {
+        CHECK_EQ(result[i], doctest::Approx(expect[i]));
+    }
+
+    /** @arg 过滤异常值，递归*/
+    k = getKData("SH000001", KQuery(3600, 4000));
+    c = k.close();
+    auto result2 = ZSCORE(c, true, 3.0, true);
+    expect = {-0.87128, -0.90354, -0.87399, -0.87383};
+    for (size_t i = 0; i < expect.size(); i++) {
+        CHECK_EQ(result2[i], doctest::Approx(expect[i]));
+    }
+    CHECK_EQ(result[16], doctest::Approx(-0.95994));
+    CHECK_EQ(result2[16], doctest::Approx(-0.95996));
 }
 
 //-----------------------------------------------------------------------------

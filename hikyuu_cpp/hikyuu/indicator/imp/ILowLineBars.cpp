@@ -21,8 +21,10 @@ ILowLineBars::ILowLineBars() : IndicatorImp("LLVBARS", 1) {
 
 ILowLineBars::~ILowLineBars() {}
 
-bool ILowLineBars::check() {
-    return getParam<int>("n") >= 0;
+void ILowLineBars::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
 }
 
 void ILowLineBars::_calculate(const Indicator& ind) {

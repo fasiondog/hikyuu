@@ -7,7 +7,7 @@ target("hikyuu")
     --     set_kind("shared")
     -- end
 
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time", "log_level")
 
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
     if is_plat("windows", "linux", "cross") then
@@ -76,6 +76,7 @@ target("hikyuu")
     add_headerfiles("../(hikyuu/**.h)|**doc.h")
 
     -- add files
+    -- add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp")
     add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp")
     add_files("./data_driver/*.cpp")
     if get_config("hdf5") or get_config("sqlite") then

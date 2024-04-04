@@ -30,6 +30,7 @@ public:
     IMacd();
     virtual ~IMacd();
 
+    virtual void _checkParam(const string& name) const override;
     virtual void _dyn_calculate(const Indicator&) override;
 
 private:

@@ -20,6 +20,7 @@ class FixedWeightAllocateFunds : public AllocateFundsBase {
 public:
     FixedWeightAllocateFunds();
     virtual ~FixedWeightAllocateFunds();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

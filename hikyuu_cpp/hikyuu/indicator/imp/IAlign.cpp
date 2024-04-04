@@ -22,10 +22,6 @@ IAlign::IAlign() : IndicatorImp("ALIGN") {
 
 IAlign::~IAlign() {}
 
-bool IAlign::check() {
-    return true;
-}
-
 void IAlign::_calculate(const Indicator& ind) {
     // ref_date_list 参数会影响 IndicatorImp 全局，勿随意修改
     DatetimeList dates = getParam<DatetimeList>("align_date_list");
@@ -135,7 +131,7 @@ void IAlign::_calculate(const Indicator& ind) {
                 for (size_t r = 0; r < m_result_num; r++) {
                     _set(ind.get(j, r), i, r);
                 }
-            } else if (!fill_null && j < ind_total) {
+            } else if (!fill_null) {
                 for (size_t r = 0; r < m_result_num; r++) {
                     _set(ind.get(j - 1, r), i, r);
                 }

@@ -23,6 +23,8 @@ public:
     IFilter();
     virtual ~IFilter();
 
+    virtual void _checkParam(const string& name) const override;
+
     virtual bool isSerial() const override {
         return true;
     }

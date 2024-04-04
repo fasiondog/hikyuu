@@ -16,9 +16,10 @@ class PySignalBase : public SignalBase {
 
 public:
     using SignalBase::SignalBase;
+    PySignalBase(const SignalBase& base) : SignalBase(base) {}
 
-    void _calculate() override {
-        PYBIND11_OVERLOAD_PURE(void, SignalBase, _calculate, );
+    void _calculate(const KData& kdata) override {
+        PYBIND11_OVERLOAD_PURE(void, SignalBase, _calculate, kdata);
     }
 
     void _reset() override {
@@ -42,6 +43,7 @@ void export_Signal(py::module& m) {
 
       .def(py::init<>())
       .def(py::init<const string&>())
+      .def(py::init<const SignalBase&>())
 
       .def("__str__", to_py_str<SignalBase>)
       .def("__repr__", to_py_str<SignalBase>)
@@ -49,7 +51,8 @@ void export_Signal(py::module& m) {
       .def_property("name", py::overload_cast<>(&SignalBase::name, py::const_),
                     py::overload_cast<const string&>(&SignalBase::name),
                     py::return_value_policy::copy, "名称")
-      .def_property("to", &SignalBase::getTO, &SignalBase::setTO, "设置或获取交易对象")
+      .def_property("to", &SignalBase::getTO, &SignalBase::setTO, py::return_value_policy::copy,
+                    "设置或获取交易对象")
 
       .def("get_param", &SignalBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -118,7 +121,10 @@ void export_Signal(py::module& m) {
 
       .def("reset", &SignalBase::reset, "复位操作")
       .def("clone", &SignalBase::clone, "克隆操作")
-      .def("_calculate", &SignalBase::_calculate, "【重载接口】子类计算接口")
+      .def("_calculate", &SignalBase::_calculate, R"(_calculate(self, kdata)
+      
+    【重载接口】子类计算接口)")
+
       .def("_reset", &SignalBase::_reset, "【重载接口】子类复位接口，复位内部私有变量")
 
         DEF_PICKLE(SGPtr);
@@ -204,4 +210,7 @@ void export_Signal(py::module& m) {
 
         SG_Band(MA(C, n=10), 100, 200)
       )");
+
+    m.def("SG_AllwaysBuy", SG_AllwaysBuy);
+    m.def("SG_Cycle", SG_Cycle);
 }

@@ -16,3 +16,4 @@ pynng
 akshare
 pyecharts
 pipdeptree
+h5py

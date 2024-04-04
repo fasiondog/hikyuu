@@ -743,27 +743,22 @@ def sysplot(sys, new=True, axes=None, style=1):
 
 
 def sys_performance(sys, ref_stk=None):
-    k = sys.to
-    if k is None or k.empty():
-        hku_info("sys.to is None or empty!")
-        return
-
-    query = Query(k[0].datetime.start_of_day(), k[-1].datetime.start_of_day() + TimeDelta(1), Query.DAY)
-
     if ref_stk is None:
         ref_stk = get_stock('sh000300')
+    ref_k = ref_stk.get_kdata(sys.query)
+
+    query = Query(ref_k[0].datetime.start_of_day(), ref_k[-1].datetime.start_of_day() + TimeDelta(1), Query.DAY)
     ref_k = ref_stk.get_kdata(query)
+
     ref_dates = ref_k.get_datetime_list()
 
-    profit = sys.tm.get_profit_curve(ref_dates)
-    profit = VALUE(profit)
-    funds = sys.tm.get_funds_curve(ref_dates)
+    funds_list = sys.tm.get_funds_list(ref_dates)
+    funds = [f.total_assets for f in funds_list]
     funds = VALUE(funds)
-    funds_return = profit / REF(funds, 1) + 1
-    # funds_return = cum_return(funds)
+    funds_return = [f.total_assets / f.total_base if f.total_base != 0.0 else None for f in funds_list]
+    funds_return = VALUE(funds_return)
     funds_return.name = "系统累积收益率"
-    cum_return = get_part("default.ind.累积收益率")
-    ref_return = cum_return(ref_k.close)
+    ref_return = ROCR(ref_k.close, 0)
     ref_return.name = ref_stk.name
 
     per = Performance()
@@ -787,56 +782,35 @@ def sys_performance(sys, ref_stk=None):
     t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
         per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
 
-    mp_back = matplotlib.get_backend()
-    if "nbagg" in mp_back:
-        fg = figure(figsize=(13, 10))
-        ax1 = fg.add_axes([0.05, 0.35, 0.65, 0.6])
-        ax2 = fg.add_axes([0.05, 0.05, 0.65, 0.25], sharex=ax1)
-
-        ref_return.plot(axes=ax1, legend_on=True)
-        funds_return.plot(axes=ax1, legend_on=True)
-
-        label = t1 + '\n\n' + t2 + '\n\n' + t3
-        ax1.text(1.01,
-                 1,
-                 text,
-                 horizontalalignment='left',
-                 verticalalignment='top',
-                 transform=ax1.transAxes,
-                 # color='r'
-                 )
-        ax2.text(0.02,
-                 1.0,
-                 label,
-                 horizontalalignment='left',
-                 verticalalignment='top',
-                 transform=ax2.transAxes,
-                 # color='r'
-                 )
-        # ax2.set_visible(False)
-        ax2.xaxis.set_visible(False)
-        ax2.yaxis.set_visible(False)
-        ax2.set_frame_on(False)
-
-    else:
-        ref_return.plot(legend_on=True)
-        funds_return.plot(legend_on=True, new=False)
-        axis = gca()
-        axis.text(-0.05,
-                  0.97,
-                  text,
-                  horizontalalignment='right',
-                  verticalalignment='top',
-                  transform=axis.transAxes,
-                  # color=text_color
-                  )
-
-        label = t1 + '\n\n' + t2 + '\n\n' + t3
-        axis.text(0.05,
-                  -0.06,
-                  label,
-                  horizontalalignment='left',
-                  verticalalignment='top',
-                  transform=axis.transAxes,
-                  # color=text_color
-                  )
+    import matplotlib.pyplot as plt
+    fg = plt.figure(figsize=(15, 10))
+    gs = fg.add_gridspec(5, 4)
+    ax1 = fg.add_subplot(gs[:4, :3])
+    ax2 = fg.add_subplot(gs[:, 3:])
+    ax3 = fg.add_subplot(gs[4:, :3])
+    ref_return.plot(axes=ax1, legend_on=True)
+    funds_return.plot(axes=ax1, legend_on=True)
+    ax1.set_title(f"{sys.name} 累积收益率")
+    label = t1 + '\n\n' + t2 + '\n\n' + t3
+    ax2.text(0,
+             1,
+             text,
+             horizontalalignment='left',
+             verticalalignment='top',
+             transform=ax2.transAxes,
+             # color='r'
+             )
+    ax3.text(0.02,
+             0.9,
+             label,
+             horizontalalignment='left',
+             verticalalignment='top',
+             transform=ax3.transAxes,
+             # color='r'
+             )
+    ax2.xaxis.set_visible(False)
+    ax2.yaxis.set_visible(False)
+    ax2.set_frame_on(False)
+    ax3.xaxis.set_visible(False)
+    ax3.yaxis.set_visible(False)
+    ax3.set_frame_on(False)

@@ -14,11 +14,11 @@ namespace hku {
 class ICorr : public IndicatorImp {
 public:
     ICorr();
-    ICorr(int n);
+    explicit ICorr(int n);
     ICorr(const Indicator& ref_ind, int n);
     virtual ~ICorr();
 
-    virtual bool check() override;
+    virtual void _checkParam(const string& name) const override;
     virtual void _calculate(const Indicator& data) override;
     virtual IndicatorImpPtr _clone() override;
 

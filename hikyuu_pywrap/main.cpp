@@ -62,13 +62,14 @@ PYBIND11_MODULE(core312, m) {
 PYBIND11_MODULE(core, m) {
 #endif
 
-    StockManager::instance().runningInPython(true);
+    py::register_exception<hku::exception>(m, "HKUException");
+
+    // 设置系统运行状态
+    setRunningInPython(true);
 
 #if HKU_ENABLE_SEND_FEEDBACK
     sendPythonVersionFeedBack(PY_MAJOR_VERSION, PY_MINOR_VERSION, PY_MICRO_VERSION);
 #endif
-
-    py::register_exception<hku::exception>(m, "HKUException");
 
     export_bind_stl(m);
     export_DataType(m);
@@ -106,6 +107,8 @@ PYBIND11_MODULE(core, m) {
     export_global_main(m);
     export_io_redirect(m);
 
+    m.def("set_python_in_jupyter", setPythonInJupyter);
+
     m.def("close_spend_time", close_spend_time, "全局关闭 c++ 部分耗时打印");
     m.def("open_spend_time", close_spend_time, "全局开启 c++ 部分耗时打印");
 
@@ -118,6 +121,8 @@ PYBIND11_MODULE(core, m) {
 
     m.def("get_version_with_build", getVersionWithBuild);
     m.def("get_version_git", getVersionWithGit);
+    m.def("get_last_version", getLatestVersion);
+    m.def("can_upgrade", CanUpgrade);
 
     m.def("get_stock", getStock,
           R"(get_stock(market_code)

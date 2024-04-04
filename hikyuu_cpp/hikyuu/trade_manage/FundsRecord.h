@@ -43,6 +43,31 @@ public:
     // 当前收益 = 当前净资产 - 当前投入本值资产
     //         = cash + market_value - short_market_value - borrow_cash - base_cash - base_asset
 
+    // 当前总资产
+    price_t total_assets() const {
+        return cash + market_value + borrow_asset - short_market_value;
+    }
+
+    // 当前净资产
+    price_t net_assets() const {
+        return cash + market_value - short_market_value - borrow_cash;
+    }
+
+    // 总负债
+    price_t total_borrow() const {
+        return borrow_cash + borrow_asset;
+    }
+
+    // 当前投入本值资产
+    price_t total_base() const {
+        return base_cash + base_asset;
+    }
+
+    // 当前收益
+    price_t profit() const {
+        return cash + market_value - short_market_value - borrow_cash - base_cash - base_asset;
+    }
+
     FundsRecord operator+(const FundsRecord& other) const;
 
     FundsRecord& operator+=(const FundsRecord& other);
@@ -63,6 +88,9 @@ private:
     }
 #endif
 };
+
+typedef vector<FundsRecord> FundsList;
+typedef vector<FundsRecord> FundsRecordList;
 
 /**
  * 输出TradeRecord信息

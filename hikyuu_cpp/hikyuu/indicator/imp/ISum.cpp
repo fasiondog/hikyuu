@@ -19,8 +19,10 @@ ISum::ISum() : IndicatorImp("SUM", 1) {
 
 ISum::~ISum() {}
 
-bool ISum::check() {
-    return getParam<int>("n") >= 0;
+void ISum::_checkParam(const string& name) const {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") >= 0);
+    }
 }
 
 void ISum::_calculate(const Indicator& ind) {

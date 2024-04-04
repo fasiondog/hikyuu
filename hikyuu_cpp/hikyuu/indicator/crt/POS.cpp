@@ -36,15 +36,13 @@ Indicator HKU_API POS(const Block& block, KQuery query, SignalPtr sg) {
         }
     }
 
-    ThreadPool tg;
-    vector<SGPtr> sgs;
-    for (auto stk_iter = block.begin(); stk_iter != block.end(); ++stk_iter) {
+    auto stks = block.getStockList();
+    vector<SGPtr> sgs = parallel_for_index(0, stks.size(), [&](size_t i) {
         auto tmpsg = sg->clone();
-        sgs.push_back(tmpsg);
-        KData kdata = stk_iter->getKData(query);
-        tg.submit([tmpsg, k = std::move(kdata)]() { tmpsg->setTO(k); });
-    }
-    tg.join();
+        auto kdata = stks[i].getKData(query);
+        tmpsg->setTO(kdata);
+        return tmpsg;
+    });
 
     // 计算每日持仓的股票数
     vector<size_t> position(dayTotal);

@@ -25,6 +25,7 @@ class IVarp : public hku::IndicatorImp {
 public:
     IVarp();
     virtual ~IVarp();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

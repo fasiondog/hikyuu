@@ -15,24 +15,35 @@ namespace hku {
 
 FixedWeightAllocateFunds::FixedWeightAllocateFunds() : AllocateFundsBase("AF_FixedWeight") {
     setParam<double>("weight", 0.1);
+
+    // 公共参数必须设置为 false，禁止自动调整权重
+    setParam<bool>("auto_adjust_weight", false);
 }
 
 FixedWeightAllocateFunds::~FixedWeightAllocateFunds() {}
 
+void FixedWeightAllocateFunds::_checkParam(const string& name) const {
+    if ("weight" == name) {
+        double weight = getParam<double>("weight");
+        HKU_ASSERT(weight > 0.0 && weight <= 1.);
+    } else if ("auto_adjust_weight" == name) {
+        bool auto_adjust_weight = getParam<bool>("auto_adjust_weight");
+        HKU_CHECK(!auto_adjust_weight, R"(param "auto_adjust_weight" must be false!)");
+    }
+}
+
 SystemWeightList FixedWeightAllocateFunds ::_allocateWeight(const Datetime& date,
-                                                            const SystemList& se_list) {
+                                                            const SystemWeightList& se_list) {
     SystemWeightList result;
-    double weight = getParam<double>("weight");
+    price_t weight = getParam<double>("weight");
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
-        result.emplace_back(*iter, weight);
+        result.emplace_back(iter->sys, weight);
     }
 
     return result;
 }
 
 AFPtr HKU_API AF_FixedWeight(double weight) {
-    HKU_CHECK_THROW(weight > 0.0 && weight <= 1.0, std::out_of_range,
-                    "input weigth ({}) is out of range [0, 1]!", weight);
     auto p = make_shared<FixedWeightAllocateFunds>();
     p->setParam<double>("weight", weight);
     return p;

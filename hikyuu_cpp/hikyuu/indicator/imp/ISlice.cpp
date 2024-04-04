@@ -29,8 +29,10 @@ ISlice::ISlice(const PriceList& data, int64_t start, int64_t end) : IndicatorImp
 
 ISlice::~ISlice() {}
 
-bool ISlice::check() {
-    return getParam<int>("result_index") >= 0;
+void ISlice::_checkParam(const string& name) const {
+    if ("result_index" == name) {
+        HKU_ASSERT(getParam<int>("result_index") >= 0);
+    }
 }
 
 void ISlice::_calculate(const Indicator& data) {

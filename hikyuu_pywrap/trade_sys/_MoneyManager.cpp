@@ -16,6 +16,7 @@ class PyMoneyManagerBase : public MoneyManagerBase {
 
 public:
     using MoneyManagerBase::MoneyManagerBase;
+    PyMoneyManagerBase(const MoneyManagerBase& base) : MoneyManagerBase(base) {}
 
     void _reset() override {
         PYBIND11_OVERLOAD(void, MoneyManagerBase, _reset, );
@@ -74,6 +75,7 @@ void export_MoneyManager(py::module& m) {
     - _reset : 【可选】重置私有属性
     - _clone : 【必须】克隆接口)")
       .def(py::init<>())
+      .def(py::init<const MoneyManagerBase&>())
       .def(py::init<const string&>(), R"(初始化构造函数
         
     :param str name: 名称)")

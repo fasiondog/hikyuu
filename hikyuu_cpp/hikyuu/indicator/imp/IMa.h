@@ -20,6 +20,7 @@ class IMa : public IndicatorImp {
 public:
     IMa();
     virtual ~IMa();
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

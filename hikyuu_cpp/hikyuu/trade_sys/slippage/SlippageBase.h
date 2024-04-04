@@ -19,11 +19,12 @@ namespace hku {
  * @ingroup Slippage
  */
 class HKU_API SlippageBase : public enable_shared_from_this<SlippageBase> {
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     SlippageBase();
-    SlippageBase(const string& name);
+    explicit SlippageBase(const string& name);
+    SlippageBase(const SlippageBase&) = default;
     virtual ~SlippageBase() {}
 
     /** 设置交易对象 */

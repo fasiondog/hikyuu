@@ -25,8 +25,14 @@ IMacd::IMacd() : IndicatorImp("MACD", 3) {
 
 IMacd::~IMacd() {}
 
-bool IMacd::check() {
-    return getParam<int>("n1") > 0 && getParam<int>("n2") > 0 && getParam<int>("n3") > 0;
+void IMacd::_checkParam(const string& name) const {
+    if ("n1" == name) {
+        HKU_ASSERT(getParam<int>("n1") >= 0);
+    } else if ("n2" == name) {
+        HKU_ASSERT(getParam<int>("n2") >= 0);
+    } else if ("n3" == name) {
+        HKU_ASSERT(getParam<int>("n3") >= 0);
+    }
 }
 
 void IMacd::_calculate(const Indicator& data) {
