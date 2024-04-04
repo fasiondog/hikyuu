@@ -3,3 +3,4 @@
 *.py linguist-language=C++
 *.html linguist-language=C++
 *.mod linguist-language=C++
+*.ipynb linguist-language=C++
