@@ -87,6 +87,10 @@ class iodog:
         close_ostream_to_python()
 
 
+if in_interactive_session():
+    set_python_in_interactive(True)
+
+
 # 如果是在 jupyter 环境中运行，重定向C++ stdout/stderr输出至python
 if in_ipython_frontend():
     set_python_in_jupyter(True)

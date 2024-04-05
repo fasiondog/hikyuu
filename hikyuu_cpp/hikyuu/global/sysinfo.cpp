@@ -25,8 +25,9 @@ using json = nlohmann::json;
 namespace hku {
 
 std::atomic<int> g_latest_version{0};
-std::atomic_bool g_runningInPython{false};  // 是否是在 python 中运行
-std::atomic_bool g_pythonInJupyter{false};  // python 是否为交互模式
+bool g_runningInPython{false};      // 是否是在 python 中运行
+bool g_pythonInInteractive{false};  // python 是否运行在交互模式下
+bool g_pythonInJupyter{false};      // python 是否运行在 Jupyter中
 
 bool HKU_API runningInPython() {
     return g_runningInPython;
@@ -34,6 +35,14 @@ bool HKU_API runningInPython() {
 
 void HKU_API setRunningInPython(bool inpython) {
     g_runningInPython = inpython;
+}
+
+bool HKU_API pythonInInteractive() {
+    return g_pythonInInteractive;
+}
+
+void HKU_API setPythonInInteractive(bool interactive) {
+    g_pythonInInteractive = interactive;
 }
 
 bool HKU_API pythonInJupyter() {

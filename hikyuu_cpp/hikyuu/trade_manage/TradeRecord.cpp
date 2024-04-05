@@ -127,7 +127,7 @@ string TradeRecord::toString() const {
 
 #if HKU_OS_WINDOWS
     return fmt::format("Trade({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", datetime,
-                       market_code, runningInPython() && pythonInJupyter() ? name : UTF8ToGB(name),
+                       market_code, pythonInInteractive() ? name : UTF8ToGB(name),
                        getBusinessName(business), planPrice, realPrice, goalPrice, number,
                        cost.commission, cost.stamptax, cost.transferfee, cost.others,
                        getSystemPartName(from));

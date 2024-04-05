@@ -108,6 +108,7 @@ PYBIND11_MODULE(core, m) {
     export_io_redirect(m);
 
     m.def("set_python_in_jupyter", setPythonInJupyter);
+    m.def("set_python_in_interactive", setPythonInInteractive);
 
     m.def("close_spend_time", close_spend_time, "全局关闭 c++ 部分耗时打印");
     m.def("open_spend_time", close_spend_time, "全局开启 c++ 部分耗时打印");
