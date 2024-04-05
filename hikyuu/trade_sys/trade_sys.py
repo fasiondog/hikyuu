@@ -82,17 +82,25 @@ def crtEV(func, params={}, name='crtEV'):
 # ------------------------------------------------------------------
 # moneymanager
 # ------------------------------------------------------------------
-def crtMM(func, params={}, name='crtMM'):
+def crtMM(get_buy_num, get_sell_num, params={}, name='crtMM', buy_notify=None, sell_notify=None):
     """
     快速创建资金管理策略
 
-    :param func: 资金管理策略计算函数
+    :param get_buy_num: 买入数量接口
+    :param sell_buy_num: 卖出数量接口
     :param {} params: 参数字典
     :param str name: 自定义名称
+    :param buy_notify: 接收买入交易记录通知
+    :param sell_notify: 接收卖出交易记录通知
     :return: 自定义资金管理策略实例
     """
     meta_x = type(name, (MoneyManagerBase, ), {'__init__': part_init, '_clone': part_clone})
-    meta_x._calculate = func
+    meta_x._get_buy_num = get_buy_num
+    meta_x._get_sell_num = get_sell_num
+    if buy_notify is not None:
+        meta_x._buy_notify = buy_notify
+    if sell_notify is not None:
+        meta_x._sell_notify = sell_notify
     return meta_x(name, params)
 
 
@@ -188,17 +196,22 @@ def crtMF(calculate_func, params={}, name='crtMF'):
 # ------------------------------------------------------------------
 # slippage
 # ------------------------------------------------------------------
-def crtSL(func, params={}, name='crtSL'):
+def crtSP(get_real_buy_price, get_real_sell_price, params={}, name='crtSP', calculate=None):
     """
     快速创建移滑价差算法
 
-    :param func: 移滑价差算法函数
+    :param get_real_buy_price: 移滑价差算法接口计算实际买入价格
+    :param get_real_sell_price: 移滑价差算法接口计算实际买入价格
     :param {} params: 参数字典
     :param str name: 自定义名称
+    :param calculate: 预处理函数
     :return: 移滑价差算法实例
     """
     meta_x = type(name, (SlippageBase, ), {'__init__': part_init, '_clone': part_clone})
-    meta_x._calculate = func
+    meta_x.get_real_buy_price = get_real_buy_price
+    meta_x.get_real_sell_price = get_real_sell_price
+    if calculate is not None:
+        meta_x._calculate = calculate
     return meta_x(name, params)
 
 
