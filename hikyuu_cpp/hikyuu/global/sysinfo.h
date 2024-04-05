@@ -52,7 +52,14 @@ bool HKU_API runningInPython();
 /** 当前是否运行在 Jupyter 环境中 */
 bool HKU_API pythonInJupyter();
 
+/** python 是否运行在交互模式下 */
+bool HKU_API pythonInInteractive();
+
+/** 设置是否运行在 python 下*/
 void HKU_API setRunningInPython(bool inpython);
+
+/** 设置 python 是否运行在交互模式下 */
+void HKU_API setPythonInInteractive(bool interactive);
 
 /** 当前是否运行在 Jupyter 环境中 */
 void HKU_API setPythonInJupyter(bool injupyter);
