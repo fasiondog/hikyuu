@@ -30,8 +30,11 @@ Datetime OrderBrokerBase::buy(Datetime datetime, const string& market, const str
     Datetime tradetime;
     try {
         tradetime = _buy(datetime, market, code, price, num);
+    } catch (const std::exception& e) {
+        HKU_ERROR(e.what());
+        tradetime = Null<Datetime>();
     } catch (...) {
-        HKU_ERROR("Unknown error in BUY operation!!!");
+        HKU_ERROR_UNKNOWN;
         tradetime = Null<Datetime>();
     }
     return tradetime;
@@ -42,8 +45,11 @@ Datetime OrderBrokerBase::sell(Datetime datetime, const string& market, const st
     Datetime tradetime;
     try {
         tradetime = _sell(datetime, market, code, price, num);
+    } catch (const std::exception& e) {
+        HKU_ERROR(e.what());
+        tradetime = Null<Datetime>();
     } catch (...) {
-        HKU_ERROR("Unknown error in SELL operation!!!");
+        HKU_ERROR_UNKNOWN;
         tradetime = Null<Datetime>();
     }
     return tradetime;

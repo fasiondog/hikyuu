@@ -40,12 +40,12 @@
     :param var: hikyuu内建类型的变量
     :param str filename: 指定的文件名
 
-.. py:function:: hku_load(var, filename)
+.. py:function:: hku_load(filename)
 
     将通过 hku_save 保存的变量，读取到var中。
     
-    :param var: 指定的变量
     :param str filename: 待载入的序列化文件。
+    :return: 之前被序列化保存的文件
     
 .. py:function:: roundUp(arg1[, arg2=0])
 
