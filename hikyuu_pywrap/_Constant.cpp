@@ -51,6 +51,14 @@ namespace py = pybind11;
 #undef STOCKTYPE_START
 #endif
 
+#ifdef STOCKTYPE_CRYPTO
+#undef STOCKTYPE_CRYPTO
+#endif
+
+#ifdef STOCKTYPE_A_BJ
+#undef STOCKTYPE_A_BJ
+#endif
+
 #ifdef STOCKTYPE_TMP
 #undef STOCKTYPE_TMP
 #endif
@@ -76,6 +84,8 @@ struct Constant {
       STOCKTYPE_BOND(7),
       STOCKTYPE_GEM(8),
       STOCKTYPE_START(9),
+      STOCKTYPE_CRYPTO(10),
+      STOCKTYPE_A_BJ(11),
       STOCKTYPE_TMP(999) {
 #if HKU_PYTHON_SUPPORT_PICKLE
         pickle_support = true;
@@ -95,17 +105,19 @@ struct Constant {
     int64_t null_int64;
     bool pickle_support;  // 是否支持pickle
 
-    int STOCKTYPE_BLOCK;  /// 板块
-    int STOCKTYPE_A;      /// A股
-    int STOCKTYPE_INDEX;  /// 指数
-    int STOCKTYPE_B;      /// B股
-    int STOCKTYPE_FUND;   /// 基金
-    int STOCKTYPE_ETF;    /// ETF
-    int STOCKTYPE_ND;     /// 国债
-    int STOCKTYPE_BOND;   /// 债券
-    int STOCKTYPE_GEM;    /// 创业板
-    int STOCKTYPE_START;  /// 科创板
-    int STOCKTYPE_TMP;    /// 临时Stock
+    int STOCKTYPE_BLOCK;   /// 板块
+    int STOCKTYPE_A;       /// A股
+    int STOCKTYPE_INDEX;   /// 指数
+    int STOCKTYPE_B;       /// B股
+    int STOCKTYPE_FUND;    /// 基金
+    int STOCKTYPE_ETF;     /// ETF
+    int STOCKTYPE_ND;      /// 国债
+    int STOCKTYPE_BOND;    /// 债券
+    int STOCKTYPE_GEM;     /// 创业板
+    int STOCKTYPE_START;   /// 科创板
+    int STOCKTYPE_CRYPTO;  /// 数字币
+    int STOCKTYPE_A_BJ;    /// A股北交所
+    int STOCKTYPE_TMP;     /// 临时Stock
 };
 
 void export_Constant(py::module& m) {
@@ -131,6 +143,8 @@ void export_Constant(py::module& m) {
       .def_readonly("STOCKTYPE_BOND", &Constant::STOCKTYPE_BOND, "债券")
       .def_readonly("STOCKTYPE_GEM", &Constant::STOCKTYPE_GEM, "创业板")
       .def_readonly("STOCKTYPE_START", &Constant::STOCKTYPE_START, "科创板")
+      .def_readonly("STOCKTYPE_CRYPTO", &Constant::STOCKTYPE_START, "数字币")
+      .def_readonly("STOCKTYPE_A_BJ", &Constant::STOCKTYPE_START, "A股北交所")
       .def_readonly("STOCKTYPE_TMP", &Constant::STOCKTYPE_TMP, "临时Stock");
 
     m.attr("constant") = Constant();
