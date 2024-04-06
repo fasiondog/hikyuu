@@ -1808,4 +1808,11 @@ void export_Indicator_build_in(py::module& m) {
     :param float nsigma: 剔除极值时使用的 nsigma 倍 sigma，默认 3.0
     :param bool recursive: 是否进行递归剔除极值，默认 False
     :rtype: Indicator)");
+
+    m.def("TURNOVER", py::overload_cast<int>(TURNOVER), py::arg("n") = 1);
+    m.def("TURNOVER", py::overload_cast<const KData&, int>(TURNOVER), py::arg("kdata"),
+          py::arg("n") = 1, R"(TURNOVER(data[,n=1])
+    换手率=股票成交量/流通股股数×100%
+
+    :param int n: 时间窗口)");
 }
