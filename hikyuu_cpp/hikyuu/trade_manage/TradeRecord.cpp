@@ -125,18 +125,10 @@ string TradeRecord::toString() const {
         name = stock.name();
     }
 
-#if HKU_OS_WINDOWS
-    return fmt::format("Trade({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", datetime,
-                       market_code, pythonInInteractive() ? name : UTF8ToGB(name),
-                       getBusinessName(business), planPrice, realPrice, goalPrice, number,
-                       cost.commission, cost.stamptax, cost.transferfee, cost.others,
-                       getSystemPartName(from));
-#else
     return fmt::format("Trade({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", datetime,
                        market_code, name, getBusinessName(business), planPrice, realPrice,
                        goalPrice, number, cost.commission, cost.stamptax, cost.transferfee,
                        cost.others, getSystemPartName(from));
-#endif
 }
 
 bool TradeRecord::isNull() const {
