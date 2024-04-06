@@ -12,7 +12,7 @@ from hikyuu.interactive import *
 def get_code_market_dict():
     ret = {}
     for s in sm:
-        if s.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_B, constant.STOCKTYPE_GEM, constant.STOCKTYPE_START):
+        if s.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_A_BJ, constant.STOCKTYPE_B, constant.STOCKTYPE_GEM, constant.STOCKTYPE_START):
             ret[s.code] = "0" if s.market == 'SH' else "1"
     return ret
 

@@ -104,7 +104,7 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
 
 string Stock::Data::marketCode() const {
     if (m_type == STOCKTYPE_CRYPTO)
-        return  m_market + "/" + m_code;
+        return m_market + "/" + m_code;
     return m_market + m_code;
 }
 
@@ -668,7 +668,8 @@ TransList Stock::getTransList(const KQuery& query) const {
 
 Parameter Stock::getFinanceInfo() const {
     Parameter result;
-    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START,
+    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START &&
+                    type() != STOCKTYPE_A_BJ,
                   result);
 
     BaseInfoDriverPtr driver = StockManager::instance().getBaseInfoDriver();
@@ -681,7 +682,8 @@ Parameter Stock::getFinanceInfo() const {
 
 PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     PriceList result;
-    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START,
+    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START &&
+                    type() != STOCKTYPE_A_BJ,
                   result);
     const StockManager& sm = StockManager::instance();
     HistoryFinanceReader rd(sm.datadir() + "/downloads/finance");

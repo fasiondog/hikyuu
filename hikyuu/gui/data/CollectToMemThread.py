@@ -103,7 +103,7 @@ class CollectToMemThread(QThread):
         return [
             stk.market_code.lower() for stk in sm
             if stk.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX,
-                            constant.STOCKTYPE_GEM) and stk.valid and stk.market.lower() == self.market.lower()
+                            constant.STOCKTYPE_GEM, constant.STOCKTYPE_A_BJ) and stk.valid and stk.market.lower() == self.market.lower()
         ]
 
     def record_is_valid(self, record):
