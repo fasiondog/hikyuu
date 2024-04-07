@@ -404,23 +404,10 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
             auto funds = sys->getTM()->getFunds(date, m_query.kType());
             size_t position = sys->getTM()->getHoldNumber(date, stk);
             KRecord krecord = stk.getKRecord(date, m_query.kType());
-#if HKU_OS_WINDOWS
-            auto stk_name =
-              runningInPython() && pythonInJupyter() ? stk.name() : UTF8ToGB(stk.name());
-            if (stk_name.size() < 11) {
-                for (size_t i = 0, total = 11 - stk_name.size(); i < total; i++) {
-                    stk_name.push_back(' ');
-                }
-            }
-            HKU_INFO("| {:<11}| {}| {:<11}| {:<13.2f}| {:<13.2f}| {:<12.2f}| {:<12.2f}|",
-                     stk.market_code(), stk_name, position, funds.market_value, funds.cash,
-                     krecord.openPrice, krecord.closePrice);
-#else
             auto stk_name = stk.name();
             HKU_INFO("| {:<11}| {:<11}| {:<11}| {:<13.2f}| {:<13.2f}| {:<12.2f}| {:<12.2f}|",
                      stk.market_code(), stk_name, position, funds.market_value, funds.cash,
                      krecord.openPrice, krecord.closePrice);
-#endif
             // clang-format off
             HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
             count++;
