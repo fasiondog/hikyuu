@@ -38,7 +38,6 @@ void export_io_redirect(py::module& m);
 
 void export_data_driver_main(py::module& m);
 void export_indicator_main(py::module& m);
-void export_instance_main(py::module& m);
 void export_SystemPart(py::module& m);
 void export_trade_manage_main(py::module& m);
 void export_trade_sys_main(py::module& m);
@@ -95,7 +94,6 @@ PYBIND11_MODULE(core, m) {
 
     export_data_driver_main(m);
     export_indicator_main(m);
-    export_instance_main(m);
 
     export_SystemPart(m);
     export_trade_manage_main(m);
