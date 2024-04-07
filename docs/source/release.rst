@@ -1,6 +1,23 @@
 版本发布说明
 =======================
 
+2.0.1 - 2024年4月7日
+-------------------------
+
+1. 新增 TURNOVER （换手率指标）
+2. 新增股票类型 STOCKTYPE_A_BJ (北交所), 修复科创板和北交所股票最小交易量为1
+3. fixed tm 建立日期小于参考日期时 sys_performance 报错
+4. hub 中的 prtflo 未 pf, 和内部叫法统一
+5. 调整 MF_MultiFactor getScores 方法命名(原为 getScore )，并调整为在指定日期不存在数据时返回空列表（原为抛出异常）
+6. fixed python 中 TradeRecordList/PositionRecordList 中 to_df 方法失效
+7. hku_catch 中忽略对 KeyboardInterrupt 的捕获，避免 python 中 Ctrl-C 无法终止
+8. crtSL 更名为 crtSP (移滑价差算法)，和内部其他叫法统一
+9. fixed 缺失 hku_save / hku_load 函数，导致示例运行失败
+10. fixed crtMM 补充缺失的接口
+11. 更新其他运行失败示例，如 OrderBroker (pybind需要先创建对象再传入方法)
+12. python 中缺失 CAPITAL (流通盘), 原可使用 LIUTONGPAN, 但缺失对 CAPITAL 的同名指定
+
+
 2.0.0 - 2024年4月3日
 -------------------------
 
