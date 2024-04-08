@@ -18,7 +18,8 @@ Python中的订单代理包装
     my_tm = crtTM(init_cash = 300000)
 
     #注册实盘交易订单代理
-    my_tm.reg_broker(crtOB(TestOrderBroker())) #TestOerderBroker是测试用订单代理对象，只打印
+    ob = crtOB(TestOrderBroker())
+    my_tm.reg_broker(ob) #TestOerderBroker是测试用订单代理对象，只打印
     #my_tm.reg_broker(crtOB(MailOrderBroker("smtp.sina.com", "yourmail@sina.com", "yourpwd", "receivermail@XXX.yy)))
 
     #根据需要修改订单代理最后的时间戳，后续只有大于该时间戳时，订单代理才会实际发出订单指令
