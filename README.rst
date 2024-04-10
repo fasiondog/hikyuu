@@ -43,11 +43,6 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
     :alt: Gitee
     
 
-**给作者加点油，每天扫扫红包，或者请作者喝杯咖啡**
-
-.. image:: http://fasiondog.gitee.io/hikyuu/images/juanzeng.jpg
-
-
 示例：
 
 ::
@@ -111,3 +106,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 - 加入微信群（请注明“加入hikyuu”）：
 
     .. figure:: http://fasiondog.gitee.io/hikyuu/images/weixin_group.jpg
+
+- 关注公众号：
+
+    .. figure:: http://fasiondog.gitee.io/hikyuu/images/weixin_gongzhonghao.jpg
