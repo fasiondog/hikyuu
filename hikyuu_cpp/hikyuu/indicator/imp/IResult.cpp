@@ -43,7 +43,7 @@ void IResult::_calculate(const Indicator& ind) {
 }
 
 Indicator HKU_API RESULT(int result_ix) {
-    return make_shared<IResult>(result_ix);
+    return Indicator(make_shared<IResult>(result_ix));
 }
 
 }  // namespace hku
