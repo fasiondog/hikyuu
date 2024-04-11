@@ -181,7 +181,7 @@ def get_new_holidays():
     res.encoding = res.apparent_encoding
     ret = re.findall(r'<textarea id="data" style="display:none;">([\s\w\d\W]+)</textarea>', res.text, re.M)[0].strip()
     day = [d.split('|')[:4] for d in ret.split('\n')]
-    return [v[0] for v in day if v[2] == '中国']
+    return [v[0] for v in day if len(v) >= 3 and v[2] == '中国']
 
 
 @hku_catch(ret=[], trace=True)
