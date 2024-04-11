@@ -73,6 +73,7 @@
 #include "crt/PRICELIST.h"
 #include "crt/RECOVER.h"
 #include "crt/REF.h"
+#include "crt/RESULT.h"
 #include "crt/REVERSE.h"
 #include "crt/ROC.h"
 #include "crt/ROCP.h"

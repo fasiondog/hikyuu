@@ -1815,4 +1815,13 @@ void export_Indicator_build_in(py::module& m) {
     换手率=股票成交量/流通股股数×100%
 
     :param int n: 时间窗口)");
+
+    m.def("RESULT", py::overload_cast<int>(RESULT));
+    m.def("RESULT", py::overload_cast<const Indicator&, int>(RESULT), py::arg("data"),
+          py::arg("result_ix"), R"(RESULT(data, result_ix)
+          
+    以公式指标的方式返回指定指标中的指定结果集
+
+    :param Indicator data: 指定的指标
+    :param int result_ix: 指定的结果集)");
 }
