@@ -45,7 +45,7 @@ jobs:
     - name: configure
       shell: cmd
       run: |
-        xmake f --feedback=n -k shared -y
+        xmake f -c --feedback=n -k shared -y -vD
 
     - name: build
       shell: cmd
