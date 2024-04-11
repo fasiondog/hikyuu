@@ -88,10 +88,23 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
     :alt: Star History Chart
 
 
-遇到了问题？想要更多了解Hikyuu？请使用以下方式联系：
+项目捐赠
 --------------------------------------------------
 
-- 作者邮箱：fasiondog@sina.com
+目前知识星球尚处于建设期，您的加入将视为对项目的捐赠（200元）
+
+    .. figure:: http://fasiondog.gitee.io/hikyuu/images/zhishixingqiu.jpg
+
+
+想要更多了解Hikyuu？请使用以下方式联系：
+--------------------------------------------------
+
+**项目交流和问题答复将逐渐转移至知识星球-【Hikyuu量化】，详见前述“项目捐赠”。**
+
+- 关注公众号：
+
+    .. figure:: http://fasiondog.gitee.io/hikyuu/images/weixin_gongzhonghao.jpg
+
 - QQ交流群：114910869, 或扫码加入：
 
     .. figure:: http://fasiondog.gitee.io/hikyuu/images/10003-qq.png
@@ -99,7 +112,3 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 - 加入微信群（请注明“加入hikyuu”）：
 
     .. figure:: http://fasiondog.gitee.io/hikyuu/images/weixin_group.jpg
-
-- 关注公众号：
-
-    .. figure:: http://fasiondog.gitee.io/hikyuu/images/weixin_gongzhonghao.jpg
