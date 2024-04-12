@@ -22,9 +22,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from hikyuu.data.common import MARKETID, STOCKTYPE
+from hikyuu.data.common import MARKETID, STOCKTYPE, historyfinancialreader
 from hikyuu.data.common_mysql import get_marketid
 from hikyuu.util import *
+
 
 @hku_catch(trace=True)
 def pytdx_import_finance_to_mysql(db_connect, pytdx_connect, market):
@@ -41,7 +42,7 @@ def pytdx_import_finance_to_mysql(db_connect, pytdx_connect, market):
     records = []
     for stk in all_list:
         x = pytdx_connect.get_finance_info(1 if stk[1] == MARKETID.SH else 0, stk[2])
-        #print(stk[2])
+        # print(stk[2])
         if x is not None and x['code'] == stk[2]:
             cur.execute(
                 "select updated_date from `hku_base`.`stkfinance` where stockid={} and updated_date={}".format(
@@ -51,9 +52,9 @@ def pytdx_import_finance_to_mysql(db_connect, pytdx_connect, market):
             a = cur.fetchall()
             a = [x[0] for x in a]
             if a:
-                #print(a)
+                # print(a)
                 continue
-            #else:
+            # else:
             #    print(market, stk[2])
             records.append(
                 (
@@ -115,3 +116,14 @@ def pytdx_import_finance_to_mysql(db_connect, pytdx_connect, market):
 
     cur.close()
     return len(records)
+
+
+def history_finance_import_mysql(connect, filename):
+    file_date = filename[-12:-4]
+    ret = historyfinancialreader(filename)
+    cur = connect.cursor()
+    cur.execute(f"delete from `hku_base`.`HistoryFinance` where file_date={file_date}")
+    cur.executemany(
+        "insert into `hku_base`.`HistoryFinance` (`file_date`, `market_code`, `report_date`, `values`) values (%s, %s, %s, %s)", ret)
+    cur.close()
+    connect.commit()

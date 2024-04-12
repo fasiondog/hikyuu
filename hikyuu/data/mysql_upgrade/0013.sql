@@ -3,7 +3,19 @@ CREATE TABLE
         `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
         `name` VARCHAR(200) NOT NULL,
         PRIMARY KEY(`id`)
-    ) COLLATE = 'utf8_general_ci' ENGINE = InnoDB;
+    ) COLLATE = 'utf8_general_ci' ENGINE = MyISAM;
+
+CREATE TABLE
+    IF NOT EXISTS `hku_base`.`HistoryFinance` (
+        `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        `file_date` INT UNSIGNED NOT NULL,
+        `market_code` VARCHAR(60) NOT NULL,
+        `report_date` INT UNSIGNED NOT NULL,
+        `values` BLOB NOT NULL,
+        PRIMARY KEY (`id`),
+        INDEX `ix1_on_history_finance` (`file_date`),
+        INDEX `ix2_on_history_finance` (`market_code`, `report_date`)
+    ) COLLATE = 'utf8_general_ci' ENGINE = MyISAM;
 
 INSERT INTO `hku_base`.`HistoryFinanceField` (`id`, `name`) VALUES (1, "基本每股收益");
 INSERT INTO `hku_base`.`HistoryFinanceField` (`id`, `name`) VALUES (2, "扣除非经常性损益每股收益");
