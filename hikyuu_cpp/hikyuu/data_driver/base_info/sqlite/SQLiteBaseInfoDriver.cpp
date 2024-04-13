@@ -378,10 +378,10 @@ vector<std::pair<size_t, string>> SQLiteBaseInfoDriver::getHistoryFinanceField()
     return result;
 }
 
-vector<vector<float>> SQLiteBaseInfoDriver::getHistoryFinance(const string& market,
-                                                              const string& code, Datetime start,
-                                                              Datetime end) {
-    vector<vector<float>> result;
+vector<HistoryFinanceInfo> SQLiteBaseInfoDriver::getHistoryFinance(const string& market,
+                                                                   const string& code,
+                                                                   Datetime start, Datetime end) {
+    vector<HistoryFinanceInfo> result;
 
     Datetime new_start = start.isNull() ? Datetime::min() : start;
     Datetime new_end = end.isNull() ? Datetime::max() : end;
@@ -400,11 +400,11 @@ vector<vector<float>> SQLiteBaseInfoDriver::getHistoryFinance(const string& mark
         for (size_t i = 0; i < total; i++) {
             const auto& finance = finances[i];
             auto& cur = result[i];
+            cur.reportDate = Datetime(finance.report_date);
             size_t len = finance.values.size() / sizeof(float);
-            cur.resize(len + 1);
-            auto* data = cur.data();
-            data[0] = static_cast<float>(finance.report_date);
-            memcpy(data + 1, finance.values.data(), len * sizeof(float));
+            cur.values.resize(len + 1);
+            auto* data = cur.values.data();
+            memcpy(data, finance.values.data(), len * sizeof(float));
         }
 
     } catch (const std::exception& e) {

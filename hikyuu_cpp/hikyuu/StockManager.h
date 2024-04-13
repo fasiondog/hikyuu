@@ -164,7 +164,7 @@ public:
     const string& getHistoryFinanceFieldName(size_t ix) const;
     size_t getHistoryFinanceFieldIndex(const string& name) const;
 
-    vector<vector<float>> getHistoryFinance(const Stock& stk, Datetime start, Datetime end);
+    vector<HistoryFinanceInfo> getHistoryFinance(const Stock& stk, Datetime start, Datetime end);
 
     /**
      * 添加Stock，仅供临时增加的特殊Stock使用
@@ -328,8 +328,8 @@ inline size_t StockManager::getHistoryFinanceFieldIndex(const string& name) cons
     return m_field_name_to_ix.at(name);
 }
 
-inline vector<vector<float>> StockManager::getHistoryFinance(const Stock& stk, Datetime start,
-                                                             Datetime end) {
+inline vector<HistoryFinanceInfo> StockManager::getHistoryFinance(const Stock& stk, Datetime start,
+                                                                  Datetime end) {
     return m_baseInfoDriver->getHistoryFinance(stk.market(), stk.code(), start, end);
 }
 

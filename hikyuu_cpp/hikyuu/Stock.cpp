@@ -748,6 +748,16 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
     }
 }
 
+const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {
+    std::lock_guard<std::mutex> lock(m_data->m_history_finance_mutex);
+    if (!m_data->m_history_finance_ready) {
+        m_data->m_history_finance =
+          StockManager::instance().getHistoryFinance(*this, Datetime::min(), Null<Datetime>());
+        m_data->m_history_finance_ready = true;
+    }
+    return m_data->m_history_finance;
+}
+
 Stock HKU_API getStock(const string& querystr) {
     const StockManager& sm = StockManager::instance();
     return sm.getStock(querystr);

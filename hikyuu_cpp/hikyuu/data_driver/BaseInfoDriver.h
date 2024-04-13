@@ -15,6 +15,7 @@
 #include "../StockTypeInfo.h"
 #include "../Stock.h"
 #include "../ZhBond10.h"
+#include "../HistoryFinanceInfo.h"
 #include "../utilities/db_connect/SQLStatementBase.h"
 
 namespace hku {
@@ -124,9 +125,9 @@ public:
      * @param start 财务报告发布起始日期
      * @return vector<float> [[财务报告发布日期(ymd), 字段1, 字段2, ...], ...]
      */
-    virtual vector<vector<float>> getHistoryFinance(const string& market, const string& code,
-                                                    Datetime start, Datetime end) {
-        return vector<vector<float>>();
+    virtual vector<HistoryFinanceInfo> getHistoryFinance(const string& market, const string& code,
+                                                         Datetime start, Datetime end) {
+        return vector<HistoryFinanceInfo>();
     }
 
     /**
