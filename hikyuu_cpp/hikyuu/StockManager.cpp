@@ -576,7 +576,7 @@ void StockManager::loadAllStockWeights() {
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             Stock& stock = iter->second;
             auto sw_list = m_baseInfoDriver->getStockWeightList(
-              stock.market(), stock.code(), stock.startDatetime(), Null<Datetime>());
+              stock.market(), stock.code(), m_context.startDatetime(), Null<Datetime>());
             {
                 std::lock_guard<std::mutex> lock2(stock.m_data->m_weight_mutex);
                 stock.m_data->m_weightList = std::move(sw_list);
