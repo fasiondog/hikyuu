@@ -599,4 +599,16 @@ void StockManager::loadHistoryFinanceField() {
     }
 }
 
+vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() const {
+    vector<std::pair<size_t, string>> ret;
+    for (auto iter = m_field_ix_to_name.begin(); iter != m_field_ix_to_name.end(); ++iter) {
+        ret.emplace_back(iter->first, iter->second);
+    }
+    std::sort(ret.begin(), ret.end(),
+              [](const std::pair<size_t, string>& a, const std::pair<size_t, string>& b) {
+                  return a.first < b.first;
+              });
+    return ret;
+}
+
 }  // namespace hku

@@ -39,12 +39,12 @@ std::vector<T> python_bytes_to_vector(const py::bytes& obj) {
     std::vector<T> result(vect_len);
 
     char* buffer = nullptr;
-    ssize_t length = 0;
+    Py_ssize_t length = 0;
     if (PyBytes_AsStringAndSize(obj.ptr(), &buffer, &length) != 0) {
         throw std::runtime_error("trans bytes to vector failed!");
     }
 
-    if (length != static_cast<ssize_t>(vect_len * sizeof(T))) {
+    if (length != static_cast<Py_ssize_t>(vect_len * sizeof(T))) {
         throw std::runtime_error("The length bytes not match!");
     }
 

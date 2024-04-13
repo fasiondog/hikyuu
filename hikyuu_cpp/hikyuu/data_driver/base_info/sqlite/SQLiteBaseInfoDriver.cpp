@@ -398,18 +398,16 @@ vector<HistoryFinanceInfo> SQLiteBaseInfoDriver::getHistoryFinance(const string&
         size_t total = finances.size();
         result.resize(total);
         for (size_t i = 0; i < total; i++) {
-            const auto& finance = finances[i];
+            auto& finance = finances[i];
             auto& cur = result[i];
             cur.reportDate = Datetime(finance.report_date);
-            size_t len = finance.values.size() / sizeof(float);
-            cur.values.resize(len + 1);
-            auto* data = cur.values.data();
-            memcpy(data, finance.values.data(), len * sizeof(float));
+            cur.values = std::move(finance.values);
         }
 
     } catch (const std::exception& e) {
         HKU_ERROR(e.what());
     } catch (...) {
+        HKU_ERROR_UNKNOWN;
     }
 
     return result;

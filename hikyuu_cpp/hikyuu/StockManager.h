@@ -163,6 +163,7 @@ public:
 
     const string& getHistoryFinanceFieldName(size_t ix) const;
     size_t getHistoryFinanceFieldIndex(const string& name) const;
+    vector<std::pair<size_t, string>> getHistoryFinanceAllFields() const;
 
     vector<HistoryFinanceInfo> getHistoryFinance(const Stock& stk, Datetime start, Datetime end);
 

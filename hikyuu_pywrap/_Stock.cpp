@@ -166,6 +166,16 @@ void export_Stock(py::module& m) {
         :param Datetime end: 结束时刻
         :rtype: StockWeightList)")
 
+      .def("get_history_finance",
+           [](const Stock& stk) {
+               auto finances = stk.getHistoryFinance();
+               py::list ret;
+               for (const auto& f : finances) {
+                   ret.append(py::make_tuple(f.reportDate, f.values));
+               }
+               return ret;
+           })
+
       .def("load_kdata_to_buffer", &Stock::loadKDataToBuffer, R"(load_kdata_to_buffer(self,
           ktype)
 

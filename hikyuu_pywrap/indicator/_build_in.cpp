@@ -1824,4 +1824,9 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator data: 指定的指标
     :param int result_ix: 指定的结果集)");
+
+    m.def("FINANCE", py::overload_cast<int>(FINANCE));
+    m.def("FINANCE", py::overload_cast<const string&>(FINANCE));
+    m.def("FINANCE", py::overload_cast<const KData&, int>(FINANCE));
+    m.def("FINANCE", py::overload_cast<const KData&, const string&>(FINANCE));
 }

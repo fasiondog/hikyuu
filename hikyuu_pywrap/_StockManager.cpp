@@ -182,6 +182,16 @@ void export_StockManager(py::module& m) {
     
     根据字段名称，获取历史财务信息相应字段索引)")
 
+      .def("get_history_finance_all_fields",
+           [](const StockManager& sm) {
+               auto fields = sm.getHistoryFinanceAllFields();
+               py::list ret;
+               for (const auto& f : fields) {
+                   ret.append(py::make_tuple(f.first, f.second));
+               }
+               return ret;
+           })
+
       .def("__len__", &StockManager::size, "返回证券数量")
       .def("__getitem__", &StockManager::getStock, "同 get_stock")
       .def(

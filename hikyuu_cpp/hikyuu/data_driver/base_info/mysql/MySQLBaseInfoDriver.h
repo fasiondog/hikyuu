@@ -42,6 +42,8 @@ public:
     virtual ZhBond10List getAllZhBond10() override;
 
     virtual vector<std::pair<size_t, string>> getHistoryFinanceField() override;
+    virtual vector<HistoryFinanceInfo> getHistoryFinance(const string& market, const string& code,
+                                                         Datetime start, Datetime end) override;
 
 private:
     ConnectPool<MySQLConnect>* m_pool;

@@ -388,4 +388,39 @@ vector<std::pair<size_t, string>> MySQLBaseInfoDriver::getHistoryFinanceField() 
     return result;
 }
 
+vector<HistoryFinanceInfo> MySQLBaseInfoDriver::getHistoryFinance(const string &market,
+                                                                  const string &code,
+                                                                  Datetime start, Datetime end) {
+    vector<HistoryFinanceInfo> result;
+
+    Datetime new_start = start.isNull() ? Datetime::min() : start;
+    Datetime new_end = end.isNull() ? Datetime::max() : end;
+    HKU_IF_RETURN(start >= end, result);
+
+    auto con = m_pool->getConnect();
+    try {
+        string market_code(fmt::format("{}{}", market, code));
+        to_upper(market_code);
+        vector<HistoryFinanceTable> finances;
+        con->batchLoad(finances, ((Field("market_code") == market_code) &
+                                  (Field("report_date") >= start.ymd())) +
+                                   ASC("report_date"));
+        size_t total = finances.size();
+        result.resize(total);
+        for (size_t i = 0; i < total; i++) {
+            auto &finance = finances[i];
+            auto &cur = result[i];
+            cur.reportDate = Datetime(finance.report_date);
+            cur.values = std::move(finance.values);
+        }
+
+    } catch (const std::exception &e) {
+        HKU_ERROR(e.what());
+    } catch (...) {
+        HKU_ERROR_UNKNOWN;
+    }
+
+    return result;
+}
+
 } /* namespace hku */

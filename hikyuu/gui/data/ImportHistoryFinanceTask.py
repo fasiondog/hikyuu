@@ -88,12 +88,13 @@ class ImportHistoryFinanceTask:
         # filesize = item['filesize']
         # get_report_file_by_size 传入实际的 filesize，实际会出错
         data = self.api.get_report_file_by_size(f'tdxfin/{filename}', 0)
+        hku_info(f"Download finance file: {filename}")
         dest_file_name = self.dest_dir + "/" + filename
         with open(dest_file_name, 'wb') as f:
             f.write(data)
         shutil.unpack_archive(dest_file_name, extract_dir=self.dest_dir)
-        hku_info(f"Download finance file: {filename}")
         self.import_to_db(f'{self.dest_dir}/{filename[0:-4]}.dat')
+        hku_info(f"Import finance file: {self.dest_dir}/{filename[0:-4]}.dat")
 
     @hku_catch(trace=True)
     def __call__(self):
