@@ -17,6 +17,8 @@
 #include "../table/StockTable.h"
 #include "../table/HolidayTable.h"
 #include "../table/ZhBond10Table.h"
+#include "../table/HistoryFinanceTable.h"
+#include "../table/HistoryFinanceFieldTable.h"
 
 namespace hku {
 
@@ -363,6 +365,24 @@ ZhBond10List MySQLBaseInfoDriver::getAllZhBond10() {
             result[i].date = Datetime(records[i].date);
             result[i].value = double(records[i].value) * 0.0001;
         }
+    } catch (...) {
+    }
+    return result;
+}
+
+vector<std::pair<size_t, string>> MySQLBaseInfoDriver::getHistoryFinanceField() {
+    vector<std::pair<size_t, string>> result;
+    auto con = m_pool->getConnect();
+    try {
+        vector<HistoryFinanceFieldTable> fields;
+        con->batchLoad(fields);
+        size_t total = fields.size();
+        result.resize(total);
+        for (size_t i = 0; i < total; i++) {
+            result[i].first = size_t(fields[i].id());
+            result[i].second = std::move(fields[i].name);
+        }
+
     } catch (...) {
     }
     return result;

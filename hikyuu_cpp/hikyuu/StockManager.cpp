@@ -125,6 +125,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     loadAllStocks();
     loadAllStockWeights();
     loadAllZhBond10();
+    loadHistoryFinanceField();
 
     // 获取板块驱动
     m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
@@ -273,6 +274,7 @@ void StockManager::reload() {
     loadAllStocks();
     loadAllStockWeights();
     loadAllZhBond10();
+    loadHistoryFinanceField();
 
     m_blockDriver->load();
 
@@ -587,6 +589,14 @@ void StockManager::loadAllStockWeights() {
 
 void StockManager::loadAllZhBond10() {
     m_zh_bond10 = m_baseInfoDriver->getAllZhBond10();
+}
+
+void StockManager::loadHistoryFinanceField() {
+    auto fields = m_baseInfoDriver->getHistoryFinanceField();
+    for (const auto& field : fields) {
+        m_field_ix_to_name[field.first] = field.second;
+        m_field_name_to_ix[field.second] = field.first;
+    }
 }
 
 }  // namespace hku

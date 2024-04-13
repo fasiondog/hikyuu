@@ -161,6 +161,11 @@ public:
      */
     bool isHoliday(const Datetime& d) const;
 
+    const string& getHistoryFinanceFieldName(size_t ix) const;
+    size_t getHistoryFinanceFieldIndex(const string& name) const;
+
+    vector<vector<float>> getHistoryFinance(const Stock& stk, Datetime start, Datetime end);
+
     /**
      * 添加Stock，仅供临时增加的特殊Stock使用
      * @param stock
@@ -233,6 +238,9 @@ private:
     /** 加载10年期中国国债收益率数据 */
     void loadAllZhBond10();
 
+    /** 加载历史财经字段索引 */
+    void loadHistoryFinanceField();
+
 private:
     StockManager();
 
@@ -260,6 +268,9 @@ private:
     std::mutex* m_holidays_mutex;
 
     ZhBond10List m_zh_bond10;  // 10年期中国国债收益率数据
+
+    unordered_map<string, size_t> m_field_name_to_ix;  // 财经字段名称到字段索引映射
+    unordered_map<size_t, string> m_field_ix_to_name;  // 财经字段索引到字段名称映射
 
     Parameter m_baseInfoDriverParam;
     Parameter m_blockDriverParam;
@@ -307,6 +318,19 @@ inline const StrategyContext& StockManager::getStrategyContext() const {
 
 inline BaseInfoDriverPtr StockManager::getBaseInfoDriver() const {
     return m_baseInfoDriver;
+}
+
+inline const string& StockManager::getHistoryFinanceFieldName(size_t ix) const {
+    return m_field_ix_to_name.at(ix);
+}
+
+inline size_t StockManager::getHistoryFinanceFieldIndex(const string& name) const {
+    return m_field_name_to_ix.at(name);
+}
+
+inline vector<vector<float>> StockManager::getHistoryFinance(const Stock& stk, Datetime start,
+                                                             Datetime end) {
+    return m_baseInfoDriver->getHistoryFinance(stk.market(), stk.code(), start, end);
 }
 
 }  // namespace hku

@@ -16,6 +16,8 @@
 #include "../table/StockTable.h"
 #include "../table/HolidayTable.h"
 #include "../table/ZhBond10Table.h"
+#include "../table/HistoryFinanceTable.h"
+#include "../table/HistoryFinanceFieldTable.h"
 
 namespace hku {
 
@@ -355,6 +357,61 @@ ZhBond10List SQLiteBaseInfoDriver::getAllZhBond10() {
         }
     } catch (...) {
     }
+    return result;
+}
+
+vector<std::pair<size_t, string>> SQLiteBaseInfoDriver::getHistoryFinanceField() {
+    vector<std::pair<size_t, string>> result;
+    auto con = m_pool->getConnect();
+    try {
+        vector<HistoryFinanceFieldTable> fields;
+        con->batchLoad(fields);
+        size_t total = fields.size();
+        result.resize(total);
+        for (size_t i = 0; i < total; i++) {
+            result[i].first = size_t(fields[i].id());
+            result[i].second = std::move(fields[i].name);
+        }
+
+    } catch (...) {
+    }
+    return result;
+}
+
+vector<vector<float>> SQLiteBaseInfoDriver::getHistoryFinance(const string& market,
+                                                              const string& code, Datetime start,
+                                                              Datetime end) {
+    vector<vector<float>> result;
+
+    Datetime new_start = start.isNull() ? Datetime::min() : start;
+    Datetime new_end = end.isNull() ? Datetime::max() : end;
+    HKU_IF_RETURN(start >= end, result);
+
+    auto con = m_pool->getConnect();
+    try {
+        string market_code(fmt::format("{}{}", market, code));
+        to_upper(market_code);
+        vector<HistoryFinanceTable> finances;
+        con->batchLoad(finances, ((Field("market_code") == market_code) &
+                                  (Field("report_date") >= start.ymd())) +
+                                   ASC("report_date"));
+        size_t total = finances.size();
+        result.resize(total);
+        for (size_t i = 0; i < total; i++) {
+            const auto& finance = finances[i];
+            auto& cur = result[i];
+            size_t len = finance.values.size() / sizeof(float);
+            cur.resize(len + 1);
+            auto* data = cur.data();
+            data[0] = static_cast<float>(finance.report_date);
+            memcpy(data + 1, finance.values.data(), len * sizeof(float));
+        }
+
+    } catch (const std::exception& e) {
+        HKU_ERROR(e.what());
+    } catch (...) {
+    }
+
     return result;
 }
 

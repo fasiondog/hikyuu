@@ -245,6 +245,9 @@ struct HKU_API Stock::Data {
     StockWeightList m_weightList;  // 权息信息列表
     std::mutex m_weight_mutex;
 
+    vector<vector<float>> m_history_finance;  // 历史财务信息 [财务报告日期, 字段1, 字段2, ...]
+    std::mutex m_history_finance_mutex;
+
     price_t m_tick;
     price_t m_tickValue;
     price_t m_unit;

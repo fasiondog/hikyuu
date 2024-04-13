@@ -118,6 +118,26 @@ public:
     }
 
     /**
+     * 获取历史财务信息
+     * @param market 市场简称
+     * @param code 证券代码
+     * @param start 财务报告发布起始日期
+     * @return vector<float> [[财务报告发布日期(ymd), 字段1, 字段2, ...], ...]
+     */
+    virtual vector<vector<float>> getHistoryFinance(const string& market, const string& code,
+                                                    Datetime start, Datetime end) {
+        return vector<vector<float>>();
+    }
+
+    /**
+     * 获取历史财务信息字段序号与名称
+     * @return vector<std::pair<size_t, string>>
+     */
+    virtual vector<std::pair<size_t, string>> getHistoryFinanceField() {
+        return vector<std::pair<size_t, string>>();
+    }
+
+    /**
      * 获取当前财务信息
      * @param market 市场标识
      * @param code 证券代码
