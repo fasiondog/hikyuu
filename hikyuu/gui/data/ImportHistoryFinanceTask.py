@@ -25,8 +25,11 @@
 import os
 import shutil
 import hashlib
+import sqlite3
+import mysql.connector
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_finance_to_mysql import history_finance_import_mysql
+from hikyuu.data.pytdx_finance_to_sqlite import history_finance_import_sqlite
 from hikyuu.util import *
 
 
@@ -58,22 +61,27 @@ class ImportHistoryFinanceTask:
         return [l2d(i.strip().split(',')) for i in content]
 
     def import_to_db(self, filename):
-        use_mysql = False
-        if self.config is not None and not self.config.getboolean('hdf5', 'enable', fallback=True):
-            use_mysql = True
-        if not use_mysql:
-            return
+        if self.config.getboolean('hdf5', 'enable', fallback=True):
+            sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
+            connect = sqlite3.connect(sqlite_file, timeout=1800)
+            history_finance_import = history_finance_import_sqlite
+        else:
+            db_config = {
+                'user': self.config['mysql']['usr'],
+                'password': self.config['mysql']['pwd'],
+                'host': self.config['mysql']['host'],
+                'port': self.config['mysql']['port']
+            }
+            connect = mysql.connector.connect(**db_config)
+            history_finance_import = history_finance_import_mysql
 
-        db_config = {
-            'user': self.config['mysql']['usr'],
-            'password': self.config['mysql']['pwd'],
-            'host': self.config['mysql']['host'],
-            'port': self.config['mysql']['port']
-        }
-        import mysql.connector
-        connect = mysql.connector.connect(**db_config)
-        history_finance_import_mysql(connect, filename)
-        connect.close()
+        try:
+            history_finance_import(connect, filename)
+        except Exception as e:
+            hku_error(str(e))
+        finally:
+            connect.commit()
+            connect.close()
 
     def download_file(self, item):
         filename = item['filename']

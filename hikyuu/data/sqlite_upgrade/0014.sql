@@ -6,6 +6,19 @@ CREATE TABLE
         `name` VARCHAR(200) NOT NULL,
         PRIMARY KEY(`id`)
     );
+
+CREATE TABLE
+    IF NOT EXISTS `HistoryFinance` (
+        `id` INTEGER,
+        `file_date` INTEGER NOT NULL,
+        `market_code` TEXT NOT NULL,
+        `report_date` INTEGER NOT NULL,
+        `values` BLOB NOT NULL,
+        PRIMARY KEY (`id` AUTOINCREMENT)
+    );
+
+CREATE INDEX "ix1_on_history_finance" ON "HistoryFinance" (file_date);
+CREATE INDEX "ix2_on_history_finance" ON "HistoryFinance" (market_code, report_date);
 	
 INSERT INTO `HistoryFinanceField` (`id`, `name`) VALUES (1, "基本每股收益");
 INSERT INTO `HistoryFinanceField` (`id`, `name`) VALUES (2, "扣除非经常性损益每股收益");

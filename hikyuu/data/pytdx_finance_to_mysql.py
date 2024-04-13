@@ -125,5 +125,5 @@ def history_finance_import_mysql(connect, filename):
     cur.execute(f"delete from `hku_base`.`HistoryFinance` where file_date={file_date}")
     cur.executemany(
         "insert into `hku_base`.`HistoryFinance` (`file_date`, `market_code`, `report_date`, `values`) values (%s, %s, %s, %s)", ret)
-    cur.close()
     connect.commit()
+    cur.close()
