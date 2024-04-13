@@ -560,14 +560,27 @@ void StockManager::loadAllHolidays() {
 
 void StockManager::loadAllStockWeights() {
     HKU_INFO("Loading stock weight...");
-    auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
-    std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
-    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-        auto weight_iter = all_stkweight_dict.find(iter->first);
-        if (weight_iter != all_stkweight_dict.end()) {
+    if (m_context.isAll()) {
+        auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
+        std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            auto weight_iter = all_stkweight_dict.find(iter->first);
+            if (weight_iter != all_stkweight_dict.end()) {
+                Stock& stock = iter->second;
+                std::lock_guard<std::mutex> lock2(stock.m_data->m_weight_mutex);
+                stock.m_data->m_weightList.swap(weight_iter->second);
+            }
+        }
+    } else {
+        std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             Stock& stock = iter->second;
-            std::lock_guard<std::mutex> lock2(stock.m_data->m_weight_mutex);
-            stock.m_data->m_weightList.swap(weight_iter->second);
+            auto sw_list = m_baseInfoDriver->getStockWeightList(
+              stock.market(), stock.code(), stock.startDatetime(), Null<Datetime>());
+            {
+                std::lock_guard<std::mutex> lock2(stock.m_data->m_weight_mutex);
+                stock.m_data->m_weightList = std::move(sw_list);
+            }
         }
     }
 }
