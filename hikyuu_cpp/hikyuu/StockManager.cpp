@@ -125,6 +125,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     loadAllStocks();
     loadAllStockWeights();
     loadAllZhBond10();
+    loadHistoryFinanceField();
 
     // 获取板块驱动
     m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
@@ -273,6 +274,7 @@ void StockManager::reload() {
     loadAllStocks();
     loadAllStockWeights();
     loadAllZhBond10();
+    loadHistoryFinanceField();
 
     m_blockDriver->load();
 
@@ -560,20 +562,53 @@ void StockManager::loadAllHolidays() {
 
 void StockManager::loadAllStockWeights() {
     HKU_INFO("Loading stock weight...");
-    auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
-    std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
-    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-        auto weight_iter = all_stkweight_dict.find(iter->first);
-        if (weight_iter != all_stkweight_dict.end()) {
+    if (m_context.isAll()) {
+        auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
+        std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            auto weight_iter = all_stkweight_dict.find(iter->first);
+            if (weight_iter != all_stkweight_dict.end()) {
+                Stock& stock = iter->second;
+                std::lock_guard<std::mutex> lock2(stock.m_data->m_weight_mutex);
+                stock.m_data->m_weightList.swap(weight_iter->second);
+            }
+        }
+    } else {
+        std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             Stock& stock = iter->second;
-            std::lock_guard<std::mutex> lock2(stock.m_data->m_weight_mutex);
-            stock.m_data->m_weightList.swap(weight_iter->second);
+            auto sw_list = m_baseInfoDriver->getStockWeightList(
+              stock.market(), stock.code(), m_context.startDatetime(), Null<Datetime>());
+            {
+                std::lock_guard<std::mutex> lock2(stock.m_data->m_weight_mutex);
+                stock.m_data->m_weightList = std::move(sw_list);
+            }
         }
     }
 }
 
 void StockManager::loadAllZhBond10() {
     m_zh_bond10 = m_baseInfoDriver->getAllZhBond10();
+}
+
+void StockManager::loadHistoryFinanceField() {
+    auto fields = m_baseInfoDriver->getHistoryFinanceField();
+    for (const auto& field : fields) {
+        m_field_ix_to_name[field.first - 1] = field.second;
+        m_field_name_to_ix[field.second] = field.first - 1;
+    }
+}
+
+vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() const {
+    vector<std::pair<size_t, string>> ret;
+    for (auto iter = m_field_ix_to_name.begin(); iter != m_field_ix_to_name.end(); ++iter) {
+        ret.emplace_back(iter->first, iter->second);
+    }
+    std::sort(ret.begin(), ret.end(),
+              [](const std::pair<size_t, string>& a, const std::pair<size_t, string>& b) {
+                  return a.first < b.first;
+              });
+    return ret;
 }
 
 }  // namespace hku

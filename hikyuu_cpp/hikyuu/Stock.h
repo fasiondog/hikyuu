@@ -14,6 +14,7 @@
 #include "KQuery.h"
 #include "TimeLineRecord.h"
 #include "TransRecord.h"
+#include "HistoryFinanceInfo.h"
 
 namespace hku {
 
@@ -180,6 +181,8 @@ public:
      */
     PriceList getHistoryFinanceInfo(const Datetime& date) const;
 
+    const vector<HistoryFinanceInfo>& getHistoryFinance() const;
+
     /** 设置权息信息, 仅供初始化时调用 */
     void setWeightList(const StockWeightList&);
 
@@ -244,6 +247,11 @@ struct HKU_API Stock::Data {
 
     StockWeightList m_weightList;  // 权息信息列表
     std::mutex m_weight_mutex;
+
+    mutable vector<HistoryFinanceInfo>
+      m_history_finance;  // 历史财务信息 [财务报告日期, 字段1, 字段2, ...]
+    mutable bool m_history_finance_ready{false};
+    mutable std::mutex m_history_finance_mutex;
 
     price_t m_tick;
     price_t m_tickValue;

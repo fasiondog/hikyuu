@@ -44,6 +44,7 @@
 #include "crt/EXIST.h"
 #include "crt/EVERY.h"
 #include "crt/FILTER.h"
+#include "crt/FINANCE.h"
 #include "crt/FLOOR.h"
 #include "crt/HHV.h"
 #include "crt/HHVBARS.h"

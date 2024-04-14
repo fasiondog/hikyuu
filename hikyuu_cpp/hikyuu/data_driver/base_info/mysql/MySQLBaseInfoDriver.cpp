@@ -17,6 +17,8 @@
 #include "../table/StockTable.h"
 #include "../table/HolidayTable.h"
 #include "../table/ZhBond10Table.h"
+#include "../table/HistoryFinanceTable.h"
+#include "../table/HistoryFinanceFieldTable.h"
 
 namespace hku {
 
@@ -365,6 +367,59 @@ ZhBond10List MySQLBaseInfoDriver::getAllZhBond10() {
         }
     } catch (...) {
     }
+    return result;
+}
+
+vector<std::pair<size_t, string>> MySQLBaseInfoDriver::getHistoryFinanceField() {
+    vector<std::pair<size_t, string>> result;
+    auto con = m_pool->getConnect();
+    try {
+        vector<HistoryFinanceFieldTable> fields;
+        con->batchLoad(fields);
+        size_t total = fields.size();
+        result.resize(total);
+        for (size_t i = 0; i < total; i++) {
+            result[i].first = size_t(fields[i].id());
+            result[i].second = std::move(fields[i].name);
+        }
+
+    } catch (...) {
+    }
+    return result;
+}
+
+vector<HistoryFinanceInfo> MySQLBaseInfoDriver::getHistoryFinance(const string &market,
+                                                                  const string &code,
+                                                                  Datetime start, Datetime end) {
+    vector<HistoryFinanceInfo> result;
+
+    Datetime new_start = start.isNull() ? Datetime::min() : start;
+    Datetime new_end = end.isNull() ? Datetime::max() : end;
+    HKU_IF_RETURN(start >= end, result);
+
+    auto con = m_pool->getConnect();
+    try {
+        string market_code(fmt::format("{}{}", market, code));
+        to_upper(market_code);
+        vector<HistoryFinanceTable> finances;
+        con->batchLoad(finances, ((Field("market_code") == market_code) &
+                                  (Field("report_date") >= start.ymd())) +
+                                   ASC("report_date"));
+        size_t total = finances.size();
+        result.resize(total);
+        for (size_t i = 0; i < total; i++) {
+            auto &finance = finances[i];
+            auto &cur = result[i];
+            cur.reportDate = Datetime(finance.report_date);
+            cur.values = std::move(finance.values);
+        }
+
+    } catch (const std::exception &e) {
+        HKU_ERROR(e.what());
+    } catch (...) {
+        HKU_ERROR_UNKNOWN;
+    }
+
     return result;
 }
 
