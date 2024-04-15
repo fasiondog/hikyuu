@@ -298,7 +298,6 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
 
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
-    HKU_IF_RETURN(total == 0, void());
     int start = total <= max_num ? 0 : total - max_num;
     {
         std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[kType]));
@@ -308,8 +307,10 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
         }
         KRecordList* ptr_klist = new KRecordList;
         m_data->pKData[kType] = ptr_klist;
-        (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code,
-                                              KQuery(start, Null<int64_t>(), kType));
+        if (total != 0) {
+            (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code,
+                                                  KQuery(start, Null<int64_t>(), kType));
+        }
     }
 }
 
