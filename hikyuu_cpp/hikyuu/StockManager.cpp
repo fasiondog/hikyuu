@@ -429,24 +429,13 @@ Stock StockManager::addTempCsvStock(const string& code, const string& day_filena
     p->setDayFileName(day_filename);
     p->setMinFileName(min_filename);
     result.setKDataDriver(driver_pool);
-    const auto& preload_param = getPreloadParameter();
-    if (preload_param.tryGet<bool>("day", true)) {
-        result.loadKDataToBuffer(KQuery::DAY);
-    }
-    if (preload_param.tryGet<bool>("min", false)) {
-        result.loadKDataToBuffer(KQuery::MIN);
-    }
+    result.loadKDataToBuffer(KQuery::DAY);
+    result.loadKDataToBuffer(KQuery::MIN);
     return addStock(result) ? result : Null<Stock>();
 }
 
 void StockManager::removeTempCsvStock(const string& code) {
-    string query_str = "TMP" + code;
-    to_upper(query_str);
-    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
-    auto iter = m_stockDict.find(query_str);
-    if (iter != m_stockDict.end()) {
-        m_stockDict.erase(iter);
-    }
+    removeStock(fmt::format("TMP{}", code));
 }
 
 bool StockManager::addStock(const Stock& stock) {
@@ -457,6 +446,16 @@ bool StockManager::addStock(const Stock& stock) {
                         "The stock had exist! {}", market_code);
     m_stockDict[market_code] = stock;
     return true;
+}
+
+void StockManager::removeStock(const string& market_code) {
+    string n_market_code(market_code);
+    to_upper(n_market_code);
+    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+    auto iter = m_stockDict.find(n_market_code);
+    if (iter != m_stockDict.end()) {
+        m_stockDict.erase(iter);
+    }
 }
 
 void StockManager::loadAllStocks() {

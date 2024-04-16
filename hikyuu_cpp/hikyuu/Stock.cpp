@@ -749,6 +749,54 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
     }
 }
 
+void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
+    HKU_IF_RETURN(ks.empty(), void());
+    string nktype(ktype);
+    to_upper(nktype);
+
+    // 写锁
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
+
+    if (!m_data->pKData[nktype]) {
+        m_data->pKData[nktype] = new KRecordList();
+    }
+
+    (*(m_data->pKData[nktype])) = ks;
+
+    Parameter param;
+    param.set<string>("type", "DoNothin");
+    m_kdataDriver = DataDriverFactory::getKDataDriverPool(param);
+
+    m_data->m_valid = true;
+    m_data->m_startDate = ks.front().datetime;
+    m_data->m_lastDate = ks.back().datetime;
+}
+
+void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
+    HKU_IF_RETURN(ks.empty(), void());
+    string nktype(ktype);
+    to_upper(nktype);
+
+    // 写锁
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
+
+    if (!m_data->pKData[nktype]) {
+        m_data->pKData[nktype] = new KRecordList();
+    }
+
+    (*m_data->pKData[nktype]) = std::move(ks);
+
+    Parameter param;
+    param.set<string>("type", "DoNothin");
+    m_kdataDriver = DataDriverFactory::getKDataDriverPool(param);
+
+    m_data->m_valid = true;
+    m_data->m_startDate = ks.front().datetime;
+    m_data->m_lastDate = ks.back().datetime;
+}
+
 const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {
     std::lock_guard<std::mutex> lock(m_data->m_history_finance_mutex);
     if (!m_data->m_history_finance_ready) {
