@@ -175,6 +175,12 @@ public:
     bool addStock(const Stock& stock);
 
     /**
+     * 从 StockManager 中移除相应的 Stock，一般用于将临时增加的 Stock 从 sm 中移除
+     * @param market_code
+     */
+    void removeStock(const string& market_code);
+
+    /**
      * 从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试
      * @details 增加的临时Stock，其market为“TMP”
      * @param code 自行编号的证券代码，不能和已有的Stock相同，否则将返回Null<Stock>
