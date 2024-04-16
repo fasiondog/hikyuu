@@ -294,7 +294,8 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
 
-    if (driver->name() != "TMPCSV" && driver->name() != "DoNothing") {
+    // CSV 直接全部加载至内存，其他类型依据配置的预加载参数进行加载
+    if (driver->name() != "TMPCSV") {
         const auto& param = StockManager::instance().getPreloadParameter();
         string preload_type = fmt::format("{}_max", kType);
         to_lower(preload_type);
