@@ -442,6 +442,7 @@ Stock StockManager::addTempCsvStock(const string& code, const string& day_filena
 void StockManager::removeTempCsvStock(const string& code) {
     string query_str = "TMP" + code;
     to_upper(query_str);
+    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.find(query_str);
     if (iter != m_stockDict.end()) {
         m_stockDict.erase(iter);
