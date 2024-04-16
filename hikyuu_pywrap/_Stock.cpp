@@ -190,6 +190,24 @@ void export_Stock(py::module& m) {
 
         :param Query.KType ktype: K线类型)")
 
+      .def(
+        "set_krecord_list",
+        [](Stock& self, const py::object& obj) {
+            if (py::isinstance<KRecordList>(obj)) {
+                const auto& ks = obj.cast<const KRecordList&>();
+                self.setKRecordList(ks);
+            } else if (py::isinstance<py::sequence>(obj)) {
+                auto seq = obj.cast<py::sequence>();
+                auto ks = python_list_to_vector<KRecord>(seq);
+                self.setKRecordList(ks);
+            } else {
+                HKU_THROW("Unusable input data type");
+            }
+        },
+        R"(set_krecord_list(self, krecord_list)
+
+        "谨慎调用！！！直接设置当前内存 KRecordList, 仅供需临时增加的外部 Stock 设置 K 线数据)")
+
       .def(py::self == py::self)
       .def(py::self != py::self)
 

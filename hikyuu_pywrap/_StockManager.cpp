@@ -192,6 +192,11 @@ void export_StockManager(py::module& m) {
                return ret;
            })
 
+      .def("add_stock", &StockManager::addStock, R"(add_stock(self, stock)
+      
+    谨慎调用！！！仅供增加某些临时的外部 Stock)
+    @return True | False)")
+
       .def("__len__", &StockManager::size, "返回证券数量")
       .def("__getitem__", &StockManager::getStock, "同 get_stock")
       .def(
