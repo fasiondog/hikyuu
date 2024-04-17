@@ -1842,7 +1842,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
     Stock stock = sm.getStock("sh000001");
     KRecord record;
 
-    ///测试日线
+    /// 测试日线
     ///===================================
 
     /** @arg 日期小于第一条记录 */
@@ -1873,7 +1873,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
     CHECK_EQ(record, Null<KRecord>());
 
     ///===================================
-    ///测试周线
+    /// 测试周线
     ///===================================
 
     /** @arg 日期小于第一条记录 */
@@ -1904,7 +1904,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
     CHECK_EQ(record, Null<KRecord>());
 
     ///===================================
-    ///测试月线
+    /// 测试月线
     ///===================================
 
     /** @arg 日期小于第一条记录 */
@@ -1935,7 +1935,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
     CHECK_EQ(record, Null<KRecord>());
 
     ///===================================
-    ///测试15分钟线
+    /// 测试15分钟线
     ///===================================
 
     /** @arg 日期小于第一条记录 */
@@ -2047,27 +2047,6 @@ TEST_CASE("test_Stock_id_map") {
     CHECK_EQ(dict[Stock()], 0);
     CHECK_EQ(dict[x3], 3);
     CHECK_EQ(dict[x4], 1);
-
-    MEMORY_CHECK;
-}
-
-/** @par 检测点 */
-TEST_CASE("test_Stock_getHistoryFinanceInfo") {
-    StockManager& sm = StockManager::instance();
-    Stock stk = getStock("sh600000");
-    PriceList result = stk.getHistoryFinanceInfo(Datetime(201109300000));
-    CHECK_EQ(result.size(), 286);
-    CHECK_EQ(result[0], doctest::Approx(1.067).epsilon(0.00001));
-    CHECK_EQ(result[1], doctest::Approx(1.061).epsilon(0.00001));
-    CHECK_EQ(result[2], doctest::Approx(1.360).epsilon(0.00001));
-    CHECK_EQ(result[3], doctest::Approx(7.482).epsilon(0.00001));
-    CHECK_EQ(result[9], doctest::Approx(0.0).epsilon(0.00001));
-    CHECK_EQ(result[14], doctest::Approx(7.87818e+09).epsilon(0.00001));
-    CHECK_EQ(result[282], doctest::Approx(6.327156e+06).epsilon(0.00001));
-    CHECK_EQ(result[285], doctest::Approx(0.0).epsilon(0.00001));
-    // for (int i = 0; i < 286; i++) {
-    //    std::cout << result[i] << std::endl;
-    //}
 
     MEMORY_CHECK;
 }

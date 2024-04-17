@@ -193,10 +193,7 @@ public:
 
     /**
      * 获取历史财务信息
-     * @param date 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
      */
-    PriceList getHistoryFinanceInfo(const Datetime& date) const;
-
     const vector<HistoryFinanceInfo>& getHistoryFinance() const;
 
     /** 设置权息信息, 仅供初始化时调用 */
