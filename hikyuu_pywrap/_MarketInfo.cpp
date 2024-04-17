@@ -21,11 +21,14 @@ void export_MarketInfo(py::module& m) {
       .def("__repr__", &MarketInfo::toString)
 
       .def_property_readonly("market", py::overload_cast<>(&MarketInfo::market, py::const_),
-                             "市场标识（如：沪市“SH”, 深市“SZ”）")
-      .def_property_readonly("name", py::overload_cast<>(&MarketInfo::name, py::const_), "市场全称")
+                             py::return_value_policy::copy, "市场标识（如：沪市“SH”, 深市“SZ”）")
+      .def_property_readonly("name", py::overload_cast<>(&MarketInfo::name, py::const_),
+                             py::return_value_policy::copy, "市场全称")
       .def_property_readonly("description",
-                             py::overload_cast<>(&MarketInfo::description, py::const_), "描述说明")
+                             py::overload_cast<>(&MarketInfo::description, py::const_),
+                             py::return_value_policy::copy, "描述说明")
       .def_property_readonly("code", py::overload_cast<>(&MarketInfo::code, py::const_),
+                             py::return_value_policy::copy,
                              "该市场对应的主要指数代码，用于获取交易日历")
 
       .def_property_readonly("last_datetime", &MarketInfo::lastDate, "该市场K线数据最后交易日期")
