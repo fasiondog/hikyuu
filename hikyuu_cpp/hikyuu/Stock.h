@@ -95,10 +95,10 @@ public:
     bool valid() const;
 
     /** 获取证券起始日期 */
-    Datetime startDatetime() const;
+    const Datetime& startDatetime() const;
 
     /** 获取证券最后日期 */
-    Datetime lastDatetime() const;
+    const Datetime& lastDatetime() const;
 
     /** 获取最小跳动量 */
     price_t tick() const;
@@ -120,6 +120,22 @@ public:
 
     /** 获取最大交易量 */
     double maxTradeNumber() const;
+
+    void market(const string& market_);
+    void code(const string& code_);
+    void name(const string& name_);
+    void type(uint32_t type_);
+    void valid(bool valid_);
+    void precision(int precision_);
+    void startDatetime(const Datetime&);
+    void lastDatetime(const Datetime&);
+    void tick(price_t tick_);
+    void tickValue(price_t val);
+    void minTradeNumber(double num);
+    void maxTradeNumber(double num);
+    void atom(double num) {
+        return minTradeNumber(num);
+    }
 
     /**
      * 获取指定时间段[start,end)内的权息信息

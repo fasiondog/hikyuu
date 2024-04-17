@@ -62,30 +62,20 @@ Indicator.__getitem__ = indicator_getitem
 Indicator.__iter__ = indicator_iter
 
 
-try:
-    import numpy as np
-    import pandas as pd
+def indicator_to_df(indicator):
+    """转化为pandas.DataFrame"""
+    if indicator.get_result_num() == 1:
+        return pd.DataFrame(indicator.to_np(), columns=[indicator.name])
+    data = {}
+    name = indicator.name
+    columns = []
+    for i in range(indicator.get_result_num()):
+        data[name + str(i)] = indicator.get_result(i)
+        columns.append(name + str(i + 1))
+    return pd.DataFrame(data, columns=columns)
 
-    def indicator_to_df(indicator):
-        """转化为pandas.DataFrame"""
-        if indicator.get_result_num() == 1:
-            return pd.DataFrame(indicator.to_np(), columns=[indicator.name])
 
-        data = {}
-        name = indicator.name
-        columns = []
-        for i in range(indicator.get_result_num()):
-            data[name + str(i)] = indicator.get_result(i)
-            columns.append(name + str(i + 1))
-        return pd.DataFrame(data, columns=columns)
-
-    Indicator.to_df = indicator_to_df
-
-except:
-    print(
-        "warning:can't import numpy or pandas lib, ",
-        "you can't use method Inidicator.to_np() and to_df!"
-    )
+Indicator.to_df = indicator_to_df
 
 
 def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
