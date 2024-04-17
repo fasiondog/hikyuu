@@ -216,6 +216,13 @@ public:
     /** （临时函数）只用于更新缓存中的K线数据 **/
     void realtimeUpdate(KRecord, KQuery::KType ktype = KQuery::DAY);
 
+    /**
+     * 部分临时创建的 Stock, 直接设置KRecordList
+     * @note 谨慎调用，通常供外部数据源直接设定数据
+     */
+    void setKRecordList(const KRecordList& ks, const KQuery::KType& ktype = KQuery::DAY);
+    void setKRecordList(KRecordList&& ks, const KQuery::KType& ktype = KQuery::DAY);
+
     /** 仅用于python的__str__ */
     string toString() const;
 

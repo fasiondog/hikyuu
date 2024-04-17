@@ -192,6 +192,15 @@ void export_StockManager(py::module& m) {
                return ret;
            })
 
+      .def("add_stock", &StockManager::addStock, R"(add_stock(self, stock)
+      
+    谨慎调用！！！仅供增加某些临时的外部 Stock)
+    @return True | False)")
+
+      .def("remove_stock", &StockManager::removeStock, R"(remove_stock(self, market_code)
+    
+    从 sm 中移除 market_code 代表的证券，谨慎使用！！！通常用于移除临时增加的外布 Stock)")
+
       .def("__len__", &StockManager::size, "返回证券数量")
       .def("__getitem__", &StockManager::getStock, "同 get_stock")
       .def(

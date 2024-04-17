@@ -153,7 +153,7 @@ KRecordList KDataTempCsvDriver::_getKRecordListByIndex(const string& market, con
     }
 
     std::ifstream infile(filename.c_str());
-    HKU_ERROR_IF_RETURN(!infile, result, "Can't open this file: {}", filename);
+    HKU_ERROR_IF_RETURN(!infile, result, "Can't open this file: {}, ktype: {}", filename, kType);
     string line;
     if (!std::getline(infile, line)) {
         infile.close();
