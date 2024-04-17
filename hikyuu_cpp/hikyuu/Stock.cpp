@@ -290,15 +290,21 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
 
     releaseKDataBuffer(kType);
 
-    const auto& param = StockManager::instance().getPreloadParameter();
-    string preload_type = fmt::format("{}_max", kType);
-    to_lower(preload_type);
-    int max_num = param.tryGet<int>(preload_type, 4096);
-    HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type, max_num);
-
+    int start = 0;
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
-    int start = total <= max_num ? 0 : total - max_num;
+
+    // CSV 直接全部加载至内存，其他类型依据配置的预加载参数进行加载
+    if (driver->name() != "TMPCSV") {
+        const auto& param = StockManager::instance().getPreloadParameter();
+        string preload_type = fmt::format("{}_max", kType);
+        to_lower(preload_type);
+        int max_num = param.tryGet<int>(preload_type, 4096);
+        HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type,
+                            max_num);
+        start = total <= max_num ? 0 : total - max_num;
+    }
+
     {
         std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[kType]));
         // 需要对是否已缓存进行二次判定，防止加锁之前已被缓存
