@@ -241,7 +241,6 @@ StockManager/Block/Stock
         
         :param str code: 创建时自定义的编码
 
-
     .. py:method:: add_stock(self, stock)
 
         谨慎调用！！！仅供增加某些临时的外部 Stock, 通常配合 Stock.set_krecord_list 方法直接使用外部来源的数据
@@ -253,7 +252,19 @@ StockManager/Block/Stock
         从 sm 中移除 market_code 代表的证券，谨慎使用！！！通常用于移除临时增加的外布 Stock
 
         :param str market_code: 证券市场标识
-   
+
+    .. py:method:: get_history_finance_all_fields(self)
+
+        获取所有历史财务信息字段及其索引
+
+    .. py:method:: get_history_finance_field_index(self, name)
+
+        根据字段名称，获取历史财务信息相应字段索引
+
+    .. py:method:: get_history_finance_field_name(self, index)
+
+        根据字段索引，获取历史财务信息相应字段名
+
 
 .. py:class:: Stock
 
