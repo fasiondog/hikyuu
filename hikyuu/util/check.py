@@ -124,6 +124,8 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False, re_
                             callback(*args, **kargs)
                         if re_raise:
                             raise Exception(errmsg)
+                except KeyboardInterrupt:
+                    raise KeyboardInterrupt()
                 except:
                     errmsg = "Unknown error! {} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
                     hku_logger.error(errmsg)

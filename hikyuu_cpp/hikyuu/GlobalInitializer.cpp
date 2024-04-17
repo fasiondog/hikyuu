@@ -76,10 +76,12 @@ void GlobalInitializer::init() {
 void GlobalInitializer::clean() {
     if (CanUpgrade()) {
         fmt::print(
-          "\n========================================================\n"
-          "A new version ({}) is available and can be upgraded.\n"
+          "\n====================================================================\n"
+          "The new version of Hikyuu is {}, and you can run the upgrade command:\n"
+          "Hikyuu 的最新新版本是 {}, 您可以运行升级命令:\n"
+          "pip install hikyuu --upgrade\n"
           "========================================================\n\n",
-          getLatestVersion());
+          getLatestVersion(), getLatestVersion());
     }
 
     releaseGlobalTaskGroup();

@@ -38,7 +38,6 @@ void export_io_redirect(py::module& m);
 
 void export_data_driver_main(py::module& m);
 void export_indicator_main(py::module& m);
-void export_instance_main(py::module& m);
 void export_SystemPart(py::module& m);
 void export_trade_manage_main(py::module& m);
 void export_trade_sys_main(py::module& m);
@@ -95,7 +94,6 @@ PYBIND11_MODULE(core, m) {
 
     export_data_driver_main(m);
     export_indicator_main(m);
-    export_instance_main(m);
 
     export_SystemPart(m);
     export_trade_manage_main(m);
@@ -108,6 +106,7 @@ PYBIND11_MODULE(core, m) {
     export_io_redirect(m);
 
     m.def("set_python_in_jupyter", setPythonInJupyter);
+    m.def("set_python_in_interactive", setPythonInInteractive);
 
     m.def("close_spend_time", close_spend_time, "全局关闭 c++ 部分耗时打印");
     m.def("open_spend_time", close_spend_time, "全局开启 c++ 部分耗时打印");
@@ -164,4 +163,13 @@ PYBIND11_MODULE(core, m) {
     :param int end: 结束日期
     :param Query.KType ktype: K 线类型, 'DAY'|'WEEK'|'MONTH'|'QUARTER'|'HALFYEAR'|'YEAR'|'MIN'|'MIN5'|'MIN15'|'MIN30'|'MIN60'
     :param Query.RecoverType recover_type: 复权类型)");
+
+    // 仅供导入历史财务数据时将其转成 cpp 的 blob 格式
+    m.def("cpp_bytes_to_vector_float_blob", [](const py::bytes& obj) {
+        vector<float> c_vector = python_bytes_to_vector<float>(obj);
+        std::ostringstream sout;
+        boost::archive::binary_oarchive oa(sout);
+        oa << BOOST_SERIALIZATION_NVP(c_vector);
+        return py::bytes(sout.str());
+    });
 }

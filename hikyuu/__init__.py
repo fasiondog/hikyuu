@@ -50,6 +50,8 @@ SOFTWARE.
 
 import traceback
 import sys
+import pickle
+
 from .util import *
 
 try:
@@ -85,11 +87,38 @@ class iodog:
         close_ostream_to_python()
 
 
+if in_interactive_session():
+    set_python_in_interactive(True)
+
+
 # 如果是在 jupyter 环境中运行，重定向C++ stdout/stderr输出至python
 if in_ipython_frontend():
     set_python_in_jupyter(True)
     hku_info("hikyuu version: {}", get_version_with_build())
     iodog.open()
+
+
+def hku_save(var, filename):
+    """
+    序列化，将hikyuu内建类型的变量（如Stock、TradeManager等）保存在指定的文件中，格式为XML。
+
+    :param var: hikyuu内建类型的变量
+    :param str filename: 指定的文件名
+    """
+    with open(filename, 'wb') as f:
+        pickle.dump(var, f)
+
+
+def hku_load(filename):
+    """
+    将通过 hku_save 保存的变量，读取到var中。
+
+    :param str filename: 待载入的序列化文件。
+    :return: 之前被序列化保存的文件    
+    """
+    with open(filename, 'rb') as f:
+        out = pickle.load(f)
+    return out
 
 
 # ==============================================================================

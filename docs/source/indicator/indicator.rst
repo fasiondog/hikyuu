@@ -796,6 +796,15 @@
     :rtype: Indicator
 
 
+.. py:function:: RESULT(data, result_ix)
+
+    以公式指标的方式返回指定指标中的指定结果集
+
+    :param Indicator data: 指定的指标
+    :param int result_ix: 指定的结果集
+    :rtype: Indicator
+
+
 .. py:function:: REVERSE([data])
 
     求相反数，REVERSE(X)返回-X

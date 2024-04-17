@@ -376,7 +376,7 @@ def realtime_update_from_sina_qq(source):
     tmpstr = queryStr
     for stock in sm:
         if stock.valid and stock.type in (
-            constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF, constant.STOCKTYPE_GEM
+            constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF, constant.STOCKTYPE_GEM, constant.STOCKTYPE_A_BJ,
         ):
             tmpstr += ("%s,") % (stock.market_code.lower())
             count = count + 1
@@ -414,7 +414,7 @@ def realtime_update_from_tushare():
         code = df.ix[i][0]
         stock = get_stock('sh' + code)
 
-        if stock.isNull() == True or stock.type != constant.STOCKTYPE_A:
+        if stock.isNull() == True or (stock.type != constant.STOCKTYPE_A and stock.type != constant.STOCKTYPE_A_BJ):
             stock = get_stock('sz' + code)
         if stock.isNull() == True:
             continue

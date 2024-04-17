@@ -172,6 +172,35 @@ void export_StockManager(py::module& m) {
 
     :param Datetime d: 待判断的日期)")
 
+      .def("get_history_finance_field_name", &StockManager::getHistoryFinanceFieldName,
+           py::return_value_policy::copy, R"(get_history_finance_field_name(self, index)
+           
+    根据字段索引，获取历史财务信息相应字段名)")
+
+      .def("get_history_finance_field_index", &StockManager::getHistoryFinanceFieldIndex,
+           R"(get_history_finance_field_index(self, name)
+    
+    根据字段名称，获取历史财务信息相应字段索引)")
+
+      .def("get_history_finance_all_fields",
+           [](const StockManager& sm) {
+               auto fields = sm.getHistoryFinanceAllFields();
+               py::list ret;
+               for (const auto& f : fields) {
+                   ret.append(py::make_tuple(f.first, f.second));
+               }
+               return ret;
+           })
+
+      .def("add_stock", &StockManager::addStock, R"(add_stock(self, stock)
+      
+    谨慎调用！！！仅供增加某些临时的外部 Stock)
+    @return True | False)")
+
+      .def("remove_stock", &StockManager::removeStock, R"(remove_stock(self, market_code)
+    
+    从 sm 中移除 market_code 代表的证券，谨慎使用！！！通常用于移除临时增加的外布 Stock)")
+
       .def("__len__", &StockManager::size, "返回证券数量")
       .def("__getitem__", &StockManager::getStock, "同 get_stock")
       .def(

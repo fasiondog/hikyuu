@@ -25,14 +25,19 @@
 import os
 import shutil
 import hashlib
+import sqlite3
+import mysql.connector
 from pytdx.hq import TdxHq_API
+from hikyuu.data.pytdx_finance_to_mysql import history_finance_import_mysql
+from hikyuu.data.pytdx_finance_to_sqlite import history_finance_import_sqlite
 from hikyuu.util import *
 
 
 class ImportHistoryFinanceTask:
-    def __init__(self, log_queue, queue, dest_dir):
+    def __init__(self, log_queue, queue, config, dest_dir):
         self.log_queue = log_queue
         self.queue = queue
+        self.config = config
         self.dest_dir = dest_dir + '/downloads/finance'
         if not os.path.lexists(self.dest_dir):
             os.makedirs(self.dest_dir)
@@ -55,30 +60,41 @@ class ImportHistoryFinanceTask:
 
         return [l2d(i.strip().split(',')) for i in content]
 
-    def download(self):
-        data_list = self.get_list_info()
-        for item in data_list:
-            dest_file = '{}/{}'.format(self.dest_dir, item['filename'])
-            if not os.path.exists(dest_file):
-                self.download_file(item)
-            else:
-                new_md5 = ''
-                with open(dest_file, 'rb') as f:
-                    new_md5 = hashlib.md5(f.read()).hexdigest()
-                if new_md5 != item['hash']:
-                    #print(dest_file, new_md5, item['hash'])
-                    self.download_file(item)
+    def import_to_db(self, filename):
+        if self.config.getboolean('hdf5', 'enable', fallback=True):
+            sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
+            connect = sqlite3.connect(sqlite_file, timeout=1800)
+            history_finance_import = history_finance_import_sqlite
+        else:
+            db_config = {
+                'user': self.config['mysql']['usr'],
+                'password': self.config['mysql']['pwd'],
+                'host': self.config['mysql']['host'],
+                'port': self.config['mysql']['port']
+            }
+            connect = mysql.connector.connect(**db_config)
+            history_finance_import = history_finance_import_mysql
+
+        try:
+            history_finance_import(connect, filename)
+        except Exception as e:
+            hku_error(str(e))
+        finally:
+            connect.commit()
+            connect.close()
 
     def download_file(self, item):
         filename = item['filename']
         # filesize = item['filesize']
         # get_report_file_by_size 传入实际的 filesize，实际会出错
         data = self.api.get_report_file_by_size(f'tdxfin/{filename}', 0)
+        hku_info(f"Download finance file: {filename}")
         dest_file_name = self.dest_dir + "/" + filename
         with open(dest_file_name, 'wb') as f:
             f.write(data)
         shutil.unpack_archive(dest_file_name, extract_dir=self.dest_dir)
-        hku_info(f"Download finance file: {filename}")
+        self.import_to_db(f'{self.dest_dir}/{filename[0:-4]}.dat')
+        hku_info(f"Import finance file: {self.dest_dir}/{filename[0:-4]}.dat")
 
     @hku_catch(trace=True)
     def __call__(self):
@@ -108,6 +124,6 @@ class ImportHistoryFinanceTask:
 
 
 if __name__ == "__main__":
-    task = ImportHistoryFinanceTask(None, "c:\\stock")
+    task = ImportHistoryFinanceTask(None, None, None, "c:\\stock")
     task()
     print("over!")

@@ -8,6 +8,7 @@
 #include "../GlobalInitializer.h"
 #include <boost/algorithm/string.hpp>
 #include "block_info/qianlong/QLBlockInfoDriver.h"
+#include "kdata/DoNothingKDataDriver.h"
 #include "kdata/cvs/KDataTempCsvDriver.h"
 #include "DataDriverFactory.h"
 #include "KDataDriver.h"
@@ -61,6 +62,7 @@ void DataDriverFactory::init() {
     m_kdataPrototypeDrivers = new map<string, KDataDriverPtr>();
     m_kdataDriverPools = new map<string, KDataDriverConnectPoolPtr>();
 
+    DataDriverFactory::regKDataDriver(make_shared<DoNothingKDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<KDataTempCsvDriver>());
 
 #if HKU_ENABLE_TDX_KDATA

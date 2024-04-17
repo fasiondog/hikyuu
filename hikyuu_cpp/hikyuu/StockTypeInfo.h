@@ -13,17 +13,18 @@
 
 namespace hku {
 
-#define STOCKTYPE_BLOCK 0  /// 板块
-#define STOCKTYPE_A 1      /// A股
-#define STOCKTYPE_INDEX 2  /// 指数
-#define STOCKTYPE_B 3      /// B股
-#define STOCKTYPE_FUND 4   /// 基金
-#define STOCKTYPE_ETF 5    /// ETF
-#define STOCKTYPE_ND 6     /// 国债
-#define STOCKTYPE_BOND 7   /// 债券
-#define STOCKTYPE_GEM 8    /// 创业板
-#define STOCKTYPE_START 9  /// 科创板
-#define STOCKTYPE_CRYPTO 10 /// 数字货币
+#define STOCKTYPE_BLOCK 0    /// 板块
+#define STOCKTYPE_A 1        /// A股
+#define STOCKTYPE_INDEX 2    /// 指数
+#define STOCKTYPE_B 3        /// B股
+#define STOCKTYPE_FUND 4     /// 基金
+#define STOCKTYPE_ETF 5      /// ETF
+#define STOCKTYPE_ND 6       /// 国债
+#define STOCKTYPE_BOND 7     /// 债券
+#define STOCKTYPE_GEM 8      /// 创业板
+#define STOCKTYPE_START 9    /// 科创板
+#define STOCKTYPE_CRYPTO 10  /// 数字货币
+#define STOCKTYPE_A_BJ 11    /// 北交所（北交所的最小交易单位不是100股）
 
 #define STOCKTYPE_TMP 999  /// 用于临时Stock
 

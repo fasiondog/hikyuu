@@ -628,7 +628,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 if can_upgrade():
                     self.import_detail_textEdit.append("========================================================")
                     self.import_detail_textEdit.append(
-                        "新版本 ({}) 已发布，建议更新".format(get_last_version()))
+                        "Hikyuu 新版本 ({}) 已发布，建议更新".format(get_last_version()))
+                    self.import_detail_textEdit.append("更新命令: pip instal hikyuu --upgrade")
                     self.import_detail_textEdit.append("========================================================")
                 self.import_running = False
 

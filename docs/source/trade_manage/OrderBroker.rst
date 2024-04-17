@@ -18,7 +18,8 @@ Python中的订单代理包装
     my_tm = crtTM(init_cash = 300000)
 
     #注册实盘交易订单代理
-    my_tm.reg_broker(crtOB(TestOrderBroker())) #TestOerderBroker是测试用订单代理对象，只打印
+    ob = crtOB(TestOrderBroker())
+    my_tm.reg_broker(ob) #TestOerderBroker是测试用订单代理对象，只打印
     #my_tm.reg_broker(crtOB(MailOrderBroker("smtp.sina.com", "yourmail@sina.com", "yourpwd", "receivermail@XXX.yy)))
 
     #根据需要修改订单代理最后的时间戳，后续只有大于该时间戳时，订单代理才会实际发出订单指令
@@ -35,12 +36,14 @@ Python中的订单代理包装
     sys.run(sm['sz000001'], Query(-150))
         
 
-.. py:class:: OrderBrokerWrap(broker[, real=True, slip=0.03])
+.. py:class:: OrderBrokerWrap
 
     订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
-    
-    :param bool real: 下单前是否重新实时获取实时分笔数据
-    :param float slip: 如果当前的卖一价格和指示买入的价格绝对差值不超过slip则下单，否则忽略; 对卖出操作无效，立即以当前价卖出
+
+    .. py:method:: __init__(self, broker, name)
+
+        :param broker: python broker 实例
+        :param str name: 名称
 
     .. py:method:: _buy(self, code, price, num)
     
@@ -59,14 +62,9 @@ Python中的订单代理包装
         :param int num: 卖出数量
                         
 
-.. py:function:: crtOB(broker[, real=True, slip=0.03]) 
+.. py:function:: crtOB(broker[, name="NO_NAME"]) 
 
     快速生成订单代理包装对象
-    
-    :param broker: 订单代理示例，必须拥有buy和sell方法，并且参数为 code, price, num
-    :param bool real: 下单前是否重新实时获取实时分笔数据
-    :param float slip: 如果当前的卖一价格和指示买入的价格绝对差值不超过slip则下单，否则忽略; 对卖出操作无效，立即以当前价卖出                      
-                        
     
 
 内建的订单代理类

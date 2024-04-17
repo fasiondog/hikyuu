@@ -104,7 +104,7 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
 
 string Stock::Data::marketCode() const {
     if (m_type == STOCKTYPE_CRYPTO)
-        return  m_market + "/" + m_code;
+        return m_market + "/" + m_code;
     return m_market + m_code;
 }
 
@@ -290,16 +290,21 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
 
     releaseKDataBuffer(kType);
 
-    const auto& param = StockManager::instance().getPreloadParameter();
-    string preload_type = fmt::format("{}_max", kType);
-    to_lower(preload_type);
-    int max_num = param.tryGet<int>(preload_type, 4096);
-    HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type, max_num);
-
+    int start = 0;
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
-    HKU_IF_RETURN(total == 0, void());
-    int start = total <= max_num ? 0 : total - max_num;
+
+    // CSV 直接全部加载至内存，其他类型依据配置的预加载参数进行加载
+    if (driver->name() != "TMPCSV") {
+        const auto& param = StockManager::instance().getPreloadParameter();
+        string preload_type = fmt::format("{}_max", kType);
+        to_lower(preload_type);
+        int max_num = param.tryGet<int>(preload_type, 4096);
+        HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type,
+                            max_num);
+        start = total <= max_num ? 0 : total - max_num;
+    }
+
     {
         std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[kType]));
         // 需要对是否已缓存进行二次判定，防止加锁之前已被缓存
@@ -308,8 +313,10 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
         }
         KRecordList* ptr_klist = new KRecordList;
         m_data->pKData[kType] = ptr_klist;
-        (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code,
-                                              KQuery(start, Null<int64_t>(), kType));
+        if (total != 0) {
+            (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code,
+                                                  KQuery(start, Null<int64_t>(), kType));
+        }
     }
 }
 
@@ -668,7 +675,8 @@ TransList Stock::getTransList(const KQuery& query) const {
 
 Parameter Stock::getFinanceInfo() const {
     Parameter result;
-    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START,
+    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START &&
+                    type() != STOCKTYPE_A_BJ,
                   result);
 
     BaseInfoDriverPtr driver = StockManager::instance().getBaseInfoDriver();
@@ -681,7 +689,8 @@ Parameter Stock::getFinanceInfo() const {
 
 PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     PriceList result;
-    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START,
+    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START &&
+                    type() != STOCKTYPE_A_BJ,
                   result);
     const StockManager& sm = StockManager::instance();
     HistoryFinanceReader rd(sm.datadir() + "/downloads/finance");
@@ -744,6 +753,64 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
     } else {
         HKU_INFO("Ignore record, datetime < last record.datetime!");
     }
+}
+
+void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
+    HKU_IF_RETURN(ks.empty(), void());
+    string nktype(ktype);
+    to_upper(nktype);
+
+    // 写锁
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
+
+    if (!m_data->pKData[nktype]) {
+        m_data->pKData[nktype] = new KRecordList();
+    }
+
+    (*(m_data->pKData[nktype])) = ks;
+
+    Parameter param;
+    param.set<string>("type", "DoNothin");
+    m_kdataDriver = DataDriverFactory::getKDataDriverPool(param);
+
+    m_data->m_valid = true;
+    m_data->m_startDate = ks.front().datetime;
+    m_data->m_lastDate = ks.back().datetime;
+}
+
+void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
+    HKU_IF_RETURN(ks.empty(), void());
+    string nktype(ktype);
+    to_upper(nktype);
+
+    // 写锁
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
+
+    if (!m_data->pKData[nktype]) {
+        m_data->pKData[nktype] = new KRecordList();
+    }
+
+    (*m_data->pKData[nktype]) = std::move(ks);
+
+    Parameter param;
+    param.set<string>("type", "DoNothin");
+    m_kdataDriver = DataDriverFactory::getKDataDriverPool(param);
+
+    m_data->m_valid = true;
+    m_data->m_startDate = ks.front().datetime;
+    m_data->m_lastDate = ks.back().datetime;
+}
+
+const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {
+    std::lock_guard<std::mutex> lock(m_data->m_history_finance_mutex);
+    if (!m_data->m_history_finance_ready) {
+        m_data->m_history_finance =
+          StockManager::instance().getHistoryFinance(*this, Datetime::min(), Null<Datetime>());
+        m_data->m_history_finance_ready = true;
+    }
+    return m_data->m_history_finance;
 }
 
 Stock HKU_API getStock(const string& querystr) {

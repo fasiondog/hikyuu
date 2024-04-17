@@ -22,7 +22,8 @@ public:
 
     Datetime _sell(Datetime datetime, const string& market, const string& code, price_t price,
                    double num) override {
-        PYBIND11_OVERLOAD_PURE(Datetime, OrderBrokerBase, datetime, market, code, price, num);
+        PYBIND11_OVERLOAD_PURE(Datetime, OrderBrokerBase, _sell, datetime, market, code, price,
+                               num);
     }
 };
 

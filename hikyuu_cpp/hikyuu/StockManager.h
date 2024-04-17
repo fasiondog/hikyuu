@@ -161,12 +161,24 @@ public:
      */
     bool isHoliday(const Datetime& d) const;
 
+    const string& getHistoryFinanceFieldName(size_t ix) const;
+    size_t getHistoryFinanceFieldIndex(const string& name) const;
+    vector<std::pair<size_t, string>> getHistoryFinanceAllFields() const;
+
+    vector<HistoryFinanceInfo> getHistoryFinance(const Stock& stk, Datetime start, Datetime end);
+
     /**
      * 添加Stock，仅供临时增加的特殊Stock使用
      * @param stock
      * @return true 成功 | false 失败
      */
     bool addStock(const Stock& stock);
+
+    /**
+     * 从 StockManager 中移除相应的 Stock，一般用于将临时增加的 Stock 从 sm 中移除
+     * @param market_code
+     */
+    void removeStock(const string& market_code);
 
     /**
      * 从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试
@@ -233,6 +245,9 @@ private:
     /** 加载10年期中国国债收益率数据 */
     void loadAllZhBond10();
 
+    /** 加载历史财经字段索引 */
+    void loadHistoryFinanceField();
+
 private:
     StockManager();
 
@@ -260,6 +275,9 @@ private:
     std::mutex* m_holidays_mutex;
 
     ZhBond10List m_zh_bond10;  // 10年期中国国债收益率数据
+
+    unordered_map<string, size_t> m_field_name_to_ix;  // 财经字段名称到字段索引映射
+    unordered_map<size_t, string> m_field_ix_to_name;  // 财经字段索引到字段名称映射
 
     Parameter m_baseInfoDriverParam;
     Parameter m_blockDriverParam;
@@ -307,6 +325,19 @@ inline const StrategyContext& StockManager::getStrategyContext() const {
 
 inline BaseInfoDriverPtr StockManager::getBaseInfoDriver() const {
     return m_baseInfoDriver;
+}
+
+inline const string& StockManager::getHistoryFinanceFieldName(size_t ix) const {
+    return m_field_ix_to_name.at(ix);
+}
+
+inline size_t StockManager::getHistoryFinanceFieldIndex(const string& name) const {
+    return m_field_name_to_ix.at(name);
+}
+
+inline vector<HistoryFinanceInfo> StockManager::getHistoryFinance(const Stock& stk, Datetime start,
+                                                                  Datetime end) {
+    return m_baseInfoDriver->getHistoryFinance(stk.market(), stk.code(), start, end);
 }
 
 }  // namespace hku

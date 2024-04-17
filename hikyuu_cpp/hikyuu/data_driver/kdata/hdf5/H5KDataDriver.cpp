@@ -6,6 +6,7 @@
  */
 
 #include <boost/algorithm/string.hpp>
+#include "hikyuu/utilities/os.h"
 #include "H5KDataDriver.h"
 
 #if H5_VERSION_GE(1, 12, 0)
@@ -102,9 +103,14 @@ bool H5KDataDriver::_init() {
         to_upper(market);
         to_upper(ktype);
 
+        filename = getParam<string>(*iter);
+        if (!existFile(filename)) {
+            // HKU_ERROR("Can't open h5file: {}", filename);
+            continue;
+        }
+
         try {
             if (ktype == KQuery::getKTypeName(KQuery::DAY)) {
-                filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
                 m_h5file_map[market + "_DAY"] = h5file;
                 m_h5file_map[market + "_WEEK"] = h5file;
@@ -114,12 +120,10 @@ bool H5KDataDriver::_init() {
                 m_h5file_map[market + "_YEAR"] = h5file;
 
             } else if (ktype == KQuery::getKTypeName(KQuery::MIN)) {
-                filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
                 m_h5file_map[market + "_MIN"] = h5file;
 
             } else if (ktype == KQuery::getKTypeName(KQuery::MIN5)) {
-                filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
                 m_h5file_map[market + "_MIN5"] = h5file;
                 m_h5file_map[market + "_MIN15"] = h5file;
@@ -128,18 +132,16 @@ bool H5KDataDriver::_init() {
                 m_h5file_map[market + "_HOUR2"] = h5file;
 
             } else if (ktype == "TIME") {
-                filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
                 m_h5file_map[market + "_TIME"] = h5file;
 
             } else if (ktype == "TRANS") {
-                filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
                 m_h5file_map[market + "_TRANS"] = h5file;
             }
 
         } catch (...) {
-            HKU_ERROR("Can't open h5file: {}", filename);
+            // HKU_ERROR("Can't open h5file: {}", filename);
         }
     }
 
@@ -213,7 +215,10 @@ bool H5KDataDriver::_getH5FileAndGroup(const string& market, const string& code,
         string key(format("{}_{}", market, kType));
         to_upper(key);
 
-        out_file = m_h5file_map[key];
+        auto iter = m_h5file_map.find(key);
+        HKU_IF_RETURN(iter == m_h5file_map.end(), false);
+
+        out_file = iter->second;
 
         if (!out_file) {
             return false;

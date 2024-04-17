@@ -14,6 +14,7 @@
 #include "KQuery.h"
 #include "TimeLineRecord.h"
 #include "TransRecord.h"
+#include "HistoryFinanceInfo.h"
 
 namespace hku {
 
@@ -180,6 +181,8 @@ public:
      */
     PriceList getHistoryFinanceInfo(const Datetime& date) const;
 
+    const vector<HistoryFinanceInfo>& getHistoryFinance() const;
+
     /** 设置权息信息, 仅供初始化时调用 */
     void setWeightList(const StockWeightList&);
 
@@ -213,6 +216,13 @@ public:
     /** （临时函数）只用于更新缓存中的K线数据 **/
     void realtimeUpdate(KRecord, KQuery::KType ktype = KQuery::DAY);
 
+    /**
+     * 部分临时创建的 Stock, 直接设置KRecordList
+     * @note 谨慎调用，通常供外部数据源直接设定数据
+     */
+    void setKRecordList(const KRecordList& ks, const KQuery::KType& ktype = KQuery::DAY);
+    void setKRecordList(KRecordList&& ks, const KQuery::KType& ktype = KQuery::DAY);
+
     /** 仅用于python的__str__ */
     string toString() const;
 
@@ -244,6 +254,11 @@ struct HKU_API Stock::Data {
 
     StockWeightList m_weightList;  // 权息信息列表
     std::mutex m_weight_mutex;
+
+    mutable vector<HistoryFinanceInfo>
+      m_history_finance;  // 历史财务信息 [财务报告日期, 字段1, 字段2, ...]
+    mutable bool m_history_finance_ready{false};
+    mutable std::mutex m_history_finance_mutex;
 
     price_t m_tick;
     price_t m_tickValue;

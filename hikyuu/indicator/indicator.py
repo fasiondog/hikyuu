@@ -62,8 +62,6 @@ Indicator.__getitem__ = indicator_getitem
 Indicator.__iter__ = indicator_iter
 
 
-VALUE = PRICELIST
-
 try:
     import numpy as np
     import pandas as pd
@@ -88,8 +86,6 @@ except:
         "warning:can't import numpy or pandas lib, ",
         "you can't use method Inidicator.to_np() and to_df!"
     )
-
-VALUE = PRICELIST
 
 
 def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
@@ -143,3 +139,7 @@ HIGH = C_HIGH()
 LOW = C_LOW()
 AMO = C_AMO()
 VOL = C_VOL()
+
+# 同名指标
+VALUE = PRICELIST
+CAPITAL = LIUTONGPAN
