@@ -393,7 +393,8 @@ vector<HistoryFinanceInfo> SQLiteBaseInfoDriver::getHistoryFinance(const string&
         to_upper(market_code);
         vector<HistoryFinanceTable> finances;
         con->batchLoad(finances, ((Field("market_code") == market_code) &
-                                  (Field("report_date") >= start.ymd())) +
+                                  (Field("report_date") >= new_start.ymd()) &
+                                  (Field("report_date") < new_end.ymd())) +
                                    ASC("report_date"));
         size_t total = finances.size();
         result.resize(total);
