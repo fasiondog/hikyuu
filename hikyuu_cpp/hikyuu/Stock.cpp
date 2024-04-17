@@ -230,13 +230,16 @@ double Stock::maxTradeNumber() const {
 }
 
 void Stock::market(const string& market_) {
+    string n_market(market_);
+    to_upper(n_market);
     if (!m_data) {
         m_data =
-          make_shared<Data>(market_, default_code, default_name, default_type, default_valid,
+          make_shared<Data>(n_market, default_code, default_name, default_type, default_valid,
                             default_startDate, default_lastDate, default_tick, default_tickValue,
                             default_precision, default_minTradeNumber, default_maxTradeNumber);
     } else {
-        m_data->m_market = market_;
+        m_data->m_market = n_market;
+        m_data->m_market_code = m_data->marketCode();
     }
 }
 
@@ -248,6 +251,7 @@ void Stock::code(const string& code_) {
                             default_precision, default_minTradeNumber, default_maxTradeNumber);
     } else {
         m_data->m_code = code_;
+        m_data->m_market_code = m_data->marketCode();
     }
 }
 
@@ -912,7 +916,7 @@ void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
     (*(m_data->pKData[nktype])) = ks;
 
     Parameter param;
-    param.set<string>("type", "DoNothin");
+    param.set<string>("type", "DoNothing");
     m_kdataDriver = DataDriverFactory::getKDataDriverPool(param);
 
     m_data->m_valid = true;
@@ -936,7 +940,7 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     (*m_data->pKData[nktype]) = std::move(ks);
 
     Parameter param;
-    param.set<string>("type", "DoNothin");
+    param.set<string>("type", "DoNothing");
     m_kdataDriver = DataDriverFactory::getKDataDriverPool(param);
 
     m_data->m_valid = true;
