@@ -51,8 +51,6 @@ def class_logger(cls, enable=False):
         logger.setLevel(logging.DEBUG)
     elif enable == 'info':
         logger.setLevel(logging.INFO)
-    cls._should_log_debug = logger.isEnabledFor(logging.DEBUG)
-    cls._should_log_info = logger.isEnabledFor(logging.INFO)
     cls.logger = logger
 
 

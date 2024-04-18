@@ -231,8 +231,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         for name in logging.Logger.manager.loggerDict.keys():
             logger = logging.getLogger(name)
             logger.addHandler(self.log_handler)
-            logger.setLevel(logging.DEBUG)
-            # logger.setLevel(logging.INFO)
+            # logger.setLevel(logging.DEBUG)
+            logger.setLevel(logging.INFO)
 
         # 多进程日志队列
         self.mp_log_q = multiprocessing.Queue()
