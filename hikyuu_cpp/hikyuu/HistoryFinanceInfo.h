@@ -11,9 +11,14 @@
 
 namespace hku {
 
+/**
+ * 历史财务信息记录
+ * @ingroup StockManage
+ */
 struct HKU_API HistoryFinanceInfo {
-    Datetime reportDate;
-    vector<float> values;
+    Datetime reportDate;  ///< 财务报告日期
+    vector<float>
+      values;  ///< 详细财务信息，字段索引可使用 StockManager.getHistoryFinanceAllFields 查询
 
     HistoryFinanceInfo() = default;
     HistoryFinanceInfo(const HistoryFinanceInfo&) = default;
