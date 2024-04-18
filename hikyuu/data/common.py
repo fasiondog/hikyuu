@@ -57,6 +57,12 @@ class STOCKTYPE:
     BOND = 7  # 其他债券
     GEM = 8  # 创业板
     START = 9  # 科创板
+    A_BJ = 11  # 北交所A股
+
+
+def get_a_stktype_list():
+    """获取A股市场证券类型元组，含B股"""
+    return (STOCKTYPE.A, STOCKTYPE.INDEX, STOCKTYPE.B, STOCKTYPE.GEM, STOCKTYPE.START, STOCKTYPE.A_BJ)
 
 
 def get_stktype_list(quotations=None):
@@ -68,13 +74,13 @@ def get_stktype_list(quotations=None):
     :return: 股票类别元组
     """
     if not quotations:
-        return (1, 2, 3, 4, 5, 6, 7, 8, 9)
+        return (1, 2, 3, 4, 5, 6, 7, 8, 9, 11)
 
     result = []
     for quotation in quotations:
         new_quotation = quotation.lower()
         if new_quotation == 'stock':
-            result += [STOCKTYPE.A, STOCKTYPE.INDEX, STOCKTYPE.B, STOCKTYPE.GEM, STOCKTYPE.START]
+            result += list(get_a_stktype_list())
         elif new_quotation == 'fund':
             result += [STOCKTYPE.FUND, STOCKTYPE.ETF]
         elif new_quotation == 'bond':

@@ -29,23 +29,40 @@ void export_Stock(py::module& m) {
       .def("__repr__", &Stock::toString)
 
       .def_property_readonly("id", &Stock::id, "内部id")
-      .def_property_readonly("market", py::overload_cast<>(&Stock::market, py::const_),
-                             "所属市场简称，市场简称是市场的唯一标识")
-      .def_property_readonly("code", py::overload_cast<>(&Stock::code, py::const_), "证券代码")
+      .def_property("market", py::overload_cast<>(&Stock::market, py::const_),
+                    py::overload_cast<const string&>(&Stock::market), py::return_value_policy::copy,
+                    "所属市场简称，市场简称是市场的唯一标识")
+      .def_property("code", py::overload_cast<>(&Stock::code, py::const_),
+                    py::overload_cast<const string&>(&Stock::code), py::return_value_policy::copy,
+                    "证券代码")
       .def_property_readonly("market_code", py::overload_cast<>(&Stock::market_code, py::const_),
                              "市场简称+证券代码，如: sh000001")
-      .def_property_readonly("name", py::overload_cast<>(&Stock::name, py::const_), "证券名称")
-      .def_property_readonly("type", &Stock::type, "证券类型，参见：constant")
-      .def_property_readonly("valid", &Stock::valid, "该证券当前是否有效")
-      .def_property_readonly("start_datetime", &Stock::startDatetime, "证券起始日期")
-      .def_property_readonly("last_datetime", &Stock::lastDatetime, "证券最后日期")
-      .def_property_readonly("tick", &Stock::tick, "最小跳动量")
-      .def_property_readonly("tick_value", &Stock::tickValue, "最小跳动量价值")
+      .def_property("name", py::overload_cast<>(&Stock::name, py::const_),
+                    py::overload_cast<const string&>(&Stock::name), py::return_value_policy::copy,
+                    "证券名称")
+      .def_property("type", py::overload_cast<>(&Stock::type, py::const_),
+                    py::overload_cast<uint32_t>(&Stock::type), "证券类型，参见：constant")
+      .def_property("valid", py::overload_cast<>(&Stock::valid, py::const_),
+                    py::overload_cast<bool>(&Stock::valid), "该证券当前是否有效")
+      .def_property("start_datetime", py::overload_cast<>(&Stock::startDatetime, py::const_),
+                    py::overload_cast<const Datetime&>(&Stock::startDatetime),
+                    py::return_value_policy::copy, "证券起始日期")
+      .def_property("last_datetime", py::overload_cast<>(&Stock::lastDatetime, py::const_),
+                    py::overload_cast<const Datetime&>(&Stock::lastDatetime),
+                    py::return_value_policy::copy, "证券最后日期")
+      .def_property("tick", py::overload_cast<>(&Stock::tick, py::const_),
+                    py::overload_cast<price_t>(&Stock::tick), "最小跳动量")
+      .def_property("tick_value", py::overload_cast<>(&Stock::tickValue, py::const_),
+                    py::overload_cast<price_t>(&Stock::tickValue), "最小跳动量价值")
       .def_property_readonly("unit", &Stock::unit, "每单位价值 = tickValue / tick")
-      .def_property_readonly("precision", &Stock::precision, "价格精度")
-      .def_property_readonly("atom", &Stock::atom, "最小交易数量，同min_tradeNumber")
-      .def_property_readonly("min_trade_number", &Stock::minTradeNumber, "最小交易数量")
-      .def_property_readonly("max_trade_number", &Stock::maxTradeNumber, "最大交易数量")
+      .def_property("precision", py::overload_cast<>(&Stock::precision, py::const_),
+                    py::overload_cast<int>(&Stock::precision), "价格精度")
+      .def_property("atom", py::overload_cast<>(&Stock::atom, py::const_),
+                    py::overload_cast<double>(&Stock::atom), "最小交易数量，同min_tradeNumber")
+      .def_property("min_trade_number", py::overload_cast<>(&Stock::minTradeNumber, py::const_),
+                    py::overload_cast<double>(&Stock::minTradeNumber), "最小交易数量")
+      .def_property("max_trade_number", py::overload_cast<>(&Stock::maxTradeNumber, py::const_),
+                    py::overload_cast<double>(&Stock::maxTradeNumber), "最大交易数量")
 
       .def("is_null", &Stock::isNull, R"(is_null(self)
 
@@ -138,14 +155,6 @@ void export_Stock(py::module& m) {
         获取当前财务信息
 
         :rtype: Parameter)")
-
-      .def("get_history_finance_info", &Stock::getHistoryFinanceInfo,
-           R"(get_history_finance_info(self, date)
-
-        获取历史财务信息, 字段含义参见：https://hikyuu.org/finance_fields.html
-
-        :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
-        :rtype: list)")
 
       .def("realtime_update", &Stock::realtimeUpdate, py::arg("krecord"),
            py::arg("ktype") = KQuery::DAY,

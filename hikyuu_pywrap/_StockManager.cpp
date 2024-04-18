@@ -184,15 +184,18 @@ void export_StockManager(py::module& m) {
     
     根据字段名称，获取历史财务信息相应字段索引)")
 
-      .def("get_history_finance_all_fields",
-           [](const StockManager& sm) {
-               auto fields = sm.getHistoryFinanceAllFields();
-               py::list ret;
-               for (const auto& f : fields) {
-                   ret.append(py::make_tuple(f.first, f.second));
-               }
-               return ret;
-           })
+      .def(
+        "get_history_finance_all_fields",
+        [](const StockManager& sm) {
+            auto fields = sm.getHistoryFinanceAllFields();
+            py::list ret;
+            for (const auto& f : fields) {
+                ret.append(py::make_tuple(f.first, f.second));
+            }
+            return ret;
+        },
+        R"(get_history_finance_all_fields(self)
+    获取所有历史财务信息字段及其索引)")
 
       .def("add_stock", &StockManager::addStock, R"(add_stock(self, stock)
       

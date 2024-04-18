@@ -1,9 +1,9 @@
 #
 # 对 C++ 引出类和函数进行扩展, pybind11 对小函数到导出效率不如 python 直接执行
 #
-
+import numpy as np
+import pandas as pd
 from datetime import *
-from .util.slice import list_getitem
 from .core import *
 
 # ------------------------------------------------------------------
@@ -293,94 +293,87 @@ def new_Query_init(self, start=0, end=None, ktype=Query.DAY, recover_type=Query.
 
 Query.__init__ = new_Query_init
 
+
 # ------------------------------------------------------------------
 # 增加转化为 np.array、pandas.DataFrame 的功能
 # ------------------------------------------------------------------
-
-try:
-    import numpy as np
-    import pandas as pd
-
-    def KData_to_np(kdata):
-        """转化为numpy结构数组"""
-        if kdata.get_query().ktype in ('DAY', 'WEEK', 'MONTH', 'QUARTER', 'HALFYEAR', 'YEAR'):
-            k_type = np.dtype(
-                {
-                    'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
-                    'formats': ['datetime64[D]', 'd', 'd', 'd', 'd', 'd', 'd']
-                }
-            )
-        else:
-            k_type = np.dtype(
-                {
-                    'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
-                    'formats': ['datetime64[ms]', 'd', 'd', 'd', 'd', 'd', 'd']
-                }
-            )
-        return np.array(
-            [(k.datetime.datetime(), k.open, k.high, k.low, k.close, k.amount, k.volume) for k in kdata], dtype=k_type
-        )
-
-    def KData_to_df(kdata):
-        """转化为pandas的DataFrame"""
-        return pd.DataFrame.from_records(KData_to_np(kdata), index='datetime')
-
-    KData.to_np = KData_to_np
-    KData.to_df = KData_to_df
-
-    def PriceList_to_np(data):
-        """仅在安装了numpy模块时生效，转换为numpy.array"""
-        return np.array(data, dtype='d')
-
-    def PriceList_to_df(data):
-        """仅在安装了pandas模块时生效，转换为pandas.DataFrame"""
-        return pd.DataFrame(data.to_np(), columns=('Value', ))
-
-    PriceList.to_np = PriceList_to_np
-    PriceList.to_df = PriceList_to_df
-
-    def DatetimeList_to_np(data):
-        """仅在安装了numpy模块时生效，转换为numpy.array"""
-        return np.array(data, dtype='datetime64[D]')
-
-    def DatetimeList_to_df(data):
-        """仅在安装了pandas模块时生效，转换为pandas.DataFrame"""
-        return pd.DataFrame(data.to_np(), columns=('Datetime', ))
-
-    DatetimeList.to_np = DatetimeList_to_np
-    DatetimeList.to_df = DatetimeList_to_df
-
-    def TimeLine_to_np(data):
-        """转化为numpy结构数组"""
-        t_type = np.dtype({'names': ['datetime', 'price', 'vol'], 'formats': ['datetime64[ms]', 'd', 'd']})
-        return np.array([(t.date.datetime(), t.price, t.vol) for t in data], dtype=t_type)
-
-    def TimeLine_to_df(kdata):
-        """转化为pandas的DataFrame"""
-        return pd.DataFrame.from_records(TimeLine_to_np(kdata), index='datetime')
-
-    TimeLineList.to_np = TimeLine_to_np
-    TimeLineList.to_df = TimeLine_to_df
-
-    def TransList_to_np(data):
-        """转化为numpy结构数组"""
-        t_type = np.dtype(
+def KData_to_np(kdata):
+    """转化为numpy结构数组"""
+    if kdata.get_query().ktype in ('DAY', 'WEEK', 'MONTH', 'QUARTER', 'HALFYEAR', 'YEAR'):
+        k_type = np.dtype(
             {
-                'names': ['datetime', 'price', 'vol', 'direct'],
-                'formats': ['datetime64[ms]', 'd', 'd', 'd']
+                'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
+                'formats': ['datetime64[D]', 'd', 'd', 'd', 'd', 'd', 'd']
             }
         )
-        return np.array([(t.date.datetime(), t.price, t.vol, t.direct) for t in data], dtype=t_type)
+    else:
+        k_type = np.dtype(
+            {
+                'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
+                'formats': ['datetime64[ms]', 'd', 'd', 'd', 'd', 'd', 'd']
+            }
+        )
+    return np.array(
+        [(k.datetime.datetime(), k.open, k.high, k.low, k.close, k.amount, k.volume) for k in kdata], dtype=k_type
+    )
 
-    def TransList_to_df(kdata):
-        """转化为pandas的DataFrame"""
-        return pd.DataFrame.from_records(TransList_to_np(kdata), index='datetime')
 
-    TransList.to_np = TransList_to_np
-    TransList.to_df = TransList_to_df
+def KData_to_df(kdata):
+    """转化为pandas的DataFrame"""
+    return pd.DataFrame.from_records(KData_to_np(kdata), index='datetime')
 
-except:
-    pass
+
+KData.to_np = KData_to_np
+KData.to_df = KData_to_df
+
+
+def DatetimeList_to_np(data):
+    """仅在安装了numpy模块时生效，转换为numpy.array"""
+    return np.array(data, dtype='datetime64[D]')
+
+
+def DatetimeList_to_df(data):
+    """仅在安装了pandas模块时生效，转换为pandas.DataFrame"""
+    return pd.DataFrame(data.to_np(), columns=('Datetime', ))
+
+
+DatetimeList.to_np = DatetimeList_to_np
+DatetimeList.to_df = DatetimeList_to_df
+
+
+def TimeLine_to_np(data):
+    """转化为numpy结构数组"""
+    t_type = np.dtype({'names': ['datetime', 'price', 'vol'], 'formats': ['datetime64[ms]', 'd', 'd']})
+    return np.array([(t.date.datetime(), t.price, t.vol) for t in data], dtype=t_type)
+
+
+def TimeLine_to_df(kdata):
+    """转化为pandas的DataFrame"""
+    return pd.DataFrame.from_records(TimeLine_to_np(kdata), index='datetime')
+
+
+TimeLineList.to_np = TimeLine_to_np
+TimeLineList.to_df = TimeLine_to_df
+
+
+def TransList_to_np(data):
+    """转化为numpy结构数组"""
+    t_type = np.dtype(
+        {
+            'names': ['datetime', 'price', 'vol', 'direct'],
+            'formats': ['datetime64[ms]', 'd', 'd', 'd']
+        }
+    )
+    return np.array([(t.date.datetime(), t.price, t.vol, t.direct) for t in data], dtype=t_type)
+
+
+def TransList_to_df(kdata):
+    """转化为pandas的DataFrame"""
+    return pd.DataFrame.from_records(TransList_to_np(kdata), index='datetime')
+
+
+TransList.to_np = TransList_to_np
+TransList.to_df = TransList_to_df
 
 # ------------------------------------------------------------------
 # 增强 Parameter

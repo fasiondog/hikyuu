@@ -22,7 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from hikyuu.data.common import MARKETID, STOCKTYPE, historyfinancialreader
+from hikyuu.data.common import MARKETID, STOCKTYPE, historyfinancialreader, get_a_stktype_list
 from hikyuu.data.common_mysql import get_marketid
 from hikyuu.util import *
 
@@ -31,8 +31,8 @@ from hikyuu.util import *
 def pytdx_import_finance_to_mysql(db_connect, pytdx_connect, market):
     """导入公司财务信息"""
     marketid = get_marketid(db_connect, market)
-    sql = "select `stockid`, `marketid`, `code`, `valid`, `type` from `hku_base`.`stock` where marketid={} and type = {} and valid=1"\
-        .format(marketid, STOCKTYPE.A)
+    sql = "select `stockid`, `marketid`, `code`, `valid`, `type` from `hku_base`.`stock` where marketid={} and type in {} and valid=1"\
+        .format(marketid, get_a_stktype_list())
 
     cur = db_connect.cursor()
     a = cur.execute(sql)

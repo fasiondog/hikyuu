@@ -21,10 +21,6 @@ public:
         return std::make_shared<DoNothingKDataDriver>();
     }
 
-    virtual bool _init() override {
-        return true;
-    }
-
     virtual bool isIndexFirst() override {
         return true;
     }
