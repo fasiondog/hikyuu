@@ -892,6 +892,14 @@ void export_Indicator_build_in(py::module& m) {
    :param KData kdata: k线数据
    :rtype: Indicator)");
 
+    m.def("ZONGGUBEN", py::overload_cast<>(ZONGGUBEN));
+    m.def("ZONGGUBEN", py::overload_cast<const KData&>(ZONGGUBEN), R"(ZONGGUBEN(kdata)
+
+   获取总股本（单位：万股）
+
+   :param KData kdata: k线数据
+   :rtype: Indicator)");
+
     m.def("HSL", HSL_1);
     m.def("HSL", HSL_2, R"(HSL(kdata)
 
