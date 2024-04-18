@@ -8,7 +8,6 @@
 #include "GlobalInitializer.h"
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
-#include "data_driver/HistoryFinanceReader.h"
 #include "KData.h"
 
 namespace hku {
@@ -829,17 +828,6 @@ Parameter Stock::getFinanceInfo() const {
         result = driver->getFinanceInfo(market(), code());
     }
 
-    return result;
-}
-
-PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
-    PriceList result;
-    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START &&
-                    type() != STOCKTYPE_A_BJ,
-                  result);
-    const StockManager& sm = StockManager::instance();
-    HistoryFinanceReader rd(sm.datadir() + "/downloads/finance");
-    result = rd.getHistoryFinanceInfo(date, market(), code());
     return result;
 }
 
