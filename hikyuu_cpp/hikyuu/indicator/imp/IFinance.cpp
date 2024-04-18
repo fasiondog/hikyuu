@@ -86,6 +86,7 @@ Indicator HKU_API FINANCE(int field_ix) {
 Indicator HKU_API FINANCE(const KData& k, int field_ix) {
     auto p = make_shared<IFinance>(k);
     p->setParam<int>("field_ix", field_ix);
+    p->setContext(k);
     return Indicator(p);
 }
 
@@ -100,6 +101,7 @@ Indicator HKU_API FINANCE(const KData& k, const string& field_name) {
     auto p = make_shared<IFinance>(k);
     p->setParam<int>("field_ix", -1);
     p->setParam<string>("field_name", field_name);
+    p->setContext(k);
     return Indicator(p);
 }
 
