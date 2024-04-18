@@ -240,7 +240,31 @@ StockManager/Block/Stock
         移除增加的临时Stock
         
         :param str code: 创建时自定义的编码
-   
+
+    .. py:method:: add_stock(self, stock)
+
+        谨慎调用！！！仅供增加某些临时的外部 Stock, 通常配合 Stock.set_krecord_list 方法直接使用外部来源的数据
+
+        :param Stock stock: sm 外部自行创建的 Stock
+
+    .. py:method:: remove_stock(self, market_code)
+
+        从 sm 中移除 market_code 代表的证券，谨慎使用！！！通常用于移除临时增加的外布 Stock
+
+        :param str market_code: 证券市场标识
+
+    .. py:method:: get_history_finance_all_fields(self)
+
+        获取所有历史财务信息字段及其索引
+
+    .. py:method:: get_history_finance_field_index(self, name)
+
+        根据字段名称，获取历史财务信息相应字段索引
+
+    .. py:method:: get_history_finance_field_name(self, index)
+
+        根据字段索引，获取历史财务信息相应字段名
+
 
 .. py:class:: Stock
 
@@ -368,6 +392,12 @@ StockManager/Block/Stock
         :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
         :rtype: list
     
+    .. py:method:: set_krecord_list(self, krecord_list)
+
+        谨慎调用！！！直接设置当前内存 KRecordList, 仅供需临时增加的外部 Stock 设置 K 线数据
+
+        :param sequence krecord_list: 一个可迭代变量获取 KRecord 实例的对象，如: list (仅包含 KRecord 实例)
+
     .. py:method:: realtime_update(self, krecord)
     
         （临时函数）只用于更新内存缓存中的日线数据
@@ -385,6 +415,9 @@ StockManager/Block/Stock
         释放指定类别的内存K线数据
         
         :param Query.KType ktype: K线类型
+
+
+    
     
     
 .. py:class:: Block
