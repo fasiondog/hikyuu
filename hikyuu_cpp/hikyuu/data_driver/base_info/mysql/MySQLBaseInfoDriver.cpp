@@ -412,7 +412,10 @@ vector<HistoryFinanceInfo> MySQLBaseInfoDriver::getHistoryFinance(const string &
             auto &finance = finances[i];
             auto &cur = result[i];
             cur.reportDate = Datetime(finance.report_date);
-            cur.values = std::move(finance.values);
+            // cur.values = std::move(finance.values);
+            size_t count = finance.values.size() / sizeof(float);
+            cur.values.resize(count);
+            memcpy(cur.values.data(), finance.values.data(), count * sizeof(float));
         }
 
     } catch (const std::exception &e) {
