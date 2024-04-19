@@ -29,11 +29,13 @@
 * :py:func:`RECOVER_BACKWARD` - 后向复权
 * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前向复权
 * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后向复权
+* :py:func:`FINANCE` - 历史财务信息
 * :py:func:`HSL` - 换手率
 * :py:func:`CAPITAL` - 流通盘，同名：LIUTONGPAN
 * :py:func:`TIMELINE`   - 分时价格
 * :py:func:`TIMELINEVOL`   - 分时成交量
 * :py:func:`ZHBOND10` - 10年期中国国债收益率
+* :py:func:`ZONGGUBEN` - 总股本
     
 
 **大盘指标**

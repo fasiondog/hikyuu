@@ -129,9 +129,10 @@ void SQLiteStatement::sub_bindBlob(int idx, const string &item) {
     SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
-void SQLiteStatement::sub_bindBlob(int idx, const char *item, size_t len) {
+void SQLiteStatement::sub_bindBlob(int idx, const std::vector<char> &item) {
     _reset();
-    int status = sqlite3_bind_blob(m_stmt, idx + 1, item, (int)len, SQLITE_TRANSIENT);
+    int status =
+      sqlite3_bind_blob(m_stmt, idx + 1, item.data(), (int)item.size(), SQLITE_TRANSIENT);
     SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
@@ -161,6 +162,16 @@ void SQLiteStatement::sub_getColumnAsBlob(int idx, std::string &item) {
     }
     const int size = sqlite3_column_bytes(m_stmt, idx);
     item = std::string(data, size);
+}
+
+void SQLiteStatement::sub_getColumnAsBlob(int idx, std::vector<char> &item) {
+    const char *data = static_cast<const char *>(sqlite3_column_blob(m_stmt, idx));
+    if (data == NULL) {
+        throw null_blob_exception();
+    }
+    const int size = sqlite3_column_bytes(m_stmt, idx);
+    item.resize(size);
+    memcpy(item.data(), data, size);
 }
 
 uint64_t SQLiteStatement::sub_getLastRowid() {

@@ -466,7 +466,7 @@ def get_trans_table(connect, market, code):
                     `buyorsell` INT NOT NULL,
                     PRIMARY KEY (`date`)
                 )
-                COLLATE='utf8_general_ci'
+                COLLATE='utf8mb4_general_ci'
                 ENGINE=MyISAM
                 ;
               """.format(
@@ -603,7 +603,7 @@ def get_time_table(connect, market, code):
                     `vol` DOUBLE NOT NULL,
                     PRIMARY KEY (`date`)
                 )
-                COLLATE='utf8_general_ci'
+                COLLATE='utf8mb4_general_ci'
                 ENGINE=MyISAM
                 ;
               """.format(
