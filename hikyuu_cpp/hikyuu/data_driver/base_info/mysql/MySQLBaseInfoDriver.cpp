@@ -411,8 +411,8 @@ vector<HistoryFinanceInfo> MySQLBaseInfoDriver::getHistoryFinance(const string &
         for (size_t i = 0; i < total; i++) {
             auto &finance = finances[i];
             auto &cur = result[i];
+            cur.fileDate = Datetime(finance.file_date);
             cur.reportDate = Datetime(finance.report_date);
-            // cur.values = std::move(finance.values);
             size_t count = finance.values.size() / sizeof(float);
             cur.values.resize(count);
             memcpy(cur.values.data(), finance.values.data(), count * sizeof(float));

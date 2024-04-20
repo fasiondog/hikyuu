@@ -181,7 +181,7 @@ void export_Stock(py::module& m) {
             auto finances = stk.getHistoryFinance();
             py::list ret;
             for (const auto& f : finances) {
-                ret.append(py::make_tuple(f.reportDate, f.values));
+                ret.append(py::make_tuple(f.fileDate, f.reportDate, f.values));
             }
             return ret;
         },
