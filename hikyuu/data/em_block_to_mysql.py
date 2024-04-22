@@ -4,8 +4,6 @@
 # Create on: 20240102
 #    Author: fasiondog
 
-import json
-import akshare  # 这里必须再导入 akshare 下，否则get_all_zsbk_info会报错
 from hikyuu.data.common import MARKET, get_stk_code_name_list
 from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_block_em import *
