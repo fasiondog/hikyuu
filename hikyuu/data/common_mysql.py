@@ -94,7 +94,7 @@ def get_codepre_list(connect, marketid, quotations):
     """获取前缀代码表"""
     stktype_list = get_stktype_list(quotations)
     sql = "select codepre, type from `hku_base`.`coderuletype` " \
-          "where marketid={marketid} and type in {type_list}"\
+          "where marketid={marketid} and type in {type_list} ORDER by length(codepre) DESC"\
         .format(marketid=marketid, type_list=stktype_list)
     cur = connect.cursor()
     cur.execute(sql)
