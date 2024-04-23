@@ -426,6 +426,7 @@ StockManager/Block/Stock
     
     .. py:attribute:: category : 板块分类
     .. py:attribute:: name : 板块名称
+    .. py:attribute:: index_stock: 对应指数（可能为空 Stock）
     
     .. py:method:: __init__(self, category, name):
     
