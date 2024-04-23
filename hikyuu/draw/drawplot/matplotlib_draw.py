@@ -147,7 +147,7 @@ class StockFuncFormatter(object):
 
 def getDayLocatorAndFormatter(dates):
     """获取显示日线时使用的Major Locator和Major Formatter"""
-    sep = len(dates) / 8
+    sep = len(dates) / 10
     loc = [
         (i, str(d) if (i != (len(dates) - 1)) and (i % sep != 0) else "{}-{}-{}".format(d.year, d.month, d.day))
         for i, d in enumerate(dates)
@@ -394,6 +394,10 @@ def iplot(
     axes.set_xlim(-1, len(indicator) + 1)
     if kref:
         ax_set_locator_formatter(axes, kref.get_datetime_list(), kref.get_query().ktype)
+    else:
+        k = indicator.get_context()
+        if len(k) > 0:
+            ax_set_locator_formatter(axes, k.get_datetime_list(), k.get_query().ktype)
     # draw()
 
 
@@ -474,6 +478,10 @@ def ibar(
     axes.set_xlim(-1, len(indicator) + 1)
     if kref:
         ax_set_locator_formatter(axes, kref.get_datetime_list(), kref.get_query().ktype)
+    else:
+        k = indicator.get_context()
+        if len(k) > 0:
+            ax_set_locator_formatter(axes, k.get_datetime_list(), k.get_query().ktype)
     # draw()
 
 

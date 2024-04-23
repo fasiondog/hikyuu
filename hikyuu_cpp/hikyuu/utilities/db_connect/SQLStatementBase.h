@@ -80,11 +80,8 @@ public:
 
     /**
      * 将 item 的值绑定至 idx 指定的 SQL 参数中
-     * @param idx sql参数序号
-     * @param item 二进制数据起始指针
-     * @param len 二进制数据长度
      */
-    void bindBlob(int idx, const char *item, size_t len);
+    void bindBlob(int idx, const std::vector<char> &time);
 
     /** 将 item 的值绑定至 idx 指定的 SQL 参数中 */
     template <typename T>
@@ -93,6 +90,8 @@ public:
     /** 将 item 的值绑定至 idx 指定的 SQL 参数中 */
     template <typename T>
     typename std::enable_if<!std::numeric_limits<T>::is_integer>::type bind(int idx, const T &item);
+
+    void bind(int idx, const std::vector<char> &item);
 
     /** 将 item 的值绑定至 idx 指定的 SQL 参数中 */
     template <typename T, typename... Args>
@@ -115,6 +114,8 @@ public:
 
     /** 获取 idx 指定的数据至 item */
     void getColumn(int idx, Datetime &item);
+
+    void getColumn(int idx, std::vector<char> &);
 
     /** 获取 idx 指定的数据至 item */
     template <typename T>
@@ -142,7 +143,7 @@ public:
     virtual void sub_bindText(int idx, const std::string &item) = 0;   ///< 子类接口 @see bind
     virtual void sub_bindText(int idx, const char *item, size_t len) = 0;  ///< 子类接口 @see bind
     virtual void sub_bindBlob(int idx, const std::string &item) = 0;  ///< 子类接口 @see bind
-    virtual void sub_bindBlob(int idx, const char *item, size_t len) = 0;  ///< 子类接口 @see bind
+    virtual void sub_bindBlob(int idx, const std::vector<char> &item) = 0;  ///< 子类接口 @see bind
 
     virtual int sub_getNumColumns() const = 0;                  ///< 子类接口 @see getNumColumns
     virtual void sub_getColumnAsInt64(int idx, int64_t &) = 0;  ///< 子类接口 @see getColumn
@@ -150,6 +151,8 @@ public:
     virtual void sub_getColumnAsDatetime(int idx, Datetime &) = 0;  ///< 子类接口 @see getColumn
     virtual void sub_getColumnAsText(int idx, std::string &) = 0;   ///< 子类接口 @see getColumn
     virtual void sub_getColumnAsBlob(int idx, std::string &) = 0;   ///< 子类接口 @see getColumn
+    virtual void sub_getColumnAsBlob(int idx,
+                                     std::vector<char> &) = 0;  ///< 子类接口 @see getColumn
 
 private:
     SQLStatementBase() = delete;
@@ -210,8 +213,8 @@ inline void SQLStatementBase::bindBlob(int idx, const std::string &item) {
     sub_bindBlob(idx, item);
 }
 
-inline void SQLStatementBase::bindBlob(int idx, const char *item, size_t len) {
-    sub_bindBlob(idx, item, len);
+inline void SQLStatementBase::bindBlob(int idx, const std::vector<char> &item) {
+    sub_bindBlob(idx, item);
 }
 
 inline uint64_t SQLStatementBase::getLastRowid() {
@@ -240,6 +243,10 @@ inline void SQLStatementBase::getColumn(int idx, std::string &item) {
     sub_getColumnAsText(idx, item);
 }
 
+inline void SQLStatementBase::bind(int idx, const std::vector<char> &item) {
+    sub_bindBlob(idx, item);
+}
+
 template <typename T>
 typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBase::bind(
   int idx, const T &item) {
@@ -261,6 +268,10 @@ typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBa
     int64_t temp;
     sub_getColumnAsInt64(idx, temp);
     item = (T)temp;
+}
+
+inline void SQLStatementBase::getColumn(int idx, std::vector<char> &item) {
+    sub_getColumnAsBlob(idx, item);
 }
 
 template <typename T>

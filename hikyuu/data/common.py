@@ -245,6 +245,7 @@ def historyfinancialreader(filepath):
         report_date = int(cw_info[313])  # 财务公告日期
         report_date = 19000000 + report_date if report_date > 800000 else 20000000 + report_date
         # results.append((modifiy_code(code), report_date, cw_info))
-        results.append((file_date, modifiy_code(code), report_date, cpp_bytes_to_vector_float_blob(info_data)))
+        # results.append((file_date, modifiy_code(code), report_date, cpp_bytes_to_vector_float_blob(info_data)))
+        results.append((file_date, modifiy_code(code), report_date, info_data))
     cw_file.close()
     return results

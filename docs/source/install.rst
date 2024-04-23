@@ -6,7 +6,7 @@
 
 支持的操作系统：64位 Windows7及以上版本、Linux请使用源码自行编译安装。
 
-Python环境：>= Python3.8
+Python环境：>= Python3.9
 
 .. note:: 
 

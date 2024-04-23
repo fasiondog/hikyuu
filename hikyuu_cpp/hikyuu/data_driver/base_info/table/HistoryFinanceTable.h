@@ -16,7 +16,8 @@ struct HistoryFinanceTable {
     uint64_t file_date;
     uint64_t report_date;
     std::string market_code;
-    std::vector<float> values;
+    // std::vector<float> values;
+    std::vector<char> values;
 };
 
 }  // namespace hku
