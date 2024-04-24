@@ -10,6 +10,7 @@
 import sys
 import traceback
 import functools
+import asyncio
 from .mylog import hku_logger
 
 
@@ -142,3 +143,11 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False, re_
         return wrappedFunc
 
     return hku_catch_wrap
+
+
+def hku_to_async(func):
+    @functools.wraps(func)
+    async def async_func(*args, **kwargs):
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, func, *args, **kwargs)
+    return async_func
