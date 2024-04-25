@@ -36,6 +36,8 @@ void export_Block(py::module& m) {
 
       .def_property("category", setCategory, getCategory, "板块所属分类")
       .def_property("name", getName, setName, "板块名称")
+      .def_property("index_stock", &Block::getIndexStock, &Block::setIndexStock,
+                    py::return_value_policy::copy, "对应指数")
 
       .def("empty", &Block::empty, R"(empty(self)
     

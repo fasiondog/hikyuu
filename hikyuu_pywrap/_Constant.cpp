@@ -144,7 +144,7 @@ void export_Constant(py::module& m) {
       .def_readonly("STOCKTYPE_GEM", &Constant::STOCKTYPE_GEM, "创业板")
       .def_readonly("STOCKTYPE_START", &Constant::STOCKTYPE_START, "科创板")
       .def_readonly("STOCKTYPE_CRYPTO", &Constant::STOCKTYPE_START, "数字币")
-      .def_readonly("STOCKTYPE_A_BJ", &Constant::STOCKTYPE_START, "A股北交所")
+      .def_readonly("STOCKTYPE_A_BJ", &Constant::STOCKTYPE_A_BJ, "A股北交所")
       .def_readonly("STOCKTYPE_TMP", &Constant::STOCKTYPE_TMP, "临时Stock");
 
     m.attr("constant") = Constant();

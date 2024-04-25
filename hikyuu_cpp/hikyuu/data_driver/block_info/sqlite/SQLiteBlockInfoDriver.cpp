@@ -12,10 +12,11 @@
 namespace hku {
 
 struct SQLiteBlockTable {
-    TABLE_BIND3(SQLiteBlockTable, block, category, name, market_code)
+    TABLE_BIND4(SQLiteBlockTable, block, category, name, market_code, index_code)
     string category;
     string name;
     string market_code;
+    string index_code;
 };
 
 SQLiteBlockInfoDriver::~SQLiteBlockInfoDriver() {}
@@ -32,7 +33,10 @@ void SQLiteBlockInfoDriver::load() {
 
     SQLiteConnect connect(m_params);
     vector<SQLiteBlockTable> records;
-    connect.batchLoad(records);
+    connect.batchLoadView(records,
+                          "select a.id, a.category, a.name, a.market_code, b.market_code as "
+                          "index_code from block a left "
+                          "join BlockIndex b on a.category=b.category and a.name = b.name");
 
     for (auto& record : records) {
         auto category_iter = m_buffer.find(record.category);
@@ -42,7 +46,7 @@ void SQLiteBlockInfoDriver::load() {
         auto& name_dict = m_buffer[record.category];
         auto name_iter = name_dict.find(record.name);
         if (name_iter == name_dict.end()) {
-            name_dict[record.name] = {Block(record.category, record.name)};
+            name_dict[record.name] = {Block(record.category, record.name, record.index_code)};
         }
         name_dict[record.name].add(record.market_code);
     }

@@ -12,10 +12,11 @@
 namespace hku {
 
 struct MySQLBlockTable {
-    TABLE_BIND3(MySQLBlockTable, block, category, name, market_code)
+    TABLE_BIND4(MySQLBlockTable, block, category, name, market_code, index_code)
     string category;
     string name;
     string market_code;
+    string index_code;
 };
 
 MySQLBlockInfoDriver::~MySQLBlockInfoDriver() {}
@@ -36,7 +37,11 @@ void MySQLBlockInfoDriver::load() {
     MySQLConnect connect(connect_param);
 
     vector<MySQLBlockTable> records;
-    connect.batchLoad(records);
+    connect.batchLoadView(
+      records,
+      "select a.id, a.category, a.name, a.market_code, b.market_code as "
+      "index_code from `hku_base`.`block` a left "
+      "join `hku_base`.`BlockIndex` b on a.category=b.category and a.name = b.name");
 
     for (auto& record : records) {
         auto category_iter = m_buffer.find(record.category);
@@ -46,7 +51,7 @@ void MySQLBlockInfoDriver::load() {
         auto& name_dict = m_buffer[record.category];
         auto name_iter = name_dict.find(record.name);
         if (name_iter == name_dict.end()) {
-            name_dict[record.name] = {Block(record.category, record.name)};
+            name_dict[record.name] = {Block(record.category, record.name, record.index_code)};
         }
         name_dict[record.name].add(record.market_code);
     }
