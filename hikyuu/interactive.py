@@ -144,7 +144,7 @@ for s in blocka:
 zsbk_sz = blocksz
 
 blockbj = Block("A", "BJ")
-for s in blocka:
+for s in sm:
     if s.market == "BJ":
         blockbj.add(s)
 zsbk_bj = blockbj
