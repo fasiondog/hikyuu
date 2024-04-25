@@ -127,7 +127,7 @@ start_spot_agent(False)
 # ==============================================================================
 blocka = Block("A", "ALL")
 for s in sm:
-    if s.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_GEM):
+    if s.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_A_BJ, constant.STOCKTYPE_GEM):
         blocka.add(s)
 zsbk_a = blocka
 
@@ -144,7 +144,7 @@ for s in blocka:
 zsbk_sz = blocksz
 
 blockbj = Block("A", "BJ")
-for s in sm:
+for s in blocka:
     if s.market == "BJ":
         blockbj.add(s)
 zsbk_bj = blockbj
