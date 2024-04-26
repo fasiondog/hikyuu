@@ -403,6 +403,10 @@ BlockList StockManager::getBlockList() {
     return m_blockDriver ? m_blockDriver->getBlockList() : BlockList();
 }
 
+BlockList StockManager::getStockBelongs(const Stock& stk, const string& category) {
+    return m_blockDriver ? m_blockDriver->getStockBelongs(stk, category) : BlockList();
+}
+
 DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string& market) {
     auto marketinfo = getMarketInfo(market);
     return getStock(fmt::format("{}{}", marketinfo.market(), marketinfo.code()))
