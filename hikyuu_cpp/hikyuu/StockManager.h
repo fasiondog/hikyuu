@@ -141,7 +141,14 @@ public:
      */
     BlockList getBlockList();
 
-    // 目前支持"SH"
+    /**
+     * 获取指定证券所属的板块列表
+     * @param stk 指定证券
+     * @param category 板块分类，如果为空字符串，返回所有板块分类下的所属板块
+     * @return BlockList
+     */
+    BlockList getStockBelongs(const Stock& stk, const string& category);
+
     /**
      * 获取交易日历，目前支持"SH"
      * @param query

@@ -23,7 +23,9 @@ public:
     Block(const string& category, const string& name);
     Block(const string& category, const string& name, const string& indexCode);
     Block(const Block&) noexcept;
+    Block(Block&&) noexcept;
     Block& operator=(const Block&) noexcept;
+    Block& operator=(Block&&) noexcept;
     virtual ~Block();
 
     typedef StockMapIterator const_iterator;

@@ -28,6 +28,7 @@ typedef DriverConnectPool<KDataDriverConnect> KDataDriverConnectPool;
 typedef shared_ptr<KDataDriverConnectPool> KDataDriverConnectPoolPtr;
 class HKU_API KData;
 class HKU_API Parameter;
+class HKU_API Block;
 
 /**
  * Stock基类，Application中一般使用StockPtr进行操作
@@ -190,6 +191,13 @@ public:
      * 获取当前财务信息
      */
     Parameter getFinanceInfo() const;
+
+    /**
+     * 获取所属板块列表
+     * @param category 指定的板块分类，如果为空，则返回所有板块分类的所属板块
+     * @return BlockList
+     */
+    vector<Block> getBelongToBlockList(const string& category) const;
 
     /**
      * 获取历史财务信息

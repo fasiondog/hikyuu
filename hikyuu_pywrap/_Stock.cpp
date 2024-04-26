@@ -176,6 +176,22 @@ void export_Stock(py::module& m) {
         :rtype: StockWeightList)")
 
       .def(
+        "get_belong_to_block_list",
+        [](Stock& stk, const py::object& category) {
+            string c_category;
+            if (!category.is_none()) {
+                c_category = category.cast<string>();
+            }
+            return stk.getBelongToBlockList(c_category);
+        },
+        py::arg("category") = py::none(), R"(get_belong_to_block_list(self[, category=None])
+      
+      获取所属板块列表
+
+      :param str category: 指定的板块分类，为 None 时，返回所有板块分类下的所属板块
+      :rtype: list)")
+
+      .def(
         "get_history_finance",
         [](const Stock& stk) {
             auto finances = stk.getHistoryFinance();

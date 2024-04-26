@@ -55,4 +55,15 @@ bool BlockInfoDriver::init(const Parameter& params) {
     return _init();
 }
 
+BlockList BlockInfoDriver::getStockBelongs(const Stock& stk, const string& category) {
+    BlockList ret;
+    auto category_blks = category.empty() ? getBlockList() : getBlockList(category);
+    for (auto&& blk : category_blks) {
+        if (blk.have(stk)) {
+            ret.emplace_back(std::move(blk));
+        }
+    }
+    return ret;
+}
+
 } /* namespace hku */
