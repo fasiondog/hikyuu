@@ -212,7 +212,7 @@
     
         复位，但不包括已有的交易对象，以及共享的部件
         
-    .. py:methon:: force_reset_all(self)
+    .. py:method:: force_reset_all(self)
 
         强制复位所有组件以及清空已有的交易对象，忽略组件的共享属性
 

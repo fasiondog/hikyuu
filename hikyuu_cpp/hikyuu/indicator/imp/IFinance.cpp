@@ -17,12 +17,20 @@ namespace hku {
 IFinance::IFinance() : IndicatorImp("FINANCE", 1) {
     setParam<int>("field_ix", 0);
     setParam<string>("field_name", "");
+
+    // 某些信息如每股收益，只使用年报计算
+    setParam<bool>("only_year_report", false);
+
+    // 某些信息如每股收益，需要动态计算，如全年收益在只有一季报时，使用一季报*4进行预估
+    setParam<bool>("dynamic", false);
 }
 
 IFinance::IFinance(const KData& k) : IndicatorImp("FINANCE", 1) {
     setParam<int>("field_ix", 0);
     setParam<string>("field_name", "");
     setParam<KData>("kdata", k);
+    setParam<bool>("only_year_report", false);
+    setParam<bool>("dynamic", false);
     IFinance::_calculate(Indicator());
 }
 
@@ -40,6 +48,17 @@ void IFinance::_calculate(const Indicator& data) {
 
     Stock stock = kdata.getStock();
     auto finances = stock.getHistoryFinance();
+
+    if (getParam<bool>("only_year_report")) {
+        vector<HistoryFinanceInfo> tmp_finances;
+        for (auto&& finance : finances) {
+            if (finance.fileDate.month() == 12L) {
+                tmp_finances.emplace_back(std::move(finance));
+            }
+        }
+        finances = std::move(tmp_finances);
+    }
+
     if (finances.empty()) {
         m_discard = total;
         return;
@@ -52,6 +71,7 @@ void IFinance::_calculate(const Indicator& data) {
           StockManager::instance().getHistoryFinanceFieldIndex(getParam<string>("field_name")));
     }
 
+    bool dynamic = getParam<bool>("dynamic");
     auto* dst = this->data();
     auto dates = kdata.getDatetimeList();
     auto* k = kdata.data();
@@ -63,13 +83,47 @@ void IFinance::_calculate(const Indicator& data) {
         auto value = finances[pos].values.at(field_ix);
         if (pos + 1 == finances_total) {
             while (cur_kix < total && finances[pos].reportDate <= k[cur_kix].datetime) {
-                dst[cur_kix] = value;
+                if (dynamic) {
+                    long month = finances[pos].fileDate.month();
+                    if (3L == month) {
+                        // 一季报
+                        dst[cur_kix] = value * 4;
+                    } else if (6L == month) {
+                        // 半年报
+                        dst[cur_kix] = value * 2;
+                    } else if (9L == month) {
+                        // 三季报
+                        dst[cur_kix] = value / 3.0 * 4.0;
+                    } else {
+                        // 年报
+                        dst[cur_kix] = value;
+                    }
+                } else {
+                    dst[cur_kix] = value;
+                }
                 cur_kix++;
             }
         } else {
             while (cur_kix < total && finances[pos].reportDate <= k[cur_kix].datetime &&
                    finances[pos + 1].reportDate > k[cur_kix].datetime) {
-                dst[cur_kix] = value;
+                if (dynamic) {
+                    long month = finances[pos].fileDate.month();
+                    if (3L == month) {
+                        // 一季报
+                        dst[cur_kix] = value * 4;
+                    } else if (6L == month) {
+                        // 半年报
+                        dst[cur_kix] = value * 2;
+                    } else if (9L == month) {
+                        // 三季报
+                        dst[cur_kix] = value / 3.0 * 4.0;
+                    } else {
+                        // 年报
+                        dst[cur_kix] = value;
+                    }
+                } else {
+                    dst[cur_kix] = value;
+                }
                 cur_kix++;
             }
         }
@@ -86,6 +140,7 @@ Indicator HKU_API FINANCE(int field_ix) {
 Indicator HKU_API FINANCE(const KData& k, int field_ix) {
     auto p = make_shared<IFinance>(k);
     p->setParam<int>("field_ix", field_ix);
+    p->setContext(k);
     return Indicator(p);
 }
 
@@ -100,6 +155,7 @@ Indicator HKU_API FINANCE(const KData& k, const string& field_name) {
     auto p = make_shared<IFinance>(k);
     p->setParam<int>("field_ix", -1);
     p->setParam<string>("field_name", field_name);
+    p->setContext(k);
     return Indicator(p);
 }
 

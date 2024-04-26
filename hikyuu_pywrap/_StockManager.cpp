@@ -147,6 +147,8 @@ void export_StockManager(py::module& m) {
     CSV文件第一行为标题，需含有
     Datetime（或Date、日期）、OPEN（或开盘价）、HIGH（或最高价）、LOW（或最低价）、CLOSE（或收盘价）、AMOUNT（或成交金额）、VOLUME（或VOL、COUNT、成交量）。
 
+    注意：请确保 csv 使用 utf8 格式存储，否则无法识别中文
+
     :param str code: 自行编号的证券代码，不能和已有的Stock相同，否则将返回Null<Stock>
     :param str day_filename: 日线CSV文件名
     :param str min_filename: 分钟线CSV文件名
@@ -182,24 +184,29 @@ void export_StockManager(py::module& m) {
     
     根据字段名称，获取历史财务信息相应字段索引)")
 
-      .def("get_history_finance_all_fields",
-           [](const StockManager& sm) {
-               auto fields = sm.getHistoryFinanceAllFields();
-               py::list ret;
-               for (const auto& f : fields) {
-                   ret.append(py::make_tuple(f.first, f.second));
-               }
-               return ret;
-           })
+      .def(
+        "get_history_finance_all_fields",
+        [](const StockManager& sm) {
+            auto fields = sm.getHistoryFinanceAllFields();
+            py::list ret;
+            for (const auto& f : fields) {
+                ret.append(py::make_tuple(f.first, f.second));
+            }
+            return ret;
+        },
+        R"(get_history_finance_all_fields(self)
+    获取所有历史财务信息字段及其索引)")
 
       .def("add_stock", &StockManager::addStock, R"(add_stock(self, stock)
       
-    谨慎调用！！！仅供增加某些临时的外部 Stock)
+    谨慎调用！！！仅供增加某些临时的外部 Stock
     @return True | False)")
 
       .def("remove_stock", &StockManager::removeStock, R"(remove_stock(self, market_code)
     
-    从 sm 中移除 market_code 代表的证券，谨慎使用！！！通常用于移除临时增加的外布 Stock)")
+    从 sm 中移除 market_code 代表的证券，谨慎使用！！！通常用于移除临时增加的外布 Stock
+    
+    :param str market_code: 证券市场标识)")
 
       .def("__len__", &StockManager::size, "返回证券数量")
       .def("__getitem__", &StockManager::getStock, "同 get_stock")

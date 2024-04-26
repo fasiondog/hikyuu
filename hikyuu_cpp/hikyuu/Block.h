@@ -21,8 +21,9 @@ class HKU_API Block {
 public:
     Block();
     Block(const string& category, const string& name);
-    Block(const Block&);
-    Block& operator=(const Block&);
+    Block(const string& category, const string& name, const string& indexCode);
+    Block(const Block&) noexcept;
+    Block& operator=(const Block&) noexcept;
     virtual ~Block();
 
     typedef StockMapIterator const_iterator;
@@ -118,10 +119,19 @@ public:
             m_data->m_stockDict.clear();
     }
 
+    /** 获取对应的指数，可能为空 Stock */
+    Stock getIndexStock() const {
+        return m_data ? m_data->m_indexStock : Stock();
+    }
+
+    /** 设置对应的指数 */
+    void setIndexStock(const Stock& stk);
+
 private:
     struct HKU_API Data {
         string m_category;
         string m_name;
+        Stock m_indexStock;  // 对应指数，可能不存在
         StockMapIterator::stock_map_t m_stockDict;
     };
     shared_ptr<Data> m_data;

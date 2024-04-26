@@ -2,10 +2,10 @@
 # -*- coding: utf8 -*-
 # gb18030
 
-#===============================================================================
+# ===============================================================================
 # 作者：fasiondog
 # 历史：1）20120928, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 import unittest
 
@@ -58,6 +58,69 @@ class StockTest(unittest.TestCase):
         fh.close()
         self.assertEqual(stock.name, b.name)
         self.assertEqual(b.market_code, 'SH000001')
+
+    def test_external_stock(self):
+        stk = Stock("xy", "00z", "测试")
+        self.assertEqual(stk.name, "测试")
+        self.assertEqual(stk.market, "XY")
+        self.assertEqual(stk.code, "00z")
+        self.assertEqual(stk.market_code, "XY00z")
+
+        stk.market = "aB"
+        self.assertEqual(stk.market, "AB")
+        self.assertEqual(stk.market_code, "AB00z")
+
+        stk.code = "000001"
+        self.assertEqual(stk.code, "000001")
+        self.assertEqual(stk.market_code, "AB000001")
+
+        stk.name = "test"
+        self.assertEqual(stk.name, "test")
+
+        self.assertEqual(stk.valid, False)
+        stk.valid = True
+        self.assert_(stk.valid)
+
+        self.assertNotEqual(stk.type, constant.STOCKTYPE_A)
+        stk.type = constant.STOCKTYPE_A
+        self.assertEqual(stk.type, constant.STOCKTYPE_A)
+
+        self.assertNotEqual(stk.tick, 1)
+        stk.tick = 1
+        self.assertEqual(stk.tick, 1)
+
+        self.assertNotEqual(stk.tick_value, 2)
+        stk.tick_value = 2
+        self.assertEqual(stk.tick_value, 2)
+        self.assertEqual(stk.unit, 2)
+
+        self.assertNotEqual(stk.atom, 2)
+        stk.atom = 2
+        self.assertEqual(stk.atom, 2)
+
+        self.assertNotEqual(stk.min_trade_number, 1)
+        stk.min_trade_number = 1
+        self.assertEqual(stk.min_trade_number, 1)
+
+        self.assertNotEqual(stk.max_trade_number, 10000)
+        stk.max_trade_number = 10000
+        self.assertEqual(stk.max_trade_number, 10000)
+
+        ks = [KRecord(Datetime(20010101), 5.0, 9.0, 4.0, 6.5, 1000.0, 100000.0)]
+        stk.set_krecord_list(ks)
+        self.assertEqual(stk.get_count(), 1)
+        k = stk.get_kdata(Query(0))
+        self.assertEqual(len(k), 1)
+        self.assertEqual(k[0], KRecord(Datetime(20010101), 5.0, 9.0, 4.0, 6.5, 1000.0, 100000.0))
+
+        self.assert_(stk not in sm)
+        sm.add_stock(stk)
+        self.assert_(stk in sm)
+        stk2 = sm['ab000001']
+        self.assert_(not stk2.is_null())
+        self.assert_(stk2, stk)
+        sm.remove_stock("ab000001")
+        self.assert_(stk not in sm)
 
 
 def suite():

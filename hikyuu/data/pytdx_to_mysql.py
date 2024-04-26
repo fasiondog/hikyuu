@@ -466,7 +466,7 @@ def get_trans_table(connect, market, code):
                     `buyorsell` INT NOT NULL,
                     PRIMARY KEY (`date`)
                 )
-                COLLATE='utf8_general_ci'
+                COLLATE='utf8mb4_general_ci'
                 ENGINE=MyISAM
                 ;
               """.format(
@@ -559,8 +559,9 @@ def import_trans(
 
     stock_list = get_stock_list(connect, market, quotations)
     total = len(stock_list)
+    a_stktype_list = get_a_stktype_list()
     for i, stock in enumerate(stock_list):
-        if stock[3] == 0 or len(stock[2]) != 6 or stock[4] not in (STOCKTYPE.A, STOCKTYPE.B, STOCKTYPE.GEM):
+        if stock[3] == 0 or len(stock[2]) != 6 or stock[4] not in a_stktype_list:
             if progress:
                 progress(i, total)
             continue
@@ -602,7 +603,7 @@ def get_time_table(connect, market, code):
                     `vol` DOUBLE NOT NULL,
                     PRIMARY KEY (`date`)
                 )
-                COLLATE='utf8_general_ci'
+                COLLATE='utf8mb4_general_ci'
                 ENGINE=MyISAM
                 ;
               """.format(

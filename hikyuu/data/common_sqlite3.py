@@ -62,11 +62,11 @@ def create_database(connect):
             cur.executescript(f.read())
 
     db_version = get_db_version(connect)
-    files = [x for x in Path(sql_dir).iterdir() \
-             if x.is_file() \
-                and x.name != 'createdb.sql' \
-                and x.name != '__init__.py' \
-                and int(x.stem) > db_version and not x.is_dir()]
+    files = [x for x in Path(sql_dir).iterdir()
+             if x.is_file()
+             and x.name != 'createdb.sql'
+             and x.name != '__init__.py'
+             and int(x.stem) > db_version and not x.is_dir()]
     files.sort()
     for file in files:
         cur.executescript(file.read_text(encoding='utf8'))
@@ -88,7 +88,7 @@ def get_codepre_list(connect, marketid, quotations):
     """获取前缀代码表"""
     stktype_list = get_stktype_list(quotations)
     sql = "select codepre, type from coderuletype " \
-          "where marketid={marketid} and type in {type_list}"\
+          "where marketid={marketid} and type in {type_list} ORDER by length(codepre) DESC"\
         .format(marketid=marketid, type_list=stktype_list)
     cur = connect.cursor()
     a = cur.execute(sql)
@@ -100,7 +100,7 @@ def get_codepre_list(connect, marketid, quotations):
 def update_last_date(connect, marketid, lastdate):
     cur = connect.cursor()
     cur.execute("update Market set lastDate={} where marketid='{}'".format(lastdate, marketid))
-    #if marketid == MARKETID.SH:
+    # if marketid == MARKETID.SH:
     #    cur.execute("update LastDate set date={}".format(lastdate))
     connect.commit()
     cur.close()

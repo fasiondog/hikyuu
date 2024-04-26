@@ -26,13 +26,20 @@ Block::Block(const string& category, const string& name) : m_data(make_shared<Da
     m_data->m_name = name;
 }
 
-Block::Block(const Block& block) {
+Block::Block(const string& category, const string& name, const string& indexCode)
+: Block(category, name) {
+    if (!indexCode.empty()) {
+        m_data->m_indexStock = StockManager::instance().getStock(indexCode);
+    }
+}
+
+Block::Block(const Block& block) noexcept {
     if (m_data == block.m_data)
         return;
     m_data = block.m_data;
 }
 
-Block& Block::operator=(const Block& block) {
+Block& Block::operator=(const Block& block) noexcept {
     HKU_IF_RETURN(this == &block || m_data == block.m_data, *this);
     m_data = block.m_data;
     return *this;
@@ -112,6 +119,12 @@ bool Block::remove(const Stock& stock) {
     HKU_IF_RETURN(!have(stock), false);
     m_data->m_stockDict.erase(stock.market_code());
     return true;
+}
+
+void Block::setIndexStock(const Stock& stk) {
+    if (!m_data)
+        m_data = shared_ptr<Data>(new Data);
+    m_data->m_indexStock = stk;
 }
 
 } /* namespace hku */

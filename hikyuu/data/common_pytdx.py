@@ -49,21 +49,21 @@ def to_pytdx_market(market):
     return pytdx_market[market.upper()]
 
 
-def ping(ip, port=7709, multithread=False):
+def ping(ip, port=7709, multithread=False, timeout=1):
     api = TdxHq_API(multithread=multithread)
     success = False
     starttime = time.time()
+    success = False
     try:
-        with api.connect(ip, port, time_out=1):
+        if api.connect(ip, port, time_out=timeout):
             # x = api.get_security_count(0)
             # x = api.get_index_bars(7, 1, '000001', 800, 100)
             x = api.get_security_bars(7, 0, '000001', 800, 100)
             if x:
                 success = True
-
     except Exception as e:
-        success = False
-
+        print(e)
+        pass
     endtime = time.time()
     return (success, endtime - starttime, ip, port)
 

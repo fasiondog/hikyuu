@@ -392,6 +392,18 @@
     :rtype: Indicator
 
 
+.. py:function:: FINANCE([kdata, ix, name])
+
+    获取历史财务信息。（可通过 StockManager.get_history_finance_all_fields 查询相应的历史财务字段信息）
+
+    ix, name 使用时，为二选一。即要不使用 ix，要不就使用 name 进行获取。
+
+    :param KData kdata: K线数据
+    :param int ix: 历史财务信息字段索引
+    :param int name: 历史财务信息字段名称
+    :rtype: Indicator
+
+
 .. py:function:: FLOOR([data])
 
     向下舍入(向数值减小方向舍入)取整
@@ -1126,6 +1138,14 @@
 
     :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
     :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值
+
+
+.. py:function:: ZONGGUBEN([data])
+
+   获取总股本（单位：万股）
+
+   :param KData kdata: k线数据
+   :rtype: Indicator    
 
 
 .. py:function:: ZSCORE([data, out_extreme, nsigma, recursive])

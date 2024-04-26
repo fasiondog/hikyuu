@@ -892,6 +892,14 @@ void export_Indicator_build_in(py::module& m) {
    :param KData kdata: k线数据
    :rtype: Indicator)");
 
+    m.def("ZONGGUBEN", py::overload_cast<>(ZONGGUBEN));
+    m.def("ZONGGUBEN", py::overload_cast<const KData&>(ZONGGUBEN), R"(ZONGGUBEN(kdata)
+
+   获取总股本（单位：万股）
+
+   :param KData kdata: k线数据
+   :rtype: Indicator)");
+
     m.def("HSL", HSL_1);
     m.def("HSL", HSL_2, R"(HSL(kdata)
 
@@ -1825,8 +1833,19 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator data: 指定的指标
     :param int result_ix: 指定的结果集)");
 
-    m.def("FINANCE", py::overload_cast<int>(FINANCE));
-    m.def("FINANCE", py::overload_cast<const string&>(FINANCE));
-    m.def("FINANCE", py::overload_cast<const KData&, int>(FINANCE));
-    m.def("FINANCE", py::overload_cast<const KData&, const string&>(FINANCE));
+    m.def("FINANCE", py::overload_cast<int>(FINANCE), py::arg("ix"));
+    m.def("FINANCE", py::overload_cast<const string&>(FINANCE), py::arg("name"));
+    m.def("FINANCE", py::overload_cast<const KData&, int>(FINANCE), py::arg("kdata"),
+          py::arg("ix"));
+    m.def("FINANCE", py::overload_cast<const KData&, const string&>(FINANCE), py::arg("kdata"),
+          py::arg("name"),
+          R"(FINANCE([kdata, ix, name])
+
+    获取历史财务信息。（可通过 StockManager.get_history_finance_all_fields 查询相应的历史财务字段信息）
+
+    ix, name 使用时，为二选一。即要不使用 ix，要不就使用 name 进行获取。
+
+    :param KData kdata: K线数据
+    :param int ix: 历史财务信息字段索引
+    :param int name: 历史财务信息字段名称)");
 }

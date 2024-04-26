@@ -403,15 +403,19 @@ vector<HistoryFinanceInfo> MySQLBaseInfoDriver::getHistoryFinance(const string &
         to_upper(market_code);
         vector<HistoryFinanceTable> finances;
         con->batchLoad(finances, ((Field("market_code") == market_code) &
-                                  (Field("report_date") >= new_start.ymd())) +
+                                  (Field("report_date") >= new_start.ymd()) &
+                                  (Field("report_date") < new_end.ymd())) +
                                    ASC("report_date"));
         size_t total = finances.size();
         result.resize(total);
         for (size_t i = 0; i < total; i++) {
             auto &finance = finances[i];
             auto &cur = result[i];
+            cur.fileDate = Datetime(finance.file_date);
             cur.reportDate = Datetime(finance.report_date);
-            cur.values = std::move(finance.values);
+            size_t count = finance.values.size() / sizeof(float);
+            cur.values.resize(count);
+            memcpy(cur.values.data(), finance.values.data(), count * sizeof(float));
         }
 
     } catch (const std::exception &e) {

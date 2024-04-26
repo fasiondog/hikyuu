@@ -5,7 +5,7 @@
 ============
 
 内建对因子合成算法
-----------------
+--------------------------------
 
 .. py:function:: MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5])
 
@@ -19,7 +19,7 @@
     :rtype: MultiFactorBase
 
 
-.. py:function:: MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
+.. py:function:: MF_ICWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
     滚动IC权重合成因子
 
@@ -32,7 +32,7 @@
     :rtype: MultiFactorBase
 
 
-.. py:function:: MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
+.. py:function:: MF_ICIRWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
     滚动ICIR权重合成因子
 
@@ -46,7 +46,7 @@
 
 
 自定义多因子合成算法基类
---------------------
+--------------------------------------
 
 自定义多因子合成算法接口：
 
@@ -54,7 +54,7 @@
 
 
 多因子合成算法基类
-------------------------
+---------------------------------------
 
 .. py:class:: MultiFactorBase
 

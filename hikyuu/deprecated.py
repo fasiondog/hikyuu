@@ -8,7 +8,7 @@ def deprecated_func(new_func, old_func_name, new_func_name):
     def wrap_deprecated_func(func):
         def wrapfunc(*args, **kwarg):
             print(
-                #'Deprecated warning: "{}" will be deprecated, please use: "{}"'.format(
+                # 'Deprecated warning: "{}" will be deprecated, please use: "{}"'.format(
                 '警告: "{}" 函数即将废弃，请使用 "{}" 代替'.format(old_func_name, new_func_name)
             )
             return new_func(*args, **kwarg)
@@ -25,11 +25,11 @@ def deprecated_attr(name_dict):
             clzname = self.__class__.__name__
             if name in name_dict:
                 if name_dict[name] is None:
-                    #print('Removed warning: the {}.{} will be removed!'.format(clzname, name))
+                    # print('Removed warning: the {}.{} will be removed!'.format(clzname, name))
                     print('警告: "{}.{}" 接口已被删除!'.format(clzname, name))
                 else:
                     print(
-                        #'Deprecated warning: the "{}.{}" will be deprecated, please use: "{}.{}"'.
+                        # 'Deprecated warning: the "{}.{}" will be deprecated, please use: "{}.{}"'.
                         '警告: "{}.{}" 即将被废弃，请使用 "{}.{}" 代替'.format(clzname, name, clzname, name_dict[name])
                     )
                 return func(self, name_dict[name])
@@ -42,11 +42,11 @@ def deprecated_attr(name_dict):
     return wrap_deprecated_attr
 
 
-#--------------------------------------------------------------------
+# --------------------------------------------------------------------
 #
 # 待废弃函数
 #
-#--------------------------------------------------------------------
+# --------------------------------------------------------------------
 
 
 @deprecated_func(get_version, 'getVersion', 'get_version')
@@ -104,11 +104,11 @@ def SL_FixedValue(*args, **kwargs):
     pass
 
 
-#--------------------------------------------------------------------
+# --------------------------------------------------------------------
 #
 # 待废弃属性
 #
-#--------------------------------------------------------------------
+# --------------------------------------------------------------------
 
 
 @deprecated_attr(
@@ -486,7 +486,6 @@ SlippageBase.__getattr__ = SlippageBase_getattr
         'getKRecordList': 'get_krecord_list',
         'getDatetimeList': 'get_datetime_list',
         'getFinanceInfo': 'get_finance_info',
-        'getHistoryFinanceInfo': 'get_history_finance_info',
         'realtimeUpdate': 'realtime_update',
         'getWeight': 'get_weight',
         'loadKDataToBuffer': 'load_kdata_to_buffer',
