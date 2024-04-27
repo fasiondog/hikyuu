@@ -754,6 +754,7 @@ def sys_performance(sys, ref_stk=None):
     if ref_stk is None:
         ref_stk = get_stock('sh000300')
     ref_k = ref_stk.get_kdata(sys.query)
+    hku_check(len(ref_k) > 0, "The length of ref_k is zero! Maybe The query date is out of the ref-stock range!\n ref_k: {}", ref_k)
 
     query = Query(ref_k[0].datetime.start_of_day(), ref_k[-1].datetime.start_of_day() + TimeDelta(1), Query.DAY)
     ref_k = ref_stk.get_kdata(query)
