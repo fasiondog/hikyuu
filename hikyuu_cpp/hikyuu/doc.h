@@ -156,9 +156,6 @@
  *
  * @defgroup ThreadPool Thread Pool 线程池
  * @ingroup Utilities
- *
- * @defgroup TaskGroup Task Group 并行任务组
- * @ingroup Utilities
  */
 
 /**

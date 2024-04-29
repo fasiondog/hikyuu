@@ -34,14 +34,26 @@ Block::Block(const string& category, const string& name, const string& indexCode
 }
 
 Block::Block(const Block& block) noexcept {
-    if (m_data == block.m_data)
+    if (!block.m_data)
         return;
     m_data = block.m_data;
+}
+
+Block::Block(Block&& block) noexcept {
+    if (!block.m_data)
+        return;
+    m_data = std::move(block.m_data);
 }
 
 Block& Block::operator=(const Block& block) noexcept {
     HKU_IF_RETURN(this == &block || m_data == block.m_data, *this);
     m_data = block.m_data;
+    return *this;
+}
+
+Block& Block::operator=(Block&& block) noexcept {
+    HKU_IF_RETURN(this == &block || m_data == block.m_data, *this);
+    m_data = std::move(block.m_data);
     return *this;
 }
 

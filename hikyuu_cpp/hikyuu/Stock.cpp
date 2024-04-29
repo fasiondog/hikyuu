@@ -831,6 +831,10 @@ Parameter Stock::getFinanceInfo() const {
     return result;
 }
 
+vector<Block> Stock::getBelongToBlockList(const string& category) const {
+    return StockManager::instance().getStockBelongs(*this, category);
+}
+
 // 判断是否在交易时间段内（不判断日期）
 bool Stock::isTransactionTime(Datetime time) {
     MarketInfo market_info = StockManager::instance().getMarketInfo(market());

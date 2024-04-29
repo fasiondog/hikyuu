@@ -36,6 +36,14 @@ public:
     bool init(const Parameter& params);
 
     /**
+     * 获取指定证券所属的板块列表
+     * @param stk 指定证券
+     * @param category 板块分类，如果为空字符串，返回所有板块分类下的所属板块
+     * @return BlockList
+     */
+    BlockList getStockBelongs(const Stock& stk, const string& category);
+
+    /**
      * 子类如果需要缓存，可实现该方法将数据加载至自身的缓存
      */
     virtual void load() {}
