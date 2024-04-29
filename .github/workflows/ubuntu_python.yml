@@ -34,7 +34,7 @@ jobs:
 
     - uses: xmake-io/github-action-setup-xmake@v1
       with:
-        xmake-version: branch@master
+        xmake-version: 2.9.1
         actions-cache-folder: '.xmake-cache'
         actions-cache-key: 'ubuntu'
 
