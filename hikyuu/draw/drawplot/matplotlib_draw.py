@@ -681,7 +681,7 @@ def cnplot(cn, new=True, axes=None, kdata=None):
     axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
 
 
-def sysplot(sys, new=True, axes=None, style=1):
+def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
     """绘制系统实际买入/卖出信号
 
     :param SystemBase sys: 系统实例
@@ -689,6 +689,7 @@ def sysplot(sys, new=True, axes=None, style=1):
                    创建新的窗口对象并在其中进行绘制
     :param axes:  指定在那个轴对象中进行绘制
     :param style: 1 | 2 信号箭头绘制样式
+    :param bool only_draw_close: 不绘制K线，仅绘制 close
     """
     kdata = sys.to
 
@@ -698,7 +699,10 @@ def sysplot(sys, new=True, axes=None, style=1):
     if axes is None:
         if new:
             axes = create_figure()
-            kplot(kdata, axes=axes)
+            if only_draw_close:
+                iplot(kdata.close, axes=axes)
+            else:
+                kplot(kdata, axes=axes)
         else:
             axes = gca()
 
