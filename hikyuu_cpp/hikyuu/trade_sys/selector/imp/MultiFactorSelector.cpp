@@ -28,6 +28,14 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     checkParam("topn");
 }
 
+MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn, const filter_func_t& filter)
+: SelectorBase("SE_MultiFactor"), m_mf(mf), m_filter(filter) {
+    HKU_CHECK(mf, "mf is null!");
+    setParam<bool>("only_should_buy", false);
+    setParam<int>("topn", topn);
+    checkParam("topn");
+}
+
 MultiFactorSelector::~MultiFactorSelector() {}
 
 void MultiFactorSelector::_checkParam(const string& name) const {
@@ -48,6 +56,7 @@ SelectorPtr MultiFactorSelector::_clone() {
     MultiFactorSelector* p = new MultiFactorSelector();
     p->m_mf = m_mf->clone();
     p->m_stk_sys_dict = m_stk_sys_dict;
+    p->m_filter = m_filter;
     return SelectorPtr(p);
 }
 
@@ -57,10 +66,22 @@ bool MultiFactorSelector::isMatchAF(const AFPtr& af) {
 
 SystemWeightList MultiFactorSelector::getSelected(Datetime date) {
     SystemWeightList ret;
-    auto scores = m_mf->getScores(date, 0, getParam<int>("topn"),
-                                  [](const ScoreRecord& sc) { return !std::isnan(sc.value); });
+    auto mf_scores = m_mf->getScores(date, 0, getParam<int>("topn"),
+                                     [](const ScoreRecord& sc) { return !std::isnan(sc.value); });
+    const auto* scores = &mf_scores;
+
+    ScoreRecordList filtered_scores;
+    if (m_filter) {
+        for (auto&& sc : mf_scores) {
+            if (m_filter(sc.stock, date)) {
+                filtered_scores.emplace_back(std::move(sc));
+            }
+        }
+        scores = &filtered_scores;
+    }
+
     if (getParam<bool>("only_should_buy")) {
-        for (const auto& sc : scores) {
+        for (const auto& sc : *scores) {
             auto sys = m_stk_sys_dict[sc.stock];
             if (sys->getSG()->shouldBuy(date)) {
                 ret.emplace_back(sys, sc.value);
@@ -68,7 +89,7 @@ SystemWeightList MultiFactorSelector::getSelected(Datetime date) {
         }
 
     } else {
-        for (const auto& sc : scores) {
+        for (const auto& sc : *scores) {
             ret.emplace_back(m_stk_sys_dict[sc.stock], sc.value);
         }
     }
@@ -81,8 +102,9 @@ void MultiFactorSelector::_calculate() {
     }
 }
 
-SelectorPtr HKU_API SE_MultiFactor(const MFPtr& mf, int topn) {
-    return make_shared<MultiFactorSelector>(mf, topn);
+SelectorPtr HKU_API SE_MultiFactor(
+  const MFPtr& mf, int topn, const std::function<bool(const Stock&, const Datetime&)>& filter) {
+    return make_shared<MultiFactorSelector>(mf, topn, filter);
 }
 
 SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, const StockList& stks,

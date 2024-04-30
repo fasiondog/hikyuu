@@ -19,7 +19,9 @@ namespace hku {
  * @return SelectorPtr
  * @ingroup Selector
  */
-SelectorPtr HKU_API SE_MultiFactor(const MFPtr& mf, int topn = 10);
+SelectorPtr HKU_API SE_MultiFactor(const MFPtr& mf, int topn = 10,
+                                   const std::function<bool(const Stock&, const Datetime&)>&
+                                     filter = std::function<bool(const Stock&, const Datetime&)>());
 
 /**
  * 基于 MultiFactor 选股算法

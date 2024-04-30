@@ -14,8 +14,12 @@ namespace hku {
 
 class MultiFactorSelector : public SelectorBase {
 public:
+    using filter_func_t = std::function<bool(const Stock&, const Datetime&)>;
+
+public:
     MultiFactorSelector();
     MultiFactorSelector(const MFPtr& mf, int topn);
+    MultiFactorSelector(const MFPtr& mf, int topn, const filter_func_t& filter);
     virtual ~MultiFactorSelector();
 
     virtual void _checkParam(const string& name) const override;
@@ -28,6 +32,7 @@ public:
 private:
     MFPtr m_mf;
     unordered_map<Stock, SYSPtr> m_stk_sys_dict;
+    filter_func_t m_filter;
 
     //============================================
 // 序列化支持
