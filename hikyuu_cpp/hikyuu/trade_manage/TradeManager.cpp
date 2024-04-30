@@ -905,9 +905,9 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     // 未持仓
     position_map_type::iterator pos_iter = m_position.find(stock.id());
-    HKU_WARN_IF_RETURN(pos_iter == m_position.end(), result,
-                       "{} {} This stock was not bought never! ({}, {:<.4f}, {}, {})", datetime,
-                       stock.market_code(), datetime, realPrice, number, int(from));
+    HKU_TRACE_IF_RETURN(pos_iter == m_position.end(), result,
+                        "{} {} This stock was not bought never! ({}, {:<.4f}, {}, {})", datetime,
+                        stock.market_code(), datetime, realPrice, number, getSystemPartName(from));
 
     // 根据权息调整当前持仓情况
     updateWithWeight(datetime);

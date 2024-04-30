@@ -76,24 +76,10 @@ void SignalBase::setTO(const KData& kdata) {
 
     bool cycle = getParam<bool>("cycle");
     m_cycle_start = kdata[0].datetime;
+    HKU_IF_RETURN(cycle, void());
 
-    const KQuery& query = kdata.getQuery();
-    if (query.queryType() == KQuery::DATE) {
-        m_cycle_end = query.endDatetime();
-    } else {
-        size_t last_pos = kdata.lastPos();
-        const Stock& stk = kdata.getStock();
-        if (last_pos + 1 >= stk.getCount(query.kType())) {
-            m_cycle_end = Null<Datetime>();
-        } else {
-            KRecord krecord = stk.getKRecord(last_pos + 1, query.kType());
-            m_cycle_end = krecord.datetime;
-        }
-    }
-
-    KData cycle_kdata = kdata.getKData(m_cycle_start, m_cycle_end);
     if (!cycle) {
-        _calculate(cycle_kdata);
+        _calculate(kdata);
     }
 }
 
