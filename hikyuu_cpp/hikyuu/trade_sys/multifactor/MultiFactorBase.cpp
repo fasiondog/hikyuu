@@ -484,7 +484,18 @@ void MultiFactorBase::calculate() {
     vector<vector<Indicator>> all_stk_inds = getAllSrcFactors();
 
     try {
-        m_all_factors = _calculate(all_stk_inds);
+        if (m_inds.size() == 1) {
+            // 直接使用原始因子
+            size_t stk_count = m_stks.size();
+            m_all_factors.resize(stk_count);
+            for (size_t i = 0; i < stk_count; i++) {
+                m_all_factors[i] = std::move(all_stk_inds[i][0]);
+            }
+
+        } else {
+            // 计算每支证券调整后的合成因子
+            m_all_factors = _calculate(all_stk_inds);
+        }
 
         // 计算完成后创建截面索引
         _buildIndex();
