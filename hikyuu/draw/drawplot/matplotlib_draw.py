@@ -147,7 +147,7 @@ class StockFuncFormatter(object):
 
 def getDayLocatorAndFormatter(dates):
     """获取显示日线时使用的Major Locator和Major Formatter"""
-    sep = len(dates) / 10
+    sep = int(len(dates) / 10)
     loc = [
         (i, str(d) if (i != (len(dates) - 1)) and (i % sep != 0) else "{}-{}-{}".format(d.year, d.month, d.day))
         for i, d in enumerate(dates)
