@@ -163,20 +163,54 @@ void export_Selector(py::module& m) {
     :param System sys: 系统策略原型
     :return: SE选择器实例)");
 
-    m.def("SE_MultiFactor", py::overload_cast<const MFPtr&, int>(SE_MultiFactor), py::arg("mf"),
-          py::arg("topn") = 10);
+    // m.def("SE_MultiFactor", py::overload_cast<const MFPtr&, int>(SE_MultiFactor), py::arg("mf"),
+    //       py::arg("topn") = 10);
+    m.def(
+      "SE_MultiFactor",
+      [](const MFPtr& mf, int topn, py::object filter) {
+          SelectorPtr ret;
+          if (filter.is_none()) {
+              ret = SE_MultiFactor(mf, topn);
+          } else {
+              HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
+              py::object filter_func = filter.attr("__call__");
+              std::function<bool(const Stock&, const Datetime&)> cpp_filter =
+                [&](const Stock& stk, const Datetime& date) {
+                    return filter_func(stk, date).cast<bool>();
+                };
+              ret = SE_MultiFactor(mf, topn, cpp_filter);
+          }
+          return ret;
+      },
+      py::arg("mf"), py::arg("topn") = 10, py::arg("filter") = py::none());
     m.def(
       "SE_MultiFactor",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query, int topn,
-         int ic_n, int ic_rolling_n, const py::object& ref_stk, const string& mode) {
+         int ic_n, int ic_rolling_n, const py::object& ref_stk, const string& mode,
+         py::object filter) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = python_list_to_vector<Stock>(stks);
           Stock c_ref_stk = ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>();
-          return SE_MultiFactor(c_inds, c_stks, query, topn, ic_n, ic_rolling_n, c_ref_stk, mode);
+
+          SelectorPtr ret;
+          if (filter.is_none()) {
+              ret =
+                SE_MultiFactor(c_inds, c_stks, query, topn, ic_n, ic_rolling_n, c_ref_stk, mode);
+          } else {
+              HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
+              py::object filter_func = filter.attr("__call__");
+              std::function<bool(const Stock&, const Datetime&)> cpp_filter =
+                [&](const Stock& stk, const Datetime& date) {
+                    return filter_func(stk, date).cast<bool>();
+                };
+              ret = SE_MultiFactor(c_inds, c_stks, query, topn, ic_n, ic_rolling_n, c_ref_stk, mode,
+                                   cpp_filter);
+          }
+          return ret;
       },
       py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("topn") = 10, py::arg("ic_n") = 5,
       py::arg("ic_rolling_n") = 120, py::arg("ref_stk") = py::none(),
-      py::arg("mode") = "MF_ICIRWeight",
+      py::arg("mode") = "MF_ICIRWeight", py::arg("filter") = py::none(),
       R"(SE_MultiFactor
 
     创建基于多因子评分的选择器，两种创建方式

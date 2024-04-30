@@ -18,7 +18,6 @@ public:
 
 public:
     MultiFactorSelector();
-    MultiFactorSelector(const MFPtr& mf, int topn);
     MultiFactorSelector(const MFPtr& mf, int topn, const filter_func_t& filter);
     virtual ~MultiFactorSelector();
 

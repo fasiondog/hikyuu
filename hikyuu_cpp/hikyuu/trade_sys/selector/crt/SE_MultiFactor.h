@@ -39,6 +39,8 @@ SelectorPtr HKU_API SE_MultiFactor(const MFPtr& mf, int topn = 10,
 SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, const StockList& stks,
                                    const KQuery& query, int topn = 10, int ic_n = 5,
                                    int ic_rolling_n = 120, const Stock& ref_stk = Stock(),
-                                   const string& mode = "MF_ICIRWeight");
+                                   const string& mode = "MF_ICIRWeight",
+                                   const std::function<bool(const Stock&, const Datetime&)>&
+                                     filter = std::function<bool(const Stock&, const Datetime&)>());
 
 }  // namespace hku

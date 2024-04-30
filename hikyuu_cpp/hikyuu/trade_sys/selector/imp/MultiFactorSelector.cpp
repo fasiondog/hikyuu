@@ -20,14 +20,6 @@ MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
     setParam<int>("topn", 10);
 }
 
-MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
-: SelectorBase("SE_MultiFactor"), m_mf(mf) {
-    HKU_CHECK(mf, "mf is null!");
-    setParam<bool>("only_should_buy", false);
-    setParam<int>("topn", topn);
-    checkParam("topn");
-}
-
 MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn, const filter_func_t& filter)
 : SelectorBase("SE_MultiFactor"), m_mf(mf), m_filter(filter) {
     HKU_CHECK(mf, "mf is null!");
@@ -107,9 +99,10 @@ SelectorPtr HKU_API SE_MultiFactor(
     return make_shared<MultiFactorSelector>(mf, topn, filter);
 }
 
-SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, const StockList& stks,
-                                   const KQuery& query, int topn, int ic_n, int ic_rolling_n,
-                                   const Stock& ref_stk, const string& mode) {
+SelectorPtr HKU_API
+SE_MultiFactor(const IndicatorList& src_inds, const StockList& stks, const KQuery& query, int topn,
+               int ic_n, int ic_rolling_n, const Stock& ref_stk, const string& mode,
+               const std::function<bool(const Stock&, const Datetime&)>& filter) {
     Stock n_ref_stk = ref_stk.isNull() ? getStock("sh000300") : ref_stk;
     MFPtr mf;
     if ("MF_ICIRWeight" == mode) {
@@ -122,7 +115,7 @@ SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, const StockLis
         HKU_THROW("Invalid mode: {}", mode);
     }
 
-    return make_shared<MultiFactorSelector>(mf, topn);
+    return make_shared<MultiFactorSelector>(mf, topn, filter);
 }
 
 }  // namespace hku
