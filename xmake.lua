@@ -161,7 +161,7 @@ local boost_version = "1.84.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "10.2.1"
 local flatbuffers_version = "23.5.26"
-local cpp_httplib_version = "0.15.3"
+local cpp_httplib_version = "0.14.3"
 local sqlite_version = "3.43.0+200"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
