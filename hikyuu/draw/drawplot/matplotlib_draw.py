@@ -147,7 +147,7 @@ class StockFuncFormatter(object):
 
 def getDayLocatorAndFormatter(dates):
     """获取显示日线时使用的Major Locator和Major Formatter"""
-    sep = len(dates) / 10
+    sep = int(len(dates) / 10)
     loc = [
         (i, str(d) if (i != (len(dates) - 1)) and (i % sep != 0) else "{}-{}-{}".format(d.year, d.month, d.day))
         for i, d in enumerate(dates)
@@ -681,7 +681,7 @@ def cnplot(cn, new=True, axes=None, kdata=None):
     axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
 
 
-def sysplot(sys, new=True, axes=None, style=1):
+def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
     """绘制系统实际买入/卖出信号
 
     :param SystemBase sys: 系统实例
@@ -689,6 +689,7 @@ def sysplot(sys, new=True, axes=None, style=1):
                    创建新的窗口对象并在其中进行绘制
     :param axes:  指定在那个轴对象中进行绘制
     :param style: 1 | 2 信号箭头绘制样式
+    :param bool only_draw_close: 不绘制K线，仅绘制 close
     """
     kdata = sys.to
 
@@ -698,7 +699,10 @@ def sysplot(sys, new=True, axes=None, style=1):
     if axes is None:
         if new:
             axes = create_figure()
-            kplot(kdata, axes=axes)
+            if only_draw_close:
+                iplot(kdata.close, axes=axes)
+            else:
+                kplot(kdata, axes=axes)
         else:
             axes = gca()
 
@@ -787,7 +791,7 @@ def sys_performance(sys, ref_stk=None):
     t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
         invest_total, cur_fund, cur_fund - invest_total)
     t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%'.format(
-        funds_return[-1], per["帐户平均年收益率%"], max_pullback)
+        funds_return[-1]*100, per["帐户平均年收益率%"], max_pullback)
     t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
         per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
 
