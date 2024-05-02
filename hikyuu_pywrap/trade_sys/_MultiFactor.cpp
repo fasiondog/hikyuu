@@ -35,7 +35,7 @@ void export_MultiFactor(py::module& m) {
       .def(py::init<const Stock&, ScoreRecord::value_t>())
       .def("__str__", to_py_str<ScoreRecord>)
       .def("__repr__", to_py_str<ScoreRecord>)
-      .def_readwrite("stock", &ScoreRecord::stock, "时间")
+      .def_readwrite("stock", &ScoreRecord::stock, "证券")
       .def_readwrite("value", &ScoreRecord::value, "时间");
 
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",
