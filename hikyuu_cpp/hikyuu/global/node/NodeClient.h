@@ -42,17 +42,17 @@ public:
 
         try {
             // 设置发送结果 socket 连接参数
-            rv = nng_setopt_ms(m_socket, NNG_OPT_RECONNMINT, 10);
-            NODE_NNG_CHECK(rv, "Failed nng_setopt_ms!");
+            rv = nng_socket_set_ms(m_socket, NNG_OPT_RECONNMINT, 10);
+            NODE_NNG_CHECK(rv, "Failed nng_socket_set_ms!");
 
-            rv = nng_setopt_ms(m_socket, NNG_OPT_RECONNMAXT, 15000);
-            NODE_NNG_CHECK(rv, "Failed nng_setopt_ms!");
+            rv = nng_socket_set_ms(m_socket, NNG_OPT_RECONNMAXT, 15000);
+            NODE_NNG_CHECK(rv, "Failed nng_socket_set_ms!");
 
-            rv = nng_setopt_ms(m_socket, NNG_OPT_SENDTIMEO, 10000);
-            NODE_NNG_CHECK(rv, "Failed nng_setopt_ms!");
+            rv = nng_socket_set_ms(m_socket, NNG_OPT_SENDTIMEO, 10000);
+            NODE_NNG_CHECK(rv, "Failed nng_socket_set_ms!");
 
-            rv = nng_setopt_ms(m_socket, NNG_OPT_RECVTIMEO, 10000);
-            NODE_NNG_CHECK(rv, "Failed nng_setopt_ms!");
+            rv = nng_socket_set_ms(m_socket, NNG_OPT_RECVTIMEO, 10000);
+            NODE_NNG_CHECK(rv, "Failed nng_socket_set_ms!");
 
             rv = nng_dial(m_socket, m_server_addr.c_str(), NULL, 0);
             NODE_NNG_CHECK(rv, "Failed dial server: {}!", m_server_addr);

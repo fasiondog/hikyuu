@@ -791,7 +791,7 @@ def sys_performance(sys, ref_stk=None):
     t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
         invest_total, cur_fund, cur_fund - invest_total)
     t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%'.format(
-        funds_return[-1]*100, per["帐户平均年收益率%"], max_pullback)
+        funds_return[-1]*100 - 100, per["帐户平均年收益率%"], max_pullback)
     t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
         per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
 

@@ -146,10 +146,10 @@ void SpotAgent::work_thread() {
     int rv = nng_sub0_open(&sock);
     HKU_ERROR_IF_RETURN(rv != 0, void(), "Can't open nng sub0! {}", nng_strerror(rv));
 
-    rv = nng_setopt(sock, NNG_OPT_SUB_SUBSCRIBE, ms_spotTopic, ms_spotTopicLength);
+    rv = nng_socket_set(sock, NNG_OPT_SUB_SUBSCRIBE, ms_spotTopic, ms_spotTopicLength);
     HKU_ERROR_IF_RETURN(rv != 0, void(), "Failed set nng socket option! {}", nng_strerror(rv));
 
-    rv = nng_setopt_ms(sock, NNG_OPT_RECVTIMEO, m_revTimeout);
+    rv = nng_socket_set_ms(sock, NNG_OPT_RECVTIMEO, m_revTimeout);
     HKU_ERROR_IF_RETURN(rv != 0, void(), "Failed set receive timeout option!");
 
     rv = -1;

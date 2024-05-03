@@ -148,7 +148,8 @@ void Portfolio::_readyForRun() {
 
         // 为内部实际执行的系统创建初始资金为0的子账户
         sys->setTM(pro_tm->clone());
-        string sys_name = fmt::format("{}_{}", sys->name(), sys->getStock().market_code());
+        string sys_name = fmt::format("{}_{}_{}", sys->name(), sys->getStock().market_code(),
+                                      sys->getStock().name());
         sys->getTM()->name(fmt::format("TM_SUB_{}", sys_name));
         sys->name(fmt::format("PF_{}", sys_name));
 
@@ -255,10 +256,10 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
     if (diff > 0.) {
         if (m_tm->currentCash() > sum_cash) {
             m_cash_tm->checkin(date, diff);
-        } else if (m_tm->currentCash() < sum_cash) {
-            if (!m_cash_tm->checkout(date, diff)) {
-                m_tm->checkin(date, diff);
-            }
+            // } else if (m_tm->currentCash() < sum_cash) {
+            //     if (!m_cash_tm->checkout(date, diff)) {
+            //         m_tm->checkin(date, diff);
+            //     }
         }
         HKU_INFO_IF(trace, "After compensate: the sum cash of sub_tm: {}, cash tm: {}, tm cash: {}",
                     sum_cash, m_cash_tm->currentCash(), m_tm->currentCash());
