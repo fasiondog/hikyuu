@@ -256,10 +256,10 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
     if (diff > 0.) {
         if (m_tm->currentCash() > sum_cash) {
             m_cash_tm->checkin(date, diff);
-            // } else if (m_tm->currentCash() < sum_cash) {
-            //     if (!m_cash_tm->checkout(date, diff)) {
-            //         m_tm->checkin(date, diff);
-            //     }
+        } else if (m_tm->currentCash() < sum_cash) {
+            if (m_cash_tm->currentCash() > diff) {
+                m_cash_tm->checkout(date, m_cash_tm->currentCash() - diff);
+            }
         }
         HKU_INFO_IF(trace, "After compensate: the sum cash of sub_tm: {}, cash tm: {}, tm cash: {}",
                     sum_cash, m_cash_tm->currentCash(), m_tm->currentCash());
