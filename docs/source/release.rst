@@ -1,6 +1,24 @@
 版本发布说明
 =======================
 
+2.0.4 - 2024年4月25日
+-------------------------
+
+1. 缺陷修复
+    - fixed ETF 权息缺少扩缩股
+    - fixed Portfolio 在非延迟买入、延迟卖出的场景下对账错误
+    - fixed matplotlib performance 绘制时，当前收益率显示显示错误
+    - fixed requirements.txt 增加tdqm, 缺失可能导致 windows HikyuuTdx 无法直接命令启动
+
+2. 其他改进
+    - Stock 添加获取所属板块列表方法 get_belong_to_block_list
+    - 改进 sys_performance，在query日期不在stock的有效日期范围内时，抛出异常
+    - matplotlib sysplot 增加 only_draw_close，避免数据量较大时, matploblib 绘制 K 线过慢
+    - 改进matplot绘制图形时，x轴坐标显示
+    - pf 系统名称加上股票名称
+    - 处理nng升级后的编译告警
+
+
 2.0.3 - 2024年4月25日
 -------------------------
 
