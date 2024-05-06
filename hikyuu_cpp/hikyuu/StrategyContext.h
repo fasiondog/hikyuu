@@ -46,12 +46,13 @@ public:
 
     void setKTypeList(const vector<KQuery::KType>& ktypeList);
 
+    /** 该返回的 ktype 列表，已经按从小到大进行排序 */
     const vector<KQuery::KType>& getKTypeList() const {
         return m_ktypeList;
     }
 
 private:
-    Datetime m_startDatetime;
+    Datetime m_startDatetime{19901219};
     vector<string> m_stockCodeList;
     vector<KQuery::KType> m_ktypeList;
 };
