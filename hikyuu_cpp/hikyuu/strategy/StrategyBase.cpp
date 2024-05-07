@@ -58,7 +58,7 @@ void StrategyBase::_initDefaultParam() {
     setParam<bool>("enable_2hour_clock", false);
 }
 
-void StrategyBase::run() {
+void StrategyBase::_run(bool forTest) {
     // 调用 strategy 自身的初始化方法
     init();
 
@@ -127,15 +127,10 @@ void StrategyBase::run() {
         ktype_list.push_back(KQuery::DAY);
     }
 
+    // 不使用默认的预加载模式
     for (auto ktype : ktype_list) {
         to_lower(ktype);
-        preloadParam.set<bool>(ktype, true);
-        string key(format("{}_max", ktype));
-        try {
-            preloadParam.set<int>(key, config.getInt("preload", key));
-        } catch (...) {
-            preloadParam.set<int>(key, 4096);
-        }
+        preloadParam.set<bool>(ktype, false);
     }
 
     sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, m_context);
@@ -152,29 +147,54 @@ void StrategyBase::run() {
     }
     HKU_WARN_IF(m_stock_list.empty(), "[Strategy {}] stock list is empty!", m_name);
 
-    if (m_stock_list.size() > 0) {
-        const Stock& ref_stk = m_stock_list[0];
-        for (const auto& ktype : ktype_list) {
-            // 由于异步初始化，此处不用通过先getCount再getKRecord的方式获取最后的KRecord
-            KRecordList klist = ref_stk.getKRecordList(KQueryByIndex(0, Null<int64_t>(), ktype));
-            size_t count = klist.size();
-            if (count > 0) {
-                m_ref_last_time[ktype] = klist[count - 1].datetime;
-            } else {
-                m_ref_last_time[ktype] = Null<Datetime>();
-            }
+    // 借助 Stock.setKRecordList 方法进行预加载（同步方式，不需要异步加载）
+    // 只从 context 指定起始日期开始加载
+    size_t ktype_count = ktype_list.size();
+    vector<KRecordList> k_buffer(ktype_count);
+    for (auto& stk : m_stock_list) {
+        // 保留原始 KDataDriver，因为使用 stock.setKRecordList 将会把 stock 的 KDataDriver 设置为
+        // DoNothing
+        auto old_driver = stk.getKDataDirver();
+
+        for (size_t i = 0; i < ktype_count; i++) {
+            k_buffer[i] = std::move(stk.getKRecordList(
+              KQueryByDate(m_context.startDatetime(), Null<Datetime>(), ktype_list[i])));
         }
+        for (size_t i = 0; i < ktype_count; i++) {
+            stk.setKRecordList(std::move(k_buffer[i]), ktype_list[i]);
+        }
+
+        // 恢复 KDataDriver
+        stk.setKDataDriver(old_driver);
     }
 
-    // 启动行情接收代理
-    auto& agent = *getGlobalSpotAgent();
-    agent.addProcess([this](const SpotRecord& spot) { this->receivedSpot(spot); });
-    agent.addPostProcess([this](Datetime revTime) { this->finishReceivedSpot(revTime); });
-    startSpotAgent(false);
+    // 计算每个类型当前最后的日期
+    for (const auto& ktype : ktype_list) {
+        Datetime last_date = Datetime::min();
+        for (auto& stk : m_stock_list) {
+            size_t count = stk.getCount(ktype);
+            if (count > 1) {
+                auto kr = stk.getKRecord(count - 1, ktype);
+                if (kr.datetime > last_date) {
+                    last_date = kr.datetime;
+                }
+            }
+        }
+        m_ref_last_time[ktype] = last_date == Datetime::min() ? Null<Datetime>() : last_date;
+    }
 
-    _addTimer();
+    if (!forTest) {
+        // 启动行情接收代理
+        auto& agent = *getGlobalSpotAgent();
+        agent.addProcess([this](const SpotRecord& spot) { this->receivedSpot(spot); });
+        agent.addPostProcess([this](Datetime revTime) { this->finishReceivedSpot(revTime); });
+        startSpotAgent(false);
 
-    _startEventLoop();
+        _addTimer();
+
+        HKU_INFO("start even loop ...");
+        _startEventLoop();
+    }
 }
 
 void StrategyBase::receivedSpot(const SpotRecord& spot) {
