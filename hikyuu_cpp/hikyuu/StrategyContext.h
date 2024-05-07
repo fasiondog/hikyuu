@@ -31,6 +31,7 @@ public:
     }
 
     void startDatetime(const Datetime& d) {
+        HKU_CHECK(!d.isNull(), "Don't use null datetime!");
         m_startDatetime = d;
     }
 

@@ -42,7 +42,7 @@ public:
 };
 
 void export_Strategy(py::module& m) {
-    py::class_<StrategyBase, PyStrategyBase>(m, "StrategyBase")
+    py::class_<StrategyBase, StrategyPtr, PyStrategyBase>(m, "StrategyBase")
       .def(py::init<>())
       .def_property("name", py::overload_cast<>(&StrategyBase::name, py::const_),
                     py::overload_cast<const string&>(&StrategyBase::name),
