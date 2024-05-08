@@ -11,6 +11,10 @@
 
 namespace hku {
 
+/**
+ * 以 PF 调仓周期为买入信号
+ * @return SignalPtr
+ */
 SignalPtr HKU_API SG_Cycle();
 
-}
+}  // namespace hku
