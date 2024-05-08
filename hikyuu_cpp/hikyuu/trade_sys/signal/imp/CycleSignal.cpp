@@ -29,7 +29,6 @@ void CycleSignal::_checkParam(const string& name) const {
 }
 
 void CycleSignal::_calculate(const KData& kdata) {
-    HKU_INFO("cycle start: {}", getCycleStart());
     _addBuySignal(getCycleStart());
 }
 
