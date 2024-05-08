@@ -87,7 +87,8 @@
     :param Indicator ind:
     :param int slow_n: 慢线EMA周期
     :return: 信号指示器
-    
+
+
 布尔信号指示器
 ^^^^^^^^^^^^^^^^
 
@@ -98,6 +99,35 @@
     :param Indicator buy: 买入指示（结果Indicator中相应位置>0则代表买入）
     :param Indicator sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
     :return: 信号指示器
+
+
+区间突破信号指示器
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: SG_Band(ind, lower, upper)
+          
+    指标区间指示器, 当指标超过上轨时，买入；
+    当指标低于下轨时，卖出。
+    
+    ::
+
+        SG_Band(MA(C, n=10), 100, 200)
+
+
+持续买入信号指示器
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: SG_AllwaysBuy()
+    
+    一个特殊的SG，持续每天发出买入信号，通常配合 PF 使用
+
+
+PF调仓周期买入信号指示器
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: SG_Cycle()
+    
+    一个特殊的SG，配合PF使用，以 PF 调仓周期为买入信号
 
 
 自定义信号指示器
