@@ -147,25 +147,11 @@ void StrategyBase::_run(bool forTest) {
     }
     HKU_WARN_IF(m_stock_list.empty(), "[Strategy {}] stock list is empty!", m_name);
 
-    // 借助 Stock.setKRecordList 方法进行预加载（同步方式，不需要异步加载）
-    // 只从 context 指定起始日期开始加载
-    size_t ktype_count = ktype_list.size();
-    vector<KRecordList> k_buffer(ktype_count);
-    for (auto& stk : m_stock_list) {
-        // 保留原始 KDataDriver，因为使用 stock.setKRecordList 将会把 stock 的 KDataDriver 设置为
-        // DoNothing
-        auto old_driver = stk.getKDataDirver();
-
-        for (size_t i = 0; i < ktype_count; i++) {
-            k_buffer[i] = std::move(stk.getKRecordList(
-              KQueryByDate(m_context.startDatetime(), Null<Datetime>(), ktype_list[i])));
-        }
-        for (size_t i = 0; i < ktype_count; i++) {
-            stk.setKRecordList(std::move(k_buffer[i]), ktype_list[i]);
-        }
-
-        // 恢复 KDataDriver
-        stk.setKDataDriver(old_driver);
+    // 非测试模式下加载上下文起始日期开始的KData
+    // 测试模式下不需要预加载，由测试灌入
+    if (!forTest) {
+        // 只从 context 指定起始日期开始加载
+        _loadKData(m_context.startDatetime(), Null<Datetime>());
     }
 
     // 计算每个类型当前最后的日期
@@ -194,6 +180,28 @@ void StrategyBase::_run(bool forTest) {
 
         HKU_INFO("start even loop ...");
         _startEventLoop();
+    }
+}
+
+void StrategyBase::_loadKData(const Datetime& start, const Datetime& end) {
+    // 借助 Stock.setKRecordList 方法进行预加载（同步方式，不需要异步加载）
+    const auto& ktype_list = getKTypeList();
+    size_t ktype_count = ktype_list.size();
+    vector<KRecordList> k_buffer(ktype_count);
+    for (auto& stk : m_stock_list) {
+        // 保留原始 KDataDriver，因为使用 stock.setKRecordList 将会把 stock 的 KDataDriver 设置为
+        // DoNothing
+        auto old_driver = stk.getKDataDirver();
+
+        for (size_t i = 0; i < ktype_count; i++) {
+            k_buffer[i] = std::move(stk.getKRecordList(KQueryByDate(start, end, ktype_list[i])));
+        }
+        for (size_t i = 0; i < ktype_count; i++) {
+            stk.setKRecordList(std::move(k_buffer[i]), ktype_list[i]);
+        }
+
+        // 恢复 KDataDriver
+        stk.setKDataDriver(old_driver);
     }
 }
 
@@ -295,6 +303,30 @@ void StrategyBase::_startEventLoop() {
             task();
         }
     }
+}
+
+void StrategyBase::backTest(const Datetime& start, const Datetime& end) {
+    HKU_CHECK(!start.isNull(), "start date can't be null!");
+    HKU_CHECK(start >= m_context.startDatetime(),
+              "The backtest start date must be greater than the context start date!");
+
+    const auto& ktypes = getKTypeList();
+    HKU_CHECK(!ktypes.empty(), "The ktype list is empty!");
+
+    _run(true);
+
+    // 加载回测日期之前的相关K线数据
+    _loadKData(m_context.startDatetime(), start);
+
+    size_t ktype_count = ktypes.size();
+    vector<int32_t> ktype_mintues(ktypes.size());
+    for (size_t i = 0; i < ktype_count; i++) {
+        ktype_mintues[i] = KQuery::getKTypeInMin(ktypes[i]);
+    }
+
+    auto dates = StockManager::instance().getTradingCalendar(KQueryByDate(start, end));
+
+    const auto& down_ktype = ktypes[0];
 }
 
 }  // namespace hku

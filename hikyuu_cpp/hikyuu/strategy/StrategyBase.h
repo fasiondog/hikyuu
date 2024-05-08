@@ -88,6 +88,8 @@ public:
         _run(false);
     }
 
+    void backTest(const Datetime& start, const Datetime& end);
+
     void receivedSpot(const SpotRecord& spot);
     void finishReceivedSpot(Datetime revTime);
 
@@ -116,6 +118,7 @@ private:
     void _addClockEvent(const string& enable, TimeDelta delta, TimeDelta openTime,
                         TimeDelta closeTime);
 
+    void _loadKData(const Datetime& start, const Datetime& end);
     void _run(bool forTest);
 
 private:
