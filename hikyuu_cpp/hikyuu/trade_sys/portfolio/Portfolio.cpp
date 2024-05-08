@@ -296,6 +296,7 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
             // 强制卖出失败的情况下，如果当前仍有持仓，则需要下一交易日继续进行处理
             PositionRecord position = sys.sys->getTM()->getPosition(date, sys.sys->getStock());
             if (position.number > 0.0) {
+                HKU_INFO_IF("[{}] failed to force sell, delay to next day", name());
                 tmp_continue_adjust_sys_list.emplace_back(sys);
             }
         }
@@ -357,17 +358,18 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
     if (trace) {
         auto funds = m_tm->getFunds(date, m_query.kType());
         HKU_INFO("[PF] [after adjust] - total funds: {},  cash: {}, market_value: {}",
-                 funds.cash + funds.market_value, funds.cash, funds.market_value);
+                 funds.total_assets(), funds.cash, funds.market_value);
     }
 
     //----------------------------------------------------------------------------
     // 执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
     //----------------------------------------------------------------------------
     for (auto& sub_sys : m_running_sys_set) {
-        HKU_TRACE_IF(trace, "run: {}", sub_sys->name());
+        HKU_INFO_IF(trace, "[PF] run: {}", sub_sys->name());
         if (adjust) {
             auto sg = sub_sys->getSG();
             sg->startCycle(date, nextCycle);
+            HKU_INFO_IF(trace, "[PF] sg should buy: {}", sg->shouldBuy(date));
         }
 
         auto tr = sub_sys->runMoment(date);
