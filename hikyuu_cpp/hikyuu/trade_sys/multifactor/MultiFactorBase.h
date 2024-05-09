@@ -155,6 +155,7 @@ private:
 protected:
     void _buildIndex();  // 计算完成后创建截面索引
     IndicatorList _getAllReturns(int ndays) const;
+    void _checkData();
 
 protected:
     string m_name;

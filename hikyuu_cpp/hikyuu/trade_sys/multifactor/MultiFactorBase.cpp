@@ -82,22 +82,7 @@ MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stk
     initParam();
     setParam<int>("ic_n", ic_n);
     checkParam("ic_n");
-
-    HKU_CHECK(!m_ref_stk.isNull(), "The reference stock must be set!");
-    HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
-
-    // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
-    for (const auto& stk : m_stks) {
-        HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
-    }
-
-    // 获取用于对齐的参考日期
-    m_ref_dates = m_ref_stk.getDatetimeList(m_query);
-    HKU_CHECK(m_ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
-              m_ref_dates.size());
-
-    HKU_CHECK(m_stks.size() >= 2, "The number of stock is insufficient! current stock number: {}",
-              m_stks.size());
+    _checkData();
 }
 
 void MultiFactorBase::initParam() {
@@ -121,6 +106,24 @@ void MultiFactorBase::baseCheckParam(const string& name) const {
 void MultiFactorBase::paramChanged() {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_calculated = false;
+}
+
+void MultiFactorBase::_checkData() {
+    HKU_CHECK(!m_ref_stk.isNull(), "The reference stock must be set!");
+    HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
+
+    // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
+    for (const auto& stk : m_stks) {
+        HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
+    }
+
+    // 获取用于对齐的参考日期
+    m_ref_dates = m_ref_stk.getDatetimeList(m_query);
+    HKU_CHECK(m_ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
+              m_ref_dates.size());
+
+    HKU_CHECK(m_stks.size() >= 2, "The number of stock is insufficient! current stock number: {}",
+              m_stks.size());
 }
 
 void MultiFactorBase::reset() {
@@ -516,6 +519,8 @@ void MultiFactorBase::calculate() {
     // SPEND_TIME(MultiFactorBase_calculate);
     std::lock_guard<std::mutex> lock(m_mutex);
     HKU_IF_RETURN(m_calculated, void());
+
+    _checkData();
 
     // 获取所有证券所有对齐后的原始因子
     vector<vector<Indicator>> all_stk_inds = getAllSrcFactors();
