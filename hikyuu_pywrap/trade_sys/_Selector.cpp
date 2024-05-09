@@ -61,6 +61,7 @@ void export_Selector(py::module& m) {
     - _clone - 【必须】克隆接口)")
 
       .def(py::init<>())
+      .def(py::init<const SelectorBase&>())
       .def(py::init<const string&>(), R"(初始化构造函数
         
     :param str name: 名称)")
