@@ -30,7 +30,7 @@ vector<Indicator> EqualWeightMultiFactor::_calculate(
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
 
-#if 0
+#if !MF_USE_MULTI_THREAD
     value_t null_value = Null<value_t>();
     vector<price_t> sumByDate(days_total);
     vector<size_t> countByDate(days_total);

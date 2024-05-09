@@ -55,7 +55,8 @@ void export_MultiFactor(py::module& m) {
       .def_property("name", py::overload_cast<>(&MultiFactorBase::name, py::const_),
                     py::overload_cast<const string&>(&MultiFactorBase::name),
                     py::return_value_policy::copy, "名称")
-      .def("get_query", &MultiFactorBase::getQuery, py::return_value_policy::copy, R"(查询条件)")
+      .def_property("query", &MultiFactorBase::getQuery, &MultiFactorBase::setQuery,
+                    py::return_value_policy::copy, R"(查询条件)")
 
       .def("get_param", &MultiFactorBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -77,14 +78,35 @@ void export_MultiFactor(py::module& m) {
 
       .def("get_ref_stock", &MultiFactorBase::getRefStock, py::return_value_policy::copy,
            "获取参考证券")
+      .def("set_ref_stock", &MultiFactorBase::setRefStock, R"(set_ref_stock(self, stk)
+      
+    设置参考证券
+    
+    :param Stock stk: 参考证券)")
+
       .def("get_datetime_list", &MultiFactorBase::getDatetimeList, py::return_value_policy::copy,
            "获取参考日期列表（由参考证券通过查询条件获得）")
+
       .def("get_stock_list", &MultiFactorBase::getStockList, py::return_value_policy::copy,
            "获取创建时指定的证券列表")
+      .def("set_stock_list", &MultiFactorBase::setStockList, R"(set_stock_list(self, stks)
+      
+    设置计算范围指定的证券列表
+    
+    :param list stks: 新的待计算证券列表)")
+
       .def("get_stock_list_num", &MultiFactorBase::getStockListNumber,
            "获取创建时指定的证券列表中证券数量")
+
       .def("get_ref_indicators", &MultiFactorBase::getRefIndicators, py::return_value_policy::copy,
            "获取创建时输入的原始因子列表")
+
+      .def("set_ref_indicators", &MultiFactorBase::setRefIndicators,
+           R"(set_ref_indicators(self, inds)
+      
+    设置原始因子列表
+    
+    :param list inds: 新的原始因子列表)")
 
       .def("get_factor", &MultiFactorBase::getFactor, py::return_value_policy::copy,
            py::arg("stock"), R"(get_factor(self, stock)

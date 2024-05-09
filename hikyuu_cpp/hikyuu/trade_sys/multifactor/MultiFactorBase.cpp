@@ -20,8 +20,7 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& out, const MultiFactorBase& mf) {
-    out << "MultiFactor{"
-        << "\n  name: " << mf.name() << "\n  params: " << mf.getParameter()
+    out << "MultiFactor{" << "\n  name: " << mf.name() << "\n  params: " << mf.getParameter()
         << "\n  query: " << mf.getQuery() << "\n  ref stock: " << mf.m_ref_stk;
 
     out << "\n  src inds count: " << mf.m_inds.size() << " [";
@@ -169,6 +168,45 @@ MultiFactorPtr MultiFactorBase::clone() {
     //     p->m_all_factors.emplace_back(ind.clone());
     // }
     return p;
+}
+
+void MultiFactorBase::setQuery(const KQuery& query) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_query = query;
+    _reset();
+    m_calculated = false;
+}
+
+void MultiFactorBase::setRefStock(const Stock& stk) {
+    HKU_CHECK(!stk.isNull(), "The reference stock must be set!");
+    DatetimeList ref_dates = stk.getDatetimeList(m_query);
+    HKU_CHECK(ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
+              ref_dates.size());
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_ref_stk = stk;
+    m_ref_dates = std::move(ref_dates);
+    _reset();
+    m_calculated = false;
+}
+
+void MultiFactorBase::setStockList(const StockList& stks) {
+    // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
+    for (const auto& stk : stks) {
+        HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
+    }
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_stks = stks;
+    _reset();
+    m_calculated = false;
+}
+
+void MultiFactorBase::setRefIndicators(const IndicatorList& inds) {
+    HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_inds = inds;
+    _reset();
+    m_calculated = false;
 }
 
 const Indicator& MultiFactorBase::getFactor(const Stock& stk) {
@@ -349,13 +387,12 @@ Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
 
 IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     bool fill_null = getParam<bool>("fill_null");
-#if 0
+#if !MF_USE_MULTI_THREAD
     vector<Indicator> all_returns;
     all_returns.reserve(m_stks.size());
     for (const auto& stk : m_stks) {
         auto k = stk.getKData(m_query);
-        all_returns.emplace_back(ALIGN(REF(ROCP(k.close(), ndays), ndays), m_ref_dates,
-        fill_null));
+        all_returns.emplace_back(ALIGN(REF(ROCP(k.close(), ndays), ndays), m_ref_dates, fill_null));
     }
     return all_returns;
 #else
