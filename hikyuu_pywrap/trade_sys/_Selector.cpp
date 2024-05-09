@@ -16,6 +16,7 @@ class PySelectorBase : public SelectorBase {
 
 public:
     using SelectorBase::SelectorBase;
+    PySelectorBase(const SelectorBase& base) : SelectorBase(base) {}
 
     void _reset() override {
         PYBIND11_OVERLOAD(void, SelectorBase, _reset, );
