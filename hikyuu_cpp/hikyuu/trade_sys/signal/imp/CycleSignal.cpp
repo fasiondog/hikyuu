@@ -15,12 +15,16 @@ namespace hku {
 
 CycleSignal::CycleSignal() : SignalBase("SG_AllwaysBuy") {
     setParam<bool>("cycle", true);
+    setParam<bool>("alternate", false);
 }
 
 void CycleSignal::_checkParam(const string& name) const {
     if ("cycle" == name) {
         bool cycle = getParam<bool>(name);
         HKU_CHECK(cycle, "param cycle must be true!");
+    } else if ("alternate" == name) {
+        bool alternate = getParam<bool>("alternate");
+        HKU_CHECK(!alternate, "param alternate must be false!");
     }
 }
 

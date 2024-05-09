@@ -77,57 +77,63 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
                     continue
                 if date == db_last_date and new_last_db_weight is not None:
                     if xdxr['songzhuangu'] is not None:
-                        new_last_db_weight[3] = int(10000 * xdxr['songzhuangu'])
+                        new_last_db_weight[3] = 10000 * xdxr['songzhuangu']
+                        update_last_db_weight = True
+                    if xdxr['suogu'] is not None:
+                        # etf 扩股
+                        new_last_db_weight[3] = 100000 * (xdxr['suogu']-1)
                         update_last_db_weight = True
                     if xdxr['peigu'] is not None:
-                        new_last_db_weight[4] = int(10000 * xdxr['peigu'])
+                        new_last_db_weight[4] = 10000 * xdxr['peigu']
                         update_last_db_weight = True
                     if xdxr['peigujia'] is not None:
-                        new_last_db_weight[5] = int(1000 * xdxr['peigujia'])
+                        new_last_db_weight[5] = 1000 * xdxr['peigujia']
                         update_last_db_weight = True
                     if xdxr['fenhong'] is not None:
-                        new_last_db_weight[6] = int(1000 * xdxr['fenhong'])
+                        new_last_db_weight[6] = 1000 * xdxr['fenhong']
                         update_last_db_weight = True
                     if xdxr['houzongguben'] is not None:
-                        new_last_db_weight[8] = round(xdxr['houzongguben'])
+                        new_last_db_weight[8] = xdxr['houzongguben']
                         update_last_db_weight = True
                         last_total_count = new_last_db_weight[8]
                     if xdxr['panhouliutong'] is not None:
-                        new_last_db_weight[9] = round(xdxr['panhouliutong'])
+                        new_last_db_weight[9] = xdxr['panhouliutong']
                         update_last_db_weight = True
                         last_free_count = new_last_db_weight[9]
                     continue
                 if date not in records:
+                    songzhuangu = 10000 * xdxr['songzhuangu'] if xdxr['songzhuangu'] is not None else 0
+                    songzhuangu = 100000 * (xdxr['suogu']-1) if xdxr['suogu'] is not None else 0
                     records[date] = [
                         stockid,
                         date,
-                        int(10000 * xdxr['songzhuangu']) if xdxr['songzhuangu'] is not None else 0,  # countAsGift
-                        int(10000 * xdxr['peigu']) if xdxr['peigu'] is not None else 0,  # countForSell
-                        int(1000 * xdxr['peigujia']) if xdxr['peigujia'] is not None else 0,  # priceForSell
-                        int(1000 * xdxr['fenhong']) if xdxr['fenhong'] is not None else 0,  # bonus
+                        songzhuangu,  # countAsGift
+                        10000 * xdxr['peigu'] if xdxr['peigu'] is not None else 0,  # countForSell
+                        1000 * xdxr['peigujia'] if xdxr['peigujia'] is not None else 0,  # priceForSell
+                        1000 * xdxr['fenhong'] if xdxr['fenhong'] is not None else 0,  # bonus
                         0,  # countOfIncreasement, pytdx 不区分送股和转增股，统一记在送股
-                        round(xdxr['houzongguben'])
-                        if xdxr['houzongguben'] is not None else last_total_count,  # totalCount
-                        round(xdxr['panhouliutong'])
-                        if xdxr['panhouliutong'] is not None else last_free_count  # freeCount
+                        xdxr['houzongguben'] if xdxr['houzongguben'] is not None else last_total_count,  # totalCount
+                        xdxr['panhouliutong'] if xdxr['panhouliutong'] is not None else last_free_count  # freeCount
                     ]
                 else:
                     if xdxr['songzhuangu'] is not None:
-                        records[date][2] = int(10000 * xdxr['songzhuangu'])
+                        records[date][2] = 10000 * xdxr['songzhuangu']
+                    if xdxr['suogu'] is not None:
+                        records[date][2] = 100000 * (xdxr['suogu']-1)
                     if xdxr['peigu'] is not None:
-                        records[date][3] = int(10000 * xdxr['peigu'])
+                        records[date][3] = 10000 * xdxr['peigu']
                     if xdxr['peigujia'] is not None:
-                        records[date][4] = int(1000 * xdxr['peigujia'])
+                        records[date][4] = 1000 * xdxr['peigujia']
                     if xdxr['fenhong'] is not None:
-                        records[date][5] = int(1000 * xdxr['fenhong'])
+                        records[date][5] = 1000 * xdxr['fenhong']
                     if xdxr['houzongguben'] is not None:
-                        records[date][7] = round(xdxr['houzongguben'])
+                        records[date][7] = xdxr['houzongguben']
                     if xdxr['panhouliutong'] is not None:
-                        records[date][8] = round(xdxr['panhouliutong'])
+                        records[date][8] = xdxr['panhouliutong']
                 if xdxr['houzongguben'] is not None:
-                    last_total_count = round(xdxr['houzongguben'])
+                    last_total_count = xdxr['houzongguben']
                 if xdxr['panhouliutong'] is not None:
-                    last_free_count = round(xdxr['panhouliutong'])
+                    last_free_count = xdxr['panhouliutong']
             except Exception as e:
                 print(e)
                 print("{} {}{} xdxr: {} last_db_weigth:{}".format(stockid, market, code, xdxr, new_last_db_weight))

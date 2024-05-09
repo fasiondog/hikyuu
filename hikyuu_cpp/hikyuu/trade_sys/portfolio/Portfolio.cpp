@@ -148,7 +148,8 @@ void Portfolio::_readyForRun() {
 
         // 为内部实际执行的系统创建初始资金为0的子账户
         sys->setTM(pro_tm->clone());
-        string sys_name = fmt::format("{}_{}", sys->name(), sys->getStock().market_code());
+        string sys_name = fmt::format("{}_{}_{}", sys->name(), sys->getStock().market_code(),
+                                      sys->getStock().name());
         sys->getTM()->name(fmt::format("TM_SUB_{}", sys_name));
         sys->name(fmt::format("PF_{}", sys_name));
 
@@ -256,8 +257,8 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
         if (m_tm->currentCash() > sum_cash) {
             m_cash_tm->checkin(date, diff);
         } else if (m_tm->currentCash() < sum_cash) {
-            if (!m_cash_tm->checkout(date, diff)) {
-                m_tm->checkin(date, diff);
+            if (m_cash_tm->currentCash() > diff) {
+                m_cash_tm->checkout(date, m_cash_tm->currentCash() - diff);
             }
         }
         HKU_INFO_IF(trace, "After compensate: the sum cash of sub_tm: {}, cash tm: {}, tm cash: {}",
@@ -295,6 +296,7 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
             // 强制卖出失败的情况下，如果当前仍有持仓，则需要下一交易日继续进行处理
             PositionRecord position = sys.sys->getTM()->getPosition(date, sys.sys->getStock());
             if (position.number > 0.0) {
+                HKU_INFO_IF("[{}] failed to force sell, delay to next day", name());
                 tmp_continue_adjust_sys_list.emplace_back(sys);
             }
         }
@@ -356,17 +358,18 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
     if (trace) {
         auto funds = m_tm->getFunds(date, m_query.kType());
         HKU_INFO("[PF] [after adjust] - total funds: {},  cash: {}, market_value: {}",
-                 funds.cash + funds.market_value, funds.cash, funds.market_value);
+                 funds.total_assets(), funds.cash, funds.market_value);
     }
 
     //----------------------------------------------------------------------------
     // 执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
     //----------------------------------------------------------------------------
     for (auto& sub_sys : m_running_sys_set) {
-        HKU_TRACE_IF(trace, "run: {}", sub_sys->name());
+        HKU_INFO_IF(trace, "[PF] run: {}", sub_sys->name());
         if (adjust) {
             auto sg = sub_sys->getSG();
             sg->startCycle(date, nextCycle);
+            HKU_INFO_IF(trace, "[PF] sg should buy: {}", sg->shouldBuy(date));
         }
 
         auto tr = sub_sys->runMoment(date);

@@ -21,6 +21,12 @@ void StrategyContext::setKTypeList(const vector<KQuery::KType>& ktypeList) {
                        to_upper(ktype);
                        return ktype;
                    });
+
+    // 对 ktype 按时间长度进行升序排序
+    std::sort(m_ktypeList.begin(), m_ktypeList.end(),
+              [](const KQuery::KType& a, const KQuery::KType& b) {
+                  return KQuery::getKTypeInMin(a) < KQuery::getKTypeInMin(b);
+              });
 }
 
 bool StrategyContext::isAll() const {

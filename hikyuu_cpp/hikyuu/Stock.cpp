@@ -936,8 +936,8 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     m_kdataDriver = DataDriverFactory::getKDataDriverPool(param);
 
     m_data->m_valid = true;
-    m_data->m_startDate = ks.front().datetime;
-    m_data->m_lastDate = ks.back().datetime;
+    m_data->m_startDate = (*m_data->pKData[nktype]).front().datetime;
+    m_data->m_lastDate = (*m_data->pKData[nktype]).back().datetime;
 }
 
 const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {

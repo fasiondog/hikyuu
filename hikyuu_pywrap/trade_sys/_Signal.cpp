@@ -205,12 +205,18 @@ void export_Signal(py::module& m) {
 
     m.def("SG_Band", SG_Band, py::arg("ind"), py::arg("lower"), py::arg("upper"),
           R"(SG_Band(ind, lower, upper)
+          
     指标区间指示器, 当指标超过上轨时，买入；
     当指标低于下轨时，卖出。::
 
         SG_Band(MA(C, n=10), 100, 200)
       )");
 
-    m.def("SG_AllwaysBuy", SG_AllwaysBuy);
-    m.def("SG_Cycle", SG_Cycle);
+    m.def("SG_AllwaysBuy", SG_AllwaysBuy, R"(SG_AllwaysBuy()
+    
+    一个特殊的SG，持续每天发出买入信号，通常配合 PF 使用)");
+
+    m.def("SG_Cycle", SG_Cycle, R"(SG_Cycle()
+    
+    一个特殊的SG，配合PF使用，以 PF 调仓周期为买入信号)");
 }
