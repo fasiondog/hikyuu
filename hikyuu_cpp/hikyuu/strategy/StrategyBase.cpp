@@ -306,6 +306,7 @@ void StrategyBase::_startEventLoop() {
 }
 
 void StrategyBase::backTest(const Datetime& start, const Datetime& end) {
+    HKU_CHECK(!m_stock_list.empty(), "The context stock list is empty!");
     HKU_CHECK(!start.isNull(), "start date can't be null!");
     HKU_CHECK(start >= m_context.startDatetime(),
               "The backtest start date must be greater than the context start date!");
@@ -324,9 +325,23 @@ void StrategyBase::backTest(const Datetime& start, const Datetime& end) {
         ktype_mintues[i] = KQuery::getKTypeInMin(ktypes[i]);
     }
 
-    auto dates = StockManager::instance().getTradingCalendar(KQueryByDate(start, end));
+    const auto& level_ktype = ktypes[0];
+    Stock level_stk = getStock("sh000001");
+    KQuery query = KQueryByDate(start, end, level_ktype);
+    auto dates = level_stk.getDatetimeList(query);
 
-    const auto& down_ktype = ktypes[0];
+    vector<list<KRecord>> krecords(m_stock_list.size());
+    for (size_t i = 0, len = m_stock_list.size(); i < len; i++) {
+        auto& stock = m_stock_list[i];
+        HKU_CHECK(!stock.isNull(), "The pos: {} stock is Null!", i);
+
+        KRecordList ks =
+          stock.getKDataDirver()->getConnect()->getKRecordList(stock.market(), stock.code(), query);
+        krecords[i].resize(ks.size());
+        std::copy(ks.begin(), ks.end(), krecords[i].begin());
+    }
+
+    vector<SpotRecord> spots;
 }
 
 }  // namespace hku

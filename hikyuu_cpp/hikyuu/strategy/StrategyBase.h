@@ -84,6 +84,10 @@ public:
         return m_context.getKTypeList();
     }
 
+    const StockList& getStockList() const {
+        return m_stock_list;
+    }
+
     void run() {
         _run(false);
     }
@@ -95,7 +99,7 @@ public:
 
     virtual void init() {}
     virtual void onTick() {}
-    virtual void onBar(const KQuery::KType& ktype){};
+    virtual void onBar(const KQuery::KType& ktype) {};
 
     virtual void onMarketOpen() {}
     virtual void onMarketClose() {}
