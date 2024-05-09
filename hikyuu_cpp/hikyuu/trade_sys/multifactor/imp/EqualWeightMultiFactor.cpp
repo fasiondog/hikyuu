@@ -111,6 +111,10 @@ vector<Indicator> EqualWeightMultiFactor::_calculate(
     });
 }
 
+MultiFactorPtr HKU_API MF_EqualWeight() {
+    return make_shared<EqualWeightMultiFactor>();
+}
+
 MultiFactorPtr HKU_API MF_EqualWeight(const IndicatorList& inds, const StockList& stks,
                                       const KQuery& query, const Stock& ref_stk, int ic_n) {
     return make_shared<EqualWeightMultiFactor>(inds, stks, query, ref_stk, ic_n);

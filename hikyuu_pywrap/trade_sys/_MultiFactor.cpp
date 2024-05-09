@@ -189,6 +189,7 @@ void export_MultiFactor(py::module& m) {
 
         DEF_PICKLE(MultiFactorPtr);
 
+    m.def("MF_EqualWeight", py::overload_cast<>(MF_EqualWeight));
     m.def(
       "MF_EqualWeight",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query,
@@ -212,6 +213,7 @@ void export_MultiFactor(py::module& m) {
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :rtype: MultiFactor)");
 
+    m.def("MF_ICWeight", py::overload_cast<>(MF_ICWeight));
     m.def(
       "MF_ICWeight",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query,
@@ -236,6 +238,7 @@ void export_MultiFactor(py::module& m) {
     :param int ic_rolling_n: IC 滚动周期
     :rtype: MultiFactor)");
 
+    m.def("MF_ICIRWeight", py::overload_cast<>(MF_ICIRWeight));
     m.def(
       "MF_ICIRWeight",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query,

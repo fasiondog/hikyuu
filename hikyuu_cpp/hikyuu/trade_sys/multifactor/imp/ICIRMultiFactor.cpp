@@ -141,6 +141,10 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
 #endif
 }
 
+MultiFactorPtr HKU_API MF_ICIRWeight() {
+    return make_shared<ICIRMultiFactor>();
+}
+
 MultiFactorPtr HKU_API MF_ICIRWeight(const IndicatorList& inds, const StockList& stks,
                                      const KQuery& query, const Stock& ref_stk, int ic_n,
                                      int ic_rolling_n) {

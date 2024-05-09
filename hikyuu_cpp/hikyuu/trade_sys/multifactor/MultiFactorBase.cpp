@@ -205,7 +205,7 @@ void MultiFactorBase::setStockList(const StockList& stks) {
 }
 
 void MultiFactorBase::setRefIndicators(const IndicatorList& inds) {
-    HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
+    HKU_CHECK(!inds.empty(), "Input source factor list is empty!");
     std::lock_guard<std::mutex> lock(m_mutex);
     m_inds = inds;
     _reset();

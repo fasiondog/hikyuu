@@ -142,6 +142,10 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
 #endif
 }
 
+MultiFactorPtr HKU_API MF_ICWeight() {
+    return std::make_shared<ICMultiFactor>();
+}
+
 MultiFactorPtr HKU_API MF_ICWeight(const IndicatorList& inds, const StockList& stks,
                                    const KQuery& query, const Stock& ref_stk, int ic_n,
                                    int ic_rolling_n) {
