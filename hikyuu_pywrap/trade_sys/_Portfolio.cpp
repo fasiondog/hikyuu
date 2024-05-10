@@ -14,7 +14,8 @@ namespace py = pybind11;
 using namespace hku;
 
 void export_Portfolio(py::module& m) {
-    py::class_<Portfolio, PortfolioPtr>(m, "Portfolio", R"(实现多标的、多策略的投资组合)")
+    py::class_<Portfolio, PortfolioPtr>(m, "Portfolio", py::dynamic_attr(),
+                                        R"(实现多标的、多策略的投资组合)")
       .def(py::init<>())
       .def(py::init<const string&>())
       .def(py::init<const TradeManagerPtr&, const SelectorPtr&, const AFPtr&>())
