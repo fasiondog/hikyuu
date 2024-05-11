@@ -91,7 +91,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 想要更多了解Hikyuu？请使用以下方式联系：
 --------------------------------------------------
 
-**加入知识星球** 获取最新的示例代码等（您的加入将视为对项目的捐赠）
+**加入知识星球** 更多示例与策略部件的及时分享（您的加入将视为对项目的捐赠）
 
     .. figure:: http://fasiondog.cn/wp-content/uploads/2024/05/zhishixingqiu.png
 
