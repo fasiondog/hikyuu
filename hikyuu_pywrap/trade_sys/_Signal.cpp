@@ -28,7 +28,8 @@ public:
 };
 
 void export_Signal(py::module& m) {
-    py::class_<SignalBase, SGPtr, PySignalBase>(m, "SignalBase", R"(信号指示器基类
+    py::class_<SignalBase, SGPtr, PySignalBase>(m, "SignalBase", py::dynamic_attr(),
+                                                R"(信号指示器基类
     信号指示器负责产生买入、卖出信号。
 
 公共参数：
