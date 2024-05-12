@@ -39,6 +39,7 @@ void export_MultiFactor(py::module& m) {
       .def_readwrite("value", &ScoreRecord::value, "分值");
 
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",
+                                                               py::dynamic_attr(),
                                                                R"(市场环境判定策略基类
 
 自定义市场环境判定策略接口：

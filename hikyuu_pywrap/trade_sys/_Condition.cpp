@@ -30,7 +30,7 @@ public:
 
 void export_Condition(py::module& m) {
     py::class_<ConditionBase, ConditionPtr, PyConditionBase>(
-      m, "ConditionBase",
+      m, "ConditionBase", py::dynamic_attr(),
       R"(系统有效条件基类自定义系统有效条件接口：
 
     - _calculate : 【必须】子类计算接口
