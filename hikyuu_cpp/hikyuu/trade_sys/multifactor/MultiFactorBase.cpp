@@ -59,11 +59,11 @@ HKU_API std::ostream& operator<<(std::ostream& out, const MultiFactorPtr& mf) {
     return out;
 }
 
-MultiFactorBase::MultiFactorBase() {
+MultiFactorBase::MultiFactorBase() : m_name("MultiFactorBase") {
     initParam();
 }
 
-MultiFactorBase::MultiFactorBase(const string& name) {
+MultiFactorBase::MultiFactorBase(const string& name) : m_name(name) {
     initParam();
 }
 
