@@ -496,7 +496,7 @@ class HubManager(metaclass=SingletonType):
         """
         abs_path = os.path.abspath(filename)  # 当前文件的绝对路径
         path_parts = pathlib.Path(abs_path).parts
-        local_base = path_parts[-4] if path_parts[-3] in ('pf', 'sys', 'ind', 'other') else path_parts[5]
+        local_base = path_parts[-4] if path_parts[-3] in ('pf', 'sys', 'ind', 'other') else path_parts[4]
         hub_model = self._session.query(HubModel.name).filter_by(local_base=local_base).first()
         checkif(hub_model is None, local_base, HubNotFoundError)
         return hub_model.name

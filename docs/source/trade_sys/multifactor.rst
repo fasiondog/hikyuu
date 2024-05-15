@@ -61,6 +61,7 @@
     多因子合成基类
     
     .. py:attribute:: name 名称
+    .. py:attribute:: query 查询条件
 
     .. py:method:: __init__(self)
     
@@ -89,17 +90,25 @@
     
         克隆操作 
 
-    .. py:method:: get_query(self)
-
-        查询条件范围
-
     .. py:method:: get_ref_stock(self)
 
         获取参考证券
 
+    .. py:method:: set_ref_stock(self, ref_stk)
+
+        重新设置参考证券
+
+        :param Stock ref_stk: 新指定的参考证券
+
     .. py:method:: get_stock_list(self)
 
         获取创建时指定的证券列表
+
+    .. py:method:: set_stock_list(self, stks)
+
+        重新指定证券列表
+
+        :param list stks: 指定的证券列表
 
     .. py:method:: get_stock_list_num(self)
 
@@ -112,6 +121,12 @@
     .. py:method:: get_ref_indicators(self)
 
         获取创建时输入的原始因子列表
+
+    .. py::method:: set_ref_indicators(self, inds)
+
+        重新设置原始因子列表
+
+        :param list Indicator: 原始因子列表
 
     .. py:method:: get_factor(self, stock)
 

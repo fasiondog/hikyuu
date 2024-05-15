@@ -127,14 +127,14 @@ StockWeightList SQLiteBaseInfoDriver::getStockWeightList(const string& market, c
         HKU_CHECK(con, "Failed fetch connect!");
 
         vector<StockWeightTable> table;
+        Datetime new_start = start.isNull() ? Datetime::min() : start;
         Datetime new_end = end.isNull() ? Datetime::max() : end;
         con->batchLoad(
           table,
           format(
             "stockid=(select stockid from stock where marketid=(select marketid from "
             "market where market='{}') and code='{}') and date>={} and date<{} order by date asc",
-            market, code, start.year() * 10000 + start.month() * 100 + start.day(),
-            new_end.year() * 10000 + new_end.month() * 100 + new_end.day()));
+            market, code, new_start.ymd(), new_end.ymd()));
 
         for (auto& w : table) {
             try {

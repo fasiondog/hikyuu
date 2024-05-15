@@ -44,7 +44,7 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
     int ic_rolling_n = getParam<int>("ic_rolling_n");
 
     // 计算每个原始因子的滚动IC值
-#if 0    
+#if !MF_USE_MULTI_THREAD
     size_t discard = 0;
     IndicatorList ic(ind_count);
     for (size_t ii = 0; ii < ind_count; ii++) {
@@ -66,7 +66,7 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
 #endif
 
     // 以滚动 IC 为权重，计算加权后的合成因子
-#if 0    
+#if !MF_USE_MULTI_THREAD
     IndicatorList all_factors(stk_count);
     PriceList new_values(days_total, 0.0);
     PriceList sum_weight(days_total, 0.0);
@@ -140,6 +140,10 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
         return ret;
     });
 #endif
+}
+
+MultiFactorPtr HKU_API MF_ICWeight() {
+    return std::make_shared<ICMultiFactor>();
 }
 
 MultiFactorPtr HKU_API MF_ICWeight(const IndicatorList& inds, const StockList& stks,

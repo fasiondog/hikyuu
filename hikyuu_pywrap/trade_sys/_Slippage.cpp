@@ -39,7 +39,8 @@ public:
 };
 
 void export_Slippage(py::module& m) {
-    py::class_<SlippageBase, SPPtr, PySlippageBase>(m, "SlippageBase", R"(移滑价差算法基类
+    py::class_<SlippageBase, SPPtr, PySlippageBase>(m, "SlippageBase", py::dynamic_attr(),
+                                                    R"(移滑价差算法基类
 
 自定义移滑价差接口：
 

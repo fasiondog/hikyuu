@@ -35,7 +35,7 @@ public:
 
 void export_AllocateFunds(py::module& m) {
     py::class_<AllocateFundsBase, AFPtr, PyAllocateFundsBase>(
-      m, "AllocateFundsBase",
+      m, "AllocateFundsBase", py::dynamic_attr(),
       R"(资产分配算法基类, 子类接口：
 
     - _allocateWeight : 【必须】子类资产分配调整实现

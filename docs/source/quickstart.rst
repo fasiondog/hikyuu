@@ -98,7 +98,7 @@ Jupyter notebook（此前被称为 IPython notebook）是一个基于web的交�
 
 ::
 
-    In [1]: from notebook.auth import passwd
+    In [1]: from jupyter_server.auth import passwd
     In [2]: passwd()
     Enter password: 
     Verify password: 
@@ -112,10 +112,10 @@ Jupyter notebook（此前被称为 IPython notebook）是一个基于web的交�
 
 ::
 
-    c.NotebookApp.ip='*'
-    c.NotebookApp.password = u'sha:ce...刚才复制的那个密文'
-    c.NotebookApp.open_browser = False
-    c.NotebookApp.port =8888 #随便指定一个端口
+    c.ServerApp.ip='0.0.0.0'
+    c.ServerApp.password = u'sha:ce...刚才复制的那个密文'
+    c.ServerApp.open_browser = False
+    c.ServerApp.port =8888 #随便指定一个端口
 
 5. 启动jupyter notebook，在 cmd 下，进入自己希望的工作目录后，键入命令：
 

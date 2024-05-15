@@ -37,7 +37,7 @@ public:
 
 void export_Environment(py::module& m) {
     py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(
-      m, "EnvironmentBase",
+      m, "EnvironmentBase", py::dynamic_attr(),
       R"(市场环境判定策略基类
 
 自定义市场环境判定策略接口：

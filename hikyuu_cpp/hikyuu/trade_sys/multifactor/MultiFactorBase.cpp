@@ -20,8 +20,7 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& out, const MultiFactorBase& mf) {
-    out << "MultiFactor{"
-        << "\n  name: " << mf.name() << "\n  params: " << mf.getParameter()
+    out << "MultiFactor{" << "\n  name: " << mf.name() << "\n  params: " << mf.getParameter()
         << "\n  query: " << mf.getQuery() << "\n  ref stock: " << mf.m_ref_stk;
 
     out << "\n  src inds count: " << mf.m_inds.size() << " [";
@@ -60,11 +59,11 @@ HKU_API std::ostream& operator<<(std::ostream& out, const MultiFactorPtr& mf) {
     return out;
 }
 
-MultiFactorBase::MultiFactorBase() {
+MultiFactorBase::MultiFactorBase() : m_name("MultiFactorBase") {
     initParam();
 }
 
-MultiFactorBase::MultiFactorBase(const string& name) {
+MultiFactorBase::MultiFactorBase(const string& name) : m_name(name) {
     initParam();
 }
 
@@ -83,22 +82,7 @@ MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stk
     initParam();
     setParam<int>("ic_n", ic_n);
     checkParam("ic_n");
-
-    HKU_CHECK(!m_ref_stk.isNull(), "The reference stock must be set!");
-    HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
-
-    // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
-    for (const auto& stk : m_stks) {
-        HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
-    }
-
-    // 获取用于对齐的参考日期
-    m_ref_dates = m_ref_stk.getDatetimeList(m_query);
-    HKU_CHECK(m_ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
-              m_ref_dates.size());
-
-    HKU_CHECK(m_stks.size() >= 2, "The number of stock is insufficient! current stock number: {}",
-              m_stks.size());
+    _checkData();
 }
 
 void MultiFactorBase::initParam() {
@@ -122,6 +106,24 @@ void MultiFactorBase::baseCheckParam(const string& name) const {
 void MultiFactorBase::paramChanged() {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_calculated = false;
+}
+
+void MultiFactorBase::_checkData() {
+    HKU_CHECK(!m_ref_stk.isNull(), "The reference stock must be set!");
+    HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
+
+    // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
+    for (const auto& stk : m_stks) {
+        HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
+    }
+
+    // 获取用于对齐的参考日期
+    m_ref_dates = m_ref_stk.getDatetimeList(m_query);
+    HKU_CHECK(m_ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
+              m_ref_dates.size());
+
+    HKU_CHECK(m_stks.size() >= 2, "The number of stock is insufficient! current stock number: {}",
+              m_stks.size());
 }
 
 void MultiFactorBase::reset() {
@@ -169,6 +171,45 @@ MultiFactorPtr MultiFactorBase::clone() {
     //     p->m_all_factors.emplace_back(ind.clone());
     // }
     return p;
+}
+
+void MultiFactorBase::setQuery(const KQuery& query) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_query = query;
+    _reset();
+    m_calculated = false;
+}
+
+void MultiFactorBase::setRefStock(const Stock& stk) {
+    HKU_CHECK(!stk.isNull(), "The reference stock must be set!");
+    DatetimeList ref_dates = stk.getDatetimeList(m_query);
+    HKU_CHECK(ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
+              ref_dates.size());
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_ref_stk = stk;
+    m_ref_dates = std::move(ref_dates);
+    _reset();
+    m_calculated = false;
+}
+
+void MultiFactorBase::setStockList(const StockList& stks) {
+    // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
+    for (const auto& stk : stks) {
+        HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
+    }
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_stks = stks;
+    _reset();
+    m_calculated = false;
+}
+
+void MultiFactorBase::setRefIndicators(const IndicatorList& inds) {
+    HKU_CHECK(!inds.empty(), "Input source factor list is empty!");
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_inds = inds;
+    _reset();
+    m_calculated = false;
 }
 
 const Indicator& MultiFactorBase::getFactor(const Stock& stk) {
@@ -349,13 +390,12 @@ Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
 
 IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     bool fill_null = getParam<bool>("fill_null");
-#if 0
+#if !MF_USE_MULTI_THREAD
     vector<Indicator> all_returns;
     all_returns.reserve(m_stks.size());
     for (const auto& stk : m_stks) {
         auto k = stk.getKData(m_query);
-        all_returns.emplace_back(ALIGN(REF(ROCP(k.close(), ndays), ndays), m_ref_dates,
-        fill_null));
+        all_returns.emplace_back(ALIGN(REF(ROCP(k.close(), ndays), ndays), m_ref_dates, fill_null));
     }
     return all_returns;
 #else
@@ -479,6 +519,8 @@ void MultiFactorBase::calculate() {
     // SPEND_TIME(MultiFactorBase_calculate);
     std::lock_guard<std::mutex> lock(m_mutex);
     HKU_IF_RETURN(m_calculated, void());
+
+    _checkData();
 
     // 获取所有证券所有对齐后的原始因子
     vector<vector<Indicator>> all_stk_inds = getAllSrcFactors();

@@ -45,7 +45,7 @@ public:
 };
 
 void export_ProfitGoal(py::module& m) {
-    py::class_<ProfitGoalBase, PGPtr, PyProfitGoalBase>(m, "ProfitGoalBase",
+    py::class_<ProfitGoalBase, PGPtr, PyProfitGoalBase>(m, "ProfitGoalBase", py::dynamic_attr(),
                                                         R"(盈利目标策略基类
     
 自定义盈利目标策略接口：

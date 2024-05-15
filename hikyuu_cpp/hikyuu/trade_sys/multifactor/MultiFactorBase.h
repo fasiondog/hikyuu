@@ -10,6 +10,8 @@
 #include "hikyuu/KData.h"
 #include "ScoreRecord.h"
 
+#define MF_USE_MULTI_THREAD 1
+
 namespace hku {
 
 /**
@@ -51,15 +53,24 @@ public:
         return m_query;
     }
 
+    /** 设置查询范围 */
+    void setQuery(const KQuery& query);
+
     /** 获取参考证券 */
     const Stock& getRefStock() const {
         return m_ref_stk;
     }
 
+    /** 设置参考证券 */
+    void setRefStock(const Stock& stk);
+
     /** 获取证券列表 */
     const StockList& getStockList() const {
         return m_stks;
     }
+
+    /** 设置计算范围证券列表 */
+    void setStockList(const StockList& stks);
 
     /** 获取证券列表当前证券数量 */
     size_t getStockListNumber() const {
@@ -70,6 +81,9 @@ public:
     const IndicatorList& getRefIndicators() const {
         return m_inds;
     }
+
+    /** 设置因子列表 */
+    void setRefIndicators(const IndicatorList& inds);
 
     /** 获取指定证券合成因子 */
     const Indicator& getFactor(const Stock&);
@@ -141,6 +155,7 @@ private:
 protected:
     void _buildIndex();  // 计算完成后创建截面索引
     IndicatorList _getAllReturns(int ndays) const;
+    void _checkData();
 
 protected:
     string m_name;

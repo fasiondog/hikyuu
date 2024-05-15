@@ -452,6 +452,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     // 如果当前环境无效
     if (!current_ev_valid) {
+        HKU_INFO_IF(trace, "[{}] current EV is invalid", name());
         TradeRecord tr;
         // 如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
@@ -465,6 +466,8 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     // 环境是从无效变为有效时
     if (!m_pre_ev_valid) {
+        HKU_INFO_IF(trace, "[{}] EV status from invalid to valid", name());
+
         // 如果使用环境判定策略进行初始建仓
         if (getParam<bool>("ev_open_position")) {
             HKU_INFO_IF(trace, "[{}] EV to buy", name());
@@ -484,6 +487,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     // 如果系统当前无效
     if (!current_cn_valid) {
+        HKU_INFO_IF(trace, "[{}] current CN is invalid", name());
         TradeRecord tr;
         // 如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
@@ -497,6 +501,8 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     // 如果系统从无效变为有效
     if (!m_pre_cn_valid) {
+        HKU_INFO_IF(trace, "[{}] CN status from invalid to valid", name());
+
         // 如果使用环境判定策略进行初始建仓
         if (getParam<bool>("cn_open_position")) {
             HKU_INFO_IF(trace, "[{}] CN to buy", name());
@@ -550,6 +556,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     price_t src_current_price = src_today.closePrice;  // 未复权的原始价格
 
     PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
+    HKU_INFO_IF(trace, "[{}] current postion: {}", name(), position.number);
     if (position.number != 0) {
         TradeRecord tr;
         if (src_current_price <= position.stoploss) {
@@ -716,6 +723,9 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
 }
 
 TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool on_open) {
+    bool trace = getParam<bool>("trace");
+    HKU_INFO_IF(trace, "[{}] force sell {} by {}", name(), num, getSystemPartName(from));
+
     TradeRecord record;
     size_t pos = m_kdata.getPos(date);
     HKU_TRACE_IF_RETURN(pos == Null<size_t>(), record,

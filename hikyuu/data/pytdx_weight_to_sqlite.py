@@ -41,7 +41,7 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
 
     for stockrecord in stockid_list:
         stockid, code = stockrecord
-        #print("{}{}".format(market, code))
+        # print("{}{}".format(market, code))
 
         # 获取当前数据库中最后的一条权息记录的总股本和流通股本
         cur = connect.cursor()
@@ -76,6 +76,10 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
                     if xdxr['songzhuangu'] is not None:
                         new_last_db_weight[3] = int(10000 * xdxr['songzhuangu'])
                         update_last_db_weight = True
+                    if xdxr['suogu'] is not None:
+                        # etf 扩股
+                        new_last_db_weight[3] = int(100000 * (xdxr['suogu']-1))
+                        update_last_db_weight = True
                     if xdxr['peigu'] is not None:
                         new_last_db_weight[4] = int(10000 * xdxr['peigu'])
                         update_last_db_weight = True
@@ -95,22 +99,26 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
                         last_free_count = new_last_db_weight[9]
                     continue
                 if date not in records:
+                    songzhuangu = int(10000 * xdxr['songzhuangu']) if xdxr['songzhuangu'] is not None else 0
+                    songzhuangu = int(100000 * (xdxr['suogu']-1)) if xdxr['suogu'] is not None else 0
                     records[date] = [
                         stockid,
                         date,
-                        int(10000 * xdxr['songzhuangu']) if xdxr['songzhuangu'] is not None else 0,  #countAsGift
-                        int(10000 * xdxr['peigu']) if xdxr['peigu'] is not None else 0,  #countForSell
-                        int(1000 * xdxr['peigujia']) if xdxr['peigujia'] is not None else 0,  #priceForSell
-                        int(1000 * xdxr['fenhong']) if xdxr['fenhong'] is not None else 0,  #bonus
-                        0,  #countOfIncreasement, pytdx 不区分送股和转增股，统一记在送股
+                        songzhuangu,  # countForGift
+                        int(10000 * xdxr['peigu']) if xdxr['peigu'] is not None else 0,  # countForSell
+                        int(1000 * xdxr['peigujia']) if xdxr['peigujia'] is not None else 0,  # priceForSell
+                        int(1000 * xdxr['fenhong']) if xdxr['fenhong'] is not None else 0,  # bonus
+                        0,  # countOfIncreasement, pytdx 不区分送股和转增股，统一记在送股
                         round(xdxr['houzongguben'])
-                        if xdxr['houzongguben'] is not None else last_total_count,  #totalCount
+                        if xdxr['houzongguben'] is not None else last_total_count,  # totalCount
                         round(xdxr['panhouliutong'])
-                        if xdxr['panhouliutong'] is not None else last_free_count  #freeCount
+                        if xdxr['panhouliutong'] is not None else last_free_count  # freeCount
                     ]
                 else:
                     if xdxr['songzhuangu'] is not None:
                         records[date][2] = int(10000 * xdxr['songzhuangu'])
+                    if xdxr['suogu'] is not None:
+                        records[date][2] = int(100000 * (xdxr['suogu']-1))
                     if xdxr['peigu'] is not None:
                         records[date][3] = int(10000 * xdxr['peigu'])
                     if xdxr['peigujia'] is not None:

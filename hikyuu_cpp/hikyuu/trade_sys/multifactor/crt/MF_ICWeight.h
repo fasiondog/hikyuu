@@ -24,5 +24,5 @@ namespace hku {
 MultiFactorPtr HKU_API MF_ICWeight(const IndicatorList& inds, const StockList& stks,
                                    const KQuery& query, const Stock& ref_stk, int ic_n = 5,
                                    int ic_rolling_n = 120);
-
+MultiFactorPtr HKU_API MF_ICWeight();
 }

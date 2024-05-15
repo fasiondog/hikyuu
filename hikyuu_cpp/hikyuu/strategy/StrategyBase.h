@@ -84,7 +84,9 @@ public:
         return m_context.getKTypeList();
     }
 
-    void run();
+    void run() {
+        _run(false);
+    }
 
     void receivedSpot(const SpotRecord& spot);
     void finishReceivedSpot(Datetime revTime);
@@ -113,6 +115,8 @@ private:
     void _addTimer();
     void _addClockEvent(const string& enable, TimeDelta delta, TimeDelta openTime,
                         TimeDelta closeTime);
+
+    void _run(bool forTest);
 
 private:
     static std::atomic_bool ms_keep_running;
