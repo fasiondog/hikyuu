@@ -89,6 +89,8 @@ void SignalBase::reset() {
     m_sellSig.clear();
     m_hold_long = false;
     m_hold_short = false;
+    m_cycle_start = Null<Datetime>();
+    m_cycle_end = Null<Datetime>();
     _reset();
 }
 
