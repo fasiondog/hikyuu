@@ -95,6 +95,29 @@ def combinate_ind_analysis_multi(
 
 
 def analysis_sys_list(stks, query, sys_proto, keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]):
+    names = ["证券代码", "证券名称"]
+    names.extend(keys)
+    ret = {}
+    for name in names:
+        ret[name] = []
+
+    per = Performance()
+    sys_proto.force_reset_all()
+    sys_proto.set_param("shared_ev", False)
+    for stk in stks:
+        # print(stk)
+        k = stk.get_kdata(query)
+        my_sys = sys_proto.clone()
+        my_sys.run(k, reset_all=True)
+        per.statistics(my_sys.tm, k[-1].datetime if len(k) > 0 else Datetime())
+        ret["证券代码"].append(stk.market_code)
+        ret["证券名称"].append(stk.name)
+        for key in keys:
+            ret[key].append(per[key])
+    return pd.DataFrame(ret)
+
+
+def analysis_sys_list_multi(stks, query, sys_proto, keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]):
     out = inner_analysis_sys_list(stks, query, sys_proto)
     if not keys:
         ret = out
