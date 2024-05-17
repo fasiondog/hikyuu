@@ -803,7 +803,11 @@ def sys_performance(sys, ref_stk=None):
     ax3 = fg.add_subplot(gs[4:, :3])
     ref_return.plot(axes=ax1, legend_on=True)
     funds_return.plot(axes=ax1, legend_on=True)
-    ax1.set_title(f"{sys.name} 累积收益率")
+    if isinstance(sys, System):
+        stk = sys.get_stock()
+        ax1.set_title(f"{sys.name} {stk.name}({stk.market_code}) 累积收益率")
+    else:
+        ax1.set_title(f"{sys.name} 累积收益率")
     label = t1 + '\n\n' + t2 + '\n\n' + t3
     ax2.text(0,
              1,
