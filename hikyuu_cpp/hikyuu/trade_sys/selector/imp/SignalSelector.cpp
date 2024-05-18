@@ -18,9 +18,9 @@ SignalSelector::SignalSelector() : SelectorBase("SE_Sigal") {}
 SignalSelector::~SignalSelector() {}
 
 bool SignalSelector::isMatchAF(const AFPtr& af) {
-    HKU_WARN_IF_RETURN(
-      af->getParam<bool>("adjust_running_sys"), false,
-      "AF will adjust running system funds, but this se is not suitable the case!");
+    // HKU_WARN_IF_RETURN(
+    //   af->getParam<bool>("adjust_running_sys"), false,
+    //   "AF will adjust running system funds, but this se is not suitable the case!");
     return true;
 }
 
