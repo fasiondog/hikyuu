@@ -16,7 +16,7 @@ namespace hku {
 BandSignal::BandSignal() : SignalBase("SG_Band") {}
 
 BandSignal::BandSignal(const Indicator& ind, price_t lower, price_t upper)
-: SignalBase("SG_Band"), m_ind(ind), m_lower(lower), m_upper(upper) {
+: SignalBase("SG_Band"), m_ind(ind.clone()), m_lower(lower), m_upper(upper) {
     HKU_CHECK(lower > upper, "BandSignal: lower track is greater than upper track");
 }
 
