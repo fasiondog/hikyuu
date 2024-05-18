@@ -112,6 +112,7 @@
     ::
 
         SG_Band(MA(C, n=10), 100, 200)
+        SG_Band(CLOSE, MA(LOW), MA(HIGH))
 
 
 持续买入信号指示器
