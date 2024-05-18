@@ -248,7 +248,7 @@ private:
     price_t _getStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
     price_t _getShortStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
 
-    price_t _getTakeProfitPrice(const Datetime& datetime);
+    price_t _getTakeProfitPrice(const Datetime& datetime, price_t currentPrice);
 
     price_t _getGoalPrice(const Datetime& datetime, price_t price);
     price_t _getShortGoalPrice(const Datetime&, price_t price);
@@ -589,8 +589,8 @@ inline price_t System ::_getRealSellPrice(const Datetime& datetime, price_t plan
     return m_sp ? m_sp->getRealSellPrice(datetime, planPrice) : planPrice;
 }
 
-inline price_t System ::_getTakeProfitPrice(const Datetime& datetime) {
-    return m_tp ? m_tp->getPrice(datetime, 0.0) : 0.0;
+inline price_t System ::_getTakeProfitPrice(const Datetime& datetime, price_t currentPrice) {
+    return m_tp ? m_tp->getPrice(datetime, currentPrice) : 0.0;
 }
 
 inline price_t System ::_getGoalPrice(const Datetime& datetime, price_t price) {
