@@ -147,10 +147,12 @@ setup(
         'Programming Language :: Python :: 3.12',
     ],
     entry_points={
-        'gui_scripts': [
-            'HikyuuTDX=hikyuu.gui.HikyuuTDX:start',
-        ],
+        # win11下使用 GUI 方式，会立刻 timeout，导致无法下载
+        # 'gui_scripts': [
+        #     'HikyuuTDX=hikyuu.gui.HikyuuTDX:start',
+        # ],
         'console_scripts': [
+            'HikyuuTDX=hikyuu.gui.HikyuuTDX:start',
             'importdata=hikyuu.gui.importdata:main',
         ]
     },

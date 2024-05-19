@@ -28,7 +28,8 @@ public:
 };
 
 void export_Signal(py::module& m) {
-    py::class_<SignalBase, SGPtr, PySignalBase>(m, "SignalBase", R"(信号指示器基类
+    py::class_<SignalBase, SGPtr, PySignalBase>(m, "SignalBase", py::dynamic_attr(),
+                                                R"(信号指示器基类
     信号指示器负责产生买入、卖出信号。
 
 公共参数：
@@ -203,14 +204,18 @@ void export_Signal(py::module& m) {
     :param int slow_n: 慢线EMA周期
     :return: 信号指示器)");
 
-    m.def("SG_Band", SG_Band, py::arg("ind"), py::arg("lower"), py::arg("upper"),
+    m.def("SG_Band",
+          py::overload_cast<const Indicator&, const Indicator&, const Indicator&>(SG_Band),
+          py::arg("ind"), py::arg("lower"), py::arg("upper"));
+    m.def("SG_Band", py::overload_cast<const Indicator&, price_t, price_t>(SG_Band), py::arg("ind"),
+          py::arg("lower"), py::arg("upper"),
           R"(SG_Band(ind, lower, upper)
           
     指标区间指示器, 当指标超过上轨时，买入；
     当指标低于下轨时，卖出。::
 
         SG_Band(MA(C, n=10), 100, 200)
-      )");
+        SG_Band(CLOSE, MA(LOW), MA(HIGH)))");
 
     m.def("SG_AllwaysBuy", SG_AllwaysBuy, R"(SG_AllwaysBuy()
     

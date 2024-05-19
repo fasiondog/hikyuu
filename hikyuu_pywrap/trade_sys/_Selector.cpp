@@ -41,7 +41,7 @@ public:
 };
 
 void export_Selector(py::module& m) {
-    py::class_<SystemWeight>(m, "SystemWeight",
+    py::class_<SystemWeight>(m, "SystemWeight", py::dynamic_attr(),
                              "系统权重系数结构，在资产分配时，指定对应系统的资产占比系数")
       .def(py::init<>())
       .def(py::init<const SystemPtr&, price_t>())

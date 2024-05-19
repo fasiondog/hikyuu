@@ -44,7 +44,7 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
     int ic_n = getParam<int>("ic_n");
     int ir_n = getParam<int>("ic_rolling_n");
 
-#if 0
+#if !MF_USE_MULTI_THREAD
     size_t discard = 0;
     vector<Indicator> icir(ind_count);
     for (size_t ii = 0; ii < ind_count; ii++) {
@@ -67,7 +67,7 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
 #endif
 
     // 以 ICIR 为权重，计算加权后的合成因子
-#if 0    
+#if !MF_USE_MULTI_THREAD
     IndicatorList all_factors(stk_count);
     PriceList new_values(days_total, 0.0);
     PriceList sum_weight(days_total, 0.0);
@@ -139,6 +139,10 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
         return ret;
     });
 #endif
+}
+
+MultiFactorPtr HKU_API MF_ICIRWeight() {
+    return make_shared<ICIRMultiFactor>();
 }
 
 MultiFactorPtr HKU_API MF_ICIRWeight(const IndicatorList& inds, const StockList& stks,
