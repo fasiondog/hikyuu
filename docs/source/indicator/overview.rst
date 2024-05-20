@@ -99,6 +99,10 @@
 * :py:func:`CORR` - 样本相关系数与协方差
 * :py:func:`SPEARMAN` - Spearman相关系数
 
+**横向统计**
+
+* :py:func:`BLOCKSETNUM` - 返回板块股个数
+
 
 **技术指标**
 

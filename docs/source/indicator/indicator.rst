@@ -168,6 +168,18 @@
     :rtype: Indicator
 
     
+.. py:function:: BLOCKSETNUM(block, query)
+
+    横向统计（返回板块股个数）, 两种调用方式:
+
+        BLOCKSET(block, query)
+        
+        BLOCKSET(category, name, query)
+
+    :param Block block: 待统计的板块
+    :param Query query: 统计范围
+
+
 .. py:function:: CLOSE([data])
    
     获取收盘价，包装KData的收盘价成Indicator
