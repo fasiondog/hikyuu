@@ -155,4 +155,9 @@ void Block::setIndexStock(const Stock& stk) {
     m_data->m_indexStock = stk;
 }
 
+HKU_API Block getBlock(const string& category, const string& name) {
+    auto& sm = StockManager::instance();
+    return sm.getBlock(category, name);
+}
+
 } /* namespace hku */

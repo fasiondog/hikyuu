@@ -43,11 +43,11 @@ public:
         return iter;
     }
 
-    bool operator==(const Block& blk) {
+    bool operator==(const Block& blk) const {
         return m_data == blk.m_data;
     }
 
-    bool operator!=(const Block& blk) {
+    bool operator!=(const Block& blk) const {
         return m_data != blk.m_data;
     }
 
@@ -159,6 +159,14 @@ private:
 typedef vector<Block> BlockList;
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Block&);
+
+/**
+ * @brief 获取 StockManager 中的 Block
+ * @param category
+ * @param name
+ * @return HKU_API
+ */
+HKU_API Block getBlock(const string& category, const string& name);
 
 } /* namespace hku */
 
