@@ -1848,4 +1848,22 @@ void export_Indicator_build_in(py::module& m) {
     :param KData kdata: K线数据
     :param int ix: 历史财务信息字段索引
     :param int name: 历史财务信息字段名称)");
+
+    m.def("BLOCKSETNUM", py::overload_cast<const Block&, const KQuery&>(BLOCKSETNUM),
+          py::arg("block"), py::arg("query"), R"(BLOCKSETNUM(block, query)
+    
+    横向统计（返回板块股个数）
+
+    :param Block block: 待统计的板块
+    :param Query query: 统计范围)");
+
+    m.def(
+      "BLOCKSETNUM", py::overload_cast<const string&, const string&, const KQuery&>(BLOCKSETNUM),
+      py::arg("category"), py::arg("name"), py::arg("query"), R"(BLOCKSETNUM(category, name, query)
+    
+    横向统计（返回板块股个数）
+
+    :param str category: 板块类别
+    :param str name: 板块名称
+    :param query 统计范围)");
 }

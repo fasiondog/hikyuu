@@ -26,6 +26,7 @@
 #include "crt/BARSLAST.h"
 #include "crt/BARSSINCE.h"
 #include "crt/BETWEEN.h"
+#include "crt/BLOCKSETNUM.h"
 #include "crt/CEILING.h"
 #include "crt/CORR.h"
 #include "crt/COS.h"
