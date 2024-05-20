@@ -9,9 +9,6 @@
 
 #include "IBlockSetNum.h"
 #include "../Indicator.h"
-#include "../crt/KDATA.h"
-#include "../crt/REF.h"
-#include "../crt/ALIGN.h"
 #include "../../StockManager.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -23,6 +20,7 @@ namespace hku {
 IBlockSetNum::IBlockSetNum() : IndicatorImp("BLOCKSETNUM", 1) {
     setParam<KQuery>("query", KQueryByIndex(-100));
     setParam<Block>("block", Block());
+    setParam<string>("market", "SH");
     setParam<bool>("ignore_context", false);
 }
 
@@ -39,7 +37,7 @@ void IBlockSetNum::_calculate(const Indicator& ind) {
         dates = k.getDatetimeList();
     } else {
         q = getParam<KQuery>("query");
-        dates = StockManager::instance().getTradingCalendar(q);
+        dates = StockManager::instance().getTradingCalendar(q, getParam<string>("market"));
     }
 
     size_t total = dates.size();
