@@ -26,6 +26,14 @@ IBlockSetNum::IBlockSetNum() : IndicatorImp("BLOCKSETNUM", 1) {
 
 IBlockSetNum::~IBlockSetNum() {}
 
+void IBlockSetNum::_checkParam(const string& name) const {
+    if ("market" == name) {
+        string market = getParam<string>(name);
+        auto market_info = StockManager::instance().getMarketInfo(market);
+        HKU_CHECK(market_info != Null<MarketInfo>(), "Invalid market: {}", market);
+    }
+}
+
 void IBlockSetNum::_calculate(const Indicator& ind) {
     Block block = getParam<Block>("block");
     bool ignore_context = getParam<bool>("ignore_context");

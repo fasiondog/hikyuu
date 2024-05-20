@@ -20,6 +20,7 @@ class IBlockSetNum : public IndicatorImp {
 public:
     IBlockSetNum();
     virtual ~IBlockSetNum();
+    virtual void _checkParam(const string& name) const override;
 };
 
 }  // namespace hku
