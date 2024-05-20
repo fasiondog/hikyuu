@@ -17,16 +17,16 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Block& blk) {
     return os;
 }
 
-Block::Block() {}
+Block::Block() noexcept {}
 
 Block::~Block() {}
 
-Block::Block(const string& category, const string& name) : m_data(make_shared<Data>()) {
+Block::Block(const string& category, const string& name) noexcept : m_data(make_shared<Data>()) {
     m_data->m_category = category;
     m_data->m_name = name;
 }
 
-Block::Block(const string& category, const string& name, const string& indexCode)
+Block::Block(const string& category, const string& name, const string& indexCode) noexcept
 : Block(category, name) {
     if (!indexCode.empty()) {
         m_data->m_indexStock = StockManager::instance().getStock(indexCode);
@@ -119,6 +119,22 @@ bool Block::add(const string& market_code) {
     return true;
 }
 
+bool Block::add(const StockList& stocks) {
+    bool success = true;
+    for (const auto& stk : stocks) {
+        success = add(stk);
+    }
+    return success;
+}
+
+bool Block::add(const StringList& market_codes) {
+    bool success = true;
+    for (const auto& code : market_codes) {
+        success = add(code);
+    }
+    return success;
+}
+
 bool Block::remove(const string& market_code) {
     HKU_IF_RETURN(!have(market_code), false);
     string query_str = market_code;
@@ -137,6 +153,11 @@ void Block::setIndexStock(const Stock& stk) {
     if (!m_data)
         m_data = shared_ptr<Data>(new Data);
     m_data->m_indexStock = stk;
+}
+
+HKU_API Block getBlock(const string& category, const string& name) {
+    auto& sm = StockManager::instance();
+    return sm.getBlock(category, name);
 }
 
 } /* namespace hku */

@@ -31,6 +31,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Parameter& param) {
             os << "(string): " << boost::any_cast<string>(iter->second) << strip;
         } else if (iter->second.type() == typeid(Stock)) {
             os << "(Stock): " << boost::any_cast<Stock>(iter->second).market_code() << strip;
+        } else if (iter->second.type() == typeid(Block)) {
+            os << "(Block): " << boost::any_cast<const Block&>(iter->second) << strip;
         } else if (iter->second.type() == typeid(KQuery)) {
             os << "(Query): " << boost::any_cast<KQuery>(iter->second) << strip;
         } else if (iter->second.type() == typeid(KData)) {
@@ -72,8 +74,9 @@ bool Parameter::support(const boost::any& value) {
     return value.type() == typeid(int) || value.type() == typeid(int64_t) ||
            value.type() == typeid(bool) || value.type() == typeid(double) ||
            value.type() == typeid(string) || value.type() == typeid(Stock) ||
-           value.type() == typeid(KQuery) || value.type() == typeid(KData) ||
-           value.type() == typeid(PriceList) || value.type() == typeid(DatetimeList);
+           value.type() == typeid(Block) || value.type() == typeid(KQuery) ||
+           value.type() == typeid(KData) || value.type() == typeid(PriceList) ||
+           value.type() == typeid(DatetimeList);
 }
 
 string Parameter::type(const string& name) const {
@@ -86,6 +89,7 @@ string Parameter::type(const string& name) const {
     HKU_IF_RETURN(iter->second.type() == typeid(double), "double");
     HKU_IF_RETURN(iter->second.type() == typeid(string), "string");
     HKU_IF_RETURN(iter->second.type() == typeid(Stock), "Stock");
+    HKU_IF_RETURN(iter->second.type() == typeid(Block), "Block");
     HKU_IF_RETURN(iter->second.type() == typeid(KQuery), "KQuery");
     HKU_IF_RETURN(iter->second.type() == typeid(KData), "KData");
     HKU_IF_RETURN(iter->second.type() == typeid(PriceList), "PriceList");
@@ -120,6 +124,8 @@ string Parameter::getNameValueList() const {
             os << "\"" << iter->first << "\"" << equal << boost::any_cast<string>(iter->second);
         } else if (iter->second.type() == typeid(Stock)) {
             os << iter->first << equal << boost::any_cast<Stock>(iter->second);
+        } else if (iter->second.type() == typeid(Block)) {
+            os << iter->first << equal << boost::any_cast<const Block&>(iter->second);
         } else if (iter->second.type() == typeid(KQuery)) {
             os << iter->first << equal << boost::any_cast<KQuery>(iter->second);
         } else if (iter->second.type() == typeid(KData)) {
@@ -173,9 +179,15 @@ HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
         }
 
         if (iter1->second.type() == typeid(Stock)) {
-            const Stock* x1 = boost::any_cast<Stock>(&iter1->second);
-            const Stock* x2 = boost::any_cast<Stock>(&iter2->second);
-            HKU_IF_RETURN(*x1 != *x2, false);
+            const Stock& x1 = boost::any_cast<const Stock&>(&iter1->second);
+            const Stock& x2 = boost::any_cast<const Stock&>(&iter2->second);
+            HKU_IF_RETURN(x1 != x2, false);
+        }
+
+        if (iter1->second.type() == typeid(Block)) {
+            const Block& x1 = boost::any_cast<const Block&>(&iter1->second);
+            const Block& x2 = boost::any_cast<const Block&>(&iter2->second);
+            HKU_IF_RETURN(x1 == x2, true);
         }
 
         if (iter1->second.type() == typeid(KQuery)) {

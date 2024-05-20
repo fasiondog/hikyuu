@@ -130,6 +130,10 @@ public:
             value = obj.cast<Stock>();
             return true;
 
+        } else if (isinstance<Block>(obj)) {
+            value = obj.cast<Block>();
+            return true;
+
         } else if (isinstance<KQuery>(obj)) {
             value = obj.cast<KQuery>();
             return true;
@@ -203,6 +207,18 @@ public:
             o.inc_ref();
             return o;
 
+        } else if (x.type() == typeid(Block)) {
+            const Block& blk = boost::any_cast<const Block&>(x);
+            std::stringstream cmd;
+            if (blk == Null<Block>()) {
+                cmd << "Block()";
+            } else {
+                cmd << "get_block('" << blk.category() << "','" << blk.name() << "')";
+            }
+            object o = eval(cmd.str());
+            o.inc_ref();
+            return o;
+
         } else if (x.type() == typeid(KQuery)) {
             const KQuery& query = boost::any_cast<KQuery>(x);
             std::stringstream cmd;
@@ -212,8 +228,8 @@ public:
                     << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             } else {
                 cmd << "Query(Datetime(" << query.startDatetime() << "), Datetime("
-                    << query.endDatetime() << "), "
-                    << "Query." << KQuery::getKTypeName(query.kType()) << "Query."
+                    << query.endDatetime() << "), " << "Query."
+                    << KQuery::getKTypeName(query.kType()) << "Query."
                     << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             }
             object o = eval(cmd.str());

@@ -38,6 +38,7 @@ void load(Archive& ar, hku::Block& blk, unsigned int version) {
     ar& boost::serialization::make_nvp("name", name);
     hku::StockList stock_list;
     ar& boost::serialization::make_nvp("stock_list", stock_list);
+    HKU_IF_RETURN(category.empty() && name.empty(), void());
     blk.category(category);
     blk.name(name);
     for (auto iter = stock_list.begin(); iter != stock_list.end(); ++iter) {
