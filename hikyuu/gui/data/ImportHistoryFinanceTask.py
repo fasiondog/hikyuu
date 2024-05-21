@@ -124,6 +124,11 @@ class ImportHistoryFinanceTask:
 
 
 if __name__ == "__main__":
+    from multiprocessing import Queue
+    from configparser import ConfigParser
+    this_dir = os.path.expanduser('~') + '/.hikyuu'
+    import_config = ConfigParser()
+    import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
     task = ImportHistoryFinanceTask(None, None, None, "c:\\stock")
     task()
     print("over!")
