@@ -28,6 +28,7 @@ from multiprocessing import Queue, Process
 from PyQt5.QtCore import QThread, pyqtSignal
 from hikyuu.gui.data.ImportTdxToH5Task import ImportTdxToH5Task
 from hikyuu.gui.data.ImportWeightToSqliteTask import ImportWeightToSqliteTask
+from hikyuu.gui.data.ImportHistoryFinanceTask import ImportHistoryFinanceTask
 
 from hikyuu.data.common_sqlite3 import create_database
 from hikyuu.data.tdx_to_h5 import tdx_import_stock_name_from_file
@@ -68,6 +69,8 @@ class UseTdxImportToH5Thread(QThread):
         self.tasks = []
         if self.config.getboolean('weight', 'enable', fallback=False):
             self.tasks.append(ImportWeightToSqliteTask(self.log_queue, self.queue, self.config, dest_dir))
+        if self.config.getboolean('finance', 'enable', fallback=True):
+            self.tasks.append(ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
         if self.config.getboolean('ktype', 'day', fallback=False):
             self.tasks.append(
                 ImportTdxToH5Task(self.log_queue, self.queue, config, 'SH', 'DAY', self.quotations, src_dir, dest_dir)
@@ -149,5 +152,7 @@ class UseTdxImportToH5Thread(QThread):
                 hdf5_import_progress[market][ktype] = progress
                 current_progress = (hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]) // 2
                 self.send_message(['IMPORT_KDATA', ktype, current_progress])
+            elif taskname == 'IMPORT_KDATA':
+                self.send_message([taskname, progress])
             else:
                 self.logger.error("Unknow task: {}".format(taskname))
