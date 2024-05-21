@@ -52,6 +52,7 @@
 #include "crt/HSL.h"
 #include "crt/IC.h"
 #include "crt/ICIR.h"
+#include "crt/INSUM.h"
 #include "crt/IR.h"
 #include "crt/INTPART.h"
 #include "crt/LAST.h"

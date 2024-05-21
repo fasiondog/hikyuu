@@ -1866,4 +1866,9 @@ void export_Indicator_build_in(py::module& m) {
     :param str category: 板块类别
     :param str name: 板块名称
     :param query 统计范围)");
+
+    m.def("INSUM", py::overload_cast<const Block&, const KQuery&, const Indicator&, int>(INSUM));
+    m.def(
+      "INSUM",
+      py::overload_cast<const string&, const string&, const KQuery&, const Indicator&, int>(INSUM));
 }
