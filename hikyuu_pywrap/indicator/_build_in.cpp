@@ -1848,4 +1848,49 @@ void export_Indicator_build_in(py::module& m) {
     :param KData kdata: K线数据
     :param int ix: 历史财务信息字段索引
     :param int name: 历史财务信息字段名称)");
+
+    m.def("BLOCKSETNUM", py::overload_cast<const Block&, const KQuery&>(BLOCKSETNUM),
+          py::arg("block"), py::arg("query"), R"(BLOCKSETNUM(block, query)
+    
+    横向统计（返回板块股个数）
+
+    :param Block block: 待统计的板块
+    :param Query query: 统计范围)");
+
+    m.def(
+      "BLOCKSETNUM", py::overload_cast<const string&, const string&, const KQuery&>(BLOCKSETNUM),
+      py::arg("category"), py::arg("name"), py::arg("query"), R"(BLOCKSETNUM(category, name, query)
+    
+    横向统计（返回板块股个数）
+
+    :param str category: 板块类别
+    :param str name: 板块名称
+    :param query 统计范围)");
+
+    m.def("INSUM", py::overload_cast<const Block&, const KQuery&, const Indicator&, int>(INSUM),
+          py::arg("block"), py::arg("query"), py::arg("ind"), py::arg("mode"),
+          R"(INSUM(block, query, ind, mode)
+
+    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+
+    :param Block block: 指定板块
+    :param Query query: 指定范围
+    :param Indicator ind: 指定指标
+    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    :rtype: Indicator)");
+
+    m.def(
+      "INSUM",
+      py::overload_cast<const string&, const string&, const KQuery&, const Indicator&, int>(INSUM),
+      py::arg("category"), py::arg("name"), py::arg("query"), py::arg("ind"), py::arg("mode"),
+      R"(INSUM(category, name, ind, mode)
+
+    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+
+    :param str category: 板块类别
+    :param str name: 板块名称
+    :param Query query: 指定范围
+    :param Indicator ind: 指定指标
+    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    :rtype: Indicator)");
 }
