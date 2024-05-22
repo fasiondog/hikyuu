@@ -168,6 +168,18 @@
     :rtype: Indicator
 
     
+.. py:function:: BLOCKSETNUM(block, query)
+
+    横向统计（返回板块股个数）, 两种调用方式:
+
+        BLOCKSET(block, query)
+        
+        BLOCKSET(category, name, query)
+
+    :param Block block: 待统计的板块
+    :param Query query: 统计范围
+
+
 .. py:function:: CLOSE([data])
    
     获取收盘价，包装KData的收盘价成Indicator
@@ -517,6 +529,23 @@
     :param Indicator b: 待选指标 b
     :rtype: Indicator
     
+
+.. py:function:: INSUM(block, query, ind, mode)
+
+    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+
+    用法:
+    
+        INSUM(block, query, ind, mode)
+
+        INSUM(category, name, query, ind, mode)
+
+    :param Block block: 指定板块
+    :param Query query: 指定范围
+    :param Indicator ind: 指定指标
+    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    :rtype: Indicator    
+
 
 .. py:function:: INTPART([data])
 
