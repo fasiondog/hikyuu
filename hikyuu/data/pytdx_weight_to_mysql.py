@@ -81,7 +81,7 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
                         update_last_db_weight = True
                     if xdxr['suogu'] is not None:
                         # etf 扩股
-                        new_last_db_weight[3] = 100000 * (xdxr['suogu']-1)
+                        new_last_db_weight[3] += 100000 * (xdxr['suogu']-1)
                         update_last_db_weight = True
                     if xdxr['peigu'] is not None:
                         new_last_db_weight[4] = 10000 * xdxr['peigu']
@@ -103,7 +103,7 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
                     continue
                 if date not in records:
                     songzhuangu = 10000 * xdxr['songzhuangu'] if xdxr['songzhuangu'] is not None else 0
-                    songzhuangu = 100000 * (xdxr['suogu']-1) if xdxr['suogu'] is not None else 0
+                    songzhuangu += 100000 * (xdxr['suogu']-1) if xdxr['suogu'] is not None else 0
                     records[date] = [
                         stockid,
                         date,
@@ -119,7 +119,7 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
                     if xdxr['songzhuangu'] is not None:
                         records[date][2] = 10000 * xdxr['songzhuangu']
                     if xdxr['suogu'] is not None:
-                        records[date][2] = 100000 * (xdxr['suogu']-1)
+                        records[date][2] += 100000 * (xdxr['suogu']-1)
                     if xdxr['peigu'] is not None:
                         records[date][3] = 10000 * xdxr['peigu']
                     if xdxr['peigujia'] is not None:

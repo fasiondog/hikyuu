@@ -23,7 +23,7 @@
 # SOFTWARE.
 
 from pytdx.hq import TDXParams
-from .common_pytdx import to_pytdx_market
+from hikyuu.data.common_pytdx import to_pytdx_market
 
 
 def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
@@ -78,7 +78,7 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
                         update_last_db_weight = True
                     if xdxr['suogu'] is not None:
                         # etf 扩股
-                        new_last_db_weight[3] = int(100000 * (xdxr['suogu']-1))
+                        new_last_db_weight[3] += int(100000 * (xdxr['suogu']-1))
                         update_last_db_weight = True
                     if xdxr['peigu'] is not None:
                         new_last_db_weight[4] = int(10000 * xdxr['peigu'])
@@ -100,7 +100,7 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
                     continue
                 if date not in records:
                     songzhuangu = int(10000 * xdxr['songzhuangu']) if xdxr['songzhuangu'] is not None else 0
-                    songzhuangu = int(100000 * (xdxr['suogu']-1)) if xdxr['suogu'] is not None else 0
+                    songzhuangu += int(100000 * (xdxr['suogu']-1)) if xdxr['suogu'] is not None else 0
                     records[date] = [
                         stockid,
                         date,
@@ -118,7 +118,7 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
                     if xdxr['songzhuangu'] is not None:
                         records[date][2] = int(10000 * xdxr['songzhuangu'])
                     if xdxr['suogu'] is not None:
-                        records[date][2] = int(100000 * (xdxr['suogu']-1))
+                        records[date][2] += int(100000 * (xdxr['suogu']-1))
                     if xdxr['peigu'] is not None:
                         records[date][3] = int(10000 * xdxr['peigu'])
                     if xdxr['peigujia'] is not None:
@@ -170,12 +170,12 @@ if __name__ == '__main__':
     from hikyuu.data.common_sqlite3 import create_database
     starttime = time.time()
 
-    dest_dir = "c:\\stock"
+    dest_dir = "d:\\stock"
     tdx_server = '119.147.212.81'
     tdx_port = 7709
     quotations = ['stock', 'fund']
 
-    connect = sqlite3.connect(dest_dir + "\\hikyuu.db")
+    connect = sqlite3.connect(dest_dir + "\\stock.db")
     create_database(connect)
 
     from pytdx.hq import TdxHq_API, TDXParams
