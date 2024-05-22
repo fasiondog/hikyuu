@@ -530,6 +530,23 @@
     :rtype: Indicator
     
 
+.. py:function:: INSUM(block, query, ind, mode)
+
+    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+
+    用法:
+    
+        INSUM(block, query, ind, mode)
+
+        INSUM(category, name, query, ind, mode)
+
+    :param Block block: 指定板块
+    :param Query query: 指定范围
+    :param Indicator ind: 指定指标
+    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    :rtype: Indicator    
+
+
 .. py:function:: INTPART([data])
 
     取整(绝对值减小取整，即取得数据的整数部分)
