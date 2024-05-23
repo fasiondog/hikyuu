@@ -1,4 +1,4 @@
-.. image:: http://fasiondog.gitee.io/hikyuu/images/00000_title.png
+.. image:: http://fasiondog.cn/wp-content/uploads/2024/05/00000_title-1.png
     :target: http://fasiondog.gitee.io/hikyuu
     :align: left
     :alt: Hikyuu
@@ -53,7 +53,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
     sys = SYS_Simple(tm = my_tm, sg = my_sg, mm = my_mm)
     sys.run(sm['sz000001'], Query(-150))
 
-.. figure:: http://fasiondog.gitee.io/hikyuu/images/10000-overview.png
+.. figure:: http://fasiondog.cn/wp-content/uploads/2024/05/10000-overview.png
         :width: 600px
 
 完整示例参见：`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_
@@ -64,7 +64,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 - **组合灵活，分类构建策略资产库** Hikyuu对系统化交易方法进行了良好的抽象，包含了九大策略组件：市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法、交易对象选择策略、资金分配策略。可以在此基础上构建自己的策略库，并进行灵活的组合和测试。在进行策略探索时，可以更加专注于某一方面的策略性能与影响。其主要功能模块如下：
 
-  .. figure:: http://fasiondog.gitee.io/hikyuu/images/10002-function-arc.png
+  .. figure:: http://fasiondog.cn/wp-content/uploads/2024/05/10002-function-arc.png
         :width: 600px
 
 - **性能保障，打造自己的专属应用** 目前项目包含了3个主要组成部分：基于C++的核心库、对C++进行包装的Python库(hikyuu)、基于Python的交互式工具。
@@ -88,27 +88,27 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
     :alt: Star History Chart
 
 
-项目捐赠（加入星球）
---------------------------------------------------
-
-目前知识星球属于前期建设，您的加入将视为对项目的捐赠（200元）
-
-    .. figure:: http://fasiondog.gitee.io/hikyuu/images/zhishixingqiu.jpg
-
-
 想要更多了解Hikyuu？请使用以下方式联系：
 --------------------------------------------------
+
+**加入知识星球** 更多示例与策略部件的及时分享（您的加入将视为对项目的捐赠）
+
+    .. figure:: http://fasiondog.cn/wp-content/uploads/2024/05/zhishixingqiu.png
+
 
 **项目交流和问题答复将转移至知识星球-【Hikyuu量化】。**
 
 - 关注公众号：
 
-    .. figure:: http://fasiondog.gitee.io/hikyuu/images/weixin_gongzhonghao.jpg
+    .. figure:: http://fasiondog.cn/wp-content/uploads/2024/05/weixin_gongzhonghao.jpg
 
-- QQ交流群：114910869, 或扫码加入：
-
-    .. figure:: http://fasiondog.gitee.io/hikyuu/images/10003-qq.png
 
 - 加入微信群（请注明“加入hikyuu”）：
 
-    .. figure:: http://fasiondog.gitee.io/hikyuu/images/weixin_group.jpg
+    .. figure:: http://fasiondog.cn/wp-content/uploads/2024/05/weixin_group.jpg
+
+
+- QQ交流群（逐渐废弃）：114910869, 或扫码加入：
+
+    .. figure:: http://fasiondog.cn/wp-content/uploads/2024/05/10003-qq.png
+

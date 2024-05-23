@@ -37,7 +37,7 @@ public:
 };
 
 void export_Stoploss(py::module& m) {
-    py::class_<StoplossBase, StoplossPtr, PyStoplossBase>(m, "StoplossBase",
+    py::class_<StoplossBase, StoplossPtr, PyStoplossBase>(m, "StoplossBase", py::dynamic_attr(),
                                                           R"(止损/止赢算法基类
 自定义止损/止赢策略接口：
 

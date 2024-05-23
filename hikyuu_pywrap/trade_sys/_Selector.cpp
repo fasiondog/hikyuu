@@ -16,6 +16,7 @@ class PySelectorBase : public SelectorBase {
 
 public:
     using SelectorBase::SelectorBase;
+    PySelectorBase(const SelectorBase& base) : SelectorBase(base) {}
 
     void _reset() override {
         PYBIND11_OVERLOAD(void, SelectorBase, _reset, );
@@ -40,7 +41,7 @@ public:
 };
 
 void export_Selector(py::module& m) {
-    py::class_<SystemWeight>(m, "SystemWeight",
+    py::class_<SystemWeight>(m, "SystemWeight", py::dynamic_attr(),
                              "系统权重系数结构，在资产分配时，指定对应系统的资产占比系数")
       .def(py::init<>())
       .def(py::init<const SystemPtr&, price_t>())
@@ -61,6 +62,7 @@ void export_Selector(py::module& m) {
     - _clone - 【必须】克隆接口)")
 
       .def(py::init<>())
+      .def(py::init<const SelectorBase&>())
       .def(py::init<const string&>(), R"(初始化构造函数
         
     :param str name: 名称)")

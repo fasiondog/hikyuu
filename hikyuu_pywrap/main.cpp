@@ -135,6 +135,14 @@ PYBIND11_MODULE(core, m) {
     int64_t null_int64 = Null<int64_t>();
     Datetime null_date = Null<Datetime>();
 
+    m.def("get_block", getBlock, R"(get_block(category: str, name: str)
+    
+    获取预定义板块
+
+    :param str category: 板块分类
+    :param str name: 板块名称
+    :rtype: Block)");
+
     m.def("get_kdata", py::overload_cast<const string&, const KQuery&>(getKData));
 
     m.def(

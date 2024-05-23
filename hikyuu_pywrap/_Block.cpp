@@ -20,11 +20,6 @@ void (Block::*setCategory)(const string&) = &Block::category;
 string (Block::*getName)() const = &Block::name;
 void (Block::*setName)(const string&) = &Block::name;
 
-bool (Block::*add_1)(const Stock&) = &Block::add;
-bool (Block::*add_2)(const string&) = &Block::add;
-bool (Block::*remove_1)(const Stock&) = &Block::remove;
-bool (Block::*remove_2)(const string&) = &Block::remove;
-
 void export_Block(py::module& m) {
     py::class_<Block>(m, "Block", "板块类，可视为证券的容器")
       .def(py::init<>())
@@ -43,25 +38,49 @@ void export_Block(py::module& m) {
     
     是否为空)")
 
-      .def("add", add_1, R"(add(self, stock)
+      .def("add", py::overload_cast<const Stock&>(&Block::add), R"(add(self, stock)
 
     加入指定的证券
 
     :param Stock stock: 待加入的证券
     :return: 是否成功加入
-    :rtype: bool)",
-           py::keep_alive<1, 2>())
+    :rtype: bool)")
 
-      .def("add", add_2, R"(add(self, market_code)
+      .def("add", py::overload_cast<const string&>(&Block::add), R"(add(self, market_code)
 
     根据"市场简称证券代码"加入指定的证券
 
     :param str market_code: 市场简称证券代码
     :return: 是否成功加入
-    :rtype: bool)",
-           py::keep_alive<1, 2>())
+    :rtype: bool)")
 
-      .def("remove", remove_1, R"(remove(self, stock)
+      .def(
+        "add",
+        [](Block& blk, py::sequence stks) {
+            auto total = len(stks);
+            HKU_IF_RETURN(total == 0, true);
+
+            if (py::isinstance<Stock>(stks[0])) {
+                StockList cpp_stks = python_list_to_vector<Stock>(stks);
+                return blk.add(cpp_stks);
+            }
+
+            if (py::isinstance<string>(stks[0])) {
+                StringList codes = python_list_to_vector<string>(stks);
+                return blk.add(codes);
+            }
+
+            HKU_ERROR("Not support type!");
+            return false;
+        },
+        R"(add(self, sequence)
+
+    加入定的证券列表
+
+    :param sequence stks: 全部由 Stock 组成的序列或全部由字符串市场简称证券代码组成的序列
+    :return: True 全部成功 | False 存在失败)")
+
+      .def("remove", py::overload_cast<const Stock&>(&Block::remove), R"(remove(self, stock)
 
     移除指定证券
 
@@ -69,7 +88,7 @@ void export_Block(py::module& m) {
     :return: 是否成功
     :rtype: bool)")
 
-      .def("remove", remove_2, R"(remove(market_code)
+      .def("remove", py::overload_cast<const string&>(&Block::remove), R"(remove(market_code)
 
     移除指定证券
 

@@ -127,7 +127,7 @@ start_spot_agent(False)
 # ==============================================================================
 blocka = Block("A", "ALL")
 for s in sm:
-    if s.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_A_BJ, constant.STOCKTYPE_GEM):
+    if s.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_A_BJ):
         blocka.add(s)
 zsbk_a = blocka
 
@@ -278,7 +278,7 @@ def UpdateOneRealtimeRecord_from_sina(tmpstr):
             stock = sm[stockstr[0][-8:]]
 
             record = KRecord()
-            record.date = d
+            record.datetime = d
             record.open = open
             record.high = high
             record.low = low
@@ -313,7 +313,7 @@ def UpdateOneRealtimeRecord_from_qq(tmpstr):
             stock = sm[stockstr[0][-8:]]
 
             record = KRecord()
-            record.date = d
+            record.datetime = d
             record.open = open
             record.high = high
             record.low = low
@@ -429,7 +429,7 @@ def realtime_update_from_tushare():
 
         from datetime import date
         d = date.today()
-        record.date = Datetime(d)
+        record.datetime = Datetime(d)
         stock.realtime_update(record)
 
     # 更新指数行情
@@ -462,7 +462,7 @@ def realtime_update_from_tushare():
         ):
             from datetime import date
             d = date.today()
-            record.date = Datetime(d)
+            record.datetime = Datetime(d)
             stock.realtime_update(record)
 
 

@@ -57,6 +57,7 @@ public:
 
 void export_MoneyManager(py::module& m) {
     py::class_<MoneyManagerBase, MMPtr, PyMoneyManagerBase>(m, "MoneyManagerBase",
+                                                            py::dynamic_attr(),
                                                             R"(资金管理策略基类
 
 公共参数：

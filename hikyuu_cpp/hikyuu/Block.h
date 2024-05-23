@@ -19,9 +19,9 @@ namespace hku {
  */
 class HKU_API Block {
 public:
-    Block();
-    Block(const string& category, const string& name);
-    Block(const string& category, const string& name, const string& indexCode);
+    Block() noexcept;
+    Block(const string& category, const string& name) noexcept;
+    Block(const string& category, const string& name, const string& indexCode) noexcept;
     Block(const Block&) noexcept;
     Block(Block&&) noexcept;
     Block& operator=(const Block&) noexcept;
@@ -43,11 +43,11 @@ public:
         return iter;
     }
 
-    bool operator==(const Block& blk) {
+    bool operator==(const Block& blk) const {
         return m_data == blk.m_data;
     }
 
-    bool operator!=(const Block& blk) {
+    bool operator!=(const Block& blk) const {
         return m_data != blk.m_data;
     }
 
@@ -99,6 +99,22 @@ public:
     /** 加入指定证券 */
     bool add(const string& market_code);
 
+    /**
+     * 加入指定的证券列表
+     * @param stocks 证券列表
+     * @return true 全部成功
+     * @return false 存在失败
+     */
+    bool add(const StockList& stocks);
+
+    /**
+     * 加入指定的证券列表
+     * @param market_codes 证券标识列表
+     * @return true 全部成功
+     * @return false 存在失败
+     */
+    bool add(const StringList& market_codes);
+
     /** 移除指定证券 */
     bool remove(const string& market_code);
 
@@ -143,6 +159,14 @@ private:
 typedef vector<Block> BlockList;
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Block&);
+
+/**
+ * @brief 获取 StockManager 中的 Block
+ * @param category
+ * @param name
+ * @return HKU_API
+ */
+HKU_API Block getBlock(const string& category, const string& name);
 
 } /* namespace hku */
 
