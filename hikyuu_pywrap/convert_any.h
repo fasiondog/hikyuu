@@ -209,9 +209,9 @@ public:
                           << KQuery::getKTypeName(query.kType()) << ", Query."
                           << KQuery::getRecoverTypeName(query.recoverType()) << ")";
                 } else {
-                    q_cmd << "Query(Datetime(" << query.startDatetime() << "), Datetime("
-                          << query.endDatetime() << "), " << "Query."
-                          << KQuery::getKTypeName(query.kType()) << "Query."
+                    q_cmd << "Query(Datetime('" << query.startDatetime() << "'), Datetime('"
+                          << query.endDatetime() << "'), " << "Query."
+                          << KQuery::getKTypeName(query.kType()) << ", Query."
                           << KQuery::getRecoverTypeName(query.recoverType()) << ")";
                 }
                 cmd << "KData(get_stock('" << stk.market_code() << "'), " << q_cmd.str() << ")";
@@ -257,9 +257,9 @@ public:
                     << KQuery::getKTypeName(query.kType()) << ", Query."
                     << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             } else {
-                cmd << "Query(Datetime(" << query.startDatetime() << "), Datetime("
-                    << query.endDatetime() << "), " << "Query."
-                    << KQuery::getKTypeName(query.kType()) << "Query."
+                cmd << "Query(Datetime('" << query.startDatetime() << "'), Datetime('"
+                    << query.endDatetime() << "'), " << "Query."
+                    << KQuery::getKTypeName(query.kType()) << ", Query."
                     << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             }
             object o = eval(cmd.str());
@@ -272,7 +272,7 @@ public:
             for (auto iter = price_list.begin(); iter != price_list.end(); ++iter) {
                 o.append(*iter);
             }
-            o.inc_ref();
+            // o.inc_ref();
             return o;
 
         } else if (x.type() == typeid(DatetimeList)) {
@@ -281,7 +281,7 @@ public:
             for (auto iter = date_list.begin(); iter != date_list.end(); ++iter) {
                 o.append(*iter);
             }
-            o.inc_ref();
+            // o.inc_ref();
             return o;
         }
 
