@@ -434,7 +434,12 @@ ValueType Parameter::get(const string& name) const {
     if (iter == m_params.end()) {
         throw std::out_of_range("out_of_range in Parameter::get : " + name);
     }
-    return boost::any_cast<ValueType>(iter->second);
+    // return boost::any_cast<ValueType>(iter->second);
+    try {
+        return boost::any_cast<ValueType>(iter->second);
+    } catch (...) {
+        throw std::runtime_error("failed conversion param: " + name);
+    }
 }
 
 template <typename ValueType>
