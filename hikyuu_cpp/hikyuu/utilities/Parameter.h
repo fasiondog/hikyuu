@@ -24,6 +24,7 @@
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/nvp.hpp>
+#include "../serialization/Block_serialization.h"
 #include "../serialization/KData_serialization.h"
 #include "../serialization/Datetime_serialization.h"
 #else
@@ -133,7 +134,7 @@ public:
     /**
      * 获取指定参数的实际类型
      * @param name 指定参数名称
-     * @return "string" | "int" | "double" | "bool" | "Stock" |
+     * @return "string" | "int" | "double" | "bool" | "Stock" | "Block"
      *         "KQuery" | "KData" | "PriceList" | "DatetimeList"
      */
     string type(const string& name) const;
@@ -213,6 +214,10 @@ private:
                 type = "stock";
                 value = "stock";
                 stock = boost::any_cast<Stock>(arg);
+            } else if (arg.type() == typeid(Block)) {
+                type = "block";
+                value = "block";
+                block = boost::any_cast<Block>(arg);
             } else if (arg.type() == typeid(KQuery)) {
                 type = "query";
                 value = "query";
@@ -239,6 +244,7 @@ private:
         string type;
         string value;
         Stock stock;
+        Block block;
         KQuery query;
         KData kdata;
         PriceList price_list;
@@ -250,6 +256,7 @@ private:
             ar& BOOST_SERIALIZATION_NVP(type);
             ar& BOOST_SERIALIZATION_NVP(value);
             ar& BOOST_SERIALIZATION_NVP(stock);
+            ar& BOOST_SERIALIZATION_NVP(block);
             ar& BOOST_SERIALIZATION_NVP(query);
             ar& BOOST_SERIALIZATION_NVP(kdata);
             ar& BOOST_SERIALIZATION_NVP(price_list);
@@ -290,6 +297,8 @@ private:
                 m_params[record.name] = record.value;
             } else if (record.type == "stock") {
                 m_params[record.name] = record.stock;
+            } else if (record.type == "block") {
+                m_params[record.name] = record.block;
             } else if (record.type == "query") {
                 m_params[record.name] = record.query;
             } else if (record.type == "kdata") {
@@ -425,7 +434,12 @@ ValueType Parameter::get(const string& name) const {
     if (iter == m_params.end()) {
         throw std::out_of_range("out_of_range in Parameter::get : " + name);
     }
-    return boost::any_cast<ValueType>(iter->second);
+    // return boost::any_cast<ValueType>(iter->second);
+    try {
+        return boost::any_cast<ValueType>(iter->second);
+    } catch (...) {
+        throw std::runtime_error("failed conversion param: " + name);
+    }
 }
 
 template <typename ValueType>

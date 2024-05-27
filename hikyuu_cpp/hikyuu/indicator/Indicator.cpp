@@ -19,7 +19,7 @@ Indicator::Indicator(const IndicatorImpPtr& imp) : m_imp(imp) {}
 
 Indicator::Indicator(const Indicator& indicator) : m_imp(indicator.m_imp) {}
 
-Indicator::Indicator(Indicator&& ind) : m_imp(std::move(ind.m_imp)) {}
+Indicator::Indicator(Indicator&& ind) noexcept : m_imp(std::move(ind.m_imp)) {}
 
 Indicator::~Indicator() {}
 

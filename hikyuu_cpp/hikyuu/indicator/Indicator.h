@@ -47,7 +47,7 @@ public:
     Indicator() {}
     Indicator(const IndicatorImpPtr& imp);
     Indicator(const Indicator& ind);
-    Indicator(Indicator&& ind);
+    Indicator(Indicator&& ind) noexcept;
     virtual ~Indicator();
 
     Indicator& operator=(const Indicator&);

@@ -130,6 +130,10 @@ public:
             value = obj.cast<Stock>();
             return true;
 
+        } else if (isinstance<Block>(obj)) {
+            value = obj.cast<Block>();
+            return true;
+
         } else if (isinstance<KQuery>(obj)) {
             value = obj.cast<KQuery>();
             return true;
@@ -191,6 +195,31 @@ public:
             std::string s(boost::any_cast<std::string>(x));
             return Py_BuildValue("s", s.c_str());
 
+        } else if (x.type() == typeid(KData)) {
+            const KData& k = boost::any_cast<KData>(x);
+            std::stringstream cmd;
+            if (k == Null<KData>()) {
+                cmd << "KData()";
+            } else {
+                auto stk = k.getStock();
+                auto query = k.getQuery();
+                std::stringstream q_cmd;
+                if (query.queryType() == KQuery::INDEX) {
+                    q_cmd << "Query(" << query.start() << "," << query.end() << ", Query."
+                          << KQuery::getKTypeName(query.kType()) << ", Query."
+                          << KQuery::getRecoverTypeName(query.recoverType()) << ")";
+                } else {
+                    q_cmd << "Query(Datetime('" << query.startDatetime() << "'), Datetime('"
+                          << query.endDatetime() << "'), " << "Query."
+                          << KQuery::getKTypeName(query.kType()) << ", Query."
+                          << KQuery::getRecoverTypeName(query.recoverType()) << ")";
+                }
+                cmd << "KData(get_stock('" << stk.market_code() << "'), " << q_cmd.str() << ")";
+            }
+            object o = eval(cmd.str());
+            o.inc_ref();
+            return o;
+
         } else if (x.type() == typeid(Stock)) {
             const Stock& stk = boost::any_cast<Stock>(x);
             std::stringstream cmd;
@@ -203,6 +232,23 @@ public:
             o.inc_ref();
             return o;
 
+        } else if (x.type() == typeid(Block)) {
+            const Block& blk = boost::any_cast<const Block&>(x);
+            std::stringstream cmd;
+            object o;
+            if (blk == Null<Block>()) {
+                cmd << "Block()";
+                o = eval(cmd.str());
+                o.inc_ref();
+            } else {
+                cmd << "Block('" << blk.category() << "','" << blk.name() << "')";
+                o = eval(cmd.str());
+                o.inc_ref();
+                Block out = o.cast<Block>();
+                out.add(blk.getStockList());
+            }
+            return o;
+
         } else if (x.type() == typeid(KQuery)) {
             const KQuery& query = boost::any_cast<KQuery>(x);
             std::stringstream cmd;
@@ -211,9 +257,9 @@ public:
                     << KQuery::getKTypeName(query.kType()) << ", Query."
                     << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             } else {
-                cmd << "Query(Datetime(" << query.startDatetime() << "), Datetime("
-                    << query.endDatetime() << "), "
-                    << "Query." << KQuery::getKTypeName(query.kType()) << "Query."
+                cmd << "Query(Datetime('" << query.startDatetime() << "'), Datetime('"
+                    << query.endDatetime() << "'), " << "Query."
+                    << KQuery::getKTypeName(query.kType()) << ", Query."
                     << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             }
             object o = eval(cmd.str());
@@ -226,7 +272,7 @@ public:
             for (auto iter = price_list.begin(); iter != price_list.end(); ++iter) {
                 o.append(*iter);
             }
-            o.inc_ref();
+            // o.inc_ref();
             return o;
 
         } else if (x.type() == typeid(DatetimeList)) {
@@ -235,7 +281,7 @@ public:
             for (auto iter = date_list.begin(); iter != date_list.end(); ++iter) {
                 o.append(*iter);
             }
-            o.inc_ref();
+            // o.inc_ref();
             return o;
         }
 

@@ -311,6 +311,13 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
         // 从选股策略获取选中的系统列表
         m_tmp_selected_list = m_se->getSelected(date);
 
+        // 如果选中的系统不在已有列表中, 则先清除其延迟操作，防止在调仓日出现未来信号
+        for (auto& sys : m_tmp_selected_list) {
+            if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
+                sys.sys->clearDelayRequest();
+            }
+        }
+
         if (trace && !m_tmp_selected_list.empty()) {
             for (auto& sys : m_tmp_selected_list) {
                 HKU_INFO("[PF] select: {}, score: {:<.4f}", sys.sys->name(), sys.weight);
