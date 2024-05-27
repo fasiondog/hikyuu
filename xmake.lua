@@ -168,8 +168,8 @@ if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm6
     mysql_version = "8.0.21" 
 end
 
--- add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.git")
-add_repositories("hikyuu-repo https://gitee.com/fasiondog/hikyuu_extern_libs.git")
+add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.git")
+-- add_repositories("hikyuu-repo https://gitee.com/fasiondog/hikyuu_extern_libs.git")
 if is_plat("windows") then
     if get_config("hdf5") then
         if is_mode("release") then
