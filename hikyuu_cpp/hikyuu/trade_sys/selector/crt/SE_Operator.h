@@ -9,4 +9,8 @@
 
 #include "../SelectorBase.h"
 
-namespace hku {}
+namespace hku {
+
+HKU_API SelectorPtr operator+(const SelectorPtr& se1, const SelectorPtr& se2);
+
+}
