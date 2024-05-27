@@ -143,6 +143,9 @@ void export_Selector(py::module& m) {
     :return: 选取的系统实例列表
     :rtype: SystemList)")
 
+      .def("__add__",
+           [](const SelectorPtr& self, const SelectorPtr& other) { return self + other; })
+
         DEF_PICKLE(SEPtr);
 
     m.def("SE_Fixed", py::overload_cast<>(SE_Fixed));
