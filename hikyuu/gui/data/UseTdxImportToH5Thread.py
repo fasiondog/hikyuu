@@ -152,7 +152,7 @@ class UseTdxImportToH5Thread(QThread):
                 hdf5_import_progress[market][ktype] = progress
                 current_progress = (hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]) // 2
                 self.send_message(['IMPORT_KDATA', ktype, current_progress])
-            elif taskname == 'IMPORT_KDATA':
+            elif taskname == 'IMPORT_FINANCE':
                 self.send_message([taskname, progress])
             else:
                 self.logger.error("Unknow task: {}".format(taskname))
