@@ -146,6 +146,9 @@ void export_Selector(py::module& m) {
       .def("__add__",
            [](const SelectorPtr& self, const SelectorPtr& other) { return self + other; })
 
+      .def("__add__", [](const SelectorPtr& self, double other) { return self + other; })
+      .def("__radd__", [](const SelectorPtr& self, double other) { return self + other; })
+
         DEF_PICKLE(SEPtr);
 
     m.def("SE_Fixed", py::overload_cast<>(SE_Fixed));
