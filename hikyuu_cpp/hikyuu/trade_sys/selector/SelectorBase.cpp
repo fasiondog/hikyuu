@@ -140,6 +140,8 @@ void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
                   "Scenarios that depend on prototype systems need to specify a TM!");
     }
 
+    _addStock(stock, protoSys);
+
     auto proto = protoSys;
     proto->forceResetAll();
     SYSPtr sys = proto->clone();

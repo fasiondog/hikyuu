@@ -101,6 +101,9 @@ public:
 
     virtual bool isMatchAF(const AFPtr& af) = 0;
 
+    /** 用于逻辑运算的子类中添加原型系统，一般不需要子类实现 */
+    virtual void _addStock(const Stock& stock, const SystemPtr& protoSys) {}
+
     /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
     void calculate(const SystemList& pf_realSysList, const KQuery& query);
 

@@ -19,6 +19,7 @@ public:
 
     virtual void _reset() override;
     virtual SelectorPtr _clone() override;
+    virtual void _addStock(const Stock& stock, const SystemPtr& protoSys) override;
     virtual bool isMatchAF(const AFPtr& af) override;
     virtual void _calculate() override;
     virtual SystemWeightList getSelected(Datetime date) override;

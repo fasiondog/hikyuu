@@ -19,11 +19,15 @@ OperatorAddSelector::OperatorAddSelector(const SelectorPtr& se1, const SelectorP
 : SelectorBase("SE_Add") {
     if (se1) {
         m_se1 = se1->clone();
-        m_se1->removeAll();
+        auto sys_list = m_se1->getProtoSystemList();
+        m_pro_sys_list = std::move(sys_list);
     }
     if (se2) {
         m_se2 = se2->clone();
-        m_se2->removeAll();
+        auto sys_list = m_se2->getProtoSystemList();
+        for (auto& sys : sys_list) {
+            m_pro_sys_list.emplace_back(std::move(sys));
+        }
     }
 }
 
@@ -40,6 +44,15 @@ void OperatorAddSelector::_reset() {
 
 bool OperatorAddSelector::isMatchAF(const AFPtr& af) {
     return true;
+}
+
+void OperatorAddSelector::_addStock(const Stock& stock, const SystemPtr& protoSys) {
+    if (m_se1) {
+        m_se1->addStock(stock, protoSys);
+    }
+    if (m_se2) {
+        m_se2->addStock(stock, protoSys);
+    }
 }
 
 SelectorPtr OperatorAddSelector::_clone() {
