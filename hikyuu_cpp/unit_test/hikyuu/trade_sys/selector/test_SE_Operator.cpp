@@ -28,6 +28,9 @@ TEST_CASE("test_SE_Add") {
     StockManager& sm = StockManager::instance();
 
     SYSPtr sys = SYS_Simple();
+    SGPtr sg = SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10));
+    MMPtr mm = MM_FixedCount(100);
+
     SEPtr se1 = SE_Fixed();
     SEPtr se2 = SE_Fixed();
     SEPtr se = se1 + se2;
@@ -38,10 +41,10 @@ TEST_CASE("test_SE_Add") {
     /** @arg 试图加入一个空的系统策略原型 */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
-    SGPtr sg = SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10));
-    MMPtr mm = MM_FixedCount(100);
     sys->setSG(sg);
     sys->setMM(mm);
+
+    se = SEPtr() + SEPtr();
     se->addStock(sm["sh600000"], sys);
     se->addStock(sm["sz000001"], sys);
     se->addStock(sm["sz000002"], sys);
@@ -50,6 +53,19 @@ TEST_CASE("test_SE_Add") {
     CHECK_EQ(proto_sys_list.size(), 3);
     se->calculate(proto_sys_list, KQuery(-20));
     auto result = se->getSelected(Datetime(200001010000L));
+    CHECK_UNARY(result.empty());
+
+    se = se1 + se2;
+    sys->setSG(sg);
+    sys->setMM(mm);
+    se->addStock(sm["sh600000"], sys);
+    se->addStock(sm["sz000001"], sys);
+    se->addStock(sm["sz000002"], sys);
+
+    proto_sys_list = se->getProtoSystemList();
+    CHECK_EQ(proto_sys_list.size(), 3);
+    se->calculate(proto_sys_list, KQuery(-20));
+    result = se->getSelected(Datetime(200001010000L));
     CHECK_EQ(result.size(), 3);
     CHECK_EQ(sm["sh600000"], result[0].sys->getStock());
     CHECK_EQ(sm["sz000001"], result[1].sys->getStock());
@@ -57,6 +73,14 @@ TEST_CASE("test_SE_Add") {
     CHECK_EQ(result[0].weight, 2.0);
     CHECK_EQ(result[1].weight, 2.0);
     CHECK_EQ(result[2].weight, 2.0);
+
+    se = 3.0 + SEPtr();
+    se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
+    proto_sys_list = se->getProtoSystemList();
+    CHECK_EQ(proto_sys_list.size(), 3);
+    se->calculate(proto_sys_list, KQuery(-20));
+    result = se->getSelected(Datetime(200001010000L));
+    CHECK_UNARY(result.empty());
 
     se = se1 + SEPtr();
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
