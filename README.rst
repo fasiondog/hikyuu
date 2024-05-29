@@ -68,7 +68,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 - **性能保障，打造自己的专属应用** 目前项目包含了3个主要组成部分：基于C++的核心库、对C++进行包装的Python库(hikyuu)、基于Python的交互式工具。
 
-    - AMD 7950x 实测：A股全市场（1913万日K线）仅加载全部日线计算 20日 MA 并求最后 MA 累积和，首次执行含数据加载 耗时 6秒，数据加载完毕后计算耗时 166 毫秒
+    - AMD 7950x 实测：A股全市场（1913万日K线）仅加载全部日线计算 20日 MA 并求最后 MA 累积和，首次执行含数据加载 耗时 6秒，数据加载完毕后计算耗时 166 毫秒，详见: `<https://mp.weixin.qq.com/s?__biz=MzkwMzY1NzYxMA==&mid=2247483768&idx=1&sn=33e40aa9633857fa7b4c7ded51c95ae7&chksm=c093a09df7e4298b3f543121ba01334c0f8bf76e75c643afd6fc53aea1792ebb92de9a32c2be&mpshare=1&scene=23&srcid=05297ByHT6DEv6XAmyje1oOr&sharer_shareinfo=b38f5f91b4efd8fb60303a4ef4774748&sharer_shareinfo_first=b38f5f91b4efd8fb60303a4ef4774748#rd>`_
 
     - C++核心库，提供了整体的策略框架，在保证性能的同时，已经考虑了对多线程和多核处理的支持，在未来追求更高运算速度提供便利。C++核心库，可以单独剥离使用，自行构建自己的客户端工具。
 
