@@ -92,6 +92,8 @@ void GlobalInitializer::clean() {
     StockManager::quit();
     DataDriverFactory::release();
 
+    nng_closeall();
+
 #if HKU_ENABLE_HDF5_KDATA
     H5close();
 #endif
