@@ -157,8 +157,8 @@ void StrategyBase::_run(bool forTest) {
         auto old_driver = stk.getKDataDirver();
 
         for (size_t i = 0; i < ktype_count; i++) {
-            k_buffer[i] = std::move(stk.getKRecordList(
-              KQueryByDate(m_context.startDatetime(), Null<Datetime>(), ktype_list[i])));
+            k_buffer[i] = stk.getKRecordList(
+              KQueryByDate(m_context.startDatetime(), Null<Datetime>(), ktype_list[i]));
         }
         for (size_t i = 0; i < ktype_count; i++) {
             stk.setKRecordList(std::move(k_buffer[i]), ktype_list[i]);
@@ -278,7 +278,7 @@ void StrategyBase::_addClockEvent(const string& enable, TimeDelta delta, TimeDel
     if (getParam<bool>(enable)) {
         int repeat = static_cast<int>((closeTime - openTime) / delta);
         scheduler->addFunc(Datetime::min(), Datetime::max(), openTime, closeTime, repeat, delta,
-                           [this, delta]() { [this, delta]() { this->onClock(delta); }; });
+                           [this, delta]() { this->onClock(delta); });
     }
 }
 

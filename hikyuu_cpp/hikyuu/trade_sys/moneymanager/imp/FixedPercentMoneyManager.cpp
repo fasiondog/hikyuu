@@ -33,9 +33,9 @@ double FixedPercentMoneyManager ::_getBuyNumber(const Datetime& datetime, const 
 }
 
 MoneyManagerPtr HKU_API MM_FixedPercent(double p) {
-    FixedPercentMoneyManager* ptr = new FixedPercentMoneyManager();
+    MoneyManagerPtr ptr = make_shared<FixedPercentMoneyManager>();
     ptr->setParam<double>("p", p);
-    return MoneyManagerPtr(ptr);
+    return ptr;
 }
 
 } /* namespace hku */

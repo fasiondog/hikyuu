@@ -48,7 +48,7 @@ CostRecord TradeCostStub::getReturnStockCost(const Datetime& borrow_datetime,
 }
 
 TradeCostPtr TradeCostStub::_clone() {
-    return TradeCostPtr(new TradeCostStub);
+    return make_shared<TradeCostStub>();
 }
 
 }  // namespace hku

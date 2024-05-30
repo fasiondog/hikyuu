@@ -45,10 +45,10 @@ void MultiFactorSelector::_reset() {
 }
 
 SelectorPtr MultiFactorSelector::_clone() {
-    MultiFactorSelector* p = new MultiFactorSelector();
+    auto p = make_shared<MultiFactorSelector>();
     p->m_mf = m_mf->clone();
     p->m_stk_sys_dict = m_stk_sys_dict;
-    return SelectorPtr(p);
+    return p;
 }
 
 bool MultiFactorSelector::isMatchAF(const AFPtr& af) {

@@ -180,7 +180,7 @@ typedef shared_ptr<ConditionBase> CNPtr;
 #define CONDITION_IMP(classname)              \
 public:                                       \
     virtual ConditionPtr _clone() {           \
-        return ConditionPtr(new classname()); \
+        return std::make_shared<classname>(); \
     }                                         \
     virtual void _calculate();
 

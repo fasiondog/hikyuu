@@ -67,14 +67,14 @@ void AddCondition::_reset() {
 }
 
 ConditionPtr AddCondition::_clone() {
-    AddCondition* p = new AddCondition();
+    auto p = make_shared<AddCondition>();
     if (m_cond1) {
         p->m_cond1 = m_cond1->clone();
     }
     if (m_cond2) {
         p->m_cond2 = m_cond2->clone();
     }
-    return ConditionPtr(p);
+    return p;
 }
 
 HKU_API ConditionPtr operator+(const ConditionPtr& cond1, const ConditionPtr& cond2) {

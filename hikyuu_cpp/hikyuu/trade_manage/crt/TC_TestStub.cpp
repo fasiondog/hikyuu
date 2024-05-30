@@ -10,7 +10,7 @@
 namespace hku {
 
 HKU_API TradeCostPtr TC_TestStub() {
-    return TradeCostPtr(new TradeCostStub());
+    return make_shared<TradeCostStub>();
 }
 
 }  // namespace hku

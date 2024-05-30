@@ -23,11 +23,11 @@ public:
         return m_x;
     }
 
-    virtual void _reset() {
+    virtual void _reset() override {
         m_x = 0;
     }
 
-    virtual SignalPtr _clone() {
+    virtual SignalPtr _clone() override {
         SignalTest *p = new SignalTest;
         p->m_x = m_x;
         return SignalPtr(p);

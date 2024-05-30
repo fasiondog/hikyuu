@@ -57,9 +57,9 @@ void BoolEnvironment::_calculate() {
 }
 
 EVPtr HKU_API EV_Bool(const Indicator& ind, const string& market) {
-    BoolEnvironment* p = new BoolEnvironment(ind);
+    EVPtr p = make_shared<BoolEnvironment>(ind);
     p->setParam<string>("market", market);
-    return EVPtr(p);
+    return p;
 }
 
 }  // namespace hku
