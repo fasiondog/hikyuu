@@ -39,10 +39,10 @@ double WilliamsFixedRiskMoneyManager::_getBuyNumber(const Datetime& datetime, co
 }
 
 MoneyManagerPtr HKU_API MM_WilliamsFixedRisk(double p, price_t max_loss) {
-    WilliamsFixedRiskMoneyManager* ptr = new WilliamsFixedRiskMoneyManager();
+    MoneyManagerPtr ptr = make_shared<WilliamsFixedRiskMoneyManager>();
     ptr->setParam<double>("p", p);
     ptr->setParam<price_t>("max_loss", max_loss);
-    return MoneyManagerPtr(ptr);
+    return ptr;
 }
 
 } /* namespace hku */

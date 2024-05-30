@@ -73,7 +73,7 @@ vector<Indicator> EqualWeightMultiFactor::_calculate(
     return all_factors;
 #endif
 
-    return parallel_for_index(0, stk_count, [&, this](size_t si) {
+    return parallel_for_index(0, stk_count, [&](size_t si) {
         vector<price_t> sumByDate(days_total);
         vector<size_t> countByDate(days_total);
 

@@ -26,13 +26,13 @@ public:
         PYBIND11_OVERLOAD_PURE(Block, BlockInfoDriver, getBlock, category, name);
     }
 
-    BlockList getBlockList(const string& category) {
+    BlockList getBlockList(const string& category) override {
         auto self = py::cast(this);
         auto py_list = self.attr("_getBlockList")(category);
         return python_list_to_vector<Block>(py_list);
     }
 
-    BlockList getBlockList() {
+    BlockList getBlockList() override {
         auto self = py::cast(this);
         auto py_list = self.attr("_getBlockList")(py::none());
         return python_list_to_vector<Block>(py_list);

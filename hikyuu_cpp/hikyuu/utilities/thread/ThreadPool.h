@@ -133,7 +133,7 @@ public:
             if (m_interrupt_flags[i]) {
                 m_interrupt_flags[i]->set();
             }
-            m_master_work_queue.push(std::move(FuncWrapper()));
+            m_master_work_queue.push(FuncWrapper());
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -168,7 +168,7 @@ public:
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
-            m_master_work_queue.push(std::move(FuncWrapper()));
+            m_master_work_queue.push(FuncWrapper());
         }
 
         // 等待线程结束

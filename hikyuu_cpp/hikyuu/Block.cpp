@@ -102,7 +102,7 @@ StockList Block::getStockList(std::function<bool(const Stock&)>&& filter) const 
 bool Block::add(const Stock& stock) {
     HKU_IF_RETURN(stock.isNull() || have(stock), false);
     if (!m_data)
-        m_data = shared_ptr<Data>(new Data);
+        m_data = make_shared<Data>();
 
     m_data->m_stockDict[stock.market_code()] = stock;
     return true;
@@ -113,7 +113,7 @@ bool Block::add(const string& market_code) {
     Stock stock = sm.getStock(market_code);
     HKU_IF_RETURN(stock.isNull() || have(stock), false);
     if (!m_data)
-        m_data = shared_ptr<Data>(new Data);
+        m_data = make_shared<Data>();
 
     m_data->m_stockDict[stock.market_code()] = stock;
     return true;
@@ -151,7 +151,7 @@ bool Block::remove(const Stock& stock) {
 
 void Block::setIndexStock(const Stock& stk) {
     if (!m_data)
-        m_data = shared_ptr<Data>(new Data);
+        m_data = make_shared<Data>();
     m_data->m_indexStock = stk;
 }
 

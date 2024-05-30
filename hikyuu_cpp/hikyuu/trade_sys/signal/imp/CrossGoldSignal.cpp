@@ -22,10 +22,10 @@ CrossGoldSignal::CrossGoldSignal(const Indicator& fast, const Indicator& slow)
 CrossGoldSignal::~CrossGoldSignal() {}
 
 SignalPtr CrossGoldSignal::_clone() {
-    CrossGoldSignal* p = new CrossGoldSignal();
+    auto p = make_shared<CrossGoldSignal>();
     p->m_fast = m_fast.clone();
     p->m_slow = m_slow.clone();
-    return SignalPtr(p);
+    return p;
 }
 
 void CrossGoldSignal::_calculate(const KData& kdata) {
@@ -50,7 +50,7 @@ void CrossGoldSignal::_calculate(const KData& kdata) {
 }
 
 SignalPtr HKU_API SG_CrossGold(const Indicator& fast, const Indicator& slow) {
-    return SignalPtr(new CrossGoldSignal(fast, slow));
+    return make_shared<CrossGoldSignal>(fast, slow);
 }
 
 } /* namespace hku */

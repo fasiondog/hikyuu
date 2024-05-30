@@ -33,9 +33,9 @@ double FixedCapitalMoneyManager ::_getBuyNumber(const Datetime& datetime, const 
 }
 
 MoneyManagerPtr HKU_API MM_FixedCapital(double capital) {
-    FixedCapitalMoneyManager* p = new FixedCapitalMoneyManager();
+    MoneyManagerPtr p = make_shared<FixedCapitalMoneyManager>();
     p->setParam<double>("capital", capital);
-    return MoneyManagerPtr(p);
+    return p;
 }
 
 } /* namespace hku */

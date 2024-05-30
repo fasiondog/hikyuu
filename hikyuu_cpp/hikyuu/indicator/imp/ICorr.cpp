@@ -36,9 +36,9 @@ void ICorr::_checkParam(const string& name) const {
 }
 
 IndicatorImpPtr ICorr::_clone() {
-    ICorr* p = new ICorr();
+    auto p = make_shared<ICorr>();
     p->m_ref_ind = m_ref_ind.clone();
-    return IndicatorImpPtr(p);
+    return p;
 }
 
 void ICorr::_calculate(const Indicator& ind) {
