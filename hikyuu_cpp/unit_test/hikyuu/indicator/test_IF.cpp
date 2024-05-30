@@ -45,7 +45,7 @@ TEST_CASE("test_IF") {
         if (i == 0)
             CHECK(std::isnan(x[i]));
         else
-            CHECK_EQ(x[i], c[i] > c[i-1] ? 1 : 0);
+            CHECK_EQ(x[i], c[i] > c[i - 1] ? 1 : 0);
     }
 
     /** @arg 参数其中之一为数字 */

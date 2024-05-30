@@ -89,14 +89,27 @@ option("log_level")
     set_description("set log level")
 option_end()
 
+option("leak_check")
+    set_default(false)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable leak check for test")
+option_end()
+
 -- project
 set_project("hikyuu")
 
 add_rules("mode.debug", "mode.release")
-if not is_plat("windows") then add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan") end
 
 -- version
 set_version("2.0.9", {build = "%Y%m%d%H%M"})
+
+if get_config("leak_check") then
+    set_policy("build.sanitizer.address", true)
+    set_policy("build.sanitizer.leak", true)
+    -- set_policy("build.sanitizer.memory", true)
+    -- set_policy("build.sanitizer.thread", true)
+end
 
 local level = get_config("log_level")
 if is_mode("debug") then

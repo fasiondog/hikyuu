@@ -149,7 +149,7 @@ public:
             if (m_interrupt_flags[i]) {
                 m_interrupt_flags[i]->set();
             }
-            m_queues[i]->push_front(std::move(FuncWrapper()));
+            m_queues[i]->push_front(FuncWrapper());
         }
 
         m_cv.notify_all();  // 唤醒所有工作线程
@@ -204,7 +204,7 @@ public:
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
-            m_master_work_queue.push(std::move(FuncWrapper()));
+            m_master_work_queue.push(FuncWrapper());
         }
 
         // 唤醒所有工作线程

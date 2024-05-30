@@ -35,10 +35,10 @@ void TwoLineEnvironment::_checkParam(const string& name) const {
 }
 
 EnvironmentPtr TwoLineEnvironment::_clone() {
-    TwoLineEnvironment* ptr = new TwoLineEnvironment;
+    auto ptr = make_shared<TwoLineEnvironment>();
     ptr->m_fast = m_fast.clone();
     ptr->m_slow = m_slow.clone();
-    return EnvironmentPtr(ptr);
+    return ptr;
 }
 
 void TwoLineEnvironment::_calculate() {
@@ -66,9 +66,9 @@ void TwoLineEnvironment::_calculate() {
 }
 
 EVPtr HKU_API EV_TwoLine(const Indicator& fast, const Indicator& slow, const string& market) {
-    TwoLineEnvironment* ptr = new TwoLineEnvironment(fast, slow);
+    EVPtr ptr = make_shared<TwoLineEnvironment>(fast, slow);
     ptr->setParam<string>("market", market);
-    return EVPtr(ptr);
+    return ptr;
 }
 
 } /* namespace hku */

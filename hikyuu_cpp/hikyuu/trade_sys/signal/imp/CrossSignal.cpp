@@ -22,10 +22,10 @@ CrossSignal::CrossSignal(const Indicator& fast, const Indicator& slow)
 CrossSignal::~CrossSignal() {}
 
 SignalPtr CrossSignal::_clone() {
-    CrossSignal* p = new CrossSignal();
+    auto p = make_shared<CrossSignal>();
     p->m_fast = m_fast.clone();
     p->m_slow = m_slow.clone();
-    return SignalPtr(p);
+    return p;
 }
 
 void CrossSignal::_calculate(const KData& kdata) {
@@ -48,7 +48,7 @@ void CrossSignal::_calculate(const KData& kdata) {
 }
 
 SignalPtr HKU_API SG_Cross(const Indicator& fast, const Indicator& slow) {
-    return SignalPtr(new CrossSignal(fast, slow));
+    return make_shared<CrossSignal>(fast, slow);
 }
 
 } /* namespace hku */

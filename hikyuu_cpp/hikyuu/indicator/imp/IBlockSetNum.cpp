@@ -38,13 +38,11 @@ void IBlockSetNum::_calculate(const Indicator& ind) {
     Block block = getParam<Block>("block");
     bool ignore_context = getParam<bool>("ignore_context");
     KData k = getContext();
-    KQuery q;
     DatetimeList dates;
     if (!ignore_context && !k.empty()) {
-        q = k.getQuery();
         dates = k.getDatetimeList();
     } else {
-        q = getParam<KQuery>("query");
+        KQuery q = getParam<KQuery>("query");
         dates = StockManager::instance().getTradingCalendar(q, getParam<string>("market"));
     }
 

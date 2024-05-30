@@ -146,12 +146,12 @@ private:                                                       \
 #define STOPLOSS_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define STOPLOSS_IMP(classname, str_name)    \
-public:                                      \
-    virtual StoplossPtr _clone() override {  \
-        return StoplossPtr(new classname()); \
-    }                                        \
-    virtual void _calculate() override;      \
+#define STOPLOSS_IMP(classname, str_name)     \
+public:                                       \
+    virtual StoplossPtr _clone() override {   \
+        return std::make_shared<classname>(); \
+    }                                         \
+    virtual void _calculate() override;       \
     virtual price_t getPrice(const Datetime&, price_t) override;
 
 /**

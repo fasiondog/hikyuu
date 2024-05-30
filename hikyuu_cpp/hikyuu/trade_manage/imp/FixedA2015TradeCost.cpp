@@ -86,17 +86,17 @@ CostRecord FixedA2015TradeCost::getSellCost(const Datetime& datetime, const Stoc
 }
 
 TradeCostPtr FixedA2015TradeCost::_clone() {
-    return TradeCostPtr(new FixedA2015TradeCost());
+    return make_shared<FixedA2015TradeCost>();
 }
 
 TradeCostPtr HKU_API TC_FixedA2015(price_t commission, price_t lowestCommission, price_t stamptax,
                                    price_t transferfee) {
-    FixedA2015TradeCost* p = new FixedA2015TradeCost();
+    TradeCostPtr p = make_shared<FixedA2015TradeCost>();
     p->setParam<price_t>("commission", commission);
     p->setParam<price_t>("lowest_commission", lowestCommission);
     p->setParam<price_t>("stamptax", stamptax);
     p->setParam<price_t>("transferfee", transferfee);
-    return TradeCostPtr(p);
+    return p;
 }
 
 } /* namespace hku */

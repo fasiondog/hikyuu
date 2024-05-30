@@ -33,7 +33,13 @@ void IDropna::_calculate(const Indicator& ind) {
 
     m_result_num = ind.getResultNumber();
     size_t row_len = total - ind.discard();
-    price_t* buf = new price_t[m_result_num * row_len];
+
+#if CPP_STANDARD >= CPP_STANDARD_17
+    std::unique_ptr<price_t[]> buf = std::make_unique<price_t[]>(m_result_num * row_len);
+#else
+    std::unique_ptr<price_t[]> buf(new price_t[m_result_num * row_len]);
+#endif
+
     if (!buf) {
         HKU_ERROR("Memory allocation failed!");
         return;
@@ -68,8 +74,6 @@ void IDropna::_calculate(const Indicator& ind) {
             dst[i] = buf[start + i];
         }
     }
-
-    delete[] buf;
 
     m_discard = 0;
     setParam<DatetimeList>("align_date_list", dates);

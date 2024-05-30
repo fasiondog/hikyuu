@@ -178,7 +178,7 @@ private:                                                       \
 #define SELECTOR_IMP(classname)                                   \
 public:                                                           \
     virtual SelectorPtr _clone() override {                       \
-        return SelectorPtr(new classname());                      \
+        return std::make_shared<classname>();                     \
     }                                                             \
     virtual SystemWeightList getSelected(Datetime date) override; \
     virtual bool isMatchAF(const AFPtr& af) override;             \
