@@ -84,6 +84,12 @@ void GlobalInitializer::clean() {
           getLatestVersion(), getLatestVersion());
     }
 
+#if !HKU_ENABLE_LEAK_DETECT && not defined(MSVC_LEAKER_DETECT)
+    // 未启用内存泄漏检测时，直接退出，让系统自行释放全部资源
+    fmt::print("Quit Hikyuu system!\n\n");
+    return;
+#endif
+
     releaseGlobalTaskGroup();
     releaseScheduler();
     releaseGlobalSpotAgent();
@@ -91,8 +97,6 @@ void GlobalInitializer::clean() {
     IndicatorImp::releaseDynEngine();
     StockManager::quit();
     DataDriverFactory::release();
-
-    nng_closeall();
 
 #if HKU_ENABLE_HDF5_KDATA
     H5close();
