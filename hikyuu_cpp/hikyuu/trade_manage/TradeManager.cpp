@@ -128,7 +128,7 @@ void TradeManager::_reset() {
 }
 
 TradeManagerPtr TradeManager::_clone() {
-    TradeManager* p = new TradeManager(m_init_datetime, m_init_cash, m_costfunc, m_name);
+    auto p = make_shared<TradeManager>(m_init_datetime, m_init_cash, m_costfunc, m_name);
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_init_datetime = m_init_datetime;
@@ -154,7 +154,7 @@ TradeManagerPtr TradeManager::_clone() {
 
     p->m_actions = m_actions;
 
-    return TradeManagerPtr(p);
+    return p;
 }
 
 double TradeManager::getMarginRate(const Datetime& datetime, const Stock& stock) {
@@ -1485,8 +1485,6 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     Datetime end_date(datetime.date() + bd::days(1));
 
     int precision = getParam<int>("precision");
-    price_t total_bonus = 0.0;
-    price_t last_cash = m_cash;
     TradeRecordList new_trade_buffer;
 
     // 更新持仓信息，并缓存新增的交易记录
@@ -1508,8 +1506,6 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
             if (weight_iter->bonus() != 0.0) {
                 price_t bonus = roundEx(position.number * weight_iter->bonus() * 0.1, precision);
                 position.sellMoney += bonus;
-                last_cash += bonus;
-                total_bonus += bonus;
                 m_cash += bonus;
 
                 TradeRecord record(stock, weight_iter->datetime(), BUSINESS_BONUS, bonus, bonus,
@@ -1527,7 +1523,7 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
                 new_trade_buffer.push_back(record);
             }
         } /* for weight */
-    }     /* for position */
+    } /* for position */
 
     std::sort(
       new_trade_buffer.begin(), new_trade_buffer.end(),
@@ -1560,9 +1556,8 @@ void TradeManager::_saveAction(const TradeRecord& record) {
         case BUSINESS_INIT:
             buf << "my_tm = crtTM(datetime=Datetime('" << record.datetime.str() << "'), "
                 << "initCash=" << record.cash << sep << "costFunc=" << m_costfunc->name() << "("
-                << m_costfunc->getParameter().getNameValueList() << "), "
-                << "name='" << m_name << "'"
-                << ")";
+                << m_costfunc->getParameter().getNameValueList() << "), " << "name='" << m_name
+                << "'" << ")";
             break;
 
         case BUSINESS_CHECKIN:
@@ -1576,17 +1571,17 @@ void TradeManager::_saveAction(const TradeRecord& record) {
             break;
 
         case BUSINESS_BUY:
-            buf << my_tm << "buy(Datetime('" << record.datetime.str() << "'), "
-                << "sm['" << record.stock.market_code() << "'], " << record.realPrice << sep
-                << record.number << sep << record.stoploss << sep << record.goalPrice << sep
-                << record.planPrice << sep << record.from << ")";
+            buf << my_tm << "buy(Datetime('" << record.datetime.str() << "'), " << "sm['"
+                << record.stock.market_code() << "'], " << record.realPrice << sep << record.number
+                << sep << record.stoploss << sep << record.goalPrice << sep << record.planPrice
+                << sep << record.from << ")";
             break;
 
         case BUSINESS_SELL:
-            buf << my_tm << "sell(Datetime('" << record.datetime.str() << "'),"
-                << "sm['" << record.stock.market_code() << "'], " << record.realPrice << sep
-                << record.number << sep << record.stoploss << sep << record.goalPrice << sep
-                << record.planPrice << sep << record.from << ")";
+            buf << my_tm << "sell(Datetime('" << record.datetime.str() << "')," << "sm['"
+                << record.stock.market_code() << "'], " << record.realPrice << sep << record.number
+                << sep << record.stoploss << sep << record.goalPrice << sep << record.planPrice
+                << sep << record.from << ")";
             break;
 
         default:

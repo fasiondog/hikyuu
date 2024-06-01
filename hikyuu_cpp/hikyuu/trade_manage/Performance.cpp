@@ -397,7 +397,6 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
     }
 
     PositionRecordList cur_position = tm->getPositionList();
-    PositionRecordList::const_iterator cur_iter;
     int total_short_days = 0;
 
     if (tm->firstDatetime() != Null<Datetime>()) {

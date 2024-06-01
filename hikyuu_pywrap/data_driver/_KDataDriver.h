@@ -20,24 +20,24 @@ class PyKDataDriver : public KDataDriver {
 public:
     using KDataDriver::KDataDriver;
 
-    bool _init() {
+    bool _init() override {
         PYBIND11_OVERLOAD(bool, KDataDriver, _init, );
     }
 
-    bool isIndexFirst() {
+    bool isIndexFirst() override {
         PYBIND11_OVERLOAD_PURE(bool, KDataDriver, isIndexFirst, );
     }
 
-    bool canParallelLoad() {
+    bool canParallelLoad() override {
         PYBIND11_OVERLOAD_PURE(bool, KDataDriver, canParallelLoad, );
     }
 
-    size_t getCount(const string& market, const string& code, KQuery::KType kType) {
+    size_t getCount(const string& market, const string& code, const KQuery::KType& kType) override {
         PYBIND11_OVERLOAD(size_t, KDataDriver, getCount, market, code, kType);
     }
 
     bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
-                             size_t& out_start, size_t& out_end) {
+                             size_t& out_start, size_t& out_end) override {
         auto self = py::cast(this);
         py::tuple t = self.attr("_getIndexRangeByDate")(market, code, query);
         if (len(t) != 2) {
@@ -65,19 +65,21 @@ public:
         return true;
     }
 
-    KRecordList getKRecordList(const string& market, const string& code, const KQuery& query) {
+    KRecordList getKRecordList(const string& market, const string& code,
+                               const KQuery& query) override {
         auto self = py::cast(this);
         py::list py_list = self.attr("_getKRecordList")(market, code, query);
         return python_list_to_vector<KRecord>(py_list);
     }
 
-    TimeLineList getTimeLineList(const string& market, const string& code, const KQuery& query) {
+    TimeLineList getTimeLineList(const string& market, const string& code,
+                                 const KQuery& query) override {
         auto self = py::cast(this);
         py::list py_list = self.attr("_getTimeLineList")(market, code, query);
         return python_list_to_vector<TimeLineRecord>(py_list);
     }
 
-    TransList getTransList(const string& market, const string& code, const KQuery& query) {
+    TransList getTransList(const string& market, const string& code, const KQuery& query) override {
         auto self = py::cast(this);
         py::list py_list = self.attr("_getTransList")(market, code, query);
         return python_list_to_vector<TransRecord>(py_list);

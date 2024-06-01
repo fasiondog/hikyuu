@@ -175,11 +175,11 @@ private:                                                            \
 #define ALLOCATEFUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define ALLOCATEFUNDS_IMP(classname)   \
-public:                                \
-    virtual AFPtr _clone() override {  \
-        return AFPtr(new classname()); \
-    }                                  \
+#define ALLOCATEFUNDS_IMP(classname)          \
+public:                                       \
+    virtual AFPtr _clone() override {         \
+        return std::make_shared<classname>(); \
+    }                                         \
     virtual SystemWeightList _allocateWeight(const Datetime&, const SystemWeightList&) override;
 
 typedef shared_ptr<AllocateFundsBase> AllocateFundsPtr;

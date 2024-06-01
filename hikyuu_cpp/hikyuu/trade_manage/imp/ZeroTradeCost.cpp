@@ -28,11 +28,11 @@ CostRecord ZeroTradeCost ::getSellCost(const Datetime& datetime, const Stock& st
 }
 
 TradeCostPtr ZeroTradeCost::_clone() {
-    return TradeCostPtr(new ZeroTradeCost());
+    return make_shared<ZeroTradeCost>();
 }
 
 TradeCostPtr HKU_API TC_Zero() {
-    return TradeCostPtr(new ZeroTradeCost());
+    return make_shared<ZeroTradeCost>();
 }
 
 } /* namespace hku */

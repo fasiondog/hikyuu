@@ -37,9 +37,9 @@ void ISpearman::_checkParam(const string &name) const {
 }
 
 IndicatorImpPtr ISpearman::_clone() {
-    ISpearman *p = new ISpearman();
+    auto p = make_shared<ISpearman>();
     p->m_ref_ind = m_ref_ind.clone();
-    return IndicatorImpPtr(p);
+    return p;
 }
 
 static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value_t *level,

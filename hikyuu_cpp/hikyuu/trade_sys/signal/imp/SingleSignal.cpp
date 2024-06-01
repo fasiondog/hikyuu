@@ -38,9 +38,9 @@ void SingleSignal::_checkParam(const string& name) const {
 }
 
 SignalPtr SingleSignal::_clone() {
-    SingleSignal* p = new SingleSignal();
+    auto p = make_shared<SingleSignal>();
     p->m_ind = m_ind.clone();
-    return SignalPtr(p);
+    return p;
 }
 
 void SingleSignal::_calculate(const KData& kdata) {
@@ -71,10 +71,10 @@ void SingleSignal::_calculate(const KData& kdata) {
 }
 
 SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n, double filter_p) {
-    SingleSignal* p = new SingleSignal(ind);
+    SignalPtr p = make_shared<SingleSignal>(ind);
     p->setParam<int>("filter_n", filter_n);
     p->setParam<double>("filter_p", filter_p);
-    return SignalPtr(p);
+    return p;
 }
 
 } /* namespace hku */

@@ -32,9 +32,9 @@ double FixedRiskMoneyManager ::_getBuyNumber(const Datetime& datetime, const Sto
 }
 
 MoneyManagerPtr HKU_API MM_FixedRisk(double risk) {
-    FixedRiskMoneyManager* p = new FixedRiskMoneyManager();
+    MoneyManagerPtr p = make_shared<FixedRiskMoneyManager>();
     p->setParam<double>("risk", risk);
-    return MoneyManagerPtr(p);
+    return p;
 }
 
 } /* namespace hku */

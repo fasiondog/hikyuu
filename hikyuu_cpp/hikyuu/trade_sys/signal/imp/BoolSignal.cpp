@@ -22,10 +22,10 @@ BoolSignal::BoolSignal(const Indicator& buy, const Indicator& sell)
 BoolSignal::~BoolSignal() {}
 
 SignalPtr BoolSignal::_clone() {
-    BoolSignal* p = new BoolSignal();
+    auto p = make_shared<BoolSignal>();
     p->m_bool_buy = m_bool_buy.clone();
     p->m_bool_sell = m_bool_sell.clone();
-    return SignalPtr(p);
+    return p;
 }
 
 void BoolSignal::_calculate(const KData& kdata) {
@@ -47,7 +47,7 @@ void BoolSignal::_calculate(const KData& kdata) {
 }
 
 SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell) {
-    return SignalPtr(new BoolSignal(buy, sell));
+    return make_shared<BoolSignal>(buy, sell);
 }
 
 } /* namespace hku */

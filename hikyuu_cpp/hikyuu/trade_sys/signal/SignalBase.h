@@ -191,11 +191,11 @@ private:                                                      \
 #define SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define SIGNAL_IMP(classname)              \
-public:                                    \
-    virtual SignalPtr _clone() override {  \
-        return SignalPtr(new classname()); \
-    }                                      \
+#define SIGNAL_IMP(classname)                 \
+public:                                       \
+    virtual SignalPtr _clone() override {     \
+        return std::make_shared<classname>(); \
+    }                                         \
     virtual void _calculate(const KData&) override;
 
 /**

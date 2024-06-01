@@ -103,13 +103,13 @@ CostRecord FixedATradeCost::getSellCost(const Datetime& datetime, const Stock& s
 }
 
 TradeCostPtr FixedATradeCost::_clone() {
-    return TradeCostPtr(new FixedATradeCost());
+    return make_shared<FixedATradeCost>();
 }
 
 TradeCostPtr HKU_API TC_FixedA(price_t commission, price_t lowestCommission, price_t stamptax,
                                price_t transferfee, price_t lowestTransferfee) {
-    return TradeCostPtr(
-      new FixedATradeCost(commission, lowestCommission, stamptax, transferfee, lowestTransferfee));
+    return make_shared<FixedATradeCost>(commission, lowestCommission, stamptax, transferfee,
+                                        lowestTransferfee);
 }
 
 } /* namespace hku */

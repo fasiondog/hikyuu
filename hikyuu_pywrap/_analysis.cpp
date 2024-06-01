@@ -132,19 +132,19 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
     if (py::isinstance<Block>(pystk_list)) {
         const auto& blk = pystk_list.cast<Block&>();
         for (const auto& stk : blk) {
-            sys_list.emplace_back(std::move(sys_proto->clone()));
+            sys_list.emplace_back(sys_proto->clone());
             stk_list.emplace_back(stk);
         }
     } else if (py::isinstance<StockManager>(pystk_list)) {
         const auto& blk = pystk_list.cast<StockManager&>();
         for (const auto& stk : blk) {
-            sys_list.emplace_back(std::move(sys_proto->clone()));
+            sys_list.emplace_back(sys_proto->clone());
             stk_list.emplace_back(stk);
         }
     } else if (py::isinstance<py::sequence>(pystk_list)) {
         auto pyseq = pystk_list.cast<py::sequence>();
         for (const auto& obj : pyseq) {
-            sys_list.emplace_back(std::move(sys_proto->clone()));
+            sys_list.emplace_back(sys_proto->clone());
             stk_list.emplace_back(obj.cast<Stock&>());
         }
     }

@@ -64,14 +64,14 @@ public:
     /** 设置板块类别 */
     void category(const string& category) {
         if (!m_data)
-            m_data = shared_ptr<Data>(new Data);
+            m_data = make_shared<Data>();
         m_data->m_category = category;
     }
 
     /** 设置名称 */
     void name(const string& name) {
         if (!m_data)
-            m_data = shared_ptr<Data>(new Data);
+            m_data = make_shared<Data>();
         m_data->m_name = name;
     }
 

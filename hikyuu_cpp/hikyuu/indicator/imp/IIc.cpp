@@ -40,11 +40,11 @@ void IIc::_checkParam(const string& name) const {
 }
 
 IndicatorImpPtr IIc::_clone() {
-    IIc* p = new IIc();
+    auto p = make_shared<IIc>();
     p->m_stks = m_stks;
     p->m_query = m_query;
     p->m_ref_stk = m_ref_stk;
-    return IndicatorImpPtr(p);
+    return p;
 }
 
 void IIc::_calculate(const Indicator& inputInd) {

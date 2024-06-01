@@ -141,7 +141,7 @@ private:                                                         \
 #define PROFITGOAL_IMP(classname)                               \
 public:                                                         \
     virtual ProfitGoalPtr _clone() override {                   \
-        return ProfitGoalPtr(new classname());                  \
+        return std::make_shared<classname>();                   \
     }                                                           \
     virtual price_t getGoal(const Datetime&, price_t) override; \
     virtual void _calculate() override;

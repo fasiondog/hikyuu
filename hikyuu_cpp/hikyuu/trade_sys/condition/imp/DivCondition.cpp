@@ -55,14 +55,14 @@ void DivCondition::_reset() {
 }
 
 ConditionPtr DivCondition::_clone() {
-    DivCondition* p = new DivCondition();
+    auto p = make_shared<DivCondition>();
     if (m_cond1) {
         p->m_cond1 = m_cond1->clone();
     }
     if (m_cond2) {
         p->m_cond2 = m_cond2->clone();
     }
-    return ConditionPtr(p);
+    return p;
 }
 
 HKU_API ConditionPtr operator/(const ConditionPtr& cond1, const ConditionPtr& cond2) {

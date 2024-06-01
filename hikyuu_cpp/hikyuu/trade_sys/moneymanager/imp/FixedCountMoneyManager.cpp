@@ -37,9 +37,9 @@ double FixedCountMoneyManager::_getSellShortNumber(const Datetime& datetime, con
 }
 
 MoneyManagerPtr HKU_API MM_FixedCount(double n) {
-    FixedCountMoneyManager* p = new FixedCountMoneyManager();
+    MoneyManagerPtr p = make_shared<FixedCountMoneyManager>();
     p->setParam<double>("n", n);
-    return MoneyManagerPtr(p);
+    return p;
 }
 
 } /* namespace hku */

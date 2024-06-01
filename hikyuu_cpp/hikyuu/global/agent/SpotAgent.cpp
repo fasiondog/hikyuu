@@ -35,7 +35,7 @@ SpotAgent::~SpotAgent() {
 void SpotAgent::start() {
     if (m_stop) {
         m_stop = false;
-        m_receiveThread = std::move(std::thread([this]() { work_thread(); }));
+        m_receiveThread = std::thread([this]() { work_thread(); });
     }
 }
 

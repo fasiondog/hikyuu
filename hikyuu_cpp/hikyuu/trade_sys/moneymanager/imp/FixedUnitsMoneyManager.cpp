@@ -37,9 +37,9 @@ double FixedUnitsMoneyManager ::_getBuyNumber(const Datetime& datetime, const St
 }
 
 MoneyManagerPtr HKU_API MM_FixedUnits(int n) {
-    FixedUnitsMoneyManager* p = new FixedUnitsMoneyManager();
+    MoneyManagerPtr p = make_shared<FixedUnitsMoneyManager>();
     p->setParam<int>("n", n);
-    return MoneyManagerPtr(p);
+    return p;
 }
 
 } /* namespace hku */

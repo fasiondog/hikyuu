@@ -35,7 +35,7 @@ price_t FixedPercentStoploss ::getPrice(const Datetime& datetime, price_t price)
 void FixedPercentStoploss::_calculate() {}
 
 StoplossPtr HKU_API ST_FixedPercent(double p) {
-    StoplossPtr result(new FixedPercentStoploss());
+    StoplossPtr result = make_shared<FixedPercentStoploss>();
     result->setParam<double>("p", p);
     return result;
 }

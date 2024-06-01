@@ -73,7 +73,6 @@ void IFinance::_calculate(const Indicator& data) {
 
     bool dynamic = getParam<bool>("dynamic");
     auto* dst = this->data();
-    auto dates = kdata.getDatetimeList();
     auto* k = kdata.data();
 
     size_t finances_total = finances.size();

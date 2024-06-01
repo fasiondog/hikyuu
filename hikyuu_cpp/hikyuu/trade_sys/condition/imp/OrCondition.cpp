@@ -73,14 +73,14 @@ void OrCondition::_reset() {
 }
 
 ConditionPtr OrCondition::_clone() {
-    OrCondition* p = new OrCondition();
+    auto p = make_shared<OrCondition>();
     if (m_cond1) {
         p->m_cond1 = m_cond1->clone();
     }
     if (m_cond2) {
         p->m_cond2 = m_cond2->clone();
     }
-    return ConditionPtr(p);
+    return p;
 }
 
 HKU_API ConditionPtr operator|(const ConditionPtr& cond1, const ConditionPtr& cond2) {

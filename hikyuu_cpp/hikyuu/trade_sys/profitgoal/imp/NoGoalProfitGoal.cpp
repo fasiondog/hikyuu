@@ -24,7 +24,7 @@ price_t NoGoalProfitGoal::getGoal(const Datetime& datetime, price_t price) {
 }
 
 ProfitGoalPtr HKU_API PG_NoGoal() {
-    return ProfitGoalPtr(new NoGoalProfitGoal);
+    return make_shared<NoGoalProfitGoal>();
 }
 
 } /* namespace hku */

@@ -6,6 +6,7 @@
  */
 
 #include <boost/algorithm/string.hpp>
+#include "hikyuu/Block.h"
 #include "../Log.h"
 #include "Parameter.h"
 

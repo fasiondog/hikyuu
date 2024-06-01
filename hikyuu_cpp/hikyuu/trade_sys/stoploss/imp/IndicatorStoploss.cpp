@@ -43,9 +43,9 @@ void IndicatorStoploss::_reset() {
 }
 
 StoplossPtr IndicatorStoploss::_clone() {
-    IndicatorStoploss* p = new IndicatorStoploss(m_op.clone(), getParam<string>("kpart"));
+    auto p = make_shared<IndicatorStoploss>(m_op.clone(), getParam<string>("kpart"));
     p->m_result = m_result;
-    return StoplossPtr(p);
+    return p;
 }
 
 void IndicatorStoploss::_calculate() {
@@ -59,7 +59,7 @@ void IndicatorStoploss::_calculate() {
 }
 
 StoplossPtr HKU_API ST_Indicator(const Indicator& op, const string& kpart) {
-    return StoplossPtr(new IndicatorStoploss(op, kpart));
+    return make_shared<IndicatorStoploss>(op, kpart);
 }
 
 } /* namespace hku */
