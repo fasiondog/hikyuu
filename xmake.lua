@@ -148,6 +148,7 @@ set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
 set_configvar("ENABLE_MSVC_LEAK_DETECT", 0)
+set_configvar("HKU_ENABLE_LEAK_DETECT", get_config("leak_check") and 1 or 0)
 set_configvar("HKU_ENABLE_SEND_FEEDBACK", get_config("feedback") and 1 or 0)
 
 set_configvar("HKU_ENABLE_HDF5_KDATA", get_config("hdf5") and 1 or 0)
