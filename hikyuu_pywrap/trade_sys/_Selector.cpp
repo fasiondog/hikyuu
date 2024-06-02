@@ -26,8 +26,12 @@ public:
         PYBIND11_OVERLOAD_PURE(void, SelectorBase, _calculate, );
     }
 
-    void _addStock(const Stock& stock, const SystemPtr& protoSys) override {
-        PYBIND11_OVERLOAD(void, SelectorBase, _addStock, stock, protoSys);
+    void _addSystem(const SystemPtr& sys) override {
+        PYBIND11_OVERLOAD(void, SelectorBase, _addSystem, sys);
+    }
+
+    void _removeAll() override {
+        PYBIND11_OVERLOAD(void, SelectorBase, _removeAll, );
     }
 
     SystemWeightList getSelected(Datetime date) override {

@@ -17,12 +17,15 @@
 
 namespace hku {
 
+class HKU_API Portfolio;
+
 /**
  * 交易对象选择模块
  * @ingroup Selector
  */
 class HKU_API SelectorBase : public enable_shared_from_this<SelectorBase> {
     PARAMETER_SUPPORT_WITH_CHECK
+    friend class HKU_API Portfolio;
 
 public:
     /** 默认构造函数 */
@@ -60,6 +63,20 @@ public:
      * @return 如果 protoSys 无效则返回false，否则返回 true
      */
     void addStockList(const StockList& stkList, const SystemPtr& protoSys);
+
+    /**
+     * 直接加入已有系统策略示例
+     * @note 应该已经绑定 stock
+     * @param sys
+     */
+    void addSystem(const SYSPtr& sys);
+
+    /**
+     * 直接加入已有系统策略示例
+     * @note 应该已经绑定 stock
+     * @param sys
+     */
+    void addSystemList(const SystemList& sys);
 
     /**
      * @brief 获取原型系统列表
@@ -102,16 +119,22 @@ public:
     virtual bool isMatchAF(const AFPtr& af) = 0;
 
     /** 用于逻辑运算的子类中添加原型系统，一般不需要子类实现 */
-    virtual void _addStock(const Stock& stock, const SystemPtr& protoSys) {}
+    virtual void _addSystem(const SYSPtr& sys) {}
+
+    /** 用于逻辑运算的子类中添加原型系统，一般不需要子类实现 */
+    virtual void _removeAll() {}
 
     /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
     void calculate(const SystemList& pf_realSysList, const KQuery& query);
+
+    virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) {}
 
     void calculate_proto(const KQuery& query);
 
 private:
     void initParam();
 
+protected:
 protected:
     string m_name;
     bool m_calculated{false};  // 是否已计算过

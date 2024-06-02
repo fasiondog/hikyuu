@@ -20,12 +20,16 @@ OperatorAddSelector::OperatorAddSelector(const SelectorPtr& se1, const SelectorP
     if (se1) {
         m_se1 = se1->clone();
         auto sys_list = m_se1->getProtoSystemList();
+        for (auto& sys : sys_list) {
+            m_se1_set.insert(sys);
+        }
         m_pro_sys_list = std::move(sys_list);
     }
     if (se2) {
         m_se2 = se2->clone();
         auto sys_list = m_se2->getProtoSystemList();
         for (auto& sys : sys_list) {
+            m_se2_set.insert(sys);
             m_pro_sys_list.emplace_back(std::move(sys));
         }
     }
@@ -36,9 +40,19 @@ OperatorAddSelector::~OperatorAddSelector() {}
 void OperatorAddSelector::_reset() {
     if (m_se1) {
         m_se1->reset();
+        m_se1_set.clear();
+        auto sys_list = m_se1->getProtoSystemList();
+        for (auto& sys : sys_list) {
+            m_se1_set.insert(sys);
+        }
     }
     if (m_se2) {
         m_se2->reset();
+        m_se2_set.clear();
+        auto sys_list = m_se2->getProtoSystemList();
+        for (auto& sys : sys_list) {
+            m_se2_set.insert(sys);
+        }
     }
 }
 
@@ -46,32 +60,57 @@ bool OperatorAddSelector::isMatchAF(const AFPtr& af) {
     return true;
 }
 
-void OperatorAddSelector::_addStock(const Stock& stock, const SystemPtr& protoSys) {
+void OperatorAddSelector::_addSystem(const SYSPtr& sys) {
     if (m_se1) {
-        m_se1->addStock(stock, protoSys);
+        m_se1->addSystem(sys);
+        m_se1_set.insert(sys);
     }
     if (m_se2) {
-        m_se2->addStock(stock, protoSys);
+        m_se2->addSystem(sys);
+        m_se2_set.insert(sys);
     }
+}
+
+void OperatorAddSelector::_removeAll() {
+    m_se1_set.clear();
+    m_se2_set.clear();
 }
 
 SelectorPtr OperatorAddSelector::_clone() {
-    OperatorAddSelector* p = new OperatorAddSelector();
+    auto p = make_shared<OperatorAddSelector>();
     if (m_se1) {
         p->m_se1 = m_se1->clone();
+        auto sys_list = p->m_se1->getProtoSystemList();
+        for (auto& sys : sys_list) {
+            p->m_se1_set.insert(sys);
+        }
     }
     if (m_se2) {
         p->m_se2 = m_se2->clone();
+        auto sys_list = p->m_se2->getProtoSystemList();
+        for (auto& sys : sys_list) {
+            p->m_se2_set.insert(sys);
+        }
     }
-    return SelectorPtr(p);
+    return p;
 }
 
 void OperatorAddSelector::_calculate() {
+    SystemList se1_list, se2_list;
+    for (const auto& sys : m_real_sys_list) {
+        const auto& protoSys = m_real_to_proto[sys];
+        if (m_se1_set.find(protoSys) != m_se1_set.end()) {
+            se1_list.emplace_back(sys);
+        }
+        if (m_se2_set.find(protoSys) != m_se2_set.end()) {
+            se2_list.emplace_back(sys);
+        }
+    }
     if (m_se1) {
-        m_se1->calculate(m_real_sys_list, m_query);
+        m_se1->calculate(se1_list, m_query);
     }
     if (m_se2) {
-        m_se2->calculate(m_real_sys_list, m_query);
+        m_se2->calculate(se2_list, m_query);
     }
 }
 

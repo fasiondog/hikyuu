@@ -64,6 +64,9 @@ TEST_CASE("test_SE_Add") {
 
     proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
+    for (const auto& sys : proto_sys_list) {
+        se->bindRealToProto(sys, sys);
+    }
     se->calculate(proto_sys_list, KQuery(-20));
     result = se->getSelected(Datetime(200001010000L));
     CHECK_EQ(result.size(), 3);
@@ -78,6 +81,9 @@ TEST_CASE("test_SE_Add") {
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
+    for (const auto& sys : proto_sys_list) {
+        se->bindRealToProto(sys, sys);
+    }
     se->calculate(proto_sys_list, KQuery(-20));
     result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
@@ -86,6 +92,9 @@ TEST_CASE("test_SE_Add") {
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
+    for (const auto& sys : proto_sys_list) {
+        se->bindRealToProto(sys, sys);
+    }
     se->calculate(proto_sys_list, KQuery(-20));
     result = se->getSelected(Datetime(200001010000L));
     CHECK_EQ(result.size(), 3);

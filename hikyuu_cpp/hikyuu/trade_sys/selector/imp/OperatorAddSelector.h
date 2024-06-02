@@ -19,14 +19,24 @@ public:
 
     virtual void _reset() override;
     virtual SelectorPtr _clone() override;
-    virtual void _addStock(const Stock& stock, const SystemPtr& protoSys) override;
     virtual bool isMatchAF(const AFPtr& af) override;
     virtual void _calculate() override;
     virtual SystemWeightList getSelected(Datetime date) override;
 
+    virtual void _addSystem(const SYSPtr& sys) override;
+    virtual void _removeAll() override;
+
+protected:
+    virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) override {
+        m_real_to_proto[real] = proto;
+    }
+
 private:
     SelectorPtr m_se1;
     SelectorPtr m_se2;
+    std::unordered_set<SYSPtr> m_se1_set;
+    std::unordered_set<SYSPtr> m_se2_set;
+    std::unordered_map<SYSPtr, SYSPtr> m_real_to_proto;
 
     //============================================
     // 序列化支持

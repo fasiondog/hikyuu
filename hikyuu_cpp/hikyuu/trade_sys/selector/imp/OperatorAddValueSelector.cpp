@@ -31,11 +31,11 @@ void OperatorAddValueSelector::_reset() {
     }
 }
 
-void OperatorAddValueSelector::_addStock(const Stock& stock, const SystemPtr& protoSys) {
-    if (m_se) {
-        m_se->addStock(stock, protoSys);
-    }
-}
+// void OperatorAddValueSelector::_addStock(const Stock& stock, const SystemPtr& protoSys) {
+//     if (m_se) {
+//         m_se->addStock(stock, protoSys);
+//     }
+// }
 
 bool OperatorAddValueSelector::isMatchAF(const AFPtr& af) {
     return true;
