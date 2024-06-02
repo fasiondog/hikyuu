@@ -203,7 +203,7 @@ def get_china_bond10_rate(start_date="19901219"):
 def modifiy_code(code):
     if code.startswith(('0', '3')):
         return 'SZ' + code
-    if code.startswith(('4', '8')):
+    if code.startswith(('4', '8', '92')):
         return 'BJ' + code
     if code.startswith('6'):
         return 'SH' + code
