@@ -52,9 +52,7 @@ void SelectorBase::paramChanged() {
 
 void SelectorBase::removeAll() {
     m_pro_sys_list.clear();
-    m_real_sys_list.clear();
-    m_calculated = false;
-    m_proto_calculated = false;
+    reset();
 }
 
 void SelectorBase::reset() {
