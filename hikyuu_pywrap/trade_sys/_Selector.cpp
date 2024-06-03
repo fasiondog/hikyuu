@@ -153,13 +153,14 @@ void export_Selector(py::module& m) {
 
       .def("__add__",
            [](const SelectorPtr& self, const SelectorPtr& other) { return self + other; })
-
       .def("__add__", [](const SelectorPtr& self, double other) { return self + other; })
       .def("__radd__", [](const SelectorPtr& self, double other) { return self + other; })
 
       .def("__sub__", [](const SelectorPtr& self, double other) { return self - other; })
       .def("__rsub__", [](const SelectorPtr& self, double other) { return other - self; })
 
+      .def("__mul__",
+           [](const SelectorPtr& self, const SelectorPtr& other) { return self * other; })
       .def("__mul__", [](const SelectorPtr& self, double other) { return self * other; })
       .def("__rmul__", [](const SelectorPtr& self, double other) { return self * other; })
 
