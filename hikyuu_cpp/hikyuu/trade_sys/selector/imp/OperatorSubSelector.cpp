@@ -5,15 +5,15 @@
  *      Author: fasiondog
  */
 
-#include "OperatorAddSelector.h"
+#include "OperatorSubSelector.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::OperatorAddSelector)
+BOOST_CLASS_EXPORT(hku::OperatorSubSelector)
 #endif
 
 namespace hku {
 
-SystemWeightList OperatorAddSelector::getSelected(Datetime date) {
+SystemWeightList OperatorSubSelector::getSelected(Datetime date) {
     SystemWeightList ret;
     SystemWeightList sws1, sws2;
     if (m_se1) {
@@ -45,9 +45,9 @@ SystemWeightList OperatorAddSelector::getSelected(Datetime date) {
         iter = sw_dict1.find(sw.sys.get());
         tmp.sys = sw.sys;
         if (iter != sw_dict1.end()) {
-            tmp.weight = std::isnan(sw.weight) ? sw.weight : sw.weight + iter->second->weight;
+            tmp.weight = std::isnan(sw.weight) ? -sw.weight : iter->second->weight - sw.weight;
         } else {
-            tmp.weight = sw.weight;
+            tmp.weight = -sw.weight;
         }
         auto& back = ret.emplace_back(std::move(tmp));
         sw_dict2[back.sys.get()] = &back;
@@ -74,8 +74,8 @@ SystemWeightList OperatorAddSelector::getSelected(Datetime date) {
     return ret;
 }
 
-HKU_API SelectorPtr operator+(const SelectorPtr& se1, const SelectorPtr& se2) {
-    return make_shared<OperatorAddSelector>(se1, se2);
+HKU_API SelectorPtr operator-(const SelectorPtr& se1, const SelectorPtr& se2) {
+    return make_shared<OperatorSubSelector>(se1, se2);
 }
 
 }  // namespace hku

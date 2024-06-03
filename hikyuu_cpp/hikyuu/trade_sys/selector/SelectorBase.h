@@ -17,15 +17,12 @@
 
 namespace hku {
 
-class HKU_API Portfolio;
-
 /**
  * 交易对象选择模块
  * @ingroup Selector
  */
 class HKU_API SelectorBase : public enable_shared_from_this<SelectorBase> {
     PARAMETER_SUPPORT_WITH_CHECK
-    friend class HKU_API Portfolio;
 
 public:
     /** 默认构造函数 */
@@ -127,6 +124,7 @@ public:
     /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
     void calculate(const SystemList& pf_realSysList, const KQuery& query);
 
+    /* 仅供PF调用，建立实际系统到原型系统映射 */
     virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) {}
 
     void calculate_proto(const KQuery& query);

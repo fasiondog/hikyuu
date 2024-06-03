@@ -11,8 +11,8 @@
 
 namespace hku {
 
-class HKU_API OperatorMulSelector : public OperatorSelector {
-    OPERATOR_SELECTOR_IMP(OperatorMulSelector, "SE_Multi")
+class HKU_API OperatorSubSelector : public OperatorSelector {
+    OPERATOR_SELECTOR_IMP(OperatorSubSelector, "SE_Sub")
     OPERATOR_SELECTOR_SERIALIZATION
 };
 
