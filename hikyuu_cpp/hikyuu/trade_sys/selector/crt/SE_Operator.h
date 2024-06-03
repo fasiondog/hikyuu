@@ -14,9 +14,19 @@ namespace hku {
 HKU_API SelectorPtr operator+(const SelectorPtr& se1, const SelectorPtr& se2);
 
 HKU_API SelectorPtr operator+(const SelectorPtr& se, double value);
-
 inline SelectorPtr operator+(double value, const SelectorPtr& se) {
     return se + value;
 }
+
+HKU_API SelectorPtr operator-(const SelectorPtr& se, double value);
+HKU_API SelectorPtr operator-(double value, const SelectorPtr& se);
+
+HKU_API SelectorPtr operator*(const SelectorPtr& se, double value);
+inline SelectorPtr operator*(double value, const SelectorPtr& se) {
+    return se * value;
+}
+
+HKU_API SelectorPtr operator/(const SelectorPtr& se, double value);
+HKU_API SelectorPtr operator/(double value, const SelectorPtr& se);
 
 }  // namespace hku

@@ -11,8 +11,8 @@
 
 namespace hku {
 
-class HKU_API OperatorAddValueSelector : public OperatorValueSelector {
-    OPERATOR_VALUE_SELECTOR_IMP(OperatorAddValueSelector, "SE_AddValue")
+class HKU_API OperatorInvertSubValueSelector : public OperatorValueSelector {
+    OPERATOR_VALUE_SELECTOR_IMP(OperatorInvertSubValueSelector, "SE_SubValue")
     OPERATOR_VALUE_SELECTOR_SERIALIZATION
 };
 

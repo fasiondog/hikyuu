@@ -5,15 +5,15 @@
  *      Author: fasiondog
  */
 
-#include "OperatorAddValueSelector.h"
+#include "OperatorInvertDivValueSelector.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::OperatorAddValueSelector)
+BOOST_CLASS_EXPORT(hku::OperatorInvertDivValueSelector)
 #endif
 
 namespace hku {
 
-SystemWeightList OperatorAddValueSelector::getSelected(Datetime date) {
+SystemWeightList OperatorInvertDivValueSelector::getSelected(Datetime date) {
     SystemWeightList ret;
     HKU_IF_RETURN(!m_se, ret);
 
@@ -25,8 +25,8 @@ SystemWeightList OperatorAddValueSelector::getSelected(Datetime date) {
     return ret;
 }
 
-HKU_API SelectorPtr operator+(const SelectorPtr& se, double value) {
-    return make_shared<OperatorAddValueSelector>(se, value);
+HKU_API SelectorPtr operator/(double value, const SelectorPtr& se) {
+    return make_shared<OperatorInvertDivValueSelector>(se, value);
 }
 
 }  // namespace hku

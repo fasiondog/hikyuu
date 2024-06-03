@@ -157,6 +157,15 @@ void export_Selector(py::module& m) {
       .def("__add__", [](const SelectorPtr& self, double other) { return self + other; })
       .def("__radd__", [](const SelectorPtr& self, double other) { return self + other; })
 
+      .def("__sub__", [](const SelectorPtr& self, double other) { return self - other; })
+      .def("__rsub__", [](const SelectorPtr& self, double other) { return other - self; })
+
+      .def("__mul__", [](const SelectorPtr& self, double other) { return self * other; })
+      .def("__rmul__", [](const SelectorPtr& self, double other) { return self * other; })
+
+      .def("__truediv__", [](const SelectorPtr& self, double other) { return self / other; })
+      .def("__rtruediv__", [](const SelectorPtr& self, double other) { return other / self; })
+
         DEF_PICKLE(SEPtr);
 
     m.def("SE_Fixed", py::overload_cast<>(SE_Fixed));
