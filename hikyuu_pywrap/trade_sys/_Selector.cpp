@@ -171,6 +171,10 @@ void export_Selector(py::module& m) {
       .def("__truediv__", [](const SelectorPtr& self, double other) { return self / other; })
       .def("__rtruediv__", [](const SelectorPtr& self, double other) { return other / self; })
 
+      .def("__and__",
+           [](const SelectorPtr& self, const SelectorPtr& other) { return self & other; })
+      .def("__or__", [](const SelectorPtr& self, const SelectorPtr& other) { return self | other; })
+
         DEF_PICKLE(SEPtr);
 
     m.def("SE_Fixed", py::overload_cast<>(SE_Fixed));

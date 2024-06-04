@@ -16,6 +16,14 @@ HKU_API SelectorPtr operator-(const SelectorPtr& se1, const SelectorPtr& se2);
 HKU_API SelectorPtr operator*(const SelectorPtr& se1, const SelectorPtr& se2);
 HKU_API SelectorPtr operator/(const SelectorPtr& se1, const SelectorPtr& se2);
 
+inline SelectorPtr operator&(const SelectorPtr& se1, const SelectorPtr& se2) {
+    return se1 * se2;
+}
+
+inline SelectorPtr operator|(const SelectorPtr& se1, const SelectorPtr& se2) {
+    return se1 + se2;
+}
+
 HKU_API SelectorPtr operator+(const SelectorPtr& se, double value);
 inline SelectorPtr operator+(double value, const SelectorPtr& se) {
     return se + value;
