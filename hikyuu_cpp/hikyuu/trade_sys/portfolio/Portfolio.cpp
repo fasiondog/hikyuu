@@ -306,16 +306,27 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
     m_delay_adjust_sys_list.swap(tmp_continue_adjust_sys_list);
 
     //---------------------------------------------------
+    // 检测当前运行中的系统是否存在延迟卖出信号，并在开盘时有效处理
+    //---------------------------------------------------
+    for (auto& sys : m_running_sys_set) {
+        auto tr = sys->pfProcessDelaySellRequest(date);
+        if (!tr.isNull()) {
+            HKU_INFO_IF(trace, "[PF] sell delay {}", tr);
+            m_tm->addTradeRecord(tr);
+        }
+    }
+
+    //---------------------------------------------------
     // 调仓日，进行资金分配调整
     //---------------------------------------------------
     if (adjust) {
         // 从选股策略获取选中的系统列表
         m_tmp_selected_list = m_se->getSelected(date);
 
-        // 如果选中的系统不在已有列表中, 则先清除其延迟操作，防止在调仓日出现未来信号
+        // 如果选中的系统不在已有列表中, 则先清除其延迟买入操作，防止在调仓日出现未来信号
         for (auto& sys : m_tmp_selected_list) {
             if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
-                sys.sys->clearDelayRequest();
+                sys.sys->clearDelayBuyRequest();
             }
         }
 
