@@ -25,12 +25,17 @@
 
 namespace hku {
 
+class HKU_API Portfolio;
+class HKU_API AllocateFundsBase;
+
 /**
  * 交易系统基类
  * @ingroup System
  */
 class HKU_API System {
     PARAMETER_SUPPORT_WITH_CHECK
+    friend class HKU_API Portfolio;
+    friend class HKU_API AllocateFundsBase;
 
 public:
     /** 默认构造函数 */
@@ -200,12 +205,6 @@ public:
      */
     TradeRecord runMoment(const Datetime& datetime);
 
-    // 清除已有的交易请求，供Portfolio使用
-    void clearDelayRequest();
-
-    // 当前是否存在延迟的操作请求，供Portfolio
-    bool haveDelayRequest() const;
-
     // 运行前准备工作, 失败将抛出异常
     void readyForRun();
 
@@ -213,6 +212,12 @@ public:
         return _sell(today, src_today, from);
     }
 
+    // 由各个相关组件调用，用于组件参数变化时通知 sys，以便重算
+    void partChangedNotify() {
+        m_calculated = false;
+    }
+
+private:
     // 强制以开盘价卖出，仅供 PF/AF 内部调用
     TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) {
         HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
@@ -225,10 +230,14 @@ public:
         return _sellForce(date, num, from, false);
     }
 
-    // 由各个相关组件调用，用于组件参数变化时通知 sys，以便重算
-    void partChangedNotify() {
-        m_calculated = false;
-    }
+    // 清除已有的交易请求，供Portfolio使用
+    void clearDelayBuyRequest();
+
+    // 当前是否存在延迟的操作请求，供Portfolio
+    bool haveDelaySellRequest() const;
+
+    // 处理延迟买入请求，仅供 PF 调用
+    TradeRecord pfProcessDelaySellRequest(const Datetime& date);
 
 private:
     bool _environmentIsValid(const Datetime& datetime);
