@@ -39,4 +39,8 @@ SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, const StockLis
                                    int ic_rolling_n = 120, const Stock& ref_stk = Stock(),
                                    const string& mode = "MF_ICIRWeight");
 
+SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, int topn = 10, int ic_n = 5,
+                                   int ic_rolling_n = 120, const Stock& ref_stk = Stock(),
+                                   const string& mode = "MF_ICIRWeight");
+
 }  // namespace hku
