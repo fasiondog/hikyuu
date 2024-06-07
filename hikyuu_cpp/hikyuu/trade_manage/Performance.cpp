@@ -128,19 +128,14 @@ string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) 
     return buf.str();
 }
 
-void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetime) {
+void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime) {
     // 清除上次统计结果
     reset();
 
-    if (!tm) {
-        HKU_INFO("TradeManagerPtr is Null!");
-        return;
-    }
-
-    if (datetime < tm->lastDatetime()) {
-        HKU_ERROR("datetime must >= tm->lastDatetime !");
-        return;
-    }
+    HKU_INFO_IF_RETURN(!tm, void(), "TradeManagerPtr is Null!");
+    HKU_ERROR_IF_RETURN(datetime.isNull(), void(), "Invalid input datetime");
+    HKU_ERROR_IF_RETURN(datetime < tm->lastDatetime(), void(),
+                        "datetime must >= tm->lastDatetime !");
 
     int precision = tm->precision();
     m_result["帐户初始金额"] = tm->initCash();
