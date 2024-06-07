@@ -675,6 +675,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
+        try:
+            self.saveConfig()
+        except Exception as e:
+            QMessageBox.about(self, "保存配置信息失败", str(e))
+            return
+
         config = self.getCurrentConfig()
         if config.getboolean('hdf5', 'enable') \
                 and (not os.path.lexists(config['hdf5']['dir']) or not os.path.isdir(config['hdf5']['dir'])):
@@ -685,11 +691,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             and (not os.path.lexists(config['tdx']['dir'])
                  or not os.path.isdir(config['tdx']['dir'])):
             QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
-            return
-        try:
-            self.saveConfig()
-        except Exception as e:
-            QMessageBox.about(self, "保存配置信息失败", str(e))
             return
 
         self.import_running = True
