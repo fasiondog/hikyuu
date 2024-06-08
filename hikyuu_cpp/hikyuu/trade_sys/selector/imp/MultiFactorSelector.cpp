@@ -50,6 +50,9 @@ void MultiFactorSelector::_checkParam(const string& name) const {
         HKU_ASSERT(getParam<int>("ic_n") >= 1);
     } else if ("ic_rolling_n" == name) {
         HKU_ASSERT(getParam<int>("ic_rolling_n") >= 1);
+    } else if ("mode" == name) {
+        auto mode = getParam<string>("mode");
+        HKU_ASSERT("MF_ICIRWeight" == mode || "MF_ICWeight" == mode || "MF_EqualWeight" == mode);
     }
 }
 

@@ -169,6 +169,16 @@ void export_Selector(py::module& m) {
           py::arg("topn") = 10);
     m.def(
       "SE_MultiFactor",
+      [](const py::sequence& inds, int topn, int ic_n, int ic_rolling_n, const py::object& ref_stk,
+         const string& mode) {
+          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
+          Stock c_ref_stk = ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>();
+          return SE_MultiFactor(c_inds, topn, ic_n, ic_rolling_n, c_ref_stk, mode);
+      },
+      py::arg("inds"), py::arg("topn") = 10, py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
+      py::arg("ref_stk") = py::none(), py::arg("mode") = "MF_ICIRWeight");
+    m.def(
+      "SE_MultiFactor",
       [](const py::sequence& inds, const py::sequence& stks, const KQuery& query, int topn,
          int ic_n, int ic_rolling_n, const py::object& ref_stk, const string& mode) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
