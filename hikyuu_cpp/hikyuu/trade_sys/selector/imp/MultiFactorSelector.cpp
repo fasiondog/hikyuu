@@ -156,22 +156,4 @@ SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, int topn = 10,
     return p;
 }
 
-SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, const StockList& stks,
-                                   const KQuery& query, int topn, int ic_n, int ic_rolling_n,
-                                   const Stock& ref_stk, const string& mode) {
-    Stock n_ref_stk = ref_stk.isNull() ? getStock("sh000300") : ref_stk;
-    MFPtr mf;
-    if ("MF_ICIRWeight" == mode) {
-        mf = MF_ICIRWeight(src_inds, stks, query, n_ref_stk, ic_n, ic_rolling_n);
-    } else if ("MF_ICWeight" == mode) {
-        mf = MF_ICWeight(src_inds, stks, query, n_ref_stk, ic_n, ic_rolling_n);
-    } else if ("MF_EqualWeight" == mode) {
-        mf = MF_EqualWeight(src_inds, stks, query, n_ref_stk, ic_n);
-    } else {
-        HKU_THROW("Invalid mode: {}", mode);
-    }
-
-    return make_shared<MultiFactorSelector>(mf, topn);
-}
-
 }  // namespace hku
