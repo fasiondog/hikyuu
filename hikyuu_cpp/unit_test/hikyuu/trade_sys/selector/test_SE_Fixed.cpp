@@ -7,6 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
+#include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
@@ -17,7 +18,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_Selector test_Selector
+ * @defgroup test_SE_Fixed test_SE_Fixed
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */
@@ -79,5 +80,45 @@ TEST_CASE("test_SE_Fixed") {
     CHECK_EQ(sm["sz000001"], result[1].sys->getStock());
     CHECK_EQ(sm["sz000002"], result[2].sys->getStock());
 }
+
+//-----------------------------------------------------------------------------
+// test export
+//-----------------------------------------------------------------------------
+#if HKU_SUPPORT_SERIALIZATION
+
+/** @par 检测点 */
+TEST_CASE("test_SE_Fixed_export") {
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/SE_FIXED.xml";
+
+    TMPtr tm = crtTM(Datetime(20010101), 100000);
+    SGPtr sg = SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10));
+    MMPtr mm = MM_FixedCount(100);
+    SYSPtr sys = SYS_Simple();
+    sys->setTM(tm);
+    sys->setSG(sg);
+    sys->setMM(mm);
+    StockList stkList;
+    stkList.push_back(sm["sh600000"]);
+    stkList.push_back(sm["sz000001"]);
+
+    SEPtr se1 = SE_Fixed(stkList, sys);
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(se1);
+    }
+
+    SEPtr se2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(se2);
+    }
+
+    CHECK_EQ(se1->name(), se2->name());
+}
+#endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 /** @} */

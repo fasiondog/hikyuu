@@ -26,6 +26,7 @@ public:
     virtual void _calculate() override;
 
     void setIndicators(const IndicatorList& inds) {
+        HKU_ASSERT(!inds.empty());
         m_inds = inds;
     }
 

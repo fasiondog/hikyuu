@@ -17,6 +17,7 @@ namespace hku {
 MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
     // 只选择发出买入信号的系统，此时选中的系统会变成资产平均分配，参考 AF 参数：ignore_zero_weight
     setParam<bool>("only_should_buy", false);
+    setParam<bool>("ignore_null", true);  // 是否忽略 MF 中 score 值为 nan 的证券
     setParam<int>("topn", 10);
     setParam<int>("ic_n", 5);
     setParam<int>("ic_rolling_n", 120);
@@ -29,6 +30,7 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
 : SelectorBase("SE_MultiFactor"), m_mf(mf) {
     HKU_CHECK(mf, "mf is null!");
     setParam<bool>("only_should_buy", false);
+    setParam<bool>("ignore_null", true);
     setParam<int>("topn", topn);
 
     setParam<int>("ic_n", mf->getParam<int>("ic_n"));
@@ -43,10 +45,7 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
 MultiFactorSelector::~MultiFactorSelector() {}
 
 void MultiFactorSelector::_checkParam(const string& name) const {
-    if ("topn" == name) {
-        int topn = getParam<int>("topn");
-        HKU_ASSERT(topn > 0);
-    } else if ("ic_n" == name) {
+    if ("ic_n" == name) {
         HKU_ASSERT(getParam<int>("ic_n") >= 1);
     } else if ("ic_rolling_n" == name) {
         HKU_ASSERT(getParam<int>("ic_rolling_n") >= 1);
@@ -79,8 +78,19 @@ bool MultiFactorSelector::isMatchAF(const AFPtr& af) {
 
 SystemWeightList MultiFactorSelector::getSelected(Datetime date) {
     SystemWeightList ret;
-    auto scores = m_mf->getScores(date, 0, getParam<int>("topn"),
-                                  [](const ScoreRecord& sc) { return !std::isnan(sc.value); });
+    int topn = getParam<int>("topn");
+    if (topn <= 0) {
+        topn = std::numeric_limits<int>::max();
+    }
+
+    ScoreRecordList scores;
+    if (getParam<bool>("ignore_null")) {
+        scores = m_mf->getScores(date, 0, getParam<int>("topn"),
+                                 [](const ScoreRecord& sc) { return !std::isnan(sc.value); });
+    } else {
+        scores = m_mf->getScores(date, 0, getParam<int>("topn"));
+    }
+
     if (getParam<bool>("only_should_buy")) {
         for (const auto& sc : scores) {
             auto sys = m_stk_sys_dict[sc.stock];
@@ -124,10 +134,10 @@ void MultiFactorSelector::_calculate() {
             HKU_THROW("Invalid mode: {}", mode);
         }
     } else {
+        m_mf->setQuery(query);
         m_mf->setRefIndicators(m_inds);
         m_mf->setRefStock(ref_stk);
         m_mf->setStockList(stks);
-        m_mf->setQuery(query);
         m_mf->setParam<int>("ic_n", ic_n);
         if (m_mf->haveParam("ic_rolling_n")) {
             m_mf->setParam<int>("ic_rolling_n", ic_rolling_n);
@@ -151,7 +161,7 @@ SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, int topn = 10,
     p->setParam<int>("topn", topn);
     p->setParam<int>("ic_n", ic_n);
     p->setParam<int>("ic_rolling_n", ic_rolling_n);
-    p->setParam<Stock>("ref_stock", ref_stk);
+    p->setParam<Stock>("ref_stk", ref_stk);
     p->setParam<string>("mode", mode);
     return p;
 }

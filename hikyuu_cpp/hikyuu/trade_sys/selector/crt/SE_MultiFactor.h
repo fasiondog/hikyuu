@@ -24,7 +24,7 @@ SelectorPtr HKU_API SE_MultiFactor(const MFPtr& mf, int topn = 10);
 /**
  * 基于 MultiFactor 选股算法
  * @param src_inds 原始因子公式
- * @param topn 只选取时间截面中前 topn 个系统
+ * @param topn 只选取时间截面中前 topn 个系统，小于等于0时代表不限制
  * @param ic_n ic 对应的 ic_n 日收益率
  * @param ic_rolling_n 计算滚动 IC （即 IC 的 n 日移动平均）周期
  * @param ref_stk 参照对比证券，未指定时，默认使用 sh000300 沪深300指数

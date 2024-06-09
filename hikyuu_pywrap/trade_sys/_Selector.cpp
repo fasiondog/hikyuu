@@ -187,8 +187,9 @@ void export_Selector(py::module& m) {
 
     - 参数直接创建:
       :param sequense(Indicator) inds: 原始因子列表
-      :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+      :param int topn: 只选取时间截面中前 topn 个系统，小于等于0时代表不限制
       :param int ic_n: 默认 IC 对应的 N 日收益率
       :param int ic_rolling_n: IC 滚动周期
+      :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
 }
