@@ -189,7 +189,7 @@ if is_plat("windows") then
         if is_mode("release") then
             add_requires("hdf5 " .. hdf5_version)
         else
-            add_requires("hdf5_D " .. hdf5_version)
+            add_requires("hdf5_d " .. hdf5_version)
         end
     end
     if get_config("mysql") then
