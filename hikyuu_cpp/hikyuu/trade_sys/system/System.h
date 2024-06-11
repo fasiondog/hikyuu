@@ -347,8 +347,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_pg);
         ar& BOOST_SERIALIZATION_NVP(m_sp);
 
-        // m_kdata中包含了stock和query的信息，不用保存m_stock
         ar& BOOST_SERIALIZATION_NVP(m_kdata);
+        ar& BOOST_SERIALIZATION_NVP(m_stock);
 
         ar& BOOST_SERIALIZATION_NVP(m_calculated);
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
@@ -381,9 +381,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_pg);
         ar& BOOST_SERIALIZATION_NVP(m_sp);
 
-        // m_kdata中包含了stock和query的信息，不用保存m_stock
         ar& BOOST_SERIALIZATION_NVP(m_kdata);
-        m_stock = m_kdata.getStock();
+        ar& BOOST_SERIALIZATION_NVP(m_stock);
 
         ar& BOOST_SERIALIZATION_NVP(m_calculated);
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);

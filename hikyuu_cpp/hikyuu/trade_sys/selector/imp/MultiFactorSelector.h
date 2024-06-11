@@ -25,7 +25,13 @@ public:
     virtual bool isMatchAF(const AFPtr& af) override;
     virtual void _calculate() override;
 
+    void setIndicators(const IndicatorList& inds) {
+        HKU_ASSERT(!inds.empty());
+        m_inds = inds;
+    }
+
 private:
+    IndicatorList m_inds;
     MFPtr m_mf;
     unordered_map<Stock, SYSPtr> m_stk_sys_dict;
 
@@ -37,6 +43,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase);
+        ar& BOOST_SERIALIZATION_NVP(m_inds);
         ar& BOOST_SERIALIZATION_NVP(m_mf);
     }
 #endif
