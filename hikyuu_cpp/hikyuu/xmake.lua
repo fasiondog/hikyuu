@@ -43,7 +43,7 @@ target("hikyuu")
             if is_mode("release") then
                 add_packages("hdf5")
             else
-                add_packages("hdf5_D")
+                add_packages("hdf5_d")
             end
         end
         if get_config("mysql") then
