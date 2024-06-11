@@ -105,6 +105,7 @@ add_rules("mode.debug", "mode.release")
 set_version("2.0.9", {build = "%Y%m%d%H%M"})
 
 if get_config("leak_check") then
+    -- 需要 export LD_PRELOAD=libasan.so
     set_policy("build.sanitizer.address", true)
     set_policy("build.sanitizer.leak", true)
     -- set_policy("build.sanitizer.memory", true)
@@ -139,7 +140,7 @@ end
 set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
-if is_plat("macosx") then
+if is_plat("macosx") or get_config("leak_check") then
     set_configvar("SUPPORT_SERIALIZATION", 0)
 else
     set_configvar("SUPPORT_SERIALIZATION", is_mode("release") and 1 or 0)
