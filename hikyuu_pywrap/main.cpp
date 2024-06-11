@@ -171,13 +171,4 @@ PYBIND11_MODULE(core, m) {
     :param int end: 结束日期
     :param Query.KType ktype: K 线类型, 'DAY'|'WEEK'|'MONTH'|'QUARTER'|'HALFYEAR'|'YEAR'|'MIN'|'MIN5'|'MIN15'|'MIN30'|'MIN60'
     :param Query.RecoverType recover_type: 复权类型)");
-
-    // 仅供导入历史财务数据时将其转成 cpp 的 blob 格式
-    m.def("cpp_bytes_to_vector_float_blob", [](const py::bytes& obj) {
-        vector<float> c_vector = python_bytes_to_vector<float>(obj);
-        std::ostringstream sout;
-        boost::archive::binary_oarchive oa(sout);
-        oa << BOOST_SERIALIZATION_NVP(c_vector);
-        return py::bytes(sout.str());
-    });
 }
