@@ -177,14 +177,21 @@ void export_Selector(py::module& m) {
 
         DEF_PICKLE(SEPtr);
 
-    m.def("SE_Fixed", py::overload_cast<>(SE_Fixed));
-    m.def("SE_Fixed", py::overload_cast<const StockList&, const SystemPtr&>(SE_Fixed),
-          R"(SE_Fixed([stk_list, sys])
+    m.def("SE_Fixed", [](double weight) { return SE_Fixed(weight); }, py::arg("weight") = 1.0);
+    m.def(
+      "SE_Fixed",
+      [](const py::sequence& pystks, const SystemPtr& sys, double weight) {
+          StockList stks = python_list_to_vector<Stock>(pystks);
+          return SE_Fixed(stks, sys, weight);
+      },
+      py::arg("stk_list"), py::arg("sys"), py::arg("weight") = 1.0,
+      R"(SE_Fixed([stk_list, sys])
 
     固定选择器，即始终选择初始划定的标的及其系统策略原型
 
     :param list stk_list: 初始划定的标的
     :param System sys: 系统策略原型
+    :param float weight: 默认权重
     :return: SE选择器实例)");
 
     m.def("SE_Signal", py::overload_cast<>(SE_Signal));
