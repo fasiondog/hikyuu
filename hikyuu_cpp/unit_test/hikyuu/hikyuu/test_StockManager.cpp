@@ -6,13 +6,11 @@
  */
 
 #include "doctest/doctest.h"
-#include <boost/filesystem.hpp>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/runtimeinfo.h>
 #include <hikyuu/Log.h>
 
 using namespace hku;
-using namespace boost::filesystem;
 
 /**
  * @defgroup test_hikyuu_StockManager test_hikyuu_StockManager
@@ -165,11 +163,8 @@ TEST_CASE("test_StockManager_getBlock") {
 TEST_CASE("test_StockManager_TempCsvStock") {
     StockManager& sm = StockManager::instance();
 
-    path tmp_dir(sm.tmpdir());
-    tmp_dir = tmp_dir.parent_path();
-
-    string day_filename(tmp_dir.string() + "/test_day_data.csv");
-    string min_filename(tmp_dir.string() + "/test_min_data.csv");
+    string day_filename(fmt::format("{}/test_day_data.csv", sm.datadir()));
+    string min_filename(fmt::format("{}/test_min_data.csv", sm.datadir()));
 
     /** @arg 增加临时增加返还的Stock的基本属性 */
     Stock stk = sm.addTempCsvStock("test", day_filename, min_filename);
