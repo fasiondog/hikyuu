@@ -15,6 +15,8 @@ namespace hku {
 
 SystemWeightList OperatorDivSelector::getSelected(Datetime date) {
     SystemWeightList ret;
+    HKU_IF_RETURN(!m_se1 || !m_se2, ret);
+
     SystemWeightList sws1, sws2;
     if (m_se1) {
         sws1 = m_se1->getSelected(date);
@@ -23,15 +25,7 @@ SystemWeightList OperatorDivSelector::getSelected(Datetime date) {
         sws2 = m_se2->getSelected(date);
     }
 
-    if (sws1.empty()) {
-        ret = std::move(sws2);
-        return ret;
-    }
-
-    if (sws2.empty()) {
-        ret = std::move(sws1);
-        return ret;
-    }
+    HKU_IF_RETURN(sws1.empty() || sws2.empty(), ret);
 
     unordered_map<System*, SystemWeight*> sw_dict1;
     for (auto& sw : sws1) {

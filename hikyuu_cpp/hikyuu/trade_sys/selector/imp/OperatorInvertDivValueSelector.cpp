@@ -19,7 +19,7 @@ SystemWeightList OperatorInvertDivValueSelector::getSelected(Datetime date) {
 
     ret = m_se->getSelected(date);
     for (auto& sw : ret) {
-        sw.weight += m_value;
+        sw.weight = m_value / sw.weight;
     }
 
     return ret;

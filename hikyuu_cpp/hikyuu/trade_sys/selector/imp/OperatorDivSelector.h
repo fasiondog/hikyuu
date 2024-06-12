@@ -12,7 +12,7 @@
 namespace hku {
 
 class HKU_API OperatorDivSelector : public OperatorSelector {
-    OPERATOR_SELECTOR_IMP(OperatorDivSelector, "SE_Add")
+    OPERATOR_SELECTOR_IMP(OperatorDivSelector, "SE_Div")
     OPERATOR_SELECTOR_SERIALIZATION
 };
 

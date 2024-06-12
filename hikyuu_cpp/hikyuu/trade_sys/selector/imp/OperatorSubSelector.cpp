@@ -24,7 +24,9 @@ SystemWeightList OperatorSubSelector::getSelected(Datetime date) {
     }
 
     if (sws1.empty()) {
-        ret = std::move(sws2);
+        for (const auto& sw : sws2) {
+            ret.emplace_back(SystemWeight(sw.sys, -sw.weight));
+        }
         return ret;
     }
 
