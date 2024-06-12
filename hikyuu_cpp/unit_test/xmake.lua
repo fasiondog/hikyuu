@@ -96,7 +96,7 @@ target("unit-test")
     end
 
     -- add files
-    add_files("**.cpp")
+    add_files("**.cpp|hikyuu/real_data/**")
 
     before_run(prepare_run)
     after_run(coverage_report)
@@ -142,6 +142,55 @@ target("small-test")
 
     -- add files
     add_files("./hikyuu/hikyuu/**.cpp");
+    add_files("./hikyuu/test_main.cpp")
+
+    before_run(prepare_run)
+    after_run(coverage_report)
+target_end()
+
+target("real-test")
+    set_kind("binary")
+    set_default(false)
+
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time", "log_level")
+
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
+    if get_config("mysql") then
+        if is_plat("macosx") then
+            add_packages("mysqlclient")
+        else
+            add_packages("mysql")
+        end
+    end
+
+    add_includedirs("..")
+
+    if is_plat("windows") then
+        add_cxflags("-wd4267", "-wd4996", "-wd4251", "-wd4244", "-wd4805", "-wd4566")
+    else
+        add_cxflags("-Wno-unused-variable",  "-Wno-missing-braces")
+        add_cxflags("-Wno-sign-compare")
+    end
+    
+    if is_plat("windows") and get_config("kind") == "shared" then
+        add_defines("HKU_API=__declspec(dllimport)")
+    end
+
+    add_defines("HKU_USE_REAL_DATA_TEST")
+    add_deps("hikyuu")
+
+    if is_plat("linux") or is_plat("macosx") then
+        add_links("sqlite3")
+        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
+    end
+
+    if is_plat("macosx") then
+        add_includedirs("/usr/local/opt/mysql-client/include")
+        add_linkdirs("/usr/local/opt/mysql-client/lib")
+    end
+
+    -- add files
+    add_files("./hikyuu/real_data/**.cpp");
     add_files("./hikyuu/test_main.cpp")
 
     before_run(prepare_run)

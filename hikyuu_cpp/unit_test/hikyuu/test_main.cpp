@@ -22,6 +22,16 @@
 #include <hikyuu/debug.h>
 using namespace hku;
 
+#ifdef HKU_USE_REAL_DATA_TEST
+void init_hikyuu_test() {
+    set_log_level(LOG_LEVEL::LOG_TRACE);
+    std::string config_file(fmt::format("{}/.hikyuu/hikyuu.ini", getUserDir()));
+    fmt::print("configure file: {}\n", config_file);
+    hikyuu_init(config_file);
+    StockManager& sm = StockManager::instance();
+    createDir(sm.tmpdir());
+}
+#else
 void init_hikyuu_test() {
     set_log_level(LOG_LEVEL::LOG_TRACE);
 
@@ -40,6 +50,7 @@ void init_hikyuu_test() {
     std::string tmp_dir(fmt::format("{}/tmp", current));
     createDir(tmp_dir);
 }
+#endif
 
 int main(int argc, char** argv) {
 #if defined(_WIN32)
