@@ -96,7 +96,7 @@ SelectorPtr SelectorBase::clone() {
     }
 
     p->m_pro_sys_list.reserve(m_pro_sys_list.size());
-    for (const auto& sys : m_real_sys_list) {
+    for (const auto& sys : m_pro_sys_list) {
         p->m_pro_sys_list.emplace_back(sys->clone());
     }
     return p;
