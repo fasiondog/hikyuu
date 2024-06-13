@@ -60,17 +60,7 @@ SystemWeightList OperatorAddSelector::getSelected(Datetime date) {
         }
     }
 
-    std::sort(ret.begin(), ret.end(), [](const SystemWeight& a, const SystemWeight& b) {
-        if (std::isnan(a.weight) && std::isnan(b.weight)) {
-            return false;
-        } else if (!std::isnan(a.weight) && std::isnan(b.weight)) {
-            return true;
-        } else if (std::isnan(a.weight) && !std::isnan(b.weight)) {
-            return false;
-        }
-        return a.weight > b.weight;
-    });
-
+    sortSystemWeightList(ret);
     return ret;
 }
 

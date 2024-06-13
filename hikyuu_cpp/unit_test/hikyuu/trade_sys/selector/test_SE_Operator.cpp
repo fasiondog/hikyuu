@@ -438,6 +438,41 @@ TEST_CASE("test_SE_Add") {
     CHECK_EQ(result[0].weight, 2.0);
     CHECK_EQ(result[1].weight, 2.0);
     CHECK_EQ(result[2].weight, 2.0);
+
+    /** 异构并集, 必须使用 addSystem 加入实际的系统实例 */
+    sys->reset();
+    auto sys1 = sys->clone();
+    sys1->setStock(sm["sh600000"]);
+    auto sys2 = sys->clone();
+    sys2->setStock(sm["sz000001"]);
+    auto sys3 = sys->clone();
+    sys3->setStock(sm["sz000002"]);
+
+    se1 = SE_Fixed(0.2);
+    se1->addSystem(sys1);
+    se1->addSystem(sys2);
+    CHECK_EQ(se1->getProtoSystemList().size(), 2);
+
+    se2 = SE_Fixed(0.3);
+    se2->addSystem(sys2);
+    se2->addSystem(sys3);
+    CHECK_EQ(se2->getProtoSystemList().size(), 2);
+
+    se = se1 + se2;
+    proto_sys_list = se->getProtoSystemList();
+    CHECK_EQ(proto_sys_list.size(), 3);
+    for (const auto& sys : proto_sys_list) {
+        se->bindRealToProto(sys, sys);
+    }
+    se->calculate(proto_sys_list, KQuery(-20));
+    result = se->getSelected(Datetime(200001010000L));
+    CHECK_EQ(result.size(), 3);
+    CHECK_EQ(sm["sz000001"], result[0].sys->getStock());
+    CHECK_EQ(sm["sz000002"], result[1].sys->getStock());
+    CHECK_EQ(sm["sh600000"], result[2].sys->getStock());
+    CHECK_EQ(result[0].weight, 0.5);
+    CHECK_EQ(result[1].weight, 0.3);
+    CHECK_EQ(result[2].weight, 0.2);
 }
 
 /** @par 检测点 */

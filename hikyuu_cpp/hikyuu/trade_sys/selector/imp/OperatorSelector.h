@@ -34,12 +34,18 @@ protected:
         m_real_to_proto[real] = proto;
     }
 
+    static void sortSystemWeightList(SystemWeightList& swlist);
+
 protected:
     SelectorPtr m_se1;
     SelectorPtr m_se2;
     std::unordered_set<SYSPtr> m_se1_set;  // se1 的原型系统实例集合
     std::unordered_set<SYSPtr> m_se2_set;  // se2 的原型系统实例集合
     std::unordered_map<SYSPtr, SYSPtr> m_real_to_proto;
+
+private:
+    static std::unordered_set<System*> findIntersection(const SelectorPtr& se1,
+                                                        const SelectorPtr& se2);
 
 private:
     //============================================
@@ -66,21 +72,7 @@ public:                                                           \
     virtual SystemWeightList getSelected(Datetime date) override; \
                                                                   \
     virtual SelectorPtr _clone() override {                       \
-        auto p = std::make_shared<classname>();                   \
-        if (m_se1) {                                              \
-            p->m_se1 = m_se1->clone();                            \
-            auto sys_list = p->m_se1->getProtoSystemList();       \
-            for (auto& sys : sys_list) {                          \
-                p->m_se1_set.insert(sys);                         \
-            }                                                     \
-        }                                                         \
-        if (m_se2) {                                              \
-            p->m_se2 = m_se2->clone();                            \
-            auto sys_list = p->m_se2->getProtoSystemList();       \
-            for (auto& sys : sys_list) {                          \
-                p->m_se2_set.insert(sys);                         \
-            }                                                     \
-        }                                                         \
+        auto p = std::make_shared<classname>(m_se1, m_se2);       \
         return p;                                                 \
     }
 

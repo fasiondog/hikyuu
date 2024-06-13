@@ -133,7 +133,6 @@ private:
     void initParam();
 
 protected:
-protected:
     string m_name;
     bool m_calculated{false};  // 是否已计算过
     bool m_proto_calculated{false};
