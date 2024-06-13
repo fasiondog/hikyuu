@@ -546,7 +546,7 @@ TEST_CASE("test_SE_Multi") {
     MMPtr mm = MM_FixedCount(100);
 
     SEPtr se1 = SE_Fixed();
-    SEPtr se2 = SE_Fixed();
+    SEPtr se2 = SE_Fixed(0.5);
     SEPtr se = se1 + se2;
 
     /** @arg 试图加入一个不存在的stock */
@@ -617,9 +617,9 @@ TEST_CASE("test_SE_Multi") {
     CHECK_EQ(sm["sh600000"], result[0].sys->getStock());
     CHECK_EQ(sm["sz000001"], result[1].sys->getStock());
     CHECK_EQ(sm["sz000002"], result[2].sys->getStock());
-    CHECK_EQ(result[0].weight, 1.0);
-    CHECK_EQ(result[1].weight, 1.0);
-    CHECK_EQ(result[2].weight, 1.0);
+    CHECK_EQ(result[0].weight, 0.5);
+    CHECK_EQ(result[1].weight, 0.5);
+    CHECK_EQ(result[2].weight, 0.5);
 }
 
 /** @par 检测点 */
@@ -631,7 +631,7 @@ TEST_CASE("test_SE_Div") {
     MMPtr mm = MM_FixedCount(100);
 
     SEPtr se1 = SE_Fixed();
-    SEPtr se2 = SE_Fixed();
+    SEPtr se2 = SE_Fixed(0.5);
     SEPtr se = se1 + se2;
 
     /** @arg 试图加入一个不存在的stock */
@@ -682,7 +682,7 @@ TEST_CASE("test_SE_Div") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 正常两个选择器相* */
+    /** @arg 正常两个选择器相除 */
     se = se1 / se2;
     CHECK_EQ(se->name(), "SE_Div");
     sys->setSG(sg);
@@ -702,9 +702,9 @@ TEST_CASE("test_SE_Div") {
     CHECK_EQ(sm["sh600000"], result[0].sys->getStock());
     CHECK_EQ(sm["sz000001"], result[1].sys->getStock());
     CHECK_EQ(sm["sz000002"], result[2].sys->getStock());
-    CHECK_EQ(result[0].weight, 1.0);
-    CHECK_EQ(result[1].weight, 1.0);
-    CHECK_EQ(result[2].weight, 1.0);
+    CHECK_EQ(result[0].weight, 2.0);
+    CHECK_EQ(result[1].weight, 2.0);
+    CHECK_EQ(result[2].weight, 2.0);
 }
 
 /** @} */
