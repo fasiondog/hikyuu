@@ -120,6 +120,7 @@ void OperatorSelector::_reset() {
             m_se2_set.insert(sys);
         }
     }
+    m_real_to_proto.clear();
 }
 
 bool OperatorSelector::isMatchAF(const AFPtr& af) {
@@ -140,25 +141,11 @@ void OperatorSelector::_addSystem(const SYSPtr& sys) {
 void OperatorSelector::_removeAll() {
     m_se1_set.clear();
     m_se2_set.clear();
+    m_real_to_proto.clear();
 }
 
 SelectorPtr OperatorSelector::_clone() {
-    auto p = make_shared<OperatorSelector>();
-    if (m_se1) {
-        p->m_se1 = m_se1->clone();
-        auto sys_list = p->m_se1->getProtoSystemList();
-        for (auto& sys : sys_list) {
-            p->m_se1_set.insert(sys);
-        }
-    }
-    if (m_se2) {
-        p->m_se2 = m_se2->clone();
-        auto sys_list = p->m_se2->getProtoSystemList();
-        for (auto& sys : sys_list) {
-            p->m_se2_set.insert(sys);
-        }
-    }
-    return p;
+    return make_shared<OperatorSelector>(name(), m_se1, m_se2);
 }
 
 void OperatorSelector::_calculate() {

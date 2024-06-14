@@ -79,8 +79,7 @@ public:                                                           \
     virtual SystemWeightList getSelected(Datetime date) override; \
                                                                   \
     virtual SelectorPtr _clone() override {                       \
-        auto p = std::make_shared<classname>(m_se1, m_se2);       \
-        return p;                                                 \
+        return std::make_shared<classname>(m_se1, m_se2);         \
     }
 
 #if HKU_SUPPORT_SERIALIZATION

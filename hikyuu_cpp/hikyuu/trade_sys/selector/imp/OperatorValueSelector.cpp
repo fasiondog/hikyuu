@@ -19,9 +19,8 @@ OperatorValueSelector::OperatorValueSelector(const string& name) : SelectorBase(
 
 OperatorValueSelector::OperatorValueSelector(const string& name, const SelectorPtr& se,
                                              double value)
-: SelectorBase(name), m_value(value) {
-    if (se) {
-        m_se = se->clone();
+: SelectorBase(name), m_se(se), m_value(value) {
+    if (m_se) {
         m_pro_sys_list = m_se->getProtoSystemList();
     }
 }
