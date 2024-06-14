@@ -34,6 +34,13 @@ protected:
         m_real_to_proto[real] = proto;
     }
 
+    SystemWeightList getUnionSelected(Datetime date,
+                                      const std::function<double(double, double)>&& func);
+
+    SystemWeightList getIntersectionSelected(Datetime date,
+                                             const std::function<double(double, double)>&& func);
+
+protected:
     static void sortSystemWeightList(SystemWeightList& swlist);
 
 protected:

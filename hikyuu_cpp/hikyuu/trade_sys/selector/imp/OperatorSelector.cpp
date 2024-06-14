@@ -180,4 +180,93 @@ void OperatorSelector::_calculate() {
     }
 }
 
+SystemWeightList OperatorSelector::getUnionSelected(
+  Datetime date, const std::function<double(double, double)>&& func) {
+    SystemWeightList ret;
+    SystemWeightList sws1, sws2;
+    if (m_se1) {
+        sws1 = m_se1->getSelected(date);
+    }
+    if (m_se2) {
+        sws2 = m_se2->getSelected(date);
+    }
+
+    if (sws1.empty()) {
+        for (const auto& sw : sws2) {
+            ret.emplace_back(SystemWeight(sw.sys, func(0, sw.weight)));
+        }
+        return ret;
+    }
+
+    if (sws2.empty()) {
+        ret = std::move(sws1);
+        return ret;
+    }
+
+    unordered_map<System*, SystemWeight*> sw_dict1;
+    for (auto& sw : sws1) {
+        sw_dict1[sw.sys.get()] = &sw;
+    }
+
+    SystemWeight tmp;
+    unordered_map<System*, SystemWeight*> sw_dict2;
+    unordered_map<System*, SystemWeight*>::iterator iter;
+    for (auto& sw : sws2) {
+        iter = sw_dict1.find(sw.sys.get());
+        tmp.sys = sw.sys;
+        if (iter != sw_dict1.end()) {
+            tmp.weight = std::isnan(sw.weight) ? sw.weight : func(iter->second->weight, sw.weight);
+        } else {
+            tmp.weight = func(0.0, sw.weight);
+        }
+        auto& back = ret.emplace_back(std::move(tmp));
+        sw_dict2[back.sys.get()] = &back;
+    }
+
+    for (auto& sw : sws1) {
+        iter = sw_dict2.find(sw.sys.get());
+        if (iter == sw_dict2.end()) {
+            ret.emplace_back(std::move(sw));
+        }
+    }
+
+    sortSystemWeightList(ret);
+    return ret;
+}
+
+SystemWeightList OperatorSelector::getIntersectionSelected(
+  Datetime date, const std::function<double(double, double)>&& func) {
+    SystemWeightList ret;
+    HKU_IF_RETURN(!m_se1 || !m_se2, ret);
+
+    SystemWeightList sws1, sws2;
+    if (m_se1) {
+        sws1 = m_se1->getSelected(date);
+    }
+    if (m_se2) {
+        sws2 = m_se2->getSelected(date);
+    }
+
+    HKU_IF_RETURN(sws1.empty() || sws2.empty(), ret);
+
+    unordered_map<System*, SystemWeight*> sw_dict1;
+    for (auto& sw : sws1) {
+        sw_dict1[sw.sys.get()] = &sw;
+    }
+
+    SystemWeight tmp;
+    unordered_map<System*, SystemWeight*>::iterator iter;
+    for (auto& sw : sws2) {
+        iter = sw_dict1.find(sw.sys.get());
+        if (iter != sw_dict1.end()) {
+            tmp.sys = sw.sys;
+            tmp.weight = func(iter->second->weight, sw.weight);
+            ret.emplace_back(std::move(tmp));
+        }
+    }
+
+    sortSystemWeightList(ret);
+    return ret;
+}
+
 }  // namespace hku
