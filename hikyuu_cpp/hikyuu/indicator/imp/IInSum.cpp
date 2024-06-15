@@ -64,8 +64,11 @@ static void insum_cum(const IndicatorList& inds, Indicator::value_t* dst, size_t
         if (value.empty()) {
             continue;
         }
-        HKU_CHECK(value.size() == len, "value len: {}, dst len: {}, stk: {}", value.size(), len,
-                  value.getContext().getStock().name());
+        if (value.size() != len) {
+            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}, stk: {}",
+                     value.getContext().getStock().name(), value.size(), len);
+            continue;
+        }
         const auto* data = value.data();
         for (size_t i = 0; i < len; i++) {
             if (!std::isnan(data[i])) {
@@ -85,8 +88,11 @@ static void insum_mean(const IndicatorList& inds, Indicator::value_t* dst, size_
         if (value.empty()) {
             continue;
         }
-        HKU_CHECK(value.size() == len, "value len: {}, dst len: {}, stk: {}", value.size(), len,
-                  value.getContext().getStock().name());
+        if (value.size() != len) {
+            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}, stk: {}",
+                     value.getContext().getStock().name(), value.size(), len);
+            continue;
+        }
         const auto* data = value.data();
         for (size_t i = 0; i < len; i++) {
             if (!std::isnan(data[i])) {
@@ -112,9 +118,11 @@ static void insum_max(const IndicatorList& inds, Indicator::value_t* dst, size_t
         if (value.empty()) {
             continue;
         }
-        HKU_CHECK(value.size() == len, "value len: {}, dst len: {}, stk: {}", value.size(), len,
-                  value.getContext().getStock().name());
-        HKU_ASSERT(value.size() == len);
+        if (value.size() != len) {
+            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}, stk: {}",
+                     value.getContext().getStock().name(), value.size(), len);
+            continue;
+        }
         const auto* data = value.data();
         for (size_t i = 0; i < len; i++) {
             if (!std::isnan(data[i])) {
