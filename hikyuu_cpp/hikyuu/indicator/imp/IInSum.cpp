@@ -61,7 +61,11 @@ static IndicatorList getAllIndicators(const Block& block, const KQuery& query,
 
 static void insum_cum(const IndicatorList& inds, Indicator::value_t* dst, size_t len) {
     for (const auto& value : inds) {
-        HKU_ASSERT(value.size() == len);
+        if (value.empty()) {
+            continue;
+        }
+        HKU_CHECK(value.size() == len, "value len: {}, dst len: {}, stk: {}", value.size(), len,
+                  value.getContext().getStock().name());
         const auto* data = value.data();
         for (size_t i = 0; i < len; i++) {
             if (!std::isnan(data[i])) {
@@ -78,7 +82,11 @@ static void insum_cum(const IndicatorList& inds, Indicator::value_t* dst, size_t
 static void insum_mean(const IndicatorList& inds, Indicator::value_t* dst, size_t len) {
     vector<size_t> count(len, 0);
     for (const auto& value : inds) {
-        HKU_ASSERT(value.size() == len);
+        if (value.empty()) {
+            continue;
+        }
+        HKU_CHECK(value.size() == len, "value len: {}, dst len: {}, stk: {}", value.size(), len,
+                  value.getContext().getStock().name());
         const auto* data = value.data();
         for (size_t i = 0; i < len; i++) {
             if (!std::isnan(data[i])) {
@@ -101,6 +109,11 @@ static void insum_mean(const IndicatorList& inds, Indicator::value_t* dst, size_
 
 static void insum_max(const IndicatorList& inds, Indicator::value_t* dst, size_t len) {
     for (const auto& value : inds) {
+        if (value.empty()) {
+            continue;
+        }
+        HKU_CHECK(value.size() == len, "value len: {}, dst len: {}, stk: {}", value.size(), len,
+                  value.getContext().getStock().name());
         HKU_ASSERT(value.size() == len);
         const auto* data = value.data();
         for (size_t i = 0; i < len; i++) {
