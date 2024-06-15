@@ -18,14 +18,6 @@ namespace hku {
  * @return Indicator
  */
 Indicator HKU_API BLOCKSETNUM(const Block& blk, const KQuery& query);
-
-/**
- * 横向统计（返回板块股个数）
- * @param category 板块分类
- * @param name 板块名称
- * @param query 统计范围
- * @return Indicator
- */
-Indicator HKU_API BLOCKSETNUM(const string& category, const string& name, const KQuery& query);
+Indicator HKU_API BLOCKSETNUM(const Block& blk);
 
 }  // namespace hku

@@ -84,18 +84,19 @@ void GlobalInitializer::clean() {
           getLatestVersion(), getLatestVersion());
     }
 
-#if !HKU_ENABLE_LEAK_DETECT && !defined(MSVC_LEAKER_DETECT)
-    // 未启用内存泄漏检测时，直接退出，让系统自行释放全部资源
-    fmt::print("Quit Hikyuu system!\n\n");
-    return;
-#endif
-
     releaseGlobalTaskGroup();
     releaseScheduler();
     releaseGlobalSpotAgent();
 
     IndicatorImp::releaseDynEngine();
+
+#if HKU_ENABLE_LEAK_DETECT || defined(MSVC_LEAKER_DETECT)
+    // 非内存泄漏检测时，内存让系统自动释放，避免某些场景下 windows 下退出速度过慢
     StockManager::quit();
+#else
+    fmt::print("Quit Hikyuu system!\n\n");
+#endif
+
     DataDriverFactory::release();
 
 #if HKU_ENABLE_HDF5_KDATA

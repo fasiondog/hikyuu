@@ -43,7 +43,9 @@ void IBlockSetNum::_calculate(const Indicator& ind) {
         dates = k.getDatetimeList();
     } else {
         KQuery q = getParam<KQuery>("query");
-        dates = StockManager::instance().getTradingCalendar(q, getParam<string>("market"));
+        if (q != KQuery(0, 0)) {
+            dates = StockManager::instance().getTradingCalendar(q, getParam<string>("market"));
+        }
     }
 
     size_t total = dates.size();
@@ -72,17 +74,13 @@ Indicator HKU_API BLOCKSETNUM(const Block& block, const KQuery& query) {
     IndicatorImpPtr p = make_shared<IBlockSetNum>();
     p->setParam<KQuery>("query", query);
     p->setParam<Block>("block", block);
-    if (query == Null<KQuery>()) {
-        p->setParam<bool>("ignore_context", true);
-    } else {
-        p->calculate();
-    }
+    p->setParam<bool>("ignore_context", false);
+    p->calculate();
     return Indicator(p);
 }
 
-Indicator HKU_API BLOCKSETNUM(const string& category, const string& name, const KQuery& query) {
-    Block block = StockManager::instance().getBlock(category, name);
-    return BLOCKSETNUM(block, query);
+Indicator HKU_API BLOCKSETNUM(const Block& block) {
+    return BLOCKSETNUM(block, KQuery(0, 0));
 }
 
 } /* namespace hku */
