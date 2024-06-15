@@ -760,7 +760,8 @@ def sys_performance(sys, ref_stk=None):
     ref_k = ref_stk.get_kdata(sys.query)
     hku_check(len(ref_k) > 0, "The length of ref_k is zero! Maybe The query date is out of the ref-stock range!\n ref_k: {}", ref_k)
 
-    query = Query(ref_k[0].datetime.start_of_day(), ref_k[-1].datetime.start_of_day() + Seconds(1), Query.DAY)
+    query = Query(ref_k[0].datetime.start_of_day(), ref_k[-1].datetime.start_of_day() +
+                  Seconds(1), Query.DAY, recover_type=Query.EQUAL_BACKWARD)
     ref_k = ref_stk.get_kdata(query)
 
     ref_dates = ref_k.get_datetime_list()
@@ -772,7 +773,7 @@ def sys_performance(sys, ref_stk=None):
     funds_return = VALUE(funds_return)
     funds_return.name = "系统累积收益率"
     ref_return = ROCR(ref_k.close, 0)
-    ref_return.name = ref_stk.name
+    ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"
 
     per = Performance()
     text = per.report(sys.tm, query.end_datetime)
