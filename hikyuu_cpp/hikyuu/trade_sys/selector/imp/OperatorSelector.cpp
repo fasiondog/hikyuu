@@ -49,20 +49,21 @@ OperatorSelector::OperatorSelector(const string& name) : SelectorBase(name) {}
 
 OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
                                    const SelectorPtr& se2)
-: SelectorBase(name) {
+: SelectorBase(name), m_se1(se1), m_se2(se2) {
     auto inter = findIntersection(se1, se2);
     if (se1 && se2) {
-        m_se1 = se1->clone();
-        m_se1->removeAll();
-        m_se2 = se2->clone();
-        m_se2->removeAll();
+        // m_se1 = se1->clone();
+        // m_se1->removeAll();
+        // m_se2 = se2->clone();
+        // m_se2->removeAll();
 
         std::map<System*, SYSPtr> tmpdict;
         const auto& raw_sys_list1 = se1->getProtoSystemList();
         for (const auto& sys : raw_sys_list1) {
-            auto tmpsys = sys->clone();
+            // auto tmpsys = sys->clone();
+            const auto& tmpsys = sys;
             m_pro_sys_list.emplace_back(tmpsys);
-            m_se1->addSystem(tmpsys);
+            // m_se1->addSystem(tmpsys);
             m_se1_set.insert(tmpsys);
             if (inter.find(sys.get()) != inter.end()) {
                 tmpdict[sys.get()] = tmpsys;
@@ -72,7 +73,8 @@ OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
         const auto& raw_sys_list2 = se2->getProtoSystemList();
         for (size_t i = 0, total = raw_sys_list2.size(); i < total; i++) {
             const auto& sys = raw_sys_list2[i];
-            auto tmpsys = sys->clone();
+            // auto tmpsys = sys->clone();
+            const auto& tmpsys = sys;
             auto iter = inter.find(sys.get());
             if (iter == inter.end()) {
                 m_pro_sys_list.emplace_back(tmpsys);
@@ -80,11 +82,11 @@ OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
             } else {
                 m_se2_set.insert(tmpdict[*iter]);
             }
-            m_se2->addSystem(tmpsys);
+            // m_se2->addSystem(tmpsys);
         }
 
     } else if (se1) {
-        m_se1 = se1->clone();
+        // m_se1 = se1->clone();
         auto sys_list = m_se1->getProtoSystemList();
         for (auto& sys : sys_list) {
             m_se1_set.insert(sys);
@@ -92,7 +94,7 @@ OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
         m_pro_sys_list = std::move(sys_list);
 
     } else if (se2) {
-        m_se2 = se2->clone();
+        // m_se2 = se2->clone();
         auto sys_list = m_se2->getProtoSystemList();
         for (auto& sys : sys_list) {
             m_se2_set.insert(sys);
@@ -145,7 +147,67 @@ void OperatorSelector::_removeAll() {
 }
 
 SelectorPtr OperatorSelector::_clone() {
-    return make_shared<OperatorSelector>(name(), m_se1, m_se2);
+    HKU_THROW("OperatorSelector Could't support clone!");
+#if 0    
+    // OperatorSelector 不支持 clone 操作
+    // 如果要实现 clone, 需要实现类似 indicator 一整套机制
+    // 需要寻找最底层的系统策略实例，并在生成 clone 对象后，对原上传该系统实例也需要用该clone对象
+    auto p = make_shared<OperatorSelector>();
+    p->cloneRebuild(m_se1, m_se2);
+    return p;
+#endif
+}
+
+void OperatorSelector::cloneRebuild(const SelectorPtr& se1, const SelectorPtr& se2) {
+    auto inter = findIntersection(se1, se2);
+    if (se1 && se2) {
+        m_se1 = se1->clone();
+        m_se1->removeAll();
+        m_se2 = se2->clone();
+        m_se2->removeAll();
+
+        std::map<System*, SYSPtr> tmpdict;
+        const auto& raw_sys_list1 = se1->getProtoSystemList();
+        for (const auto& sys : raw_sys_list1) {
+            auto tmpsys = sys->clone();
+            m_pro_sys_list.emplace_back(tmpsys);
+            m_se1->addSystem(tmpsys);
+            m_se1_set.insert(tmpsys);
+            if (inter.find(sys.get()) != inter.end()) {
+                tmpdict[sys.get()] = tmpsys;
+            }
+        }
+
+        const auto& raw_sys_list2 = se2->getProtoSystemList();
+        for (size_t i = 0, total = raw_sys_list2.size(); i < total; i++) {
+            const auto& sys = raw_sys_list2[i];
+            auto tmpsys = sys->clone();
+            auto iter = inter.find(sys.get());
+            if (iter == inter.end()) {
+                m_pro_sys_list.emplace_back(tmpsys);
+                m_se2_set.insert(tmpsys);
+            } else {
+                m_se2_set.insert(tmpdict[*iter]);
+            }
+            m_se2->addSystem(tmpsys);
+        }
+
+    } else if (se1) {
+        m_se1 = se1->clone();
+        auto sys_list = m_se1->getProtoSystemList();
+        for (auto& sys : sys_list) {
+            m_se1_set.insert(sys);
+        }
+        m_pro_sys_list = std::move(sys_list);
+
+    } else if (se2) {
+        m_se2 = se2->clone();
+        auto sys_list = m_se2->getProtoSystemList();
+        for (auto& sys : sys_list) {
+            m_se2_set.insert(sys);
+            m_pro_sys_list.emplace_back(std::move(sys));
+        }
+    }
 }
 
 void OperatorSelector::_calculate() {

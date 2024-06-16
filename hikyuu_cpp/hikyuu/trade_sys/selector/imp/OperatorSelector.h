@@ -43,6 +43,8 @@ protected:
 protected:
     static void sortSystemWeightList(SystemWeightList& swlist);
 
+    void cloneRebuild(const SelectorPtr& se1, const SelectorPtr& se2);
+
 protected:
     SelectorPtr m_se1;
     SelectorPtr m_se2;
@@ -79,7 +81,7 @@ public:                                                           \
     virtual SystemWeightList getSelected(Datetime date) override; \
                                                                   \
     virtual SelectorPtr _clone() override {                       \
-        return std::make_shared<classname>(m_se1, m_se2);         \
+        HKU_THROW("OperatorSelector Could't support clone!");     \
     }
 
 #if HKU_SUPPORT_SERIALIZATION

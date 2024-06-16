@@ -397,6 +397,7 @@ TEST_CASE("test_SE_Add") {
     CHECK_EQ(result[2].weight, 1.0);
 
     /** @arg 空指针 + 选择器 */
+    se1->removeAll();
     se = SEPtr() + se1;
     CHECK_EQ(se->name(), "SE_Add");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -416,6 +417,8 @@ TEST_CASE("test_SE_Add") {
     CHECK_EQ(result[2].weight, 1.0);
 
     /** @arg 正常两个选择器相加 */
+    se1->removeAll();
+    se2->removeAll();
     se = se1 + se2;
     CHECK_EQ(se->name(), "SE_Add");
     sys->setSG(sg);
@@ -473,6 +476,9 @@ TEST_CASE("test_SE_Add") {
     CHECK_EQ(result[0].weight, 0.5);
     CHECK_EQ(result[1].weight, 0.3);
     CHECK_EQ(result[2].weight, 0.2);
+
+    /** @arg 尝试 clone 操作 */
+    CHECK_THROWS(se->clone());
 }
 
 /** @par 检测点 */
@@ -529,6 +535,7 @@ TEST_CASE("test_SE_Sub") {
     CHECK_EQ(result[2].weight, 1.0);
 
     /** @arg 空指针 - 选择器 */
+    se1->removeAll();
     se = SEPtr() - se1;
     CHECK_EQ(se->name(), "SE_Sub");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -548,6 +555,8 @@ TEST_CASE("test_SE_Sub") {
     CHECK_EQ(result[2].weight, -1.0);
 
     /** @arg 正常两个选择器相- */
+    se1->removeAll();
+    se2->removeAll();
     se = se1 - se2;
     CHECK_EQ(se->name(), "SE_Sub");
     sys->setSG(sg);
@@ -570,6 +579,9 @@ TEST_CASE("test_SE_Sub") {
     CHECK_EQ(result[0].weight, 0.0);
     CHECK_EQ(result[1].weight, 0.0);
     CHECK_EQ(result[2].weight, 0.0);
+
+    /** @arg 尝试 clone 操作 */
+    CHECK_THROWS(se->clone());
 }
 
 /** @par 检测点 */
@@ -607,6 +619,7 @@ TEST_CASE("test_SE_Multi") {
     CHECK_UNARY(result.empty());
 
     /** @arg 选择器 * 空指针 */
+    se1->removeAll();
     se = se1 * SEPtr();
     CHECK_EQ(se->name(), "SE_Multi");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -620,6 +633,7 @@ TEST_CASE("test_SE_Multi") {
     CHECK_UNARY(result.empty());
 
     /** @arg 空指针 * 选择器 */
+    se1->removeAll();
     se = SEPtr() * se1;
     CHECK_EQ(se->name(), "SE_Multi");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -633,6 +647,8 @@ TEST_CASE("test_SE_Multi") {
     CHECK_UNARY(result.empty());
 
     /** @arg 正常两个选择器相* */
+    se1->removeAll();
+    se2->removeAll();
     se = se1 * se2;
     CHECK_EQ(se->name(), "SE_Multi");
     sys->setSG(sg);
@@ -655,6 +671,9 @@ TEST_CASE("test_SE_Multi") {
     CHECK_EQ(result[0].weight, 0.5);
     CHECK_EQ(result[1].weight, 0.5);
     CHECK_EQ(result[2].weight, 0.5);
+
+    /** @arg 尝试 clone 操作 */
+    CHECK_THROWS(se->clone());
 }
 
 /** @par 检测点 */
@@ -692,6 +711,7 @@ TEST_CASE("test_SE_Div") {
     CHECK_UNARY(result.empty());
 
     /** @arg 选择器 / 空指针 */
+    se1->removeAll();
     se = se1 / SEPtr();
     CHECK_EQ(se->name(), "SE_Div");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -705,6 +725,7 @@ TEST_CASE("test_SE_Div") {
     CHECK_UNARY(result.empty());
 
     /** @arg 空指针 / 选择器 */
+    se1->removeAll();
     se = SEPtr() / se1;
     CHECK_EQ(se->name(), "SE_Div");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -718,6 +739,8 @@ TEST_CASE("test_SE_Div") {
     CHECK_UNARY(result.empty());
 
     /** @arg 正常两个选择器相除 */
+    se1->removeAll();
+    se2->removeAll();
     se = se1 / se2;
     CHECK_EQ(se->name(), "SE_Div");
     sys->setSG(sg);
@@ -740,6 +763,9 @@ TEST_CASE("test_SE_Div") {
     CHECK_EQ(result[0].weight, 2.0);
     CHECK_EQ(result[1].weight, 2.0);
     CHECK_EQ(result[2].weight, 2.0);
+
+    /** @arg 尝试 clone 操作 */
+    CHECK_THROWS(se->clone());
 }
 
 /** @} */
