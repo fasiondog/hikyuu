@@ -1,6 +1,27 @@
 版本发布说明
 =======================
 
+2.1.0 - 2024年6月17日
+-------------------------
+
+fixed 北交所92号段历史财务信息导入
+fixed 对 etf 缩股的复权处理错误
+fixed INSUM，及 优化
+fixed getSystemPartName/getSystemPartEnum 缺失 PF
+fixed PF 处理立即买入/延迟卖出的系统
+fixed analysis 在 k 线无数据时报错
+fixed get_current_hub
+fixed 通达信本地数据导入时导入历史财务数据的进度通知消息
+优化 INSUM, BLOCKSETNUM 可直接输入 stock list, 可以忽略 query 参数
+优化 HikyuuTDX，避免目录不存在时导入
+优化 SE_MultiFactor 以更好的适应 PF
+优化 performance 绘图，参考标的累积收益率使用等比后复权计算
+优化退出
+非泄漏检测模式下直接退出，让系统释放资源
+优化泄漏检测工程；优化clang编译告警；优化shared_ptr创建
+清理 cppcheck 告警，删除多余语句
+
+
 2.0.9 - 2024年5月27日
 -------------------------
 
