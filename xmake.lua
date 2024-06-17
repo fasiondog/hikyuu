@@ -102,7 +102,7 @@ set_project("hikyuu")
 add_rules("mode.debug", "mode.release")
 
 -- version
-set_version("2.0.9", {build = "%Y%m%d%H%M"})
+set_version("2.1.0", {build = "%Y%m%d%H%M"})
 
 if get_config("leak_check") then
     -- 需要 export LD_PRELOAD=libasan.so
