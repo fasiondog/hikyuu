@@ -241,6 +241,26 @@ std::string HKU_API getUserDir() {
 #endif
 }
 
+std::string HKU_API getCurrentDir() {
+    std::string ret;
+    char* buffer = NULL;
+#if HKU_OS_WINSOWS
+    buffer = _getcwd(buffer, 0);
+#else
+    buffer = getcwd(buffer, 0);
+#endif
+
+    if (buffer) {
+#if HKU_OS_WINDOWS
+        ret = GBToUTF8(std::string(buffer));
+#else
+        ret = std::string(buffer);
+#endif
+        free(buffer);
+    }
+    return ret;
+}
+
 uint64_t HKU_API getDiskFreeSpace(const char* path) {
 #if HKU_OS_WINDOWS
     uint64_t freespace = Null<uint64_t>();

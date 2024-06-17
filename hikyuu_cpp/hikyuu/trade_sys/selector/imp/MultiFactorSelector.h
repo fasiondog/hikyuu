@@ -36,8 +36,8 @@ private:
     unordered_map<Stock, SYSPtr> m_stk_sys_dict;
 
     //============================================
-// 序列化支持
-//============================================
+    // 序列化支持
+    //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;
     template <class Archive>

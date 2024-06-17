@@ -144,6 +144,7 @@ void Portfolio::_readyForRun() {
     for (size_t i = 0; i < total; i++) {
         SystemPtr& pro_sys = pro_sys_list[i];
         SystemPtr sys = pro_sys->clone();
+        m_se->bindRealToProto(sys, pro_sys);
         m_real_sys_list.emplace_back(sys);
 
         // 为内部实际执行的系统创建初始资金为0的子账户
