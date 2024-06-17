@@ -13,47 +13,44 @@
 #error test program only for hdf5 engine! You must config --hdf5=y
 #endif
 
-#if __GNUC__ <= 8 || __clang_major__ <= 6
-#include <boost/filesystem.hpp>
-using namespace boost::filesystem;
-#else
-#include <filesystem>
-using namespace std::filesystem;
-#endif
-
 #if defined(_WIN32)
 #include <Windows.h>
 #endif
 
 #include <hikyuu/hikyuu.h>
+#include <hikyuu/utilities/os.h>
 #include <hikyuu/debug.h>
 using namespace hku;
 
+#ifdef HKU_USE_REAL_DATA_TEST
 void init_hikyuu_test() {
-    path current = current_path();
-    if (current.stem() == path("test")) {
-        current /= path("data");
-    } else {
-        current /= "test_data";
-    }
-
+    set_log_level(LOG_LEVEL::LOG_TRACE);
+    std::string config_file(fmt::format("{}/.hikyuu/hikyuu.ini", getUserDir()));
+    fmt::print("configure file: {}\n", config_file);
+    hikyuu_init(config_file);
+    StockManager& sm = StockManager::instance();
+    createDir(sm.tmpdir());
+}
+#else
+void init_hikyuu_test() {
     set_log_level(LOG_LEVEL::LOG_TRACE);
 
-    std::cout << "current path  : " << current << std::endl;
-#if defined(_MSC_VER)
-    std::cout << "configure file: " << current.string() << "\\hikyuu_win.ini" << std::endl;
-    hku::hikyuu_init(current.string() + "\\hikyuu_win.ini");
+    auto current = fmt::format("{}/test_data", getCurrentDir());
+    fmt::print("current path: {}\n", current);
+
+#if HKU_OS_WINDOWS
+    std::string config_file(fmt::format("{}\\hikyuu_win.ini", current));
 #else
-    std::cout << "configure file: " << current.string() << "/hikyuu_linux.ini" << std::endl;
-    hikyuu_init(current.string() + "/hikyuu_linux.ini");
+    std::string config_file(fmt::format("{}/hikyuu_linux.ini", current));
 #endif
 
-    path tmp_dir = current;
-    tmp_dir /= "tmp";
-    if (!exists(tmp_dir)) {
-        create_directory(tmp_dir);
-    }
+    fmt::print("configure file: {}\n", config_file);
+    hikyuu_init(config_file);
+
+    std::string tmp_dir(fmt::format("{}/tmp", current));
+    createDir(tmp_dir);
 }
+#endif
 
 int main(int argc, char** argv) {
 #if defined(_WIN32)
