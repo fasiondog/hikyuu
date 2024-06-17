@@ -20,7 +20,7 @@ std::unordered_set<System*> OperatorSelector::findIntersection(const SelectorPtr
         const auto& sys_list1 = se1->getProtoSystemList();
         const auto& sys_list2 = se2->getProtoSystemList();
         for (const auto& sys1 : sys_list1) {
-            for (const auto sys2 : sys_list2) {
+            for (const auto& sys2 : sys_list2) {
                 if (sys1 == sys2) {
                     ret.insert(sys1.get());
                 }
@@ -52,37 +52,26 @@ OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
 : SelectorBase(name), m_se1(se1), m_se2(se2) {
     auto inter = findIntersection(se1, se2);
     if (se1 && se2) {
-        // m_se1 = se1->clone();
-        // m_se1->removeAll();
-        // m_se2 = se2->clone();
-        // m_se2->removeAll();
-
         std::map<System*, SYSPtr> tmpdict;
         const auto& raw_sys_list1 = se1->getProtoSystemList();
         for (const auto& sys : raw_sys_list1) {
-            // auto tmpsys = sys->clone();
-            const auto& tmpsys = sys;
-            m_pro_sys_list.emplace_back(tmpsys);
-            // m_se1->addSystem(tmpsys);
-            m_se1_set.insert(tmpsys);
+            m_pro_sys_list.emplace_back(sys);
+            m_se1_set.insert(sys);
             if (inter.find(sys.get()) != inter.end()) {
-                tmpdict[sys.get()] = tmpsys;
+                tmpdict[sys.get()] = sys;
             }
         }
 
         const auto& raw_sys_list2 = se2->getProtoSystemList();
         for (size_t i = 0, total = raw_sys_list2.size(); i < total; i++) {
             const auto& sys = raw_sys_list2[i];
-            // auto tmpsys = sys->clone();
-            const auto& tmpsys = sys;
             auto iter = inter.find(sys.get());
             if (iter == inter.end()) {
-                m_pro_sys_list.emplace_back(tmpsys);
-                m_se2_set.insert(tmpsys);
+                m_pro_sys_list.emplace_back(sys);
+                m_se2_set.insert(sys);
             } else {
                 m_se2_set.insert(tmpdict[*iter]);
             }
-            // m_se2->addSystem(tmpsys);
         }
 
     } else if (se1) {
