@@ -37,9 +37,9 @@ price_t FixedPercentSlippage ::getRealSellPrice(const Datetime& datetime, price_
 void FixedPercentSlippage::_calculate() {}
 
 SlippagePtr HKU_API SP_FixedPercent(double p) {
-    FixedPercentSlippage* ptr = new FixedPercentSlippage;
+    SlippagePtr ptr = make_shared<FixedPercentSlippage>();
     ptr->setParam("p", p);
-    return SlippagePtr(ptr);
+    return ptr;
 }
 
 } /* namespace hku */

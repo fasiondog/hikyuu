@@ -30,8 +30,7 @@ double NotMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& st
 }
 
 MoneyManagerPtr HKU_API MM_Nothing() {
-    NotMoneyManager* p = new NotMoneyManager();
-    return MoneyManagerPtr(p);
+    return make_shared<NotMoneyManager>();
 }
 
 } /* namespace hku */

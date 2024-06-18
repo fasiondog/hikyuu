@@ -27,7 +27,6 @@ import re
 import akshare as ak
 import pandas as pd
 import datetime
-from hikyuu.core import cpp_bytes_to_vector_float_blob
 from hikyuu.util import *
 
 
@@ -203,7 +202,7 @@ def get_china_bond10_rate(start_date="19901219"):
 def modifiy_code(code):
     if code.startswith(('0', '3')):
         return 'SZ' + code
-    if code.startswith(('4', '8')):
+    if code.startswith(('4', '8', '92')):
         return 'BJ' + code
     if code.startswith('6'):
         return 'SH' + code
@@ -244,8 +243,6 @@ def historyfinancialreader(filepath):
         cw_info = list(struct.unpack(report_pack_format, info_data))
         report_date = int(cw_info[313])  # 财务公告日期
         report_date = 19000000 + report_date if report_date > 800000 else 20000000 + report_date
-        # results.append((modifiy_code(code), report_date, cw_info))
-        # results.append((file_date, modifiy_code(code), report_date, cpp_bytes_to_vector_float_blob(info_data)))
         results.append((file_date, modifiy_code(code), report_date, info_data))
     cw_file.close()
     return results

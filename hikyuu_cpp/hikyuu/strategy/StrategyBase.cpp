@@ -147,11 +147,27 @@ void StrategyBase::_run(bool forTest) {
     }
     HKU_WARN_IF(m_stock_list.empty(), "[Strategy {}] stock list is empty!", m_name);
 
-    // 非测试模式下加载上下文起始日期开始的KData
-    // 测试模式下不需要预加载，由测试灌入
+    // 借助 Stock.setKRecordList 方法进行预加载（同步方式，不需要异步加载）
+    // 只从 context 指定起始日期开始加载
     if (!forTest) {
-        // 只从 context 指定起始日期开始加载
-        _loadKData(m_context.startDatetime(), Null<Datetime>());
+        size_t ktype_count = ktype_list.size();
+        vector<KRecordList> k_buffer(ktype_count);
+        for (auto& stk : m_stock_list) {
+            // 保留原始 KDataDriver，因为使用 stock.setKRecordList 将会把 stock 的 KDataDriver
+            // 设置为 DoNothing
+            auto old_driver = stk.getKDataDirver();
+
+            for (size_t i = 0; i < ktype_count; i++) {
+                k_buffer[i] = std::move(stk.getKRecordList(
+                  KQueryByDate(m_context.startDatetime(), Null<Datetime>(), ktype_list[i])));
+            }
+            for (size_t i = 0; i < ktype_count; i++) {
+                stk.setKRecordList(std::move(k_buffer[i]), ktype_list[i]);
+            }
+
+            // 恢复 KDataDriver
+            stk.setKDataDriver(old_driver);
+        }
     }
 
     // 计算每个类型当前最后的日期
@@ -286,7 +302,7 @@ void StrategyBase::_addClockEvent(const string& enable, TimeDelta delta, TimeDel
     if (getParam<bool>(enable)) {
         int repeat = static_cast<int>((closeTime - openTime) / delta);
         scheduler->addFunc(Datetime::min(), Datetime::max(), openTime, closeTime, repeat, delta,
-                           [this, delta]() { [this, delta]() { this->onClock(delta); }; });
+                           [this, delta]() { this->onClock(delta); });
     }
 }
 

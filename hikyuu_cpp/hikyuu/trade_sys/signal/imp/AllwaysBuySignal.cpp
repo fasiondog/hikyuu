@@ -31,7 +31,7 @@ void AllwaysBuySignal::_calculate(const KData& kdata) {
 }
 
 SignalPtr HKU_API SG_AllwaysBuy() {
-    return SignalPtr(new AllwaysBuySignal);
+    return make_shared<AllwaysBuySignal>();
 }
 
 }  // namespace hku

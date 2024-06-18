@@ -13,7 +13,13 @@ BOOST_CLASS_EXPORT(hku::FixedSelector)
 
 namespace hku {
 
-FixedSelector::FixedSelector() : SelectorBase("SE_Fixed") {}
+FixedSelector::FixedSelector() : SelectorBase("SE_Fixed") {
+    setParam<double>("weight", 1.0);
+}
+
+FixedSelector::FixedSelector(double weight) : SelectorBase("SE_Fixed") {
+    setParam<double>("weight", weight);
+}
 
 FixedSelector::~FixedSelector() {}
 
@@ -22,21 +28,22 @@ bool FixedSelector::isMatchAF(const AFPtr& af) {
 }
 
 SystemWeightList FixedSelector::getSelected(Datetime date) {
+    auto weight = getParam<double>("weight");
     SystemWeightList result;
     for (auto& sys : m_real_sys_list) {
-        result.emplace_back(sys, 1.0);
+        result.emplace_back(sys, weight);
     }
     return result;
 }
 
 void FixedSelector::_calculate() {}
 
-SelectorPtr HKU_API SE_Fixed() {
-    return make_shared<FixedSelector>();
+SelectorPtr HKU_API SE_Fixed(double weight) {
+    return make_shared<FixedSelector>(weight);
 }
 
-SelectorPtr HKU_API SE_Fixed(const StockList& stock_list, const SystemPtr& sys) {
-    SelectorPtr p = make_shared<FixedSelector>();
+SelectorPtr HKU_API SE_Fixed(const StockList& stock_list, const SystemPtr& sys, double weight) {
+    SelectorPtr p = make_shared<FixedSelector>(weight);
     p->addStockList(stock_list, sys);
     return p;
 }

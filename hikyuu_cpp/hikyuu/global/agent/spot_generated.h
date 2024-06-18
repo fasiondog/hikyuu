@@ -8,9 +8,9 @@
 
 // Ensure the included flatbuffers.h is the same version as when this file was
 // generated, otherwise it may not be compatible.
-static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
-              FLATBUFFERS_VERSION_MINOR == 5 &&
-              FLATBUFFERS_VERSION_REVISION == 26,
+static_assert(FLATBUFFERS_VERSION_MAJOR == 24 &&
+              FLATBUFFERS_VERSION_MINOR == 3 &&
+              FLATBUFFERS_VERSION_REVISION == 25,
              "Non-compatible flatbuffers version included");
 
 namespace hikyuu {
@@ -18,49 +18,11 @@ namespace flat {
 
 struct Spot;
 struct SpotBuilder;
-struct SpotT;
 
 struct SpotList;
 struct SpotListBuilder;
-struct SpotListT;
-
-struct SpotT : public ::flatbuffers::NativeTable {
-  typedef Spot TableType;
-  std::string market{};
-  std::string code{};
-  std::string name{};
-  std::string datetime{};
-  double yesterday_close = 0.0;
-  double open = 0.0;
-  double high = 0.0;
-  double low = 0.0;
-  double close = 0.0;
-  double amount = 0.0;
-  double volume = 0.0;
-  double bid1 = 0.0;
-  double bid1_amount = 0.0;
-  double bid2 = 0.0;
-  double bid2_amount = 0.0;
-  double bid3 = 0.0;
-  double bid3_amount = 0.0;
-  double bid4 = 0.0;
-  double bid4_amount = 0.0;
-  double bid5 = 0.0;
-  double bid5_amount = 0.0;
-  double ask1 = 0.0;
-  double ask1_amount = 0.0;
-  double ask2 = 0.0;
-  double ask2_amount = 0.0;
-  double ask3 = 0.0;
-  double ask3_amount = 0.0;
-  double ask4 = 0.0;
-  double ask4_amount = 0.0;
-  double ask5 = 0.0;
-  double ask5_amount = 0.0;
-};
 
 struct Spot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef SpotT NativeTableType;
   typedef SpotBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_MARKET = 4,
@@ -227,9 +189,6 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<double>(verifier, VT_ASK5_AMOUNT, 8) &&
            verifier.EndTable();
   }
-  SpotT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(SpotT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static ::flatbuffers::Offset<Spot> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SpotT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct SpotBuilder {
@@ -480,19 +439,7 @@ inline ::flatbuffers::Offset<Spot> CreateSpotDirect(
       ask5_amount);
 }
 
-::flatbuffers::Offset<Spot> CreateSpot(::flatbuffers::FlatBufferBuilder &_fbb, const SpotT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-struct SpotListT : public ::flatbuffers::NativeTable {
-  typedef SpotList TableType;
-  std::vector<std::unique_ptr<hikyuu::flat::SpotT>> spot{};
-  SpotListT() = default;
-  SpotListT(const SpotListT &o);
-  SpotListT(SpotListT&&) FLATBUFFERS_NOEXCEPT = default;
-  SpotListT &operator=(SpotListT o) FLATBUFFERS_NOEXCEPT;
-};
-
 struct SpotList FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef SpotListT NativeTableType;
   typedef SpotListBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SPOT = 4
@@ -507,9 +454,6 @@ struct SpotList FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVectorOfTables(spot()) &&
            verifier.EndTable();
   }
-  SpotListT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(SpotListT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static ::flatbuffers::Offset<SpotList> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SpotListT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct SpotListBuilder {
@@ -547,160 +491,6 @@ inline ::flatbuffers::Offset<SpotList> CreateSpotListDirect(
       spot__);
 }
 
-::flatbuffers::Offset<SpotList> CreateSpotList(::flatbuffers::FlatBufferBuilder &_fbb, const SpotListT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-inline SpotT *Spot::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::unique_ptr<SpotT>(new SpotT());
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void Spot::UnPackTo(SpotT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = market(); if (_e) _o->market = _e->str(); }
-  { auto _e = code(); if (_e) _o->code = _e->str(); }
-  { auto _e = name(); if (_e) _o->name = _e->str(); }
-  { auto _e = datetime(); if (_e) _o->datetime = _e->str(); }
-  { auto _e = yesterday_close(); _o->yesterday_close = _e; }
-  { auto _e = open(); _o->open = _e; }
-  { auto _e = high(); _o->high = _e; }
-  { auto _e = low(); _o->low = _e; }
-  { auto _e = close(); _o->close = _e; }
-  { auto _e = amount(); _o->amount = _e; }
-  { auto _e = volume(); _o->volume = _e; }
-  { auto _e = bid1(); _o->bid1 = _e; }
-  { auto _e = bid1_amount(); _o->bid1_amount = _e; }
-  { auto _e = bid2(); _o->bid2 = _e; }
-  { auto _e = bid2_amount(); _o->bid2_amount = _e; }
-  { auto _e = bid3(); _o->bid3 = _e; }
-  { auto _e = bid3_amount(); _o->bid3_amount = _e; }
-  { auto _e = bid4(); _o->bid4 = _e; }
-  { auto _e = bid4_amount(); _o->bid4_amount = _e; }
-  { auto _e = bid5(); _o->bid5 = _e; }
-  { auto _e = bid5_amount(); _o->bid5_amount = _e; }
-  { auto _e = ask1(); _o->ask1 = _e; }
-  { auto _e = ask1_amount(); _o->ask1_amount = _e; }
-  { auto _e = ask2(); _o->ask2 = _e; }
-  { auto _e = ask2_amount(); _o->ask2_amount = _e; }
-  { auto _e = ask3(); _o->ask3 = _e; }
-  { auto _e = ask3_amount(); _o->ask3_amount = _e; }
-  { auto _e = ask4(); _o->ask4 = _e; }
-  { auto _e = ask4_amount(); _o->ask4_amount = _e; }
-  { auto _e = ask5(); _o->ask5 = _e; }
-  { auto _e = ask5_amount(); _o->ask5_amount = _e; }
-}
-
-inline ::flatbuffers::Offset<Spot> Spot::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SpotT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateSpot(_fbb, _o, _rehasher);
-}
-
-inline ::flatbuffers::Offset<Spot> CreateSpot(::flatbuffers::FlatBufferBuilder &_fbb, const SpotT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SpotT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _market = _o->market.empty() ? 0 : _fbb.CreateString(_o->market);
-  auto _code = _o->code.empty() ? 0 : _fbb.CreateString(_o->code);
-  auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
-  auto _datetime = _o->datetime.empty() ? 0 : _fbb.CreateString(_o->datetime);
-  auto _yesterday_close = _o->yesterday_close;
-  auto _open = _o->open;
-  auto _high = _o->high;
-  auto _low = _o->low;
-  auto _close = _o->close;
-  auto _amount = _o->amount;
-  auto _volume = _o->volume;
-  auto _bid1 = _o->bid1;
-  auto _bid1_amount = _o->bid1_amount;
-  auto _bid2 = _o->bid2;
-  auto _bid2_amount = _o->bid2_amount;
-  auto _bid3 = _o->bid3;
-  auto _bid3_amount = _o->bid3_amount;
-  auto _bid4 = _o->bid4;
-  auto _bid4_amount = _o->bid4_amount;
-  auto _bid5 = _o->bid5;
-  auto _bid5_amount = _o->bid5_amount;
-  auto _ask1 = _o->ask1;
-  auto _ask1_amount = _o->ask1_amount;
-  auto _ask2 = _o->ask2;
-  auto _ask2_amount = _o->ask2_amount;
-  auto _ask3 = _o->ask3;
-  auto _ask3_amount = _o->ask3_amount;
-  auto _ask4 = _o->ask4;
-  auto _ask4_amount = _o->ask4_amount;
-  auto _ask5 = _o->ask5;
-  auto _ask5_amount = _o->ask5_amount;
-  return hikyuu::flat::CreateSpot(
-      _fbb,
-      _market,
-      _code,
-      _name,
-      _datetime,
-      _yesterday_close,
-      _open,
-      _high,
-      _low,
-      _close,
-      _amount,
-      _volume,
-      _bid1,
-      _bid1_amount,
-      _bid2,
-      _bid2_amount,
-      _bid3,
-      _bid3_amount,
-      _bid4,
-      _bid4_amount,
-      _bid5,
-      _bid5_amount,
-      _ask1,
-      _ask1_amount,
-      _ask2,
-      _ask2_amount,
-      _ask3,
-      _ask3_amount,
-      _ask4,
-      _ask4_amount,
-      _ask5,
-      _ask5_amount);
-}
-
-inline SpotListT::SpotListT(const SpotListT &o) {
-  spot.reserve(o.spot.size());
-  for (const auto &spot_ : o.spot) { spot.emplace_back((spot_) ? new hikyuu::flat::SpotT(*spot_) : nullptr); }
-}
-
-inline SpotListT &SpotListT::operator=(SpotListT o) FLATBUFFERS_NOEXCEPT {
-  std::swap(spot, o.spot);
-  return *this;
-}
-
-inline SpotListT *SpotList::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::unique_ptr<SpotListT>(new SpotListT());
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void SpotList::UnPackTo(SpotListT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = spot(); if (_e) { _o->spot.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { if(_o->spot[_i]) { _e->Get(_i)->UnPackTo(_o->spot[_i].get(), _resolver); } else { _o->spot[_i] = std::unique_ptr<hikyuu::flat::SpotT>(_e->Get(_i)->UnPack(_resolver)); }; } } else { _o->spot.resize(0); } }
-}
-
-inline ::flatbuffers::Offset<SpotList> SpotList::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SpotListT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateSpotList(_fbb, _o, _rehasher);
-}
-
-inline ::flatbuffers::Offset<SpotList> CreateSpotList(::flatbuffers::FlatBufferBuilder &_fbb, const SpotListT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SpotListT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _spot = _o->spot.size() ? _fbb.CreateVector<::flatbuffers::Offset<hikyuu::flat::Spot>> (_o->spot.size(), [](size_t i, _VectorArgs *__va) { return CreateSpot(*__va->__fbb, __va->__o->spot[i].get(), __va->__rehasher); }, &_va ) : 0;
-  return hikyuu::flat::CreateSpotList(
-      _fbb,
-      _spot);
-}
-
 inline const hikyuu::flat::SpotList *GetSpotList(const void *buf) {
   return ::flatbuffers::GetRoot<hikyuu::flat::SpotList>(buf);
 }
@@ -729,18 +519,6 @@ inline void FinishSizePrefixedSpotListBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
     ::flatbuffers::Offset<hikyuu::flat::SpotList> root) {
   fbb.FinishSizePrefixed(root);
-}
-
-inline std::unique_ptr<hikyuu::flat::SpotListT> UnPackSpotList(
-    const void *buf,
-    const ::flatbuffers::resolver_function_t *res = nullptr) {
-  return std::unique_ptr<hikyuu::flat::SpotListT>(GetSpotList(buf)->UnPack(res));
-}
-
-inline std::unique_ptr<hikyuu::flat::SpotListT> UnPackSizePrefixedSpotList(
-    const void *buf,
-    const ::flatbuffers::resolver_function_t *res = nullptr) {
-  return std::unique_ptr<hikyuu::flat::SpotListT>(GetSizePrefixedSpotList(buf)->UnPack(res));
 }
 
 }  // namespace flat

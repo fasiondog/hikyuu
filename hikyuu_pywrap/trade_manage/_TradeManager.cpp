@@ -59,7 +59,7 @@ public:
         PYBIND11_OVERLOAD(bool, TradeManagerBase, have, stock);
     }
 
-    bool haveShort(const Stock& stock) const {
+    bool haveShort(const Stock& stock) const override {
         PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "have_short", haveShort, stock);
     }
 

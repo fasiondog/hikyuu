@@ -316,14 +316,12 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                     HKU_INFO_IF(trace, "[AF] Clean position sell: {}, recycle cash: {:<.2f}",
                                 sys->name(), sub_cash);
                 }
-            } else {
+            } else
                 // 清仓卖出失败情况，也加入到延迟卖出列表中，以便下一交易日可执行
-                PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
                 if (position.number > 0.0) {
                     delay_list.emplace_back(sys, position.number);
                     HKU_INFO_IF(trace, "[AF] Clean delay {}", sys->name());
                 }
-            }
         }
     }
 

@@ -52,9 +52,8 @@ void SelectorBase::paramChanged() {
 
 void SelectorBase::removeAll() {
     m_pro_sys_list.clear();
-    m_real_sys_list.clear();
-    m_calculated = false;
-    m_proto_calculated = false;
+    _removeAll();
+    reset();
 }
 
 void SelectorBase::reset() {
@@ -71,19 +70,7 @@ void SelectorBase::reset() {
 }
 
 SelectorPtr SelectorBase::clone() {
-    SelectorPtr p;
-    try {
-        p = _clone();
-    } catch (...) {
-        HKU_ERROR("Subclass _clone failed!");
-        p = SelectorPtr();
-    }
-
-    if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!");
-        return shared_from_this();
-    }
-
+    SelectorPtr p = _clone();
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_query = m_query;
@@ -97,7 +84,7 @@ SelectorPtr SelectorBase::clone() {
     }
 
     p->m_pro_sys_list.reserve(m_pro_sys_list.size());
-    for (const auto& sys : m_real_sys_list) {
+    for (const auto& sys : m_pro_sys_list) {
         p->m_pro_sys_list.emplace_back(sys->clone());
     }
     return p;
@@ -129,9 +116,32 @@ void SelectorBase::calculate_proto(const KQuery& query) {
     }
 }
 
+void SelectorBase::addSystem(const SYSPtr& sys) {
+    HKU_CHECK(sys, "The input sys is null!");
+    HKU_CHECK(sys->getMM(), "protoSys missing MoneyManager!");
+    HKU_CHECK(sys->getSG(), "protoSys missing Siganl!");
+    HKU_CHECK(!sys->getParam<bool>("shared_tm"), "Unsupport shared TM for sys!");
+    if (getParam<bool>("depend_on_proto_sys")) {
+        HKU_CHECK(sys->getTM(), "Scenarios that depend on prototype systems need to specify a TM!");
+    }
+
+    sys->reset();
+    _addSystem(sys);
+
+    m_pro_sys_list.emplace_back(sys);
+    m_calculated = false;
+    m_proto_calculated = false;
+}
+
+void SelectorBase::addSystemList(const SystemList& sysList) {
+    for (const auto& sys : sysList) {
+        addSystem(sys);
+    }
+}
+
 void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     HKU_CHECK(!stock.isNull(), "The input stock is null!");
-    HKU_CHECK(protoSys, "The input stock is null!");
+    HKU_CHECK(protoSys, "The input protoSys is null!");
     HKU_CHECK(protoSys->getMM(), "protoSys missing MoneyManager!");
     HKU_CHECK(protoSys->getSG(), "protoSys missing Siganl!");
     HKU_CHECK(!protoSys->getParam<bool>("shared_tm"), "Unsupport shared TM for protoSys!");
@@ -145,6 +155,7 @@ void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     SYSPtr sys = proto->clone();
     sys->reset();
     sys->setStock(stock);
+    _addSystem(sys);
     m_pro_sys_list.emplace_back(sys);
 
     m_calculated = false;

@@ -62,6 +62,20 @@ public:
     void addStockList(const StockList& stkList, const SystemPtr& protoSys);
 
     /**
+     * 直接加入已有系统策略示例
+     * @note 应该已经绑定 stock
+     * @param sys
+     */
+    void addSystem(const SYSPtr& sys);
+
+    /**
+     * 直接加入已有系统策略示例
+     * @note 应该已经绑定 stock
+     * @param sys
+     */
+    void addSystemList(const SystemList& sys);
+
+    /**
      * @brief 获取原型系统列表
      * @return const SystemList&
      */
@@ -101,8 +115,17 @@ public:
 
     virtual bool isMatchAF(const AFPtr& af) = 0;
 
+    /** 用于逻辑运算的子类中添加原型系统，一般不需要子类实现 */
+    virtual void _addSystem(const SYSPtr& sys) {}
+
+    /** 用于逻辑运算的子类中添加原型系统，一般不需要子类实现 */
+    virtual void _removeAll() {}
+
     /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
     void calculate(const SystemList& pf_realSysList, const KQuery& query);
+
+    /* 仅供PF调用，建立实际系统到原型系统映射 */
+    virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) {}
 
     void calculate_proto(const KQuery& query);
 
@@ -175,7 +198,7 @@ private:                                                       \
 #define SELECTOR_IMP(classname)                                   \
 public:                                                           \
     virtual SelectorPtr _clone() override {                       \
-        return SelectorPtr(new classname());                      \
+        return std::make_shared<classname>();                     \
     }                                                             \
     virtual SystemWeightList getSelected(Datetime date) override; \
     virtual bool isMatchAF(const AFPtr& af) override;             \

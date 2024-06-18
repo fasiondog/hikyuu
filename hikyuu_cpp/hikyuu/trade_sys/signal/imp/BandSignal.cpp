@@ -23,11 +23,11 @@ BandSignal::BandSignal(const Indicator& ind, price_t lower, price_t upper)
 BandSignal::~BandSignal() {}
 
 SignalPtr BandSignal::_clone() {
-    BandSignal* p = new BandSignal();
+    auto p = make_shared<BandSignal>();
     p->m_upper = m_upper;
     p->m_lower = m_lower;
     p->m_ind = m_ind.clone();
-    return SignalPtr(p);
+    return p;
 }
 
 void BandSignal::_calculate(const KData& kdata) {
@@ -47,7 +47,7 @@ void BandSignal::_calculate(const KData& kdata) {
 }
 
 SignalPtr HKU_API SG_Band(const Indicator& sig, price_t lower, price_t upper) {
-    return SignalPtr(new BandSignal(sig, lower, upper));
+    return make_shared<BandSignal>(sig, lower, upper);
 }
 
 }  // namespace hku

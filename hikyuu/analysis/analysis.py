@@ -109,11 +109,12 @@ def analysis_sys_list(stks, query, sys_proto, keys=["累计投入本金", "当�
         k = stk.get_kdata(query)
         my_sys = sys_proto.clone()
         my_sys.run(k, reset_all=True)
-        per.statistics(my_sys.tm, k[-1].datetime if len(k) > 0 else Datetime())
-        ret["证券代码"].append(stk.market_code)
-        ret["证券名称"].append(stk.name)
-        for key in keys:
-            ret[key].append(per[key])
+        if len(k) > 0:
+            per.statistics(my_sys.tm, k[-1].datetime)
+            ret["证券代码"].append(stk.market_code)
+            ret["证券名称"].append(stk.name)
+            for key in keys:
+                ret[key].append(per[key])
     return pd.DataFrame(ret)
 
 

@@ -18,7 +18,7 @@ public:
     using MultiFactorBase::MultiFactorBase;
     PyMultiFactor(const MultiFactorBase& base) : MultiFactorBase(base) {}
 
-    IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) {
+    IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) override {
         // PYBIND11_OVERLOAD_PURE_NAME(IndicatorList, MultiFactorBase, "_calculate", _calculate,
         //                             all_stk_inds);
         auto self = py::cast(this);

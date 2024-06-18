@@ -209,7 +209,7 @@ typedef shared_ptr<MoneyManagerBase> MMPtr;
 #define MONEY_MANAGER_IMP(classname)                                                          \
 public:                                                                                       \
     virtual MoneyManagerPtr _clone() override {                                               \
-        return MoneyManagerPtr(new classname());                                              \
+        return std::make_shared<classname>();                                                 \
     }                                                                                         \
     virtual double _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, \
                                  price_t risk, SystemPart from) override;

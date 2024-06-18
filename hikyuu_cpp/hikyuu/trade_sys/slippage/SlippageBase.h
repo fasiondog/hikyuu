@@ -129,7 +129,7 @@ private:                                                       \
 #define SLIPPAGE_IMP(classname)                                          \
 public:                                                                  \
     virtual SlippagePtr _clone() override {                              \
-        return SlippagePtr(new classname());                             \
+        return std::make_shared<classname>();                            \
     }                                                                    \
     virtual price_t getRealBuyPrice(const Datetime&, price_t) override;  \
     virtual price_t getRealSellPrice(const Datetime&, price_t) override; \

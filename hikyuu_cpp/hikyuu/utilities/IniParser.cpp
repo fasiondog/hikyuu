@@ -173,7 +173,7 @@ bool IniParser::hasOption(const std::string& section, const std::string& option)
  * @return 所有的section列表
  */
 IniParser::StringListPtr IniParser::getSectionList() const {
-    StringListPtr result(new std::list<std::string>);
+    StringListPtr result = std::make_shared<std::list<std::string>>();
     section_map_type::const_iterator iter = m_sections.begin();
     for (; iter != m_sections.end(); ++iter) {
         result->push_back(iter->first);
@@ -192,7 +192,7 @@ IniParser::StringListPtr IniParser::getOptionList(const std::string& section) co
         throw(std::invalid_argument("No section: " + section));
     }
 
-    StringListPtr result(new std::list<std::string>);
+    StringListPtr result = std::make_shared<std::list<std::string>>();
     item_map_type option_map = m_sections.find(section)->second;
     item_map_type::const_iterator iter = option_map.begin();
     for (; iter != option_map.end(); ++iter) {
