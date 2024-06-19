@@ -1849,6 +1849,7 @@ void export_Indicator_build_in(py::module& m) {
     :param int ix: 历史财务信息字段索引
     :param int name: 历史财务信息字段名称)");
 
+    m.def("BLOCKSETNUM", py::overload_cast<const Block&>(BLOCKSETNUM), py::arg("block"));
     m.def("BLOCKSETNUM", py::overload_cast<const Block&, const KQuery&>(BLOCKSETNUM),
           py::arg("block"), py::arg("query"), R"(BLOCKSETNUM(block, query)
     
@@ -1858,15 +1859,29 @@ void export_Indicator_build_in(py::module& m) {
     :param Query query: 统计范围)");
 
     m.def(
-      "BLOCKSETNUM", py::overload_cast<const string&, const string&, const KQuery&>(BLOCKSETNUM),
-      py::arg("category"), py::arg("name"), py::arg("query"), R"(BLOCKSETNUM(category, name, query)
+      "BLOCKSETNUM",
+      [](const py::sequence& stks) {
+          Block blk;
+          blk.add(python_list_to_vector<Stock>(stks));
+          return BLOCKSETNUM(blk);
+      },
+      py::arg("stks"));
+    m.def(
+      "BLOCKSETNUM",
+      [](const py::sequence& stks, const KQuery& query) {
+          Block blk;
+          blk.add(python_list_to_vector<Stock>(stks));
+          return BLOCKSETNUM(blk, query);
+      },
+      py::arg("stks"), py::arg("query"), R"(BLOCKSETNUM(block, query)
     
     横向统计（返回板块股个数）
 
-    :param str category: 板块类别
-    :param str name: 板块名称
-    :param query 统计范围)");
+    :param Sequence stks: stock list
+    :param Query query: 统计范围)");
 
+    m.def("INSUM", py::overload_cast<const Block&, const Indicator&, int>(INSUM), py::arg("block"),
+          py::arg("ind"), py::arg("mode"));
     m.def("INSUM", py::overload_cast<const Block&, const KQuery&, const Indicator&, int>(INSUM),
           py::arg("block"), py::arg("query"), py::arg("ind"), py::arg("mode"),
           R"(INSUM(block, query, ind, mode)
@@ -1881,14 +1896,25 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def(
       "INSUM",
-      py::overload_cast<const string&, const string&, const KQuery&, const Indicator&, int>(INSUM),
-      py::arg("category"), py::arg("name"), py::arg("query"), py::arg("ind"), py::arg("mode"),
-      R"(INSUM(category, name, ind, mode)
+      [](const py::sequence stks, const Indicator& ind, int mode) {
+          Block blk;
+          blk.add(python_list_to_vector<Stock>(stks));
+          return INSUM(blk, ind, mode);
+      },
+      py::arg("stks"), py::arg("ind"), py::arg("mode"));
+    m.def(
+      "INSUM",
+      [](const py::sequence stks, const KQuery& query, const Indicator& ind, int mode) {
+          Block blk;
+          blk.add(python_list_to_vector<Stock>(stks));
+          return INSUM(blk, query, ind, mode);
+      },
+      py::arg("stks"), py::arg("query"), py::arg("ind"), py::arg("mode"),
+      R"(INSUM(stks, query, ind, mode)
 
     返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
 
-    :param str category: 板块类别
-    :param str name: 板块名称
+    :param Sequence stks: stock list
     :param Query query: 指定范围
     :param Indicator ind: 指定指标
     :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.

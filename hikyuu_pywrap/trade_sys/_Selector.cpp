@@ -26,6 +26,14 @@ public:
         PYBIND11_OVERLOAD_PURE(void, SelectorBase, _calculate, );
     }
 
+    void _addSystem(const SystemPtr& sys) override {
+        PYBIND11_OVERLOAD(void, SelectorBase, _addSystem, sys);
+    }
+
+    void _removeAll() override {
+        PYBIND11_OVERLOAD(void, SelectorBase, _removeAll, );
+    }
+
     SystemWeightList getSelected(Datetime date) override {
         // PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected", getSelected,
         //                             date);
@@ -143,16 +151,47 @@ void export_Selector(py::module& m) {
     :return: 选取的系统实例列表
     :rtype: SystemList)")
 
+      .def("__add__",
+           [](const SelectorPtr& self, const SelectorPtr& other) { return self + other; })
+      .def("__add__", [](const SelectorPtr& self, double other) { return self + other; })
+      .def("__radd__", [](const SelectorPtr& self, double other) { return self + other; })
+
+      .def("__sub__",
+           [](const SelectorPtr& self, const SelectorPtr& other) { return self - other; })
+      .def("__sub__", [](const SelectorPtr& self, double other) { return self - other; })
+      .def("__rsub__", [](const SelectorPtr& self, double other) { return other - self; })
+
+      .def("__mul__",
+           [](const SelectorPtr& self, const SelectorPtr& other) { return self * other; })
+      .def("__mul__", [](const SelectorPtr& self, double other) { return self * other; })
+      .def("__rmul__", [](const SelectorPtr& self, double other) { return self * other; })
+
+      .def("__truediv__",
+           [](const SelectorPtr& self, const SelectorPtr& other) { return self / other; })
+      .def("__truediv__", [](const SelectorPtr& self, double other) { return self / other; })
+      .def("__rtruediv__", [](const SelectorPtr& self, double other) { return other / self; })
+
+      .def("__and__",
+           [](const SelectorPtr& self, const SelectorPtr& other) { return self & other; })
+      .def("__or__", [](const SelectorPtr& self, const SelectorPtr& other) { return self | other; })
+
         DEF_PICKLE(SEPtr);
 
-    m.def("SE_Fixed", py::overload_cast<>(SE_Fixed));
-    m.def("SE_Fixed", py::overload_cast<const StockList&, const SystemPtr&>(SE_Fixed),
-          R"(SE_Fixed([stk_list, sys])
+    m.def("SE_Fixed", [](double weight) { return SE_Fixed(weight); }, py::arg("weight") = 1.0);
+    m.def(
+      "SE_Fixed",
+      [](const py::sequence& pystks, const SystemPtr& sys, double weight) {
+          StockList stks = python_list_to_vector<Stock>(pystks);
+          return SE_Fixed(stks, sys, weight);
+      },
+      py::arg("stk_list"), py::arg("sys"), py::arg("weight") = 1.0,
+      R"(SE_Fixed([stk_list, sys])
 
     固定选择器，即始终选择初始划定的标的及其系统策略原型
 
     :param list stk_list: 初始划定的标的
     :param System sys: 系统策略原型
+    :param float weight: 默认权重
     :return: SE选择器实例)");
 
     m.def("SE_Signal", py::overload_cast<>(SE_Signal));
@@ -169,16 +208,14 @@ void export_Selector(py::module& m) {
           py::arg("topn") = 10);
     m.def(
       "SE_MultiFactor",
-      [](const py::sequence& inds, const py::sequence& stks, const KQuery& query, int topn,
-         int ic_n, int ic_rolling_n, const py::object& ref_stk, const string& mode) {
+      [](const py::sequence& inds, int topn, int ic_n, int ic_rolling_n, const py::object& ref_stk,
+         const string& mode) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
-          StockList c_stks = python_list_to_vector<Stock>(stks);
           Stock c_ref_stk = ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>();
-          return SE_MultiFactor(c_inds, c_stks, query, topn, ic_n, ic_rolling_n, c_ref_stk, mode);
+          return SE_MultiFactor(c_inds, topn, ic_n, ic_rolling_n, c_ref_stk, mode);
       },
-      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("topn") = 10, py::arg("ic_n") = 5,
-      py::arg("ic_rolling_n") = 120, py::arg("ref_stk") = py::none(),
-      py::arg("mode") = "MF_ICIRWeight",
+      py::arg("inds"), py::arg("topn") = 10, py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
+      py::arg("ref_stk") = py::none(), py::arg("mode") = "MF_ICIRWeight",
       R"(SE_MultiFactor
 
     创建基于多因子评分的选择器，两种创建方式
@@ -189,11 +226,9 @@ void export_Selector(py::module& m) {
 
     - 参数直接创建:
       :param sequense(Indicator) inds: 原始因子列表
-      :param sequense(stock) stks: 计算证券列表
-      :param Query query: 日期范围
-      :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+      :param int topn: 只选取时间截面中前 topn 个系统，小于等于0时代表不限制
       :param int ic_n: 默认 IC 对应的 N 日收益率
       :param int ic_rolling_n: IC 滚动周期
-      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
-      )");
+      :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
 }

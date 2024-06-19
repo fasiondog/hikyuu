@@ -174,9 +174,9 @@
 
         BLOCKSET(block, query)
         
-        BLOCKSET(category, name, query)
+        BLOCKSET(stks, query)
 
-    :param Block block: 待统计的板块
+    :param Block block | sequence stks: 待统计的板块 或 stock list
     :param Query query: 统计范围
 
 
@@ -538,9 +538,9 @@
     
         INSUM(block, query, ind, mode)
 
-        INSUM(category, name, query, ind, mode)
+        INSUM(stks, query, ind, mode)
 
-    :param Block block: 指定板块
+    :param Block block | sequence stks: 指定板块 或 证券列表
     :param Query query: 指定范围
     :param Indicator ind: 指定指标
     :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.

@@ -406,11 +406,12 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
     m_calculated = true;
 }
 
-void System::clearDelayRequest() {
+void System::clearDelayBuyRequest() {
     m_buyRequest.clear();
-    m_sellRequest.clear();
-    m_sellShortRequest.clear();
-    m_buyShortRequest.clear();
+}
+
+bool System::haveDelaySellRequest() const {
+    return m_sellRequest.valid;
 }
 
 TradeRecord System::runMoment(const Datetime& datetime) {
@@ -767,12 +768,16 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
 }
 
 TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part from) {
+    bool trace = getParam<bool>("trace");
     TradeRecord result;
     if (getParam<bool>("sell_delay")) {
         _submitSellRequest(today, src_today, from);
+        HKU_INFO_IF(trace, "[{}] will be delay to sell", name());
         return result;
     } else {
-        return _sellNow(today, src_today, from);
+        result = _sellNow(today, src_today, from);
+        HKU_INFO_IF(trace, "[{}] sell now: {}", name(), result);
+        return result;
     }
 }
 
@@ -817,6 +822,9 @@ TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Par
 }
 
 TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
+    bool trace = getParam<bool>("trace");
+    HKU_INFO_IF(trace, "[{}] process _sellDelay request", name());
+
     TradeRecord result;
     if (today.highPrice == today.lowPrice && !getParam<bool>("can_trade_when_high_eq_low")) {
         // 无法执行，保留卖出请求，继续延迟至下一时刻
@@ -1173,6 +1181,15 @@ TradeRecord System::_processRequest(const KRecord& today, const KRecord& src_tod
     HKU_IF_RETURN(m_sellShortRequest.valid, _sellShortDelay(today, src_today));
     HKU_IF_RETURN(m_buyShortRequest.valid, _buyShortDelay(today, src_today));
     return TradeRecord();
+}
+
+TradeRecord System::pfProcessDelaySellRequest(const Datetime& date) {
+    HKU_IF_RETURN(!m_sellRequest.valid, TradeRecord());
+    size_t pos = m_kdata.getPos(date);
+    HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
+    KRecord today = m_kdata.getKRecord(pos);
+    KRecord src_today = m_src_kdata.getKRecord(pos);
+    return _sellDelay(today, src_today);
 }
 
 price_t System::_getStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price) {

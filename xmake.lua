@@ -102,9 +102,10 @@ set_project("hikyuu")
 add_rules("mode.debug", "mode.release")
 
 -- version
-set_version("2.0.9", {build = "%Y%m%d%H%M"})
+set_version("2.1.0", {build = "%Y%m%d%H%M"})
 
 if get_config("leak_check") then
+    -- 需要 export LD_PRELOAD=libasan.so
     set_policy("build.sanitizer.address", true)
     set_policy("build.sanitizer.leak", true)
     -- set_policy("build.sanitizer.memory", true)
@@ -139,7 +140,7 @@ end
 set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
-if is_plat("macosx") then
+if is_plat("macosx") or get_config("leak_check") then
     set_configvar("SUPPORT_SERIALIZATION", 0)
 else
     set_configvar("SUPPORT_SERIALIZATION", is_mode("release") and 1 or 0)
@@ -171,12 +172,13 @@ if is_plat("windows") then
     end
 end
 
-local boost_version = "1.84.0"
+local boost_version = "1.85.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "10.2.1"
-local flatbuffers_version = "23.5.26"
+local flatbuffers_version = "24.3.25"
+local nng_version = "1.8.0"
 local cpp_httplib_version = "0.14.3"
-local sqlite_version = "3.43.0+200"
+local sqlite_version = "3.46.0+0"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
     mysql_version = "8.0.21" 
@@ -189,7 +191,7 @@ if is_plat("windows") then
         if is_mode("release") then
             add_requires("hdf5 " .. hdf5_version)
         else
-            add_requires("hdf5_D " .. hdf5_version)
+            add_requires("hdf5_d " .. hdf5_version)
         end
     end
     if get_config("mysql") then
@@ -220,7 +222,7 @@ add_requires("boost " .. boost_version, {
     shared = is_plat("windows"),
     multi = true,
     date_time = true,
-    filesystem = true,
+    filesystem = false,
     serialization = true,
     system = false,
     python = false,
@@ -231,7 +233,7 @@ add_requires("spdlog", {system = false, configs = {header_only = true, fmt_exter
 add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
 add_requires("sqlite3 " .. sqlite_version, {system = false, configs = {shared = true, cxflags = "-fPIC"}})
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false})
-add_requires("nng", {system = false, configs = {cxflags = "-fPIC"}})
+add_requires("nng " .. nng_version, {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib " .. cpp_httplib_version, {system = false, configs = {zlib = true, ssl = true}})
 add_requires("zlib", {system = false})

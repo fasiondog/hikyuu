@@ -74,6 +74,11 @@ bool HKU_API renameFile(const std::string& oldname, const std::string& newname,
 std::string HKU_API getUserDir();
 
 /**
+ * 获取程序当前所在路径
+ */
+std::string HKU_API getCurrentDir();
+
+/**
  * 输出终端是否支持彩色控制字符
  */
 bool HKU_API isColorTerminal() noexcept;
