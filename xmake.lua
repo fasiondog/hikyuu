@@ -173,7 +173,7 @@ if is_plat("windows") then
 end
 
 local boost_version = "1.85.0"
-local hdf5_version = "1.12.2"
+local hdf5_version = "1.13.3"
 local fmt_version = "10.2.1"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.8.0"
