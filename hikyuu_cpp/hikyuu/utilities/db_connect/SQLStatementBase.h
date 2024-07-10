@@ -21,7 +21,7 @@ namespace hku {
 class DBConnectBase;
 
 /** @ingroup DBConnect */
-typedef shared_ptr<DBConnectBase> DBConnectPtr;
+typedef std::shared_ptr<DBConnectBase> DBConnectPtr;
 
 /** @ingroup DBConnect */
 class null_blob_exception : public exception {
@@ -41,12 +41,12 @@ public:
      * @param driver 数据库连接
      * @param sql_statement SQL语句
      */
-    SQLStatementBase(DBConnectBase *driver, const string &sql_statement);
+    SQLStatementBase(DBConnectBase *driver, const std::string &sql_statement);
 
     virtual ~SQLStatementBase() = default;
 
     /** 获取构建时传入的表达式SQL语句 */
-    const string &getSqlString() const;
+    const std::string &getSqlString() const;
 
     /** 获取数据驱动 */
     DBConnectBase *getConnect() const;
@@ -163,7 +163,7 @@ protected:
 };
 
 /** @ingroup DBConnect */
-typedef shared_ptr<SQLStatementBase> SQLStatementPtr;
+typedef std::shared_ptr<SQLStatementBase> SQLStatementPtr;
 
 inline SQLStatementBase ::SQLStatementBase(DBConnectBase *driver, const std::string &sql_statement)
 : m_driver(driver), m_sql_string(sql_statement) {
@@ -277,7 +277,7 @@ inline void SQLStatementBase::getColumn(int idx, std::vector<char> &item) {
 template <typename T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementBase::getColumn(
   int idx, T &item) {
-    string tmp;
+    std::string tmp;
     try {
         sub_getColumnAsBlob(idx, tmp);
     } catch (null_blob_exception &) {

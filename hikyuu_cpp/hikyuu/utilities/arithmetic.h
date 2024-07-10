@@ -15,9 +15,9 @@
 #include <cctype>
 #include <vector>
 #include <string>
-#include <string_view>
 #include <algorithm>
 
+#include "string_view.h"
 #ifndef HKU_API
 #define HKU_API
 #endif
@@ -210,6 +210,7 @@ inline void trim(std::string& s) {
     s.erase(s.find_last_not_of("\n") + 1);
 }
 
+#if CPP_STANDARD >= CPP_STANDARD_17
 /**
  * 分割字符串
  * @param str 待封的字符串
@@ -226,9 +227,7 @@ inline std::vector<std::string_view> split(const std::string& str, char c) {
         pos = view.find_first_of(c, prepos);
     }
 
-    if (prepos < str.size() - 1) {
-        result.emplace_back(str.substr(prepos));
-    }
+    result.emplace_back(view.substr(prepos));
     return result;
 }
 
@@ -249,9 +248,7 @@ inline std::vector<std::string_view> split(const std::string_view& view, char c)
         pos = view.find_first_of(c, prepos);
     }
 
-    if (prepos < view.size() - 1) {
-        result.emplace_back(view.substr(prepos));
-    }
+    result.emplace_back(view.substr(prepos));
     return result;
 }
 
@@ -272,11 +269,52 @@ inline std::vector<std::string_view> split(const std::string_view& str,
         pos = str.find(split_str, prepos);
     }
 
+    result.emplace_back(str.substr(prepos));
+    return result;
+}
+
+#else
+/**
+ * 分割字符串
+ * @param str 待封的字符串
+ * @param c 分割符
+ */
+inline std::vector<std::string> split(const std::string &str, char c) {
+    std::vector<std::string> result;
+    size_t prepos = 0;
+    size_t pos = str.find_first_of(c);
+    while (pos != std::string::npos) {
+        result.emplace_back(str.substr(prepos, pos - prepos));
+        prepos = pos + 1;
+        pos = str.find_first_of(c, prepos);
+    }
+
+    result.emplace_back(str.substr(prepos));
+    return result;
+}
+
+inline std::vector<std::string> split(const std::string &str, const std::string &split_str) {
+    std::vector<std::string> result;
+    size_t split_str_len = split_str.size();
+    if (split_str_len == 0) {
+        result.emplace_back(str);
+        return result;
+    }
+
+    size_t prepos = 0;
+    size_t pos = str.find(split_str);
+    while (pos != std::string::npos) {
+        result.emplace_back(str.substr(prepos, pos - prepos));
+        prepos = pos + split_str_len;
+        pos = str.find(split_str, prepos);
+    }
+
     if (prepos < str.size() - 1) {
         result.emplace_back(str.substr(prepos));
     }
     return result;
 }
+#endif /* #if CPP_STANDARD >= CPP_STANDARD_17 */
 
 /**
  * byte 转 16 进制字符串, 如 "abcd" 转换为 "61626364"

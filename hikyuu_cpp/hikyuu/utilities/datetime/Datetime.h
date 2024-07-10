@@ -408,6 +408,11 @@ public:
         return d.ticks();  // or use boost::hash_combine
     }
 };
+
+inline string to_string(const hku::Datetime &date) {
+    return date.str();
+}
+
 }  // namespace std
 
 #if FMT_VERSION >= 90000

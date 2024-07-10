@@ -6,7 +6,6 @@
  */
 
 #include "DBUpgrade.h"
-#include "../../debug.h"
 
 namespace hku {
 
@@ -14,8 +13,8 @@ namespace hku {
  * 升级和创建数据库
  */
 void HKU_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
-                       const std::vector<string> &upgrade_scripts, int start_version,
-                       const char *create_script) {
+                             const std::vector<std::string> &upgrade_scripts, int start_version,
+                             const char *create_script) {
     HKU_TRACE("check {} database version ...", module_name);
 
     // 如果模块版本表不存在，则创建该表
@@ -75,7 +74,7 @@ void HKU_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
     // 当前版本已经大于等于待升至的版本，无需升级，直接返回
     if (version >= to_version) {
         HKU_TRACE("current version({}) greater the upgrade version({}), ignored!", version,
-                 to_version);
+                  to_version);
         return;
     }
 

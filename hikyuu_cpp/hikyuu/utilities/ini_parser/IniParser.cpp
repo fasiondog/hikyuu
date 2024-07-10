@@ -9,7 +9,7 @@
 #include <sstream>
 #include <fstream>
 
-#include "arithmetic.h"
+#include "../arithmetic.h"
 #include "IniParser.h"
 
 namespace hku {

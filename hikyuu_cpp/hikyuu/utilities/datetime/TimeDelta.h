@@ -58,6 +58,9 @@ public:
     /** 通过 boost::posix_time::time_duration 构造 */
     explicit TimeDelta(bt::time_duration td);
 
+    /** 从字符串构造，格式：-1 days, hh:mm:ss.000000) */
+    explicit TimeDelta(const std::string& delta);
+
     /** 赋值构造函数 */
     TimeDelta(const TimeDelta&) = default;
 
@@ -311,6 +314,14 @@ TimeDelta HKU_API Milliseconds(int64_t milliseconds);
 TimeDelta Microseconds(int64_t microsecs);
 inline TimeDelta Microseconds(int64_t microsecs) {
     return TimeDelta::fromTicks(microsecs);
+}
+
+} /* namespace hku */
+
+namespace std {
+
+inline string to_string(const hku::TimeDelta &delta) {
+    return delta.str();
 }
 
 } /* namespace hku */

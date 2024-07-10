@@ -158,11 +158,11 @@ int64_t MySQLConnect::exec(const std::string& sql_string) {
     return affect_rows;
 }
 
-SQLStatementPtr MySQLConnect::getStatement(const string& sql_statement) {
-    return make_shared<MySQLStatement>(this, sql_statement);
+SQLStatementPtr MySQLConnect::getStatement(const std::string& sql_statement) {
+    return std::make_shared<MySQLStatement>(this, sql_statement);
 }
 
-bool MySQLConnect::tableExist(const string& tablename) {
+bool MySQLConnect::tableExist(const std::string& tablename) {
     bool result = false;
     try {
         SQLStatementPtr st = getStatement(fmt::format("SELECT 1 FROM {} LIMIT 1;", tablename));

@@ -23,6 +23,10 @@ HKU_API std::ostream& operator<<(std::ostream& out, const Datetime& d) {
 }
 
 Datetime Datetime::fromHex(uint64_t time) {
+    if (Null<unsigned long long>() == time) {
+        return Datetime();
+    }
+
     uint64_t second = 0xFFULL & time;
     uint64_t minute = (0xFF00ULL & time) >> 8;
     uint64_t hour = (0xFF0000ULL & time) >> 16;

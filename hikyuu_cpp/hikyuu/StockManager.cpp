@@ -15,8 +15,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "utilities/IniParser.h"
-#include "utilities/thread/ThreadPool.h"
+#include "hikyuu/utilities/ini_parser/IniParser.h"
+#include "hikyuu/utilities/thread/ThreadPool.h"
 #include "StockManager.h"
 #include "global/GlobalTaskGroup.h"
 #include "global/schedule/inner_tasks.h"

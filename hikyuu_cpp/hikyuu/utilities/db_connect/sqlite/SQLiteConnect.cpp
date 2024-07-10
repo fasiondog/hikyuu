@@ -23,7 +23,7 @@ static int sqlite_busy_call_back(void *ptr, int count) {
 
 SQLiteConnect::SQLiteConnect(const Parameter &param) : DBConnectBase(param), m_db(nullptr) {
     try {
-        m_dbname = getParam<string>("db");
+        m_dbname = getParam<std::string>("db");
         int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
         // 多线程模式下，不同数据库连接不能使用 SQLITE_OPEN_SHAREDCACHE
         // 将导致 table is locked!
@@ -134,7 +134,7 @@ SQLStatementPtr SQLiteConnect::getStatement(const std::string &sql_statement) {
     return std::make_shared<SQLiteStatement>(this, sql_statement);
 }
 
-bool SQLiteConnect::tableExist(const string &tablename) {
+bool SQLiteConnect::tableExist(const std::string &tablename) {
     SQLStatementPtr st =
       getStatement(fmt::format("select count(1) from sqlite_master where name='{}'", tablename));
     st->exec();

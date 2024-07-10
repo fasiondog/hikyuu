@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/utilities/SpendTimer.h"
 #include "hikyuu/utilities/os.h"
 #include "SQLiteUtil.h"
 

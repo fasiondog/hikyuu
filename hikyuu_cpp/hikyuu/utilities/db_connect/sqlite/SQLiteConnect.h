@@ -78,11 +78,11 @@ private:
 
 private:
     friend class SQLiteStatement;
-    string m_dbname;
+    std::string m_dbname;
     sqlite3 *m_db;
 };
 
-typedef shared_ptr<SQLiteConnect> SQLiteConnectPtr;
+typedef std::shared_ptr<SQLiteConnect> SQLiteConnectPtr;
 
 }  // namespace hku
 
