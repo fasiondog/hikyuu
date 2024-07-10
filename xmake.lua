@@ -232,7 +232,15 @@ add_requires("boost " .. boost_version, {
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
 add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
 add_requires("sqlite3 " .. sqlite_version, {system = false, configs = {shared = true, cxflags = "-fPIC"}})
-add_requires("flatbuffers v" .. flatbuffers_version, {system = false})
+if is_plat("windows") then
+    if is_mode("release") then
+        add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs={runtimes="MD"}})
+    else
+        add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs={runtimes="MDd"}})
+    end
+else
+    add_requires("flatbuffers v" .. flatbuffers_version, {system = false})
+end
 add_requires("nng " .. nng_version, {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib " .. cpp_httplib_version, {system = false, configs = {zlib = true, ssl = true}})
