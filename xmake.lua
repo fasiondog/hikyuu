@@ -290,6 +290,7 @@ end
 -- --   add_defines("HKU_ENABLE_SSE2", "HKU_ENABLE_SSE3", "HKU_ENABLE_SSE41", "HKU_ENABLE_AVX", "HKU_ENABLE_AVX2")
 -- end
 
+includes("./copy_dependents.lua")
 includes("./hikyuu_cpp/hikyuu")
 includes("./hikyuu_pywrap")
 includes("./hikyuu_cpp/unit_test")
