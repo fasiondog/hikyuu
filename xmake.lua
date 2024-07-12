@@ -220,6 +220,7 @@ add_requires("boost " .. boost_version, {
   debug = is_mode("debug"),
   configs = {
     shared = is_plat("windows"),
+    runtimes = get_config("runtimes"),
     multi = true,
     date_time = true,
     filesystem = false,
@@ -229,18 +230,11 @@ add_requires("boost " .. boost_version, {
   },
 })
 
+add_requires("fmt " .. fmt_version, {system = false})
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
-add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
+add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, system = false})
 add_requires("sqlite3 " .. sqlite_version, {system = false, configs = {shared = true, cxflags = "-fPIC"}})
-if is_plat("windows") then
-    if is_mode("release") then
-        add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs={runtimes="MD"}})
-    else
-        add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs={runtimes="MDd"}})
-    end
-else
-    add_requires("flatbuffers v" .. flatbuffers_version, {system = false})
-end
+add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {runtimes = get_config("runtimes")}})
 add_requires("nng " .. nng_version, {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib " .. cpp_httplib_version, {system = false, configs = {zlib = true, ssl = true}})
