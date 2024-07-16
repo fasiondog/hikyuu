@@ -10,7 +10,7 @@
 #include <cstdint>
 #include "TimeDelta.h"
 #include "hikyuu/utilities/arithmetic.h"
-#include "hikyuu/Log.h"
+#include "hikyuu/utilities/Log.h"
 
 namespace hku {
 

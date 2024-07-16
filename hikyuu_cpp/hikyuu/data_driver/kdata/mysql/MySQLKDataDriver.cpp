@@ -6,7 +6,7 @@
  */
 
 #include <boost/lexical_cast.hpp>
-#include "../../../Log.h"
+#include "hikyuu/utilities/Log.h"
 #include "MySQLKDataDriver.h"
 #include "KRecordTable.h"
 

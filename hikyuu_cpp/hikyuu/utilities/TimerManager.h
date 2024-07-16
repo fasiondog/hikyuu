@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <functional>
 #include "hikyuu/utilities/datetime/Datetime.h"
-#include "hikyuu/Log.h"
+#include "hikyuu/utilities/Log.h"
 #include "thread/ThreadPool.h"
 #include "cppdef.h"
 

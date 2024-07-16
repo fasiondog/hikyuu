@@ -13,7 +13,7 @@
 #define NOMINMAX
 #endif
 
-#include "config.h"
+#include "../config.h"
 #include "exception.h"
 
 // clang-format off

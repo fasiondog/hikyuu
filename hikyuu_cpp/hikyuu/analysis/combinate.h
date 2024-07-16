@@ -10,7 +10,7 @@
 #include "hikyuu/indicator/Indicator.h"
 #include "hikyuu/trade_sys/system/System.h"
 #include "hikyuu/trade_manage/Performance.h"
-#include "../Log.h"
+#include "hikyuu/utilities/Log.h"
 
 namespace hku {
 

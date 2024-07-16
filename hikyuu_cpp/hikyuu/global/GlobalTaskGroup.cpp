@@ -8,8 +8,8 @@
  */
 
 #include "hikyuu/GlobalInitializer.h"
+#include "hikyuu/utilities/Log.h"
 #include "GlobalTaskGroup.h"
-#include "../Log.h"
 
 namespace hku {
 

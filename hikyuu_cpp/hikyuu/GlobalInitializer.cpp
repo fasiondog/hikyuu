@@ -20,7 +20,7 @@
 #include <H5public.h>
 #endif
 
-#include "Log.h"
+#include "utilities/Log.h"
 #include "hikyuu.h"
 #include "GlobalInitializer.h"
 #include "StockManager.h"

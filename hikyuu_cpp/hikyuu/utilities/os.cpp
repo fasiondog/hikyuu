@@ -33,7 +33,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include "arithmetic.h"
-#include "hikyuu/Log.h"
+#include "Log.h"
 #include "os.h"
 
 #ifdef _MSC_VER

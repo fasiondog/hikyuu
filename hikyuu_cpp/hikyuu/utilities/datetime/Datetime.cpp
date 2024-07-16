@@ -11,7 +11,7 @@
 
 #include <fmt/format.h>
 #include "hikyuu/utilities/Null.h"
-#include "hikyuu/Log.h"
+#include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/arithmetic.h"
 #include "Datetime.h"
 

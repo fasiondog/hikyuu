@@ -9,7 +9,7 @@
 
 #include <iterator>
 #include "hikyuu/utilities/arithmetic.h"
-#include "hikyuu/Log.h"
+#include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/osdef.h"
 #include "DBConnectBase.h"
 

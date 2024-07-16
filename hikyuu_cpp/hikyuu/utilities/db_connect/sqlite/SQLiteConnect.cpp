@@ -9,7 +9,7 @@
 
 #include <thread>
 #include "../../../config.h"
-#include "../../../Log.h"
+#include "hikyuu/utilities/Log.h"
 #include "SQLiteConnect.h"
 #include "SQLiteStatement.h"
 

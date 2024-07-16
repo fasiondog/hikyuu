@@ -6,9 +6,9 @@
  */
 
 #include <thread>
-#include "config.h"
-#include "utilities/os.h"
-#include "GlobalInitializer.h"
+#include "hikyuu/config.h"
+#include "hikyuu/GlobalInitializer.h"
+#include "os.h"
 #include "Log.h"
 
 #if USE_SPDLOG_LOGGER
