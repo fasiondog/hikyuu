@@ -1,0 +1,9 @@
+#pragma once
+#ifndef HKU_UTILS_CONFIG_H_
+#define HKU_UTILS_CONFIG_H_
+
+// clang-format off
+
+// clang-format on
+
+#endif /* HKU_UTILS_CONFIG_H_ */
