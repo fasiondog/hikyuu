@@ -29,6 +29,7 @@
 #include <map>
 #include <unordered_map>
 
+#include "config.h"
 #include "utilities/Log.h"
 #include "utilities/osdef.h"
 #include "utilities/cppdef.h"

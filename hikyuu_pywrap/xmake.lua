@@ -9,8 +9,6 @@ target("core")
     --     --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
     -- end
 
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "log_level")
-
     add_deps("hikyuu")
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "cpp-httplib")
     if is_plat("windows") then

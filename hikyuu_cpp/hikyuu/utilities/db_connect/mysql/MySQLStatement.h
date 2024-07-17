@@ -26,13 +26,13 @@
 typedef bool my_bool;
 #endif
 
-#ifndef HKU_API
-#define HKU_API
+#ifndef HKU_UTILS_API
+#define HKU_UTILS_API
 #endif
 
 namespace hku {
 
-class HKU_API MySQLStatement : public SQLStatementBase {
+class HKU_UTILS_API MySQLStatement : public SQLStatementBase {
 public:
     MySQLStatement() = delete;
     MySQLStatement(DBConnectBase *driver, const std::string &sql_statement);

@@ -59,8 +59,6 @@ target("unit-test")
     set_kind("binary")
     set_default(false)
 
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "log_level")
-
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
         if is_plat("macosx") then
@@ -107,8 +105,6 @@ target("small-test")
     set_kind("binary")
     set_default(false)
     
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "log_level")
-
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
         if is_plat("macosx") then
@@ -153,8 +149,6 @@ target_end()
 target("real-test")
     set_kind("binary")
     set_default(false)
-
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "log_level")
 
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then

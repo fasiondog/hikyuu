@@ -10,7 +10,6 @@
 #ifndef HIKYUU_DB_CONNECT_DBCONNECTBASE_H
 #define HIKYUU_DB_CONNECT_DBCONNECTBASE_H
 
-#include "../../DataType.h"
 #include "../../utilities/Parameter.h"
 #include "../Null.h"
 #include "DBCondition.h"
@@ -26,7 +25,7 @@ class SQLResultSet;
  * 数据库连接基类
  * @ingroup DBConnect
  */
-class HKU_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase> {
+class HKU_UTILS_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase> {
     PARAMETER_SUPPORT  // NOSONAR
 
       public :

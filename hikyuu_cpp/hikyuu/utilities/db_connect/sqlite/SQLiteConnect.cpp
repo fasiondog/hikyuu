@@ -8,7 +8,7 @@
  */
 
 #include <thread>
-#include "../../../config.h"
+#include "hikyuu/utilities/config.h"
 #include "hikyuu/utilities/Log.h"
 #include "SQLiteConnect.h"
 #include "SQLiteStatement.h"
@@ -35,7 +35,7 @@ SQLiteConnect::SQLiteConnect(const Parameter &param) : DBConnectBase(param), m_d
         int rc = sqlite3_open_v2(m_dbname.c_str(), &m_db, flags, NULL);
         SQL_CHECK(rc == SQLITE_OK, rc, sqlite3_errmsg(m_db));
 
-#ifdef HKU_ENABLE_SQLCIPHER
+#if HKU_ENABLE_SQLCIPHER
         if (haveParam("key")) {
             std::string key = getParam<std::string>("key");
             if (!key.empty()) {
@@ -91,7 +91,7 @@ void SQLiteConnect::close() {
 }
 
 int64_t SQLiteConnect::exec(const std::string &sql_string) {
-#ifdef HKU_SQL_TRACE
+#if HKU_SQL_TRACE
     HKU_DEBUG(sql_string);
 #endif
     int rc = sqlite3_exec(m_db, sql_string.c_str(), NULL, NULL, NULL);

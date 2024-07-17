@@ -15,8 +15,8 @@
 #include <fmt/ranges.h>
 #include "hikyuu/utilities/Log.h"
 
-#ifndef HKU_API
-#define HKU_API
+#ifndef HKU_UTILS_API
+#define HKU_UTILS_API
 #endif
 
 namespace hku {
@@ -38,7 +38,7 @@ struct LIMIT {
     int limit = 1;
 };
 
-class HKU_API DBCondition {
+class HKU_UTILS_API DBCondition {
 public:
     DBCondition() = default;
     DBCondition(const DBCondition &) = default;

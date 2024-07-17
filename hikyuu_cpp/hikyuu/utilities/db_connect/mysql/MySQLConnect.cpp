@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/utilities/config.h"
 #include "MySQLConnect.h"
 
 #ifdef __GNUC__
@@ -110,7 +111,7 @@ bool MySQLConnect::ping() {
 }
 
 int64_t MySQLConnect::exec(const std::string& sql_string) {
-#ifdef HKU_SQL_TRACE
+#if HKU_SQL_TRACE
     HKU_DEBUG(sql_string);
 #endif
     if (!m_mysql) {

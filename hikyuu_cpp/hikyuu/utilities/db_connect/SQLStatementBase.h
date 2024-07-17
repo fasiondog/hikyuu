@@ -34,7 +34,7 @@ public:
  * SQL Statement 基类
  * @ingroup DBConnect
  */
-class HKU_API SQLStatementBase {
+class HKU_UTILS_API SQLStatementBase {
 public:
     /**
      * 构造函数
@@ -183,7 +183,7 @@ inline void SQLStatementBase::bind(int idx, float item) {
 }
 
 inline void SQLStatementBase::exec() {
-#ifdef HKU_SQL_TRACE
+#if HKU_SQL_TRACE
     HKU_DEBUG(m_sql_string);
 #endif
     sub_exec();

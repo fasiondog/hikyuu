@@ -22,7 +22,7 @@
 
 namespace hku {
 
-class HKU_API MySQLConnect : public DBConnectBase {
+class HKU_UTILS_API MySQLConnect : public DBConnectBase {
 public:
     explicit MySQLConnect(const Parameter &param);
     virtual ~MySQLConnect();

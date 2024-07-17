@@ -12,7 +12,7 @@ namespace hku {
 /*
  * 升级和创建数据库
  */
-void HKU_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
+void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
                              const std::vector<std::string> &upgrade_scripts, int start_version,
                              const char *create_script) {
     HKU_TRACE("check {} database version ...", module_name);

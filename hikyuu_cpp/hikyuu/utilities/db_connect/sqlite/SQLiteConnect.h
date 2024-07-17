@@ -25,7 +25,7 @@ namespace hku {
  * SQLite连接
  * @ingroup SQLite
  */
-class HKU_API SQLiteConnect : public DBConnectBase {
+class HKU_UTILS_API SQLiteConnect : public DBConnectBase {
 public:
     /**
      * 构造函数

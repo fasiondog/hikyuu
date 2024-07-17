@@ -50,13 +50,19 @@ option("tdx")
     set_description("Enable tdx kdata engine.")
 option_end()
 
+option("sql_trace")
+    set_default(false)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("打印执行的 SQL 语句")
+option_end()
+
 -- 注意：stacktrace 在 windows 下会严重影响性能
 option("stacktrace")
     set_default(false)
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable check/assert with stack trace info.")
-    add_defines("HKU_ENABLE_STACK_TRACE")
 option_end()
 
 option("spend_time")
@@ -77,7 +83,7 @@ option("low_precision")
     set_default(false)
     set_showmenu(true)
     set_category("hikyuu")
-    set_description("Enable send feedback.")
+    set_description("Enable low precision.")
 option_end()
 
 option("log_level")
@@ -86,6 +92,13 @@ option("log_level")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("set log level")
+option_end()
+
+option("async_log")
+    set_default(false)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Use async log.")
 option_end()
 
 option("leak_check")
@@ -116,19 +129,19 @@ if is_mode("debug") then
     level = "trace"
 end
 if level == "trace" then
-    set_configvar("LOG_ACTIVE_LEVEL", 0)
+    set_configvar("HKU_LOG_ACTIVE_LEVEL", 0)
 elseif level == "debug" then
-    set_configvar("LOG_ACTIVE_LEVEL", 1)
+    set_configvar("HKU_LOG_ACTIVE_LEVEL", 1)
 elseif level == "info" then
-    set_configvar("LOG_ACTIVE_LEVEL", 2)
+    set_configvar("HKU_LOG_ACTIVE_LEVEL", 2)
 elseif level == "warn" then
-    set_configvar("LOG_ACTIVE_LEVEL", 3)
+    set_configvar("HKU_LOG_ACTIVE_LEVEL", 3)
 elseif level == "error" then
-    set_configvar("LOG_ACTIVE_LEVEL", 4)
+    set_configvar("HKU_LOG_ACTIVE_LEVEL", 4)
 elseif level == "fatal" then
-    set_configvar("LOG_ACTIVE_LEVEL", 5)
+    set_configvar("HKU_LOG_ACTIVE_LEVEL", 5)
 else
-    set_configvar("LOG_ACTIVE_LEVEL", 6)
+    set_configvar("HKU_LOG_ACTIVE_LEVEL", 6)
 end
 
 if is_mode("debug") then
@@ -136,7 +149,6 @@ if is_mode("debug") then
 else
     set_configvar("HKU_DEBUG_MODE", 0)
 end
-set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
 if is_plat("macosx") or get_config("leak_check") then
@@ -152,12 +164,21 @@ set_configvar("HKU_ENABLE_LEAK_DETECT", get_config("leak_check") and 1 or 0)
 set_configvar("HKU_ENABLE_SEND_FEEDBACK", get_config("feedback") and 1 or 0)
 
 set_configvar("HKU_ENABLE_HDF5_KDATA", get_config("hdf5") and 1 or 0)
+set_configvar("HKU_ENABLE_MYSQL", get_config("mysql") and 1 or 0)
 set_configvar("HKU_ENABLE_MYSQL_KDATA", get_config("mysql") and 1 or 0)
+set_configvar("HKU_ENABLE_SQLITE", (get_config("sqlite") or get_config("hdf5")) and 1 or 0)
 set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
 set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
 set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
 
+set_configvar("HKU_DEFAULT_LOG_NAME", "hikyuu")
+set_configvar("HKU_SUPPORT_DATETIME", 1)
+set_configvar("HKU_ENABLE_SQLCIPHER", 0)
+set_configvar("HKU_SQL_TRACE", get_config("sql_trace"))
+set_configvar("HKU_ENABLE_INI_PARSER", 1)
+set_configvar("HKU_USE_SPDLOG_ASYNC_LOGGER", get_config("async_log") and 1 or 0)
+set_configvar("HKU_ENABLE_STACK_TRACE", get_config("stacktrace") and 1 or 0)
 set_configvar("HKU_CLOSE_SPEND_TIME", get_config("spend_time") and 0 or 1)
 
 set_warnings("all")

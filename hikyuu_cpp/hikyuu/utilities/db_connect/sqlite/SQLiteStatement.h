@@ -19,7 +19,7 @@ namespace hku {
  * SQLite Statemen
  * @ingroup DBConnect
  */
-class HKU_API SQLiteStatement : public SQLStatementBase {
+class HKU_UTILS_API SQLiteStatement : public SQLStatementBase {
 public:
     SQLiteStatement() = delete;
 
