@@ -199,7 +199,6 @@ local hdf5_version = "1.12.2"
 local fmt_version = "10.2.1"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.8.0"
-local cpp_httplib_version = "0.14.3"
 local sqlite_version = "3.46.0+0"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
@@ -259,8 +258,6 @@ add_requires("sqlite3 " .. sqlite_version, {system = false, configs = {shared = 
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {runtimes = get_config("runtimes")}})
 add_requires("nng " .. nng_version, {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
-add_requires("cpp-httplib " .. cpp_httplib_version, {system = false, configs = {zlib = true, ssl = true}})
-add_requires("zlib", {system = false})
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 

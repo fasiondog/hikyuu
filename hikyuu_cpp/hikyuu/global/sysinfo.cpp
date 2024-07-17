@@ -10,7 +10,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_generators.hpp>
-#include <httplib.h>
+// #include <httplib.h>
 #include <nlohmann/json.hpp>
 #include "hikyuu/version.h"
 #include "hikyuu/DataType.h"

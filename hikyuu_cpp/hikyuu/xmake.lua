@@ -7,7 +7,7 @@ target("hikyuu")
     --     set_kind("shared")
     -- end
 
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json")
     if is_plat("windows", "linux", "cross") then
         add_packages("sqlite3")
     end
