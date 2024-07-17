@@ -196,7 +196,7 @@ end
 
 local boost_version = "1.85.0"
 local hdf5_version = "1.12.2"
-local fmt_version = "10.2.1"
+local fmt_version = "11.0.1"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.8.0"
 local sqlite_version = "3.46.0+0"
