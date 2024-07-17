@@ -21,9 +21,10 @@
 #include <chrono>
 #include <vector>
 #include <fmt/format.h>
+#include "hikyuu/utilities/config.h"
 
-#ifndef HKU_API
-#define HKU_API
+#ifndef HKU_UTILS_API
+#define HKU_UTILS_API
 #endif
 #ifdef __ANDROID__
 #include <android/log.h>
@@ -138,7 +139,7 @@ namespace hku {
  * @note 不建议直接使用，应使用相关工具宏
  * @see SPEND_TIME, SPEND_TIME_MSG, SPEND_TIMG_CONTROL
  */
-class HKU_API SpendTimer {
+class HKU_UTILS_API SpendTimer {
 public:
     /** 构造函数，记录当前系统时间 */
     explicit SpendTimer()
@@ -237,19 +238,19 @@ private:
     std::vector<std::string> m_keep_desc;
 
     static bool ms_closed;
-    friend void HKU_API close_spend_time();
-    friend void HKU_API open_spend_time();
-    friend bool HKU_API get_spend_time_status();
+    friend void HKU_UTILS_API close_spend_time();
+    friend void HKU_UTILS_API open_spend_time();
+    friend bool HKU_UTILS_API get_spend_time_status();
 };
 
 /** 全局关闭耗时打印输出 */
-void HKU_API close_spend_time();
+void HKU_UTILS_API close_spend_time();
 
 /** 全局开启耗时打印输出 */
-void HKU_API open_spend_time();
+void HKU_UTILS_API open_spend_time();
 
 /** 获取全局耗时打印输出状态：true - 开启，false - 关闭 */
-bool HKU_API get_spend_time_status();
+bool HKU_UTILS_API get_spend_time_status();
 
 /**
  * 耗时计时器开启关闭状态看守，记录之前的耗时开关状态，并置为指定状态，释放时恢复原状态

@@ -64,7 +64,6 @@ option("spend_time")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable spend time.")
-    add_defines("HKU_CLOSE_SPEND_TIME=0")
 option_end()
 
 option("feedback")
@@ -158,6 +157,8 @@ set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
 set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
 set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
+
+set_configvar("HKU_CLOSE_SPEND_TIME", get_config("spend_time") and 0 or 1)
 
 set_warnings("all")
 

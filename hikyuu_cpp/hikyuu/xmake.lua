@@ -7,7 +7,7 @@ target("hikyuu")
     --     set_kind("shared")
     -- end
 
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time", "log_level")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "log_level")
 
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
     if is_plat("windows", "linux", "cross") then
@@ -39,6 +39,7 @@ target("hikyuu")
     if is_plat("windows") then
         if is_kind("shared") then
             add_defines("HKU_API=__declspec(dllexport)")
+            add_defines("HKU_UTILS_API=__declspec(dllexport)")
         end
         if get_config("hdf5") then
             if is_mode("release") then

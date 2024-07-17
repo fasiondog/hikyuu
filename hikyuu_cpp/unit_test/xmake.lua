@@ -59,7 +59,7 @@ target("unit-test")
     set_kind("binary")
     set_default(false)
 
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time", "log_level")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "log_level")
 
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
@@ -81,6 +81,7 @@ target("unit-test")
     
     if is_plat("windows") and get_config("kind") == "shared" then
         add_defines("HKU_API=__declspec(dllimport)")
+        add_defines("HKU_UTILS_API=__declspec(dllimport)")
     end
 
     add_deps("hikyuu")
@@ -106,7 +107,7 @@ target("small-test")
     set_kind("binary")
     set_default(false)
     
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time", "log_level")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "log_level")
 
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
@@ -130,8 +131,9 @@ target("small-test")
         add_cxflags("-Wno-sign-compare")
     end
     
-    if is_plat("windows") and is_mode("release") then
+    if is_plat("windows") and get_config("kind") == "shared" then
         add_defines("HKU_API=__declspec(dllimport)")
+        add_defines("HKU_UTILS_API=__declspec(dllimport)")
     end
 
     add_deps("hikyuu")
@@ -152,7 +154,7 @@ target("real-test")
     set_kind("binary")
     set_default(false)
 
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time", "log_level")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "log_level")
 
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
@@ -174,6 +176,7 @@ target("real-test")
     
     if is_plat("windows") and get_config("kind") == "shared" then
         add_defines("HKU_API=__declspec(dllimport)")
+        add_defines("HKU_UTILS_API=__declspec(dllimport)")
     end
 
     add_defines("HKU_USE_REAL_DATA_TEST")

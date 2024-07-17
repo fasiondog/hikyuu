@@ -126,15 +126,15 @@ double SpendTimer::value() const {
     return sec.count();
 }
 
-void HKU_API close_spend_time() {  // NOSONAR
+void HKU_UTILS_API close_spend_time() {  // NOSONAR
     SpendTimer::ms_closed = true;
 }
 
-void HKU_API open_spend_time() {  // NOSONAR
+void HKU_UTILS_API open_spend_time() {  // NOSONAR
     SpendTimer::ms_closed = false;
 }
 
-bool HKU_API get_spend_time_status() {
+bool HKU_UTILS_API get_spend_time_status() {
     return !SpendTimer::ms_closed;
 }
 

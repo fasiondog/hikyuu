@@ -4,6 +4,14 @@
 
 // clang-format off
 
+#define HKU_SUPPORT_DATETIME 1
+
+#define HKU_ENABLE_INI_PARSER 1
+
+${define HKU_ENABLE_STACK_TRACE}
+
+${define HKU_CLOSE_SPEND_TIME}
+
 // clang-format on
 
 #endif /* HKU_UTILS_CONFIG_H_ */
