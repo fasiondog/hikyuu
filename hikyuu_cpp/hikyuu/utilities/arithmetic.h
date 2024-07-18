@@ -309,9 +309,7 @@ inline std::vector<std::string> split(const std::string &str, const std::string 
         pos = str.find(split_str, prepos);
     }
 
-    if (prepos < str.size() - 1) {
-        result.emplace_back(str.substr(prepos));
-    }
+    result.emplace_back(str.substr(prepos));
     return result;
 }
 #endif /* #if CPP_STANDARD >= CPP_STANDARD_17 */
