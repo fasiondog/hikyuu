@@ -10,7 +10,6 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_generators.hpp>
-// #include <httplib.h>
 #include <nlohmann/json.hpp>
 #include "hikyuu/version.h"
 #include "hikyuu/DataType.h"
@@ -51,7 +50,11 @@ bool HKU_API pythonInJupyter() {
 
 void HKU_API setPythonInJupyter(bool injupyter) {
     g_pythonInJupyter = injupyter;
-    initLogger(injupyter);
+    if (createDir(fmt::format("{}/.hikyuu", getUserDir()))) {
+        initLogger(injupyter, fmt::format("{}/.hikyuu/hikyuu.log", getUserDir()));
+    } else {
+        initLogger(injupyter);
+    }
 }
 
 bool HKU_API CanUpgrade() {

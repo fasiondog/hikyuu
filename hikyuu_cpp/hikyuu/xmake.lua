@@ -77,7 +77,7 @@ target("hikyuu")
 
     -- add files
     -- add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp")
-    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp")
+    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp|utilities/mo/*.cpp")
     add_files("./data_driver/*.cpp")
     if get_config("hdf5") or get_config("sqlite") then
         add_files("./data_driver/base_info/sqlite/**.cpp")

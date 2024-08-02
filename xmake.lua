@@ -1,11 +1,18 @@
 set_xmakever("2.8.2")
 
-option("hdf5")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable hdf5 kdata engine.")
-option_end()
+-- project
+set_project("hikyuu")
+
+add_rules("mode.debug", "mode.release")
+
+-- version
+set_version("2.1.0", {build = "%Y%m%d%H%M"})
+
+set_warnings("all")
+
+-- set language: C99, c++ standard
+set_languages("cxx17", "c99")
+
 
 option("mysql")
     set_default(true)
@@ -36,85 +43,19 @@ option("mysql")
     end        
 option_end()
 
-option("sqlite")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable sqlite kdata engine.")
-option_end()
-
-option("tdx")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable tdx kdata engine.")
-option_end()
-
-option("sql_trace")
-    set_default(false)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("打印执行的 SQL 语句")
-option_end()
+option("hdf5", {description = "Enable hdf5 kdata engine.", default = true})
+option("sqlite", {description = "Enable sqlite kdata engine.", default = true})
+option("tdx", {description = "Enable tdx kdata engine.", default = true})
+option("sql_trace", {description = "trace print sql", default = false})
 
 -- 注意：stacktrace 在 windows 下会严重影响性能
-option("stacktrace")
-    set_default(false)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable check/assert with stack trace info.")
-option_end()
-
-option("spend_time")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable spend time.")
-option_end()
-
-option("feedback")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable send feedback.")
-option_end()
-
-option("low_precision")
-    set_default(false)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable low precision.")
-option_end()
-
-option("log_level")
-    set_default("info")
-    set_values("trace", "debug", "info", "warn", "error", "fatal", "off")
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("set log level")
-option_end()
-
-option("async_log")
-    set_default(false)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Use async log.")
-option_end()
-
-option("leak_check")
-    set_default(false)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable leak check for test")
-option_end()
-
--- project
-set_project("hikyuu")
-
-add_rules("mode.debug", "mode.release")
-
--- version
-set_version("2.1.0", {build = "%Y%m%d%H%M"})
+option("stacktrace", {description = "Enable check/assert with stack trace info.", default = false})
+option("spend_time", {description = "Enable spend time.", default = true})
+option("feedback", {description = "Enable send feedback.", default = true})
+option("low_precision", {description = "Enable low precision.", default = false})
+option("log_level", {description = "set log level.", default = 2, values = {1, 2, 3, 4, 5, 6}})
+option("async_log", {description = "Use async log.", default = false})
+option("leak_check", {description = "Enable leak check for test", default = false})
 
 if get_config("leak_check") then
     -- 需要 export LD_PRELOAD=libasan.so
@@ -124,32 +65,18 @@ if get_config("leak_check") then
     -- set_policy("build.sanitizer.thread", true)
 end
 
-local level = get_config("log_level")
-if is_mode("debug") then
-    level = "trace"
+-- SPDLOG_ACTIVE_LEVEL 需要单独加
+local log_level = get_config("log_level")
+if log_level == nil then
+    log_level = 2
 end
-if level == "trace" then
-    set_configvar("HKU_LOG_ACTIVE_LEVEL", 0)
-elseif level == "debug" then
-    set_configvar("HKU_LOG_ACTIVE_LEVEL", 1)
-elseif level == "info" then
-    set_configvar("HKU_LOG_ACTIVE_LEVEL", 2)
-elseif level == "warn" then
-    set_configvar("HKU_LOG_ACTIVE_LEVEL", 3)
-elseif level == "error" then
-    set_configvar("HKU_LOG_ACTIVE_LEVEL", 4)
-elseif level == "fatal" then
-    set_configvar("HKU_LOG_ACTIVE_LEVEL", 5)
-else
-    set_configvar("HKU_LOG_ACTIVE_LEVEL", 6)
-end
+add_defines("SPDLOG_ACTIVE_LEVEL=" .. log_level)
 
 if is_mode("debug") then
     set_configvar("HKU_DEBUG_MODE", 1)
 else
     set_configvar("HKU_DEBUG_MODE", 0)
 end
-set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
 if is_plat("macosx") or get_config("leak_check") then
     set_configvar("SUPPORT_SERIALIZATION", 0)
@@ -172,19 +99,18 @@ set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
 set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
 
-set_configvar("HKU_DEFAULT_LOG_NAME", "hikyuu")
 set_configvar("HKU_SUPPORT_DATETIME", 1)
 set_configvar("HKU_ENABLE_SQLCIPHER", 0)
 set_configvar("HKU_SQL_TRACE", get_config("sql_trace"))
 set_configvar("HKU_ENABLE_INI_PARSER", 1)
-set_configvar("HKU_USE_SPDLOG_ASYNC_LOGGER", get_config("async_log") and 1 or 0)
 set_configvar("HKU_ENABLE_STACK_TRACE", get_config("stacktrace") and 1 or 0)
 set_configvar("HKU_CLOSE_SPEND_TIME", get_config("spend_time") and 0 or 1)
-
-set_warnings("all")
-
--- set language: C99, c++ standard
-set_languages("cxx17", "c99")
+set_configvar("HKU_USE_SPDLOG_ASYNC_LOGGER", get_config("async_log") and 1 or 0)
+set_configvar("HKU_LOG_ACTIVE_LEVEL", get_config("log_level"))
+set_configvar("HKU_ENABLE_MO", 0)
+set_configvar("HKU_ENABLE_HTTP_CLIENT", 1)
+set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", 0)
+set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", 0)
 
 if is_plat("windows") then
     if is_mode("release") then
@@ -229,10 +155,10 @@ elseif is_plat("linux", "cross") then
   
 elseif is_plat("macosx") then
     if get_config("hdf5") then
-        add_requires("brew::hdf5")
+        add_requires("brew::hdf5", {alias = "hdf5"})
     end
     if get_config("mysql") then
-        add_requires("brew::mysql-client")
+        add_requires("brew::mysql-client", {alias = "mysql"})
     end
 end
 

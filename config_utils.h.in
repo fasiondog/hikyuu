@@ -25,9 +25,16 @@ ${define HKU_ENABLE_STACK_TRACE}
 
 ${define HKU_CLOSE_SPEND_TIME}
 
-${define HKU_DEFAULT_LOG_NAME}
 ${define HKU_USE_SPDLOG_ASYNC_LOGGER}
 ${define HKU_LOG_ACTIVE_LEVEL}
+
+${define HKU_ENABLE_MO}
+
+${define HKU_ENABLE_HTTP_CLIENT}
+${define HKU_ENABLE_HTTP_CLIENT_SSL}
+${define HKU_ENABLE_HTTP_CLIENT_ZIP}
+
+${define HKU_ENABLE_NODE}
 
 // clang-format on
 

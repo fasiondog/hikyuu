@@ -39,7 +39,7 @@ task("copy_dependents")
                     end
                 elseif type(pkg_path) == 'table' then
                     for i=1, #pkg_path do
-                        local pos = string.find(pkg_path[i], "yh_utils")
+                        local pos = string.find(pkg_path[i], "hku_utils")
                         if pos == nil then
                             pos = string.find(pkg_path[i], "opencv")
                             if pos == nil then
@@ -49,11 +49,11 @@ task("copy_dependents")
                             end
                         else
                             for _, filedir in ipairs(os.dirs(pkg_path[i] .. "/*")) do
-                                local pos = string.find(filedir, "yihua")
+                                local pos = string.find(filedir, "hikyuu")
                                 if pos == nil then
                                     os.trycp(filedir, destpath .. "/include")
                                 else
-                                    os.trycp(filedir .. "/utils", destpath .. "/include/yihua")
+                                    os.trycp(filedir .. "/utilities", destpath .. "/include/hikyuu")
                                 end
                             end
                         end
