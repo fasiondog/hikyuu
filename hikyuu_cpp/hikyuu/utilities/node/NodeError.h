@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "hikyuu/utilities/exception.h"
+#include <hikyuu/utilities/exception.h>
 
 namespace hku {
 

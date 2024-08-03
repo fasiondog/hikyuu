@@ -1,4 +1,4 @@
-﻿/*
+/*
  * IniFile.h
  *
  *  Created on: 2010-5-19

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * IniFile.cpp
  *
  *  Created on: 2010-5-19

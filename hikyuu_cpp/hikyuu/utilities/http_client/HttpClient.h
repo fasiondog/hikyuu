@@ -166,6 +166,10 @@ public:
         return post(path, HttpParams(), headers, body);
     }
 
+    HttpResponse post(const std::string& path, const json& body) {
+        return post(path, HttpHeaders(), body);
+    }
+
 private:
     void _connect();
     HttpResponse _readResChunk(const std::string& method, const std::string& uri,
