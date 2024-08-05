@@ -7,6 +7,15 @@
 
 #include "DBUpgrade.h"
 
+#include "hikyuu/utilities/config.h"
+#if HKU_ENABLE_MYSQL
+#include "mysql/MySQLConnect.h"
+#endif
+
+#if HKU_ENABLE_SQLITE
+#include "sqlite/SQLiteConnect.h"
+#endif
+
 namespace hku {
 
 /*
@@ -19,9 +28,29 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
 
     // 如果模块版本表不存在，则创建该表
     if (!driver->tableExist("module_version")) {
-        driver->exec(
-          "CREATE TABLE `module_version` (`id` INTEGER PRIMARY KEY AUTOINCREMENT,`module` TEXT, "
-          "`version` INTEGER NOT NULL);");
+        bool need_create = true;
+#if HKU_ENABLE_SQLITE
+        if (need_create && typeid(*driver) == typeid(SQLiteConnect)) {
+            driver->exec(
+              "CREATE TABLE `module_version` (`id` INTEGER PRIMARY KEY AUTOINCREMENT,`module` "
+              "TEXT, "
+              "`version` INTEGER NOT NULL);");
+            need_create = false;
+        }
+#endif
+
+#if HKU_ENABLE_MYSQL
+        if (need_create && typeid(*driver) == typeid(MySQLConnect)) {
+            driver->exec(
+              R"(CREATE TABLE `module_version` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `module` varchar(20) DEFAULT NULL,
+  `version` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;)");
+            need_create = false;
+        }
+#endif
     }
 
     // 如果没有升级脚本，也没有创建脚本，则直接返回
