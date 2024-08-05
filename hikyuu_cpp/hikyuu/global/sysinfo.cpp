@@ -19,8 +19,7 @@
 
 using json = nlohmann::json;
 
-// #define FEEDBACK_SERVER_ADDR "tcp://1.tcp.cpolar.cn:20981"
-#define FEEDBACK_SERVER_ADDR "http://127.0.0.1:80"
+#define FEEDBACK_SERVER_ADDR "http://hikyuu.cpolar.cn"
 
 namespace hku {
 
