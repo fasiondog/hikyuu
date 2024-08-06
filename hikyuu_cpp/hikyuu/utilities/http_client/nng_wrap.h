@@ -118,6 +118,23 @@ public:
         }
     }
 
+    aio(aio&& rhs) : m_aio(rhs.m_aio), m_timeout(rhs.m_timeout) {
+        rhs.m_aio = nullptr;
+        rhs.m_timeout = NNG_DURATION_DEFAULT;
+    }
+
+    aio& operator=(const aio&) = delete;
+
+    aio& operator=(aio&& rhs) {
+        if (this != &rhs) {
+            m_aio = rhs.m_aio;
+            m_timeout = rhs.m_timeout;
+            rhs.m_aio = nullptr;
+            rhs.m_timeout = NNG_DURATION_DEFAULT;
+        }
+        return *this;
+    }
+
     bool valid() const noexcept {
         return m_aio != nullptr;
     }
@@ -255,6 +272,28 @@ public:
         if (m_client) {
             nng_http_client_free(m_client);
         }
+    }
+
+    http_client(const http_client&) = delete;
+    http_client& operator=(const http_client&) = delete;
+
+    http_client(http_client&& rhs)
+    : m_client(rhs.m_client), m_aio(rhs.m_aio), m_tls_cfg(rhs.m_tls_cfg) {
+        rhs.m_client = nullptr;
+        rhs.m_aio = nullptr;
+        rhs.m_tls_cfg = nullptr;
+    }
+
+    http_client& operator=(http_client&& rhs) {
+        if (this != &rhs) {
+            m_client = rhs.m_client;
+            m_aio = rhs.m_aio;
+            m_tls_cfg = rhs.m_tls_cfg;
+            rhs.m_client = nullptr;
+            rhs.m_aio = nullptr;
+            rhs.m_tls_cfg = nullptr;
+        }
+        return *this;
     }
 
     void set_url(const nng::url& url) {

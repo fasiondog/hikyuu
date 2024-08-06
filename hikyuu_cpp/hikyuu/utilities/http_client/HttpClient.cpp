@@ -126,7 +126,7 @@ HttpResponse HttpClient::request(const std::string& method, const std::string& p
         res = _readResChunk(method, uri, headers, body, body_len, content_type);
 
         if (res.getHeader("Connection") == "close") {
-            HKU_WARN("Connect closed");
+            // HKU_TRACE("Connect closed");
             reset();
         }
 

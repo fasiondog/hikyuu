@@ -116,7 +116,7 @@ void sendFeedback() {
                 saveUUID(uid);
             }
 
-            HttpClient client(FEEDBACK_SERVER_ADDR);
+            HttpClient client(FEEDBACK_SERVER_ADDR, 2000);
             json req;
             req["uid"] = boost::uuids::to_string(uid);
             req["part"] = "hikyuu";
@@ -139,7 +139,7 @@ void sendFeedback() {
 void sendPythonVersionFeedBack(int major, int minor, int micro) {
     std::thread t([=]() {
         try {
-            HttpClient client(FEEDBACK_SERVER_ADDR);
+            HttpClient client(FEEDBACK_SERVER_ADDR, 2000);
             json req;
             req["major"] = major;
             req["minor"] = minor;

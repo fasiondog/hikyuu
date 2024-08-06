@@ -36,9 +36,6 @@ namespace hku {
 class NodeServer {
     CLASS_LOGGER_IMP(NodeServer)
 
-private:
-    static constexpr size_t PARALLEL = 128;
-
 public:
     NodeServer() = default;
     explicit NodeServer(const std::string& addr) : m_addr(addr) {}
@@ -58,7 +55,7 @@ public:
         m_handles[cmd] = std::move(handle);
     }
 
-    void start() {
+    void start(size_t max_parrel = 128) {
         CLS_CHECK(!m_addr.empty(), "You must set NodeServer's addr first!");
 
         // 启动 node server
@@ -68,7 +65,7 @@ public:
         CLS_CHECK(0 == rv, "Failed listen node server socket ({})! {}", m_addr, nng_strerror(rv));
         CLS_TRACE("channel lisenter server: {}", m_addr);
 
-        m_works.resize(PARALLEL);
+        m_works.resize(max_parrel);
         for (size_t i = 0, total = m_works.size(); i < total; i++) {
             Work* w = &m_works[i];
             rv = nng_aio_alloc(&w->aio, _serverCallback, w);

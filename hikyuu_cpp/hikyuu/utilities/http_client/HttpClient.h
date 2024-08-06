@@ -86,8 +86,42 @@ private:
 class HKU_UTILS_API HttpClient {
 public:
     HttpClient() = default;
-    explicit HttpClient(const std::string& url) : m_url(nng::url(url)) {};
+    explicit HttpClient(const std::string& url, int32_t timeout_ms = NNG_DURATION_DEFAULT)
+    : m_url(nng::url(url)), m_timeout_ms(timeout_ms) {};
     virtual ~HttpClient();
+
+    HttpClient(const HttpClient&) = delete;
+    HttpClient& operator=(const HttpClient&) = delete;
+
+    HttpClient(HttpClient&& rhs)
+    : m_default_headers(std::move(rhs.m_default_headers)),
+      m_url(std::move(rhs.m_url)),
+      m_client(std::move(rhs.m_client)),
+      m_aio(std::move(rhs.m_aio)),
+      m_conn(std::move(rhs.m_conn)),
+#if HKU_ENABLE_HTTP_CLIENT_SSL
+      m_tls_cfg(std::move(rhs.m_tls_cfg)),
+      m_ca_file(std::move(rhs.m_ca_file)),
+#endif
+      m_timeout_ms(rhs.m_timeout_ms) {
+    }
+
+    HttpClient& operator=(HttpClient&& rhs) {
+        if (this != &rhs) {
+            m_default_headers = std::move(rhs.m_default_headers);
+            m_url = std::move(rhs.m_url);
+            m_client = (std::move(rhs.m_client));
+            m_aio = std::move(rhs.m_aio);
+            m_conn = std::move(rhs.m_conn);
+#if HKU_ENABLE_HTTP_CLIENT_SSL
+            m_tls_cfg = std::move(rhs.m_tls_cfg);
+            m_ca_file = std::move(rhs.m_ca_file);
+#endif
+            m_timeout_ms = rhs.m_timeout_ms;
+            rhs.m_timeout_ms = NNG_DURATION_DEFAULT;
+        }
+        return *this;
+    }
 
     bool valid() const noexcept {
         return m_url.valid();
