@@ -9,8 +9,8 @@
 #include <boost/algorithm/string.hpp>
 #include "MySQLBaseInfoDriver.h"
 
+#include "hikyuu/utilities/Log.h"
 #include "../../../StockManager.h"
-#include "../../../Log.h"
 #include "../table/MarketInfoTable.h"
 #include "../table/StockTypeInfoTable.h"
 #include "../table/StockWeightTable.h"
@@ -281,12 +281,9 @@ Parameter MySQLBaseInfoDriver::getFinanceInfo(const string &market, const string
         << "f.zhuyinglirun, f.yingshouzhangkuan, f.yingyelirun, f.touzishouyu,"
         << "f.jingyingxianjinliu, f.zongxianjinliu, f.cunhuo, f.lirunzonghe,"
         << "f.shuihoulirun, f.jinglirun, f.weifenpeilirun, f.meigujingzichan,"
-        << "f.baoliu2 from stkfinance f, stock s, market m "
-        << "where m.market='" << market << "'"
-        << " and s.code = '" << code << "'"
-        << " and s.marketid = m.marketid"
-        << " and f.stockid = s.stockid"
-        << " order by updated_date DESC limit 1";
+        << "f.baoliu2 from stkfinance f, stock s, market m " << "where m.market='" << market << "'"
+        << " and s.code = '" << code << "'" << " and s.marketid = m.marketid"
+        << " and f.stockid = s.stockid" << " order by updated_date DESC limit 1";
 
     auto con = m_pool->getConnect();
 

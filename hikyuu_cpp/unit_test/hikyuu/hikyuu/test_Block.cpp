@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <iostream>
-#include <hikyuu/Log.h>
+#include "hikyuu/utilities/Log.h"
 #include <hikyuu/Block.h>
 #include <hikyuu/StockManager.h>
 

@@ -13,7 +13,7 @@
 #include <hikyuu/utilities/thread/MQThreadPool.h>
 #include <hikyuu/utilities/thread/MQStealThreadPool.h>
 #include <hikyuu/utilities/SpendTimer.h>
-#include <hikyuu/Log.h>
+#include "hikyuu/utilities/Log.h"
 
 using namespace hku;
 

@@ -17,7 +17,8 @@
 #include <map>
 #include <boost/any.hpp>
 
-#include "../config.h"
+#include "hikyuu/config.h"
+#include "hikyuu/utilities/config.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/lexical_cast.hpp>

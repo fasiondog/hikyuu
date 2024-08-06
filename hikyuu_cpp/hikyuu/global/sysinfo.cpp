@@ -10,17 +10,16 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_generators.hpp>
-#include <httplib.h>
 #include <nlohmann/json.hpp>
 #include "hikyuu/version.h"
 #include "hikyuu/DataType.h"
 #include "hikyuu/utilities/os.h"
-#include "node/NodeClient.h"
+#include "hikyuu/utilities/http_client/HttpClient.h"
 #include "sysinfo.h"
 
 using json = nlohmann::json;
 
-#define FEEDBACK_SERVER_ADDR "tcp://1.tcp.cpolar.cn:20981"
+#define FEEDBACK_SERVER_ADDR "http://hikyuu.cpolar.cn"
 
 namespace hku {
 
@@ -51,7 +50,11 @@ bool HKU_API pythonInJupyter() {
 
 void HKU_API setPythonInJupyter(bool injupyter) {
     g_pythonInJupyter = injupyter;
-    initLogger(injupyter);
+    if (createDir(fmt::format("{}/.hikyuu", getUserDir()))) {
+        initLogger(injupyter, fmt::format("{}/.hikyuu/hikyuu.log", getUserDir()));
+    } else {
+        initLogger(injupyter);
+    }
 }
 
 bool HKU_API CanUpgrade() {
@@ -113,27 +116,17 @@ void sendFeedback() {
                 saveUUID(uid);
             }
 
-            NodeClient client(FEEDBACK_SERVER_ADDR);
-            client.dial();
-
-            json req, res;
-            req["cmd"] = 2;
-            client.post(req, res);
-            std::string host = res["host"].get<std::string>();
-            uint64_t port = res["port"].get<uint64_t>();
-            g_latest_version = res.contains("last_version") ? res["last_version"].get<int>() : 0;
-            client.close();
-
-            client.setServerAddr(fmt::format("tcp://{}:{}", host, port));
-            client.dial();
-            req["cmd"] = 1;
+            HttpClient client(FEEDBACK_SERVER_ADDR, 2000);
+            json req;
             req["uid"] = boost::uuids::to_string(uid);
             req["part"] = "hikyuu";
             req["version"] = HKU_VERSION;
             req["build"] = fmt::format("{}", HKU_VERSION_BUILD);
             req["platform"] = getPlatform();
             req["arch"] = getCpuArch();
-            client.post(req, res);
+            auto res = client.post("/hku/visit", req);
+            json r = res.json();
+            g_latest_version = r["data"]["last_version"].get<int>();
 
         } catch (...) {
             // do nothing
@@ -146,24 +139,12 @@ void sendFeedback() {
 void sendPythonVersionFeedBack(int major, int minor, int micro) {
     std::thread t([=]() {
         try {
-            NodeClient client(FEEDBACK_SERVER_ADDR);
-            client.dial();
-
-            json req, res;
-            req["cmd"] = 2;
-            client.post(req, res);
-            std::string host = res["host"].get<std::string>();
-            uint64_t port = res["port"].get<uint64_t>();
-            g_latest_version = res.contains("last_version") ? res["last_version"].get<int>() : 0;
-            client.close();
-
-            client.setServerAddr(fmt::format("tcp://{}:{}", host, port));
-            client.dial();
-            req["cmd"] = 3;
+            HttpClient client(FEEDBACK_SERVER_ADDR, 2000);
+            json req;
             req["major"] = major;
             req["minor"] = minor;
             req["micro"] = micro;
-            client.post(req, res);
+            client.post("/hku/pyver", req);
         } catch (...) {
             // do nothing
         }

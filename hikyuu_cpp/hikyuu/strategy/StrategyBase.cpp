@@ -7,8 +7,8 @@
 
 #include <csignal>
 #include <unordered_set>
-#include "../utilities/os.h"
-#include "../utilities/IniParser.h"
+#include "hikyuu/utilities/os.h"
+#include "hikyuu/utilities/ini_parser/IniParser.h"
 #include "../global/schedule/scheduler.h"
 #include "StrategyBase.h"
 

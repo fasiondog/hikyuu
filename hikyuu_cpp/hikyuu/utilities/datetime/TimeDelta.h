@@ -20,8 +20,8 @@
 #include <fmt/ostream.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#ifndef HKU_API
-#define HKU_API
+#ifndef HKU_UTILS_API
+#define HKU_UTILS_API
 #endif
 
 namespace hku {
@@ -33,7 +33,7 @@ namespace bd = boost::gregorian;
  * 时长，用于时间计算
  * @ingroup DataType
  */
-class HKU_API TimeDelta {
+class HKU_UTILS_API TimeDelta {
 public:
     /**
      * 构造函数
@@ -58,11 +58,14 @@ public:
     /** 通过 boost::posix_time::time_duration 构造 */
     explicit TimeDelta(bt::time_duration td);
 
+    /** 从字符串构造，格式：-1 days, hh:mm:ss.000000) */
+    explicit TimeDelta(const std::string& delta);
+
     /** 赋值构造函数 */
-    TimeDelta(const TimeDelta&) = default;
+    TimeDelta(const TimeDelta &) = default;
 
     /** 赋值拷贝函数 */
-    TimeDelta& operator=(const TimeDelta& other) {
+    TimeDelta &operator=(const TimeDelta &other) {
         if (this != &other) {
             m_duration = other.m_duration;
         }
@@ -259,8 +262,8 @@ private:
     static constexpr const int64_t m_one_day_ticks = 24 * 60 * 60 * 1000000LL;
 };
 
-std::ostream& operator<<(std::ostream& out, TimeDelta td);
-inline std::ostream& operator<<(std::ostream& out, TimeDelta td) {
+std::ostream &operator<<(std::ostream &out, TimeDelta td);
+inline std::ostream &operator<<(std::ostream &out, TimeDelta td) {
     out << td.str();
     return out;
 }
@@ -280,28 +283,28 @@ inline TimeDelta Days(int64_t days) {
  * @param hours 小时数
  * @ingroup DataType
  */
-TimeDelta HKU_API Hours(int64_t hours);
+TimeDelta HKU_UTILS_API Hours(int64_t hours);
 
 /**
  * TimeDelta 快捷创建函数
  * @param mins 分钟数
  * @ingroup DataType
  */
-TimeDelta HKU_API Minutes(int64_t mins);
+TimeDelta HKU_UTILS_API Minutes(int64_t mins);
 
 /**
  * TimeDelta 快捷创建函数
  * @param secs 秒数
  * @ingroup DataType
  */
-TimeDelta HKU_API Seconds(int64_t secs);
+TimeDelta HKU_UTILS_API Seconds(int64_t secs);
 
 /**
  * TimeDelta 快捷创建函数
  * @param milliseconds 毫秒数
  * @ingroup DataType
  */
-TimeDelta HKU_API Milliseconds(int64_t milliseconds);
+TimeDelta HKU_UTILS_API Milliseconds(int64_t milliseconds);
 
 /**
  * TimeDelta 快捷创建函数
@@ -315,15 +318,23 @@ inline TimeDelta Microseconds(int64_t microsecs) {
 
 } /* namespace hku */
 
+namespace std {
+
+inline string to_string(const hku::TimeDelta &delta) {
+    return delta.str();
+}
+
+}  // namespace std
+
 #if FMT_VERSION >= 90000
 template <>
 struct fmt::formatter<hku::TimeDelta> {
-    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) {
         return ctx.end();
     }
 
     template <typename FormatContext>
-    auto format(const hku::TimeDelta& d, FormatContext& ctx) const -> decltype(ctx.out()) {
+    auto format(const hku::TimeDelta &d, FormatContext &ctx) const -> decltype(ctx.out()) {
         return fmt::format_to(ctx.out(), "{}", d.str());
     }
 };

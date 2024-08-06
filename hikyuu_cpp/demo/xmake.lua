@@ -2,8 +2,6 @@ target("demo")
     set_kind("binary")
     set_default(false)
     
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time")
-    
     add_packages("boost", "spdlog", "fmt", "flatbuffers")
     add_includedirs("..")
 
@@ -14,6 +12,7 @@ target("demo")
 
     if is_plat("windows") and get_config("kind") == "shared" then
         add_defines("HKU_API=__declspec(dllimport)")
+        add_defines("HKU_UTILS_API=__declspec(dllimport)")
         add_defines("SQLITE_API=__declspec(dllimport)")
     end
    

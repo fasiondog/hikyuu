@@ -19,18 +19,6 @@
 // 检查下标越界
 #define CHECK_ACCESS_BOUND ${CHECK_ACCESS_BOUND}
 
-// 默认激活的日志级别
-#define LOG_ACTIVE_LEVEL ${LOG_ACTIVE_LEVEL}
-
-// 是否使用 spdlog
-#define USE_SPDLOG_LOGGER ${USE_SPDLOG_LOGGER}
-
-// 使用异步 logger
-#define HKU_USE_SPDLOG_ASYNC_LOGGER ${USE_SPDLOG_ASYNC_LOGGER}
-
-// spdlog默认日志级别
-#define SPDLOG_ACTIVE_LEVEL ${LOG_ACTIVE_LEVEL}
-
 // 启用MSVC内存泄漏检查
 #define ENABLE_MSVC_LEAK_DETECT ${ENABLE_MSVC_LEAK_DETECT}
 

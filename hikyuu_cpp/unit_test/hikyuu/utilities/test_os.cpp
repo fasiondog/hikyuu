@@ -7,7 +7,7 @@
  */
 
 #include <doctest/doctest.h>
-#include <hikyuu/Log.h>
+#include "hikyuu/utilities/Log.h"
 #include <hikyuu/utilities/os.h>
 
 using namespace hku;

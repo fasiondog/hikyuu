@@ -8,7 +8,7 @@
 #pragma once
 
 #include <fmt/format.h>
-#include "hikyuu/exception.h"
+#include "hikyuu/utilities/exception.h"
 
 namespace hku {
 

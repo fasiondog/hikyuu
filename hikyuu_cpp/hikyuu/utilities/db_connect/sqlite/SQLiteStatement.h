@@ -19,7 +19,7 @@ namespace hku {
  * SQLite Statemen
  * @ingroup DBConnect
  */
-class HKU_API SQLiteStatement : public SQLStatementBase {
+class HKU_UTILS_API SQLiteStatement : public SQLStatementBase {
 public:
     SQLiteStatement() = delete;
 
@@ -28,7 +28,7 @@ public:
      * @param driver 数据库连接
      * @param sql_statement SQL语句
      */
-    SQLiteStatement(DBConnectBase *driver, const string &sql_statement);
+    SQLiteStatement(DBConnectBase *driver, const std::string &sql_statement);
 
     /** 析构函数 */
     virtual ~SQLiteStatement();

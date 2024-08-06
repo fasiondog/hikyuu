@@ -7,6 +7,7 @@
 
 #pragma once
 
+#if 0
 #include <httplib.h>
 #include "../trade_manage/TradeManagerBase.h"
 
@@ -427,3 +428,4 @@ inline TMPtr crtAccountTM(const string& name, const string& pwd) {
 }
 
 }  // namespace hku
+#endif

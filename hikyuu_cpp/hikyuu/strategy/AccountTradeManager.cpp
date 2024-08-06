@@ -5,6 +5,7 @@
  *     Author: fasiondog
  */
 
+#if 0
 #include <nlohmann/json.hpp>
 #include "../utilities/arithmetic.h"
 #include "AccountTradeManager.h"
@@ -82,3 +83,4 @@ AccountTradeManager::AccountTradeManager(const string& name, const string& pwd)
 }
 
 }  // namespace hku
+#endif

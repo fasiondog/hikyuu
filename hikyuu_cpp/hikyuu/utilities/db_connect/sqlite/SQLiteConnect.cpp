@@ -8,8 +8,8 @@
  */
 
 #include <thread>
-#include "../../../config.h"
-#include "../../../Log.h"
+#include "hikyuu/utilities/config.h"
+#include "hikyuu/utilities/Log.h"
 #include "SQLiteConnect.h"
 #include "SQLiteStatement.h"
 
@@ -23,7 +23,7 @@ static int sqlite_busy_call_back(void *ptr, int count) {
 
 SQLiteConnect::SQLiteConnect(const Parameter &param) : DBConnectBase(param), m_db(nullptr) {
     try {
-        m_dbname = getParam<string>("db");
+        m_dbname = getParam<std::string>("db");
         int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
         // 多线程模式下，不同数据库连接不能使用 SQLITE_OPEN_SHAREDCACHE
         // 将导致 table is locked!
@@ -35,7 +35,7 @@ SQLiteConnect::SQLiteConnect(const Parameter &param) : DBConnectBase(param), m_d
         int rc = sqlite3_open_v2(m_dbname.c_str(), &m_db, flags, NULL);
         SQL_CHECK(rc == SQLITE_OK, rc, sqlite3_errmsg(m_db));
 
-#ifdef HKU_ENABLE_SQLCIPHER
+#if HKU_ENABLE_SQLCIPHER
         if (haveParam("key")) {
             std::string key = getParam<std::string>("key");
             if (!key.empty()) {
@@ -91,7 +91,7 @@ void SQLiteConnect::close() {
 }
 
 int64_t SQLiteConnect::exec(const std::string &sql_string) {
-#ifdef HKU_SQL_TRACE
+#if HKU_SQL_TRACE
     HKU_DEBUG(sql_string);
 #endif
     int rc = sqlite3_exec(m_db, sql_string.c_str(), NULL, NULL, NULL);
@@ -134,7 +134,7 @@ SQLStatementPtr SQLiteConnect::getStatement(const std::string &sql_statement) {
     return std::make_shared<SQLiteStatement>(this, sql_statement);
 }
 
-bool SQLiteConnect::tableExist(const string &tablename) {
+bool SQLiteConnect::tableExist(const std::string &tablename) {
     SQLStatementPtr st =
       getStatement(fmt::format("select count(1) from sqlite_master where name='{}'", tablename));
     st->exec();

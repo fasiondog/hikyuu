@@ -5,6 +5,7 @@
  *     Author: fasiondog
  */
 
+#if 0
 #include "../pybind_utils.h"
 #include <hikyuu/strategy/AccountTradeManager.h>
 
@@ -14,3 +15,4 @@ namespace py = pybind11;
 void export_AccountTradeManger(py::module& m) {
     m.def("crtAccountTM", crtAccountTM);
 }
+#endif

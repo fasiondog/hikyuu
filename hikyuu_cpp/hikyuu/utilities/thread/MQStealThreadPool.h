@@ -22,8 +22,8 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
-#ifndef HKU_API
-#define HKU_API
+#ifndef HKU_UTILS_API
+#define HKU_UTILS_API
 #endif
 
 namespace hku {
@@ -35,7 +35,7 @@ namespace hku {
 #ifdef _MSC_VER
 class MQStealThreadPool {
 #else
-class HKU_API MQStealThreadPool {
+class HKU_UTILS_API MQStealThreadPool {
 #endif
 public:
     /**
