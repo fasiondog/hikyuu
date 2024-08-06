@@ -124,7 +124,9 @@ void sendFeedback() {
             req["build"] = fmt::format("{}", HKU_VERSION_BUILD);
             req["platform"] = getPlatform();
             req["arch"] = getCpuArch();
-            client.post("/hku/visit", req);
+            auto res = client.post("/hku/visit", req);
+            json r = res.json();
+            g_latest_version = r["data"]["last_version"].get<int>();
 
         } catch (...) {
             // do nothing
@@ -142,9 +144,7 @@ void sendPythonVersionFeedBack(int major, int minor, int micro) {
             req["major"] = major;
             req["minor"] = minor;
             req["micro"] = micro;
-            auto res = client.post("/hku/pyver", req);
-            json r = res.json();
-            g_latest_version = r["data"]["last_version"].get<int>();
+            client.post("/hku/pyver", req);
         } catch (...) {
             // do nothing
         }
