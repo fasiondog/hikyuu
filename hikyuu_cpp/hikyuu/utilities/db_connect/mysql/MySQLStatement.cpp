@@ -416,7 +416,11 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, std::vector<char>& item) {
     }
 
     try {
-        item = boost::any_cast<std::vector<char>>(m_result_buffer[idx]);
+        unsigned long len = m_result_length[idx];
+        std::vector<char>* p = boost::any_cast<std::vector<char>>(&m_result_buffer[idx]);
+        item.resize(len);
+        memcpy(item.data(), p->data(), len);
+
     } catch (...) {
         HKU_THROW("Field type mismatch! idx: {}", idx);
     }
