@@ -61,7 +61,7 @@ option("leak_check", {description = "Enable leak check for test", default = fals
 -- windows下如果使用 serialize 且希望使用动态库，需要设置 runtimes 参数为 "MD"
 -- "MT" 方式下，serialize 会挂
 option("serialize", {description = "Enable support serialize object and pickle in python", default = true})
-if is_plat("windows") then
+if is_plat("windows") and get_config("runtimes") == nil then
     if is_mode("release") then
         set_runtimes("MD")
     else
