@@ -142,6 +142,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 加载 K 线至缓存
     loadAllKData();
 
+    // 加载历史财务信息
+    loadHistoryFinance();
+
     // add special Market, for temp csv file
     m_marketInfoDict["TMP"] =
       MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>(),
@@ -310,6 +313,8 @@ void StockManager::reload() {
             }
         }
     }
+
+    loadHistoryFinance();
 }
 
 string StockManager::tmpdir() const {
@@ -613,6 +618,14 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
                   return a.first < b.first;
               });
     return ret;
+}
+
+void StockManager::loadHistoryFinance() {
+    auto* tg = getGlobalTaskGroup();
+    std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
+    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+        tg->submit([=]() { iter->second.getHistoryFinance(); });
+    }
 }
 
 }  // namespace hku
