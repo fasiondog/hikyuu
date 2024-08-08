@@ -126,6 +126,8 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_
         cmd = "xmake f {} -c -y -m {} --feedback={} -k {} --low_precision={} --log_level={}".format(
             "-v -D" if verbose else "", mode, feedback, "shared" if mode == 'release' else "static", low_precision,
             2 if mode == 'release' else 0)
+        if sys.platform == 'win32':
+            cmd = f'{cmd} --runtimes=MD'
         print(cmd)
         os.system(cmd)
 

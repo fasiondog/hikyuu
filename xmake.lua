@@ -115,7 +115,6 @@ set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", 0)
 
 local boost_version = "1.85.0"
 local hdf5_version = "1.12.2"
-local fmt_version = "11.0.1"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.8.0"
 local sqlite_version = "3.46.0+0"
@@ -156,7 +155,6 @@ elseif is_plat("macosx") then
 end
 
 add_requires("boost " .. boost_version, {
-  system = false,
   debug = is_mode("debug"),
   configs = {
     shared = is_plat("windows"),
@@ -170,13 +168,13 @@ add_requires("boost " .. boost_version, {
   },
 })
 
-add_requires("fmt " .. fmt_version, {system = false})
-add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
-add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, system = false})
-add_requires("sqlite3 " .. sqlite_version, {system = false, configs = {shared = true, cxflags = "-fPIC"}})
+add_requires("fmt", {configs = {header_only = true}})
+add_requires("spdlog", {configs = {header_only = true, fmt_external = true}})
+add_requireconfs("spdlog.fmt", {override = true, configs = {header_only = true}})
+add_requires("sqlite3 " .. sqlite_version, {configs = {shared = true, cxflags = "-fPIC"}})
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {runtimes = get_config("runtimes")}})
-add_requires("nng " .. nng_version, {system = false, configs = {cxflags = "-fPIC"}})
-add_requires("nlohmann_json", {system = false})
+add_requires("nng " .. nng_version, {configs = {cxflags = "-fPIC"}})
+add_requires("nlohmann_json")
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
