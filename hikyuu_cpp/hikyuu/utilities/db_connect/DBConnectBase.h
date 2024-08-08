@@ -10,8 +10,8 @@
 #ifndef HIKYUU_DB_CONNECT_DBCONNECTBASE_H
 #define HIKYUU_DB_CONNECT_DBCONNECTBASE_H
 
-#include "../../DataType.h"
 #include "../../utilities/Parameter.h"
+#include "../Null.h"
 #include "DBCondition.h"
 #include "SQLStatementBase.h"
 #include "SQLException.h"
@@ -25,7 +25,7 @@ class SQLResultSet;
  * 数据库连接基类
  * @ingroup DBConnect
  */
-class HKU_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase> {
+class HKU_UTILS_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase> {
     PARAMETER_SUPPORT  // NOSONAR
 
       public :
@@ -297,7 +297,7 @@ private:
 };
 
 /** @ingroup DBConnect */
-typedef shared_ptr<DBConnectBase> DBConnectPtr;
+typedef std::shared_ptr<DBConnectBase> DBConnectPtr;
 
 //-------------------------------------------------------------------------
 // inline方法实现
@@ -366,19 +366,16 @@ void DBConnectBase::save(T &item, bool autotrans) {
         if (autotrans) {
             commit();
         }
-
     } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "failed save! sql: {}! {}", st->getSqlString(), e.what());
-
     } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
         HKU_THROW("failed save! sql: {}! {}", st->getSqlString(), e.what());
-
     } catch (...) {
         if (autotrans) {
             rollback();
@@ -409,19 +406,16 @@ void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool auto
         if (autotrans) {
             commit();
         }
-
     } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "failed batch save! sql: {}! {}", st->getSqlString(), e.what());
-
     } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
         HKU_THROW("failed batch save! sql: {}! {}", st->getSqlString(), e.what());
-
     } catch (...) {
         if (autotrans) {
             rollback();
@@ -431,7 +425,7 @@ void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool auto
 }
 
 template <typename T>
-void DBConnectBase::load(T &item, const string &where) {
+void DBConnectBase::load(T &item, const std::string &where) {
     std::ostringstream sql;
     if (where != "") {
         sql << T::getSelectSQL() << " where " << where << " limit 1";
@@ -451,7 +445,7 @@ void DBConnectBase::load(T &item, const DBCondition &cond) {
 }
 
 template <typename Container>
-void DBConnectBase::batchLoad(Container &container, const string &where) {
+void DBConnectBase::batchLoad(Container &container, const std::string &where) {
     std::ostringstream sql;
     if (where != "") {
         sql << Container::value_type::getSelectSQL() << " where " << where;
@@ -513,19 +507,16 @@ void DBConnectBase::batchUpdate(InputIterator first, InputIterator last, bool au
         if (autotrans) {
             commit();
         }
-
     } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "failed batch save! sql: {}! {}", st->getSqlString(), e.what());
-
     } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
         HKU_THROW("failed batch update! sql: {}! {}", st->getSqlString(), e.what());
-
     } catch (...) {
         if (autotrans) {
             rollback();
@@ -570,19 +561,16 @@ void DBConnectBase::remove(T &item, bool autotrans) {
             commit();
         }
         item.rowid(0);
-
     } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "failed delete! sql: {}! {}", st->getSqlString(), e.what());
-
     } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
         HKU_THROW("failed delete! sql: {}! {}", st->getSqlString(), e.what());
-
     } catch (...) {
         if (autotrans) {
             rollback();
@@ -610,19 +598,16 @@ void DBConnectBase::batchRemove(InputIterator first, InputIterator last, bool au
         if (autotrans) {
             commit();
         }
-
     } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "failed batch delete! {}", e.what());
-
     } catch (std::exception &e) {
         if (autotrans) {
             rollback();
         }
         HKU_THROW("failed batch delete! {}", e.what());
-
     } catch (...) {
         if (autotrans) {
             rollback();
@@ -645,13 +630,11 @@ inline void DBConnectBase::remove(const std::string &tablename, const std::strin
         if (autotrans) {
             commit();
         }
-
     } catch (hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
         SQL_THROW(e.errcode(), "Failed exec sql: {}! {}", sql, e.what());
-
     } catch (std::exception &e) {
         if (autotrans) {
             rollback();

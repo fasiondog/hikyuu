@@ -22,20 +22,20 @@
 
 namespace hku {
 
-class HKU_API MySQLConnect : public DBConnectBase {
+class HKU_UTILS_API MySQLConnect : public DBConnectBase {
 public:
-    explicit MySQLConnect(const Parameter& param);
+    explicit MySQLConnect(const Parameter &param);
     virtual ~MySQLConnect();
 
-    MySQLConnect(const MySQLConnect&) = delete;
-    MySQLConnect& operator=(const MySQLConnect&) = delete;
+    MySQLConnect(const MySQLConnect &) = delete;
+    MySQLConnect &operator=(const MySQLConnect &) = delete;
 
     virtual bool ping() override;
 
-    virtual int64_t exec(const std::string& sql_string) override;
-    virtual SQLStatementPtr getStatement(const std::string& sql_statement) override;
-    virtual bool tableExist(const std::string& tablename) override;
-    virtual void resetAutoIncrement(const std::string& tablename) override;
+    virtual int64_t exec(const std::string &sql_string) override;
+    virtual SQLStatementPtr getStatement(const std::string &sql_statement) override;
+    virtual bool tableExist(const std::string &tablename) override;
+    virtual void resetAutoIncrement(const std::string &tablename) override;
 
     virtual void transaction() noexcept override;
     virtual void commit() noexcept override;
@@ -48,7 +48,7 @@ private:
 
 private:
     friend class MySQLStatement;
-    MYSQL* m_mysql;
+    MYSQL *m_mysql;
 };
 
 }  // namespace hku

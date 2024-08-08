@@ -16,13 +16,19 @@
 #include "config.h"
 #include "exception.h"
 
+#ifndef HKU_LOG_ACTIVE_LEVEL
+#define HKU_LOG_ACTIVE_LEVEL 0
+#endif
+
 // clang-format off
-#if USE_SPDLOG_LOGGER
-    #include <spdlog/spdlog.h>
-    #include <spdlog/fmt/ostr.h>
-    #if HKU_USE_SPDLOG_ASYNC_LOGGER
-        #include "spdlog/async.h"
-    #endif
+#ifndef SPDLOG_ACTIVE_LEVEL
+#define SPDLOG_ACTIVE_LEVEL HKU_LOG_ACTIVE_LEVEL
+#endif
+
+#include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h>
+#if HKU_USE_SPDLOG_ASYNC_LOGGER
+    #include "spdlog/async.h"
 #endif
 // clang-format on
 
@@ -30,30 +36,24 @@
 #include <fmt/format.h>
 #include <fmt/chrono.h>
 
-#ifdef HKU_ENABLE_STACK_TRACE
+#ifndef HKU_ENABLE_STACK_TRACE
+#define HKU_ENABLE_STACK_TRACE 0
+#endif
+
+#if HKU_ENABLE_STACK_TRACE
 #include <boost/stacktrace.hpp>
 #endif
 
-#ifndef HKU_API
-#define HKU_API
+#ifndef HKU_UTILS_API
+#define HKU_UTILS_API
 #endif
 
 namespace hku {
 
-/**
- * @ingroup Utilities
- * @addtogroup logging Logging tools 日志工具
- * @details 打印等级：
- * TRACE < DEBUG < INFO < WARN < ERROR < FATAL
- * @{
- */
-
-bool HKU_API isLogInMainThread();
-
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
-#if USE_SPDLOG_LOGGER
+
 /** 日志级别 */
 enum LOG_LEVEL {
     LOG_TRACE = SPDLOG_LEVEL_TRACE,     ///< 跟踪
@@ -66,18 +66,26 @@ enum LOG_LEVEL {
 };
 
 /**
+ * 初始化 logger
+ * @param not_use_color 不使用彩色输出
+ * @param filename 日志文件名，为空时默认为当前目录下 "./hikyuu.log"，需自行保存存放目录存在且可写入
+ */
+void HKU_UTILS_API initLogger(bool not_use_color = false,
+                              const std::string& filename = std::string());
+
+/**
  * 获取当前日志级别
  * @return
  */
-LOG_LEVEL HKU_API get_log_level();
+LOG_LEVEL HKU_UTILS_API get_log_level();
 
 /**
  * 设置日志级别
  * @param level 指定的日志级别
  */
-void HKU_API set_log_level(LOG_LEVEL level);
+void HKU_UTILS_API set_log_level(LOG_LEVEL level);
 
-std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
+std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
 
 #define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_DEBUG(...) SPDLOG_LOGGER_DEBUG(hku::getHikyuuLogger(), __VA_ARGS__)
@@ -85,76 +93,6 @@ std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
 #define HKU_WARN(...) SPDLOG_LOGGER_WARN(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)
-
-void initLogger(bool inJupyter = false);
-
-#else
-enum LOG_LEVEL {
-    LOG_TRACE = 0,
-    LOG_DEBUG = 1,
-    LOG_INFO = 2,
-    LOG_WARN = 3,
-    LOG_ERROR = 4,
-    LOG_FATAL = 5,
-    LOG_OFF = 6,
-};
-
-LOG_LEVEL HKU_API get_log_level();
-void HKU_API set_log_level(LOG_LEVEL level);
-void initLogger(bool inJupyter = false);
-
-/** 获取系统当前时间，精确到毫秒，如：2001-01-02 13:01:02.001 */
-std::string HKU_API getLocalTime();
-
-#if LOG_ACTIVE_LEVEL <= 0
-#define HKU_TRACE(...)                                                                            \
-    fmt::print("[{}] [HKU-T] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
-               __LINE__);
-#else
-#define HKU_TRACE(...)
-#endif
-
-#if LOG_ACTIVE_LEVEL <= 1
-#define HKU_DEBUG(...)                                                                            \
-    fmt::print("[{}] [HKU-D] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
-               __LINE__);
-#else
-#define HKU_DEBUG(...)
-#endif
-
-#if LOG_ACTIVE_LEVEL <= 2
-#define HKU_INFO(...)                                                                             \
-    fmt::print("[{}] [HKU-I] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
-               __LINE__);
-#else
-#define HKU_INFO(...)
-#endif
-
-#if LOG_ACTIVE_LEVEL <= 3
-#define HKU_WARN(...)                                                                             \
-    fmt::print("[{}] [HKU-W] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
-               __LINE__);
-#else
-#define HKU_WARN(...)
-#endif
-
-#if LOG_ACTIVE_LEVEL <= 4
-#define HKU_ERROR(...)                                                                            \
-    fmt::print("[{}] [HKU-E] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
-               __LINE__);
-#else
-#define HKU_ERROR(...)
-#endif
-
-#if LOG_ACTIVE_LEVEL <= 5
-#define HKU_FATAL(...)                                                                            \
-    fmt::print("[{}] [HKU-F] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
-               __LINE__);
-#else
-#define HKU_FATAL(...)
-#endif
-
-#endif /* USE_SPDLOG_LOGGER */
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -166,7 +104,7 @@ std::string HKU_API getLocalTime();
 #define HKU_FUNCTION __FUNCTION__
 #endif
 
-#ifndef HKU_ENABLE_STACK_TRACE
+#if !HKU_ENABLE_STACK_TRACE
 /**
  * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
  * @note 用于外部入参及结果检查
@@ -212,23 +150,9 @@ std::string HKU_API getLocalTime();
                                      __FILE__, __LINE__));                                         \
         }                                                                                          \
     } while (0)
-#endif  // #ifndef HKU_ENABLE_STACK_TRACE
+#endif  // #if !HKU_ENABLE_STACK_TRACE
 
-#if HKU_DEBUG_MODE
-#define HKU_ASSERT_DEBUG(expr)
-#else
-/** 仅在 debug 模式下生效 */
-#define HKU_ASSERT_DEBUG(expr)                                                            \
-    do {                                                                                  \
-        if (!(expr)) {                                                                    \
-            std::string err_msg(fmt::format("HKU_ASSERT({})", #expr));                    \
-            throw hku::exception(                                                         \
-              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__)); \
-        }                                                                                 \
-    } while (0)
-
-#endif /* #if HKU_DEBUG_MODE */
-#ifdef HKU_ENABLE_STACK_TRACE
+#if HKU_ENABLE_STACK_TRACE
 /**
  * 若表达式为 false，将抛出 hku::exception 异常
  * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
@@ -253,9 +177,9 @@ std::string HKU_API getLocalTime();
         }                                                                                 \
     } while (0)
 
-#endif  // #ifndef HKU_ENABLE_STACK_TRACE
+#endif  // #if HKU_ENABLE_STACK_TRACE
 
-#ifndef HKU_ENABLE_STACK_TRACE
+#if !HKU_ENABLE_STACK_TRACE
 /** 抛出 hku::exception 及传入信息 */
 #define HKU_THROW(...)                                                                           \
     do {                                                                                         \
@@ -286,7 +210,7 @@ std::string HKU_API getLocalTime();
         throw except(                                                                           \
           fmt::format("EXCEPTION: {} [{}] ({}:{})", errmsg, HKU_FUNCTION, __FILE__, __LINE__)); \
     } while (0)
-#endif  // #ifndef HKU_ENABLE_STACK_TRACE
+#endif  // #if !HKU_ENABLE_STACK_TRACE
 
 /**
  * 满足指定条件时，打印 TRACE 信息
@@ -420,11 +344,65 @@ std::string HKU_API getLocalTime();
 
 /** 用于 catch (...) 中打印，减少编译后代码大小 */
 extern std::string g_unknown_error_msg;
+#define HKU_THROW_UNKNOWN HKU_THROW(g_unknown_error_msg);
 #define HKU_TRACE_UNKNOWN HKU_TRACE(g_unknown_error_msg)
 #define HKU_DEBUG_UNKNOWN HKU_DEBUG(g_unknown_error_msg)
 #define HKU_INFO_UNKNOWN HKU_INFO(g_unknown_error_msg)
 #define HKU_ERROR_UNKNOWN HKU_ERROR(g_unknown_error_msg)
 #define HKU_FATAL_UNKNOWN HKU_FATAL(g_unknown_error_msg)
+
+#if CPP_STANDARD >= CPP_STANDARD_17
+#define CLASS_LOGGER_IMP(cls) \
+protected:                    \
+    inline static const char* ms_logger = #cls;
+#else
+#define CLASS_LOGGER_IMP(cls) \
+protected:                    \
+    const char* ms_logger = #cls;
+#endif
+
+#define CLS_TRACE(...) HKU_TRACE(fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_DEBUG(...) HKU_DEBUG(fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_INFO(...) HKU_INFO(fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_WARN(...) HKU_WARN(fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_ERROR(...) HKU_ERROR(fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_FATAL(...) HKU_FATAL(fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+
+#define CLS_TRACE_IF(expr, ...) \
+    HKU_TRACE_IF(expr, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_DEBUG_IF(expr, ...) \
+    HKU_DEBUG_IF(expr, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_INFO_IF(expr, ...) \
+    HKU_INFO_IF(expr, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_WARN_IF(expr, ...) \
+    HKU_WARN_IF(expr, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_ERROR_IF(expr, ...) \
+    HKU_ERROR_IF(expr, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_FATAL_IF(expr, ...) \
+    HKU_FATAL_IF(expr, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+
+#define CLS_IF_RETURN(expr, ret) HKU_IF_RETURN(expr, ret)
+#define CLS_TRACE_IF_RETURN(expr, ret, ...) \
+    HKU_TRACE_IF_RETURN(expr, ret, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_DEBUG_IF_RETURN(expr, ret, ...) \
+    HKU_DEBUG_IF_RETURN(expr, ret, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_INFO_IF_RETURN(expr, ret, ...) \
+    HKU_INFO_IF_RETURN(expr, ret, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_WARN_IF_RETURN(expr, ret, ...) \
+    HKU_WARN_IF_RETURN(expr, ret, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_ERROR_IF_RETURN(expr, ret, ...) \
+    HKU_ERROR_IF_RETURN(expr, ret, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_FATAL_IF_RETURN(expr, ret, ...) \
+    HKU_FATAL_IF_RETURN(expr, ret, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+
+#define CLS_ASSERT HKU_ASSERT
+#define CLS_CHECK(expr, ...) \
+    HKU_CHECK(expr, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_CHECK_THROW(expr, except, ...) \
+    HKU_CHECK_THROW(expr, except, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_THROW(...) HKU_THROW(fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
+#define CLS_THROW_EXCEPTION(except, ...) \
+    HKU_THROW_EXCEPTION(except, fmt::format("[{}] {}", ms_logger, fmt::format(__VA_ARGS__)))
 
 /** @} */
 

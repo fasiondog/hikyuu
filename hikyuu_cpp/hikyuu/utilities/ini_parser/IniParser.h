@@ -1,4 +1,4 @@
-﻿/*
+/*
  * IniFile.h
  *
  *  Created on: 2010-5-19
@@ -8,6 +8,11 @@
 #pragma once
 #ifndef INIPARSER_H_
 #define INIPARSER_H_
+
+#include "hikyuu/utilities/config.h"
+#if !HKU_ENABLE_INI_PARSER
+#error "Don't enable ini_parser, please config with --ini_parser=y"
+#endif
 
 #include <stdexcept>
 #include <string>
@@ -21,8 +26,8 @@
 #pragma warning(disable : 4290)
 #endif
 
-#ifndef HKU_API
-#define HKU_API
+#ifndef HKU_UTILS_API
+#define HKU_UTILS_API
 #endif
 
 namespace hku {
@@ -52,7 +57,7 @@ namespace hku {
  * @ingroup Utilities
  */
 
-class HKU_API IniParser {
+class HKU_UTILS_API IniParser {
 public:
     typedef std::list<std::string> StringList;
     typedef std::shared_ptr<std::list<std::string> > StringListPtr;
@@ -75,7 +80,7 @@ public:
     std::string get(const std::string& section, const std::string& option,
                     const std::string& default_str = std::string()) const;
 
-    //以下默认值类型使用string的原因是因为int/float/double/bool类型没有空对象
+    // 以下默认值类型使用string的原因是因为int/float/double/bool类型没有空对象
     int getInt(const std::string& section, const std::string& option,
                const std::string& default_str = std::string()) const;
 

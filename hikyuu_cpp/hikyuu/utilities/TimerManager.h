@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <functional>
 #include "hikyuu/utilities/datetime/Datetime.h"
-#include "hikyuu/Log.h"
+#include "hikyuu/utilities/Log.h"
 #include "thread/ThreadPool.h"
 #include "cppdef.h"
 
@@ -399,7 +399,7 @@ private:
     // 分配 timer_id
     int getNewTimerId() {
         int max_int = std::numeric_limits<int>::max();
-        HKU_WARN_IF_RETURN(m_timers.size() >= max_int, -1, "Timer queue is full!");
+        HKU_WARN_IF_RETURN(m_timers.size() >= size_t(max_int), -1, "Timer queue is full!");
 
         if (m_current_timer_id >= max_int) {
             m_current_timer_id = 0;

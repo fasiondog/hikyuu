@@ -255,6 +255,9 @@ private:
     /** 加载历史财经字段索引 */
     void loadHistoryFinanceField();
 
+    /** 加载历史财务数据 */
+    void loadHistoryFinance();
+
 private:
     StockManager();
 

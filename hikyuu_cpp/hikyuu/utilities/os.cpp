@@ -33,7 +33,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include "arithmetic.h"
-#include "hikyuu/Log.h"
+#include "Log.h"
 #include "os.h"
 
 #ifdef _MSC_VER
@@ -43,7 +43,7 @@
 
 namespace hku {
 
-bool HKU_API existFile(const std::string& filename) noexcept {
+bool HKU_UTILS_API existFile(const std::string &filename) noexcept {
 #ifdef _WIN32
     auto attribs = GetFileAttributesA(HKU_PATH(filename).c_str());
     return attribs != INVALID_FILE_ATTRIBUTES;
@@ -53,7 +53,7 @@ bool HKU_API existFile(const std::string& filename) noexcept {
 #endif
 }
 
-bool HKU_API createDir(const std::string& pathname) noexcept {
+bool HKU_UTILS_API createDir(const std::string &pathname) noexcept {
     std::string npath = HKU_PATH(pathname);
 
     // 目录已存在，直接返回成功
@@ -76,36 +76,36 @@ bool HKU_API createDir(const std::string& pathname) noexcept {
     return access(npath.c_str(), 0) == 0;
 }
 
-bool HKU_API isColorTerminal() noexcept {
+bool HKU_UTILS_API isColorTerminal() noexcept {
 #if defined(_WIN32) || defined(__linux__) || defined(__ANDROID__)
     return true;
 #elif TARGET_OS_IPHONE
     return false;
 #else
-    static constexpr std::array<const char*, 14> Terms = {
+    static constexpr std::array<const char *, 14> Terms = {
       {"ansi", "color", "console", "cygwin", "gnome", "konsole", "kterm", "linux", "msys", "putty",
        "rxvt", "screen", "vt100", "xterm"}};
 
-    const char* env_p = std::getenv("TERM");
+    const char *env_p = std::getenv("TERM");
     if (env_p == nullptr) {
         return false;
     }
 
     static const bool result =
       std::any_of(std::begin(Terms), std::end(Terms),
-                  [&](const char* term) { return std::strstr(env_p, term) != nullptr; });
+                  [&](const char *term) { return std::strstr(env_p, term) != nullptr; });
     return result;
 #endif
 }
 
 // 删除文件
-bool HKU_API removeFile(const std::string& filename) noexcept {
+bool HKU_UTILS_API removeFile(const std::string &filename) noexcept {
     return std::remove(HKU_PATH(filename).c_str()) == 0;
 }
 
 #ifdef _WIN32
 // 删除目录及其包含的文件和子目录
-bool HKU_API removeDir(const std::string& path) noexcept {
+bool HKU_UTILS_API removeDir(const std::string &path) noexcept {
     std::string strPath = HKU_PATH(path);
     struct _finddata_t fb;  // 查找相同属性文件的存储结构体
     // 制作用于正则化路径
@@ -148,14 +148,14 @@ bool HKU_API removeDir(const std::string& path) noexcept {
 
 #else   // #ifdef _WIN32
 // 删除目录及其包含的文件和子目录
-bool HKU_API removeDir(const std::string& path) noexcept {
+bool HKU_UTILS_API removeDir(const std::string &path) noexcept {
     std::string strPath(path);
     if (strPath.at(strPath.length() - 1) != '\\' && strPath.at(strPath.length() - 1) != '/') {
         strPath.append("/");
     }
-    DIR* d = opendir(strPath.c_str());  // 打开这个目录
+    DIR *d = opendir(strPath.c_str());  // 打开这个目录
     if (d != NULL) {
-        struct dirent* dt = NULL;
+        struct dirent *dt = NULL;
 
         // 逐个读取目录中的文件到dt
         while (NULL != (dt = readdir(d))) {
@@ -178,7 +178,7 @@ bool HKU_API removeDir(const std::string& path) noexcept {
 }
 #endif  // #ifdef _WIN32
 
-bool HKU_API copyFile(const std::string& src, const std::string& dst, bool flush) noexcept {
+bool HKU_UTILS_API copyFile(const std::string &src, const std::string &dst, bool flush) noexcept {
     bool success = false;
     try {
         std::ifstream srcio(HKU_PATH(src), std::ios::binary);
@@ -194,8 +194,8 @@ bool HKU_API copyFile(const std::string& src, const std::string& dst, bool flush
     return success;
 }
 
-bool HKU_API renameFile(const std::string& oldname, const std::string& newname,
-                        bool overlay) noexcept {
+bool HKU_UTILS_API renameFile(const std::string &oldname, const std::string &newname,
+                              bool overlay) noexcept {
     // 先判定文件是否存在，保证 std::rename 的行为和系统无关
     if (overlay) {
         HKU_ERROR_IF_RETURN(existFile(newname) && !removeFile(newname), false,
@@ -214,7 +214,7 @@ bool HKU_API renameFile(const std::string& oldname, const std::string& newname,
  * 获取用户路径
  */
 static std::string _getUserDir() {
-    char* home = getenv("HOME");
+    char *home = getenv("HOME");
     if (home) {
         return std::string(home);
     }
@@ -233,7 +233,7 @@ static std::string _getUserDir() {
     return std::string();
 }
 
-std::string HKU_API getUserDir() {
+std::string HKU_UTILS_API getUserDir() {
 #ifdef _WIN32
     return GBToUTF8(_getUserDir());
 #else
@@ -241,9 +241,9 @@ std::string HKU_API getUserDir() {
 #endif
 }
 
-std::string HKU_API getCurrentDir() {
+std::string HKU_UTILS_API getCurrentDir() {
     std::string ret;
-    char* buffer = NULL;
+    char *buffer = NULL;
 #if HKU_OS_WINSOWS
     buffer = _getcwd(buffer, 0);
 #else
@@ -261,7 +261,7 @@ std::string HKU_API getCurrentDir() {
     return ret;
 }
 
-uint64_t HKU_API getDiskFreeSpace(const char* path) {
+uint64_t HKU_UTILS_API getDiskFreeSpace(const char *path) {
 #if HKU_OS_WINDOWS
     uint64_t freespace = Null<uint64_t>();
     std::string npath = HKU_PATH(path);
@@ -283,7 +283,7 @@ uint64_t HKU_API getDiskFreeSpace(const char* path) {
 #endif
 }
 
-std::string HKU_API getPlatform() {
+std::string HKU_UTILS_API getPlatform() {
     std::string ret;
 #if HKU_OS_WINDOWS
     ret = "windows";
@@ -303,7 +303,7 @@ std::string HKU_API getPlatform() {
     return ret;
 }
 
-std::string HKU_API getCpuArch() {
+std::string HKU_UTILS_API getCpuArch() {
     std::string ret;
 #if HKU_ARCH_ARM
     ret = "arm";

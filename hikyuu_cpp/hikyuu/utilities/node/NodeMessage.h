@@ -12,6 +12,7 @@
 #include <vector>
 #include <nng/nng.h>
 #include <nlohmann/json.hpp>
+#include <hikyuu/utilities/Log.h>
 #include "NodeError.h"
 
 using json = nlohmann::json;
@@ -26,8 +27,8 @@ namespace hku {
  * req ->
  *  {"cmd": int, ...}
  *
- * req ->
- *  {"cmd": int, "ret": code, "msg": str}
+ * <- res
+ *  {"ret": code, "msg": str} // msg 存在错误时返回错误信息 （可选）
  *
  *
  */
