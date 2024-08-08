@@ -39,3 +39,8 @@ jobs:
       shell: cmd
       run: |
         xmake -b core
+
+    - name: test
+      shell: cmd
+      run: |
+        python hikyuu\test\test.py

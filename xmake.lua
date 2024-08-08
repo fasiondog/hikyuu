@@ -182,9 +182,10 @@ add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
--- modifed to use boost static library, except boost.python, serialization
+-- on windows dll, must use runtimes MD
 if is_plat("windows") and get_config("kind") == "shared" then 
-    add_defines("BOOST_ALL_DYN_LINK") 
+    set_config("runtimes", "MD")
+    set_runtimes("MD")
 end
 
 -- is release now
