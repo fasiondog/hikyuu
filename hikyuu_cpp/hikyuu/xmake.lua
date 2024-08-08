@@ -99,17 +99,17 @@ target("hikyuu")
         add_files("./utilities/db_connect/mysql/**.cpp")
     end
 
-    on_config(function(target)
-        -- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
-        -- windows下如果使用 serialize 且希望使用动态库，需要自行设置 runtimes 参数为 "MD"
-        -- "MT" 方式下，serialize 会挂
-        if is_plat("windows") and has_config("serialize") and target:kind() == "shared" then
-            local runtime = get_config("runtimes")
-            if runtime == nil or runtime == "MT" then
-                raise('${red}Not support the option "--serialize=y" and "--runtimes=MT" for DLL on Windows at same time!')
-            end
-        end
-    end)
+    -- on_config(function(target)
+    --     -- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
+    --     -- windows下如果使用 serialize 且希望使用动态库，需要自行设置 runtimes 参数为 "MD"
+    --     -- "MT" 方式下，serialize 会挂
+    --     if is_plat("windows") and has_config("serialize") and target:kind() == "shared" then
+    --         local runtime = get_config("runtimes")
+    --         if runtime == nil or runtime == "MT" then
+    --             raise('${red}Not support the option "--serialize=y" and "--runtimes=MT" for DLL on Windows at same time!')
+    --         end
+    --     end
+    -- end)
 
     after_build(function(target)
         local destpath = get_config("buildir") .. "/" .. get_config("mode") .. "/" .. get_config("plat") .. "/" .. get_config("arch")
