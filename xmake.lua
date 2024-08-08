@@ -57,6 +57,18 @@ option("log_level", {description = "set log level.", default = 2, values = {1, 2
 option("async_log", {description = "Use async log.", default = false})
 option("leak_check", {description = "Enable leak check for test", default = false})
 
+-- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
+-- windows下如果使用 serialize 且希望使用动态库，需要设置 runtimes 参数为 "MD"
+-- "MT" 方式下，serialize 会挂
+option("serialize", {description = "Enable support serialize object and pickle in python", default = true})
+if is_plat("windows") then
+    if is_mode("release") then
+        set_runtimes("MD")
+    else
+        set_runtimes("MDd")
+    end
+end
+
 if get_config("leak_check") then
     -- 需要 export LD_PRELOAD=libasan.so
     set_policy("build.sanitizer.address", true)
@@ -78,11 +90,7 @@ else
     set_configvar("HKU_DEBUG_MODE", 0)
 end
 set_configvar("CHECK_ACCESS_BOUND", 1)
-if is_plat("macosx") or get_config("leak_check") then
-    set_configvar("SUPPORT_SERIALIZATION", 0)
-else
-    set_configvar("SUPPORT_SERIALIZATION", is_mode("release") and 1 or 0)
-end
+set_configvar("SUPPORT_SERIALIZATION", get_config("serialize") and 1 or 0)
 set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
@@ -111,14 +119,6 @@ set_configvar("HKU_ENABLE_MO", 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT", 1)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", 0)
-
-if is_plat("windows") then
-    if is_mode("release") then
-        set_runtimes("MD")
-    else
-        set_runtimes("MDd")
-    end
-end
 
 local boost_version = "1.85.0"
 local hdf5_version = "1.12.2"
