@@ -8,6 +8,10 @@ import datetime
 import multiprocessing
 from configparser import ConfigParser
 from logging.handlers import QueueListener
+
+# 优先加载，处理 VS 17.10 升级后依赖 dll 不兼容问题
+import hikyuu
+
 import PyQt5
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
