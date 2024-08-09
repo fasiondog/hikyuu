@@ -115,6 +115,7 @@ HttpResponse HttpClient::request(const std::string& method, const std::string& p
         for (auto iter = params.cbegin(); iter != params.cend(); ++iter) {
             if (first) {
                 buf << "?";
+                first = false;
             } else {
                 buf << "&";
             }
