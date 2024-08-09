@@ -42,5 +42,7 @@ jobs:
 
     - name: test
       shell: cmd
+      env:
+        PYTHONPATH: ${{ github.workspace }}
       run: |
         python hikyuu\test\test.py
