@@ -33,14 +33,14 @@ jobs:
     - name: configure
       shell: cmd
       run: |
-        xmake f -c --feedback=n -k shared -y -vD
+        xmake f -c --feedback=n -y -vD
 
     - name: build
       shell: cmd
       run: |
         xmake -bvD small-test
 
-    # - name: test
-    #   shell: cmd
-    #   run: |
-    #     xmake r small-test
+    - name: test
+      shell: cmd
+      run: |
+        xmake r small-test

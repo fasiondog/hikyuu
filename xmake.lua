@@ -57,6 +57,11 @@ option("log_level", {description = "set log level.", default = 2, values = {1, 2
 option("async_log", {description = "Use async log.", default = false})
 option("leak_check", {description = "Enable leak check for test", default = false})
 
+-- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
+-- windows下如果使用 serialize 且希望使用动态库，需要设置 runtimes 参数为 "MD"
+-- "MT" 方式下，serialize 会挂
+option("serialize", {description = "Enable support serialize object and pickle in python", default = true})
+
 if get_config("leak_check") then
     -- 需要 export LD_PRELOAD=libasan.so
     set_policy("build.sanitizer.address", true)
@@ -78,11 +83,7 @@ else
     set_configvar("HKU_DEBUG_MODE", 0)
 end
 set_configvar("CHECK_ACCESS_BOUND", 1)
-if is_plat("macosx") or get_config("leak_check") then
-    set_configvar("SUPPORT_SERIALIZATION", 0)
-else
-    set_configvar("SUPPORT_SERIALIZATION", is_mode("release") and 1 or 0)
-end
+set_configvar("SUPPORT_SERIALIZATION", get_config("serialize") and 1 or 0)
 set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
@@ -112,17 +113,9 @@ set_configvar("HKU_ENABLE_HTTP_CLIENT", 1)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", 0)
 
-if is_plat("windows") then
-    if is_mode("release") then
-        set_runtimes("MD")
-    else
-        set_runtimes("MDd")
-    end
-end
-
 local boost_version = "1.85.0"
 local hdf5_version = "1.12.2"
-local fmt_version = "11.0.1"
+local fmt_version = "10.2.1"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.8.0"
 local sqlite_version = "3.46.0+0"
@@ -163,7 +156,6 @@ elseif is_plat("macosx") then
 end
 
 add_requires("boost " .. boost_version, {
-  system = false,
   debug = is_mode("debug"),
   configs = {
     shared = is_plat("windows"),
@@ -177,22 +169,23 @@ add_requires("boost " .. boost_version, {
   },
 })
 
-add_requires("fmt " .. fmt_version, {system = false})
-add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
-add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, system = false})
-add_requires("sqlite3 " .. sqlite_version, {system = false, configs = {shared = true, cxflags = "-fPIC"}})
+add_requires("fmt", {configs = {header_only = true}})
+add_requires("spdlog", {configs = {header_only = true, fmt_external = true}})
+add_requireconfs("spdlog.fmt", {override = true, configs = {header_only = true}})
+add_requires("sqlite3 " .. sqlite_version, {configs = {shared = true, cxflags = "-fPIC"}})
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {runtimes = get_config("runtimes")}})
-add_requires("nng " .. nng_version, {system = false, configs = {cxflags = "-fPIC"}})
-add_requires("nlohmann_json", {system = false})
+add_requires("nng " .. nng_version, {configs = {cxflags = "-fPIC"}})
+add_requires("nlohmann_json")
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
--- modifed to use boost static library, except boost.python, serialization
+-- on windows dll, must use runtimes MD
 if is_plat("windows") and get_config("kind") == "shared" then 
-    add_defines("BOOST_ALL_DYN_LINK") 
+    set_config("runtimes", "MD")
+    set_runtimes("MD")
 end
 
 -- is release now

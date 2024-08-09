@@ -1,11 +1,6 @@
 
 target("hikyuu")
     set_kind("$(kind)")
-    -- if is_mode("debug", "coverage", "asan", "msan", "tsan", "lsan") then
-    --     set_kind("static")
-    -- else
-    --     set_kind("shared")
-    -- end
 
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json")
     if is_plat("windows", "linux", "cross") then
