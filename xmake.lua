@@ -115,9 +115,6 @@ set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", 0)
 
 local boost_version = "1.85.0"
 local hdf5_version = "1.12.2"
-if is_plat("windows") then
-    hdf5_version = "1.13.3"
-end
 local fmt_version = "10.2.1"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.8.0"
