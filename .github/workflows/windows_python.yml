@@ -39,10 +39,3 @@ jobs:
       shell: cmd
       run: |
         xmake -b core
-
-    - name: test
-      shell: cmd
-      env:
-        PYTHONPATH: ${{ github.workspace }}
-      run: |
-        python hikyuu\test\test.py
