@@ -1,4 +1,4 @@
-﻿/*
+/*
  * IniFile.cpp
  *
  *  Created on: 2010-5-19
@@ -9,7 +9,7 @@
 #include <sstream>
 #include <fstream>
 
-#include "arithmetic.h"
+#include "../arithmetic.h"
 #include "IniParser.h"
 
 namespace hku {

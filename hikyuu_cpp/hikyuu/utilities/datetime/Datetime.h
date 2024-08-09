@@ -17,14 +17,19 @@
 #include <string>
 #include <vector>
 #include <fmt/ostream.h>
+
+#include "hikyuu/utilities/config.h"
+#if !HKU_SUPPORT_DATETIME
+#error "Don't support datetime, you can config with --datetime=y"
+#endif
 #include "TimeDelta.h"
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4251)
 #endif
 
-#ifndef HKU_API
-#define HKU_API
+#ifndef HKU_UTILS_API
+#define HKU_UTILS_API
 #endif
 
 namespace hku {
@@ -37,7 +42,7 @@ namespace bd = boost::gregorian;
  * @details 构造失败将抛出异常 std::out_of_range
  * @ingroup DataType
  */
-class HKU_API Datetime {
+class HKU_UTILS_API Datetime {
 public:
     /** 返回所能表示的最小日期：1400-Jan-01 00:00:00 */
     static Datetime min();
@@ -61,7 +66,7 @@ public:
     /** 默认构造函数，Null<Datetime> */
     Datetime();
 
-    Datetime(const Datetime&);
+    Datetime(const Datetime &);
 
     /**
      * 构造函数
@@ -78,10 +83,10 @@ public:
              long millisec = 0, long microsec = 0);
 
     /** 从boost::gregorian::date构造日期类型 */
-    explicit Datetime(const bd::date&);
+    explicit Datetime(const bd::date &);
 
     /** 从boost::posix_time::ptime构造 */
-    explicit Datetime(const bt::ptime&);
+    explicit Datetime(const bt::ptime &);
 
     /**
      * 通过数字方式构造日期类型
@@ -103,9 +108,9 @@ public:
      *     4、"20010101T181159"
      * </pre>
      */
-    explicit Datetime(const std::string&);
+    explicit Datetime(const std::string &);
 
-    Datetime& operator=(const Datetime&);
+    Datetime &operator=(const Datetime &);
 
     /** 年份，如果是 Null 将抛出异常 */
     long year() const;
@@ -283,7 +288,7 @@ private:
     bt::ptime m_data;
 };
 
-HKU_API std::ostream& operator<<(std::ostream&, const Datetime&);
+HKU_UTILS_API std::ostream &operator<<(std::ostream &, const Datetime &);
 
 /**
  * 日期列表
@@ -297,41 +302,41 @@ typedef std::vector<Datetime> DatetimeList;
  * @param end 结束日期
  * @return [start, end)范围内的日历日期
  */
-DatetimeList HKU_API getDateRange(const Datetime& start, const Datetime& end);
+DatetimeList HKU_UTILS_API getDateRange(const Datetime &start, const Datetime &end);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
 // 关系比较函数, 不直接在类中定义是为了支持 Null<>() == d，Null可以放在左边
 //
 ///////////////////////////////////////////////////////////////////////////////
-bool operator==(const Datetime&, const Datetime&);
-bool operator!=(const Datetime&, const Datetime&);
-bool operator>(const Datetime&, const Datetime&);
-bool operator<(const Datetime&, const Datetime&);
-bool operator>=(const Datetime&, const Datetime&);
-bool operator<=(const Datetime&, const Datetime&);
+bool operator==(const Datetime &, const Datetime &);
+bool operator!=(const Datetime &, const Datetime &);
+bool operator>(const Datetime &, const Datetime &);
+bool operator<(const Datetime &, const Datetime &);
+bool operator>=(const Datetime &, const Datetime &);
+bool operator<=(const Datetime &, const Datetime &);
 
-inline bool operator==(const Datetime& d1, const Datetime& d2) {
+inline bool operator==(const Datetime &d1, const Datetime &d2) {
     return d1.ptime() == d2.ptime();
 }
 
-inline bool operator!=(const Datetime& d1, const Datetime& d2) {
+inline bool operator!=(const Datetime &d1, const Datetime &d2) {
     return d1.ptime() != d2.ptime();
 }
 
-inline bool operator>(const Datetime& d1, const Datetime& d2) {
+inline bool operator>(const Datetime &d1, const Datetime &d2) {
     return d1.ptime() > d2.ptime();
 }
 
-inline bool operator<(const Datetime& d1, const Datetime& d2) {
+inline bool operator<(const Datetime &d1, const Datetime &d2) {
     return d1.ptime() < d2.ptime();
 }
 
-inline bool operator>=(const Datetime& d1, const Datetime& d2) {
+inline bool operator>=(const Datetime &d1, const Datetime &d2) {
     return d1.ptime() >= d2.ptime();
 }
 
-inline bool operator<=(const Datetime& d1, const Datetime& d2) {
+inline bool operator<=(const Datetime &d1, const Datetime &d2) {
     return d1.ptime() <= d2.ptime();
 }
 
@@ -340,11 +345,11 @@ inline bool operator<=(const Datetime& d1, const Datetime& d2) {
 // 加、减法运算补充
 //
 ///////////////////////////////////////////////////////////////////////////////
-inline Datetime operator+(const TimeDelta& delta, const Datetime& date) {
+inline Datetime operator+(const TimeDelta &delta, const Datetime &date) {
     return date + delta;
 }
 
-inline TimeDelta operator-(const Datetime& d1, const Datetime& d2) {
+inline TimeDelta operator-(const Datetime &d1, const Datetime &d2) {
     return TimeDelta(d1.ptime() - d2.ptime());
 }
 
@@ -359,11 +364,11 @@ inline Datetime::Datetime() {
     m_data = bt::ptime(d, bt::time_duration(0, 0, 0));
 }
 
-inline Datetime::Datetime(const Datetime& d) : m_data(d.m_data) {}
+inline Datetime::Datetime(const Datetime &d) : m_data(d.m_data) {}
 
-inline Datetime::Datetime(const bd::date& d) : m_data(bt::ptime(d, bt::time_duration(0, 0, 0))) {}
+inline Datetime::Datetime(const bd::date &d) : m_data(bt::ptime(d, bt::time_duration(0, 0, 0))) {}
 
-inline Datetime::Datetime(const bt::ptime& d) : m_data(d) {}
+inline Datetime::Datetime(const bt::ptime &d) : m_data(d) {}
 
 inline bt::ptime Datetime::ptime() const {
     return m_data;
@@ -404,21 +409,26 @@ namespace std {
 template <>
 class hash<hku::Datetime> {
 public:
-    size_t operator()(hku::Datetime const& d) const noexcept {
+    size_t operator()(hku::Datetime const &d) const noexcept {
         return d.ticks();  // or use boost::hash_combine
     }
 };
+
+inline string to_string(const hku::Datetime &date) {
+    return date.str();
+}
+
 }  // namespace std
 
 #if FMT_VERSION >= 90000
 template <>
 struct fmt::formatter<hku::Datetime> {
-    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) {
         return ctx.end();
     }
 
     template <typename FormatContext>
-    auto format(const hku::Datetime& d, FormatContext& ctx) const -> decltype(ctx.out()) {
+    auto format(const hku::Datetime &d, FormatContext &ctx) const -> decltype(ctx.out()) {
         return fmt::format_to(ctx.out(), "{}", d.str());
     }
 };

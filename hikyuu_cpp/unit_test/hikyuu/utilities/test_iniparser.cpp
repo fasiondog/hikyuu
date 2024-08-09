@@ -11,7 +11,7 @@
 #include <fstream>
 #include <exception>
 #include <hikyuu/utilities/os.h>
-#include <hikyuu/utilities/IniParser.h>
+#include <hikyuu/utilities/ini_parser/IniParser.h>
 
 using namespace hku;
 using namespace std;

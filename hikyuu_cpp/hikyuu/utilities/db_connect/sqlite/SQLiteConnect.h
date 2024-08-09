@@ -25,7 +25,7 @@ namespace hku {
  * SQLite连接
  * @ingroup SQLite
  */
-class HKU_API SQLiteConnect : public DBConnectBase {
+class HKU_UTILS_API SQLiteConnect : public DBConnectBase {
 public:
     /**
      * 构造函数
@@ -78,11 +78,11 @@ private:
 
 private:
     friend class SQLiteStatement;
-    string m_dbname;
+    std::string m_dbname;
     sqlite3 *m_db;
 };
 
-typedef shared_ptr<SQLiteConnect> SQLiteConnectPtr;
+typedef std::shared_ptr<SQLiteConnect> SQLiteConnectPtr;
 
 }  // namespace hku
 

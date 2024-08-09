@@ -26,17 +26,19 @@ jobs:
 
     - uses: xmake-io/github-action-setup-xmake@v1
       with:
-        xmake-version: 2.9.2
+        xmake-version: 2.9.3
+        actions-cache-folder: '.xmake-cache'
+        actions-cache-key: 'windows'
 
     - name: configure
       shell: cmd
       run: |
-        xmake f -c --feedback=n -k shared -y -vD
+        xmake f -c --feedback=n -y -vD
 
     - name: build
       shell: cmd
       run: |
-        xmake -b small-test
+        xmake -bvD small-test
 
     - name: test
       shell: cmd

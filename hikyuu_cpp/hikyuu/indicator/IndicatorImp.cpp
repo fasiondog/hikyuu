@@ -7,10 +7,10 @@
 #include <stdexcept>
 #include <algorithm>
 #include <forward_list>
+#include "hikyuu/utilities/Log.h"
 #include "Indicator.h"
 #include "IndParam.h"
 #include "../Stock.h"
-#include "../Log.h"
 #include "../GlobalInitializer.h"
 #include "imp/ICval.h"
 

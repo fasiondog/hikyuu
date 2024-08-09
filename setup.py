@@ -123,8 +123,9 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
-        cmd = "xmake f {} -c -y -m {} --feedback={} -k {} --low_precision={}".format(
-            "-v -D" if verbose else "", mode, feedback, "shared" if mode == 'release' else "static", low_precision)
+        cmd = "xmake f {} -c -y -m {} --feedback={} -k {} --low_precision={} --log_level={}".format(
+            "-v -D" if verbose else "", mode, feedback, "shared" if mode == 'release' else "static", low_precision,
+            2 if mode == 'release' else 0)
         print(cmd)
         os.system(cmd)
 

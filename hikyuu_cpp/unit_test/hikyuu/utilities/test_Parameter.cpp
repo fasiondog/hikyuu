@@ -6,7 +6,7 @@
  */
 
 #include "doctest/doctest.h"
-#include <hikyuu/Log.h>
+#include "hikyuu/utilities/Log.h"
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/StockManager.h>
 

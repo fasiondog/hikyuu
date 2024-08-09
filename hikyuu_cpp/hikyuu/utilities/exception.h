@@ -29,6 +29,7 @@ public:
     exception(const std::string& msg)  // cppcheck-suppress noExplicitConstructor
     : std::exception(msg.c_str()) {}
     exception(const char* msg) : std::exception(msg) {}  // cppcheck-suppress noExplicitConstructor
+    virtual ~exception() noexcept {};
 };
 
 #else

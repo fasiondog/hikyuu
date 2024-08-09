@@ -1,0 +1,41 @@
+#pragma once
+#ifndef HKU_UTILS_CONFIG_H_
+#define HKU_UTILS_CONFIG_H_
+
+#include "osdef.h"
+
+// clang-format off
+
+${define HKU_ENABLE_MYSQL}
+#if HKU_ENABLE_MYSQL && HKU_OS_WINDOWS
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#endif
+
+${define HKU_ENABLE_SQLITE}
+${define HKU_ENABLE_SQLCIPHER}
+${define HKU_SQL_TRACE}
+
+${define HKU_SUPPORT_DATETIME}
+
+${define HKU_ENABLE_INI_PARSER}
+
+${define HKU_ENABLE_STACK_TRACE}
+
+${define HKU_CLOSE_SPEND_TIME}
+
+${define HKU_USE_SPDLOG_ASYNC_LOGGER}
+${define HKU_LOG_ACTIVE_LEVEL}
+
+${define HKU_ENABLE_MO}
+
+${define HKU_ENABLE_HTTP_CLIENT}
+${define HKU_ENABLE_HTTP_CLIENT_SSL}
+${define HKU_ENABLE_HTTP_CLIENT_ZIP}
+
+${define HKU_ENABLE_NODE}
+
+// clang-format on
+
+#endif /* HKU_UTILS_CONFIG_H_ */

@@ -48,7 +48,7 @@ hku_platforms = "Independant"
 hku_url = "http://hikyuu.org/"
 
 hku_description = "Hikyuu Quant Framework for System Trading Analysis and backtester"
-with open("./hikyuu/README.rst", encoding='utf-8') as f:
+with open("./readme.md", encoding='utf-8') as f:
     hku_long_description = f.read()
 
 hku_data_files = []
@@ -99,7 +99,8 @@ setup(
     name=hku_name,
     version=hku_version,
     description=hku_description,
-    long_description_content_type="text/x-rst",
+    # long_description_content_type="text/x-rst",
+    long_description_content_type='text/markdown',
     long_description=hku_long_description,
     author=hku_author,
     author_email=hku_author_email,
