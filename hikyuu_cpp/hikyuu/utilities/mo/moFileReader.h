@@ -588,7 +588,7 @@ public:
 
         // Beautify Output
         std::string fname;
-        unsigned int pos = infile.find_last_of(MO_PATHSEP);
+        size_t pos = infile.find_last_of(MO_PATHSEP);
         if (pos != std::string::npos) {
             fname = infile.substr(pos + 1, infile.length());
         } else {
