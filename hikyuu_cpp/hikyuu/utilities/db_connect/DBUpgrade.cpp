@@ -30,7 +30,7 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
     if (!driver->tableExist("module_version")) {
         bool need_create = true;
 #if HKU_ENABLE_SQLITE
-        if (need_create && typeid(*driver) == typeid(SQLiteConnect)) {
+        if (need_create && typeid(driver.get()) == typeid(SQLiteConnect *)) {
             driver->exec(
               "CREATE TABLE `module_version` (`id` INTEGER PRIMARY KEY AUTOINCREMENT,`module` "
               "TEXT, "
@@ -40,7 +40,7 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
 #endif
 
 #if HKU_ENABLE_MYSQL
-        if (need_create && typeid(*driver) == typeid(MySQLConnect)) {
+        if (need_create && typeid(driver.get()) == typeid(MySQLConnect *)) {
             driver->exec(
               R"(CREATE TABLE `module_version` (
   `id` int NOT NULL AUTO_INCREMENT,

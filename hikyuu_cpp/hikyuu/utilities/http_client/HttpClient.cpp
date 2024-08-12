@@ -98,7 +98,7 @@ void HttpClient::_connect() {
 
     if (!m_conn.valid()) {
         NNG_CHECK(m_aio.wait().result());
-        m_conn = std::move(nng::http_conn((nng_http_conn*)m_aio.get_output(0)));
+        m_conn = nng::http_conn((nng_http_conn*)m_aio.get_output(0));
     }
 }
 

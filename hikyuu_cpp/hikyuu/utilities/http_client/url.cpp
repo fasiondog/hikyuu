@@ -34,7 +34,7 @@ std::string url_escape(const char* istr) {
         if (is_unambiguous(*p)) {
             ostr += *p;
         } else {
-            sprintf(szHex, "%%%02X", *p);
+            snprintf(szHex, 4, "%%%02X", *p);
             ostr += szHex;
         }
         ++p;

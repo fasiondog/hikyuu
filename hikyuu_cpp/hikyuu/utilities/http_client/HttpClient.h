@@ -132,7 +132,7 @@ public:
     }
 
     void setUrl(const std::string& url) noexcept {
-        m_url = std::move(nng::url(url));
+        m_url = nng::url(url);
         reset();
     }
 
