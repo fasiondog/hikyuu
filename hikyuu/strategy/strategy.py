@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 # cp936
 
-from hikyuu import StrategyBase, Query, Datetime, TimeDelta
+from hikyuu import StrategyBase, Query, Datetime, TimeDelta, Seconds
 from hikyuu import StockManager
 
 
@@ -15,12 +15,6 @@ class TestStrategy(StrategyBase):
     def init(self):
         print("strategy init")
 
-    def on_bar(self, ktype):
-        print("on bar {}".format(ktype))
-        print("{}".format(len(StockManager.instance())))
-        for s in self.sm:
-            print(s)
-
 
 def my_func():
     sm = StockManager.instance()
@@ -31,5 +25,5 @@ def my_func():
 
 if __name__ == '__main__':
     s = TestStrategy()
-    s.run_daily_at(my_func, TimeDelta(0, 17, 6))
+    s.run_daily_at(my_func, Datetime.now() - Datetime.today() + Seconds(5))
     s.start()

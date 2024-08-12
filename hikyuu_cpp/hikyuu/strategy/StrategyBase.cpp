@@ -11,8 +11,16 @@
 #include "hikyuu/utilities/ini_parser/IniParser.h"
 #include "hikyuu/global/schedule/scheduler.h"
 #include "hikyuu/global/GlobalTaskGroup.h"
+#include "hikyuu/global/sysinfo.h"
 #include "hikyuu/hikyuu.h"
 #include "StrategyBase.h"
+
+#define EVENT(func)          \
+    if (runningInPython()) { \
+        event(func);         \
+    } else {                 \
+        func();              \
+    }
 
 namespace hku {
 
@@ -83,9 +91,9 @@ void StrategyBase::run() {
 
     auto& agent = *getGlobalSpotAgent();
     agent.addProcess(
-      [this](const SpotRecord& spot) { event([=]() { this->receivedSpot(spot); }); });
+      [this](const SpotRecord& spot) { EVENT([=]() { this->receivedSpot(spot); }); });
     agent.addPostProcess(
-      [this](Datetime revTime) { event([=]() { this->onReceivedSpot(revTime); }); });
+      [this](Datetime revTime) { EVENT([=]() { this->onReceivedSpot(revTime); }); });
     startSpotAgent(false);
 
     m_running = true;
@@ -99,7 +107,7 @@ void StrategyBase::start() {
 void StrategyBase::receivedSpot(const SpotRecord& spot) {
     Stock stk = getStock(format("{}{}", spot.market, spot.code));
     if (!stk.isNull()) {
-        event([=]() { this->onChange(stk, spot); });
+        EVENT([=]() { this->onChange(stk, spot); });
     }
 }
 
@@ -125,7 +133,7 @@ void StrategyBase::runDaily(std::function<void()>&& func, const TimeDelta& delta
         Datetime close2 = today + market_info.closeTime2();
         Datetime now = Datetime::now();
         if ((now > open1 && now < close1) || (now > open2 && now < close2)) {
-            event(func);
+            EVENT(func);
         }
     };
 
@@ -194,7 +202,7 @@ void StrategyBase::runDailyAt(std::function<void()>&& func, const TimeDelta& del
 
     auto new_func = [=]() {
         if (!ignoreHoliday) {
-            event(func);
+            EVENT(func);
             return;
         }
 
@@ -202,7 +210,7 @@ void StrategyBase::runDailyAt(std::function<void()>&& func, const TimeDelta& del
         auto today = Datetime::today();
         int day = today.dayOfWeek();
         if (day != 0 && day != 6 && !sm.isHoliday(today)) {
-            event(func);
+            EVENT(func);
         }
     };
 
