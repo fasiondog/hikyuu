@@ -15,11 +15,13 @@
 
 namespace hku {
 
+using TaskGroup = ThreadPool;
+
 /**
  * 获取全局线程池任务组
  * @note 请使用 future 获取任务返回
  */
-ThreadPool* getGlobalTaskGroup();
+TaskGroup* getGlobalTaskGroup();
 
 template <typename ResultType>
 using task_handle = std::future<ResultType>;

@@ -13,9 +13,9 @@
 
 namespace hku {
 
-static ThreadPool* g_threadPool;
+static TaskGroup* g_threadPool;
 
-ThreadPool* getGlobalTaskGroup() {
+TaskGroup* getGlobalTaskGroup() {
     static std::once_flag oc;
     std::call_once(oc, [&]() {
         auto cpu_num = std::thread::hardware_concurrency();
@@ -24,7 +24,7 @@ ThreadPool* getGlobalTaskGroup() {
         } else if (cpu_num > 1) {
             cpu_num--;
         }
-        g_threadPool = new ThreadPool(cpu_num);
+        g_threadPool = new TaskGroup(cpu_num);
     });
     return g_threadPool;
 }
