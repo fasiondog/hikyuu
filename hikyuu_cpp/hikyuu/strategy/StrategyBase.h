@@ -88,42 +88,53 @@ public:
         return m_stock_list;
     }
 
-    void run() {
-        _run(false);
-    }
+    /**
+     * 每日开盘时间内，以 delta 为周期循环定时执行指定任务
+     * @param func 待执行的任务
+     * @param delta 间隔时间
+     * @param market 指定的市场
+     */
+    void runDaily(std::function<void()>&& func, const TimeDelta& delta,
+                  const std::string& market = "SH");
 
-    void backTest(const Datetime& start, const Datetime& end);
+    /**
+     * 每日在指定时刻执行任务
+     * @param func 待执行的任务
+     * @param delta 指定时刻
+     * @param ignoreHoliday 忽略节假日，即节假日不执行
+     */
+    void runDailyAt(std::function<void()>&& func, const TimeDelta& delta,
+                    bool ignoreHoliday = true);
 
-    void receivedSpot(const SpotRecord& spot);
-    void finishReceivedSpot(Datetime revTime);
+    void start();
 
     virtual void init() {}
-    virtual void onTick() {}
-    virtual void onBar(const KQuery::KType& ktype) {};
 
-    virtual void onMarketOpen() {}
-    virtual void onMarketClose() {}
-    virtual void onClock(TimeDelta detla) {}
+    /**
+     * 数据发生变化，即接收到相应行情数据变更
+     * @note 通常用于调试
+     * @param stk 数据发生变化的 stock
+     * @param spot 接收到的具体数据
+     */
+    virtual void onChange(const Stock& stk, const SpotRecord& spot) {}
+
+    /**
+     * 一批行情数据接受完毕后通知
+     * @note 通常仅用于调试打印，该批行情数据中不一定含有上下文中包含的 stock
+     */
+    virtual void onReceivedSpot(Datetime revTime) {}
 
 private:
     string m_name;
     string m_config_file;
     StrategyContext m_context;
-    TMPtr m_tm;
-
     StockList m_stock_list;
-    std::unordered_map<KQuery::KType, Datetime> m_ref_last_time;
-    std::unordered_map<Stock, SpotRecord> m_spot_map;
+    TMPtr m_tm;
+    bool m_running{false};
 
 private:
-    void _initDefaultParam();
-
-    void _addTimer();
-    void _addClockEvent(const string& enable, TimeDelta delta, TimeDelta openTime,
-                        TimeDelta closeTime);
-
-    void _loadKData(const Datetime& start, const Datetime& end);
-    void _run(bool forTest);
+    void run();
+    void receivedSpot(const SpotRecord& spot);
 
 private:
     static std::atomic_bool ms_keep_running;

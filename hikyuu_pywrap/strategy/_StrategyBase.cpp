@@ -19,26 +19,6 @@ public:
     void init() override {
         PYBIND11_OVERLOAD(void, StrategyBase, init);
     }
-
-    void onTick() override {
-        PYBIND11_OVERLOAD(void, StrategyBase, onTick);
-    }
-
-    void onBar(const KQuery::KType& ktype) override {
-        PYBIND11_OVERLOAD(void, StrategyBase, onBar, ktype);
-    }
-
-    void onMarketOpen() override {
-        PYBIND11_OVERLOAD(void, StrategyBase, onMarketOpen);
-    }
-
-    void onMarketClose() override {
-        PYBIND11_OVERLOAD(void, StrategyBase, onMarketClose);
-    }
-
-    void onClock(TimeDelta detla) override {
-        PYBIND11_OVERLOAD(void, StrategyBase, onClock, detla);
-    }
 };
 
 void export_Strategy(py::module& m) {
@@ -60,11 +40,23 @@ void export_Strategy(py::module& m) {
                     py::overload_cast<const vector<KQuery::KType>&>(&StrategyBase::setKTypeList),
                     py::return_value_policy::copy, "需要的K线类型")
 
-      .def("run", &StrategyBase::run)
       .def("init", &StrategyBase::init)
-      .def("on_tick", &StrategyBase::onTick)
-      .def("on_bar", &StrategyBase::onBar)
-      .def("on_market_open", &StrategyBase::onMarketOpen)
-      .def("on_market_close", &StrategyBase::onMarketClose)
-      .def("on_clock", &StrategyBase::onClock);
+      .def("start", &PyStrategyBase::start)
+      .def("run_daily",
+           [](StrategyBase& self, py::object func, const TimeDelta& time) {
+               HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
+               py::object c_func = func.attr("__call__");
+               self.runDaily(c_func, time);
+           })
+      .def(
+        "run_daily_at",
+        [](StrategyBase& self, py::object func, const TimeDelta& time, bool ignore_holiday) {
+            HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
+            py::object c_func = func.attr("__call__");
+            self.runDailyAt(c_func, time, ignore_holiday);
+        },
+        py::arg("func"), py::arg("time"), py::arg("ignore_holiday") = true)
+      //   .def("run_daily", &StrategyBase::runDaily)
+      //   .def("run_daily_at", &StrategyBase::runDailyAt)
+      ;
 }

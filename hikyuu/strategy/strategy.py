@@ -2,8 +2,8 @@
 # -*- coding: utf8 -*-
 # cp936
 
-from hikyuu import StrategyBase, Query
-from hikyuu import StrategyContext, StockManager
+from hikyuu import StrategyBase, Query, Datetime, TimeDelta
+from hikyuu import StockManager
 
 
 class TestStrategy(StrategyBase):
@@ -22,6 +22,14 @@ class TestStrategy(StrategyBase):
             print(s)
 
 
+def my_func():
+    sm = StockManager.instance()
+    print("{}".format(len(sm)))
+    for s in sm:
+        print(s)
+
+
 if __name__ == '__main__':
     s = TestStrategy()
-    s.run()
+    s.run_daily_at(my_func, TimeDelta(0, 17, 6))
+    s.start()
