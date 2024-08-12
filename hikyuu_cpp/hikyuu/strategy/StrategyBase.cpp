@@ -15,6 +15,8 @@
 #include "hikyuu/hikyuu.h"
 #include "StrategyBase.h"
 
+// python 中运行拉回主线程循环
+// c++ 则直接执行（通常在定时调度的工作线程中执行）
 #define EVENT(func)          \
     if (runningInPython()) { \
         event(func);         \
