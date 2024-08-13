@@ -13,7 +13,7 @@
 #include "hikyuu/global/GlobalTaskGroup.h"
 #include "hikyuu/global/sysinfo.h"
 #include "hikyuu/hikyuu.h"
-#include "StrategyBase.h"
+#include "Strategy.h"
 
 // python 中运行拉回主线程循环
 // c++ 则直接执行（通常在定时调度的工作线程中执行）
@@ -26,18 +26,18 @@
 
 namespace hku {
 
-std::atomic_bool StrategyBase::ms_keep_running = true;
+std::atomic_bool Strategy::ms_keep_running = true;
 
-void StrategyBase::sig_handler(int sig) {
+void Strategy::sig_handler(int sig) {
     if (sig == SIGINT) {
         ms_keep_running = false;
         exit(0);
     }
 }
 
-StrategyBase::StrategyBase() : StrategyBase("Strategy", "") {}
+Strategy::Strategy() : Strategy("Strategy", "") {}
 
-StrategyBase::StrategyBase(const string& name, const string& config_file)
+Strategy::Strategy(const string& name, const string& config_file)
 : m_name(name), m_config_file(config_file) {
     if (m_config_file.empty()) {
         string home = getUserDir();
@@ -50,23 +50,23 @@ StrategyBase::StrategyBase(const string& name, const string& config_file)
     }
 }
 
-StrategyBase::StrategyBase(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
-                           const string& name, const string& config_file)
-: StrategyBase(name, config_file) {
+Strategy::Strategy(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
+                   const string& name, const string& config_file)
+: Strategy(name, config_file) {
     m_context.setStockCodeList(codeList);
     m_context.setKTypeList(ktypeList);
 }
 
-StrategyBase::~StrategyBase() {
+Strategy::~Strategy() {
     ms_keep_running = false;
-    HKU_INFO("[Strategy {}] Quit Strategy!", m_name);
+    CLS_INFO("Quit Strategy {}!", m_name);
 }
 
-void StrategyBase::run() {
-    HKU_IF_RETURN(m_running, void());
+void Strategy::run() {
+    CLS_IF_RETURN(m_running, void());
 
-    HKU_CHECK(!getStockCodeList().empty(), "The context does not contain any stocks!");
-    HKU_CHECK(!getKTypeList().empty(), "The K type list was empty!");
+    CLS_CHECK(!getStockCodeList().empty(), "The context does not contain any stocks!");
+    CLS_CHECK(!getKTypeList().empty(), "The K type list was empty!");
 
     StockManager& sm = StockManager::instance();
 
@@ -78,26 +78,13 @@ void StrategyBase::run() {
     // 注册 ctrl-c 终止信号
     std::signal(SIGINT, sig_handler);
 
-    HKU_INFO("[Strategy {}] strategy is running! You can press Ctrl-C to terminte ...", m_name);
+    CLS_INFO("{} is running! You can press Ctrl-C to terminte ...", m_name);
 
     // 初始化
     hikyuu_init(m_config_file, false, m_context);
 
     // 先将行情接收代理停止，以便后面加入处理函数
     stopSpotAgent();
-
-    // 根据上下文获取支持的 Stock 列表
-    const auto& stk_code_list = getStockCodeList();
-    m_stock_list.reserve(stk_code_list.size());
-    for (const auto& code : stk_code_list) {
-        Stock stk = getStock(code);
-        if (!stk.isNull()) {
-            m_stock_list.push_back(stk);
-        } else {
-            HKU_WARN("[Strategy {}] Invalid code: {}, can't find the stock!", m_name, code);
-        }
-    }
-    HKU_WARN_IF(m_stock_list.empty(), "[Strategy {}] stock list is empty!", m_name);
 
     auto& agent = *getGlobalSpotAgent();
     agent.addProcess([this](const SpotRecord& spot) { receivedSpot(spot); });
@@ -111,28 +98,27 @@ void StrategyBase::run() {
     m_running = true;
 }
 
-void StrategyBase::start() {
-    HKU_CHECK(m_running, "No handler functions are registered!");
-    HKU_INFO("start strategy even loop ...");
+void Strategy::start() {
+    CLS_CHECK(m_running, "No handler functions are registered!");
+    CLS_INFO("start even loop ...");
     _startEventLoop();
 }
 
-void StrategyBase::onChange(
-  std::function<void(const Stock&, const SpotRecord& spot)>&& changeFunc) {
+void Strategy::onChange(std::function<void(const Stock&, const SpotRecord& spot)>&& changeFunc) {
     if (!m_running) {
         run();
     }
     m_on_change = changeFunc;
 }
 
-void StrategyBase::onReceivedSpot(std::function<void(const Datetime&)>&& recievedFucn) {
+void Strategy::onReceivedSpot(std::function<void(const Datetime&)>&& recievedFucn) {
     if (!m_running) {
         run();
     }
     m_on_recieved_spot = recievedFucn;
 }
 
-void StrategyBase::receivedSpot(const SpotRecord& spot) {
+void Strategy::receivedSpot(const SpotRecord& spot) {
     Stock stk = getStock(format("{}{}", spot.market, spot.code));
     if (!stk.isNull()) {
         if (m_on_change) {
@@ -141,8 +127,8 @@ void StrategyBase::receivedSpot(const SpotRecord& spot) {
     }
 }
 
-void StrategyBase::runDaily(std::function<void()>&& func, const TimeDelta& delta,
-                            const std::string& market) {
+void Strategy::runDaily(std::function<void()>&& func, const TimeDelta& delta,
+                        const std::string& market) {
     if (!m_running) {
         run();
     }
@@ -224,15 +210,15 @@ void StrategyBase::runDaily(std::function<void()>&& func, const TimeDelta& delta
             });
 
         } else {
-            HKU_ERROR("Unknown process!");
+            CLS_ERROR("Unknown process!");
         }
     } catch (const std::exception& e) {
-        HKU_THROW(e.what());
+        CLS_THROW(e.what());
     }
 }
 
-void StrategyBase::runDailyAt(std::function<void()>&& func, const TimeDelta& delta,
-                              bool ignoreHoliday) {
+void Strategy::runDailyAt(std::function<void()>&& func, const TimeDelta& delta,
+                          bool ignoreHoliday) {
     if (!m_running) {
         run();
     }
@@ -258,7 +244,7 @@ void StrategyBase::runDailyAt(std::function<void()>&& func, const TimeDelta& del
 /*
  * 在主线程中处理事件队列，避免 python GIL
  */
-void StrategyBase::_startEventLoop() {
+void Strategy::_startEventLoop() {
     while (ms_keep_running) {
         event_type task;
         m_event_queue.wait_and_pop(task);

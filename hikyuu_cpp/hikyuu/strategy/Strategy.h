@@ -17,14 +17,16 @@
 
 namespace hku {
 
-class HKU_API StrategyBase {
-public:
-    StrategyBase();
-    explicit StrategyBase(const string& name, const string& config_file = "");
-    StrategyBase(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
-                 const string& name = "Strategy", const string& config_file = "");
+class HKU_API Strategy {
+    CLASS_LOGGER_IMP(Strategy)
 
-    virtual ~StrategyBase();
+public:
+    Strategy();
+    explicit Strategy(const string& name, const string& config_file = "");
+    Strategy(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
+             const string& name = "Strategy", const string& config_file = "");
+
+    virtual ~Strategy();
 
     const string& name() const {
         return m_name;
@@ -40,14 +42,6 @@ public:
 
     void context(const StrategyContext& context) {
         m_context = context;
-    }
-
-    Datetime startDatetime() const {
-        return m_context.startDatetime();
-    }
-
-    void startDatetime(const Datetime& d) {
-        m_context.startDatetime(d);
     }
 
     void setStockCodeList(vector<string>&& stockList) {
@@ -68,10 +62,6 @@ public:
 
     const vector<KQuery::KType>& getKTypeList() const {
         return m_context.getKTypeList();
-    }
-
-    const StockList& getStockList() const {
-        return m_stock_list;
     }
 
     /**
@@ -112,7 +102,6 @@ private:
     string m_name;
     string m_config_file;
     StrategyContext m_context;
-    StockList m_stock_list;
     std::function<void(const Datetime&)> m_on_recieved_spot;
     std::function<void(const Stock&, const SpotRecord& spot)> m_on_change;
     bool m_running{false};
@@ -154,6 +143,6 @@ private:
     void _startEventLoop();
 };
 
-typedef shared_ptr<StrategyBase> StrategyPtr;
+typedef shared_ptr<Strategy> StrategyPtr;
 
 }  // namespace hku

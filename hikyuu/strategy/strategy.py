@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 # cp936
 
-from hikyuu import StrategyBase, Query, Datetime, TimeDelta, Seconds, Minutes
+from hikyuu import Strategy, Query, Datetime, TimeDelta, Seconds, Minutes
 from hikyuu import StockManager
 
 
@@ -22,7 +22,7 @@ def my_func():
 
 
 if __name__ == '__main__':
-    s = StrategyBase(['sh600000', 'sz000001'],  [Query.MIN, Query.DAY])
+    s = Strategy(['sh600000', 'sz000001', 'xxx'],  [Query.MIN, Query.DAY])
     # s.run_daily_at(my_func, Datetime.now() - Datetime.today() + Seconds(5))
     # s.on_change(on_change)
     s.on_received_spot(on_spot)

@@ -156,9 +156,7 @@ void SpotAgent::work_thread() {
     while (!m_stop && rv != 0) {
         rv = nng_dial(sock, ms_pubUrl.c_str(), nullptr, 0);
         HKU_WARN_IF(m_print && rv != 0,
-                    "Faied connect quotation server {}, will retry after 5 seconds! You Maybe need "
-                    "start  the collection service first.",
-                    ms_pubUrl);
+                    "Faied connect quotation server {}, will retry after 5 seconds!", ms_pubUrl);
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
