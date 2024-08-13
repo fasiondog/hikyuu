@@ -10,7 +10,6 @@
 #include <future>
 #include "../DataType.h"
 #include "../StrategyContext.h"
-#include "../utilities/Parameter.h"
 #include "../utilities/thread/FuncWrapper.h"
 #include "../utilities/thread/ThreadSafeQueue.h"
 #include "../global/GlobalSpotAgent.h"
@@ -19,12 +18,11 @@
 namespace hku {
 
 class HKU_API StrategyBase {
-    PARAMETER_SUPPORT
-
 public:
     StrategyBase();
-    explicit StrategyBase(const string& name);
-    StrategyBase(const string& name, const string& config_file);
+    explicit StrategyBase(const string& name, const string& config_file = "");
+    StrategyBase(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
+                 const string& name = "Strategy", const string& config_file = "");
 
     virtual ~StrategyBase();
 
@@ -34,10 +32,6 @@ public:
 
     void name(const string& name) {
         m_name = name;
-    }
-
-    StockManager& getSM() {
-        return StockManager::instance();
     }
 
     const StrategyContext& context() const {
@@ -99,8 +93,6 @@ public:
                     bool ignoreHoliday = true);
 
     void start();
-
-    virtual void initialize() {}
 
     /**
      * 数据发生变化，即接收到相应行情数据变更

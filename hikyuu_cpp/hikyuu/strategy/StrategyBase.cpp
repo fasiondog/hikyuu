@@ -35,31 +35,38 @@ void StrategyBase::sig_handler(int sig) {
     }
 }
 
-StrategyBase::StrategyBase() : StrategyBase("Strategy") {}
-
-StrategyBase::StrategyBase(const string& name) {
-    string home = getUserDir();
-    HKU_ERROR_IF(home == "", "Failed get user home path!");
-#if HKU_OS_WINOWS
-    m_config_file = format("{}\\{}", home, ".hikyuu\\hikyuu.ini");
-#else
-    m_config_file = format("{}/{}", home, ".hikyuu/hikyuu.ini");
-#endif
-}
+StrategyBase::StrategyBase() : StrategyBase("Strategy", "") {}
 
 StrategyBase::StrategyBase(const string& name, const string& config_file)
-: m_name(name), m_config_file(config_file) {}
+: m_name(name), m_config_file(config_file) {
+    if (m_config_file.empty()) {
+        string home = getUserDir();
+        HKU_ERROR_IF(home == "", "Failed get user home path!");
+#if HKU_OS_WINOWS
+        m_config_file = format("{}\\{}", home, ".hikyuu\\hikyuu.ini");
+#else
+        m_config_file = format("{}/{}", home, ".hikyuu/hikyuu.ini");
+#endif
+    }
+}
+
+StrategyBase::StrategyBase(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
+                           const string& name, const string& config_file)
+: StrategyBase(name, config_file) {
+    m_context.setStockCodeList(codeList);
+    m_context.setKTypeList(ktypeList);
+}
 
 StrategyBase::~StrategyBase() {
+    ms_keep_running = false;
     HKU_INFO("[Strategy {}] Quit Strategy!", m_name);
 }
 
 void StrategyBase::run() {
-    HKU_INFO("StrategyBase::run()");
     HKU_IF_RETURN(m_running, void());
 
-    // 调用 strategy 自身的初始化方法
-    initialize();
+    HKU_CHECK(!getStockCodeList().empty(), "The context does not contain any stocks!");
+    HKU_CHECK(!getKTypeList().empty(), "The K type list was empty!");
 
     StockManager& sm = StockManager::instance();
 
@@ -105,7 +112,8 @@ void StrategyBase::run() {
 }
 
 void StrategyBase::start() {
-    HKU_INFO("start even loop ...");
+    HKU_CHECK(m_running, "No handler functions are registered!");
+    HKU_INFO("start strategy even loop ...");
     _startEventLoop();
 }
 

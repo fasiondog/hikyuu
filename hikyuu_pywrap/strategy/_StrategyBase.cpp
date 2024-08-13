@@ -12,24 +12,17 @@
 namespace py = pybind11;
 using namespace hku;
 
-class PyStrategyBase : public StrategyBase {
-public:
-    using StrategyBase::StrategyBase;
-
-    void initialize() override {
-        PYBIND11_OVERLOAD(void, StrategyBase, initialize);
-    }
-};
-
 void export_Strategy(py::module& m) {
-    py::class_<StrategyBase, StrategyPtr, PyStrategyBase>(m, "StrategyBase")
+    py::class_<StrategyBase, StrategyPtr>(m, "StrategyBase")
       .def(py::init<>())
+      .def(py::init<const vector<string>&, const vector<KQuery::KType>&, const std::string&,
+                    const std::string&>(),
+           py::arg("code_list"), py::arg("ktype_list"), py::arg("name") = "Strategy",
+           py::arg("config") = "")
       .def_property("name", py::overload_cast<>(&StrategyBase::name, py::const_),
                     py::overload_cast<const string&>(&StrategyBase::name),
                     py::return_value_policy::copy, "策略名称")
 
-      .def_property_readonly("sm", &StrategyBase::getSM, py::return_value_policy::reference,
-                             "获取 StockManager 实例")
       .def_property("start_datetime", py::overload_cast<>(&StrategyBase::startDatetime, py::const_),
                     py::overload_cast<const Datetime&>(&StrategyBase::startDatetime), "起始日期")
       .def_property("stock_list", py::overload_cast<>(&StrategyBase::getStockCodeList, py::const_),
@@ -39,8 +32,7 @@ void export_Strategy(py::module& m) {
                     py::overload_cast<const vector<KQuery::KType>&>(&StrategyBase::setKTypeList),
                     py::return_value_policy::copy, "需要的K线类型")
 
-      .def("initialize", &StrategyBase::initialize)
-      .def("start", &PyStrategyBase::start)
+      .def("start", &StrategyBase::start)
       .def("on_change",
            [](StrategyBase& self, py::object func) {
                HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
@@ -66,8 +58,5 @@ void export_Strategy(py::module& m) {
             py::object c_func = func.attr("__call__");
             self.runDailyAt(c_func, time, ignore_holiday);
         },
-        py::arg("func"), py::arg("time"), py::arg("ignore_holiday") = true)
-      //   .def("run_daily", &StrategyBase::runDaily)
-      //   .def("run_daily_at", &StrategyBase::runDailyAt)
-      ;
+        py::arg("func"), py::arg("time"), py::arg("ignore_holiday") = true);
 }
