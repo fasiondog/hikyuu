@@ -96,7 +96,7 @@ void StrategyBase::run() {
       [this](const SpotRecord& spot) { EVENT([=]() { this->receivedSpot(spot); }); });
     agent.addPostProcess(
       [this](Datetime revTime) { EVENT([=]() { this->onReceivedSpot(revTime); }); });
-    startSpotAgent(false);
+    startSpotAgent(true);
 
     m_running = true;
 }
@@ -135,7 +135,7 @@ void StrategyBase::runDaily(std::function<void()>&& func, const TimeDelta& delta
             Datetime open2 = today + market_info.openTime2();
             Datetime close2 = today + market_info.closeTime2();
             Datetime now = Datetime::now();
-            if ((now > open1 && now < close1) || (now > open2 && now < close2)) {
+            if ((now >= open1 && now <= close1) || (now >= open2 && now <= close2)) {
                 EVENT(func);
             }
         };
@@ -146,6 +146,7 @@ void StrategyBase::runDaily(std::function<void()>&& func, const TimeDelta& delta
         auto now = Datetime::now();
         TimeDelta now_time = now - today;
         if (now_time >= market_info.closeTime2()) {
+            HKU_INFO("time: {}", today.nextDay() + market_info.openTime1());
             scheduler->addFuncAtTime(today.nextDay() + market_info.openTime1(), [=]() {
                 new_func();
                 auto* sched = getScheduler();
@@ -168,6 +169,7 @@ void StrategyBase::runDaily(std::function<void()>&& func, const TimeDelta& delta
 
         } else if (now_time == market_info.closeTime1()) {
             scheduler->addFuncAtTime(today + market_info.openTime2(), [=]() {
+                new_func();
                 auto* sched = getScheduler();
                 sched->addDurationFunc(std::numeric_limits<int>::max(), delta, new_func);
             });
@@ -189,6 +191,7 @@ void StrategyBase::runDaily(std::function<void()>&& func, const TimeDelta& delta
 
         } else if (now_time < market_info.openTime1()) {
             scheduler->addFuncAtTime(today + market_info.openTime1(), [=]() {
+                new_func();
                 auto* sched = getScheduler();
                 sched->addDurationFunc(std::numeric_limits<int>::max(), delta, new_func);
             });

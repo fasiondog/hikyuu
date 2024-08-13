@@ -19,6 +19,14 @@ public:
     void init() override {
         PYBIND11_OVERLOAD(void, StrategyBase, init);
     }
+
+    void onChange(const Stock& stk, const SpotRecord& spot) override {
+        PYBIND11_OVERLOAD(void, StrategyBase, onChange, stk, spot);
+    }
+
+    virtual void onReceivedSpot(Datetime revTime) override {
+        PYBIND11_OVERLOAD(void, StrategyBase, onReceivedSpot, revTime);
+    }
 };
 
 void export_Strategy(py::module& m) {
@@ -41,6 +49,8 @@ void export_Strategy(py::module& m) {
                     py::return_value_policy::copy, "需要的K线类型")
 
       .def("init", &StrategyBase::init)
+      .def("on_change", &StrategyBase::onChange)
+      .def("on_received_spot", &StrategyBase::onReceivedSpot)
       .def("start", &PyStrategyBase::start)
       .def("run_daily",
            [](StrategyBase& self, py::object func, const TimeDelta& time) {
