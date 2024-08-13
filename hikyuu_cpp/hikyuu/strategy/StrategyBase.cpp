@@ -55,10 +55,11 @@ StrategyBase::~StrategyBase() {
 }
 
 void StrategyBase::run() {
+    HKU_INFO("StrategyBase::run()");
     HKU_IF_RETURN(m_running, void());
 
     // 调用 strategy 自身的初始化方法
-    init();
+    initialize();
 
     StockManager& sm = StockManager::instance();
 
@@ -92,10 +93,12 @@ void StrategyBase::run() {
     HKU_WARN_IF(m_stock_list.empty(), "[Strategy {}] stock list is empty!", m_name);
 
     auto& agent = *getGlobalSpotAgent();
-    agent.addProcess(
-      [this](const SpotRecord& spot) { EVENT([=]() { this->receivedSpot(spot); }); });
-    agent.addPostProcess(
-      [this](Datetime revTime) { EVENT([=]() { this->onReceivedSpot(revTime); }); });
+    agent.addProcess([this](const SpotRecord& spot) { receivedSpot(spot); });
+    agent.addPostProcess([this](Datetime revTime) {
+        if (m_on_recieved_spot) {
+            EVENT([=]() { m_on_recieved_spot(revTime); });
+        }
+    });
     startSpotAgent(true);
 
     m_running = true;
@@ -106,10 +109,27 @@ void StrategyBase::start() {
     _startEventLoop();
 }
 
+void StrategyBase::onChange(
+  std::function<void(const Stock&, const SpotRecord& spot)>&& changeFunc) {
+    if (!m_running) {
+        run();
+    }
+    m_on_change = changeFunc;
+}
+
+void StrategyBase::onReceivedSpot(std::function<void(const Datetime&)>&& recievedFucn) {
+    if (!m_running) {
+        run();
+    }
+    m_on_recieved_spot = recievedFucn;
+}
+
 void StrategyBase::receivedSpot(const SpotRecord& spot) {
     Stock stk = getStock(format("{}{}", spot.market, spot.code));
     if (!stk.isNull()) {
-        EVENT([=]() { this->onChange(stk, spot); });
+        if (m_on_change) {
+            EVENT([=]() { m_on_change(stk, spot); });
+        }
     }
 }
 
@@ -146,7 +166,6 @@ void StrategyBase::runDaily(std::function<void()>&& func, const TimeDelta& delta
         auto now = Datetime::now();
         TimeDelta now_time = now - today;
         if (now_time >= market_info.closeTime2()) {
-            HKU_INFO("time: {}", today.nextDay() + market_info.openTime1());
             scheduler->addFuncAtTime(today.nextDay() + market_info.openTime1(), [=]() {
                 new_func();
                 auto* sched = getScheduler();
