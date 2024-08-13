@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 # cp936
 
-from hikyuu import StrategyBase, Query, Datetime, TimeDelta, Seconds
+from hikyuu import StrategyBase, Query, Datetime, TimeDelta, Seconds, Minutes
 from hikyuu import StockManager
 
 
@@ -25,5 +25,6 @@ def my_func():
 
 if __name__ == '__main__':
     s = TestStrategy()
-    s.run_daily_at(my_func, Datetime.now() - Datetime.today() + Seconds(5))
+    # s.run_daily_at(my_func, Datetime.now() - Datetime.today() + Seconds(5))
+    s.run_daily(my_func, Minutes(1))
     s.start()
