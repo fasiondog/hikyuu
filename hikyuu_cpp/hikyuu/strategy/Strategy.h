@@ -17,6 +17,10 @@
 
 namespace hku {
 
+/**
+ * @brief 策略运行时
+ * @ingroup Stratgy
+ */
 class HKU_API Strategy {
     CLASS_LOGGER_IMP(Strategy)
 
@@ -85,7 +89,7 @@ public:
     void start();
 
     /**
-     * 数据发生变化，即接收到相应行情数据变更
+     * 正确数据发生变化调用，即接收到相应行情数据变更
      * @note 通常用于调试
      * @param stk 数据发生变化的 stock
      * @param spot 接收到的具体数据

@@ -137,8 +137,8 @@
  * @details 合成多因子
  * @ingroup TradeSystem
  *
- * @defgroup SystemInstance SystemInstance 系统实例
- * @details 系统实例
+ * @defgroup Stratgy Strategy 策略运行时
+ * @details 策略运行时
  * @ingroup Hikyuu
  *
  * @defgroup Agent Agent 对外数据接收发送代理

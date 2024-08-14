@@ -5,6 +5,7 @@
  *     Author: fasiondog
  */
 
+#pragma once
 #include "agent/SpotAgent.h"
 
 namespace hku {
