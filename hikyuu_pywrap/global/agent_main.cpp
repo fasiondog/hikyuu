@@ -9,8 +9,10 @@
 
 namespace py = pybind11;
 
+void export_SpotRecord(py::module& m);
 void export_SpotAgent(py::module& m);
 
 void export_global_main(py::module& m) {
+    export_SpotRecord(m);
     export_SpotAgent(m);
 }
