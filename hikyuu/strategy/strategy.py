@@ -21,6 +21,7 @@ def my_func():
         print(s)
 
 
+# 以 Strategy 方式运行示例
 if __name__ == '__main__':
     s = Strategy(['sh600000', 'sz000001'],  [Query.MIN, Query.DAY])
     # s.run_daily_at(my_func, Datetime.now() - Datetime.today() + Seconds(5))

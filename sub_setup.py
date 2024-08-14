@@ -53,41 +53,6 @@ with open("./readme.md", encoding='utf-8') as f:
 
 hku_data_files = []
 
-# packages = [
-#     'hikyuu',
-#     'hikyuu/analysis',
-#     'hikyuu/config',
-#     'hikyuu/config/block',
-#     'hikyuu/cpp',
-#     'hikyuu/data',
-#     'hikyuu/data/mysql_upgrade',
-#     'hikyuu/data/sqlite_upgrade',
-#     'hikyuu/data/sqlite_mem_sql',
-#     'hikyuu/data_driver',
-#     'hikyuu/examples',
-#     'hikyuu/examples/notebook',
-#     'hikyuu/examples/notebook/images',
-#     'hikyuu/examples/notebook/Demo',
-#     'hikyuu/flat',
-#     'hikyuu/fetcher',
-#     'hikyuu/fetcher/proxy',
-#     'hikyuu/fetcher/stock',
-#     'hikyuu/gui',
-#     'hikyuu/gui/data',
-#     'hikyuu/indicator',
-#     'hikyuu/draw',
-#     'hikyuu/draw/drawplot',
-#     'hikyuu/shell',
-#     'hikyuu/strategy',
-#     'hikyuu/strategy/demo',
-#     'hikyuu/test',
-#     'hikyuu/tools',
-#     'hikyuu/trade_manage',
-#     'hikyuu/trade_sys',
-#     'hikyuu/util',
-#     'hikyuu/include',
-# ]
-
 packages = ['hikyuu']
 for root, dirs, files in os.walk('hikyuu'):
     for p in dirs:
