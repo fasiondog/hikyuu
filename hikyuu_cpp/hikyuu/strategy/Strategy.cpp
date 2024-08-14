@@ -180,7 +180,7 @@ void Strategy::runDaily(std::function<void()>&& func, const TimeDelta& delta,
                 });
             }
 
-        } else if (now_time == market_info.closeTime1()) {
+        } else if (now_time >= market_info.closeTime1()) {
             scheduler->addFuncAtTime(today + market_info.openTime2(), [=]() {
                 new_func();
                 auto* sched = getScheduler();
@@ -193,8 +193,7 @@ void Strategy::runDaily(std::function<void()>&& func, const TimeDelta& delta,
             if (ticks % delta_ticks == 0) {
                 scheduler->addDurationFunc(std::numeric_limits<int>::max(), delta, new_func);
             } else {
-                auto delay =
-                  TimeDelta::fromTicks(delta_ticks - (ticks / delta_ticks) * delta_ticks);
+                auto delay = TimeDelta::fromTicks((ticks / delta_ticks + 1) * delta_ticks - ticks);
                 scheduler->addFuncAtTime(now + delay, [=]() {
                     new_func();
                     auto* sched = getScheduler();
@@ -210,7 +209,7 @@ void Strategy::runDaily(std::function<void()>&& func, const TimeDelta& delta,
             });
 
         } else {
-            CLS_ERROR("Unknown process!");
+            CLS_ERROR("Unknown process! now_time: {}", now_time);
         }
     } catch (const std::exception& e) {
         CLS_THROW(e.what());
@@ -251,7 +250,13 @@ void Strategy::_startEventLoop() {
         if (task.isNullTask()) {
             ms_keep_running = false;
         } else {
-            task();
+            try {
+                task();
+            } catch (const std::exception& e) {
+                CLS_ERROR("Failed run task! {}", e.what());
+            } catch (...) {
+                CLS_ERROR("Failed run task! Unknow error!");
+            }
         }
     }
 }

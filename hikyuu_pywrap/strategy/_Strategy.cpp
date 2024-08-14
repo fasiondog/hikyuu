@@ -35,26 +35,62 @@ void export_Strategy(py::module& m) {
            [](Strategy& self, py::object func) {
                HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
                py::object c_func = func.attr("__call__");
-               self.onChange(c_func);
+               auto new_func = [=](const Stock& stk, const SpotRecord& spot) {
+                   try {
+                       c_func(stk, spot);
+                   } catch (const std::exception& e) {
+                       HKU_ERROR(e.what());
+                   } catch (...) {
+                       HKU_ERROR("Unknown error!");
+                   }
+               };
+               self.onChange(new_func);
            })
       .def("on_received_spot",
            [](Strategy& self, py::object func) {
                HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
                py::object c_func = func.attr("__call__");
-               self.onReceivedSpot(c_func);
+               auto new_func = [=](Datetime revTime) {
+                   try {
+                       c_func(revTime);
+                   } catch (const std::exception& e) {
+                       HKU_ERROR(e.what());
+                   } catch (...) {
+                       HKU_ERROR("Unknown error!");
+                   }
+               };
+               self.onReceivedSpot(new_func);
            })
       .def("run_daily",
            [](Strategy& self, py::object func, const TimeDelta& time) {
                HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
                py::object c_func = func.attr("__call__");
-               self.runDaily(c_func, time);
+               auto new_func = [=]() {
+                   try {
+                       c_func();
+                   } catch (const std::exception& e) {
+                       HKU_ERROR(e.what());
+                   } catch (...) {
+                       HKU_ERROR("Unknown error!");
+                   }
+               };
+               self.runDaily(new_func, time);
            })
       .def(
         "run_daily_at",
         [](Strategy& self, py::object func, const TimeDelta& time, bool ignore_holiday) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             py::object c_func = func.attr("__call__");
-            self.runDailyAt(c_func, time, ignore_holiday);
+            auto new_func = [=]() {
+                try {
+                    c_func();
+                } catch (const std::exception& e) {
+                    HKU_ERROR(e.what());
+                } catch (...) {
+                    HKU_ERROR("Unknown error!");
+                }
+            };
+            self.runDailyAt(new_func, time, ignore_holiday);
         },
         py::arg("func"), py::arg("time"), py::arg("ignore_holiday") = true);
 }

@@ -160,7 +160,7 @@ void SpotAgent::work_thread() {
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
-    HKU_INFO_IF(m_print, "Ready to receive quotation ...");
+    HKU_INFO_IF(m_print, "Ready to receive quotation from {} ...", ms_pubUrl);
 
     while (!m_stop) {
         char* buf = nullptr;
@@ -184,7 +184,7 @@ void SpotAgent::work_thread() {
                         for (auto& task : m_process_task_list) {
                             task.get();
                         }
-                        HKU_INFO_IF(m_print, "received count: {}", m_batch_count);
+                        HKU_TRACE_IF(m_print, "received count: {}", m_batch_count);
                         m_batch_count = 0;
                         // 执行后处理
                         for (const auto& postProcess : m_postProcessList) {

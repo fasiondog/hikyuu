@@ -7,7 +7,7 @@ from hikyuu import StockManager
 
 
 def on_change(stk, spot):
-    print(stk, spot.bid1, spot.ask1)
+    print(stk.market_code, stk.name, spot.close, spot.bid1, spot.ask1)
 
 
 def on_spot(rev_time):
@@ -15,16 +15,16 @@ def on_spot(rev_time):
 
 
 def my_func():
+    print("calculate:", Datetime.now())
     sm = StockManager.instance()
-    print("{}".format(len(sm)))
     for s in sm:
         print(s)
 
 
 if __name__ == '__main__':
-    s = Strategy(['sh600000', 'sz000001', 'xxx'],  [Query.MIN, Query.DAY])
+    s = Strategy(['sh600000', 'sz000001'],  [Query.MIN, Query.DAY])
     # s.run_daily_at(my_func, Datetime.now() - Datetime.today() + Seconds(5))
-    # s.on_change(on_change)
+    s.on_change(on_change)
     s.on_received_spot(on_spot)
-    # s.run_daily(my_func, Minutes(1))
+    s.run_daily(my_func, Minutes(1))
     s.start()
