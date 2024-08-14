@@ -10,9 +10,9 @@
 #include <future>
 #include "../DataType.h"
 #include "../StrategyContext.h"
+#include "../global/SpotRecord.h"
 #include "../utilities/thread/FuncWrapper.h"
 #include "../utilities/thread/ThreadSafeQueue.h"
-#include "../global/GlobalSpotAgent.h"
 #include "../trade_sys/portfolio/Portfolio.h"
 
 namespace hku {

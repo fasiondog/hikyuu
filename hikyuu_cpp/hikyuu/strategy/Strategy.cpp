@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include "hikyuu/utilities/os.h"
 #include "hikyuu/utilities/ini_parser/IniParser.h"
+#include "hikyuu/global/GlobalSpotAgent.h"
 #include "hikyuu/global/schedule/scheduler.h"
 #include "hikyuu/global/GlobalTaskGroup.h"
 #include "hikyuu/global/sysinfo.h"

@@ -59,7 +59,7 @@ target("unit-test")
     set_kind("binary")
     set_default(false)
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "flatbuffers")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
         if is_plat("macosx") then
             add_packages("mysqlclient")
@@ -105,7 +105,7 @@ target("small-test")
     set_kind("binary")
     set_default(false)
     
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "flatbuffers")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
         if is_plat("macosx") then
             add_packages("mysqlclient")
@@ -150,7 +150,7 @@ target("real-test")
     set_kind("binary")
     set_default(false)
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "flatbuffers")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
         if is_plat("macosx") then
             add_packages("mysqlclient")
