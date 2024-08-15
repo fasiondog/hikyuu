@@ -86,8 +86,6 @@ public:
     void runDailyAt(std::function<void()>&& func, const TimeDelta& delta,
                     bool ignoreHoliday = true);
 
-    void start();
-
     /**
      * 正确数据发生变化调用，即接收到相应行情数据变更
      * @note 通常用于调试
@@ -101,6 +99,11 @@ public:
      * @note 通常仅用于调试打印，该批行情数据中不一定含有上下文中包含的 stock
      */
     void onReceivedSpot(std::function<void(const Datetime&)>&& recievedFucn);
+
+    /**
+     * 启动策略执行，必须在已注册相关处理函数后执行
+     */
+    void start();
 
 private:
     string m_name;

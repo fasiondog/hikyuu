@@ -3,7 +3,7 @@
 # cp936
 
 from hikyuu import Strategy, Query, Datetime, TimeDelta, Seconds, Minutes
-from hikyuu import StockManager
+from hikyuu import sm
 
 
 def on_change(stk, spot):
@@ -16,11 +16,11 @@ def on_spot(rev_time):
 
 def my_func():
     print("calculate:", Datetime.now())
-    sm = StockManager.instance()
     for s in sm:
         print(s)
 
 
+# 注意：每一个Strategy 只能作为独立进程执行，即 python xxx.py 的方式执行！
 # 以 Strategy 方式运行示例
 if __name__ == '__main__':
     s = Strategy(['sh600000', 'sz000001'],  [Query.MIN, Query.DAY])
