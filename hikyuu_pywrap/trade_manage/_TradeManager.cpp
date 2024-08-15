@@ -220,6 +220,10 @@ public:
         PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "add_trade_record", addTradeRecord, tr);
     }
 
+    bool addPosition(const PositionRecord& pr) override {
+        PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "add_position", addPosition, pr);
+    }
+
     string str() const override {
         PYBIND11_OVERRIDE_NAME(string, TradeManagerBase, "__str__", str, );
     }
@@ -543,6 +547,13 @@ void export_TradeManager(py::module& m) {
     :param TradeRecord tr: 交易记录
     :return: True（成功） | False（失败）
     :rtype: bool)")
+
+      .def("add_position", &TradeManagerBase::addPosition, R"(add_postion(self, position)
+
+    建立初始账户后，直接加入持仓记录，仅用于构建初始有持仓的账户
+
+    :param PositionRecord position: 持仓记录
+    return True | False)")
 
       .def("tocsv", &TradeManagerBase::tocsv, R"(tocsv(self, path)
 

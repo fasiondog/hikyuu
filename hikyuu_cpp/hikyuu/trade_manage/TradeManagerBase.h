@@ -675,6 +675,17 @@ public:
         return false;
     }
 
+    /**
+     * 直接加入持仓记录
+     * @param pr 持仓记录
+     * @return true 成功
+     * @return false 失败
+     */
+    virtual bool addPosition(const PositionRecord& pr) {
+        HKU_WARN("The subclass does not implement this method");
+        return false;
+    }
+
     /** 字符串输出 */
     virtual string str() const {
         HKU_WARN("The subclass does not implement this method");
