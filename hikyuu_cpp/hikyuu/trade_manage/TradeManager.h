@@ -344,6 +344,15 @@ public:
      */
     virtual bool addTradeRecord(const TradeRecord& tr) override;
 
+    /**
+     * 直接加入持仓记录
+     * @note 特殊用途构建初始持仓，可能引起混乱
+     * @param pr 持仓记录
+     * @return true 成功
+     * @return false 失败
+     */
+    virtual bool addPosition(const PositionRecord& pr) override;
+
     /** 字符串输出 */
     virtual string str() const override;
 

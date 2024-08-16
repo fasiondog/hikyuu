@@ -74,15 +74,17 @@ void GlobalInitializer::init() {
 }
 
 void GlobalInitializer::clean() {
-    if (CanUpgrade()) {
+#if HKU_ENABLE_SEND_FEEDBACK
+    if (runningInPython() && CanUpgrade()) {
         fmt::print(
           "\n====================================================================\n"
           "The new version of Hikyuu is {}, and you can run the upgrade command:\n"
-          "Hikyuu 的最新新版本是 {}, 您可以运行升级命令:\n"
+          "Hikyuu 的最新版本是 {}, 您可以运行升级命令:\n"
           "pip install hikyuu --upgrade\n"
           "========================================================\n\n",
           getLatestVersion(), getLatestVersion());
     }
+#endif
 
     releaseGlobalTaskGroup();
     releaseScheduler();

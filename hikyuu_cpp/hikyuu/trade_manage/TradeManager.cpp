@@ -1709,6 +1709,26 @@ void TradeManager::tocsv(const string& path) {
     file.close();
 }
 
+bool TradeManager::addPosition(const PositionRecord& pr) {
+    HKU_ERROR_IF_RETURN(pr.stock.isNull(), false, "Invalid postion record! stock is null!");
+    HKU_ERROR_IF_RETURN(pr.cleanDatetime != Null<Datetime>(), false,
+                        "Position cleanDatetime({}) must be Null!", pr.cleanDatetime);
+    HKU_ERROR_IF_RETURN(pr.takeDatetime < initDatetime(), false,
+                        "Poistion takeDatetime({}) > initDatetime({})", pr.takeDatetime,
+                        initDatetime());
+    HKU_ERROR_IF_RETURN(!m_trade_list.empty(), false, "Exist trade list!");
+
+    auto iter = m_position.find(pr.stock.id());
+    HKU_ERROR_IF_RETURN(iter != m_position.end(), false, "The stock({}) has position!",
+                        pr.stock.market_code());
+
+    m_position[pr.stock.id()] = pr;
+    if (pr.takeDatetime > m_init_datetime) {
+        m_init_datetime = pr.takeDatetime;
+    }
+    return true;
+}
+
 bool TradeManager::addTradeRecord(const TradeRecord& tr) {
     HKU_IF_RETURN(BUSINESS_INIT == tr.business, _add_init_tr(tr));
     HKU_ERROR_IF_RETURN(tr.datetime < lastDatetime(), false,
