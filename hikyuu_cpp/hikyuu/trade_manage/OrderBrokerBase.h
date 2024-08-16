@@ -51,8 +51,8 @@ public:
      * @param num 买入数量
      * @return 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
      */
-    Datetime buy(Datetime datetime, const string& market, const string& code, price_t price,
-                 double num);
+    string buy(Datetime datetime, const string& market, const string& code, price_t price,
+               double num);
 
     /**
      * 执行卖出操作
@@ -63,8 +63,8 @@ public:
      * @param num 卖出数量
      * @return 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
      */
-    Datetime sell(Datetime datetime, const string& market, const string& code, price_t price,
-                  double num);
+    string sell(Datetime datetime, const string& market, const string& code, price_t price,
+                double num);
 
     /**
      * 执行实际买入操作
@@ -75,8 +75,8 @@ public:
      * @param num 买入数量
      * @return 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
      */
-    virtual Datetime _buy(Datetime datetime, const string& market, const string& code,
-                          price_t price, double num) = 0;
+    virtual string _buy(Datetime datetime, const string& market, const string& code, price_t price,
+                        double num) = 0;
 
     /**
      * 执行实际卖出操作
@@ -87,8 +87,8 @@ public:
      * @param num 卖出数量
      * @return 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
      */
-    virtual Datetime _sell(Datetime datetime, const string& market, const string& code,
-                           price_t price, double num) = 0;
+    virtual string _sell(Datetime datetime, const string& market, const string& code, price_t price,
+                         double num) = 0;
 
 protected:
     string m_name;

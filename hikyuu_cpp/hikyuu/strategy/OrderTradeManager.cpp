@@ -112,14 +112,14 @@ TradeRecord OrderTradeManager::buy(const Datetime& datetime, const Stock& stock,
           roundEx(position.totalRisk + (realPrice - stoploss) * number * stock.unit(), precision);
     }
 
-    if (result.datetime > m_broker_last_datetime) {
+    if (datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-        Datetime realtime, nulltime;
+        string broker_ret;
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            realtime =
+            broker_ret =
               (*broker_iter)->buy(datetime, stock.market(), stock.code(), realPrice, number);
-            if (realtime != nulltime && realtime > m_broker_last_datetime) {
-                m_broker_last_datetime = realtime;
+            if (!broker_ret.empty() && datetime > m_broker_last_datetime) {
+                m_broker_last_datetime = datetime;
             }
         }
     }
@@ -189,14 +189,14 @@ TradeRecord OrderTradeManager::sell(const Datetime& datetime, const Stock& stock
         m_position.erase(stock.id());
     }
 
-    if (result.datetime > m_broker_last_datetime) {
+    if (datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-        Datetime realtime, nulltime;
+        string broker_ret;
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            realtime =
+            broker_ret =
               (*broker_iter)->sell(datetime, stock.market(), stock.code(), realPrice, real_number);
-            if (realtime != nulltime && realtime > m_broker_last_datetime) {
-                m_broker_last_datetime = realtime;
+            if (!broker_ret.empty() && datetime > m_broker_last_datetime) {
+                m_broker_last_datetime = datetime;
             }
         }
     }

@@ -25,34 +25,30 @@ OrderBrokerBase::OrderBrokerBase(const string& name) : m_name(name) {}
 
 OrderBrokerBase::~OrderBrokerBase() {}
 
-Datetime OrderBrokerBase::buy(Datetime datetime, const string& market, const string& code,
-                              price_t price, double num) {
-    Datetime tradetime;
+string OrderBrokerBase::buy(Datetime datetime, const string& market, const string& code,
+                            price_t price, double num) {
+    string ret;
     try {
-        tradetime = _buy(datetime, market, code, price, num);
+        ret = _buy(datetime, market, code, price, num);
     } catch (const std::exception& e) {
         HKU_ERROR(e.what());
-        tradetime = Null<Datetime>();
     } catch (...) {
         HKU_ERROR_UNKNOWN;
-        tradetime = Null<Datetime>();
     }
-    return tradetime;
+    return ret;
 }
 
-Datetime OrderBrokerBase::sell(Datetime datetime, const string& market, const string& code,
-                               price_t price, double num) {
-    Datetime tradetime;
+string OrderBrokerBase::sell(Datetime datetime, const string& market, const string& code,
+                             price_t price, double num) {
+    string ret;
     try {
-        tradetime = _sell(datetime, market, code, price, num);
+        ret = _sell(datetime, market, code, price, num);
     } catch (const std::exception& e) {
         HKU_ERROR(e.what());
-        tradetime = Null<Datetime>();
     } catch (...) {
         HKU_ERROR_UNKNOWN;
-        tradetime = Null<Datetime>();
     }
-    return tradetime;
+    return ret;
 }
 
 } /* namespace hku */
