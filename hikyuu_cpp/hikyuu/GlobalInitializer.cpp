@@ -74,6 +74,7 @@ void GlobalInitializer::init() {
 }
 
 void GlobalInitializer::clean() {
+#if HKU_ENABLE_SEND_FEEDBACK
     if (runningInPython() && CanUpgrade()) {
         fmt::print(
           "\n====================================================================\n"
@@ -83,6 +84,7 @@ void GlobalInitializer::clean() {
           "========================================================\n\n",
           getLatestVersion(), getLatestVersion());
     }
+#endif
 
     releaseGlobalTaskGroup();
     releaseScheduler();
