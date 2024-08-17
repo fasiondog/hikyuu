@@ -24,6 +24,14 @@ public:
                  double num) override {
         PYBIND11_OVERLOAD_PURE(string, OrderBrokerBase, _sell, datetime, market, code, price, num);
     }
+
+    string _balance() override {
+        PYBIND11_OVERLOAD(string, OrderBrokerBase, _balance);
+    }
+
+    vector<string> _position() override {
+        PYBIND11_OVERLOAD(vector<string>, OrderBrokerBase, _position);
+    }
 };
 
 void export_OrderBroker(py::module& m) {
@@ -69,6 +77,11 @@ void export_OrderBroker(py::module& m) {
     :return: 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
     "rtype: Datetime)")
 
+      .def("balance", &OrderBrokerBase::balance)
+
+      .def("position",
+           [](OrderBrokerBase& self) { return vector_to_python_list<Parameter>(self.position()); })
+
       .def("_buy", &OrderBrokerBase::_buy,
            R"(_buy(self, datetime, market, code, price, num)
 
@@ -93,5 +106,8 @@ void export_OrderBroker(py::module& m) {
     :param float price: 卖出价格
     :param float num: 卖出数量
     :return: 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
-    "rtype: Datetime)");
+    "rtype: Datetime)")
+
+      .def("_balance", &OrderBrokerBase::_balance)
+      .def("_position", &OrderBrokerBase::_position);
 }

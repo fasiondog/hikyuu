@@ -49,10 +49,10 @@ public:
      * @param code 证券代码
      * @param price 买入价格
      * @param num 买入数量
-     * @return 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
+     * @return 委托单号，否则返回空字符串
      */
     string buy(Datetime datetime, const string& market, const string& code, price_t price,
-               double num);
+               double num) noexcept;
 
     /**
      * 执行卖出操作
@@ -61,13 +61,21 @@ public:
      * @param code 证券代码
      * @param price 卖出价格
      * @param num 卖出数量
-     * @return 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
+     * @return 委托单号，否则返回空字符串
      */
     string sell(Datetime datetime, const string& market, const string& code, price_t price,
-                double num);
+                double num) noexcept;
 
     /**
-     * 执行实际买入操作
+     * 获取资金状况
+     * @return {"cash"(double): 可用资金，"frozen"(double): 冻结资金}
+     */
+    Parameter balance() noexcept;
+
+    vector<Parameter> position() noexcept;
+
+    /**
+     * 子类实现接口，执行实际买入操作
      * @param datetime 策略指示时间
      * @param market 市场标识
      * @param code 证券代码
@@ -79,7 +87,7 @@ public:
                         double num) = 0;
 
     /**
-     * 执行实际卖出操作
+     * 子类实现接口，执行实际卖出操作
      * @param datetime 策略指示时间
      * @param market 市场标识
      * @param code 证券代码
@@ -89,6 +97,32 @@ public:
      */
     virtual string _sell(Datetime datetime, const string& market, const string& code, price_t price,
                          double num) = 0;
+
+    /**
+     * 子类获取资产信息实现
+     * @return string json字符串，需包含 number： "cash"(可用资金，必须), "frozen"（冻结资金，可选）
+     */
+    virtual string _balance() {
+        return string();
+    }
+
+    /**
+     * 子类获取持仓信息实现
+     * @return vector<string> json 字符串组成的持仓信息列表
+     * <pre>
+     * 其中：market, code, num 为必须
+     * 示例：
+     * [{"market": "SZ",
+     *   "code": "000001",
+     *   "num": 100,
+     *   "buy_frozen_num", 0,
+     *   "sell_frozen_num", 0
+     * }]
+     * </pre
+     */
+    virtual vector<string> _position() {
+        return vector<string>();
+    }
 
 protected:
     string m_name;
