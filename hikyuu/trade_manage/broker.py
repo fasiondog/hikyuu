@@ -54,6 +54,16 @@ class OrderBrokerWrap(OrderBrokerBase):
         ret = self._broker.sell('{}{}'.format(market, code), price, num)
         return str(datetime) if ret is not None else str(ret)
 
+    def _balance(self):
+        if hasattr(self._broker, "balance"):
+            return self._broker.balance()
+        return str()
+
+    def _position(self):
+        if hasattr(self._broker, "position"):
+            return self._broker.position()
+        return list()
+
 
 class TestOrderBroker:
     """用于测试的订单代理，仅在执行买入/卖出时打印信息"""
