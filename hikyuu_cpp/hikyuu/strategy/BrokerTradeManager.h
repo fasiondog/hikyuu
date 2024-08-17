@@ -11,13 +11,13 @@
 
 namespace hku {
 
-class HKU_API OrderTradeManager : public TradeManagerBase {
+class HKU_API BrokerTradeManager : public TradeManagerBase {
 public:
-    explicit OrderTradeManager(const Datetime& datetime = Datetime(199001010000LL),
-                               price_t initcash = 100000.0,
-                               const TradeCostPtr& costfunc = TC_Zero(),
-                               const string& name = "SYS");
-    virtual ~OrderTradeManager() {}
+    BrokerTradeManager() = default;
+    explicit BrokerTradeManager(const OrderBrokerPtr& broker,
+                                const TradeCostPtr& costfunc = TC_Zero(),
+                                const string& name = "SYS");
+    virtual ~BrokerTradeManager() {}
 
     virtual void _reset() override;
 
@@ -434,6 +434,9 @@ public:
     }
 
 private:
+    void getCurrentBrokerPosition();
+
+private:
     Datetime m_init_datetime;   // 账户建立日期
     Datetime m_first_datetime;  // 第一次交易时间
     Datetime m_last_datetime;   // 最后一次交易时间
@@ -444,44 +447,6 @@ private:
 
     typedef map<uint64_t, PositionRecord> position_map_type;
     position_map_type m_position;  // 当前持仓交易对象的持仓记录
-
-//============================================
-// 序列化支持
-//============================================
-#if HKU_SUPPORT_SERIALIZATION
-private:
-    friend class boost::serialization::access;
-    template <class Archive>
-    void save(Archive& ar, const unsigned int version) const {
-        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(TradeManagerBase);
-        ar& BOOST_SERIALIZATION_NVP(m_init_datetime);
-        ar& BOOST_SERIALIZATION_NVP(m_first_datetime);
-        ar& BOOST_SERIALIZATION_NVP(m_last_datetime);
-        ar& BOOST_SERIALIZATION_NVP(m_init_cash);
-        ar& BOOST_SERIALIZATION_NVP(m_cash);
-        ar& BOOST_SERIALIZATION_NVP(m_frozen_cash);
-        PositionRecordList position = getPositionList();
-        ar& bs::make_nvp<PositionRecordList>("m_position", position);
-    }
-
-    template <class Archive>
-    void load(Archive& ar, const unsigned int version) {
-        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(TradeManagerBase);
-        ar& BOOST_SERIALIZATION_NVP(m_init_datetime);
-        ar& BOOST_SERIALIZATION_NVP(m_first_datetime);
-        ar& BOOST_SERIALIZATION_NVP(m_last_datetime);
-        ar& BOOST_SERIALIZATION_NVP(m_init_cash);
-        ar& BOOST_SERIALIZATION_NVP(m_cash);
-        ar& BOOST_SERIALIZATION_NVP(m_frozen_cash);
-        PositionRecordList position;
-        ar& bs::make_nvp<PositionRecordList>("m_position", position);
-        PositionRecordList::const_iterator iter = position.begin();
-        for (; iter != position.end(); ++iter) {
-            m_position[iter->stock.id()] = *iter;
-        }
-    }
-
-#endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
 }  // namespace hku

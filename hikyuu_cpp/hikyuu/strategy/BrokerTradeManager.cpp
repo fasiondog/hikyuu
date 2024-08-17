@@ -6,22 +6,41 @@
  */
 
 #include "hikyuu/trade_manage/crt/TC_Zero.h"
-#include "OrderTradeManager.h"
+#include "BrokerTradeManager.h"
 
 namespace hku {
 
-OrderTradeManager::OrderTradeManager(const Datetime& datetime, price_t initcash,
-                                     const TradeCostPtr& costfunc, const string& name)
-: TradeManagerBase(name, costfunc),
-  m_init_datetime(datetime),
-  m_first_datetime(datetime),
-  m_last_datetime(datetime) {
-    m_init_cash = roundEx(initcash, 2);
+BrokerTradeManager::BrokerTradeManager(const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
+                                       const string& name)
+: TradeManagerBase(name, costfunc) {
+    HKU_ASSERT(broker);
+    m_broker_list.emplace_back(broker);
+
+    auto balance = broker->balance();
+    m_init_cash = balance.get<double>("cash");
     m_cash = m_init_cash;
-    m_broker_last_datetime = Datetime::now();
+    m_frozen_cash = balance.get<double>("frozen");
+
+    auto now = Datetime::now();
+    auto brk_positions = broker->position();
+    for (const auto& brk_pos : brk_positions) {
+        PositionRecord pos;
+        pos.takeDatetime = now;
+        pos.stock = brk_pos.get<Stock>("stock");
+        pos.number = brk_pos.get<double>("num");
+        pos.totalNumber = pos.number;
+        pos.buyMoney = brk_pos.get<double>("cost");
+        pos.totalRisk = pos.buyMoney;
+        m_position[pos.stock.id()] = pos;
+    }
+
+    m_init_datetime = Datetime::now();
+    m_first_datetime = m_init_datetime;
+    m_last_datetime = m_init_datetime;
+    m_broker_last_datetime = m_init_datetime;
 }
 
-void OrderTradeManager::_reset() {
+void BrokerTradeManager::_reset() {
     HKU_WARN("The subclass does not implement a reset method");
     m_first_datetime = m_init_datetime;
     m_last_datetime = m_init_datetime;
@@ -30,8 +49,8 @@ void OrderTradeManager::_reset() {
     m_position.clear();
 }
 
-shared_ptr<TradeManagerBase> OrderTradeManager::_clone() {
-    OrderTradeManager* p = new OrderTradeManager(m_init_datetime, m_init_cash, m_costfunc, m_name);
+shared_ptr<TradeManagerBase> BrokerTradeManager::_clone() {
+    BrokerTradeManager* p = new BrokerTradeManager();
     p->m_init_datetime = m_init_datetime;
     p->m_first_datetime = m_first_datetime;
     p->m_last_datetime = m_last_datetime;
@@ -42,7 +61,40 @@ shared_ptr<TradeManagerBase> OrderTradeManager::_clone() {
     return shared_ptr<TradeManagerBase>(p);
 }
 
-PositionRecordList OrderTradeManager::getPositionList() const {
+void BrokerTradeManager::getCurrentBrokerPosition() {
+    auto& broker = m_broker_list.front();
+
+    auto balance = broker->balance();
+    m_cash = m_init_cash;
+    m_frozen_cash = balance.get<double>("frozen");
+
+    auto now = Datetime::now();
+    auto brk_positions = broker->position();
+    for (const auto& brk_pos : brk_positions) {
+        PositionRecord pos;
+        pos.takeDatetime = now;
+        pos.stock = brk_pos.get<Stock>("stock");
+        pos.number = brk_pos.get<double>("num");
+        pos.totalNumber = pos.number;
+        pos.buyMoney = brk_pos.get<double>("cost");
+        pos.totalRisk = pos.buyMoney;
+        auto iter = m_position.find(pos.stock.id());
+        if (iter == m_position.end()) {
+            m_position[pos.stock.id()] = pos;
+        } else {
+            iter->number = pos.number;
+            iter->totalNumber = pos.totalNumber;
+            iter->buyMoney = pos.buyMoney;
+        }
+    }
+
+    m_init_datetime = Datetime::now();
+    m_first_datetime = m_init_datetime;
+    m_last_datetime = m_init_datetime;
+    m_broker_last_datetime = m_init_datetime;
+}
+
+PositionRecordList BrokerTradeManager::getPositionList() const {
     PositionRecordList result;
     position_map_type::const_iterator iter = m_position.begin();
     for (; iter != m_position.end(); ++iter) {
@@ -51,15 +103,15 @@ PositionRecordList OrderTradeManager::getPositionList() const {
     return result;
 }
 
-bool OrderTradeManager::checkin(const Datetime& datetime, price_t cash) {
+bool BrokerTradeManager::checkin(const Datetime& datetime, price_t cash) {
     HKU_IF_RETURN(datetime < m_last_datetime, false);
     m_cash += cash;
     return true;
 }
 
-TradeRecord OrderTradeManager::buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                                   double number, price_t stoploss, price_t goalPrice,
-                                   price_t planPrice, SystemPart from) {
+TradeRecord BrokerTradeManager::buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
+                                    double number, price_t stoploss, price_t goalPrice,
+                                    price_t planPrice, SystemPart from) {
     TradeRecord result;
     result.business = BUSINESS_INVALID;
 
@@ -127,9 +179,9 @@ TradeRecord OrderTradeManager::buy(const Datetime& datetime, const Stock& stock,
     return result;
 }
 
-TradeRecord OrderTradeManager::sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                                    double number, price_t stoploss, price_t goalPrice,
-                                    price_t planPrice, SystemPart from) {
+TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stock,
+                                     price_t realPrice, double number, price_t stoploss,
+                                     price_t goalPrice, price_t planPrice, SystemPart from) {
     HKU_CHECK(!std::isnan(number), "sell number should be a valid double!");
     TradeRecord result;
 

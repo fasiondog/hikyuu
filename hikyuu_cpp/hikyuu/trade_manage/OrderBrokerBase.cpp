@@ -112,6 +112,7 @@ vector<Parameter> OrderBrokerBase::position() noexcept {
 
             pos.set<Stock>("stock", stock);
             pos.set<double>("num", brk_pos["number"].get<double>());
+            pos.set<double>("cost", brk_pos["cost"].get<double>());  // 总成本
             if (brk_pos.contains("buy_frozen_num")) {
                 pos.set<double>("buy_frozen_num", brk_pos["buy_frozen_num"].get<double>());
             } else {
