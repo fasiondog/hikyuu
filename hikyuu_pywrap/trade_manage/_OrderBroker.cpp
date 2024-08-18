@@ -15,14 +15,14 @@ class PyOrderBrokerBase : public OrderBrokerBase {
 public:
     using OrderBrokerBase::OrderBrokerBase;
 
-    string _buy(Datetime datetime, const string& market, const string& code, price_t price,
-                double num) override {
-        PYBIND11_OVERLOAD_PURE(string, OrderBrokerBase, _buy, datetime, market, code, price, num);
+    void _buy(Datetime datetime, const string& market, const string& code, price_t price,
+              double num) override {
+        PYBIND11_OVERLOAD_PURE(void, OrderBrokerBase, _buy, datetime, market, code, price, num);
     }
 
-    string _sell(Datetime datetime, const string& market, const string& code, price_t price,
-                 double num) override {
-        PYBIND11_OVERLOAD_PURE(string, OrderBrokerBase, _sell, datetime, market, code, price, num);
+    void _sell(Datetime datetime, const string& market, const string& code, price_t price,
+               double num) override {
+        PYBIND11_OVERLOAD_PURE(void, OrderBrokerBase, _sell, datetime, market, code, price, num);
     }
 
     price_t _cash() override {
@@ -61,9 +61,7 @@ void export_OrderBroker(py::module& m) {
     :param str market: 市场标识
     :param str code: 证券代码
     :param float price: 买入价格
-    :param float num: 买入数量
-    :return: 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
-    :rtype: Datetime)")
+    :param float num: 买入数量)")
 
       .def("sell", &OrderBrokerBase::sell, R"(sell(self, datetime, market, code, price, num)
 
@@ -73,9 +71,7 @@ void export_OrderBroker(py::module& m) {
     :param str market: 市场标识
     :param str code: 证券代码
     :param float price: 卖出价格
-    :param float num: 卖出数量
-    :return: 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
-    "rtype: Datetime)")
+    :param float num: 卖出数量)")
 
       .def("cash", &OrderBrokerBase::cash)
 
@@ -91,9 +87,7 @@ void export_OrderBroker(py::module& m) {
     :param str market: 市场标识
     :param str code: 证券代码
     :param float price: 买入价格
-    :param float num: 买入数量
-    :return: 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
-    :rtype: Datetime)")
+    :param float num: 买入数量)")
 
       .def("_sell", &OrderBrokerBase::_sell,
            R"(_sell(self, datetime, market, code, price, num)
@@ -104,9 +98,7 @@ void export_OrderBroker(py::module& m) {
     :param str market: 市场标识
     :param str code: 证券代码
     :param float price: 卖出价格
-    :param float num: 卖出数量
-    :return: 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
-    "rtype: Datetime)")
+    :param float num: 卖出数量)")
 
       .def("_cash", &OrderBrokerBase::_cash)
       .def("_position", &OrderBrokerBase::_position);

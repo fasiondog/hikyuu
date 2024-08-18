@@ -46,13 +46,11 @@ class OrderBrokerWrap(OrderBrokerBase):
 
     def _buy(self, datetime, market, code, price, num):
         """实现 OrderBrokerBase 的 _buy 接口"""
-        ret = self._broker.buy('{}{}'.format(market, code), price, num)
-        return str(datetime) if ret is not None else str(ret)
+        self._broker.buy('{}{}'.format(market, code), price, num)
 
     def _sell(self, datetime, market, code, price, num):
         """实现 OrderBrokerBase 的 _sell 接口"""
-        ret = self._broker.sell('{}{}'.format(market, code), price, num)
-        return str(datetime) if ret is not None else str(ret)
+        self._broker.sell('{}{}'.format(market, code), price, num)
 
     def _cash(self):
         if hasattr(self._broker, "cash"):
