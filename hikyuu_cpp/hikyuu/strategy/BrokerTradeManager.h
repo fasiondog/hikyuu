@@ -420,7 +420,8 @@ public:
     }
 
 private:
-    void getCurrentBrokerPosition();
+    void getCashFromBroker();
+    void getPositionFromBroker();
 
 private:
     Datetime m_init_datetime;   // 账户建立日期

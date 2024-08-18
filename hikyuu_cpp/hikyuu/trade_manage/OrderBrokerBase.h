@@ -14,6 +14,18 @@
 
 namespace hku {
 
+struct HKU_API BrokerPositionRecord {
+    Stock stock;
+    price_t number{0.0};
+
+    BrokerPositionRecord() = default;
+    BrokerPositionRecord(const BrokerPositionRecord&) = default;
+    BrokerPositionRecord(BrokerPositionRecord&& rv);
+
+    BrokerPositionRecord& operator=(const BrokerPositionRecord&) = default;
+    BrokerPositionRecord& operator=(BrokerPositionRecord&& rv);
+};
+
 /**
  * 订单代理基类，实现实际的订单操作及程序化的订单。
  * @details 可通过向 TradeManager.regBroker 向 TradeManager 注册多个订单代理实例。

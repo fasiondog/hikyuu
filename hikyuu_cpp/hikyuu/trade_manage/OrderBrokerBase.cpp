@@ -12,6 +12,20 @@ namespace hku {
 
 using json = nlohmann::json;
 
+BrokerPositionRecord::BrokerPositionRecord(BrokerPositionRecord&& rv)
+: stock(std::move(rv.stock)), number(rv.number) {
+    rv.number = 0.0;
+}
+
+BrokerPositionRecord& BrokerPositionRecord::operator=(BrokerPositionRecord&& rv) {
+    if (this != &rv) {
+        stock = std::move(rv.stock);
+        number = rv.number;
+        rv.number = 0.0;
+    }
+    return *this;
+}
+
 HKU_API std::ostream& operator<<(std::ostream& os, const OrderBrokerBase& broker) {
     os << "OrderBroker(" << broker.name() << ")";
     return os;

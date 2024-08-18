@@ -57,10 +57,12 @@ shared_ptr<TradeManagerBase> BrokerTradeManager::_clone() {
     return shared_ptr<TradeManagerBase>(p);
 }
 
-void BrokerTradeManager::getCurrentBrokerPosition() {
-    auto& broker = m_broker_list.front();
+void BrokerTradeManager::getCashFromBroker() {
+    m_cash = m_broker_list.front()->cash();
+}
 
-    m_cash = broker->cash();
+void BrokerTradeManager::getPositionFromBroker() {
+    auto& broker = m_broker_list.front();
 
     auto now = Datetime::now();
     auto brk_positions = broker->position();
