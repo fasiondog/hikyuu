@@ -124,6 +124,10 @@ TradeRecord BrokerTradeManager::buy(const Datetime& datetime, const Stock& stock
                         "{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
 
+    // 同步资金与账户信息
+    getCashFromBroker();
+    getPositionFromBroker();
+
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
 
     // 实际交易需要的现金＝交易数量＊实际交易价格＋交易总成本
@@ -193,6 +197,10 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
     HKU_ERROR_IF_RETURN(number != MAX_DOUBLE && number > stock.maxTradeNumber(), result,
                         "{} {} Sell number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
+
+    // 同步资金与账户信息
+    getCashFromBroker();
+    getPositionFromBroker();
 
     // 未持仓
     position_map_type::iterator pos_iter = m_position.find(stock.id());
