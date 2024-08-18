@@ -24,11 +24,11 @@ BrokerTradeManager::BrokerTradeManager(const OrderBrokerPtr& broker, const Trade
     for (const auto& brk_pos : brk_positions) {
         PositionRecord pos;
         pos.takeDatetime = now;
-        pos.stock = brk_pos.get<Stock>("stock");
-        pos.number = brk_pos.get<double>("num");
-        pos.totalNumber = pos.number;
-        pos.buyMoney = brk_pos.get<double>("cost");
-        pos.totalRisk = pos.buyMoney;
+        pos.stock = brk_pos.stock;
+        pos.number = brk_pos.number;
+        pos.totalNumber = brk_pos.number;
+        pos.buyMoney = brk_pos.money;
+        pos.totalRisk = brk_pos.money;
         m_position[pos.stock.id()] = pos;
     }
 
@@ -69,11 +69,11 @@ void BrokerTradeManager::getPositionFromBroker() {
     for (const auto& brk_pos : brk_positions) {
         PositionRecord pos;
         pos.takeDatetime = now;
-        pos.stock = brk_pos.get<Stock>("stock");
-        pos.number = brk_pos.get<double>("num");
-        pos.totalNumber = pos.number;
-        pos.buyMoney = brk_pos.get<double>("cost");
-        pos.totalRisk = pos.buyMoney;
+        pos.stock = brk_pos.stock;
+        pos.number = brk_pos.number;
+        pos.totalNumber = brk_pos.number;
+        pos.buyMoney = brk_pos.money;
+        pos.totalRisk = brk_pos.money;
         auto iter = m_position.find(pos.stock.id());
         if (iter == m_position.end()) {
             m_position[pos.stock.id()] = pos;

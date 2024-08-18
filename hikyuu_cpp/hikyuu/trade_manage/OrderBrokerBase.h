@@ -16,15 +16,21 @@ namespace hku {
 
 struct HKU_API BrokerPositionRecord {
     Stock stock;
-    price_t number{0.0};
+    price_t number{0.0};  // 数量
+    price_t money{0.0};   // 买入花费总资金
 
     BrokerPositionRecord() = default;
+    BrokerPositionRecord(const Stock& stock, price_t number, price_t money);
     BrokerPositionRecord(const BrokerPositionRecord&) = default;
     BrokerPositionRecord(BrokerPositionRecord&& rv);
 
     BrokerPositionRecord& operator=(const BrokerPositionRecord&) = default;
     BrokerPositionRecord& operator=(BrokerPositionRecord&& rv);
+
+    string str() const;
 };
+
+HKU_API std::ostream& operator<<(std::ostream& os, const BrokerPositionRecord&);
 
 /**
  * 订单代理基类，实现实际的订单操作及程序化的订单。
@@ -81,7 +87,7 @@ public:
      */
     price_t cash() noexcept;
 
-    vector<Parameter> position() noexcept;
+    vector<BrokerPositionRecord> position() noexcept;
 
     /**
      * 子类实现接口，执行实际买入操作
@@ -116,13 +122,11 @@ public:
      * 子类获取持仓信息实现
      * @return vector<string> json 字符串组成的持仓信息列表
      * <pre>
-     * 其中：market, code, num 为必须
      * 示例：
      * [{"market": "SZ",
      *   "code": "000001",
-     *   "num": 100,
-     *   "buy_frozen_num", 0,
-     *   "sell_frozen_num", 0
+     *   "number": 100,
+     *   "money": 0,
      * }]
      * </pre
      */

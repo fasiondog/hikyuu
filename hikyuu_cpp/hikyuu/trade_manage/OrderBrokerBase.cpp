@@ -12,18 +12,34 @@ namespace hku {
 
 using json = nlohmann::json;
 
+BrokerPositionRecord::BrokerPositionRecord(const Stock& stock_, price_t number_, price_t money_)
+: stock(stock_), number(number_), money(money_) {}
+
 BrokerPositionRecord::BrokerPositionRecord(BrokerPositionRecord&& rv)
-: stock(std::move(rv.stock)), number(rv.number) {
+: stock(std::move(rv.stock)), number(rv.number), money(rv.money) {
     rv.number = 0.0;
+    rv.money = 0.0;
 }
 
 BrokerPositionRecord& BrokerPositionRecord::operator=(BrokerPositionRecord&& rv) {
     if (this != &rv) {
         stock = std::move(rv.stock);
         number = rv.number;
+        money = rv.money;
         rv.number = 0.0;
+        rv.money = 0.0;
     }
     return *this;
+}
+
+string BrokerPositionRecord::str() const {
+    return fmt::format("BrokerPositionRecord({}, {:<.4f}, {:<.4f})", stock.market_code(), number,
+                       money);
+}
+
+HKU_API std::ostream& operator<<(std::ostream& os, const BrokerPositionRecord& pos) {
+    os << pos.str();
+    return os;
 }
 
 HKU_API std::ostream& operator<<(std::ostream& os, const OrderBrokerBase& broker) {
@@ -76,8 +92,8 @@ price_t OrderBrokerBase::cash() noexcept {
     return ret;
 }
 
-vector<Parameter> OrderBrokerBase::position() noexcept {
-    vector<Parameter> ret;
+vector<BrokerPositionRecord> OrderBrokerBase::position() noexcept {
+    vector<BrokerPositionRecord> ret;
 
     vector<string> brk_positions;
     try {
@@ -97,31 +113,19 @@ vector<Parameter> OrderBrokerBase::position() noexcept {
                 continue;
             }
 
-            Parameter pos;
+            BrokerPositionRecord pos;
             auto market = brk_pos["market"].get<string>();
             auto code = brk_pos["code"].get<string>();
             auto stock = getStock(fmt::format("{}{}", market, code));
             if (stock.isNull()) {
                 // 策略的上下文可能并不包含该股，此时忽略
-                HKU_DEBUG("Not found the stock: {}{}", market, code);
+                HKU_WARN("Not found the stock: {}{}", market, code);
                 continue;
             }
 
-            pos.set<Stock>("stock", stock);
-            pos.set<double>("num", brk_pos["number"].get<double>());
-            pos.set<double>("cost", brk_pos["cost"].get<double>());  // 总成本
-            if (brk_pos.contains("buy_frozen_num")) {
-                pos.set<double>("buy_frozen_num", brk_pos["buy_frozen_num"].get<double>());
-            } else {
-                pos.set<double>("buy_frozen_num", 0.0);
-            }
-
-            if (brk_pos.contains("sell_frozon_num")) {
-                pos.set<double>("sell_frozon_num", brk_pos["sell_frozon_num"].get<double>());
-            } else {
-                pos.set<double>("sell_frozon_num", 0.0);
-            }
-
+            pos.stock = stock;
+            pos.number = brk_pos["number"].get<double>();
+            pos.money = brk_pos["money"].get<double>();
             ret.emplace_back(pos);
 
         } catch (const std::exception& e) {

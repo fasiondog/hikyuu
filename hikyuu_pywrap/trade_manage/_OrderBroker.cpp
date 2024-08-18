@@ -35,6 +35,15 @@ public:
 };
 
 void export_OrderBroker(py::module& m) {
+    py::class_<BrokerPositionRecord>(m, "BrokerPositionRecord")
+      .def(py::init<>())
+      .def(py::init<const Stock&, price_t, price_t>())
+      .def("__str__", &BrokerPositionRecord::str)
+      .def("__repr__", &BrokerPositionRecord::str)
+      .def_readwrite("stock", &BrokerPositionRecord::stock, "持仓对象")
+      .def_readwrite("number", &BrokerPositionRecord::number, "持仓数量")
+      .def_readwrite("money", &BrokerPositionRecord::money, "买入花费总资金");
+
     py::class_<OrderBrokerBase, OrderBrokerPtr, PyOrderBrokerBase>(
       m, "OrderBrokerBase",
       R"(订单代理包装基类，用户可以参考自定义自己的订单代理，加入额外的处理
@@ -76,7 +85,9 @@ void export_OrderBroker(py::module& m) {
       .def("cash", &OrderBrokerBase::cash)
 
       .def("position",
-           [](OrderBrokerBase& self) { return vector_to_python_list<Parameter>(self.position()); })
+           [](OrderBrokerBase& self) {
+               return vector_to_python_list<BrokerPositionRecord>(self.position());
+           })
 
       .def("_buy", &OrderBrokerBase::_buy,
            R"(_buy(self, datetime, market, code, price, num)

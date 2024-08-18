@@ -26,7 +26,7 @@ public:
                    price_t buyMoney, price_t totalCost, price_t totalRisk, price_t sellMoney);
 
     /** 仅用于python的__str__ */
-    string toString() const;
+    string str() const;
 
     Stock stock;              ///< 交易对象
     Datetime takeDatetime;    ///< 初次建仓日期
