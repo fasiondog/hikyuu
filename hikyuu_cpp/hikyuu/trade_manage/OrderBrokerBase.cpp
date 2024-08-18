@@ -57,8 +57,7 @@ string OrderBrokerBase::sell(Datetime datetime, const string& market, const stri
 price_t OrderBrokerBase::cash() noexcept {
     price_t ret = 0.0;
     try {
-        return _cash();
-
+        ret = _cash();
     } catch (const std::exception& e) {
         HKU_ERROR(e.what());
     } catch (...) {

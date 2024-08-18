@@ -15,3 +15,10 @@ class EasyTraderOrderBroker:
     def sell(self, code, price, num):
         self.user.sell(code[2:], price=price, amount=num)
         print("卖出：%s  %.3f  %i" % (code, price, num))
+
+    def cash(self):
+        balance = self.user.balance
+        ret = 0.0
+        for i in range(len(balance)):
+            ret += balance[i]['可用资金']
+        return ret
