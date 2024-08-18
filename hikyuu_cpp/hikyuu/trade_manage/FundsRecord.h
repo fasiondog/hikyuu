@@ -20,17 +20,17 @@ namespace hku {
  */
 class HKU_API FundsRecord {
 public:
-    FundsRecord();
+    FundsRecord() = default;
     FundsRecord(price_t cash, price_t market_value, price_t short_market_value, price_t base_cash,
                 price_t base_asset, price_t borrow_cash, price_t borrow_asset);
 
-    price_t cash;               /**< 当前现金 */
-    price_t market_value;       /**< 当前多头市值 */
-    price_t short_market_value; /**< 当前空头仓位市值 */
-    price_t base_cash;          /**< 当前投入本金principal */
-    price_t base_asset;         /**< 当前投入的资产价值 */
-    price_t borrow_cash;        /**< 当前借入的资金，即负债 */
-    price_t borrow_asset;       /**< 当前借入证券资产价值 */
+    price_t cash{0.0};               /**< 当前现金 */
+    price_t market_value{0.0};       /**< 当前多头市值 */
+    price_t short_market_value{0.0}; /**< 当前空头仓位市值 */
+    price_t base_cash{0.0};          /**< 当前投入本金principal */
+    price_t base_asset{0.0};         /**< 当前投入的资产价值 */
+    price_t borrow_cash{0.0};        /**< 当前借入的资金，即负债 */
+    price_t borrow_asset{0.0};       /**< 当前借入证券资产价值 */
 
     // 当前总资产 = 现金 + 多头市值 + 空头数量×（借入价格 - 当前价格)
     //          = cash + market_value + borrow_asset - short_market_value

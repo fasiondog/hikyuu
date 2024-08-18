@@ -67,10 +67,9 @@ public:
                 double num) noexcept;
 
     /**
-     * 获取资金状况
-     * @return {"cash"(double): 可用资金，"frozen"(double): 冻结资金}
+     * 获取当前可用资金
      */
-    Parameter balance() noexcept;
+    price_t cash() noexcept;
 
     vector<Parameter> position() noexcept;
 
@@ -99,11 +98,10 @@ public:
                          double num) = 0;
 
     /**
-     * 子类获取资产信息实现
-     * @return string json字符串，需包含 number： "cash"(可用资金，必须), "frozen"（冻结资金，可选）
+     * 子类获取当前可用现金接口
      */
-    virtual string _balance() {
-        return string();
+    virtual price_t _cash() {
+        return 0.0;
     }
 
     /**

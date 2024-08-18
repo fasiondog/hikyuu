@@ -54,10 +54,10 @@ class OrderBrokerWrap(OrderBrokerBase):
         ret = self._broker.sell('{}{}'.format(market, code), price, num)
         return str(datetime) if ret is not None else str(ret)
 
-    def _balance(self):
-        if hasattr(self._broker, "balance"):
-            return self._broker.balance()
-        return str()
+    def _cash(self):
+        if hasattr(self._broker, "cash"):
+            return self._broker.cash()
+        return 0.0
 
     def _position(self):
         if hasattr(self._broker, "position"):

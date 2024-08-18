@@ -16,10 +16,8 @@ BrokerTradeManager::BrokerTradeManager(const OrderBrokerPtr& broker, const Trade
     HKU_ASSERT(broker);
     m_broker_list.emplace_back(broker);
 
-    auto balance = broker->balance();
-    m_init_cash = balance.get<double>("cash");
+    m_init_cash = broker->cash();
     m_cash = m_init_cash;
-    m_frozen_cash = balance.get<double>("frozen");
 
     auto now = Datetime::now();
     auto brk_positions = broker->position();
@@ -45,7 +43,6 @@ void BrokerTradeManager::_reset() {
     m_first_datetime = m_init_datetime;
     m_last_datetime = m_init_datetime;
     m_cash = m_init_cash;
-    m_frozen_cash = 0.0;
     m_position.clear();
 }
 
@@ -56,7 +53,6 @@ shared_ptr<TradeManagerBase> BrokerTradeManager::_clone() {
     p->m_last_datetime = m_last_datetime;
     p->m_init_cash = m_init_cash;
     p->m_cash = m_cash;
-    p->m_frozen_cash = m_frozen_cash;
     p->m_position = m_position;
     return shared_ptr<TradeManagerBase>(p);
 }
@@ -64,9 +60,7 @@ shared_ptr<TradeManagerBase> BrokerTradeManager::_clone() {
 void BrokerTradeManager::getCurrentBrokerPosition() {
     auto& broker = m_broker_list.front();
 
-    auto balance = broker->balance();
-    m_cash = m_init_cash;
-    m_frozen_cash = balance.get<double>("frozen");
+    m_cash = broker->cash();
 
     auto now = Datetime::now();
     auto brk_positions = broker->position();
@@ -82,9 +76,9 @@ void BrokerTradeManager::getCurrentBrokerPosition() {
         if (iter == m_position.end()) {
             m_position[pos.stock.id()] = pos;
         } else {
-            iter->number = pos.number;
-            iter->totalNumber = pos.totalNumber;
-            iter->buyMoney = pos.buyMoney;
+            iter->second.number = pos.number;
+            iter->second.totalNumber = pos.totalNumber;
+            iter->second.buyMoney = pos.buyMoney;
         }
     }
 
@@ -254,6 +248,35 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
     }
 
     return result;
+}
+
+FundsRecord BrokerTradeManager::getFunds(KQuery::KType inktype) const {
+    FundsRecord funds;
+    int precision = getParam<int>("precision");
+
+    string ktype(inktype);
+    to_upper(ktype);
+
+    price_t value{0.0};  // 当前市值
+    position_map_type::const_iterator iter = m_position.begin();
+    for (; iter != m_position.end(); ++iter) {
+        const PositionRecord& record = iter->second;
+        auto price = record.stock.getMarketValue(lastDatetime(), ktype);
+        value = roundEx((value + record.number * price * record.stock.unit()), precision);
+    }
+
+    funds.cash = m_cash;
+    funds.market_value = value;
+    funds.short_market_value = 0.0;
+    funds.base_cash = m_init_cash;
+    funds.base_asset = 0.0;
+    funds.borrow_cash = 0.0;
+    funds.borrow_asset = 0.0;
+    return funds;
+}
+
+FundsRecord BrokerTradeManager::getFunds(const Datetime& datetime, KQuery::KType ktype) {
+    return (datetime >= m_last_datetime) ? getFunds(ktype) : FundsRecord();
 }
 
 }  // namespace hku

@@ -54,22 +54,10 @@ string OrderBrokerBase::sell(Datetime datetime, const string& market, const stri
     return ret;
 }
 
-Parameter OrderBrokerBase::balance() noexcept {
-    Parameter ret;
-    ret.set<double>("cash", 0.0);
-    ret.set<double>("frozen", 0.0);
-
+price_t OrderBrokerBase::cash() noexcept {
+    price_t ret = 0.0;
     try {
-        auto brk_ret = _balance();
-        HKU_IF_RETURN(brk_ret.empty(), ret);
-
-        json x(brk_ret);
-        ret.set<double>("cash", x["cash"].get<double>());
-        if (x.contains("forzen")) {
-            ret.set<double>("forzen", x["frozen"].get<double>());
-        } else {
-            ret.set<double>("frozen", 0.0);
-        }
+        return _cash();
 
     } catch (const std::exception& e) {
         HKU_ERROR(e.what());

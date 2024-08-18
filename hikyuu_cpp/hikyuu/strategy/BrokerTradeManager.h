@@ -35,7 +35,7 @@ public:
      * @param datetime 日期
      * @param stock 指定对象
      */
-    virtual double getMarginRate(const Datetime& datetime, const Stock& stock) {
+    virtual double getMarginRate(const Datetime& datetime, const Stock& stock) override {
         HKU_WARN("The subclass does not implement a getMarginRate method");
         return 0.0;
     }
@@ -51,13 +51,12 @@ public:
     }
 
     /** 第一笔买入交易发生日期，如未发生交易返回Null<Datetime>() */
-    virtual Datetime firstDatetime() const {
-        HKU_WARN("The subclass does not implement this method");
-        return Datetime();
+    virtual Datetime firstDatetime() const override {
+        return m_first_datetime;
     }
 
     /** 最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期 */
-    virtual Datetime lastDatetime() const {
+    virtual Datetime lastDatetime() const override {
         return m_last_datetime;
     }
 
@@ -70,19 +69,11 @@ public:
     }
 
     /**
-     * 当前冻结现金
-     */
-    virtual price_t currentFrozen() const override {
-        return m_frozen_cash;
-    }
-
-    /**
      * 获取指定日期的现金
      * @note 如果不带日期参数，无法根据权息信息调整持仓
      */
-    virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
-        HKU_WARN("The subclass does not implement this method");
-        return 0.0;
+    virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override {
+        return (datetime >= m_last_datetime) ? m_cash : 0.0;
     }
 
     /**
@@ -211,7 +202,7 @@ public:
      * @param cash 存入的资金量
      * @return true | false
      */
-    virtual bool checkin(const Datetime& datetime, price_t cash);
+    virtual bool checkin(const Datetime& datetime, price_t cash) override;
 
     /**
      * 取出资金
@@ -219,7 +210,7 @@ public:
      * @param cash 取出的资金量
      * @return true | false
      */
-    virtual bool checkout(const Datetime& datetime, price_t cash) {
+    virtual bool checkout(const Datetime& datetime, price_t cash) override {
         m_cash = (cash > m_cash) ? 0.0 : m_cash - cash;
         return true;
     }
@@ -284,7 +275,7 @@ public:
     virtual TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                              double number = MAX_DOUBLE, price_t stoploss = 0.0,
                              price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                             SystemPart from = PART_INVALID);
+                             SystemPart from = PART_INVALID) override;
 
     /**
      * 卖空
@@ -380,10 +371,7 @@ public:
      * @param ktype 日期的类型
      * @return 资产详情
      */
-    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const {
-        HKU_WARN("The subclass does not implement this method");
-        return FundsRecord();
-    }
+    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const override;
 
     /**
      * 获取指定时刻的资产市值详情
@@ -392,10 +380,8 @@ public:
      * @return 资产详情
      * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同
      */
-    virtual FundsRecord getFunds(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
-        HKU_WARN("The subclass does not implement this method");
-        return FundsRecord();
-    }
+    virtual FundsRecord getFunds(const Datetime& datetime,
+                                 KQuery::KType ktype = KQuery::DAY) override;
 
     /**
      * 直接加入交易记录
@@ -441,9 +427,8 @@ private:
     Datetime m_first_datetime;  // 第一次交易时间
     Datetime m_last_datetime;   // 最后一次交易时间
 
-    price_t m_init_cash{0.0};    // 初始资金
-    price_t m_cash{0.0};         // 当前可用现金
-    price_t m_frozen_cash{0.0};  // 当前冻结资金
+    price_t m_init_cash{0.0};  // 初始资金
+    price_t m_cash{0.0};       // 当前可用现金
 
     typedef map<uint64_t, PositionRecord> position_map_type;
     position_map_type m_position;  // 当前持仓交易对象的持仓记录

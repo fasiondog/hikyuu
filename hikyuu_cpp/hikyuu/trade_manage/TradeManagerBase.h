@@ -323,13 +323,6 @@ public:
     }
 
     /**
-     * 当前冻结现金
-     */
-    virtual price_t currentFrozen() const {
-        return 0.0;
-    }
-
-    /**
      * 获取指定日期的现金
      * @note 如果不带日期参数，无法根据权息信息调整持仓
      */
