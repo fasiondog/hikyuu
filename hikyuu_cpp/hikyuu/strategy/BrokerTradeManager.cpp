@@ -5,10 +5,13 @@
  *      Author: fasiondog
  */
 
+#include <nlohmann/json.hpp>
 #include "hikyuu/trade_manage/crt/TC_Zero.h"
 #include "BrokerTradeManager.h"
 
 namespace hku {
+
+using json = nlohmann::json;
 
 BrokerTradeManager::BrokerTradeManager(const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
                                        const string& name)
@@ -16,8 +19,7 @@ BrokerTradeManager::BrokerTradeManager(const OrderBrokerPtr& broker, const Trade
     HKU_ASSERT(broker);
     m_broker_list.emplace_back(broker);
 
-    m_init_cash = broker->cash();
-    m_cash = m_init_cash;
+    m_cash = broker->cash();
 
     auto now = Datetime::now();
     auto brk_positions = broker->position();
@@ -32,74 +34,73 @@ BrokerTradeManager::BrokerTradeManager(const OrderBrokerPtr& broker, const Trade
         m_position[pos.stock.id()] = pos;
     }
 
-    m_init_datetime = Datetime::now();
-    m_first_datetime = m_init_datetime;
-    m_last_datetime = m_init_datetime;
-    m_broker_last_datetime = m_init_datetime;
+    m_datetime = Datetime::now();
+    m_broker_last_datetime = m_datetime;
 }
 
 void BrokerTradeManager::_reset() {
     HKU_WARN("The subclass does not implement a reset method");
-    m_first_datetime = m_init_datetime;
-    m_last_datetime = m_init_datetime;
-    m_cash = m_init_cash;
+    m_datetime = Datetime::max();
+    m_cash = 0.0;
     m_position.clear();
 }
 
 shared_ptr<TradeManagerBase> BrokerTradeManager::_clone() {
     BrokerTradeManager* p = new BrokerTradeManager();
-    p->m_init_datetime = m_init_datetime;
-    p->m_first_datetime = m_first_datetime;
-    p->m_last_datetime = m_last_datetime;
-    p->m_init_cash = m_init_cash;
+    p->m_datetime = m_datetime;
     p->m_cash = m_cash;
     p->m_position = m_position;
     return shared_ptr<TradeManagerBase>(p);
 }
 
-void BrokerTradeManager::getCashFromBroker() {
-    m_cash = m_broker_list.front()->cash();
-}
+void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) {
+    HKU_CHECK(broker, "broker is null!");
 
-void BrokerTradeManager::getPositionFromBroker() {
-    auto& broker = m_broker_list.front();
-
-    auto now = Datetime::now();
-    auto brk_positions = broker->position();
-
-    position_map_type new_positions;
-    for (const auto& brk_pos : brk_positions) {
-        PositionRecord pos;
-        pos.takeDatetime = now;
-        pos.stock = brk_pos.stock;
-        auto iter = m_position.find(pos.stock.id());
-        if (iter == m_position.end()) {
-            pos.number = brk_pos.number;
-            pos.totalNumber = brk_pos.number;
-            pos.buyMoney = brk_pos.money;
-            pos.totalRisk = brk_pos.money;
-            new_positions[pos.stock.id()] = pos;
-        } else {
-            auto& cur_pos = iter->second;
-            if (cur_pos.number != 0.0) {
-                pos.totalCost = cur_pos.totalCost / cur_pos.number * brk_pos.number;
-                pos.totalRisk = cur_pos.totalRisk / cur_pos.number * brk_pos.number;
-            } else {
-                pos.totalRisk = brk_pos.money;
-            }
-            pos.number = brk_pos.number;
-            pos.totalNumber = brk_pos.number;
-            pos.buyMoney = pos.buyMoney;
-            new_positions[pos.stock.id()] = pos;
-        }
+    auto brk_asset = broker->getAssetInfo();
+    if (brk_asset.empty()) {
+        m_datetime = Datetime::now();
+        m_cash = 0.0;
+        m_position.clear();
+        return;
     }
 
-    m_position.swap(new_positions);
+    try {
+        json asset(brk_asset);
+        m_datetime = asset.contains("datetime")
+                       ? m_datetime = Datetime(asset["datetime"].get<string>())
+                       : m_datetime = Datetime::now();
 
-    m_init_datetime = Datetime::now();
-    m_first_datetime = m_init_datetime;
-    m_last_datetime = m_init_datetime;
-    m_broker_last_datetime = m_init_datetime;
+        m_cash = asset["cash"];
+
+        auto& positions = asset["positions"];
+        for (auto iter = positions.cbegin(); iter != positions.cend(); ++iter) {
+            const auto& jpos = *iter;
+            auto market = jpos["market"].get<string>();
+            auto code = jpos["code"].get<string>();
+            Stock stock = getStock(fmt::format("{}{}", market, code));
+            if (stock.isNull()) {
+                HKU_WARN("Not found stock: {}{}", market, code);
+                continue;
+            }
+
+            PositionRecord pos;
+            pos.stock = stock;
+            pos.takeDatetime = m_datetime;
+            pos.number = jpos["number"].get<double>();
+            pos.stoploss = jpos["stoploss"].get<price_t>();
+            pos.goalPrice = jpos["goal_price"].get<price_t>();
+            pos.totalNumber = pos.number;
+            price_t cost_price = jpos["cost_price"].get<price_t>();
+            pos.buyMoney = pos.number * cost_price;
+            pos.totalRisk = (pos.stoploss - cost_price) * pos.number;
+            m_position[stock.id()] = pos;
+        }
+
+    } catch (const std::exception& e) {
+        HKU_ERROR(e.what());
+    }
+
+    m_broker_last_datetime = m_datetime;
 }
 
 PositionRecordList BrokerTradeManager::getPositionList() const {
@@ -112,7 +113,7 @@ PositionRecordList BrokerTradeManager::getPositionList() const {
 }
 
 bool BrokerTradeManager::checkin(const Datetime& datetime, price_t cash) {
-    HKU_IF_RETURN(datetime < m_last_datetime, false);
+    HKU_IF_RETURN(datetime < m_datetime, false);
     m_cash += cash;
     return true;
 }
@@ -135,10 +136,6 @@ TradeRecord BrokerTradeManager::buy(const Datetime& datetime, const Stock& stock
     HKU_ERROR_IF_RETURN(number > stock.maxTradeNumber(), result,
                         "{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
-
-    // 同步资金与账户信息
-    getCashFromBroker();
-    getPositionFromBroker();
 
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
 
@@ -211,10 +208,6 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
     HKU_ERROR_IF_RETURN(number != MAX_DOUBLE && number > stock.maxTradeNumber(), result,
                         "{} {} Sell number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
-
-    // 同步资金与账户信息
-    getCashFromBroker();
-    getPositionFromBroker();
 
     // 未持仓
     position_map_type::iterator pos_iter = m_position.find(stock.id());
@@ -290,7 +283,7 @@ FundsRecord BrokerTradeManager::getFunds(KQuery::KType inktype) const {
     funds.cash = m_cash;
     funds.market_value = value;
     funds.short_market_value = 0.0;
-    funds.base_cash = m_init_cash;
+    funds.base_cash = m_cash;
     funds.base_asset = 0.0;
     funds.borrow_cash = 0.0;
     funds.borrow_asset = 0.0;
@@ -298,7 +291,7 @@ FundsRecord BrokerTradeManager::getFunds(KQuery::KType inktype) const {
 }
 
 FundsRecord BrokerTradeManager::getFunds(const Datetime& datetime, KQuery::KType ktype) {
-    return (datetime >= m_last_datetime) ? getFunds(ktype) : FundsRecord();
+    return (datetime >= m_datetime) ? getFunds(ktype) : FundsRecord();
 }
 
 }  // namespace hku

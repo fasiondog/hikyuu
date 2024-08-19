@@ -693,6 +693,14 @@ public:
         HKU_WARN("The subclass does not implement this method");
     }
 
+    /**
+     * 从订单代理实例同步当前账户资产信息（包含资金、持仓等）
+     * @param broker 订单代理实例
+     */
+    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) {
+        HKU_WARN("The subclass does not implement this method");
+    }
+
 protected:
     string m_name;            // 账户名称
     TradeCostPtr m_costfunc;  // 成本算法

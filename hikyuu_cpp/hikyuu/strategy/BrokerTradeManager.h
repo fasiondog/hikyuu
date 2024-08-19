@@ -23,6 +23,8 @@ public:
 
     virtual shared_ptr<TradeManagerBase> _clone() override;
 
+    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) override;
+
     /**
      * 根据权息信息更新当前持仓与交易情况
      * @note 必须按时间顺序调用
@@ -42,22 +44,22 @@ public:
 
     /** 初始资金 */
     virtual price_t initCash() const override {
-        return m_init_cash;
+        return m_cash;
     }
 
     /** 账户建立日期 */
     virtual Datetime initDatetime() const override {
-        return m_init_datetime;
+        return m_datetime;
     }
 
     /** 第一笔买入交易发生日期，如未发生交易返回Null<Datetime>() */
     virtual Datetime firstDatetime() const override {
-        return m_first_datetime;
+        return m_datetime;
     }
 
     /** 最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期 */
     virtual Datetime lastDatetime() const override {
-        return m_last_datetime;
+        return m_datetime;
     }
 
     /**
@@ -73,7 +75,7 @@ public:
      * @note 如果不带日期参数，无法根据权息信息调整持仓
      */
     virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override {
-        return (datetime >= m_last_datetime) ? currentCash() : 0.0;
+        return (datetime >= m_datetime) ? currentCash() : 0.0;
     }
 
     /**
@@ -420,16 +422,9 @@ public:
     }
 
 private:
-    void getCashFromBroker();
-    void getPositionFromBroker();
+    Datetime m_datetime;  // 当前日期
 
-private:
-    Datetime m_init_datetime;   // 账户建立日期
-    Datetime m_first_datetime;  // 第一次交易时间
-    Datetime m_last_datetime;   // 最后一次交易时间
-
-    price_t m_init_cash{0.0};  // 初始资金
-    price_t m_cash{0.0};       // 当前可用现金
+    price_t m_cash{0.0};  // 当前可用现金
 
     typedef map<uint64_t, PositionRecord> position_map_type;
     position_map_type m_position;  // 当前持仓交易对象的持仓记录

@@ -97,6 +97,30 @@ public:
     vector<BrokerPositionRecord> position() noexcept;
 
     /**
+     * 获取当前资产信息
+     * @return string json字符串
+     * <pre>
+     * 接口规范：
+     * {
+     *   "datetime": "2001-01-01 18:00:00.12345",
+     *   "cash": 0.0,
+     *   "positions": [
+     *       {"market": "SZ", "code": "000001", "number": 100.0, "stoploss": 0.0, "goal_price": 0.0,
+     *        "cost_price": 0.0},
+     *       {"market": "SH", "code": "600001", "number": 100.0, "stoploss": 0.0, "goal_price": 0.0,
+     *        "cost_price": 0.0},
+     *    ]
+     * }
+     *
+     * 说明：
+     * cash: 当前可用资金
+     * number 应该为：现有持仓 + 正在买入 - 正在卖出
+     * cost_price: 每股买入成本价
+     * </pre>
+     */
+    string getAssetInfo() noexcept;
+
+    /**
      * 子类实现接口，执行实际买入操作
      * @param datetime 策略指示时间
      * @param market 市场标识
@@ -142,6 +166,10 @@ public:
      */
     virtual vector<string> _position() {
         return vector<string>();
+    }
+
+    virtual string _getAssetInfo() {
+        return string();
     }
 
 protected:

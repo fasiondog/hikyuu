@@ -82,6 +82,18 @@ void OrderBrokerBase::sell(Datetime datetime, const string& market, const string
     }
 }
 
+string OrderBrokerBase::getAssetInfo() noexcept {
+    string ret;
+    try {
+        ret = _getAssetInfo();
+    } catch (const std::exception& e) {
+        HKU_ERROR(e.what());
+    } catch (...) {
+        HKU_ERROR_UNKNOWN;
+    }
+    return ret;
+}
+
 price_t OrderBrokerBase::cash() noexcept {
     price_t ret = 0.0;
     try {
