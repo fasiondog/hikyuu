@@ -44,13 +44,13 @@ class OrderBrokerWrap(OrderBrokerBase):
         super(OrderBrokerWrap, self).__init__(name)
         self._broker = broker
 
-    def _buy(self, datetime, market, code, price, num):
+    def _buy(self, datetime, market, code, price, num, stoploss, goal_price, part_from):
         """实现 OrderBrokerBase 的 _buy 接口"""
-        self._broker.buy('{}{}'.format(market, code), price, num)
+        self._broker.buy('{}{}'.format(market, code), price, num, stoploss, goal_price, part_from)
 
-    def _sell(self, datetime, market, code, price, num):
+    def _sell(self, datetime, market, code, price, num, stoploss, goal_price, part_from):
         """实现 OrderBrokerBase 的 _sell 接口"""
-        self._broker.sell('{}{}'.format(market, code), price, num)
+        self._broker.sell('{}{}'.format(market, code), price, num, stoploss, goal_price, part_from)
 
     def _cash(self):
         if hasattr(self._broker, "cash"):
@@ -69,10 +69,10 @@ class TestOrderBroker:
     def __init__(self):
         pass
 
-    def buy(self, code, price, num):
+    def buy(self, code, price, num, stoploss, goal_price, part_from):
         print("买入：%s  %.3f  %i" % (code, price, num))
 
-    def sell(self, code, price, num):
+    def sell(self, code, price, num, stoploss, goal_price, part_from):
         print("卖出：%s  %.3f  %i" % (code, price, num))
 
 

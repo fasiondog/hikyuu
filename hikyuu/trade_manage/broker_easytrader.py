@@ -8,11 +8,11 @@ class EasyTraderOrderBroker:
     def __init__(self, user):
         self.user = user
 
-    def buy(self, code, price, num):
+    def buy(self, code, price, num, stoploss, goal_price, part_from):
         self.user.buy(code[2:], price=price, amount=num)
         print("买入：%s  %.3f  %i" % (code, price, num))
 
-    def sell(self, code, price, num):
+    def sell(self, code, price, num, stoploss, goal_price, part_from):
         self.user.sell(code[2:], price=price, amount=num)
         print("卖出：%s  %.3f  %i" % (code, price, num))
 
