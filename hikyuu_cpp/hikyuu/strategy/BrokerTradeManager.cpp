@@ -66,23 +66,35 @@ void BrokerTradeManager::getPositionFromBroker() {
 
     auto now = Datetime::now();
     auto brk_positions = broker->position();
+
+    position_map_type new_positions;
     for (const auto& brk_pos : brk_positions) {
         PositionRecord pos;
         pos.takeDatetime = now;
         pos.stock = brk_pos.stock;
-        pos.number = brk_pos.number;
-        pos.totalNumber = brk_pos.number;
-        pos.buyMoney = brk_pos.money;
-        pos.totalRisk = brk_pos.money;
         auto iter = m_position.find(pos.stock.id());
         if (iter == m_position.end()) {
-            m_position[pos.stock.id()] = pos;
+            pos.number = brk_pos.number;
+            pos.totalNumber = brk_pos.number;
+            pos.buyMoney = brk_pos.money;
+            pos.totalRisk = brk_pos.money;
+            new_positions[pos.stock.id()] = pos;
         } else {
-            iter->second.number = pos.number;
-            iter->second.totalNumber = pos.totalNumber;
-            iter->second.buyMoney = pos.buyMoney;
+            auto& cur_pos = iter->second;
+            if (cur_pos.number != 0.0) {
+                pos.totalCost = cur_pos.totalCost / cur_pos.number * brk_pos.number;
+                pos.totalRisk = cur_pos.totalRisk / cur_pos.number * brk_pos.number;
+            } else {
+                pos.totalRisk = brk_pos.money;
+            }
+            pos.number = brk_pos.number;
+            pos.totalNumber = brk_pos.number;
+            pos.buyMoney = pos.buyMoney;
+            new_positions[pos.stock.id()] = pos;
         }
     }
+
+    m_position.swap(new_positions);
 
     m_init_datetime = Datetime::now();
     m_first_datetime = m_init_datetime;

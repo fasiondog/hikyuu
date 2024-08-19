@@ -126,6 +126,12 @@ vector<BrokerPositionRecord> OrderBrokerBase::position() noexcept {
             pos.stock = stock;
             pos.number = brk_pos["number"].get<double>();
             pos.money = brk_pos["money"].get<double>();
+            if (pos.number == 0.0 || pos.money == 0.0) {
+                HKU_WARN(
+                  "Fetched position number({:<.4f}) or money({:<.4f}) was zero! It's ignored!",
+                  pos.number, pos.money);
+                continue;
+            }
             ret.emplace_back(pos);
 
         } catch (const std::exception& e) {
