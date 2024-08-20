@@ -96,9 +96,11 @@ Parameter default_other_param() {
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam, const StrategyContext& context) {
-    HKU_WARN_IF_RETURN(m_initializing, void(),
-                       "The last initialization has not finished. Please try again later!");
-    m_initializing = true;
+    // 防止重复 init
+    if (m_thread_id != std::thread::id()) {
+        return;
+    }
+
     m_thread_id = std::this_thread::get_id();
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
@@ -150,6 +152,8 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 加载历史财务信息
     loadHistoryFinance();
 
+    initInnerTask();
+
     // add special Market, for temp csv file
     m_marketInfoDict["TMP"] =
       MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>(),
@@ -157,7 +161,6 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
-    m_initializing = false;
 }
 
 void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
@@ -203,8 +206,6 @@ void StockManager::loadAllKData() {
             }
         }
     }
-
-    initInnerTask();
 }
 
 void StockManager::reload() {
