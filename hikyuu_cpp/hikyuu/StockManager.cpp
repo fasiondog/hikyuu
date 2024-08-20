@@ -472,6 +472,7 @@ void StockManager::loadAllStocks() {
                 stock.m_data->m_precision = info.precision;
                 stock.m_data->m_minTradeNumber = info.minTradeNumber;
                 stock.m_data->m_maxTradeNumber = info.maxTradeNumber;
+                stock.m_data->m_history_finance_ready = false;
             }
         }
     }
