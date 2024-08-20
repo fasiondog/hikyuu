@@ -43,7 +43,10 @@ public:
      * 指定线程池方式构造，以便共享其他线程池
      * @param tg 指定任务组线程池
      */
-    TimerManager(const std::shared_ptr<ThreadPool>& tg) : m_tg(tg) {}
+    TimerManager(const std::shared_ptr<ThreadPool>& tg)
+    : m_stop(true), m_current_timer_id(-1), m_work_num(1), m_tg(tg) {
+        start();
+    }
 
     /** 析构函数 */
     ~TimerManager() {
