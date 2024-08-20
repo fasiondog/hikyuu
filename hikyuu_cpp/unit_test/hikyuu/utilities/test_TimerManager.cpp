@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/utilities/TimerManager.h>
-#include <hikyuu/Log.h>
+#include "hikyuu/utilities/Log.h"
 
 using namespace hku;
 

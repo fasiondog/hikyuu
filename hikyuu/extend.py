@@ -1,10 +1,12 @@
 #
 # 对 C++ 引出类和函数进行扩展, pybind11 对小函数到导出效率不如 python 直接执行
 #
+
+# 优先加载 hikyuu 库，防止 windows 公共依赖库不同导致DLL初始化失败
+from .core import *
 import numpy as np
 import pandas as pd
 from datetime import *
-from .core import *
 
 # ------------------------------------------------------------------
 # 增加Datetime、Stock的hash支持，以便可做为dict的key

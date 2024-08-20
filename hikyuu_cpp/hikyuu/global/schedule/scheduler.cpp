@@ -5,10 +5,10 @@
  *     Author: fasiondog
  */
 
-#include <hikyuu/GlobalInitializer.h>
+#include "hikyuu/GlobalInitializer.h"
+#include "hikyuu/utilities/Log.h"
 #include <mutex>
 #include "scheduler.h"
-#include "../../Log.h"
 
 namespace hku {
 

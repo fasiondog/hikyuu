@@ -1,11 +1,18 @@
 set_xmakever("2.8.2")
 
-option("hdf5")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable hdf5 kdata engine.")
-option_end()
+-- project
+set_project("hikyuu")
+
+add_rules("mode.debug", "mode.release")
+
+-- version
+set_version("2.1.1", {build = "%Y%m%d%H%M"})
+
+set_warnings("all")
+
+-- set language: C99, c++ standard
+set_languages("cxx17", "c99")
+
 
 option("mysql")
     set_default(true)
@@ -36,73 +43,24 @@ option("mysql")
     end        
 option_end()
 
-option("sqlite")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable sqlite kdata engine.")
-option_end()
-
-option("tdx")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable tdx kdata engine.")
-option_end()
+option("hdf5", {description = "Enable hdf5 kdata engine.", default = true})
+option("sqlite", {description = "Enable sqlite kdata engine.", default = true})
+option("tdx", {description = "Enable tdx kdata engine.", default = true})
+option("sql_trace", {description = "trace print sql", default = false})
 
 -- 注意：stacktrace 在 windows 下会严重影响性能
-option("stacktrace")
-    set_default(false)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable check/assert with stack trace info.")
-    add_defines("HKU_ENABLE_STACK_TRACE")
-option_end()
+option("stacktrace", {description = "Enable check/assert with stack trace info.", default = false})
+option("spend_time", {description = "Enable spend time.", default = true})
+option("feedback", {description = "Enable send feedback.", default = true})
+option("low_precision", {description = "Enable low precision.", default = false})
+option("log_level", {description = "set log level.", default = 2, values = {1, 2, 3, 4, 5, 6}})
+option("async_log", {description = "Use async log.", default = false})
+option("leak_check", {description = "Enable leak check for test", default = false})
 
-option("spend_time")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable spend time.")
-    add_defines("HKU_CLOSE_SPEND_TIME=0")
-option_end()
-
-option("feedback")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable send feedback.")
-option_end()
-
-option("low_precision")
-    set_default(false)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable send feedback.")
-option_end()
-
-option("log_level")
-    set_default("info")
-    set_values("trace", "debug", "info", "warn", "error", "fatal", "off")
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("set log level")
-option_end()
-
-option("leak_check")
-    set_default(false)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable leak check for test")
-option_end()
-
--- project
-set_project("hikyuu")
-
-add_rules("mode.debug", "mode.release")
-
--- version
-set_version("2.1.0", {build = "%Y%m%d%H%M"})
+-- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
+-- windows下如果使用 serialize 且希望使用动态库，需要设置 runtimes 参数为 "MD"
+-- "MT" 方式下，serialize 会挂
+option("serialize", {description = "Enable support serialize object and pickle in python", default = true})
 
 if get_config("leak_check") then
     -- 需要 export LD_PRELOAD=libasan.so
@@ -112,39 +70,20 @@ if get_config("leak_check") then
     -- set_policy("build.sanitizer.thread", true)
 end
 
-local level = get_config("log_level")
-if is_mode("debug") then
-    level = "trace"
+-- SPDLOG_ACTIVE_LEVEL 需要单独加
+local log_level = get_config("log_level")
+if log_level == nil then
+    log_level = 2
 end
-if level == "trace" then
-    set_configvar("LOG_ACTIVE_LEVEL", 0)
-elseif level == "debug" then
-    set_configvar("LOG_ACTIVE_LEVEL", 1)
-elseif level == "info" then
-    set_configvar("LOG_ACTIVE_LEVEL", 2)
-elseif level == "warn" then
-    set_configvar("LOG_ACTIVE_LEVEL", 3)
-elseif level == "error" then
-    set_configvar("LOG_ACTIVE_LEVEL", 4)
-elseif level == "fatal" then
-    set_configvar("LOG_ACTIVE_LEVEL", 5)
-else
-    set_configvar("LOG_ACTIVE_LEVEL", 6)
-end
+add_defines("SPDLOG_ACTIVE_LEVEL=" .. log_level)
 
 if is_mode("debug") then
     set_configvar("HKU_DEBUG_MODE", 1)
 else
     set_configvar("HKU_DEBUG_MODE", 0)
 end
-set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
-set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
-if is_plat("macosx") or get_config("leak_check") then
-    set_configvar("SUPPORT_SERIALIZATION", 0)
-else
-    set_configvar("SUPPORT_SERIALIZATION", is_mode("release") and 1 or 0)
-end
+set_configvar("SUPPORT_SERIALIZATION", get_config("serialize") and 1 or 0)
 set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
@@ -153,31 +92,32 @@ set_configvar("HKU_ENABLE_LEAK_DETECT", get_config("leak_check") and 1 or 0)
 set_configvar("HKU_ENABLE_SEND_FEEDBACK", get_config("feedback") and 1 or 0)
 
 set_configvar("HKU_ENABLE_HDF5_KDATA", get_config("hdf5") and 1 or 0)
+set_configvar("HKU_ENABLE_MYSQL", get_config("mysql") and 1 or 0)
 set_configvar("HKU_ENABLE_MYSQL_KDATA", get_config("mysql") and 1 or 0)
+set_configvar("HKU_ENABLE_SQLITE", (get_config("sqlite") or get_config("hdf5")) and 1 or 0)
 set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
 set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
 set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
 
-set_warnings("all")
-
--- set language: C99, c++ standard
-set_languages("cxx17", "c99")
-
-if is_plat("windows") then
-    if is_mode("release") then
-        set_runtimes("MD")
-    else
-        set_runtimes("MDd")
-    end
-end
+set_configvar("HKU_SUPPORT_DATETIME", 1)
+set_configvar("HKU_ENABLE_SQLCIPHER", 0)
+set_configvar("HKU_SQL_TRACE", get_config("sql_trace"))
+set_configvar("HKU_ENABLE_INI_PARSER", 1)
+set_configvar("HKU_ENABLE_STACK_TRACE", get_config("stacktrace") and 1 or 0)
+set_configvar("HKU_CLOSE_SPEND_TIME", get_config("spend_time") and 0 or 1)
+set_configvar("HKU_USE_SPDLOG_ASYNC_LOGGER", get_config("async_log") and 1 or 0)
+set_configvar("HKU_LOG_ACTIVE_LEVEL", get_config("log_level"))
+set_configvar("HKU_ENABLE_MO", 0)
+set_configvar("HKU_ENABLE_HTTP_CLIENT", 1)
+set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", 0)
+set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", 0)
 
 local boost_version = "1.85.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "10.2.1"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.8.0"
-local cpp_httplib_version = "0.14.3"
 local sqlite_version = "3.46.0+0"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
@@ -208,18 +148,18 @@ elseif is_plat("linux", "cross") then
   
 elseif is_plat("macosx") then
     if get_config("hdf5") then
-        add_requires("brew::hdf5")
+        add_requires("brew::hdf5", {alias = "hdf5"})
     end
     if get_config("mysql") then
-        add_requires("brew::mysql-client")
+        add_requires("brew::mysql-client", {alias = "mysql"})
     end
 end
 
 add_requires("boost " .. boost_version, {
-  system = false,
   debug = is_mode("debug"),
   configs = {
     shared = is_plat("windows"),
+    runtimes = get_config("runtimes"),
     multi = true,
     date_time = true,
     filesystem = false,
@@ -229,23 +169,23 @@ add_requires("boost " .. boost_version, {
   },
 })
 
-add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
-add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
-add_requires("sqlite3 " .. sqlite_version, {system = false, configs = {shared = true, cxflags = "-fPIC"}})
-add_requires("flatbuffers v" .. flatbuffers_version, {system = false})
-add_requires("nng " .. nng_version, {system = false, configs = {cxflags = "-fPIC"}})
-add_requires("nlohmann_json", {system = false})
-add_requires("cpp-httplib " .. cpp_httplib_version, {system = false, configs = {zlib = true, ssl = true}})
-add_requires("zlib", {system = false})
+add_requires("fmt", {configs = {header_only = true}})
+add_requires("spdlog", {configs = {header_only = true, fmt_external = true}})
+add_requireconfs("spdlog.fmt", {override = true, configs = {header_only = true}})
+add_requires("sqlite3 " .. sqlite_version, {configs = {shared = true, safe_mode="2", cxflags = "-fPIC"}})
+add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {runtimes = get_config("runtimes")}})
+add_requires("nng " .. nng_version, {configs = {cxflags = "-fPIC"}})
+add_requires("nlohmann_json")
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
--- modifed to use boost static library, except boost.python, serialization
+-- on windows dll, must use runtimes MD
 if is_plat("windows") and get_config("kind") == "shared" then 
-    add_defines("BOOST_ALL_DYN_LINK") 
+    set_config("runtimes", "MD")
+    set_runtimes("MD")
 end
 
 -- is release now
@@ -282,6 +222,7 @@ end
 -- --   add_defines("HKU_ENABLE_SSE2", "HKU_ENABLE_SSE3", "HKU_ENABLE_SSE41", "HKU_ENABLE_AVX", "HKU_ENABLE_AVX2")
 -- end
 
+includes("./copy_dependents.lua")
 includes("./hikyuu_cpp/hikyuu")
 includes("./hikyuu_pywrap")
 includes("./hikyuu_cpp/unit_test")

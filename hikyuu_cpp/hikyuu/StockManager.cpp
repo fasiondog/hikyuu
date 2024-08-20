@@ -15,8 +15,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "utilities/IniParser.h"
-#include "utilities/thread/ThreadPool.h"
+#include "hikyuu/utilities/ini_parser/IniParser.h"
+#include "hikyuu/utilities/thread/ThreadPool.h"
 #include "StockManager.h"
 #include "global/GlobalTaskGroup.h"
 #include "global/schedule/inner_tasks.h"
@@ -134,13 +134,21 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     HKU_INFO("Loading KData...");
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
 
-    setKDataDriver(DataDriverFactory::getKDataDriverPool(m_kdataDriverParam));
+    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+    HKU_CHECK(driver, "driver is null!");
+    if (m_kdataDriverParam != driver->getPrototype()->getParameter()) {
+        m_kdataDriverParam = driver->getPrototype()->getParameter();
+    }
+    setKDataDriver(driver);
 
     // 加载 block，须在 stock 的 kdatadriver 被设置之后调用
     m_blockDriver->load();
 
     // 加载 K 线至缓存
     loadAllKData();
+
+    // 加载历史财务信息
+    loadHistoryFinance();
 
     // add special Market, for temp csv file
     m_marketInfoDict["TMP"] =
@@ -161,105 +169,38 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
 }
 
 void StockManager::loadAllKData() {
-    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
-    HKU_ERROR_IF_RETURN(!driver, void(), "kdata driver is null!");
-
-    if (m_kdataDriverParam != driver->getPrototype()->getParameter()) {
-        m_kdataDriverParam = driver->getPrototype()->getParameter();
+    const auto& ktypes = KQuery::getAllKType();
+    vector<string> low_ktypes;
+    low_ktypes.reserve(ktypes.size());
+    for (const auto& ktype : ktypes) {
+        auto& back = low_ktypes.emplace_back(ktype);
+        to_lower(back);
+        HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false), "Preloading all {} kdata to buffer!",
+                    back);
     }
 
-    bool preload_day = m_preloadParam.tryGet<bool>("day", false);
-    HKU_INFO_IF(preload_day, "Preloading all day kdata to buffer!");
-
-    bool preload_week = m_preloadParam.tryGet<bool>("week", false);
-    HKU_INFO_IF(preload_week, "Preloading all week kdata to buffer!");
-
-    bool preload_month = m_preloadParam.tryGet<bool>("month", false);
-    HKU_INFO_IF(preload_month, "Preloading all month kdata to buffer!");
-
-    bool preload_quarter = m_preloadParam.tryGet<bool>("quarter", false);
-    HKU_INFO_IF(preload_quarter, "Preloading all quarter kdata to buffer!");
-
-    bool preload_halfyear = m_preloadParam.tryGet<bool>("halfyear", false);
-    HKU_INFO_IF(preload_halfyear, "Preloading all halfyear kdata to buffer!");
-
-    bool preload_year = m_preloadParam.tryGet<bool>("year", false);
-    HKU_INFO_IF(preload_year, "Preloading all year kdata to buffer!");
-
-    bool preload_min = m_preloadParam.tryGet<bool>("min", false);
-    HKU_INFO_IF(preload_min, "Preloading all 1 min kdata to buffer!");
-
-    bool preload_min5 = m_preloadParam.tryGet<bool>("min5", false);
-    HKU_INFO_IF(preload_min5, "Preloading all 5 min kdata to buffer!");
-
-    bool preload_min15 = m_preloadParam.tryGet<bool>("min15", false);
-    HKU_INFO_IF(preload_min15, "Preloading all 15 min kdata to buffer!");
-
-    bool preload_min30 = m_preloadParam.tryGet<bool>("min30", false);
-    HKU_INFO_IF(preload_min30, "Preloading all 30 min kdata to buffer!");
-
-    bool preload_min60 = m_preloadParam.tryGet<bool>("min60", false);
-    HKU_INFO_IF(preload_min60, "Preloading all 60 min kdata to buffer!");
-
-    bool preload_hour2 = m_preloadParam.tryGet<bool>("hour2", false);
-    HKU_INFO_IF(preload_hour2, "Preloading all 120 min kdata to buffer!");
-
+    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
     if (!driver->getPrototype()->canParallelLoad()) {
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-            if (preload_day)
-                iter->second.loadKDataToBuffer(KQuery::DAY);
-            if (preload_week)
-                iter->second.loadKDataToBuffer(KQuery::WEEK);
-            if (preload_month)
-                iter->second.loadKDataToBuffer(KQuery::MONTH);
-            if (preload_quarter)
-                iter->second.loadKDataToBuffer(KQuery::QUARTER);
-            if (preload_halfyear)
-                iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
-            if (preload_year)
-                iter->second.loadKDataToBuffer(KQuery::YEAR);
-            if (preload_min)
-                iter->second.loadKDataToBuffer(KQuery::MIN);
-            if (preload_min5)
-                iter->second.loadKDataToBuffer(KQuery::MIN5);
-            if (preload_min15)
-                iter->second.loadKDataToBuffer(KQuery::MIN15);
-            if (preload_min30)
-                iter->second.loadKDataToBuffer(KQuery::MIN30);
-            if (preload_min60)
-                iter->second.loadKDataToBuffer(KQuery::MIN60);
-            if (preload_hour2)
-                iter->second.loadKDataToBuffer(KQuery::HOUR2);
+            for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+                const auto& low_ktype = low_ktypes[i];
+                if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
+                    iter->second.loadKDataToBuffer(ktypes[i]);
+                }
+            }
         }
 
     } else {
         // 异步并行加载
         auto& tg = *getGlobalTaskGroup();
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-            if (preload_day)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::DAY); });
-            if (preload_week)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::WEEK); });
-            if (preload_month)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MONTH); });
-            if (preload_quarter)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::QUARTER); });
-            if (preload_halfyear)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::HALFYEAR); });
-            if (preload_year)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::YEAR); });
-            if (preload_min)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN); });
-            if (preload_min5)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN5); });
-            if (preload_min15)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN15); });
-            if (preload_min30)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN30); });
-            if (preload_min60)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN60); });
-            if (preload_hour2)
-                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::HOUR2); });
+            for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+                const auto& low_ktype = low_ktypes[i];
+                if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
+                    tg.submit(
+                      [=, ktype = ktypes[i]]() mutable { iter->second.loadKDataToBuffer(ktype); });
+                }
+            }
         }
     }
 
@@ -310,6 +251,8 @@ void StockManager::reload() {
             }
         }
     }
+
+    loadHistoryFinance();
 }
 
 string StockManager::tmpdir() const {
@@ -613,6 +556,14 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
                   return a.first < b.first;
               });
     return ret;
+}
+
+void StockManager::loadHistoryFinance() {
+    auto* tg = getGlobalTaskGroup();
+    std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
+    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+        tg->submit([=]() { iter->second.getHistoryFinance(); });
+    }
 }
 
 }  // namespace hku

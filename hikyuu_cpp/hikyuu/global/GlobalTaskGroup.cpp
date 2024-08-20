@@ -8,14 +8,14 @@
  */
 
 #include "hikyuu/GlobalInitializer.h"
+#include "hikyuu/utilities/Log.h"
 #include "GlobalTaskGroup.h"
-#include "../Log.h"
 
 namespace hku {
 
-static StealThreadPool* g_threadPool;
+static TaskGroup* g_threadPool;
 
-StealThreadPool* getGlobalTaskGroup() {
+TaskGroup* getGlobalTaskGroup() {
     static std::once_flag oc;
     std::call_once(oc, [&]() {
         auto cpu_num = std::thread::hardware_concurrency();
@@ -24,7 +24,7 @@ StealThreadPool* getGlobalTaskGroup() {
         } else if (cpu_num > 1) {
             cpu_num--;
         }
-        g_threadPool = new StealThreadPool(cpu_num);
+        g_threadPool = new TaskGroup(cpu_num);
     });
     return g_threadPool;
 }

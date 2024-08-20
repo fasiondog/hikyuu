@@ -323,6 +323,13 @@ public:
     }
 
     /**
+     * 当前冻结现金
+     */
+    virtual price_t currentFrozen() const {
+        return 0.0;
+    }
+
+    /**
      * 获取指定日期的现金
      * @note 如果不带日期参数，无法根据权息信息调整持仓
      */
@@ -664,6 +671,17 @@ public:
      * @return bool true 成功 | false 失败
      */
     virtual bool addTradeRecord(const TradeRecord& tr) {
+        HKU_WARN("The subclass does not implement this method");
+        return false;
+    }
+
+    /**
+     * 直接加入持仓记录
+     * @param pr 持仓记录
+     * @return true 成功
+     * @return false 失败
+     */
+    virtual bool addPosition(const PositionRecord& pr) {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }

@@ -21,8 +21,8 @@ namespace hku {
  * @param create_script 数据库创建脚本，若对应的数据库不存在则使用该脚本创建数据库
  * @ingroup DataDriver
  */
-void HKU_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
-                            const std::vector<std::string> &upgrade_scripts, int start_version = 2,
-                       const char *create_script = nullptr);
+void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
+                             const std::vector<std::string> &upgrade_scripts, int start_version = 2,
+                             const char *create_script = nullptr);
 
 }  // namespace hku

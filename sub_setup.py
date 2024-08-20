@@ -48,45 +48,10 @@ hku_platforms = "Independant"
 hku_url = "http://hikyuu.org/"
 
 hku_description = "Hikyuu Quant Framework for System Trading Analysis and backtester"
-with open("./hikyuu/README.rst", encoding='utf-8') as f:
+with open("./readme.md", encoding='utf-8') as f:
     hku_long_description = f.read()
 
 hku_data_files = []
-
-# packages = [
-#     'hikyuu',
-#     'hikyuu/analysis',
-#     'hikyuu/config',
-#     'hikyuu/config/block',
-#     'hikyuu/cpp',
-#     'hikyuu/data',
-#     'hikyuu/data/mysql_upgrade',
-#     'hikyuu/data/sqlite_upgrade',
-#     'hikyuu/data/sqlite_mem_sql',
-#     'hikyuu/data_driver',
-#     'hikyuu/examples',
-#     'hikyuu/examples/notebook',
-#     'hikyuu/examples/notebook/images',
-#     'hikyuu/examples/notebook/Demo',
-#     'hikyuu/flat',
-#     'hikyuu/fetcher',
-#     'hikyuu/fetcher/proxy',
-#     'hikyuu/fetcher/stock',
-#     'hikyuu/gui',
-#     'hikyuu/gui/data',
-#     'hikyuu/indicator',
-#     'hikyuu/draw',
-#     'hikyuu/draw/drawplot',
-#     'hikyuu/shell',
-#     'hikyuu/strategy',
-#     'hikyuu/strategy/demo',
-#     'hikyuu/test',
-#     'hikyuu/tools',
-#     'hikyuu/trade_manage',
-#     'hikyuu/trade_sys',
-#     'hikyuu/util',
-#     'hikyuu/include',
-# ]
 
 packages = ['hikyuu']
 for root, dirs, files in os.walk('hikyuu'):
@@ -99,7 +64,8 @@ setup(
     name=hku_name,
     version=hku_version,
     description=hku_description,
-    long_description_content_type="text/x-rst",
+    # long_description_content_type="text/x-rst",
+    long_description_content_type='text/markdown',
     long_description=hku_long_description,
     author=hku_author,
     author_email=hku_author_email,

@@ -14,7 +14,16 @@
 #include <string>
 #include <exception>
 
+#ifndef HKU_UTILS_API
+#define HKU_UTILS_API
+#endif
+
 namespace hku {
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4275)
+#endif
 
 /**
  * @ingroup Utilities
@@ -22,31 +31,21 @@ namespace hku {
  * @{
  */
 
-#if !defined(__clang__) && !defined(__GNUC__)
-class exception : public std::exception {
-public:
-    exception() : std::exception("Unknown exception!") {}
-    exception(const std::string& msg)  // cppcheck-suppress noExplicitConstructor
-    : std::exception(msg.c_str()) {}
-    exception(const char* msg) : std::exception(msg) {}  // cppcheck-suppress noExplicitConstructor
-};
-
-#else
-// llvm 中的 std::exception 不接受参数
-class exception : public std::exception {
+class HKU_UTILS_API exception : public std::exception {
 public:
     exception() : m_msg("Unknown exception!") {}
     exception(const char *msg) : m_msg(msg) {}         // cppcheck-suppress noExplicitConstructor
     exception(const std::string &msg) : m_msg(msg) {}  // cppcheck-suppress noExplicitConstructor
     virtual ~exception() noexcept {}
-    virtual const char *what() const noexcept {
-        return m_msg.c_str();
-    }
+    virtual const char *what() const noexcept;
 
 protected:
     std::string m_msg;
 };
-#endif /* #ifdef __clang__ */
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 } /* namespace hku */
 

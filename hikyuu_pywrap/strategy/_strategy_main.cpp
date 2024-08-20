@@ -10,9 +10,7 @@
 namespace py = pybind11;
 
 void export_Strategy(py::module& m);
-void export_AccountTradeManger(py::module& m);
 
 void export_strategy_main(py::module& m) {
     export_Strategy(m);
-    export_AccountTradeManger(m);
 }

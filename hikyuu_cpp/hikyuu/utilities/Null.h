@@ -10,6 +10,7 @@
 #define NULL_H_
 
 #include <cstddef>
+#include <cstdint>
 #include <limits>
 #include <type_traits>
 #include "osdef.h"

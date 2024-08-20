@@ -51,6 +51,10 @@ public:
         PYBIND11_OVERRIDE_NAME(price_t, TradeManagerBase, "current_cash", currentCash);
     }
 
+    price_t currentFrozen() const override {
+        PYBIND11_OVERRIDE_NAME(price_t, TradeManagerBase, "current_frozen", currentFrozen);
+    }
+
     price_t cash(const Datetime& datetime, KQuery::KType ktype) override {
         PYBIND11_OVERLOAD(price_t, TradeManagerBase, cash, datetime, ktype);
     }
@@ -216,6 +220,10 @@ public:
         PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "add_trade_record", addTradeRecord, tr);
     }
 
+    bool addPosition(const PositionRecord& pr) override {
+        PYBIND11_OVERRIDE_NAME(bool, TradeManagerBase, "add_position", addPosition, pr);
+    }
+
     string str() const override {
         PYBIND11_OVERRIDE_NAME(string, TradeManagerBase, "__str__", str, );
     }
@@ -280,6 +288,10 @@ void export_TradeManager(py::module& m) {
                     R"(实际开始订单代理操作的时刻。
         
     默认情况下，TradeManager会在执行买入/卖出操作时，调用订单代理执行代理的买入/卖出动作，但这样在实盘操作时会存在问题。因为系统在计算信号指示时，需要回溯历史数据才能得到最新的信号，这样TradeManager会在历史时刻就执行买入/卖出操作，此时如果订单代理本身没有对发出买入/卖出指令的时刻进行控制，会导致代理发送错误的指令。此时，需要指定在某一个时刻之后，才允许指定订单代理的买入/卖出操作。属性 brokeLastDatetime 即用于指定该时刻。)")
+
+      .def("current_frozen", &TradeManagerBase::currentFrozen, R"(frozen(self)
+    
+    获取当前冻结资金)")
 
       .def("getParam", &TradeManagerBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -535,6 +547,13 @@ void export_TradeManager(py::module& m) {
     :param TradeRecord tr: 交易记录
     :return: True（成功） | False（失败）
     :rtype: bool)")
+
+      .def("add_position", &TradeManagerBase::addPosition, R"(add_postion(self, position)
+
+    建立初始账户后，直接加入持仓记录，仅用于构建初始有持仓的账户
+
+    :param PositionRecord position: 持仓记录
+    return True | False)")
 
       .def("tocsv", &TradeManagerBase::tocsv, R"(tocsv(self, path)
 

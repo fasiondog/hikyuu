@@ -20,7 +20,8 @@
 #include <H5public.h>
 #endif
 
-#include "Log.h"
+#include "utilities/Log.h"
+#include "utilities/os.h"
 #include "hikyuu.h"
 #include "GlobalInitializer.h"
 #include "StockManager.h"
@@ -56,12 +57,11 @@ void GlobalInitializer::init() {
     fmt::print("Initialize hikyuu_{} ...\n", getVersionWithBuild());
 #endif
 
-    initLogger();
-#if defined(_DEBUG) || defined(DEBUG)
-    set_log_level(LOG_LEVEL::LOG_TRACE);
-#else
-    set_log_level(LOG_LEVEL::LOG_INFO);
-#endif
+    if (createDir(fmt::format("{}/.hikyuu", getUserDir()))) {
+        initLogger(false, fmt::format("{}/.hikyuu/hikyuu.log", getUserDir()));
+    } else {
+        initLogger();
+    }
 
 #if HKU_ENABLE_SEND_FEEDBACK
     sendFeedback();
@@ -74,15 +74,17 @@ void GlobalInitializer::init() {
 }
 
 void GlobalInitializer::clean() {
-    if (CanUpgrade()) {
+#if HKU_ENABLE_SEND_FEEDBACK
+    if (runningInPython() && CanUpgrade()) {
         fmt::print(
           "\n====================================================================\n"
           "The new version of Hikyuu is {}, and you can run the upgrade command:\n"
-          "Hikyuu 的最新新版本是 {}, 您可以运行升级命令:\n"
+          "Hikyuu 的最新版本是 {}, 您可以运行升级命令:\n"
           "pip install hikyuu --upgrade\n"
           "========================================================\n\n",
           getLatestVersion(), getLatestVersion());
     }
+#endif
 
     releaseGlobalTaskGroup();
     releaseScheduler();
@@ -103,9 +105,7 @@ void GlobalInitializer::clean() {
     H5close();
 #endif
 
-#if USE_SPDLOG_LOGGER
     spdlog::drop_all();
-#endif
 
 #ifdef MSVC_LEAKER_DETECT
     // MSVC 内存泄露检测，输出至 VS 的输出窗口
