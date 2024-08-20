@@ -39,6 +39,12 @@ public:
         start();
     }
 
+    /**
+     * 指定线程池方式构造，以便共享其他线程池
+     * @param tg 指定任务组线程池
+     */
+    TimerManager(const std::shared_ptr<ThreadPool>& tg) : m_tg(tg) {}
+
     /** 析构函数 */
     ~TimerManager() {
         stop();
@@ -60,11 +66,7 @@ public:
         std::priority_queue<IntervalS> new_queue;
         m_queue.swap(new_queue);
         if (!m_tg) {
-#if CPP_STANDARD >= CPP_STANDARD_14
-            m_tg = std::make_unique<ThreadPool>(m_work_num);
-#else
-            m_tg = std::unique_ptr<ThreadPool>(new ThreadPool(m_work_num));
-#endif
+            m_tg = std::make_shared<ThreadPool>(m_work_num);
         }
 
         /*
@@ -532,7 +534,7 @@ private:
     std::unordered_map<int, Timer*> m_timers;
     int m_current_timer_id;
     size_t m_work_num;  // 任务执行线程池线程数量
-    std::unique_ptr<ThreadPool> m_tg;
+    std::shared_ptr<ThreadPool> m_tg;
 };
 
 }  // namespace hku

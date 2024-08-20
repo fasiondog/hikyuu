@@ -13,9 +13,9 @@
 
 namespace hku {
 
-static TaskGroup* g_threadPool;
+static std::shared_ptr<TaskGroup> g_threadPool;
 
-TaskGroup* getGlobalTaskGroup() {
+std::shared_ptr<TaskGroup>& getGlobalTaskGroup() {
     static std::once_flag oc;
     std::call_once(oc, [&]() {
         auto cpu_num = std::thread::hardware_concurrency();
@@ -24,7 +24,7 @@ TaskGroup* getGlobalTaskGroup() {
         } else if (cpu_num > 1) {
             cpu_num--;
         }
-        g_threadPool = new TaskGroup(cpu_num);
+        g_threadPool = std::make_shared<TaskGroup>(cpu_num);
     });
     return g_threadPool;
 }
@@ -33,8 +33,7 @@ void releaseGlobalTaskGroup() {
     HKU_TRACE("releaseGlobalTaskGroup");
     if (g_threadPool) {
         g_threadPool->stop();
-        delete g_threadPool;
-        g_threadPool = nullptr;
+        g_threadPool.reset();
     }
 }
 

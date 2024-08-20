@@ -192,12 +192,12 @@ void StockManager::loadAllKData() {
 
     } else {
         // 异步并行加载
-        auto& tg = *getGlobalTaskGroup();
+        auto& tg = getGlobalTaskGroup();
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             for (size_t i = 0, len = ktypes.size(); i < len; i++) {
                 const auto& low_ktype = low_ktypes[i];
                 if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
-                    tg.submit(
+                    tg->submit(
                       [=, ktype = ktypes[i]]() mutable { iter->second.loadKDataToBuffer(ktype); });
                 }
             }
@@ -222,7 +222,7 @@ void StockManager::reload() {
     HKU_INFO("start reload kdata to buffer");
     std::vector<Stock> can_not_parallel_stk_list;  // 记录不支持并行加载的Stock
     {
-        auto* tg = getGlobalTaskGroup();
+        auto& tg = getGlobalTaskGroup();
         std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             auto driver = iter->second.getKDataDirver();
@@ -559,7 +559,7 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
 }
 
 void StockManager::loadHistoryFinance() {
-    auto* tg = getGlobalTaskGroup();
+    auto& tg = getGlobalTaskGroup();
     std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
     for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
         tg->submit([=]() { iter->second.getHistoryFinance(); });

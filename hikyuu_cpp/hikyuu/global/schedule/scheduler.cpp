@@ -6,8 +6,9 @@
  */
 
 #include "hikyuu/GlobalInitializer.h"
-#include "hikyuu/utilities/Log.h"
 #include <mutex>
+#include "hikyuu/utilities/Log.h"
+#include "hikyuu/global/GlobalTaskGroup.h"
 #include "scheduler.h"
 
 namespace hku {
@@ -16,7 +17,7 @@ static TimerManager *g_scheduler;
 
 TimerManager *getScheduler() {
     static std::once_flag oc;
-    std::call_once(oc, [&]() { g_scheduler = new TimerManager(2); });
+    std::call_once(oc, [&]() { g_scheduler = new TimerManager(getGlobalTaskGroup()); });
     return g_scheduler;
 }
 
