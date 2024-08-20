@@ -29,7 +29,9 @@
 # 1. 20170704, Added by fasiondog
 # ===============================================================================
 
+import json
 from hikyuu import OrderBrokerBase
+from hikyuu.util import hku_error
 
 
 class OrderBrokerWrap(OrderBrokerBase):
@@ -52,15 +54,15 @@ class OrderBrokerWrap(OrderBrokerBase):
         """实现 OrderBrokerBase 的 _sell 接口"""
         self._broker.sell('{}{}'.format(market, code), price, num, stoploss, goal_price, part_from)
 
-    def _cash(self):
-        if hasattr(self._broker, "cash"):
-            return self._broker.cash()
-        return 0.0
-
-    def _position(self):
-        if hasattr(self._broker, "position"):
-            return self._broker.position()
-        return list()
+    def _get_asset_info(self):
+        try:
+            if hasattr(self._broker, "get_asset_info"):
+                ret = self._broker.get_asset_info()
+                return json.dumps(ret) if type(ret) == dict else str(ret)
+            return str()
+        except Exception as e:
+            hku_error(e)
+            return str()
 
 
 class TestOrderBroker:

@@ -27,12 +27,8 @@ public:
                                stoploss, goalPrice, from);
     }
 
-    price_t _cash() override {
-        PYBIND11_OVERLOAD(price_t, OrderBrokerBase, _cash);
-    }
-
-    vector<string> _position() override {
-        PYBIND11_OVERLOAD(vector<string>, OrderBrokerBase, _position);
+    string _getAssetInfo() override {
+        PYBIND11_OVERLOAD_NAME(string, OrderBrokerBase, "_get_asset_info", _getAssetInfo);
     }
 };
 
@@ -84,13 +80,6 @@ void export_OrderBroker(py::module& m) {
     :param float price: 卖出价格
     :param float num: 卖出数量)")
 
-      .def("cash", &OrderBrokerBase::cash)
-
-      .def("position",
-           [](OrderBrokerBase& self) {
-               return vector_to_python_list<BrokerPositionRecord>(self.position());
-           })
-
       .def("_buy", &OrderBrokerBase::_buy,
            R"(_buy(self, datetime, market, code, price, num)
 
@@ -113,6 +102,5 @@ void export_OrderBroker(py::module& m) {
     :param float price: 卖出价格
     :param float num: 卖出数量)")
 
-      .def("_cash", &OrderBrokerBase::_cash)
-      .def("_position", &OrderBrokerBase::_position);
+      .def("_get_asset_info", &OrderBrokerBase::_getAssetInfo);
 }

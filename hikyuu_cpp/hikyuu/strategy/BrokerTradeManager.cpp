@@ -19,21 +19,6 @@ BrokerTradeManager::BrokerTradeManager(const OrderBrokerPtr& broker, const Trade
     HKU_ASSERT(broker);
     m_broker_list.emplace_back(broker);
 
-    m_cash = broker->cash();
-
-    auto now = Datetime::now();
-    auto brk_positions = broker->position();
-    for (const auto& brk_pos : brk_positions) {
-        PositionRecord pos;
-        pos.takeDatetime = now;
-        pos.stock = brk_pos.stock;
-        pos.number = brk_pos.number;
-        pos.totalNumber = brk_pos.number;
-        pos.buyMoney = brk_pos.money;
-        pos.totalRisk = brk_pos.money;
-        m_position[pos.stock.id()] = pos;
-    }
-
     m_datetime = Datetime::now();
     m_broker_last_datetime = m_datetime;
 }

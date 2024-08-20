@@ -90,13 +90,6 @@ public:
               double num, price_t stoploss, price_t goalPrice, SystemPart from) noexcept;
 
     /**
-     * 获取当前可用资金
-     */
-    price_t cash() noexcept;
-
-    vector<BrokerPositionRecord> position() noexcept;
-
-    /**
      * 获取当前资产信息
      * @return string json字符串
      * <pre>
@@ -144,29 +137,6 @@ public:
      */
     virtual void _sell(Datetime datetime, const string& market, const string& code, price_t price,
                        double num, price_t stoploss, price_t goalPrice, SystemPart from) = 0;
-
-    /**
-     * 子类获取当前可用现金接口
-     */
-    virtual price_t _cash() {
-        return 0.0;
-    }
-
-    /**
-     * 子类获取持仓信息实现
-     * @return vector<string> json 字符串组成的持仓信息列表
-     * <pre>
-     * 示例：
-     * [{"market": "SZ",
-     *   "code": "000001",
-     *   "number": 100,
-     *   "money": 0,
-     * }]
-     * </pre
-     */
-    virtual vector<string> _position() {
-        return vector<string>();
-    }
 
     virtual string _getAssetInfo() {
         return string();
