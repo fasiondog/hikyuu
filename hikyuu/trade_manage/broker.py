@@ -72,10 +72,10 @@ class TestOrderBroker:
         pass
 
     def buy(self, code, price, num, stoploss, goal_price, part_from):
-        print("买入：%s  %.3f  %i" % (code, price, num))
+        print(f"买入：{code}, 价格: {price}, 数量: {num} 预期止损价: {stoploss}, 预期目标价: {goal_price}, 信号来源: {part_from}")
 
     def sell(self, code, price, num, stoploss, goal_price, part_from):
-        print("卖出：%s  %.3f  %i" % (code, price, num))
+        print(f"卖出：{code}, 价格: {price}, 数量: {num}, 信号来源: {part_from}")
 
 
 def crtOB(broker, name="NO_NAME"):

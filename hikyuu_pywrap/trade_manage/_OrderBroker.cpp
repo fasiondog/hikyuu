@@ -80,6 +80,8 @@ void export_OrderBroker(py::module& m) {
     :param float price: 卖出价格
     :param float num: 卖出数量)")
 
+      .def("get_asset_info", &OrderBrokerBase::getAssetInfo)
+
       .def("_buy", &OrderBrokerBase::_buy,
            R"(_buy(self, datetime, market, code, price, num)
 
