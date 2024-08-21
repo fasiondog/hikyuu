@@ -35,7 +35,12 @@ public:
      * @param work_num 定时任务执行线程池线程数量
      */
     explicit TimerManager(size_t work_num = 1)
-    : m_stop(true), m_current_timer_id(-1), m_work_num(work_num) {
+    : m_stop(true),
+      m_current_timer_id(-1),
+      m_work_num(work_num),
+      m_tg(nullptr),
+      m_use_extend_tg(false) {
+        HKU_ASSERT(work_num >= 1);
         start();
     }
 
@@ -43,13 +48,15 @@ public:
      * 指定线程池方式构造，以便共享其他线程池
      * @param tg 指定任务组线程池
      */
-    TimerManager(const std::shared_ptr<ThreadPool>& tg)
-    : m_stop(true), m_current_timer_id(-1), m_work_num(1), m_tg(tg) {
+    explicit TimerManager(ThreadPool* tg)
+    : m_stop(true), m_current_timer_id(-1), m_work_num(1), m_tg(tg), m_use_extend_tg(true) {
+        HKU_ASSERT(m_tg);
         start();
     }
 
     /** 析构函数 */
     ~TimerManager() {
+        HKU_DEBUG("~TimerManager");
         stop();
         for (auto iter = m_timers.begin(); iter != m_timers.end(); ++iter) {
             delete iter->second;
@@ -69,7 +76,7 @@ public:
         std::priority_queue<IntervalS> new_queue;
         m_queue.swap(new_queue);
         if (!m_tg) {
-            m_tg = std::make_shared<ThreadPool>(m_work_num);
+            m_tg = new ThreadPool(m_work_num);
         }
 
         /*
@@ -157,9 +164,10 @@ public:
             m_detect_thread.join();
         }
 
-        if (m_tg) {
+        if (!m_use_extend_tg && m_tg) {
             m_tg->stop();
-            m_tg.reset();
+            delete m_tg;
+            m_tg = nullptr;
         }
     }
 
@@ -537,7 +545,8 @@ private:
     std::unordered_map<int, Timer*> m_timers;
     int m_current_timer_id;
     size_t m_work_num;  // 任务执行线程池线程数量
-    std::shared_ptr<ThreadPool> m_tg;
+    ThreadPool* m_tg{nullptr};
+    bool m_use_extend_tg{false};
 };
 
 }  // namespace hku
