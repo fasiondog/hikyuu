@@ -45,6 +45,7 @@ public:
 
     /** 设置是否打印数据接收进展情况，主要用于在交互环境下关闭打印 */
     void setPrintFlag(bool print) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_print = print;
     }
 
@@ -104,14 +105,18 @@ private:
     enum STATUS { WAITING, RECEIVING };  // 等待新的批次数据，正在接收批次数据中
     enum STATUS m_status = WAITING;      // 当前内部状态
     std::atomic_bool m_stop = true;      // 结束代理工作标识
-    bool m_print = true;          // 是否打印接收进度，防止的交互模式的影响
+
     int m_revTimeout = 100;       // 连接数据服务超时时长（毫秒）
     size_t m_batch_count = 0;     // 记录本次批次接收的数据数量
     std::thread m_receiveThread;  // 数据接收线程
     ThreadPool m_tg;              // 数据处理任务线程池
+    vector<std::future<void>> m_process_task_list;
+
+    // 下面属性被修改时需要加锁，以便可以使用多线程方式运行 strategy
+    std::mutex m_mutex;
+    bool m_print = true;  // 是否打印接收进度，防止的交互模式的影响
     list<std::function<void(const SpotRecord&)>> m_processList;  // 已注册的 spot 处理函数列表
     list<std::function<void(Datetime)>> m_postProcessList;  // 已注册的批次后处理函数列表
-    vector<std::future<void>> m_process_task_list;
 };
 
 }  // namespace hku

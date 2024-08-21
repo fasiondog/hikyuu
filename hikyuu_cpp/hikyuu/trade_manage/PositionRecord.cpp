@@ -65,7 +65,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const PositionRecord& record)
     return os;
 }
 
-string PositionRecord::toString() const {
+string PositionRecord::str() const {
     int precision = 2;
     std::string market(""), code(""), name("");
     if (!stock.isNull()) {

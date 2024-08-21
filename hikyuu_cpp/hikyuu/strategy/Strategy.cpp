@@ -16,8 +16,7 @@
 #include "hikyuu/hikyuu.h"
 #include "Strategy.h"
 
-// python 中运行拉回主线程循环
-// c++ 则直接执行（通常在定时调度的工作线程中执行）
+// python 中运行拉回主线程循环，非 python 环境则直接执行
 #define EVENT(func)          \
     if (runningInPython()) { \
         event(func);         \
@@ -66,23 +65,23 @@ Strategy::~Strategy() {
 void Strategy::run() {
     CLS_IF_RETURN(m_running, void());
 
-    CLS_CHECK(!getStockCodeList().empty(), "The context does not contain any stocks!");
-    CLS_CHECK(!getKTypeList().empty(), "The K type list was empty!");
-
     StockManager& sm = StockManager::instance();
 
-    // 非独立进程方式运行 Stratege 或 重复执行，则直接返回
-    if (sm.thread_id() == std::this_thread::get_id()) {
-        return;
+    // sm 尚未初始化，则初始化
+    if (sm.thread_id() == std::thread::id()) {
+        // 注册 ctrl-c 终止信号
+        std::signal(SIGINT, sig_handler);
+
+        CLS_INFO("{} is running! You can press Ctrl-C to terminte ...", m_name);
+
+        // 初始化
+        hikyuu_init(m_config_file, false, m_context);
+    } else {
+        m_context = sm.getStrategyContext();
     }
 
-    // 注册 ctrl-c 终止信号
-    std::signal(SIGINT, sig_handler);
-
-    CLS_INFO("{} is running! You can press Ctrl-C to terminte ...", m_name);
-
-    // 初始化
-    hikyuu_init(m_config_file, false, m_context);
+    CLS_CHECK(!m_context.getStockCodeList().empty(), "The context does not contain any stocks!");
+    CLS_CHECK(!m_context.getKTypeList().empty(), "The K type list was empty!");
 
     // 先将行情接收代理停止，以便后面加入处理函数
     stopSpotAgent();

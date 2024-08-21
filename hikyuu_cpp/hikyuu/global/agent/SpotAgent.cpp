@@ -34,6 +34,7 @@ SpotAgent::~SpotAgent() {
 }
 
 void SpotAgent::start() {
+    stop();
     if (m_stop) {
         m_stop = false;
         m_receiveThread = std::thread([this]() { work_thread(); });
@@ -214,21 +215,25 @@ void SpotAgent::work_thread() {
 
 void SpotAgent::addProcess(std::function<void(const SpotRecord&)> process) {
     HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_processList.push_back(process);
 }
 
 void SpotAgent::addPostProcess(std::function<void(Datetime)> func) {
     HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_postProcessList.push_back(func);
 }
 
 void SpotAgent::clearProcessList() {
     HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_processList.clear();
 }
 
 void SpotAgent::clearPostProcessList() {
     HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_postProcessList.clear();
 }
 

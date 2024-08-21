@@ -88,11 +88,11 @@ ValueT roundEx(ValueT number, int ndigits = 0) {
     ValueT pow1, pow2, y, z;
     ValueT x = number;
     if (ndigits >= 0) {
-        pow1 = std::pow<ValueT>(10.0, (ValueT)ndigits);
+        pow1 = pow(ValueT(10.0), ValueT(ndigits));
         pow2 = 1.0;
         y = (x * pow1) * pow2;
     } else {
-        pow1 = std::pow<ValueT>(10.0, (ValueT)-ndigits);
+        pow1 = pow(ValueT(10.0), ValueT(-ndigits));
         pow2 = 1.0;
         y = x / pow1;
     }

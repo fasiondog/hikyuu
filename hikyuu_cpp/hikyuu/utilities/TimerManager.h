@@ -35,7 +35,23 @@ public:
      * @param work_num 定时任务执行线程池线程数量
      */
     explicit TimerManager(size_t work_num = 1)
-    : m_stop(true), m_current_timer_id(-1), m_work_num(work_num) {
+    : m_stop(true),
+      m_current_timer_id(-1),
+      m_work_num(work_num),
+      m_tg(nullptr),
+      m_use_extend_tg(false) {
+        HKU_ASSERT(work_num >= 1);
+        start();
+    }
+
+    /**
+     * 指定线程池方式构造，以便共享其他线程池
+     * @note 请自行保证 tg 的生命周期在 TimerManager 存活期间始终有效
+     * @param tg 指定任务组线程池
+     */
+    explicit TimerManager(ThreadPool* tg)
+    : m_stop(true), m_current_timer_id(-1), m_work_num(1), m_tg(tg), m_use_extend_tg(true) {
+        HKU_ASSERT(m_tg);
         start();
     }
 
@@ -60,11 +76,7 @@ public:
         std::priority_queue<IntervalS> new_queue;
         m_queue.swap(new_queue);
         if (!m_tg) {
-#if CPP_STANDARD >= CPP_STANDARD_14
-            m_tg = std::make_unique<ThreadPool>(m_work_num);
-#else
-            m_tg = std::unique_ptr<ThreadPool>(new ThreadPool(m_work_num));
-#endif
+            m_tg = new ThreadPool(m_work_num);
         }
 
         /*
@@ -152,9 +164,10 @@ public:
             m_detect_thread.join();
         }
 
-        if (m_tg) {
+        if (!m_use_extend_tg && m_tg) {
             m_tg->stop();
-            m_tg.reset();
+            delete m_tg;
+            m_tg = nullptr;
         }
     }
 
@@ -532,7 +545,8 @@ private:
     std::unordered_map<int, Timer*> m_timers;
     int m_current_timer_id;
     size_t m_work_num;  // 任务执行线程池线程数量
-    std::unique_ptr<ThreadPool> m_tg;
+    ThreadPool* m_tg{nullptr};
+    bool m_use_extend_tg{false};
 };
 
 }  // namespace hku

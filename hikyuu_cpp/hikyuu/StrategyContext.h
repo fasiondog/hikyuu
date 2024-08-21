@@ -24,9 +24,11 @@ public:
 
     virtual ~StrategyContext() = default;
 
-    bool isAll() const;
+    bool isAll() const noexcept;
 
-    Datetime startDatetime() const {
+    bool isValid() const noexcept;
+
+    Datetime startDatetime() const noexcept {
         return m_startDatetime;
     }
 

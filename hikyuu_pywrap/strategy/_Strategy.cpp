@@ -23,12 +23,8 @@ void export_Strategy(py::module& m) {
                     py::overload_cast<const string&>(&Strategy::name),
                     py::return_value_policy::copy, "策略名称")
 
-      .def_property("stock_list", py::overload_cast<>(&Strategy::getStockCodeList, py::const_),
-                    py::overload_cast<const vector<string>&>(&Strategy::setStockCodeList),
-                    py::return_value_policy::copy, "股票代码列表")
-      .def_property("ktype_list", py::overload_cast<>(&Strategy::getKTypeList, py::const_),
-                    py::overload_cast<const vector<KQuery::KType>&>(&Strategy::setKTypeList),
-                    py::return_value_policy::copy, "需要的K线类型")
+      .def_property_readonly("context", &Strategy::context, py::return_value_policy::copy,
+                             "策略上下文")
 
       .def("start", &Strategy::start)
       .def("on_change",

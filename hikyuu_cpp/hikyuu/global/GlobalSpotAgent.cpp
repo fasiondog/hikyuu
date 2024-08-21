@@ -171,68 +171,74 @@ void HKU_API startSpotAgent(bool print) {
 
     agent.setPrintFlag(print);
 
-    const auto& preloadParam = sm.getPreloadParameter();
-    if (preloadParam.tryGet<bool>("min", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN));
-    }
+    // 防止调用 stopSpotAgent 后重新 startSpotAgent
+    static std::atomic_bool g_init_spot_agent{false};
+    if (!g_init_spot_agent) {
+        const auto& preloadParam = sm.getPreloadParameter();
+        if (preloadParam.tryGet<bool>("min", false)) {
+            agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN));
+        }
 
-    if (preloadParam.tryGet<bool>("day", false)) {
-        agent.addProcess(updateStockDayData);
-    }
+        if (preloadParam.tryGet<bool>("day", false)) {
+            agent.addProcess(updateStockDayData);
+        }
 
-    if (preloadParam.tryGet<bool>("week", false)) {
-        agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::WEEK));
-    }
+        if (preloadParam.tryGet<bool>("week", false)) {
+            agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::WEEK));
+        }
 
-    if (preloadParam.tryGet<bool>("month", false)) {
-        agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::MONTH));
-    }
+        if (preloadParam.tryGet<bool>("month", false)) {
+            agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::MONTH));
+        }
 
-    if (preloadParam.tryGet<bool>("quarter", false)) {
-        agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::QUARTER));
-    }
+        if (preloadParam.tryGet<bool>("quarter", false)) {
+            agent.addProcess(
+              std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::QUARTER));
+        }
 
-    if (preloadParam.tryGet<bool>("halfyear", false)) {
-        agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::HALFYEAR));
-    }
+        if (preloadParam.tryGet<bool>("halfyear", false)) {
+            agent.addProcess(
+              std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::HALFYEAR));
+        }
 
-    if (preloadParam.tryGet<bool>("year", false)) {
-        agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::YEAR));
-    }
+        if (preloadParam.tryGet<bool>("year", false)) {
+            agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::YEAR));
+        }
 
-    if (preloadParam.tryGet<bool>("min5", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN5));
-    }
+        if (preloadParam.tryGet<bool>("min5", false)) {
+            agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN5));
+        }
 
-    if (preloadParam.tryGet<bool>("min15", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN15));
-    }
+        if (preloadParam.tryGet<bool>("min15", false)) {
+            agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN15));
+        }
 
-    if (preloadParam.tryGet<bool>("min30", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN30));
-    }
+        if (preloadParam.tryGet<bool>("min30", false)) {
+            agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN30));
+        }
 
-    if (preloadParam.tryGet<bool>("min60", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN60));
-    }
-    if (preloadParam.tryGet<bool>("min3", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN3));
-    }
+        if (preloadParam.tryGet<bool>("min60", false)) {
+            agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN60));
+        }
+        if (preloadParam.tryGet<bool>("min3", false)) {
+            agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN3));
+        }
 
-    if (preloadParam.tryGet<bool>("hour2", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR2));
-    }
+        if (preloadParam.tryGet<bool>("hour2", false)) {
+            agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR2));
+        }
 
-    if (preloadParam.tryGet<bool>("hour4", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR4));
-    }
+        if (preloadParam.tryGet<bool>("hour4", false)) {
+            agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR4));
+        }
 
-    if (preloadParam.tryGet<bool>("hour6", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR6));
-    }
+        if (preloadParam.tryGet<bool>("hour6", false)) {
+            agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR6));
+        }
 
-    if (preloadParam.tryGet<bool>("hour12", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR12));
+        if (preloadParam.tryGet<bool>("hour12", false)) {
+            agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR12));
+        }
     }
 
     agent.start();

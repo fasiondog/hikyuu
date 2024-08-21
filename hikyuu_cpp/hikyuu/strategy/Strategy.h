@@ -44,30 +44,6 @@ public:
         return m_context;
     }
 
-    void context(const StrategyContext& context) {
-        m_context = context;
-    }
-
-    void setStockCodeList(vector<string>&& stockList) {
-        m_context.setStockCodeList(std::move(stockList));
-    }
-
-    void setStockCodeList(const vector<string>& stockList) {
-        m_context.setStockCodeList(stockList);
-    }
-
-    const vector<string>& getStockCodeList() const {
-        return m_context.getStockCodeList();
-    }
-
-    void setKTypeList(const vector<KQuery::KType>& ktypeList) {
-        m_context.setKTypeList(ktypeList);
-    }
-
-    const vector<KQuery::KType>& getKTypeList() const {
-        return m_context.getKTypeList();
-    }
-
     /**
      * 每日开盘时间内，以 delta 为周期循环定时执行指定任务
      * @param func 待执行的任务
@@ -88,7 +64,7 @@ public:
 
     /**
      * 正确数据发生变化调用，即接收到相应行情数据变更
-     * @note 通常用于调试
+     * @note 通常用于调试。且只要收到行情采集消息就会触发，不受开、闭市时间限制
      * @param stk 数据发生变化的 stock
      * @param spot 接收到的具体数据
      */
@@ -97,6 +73,7 @@ public:
     /**
      * 一批行情数据接受完毕后通知
      * @note 通常仅用于调试打印，该批行情数据中不一定含有上下文中包含的 stock
+     *       且只要收到行情采集消息就会触发，不受开、闭市时间限制。
      */
     void onReceivedSpot(std::function<void(const Datetime&)>&& recievedFucn);
 
