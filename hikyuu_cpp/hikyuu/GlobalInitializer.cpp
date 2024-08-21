@@ -86,8 +86,8 @@ void GlobalInitializer::clean() {
     }
 #endif
 
-    releaseGlobalTaskGroup();
     releaseScheduler();
+    releaseGlobalTaskGroup();
     releaseGlobalSpotAgent();
 
     IndicatorImp::releaseDynEngine();

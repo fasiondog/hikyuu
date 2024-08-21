@@ -17,6 +17,7 @@ static TimerManager *g_scheduler;
 
 TimerManager *getScheduler() {
     static std::once_flag oc;
+    // 使用内部公共任务组，减少内部线程
     std::call_once(oc, [&]() { g_scheduler = new TimerManager(getGlobalTaskGroup()); });
     return g_scheduler;
 }
