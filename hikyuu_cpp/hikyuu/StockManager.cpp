@@ -96,6 +96,10 @@ Parameter default_other_param() {
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam, const StrategyContext& context) {
+    HKU_WARN_IF_RETURN(m_initializing, void(),
+                       "The last initialization has not finished. Please try again later!");
+    m_initializing = true;
+
     // 防止重复 init
     if (m_thread_id != std::thread::id()) {
         return;
@@ -161,6 +165,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
+    m_initializing = false;
 }
 
 void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
@@ -195,7 +200,7 @@ void StockManager::loadAllKData() {
 
     } else {
         // 异步并行加载
-        auto& tg = getGlobalTaskGroup();
+        auto* tg = getGlobalTaskGroup();
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             for (size_t i = 0, len = ktypes.size(); i < len; i++) {
                 const auto& low_ktype = low_ktypes[i];
@@ -209,8 +214,10 @@ void StockManager::loadAllKData() {
 }
 
 void StockManager::reload() {
-    loadAllHolidays();
+    HKU_IF_RETURN(m_initializing, void());
+    m_initializing = true;
 
+    loadAllHolidays();
     loadAllMarketInfos();
     loadAllStockTypeInfo();
     loadAllStocks();
@@ -223,7 +230,7 @@ void StockManager::reload() {
     HKU_INFO("start reload kdata to buffer");
     std::vector<Stock> can_not_parallel_stk_list;  // 记录不支持并行加载的Stock
     {
-        auto& tg = getGlobalTaskGroup();
+        auto* tg = getGlobalTaskGroup();
         std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             auto driver = iter->second.getKDataDirver();
@@ -254,6 +261,7 @@ void StockManager::reload() {
     }
 
     loadHistoryFinance();
+    m_initializing = false;
 }
 
 string StockManager::tmpdir() const {
@@ -561,7 +569,7 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
 }
 
 void StockManager::loadHistoryFinance() {
-    auto& tg = getGlobalTaskGroup();
+    auto* tg = getGlobalTaskGroup();
     std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
     for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
         tg->submit([=]() { iter->second.getHistoryFinance(); });
