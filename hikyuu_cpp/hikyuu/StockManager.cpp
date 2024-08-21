@@ -98,14 +98,14 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
                         const Parameter& hikyuuParam, const StrategyContext& context) {
     HKU_WARN_IF_RETURN(m_initializing, void(),
                        "The last initialization has not finished. Please try again later!");
-    m_initializing = true;
 
     // 防止重复 init
     if (m_thread_id != std::thread::id()) {
         return;
     }
-
+    m_initializing = true;
     m_thread_id = std::this_thread::get_id();
+
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
     m_kdataDriverParam = kdataParam;

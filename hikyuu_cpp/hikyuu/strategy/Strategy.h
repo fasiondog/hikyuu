@@ -44,30 +44,6 @@ public:
         return m_context;
     }
 
-    void context(const StrategyContext& context) {
-        m_context = context;
-    }
-
-    void setStockCodeList(vector<string>&& stockList) {
-        m_context.setStockCodeList(std::move(stockList));
-    }
-
-    void setStockCodeList(const vector<string>& stockList) {
-        m_context.setStockCodeList(stockList);
-    }
-
-    const vector<string>& getStockCodeList() const {
-        return m_context.getStockCodeList();
-    }
-
-    void setKTypeList(const vector<KQuery::KType>& ktypeList) {
-        m_context.setKTypeList(ktypeList);
-    }
-
-    const vector<KQuery::KType>& getKTypeList() const {
-        return m_context.getKTypeList();
-    }
-
     /**
      * 每日开盘时间内，以 delta 为周期循环定时执行指定任务
      * @param func 待执行的任务

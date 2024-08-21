@@ -15,6 +15,12 @@ static void changed(const Stock& stk, const SpotRecord& spot) {
     HKU_INFO("{} {} 当前收盘价: {}", stk.market_code(), stk.name(), spot.close);
 }
 
+static void changed2(const Stock& stk, const SpotRecord& spot) {
+    if (stk.market_code() == "SZ000001") {
+        HKU_INFO("strategy 2 process sz000001");
+    }
+}
+
 static void my_process1() {
     HKU_INFO("{}", getStock("sh000001"));
 }
@@ -40,6 +46,12 @@ int main(int argc, char* argv[]) {
 
     // 每日定点执行
     stg.runDailyAt(my_process2, Datetime::now() - Datetime::today() + Seconds(20));
+
+    auto t = std::thread([]() {
+        Strategy stg2("stratege2");
+        stg2.onChange(changed2);
+        stg2.start();
+    });
 
     // 启动策略
     stg.start();

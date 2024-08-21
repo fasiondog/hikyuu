@@ -16,8 +16,7 @@
 #include "hikyuu/hikyuu.h"
 #include "Strategy.h"
 
-// python 中运行拉回主线程循环
-// c++ 则直接执行（通常在定时调度的工作线程中执行）
+// python 中运行拉回主线程循环，非 python 环境则直接执行
 #define EVENT(func)          \
     if (runningInPython()) { \
         event(func);         \
@@ -66,9 +65,6 @@ Strategy::~Strategy() {
 void Strategy::run() {
     CLS_IF_RETURN(m_running, void());
 
-    CLS_CHECK(!getStockCodeList().empty(), "The context does not contain any stocks!");
-    CLS_CHECK(!getKTypeList().empty(), "The K type list was empty!");
-
     StockManager& sm = StockManager::instance();
 
     // sm 尚未初始化，则初始化
@@ -80,7 +76,12 @@ void Strategy::run() {
 
         // 初始化
         hikyuu_init(m_config_file, false, m_context);
+    } else {
+        m_context = sm.getStrategyContext();
     }
+
+    CLS_CHECK(!m_context.getStockCodeList().empty(), "The context does not contain any stocks!");
+    CLS_CHECK(!m_context.getKTypeList().empty(), "The K type list was empty!");
 
     // 先将行情接收代理停止，以便后面加入处理函数
     stopSpotAgent();
