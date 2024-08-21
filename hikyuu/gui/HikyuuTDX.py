@@ -8,6 +8,10 @@ import datetime
 import multiprocessing
 from configparser import ConfigParser
 from logging.handlers import QueueListener
+
+# 优先加载，处理 VS 17.10 升级后依赖 dll 不兼容问题
+import hikyuu
+
 import PyQt5
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
@@ -240,6 +244,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mp_log_q_lisener.start()
 
     def initUI(self):
+        # 读取配置文件放在 output 重定向之前，防止配置文件读取失败没有提示
+        # 读取保存的配置文件信息，如果不存在，则使用默认配置
+        this_dir = self.getUserConfigDir()
+        import_config = ConfigParser()
+        if os.path.exists(this_dir + '/importdata-gui.ini'):
+            import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
+
         self._is_sched_import_running = False
         self._is_collect_running = False
         self._stream = None
@@ -271,12 +282,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.trans_start_dateEdit.setMinimumDate(today - datetime.timedelta(90))
         self.time_start_dateEdit.setMinimumDate(today - datetime.timedelta(300))
         self.collect_status_label.setText("已停止")
-
-        # 读取保存的配置文件信息，如果不存在，则使用默认配置
-        this_dir = self.getUserConfigDir()
-        import_config = ConfigParser()
-        if os.path.exists(this_dir + '/importdata-gui.ini'):
-            import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
 
         # 初始化导入行情数据类型配置
         self.import_stock_checkBox.setChecked(import_config.getboolean('quotation', 'stock', fallback=True))

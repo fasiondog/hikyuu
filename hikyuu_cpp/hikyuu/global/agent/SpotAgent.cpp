@@ -8,6 +8,7 @@
 #include <chrono>
 #include <nng/nng.h>
 #include <nng/protocol/pubsub0/sub.h>
+#include "spot_generated.h"
 #include "SpotAgent.h"
 
 using namespace hikyuu::flat;
@@ -33,6 +34,7 @@ SpotAgent::~SpotAgent() {
 }
 
 void SpotAgent::start() {
+    stop();
     if (m_stop) {
         m_stop = false;
         m_receiveThread = std::thread([this]() { work_thread(); });
@@ -156,13 +158,11 @@ void SpotAgent::work_thread() {
     while (!m_stop && rv != 0) {
         rv = nng_dial(sock, ms_pubUrl.c_str(), nullptr, 0);
         HKU_WARN_IF(m_print && rv != 0,
-                    "Faied connect quotation server {}, will retry after 5 seconds! You Maybe need "
-                    "start  the collection service first.",
-                    ms_pubUrl);
+                    "Faied connect quotation server {}, will retry after 5 seconds!", ms_pubUrl);
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
-    HKU_INFO_IF(m_print, "Ready to receive quotation ...");
+    HKU_INFO_IF(m_print, "Ready to receive quotation from {} ...", ms_pubUrl);
 
     while (!m_stop) {
         char* buf = nullptr;
@@ -186,7 +186,7 @@ void SpotAgent::work_thread() {
                         for (auto& task : m_process_task_list) {
                             task.get();
                         }
-                        HKU_INFO_IF(m_print, "received count: {}", m_batch_count);
+                        HKU_TRACE_IF(m_print, "received count: {}", m_batch_count);
                         m_batch_count = 0;
                         // 执行后处理
                         for (const auto& postProcess : m_postProcessList) {
@@ -215,21 +215,25 @@ void SpotAgent::work_thread() {
 
 void SpotAgent::addProcess(std::function<void(const SpotRecord&)> process) {
     HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_processList.push_back(process);
 }
 
 void SpotAgent::addPostProcess(std::function<void(Datetime)> func) {
     HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_postProcessList.push_back(func);
 }
 
 void SpotAgent::clearProcessList() {
     HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_processList.clear();
 }
 
 void SpotAgent::clearPostProcessList() {
     HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_postProcessList.clear();
 }
 

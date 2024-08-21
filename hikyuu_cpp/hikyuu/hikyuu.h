@@ -16,6 +16,7 @@
 #include "indicator/build_in.h"
 #include "trade_manage/build_in.h"
 #include "trade_sys/all.h"
+#include "strategy/Strategy.h"
 
 namespace hku {
 

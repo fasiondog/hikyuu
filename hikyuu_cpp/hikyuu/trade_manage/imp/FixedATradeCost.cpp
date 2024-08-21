@@ -6,8 +6,8 @@
  */
 
 #include "FixedATradeCost.h"
+#include "hikyuu/utilities/Log.h"
 #include "../../StockTypeInfo.h"
-#include "../../Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedATradeCost)

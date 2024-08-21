@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/Log.h>
+#include "hikyuu/utilities/Log.h"
 #include "pybind_utils.h"
 
 using namespace hku;

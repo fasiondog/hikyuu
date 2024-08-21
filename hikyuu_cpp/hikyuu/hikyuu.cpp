@@ -11,7 +11,7 @@
 
 #include <set>
 #include <fmt/format.h>
-#include "utilities/IniParser.h"
+#include "utilities/ini_parser/IniParser.h"
 #include "hikyuu.h"
 #include "version.h"
 
@@ -40,8 +40,8 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload,
 
     hkuParam.set<string>("tmpdir", config.get("hikyuu", "tmpdir", "."));
     hkuParam.set<string>("datadir", config.get("hikyuu", "datadir", "."));
-    hkuParam.set<string>("quotation_server", config.get("hikyuu", "quotation_server",
-                                                        "ipc:///tmp/hikyuu_real.ipc"));
+    hkuParam.set<string>("quotation_server",
+                         config.get("hikyuu", "quotation_server", "ipc:///tmp/hikyuu_real.ipc"));
 
     if (!config.hasSection("baseinfo")) {
         HKU_FATAL("Missing configure of baseinfo!");
@@ -73,17 +73,17 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload,
 
     for (auto iter = option->begin(); iter != option->end(); ++iter) {
         try {
-            preloadParam.set<bool>(*iter,
-                                   ignore_preload ? false : config.getBool("preload", *iter));
-        } catch (...) {
-            if (!ignore_preload) {
-                // 获取预加载的最大数量
-                try {
-                    preloadParam.set<int>(*iter, config.getInt("preload", *iter));
-                } catch (...) {
-                    HKU_WARN("Invalid option: {}", *iter);
-                }
+            auto pos = (*iter).find("max");
+            if (pos == std::string::npos) {
+                preloadParam.set<bool>(*iter,
+                                       ignore_preload ? false : config.getBool("preload", *iter));
+            } else if (!ignore_preload) {
+                preloadParam.set<int>(*iter, config.getInt("preload", *iter));
             }
+        } catch (const std::exception& e) {
+            HKU_ERROR("proload param ({}) error! {}!", *iter, e.what());
+        } catch (...) {
+            HKU_ERROR("proload param ({})! Unknown error!", *iter);
         }
     }
 

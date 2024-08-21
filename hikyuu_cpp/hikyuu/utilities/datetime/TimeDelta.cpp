@@ -10,7 +10,7 @@
 #include <cstdint>
 #include "TimeDelta.h"
 #include "hikyuu/utilities/arithmetic.h"
-#include "hikyuu/Log.h"
+#include "hikyuu/utilities/Log.h"
 
 namespace hku {
 
@@ -37,6 +37,24 @@ TimeDelta::TimeDelta(bt::time_duration td) {
     int64_t total = td.total_microseconds();
     HKU_CHECK(total >= m_min_micro_seconds && total <= m_max_micro_seconds, "Out of total range!");
     m_duration = td;
+}
+
+/** 从字符串构造，格式：-1 days, hh:mm:ss.000000) */
+TimeDelta::TimeDelta(const std::string& delta) {
+    std::string val(delta);
+    std::string errmsg(fmt::format("Invalid format: {}", delta));
+    to_lower(val);
+    auto vals = split(val, ' ');
+    HKU_CHECK(vals.size() == 3, errmsg);
+    int64_t days = std::stoll(std::string(vals[0]));
+    vals = split(vals[2], ':');
+    HKU_CHECK(vals.size() == 3, errmsg);
+    int64_t hours = std::stoll(std::string(vals[0]));
+    int64_t minutes = std::stoll(std::string(vals[1]));
+    int64_t microseconds = static_cast<int64_t>(std::stod(std::string(vals[2])) * 1000000.0);
+    int64_t total = (((days * 24) + hours) * 60 + minutes) * 60000000LL + microseconds;
+    HKU_CHECK(total >= m_min_micro_seconds && total <= m_max_micro_seconds, "Out of total range!");
+    m_duration = bt::time_duration(0, 0, 0, total);
 }
 
 TimeDelta TimeDelta::fromTicks(int64_t ticks) {
@@ -120,28 +138,28 @@ int64_t TimeDelta::microseconds() const {
     return std::abs(ticks() % 1000);
 }
 
-TimeDelta HKU_API Hours(int64_t hours) {
+TimeDelta HKU_UTILS_API Hours(int64_t hours) {
     HKU_CHECK(hours >= TimeDelta::minTicks() / 3600000000LL &&
                 hours <= TimeDelta::maxTicks() / 3600000000LL,
               "Out of total range!");
     return TimeDelta::fromTicks(hours * 3600000000LL);
 }
 
-TimeDelta HKU_API Minutes(int64_t mins) {
+TimeDelta HKU_UTILS_API Minutes(int64_t mins) {
     HKU_CHECK(
       mins >= TimeDelta::minTicks() / 60000000LL && mins <= TimeDelta::maxTicks() / 60000000LL,
       "Out of total range!");
     return TimeDelta::fromTicks(mins * 60000000LL);
 }
 
-TimeDelta HKU_API Seconds(int64_t secs) {
+TimeDelta HKU_UTILS_API Seconds(int64_t secs) {
     HKU_CHECK(
       secs >= TimeDelta::minTicks() / 1000000LL && secs <= TimeDelta::maxTicks() / 1000000LL,
       "Out of total range!");
     return TimeDelta::fromTicks(secs * 1000000LL);
 }
 
-TimeDelta HKU_API Milliseconds(int64_t milliseconds) {
+TimeDelta HKU_UTILS_API Milliseconds(int64_t milliseconds) {
     HKU_CHECK(milliseconds >= TimeDelta::minTicks() / 1000LL &&
                 milliseconds <= TimeDelta::maxTicks() / 1000LL,
               "Out of total range!");
@@ -149,12 +167,12 @@ TimeDelta HKU_API Milliseconds(int64_t milliseconds) {
 }
 
 TimeDelta TimeDelta::operator*(double p) const {
-    return TimeDelta::fromTicks(static_cast<int64_t>(roundEx(double(ticks()) * p, 0)));
+    return TimeDelta::fromTicks(static_cast<int64_t>(roundEx<double>(double(ticks()) * p, 0)));
 }
 
 TimeDelta TimeDelta::operator/(double p) const {
     HKU_CHECK(p != 0, "Attempt to divide by 0!");
-    return TimeDelta::fromTicks(static_cast<int64_t>(roundEx(double(ticks()) / p, 0)));
+    return TimeDelta::fromTicks(static_cast<int64_t>(roundEx<double>(double(ticks()) / p, 0)));
 }
 
 TimeDelta TimeDelta::floorDiv(double p) const {

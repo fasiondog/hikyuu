@@ -35,6 +35,7 @@ int main(int argc, char* argv[]) {
         std::cout << k[i] << std::endl;
     }
 
+    // 启动行情接收（只是计算回测可以不需要）
     startSpotAgent(true);
 
     while (true) {

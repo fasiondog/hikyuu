@@ -9,11 +9,8 @@ target("core")
     --     --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
     -- end
 
-    -- add_options("stacktrace")
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stacktrace", "spend_time", "log_level")
-
     add_deps("hikyuu")
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "cpp-httplib")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11")
     if is_plat("windows") then
         set_filename("core.pyd")
         add_cxflags("-wd4251")
@@ -23,6 +20,7 @@ target("core")
 
     if is_plat("windows") and get_config("kind") == "shared" then
         add_defines("HKU_API=__declspec(dllimport)")
+        add_defines("HKU_UTILS_API=__declspec(dllimport)")
         add_cxflags("-wd4566")
     end
     
@@ -32,10 +30,19 @@ target("core")
         add_cxflags("-Wno-error=parentheses-equality -Wno-error=missing-braces")
     end
 
+    if is_plat("linux", "cross") then 
+        add_rpathdirs("$ORIGIN", "$ORIGIN/cpp")
+    end
+
+    if is_plat("macosx") then
+        add_linkdirs("/usr/lib")
+
+        -- macosx 下不能主动链接 python，所以需要使用如下编译选项
+        add_shflags("-undefined dynamic_lookup")
+    end    
+
     add_includedirs("../hikyuu_cpp")
     add_files("./**.cpp")
-
-    add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
 
     on_load("windows", "linux", "macosx", function(target)
         import("lib.detect.find_tool")

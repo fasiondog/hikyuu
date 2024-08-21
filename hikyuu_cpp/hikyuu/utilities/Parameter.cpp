@@ -6,8 +6,8 @@
  */
 
 #include <boost/algorithm/string.hpp>
+#include "hikyuu/utilities/Log.h"
 #include "hikyuu/Block.h"
-#include "../Log.h"
 #include "Parameter.h"
 
 namespace hku {

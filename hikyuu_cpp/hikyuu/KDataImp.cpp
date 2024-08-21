@@ -238,7 +238,6 @@ void KDataImp::_recoverBackward() {
     Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
-    StockWeightList::const_reverse_iterator pre_weightIter;
 
     size_t pre_pos = total - 1;
     for (; weightIter != weightList.rend(); ++weightIter) {
@@ -360,7 +359,6 @@ void KDataImp::_recoverEqualBackward() {
     Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
-    StockWeightList::const_reverse_iterator pre_weightIter;
 
     size_t pre_pos = total - 1;
     for (; weightIter != weightList.rend(); ++weightIter) {

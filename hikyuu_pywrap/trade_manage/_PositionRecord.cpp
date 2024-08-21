@@ -21,8 +21,8 @@ void export_PositionRecord(py::module& m) {
       .def(py::init<const Stock&, const Datetime&, const Datetime&, double, price_t, price_t,
                     double, price_t, price_t, price_t, price_t>())
 
-      .def("__str__", &PositionRecord::toString)
-      .def("__repr__", &PositionRecord::toString)
+      .def("__str__", &PositionRecord::str)
+      .def("__repr__", &PositionRecord::str)
 
       .def_readwrite("stock", &PositionRecord::stock, "交易对象（Stock）")
       .def_readwrite("take_datetime", &PositionRecord::takeDatetime, "初次建仓时刻（Datetime）")

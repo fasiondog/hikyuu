@@ -2168,8 +2168,7 @@ public:                                                                         
     }
 
 #define TABLE_NO_AUTOID_BIND12(ROWID, table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12)    \
-    pprivate:                                                                                      \
-    uint64_t m_rowid = 0;                                                                          \
+    pprivate : uint64_t m_rowid = 0;                                                               \
                                                                                                    \
 public:                                                                                            \
     bool valid() const {                                                                           \

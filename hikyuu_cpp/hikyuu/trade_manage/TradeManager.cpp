@@ -865,14 +865,14 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
           roundEx(position.totalRisk + (realPrice - stoploss) * number * stock.unit(), precision);
     }
 
-    if (result.datetime > m_broker_last_datetime) {
+    if (datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-        Datetime realtime, nulltime;
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            realtime =
-              (*broker_iter)->buy(datetime, stock.market(), stock.code(), realPrice, number);
-            if (realtime != nulltime && realtime > m_broker_last_datetime) {
-                m_broker_last_datetime = realtime;
+            (*broker_iter)
+              ->buy(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
+                    from);
+            if (datetime > m_broker_last_datetime) {
+                m_broker_last_datetime = datetime;
             }
         }
     }
@@ -955,14 +955,14 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
         returnCash(datetime, m_borrow_cash < m_cash ? m_borrow_cash : m_cash);
     }
 
-    if (result.datetime > m_broker_last_datetime) {
+    if (datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-        Datetime realtime, nulltime;
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            realtime =
-              (*broker_iter)->sell(datetime, stock.market(), stock.code(), realPrice, real_number);
-            if (realtime != nulltime && realtime > m_broker_last_datetime) {
-                m_broker_last_datetime = realtime;
+            (*broker_iter)
+              ->sell(datetime, stock.market(), stock.code(), realPrice, real_number, stoploss,
+                     goalPrice, from);
+            if (datetime > m_broker_last_datetime) {
+                m_broker_last_datetime = datetime;
             }
         }
     }
@@ -1070,14 +1070,14 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         position.sellMoney = roundEx(position.sellMoney + money, precision);
     }
 
-    if (result.datetime > m_broker_last_datetime) {
+    if (datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-        Datetime realtime, nulltime;
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            realtime =
-              (*broker_iter)->sell(datetime, stock.market(), stock.code(), realPrice, number);
-            if (realtime != nulltime && realtime > m_broker_last_datetime) {
-                m_broker_last_datetime = realtime;
+            (*broker_iter)
+              ->sell(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
+                     from);
+            if (datetime > m_broker_last_datetime) {
+                m_broker_last_datetime = datetime;
             }
         }
     }
@@ -1144,14 +1144,14 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
         m_short_position.erase(stock.id());
     }
 
-    if (result.datetime > m_broker_last_datetime) {
+    if (datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-        Datetime realtime, nulltime;
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            realtime =
-              (*broker_iter)->buy(datetime, stock.market(), stock.code(), realPrice, number);
-            if (realtime != nulltime && realtime > m_broker_last_datetime) {
-                m_broker_last_datetime = realtime;
+            (*broker_iter)
+              ->buy(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
+                    from);
+            if (datetime > m_broker_last_datetime) {
+                m_broker_last_datetime = datetime;
             }
         }
     }
@@ -1707,6 +1707,26 @@ void TradeManager::tocsv(const string& path) {
         file << *action_iter << std::endl;
     }
     file.close();
+}
+
+bool TradeManager::addPosition(const PositionRecord& pr) {
+    HKU_ERROR_IF_RETURN(pr.stock.isNull(), false, "Invalid postion record! stock is null!");
+    HKU_ERROR_IF_RETURN(pr.cleanDatetime != Null<Datetime>(), false,
+                        "Position cleanDatetime({}) must be Null!", pr.cleanDatetime);
+    HKU_ERROR_IF_RETURN(pr.takeDatetime < initDatetime(), false,
+                        "Poistion takeDatetime({}) > initDatetime({})", pr.takeDatetime,
+                        initDatetime());
+    HKU_ERROR_IF_RETURN(!m_trade_list.empty(), false, "Exist trade list!");
+
+    auto iter = m_position.find(pr.stock.id());
+    HKU_ERROR_IF_RETURN(iter != m_position.end(), false, "The stock({}) has position!",
+                        pr.stock.market_code());
+
+    m_position[pr.stock.id()] = pr;
+    if (pr.takeDatetime > m_init_datetime) {
+        m_init_datetime = pr.takeDatetime;
+    }
+    return true;
 }
 
 bool TradeManager::addTradeRecord(const TradeRecord& tr) {

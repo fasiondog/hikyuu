@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/utilities/db_connect/DBCondition.h>
-#include <hikyuu/Log.h>
+#include "hikyuu/utilities/Log.h"
 #include <fmt/ranges.h>
 
 using namespace hku;

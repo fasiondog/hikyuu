@@ -13,8 +13,8 @@ namespace hku {
 
 struct HistoryFinanceTable {
     TABLE_BIND4(HistoryFinanceTable, HistoryFinance, file_date, report_date, market_code, values)
-    uint64_t file_date;
-    uint64_t report_date;
+    uint64_t file_date{0};
+    uint64_t report_date{0};
     std::string market_code;
     // std::vector<float> values;
     std::vector<char> values;

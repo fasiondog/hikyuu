@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/utilities/arithmetic.h>
-#include <hikyuu/Log.h>
+#include "hikyuu/utilities/Log.h"
 
 using namespace hku;
 
@@ -102,15 +102,16 @@ TEST_CASE("test_split_by_char") {
 
     x = "100.1.";
     splits = split(x, '.');
-    CHECK_EQ(splits.size(), 2);
+    CHECK_EQ(splits.size(), 3);
     CHECK_EQ(splits[0], "100");
     CHECK_EQ(splits[1], "1");
 
     x = "..";
     splits = split(x, '.');
-    CHECK_EQ(splits.size(), 2);
+    CHECK_EQ(splits.size(), 3);
     CHECK_EQ(splits[0], "");
     CHECK_EQ(splits[1], "");
+    CHECK_EQ(splits[2], "");
 }
 
 TEST_CASE("test_split_by_string") {
@@ -129,9 +130,10 @@ TEST_CASE("test_split_by_string") {
     // 分割字符串长度为1
     x = "100.1.";
     splits = split(x, ".");
-    CHECK_EQ(splits.size(), 2);
+    CHECK_EQ(splits.size(), 3);
     CHECK_EQ(splits[0], "100");
     CHECK_EQ(splits[1], "1");
+    CHECK_EQ(splits[2], "");
 
     // 分割字符串长度为2
     x = "100.1.234.1.56";
@@ -143,9 +145,10 @@ TEST_CASE("test_split_by_string") {
 
     x = "..";
     splits = split(x, ".");
-    CHECK_EQ(splits.size(), 2);
+    CHECK_EQ(splits.size(), 3);
     CHECK_EQ(splits[0], "");
     CHECK_EQ(splits[1], "");
+    CHECK_EQ(splits[2], "");
 }
 
 /** @} */

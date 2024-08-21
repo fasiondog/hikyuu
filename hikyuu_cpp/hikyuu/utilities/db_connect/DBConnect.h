@@ -17,4 +17,14 @@
 #include "TableMacro.h"
 #include "DBUpgrade.h"
 
+#include "hikyuu/utilities/config.h"
+#if HKU_ENABLE_MYSQL
+#include "mysql/MySQLConnect.h"
+#endif
+
+#if HKU_ENABLE_SQLITE
+#include "sqlite/SQLiteConnect.h"
+#include "sqlite/SQLiteUtil.h"
+#endif
+
 #endif /* HIKYUU_DB_CONNECT_H */

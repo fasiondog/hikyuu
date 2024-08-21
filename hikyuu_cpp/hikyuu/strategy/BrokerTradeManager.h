@@ -1,28 +1,36 @@
 /*
- *  Copyright(C) 2021 hikyuu.org
+ *  Copyright (c) 2024 hikyuu.org
  *
- *  Create on: 2021-03-23
- *     Author: fasiondog
+ *  Created on: 2024-08-16
+ *      Author: fasiondog
  */
 
 #pragma once
 
-#include <httplib.h>
-#include "../trade_manage/TradeManagerBase.h"
+#include "hikyuu/trade_manage/TradeManagerBase.h"
 
 namespace hku {
 
-class HKU_API AccountTradeManager : public TradeManagerBase {
+class HKU_API BrokerTradeManager : public TradeManagerBase {
 public:
-    AccountTradeManager() = default;
-    AccountTradeManager(const string& name, const string& pwd);
-    virtual ~AccountTradeManager() = default;
+    BrokerTradeManager() = default;
+    explicit BrokerTradeManager(const OrderBrokerPtr& broker,
+                                const TradeCostPtr& costfunc = TC_Zero(),
+                                const string& name = "SYS");
+    virtual ~BrokerTradeManager() {}
 
-    virtual void _reset() override {}
+    virtual void _reset() override;
 
-    virtual shared_ptr<TradeManagerBase> _clone() override {
-        return std::make_shared<AccountTradeManager>();
-    }
+    virtual shared_ptr<TradeManagerBase> _clone() override;
+
+    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) override;
+
+    /**
+     * 根据权息信息更新当前持仓与交易情况
+     * @note 必须按时间顺序调用
+     * @param datetime 当前时刻
+     */
+    virtual void updateWithWeight(const Datetime& datetime) override {}
 
     /**
      * 获取指定对象的保证金比率
@@ -36,26 +44,22 @@ public:
 
     /** 初始资金 */
     virtual price_t initCash() const override {
-        HKU_WARN("The subclass does not implement this method");
-        return 0.0;
+        return m_cash;
     }
 
     /** 账户建立日期 */
     virtual Datetime initDatetime() const override {
-        HKU_WARN("The subclass does not implement this method");
-        return Datetime();
+        return m_datetime;
     }
 
     /** 第一笔买入交易发生日期，如未发生交易返回Null<Datetime>() */
     virtual Datetime firstDatetime() const override {
-        HKU_WARN("The subclass does not implement this method");
-        return Datetime();
+        return m_datetime;
     }
 
     /** 最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期 */
     virtual Datetime lastDatetime() const override {
-        HKU_WARN("The subclass does not implement this method");
-        return Datetime();
+        return m_datetime;
     }
 
     /**
@@ -63,8 +67,7 @@ public:
      * @note 仅返回当前信息，不会根据权息进行调整
      */
     virtual price_t currentCash() const override {
-        HKU_WARN("The subclass does not implement this method");
-        return 0.0;
+        return m_cash;
     }
 
     /**
@@ -72,8 +75,7 @@ public:
      * @note 如果不带日期参数，无法根据权息信息调整持仓
      */
     virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override {
-        HKU_WARN("The subclass does not implement this method");
-        return 0.0;
+        return (datetime >= m_datetime) ? currentCash() : 0.0;
     }
 
     /**
@@ -83,8 +85,7 @@ public:
      * @return true 是 | false 否
      */
     virtual bool have(const Stock& stock) const override {
-        HKU_WARN("The subclass does not implement this method");
-        return false;
+        return m_position.count(stock.id()) ? true : false;
     }
 
     /**
@@ -93,49 +94,48 @@ public:
      * @param stock 指定证券
      * @return true 是 | false 否
      */
-    virtual bool haveShort(const Stock& stock) const override {
+    virtual bool haveShort(const Stock& stock) const {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }
 
     /** 当前持有的证券种类数量 */
-    virtual size_t getStockNumber() const override {
-        HKU_WARN("The subclass does not implement this method");
-        return 0;
+    virtual size_t getStockNumber() const {
+        return m_position.size();
     }
 
     /** 当前空头持有的证券种类数量 */
-    virtual size_t getShortStockNumber() const override {
+    virtual size_t getShortStockNumber() const {
         HKU_WARN("The subclass does not implement this method");
         return 0;
     }
 
     /** 获取指定时刻的某证券持有数量 */
-    virtual double getHoldNumber(const Datetime& datetime, const Stock& stock) override {
+    virtual double getHoldNumber(const Datetime& datetime, const Stock& stock) {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }
 
     /** 获取指定时刻的空头某证券持有数量 */
-    virtual double getShortHoldNumber(const Datetime& datetime, const Stock& stock) override {
+    virtual double getShortHoldNumber(const Datetime& datetime, const Stock& stock) {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }
 
     /** 获取指定时刻已借入的股票数量 */
-    virtual double getDebtNumber(const Datetime& datetime, const Stock& stock) override {
+    virtual double getDebtNumber(const Datetime& datetime, const Stock& stock) {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }
 
     /** 获取指定时刻已借入的现金额 */
-    virtual price_t getDebtCash(const Datetime& datetime) override {
+    virtual price_t getDebtCash(const Datetime& datetime) {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }
 
     /** 获取全部交易记录 */
-    virtual TradeRecordList getTradeList() const override {
+    virtual TradeRecordList getTradeList() const {
         HKU_WARN("The subclass does not implement this method");
         return TradeRecordList();
     }
@@ -146,50 +146,54 @@ public:
      * @param end 结束日期
      * @return 交易记录列表
      */
-    virtual TradeRecordList getTradeList(const Datetime& start,
-                                         const Datetime& end) const override {
+    virtual TradeRecordList getTradeList(const Datetime& start, const Datetime& end) const {
         HKU_WARN("The subclass does not implement this method");
         return TradeRecordList();
     }
 
     /** 获取当前全部持仓记录 */
-    virtual PositionRecordList getPositionList() const override {
-        HKU_WARN("The subclass does not implement this method");
-        return PositionRecordList();
-    }
+    virtual PositionRecordList getPositionList() const override;
 
     /** 获取全部历史持仓记录，即已平仓记录 */
-    virtual PositionRecordList getHistoryPositionList() const override {
+    virtual PositionRecordList getHistoryPositionList() const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecordList();
     }
 
     /** 获取当前全部空头仓位记录 */
-    virtual PositionRecordList getShortPositionList() const override {
+    virtual PositionRecordList getShortPositionList() const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecordList();
     }
 
     /** 获取全部空头历史仓位记录 */
-    virtual PositionRecordList getShortHistoryPositionList() const override {
+    virtual PositionRecordList getShortHistoryPositionList() const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecordList();
     }
 
-    /** 获取指定证券的当前持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
-    virtual PositionRecord getPosition(const Datetime&, const Stock&) override {
+    /**
+     * 获取指定证券的持仓记录
+     * @param date 指定日期
+     * @param stock 指定的证券
+     */
+    virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();
     }
 
-    /** 获取指定证券的当前空头仓位持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
-    virtual PositionRecord getShortPosition(const Stock&) const override {
+    /**
+     * 获取指定证券的空头持仓记录
+     * @param date 指定日期
+     * @param stock 指定的证券
+     */
+    virtual PositionRecord getShortPosition(const Stock&) const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();
     }
 
     /** 获取当前借入的股票列表 */
-    virtual BorrowRecordList getBorrowStockList() const override {
+    virtual BorrowRecordList getBorrowStockList() const {
         HKU_WARN("The subclass does not implement this method");
         return BorrowRecordList();
     }
@@ -200,10 +204,7 @@ public:
      * @param cash 存入的资金量
      * @return true | false
      */
-    virtual bool checkin(const Datetime& datetime, price_t cash) override {
-        HKU_WARN("The subclass does not implement this method");
-        return false;
-    }
+    virtual bool checkin(const Datetime& datetime, price_t cash) override;
 
     /**
      * 取出资金
@@ -212,8 +213,8 @@ public:
      * @return true | false
      */
     virtual bool checkout(const Datetime& datetime, price_t cash) override {
-        HKU_WARN("The subclass does not implement this method");
-        return false;
+        m_cash = (cash > m_cash) ? 0.0 : m_cash - cash;
+        return true;
     }
 
     /**
@@ -225,7 +226,7 @@ public:
      * @return true | false
      */
     virtual bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
-                              double number) override {
+                              double number) {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }
@@ -240,7 +241,7 @@ public:
      * @note 应该不会被用到
      */
     virtual bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
-                               double number) override {
+                               double number) {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }
@@ -259,10 +260,7 @@ public:
      */
     virtual TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
                             double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                            price_t planPrice = 0.0, SystemPart from = PART_INVALID) override {
-        HKU_WARN("The subclass does not implement this method");
-        return TradeRecord();
-    }
+                            price_t planPrice = 0.0, SystemPart from = PART_INVALID) override;
 
     /**
      * 卖出操作
@@ -279,10 +277,7 @@ public:
     virtual TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                              double number = MAX_DOUBLE, price_t stoploss = 0.0,
                              price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                             SystemPart from = PART_INVALID) override {
-        HKU_WARN("The subclass does not implement this method");
-        return TradeRecord();
-    }
+                             SystemPart from = PART_INVALID) override;
 
     /**
      * 卖空
@@ -298,8 +293,7 @@ public:
      */
     virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                   double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                                  price_t planPrice = 0.0,
-                                  SystemPart from = PART_INVALID) override {
+                                  price_t planPrice = 0.0, SystemPart from = PART_INVALID) {
         HKU_WARN("The subclass does not implement this method");
         return TradeRecord();
     }
@@ -319,7 +313,7 @@ public:
     virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                  double number = MAX_DOUBLE, price_t stoploss = 0.0,
                                  price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                                 SystemPart from = PART_INVALID) override {
+                                 SystemPart from = PART_INVALID) {
         HKU_WARN("The subclass does not implement this method");
         return TradeRecord();
     }
@@ -330,7 +324,7 @@ public:
      * @param cash 借入的现金
      * @return true | false
      */
-    virtual bool borrowCash(const Datetime& datetime, price_t cash) override {
+    virtual bool borrowCash(const Datetime& datetime, price_t cash) {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }
@@ -341,7 +335,7 @@ public:
      * @param cash 归还现金
      * @return true | false
      */
-    virtual bool returnCash(const Datetime& datetime, price_t cash) override {
+    virtual bool returnCash(const Datetime& datetime, price_t cash) {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }
@@ -355,7 +349,7 @@ public:
      * @return true | false
      */
     virtual bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
-                             double number) override {
+                             double number) {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }
@@ -369,10 +363,17 @@ public:
      * @return true | false
      */
     virtual bool returnStock(const Datetime& datetime, const Stock& stock, price_t price,
-                             double number) override {
+                             double number) {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }
+
+    /**
+     * 获取账户当前时刻的资产详情
+     * @param ktype 日期的类型
+     * @return 资产详情
+     */
+    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const override;
 
     /**
      * 获取指定时刻的资产市值详情
@@ -382,10 +383,7 @@ public:
      * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同
      */
     virtual FundsRecord getFunds(const Datetime& datetime,
-                                 KQuery::KType ktype = KQuery::DAY) override {
-        HKU_WARN("The subclass does not implement this method");
-        return FundsRecord();
-    }
+                                 KQuery::KType ktype = KQuery::DAY) override;
 
     /**
      * 直接加入交易记录
@@ -393,13 +391,24 @@ public:
      * @param tr 待加入的交易记录
      * @return bool true 成功 | false 失败
      */
-    virtual bool addTradeRecord(const TradeRecord& tr) override {
+    virtual bool addTradeRecord(const TradeRecord& tr) {
+        HKU_WARN("The subclass does not implement this method");
+        return false;
+    }
+
+    /**
+     * 直接加入持仓记录
+     * @param pr 持仓记录
+     * @return true 成功
+     * @return false 失败
+     */
+    virtual bool addPosition(const PositionRecord& pr) {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }
 
     /** 字符串输出 */
-    virtual string str() const override {
+    virtual string str() const {
         HKU_WARN("The subclass does not implement this method");
         return string();
     }
@@ -408,22 +417,17 @@ public:
      * 以csv格式输出交易记录、未平仓记录、已平仓记录、资产净值曲线
      * @param path 输出文件所在目录
      */
-    virtual void tocsv(const string& path) override {
+    virtual void tocsv(const string& path) {
         HKU_WARN("The subclass does not implement this method");
     }
 
 private:
-    string getToken();
+    Datetime m_datetime;  // 当前日期
 
-private:
-    std::unique_ptr<httplib::Client> m_client;
-    string m_user;
-    string m_password;
-    string m_token;
+    price_t m_cash{0.0};  // 当前可用现金
+
+    typedef map<uint64_t, PositionRecord> position_map_type;
+    position_map_type m_position;  // 当前持仓交易对象的持仓记录
 };
-
-inline TMPtr crtAccountTM(const string& name, const string& pwd) {
-    return std::make_shared<AccountTradeManager>(name, pwd);
-}
 
 }  // namespace hku

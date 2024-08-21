@@ -382,8 +382,15 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
     size_t total = kdata.size();
     auto const* ks = kdata.data();
     auto const* src_ks = m_src_kdata.data();
+
+    // 适应 strategy 模式下运行时同步资产信息可能造成的偏差
+    Datetime tm_init_datetime = m_tm->initDatetime();
+    if (KQuery::getKTypeInMin(kdata.getQuery().kType()) >= 1440) {
+        tm_init_datetime = tm_init_datetime.startOfDay();
+    }
+
     for (size_t i = 0; i < total; ++i) {
-        if (ks[i].datetime >= m_tm->initDatetime()) {
+        if (ks[i].datetime >= tm_init_datetime) {
             auto tr = _runMoment(ks[i], src_ks[i]);
             if (trace) {
                 HKU_INFO_IF(!tr.isNull(), "{}", tr);

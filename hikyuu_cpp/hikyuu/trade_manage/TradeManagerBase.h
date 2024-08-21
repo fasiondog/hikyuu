@@ -668,6 +668,17 @@ public:
         return false;
     }
 
+    /**
+     * 直接加入持仓记录
+     * @param pr 持仓记录
+     * @return true 成功
+     * @return false 失败
+     */
+    virtual bool addPosition(const PositionRecord& pr) {
+        HKU_WARN("The subclass does not implement this method");
+        return false;
+    }
+
     /** 字符串输出 */
     virtual string str() const {
         HKU_WARN("The subclass does not implement this method");
@@ -679,6 +690,14 @@ public:
      * @param path 输出文件所在目录
      */
     virtual void tocsv(const string& path) {
+        HKU_WARN("The subclass does not implement this method");
+    }
+
+    /**
+     * 从订单代理实例同步当前账户资产信息（包含资金、持仓等）
+     * @param broker 订单代理实例
+     */
+    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) {
         HKU_WARN("The subclass does not implement this method");
     }
 
