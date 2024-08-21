@@ -48,6 +48,9 @@ int main(int argc, char* argv[]) {
     stg.runDailyAt(my_process2, Datetime::now() - Datetime::today() + Seconds(20));
 
     auto t = std::thread([]() {
+        // 以线程的方式执行另一个策略
+        // 注意：同一进程内的所有 strategy 共享的是同一个上下文，
+        //       即使后续创建的 strategy 指定了新的上下文，但不会生效！！！
         Strategy stg2("stratege2");
         stg2.onChange(changed2);
         stg2.start();

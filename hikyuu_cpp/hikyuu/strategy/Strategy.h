@@ -64,7 +64,7 @@ public:
 
     /**
      * 正确数据发生变化调用，即接收到相应行情数据变更
-     * @note 通常用于调试
+     * @note 通常用于调试。且只要收到行情采集消息就会触发，不受开、闭市时间限制
      * @param stk 数据发生变化的 stock
      * @param spot 接收到的具体数据
      */
@@ -73,6 +73,7 @@ public:
     /**
      * 一批行情数据接受完毕后通知
      * @note 通常仅用于调试打印，该批行情数据中不一定含有上下文中包含的 stock
+     *       且只要收到行情采集消息就会触发，不受开、闭市时间限制。
      */
     void onReceivedSpot(std::function<void(const Datetime&)>&& recievedFucn);
 
