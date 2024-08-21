@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-12]
-        arch: [x86_64, arm64]
+        arch: [x86_64]
         kind: [shared]
 
     runs-on: ${{ matrix.os }}

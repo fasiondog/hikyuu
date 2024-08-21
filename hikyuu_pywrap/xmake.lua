@@ -33,7 +33,7 @@ target("core")
     add_includedirs("../hikyuu_cpp")
     add_files("./**.cpp")
 
-    add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
+    add_rpathdirs("$ORIGIN")
 
     on_load("windows", "linux", "macosx", function(target)
         import("lib.detect.find_tool")
