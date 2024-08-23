@@ -23,11 +23,7 @@ BrokerTradeManager::BrokerTradeManager(const OrderBrokerPtr& broker, const Trade
     m_broker_last_datetime = m_datetime;
 }
 
-void BrokerTradeManager::_reset() {
-    m_datetime = Datetime::max();
-    m_cash = 0.0;
-    m_position.clear();
-}
+void BrokerTradeManager::_reset() {}
 
 shared_ptr<TradeManagerBase> BrokerTradeManager::_clone() {
     BrokerTradeManager* p = new BrokerTradeManager();
@@ -100,13 +96,11 @@ PositionRecordList BrokerTradeManager::getPositionList() const {
 
 PositionRecord BrokerTradeManager::getPosition(const Datetime& date, const Stock& stock) {
     PositionRecord ret;
-    HKU_IF_RETURN(date < m_datetime || stock.isNull(), ret);
     auto iter = m_position.find(stock.id());
     return iter != m_position.end() ? iter->second : ret;
 }
 
 bool BrokerTradeManager::checkin(const Datetime& datetime, price_t cash) {
-    HKU_IF_RETURN(datetime < m_datetime, false);
     m_cash += cash;
     return true;
 }
@@ -118,9 +112,6 @@ TradeRecord BrokerTradeManager::buy(const Datetime& datetime, const Stock& stock
     result.business = BUSINESS_INVALID;
 
     HKU_ERROR_IF_RETURN(stock.isNull(), result, "{} Stock is Null!", datetime);
-    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
-                        "{} {} datetime must be >= lastDatetime({})!", datetime,
-                        stock.market_code(), lastDatetime());
     HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} numer is zero!", datetime,
                         stock.market_code());
     HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
@@ -166,15 +157,13 @@ TradeRecord BrokerTradeManager::buy(const Datetime& datetime, const Stock& stock
           roundEx(position.totalRisk + (realPrice - stoploss) * number * stock.unit(), precision);
     }
 
-    if (datetime > m_broker_last_datetime) {
-        list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-        for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            (*broker_iter)
-              ->buy(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
-                    from);
-            if (datetime > m_broker_last_datetime) {
-                m_broker_last_datetime = datetime;
-            }
+    list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+    for (; broker_iter != m_broker_list.end(); ++broker_iter) {
+        (*broker_iter)
+          ->buy(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
+                from);
+        if (datetime > m_broker_last_datetime) {
+            m_broker_last_datetime = datetime;
         }
     }
 
@@ -188,9 +177,6 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
     TradeRecord result;
 
     HKU_ERROR_IF_RETURN(stock.isNull(), result, "{} Stock is Null!", datetime);
-    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
-                        "{} {} datetime must be >= lastDatetime({})!", datetime,
-                        stock.market_code(), lastDatetime());
     HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} number is zero!", datetime,
                         stock.market_code());
 
@@ -243,15 +229,13 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
         m_position.erase(stock.id());
     }
 
-    if (datetime > m_broker_last_datetime) {
-        list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-        for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            (*broker_iter)
-              ->sell(datetime, stock.market(), stock.code(), realPrice, real_number, stoploss,
-                     goalPrice, from);
-            if (datetime > m_broker_last_datetime) {
-                m_broker_last_datetime = datetime;
-            }
+    list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+    for (; broker_iter != m_broker_list.end(); ++broker_iter) {
+        (*broker_iter)
+          ->sell(datetime, stock.market(), stock.code(), realPrice, real_number, stoploss,
+                 goalPrice, from);
+        if (datetime > m_broker_last_datetime) {
+            m_broker_last_datetime = datetime;
         }
     }
 
