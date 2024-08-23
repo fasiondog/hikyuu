@@ -18,7 +18,8 @@ import threading
 import hikyuu.flat as fb
 
 from hikyuu.util import *
-from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot
+from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot as qq_get_spot
+from hikyuu.fetcher.stock.zh_stock_a_qmt import get_spot as qmt_get_spot
 from hikyuu import hikyuu_init, StockManager, constant, Datetime, TimeDelta
 
 
@@ -269,13 +270,21 @@ def collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     hikyuu_init(config_file, ignore_preload=True)
 
     sm = StockManager.instance()
-    stk_list = [
-        stk.market_code.lower() for stk in sm if stk.valid and stk.type in
-        (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM,
-         constant.STOCKTYPE_START, constant.STOCKTYPE_A_BJ)
-    ]
+    if source == 'qmt':
+        stk_list = [s for s in sm if s.valid]
+    else:
+        stk_list = [
+            stk.market_code.lower() for stk in sm if stk.valid and stk.type in
+            (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM,
+             constant.STOCKTYPE_START, constant.STOCKTYPE_A_BJ)
+        ]
 
     _ = get_nng_senders()
+
+    if source == 'qmt':
+        get_spot = qmt_get_spot
+    elif source == 'qq':
+        get_spot = qq_get_spot
 
     start_time = Datetime.now()
     delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
@@ -308,7 +317,7 @@ def collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 @click.command()
 @click.option('-server', '--server', default='tcp://*:9200')
 @click.option('-use_proxy', '--use_proxy', is_flag=True, help='是否使用代理，须自行申请芝麻http代理并加入ip白名单')
-@click.option('-source', '--source', default='qq', type=click.Choice(['sina', 'qq']), help='数据来源')
+@click.option('-source', '--source', default='qq', type=click.Choice(['qmt', 'qq']), help='数据来源')
 @click.option('-seconds', '--seconds', default=10)
 @click.option('-phase1', '--phase1', default='9:00-12:00')
 @click.option('-phase2', '--phase2', default='13:00-15:00')

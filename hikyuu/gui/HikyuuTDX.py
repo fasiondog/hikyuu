@@ -81,7 +81,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.hdf5_import_thread.stop()
         if self.escape_time_thread:
             self.escape_time_thread.stop()
-        self.mp_log_q_lisener.stop()
+        if hasattr(self, 'mp_log_q_lisener'):
+            self.mp_log_q_lisener.stop()
         event.accept()
 
     def getUserConfigDir(self):

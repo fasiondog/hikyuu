@@ -227,6 +227,11 @@ public:
     void tocsv(const string& path) override {
         PYBIND11_OVERLOAD(void, TradeManagerBase, tocsv, path);
     }
+
+    void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) override {
+        PYBIND11_OVERRIDE_NAME(void, TradeManagerBase, "fetch_asset_info_from_broker",
+                               fetchAssetInfoFromBroker, broker);
+    }
 };
 
 FundsRecord (TradeManagerBase::*getFunds_1)(KQuery::KType) const = &TradeManagerBase::getFunds;
@@ -559,6 +564,8 @@ void export_TradeManager(py::module& m) {
       根据权息信息更新当前持仓及交易记录，必须按时间顺序被调用
 
       :param Datetime date: 当前时刻)")
+
+      .def("fetch_asset_info_from_broker", &TradeManagerBase::fetchAssetInfoFromBroker)
 
         DEF_PICKLE(TradeManagerPtr);
 }

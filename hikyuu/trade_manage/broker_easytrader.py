@@ -28,19 +28,18 @@ class EasyTraderOrderBroker:
                 self.buffer[code] = (old_num - num, stoploss, goal_price)
 
     def get_asset_info(self):
+        '''以下只适用于华泰'''
         balance = self.user.balance
-        cash = 0.0
-        for item in balance:
-            cash += item['可用资金']
+        cash = balance['可用金额']
 
         positions = []
         for v in self.user.position:
-            if v["交易市场"] == "沪A":
+            if v["市场类别"] == "上海Ａ":
                 market = "SH"
-            elif v["交易市场"] == "深A":
+            elif v["市场类别"] == "深圳Ａ":
                 market = "SZ"
             else:
-                hku_info(f"Ignored not supported market: {v['交易市场']}")
+                hku_info(f"Ignored not supported market: {v['市场类别']}")
                 continue
 
             code = v["证券代码"]
@@ -49,7 +48,7 @@ class EasyTraderOrderBroker:
                 stoploss, goal_price = self.buffer[market_code]
             else:
                 stoploss, goal_price = 0.0, 0.0
-            positions.append(dict(market=market, code=code, number=(
-                v['当前持仓'] + v['买入冻结'] - v['卖出冻结']), stoploss=stoploss, goal_price=goal_price))
+            positions.append(dict(market=market, code=code,
+                             number=v['可用余额'], stoploss=stoploss, goal_price=goal_price, cost_price=v['成本价']))
 
         return dict(datetime=str(Datetime.now()), cash=cash, positions=positions)

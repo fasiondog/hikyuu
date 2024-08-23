@@ -24,7 +24,6 @@ BrokerTradeManager::BrokerTradeManager(const OrderBrokerPtr& broker, const Trade
 }
 
 void BrokerTradeManager::_reset() {
-    HKU_WARN("The subclass does not implement a reset method");
     m_datetime = Datetime::max();
     m_cash = 0.0;
     m_position.clear();
@@ -50,37 +49,39 @@ void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) 
     }
 
     try {
-        json asset(brk_asset);
+        json asset = json::parse(brk_asset);
         m_datetime = asset.contains("datetime")
                        ? m_datetime = Datetime(asset["datetime"].get<string>())
                        : m_datetime = Datetime::now();
-
-        m_cash = asset["cash"];
+        m_cash = asset["cash"].get<price_t>();
 
         auto& positions = asset["positions"];
         for (auto iter = positions.cbegin(); iter != positions.cend(); ++iter) {
-            const auto& jpos = *iter;
-            auto market = jpos["market"].get<string>();
-            auto code = jpos["code"].get<string>();
-            Stock stock = getStock(fmt::format("{}{}", market, code));
-            if (stock.isNull()) {
-                HKU_WARN("Not found stock: {}{}", market, code);
-                continue;
+            try {
+                const auto& jpos = *iter;
+                auto market = jpos["market"].get<string>();
+                auto code = jpos["code"].get<string>();
+                Stock stock = getStock(fmt::format("{}{}", market, code));
+                if (stock.isNull()) {
+                    HKU_DEBUG("Not found stock: {}{}", market, code);
+                    continue;
+                }
+
+                PositionRecord pos;
+                pos.stock = stock;
+                pos.takeDatetime = m_datetime;
+                pos.number = jpos["number"].get<double>();
+                pos.stoploss = jpos["stoploss"].get<price_t>();
+                pos.goalPrice = jpos["goal_price"].get<price_t>();
+                pos.totalNumber = pos.number;
+                price_t cost_price = jpos["cost_price"].get<price_t>();
+                pos.buyMoney = pos.number * cost_price;
+                pos.totalRisk = (pos.stoploss - cost_price) * pos.number;
+                m_position[stock.id()] = pos;
+            } catch (const std::exception& e) {
+                HKU_ERROR(e.what());
             }
-
-            PositionRecord pos;
-            pos.stock = stock;
-            pos.takeDatetime = m_datetime;
-            pos.number = jpos["number"].get<double>();
-            pos.stoploss = jpos["stoploss"].get<price_t>();
-            pos.goalPrice = jpos["goal_price"].get<price_t>();
-            pos.totalNumber = pos.number;
-            price_t cost_price = jpos["cost_price"].get<price_t>();
-            pos.buyMoney = pos.number * cost_price;
-            pos.totalRisk = (pos.stoploss - cost_price) * pos.number;
-            m_position[stock.id()] = pos;
         }
-
     } catch (const std::exception& e) {
         HKU_ERROR(e.what());
     }
@@ -95,6 +96,13 @@ PositionRecordList BrokerTradeManager::getPositionList() const {
         result.push_back(iter->second);
     }
     return result;
+}
+
+PositionRecord BrokerTradeManager::getPosition(const Datetime& date, const Stock& stock) {
+    PositionRecord ret;
+    HKU_IF_RETURN(date < m_datetime || stock.isNull(), ret);
+    auto iter = m_position.find(stock.id());
+    return iter != m_position.end() ? iter->second : ret;
 }
 
 bool BrokerTradeManager::checkin(const Datetime& datetime, price_t cash) {
@@ -277,6 +285,49 @@ FundsRecord BrokerTradeManager::getFunds(KQuery::KType inktype) const {
 
 FundsRecord BrokerTradeManager::getFunds(const Datetime& datetime, KQuery::KType ktype) {
     return (datetime >= m_datetime) ? getFunds(ktype) : FundsRecord();
+}
+
+string BrokerTradeManager::str() const {
+    std::stringstream os;
+    os << std::fixed;
+    os.precision(2);
+
+    FundsRecord funds = getFunds();
+    string strip(",\n");
+    os << "BrokerTradeManager {\n"
+       << "  name: " << name() << strip << "  date: " << initDatetime() << strip
+       << "  cash: " << initCash() << strip << "  TradeCostFunc: " << costFunc() << strip
+       << "  current total funds: "
+       << funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value << strip
+       << "  current cash: " << currentCash() << strip
+       << "  current market_value: " << funds.market_value << strip << "  Position: \n";
+
+    StockManager& sm = StockManager::instance();
+    KQuery query(-1);
+    PositionRecordList position = getPositionList();
+    PositionRecordList::const_iterator iter = position.begin();
+    for (; iter != position.end(); ++iter) {
+        price_t invest = iter->buyMoney - iter->sellMoney + iter->totalCost;
+        KData k = iter->stock.getKData(query);
+        price_t cur_val = k[0].closePrice * iter->number;
+        price_t bonus = cur_val - invest;
+        DatetimeList date_list =
+          sm.getTradingCalendar(KQueryByDate(Datetime(iter->takeDatetime.date())));
+        os << "    " << iter->stock.market_code() << " " << iter->stock.name() << " "
+           << k[0].datetime << " " << date_list.size() << " " << iter->number << " " << invest
+           << " " << cur_val << " " << bonus << " " << 100 * bonus / invest << "%\n";
+    }
+
+    os << "}";
+
+    os.unsetf(std::ostream::floatfield);
+    os.precision();
+    return os.str();
+}
+
+TradeManagerPtr HKU_API crtBrokerTM(const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
+                                    const string& name) {
+    return std::make_shared<BrokerTradeManager>(broker, costfunc, name);
 }
 
 }  // namespace hku

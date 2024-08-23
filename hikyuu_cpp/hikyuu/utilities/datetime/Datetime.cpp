@@ -93,22 +93,38 @@ Datetime::Datetime(unsigned long long datetime) {
 }
 
 Datetime::Datetime(const std::string &ts) {
+    HKU_CHECK(ts.size() >= 8, "Invalid datetime str: {}", ts);
+
     std::string timeStr(ts);
     trim(timeStr);
     if ("+infinity" == timeStr) {
         m_data = bt::ptime(bd::date(bd::pos_infin), bt::time_duration(0, 0, 0));
-    } else if (timeStr.size() <= 10) {
-        auto pos1 = timeStr.rfind("-");
-        auto pos2 = timeStr.rfind("/");
+        return;
+    }
+
+    to_upper(timeStr);
+    auto pos = timeStr.find('T');
+    if (pos != std::string::npos) {
+        m_data = bt::from_iso_string(timeStr);
+        return;
+    }
+
+    pos = timeStr.find(' ');
+    auto pos1 = timeStr.find('-');
+    auto pos2 = timeStr.find('/');
+    if (pos == std::string::npos) {
         m_data = (pos1 != std::string::npos || pos2 != std::string::npos)
                    ? bt::ptime(bd::from_string(timeStr), bt::time_duration(0, 0, 0))
                    : bt::ptime(bd::from_undelimited_string(timeStr), bt::time_duration(0, 0, 0));
-    } else {
-        to_upper(timeStr);
-        auto pos = timeStr.find("T");
-        m_data =
-          (pos != std::string::npos) ? bt::from_iso_string(timeStr) : bt::time_from_string(timeStr);
+        return;
     }
+
+    auto date_str = timeStr.substr(0, pos);
+    auto time_str = timeStr.substr(pos + 1);
+    m_data =
+      (pos1 != std::string::npos || pos2 != std::string::npos)
+        ? bt::time_from_string(timeStr)
+        : bt::ptime(bd::from_undelimited_string(date_str), bt::duration_from_string(time_str));
 }
 
 bool Datetime::isNull() const {

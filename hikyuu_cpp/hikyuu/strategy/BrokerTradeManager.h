@@ -177,10 +177,7 @@ public:
      * @param date 指定日期
      * @param stock 指定的证券
      */
-    virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) {
-        HKU_WARN("The subclass does not implement this method");
-        return PositionRecord();
-    }
+    virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) override;
 
     /**
      * 获取指定证券的空头持仓记录
@@ -408,10 +405,7 @@ public:
     }
 
     /** 字符串输出 */
-    virtual string str() const {
-        HKU_WARN("The subclass does not implement this method");
-        return string();
-    }
+    virtual string str() const override;
 
     /**
      * 以csv格式输出交易记录、未平仓记录、已平仓记录、资产净值曲线
@@ -429,5 +423,9 @@ private:
     typedef map<uint64_t, PositionRecord> position_map_type;
     position_map_type m_position;  // 当前持仓交易对象的持仓记录
 };
+
+TradeManagerPtr HKU_API crtBrokerTM(const OrderBrokerPtr& broker,
+                                    const TradeCostPtr& costfunc = TC_Zero(),
+                                    const string& name = "SYS");
 
 }  // namespace hku

@@ -466,11 +466,36 @@ def realtime_update_from_tushare():
             stock.realtime_update(record)
 
 
+def realtime_update_from_qmt():
+    from xtquant import xtdata
+    code_list = [f'{s.code}.{s.market}' for s in sm if s.valid]
+    full_tick = xtdata.get_full_tick(code_list)
+    for qmt_code, data in full_tick.items():
+        try:
+            code, market = qmt_code.split(".")
+            stock = sm[f'{market}{code}']
+            record = KRecord()
+            record.datetime = Datetime(data['timetag'].split(' ')[0])
+            record.open = data['open']
+            record.high = data['high']
+            record.low = data['low']
+            record.close = data['lastPrice']
+            record.volume = data['volume'] * 0.1
+            record.amount = data['amount'] * 0.001
+            stock.realtime_update(record)
+        except Exception as e:
+            hku_error(str(e))
+        except:
+            pass
+
+
 def realtime_update_inner(source='sina'):
     if source == 'sina' or source == 'qq':
         realtime_update_from_sina_qq(source)
     elif source == 'tushare':
         realtime_update_from_tushare()
+    elif source == 'qmt':
+        realtime_update_from_qmt()
     else:
         print(source, ' not support!')
 
@@ -482,13 +507,13 @@ def realtime_update_wrap():
         """
         更新实时日线数据
         参数：
-            source: 数据源（'sina' | 'qq' | 'tushare'）
+            source: 数据源（'qq' | 'qmt' | 'tushare' | 'sina'）
             delta: 更新间隔时间
         """
         from datetime import timedelta, datetime
         nonlocal pre_update_time
         now_update_time = datetime.now()
-        if (pre_update_time is None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
+        if (source == 'qmt') or (pre_update_time is None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
             realtime_update_inner(source)
             pre_update_time = datetime.now()
             print("更新完毕！", pre_update_time)

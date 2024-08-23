@@ -177,7 +177,7 @@ PF调仓周期买入信号指示器
             p._x = self._x
             return p
         
-        def _calculate(self):
+        def _calculate(self, k):
             self._addBuySignal(Datetime(201201210000))
             self._addSellSignal(Datetime(201201300000))
 
