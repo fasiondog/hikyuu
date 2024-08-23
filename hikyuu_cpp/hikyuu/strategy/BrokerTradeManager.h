@@ -75,7 +75,7 @@ public:
      * @note 如果不带日期参数，无法根据权息信息调整持仓
      */
     virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override {
-        return (datetime >= m_datetime) ? currentCash() : 0.0;
+        return m_cash;
     }
 
     /**
