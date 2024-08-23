@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/strategy/Strategy.h>
+#include <hikyuu/strategy/BrokerTradeManager.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -89,4 +90,7 @@ void export_Strategy(py::module& m) {
             self.runDailyAt(new_func, time, ignore_holiday);
         },
         py::arg("func"), py::arg("time"), py::arg("ignore_holiday") = true);
+
+    m.def("crtBrokerTM", crtBrokerTM, py::arg("broker"), py::arg("cost_func") = TC_Zero(),
+          py::arg("name") = "SYS");
 }
