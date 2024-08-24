@@ -8,12 +8,13 @@
 #pragma once
 
 #include <future>
-#include "../DataType.h"
-#include "../StrategyContext.h"
-#include "../global/SpotRecord.h"
-#include "../utilities/thread/FuncWrapper.h"
-#include "../utilities/thread/ThreadSafeQueue.h"
-#include "../trade_sys/portfolio/Portfolio.h"
+#include "hikyuu/DataType.h"
+#include "hikyuu/StrategyContext.h"
+#include "hikyuu/global/SpotRecord.h"
+#include "hikyuu/utilities/thread/FuncWrapper.h"
+#include "hikyuu/utilities/thread/ThreadSafeQueue.h"
+#include "hikyuu/trade_sys/portfolio/Portfolio.h"
+#include "BrokerTradeManager.h"
 
 namespace hku {
 
@@ -128,5 +129,11 @@ private:
 };
 
 typedef shared_ptr<Strategy> StrategyPtr;
+
+void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
+                           const OrderBrokerPtr& broker, const TradeCostPtr& costFunc);
+
+void HKU_API runInstrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
+                           const OrderBrokerPtr& broker, const TradeCostPtr& costFunc);
 
 }  // namespace hku

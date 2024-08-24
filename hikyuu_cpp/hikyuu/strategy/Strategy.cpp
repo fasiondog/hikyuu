@@ -261,4 +261,32 @@ void Strategy::_startEventLoop() {
     }
 }
 
+void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
+                           const OrderBrokerPtr& broker, const TradeCostPtr& costFunc) {
+    HKU_ASSERT(sys && broker && costFunc);
+    HKU_ASSERT(!stk.isNull());
+    HKU_ASSERT(query != Null<KQuery>());
+    auto tm = crtBrokerTM(broker, costFunc, sys->name());
+    sys->setTM(tm);
+    sys->setSP(SlippagePtr());  // 清除移滑价差算法
+    sys->run(stk, query);
+}
+
+void HKU_API runInstrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
+                           const OrderBrokerPtr& broker, const TradeCostPtr& costFunc) {
+    HKU_ASSERT(pf && broker && costFunc);
+    HKU_ASSERT(query != Null<KQuery>());
+
+    auto se = pf->getSE();
+    HKU_ASSERT(se);
+    const auto& sys_list = se->getProtoSystemList();
+    for (const auto& sys : sys_list) {
+        HKU_CHECK(!sys->getSP(), "Exist Slippage part in sys, You must clear it! {}", sys->name());
+    }
+
+    auto tm = crtBrokerTM(broker, costFunc, pf->name());
+    pf->setTM(tm);
+    pf->run(query, adjust_cycle, true);
+}
+
 }  // namespace hku
