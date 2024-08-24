@@ -93,4 +93,15 @@ void export_Strategy(py::module& m) {
 
     m.def("crtBrokerTM", crtBrokerTM, py::arg("broker"), py::arg("cost_func") = TC_Zero(),
           py::arg("name") = "SYS");
+
+    m.def("run_in_strategy",
+          py::overload_cast<const SYSPtr&, const Stock&, const KQuery&, const OrderBrokerPtr&,
+                            const TradeCostPtr&>(runInStrategy),
+          py::arg("sys"), py::arg("stock"), py::arg("query"), py::arg("broker"),
+          py::arg("cost_func"));
+    m.def("run_in_strategy",
+          py::overload_cast<const PFPtr&, const KQuery&, int, const OrderBrokerPtr&,
+                            const TradeCostPtr&>(runInStrategy),
+          py::arg("pf"), py::arg("query"), py::arg("adjust_cycle"), py::arg("broker"),
+          py::arg("cost_func"));
 }
