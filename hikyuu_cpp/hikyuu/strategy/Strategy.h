@@ -131,9 +131,9 @@ private:
 typedef shared_ptr<Strategy> StrategyPtr;
 
 void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
-                           const OrderBrokerPtr& broker, const TradeCostPtr& costFunc);
+                           const OrderBrokerPtr& broker, const TradeCostPtr& costfunc);
 
-void HKU_API runInstrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
-                           const OrderBrokerPtr& broker, const TradeCostPtr& costFunc);
+void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
+                           const OrderBrokerPtr& broker, const TradeCostPtr& costfunc);
 
 }  // namespace hku
