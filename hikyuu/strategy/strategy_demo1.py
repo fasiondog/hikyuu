@@ -2,8 +2,7 @@
 # -*- coding: utf8 -*-
 # cp936
 
-import easytrader
-from hikyuu import Strategy, Query, Datetime, TimeDelta, Seconds, Minutes
+from hikyuu import Strategy, Query, Datetime, Seconds, Minutes
 from hikyuu import sm
 
 
