@@ -38,28 +38,40 @@ Python中的订单代理包装
 
 .. py:class:: OrderBrokerWrap
 
-    订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
+    用于包装 python 中订单代理包装类，这样 python 中的代理类无需从 OrderBrokerBase 继承，只需包含 buy, sell, get_asset_info 方法的实现即可。此类 python 代理类需要使用 crtOB 进行包装后, 才可供 c++ 调用。
 
     .. py:method:: __init__(self, broker, name)
 
         :param broker: python broker 实例
         :param str name: 名称
 
-    .. py:method:: _buy(self, code, price, num)
+    .. py:method:: _buy(self, market, code, price, num, stoploss, goal_price, part_from)
     
         包装 Python 变量的 buy 方法
         
+        :param str market: 证券市场 "SH" | "SZ"
         :param str code: 证券代码
         :param float price: 买入价格
-        :param int num: 买入数量
+        :param float num: 买入数量
+        :param float stoploss: 计划止损价
+        :param float goal_price: 计划盈利目标价
+        :param SystemPart part_from: 信号来源
 
-    .. py:method:: _sell(self, code, price, num)
+    .. py:method:: _sell(self, market, code, price, num, stoploss, goal_price, part_from)
     
         包装 Python 变量的 sell 方法
         
+        :param str market: 证券市场
         :param str code: 证券代码
         :param float price: 卖出价格
-        :param int num: 卖出数量
+        :param float num: 卖出数量
+        :param float stoploss: 计划止损价
+        :param float goal_price: 计划盈利目标价
+        :param SystemPart part_from: 信号来源
+
+    .. py:method:: _get_asset_info(self)
+
+        详情参见 :py:meth:`OrderBrokerBase._get_asset_info`
                         
 
 .. py:function:: crtOB(broker[, name="NO_NAME"]) 
@@ -90,29 +102,36 @@ Python中的订单代理包装
         :param str pwd: 密码
         :param list receivers: 接受者邮箱列表
 
-    .. py:method:: buy(self, code, price, num)
+    .. py:method:: buy(self, market, code, price, num)
     
         执行买入操作，向指定的邮箱发送邮件，格式如下:
         
             邮件标题：【Hkyuu提醒】买入 证券代码
             邮件内容：买入：证券代码，价格：买入的价格，数量：买入数量
         
+        :param str market: 证券市场
         :param str code: 证券代码
         :param float price: 买入价格
-        :param int num: 买入数量
+        :param float num: 买入数量
+        :param float stoploss: 计划止损价
+        :param float goal_price: 计划盈利目标价
+        :param SystemPart part_from: 信号来源
         
         
-    .. py:method:: sell(self, code, price, num)
+    .. py:method:: sell(self, market, code, price, num)
     
         执行卖出操作，向指定的邮箱发送邮件，格式如下:
         
             邮件标题：【Hkyuu提醒】卖出 证券代码
             邮件内容：卖出：证券代码，价格：卖出的价格，数量：卖出数量
     
+        :param str market: 证券市场
         :param str code: 证券代码
         :param float price: 卖出价格
-        :param int num: 卖出数量
-        
+        :param float num: 卖出数量
+        :param float stoploss: 计划止损价
+        :param float goal_price: 计划盈利目标价
+        :param SystemPart part_from: 信号来源        
    
 
 订单代理基类
@@ -124,6 +143,7 @@ Python中非必须使用 OrderBrokerBase 来实现自定义的订单代理。只
 
 * :py:meth:`OrderBrokerBase._buy` - 【必须】执行实际买入操作
 * :py:meth:`OrderBrokerBase._sell` - 【必须】执行实际卖出操作
+* :py:meth:`OrderBrokerBase._get_asset_info` - 【可选】返回当前资产信息，如需在 Strategy 中使用 sys/pf，需要实现该接口
 
 
 .. py:class:: OrderBrokerBase
@@ -138,38 +158,71 @@ Python中非必须使用 OrderBrokerBase 来实现自定义的订单代理。只
         
         :param str name: 代理名称
         
-    .. py:method:: buy(self, code, price, num)
+    .. py:method:: buy(self, market, code, price, num, stoploss, goal_price, part_from)
 
         执行买入操作
     
+        :param str market: 证券市场
         :param str code: 证券代码
         :param float price: 买入价格
-        :param int num: 买入数量
+        :param float num: 买入数量
+        :param float stoploss: 计划止损价
+        :param float goal_price: 计划盈利目标价
+        :param SystemPart part_from: 信号来源
         :return: 买入操作的执行时刻
         :rtype: Datetime
         
-    .. py:method:: sell(self, code, price, num)
+    .. py:method:: sell(self, market, code, price, num, stoploss, goal_price, part_from)
     
         执行买入操作
     
+        :param str market: 证券市场
         :param str code: 证券代码
-        :param float price: 买入价格
-        :param int num: 买入数量
+        :param float price: 卖出价格
+        :param float num: 卖出数量
+        :param float stoploss: 计划止损价
+        :param float goal_price: 计划盈利目标价
+        :param SystemPart part_from: 信号来源        
         :return: 卖出操作的执行时刻
         :rtype: Datetime
 
-    .. py:method:: _buy(self, code, price, num)
+    .. py:method:: _buy(self, market, code, price, num, stoploss, goal_price, part_from)
 
         【重载接口】执行实际买入操作
     
         :param str code: 证券代码
         :param float price: 买入价格
-        :param int num: 买入数量
+        :param float num: 买入数量
+        :param float stoploss: 计划止损价
+        :param float goal_price: 计划盈利目标价
+        :param SystemPart part_from: 信号来源        
         
-    .. py:method:: _sell(self, code, price, num)
+    .. py:method:: _sell(self, market, code, price, num, stoploss, goal_price, part_from)
     
         【重载接口】执行实际买入操作
     
+        :param str market: 证券市场    
         :param str code: 证券代码
-        :param float price: 买入价格
-        :param int num: 买入数量
+        :param float price: 卖出价格
+        :param float num: 卖出数量
+        :param float stoploss: 计划止损价
+        :param float goal_price: 计划盈利目标价
+        :param SystemPart part_from: 信号来源
+
+    .. py:method:: _get_asset_info(self)
+
+        【子类接口】获取当前资产信息，子类需返回符合如下规范的 json 字符串::
+
+            {
+                "datetime": "2001-01-01 18:00:00.12345",
+                "cash": 0.0,
+                "positions": [
+                    {"market": "SZ", "code": "000001", "number": 100.0, "stoploss": 0.0, "goal_price": 0.0,
+                    "cost_price": 0.0},
+                    {"market": "SH", "code": "600001", "number": 100.0, "stoploss": 0.0, "goal_price": 0.0,
+                    "cost_price": 0.0},
+                ]
+            }    
+
+        :return: 以字符串（json格式）方式返回当前资产信息
+        :rtype: str    
