@@ -48,11 +48,11 @@ class OrderBrokerWrap(OrderBrokerBase):
 
     def _buy(self, datetime, market, code, price, num, stoploss, goal_price, part_from):
         """实现 OrderBrokerBase 的 _buy 接口"""
-        self._broker.buy('{}{}'.format(market, code), price, num, stoploss, goal_price, part_from)
+        self._broker.buy(market, code, price, num, stoploss, goal_price, part_from)
 
     def _sell(self, datetime, market, code, price, num, stoploss, goal_price, part_from):
         """实现 OrderBrokerBase 的 _sell 接口"""
-        self._broker.sell('{}{}'.format(market, code), price, num, stoploss, goal_price, part_from)
+        self._broker.sell(market, code, price, num, stoploss, goal_price, part_from)
 
     def _get_asset_info(self):
         try:
@@ -71,11 +71,11 @@ class TestOrderBroker:
     def __init__(self):
         pass
 
-    def buy(self, code, price, num, stoploss, goal_price, part_from):
-        print(f"买入：{code}, 价格: {price}, 数量: {num} 预期止损价: {stoploss}, 预期目标价: {goal_price}, 信号来源: {part_from}")
+    def buy(self, market, code, price, num, stoploss, goal_price, part_from):
+        print(f"买入：{market}{code}, 价格: {price}, 数量: {num} 预期止损价: {stoploss}, 预期目标价: {goal_price}, 信号来源: {part_from}")
 
-    def sell(self, code, price, num, stoploss, goal_price, part_from):
-        print(f"卖出：{code}, 价格: {price}, 数量: {num}, 信号来源: {part_from}")
+    def sell(self, market, code, price, num, stoploss, goal_price, part_from):
+        print(f"卖出：{market}{code}, 价格: {price}, 数量: {num}, 信号来源: {part_from}")
 
 
 def crtOB(broker, name="NO_NAME"):

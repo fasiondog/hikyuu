@@ -58,21 +58,25 @@ void export_Strategy(py::module& m) {
                };
                self.onReceivedSpot(new_func);
            })
-      .def("run_daily",
-           [](Strategy& self, py::object func, const TimeDelta& time) {
-               HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
-               py::object c_func = func.attr("__call__");
-               auto new_func = [=]() {
-                   try {
-                       c_func();
-                   } catch (const std::exception& e) {
-                       HKU_ERROR(e.what());
-                   } catch (...) {
-                       HKU_ERROR("Unknown error!");
-                   }
-               };
-               self.runDaily(new_func, time);
-           })
+      .def(
+        "run_daily",
+        [](Strategy& self, py::object func, const TimeDelta& time, std::string market,
+           bool ignore_market) {
+            HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
+            py::object c_func = func.attr("__call__");
+            auto new_func = [=]() {
+                try {
+                    c_func();
+                } catch (const std::exception& e) {
+                    HKU_ERROR(e.what());
+                } catch (...) {
+                    HKU_ERROR("Unknown error!");
+                }
+            };
+            self.runDaily(new_func, time, market, ignore_market);
+        },
+        py::arg("func"), py::arg("time"), py::arg("market") = "SH",
+        py::arg("ignore_market") = false)
       .def(
         "run_daily_at",
         [](Strategy& self, py::object func, const TimeDelta& time, bool ignore_holiday) {

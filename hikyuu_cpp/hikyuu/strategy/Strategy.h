@@ -50,9 +50,10 @@ public:
      * @param func 待执行的任务
      * @param delta 间隔时间
      * @param market 指定的市场
+     * @param ignoreMarket 是否忽略市场时间限制，如为 true，则为定时循环不受开闭市时间限制
      */
     void runDaily(std::function<void()>&& func, const TimeDelta& delta,
-                  const std::string& market = "SH");
+                  const std::string& market = "SH", bool ignoreMarket = false);
 
     /**
      * 每日在指定时刻执行任务
@@ -89,11 +90,20 @@ private:
     StrategyContext m_context;
     std::function<void(const Datetime&)> m_on_recieved_spot;
     std::function<void(const Stock&, const SpotRecord& spot)> m_on_change;
-    bool m_running{false};
+
+    std::function<void()> m_run_daily_func;
+    TimeDelta m_run_daily_delta;
+    string m_run_daily_market;
+    bool m_ignoreMarket{false};
+
+    std::function<void()> m_run_daily_at_func;
+    TimeDelta m_run_daily_at_delta;
 
 private:
-    void run();
-    void receivedSpot(const SpotRecord& spot);
+    void _init();
+    void _receivedSpot(const SpotRecord& spot);
+    void _runDaily();
+    void _runDailyAt();
 
 private:
     static std::atomic_bool ms_keep_running;
