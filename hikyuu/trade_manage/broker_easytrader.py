@@ -8,18 +8,23 @@ from hikyuu import Datetime, hku_info
 
 
 class EasyTraderOrderBroker:
+    '''
+    使用华泰客户端实例
+    注意：buy|sell 中已屏蔽实际通过easytrade下单，防止调试误操作，请自行根据需要打开
+    '''
+
     def __init__(self, user):
         self.user = user
         self.buffer = {}
 
     def buy(self, market, code, price, num, stoploss, goal_price, part_from):
-        self.user.buy(code, price=price, amount=num)
+        # self.user.buy(code, price=price, amount=num)
         market_code = f"{market}{code}"
         print(f"计划买入：{market_code}  {price}  {num}")
         self.buffer[market_code] = (num, stoploss, goal_price)
 
     def sell(self, market, code, price, num, stoploss, goal_price, part_from):
-        self.user.sell(code, price=price, amount=num)
+        # self.user.sell(code, price=price, amount=num)
         market_code = f"{market}{code}"
         print(f"计划卖出：{market_code}  {price}  {num}")
         if market_code in self.buffer:
