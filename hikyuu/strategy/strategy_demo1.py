@@ -2,6 +2,11 @@
 # -*- coding: utf8 -*-
 # cp936
 
+#
+# 警告：Hikyuu 为量化研究工具，本身不包含程序化交易接口。此部分仅为策略调度运行时示例，
+#      供自行实现程序化交易时参考，请自行负责程序化交易可能造成的损失。
+#
+
 from hikyuu import Strategy, Query, Datetime, Seconds, Minutes
 from hikyuu import sm
 

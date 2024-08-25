@@ -60,21 +60,22 @@ void RunSystemInStrategy::run(const Stock& stock) {
     }
 }
 
-StrategyPtr HKU_API crtSysStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
-                                   const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
-                                   const string& name, const string& config_file) {
+StrategyPtr HKU_API crtSysStrategy(const SYSPtr& sys, const string& stk_market_code,
+                                   const KQuery& query, const OrderBrokerPtr& broker,
+                                   const TradeCostPtr& costfunc, const string& name,
+                                   const string& config_file) {
     std::shared_ptr<RunSystemInStrategy> runner =
       std::make_shared<RunSystemInStrategy>(sys, broker, query, costfunc);
 
-    std::function<void()> func = [=]() { runner->run(stk); };
+    std::function<void()> func = [=]() { runner->run(getStock(stk_market_code)); };
 
     KQuery::KType ktype = query.kType();
-    StrategyPtr stg = std::make_shared<Strategy>(vector<string>{stk.market_code()},
+    StrategyPtr stg = std::make_shared<Strategy>(vector<string>{stk_market_code, "SH000001"},
                                                  vector<KQuery::KType>{ktype}, name, config_file);
 
     int32_t m = KQuery::getKTypeInMin(ktype);
     if (m < KQuery::getKTypeInMin(KQuery::DAY)) {
-        stg->runDaily(std::move(func), Minutes(m), stk.market());
+        stg->runDaily(std::move(func), Minutes(m), "SH");
     } else {
         stg->runDailyAt(std::move(func), TimeDelta(0, 14, 50));
     }

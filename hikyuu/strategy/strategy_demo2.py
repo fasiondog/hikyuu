@@ -1,13 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
-# cp936
 
 import easytrader
 from hikyuu import *
 
+#
+# 警告：Hikyuu 为量化研究工具，本身不包含程序化交易接口。此部分仅为策略调度运行时示例，
+#      供自行实现程序化交易时参考，请自行负责程序化交易可能造成的损失。
+#
 
 # 创建 easytrade 订单代理（示例仅支持华泰）可自行参照 EasyTraderOrderBroker 修改
-# buy|sell 中已屏蔽实际通过easytrade下单，防止调试误操作，请自行根据需要打开
+# buy|sell 中已屏蔽实际通过easytrade下单，防止调试误操作
 user = easytrader.use('ht_client')
 user.connect(r'D:\htwt\xiadan.exe')
 easy_ob = EasyTraderOrderBroker(user)
@@ -22,6 +25,8 @@ sys.set_param("sell_delay", False)
 
 # 执行策略主体
 def my_func():
+    # 这里示例使用的是 TC_Zero() 零成本算法，但实际建议使用接近实际的成本算法
+    # 因为 sys 不依赖于成交单中的实际成本，而是使用成本算法预算需要买入的数量
     run_in_strategy(sys, sm['sz000001'], Query(Datetime(20240101)), broker, TC_Zero())
 
 
@@ -38,3 +43,5 @@ if __name__ == '__main__':
     # 每交易日 14点55分 执行
     s.run_daily_at(my_func, TimeDelta(0, 14, 55))
     s.start()
+
+    # 上述，也可以参见 strategy_demo3.py 中使用 crt_sys_strategy 快捷创建 strategy
