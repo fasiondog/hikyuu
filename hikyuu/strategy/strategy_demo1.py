@@ -25,9 +25,14 @@ def my_func2():
         print(s)
 
 
-# 注意：每一个Strategy 只能作为独立进程执行，即 python xxx.py 的方式执行！
-# 以 Strategy 方式运行示例
+# 注意：
+#   1.每一个Strategy 只能作为独立进程执行，即 python xxx.py 的方式执行！
+#   2.请开启 HikyuuTdx 行情采集，否则接收不到数据
+# Strategy 方式运行示例
 if __name__ == '__main__':
+    # 创建策略运行时，必须指定 stock 和 ktype 列表
+    # strategy 只会加载指定的 stock, ktype 的数据，行情接收也只会更新这些数据
+    # 如需使用交易日历，请记得同时指定 sh000001
     s = Strategy(['sh600000', 'sz000001'],  [Query.MIN, Query.DAY])
 
     # 当前自动10秒后执行，忽略节假日限制
