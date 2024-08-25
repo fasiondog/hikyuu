@@ -8,20 +8,25 @@ from hikyuu import Datetime, hku_info
 
 
 class EasyTraderOrderBroker:
+    '''
+    使用华泰客户端实例
+    注意：buy|sell 中已屏蔽实际通过easytrade下单，防止调试误操作，请自行根据需要打开
+    '''
+
     def __init__(self, user):
         self.user = user
         self.buffer = {}
 
     def buy(self, market, code, price, num, stoploss, goal_price, part_from):
-        self.user.buy(code, price=price, amount=num)
+        # self.user.buy(code, price=price, amount=num)
         market_code = f"{market}{code}"
-        print(f"买入：{market_code}  {price}  {num}")
+        print(f"计划买入：{market_code}  {price}  {num}")
         self.buffer[market_code] = (num, stoploss, goal_price)
 
     def sell(self, market, code, price, num, stoploss, goal_price, part_from):
-        self.user.sell(code, price=price, amount=num)
+        # self.user.sell(code, price=price, amount=num)
         market_code = f"{market}{code}"
-        print(f"卖出：{market_code}  {price}  {num}")
+        print(f"计划卖出：{market_code}  {price}  {num}")
         if market_code in self.buffer:
             old_num = self.buffer[market_code][0]
             if old_num == num:
@@ -53,4 +58,6 @@ class EasyTraderOrderBroker:
             positions.append(dict(market=market, code=code,
                              number=v['可用余额'], stoploss=stoploss, goal_price=goal_price, cost_price=v['成本价']))
 
-        return dict(datetime=str(Datetime.now()), cash=cash, positions=positions)
+        ret = dict(datetime=str(Datetime.now()), cash=cash, positions=positions)
+        print(ret)
+        return ret

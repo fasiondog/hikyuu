@@ -60,30 +60,12 @@ void export_OrderBroker(py::module& m) {
                     py::overload_cast<const string&>(&OrderBrokerBase::name),
                     py::return_value_policy::copy, "名称（可读写）")
 
-      .def("buy", &OrderBrokerBase::buy, R"(buy(self, datetime, market, code, price, num)
-
-    执行买入操作
-
-    :param Datetime datetime: 策略指示时间
-    :param str market: 市场标识
-    :param str code: 证券代码
-    :param float price: 买入价格
-    :param float num: 买入数量)")
-
-      .def("sell", &OrderBrokerBase::sell, R"(sell(self, datetime, market, code, price, num)
-
-    执行卖出操作
-
-    :param Datetime datetime: 策略指示时间
-    :param str market: 市场标识
-    :param str code: 证券代码
-    :param float price: 卖出价格
-    :param float num: 卖出数量)")
-
-      .def("get_asset_info", &OrderBrokerBase::getAssetInfo)
+      .def("buy", &OrderBrokerBase::buy, "详情见子类实现接口: _buy")
+      .def("sell", &OrderBrokerBase::sell, "详情见子类实现接口: _sell")
+      .def("get_asset_info", &OrderBrokerBase::getAssetInfo, "详情见子类实现接口: _get_asset_info")
 
       .def("_buy", &OrderBrokerBase::_buy,
-           R"(_buy(self, datetime, market, code, price, num)
+           R"(_buy(self, datetime, market, code, price, num, stoploss, goal_price, part_from)
 
     【子类接口】执行买入操作
 
@@ -91,10 +73,13 @@ void export_OrderBroker(py::module& m) {
     :param str market: 市场标识
     :param str code: 证券代码
     :param float price: 买入价格
-    :param float num: 买入数量)")
+    :param float num: 买入数量
+    :param float stoploss: 计划止损价
+    :param float goal_price: 计划盈利目标价
+    :param SystemPart part_from: 信号来源)")
 
       .def("_sell", &OrderBrokerBase::_sell,
-           R"(_sell(self, datetime, market, code, price, num)
+           R"(_sell(self, datetime, market, code, price, num, stoploss, goal_price, part_from)
 
     【子类接口】执行卖出操作
 
@@ -102,7 +87,26 @@ void export_OrderBroker(py::module& m) {
     :param str market: 市场标识
     :param str code: 证券代码
     :param float price: 卖出价格
-    :param float num: 卖出数量)")
+    :param float num: 卖出数量
+    :param float stoploss: 计划止损价
+    :param float goal_price: 计划盈利目标价
+    :param SystemPart part_from: 信号来源)")
 
-      .def("_get_asset_info", &OrderBrokerBase::_getAssetInfo);
+      .def("_get_asset_info", &OrderBrokerBase::_getAssetInfo, R"(_get_asset_info(self)
+
+    【子类接口】获取当前资产信息，子类需返回符合如下规范的 json 字符串:
+
+    {
+        "datetime": "2001-01-01 18:00:00.12345",
+        "cash": 0.0,
+        "positions": [
+            {"market": "SZ", "code": "000001", "number": 100.0, "stoploss": 0.0, "goal_price": 0.0,
+             "cost_price": 0.0},
+            {"market": "SH", "code": "600001", "number": 100.0, "stoploss": 0.0, "goal_price": 0.0,
+             "cost_price": 0.0},
+         ]
+    }    
+
+    :return: 以字符串（json格式）方式返回当前资产信息
+    :rtype: str)");
 }

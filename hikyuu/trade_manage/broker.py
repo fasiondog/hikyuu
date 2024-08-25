@@ -47,7 +47,13 @@ class OrderBrokerWrap(OrderBrokerBase):
         self._broker = broker
 
     def _buy(self, datetime, market, code, price, num, stoploss, goal_price, part_from):
-        """实现 OrderBrokerBase 的 _buy 接口"""
+        """
+        实现 OrderBrokerBase 的 _buy 接口
+        :param str market: 证券市场    
+        :param str code: 证券代码
+        :param float price: 买入价格
+        :param int num: 买入数量        
+        """
         self._broker.buy(market, code, price, num, stoploss, goal_price, part_from)
 
     def _sell(self, datetime, market, code, price, num, stoploss, goal_price, part_from):
