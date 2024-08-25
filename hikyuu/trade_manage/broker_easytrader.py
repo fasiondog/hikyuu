@@ -12,20 +12,22 @@ class EasyTraderOrderBroker:
         self.user = user
         self.buffer = {}
 
-    def buy(self, code, price, num, stoploss, goal_price, part_from):
-        self.user.buy(code[2:], price=price, amount=num)
-        print("买入：%s  %.3f  %i" % (code, price, num))
-        self.buffer[code] = (num, stoploss, goal_price)
+    def buy(self, market, code, price, num, stoploss, goal_price, part_from):
+        self.user.buy(code, price=price, amount=num)
+        market_code = f"{market}{code}"
+        print(f"买入：{market_code}  {price}  {num}")
+        self.buffer[market_code] = (num, stoploss, goal_price)
 
-    def sell(self, code, price, num, stoploss, goal_price, part_from):
-        self.user.sell(code[2:], price=price, amount=num)
-        print("卖出：%s  %.3f  %i" % (code, price, num))
-        if code in self.buffer:
-            old_num = self.buffer[code][0]
+    def sell(self, market, code, price, num, stoploss, goal_price, part_from):
+        self.user.sell(code, price=price, amount=num)
+        market_code = f"{market}{code}"
+        print(f"卖出：{market_code}  {price}  {num}")
+        if market_code in self.buffer:
+            old_num = self.buffer[market_code][0]
             if old_num == num:
-                self.buffer.pop(code)
+                self.buffer.pop(market_code)
             else:
-                self.buffer[code] = (old_num - num, stoploss, goal_price)
+                self.buffer[market_code] = (old_num - num, stoploss, goal_price)
 
     def get_asset_info(self):
         '''以下只适用于华泰'''
