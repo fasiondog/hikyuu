@@ -19,8 +19,12 @@
 namespace hku {
 
 /**
- * @brief 策略运行时
  * @ingroup Stratgy
+ * @{
+ */
+
+/**
+ * @brief 策略运行时
  */
 class HKU_API Strategy {
     CLASS_LOGGER_IMP(Strategy)
@@ -140,10 +144,29 @@ private:
 
 typedef shared_ptr<Strategy> StrategyPtr;
 
+/**
+ * @brief 在策略运行时中执行系统交易 SYS
+ * @note 目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
+ * @param sys 交易系统
+ * @param stk 交易对象
+ * @param query 查询条件
+ * @param broker 订单代理
+ * @param costfunc 成本函数
+ */
 void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
                            const OrderBrokerPtr& broker, const TradeCostPtr& costfunc);
 
+/**
+ * @brief 在策略运行时中执行组合策略 PF
+ * @note 目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
+ * @param pf 资产组合
+ * @param query 查询条件
+ * @param adjust_cycle 调仓周期
+ * @param broker 订单代理
+ * @param costfunc 成本函数
+ */
 void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
                            const OrderBrokerPtr& broker, const TradeCostPtr& costfunc);
 
+/** @} */
 }  // namespace hku
