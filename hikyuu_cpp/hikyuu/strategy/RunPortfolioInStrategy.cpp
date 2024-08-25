@@ -13,7 +13,7 @@ namespace hku {
 RunPortfolioInStrategy::RunPortfolioInStrategy(const PFPtr& pf, const KQuery& query,
                                                int adjust_cycle, const OrderBrokerPtr& broker,
                                                const TradeCostPtr& costfunc)
-: m_pf(pf), m_adjust_cycle(adjust_cycle), m_broker(broker) {
+: m_pf(pf), m_broker(broker), m_adjust_cycle(adjust_cycle) {
     HKU_ASSERT(pf && broker);
 
     if (query.queryType() == KQuery::INDEX) {

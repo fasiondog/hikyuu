@@ -25,7 +25,7 @@ private:
     PFPtr m_pf;
     OrderBrokerPtr m_broker;
     KQuery m_query;
-    int m_adjust_cycle;
+    int m_adjust_cycle = 1;
 };
 
 StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
