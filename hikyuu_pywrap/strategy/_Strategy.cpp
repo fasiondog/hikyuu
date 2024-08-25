@@ -7,6 +7,7 @@
 
 #include <hikyuu/strategy/Strategy.h>
 #include <hikyuu/strategy/BrokerTradeManager.h>
+#include <hikyuu/strategy/RunSystemInStrategy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -20,6 +21,8 @@ void export_Strategy(py::module& m) {
                     const std::string&>(),
            py::arg("code_list"), py::arg("ktype_list"), py::arg("name") = "Strategy",
            py::arg("config") = "")
+      .def(py::init<const StrategyContext&, const string&, const string&>(), py::arg("context"),
+           py::arg("name") = "Strategy", py::arg("config") = "")
       .def_property("name", py::overload_cast<>(&Strategy::name, py::const_),
                     py::overload_cast<const string&>(&Strategy::name),
                     py::return_value_policy::copy, "策略名称")
@@ -108,4 +111,8 @@ void export_Strategy(py::module& m) {
                             const TradeCostPtr&>(runInStrategy),
           py::arg("pf"), py::arg("query"), py::arg("adjust_cycle"), py::arg("broker"),
           py::arg("cost_func"));
+
+    m.def("crt_sys_strategy", crtSysStrategy, py::arg("sys"), py::arg("stk_market_code"),
+          py::arg("query"), py::arg("broker"), py::arg("cost_func"),
+          py::arg("name") = "SYSStrategy", py::arg("config") = "");
 }
