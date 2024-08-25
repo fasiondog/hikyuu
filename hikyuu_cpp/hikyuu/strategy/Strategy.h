@@ -34,6 +34,8 @@ public:
     explicit Strategy(const string& name, const string& config_file = "");
     Strategy(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
              const string& name = "Strategy", const string& config_file = "");
+    explicit Strategy(const StrategyContext& context, const string& name = "Strategy",
+                      const string& config_file = "");
 
     virtual ~Strategy();
 

@@ -57,6 +57,11 @@ Strategy::Strategy(const vector<string>& codeList, const vector<KQuery::KType>& 
     m_context.setKTypeList(ktypeList);
 }
 
+Strategy::Strategy(const StrategyContext& context, const string& name, const string& config_file)
+: Strategy(name, config_file) {
+    m_context = m_context;
+}
+
 Strategy::~Strategy() {
     ms_keep_running = false;
     CLS_INFO("Quit Strategy {}!", m_name);

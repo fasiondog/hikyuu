@@ -22,6 +22,9 @@ public:
     explicit StrategyContext(vector<string>&& stockCodeList)
     : m_stockCodeList(std::move(stockCodeList)) {}
 
+    StrategyContext(const vector<string>& stockCodeList, const vector<KQuery::KType>& ktypeList)
+    : m_stockCodeList(stockCodeList), m_ktypeList(ktypeList) {}
+
     virtual ~StrategyContext() = default;
 
     bool isAll() const noexcept;

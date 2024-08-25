@@ -20,6 +20,8 @@ void export_Strategy(py::module& m) {
                     const std::string&>(),
            py::arg("code_list"), py::arg("ktype_list"), py::arg("name") = "Strategy",
            py::arg("config") = "")
+      .def(py::init<const StrategyContext&, const string&, const string&>(), py::arg("context"),
+           py::arg("name") = "Strategy", py::arg("config") = "")
       .def_property("name", py::overload_cast<>(&Strategy::name, py::const_),
                     py::overload_cast<const string&>(&Strategy::name),
                     py::return_value_policy::copy, "策略名称")
