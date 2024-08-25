@@ -74,6 +74,17 @@ void Strategy::_init() {
 
         // 初始化
         hikyuu_init(m_config_file, false, m_context);
+
+        // 对上下文中的K线类型和其预加载参数进行检查，并给出警告
+        const auto& ktypes = m_context.getKTypeList();
+        const auto& preload_params = sm.getPreloadParameter();
+        for (const auto& ktype : ktypes) {
+            std::string low_ktype = ktype;
+            to_lower(low_ktype);
+            HKU_ERROR_IF(!preload_params.tryGet(low_ktype, false),
+                         "The K-line type in the context is not configured to be preloaded!");
+        }
+
     } else {
         m_context = sm.getStrategyContext();
     }
