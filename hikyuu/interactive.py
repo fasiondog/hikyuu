@@ -255,44 +255,6 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
 # ==============================================================================
 
 
-def UpdateOneRealtimeRecord_from_sina(tmpstr):
-    try:
-        if len(tmpstr) > 3 and tmpstr[:3] == 'var':
-            a = tmpstr.split(',')
-            if len(a) < 9:
-                return
-
-            open, close, high, low = float(a[1]), float(a[3]), float(a[4]), float(a[5])
-            transamount = float(a[9])
-            transcount = float(a[8])
-
-            try:
-                d = Datetime(a[-3])
-            except:
-                d = Datetime(a[-4])
-            temp = (open, high, low, close)
-            if 0 in temp:
-                return
-
-            stockstr = a[0].split('=')
-            stock = sm[stockstr[0][-8:]]
-
-            record = KRecord()
-            record.datetime = d
-            record.open = open
-            record.high = high
-            record.low = low
-            record.close = close
-            record.amount = transamount
-            record.volume = transcount / 100
-
-            stock.realtime_update(record)
-
-    except Exception as e:
-        print(tmpstr)
-        print(e)
-
-
 def UpdateOneRealtimeRecord_from_qq(tmpstr):
     try:
         if len(tmpstr) > 3 and tmpstr[:2] == 'v_':
@@ -328,20 +290,6 @@ def UpdateOneRealtimeRecord_from_qq(tmpstr):
         print(e)
 
 
-def realtimePartUpdate_from_sina(queryStr):
-    result = urllib.request.urlopen(queryStr).read()
-    try:
-        result = result.decode('gbk')
-    except Exception as e:
-        print(result)
-        print(e)
-        return
-
-    result = result.split('\n')
-    for tmpstr in result:
-        UpdateOneRealtimeRecord_from_sina(tmpstr)
-
-
 def realtimePartUpdate_from_qq(queryStr):
     result = urllib.request.urlopen(queryStr).read()
     try:
@@ -356,14 +304,8 @@ def realtimePartUpdate_from_qq(queryStr):
         UpdateOneRealtimeRecord_from_qq(tmpstr)
 
 
-def realtime_update_from_sina_qq(source):
-    if source == 'sina':
-        hku_error("sina已不支持获取实时数据")
-        return
-        # queryStr = "http://hq.sinajs.cn/list="
-        # update_func = realtimePartUpdate_from_sina
-        # max_size = 140
-    elif source == 'qq':
+def realtime_update_from_website(source, stk_list=None):
+    if source == 'qq':
         queryStr = "http://qt.gtimg.cn/q="
         update_func = realtimePartUpdate_from_qq
         max_size = 60
@@ -374,7 +316,9 @@ def realtime_update_from_sina_qq(source):
     count = 0
     # urls = []
     tmpstr = queryStr
-    for stock in sm:
+    if stk_list is None:
+        stk_list = sm
+    for stock in stk_list:
         if stock.valid and stock.type in (
             constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF, constant.STOCKTYPE_GEM, constant.STOCKTYPE_A_BJ,
         ):
@@ -402,99 +346,60 @@ def realtime_update_from_sina_qq(source):
     # pool.join()
 
 
-def realtime_update_from_tushare():
-    import tushare as ts
-
-    # 更新股票行情
-    df = ts.get_today_all()
-    for i in range(len(df)):
-        if df.ix[i, 'open'] == 0:
-            continue  # 停牌
-
-        code = df.ix[i][0]
-        stock = get_stock('sh' + code)
-
-        if stock.isNull() == True or (stock.type != constant.STOCKTYPE_A and stock.type != constant.STOCKTYPE_A_BJ):
-            stock = get_stock('sz' + code)
-        if stock.isNull() == True:
-            continue
-
-        record = KRecord()
-        record.open = df.ix[i, 'open']
-        record.high = df.ix[i, 'high']
-        record.lowe = df.ix[i, 'low']
-        record.close = df.ix[i, 'trade']
-        record.amount = float(df.ix[i, 'amount'])
-        record.volume = float(df.ix[i, 'volume'])
-
-        from datetime import date
-        d = date.today()
-        record.datetime = Datetime(d)
-        stock.realtime_update(record)
-
-    # 更新指数行情
-    df = ts.get_index()
-    for i in range(len(df)):
-        code = df.ix[i][0]
-        stock = get_stock('sh' + code)
-        if stock.isNull() == True or stock.type != constant.STOCKTYPE_INDEX:
-            stock = get_stock('sz' + code)
-        if stock.isNull() == True:
-            continue
-
-        total = stock.getCount(Query.DAY)
-        if total == 0:
-            continue
-
-        last_record = stock.getKRecord(total - 1)
-
-        record = KRecord()
-        record.open = df.ix[i, 'open']
-        record.high = df.ix[i, 'high']
-        record.low = df.ix[i, 'low']
-        record.close = df.ix[i, 'close']
-        record.volume = float(df.ix[i, 'volume'])
-        record.amount = float(df.ix[i, 'amount'])
-
-        if (
-            last_record.close != record.close or last_record.high != record.high or last_record.low != record.low
-            or last_record.open != record.open
-        ):
-            from datetime import date
-            d = date.today()
-            record.datetime = Datetime(d)
+def realtime_update_from_qmt(stk_list=None):
+    from xtquant import xtdata
+    if stk_list is None:
+        stk_list = sm
+    code_list = [f'{s.code}.{s.market}' for s in stk_list if s.valid]
+    full_tick = xtdata.get_full_tick(code_list)
+    for qmt_code, data in full_tick.items():
+        try:
+            code, market = qmt_code.split(".")
+            stock = sm[f'{market}{code}']
+            record = KRecord()
+            record.datetime = Datetime(data['timetag'].split(' ')[0])
+            record.open = data['open']
+            record.high = data['high']
+            record.low = data['low']
+            record.close = data['lastPrice']
+            record.volume = data['volume'] * 0.1
+            record.amount = data['amount'] * 0.001
             stock.realtime_update(record)
+        except Exception as e:
+            hku_error(str(e))
+        except:
+            pass
 
 
-def realtime_update_inner(source='sina'):
-    if source == 'sina' or source == 'qq':
-        realtime_update_from_sina_qq(source)
-    elif source == 'tushare':
-        realtime_update_from_tushare()
+def realtime_update_inner(source='qq', stk_list=None):
+    if source == 'qq':
+        realtime_update_from_website(source, stk_list)
+    elif source == 'qmt':
+        realtime_update_from_qmt(stk_list)
     else:
-        print(source, ' not support!')
+        hku_error(f'Not support website source: {source}!')
 
 
 def realtime_update_wrap():
     pre_update_time = None
 
-    def realtime_update_closure(source='qq', delta=60):
+    def realtime_update_closure(source='qq', delta=60, stk_list=None):
         """
         更新实时日线数据
-        参数：
-            source: 数据源（'sina' | 'qq' | 'tushare'）
-            delta: 更新间隔时间
+        :param str source: 数据源 ('qq' | 'qmt')
+        :param int delta: 最小更新间隔时间, 防止更新过于频繁
+        :param sequence stk_list: 待更新的stock列表, 如为 None 则更新全部
         """
         from datetime import timedelta, datetime
         nonlocal pre_update_time
         now_update_time = datetime.now()
-        if (pre_update_time is None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
-            realtime_update_inner(source)
+        if (source == 'qmt') or (pre_update_time is None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
+            realtime_update_inner(source, stk_list)
             pre_update_time = datetime.now()
-            print("更新完毕！", pre_update_time)
+            print(f"更新完毕！更新时间: {pre_update_time}")
         else:
-            print("更新间隔小于" + str(delta) + "秒，未更新")
-            print("上次更新时间: ", pre_update_time)
+            print(f"更新间隔小于 {str(delta)} 秒，未更新")
+            print(f"上次更新时间: {pre_update_time}")
 
     return realtime_update_closure
 

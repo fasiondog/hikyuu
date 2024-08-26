@@ -713,21 +713,21 @@
        </property>
        <property name="html">
         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入上证日线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入深证日线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入上证5分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入深证5分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入上证1分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入深证1分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入上证分笔记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入深证分笔记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入上证分时数据：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入深证分时数据：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入权息数据数：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入完毕！&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入上证日线记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入深证日线记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入上证5分钟线记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入深证5分钟线记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入上证1分钟线记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入深证1分钟线记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入上证分笔记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入深证分笔记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入上证分时数据：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入深证分时数据：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入权息数据数：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入完毕！&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </widget>
@@ -815,14 +815,14 @@ p, li { white-space: pre-wrap; }
          <x>40</x>
          <y>80</y>
          <width>321</width>
-         <height>282</height>
+         <height>296</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="preload_day_checkBox">
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="preload_week_checkBox">
           <property name="text">
-           <string>预加载日线</string>
+           <string>预加载周线</string>
           </property>
          </widget>
         </item>
@@ -833,31 +833,17 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QSpinBox" name="preload_day_spinBox">
-          <property name="maximum">
-           <number>999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QCheckBox" name="preload_week_checkBox">
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="preload_day_checkBox">
           <property name="text">
-           <string>预加载周线</string>
+           <string>预加载日线</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLabel" name="label_25">
+        <item row="8" column="0">
+         <widget class="QCheckBox" name="preload_min15_checkBox">
           <property name="text">
-           <string>最大缓存数量：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QSpinBox" name="preload_week_spinBox">
-          <property name="maximum">
-           <number>999999</number>
+           <string>预加载15分钟线</string>
           </property>
          </widget>
         </item>
@@ -868,99 +854,8 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="label_26">
-          <property name="text">
-           <string>最大缓存数量：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QSpinBox" name="preload_month_spinBox">
-          <property name="maximum">
-           <number>999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QCheckBox" name="preload_quarter_checkBox">
-          <property name="text">
-           <string>预加载季线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLabel" name="label_27">
-          <property name="text">
-           <string>最大缓存数量：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QSpinBox" name="preload_quarter_spinBox">
-          <property name="maximum">
-           <number>999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QCheckBox" name="preload_halfyear_checkBox">
-          <property name="text">
-           <string>预加载半年线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLabel" name="label_28">
-          <property name="text">
-           <string>最大缓存数量：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QSpinBox" name="preload_halfyear_spinBox">
-          <property name="maximum">
-           <number>999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QCheckBox" name="preload_year_checkBox">
-          <property name="text">
-           <string>预加载年线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLabel" name="label_29">
-          <property name="text">
-           <string>最大缓存数量：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2">
-         <widget class="QSpinBox" name="preload_year_spinBox">
-          <property name="maximum">
-           <number>999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QCheckBox" name="preload_min1_checkBox">
-          <property name="text">
-           <string>预加载1分钟线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QLabel" name="label_30">
-          <property name="text">
-           <string>最大缓存数量：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="2">
-         <widget class="QSpinBox" name="preload_min1_spinBox">
+        <item row="0" column="2">
+         <widget class="QSpinBox" name="preload_day_spinBox">
           <property name="maximum">
            <number>999999</number>
           </property>
@@ -973,24 +868,17 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="7" column="1">
-         <widget class="QLabel" name="label_31">
-          <property name="text">
-           <string>最大缓存数量：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="2">
-         <widget class="QSpinBox" name="preload_min5_spinBox">
+        <item row="4" column="2">
+         <widget class="QSpinBox" name="preload_halfyear_spinBox">
           <property name="maximum">
            <number>999999</number>
           </property>
          </widget>
         </item>
-        <item row="8" column="0">
-         <widget class="QCheckBox" name="preload_min15_checkBox">
+        <item row="6" column="1">
+         <widget class="QLabel" name="label_30">
           <property name="text">
-           <string>预加载15分钟线</string>
+           <string>最大缓存数量：</string>
           </property>
          </widget>
         </item>
@@ -1001,29 +889,15 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="8" column="2">
-         <widget class="QSpinBox" name="preload_min15_spinBox">
-          <property name="maximum">
-           <number>999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="0">
-         <widget class="QCheckBox" name="preload_min30_checkBox">
-          <property name="text">
-           <string>预加载30分钟线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="1">
-         <widget class="QLabel" name="label_33">
+        <item row="2" column="1">
+         <widget class="QLabel" name="label_26">
           <property name="text">
            <string>最大缓存数量：</string>
           </property>
          </widget>
         </item>
-        <item row="9" column="2">
-         <widget class="QSpinBox" name="preload_min30_spinBox">
+        <item row="3" column="2">
+         <widget class="QSpinBox" name="preload_quarter_spinBox">
           <property name="maximum">
            <number>999999</number>
           </property>
@@ -1036,6 +910,48 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
+        <item row="6" column="0">
+         <widget class="QCheckBox" name="preload_min1_checkBox">
+          <property name="text">
+           <string>预加载1分钟线</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QSpinBox" name="preload_week_spinBox">
+          <property name="maximum">
+           <number>999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QCheckBox" name="preload_halfyear_checkBox">
+          <property name="text">
+           <string>预加载半年线</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QCheckBox" name="preload_min30_checkBox">
+          <property name="text">
+           <string>预加载30分钟线</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLabel" name="label_29">
+          <property name="text">
+           <string>最大缓存数量：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="2">
+         <widget class="QSpinBox" name="preload_min30_spinBox">
+          <property name="maximum">
+           <number>999999</number>
+          </property>
+         </widget>
+        </item>
         <item row="10" column="1">
          <widget class="QLabel" name="label_34">
           <property name="text">
@@ -1043,8 +959,113 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
+        <item row="7" column="2">
+         <widget class="QSpinBox" name="preload_min5_spinBox">
+          <property name="maximum">
+           <number>999999</number>
+          </property>
+         </widget>
+        </item>
         <item row="10" column="2">
          <widget class="QSpinBox" name="preload_min60_spinBox">
+          <property name="maximum">
+           <number>999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2">
+         <widget class="QSpinBox" name="preload_year_spinBox">
+          <property name="maximum">
+           <number>999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QSpinBox" name="preload_month_spinBox">
+          <property name="maximum">
+           <number>999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_25">
+          <property name="text">
+           <string>最大缓存数量：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <widget class="QLabel" name="label_33">
+          <property name="text">
+           <string>最大缓存数量：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLabel" name="label_27">
+          <property name="text">
+           <string>最大缓存数量：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLabel" name="label_28">
+          <property name="text">
+           <string>最大缓存数量：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QLabel" name="label_31">
+          <property name="text">
+           <string>最大缓存数量：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2">
+         <widget class="QSpinBox" name="preload_min1_spinBox">
+          <property name="maximum">
+           <number>999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="2">
+         <widget class="QSpinBox" name="preload_min15_spinBox">
+          <property name="maximum">
+           <number>999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QCheckBox" name="preload_year_checkBox">
+          <property name="text">
+           <string>预加载年线</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="preload_quarter_checkBox">
+          <property name="text">
+           <string>预加载季线</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
+         <widget class="QCheckBox" name="preload_hour2_checkBox">
+          <property name="text">
+           <string>预加载120分钟线</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
+         <widget class="QLabel" name="label_42">
+          <property name="text">
+           <string>最大缓存数量：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="2">
+         <widget class="QSpinBox" name="preload_hour2_spinBox">
           <property name="maximum">
            <number>999999</number>
           </property>
@@ -1114,7 +1135,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>280</y>
+        <y>275</y>
         <width>141</width>
         <height>16</height>
        </rect>
@@ -1207,22 +1228,22 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>321</y>
+        <y>311</y>
         <width>511</width>
-        <height>181</height>
+        <height>191</height>
        </rect>
       </property>
       <property name="html">
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;注：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;1、行情采集服务仅对预加载数据有效&lt;/span&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;，在行情采集服务运行期间，hikyuu.interactive运行时将自动连接采集服务获取行情数据，并更新预加载的内容数据。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'SimSun';&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;2、如使用芝麻代理（&lt;/span&gt;&lt;a href=&quot;http://h.zhimaruanjian.com/&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; text-decoration: underline; color:#0000ff;&quot;&gt;http://h.zhimaruanjian.com/&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;），请自行申请（需付费），并确保ip为其白名单。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'SimSun';&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-weight:700; color:#0000ff;&quot;&gt;3、此处采集为网络采集，更推荐直接运行安装目录下gui子目录下的 start_huatai_insight.py ,使用华泰 insight 的实时服务。运行前，需手工修改该文件最下方 __main__ 中的 login，放入自己的账号和密码。该程序独立运行，不用关闭，和这里的采集效果一样。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;注：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;1、行情采集服务仅对预加载数据有效&lt;/span&gt;，在行情采集服务运行期间，hikyuu.interactive运行时将自动连接采集服务获取行情数据，并更新预加载的内容数据。&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2、如使用芝麻代理（&lt;a href=&quot;http://h.zhimaruanjian.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://h.zhimaruanjian.com/&lt;/span&gt;&lt;/a&gt;），请自行申请（需付费），并确保ip为其白名单。&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:696; color:#0000ff;&quot;&gt;3、此处采集为网络采集，更推荐直接运行安装目录下gui子目录下的 start_qmt.py ,使用miniqmt 实时服务。该程序独立运行，不用关闭，和这里的采集效果一样。注意：miniqmt需要QMT交易端配合，且在同一机器上执行。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QWidget" name="layoutWidget">
@@ -1247,6 +1268,11 @@ p, li { white-space: pre-wrap; }
          <item>
           <property name="text">
            <string>qq</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>qmt</string>
           </property>
          </item>
         </widget>

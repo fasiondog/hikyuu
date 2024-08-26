@@ -8,18 +8,23 @@
 #pragma once
 
 #include <future>
-#include "../DataType.h"
-#include "../StrategyContext.h"
-#include "../global/SpotRecord.h"
-#include "../utilities/thread/FuncWrapper.h"
-#include "../utilities/thread/ThreadSafeQueue.h"
-#include "../trade_sys/portfolio/Portfolio.h"
+#include "hikyuu/DataType.h"
+#include "hikyuu/StrategyContext.h"
+#include "hikyuu/global/SpotRecord.h"
+#include "hikyuu/utilities/thread/FuncWrapper.h"
+#include "hikyuu/utilities/thread/ThreadSafeQueue.h"
+#include "hikyuu/trade_sys/portfolio/Portfolio.h"
+#include "BrokerTradeManager.h"
 
 namespace hku {
 
 /**
- * @brief 策略运行时
  * @ingroup Stratgy
+ * @{
+ */
+
+/**
+ * @brief 策略运行时
  */
 class HKU_API Strategy {
     CLASS_LOGGER_IMP(Strategy)
@@ -29,6 +34,8 @@ public:
     explicit Strategy(const string& name, const string& config_file = "");
     Strategy(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
              const string& name = "Strategy", const string& config_file = "");
+    explicit Strategy(const StrategyContext& context, const string& name = "Strategy",
+                      const string& config_file = "");
 
     virtual ~Strategy();
 
@@ -44,38 +51,15 @@ public:
         return m_context;
     }
 
-    void context(const StrategyContext& context) {
-        m_context = context;
-    }
-
-    void setStockCodeList(vector<string>&& stockList) {
-        m_context.setStockCodeList(std::move(stockList));
-    }
-
-    void setStockCodeList(const vector<string>& stockList) {
-        m_context.setStockCodeList(stockList);
-    }
-
-    const vector<string>& getStockCodeList() const {
-        return m_context.getStockCodeList();
-    }
-
-    void setKTypeList(const vector<KQuery::KType>& ktypeList) {
-        m_context.setKTypeList(ktypeList);
-    }
-
-    const vector<KQuery::KType>& getKTypeList() const {
-        return m_context.getKTypeList();
-    }
-
     /**
      * 每日开盘时间内，以 delta 为周期循环定时执行指定任务
      * @param func 待执行的任务
      * @param delta 间隔时间
      * @param market 指定的市场
+     * @param ignoreMarket 是否忽略市场时间限制，如为 true，则为定时循环不受开闭市时间限制
      */
     void runDaily(std::function<void()>&& func, const TimeDelta& delta,
-                  const std::string& market = "SH");
+                  const std::string& market = "SH", bool ignoreMarket = false);
 
     /**
      * 每日在指定时刻执行任务
@@ -88,7 +72,7 @@ public:
 
     /**
      * 正确数据发生变化调用，即接收到相应行情数据变更
-     * @note 通常用于调试
+     * @note 通常用于调试。且只要收到行情采集消息就会触发，不受开、闭市时间限制
      * @param stk 数据发生变化的 stock
      * @param spot 接收到的具体数据
      */
@@ -97,6 +81,7 @@ public:
     /**
      * 一批行情数据接受完毕后通知
      * @note 通常仅用于调试打印，该批行情数据中不一定含有上下文中包含的 stock
+     *       且只要收到行情采集消息就会触发，不受开、闭市时间限制。
      */
     void onReceivedSpot(std::function<void(const Datetime&)>&& recievedFucn);
 
@@ -111,11 +96,20 @@ private:
     StrategyContext m_context;
     std::function<void(const Datetime&)> m_on_recieved_spot;
     std::function<void(const Stock&, const SpotRecord& spot)> m_on_change;
-    bool m_running{false};
+
+    std::function<void()> m_run_daily_func;
+    TimeDelta m_run_daily_delta;
+    string m_run_daily_market;
+    bool m_ignoreMarket{false};
+
+    std::function<void()> m_run_daily_at_func;
+    TimeDelta m_run_daily_at_delta;
 
 private:
-    void run();
-    void receivedSpot(const SpotRecord& spot);
+    void _init();
+    void _receivedSpot(const SpotRecord& spot);
+    void _runDaily();
+    void _runDailyAt();
 
 private:
     static std::atomic_bool ms_keep_running;
@@ -152,4 +146,29 @@ private:
 
 typedef shared_ptr<Strategy> StrategyPtr;
 
+/**
+ * @brief 在策略运行时中执行系统交易 SYS
+ * @note 目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
+ * @param sys 交易系统
+ * @param stk 交易对象
+ * @param query 查询条件
+ * @param broker 订单代理
+ * @param costfunc 成本函数
+ */
+void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
+                           const OrderBrokerPtr& broker, const TradeCostPtr& costfunc);
+
+/**
+ * @brief 在策略运行时中执行组合策略 PF
+ * @note 目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
+ * @param pf 资产组合
+ * @param query 查询条件
+ * @param adjust_cycle 调仓周期
+ * @param broker 订单代理
+ * @param costfunc 成本函数
+ */
+void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
+                           const OrderBrokerPtr& broker, const TradeCostPtr& costfunc);
+
+/** @} */
 }  // namespace hku

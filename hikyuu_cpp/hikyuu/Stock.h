@@ -278,7 +278,7 @@ struct HKU_API Stock::Data {
 
     mutable vector<HistoryFinanceInfo>
       m_history_finance;  // 历史财务信息 [财务报告日期, 字段1, 字段2, ...]
-    mutable bool m_history_finance_ready{false};
+    mutable std::atomic_bool m_history_finance_ready{false};
     mutable std::mutex m_history_finance_mutex;
 
     price_t m_tick;

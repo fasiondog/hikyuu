@@ -15,19 +15,33 @@ class PyOrderBrokerBase : public OrderBrokerBase {
 public:
     using OrderBrokerBase::OrderBrokerBase;
 
-    Datetime _buy(Datetime datetime, const string& market, const string& code, price_t price,
-                  double num) override {
-        PYBIND11_OVERLOAD_PURE(Datetime, OrderBrokerBase, _buy, datetime, market, code, price, num);
+    void _buy(Datetime datetime, const string& market, const string& code, price_t price,
+              double num, price_t stoploss, price_t goalPrice, SystemPart from) override {
+        PYBIND11_OVERLOAD_PURE(void, OrderBrokerBase, _buy, datetime, market, code, price, num,
+                               stoploss, goalPrice, from);
     }
 
-    Datetime _sell(Datetime datetime, const string& market, const string& code, price_t price,
-                   double num) override {
-        PYBIND11_OVERLOAD_PURE(Datetime, OrderBrokerBase, _sell, datetime, market, code, price,
-                               num);
+    void _sell(Datetime datetime, const string& market, const string& code, price_t price,
+               double num, price_t stoploss, price_t goalPrice, SystemPart from) override {
+        PYBIND11_OVERLOAD_PURE(void, OrderBrokerBase, _sell, datetime, market, code, price, num,
+                               stoploss, goalPrice, from);
+    }
+
+    string _getAssetInfo() override {
+        PYBIND11_OVERLOAD_NAME(string, OrderBrokerBase, "_get_asset_info", _getAssetInfo);
     }
 };
 
 void export_OrderBroker(py::module& m) {
+    py::class_<BrokerPositionRecord>(m, "BrokerPositionRecord")
+      .def(py::init<>())
+      .def(py::init<const Stock&, price_t, price_t>())
+      .def("__str__", &BrokerPositionRecord::str)
+      .def("__repr__", &BrokerPositionRecord::str)
+      .def_readwrite("stock", &BrokerPositionRecord::stock, "持仓对象")
+      .def_readwrite("number", &BrokerPositionRecord::number, "持仓数量")
+      .def_readwrite("money", &BrokerPositionRecord::money, "买入花费总资金");
+
     py::class_<OrderBrokerBase, OrderBrokerPtr, PyOrderBrokerBase>(
       m, "OrderBrokerBase",
       R"(订单代理包装基类，用户可以参考自定义自己的订单代理，加入额外的处理
@@ -46,32 +60,12 @@ void export_OrderBroker(py::module& m) {
                     py::overload_cast<const string&>(&OrderBrokerBase::name),
                     py::return_value_policy::copy, "名称（可读写）")
 
-      .def("buy", &OrderBrokerBase::buy, R"(buy(self, datetime, market, code, price, num)
-
-    执行买入操作
-
-    :param Datetime datetime: 策略指示时间
-    :param str market: 市场标识
-    :param str code: 证券代码
-    :param float price: 买入价格
-    :param float num: 买入数量
-    :return: 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
-    :rtype: Datetime)")
-
-      .def("sell", &OrderBrokerBase::sell, R"(sell(self, datetime, market, code, price, num)
-
-    执行卖出操作
-
-    :param Datetime datetime: 策略指示时间
-    :param str market: 市场标识
-    :param str code: 证券代码
-    :param float price: 卖出价格
-    :param float num: 卖出数量
-    :return: 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
-    "rtype: Datetime)")
+      .def("buy", &OrderBrokerBase::buy, "详情见子类实现接口: _buy")
+      .def("sell", &OrderBrokerBase::sell, "详情见子类实现接口: _sell")
+      .def("get_asset_info", &OrderBrokerBase::getAssetInfo, "详情见子类实现接口: _get_asset_info")
 
       .def("_buy", &OrderBrokerBase::_buy,
-           R"(_buy(self, datetime, market, code, price, num)
+           R"(_buy(self, datetime, market, code, price, num, stoploss, goal_price, part_from)
 
     【子类接口】执行买入操作
 
@@ -80,11 +74,12 @@ void export_OrderBroker(py::module& m) {
     :param str code: 证券代码
     :param float price: 买入价格
     :param float num: 买入数量
-    :return: 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
-    :rtype: Datetime)")
+    :param float stoploss: 计划止损价
+    :param float goal_price: 计划盈利目标价
+    :param SystemPart part_from: 信号来源)")
 
       .def("_sell", &OrderBrokerBase::_sell,
-           R"(_sell(self, datetime, market, code, price, num)
+           R"(_sell(self, datetime, market, code, price, num, stoploss, goal_price, part_from)
 
     【子类接口】执行卖出操作
 
@@ -93,6 +88,25 @@ void export_OrderBroker(py::module& m) {
     :param str code: 证券代码
     :param float price: 卖出价格
     :param float num: 卖出数量
-    :return: 操作执行的时刻。实盘时，应返回委托单时间或服务器交易时间。
-    "rtype: Datetime)");
+    :param float stoploss: 计划止损价
+    :param float goal_price: 计划盈利目标价
+    :param SystemPart part_from: 信号来源)")
+
+      .def("_get_asset_info", &OrderBrokerBase::_getAssetInfo, R"(_get_asset_info(self)
+
+    【子类接口】获取当前资产信息，子类需返回符合如下规范的 json 字符串:
+
+    {
+        "datetime": "2001-01-01 18:00:00.12345",
+        "cash": 0.0,
+        "positions": [
+            {"market": "SZ", "code": "000001", "number": 100.0, "stoploss": 0.0, "goal_price": 0.0,
+             "cost_price": 0.0},
+            {"market": "SH", "code": "600001", "number": 100.0, "stoploss": 0.0, "goal_price": 0.0,
+             "cost_price": 0.0},
+         ]
+    }    
+
+    :return: 以字符串（json格式）方式返回当前资产信息
+    :rtype: str)");
 }

@@ -30,10 +30,19 @@ target("core")
         add_cxflags("-Wno-error=parentheses-equality -Wno-error=missing-braces")
     end
 
+    if is_plat("linux", "cross") then 
+        add_rpathdirs("$ORIGIN", "$ORIGIN/cpp")
+    end
+
+    if is_plat("macosx") then
+        add_linkdirs("/usr/lib")
+
+        -- macosx 下不能主动链接 python，所以需要使用如下编译选项
+        add_shflags("-undefined dynamic_lookup")
+    end    
+
     add_includedirs("../hikyuu_cpp")
     add_files("./**.cpp")
-
-    add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
 
     on_load("windows", "linux", "macosx", function(target)
         import("lib.detect.find_tool")

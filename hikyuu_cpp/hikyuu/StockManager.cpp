@@ -98,8 +98,14 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
                         const Parameter& hikyuuParam, const StrategyContext& context) {
     HKU_WARN_IF_RETURN(m_initializing, void(),
                        "The last initialization has not finished. Please try again later!");
+
+    // 防止重复 init
+    if (m_thread_id != std::thread::id()) {
+        return;
+    }
     m_initializing = true;
     m_thread_id = std::this_thread::get_id();
+
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
     m_kdataDriverParam = kdataParam;
@@ -150,6 +156,8 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 加载历史财务信息
     loadHistoryFinance();
 
+    initInnerTask();
+
     // add special Market, for temp csv file
     m_marketInfoDict["TMP"] =
       MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>(),
@@ -192,24 +200,24 @@ void StockManager::loadAllKData() {
 
     } else {
         // 异步并行加载
-        auto& tg = *getGlobalTaskGroup();
+        auto* tg = getGlobalTaskGroup();
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             for (size_t i = 0, len = ktypes.size(); i < len; i++) {
                 const auto& low_ktype = low_ktypes[i];
                 if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
-                    tg.submit(
+                    tg->submit(
                       [=, ktype = ktypes[i]]() mutable { iter->second.loadKDataToBuffer(ktype); });
                 }
             }
         }
     }
-
-    initInnerTask();
 }
 
 void StockManager::reload() {
-    loadAllHolidays();
+    HKU_IF_RETURN(m_initializing, void());
+    m_initializing = true;
 
+    loadAllHolidays();
     loadAllMarketInfos();
     loadAllStockTypeInfo();
     loadAllStocks();
@@ -253,6 +261,7 @@ void StockManager::reload() {
     }
 
     loadHistoryFinance();
+    m_initializing = false;
 }
 
 string StockManager::tmpdir() const {
@@ -472,6 +481,7 @@ void StockManager::loadAllStocks() {
                 stock.m_data->m_precision = info.precision;
                 stock.m_data->m_minTradeNumber = info.minTradeNumber;
                 stock.m_data->m_maxTradeNumber = info.maxTradeNumber;
+                stock.m_data->m_history_finance_ready = false;
             }
         }
     }

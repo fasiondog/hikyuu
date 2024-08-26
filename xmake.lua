@@ -6,7 +6,7 @@ set_project("hikyuu")
 add_rules("mode.debug", "mode.release")
 
 -- version
-set_version("2.1.1", {build = "%Y%m%d%H%M"})
+set_version("2.1.2", {build = "%Y%m%d%H%M"})
 
 set_warnings("all")
 
@@ -208,7 +208,7 @@ if is_plat("windows") then
   end
 end
 
-if not is_plat("windows") then
+if is_plat("linux", "cross", "macosx") then
   -- disable some compiler errors
   add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
   add_cxflags("-ftemplate-depth=1023", "-pthread")

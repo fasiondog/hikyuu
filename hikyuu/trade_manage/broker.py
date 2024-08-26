@@ -29,7 +29,9 @@
 # 1. 20170704, Added by fasiondog
 # ===============================================================================
 
+import json
 from hikyuu import OrderBrokerBase
+from hikyuu.util import hku_error
 
 
 class OrderBrokerWrap(OrderBrokerBase):
@@ -44,15 +46,29 @@ class OrderBrokerWrap(OrderBrokerBase):
         super(OrderBrokerWrap, self).__init__(name)
         self._broker = broker
 
-    def _buy(self, datetime, market, code, price, num):
-        """实现 OrderBrokerBase 的 _buy 接口"""
-        self._broker.buy('{}{}'.format(market, code), price, num)
-        return datetime
+    def _buy(self, datetime, market, code, price, num, stoploss, goal_price, part_from):
+        """
+        实现 OrderBrokerBase 的 _buy 接口
+        :param str market: 证券市场    
+        :param str code: 证券代码
+        :param float price: 买入价格
+        :param int num: 买入数量        
+        """
+        self._broker.buy(market, code, price, num, stoploss, goal_price, part_from)
 
-    def _sell(self, datetime, market, code, price, num):
+    def _sell(self, datetime, market, code, price, num, stoploss, goal_price, part_from):
         """实现 OrderBrokerBase 的 _sell 接口"""
-        self._broker.sell('{}{}'.format(market, code), price, num)
-        return datetime
+        self._broker.sell(market, code, price, num, stoploss, goal_price, part_from)
+
+    def _get_asset_info(self):
+        try:
+            if hasattr(self._broker, "get_asset_info"):
+                ret = self._broker.get_asset_info()
+                return json.dumps(ret) if type(ret) == dict else str(ret)
+            return str()
+        except Exception as e:
+            hku_error(e)
+            return str()
 
 
 class TestOrderBroker:
@@ -61,11 +77,11 @@ class TestOrderBroker:
     def __init__(self):
         pass
 
-    def buy(self, code, price, num):
-        print("买入：%s  %.3f  %i" % (code, price, num))
+    def buy(self, market, code, price, num, stoploss, goal_price, part_from):
+        print(f"买入：{market}{code}, 价格: {price}, 数量: {num} 预期止损价: {stoploss}, 预期目标价: {goal_price}, 信号来源: {part_from}")
 
-    def sell(self, code, price, num):
-        print("卖出：%s  %.3f  %i" % (code, price, num))
+    def sell(self, market, code, price, num, stoploss, goal_price, part_from):
+        print(f"卖出：{market}{code}, 价格: {price}, 数量: {num}, 信号来源: {part_from}")
 
 
 def crtOB(broker, name="NO_NAME"):

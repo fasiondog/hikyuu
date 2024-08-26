@@ -29,11 +29,15 @@ void StrategyContext::setKTypeList(const vector<KQuery::KType>& ktypeList) {
               });
 }
 
-bool StrategyContext::isAll() const {
+bool StrategyContext::isAll() const noexcept {
     return std::find_if(m_stockCodeList.begin(), m_stockCodeList.end(), [](string val) {
                to_upper(val);
                return val == "ALL";
            }) != m_stockCodeList.end();
+}
+
+bool StrategyContext::isValid() const noexcept {
+    return m_stockCodeList.empty() || m_ktypeList.empty();
 }
 
 }  // namespace hku

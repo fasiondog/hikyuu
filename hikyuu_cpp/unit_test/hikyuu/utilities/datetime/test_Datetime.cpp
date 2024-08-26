@@ -61,6 +61,7 @@ TEST_CASE("test_Datetime") {
     CHECK(Datetime("2001/1/2 3:4:5") == d);
     CHECK(Datetime("20010102T030405") == d);
     CHECK(Datetime("20010102t030405") == d);
+    CHECK(Datetime("20010102 3:4:5") == d);
     CHECK_THROWS(Datetime("2001"));
 
     /** @arg 非法年份 */

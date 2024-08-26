@@ -15,7 +15,6 @@ namespace hku {
 void initInnerTask() {
     auto* tm = getScheduler();
     tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(), reloadHikyuuTask);
-    tm->start();
 }
 
 void reloadHikyuuTask() {

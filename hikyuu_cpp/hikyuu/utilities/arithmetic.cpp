@@ -17,6 +17,13 @@
 
 namespace hku {
 
+template double HKU_UTILS_API roundEx(double number, int ndigits);
+template float HKU_UTILS_API roundEx(float number, int ndigits);
+template double HKU_UTILS_API roundUp(double number, int ndigits);
+template float HKU_UTILS_API roundUp(float number, int ndigits);
+template double HKU_UTILS_API roundDown(double number, int ndigits);
+template float HKU_UTILS_API roundDown(float number, int ndigits);
+
 #if defined(_MSC_VER)
 /**
  * 将UTF8编码的字符串转换为GB2312编码的字符串

@@ -22,11 +22,16 @@ public:
     explicit StrategyContext(vector<string>&& stockCodeList)
     : m_stockCodeList(std::move(stockCodeList)) {}
 
+    StrategyContext(const vector<string>& stockCodeList, const vector<KQuery::KType>& ktypeList)
+    : m_stockCodeList(stockCodeList), m_ktypeList(ktypeList) {}
+
     virtual ~StrategyContext() = default;
 
-    bool isAll() const;
+    bool isAll() const noexcept;
 
-    Datetime startDatetime() const {
+    bool isValid() const noexcept;
+
+    Datetime startDatetime() const noexcept {
         return m_startDatetime;
     }
 

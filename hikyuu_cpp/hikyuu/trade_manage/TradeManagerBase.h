@@ -323,13 +323,6 @@ public:
     }
 
     /**
-     * 当前冻结现金
-     */
-    virtual price_t currentFrozen() const {
-        return 0.0;
-    }
-
-    /**
      * 获取指定日期的现金
      * @note 如果不带日期参数，无法根据权息信息调整持仓
      */
@@ -697,6 +690,14 @@ public:
      * @param path 输出文件所在目录
      */
     virtual void tocsv(const string& path) {
+        HKU_WARN("The subclass does not implement this method");
+    }
+
+    /**
+     * 从订单代理实例同步当前账户资产信息（包含资金、持仓等）
+     * @param broker 订单代理实例
+     */
+    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) {
         HKU_WARN("The subclass does not implement this method");
     }
 

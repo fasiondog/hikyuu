@@ -238,7 +238,6 @@ void KDataImp::_recoverBackward() {
     Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
-    StockWeightList::const_reverse_iterator pre_weightIter;
 
     size_t pre_pos = total - 1;
     for (; weightIter != weightList.rend(); ++weightIter) {
@@ -299,7 +298,6 @@ void KDataImp::_recoverEqualForward() {
 
     KRecordList kdata = m_buffer;  // 防止同一天两条权息记录
     StockWeightList::const_iterator weightIter = weightList.begin();
-    StockWeightList::const_iterator pre_weightIter;
     size_t pre_pos = 0;
     for (; weightIter != weightList.end(); ++weightIter) {
         // 计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
@@ -360,7 +358,6 @@ void KDataImp::_recoverEqualBackward() {
     Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
-    StockWeightList::const_reverse_iterator pre_weightIter;
 
     size_t pre_pos = total - 1;
     for (; weightIter != weightList.rend(); ++weightIter) {
