@@ -112,6 +112,7 @@ set_configvar("HKU_ENABLE_MO", 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT", 1)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", 0)
+set_configvar("HKU_ENABLE_NODE", 1)
 
 local boost_version = "1.85.0"
 local hdf5_version = "1.12.2"

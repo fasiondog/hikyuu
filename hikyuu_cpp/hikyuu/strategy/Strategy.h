@@ -170,5 +170,8 @@ void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& qu
 void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
                            const OrderBrokerPtr& broker, const TradeCostPtr& costfunc);
 
+void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& stklist,
+                                     const KQuery::KType& ktype);
+
 /** @} */
 }  // namespace hku

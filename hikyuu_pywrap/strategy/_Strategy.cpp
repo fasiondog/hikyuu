@@ -115,4 +115,6 @@ void export_Strategy(py::module& m) {
     m.def("crt_sys_strategy", crtSysStrategy, py::arg("sys"), py::arg("stk_market_code"),
           py::arg("query"), py::arg("broker"), py::arg("cost_func"),
           py::arg("name") = "SYSStrategy", py::arg("config") = "");
+
+    m.def("get_data_from_buffer_server", getDataFromBufferServer);
 }
