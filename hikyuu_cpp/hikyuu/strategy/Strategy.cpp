@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include "hikyuu/utilities/os.h"
 #include "hikyuu/utilities/ini_parser/IniParser.h"
+#include "hikyuu/utilities/node/NodeClient.h"
 #include "hikyuu/global/GlobalSpotAgent.h"
 #include "hikyuu/global/schedule/scheduler.h"
 #include "hikyuu/global/GlobalTaskGroup.h"
@@ -333,6 +334,49 @@ void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycl
     tm->fetchAssetInfoFromBroker(broker);
     pf->setTM(tm);
     pf->run(query, adjust_cycle, true);
+}
+
+void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& stklist,
+                                     const KQuery::KType& ktype) {
+    // SPEND_TIME(getDataFromBufferServer);
+    NodeClient client(addr);
+    try {
+        HKU_CHECK(client.dial(), "Failed dial server!");
+        json req;
+        req["cmd"] = "market";
+        req["ktype"] = ktype;
+        json code_list;
+        for (const auto& stk : stklist) {
+            code_list.emplace_back(stk.market_code());
+        }
+        req["codes"] = std::move(code_list);
+
+        json res;
+        client.post(req, res);
+        HKU_ERROR_IF_RETURN(res["ret"] != NodeErrorCode::SUCCESS, void(),
+                            "Recieved error: {}, msg: {}", res["ret"].get<int>(),
+                            res["msg"].get<string>());
+
+        const auto& jdata = res["data"];
+        for (auto iter = jdata.cbegin(); iter != jdata.cend(); ++iter) {
+            const auto& r = *iter;
+            try {
+                string market_code = r[0].get<string>();
+                Stock stk = getStock(market_code);
+                if (!stk.isNull()) {
+                    KRecord k(Datetime(r[1].get<string>()), r[2], r[3], r[4], r[5], r[6], r[7]);
+                    stk.realtimeUpdate(k, ktype);
+                }
+            } catch (const std::exception& e) {
+                HKU_ERROR("Failed decode json: {}! {}", to_string(r), e.what());
+            }
+        }
+
+    } catch (const std::exception& e) {
+        HKU_ERROR("Failed get data from buffer server! {}", e.what());
+    } catch (...) {
+        HKU_ERROR_UNKNOWN;
+    }
 }
 
 }  // namespace hku
