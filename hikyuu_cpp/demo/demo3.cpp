@@ -7,6 +7,7 @@
 #include <csignal>
 #include <hikyuu/global/GlobalSpotAgent.h>
 #include <hikyuu/utilities/node/NodeServer.h>
+#include <hikyuu/utilities/os.h>
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -38,7 +39,7 @@ int main(int argc, char* argv[]) {
 
     try {
         // 配置文件的位置自行修改
-        hikyuu_init("C:\\Users\\admin\\.hikyuu\\hikyuu.ini");
+        hikyuu_init(fmt::format("{}/.hikyuu/hikyuu.ini", getUserDir()));
 
         // 启动行情接收（只是计算回测可以不需要）
         startSpotAgent(true);
@@ -61,6 +62,7 @@ int main(int argc, char* argv[]) {
 
             json data;
             const auto& jcodes = req["codes"];
+            // HKU_INFO("codes size: {}", jcodes.size());
             for (auto iter = jcodes.cbegin(); iter != jcodes.cend(); ++iter) {
                 string market_code = to_string(*iter);
                 market_code = market_code.substr(1, market_code.size() - 2);
