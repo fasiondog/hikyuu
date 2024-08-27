@@ -5,6 +5,7 @@
 #include <thread>
 #include <chrono>
 #include <hikyuu/global/GlobalSpotAgent.h>
+#include <hikyuu/utilities/os.h>
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -20,8 +21,7 @@ int main(int argc, char* argv[]) {
 #endif
 
     // 配置文件的位置自行修改
-    hikyuu_init("C:\\Users\\admin\\.hikyuu\\hikyuu.ini");
-    // hikyuu_init("/home/fsd/.hikyuu/hikyuu.ini");
+    hikyuu_init(fmt::format("{}/.hikyuu/hikyuu.ini", getUserDir()));
 
     StockManager& sm = StockManager::instance();
 
