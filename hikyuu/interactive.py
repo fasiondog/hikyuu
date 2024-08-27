@@ -347,7 +347,11 @@ def realtime_update_from_website(source, stk_list=None):
 
 
 def realtime_update_from_qmt(stk_list=None):
-    from xtquant import xtdata
+    try:
+        from xtquant import xtdata
+    except:
+        # xtquant 不支持 linux，需自行下载安装
+        return
     if stk_list is None:
         stk_list = sm
     code_list = [f'{s.code}.{s.market}' for s in stk_list if s.valid]
