@@ -901,7 +901,8 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
     } else if (tmp.datetime < record.datetime) {
         m_data->pKData[ktype]->push_back(record);
     } else {
-        HKU_INFO("Ignore record, datetime < last record.datetime!");
+        HKU_INFO("Ignore record, datetime({}) < last record.datetime({})! {} {}", record.datetime,
+                 tmp.datetime, market_code(), inktype);
     }
 }
 

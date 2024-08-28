@@ -149,8 +149,13 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     }
 
     Datetime minute = spot.datetime;
-    minute = minute - (minute - minute.startOfDay()) % gap;
-    KRecordList klist = stk.getKRecordList(KQuery(minute, minute + gap, ktype));
+    Datetime today = minute.startOfDay();
+    // 非24小时交易品种，且时间和当天零时相同认为无分钟线级别数据
+    HKU_IF_RETURN(stk.type() != STOCKTYPE_CRYPTO && minute == today, void());
+
+    Datetime start_minute = minute - (minute - today) % gap;
+    Datetime end_minute = start_minute + gap;
+    KRecordList klist = stk.getKRecordList(KQuery(start_minute, end_minute, ktype));
     price_t sum_amount = 0.0, sum_volume = 0.0;
     for (const auto& k : klist) {
         sum_amount += k.transAmount;
@@ -160,7 +165,7 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     price_t amount = spot.amount > sum_amount ? spot.amount - sum_amount : spot.amount;
     price_t spot_volume = spot.volume * 100;  // spot 传过来的是手数
     price_t volume = spot_volume > sum_volume ? spot_volume - sum_volume : spot_volume;
-    KRecord krecord(minute, spot.open, spot.high, spot.low, spot.close, amount, volume);
+    KRecord krecord(end_minute, spot.open, spot.high, spot.low, spot.close, amount, volume);
     stk.realtimeUpdate(krecord, ktype);
 }
 
