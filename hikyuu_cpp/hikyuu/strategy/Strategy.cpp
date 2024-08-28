@@ -339,6 +339,12 @@ void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycl
 void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& stklist,
                                      const KQuery::KType& ktype) {
     // SPEND_TIME(getDataFromBufferServer);
+    const auto& preload = StockManager::instance().getPreloadParameter();
+    string low_ktype = ktype;
+    to_lower(low_ktype);
+    HKU_ERROR_IF_RETURN(!preload.tryGet<bool>(low_ktype, false), void(),
+                        "The {} kdata is not preload! Can't update!", low_ktype);
+
     NodeClient client(addr);
     try {
         HKU_CHECK(client.dial(), "Failed dial server!");
@@ -358,6 +364,7 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
                             res["msg"].get<string>());
 
         const auto& jdata = res["data"];
+        // HKU_INFO("{}", to_string(jdata));
         for (auto iter = jdata.cbegin(); iter != jdata.cend(); ++iter) {
             const auto& r = *iter;
             try {
