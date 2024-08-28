@@ -54,7 +54,13 @@ public:
     : m_func(func), m_spot(spot) {}
 
     void operator()() {
-        m_func(m_spot);
+        try {
+            m_func(m_spot);
+        } catch (const std::exception& e) {
+            HKU_ERROR(e.what());
+        } catch (...) {
+            HKU_ERROR_UNKNOWN;
+        }
     }
 
 private:
