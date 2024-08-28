@@ -402,6 +402,7 @@ bool Stock::isBuffer(KQuery::KType ktype) const {
     HKU_IF_RETURN(!m_data, false);
     string nktype(ktype);
     to_upper(nktype);
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     return m_data->pKData.find(nktype) != m_data->pKData.end() && m_data->pKData[nktype];
 }
 
@@ -497,11 +498,22 @@ size_t Stock::getCount(KQuery::KType kType) const {
     HKU_IF_RETURN(!m_data, 0);
     string nktype(kType);
     to_upper(nktype);
-    if (m_data->pKData.find(nktype) != m_data->pKData.end() && m_data->pKData[nktype]) {
+    if (isBuffer(nktype)) {
         return _getCountFromBuffer(nktype);
     }
 
-    return m_kdataDriver ? m_kdataDriver->getConnect()->getCount(market(), code(), nktype) : 0;
+    size_t ret =
+      m_kdataDriver ? m_kdataDriver->getConnect()->getCount(market(), code(), nktype) : 0;
+
+    // 异步加载时如果数据库数据量大于预加载数量强制返回预加载最大数量
+    const auto& preload_params = StockManager::instance().getPreloadParameter();
+    if (preload_params.tryGet<bool>(nktype, false)) {
+        int num = preload_params.tryGet<int>(fmt::format("{}_max", nktype), 4096);
+        if (ret > num) {
+            ret = num;
+        }
+    }
+    return ret;
 }
 
 price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) const {
@@ -702,7 +714,8 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
 
 KRecord Stock::_getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const {
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-    return m_data->pKData[ktype]->at(pos);
+    const auto& buf = *(m_data->pKData[ktype]);
+    return pos >= buf.size() ? KRecord() : buf[pos];
 }
 
 KRecord Stock::getKRecord(size_t pos, const KQuery::KType& kType) const {
