@@ -271,7 +271,9 @@ def collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
     sm = StockManager.instance()
     if source == 'qmt':
-        stk_list = [s for s in sm if s.valid]
+        stk_list = [s for s in sm if s.valid and s.type in (
+            constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF,
+            constant.STOCKTYPE_GEM, constant.STOCKTYPE_START, constant.STOCKTYPE_A_BJ)]
     else:
         stk_list = [
             stk.market_code.lower() for stk in sm if stk.valid and stk.type in
