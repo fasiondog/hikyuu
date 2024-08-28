@@ -37,7 +37,7 @@ static string getSpotMarketCode(const SpotRecord& spot) {
 
 static void updateStockDayData(const SpotRecord& spot) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
-    HKU_IF_RETURN(stk.isNull(), void());
+    HKU_IF_RETURN(stk.isNull() || !stk.isBuffer(KQuery::DAY), void());
     // HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
     KRecord krecord(Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day()),
                     spot.open, spot.high, spot.low, spot.close, spot.amount, spot.volume);
@@ -46,7 +46,7 @@ static void updateStockDayData(const SpotRecord& spot) {
 
 static void updateStockDayUpData(const SpotRecord& spot, KQuery::KType ktype) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
-    HKU_IF_RETURN(stk.isNull(), void());
+    HKU_IF_RETURN(stk.isNull() || !stk.isBuffer(ktype), void());
     // HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
 
     std::function<Datetime(Datetime*)> endOfPhase;
@@ -120,7 +120,7 @@ static void updateStockDayUpData(const SpotRecord& spot, KQuery::KType ktype) {
 
 static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
-    HKU_IF_RETURN(stk.isNull(), void());
+    HKU_IF_RETURN(stk.isNull() || !stk.isBuffer(ktype), void());
     // HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
 
     TimeDelta gap;
