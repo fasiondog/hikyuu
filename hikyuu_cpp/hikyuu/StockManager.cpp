@@ -55,44 +55,6 @@ StockManager& StockManager::instance() {
     return (*m_sm);
 }
 
-Parameter default_preload_param() {
-    Parameter param;
-    param.set<bool>("day", true);
-    param.set<bool>("week", false);
-    param.set<bool>("month", false);
-    param.set<bool>("quarter", false);
-    param.set<bool>("halfyear", false);
-    param.set<bool>("year", false);
-    param.set<bool>("min", false);
-    param.set<bool>("min5", false);
-    param.set<bool>("min15", false);
-    param.set<bool>("min30", false);
-    param.set<bool>("min60", false);
-    param.set<bool>("hour2", false);
-    param.set<bool>("ticks", false);
-    param.set<int>("day_max", 100000);
-    param.set<int>("week_max", 100000);
-    param.set<int>("month_max", 100000);
-    param.set<int>("quarter_max", 100000);
-    param.set<int>("halfyear_max", 100000);
-    param.set<int>("year_max", 100000);
-    param.set<int>("min_max", 5120);
-    param.set<int>("min5_max", 5120);
-    param.set<int>("min15_max", 5120);
-    param.set<int>("min30_max", 5120);
-    param.set<int>("min60_max", 5120);
-    param.set<int>("hour2_max", 5120);
-    param.set<int>("ticks_max", 5120);
-    return param;
-}
-
-Parameter default_other_param() {
-    Parameter param;
-    param.set<string>("tmpdir", ".");
-    param.set<string>("logger", "");
-    return param;
-}
-
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam, const StrategyContext& context) {
@@ -239,7 +201,7 @@ void StockManager::reload() {
                 continue;
             }
 
-            auto& ktype_list = KQuery::getAllKType();
+            const auto& ktype_list = KQuery::getAllKType();
             for (auto& ktype : ktype_list) {
                 if (iter->second.isBuffer(ktype)) {
                     tg->submit([=]() mutable {

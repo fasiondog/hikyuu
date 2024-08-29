@@ -83,8 +83,6 @@ ini.read(config_file, encoding='utf-8')
 hku_param = Parameter()
 hku_param["tmpdir"] = ini.get('hikyuu', 'tmpdir')
 hku_param["datadir"] = ini.get('hikyuu', 'datadir')
-if ini.has_option('hikyuu', 'logger'):
-    hku_param["logger"] = ini['hikyuu']['logger']
 if ini.has_option('hikyuu', 'quotation_server'):
     hku_param["quotation_server"] = ini['hikyuu']['quotation_server']
 

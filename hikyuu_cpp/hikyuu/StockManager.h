@@ -21,9 +21,6 @@ namespace hku {
 
 typedef vector<string> MarketList;
 
-Parameter default_preload_param();
-Parameter default_other_param();
-
 /**
  * 证券信息统一管理类
  * @ingroup StockManage
@@ -47,8 +44,8 @@ public:
      * @param context 策略上下文
      */
     void init(const Parameter& baseInfoParam, const Parameter& blockParam,
-              const Parameter& kdataParam, const Parameter& preloadParam = default_preload_param(),
-              const Parameter& hikyuuParam = default_other_param(),
+              const Parameter& kdataParam, const Parameter& preloadParam,
+              const Parameter& hikyuuParam,
               const StrategyContext& context = StrategyContext({"all"}));
 
     /** 重新加载 */

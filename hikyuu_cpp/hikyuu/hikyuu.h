@@ -35,6 +35,10 @@ namespace hku {
 void HKU_API hikyuu_init(const string& config_file_name, bool ignore_preload = false,
                          const StrategyContext& context = StrategyContext({"all"}));
 
+void HKU_API getConfigFromIni(const string& config_file_name, Parameter& baseParam,
+                              Parameter& blockParam, Parameter& kdataParam, Parameter& preloadParam,
+                              Parameter& hkuParam);
+
 /** @} */
 
 }  // namespace hku
