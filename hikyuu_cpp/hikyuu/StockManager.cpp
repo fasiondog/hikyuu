@@ -480,6 +480,7 @@ void StockManager::loadAllHolidays() {
 }
 
 void StockManager::loadAllStockWeights() {
+    HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("load_stock_weight", true), void());
     HKU_INFO("Loading stock weight...");
     if (m_context.isAll()) {
         auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
@@ -511,10 +512,12 @@ void StockManager::loadAllZhBond10() {
 }
 
 void StockManager::loadHistoryFinanceField() {
-    auto fields = m_baseInfoDriver->getHistoryFinanceField();
-    for (const auto& field : fields) {
-        m_field_ix_to_name[field.first - 1] = field.second;
-        m_field_name_to_ix[field.second] = field.first - 1;
+    if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
+        auto fields = m_baseInfoDriver->getHistoryFinanceField();
+        for (const auto& field : fields) {
+            m_field_ix_to_name[field.first - 1] = field.second;
+            m_field_name_to_ix[field.second] = field.first - 1;
+        }
     }
 }
 
@@ -531,10 +534,12 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
 }
 
 void StockManager::loadHistoryFinance() {
-    auto* tg = getGlobalTaskGroup();
-    std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
-    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-        tg->submit([=]() { iter->second.getHistoryFinance(); });
+    if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
+        auto* tg = getGlobalTaskGroup();
+        std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            tg->submit([=]() { iter->second.getHistoryFinance(); });
+        }
     }
 }
 

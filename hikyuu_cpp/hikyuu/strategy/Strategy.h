@@ -28,6 +28,7 @@ namespace hku {
  */
 class HKU_API Strategy {
     CLASS_LOGGER_IMP(Strategy)
+    PARAMETER_SUPPORT
 
 public:
     Strategy();
