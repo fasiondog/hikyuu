@@ -105,16 +105,23 @@ void StockManager::loadData() {
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
     m_data_ready = false;
 
-    loadAllHolidays();
+    ThreadPool tg(2);
+    tg.submit([this]() { this->loadAllHolidays(); });
+    tg.submit([this]() { this->loadHistoryFinanceField(); });
+    tg.submit([this]() { this->loadAllStockTypeInfo(); });
+    tg.submit([this]() { this->loadAllZhBond10(); });
+
+    // loadAllHolidays();
     loadAllMarketInfos();
-    loadAllStockTypeInfo();
+    // loadAllStockTypeInfo();
     loadAllStocks();
     loadAllStockWeights();
-    loadAllZhBond10();
-    loadHistoryFinanceField();
+    // loadAllZhBond10();
+    // loadHistoryFinanceField();
 
     HKU_INFO("Loading block...");
-    m_blockDriver->load();
+    // m_blockDriver->load();
+    tg.submit([this]() { this->m_blockDriver->load(); });
 
     // 获取K线数据驱动并预加载指定的数据
     HKU_INFO("Loading KData...");
@@ -123,6 +130,8 @@ void StockManager::loadData() {
 
     // 加载K线及历史财务信息
     loadAllKData();
+
+    tg.join();
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
@@ -171,14 +180,16 @@ void StockManager::loadAllKData() {
     } else {
         // 异步并行加载
         std::thread t = std::thread([this, ktypes, low_ktypes]() {
-            ThreadPool tg(std::thread::hardware_concurrency());
+            this->m_load_tg = std::make_unique<ThreadPool>();
+            // ThreadPool tg(std::thread::hardware_concurrency());
             for (size_t i = 0, len = ktypes.size(); i < len; i++) {
                 std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
                 for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
                     if (m_preloadParam.tryGet<bool>(low_ktypes[i], false)) {
-                        tg.submit([stk = iter->second, ktype = std::move(ktypes[i])]() mutable {
-                            stk.loadKDataToBuffer(ktype);
-                        });
+                        m_load_tg->submit(
+                          [stk = iter->second, ktype = std::move(ktypes[i])]() mutable {
+                              stk.loadKDataToBuffer(ktype);
+                          });
                     }
                 }
             }
@@ -186,11 +197,12 @@ void StockManager::loadAllKData() {
             if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
                 std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
                 for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-                    tg.submit([stk = iter->second]() { stk.getHistoryFinance(); });
+                    m_load_tg->submit([stk = iter->second]() { stk.getHistoryFinance(); });
                 }
             }
 
-            tg.join();
+            m_load_tg->join();
+            m_load_tg.reset();
             m_data_ready = true;
         });
         t.detach();

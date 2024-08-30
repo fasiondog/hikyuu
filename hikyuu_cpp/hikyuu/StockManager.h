@@ -10,8 +10,9 @@
 
 #include <mutex>
 #include <thread>
-#include "utilities/Parameter.h"
-#include "data_driver/DataDriverFactory.h"
+#include "hikyuu/utilities/Parameter.h"
+#include "hikyuu/utilities/thread/thread.h"
+#include "hikyuu/data_driver/DataDriverFactory.h"
 #include "Block.h"
 #include "MarketInfo.h"
 #include "StockTypeInfo.h"
@@ -218,6 +219,11 @@ public:
         return m_thread_id;
     }
 
+    /** 仅由程序退出使使用！！！ */
+    ThreadPool* getLoadTaskGroup() {
+        return m_load_tg.get();
+    }
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
@@ -293,6 +299,8 @@ private:
     Parameter m_preloadParam;
     Parameter m_hikyuuParam;
     StrategyContext m_context;
+
+    std::unique_ptr<ThreadPool> m_load_tg;  // 异步数据加载辅助线程组
 };
 
 inline size_t StockManager::size() const {
