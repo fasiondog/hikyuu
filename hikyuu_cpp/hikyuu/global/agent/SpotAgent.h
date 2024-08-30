@@ -27,7 +27,7 @@ namespace hku {
  */
 class HKU_API SpotAgent {
 public:
-    SpotAgent();
+    SpotAgent(size_t worker_num);
 
     /** 析构函数 */
     virtual ~SpotAgent();

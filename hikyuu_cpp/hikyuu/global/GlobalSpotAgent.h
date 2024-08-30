@@ -15,7 +15,8 @@ namespace hku {
  * @param print 打印接收数据进展
  * @ingroup Agent
  */
-void HKU_API startSpotAgent(bool print = true);
+void HKU_API startSpotAgent(bool print = true,
+                            size_t worker_num = std::thread::hardware_concurrency());
 
 /**
  * 终止 Spot 数据接收代理
@@ -23,7 +24,7 @@ void HKU_API startSpotAgent(bool print = true);
  */
 void HKU_API stopSpotAgent();
 
-SpotAgent* getGlobalSpotAgent();
+SpotAgent* getGlobalSpotAgent(size_t worker_num = std::thread::hardware_concurrency());
 
 void releaseGlobalSpotAgent();
 

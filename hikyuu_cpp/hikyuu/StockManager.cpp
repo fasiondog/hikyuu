@@ -181,7 +181,6 @@ void StockManager::loadAllKData() {
         // 异步并行加载
         std::thread t = std::thread([this, ktypes, low_ktypes]() {
             this->m_load_tg = std::make_unique<ThreadPool>();
-            // ThreadPool tg(std::thread::hardware_concurrency());
             for (size_t i = 0, len = ktypes.size(); i < len; i++) {
                 std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
                 for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {

@@ -25,8 +25,8 @@ const size_t SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
 
 Datetime SpotAgent::ms_start_rev_time;
 
-SpotAgent::SpotAgent() {
-    m_tg = std::make_unique<ThreadPool>();
+SpotAgent::SpotAgent(size_t worker_num) {
+    m_tg = std::make_unique<ThreadPool>(worker_num);
 }
 
 SpotAgent::~SpotAgent() {

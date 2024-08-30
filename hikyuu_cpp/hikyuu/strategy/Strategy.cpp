@@ -98,7 +98,14 @@ void Strategy::start() {
 
     _runDailyAt();
 
-    auto& agent = *getGlobalSpotAgent();
+    size_t stock_num = StockManager::instance().size();
+    size_t spot_worker_num = stock_num / 300;
+    size_t cpu_num = std::thread::hardware_concurrency();
+    if (spot_worker_num > cpu_num) {
+        spot_worker_num = cpu_num;
+    }
+
+    auto& agent = *getGlobalSpotAgent(spot_worker_num);
     agent.addProcess([this](const SpotRecord& spot) { _receivedSpot(spot); });
     agent.addPostProcess([this](Datetime revTime) {
         if (m_on_recieved_spot) {
