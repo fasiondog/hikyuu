@@ -55,7 +55,7 @@ static const unordered_map<string, int32_t> g_ktype2min{
 };
 
 // 获取所有的 KType
-const vector<string>& KQuery::getAllKType() {
+const vector<KQuery::KType>& KQuery::getAllKType() {
     return g_all_ktype;
 }
 

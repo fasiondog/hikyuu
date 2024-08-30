@@ -70,7 +70,7 @@ public:
     // static const string INVALID_KTYPE;
 
     /** 获取所有的 KType */
-    static const vector<string>& getAllKType();
+    static const vector<KType>& getAllKType();
 
     static int32_t getKTypeInMin(KType);
 

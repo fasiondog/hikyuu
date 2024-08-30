@@ -139,20 +139,28 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
 }
 
 void StockManager::loadAllKData() {
-    const auto& ktypes = KQuery::getAllKType();
+    // 按 K 线类型控制加载顺序
+    // const auto& ktypes = KQuery::getAllKType();
+    vector<KQuery::KType> ktypes{KQuery::DAY,     KQuery::MIN,      KQuery::WEEK,  KQuery::MONTH,
+                                 KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::MIN5,
+                                 KQuery::MIN15,   KQuery::MIN30,    KQuery::MIN60, KQuery::MIN3,
+                                 KQuery::HOUR2,   KQuery::HOUR4,    KQuery::HOUR6, KQuery::HOUR12};
+    HKU_ASSERT(ktypes.size() == KQuery::getAllKType().size());
+
     vector<string> low_ktypes;
     low_ktypes.reserve(ktypes.size());
     for (const auto& ktype : ktypes) {
         auto& back = low_ktypes.emplace_back(ktype);
         to_lower(back);
-        HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false), "Preloading all {} kdata to buffer!",
+        HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false), "Preloading all {} kdata to buffer !",
                     back);
     }
 
+    // 先加载同类K线
     auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
     if (!driver->getPrototype()->canParallelLoad()) {
-        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-            for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+        for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+            for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
                 const auto& low_ktype = low_ktypes[i];
                 if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
                     iter->second.loadKDataToBuffer(ktypes[i]);
@@ -163,8 +171,8 @@ void StockManager::loadAllKData() {
     } else {
         // 异步并行加载
         auto* tg = getGlobalTaskGroup();
-        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-            for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+        for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+            for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
                 const auto& low_ktype = low_ktypes[i];
                 if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
                     tg->submit(
@@ -179,6 +187,7 @@ void StockManager::reload() {
     HKU_IF_RETURN(m_initializing, void());
     m_initializing = true;
 
+    HKU_INFO("start reload ...");
     loadAllHolidays();
     loadAllMarketInfos();
     loadAllStockTypeInfo();
@@ -188,40 +197,7 @@ void StockManager::reload() {
     loadHistoryFinanceField();
 
     m_blockDriver->load();
-
-    HKU_INFO("start reload kdata to buffer");
-    std::vector<Stock> can_not_parallel_stk_list;  // 记录不支持并行加载的Stock
-    {
-        auto* tg = getGlobalTaskGroup();
-        std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
-        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-            auto driver = iter->second.getKDataDirver();
-            if (!driver->getPrototype()->canParallelLoad()) {
-                can_not_parallel_stk_list.push_back(iter->second);
-                continue;
-            }
-
-            const auto& ktype_list = KQuery::getAllKType();
-            for (auto& ktype : ktype_list) {
-                if (iter->second.isBuffer(ktype)) {
-                    tg->submit([=]() mutable {
-                        Stock& stk = iter->second;
-                        stk.loadKDataToBuffer(ktype);
-                    });
-                }
-            }
-        }
-    }
-
-    for (auto& stk : can_not_parallel_stk_list) {
-        const auto& ktype_list = KQuery::getAllKType();
-        for (const auto& ktype : ktype_list) {
-            if (stk.isBuffer(ktype)) {
-                stk.loadKDataToBuffer(ktype);
-            }
-        }
-    }
-
+    loadAllKData();
     loadHistoryFinance();
     m_initializing = false;
 }
