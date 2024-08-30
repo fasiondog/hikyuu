@@ -89,13 +89,11 @@ void GlobalInitializer::clean() {
 
     IndicatorImp::releaseDynEngine();
 
-#if !HKU_OS_WINDOWS
     // 主动停止异步数据加载任务组，否则 hdf5 在 linux 下会报关闭异常
     auto *tg = StockManager::instance().getLoadTaskGroup();
     if (tg) {
         tg->stop();
     }
-#endif
 
 #if HKU_ENABLE_LEAK_DETECT || defined(MSVC_LEAKER_DETECT)
     // 非内存泄漏检测时，内存让系统自动释放，避免某些场景下 windows 下退出速度过慢
