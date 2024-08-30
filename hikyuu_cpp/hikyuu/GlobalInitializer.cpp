@@ -25,7 +25,6 @@
 #include "hikyuu.h"
 #include "GlobalInitializer.h"
 #include "StockManager.h"
-#include "global/GlobalTaskGroup.h"
 #include "global/GlobalSpotAgent.h"
 #include "global/schedule/scheduler.h"
 #include "indicator/IndicatorImp.h"
@@ -70,7 +69,6 @@ void GlobalInitializer::init() {
     DataDriverFactory::init();
     StockManager::instance();
     IndicatorImp::initDynEngine();
-    getGlobalSpotAgent();
 }
 
 void GlobalInitializer::clean() {
@@ -87,7 +85,6 @@ void GlobalInitializer::clean() {
 #endif
 
     releaseScheduler();
-    releaseGlobalTaskGroup();
     releaseGlobalSpotAgent();
 
     IndicatorImp::releaseDynEngine();

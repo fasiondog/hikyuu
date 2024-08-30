@@ -87,6 +87,9 @@ public:
     /** 获取证券数量 */
     size_t size() const;
 
+    /** 是否所有数据准备完毕 */
+    bool dataReady() const;
+
     /**
      * 根据"市场简称证券代码"获取对应的证券实例
      * @param querystr 格式：“市场简称证券代码”，如"sh000001"
@@ -252,15 +255,13 @@ private:
     /** 加载历史财经字段索引 */
     void loadHistoryFinanceField();
 
-    /** 加载历史财务数据 */
-    void loadHistoryFinance();
-
 private:
     StockManager();
 
 private:
     static StockManager* m_sm;
     std::atomic_bool m_initializing;
+    std::atomic_bool m_data_ready;  // 用于指示是否所有数据准备完毕
     std::thread::id m_thread_id;  // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
     string m_tmpdir;
     string m_datadir;
@@ -296,6 +297,10 @@ private:
 
 inline size_t StockManager::size() const {
     return m_stockDict.size();
+}
+
+inline bool StockManager::dataReady() const {
+    return m_data_ready;
 }
 
 inline Stock StockManager::operator[](const string& query) const {

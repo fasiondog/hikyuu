@@ -18,7 +18,6 @@
 #include "hikyuu/utilities/ini_parser/IniParser.h"
 #include "hikyuu/utilities/thread/ThreadPool.h"
 #include "StockManager.h"
-#include "global/GlobalTaskGroup.h"
 #include "global/schedule/inner_tasks.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
 
@@ -33,7 +32,7 @@ void StockManager::quit() {
     }
 }
 
-StockManager::StockManager() : m_initializing(false) {
+StockManager::StockManager() : m_initializing(false), m_data_ready(false) {
     m_stockDict_mutex = new std::mutex;
     m_marketInfoDict_mutex = new std::mutex;
     m_stockTypeInfo_mutex = new std::mutex;
@@ -103,6 +102,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 }
 
 void StockManager::loadData() {
+    std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
+    m_data_ready = false;
+
     loadAllHolidays();
     loadAllMarketInfos();
     loadAllStockTypeInfo();
@@ -111,13 +113,16 @@ void StockManager::loadData() {
     loadAllZhBond10();
     loadHistoryFinanceField();
 
+    HKU_INFO("Loading block...");
+    m_blockDriver->load();
+
     // 获取K线数据驱动并预加载指定的数据
     HKU_INFO("Loading KData...");
-    std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
 
-    m_blockDriver->load();
+    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+
+    // 加载K线及历史财务信息
     loadAllKData();
-    loadHistoryFinance();
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
@@ -153,18 +158,42 @@ void StockManager::loadAllKData() {
             }
         }
 
+        if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
+            ThreadPool tg;
+            for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+                tg.submit([stk = iter->second]() { stk.getHistoryFinance(); });
+            }
+            tg.join();
+        }
+
+        m_data_ready = true;
+
     } else {
         // 异步并行加载
-        auto* tg = getGlobalTaskGroup();
-        for (size_t i = 0, len = ktypes.size(); i < len; i++) {
-            for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-                const auto& low_ktype = low_ktypes[i];
-                if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
-                    tg->submit(
-                      [=, ktype = ktypes[i]]() mutable { iter->second.loadKDataToBuffer(ktype); });
+        std::thread t = std::thread([this, ktypes, low_ktypes]() {
+            ThreadPool tg(std::thread::hardware_concurrency());
+            for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+                std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+                for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+                    if (m_preloadParam.tryGet<bool>(low_ktypes[i], false)) {
+                        tg.submit([stk = iter->second, ktype = std::move(ktypes[i])]() mutable {
+                            stk.loadKDataToBuffer(ktype);
+                        });
+                    }
                 }
             }
-        }
+
+            if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
+                std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+                for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+                    tg.submit([stk = iter->second]() { stk.getHistoryFinance(); });
+                }
+            }
+
+            tg.join();
+            m_data_ready = true;
+        });
+        t.detach();
     }
 }
 
@@ -494,16 +523,6 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
                   return a.first < b.first;
               });
     return ret;
-}
-
-void StockManager::loadHistoryFinance() {
-    if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
-        auto* tg = getGlobalTaskGroup();
-        std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
-        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-            tg->submit([=]() { iter->second.getHistoryFinance(); });
-        }
-    }
 }
 
 }  // namespace hku

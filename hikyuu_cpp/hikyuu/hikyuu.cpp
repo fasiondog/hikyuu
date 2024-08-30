@@ -53,14 +53,6 @@ void HKU_API getConfigFromIni(const string& config_file_name, Parameter& basePar
     hkuParam.set<bool>("load_history_finance",
                        config.getBool("hikyuu", "load_history_finance", "True"));
 
-    // 公共线程池线程数量
-    size_t cpu_num = 2 * std::thread::hardware_concurrency();
-    if (cpu_num > 30) {
-        cpu_num = 30;
-    }
-    hkuParam.set<int>("commont_thread_pool_num", config.getInt("hikyuu", "commont_thread_pool_num",
-                                                               fmt::format("{}", cpu_num)));
-
     IniParser::StringListPtr option = config.getOptionList("baseinfo");
     for (auto iter = option->begin(); iter != option->end(); ++iter) {
         string value = config.get("baseinfo", *iter);

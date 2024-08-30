@@ -12,18 +12,9 @@
 #include "hikyuu/utilities/node/NodeClient.h"
 #include "hikyuu/global/GlobalSpotAgent.h"
 #include "hikyuu/global/schedule/scheduler.h"
-#include "hikyuu/global/GlobalTaskGroup.h"
 #include "hikyuu/global/sysinfo.h"
 #include "hikyuu/hikyuu.h"
 #include "Strategy.h"
-
-// python 中运行拉回主线程循环，非 python 环境则直接执行
-#define EVENT(func)          \
-    if (runningInPython()) { \
-        event(func);         \
-    } else {                 \
-        func();              \
-    }
 
 namespace hku {
 
@@ -111,7 +102,7 @@ void Strategy::start() {
     agent.addProcess([this](const SpotRecord& spot) { _receivedSpot(spot); });
     agent.addPostProcess([this](Datetime revTime) {
         if (m_on_recieved_spot) {
-            EVENT([=]() { m_on_recieved_spot(revTime); });
+            event([=]() { m_on_recieved_spot(revTime); });
         }
     });
     startSpotAgent(true);
@@ -136,7 +127,7 @@ void Strategy::_receivedSpot(const SpotRecord& spot) {
     Stock stk = getStock(format("{}{}", spot.market, spot.code));
     if (!stk.isNull()) {
         if (m_on_change) {
-            EVENT([=]() { m_on_change(stk, spot); });
+            event([=]() { m_on_change(stk, spot); });
         }
     }
 }
@@ -149,7 +140,7 @@ void Strategy::runDaily(std::function<void()>&& func, const TimeDelta& delta,
     m_ignoreMarket = ignoreMarket;
 
     if (ignoreMarket) {
-        m_run_daily_func = [=]() { EVENT(func); };
+        m_run_daily_func = [=]() { event(func); };
 
     } else {
         m_run_daily_func = [=]() {
@@ -167,7 +158,7 @@ void Strategy::runDaily(std::function<void()>&& func, const TimeDelta& delta,
             Datetime close2 = today + market_info.closeTime2();
             Datetime now = Datetime::now();
             if ((now >= open1 && now <= close1) || (now >= open2 && now <= close2)) {
-                EVENT(func);
+                event(func);
             }
         };
     }
@@ -264,12 +255,12 @@ void Strategy::runDailyAt(std::function<void()>&& func, const TimeDelta& delta,
             auto today = Datetime::today();
             int day = today.dayOfWeek();
             if (day != 0 && day != 6 && !sm.isHoliday(today)) {
-                EVENT(func);
+                event(func);
             }
         };
 
     } else {
-        m_run_daily_at_func = [=]() { EVENT(func); };
+        m_run_daily_at_func = [=]() { event(func); };
     }
 }
 
