@@ -93,26 +93,28 @@ void Strategy::_init() {
     stopSpotAgent();
 }
 
-void Strategy::start() {
+void Strategy::start(bool autoRecieveSpot) {
     _init();
 
     _runDailyAt();
 
-    size_t stock_num = StockManager::instance().size();
-    size_t spot_worker_num = stock_num / 300;
-    size_t cpu_num = std::thread::hardware_concurrency();
-    if (spot_worker_num > cpu_num) {
-        spot_worker_num = cpu_num;
-    }
-
-    auto& agent = *getGlobalSpotAgent(spot_worker_num);
-    agent.addProcess([this](const SpotRecord& spot) { _receivedSpot(spot); });
-    agent.addPostProcess([this](Datetime revTime) {
-        if (m_on_recieved_spot) {
-            event([=]() { m_on_recieved_spot(revTime); });
+    if (autoRecieveSpot) {
+        size_t stock_num = StockManager::instance().size();
+        size_t spot_worker_num = stock_num / 300;
+        size_t cpu_num = std::thread::hardware_concurrency();
+        if (spot_worker_num > cpu_num) {
+            spot_worker_num = cpu_num;
         }
-    });
-    startSpotAgent(true);
+
+        auto& agent = *getGlobalSpotAgent(spot_worker_num);
+        agent.addProcess([this](const SpotRecord& spot) { _receivedSpot(spot); });
+        agent.addPostProcess([this](Datetime revTime) {
+            if (m_on_recieved_spot) {
+                event([=]() { m_on_recieved_spot(revTime); });
+            }
+        });
+        startSpotAgent(true);
+    }
 
     _runDaily();
 
