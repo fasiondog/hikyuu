@@ -225,8 +225,8 @@ public:
     }
 
 private:
-    /* 设置K线驱动 */
-    void setKDataDriver(const KDataDriverConnectPoolPtr&);
+    /* 加载全部数据 */
+    void loadData();
 
     /* 加载 K线数据至缓存 */
     void loadAllKData();

@@ -87,6 +87,22 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_baseInfoDriver = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
     HKU_CHECK(m_baseInfoDriver, "Failed get base info driver!");
 
+    // 获取板块驱动
+    m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
+
+    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+    HKU_CHECK(driver, "driver is null!");
+    if (m_kdataDriverParam != driver->getPrototype()->getParameter()) {
+        m_kdataDriverParam = driver->getPrototype()->getParameter();
+    }
+
+    loadData();
+    initInnerTask();
+
+    m_initializing = false;
+}
+
+void StockManager::loadData() {
     loadAllHolidays();
     loadAllMarketInfos();
     loadAllStockTypeInfo();
@@ -95,42 +111,16 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     loadAllZhBond10();
     loadHistoryFinanceField();
 
-    // 获取板块驱动
-    m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
-
     // 获取K线数据驱动并预加载指定的数据
     HKU_INFO("Loading KData...");
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
 
-    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
-    HKU_CHECK(driver, "driver is null!");
-    if (m_kdataDriverParam != driver->getPrototype()->getParameter()) {
-        m_kdataDriverParam = driver->getPrototype()->getParameter();
-    }
-    setKDataDriver(driver);
-
-    // 加载 block，须在 stock 的 kdatadriver 被设置之后调用
     m_blockDriver->load();
-
-    // 加载 K 线至缓存
     loadAllKData();
-
-    // 加载历史财务信息
     loadHistoryFinance();
-
-    initInnerTask();
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
-    m_initializing = false;
-}
-
-void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
-    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-        if (iter->second.market() == "TMP")
-            continue;
-        iter->second.setKDataDriver(driver);
-    }
 }
 
 void StockManager::loadAllKData() {
@@ -183,17 +173,7 @@ void StockManager::reload() {
     m_initializing = true;
 
     HKU_INFO("start reload ...");
-    loadAllHolidays();
-    loadAllMarketInfos();
-    loadAllStockTypeInfo();
-    loadAllStocks();
-    loadAllStockWeights();
-    loadAllZhBond10();
-    loadHistoryFinanceField();
-
-    m_blockDriver->load();
-    loadAllKData();
-    loadHistoryFinance();
+    loadData();
     m_initializing = false;
 }
 
@@ -372,6 +352,8 @@ void StockManager::loadAllStocks() {
         }
     }
 
+    auto kdriver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+
     std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
     for (auto& info : stockInfos) {
         Datetime startDate, endDate;
@@ -385,15 +367,17 @@ void StockManager::loadAllStocks() {
         } catch (...) {
             endDate = Null<Datetime>();
         }
-        Stock _stock(info.market, info.code, info.name, info.type, info.valid, startDate, endDate,
-                     info.tick, info.tickValue, info.precision, info.minTradeNumber,
-                     info.maxTradeNumber);
-        string market_code = _stock.market_code();
-        ;
+
+        string market_code = fmt::format("{}{}", info.market, info.code);
         to_upper(market_code);
+
         auto iter = m_stockDict.find(market_code);
         if (iter == m_stockDict.end()) {
-            m_stockDict[market_code] = _stock;
+            Stock _stock(info.market, info.code, info.name, info.type, info.valid, startDate,
+                         endDate, info.tick, info.tickValue, info.precision, info.minTradeNumber,
+                         info.maxTradeNumber);
+            _stock.setKDataDriver(kdriver);
+            m_stockDict[market_code] = std::move(_stock);
         } else {
             Stock& stock = iter->second;
             if (!stock.m_data) {
@@ -415,6 +399,9 @@ void StockManager::loadAllStocks() {
                 stock.m_data->m_minTradeNumber = info.minTradeNumber;
                 stock.m_data->m_maxTradeNumber = info.maxTradeNumber;
                 stock.m_data->m_history_finance_ready = false;
+            }
+            if (!stock.getKDataDirver()) {
+                stock.setKDataDriver(kdriver);
             }
         }
     }
