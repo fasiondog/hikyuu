@@ -74,6 +74,9 @@ public:
 
     static int32_t getKTypeInMin(KType);
 
+    /** 判断是否为有效 ktype */
+    static bool isKType(const string& ktype);
+
     /**
      * 复权类型
      * @note 日线以上，如周线/月线不支持复权

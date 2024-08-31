@@ -63,6 +63,17 @@ int32_t KQuery::getKTypeInMin(KType ktype) {
     return g_ktype2min.at(ktype);
 }
 
+bool KQuery::isKType(const string& ktype) {
+    string nktype(ktype);
+    to_upper(nktype);
+    for (const auto& v : g_all_ktype) {
+        if (nktype == v) {
+            return true;
+        }
+    }
+    return false;
+}
+
 KQuery::KQuery(Datetime start, Datetime end, const KType& ktype, RecoverType recoverType)
 : m_start(start == Null<Datetime>() ? (int64_t)start.number()
                                     : (int64_t)(start.number() * 100 + start.second())),

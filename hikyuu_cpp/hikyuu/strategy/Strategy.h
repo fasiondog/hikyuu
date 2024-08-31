@@ -19,7 +19,7 @@
 namespace hku {
 
 /**
- * @ingroup Stratgy
+ * @ingroup Strategy
  * @{
  */
 
@@ -37,6 +37,9 @@ public:
              const string& name = "Strategy", const string& config_file = "");
     explicit Strategy(const StrategyContext& context, const string& name = "Strategy",
                       const string& config_file = "");
+
+    Strategy(const Strategy&) = delete;
+    Strategy& operator=(const Strategy&) = delete;
 
     virtual ~Strategy();
 

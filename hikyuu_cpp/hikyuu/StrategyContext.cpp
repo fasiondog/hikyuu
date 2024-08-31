@@ -9,18 +9,68 @@
 
 namespace hku {
 
-void StrategyContext::setStockCodeList(const vector<string>& stockList) {
-    m_stockCodeList.resize(stockList.size());
-    std::copy(stockList.begin(), stockList.end(), m_stockCodeList.begin());
+StrategyContext::StrategyContext(const vector<string>& stockCodeList) {
+    _removeDuplicateCode(stockCodeList);
 }
 
-void StrategyContext::setKTypeList(const vector<KQuery::KType>& ktypeList) {
-    m_ktypeList.resize(ktypeList.size());
-    std::transform(ktypeList.begin(), ktypeList.end(), m_ktypeList.begin(),
-                   [](KQuery::KType ktype) {
-                       to_upper(ktype);
-                       return ktype;
-                   });
+StrategyContext::StrategyContext(const vector<string>& stockCodeList,
+                                 const vector<KQuery::KType>& ktypeList) {
+    _removeDuplicateCode(stockCodeList);
+    _checkAndRemoveDuplicateKType(ktypeList);
+}
+
+StrategyContext::StrategyContext(StrategyContext&& rv)
+: m_startDatetime(std::move(rv.m_startDatetime)),
+  m_mustLoad(std::move(rv.m_mustLoad)),
+  m_stockCodeList(std::move(rv.m_stockCodeList)),
+  m_ktypeList(std::move(m_ktypeList)) {}
+
+StrategyContext& StrategyContext::operator=(const StrategyContext& rv) {
+    if (this != &rv) {
+        m_startDatetime = rv.m_startDatetime;
+        m_mustLoad = rv.m_mustLoad;
+        m_stockCodeList = rv.m_stockCodeList;
+        m_ktypeList = rv.m_ktypeList;
+    }
+    return *this;
+}
+
+StrategyContext& StrategyContext::operator=(StrategyContext&& rv) {
+    if (this != &rv) {
+        m_startDatetime = std::move(rv.m_startDatetime);
+        m_mustLoad = std::move(rv.m_mustLoad);
+        m_stockCodeList = std::move(rv.m_stockCodeList);
+        m_ktypeList = std::move(rv.m_ktypeList);
+    }
+    return *this;
+}
+
+void StrategyContext::_removeDuplicateCode(const vector<string>& stockCodeList) {
+    m_stockCodeList.reserve(stockCodeList.size());
+    std::set<string> code_set;
+    for (const auto& code : m_mustLoad) {
+        code_set.insert(code);
+    }
+    for (const auto& code : stockCodeList) {
+        if (code_set.find(code) == code_set.end()) {
+            m_stockCodeList.push_back(code);
+        } else {
+            code_set.insert(code);
+        }
+    }
+}
+
+void StrategyContext::_checkAndRemoveDuplicateKType(const vector<KQuery::KType>& ktypeList) {
+    m_ktypeList.reserve(ktypeList.size());
+    std::set<KQuery::KType> ktype_set;
+    for (const auto& ktype : ktypeList) {
+        HKU_CHECK(KQuery::isKType(ktype), "Invalid ktype: {}", ktype);
+        if (ktype_set.find(ktype) == ktype_set.end()) {
+            m_ktypeList.push_back(ktype);
+        } else {
+            ktype_set.insert(ktype);
+        }
+    }
 }
 
 bool StrategyContext::isAll() const noexcept {
@@ -30,7 +80,7 @@ bool StrategyContext::isAll() const noexcept {
            }) != m_stockCodeList.end();
 }
 
-vector<string> StrategyContext::getAllNeedLoadStockCodeList() const {
+vector<string> StrategyContext::getAllNeedLoadStockCodeList() const noexcept {
     vector<string> ret{m_stockCodeList};
     for (const auto& code : m_mustLoad) {
         ret.push_back(code);
