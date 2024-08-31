@@ -51,21 +51,12 @@ SOFTWARE.
 """
 
 import urllib
-import sys
 import os
 import configparser
 
 from hikyuu.data.hku_config_template import generate_default_config
 from hikyuu import *
 
-# ==============================================================================
-# 引入扯线木偶
-# ==============================================================================
-# Puppet是一套以同花顺交易客户端为核心的完整的闭环实盘交易系统框架。
-# 来自："睿瞳深邃(https://github.com/Raytone-D" 感谢睿瞳深邃的大度共享 :-)
-# 可以用：tm.regBroker(crtRB(Puppet())) 的方式注册进tm实例，实现实盘下单
-if sys.platform == 'win32':
-    from .puppet import *
 
 # ==============================================================================
 #
@@ -119,18 +110,26 @@ if 'HKU_KTYPE_LIST' in os.environ:
     context.ktype_list = os.environ['HKU_KTYPE_LIST'].split(";")
 if 'HKU_LOAD_HISTORY_FINANCE' in os.environ:
     load_str = os.environ['HKU_LOAD_HISTORY_FINANCE'].upper()
-    load_finance = os.environ['HKU_LOAD_HISTORY_FINANCE'] in ("1", "TRUE")
+    load_finance = load_str in ("1", "TRUE")
     hku_param.set("load_history_finance", load_finance)
 if 'HKU_LOAD_STOCK_WEIGHT' in os.environ:
     load_str = os.environ['HKU_LOAD_STOCK_WEIGHT'].upper()
-    load_stk_weight = os.environ['HKU_LOAD_STOCK_WEIGHT'] in ("1", "TRUE")
+    load_stk_weight = load_str in ("1", "TRUE")
     hku_param.set("load_stock_weight", load_stk_weight)
 
 sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
 # set_log_level(LOG_LEVEL.INFO)
 
+start_spot = False
+if 'HKU_START_SPOT' in os.environ:
+    spot_str = os.environ['HKU_START_SPOT'].upper()
+    start_spot = spot_str in ('1', 'TRUE')
+spot_worker_num = os.cpu_count()
+if 'HKU_SPOT_WORKER_NUM' in os.environ:
+    spot_worker_num = int(os.environ['HKU_SPOT_WORKER_NUM'])
+
 # 启动行情接收代理
-start_spot_agent(False)
+start_spot_agent(False, spot_worker_num)
 
 # ==============================================================================
 #
