@@ -139,14 +139,24 @@ void StockManager::loadData() {
 
 void StockManager::loadAllKData() {
     // 按 K 线类型控制加载顺序
-    // const auto& ktypes = KQuery::getAllKType();
-    vector<KQuery::KType> ktypes{KQuery::DAY,     KQuery::MIN,      KQuery::WEEK,  KQuery::MONTH,
-                                 KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::MIN5,
-                                 KQuery::MIN15,   KQuery::MIN30,    KQuery::MIN60, KQuery::MIN3,
-                                 KQuery::HOUR2,   KQuery::HOUR4,    KQuery::HOUR6, KQuery::HOUR12};
-    HKU_ASSERT(ktypes.size() == KQuery::getAllKType().size());
+    vector<KQuery::KType> default_ktypes{
+      KQuery::DAY,   KQuery::MIN,   KQuery::WEEK,  KQuery::MONTH, KQuery::QUARTER, KQuery::HALFYEAR,
+      KQuery::YEAR,  KQuery::MIN5,  KQuery::MIN15, KQuery::MIN30, KQuery::MIN60,   KQuery::MIN3,
+      KQuery::HOUR2, KQuery::HOUR4, KQuery::HOUR6, KQuery::HOUR12};
 
+    vector<KQuery::KType> ktypes;
     vector<string> low_ktypes;
+
+    // 如果上下文指定了 ktype list，则按上下文指定的 ktype 顺序加载，否则按默认顺序加载
+    const auto& context_ktypes = m_context.getKTypeList();
+    if (context_ktypes.empty()) {
+        ktypes = std::move(default_ktypes);
+        HKU_ASSERT(ktypes.size() == KQuery::getAllKType().size());
+
+    } else {
+        ktypes = context_ktypes;
+    }
+
     low_ktypes.reserve(ktypes.size());
     for (const auto& ktype : ktypes) {
         auto& back = low_ktypes.emplace_back(ktype);
@@ -373,9 +383,9 @@ void StockManager::loadAllStocks() {
     if (m_context.isAll()) {
         stockInfos = m_baseInfoDriver->getAllStockInfo();
     } else {
-        const vector<string>& context_stock_code_list = m_context.getStockCodeList();
+        auto load_stock_code_list = m_context.getAllNeedLoadStockCodeList();
         auto all_market = getAllMarket();
-        for (auto stkcode : context_stock_code_list) {
+        for (auto stkcode : load_stock_code_list) {
             to_upper(stkcode);
             bool find = false;
             for (auto& market : all_market) {

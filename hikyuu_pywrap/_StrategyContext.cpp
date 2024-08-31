@@ -32,9 +32,16 @@ void export_StrategeContext(py::module& m) {
       .def(py::init<const vector<string>&, const vector<KQuery::KType>&>(), py::arg("stock_list"),
            py::arg("ktype_list"))
       .def_property("start_datetime", get_start_datetime, set_start_datetime, "起始日期")
-      .def_property("stock_list",
-                    py::overload_cast<>(&StrategyContext::getStockCodeList, py::const_),
-                    setStockList, "股票代码列表")
-      .def_property("ktype_list", py::overload_cast<>(&StrategyContext::getKTypeList, py::const_),
-                    setKTypeList, "需要的K线类型");
+      .def_property(
+        "stock_list", py::overload_cast<>(&StrategyContext::getStockCodeList, py::const_),
+        [](StrategyContext& self, const py::sequence& stk_list) {
+            self.setStockCodeList(python_list_to_vector<string>(stk_list));
+        },
+        "股票代码列表")
+      .def_property(
+        "ktype_list", py::overload_cast<>(&StrategyContext::getKTypeList, py::const_),
+        [](StrategyContext& self, const py::sequence& ktype_list) {
+            self.setKTypeList(python_list_to_vector<string>(ktype_list));
+        },
+        "需要的K线类型");
 }

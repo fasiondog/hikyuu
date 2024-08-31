@@ -112,7 +112,21 @@ for p in kdata_config:
         continue
     kdata_param[p] = ini.get('kdata', p)
 
-sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
+context = StrategyContext()
+if 'HKU_STOCK_LIST' in os.environ:
+    context.stock_list = os.environ['HKU_STOCK_LIST'].split(";")
+if 'HKU_KTYPE_LIST' in os.environ:
+    context.ktype_list = os.environ['HKU_KTYPE_LIST'].split(";")
+if 'HKU_LOAD_HISTORY_FINANCE' in os.environ:
+    load_str = os.environ['HKU_LOAD_HISTORY_FINANCE'].upper()
+    load_finance = os.environ['HKU_LOAD_HISTORY_FINANCE'] in ("1", "TRUE")
+    hku_param.set("load_history_finance", load_finance)
+if 'HKU_LOAD_STOCK_WEIGHT' in os.environ:
+    load_str = os.environ['HKU_LOAD_STOCK_WEIGHT'].upper()
+    load_stk_weight = os.environ['HKU_LOAD_STOCK_WEIGHT'] in ("1", "TRUE")
+    hku_param.set("load_stock_weight", load_stk_weight)
+
+sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
 # set_log_level(LOG_LEVEL.INFO)
 
 # 启动行情接收代理

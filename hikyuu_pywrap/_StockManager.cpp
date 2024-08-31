@@ -31,6 +31,9 @@ void export_StockManager(py::module& m) {
      param hikyuu_param 其他参数
      param StrategyContext context 策略上下文, 默认加载全部证券)")
 
+      .def_property_readonly("data_ready", &StockManager::dataReady,
+                             "是否所有数据已准备就绪（加载完毕）")
+
       .def("reload", &StockManager::reload, "重新加载所有证券数据")
 
       .def("tmpdir", &StockManager::tmpdir, R"(tmpdir(self) -> str

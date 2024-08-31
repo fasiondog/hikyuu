@@ -21,12 +21,6 @@ void StrategyContext::setKTypeList(const vector<KQuery::KType>& ktypeList) {
                        to_upper(ktype);
                        return ktype;
                    });
-
-    // 对 ktype 按时间长度进行升序排序
-    std::sort(m_ktypeList.begin(), m_ktypeList.end(),
-              [](const KQuery::KType& a, const KQuery::KType& b) {
-                  return KQuery::getKTypeInMin(a) < KQuery::getKTypeInMin(b);
-              });
 }
 
 bool StrategyContext::isAll() const noexcept {
@@ -36,8 +30,12 @@ bool StrategyContext::isAll() const noexcept {
            }) != m_stockCodeList.end();
 }
 
-bool StrategyContext::isValid() const noexcept {
-    return m_stockCodeList.empty() || m_ktypeList.empty();
+vector<string> StrategyContext::getAllNeedLoadStockCodeList() const {
+    vector<string> ret{m_stockCodeList};
+    for (const auto& code : m_mustLoad) {
+        ret.push_back(code);
+    }
+    return ret;
 }
 
 }  // namespace hku

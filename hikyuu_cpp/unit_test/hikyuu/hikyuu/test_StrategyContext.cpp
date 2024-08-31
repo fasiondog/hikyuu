@@ -20,8 +20,8 @@ TEST_CASE("test_StrategyContext") {
     sc.setKTypeList(
       {KQuery::MONTH, KQuery::MIN5, KQuery::DAY, KQuery::MIN, KQuery::WEEK, KQuery::MIN60});
 
-    vector<KQuery::KType> expect{KQuery::MIN, KQuery::MIN5, KQuery::MIN60,
-                                 KQuery::DAY, KQuery::WEEK, KQuery::MONTH};
+    vector<KQuery::KType> expect{KQuery::MONTH, KQuery::MIN5, KQuery::DAY,
+                                 KQuery::MIN,   KQuery::WEEK, KQuery::MIN60};
     const auto ktypes = sc.getKTypeList();
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
         CHECK_EQ(ktypes[i], expect[i]);

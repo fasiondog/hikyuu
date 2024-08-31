@@ -26,6 +26,6 @@ void HKU_API stopSpotAgent();
 
 SpotAgent* getGlobalSpotAgent(size_t worker_num = std::thread::hardware_concurrency());
 
-void releaseGlobalSpotAgent();
+void HKU_API releaseGlobalSpotAgent();
 
 }  // namespace hku
