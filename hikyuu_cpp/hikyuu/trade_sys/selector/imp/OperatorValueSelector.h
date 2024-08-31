@@ -14,7 +14,7 @@ namespace hku {
 class HKU_API OperatorValueSelector : public SelectorBase {
 public:
     OperatorValueSelector();
-    OperatorValueSelector(const string& name);
+    explicit OperatorValueSelector(const string& name);
     OperatorValueSelector(const string& name, const SelectorPtr& se, double value);
     virtual ~OperatorValueSelector();
 

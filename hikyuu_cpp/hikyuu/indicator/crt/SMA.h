@@ -34,7 +34,7 @@ Indicator HKU_API SMA(const IndParam& n, const IndParam& m);
  * <pre>
  * 用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
  * </pre>
- * @param data 待计算的数据
+ * @param ind 待计算的数据
  * @param n 计算均值的周期窗口，必须为大于0的整数
  * @param m 系数
  * @ingroup Indicator

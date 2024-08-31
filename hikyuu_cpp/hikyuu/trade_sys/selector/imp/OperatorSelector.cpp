@@ -281,13 +281,8 @@ SystemWeightList OperatorSelector::getIntersectionSelected(
     SystemWeightList ret;
     HKU_IF_RETURN(!m_se1 || !m_se2, ret);
 
-    SystemWeightList sws1, sws2;
-    if (m_se1) {
-        sws1 = m_se1->getSelected(date);
-    }
-    if (m_se2) {
-        sws2 = m_se2->getSelected(date);
-    }
+    SystemWeightList sws1 = m_se1->getSelected(date);
+    SystemWeightList sws2 = m_se2->getSelected(date);
 
     HKU_IF_RETURN(sws1.empty() || sws2.empty(), ret);
 

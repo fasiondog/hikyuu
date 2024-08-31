@@ -123,6 +123,7 @@ public:
      * @param market 市场简称
      * @param code 证券代码
      * @param start 财务报告发布起始日期
+     * @param end 查询结束日期
      * @return vector<float> [[财务报告发布日期(ymd), 字段1, 字段2, ...], ...]
      */
     virtual vector<HistoryFinanceInfo> getHistoryFinance(const string& market, const string& code,

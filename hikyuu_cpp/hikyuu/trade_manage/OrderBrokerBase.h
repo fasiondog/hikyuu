@@ -134,6 +134,9 @@ public:
      * @param code 证券代码
      * @param price 卖出价格
      * @param num 卖出数量
+     * @param stoploss 新预期的止损价
+     * @param goalPrice 新预期的目标价位
+     * @param from 系统部件来源
      */
     virtual void _sell(Datetime datetime, const string& market, const string& code, price_t price,
                        double num, price_t stoploss, price_t goalPrice, SystemPart from) = 0;

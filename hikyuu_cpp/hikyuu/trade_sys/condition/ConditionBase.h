@@ -72,6 +72,7 @@ public:
     /**
      * 加入有效时间，在_calculate中调用
      * @param datetime 系统有效日期
+     * @param value 值
      */
     void _addValid(const Datetime& datetime, price_t value = 1.0);
 

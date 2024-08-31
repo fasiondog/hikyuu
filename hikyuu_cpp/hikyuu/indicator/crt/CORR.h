@@ -18,7 +18,7 @@ namespace hku {
  * @param n 滚动窗口 （大于2或等于0），等于0时使用输入的ind实际长度。
  * @ingroup Indicator
  */
-Indicator HKU_API CORR(int n = 10);
 Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n = 10);
+Indicator HKU_API CORR(int n = 10);
 
 }  // namespace hku

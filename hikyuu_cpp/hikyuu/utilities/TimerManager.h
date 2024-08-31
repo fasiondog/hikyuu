@@ -196,7 +196,7 @@ public:
      * @param start_time 允许运行的起始时间
      * @param end_time 允许运行的结束时间
      * @param repeat_num 重复次数，必须大于0，等于std::numeric_limits<int>::max()时表示无限循环
-     * @param delay 间隔时间，需大于 TimeDelta(0)
+     * @param duration 间隔时间，需大于 TimeDelta(0)
      * @param f 待执行的延迟任务
      * @param args 任务具体参数
      * @return timer id
@@ -226,7 +226,7 @@ public:
      * @tparam F 任务类型
      * @tparam Args 任务参数
      * @param repeat_num 重复次数，必须大于0，等于std::numeric_limits<int>::max()时表示无限循环
-     * @param delay 间隔时间，需大于 TimeDelta(0)
+     * @param duration 间隔时间，需大于 TimeDelta(0)
      * @param f 待执行的延迟任务
      * @param args 任务具体参数
      * @return timer id

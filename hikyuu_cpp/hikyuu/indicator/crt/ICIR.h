@@ -16,6 +16,7 @@ namespace hku {
  * @brief 计算指定的因子相对于参考证券的 ICIR （实际为 RankIC）
  * @details IR:信息比率(Information Ratio,简称IR)=
  * IC的多周期均值/IC的标准方差，代表因子获取稳定Alpha的能力。
+ * @param ind 因子公式
  * @param stks 证券组合
  * @param query 查询条件
  * @param ref_stk 参照证券，默认 sh000300 沪深300
