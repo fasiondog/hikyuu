@@ -29,8 +29,6 @@ public:
 
     bool isAll() const noexcept;
 
-    bool isValid() const noexcept;
-
     Datetime startDatetime() const noexcept {
         return m_startDatetime;
     }
@@ -57,8 +55,15 @@ public:
         return m_ktypeList;
     }
 
+    const vector<string>& getMustLoadStockCodeList() const {
+        return m_mustLoad;
+    }
+
+    vector<string> getAllNeedLoadStockCodeList() const;
+
 private:
     Datetime m_startDatetime{19901219};
+    vector<string> m_mustLoad{"sh000001", "sh000300"};  // 默认必须加载的 stock
     vector<string> m_stockCodeList;
     vector<KQuery::KType> m_ktypeList;
 };

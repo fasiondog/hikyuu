@@ -14,9 +14,9 @@ namespace hku {
 
 SpotAgent* g_spot_agent = nullptr;
 
-SpotAgent* getGlobalSpotAgent() {
+SpotAgent* getGlobalSpotAgent(size_t worker_num) {
     if (!g_spot_agent) {
-        g_spot_agent = new SpotAgent();
+        g_spot_agent = new SpotAgent(worker_num);
     }
     return g_spot_agent;
 }
@@ -37,8 +37,8 @@ static string getSpotMarketCode(const SpotRecord& spot) {
 
 static void updateStockDayData(const SpotRecord& spot) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
-    HKU_IF_RETURN(stk.isNull(), void());
-    // HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
+    HKU_IF_RETURN(stk.isNull() || !stk.isBuffer(KQuery::DAY), void());
+    HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
     KRecord krecord(Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day()),
                     spot.open, spot.high, spot.low, spot.close, spot.amount, spot.volume);
     stk.realtimeUpdate(krecord, KQuery::DAY);
@@ -46,8 +46,8 @@ static void updateStockDayData(const SpotRecord& spot) {
 
 static void updateStockDayUpData(const SpotRecord& spot, KQuery::KType ktype) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
-    HKU_IF_RETURN(stk.isNull(), void());
-    // HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
+    HKU_IF_RETURN(stk.isNull() || !stk.isBuffer(ktype), void());
+    HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
 
     std::function<Datetime(Datetime*)> endOfPhase;
     std::function<Datetime(Datetime*)> startOfPhase;
@@ -120,8 +120,8 @@ static void updateStockDayUpData(const SpotRecord& spot, KQuery::KType ktype) {
 
 static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
-    HKU_IF_RETURN(stk.isNull(), void());
-    // HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
+    HKU_IF_RETURN(stk.isNull() || !stk.isBuffer(ktype), void());
+    HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
 
     TimeDelta gap;
     if (KQuery::MIN == ktype) {
@@ -149,8 +149,13 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     }
 
     Datetime minute = spot.datetime;
-    minute = minute - (minute - minute.startOfDay()) % gap;
-    KRecordList klist = stk.getKRecordList(KQuery(minute, minute + gap, ktype));
+    Datetime today = minute.startOfDay();
+    // 非24小时交易品种，且时间和当天零时相同认为无分钟线级别数据
+    HKU_IF_RETURN(stk.type() != STOCKTYPE_CRYPTO && minute == today, void());
+
+    Datetime start_minute = minute - (minute - today) % gap;
+    Datetime end_minute = start_minute + gap;
+    KRecordList klist = stk.getKRecordList(KQuery(start_minute, end_minute, ktype));
     price_t sum_amount = 0.0, sum_volume = 0.0;
     for (const auto& k : klist) {
         sum_amount += k.transAmount;
@@ -160,15 +165,15 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     price_t amount = spot.amount > sum_amount ? spot.amount - sum_amount : spot.amount;
     price_t spot_volume = spot.volume * 100;  // spot 传过来的是手数
     price_t volume = spot_volume > sum_volume ? spot_volume - sum_volume : spot_volume;
-    KRecord krecord(minute, spot.open, spot.high, spot.low, spot.close, amount, volume);
+    KRecord krecord(end_minute, spot.open, spot.high, spot.low, spot.close, amount, volume);
     stk.realtimeUpdate(krecord, ktype);
 }
 
-void HKU_API startSpotAgent(bool print) {
+void HKU_API startSpotAgent(bool print, size_t worker_num) {
     StockManager& sm = StockManager::instance();
     SpotAgent::setQuotationServer(
       sm.getHikyuuParameter().tryGet<string>("quotation_server", "ipc:///tmp/hikyuu_real.ipc"));
-    auto& agent = *getGlobalSpotAgent();
+    auto& agent = *getGlobalSpotAgent(worker_num);
     HKU_CHECK(!agent.isRunning(), "The agent is running, please stop first!");
 
     agent.setPrintFlag(print);

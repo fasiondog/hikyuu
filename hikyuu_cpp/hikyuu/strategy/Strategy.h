@@ -28,6 +28,7 @@ namespace hku {
  */
 class HKU_API Strategy {
     CLASS_LOGGER_IMP(Strategy)
+    PARAMETER_SUPPORT
 
 public:
     Strategy();
@@ -88,7 +89,7 @@ public:
     /**
      * 启动策略执行，必须在已注册相关处理函数后执行
      */
-    void start();
+    void start(bool autoRecieveSpot = true);
 
 private:
     string m_name;

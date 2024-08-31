@@ -12,18 +12,9 @@
 #include "hikyuu/utilities/node/NodeClient.h"
 #include "hikyuu/global/GlobalSpotAgent.h"
 #include "hikyuu/global/schedule/scheduler.h"
-#include "hikyuu/global/GlobalTaskGroup.h"
 #include "hikyuu/global/sysinfo.h"
 #include "hikyuu/hikyuu.h"
 #include "Strategy.h"
-
-// python 中运行拉回主线程循环，非 python 环境则直接执行
-#define EVENT(func)          \
-    if (runningInPython()) { \
-        event(func);         \
-    } else {                 \
-        func();              \
-    }
 
 namespace hku {
 
@@ -102,19 +93,28 @@ void Strategy::_init() {
     stopSpotAgent();
 }
 
-void Strategy::start() {
+void Strategy::start(bool autoRecieveSpot) {
     _init();
 
     _runDailyAt();
 
-    auto& agent = *getGlobalSpotAgent();
-    agent.addProcess([this](const SpotRecord& spot) { _receivedSpot(spot); });
-    agent.addPostProcess([this](Datetime revTime) {
-        if (m_on_recieved_spot) {
-            EVENT([=]() { m_on_recieved_spot(revTime); });
+    if (autoRecieveSpot) {
+        size_t stock_num = StockManager::instance().size();
+        size_t spot_worker_num = stock_num / 300;
+        size_t cpu_num = std::thread::hardware_concurrency();
+        if (spot_worker_num > cpu_num) {
+            spot_worker_num = cpu_num;
         }
-    });
-    startSpotAgent(true);
+
+        auto& agent = *getGlobalSpotAgent(spot_worker_num);
+        agent.addProcess([this](const SpotRecord& spot) { _receivedSpot(spot); });
+        agent.addPostProcess([this](Datetime revTime) {
+            if (m_on_recieved_spot) {
+                event([=]() { m_on_recieved_spot(revTime); });
+            }
+        });
+        startSpotAgent(true);
+    }
 
     _runDaily();
 
@@ -136,7 +136,7 @@ void Strategy::_receivedSpot(const SpotRecord& spot) {
     Stock stk = getStock(format("{}{}", spot.market, spot.code));
     if (!stk.isNull()) {
         if (m_on_change) {
-            EVENT([=]() { m_on_change(stk, spot); });
+            event([=]() { m_on_change(stk, spot); });
         }
     }
 }
@@ -149,7 +149,7 @@ void Strategy::runDaily(std::function<void()>&& func, const TimeDelta& delta,
     m_ignoreMarket = ignoreMarket;
 
     if (ignoreMarket) {
-        m_run_daily_func = [=]() { EVENT(func); };
+        m_run_daily_func = [=]() { event(func); };
 
     } else {
         m_run_daily_func = [=]() {
@@ -167,7 +167,7 @@ void Strategy::runDaily(std::function<void()>&& func, const TimeDelta& delta,
             Datetime close2 = today + market_info.closeTime2();
             Datetime now = Datetime::now();
             if ((now >= open1 && now <= close1) || (now >= open2 && now <= close2)) {
-                EVENT(func);
+                event(func);
             }
         };
     }
@@ -264,12 +264,12 @@ void Strategy::runDailyAt(std::function<void()>&& func, const TimeDelta& delta,
             auto today = Datetime::today();
             int day = today.dayOfWeek();
             if (day != 0 && day != 6 && !sm.isHoliday(today)) {
-                EVENT(func);
+                event(func);
             }
         };
 
     } else {
-        m_run_daily_at_func = [=]() { EVENT(func); };
+        m_run_daily_at_func = [=]() { event(func); };
     }
 }
 
@@ -339,6 +339,12 @@ void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycl
 void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& stklist,
                                      const KQuery::KType& ktype) {
     // SPEND_TIME(getDataFromBufferServer);
+    const auto& preload = StockManager::instance().getPreloadParameter();
+    string low_ktype = ktype;
+    to_lower(low_ktype);
+    HKU_ERROR_IF_RETURN(!preload.tryGet<bool>(low_ktype, false), void(),
+                        "The {} kdata is not preload! Can't update!", low_ktype);
+
     NodeClient client(addr);
     try {
         HKU_CHECK(client.dial(), "Failed dial server!");
@@ -358,6 +364,7 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
                             res["msg"].get<string>());
 
         const auto& jdata = res["data"];
+        // HKU_INFO("{}", to_string(jdata));
         for (auto iter = jdata.cbegin(); iter != jdata.cend(); ++iter) {
             const auto& r = *iter;
             try {

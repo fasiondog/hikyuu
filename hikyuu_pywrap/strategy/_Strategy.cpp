@@ -30,7 +30,7 @@ void export_Strategy(py::module& m) {
       .def_property_readonly("context", &Strategy::context, py::return_value_policy::copy,
                              "策略上下文")
 
-      .def("start", &Strategy::start)
+      .def("start", &Strategy::start, py::arg("auto_recieve_spot") = true)
       .def("on_change",
            [](Strategy& self, py::object func) {
                HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");

@@ -70,7 +70,7 @@ public:
     // static const string INVALID_KTYPE;
 
     /** 获取所有的 KType */
-    static vector<string>& getAllKType();
+    static const vector<KType>& getAllKType();
 
     static int32_t getKTypeInMin(KType);
 
@@ -93,7 +93,7 @@ public:
       m_end(Null<int64_t>()),
       m_queryType(INDEX),
       m_dataType(DAY),
-      m_recoverType(NO_RECOVER){};
+      m_recoverType(NO_RECOVER) {};
 
     /**
      * K线查询，范围[start, end)

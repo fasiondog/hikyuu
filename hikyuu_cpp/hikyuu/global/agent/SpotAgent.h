@@ -27,7 +27,7 @@ namespace hku {
  */
 class HKU_API SpotAgent {
 public:
-    SpotAgent() = default;
+    SpotAgent(size_t worker_num);
 
     /** 析构函数 */
     virtual ~SpotAgent();
@@ -109,7 +109,8 @@ private:
     int m_revTimeout = 100;       // 连接数据服务超时时长（毫秒）
     size_t m_batch_count = 0;     // 记录本次批次接收的数据数量
     std::thread m_receiveThread;  // 数据接收线程
-    ThreadPool m_tg;              // 数据处理任务线程池
+    // ThreadPool m_tg;              // 数据处理任务线程池
+    std::unique_ptr<ThreadPool> m_tg;
     vector<std::future<void>> m_process_task_list;
 
     // 下面属性被修改时需要加锁，以便可以使用多线程方式运行 strategy

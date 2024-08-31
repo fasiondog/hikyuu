@@ -7,7 +7,6 @@
 
 #include "inner_tasks.h"
 #include "scheduler.h"
-#include "../GlobalTaskGroup.h"
 #include "../../StockManager.h"
 
 namespace hku {

@@ -25,12 +25,16 @@ const size_t SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
 
 Datetime SpotAgent::ms_start_rev_time;
 
-void SpotAgent::setQuotationServer(const string& server) {
-    ms_pubUrl = server;
+SpotAgent::SpotAgent(size_t worker_num) {
+    m_tg = std::make_unique<ThreadPool>(worker_num);
 }
 
 SpotAgent::~SpotAgent() {
     stop();
+}
+
+void SpotAgent::setQuotationServer(const string& server) {
+    ms_pubUrl = server;
 }
 
 void SpotAgent::start() {
@@ -128,7 +132,7 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
 #pragma warning(disable : 4267)
 #endif
 
-    // 更新日线数据
+    // 更新K线数据
     auto* spot_list = GetSpotList(spot_list_buf);
     auto* spots = spot_list->spot();
     size_t total = spots->size();
@@ -138,7 +142,7 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
         auto spot_record = parseFlatSpot(spot);
         if (spot_record) {
             for (const auto& process : m_processList) {
-                m_process_task_list.push_back(m_tg.submit(ProcessTask(process, *spot_record)));
+                m_process_task_list.emplace_back(m_tg->submit(ProcessTask(process, *spot_record)));
             }
         }
     }
