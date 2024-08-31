@@ -19,32 +19,6 @@ StrategyContext::StrategyContext(const vector<string>& stockCodeList,
     _checkAndRemoveDuplicateKType(ktypeList);
 }
 
-StrategyContext::StrategyContext(StrategyContext&& rv)
-: m_startDatetime(std::move(rv.m_startDatetime)),
-  m_mustLoad(std::move(rv.m_mustLoad)),
-  m_stockCodeList(std::move(rv.m_stockCodeList)),
-  m_ktypeList(std::move(m_ktypeList)) {}
-
-StrategyContext& StrategyContext::operator=(const StrategyContext& rv) {
-    if (this != &rv) {
-        m_startDatetime = rv.m_startDatetime;
-        m_mustLoad = rv.m_mustLoad;
-        m_stockCodeList = rv.m_stockCodeList;
-        m_ktypeList = rv.m_ktypeList;
-    }
-    return *this;
-}
-
-StrategyContext& StrategyContext::operator=(StrategyContext&& rv) {
-    if (this != &rv) {
-        m_startDatetime = std::move(rv.m_startDatetime);
-        m_mustLoad = std::move(rv.m_mustLoad);
-        m_stockCodeList = std::move(rv.m_stockCodeList);
-        m_ktypeList = std::move(rv.m_ktypeList);
-    }
-    return *this;
-}
-
 void StrategyContext::_removeDuplicateCode(const vector<string>& stockCodeList) {
     m_stockCodeList.reserve(stockCodeList.size());
     std::set<string> code_set;
@@ -74,7 +48,8 @@ void StrategyContext::_checkAndRemoveDuplicateKType(const vector<KQuery::KType>&
 }
 
 bool StrategyContext::isAll() const noexcept {
-    return std::find_if(m_stockCodeList.begin(), m_stockCodeList.end(), [](string val) {
+    return m_stockCodeList.empty() ||
+           std::find_if(m_stockCodeList.begin(), m_stockCodeList.end(), [](string val) {
                to_upper(val);
                return val == "ALL";
            }) != m_stockCodeList.end();

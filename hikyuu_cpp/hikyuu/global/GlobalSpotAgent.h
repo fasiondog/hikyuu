@@ -13,7 +13,7 @@ namespace hku {
 /**
  * 启动 Spot 数据接收代理，如果之前已经处于运行状态，将抛出异常
  * @param print 打印接收数据进展
- * @param worker_num 接收数据后处理时的工作任务组线程数（该参数仅在第一次调用时生效）
+ * @param worker_num 接收数据后处理时的工作任务组线程数
  * @ingroup Agent
  */
 void HKU_API startSpotAgent(bool print = true,
@@ -25,7 +25,7 @@ void HKU_API startSpotAgent(bool print = true,
  */
 void HKU_API stopSpotAgent();
 
-SpotAgent* getGlobalSpotAgent(size_t worker_num = std::thread::hardware_concurrency());
+SpotAgent* getGlobalSpotAgent();
 
 void HKU_API releaseGlobalSpotAgent();
 

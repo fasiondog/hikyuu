@@ -14,9 +14,9 @@ namespace hku {
 
 SpotAgent* g_spot_agent = nullptr;
 
-SpotAgent* getGlobalSpotAgent(size_t worker_num) {
+SpotAgent* getGlobalSpotAgent() {
     if (!g_spot_agent) {
-        g_spot_agent = new SpotAgent(worker_num);
+        g_spot_agent = new SpotAgent();
     }
     return g_spot_agent;
 }
@@ -173,9 +173,10 @@ void HKU_API startSpotAgent(bool print, size_t worker_num) {
     StockManager& sm = StockManager::instance();
     SpotAgent::setQuotationServer(
       sm.getHikyuuParameter().tryGet<string>("quotation_server", "ipc:///tmp/hikyuu_real.ipc"));
-    auto& agent = *getGlobalSpotAgent(worker_num);
+    auto& agent = *getGlobalSpotAgent();
     HKU_CHECK(!agent.isRunning(), "The agent is running, please stop first!");
 
+    agent.setWorkerNum(worker_num);
     agent.setPrintFlag(print);
 
     // 防止调用 stopSpotAgent 后重新 startSpotAgent

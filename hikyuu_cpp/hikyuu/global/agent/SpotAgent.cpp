@@ -25,10 +25,6 @@ const size_t SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
 
 Datetime SpotAgent::ms_start_rev_time;
 
-SpotAgent::SpotAgent(size_t worker_num) {
-    m_tg = std::make_unique<ThreadPool>(worker_num);
-}
-
 SpotAgent::~SpotAgent() {
     stop();
 }
@@ -41,14 +37,24 @@ void SpotAgent::start() {
     stop();
     if (m_stop) {
         m_stop = false;
+        if (m_tg) {
+            m_tg.reset();
+            m_tg = std::make_unique<ThreadPool>(m_work_num);
+        }
         m_receiveThread = std::thread([this]() { work_thread(); });
     }
 }
 
 void SpotAgent::stop() {
     m_stop = true;
+    if (m_tg) {
+        m_tg->stop();
+    }
     if (m_receiveThread.joinable()) {
         m_receiveThread.join();
+    }
+    if (m_tg) {
+        m_tg.reset();
     }
 }
 

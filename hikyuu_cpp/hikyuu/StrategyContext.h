@@ -17,10 +17,10 @@ namespace hku {
  * @ingroup Strategy
  *
  */
-class HKU_API StrategyContext final {
+class HKU_API StrategyContext {
 public:
     StrategyContext() = default;
-    ~StrategyContext() = default;
+    virtual ~StrategyContext() = default;
 
     explicit StrategyContext(const vector<string>& stockCodeList);
 
@@ -33,14 +33,14 @@ public:
      */
     StrategyContext(const vector<string>& stockCodeList, const vector<KQuery::KType>& ktypeList);
 
-    StrategyContext(const StrategyContext&) = default;
-    StrategyContext(StrategyContext&& rv);
-
-    StrategyContext& operator=(const StrategyContext&);
-    StrategyContext& operator=(StrategyContext&&);
+    // 自定义移动构造与赋值会引起 python 中无法正常退出
+    // StrategyContext(const StrategyContext&) = default;
+    // StrategyContext(StrategyContext&& rv) = delete;
+    // StrategyContext& operator=(const StrategyContext&) = default;
+    // StrategyContext& operator=(StrategyContext&&) = delete;
 
     /**
-     * 是否为加载全部证券，只要 stockCodeList 包含 "ALL"(不区分大小写)，即认为加载全部
+     * 是否为加载全部证券，只要 stockCodeList 包含 "ALL"(不区分大小写) 或者为空，即认为加载全部
      * @return true
      * @return false
      */
@@ -48,10 +48,6 @@ public:
 
     Datetime startDatetime() const noexcept {
         return m_startDatetime;
-    }
-
-    void setStockCodeList(vector<string>&& stockList) {
-        m_stockCodeList = std::move(stockList);
     }
 
     void setStockCodeList(const vector<string>& stockList) {

@@ -106,14 +106,14 @@ void Strategy::start(bool autoRecieveSpot) {
             spot_worker_num = cpu_num;
         }
 
-        auto& agent = *getGlobalSpotAgent(spot_worker_num);
+        auto& agent = *getGlobalSpotAgent();
         agent.addProcess([this](const SpotRecord& spot) { _receivedSpot(spot); });
         agent.addPostProcess([this](Datetime revTime) {
             if (m_on_recieved_spot) {
                 event([=]() { m_on_recieved_spot(revTime); });
             }
         });
-        startSpotAgent(true);
+        startSpotAgent(true, spot_worker_num);
     }
 
     _runDaily();
