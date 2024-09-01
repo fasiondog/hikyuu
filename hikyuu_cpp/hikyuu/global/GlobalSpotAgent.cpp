@@ -76,46 +76,24 @@ static void updateStockDayUpData(const SpotRecord& spot, KQuery::KType ktype) {
     if (KQuery::WEEK == ktype) {
         spot_end_of_phase = spot_end_of_phase - TimeDelta(2);  // 周五日期
     }
-    size_t total = stk.getCount(ktype);
 
-    // 没有历史数据，则直接更新并返回
-    if (total == 0) {
-        stk.realtimeUpdate(KRecord(spot_end_of_phase, spot.open, spot.high, spot.low, spot.close,
-                                   spot.amount, spot.volume),
-                           ktype);
-        return;
+    // 重新计算交易金额、交易量
+    Datetime spot_start_of_phase = startOfPhase(&spot_day);
+    KRecordList klist =
+      stk.getKRecordList(KQuery(spot_start_of_phase, spot_end_of_phase + TimeDelta(1), ktype));
+    price_t sum_amount = 0.0, sum_volume = 0.0;
+    for (const auto& k : klist) {
+        sum_amount += k.transAmount;
+        sum_volume += k.transCount;
     }
 
-    KRecord last_record = stk.getKRecord(total - 1, ktype);
-    HKU_IF_RETURN(!last_record.isValid(), void());
-
-    if (spot_end_of_phase > last_record.datetime) {
-        // 如果当前的日期大于最后记录的日期，则为新增数据，直接更新并返回
-        stk.realtimeUpdate(KRecord(spot_end_of_phase, spot.open, spot.high, spot.low, spot.close,
-                                   spot.amount, spot.volume),
-                           ktype);
-
-    } else if (spot_end_of_phase == last_record.datetime) {
-        // 如果当前日期等于最后记录的日期，则需要重新计算最高价、最低价、交易金额、交易量
-        Datetime spot_start_of_phase = startOfPhase(&spot_day);
-        KRecordList klist =
-          stk.getKRecordList(KQuery(spot_start_of_phase, spot_end_of_phase + TimeDelta(1), ktype));
-        price_t amount = 0.0, volume = 0.0;
-        for (const auto& k : klist) {
-            amount += k.transAmount;
-            volume += k.transCount;
-        }
-        stk.realtimeUpdate(
-          KRecord(spot_end_of_phase, last_record.openPrice,
-                  spot.high > last_record.highPrice ? spot.high : last_record.highPrice,
-                  spot.low < last_record.lowPrice ? spot.low : last_record.lowPrice, spot.close,
-                  amount, volume),
-          ktype);
-    } else {
-        // 不应该出现的情况：当前日期小于最后记录的日期
-        HKU_WARN(
-          "Ignore, What should not happen, the current date is less than the last recorded date!");
-    }
+    price_t amount =
+      spot.amount > sum_amount ? spot.amount - sum_amount : (sum_amount == 0.0 ? spot.amount : 0.0);
+    price_t spot_volume = spot.volume;
+    price_t volume =
+      spot_volume > sum_volume ? spot_volume - sum_volume : (sum_volume == 0.0 ? spot_volume : 0.0);
+    KRecord krecord(spot_end_of_phase, spot.open, spot.high, spot.low, spot.close, amount, volume);
+    stk.realtimeUpdate(krecord, ktype);
 }
 
 static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {

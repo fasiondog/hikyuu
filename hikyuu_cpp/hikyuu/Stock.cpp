@@ -897,7 +897,16 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
 
     // 如果传入的记录日期等于最后一条记录日期，则更新最后一条记录；否则，追加入缓存
     if (tmp.datetime == record.datetime) {
-        tmp = record;
+        if (tmp.highPrice < record.highPrice) {
+            tmp.highPrice = record.highPrice;
+        }
+        if (tmp.lowPrice > record.lowPrice) {
+            tmp.lowPrice = record.lowPrice;
+        }
+        tmp.closePrice = record.closePrice;
+        tmp.transAmount = record.transAmount;
+        tmp.transCount = record.transCount;
+
     } else if (tmp.datetime < record.datetime) {
         m_data->pKData[ktype]->push_back(record);
     } else {
