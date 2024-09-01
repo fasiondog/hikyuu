@@ -39,8 +39,8 @@ static void updateStockDayData(const SpotRecord& spot) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
     HKU_IF_RETURN(stk.isNull() || !stk.isBuffer(KQuery::DAY), void());
     HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
-    KRecord krecord(Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day()),
-                    spot.open, spot.high, spot.low, spot.close, spot.amount, spot.volume);
+    KRecord krecord(spot.datetime.startOfDay(), spot.open, spot.high, spot.low, spot.close,
+                    spot.amount, spot.volume);
     stk.realtimeUpdate(krecord, KQuery::DAY);
 }
 

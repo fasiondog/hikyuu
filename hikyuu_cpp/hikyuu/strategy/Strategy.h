@@ -174,6 +174,12 @@ void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& qu
 void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
                            const OrderBrokerPtr& broker, const TradeCostPtr& costfunc);
 
+/**
+ * 从 hikyuu 数据缓存服务器拉取更新最新的缓存数据
+ * @param addr 缓存服务地址，如: tcp://192.168.1.1:9201
+ * @param stklist 待更新的股票列表
+ * @param ktype 指定更新的K线类型
+ */
 void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& stklist,
                                      const KQuery::KType& ktype);
 
