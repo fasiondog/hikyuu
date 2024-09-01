@@ -19,7 +19,7 @@ Welcome to Hikyuu's documentation!
    trade_manage/trade_manage
    trade_sys/trade_sys
    trade_portfolio/trade_portfolio
-   kdriver/data_driver.rst
+   strategy
    reference
    developer.rst
    release
