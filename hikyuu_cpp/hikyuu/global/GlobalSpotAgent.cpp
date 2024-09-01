@@ -162,9 +162,11 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
         sum_volume += k.transCount;
     }
 
-    price_t amount = spot.amount > sum_amount ? spot.amount - sum_amount : spot.amount;
-    price_t spot_volume = spot.volume * 100;  // spot 传过来的是手数
-    price_t volume = spot_volume > sum_volume ? spot_volume - sum_volume : spot_volume;
+    price_t amount =
+      spot.amount > sum_amount ? spot.amount - sum_amount : (sum_amount == 0.0 ? spot.amount : 0.0);
+    price_t spot_volume = spot.volume * 100.;  // spot 传过来的是手数
+    price_t volume =
+      spot_volume > sum_volume ? spot_volume - sum_volume : (sum_volume == 0.0 ? spot_volume : 0.0);
     KRecord krecord(end_minute, spot.open, spot.high, spot.low, spot.close, amount, volume);
     stk.realtimeUpdate(krecord, ktype);
 }
