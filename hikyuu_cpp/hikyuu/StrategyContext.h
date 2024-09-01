@@ -22,12 +22,17 @@ public:
     StrategyContext() = default;
     virtual ~StrategyContext() = default;
 
+    /**
+     * 构造函数
+     * @note 未指定 ktypelist 时，默认按预加载参数加载全部
+     * @param stockCodeList 指定的证券代码列表，如：如：{"sz000001", "sz000002"}
+     */
     explicit StrategyContext(const vector<string>& stockCodeList);
 
     /**
      * 构造函数
      * @note 证券列表中如果包含 ("ALL") 则表示全部证券;
-     * 指定K线类型列表同时影响着K线数据的优先加载顺序，靠前的将优先加载
+     * 指定K线类型列表同时影响着K线数据的优先加载顺序，靠前的将优先加载。同时受系统配置中预加载参数影响！
      * @param stockCodeList 指定的证券代码列表，如：{"sh000001", "sz000001"}
      * @param ktypeList 指定的 K线数据列表，如：{"day", "min"}
      */
@@ -40,11 +45,15 @@ public:
     // StrategyContext& operator=(StrategyContext&&) = delete;
 
     /**
-     * 是否为加载全部证券，只要 stockCodeList 包含 "ALL"(不区分大小写) 或者为空，即认为加载全部
+     * 是否为加载全部证券，只要 stockCodeList 包含 "ALL"(不区分大小写) ，即认为加载全部
      * @return true
      * @return false
      */
     bool isAll() const noexcept;
+
+    bool empty() const noexcept {
+        return m_stockCodeList.empty();
+    }
 
     Datetime startDatetime() const noexcept {
         return m_startDatetime;
@@ -80,6 +89,8 @@ public:
      */
     vector<string> getAllNeedLoadStockCodeList() const noexcept;
 
+    string str() const;
+
 private:
     void _removeDuplicateCode(const vector<string>& stockCodeList);
     void _checkAndRemoveDuplicateKType(const vector<KQuery::KType>& ktypeList);
@@ -90,5 +101,7 @@ private:
     vector<string> m_stockCodeList;
     vector<KQuery::KType> m_ktypeList;
 };
+
+HKU_API std::ostream& operator<<(std::ostream& os, const StrategyContext& context);
 
 }  // namespace hku

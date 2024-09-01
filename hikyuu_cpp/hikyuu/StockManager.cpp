@@ -57,6 +57,7 @@ StockManager& StockManager::instance() {
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam, const StrategyContext& context) {
+    HKU_CHECK(!context.empty(), "No stock code list is included in the context!");
     HKU_WARN_IF_RETURN(m_initializing, void(),
                        "The last initialization has not finished. Please try again later!");
 

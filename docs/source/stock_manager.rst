@@ -141,6 +141,11 @@ StockManager/Block/Stock
     
         :return: 其他hikyuu参数
         :rtype: Parameter
+
+    .. py:method:: get_context(self)
+
+        :return: 获取当前上下文
+        :rtype: StrategyContext
     
     .. py:method:: tmpdir(self)
     

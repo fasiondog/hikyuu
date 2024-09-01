@@ -54,6 +54,8 @@ void export_StockManager(py::module& m) {
            py::return_value_policy::copy, "获取当前预加载参数")
       .def("get_hikyuu_parameter", &StockManager::getHikyuuParameter, py::return_value_policy::copy,
            "获取当前其他参数")
+      .def("get_context", &StockManager::getStrategyContext, py::return_value_policy::copy,
+           "获取当前上下文")
 
       .def("get_market_list", &StockManager::getAllMarket, R"(get_market_list(self)
 

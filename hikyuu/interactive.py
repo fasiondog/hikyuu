@@ -103,7 +103,7 @@ for p in kdata_config:
         continue
     kdata_param[p] = ini.get('kdata', p)
 
-context = StrategyContext()
+context = StrategyContext(["all"])
 if 'HKU_STOCK_LIST' in os.environ:
     context.stock_list = os.environ['HKU_STOCK_LIST'].split(";")
 if 'HKU_KTYPE_LIST' in os.environ:
