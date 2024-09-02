@@ -37,16 +37,16 @@ static string getSpotMarketCode(const SpotRecord& spot) {
 
 static void updateStockDayData(const SpotRecord& spot) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
-    HKU_IF_RETURN(stk.isNull(), void());
+    HKU_IF_RETURN(stk.isNull() || !stk.isBuffer(KQuery::DAY), void());
     HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
-    KRecord krecord(Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day()),
-                    spot.open, spot.high, spot.low, spot.close, spot.amount, spot.volume);
+    KRecord krecord(spot.datetime.startOfDay(), spot.open, spot.high, spot.low, spot.close,
+                    spot.amount, spot.volume);
     stk.realtimeUpdate(krecord, KQuery::DAY);
 }
 
 static void updateStockDayUpData(const SpotRecord& spot, KQuery::KType ktype) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
-    HKU_IF_RETURN(stk.isNull(), void());
+    HKU_IF_RETURN(stk.isNull() || !stk.isBuffer(ktype), void());
     HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
 
     std::function<Datetime(Datetime*)> endOfPhase;
@@ -76,49 +76,29 @@ static void updateStockDayUpData(const SpotRecord& spot, KQuery::KType ktype) {
     if (KQuery::WEEK == ktype) {
         spot_end_of_phase = spot_end_of_phase - TimeDelta(2);  // 周五日期
     }
-    size_t total = stk.getCount(ktype);
 
-    // 没有历史数据，则直接更新并返回
-    if (total == 0) {
-        stk.realtimeUpdate(KRecord(spot_end_of_phase, spot.open, spot.high, spot.low, spot.close,
-                                   spot.amount, spot.volume),
-                           ktype);
-        return;
+    // 重新计算交易金额、交易量
+    Datetime spot_start_of_phase = startOfPhase(&spot_day);
+    KRecordList klist =
+      stk.getKRecordList(KQuery(spot_start_of_phase, spot_end_of_phase + TimeDelta(1), ktype));
+    price_t sum_amount = 0.0, sum_volume = 0.0;
+    for (const auto& k : klist) {
+        sum_amount += k.transAmount;
+        sum_volume += k.transCount;
     }
 
-    KRecord last_record = stk.getKRecord(total - 1, ktype);
-    if (spot_end_of_phase > last_record.datetime) {
-        // 如果当前的日期大于最后记录的日期，则为新增数据，直接更新并返回
-        stk.realtimeUpdate(KRecord(spot_end_of_phase, spot.open, spot.high, spot.low, spot.close,
-                                   spot.amount, spot.volume),
-                           ktype);
-
-    } else if (spot_end_of_phase == last_record.datetime) {
-        // 如果当前日期等于最后记录的日期，则需要重新计算最高价、最低价、交易金额、交易量
-        Datetime spot_start_of_phase = startOfPhase(&spot_day);
-        KRecordList klist =
-          stk.getKRecordList(KQuery(spot_start_of_phase, spot_end_of_phase + TimeDelta(1), ktype));
-        price_t amount = 0.0, volume = 0.0;
-        for (const auto& k : klist) {
-            amount += k.transAmount;
-            volume += k.transCount;
-        }
-        stk.realtimeUpdate(
-          KRecord(spot_end_of_phase, last_record.openPrice,
-                  spot.high > last_record.highPrice ? spot.high : last_record.highPrice,
-                  spot.low < last_record.lowPrice ? spot.low : last_record.lowPrice, spot.close,
-                  amount, volume),
-          ktype);
-    } else {
-        // 不应该出现的情况：当前日期小于最后记录的日期
-        HKU_WARN(
-          "Ignore, What should not happen, the current date is less than the last recorded date!");
-    }
+    price_t amount =
+      spot.amount > sum_amount ? spot.amount - sum_amount : (sum_amount == 0.0 ? spot.amount : 0.0);
+    price_t spot_volume = spot.volume;
+    price_t volume =
+      spot_volume > sum_volume ? spot_volume - sum_volume : (sum_volume == 0.0 ? spot_volume : 0.0);
+    KRecord krecord(spot_end_of_phase, spot.open, spot.high, spot.low, spot.close, amount, volume);
+    stk.realtimeUpdate(krecord, ktype);
 }
 
 static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
-    HKU_IF_RETURN(stk.isNull(), void());
+    HKU_IF_RETURN(stk.isNull() || !stk.isBuffer(ktype), void());
     HKU_IF_RETURN(!stk.isTransactionTime(spot.datetime), void());
 
     TimeDelta gap;
@@ -147,28 +127,36 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     }
 
     Datetime minute = spot.datetime;
-    minute = minute - (minute - minute.startOfDay()) % gap;
-    KRecordList klist = stk.getKRecordList(KQuery(minute, minute + gap, ktype));
+    Datetime today = minute.startOfDay();
+    // 非24小时交易品种，且时间和当天零时相同认为无分钟线级别数据
+    HKU_IF_RETURN(stk.type() != STOCKTYPE_CRYPTO && minute == today, void());
+
+    Datetime start_minute = minute - (minute - today) % gap;
+    Datetime end_minute = start_minute + gap;
+    KRecordList klist = stk.getKRecordList(KQuery(start_minute, end_minute, ktype));
     price_t sum_amount = 0.0, sum_volume = 0.0;
     for (const auto& k : klist) {
         sum_amount += k.transAmount;
         sum_volume += k.transCount;
     }
 
-    price_t amount = spot.amount > sum_amount ? spot.amount - sum_amount : spot.amount;
-    price_t spot_volume = spot.volume * 100;  // spot 传过来的是手数
-    price_t volume = spot_volume > sum_volume ? spot_volume - sum_volume : spot_volume;
-    KRecord krecord(minute, spot.open, spot.high, spot.low, spot.close, amount, volume);
+    price_t amount =
+      spot.amount > sum_amount ? spot.amount - sum_amount : (sum_amount == 0.0 ? spot.amount : 0.0);
+    price_t spot_volume = spot.volume * 100.;  // spot 传过来的是手数
+    price_t volume =
+      spot_volume > sum_volume ? spot_volume - sum_volume : (sum_volume == 0.0 ? spot_volume : 0.0);
+    KRecord krecord(end_minute, spot.open, spot.high, spot.low, spot.close, amount, volume);
     stk.realtimeUpdate(krecord, ktype);
 }
 
-void HKU_API startSpotAgent(bool print) {
+void HKU_API startSpotAgent(bool print, size_t worker_num) {
     StockManager& sm = StockManager::instance();
     SpotAgent::setQuotationServer(
       sm.getHikyuuParameter().tryGet<string>("quotation_server", "ipc:///tmp/hikyuu_real.ipc"));
     auto& agent = *getGlobalSpotAgent();
     HKU_CHECK(!agent.isRunning(), "The agent is running, please stop first!");
 
+    agent.setWorkerNum(worker_num);
     agent.setPrintFlag(print);
 
     // 防止调用 stopSpotAgent 后重新 startSpotAgent

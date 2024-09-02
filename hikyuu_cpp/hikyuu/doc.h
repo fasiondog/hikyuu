@@ -137,7 +137,7 @@
  * @details 合成多因子
  * @ingroup TradeSystem
  *
- * @defgroup Stratgy Strategy 策略运行时
+ * @defgroup Strategy Strategy 策略运行时
  * @details 策略运行时
  * @ingroup Hikyuu
  *

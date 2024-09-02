@@ -53,6 +53,7 @@ public:
      * @note
      * 由于各个组件可能存在参数变化的情况，无法自动感知判断是否需要重新计算，此时需要手工指定强制计算
      * @param query 查询条件
+     * @param adjust_cycle 调仓周期
      * @param force 是否强制重计算
      */
     void run(const KQuery& query, int adjust_cycle = 1, bool force = false);

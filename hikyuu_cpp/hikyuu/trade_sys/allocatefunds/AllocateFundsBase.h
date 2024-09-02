@@ -47,7 +47,6 @@ public:
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
      * @param running_list 当前运行中的系统实例
-     * @param ignore_list 忽略不进行调仓的运行中系统
      * @return 需延迟执行卖出操作的系统列表，其中权重为相应需卖出的数量
      */
     SystemWeightList adjustFunds(const Datetime& date, const SystemWeightList& se_list,

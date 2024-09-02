@@ -51,21 +51,12 @@ SOFTWARE.
 """
 
 import urllib
-import sys
 import os
 import configparser
 
 from hikyuu.data.hku_config_template import generate_default_config
 from hikyuu import *
 
-# ==============================================================================
-# 引入扯线木偶
-# ==============================================================================
-# Puppet是一套以同花顺交易客户端为核心的完整的闭环实盘交易系统框架。
-# 来自："睿瞳深邃(https://github.com/Raytone-D" 感谢睿瞳深邃的大度共享 :-)
-# 可以用：tm.regBroker(crtRB(Puppet())) 的方式注册进tm实例，实现实盘下单
-if sys.platform == 'win32':
-    from .puppet import *
 
 # ==============================================================================
 #
@@ -83,8 +74,6 @@ ini.read(config_file, encoding='utf-8')
 hku_param = Parameter()
 hku_param["tmpdir"] = ini.get('hikyuu', 'tmpdir')
 hku_param["datadir"] = ini.get('hikyuu', 'datadir')
-if ini.has_option('hikyuu', 'logger'):
-    hku_param["logger"] = ini['hikyuu']['logger']
 if ini.has_option('hikyuu', 'quotation_server'):
     hku_param["quotation_server"] = ini['hikyuu']['quotation_server']
 
@@ -114,11 +103,33 @@ for p in kdata_config:
         continue
     kdata_param[p] = ini.get('kdata', p)
 
-sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
+context = StrategyContext(["all"])
+if 'HKU_STOCK_LIST' in os.environ:
+    context.stock_list = os.environ['HKU_STOCK_LIST'].split(";")
+if 'HKU_KTYPE_LIST' in os.environ:
+    context.ktype_list = os.environ['HKU_KTYPE_LIST'].split(";")
+if 'HKU_LOAD_HISTORY_FINANCE' in os.environ:
+    load_str = os.environ['HKU_LOAD_HISTORY_FINANCE'].upper()
+    load_finance = load_str in ("1", "TRUE")
+    hku_param.set("load_history_finance", load_finance)
+if 'HKU_LOAD_STOCK_WEIGHT' in os.environ:
+    load_str = os.environ['HKU_LOAD_STOCK_WEIGHT'].upper()
+    load_stk_weight = load_str in ("1", "TRUE")
+    hku_param.set("load_stock_weight", load_stk_weight)
+
+sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
 # set_log_level(LOG_LEVEL.INFO)
 
+start_spot = False
+if 'HKU_START_SPOT' in os.environ:
+    spot_str = os.environ['HKU_START_SPOT'].upper()
+    start_spot = spot_str in ('1', 'TRUE')
+spot_worker_num = os.cpu_count()
+if 'HKU_SPOT_WORKER_NUM' in os.environ:
+    spot_worker_num = int(os.environ['HKU_SPOT_WORKER_NUM'])
+
 # 启动行情接收代理
-start_spot_agent(False)
+start_spot_agent(False, spot_worker_num)
 
 # ==============================================================================
 #
@@ -255,129 +266,33 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
 # ==============================================================================
 
 
-def UpdateOneRealtimeRecord_from_qq(tmpstr):
-    try:
-        if len(tmpstr) > 3 and tmpstr[:2] == 'v_':
-            a = tmpstr.split('~')
-            if len(a) < 9:
-                return
-
-            open, close, high, low = float(a[5]), float(a[3]), float(a[33]), float(a[34])
-            transamount = float(a[36])
-            transcount = float(a[37])
-
-            d = Datetime(int(a[30][:8] + '0000'))
-            temp = (open, high, low, close)
-            if 0 in temp:
-                return
-
-            stockstr = a[0].split('=')
-            stock = sm[stockstr[0][-8:]]
-
-            record = KRecord()
-            record.datetime = d
-            record.open = open
-            record.high = high
-            record.low = low
-            record.close = close
-            record.amount = transamount
-            record.volume = transcount / 100
-
-            stock.realtime_update(record)
-
-    except Exception as e:
-        print(tmpstr)
-        print(e)
-
-
-def realtimePartUpdate_from_qq(queryStr):
-    result = urllib.request.urlopen(queryStr).read()
-    try:
-        result = result.decode('gbk')
-    except Exception as e:
-        print(result)
-        print(e)
-        return
-
-    result = result.split('\n')
-    for tmpstr in result:
-        UpdateOneRealtimeRecord_from_qq(tmpstr)
-
-
-def realtime_update_from_website(source, stk_list=None):
-    if source == 'qq':
-        queryStr = "http://qt.gtimg.cn/q="
-        update_func = realtimePartUpdate_from_qq
-        max_size = 60
-    else:
-        print('Not support!')
-        return
-
-    count = 0
-    # urls = []
-    tmpstr = queryStr
-    if stk_list is None:
-        stk_list = sm
-    for stock in stk_list:
-        if stock.valid and stock.type in (
-            constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF, constant.STOCKTYPE_GEM, constant.STOCKTYPE_A_BJ,
-        ):
-            tmpstr += ("%s,") % (stock.market_code.lower())
-            count = count + 1
-            if count >= max_size:
-                # urls.append(tmpstr)
-                update_func(tmpstr)
-                count = 0
-                tmpstr = queryStr
-
-    if tmpstr != queryStr:
-        # urls.append(tmpstr)
-        update_func(tmpstr)
-
-    # 不用并行，防止过快，ip被网站屏蔽
-    # from multiprocessing import Pool
-    # from multiprocessing.dummy import Pool as ThreadPool
-    # pool = ThreadPool()
-    # if source == 'sina':
-    #    pool.map(realtimePartUpdate_from_sina, urls)
-    # else:
-    #    pool.map(realtimePartUpdate_from_qq, urls)
-    # pool.close()
-    # pool.join()
-
-
-def realtime_update_from_qmt(stk_list=None):
-    from xtquant import xtdata
-    if stk_list is None:
-        stk_list = sm
-    code_list = [f'{s.code}.{s.market}' for s in stk_list if s.valid]
-    full_tick = xtdata.get_full_tick(code_list)
-    for qmt_code, data in full_tick.items():
-        try:
-            code, market = qmt_code.split(".")
-            stock = sm[f'{market}{code}']
-            record = KRecord()
-            record.datetime = Datetime(data['timetag'].split(' ')[0])
-            record.open = data['open']
-            record.high = data['high']
-            record.low = data['low']
-            record.close = data['lastPrice']
-            record.volume = data['volume'] * 0.1
-            record.amount = data['amount'] * 0.001
-            stock.realtime_update(record)
-        except Exception as e:
-            hku_error(str(e))
-        except:
-            pass
-
-
 def realtime_update_inner(source='qq', stk_list=None):
+    if stk_list is None:
+        stk_list = sm
     if source == 'qq':
-        realtime_update_from_website(source, stk_list)
+        from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot
+        stk_list = [s.market_code.lower() for s in stk_list]
+        records = get_spot(stk_list, 'qq')
     elif source == 'qmt':
-        realtime_update_from_qmt(stk_list)
+        from hikyuu.fetcher.stock.zh_stock_a_qmt import get_spot
+        records = get_spot(stk_list)
     else:
         hku_error(f'Not support website source: {source}!')
+        return
+
+    for r in records:
+        stk = sm[f'{r["market"]}{r["code"]}']
+        if stk.is_null():
+            continue
+        k = KRecord()
+        k.datetime = Datetime(r['datetime']).start_of_day()
+        k.open = r['open']
+        k.high = r['high']
+        k.low = r['low']
+        k.close = r['close']
+        k.volume = r['volume']
+        k.amount = r['amount']
+        stk.realtime_update(k)
 
 
 def realtime_update_wrap():

@@ -21,32 +21,37 @@ static Parameter g_hikyuu_context;
 
 void hikyuu_init(const string& config_file_name, bool ignore_preload,
                  const StrategyContext& context) {
-    IniParser config;
-    try {
-        config.read(config_file_name);
-
-    } catch (std::invalid_argument& e) {
-        HKU_FATAL("Reading configure error! {}", e.what());
-        exit(1);
-    } catch (std::logic_error& e) {
-        HKU_FATAL("Reading configure error! {}", e.what());
-        exit(1);
-    } catch (...) {
-        HKU_WARN("Reading configure error! Don't know  error!");
-        exit(1);
+    Parameter baseParam, blockParam, kdataParam, preloadParam, hkuParam;
+    getConfigFromIni(config_file_name, baseParam, blockParam, kdataParam, preloadParam, hkuParam);
+    if (ignore_preload) {
+        const auto& ktypes = KQuery::getAllKType();
+        for (const auto& ktype : ktypes) {
+            string low_ktype = ktype;
+            to_lower(low_ktype);
+            preloadParam.set<bool>(low_ktype, false);
+        }
     }
 
-    Parameter baseParam, blockParam, kdataParam, preloadParam, hkuParam;
+    StockManager& sm = StockManager::instance();
+    sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, context);
+}
+
+void HKU_API getConfigFromIni(const string& config_file_name, Parameter& baseParam,
+                              Parameter& blockParam, Parameter& kdataParam, Parameter& preloadParam,
+                              Parameter& hkuParam) {
+    IniParser config;
+    config.read(config_file_name);
 
     hkuParam.set<string>("tmpdir", config.get("hikyuu", "tmpdir", "."));
     hkuParam.set<string>("datadir", config.get("hikyuu", "datadir", "."));
     hkuParam.set<string>("quotation_server",
                          config.get("hikyuu", "quotation_server", "ipc:///tmp/hikyuu_real.ipc"));
+    // 加载权息数据
+    hkuParam.set<bool>("load_stock_weight", config.getBool("hikyuu", "load_stock_weight", "True"));
 
-    if (!config.hasSection("baseinfo")) {
-        HKU_FATAL("Missing configure of baseinfo!");
-        exit(1);
-    }
+    // 加载历史财务数据
+    hkuParam.set<bool>("load_history_finance",
+                       config.getBool("hikyuu", "load_history_finance", "True"));
 
     IniParser::StringListPtr option = config.getOptionList("baseinfo");
     for (auto iter = option->begin(); iter != option->end(); ++iter) {
@@ -69,26 +74,14 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload,
         kdataParam.set<string>(*iter, config.get("kdata", *iter));
     }
 
-    option = config.getOptionList("preload");
-
-    for (auto iter = option->begin(); iter != option->end(); ++iter) {
-        try {
-            auto pos = (*iter).find("max");
-            if (pos == std::string::npos) {
-                preloadParam.set<bool>(*iter,
-                                       ignore_preload ? false : config.getBool("preload", *iter));
-            } else if (!ignore_preload) {
-                preloadParam.set<int>(*iter, config.getInt("preload", *iter));
-            }
-        } catch (const std::exception& e) {
-            HKU_ERROR("proload param ({}) error! {}!", *iter, e.what());
-        } catch (...) {
-            HKU_ERROR("proload param ({})! Unknown error!", *iter);
-        }
+    const auto& ktypes = KQuery::getAllKType();
+    for (const auto& ktype : ktypes) {
+        string low_ktype = ktype;
+        to_lower(low_ktype);
+        preloadParam.set<bool>(low_ktype, config.getBool("preload", low_ktype, "False"));
+        string num_preload = fmt::format("{}_max", low_ktype);
+        preloadParam.set<int>(num_preload, config.getInt("preload", num_preload, "4096"));
     }
-
-    StockManager& sm = StockManager::instance();
-    sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, context);
 }
 
 }  // namespace hku

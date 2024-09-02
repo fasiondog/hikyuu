@@ -14,7 +14,7 @@ namespace hku {
 class HKU_API OperatorValueSelector : public SelectorBase {
 public:
     OperatorValueSelector();
-    OperatorValueSelector(const string& name);
+    explicit OperatorValueSelector(const string& name);
     OperatorValueSelector(const string& name, const SelectorPtr& se, double value);
     virtual ~OperatorValueSelector();
 
@@ -36,12 +36,29 @@ private:
     //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;
+    // template <class Archive>
+    // void serialize(Archive& ar, const unsigned int version) {
+    //     ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase);
+    //     ar& BOOST_SERIALIZATION_NVP(m_se);
+    //     ar& BOOST_SERIALIZATION_NVP(m_value);
+    // }
     template <class Archive>
-    void serialize(Archive& ar, const unsigned int version) {
+    void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase);
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_value);
     }
+
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase);
+        ar& BOOST_SERIALIZATION_NVP(m_se);
+        ar& BOOST_SERIALIZATION_NVP(m_value);
+        if (m_se) {
+            m_pro_sys_list = m_se->getProtoSystemList();
+        }
+    }
+
 #endif
 };
 

@@ -19,7 +19,7 @@ class FixedSelector : public SelectorBase {
 
 public:
     FixedSelector();
-    FixedSelector(double weight);
+    explicit FixedSelector(double weight);
     virtual ~FixedSelector();
 };
 

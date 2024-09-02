@@ -14,7 +14,7 @@ namespace hku {
 class HKU_API OperatorSelector : public SelectorBase {
 public:
     OperatorSelector();
-    OperatorSelector(const string& name);
+    explicit OperatorSelector(const string& name);
     OperatorSelector(const string& name, const SelectorPtr& se1, const SelectorPtr& se2);
     virtual ~OperatorSelector();
 
@@ -43,6 +43,7 @@ protected:
 protected:
     static void sortSystemWeightList(SystemWeightList& swlist);
 
+    void build();
     void cloneRebuild(const SelectorPtr& se1, const SelectorPtr& se2);
 
 protected:
@@ -63,10 +64,18 @@ private:
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;
     template <class Archive>
-    void serialize(Archive& ar, const unsigned int version) {
+    void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase);
         ar& BOOST_SERIALIZATION_NVP(m_se1);
         ar& BOOST_SERIALIZATION_NVP(m_se2);
+    }
+
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase);
+        ar& BOOST_SERIALIZATION_NVP(m_se1);
+        ar& BOOST_SERIALIZATION_NVP(m_se2);
+        build();
     }
 #endif
 };

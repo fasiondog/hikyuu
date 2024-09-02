@@ -342,7 +342,7 @@ public:
     };
 
     /** \brief Reads a .mo-file
-     * \param[in] _filename The path to the file to load.
+     * \param[in] data The path to the file to load.
      * \return SUCCESS on success or one of the other error-codes in eErrorCode on error.
      *
      * This is the core-feature. This method loads the .mo-file and stores
@@ -357,7 +357,7 @@ public:
     }
 
     /** \brief Reads a .mo-file
-     * \param[in] _filename The path to the file to load.
+     * \param[in] filename The path to the file to load.
      * \return SUCCESS on success or one of the other error-codes in eErrorCode on error.
      *
      * This is the core-feature. This method loads the .mo-file and stores

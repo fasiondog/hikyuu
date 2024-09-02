@@ -19,7 +19,7 @@
 namespace hku {
 
 /**
- * @ingroup Stratgy
+ * @ingroup Strategy
  * @{
  */
 
@@ -28,6 +28,7 @@ namespace hku {
  */
 class HKU_API Strategy {
     CLASS_LOGGER_IMP(Strategy)
+    PARAMETER_SUPPORT
 
 public:
     Strategy();
@@ -36,6 +37,9 @@ public:
              const string& name = "Strategy", const string& config_file = "");
     explicit Strategy(const StrategyContext& context, const string& name = "Strategy",
                       const string& config_file = "");
+
+    Strategy(const Strategy&) = delete;
+    Strategy& operator=(const Strategy&) = delete;
 
     virtual ~Strategy();
 
@@ -73,8 +77,7 @@ public:
     /**
      * 正确数据发生变化调用，即接收到相应行情数据变更
      * @note 通常用于调试。且只要收到行情采集消息就会触发，不受开、闭市时间限制
-     * @param stk 数据发生变化的 stock
-     * @param spot 接收到的具体数据
+     * @param changeFunc 回调函数
      */
     void onChange(std::function<void(const Stock&, const SpotRecord& spot)>&& changeFunc);
 
@@ -82,13 +85,14 @@ public:
      * 一批行情数据接受完毕后通知
      * @note 通常仅用于调试打印，该批行情数据中不一定含有上下文中包含的 stock
      *       且只要收到行情采集消息就会触发，不受开、闭市时间限制。
+     * @param recievedFucn 回调函数
      */
     void onReceivedSpot(std::function<void(const Datetime&)>&& recievedFucn);
 
     /**
      * 启动策略执行，必须在已注册相关处理函数后执行
      */
-    void start();
+    void start(bool autoRecieveSpot = true);
 
 private:
     string m_name;
@@ -169,6 +173,15 @@ void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& qu
  */
 void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
                            const OrderBrokerPtr& broker, const TradeCostPtr& costfunc);
+
+/**
+ * 从 hikyuu 数据缓存服务器拉取更新最新的缓存数据
+ * @param addr 缓存服务地址，如: tcp://192.168.1.1:9201
+ * @param stklist 待更新的股票列表
+ * @param ktype 指定更新的K线类型
+ */
+void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& stklist,
+                                     const KQuery::KType& ktype);
 
 /** @} */
 }  // namespace hku

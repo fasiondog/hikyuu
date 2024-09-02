@@ -37,8 +37,6 @@ namespace hku {
  * 对消息进行解码，消息类型和消息体必须匹配
  * @tparam T 消息体类型
  * @param msg 消息
- * @param out 解码输出的消息
- * @exception yas::io_exception 消息解码失败
  * @exception NodeErrorCode 消息类型不匹配
  */
 inline json decodeMsg(nng_msg *msg) {
@@ -68,7 +66,7 @@ inline void encodeMsg(nng_msg *msg, const json &in) {
 
 /**
  * 构造错误消息响应
- * @param msg[out] 消息
+ * @param msg [out] 消息
  * @param errcode 错误码
  * @param errmsg 错误消息
  */

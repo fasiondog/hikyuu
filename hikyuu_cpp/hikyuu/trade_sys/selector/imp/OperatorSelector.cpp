@@ -50,10 +50,16 @@ OperatorSelector::OperatorSelector(const string& name) : SelectorBase(name) {}
 OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
                                    const SelectorPtr& se2)
 : SelectorBase(name), m_se1(se1), m_se2(se2) {
-    auto inter = findIntersection(se1, se2);
-    if (se1 && se2) {
+    build();
+}
+
+OperatorSelector::~OperatorSelector() {}
+
+void OperatorSelector::build() {
+    auto inter = findIntersection(m_se1, m_se2);
+    if (m_se1 && m_se2) {
         std::map<System*, SYSPtr> tmpdict;
-        const auto& raw_sys_list1 = se1->getProtoSystemList();
+        const auto& raw_sys_list1 = m_se1->getProtoSystemList();
         for (const auto& sys : raw_sys_list1) {
             m_pro_sys_list.emplace_back(sys);
             m_se1_set.insert(sys);
@@ -62,7 +68,7 @@ OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
             }
         }
 
-        const auto& raw_sys_list2 = se2->getProtoSystemList();
+        const auto& raw_sys_list2 = m_se2->getProtoSystemList();
         for (size_t i = 0, total = raw_sys_list2.size(); i < total; i++) {
             const auto& sys = raw_sys_list2[i];
             auto iter = inter.find(sys.get());
@@ -74,7 +80,7 @@ OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
             }
         }
 
-    } else if (se1) {
+    } else if (m_se1) {
         // m_se1 = se1->clone();
         auto sys_list = m_se1->getProtoSystemList();
         for (auto& sys : sys_list) {
@@ -82,7 +88,7 @@ OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
         }
         m_pro_sys_list = std::move(sys_list);
 
-    } else if (se2) {
+    } else if (m_se2) {
         // m_se2 = se2->clone();
         auto sys_list = m_se2->getProtoSystemList();
         for (auto& sys : sys_list) {
@@ -91,8 +97,6 @@ OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
         }
     }
 }
-
-OperatorSelector::~OperatorSelector() {}
 
 void OperatorSelector::_reset() {
     if (m_se1) {
@@ -277,13 +281,8 @@ SystemWeightList OperatorSelector::getIntersectionSelected(
     SystemWeightList ret;
     HKU_IF_RETURN(!m_se1 || !m_se2, ret);
 
-    SystemWeightList sws1, sws2;
-    if (m_se1) {
-        sws1 = m_se1->getSelected(date);
-    }
-    if (m_se2) {
-        sws2 = m_se2->getSelected(date);
-    }
+    SystemWeightList sws1 = m_se1->getSelected(date);
+    SystemWeightList sws2 = m_se2->getSelected(date);
 
     HKU_IF_RETURN(sws1.empty() || sws2.empty(), ret);
 

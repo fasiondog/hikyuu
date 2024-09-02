@@ -316,7 +316,7 @@ inline std::vector<std::string> split(const std::string &str, const std::string 
 
 /**
  * byte 转 16 进制字符串, 如 "abcd" 转换为 "61626364"
- * @param in_byte 输入的 byte 数组
+ * @param bytes 输入的 byte 数组
  * @param in_len byte 数组长度
  */
 inline std::string byteToHexStr(const char *bytes, size_t in_len) {
@@ -345,7 +345,7 @@ inline std::string byteToHexStr(const char *bytes, size_t in_len) {
 
 /**
  * byte 转 16 进制字符串, 如 "abcd" 转换为 "61626364"
- * @param in_byte std::string 格式的输入
+ * @param bytes std::string 格式的输入
  */
 inline std::string byteToHexStr(const std::string &bytes) {
     return byteToHexStr(bytes.c_str(), bytes.size());
@@ -353,7 +353,7 @@ inline std::string byteToHexStr(const std::string &bytes) {
 
 /**
  * byte 转 16 进制字符串, 如 "abcd" 转换为 "0x61 0x62 0x63 0x64"
- * @param in_byte 输入的 byte 数组
+ * @param bytes 输入的 byte 数组
  * @param in_len byte 数组长度
  */
 inline std::string byteToHexStrForPrint(const char *bytes, size_t in_len) {
@@ -389,7 +389,7 @@ inline std::string byteToHexStrForPrint(const char *bytes, size_t in_len) {
 
 /**
  * byte 转 16 进制字符串, 如 "abcd" 转换为 "61626364"
- * @param in_byte 输入的 byte 数组
+ * @param bytes 输入的 byte 数组
  */
 inline std::string byteToHexStrForPrint(const std::string &bytes) {
     return byteToHexStrForPrint(bytes.c_str(), bytes.size());

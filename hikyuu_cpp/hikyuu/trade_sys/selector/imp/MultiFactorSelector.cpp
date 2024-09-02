@@ -85,10 +85,10 @@ SystemWeightList MultiFactorSelector::getSelected(Datetime date) {
 
     ScoreRecordList scores;
     if (getParam<bool>("ignore_null")) {
-        scores = m_mf->getScores(date, 0, getParam<int>("topn"),
+        scores = m_mf->getScores(date, 0, topn,
                                  [](const ScoreRecord& sc) { return !std::isnan(sc.value); });
     } else {
-        scores = m_mf->getScores(date, 0, getParam<int>("topn"));
+        scores = m_mf->getScores(date, 0, topn);
     }
 
     if (getParam<bool>("only_should_buy")) {

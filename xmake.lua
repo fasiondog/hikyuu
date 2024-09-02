@@ -6,7 +6,7 @@ set_project("hikyuu")
 add_rules("mode.debug", "mode.release")
 
 -- version
-set_version("2.1.2", {build = "%Y%m%d%H%M"})
+set_version("2.1.3", {build = "%Y%m%d%H%M"})
 
 set_warnings("all")
 
@@ -112,6 +112,7 @@ set_configvar("HKU_ENABLE_MO", 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT", 1)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", 0)
+set_configvar("HKU_ENABLE_NODE", 1)
 
 local boost_version = "1.85.0"
 local hdf5_version = "1.12.2"

@@ -40,11 +40,6 @@ void IDropna::_calculate(const Indicator& ind) {
     std::unique_ptr<price_t[]> buf(new price_t[m_result_num * row_len]);
 #endif
 
-    if (!buf) {
-        HKU_ERROR("Memory allocation failed!");
-        return;
-    }
-
     DatetimeList dates;
     size_t pos = 0;
     for (size_t i = ind.discard(); i < total; i++) {

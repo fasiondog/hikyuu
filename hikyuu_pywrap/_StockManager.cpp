@@ -31,6 +31,9 @@ void export_StockManager(py::module& m) {
      param hikyuu_param 其他参数
      param StrategyContext context 策略上下文, 默认加载全部证券)")
 
+      .def_property_readonly("data_ready", &StockManager::dataReady,
+                             "是否所有数据已准备就绪（加载完毕）")
+
       .def("reload", &StockManager::reload, "重新加载所有证券数据")
 
       .def("tmpdir", &StockManager::tmpdir, R"(tmpdir(self) -> str
@@ -51,6 +54,8 @@ void export_StockManager(py::module& m) {
            py::return_value_policy::copy, "获取当前预加载参数")
       .def("get_hikyuu_parameter", &StockManager::getHikyuuParameter, py::return_value_policy::copy,
            "获取当前其他参数")
+      .def("get_context", &StockManager::getStrategyContext, py::return_value_policy::copy,
+           "获取当前上下文")
 
       .def("get_market_list", &StockManager::getAllMarket, R"(get_market_list(self)
 

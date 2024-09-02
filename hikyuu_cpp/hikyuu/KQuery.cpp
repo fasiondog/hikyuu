@@ -55,12 +55,23 @@ static const unordered_map<string, int32_t> g_ktype2min{
 };
 
 // 获取所有的 KType
-vector<string>& KQuery::getAllKType() {
+const vector<KQuery::KType>& KQuery::getAllKType() {
     return g_all_ktype;
 }
 
 int32_t KQuery::getKTypeInMin(KType ktype) {
     return g_ktype2min.at(ktype);
+}
+
+bool KQuery::isKType(const string& ktype) {
+    string nktype(ktype);
+    to_upper(nktype);
+    for (const auto& v : g_all_ktype) {
+        if (nktype == v) {
+            return true;
+        }
+    }
+    return false;
 }
 
 KQuery::KQuery(Datetime start, Datetime end, const KType& ktype, RecoverType recoverType)

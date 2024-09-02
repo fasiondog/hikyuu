@@ -181,10 +181,9 @@ public:
 
     /**
      * 获取指定证券的空头持仓记录
-     * @param date 指定日期
      * @param stock 指定的证券
      */
-    virtual PositionRecord getShortPosition(const Stock&) const {
+    virtual PositionRecord getShortPosition(const Stock& stock) const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();
     }

@@ -27,8 +27,7 @@ std::string HKU_UTILS_API base64_encode(unsigned char const* bytes_to_encode, si
 
 /**
  * 字符串编码为 base64
- * @param bytes_to_encode 内存起始地址
- * @param in_len 待计算的字节长度
+ * @param src 输入字符串
  * @note 通过 func(unsigned char *, unsigned int) 函数实现，而不是直接只提供 string_view
  * 版本的原因是：c++17 string_view 处理 nullptr 时，程序会直接挂掉，无异常
  */

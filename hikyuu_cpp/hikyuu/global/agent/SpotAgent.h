@@ -43,6 +43,11 @@ public:
         return !m_stop;
     }
 
+    void setWorkerNum(size_t worker_num) {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_work_num = worker_num;
+    }
+
     /** 设置是否打印数据接收进展情况，主要用于在交互环境下关闭打印 */
     void setPrintFlag(bool print) {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -106,10 +111,11 @@ private:
     enum STATUS m_status = WAITING;      // 当前内部状态
     std::atomic_bool m_stop = true;      // 结束代理工作标识
 
-    int m_revTimeout = 100;       // 连接数据服务超时时长（毫秒）
-    size_t m_batch_count = 0;     // 记录本次批次接收的数据数量
-    std::thread m_receiveThread;  // 数据接收线程
-    ThreadPool m_tg;              // 数据处理任务线程池
+    int m_revTimeout = 100;            // 连接数据服务超时时长（毫秒）
+    size_t m_batch_count = 0;          // 记录本次批次接收的数据数量
+    std::thread m_receiveThread;       // 数据接收线程
+    std::unique_ptr<ThreadPool> m_tg;  // 数据处理任务线程池
+    size_t m_work_num = 1;             // 数据处理任务线程池线程数
     vector<std::future<void>> m_process_task_list;
 
     // 下面属性被修改时需要加锁，以便可以使用多线程方式运行 strategy
