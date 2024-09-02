@@ -64,8 +64,11 @@ def parse_one_result_qq(resultstr):
     hku_check_ignore(len(resultstr) > 3 and resultstr[:2] == 'v_', "Invalid input param! {}", resultstr)
 
     a = resultstr.split('~')
-    result['market'] = a[0][2:4]
-    result['code'] = a[0][4:10]
+    market = a[0][2:4].upper()
+    code = a[0][4:10]
+    result['market'] = market
+    result['code'] = code
+
     result['name'] = a[1]
     result['close'] = float(a[3])  # 当前价格
     result['yesterday_close'] = float(a[4])  # 昨日收盘价
@@ -103,8 +106,11 @@ def parse_one_result_qq(resultstr):
     result['high'] = float(a[33])  # 最高价
     result['low'] = float(a[34])  # 最低价
     # 35: 价格/成交量（手）/成交额
-    result['volume'] = float(a[36])  # 成交量（手）
-    result['amount'] = float(a[37]) * 10.0  # 成交额（万）
+    if (market == 'SZ' and code[:2] == '39') or (market == 'SH' and code[:3] == '000'):
+        result['volume'] = float(a[36]) * 0.01  # 成交量（手）
+    else:
+        result['volume'] = float(a[36])  # 成交量（手）
+    result['amount'] = float(a[37])  # 成交额（万）
     result['turnover_rate'] = float(a[38]) if a[38] else 0.0  # 换手率
     result['pe'] = float(a[39]) if a[39] else 0.0  # 市盈率 Price Earnings Ratio，简称P/E或PER
     result['amplitude'] = float(a[43]) if a[43] else 0.0  # 振幅
