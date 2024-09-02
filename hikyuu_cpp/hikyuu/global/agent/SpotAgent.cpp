@@ -8,6 +8,7 @@
 #include <chrono>
 #include <nng/nng.h>
 #include <nng/protocol/pubsub0/sub.h>
+#include "hikyuu/StockManager.h"
 #include "spot_generated.h"
 #include "SpotAgent.h"
 

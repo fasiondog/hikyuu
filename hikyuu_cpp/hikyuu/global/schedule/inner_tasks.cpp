@@ -5,9 +5,10 @@
  *     Author: fasiondog
  */
 
+#include "hikyuu/StockManager.h"
+#include "hikyuu/global/GlobalSpotAgent.h"
 #include "inner_tasks.h"
 #include "scheduler.h"
-#include "../../StockManager.h"
 
 namespace hku {
 
@@ -17,7 +18,17 @@ void initInnerTask() {
 }
 
 void reloadHikyuuTask() {
+    // 先停止行情接收
+    auto* agent = getGlobalSpotAgent();
+    agent->stop();
+
+    // 重新加载数据
     StockManager::instance().reload();
+
+    // 重新启动行情接收
+    bool print = agent->getPrintFlag();
+    size_t work_num = agent->getWorkerNum();
+    startSpotAgent(print, work_num);
 }
 
 }  // namespace hku
