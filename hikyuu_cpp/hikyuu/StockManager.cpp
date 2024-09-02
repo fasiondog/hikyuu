@@ -33,10 +33,10 @@ void StockManager::quit() {
 }
 
 StockManager::StockManager() : m_initializing(false), m_data_ready(false) {
-    m_stockDict_mutex = new std::mutex;
-    m_marketInfoDict_mutex = new std::mutex;
-    m_stockTypeInfo_mutex = new std::mutex;
-    m_holidays_mutex = new std::mutex;
+    m_stockDict_mutex = new std::shared_mutex;
+    m_marketInfoDict_mutex = new std::shared_mutex;
+    m_stockTypeInfo_mutex = new std::shared_mutex;
+    m_holidays_mutex = new std::shared_mutex;
 }
 
 StockManager::~StockManager() {
@@ -78,10 +78,6 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 获取路径信息
     m_tmpdir = hikyuuParam.tryGet<string>("tmpdir", ".");
     m_datadir = hikyuuParam.tryGet<string>("datadir", ".");
-
-    m_stockDict.clear();
-    m_marketInfoDict.clear();
-    m_stockTypeInfo.clear();
 
     // 加载证券基本信息
     m_baseInfoDriver = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
@@ -184,7 +180,7 @@ void StockManager::loadAllKData() {
         std::thread t = std::thread([this, ktypes, low_ktypes]() {
             this->m_load_tg = std::make_unique<ThreadPool>();
             for (size_t i = 0, len = ktypes.size(); i < len; i++) {
-                std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+                std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
                 for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
                     if (m_preloadParam.tryGet<bool>(low_ktypes[i], false)) {
                         m_load_tg->submit(
@@ -196,7 +192,7 @@ void StockManager::loadAllKData() {
             }
 
             if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
-                std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+                std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
                 for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
                     m_load_tg->submit([stk = iter->second]() { stk.getHistoryFinance(); });
                 }
@@ -231,15 +227,15 @@ Stock StockManager::getStock(const string& querystr) const {
     Stock result;
     string query_str = querystr;
     to_upper(query_str);
-    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+    std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.find(query_str);
     return (iter != m_stockDict.end()) ? iter->second : result;
 }
 
 StockList StockManager::getStockList(std::function<bool(const Stock&)>&& filter) const {
     StockList ret;
+    std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     ret.reserve(m_stockDict.size());
-    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.begin();
     if (filter) {
         for (; iter != m_stockDict.end(); ++iter) {
@@ -260,7 +256,7 @@ MarketInfo StockManager::getMarketInfo(const string& market) const {
     string market_tmp = market;
     to_upper(market_tmp);
 
-    std::lock_guard<std::mutex> lock(*m_marketInfoDict_mutex);
+    std::shared_lock<std::shared_mutex> lock(*m_marketInfoDict_mutex);
     auto iter = m_marketInfoDict.find(market_tmp);
     if (iter != m_marketInfoDict.end()) {
         result = iter->second;
@@ -275,7 +271,7 @@ MarketInfo StockManager::getMarketInfo(const string& market) const {
 
 StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
     StockTypeInfo result;
-    std::lock_guard<std::mutex> lock(*m_stockTypeInfo_mutex);
+    std::shared_lock<std::shared_mutex> lock(*m_stockTypeInfo_mutex);
     auto iter = m_stockTypeInfo.find(type);
     if (iter != m_stockTypeInfo.end()) {
         result = iter->second;
@@ -290,7 +286,7 @@ StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
 
 MarketList StockManager::getAllMarket() const {
     MarketList result;
-    std::lock_guard<std::mutex> lock(*m_marketInfoDict_mutex);
+    std::shared_lock<std::shared_mutex> lock(*m_marketInfoDict_mutex);
     auto iter = m_marketInfoDict.begin();
     for (; iter != m_marketInfoDict.end(); ++iter) {
         result.push_back(iter->first);
@@ -324,6 +320,11 @@ const ZhBond10List& StockManager::getZhBond10() const {
     return m_zh_bond10;
 }
 
+bool StockManager::isHoliday(const Datetime& d) const {
+    std::shared_lock<std::shared_mutex> lock(*m_holidays_mutex);
+    return m_holidays.count(d);
+}
+
 Stock StockManager::addTempCsvStock(const string& code, const string& day_filename,
                                     const string& min_filename, price_t tick, price_t tickValue,
                                     int precision, size_t minTradeNumber, size_t maxTradeNumber) {
@@ -352,7 +353,7 @@ void StockManager::removeTempCsvStock(const string& code) {
 bool StockManager::addStock(const Stock& stock) {
     string market_code(stock.market_code());
     to_upper(market_code);
-    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+    std::unique_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     HKU_ERROR_IF_RETURN(m_stockDict.find(market_code) != m_stockDict.end(), false,
                         "The stock had exist! {}", market_code);
     m_stockDict[market_code] = stock;
@@ -362,7 +363,7 @@ bool StockManager::addStock(const Stock& stock) {
 void StockManager::removeStock(const string& market_code) {
     string n_market_code(market_code);
     to_upper(n_market_code);
-    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+    std::unique_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.find(n_market_code);
     if (iter != m_stockDict.end()) {
         m_stockDict.erase(iter);
@@ -396,7 +397,7 @@ void StockManager::loadAllStocks() {
 
     auto kdriver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
 
-    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+    std::unique_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     for (auto& info : stockInfos) {
         Datetime startDate, endDate;
         try {
@@ -452,7 +453,7 @@ void StockManager::loadAllStocks() {
 void StockManager::loadAllMarketInfos() {
     HKU_INFO("Loading market information...");
     auto marketInfos = m_baseInfoDriver->getAllMarketInfo();
-    std::lock_guard<std::mutex> lock(*m_marketInfoDict_mutex);
+    std::unique_lock<std::shared_mutex> lock(*m_marketInfoDict_mutex);
     m_marketInfoDict.clear();
     m_marketInfoDict.reserve(marketInfos.size());
     for (auto& marketInfo : marketInfos) {
@@ -470,7 +471,7 @@ void StockManager::loadAllMarketInfos() {
 void StockManager::loadAllStockTypeInfo() {
     HKU_INFO("Loading stock type information...");
     auto stkTypeInfos = m_baseInfoDriver->getAllStockTypeInfo();
-    std::lock_guard<std::mutex> lock(*m_stockTypeInfo_mutex);
+    std::unique_lock<std::shared_mutex> lock(*m_stockTypeInfo_mutex);
     m_stockTypeInfo.clear();
     m_stockTypeInfo.reserve(stkTypeInfos.size());
     for (auto& stkTypeInfo : stkTypeInfos) {
@@ -480,7 +481,7 @@ void StockManager::loadAllStockTypeInfo() {
 
 void StockManager::loadAllHolidays() {
     auto holidays = m_baseInfoDriver->getAllHolidays();
-    std::lock_guard<std::mutex> lock(*m_holidays_mutex);
+    std::unique_lock<std::shared_mutex> lock(*m_holidays_mutex);
     m_holidays = std::move(holidays);
 }
 
@@ -489,7 +490,7 @@ void StockManager::loadAllStockWeights() {
     HKU_INFO("Loading stock weight...");
     if (m_context.isAll()) {
         auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
-        std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
+        std::shared_lock<std::shared_mutex> lock1(*m_stockDict_mutex);
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             auto weight_iter = all_stkweight_dict.find(iter->first);
             if (weight_iter != all_stkweight_dict.end()) {
@@ -499,7 +500,7 @@ void StockManager::loadAllStockWeights() {
             }
         }
     } else {
-        std::lock_guard<std::mutex> lock1(*m_stockDict_mutex);
+        std::shared_lock<std::shared_mutex> lock1(*m_stockDict_mutex);
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             Stock& stock = iter->second;
             auto sw_list = m_baseInfoDriver->getStockWeightList(

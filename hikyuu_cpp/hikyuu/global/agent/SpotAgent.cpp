@@ -8,6 +8,7 @@
 #include <chrono>
 #include <nng/nng.h>
 #include <nng/protocol/pubsub0/sub.h>
+#include "hikyuu/StockManager.h"
 #include "spot_generated.h"
 #include "SpotAgent.h"
 
@@ -156,6 +157,12 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
 }
 
 void SpotAgent::work_thread() {
+    // 等待 sm 所有数据准备完毕后，再连接行情更新
+    while (!StockManager::instance().dataReady() && !m_stop) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    HKU_IF_RETURN(m_stop, void());
+
     nng_socket sock;
 
     int rv = nng_sub0_open(&sock);
