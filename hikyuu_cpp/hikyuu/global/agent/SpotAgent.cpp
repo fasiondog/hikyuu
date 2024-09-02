@@ -37,10 +37,7 @@ void SpotAgent::start() {
     stop();
     if (m_stop) {
         m_stop = false;
-        if (m_tg) {
-            m_tg.reset();
-            m_tg = std::make_unique<ThreadPool>(m_work_num);
-        }
+        m_tg = std::make_unique<ThreadPool>(m_work_num);
         m_receiveThread = std::thread([this]() { work_thread(); });
     }
 }
