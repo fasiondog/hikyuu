@@ -131,9 +131,21 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     // 非24小时交易品种，且时间和当天零时相同认为无分钟线级别数据
     HKU_IF_RETURN(stk.type() != STOCKTYPE_CRYPTO && minute == today, void());
 
-    Datetime start_minute = minute - (minute - today) % gap;
-    Datetime end_minute = start_minute + gap;
-    KRecordList klist = stk.getKRecordList(KQuery(start_minute, end_minute, ktype));
+    Datetime end_minute = minute - (minute - today) % gap + gap;
+
+    // 处理闭市时最后一条记录
+    MarketInfo market_info = StockManager::instance().getMarketInfo(stk.market());
+    Datetime close1 = today + market_info.closeTime1();
+    Datetime close2 = today + market_info.closeTime2();
+    Datetime open2 = today + market_info.openTime2();
+    if (!close2.isNull() && end_minute > close2) {
+        end_minute = close2;
+    } else if (!open2.isNull() && !close1.isNull() && end_minute < open2 && end_minute > close1) {
+        end_minute = close1;
+    }
+
+    // 计算当前之前的累积成交金额、成交量
+    KRecordList klist = stk.getKRecordList(KQuery(today, end_minute, ktype));
     price_t sum_amount = 0.0, sum_volume = 0.0;
     for (const auto& k : klist) {
         sum_amount += k.transAmount;
