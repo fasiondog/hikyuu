@@ -106,23 +106,16 @@ void StockManager::loadData() {
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
     m_data_ready = false;
 
-    ThreadPool tg(2);
-    tg.submit([this]() { this->loadAllHolidays(); });
-    tg.submit([this]() { this->loadHistoryFinanceField(); });
-    tg.submit([this]() { this->loadAllStockTypeInfo(); });
-    tg.submit([this]() { this->loadAllZhBond10(); });
-
-    // loadAllHolidays();
+    loadAllHolidays();
     loadAllMarketInfos();
-    // loadAllStockTypeInfo();
+    loadAllStockTypeInfo();
     loadAllStocks();
     loadAllStockWeights();
-    // loadAllZhBond10();
-    // loadHistoryFinanceField();
+    loadAllZhBond10();
+    loadHistoryFinanceField();
 
     HKU_INFO("Loading block...");
-    // m_blockDriver->load();
-    tg.submit([this]() { this->m_blockDriver->load(); });
+    m_blockDriver->load();
 
     // 获取K线数据驱动并预加载指定的数据
     HKU_INFO("Loading KData...");
@@ -131,8 +124,6 @@ void StockManager::loadData() {
 
     // 加载K线及历史财务信息
     loadAllKData();
-
-    tg.join();
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
