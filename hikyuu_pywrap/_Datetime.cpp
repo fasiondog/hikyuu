@@ -25,6 +25,7 @@ void export_Datetime(py::module& m) {
       .def(py::init<>())
       .def(py::init<const std::string&>())
       .def(py::init<unsigned long long>())
+      .def(py::init<const Datetime&>())
       .def(py::init<long, long, long, long, long, long, long, long>(), py::arg("year"),
            py::arg("month"), py::arg("day"), py::arg("hour") = 0, py::arg("minute") = 0,
            py::arg("second") = 0, py::arg("millisecond") = 0, py::arg("microsecond") = 0)

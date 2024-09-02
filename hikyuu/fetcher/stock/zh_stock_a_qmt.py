@@ -40,7 +40,7 @@ try:
             result[f'ask{i+1}_amount'] = data['askVol'][i]
         return result
 
-    def get_spot(stocklist, unused1, unused2, batch_func=None):
+    def get_spot(stocklist, unused1=None, unused2=None, batch_func=None):
         code_list = [f'{s.code}.{s.market}' for s in stocklist]
         full_tick = xtdata.get_full_tick(code_list)
         records = [parse_one_result_qmt(code, data) for code, data in full_tick.items()]
@@ -53,6 +53,6 @@ except:
         hku_error("Not fount xtquant")
         return dict()
 
-    def get_spot(stocklist, unused1, unused2, batch_func=None):
+    def get_spot(stocklist, unused1=None, unused2=None, batch_func=None):
         hku_error("Not fount xtquant")
         return list()

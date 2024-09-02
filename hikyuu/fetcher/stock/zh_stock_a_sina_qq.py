@@ -61,7 +61,9 @@ def parse_one_result_sina(resultstr):
 def parse_one_result_qq(resultstr):
     result = {}
     hku_check_ignore(resultstr, "Invalid input param!")
-    hku_check_ignore(len(resultstr) > 3 and resultstr[:2] == 'v_', "Invalid input param! {}", resultstr)
+    # hku_check_ignore(len(resultstr) > 3 and resultstr[:2] == 'v_', "Invalid input param! {}", resultstr)
+    if (len(resultstr) <= 3 or resultstr[:2] != 'v_'):
+        return None
 
     a = resultstr.split('~')
     market = a[0][2:4].upper()
