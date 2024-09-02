@@ -285,7 +285,7 @@ def realtime_update_inner(source='qq', stk_list=None):
         if stk.is_null():
             continue
         k = KRecord()
-        k.datetime = Datetime(r['datetime'])
+        k.datetime = Datetime(r['datetime']).start_of_day()
         k.open = r['open']
         k.high = r['high']
         k.low = r['low']

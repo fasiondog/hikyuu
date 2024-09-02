@@ -66,6 +66,8 @@ def parse_one_result_qq(resultstr):
         return None
 
     a = resultstr.split('~')
+    if len(a) <= 1:
+        return None
     market = a[0][2:4].upper()
     code = a[0][4:10]
     result['market'] = market
