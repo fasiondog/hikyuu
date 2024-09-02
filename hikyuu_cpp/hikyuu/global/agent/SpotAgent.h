@@ -44,14 +44,20 @@ public:
     }
 
     void setWorkerNum(size_t worker_num) {
-        std::lock_guard<std::mutex> lock(m_mutex);
         m_work_num = worker_num;
+    }
+
+    size_t getWorkerNum() const {
+        return m_work_num;
     }
 
     /** 设置是否打印数据接收进展情况，主要用于在交互环境下关闭打印 */
     void setPrintFlag(bool print) {
-        std::lock_guard<std::mutex> lock(m_mutex);
         m_print = print;
+    }
+
+    bool getPrintFlag() const {
+        return m_print;
     }
 
     /**

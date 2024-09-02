@@ -8,6 +8,7 @@
 #include <chrono>
 #include <nng/nng.h>
 #include <nng/protocol/pubsub0/sub.h>
+#include "hikyuu/StockManager.h"
 #include "spot_generated.h"
 #include "SpotAgent.h"
 
@@ -37,10 +38,7 @@ void SpotAgent::start() {
     stop();
     if (m_stop) {
         m_stop = false;
-        if (m_tg) {
-            m_tg.reset();
-            m_tg = std::make_unique<ThreadPool>(m_work_num);
-        }
+        m_tg = std::make_unique<ThreadPool>(m_work_num);
         m_receiveThread = std::thread([this]() { work_thread(); });
     }
 }

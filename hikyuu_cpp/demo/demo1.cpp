@@ -1,5 +1,18 @@
-// demo.cpp : 定义控制台应用程序的入口点。
-//
+/*
+ *  Copyright (c) 2024 hikyuu.org
+ *
+ *  Created on: 2024-09-02
+ *      Author: fasiondog
+ */
+
+/*************************************************************
+ *
+ * 该示例，为使用 C++ 方式使用 hikyuu
+ * 1. 初始化 hikyuu
+ * 2. 打印 K 线数据
+ * 更多使用可以参考 python，基本一致，仅函数命名风格不一样
+ *
+ *************************************************************/
 
 #include <hikyuu/hikyuu.h>
 #include <thread>
@@ -36,11 +49,10 @@ int main(int argc, char* argv[]) {
     }
 
     // 启动行情接收（只是计算回测可以不需要）
-    startSpotAgent(true);
-
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
+    // startSpotAgent(true);
+    // while (true) {
+    //     std::this_thread::sleep_for(std::chrono::seconds(1));
+    // }
 
 #if defined(_WIN32)
     SetConsoleOutputCP(old_cp);

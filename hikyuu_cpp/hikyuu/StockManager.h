@@ -275,18 +275,18 @@ private:
     BlockInfoDriverPtr m_blockDriver;
 
     StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock
-    std::mutex* m_stockDict_mutex;
+    std::shared_mutex* m_stockDict_mutex;
 
     typedef unordered_map<string, MarketInfo> MarketInfoMap;
     mutable MarketInfoMap m_marketInfoDict;
-    std::mutex* m_marketInfoDict_mutex;
+    std::shared_mutex* m_marketInfoDict_mutex;
 
     typedef unordered_map<uint32_t, StockTypeInfo> StockTypeInfoMap;
     mutable StockTypeInfoMap m_stockTypeInfo;
-    std::mutex* m_stockTypeInfo_mutex;
+    std::shared_mutex* m_stockTypeInfo_mutex;
 
     std::unordered_set<Datetime> m_holidays;  // 节假日
-    std::mutex* m_holidays_mutex;
+    std::shared_mutex* m_holidays_mutex;
 
     ZhBond10List m_zh_bond10;  // 10年期中国国债收益率数据
 
@@ -313,10 +313,6 @@ inline bool StockManager::dataReady() const {
 
 inline Stock StockManager::operator[](const string& query) const {
     return getStock(query);
-}
-
-inline bool StockManager::isHoliday(const Datetime& d) const {
-    return m_holidays.count(d);
 }
 
 inline const Parameter& StockManager::getBaseInfoDriverParameter() const {
