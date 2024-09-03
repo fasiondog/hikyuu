@@ -114,7 +114,7 @@ def parse_one_result_qq(resultstr):
         result['volume'] = float(a[36]) * 0.01  # 成交量（手）
     else:
         result['volume'] = float(a[36])  # 成交量（手）
-    result['amount'] = float(a[37]) * 10.0  # 成交额（万）
+    result['amount'] = float(a[37])   # 成交额（万）
     result['turnover_rate'] = float(a[38]) if a[38] else 0.0  # 换手率
     result['pe'] = float(a[39]) if a[39] else 0.0  # 市盈率 Price Earnings Ratio，简称P/E或PER
     result['amplitude'] = float(a[43]) if a[43] else 0.0  # 振幅
