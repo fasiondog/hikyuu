@@ -6,6 +6,7 @@
 #     Author: fasiondog
 
 import datetime
+from concurrent import futures
 from pytdx.hq import TdxHq_API
 from hikyuu.data.common_pytdx import search_best_tdx
 from hikyuu import get_stock, constant
@@ -71,7 +72,7 @@ def request_data(api, stklist, parse_one_result):
     return [r for r in result if r is not None]
 
 
-@spend_time
+@hku_catch(ret=([], []))
 def get_spot(stocklist, ip, port, batch_func=None):
     api = TdxHq_API()
     hku_check(api.connect(ip, port), 'Failed connect tdx ({}:{})!'.format(ip, port))
@@ -80,6 +81,7 @@ def get_spot(stocklist, ip, port, batch_func=None):
     tmplist = []
     result = []
     max_size = 80
+    err_list = []
     for stk in stocklist:
         tmplist.append((1 if stk.market == 'SH' else 0, stk.code))
         count += 1
@@ -89,6 +91,8 @@ def get_spot(stocklist, ip, port, batch_func=None):
                 result.extend(phase_result)
                 if batch_func:
                     batch_func(phase_result)
+            else:
+                err_list.extend(tmplist)
             count = 0
             tmplist = []
     if tmplist:
@@ -97,4 +101,39 @@ def get_spot(stocklist, ip, port, batch_func=None):
             result.extend(phase_result)
             if batch_func:
                 batch_func(phase_result)
-    return result
+        else:
+            err_list.extend(tmplist)
+    return result, err_list
+
+
+@spend_time
+def get_spot2(stocklist, ip, port, batch_func=None):
+    hosts = search_best_tdx()
+    hosts_cnt = len(hosts)
+    num = len(stocklist) // hosts_cnt
+    batchslist = []
+    for i in range(hosts_cnt):
+        batchslist.append([[stk for stk in stocklist[i*num: (i+1)*num]], hosts[i][2], hosts[i][3], batch_func])
+    if len(stocklist) % hosts_cnt != 0:
+        pos = num * hosts_cnt
+        for i in range(hosts_cnt):
+            batchslist[i][0].append(stocklist[pos])
+            pos += 1
+            if pos >= len(stocklist):
+                break
+
+    def do_inner(param):
+        ret = get_spot(param[0], param[1], param[2], param[3])
+        return ret
+
+    with futures.ThreadPoolExecutor() as executor:
+        res = executor.map(do_inner, batchslist, timeout=10)
+
+    result = []
+    errors = []
+    for batch_result in res:
+        if batch_result[0]:
+            result.extend(batch_result[0])
+        if batch_result[1]:
+            errors.extend(batch_result[1])
+    return result, errors

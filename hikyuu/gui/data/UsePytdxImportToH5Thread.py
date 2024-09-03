@@ -84,14 +84,8 @@ class UsePytdxImportToH5Thread(QThread):
     def init_task(self):
         config = self.config
         dest_dir = config['hdf5']['dir']
-        sqlite_file_name = dest_dir + "/stock.db"
 
         self.tasks = []
-        # if self.config.getboolean('weight', 'enable', fallback=False):
-        #     self.tasks.append(
-        #         ImportWeightToSqliteTask(self.log_queue, self.queue,
-        #                                  self.config, dest_dir))
-
         if self.config.getboolean('finance', 'enable', fallback=True):
             self.tasks.append(
                 ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
