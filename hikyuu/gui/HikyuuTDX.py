@@ -631,6 +631,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 self.escape_time_thread = None
                 self.start_import_pushButton.setEnabled(True)
                 self.import_detail_textEdit.append("导入完毕！")
+                self.hdf5_weight_label.setText("导入完毕!")
                 if can_upgrade():
                     self.import_detail_textEdit.append("========================================================")
                     self.import_detail_textEdit.append(
@@ -661,7 +662,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                     self.import_detail_textEdit.append('导入 {} 分时记录数：{}'.format(msg[3], msg[5]))
 
             elif msg_task_name == 'IMPORT_WEIGHT':
-                self.hdf5_weight_label.setText(msg[2])
                 if msg[2] == '导入权息数据完毕!':
                     self.import_detail_textEdit.append('导入权息记录数：{}'.format(msg[3]))
                 elif msg[2] == '导入通达信财务信息完毕!':
