@@ -30,7 +30,10 @@ from hikyuu.gui.data.ImportTdxToH5Task import ImportTdxToH5Task
 from hikyuu.gui.data.ImportWeightToSqliteTask import ImportWeightToSqliteTask
 from hikyuu.gui.data.ImportHistoryFinanceTask import ImportHistoryFinanceTask
 
+from pytdx.hq import TdxHq_API
+from hikyuu.data.common import g_market_list
 from hikyuu.data.common_sqlite3 import create_database
+from hikyuu.data.common_pytdx import search_best_tdx
 from hikyuu.data.tdx_to_h5 import tdx_import_stock_name_from_file
 from hikyuu.util import *
 
@@ -57,18 +60,39 @@ class UseTdxImportToH5Thread(QThread):
             self.quotations.append('stock')
         if self.config['quotation']['fund']:
             self.quotations.append('fund')
-        #if self.config['quotation']['future']:
+        # if self.config['quotation']['future']:
         #    self.quotations.append('future')
 
-        #通达信盘后没有债券数据。另外，如果用Pytdx下载债券数据，
-        #每个债券本身的数据很少但债券种类太多占用空间和时间太多，用途较少不再考虑导入
-        #if self.config['quotation']['bond']:
+        # 通达信盘后没有债券数据。另外，如果用Pytdx下载债券数据，
+        # 每个债券本身的数据很少但债券种类太多占用空间和时间太多，用途较少不再考虑导入
+        # if self.config['quotation']['bond']:
         #    self.quotations.append('bond')
+
+        hosts = search_best_tdx()
+        api = TdxHq_API()
+        hku_check(api.connect(hosts[0][2], hosts[0][3]), "failed connect pytdx {}:{}!", hosts[0][2], hosts[0][3])
 
         self.queue = Queue()
         self.tasks = []
+
+        cur_host = 0
         if self.config.getboolean('weight', 'enable', fallback=False):
-            self.tasks.append(ImportWeightToSqliteTask(self.log_queue, self.queue, self.config, dest_dir))
+            for market in g_market_list:
+                self.tasks.append(
+                    ImportWeightToSqliteTask(self.log_queue, self.queue,
+                                             self.config, dest_dir, market, 'weight', hosts[cur_host][2],
+                                             hosts[cur_host][3]))
+                cur_host += 1
+                if cur_host >= len(hosts):
+                    cur_host = 0
+                self.tasks.append(
+                    ImportWeightToSqliteTask(self.log_queue, self.queue,
+                                             self.config, dest_dir, market, 'finance', hosts[cur_host][2],
+                                             hosts[cur_host][3]))
+                cur_host += 1
+                if cur_host >= len(hosts):
+                    cur_host = 0
+
         if self.config.getboolean('finance', 'enable', fallback=True):
             self.tasks.append(ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
         if self.config.getboolean('ktype', 'day', fallback=False):
@@ -115,7 +139,7 @@ class UseTdxImportToH5Thread(QThread):
         dest_dir = self.config['hdf5']['dir']
         hdf5_import_progress = {'SH': {'DAY': 0, '1MIN': 0, '5MIN': 0}, 'SZ': {'DAY': 0, '1MIN': 0, '5MIN': 0}}
 
-        #正在导入代码表
+        # 正在导入代码表
         self.send_message(['START_IMPORT_CODE'])
 
         connect = sqlite3.connect(dest_dir + "/stock.db")

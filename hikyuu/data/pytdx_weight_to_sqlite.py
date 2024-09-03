@@ -35,7 +35,7 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
     pytdx_market = to_pytdx_market(market)
 
     total_count = 0
-    stockid_list = cur.execute("select stockid, code from Stock where marketid=%s" % (marketid))
+    stockid_list = cur.execute("select stockid, code from Stock where marketid=%s and valid=1" % (marketid))
     stockid_list = [x for x in stockid_list]
     cur.close()
 

@@ -122,6 +122,21 @@ def import_stock_name(connect, api, market, quotations=None):
     """
     cur = connect.cursor()
 
+    deSet = set()  # 记录退市证券
+    if market == MARKET.SH:
+        df = ak.stock_info_sh_delist()
+        l = df[['公司代码', '公司简称']].to_dict(orient='records') if not df .empty else []
+        for stock in l:
+            code = str(stock['公司代码'])
+            deSet.add(code)
+    elif market == MARKET.SZ:
+        for t in ['暂停上市公司', '终止上市公司']:
+            df = ak.stock_info_sz_delist(t)
+            l = df[['证券代码', '证券简称']].to_dict(orient='records') if not df.empty else []
+            for stock in l:
+                code = str(stock['证券代码'])
+                deSet.add(code)
+
     newStockDict = {}
     stk_list = get_stk_code_name_list(market)
     if not stk_list:
@@ -131,7 +146,9 @@ def import_stock_name(connect, api, market, quotations=None):
     if not quotations or "fund" in [v.lower() for v in quotations]:
         stk_list.extend(get_fund_code_name_list(market))
     for stock in stk_list:
-        newStockDict[str(stock["code"])] = stock["name"]
+        code = str(stock["code"])
+        if code not in deSet:
+            newStockDict[code] = stock["name"]
 
     marketid = get_marketid(connect, market)
 
@@ -156,7 +173,8 @@ def import_stock_name(connect, api, market, quotations=None):
         oldStockDict[oldcode] = oldstockid
 
         # 新的代码表中无此股票，则置为无效
-        if (oldvalid == 1) and (oldcode not in newStockDict):
+        # if (oldvalid == 1) and (oldcode not in newStockDict):
+        if (oldvalid == 1) and ((oldcode not in newStockDict) or oldcode in deSet):
             cur.execute(
                 "update `hku_base`.`stock` set valid=0 where stockid=%i" % oldstockid
             )

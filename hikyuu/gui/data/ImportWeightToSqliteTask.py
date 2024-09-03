@@ -42,7 +42,7 @@ from hikyuu.util.check import hku_catch, hku_check
 
 
 class ImportWeightToSqliteTask:
-    def __init__(self, log_queue, queue, config, dest_dir):
+    def __init__(self, log_queue, queue, config, dest_dir, market, cmd, host, port):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.log_queue = log_queue
         self.queue = queue
@@ -50,6 +50,10 @@ class ImportWeightToSqliteTask:
         self.dest_dir = dest_dir
         self.msg_name = 'IMPORT_WEIGHT'
         self.status = "no run"
+        self.market = market
+        self.cmd = cmd  # "weight" | "finance"
+        self.host = host
+        self.port = port
 
     @hku_catch(trace=True)
     def __call__(self):
@@ -76,44 +80,31 @@ class ImportWeightToSqliteTask:
                 self.logger.debug('use mysql import weight')
 
         except Exception as e:
-            #self.queue.put([self.msg_name, str(e), -1, 0, total_count])
+            # self.queue.put([self.msg_name, str(e), -1, 0, total_count])
             self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])
             self.queue.put([self.msg_name, '', 0, None, total_count])
             self.status = "failure"
             return
 
         try:
-            hosts = search_best_tdx()
             api = TdxHq_API()
-            hku_check(api.connect(hosts[0][2], hosts[0][3]), "failed connect pytdx {}:{}!", hosts[0][2], hosts[0][3])
+            hku_check(api.connect(self.host, self.port), "failed connect pytdx {}:{}!", self.host, self.port)
 
-            self.logger.info('正在导入权息数据')
-            self.queue.put([self.msg_name, '正在导入权息数据...', 0, 0, 0])
-
-            total_count = 0
-            for market in g_market_list:
-                count = pytdx_import_weight(api, connect, market)
-                self.logger.info("导入 {} 权息记录数: {}".format(market, count))
-                total_count += count
-
-            self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, total_count])
-            self.logger.info('导入权息数据完毕')
-
-            self.queue.put([self.msg_name, '下载通达信财务信息(上证)...', 0, 0, 0])
-            x = pytdx_import_finance(connect, api, "SH")
-
-            self.queue.put([self.msg_name, '下载通达信财务信息(深证)...', 0, 0, 0])
-            x += pytdx_import_finance(connect, api, "SZ")
-
-            self.queue.put([self.msg_name, '下载通达信财务信息(北证)...', 0, 0, 0])
-            x += pytdx_import_finance(connect, api, "BJ")
-            self.queue.put([self.msg_name, '导入通达信财务信息完毕!', 0, 0, x])
+            if self.cmd == 'weight':
+                count = pytdx_import_weight(api, connect, self.market)
+                self.logger.info("导入 {} 权息记录数: {}".format(self.market, count))
+                self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, f'{self.market} {total_count}'])
+            elif self.cmd == 'finance':
+                self.queue.put([self.msg_name, f'下载通达信当前财务信息({self.market})...', 0, 0, 0])
+                x = pytdx_import_finance(connect, api, self.market)
+                self.logger.info(f'导入 {self.market} 通达信当前财务信息数: {x}')
+                self.queue.put([self.msg_name, '导入通达信财务信息完毕!', 0, 0, f'{self.market} {x}'])
 
             api.disconnect()
 
         except Exception as e:
             self.logger.error(e)
-            #self.queue.put([self.msg_name, str(e), -1, 0, total_count])
+            # self.queue.put([self.msg_name, str(e), -1, 0, total_count])
             self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])
         finally:
             connect.commit()
