@@ -50,7 +50,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import urllib
 import os
 import configparser
 
@@ -124,7 +123,7 @@ start_spot = False
 if 'HKU_START_SPOT' in os.environ:
     spot_str = os.environ['HKU_START_SPOT'].upper()
     start_spot = spot_str in ('1', 'TRUE')
-spot_worker_num = os.cpu_count()
+spot_worker_num = 1
 if 'HKU_SPOT_WORKER_NUM' in os.environ:
     spot_worker_num = int(os.environ['HKU_SPOT_WORKER_NUM'])
 

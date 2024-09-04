@@ -28,7 +28,7 @@ namespace hku {
  */
 class HKU_API Strategy {
     CLASS_LOGGER_IMP(Strategy)
-    PARAMETER_SUPPORT
+    PARAMETER_SUPPORT_WITH_CHECK
 
 public:
     Strategy();
@@ -110,6 +110,7 @@ private:
     TimeDelta m_run_daily_at_delta;
 
 private:
+    void _initParam();
     void _init();
     void _receivedSpot(const SpotRecord& spot);
     void _runDaily();
