@@ -12,7 +12,7 @@ using namespace hku;
 namespace py = pybind11;
 
 void export_SpotAgent(py::module& m) {
-    m.def("start_spot_agent", startSpotAgent, py::arg("print") = false,
-          py::arg("worker_num") = std::thread::hardware_concurrency(), py::arg("addr") = string());
+    m.def("start_spot_agent", startSpotAgent, py::arg("print") = false, py::arg("worker_num") = 1,
+          py::arg("addr") = string());
     m.def("stop_spot_agent", stopSpotAgent);
 }

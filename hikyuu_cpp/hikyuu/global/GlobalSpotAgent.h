@@ -17,8 +17,7 @@ namespace hku {
  * @param addr 服务端地址，为空表示使用 hikyuu 配置文件中的行情服务器地址
  * @ingroup Agent
  */
-void HKU_API startSpotAgent(bool print = true,
-                            size_t worker_num = std::thread::hardware_concurrency(),
+void HKU_API startSpotAgent(bool print = true, size_t worker_num = 1,
                             const string& addr = string());
 
 /**
