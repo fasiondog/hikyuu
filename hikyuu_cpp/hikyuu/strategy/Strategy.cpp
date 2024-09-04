@@ -352,10 +352,20 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
         req["cmd"] = "market";
         req["ktype"] = ktype;
         json code_list;
+        json date_list;
         for (const auto& stk : stklist) {
-            code_list.emplace_back(stk.market_code());
+            if (!stk.isNull()) {
+                code_list.emplace_back(stk.market_code());
+                auto k = stk.getKData(KQueryByIndex(-1, Null<int64_t>(), ktype));
+                if (k.empty()) {
+                    date_list.emplace_back(Datetime::min().str());
+                } else {
+                    date_list.emplace_back(k[k.size() - 1].datetime.str());
+                }
+            }
         }
         req["codes"] = std::move(code_list);
+        req["dates"] = std::move(date_list);
 
         json res;
         client.post(req, res);
@@ -368,12 +378,19 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
         for (auto iter = jdata.cbegin(); iter != jdata.cend(); ++iter) {
             const auto& r = *iter;
             try {
-                string market_code = r[0].get<string>();
+                string market_code = r["code"].get<string>();
                 Stock stk = getStock(market_code);
-                if (!stk.isNull()) {
-                    KRecord k(Datetime(r[1].get<string>()), r[2], r[3], r[4], r[5], r[6], r[7]);
-                    stk.realtimeUpdate(k, ktype);
+                if (stk.isNull()) {
+                    continue;
                 }
+
+                const auto& jklist = r["data"];
+                for (auto kiter = jklist.cbegin(); kiter != jklist.cend(); ++kiter) {
+                    const auto& k = *kiter;
+                    KRecord kr(Datetime(k[0].get<string>()), k[1], k[2], k[3], k[4], k[5], k[6]);
+                    stk.realtimeUpdate(kr, ktype);
+                }
+
             } catch (const std::exception& e) {
                 HKU_ERROR("Failed decode json: {}! {}", to_string(r), e.what());
             }

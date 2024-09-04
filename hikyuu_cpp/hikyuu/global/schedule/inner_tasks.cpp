@@ -28,7 +28,8 @@ void reloadHikyuuTask() {
     // 重新启动行情接收
     bool print = agent->getPrintFlag();
     size_t work_num = agent->getWorkerNum();
-    startSpotAgent(print, work_num);
+    const string& addr = agent->getServerAddr();
+    startSpotAgent(print, work_num, addr);
 }
 
 }  // namespace hku

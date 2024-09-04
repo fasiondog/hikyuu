@@ -268,7 +268,17 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
 
 def realtime_update_inner(source='qq', stk_list=None):
     if stk_list is None:
-        stk_list = sm
+        if source == 'qmt':
+            stk_list = [s for s in sm if s.valid and s.type in (
+                constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF,
+                constant.STOCKTYPE_GEM, constant.STOCKTYPE_START, constant.STOCKTYPE_A_BJ)]
+        else:
+            stk_list = [
+                stk.market_code.lower() for stk in sm if stk.valid and stk.type in
+                (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM,
+                 constant.STOCKTYPE_START, constant.STOCKTYPE_A_BJ)
+            ]
+
     if source == 'qq':
         from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot
         stk_list = [s.market_code.lower() for s in stk_list]
