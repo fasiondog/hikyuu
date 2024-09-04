@@ -66,6 +66,7 @@ Strategy::~Strategy() {
 
 void Strategy::_initParam() {
     setParam<int>("spot_worker_num", 1);
+    setParam<string>("quotation_server", string());
 }
 
 void Strategy::baseCheckParam(const string& name) const {
@@ -123,7 +124,8 @@ void Strategy::start(bool autoRecieveSpot) {
                 event([=]() { m_on_recieved_spot(revTime); });
             }
         });
-        startSpotAgent(true, getParam<int>("spot_worker_num"));
+        startSpotAgent(true, getParam<int>("spot_worker_num"),
+                       getParam<string>("quotation_server"));
     }
 
     _runDaily();
