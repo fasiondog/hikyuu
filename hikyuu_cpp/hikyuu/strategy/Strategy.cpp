@@ -21,7 +21,7 @@ namespace hku {
 std::atomic_bool Strategy::ms_keep_running = true;
 
 void Strategy::sig_handler(int sig) {
-    if (sig == SIGINT) {
+    if (sig == SIGINT || sig == SIGTERM) {
         ms_keep_running = false;
         exit(0);
     }

@@ -48,7 +48,11 @@ int main(int argc, char* argv[]) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-    Strategy stg({"sh000001", "sz000001"}, {KQuery::DAY}, "test");
+    // 以多线程的方式执行多个策略
+    // 注意：同一进程内的所有 strategy 共享的是同一个上下文！！！
+    StrategyContext context({"sh000001", "sz000001"}, {KQuery::DAY});
+
+    Strategy stg(context, "test");
 
     // stock 数据变化接收，通常用于调测，直接一般不需要
     stg.onChange(changed);
@@ -59,11 +63,8 @@ int main(int argc, char* argv[]) {
     // 每日定点执行
     stg.runDailyAt(my_process2, Datetime::now() - Datetime::today() + Seconds(20));
 
-    auto t = std::thread([]() {
-        // 以线程的方式执行另一个策略
-        // 注意：同一进程内的所有 strategy 共享的是同一个上下文，
-        //      即使后续创建的 strategy 指定了新的 stock 列表，但不会生效！！！
-        Strategy stg2("stratege2");
+    auto t = std::thread([context]() {
+        Strategy stg2(context, "stratege2");
         stg2.onChange(changed2);
         stg2.start();
     });
