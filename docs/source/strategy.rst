@@ -11,6 +11,12 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
 具体可参见安装目录下的 strategy 子目录下的相关 demo。
 
 
+公共参数：
+
+    * **spot_worker_num=1** *(int)* : 接收行情数据时内部的线程数
+    * **quotation_server=""** *(string)* : 指定行情服务地址，为空表示使用本机默认配置（hikyuu.ini）
+
+
 .. py:class:: Strategy
 
     策略运行时
