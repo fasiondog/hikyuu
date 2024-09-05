@@ -30,7 +30,7 @@ try:
         result['high'] = data['high']
         result['low'] = data['low']
         result['close'] = data['lastPrice']
-        result['amount'] = data['amount'] * 0.001  # 转千元
+        result['amount'] = data['amount'] * 0.0001  # 转千元
         result['volume'] = data['pvolume'] * 0.01  # 转手数
 
         for i in range(5):

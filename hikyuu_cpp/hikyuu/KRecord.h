@@ -24,7 +24,7 @@ public:
     price_t highPrice;    ///< 最高价
     price_t lowPrice;     ///< 最低价
     price_t closePrice;   ///< 收盘价
-    price_t transAmount;  ///< 成交金额（千元）
+    price_t transAmount;  ///< 成交金额（万元）
     price_t transCount;   ///< 成交量（手），日线以下为股数
 
     KRecord()

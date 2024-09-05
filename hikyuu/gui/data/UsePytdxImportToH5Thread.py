@@ -84,14 +84,8 @@ class UsePytdxImportToH5Thread(QThread):
     def init_task(self):
         config = self.config
         dest_dir = config['hdf5']['dir']
-        sqlite_file_name = dest_dir + "/stock.db"
 
         self.tasks = []
-        if self.config.getboolean('weight', 'enable', fallback=False):
-            self.tasks.append(
-                ImportWeightToSqliteTask(self.log_queue, self.queue,
-                                         self.config, dest_dir))
-
         if self.config.getboolean('finance', 'enable', fallback=True):
             self.tasks.append(
                 ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
@@ -112,6 +106,8 @@ class UsePytdxImportToH5Thread(QThread):
             task_count += market_count
         if self.config.getboolean('ktype', 'time', fallback=False):
             task_count += market_count
+        if self.config.getboolean('weight', 'enable', fallback=False):
+            task_count += (market_count*2)
 
         self.logger.info('搜索通达信服务器')
         self.send_message(['INFO', '搜索通达信服务器'])
@@ -210,6 +206,19 @@ class UsePytdxImportToH5Thread(QThread):
                         start_date.month * 1000000 + start_date.day * 10000))
                 cur_host += 1
 
+        if self.config.getboolean('weight', 'enable', fallback=False):
+            for market in g_market_list:
+                self.tasks.append(
+                    ImportWeightToSqliteTask(self.log_queue, self.queue,
+                                             self.config, dest_dir, market, 'weight', use_hosts[cur_host][0],
+                                             use_hosts[cur_host][1]))
+                cur_host += 1
+                self.tasks.append(
+                    ImportWeightToSqliteTask(self.log_queue, self.queue,
+                                             self.config, dest_dir, market, 'finance', use_hosts[cur_host][0],
+                                             use_hosts[cur_host][1]))
+                cur_host += 1
+
     def run(self):
         try:
             self.init_task()
@@ -298,6 +307,8 @@ class UsePytdxImportToH5Thread(QThread):
                         self.send_message([taskname, ktype])
                     elif taskname == 'IMPORT_ZH_BOND10':
                         self.send_message([taskname, ktype])
+                    elif taskname == 'IMPORT_WEIGHT':
+                        pass
                     else:
                         self.send_message([taskname, 'FINISHED'])
                     continue

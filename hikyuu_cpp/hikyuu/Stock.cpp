@@ -402,7 +402,7 @@ bool Stock::isBuffer(KQuery::KType ktype) const {
     HKU_IF_RETURN(!m_data, false);
     string nktype(ktype);
     to_upper(nktype);
-    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     return m_data->pKData.find(nktype) != m_data->pKData.end() && m_data->pKData[nktype];
 }
 
@@ -865,11 +865,12 @@ bool Stock::isTransactionTime(Datetime time) {
     Datetime today = Datetime::today();
     Datetime openTime1 = today + market_info.openTime1();
     Datetime closeTime1 = today + market_info.closeTime1();
-    HKU_IF_RETURN(time >= openTime1 && time <= closeTime1, true);  // close判断包括等于
+    // 某些行情闭市最后一天tick时间可能延迟数秒，补充余量
+    HKU_IF_RETURN(time >= openTime1 && time <= closeTime1 + Seconds(30), true);
 
     Datetime openTime2 = today + market_info.openTime2();
     Datetime closeTime2 = today + market_info.closeTime2();
-    return time >= openTime2 && time <= closeTime2;
+    return time >= openTime2 && time <= closeTime2 + Seconds(30);
 }
 
 void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
@@ -910,8 +911,8 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
     } else if (tmp.datetime < record.datetime) {
         m_data->pKData[ktype]->push_back(record);
     } else {
-        HKU_INFO("Ignore record, datetime({}) < last record.datetime({})! {} {}", record.datetime,
-                 tmp.datetime, market_code(), inktype);
+        HKU_DEBUG("Ignore record, datetime({}) < last record.datetime({})! {} {}", record.datetime,
+                  tmp.datetime, market_code(), inktype);
     }
 }
 

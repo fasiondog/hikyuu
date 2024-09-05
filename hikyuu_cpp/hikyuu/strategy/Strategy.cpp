@@ -21,16 +21,19 @@ namespace hku {
 std::atomic_bool Strategy::ms_keep_running = true;
 
 void Strategy::sig_handler(int sig) {
-    if (sig == SIGINT) {
+    if (sig == SIGINT || sig == SIGTERM) {
         ms_keep_running = false;
         exit(0);
     }
 }
 
-Strategy::Strategy() : Strategy("Strategy", "") {}
+Strategy::Strategy() : Strategy("Strategy", "") {
+    _initParam();
+}
 
 Strategy::Strategy(const string& name, const string& config_file)
 : m_name(name), m_config_file(config_file) {
+    _initParam();
     if (m_config_file.empty()) {
         string home = getUserDir();
         HKU_ERROR_IF(home == "", "Failed get user home path!");
@@ -45,12 +48,14 @@ Strategy::Strategy(const string& name, const string& config_file)
 Strategy::Strategy(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
                    const string& name, const string& config_file)
 : Strategy(name, config_file) {
+    _initParam();
     m_context.setStockCodeList(codeList);
     m_context.setKTypeList(ktypeList);
 }
 
 Strategy::Strategy(const StrategyContext& context, const string& name, const string& config_file)
 : Strategy(name, config_file) {
+    _initParam();
     m_context = m_context;
 }
 
@@ -58,6 +63,19 @@ Strategy::~Strategy() {
     ms_keep_running = false;
     CLS_INFO("Quit Strategy {}!", m_name);
 }
+
+void Strategy::_initParam() {
+    setParam<int>("spot_worker_num", 1);
+    setParam<string>("quotation_server", string());
+}
+
+void Strategy::baseCheckParam(const string& name) const {
+    if (name == "spot_worker_num") {
+        HKU_ASSERT(getParam<int>(name) > 0);
+    }
+}
+
+void Strategy::paramChanged() {}
 
 void Strategy::_init() {
     StockManager& sm = StockManager::instance();
@@ -99,13 +117,6 @@ void Strategy::start(bool autoRecieveSpot) {
     _runDailyAt();
 
     if (autoRecieveSpot) {
-        size_t stock_num = StockManager::instance().size();
-        size_t spot_worker_num = stock_num / 300;
-        size_t cpu_num = std::thread::hardware_concurrency();
-        if (spot_worker_num > cpu_num) {
-            spot_worker_num = cpu_num;
-        }
-
         auto& agent = *getGlobalSpotAgent();
         agent.addProcess([this](const SpotRecord& spot) { _receivedSpot(spot); });
         agent.addPostProcess([this](Datetime revTime) {
@@ -113,7 +124,8 @@ void Strategy::start(bool autoRecieveSpot) {
                 event([=]() { m_on_recieved_spot(revTime); });
             }
         });
-        startSpotAgent(true, spot_worker_num);
+        startSpotAgent(true, getParam<int>("spot_worker_num"),
+                       getParam<string>("quotation_server"));
     }
 
     _runDaily();
@@ -352,10 +364,20 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
         req["cmd"] = "market";
         req["ktype"] = ktype;
         json code_list;
+        json date_list;
         for (const auto& stk : stklist) {
-            code_list.emplace_back(stk.market_code());
+            if (!stk.isNull()) {
+                code_list.emplace_back(stk.market_code());
+                auto k = stk.getKData(KQueryByIndex(-1, Null<int64_t>(), ktype));
+                if (k.empty()) {
+                    date_list.emplace_back(Datetime::min().str());
+                } else {
+                    date_list.emplace_back(k[k.size() - 1].datetime.str());
+                }
+            }
         }
         req["codes"] = std::move(code_list);
+        req["dates"] = std::move(date_list);
 
         json res;
         client.post(req, res);
@@ -368,12 +390,19 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
         for (auto iter = jdata.cbegin(); iter != jdata.cend(); ++iter) {
             const auto& r = *iter;
             try {
-                string market_code = r[0].get<string>();
+                string market_code = r["code"].get<string>();
                 Stock stk = getStock(market_code);
-                if (!stk.isNull()) {
-                    KRecord k(Datetime(r[1].get<string>()), r[2], r[3], r[4], r[5], r[6], r[7]);
-                    stk.realtimeUpdate(k, ktype);
+                if (stk.isNull()) {
+                    continue;
                 }
+
+                const auto& jklist = r["data"];
+                for (auto kiter = jklist.cbegin(); kiter != jklist.cend(); ++kiter) {
+                    const auto& k = *kiter;
+                    KRecord kr(Datetime(k[0].get<string>()), k[1], k[2], k[3], k[4], k[5], k[6]);
+                    stk.realtimeUpdate(kr, ktype);
+                }
+
             } catch (const std::exception& e) {
                 HKU_ERROR("Failed decode json: {}! {}", to_string(r), e.what());
             }

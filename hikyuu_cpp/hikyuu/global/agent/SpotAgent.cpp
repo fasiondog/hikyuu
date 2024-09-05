@@ -8,6 +8,7 @@
 #include <chrono>
 #include <nng/nng.h>
 #include <nng/protocol/pubsub0/sub.h>
+#include "hikyuu/StockManager.h"
 #include "spot_generated.h"
 #include "SpotAgent.h"
 
@@ -175,7 +176,7 @@ void SpotAgent::work_thread() {
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
-    HKU_INFO_IF(m_print, "Ready to receive quotation from {} ...", ms_pubUrl);
+    HKU_INFO_IF(!m_stop && m_print, "Ready to receive quotation from {} ...", ms_pubUrl);
 
     while (!m_stop) {
         char* buf = nullptr;

@@ -44,14 +44,28 @@ public:
     }
 
     void setWorkerNum(size_t worker_num) {
-        std::lock_guard<std::mutex> lock(m_mutex);
         m_work_num = worker_num;
+    }
+
+    size_t getWorkerNum() const {
+        return m_work_num;
     }
 
     /** 设置是否打印数据接收进展情况，主要用于在交互环境下关闭打印 */
     void setPrintFlag(bool print) {
-        std::lock_guard<std::mutex> lock(m_mutex);
         m_print = print;
+    }
+
+    bool getPrintFlag() const {
+        return m_print;
+    }
+
+    void setServerAddr(const string& addr) {
+        m_server_addr = addr;
+    }
+
+    const string& getServerAddr() const {
+        return m_server_addr;
     }
 
     /**
@@ -118,9 +132,11 @@ private:
     size_t m_work_num = 1;             // 数据处理任务线程池线程数
     vector<std::future<void>> m_process_task_list;
 
+    bool m_print = true;   // 是否打印连接信息
+    string m_server_addr;  // 服务器地址
+
     // 下面属性被修改时需要加锁，以便可以使用多线程方式运行 strategy
     std::mutex m_mutex;
-    bool m_print = true;  // 是否打印接收进度，防止的交互模式的影响
     list<std::function<void(const SpotRecord&)>> m_processList;  // 已注册的 spot 处理函数列表
     list<std::function<void(Datetime)>> m_postProcessList;  // 已注册的批次后处理函数列表
 };

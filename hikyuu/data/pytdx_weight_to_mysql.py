@@ -38,7 +38,7 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
     pytdx_market = to_pytdx_market(market)
 
     total_count = 0
-    cur.execute("select stockid, code from `hku_base`.`stock` where marketid=%s" % (marketid))
+    cur.execute("select stockid, code from `hku_base`.`stock` where marketid=%s and valid=1" % (marketid))
     stockid_list = [x for x in cur.fetchall()]
     cur.close()
 
