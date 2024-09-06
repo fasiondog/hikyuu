@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 
-from hikyuu.fetcher.stock.zh_stock_a_qmt import parse_one_result_qmt
+from hikyuu.fetcher.stock.zh_stock_a_qmt import parse_one_result_qmt, get_spot
 from hikyuu.gui.spot_server import release_nng_senders, start_send_spot, end_send_spot, send_spot
 
 
 def callback(datas):
     records = []
     for stock_code, data in datas.items():
-        # print(stock_code, data)
         records.append(parse_one_result_qmt(stock_code, data))
+    # print(len(records))
 
     if records:
         start_send_spot()
@@ -91,13 +91,35 @@ if __name__ == "__main__":
     while not sm.data_ready:
         import time
         time.sleep(100)
+
+    def get_full():
+        stk_list = [s for s in sm if s.valid and s.type in (
+            constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF,
+            constant.STOCKTYPE_GEM, constant.STOCKTYPE_START, constant.STOCKTYPE_A_BJ)]
+        start_send_spot()
+        records = get_spot(stk_list, None, None, send_spot)
+        end_send_spot()
+
+    def timer_func():
+        import threading
+        today = Datetime.today()
+        if today.day_of_week() not in (0, 6) and not sm.is_holiday(today):
+            get_full()
+        tomorrow = Datetime.today().next_day()
+        delta = Datetime.today().next_day() + TimeDelta(0, 9, 30) - Datetime.now()
+        timer = threading.Timer(delta.total_seconds(), timer_func)
+        timer.start()
+        return timer
+
+    # 每日9:30先获取一次当天全部数据，以便生成分钟级别数据
+    # 后续订阅更新因为只更新存在变化的数据，内部分钟级别数据可能时不连续的（如果分钟内不存在变化, 不会触发hikyuu更新）
+    timer = timer_func()
+
     hku_info("start xtquant")
-
+    code_list = [f'{s.code}.{s.market}' for s in sm if s.valid and s.type in (
+        constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF,
+        constant.STOCKTYPE_GEM, constant.STOCKTYPE_START, constant.STOCKTYPE_A_BJ)]
     from xtquant import xtdata
-
-    code_list = [f'{s.code}.{s.market}' for s in sm if s.valid]
-    # code_list = ['000001.SZ']
-
     xtdata.subscribe_whole_quote(code_list, callback)
 
     try:
