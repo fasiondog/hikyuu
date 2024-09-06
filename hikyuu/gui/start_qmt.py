@@ -86,15 +86,12 @@ if __name__ == "__main__":
         hku_param.set("load_stock_weight", load_stk_weight)
 
     sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
-    # set_log_level(LOG_LEVEL.INFO)
 
-    start_spot = False
-    if 'HKU_START_SPOT' in os.environ:
-        spot_str = os.environ['HKU_START_SPOT'].upper()
-        start_spot = spot_str in ('1', 'TRUE')
-    spot_worker_num = 1
-    if 'HKU_SPOT_WORKER_NUM' in os.environ:
-        spot_worker_num = int(os.environ['HKU_SPOT_WORKER_NUM'])
+    hku_info("waiting all data loaded ...")
+    while not sm.data_ready:
+        import time
+        time.sleep(100)
+    hku_info("start xtquant")
 
     from xtquant import xtdata
 
