@@ -87,45 +87,47 @@ if __name__ == "__main__":
 
     sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
 
+    # 后续希望每次先主动获取一次全部的tick, 这里需要等待所有数据加载完毕，以便保证全部证券收到第一次tick通知
     hku_info("waiting all data loaded ...")
     while not sm.data_ready:
         import time
         time.sleep(100)
 
-    def get_full():
-        stk_list = [s for s in sm if s.valid and s.type in (
-            constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF,
-            constant.STOCKTYPE_GEM, constant.STOCKTYPE_START, constant.STOCKTYPE_A_BJ)]
-        start_send_spot()
-        records = get_spot(stk_list, None, None, send_spot)
-        end_send_spot()
-
-    def timer_func():
-        import threading
-        today = Datetime.today()
-        if today.day_of_week() not in (0, 6) and not sm.is_holiday(today):
-            get_full()
-        tomorrow = Datetime.today().next_day()
-        delta = Datetime.today().next_day() + TimeDelta(0, 9, 30) - Datetime.now()
-        timer = threading.Timer(delta.total_seconds(), timer_func)
-        timer.start()
-        return timer
-
-    # 每日9:30先获取一次当天全部数据，以便生成分钟级别数据
-    # 后续订阅更新因为只更新存在变化的数据，内部分钟级别数据可能时不连续的（如果分钟内不存在变化, 不会触发hikyuu更新）
-    timer = timer_func()
-
-    hku_info("start xtquant")
-    code_list = [f'{s.code}.{s.market}' for s in sm if s.valid and s.type in (
+    stk_list = [s for s in sm if s.valid and s.type in (
         constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF,
         constant.STOCKTYPE_GEM, constant.STOCKTYPE_START, constant.STOCKTYPE_A_BJ)]
+
+    hku_info("start xtquant")
+    code_list = [f'{s.code}.{s.market}' for s in stk_list]
     from xtquant import xtdata
     xtdata.subscribe_whole_quote(code_list, callback)
 
-    try:
-        xtdata.run()
-    except Exception as e:
-        hku_error(e)
-    finally:
-        # 退出释放资源
-        release_nng_senders()
+    # 每日 9:30 时，主动读取行情一次，以便 hikyuu 生成当日首个分钟线
+    while True:
+        try:
+            today = Datetime.today()
+            if today.day_of_week() not in (0, 6) and not sm.is_holiday(today):
+                hku_info("get full tick ...")
+                start_send_spot()
+                records = get_spot(stk_list, None, None, send_spot)
+                end_send_spot()
+            delta = Datetime.today().next_day() + TimeDelta(0, 9, 30) - Datetime.now()
+            hku_info(f"start timer: {delta}s")
+            time.sleep(delta.total_seconds())
+        except KeyboardInterrupt:
+            print("Ctrl-C 终止")
+            break
+        except Exception as e:
+            hku_error(e)
+            time.sleep(10)
+
+    release_nng_senders()
+
+    # try:
+    #     xtdata.run()
+    # except Exception as e:
+    #     hku_error(e)
+    # finally:
+    #     # 退出释放资源
+    #     release_nng_senders()
+    #     exit(0)
