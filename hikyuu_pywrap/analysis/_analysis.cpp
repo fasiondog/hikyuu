@@ -7,7 +7,7 @@
 
 #include <hikyuu/analysis/combinate.h>
 #include <hikyuu/analysis/analysis_sys.h>
-#include "pybind_utils.h"
+#include "../pybind_utils.h"
 
 using namespace hku;
 namespace py = pybind11;

@@ -42,7 +42,7 @@ void export_SystemPart(py::module& m);
 void export_trade_manage_main(py::module& m);
 void export_trade_sys_main(py::module& m);
 void export_global_main(py::module& m);
-void export_analysis(py::module& m);
+void export_analysis_main(py::module& m);
 
 void export_StrategeContext(py::module& m);
 void export_strategy_main(py::module& m);
@@ -99,7 +99,7 @@ PYBIND11_MODULE(core, m) {
     export_trade_manage_main(m);
     export_trade_sys_main(m);  // must after export_trade_manage_main
 
-    export_analysis(m);
+    export_analysis_main(m);
     export_strategy_main(m);
 
     export_global_main(m);
