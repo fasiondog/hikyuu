@@ -10,12 +10,12 @@
 
 namespace hku {
 
-vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const SystemList& sys_list,
-                                                              const StockList& stk_list,
-                                                              const KQuery& query) {
+vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_list,
+                                                        const StockList& stk_list,
+                                                        const KQuery& query) {
     HKU_ASSERT(sys_list.size() == stk_list.size());
 
-    vector<AnalysisSystemWithBlockOut> result;
+    vector<AnalysisSystemOutput> result;
     size_t total = sys_list.size();
     HKU_IF_RETURN(0 == total, result);
 
@@ -23,7 +23,7 @@ vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const SystemList& 
         const auto& sys = sys_list[i];
         const auto& stk = stk_list[i];
 
-        AnalysisSystemWithBlockOut ret;
+        AnalysisSystemOutput ret;
         if (!sys || stk.isNull()) {
             return ret;
         }
@@ -46,16 +46,16 @@ vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const SystemList& 
     return result;
 }
 
-vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const StockList& stk_list,
-                                                              const KQuery& query,
-                                                              const SystemPtr& pro_sys) {
+vector<AnalysisSystemOutput> HKU_API analysisSystemList(const StockList& stk_list,
+                                                        const KQuery& query,
+                                                        const SystemPtr& pro_sys) {
     HKU_CHECK(pro_sys, "pro_sys is null!");
 
     return parallel_for_range(0, stk_list.size(), [=](const range_t& range) {
-        vector<AnalysisSystemWithBlockOut> ret;
+        vector<AnalysisSystemOutput> ret;
         auto sys = pro_sys->clone();
         Performance per;
-        AnalysisSystemWithBlockOut out;
+        AnalysisSystemOutput out;
         for (size_t i = range.first; i < range.second; i++) {
             try {
                 auto stk = stk_list[i];

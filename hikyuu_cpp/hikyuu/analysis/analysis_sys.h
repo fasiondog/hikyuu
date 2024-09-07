@@ -13,20 +13,20 @@
 
 namespace hku {
 
-struct HKU_API AnalysisSystemWithBlockOut {
+struct HKU_API AnalysisSystemOutput {
     string market_code;  ///< 证券代码
     string name;         ///< 证券名称
     PriceList values;    ///< 统计各项指标值
 
-    AnalysisSystemWithBlockOut() = default;
-    AnalysisSystemWithBlockOut(const AnalysisSystemWithBlockOut& other) = default;
-    AnalysisSystemWithBlockOut(AnalysisSystemWithBlockOut&& rv)
+    AnalysisSystemOutput() = default;
+    AnalysisSystemOutput(const AnalysisSystemOutput& other) = default;
+    AnalysisSystemOutput(AnalysisSystemOutput&& rv)
     : market_code(std::move(rv.market_code)),
       name(std::move(rv.name)),
       values(std::move(rv.values)) {}
 
-    AnalysisSystemWithBlockOut& operator=(const AnalysisSystemWithBlockOut&) = default;
-    AnalysisSystemWithBlockOut& operator=(AnalysisSystemWithBlockOut&& rv) {
+    AnalysisSystemOutput& operator=(const AnalysisSystemOutput&) = default;
+    AnalysisSystemOutput& operator=(AnalysisSystemOutput&& rv) {
         HKU_IF_RETURN(this == &rv, *this);
         market_code = std::move(rv.market_code);
         name = std::move(rv.name);
@@ -35,12 +35,12 @@ struct HKU_API AnalysisSystemWithBlockOut {
     }
 };
 
-vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const SystemList& sys_list,
-                                                              const StockList& stk_list,
-                                                              const KQuery& query);
+vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_list,
+                                                        const StockList& stk_list,
+                                                        const KQuery& query);
 
-vector<AnalysisSystemWithBlockOut> HKU_API analysisSystemList(const StockList& stk_list,
-                                                              const KQuery& query,
-                                                              const SystemPtr& pro_sys);
+vector<AnalysisSystemOutput> HKU_API analysisSystemList(const StockList& stk_list,
+                                                        const KQuery& query,
+                                                        const SystemPtr& pro_sys);
 
 }  // namespace hku

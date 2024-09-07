@@ -149,7 +149,7 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
         }
     }
 
-    vector<AnalysisSystemWithBlockOut> records;
+    vector<AnalysisSystemOutput> records;
     {
         OStreamToPython guard(false);
         py::gil_scoped_release release;
