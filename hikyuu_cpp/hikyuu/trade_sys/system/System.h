@@ -151,6 +151,9 @@ public:
     const TradeRequest& getSellShortTradeRequest() const;
     const TradeRequest& getBuyShortTradeRequest() const;
 
+    /** 将所有组件全部置为非共享 */
+    void setNotSharedAll();
+
     /**
      * 复位，但不包括已有的交易对象，以及共享的部件
      * @note 实际复位操作依赖于系统中各个部件的共享参数

@@ -126,6 +126,18 @@ void System::initParam() {
     setParam<bool>("shared_sp", false);
 }
 
+void System::setNotSharedAll() {
+    setParam<bool>("shared_tm", false);
+    setParam<bool>("shared_ev", false);
+    setParam<bool>("shared_cn", false);
+    setParam<bool>("shared_sg", false);
+    setParam<bool>("shared_mm", false);
+    setParam<bool>("shared_st", false);
+    setParam<bool>("shared_tp", false);
+    setParam<bool>("shared_pg", false);
+    setParam<bool>("shared_sp", false);
+}
+
 void System::baseCheckParam(const string& name) const {
     if ("max_delay_count" == name) {
         HKU_ASSERT(getParam<int>("max_delay_count") >= 0);
