@@ -67,9 +67,8 @@ void export_System(py::module& m) {
         DEF_PICKLE(TradeRequest);
 
     //--------------------------------------------------------------------------------------
-    py::class_<System, SystemPtr>(
-      m, "System",
-      R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
+    py::class_<System, SystemPtr>(m, "System",
+                                  R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
 
 系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
@@ -123,6 +122,8 @@ void export_System(py::module& m) {
     :raises logic_error: Unsupported type! 不支持的参数类型)")
 
       .def("have_param", &System::haveParam, "是否存在指定参数")
+
+      .def("set_not_shared_all", &System::setNotSharedAll, "将所有组件设置为非共享")
 
       .def("get_stock", &System::getStock, R"(get_stock(self)
 

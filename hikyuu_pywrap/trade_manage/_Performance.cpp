@@ -14,6 +14,8 @@ namespace py = pybind11;
 void export_Performance(py::module& m) {
     py::class_<Performance>(m, "Performance", "简单绩效统计")
       .def(py::init<>())
+      .def_static("exist", &Performance::exist)
+
       .def("reset", &Performance::reset, R"(reset(self)
 
         复位，清除已计算的结果)")
