@@ -20,7 +20,7 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_li
     HKU_IF_RETURN(0 == total, result);
 
     auto date_list = StockManager::instance().getTradingCalendar(query);
-    HKU_IF_RETURN(!date_list.empty(), result);
+    HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 
     result = parallel_for_index(0, total, [&, last_datetime](size_t i) {
@@ -57,7 +57,7 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_li
     HKU_IF_RETURN(0 == total, result);
 
     auto date_list = StockManager::instance().getTradingCalendar(query);
-    HKU_IF_RETURN(!date_list.empty(), result);
+    HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 
     result = parallel_for_index(0, total, [&, stk, last_datetime](size_t i) {
@@ -102,7 +102,7 @@ std::pair<double, SYSPtr> findOptimalSystem(const SystemList& sys_list, const St
 
     // 保证只统计到 query 指定的最后日期，而不是默认到现在，否则仍有持仓的系统收益不合适
     auto date_list = StockManager::instance().getTradingCalendar(query);
-    HKU_IF_RETURN(!date_list.empty(), result);
+    HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 
     auto all_result = parallel_for_index(0, total, [&, stk, last_datetime, init_val](size_t i) {
