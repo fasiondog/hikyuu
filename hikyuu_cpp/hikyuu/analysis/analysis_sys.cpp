@@ -19,7 +19,11 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_li
     size_t total = sys_list.size();
     HKU_IF_RETURN(0 == total, result);
 
-    result = parallel_for_index(0, total, [&](size_t i) {
+    auto date_list = StockManager::instance().getTradingCalendar(query);
+    HKU_IF_RETURN(!date_list.empty(), result);
+    Datetime last_datetime = date_list.back();
+
+    result = parallel_for_index(0, total, [&, last_datetime](size_t i) {
         const auto& sys = sys_list[i];
         const auto& stk = stk_list[i];
 
@@ -31,7 +35,7 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_li
         try {
             sys->run(stk, query);
             Performance per;
-            per.statistics(sys->getTM());
+            per.statistics(sys->getTM(), last_datetime);
             ret.market_code = stk.market_code();
             ret.name = stk.name();
             ret.values = per.values();
@@ -44,33 +48,6 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_li
     });
 
     return result;
-}
-
-vector<AnalysisSystemOutput> HKU_API analysisSystemList(const StockList& stk_list,
-                                                        const KQuery& query,
-                                                        const SystemPtr& pro_sys) {
-    HKU_CHECK(pro_sys, "pro_sys is null!");
-
-    return parallel_for_range(0, stk_list.size(), [=](const range_t& range) {
-        vector<AnalysisSystemOutput> ret;
-        auto sys = pro_sys->clone();
-        Performance per;
-        AnalysisSystemOutput out;
-        for (size_t i = range.first; i < range.second; i++) {
-            try {
-                auto stk = stk_list[i];
-                sys->run(stk, query);
-                per.statistics(sys->getTM());
-                out.market_code = stk.market_code();
-                out.name = stk.name();
-                out.values = per.values();
-                ret.emplace_back(std::move(out));
-            } catch (const std::exception& e) {
-                HKU_ERROR(e.what());
-            }
-        }
-        return ret;
-    });
 }
 
 vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_list,
@@ -109,8 +86,11 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_li
 }
 
 std::pair<double, SYSPtr> findOptimalSystem(const SystemList& sys_list, const Stock& stk,
-                                            const KQuery& query, const string& sort_key) {
-    std::pair<double, SYSPtr> result{std::numeric_limits<double>::min(), SYSPtr()};
+                                            const KQuery& query, const string& sort_key,
+                                            int sort_mode) {
+    double init_val =
+      sort_mode == 0 ? std::numeric_limits<double>::min() : std::numeric_limits<double>::max();
+    std::pair<double, SYSPtr> result{init_val, SYSPtr()};
     size_t total = sys_list.size();
     HKU_IF_RETURN(0 == total, result);
 
@@ -125,9 +105,9 @@ std::pair<double, SYSPtr> findOptimalSystem(const SystemList& sys_list, const St
     HKU_IF_RETURN(!date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 
-    auto all_result = parallel_for_index(0, total, [&, stk, last_datetime](size_t i) {
+    auto all_result = parallel_for_index(0, total, [&, stk, last_datetime, init_val](size_t i) {
         const auto& sys = sys_list[i];
-        std::pair<double, SYSPtr> ret{std::numeric_limits<double>::min(), sys};
+        std::pair<double, SYSPtr> ret{init_val, sys};
 
         HKU_ERROR_IF_RETURN(!sys, ret, "sys_list[{}] is null!", i);
 
@@ -150,7 +130,11 @@ std::pair<double, SYSPtr> findOptimalSystem(const SystemList& sys_list, const St
                   [](const std::pair<double, SYSPtr>& a, const std::pair<double, SYSPtr>& b) {
                       return a.first > b.first;
                   });
-        result = all_result.front();
+        if (0 == sort_mode) {
+            result = all_result.front();
+        } else {
+            result = all_result.back();
+        }
     }
 
     return result;
