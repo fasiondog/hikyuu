@@ -43,4 +43,10 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const StockList& stk_lis
                                                         const KQuery& query,
                                                         const SystemPtr& pro_sys);
 
+vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_list,
+                                                        const Stock& stk, const KQuery& query);
+
+std::pair<double, SYSPtr> findOptimalSystem(const SystemList& sys_list, const Stock& stk,
+                                            const KQuery& query, const string& sort_key);
+
 }  // namespace hku

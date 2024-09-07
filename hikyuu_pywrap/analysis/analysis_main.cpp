@@ -10,9 +10,7 @@
 namespace py = pybind11;
 
 void export_analysis(py::module& m);
-void export_optimize(py::module& m);
 
 void export_analysis_main(py::module& m) {
     export_analysis(m);
-    export_optimize(m);
 }
