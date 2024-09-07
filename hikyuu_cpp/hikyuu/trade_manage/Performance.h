@@ -29,6 +29,9 @@ public:
     Performance& operator=(const Performance& other);
     Performance& operator=(Performance&& other);
 
+    /** 是否为合法的统计项 */
+    static bool exist(const string& key);
+
     /** 复位，清除已计算的结果 */
     void reset();
 

@@ -72,6 +72,17 @@ Performance::Performance() {
 
 Performance::~Performance() {}
 
+bool Performance::exist(const string& key) {
+    bool ret = false;
+    for (const auto& item : ms_keys) {
+        if (item == key) {
+            ret = true;
+            break;
+        }
+    }
+    return ret;
+}
+
 Performance& Performance::operator=(const Performance& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_result = other.m_result;
