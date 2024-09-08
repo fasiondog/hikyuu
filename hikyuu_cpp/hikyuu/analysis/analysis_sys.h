@@ -70,4 +70,7 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystem(const SystemList& sys_list, 
                                                     const KQuery& query, const string& sort_key,
                                                     int sort_mode = 0);
 
+std::pair<double, SYSPtr> HKU_API findOptimalSystemMulti(const SystemList& sys_list,
+                                                         const Stock& stk, const KQuery& query,
+                                                         const string& sort_key, int sort_mode = 0);
 }  // namespace hku

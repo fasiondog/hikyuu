@@ -16,13 +16,13 @@ os.environ['HKU_STOCK_LIST'] = stk_code  # 仅加载指定的证券
 os.environ['HKU_KTYPE_LIST'] = 'day'  # 加载K线类型（同时包含加载顺序）
 # os.environ['HKU_LOAD_STOCK_WEIGHT'] = '0'  # 禁止加载权息数据
 # os.environ['HKU_LOAD_HISTORY_FINANCE'] = '0'  # 禁止加载历史财务信息
-# os.environ['HKU_START_SPOT'] = '0'  # 禁止启动行情接收代理
+os.environ['HKU_START_SPOT'] = '0'  # 禁止启动行情接收代理
 
 from hikyuu.interactive import *  # NOQA: E402
 
 
-fast_n = range(3, 100)
-slow_n = range(100, 200)
+fast_n = range(3, 200)
+slow_n = range(5, 300)
 params = [v for v in product(fast_n, slow_n)]
 # print(params)
 
@@ -37,7 +37,7 @@ print(len(sys_list))
 
 
 stk = sm[stk_code]
-query = Query(-1500)
+query = Query(-2000)
 
 dates = sm.get_trading_calendar(query)
 if len(dates) == 0:
@@ -68,7 +68,13 @@ def find_optimal_param(sys_list, stk, query, key=None):
     return max_val, max_sys
 
 
-max_val, max_sys = find_optimal_param(sys_list, stk, query, key='当前总资产')
+while not sm.data_ready:
+    import time
+    time.sleep(100)
+
+# max_val, max_sys = find_optimal_param(sys_list, stk, query, key='当前总资产')
+max_val, max_sys = find_optimal_system_multi(sys_list, stk, query, '当前总资产', 0)
+
 # print(max_val)
 print(max_sys.name)
 print(len(sys_list))

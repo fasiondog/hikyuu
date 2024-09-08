@@ -106,6 +106,56 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystem(const SystemList& sys_list, 
     HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 
+    for (size_t i = 0; i < total; i++) {
+        const auto& sys = sys_list[i];
+        if (!sys) {
+            continue;
+        }
+
+        try {
+            sys->run(stk, query);
+            Performance per;
+            per.statistics(sys->getTM(), last_datetime);
+            double val = per.get(sort_key);
+            if (sort_mode == 0 && val > result.first) {
+                result.first = val;
+                result.second = sys;
+            } else if (sort_mode != 0 && val < result.first) {
+                result.first = val;
+                result.second = sys;
+            }
+
+        } catch (const std::exception& e) {
+            HKU_ERROR("sys_list[{}] run failed! {}", i, e.what());
+        } catch (...) {
+            HKU_ERROR("sys_list[{}] run failed! Unknown error!", i);
+        }
+    }
+
+    return result;
+}
+
+std::pair<double, SYSPtr> HKU_API findOptimalSystemMulti(const SystemList& sys_list,
+                                                         const Stock& stk, const KQuery& query,
+                                                         const string& sort_key, int sort_mode) {
+    SPEND_TIME(findOptimalSystemMulti);
+    double init_val =
+      sort_mode == 0 ? std::numeric_limits<double>::min() : std::numeric_limits<double>::max();
+    std::pair<double, SYSPtr> result{init_val, SYSPtr()};
+    size_t total = sys_list.size();
+    HKU_IF_RETURN(0 == total, result);
+
+    HKU_ERROR_IF_RETURN(stk.isNull(), result, "stock is null!");
+
+    string statistic_key = sort_key.empty() ? "帐户平均年收益率%" : sort_key;
+    HKU_ERROR_IF_RETURN(!Performance::exist(statistic_key), result,
+                        "Invalid sort key: {}! A statistical item does not exist!", statistic_key);
+
+    // 保证只统计到 query 指定的最后日期，而不是默认到现在，否则仍有持仓的系统收益不合适
+    auto date_list = StockManager::instance().getTradingCalendar(query);
+    HKU_IF_RETURN(date_list.empty(), result);
+    Datetime last_datetime = date_list.back();
+
     auto all_result = parallel_for_index(0, total, [&, stk, last_datetime, init_val](size_t i) {
         const auto& sys = sys_list[i];
         std::pair<double, SYSPtr> ret{init_val, sys};

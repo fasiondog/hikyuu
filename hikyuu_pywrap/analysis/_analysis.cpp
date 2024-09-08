@@ -209,4 +209,7 @@ void export_analysis(py::module& m) {
 
     m.def("find_optimal_system", findOptimalSystem, py::arg("sys_list"), py::arg("stock"),
           py::arg("query"), py::arg("sort_key") = string(), py::arg("sort_mode") = 0);
+    m.def("find_optimal_system_multi", findOptimalSystemMulti, py::arg("sys_list"),
+          py::arg("stock"), py::arg("query"), py::arg("sort_key") = string(),
+          py::arg("sort_mode") = 0);
 }
