@@ -66,8 +66,8 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_li
  * @param sort_mode 0 为取统计最高值的系统，其他值为取统计最低值的系统
  * @return std::pair<double, SYSPtr>
  */
-std::pair<double, SYSPtr> findOptimalSystem(const SystemList& sys_list, const Stock& stk,
-                                            const KQuery& query, const string& sort_key,
-                                            int sort_mode = 0);
+std::pair<double, SYSPtr> HKU_API findOptimalSystem(const SystemList& sys_list, const Stock& stk,
+                                                    const KQuery& query, const string& sort_key,
+                                                    int sort_mode = 0);
 
 }  // namespace hku

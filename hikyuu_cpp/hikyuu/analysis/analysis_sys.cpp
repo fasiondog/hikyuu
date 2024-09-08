@@ -85,9 +85,10 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_li
     return result;
 }
 
-std::pair<double, SYSPtr> findOptimalSystem(const SystemList& sys_list, const Stock& stk,
-                                            const KQuery& query, const string& sort_key,
-                                            int sort_mode) {
+std::pair<double, SYSPtr> HKU_API findOptimalSystem(const SystemList& sys_list, const Stock& stk,
+                                                    const KQuery& query, const string& sort_key,
+                                                    int sort_mode) {
+    SPEND_TIME(findOptimalSystem);
     double init_val =
       sort_mode == 0 ? std::numeric_limits<double>::min() : std::numeric_limits<double>::max();
     std::pair<double, SYSPtr> result{init_val, SYSPtr()};
@@ -125,15 +126,19 @@ std::pair<double, SYSPtr> findOptimalSystem(const SystemList& sys_list, const St
         return ret;
     });
 
-    if (!all_result.empty()) {
-        std::sort(all_result.begin(), all_result.end(),
-                  [](const std::pair<double, SYSPtr>& a, const std::pair<double, SYSPtr>& b) {
-                      return a.first > b.first;
-                  });
-        if (0 == sort_mode) {
-            result = all_result.front();
-        } else {
-            result = all_result.back();
+    if (0 == sort_mode) {
+        for (auto& v : all_result) {
+            if (v.first > result.first) {
+                result.first = v.first;
+                result.second = v.second;
+            }
+        }
+    } else {
+        for (auto& v : all_result) {
+            if (v.first < result.first) {
+                result.first = v.first;
+                result.second = v.second;
+            }
         }
     }
 

@@ -206,4 +206,7 @@ void export_analysis(py::module& m) {
     m.def("inner_combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
 
     m.def("inner_analysis_sys_list", analysis_sys_list);
+
+    m.def("find_optimal_system", findOptimalSystem, py::arg("sys_list"), py::arg("stock"),
+          py::arg("query"), py::arg("sort_key") = string(), py::arg("sort_mode") = 0);
 }
