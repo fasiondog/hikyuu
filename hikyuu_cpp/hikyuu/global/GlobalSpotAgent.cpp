@@ -144,7 +144,7 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
         end_minute = close1;
     }
 
-    // 计算当前之前的累积成交金额、成交量
+    // 计算当天之前的累积成交金额、成交量
     KRecordList klist = stk.getKRecordList(KQuery(today, end_minute, ktype));
     price_t sum_amount = 0.0, sum_volume = 0.0;
     for (const auto& k : klist) {
@@ -157,7 +157,11 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     price_t spot_volume = spot.volume * 100.;  // spot 传过来的是手数
     price_t volume =
       spot_volume > sum_volume ? spot_volume - sum_volume : (sum_volume == 0.0 ? spot_volume : 0.0);
-    KRecord krecord(end_minute, spot.open, spot.high, spot.low, spot.close, amount, volume);
+
+    // 采集时间间隔如果大于等于ktype，则对应的OHLC值均为 spot close
+    // 采集时间间隔小于ktype, 则多次采集后，其ktype对应值才会体现出 OHLC
+    // 开盘价、最高价、最低价都须使用当前 spot 收盘价（因为 spot 中的开高低均为当天值）
+    KRecord krecord(end_minute, spot.close, spot.close, spot.close, spot.close, amount, volume);
     stk.realtimeUpdate(krecord, ktype);
 }
 
