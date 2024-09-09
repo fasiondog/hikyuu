@@ -73,7 +73,7 @@ def request_data(api, stklist, parse_one_result):
 
 
 @hku_catch(ret=([], []))
-def get_spot(stocklist, ip, port, batch_func=None):
+def inner_get_spot(stocklist, ip, port, batch_func=None):
     api = TdxHq_API()
     hku_check(api.connect(ip, port), 'Failed connect tdx ({}:{})!'.format(ip, port))
 
@@ -107,7 +107,7 @@ def get_spot(stocklist, ip, port, batch_func=None):
 
 
 @spend_time
-def get_spot2(stocklist, ip, port, batch_func=None):
+def get_spot(stocklist, ip, port, batch_func=None):
     hosts = search_best_tdx()
     hosts_cnt = len(hosts)
     num = len(stocklist) // hosts_cnt
@@ -123,7 +123,7 @@ def get_spot2(stocklist, ip, port, batch_func=None):
                 break
 
     def do_inner(param):
-        ret = get_spot(param[0], param[1], param[2], param[3])
+        ret = inner_get_spot(param[0], param[1], param[2], param[3])
         return ret
 
     with futures.ThreadPoolExecutor() as executor:

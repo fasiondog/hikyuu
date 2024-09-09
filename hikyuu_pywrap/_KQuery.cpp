@@ -27,8 +27,10 @@ void export_KQuery(py::module& m) {
                              "结束日期，当按索引查询方式创建时无效")
       .def_property_readonly("query_type", &KQuery::queryType, "查询方式")
       .def_property_readonly("ktype", &KQuery::kType, "查询的K线类型")
-      .def_property_readonly("recover_type",
-                             py::overload_cast<>(&KQuery::recoverType, py::const_), "复权类别")
+      .def_property_readonly("recover_type", py::overload_cast<>(&KQuery::recoverType, py::const_),
+                             "复权类别")
+      .def("get_all_ktype", &KQuery::getAllKType, "获取所有KType")
+      .def("get_ktype_in_min", &KQuery::getKTypeInMin, "获取ktype对应的分钟数")
 
         DEF_PICKLE(KQuery);
 
