@@ -56,12 +56,7 @@ if __name__ == "__main__":
     # 不使用配置文件中的预加载参数
     preload_param = Parameter()
     if p in Query.get_all_ktype():
-        preload_param[p] = True
-        minute = Query.get_ktype_in_min()
-        if minute >= 240:
-            preload_param[f'{p.lower()}_max'] = 1
-        else:
-            preload_param[f'{p.lower()}_max'] = 240 // minute
+        preload_param[p] = False
 
     kdata_param = Parameter()
     kdata_config = ini.options('kdata')
@@ -72,18 +67,7 @@ if __name__ == "__main__":
         kdata_param[p] = ini.get('kdata', p)
 
     context = StrategyContext(["all"])
-    if 'HKU_STOCK_LIST' in os.environ:
-        context.stock_list = os.environ['HKU_STOCK_LIST'].split(";")
-    if 'HKU_KTYPE_LIST' in os.environ:
-        context.ktype_list = os.environ['HKU_KTYPE_LIST'].split(";")
-    if 'HKU_LOAD_HISTORY_FINANCE' in os.environ:
-        load_str = os.environ['HKU_LOAD_HISTORY_FINANCE'].upper()
-        load_finance = load_str in ("1", "TRUE")
-        hku_param.set("load_history_finance", load_finance)
-    if 'HKU_LOAD_STOCK_WEIGHT' in os.environ:
-        load_str = os.environ['HKU_LOAD_STOCK_WEIGHT'].upper()
-        load_stk_weight = load_str in ("1", "TRUE")
-        hku_param.set("load_stock_weight", load_stk_weight)
+    context.ktype_list = ["day"]
 
     sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
 
@@ -111,7 +95,12 @@ if __name__ == "__main__":
                 start_send_spot()
                 records = get_spot(stk_list, None, None, send_spot)
                 end_send_spot()
-            delta = Datetime.today().next_day() + TimeDelta(0, 9, 30) - Datetime.now()
+            now = Datetime.now()
+            today_open = today + TimeDelta(0, 9, 30)
+            if now < today_open:
+                delta = today_open - Datetime.now()
+            else:
+                delta = today_open + Days(1) - Datetime.now()
             hku_info(f"start timer: {delta}s")
             time.sleep(delta.total_seconds())
         except KeyboardInterrupt:
