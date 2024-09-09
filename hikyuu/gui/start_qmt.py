@@ -111,7 +111,12 @@ if __name__ == "__main__":
                 start_send_spot()
                 records = get_spot(stk_list, None, None, send_spot)
                 end_send_spot()
-            delta = Datetime.today().next_day() + TimeDelta(0, 9, 30) - Datetime.now()
+            now = Datetime.now()
+            today_open = today + TimeDelta(0, 9, 30)
+            if now < today_open:
+                delta = today_open - Datetime.now()
+            else:
+                delta = today_open + Days(1) - Datetime.now()
             hku_info(f"start timer: {delta}s")
             time.sleep(delta.total_seconds())
         except KeyboardInterrupt:
