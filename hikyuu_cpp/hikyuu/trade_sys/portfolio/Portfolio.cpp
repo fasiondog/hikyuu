@@ -297,7 +297,7 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
             // 强制卖出失败的情况下，如果当前仍有持仓，则需要下一交易日继续进行处理
             PositionRecord position = sys.sys->getTM()->getPosition(date, sys.sys->getStock());
             if (position.number > 0.0) {
-                HKU_INFO_IF("[{}] failed to force sell, delay to next day", name());
+                HKU_INFO_IF(trace, "[{}] failed to force sell, delay to next day", name());
                 tmp_continue_adjust_sys_list.emplace_back(sys);
             }
         }

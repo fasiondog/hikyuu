@@ -27,13 +27,7 @@ namespace hku {
  * @param a 动态系数
  * @ingroup Indicator
  */
-Indicator DMA(const Indicator& ind1, const Indicator& a);
-
-inline Indicator DMA(const Indicator& ind1, const Indicator& a) {
-    Indicator dma = a * ind1 + (1 - a) * REF(ind1, 1);
-    dma.name("DMA");
-    return dma;
-}
+Indicator HKU_API DMA(const Indicator& x, const Indicator& a);
 
 }  // namespace hku
 
