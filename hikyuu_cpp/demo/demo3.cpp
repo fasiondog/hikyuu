@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
                                       hkuParam);
 
         // 启动行情接收
-        startSpotAgent(true, 3);
+        startSpotAgent(true, 2);
 
         server.setAddr("tcp://0.0.0.0:9201");
 
