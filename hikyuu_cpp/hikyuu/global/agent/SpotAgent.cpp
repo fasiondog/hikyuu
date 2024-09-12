@@ -38,6 +38,7 @@ void SpotAgent::start() {
     stop();
     if (m_stop) {
         m_stop = false;
+        m_receive_data_tg = std::make_unique<ThreadPool>(1);
         m_tg = std::make_unique<ThreadPool>(m_work_num);
         m_receiveThread = std::thread([this]() { work_thread(); });
     }
@@ -45,11 +46,17 @@ void SpotAgent::start() {
 
 void SpotAgent::stop() {
     m_stop = true;
+    if (m_receive_data_tg) {
+        m_receive_data_tg->stop();
+    }
     if (m_tg) {
         m_tg->stop();
     }
     if (m_receiveThread.joinable()) {
         m_receiveThread.join();
+    }
+    if (m_receive_data_tg) {
+        m_receive_data_tg.reset();
     }
     if (m_tg) {
         m_tg.reset();
@@ -140,16 +147,28 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     auto* spot_list = GetSpotList(spot_list_buf);
     auto* spots = spot_list->spot();
     size_t total = spots->size();
-    m_batch_count += total;
+    // m_batch_count += total;
+    vector<std::future<void>> tasks;
     for (size_t i = 0; i < total; i++) {
         auto* spot = spots->Get(i);
         auto spot_record = parseFlatSpot(spot);
         if (spot_record) {
             for (const auto& process : m_processList) {
-                m_process_task_list.emplace_back(m_tg->submit(ProcessTask(process, *spot_record)));
+                tasks.emplace_back(m_tg->submit(ProcessTask(process, *spot_record)));
             }
         }
     }
+
+    for (auto& task : tasks) {
+        task.get();
+    }
+    HKU_TRACE_IF(m_print, "received count: {}", total);
+    // m_batch_count = 0;
+    // 执行后处理
+    for (const auto& postProcess : m_postProcessList) {
+        postProcess(ms_start_rev_time);
+    }
+    // m_process_task_list.clear();
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
@@ -197,20 +216,24 @@ void SpotAgent::work_thread() {
                 case RECEIVING:
                     if (memcmp(buf, ms_endTag, ms_endTagLength) == 0) {
                         m_status = WAITING;
-                        for (auto& task : m_process_task_list) {
-                            task.get();
-                        }
-                        HKU_TRACE_IF(m_print, "received count: {}", m_batch_count);
-                        m_batch_count = 0;
-                        // 执行后处理
-                        for (const auto& postProcess : m_postProcessList) {
-                            postProcess(ms_start_rev_time);
-                        }
-                        m_process_task_list.clear();
+                        // for (auto& task : m_process_task_list) {
+                        //     task.get();
+                        // }
+                        // HKU_TRACE_IF(m_print, "received count: {}", m_batch_count);
+                        // m_batch_count = 0;
+                        // // 执行后处理
+                        // for (const auto& postProcess : m_postProcessList) {
+                        //     postProcess(ms_start_rev_time);
+                        // }
+                        // m_process_task_list.clear();
                     } else {
                         HKU_CHECK(memcmp(buf, ms_startTag, ms_startTagLength) != 0,
                                   "Data not received in time, maybe the send speed is too fast!");
-                        parseSpotData(buf, length);
+                        std::shared_ptr<char[]> data_buf(new char[length]);
+                        memcpy(data_buf.get(), buf, length);
+                        m_receive_data_tg->submit([this, length, new_buf = std::move(data_buf)]() {
+                            this->parseSpotData(new_buf.get(), length);
+                        });
                     }
                     break;
             }
