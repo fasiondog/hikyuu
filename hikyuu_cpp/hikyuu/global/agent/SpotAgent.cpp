@@ -147,7 +147,6 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     auto* spot_list = GetSpotList(spot_list_buf);
     auto* spots = spot_list->spot();
     size_t total = spots->size();
-    // m_batch_count += total;
     vector<std::future<void>> tasks;
     for (size_t i = 0; i < total; i++) {
         auto* spot = spots->Get(i);
@@ -163,12 +162,9 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
         task.get();
     }
     HKU_TRACE_IF(m_print, "received count: {}", total);
-    // m_batch_count = 0;
-    // 执行后处理
     for (const auto& postProcess : m_postProcessList) {
         postProcess(ms_start_rev_time);
     }
-    // m_process_task_list.clear();
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
@@ -216,25 +212,13 @@ void SpotAgent::work_thread() {
                 case RECEIVING:
                     if (memcmp(buf, ms_endTag, ms_endTagLength) == 0) {
                         m_status = WAITING;
-                        // for (auto& task : m_process_task_list) {
-                        //     task.get();
-                        // }
-                        // HKU_TRACE_IF(m_print, "received count: {}", m_batch_count);
-                        // m_batch_count = 0;
-                        // // 执行后处理
-                        // for (const auto& postProcess : m_postProcessList) {
-                        //     postProcess(ms_start_rev_time);
-                        // }
-                        // m_process_task_list.clear();
-                    } else {
-                        HKU_CHECK(memcmp(buf, ms_startTag, ms_startTagLength) != 0,
-                                  "Data not received in time, maybe the send speed is too fast!");
+                    } else if (memcmp(buf, ms_startTag, ms_startTagLength) != 0) {
                         std::shared_ptr<char[]> data_buf(new char[length]);
                         memcpy(data_buf.get(), buf, length);
                         m_receive_data_tg->submit([this, length, new_buf = std::move(data_buf)]() {
                             this->parseSpotData(new_buf.get(), length);
                         });
-                    }
+                    }  // else {继续等待数据}
                     break;
             }
         } catch (std::exception& e) {
