@@ -11,15 +11,12 @@
  * 其接收 HikyuuTDX 行情采集发来的行情数据，并提供服务接口供其他程序来获取最新数据
  *
  * 用途：
- * 在程序化交易里，经常在实际下单时，希望获取一下最新数据，
+ * 在程序化交易里，经常在实际下单时，希望获取最新数据，
  * 或者是日频交易时，不开启 hikyuu 本身的行情自动接收，而是在收盘前定时执行时，手工获取下最新数据
  *
  * hikyuu 中提供了对应的函数 get_data_from_buffer_server(python), getDataFromBufferServer(C++)
- * 用来从该服务获取最新数据, 如：
+ * 用来从该服务获取最新数据（补齐当天数据）, 如：
  * get_data_from_buffer_server("tcp://192.168.1.1:9201", Query.DAY)
- *
- * 目的：
- * 如何使用更多的初始化方式，控制 hikyuu 数据加载
  *
  *************************************************************/
 
@@ -67,13 +64,19 @@ int main(int argc, char* argv[]) {
         getConfigFromIni(fmt::format("{}/.hikyuu/hikyuu.ini", getUserDir()), baseParam, blockParam,
                          kdataParam, preloadParam, hkuParam);
 
-        // 调整所有类型K线为预加载且预加载数量为1
+        // 调整所有类型K线为预加载且预加载数量为1天的量
         Parameter new_preloadParam;
         auto ktypes = KQuery::getAllKType();
         for (auto& ktype : ktypes) {
+            auto minutes = KQuery::getKTypeInMin(ktype);
             to_lower(ktype);
             new_preloadParam.set<bool>(ktype, true);
-            new_preloadParam.set<int>(fmt::format("{}_max", ktype), 1);
+            if (minutes >= 240) {
+                new_preloadParam.set<int>(fmt::format("{}_max", ktype), 1);
+            } else {
+                new_preloadParam.set<int>(fmt::format("{}_max", ktype), 240 / minutes);
+                HKU_INFO("{}: {}", fmt::format("{}_max", ktype), 240 / minutes);
+            }
         }
         // 不加载历史财务信息，不加载权息数据
         hkuParam.set<bool>("load_history_finance", false);
@@ -81,8 +84,8 @@ int main(int argc, char* argv[]) {
         StockManager::instance().init(baseParam, blockParam, kdataParam, new_preloadParam,
                                       hkuParam);
 
-        // 启动行情接收（只是计算回测可以不需要）
-        startSpotAgent(true);
+        // 启动行情接收
+        startSpotAgent(true, 3);
 
         server.setAddr("tcp://0.0.0.0:9201");
 
@@ -100,43 +103,57 @@ int main(int argc, char* argv[]) {
             HKU_CHECK(param.tryGet<bool>(low_ktype, false), "The ktype: {} is not be preloaded!",
                       ktype);
 
-            json data;
             const auto& jcodes = req["codes"];
-            // HKU_INFO("codes size: {}", jcodes.size());
-            for (auto iter = jcodes.cbegin(); iter != jcodes.cend(); ++iter) {
-                string market_code = to_string(*iter);
-                market_code = market_code.substr(1, market_code.size() - 2);
-                Stock stk = getStock(market_code);
-                if (stk.isNull()) {
-                    HKU_WARN("Not found stock: {}", market_code);
-                    continue;
-                }
+            const auto& jdates = req["dates"];
+            HKU_CHECK(jcodes.size() == jdates.size(), "The leght of codes and dates is not equal!");
 
-                KRecordList krecords =
-                  stk.getKRecordList(KQueryByIndex(-1, Null<int64_t>(), ktype));
-                if (!krecords.empty()) {
-                    const auto& k = krecords.back();
-                    json jr;
-                    jr.emplace_back(market_code);
-                    jr.emplace_back(k.datetime.str());
-                    jr.emplace_back(k.openPrice);
-                    jr.emplace_back(k.highPrice);
-                    jr.emplace_back(k.lowPrice);
-                    jr.emplace_back(k.closePrice);
-                    jr.emplace_back(k.transAmount);
-                    jr.emplace_back(k.transCount);
-                    data.emplace_back(std::move(jr));
+            json jstklist;
+            for (size_t i = 0, len = jcodes.size(); i < len; i++) {
+                try {
+                    string market_code = jcodes[i].get<string>();
+                    Datetime start_date = Datetime(jdates[i].get<string>());
+                    Stock stk = getStock(market_code);
+                    if (stk.isNull()) {
+                        HKU_WARN("Not found stock: {}", market_code);
+                        continue;
+                    }
+
+                    KData kdata = stk.getKData(KQueryByDate(start_date, Null<Datetime>(), ktype));
+                    if (kdata.empty()) {
+                        continue;
+                    }
+
+                    json jklist;
+                    for (const auto& k : kdata) {
+                        json jr;
+                        jr.emplace_back(k.datetime.str());
+                        jr.emplace_back(k.openPrice);
+                        jr.emplace_back(k.highPrice);
+                        jr.emplace_back(k.lowPrice);
+                        jr.emplace_back(k.closePrice);
+                        jr.emplace_back(k.transAmount);
+                        jr.emplace_back(k.transCount);
+                        jklist.emplace_back(std::move(jr));
+                    }
+
+                    json jstk;
+                    jstk["code"] = std::move(market_code);
+                    jstk["data"] = std::move(jklist);
+                    jstklist.emplace_back(std::move(jstk));
+
+                } catch (const std::exception& e) {
+                    HKU_ERROR("{}! The error occurred in record: {}", e.what(), i);
                 }
             }
 
             json res;
-            res["data"] = data;
+            res["data"] = std::move(jstklist);
             // HKU_INFO("<-- res: {}", to_string(res));
             return res;
         });
 
         server.start();
-        // server.loop();
+
         while (true) {
             std::this_thread::sleep_for(std::chrono::seconds(10));
         }

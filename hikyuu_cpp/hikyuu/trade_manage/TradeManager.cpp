@@ -455,11 +455,12 @@ bool TradeManager::checkout(const Datetime& datetime, price_t cash) {
 
     int precision = getParam<int>("precision");
     price_t out_cash = roundEx(cash, precision);
-    HKU_ERROR_IF_RETURN(out_cash > m_cash, false,
-                        "{} cash({:<.4f}) must be <= current cash({:<.4f})!", datetime, cash,
-                        m_cash);
 
-    m_cash = roundEx(m_cash - out_cash, precision);
+    price_t tmp_cash = roundEx(m_cash - out_cash, precision);
+    HKU_ERROR_IF_RETURN(tmp_cash < 0.0, false, "{} cash({:<.4f}) must be <= current cash({:<.4f})!",
+                        datetime, cash, m_cash);
+
+    m_cash = tmp_cash;
     m_checkout_cash = roundEx(m_checkout_cash + out_cash, precision);
     m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime, BUSINESS_CHECKOUT, out_cash,
                                        out_cash, 0.0, 0, CostRecord(), 0.0, m_cash, PART_INVALID));

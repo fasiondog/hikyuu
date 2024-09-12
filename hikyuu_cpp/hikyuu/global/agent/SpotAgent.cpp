@@ -195,7 +195,7 @@ void SpotAgent::work_thread() {
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
-    HKU_INFO_IF(m_print, "Ready to receive quotation from {} ...", ms_pubUrl);
+    HKU_INFO_IF(!m_stop && m_print, "Ready to receive quotation from {} ...", ms_pubUrl);
 
     while (!m_stop) {
         char* buf = nullptr;
