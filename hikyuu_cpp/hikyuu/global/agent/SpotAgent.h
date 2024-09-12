@@ -125,12 +125,11 @@ private:
     enum STATUS m_status = WAITING;      // 当前内部状态
     std::atomic_bool m_stop = true;      // 结束代理工作标识
 
-    int m_revTimeout = 100;            // 连接数据服务超时时长（毫秒）
-    size_t m_batch_count = 0;          // 记录本次批次接收的数据数量
-    std::thread m_receiveThread;       // 数据接收线程
-    std::unique_ptr<ThreadPool> m_tg;  // 数据处理任务线程池
-    size_t m_work_num = 1;             // 数据处理任务线程池线程数
-    vector<std::future<void>> m_process_task_list;
+    int m_revTimeout = 100;                         // 连接数据服务超时时长（毫秒）
+    std::thread m_receiveThread;                    // 数据接收线程
+    std::unique_ptr<ThreadPool> m_tg;               // 数据处理任务线程池
+    size_t m_work_num = 1;                          // 数据处理任务线程池线程数
+    std::unique_ptr<ThreadPool> m_receive_data_tg;  // 数据接收任务组
 
     bool m_print = true;   // 是否打印连接信息
     string m_server_addr;  // 服务器地址
