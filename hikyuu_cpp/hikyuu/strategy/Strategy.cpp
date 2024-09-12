@@ -268,10 +268,13 @@ void Strategy::_runDaily() {
 void Strategy::runDailyAt(std::function<void()>&& func, const TimeDelta& delta,
                           bool ignoreHoliday) {
     HKU_CHECK(func, "Invalid func!");
-    m_run_daily_at_delta = delta;
+    HKU_CHECK(delta < Days(1), "TimeDelta must < Days(1)!");
+    HKU_CHECK(m_run_daily_at_funcs.find(delta) == m_run_daily_at_funcs.end(),
+              "A task already exists at this point in time!");
 
+    std::function<void()> new_func;
     if (ignoreHoliday) {
-        m_run_daily_at_func = [=]() {
+        new_func = [=]() {
             const auto& sm = StockManager::instance();
             auto today = Datetime::today();
             int day = today.dayOfWeek();
@@ -281,15 +284,18 @@ void Strategy::runDailyAt(std::function<void()>&& func, const TimeDelta& delta,
         };
 
     } else {
-        m_run_daily_at_func = [=]() { event(func); };
+        new_func = [=]() { event(func); };
     }
+
+    m_run_daily_at_funcs[delta] = new_func;
 }
 
 void Strategy::_runDailyAt() {
-    if (m_run_daily_at_func) {
-        auto* scheduler = getScheduler();
-        scheduler->addFuncAtTimeEveryDay(m_run_daily_at_delta, m_run_daily_at_func);
+    auto* scheduler = getScheduler();
+    for (const auto& [time, func] : m_run_daily_at_funcs) {
+        scheduler->addFuncAtTimeEveryDay(time, func);
     }
+    m_run_daily_at_funcs.clear();
 }
 
 /*

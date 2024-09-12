@@ -39,8 +39,9 @@ if __name__ == '__main__':
     # 如需使用交易日历，请记得同时指定 sh000001
     s = Strategy(['sh600000', 'sz000001'],  [Query.MIN, Query.DAY])
 
-    # 当前自动10秒后执行，忽略节假日限制
+    # 当前自动延迟10秒/20秒后执行，忽略节假日限制
     s.run_daily_at(my_func1, Datetime.now() - Datetime.today() + Seconds(10), False)
+    s.run_daily_at(my_func1, Datetime.now() - Datetime.today() + Seconds(20), False)
 
     # 收到指定 stock 的行情更新
     s.on_change(on_change)
