@@ -216,7 +216,13 @@ void SpotAgent::work_thread() {
                         std::shared_ptr<char[]> data_buf(new char[length]);
                         memcpy(data_buf.get(), buf, length);
                         m_receive_data_tg->submit([this, length, new_buf = std::move(data_buf)]() {
-                            this->parseSpotData(new_buf.get(), length);
+                            try {
+                                this->parseSpotData(new_buf.get(), length);
+                            } catch (const std::exception& e) {
+                                HKU_ERROR(e.what());
+                            } catch (...) {
+                                HKU_ERROR_UNKNOWN;
+                            }
                         });
                     }  // else {继续等待数据}
                     break;
