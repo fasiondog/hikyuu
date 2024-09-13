@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #include "System.h"
 
 namespace hku {
