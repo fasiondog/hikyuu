@@ -59,7 +59,10 @@ def crtCN(func, params={}, name='crtCN'):
     """
     meta_x = type(name, (ConditionBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
-    return meta_x(name, params)
+    # 强制引入全局空间，避免 hub 使用是自定义继承丢失虚拟函数接口
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
 
 
 # ------------------------------------------------------------------
@@ -76,7 +79,9 @@ def crtEV(func, params={}, name='crtEV'):
     """
     meta_x = type(name, (EnvironmentBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
-    return meta_x(name, params)
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
 
 
 # ------------------------------------------------------------------
@@ -101,7 +106,9 @@ def crtMM(get_buy_num, get_sell_num, params={}, name='crtMM', buy_notify=None, s
         meta_x._buy_notify = buy_notify
     if sell_notify is not None:
         meta_x._sell_notify = sell_notify
-    return meta_x(name, params)
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
 
 
 # ------------------------------------------------------------------
@@ -118,7 +125,9 @@ def crtPG(func, params={}, name='crtPG'):
     """
     meta_x = type(name, (ProfitGoalBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
-    return meta_x(name, params)
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
 
 
 # ------------------------------------------------------------------
@@ -156,7 +165,9 @@ def crtSE(calculate, get_selected, is_match_af=None, params={}, name='crtSE'):
     meta_x._calculate = calculate
     meta_x.get_selected = get_selected
     meta_x.is_match_af = (lambda self, af: True) if is_match_af is None else is_match_af
-    return meta_x(name, params)
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
 
 
 # ------------------------------------------------------------------
@@ -173,7 +184,9 @@ def crtAF(allocate_weight_func, params={}, name='crtAF'):
     """
     meta_x = type(name, (AllocateFundsBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._allocate_weight = allocate_weight_func
-    return meta_x(name, params)
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
 
 
 # ------------------------------------------------------------------
@@ -190,7 +203,9 @@ def crtMF(calculate_func, params={}, name='crtMF'):
     """
     meta_x = type(name, (MultiFactorBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = calculate_func
-    return meta_x(name, params)
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
 
 
 # ------------------------------------------------------------------
@@ -212,7 +227,9 @@ def crtSP(get_real_buy_price, get_real_sell_price, params={}, name='crtSP', calc
     meta_x.get_real_sell_price = get_real_sell_price
     if calculate is not None:
         meta_x._calculate = calculate
-    return meta_x(name, params)
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
 
 
 # ------------------------------------------------------------------
@@ -229,4 +246,6 @@ def crtST(func, params={}, name='crtST'):
     """
     meta_x = type(name, (StoplossBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
-    return meta_x(name, params)
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
