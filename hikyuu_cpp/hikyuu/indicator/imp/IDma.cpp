@@ -46,7 +46,11 @@ void IDma::_calculate(const Indicator& ind) {
     const auto* x = ind.data();
     y[m_discard] = x[m_discard];
     for (size_t i = m_discard + 1; i < total; i++) {
-        y[i] = a[i] * x[i] + (1 - a[i]) * y[i - 1];
+        if (std::isnan(y[i - 1])) {
+            y[i] = x[i];
+        } else {
+            y[i] = a[i] * x[i] + (1 - a[i]) * y[i - 1];
+        }
     }
 }
 

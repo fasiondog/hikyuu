@@ -195,6 +195,13 @@ void IInSum::_calculate(const Indicator& ind) {
     } else {
         HKU_ERROR("Not support mode: {}", mode);
     }
+
+    for (size_t i = m_discard; i < total; i++) {
+        if (!std::isnan(dst[i])) {
+            break;
+        }
+        m_discard++;
+    }
 }
 
 Indicator HKU_API INSUM(const Block& block, const KQuery& query, const Indicator& ind, int mode) {
