@@ -15,12 +15,6 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
-void (System::*run_1)(const KQuery&, bool, bool) = &System::run;
-void (System::*run_2)(const KData&, bool, bool) = &System::run;
-void (System::*run_3)(const Stock&, const KQuery&, bool, bool) = &System::run;
-
-TradeRecord (System::*runMoment_1)(const Datetime&) = &System::runMoment;
-
 void export_System(py::module& m) {
     m.def("get_system_part_name", getSystemPartName, R"(get_system_part_name(part)
 
@@ -67,8 +61,9 @@ void export_System(py::module& m) {
         DEF_PICKLE(TradeRequest);
 
     //--------------------------------------------------------------------------------------
-    py::class_<System, SystemPtr>(m, "System",
-                                  R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
+    py::class_<System, SystemPtr>(
+      m, "System",
+      R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
 
 系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
@@ -84,6 +79,7 @@ void export_System(py::module& m) {
   - cn_open_position=False (bool): 是否使用系统有效性条件进行初始建仓)")
 
       .def(py::init<const string&>())
+      .def(py::init<const System&>())
       .def(py::init<const TradeManagerPtr&, const MoneyManagerPtr&, const EnvironmentPtr&,
                     const ConditionPtr&, const SignalPtr&, const StoplossPtr&, const StoplossPtr&,
                     const ProfitGoalPtr&, const SlippagePtr&, const string&>())
@@ -172,9 +168,12 @@ void export_System(py::module& m) {
 
     克隆操作，会依据部件的共享特性进行克隆，共享部件不进行实际的克隆操作，保持共享。)")
 
-      .def("run", run_1, py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false)
-      .def("run", run_2, py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false)
-      .def("run", run_3, py::arg("stock"), py::arg("query"), py::arg("reset") = true,
+      .def("run", py::overload_cast<const KQuery&, bool, bool>(&System::run), py::arg("query"),
+           py::arg("reset") = true, py::arg("reset_all") = false)
+      .def("run", py::overload_cast<const KData&, bool, bool>(&System::run), py::arg("kdata"),
+           py::arg("reset") = true, py::arg("reset_all") = false)
+      .def("run", py::overload_cast<const Stock&, const KQuery&, bool, bool>(&System::run),
+           py::arg("stock"), py::arg("query"), py::arg("reset") = true,
            py::arg("reset_all") = false,
            R"(run(self, stock, query[, reset=True])
   

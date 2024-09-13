@@ -193,6 +193,8 @@ void System::reset() {
     m_sellRequest.clear();
     m_sellShortRequest.clear();
     m_buyShortRequest.clear();
+
+    _reset();
 }
 
 void System::forceResetAll() {
@@ -234,6 +236,8 @@ void System::forceResetAll() {
     m_sellRequest.clear();
     m_sellShortRequest.clear();
     m_buyShortRequest.clear();
+
+    _forceResetAll();
 }
 
 void System::setTO(const KData& kdata) {
@@ -279,7 +283,7 @@ void System::setTO(const KData& kdata) {
 }
 
 SystemPtr System::clone() {
-    SystemPtr p = make_shared<System>();
+    SystemPtr p = _clone();
     if (m_tm)
         p->m_tm = getParam<bool>("shared_tm") ? m_tm : m_tm->clone();
     if (m_ev)
