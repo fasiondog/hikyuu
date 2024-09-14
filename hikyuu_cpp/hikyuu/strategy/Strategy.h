@@ -106,8 +106,7 @@ private:
     string m_run_daily_market;
     bool m_ignoreMarket{false};
 
-    std::function<void()> m_run_daily_at_func;
-    TimeDelta m_run_daily_at_delta;
+    std::map<TimeDelta, std::function<void()>> m_run_daily_at_funcs;
 
 private:
     void _initParam();
