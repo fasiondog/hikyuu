@@ -90,15 +90,20 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
             Datetime start_date = dates[train_ranges[i].first];
             Datetime end_date = dates[train_ranges[i].second];
             KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
-            double max_value = std::numeric_limits<double>::min();
             SYSPtr max_sys;
-            for (auto& sys : m_pro_sys_list) {
-                sys->run(q);
-                per.statistics(sys->getTM(), end_date);
-                double value = per.get(key);
-                if (value > max_value) {
-                    max_value = value;
-                    max_sys = sys;
+            if (m_pro_sys_list.size() == 1) {
+                max_sys = m_pro_sys_list.back();
+                max_sys->run(q);
+            } else {
+                double max_value = std::numeric_limits<double>::min();
+                for (auto& sys : m_pro_sys_list) {
+                    sys->run(q);
+                    per.statistics(sys->getTM(), end_date);
+                    double value = per.get(key);
+                    if (value > max_value) {
+                        max_value = value;
+                        max_sys = sys;
+                    }
                 }
             }
 
@@ -118,15 +123,20 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
             Datetime start_date = dates[train_ranges[i].first];
             Datetime end_date = dates[train_ranges[i].second];
             KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
-            double min_value = std::numeric_limits<double>::max();
             SYSPtr min_sys;
-            for (auto& sys : m_pro_sys_list) {
-                sys->run(q);
-                per.statistics(sys->getTM(), end_date);
-                double value = per.get(key);
-                if (value > min_value) {
-                    min_value = value;
-                    min_sys = sys;
+            if (m_pro_sys_list.size() == 1) {
+                min_sys = m_pro_sys_list.back();
+                min_sys->run(q);
+            } else {
+                double min_value = std::numeric_limits<double>::max();
+                for (auto& sys : m_pro_sys_list) {
+                    sys->run(q);
+                    per.statistics(sys->getTM(), end_date);
+                    double value = per.get(key);
+                    if (value > min_value) {
+                        min_value = value;
+                        min_sys = sys;
+                    }
                 }
             }
 
