@@ -100,16 +100,6 @@ AFPtr AllocateFundsBase::clone() {
     return p;
 }
 
-void AllocateFundsBase::_check_weight(const SystemWeightList& sw_list) {
-    price_t sum_weight = 0.0;
-    for (const auto& sw : sw_list) {
-        HKU_CHECK(!std::isnan(sw.weight) && sw.weight >= 0.0 && sw.weight <= 1.0,
-                  "Invalid weight ({}, {})", sw.sys->name(), sw.weight);
-        sum_weight += sw.weight;
-    }
-    HKU_CHECK(sum_weight <= 1.001, "The cumulative weight exceeds 1! sum_weight: {}", sum_weight);
-}
-
 SystemWeightList AllocateFundsBase::adjustFunds(const Datetime& date,
                                                 const SystemWeightList& se_list,
                                                 const std::unordered_set<SYSPtr>& running_list) {
@@ -211,6 +201,10 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
             break;
         }
 
+        if (!iter->sys) {
+            continue;
+        }
+
         // 如果是运行中系统，不使用计算的权重，更新累积权重和
         if (running_set.find(iter->sys) != running_set.cend()) {
             FundsRecord sub_funds = m_tm->getFunds(date, m_query.kType());
@@ -274,11 +268,13 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     // 回收所有运行中系统剩余资金，用于重新分配
     //-----------------------------------------------------------------
     for (const auto& sys : running_set) {
-        auto sub_tm = sys->getTM();
-        auto sub_cash = sub_tm->currentCash();
-        if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
-            m_cash_tm->checkin(date, sub_cash);
-            HKU_INFO_IF(trace, "[AF] Recycle cash: {:<.2f} from {}", sub_cash, sys->name());
+        if (sys) {
+            auto sub_tm = sys->getTM();
+            auto sub_cash = sub_tm->currentCash();
+            if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
+                m_cash_tm->checkin(date, sub_cash);
+                HKU_INFO_IF(trace, "[AF] Recycle cash: {:<.2f} from {}", sub_cash, sys->name());
+            }
         }
     }
 
@@ -336,6 +332,10 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
 
     std::unordered_set<SYSPtr> reduced_running_set;  // 缓存已执行过减仓的运行中系统
     for (auto iter = sw_list.begin(), end_iter = sw_list.end(); iter != end_iter; ++iter) {
+        if (!iter->sys) {
+            continue;
+        }
+
         // 如果当前系统是运行中的系统
         if (running_set.find(iter->sys) != running_set.cend()) {
             TMPtr sub_tm = iter->sys->getTM();
@@ -416,6 +416,10 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     for (auto iter = sw_list.begin(), end_iter = sw_list.end(); iter != end_iter; ++iter) {
         if (sum_weight >= can_allocate_weight || can_allocate_cash < 1.0) {
             break;
+        }
+
+        if (!iter->sys) {
+            continue;
         }
 
         // 系统期望分配的资产额
