@@ -7,6 +7,10 @@
 
 #include "DelegateSystem.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::DelegateSystem)
+#endif
+
 namespace hku {
 
 void DelegateSystem::_reset() {

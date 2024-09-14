@@ -93,7 +93,6 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
             SYSPtr max_sys;
             if (m_pro_sys_list.size() == 1) {
                 max_sys = m_pro_sys_list.back();
-                max_sys->run(q);
             } else {
                 double max_value = std::numeric_limits<double>::min();
                 for (auto& sys : m_pro_sys_list) {
@@ -126,7 +125,6 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
             SYSPtr min_sys;
             if (m_pro_sys_list.size() == 1) {
                 min_sys = m_pro_sys_list.back();
-                min_sys->run(q);
             } else {
                 double min_value = std::numeric_limits<double>::max();
                 for (auto& sys : m_pro_sys_list) {
@@ -154,6 +152,10 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
     }
 
     m_calculated = true;
+}
+
+SEPtr HKU_API SE_Optimal() {
+    return make_shared<OptimalSelector>();
 }
 
 }  // namespace hku

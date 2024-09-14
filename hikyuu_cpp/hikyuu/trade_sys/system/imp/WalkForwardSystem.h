@@ -6,16 +6,17 @@
  */
 
 #pragma once
+
+#include "hikyuu/trade_sys/selector/SelectorBase.h"
 #include "../System.h"
 
 namespace hku {
 
-class HKU_API DelegateSystem : public System {
+class HKU_API WalkForwardSystem : public System {
 public:
-    DelegateSystem() = default;
-    explicit DelegateSystem(const string& name) : System(name) {}
-    explicit DelegateSystem(const SystemPtr& sys) : m_sys(sys) {}
-    virtual ~DelegateSystem() = default;
+    WalkForwardSystem();
+    WalkForwardSystem(const SystemList& candidate_sys_list);
+    virtual ~WalkForwardSystem() = default;
 
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false) override;
     virtual TradeRecord runMoment(const Datetime& datetime) override;
@@ -32,7 +33,7 @@ public:
     virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date) override;
 
 private:
-    SystemPtr m_sys;
+    SEPtr m_se;
 
 //========================================
 // 序列化支持
@@ -43,7 +44,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(System);
-        ar& BOOST_SERIALIZATION_NVP(m_sys);
+        ar& BOOST_SERIALIZATION_NVP(m_se);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
