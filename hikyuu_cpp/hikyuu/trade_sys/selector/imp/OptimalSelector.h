@@ -19,6 +19,10 @@ public:
     virtual ~OptimalSelector() = default;
 
     virtual void _checkParam(const string& name) const override;
+    virtual void calculate(const SystemList& pf_realSysList, const KQuery& query) override;
+
+private:
+    unordered_map<Datetime, SYSPtr> m_sys_dict;
 };
 
-}
+}  // namespace hku
