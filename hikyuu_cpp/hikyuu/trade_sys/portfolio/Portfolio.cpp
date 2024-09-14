@@ -143,20 +143,22 @@ void Portfolio::_readyForRun() {
     m_real_sys_list.reserve(total);
     for (size_t i = 0; i < total; i++) {
         SystemPtr& pro_sys = pro_sys_list[i];
-        SystemPtr sys = pro_sys->clone();
-        m_se->bindRealToProto(sys, pro_sys);
-        m_real_sys_list.emplace_back(sys);
+        if (pro_sys) {
+            SystemPtr sys = pro_sys->clone();
+            m_se->bindRealToProto(sys, pro_sys);
+            m_real_sys_list.emplace_back(sys);
 
-        // 为内部实际执行的系统创建初始资金为0的子账户
-        sys->setTM(pro_tm->clone());
-        string sys_name = fmt::format("{}_{}_{}", sys->name(), sys->getStock().market_code(),
-                                      sys->getStock().name());
-        sys->getTM()->name(fmt::format("TM_SUB_{}", sys_name));
-        sys->name(fmt::format("PF_{}", sys_name));
+            // 为内部实际执行的系统创建初始资金为0的子账户
+            sys->setTM(pro_tm->clone());
+            string sys_name = fmt::format("{}_{}_{}", sys->name(), sys->getStock().market_code(),
+                                          sys->getStock().name());
+            sys->getTM()->name(fmt::format("TM_SUB_{}", sys_name));
+            sys->name(fmt::format("PF_{}", sys_name));
 
-        sys->readyForRun();
-        KData k = sys->getStock().getKData(m_query);
-        sys->setTO(k);
+            sys->readyForRun();
+            KData k = sys->getStock().getKData(m_query);
+            sys->setTO(k);
+        }
     }
 
     // 告知 se 当前实际运行的系统列表
@@ -325,14 +327,17 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
 
         // 如果选中的系统不在已有列表中, 则先清除其延迟买入操作，防止在调仓日出现未来信号
         for (auto& sys : m_tmp_selected_list) {
-            if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
-                sys.sys->clearDelayBuyRequest();
+            if (sys.sys) {
+                if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
+                    sys.sys->clearDelayBuyRequest();
+                }
             }
         }
 
         if (trace && !m_tmp_selected_list.empty()) {
             for (auto& sys : m_tmp_selected_list) {
-                HKU_INFO("[PF] select: {}, score: {:<.4f}", sys.sys->name(), sys.weight);
+                HKU_INFO_IF(sys.sys, "[PF] select: {}, score: {:<.4f}", sys.sys->name(),
+                            sys.weight);
             }
         }
 
@@ -350,9 +355,11 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
 
         // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统列表
         for (auto& sys : m_tmp_selected_list) {
-            if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
-                if (sys.sys->getTM()->cash(date, m_query.kType()) > 0.0) {
-                    m_running_sys_set.insert(sys.sys);
+            if (sys.sys) {
+                if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
+                    if (sys.sys->getTM()->cash(date, m_query.kType()) > 0.0) {
+                        m_running_sys_set.insert(sys.sys);
+                    }
                 }
             }
         }
