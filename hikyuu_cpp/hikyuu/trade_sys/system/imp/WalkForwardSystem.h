@@ -38,8 +38,8 @@ private:
     void syncDataToSystem(const SYSPtr&);
 
 private:
-    SystemList m_candidate_sys_list;
     SEPtr m_se;
+    SystemList m_candidate_sys_list;
     SYSPtr m_cur_sys;
     vector<KData> m_kdata_list;
     size_t m_cur_kdata{0};
@@ -53,8 +53,8 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(System);
-        ar& BOOST_SERIALIZATION_NVP(m_candidate_sys_list);
         ar& BOOST_SERIALIZATION_NVP(m_se);
+        ar& BOOST_SERIALIZATION_NVP(m_candidate_sys_list);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };

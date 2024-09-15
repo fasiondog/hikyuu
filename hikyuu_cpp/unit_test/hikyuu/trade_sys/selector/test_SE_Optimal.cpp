@@ -64,9 +64,9 @@ TEST_CASE("test_SE_Optimal") {
     se->removeAll();
     se->addSystem(sys);
     REQUIRE(se->getProtoSystemList().size() == 1);
-    KQuery query(-200);
-    se->setParam<int>("train_len", 50);
-    se->setParam<int>("test_len", 20);
+    KQuery query(-50);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 25);
     se->calculate(SystemList(), query);
     OptimalSelector* raw_se = dynamic_cast<OptimalSelector*>(se.get());
     auto run_ranges = raw_se->getRunRanges();

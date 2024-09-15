@@ -34,7 +34,7 @@ void OptimalSelector::_checkParam(const string& name) const {
     } else if ("train_len" == name) {
         HKU_ASSERT(getParam<int>("train_len") > 0);
     } else if ("test_len" == name) {
-        HKU_ASSERT(getParam<int>("test_len") >= 0);
+        HKU_ASSERT(getParam<int>("test_len") > 0);
     } else if ("depend_on_proto_sys" == name) {
         HKU_ASSERT(getParam<bool>("depend_on_proto_sys"));
     } else if ("market" == name) {
@@ -82,7 +82,6 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
 
     size_t train_len = static_cast<size_t>(getParam<int>("train_len"));
     size_t test_len = static_cast<size_t>(getParam<int>("test_len"));
-    size_t data_len = train_len + test_len;
 
     auto dates = StockManager::instance().getTradingCalendar(query, getParam<string>("market"));
     size_t dates_len = dates.size();
@@ -105,78 +104,56 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
     HKU_INFO_IF(trace, "[SE_Optimal] statistic key: {}, mode: {}", key, mode);
 
     Performance per;
-    if (0 == mode) {
-        for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
-            Datetime start_date = dates[train_ranges[i].first];
-            Datetime end_date = dates[train_ranges[i].second];
-            KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
-            HKU_INFO_IF(trace, "[SE_Optimal] iteration: {}, range: {}", i, q);
-            SYSPtr max_sys;
-            if (m_pro_sys_list.size() == 1) {
-                max_sys = m_pro_sys_list.back();
-            } else {
-                double max_value = std::numeric_limits<double>::lowest();
-                for (const auto& sys : m_pro_sys_list) {
-                    sys->run(q, true);
-                    per.statistics(sys->getTM(), end_date);
-                    double value = per.get(key);
-                    if (value > max_value) {
-                        max_value = value;
-                        max_sys = sys;
-                    }
+    for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
+        Datetime start_date = dates[train_ranges[i].first];
+        Datetime end_date = dates[train_ranges[i].second];
+        KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
+        HKU_INFO_IF(trace, "[SE_Optimal] iteration: {}, range: {}", i, q);
+        SYSPtr selected_sys;
+        if (m_pro_sys_list.size() == 1) {
+            selected_sys = m_pro_sys_list.back();
+        } else if (0 == mode) {
+            double max_value = std::numeric_limits<double>::lowest();
+            for (const auto& sys : m_pro_sys_list) {
+                sys->run(q, true);
+                per.statistics(sys->getTM(), end_date);
+                double value = per.get(key);
+                if (value > max_value) {
+                    max_value = value;
+                    selected_sys = sys;
                 }
             }
-
-            HKU_ASSERT(max_sys);
-            size_t test_start = train_ranges[i].second;
-            size_t test_end = test_start + test_len;
-            if (test_end > dates_len) {
-                test_end = dates_len;
-            }
-            max_sys->reset();
-            max_sys = max_sys->clone();
-            for (size_t pos = test_start; pos < test_end; pos++) {
-                m_sys_dict[dates[pos]] = max_sys;
-            }
-            m_run_ranges.emplace_back(std::make_pair(dates[test_start], dates[test_end]));
-            HKU_INFO_IF(trace, "[SE_Optimal] iteration: {}, max_sys: {}", i, max_sys->name());
-        }
-    } else {
-        for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
-            Datetime start_date = dates[train_ranges[i].first];
-            Datetime end_date = dates[train_ranges[i].second];
-            KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
-            HKU_INFO_IF(trace, "[SE_Optimal] iteration: {}, range: {}", i, q);
-            SYSPtr min_sys;
-            if (m_pro_sys_list.size() == 1) {
-                min_sys = m_pro_sys_list.back();
-            } else {
-                double min_value = std::numeric_limits<double>::max();
-                for (auto& sys : m_pro_sys_list) {
-                    sys->run(q);
-                    per.statistics(sys->getTM(), end_date);
-                    double value = per.get(key);
-                    if (value > min_value) {
-                        min_value = value;
-                        min_sys = sys;
-                    }
+        } else if (1 == mode) {
+            double min_value = std::numeric_limits<double>::max();
+            for (const auto& sys : m_pro_sys_list) {
+                sys->run(q, true);
+                per.statistics(sys->getTM(), end_date);
+                double value = per.get(key);
+                if (value < min_value) {
+                    min_value = value;
+                    selected_sys = sys;
                 }
             }
-
-            HKU_ASSERT(min_sys);
-            size_t test_start = train_ranges[i].second;
-            size_t test_end = test_start + test_len;
-            if (test_end >= dates_len) {
-                test_end = dates_len - 1;
-            }
-            min_sys->reset();
-            min_sys = min_sys->clone();
-            for (size_t pos = test_start; pos < test_end; pos++) {
-                m_sys_dict[dates[pos]] = min_sys;
-            }
-            m_run_ranges.emplace_back(std::make_pair(dates[test_start], dates[test_end]));
-            HKU_INFO_IF(trace, "[SE_Optimal] iteration: {}, min_sys: {}", i, min_sys->name());
         }
+
+        HKU_ASSERT(selected_sys);
+        size_t test_start = train_ranges[i].second;
+        size_t test_end = test_start + test_len;
+        if (test_end > dates_len) {
+            test_end = dates_len;
+        }
+        selected_sys->reset();
+        selected_sys = selected_sys->clone();
+        for (size_t pos = test_start; pos < test_end; pos++) {
+            m_sys_dict[dates[pos]] = selected_sys;
+        }
+        if (test_end < dates_len) {
+            m_run_ranges.emplace_back(std::make_pair(dates[test_start], dates[test_end]));
+        } else {
+            m_run_ranges.emplace_back(
+              std::make_pair(dates[test_start], dates[test_end - 1] + Seconds(1)));
+        }
+        HKU_INFO_IF(trace, "[SE_Optimal] iteration: {}, selected_sys: {}", i, selected_sys->name());
     }
 
     m_calculated = true;

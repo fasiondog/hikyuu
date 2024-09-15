@@ -72,7 +72,7 @@ void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, const KData& kdata
     m_lastShortTakeProfit = sys->m_lastShortTakeProfit;
 
     auto dates = kdata.getDatetimeList();
-    auto& ev = sys->getEV();
+    auto ev = sys->getEV();
     if (ev) {
         for (const auto& date : dates) {
             if (ev->isValid(date)) {
@@ -81,7 +81,7 @@ void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, const KData& kdata
         }
     }
 
-    auto& cn = sys->getCN();
+    auto cn = sys->getCN();
     if (cn) {
         for (const auto& date : dates) {
             if (cn->isValid(date)) {
@@ -90,7 +90,7 @@ void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, const KData& kdata
         }
     }
 
-    auto& sg = sys->getSG();
+    auto sg = sys->getSG();
     if (sg) {
         auto buy_dates = sg->getBuySignal();
         for (const auto& date : buy_dates) {
@@ -175,15 +175,11 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     const KQuery& query = kdata.getQuery();
     const Stock& stock = kdata.getStock();
 
-    for (size_t i = 0; i < run_ranges_len - 1; i++) {
-        KQuery range_query = KQueryByDate(run_ranges[i].second, run_ranges[i].second, query.kType(),
+    for (size_t i = 0; i < run_ranges_len; i++) {
+        KQuery range_query = KQueryByDate(run_ranges[i].first, run_ranges[i].second, query.kType(),
                                           query.recoverType());
         m_kdata_list.emplace_back(stock.getKData(range_query));
     }
-
-    m_kdata_list.emplace_back(stock.getKData(KQueryByDate(
-      run_ranges[run_ranges_len - 1].second, run_ranges[run_ranges_len - 1].second + Seconds(1),
-      query.kType(), query.recoverType())));
 
     for (auto& kdata : m_kdata_list) {
         if (kdata.empty()) {
