@@ -72,9 +72,9 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
 
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "[SE_Optimal] candidate sys count: {}", m_pro_sys_list.size());
-    for (const auto& sys : m_pro_sys_list) {
-        HKU_INFO_IF(trace, "[SE_Optimal] {}", sys->name());
-    }
+    // for (const auto& sys : m_pro_sys_list) {
+    //     HKU_DEBUG_IF(trace, "[SE_Optimal] {}", sys->name());
+    // }
 
     size_t train_len = static_cast<size_t>(getParam<int>("train_len"));
     size_t test_len = static_cast<size_t>(getParam<int>("test_len"));
@@ -82,7 +82,6 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
 
     auto dates = StockManager::instance().getTradingCalendar(query, getParam<string>("market"));
     size_t dates_len = dates.size();
-    // HKU_INFO("date_len: {}, last: {}", dates_len, dates.back());
 
     vector<std::pair<size_t, size_t>> train_ranges;
     size_t start = 0, end = train_len;
@@ -114,7 +113,6 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
             } else {
                 double max_value = std::numeric_limits<double>::lowest();
                 for (const auto& sys : m_pro_sys_list) {
-                    // sys->setParam<bool>("trace", trace);
                     sys->run(q, true);
                     per.statistics(sys->getTM(), end_date);
                     double value = per.get(key);
@@ -144,6 +142,7 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
             Datetime start_date = dates[train_ranges[i].first];
             Datetime end_date = dates[train_ranges[i].second];
             KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
+            HKU_INFO_IF(trace, "[SE_Optimal] iteration: {}, range: {}", i, q);
             SYSPtr min_sys;
             if (m_pro_sys_list.size() == 1) {
                 min_sys = m_pro_sys_list.back();
@@ -172,6 +171,7 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
                 m_sys_dict[dates[pos]] = min_sys;
             }
             m_run_ranges.emplace_back(std::make_pair(dates[test_start], dates[test_end]));
+            HKU_INFO_IF(trace, "[SE_Optimal] iteration: {}, min_sys: {}", i, min_sys->name());
         }
     }
 
