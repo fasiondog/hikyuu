@@ -232,8 +232,8 @@ void System::setTO(const KData& kdata) {
 
     HKU_TRACE_IF_RETURN(m_calculated, void(), "No need to calcule!");
 
-    m_stock = kdata.getStock();
-    KQuery query = kdata.getQuery();
+    m_stock = m_kdata.getStock();
+    KQuery query = m_kdata.getQuery();
     if (m_stock.isNull() || query.recoverType() == KQuery::NO_RECOVER) {
         m_src_kdata = m_kdata;
     } else {
@@ -248,13 +248,13 @@ void System::setTO(const KData& kdata) {
 
     // sg->setTO必须在cn->setTO之前，cn会使用到sg，防止sg被计算两次
     if (m_sg)
-        m_sg->setTO(kdata);  // 传入复权的 KData
+        m_sg->setTO(m_kdata);  // 传入复权的 KData
     if (m_cn)
-        m_cn->setTO(kdata);  // 传入复权的 KData
+        m_cn->setTO(m_kdata);  // 传入复权的 KData
     if (m_st)
-        m_st->setTO(kdata);  // 传入复权的 KData
+        m_st->setTO(m_kdata);  // 传入复权的 KData
     if (m_tp)
-        m_tp->setTO(kdata);  // 传入复权的 KData
+        m_tp->setTO(m_kdata);  // 传入复权的 KData
     if (m_pg)
         m_pg->setTO(m_src_kdata);  // 传入原始未复权的 KData
     if (m_sp)
@@ -379,13 +379,13 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
 
     bool trace = getParam<bool>("trace");
     setTO(kdata);
-    size_t total = kdata.size();
-    auto const* ks = kdata.data();
+    size_t total = m_kdata.size();
+    auto const* ks = m_kdata.data();
     auto const* src_ks = m_src_kdata.data();
 
     // 适应 strategy 模式下运行时同步资产信息可能造成的偏差
     Datetime tm_init_datetime = m_tm->initDatetime();
-    if (KQuery::getKTypeInMin(kdata.getQuery().kType()) >= 1440) {
+    if (KQuery::getKTypeInMin(m_kdata.getQuery().kType()) >= 1440) {
         tm_init_datetime = tm_init_datetime.startOfDay();
     }
 
@@ -395,7 +395,7 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
             if (trace) {
                 HKU_INFO_IF(!tr.isNull(), "{}", tr);
                 PositionRecord position = m_tm->getPosition(ks[i].datetime, m_stock);
-                FundsRecord funds = m_tm->getFunds(kdata.getQuery().kType());
+                FundsRecord funds = m_tm->getFunds(m_kdata.getQuery().kType());
                 if (position.number > 0.0) {
                     // clang-format off
                     HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
