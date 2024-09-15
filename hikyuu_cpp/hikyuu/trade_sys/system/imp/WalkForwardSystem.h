@@ -18,6 +18,7 @@ public:
     WalkForwardSystem(const SystemList& candidate_sys_list);
     virtual ~WalkForwardSystem() = default;
 
+    virtual void readyForRun() override;
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false) override;
     virtual TradeRecord runMoment(const Datetime& datetime) override;
 
@@ -33,7 +34,15 @@ public:
     virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date) override;
 
 private:
+    void syncDataFromSystem(const SYSPtr&, const KData&, bool isMoment);
+    void syncDataToSystem(const SYSPtr&);
+
+private:
+    SystemList m_candidate_sys_list;
     SEPtr m_se;
+    SYSPtr m_cur_sys;
+    vector<KData> m_kdata_list;
+    size_t m_cur_kdata{0};
 
 //========================================
 // 序列化支持
@@ -44,6 +53,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(System);
+        ar& BOOST_SERIALIZATION_NVP(m_candidate_sys_list);
         ar& BOOST_SERIALIZATION_NVP(m_se);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */

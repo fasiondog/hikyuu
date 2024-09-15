@@ -27,6 +27,7 @@ namespace hku {
 
 class HKU_API Portfolio;
 class HKU_API AllocateFundsBase;
+class HKU_API WalkForwardSystem;
 
 /**
  * 交易系统基类
@@ -36,6 +37,7 @@ class HKU_API System {
     PARAMETER_SUPPORT_WITH_CHECK
     friend class HKU_API Portfolio;
     friend class HKU_API AllocateFundsBase;
+    friend class HKU_API WalkForwardSystem;
 
 public:
     /** 默认构造函数 */
@@ -211,7 +213,7 @@ public:
     virtual TradeRecord runMoment(const Datetime& datetime);
 
     // 运行前准备工作, 失败将抛出异常
-    void readyForRun();
+    virtual void readyForRun();
 
     // 由各个相关组件调用，用于组件参数变化时通知 sys，以便重算
     void partChangedNotify() {

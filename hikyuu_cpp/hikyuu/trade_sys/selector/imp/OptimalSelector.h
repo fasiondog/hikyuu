@@ -21,8 +21,15 @@ public:
     virtual void _checkParam(const string& name) const override;
     virtual void calculate(const SystemList& pf_realSysList, const KQuery& query) override;
 
+    virtual void _reset() override;
+
+    const vector<std::pair<Datetime, Datetime>>& getRunRanges() const {
+        return m_run_ranges;
+    }
+
 private:
     unordered_map<Datetime, SYSPtr> m_sys_dict;
+    vector<std::pair<Datetime, Datetime>> m_run_ranges;
 };
 
 }  // namespace hku

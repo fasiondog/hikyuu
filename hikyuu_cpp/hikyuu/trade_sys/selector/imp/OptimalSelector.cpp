@@ -56,6 +56,11 @@ bool OptimalSelector::isMatchAF(const AFPtr& af) {
     return true;
 }
 
+void OptimalSelector::_reset() {
+    m_sys_dict.clear();
+    m_run_ranges.clear();
+}
+
 void OptimalSelector::_calculate() {}
 
 void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& query) {
@@ -106,16 +111,18 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
                 }
             }
 
-            if (max_sys) {
-                size_t test_start = train_ranges[i].second;
-                size_t test_end = test_start + test_len;
-                if (test_end > dates_len) {
-                    test_end = dates_len;
-                }
-                for (size_t pos = test_start; pos < test_end; pos++) {
-                    m_sys_dict[dates[pos]] = max_sys;
-                }
+            HKU_ASSERT(max_sys);
+            size_t test_start = train_ranges[i].second;
+            size_t test_end = test_start + test_len;
+            if (test_end > dates_len) {
+                test_end = dates_len;
             }
+            max_sys->reset();
+            max_sys = max_sys->clone();
+            for (size_t pos = test_start; pos < test_end; pos++) {
+                m_sys_dict[dates[pos]] = max_sys;
+            }
+            m_run_ranges.emplace_back(std::make_pair(dates[test_start], dates[test_end]));
         }
     } else {
         for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
@@ -138,16 +145,18 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
                 }
             }
 
-            if (min_sys) {
-                size_t test_start = train_ranges[i].second;
-                size_t test_end = test_start + test_len;
-                if (test_end > dates_len) {
-                    test_end = dates_len;
-                }
-                for (size_t pos = test_start; pos < test_end; pos++) {
-                    m_sys_dict[dates[pos]] = min_sys;
-                }
+            HKU_ASSERT(min_sys);
+            size_t test_start = train_ranges[i].second;
+            size_t test_end = test_start + test_len;
+            if (test_end > dates_len) {
+                test_end = dates_len;
             }
+            min_sys->reset();
+            min_sys = min_sys->clone();
+            for (size_t pos = test_start; pos < test_end; pos++) {
+                m_sys_dict[dates[pos]] = min_sys;
+            }
+            m_run_ranges.emplace_back(std::make_pair(dates[test_start], dates[test_end]));
         }
     }
 
