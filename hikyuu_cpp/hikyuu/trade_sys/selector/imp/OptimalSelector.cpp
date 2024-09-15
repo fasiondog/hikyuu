@@ -62,6 +62,10 @@ void OptimalSelector::_reset() {
     m_run_ranges.clear();
 }
 
+void OptimalSelector::_addSystem(const SYSPtr& sys) {
+    HKU_CHECK(!sys->getStock().isNull(), "Invalid system({}) for unspecified stock!", sys->name());
+}
+
 void OptimalSelector::_calculate() {}
 
 void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& query) {
@@ -162,8 +166,8 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
             HKU_ASSERT(min_sys);
             size_t test_start = train_ranges[i].second;
             size_t test_end = test_start + test_len;
-            if (test_end > dates_len) {
-                test_end = dates_len;
+            if (test_end >= dates_len) {
+                test_end = dates_len - 1;
             }
             min_sys->reset();
             min_sys = min_sys->clone();

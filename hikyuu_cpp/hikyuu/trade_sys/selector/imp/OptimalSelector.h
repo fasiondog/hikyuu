@@ -21,6 +21,7 @@ public:
     virtual void _checkParam(const string& name) const override;
     virtual void calculate(const SystemList& pf_realSysList, const KQuery& query) override;
 
+    virtual void _addSystem(const SYSPtr& sys) override;
     virtual void _reset() override;
 
     const vector<std::pair<Datetime, Datetime>>& getRunRanges() const {
