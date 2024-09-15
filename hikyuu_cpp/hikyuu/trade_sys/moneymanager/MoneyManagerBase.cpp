@@ -94,10 +94,9 @@ double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& st
         HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
     }
 
-    HKU_ERROR_IF_RETURN(
-      risk <= 0.0, 0.0,
-      "risk is negative! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f}) Part({})", datetime,
-      stock.market_code(), price, risk, getSystemPartName(from));
+    HKU_ERROR_IF_RETURN(risk <= 0.0, 0.0,
+                        "risk is negative! Datetime({}) Stock({}) price({:<.3f}) risk({}) Part({})",
+                        datetime, stock.market_code(), price, risk, getSystemPartName(from));
     return _getSellNumber(datetime, stock, price, risk, from);
 }
 

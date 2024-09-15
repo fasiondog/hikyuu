@@ -90,7 +90,7 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystem(const SystemList& sys_list, 
                                                     int sort_mode) {
     SPEND_TIME(findOptimalSystem);
     double init_val =
-      sort_mode == 0 ? std::numeric_limits<double>::min() : std::numeric_limits<double>::max();
+      sort_mode == 0 ? std::numeric_limits<double>::lowest() : std::numeric_limits<double>::max();
     std::pair<double, SYSPtr> result{init_val, SYSPtr()};
     size_t total = sys_list.size();
     HKU_IF_RETURN(0 == total, result);
@@ -140,7 +140,7 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystemMulti(const SystemList& sys_l
                                                          const string& sort_key, int sort_mode) {
     SPEND_TIME(findOptimalSystemMulti);
     double init_val =
-      sort_mode == 0 ? std::numeric_limits<double>::min() : std::numeric_limits<double>::max();
+      sort_mode == 0 ? std::numeric_limits<double>::lowest() : std::numeric_limits<double>::max();
     std::pair<double, SYSPtr> result{init_val, SYSPtr()};
     size_t total = sys_list.size();
     HKU_IF_RETURN(0 == total, result);
