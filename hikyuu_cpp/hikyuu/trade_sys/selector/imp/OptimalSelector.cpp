@@ -63,7 +63,7 @@ void OptimalSelector::_reset() {
 }
 
 void OptimalSelector::_addSystem(const SYSPtr& sys) {
-    HKU_CHECK(!sys->getStock().isNull(), "Invalid system({}) for unspecified stock!", sys->name());
+    CLS_CHECK(!sys->getStock().isNull(), "Invalid system({}) for unspecified stock!", sys->name());
 }
 
 void OptimalSelector::_calculate() {}
@@ -75,7 +75,7 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
     m_real_sys_list = pf_realSysList;
 
     bool trace = getParam<bool>("trace");
-    HKU_INFO_IF(trace, "[SE_Optimal] candidate sys list size: {}", m_pro_sys_list.size());
+    CLS_INFO_IF(trace, "candidate sys list size: {}", m_pro_sys_list.size());
     // for (const auto& sys : m_pro_sys_list) {
     //     HKU_DEBUG_IF(trace, "[SE_Optimal] {}", sys->name());
     // }
@@ -101,14 +101,14 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
 
     string key = getParam<string>("key");
     int mode = getParam<int>("mode");
-    HKU_INFO_IF(trace, "[SE_Optimal] statistic key: {}, mode: {}", key, mode);
+    CLS_INFO_IF(trace, "statistic key: {}, mode: {}", key, mode);
 
     Performance per;
     for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
         Datetime start_date = dates[train_ranges[i].first];
         Datetime end_date = dates[train_ranges[i].second];
         KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
-        HKU_INFO_IF(trace, "[SE_Optimal] iteration: {}, range: {}", i, q);
+        CLS_INFO_IF(trace, "iteration: {}|{}, range: {}", i + 1, total, q);
         SYSPtr selected_sys;
         if (m_pro_sys_list.size() == 1) {
             selected_sys = m_pro_sys_list.back();
@@ -118,6 +118,7 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
                 sys->run(q, true);
                 per.statistics(sys->getTM(), end_date);
                 double value = per.get(key);
+                CLS_INFO("value: {}, sys: {}, query: {}", value, sys->name(), sys->getQuery());
                 if (value > max_value) {
                     max_value = value;
                     selected_sys = sys;
@@ -153,7 +154,7 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
             m_run_ranges.emplace_back(
               std::make_pair(dates[test_start], dates[test_end - 1] + Seconds(1)));
         }
-        HKU_INFO_IF(trace, "[SE_Optimal] iteration: {}, selected_sys: {}", i, selected_sys->name());
+        CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1, selected_sys->name());
     }
 
     m_calculated = true;

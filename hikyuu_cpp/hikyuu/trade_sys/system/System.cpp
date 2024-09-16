@@ -241,10 +241,17 @@ void System::forceResetAll() {
 }
 
 void System::setTO(const KData& kdata) {
+    HKU_INFO("setTO {} {}, {}, {}", name(), m_kdata.getQuery() == kdata.getQuery(),
+             m_kdata.getQuery(), kdata.getQuery());
+    HKU_WARN("m_kdata == kdata: {}", m_kdata == kdata);
+    HKU_WARN("m_kdata != kdata: {}", m_kdata != kdata);
     if (m_kdata != kdata) {
         m_calculated = false;
         m_kdata = kdata;
+        HKU_WARN("k {}", m_kdata.getQuery());
     }
+
+    HKU_WARN("m_calculated: {}", m_calculated);
 
     HKU_TRACE_IF_RETURN(m_calculated, void(), "No need to calcule!");
 

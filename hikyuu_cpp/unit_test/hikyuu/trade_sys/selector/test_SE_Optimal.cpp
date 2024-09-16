@@ -120,7 +120,7 @@ TEST_CASE("test_SE_Optimal") {
         se->addSystem(sys);
     }
 
-    query = KQueryByIndex(-200);
+    query = KQueryByIndex(-125);
     KData k = getKData("sh000001", query);
     HKU_INFO("sh000001 k len: {}, {} - {}", k.size(), k[0].datetime, k[k.size() - 1].datetime);
     k = getKData("sz000001", query);
@@ -128,7 +128,7 @@ TEST_CASE("test_SE_Optimal") {
 
     se->setParam<bool>("trace", true);
     se->setParam<int>("train_len", 100);
-    se->setParam<int>("test_len", 20);
+    se->setParam<int>("test_len", 2);
     se->calculate(SystemList(), query);
 
     // HKU_INFO("total: {}", run_ranges.size());

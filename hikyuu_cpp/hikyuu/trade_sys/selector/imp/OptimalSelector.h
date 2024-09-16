@@ -11,6 +11,7 @@
 namespace hku {
 
 class OptimalSelector : public SelectorBase {
+    CLASS_LOGGER_IMP(SE_Optimal)
     SELECTOR_IMP(OptimalSelector)
     SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
