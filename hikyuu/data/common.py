@@ -91,7 +91,7 @@ def get_stktype_list(quotations=None):
 
 
 @hku_catch(ret=[], trace=True)
-@timeout(120)
+@timeout(30)
 def get_stk_code_name_list(market: str) -> list:
     """
     获取指定证券交易所股票代码与名称列表
@@ -128,7 +128,7 @@ def get_stk_code_name_list(market: str) -> list:
 
 
 @hku_catch(ret=[], trace=True)
-@timeout(120)
+@timeout(60)
 def get_index_code_name_list() -> list:
     """
     获取所有股票指数代码名称列表
@@ -191,7 +191,7 @@ def get_new_holidays():
 
 
 @hku_catch(ret=[], trace=True)
-@timeout(120)
+@timeout(60)
 def get_china_bond10_rate(start_date="19901219"):
     """获取中国国债收益率10年"""
     bond_zh_us_rate_df = ak.bond_zh_us_rate(start_date)
