@@ -118,7 +118,7 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
                 sys->run(q, true);
                 per.statistics(sys->getTM(), end_date);
                 double value = per.get(key);
-                CLS_INFO("value: {}, sys: {}, query: {}", value, sys->name(), sys->getQuery());
+                CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
                 if (value > max_value) {
                     max_value = value;
                     selected_sys = sys;
@@ -130,6 +130,7 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
                 sys->run(q, true);
                 per.statistics(sys->getTM(), end_date);
                 double value = per.get(key);
+                CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
                 if (value < min_value) {
                     min_value = value;
                     selected_sys = sys;
