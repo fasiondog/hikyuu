@@ -6,6 +6,9 @@
  */
 
 #include "hikyuu/trade_manage/crt/crtTM.h"
+#include "hikyuu/trade_sys/environment/crt/EV_Manual.h"
+#include "hikyuu/trade_sys/condition/crt/CN_Manual.h"
+#include "hikyuu/trade_sys/signal/crt/SG_Manual.h"
 #include "hikyuu/trade_sys/selector/crt/SE_Optimal.h"
 #include "hikyuu/trade_sys/selector/imp/OptimalSelector.h"
 #include "WalkForwardSystem.h"
@@ -41,16 +44,7 @@ void WalkForwardSystem::_reset() {
 }
 
 void WalkForwardSystem::_forceResetAll() {
-    m_kdata_list.clear();
-    m_cur_kdata = 0;
-    m_cur_sys.reset();
-    m_se->reset();
-
-    m_trade_list.clear();
-    m_buyRequest.clear();
-    m_sellRequest.clear();
-    m_sellShortRequest.clear();
-    m_buyShortRequest.clear();
+    this->_reset();
 }
 
 SystemPtr WalkForwardSystem::_clone() {
@@ -79,38 +73,6 @@ void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, const KData& kdata
     m_sell_short_days = sys->m_sell_short_days;
     m_lastTakeProfit = sys->m_lastTakeProfit;
     m_lastShortTakeProfit = sys->m_lastShortTakeProfit;
-
-    auto dates = kdata.getDatetimeList();
-    auto ev = sys->getEV();
-    if (ev) {
-        for (const auto& date : dates) {
-            if (ev->isValid(date)) {
-                m_ev->_addValid(date);
-            }
-        }
-    }
-
-    auto cn = sys->getCN();
-    if (cn) {
-        for (const auto& date : dates) {
-            if (cn->isValid(date)) {
-                m_cn->_addValid(date);
-            }
-        }
-    }
-
-    auto sg = sys->getSG();
-    if (sg) {
-        auto buy_dates = sg->getBuySignal();
-        for (const auto& date : buy_dates) {
-            m_sg->_addBuySignal(date);
-        }
-
-        auto sell_dates = sg->getSellSignal();
-        for (const auto& date : sell_dates) {
-            m_sg->_addSellSignal(date);
-        }
-    }
 }
 
 void WalkForwardSystem::syncDataToSystem(const SYSPtr& sys) {
@@ -242,6 +204,19 @@ TradeRecord WalkForwardSystem::pfProcessDelaySellRequest(const Datetime& date) {
         m_trade_list.push_back(ret);
         syncDataFromSystem(m_cur_sys, m_kdata_list[m_cur_kdata], true);
     }
+    return ret;
+}
+
+SystemPtr HKU_API SYS_WalkForward(const TradeManagerPtr& tm, const SystemList& candidate_sys_list,
+                                  const TradeManagerPtr& train_tm) {
+    HKU_CHECK(!tm, "input tm is null!");
+    SystemPtr ret;
+    if (train_tm) {
+        ret = make_shared<WalkForwardSystem>(candidate_sys_list, train_tm);
+    } else {
+        ret = make_shared<WalkForwardSystem>(candidate_sys_list, tm->clone());
+    }
+    ret->setTM(tm);
     return ret;
 }
 
