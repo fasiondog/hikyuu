@@ -15,7 +15,7 @@ namespace hku {
 class HKU_API WalkForwardSystem : public System {
 public:
     WalkForwardSystem();
-    WalkForwardSystem(const SystemList& candidate_sys_list);
+    WalkForwardSystem(const SystemList& candidate_sys_list, const TradeManagerPtr& train_tm);
     virtual ~WalkForwardSystem() = default;
 
     virtual void readyForRun() override;
@@ -38,7 +38,8 @@ private:
     void syncDataToSystem(const SYSPtr&);
 
 private:
-    SEPtr m_se;
+    SEPtr m_se;        // 寻优SE
+    TMPtr m_train_tm;  // 用于优化评估计算的账户
     SYSPtr m_cur_sys;
     vector<KData> m_kdata_list;
     size_t m_cur_kdata{0};
@@ -52,6 +53,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(System);
+        ar& BOOST_SERIALIZATION_NVP(m_train_tm);
         ar& BOOST_SERIALIZATION_NVP(m_se);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */

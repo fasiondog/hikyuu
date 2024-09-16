@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/trade_manage/crt/crtTM.h"
 #include "hikyuu/trade_sys/selector/crt/SE_Optimal.h"
 #include "hikyuu/trade_sys/selector/imp/OptimalSelector.h"
 #include "WalkForwardSystem.h"
@@ -15,11 +16,15 @@ BOOST_CLASS_EXPORT(hku::WalkForwardSystem)
 
 namespace hku {
 
-WalkForwardSystem::WalkForwardSystem() : System("SYS_Optimal"), m_se(SE_Optimal()) {}
+WalkForwardSystem::WalkForwardSystem()
+: System("SYS_Optimal"), m_se(SE_Optimal()), m_train_tm(crtTM()) {}
 
-WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list)
+WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list,
+                                     const TradeManagerPtr& train_tm)
 : System("SYS_Optimal"), m_se(SE_Optimal()) {
+    HKU_ASSERT(train_tm);
     m_se->addSystemList(candidate_sys_list);
+    m_train_tm = train_tm->clone();
 }
 
 void WalkForwardSystem::_reset() {
@@ -50,6 +55,7 @@ void WalkForwardSystem::_forceResetAll() {
 
 SystemPtr WalkForwardSystem::_clone() {
     WalkForwardSystem* p = new WalkForwardSystem();
+    p->m_train_tm = m_train_tm->clone();
     p->m_se = m_se->clone();
     p->m_se->reset();
     return SystemPtr(p);
@@ -124,35 +130,10 @@ void WalkForwardSystem::syncDataToSystem(const SYSPtr& sys) {
 
 void WalkForwardSystem::readyForRun() {
     HKU_CHECK(m_tm, "Not setTradeManager! {}", name());
-    HKU_CHECK(m_mm, "Not setMoneyManager! {}", name());
-    HKU_CHECK(m_sg, "Not setSignal! {}", name());
-
-    // 如果存在市场环境判断策略，则需要将默认的前一日市场有效标志置为false
-    // 因为需要由市场环境判断策略全权判定市场是否有效
-    if (m_ev)
-        m_pre_ev_valid = false;
-
-    if (m_cn) {
-        m_cn->setTM(m_tm);
-        m_cn->setSG(m_sg);
-        m_pre_cn_valid = false;  // 默认的前一日市场有效标志置为false
-    }
-
-    m_mm->setTM(m_tm);
-    if (m_pg)
-        m_pg->setTM(m_tm);
-    if (m_st)
-        m_st->setTM(m_tm);
-    if (m_tp)
-        m_tp->setTM(m_tm);
-
-    m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
-    m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
-
     m_se->reset();
     const auto& candidate_sys_list = m_se->getProtoSystemList();
     for (const auto& sys : candidate_sys_list) {
-        sys->setTM(getTM()->clone());
+        sys->setTM(m_train_tm->clone());
     }
     m_se->calculate(SystemList(), m_kdata.getQuery());
 }

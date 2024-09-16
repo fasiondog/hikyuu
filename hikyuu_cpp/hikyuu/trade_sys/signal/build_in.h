@@ -17,5 +17,6 @@
 #include "crt/SG_Single.h"
 #include "crt/SG_Bool.h"
 #include "crt/SG_Band.h"
+#include "crt/SG_Manual.h"
 
 #endif /* SIGNAL_BUILD_IN_H_ */
