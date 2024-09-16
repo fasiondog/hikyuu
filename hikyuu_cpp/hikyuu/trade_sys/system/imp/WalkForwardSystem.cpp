@@ -18,7 +18,9 @@ namespace hku {
 WalkForwardSystem::WalkForwardSystem() : System("SYS_Optimal"), m_se(SE_Optimal()) {}
 
 WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list)
-: System("SYS_Optimal"), m_se(SE_Optimal()), m_candidate_sys_list(candidate_sys_list) {}
+: System("SYS_Optimal"), m_se(SE_Optimal()) {
+    m_se->addSystemList(candidate_sys_list);
+}
 
 void WalkForwardSystem::_reset() {
     m_kdata_list.clear();
@@ -49,6 +51,7 @@ void WalkForwardSystem::_forceResetAll() {
 SystemPtr WalkForwardSystem::_clone() {
     WalkForwardSystem* p = new WalkForwardSystem();
     p->m_se = m_se->clone();
+    p->m_se->reset();
     return SystemPtr(p);
 }
 
@@ -146,11 +149,11 @@ void WalkForwardSystem::readyForRun() {
     m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
     m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
 
-    m_se->removeAll();
-    for (auto& sys : m_candidate_sys_list) {
+    m_se->reset();
+    const auto& candidate_sys_list = m_se->getProtoSystemList();
+    for (const auto& sys : candidate_sys_list) {
         sys->setTM(getTM()->clone());
     }
-    m_se->addSystemList(m_candidate_sys_list);
     m_se->calculate(SystemList(), m_kdata.getQuery());
 }
 
