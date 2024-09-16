@@ -30,8 +30,13 @@ public:
     }
 
 private:
+    void _calculate_single(const vector<std::pair<size_t, size_t>>& train_ranges,
+                           const DatetimeList& dates, const string& key, int mode, size_t test_len,
+                           bool trace);
+
     void _calculate_parallel(const vector<std::pair<size_t, size_t>>& train_ranges,
-                             const DatetimeList& dates);
+                             const DatetimeList& dates, const string& key, int mode,
+                             size_t test_len, bool trace);
 
 private:
     unordered_map<Datetime, SYSPtr> m_sys_dict;

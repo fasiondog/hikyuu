@@ -123,7 +123,7 @@ TEST_CASE("test_SE_Optimal") {
 
     query = KQueryByIndex(-125);
     // se->setParam<bool>("trace", true);
-    se->setParam<bool>("parallel", true);
+    // se->setParam<bool>("parallel", true);
     se->setParam<int>("train_len", 30);
     se->setParam<int>("test_len", 20);
     se->calculate(SystemList(), query);
