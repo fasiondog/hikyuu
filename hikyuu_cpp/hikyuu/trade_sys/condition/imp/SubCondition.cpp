@@ -7,6 +7,10 @@
 
 #include "SubCondition.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::SubCondition)
+#endif
+
 namespace hku {
 
 SubCondition::SubCondition() : ConditionBase("CN_Sub") {}
