@@ -21,6 +21,7 @@ OptimalSelector::OptimalSelector() : SelectorBase("SE_Optimal") {
     setParam<int>("mode", 0);  // 0 取最高值，1 取最低值
     setParam<int>("train_len", 100);
     setParam<int>("test_len", 20);
+    setParam<bool>("parallel", false);
     setParam<bool>("trace", false);
 }
 
@@ -103,6 +104,11 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
     int mode = getParam<int>("mode");
     CLS_INFO_IF(trace, "statistic key: {}, mode: {}", key, mode);
 
+    if (getParam<bool>("parallel")) {
+        _calculate_parallel(train_ranges, dates);
+        return;
+    }
+
     Performance per;
     for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
         Datetime start_date = dates[train_ranges[i].first];
@@ -158,6 +164,80 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
         CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1, selected_sys->name());
     }
 
+    m_calculated = true;
+}
+
+void OptimalSelector::_calculate_parallel(const vector<std::pair<size_t, size_t>>& train_ranges,
+                                          const DatetimeList& dates) {
+    auto sys_list = parallel_for_index(
+      0, train_ranges.size(), [this, &train_ranges, &dates, query = m_query](size_t i) {
+          bool trace = getParam<bool>("trace");
+          string key = getParam<string>("key");
+          int mode = getParam<int>("mode");
+
+          Datetime start_date = dates[train_ranges[i].first];
+          Datetime end_date = dates[train_ranges[i].second];
+          KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
+          CLS_INFO_IF(trace, "iteration: {}|{}, range: {}", i + 1, train_ranges.size(), q);
+
+          Performance per;
+          SYSPtr selected_sys;
+          if (m_pro_sys_list.size() == 1) {
+              selected_sys = m_pro_sys_list.back();
+          } else if (0 == mode) {
+              double max_value = std::numeric_limits<double>::lowest();
+              for (const auto& sys : m_pro_sys_list) {
+                  sys->run(q, true);
+                  per.statistics(sys->getTM(), end_date);
+                  double value = per.get(key);
+                  CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
+                  if (value > max_value) {
+                      max_value = value;
+                      selected_sys = sys;
+                  }
+              }
+          } else if (1 == mode) {
+              double min_value = std::numeric_limits<double>::max();
+              for (const auto& sys : m_pro_sys_list) {
+                  sys->run(q, true);
+                  per.statistics(sys->getTM(), end_date);
+                  double value = per.get(key);
+                  CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
+                  if (value < min_value) {
+                      min_value = value;
+                      selected_sys = sys;
+                  }
+              }
+          }
+
+          HKU_IF_RETURN(!selected_sys, selected_sys);
+
+          selected_sys->reset();
+          return selected_sys->clone();
+      });
+
+    // size_t train_len = static_cast<size_t>(getParam<int>("train_len"));
+    bool trace = getParam<bool>("trace");
+    size_t dates_len = dates.size();
+    size_t test_len = static_cast<size_t>(getParam<int>("test_len"));
+    for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
+        size_t test_start = train_ranges[i].second;
+        size_t test_end = test_start + test_len;
+        if (test_end > dates_len) {
+            test_end = dates_len;
+        }
+        const auto& selected_sys = sys_list[i];
+        for (size_t pos = test_start; pos < test_end; pos++) {
+            m_sys_dict[dates[pos]] = selected_sys;
+        }
+        if (test_end < dates_len) {
+            m_run_ranges.emplace_back(std::make_pair(dates[test_start], dates[test_end]));
+        } else {
+            m_run_ranges.emplace_back(
+              std::make_pair(dates[test_start], dates[test_end - 1] + Seconds(1)));
+        }
+        CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1, selected_sys->name());
+    }
     m_calculated = true;
 }
 

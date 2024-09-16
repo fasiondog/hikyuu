@@ -30,6 +30,10 @@ public:
     }
 
 private:
+    void _calculate_parallel(const vector<std::pair<size_t, size_t>>& train_ranges,
+                             const DatetimeList& dates);
+
+private:
     unordered_map<Datetime, SYSPtr> m_sys_dict;
     vector<std::pair<Datetime, Datetime>> m_run_ranges;
 };
