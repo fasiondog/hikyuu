@@ -75,7 +75,7 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
     m_real_sys_list = pf_realSysList;
 
     bool trace = getParam<bool>("trace");
-    HKU_INFO_IF(trace, "[SE_Optimal] candidate sys count: {}", m_pro_sys_list.size());
+    HKU_INFO_IF(trace, "[SE_Optimal] candidate sys list size: {}", m_pro_sys_list.size());
     // for (const auto& sys : m_pro_sys_list) {
     //     HKU_DEBUG_IF(trace, "[SE_Optimal] {}", sys->name());
     // }
