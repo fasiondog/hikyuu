@@ -457,7 +457,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     bool trace = getParam<bool>("trace");
     if (trace) {
         HKU_INFO("{} ------------------------------------------------------", today.datetime);
-        HKU_INFO("[{}] today {} ", name(), today);
+        HKU_INFO("[{}] cal today {} ", name(), today);
         HKU_INFO("[{}] raw today {} ", name(), src_today);
         HKU_INFO_IF(m_kdata.getQuery().recoverType() != KQuery::NO_RECOVER, "[{}] Restitution {} ",
                     name(), src_today);

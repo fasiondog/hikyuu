@@ -13,6 +13,8 @@
 namespace hku {
 
 class HKU_API WalkForwardSystem : public System {
+    CLASS_LOGGER_IMP(SYS_WalkForward)
+
 public:
     WalkForwardSystem();
     WalkForwardSystem(const SystemList& candidate_sys_list, const TradeManagerPtr& train_tm);

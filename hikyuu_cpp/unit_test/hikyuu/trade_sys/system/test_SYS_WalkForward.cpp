@@ -51,7 +51,8 @@ TEST_CASE("test_SYS_WalkForword") {
 
     /** @arg 只有一个候选系统 */
     sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm);
-    query = KQueryByIndex(-500);
+    query = KQueryByIndex(-150);
+    sys->setParam<bool>("trace", true);
     sys->run(stk, query);
     // HKU_INFO("{}", sys->str());
     // std::cout << sys << std::endl;

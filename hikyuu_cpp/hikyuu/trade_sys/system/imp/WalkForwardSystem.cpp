@@ -35,12 +35,12 @@ string WalkForwardSystem::str() const {
     return os.str();
 }
 
-WalkForwardSystem::WalkForwardSystem() : System("SYS_Optimal"), m_se(SE_Optimal()) {}
+WalkForwardSystem::WalkForwardSystem() : System("SYS_WalkForward"), m_se(SE_Optimal()) {}
 
 WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list,
                                      const TradeManagerPtr& train_tm)
-: System("SYS_Optimal"), m_se(SE_Optimal()), m_train_tm(train_tm) {
-    HKU_ASSERT(!candidate_sys_list.empty());
+: System("SYS_WalkForward"), m_se(SE_Optimal()), m_train_tm(train_tm) {
+    CLS_ASSERT(!candidate_sys_list.empty());
     m_se->addSystemList(candidate_sys_list);
 }
 
@@ -77,7 +77,9 @@ SystemPtr WalkForwardSystem::_clone() {
 void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, const KData& kdata, bool isMoment) {
     if (!isMoment) {
         const auto& sys_trade_list = sys->getTradeRecordList();
-        std::copy(sys_trade_list.cbegin(), sys_trade_list.cend(), m_trade_list.begin());
+        for (const auto& tr : sys_trade_list) {
+            m_trade_list.emplace_back(tr);
+        }
     }
 
     m_buyRequest = sys->getBuyTradeRequest();
@@ -110,16 +112,16 @@ void WalkForwardSystem::syncDataToSystem(const SYSPtr& sys) {
 }
 
 void WalkForwardSystem::readyForRun() {
-    HKU_CHECK(m_tm, "Not TradeManager was specified! {}", name());
+    CLS_CHECK(m_tm, "Not TradeManager was specified! {}", name());
     if (!m_train_tm) {
         m_train_tm = m_tm->clone();
     }
 
     m_se->reset();
     const auto& candidate_sys_list = m_se->getProtoSystemList();
-    HKU_CHECK(!candidate_sys_list.empty(), "Candidate sys list is empty!");
+    CLS_CHECK(!candidate_sys_list.empty(), "Candidate sys list is empty!");
 
-    for (const auto& sys : candidate_sys_list) {
+    for (auto& sys : candidate_sys_list) {
         sys->setTM(m_train_tm->clone());
         sys->setStock(m_stock);
     }
@@ -134,9 +136,10 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
         this->reset();
     }
 
-    HKU_DEBUG_IF_RETURN(m_calculated && m_kdata == kdata, void(), "Not need calculate.");
+    CLS_DEBUG_IF_RETURN(m_calculated && m_kdata == kdata, void(), "Not need calculate.");
 
     m_kdata = kdata;
+    m_stock = m_kdata.getStock();
     readyForRun();
 
     OptimalSelector* se_ptr = dynamic_cast<OptimalSelector*>(m_se.get());
@@ -153,19 +156,46 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
         m_kdata_list.emplace_back(stock.getKData(range_query));
     }
 
-    for (auto& kdata : m_kdata_list) {
+    bool trace = getParam<bool>("trace");
+    for (size_t i = 0, total = m_kdata_list.size(); i < total; i++) {
+        const auto& kdata = m_kdata_list[i];
         if (kdata.empty()) {
+            CLS_INFO_IF(trace,
+                        "\n+-------------------------------------------------------------------"
+                        "\n|  name: {} "
+                        "\n|  iteration {}|{}"
+                        "\n|  ignore, this iteration kdata is empty."
+                        "\n+-------------------------------------------------------------------\n",
+                        name(), i + 1, total);
             continue;
         }
 
         auto sw_list = m_se->getSelected(kdata[0].datetime);
         if (!sw_list.empty()) {
             auto& sys = sw_list.front().sys;
+            CLS_INFO_IF(trace,
+                        "\n+-------------------------------------------------------------------"
+                        "\n|  name: {} "
+                        "\n|  iteration {}|{}: {}, {}"
+                        "\n|  use sys: {}"
+                        "\n+-------------------------------------------------------------------\n",
+                        name(), i + 1, total, kdata[0].datetime, kdata[kdata.size() - 1].datetime,
+                        sys->name());
+
             sys->setTM(getTM());
             sys->readyForRun();
+            sys->setParam<bool>("trace", trace);
             syncDataToSystem(sys);
             sys->run(kdata);
             syncDataFromSystem(sys, kdata, false);
+        } else {
+            CLS_INFO_IF(trace,
+                        "\n+-------------------------------------------------------------------"
+                        "\n|  name: {} "
+                        "\n|  iteration {}|{}"
+                        "\n|  ignore no selected sys."
+                        "\n+-------------------------------------------------------------------\n",
+                        name(), i + 1, total);
         }
     }
 
