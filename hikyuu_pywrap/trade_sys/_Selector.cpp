@@ -46,6 +46,10 @@ public:
     bool isMatchAF(const AFPtr& af) override {
         PYBIND11_OVERLOAD_PURE_NAME(bool, SelectorBase, "is_match_af", isMatchAF, af);
     }
+
+    string str() const override {
+        PYBIND11_OVERRIDE_NAME(string, SelectorBase, "__str__", str, );
+    }
 };
 
 void export_Selector(py::module& m) {
@@ -75,8 +79,8 @@ void export_Selector(py::module& m) {
         
     :param str name: 名称)")
 
-      .def("__str__", to_py_str<SelectorBase>)
-      .def("__repr__", to_py_str<SelectorBase>)
+      .def("__str__", &SelectorBase::str)
+      .def("__repr__", &SelectorBase::str)
 
       .def_property("name", py::overload_cast<>(&SelectorBase::name, py::const_),
                     py::overload_cast<const string&>(&SelectorBase::name),

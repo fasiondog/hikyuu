@@ -53,11 +53,22 @@ TEST_CASE("test_SE_Optimal") {
 
     /** @arg 尝试加入未指定证券标的的系统 */
     sys = create_test_sys(2, 3);
-    CHECK_THROWS(se->addSystem(sys));
+    // CHECK_THROWS(se->addSystem(sys));
+    se->addSystem(sys);
+    se->calculate(SystemList(), KQueryByIndex(-50));
+    OptimalSelector* raw_se = dynamic_cast<OptimalSelector*>(se.get());
+    CHECK_UNARY(raw_se->getRunRanges().empty());
 
     /** @arg 尝试加入未指定证券标的的系统列表 */
     sys = create_test_sys(2, 3);
-    CHECK_THROWS(se->addSystemList({sys}));
+    se->addSystemList({sys});
+    se->calculate(SystemList(), KQueryByIndex(-50));
+    CHECK_UNARY(raw_se->getRunRanges().empty());
+
+    /** @arg 候选系统列表长度为0 */
+    se->removeAll();
+    REQUIRE(se->getProtoSystemList().empty());
+    se->calculate(SystemList(), KQueryByIndex(-50));
 
     /** @arg 只有一个候选系统 */
     Stock stk = getStock("sz000001");
@@ -70,7 +81,6 @@ TEST_CASE("test_SE_Optimal") {
     se->setParam<int>("train_len", 30);
     se->setParam<int>("test_len", 25);
     se->calculate(SystemList(), query);
-    OptimalSelector* raw_se = dynamic_cast<OptimalSelector*>(se.get());
     auto run_ranges = raw_se->getRunRanges();
     CHECK_EQ(run_ranges.size(), 1);
     auto dates = StockManager::instance().getTradingCalendar(query);

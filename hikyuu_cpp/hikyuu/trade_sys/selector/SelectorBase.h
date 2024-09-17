@@ -129,6 +129,8 @@ public:
 
     void calculate_proto(const KQuery& query);
 
+    virtual string str() const;
+
 private:
     void initParam();
 

@@ -11,25 +11,30 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const System& sys) {
-    string strip(",\n");
-    string space("  ");
-    os << "System{\n"
-       << space << sys.name() << strip << space << sys.getTO().getQuery() << strip << space
-       << sys.getStock() << strip << space << sys.getParameter() << strip << space << sys.getEV()
-       << strip << space << sys.getCN() << strip << space << sys.getMM() << strip << space
-       << sys.getSG() << strip << space << sys.getST() << strip << space << sys.getTP() << strip
-       << space << sys.getPG() << strip << space << sys.getSP() << strip << space
-       << (sys.getTM() ? sys.getTM()->str() : "TradeManager(NULL)") << strip << "}";
+    os << sys.str();
     return os;
 }
 
 HKU_API std::ostream& operator<<(std::ostream& os, const SystemPtr& sys) {
     if (sys) {
-        os << *sys;
+        os << sys->str();
     } else {
         os << "System(NULL)";
     }
     return os;
+}
+
+string System::str() const {
+    std::ostringstream os;
+    string strip(",\n");
+    string space("  ");
+    os << "System{\n"
+       << space << name() << strip << space << getTO().getQuery() << strip << space << getStock()
+       << strip << space << getParameter() << strip << space << getEV() << strip << space << getCN()
+       << strip << space << getMM() << strip << space << getSG() << strip << space << getST()
+       << strip << space << getTP() << strip << space << getPG() << strip << space << getSP()
+       << strip << space << (getTM() ? getTM()->str() : "TradeManager(NULL)") << strip << "}";
+    return os.str();
 }
 
 System::System()

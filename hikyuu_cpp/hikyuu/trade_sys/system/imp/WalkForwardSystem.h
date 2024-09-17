@@ -26,6 +26,8 @@ public:
     virtual void _forceResetAll() override;
     virtual SystemPtr _clone() override;
 
+    virtual string str() const override;
+
 public:
     virtual TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) override;
     virtual TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) override;
@@ -53,8 +55,8 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(System);
-        ar& BOOST_SERIALIZATION_NVP(m_train_tm);
         ar& BOOST_SERIALIZATION_NVP(m_se);
+        ar& BOOST_SERIALIZATION_NVP(m_train_tm);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };

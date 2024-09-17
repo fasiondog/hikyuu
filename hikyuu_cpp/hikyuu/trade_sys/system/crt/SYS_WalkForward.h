@@ -11,7 +11,9 @@
 
 namespace hku {
 
-SystemPtr HKU_API SYS_WalkForward(const TradeManagerPtr& tm, const SystemList& candidate_sys_list,
+SystemPtr HKU_API SYS_WalkForward(const SystemList& candidate_sys_list,
+                                  const TradeManagerPtr& tm = TradeManagerPtr(),
+                                  size_t train_len = 100, size_t test_len = 20,
                                   const TradeManagerPtr& train_tm = TradeManagerPtr());
 
 }

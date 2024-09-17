@@ -5,10 +5,6 @@
  *      Author: fasiondog
  */
 
-#include "hikyuu/trade_manage/crt/crtTM.h"
-#include "hikyuu/trade_sys/environment/crt/EV_Manual.h"
-#include "hikyuu/trade_sys/condition/crt/CN_Manual.h"
-#include "hikyuu/trade_sys/signal/crt/SG_Manual.h"
 #include "hikyuu/trade_sys/selector/crt/SE_Optimal.h"
 #include "hikyuu/trade_sys/selector/imp/OptimalSelector.h"
 #include "WalkForwardSystem.h"
@@ -19,15 +15,33 @@ BOOST_CLASS_EXPORT(hku::WalkForwardSystem)
 
 namespace hku {
 
-WalkForwardSystem::WalkForwardSystem()
-: System("SYS_Optimal"), m_se(SE_Optimal()), m_train_tm(crtTM()) {}
+string WalkForwardSystem::str() const {
+    std::ostringstream os;
+    string strip(",\n");
+    string space("  ");
+    TMPtr train_tm = m_train_tm ? m_train_tm : m_tm;
+    string train_tm_str("Train TradeManager(NULL)");
+    if (train_tm) {
+        train_tm_str = fmt::format("Train TradeManager(init date: {}, init cash: {})",
+                                   train_tm->initDatetime(), train_tm->initCash());
+    }
+    os << "System{\n"
+       << space << name() << strip << space << getTO().getQuery() << strip << space << getStock()
+       << strip << space << getParameter() << strip << space << m_se << strip << space
+       << train_tm_str << strip << space << getEV() << strip << space << getCN() << strip << space
+       << getMM() << strip << space << getSG() << strip << space << getST() << strip << space
+       << getTP() << strip << space << getPG() << strip << space << getSP() << strip << space
+       << (getTM() ? getTM()->str() : "TradeManager(NULL)") << strip << "}";
+    return os.str();
+}
+
+WalkForwardSystem::WalkForwardSystem() : System("SYS_Optimal"), m_se(SE_Optimal()) {}
 
 WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list,
                                      const TradeManagerPtr& train_tm)
-: System("SYS_Optimal"), m_se(SE_Optimal()) {
-    HKU_ASSERT(train_tm);
+: System("SYS_Optimal"), m_se(SE_Optimal()), m_train_tm(train_tm) {
+    HKU_ASSERT(!candidate_sys_list.empty());
     m_se->addSystemList(candidate_sys_list);
-    m_train_tm = train_tm->clone();
 }
 
 void WalkForwardSystem::_reset() {
@@ -35,6 +49,9 @@ void WalkForwardSystem::_reset() {
     m_cur_kdata = 0;
     m_cur_sys.reset();
     m_se->reset();
+    if (m_train_tm) {
+        m_train_tm->reset();
+    }
 
     m_trade_list.clear();
     m_buyRequest.clear();
@@ -49,9 +66,11 @@ void WalkForwardSystem::_forceResetAll() {
 
 SystemPtr WalkForwardSystem::_clone() {
     WalkForwardSystem* p = new WalkForwardSystem();
-    p->m_train_tm = m_train_tm->clone();
     p->m_se = m_se->clone();
     p->m_se->reset();
+    if (m_train_tm) {
+        p->m_train_tm = m_train_tm->clone();
+    }
     return SystemPtr(p);
 }
 
@@ -91,11 +110,18 @@ void WalkForwardSystem::syncDataToSystem(const SYSPtr& sys) {
 }
 
 void WalkForwardSystem::readyForRun() {
-    HKU_CHECK(m_tm, "Not setTradeManager! {}", name());
+    HKU_CHECK(m_tm, "Not TradeManager was specified! {}", name());
+    if (!m_train_tm) {
+        m_train_tm = m_tm->clone();
+    }
+
     m_se->reset();
     const auto& candidate_sys_list = m_se->getProtoSystemList();
+    HKU_CHECK(!candidate_sys_list.empty(), "Candidate sys list is empty!");
+
     for (const auto& sys : candidate_sys_list) {
         sys->setTM(m_train_tm->clone());
+        sys->setStock(m_stock);
     }
     m_se->calculate(SystemList(), m_kdata.getQuery());
 }
@@ -207,16 +233,13 @@ TradeRecord WalkForwardSystem::pfProcessDelaySellRequest(const Datetime& date) {
     return ret;
 }
 
-SystemPtr HKU_API SYS_WalkForward(const TradeManagerPtr& tm, const SystemList& candidate_sys_list,
+SystemPtr HKU_API SYS_WalkForward(const SystemList& candidate_sys_list, const TradeManagerPtr& tm,
+                                  size_t train_len, size_t test_len,
                                   const TradeManagerPtr& train_tm) {
-    HKU_CHECK(!tm, "input tm is null!");
-    SystemPtr ret;
-    if (train_tm) {
-        ret = make_shared<WalkForwardSystem>(candidate_sys_list, train_tm);
-    } else {
-        ret = make_shared<WalkForwardSystem>(candidate_sys_list, tm->clone());
-    }
+    SystemPtr ret = make_shared<WalkForwardSystem>(candidate_sys_list, train_tm);
     ret->setTM(tm);
+    ret->setParam<int>("train_len", train_len);
+    ret->setParam<int>("test_len", test_len);
     return ret;
 }
 

@@ -228,6 +228,8 @@ public:
         return make_shared<System>();
     }
 
+    virtual string str() const;
+
 public:
     //-------------------------
     // 仅供 PF/AF 内部调用

@@ -14,6 +14,13 @@ BOOST_CLASS_EXPORT(hku::OptimalSelector)
 
 namespace hku {
 
+string OptimalSelector::str() const {
+    std::ostringstream buf;
+    buf << "Selector(" << name() << ", " << getParameter()
+        << ", candidate systems count: " << m_pro_sys_list.size() << ")";
+    return buf.str();
+}
+
 OptimalSelector::OptimalSelector() : SelectorBase("SE_Optimal") {
     setParam<bool>("depend_on_proto_sys", true);
     setParam<string>("market", "SH");
@@ -63,10 +70,6 @@ void OptimalSelector::_reset() {
     m_run_ranges.clear();
 }
 
-void OptimalSelector::_addSystem(const SYSPtr& sys) {
-    CLS_CHECK(!sys->getStock().isNull(), "Invalid system({}) for unspecified stock!", sys->name());
-}
-
 void OptimalSelector::_calculate() {}
 
 void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& query) {
@@ -77,6 +80,13 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
 
     bool trace = getParam<bool>("trace");
     CLS_INFO_IF(trace, "candidate sys list size: {}", m_pro_sys_list.size());
+    CLS_WARN_IF_RETURN(m_pro_sys_list.empty(), void(), "candidate sys list is empty!");
+
+    // 运行时检查，而不是 addSystem 时检查，以便 WalkForwordSystem 可以直接加入未指定标的的系统列表
+    for (const auto& sys : m_pro_sys_list) {
+        CLS_ERROR_IF_RETURN(sys->getStock().isNull(), void(),
+                            "The candidate sys ({}) was specified stock!", sys->name());
+    }
 
     size_t train_len = static_cast<size_t>(getParam<int>("train_len"));
     size_t test_len = static_cast<size_t>(getParam<int>("test_len"));

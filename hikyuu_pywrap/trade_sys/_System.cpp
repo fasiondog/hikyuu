@@ -61,9 +61,8 @@ void export_System(py::module& m) {
         DEF_PICKLE(TradeRequest);
 
     //--------------------------------------------------------------------------------------
-    py::class_<System, SystemPtr>(
-      m, "System",
-      R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
+    py::class_<System, SystemPtr>(m, "System",
+                                  R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
 
 系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
@@ -83,8 +82,8 @@ void export_System(py::module& m) {
       .def(py::init<const TradeManagerPtr&, const MoneyManagerPtr&, const EnvironmentPtr&,
                     const ConditionPtr&, const SignalPtr&, const StoplossPtr&, const StoplossPtr&,
                     const ProfitGoalPtr&, const SlippagePtr&, const string&>())
-      .def("__str__", to_py_str<System>)
-      .def("__repr__", to_py_str<System>)
+      .def("__str__", &System::str)
+      .def("__repr__", &System::str)
 
       .def_property("name", py::overload_cast<>(&System::name, py::const_),
                     py::overload_cast<const string&>(&System::name), py::return_value_policy::copy,
