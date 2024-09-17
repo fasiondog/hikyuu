@@ -54,7 +54,8 @@ TEST_CASE("test_SYS_WalkForword") {
     query = KQueryByIndex(-150);
     sys->setParam<bool>("trace", true);
     sys->run(stk, query);
-    // HKU_INFO("{}", sys->str());
+    HKU_INFO("{}", sys->getBuyTradeRequest());
+    // HKU_INFO("{}", sys);
     // std::cout << sys << std::endl;
 }
 

@@ -50,6 +50,9 @@ void export_System(py::module& m) {
 本身的运行没有影响。)")
 
       .def(py::init<>())
+      .def("__str__", to_py_str<TradeRequest>)
+      .def("__repr__", to_py_str<TradeRequest>)
+
       .def_readwrite("valid", &TradeRequest::valid, "该交易请求记录是否有效（True | False）")
       .def_readwrite("business", &TradeRequest::business,
                      "交易业务类型，参见：:py:class:`hikyuu.trade_manage.BUSINESS`")
@@ -82,8 +85,8 @@ void export_System(py::module& m) {
       .def(py::init<const TradeManagerPtr&, const MoneyManagerPtr&, const EnvironmentPtr&,
                     const ConditionPtr&, const SignalPtr&, const StoplossPtr&, const StoplossPtr&,
                     const ProfitGoalPtr&, const SlippagePtr&, const string&>())
-      .def("__str__", &System::str)
-      .def("__repr__", &System::str)
+      .def("__str__", to_py_str<System>)
+      .def("__repr__", to_py_str<System>)
 
       .def_property("name", py::overload_cast<>(&System::name, py::const_),
                     py::overload_cast<const string&>(&System::name), py::return_value_policy::copy,
@@ -263,4 +266,6 @@ void export_System(py::module& m) {
     :param ProfitGoalBase pg: 盈利目标策略
     :param SlippageBase sp: 移滑价差算法
     :return: system实例)");
+
+    m.def("SYS_WalkForward", SYS_WalkForward);
 }

@@ -185,8 +185,8 @@ void System::reset() {
     //  m_stock
 
     m_calculated = false;
-    m_pre_ev_valid = false;  // true;
-    m_pre_cn_valid = false;  // true;
+    m_pre_ev_valid = m_ev ? false : true;
+    m_pre_cn_valid = m_cn ? false : true;
 
     m_buy_days = 0;
     m_sell_short_days = 0;
@@ -228,8 +228,8 @@ void System::forceResetAll() {
     m_kdata = Null<KData>();
 
     m_calculated = false;
-    m_pre_ev_valid = false;  // true;
-    m_pre_cn_valid = false;  // true;
+    m_pre_ev_valid = m_ev ? false : true;
+    m_pre_cn_valid = m_cn ? false : true;
 
     m_buy_days = 0;
     m_sell_short_days = 0;
@@ -418,7 +418,7 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
             if (trace) {
                 HKU_INFO_IF(!tr.isNull(), "{}", tr);
                 PositionRecord position = m_tm->getPosition(ks[i].datetime, m_stock);
-                FundsRecord funds = m_tm->getFunds(m_kdata.getQuery().kType());
+                FundsRecord funds = m_tm->getFunds(ks[i].datetime, m_kdata.getQuery().kType());
                 if (position.number > 0.0) {
                     // clang-format off
                     HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");

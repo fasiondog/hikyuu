@@ -160,42 +160,52 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     for (size_t i = 0, total = m_kdata_list.size(); i < total; i++) {
         const auto& kdata = m_kdata_list[i];
         if (kdata.empty()) {
-            CLS_INFO_IF(trace,
-                        "\n+-------------------------------------------------------------------"
-                        "\n|  name: {} "
-                        "\n|  iteration {}|{}"
-                        "\n|  ignore, this iteration kdata is empty."
-                        "\n+-------------------------------------------------------------------\n",
-                        name(), i + 1, total);
+            CLS_INFO_IF(
+              trace,
+              "\n+======================================================================="
+              "\n|"
+              "\n|  name: {} "
+              "\n|  iteration {}|{}"
+              "\n|  ignore, this iteration kdata is empty."
+              "\n|"
+              "\n+=======================================================================\n",
+              name(), i + 1, total);
             continue;
         }
 
         auto sw_list = m_se->getSelected(kdata[0].datetime);
         if (!sw_list.empty()) {
             auto& sys = sw_list.front().sys;
-            CLS_INFO_IF(trace,
-                        "\n+-------------------------------------------------------------------"
-                        "\n|  name: {} "
-                        "\n|  iteration {}|{}: {}, {}"
-                        "\n|  use sys: {}"
-                        "\n+-------------------------------------------------------------------\n",
-                        name(), i + 1, total, kdata[0].datetime, kdata[kdata.size() - 1].datetime,
-                        sys->name());
+            CLS_INFO_IF(
+              trace,
+              "\n+======================================================================="
+              "\n|"
+              "\n|  name: {} "
+              "\n|  iteration {}|{}: {}, {}"
+              "\n|  use sys: {}"
+              "\n|"
+              "\n+=======================================================================\n",
+              name(), i + 1, total, kdata[0].datetime, kdata[kdata.size() - 1].datetime,
+              sys->name());
 
+            sys->setParam<bool>("shared_tm", true);
+            sys->setParam<bool>("trace", trace);
             sys->setTM(getTM());
             sys->readyForRun();
-            sys->setParam<bool>("trace", trace);
             syncDataToSystem(sys);
             sys->run(kdata);
             syncDataFromSystem(sys, kdata, false);
         } else {
-            CLS_INFO_IF(trace,
-                        "\n+-------------------------------------------------------------------"
-                        "\n|  name: {} "
-                        "\n|  iteration {}|{}"
-                        "\n|  ignore no selected sys."
-                        "\n+-------------------------------------------------------------------\n",
-                        name(), i + 1, total);
+            CLS_INFO_IF(
+              trace,
+              "\n+======================================================================="
+              "\n|"
+              "\n|  name: {} "
+              "\n|  iteration {}|{}"
+              "\n|  ignore no selected sys."
+              "\n|"
+              "\n+=======================================================================\n",
+              name(), i + 1, total);
         }
     }
 
@@ -211,6 +221,8 @@ TradeRecord WalkForwardSystem::runMoment(const Datetime& datetime) {
     if (sys != m_cur_sys) {
         m_cur_kdata++;
         m_cur_sys = sys;
+        m_cur_sys->setParam<bool>("shared_tm", true);
+        m_cur_sys->setParam<bool>("trace", getParam<bool>("trace"));
         m_cur_sys->setTM(getTM());
         m_cur_sys->readyForRun();
         syncDataToSystem(m_cur_sys);
