@@ -177,8 +177,9 @@ void OptimalSelector::_calculate_single(const vector<std::pair<size_t, size_t>>&
             if (test_end < dates_len) {
                 m_run_ranges.emplace_back(std::make_pair(dates[test_start], dates[test_end]));
             } else {
+                // K线日期只到分钟级，最后一段加1分钟
                 m_run_ranges.emplace_back(
-                  std::make_pair(dates[test_start], dates[test_end - 1] + Seconds(1)));
+                  std::make_pair(dates[test_start], dates[test_end - 1] + Minutes(1)));
             }
 
             CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1, selected_sys->name());
@@ -251,7 +252,7 @@ void OptimalSelector::_calculate_parallel(const vector<std::pair<size_t, size_t>
                 m_run_ranges.emplace_back(std::make_pair(dates[test_start], dates[test_end]));
             } else {
                 m_run_ranges.emplace_back(
-                  std::make_pair(dates[test_start], dates[test_end - 1] + Seconds(1)));
+                  std::make_pair(dates[test_start], dates[test_end - 1] + Minutes(1)));
             }
 
             CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1, selected_sys->name());

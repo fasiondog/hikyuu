@@ -85,7 +85,7 @@ TEST_CASE("test_SE_Optimal") {
     CHECK_EQ(run_ranges.size(), 1);
     auto dates = StockManager::instance().getTradingCalendar(query);
     CHECK_EQ(run_ranges[0].first, dates[30]);
-    CHECK_EQ(run_ranges[0].second, dates[49] + Seconds(1));
+    CHECK_EQ(run_ranges[0].second, dates[49] + Minutes(1));
     for (size_t i = 0; i < 30; i++) {
         CHECK_UNARY(se->getSelected(dates[i]).empty());
     }
@@ -110,7 +110,7 @@ TEST_CASE("test_SE_Optimal") {
     CHECK_EQ(run_ranges[2].first, dates[40]);
     CHECK_EQ(run_ranges[2].second, dates[50]);
     CHECK_EQ(run_ranges[3].first, dates[50]);
-    CHECK_EQ(run_ranges[3].second, dates[59] + Seconds(1));
+    CHECK_EQ(run_ranges[3].second, dates[59] + Minutes(1));
     for (size_t i = 0; i < 20; i++) {
         CHECK_UNARY(se->getSelected(dates[i]).empty());
     }
@@ -149,7 +149,7 @@ TEST_CASE("test_SE_Optimal") {
     CHECK_EQ(run_ranges[3].first, dates[90]);
     CHECK_EQ(run_ranges[3].second, dates[110]);
     CHECK_EQ(run_ranges[4].first, dates[110]);
-    CHECK_EQ(run_ranges[4].second, dates[124] + Seconds(1));
+    CHECK_EQ(run_ranges[4].second, dates[124] + Minutes(1));
     for (size_t i = 0; i < 30; i++) {
         CHECK_UNARY(se->getSelected(dates[i]).empty());
     }
@@ -181,7 +181,7 @@ TEST_CASE("test_SE_Optimal") {
     CHECK_EQ(run_ranges[3].first, dates[90]);
     CHECK_EQ(run_ranges[3].second, dates[110]);
     CHECK_EQ(run_ranges[4].first, dates[110]);
-    CHECK_EQ(run_ranges[4].second, dates[124] + Seconds(1));
+    CHECK_EQ(run_ranges[4].second, dates[124] + Minutes(1));
     for (size_t i = 0; i < 30; i++) {
         CHECK_UNARY(se->getSelected(dates[i]).empty());
     }
