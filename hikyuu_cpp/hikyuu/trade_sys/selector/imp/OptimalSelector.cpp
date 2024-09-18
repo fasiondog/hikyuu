@@ -124,7 +124,7 @@ void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& 
 void OptimalSelector::_calculate_single(const vector<std::pair<size_t, size_t>>& train_ranges,
                                         const DatetimeList& dates, const string& key, int mode,
                                         size_t test_len, bool trace) {
-    SPEND_TIME(OptimalSelector_calculate_single);
+    // SPEND_TIME(OptimalSelector_calculate_single);
     size_t dates_len = dates.size();
     Performance per;
     for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
@@ -191,7 +191,7 @@ void OptimalSelector::_calculate_single(const vector<std::pair<size_t, size_t>>&
 void OptimalSelector::_calculate_parallel(const vector<std::pair<size_t, size_t>>& train_ranges,
                                           const DatetimeList& dates, const string& key, int mode,
                                           size_t test_len, bool trace) {
-    SPEND_TIME(OptimalSelector_calculate_parallel);
+    // SPEND_TIME(OptimalSelector_calculate_parallel);
     auto sys_list = parallel_for_index(
       0, train_ranges.size(),
       [this, &train_ranges, &dates, query = m_query, trace, key, mode](size_t i) {
@@ -207,6 +207,7 @@ void OptimalSelector::_calculate_parallel(const vector<std::pair<size_t, size_t>
           } else if (0 == mode) {
               double max_value = std::numeric_limits<double>::lowest();
               for (const auto& sys : m_pro_sys_list) {
+                  // 切断所有共享组件，避免并行冲突
                   auto new_sys = sys->clone();
                   new_sys->run(q, true);
                   per.statistics(new_sys->getTM(), end_date);
@@ -220,13 +221,14 @@ void OptimalSelector::_calculate_parallel(const vector<std::pair<size_t, size_t>
           } else if (1 == mode) {
               double min_value = std::numeric_limits<double>::max();
               for (const auto& sys : m_pro_sys_list) {
-                  sys->run(q, true);
+                  auto new_sys = sys->clone();
+                  new_sys->run(q, true);
                   per.statistics(sys->getTM(), end_date);
                   double value = per.get(key);
                   CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
                   if (value < min_value) {
                       min_value = value;
-                      selected_sys = sys;
+                      selected_sys = new_sys;
                   }
               }
           }
@@ -239,7 +241,6 @@ void OptimalSelector::_calculate_parallel(const vector<std::pair<size_t, size_t>
         auto& selected_sys = sys_list[i];
         if (selected_sys) {
             selected_sys->reset();
-            selected_sys = selected_sys->clone();
 
             size_t test_start = train_ranges[i].second;
             size_t test_end = test_start + test_len;
