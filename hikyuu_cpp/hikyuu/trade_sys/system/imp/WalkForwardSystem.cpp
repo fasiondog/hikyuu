@@ -7,6 +7,7 @@
 
 #include "hikyuu/trade_sys/selector/crt/SE_Optimal.h"
 #include "hikyuu/trade_sys/selector/imp/OptimalSelector.h"
+#include "hikyuu/trade_manage/Performance.h"
 #include "WalkForwardSystem.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -50,15 +51,31 @@ WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list,
 }
 
 void WalkForwardSystem::initParam() {
+    setParam<string>("market", "SH");
+    setParam<string>("key", "帐户平均年收益率%");
+    setParam<int>("mode", 0);  // 0 取最高值，1 取最低值
     setParam<int>("train_len", 100);
     setParam<int>("test_len", 20);
+    setParam<bool>("parallel", false);
 }
 
 void WalkForwardSystem::_checkParam(const string& name) const {
-    if ("train_len" == name) {
+    if ("mode" == name) {
+        int mode = getParam<int>(name);
+        HKU_ASSERT(0 == mode || 1 == mode);
+    } else if ("key" == name) {
+        string key = getParam<string>("key");
+        HKU_CHECK(Performance::exist(key), R"(Invalid key("{}") in Performance!)", key);
+    } else if ("train_len" == name) {
         HKU_ASSERT(getParam<int>("train_len") > 0);
     } else if ("test_len" == name) {
         HKU_ASSERT(getParam<int>("test_len") > 0);
+    } else if ("depend_on_proto_sys" == name) {
+        HKU_ASSERT(getParam<bool>("depend_on_proto_sys"));
+    } else if ("market" == name) {
+        string market = getParam<string>(name);
+        auto market_info = StockManager::instance().getMarketInfo(market);
+        HKU_CHECK(market_info != Null<MarketInfo>(), "Invalid market: {}", market);
     }
 }
 
@@ -135,8 +152,13 @@ void WalkForwardSystem::readyForRun() {
         m_train_tm = m_tm->clone();
     }
 
+    m_se->setParam<string>("market", getParam<string>("market"));
+    m_se->setParam<string>("key", getParam<string>("key"));
+    m_se->setParam<int>("mode", getParam<int>("mode"));
     m_se->setParam<int>("train_len", getParam<int>("train_len"));
     m_se->setParam<int>("test_len", getParam<int>("test_len"));
+    m_se->setParam<bool>("parallel", getParam<bool>("parallel"));
+
     m_se->reset();
     const auto& candidate_sys_list = m_se->getProtoSystemList();
     CLS_CHECK(!candidate_sys_list.empty(), "Candidate sys list is empty!");
@@ -295,10 +317,11 @@ TradeRecord WalkForwardSystem::pfProcessDelaySellRequest(const Datetime& date) {
 }
 
 SystemPtr HKU_API SYS_WalkForward(const SystemList& candidate_sys_list, const TradeManagerPtr& tm,
-                                  size_t train_len, size_t test_len,
+                                  size_t train_len, size_t test_len, const string& key,
                                   const TradeManagerPtr& train_tm) {
     SystemPtr ret = make_shared<WalkForwardSystem>(candidate_sys_list, train_tm);
     ret->setTM(tm);
+    ret->setParam<string>("key", key);
     ret->setParam<int>("train_len", train_len);
     ret->setParam<int>("test_len", test_len);
     return ret;
