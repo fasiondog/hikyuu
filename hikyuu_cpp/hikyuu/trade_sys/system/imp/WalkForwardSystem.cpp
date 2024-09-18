@@ -35,13 +35,31 @@ string WalkForwardSystem::str() const {
     return os.str();
 }
 
-WalkForwardSystem::WalkForwardSystem() : System("SYS_WalkForward"), m_se(SE_Optimal()) {}
+WalkForwardSystem::WalkForwardSystem() : System("SYS_WalkForward"), m_se(SE_Optimal()) {
+    initParam();
+}
 
 WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list,
                                      const TradeManagerPtr& train_tm)
 : System("SYS_WalkForward"), m_se(SE_Optimal()), m_train_tm(train_tm) {
     CLS_ASSERT(!candidate_sys_list.empty());
+    initParam();
+    m_se->setParam<int>("train_len", getParam<int>("train_len"));
+    m_se->setParam<int>("test_len", getParam<int>("test_len"));
     m_se->addSystemList(candidate_sys_list);
+}
+
+void WalkForwardSystem::initParam() {
+    setParam<int>("train_len", 100);
+    setParam<int>("test_len", 20);
+}
+
+void WalkForwardSystem::_checkParam(const string& name) const {
+    if ("train_len" == name) {
+        HKU_ASSERT(getParam<int>("train_len") > 0);
+    } else if ("test_len" == name) {
+        HKU_ASSERT(getParam<int>("test_len") > 0);
+    }
 }
 
 void WalkForwardSystem::_reset() {
@@ -117,6 +135,8 @@ void WalkForwardSystem::readyForRun() {
         m_train_tm = m_tm->clone();
     }
 
+    m_se->setParam<int>("train_len", getParam<int>("train_len"));
+    m_se->setParam<int>("test_len", getParam<int>("test_len"));
     m_se->reset();
     const auto& candidate_sys_list = m_se->getProtoSystemList();
     CLS_CHECK(!candidate_sys_list.empty(), "Candidate sys list is empty!");
@@ -191,9 +211,8 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
             sys->setParam<bool>("shared_tm", true);
             sys->setParam<bool>("trace", trace);
             sys->setTM(getTM());
-            sys->readyForRun();
             syncDataToSystem(sys);
-            sys->run(kdata);
+            sys->run(kdata, false, false);
             syncDataFromSystem(sys, kdata, false);
         } else {
             CLS_INFO_IF(

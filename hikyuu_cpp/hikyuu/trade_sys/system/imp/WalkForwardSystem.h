@@ -24,6 +24,7 @@ public:
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false) override;
     virtual TradeRecord runMoment(const Datetime& datetime) override;
 
+    virtual void _checkParam(const string& name) const override;
     virtual void _reset() override;
     virtual void _forceResetAll() override;
     virtual SystemPtr _clone() override;
@@ -38,6 +39,7 @@ public:
     virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date) override;
 
 private:
+    void initParam();
     void syncDataFromSystem(const SYSPtr&, const KData&, bool isMoment);
     void syncDataToSystem(const SYSPtr&);
 

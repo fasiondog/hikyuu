@@ -50,13 +50,54 @@ TEST_CASE("test_SYS_WalkForword") {
     CHECK_THROWS(sys->run(query));
 
     /** @arg 只有一个候选系统 */
-    sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm);
-    query = KQueryByIndex(-150);
-    sys->setParam<bool>("trace", true);
+    sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20);
+    CHECK_EQ(sys->name(), "SYS_WalkForward");
+    query = KQueryByIndex(-125);
+    // sys->setParam<bool>("trace", true);
     sys->run(stk, query);
-    HKU_INFO("{}", sys->getBuyTradeRequest());
-    // HKU_INFO("{}", sys);
-    // std::cout << sys << std::endl;
+
+    auto delay_request = sys->getBuyTradeRequest();
+    CHECK_UNARY(delay_request.valid);
+    CHECK_EQ(delay_request.business, BUSINESS_BUY);
+    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+
+    tm = sys->getTM();
+    CHECK_EQ(tm->currentCash(), 105504.0);
+
+    auto tr_list1 = tm->getTradeList();
+    auto tr_list2 = sys->getTradeRecordList();
+    CHECK_EQ(tr_list1.size(), tr_list2.size() + 1);
+    for (size_t i = 0, total = tr_list2.size(); i < total; i++) {
+        CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
+    }
+
+    /** @arg 多个后续系统 */
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    SystemList sys_list;
+    for (const auto& param : params) {
+        sys_list.emplace_back(create_test_sys(param.first, param.second));
+    }
+    tm->reset();
+    REQUIRE(tm->getTradeList().size() == 1);
+    sys = SYS_WalkForward(sys_list, tm, 30, 20);
+    query = KQueryByIndex(-125);
+    // sys->setParam<bool>("trace", true);
+    sys->run(stk, query);
+
+    delay_request = sys->getBuyTradeRequest();
+    CHECK_UNARY(delay_request.valid);
+    CHECK_EQ(delay_request.business, BUSINESS_BUY);
+    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+
+    tm = sys->getTM();
+    CHECK_EQ(tm->currentCash(), 101045.0);
+
+    tr_list1 = tm->getTradeList();
+    tr_list2 = sys->getTradeRecordList();
+    CHECK_EQ(tr_list1.size(), tr_list2.size() + 1);
+    for (size_t i = 0, total = tr_list2.size(); i < total; i++) {
+        CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -65,7 +106,46 @@ TEST_CASE("test_SYS_WalkForword") {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-TEST_CASE("test_SYS_WalkForword_export") {}
+TEST_CASE("test_SYS_WalkForword_export") {
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/SYS_WalkForward.xml";
+
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    SystemList sys_list;
+    for (const auto& param : params) {
+        sys_list.emplace_back(create_test_sys(param.first, param.second));
+    }
+    TMPtr tm = crtTM();
+    Stock stk = getStock("sz000001");
+    auto sys1 = SYS_WalkForward(sys_list, tm, 30, 20);
+    auto query = KQueryByIndex(-125);
+    sys1->run(stk, query);
+    auto tr_list1 = sys1->getTradeRecordList();
+    sys1->reset();
+
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(sys1);
+    }
+
+    SYSPtr sys2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(sys2);
+    }
+
+    CHECK_EQ(sys1->name(), sys2->name());
+
+    sys2->run(stk, query);
+    auto tr_list2 = sys2->getTradeRecordList();
+    CHECK_EQ(tr_list1.size(), tr_list2.size());
+    for (size_t i = 0, total = tr_list2.size(); i < total; i++) {
+        CHECK_EQ(tr_list1[i], tr_list2[i]);
+    }
+}
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 /** @} */
