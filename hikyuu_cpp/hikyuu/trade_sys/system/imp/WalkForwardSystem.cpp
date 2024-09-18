@@ -171,6 +171,7 @@ void WalkForwardSystem::readyForRun() {
 }
 
 void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
+    SPEND_TIME(WalkForwardSystem_run);
     HKU_IF_RETURN(kdata.empty(), void());
     if (resetAll) {
         this->forceResetAll();

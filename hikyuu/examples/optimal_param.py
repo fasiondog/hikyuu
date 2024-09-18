@@ -21,8 +21,8 @@ os.environ['HKU_START_SPOT'] = '0'  # 禁止启动行情接收代理
 from hikyuu.interactive import *  # NOQA: E402
 
 
-fast_n = range(3, 200)
-slow_n = range(5, 300)
+fast_n = range(3, 20)
+slow_n = range(5, 100)
 params = [v for v in product(fast_n, slow_n)]
 # print(params)
 
@@ -73,11 +73,11 @@ while not sm.data_ready:
     time.sleep(100)
 
 # max_val, max_sys = find_optimal_param(sys_list, stk, query, key='当前总资产')
-max_val, max_sys = find_optimal_system_multi(sys_list, stk, query, '当前总资产', 0)
+# max_val, max_sys = find_optimal_system_multi(sys_list, stk, query, '当前总资产', 0)
 
 # print(max_val)
-print(max_sys.name)
-print(len(sys_list))
+# print(max_sys.name)
+# print(len(sys_list))
 
 # max_sys.run(stk, query)
 # max_sys.performance()
@@ -86,3 +86,9 @@ print(len(sys_list))
 
 # x = find_optimal_system(sys_list, stk, query, '当前总资产', 0)
 # print(x)
+
+my_sys = SYS_WalkForward(sys_list, crtTM())
+my_sys.set_param("parallel", True)
+my_sys.run(stk, query)
+my_sys.performance()
+plt.show()
