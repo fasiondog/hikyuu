@@ -27,7 +27,6 @@ public:
     virtual ~WalkForwardTradeManager() {}
 
     virtual void _reset() {
-        HKU_INFO("********** reset ***********");
         m_tm->_reset();
     }
 

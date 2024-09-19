@@ -413,7 +413,7 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
     }
 
     for (size_t i = 0; i < total; ++i) {
-        if (ks[i].datetime >= tm_init_datetime) {
+        if (ks[i].datetime >= tm_init_datetime && ks[i].datetime >= m_tm->lastDatetime()) {
             auto tr = _runMoment(ks[i], src_ks[i]);
             if (trace) {
                 HKU_INFO_IF(!tr.isNull(), "{}", tr);
