@@ -73,6 +73,7 @@ void OptimalSelector::_reset() {
 void OptimalSelector::_calculate() {}
 
 void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& query) {
+    SPEND_TIME(OptimalSelector_calculate);
     HKU_IF_RETURN(m_calculated && m_query == query, void());
 
     m_query = query;
@@ -165,6 +166,7 @@ void OptimalSelector::_calculate_single(const vector<std::pair<size_t, size_t>>&
             selected_sys->reset();
             selected_sys = selected_sys->clone();
 
+            size_t train_start = train_ranges[i].first;
             size_t test_start = train_ranges[i].second;
             size_t test_end = test_start + test_len;
             if (test_end > dates_len) {
@@ -177,10 +179,14 @@ void OptimalSelector::_calculate_single(const vector<std::pair<size_t, size_t>>&
 
             if (test_end < dates_len) {
                 m_run_ranges.emplace_back(std::make_pair(dates[test_start], dates[test_end]));
+                m_run_ranges2.emplace_back(
+                  RunRanges(dates[train_start], dates[test_start], dates[test_end]));
             } else {
                 // K线日期只到分钟级，最后一段加1分钟
                 m_run_ranges.emplace_back(
                   std::make_pair(dates[test_start], dates[test_end - 1] + Minutes(1)));
+                m_run_ranges2.emplace_back(RunRanges(dates[train_start], dates[test_start],
+                                                     dates[test_end - 1] + Minutes(1)));
             }
 
             CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1, selected_sys->name());

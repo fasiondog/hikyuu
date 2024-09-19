@@ -11,7 +11,7 @@ import sys
 if sys.platform == 'win32':
     os.system('chcp 65001')
 
-stk_code = "sz000001"
+stk_code = "sz000002"
 os.environ['HKU_STOCK_LIST'] = stk_code  # 仅加载指定的证券
 os.environ['HKU_KTYPE_LIST'] = 'day'  # 加载K线类型（同时包含加载顺序）
 # os.environ['HKU_LOAD_STOCK_WEIGHT'] = '0'  # 禁止加载权息数据
@@ -21,9 +21,10 @@ os.environ['HKU_START_SPOT'] = '0'  # 禁止启动行情接收代理
 from hikyuu.interactive import *  # NOQA: E402
 
 
-fast_n = range(3, 20)
-slow_n = range(5, 100)
+fast_n = range(2, 100)
+slow_n = range(3, 100)
 params = [v for v in product(fast_n, slow_n)]
+params = [(k, v) for k, v in params if v > k]
 # print(params)
 
 # sys_list = [get_part('default.sys.趋势双均线', fast_n=x, slow_n=y) for x, y in params]
@@ -87,8 +88,9 @@ while not sm.data_ready:
 # x = find_optimal_system(sys_list, stk, query, '当前总资产', 0)
 # print(x)
 
-my_sys = SYS_WalkForward(sys_list, crtTM())
-my_sys.set_param("parallel", True)
+my_sys = SYS_WalkForward(sys_list, crtTM(), train_len=500, test_len=100)
+# my_sys.set_param("parallel", True)
+my_sys.set_param("trace", True)
 my_sys.run(stk, query)
 my_sys.performance()
 plt.show()

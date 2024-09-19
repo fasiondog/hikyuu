@@ -170,6 +170,34 @@ void WalkForwardSystem::readyForRun() {
     m_se->calculate(SystemList(), m_kdata.getQuery());
 }
 
+void WalkForwardSystem::readyPhaseSystem(const SYSPtr& sys, const KData& run_kdata,
+                                         const KData& kdata) {
+    // 先以 train + test 长度的 kdata 进行计算，以便按其长度生成各个 part，避免指标中可能的 discard
+    sys->setParam<bool>("shared_tm", true);
+    sys->setParam<bool>("shared_sg", true);
+    sys->setParam<bool>("trace", getParam<bool>("trace"));
+    sys->reset();
+    sys->setTM(getTM());
+    sys->readyForRun();
+    sys->setTO(kdata);
+
+    auto sg = sys->getSG();
+    if (sg) {
+        sg->setTO(run_kdata);
+    }
+    auto mm = sys->getMM();
+    if (mm) {
+        mm->setQuery(run_kdata.getQuery());
+    }
+    auto cn = sys->getCN();
+    if (cn) {
+        cn->setSG(sg);
+        cn->setTO(run_kdata);
+    }
+
+    syncDataToSystem(sys);
+}
+
 void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     SPEND_TIME(WalkForwardSystem_run);
     HKU_IF_RETURN(kdata.empty(), void());
@@ -186,7 +214,7 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     readyForRun();
 
     OptimalSelector* se_ptr = dynamic_cast<OptimalSelector*>(m_se.get());
-    const auto& run_ranges = se_ptr->getRunRanges();
+    const auto& run_ranges = se_ptr->getRunRanges2();
     size_t run_ranges_len = run_ranges.size();
     HKU_IF_RETURN(run_ranges_len == 0, void());
 
@@ -194,14 +222,18 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     const Stock& stock = kdata.getStock();
 
     for (size_t i = 0; i < run_ranges_len; i++) {
-        KQuery range_query = KQueryByDate(run_ranges[i].first, run_ranges[i].second, query.kType(),
+        KQuery range_query = KQueryByDate(run_ranges[i].run_start, run_ranges[i].end, query.kType(),
                                           query.recoverType());
         m_kdata_list.emplace_back(stock.getKData(range_query));
+        m_train_kdata_list.emplace_back(stock.getKData(KQueryByDate(
+          run_ranges[i].start, run_ranges[i].end, query.kType(), query.recoverType())));
     }
 
     bool trace = getParam<bool>("trace");
     for (size_t i = 0, total = m_kdata_list.size(); i < total; i++) {
         const auto& kdata = m_kdata_list[i];
+        const auto& run_kdata = m_train_kdata_list[i];
+        HKU_INFO("{}, {}, {}", i, run_kdata.size(), m_train_kdata_list.size());
         if (kdata.empty()) {
             CLS_INFO_IF(
               trace,
@@ -231,26 +263,54 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
               name(), i + 1, total, kdata[0].datetime, kdata[kdata.size() - 1].datetime,
               sys->name());
 
+#if 0
+            readyPhaseSystem(sys, run_kdata, kdata);
+            for (size_t n = 0, len = kdata.size(); n < len; n++) {
+                auto tr = sys->runMoment(kdata[n].datetime);
+
+                if (trace) {
+                    HKU_INFO_IF(!tr.isNull(), "{}", tr);
+                    PositionRecord position = m_tm->getPosition(kdata[n].datetime, m_stock);
+                    FundsRecord funds = m_tm->getFunds(kdata[n].datetime, kdata.getQuery().kType());
+                    if (position.number > 0.0) {
+                        // clang-format off
+                    HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
+                    HKU_INFO("| total       | cash        | profit      | market      | position    | close price | stoploss    | goal price  | total cost  |");
+                    HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
+                    HKU_INFO("| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}|",
+                        funds.total_assets(), funds.cash, funds.profit(), funds.market_value,
+                        position.number, sys->m_src_kdata[n].closePrice, position.stoploss,
+                        position.goalPrice, position.totalCost);
+                    HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
+                        // clang-format on
+                    }
+                }
+            }
+            syncDataFromSystem(sys, kdata, false);
+#else
             sys->setParam<bool>("shared_tm", true);
             sys->setParam<bool>("trace", trace);
             sys->setTM(getTM());
             syncDataToSystem(sys);
             sys->run(kdata, false, false);
             syncDataFromSystem(sys, kdata, false);
+#endif
+
         } else {
-            CLS_INFO_IF(
-              trace,
-              "\n+======================================================================="
-              "\n|"
-              "\n|  name: {} "
-              "\n|  iteration {}|{}"
-              "\n|  ignore no selected sys."
-              "\n|"
-              "\n+=======================================================================\n",
-              name(), i + 1, total);
+            CLS_INFO_IF(trace,
+                        "\n+======================================================================="
+                        "\n|"
+                        "\n|  name: {} "
+                        "\n|  iteration {}|{}"
+                        "\n|  ignore no selected sys."
+                        "\n|"
+                        "\n+======================================================================="
+                        "\n",
+                        name(), i + 1, total);
         }
     }
 
+    HKU_INFO("************************");
     m_calculated = true;
 }
 
@@ -263,11 +323,12 @@ TradeRecord WalkForwardSystem::runMoment(const Datetime& datetime) {
     if (sys != m_cur_sys) {
         m_cur_kdata++;
         m_cur_sys = sys;
-        m_cur_sys->setParam<bool>("shared_tm", true);
-        m_cur_sys->setParam<bool>("trace", getParam<bool>("trace"));
-        m_cur_sys->setTM(getTM());
-        m_cur_sys->readyForRun();
-        syncDataToSystem(m_cur_sys);
+        readyPhaseSystem(sys, m_train_kdata_list[m_cur_kdata], m_kdata_list[m_cur_kdata]);
+        // m_cur_sys->setParam<bool>("shared_tm", true);
+        // m_cur_sys->setParam<bool>("trace", getParam<bool>("trace"));
+        // m_cur_sys->setTM(getTM());
+        // m_cur_sys->readyForRun();
+        // syncDataToSystem(m_cur_sys);
     }
 
     ret = m_cur_sys->runMoment(datetime);

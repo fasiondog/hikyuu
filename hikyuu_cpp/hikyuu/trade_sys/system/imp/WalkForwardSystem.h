@@ -40,6 +40,7 @@ public:
 
 private:
     void initParam();
+    void readyPhaseSystem(const SYSPtr& sys, const KData& run_kdata, const KData& kdata);
     void syncDataFromSystem(const SYSPtr&, const KData&, bool isMoment);
     void syncDataToSystem(const SYSPtr&);
 
@@ -49,6 +50,7 @@ private:
     SYSPtr m_cur_sys;
     vector<KData> m_kdata_list;
     size_t m_cur_kdata{0};
+    vector<KData> m_train_kdata_list;
 
 //========================================
 // 序列化支持
