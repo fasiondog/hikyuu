@@ -11,7 +11,7 @@ import sys
 if sys.platform == 'win32':
     os.system('chcp 65001')
 
-stk_code = "sz000002"
+stk_code = "sz000001"
 os.environ['HKU_STOCK_LIST'] = stk_code  # 仅加载指定的证券
 os.environ['HKU_KTYPE_LIST'] = 'day'  # 加载K线类型（同时包含加载顺序）
 # os.environ['HKU_LOAD_STOCK_WEIGHT'] = '0'  # 禁止加载权息数据

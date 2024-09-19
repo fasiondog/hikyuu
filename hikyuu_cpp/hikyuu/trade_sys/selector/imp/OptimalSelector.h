@@ -10,6 +10,10 @@
 
 namespace hku {
 
+//
+// start ------ run_start --end
+// | train_len | test_len
+//
 struct RunRanges {
     Datetime start;
     Datetime run_start;
@@ -35,12 +39,8 @@ public:
 
     virtual string str() const override;
 
-    const vector<std::pair<Datetime, Datetime>>& getRunRanges() const {
+    const vector<RunRanges>& getRunRanges() const {
         return m_run_ranges;
-    }
-
-    const vector<RunRanges>& getRunRanges2() const {
-        return m_run_ranges2;
     }
 
 private:
@@ -54,8 +54,7 @@ private:
 
 private:
     unordered_map<Datetime, SYSPtr> m_sys_dict;
-    vector<std::pair<Datetime, Datetime>> m_run_ranges;
-    vector<RunRanges> m_run_ranges2;
+    vector<RunRanges> m_run_ranges;
 };
 
 }  // namespace hku

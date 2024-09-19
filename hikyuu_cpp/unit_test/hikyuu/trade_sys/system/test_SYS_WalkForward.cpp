@@ -62,7 +62,7 @@ TEST_CASE("test_SYS_WalkForword") {
     CHECK_EQ(delay_request.datetime, Datetime(20111205));
 
     tm = sys->getTM();
-    CHECK_EQ(tm->currentCash(), 105504.0);
+    CHECK_EQ(tm->currentCash(), 99328.0);
 
     auto tr_list1 = tm->getTradeList();
     auto tr_list2 = sys->getTradeRecordList();
@@ -90,7 +90,7 @@ TEST_CASE("test_SYS_WalkForword") {
     CHECK_EQ(delay_request.datetime, Datetime(20111205));
 
     tm = sys->getTM();
-    CHECK_EQ(tm->currentCash(), 101045.0);
+    CHECK_EQ(tm->currentCash(), 98286.0);
 
     tr_list1 = tm->getTradeList();
     tr_list2 = sys->getTradeRecordList();

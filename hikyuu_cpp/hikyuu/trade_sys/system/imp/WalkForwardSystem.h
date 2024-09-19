@@ -40,17 +40,16 @@ public:
 
 private:
     void initParam();
-    void readyPhaseSystem(const SYSPtr& sys, const KData& run_kdata, const KData& kdata);
-    void syncDataFromSystem(const SYSPtr&, const KData&, bool isMoment);
+    void syncDataFromSystem(const SYSPtr&, bool isMoment);
     void syncDataToSystem(const SYSPtr&);
 
 private:
     SEPtr m_se;        // 寻优SE
     TMPtr m_train_tm;  // 用于优化评估计算的账户
     SYSPtr m_cur_sys;
-    vector<KData> m_kdata_list;
     size_t m_cur_kdata{0};
     vector<KData> m_train_kdata_list;
+    vector<RunRanges> m_run_ranges;
 
 //========================================
 // 序列化支持

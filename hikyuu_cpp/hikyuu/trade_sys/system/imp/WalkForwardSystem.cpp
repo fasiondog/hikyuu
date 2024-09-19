@@ -9,6 +9,7 @@
 #include "hikyuu/trade_sys/selector/imp/OptimalSelector.h"
 #include "hikyuu/trade_manage/Performance.h"
 #include "WalkForwardSystem.h"
+#include "WalkForwardTradeManager.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::WalkForwardSystem)
@@ -80,7 +81,6 @@ void WalkForwardSystem::_checkParam(const string& name) const {
 }
 
 void WalkForwardSystem::_reset() {
-    m_kdata_list.clear();
     m_cur_kdata = 0;
     m_cur_sys.reset();
     m_se->reset();
@@ -109,7 +109,7 @@ SystemPtr WalkForwardSystem::_clone() {
     return SystemPtr(p);
 }
 
-void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, const KData& kdata, bool isMoment) {
+void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, bool isMoment) {
     if (!isMoment) {
         const auto& sys_trade_list = sys->getTradeRecordList();
         for (const auto& tr : sys_trade_list) {
@@ -122,8 +122,8 @@ void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, const KData& kdata
     m_sellShortRequest = sys->getSellShortTradeRequest();
     m_buyShortRequest = sys->getBuyShortTradeRequest();
 
-    m_pre_ev_valid = sys->m_pre_ev_valid;
-    m_pre_cn_valid = sys->m_pre_cn_valid;
+    // m_pre_ev_valid = sys->m_pre_ev_valid;
+    // m_pre_cn_valid = sys->m_pre_cn_valid;
 
     m_buy_days = sys->m_buy_days;
     m_sell_short_days = sys->m_sell_short_days;
@@ -137,8 +137,8 @@ void WalkForwardSystem::syncDataToSystem(const SYSPtr& sys) {
     sys->m_sellShortRequest = m_sellShortRequest;
     sys->m_buyShortRequest = m_buyShortRequest;
 
-    sys->m_pre_ev_valid = m_pre_ev_valid;
-    sys->m_pre_cn_valid = m_pre_cn_valid;
+    // sys->m_pre_ev_valid = m_pre_ev_valid;
+    // sys->m_pre_cn_valid = m_pre_cn_valid;
 
     sys->m_buy_days = m_buy_days;
     sys->m_sell_short_days = m_sell_short_days;
@@ -170,34 +170,6 @@ void WalkForwardSystem::readyForRun() {
     m_se->calculate(SystemList(), m_kdata.getQuery());
 }
 
-void WalkForwardSystem::readyPhaseSystem(const SYSPtr& sys, const KData& run_kdata,
-                                         const KData& kdata) {
-    // 先以 train + test 长度的 kdata 进行计算，以便按其长度生成各个 part，避免指标中可能的 discard
-    sys->setParam<bool>("shared_tm", true);
-    sys->setParam<bool>("shared_sg", true);
-    sys->setParam<bool>("trace", getParam<bool>("trace"));
-    sys->reset();
-    sys->setTM(getTM());
-    sys->readyForRun();
-    sys->setTO(kdata);
-
-    auto sg = sys->getSG();
-    if (sg) {
-        sg->setTO(run_kdata);
-    }
-    auto mm = sys->getMM();
-    if (mm) {
-        mm->setQuery(run_kdata.getQuery());
-    }
-    auto cn = sys->getCN();
-    if (cn) {
-        cn->setSG(sg);
-        cn->setTO(run_kdata);
-    }
-
-    syncDataToSystem(sys);
-}
-
 void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     SPEND_TIME(WalkForwardSystem_run);
     HKU_IF_RETURN(kdata.empty(), void());
@@ -214,27 +186,24 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     readyForRun();
 
     OptimalSelector* se_ptr = dynamic_cast<OptimalSelector*>(m_se.get());
-    const auto& run_ranges = se_ptr->getRunRanges2();
-    size_t run_ranges_len = run_ranges.size();
+    const auto& m_run_ranges = se_ptr->getRunRanges();
+    size_t run_ranges_len = m_run_ranges.size();
     HKU_IF_RETURN(run_ranges_len == 0, void());
 
     const KQuery& query = kdata.getQuery();
     const Stock& stock = kdata.getStock();
 
     for (size_t i = 0; i < run_ranges_len; i++) {
-        KQuery range_query = KQueryByDate(run_ranges[i].run_start, run_ranges[i].end, query.kType(),
-                                          query.recoverType());
-        m_kdata_list.emplace_back(stock.getKData(range_query));
+        KQuery range_query = KQueryByDate(m_run_ranges[i].run_start, m_run_ranges[i].end,
+                                          query.kType(), query.recoverType());
         m_train_kdata_list.emplace_back(stock.getKData(KQueryByDate(
-          run_ranges[i].start, run_ranges[i].end, query.kType(), query.recoverType())));
+          m_run_ranges[i].start, m_run_ranges[i].end, query.kType(), query.recoverType())));
     }
 
     bool trace = getParam<bool>("trace");
-    for (size_t i = 0, total = m_kdata_list.size(); i < total; i++) {
-        const auto& kdata = m_kdata_list[i];
+    for (size_t i = 0, total = m_train_kdata_list.size(); i < total; i++) {
         const auto& run_kdata = m_train_kdata_list[i];
-        HKU_INFO("{}, {}, {}", i, run_kdata.size(), m_train_kdata_list.size());
-        if (kdata.empty()) {
+        if (run_kdata.empty()) {
             CLS_INFO_IF(
               trace,
               "\n+======================================================================="
@@ -248,7 +217,7 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
             continue;
         }
 
-        auto sw_list = m_se->getSelected(kdata[0].datetime);
+        auto sw_list = m_se->getSelected(m_run_ranges[i].run_start);
         if (!sw_list.empty()) {
             auto& sys = sw_list.front().sys;
             CLS_INFO_IF(
@@ -260,41 +229,15 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
               "\n|  use sys: {}"
               "\n|"
               "\n+=======================================================================\n",
-              name(), i + 1, total, kdata[0].datetime, kdata[kdata.size() - 1].datetime,
-              sys->name());
+              name(), i + 1, total, m_run_ranges[i].run_start,
+              run_kdata[run_kdata.size() - 1].datetime, sys->name());
 
-#if 0
-            readyPhaseSystem(sys, run_kdata, kdata);
-            for (size_t n = 0, len = kdata.size(); n < len; n++) {
-                auto tr = sys->runMoment(kdata[n].datetime);
-
-                if (trace) {
-                    HKU_INFO_IF(!tr.isNull(), "{}", tr);
-                    PositionRecord position = m_tm->getPosition(kdata[n].datetime, m_stock);
-                    FundsRecord funds = m_tm->getFunds(kdata[n].datetime, kdata.getQuery().kType());
-                    if (position.number > 0.0) {
-                        // clang-format off
-                    HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
-                    HKU_INFO("| total       | cash        | profit      | market      | position    | close price | stoploss    | goal price  | total cost  |");
-                    HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
-                    HKU_INFO("| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}|",
-                        funds.total_assets(), funds.cash, funds.profit(), funds.market_value,
-                        position.number, sys->m_src_kdata[n].closePrice, position.stoploss,
-                        position.goalPrice, position.totalCost);
-                    HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
-                        // clang-format on
-                    }
-                }
-            }
-            syncDataFromSystem(sys, kdata, false);
-#else
             sys->setParam<bool>("shared_tm", true);
             sys->setParam<bool>("trace", trace);
-            sys->setTM(getTM());
+            sys->setTM(crtWalkForwardTM(getTM(), m_run_ranges[i].run_start));
             syncDataToSystem(sys);
-            sys->run(kdata, false, false);
-            syncDataFromSystem(sys, kdata, false);
-#endif
+            sys->run(run_kdata, false, false);
+            syncDataFromSystem(sys, false);
 
         } else {
             CLS_INFO_IF(trace,
@@ -310,7 +253,6 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
         }
     }
 
-    HKU_INFO("************************");
     m_calculated = true;
 }
 
@@ -323,17 +265,17 @@ TradeRecord WalkForwardSystem::runMoment(const Datetime& datetime) {
     if (sys != m_cur_sys) {
         m_cur_kdata++;
         m_cur_sys = sys;
-        readyPhaseSystem(sys, m_train_kdata_list[m_cur_kdata], m_kdata_list[m_cur_kdata]);
-        // m_cur_sys->setParam<bool>("shared_tm", true);
-        // m_cur_sys->setParam<bool>("trace", getParam<bool>("trace"));
-        // m_cur_sys->setTM(getTM());
-        // m_cur_sys->readyForRun();
-        // syncDataToSystem(m_cur_sys);
+        m_cur_sys->setParam<bool>("shared_tm", true);
+        m_cur_sys->setParam<bool>("trace", getParam<bool>("trace"));
+        m_cur_sys->setTM(crtWalkForwardTM(getTM(), m_run_ranges[m_cur_kdata].run_start));
+        m_cur_sys->readyForRun();
+        m_cur_sys->setTO(m_train_kdata_list[m_cur_kdata]);
+        syncDataToSystem(m_cur_sys);
     }
 
     ret = m_cur_sys->runMoment(datetime);
     m_trade_list.push_back(ret);
-    syncDataFromSystem(m_cur_sys, m_kdata_list[m_cur_kdata], true);
+    syncDataFromSystem(m_cur_sys, true);
     return ret;
 }
 
@@ -342,7 +284,7 @@ TradeRecord WalkForwardSystem::sellForceOnOpen(const Datetime& date, double num,
     if (m_cur_sys) {
         ret = m_cur_sys->sellForceOnOpen(date, num, from);
         m_trade_list.push_back(ret);
-        syncDataFromSystem(m_cur_sys, m_kdata_list[m_cur_kdata], true);
+        syncDataFromSystem(m_cur_sys, true);
     }
     return ret;
 }
@@ -352,7 +294,7 @@ TradeRecord WalkForwardSystem::sellForceOnClose(const Datetime& date, double num
     if (m_cur_sys) {
         ret = m_cur_sys->sellForceOnClose(date, num, from);
         m_trade_list.push_back(ret);
-        syncDataFromSystem(m_cur_sys, m_kdata_list[m_cur_kdata], true);
+        syncDataFromSystem(m_cur_sys, true);
     }
     return ret;
 }
@@ -373,7 +315,7 @@ TradeRecord WalkForwardSystem::pfProcessDelaySellRequest(const Datetime& date) {
     if (m_cur_sys) {
         ret = m_cur_sys->pfProcessDelaySellRequest(date);
         m_trade_list.push_back(ret);
-        syncDataFromSystem(m_cur_sys, m_kdata_list[m_cur_kdata], true);
+        syncDataFromSystem(m_cur_sys, true);
     }
     return ret;
 }
