@@ -17,7 +17,8 @@ class HKU_API WalkForwardSystem : public System {
 
 public:
     WalkForwardSystem();
-    WalkForwardSystem(const SystemList& candidate_sys_list, const TradeManagerPtr& train_tm);
+    WalkForwardSystem(const SystemList& candidate_sys_list, const SelectorPtr& se,
+                      const TradeManagerPtr& train_tm);
     virtual ~WalkForwardSystem() = default;
 
     virtual void readyForRun() override;

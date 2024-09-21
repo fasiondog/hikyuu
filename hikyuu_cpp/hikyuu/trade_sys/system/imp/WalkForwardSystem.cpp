@@ -41,11 +41,18 @@ WalkForwardSystem::WalkForwardSystem() : System("SYS_WalkForward"), m_se(SE_Opti
     initParam();
 }
 
-WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list,
+WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list, const SelectorPtr& se,
                                      const TradeManagerPtr& train_tm)
-: System("SYS_WalkForward"), m_se(SE_Optimal()), m_train_tm(train_tm) {
+: System("SYS_WalkForward"), m_train_tm(train_tm) {
     CLS_ASSERT(!candidate_sys_list.empty());
+    CLS_ASSERT(se);
+    try {
+        OptimalSelectorBase* _ = dynamic_cast<OptimalSelectorBase*>(se.get());
+    } catch (...) {
+        CLS_THROW("Only the OptimalSelectorBase type is accepted!");
+    }
     initParam();
+    m_se = se;
     m_se->setParam<int>("train_len", getParam<int>("train_len"));
     m_se->setParam<int>("test_len", getParam<int>("test_len"));
     m_se->addSystemList(candidate_sys_list);
@@ -320,12 +327,26 @@ TradeRecord WalkForwardSystem::pfProcessDelaySellRequest(const Datetime& date) {
     return ret;
 }
 
+// SystemPtr HKU_API SYS_WalkForward(const SystemList& candidate_sys_list, const TradeManagerPtr&
+// tm,
+//                                   size_t train_len, size_t test_len, const string& key,
+//                                   const TradeManagerPtr& train_tm) {
+//     HKU_CHECK(tm, "Input tm is null!");
+//     TradeManagerPtr new_train_tm = train_tm ? train_tm : tm->clone();
+//     SystemPtr ret = make_shared<WalkForwardSystem>(candidate_sys_list, SE_Optimal(),
+//     new_train_tm); ret->setTM(tm); ret->setParam<string>("key", key);
+//     ret->setParam<int>("train_len", train_len);
+//     ret->setParam<int>("test_len", test_len);
+//     return ret;
+// }
+
 SystemPtr HKU_API SYS_WalkForward(const SystemList& candidate_sys_list, const TradeManagerPtr& tm,
-                                  size_t train_len, size_t test_len, const string& key,
+                                  size_t train_len, size_t test_len, const SelectorPtr& se,
                                   const TradeManagerPtr& train_tm) {
-    SystemPtr ret = make_shared<WalkForwardSystem>(candidate_sys_list, train_tm);
+    HKU_CHECK(tm, "Input tm is null!");
+    TradeManagerPtr new_train_tm = train_tm ? train_tm : tm->clone();
+    SystemPtr ret = make_shared<WalkForwardSystem>(candidate_sys_list, se, new_train_tm);
     ret->setTM(tm);
-    ret->setParam<string>("key", key);
     ret->setParam<int>("train_len", train_len);
     ret->setParam<int>("test_len", test_len);
     return ret;

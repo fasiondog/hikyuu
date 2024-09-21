@@ -41,12 +41,12 @@ TEST_CASE("test_SYS_WalkForword") {
     /** @arg 候选系统列表为空 */
     CHECK_THROWS(SYS_WalkForward(SystemList(), tm));
 
-    /** @arg 运行时未指定tm */
+    /** @arg 未指定tm */
     SystemList candidate_sys_list{create_test_sys(3, 5)};
-    auto sys = SYS_WalkForward(candidate_sys_list);
-    CHECK_THROWS(sys->run(stk, query));
+    CHECK_THROWS(SYS_WalkForward(candidate_sys_list));
 
     /** @arg 执行时未指定证券标的 */
+    auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20);
     CHECK_THROWS(sys->run(query));
 
     /** @arg 只有一个候选系统 */
