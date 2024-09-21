@@ -7,15 +7,15 @@
 
 #pragma once
 
-#include "../ConditionBase.h"
+#include "hikyuu/trade_sys/condition/ConditionBase.h"
 
 namespace hku {
 
-class HKU_API DivCondition : public ConditionBase {
+class HKU_API OrCondition : public ConditionBase {
 public:
-    DivCondition();
-    DivCondition(const ConditionPtr& cond1, const ConditionPtr& cond2);
-    virtual ~DivCondition();
+    OrCondition();
+    OrCondition(const ConditionPtr& cond1, const ConditionPtr& cond2);
+    virtual ~OrCondition();
 
     virtual void _calculate() override;
     virtual void _reset() override;

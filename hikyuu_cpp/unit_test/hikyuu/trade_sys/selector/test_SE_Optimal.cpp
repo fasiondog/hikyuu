@@ -9,7 +9,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Optimal.h>
-#include <hikyuu/trade_sys/selector/imp/OptimalSelector.h>
+#include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelector.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/NOT.h>

@@ -6,7 +6,7 @@
  */
 
 #include "hikyuu/trade_sys/selector/crt/SE_Optimal.h"
-#include "hikyuu/trade_sys/selector/imp/OptimalSelector.h"
+#include "hikyuu/trade_sys/selector/imp/optimal/OptimalSelector.h"
 #include "hikyuu/trade_manage/Performance.h"
 #include "WalkForwardSystem.h"
 #include "WalkForwardTradeManager.h"

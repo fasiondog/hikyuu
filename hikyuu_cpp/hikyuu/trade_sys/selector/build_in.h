@@ -11,7 +11,7 @@
 
 #include "crt/SE_Fixed.h"
 #include "crt/SE_MultiFactor.h"
-#include "crt/SE_Operator.h"
+#include "crt/SE_Logic.h"
 #include "crt/SE_Optimal.h"
 #include "crt/SE_Signal.h"
 
