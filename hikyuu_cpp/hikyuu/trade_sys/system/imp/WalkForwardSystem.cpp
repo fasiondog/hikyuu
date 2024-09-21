@@ -185,7 +185,7 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     m_stock = m_kdata.getStock();
     readyForRun();
 
-    OptimalSelector* se_ptr = dynamic_cast<OptimalSelector*>(m_se.get());
+    OptimalSelectorBase* se_ptr = dynamic_cast<OptimalSelectorBase*>(m_se.get());
     const auto& m_run_ranges = se_ptr->getRunRanges();
     size_t run_ranges_len = m_run_ranges.size();
     HKU_IF_RETURN(run_ranges_len == 0, void());

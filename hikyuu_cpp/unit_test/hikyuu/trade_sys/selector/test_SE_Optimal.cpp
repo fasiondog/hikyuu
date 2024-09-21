@@ -9,7 +9,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Optimal.h>
-#include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelector.h>
+#include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/NOT.h>
@@ -56,7 +56,7 @@ TEST_CASE("test_SE_Optimal") {
     // CHECK_THROWS(se->addSystem(sys));
     se->addSystem(sys);
     se->calculate(SystemList(), KQueryByIndex(-50));
-    OptimalSelector* raw_se = dynamic_cast<OptimalSelector*>(se.get());
+    OptimalSelectorBase* raw_se = dynamic_cast<OptimalSelectorBase*>(se.get());
     CHECK_UNARY(raw_se->getRunRanges().empty());
 
     /** @arg 尝试加入未指定证券标的的系统列表 */
@@ -176,6 +176,7 @@ TEST_CASE("test_SE_Optimal") {
 
     /** @arg 多候选系统，取最小值 */
     // se->setParam<bool>("trace", true);
+    // se->setParam<bool>("parallel", true);
     se->setParam<int>("mode", 1);
     se->reset();
     se->calculate(SystemList(), query);
@@ -244,7 +245,7 @@ TEST_CASE("test_SE_Optimal_export") {
     // }
     // KQuery query(-125);
     // se1->calculate(SystemList(), query);
-    // OptimalSelector* raw_se1 = dynamic_cast<OptimalSelector*>(se1.get());
+    // OptimalSelectorBase* raw_se1 = dynamic_cast<OptimalSelectorBase*>(se1.get());
     // auto run_ranges1 = raw_se1->getRunRanges();
 
     // // 目前计算后必须reset才能正常序列化后重加载
@@ -268,7 +269,7 @@ TEST_CASE("test_SE_Optimal_export") {
 
     // // se2->setParam<bool>("trace", true);
     // se2->calculate(SystemList(), query);
-    // OptimalSelector* raw_se2 = dynamic_cast<OptimalSelector*>(se2.get());
+    // OptimalSelectorBase* raw_se2 = dynamic_cast<OptimalSelectorBase*>(se2.get());
     // auto run_ranges2 = raw_se2->getRunRanges();
     // CHECK_EQ(run_ranges1.size(), run_ranges2.size());
     // for (size_t i = 0, len = run_ranges1.size(); i < len; i++) {

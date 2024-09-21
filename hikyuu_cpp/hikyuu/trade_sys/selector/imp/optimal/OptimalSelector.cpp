@@ -14,63 +14,35 @@ BOOST_CLASS_EXPORT(hku::OptimalSelector)
 
 namespace hku {
 
-string OptimalSelector::str() const {
-    std::ostringstream buf;
-    buf << "Selector(" << name() << ", " << getParameter()
-        << ", candidate systems count: " << m_pro_sys_list.size() << ")";
-    return buf.str();
-}
-
-OptimalSelector::OptimalSelector() : SelectorBase("SE_Optimal") {
-    setParam<bool>("depend_on_proto_sys", true);
-    setParam<string>("market", "SH");
+OptimalSelector::OptimalSelector() : OptimalSelectorBase("SE_Optimal") {
     setParam<string>("key", "帐户平均年收益率%");
     setParam<int>("mode", 0);  // 0 取最高值，1 取最低值
-    setParam<int>("train_len", 100);
-    setParam<int>("test_len", 20);
-    setParam<bool>("parallel", false);
-    setParam<bool>("trace", false);
 }
 
 void OptimalSelector::_checkParam(const string& name) const {
+    OptimalSelectorBase::_checkParam(name);
     if ("mode" == name) {
         int mode = getParam<int>(name);
         HKU_ASSERT(0 == mode || 1 == mode);
     } else if ("key" == name) {
         string key = getParam<string>("key");
         HKU_CHECK(Performance::exist(key), R"(Invalid key("{}") in Performance!)", key);
-    } else if ("train_len" == name) {
-        HKU_ASSERT(getParam<int>("train_len") > 0);
-    } else if ("test_len" == name) {
-        HKU_ASSERT(getParam<int>("test_len") > 0);
-    } else if ("depend_on_proto_sys" == name) {
-        HKU_ASSERT(getParam<bool>("depend_on_proto_sys"));
-    } else if ("market" == name) {
-        string market = getParam<string>(name);
-        auto market_info = StockManager::instance().getMarketInfo(market);
-        HKU_CHECK(market_info != Null<MarketInfo>(), "Invalid market: {}", market);
     }
 }
 
 SystemWeightList OptimalSelector::getSelected(Datetime date) {
     SystemWeightList ret;
-    auto iter = m_sys_dict.find(date);
-    if (iter != m_sys_dict.end()) {
+    auto iter = this->m_sys_dict.find(date);
+    if (iter != this->m_sys_dict.end()) {
         ret.emplace_back(SystemWeight(iter->second, 1.0));
     }
     return ret;
 }
 
-bool OptimalSelector::isMatchAF(const AFPtr& af) {
-    return true;
-}
-
 void OptimalSelector::_reset() {
+    OptimalSelectorBase::_reset();
     m_sys_dict.clear();
-    m_run_ranges.clear();
 }
-
-void OptimalSelector::_calculate() {}
 
 void OptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& query) {
     SPEND_TIME(OptimalSelector_calculate);
@@ -226,7 +198,7 @@ void OptimalSelector::_calculate_parallel(const vector<std::pair<size_t, size_t>
               for (const auto& sys : m_pro_sys_list) {
                   auto new_sys = sys->clone();
                   new_sys->run(q, true);
-                  per.statistics(sys->getTM(), end_date);
+                  per.statistics(new_sys->getTM(), end_date);
                   double value = per.get(key);
                   CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
                   if (value < min_value) {

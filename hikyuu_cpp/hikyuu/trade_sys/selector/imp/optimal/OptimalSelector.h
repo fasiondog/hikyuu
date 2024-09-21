@@ -6,27 +6,15 @@
  */
 
 #pragma once
-#include "hikyuu/trade_sys/selector/SelectorBase.h"
+
+#include "OptimalSelectorBase.h"
 
 namespace hku {
 
-//
-// start ------ run_start --end
-// | train_len | test_len
-//
-struct RunRanges {
-    Datetime start;
-    Datetime run_start;
-    Datetime end;
-
-    RunRanges(const Datetime& start_, const Datetime& run_start_, const Datetime end_)
-    : start(start_), run_start(run_start_), end(end_) {}
-};
-
-class OptimalSelector : public SelectorBase {
+class OptimalSelector : public OptimalSelectorBase {
     CLASS_LOGGER_IMP(SE_Optimal)
-    SELECTOR_IMP(OptimalSelector)
-    SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
+    OPTIMAL_SELECTOR_IMP(OptimalSelector)
+    OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     OptimalSelector();
@@ -35,13 +23,8 @@ public:
     virtual void _checkParam(const string& name) const override;
     virtual void calculate(const SystemList& pf_realSysList, const KQuery& query) override;
 
+    virtual SystemWeightList getSelected(Datetime date);
     virtual void _reset() override;
-
-    virtual string str() const override;
-
-    const vector<RunRanges>& getRunRanges() const {
-        return m_run_ranges;
-    }
 
 private:
     void _calculate_single(const vector<std::pair<size_t, size_t>>& train_ranges,
@@ -54,7 +37,6 @@ private:
 
 private:
     unordered_map<Datetime, SYSPtr> m_sys_dict;
-    vector<RunRanges> m_run_ranges;
 };
 
 }  // namespace hku
