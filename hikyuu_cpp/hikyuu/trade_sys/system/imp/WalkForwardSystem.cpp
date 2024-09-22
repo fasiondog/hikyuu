@@ -60,21 +60,13 @@ WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list, const
 
 void WalkForwardSystem::initParam() {
     setParam<string>("market", "SH");
-    setParam<string>("key", "帐户平均年收益率%");
-    setParam<int>("mode", 0);  // 0 取最高值，1 取最低值
     setParam<int>("train_len", 100);
     setParam<int>("test_len", 20);
     setParam<bool>("parallel", false);
 }
 
 void WalkForwardSystem::_checkParam(const string& name) const {
-    if ("mode" == name) {
-        int mode = getParam<int>(name);
-        HKU_ASSERT(0 == mode || 1 == mode);
-    } else if ("key" == name) {
-        string key = getParam<string>("key");
-        HKU_CHECK(Performance::exist(key), R"(Invalid key("{}") in Performance!)", key);
-    } else if ("train_len" == name) {
+    if ("train_len" == name) {
         HKU_ASSERT(getParam<int>("train_len") > 0);
     } else if ("test_len" == name) {
         HKU_ASSERT(getParam<int>("test_len") > 0);
@@ -160,8 +152,6 @@ void WalkForwardSystem::readyForRun() {
     }
 
     m_se->setParam<string>("market", getParam<string>("market"));
-    m_se->setParam<string>("key", getParam<string>("key"));
-    m_se->setParam<int>("mode", getParam<int>("mode"));
     m_se->setParam<int>("train_len", getParam<int>("train_len"));
     m_se->setParam<int>("test_len", getParam<int>("test_len"));
     m_se->setParam<bool>("parallel", getParam<bool>("parallel"));

@@ -39,6 +39,10 @@ SystemWeightList OptimalSelector::getSelected(Datetime date) {
     return ret;
 }
 
+SelectorPtr OptimalSelector::_clone() {
+    return std::make_shared<OptimalSelector>();
+}
+
 void OptimalSelector::_reset() {
     OptimalSelectorBase::_reset();
     m_sys_dict.clear();

@@ -13,4 +13,6 @@ namespace hku {
 
 SEPtr HKU_API SE_Optimal();
 
+SEPtr HKU_API SE_MaxFundsOptimal();
+
 }

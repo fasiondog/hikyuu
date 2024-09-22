@@ -13,7 +13,6 @@ namespace hku {
 
 class OptimalSelector : public OptimalSelectorBase {
     CLASS_LOGGER_IMP(SE_Optimal)
-    OPTIMAL_SELECTOR_IMP(OptimalSelector)
     OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
@@ -24,6 +23,7 @@ public:
     virtual void calculate(const SystemList& pf_realSysList, const KQuery& query) override;
 
     virtual SystemWeightList getSelected(Datetime date);
+    virtual SelectorPtr _clone() override;
     virtual void _reset() override;
 
 private:

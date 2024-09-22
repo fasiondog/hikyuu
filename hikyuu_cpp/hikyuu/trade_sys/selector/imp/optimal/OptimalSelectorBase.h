@@ -42,7 +42,7 @@ public:
 
     // 以便继承子类只需要实现 _clone 和 该接口即可
     // 该接口实现系统绩效评估，getSelected 时将取评估结果最大的系统
-    virtual double evaluate(const SYSPtr&, const Datetime& endDate) {
+    virtual double evaluate(const SYSPtr& sys, const Datetime& endDate) {
         return Null<double>();
     }
 
@@ -79,6 +79,7 @@ private:                                                       \
 public:                                       \
     virtual SelectorPtr _clone() override {   \
         return std::make_shared<classname>(); \
-    }
+    }                                         \
+    virtual double evaluate(const SYSPtr&, const Datetime& endDate) override;
 
 }  // namespace hku
