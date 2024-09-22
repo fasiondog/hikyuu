@@ -7,7 +7,7 @@
 
 #include <hikyuu/analysis/combinate.h>
 #include <hikyuu/analysis/analysis_sys.h>
-#include "pybind_utils.h"
+#include "../pybind_utils.h"
 
 using namespace hku;
 namespace py = pybind11;
@@ -149,12 +149,11 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
         }
     }
 
-    vector<AnalysisSystemWithBlockOut> records;
+    vector<AnalysisSystemOutput> records;
     {
         OStreamToPython guard(false);
         py::gil_scoped_release release;
         records = analysisSystemList(sys_list, stk_list, query);
-        // records = analysisSystemList(stk_list, query, sys_proto);
     }
 
     Performance per;
@@ -207,4 +206,10 @@ void export_analysis(py::module& m) {
     m.def("inner_combinate_ind_analysis_with_block", combinate_ind_analysis_with_block);
 
     m.def("inner_analysis_sys_list", analysis_sys_list);
+
+    m.def("find_optimal_system", findOptimalSystem, py::arg("sys_list"), py::arg("stock"),
+          py::arg("query"), py::arg("sort_key") = string(), py::arg("sort_mode") = 0);
+    m.def("find_optimal_system_multi", findOptimalSystemMulti, py::arg("sys_list"),
+          py::arg("stock"), py::arg("query"), py::arg("sort_key") = string(),
+          py::arg("sort_mode") = 0);
 }

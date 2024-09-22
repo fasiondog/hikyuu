@@ -17,7 +17,8 @@
  * 测试用例文档，用于组织和描述测试用例。 \n
  *
  * @section test_rule 测试工程的组织原则
- * 组织原则1：测试工程与源代码工程在物理上隔离，使用完全独立的并行目录，但内部目录结构应于源代码工程保持一致。 \n
+ * 组织原则1：测试工程与源代码工程在物理上隔离，使用完全独立的并行目录，但内部目录结构应于源代码工程保持一致。
+ * \n
  * 组织原则2：针对一个模块（通常为一个类），应建立一个测试套件（test_suite），其命名规则为：test_模块名（类名)_suite，
  *          例如，针对类IniParser，建立一个测试套件：test_iniparser_suite。建议全部使用小写字母。 \n
  * 组织原则3：针对每一测试套件，使用一个单独的测试文件，文件命名规则：test_模块名（类名）.cpp。 \n
@@ -37,6 +38,7 @@
  * @defgroup test_hikyuu_indicator_suite test_hikyuu_indicator_suite
  * @defgroup test_hikyuu_trade_manage_suite test_hikyuu_trade_manage_suite
  * @defgroup test_hikyuu_trade_sys_suite test_hikyuu_trade_sys_suite
+ * @defgroup test_hikyuu_analysis_suite test_hikyuu_analysis_suite
  *
  *
  */

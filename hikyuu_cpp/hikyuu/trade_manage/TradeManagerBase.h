@@ -770,3 +770,11 @@ inline std::ostream& operator<<(std::ostream& os, const TradeManagerPtr& ptm) {
 }
 
 }  // namespace hku
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::TradeManagerBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::TradeManagerPtr> : ostream_formatter {};
+#endif

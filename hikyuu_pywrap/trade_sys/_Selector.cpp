@@ -46,6 +46,10 @@ public:
     bool isMatchAF(const AFPtr& af) override {
         PYBIND11_OVERLOAD_PURE_NAME(bool, SelectorBase, "is_match_af", isMatchAF, af);
     }
+
+    string str() const override {
+        PYBIND11_OVERRIDE_NAME(string, SelectorBase, "__str__", str, );
+    }
 };
 
 void export_Selector(py::module& m) {

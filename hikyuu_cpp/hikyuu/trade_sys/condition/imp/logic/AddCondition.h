@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../ConditionBase.h"
+#include "hikyuu/trade_sys/condition/ConditionBase.h"
 
 namespace hku {
 

@@ -6,7 +6,6 @@
  */
 
 #include <hikyuu/trade_sys/condition/build_in.h>
-#include <hikyuu/trade_sys/condition/imp/AndCondition.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;

@@ -1,21 +1,21 @@
 /*
- *  Copyright (c) 2019~2023, hikyuu.org
+ *  Copyright (c) 2024 hikyuu.org
  *
- *  History:
- *    1. 20240223 added by fasiondog
+ *  Created on: 2024-02-16
+ *      Author: fasiondog
  */
 
 #pragma once
 
-#include "../ConditionBase.h"
+#include "hikyuu/trade_sys/condition/ConditionBase.h"
 
 namespace hku {
 
-class HKU_API OrCondition : public ConditionBase {
+class HKU_API AndCondition : public ConditionBase {
 public:
-    OrCondition();
-    OrCondition(const ConditionPtr& cond1, const ConditionPtr& cond2);
-    virtual ~OrCondition();
+    AndCondition();
+    AndCondition(const ConditionPtr& cond1, const ConditionPtr& cond2);
+    virtual ~AndCondition();
 
     virtual void _calculate() override;
     virtual void _reset() override;
