@@ -274,7 +274,7 @@ void export_System(py::module& m) {
           SystemList sys_list = python_list_to_vector<SystemPtr>(candidate_sys_list);
           SelectorPtr c_se = se;
           if (!c_se) {
-              c_se = SE_Optimal();
+              c_se = SE_MaxFundsOptimal();
           }
           return SYS_WalkForward(sys_list, tm, train_len, test_len, c_se, train_tm);
       },

@@ -31,6 +31,7 @@ OptimalSelectorBase::OptimalSelectorBase(const string& name) : SelectorBase(name
 void OptimalSelectorBase::_initParams() {
     setParam<bool>("depend_on_proto_sys", true);
     setParam<string>("market", "SH");
+    setParam<int>("index", 0);  // 取排序后的第 index 个结果
     setParam<int>("train_len", 100);
     setParam<int>("test_len", 20);
     setParam<bool>("parallel", false);
@@ -42,6 +43,8 @@ void OptimalSelectorBase::_checkParam(const string& name) const {
         HKU_ASSERT(getParam<int>("train_len") > 0);
     } else if ("test_len" == name) {
         HKU_ASSERT(getParam<int>("test_len") > 0);
+    } else if ("index" == name) {
+        HKU_ASSERT(getParam<int>("index") >= 0);
     } else if ("depend_on_proto_sys" == name) {
         HKU_ASSERT(getParam<bool>("depend_on_proto_sys"));
     } else if ("market" == name) {
@@ -55,7 +58,12 @@ SystemWeightList OptimalSelectorBase::getSelected(Datetime date) {
     SystemWeightList ret;
     auto iter = m_sys_dict.find(date);
     if (iter != m_sys_dict.end()) {
-        ret.push_back(iter->second->front());
+        int index = getParam<int>("index");
+        if (index < iter->second->size()) {
+            ret.emplace_back(iter->second->at(index));
+        } else {
+            ret.emplace_back(iter->second->at(iter->second->size() - 1));
+        }
     }
     return ret;
 }

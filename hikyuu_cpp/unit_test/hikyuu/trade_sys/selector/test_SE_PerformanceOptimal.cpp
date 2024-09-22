@@ -35,9 +35,9 @@ static SYSPtr create_test_sys(int fast_n, int slow_n) {
 }
 
 /** @par 检测点 */
-TEST_CASE("test_SE_Optimal") {
-    auto se = SE_Optimal();
-    CHECK_EQ(se->name(), "SE_Optimal");
+TEST_CASE("test_SE_PerformanceOptimal") {
+    auto se = SE_PerformanceOptimal();
+    CHECK_EQ(se->name(), "SE_PerformanceOptimal");
 
     /** @arg 尝试加入空系统 */
     CHECK_THROWS(se->addSystem(SYSPtr()));
@@ -229,12 +229,12 @@ TEST_CASE("test_SE_Optimal") {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-TEST_CASE("test_SE_Optimal_export") {
+TEST_CASE("test_SE_PerformanceOptimal_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/SE_Optimal.xml";
+    filename += "/SE_PerformanceOptimal.xml";
 
-    auto se1 = SE_Optimal();
+    auto se1 = SE_PerformanceOptimal();
     Stock stk = getStock("sz000001");
     vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
     for (const auto& param : params) {

@@ -6,7 +6,7 @@
  */
 
 #include "hikyuu/trade_sys/selector/crt/SE_Optimal.h"
-#include "hikyuu/trade_sys/selector/imp/optimal/OptimalSelector.h"
+#include "hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h"
 #include "hikyuu/trade_manage/Performance.h"
 #include "WalkForwardSystem.h"
 #include "WalkForwardTradeManager.h"
@@ -37,7 +37,7 @@ string WalkForwardSystem::str() const {
     return os.str();
 }
 
-WalkForwardSystem::WalkForwardSystem() : System("SYS_WalkForward"), m_se(SE_Optimal()) {
+WalkForwardSystem::WalkForwardSystem() : System("SYS_WalkForward"), m_se(SE_MaxFundsOptimal()) {
     initParam();
 }
 

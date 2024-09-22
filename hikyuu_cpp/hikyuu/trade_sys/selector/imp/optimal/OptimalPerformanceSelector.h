@@ -11,13 +11,13 @@
 
 namespace hku {
 
-class OptimalSelector : public OptimalSelectorBase {
+class OptimalPerformanceSelector : public OptimalSelectorBase {
     CLASS_LOGGER_IMP(SE_Optimal)
     OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    OptimalSelector();
-    virtual ~OptimalSelector() = default;
+    OptimalPerformanceSelector();
+    virtual ~OptimalPerformanceSelector() = default;
 
     virtual void _checkParam(const string& name) const override;
     virtual void calculate(const SystemList& pf_realSysList, const KQuery& query) override;
