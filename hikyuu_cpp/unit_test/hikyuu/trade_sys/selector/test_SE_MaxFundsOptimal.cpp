@@ -35,9 +35,9 @@ static SYSPtr create_test_sys(int fast_n, int slow_n) {
 }
 
 /** @par 检测点 */
-TEST_CASE("test_SE_Optimal") {
-    auto se = SE_Optimal();
-    CHECK_EQ(se->name(), "SE_Optimal");
+TEST_CASE("test_SE_MaxFundsOptimal") {
+    auto se = SE_MaxFundsOptimal();
+    CHECK_EQ(se->name(), "SE_MaxFundsOptimal");
 
     /** @arg 尝试加入空系统 */
     CHECK_THROWS(se->addSystem(SYSPtr()));
@@ -173,54 +173,6 @@ TEST_CASE("test_SE_Optimal") {
         CHECK_EQ(sw.size(), 1);
         CHECK_EQ(sw[0].sys->name(), "test_sys_3_5");
     }
-
-    /** @arg 多候选系统，取最小值 */
-    // se->setParam<bool>("trace", true);
-    // se->setParam<bool>("parallel", true);
-    se->setParam<int>("mode", 1);
-    se->reset();
-    se->calculate(SystemList(), query);
-    run_ranges = raw_se->getRunRanges();
-    CHECK_EQ(run_ranges.size(), 5);
-    dates = StockManager::instance().getTradingCalendar(query);
-    CHECK_EQ(run_ranges[0].start, dates[0]);
-    CHECK_EQ(run_ranges[0].run_start, dates[30]);
-    CHECK_EQ(run_ranges[0].end, dates[50]);
-    CHECK_EQ(run_ranges[1].start, dates[20]);
-    CHECK_EQ(run_ranges[1].run_start, dates[50]);
-    CHECK_EQ(run_ranges[1].end, dates[70]);
-    CHECK_EQ(run_ranges[2].start, dates[40]);
-    CHECK_EQ(run_ranges[2].run_start, dates[70]);
-    CHECK_EQ(run_ranges[2].end, dates[90]);
-    CHECK_EQ(run_ranges[3].start, dates[60]);
-    CHECK_EQ(run_ranges[3].run_start, dates[90]);
-    CHECK_EQ(run_ranges[3].end, dates[110]);
-    CHECK_EQ(run_ranges[4].start, dates[80]);
-    CHECK_EQ(run_ranges[4].run_start, dates[110]);
-    CHECK_EQ(run_ranges[4].end, dates[124] + Minutes(1));
-    for (size_t i = 0; i < 30; i++) {
-        CHECK_UNARY(se->getSelected(dates[i]).empty());
-    }
-    for (size_t i = 30; i < 50; i++) {
-        auto sw = se->getSelected(dates[i]);
-        CHECK_EQ(sw.size(), 1);
-        CHECK_EQ(sw[0].sys->name(), "test_sys_5_10");
-    }
-    for (size_t i = 50; i < 70; i++) {
-        auto sw = se->getSelected(dates[i]);
-        CHECK_EQ(sw.size(), 1);
-        CHECK_EQ(sw[0].sys->name(), "test_sys_5_20");
-    }
-    for (size_t i = 70; i < 110; i++) {
-        auto sw = se->getSelected(dates[i]);
-        CHECK_EQ(sw.size(), 1);
-        CHECK_EQ(sw[0].sys->name(), "test_sys_5_10");
-    }
-    for (size_t i = 110; i < 125; i++) {
-        auto sw = se->getSelected(dates[i]);
-        CHECK_EQ(sw.size(), 1);
-        CHECK_EQ(sw[0].sys->name(), "test_sys_5_20");
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -229,12 +181,12 @@ TEST_CASE("test_SE_Optimal") {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-TEST_CASE("test_SE_Optimal_export") {
+TEST_CASE("test_SE_MaxFundsOptimal_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/SE_Optimal.xml";
+    filename += "/SE_MaxFundsOptimal.xml";
 
-    auto se1 = SE_Optimal();
+    auto se1 = SE_MaxFundsOptimal();
     Stock stk = getStock("sz000001");
     vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
     for (const auto& param : params) {

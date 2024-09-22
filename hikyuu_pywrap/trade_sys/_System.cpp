@@ -64,9 +64,8 @@ void export_System(py::module& m) {
         DEF_PICKLE(TradeRequest);
 
     //--------------------------------------------------------------------------------------
-    py::class_<System, SystemPtr>(
-      m, "System",
-      R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
+    py::class_<System, SystemPtr>(m, "System",
+                                  R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
 
 系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
@@ -271,12 +270,12 @@ void export_System(py::module& m) {
     m.def(
       "SYS_WalkForward",
       [](const py::sequence& candidate_sys_list, const TradeManagerPtr& tm, size_t train_len,
-         size_t test_len, const string& key, const TradeManagerPtr& train_tm) {
+         size_t test_len, const SelectorPtr& se, const TradeManagerPtr& train_tm) {
           SystemList sys_list = python_list_to_vector<SystemPtr>(candidate_sys_list);
-          return SYS_WalkForward(sys_list, tm, train_len, test_len, key, train_tm);
+          return SYS_WalkForward(sys_list, tm, train_len, test_len, se, train_tm);
       },
       py::arg("sys_list"), py::arg("tm") = TradeManagerPtr(), py::arg("train_len") = 100,
-      py::arg("test_len") = 20, py::arg("key") = "帐户平均年收益率%",
+      py::arg("test_len") = 20, py::arg("se") = SE_Optimal(),
       py::arg("train_tm") = TradeManagerPtr(),
       R"(SYS_WalkForward(sys_list, tm, train_len, test_len, train_tm)
 
@@ -286,6 +285,6 @@ void export_System(py::module& m) {
   :param TradeManager tm: 交易账户
   :param int train_len: 滚动评估系统绩效时使用的数据长度
   :param int test_len: 使用在 train_len 中选出的最优系统执行的数据长度
-  :param str key: 评估时使用统计项
+  :param SelectorBase se: 寻优选择器
   :param TradeManager train_tm: 滚动评估时使用的交易账户, 为None时, 使用 tm 的拷贝进行评估)");
 }

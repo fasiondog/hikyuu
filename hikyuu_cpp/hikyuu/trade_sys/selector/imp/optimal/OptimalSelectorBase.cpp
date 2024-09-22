@@ -130,11 +130,17 @@ void OptimalSelectorBase::_calculate_single(const vector<std::pair<size_t, size_
 
         selected_sys_list = std::make_shared<SystemWeightList>();
         for (const auto& sys : m_pro_sys_list) {
-            sys->run(q, true);
-            double value = evaluate(sys, end_date);
-            sys->reset();
-            if (!std::isnan(value)) {
-                selected_sys_list->emplace_back(SystemWeight(sys->clone(), value));
+            try {
+                sys->run(q, true);
+                double value = evaluate(sys, end_date);
+                sys->reset();
+                if (!std::isnan(value)) {
+                    selected_sys_list->emplace_back(SystemWeight(sys->clone(), value));
+                }
+            } catch (const std::exception& e) {
+                CLS_ERROR("{}! {}", e.what(), sys->name());
+            } catch (...) {
+                CLS_ERROR("Unknown error! {}", sys->name());
             }
         }
 
@@ -180,11 +186,17 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
 
           auto selected_sys_list = std::make_shared<SystemWeightList>();
           for (const auto& sys : m_pro_sys_list) {
-              sys->run(q, true);
-              double value = evaluate(sys, end_date);
-              sys->reset();
-              if (!std::isnan(value)) {
-                  selected_sys_list->emplace_back(SystemWeight(sys->clone(), value));
+              try {
+                  sys->run(q, true);
+                  double value = evaluate(sys, end_date);
+                  sys->reset();
+                  if (!std::isnan(value)) {
+                      selected_sys_list->emplace_back(SystemWeight(sys->clone(), value));
+                  }
+              } catch (const std::exception& e) {
+                  CLS_ERROR("{}! {}", e.what(), sys->name());
+              } catch (...) {
+                  CLS_ERROR("Unknown error! {}", sys->name());
               }
           }
 
@@ -222,9 +234,5 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
         }
     }
 }
-
-// SEPtr HKU_API SE_Optimal() {
-//     return make_shared<OptimalSelectorBase>();
-// }
 
 }  // namespace hku

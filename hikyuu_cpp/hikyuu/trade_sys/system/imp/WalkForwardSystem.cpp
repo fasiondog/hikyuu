@@ -46,11 +46,20 @@ WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list, const
 : System("SYS_WalkForward"), m_train_tm(train_tm) {
     CLS_ASSERT(!candidate_sys_list.empty());
     CLS_ASSERT(se);
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
     try {
         OptimalSelectorBase* _ = dynamic_cast<OptimalSelectorBase*>(se.get());
     } catch (...) {
         CLS_THROW("Only the OptimalSelectorBase type is accepted!");
     }
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
     initParam();
     m_se = se;
     m_se->setParam<int>("train_len", getParam<int>("train_len"));
@@ -259,20 +268,26 @@ TradeRecord WalkForwardSystem::runMoment(const Datetime& datetime) {
     HKU_IF_RETURN(sw_list.empty(), ret);
 
     auto& sys = sw_list.front().sys;
-    if (sys != m_cur_sys) {
+    if (sys && sys != m_cur_sys) {
         m_cur_kdata++;
-        m_cur_sys = sys;
-        m_cur_sys->setParam<bool>("shared_tm", true);
-        m_cur_sys->setParam<bool>("trace", getParam<bool>("trace"));
-        m_cur_sys->setTM(crtWalkForwardTM(getTM(), m_run_ranges[m_cur_kdata].run_start));
-        m_cur_sys->readyForRun();
-        m_cur_sys->setTO(m_train_kdata_list[m_cur_kdata]);
-        syncDataToSystem(m_cur_sys);
+        if (m_cur_kdata < m_train_kdata_list.size()) {
+            m_cur_sys = sys;
+            m_cur_sys->setParam<bool>("shared_tm", true);
+            m_cur_sys->setParam<bool>("trace", getParam<bool>("trace"));
+            m_cur_sys->setTM(crtWalkForwardTM(getTM(), m_run_ranges[m_cur_kdata].run_start));
+            m_cur_sys->readyForRun();
+            m_cur_sys->setTO(m_train_kdata_list[m_cur_kdata]);
+            syncDataToSystem(m_cur_sys);
+        } else {
+            m_cur_sys.reset();
+        }
     }
 
-    ret = m_cur_sys->runMoment(datetime);
-    m_trade_list.push_back(ret);
-    syncDataFromSystem(m_cur_sys, true);
+    if (m_cur_sys) {
+        ret = m_cur_sys->runMoment(datetime);
+        m_trade_list.push_back(ret);
+        syncDataFromSystem(m_cur_sys, true);
+    }
     return ret;
 }
 

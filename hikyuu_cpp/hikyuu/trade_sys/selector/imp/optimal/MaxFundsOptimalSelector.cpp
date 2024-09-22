@@ -17,9 +17,17 @@ MaxFundsOptimalSelector::MaxFundsOptimalSelector() : OptimalSelectorBase("SE_Max
 
 MaxFundsOptimalSelector::~MaxFundsOptimalSelector() {}
 
-double MaxFundsOptimalSelector::evaluate(const SYSPtr& sys, const Datetime& endDate) {
-    auto funds = sys->getTM()->getFunds(endDate);
-    return funds.total_assets();
+double MaxFundsOptimalSelector::evaluate(const SYSPtr& sys, const Datetime& endDate) noexcept {
+    double ret = Null<double>();
+    try {
+        auto funds = sys->getTM()->getFunds(endDate);
+        ret = funds.total_assets();
+    } catch (const std::exception& e) {
+        HKU_ERROR("Get funds failed! {}! {}", e.what(), name());
+    } catch (...) {
+        HKU_ERROR("Get funds failed! Unknown exception! {}", name());
+    }
+    return ret;
 }
 
 SEPtr HKU_API SE_MaxFundsOptimal() {
