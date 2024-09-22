@@ -355,18 +355,18 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     m_result["赢利期望值"] = 0.01 * m_result["赢利交易比例%"] * m_result["赢利交易平均赢利"] +
                              (1 - 0.01 * m_result["赢利交易比例%"]) * m_result["亏损交易平均亏损"];
 
-    int duration = 0;
+    int64_t duration = 0;
     if (tm->firstDatetime() != Null<Datetime>()) {
         if (datetime == Null<Datetime>()) {
-            duration = (Datetime::now().date() - tm->firstDatetime().date()).days();
+            duration = (Datetime::now() - tm->firstDatetime()).days() + 1;
         } else {
-            duration = (datetime.date() - tm->firstDatetime().date()).days();
+            duration = (datetime - tm->firstDatetime()).days() + 1;
         }
     }
 
     double years = duration / 365.0;
 
-    if (duration != 0) {
+    if (duration > 1) {
         m_result["交易机会频率/年"] = m_result["已平仓交易总数"] / years;
         m_result["年度期望R乘数"] =
           roundEx(m_result["R乘数期望值"] * m_result["交易机会频率/年"], precision);
