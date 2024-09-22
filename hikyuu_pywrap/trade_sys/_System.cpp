@@ -272,10 +272,14 @@ void export_System(py::module& m) {
       [](const py::sequence& candidate_sys_list, const TradeManagerPtr& tm, size_t train_len,
          size_t test_len, const SelectorPtr& se, const TradeManagerPtr& train_tm) {
           SystemList sys_list = python_list_to_vector<SystemPtr>(candidate_sys_list);
-          return SYS_WalkForward(sys_list, tm, train_len, test_len, se, train_tm);
+          SelectorPtr c_se = se;
+          if (!c_se) {
+              c_se = SE_Optimal();
+          }
+          return SYS_WalkForward(sys_list, tm, train_len, test_len, c_se, train_tm);
       },
       py::arg("sys_list"), py::arg("tm") = TradeManagerPtr(), py::arg("train_len") = 100,
-      py::arg("test_len") = 20, py::arg("se") = SE_Optimal(),
+      py::arg("test_len") = 20, py::arg("se") = SelectorPtr(),
       py::arg("train_tm") = TradeManagerPtr(),
       R"(SYS_WalkForward(sys_list, tm, train_len, test_len, train_tm)
 
