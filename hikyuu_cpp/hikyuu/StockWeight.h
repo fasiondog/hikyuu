@@ -20,13 +20,13 @@ namespace hku {
 class HKU_API StockWeight {
 public:
     /** 默认构造函数，返回Null<StockWeight>() */
-    StockWeight();
+    StockWeight() = default;
 
     explicit StockWeight(const Datetime& datetime);
 
     StockWeight(const Datetime& datetime, price_t countAsGift, price_t countForSell,
                 price_t priceForSell, price_t bonus, price_t increasement, price_t totalCount,
-                price_t freeCount);
+                price_t freeCount, price_t suogu);
 
     /** 权息日期 */
     Datetime datetime() const {
@@ -68,15 +68,21 @@ public:
         return m_freeCount;
     }
 
+    /** 扩缩股比例 */
+    price_t suogu() const {
+        return m_suogu;
+    }
+
 private:
-    Datetime m_datetime;     // 权息日期
-    price_t m_countAsGift;   // 每10股送X股
-    price_t m_countForSell;  // 每10股配X股
-    price_t m_priceForSell;  // 配股价
-    price_t m_bonus;         // 每10股红利
-    price_t m_increasement;  // 每10股转增X股
-    price_t m_totalCount;    // 总股本（万股）
-    price_t m_freeCount;     // 流通股（万股）
+    Datetime m_datetime;         // 权息日期
+    price_t m_countAsGift{0.};   // 每10股送X股
+    price_t m_countForSell{0.};  // 每10股配X股
+    price_t m_priceForSell{0.};  // 配股价
+    price_t m_bonus{0.};         // 每10股红利
+    price_t m_increasement{0.};  // 每10股转增X股
+    price_t m_totalCount{0.};    // 总股本（万股）
+    price_t m_freeCount{0.};     // 流通股（万股）
+    price_t m_suogu{0.};         // 扩缩股比例
 };
 
 /** @ingroup StockManage */

@@ -51,7 +51,7 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
         cur.execute(
             "select id, stockid, date, countAsGift, countForSell, priceForSell, \
                     bonus, countOfIncreasement, totalCount, \
-                    freeCount from `hku_base`.`stkweight` where stockid=%s \
+                    freeCount, suogu from `hku_base`.`stkweight` where stockid=%s \
                     order by date desc limit 1" % stockid
         )
         a = [x for x in cur.fetchall()]
@@ -79,10 +79,6 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
                     if xdxr['songzhuangu'] is not None:
                         new_last_db_weight[3] = 10000 * xdxr['songzhuangu']
                         update_last_db_weight = True
-                    if xdxr['suogu'] is not None:
-                        # etf 扩股
-                        new_last_db_weight[3] += 100000 * (xdxr['suogu']-1)
-                        update_last_db_weight = True
                     if xdxr['peigu'] is not None:
                         new_last_db_weight[4] = 10000 * xdxr['peigu']
                         update_last_db_weight = True
@@ -100,26 +96,27 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
                         new_last_db_weight[9] = xdxr['panhouliutong']
                         update_last_db_weight = True
                         last_free_count = new_last_db_weight[9]
+                    if xdxr['suogu'] is not None:
+                        # etf 扩缩股
+                        new_last_db_weight[10] = xdxr['suogu']
+                        update_last_db_weight = True
                     continue
                 if date not in records:
-                    songzhuangu = 10000 * xdxr['songzhuangu'] if xdxr['songzhuangu'] is not None else 0
-                    songzhuangu += 100000 * (xdxr['suogu']-1) if xdxr['suogu'] is not None else 0
                     records[date] = [
                         stockid,
                         date,
-                        songzhuangu,  # countAsGift
+                        10000 * xdxr['songzhuangu'] if xdxr['songzhuangu'] is not None else 0,  # countAsGift
                         10000 * xdxr['peigu'] if xdxr['peigu'] is not None else 0,  # countForSell
                         1000 * xdxr['peigujia'] if xdxr['peigujia'] is not None else 0,  # priceForSell
                         1000 * xdxr['fenhong'] if xdxr['fenhong'] is not None else 0,  # bonus
                         0,  # countOfIncreasement, pytdx 不区分送股和转增股，统一记在送股
                         xdxr['houzongguben'] if xdxr['houzongguben'] is not None else last_total_count,  # totalCount
-                        xdxr['panhouliutong'] if xdxr['panhouliutong'] is not None else last_free_count  # freeCount
+                        xdxr['panhouliutong'] if xdxr['panhouliutong'] is not None else last_free_count,  # freeCount
+                        xdxr["suogu"] if xdxr["suogu"] is not None else 0
                     ]
                 else:
                     if xdxr['songzhuangu'] is not None:
                         records[date][2] = 10000 * xdxr['songzhuangu']
-                    if xdxr['suogu'] is not None:
-                        records[date][2] += 100000 * (xdxr['suogu']-1)
                     if xdxr['peigu'] is not None:
                         records[date][3] = 10000 * xdxr['peigu']
                     if xdxr['peigujia'] is not None:
@@ -130,6 +127,8 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
                         records[date][7] = xdxr['houzongguben']
                     if xdxr['panhouliutong'] is not None:
                         records[date][8] = xdxr['panhouliutong']
+                    if xdxr['suogu'] is not None:
+                        records[date][9] = xdxr['suogu']
                 if xdxr['houzongguben'] is not None:
                     last_total_count = xdxr['houzongguben']
                 if xdxr['panhouliutong'] is not None:
@@ -144,8 +143,8 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
             x = new_last_db_weight
             cur.execute(
                 "UPDATE `hku_base`.`stkweight` SET countAsGift=%s, countForSell=%s, priceForSell=%s, \
-                    bonus=%s, totalCount=%s, freeCount=%s \
-                    where id=%s" % (x[3], x[4], x[5], x[6], x[8], x[9], x[0])
+                    bonus=%s, totalCount=%s, freeCount=%s, suogu=%s \
+                    where id=%s" % (x[3], x[4], x[5], x[6], x[8], x[9], x[10], x[0])
             )
             connect.commit()
             cur.close()
@@ -154,8 +153,8 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
             cur = connect.cursor()
             cur.executemany(
                 "INSERT INTO `hku_base`.`stkweight` (stockid, date, countAsGift, \
-                             countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount) \
-                             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)", [x for x in records.values()]
+                countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount, suogu) \
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", [x for x in records.values()]
             )
             connect.commit()
             cur.close()
