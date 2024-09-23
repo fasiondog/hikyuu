@@ -6,21 +6,21 @@
  */
 
 #include "hikyuu/trade_manage/Performance.h"
-#include "OptimalPerformanceSelector.h"
+#include "PerformanceOptimalSelector.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::OptimalPerformanceSelector)
+BOOST_CLASS_EXPORT(hku::PerformanceOptimalSelector)
 #endif
 
 namespace hku {
 
-OptimalPerformanceSelector::OptimalPerformanceSelector()
+PerformanceOptimalSelector::PerformanceOptimalSelector()
 : OptimalSelectorBase("SE_PerformanceOptimal") {
     setParam<string>("key", "帐户平均年收益率%");
     setParam<int>("mode", 0);  // 0 取最高值，1 取最低值
 }
 
-void OptimalPerformanceSelector::_checkParam(const string& name) const {
+void PerformanceOptimalSelector::_checkParam(const string& name) const {
     OptimalSelectorBase::_checkParam(name);
     if ("mode" == name) {
         int mode = getParam<int>(name);
@@ -31,7 +31,7 @@ void OptimalPerformanceSelector::_checkParam(const string& name) const {
     }
 }
 
-SystemWeightList OptimalPerformanceSelector::getSelected(Datetime date) {
+SystemWeightList PerformanceOptimalSelector::getSelected(Datetime date) {
     SystemWeightList ret;
     auto iter = this->m_sys_dict.find(date);
     if (iter != this->m_sys_dict.end()) {
@@ -40,16 +40,16 @@ SystemWeightList OptimalPerformanceSelector::getSelected(Datetime date) {
     return ret;
 }
 
-SelectorPtr OptimalPerformanceSelector::_clone() {
-    return std::make_shared<OptimalPerformanceSelector>();
+SelectorPtr PerformanceOptimalSelector::_clone() {
+    return std::make_shared<PerformanceOptimalSelector>();
 }
 
-void OptimalPerformanceSelector::_reset() {
+void PerformanceOptimalSelector::_reset() {
     OptimalSelectorBase::_reset();
     m_sys_dict.clear();
 }
 
-void OptimalPerformanceSelector::calculate(const SystemList& pf_realSysList, const KQuery& query) {
+void PerformanceOptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& query) {
     SPEND_TIME(OptimalSelector_calculate);
     HKU_IF_RETURN(m_calculated && m_query == query, void());
 
@@ -99,7 +99,7 @@ void OptimalPerformanceSelector::calculate(const SystemList& pf_realSysList, con
     m_calculated = true;
 }
 
-void OptimalPerformanceSelector::_calculate_single(
+void PerformanceOptimalSelector::_calculate_single(
   const vector<std::pair<size_t, size_t>>& train_ranges, const DatetimeList& dates,
   const string& key, int mode, size_t test_len, bool trace) {
     // SPEND_TIME(OptimalSelector_calculate_single);
@@ -168,7 +168,7 @@ void OptimalPerformanceSelector::_calculate_single(
     }
 }
 
-void OptimalPerformanceSelector::_calculate_parallel(
+void PerformanceOptimalSelector::_calculate_parallel(
   const vector<std::pair<size_t, size_t>>& train_ranges, const DatetimeList& dates,
   const string& key, int mode, size_t test_len, bool trace) {
     // SPEND_TIME(OptimalSelector_calculate_parallel);
@@ -247,7 +247,7 @@ void OptimalPerformanceSelector::_calculate_parallel(
 }
 
 SEPtr HKU_API SE_PerformanceOptimal() {
-    return make_shared<OptimalPerformanceSelector>();
+    return make_shared<PerformanceOptimalSelector>();
 }
 
 }  // namespace hku

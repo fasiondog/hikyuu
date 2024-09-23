@@ -12,7 +12,7 @@
 namespace hku {
 
 /**
- * 测试账户资产最大寻优选择器
+ * 账户资产最大寻优选择器
  * @return SEPtr
  */
 SEPtr HKU_API SE_MaxFundsOptimal();
