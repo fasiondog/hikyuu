@@ -91,8 +91,8 @@ class ImportWeightToSqliteTask:
             hku_check(api.connect(self.host, self.port), "failed connect pytdx {}:{}!", self.host, self.port)
 
             if self.cmd == 'weight':
-                count = pytdx_import_weight(api, connect, self.market)
-                self.logger.info("导入 {} 权息记录数: {}".format(self.market, count))
+                total_count = pytdx_import_weight(api, connect, self.market)
+                self.logger.info("导入 {} 权息记录数: {}".format(self.market, total_count))
                 self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, f'{self.market} {total_count}'])
             elif self.cmd == 'finance':
                 self.queue.put([self.msg_name, f'下载通达信当前财务信息({self.market})...', 0, 0, 0])

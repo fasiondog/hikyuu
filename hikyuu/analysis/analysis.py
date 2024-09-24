@@ -31,6 +31,11 @@ def combinate_ind_analysis(
     :param list keys: 输出 Performance 统计项
     :rtype: pd.DataFrame
     '''
+    if not keys:
+        for key in keys:
+            if not Performance.exist(key):
+                raise Exception(f'Invalid key: {key}')
+
     pers = inner_combinate_ind_analysis(stk, query, tm, sys, buy_inds, sell_inds, n)
 
     if not keys:
@@ -75,6 +80,11 @@ def combinate_ind_analysis_multi(
     :param int n: 买入信号组合时的周期
     :param list keys: 输出 Performance 统计项
     '''
+    if not keys:
+        for key in keys:
+            if not Performance.exist(key):
+                raise Exception(f'Invalid key: {key}')
+
     if isinstance(stks, Block):
         blks = stks
     else:
@@ -95,6 +105,11 @@ def combinate_ind_analysis_multi(
 
 
 def analysis_sys_list(stks, query, sys_proto, keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]):
+    if not keys:
+        for key in keys:
+            if not Performance.exist(key):
+                raise Exception(f'Invalid key: {key}')
+
     names = ["证券代码", "证券名称"]
     names.extend(keys)
     ret = {}
@@ -119,6 +134,11 @@ def analysis_sys_list(stks, query, sys_proto, keys=["累计投入本金", "当�
 
 
 def analysis_sys_list_multi(stks, query, sys_proto, keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]):
+    if not keys:
+        for key in keys:
+            if not Performance.exist(key):
+                raise Exception(f'Invalid key: {key}')
+
     out = inner_analysis_sys_list(stks, query, sys_proto)
     if not keys:
         ret = out

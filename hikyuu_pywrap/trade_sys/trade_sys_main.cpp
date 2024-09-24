@@ -30,9 +30,9 @@ void export_trade_sys_main(py::module& m) {
     export_Stoploss(m);
     export_ProfitGoal(m);
     export_Slippage(m);
-    export_System(m);
     export_Selector(m);
     export_AllocateFunds(m);
     export_Portfolio(m);
     export_MultiFactor(m);
+    export_System(m);
 }

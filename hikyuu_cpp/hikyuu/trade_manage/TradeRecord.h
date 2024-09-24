@@ -73,7 +73,7 @@ public:
     BUSINESS business;  ///< 业务类型
     price_t planPrice;  ///< 计划交易价格
     price_t realPrice;  ///< 实际交易价格
-    price_t goalPrice;  ///< 目标价位，如果为0表示未限定目标
+    price_t goalPrice;  ///< 目标价位，如果为0或Null表示未限定目标
     double number;      ///< 成交数量
     CostRecord cost;    ///< 交易成本
     price_t stoploss;   ///< 止损价

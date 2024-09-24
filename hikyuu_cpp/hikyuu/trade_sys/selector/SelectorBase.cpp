@@ -10,18 +10,24 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const SelectorBase& st) {
-    os << "Selector(" << st.name() << ", " << st.getParameter() << ")";
+    os << st.str();
     return os;
 }
 
 HKU_API std::ostream& operator<<(std::ostream& os, const SelectorPtr& st) {
     if (st) {
-        os << *st;
+        os << st->str();
     } else {
         os << "Selector(NULL)";
     }
 
     return os;
+}
+
+string SelectorBase::str() const {
+    std::ostringstream buf;
+    buf << "Selector(" << name() << ", " << getParameter() << ")";
+    return buf.str();
 }
 
 SelectorBase::SelectorBase() : m_name("SelectorBase") {

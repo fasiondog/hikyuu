@@ -7,6 +7,10 @@
 
 #include "DivCondition.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::DivCondition)
+#endif
+
 namespace hku {
 
 DivCondition::DivCondition() : ConditionBase("CN_Div") {}

@@ -15,12 +15,6 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
-void (System::*run_1)(const KQuery&, bool, bool) = &System::run;
-void (System::*run_2)(const KData&, bool, bool) = &System::run;
-void (System::*run_3)(const Stock&, const KQuery&, bool, bool) = &System::run;
-
-TradeRecord (System::*runMoment_1)(const Datetime&) = &System::runMoment;
-
 void export_System(py::module& m) {
     m.def("get_system_part_name", getSystemPartName, R"(get_system_part_name(part)
 
@@ -56,6 +50,9 @@ void export_System(py::module& m) {
 本身的运行没有影响。)")
 
       .def(py::init<>())
+      .def("__str__", to_py_str<TradeRequest>)
+      .def("__repr__", to_py_str<TradeRequest>)
+
       .def_readwrite("valid", &TradeRequest::valid, "该交易请求记录是否有效（True | False）")
       .def_readwrite("business", &TradeRequest::business,
                      "交易业务类型，参见：:py:class:`hikyuu.trade_manage.BUSINESS`")
@@ -67,9 +64,8 @@ void export_System(py::module& m) {
         DEF_PICKLE(TradeRequest);
 
     //--------------------------------------------------------------------------------------
-    py::class_<System, SystemPtr>(
-      m, "System",
-      R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
+    py::class_<System, SystemPtr>(m, "System",
+                                  R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
 
 系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
@@ -85,6 +81,7 @@ void export_System(py::module& m) {
   - cn_open_position=False (bool): 是否使用系统有效性条件进行初始建仓)")
 
       .def(py::init<const string&>())
+      .def(py::init<const System&>())
       .def(py::init<const TradeManagerPtr&, const MoneyManagerPtr&, const EnvironmentPtr&,
                     const ConditionPtr&, const SignalPtr&, const StoplossPtr&, const StoplossPtr&,
                     const ProfitGoalPtr&, const SlippagePtr&, const string&>())
@@ -123,6 +120,8 @@ void export_System(py::module& m) {
     :raises logic_error: Unsupported type! 不支持的参数类型)")
 
       .def("have_param", &System::haveParam, "是否存在指定参数")
+
+      .def("set_not_shared_all", &System::setNotSharedAll, "将所有组件设置为非共享")
 
       .def("get_stock", &System::getStock, R"(get_stock(self)
 
@@ -171,9 +170,12 @@ void export_System(py::module& m) {
 
     克隆操作，会依据部件的共享特性进行克隆，共享部件不进行实际的克隆操作，保持共享。)")
 
-      .def("run", run_1, py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false)
-      .def("run", run_2, py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false)
-      .def("run", run_3, py::arg("stock"), py::arg("query"), py::arg("reset") = true,
+      .def("run", py::overload_cast<const KQuery&, bool, bool>(&System::run), py::arg("query"),
+           py::arg("reset") = true, py::arg("reset_all") = false)
+      .def("run", py::overload_cast<const KData&, bool, bool>(&System::run), py::arg("kdata"),
+           py::arg("reset") = true, py::arg("reset_all") = false)
+      .def("run", py::overload_cast<const Stock&, const KQuery&, bool, bool>(&System::run),
+           py::arg("stock"), py::arg("query"), py::arg("reset") = true,
            py::arg("reset_all") = false,
            R"(run(self, stock, query[, reset=True])
   
@@ -264,4 +266,29 @@ void export_System(py::module& m) {
     :param ProfitGoalBase pg: 盈利目标策略
     :param SlippageBase sp: 移滑价差算法
     :return: system实例)");
+
+    m.def(
+      "SYS_WalkForward",
+      [](const py::sequence& candidate_sys_list, const TradeManagerPtr& tm, size_t train_len,
+         size_t test_len, const SelectorPtr& se, const TradeManagerPtr& train_tm) {
+          SystemList sys_list = python_list_to_vector<SystemPtr>(candidate_sys_list);
+          SelectorPtr c_se = se;
+          if (!c_se) {
+              c_se = SE_MaxFundsOptimal();
+          }
+          return SYS_WalkForward(sys_list, tm, train_len, test_len, c_se, train_tm);
+      },
+      py::arg("sys_list"), py::arg("tm") = TradeManagerPtr(), py::arg("train_len") = 100,
+      py::arg("test_len") = 20, py::arg("se") = SelectorPtr(),
+      py::arg("train_tm") = TradeManagerPtr(),
+      R"(SYS_WalkForward(sys_list, tm, train_len, test_len, train_tm)
+
+  创建滚动寻优系统，当输入的后续系统列表中仅有一个候选系统时，即为滚动系统
+
+  :param sequence sys_list: 后续系统列表
+  :param TradeManager tm: 交易账户
+  :param int train_len: 滚动评估系统绩效时使用的数据长度
+  :param int test_len: 使用在 train_len 中选出的最优系统执行的数据长度
+  :param SelectorBase se: 寻优选择器
+  :param TradeManager train_tm: 滚动评估时使用的交易账户, 为None时, 使用 tm 的拷贝进行评估)");
 }

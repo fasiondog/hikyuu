@@ -122,12 +122,14 @@ public:
     virtual void _removeAll() {}
 
     /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
-    void calculate(const SystemList& pf_realSysList, const KQuery& query);
+    virtual void calculate(const SystemList& pf_realSysList, const KQuery& query);
 
     /* 仅供PF调用，建立实际系统到原型系统映射 */
     virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) {}
 
     void calculate_proto(const KQuery& query);
+
+    virtual string str() const;
 
 private:
     void initParam();

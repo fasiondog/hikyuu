@@ -32,6 +32,8 @@ TEST_CASE("test_SG_AMA_export") {
     filename += "/SG_AMA.xml";
 
     SignalPtr sg1 = SG_Single(AMA(CLOSE()));
+    auto k = getKData("sz000001", KQueryByIndex(-100));
+    sg1->setTO(k);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -46,6 +48,7 @@ TEST_CASE("test_SG_AMA_export") {
     }
 
     CHECK_EQ(sg1->name(), sg2->name());
+    CHECK_UNARY(sg2->getTO().empty());
 }
 
 /** @} */

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../SelectorBase.h"
+#include "hikyuu/trade_sys/selector/SelectorBase.h"
 
 namespace hku {
 

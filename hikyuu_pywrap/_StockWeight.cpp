@@ -19,8 +19,8 @@ void export_StockWeight(py::module& m) {
     py::class_<StockWeight>(m, "StockWeight", "权息记录")
       .def(py::init<>())
       .def(py::init<const Datetime&>())
-      .def(
-        py::init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t, price_t>())
+      .def(py::init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t, price_t,
+                    price_t>())
 
       .def("__str__", to_py_str<StockWeight>)
       .def("__repr__", to_py_str<StockWeight>)
@@ -33,6 +33,7 @@ void export_StockWeight(py::module& m) {
       .def_property_readonly("increasement", &StockWeight::increasement, "每10股转增X股")
       .def_property_readonly("total_count", &StockWeight::totalCount, "总股本（万股）")
       .def_property_readonly("free_count", &StockWeight::freeCount, "流通股（万股）")
+      .def_property_readonly("suogu", &StockWeight::suogu, "扩缩股比例")
 
         DEF_PICKLE(StockWeight);
 }

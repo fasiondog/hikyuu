@@ -141,7 +141,7 @@ StockWeightList SQLiteBaseInfoDriver::getStockWeightList(const string& market, c
                 result.push_back(StockWeight(Datetime(w.date * 10000), w.countAsGift * 0.0001,
                                              w.countForSell * 0.0001, w.priceForSell * 0.001,
                                              w.bonus * 0.001, w.countOfIncreasement * 0.0001,
-                                             w.totalCount, w.freeCount));
+                                             w.totalCount, w.freeCount, w.suogu));
             } catch (std::out_of_range& e) {
                 HKU_WARN("Date of id({}) is invalid! {}", w.id(), e.what());
             } catch (std::exception& e) {
@@ -174,8 +174,8 @@ unordered_map<string, StockWeightList> SQLiteBaseInfoDriver::getAllStockWeightLi
           "SELECT a.id AS id, (market.market || stock.code) AS market_code, a.date, "
           "a.countAsGift*0.0001 AS countAsGift, a.countForSell*0.0001 AS countForSell, "
           "a.priceForSell*0.001 AS priceForSell, a.bonus*0.001,a.countOfIncreasement*0.0001 AS "
-          "countOfIncreasement, a.totalCount AS totalCount, a.freeCount AS freeCount FROM "
-          "stkweight AS a, stock, market WHERE a.stockid=stock.stockid AND "
+          "countOfIncreasement, a.totalCount AS totalCount, a.freeCount AS freeCount, a.suogu AS "
+          "suogu FROM stkweight AS a, stock, market WHERE a.stockid=stock.stockid AND "
           "market.marketid=stock.marketid ORDER BY a.stockid, a.date");
 
         for (const auto& record : view) {
@@ -186,9 +186,10 @@ unordered_map<string, StockWeightList> SQLiteBaseInfoDriver::getAllStockWeightLi
                     iter = in_iter.first;
                 }
             }
-            iter->second.emplace_back(StockWeight(
-              Datetime(record.date), record.countAsGift, record.countForSell, record.priceForSell,
-              record.bonus, record.countOfIncreasement, record.totalCount, record.freeCount));
+            iter->second.emplace_back(
+              StockWeight(Datetime(record.date), record.countAsGift, record.countForSell,
+                          record.priceForSell, record.bonus, record.countOfIncreasement,
+                          record.totalCount, record.freeCount, record.suogu));
         }
 
     } catch (std::exception& e) {
