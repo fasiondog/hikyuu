@@ -115,6 +115,13 @@ class ImportHistoryFinanceTask:
                         old_md5 = hashlib.md5(f.read()).hexdigest()
                     if old_md5 != item['hash']:
                         self.download_file(item)
+                    else:
+                        # 不管是否有变化，都导入一次，以便切换引擎时可以导入
+                        shutil.unpack_archive(dest_file, extract_dir=self.dest_dir)
+                        filename = item['filename']
+                        filename = f'{self.dest_dir}/{filename[0:-4]}.dat'
+                        self.import_to_db(filename)
+                        hku_info(f"Import finance file: {filename}")
                 count += 1
                 self.queue.put([self.task_name, None, None, int(100 * count / self.total_count), self.total_count])
             except Exception as e:
