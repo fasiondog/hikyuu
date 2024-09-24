@@ -8,7 +8,7 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. 新增特性
-    - 新增 WalkForwardSystem 滚动系统策略（单后续系统时为滚动，多后续系统时为滚动寻优）
+    - 新增 WalkForwardSystem 滚动系统策略（单候选系统时为滚动，多候选系统时为滚动寻优）
     - 新增 OptimalSelector 滚动系统策略寻优算法（配合 WalkForwardSystem 使用）
     - Strategy 支持指定多个时间点任务
 
