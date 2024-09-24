@@ -52,7 +52,7 @@ WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list, const
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
     try {
-        OptimalSelectorBase* _ = dynamic_cast<OptimalSelectorBase*>(se.get());
+        OptimalSelectorBase const* _ = dynamic_cast<OptimalSelectorBase*>(se.get());
     } catch (...) {
         CLS_THROW("Only the OptimalSelectorBase type is accepted!");
     }
@@ -192,7 +192,7 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     readyForRun();
 
     OptimalSelectorBase* se_ptr = dynamic_cast<OptimalSelectorBase*>(m_se.get());
-    const auto& m_run_ranges = se_ptr->getRunRanges();
+    m_run_ranges = se_ptr->getRunRanges();
     size_t run_ranges_len = m_run_ranges.size();
     HKU_IF_RETURN(run_ranges_len == 0, void());
 
@@ -200,8 +200,6 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     const Stock& stock = kdata.getStock();
 
     for (size_t i = 0; i < run_ranges_len; i++) {
-        KQuery range_query = KQueryByDate(m_run_ranges[i].run_start, m_run_ranges[i].end,
-                                          query.kType(), query.recoverType());
         m_train_kdata_list.emplace_back(stock.getKData(KQueryByDate(
           m_run_ranges[i].start, m_run_ranges[i].end, query.kType(), query.recoverType())));
     }
@@ -267,7 +265,7 @@ TradeRecord WalkForwardSystem::runMoment(const Datetime& datetime) {
     auto sw_list = m_se->getSelected(datetime);
     HKU_IF_RETURN(sw_list.empty(), ret);
 
-    auto& sys = sw_list.front().sys;
+    const auto& sys = sw_list.front().sys;
     if (sys && sys != m_cur_sys) {
         m_cur_kdata++;
         if (m_cur_kdata < m_train_kdata_list.size()) {

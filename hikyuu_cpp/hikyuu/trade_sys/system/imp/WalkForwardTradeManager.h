@@ -26,11 +26,11 @@ public:
 
     virtual ~WalkForwardTradeManager() {}
 
-    virtual void _reset() {
+    virtual void _reset() override {
         m_tm->_reset();
     }
 
-    virtual shared_ptr<TradeManagerBase> _clone() {
+    virtual shared_ptr<TradeManagerBase> _clone() override {
         WalkForwardTradeManager* p = new WalkForwardTradeManager();
         p->m_tm = m_tm->clone();
         p->m_run_start = m_run_start;
@@ -42,7 +42,7 @@ public:
      * @note 必须按时间顺序调用
      * @param datetime 当前时刻
      */
-    virtual void updateWithWeight(const Datetime& datetime) {
+    virtual void updateWithWeight(const Datetime& datetime) override {
         m_tm->updateWithWeight(datetime);
     }
 
@@ -51,27 +51,27 @@ public:
      * @param datetime 日期
      * @param stock 指定对象
      */
-    virtual double getMarginRate(const Datetime& datetime, const Stock& stock) {
+    virtual double getMarginRate(const Datetime& datetime, const Stock& stock) override {
         return (datetime >= m_run_start) ? m_tm->getMarginRate(datetime, stock) : 0.0;
     }
 
     /** 初始资金 */
-    virtual price_t initCash() const {
+    virtual price_t initCash() const override {
         return m_tm->initCash();
     }
 
     /** 账户建立日期 */
-    virtual Datetime initDatetime() const {
+    virtual Datetime initDatetime() const override {
         return m_tm->initDatetime();
     }
 
     /** 第一笔买入交易发生日期，如未发生交易返回Null<Datetime>() */
-    virtual Datetime firstDatetime() const {
+    virtual Datetime firstDatetime() const override {
         return m_tm->firstDatetime();
     }
 
     /** 最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期 */
-    virtual Datetime lastDatetime() const {
+    virtual Datetime lastDatetime() const override {
         return m_tm->lastDatetime();
     }
 
@@ -79,7 +79,7 @@ public:
      * 返回当前现金
      * @note 仅返回当前信息，不会根据权息进行调整
      */
-    virtual price_t currentCash() const {
+    virtual price_t currentCash() const override {
         return m_tm->currentCash();
     }
 
@@ -87,7 +87,7 @@ public:
      * 获取指定日期的现金
      * @note 如果不带日期参数，无法根据权息信息调整持仓
      */
-    virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
+    virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override {
         return m_tm->cash(datetime, ktype);
     }
 
@@ -97,7 +97,7 @@ public:
      * @param stock 指定证券
      * @return true 是 | false 否
      */
-    virtual bool have(const Stock& stock) const {
+    virtual bool have(const Stock& stock) const override {
         return m_tm->have(stock);
     }
 
@@ -107,42 +107,42 @@ public:
      * @param stock 指定证券
      * @return true 是 | false 否
      */
-    virtual bool haveShort(const Stock& stock) const {
+    virtual bool haveShort(const Stock& stock) const override {
         return m_tm->haveShort(stock);
     }
 
     /** 当前持有的证券种类数量 */
-    virtual size_t getStockNumber() const {
+    virtual size_t getStockNumber() const override {
         return m_tm->getStockNumber();
     }
 
     /** 当前空头持有的证券种类数量 */
-    virtual size_t getShortStockNumber() const {
+    virtual size_t getShortStockNumber() const override {
         return m_tm->getShortStockNumber();
     }
 
     /** 获取指定时刻的某证券持有数量 */
-    virtual double getHoldNumber(const Datetime& datetime, const Stock& stock) {
+    virtual double getHoldNumber(const Datetime& datetime, const Stock& stock) override {
         return m_tm->getHoldNumber(datetime, stock);
     }
 
     /** 获取指定时刻的空头某证券持有数量 */
-    virtual double getShortHoldNumber(const Datetime& datetime, const Stock& stock) {
+    virtual double getShortHoldNumber(const Datetime& datetime, const Stock& stock) override {
         return m_tm->getShortHoldNumber(datetime, stock);
     }
 
     /** 获取指定时刻已借入的股票数量 */
-    virtual double getDebtNumber(const Datetime& datetime, const Stock& stock) {
+    virtual double getDebtNumber(const Datetime& datetime, const Stock& stock) override {
         return m_tm->getDebtNumber(datetime, stock);
     }
 
     /** 获取指定时刻已借入的现金额 */
-    virtual price_t getDebtCash(const Datetime& datetime) {
+    virtual price_t getDebtCash(const Datetime& datetime) override {
         return m_tm->getDebtCash(datetime);
     }
 
     /** 获取全部交易记录 */
-    virtual TradeRecordList getTradeList() const {
+    virtual TradeRecordList getTradeList() const override {
         return m_tm->getTradeList();
     }
 
@@ -152,27 +152,28 @@ public:
      * @param end 结束日期
      * @return 交易记录列表
      */
-    virtual TradeRecordList getTradeList(const Datetime& start, const Datetime& end) const {
+    virtual TradeRecordList getTradeList(const Datetime& start,
+                                         const Datetime& end) const override {
         return m_tm->getTradeList(start, end);
     }
 
     /** 获取当前全部持仓记录 */
-    virtual PositionRecordList getPositionList() const {
+    virtual PositionRecordList getPositionList() const override {
         return m_tm->getPositionList();
     }
 
     /** 获取全部历史持仓记录，即已平仓记录 */
-    virtual PositionRecordList getHistoryPositionList() const {
+    virtual PositionRecordList getHistoryPositionList() const override {
         return m_tm->getHistoryPositionList();
     }
 
     /** 获取当前全部空头仓位记录 */
-    virtual PositionRecordList getShortPositionList() const {
+    virtual PositionRecordList getShortPositionList() const override {
         return m_tm->getShortPositionList();
     }
 
     /** 获取全部空头历史仓位记录 */
-    virtual PositionRecordList getShortHistoryPositionList() const {
+    virtual PositionRecordList getShortHistoryPositionList() const override {
         return m_tm->getShortHistoryPositionList();
     }
 
@@ -181,7 +182,7 @@ public:
      * @param date 指定日期
      * @param stock 指定的证券
      */
-    virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) {
+    virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) override {
         return m_tm->getPosition(date, stock);
     }
 
@@ -189,12 +190,12 @@ public:
      * 获取指定证券的空头持仓记录
      * @param stock 指定的证券
      */
-    virtual PositionRecord getShortPosition(const Stock& stock) const {
+    virtual PositionRecord getShortPosition(const Stock& stock) const override {
         return m_tm->getShortPosition(stock);
     }
 
     /** 获取当前借入的股票列表 */
-    virtual BorrowRecordList getBorrowStockList() const {
+    virtual BorrowRecordList getBorrowStockList() const override {
         return m_tm->getBorrowStockList();
     }
 
@@ -204,7 +205,7 @@ public:
      * @param cash 存入的资金量
      * @return true | false
      */
-    virtual bool checkin(const Datetime& datetime, price_t cash) {
+    virtual bool checkin(const Datetime& datetime, price_t cash) override {
         return (datetime >= m_run_start) ? m_tm->checkin(datetime, cash) : false;
     }
 
@@ -214,7 +215,7 @@ public:
      * @param cash 取出的资金量
      * @return true | false
      */
-    virtual bool checkout(const Datetime& datetime, price_t cash) {
+    virtual bool checkout(const Datetime& datetime, price_t cash) override {
         return (datetime >= m_run_start) ? m_tm->checkout(datetime, cash) : false;
     }
 
@@ -227,7 +228,7 @@ public:
      * @return true | false
      */
     virtual bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
-                              double number) {
+                              double number) override {
         return (datetime >= m_run_start) ? m_tm->checkinStock(datetime, stock, price, number)
                                          : false;
     }
@@ -242,7 +243,7 @@ public:
      * @note 应该不会被用到
      */
     virtual bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
-                               double number) {
+                               double number) override {
         return (datetime >= m_run_start) ? m_tm->checkoutStock(datetime, stock, price, number)
                                          : false;
     }
@@ -261,7 +262,7 @@ public:
      */
     virtual TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
                             double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                            price_t planPrice = 0.0, SystemPart from = PART_INVALID) {
+                            price_t planPrice = 0.0, SystemPart from = PART_INVALID) override {
         return (datetime >= m_run_start) ? m_tm->buy(datetime, stock, realPrice, number, stoploss,
                                                      goalPrice, planPrice, from)
                                          : TradeRecord();
@@ -282,7 +283,7 @@ public:
     virtual TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                              double number = MAX_DOUBLE, price_t stoploss = 0.0,
                              price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                             SystemPart from = PART_INVALID) {
+                             SystemPart from = PART_INVALID) override {
         return (datetime >= m_run_start) ? m_tm->sell(datetime, stock, realPrice, number, stoploss,
                                                       goalPrice, planPrice, from)
                                          : TradeRecord();
@@ -302,7 +303,8 @@ public:
      */
     virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                   double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                                  price_t planPrice = 0.0, SystemPart from = PART_INVALID) {
+                                  price_t planPrice = 0.0,
+                                  SystemPart from = PART_INVALID) override {
         return (datetime >= m_run_start) ? m_tm->sellShort(datetime, stock, realPrice, number,
                                                            stoploss, goalPrice, planPrice, from)
                                          : TradeRecord();
@@ -323,7 +325,7 @@ public:
     virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                  double number = MAX_DOUBLE, price_t stoploss = 0.0,
                                  price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                                 SystemPart from = PART_INVALID) {
+                                 SystemPart from = PART_INVALID) override {
         return (datetime >= m_run_start) ? m_tm->buyShort(datetime, stock, realPrice, number,
                                                           stoploss, goalPrice, planPrice, from)
                                          : TradeRecord();
@@ -335,7 +337,7 @@ public:
      * @param cash 借入的现金
      * @return true | false
      */
-    virtual bool borrowCash(const Datetime& datetime, price_t cash) {
+    virtual bool borrowCash(const Datetime& datetime, price_t cash) override {
         return (datetime >= m_run_start) ? m_tm->borrowCash(datetime, cash) : false;
     }
 
@@ -345,7 +347,7 @@ public:
      * @param cash 归还现金
      * @return true | false
      */
-    virtual bool returnCash(const Datetime& datetime, price_t cash) {
+    virtual bool returnCash(const Datetime& datetime, price_t cash) override {
         return (datetime >= m_run_start) ? m_tm->returnCash(datetime, cash) : false;
     }
 
@@ -358,7 +360,7 @@ public:
      * @return true | false
      */
     virtual bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
-                             double number) {
+                             double number) override {
         return (datetime >= m_run_start) ? m_tm->borrowStock(datetime, stock, price, number)
                                          : false;
     }
@@ -372,7 +374,7 @@ public:
      * @return true | false
      */
     virtual bool returnStock(const Datetime& datetime, const Stock& stock, price_t price,
-                             double number) {
+                             double number) override {
         return (datetime >= m_run_start) ? m_tm->returnStock(datetime, stock, price, number)
                                          : false;
     }
@@ -382,7 +384,7 @@ public:
      * @param ktype 日期的类型
      * @return 资产详情
      */
-    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const {
+    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const override {
         return m_tm->getFunds(ktype);
     }
 
@@ -393,7 +395,8 @@ public:
      * @return 资产详情
      * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同
      */
-    virtual FundsRecord getFunds(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
+    virtual FundsRecord getFunds(const Datetime& datetime,
+                                 KQuery::KType ktype = KQuery::DAY) override {
         return m_tm->getFunds(datetime, ktype);
     }
 
@@ -403,7 +406,7 @@ public:
      * @param tr 待加入的交易记录
      * @return bool true 成功 | false 失败
      */
-    virtual bool addTradeRecord(const TradeRecord& tr) {
+    virtual bool addTradeRecord(const TradeRecord& tr) override {
         return (tr.datetime >= m_run_start) ? m_tm->addTradeRecord(tr) : false;
     }
 
@@ -413,12 +416,12 @@ public:
      * @return true 成功
      * @return false 失败
      */
-    virtual bool addPosition(const PositionRecord& pr) {
+    virtual bool addPosition(const PositionRecord& pr) override {
         return m_tm->addPosition(pr);
     }
 
     /** 字符串输出 */
-    virtual string str() const {
+    virtual string str() const override {
         return m_tm->str();
     }
 
@@ -426,7 +429,7 @@ public:
      * 以csv格式输出交易记录、未平仓记录、已平仓记录、资产净值曲线
      * @param path 输出文件所在目录
      */
-    virtual void tocsv(const string& path) {
+    virtual void tocsv(const string& path) override {
         m_tm->tocsv(path);
     }
 
@@ -434,7 +437,7 @@ public:
      * 从订单代理实例同步当前账户资产信息（包含资金、持仓等）
      * @param broker 订单代理实例
      */
-    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) {
+    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) override {
         m_tm->fetchAssetInfoFromBroker(broker);
     }
 
