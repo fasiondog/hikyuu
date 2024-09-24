@@ -12,6 +12,11 @@ Welcome to Hikyuu's documentation!
    overview
    install
    quickstart
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Reference
+
    interactive/index
    base/index
    stock_manager
@@ -21,8 +26,19 @@ Welcome to Hikyuu's documentation!
    trade_portfolio/trade_portfolio
    strategy
    reference
+
+.. toctree::
+   :maxdepth: 1
+   :caption: C++开发指南
+
    developer.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Release
+
    release
+
    
 Indices and tables
 ==================

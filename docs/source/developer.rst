@@ -1,7 +1,3 @@
-.. _developer:
-
-C++ 开发者指南
-===============
 
 .. note::
 
@@ -10,6 +6,9 @@ C++ 开发者指南
 C++ API参考：`<http://fasiondog.cn/hikyuu/cpp_ref/index.html>`_。
 
 C++测试工程参考：`<http://fasiondog.cn/hikyuu/test_doc/index.html>`_
+
+
+.. _developer:
 
 
 编译前准备
