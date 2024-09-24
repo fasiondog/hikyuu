@@ -21,6 +21,6 @@ SEPtr HKU_API SE_MaxFundsOptimal();
  * 使用 Performance 统计结果进行寻优的选择器
  * @return SEPtr
  */
-SEPtr HKU_API SE_PerformanceOptimal();
+SEPtr HKU_API SE_PerformanceOptimal(const string& key = "帐户平均年收益率%", int mode = 0);
 
 }  // namespace hku
