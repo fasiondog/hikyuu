@@ -50,4 +50,4 @@ jobs:
 
       - name: build
         run: |
-          xmake -bvD core
+          xmake -b core

@@ -180,10 +180,10 @@ typedef shared_ptr<ConditionBase> CNPtr;
 
 #define CONDITION_IMP(classname)              \
 public:                                       \
-    virtual ConditionPtr _clone() {           \
+    virtual ConditionPtr _clone() override {  \
         return std::make_shared<classname>(); \
     }                                         \
-    virtual void _calculate();
+    virtual void _calculate() override;
 
 HKU_API std::ostream& operator<<(std::ostream&, const ConditionPtr&);
 HKU_API std::ostream& operator<<(std::ostream&, const ConditionBase&);
