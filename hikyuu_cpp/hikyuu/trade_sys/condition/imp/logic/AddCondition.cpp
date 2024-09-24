@@ -7,6 +7,10 @@
 
 #include "AddCondition.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::AddCondition)
+#endif
+
 namespace hku {
 
 AddCondition::AddCondition() : ConditionBase("CN_Add") {}

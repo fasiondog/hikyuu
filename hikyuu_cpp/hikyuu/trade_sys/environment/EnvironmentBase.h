@@ -151,12 +151,12 @@ private:                                                          \
 typedef shared_ptr<EnvironmentBase> EnvironmentPtr;
 typedef shared_ptr<EnvironmentBase> EVPtr;
 
-#define ENVIRONMENT_IMP(classname)            \
-public:                                       \
-    virtual EnvironmentPtr _clone() {         \
-        return std::make_shared<classname>(); \
-    }                                         \
-    virtual void _calculate();
+#define ENVIRONMENT_IMP(classname)             \
+public:                                        \
+    virtual EnvironmentPtr _clone() override { \
+        return std::make_shared<classname>();  \
+    }                                          \
+    virtual void _calculate() override;
 
 /**
  * 输出Environment信息，如：Environment(name, params[...])

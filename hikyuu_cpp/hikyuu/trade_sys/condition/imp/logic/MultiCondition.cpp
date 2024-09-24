@@ -7,6 +7,10 @@
 
 #include "MultiCondition.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::MultiCondition)
+#endif
+
 namespace hku {
 
 MultiCondition::MultiCondition() : ConditionBase("CN_Multi") {}

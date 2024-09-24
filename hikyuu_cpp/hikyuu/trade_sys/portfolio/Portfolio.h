@@ -34,10 +34,10 @@ public:
     /**
      * @brief 构造函数
      * @param tm 账户
-     * @param st 选择器
+     * @param se 选择器
      * @param af 资产分配算法
      */
-    Portfolio(const TradeManagerPtr& tm, const SelectorPtr& st, const AFPtr& af);
+    Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFPtr& af);
 
     /** 析构函数 */
     virtual ~Portfolio();

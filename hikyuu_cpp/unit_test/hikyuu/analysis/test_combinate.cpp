@@ -13,7 +13,7 @@ using namespace hku;
 
 /**
  * @defgroup test_hikyuu_combinate test_hikyuu_combinate
- * @ingroup test_hikyuu_combinate_suite
+ * @ingroup test_hikyuu_analysis_suite
  * @{
  */
 

@@ -13,7 +13,7 @@
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/MA.h>
-#include <hikyuu/trade_sys/selector/crt/SE_Operator.h>
+#include <hikyuu/trade_sys/selector/crt/SE_Logic.h>
 
 using namespace hku;
 

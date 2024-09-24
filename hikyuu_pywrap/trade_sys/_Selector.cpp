@@ -46,6 +46,10 @@ public:
     bool isMatchAF(const AFPtr& af) override {
         PYBIND11_OVERLOAD_PURE_NAME(bool, SelectorBase, "is_match_af", isMatchAF, af);
     }
+
+    string str() const override {
+        PYBIND11_OVERRIDE_NAME(string, SelectorBase, "__str__", str, );
+    }
 };
 
 void export_Selector(py::module& m) {
@@ -234,4 +238,8 @@ void export_Selector(py::module& m) {
       :param int ic_rolling_n: IC 滚动周期
       :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
+
+    m.def("SE_MaxFundsOptimal", SE_MaxFundsOptimal, "账户资产最大寻优选择器");
+    m.def("SE_PerformanceOptimal", SE_PerformanceOptimal,
+          "使用 Performance 统计结果进行寻优的选择器");
 }

@@ -20,19 +20,19 @@ namespace hku {
  */
 class HKU_API TradeRequest {
 public:
-    TradeRequest();
-    void clear();
+    TradeRequest() = default;
+    void clear() noexcept;
 
-    bool valid;
-    BUSINESS business;
+    bool valid{false};
+    BUSINESS business{BUSINESS_INVALID};
     Datetime datetime;
-    price_t stoploss;
-    price_t goal;
-    double number;  //计划的买入/卖出数量，使用发出请求时刻的收盘价，
-                    //用于避免实际买入时需用重新计算数量时，人工执行速度较慢
-                    //可通过系统参数进行设置，是否使用
-    SystemPart from;  //记录SystemBase::Part
-    int count;        //因操作失败，连续延迟的次数
+    price_t stoploss{0.0};
+    price_t goal{0.0};
+    double number{0.0};  // 计划的买入/卖出数量，使用发出请求时刻的收盘价，
+                         // 用于避免实际买入时需用重新计算数量时，人工执行速度较慢
+                         // 可通过系统参数进行设置，是否使用
+    SystemPart from{PART_INVALID};  // 记录SystemBase::Part
+    int count{0};                   // 因操作失败，连续延迟的次数
     KRecord krecord;
 
 //============================================
@@ -82,5 +82,13 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
+HKU_API std::ostream& operator<<(std::ostream& os, const TradeRequest& tr);
+
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::TradeRequest> : ostream_formatter {};
+#endif
+
 #endif /* TRADEREQUEST_H_ */

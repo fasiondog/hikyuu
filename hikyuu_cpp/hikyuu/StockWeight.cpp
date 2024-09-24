@@ -17,34 +17,26 @@ HKU_API std::ostream& operator<<(std::ostream& os, const StockWeight& record) {
 
     os << "Weight(" << record.datetime() << ", " << record.countAsGift() << ", "
        << record.countForSell() << ", " << record.priceForSell() << ", " << record.bonus() << ", "
-       << record.increasement() << ", " << record.totalCount() << ", " << record.freeCount() << ")";
+       << record.increasement() << ", " << record.totalCount() << ", " << record.freeCount() << ", "
+       << record.suogu() << ")";
     os.precision(6);
     return os;
 }
 
-StockWeight::StockWeight()
-: m_datetime(Null<Datetime>()),
-  m_countAsGift(0),
-  m_countForSell(0),
-  m_priceForSell(0),
-  m_bonus(0),
-  m_increasement(0),
-  m_totalCount(0),
-  m_freeCount(0) {}
-
 StockWeight::StockWeight(const Datetime& datetime)
 : m_datetime(datetime),
-  m_countAsGift(0),
-  m_countForSell(0),
-  m_priceForSell(0),
-  m_bonus(0),
-  m_increasement(0),
-  m_totalCount(0),
-  m_freeCount(0) {}
+  m_countAsGift(0.0),
+  m_countForSell(0.0),
+  m_priceForSell(0.0),
+  m_bonus(0.0),
+  m_increasement(0.0),
+  m_totalCount(0.0),
+  m_freeCount(0.0),
+  m_suogu(0.0) {}
 
 StockWeight::StockWeight(const Datetime& datetime, price_t countAsGift, price_t countForSell,
                          price_t priceForSell, price_t bonus, price_t increasement,
-                         price_t totalCount, price_t freeCount)
+                         price_t totalCount, price_t freeCount, price_t suogu)
 : m_datetime(datetime),
   m_countAsGift(countAsGift),
   m_countForSell(countForSell),
@@ -52,6 +44,7 @@ StockWeight::StockWeight(const Datetime& datetime, price_t countAsGift, price_t 
   m_bonus(bonus),
   m_increasement(increasement),
   m_totalCount(totalCount),
-  m_freeCount(freeCount) {}
+  m_freeCount(freeCount),
+  m_suogu(suogu) {}
 
 }  // namespace hku

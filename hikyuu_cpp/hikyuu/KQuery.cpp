@@ -176,14 +176,24 @@ HKU_API std::ostream& operator<<(std::ostream& os, const KQuery& query) {
 
 bool HKU_API operator!=(const KQuery& q1, const KQuery& q2) {
     // cppcheck-suppress [mismatchingContainerExpression]
-    return q1.start() != q2.start() || q1.end() != q2.end() || q1.queryType() != q2.queryType() ||
-           q1.kType() != q2.kType() || q1.recoverType() != q2.recoverType();
+    HKU_IF_RETURN(q1.queryType() != q2.queryType(), true);
+    if (q1.queryType() == KQuery::DATE) {
+        return q1.kType() != q2.kType() || q1.recoverType() != q2.recoverType() ||
+               q1.startDatetime() != q2.startDatetime() || q1.endDatetime() != q2.endDatetime();
+    }
+    return q1.kType() != q2.kType() || q1.recoverType() != q2.recoverType() ||
+           q1.start() != q2.start() || q1.end() != q2.end();
 }
 
 bool HKU_API operator==(const KQuery& q1, const KQuery& q2) {
     // cppcheck-suppress [mismatchingContainerExpression]
-    return q1.start() == q2.start() && q1.end() == q2.end() && q1.queryType() == q2.queryType() &&
-           q1.kType() == q2.kType() && q1.recoverType() == q2.recoverType();
+    HKU_IF_RETURN(q1.queryType() != q2.queryType(), false);
+    if (q1.queryType() == KQuery::DATE) {
+        return q1.kType() == q2.kType() && q1.recoverType() == q2.recoverType() &&
+               q1.startDatetime() == q2.startDatetime() && q1.endDatetime() == q2.endDatetime();
+    }
+    return q1.kType() == q2.kType() && q1.recoverType() == q2.recoverType() &&
+           q1.start() == q2.start() && q1.end() == q2.end();
 }
 
 }  // namespace hku

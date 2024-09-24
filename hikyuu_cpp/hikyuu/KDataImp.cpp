@@ -192,7 +192,7 @@ void KDataImp::_recoverForward() {
         // 计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
         if ((weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
              weightIter->priceForSell() == 0.0 && weightIter->bonus() == 0.0 &&
-             weightIter->increasement() == 0.0))
+             weightIter->increasement() == 0.0 && weightIter->suogu() == 0.0))
             continue;
 
         size_t i = pre_pos;
@@ -201,12 +201,16 @@ void KDataImp::_recoverForward() {
         }
         pre_pos = i;  // 除权日
 
-        price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
-                                weightIter->increasement());
-        // change 小于 0 时为缩股
-        price_t denominator =
-          change < 0.0 ? std::abs(change * 0.1) : 1.0 + change;  // 分母 = (1+流通股份变动比例)
-        price_t temp = weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
+        price_t denominator = 0.0, temp = 0.0;
+        if (weightIter->suogu() != 0.0) {
+            denominator = weightIter->suogu();
+        } else {
+            price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
+                                    weightIter->increasement());
+            // change 小于 0 时为缩股
+            denominator = 1.0 + change;  // 分母 = (1+流通股份变动比例)
+            temp = weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
+        }
 
         if (denominator == 1.0 && temp == 0.0)
             continue;
@@ -244,7 +248,7 @@ void KDataImp::_recoverBackward() {
         // 计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
         if ((weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
              weightIter->priceForSell() == 0.0 && weightIter->bonus() == 0.0 &&
-             weightIter->increasement() == 0.0))
+             weightIter->increasement() == 0.0 && weightIter->suogu() == 0.0))
             continue;
 
         size_t i = pre_pos;
@@ -253,13 +257,17 @@ void KDataImp::_recoverBackward() {
         }
         pre_pos = i;
 
-        // 流通股份变动比例
-        price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
-                                weightIter->increasement());
-        // change 小于 0 时为缩股
-        price_t denominator =
-          change < 0 ? std::abs(change * 0.1) : 1.0 + change;  //(1+流通股份变动比例)
-        price_t temp = 0.1 * weightIter->bonus() - weightIter->priceForSell() * change;
+        price_t denominator = 0.0, temp = 0.0;
+        if (weightIter->suogu() != 0.0) {
+            denominator = weightIter->suogu();
+        } else {
+            // 流通股份变动比例
+            price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
+                                    weightIter->increasement());
+            // change 小于 0 时为缩股
+            denominator = 1.0 + change;  //(1+流通股份变动比例)
+            temp = 0.1 * weightIter->bonus() - weightIter->priceForSell() * change;
+        }
 
         if (denominator == 1.0 && temp == 0.0)
             continue;
@@ -303,7 +311,7 @@ void KDataImp::_recoverEqualForward() {
         // 计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
         if ((weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
              weightIter->priceForSell() == 0.0 && weightIter->bonus() == 0.0 &&
-             weightIter->increasement() == 0.0))
+             weightIter->increasement() == 0.0 && weightIter->suogu() == 0.0))
             continue;
 
         size_t i = pre_pos;
@@ -321,13 +329,17 @@ void KDataImp::_recoverEqualForward() {
             continue;  // 除零保护
         }
 
-        // 流通股份变动比例
-        price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
-                                weightIter->increasement());
-        // change 小于 0 时为缩股
-        price_t denominator =
-          change < 0.0 ? std::abs(change * 0.1) : 1.0 + change;  //(1+流通股份变动比例)
-        price_t temp = weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
+        price_t denominator = 0.0, temp = 0.0;
+        if (weightIter->suogu() != 0.0) {
+            denominator = weightIter->suogu();
+        } else {
+            // 流通股份变动比例
+            price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
+                                    weightIter->increasement());
+            // change 小于 0 时为缩股
+            denominator = 1.0 + change;  //(1+流通股份变动比例)
+            temp = weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
+        }
 
         if (denominator == 0.0 || (denominator == 1.0 && temp == 0.0))
             continue;
@@ -371,15 +383,21 @@ void KDataImp::_recoverEqualBackward() {
         if (pre_pos == 0) {
             continue;
         }
+
         price_t closePrice = m_buffer[pre_pos - 1].closePrice;
 
-        // 流通股份变动比例
-        price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
-                                weightIter->increasement());
-        // change 小于 0 时为缩股
-        price_t denominator =
-          change < 0.0 ? std::abs(change * 0.1) : 1.0 + change;  //(1+流通股份变动比例)
-        price_t temp = closePrice + weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
+        price_t denominator = 0.0, temp = closePrice;
+        if (weightIter->suogu() != 0.0) {
+            denominator = weightIter->suogu();
+        } else {
+            // 流通股份变动比例
+            price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
+                                    weightIter->increasement());
+            // change 小于 0 时为缩股
+            denominator = 1.0 + change;  //(1+流通股份变动比例)
+            temp = closePrice + weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
+        }
+
         if (temp == 0.0 || denominator == 0.0) {
             continue;
         }

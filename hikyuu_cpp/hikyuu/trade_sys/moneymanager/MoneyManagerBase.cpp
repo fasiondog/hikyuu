@@ -119,7 +119,7 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
     double n = _getBuyNumber(datetime, stock, price, risk, from);
     double min_trade = stock.minTradeNumber();
     HKU_TRACE_IF_RETURN(n < min_trade, 0.0,
-                        "Ignore! Is less than the minimum number of transactions({}<{}) {}", n,
+                        "Ignore! Is less than the minimum number of transactions({:<.4f}<{}) {}", n,
                         min_trade, stock.market_code());
 
     // 转换为最小交易量的整数倍

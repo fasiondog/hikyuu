@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
                     Datetime start_date = Datetime(jdates[i].get<string>());
                     Stock stk = getStock(market_code);
                     if (stk.isNull()) {
-                        HKU_WARN("Not found stock: {}", market_code);
+                        HKU_DEBUG("Not found stock: {}", market_code);
                         continue;
                     }
 

@@ -27,6 +27,7 @@ namespace hku {
 
 class HKU_API Portfolio;
 class HKU_API AllocateFundsBase;
+class HKU_API WalkForwardSystem;
 
 /**
  * 交易系统基类
@@ -36,6 +37,7 @@ class HKU_API System {
     PARAMETER_SUPPORT_WITH_CHECK
     friend class HKU_API Portfolio;
     friend class HKU_API AllocateFundsBase;
+    friend class HKU_API WalkForwardSystem;
 
 public:
     /** 默认构造函数 */
@@ -62,6 +64,8 @@ public:
            const ConditionPtr& cn, const SignalPtr& sg, const StoplossPtr& st,
            const StoplossPtr& tp, const ProfitGoalPtr& pg, const SlippagePtr& sp,
            const string& name);
+
+    System(const System&) = default;
 
     /** 析构函数 */
     virtual ~System();
@@ -151,6 +155,9 @@ public:
     const TradeRequest& getSellShortTradeRequest() const;
     const TradeRequest& getBuyShortTradeRequest() const;
 
+    /** 将所有组件全部置为非共享 */
+    void setNotSharedAll();
+
     /**
      * 复位，但不包括已有的交易对象，以及共享的部件
      * @note 实际复位操作依赖于系统中各个部件的共享参数
@@ -196,48 +203,58 @@ public:
      * @param reset 执行前是否依据系统部件共享属性复位
      * @param resetAll 强制复位所有部件
      */
-    void run(const KData& kdata, bool reset = true, bool resetAll = false);
+    virtual void run(const KData& kdata, bool reset = true, bool resetAll = false);
 
     /**
      * @brief 在指定的日期执行一步，仅由 PF 调用
      * @param datetime 指定的日期
      * @return TradeRecord
      */
-    TradeRecord runMoment(const Datetime& datetime);
+    virtual TradeRecord runMoment(const Datetime& datetime);
 
     // 运行前准备工作, 失败将抛出异常
-    void readyForRun();
-
-    TradeRecord sell(const KRecord& today, const KRecord& src_today, Part from) {
-        return _sell(today, src_today, from);
-    }
+    virtual void readyForRun();
 
     // 由各个相关组件调用，用于组件参数变化时通知 sys，以便重算
     void partChangedNotify() {
         m_calculated = false;
     }
 
-private:
+    virtual void _reset() {}
+    virtual void _forceResetAll() {}
+
+    /** 子类克隆接口 */
+    virtual SystemPtr _clone() {
+        return make_shared<System>();
+    }
+
+    virtual string str() const;
+
+public:
+    //-------------------------
+    // 仅供 PF/AF 内部调用
+    //-------------------------
+
     // 强制以开盘价卖出，仅供 PF/AF 内部调用
-    TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) {
+    virtual TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) {
         HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
         return _sellForce(date, num, from, true);
     }
 
     // 强制以收盘价卖出，仅供 PF/AF 内部调用
-    TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) {
+    virtual TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) {
         HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
         return _sellForce(date, num, from, false);
     }
 
     // 清除已有的交易请求，供Portfolio使用
-    void clearDelayBuyRequest();
+    virtual void clearDelayBuyRequest();
 
     // 当前是否存在延迟的操作请求，供Portfolio
-    bool haveDelaySellRequest() const;
+    virtual bool haveDelaySellRequest() const;
 
     // 处理延迟买入请求，仅供 PF 调用
-    TradeRecord pfProcessDelaySellRequest(const Datetime& date);
+    virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date);
 
 private:
     bool _environmentIsValid(const Datetime& datetime);

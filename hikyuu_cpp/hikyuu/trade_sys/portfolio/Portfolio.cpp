@@ -6,7 +6,8 @@
  */
 
 #include "hikyuu/global/sysinfo.h"
-#include "../../trade_manage/crt/crtTM.h"
+#include "hikyuu/trade_manage/crt/crtTM.h"
+#include "hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h"
 
 #include "Portfolio.h"
 
@@ -115,6 +116,20 @@ void Portfolio::_readyForRun() {
     HKU_CHECK(m_se, "m_se is null!");
     HKU_CHECK(m_tm, "m_tm is null!");
     HKU_CHECK(m_af, "m_am is null!");
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+    try {
+        OptimalSelectorBase const* _ = dynamic_cast<OptimalSelectorBase*>(m_se.get());
+        HKU_THROW("Can't use is OptimalSelectorBase type m_se in PF!");
+    } catch (...) {
+        // do nothing
+    }
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
     // se算法和af算法不匹配
     HKU_CHECK(m_se->isMatchAF(m_af), "The current SE and AF do not match!");

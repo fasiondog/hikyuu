@@ -703,6 +703,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.start_import_pushButton.setEnabled(False)
         self.reset_progress_bar()
 
+        if config.getboolean('weight', 'enable', fallback=False):
+            self.hdf5_weight_label.setText("正在导入")
+
         self.import_status_label.setText("正在启动任务....")
         QApplication.processEvents()
 

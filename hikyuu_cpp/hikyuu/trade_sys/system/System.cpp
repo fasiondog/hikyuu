@@ -11,25 +11,30 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const System& sys) {
-    string strip(",\n");
-    string space("  ");
-    os << "System{\n"
-       << space << sys.name() << strip << space << sys.getTO().getQuery() << strip << space
-       << sys.getStock() << strip << space << sys.getParameter() << strip << space << sys.getEV()
-       << strip << space << sys.getCN() << strip << space << sys.getMM() << strip << space
-       << sys.getSG() << strip << space << sys.getST() << strip << space << sys.getTP() << strip
-       << space << sys.getPG() << strip << space << sys.getSP() << strip << space
-       << (sys.getTM() ? sys.getTM()->str() : "TradeManager(NULL)") << strip << "}";
+    os << sys.str();
     return os;
 }
 
 HKU_API std::ostream& operator<<(std::ostream& os, const SystemPtr& sys) {
     if (sys) {
-        os << *sys;
+        os << sys->str();
     } else {
         os << "System(NULL)";
     }
     return os;
+}
+
+string System::str() const {
+    std::ostringstream os;
+    string strip(",\n");
+    string space("  ");
+    os << "System{\n"
+       << space << name() << strip << space << getTO().getQuery() << strip << space << getStock()
+       << strip << space << getParameter() << strip << space << getEV() << strip << space << getCN()
+       << strip << space << getMM() << strip << space << getSG() << strip << space << getST()
+       << strip << space << getTP() << strip << space << getPG() << strip << space << getSP()
+       << strip << space << (getTM() ? getTM()->str() : "TradeManager(NULL)") << strip << "}";
+    return os.str();
 }
 
 System::System()
@@ -126,6 +131,18 @@ void System::initParam() {
     setParam<bool>("shared_sp", false);
 }
 
+void System::setNotSharedAll() {
+    setParam<bool>("shared_tm", false);
+    setParam<bool>("shared_ev", false);
+    setParam<bool>("shared_cn", false);
+    setParam<bool>("shared_sg", false);
+    setParam<bool>("shared_mm", false);
+    setParam<bool>("shared_st", false);
+    setParam<bool>("shared_tp", false);
+    setParam<bool>("shared_pg", false);
+    setParam<bool>("shared_sp", false);
+}
+
 void System::baseCheckParam(const string& name) const {
     if ("max_delay_count" == name) {
         HKU_ASSERT(getParam<int>("max_delay_count") >= 0);
@@ -168,8 +185,8 @@ void System::reset() {
     //  m_stock
 
     m_calculated = false;
-    m_pre_ev_valid = false;  // true;
-    m_pre_cn_valid = false;  // true;
+    m_pre_ev_valid = m_ev ? false : true;
+    m_pre_cn_valid = m_cn ? false : true;
 
     m_buy_days = 0;
     m_sell_short_days = 0;
@@ -181,6 +198,8 @@ void System::reset() {
     m_sellRequest.clear();
     m_sellShortRequest.clear();
     m_buyShortRequest.clear();
+
+    _reset();
 }
 
 void System::forceResetAll() {
@@ -209,8 +228,8 @@ void System::forceResetAll() {
     m_kdata = Null<KData>();
 
     m_calculated = false;
-    m_pre_ev_valid = false;  // true;
-    m_pre_cn_valid = false;  // true;
+    m_pre_ev_valid = m_ev ? false : true;
+    m_pre_cn_valid = m_cn ? false : true;
 
     m_buy_days = 0;
     m_sell_short_days = 0;
@@ -222,6 +241,8 @@ void System::forceResetAll() {
     m_sellRequest.clear();
     m_sellShortRequest.clear();
     m_buyShortRequest.clear();
+
+    _forceResetAll();
 }
 
 void System::setTO(const KData& kdata) {
@@ -232,8 +253,8 @@ void System::setTO(const KData& kdata) {
 
     HKU_TRACE_IF_RETURN(m_calculated, void(), "No need to calcule!");
 
-    m_stock = kdata.getStock();
-    KQuery query = kdata.getQuery();
+    m_stock = m_kdata.getStock();
+    KQuery query = m_kdata.getQuery();
     if (m_stock.isNull() || query.recoverType() == KQuery::NO_RECOVER) {
         m_src_kdata = m_kdata;
     } else {
@@ -241,6 +262,7 @@ void System::setTO(const KData& kdata) {
         no_recover_query.recoverType(KQuery::NO_RECOVER);
         m_src_kdata = m_stock.getKData(no_recover_query);
     }
+    HKU_ASSERT(m_kdata.size() == m_src_kdata.size());
 
     HKU_WARN_IF(
       query.recoverType() == KQuery::FORWARD || query.recoverType() == KQuery::EQUAL_FORWARD,
@@ -248,13 +270,13 @@ void System::setTO(const KData& kdata) {
 
     // sg->setTO必须在cn->setTO之前，cn会使用到sg，防止sg被计算两次
     if (m_sg)
-        m_sg->setTO(kdata);  // 传入复权的 KData
+        m_sg->setTO(m_kdata);  // 传入复权的 KData
     if (m_cn)
-        m_cn->setTO(kdata);  // 传入复权的 KData
+        m_cn->setTO(m_kdata);  // 传入复权的 KData
     if (m_st)
-        m_st->setTO(kdata);  // 传入复权的 KData
+        m_st->setTO(m_kdata);  // 传入复权的 KData
     if (m_tp)
-        m_tp->setTO(kdata);  // 传入复权的 KData
+        m_tp->setTO(m_kdata);  // 传入复权的 KData
     if (m_pg)
         m_pg->setTO(m_src_kdata);  // 传入原始未复权的 KData
     if (m_sp)
@@ -267,7 +289,7 @@ void System::setTO(const KData& kdata) {
 }
 
 SystemPtr System::clone() {
-    SystemPtr p = make_shared<System>();
+    SystemPtr p = _clone();
     if (m_tm)
         p->m_tm = getParam<bool>("shared_tm") ? m_tm : m_tm->clone();
     if (m_ev)
@@ -379,23 +401,24 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
 
     bool trace = getParam<bool>("trace");
     setTO(kdata);
-    size_t total = kdata.size();
-    auto const* ks = kdata.data();
+    size_t total = m_kdata.size();
+    auto const* ks = m_kdata.data();
     auto const* src_ks = m_src_kdata.data();
+    HKU_ASSERT(m_kdata.size() == m_src_kdata.size());
 
     // 适应 strategy 模式下运行时同步资产信息可能造成的偏差
     Datetime tm_init_datetime = m_tm->initDatetime();
-    if (KQuery::getKTypeInMin(kdata.getQuery().kType()) >= 1440) {
+    if (KQuery::getKTypeInMin(m_kdata.getQuery().kType()) >= 1440) {
         tm_init_datetime = tm_init_datetime.startOfDay();
     }
 
     for (size_t i = 0; i < total; ++i) {
-        if (ks[i].datetime >= tm_init_datetime) {
+        if (ks[i].datetime >= tm_init_datetime && ks[i].datetime >= m_tm->lastDatetime()) {
             auto tr = _runMoment(ks[i], src_ks[i]);
             if (trace) {
                 HKU_INFO_IF(!tr.isNull(), "{}", tr);
                 PositionRecord position = m_tm->getPosition(ks[i].datetime, m_stock);
-                FundsRecord funds = m_tm->getFunds(kdata.getQuery().kType());
+                FundsRecord funds = m_tm->getFunds(ks[i].datetime, m_kdata.getQuery().kType());
                 if (position.number > 0.0) {
                     // clang-format off
                     HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
@@ -434,7 +457,8 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     bool trace = getParam<bool>("trace");
     if (trace) {
         HKU_INFO("{} ------------------------------------------------------", today.datetime);
-        HKU_INFO("[{}] source {} ", name(), src_today);
+        HKU_INFO("[{}] cal today {} ", name(), today);
+        HKU_INFO("[{}] raw today {} ", name(), src_today);
         HKU_INFO_IF(m_kdata.getQuery().recoverType() != KQuery::NO_RECOVER, "[{}] Restitution {} ",
                     name(), src_today);
     }
