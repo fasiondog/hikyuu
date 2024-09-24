@@ -4,7 +4,12 @@
 TA-Lib 包装
 ============
 
-由于内建指标还不完整，在交互工具里对TA-Lib进行了包装，命名方式统一为 TA_FUNC名称。其中，ta-lib指标的lookback属性，用discard属性代替。
+.. note::
+    
+    talib 包无法在 Windows 下通过 pip 安装，请从 `<https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib/>`_ 上下载相应的 wheel 包，手工安装。
+
+
+在交互工具里对TA-Lib进行了包装，做为对 hikyuu 指标的补充，其命名方式统一为 TA_FUNC名称。其中，ta-lib指标的lookback属性，用discard属性代替。
 
 ::
 

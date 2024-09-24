@@ -7,5 +7,6 @@
 .. toctree::
 
    portfolio
+   multifactor
    selector
    allocate_funds
