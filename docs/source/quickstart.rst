@@ -6,10 +6,6 @@
 开始请先下载数据
 ----------------
 
-.. note::
-
-    数据下载工具需要使用到 unrar 命令，Linux 下请自行安装 unrar。
-
 pip 安装 Hikyuu 后，可在命令行终端中执行 hikyuutdx 命令，启动数据下载工具，并按界面提示下载数据：
 
 .. figure:: _static/install-20190228.png

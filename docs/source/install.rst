@@ -38,4 +38,4 @@ pip 安装
 源码编译安装
 ----------------
 
-Linux上建议使用源码方式安装，具体参见 :ref:`developer` 。
+Linux上建议使用源码方式安装，参见 :ref:`developer` 。
