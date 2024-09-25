@@ -129,14 +129,9 @@ void TradeManager::_reset() {
 
 TradeManagerPtr TradeManager::_clone() {
     auto p = make_shared<TradeManager>(m_init_datetime, m_init_cash, m_costfunc, m_name);
-    p->m_params = m_params;
-    p->m_name = m_name;
     p->m_init_datetime = m_init_datetime;
     p->m_init_cash = m_init_cash;
     p->m_last_update_datetime = m_last_update_datetime;
-
-    // costfunc是一个公共的函数对象，是共享实现，无须deepcopy
-    p->m_costfunc = m_costfunc;
 
     p->m_cash = m_cash;
     p->m_checkin_cash = m_checkin_cash;
@@ -149,11 +144,7 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_trade_list = m_trade_list;
     p->m_position = m_position;
     p->m_position_history = m_position_history;
-    p->m_broker_list = m_broker_list;
-    p->m_broker_last_datetime = m_broker_last_datetime;
-
     p->m_actions = m_actions;
-
     return p;
 }
 
