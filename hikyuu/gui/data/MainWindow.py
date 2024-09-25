@@ -653,7 +653,7 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">导入深证分时数据：</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">导入权息数据数：</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">导入完毕！</p></body></html>"))
-        self.import_status_label.setText(_translate("MainWindow", "import_status_label"))
+        self.import_status_label.setText(_translate("MainWindow", "请勿盘中导入！"))
         self.sched_import_pushButton.setText(_translate("MainWindow", "启动定时导入"))
         self.label_40.setText(_translate("MainWindow", "导入执行时间："))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "执行导入"))
