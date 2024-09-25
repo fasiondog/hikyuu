@@ -168,6 +168,7 @@ public:
         p->m_name = m_name;
         p->m_broker_last_datetime = m_broker_last_datetime;
         p->m_costfunc = m_costfunc;
+        p->m_broker_list = m_broker_list;
         return p;
     }
 

@@ -19,9 +19,9 @@ MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
     setParam<bool>("only_should_buy", false);
     setParam<bool>("ignore_null", true);  // 是否忽略 MF 中 score 值为 nan 的证券
     setParam<int>("topn", 10);
+    setParam<bool>("reverse", false);  // 逆序，此时 topn 代表最末尾的几个，相当于按最低值排序
     setParam<int>("ic_n", 5);
     setParam<int>("ic_rolling_n", 120);
-    setParam<KQuery>("query", KQuery());
     setParam<Stock>("ref_stk", Stock());
     setParam<string>("mode", "MF_ICIRWeight");
 }
@@ -32,12 +32,14 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     setParam<bool>("only_should_buy", false);
     setParam<bool>("ignore_null", true);
     setParam<int>("topn", topn);
+    setParam<bool>("reverse", false);
 
     setParam<int>("ic_n", mf->getParam<int>("ic_n"));
-    setParam<KQuery>("query", mf->getQuery());
     setParam<Stock>("ref_stk", mf->getRefStock());
     if (mf->haveParam("ic_rolling_n")) {
         setParam<int>("ic_rolling_n", mf->getParam<int>("ic_rolling_n"));
+    } else {
+        setParam<int>("ic_rolling_n", 120);
     }
     setParam<string>("mode", mf->name());
 }
@@ -84,11 +86,34 @@ SystemWeightList MultiFactorSelector::getSelected(Datetime date) {
     }
 
     ScoreRecordList scores;
-    if (getParam<bool>("ignore_null")) {
-        scores = m_mf->getScores(date, 0, topn,
-                                 [](const ScoreRecord& sc) { return !std::isnan(sc.value); });
+    if (!getParam<bool>("reverse")) {
+        if (getParam<bool>("ignore_null")) {
+            scores = m_mf->getScores(date, 0, topn,
+                                     [](const ScoreRecord& sc) { return !std::isnan(sc.value); });
+        } else {
+            scores = m_mf->getScores(date, 0, topn);
+        }
     } else {
-        scores = m_mf->getScores(date, 0, topn);
+        ScoreRecordList raw_scores = m_mf->getScores(date);
+        auto iter = raw_scores.rbegin();
+        for (size_t count = 0; count < topn && iter != raw_scores.rend(); ++iter) {
+            if (!std::isnan(iter->value)) {
+                scores.emplace_back(*iter);
+                count++;
+            }
+        }
+        if (scores.size() < topn && !getParam<bool>("ignore_null")) {
+            size_t lack = topn - scores.size();
+            auto iter = raw_scores.rbegin();
+            for (size_t count = 0; count < lack && iter != raw_scores.rend(); ++iter) {
+                if (std::isnan(iter->value)) {
+                    scores.emplace_back(*iter);
+                    count++;
+                } else {
+                    break;
+                }
+            }
+        }
     }
 
     if (getParam<bool>("only_should_buy")) {
@@ -118,7 +143,7 @@ void MultiFactorSelector::_calculate() {
         stks.emplace_back(sys->getStock());
     }
 
-    auto query = getParam<KQuery>("query");
+    const auto& query = m_query;
     auto ic_n = getParam<int>("ic_n");
     auto ic_rolling_n = getParam<int>("ic_rolling_n");
     auto mode = getParam<string>("mode");
