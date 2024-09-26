@@ -252,13 +252,14 @@ void export_Selector(py::module& m) {
     m.def(
       "SE_MultiFactor",
       [](const py::sequence& inds, int topn, int ic_n, int ic_rolling_n, const py::object& ref_stk,
-         const string& mode) {
+         bool spearman, const string& mode) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           Stock c_ref_stk = ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>();
-          return SE_MultiFactor(c_inds, topn, ic_n, ic_rolling_n, c_ref_stk, mode);
+          return SE_MultiFactor(c_inds, topn, ic_n, ic_rolling_n, c_ref_stk, spearman, mode);
       },
       py::arg("inds"), py::arg("topn") = 10, py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
-      py::arg("ref_stk") = py::none(), py::arg("mode") = "MF_ICIRWeight",
+      py::arg("ref_stk") = py::none(), py::arg("spearman") = true,
+      py::arg("mode") = "MF_ICIRWeight",
       R"(SE_MultiFactor
 
     创建基于多因子评分的选择器，两种创建方式
@@ -273,6 +274,7 @@ void export_Selector(py::module& m) {
       :param int ic_n: 默认 IC 对应的 N 日收益率
       :param int ic_rolling_n: IC 滚动周期
       :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+      :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
 
     m.def("crtSEOptimal", crtSEOptimal, R"(crtSEOptimal(func)

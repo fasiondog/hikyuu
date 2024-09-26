@@ -28,12 +28,13 @@ SelectorPtr HKU_API SE_MultiFactor(const MFPtr& mf, int topn = 10);
  * @param ic_n ic 对应的 ic_n 日收益率
  * @param ic_rolling_n 计算滚动 IC （即 IC 的 n 日移动平均）周期
  * @param ref_stk 参照对比证券，未指定时，默认使用 sh000300 沪深300指数
+ * @param spearman 默认使用 spearman 计算相关系数，否则为 pearson
  * @param mode "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
  * @return SelectorPtr
  * @ingroup Selector
  */
 SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, int topn = 10, int ic_n = 5,
                                    int ic_rolling_n = 120, const Stock& ref_stk = Stock(),
-                                   const string& mode = "MF_ICIRWeight");
+                                   bool spearman = true, const string& mode = "MF_ICIRWeight");
 
 }  // namespace hku
