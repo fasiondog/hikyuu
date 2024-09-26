@@ -23,6 +23,7 @@ MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
     setParam<int>("ic_n", 5);
     setParam<int>("ic_rolling_n", 120);
     setParam<Stock>("ref_stk", Stock());
+    setParam<bool>("use_spearman", true);
     setParam<string>("mode", "MF_ICIRWeight");
 }
 
@@ -41,6 +42,7 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     } else {
         setParam<int>("ic_rolling_n", 120);
     }
+    setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
     setParam<string>("mode", mf->name());
 }
 
@@ -146,15 +148,16 @@ void MultiFactorSelector::_calculate() {
     const auto& query = m_query;
     auto ic_n = getParam<int>("ic_n");
     auto ic_rolling_n = getParam<int>("ic_rolling_n");
+    bool spearman = getParam<bool>("use_spearman");
     auto mode = getParam<string>("mode");
 
     if (!m_mf) {
         if ("MF_ICIRWeight" == mode) {
-            m_mf = MF_ICIRWeight(m_inds, stks, query, ref_stk, ic_n, ic_rolling_n);
+            m_mf = MF_ICIRWeight(m_inds, stks, query, ref_stk, ic_n, ic_rolling_n, spearman);
         } else if ("MF_ICWeight" == mode) {
-            m_mf = MF_ICWeight(m_inds, stks, query, ref_stk, ic_n, ic_rolling_n);
+            m_mf = MF_ICWeight(m_inds, stks, query, ref_stk, ic_n, ic_rolling_n, spearman);
         } else if ("MF_EqualWeight" == mode) {
-            m_mf = MF_EqualWeight(m_inds, stks, query, ref_stk, ic_n);
+            m_mf = MF_EqualWeight(m_inds, stks, query, ref_stk, ic_n, spearman);
         } else {
             HKU_THROW("Invalid mode: {}", mode);
         }
@@ -164,6 +167,7 @@ void MultiFactorSelector::_calculate() {
         m_mf->setRefStock(ref_stk);
         m_mf->setStockList(stks);
         m_mf->setParam<int>("ic_n", ic_n);
+        m_mf->setParam<bool>("use_spearman", spearman);
         if (m_mf->haveParam("ic_rolling_n")) {
             m_mf->setParam<int>("ic_rolling_n", ic_rolling_n);
         }
@@ -178,15 +182,16 @@ SelectorPtr HKU_API SE_MultiFactor(const MFPtr& mf, int topn) {
     return make_shared<MultiFactorSelector>(mf, topn);
 }
 
-SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, int topn = 10, int ic_n = 5,
-                                   int ic_rolling_n = 120, const Stock& ref_stk = Stock(),
-                                   const string& mode = "MF_ICIRWeight") {
+SelectorPtr HKU_API SE_MultiFactor(const IndicatorList& src_inds, int topn, int ic_n,
+                                   int ic_rolling_n, const Stock& ref_stk, bool spearman,
+                                   const string& mode) {
     auto p = make_shared<MultiFactorSelector>();
     p->setIndicators(src_inds);
     p->setParam<int>("topn", topn);
     p->setParam<int>("ic_n", ic_n);
     p->setParam<int>("ic_rolling_n", ic_rolling_n);
     p->setParam<Stock>("ref_stk", ref_stk);
+    p->setParam<bool>("use_spearman", spearman);
     p->setParam<string>("mode", mode);
     return p;
 }
