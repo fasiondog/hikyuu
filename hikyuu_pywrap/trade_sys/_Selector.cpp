@@ -53,6 +53,9 @@ public:
     }
 };
 
+#ifdef __GNUC__
+#pragma GCC visibility push(hidden)
+#endif
 class PyOptimalSelector : public OptimalSelectorBase {
     OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
@@ -83,8 +86,11 @@ private:
     // 目前无法序列化
     py::function m_evaluate;
 };
+#ifdef __GNUC__
+#pragma GCC visibility pop
+#endif
 
-SEPtr crtSEOptimal(const py::function&& evalfunc) {
+SEPtr crtSEOptimal(const py::function& evalfunc) {
     return std::make_shared<PyOptimalSelector>(evalfunc);
 }
 
