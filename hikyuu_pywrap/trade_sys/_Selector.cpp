@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/trade_sys/selector/build_in.h>
+#include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -51,6 +52,41 @@ public:
         PYBIND11_OVERRIDE_NAME(string, SelectorBase, "__str__", str, );
     }
 };
+
+class PyOptimalSelector : public OptimalSelectorBase {
+    OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
+
+public:
+    PyOptimalSelector() : OptimalSelectorBase("SE_PyOptimal") {}
+    explicit PyOptimalSelector(const py::function& evalfunc)
+    : OptimalSelectorBase("SE_PyOptimal"), m_evaluate(evalfunc) {}
+    virtual ~PyOptimalSelector() = default;
+
+public:
+    virtual SelectorPtr _clone() override {
+        return std::make_shared<PyOptimalSelector>();
+    }
+
+    virtual double evaluate(const SYSPtr& sys, const Datetime& lastDate) noexcept override {
+        double ret = Null<double>();
+        try {
+            ret = m_evaluate(sys, lastDate).cast<double>();
+        } catch (const std::exception& e) {
+            HKU_ERROR(e.what());
+        } catch (...) {
+            HKU_ERROR("Unknown error!");
+        }
+        return ret;
+    }
+
+private:
+    // 目前无法序列化
+    py::function m_evaluate;
+};
+
+SEPtr crtSEOptimal(const py::function&& evalfunc) {
+    return std::make_shared<PyOptimalSelector>(evalfunc);
+}
 
 void export_Selector(py::module& m) {
     py::class_<SystemWeight>(m, "SystemWeight", py::dynamic_attr(),
@@ -238,6 +274,12 @@ void export_Selector(py::module& m) {
       :param int ic_rolling_n: IC 滚动周期
       :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
+
+    m.def("crtSEOptimal", crtSEOptimal, R"(crtSEOptimal(func)
+    
+    快速创建自定义绩效评估函数的寻优选择器
+
+    :param func: 一个可调用对象，接收参数为 (sys, lastdate)，返回一个 float 数值)");
 
     m.def("SE_MaxFundsOptimal", SE_MaxFundsOptimal, "账户资产最大寻优选择器");
 

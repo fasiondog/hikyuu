@@ -11,6 +11,7 @@
 #include "hikyuu/indicator/crt/ROCP.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "hikyuu/indicator/crt/SPEARMAN.h"
+#include "hikyuu/indicator/crt/CORR.h"
 #include "IIc.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -23,12 +24,14 @@ IIc::IIc() : IndicatorImp("IC", 1) {
     setParam<int>("n", 1);  // 调仓周期
     // 对齐时是否以 nan 值进行填充，否则以小于当前日期的最后值作为填充
     setParam<bool>("fill_null", true);
+    setParam<bool>("use_spearman", true);  // 默认使用SPEARMAN计算相关系数, 否则使用pearson相关系数
 }
 
-IIc::IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk)
+IIc::IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk, bool spearman)
 : IndicatorImp("IC", 1), m_query(query), m_ref_stk(ref_stk), m_stks(stks) {
     setParam<int>("n", n);
     setParam<bool>("fill_null", true);
+    setParam<bool>("use_spearman", spearman);
 }
 
 IIc::~IIc() {}
@@ -89,6 +92,11 @@ void IIc::_calculate(const Indicator& inputInd) {
     m_discard = discard;
     HKU_IF_RETURN(m_discard >= days_total, void());
 
+    Indicator (*spearman)(const Indicator&, const Indicator&, int) = hku::SPEARMAN;
+    if (!getParam<bool>("use_spearman")) {
+        spearman = hku::CORR;
+    }
+
     PriceList tmp(stk_count, Null<price_t>());
     PriceList tmp_return(stk_count, Null<price_t>());
     auto* dst = this->data();
@@ -100,7 +108,7 @@ void IIc::_calculate(const Indicator& inputInd) {
         }
         auto a = PRICELIST(tmp);
         auto b = PRICELIST(tmp_return);
-        auto ic = hku::SPEARMAN(a, b, stk_count);
+        auto ic = spearman(a, b, stk_count);
         dst[i] = ic[ic.size() - 1];
     }
 
@@ -112,13 +120,15 @@ void IIc::_calculate(const Indicator& inputInd) {
     }
 }
 
-Indicator HKU_API IC(const StockList& stks, const KQuery& query, const Stock& ref_stk, int n) {
-    return Indicator(make_shared<IIc>(stks, query, n, ref_stk));
+Indicator HKU_API IC(const StockList& stks, const KQuery& query, const Stock& ref_stk, int n,
+                     bool spearman) {
+    return Indicator(make_shared<IIc>(stks, query, n, ref_stk, spearman));
 }
 
-Indicator HKU_API IC(const Block& blk, const KQuery& query, const Stock& ref_stk, int n) {
+Indicator HKU_API IC(const Block& blk, const KQuery& query, const Stock& ref_stk, int n,
+                     bool spearman) {
     StockList stks = blk.getStockList();
-    return IC(stks, query, ref_stk, n);
+    return IC(stks, query, ref_stk, n, spearman);
 }
 
 }  // namespace hku

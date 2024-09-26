@@ -23,7 +23,7 @@ struct RunRanges {
     : start(start_), run_start(run_start_), end(end_) {}
 };
 
-class OptimalSelectorBase : public SelectorBase {
+class HKU_API OptimalSelectorBase : public SelectorBase {
     CLASS_LOGGER_IMP(SE_Optimal)
     SELECTOR_IMP(OptimalSelectorBase)
     SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -42,6 +42,7 @@ public:
 
     // 以便继承子类只需要实现 _clone 和 该接口即可
     // 该接口实现系统绩效评估，getSelected 时将取评估结果最大的系统
+    // 使用 std::function 的话，在 C++ 中无法序列化，所以使用继承
     virtual double evaluate(const SYSPtr& sys, const Datetime& endDate) noexcept {
         return Null<double>();
     }
