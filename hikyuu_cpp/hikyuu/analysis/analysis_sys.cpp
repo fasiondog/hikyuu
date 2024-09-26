@@ -177,14 +177,14 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystemMulti(const SystemList& sys_l
     });
 
     if (0 == sort_mode) {
-        for (auto& v : all_result) {
+        for (const auto& v : all_result) {
             if (v.first > result.first) {
                 result.first = v.first;
                 result.second = v.second;
             }
         }
     } else {
-        for (auto& v : all_result) {
+        for (const auto& v : all_result) {
             if (v.first < result.first) {
                 result.first = v.first;
                 result.second = v.second;

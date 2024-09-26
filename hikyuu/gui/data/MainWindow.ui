@@ -741,7 +741,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>import_status_label</string>
+       <string>请勿盘中导入！</string>
       </property>
      </widget>
      <widget class="QPushButton" name="sched_import_pushButton">

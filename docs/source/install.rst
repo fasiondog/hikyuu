@@ -25,11 +25,7 @@ pip 安装
 .. note::
 
     第一次使用，请详细阅读 :ref:`quickstart` 。
-
-.. note::
-    
-    由于依赖的 talib 包，无法在 Windows 下通过 pip 安装，请从 `<https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib/>`_ 上下载相应的 wheel 包，手工安装。
-    
+   
 .. note::
 
     Linux 需要安装依赖的库：libhdf5、libmysqlclient、libsqlite3
@@ -38,4 +34,4 @@ pip 安装
 源码编译安装
 ----------------
 
-Linux上建议使用源码方式安装，具体参见 :ref:`developer` 。
+Linux上建议使用源码方式安装，参见 :ref:`developer` 。

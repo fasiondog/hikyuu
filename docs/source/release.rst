@@ -1,8 +1,29 @@
 版本发布说明
 =======================
 
-版本发布说明
---------------
+2.2.0 - 2024年9月26日
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. 新增特性
+    - 新增 WalkForwardSystem 滚动系统策略（单候选系统时为滚动，多候选系统时为滚动寻优）
+    - 新增 OptimalSelector 滚动系统策略寻优算法（配合 WalkForwardSystem 使用）
+    - Strategy 支持指定多个时间点任务
+    - IC/ICIR/MF_MultiFactor/SE_MultiFactor 增加 spearman 参数，控制相关系数计算方法
+
+2. 功能优化
+    - 优化 SpotAgent
+    - 解决 hub 中自定义继承类接口在另一个part中引用时丢失的问题
+    - 调整 HikyuuTDX 超时时长，避免 linux 超时时等待时间过长
+
+3. 缺陷修复
+    - fixed etf 缩扩股，调整权息表以适应缩扩股
+    - fixed DMA和INSUM,处理 nan 和 discard
+    - fixed 日期型 KQuery 比较失败
+    - fixed System未正确使用 m_kdata
+    - fixed performance 统计计算天数时加1
+    - fixed some CN not register serialization
+    - fixed portfolio 打印缺失
+
 
 2.1.5 - 2024年9月11日
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

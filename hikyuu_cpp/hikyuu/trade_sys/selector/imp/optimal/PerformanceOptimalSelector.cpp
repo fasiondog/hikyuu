@@ -246,8 +246,11 @@ void PerformanceOptimalSelector::_calculate_parallel(
     }
 }
 
-SEPtr HKU_API SE_PerformanceOptimal() {
-    return make_shared<PerformanceOptimalSelector>();
+SEPtr HKU_API SE_PerformanceOptimal(const string& key, int mode) {
+    PerformanceOptimalSelector* p = new PerformanceOptimalSelector();
+    p->setParam<string>("key", key);
+    p->setParam<int>("mode", mode);
+    return SEPtr(p);
 }
 
 }  // namespace hku

@@ -168,6 +168,7 @@ public:
         p->m_name = m_name;
         p->m_broker_last_datetime = m_broker_last_datetime;
         p->m_costfunc = m_costfunc;
+        p->m_broker_list = m_broker_list;
         return p;
     }
 
@@ -197,7 +198,7 @@ public:
      * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
      * @return 日资产记录列表
      */
-    FundsList getFundsList(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
+    FundsList getFundsList(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY) {
         size_t total = dates.size();
         FundsList result(total);
         HKU_IF_RETURN(total == 0, result);
@@ -213,7 +214,7 @@ public:
      * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
      * @return 资产净值列表
      */
-    PriceList getFundsCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
+    PriceList getFundsCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY) {
         FundsList funds_list = getFundsList(dates, ktype);
         PriceList ret(funds_list.size());
         int precision = getParam<int>("precision");
@@ -229,7 +230,7 @@ public:
      * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
      * @return 收益曲线
      */
-    PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
+    PriceList getProfitCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY) {
         FundsList funds_list = getFundsList(dates, ktype);
         PriceList ret(funds_list.size());
         int precision = getParam<int>("precision");
@@ -246,7 +247,7 @@ public:
      * @return 收益率曲线
      */
     PriceList getProfitCumChangeCurve(const DatetimeList& dates,
-                                      KQuery::KType ktype = KQuery::DAY) {
+                                      const KQuery::KType& ktype = KQuery::DAY) {
         FundsList funds_list = getFundsList(dates, ktype);
         PriceList ret(funds_list.size());
         for (size_t i = 0, total = funds_list.size(); i < total; i++) {
@@ -261,7 +262,8 @@ public:
      * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
      * @return 价格曲线
      */
-    PriceList getBaseAssetsCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
+    PriceList getBaseAssetsCurve(const DatetimeList& dates,
+                                 const KQuery::KType& ktype = KQuery::DAY) {
         FundsList funds_list = getFundsList(dates, ktype);
         PriceList ret(funds_list.size());
         for (size_t i = 0, total = funds_list.size(); i < total; i++) {

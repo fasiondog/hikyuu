@@ -122,7 +122,7 @@ void Portfolio::_readyForRun() {
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
     try {
-        OptimalSelectorBase* _ = dynamic_cast<OptimalSelectorBase*>(m_se.get());
+        OptimalSelectorBase const* _ = dynamic_cast<OptimalSelectorBase*>(m_se.get());
         HKU_THROW("Can't use is OptimalSelectorBase type m_se in PF!");
     } catch (...) {
         // do nothing

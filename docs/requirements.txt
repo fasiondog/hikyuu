@@ -1,0 +1,4 @@
+sphinx==5.0.0
+recommonmark
+sphinx_markdown_tables
+sphinx_rtd_theme
