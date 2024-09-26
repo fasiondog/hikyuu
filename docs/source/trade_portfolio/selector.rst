@@ -29,7 +29,7 @@
     :param System sys: 系统策略原型
     :return: SE选择器实例
 
-.. py:function:: SE_MultiFactor(inds[, topn=10, ic_n=5, ic_rolling_n=120, ref_stk=None, mode="MF_ICIRWeight"])
+.. py:function:: SE_MultiFactor(inds[, topn=10, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight"])
 
     创建基于多因子评分的选择器，两种创建方式:
 
@@ -41,6 +41,7 @@
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param bool spearman: 默认使用 spearman 计算相关系数，否则使用 pearson
     :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
     :return: SE选择器实例
 
