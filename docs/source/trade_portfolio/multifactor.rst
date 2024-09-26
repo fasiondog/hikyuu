@@ -10,7 +10,7 @@
 内建对因子合成算法
 --------------------------------
 
-.. py:function:: MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5])
+.. py:function:: MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, spearman=True])
 
     等权重合成因子
 
@@ -19,10 +19,11 @@
     :param Query query: 日期范围
     :param Stock ref_stk: 参考证券
     :param int ic_n: 默认 IC 对应的 N 日收益率
+    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :rtype: MultiFactorBase
 
 
-.. py:function:: MF_ICWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
+.. py:function:: MF_ICWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120, spearman=True])
 
     滚动IC权重合成因子
 
@@ -32,10 +33,11 @@
     :param Stock ref_stk: 参考证券
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
+    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :rtype: MultiFactorBase
 
 
-.. py:function:: MF_ICIRWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
+.. py:function:: MF_ICIRWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120, spearman=True])
 
     滚动ICIR权重合成因子
 
@@ -45,6 +47,7 @@
     :param Stock ref_stk: 参考证券
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
+    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :rtype: MultiFactorBase
 
 
