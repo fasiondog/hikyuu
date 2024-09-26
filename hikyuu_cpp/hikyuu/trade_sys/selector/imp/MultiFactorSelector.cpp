@@ -106,7 +106,7 @@ SystemWeightList MultiFactorSelector::getSelected(Datetime date) {
         }
         if (scores.size() < topn && !getParam<bool>("ignore_null")) {
             size_t lack = topn - scores.size();
-            auto iter = raw_scores.rbegin();
+            iter = raw_scores.rbegin();
             for (size_t count = 0; count < lack && iter != raw_scores.rend(); ++iter) {
                 if (std::isnan(iter->value)) {
                     scores.emplace_back(*iter);
