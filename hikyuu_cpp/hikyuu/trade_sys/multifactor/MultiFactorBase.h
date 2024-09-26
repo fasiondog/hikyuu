@@ -29,7 +29,7 @@ public:
     MultiFactorBase();
     explicit MultiFactorBase(const string& name);
     MultiFactorBase(const IndicatorList& inds, const StockList& stks, const KQuery& query,
-                    const Stock& ref_stk, const string& name, int ic_n);
+                    const Stock& ref_stk, const string& name, int ic_n, bool spearman);
     MultiFactorBase(const MultiFactorBase&);
     virtual ~MultiFactorBase() = default;
 

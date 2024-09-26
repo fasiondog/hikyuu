@@ -18,7 +18,7 @@ class ICMultiFactor : public MultiFactorBase {
 public:
     ICMultiFactor();
     ICMultiFactor(const IndicatorList& inds, const StockList& stks, const KQuery& query,
-                  const Stock& ref_stk, int ic_n, int ic_rolling_n);
+                  const Stock& ref_stk, int ic_n, int ic_rolling_n, bool spearman);
     virtual ~ICMultiFactor() = default;
 
     virtual void _checkParam(const string& name) const override;
