@@ -1748,20 +1748,21 @@ void export_Indicator_build_in(py::module& m) {
     m.def(
       "IC",
       [](const Indicator& ind, const py::object& stks, const KQuery& query, const Stock& ref_stk,
-         int n) {
+         int n, bool spearman) {
           if (py::isinstance<Block>(stks)) {
               const auto& blk = stks.cast<Block&>();
-              return IC(ind, blk, query, ref_stk, n);
+              return IC(ind, blk, query, ref_stk, n, spearman);
           }
 
           if (py::isinstance<py::sequence>(stks)) {
               StockList c_stks = python_list_to_vector<Stock>(stks);
-              return IC(ind, c_stks, query, ref_stk, n);
+              return IC(ind, c_stks, query, ref_stk, n, spearman);
           }
 
           HKU_THROW("Input stks must be Block or sequenc(Stock)!");
       },
       py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("n") = 1,
+      py::arg("spearman") = true,
       R"(IC(ind, stks, query, ref_stk[, n=1])
 
     计算指定的因子相对于参考证券的 IC （实际为 RankIC）
@@ -1770,26 +1771,27 @@ void export_Indicator_build_in(py::module& m) {
     :param sequence(stock)|Block stks 证券组合
     :param Query query: 查询条件
     :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
-    :param int n: 时间窗口)");
+    :param int n: 时间窗口
+    :param bool spearman: 使用 spearman 相关系数，否则为 pearson)");
 
     m.def(
       "ICIR",
       [](const Indicator& ind, const py::object& stks, const KQuery& query, const Stock& ref_stk,
-         int n, int rolling_n) {
+         int n, int rolling_n, bool spearman) {
           if (py::isinstance<Block>(stks)) {
               const auto& blk = stks.cast<Block&>();
-              return ICIR(ind, blk, query, ref_stk, n, rolling_n);
+              return ICIR(ind, blk, query, ref_stk, n, rolling_n, spearman);
           }
 
           if (py::isinstance<py::sequence>(stks)) {
               StockList c_stks = python_list_to_vector<Stock>(stks);
-              return ICIR(ind, c_stks, query, ref_stk, n, rolling_n);
+              return ICIR(ind, c_stks, query, ref_stk, n, rolling_n, spearman);
           }
 
           HKU_THROW("Input stks must be Block or sequenc(Stock)!");
       },
       py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("n") = 1,
-      py::arg("rolling_n") = 120,
+      py::arg("rolling_n") = 120, py::arg("spearman") = true,
       R"(ICIR(ind, stks, query, ref_stk[, n=1, rolling_n=120])
 
     计算 IC 因子 IR = IC的多周期均值/IC的标准方差
@@ -1799,7 +1801,8 @@ void export_Indicator_build_in(py::module& m) {
     :param Query query: 查询条件
     :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
     :param int n: 计算IC时对应的 n 日收益率
-    :param int rolling_n: 滚动周期)");
+    :param int rolling_n: 滚动周期
+    :param bool spearman: 使用 spearman 相关系数，否则为 pearson)");
 
     m.def("ZSCORE", ZSCORE_1, py::arg("out_extreme") = false, py::arg("nsigma") = 3.0,
           py::arg("recursive") = false);

@@ -22,12 +22,14 @@ namespace hku {
  * @param ref_stk 参照证券，默认 sh000300 沪深300
  * @param n IC对应的N日收益率
  * @param rolling_n 滚动时间窗口
+ * @param spearman 使用 spearman 相关系数，否则为 pearson
  * @return Indicator
  * @ingroup Indicator
  */
 inline Indicator ICIR(const Indicator& ind, const StockList& stks, const KQuery& query,
-                      const Stock& ref_stk = getStock("sh000300"), int n = 1, int rolling_n = 120) {
-    Indicator ic = IC(ind, stks, query, ref_stk, n);
+                      const Stock& ref_stk = getStock("sh000300"), int n = 1, int rolling_n = 120,
+                      bool spearman = true) {
+    Indicator ic = IC(ind, stks, query, ref_stk, n, spearman);
     Indicator x = MA(ic, rolling_n) / STDEV(ic, rolling_n);
     x.name("ICIR");
     x.setParam<int>("n", n);
@@ -36,8 +38,9 @@ inline Indicator ICIR(const Indicator& ind, const StockList& stks, const KQuery&
 }
 
 inline Indicator ICIR(const Indicator& ind, const Block& blk, const KQuery& query,
-                      const Stock& ref_stk = getStock("sh000300"), int n = 1, int rolling_n = 120) {
-    Indicator ic = IC(ind, blk, query, ref_stk, n);
+                      const Stock& ref_stk = getStock("sh000300"), int n = 1, int rolling_n = 120,
+                      bool spearman = true) {
+    Indicator ic = IC(ind, blk, query, ref_stk, n, spearman);
     Indicator x = MA(ic, rolling_n) / STDEV(ic, rolling_n);
     x.name("ICIR");
     x.setParam<int>("n", n);

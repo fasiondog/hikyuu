@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/trade_sys/selector/build_in.h>
+#include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -51,6 +52,41 @@ public:
         PYBIND11_OVERRIDE_NAME(string, SelectorBase, "__str__", str, );
     }
 };
+
+class PyOptimalSelector : public OptimalSelectorBase {
+    OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
+
+public:
+    PyOptimalSelector() : OptimalSelectorBase("SE_PyOptimal") {}
+    explicit PyOptimalSelector(const py::function& evalfunc)
+    : OptimalSelectorBase("SE_PyOptimal"), m_evaluate(evalfunc) {}
+    virtual ~PyOptimalSelector() = default;
+
+public:
+    virtual SelectorPtr _clone() override {
+        return std::make_shared<PyOptimalSelector>();
+    }
+
+    virtual double evaluate(const SYSPtr& sys, const Datetime& lastDate) noexcept override {
+        double ret = Null<double>();
+        try {
+            ret = m_evaluate(sys, lastDate).cast<double>();
+        } catch (const std::exception& e) {
+            HKU_ERROR(e.what());
+        } catch (...) {
+            HKU_ERROR("Unknown error!");
+        }
+        return ret;
+    }
+
+private:
+    // 目前无法序列化
+    py::function m_evaluate;
+};
+
+SEPtr crtSEOptimal(const py::function&& evalfunc) {
+    return std::make_shared<PyOptimalSelector>(evalfunc);
+}
 
 void export_Selector(py::module& m) {
     py::class_<SystemWeight>(m, "SystemWeight", py::dynamic_attr(),
@@ -216,13 +252,14 @@ void export_Selector(py::module& m) {
     m.def(
       "SE_MultiFactor",
       [](const py::sequence& inds, int topn, int ic_n, int ic_rolling_n, const py::object& ref_stk,
-         const string& mode) {
+         bool spearman, const string& mode) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           Stock c_ref_stk = ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>();
-          return SE_MultiFactor(c_inds, topn, ic_n, ic_rolling_n, c_ref_stk, mode);
+          return SE_MultiFactor(c_inds, topn, ic_n, ic_rolling_n, c_ref_stk, spearman, mode);
       },
       py::arg("inds"), py::arg("topn") = 10, py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
-      py::arg("ref_stk") = py::none(), py::arg("mode") = "MF_ICIRWeight",
+      py::arg("ref_stk") = py::none(), py::arg("spearman") = true,
+      py::arg("mode") = "MF_ICIRWeight",
       R"(SE_MultiFactor
 
     创建基于多因子评分的选择器，两种创建方式
@@ -237,7 +274,14 @@ void export_Selector(py::module& m) {
       :param int ic_n: 默认 IC 对应的 N 日收益率
       :param int ic_rolling_n: IC 滚动周期
       :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+      :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
+
+    m.def("crtSEOptimal", crtSEOptimal, R"(crtSEOptimal(func)
+    
+    快速创建自定义绩效评估函数的寻优选择器
+
+    :param func: 一个可调用对象，接收参数为 (sys, lastdate)，返回一个 float 数值)");
 
     m.def("SE_MaxFundsOptimal", SE_MaxFundsOptimal, "账户资产最大寻优选择器");
     m.def("SE_PerformanceOptimal", SE_PerformanceOptimal,

@@ -267,8 +267,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         current_dir = os.path.dirname(__file__)
         self.setWindowIcon(QIcon("{}/hikyuu.ico".format(current_dir)))
-        # self.setFixedSize(self.width(), self.height())
-        self.import_status_label.setText('')
         self.import_detail_textEdit.clear()
         self.reset_progress_bar()
         self.day_start_dateEdit.setMinimumDate(datetime.date(1990, 12, 19))

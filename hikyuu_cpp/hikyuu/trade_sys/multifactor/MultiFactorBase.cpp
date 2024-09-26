@@ -14,6 +14,7 @@
 #include "hikyuu/indicator/crt/IC.h"
 #include "hikyuu/indicator/crt/ICIR.h"
 #include "hikyuu/indicator/crt/SPEARMAN.h"
+#include "hikyuu/indicator/crt/CORR.h"
 #include "hikyuu/indicator/crt/ZSCORE.h"
 #include "MultiFactorBase.h"
 
@@ -77,9 +78,10 @@ MultiFactorBase::MultiFactorBase(const MultiFactorBase& base)
 
 MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stks,
                                  const KQuery& query, const Stock& ref_stk, const string& name,
-                                 int ic_n)
+                                 int ic_n, bool spearman)
 : m_name(name), m_inds(inds), m_stks(stks), m_ref_stk(ref_stk), m_query(query) {
     initParam();
+    setParam<bool>("spearman", spearman);
     setParam<int>("ic_n", ic_n);
     checkParam("ic_n");
     _checkData();
@@ -93,6 +95,7 @@ void MultiFactorBase::initParam() {
     setParam<bool>("zscore_out_extreme", false);
     setParam<bool>("zscore_recursive", false);
     setParam<double>("zscore_nsigma", 3.0);
+    setParam<bool>("use_spearman", true);  // 默认使用SPEARMAN计算相关系数, 否则使用pearson相关系数
 }
 
 void MultiFactorBase::baseCheckParam(const string& name) const {
@@ -358,6 +361,11 @@ Indicator MultiFactorBase::getIC(int ndays) {
 
     result.setDiscard(discard);
 
+    Indicator (*spearman)(const Indicator&, const Indicator&, int) = hku::SPEARMAN;
+    if (!getParam<bool>("use_spearman")) {
+        spearman = hku::CORR;
+    }
+
     PriceList tmp(ind_count, Null<price_t>());
     PriceList tmp_return(ind_count, Null<price_t>());
     auto* dst = result.data();
@@ -368,7 +376,7 @@ Indicator MultiFactorBase::getIC(int ndays) {
         }
         auto a = PRICELIST(tmp);
         auto b = PRICELIST(tmp_return);
-        auto ic = hku::SPEARMAN(a, b, ind_count);
+        auto ic = spearman(a, b, ind_count);
         dst[i] = ic[ic.size() - 1];
     }
 
