@@ -53,6 +53,9 @@ public:
     }
 };
 
+#ifdef __GNUC__
+#pragma GCC visibility push(hidden)
+#endif
 class PyOptimalSelector : public OptimalSelectorBase {
     OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
@@ -83,8 +86,11 @@ private:
     // 目前无法序列化
     py::function m_evaluate;
 };
+#ifdef __GNUC__
+#pragma GCC visibility pop
+#endif
 
-SEPtr crtSEOptimal(const py::function&& evalfunc) {
+SEPtr crtSEOptimal(const py::function& evalfunc) {
     return std::make_shared<PyOptimalSelector>(evalfunc);
 }
 
@@ -284,6 +290,12 @@ void export_Selector(py::module& m) {
     :param func: 一个可调用对象，接收参数为 (sys, lastdate)，返回一个 float 数值)");
 
     m.def("SE_MaxFundsOptimal", SE_MaxFundsOptimal, "账户资产最大寻优选择器");
-    m.def("SE_PerformanceOptimal", SE_PerformanceOptimal,
-          "使用 Performance 统计结果进行寻优的选择器");
+
+    m.def("SE_PerformanceOptimal", SE_PerformanceOptimal, py::arg("key") = "帐户平均年收益率%",
+          py::arg("mode") = 0, R"(SE_PerformanceOptimal(key="帐户平均年收益率%", mode=0)
+
+    使用 Performance 统计结果进行寻优的选择器
+
+    :param string key: Performance 统计项
+    :param int mode:  0 取统计结果最大的值系统 | 1 取统计结果为最小值的系统)");
 }

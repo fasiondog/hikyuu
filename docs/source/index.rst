@@ -15,7 +15,7 @@ Welcome to Hikyuu's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: Reference
+   :caption: Python指南
 
    interactive/index
    base/index
@@ -24,12 +24,15 @@ Welcome to Hikyuu's documentation!
    trade_manage/trade_manage
    trade_sys/trade_sys
    trade_portfolio/trade_portfolio
+   trade_sys/walkforward
    strategy
    reference
+
 
 .. toctree::
    :maxdepth: 1
    :caption: C++开发指南
+   :name: C++ Develop Guide
 
    developer.rst
 
