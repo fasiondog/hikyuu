@@ -18,6 +18,38 @@
 
 namespace hku {
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+
+#if HKU_ENABLE_SQLITE
+static bool isSQLite(DBConnectBase *db) {
+    try {
+        SQLiteConnect *sqlite = dynamic_cast<SQLiteConnect *>(db);
+        return true;
+    } catch (...) {
+        // do nothing
+    }
+    return false;
+}
+#endif
+
+#if HKU_ENABLE_MYSQL
+static bool isMySQL(DBConnectBase *db) {
+    try {
+        MySQLConnect *mysql = dynamic_cast<MySQLConnect *>(db);
+        return true;
+    } catch (...) {
+        // do nothing
+    }
+    return false;
+}
+#endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 /*
  * 升级和创建数据库
  */
@@ -30,7 +62,7 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
     if (!driver->tableExist("module_version")) {
         bool need_create = true;
 #if HKU_ENABLE_SQLITE
-        if (need_create && typeid(driver.get()) == typeid(SQLiteConnect *)) {
+        if (need_create && isSQLite(driver.get())) {
             driver->exec(
               "CREATE TABLE `module_version` (`id` INTEGER PRIMARY KEY AUTOINCREMENT,`module` "
               "TEXT, "
@@ -40,7 +72,7 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
 #endif
 
 #if HKU_ENABLE_MYSQL
-        if (need_create && typeid(driver.get()) == typeid(MySQLConnect *)) {
+        if (need_create && isMySQL(driver.get())) {
             driver->exec(
               R"(CREATE TABLE `module_version` (
   `id` int NOT NULL AUTO_INCREMENT,
