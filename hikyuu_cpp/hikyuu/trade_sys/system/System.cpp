@@ -408,12 +408,14 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
 
     // 适应 strategy 模式下运行时同步资产信息可能造成的偏差
     Datetime tm_init_datetime = m_tm->initDatetime();
+    Datetime tm_last_datetime = m_tm->lastDatetime();
     if (KQuery::getKTypeInMin(m_kdata.getQuery().kType()) >= 1440) {
         tm_init_datetime = tm_init_datetime.startOfDay();
+        tm_last_datetime = tm_last_datetime.startOfDay();
     }
 
     for (size_t i = 0; i < total; ++i) {
-        if (ks[i].datetime >= tm_init_datetime && ks[i].datetime >= m_tm->lastDatetime()) {
+        if (ks[i].datetime >= tm_init_datetime && ks[i].datetime >= tm_last_datetime) {
             auto tr = _runMoment(ks[i], src_ks[i]);
             if (trace) {
                 HKU_INFO_IF(!tr.isNull(), "{}", tr);
