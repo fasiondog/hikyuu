@@ -23,6 +23,8 @@ std::atomic_bool Strategy::ms_keep_running = true;
 void Strategy::sig_handler(int sig) {
     if (sig == SIGINT || sig == SIGTERM) {
         ms_keep_running = false;
+        auto* scheduler = getScheduler();
+        scheduler->stop();
         exit(0);
     }
 }
@@ -56,7 +58,7 @@ Strategy::Strategy(const vector<string>& codeList, const vector<KQuery::KType>& 
 Strategy::Strategy(const StrategyContext& context, const string& name, const string& config_file)
 : Strategy(name, config_file) {
     _initParam();
-    m_context = m_context;
+    m_context = context;
 }
 
 Strategy::~Strategy() {
@@ -91,7 +93,10 @@ void Strategy::_init() {
         hikyuu_init(m_config_file, false, m_context);
 
         // 对上下文中的K线类型和其预加载参数进行检查，并给出警告
-        const auto& ktypes = m_context.getKTypeList();
+        auto ktypes = m_context.getKTypeList();
+        if (ktypes.empty()) {
+            ktypes = KQuery::getAllKType();
+        }
         const auto& preload_params = sm.getPreloadParameter();
         for (const auto& ktype : ktypes) {
             std::string low_ktype = ktype;
@@ -105,7 +110,6 @@ void Strategy::_init() {
     }
 
     CLS_CHECK(!m_context.getStockCodeList().empty(), "The context does not contain any stocks!");
-    CLS_CHECK(!m_context.getKTypeList().empty(), "The K type list was empty!");
 
     // 先将行情接收代理停止，以便后面加入处理函数
     stopSpotAgent();
