@@ -458,32 +458,42 @@
           <property name="title">
            <string>存储引擎设置</string>
           </property>
-          <widget class="QRadioButton" name="enable_hdf55_radioButton">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>40</y>
-             <width>121</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>使用HDF5（推荐）</string>
-           </property>
-          </widget>
-          <widget class="QRadioButton" name="enable_mysql_radioButton">
-           <property name="geometry">
-            <rect>
-             <x>170</x>
-             <y>40</y>
-             <width>89</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>使用MYSQL</string>
-           </property>
-          </widget>
+          <layout class="QVBoxLayout" name="verticalLayout_14">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_19">
+             <property name="leftMargin">
+              <number>10</number>
+             </property>
+             <item>
+              <widget class="QRadioButton" name="enable_hdf55_radioButton">
+               <property name="text">
+                <string>使用HDF5（推荐）</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="enable_mysql_radioButton">
+               <property name="text">
+                <string>使用MYSQL</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_10">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
