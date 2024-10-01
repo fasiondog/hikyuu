@@ -62,6 +62,14 @@ option("leak_check", {description = "Enable leak check for test", default = fals
 -- "MT" 方式下，serialize 会挂
 option("serialize", {description = "Enable support serialize object and pickle in python", default = true})
 
+-- 和 hku_utils 编译选项保持一致，以便互相替换
+option("mo", {description = "International language support", default = false})
+-- option("http_client", {description = "use http client", default = true})
+option("http_client_ssl", {description = "enable https support for http client", default = false})
+option("http_client_zip", {description = "enable http support gzip", default = false})
+-- option("node", {description = "enable node reqrep server/client", default = true})
+
+
 if get_config("leak_check") then
     -- 需要 export LD_PRELOAD=libasan.so
     set_policy("build.sanitizer.address", true)
@@ -108,10 +116,10 @@ set_configvar("HKU_ENABLE_STACK_TRACE", get_config("stacktrace") and 1 or 0)
 set_configvar("HKU_CLOSE_SPEND_TIME", get_config("spend_time") and 0 or 1)
 set_configvar("HKU_USE_SPDLOG_ASYNC_LOGGER", get_config("async_log") and 1 or 0)
 set_configvar("HKU_LOG_ACTIVE_LEVEL", get_config("log_level"))
-set_configvar("HKU_ENABLE_MO", 0)
+set_configvar("HKU_ENABLE_MO", get_config("mo") and 1 or 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT", 1)
-set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", 0)
-set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", 0)
+set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", get_config("http_client_ssl") and 1 or 0)
+set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", get_config("http_client_zip") and 1 or 0)
 set_configvar("HKU_ENABLE_NODE", 1)
 
 local boost_version = "1.86.0"
@@ -175,8 +183,12 @@ add_requires("spdlog", {configs = {header_only = true, fmt_external = true}})
 add_requireconfs("spdlog.fmt", {override = true, configs = {header_only = true}})
 add_requires("sqlite3 " .. sqlite_version, {configs = {shared = true, safe_mode="2", cxflags = "-fPIC"}})
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {runtimes = get_config("runtimes")}})
-add_requires("nng " .. nng_version, {configs = {cxflags = "-fPIC"}})
+add_requires("nng " .. nng_version, {configs = {NNG_ENABLE_TLS = has_config("http_client_ssl"), cxflags = "-fPIC"}})
 add_requires("nlohmann_json")
+
+if has_config("http_client_zip") then
+    add_requires("gzip-hpp")
+end
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 

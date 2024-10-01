@@ -4,8 +4,13 @@ target("hikyuu")
 
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json")
     if is_plat("windows", "linux", "cross") then
-        add_packages("sqlite3")
+        if get_config("sqlite") or get_config("hdf5") then
+            add_packages("sqlite3")
+        end
     end
+    if has_config("http_client_zip") then
+        add_packages("gzip-hpp")
+    end    
 
     add_includedirs("..")
 
