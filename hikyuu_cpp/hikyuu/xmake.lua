@@ -89,7 +89,7 @@ target("hikyuu")
     end
     add_files("./data_driver/block_info/qianlong/**.cpp")
     add_files("./data_driver/kdata/cvs/**.cpp")
-    if get_config("sqlite") then
+    if get_config("sqlite") or get_config("hdf5") then
         add_files("./data_driver/kdata/sqlite/**.cpp")
     end
     if get_config("hdf5") then
@@ -104,6 +104,10 @@ target("hikyuu")
 
     if get_config("mysql") then
         add_files("./utilities/db_connect/mysql/**.cpp")
+    end
+
+    if has_config("mo") then
+        add_files("./utilities/mo/**.cpp")
     end
 
     after_build(function(target)
