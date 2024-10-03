@@ -5,6 +5,7 @@
  *     Author: fasiondog
  */
 
+#include <csignal>
 #include <hikyuu/strategy/Strategy.h>
 #include <hikyuu/strategy/BrokerTradeManager.h>
 #include <hikyuu/strategy/RunSystemInStrategy.h>
@@ -101,6 +102,11 @@ void export_Strategy(py::module& m) {
             auto new_func = [=]() {
                 try {
                     c_func();
+                } catch (py::error_already_set& e) {
+                    if (e.matches(PyExc_KeyboardInterrupt)) {
+                        HKU_INFO("KeyboardInterrupt");
+                        raise(SIGTERM);
+                    }
                 } catch (const std::exception& e) {
                     HKU_ERROR(e.what());
                 } catch (...) {
