@@ -43,11 +43,11 @@ class HKU_UTILS_API DBConnectBase : public std::enable_shared_from_this<DBConnec
     /** ping 操作，用于判断是否连接 */
     virtual bool ping() = 0;
 
-    /** 开始事务 */
-    virtual void transaction() noexcept = 0;
+    /** 开始事务，失败时抛出异常 */
+    virtual void transaction() = 0;
 
-    /** 提交事务 */
-    virtual void commit() noexcept = 0;
+    /** 提交事务，失败时抛出异常 */
+    virtual void commit() = 0;
 
     /** 回滚事务 */
     virtual void rollback() noexcept = 0;

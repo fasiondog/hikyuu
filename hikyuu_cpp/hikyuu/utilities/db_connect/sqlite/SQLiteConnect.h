@@ -45,8 +45,8 @@ public:
     /** 如果 sqlite 文件无效，返回false */
     virtual bool ping() override;
 
-    virtual void transaction() noexcept override;
-    virtual void commit() noexcept override;
+    virtual void transaction() override;
+    virtual void commit() override;
     virtual void rollback() noexcept override;
     virtual int64_t exec(const std::string &sql_string) override;
     virtual SQLStatementPtr getStatement(const std::string &sql_statement) override;
