@@ -8,6 +8,7 @@ import logging.handlers
 import traceback
 import time
 import functools
+import multiprocessing
 
 
 # 统计函数运行时间
@@ -38,6 +39,8 @@ _logfile = logging.handlers.RotatingFileHandler(
 _logfile.setFormatter(logging.Formatter(FORMAT))
 _logfile.setLevel(logging.WARN)
 hku_logger.addHandler(_logfile)
+
+g_hku_logger_lock = multiprocessing.Lock()
 
 
 def get_default_logger():
@@ -96,7 +99,8 @@ def hku_warn(msg, *args, **kwargs):
     if logger:
         logger.warning("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
     else:
-        hku_logger.warning("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
+        with g_hku_logger_lock:
+            hku_logger.warning("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
 
 
 def hku_error(msg, *args, **kwargs):
@@ -105,7 +109,8 @@ def hku_error(msg, *args, **kwargs):
     if logger:
         logger.error("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
     else:
-        hku_logger.error("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
+        with g_hku_logger_lock:
+            hku_logger.error("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
 
 
 def hku_fatal(msg, *args, **kwargs):
@@ -114,7 +119,8 @@ def hku_fatal(msg, *args, **kwargs):
     if logger:
         logger.critical("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
     else:
-        hku_logger.critical("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
+        with g_hku_logger_lock:
+            hku_logger.critical("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
 
 
 def hku_debug_if(exp, msg, *args, **kwargs):
@@ -154,7 +160,9 @@ def hku_warn_if(exp, msg, *args, **kwargs):
         if logger:
             logger.warning("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         else:
-            hku_logger.warning("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
+            with g_hku_logger_lock:
+                hku_logger.warning("{} [{}] ({}:{})".format(msg.format(
+                    *args, **kwargs), st.name, st.filename, st.lineno))
         if callback:
             callback()
 
@@ -167,7 +175,8 @@ def hku_error_if(exp, msg, *args, **kwargs):
         if logger:
             logger.error("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         else:
-            hku_logger.error("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
+            with g_hku_logger_lock:
+                hku_logger.error("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         if callback:
             callback()
 
@@ -180,7 +189,9 @@ def hku_fatal_if(exp, msg, *args, **kwargs):
         if logger:
             logger.critical("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         else:
-            hku_logger.critical("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
+            with g_hku_logger_lock:
+                hku_logger.critical("{} [{}] ({}:{})".format(
+                    msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         if callback:
             callback()
 
