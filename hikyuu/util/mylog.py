@@ -43,6 +43,17 @@ hku_logger.addHandler(_logfile)
 g_hku_logger_lock = multiprocessing.Lock()
 
 
+def set_my_logger_file(file_name):
+    global _logfile
+    with g_hku_logger_lock:
+        hku_logger.removeHandler(_logfile)
+        _logfile = logging.handlers.RotatingFileHandler(
+            file_name, maxBytes=10240, backupCount=3, encoding="utf-8")
+        _logfile.setFormatter(logging.Formatter(FORMAT))
+        _logfile.setLevel(logging.WARN)
+        hku_logger.addHandler(_logfile)
+
+
 def get_default_logger():
     return logging.getLogger(hku_logger_name)
 
