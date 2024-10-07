@@ -76,14 +76,11 @@ public:
     /** 析构函数 */
     ~TransAction() {
         // 如果没有主动提交事务，视为需要回滚
-        if (!m_started) {
-            HKU_WARN("Not manul begin transaction!");
-            return;
-        }
-
         if (m_started && !m_committed) {
             HKU_WARN("The transaction is rolled back!");
             m_driver->rollback();
+        } else if (!m_committed) {
+            HKU_WARN("Not manul begin transaction!");
         }
     }
 
