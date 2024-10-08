@@ -1966,7 +1966,7 @@ public:                                                                         
         st->bind(0, f1, f2, f3, f4, f5, f6, m_rowid);                                              \
     }                                                                                              \
     void load(const SQLStatementPtr& st) {                                                         \
-        st->getColumn(0, m_rowid, f1, f2, f3, f4, f5, f6);                                         \
+        st->getColumn(0, f1, f2, f3, f4, f5, f6);                                                  \
     }
 
 #define TABLE_NO_AUTOID_BIND7(ROWID, table, f1, f2, f3, f4, f5, f6, f7)                            \
@@ -2168,7 +2168,8 @@ public:                                                                         
     }
 
 #define TABLE_NO_AUTOID_BIND12(ROWID, table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12)    \
-    pprivate : uint64_t m_rowid = 0;                                                               \
+    pprivate:                                                                                      \
+    uint64_t m_rowid = 0;                                                                          \
                                                                                                    \
 public:                                                                                            \
     bool valid() const {                                                                           \
