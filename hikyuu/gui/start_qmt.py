@@ -107,7 +107,7 @@ if __name__ == "__main__":
             print("Ctrl-C 终止")
             break
         except Exception as e:
-            hku_error(e)
+            hku_error(str(e))
             time.sleep(10)
 
     release_nng_senders()
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     # try:
     #     xtdata.run()
     # except Exception as e:
-    #     hku_error(e)
+    #     hku_error(str(e))
     # finally:
     #     # 退出释放资源
     #     release_nng_senders()
