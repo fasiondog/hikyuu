@@ -1782,40 +1782,40 @@ public:                                                                    \
         st->getColumn(0, f1);                                              \
     }
 
-#define TABLE_NO_AUTOID_BIND2(ROWID, table, f1, f2)                                   \
-private:                                                                              \
-    uint64_t m_rowid = 0;                                                             \
-                                                                                      \
-public:                                                                               \
-    bool valid() const {                                                              \
-        return m_rowid != 0;                                                          \
-    }                                                                                 \
-    uint64_t rowid() const {                                                          \
-        return m_rowid;                                                               \
-    }                                                                                 \
-    void rowid(uint64_t id) {                                                         \
-        m_rowid = id;                                                                 \
-    }                                                                                 \
-    static std::string getTableName() {                                               \
-        return #table;                                                                \
-    }                                                                                 \
-    static const char* getInsertSQL() {                                               \
-        return "insert into `" #table "` (`" #f1 "`,`" #f2 "`) values (?,?)";         \
-    }                                                                                 \
-    static const char* getUpdateSQL() {                                               \
-        return "update `" #table "` set `" #f1 "`=?,`" #f2 "`=? where `" ROWID "`=?"; \
-    }                                                                                 \
-    static const char* getSelectSQL() {                                               \
-        return "select `" #f1 "`,`" #f2 "` from `" #table "`";                        \
-    }                                                                                 \
-    void save(const SQLStatementPtr& st) const {                                      \
-        st->bind(0, f1, f2);                                                          \
-    }                                                                                 \
-    void update(const SQLStatementPtr& st) const {                                    \
-        st->bind(0, f1, f2, m_rowid);                                                 \
-    }                                                                                 \
-    void load(const SQLStatementPtr& st) {                                            \
-        st->getColumn(0, f1, f2);                                                     \
+#define TABLE_NO_AUTOID_BIND2(ROWID, table, f1, f2)                                    \
+private:                                                                               \
+    uint64_t m_rowid = 0;                                                              \
+                                                                                       \
+public:                                                                                \
+    bool valid() const {                                                               \
+        return m_rowid != 0;                                                           \
+    }                                                                                  \
+    uint64_t rowid() const {                                                           \
+        return m_rowid;                                                                \
+    }                                                                                  \
+    void rowid(uint64_t id) {                                                          \
+        m_rowid = id;                                                                  \
+    }                                                                                  \
+    static std::string getTableName() {                                                \
+        return #table;                                                                 \
+    }                                                                                  \
+    static const char* getInsertSQL() {                                                \
+        return "insert into `" #table "` (`" #f1 "`,`" #f2 "`) values (?,?)";          \
+    }                                                                                  \
+    static const char* getUpdateSQL() {                                                \
+        return "update `" #table "` set `" #f1 "`=?,`" #f2 "`=? where `" #ROWID "`=?"; \
+    }                                                                                  \
+    static const char* getSelectSQL() {                                                \
+        return "select `" #f1 "`,`" #f2 "` from `" #table "`";                         \
+    }                                                                                  \
+    void save(const SQLStatementPtr& st) const {                                       \
+        st->bind(0, f1, f2);                                                           \
+    }                                                                                  \
+    void update(const SQLStatementPtr& st) const {                                     \
+        st->bind(0, f1, f2, m_rowid);                                                  \
+    }                                                                                  \
+    void load(const SQLStatementPtr& st) {                                             \
+        st->getColumn(0, f1, f2);                                                      \
     }
 
 #define TABLE_NO_AUTOID_BIND3(ROWID, table, f1, f2, f3)                                            \
