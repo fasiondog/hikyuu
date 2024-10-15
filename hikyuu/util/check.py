@@ -11,7 +11,7 @@ import sys
 import traceback
 import functools
 import asyncio
-from .mylog import hku_logger
+from .mylog import hku_logger, g_hku_logger_lock
 
 
 class HKUCheckError(Exception):
@@ -116,10 +116,10 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False, re_
                     hku_logger.debug(errmsg)
                 except Exception:
                     errmsg = "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
-                    hku_logger.error(errmsg)
-                    if trace:
-                        # traceback.print_exc()
-                        hku_logger.error(traceback.format_exc())
+                    with g_hku_logger_lock:
+                        hku_logger.error(errmsg)
+                        if trace:
+                            hku_logger.error(traceback.format_exc())
                     if i == (retry - 1):
                         if callback is not None:
                             callback(*args, **kargs)
@@ -129,10 +129,10 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False, re_
                     raise KeyboardInterrupt()
                 except:
                     errmsg = "Unknown error! {} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
-                    hku_logger.error(errmsg)
-                    if trace:
-                        # traceback.print_exc()
-                        hku_logger.error(traceback.format_exc())
+                    with g_hku_logger_lock:
+                        hku_logger.error(errmsg)
+                        if trace:
+                            hku_logger.error(traceback.format_exc())
                     if i == (retry - 1):
                         if callback is not None:
                             callback(*args, **kargs)

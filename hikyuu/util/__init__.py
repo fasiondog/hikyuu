@@ -41,6 +41,7 @@ __all__ = [
     'hku_error_if',
     'hku_fatal_if',
     'with_trace',
+    'set_my_logger_file',
     'capture_multiprocess_all_logger',
     'LoggingContext',
     'in_interactive_session',

@@ -1734,7 +1734,7 @@ public:                                                                         
     }                                                                                              \
     void load(const SQLStatementPtr& st) {                                                         \
         st->getColumn(0, m_id, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15,   \
-                      f16, f17, f18, f20);                                                         \
+                      f16, f17, f18, f19, f20);                                                    \
     }
 
 //-------------------------------------------------------------------
@@ -1782,40 +1782,40 @@ public:                                                                    \
         st->getColumn(0, f1);                                              \
     }
 
-#define TABLE_NO_AUTOID_BIND2(ROWID, table, f1, f2)                                   \
-private:                                                                              \
-    uint64_t m_rowid = 0;                                                             \
-                                                                                      \
-public:                                                                               \
-    bool valid() const {                                                              \
-        return m_rowid != 0;                                                          \
-    }                                                                                 \
-    uint64_t rowid() const {                                                          \
-        return m_rowid;                                                               \
-    }                                                                                 \
-    void rowid(uint64_t id) {                                                         \
-        m_rowid = id;                                                                 \
-    }                                                                                 \
-    static std::string getTableName() {                                               \
-        return #table;                                                                \
-    }                                                                                 \
-    static const char* getInsertSQL() {                                               \
-        return "insert into `" #table "` (`" #f1 "`,`" #f2 "`) values (?,?)";         \
-    }                                                                                 \
-    static const char* getUpdateSQL() {                                               \
-        return "update `" #table "` set `" #f1 "`=?,`" #f2 "`=? where `" ROWID "`=?"; \
-    }                                                                                 \
-    static const char* getSelectSQL() {                                               \
-        return "select `" #f1 "`,`" #f2 "` from `" #table "`";                        \
-    }                                                                                 \
-    void save(const SQLStatementPtr& st) const {                                      \
-        st->bind(0, f1, f2);                                                          \
-    }                                                                                 \
-    void update(const SQLStatementPtr& st) const {                                    \
-        st->bind(0, f1, f2, m_rowid);                                                 \
-    }                                                                                 \
-    void load(const SQLStatementPtr& st) {                                            \
-        st->getColumn(0, f1, f2);                                                     \
+#define TABLE_NO_AUTOID_BIND2(ROWID, table, f1, f2)                                    \
+private:                                                                               \
+    uint64_t m_rowid = 0;                                                              \
+                                                                                       \
+public:                                                                                \
+    bool valid() const {                                                               \
+        return m_rowid != 0;                                                           \
+    }                                                                                  \
+    uint64_t rowid() const {                                                           \
+        return m_rowid;                                                                \
+    }                                                                                  \
+    void rowid(uint64_t id) {                                                          \
+        m_rowid = id;                                                                  \
+    }                                                                                  \
+    static std::string getTableName() {                                                \
+        return #table;                                                                 \
+    }                                                                                  \
+    static const char* getInsertSQL() {                                                \
+        return "insert into `" #table "` (`" #f1 "`,`" #f2 "`) values (?,?)";          \
+    }                                                                                  \
+    static const char* getUpdateSQL() {                                                \
+        return "update `" #table "` set `" #f1 "`=?,`" #f2 "`=? where `" #ROWID "`=?"; \
+    }                                                                                  \
+    static const char* getSelectSQL() {                                                \
+        return "select `" #f1 "`,`" #f2 "` from `" #table "`";                         \
+    }                                                                                  \
+    void save(const SQLStatementPtr& st) const {                                       \
+        st->bind(0, f1, f2);                                                           \
+    }                                                                                  \
+    void update(const SQLStatementPtr& st) const {                                     \
+        st->bind(0, f1, f2, m_rowid);                                                  \
+    }                                                                                  \
+    void load(const SQLStatementPtr& st) {                                             \
+        st->getColumn(0, f1, f2);                                                      \
     }
 
 #define TABLE_NO_AUTOID_BIND3(ROWID, table, f1, f2, f3)                                            \
@@ -1966,7 +1966,7 @@ public:                                                                         
         st->bind(0, f1, f2, f3, f4, f5, f6, m_rowid);                                              \
     }                                                                                              \
     void load(const SQLStatementPtr& st) {                                                         \
-        st->getColumn(0, m_rowid, f1, f2, f3, f4, f5, f6);                                         \
+        st->getColumn(0, f1, f2, f3, f4, f5, f6);                                                  \
     }
 
 #define TABLE_NO_AUTOID_BIND7(ROWID, table, f1, f2, f3, f4, f5, f6, f7)                            \
@@ -2168,7 +2168,8 @@ public:                                                                         
     }
 
 #define TABLE_NO_AUTOID_BIND12(ROWID, table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12)    \
-    pprivate : uint64_t m_rowid = 0;                                                               \
+private:                                                                                           \
+    uint64_t m_rowid = 0;                                                                          \
                                                                                                    \
 public:                                                                                            \
     bool valid() const {                                                                           \
@@ -2570,7 +2571,7 @@ public:                                                                         
     }                                                                                              \
     void load(const SQLStatementPtr& st) {                                                         \
         st->getColumn(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16,    \
-                      f17, f18, f20);                                                              \
+                      f17, f18, f19, f20);                                                         \
     }
 
 }  // namespace hku

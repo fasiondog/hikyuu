@@ -67,7 +67,7 @@ class OrderBrokerWrap(OrderBrokerBase):
                 return json.dumps(ret) if type(ret) == dict else str(ret)
             return str()
         except Exception as e:
-            hku_error(e)
+            hku_error(str(e))
             return str()
 
 

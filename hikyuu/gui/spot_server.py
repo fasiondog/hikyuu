@@ -311,7 +311,7 @@ def collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
             print("Ctrl-C 终止")
             break
         except Exception as e:
-            hku_error(e)
+            hku_error(str(e))
             time.sleep(10)
     release_nng_senders()
 

@@ -3,6 +3,16 @@
 Hikyuu 简介
 ============
 
+👉 项目首页：[https://hikyuu.org/](https://hikyuu.org/)
+
+👉 帮助文档：[https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)
+
+👉 入门示例:  [https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
+
+👉 策略部件库：[https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)
+
+👉 感谢网友提供的 Hikyuu Ubuntu虚拟机环境, 百度网盘下载(提取码: ht8j): [https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw?pwd=ht8j](https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw?pwd=ht8j)
+
 Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测（仅受限于数据，如有数据也可用于期货等）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。例如：
 
 ::
@@ -51,3 +61,23 @@ Maybe，你已经注意到了，上面没有“选股策略”？！是的，选
 - **安全、自由、隐私，搭建自己的专属云量化平台** 结合 Python + Jupyter 的强大能力与云服务器，可以搭建自己专属的云量化平台。将Jupyter部署在云服务器上，随时随地的访问自己的云平台，即刻实现自己新的想法，如下图所示通过手机访问自己的云平台。结合Python强大成熟的数据分析、人工智能工具（如 numpy、scipy、pandas、TensorFlow)搭建更强大的人工智能平台。
  
 - **数据存储方式可扩展** 目前支持本地HDF5格式、MySQL存储。默认使用HDF5，数据文件体积小、速度更快、备份更便利。截止至2017年4月21日，沪市日线数据文件149M、深市日线数据文件184M、5分钟线数据各不到2G。
+
+
+想要更多了解Hikyuu？请使用以下方式联系：
+---------------------------------------------------------------
+
+更多示例与程序化交易分享（您的加入将视为对项目的捐赠），只保证对星球用户的有问必答，其它群视情况而定。
+
+.. figure:: _static/zhishixingqiu.png
+
+关注公众号：
+
+.. figure:: _static/weixin_gongzhonghao.jpg
+
+微信群（请备注：加入 Hikyuu)：
+
+.. figure:: _static/weixin.jpg
+
+QQ交流群（逐渐废弃）：114910869, 或扫码加入
+
+.. figure:: _static/10003-qq.png

@@ -181,24 +181,12 @@ void MySQLConnect::resetAutoIncrement(const std::string& tablename) {
     exec(fmt::format("alter {} auto_increment=1", tablename));
 }
 
-void MySQLConnect::transaction() noexcept {
-    try {
-        exec("BEGIN");
-    } catch (const std::exception& e) {
-        HKU_ERROR("Failed transaction! {}", e.what());
-    } catch (...) {
-        HKU_ERROR("Unknown error!");
-    }
+void MySQLConnect::transaction() {
+    exec("BEGIN");
 }
 
-void MySQLConnect::commit() noexcept {
-    try {
-        exec("COMMIT");
-    } catch (const std::exception& e) {
-        HKU_ERROR("Failed transaction! {}", e.what());
-    } catch (...) {
-        HKU_ERROR("Unknown error!");
-    }
+void MySQLConnect::commit() {
+    exec("COMMIT");
 }
 
 void MySQLConnect::rollback() noexcept {
