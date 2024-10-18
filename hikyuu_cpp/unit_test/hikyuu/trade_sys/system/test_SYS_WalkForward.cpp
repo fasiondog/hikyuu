@@ -71,7 +71,7 @@ TEST_CASE("test_SYS_WalkForword") {
         CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
     }
 
-    /** @arg 多个后续系统 */
+    /** @arg 多个候选系统 */
     vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
     SystemList sys_list;
     for (const auto& param : params) {
