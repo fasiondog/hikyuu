@@ -134,6 +134,8 @@ Jupyter notebook（此前被称为 IPython notebook）是一个基于web的交�
 matplotlib显示图形时中文字体乱码的问题
 ---------------------------------------
 
+通常 hikyuu 绘图已经默认支持中文，如果仍出现乱码，可参考此处，或百度。
+
 需修改 matplotlib 配置文件，把字体改为支持中文的字体。matplotlib文件位于 python安装目录/matplotlib/mpl-data/matplotlibrc，可用任意文本编辑器打开编辑，文件位置如下图所示：
 
 .. figure:: _static/quickstart_matplotlib_config.png
