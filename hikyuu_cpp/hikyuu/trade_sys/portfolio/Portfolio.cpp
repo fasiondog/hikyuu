@@ -55,15 +55,32 @@ Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFP
 Portfolio::~Portfolio() {}
 
 void Portfolio::initParam() {
-    setParam<int>("adjust_cycle", 1);    // 调仓周期
-    setParam<bool>("trace", false);      // 打印跟踪
+    setParam<int>("adjust_cycle", 1);              // 调仓周期
+    setParam<string>("adjust_mode", "query");      // 调仓模式
+    setParam<bool>("delay_to_trading_day", true);  // 延迟至交易日
+    setParam<bool>("trace", false);                // 打印跟踪
     setParam<int>("trace_max_num", 10);  // 打印跟踪时，显示当前持仓证券最大数量
 }
 
 void Portfolio::baseCheckParam(const string& name) const {
-    if ("adjust_cycle" == name) {
+    if ("adjust_mode" == name || "adjust_cycle" == name) {
+        string adjust_mode = getParam<string>("adjust_mode");
+        to_lower(adjust_mode);
         int adjust_cycle = getParam<int>("adjust_cycle");
-        HKU_ASSERT(adjust_cycle >= 1);
+        if ("query" == adjust_mode) {
+            HKU_ASSERT(adjust_cycle >= 1);
+        } else if ("day" == adjust_mode) {
+            HKU_ASSERT(adjust_cycle >= 1);
+        } else if ("week" == adjust_mode) {
+            HKU_ASSERT(adjust_cycle >= 1 && adjust_cycle <= 5);
+        } else if ("month" == adjust_mode) {
+            HKU_ASSERT(adjust_cycle >= 1 && adjust_cycle <= 31);
+        } else if ("year" == adjust_mode) {
+            HKU_ASSERT(adjust_cycle >= 1 && adjust_cycle <= 366);
+        } else {
+            HKU_THROW("Invalid adjust_mode: {}!", adjust_mode);
+        }
+
     } else if ("trace" == name) {
         if (getParam<bool>("trace") && pythonInJupyter()) {
             HKU_THROW("You can't trace in jupyter!");
@@ -180,9 +197,21 @@ void Portfolio::_readyForRun() {
     m_se->calculate(m_real_sys_list, m_query);
 }
 
-void Portfolio::run(const KQuery& query, int adjust_cycle, bool force) {
+void Portfolio::run(const KQuery& query, int adjust_cycle, bool force, const string& adjust_mode,
+                    bool delay_to_trading_day) {
     SPEND_TIME(Portfolio_run);
+
+    string mode = adjust_mode;
+    to_lower(mode);
+    if (mode != "query") {
+        HKU_CHECK(query.kType() == KQuery::DAY,
+                  R"(The kType of query({}) must be DAY when adjust_mode is not "query"!)",
+                  query.kType());
+    }
+
     setParam<int>("adjust_cycle", adjust_cycle);
+    setParam<string>("adjust_mode", adjust_mode);
+    setParam<bool>("delay_to_trading_day", delay_to_trading_day);
     setQuery(query);
 
     if (force) {
@@ -195,19 +224,26 @@ void Portfolio::run(const KQuery& query, int adjust_cycle, bool force) {
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     HKU_IF_RETURN(datelist.empty(), void());
 
-    size_t cur_adjust_ix = 0;
-    Datetime cur_cycle_end;
-    for (size_t i = 0, total = datelist.size(); i < total; i++) {
-        bool adjust = false;
-        if (i == cur_adjust_ix) {
-            adjust = true;
-            cur_adjust_ix += adjust_cycle;
-            cur_cycle_end =
-              cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Seconds(1);
+    if ("query" == mode || "day" == mode) {
+        size_t cur_adjust_ix = 0;
+        Datetime cur_cycle_end;
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            bool adjust = false;
+            if (i == cur_adjust_ix) {
+                adjust = true;
+                cur_adjust_ix += adjust_cycle;
+                cur_cycle_end =
+                  cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Seconds(1);
+            }
+
+            const auto& date = datelist[i];
+            _runMoment(date, cur_cycle_end, adjust);
         }
 
-        const auto& date = datelist[i];
-        _runMoment(date, cur_cycle_end, adjust);
+    } else if (delay_to_trading_day) {
+        _runOnModeDelayToTradingDay(datelist, adjust_cycle, mode);
+    } else {
+        _runOnMode(datelist, adjust_cycle, mode);
     }
 
     m_need_calculate = false;
@@ -215,6 +251,56 @@ void Portfolio::run(const KQuery& query, int adjust_cycle, bool force) {
     // 释放掉临时数据占用的内存
     m_tmp_selected_list = SystemWeightList();
     m_tmp_will_remove_sys = SystemWeightList();
+}
+
+void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const string& mode) {
+    if ("week" == mode) {
+        Datetime cur_cycle_end;
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            bool adjust = (date.dayOfWeek() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextWeek();
+            }
+            _runMoment(date, cur_cycle_end, adjust);
+        }
+    } else if ("month" == mode) {
+        Datetime cur_cycle_end;
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            bool adjust = (date.day() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextMonth();
+            }
+            _runMoment(date, cur_cycle_end, adjust);
+        }
+    } else if ("year" == mode) {
+        Datetime cur_cycle_end;
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            bool adjust = (date.dayOfYear() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextYear();
+            }
+            _runMoment(date, cur_cycle_end, adjust);
+        }
+    }
+}
+
+void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int adjust_cycle,
+                                            const string& mode) {
+    std::set<Datetime> date_set;
+    if ("week" == mode) {
+        Datetime cur_cycle_end;
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            bool adjust = (date.dayOfWeek() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextWeek();
+            }
+            _runMoment(date, cur_cycle_end, adjust);
+        }
+    }
 }
 
 void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
