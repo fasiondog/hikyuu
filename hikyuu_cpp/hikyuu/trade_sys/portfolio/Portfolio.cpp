@@ -317,20 +317,20 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
 
 void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int adjust_cycle,
                                             const string& mode) {
-    std::set<Datetime> date_set;
+    std::set<Datetime> adjust_date_set;
     if ("week" == mode) {
-        Datetime cur_adjust_date = Datetime::min();
         Datetime cur_cycle_end = datelist.front().nextWeek();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             const auto& date = datelist[i];
-            Datetime need_adjust_date = date.startOfWeek() + Days(adjust_cycle - 1);
+            Datetime adjust_date = date.startOfWeek() + Days(adjust_cycle - 1);
             bool adjust = false;
-            if (date == need_adjust_date) {
+            if (date == adjust_date) {
                 adjust = true;
-                cur_adjust_date = date;
-            } else if (date > cur_adjust_date) {
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
                 adjust = true;
-                cur_adjust_date = date;
+                adjust_date_set.emplace(adjust_date);
             }
 
             if (adjust) {
@@ -344,18 +344,18 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
         }
 
     } else if ("month" == mode) {
-        Datetime cur_adjust_date = Datetime::min();
         Datetime cur_cycle_end = datelist.front().nextMonth();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             const auto& date = datelist[i];
-            Datetime need_adjust_date = date.startOfMonth() + Days(adjust_cycle - 1);
+            Datetime adjust_date = date.startOfMonth() + Days(adjust_cycle - 1);
             bool adjust = false;
-            if (date == need_adjust_date) {
+            if (date == adjust_date) {
                 adjust = true;
-                cur_adjust_date = date;
-            } else if (date > cur_adjust_date) {
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
                 adjust = true;
-                cur_adjust_date = date;
+                adjust_date_set.emplace(adjust_date);
             }
 
             if (adjust) {
@@ -369,18 +369,18 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
         }
 
     } else if ("quarter" == mode) {
-        Datetime cur_adjust_date = Datetime::min();
         Datetime cur_cycle_end = datelist.front().nextQuarter();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             const auto& date = datelist[i];
-            Datetime need_adjust_date = date.startOfQuarter() + Days(adjust_cycle - 1);
+            Datetime adjust_date = date.startOfQuarter() + Days(adjust_cycle - 1);
             bool adjust = false;
-            if (date == need_adjust_date) {
+            if (date == adjust_date) {
                 adjust = true;
-                cur_adjust_date = date;
-            } else if (date > cur_adjust_date) {
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
                 adjust = true;
-                cur_adjust_date = date;
+                adjust_date_set.emplace(adjust_date);
             }
 
             if (adjust) {
@@ -394,18 +394,18 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
         }
 
     } else if ("year" == mode) {
-        Datetime cur_adjust_date = Datetime::min();
         Datetime cur_cycle_end = datelist.front().nextYear();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             const auto& date = datelist[i];
-            Datetime need_adjust_date = date.startOfYear() + Days(adjust_cycle - 1);
+            Datetime adjust_date = date.startOfYear() + Days(adjust_cycle - 1);
             bool adjust = false;
-            if (date == need_adjust_date) {
+            if (date == adjust_date) {
                 adjust = true;
-                cur_adjust_date = date;
-            } else if (date > cur_adjust_date) {
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
                 adjust = true;
-                cur_adjust_date = date;
+                adjust_date_set.emplace(adjust_date);
             }
 
             if (adjust) {

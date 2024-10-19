@@ -50,17 +50,25 @@ public:
 
     /**
      * @brief 运行资产组合
+     * @details
+     * <pre>
+     * 调仓模式 adjust_mode 说明：
+     *  - "query" 模式，跟随输入参数 query 中的 ktype，此时 adjust_cycle 为以 query 中的 ktype
+     *    决定周期间隔；
+     *  - "day" 模式，adjust_cycle 为调仓间隔天数
+     *  - "week" | "month" | "quarter" | "year" 模式时，adjust_cycle
+     *    为对应的每周第N日、每月第n日、每季度第n日、每年第n日，在 delay_to_trading_day 为 false 时
+     *    如果当日不是交易日将会被跳过调仓；当 delay_to_trading_day 为 true时，如果当日不是交易日
+     *    将会顺延至当前周期内的第一个交易日，如指定每月第1日调仓，但当月1日不是交易日，则将顺延至当月
+     *    的第一个交易日
+     * </pre>
      * @note
      * 由于各个组件可能存在参数变化的情况，无法自动感知判断是否需要重新计算，此时需要手工指定强制计算
      * @param query 查询条件, 其 KType 必须为 KQuery::DAY
      * @param adjust_cycle 调仓周期（受 adjust_mode 影响）, 默认为1
      * @param force 是否强制重计算
      * @param adjust_mode 调仓模式 "query" | "day" | "week" | "month" | "year"
-     *    为 "query" 时，跟随输入参数 query 中的 ktype;
-     *    其他模式下，query 的 KType 必须为 KQuery::DAY
-     *    "week" | "month" | "year" 模式下，adjust_cycle
-     *        为对应的每周第N日、每月第n日、每年第n日进行调仓，如果当日不是交易日将会被跳过调仓
-     * @param delay_to_trading_day 仅交易日
+     * @param delay_to_trading_day true 时，如果当日不是交易日将会被顺延至当前周期内的第一个交易日
      */
     void run(const KQuery& query, int adjust_cycle = 1, bool force = false,
              const string& adjust_mode = "query", bool delay_to_trading_day = true);
