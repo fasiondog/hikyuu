@@ -255,12 +255,15 @@ void Portfolio::run(const KQuery& query, int adjust_cycle, bool force, const str
 
 void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const string& mode) {
     if ("week" == mode) {
-        Datetime cur_cycle_end;
+        Datetime cur_cycle_end = datelist.front().nextWeek();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             const auto& date = datelist[i];
             bool adjust = (date.dayOfWeek() == adjust_cycle);
             if (adjust) {
                 cur_cycle_end = date.nextWeek();
+            }
+            if (cur_cycle_end > datelist.back()) {
+                cur_cycle_end = datelist.back() + Seconds(1);
             }
             _runMoment(date, cur_cycle_end, adjust);
         }
@@ -291,10 +294,20 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                                             const string& mode) {
     std::set<Datetime> date_set;
     if ("week" == mode) {
+        Datetime cur_adjust_date = Datetime::min();
         Datetime cur_cycle_end;
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             const auto& date = datelist[i];
-            bool adjust = (date.dayOfWeek() == adjust_cycle);
+            Datetime need_adjust_date = date.startOfWeek() + Days(adjust_cycle - 1);
+            bool adjust = false;
+            if (date == need_adjust_date) {
+                adjust = true;
+                cur_adjust_date = date;
+            } else if (date > cur_adjust_date) {
+                adjust = true;
+                cur_adjust_date = date;
+            }
+
             if (adjust) {
                 cur_cycle_end = date.nextWeek();
             }
