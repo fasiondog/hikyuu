@@ -310,8 +310,15 @@ string BrokerTradeManager::str() const {
 }
 
 TradeManagerPtr HKU_API crtBrokerTM(const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
-                                    const string& name) {
-    return std::make_shared<BrokerTradeManager>(broker, costfunc, name);
+                                    const string& name,
+                                    const std::vector<OrderBrokerPtr>& other_brokers) {
+    auto tm = std::make_shared<BrokerTradeManager>(broker, costfunc, name);
+    for (const auto& brk : other_brokers) {
+        if (brk) {
+            tm->regBroker(brk);
+        }
+    }
+    return tm;
 }
 
 }  // namespace hku

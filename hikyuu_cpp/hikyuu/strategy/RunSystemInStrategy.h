@@ -32,6 +32,7 @@ private:
 StrategyPtr HKU_API crtSysStrategy(const SYSPtr& sys, const string& stk_market_code,
                                    const KQuery& query, const OrderBrokerPtr& broker,
                                    const TradeCostPtr& costfunc, const string& name = "SYSStrategy",
+                                   const std::vector<OrderBrokerPtr>& other_brokers = {},
                                    const string& config_file = "");
 
 }  // namespace hku

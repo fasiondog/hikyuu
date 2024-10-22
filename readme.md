@@ -67,6 +67,6 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 ![weixin](docs/source/_static/weixin.jpg)
 
-## QQ交流群（逐渐废弃）：114910869, 或扫码加入
+## QQ交流群：114910869, 或扫码加入
 
 ![img](docs/source/_static/10003-qq.png)

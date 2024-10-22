@@ -31,6 +31,7 @@ private:
 StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
                                   const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
                                   const string& name = "PFStrategy",
+                                  const std::vector<OrderBrokerPtr>& other_brokers = {},
                                   const string& config_file = "");
 
 }  // namespace hku
