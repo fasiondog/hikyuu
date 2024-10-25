@@ -757,14 +757,12 @@ def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
 def sys_performance(sys, ref_stk=None):
     if ref_stk is None:
         ref_stk = get_stock('sh000300')
+
+    query = sys.query
+    sh000001_k = get_kdata('sh000001', query)
+    ref_dates = sh000001_k.get_datetime_list()
+
     ref_k = ref_stk.get_kdata(sys.query)
-    hku_check(len(ref_k) > 0, "The length of ref_k is zero! Maybe The query date is out of the ref-stock range!\n ref_k: {}", ref_k)
-
-    query = Query(ref_k[0].datetime.start_of_day(), ref_k[-1].datetime.start_of_day() +
-                  Seconds(1), Query.DAY, recover_type=Query.EQUAL_BACKWARD)
-    ref_k = ref_stk.get_kdata(query)
-
-    ref_dates = ref_k.get_datetime_list()
 
     funds_list = sys.tm.get_funds_list(ref_dates)
     funds = [f.total_assets for f in funds_list]
@@ -772,11 +770,11 @@ def sys_performance(sys, ref_stk=None):
     funds_return = [f.total_assets / f.total_base if f.total_base != 0.0 else constant.null_price for f in funds_list]
     funds_return = VALUE(funds_return)
     funds_return.name = "系统累积收益率"
-    ref_return = ROCR(ref_k.close, 0)
+    ref_return = ALIGN(ROCR(ref_k.close, 0), ref_dates)
     ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"
 
     per = Performance()
-    text = per.report(sys.tm, query.end_datetime)
+    text = per.report(sys.tm, sh000001_k[-1].datetime)
 
     # 计算最大回撤
     max_pullback = min(MDD(funds).to_np())
