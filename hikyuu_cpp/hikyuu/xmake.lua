@@ -12,6 +12,7 @@ target("hikyuu")
         add_packages("gzip-hpp")
     end    
 
+    add_options("mysql")
     add_includedirs("..")
 
     -- set version for release

@@ -340,10 +340,12 @@ def install(j, o, low_precision):
               default=False,
               type=bool,
               help='使用低精度版本')
-def wheel(feedback, j, low_precision):
+@click.option('-c', '--clear', is_flag=False, help='先清除之前编译结果')
+def wheel(feedback, j, low_precision, clear):
     """ 生成 python 的 wheel 安装包 """
     # 清理之前遗留的打包产物
-    clear_build()
+    if clear:
+        clear_build()
 
     # 尝试编译
     start_build(False, 'release', feedback, j, low_precision)
