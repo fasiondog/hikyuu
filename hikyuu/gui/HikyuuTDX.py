@@ -686,15 +686,29 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             return
 
         config = self.getCurrentConfig()
-        if config.getboolean('hdf5', 'enable') \
-                and (not os.path.lexists(config['hdf5']['dir']) or not os.path.isdir(config['hdf5']['dir'])):
-            QMessageBox.about(self, "错误", '指定的目标数据存放目录不存在！')
-            return
+        try:
+            if config.getboolean('hdf5', 'enable'):
+                if not os.path.lexists(config['hdf5']['dir']):
+                    os.makedirs(f"{config['hdf5']['dir']}/tmp")
+                elif not os.path.isdir(config['hdf5']['dir']):
+                    QMessageBox.about(self, "错误", '指定的目标数据存放目录不存在！')
+                    return
 
-        if config.getboolean('tdx', 'enable') \
-            and (not os.path.lexists(config['tdx']['dir'])
-                 or not os.path.isdir(config['tdx']['dir'])):
-            QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
+            if config.getboolean('tdx', 'enable'):
+                if not os.path.lexists(config['tdx']['dir']):
+                    os.makedirs(f"{config['tdx']['dir']}/tmp")
+                elif not os.path.isdir(config['tdx']['dir']):
+                    QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
+                    return
+
+            if config.getboolean('mysql', 'enable'):
+                if not os.path.lexists(config['mysql']['tmpdir']):
+                    os.makedirs(config['mysql']['tmpdir'])
+                elif not os.path.isdir(config['mysql']['tmpdir']):
+                    QMessageBox.about(self, "错误", "请确认临时目录是否正确！")
+                    return
+        except Exception as e:
+            QMessageBox.about(self, "错误", str(e))
             return
 
         self.import_running = True
