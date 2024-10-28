@@ -20,7 +20,7 @@ pip 安装 Hikyuu 后，可在命令行终端中执行 hikyuutdx 命令，启动
 
 .. note::
 
-    由于 importdata 命令使用的是 HikyuuTDX 生成的配置文件，所以在第一次执行 importdata 之前需要建议至少运行过一次 HikyuuTDX（可以不执行导入，仅配置后退出），否则将使用默认配置。如果默认配置导入出错，可以自行修改用户目录下.hikyuu目录中的相应配置文件。
+    由于 importdata 命令使用的是 HikyuuTDX 生成的配置文件，windows建议至少运行过一次 HikyuuTDX 进行配置（可以不执行导入，但配置后必须先退出），否则将使用默认配置。如果默认配置导入出错，可以自行修改用户目录下.hikyuu目录中的相应配置文件。
 
 
 
