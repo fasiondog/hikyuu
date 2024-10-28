@@ -324,14 +324,15 @@ void Strategy::_startEventLoop() {
 }
 
 void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
-                           const OrderBrokerPtr& broker, const TradeCostPtr& costfunc) {
+                           const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
+                           const std::vector<OrderBrokerPtr>& other_brokers) {
     HKU_ASSERT(sys && broker && sys->getTM());
     HKU_ASSERT(!stk.isNull());
     HKU_ASSERT(query != Null<KQuery>());
     HKU_CHECK(!sys->getParam<bool>("buy_delay") && !sys->getParam<bool>("sell_delay"),
               "Thie method only support buy|sell on close!");
 
-    auto tm = crtBrokerTM(broker, costfunc, sys->name());
+    auto tm = crtBrokerTM(broker, costfunc, sys->name(), other_brokers);
     tm->fetchAssetInfoFromBroker(broker);
     sys->setTM(tm);
     sys->setSP(SlippagePtr());  // 清除移滑价差算法
@@ -339,7 +340,8 @@ void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& qu
 }
 
 void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
-                           const OrderBrokerPtr& broker, const TradeCostPtr& costfunc) {
+                           const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
+                           const std::vector<OrderBrokerPtr>& other_brokers) {
     HKU_ASSERT(pf && broker && pf->getTM());
     HKU_ASSERT(query != Null<KQuery>());
 
@@ -352,7 +354,7 @@ void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycl
                   "Thie method only support buy|sell on close!");
     }
 
-    auto tm = crtBrokerTM(broker, costfunc, pf->name());
+    auto tm = crtBrokerTM(broker, costfunc, pf->name(), other_brokers);
     tm->fetchAssetInfoFromBroker(broker);
     pf->setTM(tm);
     pf->run(query, adjust_cycle, true);

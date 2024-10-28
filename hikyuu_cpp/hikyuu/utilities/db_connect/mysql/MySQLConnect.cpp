@@ -124,12 +124,12 @@ int64_t MySQLConnect::exec(const std::string& sql_string) {
         if (ping()) {
             ret = mysql_query(m_mysql, sql_string.c_str());
         } else {
-            SQL_THROW(ret, "SQL error：{}! error msg: {}", sql_string, mysql_error(m_mysql));
+            SQL_THROW(ret, "SQL error: {}! error msg: {}", sql_string, mysql_error(m_mysql));
         }
     }
 
     if (ret) {
-        SQL_THROW(ret, "SQL error：{}! error msg: {}", sql_string, mysql_error(m_mysql));
+        SQL_THROW(ret, "SQL error: {}! error msg: {}", sql_string, mysql_error(m_mysql));
     }
 
     int64_t affect_rows = mysql_affected_rows(m_mysql);

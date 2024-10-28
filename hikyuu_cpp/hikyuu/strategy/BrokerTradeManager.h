@@ -427,6 +427,7 @@ private:
 
 TradeManagerPtr HKU_API crtBrokerTM(const OrderBrokerPtr& broker,
                                     const TradeCostPtr& costfunc = TC_Zero(),
-                                    const string& name = "SYS");
+                                    const string& name = "SYS",
+                                    const std::vector<OrderBrokerPtr>& other_brokers = {});
 
 }  // namespace hku

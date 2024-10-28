@@ -9,6 +9,7 @@
 #include <hikyuu/strategy/Strategy.h>
 #include <hikyuu/strategy/BrokerTradeManager.h>
 #include <hikyuu/strategy/RunSystemInStrategy.h>
+#include <hikyuu/strategy/RunPortfolioInStrategy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -152,22 +153,51 @@ void export_Strategy(py::module& m) {
     :param ignore_holiday: 节假日不执行)");
 
     m.def("crtBrokerTM", crtBrokerTM, py::arg("broker"), py::arg("cost_func") = TC_Zero(),
-          py::arg("name") = "SYS");
+          py::arg("name") = "SYS", py::arg("other_brokers") = std::vector<OrderBrokerPtr>());
 
     m.def("run_in_strategy",
           py::overload_cast<const SYSPtr&, const Stock&, const KQuery&, const OrderBrokerPtr&,
-                            const TradeCostPtr&>(runInStrategy),
+                            const TradeCostPtr&, const std::vector<OrderBrokerPtr>&>(runInStrategy),
           py::arg("sys"), py::arg("stock"), py::arg("query"), py::arg("broker"),
-          py::arg("cost_func"));
+          py::arg("cost_func"), py::arg("other_brokers") = std::vector<OrderBrokerPtr>(),
+          R"(run_in_strategy(sys, stk, query, broker, costfunc, [other_brokers=[]])
+          
+    在策略运行时中执行系统交易 SYS
+    目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
+ 
+    :param sys: 交易系统
+    :param stk: 交易对象
+    :param query: 查询条件
+    :param broker: 订单代理（专用与和账户资产同步的订单代理）
+    :param costfunc: 成本函数
+    :param other_brokers: 其他的订单代理)");
+
     m.def("run_in_strategy",
           py::overload_cast<const PFPtr&, const KQuery&, int, const OrderBrokerPtr&,
-                            const TradeCostPtr&>(runInStrategy),
+                            const TradeCostPtr&, const std::vector<OrderBrokerPtr>&>(runInStrategy),
           py::arg("pf"), py::arg("query"), py::arg("adjust_cycle"), py::arg("broker"),
-          py::arg("cost_func"));
+          py::arg("cost_func"), py::arg("other_brokers") = std::vector<OrderBrokerPtr>(),
+          R"(run_in_strategy(pf, query, adjust_cycle, broker, costfunc, [other_brokers=[]])
+          
+    在策略运行时中执行组合策略 PF
+    目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
+
+    :param Portfolio pf: 资产组合
+    :param Query query: 查询条件
+    :param int adjust_cycle: 调仓周期
+    :param broker: 订单代理（专用与和账户资产同步的订单代理）
+    :param costfunc: 成本函数
+    :param other_brokers: 其他的订单代理)");
 
     m.def("crt_sys_strategy", crtSysStrategy, py::arg("sys"), py::arg("stk_market_code"),
           py::arg("query"), py::arg("broker"), py::arg("cost_func"),
-          py::arg("name") = "SYSStrategy", py::arg("config") = "");
+          py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("name") = "SYSStrategy",
+          py::arg("config") = "");
+
+    m.def("crt_pf_strategy", crtPFStrategy, py::arg("pf"), py::arg("query"),
+          py::arg("adjust_cycle"), py::arg("broker"), py::arg("cost_func"),
+          py::arg("name") = "PFStrategy", py::arg("other_brokers") = std::vector<OrderBrokerPtr>(),
+          py::arg("config") = "");
 
     m.def("get_data_from_buffer_server", getDataFromBufferServer);
 }

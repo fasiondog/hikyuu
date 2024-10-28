@@ -63,9 +63,17 @@ void RunSystemInStrategy::run(const Stock& stock) {
 StrategyPtr HKU_API crtSysStrategy(const SYSPtr& sys, const string& stk_market_code,
                                    const KQuery& query, const OrderBrokerPtr& broker,
                                    const TradeCostPtr& costfunc, const string& name,
+                                   const std::vector<OrderBrokerPtr>& other_brokers,
                                    const string& config_file) {
     std::shared_ptr<RunSystemInStrategy> runner =
       std::make_shared<RunSystemInStrategy>(sys, broker, query, costfunc);
+
+    auto tm = sys->getTM();
+    for (const auto& brk : other_brokers) {
+        if (brk) {
+            tm->regBroker(brk);
+        }
+    }
 
     std::function<void()> func = [=]() { runner->run(getStock(stk_market_code)); };
 

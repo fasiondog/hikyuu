@@ -45,9 +45,18 @@ void RunPortfolioInStrategy::run() {
 
 StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
                                   const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
-                                  const string& name, const string& config_file) {
+                                  const string& name,
+                                  const std::vector<OrderBrokerPtr>& other_brokers,
+                                  const string& config_file) {
     std::shared_ptr<RunPortfolioInStrategy> runner =
       std::make_shared<RunPortfolioInStrategy>(pf, query, adjust_cycle, broker, costfunc);
+
+    auto tm = pf->getTM();
+    for (const auto& brk : other_brokers) {
+        if (brk) {
+            tm->regBroker(brk);
+        }
+    }
 
     std::function<void()> func = [=]() { runner->run(); };
 

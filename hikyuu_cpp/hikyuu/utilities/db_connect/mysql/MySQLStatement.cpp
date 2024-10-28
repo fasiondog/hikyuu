@@ -295,13 +295,23 @@ void MySQLStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
     }
 
     try {
-        item = boost::any_cast<int64_t>(m_result_buffer[idx]);
-    } catch (...) {
-        try {
+        if (m_result_bind[idx].buffer_type == MYSQL_TYPE_LONGLONG) {
+            item = boost::any_cast<int64_t>(m_result_buffer[idx]);
+        } else if (m_result_bind[idx].buffer_type == MYSQL_TYPE_LONG) {
             item = boost::any_cast<int32_t>(m_result_buffer[idx]);
-        } catch (...) {
+        } else if (m_result_bind[idx].buffer_type == MYSQL_TYPE_TINY) {
+            item = boost::any_cast<int8_t>(m_result_buffer[idx]);
+        } else if (m_result_bind[idx].buffer_type == MYSQL_TYPE_SHORT) {
+            item = boost::any_cast<short>(m_result_buffer[idx]);
+        } else {
             HKU_THROW("Field type mismatch! idx: {}", idx);
         }
+    } catch (const hku::exception&) {
+        throw;
+    } catch (const std::exception& e) {
+        HKU_THROW("Failed get column idx: {}! {}", idx, e.what());
+    } catch (...) {
+        HKU_THROW("Failed get columon idx: {}! Unknown error!", idx);
     }
 }
 
@@ -317,13 +327,19 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
     }
 
     try {
-        item = boost::any_cast<double>(m_result_buffer[idx]);
-    } catch (...) {
-        try {
+        if (m_result_bind[idx].buffer_type == MYSQL_TYPE_DOUBLE) {
+            item = boost::any_cast<double>(m_result_buffer[idx]);
+        } else if (m_result_bind[idx].buffer_type == MYSQL_TYPE_FLOAT) {
             item = boost::any_cast<float>(m_result_buffer[idx]);
-        } catch (...) {
+        } else {
             HKU_THROW("Field type mismatch! idx: {}", idx);
         }
+    } catch (const hku::exception&) {
+        throw;
+    } catch (const std::exception& e) {
+        HKU_THROW("Failed get column idx: {}! {}", idx, e.what());
+    } catch (...) {
+        HKU_THROW("Failed get columon idx: {}! Unknown error!", idx);
     }
 }
 
