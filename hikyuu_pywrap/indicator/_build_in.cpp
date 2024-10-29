@@ -659,17 +659,30 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def(
       "PRICELIST",
-      [](const py::object& obj, int result_index = 0, int discard = 0) {
+      [](const py::object& obj, int result_index = 0, int discard = 0,
+         const py::object& pyalign_dates = py::none()) {
           if (py::isinstance<Indicator>(obj)) {
               Indicator data = obj.cast<Indicator>();
               return PRICELIST(data, result_index);
           } else if (py::isinstance<py::sequence>(obj)) {
               const auto& x = obj.cast<py::sequence>();
-              return PRICELIST(python_list_to_vector<price_t>(x), discard);
+              auto values = python_list_to_vector<price_t>(x);
+              if (pyalign_dates.is_none()) {
+                  return PRICELIST(values, discard);
+              } else {
+                  py::sequence align_dates = pyalign_dates.cast<py::sequence>();
+                  auto total = len(align_dates);
+                  DatetimeList dates(total);
+                  for (auto i = 0; i < total; ++i) {
+                      dates[i] = pydatetime_to_Datetime(align_dates[i]);
+                  }
+                  return PRICELIST(values, dates, discard);
+              }
           }
           HKU_THROW("Invalid input data type!");
       },
-      py::arg("data"), py::arg("result_index") = 0, py::arg("discard") = 0);
+      py::arg("data"), py::arg("result_index") = 0, py::arg("discard") = 0,
+      py::arg("align_dates") = py::none());
 
     m.def("SMA", SMA_1, py::arg("n") = 22, py::arg("m") = 2.0);
     m.def("SMA", SMA_2, py::arg("n"), py::arg("m"));
