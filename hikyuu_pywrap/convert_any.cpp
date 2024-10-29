@@ -6,6 +6,7 @@
  */
 
 #include "convert_any.h"
+#include <datetime.h>
 
 Datetime pydatetime_to_Datetime(const pybind11::object& source) {
     Datetime value;
