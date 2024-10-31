@@ -762,13 +762,13 @@ def sys_performance(sys, ref_stk=None):
     sh000001_k = get_kdata('sh000001', query)
     ref_dates = sh000001_k.get_datetime_list()
 
-    ref_k = ref_stk.get_kdata(sys.query)
+    ref_k = ref_stk.get_kdata(query)
 
     funds_list = sys.tm.get_funds_list(ref_dates)
     funds = [f.total_assets for f in funds_list]
     funds = VALUE(funds)
     funds_return = [f.total_assets / f.total_base if f.total_base != 0.0 else constant.null_price for f in funds_list]
-    funds_return = VALUE(funds_return)
+    funds_return = VALUE(funds_return, align_dates=ref_dates)
     funds_return.name = "系统累积收益率"
     ref_return = ALIGN(ROCR(ref_k.close, 0), ref_dates)
     ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"

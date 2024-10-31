@@ -25,39 +25,6 @@ __old_Datetime_add__ = Datetime.__add__
 __old_Datetime_sub__ = Datetime.__sub__
 
 
-def __new_Datetime_init__(self, *args, **kwargs):
-    """
-    日期时间类（精确到秒），通过以下方式构建：
-
-    - 通过字符串：Datetime("2010-1-1 10:00:00")
-    - 通过 Python 的date：Datetime(date(2010,1,1))
-    - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
-    - 通过 YYYYMMDDHHMM 形式的整数：Datetime(201001011000)
-    - Datetime(year, month, day, hour=0, minute=0, second=0, millisecond=0, microsecond=0)
-
-    获取日期列表参见： :py:func:`getDateRange`
-
-    获取交易日日期参见： :py:meth:`StockManager.getTradingCalendar` 
-    """
-    if not args:
-        __old_Datetime_init__(self, **kwargs)
-
-    # datetime实例同时也是date的实例，判断必须放在date之前
-    elif isinstance(args[0], datetime):
-        d = args[0]
-        milliseconds = d.microsecond // 1000
-        microseconds = d.microsecond - milliseconds * 1000
-        __old_Datetime_init__(self, d.year, d.month, d.day, d.hour, d.minute, d.second, milliseconds, microseconds)
-    elif isinstance(args[0], date):
-        d = args[0]
-        __old_Datetime_init__(self, d.year, d.month, d.day, 0, 0, 0, 0)
-
-    elif isinstance(args[0], str):
-        __old_Datetime_init__(self, args[0])
-    else:
-        __old_Datetime_init__(self, *args)
-
-
 def __new_Datetime_add__(self, td):
     """加上指定时长，时长对象可为 TimeDelta 或 datetime.timedelta 类型
 
@@ -98,7 +65,6 @@ def Datetime_datetime(self):
     return datetime(self.year, self.month, self.day, self.hour, self.minute, self.second, self.microsecond)
 
 
-Datetime.__init__ = __new_Datetime_init__
 Datetime.__add__ = __new_Datetime_add__
 Datetime.__radd__ = __new_Datetime_add__
 Datetime.__sub__ = __new_Datetime_sub__

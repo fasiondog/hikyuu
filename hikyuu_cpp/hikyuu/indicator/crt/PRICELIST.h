@@ -22,6 +22,7 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API PRICELIST(const PriceList& data, int discard = 0);
+Indicator HKU_API PRICELIST(const PriceList& data, const DatetimeList& ds, int discard = 0);
 
 /**
  * 将某指标转化为PRICELIST

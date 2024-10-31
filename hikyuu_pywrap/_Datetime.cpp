@@ -29,6 +29,8 @@ void export_Datetime(py::module& m) {
       .def(py::init<long, long, long, long, long, long, long, long>(), py::arg("year"),
            py::arg("month"), py::arg("day"), py::arg("hour") = 0, py::arg("minute") = 0,
            py::arg("second") = 0, py::arg("millisecond") = 0, py::arg("microsecond") = 0)
+      .def("__init__",
+           [](Datetime& self, const py::object& source) { self = pydatetime_to_Datetime(source); })
 
       .def("__str__", &Datetime::str)
       .def("__repr__", &Datetime::repr)
