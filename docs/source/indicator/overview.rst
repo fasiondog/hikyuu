@@ -107,6 +107,7 @@
 
 **技术指标**
 
+* :py:func:`AD` - 累积/派发线
 * :py:func:`BACKSET` - 向前赋值将当前位置到若干周期前的数据设为1
 * :py:func:`BARSCOUNT` - 有效值周期数, 求总的周期数。
 * :py:func:`BARSLAST` - 上一次条件成立位置, 上一次条件成立到当前的周期数
@@ -126,6 +127,10 @@
 * :py:func:`AMA` - 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
 * :py:func:`EMA` - 指数移动平均线(Exponential Moving Average)
 * :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
+* :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
+* :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
+* :py:func:`ROCR` - 变动率指标: (price / prevPrice)
+* :py:func:`ROCR100` - 变动率指标: (price / prevPrice) * 100
 * :py:func:`RSI` - 相对强弱指标
 * :py:func:`SMA` - 移动平均线
 * :py:func:`SAFTYLOSS` - 亚历山大 艾尔德安全地带止损线
@@ -152,20 +157,10 @@
 * :py:func:`ICIR` - 计算因子 IC 的 IR 值
 
 
-**Ta-lib指标**
-
-以下指标计算方法同 Ta-lib
-
-* :py:func:`AD` - 累积/派发线
-* :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
-* :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
-* :py:func:`ROCR` - 变动率指标: (price / prevPrice)
-* :py:func:`ROCR100` - 变动率指标: (price / prevPrice) * 100
-
 **其他转换辅助**
 
 * :py:func:`concat_to_df` - 合并指标列表为 DateFrame
-
+* :py:func:`df_to_ind` - 将 DataFrame 指定列转为指标
 
 .. py:function:: concat_to_df(dates, ind_list[, head_stock_code=True, head_ind_name=False])
     将列表中的指标至合并在一张 pandas DataFrame 中
@@ -197,3 +192,22 @@
         197	2024-03-05 00:00:00	10.038182	9.816364
         198	2024-03-06 00:00:00	10.070455	9.776818
         199	2024-03-07 00:00:00	10.101364	9.738182
+
+
+
+
+.. py:function:: df_to_ind(df, col_name, col_date=None):
+    
+    将 pandas.DataFrame 指定列转化为 Indicator
+
+    :param df: pandas.DataFrame
+    :param col_name: 指定列名
+    :param col_date: 指定日期列名 (为None时忽略, 否则该列为对应参考日期)
+    :return: Indicator
+
+::
+
+    示例, 从 akshare 获取美国国债10年期收益率:
+        import akshare as ak
+        df = ak.bond_zh_us_rate("19901219")
+        x = df_to_ind(df, '美国国债收益率10年', '日期')

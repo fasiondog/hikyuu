@@ -20,7 +20,7 @@ pip 安装 Hikyuu 后，可在命令行终端中执行 hikyuutdx 命令，启动
 
 .. note::
 
-    由于 importdata 命令使用的是 HikyuuTDX 生成的配置文件，所以在第一次执行 importdata 之前需要至少运行过一次 HikyuuTDX。
+    由于 importdata 命令使用的是 HikyuuTDX 生成的配置文件，windows建议至少运行过一次 HikyuuTDX 进行配置（可以不执行导入，但配置后必须先退出），否则将使用默认配置。如果默认配置导入出错，可以自行修改用户目录下.hikyuu目录中的相应配置文件。
 
 
 
@@ -133,6 +133,8 @@ Jupyter notebook（此前被称为 IPython notebook）是一个基于web的交�
 
 matplotlib显示图形时中文字体乱码的问题
 ---------------------------------------
+
+通常 hikyuu 绘图已经默认支持中文，如果仍出现乱码，可参考此处，或百度。
 
 需修改 matplotlib 配置文件，把字体改为支持中文的字体。matplotlib文件位于 python安装目录/matplotlib/mpl-data/matplotlibrc，可用任意文本编辑器打开编辑，文件位置如下图所示：
 
