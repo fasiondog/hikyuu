@@ -160,7 +160,7 @@
 **其他转换辅助**
 
 * :py:func:`concat_to_df` - 合并指标列表为 DateFrame
-
+* :py:func:`df_to_ind` - 将 DataFrame 指定列转为指标
 
 .. py:function:: concat_to_df(dates, ind_list[, head_stock_code=True, head_ind_name=False])
     将列表中的指标至合并在一张 pandas DataFrame 中
@@ -192,3 +192,22 @@
         197	2024-03-05 00:00:00	10.038182	9.816364
         198	2024-03-06 00:00:00	10.070455	9.776818
         199	2024-03-07 00:00:00	10.101364	9.738182
+
+
+
+
+.. py:function:: df_to_ind(df, col_name, col_date=None):
+    
+    将 pandas.DataFrame 指定列转化为 Indicator
+
+    :param df: pandas.DataFrame
+    :param col_name: 指定列名
+    :param col_date: 指定日期列名 (为None时忽略, 否则该列为对应参考日期)
+    :return: Indicator
+
+::
+
+    示例, 从 akshare 获取美国国债10年期收益率:
+        import akshare as ak
+        df = ak.bond_zh_us_rate("19901219")
+        x = df_to_ind(df, '美国国债收益率10年', '日期')
