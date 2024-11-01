@@ -169,7 +169,7 @@ enable = True
 
 [tdx]
 enable = False
-;dir = d:\TdxW_HuaTai
+;dir = d:/TdxW_HuaTai
 
 [pytdx]
 enable = False
