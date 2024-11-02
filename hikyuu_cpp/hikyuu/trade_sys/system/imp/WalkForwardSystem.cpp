@@ -72,6 +72,7 @@ void WalkForwardSystem::initParam() {
     setParam<int>("train_len", 100);
     setParam<int>("test_len", 20);
     setParam<bool>("parallel", false);
+    setParam<bool>("se_trace", false);
 }
 
 void WalkForwardSystem::_checkParam(const string& name) const {
@@ -164,6 +165,7 @@ void WalkForwardSystem::readyForRun() {
     m_se->setParam<int>("train_len", getParam<int>("train_len"));
     m_se->setParam<int>("test_len", getParam<int>("test_len"));
     m_se->setParam<bool>("parallel", getParam<bool>("parallel"));
+    m_se->setParam<bool>("trace", getParam<bool>("se_trace"));
 
     m_se->reset();
     const auto& candidate_sys_list = m_se->getProtoSystemList();
@@ -329,19 +331,6 @@ TradeRecord WalkForwardSystem::pfProcessDelaySellRequest(const Datetime& date) {
     }
     return ret;
 }
-
-// SystemPtr HKU_API SYS_WalkForward(const SystemList& candidate_sys_list, const TradeManagerPtr&
-// tm,
-//                                   size_t train_len, size_t test_len, const string& key,
-//                                   const TradeManagerPtr& train_tm) {
-//     HKU_CHECK(tm, "Input tm is null!");
-//     TradeManagerPtr new_train_tm = train_tm ? train_tm : tm->clone();
-//     SystemPtr ret = make_shared<WalkForwardSystem>(candidate_sys_list, SE_Optimal(),
-//     new_train_tm); ret->setTM(tm); ret->setParam<string>("key", key);
-//     ret->setParam<int>("train_len", train_len);
-//     ret->setParam<int>("test_len", test_len);
-//     return ret;
-// }
 
 SystemPtr HKU_API SYS_WalkForward(const SystemList& candidate_sys_list, const TradeManagerPtr& tm,
                                   size_t train_len, size_t test_len, const SelectorPtr& se,
