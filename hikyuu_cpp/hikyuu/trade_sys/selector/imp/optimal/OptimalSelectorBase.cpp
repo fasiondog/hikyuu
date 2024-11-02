@@ -154,9 +154,9 @@ void OptimalSelectorBase::_calculate_single(const vector<std::pair<size_t, size_
 
         if (!selected_sys_list->empty()) {
             // 降序排列，相等时取排在候选前面的
-            std::sort(
+            std::stable_sort(
               selected_sys_list->begin(), selected_sys_list->end(),
-              [](const SystemWeight& a, const SystemWeight& b) { return a.weight >= b.weight; });
+              [](const SystemWeight& a, const SystemWeight& b) { return a.weight > b.weight; });
 
             size_t train_start = train_ranges[i].first;
             size_t test_start = train_ranges[i].second;
@@ -210,9 +210,9 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
 
           if (!selected_sys_list->empty()) {
               // 降序排列，相等时取排在候选前面的
-              std::sort(
+              std::stable_sort(
                 selected_sys_list->begin(), selected_sys_list->end(),
-                [](const SystemWeight& a, const SystemWeight& b) { return a.weight >= b.weight; });
+                [](const SystemWeight& a, const SystemWeight& b) { return a.weight > b.weight; });
           }
           return selected_sys_list;
       });
