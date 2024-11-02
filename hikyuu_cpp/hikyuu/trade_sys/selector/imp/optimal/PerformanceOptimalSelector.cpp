@@ -140,6 +140,9 @@ void PerformanceOptimalSelector::_calculate_single(
         }
 
         if (selected_sys) {
+            selected_sys->reset();
+            selected_sys = selected_sys->clone();
+
             size_t train_start = train_ranges[i].first;
             size_t test_start = train_ranges[i].second;
             size_t test_end = test_start + test_len;
@@ -180,7 +183,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
           Performance per;
           SYSPtr selected_sys;
           if (m_pro_sys_list.size() == 1) {
-              selected_sys = m_pro_sys_list.back();
+              selected_sys = m_pro_sys_list.back()->clone();
           } else if (0 == mode) {
               double max_value = std::numeric_limits<double>::lowest();
               for (const auto& sys : m_pro_sys_list) {
@@ -217,6 +220,8 @@ void PerformanceOptimalSelector::_calculate_parallel(
     for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
         auto& selected_sys = sys_list[i];
         if (selected_sys) {
+            selected_sys->reset();
+
             size_t train_start = train_ranges[i].first;
             size_t test_start = train_ranges[i].second;
             size_t test_end = test_start + test_len;
