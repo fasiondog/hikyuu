@@ -183,7 +183,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
           Performance per;
           SYSPtr selected_sys;
           if (m_pro_sys_list.size() == 1) {
-              selected_sys = m_pro_sys_list.back();
+              selected_sys = m_pro_sys_list.back()->clone();
           } else if (0 == mode) {
               double max_value = std::numeric_limits<double>::lowest();
               for (const auto& sys : m_pro_sys_list) {
