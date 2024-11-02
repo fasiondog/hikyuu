@@ -140,9 +140,6 @@ void PerformanceOptimalSelector::_calculate_single(
         }
 
         if (selected_sys) {
-            selected_sys->reset();
-            selected_sys = selected_sys->clone();
-
             size_t train_start = train_ranges[i].first;
             size_t test_start = train_ranges[i].second;
             size_t test_end = test_start + test_len;
@@ -220,8 +217,6 @@ void PerformanceOptimalSelector::_calculate_parallel(
     for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
         auto& selected_sys = sys_list[i];
         if (selected_sys) {
-            selected_sys->reset();
-
             size_t train_start = train_ranges[i].first;
             size_t test_start = train_ranges[i].second;
             size_t test_end = test_start + test_len;

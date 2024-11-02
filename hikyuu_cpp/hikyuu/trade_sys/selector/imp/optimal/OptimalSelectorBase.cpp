@@ -141,9 +141,8 @@ void OptimalSelectorBase::_calculate_single(const vector<std::pair<size_t, size_
             try {
                 sys->run(q, true);
                 double value = evaluate(sys, end_date);
-                sys->reset();
                 if (!std::isnan(value)) {
-                    selected_sys_list->emplace_back(SystemWeight(sys->clone(), value));
+                    selected_sys_list->emplace_back(SystemWeight(sys, value));
                 }
             } catch (const std::exception& e) {
                 CLS_ERROR("{}! {}", e.what(), sys->name());
@@ -195,11 +194,11 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
           auto selected_sys_list = std::make_shared<SystemWeightList>();
           for (const auto& sys : m_pro_sys_list) {
               try {
-                  sys->run(q, true);
-                  double value = evaluate(sys, end_date);
-                  sys->reset();
+                  auto nsys = sys->clone();
+                  nsys->run(q, true);
+                  double value = evaluate(nsys, end_date);
                   if (!std::isnan(value)) {
-                      selected_sys_list->emplace_back(SystemWeight(sys->clone(), value));
+                      selected_sys_list->emplace_back(SystemWeight(nsys, value));
                   }
               } catch (const std::exception& e) {
                   CLS_ERROR("{}! {}", e.what(), sys->name());
