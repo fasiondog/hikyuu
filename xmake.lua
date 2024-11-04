@@ -175,6 +175,7 @@ add_requires("boost " .. boost_version, {
     serialization = true,
     system = false,
     python = false,
+    cmake = false,
   },
 })
 
