@@ -19,26 +19,7 @@ option("mysql")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable mysql kdata engine.")
-    if is_plat("macosx") then
-        if os.exists("/usr/local/opt/mysql-client/lib") then
-            add_includedirs("/usr/local/opt/mysql-client/include/mysql")
-            add_includedirs("/usr/local/opt/mysql-client/include")
-            add_linkdirs("/usr/local/opt/mysql-client/lib")
-            add_rpathdirs("/usr/local/opt/mysql-client/lib")
-        end
-        if os.exists("/usr/local/mysql/lib") then
-            add_linkdirs("/usr/local/mysql/lib")
-            add_rpathdirs("/usr/local/mysql/lib")
-        end
-        if not os.exists("/usr/local/include/mysql") then
-            if os.exists("/usr/local/mysql/include") then
-                os.run("ln -s /usr/local/mysql/include /usr/local/include/mysql")
-            else
-                print("Not Found MySQL include dir!")
-            end
-        end
-        add_links("mysqlclient")
-    elseif is_plat("windows") then
+    if is_plat("windows") then
         add_defines("NOMINMAX")
     end        
 option_end()
@@ -157,10 +138,12 @@ elseif is_plat("linux", "cross") then
   
 elseif is_plat("macosx") then
     if get_config("hdf5") then
-        add_requires("brew::hdf5", {alias = "hdf5"})
+        add_requires("hdf5 " .. hdf5_version)
+        -- add_requires("brew::hdf5", {alias = "hdf5"})
     end
     if get_config("mysql") then
-        add_requires("brew::mysql-client", {alias = "mysql"})
+        add_requires("mysql")
+        -- add_requires("brew::mysql-client", {alias = "mysql"})
     end
 end
 
@@ -228,6 +211,10 @@ if is_plat("linux", "cross", "macosx") then
   add_cxflags("-ftemplate-depth=1023", "-pthread")
   add_shflags("-pthread")
   add_ldflags("-pthread")
+end
+
+if is_plat("macosx") then
+    add_cxflags("-Wno-deprecated-declarations")
 end
 
 -- if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then

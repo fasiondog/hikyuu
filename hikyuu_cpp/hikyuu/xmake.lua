@@ -3,7 +3,7 @@ target("hikyuu")
     set_kind("$(kind)")
 
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json")
-    if is_plat("windows", "linux", "cross") then
+    if is_plat("windows", "linux", "cross", "macosx") then
         if get_config("sqlite") or get_config("hdf5") then
             add_packages("sqlite3")
         end
@@ -65,12 +65,10 @@ target("hikyuu")
     if is_plat("macosx") then
         add_links("iconv", "sqlite3")
         if get_config("mysql") then
-            add_packages("mysqlclient")
+            add_packages("mysql")
         end
         if get_config("hdf5") then
-            add_includedirs("/usr/local/opt/hdf5/include")
-            add_linkdirs("/usr/local/opt/hdf5/lib")
-            add_links("hdf5", "hdf5_cpp")
+            add_packages("hdf5")
         end
     end
 
