@@ -112,6 +112,8 @@ local sqlite_version = "3.46.0+100"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
     mysql_version = "8.0.21" 
+elseif is_plat("macosx") then
+    mysql_version = "8.0.40"
 end
 
 add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.git")
@@ -128,29 +130,19 @@ if is_plat("windows") then
         add_requires("mysql " .. mysql_version)
     end
 
-elseif is_plat("linux", "cross") then
+elseif is_plat("linux", "macosx", "cross") then
     if get_config("hdf5") then
         add_requires("hdf5 " .. hdf5_version, { system = false })
     end
     if get_config("mysql") then
         add_requires("mysql " .. mysql_version, { system = false })
     end
-  
-elseif is_plat("macosx") then
-    if get_config("hdf5") then
-        add_requires("hdf5 " .. hdf5_version)
-        -- add_requires("brew::hdf5", {alias = "hdf5"})
-    end
-    if get_config("mysql") then
-        add_requires("mysql")
-        -- add_requires("brew::mysql-client", {alias = "mysql"})
-    end
 end
 
 add_requires("boost " .. boost_version, {
   debug = is_mode("debug"),
   configs = {
-    shared = is_plat("windows"),
+    shared = is_plat("windows", "macosx"),
     runtimes = get_config("runtimes"),
     multi = true,
     date_time = true,

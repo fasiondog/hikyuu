@@ -45,14 +45,18 @@ function prepare_run(target)
       os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     end
   
-    if is_plat("windows") then os.cp("$(env BOOST_LIB)/boost_*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/") end
+    if is_plat("windows") then 
+        os.cp("$(env BOOST_LIB)/boost_*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/") 
+    end
   
     -- if is_plat("linux") and os.getenv(BOOST_LIB) > "" then
     --   -- 不确定是否需要加入这段才能在fedora下使用
     --   os.cp("$(env BOOST_LIB)/libboost_*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     -- end
   
-    if is_plat("macosx") then os.cp("$(env BOOST_LIB)/libboost_*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/") end
+    if is_plat("macosx") then
+        os.cp("$(env BOOST_LIB)/libboost_*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/") 
+    end
   end
 
 target("unit-test")
@@ -132,6 +136,7 @@ target("small-test")
     -- add files
     add_files("./hikyuu/hikyuu/**.cpp");
     add_files("./hikyuu/test_main.cpp")
+    add_files("./hikyuu/utilities/test_Parameter.cpp")
 
     before_run(prepare_run)
     after_run(coverage_report)
