@@ -74,10 +74,13 @@ Parameter& Parameter::operator=(const Parameter& p) {
 bool Parameter::support(const boost::any& value) {
     return value.type() == typeid(int) || value.type() == typeid(int64_t) ||
            value.type() == typeid(bool) || value.type() == typeid(double) ||
-           value.type() == typeid(string) || value.type() == typeid(Stock) ||
-           value.type() == typeid(Block) || value.type() == typeid(KQuery) ||
-           value.type() == typeid(KData) || value.type() == typeid(PriceList) ||
-           value.type() == typeid(DatetimeList);
+           strcmp(value.type().name(), typeid(string).name()) == 0 ||
+           strcmp(value.type().name(), typeid(Stock).name()) == 0 ||
+           strcmp(value.type().name(), typeid(Block).name()) == 0 ||
+           strcmp(value.type().name(), typeid(KQuery).name()) == 0 ||
+           strcmp(value.type().name(), typeid(KData).name()) == 0 ||
+           strcmp(value.type().name(), typeid(PriceList).name()) == 0 ||
+           strcmp(value.type().name(), typeid(DatetimeList).name()) == 0;
 }
 
 string Parameter::type(const string& name) const {

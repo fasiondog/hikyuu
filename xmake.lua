@@ -11,7 +11,7 @@ set_version("2.2.3", {build = "%Y%m%d%H%M"})
 set_warnings("all")
 
 -- set language: C99, c++ standard
-set_languages("cxx17", "c99")
+set_languages("c++17")
 
 
 option("mysql")
@@ -142,12 +142,12 @@ end
 add_requires("boost " .. boost_version, {
   debug = is_mode("debug"),
   configs = {
-    shared = is_plat("windows", "macosx"),
+    shared = is_plat("windows"),
     runtimes = get_config("runtimes"),
     multi = true,
     date_time = true,
     filesystem = false,
-    serialization = true,
+    serialization = get_config("serialize"),
     system = false,
     python = false,
     cmake = false,
