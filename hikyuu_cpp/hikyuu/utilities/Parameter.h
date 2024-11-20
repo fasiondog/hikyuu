@@ -463,7 +463,7 @@ void Parameter::set(const string& name, const ValueType& value) {
         return;
     }
 
-    if (m_params[name].type() != typeid(ValueType)) {
+    if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
         if ((m_params[name].type() == typeid(int) || m_params[name].type() == typeid(int64_t)) &&
             (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
             // 忽略，允许设定
@@ -494,7 +494,7 @@ inline void Parameter::set(const string& name, const boost::any& value) {
         return;
     }
 
-    if (m_params[name].type() != value.type()) {
+    if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
         throw std::logic_error("Mismatching type! need type " +
                                string(m_params[name].type().name()) + " but value type is " +
                                string(value.type().name()));
