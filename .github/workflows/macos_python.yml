@@ -1,4 +1,4 @@
-name: macOS_arm64
+name: macOS_python_arm64
 
 on:
   push:
