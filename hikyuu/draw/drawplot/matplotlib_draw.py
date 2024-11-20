@@ -27,7 +27,8 @@ def set_mpl_params():
     rcParams['font.family'] = 'sans-serif'
     rcParams['axes.unicode_minus'] = False
 
-    expected_fonts = ['Microsoft YaHei', 'SimSun', 'SimHei', 'Source Han Sans CN', 'Noto Sans CJK JP']
+    expected_fonts = ['Microsoft YaHei', 'SimSun', 'SimHei',
+                      'Source Han Sans CN', 'Noto Sans CJK JP', 'Arial Unicode MS']
     current_fonts = matplotlib.rcParams['font.sans-serif']
     for font in expected_fonts:
         if font in current_fonts:
