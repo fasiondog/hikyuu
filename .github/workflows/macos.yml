@@ -50,6 +50,10 @@ jobs:
 
       - name: build
         run: |
+          xmake -b core          
+
+      - name: build
+        run: |
           xmake -b small-test
     
       - name: test
