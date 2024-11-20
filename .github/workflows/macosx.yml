@@ -1,4 +1,4 @@
-name: macOS_arm64
+name: macosx-build
 
 on:
   push:
@@ -48,14 +48,18 @@ jobs:
         run: |
           xmake f -c -k ${{ matrix.kind }} -y -vD --feedback=n
 
-      - name: build
+      - name: build python
         run: |
-          xmake -b core          
+          xmake -b core   
+          
+      - name: test python
+        run: |
+          python hikyuu/test/test.py
 
-      - name: build
+      - name: build test
         run: |
-          xmake -b small-test
+          xmake -b unit-test
     
       - name: test
         run: |
-          xmake r small-test
+          xmake r unit-test
