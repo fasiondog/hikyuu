@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [macos-14]
         arch: [arm64]
-        kind: [shared]
+        kind: [static]
 
     runs-on: ${{ matrix.os }}
 
@@ -46,7 +46,7 @@ jobs:
 
       - name: config
         run: |
-          xmake f -c -k ${{ matrix.kind }} -y -vD --mysql=n --hdf5=n
+          xmake f -c -k ${{ matrix.kind }} -y -vD --feedback=n
 
       - name: build
         run: |

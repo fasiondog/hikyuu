@@ -77,10 +77,6 @@ target("core")
     end)
 
     after_build(function(target)
-        if is_plat("macosx") then
-            os.run(format("install_name_tool -change @rpath/libhikyuu.dylib @loader_path/libhikyuu.dylib %s/%s", target:targetdir(), "core.so"))
-        end
-
         local dst_dir = "$(projectdir)/hikyuu/cpp/"
         local dst_obj = dst_dir .. "core.so"
 
@@ -104,6 +100,20 @@ target("core")
             if not is_plat("cross") then
                 os.trymv(target:targetdir() .. '/core.so', dst_obj .. ".so")
             end
+        end
+
+        if is_plat("macosx") then
+            dst_obj = dst_obj .. ".so"
+            for _, filepath in ipairs(os.files(dst_dir .. "/*.dylib")) do
+                -- print(path.filename(filepath))
+                local filename = path.filename(filepath)
+                os.run(format("install_name_tool -change @rpath/%s @loader_path/%s %s", filename, filename, dst_obj))
+            end
+            os.run(format("install_name_tool -change libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_obj))
+            os.run(format("install_name_tool -change libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_obj))
+            filename = "libmysqlclient.21.dylib"
+            os.run(format("install_name_tool -change @loader_path/../lib/libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_dir .. filename))
+            os.run(format("install_name_tool -change @loader_path/../lib/libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_dir .. filename))
         end
     end)
 
