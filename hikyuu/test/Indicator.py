@@ -48,10 +48,10 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(m.name, "AddIndicator")
         self.assertEqual(len(m), 4)
         self.assertEqual(m.empty(), False)
-        self.assert_(abs(m[0] - 1) < 0.0001)
-        self.assert_(abs(m[1] - 2) < 0.0001)
-        self.assert_(abs(m[2] - 3) < 0.0001)
-        self.assert_(abs(m[3] - 4) < 0.0001)
+        self.assertTrue(abs(m[0] - 1) < 0.0001)
+        self.assertTrue(abs(m[1] - 2) < 0.0001)
+        self.assertTrue(abs(m[2] - 3) < 0.0001)
+        self.assertTrue(abs(m[3] - 4) < 0.0001)
 
         b = toPriceList([1, 2, 3, 4])
         x = PRICELIST(b)
@@ -59,10 +59,10 @@ class IndicatorTest(unittest.TestCase):
         m = m(x)
         self.assertEqual(len(m), 4)
         self.assertEqual(m.empty(), False)
-        self.assert_(abs(m[0] - 2) < 0.0001)
-        self.assert_(abs(m[1] - 3) < 0.0001)
-        self.assert_(abs(m[2] - 4) < 0.0001)
-        self.assert_(abs(m[3] - 5) < 0.0001)
+        self.assertTrue(abs(m[0] - 2) < 0.0001)
+        self.assertTrue(abs(m[1] - 3) < 0.0001)
+        self.assertTrue(abs(m[2] - 4) < 0.0001)
+        self.assertTrue(abs(m[3] - 5) < 0.0001)
 
     def test_operator(self):
         a = toPriceList([0, 1, 2, 3, 5])
@@ -76,16 +76,16 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[3], 7)
 
         a = x1 + 1.1
-        self.assert_(abs(a[0] - 1.1) < 0.0001)
-        self.assert_(abs(a[1] - 2.1) < 0.0001)
-        self.assert_(abs(a[2] - 3.1) < 0.0001)
-        self.assert_(abs(a[3] - 4.1) < 0.0001)
+        self.assertTrue(abs(a[0] - 1.1) < 0.0001)
+        self.assertTrue(abs(a[1] - 2.1) < 0.0001)
+        self.assertTrue(abs(a[2] - 3.1) < 0.0001)
+        self.assertTrue(abs(a[3] - 4.1) < 0.0001)
 
         a = 2.1 + x1
-        self.assert_(abs(a[0] - 2.1) < 0.0001)
-        self.assert_(abs(a[1] - 3.1) < 0.0001)
-        self.assert_(abs(a[2] - 4.1) < 0.0001)
-        self.assert_(abs(a[3] - 5.1) < 0.0001)
+        self.assertTrue(abs(a[0] - 2.1) < 0.0001)
+        self.assertTrue(abs(a[1] - 3.1) < 0.0001)
+        self.assertTrue(abs(a[2] - 4.1) < 0.0001)
+        self.assertTrue(abs(a[3] - 5.1) < 0.0001)
 
         a = x2 - x1
         self.assertEqual(a[0], 1)
@@ -124,10 +124,10 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[3], 6)
 
         a = x2 / x1
-        self.assert_(isinf(a[0]))
+        self.assertTrue(isinf(a[0]))
         self.assertEqual(a[1], 2)
         self.assertEqual(a[2], 1.5)
-        self.assert_(abs(a[3] - 4.0 / 3.0) < 0.0001)
+        self.assertTrue(abs(a[3] - 4.0 / 3.0) < 0.0001)
 
         a = x1 / 0.5
         self.assertEqual(a[0], 0)
@@ -136,10 +136,10 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[3], 6)
 
         a = 2. / x1
-        self.assert_(isinf(a[0]))
+        self.assertTrue(isinf(a[0]))
         self.assertEqual(a[1], 2.0)
         self.assertEqual(a[2], 1.)
-        self.assert_(abs(a[3] - 2.0/3.0) < 0.0001)
+        self.assertTrue(abs(a[3] - 2.0/3.0) < 0.0001)
 
         a = x1 > x2
         self.assertEqual(a[0], 0 > 1)
@@ -180,19 +180,19 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a.empty(), False)
         self.assertEqual(v.empty(), False)
 
-        self.assert_(abs(o[0] - 96.05) < 0.0001)
-        self.assert_(abs(h[0] - 99.98) < 0.0001)
-        self.assert_(abs(l[0] - 95.79) < 0.0001)
-        self.assert_(abs(c[0] - 99.98) < 0.0001)
-        self.assert_(abs(a[0] - 49.4) < 0.0001)
-        self.assert_(abs(v[0] - 1260) < 0.0001)
+        self.assertTrue(abs(o[0] - 96.05) < 0.0001)
+        self.assertTrue(abs(h[0] - 99.98) < 0.0001)
+        self.assertTrue(abs(l[0] - 95.79) < 0.0001)
+        self.assertTrue(abs(c[0] - 99.98) < 0.0001)
+        self.assertTrue(abs(a[0] - 49.4) < 0.0001)
+        self.assertTrue(abs(v[0] - 1260) < 0.0001)
 
-        self.assert_(abs(o[1] - 104.3) < 0.0001)
-        self.assert_(abs(h[1] - 104.39) < 0.0001)
-        self.assert_(abs(l[1] - 99.98) < 0.0001)
-        self.assert_(abs(c[1] - 104.39) < 0.0001)
-        self.assert_(abs(a[1] - 8.4) < 0.0001)
-        self.assert_(abs(v[1] - 197) < 0.0001)
+        self.assertTrue(abs(o[1] - 104.3) < 0.0001)
+        self.assertTrue(abs(h[1] - 104.39) < 0.0001)
+        self.assertTrue(abs(l[1] - 99.98) < 0.0001)
+        self.assertTrue(abs(c[1] - 104.39) < 0.0001)
+        self.assertTrue(abs(a[1] - 8.4) < 0.0001)
+        self.assertTrue(abs(v[1] - 197) < 0.0001)
 
     def test_MA(self):
         a = toPriceList([0, 1, 2, 3])
@@ -200,10 +200,10 @@ class IndicatorTest(unittest.TestCase):
         m = MA(x, 2)
         self.assertEqual(len(m), 4)
         self.assertEqual(m.discard, 0)
-        self.assert_(abs(m[0] - 0.0) < 0.0001)
-        self.assert_(abs(m[1] - 0.5) < 0.0001)
-        self.assert_(abs(m[2] - 1.5) < 0.0001)
-        self.assert_(abs(m[3] - 2.5) < 0.0001)
+        self.assertTrue(abs(m[0] - 0.0) < 0.0001)
+        self.assertTrue(abs(m[1] - 0.5) < 0.0001)
+        self.assertTrue(abs(m[2] - 1.5) < 0.0001)
+        self.assertTrue(abs(m[3] - 2.5) < 0.0001)
 
     def test_pickle(self):
         if not constant.pickle_support:

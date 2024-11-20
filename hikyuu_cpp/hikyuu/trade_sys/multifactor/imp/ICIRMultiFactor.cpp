@@ -106,7 +106,7 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
 
     return all_factors;
 #else
-    return parallel_for_index(0, stk_count, [&, this, discard, ind_count, days_total](size_t si) {
+    return parallel_for_index(0, stk_count, [&, discard, ind_count, days_total](size_t si) {
         PriceList new_values(days_total, 0.0);
         PriceList sum_weight(days_total, 0.0);
         for (size_t di = 0; di < discard; di++) {

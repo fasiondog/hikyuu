@@ -147,7 +147,32 @@ public:
 
 protected:
     string m_name;
+
+//============================================
+// 序列化支持
+//============================================
+#if HKU_SUPPORT_SERIALIZATION
+private:
+    friend class boost::serialization::access;
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
+        ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+    }
+
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+    }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif /* HKU_SUPPORT_SERIALIZATION */
 };
+
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(OrderBrokerBase)
+#endif
 
 /**
  * 客户程序应使用此类型进行实际操作

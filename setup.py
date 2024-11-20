@@ -123,8 +123,9 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
+        kind = "shared" if mode == 'release' and sys.platform != 'darwin' else "static"
         cmd = "xmake f {} -c -y -m {} --feedback={} -k {} --low_precision={} --log_level={}".format(
-            "-v -D" if verbose else "", mode, feedback, "shared" if mode == 'release' else "static", low_precision,
+            "-v -D" if verbose else "", mode, feedback, kind, low_precision,
             2 if mode == 'release' else 0)
         print(cmd)
         os.system(cmd)
@@ -365,10 +366,12 @@ def wheel(feedback, j, low_precision, clear):
         plat = f"manylinux1_{cpu_arch}"
     elif current_plat == 'linux' and current_bits == 32:
         plat = f"manylinux1_{cpu_arch}"
-    elif current_plat == 'darwin' and current_bits == 32:
+    elif current_plat == 'darwin' and cpu_arch != 'arm64' and current_bits == 32:
         plat = "macosx_i686"
-    elif current_plat == 'darwin' and current_bits == 64:
-        plat = "macosx_10_9_x86_64"
+    elif current_plat == 'darwin' and cpu_arch != 'arm64' and current_bits == 64:
+        plat = "macosx_x86_64"
+    elif current_plat == 'darwin' and cpu_arch == 'arm64':
+        plat = "macosx_11_1_arm64"
     else:
         print("*********尚未实现该平台的支持*******")
         return

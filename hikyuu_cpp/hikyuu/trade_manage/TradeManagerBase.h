@@ -737,10 +737,6 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
-#if HKU_SUPPORT_SERIALIZATION
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(TradeManagerBase)
-#endif
-
 inline void TradeManagerBase::baseCheckParam(const string& name) const {
     if ("precision" == name) {
         int precision = getParam<int>("precision");
