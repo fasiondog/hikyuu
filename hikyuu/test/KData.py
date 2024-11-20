@@ -2,10 +2,10 @@
 # -*- coding: utf8 -*-
 # gb18030
 
-#===============================================================================
+# ===============================================================================
 # 作者：fasiondog
 # 历史：1）20130220, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 import unittest
 
@@ -33,14 +33,14 @@ class KDataTest(unittest.TestCase):
         self.assertEqual(k.end_pos, 10)
         self.assertEqual(k.last_pos, 9)
         self.assertEqual(k[0].datetime, Datetime(199012190000))
-        self.assert_(abs(k[0].open - 96.05) < 0.0001)
-        self.assert_(abs(k[0].high - 99.980) < 0.0001)
-        self.assert_(abs(k[0].low - 95.79) < 0.0001)
-        self.assert_(abs(k[0].close - 99.98) < 0.0001)
-        self.assert_(abs(k[0].amount - 49.4) < 0.0001)
-        self.assert_(abs(k[0].volume - 1260) < 0.0001)
-        self.assert_(abs(k[1].open - 104.3) < 0.0001)
-        self.assert_(abs(k[9].open - 127.61) < 0.0001)
+        self.assertTrue(abs(k[0].open - 96.05) < 0.0001)
+        self.assertTrue(abs(k[0].high - 99.980) < 0.0001)
+        self.assertTrue(abs(k[0].low - 95.79) < 0.0001)
+        self.assertTrue(abs(k[0].close - 99.98) < 0.0001)
+        self.assertTrue(abs(k[0].amount - 49.4) < 0.0001)
+        self.assertTrue(abs(k[0].volume - 1260) < 0.0001)
+        self.assertTrue(abs(k[1].open - 104.3) < 0.0001)
+        self.assertTrue(abs(k[9].open - 127.61) < 0.0001)
 
     def test_pickle(self):
         if not constant.pickle_support:
