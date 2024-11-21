@@ -60,8 +60,8 @@ jobs:
 
       - name: build test
         run: |
-          xmake -b unit-test
+          xmake -b small-test
     
       - name: test
         run: |
-          xmake r unit-test
+          xmake r small-test
