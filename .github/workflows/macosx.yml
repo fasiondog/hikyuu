@@ -55,6 +55,7 @@ jobs:
       - name: test python
         run: |
           export PYTHONPATH=.
+          pip install -r requirements.txt
           python hikyuu/test/test.py
 
       - name: build test
