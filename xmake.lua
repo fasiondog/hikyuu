@@ -118,26 +118,12 @@ end
 
 add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.git")
 -- add_repositories("hikyuu-repo https://gitee.com/fasiondog/hikyuu_extern_libs.git")
-if is_plat("windows") then
-    if get_config("hdf5") then
-        if is_mode("release") then
-            add_requires("hdf5 " .. hdf5_version)
-        else
-            add_requires("hdf5_d " .. hdf5_version)
-        end
-    end
-    if get_config("mysql") then
-        add_requires("mysql " .. mysql_version)
-    end
-
-elseif is_plat("linux", "macosx", "cross") then
-    if get_config("hdf5") then
+ if get_config("hdf5") then
         add_requires("hdf5 " .. hdf5_version, { system = false })
-    end
-    if get_config("mysql") then
-        add_requires("mysql " .. mysql_version, { system = false })
-    end
-end
+ end
+ if get_config("mysql") then
+     add_requires("mysql " .. mysql_version, { system = false })
+ end
 
 add_requires("boost " .. boost_version, {
   debug = is_mode("debug"),
