@@ -30,16 +30,7 @@ MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_sta
   m_meta_result(nullptr),
   m_needs_reset(false),
   m_has_bind_result(false) {
-    if (!_prepare()) {
-        // 尝试重连
-        if ((dynamic_cast<MySQLConnect*>(driver))->ping()) {
-            m_db = (dynamic_cast<MySQLConnect*>(driver))->m_mysql;
-            HKU_CHECK(_prepare(), "Failed prepare statement, while reconnect to mysql!");
-            HKU_INFO("success reconnect to mysql");
-        } else {
-            HKU_THROW("Failed reconnect mysql!");
-        }
-    }
+    _prepare(driver);
 
     auto param_count = mysql_stmt_param_count(m_stmt);
     if (param_count > 0) {
@@ -65,19 +56,35 @@ MySQLStatement::~MySQLStatement() {
     mysql_stmt_close(m_stmt);
 }
 
-bool MySQLStatement::_prepare() {
+void MySQLStatement::_prepare(DBConnectBase* driver) {
     m_stmt = mysql_stmt_init(m_db);
-    HKU_ERROR_IF_RETURN(!m_stmt, false, "Failed mysql_stmt_init!");
+    HKU_CHECK(m_stmt, "Failed mysql_stmt_init!");
 
     int ret = mysql_stmt_prepare(m_stmt, m_sql_string.c_str(), m_sql_string.size());
-    if (ret != 0) {
-        std::string stmt_errorstr(mysql_stmt_error(m_stmt));
-        mysql_stmt_close(m_stmt);
-        m_stmt = nullptr;
-        HKU_ERROR("Failed prepare sql statement: {}! error msg: {}!", m_sql_string, stmt_errorstr);
-        return false;
+    HKU_IF_RETURN(0 == ret, void());
+
+    mysql_stmt_close(m_stmt);
+    m_stmt = nullptr;
+
+    // 如果是服务器异常，尝试重连服务器
+    if (CR_SERVER_LOST == ret || CR_SERVER_GONE_ERROR == ret) {
+        if ((dynamic_cast<MySQLConnect*>(driver))->ping()) {
+            m_db = (dynamic_cast<MySQLConnect*>(driver))->m_mysql;
+        } else {
+            HKU_THROW("Failed reconnect mysql!");
+        }
+    } else if (CR_OUT_OF_MEMORY == ret) {
+        HKU_THROW("Out of memory!");
     }
-    return true;
+
+    m_stmt = mysql_stmt_init(m_db);
+    ret = mysql_stmt_prepare(m_stmt, m_sql_string.c_str(), m_sql_string.size());
+    HKU_IF_RETURN(0 == ret, void());
+
+    std::string stmt_errorstr(mysql_stmt_error(m_stmt));
+    mysql_stmt_close(m_stmt);
+    m_stmt = nullptr;
+    HKU_THROW("Failed prepare statement: {}! error msg: {}!", m_sql_string, stmt_errorstr);
 }
 
 void MySQLStatement::_reset() {
