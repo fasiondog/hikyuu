@@ -711,6 +711,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.about(self, "错误", str(e))
             return
 
+        now = hikyuu.Datetime.now()
+        today = hikyuu.Datetime.today()
+        if now.day_of_week() not in (0, 6) and hikyuu.TimeDelta(0, 8, 30) < now - today < hikyuu.TimeDelta(0, 15, 45):
+            reply = QMessageBox.question(self, '警告', '交易日8:30-15:45分之间导入数据将导致盘后数据错误，是否仍要继续执行导入?',
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.No:
+                return
+
         self.import_running = True
         self.start_import_pushButton.setEnabled(False)
         self.reset_progress_bar()
