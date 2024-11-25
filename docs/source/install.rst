@@ -15,7 +15,7 @@
 
 2. 安装 git （如使用 hub，必须安装）
 
-    git工具官方链接://git-scm.com/downloads。 
+    git工具官方链接: `https://git-scm.com/downloads <https://git-scm.com/downloads>`_
 
 
 pip 安装
