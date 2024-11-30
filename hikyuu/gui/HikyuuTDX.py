@@ -16,7 +16,7 @@ import PyQt5
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot, QObject, pyqtSignal
-from PyQt5.QtGui import QIcon, QTextCursor, QFont
+from PyQt5.QtGui import QIcon, QTextCursor, QFont, QPalette
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -50,11 +50,12 @@ class EmittingStream(QObject):
 
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, parent=None, capture_output=False, use_dark_style=False):
+    def __init__(self, parent=None, capture_output=False):
         super(MyMainWindow, self).__init__(parent)
         self._capture_output = capture_output  # 捕获Python stdout 输出
-        self._use_dark_style = use_dark_style  # 使用暗黑主题
-        self._text_color = '#FFFFFF' if use_dark_style else '#000000'
+        palette = QApplication.instance().palette()
+        # 获取文字默认颜色
+        self._text_color = palette.color(QPalette.WindowText).name()
         self.setupUi(self)
         self.initUI()
         self.initLogger()
@@ -830,18 +831,14 @@ if __name__ == "__main__":
     f.setPixelSize(12)
     app.setFont(f)
 
-    use_dark_style = False  # 使用暗黑主题
-    if use_dark_style:
-        import qdarkstyle
-        app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
         FORMAT = '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
         logging.basicConfig(format=FORMAT, level=logging.INFO, handlers=[
             logging.StreamHandler(),
         ])
-        myWin = MyMainWindow(capture_output=False, use_dark_style=use_dark_style)
+        myWin = MyMainWindow(capture_output=False)
     else:
-        myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
+        myWin = MyMainWindow(capture_output=True)
 
     myWin.show()
     sys.exit(app.exec())
