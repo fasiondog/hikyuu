@@ -165,7 +165,7 @@ class Ui_MainWindow(object):
         self.label_6.setObjectName("label_6")
         self.gridLayout_4.addWidget(self.label_6, 3, 0, 1, 1)
         self.min5_start_dateEdit = QtWidgets.QDateEdit(self.groupBox_7)
-        self.min5_start_dateEdit.setMinimumDateTime(QtCore.QDateTime(QtCore.QDate(1989, 12, 31), QtCore.QTime(8, 0, 0)))
+        self.min5_start_dateEdit.setMinimumDateTime(QtCore.QDateTime(QtCore.QDate(1989, 12, 31), QtCore.QTime(0, 0, 0)))
         self.min5_start_dateEdit.setCalendarPopup(True)
         self.min5_start_dateEdit.setObjectName("min5_start_dateEdit")
         self.gridLayout_4.addWidget(self.min5_start_dateEdit, 1, 1, 1, 1)
@@ -174,10 +174,6 @@ class Ui_MainWindow(object):
         self.min_start_dateEdit.setObjectName("min_start_dateEdit")
         self.gridLayout_4.addWidget(self.min_start_dateEdit, 2, 1, 1, 1)
         self.label_3 = QtWidgets.QLabel(self.groupBox_7)
-        font = QtGui.QFont()
-        font.setFamily(".AppleSystemUIFont")
-        font.setPointSize(13)
-        self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
         self.gridLayout_4.addWidget(self.label_3, 0, 0, 1, 1)
         self.label_10 = QtWidgets.QLabel(self.groupBox_7)
@@ -191,7 +187,7 @@ class Ui_MainWindow(object):
         self.trans_start_dateEdit.setObjectName("trans_start_dateEdit")
         self.gridLayout_4.addWidget(self.trans_start_dateEdit, 3, 1, 1, 1)
         self.day_start_dateEdit = QtWidgets.QDateEdit(self.groupBox_7)
-        self.day_start_dateEdit.setMinimumDateTime(QtCore.QDateTime(QtCore.QDate(1989, 12, 31), QtCore.QTime(8, 0, 0)))
+        self.day_start_dateEdit.setMinimumDateTime(QtCore.QDateTime(QtCore.QDate(1989, 12, 31), QtCore.QTime(0, 0, 0)))
         self.day_start_dateEdit.setCalendarPopup(True)
         self.day_start_dateEdit.setObjectName("day_start_dateEdit")
         self.gridLayout_4.addWidget(self.day_start_dateEdit, 0, 1, 1, 1)
@@ -757,19 +753,19 @@ class Ui_MainWindow(object):
 "hr { height: 1px; border-width: 0; }\n"
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
-"</style></head><body style=\" font-family:\'.AppleSystemUIFont\'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入上证日线记录：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入深证日线记录：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入上证5分钟线记录：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入深证5分钟线记录：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入上证1分钟线记录：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入深证1分钟线记录：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入上证分笔记录：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入深证分笔记录：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入上证分时数据：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入深证分时数据：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入权息数据数：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">导入完毕！</span></p></body></html>"))
+"</style></head><body style=\" font-family:\'Microsoft YaHei UI\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入上证日线记录：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入深证日线记录：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入上证5分钟线记录：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入深证5分钟线记录：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入上证1分钟线记录：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入深证1分钟线记录：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入上证分笔记录：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入深证分笔记录：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入上证分时数据：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入深证分时数据：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入权息数据数：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">导入完毕！</span></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "执行导入"))
         self.groupBox_6.setTitle(_translate("MainWindow", "预加载设置"))
         self.label_35.setText(_translate("MainWindow", "此处为 Hikyuu 运行时的数据预加载设置，请根据机器内存大小选择"))
@@ -817,12 +813,12 @@ class Ui_MainWindow(object):
 "hr { height: 1px; border-width: 0; }\n"
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
-"</style></head><body style=\" font-family:\'.AppleSystemUIFont\'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">注：</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:10pt; font-weight:600; color:#ff0000;\">1、行情采集服务仅对预加载数据有效</span><span style=\" font-family:\'SimSun\'; font-size:9pt;\">，在行情采集服务运行期间，hikyuu.interactive运行时将自动连接采集服务获取行情数据，并更新预加载的内容数据。</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\'; font-size:9pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt;\">2、如使用芝麻代理（</span><a href=\"http://h.zhimaruanjian.com/\"><span style=\" font-family:\'SimSun\'; font-size:9pt; text-decoration: underline; color:#0000ff;\">http://h.zhimaruanjian.com/</span></a><span style=\" font-family:\'SimSun\'; font-size:9pt;\">），请自行申请（需付费），并确保ip为其白名单。</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\'; font-size:9pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:696; color:#0000ff;\">3、此处采集为网络采集，更推荐直接运行安装目录下gui子目录下的 start_qmt.py ,使用miniqmt 实时服务。该程序独立运行，不用关闭，和这里的采集效果一样。注意：miniqmt需要QMT交易端配合，且在同一机器上执行。</span></p></body></html>"))
+"</style></head><body style=\" font-family:\'Microsoft YaHei UI\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">注：</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-size:10pt; font-weight:600; color:#ff0000;\">1、行情采集服务仅对预加载数据有效</span><span style=\" font-family:\'SimSun\';\">，在行情采集服务运行期间，hikyuu.interactive运行时将自动连接采集服务获取行情数据，并更新预加载的内容数据。</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\';\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">2、如使用芝麻代理（</span><a href=\"http://h.zhimaruanjian.com/\"><span style=\" font-family:\'SimSun\'; text-decoration: underline; color:#0000ff;\">http://h.zhimaruanjian.com/</span></a><span style=\" font-family:\'SimSun\';\">），请自行申请（需付费），并确保ip为其白名单。</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\';\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\'; font-weight:696; color:#0000ff;\">3、此处采集为网络采集，更推荐直接运行安装目录下gui子目录下的 start_qmt.py ,使用miniqmt 实时服务。该程序独立运行，不用关闭，和这里的采集效果一样。注意：miniqmt需要QMT交易端配合，且在同一机器上执行。</span></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "行情采集服务"))
         self.label_41.setText(_translate("MainWindow", "执行日志"))
