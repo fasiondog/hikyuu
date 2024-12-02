@@ -130,16 +130,10 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_
         print(cmd)
         os.system(cmd)
 
-    if mode == "release":
-        cmd = "xmake -j {} -b {} core".format(worker_num,
-                                              "-v -D" if verbose else "")
-        print(cmd)
-        os.system(cmd)
-    else:
-        cmd = "xmake -j {} -b {} hikyuu".format(worker_num,
-                                                "-v -D" if verbose else "")
-        print(cmd)
-        os.system(cmd)
+    cmd = "xmake -j {} -b {} core".format(worker_num,
+                                          "-v -D" if verbose else "")
+    print(cmd)
+    os.system(cmd)
 
     # 保存当前的编译信息
     save_current_compile_info(current_compile_info)
