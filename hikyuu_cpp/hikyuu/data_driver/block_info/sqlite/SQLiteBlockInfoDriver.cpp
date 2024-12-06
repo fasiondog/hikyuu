@@ -88,8 +88,12 @@ BlockList SQLiteBlockInfoDriver::getBlockList() {
     return ret;
 }
 
-void SQLiteBlockInfoDriver::save(const Block& block) {}
+void SQLiteBlockInfoDriver::save(const Block& block) {
+    HKU_THROW("Not support save block info!");
+}
 
-void SQLiteBlockInfoDriver::remove(const string& category, const string& name) {}
+void SQLiteBlockInfoDriver::remove(const string& category, const string& name) {
+    HKU_THROW("Not support save block info!");
+}
 
 }  // namespace hku
