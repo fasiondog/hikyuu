@@ -93,4 +93,8 @@ BlockList MySQLBlockInfoDriver::getBlockList() {
     return ret;
 }
 
+void MySQLBlockInfoDriver::save(const Block& block) {}
+
+void MySQLBlockInfoDriver::remove(const string& category, const string& name) {}
+
 }  // namespace hku

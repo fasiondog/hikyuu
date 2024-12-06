@@ -23,7 +23,7 @@ class HKU_API BlockInfoDriver {
 
 public:
     BlockInfoDriver(const string& name);
-    virtual ~BlockInfoDriver(){};
+    virtual ~BlockInfoDriver() {};
 
     /** 获取驱动名称 */
     const string& name() const;
@@ -73,6 +73,20 @@ public:
      * @return 所有板块列表
      */
     virtual BlockList getBlockList() = 0;
+
+    /**
+     * 保存指定的板块
+     * @note 如果已存在同名板块，则覆盖；如果板块分类或名称存在修改，需要手工在修改前删除原板块
+     * @param block
+     */
+    virtual void save(const Block& block) = 0;
+
+    /**
+     * 删除指定的板块
+     * @param category 板块分类
+     * @param name 板块名称
+     */
+    virtual void remove(const string& category, const string& name) = 0;
 
 private:
     bool checkType();
