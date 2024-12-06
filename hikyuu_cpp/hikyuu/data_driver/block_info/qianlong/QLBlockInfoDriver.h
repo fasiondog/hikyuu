@@ -15,13 +15,15 @@ namespace hku {
 
 class QLBlockInfoDriver : public BlockInfoDriver {
 public:
-    QLBlockInfoDriver() : BlockInfoDriver("qianlong"){};
+    QLBlockInfoDriver() : BlockInfoDriver("qianlong") {};
     virtual ~QLBlockInfoDriver();
 
     virtual bool _init() override;
     virtual Block getBlock(const string&, const string&) override;
     virtual BlockList getBlockList(const string& category) override;
     virtual BlockList getBlockList() override;
+    virtual void save(const Block& block) override;
+    virtual void remove(const string& category, const string& name) override;
 };
 
 } /* namespace hku */
