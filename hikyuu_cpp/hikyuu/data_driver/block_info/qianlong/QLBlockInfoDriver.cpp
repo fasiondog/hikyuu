@@ -190,11 +190,11 @@ BlockList QLBlockInfoDriver::getBlockList() {
 }
 
 void QLBlockInfoDriver::save(const Block& block) {
-    HKU_THROW("Not support save block info!");
+    HKU_INFO("Not support save block info!");
 }
 
 void QLBlockInfoDriver::remove(const string& category, const string& name) {
-    HKU_THROW("Not support remove block info!");
+    HKU_INFO("Not support remove block info!");
 }
 
 } /* namespace hku */

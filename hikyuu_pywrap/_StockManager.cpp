@@ -117,6 +117,14 @@ void export_StockManager(py::module& m) {
     :return: 板块，如找不到返回空Block
     :rtype: Block)")
 
+      .def("add_block", &StockManager::addBlock, R"(add_block(self, block))")
+      .def("save_block", &StockManager::saveBlock, R"(save_block(self, block))")
+      .def("remove_block",
+           py::overload_cast<const string&, const string&>(&StockManager::removeBlock),
+           py::arg("category"), py::arg("name"), R"(remove_block(self, category, name))")
+      .def("remove_block", py::overload_cast<const Block&>(&StockManager::removeBlock),
+           py::arg("block"), R"(remove_block(self, block))")
+
       .def("get_block_list", py::overload_cast<>(&StockManager::getBlockList))
       .def("get_block_list", py::overload_cast<const string&>(&StockManager::getBlockList),
            R"(get_block_list(self[, category])
