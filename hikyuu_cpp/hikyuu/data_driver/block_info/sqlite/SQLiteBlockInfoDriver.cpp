@@ -11,12 +11,26 @@
 
 namespace hku {
 
-struct SQLiteBlockTable {
-    TABLE_BIND4(SQLiteBlockTable, block, category, name, market_code, index_code)
+struct SQLiteBlockView {
+    TABLE_BIND4(SQLiteBlockView, block, category, name, market_code, index_code)
     string category;
     string name;
     string market_code;
     string index_code;
+};
+
+struct SQLiteBlockTable {
+    TABLE_BIND3(SQLiteBlockTable, block, category, name, market_code)
+    string category;
+    string name;
+    string market_code;
+};
+
+struct SQLiteBlockIndexTable {
+    TABLE_BIND3(SQLiteBlockIndexTable, BlockIndex, category, name, market_code)
+    string category;
+    string name;
+    string market_code;
 };
 
 SQLiteBlockInfoDriver::~SQLiteBlockInfoDriver() {}
@@ -34,7 +48,7 @@ DBConnectPtr SQLiteBlockInfoDriver::getConnect() {
 }
 
 void SQLiteBlockInfoDriver::load() {
-    vector<SQLiteBlockTable> records;
+    vector<SQLiteBlockView> records;
     auto connect = getConnect();
     connect->batchLoadView(records,
                            "select a.id, a.category, a.name, a.market_code, b.market_code as "
@@ -106,24 +120,35 @@ void SQLiteBlockInfoDriver::save(const Block& block) {
 
     auto connect = getConnect();
     AutoTransAction trans(connect);
-    connect->remove(SQLiteBlockTable::getTableName(),
-                    (Field("category") == block.category()) & (Field("name") == block.name()),
-                    false);
+    auto condition = (Field("category") == block.category()) & (Field("name") == block.name());
+    connect->remove(SQLiteBlockView::getTableName(), condition, false);
+    connect->remove(SQLiteBlockIndexTable::getTableName(), condition, false);
+
+    if (!block.getIndexStock().isNull()) {
+        SQLiteBlockIndexTable index;
+        index.category = block.category();
+        index.name = block.name();
+        index.market_code = block.getIndexStock().market_code();
+        connect->save(index, false);
+    }
 
     for (auto iter = block.begin(); iter != block.end(); ++iter) {
         SQLiteBlockTable record;
         record.category = block.category();
         record.name = block.name();
         record.market_code = iter->market_code();
-        record.index_code = block.getIndexStock().market_code();
         connect->save(record, false);
     }
 }
 
 void SQLiteBlockInfoDriver::remove(const string& category, const string& name) {
-    auto connect = getConnect();
-    connect->remove(SQLiteBlockTable::getTableName(),
-                    (Field("category") == category) & (Field("name") == name));
+    {
+        auto connect = getConnect();
+        AutoTransAction trans(connect);
+        auto condition = (Field("category") == category) & (Field("name") == name);
+        connect->remove(SQLiteBlockTable::getTableName(), condition, false);
+        connect->remove(SQLiteBlockIndexTable::getTableName(), condition, false);
+    }
 
     std::unique_lock<std::shared_mutex> lock(m_buffer_mutex);
     auto category_iter = m_buffer.find(category);
