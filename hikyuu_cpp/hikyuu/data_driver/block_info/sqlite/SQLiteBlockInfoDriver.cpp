@@ -5,8 +5,8 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/utilities/db_connect/DBConnect.h"
 #include "hikyuu/utilities/db_connect/sqlite/SQLiteConnect.h"
-#include "hikyuu/utilities/db_connect/TableMacro.h"
 #include "SQLiteBlockInfoDriver.h"
 
 namespace hku {
@@ -26,18 +26,22 @@ bool SQLiteBlockInfoDriver::_init() {
     return !(dbname == "");
 }
 
-void SQLiteBlockInfoDriver::load() {
+DBConnectPtr SQLiteBlockInfoDriver::getConnect() {
     string dbname = tryGetParam<string>("db", "");
-    HKU_ERROR_IF_RETURN(dbname == "", void(), "Can't get Sqlite3 filename!");
+    HKU_CHECK(!dbname.empty(), "Can't get Sqlite3 filename!");
     HKU_TRACE("SQLITE3: {}", dbname);
+    return std::make_shared<SQLiteConnect>(m_params);
+}
 
-    SQLiteConnect connect(m_params);
+void SQLiteBlockInfoDriver::load() {
     vector<SQLiteBlockTable> records;
-    connect.batchLoadView(records,
-                          "select a.id, a.category, a.name, a.market_code, b.market_code as "
-                          "index_code from block a left "
-                          "join BlockIndex b on a.category=b.category and a.name = b.name");
+    auto connect = getConnect();
+    connect->batchLoadView(records,
+                           "select a.id, a.category, a.name, a.market_code, b.market_code as "
+                           "index_code from block a left "
+                           "join BlockIndex b on a.category=b.category and a.name = b.name");
 
+    std::unique_lock<std::shared_mutex> lock(m_buffer_mutex);
     for (auto& record : records) {
         auto category_iter = m_buffer.find(record.category);
         if (category_iter == m_buffer.end()) {
@@ -54,6 +58,7 @@ void SQLiteBlockInfoDriver::load() {
 
 Block SQLiteBlockInfoDriver::getBlock(const string& category, const string& name) {
     Block ret;
+    std::shared_lock<std::shared_mutex> lock(m_buffer_mutex);
     auto category_iter = m_buffer.find(category);
     HKU_IF_RETURN(category_iter == m_buffer.end(), ret);
 
@@ -66,6 +71,7 @@ Block SQLiteBlockInfoDriver::getBlock(const string& category, const string& name
 
 BlockList SQLiteBlockInfoDriver::getBlockList(const string& category) {
     BlockList ret;
+    std::shared_lock<std::shared_mutex> lock(m_buffer_mutex);
     auto category_iter = m_buffer.find(category);
     HKU_IF_RETURN(category_iter == m_buffer.end(), ret);
 
@@ -79,6 +85,7 @@ BlockList SQLiteBlockInfoDriver::getBlockList(const string& category) {
 
 BlockList SQLiteBlockInfoDriver::getBlockList() {
     BlockList ret;
+    std::shared_lock<std::shared_mutex> lock(m_buffer_mutex);
     for (auto category_iter = m_buffer.begin(); category_iter != m_buffer.end(); ++category_iter) {
         const auto& category_blocks = category_iter->second;
         for (auto iter = category_blocks.begin(); iter != category_blocks.end(); ++iter) {
@@ -89,11 +96,44 @@ BlockList SQLiteBlockInfoDriver::getBlockList() {
 }
 
 void SQLiteBlockInfoDriver::save(const Block& block) {
-    HKU_THROW("Not support save block info!");
+    std::unique_lock<std::shared_mutex> lock(m_buffer_mutex);
+    auto category_iter = m_buffer.find(block.category());
+    if (category_iter == m_buffer.end()) {
+        m_buffer.emplace(block.category(), unordered_map<string, Block>{{block.name(), block}});
+    } else {
+        category_iter->second.emplace(block.name(), block);
+    }
+
+    auto connect = getConnect();
+    AutoTransAction trans(connect);
+    connect->remove(SQLiteBlockTable::getTableName(),
+                    (Field("category") == block.category()) & (Field("name") == block.name()),
+                    false);
+
+    for (auto iter = block.begin(); iter != block.end(); ++iter) {
+        SQLiteBlockTable record;
+        record.category = block.category();
+        record.name = block.name();
+        record.market_code = iter->market_code();
+        record.index_code = block.getIndexStock().market_code();
+        connect->save(record, false);
+    }
 }
 
 void SQLiteBlockInfoDriver::remove(const string& category, const string& name) {
-    HKU_THROW("Not support save block info!");
+    auto connect = getConnect();
+    connect->remove(SQLiteBlockTable::getTableName(),
+                    (Field("category") == category) & (Field("name") == name));
+
+    std::unique_lock<std::shared_mutex> lock(m_buffer_mutex);
+    auto category_iter = m_buffer.find(category);
+    HKU_IF_RETURN(category_iter == m_buffer.end(), void());
+
+    auto block_iter = category_iter->second.find(name);
+    HKU_IF_RETURN(block_iter == category_iter->second.end(), void());
+
+    category_iter->second.erase(block_iter);
+    m_buffer.erase(category_iter);
 }
 
 }  // namespace hku
