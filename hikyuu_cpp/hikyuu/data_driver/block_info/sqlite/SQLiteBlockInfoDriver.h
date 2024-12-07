@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <mutex>
 #include "../../BlockInfoDriver.h"
 
 namespace hku {
@@ -25,7 +26,11 @@ public:
     virtual void remove(const string& category, const string& name) override;
 
 private:
+    DBConnectPtr getConnect();
+
+private:
     unordered_map<string, unordered_map<string, Block>> m_buffer;
+    std::shared_mutex m_buffer_mutex;
 };
 
 }  // namespace hku

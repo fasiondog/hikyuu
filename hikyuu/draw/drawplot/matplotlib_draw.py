@@ -24,6 +24,10 @@ def set_mpl_params():
     if in_interactive_session():
         rcParams['interactive'] = True
 
+    if sys.platform == 'darwin':
+        matplotlib.rcParams['font.sans-serif'] = 'Arial Unicode MS'
+        return
+
     rcParams['font.family'] = 'sans-serif'
     rcParams['axes.unicode_minus'] = False
 

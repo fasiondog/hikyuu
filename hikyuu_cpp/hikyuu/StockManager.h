@@ -129,6 +129,16 @@ public:
      */
     Block getBlock(const string& category, const string& name);
 
+    void addBlock(const Block& blk) {
+        saveBlock(blk);
+    }
+
+    void saveBlock(const Block& blk);
+    void removeBlock(const string& category, const string& name);
+    void removeBlock(const Block& blk) {
+        removeBlock(blk.category(), blk.name());
+    }
+
     /**
      * 获取指定分类的板块列表
      * @param category 板块分类
