@@ -197,6 +197,18 @@ StockManager/Block/Stock
         :param str name: 板块名称
         :return: 板块，如找不到返回空Block
         :rtype: Block
+
+    .. py:method:: add_block(self, block)
+
+        将新增独立的板块加入到数据库系统中。注意，如 block 发生变化，需要调用 save_block 进行保存。
+
+        :param Block block: 新增的板块
+
+    .. py:method:: remove_block(self, block)
+
+        从数据库系统中删除板块
+
+        :param Block block: 要删除的板块
         
     .. py:method:: get_block_list(self[, category])
     
