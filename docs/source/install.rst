@@ -6,7 +6,7 @@
 
 支持的操作系统：64位 Windows7及以上版本、Ubuntu、MacOSX （其中 Windows、Ubuntu 22.04及以上可以直接 pip 安装，其他建议使用源码编译安装）
 
-1. Python环境：>= Python3.8
+1. Python环境：>= Python3.8 (macosx python >= 3.10)
 
 .. note:: 
 

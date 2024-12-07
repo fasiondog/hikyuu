@@ -375,15 +375,9 @@ def wheel(feedback, j, low_precision, clear):
 
     py_version = get_python_version()
     main_ver, min_ver = py_version.split('.')
-    if current_plat == 'win32':
-        cmd = 'python sub_setup.py bdist_wheel -p {}'.format(plat)
-        print(cmd)
-        os.system(cmd)
-    else:
-        cmd = 'python3 sub_setup.py bdist_wheel --python-tag cp{}{} -p {}'.format(
-            main_ver, min_ver, plat)
-        print(cmd)
-        os.system(cmd)
+    cmd = 'python sub_setup.py bdist_wheel -p {}'.format(plat)
+    print(cmd)
+    os.system(cmd)
 
     shutil.rmtree('hikyuu/include', True)
 
