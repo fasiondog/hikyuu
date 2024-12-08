@@ -16,7 +16,7 @@ import PyQt5
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot, QObject, pyqtSignal
-from PyQt5.QtGui import QIcon, QTextCursor, QFont
+from PyQt5.QtGui import QIcon, QTextCursor, QFont, QPalette
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -50,11 +50,12 @@ class EmittingStream(QObject):
 
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, parent=None, capture_output=False, use_dark_style=False):
+    def __init__(self, parent=None, capture_output=False):
         super(MyMainWindow, self).__init__(parent)
         self._capture_output = capture_output  # 捕获Python stdout 输出
-        self._use_dark_style = use_dark_style  # 使用暗黑主题
-        self._text_color = '#FFFFFF' if use_dark_style else '#000000'
+        palette = QApplication.instance().palette()
+        # 获取文字默认颜色
+        self._text_color = palette.color(QPalette.WindowText).name()
         self.setupUi(self)
         self.initUI()
         self.initLogger()
@@ -686,16 +687,38 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             return
 
         config = self.getCurrentConfig()
-        if config.getboolean('hdf5', 'enable') \
-                and (not os.path.lexists(config['hdf5']['dir']) or not os.path.isdir(config['hdf5']['dir'])):
-            QMessageBox.about(self, "错误", '指定的目标数据存放目录不存在！')
+        try:
+            if config.getboolean('hdf5', 'enable'):
+                if not os.path.lexists(config['hdf5']['dir']):
+                    os.makedirs(f"{config['hdf5']['dir']}/tmp")
+                elif not os.path.isdir(config['hdf5']['dir']):
+                    QMessageBox.about(self, "错误", '指定的目标数据存放目录不存在！')
+                    return
+
+            if config.getboolean('tdx', 'enable'):
+                if not os.path.lexists(config['tdx']['dir']):
+                    os.makedirs(f"{config['tdx']['dir']}/tmp")
+                elif not os.path.isdir(config['tdx']['dir']):
+                    QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
+                    return
+
+            if config.getboolean('mysql', 'enable'):
+                if not os.path.lexists(config['mysql']['tmpdir']):
+                    os.makedirs(config['mysql']['tmpdir'])
+                elif not os.path.isdir(config['mysql']['tmpdir']):
+                    QMessageBox.about(self, "错误", "请确认临时目录是否正确！")
+                    return
+        except Exception as e:
+            QMessageBox.about(self, "错误", str(e))
             return
 
-        if config.getboolean('tdx', 'enable') \
-            and (not os.path.lexists(config['tdx']['dir'])
-                 or not os.path.isdir(config['tdx']['dir'])):
-            QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
-            return
+        now = hikyuu.Datetime.now()
+        today = hikyuu.Datetime.today()
+        if now.day_of_week() not in (0, 6) and hikyuu.TimeDelta(0, 8, 30) < now - today < hikyuu.TimeDelta(0, 15, 45):
+            reply = QMessageBox.question(self, '警告', '交易日8:30-15:45分之间导入数据将导致盘后数据错误，是否仍要继续执行导入?',
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.No:
+                return
 
         self.import_running = True
         self.start_import_pushButton.setEnabled(False)
@@ -783,11 +806,7 @@ def start():
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     app = QApplication(sys.argv)
-    use_dark_style = False  # 使用暗黑主题
-    if use_dark_style:
-        import qdarkstyle
-        app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
-    myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
+    myWin = MyMainWindow(capture_output=True)
     myWin.show()
     sys.exit(app.exec())
 
@@ -808,18 +827,14 @@ if __name__ == "__main__":
     f.setPixelSize(12)
     app.setFont(f)
 
-    use_dark_style = False  # 使用暗黑主题
-    if use_dark_style:
-        import qdarkstyle
-        app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
         FORMAT = '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
         logging.basicConfig(format=FORMAT, level=logging.INFO, handlers=[
             logging.StreamHandler(),
         ])
-        myWin = MyMainWindow(capture_output=False, use_dark_style=use_dark_style)
+        myWin = MyMainWindow(capture_output=False)
     else:
-        myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
+        myWin = MyMainWindow(capture_output=True)
 
     myWin.show()
     sys.exit(app.exec())

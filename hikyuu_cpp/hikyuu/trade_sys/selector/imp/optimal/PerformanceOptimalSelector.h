@@ -22,7 +22,7 @@ public:
     virtual void _checkParam(const string& name) const override;
     virtual void calculate(const SystemList& pf_realSysList, const KQuery& query) override;
 
-    virtual SystemWeightList getSelected(Datetime date);
+    virtual SystemWeightList getSelected(Datetime date) override;
     virtual SelectorPtr _clone() override;
     virtual void _reset() override;
 

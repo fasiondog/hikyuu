@@ -121,6 +121,28 @@ def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
     return df
 
 
+def df_to_ind(df, col_name, col_date=None):
+    """
+    将 pandas.DataFrame 指定列转化为 Indicator
+
+    示例，从 akshare 获取美国国债10年期收益率:
+
+        import akshare as ak
+        df = ak.bond_zh_us_rate("19901219")
+        x = df_to_ind(df, '美国国债收益率10年', '日期')
+
+    :param df: pandas.DataFrame
+    :param col_name: 指定列名
+    :param col_date: 指定日期列名 (为None时忽略, 否则该列为对应参考日期)
+    :return: Indicator
+    """
+    if col_date is not None:
+        dates = df[col_date].to_list()
+        dates = DatetimeList([Datetime(x) for x in dates])
+        return PRICELIST(df[col_name].to_list(), align_dates=dates)
+    return PRICELIST(df[col_name].to_list())
+
+
 # 避免 python 中公式原型必须加括号
 KDATA = C_KDATA()
 CLOSE = C_CLOSE()

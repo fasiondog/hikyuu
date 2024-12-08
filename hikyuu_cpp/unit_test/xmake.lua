@@ -45,14 +45,18 @@ function prepare_run(target)
       os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     end
   
-    if is_plat("windows") then os.cp("$(env BOOST_LIB)/boost_*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/") end
+    if is_plat("windows") then 
+        os.cp("$(env BOOST_LIB)/boost_*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/") 
+    end
   
     -- if is_plat("linux") and os.getenv(BOOST_LIB) > "" then
     --   -- 不确定是否需要加入这段才能在fedora下使用
     --   os.cp("$(env BOOST_LIB)/libboost_*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     -- end
   
-    if is_plat("macosx") then os.cp("$(env BOOST_LIB)/libboost_*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/") end
+    if is_plat("macosx") then
+        os.cp("$(env BOOST_LIB)/libboost_*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/") 
+    end
   end
 
 target("unit-test")
@@ -61,11 +65,7 @@ target("unit-test")
 
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
-        if is_plat("macosx") then
-            add_packages("mysqlclient")
-        else
-            add_packages("mysql")
-        end
+        add_packages("mysql")
     end
 
     add_includedirs("..")
@@ -87,11 +87,6 @@ target("unit-test")
     if is_plat("linux") or is_plat("macosx") then
         add_links("sqlite3")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
-    end
-
-    if is_plat("macosx") then
-        add_includedirs("/usr/local/opt/mysql-client/include")
-        add_linkdirs("/usr/local/opt/mysql-client/lib")
     end
 
     -- add files

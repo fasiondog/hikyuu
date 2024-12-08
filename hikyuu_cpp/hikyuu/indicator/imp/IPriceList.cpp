@@ -70,10 +70,23 @@ void IPriceList::_calculate(const Indicator& data) {
 
     // 更新抛弃数量
     m_discard = data.discard();
+
+    DatetimeList dates = data.getDatetimeList();
+    if (!dates.empty()) {
+        setParam<DatetimeList>("align_date_list", dates);
+    }
 }
 
 Indicator HKU_API PRICELIST(const PriceList& data, int discard) {
     return make_shared<IPriceList>(data, discard)->calculate();
+}
+
+Indicator HKU_API PRICELIST(const PriceList& data, const DatetimeList& ds, int discard) {
+    auto ret = PRICELIST(data, discard);
+    HKU_CHECK(data.size() == ds.size(),
+              "The data length must be the same as the length of the reference date list");
+    ret.setParam<DatetimeList>("align_date_list", ds);
+    return ret;
 }
 
 Indicator HKU_API PRICELIST(const Indicator& data, int result_index) {

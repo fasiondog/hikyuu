@@ -6,13 +6,19 @@
 
 Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测（目前主要用于国内A股市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。
 
-👉 项目首页：[https://hikyuu.org/](https://hikyuu.org/)
+👉 **项目地址：**
 
-👉 帮助文档：[https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)
+* [https://github.com/fasiondog/hikyuu](https://github.com/fasiondog/hikyuu)
+* [https://gitee.com/fasiondog/hikyuu](https://gitee.com/fasiondog/hikyuu)
+* [https://gitcode.com/hikyuu/hikyuu](https://gitcode.com/hikyuu/hikyuu)
 
-👉 入门示例:  [https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
+👉 **项目首页：**[https://hikyuu.org/](https://hikyuu.org/)
 
-👉 策略部件库：[https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)
+👉 **帮助文档：**[https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)
+
+👉 **入门示例:**  [https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
+
+👉 **策略部件库：**[https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)
 
 👉 感谢网友提供的 Hikyuu Ubuntu虚拟机环境, 百度网盘下载(提取码: ht8j): [https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw?pwd=ht8j](https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw?pwd=ht8j)
 
@@ -55,7 +61,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 ## **加入知识星球**
 
-更多示例与程序化交易的分享（您的加入将视为对项目的捐赠）。**作者只保证对知识星球用户有问必答，其他渠道视情况。**
+更多示例与程序化交易的分享（您的加入将视为对项目的捐赠）。**作者只保证对知识星球用户有问必答，其他渠道视情况。(公众号文章末尾可能不定期发放优惠券)**
 
 ![知识星球](docs/source/_static/zhishixingqiu.png)
 
@@ -67,6 +73,27 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 ![weixin](docs/source/_static/weixin.jpg)
 
-## QQ交流群（逐渐废弃）：114910869, 或扫码加入
+## QQ交流群：114910869, 或扫码加入
 
 ![img](docs/source/_static/10003-qq.png)
+
+## 项目依赖说明
+
+Hikyuu直接依赖以下开源项目（由以下项目间接依赖的项目未列出），感谢所有开源作者的贡献：
+
+| 名称          | 项目地址                                                                    | License                                                                               |
+| ------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| xmake         | [https://github.com/xmake-io/xmake](https://github.com/xmake-io/xmake)         | Apache 2.0                                                                            |
+| hdf5          | [https://github.com/HDFGroup/hdf5](https://github.com/HDFGroup/hdf5)           | [hdf5 license](https://github.com/HDFGroup/hdf5?tab=License-1-ov-file#License-1-ov-file) |
+| mysql(client) | [https://github.com/mysql/mysql-server]()                                      | [mysql license](https://github.com/mysql/mysql-server?tab=License-1-ov-file#readme)      |
+| fmt           | [https://github.com/fmtlib/fmt](https://github.com/fmtlib/fmt)                 | [fmt license](https://github.com/fmtlib/fmt?tab=License-1-ov-file#readme)                |
+| spdlog        | [https://github.com/gabime/spdlog](https://github.com/gabime/spdlog)           | MIT                                                                                   |
+| sqlite        | [https://www.sqlite.org/](https://www.sqlite.org/)                             | [sqlite license](https://www.sqlite.org/copyright.html)                                  |
+| flatbuffers   | [https://github.com/google/flatbuffers](https://github.com/google/flatbuffers) | Apache 2.0                                                                            |
+| nng           | [https://github.com/nanomsg/nng](https://github.com/nanomsg/nng)               | MIT                                                                                   |
+| nlohmann_json | [https://github.com/nlohmann/json](https://github.com/nlohmann/json)           | MIT                                                                                   |
+| boost         | [https://www.boost.org/](https://www.boost.org/)                               | [Boost Software License](https://www.boost.org/users/license.html)                       |
+| python        | [https://www.python.org/](https://www.python.org/)                             | [Python license](https://docs.python.org/3/license.html)                                 |
+| pybind11      | [https://github.com/pybind/pybind11](https://github.com/pybind/pybind11)       | [pybind11 license](https://github.com/pybind/pybind11?tab=License-1-ov-file#readme)      |
+| gzip-hpp      | [https://github.com/mapbox/gzip-hpp](https://github.com/mapbox/gzip-hpp)       | BSD-2-Clause license                                                                  |
+| doctest       | [https://github.com/doctest/doctest](https://github.com/doctest/doctest)       | MIT                                                                                   |

@@ -6,12 +6,12 @@ set_project("hikyuu")
 add_rules("mode.debug", "mode.release")
 
 -- version
-set_version("2.2.1", {build = "%Y%m%d%H%M"})
+set_version("2.2.3", {build = "%Y%m%d%H%M"})
 
 set_warnings("all")
 
 -- set language: C99, c++ standard
-set_languages("cxx17", "c99")
+set_languages("c++17")
 
 
 option("mysql")
@@ -19,26 +19,7 @@ option("mysql")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable mysql kdata engine.")
-    if is_plat("macosx") then
-        if os.exists("/usr/local/opt/mysql-client/lib") then
-            add_includedirs("/usr/local/opt/mysql-client/include/mysql")
-            add_includedirs("/usr/local/opt/mysql-client/include")
-            add_linkdirs("/usr/local/opt/mysql-client/lib")
-            add_rpathdirs("/usr/local/opt/mysql-client/lib")
-        end
-        if os.exists("/usr/local/mysql/lib") then
-            add_linkdirs("/usr/local/mysql/lib")
-            add_rpathdirs("/usr/local/mysql/lib")
-        end
-        if not os.exists("/usr/local/include/mysql") then
-            if os.exists("/usr/local/mysql/include") then
-                os.run("ln -s /usr/local/mysql/include /usr/local/include/mysql")
-            else
-                print("Not Found MySQL include dir!")
-            end
-        end
-        add_links("mysqlclient")
-    elseif is_plat("windows") then
+    if is_plat("windows") then
         add_defines("NOMINMAX")
     end        
 option_end()
@@ -131,38 +112,18 @@ local sqlite_version = "3.46.0+100"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
     mysql_version = "8.0.21" 
+elseif is_plat("macosx") then
+    mysql_version = "8.0.40"
 end
 
 add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.git")
 -- add_repositories("hikyuu-repo https://gitee.com/fasiondog/hikyuu_extern_libs.git")
-if is_plat("windows") then
-    if get_config("hdf5") then
-        if is_mode("release") then
-            add_requires("hdf5 " .. hdf5_version)
-        else
-            add_requires("hdf5_d " .. hdf5_version)
-        end
-    end
-    if get_config("mysql") then
-        add_requires("mysql " .. mysql_version)
-    end
-
-elseif is_plat("linux", "cross") then
-    if get_config("hdf5") then
+ if get_config("hdf5") then
         add_requires("hdf5 " .. hdf5_version, { system = false })
-    end
-    if get_config("mysql") then
-        add_requires("mysql " .. mysql_version, { system = false })
-    end
-  
-elseif is_plat("macosx") then
-    if get_config("hdf5") then
-        add_requires("brew::hdf5", {alias = "hdf5"})
-    end
-    if get_config("mysql") then
-        add_requires("brew::mysql-client", {alias = "mysql"})
-    end
-end
+ end
+ if get_config("mysql") then
+     add_requires("mysql " .. mysql_version, { system = false })
+ end
 
 add_requires("boost " .. boost_version, {
   debug = is_mode("debug"),
@@ -172,9 +133,10 @@ add_requires("boost " .. boost_version, {
     multi = true,
     date_time = true,
     filesystem = false,
-    serialization = true,
+    serialization = get_config("serialize"),
     system = false,
     python = false,
+    cmake = false,
   },
 })
 
@@ -227,6 +189,10 @@ if is_plat("linux", "cross", "macosx") then
   add_cxflags("-ftemplate-depth=1023", "-pthread")
   add_shflags("-pthread")
   add_ldflags("-pthread")
+end
+
+if is_plat("macosx") then
+    add_cxflags("-Wno-deprecated-declarations")
 end
 
 -- if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then

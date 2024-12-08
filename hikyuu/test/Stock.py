@@ -36,12 +36,12 @@ class StockTest(unittest.TestCase):
 
         s1 = sm['sh000001']
         s2 = sm['sh000001']
-        self.assert_(s1 == s2)
-        self.assert_(not (s1 != s2))
+        self.assertTrue(s1 == s2)
+        self.assertTrue(not (s1 != s2))
 
         s2 = sm['sz000001']
-        self.assert_(not (s1 == s2))
-        self.assert_(s1 != s2)
+        self.assertTrue(not (s1 == s2))
+        self.assertTrue(s1 != s2)
 
     def test_pickle(self):
         if not constant.pickle_support:
@@ -79,7 +79,7 @@ class StockTest(unittest.TestCase):
 
         self.assertEqual(stk.valid, False)
         stk.valid = True
-        self.assert_(stk.valid)
+        self.assertTrue(stk.valid)
 
         self.assertNotEqual(stk.type, constant.STOCKTYPE_A)
         stk.type = constant.STOCKTYPE_A
@@ -113,14 +113,14 @@ class StockTest(unittest.TestCase):
         self.assertEqual(len(k), 1)
         self.assertEqual(k[0], KRecord(Datetime(20010101), 5.0, 9.0, 4.0, 6.5, 1000.0, 100000.0))
 
-        self.assert_(stk not in sm)
+        self.assertTrue(stk not in sm)
         sm.add_stock(stk)
-        self.assert_(stk in sm)
+        self.assertTrue(stk in sm)
         stk2 = sm['ab000001']
-        self.assert_(not stk2.is_null())
-        self.assert_(stk2, stk)
+        self.assertTrue(not stk2.is_null())
+        self.assertTrue(stk2, stk)
         sm.remove_stock("ab000001")
-        self.assert_(stk not in sm)
+        self.assertTrue(stk not in sm)
 
 
 def suite():

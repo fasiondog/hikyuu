@@ -17,6 +17,7 @@
 #define NOMINMAX
 #endif
 
+#include "config.h"
 #include <boost/config.hpp>
 
 #include <stdio.h>
@@ -28,8 +29,9 @@
 // #include <vector>
 #include <map>
 #include <unordered_map>
+#include <set>
+#include <unordered_set>
 
-#include "config.h"
 #include "utilities/Log.h"
 #include "utilities/osdef.h"
 #include "utilities/cppdef.h"

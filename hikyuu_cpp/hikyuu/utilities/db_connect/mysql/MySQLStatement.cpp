@@ -30,16 +30,7 @@ MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_sta
   m_meta_result(nullptr),
   m_needs_reset(false),
   m_has_bind_result(false) {
-    m_stmt = mysql_stmt_init(m_db);
-    HKU_CHECK(m_stmt != nullptr, "Failed mysql_stmt_init!");
-    int ret = mysql_stmt_prepare(m_stmt, sql_statement.c_str(), sql_statement.size());
-    if (ret != 0) {
-        std::string stmt_errorstr(mysql_stmt_error(m_stmt));
-        mysql_stmt_close(m_stmt);
-        m_stmt = nullptr;
-        SQL_THROW(ret, "Failed prepare sql statement: {}! error msg: {}!", sql_statement,
-                  stmt_errorstr);
-    }
+    _prepare(driver);
 
     auto param_count = mysql_stmt_param_count(m_stmt);
     if (param_count > 0) {
@@ -63,6 +54,37 @@ MySQLStatement::~MySQLStatement() {
         mysql_free_result(m_meta_result);
     }
     mysql_stmt_close(m_stmt);
+}
+
+void MySQLStatement::_prepare(DBConnectBase* driver) {
+    m_stmt = mysql_stmt_init(m_db);
+    HKU_CHECK(m_stmt, "Failed mysql_stmt_init!");
+
+    int ret = mysql_stmt_prepare(m_stmt, m_sql_string.c_str(), m_sql_string.size());
+    HKU_IF_RETURN(0 == ret, void());
+
+    mysql_stmt_close(m_stmt);
+    m_stmt = nullptr;
+
+    // 如果是服务器异常，尝试重连服务器
+    if (CR_SERVER_LOST == ret || CR_SERVER_GONE_ERROR == ret) {
+        if ((dynamic_cast<MySQLConnect*>(driver))->ping()) {
+            m_db = (dynamic_cast<MySQLConnect*>(driver))->m_mysql;
+        } else {
+            HKU_THROW("Failed reconnect mysql!");
+        }
+    } else if (CR_OUT_OF_MEMORY == ret) {
+        HKU_THROW("Out of memory!");
+    }
+
+    m_stmt = mysql_stmt_init(m_db);
+    ret = mysql_stmt_prepare(m_stmt, m_sql_string.c_str(), m_sql_string.size());
+    HKU_IF_RETURN(0 == ret, void());
+
+    std::string stmt_errorstr(mysql_stmt_error(m_stmt));
+    mysql_stmt_close(m_stmt);
+    m_stmt = nullptr;
+    HKU_THROW("Failed prepare statement: {}! error msg: {}!", m_sql_string, stmt_errorstr);
 }
 
 void MySQLStatement::_reset() {
@@ -295,13 +317,23 @@ void MySQLStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
     }
 
     try {
-        item = boost::any_cast<int64_t>(m_result_buffer[idx]);
-    } catch (...) {
-        try {
+        if (m_result_bind[idx].buffer_type == MYSQL_TYPE_LONGLONG) {
+            item = boost::any_cast<int64_t>(m_result_buffer[idx]);
+        } else if (m_result_bind[idx].buffer_type == MYSQL_TYPE_LONG) {
             item = boost::any_cast<int32_t>(m_result_buffer[idx]);
-        } catch (...) {
+        } else if (m_result_bind[idx].buffer_type == MYSQL_TYPE_TINY) {
+            item = boost::any_cast<int8_t>(m_result_buffer[idx]);
+        } else if (m_result_bind[idx].buffer_type == MYSQL_TYPE_SHORT) {
+            item = boost::any_cast<short>(m_result_buffer[idx]);
+        } else {
             HKU_THROW("Field type mismatch! idx: {}", idx);
         }
+    } catch (const hku::exception&) {
+        throw;
+    } catch (const std::exception& e) {
+        HKU_THROW("Failed get column idx: {}! {}", idx, e.what());
+    } catch (...) {
+        HKU_THROW("Failed get columon idx: {}! Unknown error!", idx);
     }
 }
 
@@ -317,13 +349,19 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
     }
 
     try {
-        item = boost::any_cast<double>(m_result_buffer[idx]);
-    } catch (...) {
-        try {
+        if (m_result_bind[idx].buffer_type == MYSQL_TYPE_DOUBLE) {
+            item = boost::any_cast<double>(m_result_buffer[idx]);
+        } else if (m_result_bind[idx].buffer_type == MYSQL_TYPE_FLOAT) {
             item = boost::any_cast<float>(m_result_buffer[idx]);
-        } catch (...) {
+        } else {
             HKU_THROW("Field type mismatch! idx: {}", idx);
         }
+    } catch (const hku::exception&) {
+        throw;
+    } catch (const std::exception& e) {
+        HKU_THROW("Failed get column idx: {}! {}", idx, e.what());
+    } catch (...) {
+        HKU_THROW("Failed get columon idx: {}! Unknown error!", idx);
     }
 }
 

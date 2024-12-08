@@ -123,22 +123,17 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
+        kind = "shared" if mode == 'release' and sys.platform != 'darwin' else "static"
         cmd = "xmake f {} -c -y -m {} --feedback={} -k {} --low_precision={} --log_level={}".format(
-            "-v -D" if verbose else "", mode, feedback, "shared" if mode == 'release' else "static", low_precision,
+            "-v -D" if verbose else "", mode, feedback, kind, low_precision,
             2 if mode == 'release' else 0)
         print(cmd)
         os.system(cmd)
 
-    if mode == "release":
-        cmd = "xmake -j {} -b {} core".format(worker_num,
-                                              "-v -D" if verbose else "")
-        print(cmd)
-        os.system(cmd)
-    else:
-        cmd = "xmake -j {} -b {} hikyuu".format(worker_num,
-                                                "-v -D" if verbose else "")
-        print(cmd)
-        os.system(cmd)
+    cmd = "xmake -j {} -b {} core".format(worker_num,
+                                          "-v -D" if verbose else "")
+    print(cmd)
+    os.system(cmd)
 
     # 保存当前的编译信息
     save_current_compile_info(current_compile_info)
@@ -340,10 +335,12 @@ def install(j, o, low_precision):
               default=False,
               type=bool,
               help='使用低精度版本')
-def wheel(feedback, j, low_precision):
+@click.option('-c', '--clear', is_flag=False, help='先清除之前编译结果')
+def wheel(feedback, j, low_precision, clear):
     """ 生成 python 的 wheel 安装包 """
     # 清理之前遗留的打包产物
-    clear_build()
+    if clear:
+        clear_build()
 
     # 尝试编译
     start_build(False, 'release', feedback, j, low_precision)
@@ -363,10 +360,12 @@ def wheel(feedback, j, low_precision):
         plat = f"manylinux1_{cpu_arch}"
     elif current_plat == 'linux' and current_bits == 32:
         plat = f"manylinux1_{cpu_arch}"
-    elif current_plat == 'darwin' and current_bits == 32:
+    elif current_plat == 'darwin' and cpu_arch != 'arm64' and current_bits == 32:
         plat = "macosx_i686"
-    elif current_plat == 'darwin' and current_bits == 64:
-        plat = "macosx_10_9_x86_64"
+    elif current_plat == 'darwin' and cpu_arch != 'arm64' and current_bits == 64:
+        plat = "macosx_x86_64"
+    elif current_plat == 'darwin' and cpu_arch == 'arm64':
+        plat = "macosx_11_1_arm64"
     else:
         print("*********尚未实现该平台的支持*******")
         return
@@ -377,8 +376,7 @@ def wheel(feedback, j, low_precision):
     py_version = get_python_version()
     main_ver, min_ver = py_version.split('.')
     if current_plat == 'win32':
-        cmd = 'python sub_setup.py bdist_wheel --python-tag cp{}{} -p {}'.format(
-            main_ver, min_ver, plat)
+        cmd = 'python sub_setup.py bdist_wheel -p {}'.format(plat)
         print(cmd)
         os.system(cmd)
     else:

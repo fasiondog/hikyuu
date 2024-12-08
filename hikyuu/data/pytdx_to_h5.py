@@ -287,7 +287,7 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
                 if ktype != 'DAY':
                     bar_datetime += bar['hour'] * 100 + bar['minute']
             except Exception as e:
-                hku_error("Failed translate datetime: {}! {}".format(bar, e))
+                hku_error("Failed translate datetime: {}, from {}! {}".format(bar, api.ip, e))
                 continue
 
             if today_datetime >= bar_datetime > last_datetime \

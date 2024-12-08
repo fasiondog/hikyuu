@@ -2,10 +2,10 @@
 # -*- coding: utf8 -*-
 # cp936
 
-#===============================================================================
+# ===============================================================================
 # 作者：fasiondog
 # 历史：1）20120927, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 import unittest
 
@@ -24,16 +24,16 @@ class DatetimeTest(unittest.TestCase):
         self.assertEqual(Datetime(140001010000), Datetime.min())
         self.assertEqual(Datetime(999912310000), Datetime.max())
 
-        self.assert_(d == Datetime(201209272301))
-        self.assert_(d != Datetime(200101010000))
-        self.assert_(d >= Datetime(201209272301))
-        self.assert_(d >= Datetime(201209272259))
-        self.assert_(d <= Datetime(201209272301))
-        self.assert_(d <= Datetime(201209272302))
-        self.assert_(not (d > Datetime(201209272301)))
-        self.assert_(d > Datetime(201209272259))
-        self.assert_(not (d < Datetime(201209272301)))
-        self.assert_(d < Datetime(201209272302))
+        self.assertEqual(d, Datetime(201209272301))
+        self.assertNotEqual(d, Datetime(200101010000))
+        self.assertGreaterEqual(d, Datetime(201209272301))
+        self.assertTrue(d >= Datetime(201209272259))
+        self.assertTrue(d <= Datetime(201209272301))
+        self.assertTrue(d <= Datetime(201209272302))
+        self.assertTrue(not (d > Datetime(201209272301)))
+        self.assertTrue(d > Datetime(201209272259))
+        self.assertTrue(not (d < Datetime(201209272301)))
+        self.assertTrue(d < Datetime(201209272302))
 
         d = Datetime(200101010159)
         self.assertEqual(str(d), "2001-01-01 01:59:00")

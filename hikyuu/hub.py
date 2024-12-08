@@ -206,7 +206,7 @@ class HubManager(metaclass=SingletonType):
         # 检查并下载 hikyuu 默认策略仓库, hikyuu_hub 避免导入时模块和 hikyuu 重名
         hikyuu_hub_path = self._session.query(HubModel.local).filter(HubModel.name == 'default').first()
         if hikyuu_hub_path is None:
-            self.add_remote_hub('default', 'https://gitee.com/fasiondog/hikyuu_hub.git', 'master')
+            self.add_remote_hub('default', 'https://gitee.com/fasiondog/hikyuu_hub.git', 'main')
 
     def download_remote_hub(self, local_dir, url, branch):
         print('正在下载 hikyuu 策略仓库至："{}"'.format(local_dir))
@@ -222,7 +222,7 @@ class HubManager(metaclass=SingletonType):
         print('下载完毕')
 
     @dbsession
-    def add_remote_hub(self, name, url, branch='master'):
+    def add_remote_hub(self, name, url, branch='main'):
         """增加远程策略仓库
 
         :param str name: 本地仓库名称（自行起名）
@@ -502,7 +502,7 @@ class HubManager(metaclass=SingletonType):
         return hub_model.name
 
 
-def add_remote_hub(name, url, branch='master'):
+def add_remote_hub(name, url, branch='main'):
     """增加远程策略仓库
 
     :param str name: 本地仓库名称（自行起名）

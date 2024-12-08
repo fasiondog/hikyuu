@@ -24,7 +24,7 @@ class HKUImportDataCMD:
         return os.path.expanduser('~') + '/.hikyuu'
 
     def getCurrentConfig(self):
-        #读取保存的配置文件信息，如果不存在，则使用默认配置
+        # 读取保存的配置文件信息，如果不存在，则使用默认配置
         this_dir = self.getUserConfigDir()
         import_config = ConfigParser()
         import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
@@ -115,18 +115,26 @@ class HKUImportDataCMD:
 
     def start_import_data(self):
         config = self.getCurrentConfig()
-        dest_dir = config.get('hdf5', 'dir')
-        if not os.path.exists(dest_dir) or not os.path.isdir(dest_dir):
-            print("错误:", '指定的目标数据存放目录不存在！')
-            sys.exit(-1)
-            #return
+        if config.getboolean('hdf5', 'enable'):
+            if not os.path.lexists(config['hdf5']['dir']):
+                os.makedirs(f"{config['hdf5']['dir']}/tmp")
+            elif not os.path.isdir(config['hdf5']['dir']):
+                print("错误", '指定的目标数据存放目录不存在！')
+                sys.exit(-1)
 
-        if config.getboolean('tdx', 'enable') \
-            and (not os.path.exists(config['tdx']['dir']
-                 or os.path.isdir(config['tdx']['dir']))):
-            print("错误:", "请确认通达信安装目录是否正确！")
-            sys.exit(-1)
-            #return
+        if config.getboolean('tdx', 'enable'):
+            if not os.path.lexists(config['tdx']['dir']):
+                os.makedirs(f"{config['tdx']['dir']}/tmp")
+            elif not os.path.isdir(config['tdx']['dir']):
+                print("错误", "请确认通达信安装目录是否正确！")
+                sys.exit(-1)
+
+        if config.getboolean('mysql', 'enable'):
+            if not os.path.lexists(config['mysql']['tmpdir']):
+                os.makedirs(config['mysql']['tmpdir'])
+            elif not os.path.isdir(config['mysql']['tmpdir']):
+                print("错误", "请确认临时目录是否正确！")
+                sys.exit(-1)
 
         self.import_running = True
 

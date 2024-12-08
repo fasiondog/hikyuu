@@ -254,7 +254,7 @@ StockManager/Block/Stock
 
     .. py:method:: remove_stock(self, market_code)
 
-        从 sm 中移除 market_code 代表的证券，谨慎使用！！！通常用于移除临时增加的外布 Stock
+        从 sm 中移除 market_code 代表的证券，谨慎使用！！！通常用于移除临时增加的外部 Stock
 
         :param str market_code: 证券市场标识
 

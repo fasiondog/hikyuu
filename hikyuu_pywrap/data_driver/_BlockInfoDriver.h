@@ -37,4 +37,12 @@ public:
         auto py_list = self.attr("_getBlockList")(py::none());
         return python_list_to_vector<Block>(py_list);
     }
+
+    void save(const Block& block) override {
+        PYBIND11_OVERLOAD_PURE(void, BlockInfoDriver, save, block);
+    }
+
+    void remove(const string& category, const string& name) override {
+        PYBIND11_OVERLOAD_PURE(void, BlockInfoDriver, remove, category, name);
+    }
 };

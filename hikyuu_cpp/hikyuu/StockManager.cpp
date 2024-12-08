@@ -298,6 +298,20 @@ Block StockManager::getBlock(const string& category, const string& name) {
     return m_blockDriver ? m_blockDriver->getBlock(category, name) : Block();
 }
 
+void StockManager::saveBlock(const Block& blk) {
+    if (m_blockDriver) {
+        HKU_CHECK(!blk.category().empty(), "block's category can not be empty!");
+        HKU_CHECK(!blk.name().empty(), "block's name can not be empty!");
+        HKU_CHECK(!blk.empty(), "Can't save empty block!");
+        m_blockDriver->save(blk);
+    }
+}
+void StockManager::removeBlock(const string& category, const string& name) {
+    if (m_blockDriver) {
+        m_blockDriver->remove(category, name);
+    }
+}
+
 BlockList StockManager::getBlockList(const string& category) {
     return m_blockDriver ? m_blockDriver->getBlockList(category) : BlockList();
 }

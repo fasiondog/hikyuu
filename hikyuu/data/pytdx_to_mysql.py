@@ -335,7 +335,8 @@ def import_one_stock_data(
                 bar_datetime = (tmp.year * 10000 + tmp.month * 100 + tmp.day) * 10000
                 if ktype != "DAY":
                     bar_datetime += bar["hour"] * 100 + bar["minute"]
-            except:
+            except Exception as e:
+                hku_error("Failed translate datetime: {}, from {}! {}".format(bar, api.ip, e))
                 continue
 
             if (

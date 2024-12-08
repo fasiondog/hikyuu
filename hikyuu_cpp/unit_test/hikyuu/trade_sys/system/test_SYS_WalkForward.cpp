@@ -33,7 +33,7 @@ static SYSPtr create_test_sys(int fast_n, int slow_n) {
 }
 
 /** @par 检测点 */
-TEST_CASE("test_SYS_WalkForword") {
+TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_not_parallel") {
     Stock stk = getStock("sz000001");
     KQuery query = KQueryByIndex(-50);
     TMPtr tm = crtTM();
@@ -49,11 +49,12 @@ TEST_CASE("test_SYS_WalkForword") {
     auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20);
     CHECK_THROWS(sys->run(query));
 
-    /** @arg 只有一个候选系统 */
-    sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20);
+    /** @arg 只有一个候选系统, 使用 SE_MaxFundsOptimal */
+    auto se = SE_MaxFundsOptimal();
+    sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20, se);
     CHECK_EQ(sys->name(), "SYS_WalkForward");
     query = KQueryByIndex(-125);
-    // sys->setParam<bool>("trace", true);
+    sys->setParam<bool>("parallel", false);
     sys->run(stk, query);
 
     auto delay_request = sys->getBuyTradeRequest();
@@ -71,7 +72,7 @@ TEST_CASE("test_SYS_WalkForword") {
         CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
     }
 
-    /** @arg 多个后续系统 */
+    /** @arg 多个候选系统， 使用 SE_MaxFundsOptimal */
     vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
     SystemList sys_list;
     for (const auto& param : params) {
@@ -79,9 +80,183 @@ TEST_CASE("test_SYS_WalkForword") {
     }
     tm->reset();
     REQUIRE(tm->getTradeList().size() == 1);
-    sys = SYS_WalkForward(sys_list, tm, 30, 20);
+    sys = SYS_WalkForward(sys_list, tm, 30, 20, se);
     query = KQueryByIndex(-125);
-    // sys->setParam<bool>("trace", true);
+    sys->setParam<bool>("parallel", false);
+    sys->run(stk, query);
+
+    delay_request = sys->getBuyTradeRequest();
+    CHECK_UNARY(delay_request.valid);
+    CHECK_EQ(delay_request.business, BUSINESS_BUY);
+    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+
+    tm = sys->getTM();
+    CHECK_EQ(tm->currentCash(), 98286.0);
+
+    tr_list1 = tm->getTradeList();
+    tr_list2 = sys->getTradeRecordList();
+    CHECK_EQ(tr_list1.size(), tr_list2.size() + 1);
+    for (size_t i = 0, total = tr_list2.size(); i < total; i++) {
+        CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_parallel") {
+    Stock stk = getStock("sz000001");
+    KQuery query = KQueryByIndex(-50);
+    TMPtr tm = crtTM();
+
+    /** @arg 只有一个候选系统, 使用 SE_MaxFundsOptimal */
+    auto se = SE_MaxFundsOptimal();
+    auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20, se);
+    CHECK_EQ(sys->name(), "SYS_WalkForward");
+    query = KQueryByIndex(-125);
+    sys->setParam<bool>("parallel", true);
+    sys->run(stk, query);
+
+    auto delay_request = sys->getBuyTradeRequest();
+    CHECK_UNARY(delay_request.valid);
+    CHECK_EQ(delay_request.business, BUSINESS_BUY);
+    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+
+    tm = sys->getTM();
+    CHECK_EQ(tm->currentCash(), 99328.0);
+
+    auto tr_list1 = tm->getTradeList();
+    auto tr_list2 = sys->getTradeRecordList();
+    CHECK_EQ(tr_list1.size(), tr_list2.size() + 1);
+    for (size_t i = 0, total = tr_list2.size(); i < total; i++) {
+        CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
+    }
+
+    /** @arg 多个候选系统， 使用 SE_MaxFundsOptimal */
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    SystemList sys_list;
+    for (const auto& param : params) {
+        sys_list.emplace_back(create_test_sys(param.first, param.second));
+    }
+    tm->reset();
+    REQUIRE(tm->getTradeList().size() == 1);
+    sys = SYS_WalkForward(sys_list, tm, 30, 20, se);
+    query = KQueryByIndex(-125);
+    sys->setParam<bool>("parallel", true);
+    sys->run(stk, query);
+
+    delay_request = sys->getBuyTradeRequest();
+    CHECK_UNARY(delay_request.valid);
+    CHECK_EQ(delay_request.business, BUSINESS_BUY);
+    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+
+    tm = sys->getTM();
+    CHECK_EQ(tm->currentCash(), 98286.0);
+
+    tr_list1 = tm->getTradeList();
+    tr_list2 = sys->getTradeRecordList();
+    CHECK_EQ(tr_list1.size(), tr_list2.size() + 1);
+    for (size_t i = 0, total = tr_list2.size(); i < total; i++) {
+        CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_not_parallel") {
+    Stock stk = getStock("sz000001");
+    KQuery query = KQueryByIndex(-50);
+    TMPtr tm = crtTM();
+
+    /** @arg 只有一个候选系统, 使用 SE_MaxFundsOptimal */
+    auto se = SE_PerformanceOptimal("当前总资产");
+    auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20, se);
+    CHECK_EQ(sys->name(), "SYS_WalkForward");
+    query = KQueryByIndex(-125);
+    sys->setParam<bool>("parallel", false);
+    sys->run(stk, query);
+
+    auto delay_request = sys->getBuyTradeRequest();
+    CHECK_UNARY(delay_request.valid);
+    CHECK_EQ(delay_request.business, BUSINESS_BUY);
+    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+
+    tm = sys->getTM();
+    CHECK_EQ(tm->currentCash(), 99328.0);
+
+    auto tr_list1 = tm->getTradeList();
+    auto tr_list2 = sys->getTradeRecordList();
+    CHECK_EQ(tr_list1.size(), tr_list2.size() + 1);
+    for (size_t i = 0, total = tr_list2.size(); i < total; i++) {
+        CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
+    }
+
+    /** @arg 多个候选系统， 使用 SE_MaxFundsOptimal */
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    SystemList sys_list;
+    for (const auto& param : params) {
+        sys_list.emplace_back(create_test_sys(param.first, param.second));
+    }
+    tm->reset();
+    REQUIRE(tm->getTradeList().size() == 1);
+    sys = SYS_WalkForward(sys_list, tm, 30, 20, se);
+    query = KQueryByIndex(-125);
+    sys->setParam<bool>("parallel", false);
+    sys->run(stk, query);
+
+    delay_request = sys->getBuyTradeRequest();
+    CHECK_UNARY(delay_request.valid);
+    CHECK_EQ(delay_request.business, BUSINESS_BUY);
+    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+
+    tm = sys->getTM();
+    CHECK_EQ(tm->currentCash(), 98286.0);
+
+    tr_list1 = tm->getTradeList();
+    tr_list2 = sys->getTradeRecordList();
+    CHECK_EQ(tr_list1.size(), tr_list2.size() + 1);
+    for (size_t i = 0, total = tr_list2.size(); i < total; i++) {
+        CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_parallel") {
+    Stock stk = getStock("sz000001");
+    KQuery query = KQueryByIndex(-50);
+    TMPtr tm = crtTM();
+
+    /** @arg 只有一个候选系统, 使用 SE_MaxFundsOptimal */
+    auto se = SE_PerformanceOptimal("当前总资产");
+    auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20, se);
+    CHECK_EQ(sys->name(), "SYS_WalkForward");
+    query = KQueryByIndex(-125);
+    sys->setParam<bool>("parallel", true);
+    sys->run(stk, query);
+
+    auto delay_request = sys->getBuyTradeRequest();
+    CHECK_UNARY(delay_request.valid);
+    CHECK_EQ(delay_request.business, BUSINESS_BUY);
+    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+
+    tm = sys->getTM();
+    CHECK_EQ(tm->currentCash(), 99328.0);
+
+    auto tr_list1 = tm->getTradeList();
+    auto tr_list2 = sys->getTradeRecordList();
+    CHECK_EQ(tr_list1.size(), tr_list2.size() + 1);
+    for (size_t i = 0, total = tr_list2.size(); i < total; i++) {
+        CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
+    }
+
+    /** @arg 多个候选系统， 使用 SE_MaxFundsOptimal */
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    SystemList sys_list;
+    for (const auto& param : params) {
+        sys_list.emplace_back(create_test_sys(param.first, param.second));
+    }
+    tm->reset();
+    REQUIRE(tm->getTradeList().size() == 1);
+    sys = SYS_WalkForward(sys_list, tm, 30, 20, se);
+    query = KQueryByIndex(-125);
+    sys->setParam<bool>("parallel", true);
     sys->run(stk, query);
 
     delay_request = sys->getBuyTradeRequest();

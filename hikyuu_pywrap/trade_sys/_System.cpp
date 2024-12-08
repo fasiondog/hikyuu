@@ -274,7 +274,7 @@ void export_System(py::module& m) {
           SystemList sys_list = python_list_to_vector<SystemPtr>(candidate_sys_list);
           SelectorPtr c_se = se;
           if (!c_se) {
-              c_se = SE_MaxFundsOptimal();
+              c_se = SE_PerformanceOptimal();
           }
           return SYS_WalkForward(sys_list, tm, train_len, test_len, c_se, train_tm);
       },
@@ -283,12 +283,12 @@ void export_System(py::module& m) {
       py::arg("train_tm") = TradeManagerPtr(),
       R"(SYS_WalkForward(sys_list, tm, train_len, test_len, train_tm)
 
-  创建滚动寻优系统，当输入的后续系统列表中仅有一个候选系统时，即为滚动系统
+  创建滚动寻优系统，当输入的候选系统列表中仅有一个候选系统时，即为滚动系统
 
-  :param sequence sys_list: 后续系统列表
+  :param sequence sys_list: 候选系统列表
   :param TradeManager tm: 交易账户
   :param int train_len: 滚动评估系统绩效时使用的数据长度
   :param int test_len: 使用在 train_len 中选出的最优系统执行的数据长度
-  :param SelectorBase se: 寻优选择器
+  :param SelectorBase se: 寻优选择器，默认为按“帐户平均年收益率%”最大选择
   :param TradeManager train_tm: 滚动评估时使用的交易账户, 为None时, 使用 tm 的拷贝进行评估)");
 }

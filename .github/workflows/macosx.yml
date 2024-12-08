@@ -1,4 +1,4 @@
-name: macOS_arm64
+name: macosx-build
 
 on:
   push:
@@ -14,8 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-14]
-        arch: [arm64]
-        kind: [shared]
+        arch: [arm64, x86_64]
+        kind: [static]
 
     runs-on: ${{ matrix.os }}
 
@@ -46,8 +46,22 @@ jobs:
 
       - name: config
         run: |
-          xmake f -c -k ${{ matrix.kind }} -y -vD --mysql=n --hdf5=n
+          xmake f -c -k ${{ matrix.kind }} -y -vD --feedback=n
 
-      - name: build
+      - name: build python
         run: |
-          xmake -b core
+          xmake -b core   
+          
+      - name: test python
+        run: |
+          export PYTHONPATH=.
+          pip install -r requirements.txt
+          python hikyuu/test/test.py
+
+      - name: build test
+        run: |
+          xmake -b small-test
+    
+      - name: test
+        run: |
+          xmake r small-test

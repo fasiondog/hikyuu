@@ -57,6 +57,8 @@ PYBIND11_MODULE(core310, m) {
 PYBIND11_MODULE(core311, m) {
 #elif PY_MINOR_VERSION == 12
 PYBIND11_MODULE(core312, m) {
+#elif PY_MINOR_VERSION == 13
+PYBIND11_MODULE(core313, m) {
 #else
 PYBIND11_MODULE(core, m) {
 #endif

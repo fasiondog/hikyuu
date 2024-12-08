@@ -3,7 +3,7 @@ target("hikyuu")
     set_kind("$(kind)")
 
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json")
-    if is_plat("windows", "linux", "cross") then
+    if is_plat("windows", "linux", "cross", "macosx") then
         if get_config("sqlite") or get_config("hdf5") then
             add_packages("sqlite3")
         end
@@ -12,6 +12,7 @@ target("hikyuu")
         add_packages("gzip-hpp")
     end    
 
+    add_options("mysql")
     add_includedirs("..")
 
     -- set version for release
@@ -34,43 +35,26 @@ target("hikyuu")
         add_cxflags("-Wno-sign-compare", "-Wno-missing-braces")
     end
 
+    if get_config("hdf5") then
+        add_packages("hdf5")
+    end
+    if get_config("mysql") then
+        add_packages("mysql")
+    end
+
     if is_plat("windows") then
         if is_kind("shared") then
             add_defines("HKU_API=__declspec(dllexport)")
             add_defines("HKU_UTILS_API=__declspec(dllexport)")
         end
-        if get_config("hdf5") then
-            if is_mode("release") then
-                add_packages("hdf5")
-            else
-                add_packages("hdf5_d")
-            end
-        end
-        if get_config("mysql") then
-            add_packages("mysql")
-        end
     end
 
     if is_plat("linux", "cross") then
         add_cxflags("-fPIC")
-        if get_config("hdf5") then
-            add_packages("hdf5")
-        end
-        if get_config("mysql") then
-            add_packages("mysql")
-        end
     end
 
     if is_plat("macosx") then
         add_links("iconv", "sqlite3")
-        if get_config("mysql") then
-            add_packages("mysqlclient")
-        end
-        if get_config("hdf5") then
-            add_includedirs("/usr/local/opt/hdf5/include")
-            add_linkdirs("/usr/local/opt/hdf5/lib")
-            add_links("hdf5", "hdf5_cpp")
-        end
     end
 
     add_headerfiles("../(hikyuu/**.h)|**doc.h")

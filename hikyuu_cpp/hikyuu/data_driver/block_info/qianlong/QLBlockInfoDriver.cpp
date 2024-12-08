@@ -189,4 +189,12 @@ BlockList QLBlockInfoDriver::getBlockList() {
     return result;
 }
 
+void QLBlockInfoDriver::save(const Block& block) {
+    HKU_THROW("Not support save block info! You can use ini file to do it!");
+}
+
+void QLBlockInfoDriver::remove(const string& category, const string& name) {
+    HKU_THROW("Not support save block info! You can use ini file to do it!");
+}
+
 } /* namespace hku */
