@@ -1935,4 +1935,7 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind: 指定指标
     :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
     :rtype: Indicator)");
+
+    m.def("WMA", py::overload_cast<int>(WMA), py::arg("n"));
+    m.def("WMA", py::overload_cast<const Indicator&, int>(WMA), py::arg("ind"), py::arg("n"));
 }
