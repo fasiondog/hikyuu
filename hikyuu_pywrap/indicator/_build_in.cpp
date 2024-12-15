@@ -97,6 +97,12 @@ Indicator (*MA_3)(const Indicator&, const IndParam&) = MA;
 Indicator (*MA_4)(const Indicator&, const Indicator&) = MA;
 Indicator (*MA_5)(const Indicator&, int) = MA;
 
+Indicator (*WMA_1)(int) = WMA;
+Indicator (*WMA_2)(const IndParam&) = WMA;
+Indicator (*WMA_3)(const Indicator&, const IndParam&) = WMA;
+Indicator (*WMA_4)(const Indicator&, const Indicator&) = WMA;
+Indicator (*WMA_5)(const Indicator&, int) = WMA;
+
 Indicator (*SMA_1)(int, double) = SMA;
 Indicator (*SMA_2)(int, const IndParam&) = SMA;
 Indicator (*SMA_3)(const IndParam&, double) = SMA;
@@ -724,6 +730,18 @@ void export_Indicator_build_in(py::module& m) {
     m.def("MA", MA_5, py::arg("data"), py::arg("n") = 22, R"(MA([data, n=22])
 
     简单移动平均
+
+    :param Indicator data: 输入数据
+    :param int|Indicator|IndParam n: 时间窗口
+    :rtype: Indicator)");
+
+    m.def("WMA", WMA_1, py::arg("n") = 22);
+    m.def("WMA", WMA_2, py::arg("n"));
+    m.def("WMA", WMA_3, py::arg("data"), py::arg("n"));
+    m.def("WMA", WMA_4, py::arg("data"), py::arg("n"));
+    m.def("WMA", WMA_5, py::arg("data"), py::arg("n") = 22, R"(WMA([data, n=22])
+
+    加权移动平均，算法:Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)
 
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
@@ -1935,7 +1953,4 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind: 指定指标
     :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
     :rtype: Indicator)");
-
-    m.def("WMA", py::overload_cast<int>(WMA), py::arg("n"));
-    m.def("WMA", py::overload_cast<const Indicator&, int>(WMA), py::arg("ind"), py::arg("n"));
 }

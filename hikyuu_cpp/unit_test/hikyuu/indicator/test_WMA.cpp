@@ -78,15 +78,14 @@ TEST_CASE("test_WMA") {
     CHECK_EQ(result[9], doctest::Approx(6.).epsilon(0.0001));
 }
 
-#if 0
 /** @par 检测点 */
-TEST_CASE("test_SUM_dyn") {
+TEST_CASE("test_WMA_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
     // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
     Indicator c = CLOSE(kdata);
-    Indicator expect = SUM(c, 10);
-    Indicator result = SUM(c, CVAL(c, 10));
+    Indicator expect = WMA(c, 10);
+    Indicator result = WMA(c, CVAL(c, 10));
     CHECK_EQ(expect.size(), result.size());
     CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.discard(); i++) {
@@ -96,18 +95,7 @@ TEST_CASE("test_SUM_dyn") {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 
-    result = SUM(c, IndParam(CVAL(c, 10)));
-    CHECK_EQ(expect.size(), result.size());
-    CHECK_EQ(expect.discard(), result.discard());
-    for (size_t i = 0; i < result.discard(); i++) {
-        CHECK_UNARY(std::isnan(result[i]));
-    }
-    for (size_t i = expect.discard(); i < expect.size(); i++) {
-        CHECK_EQ(expect[i], doctest::Approx(result[i]));
-    }
-
-    expect = SUM(c, 0);
-    result = SUM(c, CVAL(c, 0));
+    result = WMA(c, IndParam(CVAL(c, 10)));
     CHECK_EQ(expect.size(), result.size());
     CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.discard(); i++) {
@@ -117,7 +105,6 @@ TEST_CASE("test_SUM_dyn") {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 }
-#endif
 
 //-----------------------------------------------------------------------------
 // test export
