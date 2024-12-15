@@ -1446,13 +1446,19 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(0 == total || m_discard >= total, void());
 
+    const value_t *param_data = ind_param->data();
+
     static const size_t minCircleLength = 400;
     size_t workerNum = ms_tg->worker_num();
     if (total < minCircleLength || isSerial() || workerNum == 1) {
         // HKU_INFO("single_thread");
         for (size_t i = ind.discard(); i < total; i++) {
-            size_t step = size_t(ind_param->get(i));
-            _dyn_run_one_step(ind, i, step);
+            if (std::isnan(param_data[i])) {
+                _set(Null<value_t>(), i);
+            } else {
+                size_t step = size_t(param_data[i]);
+                _dyn_run_one_step(ind, i, step);
+            }
         }
         _update_discard();
         return;
@@ -1471,14 +1477,18 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
         if (first >= total) {
             break;
         }
-        tasks.push_back(ms_tg->submit([=, &ind, &ind_param]() {
+        tasks.push_back(ms_tg->submit([=, &ind]() {
             size_t endPos = first + circleLength;
             if (endPos > total) {
                 endPos = total;
             }
             for (size_t i = circleLength * group; i < endPos; i++) {
-                size_t step = size_t(ind_param->get(i));
-                _dyn_run_one_step(ind, i, step);
+                if (std::isnan(param_data[i])) {
+                    _set(Null<value_t>(), i);
+                } else {
+                    size_t step = size_t(param_data[i]);
+                    _dyn_run_one_step(ind, i, step);
+                }
             }
         }));
     }
