@@ -39,7 +39,7 @@ from .drawplot import (use_draw_engine,
                        ax_draw_macd2,
                        gca,
                        gcf)
-from .drawplot import (STICKLINE)
+from .drawplot import (STICKLINE, DRAWBAND)
 
 from . import volume as vl
 from . import elder as el
@@ -57,5 +57,6 @@ __all__ = [
     'ax_draw_macd2',
     'gcf', 'gca',
     'show_gcf',
-    'STICKLINE'
+    'STICKLINE',
+    'DRAWBAND'
 ]

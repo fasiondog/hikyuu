@@ -63,7 +63,7 @@ def create_two_axes_figure(figsize=(10, 8)):
     """生成一个含有2个坐标轴的figure，并返回坐标轴列表
 
     :param figsize: (宽, 高)
-    :return: (ax1, ax2)    
+    :return: (ax1, ax2)
     """
     rect1 = [0.05, 0.35, 0.9, 0.60]
     rect2 = [0.05, 0.05, 0.9, 0.30]
@@ -854,7 +854,7 @@ def STICKLINE(cond: Indicator, price1: Indicator, price2: Indicator, width: int 
         width (int, optional): 柱状宽度. Defaults to 2.0.
         empty (bool, optional): 空心. Defaults to False.
         kdata (_type_, optional): 指定的上下文K线. Defaults to None.
-        new (bool, optional): 是否在新窗口中绘制. Defaults to False.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
         axes (_type_, optional): 在指定的坐标轴中绘制. Defaults to None.
         color (str, optional): 颜色. Defaults to 'm'.
         alpha (float, optional): 透明度. Defaults to 1.0.
@@ -884,3 +884,49 @@ def STICKLINE(cond: Indicator, price1: Indicator, price2: Indicator, width: int 
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(cond) + 1)
+
+
+def DRAWBAND(val1: Indicator, color1='m', val2: Indicator = None, color2='b', kdata=None, alpha=0.2, new=False, axes=None, linestyle='-'):
+    """画出带状线
+
+    用法:DRAWBAND(val1, color1, val2, color2), 当 val1 > val2 时,在 val1 和 val2 之间填充 color1;
+    当 val1 < val2 时,填充 color2,这里的颜色均使用 matplotlib 颜色代码.
+    例如:DRAWBAND(OPEN, 'r', CLOSE, 'b')
+
+    Args:
+        val1 (Indicator): 指标1
+        color1 (str, optional): 颜色1. Defaults to 'm'.
+        val2 (Indicator, optional): 指标2. Defaults to None.
+        color2 (str, optional): 颜色2. Defaults to 'b'.
+        kdata (_type_, optional): 指定指标上下文. Defaults to None.
+        alpha (float, optional): 透明度. Defaults to 0.2.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 在指定的坐标轴中绘制. Defaults to None.
+        linestyle (str, optional): 包络线类型. Defaults to '-'.
+    """
+    hku_check(val1 is not None, "val1 cannot be None")
+
+    if kdata is not None:
+        val1 = val1(kdata)
+        if val2 is not None:
+            val2 = val2(kdata)
+
+    if val2 is None:
+        val2 = CVAL(val1, 0.)
+
+    hku_check(len(val1) == len(val2), "val1, val2 length not match")
+    hku_warn_if(len(val1) <= 0, "val1, val2 length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    cond = IF(val1 <= val2, val1, val2)
+    axes.fill_between(range(cond.discard, len(val1)), val1[cond.discard:], cond[cond.discard:], alpha=alpha,
+                      color=color1, facecolor=color1, edgecolor=color1, linestyle=linestyle)
+
+    cond = IF(val1 > val2, val1, val2)
+    axes.fill_between(range(cond.discard, len(val1)), val1[cond.discard:], cond[cond.discard:], alpha=alpha,
+                      color=color2, facecolor=color2, edgecolor=color2, linestyle=linestyle)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(val1) + 1)
