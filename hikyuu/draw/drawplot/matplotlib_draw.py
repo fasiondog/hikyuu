@@ -15,6 +15,7 @@ from matplotlib.lines import Line2D, TICKLEFT, TICKRIGHT
 from matplotlib.ticker import FuncFormatter, FixedLocator
 
 from hikyuu import *
+from hikyuu import constant, Indicator, KData, IF
 
 from .common import get_draw_title
 
@@ -935,3 +936,30 @@ def DRAWBAND(val1: Indicator, color1='m', val2: Indicator = None, color2='b', kd
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(val1) + 1)
+
+
+def PLOYLINE(cond: Indicator, price: Indicator, kdata: KData = None, color: str = 'b', linewidth=1.0, new=False, axes=None, *args, **kwargs):
+    """在图形上绘制折线段。
+
+    用法：PLOYLINE(COND，PRICE)，当COND条件满足时，以PRICE位置为顶点画折线连接。
+    例如：PLOYLINE(HIGH>=HHV(HIGH,20),HIGH, kdata=k)表示在创20天新高点之间画折线。
+
+    Args:
+        cond (Indicator): 指定条件
+        price (Indicator): 位置
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 颜色. Defaults to 'b'.
+        linewidth (float, optional): 宽度. Defaults to 1.0.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的axes. Defaults to None.
+    """
+    hku_check(cond is not None and price is not None, "cond, price cannot be None")
+
+    ind = IF(cond, price, constant.null_price)
+    if kdata is not None:
+        ind = ind(kdata)
+        price = price(kdata)
+    hku_check(len(ind) == len(price), "cond, price length not match!")
+    hku_warn_if(len(ind) <= 0, "cond length <=0")
+
+    ind.plot(new=new, axes=axes, color=color, linewidth=linewidth, *args, **kwargs)
