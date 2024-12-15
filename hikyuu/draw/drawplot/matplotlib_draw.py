@@ -835,3 +835,52 @@ def sys_performance(sys, ref_stk=None):
     ax3.xaxis.set_visible(False)
     ax3.yaxis.set_visible(False)
     ax3.set_frame_on(False)
+
+
+# ============================================================================
+# 通达信画图函数
+# ============================================================================
+
+def STICKLINE(cond: Indicator, price1: Indicator, price2: Indicator, width: int = 2.0,
+              empty: bool = False, color='m', alpha=1.0, kdata=None, new=False, axes=None):
+    """在满足cond的条件下，在 price1 和 price2 之间绘制一个宽度为 width 的柱状图。
+
+    注意: cond, price1, price2 应含有数据，否则请指定 kdata 作为指标计算的上下文
+
+    参数说明:
+        cond (Indicator): 条件表达式，用于确定是否绘制柱状线
+        price1 (Indicator): 第一个价格
+        price2 (Indicator): 第二个价格
+        width (int, optional): 柱状宽度. Defaults to 2.0.
+        empty (bool, optional): 空心. Defaults to False.
+        kdata (_type_, optional): 指定的上下文K线. Defaults to None.
+        new (bool, optional): 是否在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 在指定的坐标轴中绘制. Defaults to None.
+        color (str, optional): 颜色. Defaults to 'm'.
+        alpha (float, optional): 透明度. Defaults to 1.0.
+    """
+    hku_check(cond is not None and price1 is not None and price2 is not None, "cond, price1, price2 cannot be None")
+
+    if kdata is not None:
+        cond = cond(kdata)
+        price1 = price1(kdata)
+        price2 = price2(kdata)
+    hku_check(len(cond) == len(price1) == len(price2), "cond, price1, price2 length not match")
+    hku_warn_if(len(cond) <= 0, "cond, price1, price2 length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    width = 0.3 * width
+    OFFSET = width / 2.0
+    for i in range(len(cond)):
+        if cond[i] > 0.:
+            height = abs(price1[i] - price2[i])
+            lower = min(price1[i], price2[i])
+            rect = Rectangle(xy=(i - OFFSET, lower), width=width, height=height,
+                             facecolor=color, edgecolor=color, fill=(not empty))
+            rect.set_alpha(alpha)
+            axes.add_patch(rect)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond) + 1)
