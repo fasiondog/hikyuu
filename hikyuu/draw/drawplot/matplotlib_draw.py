@@ -841,6 +841,11 @@ def sys_performance(sys, ref_stk=None):
 # 通达信画图函数
 # ============================================================================
 
+def RGB(r: int, g: int, b: int):
+    hku_check(0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255, "r,g,b must in [0,255]!")
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
 def STICKLINE(cond: Indicator, price1: Indicator, price2: Indicator, width: int = 2.0,
               empty: bool = False, color='m', alpha=1.0, kdata=None, new=False, axes=None):
     """在满足cond的条件下，在 price1 和 price2 之间绘制一个宽度为 width 的柱状图。
