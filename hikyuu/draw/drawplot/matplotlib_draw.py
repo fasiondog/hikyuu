@@ -15,7 +15,7 @@ from matplotlib.lines import Line2D, TICKLEFT, TICKRIGHT
 from matplotlib.ticker import FuncFormatter, FixedLocator
 
 from hikyuu import *
-from hikyuu import constant, Indicator, KData, IF
+from hikyuu import constant, isnan, Indicator, KData, IF
 
 from .common import get_draw_title
 
@@ -842,6 +842,9 @@ def sys_performance(sys, ref_stk=None):
 # 通达信画图函数
 # ============================================================================
 
+DRAWNULL = constant.null_price
+
+
 def RGB(r: int, g: int, b: int):
     hku_check(0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255, "r,g,b must in [0,255]!")
     return f"#{r:02x}{g:02x}{b:02x}"
@@ -974,3 +977,144 @@ def PLOYLINE(cond: Indicator, price: Indicator, kdata: KData = None, color: str 
             y.append(val)
     if len(x) > 0:
         axes.plot(x, y, color=color, linewidth=linewidth, *args, **kwargs)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(ind) + 1)
+
+
+def DRAWLINE(cond1: Indicator, price1: Indicator, cond2: Indicator, price2: Indicator, expand: int = 0, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """在图形上绘制直线段。
+
+    用法：DRAWLINE(cond1, price1, cond2, price2, expand)
+    当COND1条件满足时，在PRICE1位置画直线起点，当COND2条件满足时，在PRICE2位置画直线终点，EXPAND为延长类型。
+    例如：DRAWLINE(HIGH>=HHV(HIGH,20),HIGH,LOW<=LLV(LOW,20),LOW,1)表示在创20天新高与创20天新低之间画直线并且向右延长
+
+    Args:
+        cond1 (Indicator): 条件1
+        price1 (Indicator): 位置1
+        cond2 (Indicator): 条件2
+        price2 (Indicator): 位置2
+        expand (int, optional): 0: 不延长 | 1: 向右延长 | 10: 向左延长 | 11: 双向延长. Defaults to 0.
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 指定颜色. Defaults to 'm'.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+    """
+    hku_check(cond1 is not None and cond2 is not None and price1 is not None and price2 is not None,
+              "cond1, cond2, price1, price2 cannot be None")
+    hku_check(expand in (0, 1, 10, 11), "expand must be 0, 1, 10 or 11")
+
+    if kdata is not None:
+        cond1 = cond1(kdata)
+        price1 = price1(kdata)
+        cond2 = cond2(kdata)
+        price2 = price2(kdata)
+    hku_check(len(cond1) == len(cond2) == len(price1) == len(price2), "cond1, cond2, price1, price2 length not match")
+    hku_warn_if(len(cond1) <= 0, "cond1, cond2, price1, price2 length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    length = len(cond1)
+    x1, y1 = None, None
+    for i in range(cond1.discard, length):
+        cond1_val = cond1[i]
+        if cond1_val > 0. or isnan(cond1_val):
+            if x1 is None:
+                x1, y1 = i, price1[i]
+            else:
+                x1, y1 = None, None
+        cond2_val = cond2[i]
+        if cond2_val > 0. or isnan(cond2_val):
+            if x1 is not None:
+                if expand == 0:
+                    x = [x1, i]
+                    y = [y1, price2[i]]
+                elif expand == 1:
+                    x = [n for n in range(i, length)]
+                    x.insert(0, x1)
+                    val = price2[i]
+                    y = [val for n in range(i, length)]
+                    y.insert(0, y1)
+                elif expand == 10:
+                    x = [n for n in range(0, i+1)]
+                    val = price2[i]
+                    y = [val for n in range(0, i+1)]
+                elif expand == 11:
+                    x = [n for n in range(0, length)]
+                    val = price2[i]
+                    y = [val for n in range(0, length)]
+                axes.plot(x, y, color=color, *args, **kwargs)
+                x1, y1 = None, None
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond1) + 1)
+
+
+def DRAWTEXT(cond: Indicator, price: Indicator, text: str, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """在图形上显示文字。
+
+    用法: DRAWTEXT(cond, price, text), 当 cond 条件满足时, 在 price 位置书写文字 text。
+    例如: DRAWTEXT(CLOSE/OPEN>1.08,LOW,'大阳线')表示当日实体阳线大于8%时在最低价位置显示'大阳线'字样.
+
+    Args:
+        cond (Indicator): 条件
+        price (Indicator): 显示位置
+        text (str): 待显示文字
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 指定颜色. Defaults to 'm'.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+    """
+    hku_check(cond is not None and price is not None, "cond, price cannot be None")
+
+    if kdata is not None:
+        cond = cond(kdata)
+        price = price(kdata)
+    hku_check(len(cond) == len(price), "cond, price length not match")
+    hku_warn_if(len(cond) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    for i in range(cond.discard, len(cond)):
+        if cond[i] > 0. or isnan(cond[i]):
+            axes.text(i, price[i], text, color=color, *args, **kwargs)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond) + 1)
+
+
+def DRAWNUMBER(cond: Indicator, price: Indicator, number: Indicator, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """画出数字.
+
+    用法:DRAWNUMBER(cond, price, number),当 cond 条件满足时,在 price 位置书写数字 number.
+    例如:DRAWNUMBER(CLOSE/OPEN>1.08,LOW,C)表示当日实体阳线大于8%时在最低价位置显示收盘价。
+
+    Args:
+        cond (Indicator): 条件
+        price (Indicator): 绘制位置
+        number (Indicator): 待绘制数字
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 指定颜色. Defaults to 'm'.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+    """
+    hku_check(cond is not None and price is not None, "cond, price cannot be None")
+
+    if kdata is not None:
+        cond = cond(kdata)
+        price = price(kdata)
+        number = number(kdata)
+    hku_check(len(cond) == len(price), "cond, price, number length not match")
+    hku_warn_if(len(cond) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    for i in range(cond.discard, len(cond)):
+        if cond[i] > 0. or isnan(cond[i]):
+            axes.text(i, price[i], str(number[i]), color=color, *args, **kwargs)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond) + 1)
