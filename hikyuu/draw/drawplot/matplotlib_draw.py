@@ -8,6 +8,7 @@ import datetime
 import logging
 import numpy as np
 import matplotlib
+import math
 from pylab import Rectangle, gca, figure, ylabel, axes, draw
 from matplotlib import rcParams
 from matplotlib.font_manager import FontManager, _log as fm_logger
@@ -1019,13 +1020,13 @@ def DRAWLINE(cond1: Indicator, price1: Indicator, cond2: Indicator, price2: Indi
     x1, y1 = None, None
     for i in range(cond1.discard, length):
         cond1_val = cond1[i]
-        if cond1_val > 0. or isnan(cond1_val):
+        if cond1_val > 0.:
             if x1 is None:
                 x1, y1 = i, price1[i]
             else:
                 x1, y1 = None, None
         cond2_val = cond2[i]
-        if cond2_val > 0. or isnan(cond2_val):
+        if cond2_val > 0.:
             if x1 is not None:
                 if expand == 0:
                     x = [x1, i]
@@ -1078,8 +1079,45 @@ def DRAWTEXT(cond: Indicator, price: Indicator, text: str, kdata: KData = None, 
         axes = create_figure() if new else gca()
 
     for i in range(cond.discard, len(cond)):
-        if cond[i] > 0. or isnan(cond[i]):
+        if cond[i] > 0.:
             axes.text(i, price[i], text, color=color, *args, **kwargs)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond) + 1)
+
+
+def DRAWTEXT_FIX(cond: Indicator, x: float, y: float,  type: int, text: str, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """固定位置显示文字
+
+    用法:DRAWTEXT_FIX(cond,x y, text), cond 中一般需要加 ISLASTBAR,当 cond 条件满足时,
+    在当前指标窗口内(X,Y)位置书写文字TEXT,X,Y为书写点在窗口中相对于左上角的百分比
+
+    例如:DRAWTEXT_FIX(ISLASTBAR() & (CLOSE/OPEN>1.08),0.5,0.5,0,'大阳线')表示最后一个交易日实体阳线
+    大于8%时在窗口中间位置显示'大阳线'字样.
+
+    Args:
+        cond (Indicator): 条件
+        x (float): x轴坐标
+        y (float): y轴坐标
+        type (int, optional): 0 左对齐 | 1 右对齐. 
+        text (str): 待显示文字
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 指定颜色. Defaults to 'm'.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定坐标轴. Defaults to None.
+    """
+    hku_check(cond is not None, "cond cannot be None")
+    if kdata is not None:
+        cond = cond(kdata)
+    hku_warn_if(len(cond) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    for i in range(cond.discard, len(cond)):
+        if cond[i] > 0.:
+            axes.text(x, 1-y, text, horizontalalignment='left' if type == 0 else 'right', verticalalignment='top',
+                      transform=axes.transAxes, color=color, *args, **kwargs)
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(cond) + 1)
@@ -1113,8 +1151,52 @@ def DRAWNUMBER(cond: Indicator, price: Indicator, number: Indicator, kdata: KDat
         axes = create_figure() if new else gca()
 
     for i in range(cond.discard, len(cond)):
-        if cond[i] > 0. or isnan(cond[i]):
+        if cond[i] > 0.:
             axes.text(i, price[i], str(number[i]), color=color, *args, **kwargs)
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(cond) + 1)
+
+
+def DRAWNUMBER_FIX(cond: Indicator, x: float, y: float, type: int, number: float, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """固定位置显示数字.
+
+    用法:DRAWNUMBER_FIX(cond,x,y,type,number), cond 中一般需要加 ISLASTBAR, 当 cond 条件满足时,
+    在当前指标窗口内 (x, y) 位置书写数字 number, x,y为书写点在窗口中相对于左上角的百分比,type:0为左对齐,1为右对齐。
+
+    例如:DRAWNUMBER_FIX(ISLASTBAR() & (CLOSE/OPEN>1.08), 0.5,0.5,0,C)表示最后一个交易日实体阳线大于8%时在窗口中间位置显示收盘价
+
+    Args:
+        cond (Indicator): _description_
+        x (float): _description_
+        y (float): _description_
+        type (int): _description_
+        number (Indicator): _description_
+        kdata (KData, optional): _description_. Defaults to None.
+        color (str, optional): _description_. Defaults to 'm'.
+        new (bool, optional): _description_. Defaults to False.
+        axes (_type_, optional): _description_. Defaults to None.
+    """
+    DRAWTEXT_FIX(cond, x, y, type, str(number), kdata, color, new, axes, *args, **kwargs)
+
+
+def DRAWSL(cond: Indicator, price: Indicator, slope: float, length: int, direct: int, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    hku_check(cond is not None and price is not None, "cond, price cannot be None")
+    hku_check(direct in (0, 1, 2), "direct must be 0,1,2")
+
+    if kdata is not None:
+        cond = cond(kdata)
+        price = price(kdata)
+    hku_check(len(cond) == len(price), "cond, price length not match")
+    hku_warn_if(len(cond) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    for i in range(cond.discard, len(cond)):
+        val = price[i]
+        if not isnan(val):
+            x = length / math.sqrt(1/(1+slope**2))
+            y = x * slope
+            print(x, y)
+            axes.plot([i, i+int(x)], [val, val+int(y)], color=color, *args, **kwargs)
