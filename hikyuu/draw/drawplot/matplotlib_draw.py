@@ -938,7 +938,7 @@ def DRAWBAND(val1: Indicator, color1='m', val2: Indicator = None, color2='b', kd
     axes.set_xlim(-1, len(val1) + 1)
 
 
-def PLOYLINE(cond: Indicator, price: Indicator, kdata: KData = None, color: str = 'b', linewidth=1.0, new=False, axes=None, *args, **kwargs):
+def PLOYLINE(cond: Indicator, price: Indicator, kdata: KData = None, color: str = 'm', linewidth=1.0, new=False, axes=None, *args, **kwargs):
     """在图形上绘制折线段。
 
     用法：PLOYLINE(COND，PRICE)，当COND条件满足时，以PRICE位置为顶点画折线连接。
@@ -962,4 +962,15 @@ def PLOYLINE(cond: Indicator, price: Indicator, kdata: KData = None, color: str 
     hku_check(len(ind) == len(price), "cond, price length not match!")
     hku_warn_if(len(ind) <= 0, "cond length <=0")
 
-    ind.plot(new=new, axes=axes, color=color, linewidth=linewidth, *args, **kwargs)
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    # ind.plot(new=new, axes=axes, color=color, linewidth=linewidth, *args, **kwargs)
+    x, y = [], []
+    for i in range(ind.discard, len(ind)):
+        val = ind[i]
+        if not isnan(val):
+            x.append(i)
+            y.append(val)
+    if len(x) > 0:
+        axes.plot(x, y, color=color, linewidth=linewidth, *args, **kwargs)
