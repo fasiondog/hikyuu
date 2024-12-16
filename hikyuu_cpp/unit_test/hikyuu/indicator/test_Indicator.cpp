@@ -18,6 +18,19 @@
  */
 
 /** @par 检测点 */
+TEST_CASE("test_indicator_other") {
+    double dx = Null<double>();
+    size_t ix = size_t(dx);
+    // 随机值
+    HKU_INFO("double nan to size_t: {}", ix);
+
+    float fx = Null<float>();
+    ix = size_t(fx);
+    // 随机值
+    HKU_INFO("float nan to size_t: {}", ix);
+}
+
+/** @par 检测点 */
 TEST_CASE("test_indicator_alike") {
     /** @arg 空 indicator 比较 */
     CHECK_UNARY(Indicator().alike(Indicator()));

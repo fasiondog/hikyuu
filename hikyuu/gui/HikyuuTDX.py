@@ -267,7 +267,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.log_textEdit.document().setMaximumBlockCount(1000)
 
         current_dir = os.path.dirname(__file__)
-        self.setWindowIcon(QIcon("{}/hikyuu.ico".format(current_dir)))
+        icon = QIcon(f"{current_dir}/hikyuu_small.png")
+        self.setWindowIcon(icon)
+        QApplication.instance().setWindowIcon(icon)
         self.import_detail_textEdit.clear()
         self.reset_progress_bar()
         self.day_start_dateEdit.setMinimumDate(datetime.date(1990, 12, 19))

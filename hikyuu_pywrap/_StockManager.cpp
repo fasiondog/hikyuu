@@ -117,13 +117,27 @@ void export_StockManager(py::module& m) {
     :return: 板块，如找不到返回空Block
     :rtype: Block)")
 
-      .def("add_block", &StockManager::addBlock, R"(add_block(self, block))")
-      .def("save_block", &StockManager::saveBlock, R"(save_block(self, block))")
+      .def("add_block", &StockManager::addBlock, R"(add_block(self, block)
+      
+    将独立的板块加入到数据库中， 板块通过 category+name 区分， 数据库中相同板块将被覆盖。注意，如果板块发生变化，需要调用 save_block 重新保存。
+      
+    :param Block block: 板块实例)")
+
+      .def("save_block", &StockManager::saveBlock, R"(save_block(self, block)
+      
+    保存发生变化后的板块保存至数据库
+
+    :param Block block: 板块实例)")
+
       .def("remove_block",
            py::overload_cast<const string&, const string&>(&StockManager::removeBlock),
-           py::arg("category"), py::arg("name"), R"(remove_block(self, category, name))")
+           py::arg("category"), py::arg("name"))
       .def("remove_block", py::overload_cast<const Block&>(&StockManager::removeBlock),
-           py::arg("block"), R"(remove_block(self, block))")
+           py::arg("block"), R"(remove_block(self, block)
+           
+    从数据库中删除板块
+    
+    :param Block block: 板块实例)")
 
       .def("get_block_list", py::overload_cast<>(&StockManager::getBlockList))
       .def("get_block_list", py::overload_cast<const string&>(&StockManager::getBlockList),
