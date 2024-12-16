@@ -1953,4 +1953,14 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind: 指定指标
     :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
     :rtype: Indicator)");
+
+    m.def("ISLASTBAR", py::overload_cast<>(ISLASTBAR));
+    m.def("ISLASTBAR", py::overload_cast<const KData&>(ISLASTBAR), py::arg("data"));
+    m.def("ISLASTBAR", py::overload_cast<const Indicator&>(ISLASTBAR), py::arg("data"),
+          R"(ISLASTBAR(ind)
+
+    判断当前数据是否为最后一个数据，若为最后一个数据，则返回1，否则返回0.
+
+    :param Indicator|KData data: 指定指标
+    :rtype: Indicator)");
 }

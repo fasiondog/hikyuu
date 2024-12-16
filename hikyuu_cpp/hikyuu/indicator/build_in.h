@@ -55,6 +55,7 @@
 #include "crt/INSUM.h"
 #include "crt/IR.h"
 #include "crt/INTPART.h"
+#include "crt/ISLASTBAR.h"
 #include "crt/LAST.h"
 #include "crt/LIUTONGPAN.h"
 #include "crt/LLV.h"
