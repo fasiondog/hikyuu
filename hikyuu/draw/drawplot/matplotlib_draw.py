@@ -4,22 +4,27 @@
 交互模式下绘制相关图形，如K线图，美式K线图
 """
 import sys
+import os
 import datetime
 import logging
 import numpy as np
 import matplotlib
 import math
 from typing import Union
-from pylab import Rectangle, gca, figure, ylabel, axes, draw
+from pylab import Rectangle, gca, gcf, figure, ylabel, axes, draw
 from matplotlib import rcParams
 from matplotlib.font_manager import FontManager, _log as fm_logger
 from matplotlib.lines import Line2D, TICKLEFT, TICKRIGHT
 from matplotlib.ticker import FuncFormatter, FixedLocator
+from matplotlib.image import imread
 
 from hikyuu import *
 from hikyuu import constant, isnan, Indicator, KData, IF
 
 from .common import get_draw_title
+
+
+ICON_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 def set_mpl_params():
@@ -1242,3 +1247,89 @@ def DRAWSL(cond: Indicator, price: Indicator, slope: Union[Indicator, float, int
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(cond) + 1)
+
+
+def DRAWIMG(cond: Indicator, price: Indicator, img: str, kdata: KData = None, new=False, axes=None, *args, **kwargs):
+    """画图片
+
+    用法:DRAWIMG(cond,price,'图像文件文件名'),当条件 cond 满足时,在 price 位置画指定的图片
+    例如:DRAWIMG(O>C,CLOSE, '123.png')。
+
+    Args:
+        cond (Indicator): 指定条件
+        price (Indicator): 指定价格
+        img (str): 图像文件名
+        kdata (KData, optional): 指定上下文. Defaults to None.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 在指定坐标轴中绘制. Defaults to None.
+    """
+    hku_check(cond is not None and price is not None, "cond, price cannot be None")
+
+    if kdata is not None:
+        cond = cond(kdata)
+        price = price(kdata)
+    hku_check(len(cond) == len(price), "cond, price length not match")
+    hku_warn_if(len(cond) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    image = imread(img)
+
+    p = axes.get_window_extent()
+    pw = p.x1 - p.x0
+    ph = p.y1 - p.y0
+    x0, x1 = axes.get_xlim()
+    y0, y1 = axes.get_ylim()
+    xw = x1 - x0
+    yh = y1 - y0
+    pixel = 20.  # 显示像素大小
+    w = xw / pw * pixel
+    h = yh / ph * pixel
+    for i in range(cond.discard, len(cond)):
+        if cond[i] > 0.:
+            axes.imshow(image, extent=[i-w, i+w, price[i]-h, price[i]+h], *args, **kwargs)
+
+    axes.set_aspect('auto')
+    axes.autoscale_view()
+    axes.set_ylim(y0, y1)
+    axes.set_xlim(-1, len(cond) + 1)
+
+
+DRAWBMP = DRAWIMG
+
+
+def DRAWICON(cond: Indicator, price: Indicator, type: int, kdata: KData = None, new=False, axes=None, *args, **kwargs):
+    DRAWIMG(cond, price, f'{ICON_PATH}/icon/{type}.png', kdata, new, axes, *args, **kwargs)
+
+
+def SHOWICONS():
+    """显示所有内置图标"""
+    axes = create_one_axes_figure([8, 6])
+    p = axes.get_window_extent()
+    pw = p.x1 - p.x0
+    ph = p.y1 - p.y0
+    x0, x1 = axes.get_xlim()
+    y0, y1 = axes.get_ylim()
+    xw = x1 - x0
+    yh = y1 - y0
+    pixel = 100.  # 显示像素大小
+    w = xw / pw * pixel
+    h = yh / ph * pixel
+
+    row, col = 5, 10
+    for i in range(row):
+        for j in range(col):
+            n = i*col+j + 1
+            name = f'{ICON_PATH}/icon/{n}.png'
+            if os.path.exists(name):
+                try:
+                    x = j*w
+                    y = i*h
+                    axes.imshow(imread(name), extent=[x, x+w, 1-(y+h), 1-y])
+                except:
+                    pass
+    axes.set_aspect('auto')
+    axes.autoscale_view()
+    axes.set_ylim(y0, y1)
+    axes.set_xlim(x0, x1)
