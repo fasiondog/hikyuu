@@ -9,6 +9,7 @@ import logging
 import numpy as np
 import matplotlib
 import math
+from typing import Union
 from pylab import Rectangle, gca, figure, ylabel, axes, draw
 from matplotlib import rcParams
 from matplotlib.font_manager import FontManager, _log as fm_logger
@@ -1180,13 +1181,38 @@ def DRAWNUMBER_FIX(cond: Indicator, x: float, y: float, type: int, number: float
     DRAWTEXT_FIX(cond, x, y, type, str(number), kdata, color, new, axes, *args, **kwargs)
 
 
-def DRAWSL(cond: Indicator, price: Indicator, slope: float, length: int, direct: int, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+def DRAWSL(cond: Indicator, price: Indicator, slope: Union[Indicator, float, int], length: Union[Indicator, float, int], direct: int, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """绘制斜线.
+
+    用法:DRAWSL(cond,price,slope,length,diect),当 cond 条件满足时,在 price 位置画斜线, slope 为斜率, 
+    lengh为长度, direct 为0向右延伸,1向左延伸,2双向延伸。
+
+    注意:
+    1. K线间的纵向高度差为 slope;
+    2. slope 为 0 时, 为水平线;
+    3. slope 为 10000 时, 为垂直线, length 为向上的像素高度, direct 表示向上或向下延伸
+    4. slope 和 length 支持变量;
+
+    Args:
+        cond (Indicator): 条件指标
+        price (Indicator): 价格
+        slope (int|float|Indicator): 斜率
+        length (int|float|Indicator): 长度
+        direct (int): 方向
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 颜色. Defaults to 'm'.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+    """
     hku_check(cond is not None and price is not None, "cond, price cannot be None")
     hku_check(direct in (0, 1, 2), "direct must be 0,1,2")
 
     if kdata is not None:
         cond = cond(kdata)
         price = price(kdata)
+        slope = slope(kdata) if isinstance(slope, Indicator) else [slope for i in range(len(kdata))]
+        length = length(kdata) if isinstance(length, Indicator) else [length for i in range(len(kdata))]
+
     hku_check(len(cond) == len(price), "cond, price length not match")
     hku_warn_if(len(cond) <= 0, "cond length <=0")
 
@@ -1196,7 +1222,23 @@ def DRAWSL(cond: Indicator, price: Indicator, slope: float, length: int, direct:
     for i in range(cond.discard, len(cond)):
         val = price[i]
         if not isnan(val):
-            x = length / math.sqrt(1/(1+slope**2))
-            y = x * slope
-            print(x, y)
-            axes.plot([i, i+int(x)], [val, val+int(y)], color=color, *args, **kwargs)
+            if slope[i] < 10000:
+                x = length[i] / math.sqrt(1+slope[i]**2)
+                y = x * slope[i]
+                if direct == 0:
+                    axes.plot([i, i+x], [val, val+y], color=color, *args, **kwargs)
+                elif direct == 1:
+                    axes.plot([i-x, i], [val-y, val], color=color, *args, **kwargs)
+                else:
+                    axes.plot([i-x*0.5, i, i+x*0.5], [val-y*0.5, val, val+y*0.5], color=color, *args, **kwargs)
+            else:
+                y = length[i]
+                if direct == 0:
+                    axes.plot([i, i], [val, val+y], color=color, *args, **kwargs)
+                elif direct == 1:
+                    axes.plot([i, i], [val, val-y], color=color, *args, **kwargs)
+                else:
+                    axes.plot([i, i, i], [val-y*0.5, val, val+y*0.5], color=color, *args, **kwargs)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond) + 1)
