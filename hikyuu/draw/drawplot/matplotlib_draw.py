@@ -1335,7 +1335,7 @@ def SHOWICONS():
     axes.set_xlim(x0, x1)
 
 
-def DRAWRECTREL(left: int, top: int, right: int, bottom: int, color='m', frame=False, fill=True, alpha=0.1, new=False, axes=None, *args, **kwargs):
+def DRAWRECTREL(left: int, top: int, right: int, bottom: int, color='m', frame=True, fill=True, alpha=0.1, new=False, axes=None, *args, **kwargs):
     """相对位置上画矩形.
 
     注意：原点为坐标轴左上角(0, 0)，和 matplotlib 不同。
@@ -1345,16 +1345,16 @@ def DRAWRECTREL(left: int, top: int, right: int, bottom: int, color='m', frame=F
     例如:DRAWRECTREL(0,0,500,500,RGB(255,255,0)) 表示在图形最左上部1/4位置用黄色绘制矩形
 
     Args:
-        left (int): _description_
-        top (int): _description_
-        right (int): _description_
-        bottom (int): _description_
-        color (str, optional): _description_. Defaults to 'm'.
-        frame (bool, optional): _description_. Defaults to False.
-        fill (bool, optional): _description_. Defaults to True.
-        alpha (float, optional): _description_. Defaults to 0.1.
-        new (bool, optional): _description_. Defaults to False.
-        axes (_type_, optional): _description_. Defaults to None.
+        left (int): 左上角x
+        top (int): 左上角y
+        right (int): 右下角x
+        bottom (int): 右下角y
+        color (str, optional): 指定颜色. Defaults to 'm'.
+        frame (bool, optional): 添加边框. Defaults to False.
+        fill (bool, optional): 颜色填充. Defaults to True.
+        alpha (float, optional): 透明度. Defaults to 0.1.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的坐标轴. Defaults to None.
     """
     if axes is None:
         axes = create_figure() if new else gca()
