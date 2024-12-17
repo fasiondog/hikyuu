@@ -51,7 +51,7 @@ from .matplotlib_draw import adjust_axes_show as mpl_adjust_axes_show
 from .matplotlib_draw import sys_performance as mpl_sys_performance
 from .matplotlib_draw import (DRAWNULL, STICKLINE, DRAWBAND, RGB, PLOYLINE,
                               DRAWLINE, DRAWTEXT, DRAWNUMBER, DRAWTEXT_FIX, DRAWNUMBER_FIX, DRAWSL,
-                              DRAWIMG, DRAWICON, DRAWBMP, SHOWICONS)
+                              DRAWIMG, DRAWICON, DRAWBMP, SHOWICONS, DRAWRECTREL)
 
 from .bokeh_draw import gcf as bk_gcf
 from .bokeh_draw import gca as bk_gca
@@ -292,5 +292,6 @@ __all__ = [
     'use_bokeh_in_notebook',
     'use_draw_with_echarts',
     'DRAWNULL', 'STICKLINE', 'DRAWBAND', 'RGB', 'PLOYLINE', 'DRAWLINE', 'DRAWTEXT', 'DRAWNUMBER',
-    'DRAWTEXT_FIX', 'DRAWNUMBER_FIX', 'DRAWSL', 'DRAWIMG', 'DRAWICON', 'DRAWBMP', 'SHOWICONS'
+    'DRAWTEXT_FIX', 'DRAWNUMBER_FIX', 'DRAWSL', 'DRAWIMG', 'DRAWICON', 'DRAWBMP', 'SHOWICONS',
+    'DRAWRECTREL'
 ]

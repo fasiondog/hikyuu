@@ -41,7 +41,7 @@ from .drawplot import (use_draw_engine,
                        gcf)
 from .drawplot import (RGB, DRAWNULL, STICKLINE, DRAWBAND, PLOYLINE, DRAWLINE,
                        DRAWTEXT, DRAWNUMBER, DRAWTEXT_FIX, DRAWNUMBER_FIX, DRAWSL, DRAWIMG,
-                       DRAWICON, DRAWBMP, SHOWICONS)
+                       DRAWICON, DRAWBMP, SHOWICONS, DRAWRECTREL)
 
 from . import volume as vl
 from . import elder as el
@@ -61,5 +61,5 @@ __all__ = [
     'show_gcf',
     'DRAWNULL', 'STICKLINE',
     'DRAWBAND', 'RGB', 'PLOYLINE', 'DRAWLINE', 'DRAWTEXT', 'DRAWNUMBER', 'DRAWTEXT_FIX',
-    'DRAWNUMBER_FIX', 'DRAWSL', 'DRAWIMG', 'DRAWICON', 'DRAWBMP', 'SHOWICONS'
+    'DRAWNUMBER_FIX', 'DRAWSL', 'DRAWIMG', 'DRAWICON', 'DRAWBMP', 'SHOWICONS', 'DRAWRECTREL'
 ]

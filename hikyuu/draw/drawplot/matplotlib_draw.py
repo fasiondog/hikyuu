@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib
 import math
 from typing import Union
-from pylab import Rectangle, gca, gcf, figure, ylabel, axes, draw
+from matplotlib.pylab import Rectangle, gca, gcf, figure, ylabel, axes, draw
 from matplotlib import rcParams
 from matplotlib.font_manager import FontManager, _log as fm_logger
 from matplotlib.lines import Line2D, TICKLEFT, TICKRIGHT
@@ -1333,3 +1333,48 @@ def SHOWICONS():
     axes.autoscale_view()
     axes.set_ylim(y0, y1)
     axes.set_xlim(x0, x1)
+
+
+def DRAWRECTREL(left: int, top: int, right: int, bottom: int, color='m', frame=False, fill=True, alpha=0.1, new=False, axes=None, *args, **kwargs):
+    """相对位置上画矩形.
+
+    注意：原点为坐标轴左上角(0, 0)，和 matplotlib 不同。
+    用法: DRAWRECTREL(left,top,right,bottom,color), 以图形窗口 (left, top) 为左上角, (right, bottom) 为
+         右下角绘制矩形, 坐标单位是窗口沿水平和垂直方向的1/1000,取值范围是0—999,超出范围则可能显示在图形窗口外,矩形
+         中间填充颜色COLOR,COLOR为0表示不填充.
+    例如:DRAWRECTREL(0,0,500,500,RGB(255,255,0)) 表示在图形最左上部1/4位置用黄色绘制矩形
+
+    Args:
+        left (int): _description_
+        top (int): _description_
+        right (int): _description_
+        bottom (int): _description_
+        color (str, optional): _description_. Defaults to 'm'.
+        frame (bool, optional): _description_. Defaults to False.
+        fill (bool, optional): _description_. Defaults to True.
+        alpha (float, optional): _description_. Defaults to 0.1.
+        new (bool, optional): _description_. Defaults to False.
+        axes (_type_, optional): _description_. Defaults to None.
+    """
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    x0, x1 = axes.get_xlim()
+    y0, y1 = axes.get_ylim()
+    w = x1 - x0
+    h = y1 - y0
+
+    limit = 1000
+    cx = w / limit
+    cy = h / limit
+    x = left * cx + x0
+    y = (limit - bottom) * cy + y0
+    width = (right - left) * cx
+    height = (bottom - top) * cy
+    print(x, y, width, height)
+    if frame:
+        rect = Rectangle(xy=(x, y), width=width, height=height, facecolor=color, edgecolor=color, fill=fill)
+    else:
+        rect = Rectangle(xy=(x, y), width=width, height=height, facecolor=color, fill=fill)
+    rect.set_alpha(alpha)
+    axes.add_patch(rect)
