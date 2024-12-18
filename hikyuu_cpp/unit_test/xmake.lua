@@ -90,7 +90,11 @@ target("unit-test")
     end
 
     -- add files
-    add_files("**.cpp|hikyuu/real_data/**")
+    add_files("**.cpp|hikyuu/real_data/**|hikyuu/indicator_talib/**.cpp")
+    
+    if has_config("ta_lib") then
+        add_files("hikyuu/indicator_talib/**.cpp")
+    end
 
     before_run(prepare_run)
     after_run(coverage_report)

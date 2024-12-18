@@ -67,11 +67,16 @@ option_end()
 
 
 if get_config("leak_check") then
-    -- 需要 export LD_PRELOAD=libasan.so
-    set_policy("build.sanitizer.address", true)
-    set_policy("build.sanitizer.leak", true)
-    -- set_policy("build.sanitizer.memory", true)
-    -- set_policy("build.sanitizer.thread", true)
+    if is_plat("macosx") then
+        add_cxflags("-fsanitize=address")
+        add_ldflags("-fsanitize=address")
+    elseif is_plat("linux") then
+        -- 需要 export LD_PRELOAD=libasan.so
+        set_policy("build.sanitizer.address", true)
+        set_policy("build.sanitizer.leak", true)
+        -- set_policy("build.sanitizer.memory", true)
+        -- set_policy("build.sanitizer.thread", true)
+    end
 end
 
 -- SPDLOG_ACTIVE_LEVEL 需要单独加

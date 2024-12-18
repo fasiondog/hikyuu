@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
 
 namespace hku {
 

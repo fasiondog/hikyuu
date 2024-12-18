@@ -1,7 +1,7 @@
 /*
- * TaCmo.cpp
+ *  Copyright (c) 2024 hikyuu.org
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2024-12-18
  *      Author: fasiondog
  */
 
@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::TaCmo)
 
 namespace hku {
 
-TaCmo::TaCmo() : IndicatorImp("T_CMO", 1) {
+TaCmo::TaCmo() : IndicatorImp("TA_CMO", 1) {
     setParam<int>("n", 14);
 }
 
@@ -42,13 +42,6 @@ void TaCmo::_calculate(const Indicator &data) {
     int outBegIdx;
     int outNbElement;
     TA_CMO(data.discard(), total - 1, src, n, &outBegIdx, &outNbElement, dst + m_discard);
-
-    // TA_LIB_API TA_RetCode TA_CMO( int    startIdx,
-    //                               int    endIdx,
-    //                                          const double inReal[],
-    //                                          int           optInTimePeriod,
-    //                                          int          *outBegIdx, int *outNBElement,
-    //                                          double        outReal[] );
 }
 
 Indicator HKU_API TA_CMO(int n) {

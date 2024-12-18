@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/indicator/build_in.h>
+#include <hikyuu/indicator_talib/ta_crt.h>
 
 #if HKU_ENABLE_TA_LIB
 
