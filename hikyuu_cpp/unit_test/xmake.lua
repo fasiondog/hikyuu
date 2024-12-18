@@ -63,6 +63,19 @@ target("unit-test")
     set_kind("binary")
     set_default(false)
 
+    if get_config("leak_check") then
+        if is_plat("macosx") then
+            add_cxflags("-fsanitize=address")
+            add_ldflags("-fsanitize=address")
+        elseif is_plat("linux") then
+            -- 需要 export LD_PRELOAD=libasan.so
+            set_policy("build.sanitizer.address", true)
+            set_policy("build.sanitizer.leak", true)
+            -- set_policy("build.sanitizer.memory", true)
+            -- set_policy("build.sanitizer.thread", true)
+        end
+    end
+
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
         add_packages("mysql")
