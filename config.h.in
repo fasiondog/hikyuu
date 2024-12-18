@@ -43,6 +43,9 @@
 // 使用低精度版本，Indicator 使用 float 类型进行计算
 #define HKU_USE_LOW_PRECISION ${HKU_USE_LOW_PRECISION}
 
+// 使用 TA-Lib
+#define HKU_ENABLE_TA_LIB ${HKU_ENABLE_TA_LIB}
+
 // clang-format on
 
 #endif /* HIKYUU_CONFIG_H_ */

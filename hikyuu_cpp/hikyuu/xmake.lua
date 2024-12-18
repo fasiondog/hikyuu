@@ -8,9 +8,14 @@ target("hikyuu")
             add_packages("sqlite3")
         end
     end
+
     if has_config("http_client_zip") then
         add_packages("gzip-hpp")
-    end    
+    end
+
+    if has_config("ta_lib") then
+        add_packages("ta-lib")
+    end
 
     add_options("mysql")
     add_includedirs("..")
@@ -61,7 +66,7 @@ target("hikyuu")
 
     -- add files
     -- add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp")
-    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|utilities/mo/**.cpp")
+    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|utilities/mo/**.cpp|indicator/talib/**.cpp")
     add_files("./data_driver/*.cpp")
     if get_config("hdf5") or get_config("sqlite") then
         add_files("./data_driver/base_info/sqlite/**.cpp")
@@ -85,13 +90,14 @@ target("hikyuu")
     if get_config("tdx") then
         add_files("./data_driver/kdata/tdx/**.cpp")
     end
-
     if get_config("mysql") then
         add_files("./utilities/db_connect/mysql/**.cpp")
     end
-
     if has_config("mo") then
         add_files("./utilities/mo/**.cpp")
+    end
+    if has_config("ta_lib") then
+        add_files("./indicator/talib/**.cpp")
     end
 
     after_build(function(target)
