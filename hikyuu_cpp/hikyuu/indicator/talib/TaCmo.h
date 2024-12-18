@@ -7,18 +7,18 @@
 
 #pragma once
 
-#include "ta-lib/ta_func.h"
-#include "hikyuu/indicator/Indicator.h"
+#include "../Indicator.h"
 
 namespace hku {
 
-class TCmo : public IndicatorImp {
-    INDICATOR_IMP(TCmo)
+class TaCmo : public IndicatorImp {
+    INDICATOR_IMP(TaCmo)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    TCmo();
-    virtual ~TCmo();
+    TaCmo();
+    virtual ~TaCmo();
+    virtual void _checkParam(const string& name) const override;
 };
 
 }  // namespace hku

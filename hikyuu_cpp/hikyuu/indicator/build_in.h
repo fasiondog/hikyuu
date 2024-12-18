@@ -10,6 +10,11 @@
 #define INDICATOR_BUILD_IN_H_
 
 #include "Indicator.h"
+
+#if HKU_ENABLE_TA_LIB
+#include "talib/ta_crt.h"
+#endif
+
 #include "crt/KDATA.h"
 #include "crt/ABS.h"
 #include "crt/ACOS.h"
