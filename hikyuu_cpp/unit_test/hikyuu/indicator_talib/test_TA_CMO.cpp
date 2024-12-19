@@ -10,7 +10,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator_talib/ta_crt.h>
 #include <hikyuu/indicator/crt/KDATA.h>
-#include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 
 using namespace hku;
 
@@ -37,6 +37,46 @@ TEST_CASE("test_TA_CMO") {
     CHECK_EQ(result.size(), kdata.size());
     CHECK_EQ(result[2], doctest::Approx(-74.8826).epsilon(0.0001));
     CHECK_EQ(result[9], doctest::Approx(-61.9996).epsilon(0.0001));
+}
+
+/** @par 检测点 */
+TEST_CASE("test_TA_CMO_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = TA_CMO(c, 10);
+    Indicator result = TA_CMO(c, CVAL(c, 10));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        // HKU_INFO("{}: {}, {}", i, result[i], expect[i]);
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    result = TA_CMO(c, IndParam(CVAL(c, 10)));
+    CHECK_EQ(expect.size(), result.size());
+    // CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    // expect = EMA(c, 2);
+    // result = EMA(c, CVAL(c, 2));
+    // CHECK_EQ(expect.size(), result.size());
+    // // CHECK_EQ(expect.discard(), result.discard());
+    // for (size_t i = 0; i < result.discard(); i++) {
+    //     CHECK_UNARY(std::isnan(result[i]));
+    // }
+    // for (size_t i = expect.discard(); i < expect.size(); i++) {
+    //     CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    // }
 }
 
 //-----------------------------------------------------------------------------

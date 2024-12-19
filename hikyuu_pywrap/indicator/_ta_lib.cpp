@@ -11,18 +11,39 @@
 
 #include "../pybind_utils.h"
 
+#define TA_IN1_OUT1_N_PY(func, period)                                            \
+    m.def(#func, py::overload_cast<int>(func), py::arg("n") = period);            \
+    m.def(#func, py::overload_cast<const IndParam&>(func));                       \
+    m.def(#func, py::overload_cast<const Indicator&, const IndParam&>(func));     \
+    m.def(#func, py::overload_cast<const Indicator&, const Indicator&>(func));    \
+    m.def(#func, py::overload_cast<const Indicator&, int>(func), py::arg("data"), \
+          py::arg("n") = period);
+
 namespace py = pybind11;
 using namespace hku;
 
 void export_Indicator_ta_lib(py::module& m) {
-    m.def("TA_CMO", py::overload_cast<int>(TA_CMO), py::arg("n") = 14);
-    m.def("TA_CMO", py::overload_cast<const Indicator&, int>(TA_CMO), py::arg("data"),
-          py::arg("n") = 14, R"(TA_CMO(data, n=14) -> Indicator)
-
-    Chande Momentum Oscillator
-
-    :param Indicator data: 指定指标
-    :param n: Number of period (From 2 to 100000))");
+    TA_IN1_OUT1_N_PY(TA_CMO, 14)
+    TA_IN1_OUT1_N_PY(TA_DEMA, 30)
+    TA_IN1_OUT1_N_PY(TA_EMA, 30)
+    TA_IN1_OUT1_N_PY(TA_AVGDEV, 14)
+    TA_IN1_OUT1_N_PY(TA_KAMA, 30)
+    TA_IN1_OUT1_N_PY(TA_LINEARREG_ANGLE, 14)
+    TA_IN1_OUT1_N_PY(TA_MAX, 30)
+    TA_IN1_OUT1_N_PY(TA_MIDPOINT, 14)
+    TA_IN1_OUT1_N_PY(TA_MIN, 30)
+    TA_IN1_OUT1_N_PY(TA_MOM, 10)
+    TA_IN1_OUT1_N_PY(TA_ROC, 10)
+    TA_IN1_OUT1_N_PY(TA_ROCP, 10)
+    TA_IN1_OUT1_N_PY(TA_ROCR, 10)
+    TA_IN1_OUT1_N_PY(TA_ROCR100, 10)
+    TA_IN1_OUT1_N_PY(TA_RSI, 14)
+    TA_IN1_OUT1_N_PY(TA_SMA, 30)
+    TA_IN1_OUT1_N_PY(TA_TEMA, 30)  //?
+    TA_IN1_OUT1_N_PY(TA_TRIMA, 30)
+    TA_IN1_OUT1_N_PY(TA_TRIX, 30)
+    TA_IN1_OUT1_N_PY(TA_TSF, 14)
+    TA_IN1_OUT1_N_PY(TA_WMA, 30)
 }
 
 #endif /* HKU_ENABLE_TA_LIB */
