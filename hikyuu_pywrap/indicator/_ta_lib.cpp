@@ -39,7 +39,7 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT1_N_PY(TA_ROCR100, 10)
     TA_IN1_OUT1_N_PY(TA_RSI, 14)
     TA_IN1_OUT1_N_PY(TA_SMA, 30)
-    TA_IN1_OUT1_N_PY(TA_TEMA, 30)  //?
+    TA_IN1_OUT1_N_PY(TA_TEMA, 30)
     TA_IN1_OUT1_N_PY(TA_TRIMA, 30)
     TA_IN1_OUT1_N_PY(TA_TRIX, 30)
     TA_IN1_OUT1_N_PY(TA_TSF, 14)

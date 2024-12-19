@@ -35,6 +35,14 @@
         int outBegIdx;                                                                       \
         int outNbElement;                                                                    \
         func(data.discard(), total - 1, src, n, &outBegIdx, &outNbElement, dst + m_discard); \
+        if (outBegIdx != m_discard) {                                                        \
+            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);        \
+            double null_double = Null<double>();                                             \
+            for (size_t i = m_discard; i < outBegIdx; ++i) {                                 \
+                _set(null_double, i);                                                        \
+            }                                                                                \
+            m_discard = outBegIdx;                                                           \
+        }                                                                                    \
     }                                                                                        \
                                                                                              \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) {   \
