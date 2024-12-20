@@ -45,9 +45,10 @@ void TaAccbands::_calculate(const Indicator& data) {
 
     const KRecord* kptr = k.data();
 
-    std::unique_ptr<double[]> high = std::make_unique<double[]>(total);
-    std::unique_ptr<double[]> low = std::make_unique<double[]>(total);
-    std::unique_ptr<double[]> close = std::make_unique<double[]>(total);
+    std::unique_ptr<double[]> buf = std::make_unique<double[]>(3 * total);
+    double* high = buf.get();
+    double* low = high + total;
+    double* close = low + total;
     for (size_t i = 0; i < total; ++i) {
         high[i] = kptr[i].highPrice;
         low[i] = kptr[i].lowPrice;
@@ -65,8 +66,8 @@ void TaAccbands::_calculate(const Indicator& data) {
     m_discard = back;
     int outBegIdx;
     int outNbElement;
-    TA_ACCBANDS(0, total - 1, high.get(), low.get(), close.get(), n, &outBegIdx, &outNbElement,
-                dst0 + back, dst1 + back, dst2 + back);
+    TA_ACCBANDS(0, total - 1, high, low, close, n, &outBegIdx, &outNbElement, dst0 + back,
+                dst1 + back, dst2 + back);
 }
 
 Indicator HKU_API TA_ACCBANDS() {

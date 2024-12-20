@@ -34,10 +34,11 @@ void TaAd::_calculate(const Indicator& data) {
     _readyBuffer(total, 1);
 
     const KRecord* kptr = k.data();
-    std::unique_ptr<double[]> high = std::make_unique<double[]>(total);
-    std::unique_ptr<double[]> low = std::make_unique<double[]>(total);
-    std::unique_ptr<double[]> close = std::make_unique<double[]>(total);
-    std::unique_ptr<double[]> vol = std::make_unique<double[]>(total);
+    std::unique_ptr<double[]> buf = std::make_unique<double[]>(4 * total);
+    double* high = buf.get();
+    double* low = high + total;
+    double* close = low + total;
+    double* vol = close + total;
     for (size_t i = 0; i < total; ++i) {
         high[i] = kptr[i].highPrice;
         low[i] = kptr[i].lowPrice;
@@ -49,8 +50,7 @@ void TaAd::_calculate(const Indicator& data) {
 
     int outBegIdx;
     int outNbElement;
-    TA_AD(0, total - 1, high.get(), low.get(), close.get(), vol.get(), &outBegIdx, &outNbElement,
-          dst);
+    TA_AD(0, total - 1, high, low, close, vol, &outBegIdx, &outNbElement, dst);
 }
 
 Indicator HKU_API TA_AD() {
