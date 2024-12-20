@@ -176,12 +176,12 @@ public:
         return m_imp;
     }
 
-    value_t* data(size_t result_num = 0) {
-        return m_imp ? m_imp->data(result_num) : nullptr;
+    value_t* data(size_t result_idx = 0) {
+        return m_imp ? m_imp->data(result_idx) : nullptr;
     }
 
-    value_t const* data(size_t result_num = 0) const {
-        return m_imp ? m_imp->data(result_num) : nullptr;
+    value_t const* data(size_t result_idx = 0) const {
+        return m_imp ? m_imp->data(result_idx) : nullptr;
     }
 
     /**

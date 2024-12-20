@@ -36,7 +36,18 @@
     }
 
 namespace hku {
+
+Indicator HKU_API TA_ACCBANDS();
+Indicator HKU_API TA_ACCBANDS(const KData& k, int n = 20);
+
 TA_IN1_OUT1_CRT(TA_ACOS)
+
+Indicator HKU_API TA_AD();
+Indicator HKU_API TA_AD(const KData& k);
+
+Indicator HKU_API TA_ADOSC();
+Indicator HKU_API TA_ADOSC(const KData& k, int fast_n = 3, int slow_n = 10);
+
 TA_IN1_OUT1_CRT(TA_ASIN)
 TA_IN1_OUT1_CRT(TA_ATAN)
 TA_IN1_OUT1_N_CRT(TA_AVGDEV, 14)

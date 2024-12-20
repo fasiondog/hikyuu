@@ -1,0 +1,85 @@
+/*
+ *  Copyright (c) 2024 hikyuu.org
+ *
+ *  Created on: 2024-12-20
+ *      Author: fasiondog
+ */
+
+#include "ta_func.h"
+#include "TaAdosc.h"
+
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::TaAdosc)
+#endif
+
+namespace hku {
+
+TaAdosc::TaAdosc() : IndicatorImp("TA_ADOSC", 1) {
+    setParam<int>("fast_n", 3);
+    setParam<int>("slow_n", 10);
+}
+
+TaAdosc::TaAdosc(const KData& k, int fast_n, int slow_n) : IndicatorImp("TA_ADOSC", 1) {
+    setParam<KData>("kdata", k);
+    setParam<int>("fast_n", fast_n);
+    setParam<int>("slow_n", slow_n);
+    TaAdosc::_calculate(Indicator());
+}
+
+void TaAdosc::_checkParam(const string& name) const {
+    if (name == "fast_n") {
+        int fast_n = getParam<int>("fast_n");
+        HKU_ASSERT(fast_n >= 2 && fast_n <= 100000);
+    } else if (name == "slow_n") {
+        int slow_n = getParam<int>("slow_n");
+        HKU_ASSERT(slow_n >= 2 && slow_n <= 100000);
+    }
+}
+
+void TaAdosc::_calculate(const Indicator& data) {
+    HKU_WARN_IF(!isLeaf() && !data.empty(),
+                "The input is ignored because {} depends on the context!", m_name);
+
+    KData k = getContext();
+    size_t total = k.size();
+    if (total == 0) {
+        return;
+    }
+
+    _readyBuffer(total, 1);
+
+    const KRecord* kptr = k.data();
+    std::unique_ptr<double[]> high = std::make_unique<double[]>(total);
+    std::unique_ptr<double[]> low = std::make_unique<double[]>(total);
+    std::unique_ptr<double[]> close = std::make_unique<double[]>(total);
+    std::unique_ptr<double[]> vol = std::make_unique<double[]>(total);
+    for (size_t i = 0; i < total; ++i) {
+        high[i] = kptr[i].highPrice;
+        low[i] = kptr[i].lowPrice;
+        close[i] = kptr[i].closePrice;
+        vol[i] = kptr[i].transCount;
+    }
+
+    auto* dst = this->data();
+
+    int fast_n = getParam<int>("fast_n");
+    int slow_n = getParam<int>("slow_n");
+    int back = TA_ADOSC_Lookback(fast_n, slow_n);
+    HKU_IF_RETURN(back < 0, void());
+
+    m_discard = back;
+    int outBegIdx;
+    int outNbElement;
+    TA_ADOSC(0, total - 1, high.get(), low.get(), close.get(), vol.get(), fast_n, slow_n,
+             &outBegIdx, &outNbElement, dst + m_discard);
+}
+
+Indicator HKU_API TA_ADOSC() {
+    return make_shared<TaAdosc>()->calculate();
+}
+
+Indicator HKU_API TA_ADOSC(const KData& k, int fast_n, int slow_n) {
+    return Indicator(make_shared<TaAdosc>(k, fast_n, slow_n));
+}
+
+} /* namespace hku */

@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#pragma once
+
 #define EXPOERT_TA_FUNC(func) BOOST_CLASS_EXPORT(hku::Cls_##func)
 
 #define TA_IN1_OUT1_IMP(func)                                                              \

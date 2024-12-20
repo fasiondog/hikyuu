@@ -28,7 +28,19 @@ namespace py = pybind11;
 using namespace hku;
 
 void export_Indicator_ta_lib(py::module& m) {
+    m.def("TA_ACCBANDS", py::overload_cast<>(TA_ACCBANDS));
+    m.def("TA_ACCBANDS", py::overload_cast<const KData&, int>(TA_ACCBANDS), py::arg("data"),
+          py::arg("n") = 20);
+
     TA_IN1_OUT1_PY(TA_ACOS)
+
+    m.def("TA_AD", py::overload_cast<>(TA_AD));
+    m.def("TA_AD", py::overload_cast<const KData&>(TA_AD), py::arg("data"));
+
+    m.def("TA_ADOSC", py::overload_cast<>(TA_ADOSC));
+    m.def("TA_ADOSC", py::overload_cast<const KData&, int, int>(TA_ADOSC), py::arg("data"),
+          py::arg("fast_n") = 3, py::arg("slow_n") = 10);
+
     TA_IN1_OUT1_PY(TA_ASIN)
     TA_IN1_OUT1_PY(TA_ATAN)
     TA_IN1_OUT1_N_PY(TA_AVGDEV, 14)
