@@ -9,8 +9,18 @@
 
 #include "hikyuu/config.h"
 #include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/indicator/crt/CVAL.h"
 
 #if HKU_ENABLE_TA_LIB
+
+#define TA_IN1_OUT1_CRT(func)                               \
+    Indicator HKU_API func();                               \
+    inline Indicator func(const Indicator& ind) {           \
+        return func()(ind);                                 \
+    }                                                       \
+    inline Indicator HKU_API func(Indicator::value_t val) { \
+        return func(CVAL(val));                             \
+    }
 
 #define TA_IN1_OUT1_N_CRT(func, period)                                        \
     Indicator HKU_API func(int n = period);                                    \
@@ -26,13 +36,28 @@
     }
 
 namespace hku {
-
+TA_IN1_OUT1_CRT(TA_ACOS)
+TA_IN1_OUT1_CRT(TA_ASIN)
+TA_IN1_OUT1_CRT(TA_ATAN)
+TA_IN1_OUT1_N_CRT(TA_AVGDEV, 14)
+TA_IN1_OUT1_CRT(TA_CEIL)
 TA_IN1_OUT1_N_CRT(TA_CMO, 14)
+TA_IN1_OUT1_CRT(TA_COS)
+TA_IN1_OUT1_CRT(TA_COSH)
 TA_IN1_OUT1_N_CRT(TA_DEMA, 30)
 TA_IN1_OUT1_N_CRT(TA_EMA, 30)
-TA_IN1_OUT1_N_CRT(TA_AVGDEV, 14)
+TA_IN1_OUT1_CRT(TA_EXP)
+TA_IN1_OUT1_CRT(TA_FLOOR)
+TA_IN1_OUT1_CRT(TA_HT_DCPERIOD)
+TA_IN1_OUT1_CRT(TA_HT_DCPHASE)
+TA_IN1_OUT1_CRT(TA_HT_TRENDLINE)
 TA_IN1_OUT1_N_CRT(TA_KAMA, 30)
 TA_IN1_OUT1_N_CRT(TA_LINEARREG_ANGLE, 14)
+TA_IN1_OUT1_N_CRT(TA_LINEARREG_INTERCEPT, 14)
+TA_IN1_OUT1_N_CRT(TA_LINEARREG_SLOPE, 14)
+TA_IN1_OUT1_N_CRT(TA_LINEARREG, 14)
+TA_IN1_OUT1_CRT(TA_LN)
+TA_IN1_OUT1_CRT(TA_LOG10)
 TA_IN1_OUT1_N_CRT(TA_MAX, 30)
 TA_IN1_OUT1_N_CRT(TA_MIDPOINT, 14)
 TA_IN1_OUT1_N_CRT(TA_MIN, 30)
@@ -42,7 +67,12 @@ TA_IN1_OUT1_N_CRT(TA_ROCP, 10)
 TA_IN1_OUT1_N_CRT(TA_ROCR, 10)
 TA_IN1_OUT1_N_CRT(TA_ROCR100, 10)
 TA_IN1_OUT1_N_CRT(TA_RSI, 14)
+TA_IN1_OUT1_CRT(TA_SIN)
+TA_IN1_OUT1_CRT(TA_SINH)
 TA_IN1_OUT1_N_CRT(TA_SMA, 30)
+TA_IN1_OUT1_CRT(TA_SQRT)
+TA_IN1_OUT1_CRT(TA_TAN)
+TA_IN1_OUT1_CRT(TA_TANH)
 TA_IN1_OUT1_N_CRT(TA_TEMA, 30)
 TA_IN1_OUT1_N_CRT(TA_TRIMA, 30)
 TA_IN1_OUT1_N_CRT(TA_TRIX, 30)
