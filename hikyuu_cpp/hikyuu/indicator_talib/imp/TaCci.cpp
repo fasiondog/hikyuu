@@ -1,37 +1,37 @@
 /*
  *  Copyright (c) 2024 hikyuu.org
  *
- *  Created on: 2024-12-20
+ *  Created on: 2024-12-21
  *      Author: fasiondog
  */
 
 #include "ta_func.h"
-#include "TaAccbands.h"
+#include "TaCci.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::TaAccbands)
+BOOST_CLASS_EXPORT(hku::TaCci)
 #endif
 
 namespace hku {
 
-TaAccbands::TaAccbands() : IndicatorImp("TA_ACCBANDS", 3) {
-    setParam<int>("n", 20);
+TaCci::TaCci() : IndicatorImp("TA_CCI", 1) {
+    setParam<int>("n", 14);
 }
 
-TaAccbands::TaAccbands(const KData& k, int n) : IndicatorImp("TA_ACCBANDS", 3) {
+TaCci::TaCci(const KData& k, int n) : IndicatorImp("TA_CCI", 1) {
     setParam<KData>("kdata", k);
     setParam<int>("n", n);
-    TaAccbands::_calculate(Indicator());
+    TaCci::_calculate(Indicator());
 }
 
-void TaAccbands::_checkParam(const string& name) const {
+void TaCci::_checkParam(const string& name) const {
     if (name == "n") {
         int n = getParam<int>("n");
-        HKU_ASSERT(n >= 2 && n <= 100000);
+        HKU_ASSERT(n >= 1 && n <= 100000);
     }
 }
 
-void TaAccbands::_calculate(const Indicator& data) {
+void TaCci::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
@@ -41,7 +41,7 @@ void TaAccbands::_calculate(const Indicator& data) {
         return;
     }
 
-    _readyBuffer(total, 3);
+    _readyBuffer(total, 1);
 
     const KRecord* kptr = k.data();
 
@@ -55,30 +55,26 @@ void TaAccbands::_calculate(const Indicator& data) {
         close[i] = kptr[i].closePrice;
     }
 
-    auto* dst0 = this->data(0);
-    auto* dst1 = this->data(1);
-    auto* dst2 = this->data(2);
-
     int n = getParam<int>("n");
-    int back = TA_ACCBANDS_Lookback(n);
+    int back = TA_CCI_Lookback(n);
     HKU_IF_RETURN(back < 0, void());
 
+    auto* dst = this->data();
     m_discard = back;
     int outBegIdx;
     int outNbElement;
-    TA_ACCBANDS(0, total - 1, high, low, close, n, &outBegIdx, &outNbElement, dst0 + back,
-                dst1 + back, dst2 + back);
+    TA_CCI(0, total - 1, high, low, close, n, &outBegIdx, &outNbElement, dst + back);
 }
 
-Indicator HKU_API TA_ACCBANDS(int n) {
-    auto p = make_shared<TaAccbands>();
+Indicator HKU_API TA_CCI(int n) {
+    auto p = make_shared<TaCci>();
     p->setParam<int>("n", n);
     p->calculate();
     return Indicator(p);
 }
 
-Indicator HKU_API TA_ACCBANDS(const KData& k, int n) {
-    return Indicator(make_shared<TaAccbands>(k, n));
+Indicator HKU_API TA_CCI(const KData& k, int n) {
+    return Indicator(make_shared<TaCci>(k, n));
 }
 
 } /* namespace hku */

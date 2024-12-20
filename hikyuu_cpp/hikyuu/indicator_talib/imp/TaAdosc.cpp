@@ -75,8 +75,12 @@ void TaAdosc::_calculate(const Indicator& data) {
              dst + m_discard);
 }
 
-Indicator HKU_API TA_ADOSC() {
-    return make_shared<TaAdosc>()->calculate();
+Indicator HKU_API TA_ADOSC(int fast_n, int slow_n) {
+    auto p = make_shared<TaAdosc>();
+    p->setParam<int>("fast_n", fast_n);
+    p->setParam<int>("slow_n", slow_n);
+    p->calculate();
+    return Indicator(p);
 }
 
 Indicator HKU_API TA_ADOSC(const KData& k, int fast_n, int slow_n) {

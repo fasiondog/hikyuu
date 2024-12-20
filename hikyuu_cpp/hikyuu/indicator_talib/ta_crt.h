@@ -37,7 +37,7 @@
 
 namespace hku {
 
-Indicator HKU_API TA_ACCBANDS();
+Indicator HKU_API TA_ACCBANDS(int n = 20);
 Indicator HKU_API TA_ACCBANDS(const KData& k, int n = 20);
 
 TA_IN1_OUT1_CRT(TA_ACOS)
@@ -45,23 +45,84 @@ TA_IN1_OUT1_CRT(TA_ACOS)
 Indicator HKU_API TA_AD();
 Indicator HKU_API TA_AD(const KData& k);
 
-Indicator HKU_API TA_ADOSC();
+Indicator HKU_API TA_ADOSC(int fast_n = 3, int slow_n = 10);
 Indicator HKU_API TA_ADOSC(const KData& k, int fast_n = 3, int slow_n = 10);
+
+Indicator HKU_API TA_ADX(int n = 14);
+Indicator HKU_API TA_ADX(const KData& k, int n = 14);
+
+Indicator HKU_API TA_ADXR(int n = 14);
+Indicator HKU_API TA_ADXR(const KData& k, int n = 14);
+
+Indicator HKU_API TA_APO(int fast_n = 12, int slow_n = 26, int matype = 0);
+inline Indicator TA_APO(const Indicator& ind, int fast_n = 12, int slow_n = 26, int matype = 0) {
+    return TA_APO(fast_n, slow_n, matype)(ind);
+}
+
+Indicator HKU_API TA_AROON(int n = 14);
+Indicator HKU_API TA_AROON(const KData& k, int n = 14);
+
+Indicator HKU_API TA_AROONOSC(int n = 14);
+Indicator HKU_API TA_AROONOSC(const KData& k, int n = 14);
 
 TA_IN1_OUT1_CRT(TA_ASIN)
 TA_IN1_OUT1_CRT(TA_ATAN)
+
+Indicator HKU_API TA_ATR(int n = 14);
+Indicator HKU_API TA_ATR(const KData& k, int n = 14);
+
 TA_IN1_OUT1_N_CRT(TA_AVGDEV, 14)
+
+Indicator HKU_API TA_AVGPRICE();
+Indicator HKU_API TA_AVGPRICE(const KData& k);
+
+Indicator HKU_API TA_BBANDS(int n = 5, double nbdevup = 2., double nbdevdn = 2., int matype = 0);
+inline Indicator TA_BBANDS(const Indicator& ind, int n = 5, double nbdevup = 2.,
+                           double nbdevdn = 2., int matype = 0) {
+    return TA_BBANDS(n, nbdevup, nbdevdn, matype)(ind);
+}
+
+Indicator HKU_API TA_BOP();
+Indicator HKU_API TA_BOP(const KData& k);
+
+Indicator HKU_API TA_CCI(int n = 14);
+Indicator HKU_API TA_CCI(const KData& k, int n = 14);
+
 TA_IN1_OUT1_CRT(TA_CEIL)
 TA_IN1_OUT1_N_CRT(TA_CMO, 14)
 TA_IN1_OUT1_CRT(TA_COS)
 TA_IN1_OUT1_CRT(TA_COSH)
 TA_IN1_OUT1_N_CRT(TA_DEMA, 30)
+
+Indicator HKU_API TA_DX(int n = 14);
+Indicator HKU_API TA_DX(const KData& k, int n = 14);
+
 TA_IN1_OUT1_N_CRT(TA_EMA, 30)
 TA_IN1_OUT1_CRT(TA_EXP)
 TA_IN1_OUT1_CRT(TA_FLOOR)
 TA_IN1_OUT1_CRT(TA_HT_DCPERIOD)
 TA_IN1_OUT1_CRT(TA_HT_DCPHASE)
+
+Indicator HKU_API TA_HT_PHASOR();
+inline Indicator TA_HT_PHASOR(const Indicator& ind) {
+    return TA_HT_PHASOR()(ind);
+}
+
+Indicator HKU_API TA_HT_SINE();
+inline Indicator TA_HT_SINE(const Indicator& ind) {
+    return TA_HT_SINE()(ind);
+}
+
 TA_IN1_OUT1_CRT(TA_HT_TRENDLINE)
+
+Indicator HKU_API TA_HT_TRENDMODE();
+inline Indicator TA_HT_TRENDMODE(const Indicator& ind) {
+    return TA_HT_TRENDMODE()(ind);
+}
+
+Indicator HKU_API TA_IMI(int n = 14);
+Indicator HKU_API TA_IMI(const KData& k, int n = 14);
+
 TA_IN1_OUT1_N_CRT(TA_KAMA, 30)
 TA_IN1_OUT1_N_CRT(TA_LINEARREG_ANGLE, 14)
 TA_IN1_OUT1_N_CRT(TA_LINEARREG_INTERCEPT, 14)
@@ -69,7 +130,49 @@ TA_IN1_OUT1_N_CRT(TA_LINEARREG_SLOPE, 14)
 TA_IN1_OUT1_N_CRT(TA_LINEARREG, 14)
 TA_IN1_OUT1_CRT(TA_LN)
 TA_IN1_OUT1_CRT(TA_LOG10)
+
+Indicator HKU_API TA_MA(int n = 30, int matype = 0);
+inline Indicator TA_MA(const Indicator& ind, int n = 30, int matype = 0) {
+    return TA_MA(n, matype)(ind);
+}
+
+Indicator HKU_API TA_MACD(int fast_n = 12, int slow_n = 26, int signal_n = 9);
+inline Indicator TA_MACD(const Indicator& ind, int fast_n = 12, int slow_n = 26, int signal_n = 9) {
+    return TA_MACD(fast_n, slow_n, signal_n)(ind);
+}
+
+Indicator HKU_API TA_MACDEXT(int fast_n = 12, int slow_n = 26, int signal_n = 9,
+                             int fast_matype = 0, int slow_matype = 0, int signal_matype = 0);
+inline Indicator TA_MACDEXT(const Indicator& ind, int fast_n = 12, int slow_n = 26,
+                            int signal_n = 9, int fast_matype = 0, int slow_matype = 0,
+                            int signal_matype = 0) {
+    return TA_MACDEXT(fast_n, slow_n, signal_n, fast_matype, slow_matype, signal_matype)(ind);
+}
+
+Indicator HKU_API TA_MACDFIX(int n = 9);
+inline Indicator TA_MACDFIX(const Indicator& ind, int n = 9) {
+    return TA_MACDFIX(n)(ind);
+}
+
+Indicator HKU_API TA_MAMA(double fast_limit = 5.000000e-1, double slow_limit = 5.000000e-2);
+inline Indicator TA_MAMA(const Indicator& ind, double fast_limit = 5.000000e-1,
+                         double slow_limit = 5.000000e-2) {
+    return TA_MAMA(fast_limit, slow_limit)(ind);
+}
+
 TA_IN1_OUT1_N_CRT(TA_MAX, 30)
+
+Indicator HKU_API TA_MAXINDEX(int n = 30);
+inline Indicator TA_MAXINDEX(const Indicator& ind, int n = 30) {
+    return TA_MAXINDEX(n)(ind);
+}
+
+Indicator HKU_API TA_MEDPRICE();
+Indicator HKU_API TA_MEDPRICE(const KData& k);
+
+Indicator HKU_API TA_MFI(int n = 14);
+Indicator HKU_API TA_MFI(const KData& k, int n = 14);
+
 TA_IN1_OUT1_N_CRT(TA_MIDPOINT, 14)
 TA_IN1_OUT1_N_CRT(TA_MIN, 30)
 TA_IN1_OUT1_N_CRT(TA_MOM, 10)
