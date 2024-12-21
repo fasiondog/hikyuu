@@ -78,10 +78,7 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT_PY(TA_COS)
     TA_IN1_OUT_PY(TA_COSH)
     TA_IN1_OUT_N_PY(TA_DEMA, 30)
-
-    m.def("TA_DX", py::overload_cast<int>(TA_DX), py::arg("n") = 14);
-    m.def("TA_DX", py::overload_cast<const KData&, int>(TA_DX), py::arg("data"), py::arg("n") = 14);
-
+    TA_K_OUT_N_PY(TA_DX, 14)
     TA_IN1_OUT_N_PY(TA_EMA, 30)
     TA_IN1_OUT_PY(TA_EXP)
     TA_IN1_OUT_PY(TA_FLOOR)
@@ -99,10 +96,7 @@ void export_Indicator_ta_lib(py::module& m) {
     m.def("TA_HT_TRENDMODE", py::overload_cast<>(TA_HT_TRENDMODE));
     m.def("TA_HT_TRENDMODE", py::overload_cast<const Indicator&>(TA_HT_TRENDMODE));
 
-    m.def("TA_IMI", py::overload_cast<int>(TA_IMI), py::arg("n") = 14);
-    m.def("TA_IMI", py::overload_cast<const KData&, int>(TA_IMI), py::arg("data"),
-          py::arg("n") = 14);
-
+    TA_K_OUT_N_PY(TA_IMI, 14)
     TA_IN1_OUT_N_PY(TA_KAMA, 30)
     TA_IN1_OUT_N_PY(TA_LINEARREG_ANGLE, 14)
     TA_IN1_OUT_N_PY(TA_LINEARREG_INTERCEPT, 14)
@@ -144,17 +138,9 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("n") = 30);
 
     TA_K_OUT_PY(TA_MEDPRICE)
-
-    m.def("TA_MFI", py::overload_cast<int>(TA_MFI), py::arg("n") = 14);
-    m.def("TA_MFI", py::overload_cast<const KData&, int>(TA_MFI), py::arg("data"),
-          py::arg("n") = 14);
-
+    TA_K_OUT_N_PY(TA_MFI, 14)
     TA_IN1_OUT_N_PY(TA_MIDPOINT, 14)
-
-    m.def("TA_MIDPRICE", py::overload_cast<int>(TA_MIDPRICE), py::arg("n") = 14);
-    m.def("TA_MIDPRICE", py::overload_cast<const KData&, int>(TA_MIDPRICE), py::arg("data"),
-          py::arg("n") = 14);
-
+    TA_K_OUT_N_PY(TA_MIDPRICE, 14)
     TA_IN1_OUT_N_PY(TA_MIN, 30)
 
     m.def("TA_MININDEX", py::overload_cast<int>(TA_MININDEX), py::arg("n") = 30);
@@ -167,6 +153,8 @@ void export_Indicator_ta_lib(py::module& m) {
     m.def("TA_MINMAXINDEX", py::overload_cast<const Indicator&, int>(TA_MINMAXINDEX),
           py::arg("data"), py::arg("n") = 30);
 
+    TA_K_OUT_N_PY(TA_MINUS_DI, 14)
+    TA_K_OUT_N_PY(TA_MINUS_DM, 14)
     TA_IN1_OUT_N_PY(TA_MOM, 10)
     TA_IN1_OUT_N_PY(TA_ROC, 10)
     TA_IN1_OUT_N_PY(TA_ROCP, 10)

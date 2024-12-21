@@ -86,10 +86,7 @@ TA_IN1_OUT_N_CRT(TA_CMO, 14)
 TA_IN1_OUT_CRT(TA_COS)
 TA_IN1_OUT_CRT(TA_COSH)
 TA_IN1_OUT_N_CRT(TA_DEMA, 30)
-
-Indicator HKU_API TA_DX(int n = 14);
-Indicator HKU_API TA_DX(const KData& k, int n = 14);
-
+TA_K_OUT_N_CRT(TA_DX, 14)
 TA_IN1_OUT_N_CRT(TA_EMA, 30)
 TA_IN1_OUT_CRT(TA_EXP)
 TA_IN1_OUT_CRT(TA_FLOOR)
@@ -113,9 +110,7 @@ inline Indicator TA_HT_TRENDMODE(const Indicator& ind) {
     return TA_HT_TRENDMODE()(ind);
 }
 
-Indicator HKU_API TA_IMI(int n = 14);
-Indicator HKU_API TA_IMI(const KData& k, int n = 14);
-
+TA_K_OUT_N_CRT(TA_IMI, 14)
 TA_IN1_OUT_N_CRT(TA_KAMA, 30)
 TA_IN1_OUT_N_CRT(TA_LINEARREG_ANGLE, 14)
 TA_IN1_OUT_N_CRT(TA_LINEARREG_INTERCEPT, 14)
@@ -161,10 +156,7 @@ inline Indicator TA_MAXINDEX(const Indicator& ind, int n = 30) {
 }
 
 TA_K_OUT_CRT(TA_MEDPRICE)
-
-Indicator HKU_API TA_MFI(int n = 14);
-Indicator HKU_API TA_MFI(const KData& k, int n = 14);
-
+TA_K_OUT_N_CRT(TA_MFI, 14)
 TA_IN1_OUT_N_CRT(TA_MIDPOINT, 14)
 
 Indicator HKU_API TA_MIDPRICE(int n = 14);
@@ -184,6 +176,8 @@ inline Indicator TA_MINMAXINDEX(const Indicator& ind, int n = 30) {
     return TA_MINMAXINDEX(n)(ind);
 }
 
+TA_K_OUT_N_CRT(TA_MINUS_DI, 14)
+TA_K_OUT_N_CRT(TA_MINUS_DM, 14)
 TA_IN1_OUT_N_CRT(TA_MOM, 10)
 TA_IN1_OUT_N_CRT(TA_ROC, 10)
 TA_IN1_OUT_N_CRT(TA_ROCP, 10)
