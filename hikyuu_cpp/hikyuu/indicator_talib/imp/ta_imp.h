@@ -189,3 +189,99 @@
         p->setIndParam("n", n);                                                              \
         return Indicator(p);                                                                 \
     }
+
+#define TA_OHLC_OUT1_IMP(func)                                                          \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
+                                                                                        \
+    Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                   \
+        setParam<KData>("kdata", k);                                                    \
+        Cls_##func::_calculate(Indicator());                                            \
+    }                                                                                   \
+                                                                                        \
+    void Cls_##func::_calculate(const Indicator &data) {                                \
+        HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
+                    "The input is ignored because {} depends on the context!", m_name); \
+                                                                                        \
+        KData k = getContext();                                                         \
+        size_t total = k.size();                                                        \
+        if (total == 0) {                                                               \
+            return;                                                                     \
+        }                                                                               \
+                                                                                        \
+        _readyBuffer(total, 1);                                                         \
+                                                                                        \
+        const KRecord *kptr = k.data();                                                 \
+        std::unique_ptr<double[]> buf = std::make_unique<double[]>(4 * total);          \
+        double *open = buf.get();                                                       \
+        double *high = open + total;                                                    \
+        double *low = high + total;                                                     \
+        double *close = low + total;                                                    \
+        for (size_t i = 0; i < total; ++i) {                                            \
+            open[i] = kptr[i].openPrice;                                                \
+            high[i] = kptr[i].highPrice;                                                \
+            low[i] = kptr[i].lowPrice;                                                  \
+            close[i] = kptr[i].closePrice;                                              \
+        }                                                                               \
+                                                                                        \
+        auto *dst = this->data();                                                       \
+                                                                                        \
+        int outBegIdx;                                                                  \
+        int outNbElement;                                                               \
+        func(0, total - 1, open, high, low, close, &outBegIdx, &outNbElement, dst);     \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func() {                                                          \
+        return make_shared<Cls_##func>()->calculate();                                  \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func(const KData &k) {                                            \
+        return Indicator(make_shared<Cls_##func>(k));                                   \
+    }
+
+#define TA_HLCV_OUT1_IMP(func)                                                          \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
+                                                                                        \
+    Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                   \
+        setParam<KData>("kdata", k);                                                    \
+        Cls_##func::_calculate(Indicator());                                            \
+    }                                                                                   \
+                                                                                        \
+    void Cls_##func::_calculate(const Indicator &data) {                                \
+        HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
+                    "The input is ignored because {} depends on the context!", m_name); \
+                                                                                        \
+        KData k = getContext();                                                         \
+        size_t total = k.size();                                                        \
+        if (total == 0) {                                                               \
+            return;                                                                     \
+        }                                                                               \
+                                                                                        \
+        _readyBuffer(total, 1);                                                         \
+                                                                                        \
+        const KRecord *kptr = k.data();                                                 \
+        std::unique_ptr<double[]> buf = std::make_unique<double[]>(4 * total);          \
+        double *high = buf.get();                                                       \
+        double *low = high + total;                                                     \
+        double *close = low + total;                                                    \
+        double *vol = close + total;                                                    \
+        for (size_t i = 0; i < total; ++i) {                                            \
+            high[i] = kptr[i].highPrice;                                                \
+            low[i] = kptr[i].lowPrice;                                                  \
+            close[i] = kptr[i].closePrice;                                              \
+            vol[i] = kptr[i].transCount;                                                \
+        }                                                                               \
+                                                                                        \
+        auto *dst = this->data();                                                       \
+                                                                                        \
+        int outBegIdx;                                                                  \
+        int outNbElement;                                                               \
+        func(0, total - 1, high, low, close, vol, &outBegIdx, &outNbElement, dst);      \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func() {                                                          \
+        return make_shared<Cls_##func>()->calculate();                                  \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func(const KData &k) {                                            \
+        return Indicator(make_shared<Cls_##func>(k));                                   \
+    }

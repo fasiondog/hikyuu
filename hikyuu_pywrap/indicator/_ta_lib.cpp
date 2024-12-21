@@ -24,6 +24,10 @@
     m.def(#func, py::overload_cast<const Indicator&, int>(func), py::arg("data"), \
           py::arg("n") = period);
 
+#define TA_K_OUT_PY(func)                    \
+    m.def(#func, py::overload_cast<>(func)); \
+    m.def(#func, py::overload_cast<const KData&>(func), py::arg("data"));
+
 namespace py = pybind11;
 using namespace hku;
 
@@ -33,9 +37,7 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("n") = 20);
 
     TA_IN1_OUT_PY(TA_ACOS)
-
-    m.def("TA_AD", py::overload_cast<>(TA_AD));
-    m.def("TA_AD", py::overload_cast<const KData&>(TA_AD), py::arg("data"));
+    TA_K_OUT_PY(TA_AD)
 
     m.def("TA_ADOSC", py::overload_cast<int, int>(TA_ADOSC), py::arg("fast_n") = 3,
           py::arg("slow_n") = 10);
@@ -71,9 +73,7 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("n") = 14);
 
     TA_IN1_OUT_N_PY(TA_AVGDEV, 14)
-
-    m.def("TA_AVGPRICE", py::overload_cast<>(TA_AVGPRICE));
-    m.def("TA_AVGPRICE", py::overload_cast<const KData&>(TA_AVGPRICE), py::arg("data"));
+    TA_K_OUT_PY(TA_AVGPRICE)
 
     m.def("TA_BBANDS", py::overload_cast<int, double, double, int>(TA_BBANDS), py::arg("n") = 5,
           py::arg("nbdevup") = 2., py::arg("nbdevdn") = 2., py::arg("matype") = 0);

@@ -35,15 +35,17 @@
         return func(IndParam(n))(data);                                        \
     }
 
+#define TA_K_OUT_CRT(func)    \
+    Indicator HKU_API func(); \
+    Indicator HKU_API func(const KData& k);
+
 namespace hku {
 
 Indicator HKU_API TA_ACCBANDS(int n = 20);
 Indicator HKU_API TA_ACCBANDS(const KData& k, int n = 20);
 
 TA_IN1_OUT_CRT(TA_ACOS)
-
-Indicator HKU_API TA_AD();
-Indicator HKU_API TA_AD(const KData& k);
+TA_K_OUT_CRT(TA_AD)
 
 Indicator HKU_API TA_ADOSC(int fast_n = 3, int slow_n = 10);
 Indicator HKU_API TA_ADOSC(const KData& k, int fast_n = 3, int slow_n = 10);
@@ -72,6 +74,7 @@ Indicator HKU_API TA_ATR(int n = 14);
 Indicator HKU_API TA_ATR(const KData& k, int n = 14);
 
 TA_IN1_OUT_N_CRT(TA_AVGDEV, 14)
+TA_K_OUT_CRT(TA_AVGPRICE)
 
 Indicator HKU_API TA_AVGPRICE();
 Indicator HKU_API TA_AVGPRICE(const KData& k);
