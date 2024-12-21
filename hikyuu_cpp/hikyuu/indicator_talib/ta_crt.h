@@ -45,9 +45,7 @@
 
 namespace hku {
 
-Indicator HKU_API TA_ACCBANDS(int n = 20);
-Indicator HKU_API TA_ACCBANDS(const KData& k, int n = 20);
-
+TA_K_OUT_N_CRT(TA_ACCBANDS, 20)
 TA_IN1_OUT_CRT(TA_ACOS)
 TA_K_OUT_CRT(TA_AD)
 
@@ -67,9 +65,7 @@ TA_K_OUT_N_CRT(TA_AROONOSC, 14)
 
 TA_IN1_OUT_CRT(TA_ASIN)
 TA_IN1_OUT_CRT(TA_ATAN)
-
-Indicator HKU_API TA_ATR(int n = 14);
-Indicator HKU_API TA_ATR(const KData& k, int n = 14);
+TA_K_OUT_N_CRT(TA_ATR, 14)
 
 TA_IN1_OUT_N_CRT(TA_AVGDEV, 14)
 TA_K_OUT_CRT(TA_AVGPRICE)
@@ -84,10 +80,7 @@ inline Indicator TA_BBANDS(const Indicator& ind, int n = 5, double nbdevup = 2.,
 }
 
 TA_K_OUT_CRT(TA_BOP)
-
-Indicator HKU_API TA_CCI(int n = 14);
-Indicator HKU_API TA_CCI(const KData& k, int n = 14);
-
+TA_K_OUT_N_CRT(TA_CCI, 14)
 TA_IN1_OUT_CRT(TA_CEIL)
 TA_IN1_OUT_N_CRT(TA_CMO, 14)
 TA_IN1_OUT_CRT(TA_COS)

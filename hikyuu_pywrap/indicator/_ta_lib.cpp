@@ -37,10 +37,7 @@ namespace py = pybind11;
 using namespace hku;
 
 void export_Indicator_ta_lib(py::module& m) {
-    m.def("TA_ACCBANDS", py::overload_cast<int>(TA_ACCBANDS), py::arg("n") = 20);
-    m.def("TA_ACCBANDS", py::overload_cast<const KData&, int>(TA_ACCBANDS), py::arg("data"),
-          py::arg("n") = 20);
-
+    TA_K_OUT_N_PY(TA_ACCBANDS, 20)
     TA_IN1_OUT_PY(TA_ACOS)
     TA_K_OUT_PY(TA_AD)
 
@@ -63,9 +60,7 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT_PY(TA_ASIN)
     TA_IN1_OUT_PY(TA_ATAN)
 
-    m.def("TA_ATR", py::overload_cast<int>(TA_ATR), py::arg("n") = 14);
-    m.def("TA_ATR", py::overload_cast<const KData&, int>(TA_ATR), py::arg("data"),
-          py::arg("n") = 14);
+    TA_K_OUT_N_PY(TA_ATR, 14)
 
     TA_IN1_OUT_N_PY(TA_AVGDEV, 14)
     TA_K_OUT_PY(TA_AVGPRICE)
@@ -77,11 +72,7 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("matype") = 0);
 
     TA_K_OUT_PY(TA_BOP)
-
-    m.def("TA_CCI", py::overload_cast<int>(TA_CCI), py::arg("n") = 14);
-    m.def("TA_CCI", py::overload_cast<const KData&, int>(TA_CCI), py::arg("data"),
-          py::arg("n") = 14);
-
+    TA_K_OUT_N_PY(TA_CCI, 14)
     TA_IN1_OUT_PY(TA_CEIL)
     TA_IN1_OUT_N_PY(TA_CMO, 14)
     TA_IN1_OUT_PY(TA_COS)
