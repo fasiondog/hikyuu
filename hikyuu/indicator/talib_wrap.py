@@ -728,7 +728,7 @@ try:
 
     PYTA_ULTOSC.__doc__ = talib.ULTOSC.__doc__
 
-    def PYTA_VAR(ind=None, timeperiod=5, nbdev=1):
+    def PYTA_VAR(ind=None, timeperiod=5, nbdev=1.):
         imp = crtTaIndicatorImp(ta.VAR, 'PYTA_VAR', result_num=1, params={'timeperiod': timeperiod, 'nbdev': nbdev})
         return Indicator(imp)(ind) if ind else Indicator(imp)
 

@@ -235,6 +235,12 @@ TA_IN1_OUT_N_CRT(TA_MOM, 10)
 TA_K_OUT_N_CRT(TA_NATR, 14)
 TA_K_OUT_N_CRT(TA_PLUS_DI, 14)
 TA_K_OUT_N_CRT(TA_PLUS_DM, 14)
+
+Indicator HKU_API TA_PPO(int fast_n = 12, int slow_n = 26, int matype = 0);
+inline Indicator TA_PPO(const Indicator& ind, int fast_n = 12, int slow_n = 26, int matype = 0) {
+    return TA_PPO(fast_n, slow_n, matype)(ind);
+}
+
 TA_IN1_OUT_N_CRT(TA_ROC, 10)
 TA_IN1_OUT_N_CRT(TA_ROCP, 10)
 TA_IN1_OUT_N_CRT(TA_ROCR, 10)

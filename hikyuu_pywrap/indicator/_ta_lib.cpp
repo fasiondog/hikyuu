@@ -211,6 +211,12 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT_N_PY(TA_MINMAXINDEX, 30)
     TA_K_OUT_N_PY(TA_MINUS_DI, 14)
     TA_K_OUT_N_PY(TA_MINUS_DM, 14)
+
+    m.def("TA_PPO", py::overload_cast<int, int, int>(TA_PPO), py::arg("fast_n") = 12,
+          py::arg("slow_n") = 26, py::arg("matype") = 0);
+    m.def("TA_PPO", py::overload_cast<const Indicator&, int, int, int>(TA_PPO), py::arg("data"),
+          py::arg("fast_n") = 12, py::arg("slow_n") = 26, py::arg("matype") = 0);
+
     TA_IN1_OUT_N_PY(TA_MOM, 10)
     TA_K_OUT_N_PY(TA_NATR, 14)
     TA_K_OUT_N_PY(TA_PLUS_DI, 14)
