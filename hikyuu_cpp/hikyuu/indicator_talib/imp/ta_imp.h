@@ -224,7 +224,6 @@
         }                                                                               \
                                                                                         \
         auto *dst = this->data();                                                       \
-                                                                                        \
         int outBegIdx;                                                                  \
         int outNbElement;                                                               \
         func(0, total - 1, open, high, low, close, &outBegIdx, &outNbElement, dst);     \
@@ -272,7 +271,6 @@
         }                                                                               \
                                                                                         \
         auto *dst = this->data();                                                       \
-                                                                                        \
         int outBegIdx;                                                                  \
         int outNbElement;                                                               \
         func(0, total - 1, high, low, close, vol, &outBegIdx, &outNbElement, dst);      \
@@ -284,4 +282,251 @@
                                                                                         \
     Indicator HKU_API func(const KData &k) {                                            \
         return Indicator(make_shared<Cls_##func>(k));                                   \
+    }
+
+#define TA_HL_OUT1_IMP(func)                                                            \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
+                                                                                        \
+    Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                   \
+        setParam<KData>("kdata", k);                                                    \
+        Cls_##func::_calculate(Indicator());                                            \
+    }                                                                                   \
+                                                                                        \
+    void Cls_##func::_calculate(const Indicator &data) {                                \
+        HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
+                    "The input is ignored because {} depends on the context!", m_name); \
+                                                                                        \
+        KData k = getContext();                                                         \
+        size_t total = k.size();                                                        \
+        if (total == 0) {                                                               \
+            return;                                                                     \
+        }                                                                               \
+                                                                                        \
+        _readyBuffer(total, 1);                                                         \
+                                                                                        \
+        const KRecord *kptr = k.data();                                                 \
+        std::unique_ptr<double[]> buf = std::make_unique<double[]>(4 * total);          \
+        double *high = buf.get();                                                       \
+        double *low = high + total;                                                     \
+        for (size_t i = 0; i < total; ++i) {                                            \
+            high[i] = kptr[i].highPrice;                                                \
+            low[i] = kptr[i].lowPrice;                                                  \
+        }                                                                               \
+                                                                                        \
+        auto *dst = this->data();                                                       \
+        int outBegIdx;                                                                  \
+        int outNbElement;                                                               \
+        func(0, total - 1, high, low, &outBegIdx, &outNbElement, dst);                  \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func() {                                                          \
+        return make_shared<Cls_##func>()->calculate();                                  \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func(const KData &k) {                                            \
+        return Indicator(make_shared<Cls_##func>(k));                                   \
+    }
+
+#define TA_HLC_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)               \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                      \
+        setParam<int>("n", period);                                                          \
+    }                                                                                        \
+                                                                                             \
+    Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 1) {                 \
+        setParam<KData>("kdata", k);                                                         \
+        setParam<int>("n", n);                                                               \
+        Cls_##func::_calculate(Indicator());                                                 \
+    }                                                                                        \
+                                                                                             \
+    void Cls_##func::_checkParam(const string &name) const {                                 \
+        if (name == "n") {                                                                   \
+            int n = getParam<int>("n");                                                      \
+            HKU_ASSERT(n >= period_min && n <= period_max);                                  \
+        }                                                                                    \
+    }                                                                                        \
+                                                                                             \
+    void Cls_##func::_calculate(const Indicator &data) {                                     \
+        HKU_WARN_IF(!isLeaf() && !data.empty(),                                              \
+                    "The input is ignored because {} depends on the context!", m_name);      \
+                                                                                             \
+        KData k = getContext();                                                              \
+        size_t total = k.size();                                                             \
+        HKU_IF_RETURN(total == 0, void());                                                   \
+                                                                                             \
+        int n = getParam<int>("n");                                                          \
+        int back = func_lookback(n);                                                         \
+        HKU_IF_RETURN(back < 0, void());                                                     \
+                                                                                             \
+        _readyBuffer(total, 1);                                                              \
+        const KRecord *kptr = k.data();                                                      \
+        std::unique_ptr<double[]> buf = std::make_unique<double[]>(3 * total);               \
+        double *high = buf.get();                                                            \
+        double *low = high + total;                                                          \
+        double *close = low + total;                                                         \
+        for (size_t i = 0; i < total; ++i) {                                                 \
+            high[i] = kptr[i].highPrice;                                                     \
+            low[i] = kptr[i].lowPrice;                                                       \
+            close[i] = kptr[i].closePrice;                                                   \
+        }                                                                                    \
+                                                                                             \
+        auto *dst = this->data();                                                            \
+        m_discard = back;                                                                    \
+        int outBegIdx;                                                                       \
+        int outNbElement;                                                                    \
+        func(0, total - 1, high, low, close, n, &outBegIdx, &outNbElement, dst + m_discard); \
+        if (outBegIdx != m_discard) {                                                        \
+            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);        \
+            double null_double = Null<double>();                                             \
+            for (size_t i = m_discard; i < outBegIdx; ++i) {                                 \
+                _set(null_double, i);                                                        \
+            }                                                                                \
+            m_discard = outBegIdx;                                                           \
+        }                                                                                    \
+    }                                                                                        \
+                                                                                             \
+    Indicator HKU_API func(int n) {                                                          \
+        auto p = make_shared<Cls_##func>();                                                  \
+        p->setParam<int>("n", n);                                                            \
+        p->calculate();                                                                      \
+        return Indicator(p);                                                                 \
+    }                                                                                        \
+                                                                                             \
+    Indicator HKU_API func(const KData &k, int n) {                                          \
+        return Indicator(make_shared<Cls_##func>(k, n));                                     \
+    }
+
+#define TA_HL_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)           \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                 \
+        setParam<int>("n", period);                                                     \
+    }                                                                                   \
+                                                                                        \
+    Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 1) {            \
+        setParam<KData>("kdata", k);                                                    \
+        setParam<int>("n", n);                                                          \
+        Cls_##func::_calculate(Indicator());                                            \
+    }                                                                                   \
+                                                                                        \
+    void Cls_##func::_checkParam(const string &name) const {                            \
+        if (name == "n") {                                                              \
+            int n = getParam<int>("n");                                                 \
+            HKU_ASSERT(n >= period_min && n <= period_max);                             \
+        }                                                                               \
+    }                                                                                   \
+                                                                                        \
+    void Cls_##func::_calculate(const Indicator &data) {                                \
+        HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
+                    "The input is ignored because {} depends on the context!", m_name); \
+                                                                                        \
+        KData k = getContext();                                                         \
+        size_t total = k.size();                                                        \
+        HKU_IF_RETURN(total == 0, void());                                              \
+                                                                                        \
+        int n = getParam<int>("n");                                                     \
+        int back = func_lookback(n);                                                    \
+        HKU_IF_RETURN(back < 0, void());                                                \
+                                                                                        \
+        _readyBuffer(total, 1);                                                         \
+        const KRecord *kptr = k.data();                                                 \
+        std::unique_ptr<double[]> buf = std::make_unique<double[]>(3 * total);          \
+        double *high = buf.get();                                                       \
+        double *low = high + total;                                                     \
+        for (size_t i = 0; i < total; ++i) {                                            \
+            high[i] = kptr[i].highPrice;                                                \
+            low[i] = kptr[i].lowPrice;                                                  \
+        }                                                                               \
+                                                                                        \
+        auto *dst = this->data();                                                       \
+        m_discard = back;                                                               \
+        int outBegIdx;                                                                  \
+        int outNbElement;                                                               \
+        func(0, total - 1, high, low, n, &outBegIdx, &outNbElement, dst + m_discard);   \
+        if (outBegIdx != m_discard) {                                                   \
+            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);   \
+            double null_double = Null<double>();                                        \
+            for (size_t i = m_discard; i < outBegIdx; ++i) {                            \
+                _set(null_double, i);                                                   \
+            }                                                                           \
+            m_discard = outBegIdx;                                                      \
+        }                                                                               \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func(int n) {                                                     \
+        auto p = make_shared<Cls_##func>();                                             \
+        p->setParam<int>("n", n);                                                       \
+        p->calculate();                                                                 \
+        return Indicator(p);                                                            \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func(const KData &k, int n) {                                     \
+        return Indicator(make_shared<Cls_##func>(k, n));                                \
+    }
+
+#define TA_HL_OUT2_N_IMP(func, func_lookback, period, period_min, period_max)           \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 2) {                                 \
+        setParam<int>("n", period);                                                     \
+    }                                                                                   \
+                                                                                        \
+    Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 2) {            \
+        setParam<KData>("kdata", k);                                                    \
+        setParam<int>("n", n);                                                          \
+        Cls_##func::_calculate(Indicator());                                            \
+    }                                                                                   \
+                                                                                        \
+    void Cls_##func::_checkParam(const string &name) const {                            \
+        if (name == "n") {                                                              \
+            int n = getParam<int>("n");                                                 \
+            HKU_ASSERT(n >= period_min && n <= period_max);                             \
+        }                                                                               \
+    }                                                                                   \
+                                                                                        \
+    void Cls_##func::_calculate(const Indicator &data) {                                \
+        HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
+                    "The input is ignored because {} depends on the context!", m_name); \
+                                                                                        \
+        KData k = getContext();                                                         \
+        size_t total = k.size();                                                        \
+        HKU_IF_RETURN(total == 0, void());                                              \
+                                                                                        \
+        int n = getParam<int>("n");                                                     \
+        int back = func_lookback(n);                                                    \
+        HKU_IF_RETURN(back < 0, void());                                                \
+                                                                                        \
+        _readyBuffer(total, 2);                                                         \
+        const KRecord *kptr = k.data();                                                 \
+        std::unique_ptr<double[]> buf = std::make_unique<double[]>(3 * total);          \
+        double *high = buf.get();                                                       \
+        double *low = high + total;                                                     \
+        for (size_t i = 0; i < total; ++i) {                                            \
+            high[i] = kptr[i].highPrice;                                                \
+            low[i] = kptr[i].lowPrice;                                                  \
+        }                                                                               \
+                                                                                        \
+        auto *dst0 = this->data(0);                                                     \
+        auto *dst1 = this->data(1);                                                     \
+        m_discard = back;                                                               \
+        int outBegIdx;                                                                  \
+        int outNbElement;                                                               \
+        func(0, total - 1, high, low, n, &outBegIdx, &outNbElement, dst0 + m_discard,   \
+             dst1 + m_discard);                                                         \
+        if (outBegIdx != m_discard) {                                                   \
+            memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement); \
+            memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement); \
+            double null_double = Null<double>();                                        \
+            for (size_t i = m_discard; i < outBegIdx; ++i) {                            \
+                _set(null_double, i, 0);                                                \
+                _set(null_double, i, 1);                                                \
+            }                                                                           \
+            m_discard = outBegIdx;                                                      \
+        }                                                                               \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func(int n) {                                                     \
+        auto p = make_shared<Cls_##func>();                                             \
+        p->setParam<int>("n", n);                                                       \
+        p->calculate();                                                                 \
+        return Indicator(p);                                                            \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func(const KData &k, int n) {                                     \
+        return Indicator(make_shared<Cls_##func>(k, n));                                \
     }

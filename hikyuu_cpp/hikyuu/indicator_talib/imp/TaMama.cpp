@@ -33,7 +33,7 @@ void TaMama::_calculate(const Indicator& data) {
     int lookback = TA_MAMA_Lookback(fast_limit, slow_limit);
     HKU_IF_RETURN(lookback < 0, void());
 
-    _readyBuffer(total, 3);
+    _readyBuffer(total, 2);
 
     const double* src = data.data();
     auto* dst0 = this->data(0);

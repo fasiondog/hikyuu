@@ -39,6 +39,10 @@
     Indicator HKU_API func(); \
     Indicator HKU_API func(const KData& k);
 
+#define TA_K_OUT_N_CRT(func, period)        \
+    Indicator HKU_API func(int n = period); \
+    Indicator HKU_API func(const KData& k, int n = period);
+
 namespace hku {
 
 Indicator HKU_API TA_ACCBANDS(int n = 20);
@@ -50,22 +54,16 @@ TA_K_OUT_CRT(TA_AD)
 Indicator HKU_API TA_ADOSC(int fast_n = 3, int slow_n = 10);
 Indicator HKU_API TA_ADOSC(const KData& k, int fast_n = 3, int slow_n = 10);
 
-Indicator HKU_API TA_ADX(int n = 14);
-Indicator HKU_API TA_ADX(const KData& k, int n = 14);
-
-Indicator HKU_API TA_ADXR(int n = 14);
-Indicator HKU_API TA_ADXR(const KData& k, int n = 14);
+TA_K_OUT_N_CRT(TA_ADX, 14)
+TA_K_OUT_N_CRT(TA_ADXR, 14)
 
 Indicator HKU_API TA_APO(int fast_n = 12, int slow_n = 26, int matype = 0);
 inline Indicator TA_APO(const Indicator& ind, int fast_n = 12, int slow_n = 26, int matype = 0) {
     return TA_APO(fast_n, slow_n, matype)(ind);
 }
 
-Indicator HKU_API TA_AROON(int n = 14);
-Indicator HKU_API TA_AROON(const KData& k, int n = 14);
-
-Indicator HKU_API TA_AROONOSC(int n = 14);
-Indicator HKU_API TA_AROONOSC(const KData& k, int n = 14);
+TA_K_OUT_N_CRT(TA_AROON, 14)
+TA_K_OUT_N_CRT(TA_AROONOSC, 14)
 
 TA_IN1_OUT_CRT(TA_ASIN)
 TA_IN1_OUT_CRT(TA_ATAN)
@@ -85,8 +83,7 @@ inline Indicator TA_BBANDS(const Indicator& ind, int n = 5, double nbdevup = 2.,
     return TA_BBANDS(n, nbdevup, nbdevdn, matype)(ind);
 }
 
-Indicator HKU_API TA_BOP();
-Indicator HKU_API TA_BOP(const KData& k);
+TA_K_OUT_CRT(TA_BOP)
 
 Indicator HKU_API TA_CCI(int n = 14);
 Indicator HKU_API TA_CCI(const KData& k, int n = 14);
@@ -170,8 +167,7 @@ inline Indicator TA_MAXINDEX(const Indicator& ind, int n = 30) {
     return TA_MAXINDEX(n)(ind);
 }
 
-Indicator HKU_API TA_MEDPRICE();
-Indicator HKU_API TA_MEDPRICE(const KData& k);
+TA_K_OUT_CRT(TA_MEDPRICE)
 
 Indicator HKU_API TA_MFI(int n = 14);
 Indicator HKU_API TA_MFI(const KData& k, int n = 14);

@@ -28,6 +28,11 @@
     m.def(#func, py::overload_cast<>(func)); \
     m.def(#func, py::overload_cast<const KData&>(func), py::arg("data"));
 
+#define TA_K_OUT_N_PY(func, period)                                           \
+    m.def(#func, py::overload_cast<int>(func), py::arg("n") = period);        \
+    m.def(#func, py::overload_cast<const KData&, int>(func), py::arg("data"), \
+          py::arg("n") = period);
+
 namespace py = pybind11;
 using namespace hku;
 
@@ -44,26 +49,16 @@ void export_Indicator_ta_lib(py::module& m) {
     m.def("TA_ADOSC", py::overload_cast<const KData&, int, int>(TA_ADOSC), py::arg("data"),
           py::arg("fast_n") = 3, py::arg("slow_n") = 10);
 
-    m.def("TA_ADX", py::overload_cast<int>(TA_ADX), py::arg("n") = 14);
-    m.def("TA_ADX", py::overload_cast<const KData&, int>(TA_ADX), py::arg("data"),
-          py::arg("n") = 14);
-
-    m.def("TA_ADXR", py::overload_cast<int>(TA_ADXR), py::arg("n") = 14);
-    m.def("TA_ADXR", py::overload_cast<const KData&, int>(TA_ADXR), py::arg("data"),
-          py::arg("n") = 14);
+    TA_K_OUT_N_PY(TA_ADX, 14)
+    TA_K_OUT_N_PY(TA_ADXR, 14)
 
     m.def("TA_APO", py::overload_cast<int, int, int>(TA_APO), py::arg("fast_n") = 12,
           py::arg("slow_n") = 26, py::arg("matype") = 0);
     m.def("TA_APO", py::overload_cast<const Indicator&, int, int, int>(TA_APO), py::arg("data"),
           py::arg("fast_n") = 12, py::arg("slow_n") = 26, py::arg("matype") = 0);
 
-    m.def("TA_AROON", py::overload_cast<int>(TA_AROON), py::arg("n") = 14);
-    m.def("TA_AROON", py::overload_cast<const KData&, int>(TA_AROON), py::arg("data"),
-          py::arg("n") = 14);
-
-    m.def("TA_AROONOSC", py::overload_cast<int>(TA_AROONOSC), py::arg("n") = 14);
-    m.def("TA_AROONOSC", py::overload_cast<const KData&, int>(TA_AROONOSC), py::arg("data"),
-          py::arg("n") = 14);
+    TA_K_OUT_N_PY(TA_AROON, 14)
+    TA_K_OUT_N_PY(TA_AROONOSC, 14)
 
     TA_IN1_OUT_PY(TA_ASIN)
     TA_IN1_OUT_PY(TA_ATAN)
@@ -81,8 +76,7 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("data"), py::arg("n") = 5, py::arg("nbdevup") = 2., py::arg("nbdevdn") = 2.,
           py::arg("matype") = 0);
 
-    m.def("TA_BOP", py::overload_cast<>(TA_BOP));
-    m.def("TA_BOP", py::overload_cast<const KData&>(TA_BOP), py::arg("data"));
+    TA_K_OUT_PY(TA_BOP)
 
     m.def("TA_CCI", py::overload_cast<int>(TA_CCI), py::arg("n") = 14);
     m.def("TA_CCI", py::overload_cast<const KData&, int>(TA_CCI), py::arg("data"),
@@ -158,8 +152,7 @@ void export_Indicator_ta_lib(py::module& m) {
     m.def("TA_MAXINDEX", py::overload_cast<const Indicator&, int>(TA_MAXINDEX), py::arg("data"),
           py::arg("n") = 30);
 
-    m.def("TA_MEDPRICE", py::overload_cast<>(TA_MEDPRICE));
-    m.def("TA_MEDPRICE", py::overload_cast<const KData&>(TA_MEDPRICE), py::arg("data"));
+    TA_K_OUT_PY(TA_MEDPRICE)
 
     m.def("TA_MFI", py::overload_cast<int>(TA_MFI), py::arg("n") = 14);
     m.def("TA_MFI", py::overload_cast<const KData&, int>(TA_MFI), py::arg("data"),
