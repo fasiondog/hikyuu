@@ -224,6 +224,7 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT_PY(TA_SINH)
     TA_IN1_OUT_N_PY(TA_SMA, 30)
     TA_IN1_OUT_PY(TA_SQRT)
+    TA_IN1_OUT_N_PY(TA_SUM, 30)
     TA_IN1_OUT_PY(TA_TAN)
     TA_IN1_OUT_PY(TA_TANH)
     TA_IN1_OUT_N_PY(TA_TEMA, 30)
