@@ -33,6 +33,11 @@
     m.def(#func, py::overload_cast<const KData&, int>(func), py::arg("data"), \
           py::arg("n") = period);
 
+#define TA_K_OUT_P_D_PY(func, param, param_val)                                  \
+    m.def(#func, py::overload_cast<double>(func), py::arg(#param) = param_val);  \
+    m.def(#func, py::overload_cast<const KData&, double>(func), py::arg("data"), \
+          py::arg(#param) = param_val);
+
 namespace py = pybind11;
 using namespace hku;
 
@@ -80,19 +85,20 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_K_OUT_PY(TA_CDL3OUTSIDE)
     TA_K_OUT_PY(TA_CDL3STARSINSOUTH)
     TA_K_OUT_PY(TA_CDL3WHITESOLDIERS)
-
+    TA_K_OUT_P_D_PY(TA_CDLABANDONEDBABY, penetration, 3.000000e-1)
     TA_K_OUT_PY(TA_CDLADVANCEBLOCK)
     TA_K_OUT_PY(TA_CDLBELTHOLD)
     TA_K_OUT_PY(TA_CDLBREAKAWAY)
     TA_K_OUT_PY(TA_CDLCLOSINGMARUBOZU)
     TA_K_OUT_PY(TA_CDLCONCEALBABYSWALL)
     TA_K_OUT_PY(TA_CDLCOUNTERATTACK)
-
+    TA_K_OUT_P_D_PY(TA_CDLDARKCLOUDCOVER, penetration, 5.000000e-1)
     TA_K_OUT_PY(TA_CDLDOJI)
     TA_K_OUT_PY(TA_CDLDOJISTAR)
     TA_K_OUT_PY(TA_CDLDRAGONFLYDOJI)
     TA_K_OUT_PY(TA_CDLENGULFING)
-
+    TA_K_OUT_P_D_PY(TA_CDLEVENINGDOJISTAR, penetration, 3.000000e-1)
+    TA_K_OUT_P_D_PY(TA_CDLEVENINGSTAR, penetration, 3.000000e-1)
     TA_K_OUT_PY(TA_CDLGAPSIDESIDEWHITE)
     TA_K_OUT_PY(TA_CDLGRAVESTONEDOJI)
     TA_K_OUT_PY(TA_CDLHAMMER)
@@ -113,7 +119,9 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_K_OUT_PY(TA_CDLLONGLINE)
     TA_K_OUT_PY(TA_CDLMARUBOZU)
     TA_K_OUT_PY(TA_CDLMATCHINGLOW)
-
+    TA_K_OUT_P_D_PY(TA_CDLMATHOLD, penetration, 5.000000e-1)
+    TA_K_OUT_P_D_PY(TA_CDLMORNINGDOJISTAR, penetration, 3.000000e-1)
+    TA_K_OUT_P_D_PY(TA_CDLMORNINGSTAR, penetration, 3.000000e-1)
     TA_K_OUT_PY(TA_CDLONNECK)
     TA_K_OUT_PY(TA_CDLPIERCING)
     TA_K_OUT_PY(TA_CDLRICKSHAWMAN)
@@ -191,27 +199,16 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("fast_limit") = 5.000000e-1, py::arg("slow_limit") = 5.000000e-2);
 
     TA_IN1_OUT_N_PY(TA_MAX, 30)
-
-    m.def("TA_MAXINDEX", py::overload_cast<int>(TA_MAXINDEX), py::arg("n") = 30);
-    m.def("TA_MAXINDEX", py::overload_cast<const Indicator&, int>(TA_MAXINDEX), py::arg("data"),
-          py::arg("n") = 30);
+    TA_IN1_OUT_N_PY(TA_MAXINDEX, 30)
 
     TA_K_OUT_PY(TA_MEDPRICE)
     TA_K_OUT_N_PY(TA_MFI, 14)
     TA_IN1_OUT_N_PY(TA_MIDPOINT, 14)
     TA_K_OUT_N_PY(TA_MIDPRICE, 14)
     TA_IN1_OUT_N_PY(TA_MIN, 30)
-
-    m.def("TA_MININDEX", py::overload_cast<int>(TA_MININDEX), py::arg("n") = 30);
-    m.def("TA_MININDEX", py::overload_cast<const Indicator&, int>(TA_MININDEX), py::arg("data"),
-          py::arg("n") = 30);
-
+    TA_IN1_OUT_N_PY(TA_MININDEX, 30)
     TA_IN1_OUT_N_PY(TA_MINMAX, 30)
-
-    m.def("TA_MINMAXINDEX", py::overload_cast<int>(TA_MINMAXINDEX), py::arg("n") = 30);
-    m.def("TA_MINMAXINDEX", py::overload_cast<const Indicator&, int>(TA_MINMAXINDEX),
-          py::arg("data"), py::arg("n") = 30);
-
+    TA_IN1_OUT_N_PY(TA_MINMAXINDEX, 30)
     TA_K_OUT_N_PY(TA_MINUS_DI, 14)
     TA_K_OUT_N_PY(TA_MINUS_DM, 14)
     TA_IN1_OUT_N_PY(TA_MOM, 10)
