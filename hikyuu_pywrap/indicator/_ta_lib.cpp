@@ -156,6 +156,9 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_K_OUT_N_PY(TA_MINUS_DI, 14)
     TA_K_OUT_N_PY(TA_MINUS_DM, 14)
     TA_IN1_OUT_N_PY(TA_MOM, 10)
+    TA_K_OUT_N_PY(TA_NATR, 14)
+    TA_K_OUT_N_PY(TA_PLUS_DI, 14)
+    TA_K_OUT_N_PY(TA_PLUS_DM, 14)
     TA_IN1_OUT_N_PY(TA_ROC, 10)
     TA_IN1_OUT_N_PY(TA_ROCP, 10)
     TA_IN1_OUT_N_PY(TA_ROCR, 10)
@@ -168,9 +171,13 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT_PY(TA_TAN)
     TA_IN1_OUT_PY(TA_TANH)
     TA_IN1_OUT_N_PY(TA_TEMA, 30)
+    TA_K_OUT_PY(TA_TRANGE)
     TA_IN1_OUT_N_PY(TA_TRIMA, 30)
     TA_IN1_OUT_N_PY(TA_TRIX, 30)
     TA_IN1_OUT_N_PY(TA_TSF, 14)
+    TA_K_OUT_PY(TA_TYPPRICE)
+    TA_K_OUT_PY(TA_WCLPRICE)
+    TA_K_OUT_N_PY(TA_WILLR, 14)
     TA_IN1_OUT_N_PY(TA_WMA, 30)
 }
 
