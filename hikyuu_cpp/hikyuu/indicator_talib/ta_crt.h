@@ -250,7 +250,19 @@ TA_IN1_OUT_CRT(TA_SIN)
 TA_IN1_OUT_CRT(TA_SINH)
 TA_IN1_OUT_N_CRT(TA_SMA, 30)
 TA_IN1_OUT_CRT(TA_SQRT)
+
+Indicator HKU_API TA_STDDEV(int n = 5, double nbdev = 1.0);
+inline Indicator TA_STDDEV(const Indicator& ind, int n = 5, double nbdev = 1.0) {
+    return TA_STDDEV(n, nbdev)(ind);
+}
+
 TA_IN1_OUT_N_CRT(TA_SUM, 30)
+
+Indicator HKU_API TA_T3(int n = 5, double vfactor = 7.000000e-1);
+inline Indicator TA_T3(const Indicator& ind, int n = 5, double vfactor = 7.000000e-1) {
+    return TA_T3(n, vfactor)(ind);
+}
+
 TA_IN1_OUT_CRT(TA_TAN)
 TA_IN1_OUT_CRT(TA_TANH)
 TA_IN1_OUT_N_CRT(TA_TEMA, 30)
@@ -259,6 +271,12 @@ TA_IN1_OUT_N_CRT(TA_TRIMA, 30)
 TA_IN1_OUT_N_CRT(TA_TRIX, 30)
 TA_IN1_OUT_N_CRT(TA_TSF, 14)
 TA_K_OUT_CRT(TA_TYPPRICE)
+
+Indicator HKU_API TA_VAR(int n = 5, double nbdev = 1.0);
+inline Indicator TA_VAR(const Indicator& ind, int n = 5, double nbdev = 1.0) {
+    return TA_VAR(n, nbdev)(ind);
+}
+
 TA_K_OUT_CRT(TA_WCLPRICE)
 TA_K_OUT_N_CRT(TA_WILLR, 14)
 TA_IN1_OUT_N_CRT(TA_WMA, 30)

@@ -600,7 +600,7 @@ try:
 
     PYTA_SMA.__doc__ = talib.SMA.__doc__
 
-    def PYTA_STDDEV(ind=None, timeperiod=5, nbdev=1):
+    def PYTA_STDDEV(ind=None, timeperiod=5, nbdev=1.0):
         imp = crtTaIndicatorImp(ta.STDDEV, 'PYTA_STDDEV', result_num=1, params={
                                 'timeperiod': timeperiod, 'nbdev': nbdev})
         return Indicator(imp)(ind) if ind else Indicator(imp)

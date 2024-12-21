@@ -230,7 +230,19 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT_PY(TA_SINH)
     TA_IN1_OUT_N_PY(TA_SMA, 30)
     TA_IN1_OUT_PY(TA_SQRT)
+
+    m.def("TA_STDDEV", py::overload_cast<int, double>(TA_STDDEV), py::arg("n") = 5,
+          py::arg("nbdev") = 1.0);
+    m.def("TA_STDDEV", py::overload_cast<const Indicator&, int, double>(TA_STDDEV), py::arg("data"),
+          py::arg("n") = 5, py::arg("nbdev") = 1.0);
+
     TA_IN1_OUT_N_PY(TA_SUM, 30)
+
+    m.def("TA_T3", py::overload_cast<int, double>(TA_T3), py::arg("n") = 5,
+          py::arg("vfactor") = 7.000000e-1);
+    m.def("TA_T3", py::overload_cast<const Indicator&, int, double>(TA_T3), py::arg("data"),
+          py::arg("n") = 5, py::arg("vfactor") = 7.000000e-1);
+
     TA_IN1_OUT_PY(TA_TAN)
     TA_IN1_OUT_PY(TA_TANH)
     TA_IN1_OUT_N_PY(TA_TEMA, 30)
@@ -239,6 +251,12 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT_N_PY(TA_TRIX, 30)
     TA_IN1_OUT_N_PY(TA_TSF, 14)
     TA_K_OUT_PY(TA_TYPPRICE)
+
+    m.def("TA_VAR", py::overload_cast<int, double>(TA_VAR), py::arg("n") = 5,
+          py::arg("nbdev") = 1.0);
+    m.def("TA_VAR", py::overload_cast<const Indicator&, int, double>(TA_VAR), py::arg("data"),
+          py::arg("n") = 5, py::arg("nbdev") = 1.0);
+
     TA_K_OUT_PY(TA_WCLPRICE)
     TA_K_OUT_N_PY(TA_WILLR, 14)
     TA_IN1_OUT_N_PY(TA_WMA, 30)
