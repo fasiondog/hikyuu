@@ -233,6 +233,7 @@ TA_K_OUT_N_CRT(TA_MINUS_DI, 14)
 TA_K_OUT_N_CRT(TA_MINUS_DM, 14)
 TA_IN1_OUT_N_CRT(TA_MOM, 10)
 TA_K_OUT_N_CRT(TA_NATR, 14)
+TA_K_OUT_CRT(TA_OBV)
 TA_K_OUT_N_CRT(TA_PLUS_DI, 14)
 TA_K_OUT_N_CRT(TA_PLUS_DM, 14)
 
@@ -268,6 +269,14 @@ Indicator HKU_API TA_STDDEV(int n = 5, double nbdev = 1.0);
 inline Indicator TA_STDDEV(const Indicator& ind, int n = 5, double nbdev = 1.0) {
     return TA_STDDEV(n, nbdev)(ind);
 }
+
+Indicator HKU_API TA_STOCH(int fastk_n = 5, int slowk_n = 3, int slowk_matype = 0, int slowd_n = 3,
+                           int slowd_matype = 0);
+Indicator HKU_API TA_STOCH(const KData& k, int fastk_n = 5, int slowk_n = 3, int slowk_matype = 0,
+                           int slowd_n = 3, int slowd_matype = 0);
+
+Indicator HKU_API TA_STOCHF(int fastk_n = 5, int fastd_n = 3, int fastd_matype = 0);
+Indicator HKU_API TA_STOCHF(const KData& k, int fastk_n = 5, int fastd_n = 3, int fastd_matype = 0);
 
 Indicator HKU_API TA_STOCHRSI(int n = 14, int fastk_n = 5, int fastd_n = 3, int matype = 0);
 inline Indicator TA_STOCHRSI(const Indicator& ind, int n = 14, int fastk_n = 5, int fastd_n = 3,

@@ -219,6 +219,7 @@ void export_Indicator_ta_lib(py::module& m) {
 
     TA_IN1_OUT_N_PY(TA_MOM, 10)
     TA_K_OUT_N_PY(TA_NATR, 14)
+    TA_K_OUT_PY(TA_OBV)
     TA_K_OUT_N_PY(TA_PLUS_DI, 14)
     TA_K_OUT_N_PY(TA_PLUS_DM, 14)
     TA_IN1_OUT_N_PY(TA_ROC, 10)
@@ -256,6 +257,18 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("nbdev") = 1.0);
     m.def("TA_STDDEV", py::overload_cast<const Indicator&, int, double>(TA_STDDEV), py::arg("data"),
           py::arg("n") = 5, py::arg("nbdev") = 1.0);
+
+    m.def("TA_STOCH", py::overload_cast<int, int, int, int, int>(TA_STOCH), py::arg("fastk_n") = 5,
+          py::arg("slowk_n") = 3, py::arg("slowk_matype") = 0, py::arg("slowd_n") = 3,
+          py::arg("slowd_matype") = 0);
+    m.def("TA_STOCH", py::overload_cast<const KData&, int, int, int, int, int>(TA_STOCH),
+          py::arg("data"), py::arg("fastk_n") = 5, py::arg("slowk_n") = 3,
+          py::arg("slowk_matype") = 0, py::arg("slowd_n") = 3, py::arg("slowd_matype") = 0);
+
+    m.def("TA_STOCHF", py::overload_cast<int, int, int>(TA_STOCHF), py::arg("fastk_n") = 5,
+          py::arg("fastd_n") = 3, py::arg("fastd_matype") = 0);
+    m.def("TA_STOCHF", py::overload_cast<const KData&, int, int, int>(TA_STOCHF), py::arg("data"),
+          py::arg("fastk_n") = 5, py::arg("fastd_n") = 3, py::arg("fastd_matype") = 0);
 
     m.def("TA_STOCHRSI", py::overload_cast<int, int, int, int>(TA_STOCHRSI), py::arg("n") = 14,
           py::arg("fastk_n") = 5, py::arg("fastd_n") = 3, py::arg("matype") = 0);

@@ -591,6 +591,54 @@
         return Indicator(make_shared<Cls_##func>(k));                                   \
     }
 
+#define TA_CV_OUT1_IMP(func)                                                            \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
+                                                                                        \
+    Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                   \
+        setParam<KData>("kdata", k);                                                    \
+        Cls_##func::_calculate(Indicator());                                            \
+    }                                                                                   \
+                                                                                        \
+    void Cls_##func::_calculate(const Indicator &data) {                                \
+        HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
+                    "The input is ignored because {} depends on the context!", m_name); \
+                                                                                        \
+        KData k = getContext();                                                         \
+        size_t total = k.size();                                                        \
+        HKU_IF_RETURN(total == 0, void());                                              \
+                                                                                        \
+        _readyBuffer(total, 1);                                                         \
+        const KRecord *kptr = k.data();                                                 \
+        std::unique_ptr<double[]> buf = std::make_unique<double[]>(2 * total);          \
+        double *close = buf.get();                                                      \
+        double *vol = close + total;                                                    \
+        for (size_t i = 0; i < total; ++i) {                                            \
+            close[i] = kptr[i].closePrice;                                              \
+            vol[i] = kptr[i].transCount;                                                \
+        }                                                                               \
+                                                                                        \
+        auto *dst = this->data();                                                       \
+        int outBegIdx;                                                                  \
+        int outNbElement;                                                               \
+        func(0, total - 1, close, vol, &outBegIdx, &outNbElement, dst);                 \
+        if (outBegIdx > 0) {                                                            \
+            memmove(dst + outBegIdx, dst, sizeof(double) * outNbElement);               \
+            double null_double = Null<double>();                                        \
+            for (size_t i = 0; i < outBegIdx; ++i) {                                    \
+                _set(null_double, i);                                                   \
+            }                                                                           \
+            m_discard = outBegIdx;                                                      \
+        }                                                                               \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func() {                                                          \
+        return make_shared<Cls_##func>()->calculate();                                  \
+    }                                                                                   \
+                                                                                        \
+    Indicator HKU_API func(const KData &k) {                                            \
+        return Indicator(make_shared<Cls_##func>(k));                                   \
+    }
+
 #define TA_HLC_OUT1_IMP(func)                                                           \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
                                                                                         \
