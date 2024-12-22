@@ -212,6 +212,12 @@ void export_Indicator_ta_lib(py::module& m) {
     m.def("TA_MAMA", py::overload_cast<const Indicator&, double, double>(TA_MAMA), py::arg("data"),
           py::arg("fast_limit") = 5.000000e-1, py::arg("slow_limit") = 5.000000e-2);
 
+    m.def("TA_MAVP", py::overload_cast<int, int, int>(TA_MAVP), py::arg("min_n") = 2,
+          py::arg("max_n") = 30, py::arg("matype") = 0);
+    m.def("TA_MAVP", py::overload_cast<const Indicator&, const Indicator&, int, int, int>(TA_MAVP),
+          py::arg("ind1"), py::arg("ind2"), py::arg("min_n") = 2, py::arg("max_n") = 30,
+          py::arg("matype") = 0);
+
     TA_IN1_OUT_N_PY(TA_MAX, 30)
     TA_IN1_OUT_N_PY(TA_MAXINDEX, 30)
 
