@@ -291,6 +291,9 @@ TA_IN1_OUT_N_CRT(TA_TRIX, 30)
 TA_IN1_OUT_N_CRT(TA_TSF, 14)
 TA_K_OUT_CRT(TA_TYPPRICE)
 
+Indicator HKU_API TA_ULTOSC(int n1 = 7, int n2 = 14, int n3 = 28);
+Indicator HKU_API TA_ULTOSC(const KData& k, int n1 = 7, int n2 = 14, int n3 = 28);
+
 Indicator HKU_API TA_VAR(int n = 5, double nbdev = 1.0);
 inline Indicator TA_VAR(const Indicator& ind, int n = 5, double nbdev = 1.0) {
     return TA_VAR(n, nbdev)(ind);

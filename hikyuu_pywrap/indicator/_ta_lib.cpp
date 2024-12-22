@@ -279,6 +279,11 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT_N_PY(TA_TSF, 14)
     TA_K_OUT_PY(TA_TYPPRICE)
 
+    m.def("TA_ULTOSC", py::overload_cast<int, int, int>(TA_ULTOSC), py::arg("n1") = 7,
+          py::arg("n2") = 14, py::arg("n3") = 28);
+    m.def("TA_ULTOSC", py::overload_cast<const KData&, int, int, int>(TA_ULTOSC), py::arg("data"),
+          py::arg("n1") = 7, py::arg("n2") = 14, py::arg("n3") = 28);
+
     m.def("TA_VAR", py::overload_cast<int, double>(TA_VAR), py::arg("n") = 5,
           py::arg("nbdev") = 1.0);
     m.def("TA_VAR", py::overload_cast<const Indicator&, int, double>(TA_VAR), py::arg("data"),
