@@ -29,10 +29,10 @@
     m.def(#func, py::overload_cast<const Indicator&, const Indicator&>(func), py::arg("ind1"), \
           py::arg("ind2"));
 
-#define TA_IN2_OUT_N_PY(func, period)                                              \
+#define TA_IN2_OUT_N_PY(func, period, doc)                                         \
     m.def(#func, py::overload_cast<int>(func), py::arg("n") = period);             \
     m.def(#func, py::overload_cast<const Indicator&, const Indicator&, int>(func), \
-          py::arg("ind1"), py::arg("ind2"), py::arg("n") = period);
+          py::arg("ind1"), py::arg("ind2"), py::arg("n") = period, doc);
 
 #define TA_K_OUT_PY(func)                    \
     m.def(#func, py::overload_cast<>(func)); \
@@ -60,7 +60,11 @@ void export_Indicator_ta_lib(py::module& m) {
     m.def("TA_ADOSC", py::overload_cast<int, int>(TA_ADOSC), py::arg("fast_n") = 3,
           py::arg("slow_n") = 10);
     m.def("TA_ADOSC", py::overload_cast<const KData&, int, int>(TA_ADOSC), py::arg("data"),
-          py::arg("fast_n") = 3, py::arg("slow_n") = 10);
+          py::arg("fast_n") = 3, py::arg("slow_n") = 10, R"(TA_ADOSC - Chaikin A/D Oscillator
+
+:param KData data: KData
+:param int fast_n: Number of period for the fast MA (From 2 to 100000)
+:param int slow_n: Number of period for the slow MA (From 2 to 100000))");
 
     TA_K_OUT_N_PY(TA_ADX, 14)
     TA_K_OUT_N_PY(TA_ADXR, 14)
@@ -87,7 +91,12 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("data"), py::arg("n") = 5, py::arg("nbdevup") = 2., py::arg("nbdevdn") = 2.,
           py::arg("matype") = 0);
 
-    TA_IN2_OUT_N_PY(TA_BETA, 5)
+    TA_IN2_OUT_N_PY(TA_BETA, 5, R"(TA_BETA - Beta
+
+:param Indicator ind1: input1
+:param Indicator ind2: input2
+:param int n: Number of periode (From 1 to 100000))")
+
     TA_K_OUT_PY(TA_BOP)
     TA_K_OUT_N_PY(TA_CCI, 14)
     TA_K_OUT_PY(TA_CDL2CROWS)
@@ -154,7 +163,12 @@ void export_Indicator_ta_lib(py::module& m) {
 
     TA_IN1_OUT_PY(TA_CEIL)
     TA_IN1_OUT_N_PY(TA_CMO, 14)
-    TA_IN2_OUT_N_PY(TA_CORREL, 30)
+    TA_IN2_OUT_N_PY(TA_CORREL, 30, R"(TA_CORREL - Pearson's Correlation Coefficient (r)
+    
+:param Indicator ind1: input1
+:param Indicator ind2: input2
+:param int n: Number of periode (From 1 to 100000))")
+
     TA_IN1_OUT_PY(TA_COS)
     TA_IN1_OUT_PY(TA_COSH)
     TA_IN1_OUT_N_PY(TA_DEMA, 30)
