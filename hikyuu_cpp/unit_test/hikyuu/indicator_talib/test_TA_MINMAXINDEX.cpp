@@ -22,8 +22,11 @@ using namespace hku;
 
 /** @par 检测点 */
 TEST_CASE("test_TA_MINMAXINDEX") {
-    Indicator result;
+    /** @arg 非法参数 */
+    CHECK_THROWS(TA_MINMAXINDEX(1));
+    CHECK_THROWS(TA_MINMAXINDEX(100001));
 
+    /** @arg 正常数据 */
     PriceList a;
     for (int i = 0; i < 10; ++i) {
         a.push_back(i);
@@ -35,7 +38,7 @@ TEST_CASE("test_TA_MINMAXINDEX") {
     Indicator expect1 = PRICELIST(
       PriceList{Null<Indicator::value_t>(), Null<Indicator::value_t>(), 2, 3, 4, 5, 6, 7, 8, 9});
 
-    result = TA_MINMAXINDEX(data, 3);
+    Indicator result = TA_MINMAXINDEX(data, 3);
     CHECK_EQ(result.name(), "TA_MINMAXINDEX");
     CHECK_EQ(result.discard(), 2);
     CHECK_EQ(result.getResultNumber(), 2);
