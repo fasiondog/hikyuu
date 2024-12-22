@@ -43,7 +43,6 @@ TEST_CASE("test_TA_CMO") {
 TEST_CASE("test_TA_CMO_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
-    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
     Indicator c = CLOSE(kdata);
     Indicator expect = TA_CMO(c, 10);
     Indicator result = TA_CMO(c, CVAL(c, 10));
@@ -53,30 +52,17 @@ TEST_CASE("test_TA_CMO_dyn") {
         CHECK_UNARY(std::isnan(result[i]));
     }
     for (size_t i = expect.discard(); i < expect.size(); i++) {
-        // HKU_INFO("{}: {}, {}", i, result[i], expect[i]);
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 
     result = TA_CMO(c, IndParam(CVAL(c, 10)));
     CHECK_EQ(expect.size(), result.size());
-    // CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.discard(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
     }
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
-
-    // expect = EMA(c, 2);
-    // result = EMA(c, CVAL(c, 2));
-    // CHECK_EQ(expect.size(), result.size());
-    // // CHECK_EQ(expect.discard(), result.discard());
-    // for (size_t i = 0; i < result.discard(); i++) {
-    //     CHECK_UNARY(std::isnan(result[i]));
-    // }
-    // for (size_t i = expect.discard(); i < expect.size(); i++) {
-    //     CHECK_EQ(expect[i], doctest::Approx(result[i]));
-    // }
 }
 
 //-----------------------------------------------------------------------------
