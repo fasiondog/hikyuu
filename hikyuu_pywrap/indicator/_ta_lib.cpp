@@ -226,6 +226,27 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT_N_PY(TA_ROCR, 10)
     TA_IN1_OUT_N_PY(TA_ROCR100, 10)
     TA_IN1_OUT_N_PY(TA_RSI, 14)
+
+    m.def("TA_SAR", py::overload_cast<double, double>(TA_SAR), py::arg("acceleration") = 0.02,
+          py::arg("maximum") = 0.2);
+    m.def("TA_SAR", py::overload_cast<const KData&, double, double>(TA_SAR), py::arg("data"),
+          py::arg("acceleration") = 0.02, py::arg("maximum") = 0.2);
+
+    m.def(
+      "TA_SAREXT",
+      py::overload_cast<double, double, double, double, double, double, double, double>(TA_SAREXT),
+      py::arg("startvalue") = 0.0, py::arg("offsetonreverse") = 0.0,
+      py::arg("accelerationinitlong") = 0.02, py::arg("accelerationlong") = 0.02,
+      py::arg("accelerationmaxlong") = 0.2, py::arg("accelerationinitshort") = 0.02,
+      py::arg("accelerationshort") = 0.02, py::arg("accelerationmaxshort") = 0.2);
+    m.def("TA_SAREXT",
+          py::overload_cast<const KData&, double, double, double, double, double, double, double,
+                            double>(TA_SAREXT),
+          py::arg("data"), py::arg("startvalue") = 0.0, py::arg("offsetonreverse") = 0.0,
+          py::arg("accelerationinitlong") = 0.02, py::arg("accelerationlong") = 0.02,
+          py::arg("accelerationmaxlong") = 0.2, py::arg("accelerationinitshort") = 0.02,
+          py::arg("accelerationshort") = 0.02, py::arg("accelerationmaxshort") = 0.2);
+
     TA_IN1_OUT_PY(TA_SIN)
     TA_IN1_OUT_PY(TA_SINH)
     TA_IN1_OUT_N_PY(TA_SMA, 30)
@@ -235,6 +256,12 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("nbdev") = 1.0);
     m.def("TA_STDDEV", py::overload_cast<const Indicator&, int, double>(TA_STDDEV), py::arg("data"),
           py::arg("n") = 5, py::arg("nbdev") = 1.0);
+
+    m.def("TA_STOCHRSI", py::overload_cast<int, int, int, int>(TA_STOCHRSI), py::arg("n") = 14,
+          py::arg("fastk_n") = 5, py::arg("fastd_n") = 3, py::arg("matype") = 0);
+    m.def("TA_STOCHRSI", py::overload_cast<const Indicator&, int, int, int, int>(TA_STOCHRSI),
+          py::arg("data"), py::arg("n") = 14, py::arg("fastk_n") = 5, py::arg("fastd_n") = 3,
+          py::arg("matype") = 0);
 
     TA_IN1_OUT_N_PY(TA_SUM, 30)
 

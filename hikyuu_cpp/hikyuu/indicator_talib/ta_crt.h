@@ -246,6 +246,19 @@ TA_IN1_OUT_N_CRT(TA_ROCP, 10)
 TA_IN1_OUT_N_CRT(TA_ROCR, 10)
 TA_IN1_OUT_N_CRT(TA_ROCR100, 10)
 TA_IN1_OUT_N_CRT(TA_RSI, 14)
+
+Indicator HKU_API TA_SAR(double acceleration = 0.02, double maximum = 0.2);
+Indicator HKU_API TA_SAR(const KData& k, double acceleration = 0.02, double maximum = 0.2);
+
+Indicator HKU_API TA_SAREXT(double startvalue = 0.0, double offsetonreverse = 0.0,
+                            double accelerationinitlong = 0.02, double accelerationlong = 0.02,
+                            double accelerationmaxlong = 0.2, double accelerationinitshort = 0.02,
+                            double accelerationshort = 0.02, double accelerationmaxshort = 0.2);
+Indicator HKU_API TA_SAREXT(const KData& k, double startvalue = 0.0, double offsetonreverse = 0.0,
+                            double accelerationinitlong = 0.02, double accelerationlong = 0.02,
+                            double accelerationmaxlong = 0.2, double accelerationinitshort = 0.02,
+                            double accelerationshort = 0.02, double accelerationmaxshort = 0.2);
+
 TA_IN1_OUT_CRT(TA_SIN)
 TA_IN1_OUT_CRT(TA_SINH)
 TA_IN1_OUT_N_CRT(TA_SMA, 30)
@@ -254,6 +267,12 @@ TA_IN1_OUT_CRT(TA_SQRT)
 Indicator HKU_API TA_STDDEV(int n = 5, double nbdev = 1.0);
 inline Indicator TA_STDDEV(const Indicator& ind, int n = 5, double nbdev = 1.0) {
     return TA_STDDEV(n, nbdev)(ind);
+}
+
+Indicator HKU_API TA_STOCHRSI(int n = 14, int fastk_n = 5, int fastd_n = 3, int matype = 0);
+inline Indicator TA_STOCHRSI(const Indicator& ind, int n = 14, int fastk_n = 5, int fastd_n = 3,
+                             int matype = 0) {
+    return TA_STOCHRSI(n, fastk_n, fastd_n, matype)(ind);
 }
 
 TA_IN1_OUT_N_CRT(TA_SUM, 30)
