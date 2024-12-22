@@ -20,6 +20,80 @@
         virtual void _checkParam(const string& name) const override; \
     };
 
+#if HKU_SUPPORT_SERIALIZATION
+#define TA_IN2_OUT_DEF(func)                                       \
+    class Cls_##func : public IndicatorImp {                       \
+    public:                                                        \
+        Cls_##func();                                              \
+        Cls_##func(const Indicator& ref_ind);                      \
+        virtual ~Cls_##func();                                     \
+        virtual void _calculate(const Indicator& data) override;   \
+        virtual IndicatorImpPtr _clone() override;                 \
+                                                                   \
+    private:                                                       \
+        Indicator m_ref_ind;                                       \
+                                                                   \
+    private:                                                       \
+        friend class boost::serialization::access;                 \
+        template <class Archive>                                   \
+        void serialize(Archive& ar, const unsigned int version) {  \
+            ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(IndicatorImp); \
+            ar& BOOST_SERIALIZATION_NVP(m_ref_ind);                \
+        }                                                          \
+    };
+
+#define TA_IN2_OUT_N_DEF(func)                                       \
+    class Cls_##func : public IndicatorImp {                         \
+    public:                                                          \
+        Cls_##func();                                                \
+        explicit Cls_##func(int n);                                  \
+        Cls_##func(const Indicator& ref_ind, int n);                 \
+        virtual ~Cls_##func();                                       \
+        virtual void _checkParam(const string& name) const override; \
+        virtual void _calculate(const Indicator& data) override;     \
+        virtual IndicatorImpPtr _clone() override;                   \
+                                                                     \
+    private:                                                         \
+        Indicator m_ref_ind;                                         \
+                                                                     \
+    private:                                                         \
+        friend class boost::serialization::access;                   \
+        template <class Archive>                                     \
+        void serialize(Archive& ar, const unsigned int version) {    \
+            ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(IndicatorImp);   \
+            ar& BOOST_SERIALIZATION_NVP(m_ref_ind);                  \
+        }                                                            \
+    };
+#else
+#define TA_IN2_OUT_DEF(func)                                     \
+    class Cls_##func : public IndicatorImp {                     \
+    public:                                                      \
+        Cls_##func();                                            \
+        Cls_##func(const Indicator& ref_ind);                    \
+        virtual ~Cls_##func();                                   \
+        virtual void _calculate(const Indicator& data) override; \
+        virtual IndicatorImpPtr _clone() override;               \
+                                                                 \
+    private:                                                     \
+        Indicator m_ref_ind;                                     \
+    };
+
+#define TA_IN2_OUT_N_DEF(func)                                       \
+    class Cls_##func : public IndicatorImp {                         \
+    public:                                                          \
+        Cls_##func();                                                \
+        explicit Cls_##func(int n);                                  \
+        Cls_##func(const Indicator& ref_ind, int n);                 \
+        virtual ~Cls_##func();                                       \
+        virtual void _checkParam(const string& name) const override; \
+        virtual void _calculate(const Indicator& data) override;     \
+        virtual IndicatorImpPtr _clone() override;                   \
+                                                                     \
+    private:                                                         \
+        Indicator m_ref_ind;                                         \
+    };
+#endif
+
 #define TA_K_OUT_DEF(func)                            \
     class Cls_##func : public IndicatorImp {          \
         INDICATOR_IMP(Cls_##func)                     \
@@ -60,6 +134,7 @@ namespace hku {
 TA_K_OUT_N_DEF(TA_ACCBANDS)
 TA_IN1_OUT_DEF(TA_ACOS)
 TA_K_OUT_DEF(TA_AD)
+TA_IN2_OUT_DEF(TA_ADD)
 TA_K_OUT_N_DEF(TA_ADX)
 TA_K_OUT_N_DEF(TA_ADXR)
 TA_K_OUT_N_DEF(TA_AROON)
@@ -69,6 +144,7 @@ TA_IN1_OUT_DEF(TA_ATAN)
 TA_K_OUT_N_DEF(TA_ATR)
 TA_IN1_OUT_DEF(TA_AVGDEV)
 TA_K_OUT_DEF(TA_AVGPRICE)
+TA_IN2_OUT_N_DEF(TA_BETA)
 TA_K_OUT_DEF(TA_BOP)
 TA_K_OUT_N_DEF(TA_CCI)
 TA_K_OUT_DEF(TA_CDL2CROWS)
@@ -134,9 +210,11 @@ TA_K_OUT_DEF(TA_CDLUPSIDEGAP2CROWS)
 TA_K_OUT_DEF(TA_CDLXSIDEGAP3METHODS)
 TA_IN1_OUT_DEF(TA_CEIL)
 TA_IN1_OUT_DEF(TA_CMO)
+TA_IN2_OUT_N_DEF(TA_CORREL)
 TA_IN1_OUT_DEF(TA_COS)
 TA_IN1_OUT_DEF(TA_COSH)
 TA_IN1_OUT_DEF(TA_DEMA)
+TA_IN2_OUT_DEF(TA_DIV)
 TA_K_OUT_N_DEF(TA_DX)
 TA_IN1_OUT_DEF(TA_EMA)
 TA_IN1_OUT_DEF(TA_EXP)
@@ -165,6 +243,7 @@ TA_IN1_OUT_DEF(TA_MINMAXINDEX)
 TA_K_OUT_N_DEF(TA_MINUS_DI)
 TA_K_OUT_N_DEF(TA_MINUS_DM)
 TA_IN1_OUT_DEF(TA_MOM)
+TA_IN2_OUT_DEF(TA_MULT)
 TA_K_OUT_N_DEF(TA_NATR)
 TA_K_OUT_DEF(TA_OBV)
 TA_K_OUT_N_DEF(TA_PLUS_DI)
@@ -178,6 +257,7 @@ TA_IN1_OUT_DEF(TA_SIN)
 TA_IN1_OUT_DEF(TA_SINH)
 TA_IN1_OUT_DEF(TA_SMA)
 TA_IN1_OUT_DEF(TA_SQRT)
+TA_IN2_OUT_DEF(TA_SUB)
 TA_IN1_OUT_DEF(TA_SUM)
 TA_IN1_OUT_DEF(TA_TAN)
 TA_IN1_OUT_DEF(TA_TANH)

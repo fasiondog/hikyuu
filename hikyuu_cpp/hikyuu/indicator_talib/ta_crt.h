@@ -35,6 +35,14 @@
         return func(IndParam(n))(data);                                        \
     }
 
+#define TA_IN2_OUT_CRT(func)                                              \
+    Indicator HKU_API func(const Indicator& ind1, const Indicator& ind2); \
+    Indicator HKU_API func();
+
+#define TA_IN2_OUT_N_CRT(func, period)                                                    \
+    Indicator HKU_API func(const Indicator& ind1, const Indicator& ind2, int n = period); \
+    Indicator HKU_API func(int n = period);
+
 #define TA_K_OUT_CRT(func)    \
     Indicator HKU_API func(); \
     Indicator HKU_API func(const KData& k);
@@ -52,6 +60,7 @@ namespace hku {
 TA_K_OUT_N_CRT(TA_ACCBANDS, 20)
 TA_IN1_OUT_CRT(TA_ACOS)
 TA_K_OUT_CRT(TA_AD)
+TA_IN2_OUT_CRT(TA_ADD)
 
 Indicator HKU_API TA_ADOSC(int fast_n = 3, int slow_n = 10);
 Indicator HKU_API TA_ADOSC(const KData& k, int fast_n = 3, int slow_n = 10);
@@ -83,6 +92,7 @@ inline Indicator TA_BBANDS(const Indicator& ind, int n = 5, double nbdevup = 2.,
     return TA_BBANDS(n, nbdevup, nbdevdn, matype)(ind);
 }
 
+TA_IN2_OUT_N_CRT(TA_BETA, 5)
 TA_K_OUT_CRT(TA_BOP)
 TA_K_OUT_N_CRT(TA_CCI, 14)
 TA_K_OUT_CRT(TA_CDL2CROWS)
@@ -149,9 +159,11 @@ TA_K_OUT_CRT(TA_CDLXSIDEGAP3METHODS)
 
 TA_IN1_OUT_CRT(TA_CEIL)
 TA_IN1_OUT_N_CRT(TA_CMO, 14)
+TA_IN2_OUT_N_CRT(TA_CORREL, 30)
 TA_IN1_OUT_CRT(TA_COS)
 TA_IN1_OUT_CRT(TA_COSH)
 TA_IN1_OUT_N_CRT(TA_DEMA, 30)
+TA_IN2_OUT_CRT(TA_DIV)
 TA_K_OUT_N_CRT(TA_DX, 14)
 TA_IN1_OUT_N_CRT(TA_EMA, 30)
 TA_IN1_OUT_CRT(TA_EXP)
@@ -232,6 +244,7 @@ TA_IN1_OUT_N_CRT(TA_MINMAXINDEX, 30)
 TA_K_OUT_N_CRT(TA_MINUS_DI, 14)
 TA_K_OUT_N_CRT(TA_MINUS_DM, 14)
 TA_IN1_OUT_N_CRT(TA_MOM, 10)
+TA_IN2_OUT_CRT(TA_MULT)
 TA_K_OUT_N_CRT(TA_NATR, 14)
 TA_K_OUT_CRT(TA_OBV)
 TA_K_OUT_N_CRT(TA_PLUS_DI, 14)
@@ -284,6 +297,7 @@ inline Indicator TA_STOCHRSI(const Indicator& ind, int n = 14, int fastk_n = 5, 
     return TA_STOCHRSI(n, fastk_n, fastd_n, matype)(ind);
 }
 
+TA_IN2_OUT_CRT(TA_SUB)
 TA_IN1_OUT_N_CRT(TA_SUM, 30)
 
 Indicator HKU_API TA_T3(int n = 5, double vfactor = 7.000000e-1);

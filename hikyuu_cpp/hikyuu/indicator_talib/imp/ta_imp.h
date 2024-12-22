@@ -330,6 +330,134 @@
         return Indicator(p);                                                                 \
     }
 
+#define TA_IN2_OUT1_IMP(func, func_lookback)                                                      \
+    Cls_##func::Cls_##func() : IndicatorImp(#func) {}                                             \
+    Cls_##func::Cls_##func(const Indicator &ref_ind) : IndicatorImp(#func), m_ref_ind(ref_ind) {} \
+    Cls_##func::~Cls_##func() {}                                                                  \
+    IndicatorImpPtr Cls_##func::_clone() {                                                        \
+        auto p = make_shared<Cls_##func>();                                                       \
+        p->m_ref_ind = m_ref_ind.clone();                                                         \
+        return p;                                                                                 \
+    }                                                                                             \
+                                                                                                  \
+    void Cls_##func::_calculate(const Indicator &ind) {                                           \
+        size_t total = ind.size();                                                                \
+        HKU_IF_RETURN(total == 0, void());                                                        \
+                                                                                                  \
+        auto k = getContext();                                                                    \
+        m_ref_ind.setContext(k);                                                                  \
+        Indicator ref = m_ref_ind;                                                                \
+        if (m_ref_ind.size() != ind.size()) {                                                     \
+            ref = ALIGN(m_ref_ind, ind);                                                          \
+        }                                                                                         \
+                                                                                                  \
+        _readyBuffer(total, 1);                                                                   \
+                                                                                                  \
+        int lookback = func_lookback();                                                           \
+        HKU_IF_RETURN(lookback < 0, void());                                                      \
+                                                                                                  \
+        m_discard = lookback + std::max(ind.discard(), ref.discard());                            \
+                                                                                                  \
+        const auto *src0 = ind.data();                                                            \
+        const auto *src1 = ref.data();                                                            \
+        auto *dst = this->data();                                                                 \
+        int outBegIdx;                                                                            \
+        int outNbElement;                                                                         \
+        func(m_discard, total, src0, src1, &outBegIdx, &outNbElement, dst + m_discard);           \
+        if (outBegIdx > m_discard) {                                                              \
+            memmove(dst + outBegIdx, dst + m_discard, outNbElement * sizeof(double));             \
+            double null_double = Null<double>();                                                  \
+            for (size_t i = m_discard; i < outBegIdx; ++i) {                                      \
+                _set(null_double, i);                                                             \
+            }                                                                                     \
+            m_discard = outBegIdx;                                                                \
+        }                                                                                         \
+    }                                                                                             \
+                                                                                                  \
+    Indicator HKU_API func() {                                                                    \
+        return Indicator(make_shared<Cls_##func>());                                              \
+    }                                                                                             \
+                                                                                                  \
+    Indicator HKU_API func(const Indicator &ind1, const Indicator &ind2) {                        \
+        auto p = make_shared<Cls_##func>(ind2);                                                   \
+        Indicator result(p);                                                                      \
+        return result(ind1);                                                                      \
+    }
+
+#define TA_IN2_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)             \
+    Cls_##func::Cls_##func() : IndicatorImp(#func) {                                       \
+        setParam<int>("n", period);                                                        \
+    }                                                                                      \
+                                                                                           \
+    Cls_##func::Cls_##func(int n) : IndicatorImp(#func) {                                  \
+        setParam<int>("n", n);                                                             \
+    }                                                                                      \
+                                                                                           \
+    Cls_##func::Cls_##func(const Indicator &ref_ind, int n)                                \
+    : IndicatorImp(#func), m_ref_ind(ref_ind) {                                            \
+        setParam<int>("n", n);                                                             \
+    }                                                                                      \
+                                                                                           \
+    Cls_##func::~Cls_##func() {}                                                           \
+                                                                                           \
+    void Cls_##func::_checkParam(const string &name) const {                               \
+        if ("n" == name) {                                                                 \
+            int n = getParam<int>("n");                                                    \
+            HKU_ASSERT(n >= period_min && n <= period_max);                                \
+        }                                                                                  \
+    }                                                                                      \
+                                                                                           \
+    IndicatorImpPtr Cls_##func::_clone() {                                                 \
+        auto p = make_shared<Cls_##func>();                                                \
+        p->m_ref_ind = m_ref_ind.clone();                                                  \
+        return p;                                                                          \
+    }                                                                                      \
+                                                                                           \
+    void Cls_##func::_calculate(const Indicator &ind) {                                    \
+        size_t total = ind.size();                                                         \
+        HKU_IF_RETURN(total == 0, void());                                                 \
+                                                                                           \
+        auto k = getContext();                                                             \
+        m_ref_ind.setContext(k);                                                           \
+        Indicator ref = m_ref_ind;                                                         \
+        if (m_ref_ind.size() != ind.size()) {                                              \
+            ref = ALIGN(m_ref_ind, ind);                                                   \
+        }                                                                                  \
+                                                                                           \
+        _readyBuffer(total, 1);                                                            \
+                                                                                           \
+        int n = getParam<int>("n");                                                        \
+        int lookback = func_lookback(n);                                                   \
+        HKU_IF_RETURN(lookback < 0, void());                                               \
+                                                                                           \
+        m_discard = lookback + std::max(ind.discard(), ref.discard());                     \
+                                                                                           \
+        const auto *src0 = ind.data();                                                     \
+        const auto *src1 = ref.data();                                                     \
+        auto *dst = this->data();                                                          \
+        int outBegIdx;                                                                     \
+        int outNbElement;                                                                  \
+        func(m_discard, total, src0, src1, n, &outBegIdx, &outNbElement, dst + m_discard); \
+        if (outBegIdx > m_discard) {                                                       \
+            memmove(dst + outBegIdx, dst + m_discard, outNbElement * sizeof(double));      \
+            double null_double = Null<double>();                                           \
+            for (size_t i = m_discard; i < outBegIdx; ++i) {                               \
+                _set(null_double, i);                                                      \
+            }                                                                              \
+            m_discard = outBegIdx;                                                         \
+        }                                                                                  \
+    }                                                                                      \
+                                                                                           \
+    Indicator HKU_API func(int n) {                                                        \
+        return Indicator(make_shared<Cls_##func>(n));                                      \
+    }                                                                                      \
+                                                                                           \
+    Indicator HKU_API func(const Indicator &ind1, const Indicator &ind2, int n) {          \
+        auto p = make_shared<Cls_##func>(ind2, n);                                         \
+        Indicator result(p);                                                               \
+        return result(ind1);                                                               \
+    }
+
 #define TA_OHLC_OUT1_IMP(func)                                                          \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
                                                                                         \

@@ -24,6 +24,16 @@
     m.def(#func, py::overload_cast<const Indicator&, int>(func), py::arg("data"), \
           py::arg("n") = period);
 
+#define TA_IN2_OUT_PY(func)                                                                    \
+    m.def(#func, py::overload_cast<>(func));                                                   \
+    m.def(#func, py::overload_cast<const Indicator&, const Indicator&>(func), py::arg("ind1"), \
+          py::arg("ind2"));
+
+#define TA_IN2_OUT_N_PY(func, period)                                              \
+    m.def(#func, py::overload_cast<int>(func), py::arg("n") = period);             \
+    m.def(#func, py::overload_cast<const Indicator&, const Indicator&, int>(func), \
+          py::arg("ind1"), py::arg("ind2"), py::arg("n") = period);
+
 #define TA_K_OUT_PY(func)                    \
     m.def(#func, py::overload_cast<>(func)); \
     m.def(#func, py::overload_cast<const KData&>(func), py::arg("data"));
@@ -45,6 +55,7 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_K_OUT_N_PY(TA_ACCBANDS, 20)
     TA_IN1_OUT_PY(TA_ACOS)
     TA_K_OUT_PY(TA_AD)
+    TA_IN2_OUT_PY(TA_ADD)
 
     m.def("TA_ADOSC", py::overload_cast<int, int>(TA_ADOSC), py::arg("fast_n") = 3,
           py::arg("slow_n") = 10);
@@ -76,6 +87,7 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("data"), py::arg("n") = 5, py::arg("nbdevup") = 2., py::arg("nbdevdn") = 2.,
           py::arg("matype") = 0);
 
+    TA_IN2_OUT_N_PY(TA_BETA, 5)
     TA_K_OUT_PY(TA_BOP)
     TA_K_OUT_N_PY(TA_CCI, 14)
     TA_K_OUT_PY(TA_CDL2CROWS)
@@ -142,9 +154,11 @@ void export_Indicator_ta_lib(py::module& m) {
 
     TA_IN1_OUT_PY(TA_CEIL)
     TA_IN1_OUT_N_PY(TA_CMO, 14)
+    TA_IN2_OUT_N_PY(TA_CORREL, 30)
     TA_IN1_OUT_PY(TA_COS)
     TA_IN1_OUT_PY(TA_COSH)
     TA_IN1_OUT_N_PY(TA_DEMA, 30)
+    TA_IN2_OUT_PY(TA_DIV)
     TA_K_OUT_N_PY(TA_DX, 14)
     TA_IN1_OUT_N_PY(TA_EMA, 30)
     TA_IN1_OUT_PY(TA_EXP)
@@ -218,6 +232,7 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("fast_n") = 12, py::arg("slow_n") = 26, py::arg("matype") = 0);
 
     TA_IN1_OUT_N_PY(TA_MOM, 10)
+    TA_IN2_OUT_PY(TA_MULT)
     TA_K_OUT_N_PY(TA_NATR, 14)
     TA_K_OUT_PY(TA_OBV)
     TA_K_OUT_N_PY(TA_PLUS_DI, 14)
@@ -276,6 +291,7 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("data"), py::arg("n") = 14, py::arg("fastk_n") = 5, py::arg("fastd_n") = 3,
           py::arg("matype") = 0);
 
+    TA_IN2_OUT_PY(TA_SUB)
     TA_IN1_OUT_N_PY(TA_SUM, 30)
 
     m.def("TA_T3", py::overload_cast<int, double>(TA_T3), py::arg("n") = 5,
