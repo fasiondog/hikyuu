@@ -42,6 +42,18 @@ TEST_CASE("test_TA_BETA") {
     for (int i = result.discard(), len = result.size(); i < len; ++i) {
         CHECK_EQ(result[i], doctest::Approx(expect[i]).epsilon(0.00001));
     }
+
+    /** @arg 计算数据的 discard 不为0 */
+    data0 = TA_MA(getKData("sz000001", KQuery(-30)).close(), 4);
+    data1 = TA_MA(getKData("sz000002", KQuery(-30)).close(), 5);
+    CHECK_UNARY(data0.discard() > 0);
+    CHECK_UNARY(data1.discard() > 0);
+    result = TA_BETA(data0, data1);
+    CHECK_EQ(result.name(), "TA_BETA");
+    CHECK_EQ(result.discard(), 9);
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result[9], doctest::Approx(0.50375).epsilon(0.0001));
+    CHECK_EQ(result[29], doctest::Approx(-0.12008).epsilon(0.0001));
 }
 
 //-----------------------------------------------------------------------------

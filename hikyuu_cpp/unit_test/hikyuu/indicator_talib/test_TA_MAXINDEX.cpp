@@ -43,6 +43,16 @@ TEST_CASE("test_TA_MAXINDEX") {
     for (int i = result.discard(), len = expect.size(); i < len; ++i) {
         CHECK_EQ(result[i], expect[i]);
     }
+
+    /** @arg 计算数据的 discard 不为0 */
+    data = TA_MA(getKData("sh000001", KQuery(-10)).close(), 3);
+    CHECK_EQ(data.discard(), 2);
+    result = TA_MAXINDEX(data, 3);
+    CHECK_EQ(result.name(), "TA_MAXINDEX");
+    CHECK_EQ(result.discard(), 4);
+    CHECK_EQ(result.size(), data.size());
+    CHECK_EQ(result[4], 4.);
+    CHECK_EQ(result[9], 7.);
 }
 
 //-----------------------------------------------------------------------------

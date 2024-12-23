@@ -47,6 +47,18 @@ TEST_CASE("test_TA_MINMAX") {
         CHECK_EQ(result[i], expect0[i]);
         CHECK_EQ(result.get(i, 1), expect1[i]);
     }
+
+    /** @arg 计算数据的 discard 不为0 */
+    data = TA_MA(getKData("sh000001", KQuery(-10)).close(), 3);
+    CHECK_EQ(data.discard(), 2);
+    result = TA_MINMAX(data, 3);
+    CHECK_EQ(result.name(), "TA_MINMAX");
+    CHECK_EQ(result.discard(), 4);
+    CHECK_EQ(result.size(), data.size());
+    CHECK_EQ(result[4], doctest::Approx(2386.9373).epsilon(0.0001));
+    CHECK_EQ(result[9], doctest::Approx(2339.9326).epsilon(0.0001));
+    CHECK_EQ(result.get(4, 1), doctest::Approx(2391.8836).epsilon(0.0001));
+    CHECK_EQ(result.get(9, 1), doctest::Approx(2360.3126).epsilon(0.0001));
 }
 
 //-----------------------------------------------------------------------------
