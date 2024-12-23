@@ -27,19 +27,21 @@ TEST_CASE("test_TA_BETA") {
     CHECK_THROWS(TA_BETA(100001));
 
     /** @arg 正常数据 */
+    Indicator data0 = PRICELIST(PriceList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+    Indicator data1 = PRICELIST(PriceList{9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
+    double null_value = Null<price_t>();
+    Indicator expect =
+      PRICELIST(PriceList{null_value, null_value, null_value, null_value, null_value, 0.03926,
+                          0.08285, 0.12509, 0.16500, 0.20232});
 
-    // Indicator data0 = PRICELIST(PriceList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
-    // Indicator data1 = PRICELIST(PriceList{9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
-    // Indicator expect = PRICELIST(PriceList{-8, -8, -8, -8, -8, -8, -8, -8, -8, -8});
-
-    // Indicator result = TA_BETA(data0, data1);
-    // CHECK_EQ(result.name(), "TA_BETA");
-    // CHECK_EQ(result.discard(), 0);
-    // CHECK_EQ(result.getResultNumber(), 1);
-    // CHECK_EQ(result.size(), expect.size());
-    // for (int i = result.discard(), len = result.size(); i < len; ++i) {
-    //     CHECK_EQ(result[i], expect[i]);
-    // }
+    Indicator result = TA_BETA(data0, data1, 5);
+    CHECK_EQ(result.name(), "TA_BETA");
+    CHECK_EQ(result.discard(), 5);
+    CHECK_EQ(result.getResultNumber(), 1);
+    CHECK_EQ(result.size(), expect.size());
+    for (int i = result.discard(), len = result.size(); i < len; ++i) {
+        CHECK_EQ(result[i], doctest::Approx(expect[i]).epsilon(0.00001));
+    }
 }
 
 //-----------------------------------------------------------------------------

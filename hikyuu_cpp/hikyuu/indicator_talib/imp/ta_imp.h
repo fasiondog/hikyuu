@@ -425,8 +425,6 @@
         size_t total = ind.size();                                                              \
         HKU_IF_RETURN(total == 0, void());                                                      \
                                                                                                 \
-        auto k = getContext();                                                                  \
-        m_ref_ind.setContext(k);                                                                \
         Indicator ref = m_ref_ind;                                                              \
         if (m_ref_ind.size() != ind.size()) {                                                   \
             ref = ALIGN(m_ref_ind, ind);                                                        \
@@ -471,6 +469,7 @@
                                                                                                 \
     Indicator HKU_API func(const Indicator &ind1, const Indicator &ind2, int n) {               \
         auto p = make_shared<Cls_##func>(ind2, n);                                              \
+        HKU_WARN_IF(ind2.size() == 0, "The lenght of ind2 is zero!");                           \
         Indicator result(p);                                                                    \
         return result(ind1);                                                                    \
     }
