@@ -19,20 +19,26 @@ TaHtSine::TaHtSine() : IndicatorImp("TA_HT_SINE", 2) {}
 void TaHtSine::_calculate(const Indicator& data) {
     size_t total = data.size();
     int lookback = TA_HT_SINE_Lookback();
-    HKU_IF_RETURN(lookback < 0, void());
-
-    _readyBuffer(total, 2);
-    auto* dst0 = this->data(0);
-    auto* dst1 = this->data(1);
-
-    const double* src = data.data();
+    if (lookback < 0) {
+        m_discard = total;
+        return;
+    }
 
     m_discard = data.discard() + lookback;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
+    auto* dst0 = this->data(0);
+    auto* dst1 = this->data(1);
+    const double* src = data.data();
     int outBegIdx;
     int outNbElement;
-    TA_HT_SINE(data.discard(), total - 1, src, &outBegIdx, &outNbElement, dst0 + m_discard,
+    TA_HT_SINE(m_discard, total - 1, src, &outBegIdx, &outNbElement, dst0 + m_discard,
                dst1 + m_discard);
-    if (outBegIdx != m_discard) {
+    HKU_ASSERT((outBegIdx + outNbElement) <= total);
+    if (outBegIdx > m_discard) {
         memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement);
         memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement);
         double null_double = Null<double>();

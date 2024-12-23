@@ -41,7 +41,10 @@ void TaStochrsi::_calculate(const Indicator& data) {
     TA_MAType matype = (TA_MAType)getParam<int>("matype");
     size_t total = data.size();
     int lookback = TA_STOCHRSI_Lookback(n, fastk_n, fastd_n, matype);
-    HKU_IF_RETURN(lookback < 0, void());
+    if (lookback < 0) {
+        m_discard = total;
+        return;
+    }
 
     m_discard = data.discard() + lookback;
     if (m_discard >= total) {
@@ -55,9 +58,10 @@ void TaStochrsi::_calculate(const Indicator& data) {
 
     int outBegIdx;
     int outNbElement;
-    TA_STOCHRSI(data.discard(), total - 1, src, n, fastk_n, fastd_n, matype, &outBegIdx,
-                &outNbElement, dst0 + m_discard, dst1 + m_discard);
-    if (outBegIdx != m_discard) {
+    TA_STOCHRSI(m_discard, total - 1, src, n, fastk_n, fastd_n, matype, &outBegIdx, &outNbElement,
+                dst0 + m_discard, dst1 + m_discard);
+    HKU_ASSERT((outBegIdx + outNbElement) <= total);
+    if (outBegIdx > m_discard) {
         memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement);
         memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement);
         double null_double = Null<double>();

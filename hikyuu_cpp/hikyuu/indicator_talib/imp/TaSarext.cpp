@@ -86,7 +86,10 @@ void TaSarext::_calculate(const Indicator& data) {
     int back = TA_SAREXT_Lookback(startvalue, offsetonreverse, accelerationinitlong,
                                   accelerationlong, accelerationmaxlong, accelerationinitshort,
                                   accelerationshort, accelerationmaxshort);
-    HKU_IF_RETURN(back < 0, void());
+    if (back < 0) {
+        m_discard = total;
+        return;
+    }
 
     const KRecord* kptr = k.data();
     std::unique_ptr<double[]> buf = std::make_unique<double[]>(2 * total);
@@ -101,7 +104,7 @@ void TaSarext::_calculate(const Indicator& data) {
     m_discard = back;
     int outBegIdx;
     int outNbElement;
-    TA_SAREXT(0, total - 1, high, low, startvalue, offsetonreverse, accelerationinitlong,
+    TA_SAREXT(m_discard, total - 1, high, low, startvalue, offsetonreverse, accelerationinitlong,
               accelerationlong, accelerationmaxlong, accelerationinitshort, accelerationshort,
               accelerationmaxshort, &outBegIdx, &outNbElement, dst + m_discard);
 }

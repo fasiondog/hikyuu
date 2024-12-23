@@ -36,19 +36,26 @@ void TaPpo::_calculate(const Indicator& data) {
     TA_MAType matype = (TA_MAType)getParam<int>("matype");
     size_t total = data.size();
     int lookback = TA_PPO_Lookback(fast_n, slow_n, matype);
-    HKU_IF_RETURN(lookback < 0, void());
+    if (lookback < 0) {
+        m_discard = total;
+        return;
+    }
 
-    _readyBuffer(total, 1);
+    m_discard = data.discard() + lookback;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
 
     const double* src = data.data();
     auto* dst = this->data();
 
-    m_discard = data.discard() + lookback;
     int outBegIdx;
     int outNbElement;
-    TA_PPO(data.discard(), total - 1, src, fast_n, slow_n, matype, &outBegIdx, &outNbElement,
+    TA_PPO(m_discard, total - 1, src, fast_n, slow_n, matype, &outBegIdx, &outNbElement,
            dst + m_discard);
-    if (outBegIdx != m_discard) {
+    HKU_ASSERT((outBegIdx + outNbElement) <= total);
+    if (outBegIdx > m_discard) {
         memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);
         double null_double = Null<double>();
         for (size_t i = m_discard; i < outBegIdx; ++i) {

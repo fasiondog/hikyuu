@@ -34,18 +34,24 @@ void TaT3::_calculate(const Indicator& data) {
     double vfactor = getParam<double>("vfactor");
     size_t total = data.size();
     int lookback = TA_T3_Lookback(n, vfactor);
-    HKU_IF_RETURN(lookback < 0, void());
+    if (lookback < 0) {
+        m_discard = total;
+        return;
+    }
 
-    _readyBuffer(total, 1);
+    m_discard = data.discard() + lookback;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
 
     const double* src = data.data();
     auto* dst = this->data();
-
-    m_discard = data.discard() + lookback;
     int outBegIdx;
     int outNbElement;
-    TA_T3(data.discard(), total - 1, src, n, vfactor, &outBegIdx, &outNbElement, dst + m_discard);
-    if (outBegIdx != m_discard) {
+    TA_T3(m_discard, total - 1, src, n, vfactor, &outBegIdx, &outNbElement, dst + m_discard);
+    HKU_ASSERT((outBegIdx + outNbElement) <= total);
+    if (outBegIdx > m_discard) {
         memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);
         double null_double = Null<double>();
         for (size_t i = m_discard; i < outBegIdx; ++i) {

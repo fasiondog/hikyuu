@@ -36,21 +36,28 @@ void TaMacd::_calculate(const Indicator& data) {
     int signal_n = getParam<int>("signal_n");
     size_t total = data.size();
     int lookback = TA_MACD_Lookback(fast_n, slow_n, signal_n);
-    HKU_IF_RETURN(lookback < 0, void());
+    if (lookback < 0) {
+        m_discard = total;
+        return;
+    }
 
-    _readyBuffer(total, 3);
+    m_discard = data.discard() + lookback;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
 
     const double* src = data.data();
     auto* dst0 = this->data(0);
     auto* dst1 = this->data(1);
     auto* dst2 = this->data(2);
 
-    m_discard = data.discard() + lookback;
     int outBegIdx;
     int outNbElement;
-    TA_MACD(data.discard(), total - 1, src, fast_n, slow_n, signal_n, &outBegIdx, &outNbElement,
+    TA_MACD(m_discard, total - 1, src, fast_n, slow_n, signal_n, &outBegIdx, &outNbElement,
             dst0 + m_discard, dst1 + m_discard, dst2 + m_discard);
-    if (outBegIdx != m_discard) {
+    HKU_ASSERT((outBegIdx + outNbElement) <= total);
+    if (outBegIdx > m_discard) {
         memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement);
         memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement);
         memmove(dst2 + outBegIdx, dst2 + m_discard, sizeof(double) * outNbElement);

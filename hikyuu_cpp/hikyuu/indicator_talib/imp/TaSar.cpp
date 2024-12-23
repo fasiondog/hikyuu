@@ -45,6 +45,14 @@ void TaSar::_calculate(const Indicator& data) {
 
     _readyBuffer(total, 1);
 
+    double acceleration = getParam<double>("acceleration");
+    double maximum = getParam<double>("maximum");
+    int back = TA_SAR_Lookback(acceleration, maximum);
+    if (back < 0) {
+        m_discard = total;
+        return;
+    }
+
     const KRecord* kptr = k.data();
     std::unique_ptr<double[]> buf = std::make_unique<double[]>(2 * total);
     double* high = buf.get();
@@ -55,16 +63,10 @@ void TaSar::_calculate(const Indicator& data) {
     }
 
     auto* dst = this->data();
-
-    double acceleration = getParam<double>("acceleration");
-    double maximum = getParam<double>("maximum");
-    int back = TA_SAR_Lookback(acceleration, maximum);
-    HKU_IF_RETURN(back < 0, void());
-
     m_discard = back;
     int outBegIdx;
     int outNbElement;
-    TA_SAR(0, total - 1, high, low, acceleration, maximum, &outBegIdx, &outNbElement,
+    TA_SAR(m_discard, total - 1, high, low, acceleration, maximum, &outBegIdx, &outNbElement,
            dst + m_discard);
 }
 

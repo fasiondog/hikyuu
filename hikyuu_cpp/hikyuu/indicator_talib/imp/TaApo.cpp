@@ -41,7 +41,6 @@ void TaApo::_calculate(const Indicator& data) {
         return;
     }
 
-    _readyBuffer(total, 1);
     m_discard = data.discard() + lookback;
     if (m_discard >= total) {
         m_discard = total;

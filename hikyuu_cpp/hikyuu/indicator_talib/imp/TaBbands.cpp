@@ -47,7 +47,6 @@ void TaBbands::_calculate(const Indicator& data) {
         return;
     }
 
-    _readyBuffer(total, 3);
     m_discard = data.discard() + lookback;
     if (m_discard >= total) {
         m_discard = total;

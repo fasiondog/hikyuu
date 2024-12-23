@@ -31,19 +31,26 @@ void TaMama::_calculate(const Indicator& data) {
     double slow_limit = getParam<double>("slow_limit");
     size_t total = data.size();
     int lookback = TA_MAMA_Lookback(fast_limit, slow_limit);
-    HKU_IF_RETURN(lookback < 0, void());
+    if (lookback < 0) {
+        m_discard = total;
+        return;
+    }
 
-    _readyBuffer(total, 2);
+    m_discard = data.discard() + lookback;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
 
     const double* src = data.data();
     auto* dst0 = this->data(0);
     auto* dst1 = this->data(1);
 
-    m_discard = data.discard() + lookback;
     int outBegIdx;
     int outNbElement;
-    TA_MAMA(data.discard(), total - 1, src, fast_limit, slow_limit, &outBegIdx, &outNbElement,
+    TA_MAMA(m_discard, total - 1, src, fast_limit, slow_limit, &outBegIdx, &outNbElement,
             dst0 + m_discard, dst1 + m_discard);
+    HKU_ASSERT((outBegIdx + outNbElement) <= total);
     if (outBegIdx != m_discard) {
         memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement);
         memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement);

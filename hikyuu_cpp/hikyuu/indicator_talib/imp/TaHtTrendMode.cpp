@@ -19,23 +19,31 @@ TaHtTrendMode::TaHtTrendMode() : IndicatorImp("TA_HT_TRENDMODE", 1) {}
 void TaHtTrendMode::_calculate(const Indicator& data) {
     size_t total = data.size();
     int lookback = TA_HT_TRENDMODE_Lookback();
-    HKU_IF_RETURN(lookback < 0, void());
+    if (lookback < 0) {
+        m_discard = total;
+        return;
+    }
 
-    _readyBuffer(total, 1);
+    m_discard = data.discard() + lookback;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
     auto* dst = this->data();
     const double* src = data.data();
 
     std::unique_ptr<int[]> buf = std::make_unique<int[]>(total);
 
-    m_discard = data.discard() + lookback;
     int outBegIdx;
     int outNbElement;
-    TA_HT_TRENDMODE(data.discard(), total - 1, src, &outBegIdx, &outNbElement,
-                    buf.get() + m_discard);
+    TA_HT_TRENDMODE(m_discard, total - 1, src, &outBegIdx, &outNbElement, buf.get());
+    HKU_ASSERT((outBegIdx + outNbElement) <= total);
     if (outBegIdx > m_discard) {
         m_discard = outBegIdx;
     }
-    for (size_t i = m_discard; i < total; ++i) {
+    dst = dst + m_discard;
+    for (size_t i = 0; i < outNbElement; ++i) {
         dst[i] = buf[i];
     }
 }

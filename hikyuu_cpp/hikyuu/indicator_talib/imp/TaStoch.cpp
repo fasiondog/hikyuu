@@ -52,6 +52,8 @@ void TaStoch::_calculate(const Indicator& data) {
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
+    _readyBuffer(total, 2);
+
     int fastk_n = getParam<int>("fastk_n");
     int slowk_n = getParam<int>("slowk_n");
     TA_MAType slowk_matype = (TA_MAType)getParam<int>("slowk_matype");
@@ -62,8 +64,6 @@ void TaStoch::_calculate(const Indicator& data) {
         m_discard = total;
         return;
     }
-
-    _readyBuffer(total, 2);
 
     const KRecord* kptr = k.data();
     std::unique_ptr<double[]> buf = std::make_unique<double[]>(3 * total);
@@ -81,8 +81,8 @@ void TaStoch::_calculate(const Indicator& data) {
     m_discard = back;
     int outBegIdx;
     int outNbElement;
-    TA_STOCH(0, total - 1, high, low, close, fastk_n, slowk_n, slowk_matype, slowd_n, slowd_matype,
-             &outBegIdx, &outNbElement, dst0 + m_discard, dst1 + m_discard);
+    TA_STOCH(m_discard, total - 1, high, low, close, fastk_n, slowk_n, slowk_matype, slowd_n,
+             slowd_matype, &outBegIdx, &outNbElement, dst0 + m_discard, dst1 + m_discard);
 }
 
 Indicator HKU_API TA_STOCH(int fastk_n, int slowk_n, int slowk_matype, int slowd_n,

@@ -47,6 +47,15 @@ void TaUltosc::_calculate(const Indicator& data) {
 
     _readyBuffer(total, 1);
 
+    int n1 = getParam<int>("n1");
+    int n2 = getParam<int>("n2");
+    int n3 = getParam<int>("n3");
+    int back = TA_ULTOSC_Lookback(n1, n2, n3);
+    if (back < 0) {
+        m_discard = total;
+        return;
+    }
+
     const KRecord* kptr = k.data();
     std::unique_ptr<double[]> buf = std::make_unique<double[]>(3 * total);
     double* high = buf.get();
@@ -59,17 +68,10 @@ void TaUltosc::_calculate(const Indicator& data) {
     }
 
     auto* dst = this->data();
-
-    int n1 = getParam<int>("n1");
-    int n2 = getParam<int>("n2");
-    int n3 = getParam<int>("n3");
-    int back = TA_ULTOSC_Lookback(n1, n2, n3);
-    HKU_IF_RETURN(back < 0, void());
-
     m_discard = back;
     int outBegIdx;
     int outNbElement;
-    TA_ULTOSC(0, total - 1, high, low, close, n1, n2, n3, &outBegIdx, &outNbElement,
+    TA_ULTOSC(m_discard, total - 1, high, low, close, n1, n2, n3, &outBegIdx, &outNbElement,
               dst + m_discard);
 }
 
