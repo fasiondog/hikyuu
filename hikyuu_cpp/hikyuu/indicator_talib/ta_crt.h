@@ -13,26 +13,26 @@
 
 #if HKU_ENABLE_TA_LIB
 
-#define TA_IN1_OUT_CRT(func)                                \
-    Indicator HKU_API func();                               \
-    inline Indicator func(const Indicator& ind) {           \
-        return func()(ind);                                 \
-    }                                                       \
-    inline Indicator HKU_API func(Indicator::value_t val) { \
-        return func(CVAL(val));                             \
+#define TA_IN1_OUT_CRT(func)                        \
+    Indicator HKU_API func();                       \
+    inline Indicator func(const Indicator& ind) {   \
+        return func()(ind);                         \
+    }                                               \
+    inline Indicator func(Indicator::value_t val) { \
+        return func(CVAL(val));                     \
     }
 
-#define TA_IN1_OUT_N_CRT(func, period)                                         \
-    Indicator HKU_API func(int n = period);                                    \
-    Indicator HKU_API func(const IndParam& n);                                 \
-    inline Indicator func(const Indicator& ind, int n = period) {              \
-        return func(n)(ind);                                                   \
-    }                                                                          \
-    inline Indicator HKU_API func(const Indicator& data, const IndParam& n) {  \
-        return func(n)(data);                                                  \
-    }                                                                          \
-    inline Indicator HKU_API func(const Indicator& data, const Indicator& n) { \
-        return func(IndParam(n))(data);                                        \
+#define TA_IN1_OUT_N_CRT(func, period)                                 \
+    Indicator HKU_API func(int n = period);                            \
+    Indicator HKU_API func(const IndParam& n);                         \
+    inline Indicator func(const Indicator& ind, int n = period) {      \
+        return func(n)(ind);                                           \
+    }                                                                  \
+    inline Indicator func(const Indicator& data, const IndParam& n) {  \
+        return func(n)(data);                                          \
+    }                                                                  \
+    inline Indicator func(const Indicator& data, const Indicator& n) { \
+        return func(IndParam(n))(data);                                \
     }
 
 #define TA_IN2_OUT_CRT(func)                                              \

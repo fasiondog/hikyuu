@@ -42,6 +42,7 @@ target("hikyuu")
     add_defines("CPPHTTPLIB_OPENSSL_SUPPORT", "CPPHTTPLIB_ZLIB_SUPPORT")
 
     if is_plat("windows") then
+        add_cxflags("/bigobj")
         add_cxflags("-wd4819")
         add_cxflags("-wd4251") -- template dll export warning
         add_cxflags("-wd4267")
