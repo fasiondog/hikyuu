@@ -75,6 +75,7 @@ void TaAdosc::_calculate(const Indicator& data) {
     int outNbElement;
     TA_ADOSC(m_discard, total - 1, high, low, close, vol, fast_n, slow_n, &outBegIdx, &outNbElement,
              dst + m_discard);
+    HKU_ASSERT(m_discard == outBegIdx);
 }
 
 Indicator HKU_API TA_ADOSC(int fast_n, int slow_n) {

@@ -170,24 +170,10 @@ TA_IN1_OUT_CRT(TA_EXP)
 TA_IN1_OUT_CRT(TA_FLOOR)
 TA_IN1_OUT_CRT(TA_HT_DCPERIOD)
 TA_IN1_OUT_CRT(TA_HT_DCPHASE)
-
-Indicator HKU_API TA_HT_PHASOR();
-inline Indicator TA_HT_PHASOR(const Indicator& ind) {
-    return TA_HT_PHASOR()(ind);
-}
-
-Indicator HKU_API TA_HT_SINE();
-inline Indicator TA_HT_SINE(const Indicator& ind) {
-    return TA_HT_SINE()(ind);
-}
-
+TA_IN1_OUT_CRT(TA_HT_PHASOR)
+TA_IN1_OUT_CRT(TA_HT_SINE)
 TA_IN1_OUT_CRT(TA_HT_TRENDLINE)
-
-Indicator HKU_API TA_HT_TRENDMODE();
-inline Indicator TA_HT_TRENDMODE(const Indicator& ind) {
-    return TA_HT_TRENDMODE()(ind);
-}
-
+TA_IN1_OUT_CRT(TA_HT_TRENDMODE)
 TA_K_OUT_N_CRT(TA_IMI, 14)
 TA_IN1_OUT_N_CRT(TA_KAMA, 30)
 TA_IN1_OUT_N_CRT(TA_LINEARREG_ANGLE, 14)

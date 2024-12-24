@@ -46,6 +46,42 @@
         return Indicator(make_shared<Cls_##func>());                                  \
     }
 
+#define TA_IN1_OUT1_INT_IMP(func, func_lookback)                                     \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                             \
+    Cls_##func::~Cls_##func() {}                                                     \
+                                                                                     \
+    void Cls_##func::_calculate(const Indicator &data) {                             \
+        int lookback = func_lookback();                                              \
+        size_t total = data.size();                                                  \
+        if (lookback < 0) {                                                          \
+            m_discard = total;                                                       \
+            return;                                                                  \
+        }                                                                            \
+                                                                                     \
+        m_discard = data.discard() + lookback;                                       \
+        if (m_discard >= total) {                                                    \
+            m_discard = total;                                                       \
+            return;                                                                  \
+        }                                                                            \
+                                                                                     \
+        auto const *src = data.data();                                               \
+        std::unique_ptr<int[]> buf = std::make_unique<int[]>(total);                 \
+        int outBegIdx;                                                               \
+        int outNbElement;                                                            \
+        func(m_discard, total - 1, src, &outBegIdx, &outNbElement, buf.get());       \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total); \
+        m_discard = outBegIdx;                                                       \
+        auto *dst = this->data();                                                    \
+        dst = dst + outBegIdx;                                                       \
+        for (int i = 0; i < outNbElement; ++i) {                                     \
+            dst[i] = buf[i];                                                         \
+        }                                                                            \
+    }                                                                                \
+                                                                                     \
+    Indicator HKU_API func() {                                                       \
+        return Indicator(make_shared<Cls_##func>());                                 \
+    }
+
 #define TA_IN1_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)             \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                    \
         setParam<int>("n", period);                                                        \
@@ -183,6 +219,37 @@
         IndicatorImpPtr p = make_shared<Cls_##func>();                                     \
         p->setIndParam("n", n);                                                            \
         return Indicator(p);                                                               \
+    }
+
+#define TA_IN1_OUT2_IMP(func, func_lookback)                                         \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 2) {}                             \
+    Cls_##func::~Cls_##func() {}                                                     \
+    void Cls_##func::_calculate(const Indicator &data) {                             \
+        size_t total = data.size();                                                  \
+        int lookback = func_lookback();                                              \
+        if (lookback < 0) {                                                          \
+            m_discard = total;                                                       \
+            return;                                                                  \
+        }                                                                            \
+        m_discard = data.discard() + lookback;                                       \
+        if (m_discard >= total) {                                                    \
+            m_discard = total;                                                       \
+            return;                                                                  \
+        }                                                                            \
+                                                                                     \
+        auto const *src = data.data();                                               \
+        auto *dst0 = this->data(0);                                                  \
+        auto *dst1 = this->data(1);                                                  \
+                                                                                     \
+        int outBegIdx;                                                               \
+        int outNbElement;                                                            \
+        func(m_discard, total - 1, src, &outBegIdx, &outNbElement, dst0 + m_discard, \
+             dst1 + m_discard);                                                      \
+        HKU_ASSERT(outBegIdx == m_discard && (outBegIdx + outNbElement) <= total);   \
+    }                                                                                \
+                                                                                     \
+    Indicator HKU_API func() {                                                       \
+        return Indicator(make_shared<Cls_##func>());                                 \
     }
 
 #define TA_IN1_OUT2_INT_N_IMP(func, func_lookback, period, period_min, period_max)         \

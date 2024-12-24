@@ -179,18 +179,10 @@ void export_Indicator_ta_lib(py::module& m) {
     TA_IN1_OUT_PY(TA_FLOOR)
     TA_IN1_OUT_PY(TA_HT_DCPERIOD)
     TA_IN1_OUT_PY(TA_HT_DCPHASE)
-
-    m.def("TA_HT_PHASOR", py::overload_cast<>(TA_HT_PHASOR));
-    m.def("TA_HT_PHASOR", py::overload_cast<const Indicator&>(TA_HT_PHASOR));
-
-    m.def("TA_HT_SINE", py::overload_cast<>(TA_HT_SINE));
-    m.def("TA_HT_SINE", py::overload_cast<const Indicator&>(TA_HT_SINE));
-
+    TA_IN1_OUT_PY(TA_HT_PHASOR)
+    TA_IN1_OUT_PY(TA_HT_SINE)
     TA_IN1_OUT_PY(TA_HT_TRENDLINE)
-
-    m.def("TA_HT_TRENDMODE", py::overload_cast<>(TA_HT_TRENDMODE));
-    m.def("TA_HT_TRENDMODE", py::overload_cast<const Indicator&>(TA_HT_TRENDMODE));
-
+    TA_IN1_OUT_PY(TA_HT_TRENDMODE)
     TA_K_OUT_N_PY(TA_IMI, 14)
     TA_IN1_OUT_N_PY(TA_KAMA, 30)
     TA_IN1_OUT_N_PY(TA_LINEARREG_ANGLE, 14)
