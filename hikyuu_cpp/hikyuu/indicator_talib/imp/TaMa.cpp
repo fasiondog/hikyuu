@@ -22,7 +22,7 @@ TaMa::TaMa() : IndicatorImp("TA_MA", 1) {
 void TaMa::_checkParam(const string& name) const {
     if (name == "n") {
         int n = getParam<int>(name);
-        HKU_ASSERT(n >= 2 && n <= 100000);
+        HKU_ASSERT(n >= 1 && n <= 100000);
     } else if (name == "matype") {
         int matype = getParam<int>("matype");
         HKU_ASSERT(matype >= 0 && matype <= 8);
