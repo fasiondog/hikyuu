@@ -57,9 +57,14 @@ TaSarext::TaSarext(const KData& k, double startvalue, double offsetonreverse,
 }
 
 void TaSarext::_checkParam(const string& name) const {
-    if (name == "acceleration" || name == "maximum") {
+    if (name == "startvalue") {
+        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+    } else if (name == "offsetonreverse" || name == "accelerationlong" ||
+               name == "accelerationshort" || name == "accelerationmaxshort" ||
+               name == "accelerationinitlong" || name == "accelerationmaxlong" ||
+               name == "accelerationinitshort") {
         double p = getParam<double>(name);
-        HKU_CHECK(p >= 0.0 && p <= 3.000000e+37, "{} must >= 0!", name);
+        HKU_CHECK(p >= 0, "{} must >= 0!", name);
     }
 }
 
@@ -69,9 +74,7 @@ void TaSarext::_calculate(const Indicator& data) {
 
     KData k = getContext();
     size_t total = k.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
 
@@ -86,7 +89,7 @@ void TaSarext::_calculate(const Indicator& data) {
     int back = TA_SAREXT_Lookback(startvalue, offsetonreverse, accelerationinitlong,
                                   accelerationlong, accelerationmaxlong, accelerationinitshort,
                                   accelerationshort, accelerationmaxshort);
-    if (back < 0) {
+    if (back < 0 || back >= total) {
         m_discard = total;
         return;
     }
@@ -107,6 +110,7 @@ void TaSarext::_calculate(const Indicator& data) {
     TA_SAREXT(m_discard, total - 1, high, low, startvalue, offsetonreverse, accelerationinitlong,
               accelerationlong, accelerationmaxlong, accelerationinitshort, accelerationshort,
               accelerationmaxshort, &outBegIdx, &outNbElement, dst + m_discard);
+    HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
 Indicator HKU_API TA_SAREXT(double startvalue, double offsetonreverse, double accelerationinitlong,

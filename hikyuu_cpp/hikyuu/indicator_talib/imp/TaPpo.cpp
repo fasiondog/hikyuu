@@ -54,15 +54,7 @@ void TaPpo::_calculate(const Indicator& data) {
     int outNbElement;
     TA_PPO(m_discard, total - 1, src, fast_n, slow_n, matype, &outBegIdx, &outNbElement,
            dst + m_discard);
-    HKU_ASSERT((outBegIdx + outNbElement) <= total);
-    if (outBegIdx > m_discard) {
-        memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);
-        double null_double = Null<double>();
-        for (size_t i = m_discard; i < outBegIdx; ++i) {
-            _set(null_double, i);
-        }
-        m_discard = outBegIdx;
-    }
+    HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
 Indicator HKU_API TA_PPO(int fast_n, int slow_n, int matype) {

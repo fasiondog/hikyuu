@@ -39,16 +39,14 @@ void TaSar::_calculate(const Indicator& data) {
 
     KData k = getContext();
     size_t total = k.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
 
     double acceleration = getParam<double>("acceleration");
     double maximum = getParam<double>("maximum");
     int back = TA_SAR_Lookback(acceleration, maximum);
-    if (back < 0) {
+    if (back < 0 || back >= total) {
         m_discard = total;
         return;
     }
@@ -68,6 +66,7 @@ void TaSar::_calculate(const Indicator& data) {
     int outNbElement;
     TA_SAR(m_discard, total - 1, high, low, acceleration, maximum, &outBegIdx, &outNbElement,
            dst + m_discard);
+    HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
 Indicator HKU_API TA_SAR(double acceleration, double maximum) {

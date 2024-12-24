@@ -15,14 +15,14 @@ BOOST_CLASS_EXPORT(hku::TaMama)
 namespace hku {
 
 TaMama::TaMama() : IndicatorImp("TA_MAMA", 2) {
-    setParam<double>("fast_limit", 5.000000e-1);
-    setParam<double>("slow_limit", 5.000000e-2);
+    setParam<double>("fast_limit", 0.5);
+    setParam<double>("slow_limit", 0.05);
 }
 
 void TaMama::_checkParam(const string& name) const {
     if (name == "fast_limit" || name == "slow_limit") {
         double limit = getParam<double>(name);
-        HKU_ASSERT(limit >= 1.000000e-2 && limit <= 9.900000e-1);
+        HKU_CHECK(limit >= 0.01 && limit <= 0.99, "{} must be in [0.01, 0.99]!", name);
     }
 }
 
@@ -50,16 +50,7 @@ void TaMama::_calculate(const Indicator& data) {
     int outNbElement;
     TA_MAMA(m_discard, total - 1, src, fast_limit, slow_limit, &outBegIdx, &outNbElement,
             dst0 + m_discard, dst1 + m_discard);
-    HKU_ASSERT((outBegIdx + outNbElement) <= total);
-    if (outBegIdx != m_discard) {
-        memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement);
-        memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement);
-        double null_double = Null<double>();
-        for (size_t i = m_discard; i < outBegIdx; ++i) {
-            _set(null_double, i);
-        }
-        m_discard = outBegIdx;
-    }
+    HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
 Indicator HKU_API TA_MAMA(double fast_limit, double slow_limit) {
