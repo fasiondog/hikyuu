@@ -1,11 +1,11 @@
 /*
- * test_SUM.cpp
+ *  Copyright (c) 2024 hikyuu.org
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2024-12-15
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/WMA.h>
@@ -105,6 +105,26 @@ TEST_CASE("test_WMA_dyn") {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 }
+
+//-----------------------------------------------------------------------------
+// benchmark
+//-----------------------------------------------------------------------------
+#if ENABLE_BENCHMARK_TEST
+TEST_CASE("test_WMA_benchmark") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    Indicator c = kdata.close();
+    int cycle = 1000;  // 测试循环次数
+
+    {
+        BENCHMARK_TIME_MSG(test_WMA_benchmark, cycle, fmt::format("data len: {}", c.size()));
+        SPEND_TIME_CONTROL(false);
+        for (int i = 0; i < cycle; i++) {
+            Indicator result = WMA(c);
+        }
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // test export

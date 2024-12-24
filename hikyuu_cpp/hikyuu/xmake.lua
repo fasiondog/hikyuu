@@ -2,15 +2,33 @@
 target("hikyuu")
     set_kind("$(kind)")
 
+    if get_config("leak_check") then
+        if is_plat("macosx") then
+            add_cxflags("-fsanitize=address")
+            add_ldflags("-fsanitize=address")
+        elseif is_plat("linux") then
+            -- 需要 export LD_PRELOAD=libasan.so
+            set_policy("build.sanitizer.address", true)
+            set_policy("build.sanitizer.leak", true)
+            -- set_policy("build.sanitizer.memory", true)
+            -- set_policy("build.sanitizer.thread", true)
+        end
+    end
+
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json")
     if is_plat("windows", "linux", "cross", "macosx") then
         if get_config("sqlite") or get_config("hdf5") then
             add_packages("sqlite3")
         end
     end
+
     if has_config("http_client_zip") then
         add_packages("gzip-hpp")
-    end    
+    end
+
+    if has_config("ta_lib") then
+        add_packages("ta-lib")
+    end
 
     add_options("mysql")
     add_includedirs("..")
@@ -24,6 +42,7 @@ target("hikyuu")
     add_defines("CPPHTTPLIB_OPENSSL_SUPPORT", "CPPHTTPLIB_ZLIB_SUPPORT")
 
     if is_plat("windows") then
+        add_cxflags("/bigobj")
         add_cxflags("-wd4819")
         add_cxflags("-wd4251") -- template dll export warning
         add_cxflags("-wd4267")
@@ -61,7 +80,7 @@ target("hikyuu")
 
     -- add files
     -- add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp")
-    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|utilities/mo/**.cpp")
+    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|utilities/mo/**.cpp|indicator_talib/**.cpp")
     add_files("./data_driver/*.cpp")
     if get_config("hdf5") or get_config("sqlite") then
         add_files("./data_driver/base_info/sqlite/**.cpp")
@@ -85,13 +104,14 @@ target("hikyuu")
     if get_config("tdx") then
         add_files("./data_driver/kdata/tdx/**.cpp")
     end
-
     if get_config("mysql") then
         add_files("./utilities/db_connect/mysql/**.cpp")
     end
-
     if has_config("mo") then
         add_files("./utilities/mo/**.cpp")
+    end
+    if has_config("ta_lib") then
+        add_files("./indicator_talib/**.cpp")
     end
 
     after_build(function(target)

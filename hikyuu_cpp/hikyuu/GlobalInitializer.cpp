@@ -20,6 +20,10 @@
 #include <H5public.h>
 #endif
 
+#if HKU_ENABLE_TA_LIB
+#include <ta_libc.h>
+#endif
+
 #include "utilities/Log.h"
 #include "utilities/os.h"
 #include "hikyuu.h"
@@ -66,6 +70,10 @@ void GlobalInitializer::init() {
     sendFeedback();
 #endif
 
+#if HKU_ENABLE_TA_LIB
+    TA_Initialize();
+#endif
+
     DataDriverFactory::init();
     StockManager::instance();
     IndicatorImp::initDynEngine();
@@ -95,6 +103,10 @@ void GlobalInitializer::clean() {
     if (tg) {
         tg->stop();
     }
+
+#if HKU_ENABLE_TA_LIB
+    TA_Shutdown();
+#endif
 
 #if HKU_ENABLE_LEAK_DETECT || defined(MSVC_LEAKER_DETECT)
     // 非内存泄漏检测时，内存让系统自动释放，避免某些场景下 windows 下退出速度过慢

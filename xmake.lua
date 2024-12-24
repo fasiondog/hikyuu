@@ -50,14 +50,21 @@ option("http_client_ssl", {description = "enable https support for http client",
 option("http_client_zip", {description = "enable http support gzip", default = false})
 -- option("node", {description = "enable node reqrep server/client", default = true})
 
+option("ta_lib")
+    add_deps("low_precision")
+    set_default(true)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable ta-lib support.")
+    -- low_precision 时，需禁用，ta-lib不支持输出为 float
+    after_check(function (option)
+      if option:dep("low_precision"):enabled() then
+          cprint('${red}[warning] "low_precision" is enabled, ta-lib will be disabled')
+          option:enable(false)
+      end
+    end)        
+option_end()
 
-if get_config("leak_check") then
-    -- 需要 export LD_PRELOAD=libasan.so
-    set_policy("build.sanitizer.address", true)
-    set_policy("build.sanitizer.leak", true)
-    -- set_policy("build.sanitizer.memory", true)
-    -- set_policy("build.sanitizer.thread", true)
-end
 
 -- SPDLOG_ACTIVE_LEVEL 需要单独加
 local log_level = get_config("log_level")
@@ -88,6 +95,7 @@ set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
 set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
 set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
+set_configvar("HKU_ENABLE_TA_LIB", get_config("ta_lib") and 1 or 0)
 
 set_configvar("HKU_SUPPORT_DATETIME", 1)
 set_configvar("HKU_ENABLE_SQLCIPHER", 0)
@@ -150,6 +158,10 @@ add_requires("nlohmann_json")
 
 if has_config("http_client_zip") then
     add_requires("gzip-hpp")
+end
+
+if has_config("ta_lib") then
+    add_requires("ta-lib")
 end
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
