@@ -15,45 +15,46 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_TA_SAREXT test_indicator_TA_SAREXT
+ * @defgroup test_indicator_TA_ULTOSC test_indicator_TA_ULTOSC
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-TEST_CASE("test_TA_SAREXT") {
+TEST_CASE("test_TA_ULTOSC") {
     KData kdata = getKData("sz000001", KQuery(-10));
 
     /** @arg 非法参数 */
-    CHECK_THROWS(TA_SAREXT(kdata, Null<double>()));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, -1.0));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, 0, 0, -1.));
+    CHECK_THROWS(TA_ULTOSC(kdata, 0, 14, 28));
+    CHECK_THROWS(TA_ULTOSC(kdata, 100001, 14, 28));
+    CHECK_THROWS(TA_ULTOSC(kdata, 7, 0, 28));
+    CHECK_THROWS(TA_ULTOSC(kdata, 7, 100001, 28));
+    CHECK_THROWS(TA_ULTOSC(kdata, 7, 14, 0));
+    CHECK_THROWS(TA_ULTOSC(kdata, 7, 14, 100001));
 
     /** @arg KData 为空 */
-    Indicator result = TA_SAREXT(KData());
-    CHECK_EQ(result.name(), "TA_SAREXT");
+    Indicator result = TA_ULTOSC(KData());
+    CHECK_EQ(result.name(), "TA_ULTOSC");
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.size(), 0);
+    CHECK_EQ(result.getResultNumber(), 1);
 
     /** @arg KData 长度小于默认参数抛弃数量 */
-    result = TA_SAREXT(getKData("sh000001", KQuery(-1)));
+    result = TA_ULTOSC(getKData("sh000001", KQuery(-1)));
     CHECK_EQ(result.discard(), 1);
     CHECK_EQ(result.size(), 1);
+    CHECK_EQ(result.getResultNumber(), 1);
 
     /** @arg 正常情况 */
-    result = TA_SAREXT(kdata);
-    CHECK_EQ(result.name(), "TA_SAREXT");
-    CHECK_EQ(result.discard(), 1);
+    kdata = getKData("sz000001", KQuery(-30));
+    result = TA_ULTOSC(kdata);
+    CHECK_EQ(result.name(), "TA_ULTOSC");
+    CHECK_EQ(result.discard(), 28);
     CHECK_EQ(result.size(), kdata.size());
     CHECK_EQ(result.getResultNumber(), 1);
-    CHECK_UNARY(std::isnan(result[0]));
-    CHECK_EQ(result[1], doctest::Approx(15.72).epsilon(0.00001));
-    CHECK_EQ(result[9], doctest::Approx(15.4958).epsilon(0.00001));
+    CHECK_UNARY(std::isnan(result[27]));
+    CHECK_EQ(result[28], doctest::Approx(46.52731).epsilon(0.00001));
+    CHECK_EQ(result[29], doctest::Approx(47.574192).epsilon(0.00001));
 }
 
 //-----------------------------------------------------------------------------
@@ -62,14 +63,14 @@ TEST_CASE("test_TA_SAREXT") {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-TEST_CASE("test_TA_SAREXT_export") {
+TEST_CASE("test_TA_ULTOSC_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/TA_SAREXT.xml";
+    filename += "/TA_ULTOSC.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = TA_SAREXT(kdata);
+    Indicator x1 = TA_ULTOSC(kdata);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -87,8 +88,10 @@ TEST_CASE("test_TA_SAREXT_export") {
     CHECK_UNARY(x1.size() == x2.size());
     CHECK_UNARY(x1.discard() == x2.discard());
     CHECK_UNARY(x1.getResultNumber() == x2.getResultNumber());
-    for (size_t i = x1.discard(); i < x1.size(); ++i) {
-        CHECK_EQ(x1[i], doctest::Approx(x2[i]).epsilon(0.00001));
+    for (size_t r = 0, total = x1.getResultNumber(); r < total; ++r) {
+        for (size_t i = x1.discard(); i < x1.size(); ++i) {
+            CHECK_EQ(x1.get(i, r), doctest::Approx(x2.get(i, r)).epsilon(0.00001));
+        }
     }
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */

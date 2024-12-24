@@ -22,10 +22,10 @@ TaStddev::TaStddev() : IndicatorImp("TA_STDDEV", 1) {
 void TaStddev::_checkParam(const string& name) const {
     if (name == "n") {
         int n = getParam<int>(name);
-        HKU_CHECK(n >= 1 && n <= 100000, "n must >= 1 and <= 100000 ");
+        HKU_CHECK(n >= 2 && n <= 100000, "n must in [2, 100000]!]");
     } else if (name == "nbdev") {
         double nbdev = getParam<double>("nbdev");
-        HKU_ASSERT(nbdev >= -3.000000e+37 && nbdev <= 3.000000e+37);
+        HKU_ASSERT(!std::isnan(nbdev));
     }
 }
 
@@ -51,15 +51,7 @@ void TaStddev::_calculate(const Indicator& data) {
     int outBegIdx;
     int outNbElement;
     TA_STDDEV(m_discard, total - 1, src, n, nbdev, &outBegIdx, &outNbElement, dst + m_discard);
-    HKU_ASSERT((outBegIdx + outNbElement) <= total);
-    if (outBegIdx > m_discard) {
-        memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);
-        double null_double = Null<double>();
-        for (size_t i = m_discard; i < outBegIdx; ++i) {
-            _set(null_double, i);
-        }
-        m_discard = outBegIdx;
-    }
+    HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
 Indicator HKU_API TA_STDDEV(int n, double nbdev) {

@@ -60,7 +60,7 @@ void TaStoch::_calculate(const Indicator& data) {
     int slowd_n = getParam<int>("slowd_n");
     TA_MAType slowd_matype = (TA_MAType)getParam<int>("slowd_matype");
     int back = TA_STOCH_Lookback(fastk_n, slowk_n, slowk_matype, slowd_n, slowd_matype);
-    if (back < 0) {
+    if (back < 0 || back >= total) {
         m_discard = total;
         return;
     }
@@ -83,6 +83,7 @@ void TaStoch::_calculate(const Indicator& data) {
     int outNbElement;
     TA_STOCH(m_discard, total - 1, high, low, close, fastk_n, slowk_n, slowk_matype, slowd_n,
              slowd_matype, &outBegIdx, &outNbElement, dst0 + m_discard, dst1 + m_discard);
+    HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
 Indicator HKU_API TA_STOCH(int fastk_n, int slowk_n, int slowk_matype, int slowd_n,

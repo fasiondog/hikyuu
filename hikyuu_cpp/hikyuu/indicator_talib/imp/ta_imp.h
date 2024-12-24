@@ -9,41 +9,33 @@
 
 #define EXPOERT_TA_FUNC(func) BOOST_CLASS_EXPORT(hku::Cls_##func)
 
-#define TA_IN1_OUT1_IMP(func, func_lookback)                                          \
-    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                              \
-    Cls_##func::~Cls_##func() {}                                                      \
-                                                                                      \
-    void Cls_##func::_calculate(const Indicator &data) {                              \
-        int lookback = func_lookback();                                               \
-        size_t total = data.size();                                                   \
-        if (lookback < 0) {                                                           \
-            m_discard = total;                                                        \
-            return;                                                                   \
-        }                                                                             \
-        m_discard = data.discard() + lookback;                                        \
-        if (m_discard >= total) {                                                     \
-            m_discard = total;                                                        \
-            return;                                                                   \
-        }                                                                             \
-                                                                                      \
-        auto const *src = data.data();                                                \
-        auto *dst = this->data();                                                     \
-        int outBegIdx;                                                                \
-        int outNbElement;                                                             \
-        func(m_discard, total - 1, src, &outBegIdx, &outNbElement, dst + m_discard);  \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                              \
-        if (outBegIdx != m_discard) {                                                 \
-            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement); \
-            double null_double = Null<double>();                                      \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                          \
-                _set(null_double, i);                                                 \
-            }                                                                         \
-            m_discard = outBegIdx;                                                    \
-        }                                                                             \
-    }                                                                                 \
-                                                                                      \
-    Indicator HKU_API func() {                                                        \
-        return Indicator(make_shared<Cls_##func>());                                  \
+#define TA_IN1_OUT1_IMP(func, func_lookback)                                         \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                             \
+    Cls_##func::~Cls_##func() {}                                                     \
+                                                                                     \
+    void Cls_##func::_calculate(const Indicator &data) {                             \
+        int lookback = func_lookback();                                              \
+        size_t total = data.size();                                                  \
+        if (lookback < 0) {                                                          \
+            m_discard = total;                                                       \
+            return;                                                                  \
+        }                                                                            \
+        m_discard = data.discard() + lookback;                                       \
+        if (m_discard >= total) {                                                    \
+            m_discard = total;                                                       \
+            return;                                                                  \
+        }                                                                            \
+                                                                                     \
+        auto const *src = data.data();                                               \
+        auto *dst = this->data();                                                    \
+        int outBegIdx;                                                               \
+        int outNbElement;                                                            \
+        func(m_discard, total - 1, src, &outBegIdx, &outNbElement, dst + m_discard); \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total); \
+    }                                                                                \
+                                                                                     \
+    Indicator HKU_API func() {                                                       \
+        return Indicator(make_shared<Cls_##func>());                                 \
     }
 
 #define TA_IN1_OUT1_INT_IMP(func, func_lookback)                                     \
@@ -116,15 +108,7 @@
         int outBegIdx;                                                                     \
         int outNbElement;                                                                  \
         func(m_discard, total - 1, src, n, &outBegIdx, &outNbElement, dst + m_discard);    \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                   \
-        if (outBegIdx > m_discard) {                                                       \
-            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);      \
-            double null_double = Null<double>();                                           \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                               \
-                _set(null_double, i);                                                      \
-            }                                                                              \
-            m_discard = outBegIdx;                                                         \
-        }                                                                                  \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);       \
     }                                                                                      \
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
@@ -186,7 +170,7 @@
         int outBegIdx;                                                                     \
         int outNbElement;                                                                  \
         func(m_discard, total - 1, src, n, &outBegIdx, &outNbElement, buf.get());          \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                   \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);       \
         m_discard = outBegIdx;                                                             \
         auto *dst = this->data();                                                          \
         dst = dst + outBegIdx;                                                             \
@@ -287,7 +271,7 @@
         int outBegIdx;                                                                     \
         int outNbElement;                                                                  \
         func(m_discard, total - 1, src, n, &outBegIdx, &outNbElement, buf0, buf1);         \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                   \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);       \
         m_discard = outBegIdx;                                                             \
         auto *dst0 = this->data(0) + outBegIdx;                                            \
         auto *dst1 = this->data(1) + outBegIdx;                                            \
@@ -361,17 +345,7 @@
         int outNbElement;                                                                  \
         func(m_discard, total - 1, src, n, &outBegIdx, &outNbElement, dst0 + m_discard,    \
              dst1 + m_discard);                                                            \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                   \
-        if (outBegIdx > m_discard) {                                                       \
-            memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement);    \
-            memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement);    \
-            double null_double = Null<double>();                                           \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                               \
-                _set(null_double, i, 0);                                                   \
-                _set(null_double, i, 1);                                                   \
-            }                                                                              \
-            m_discard = outBegIdx;                                                         \
-        }                                                                                  \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);       \
     }                                                                                      \
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
@@ -511,17 +485,8 @@
         auto *dst = this->data();                                                           \
         int outBegIdx;                                                                      \
         int outNbElement;                                                                   \
-        HKU_INFO("m_discard: {}", m_discard);                                               \
         func(m_discard, total - 1, src0, src1, &outBegIdx, &outNbElement, dst + m_discard); \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                    \
-        if (outBegIdx > m_discard) {                                                        \
-            memmove(dst + outBegIdx, dst + m_discard, outNbElement * sizeof(double));       \
-            double null_double = Null<double>();                                            \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                                \
-                _set(null_double, i);                                                       \
-            }                                                                               \
-            m_discard = outBegIdx;                                                          \
-        }                                                                                   \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);        \
     }                                                                                       \
                                                                                             \
     Indicator HKU_API func() {                                                              \
@@ -592,15 +557,7 @@
         int outBegIdx;                                                                         \
         int outNbElement;                                                                      \
         func(m_discard, total - 1, src0, src1, n, &outBegIdx, &outNbElement, dst + m_discard); \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                       \
-        if (outBegIdx > m_discard) {                                                           \
-            memmove(dst + outBegIdx, dst + m_discard, outNbElement * sizeof(double));          \
-            double null_double = Null<double>();                                               \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                                   \
-                _set(null_double, i);                                                          \
-            }                                                                                  \
-            m_discard = outBegIdx;                                                             \
-        }                                                                                      \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);           \
     }                                                                                          \
                                                                                                \
     Indicator HKU_API func(int n) {                                                            \
@@ -656,15 +613,7 @@
         int outNbElement;                                                               \
         func(m_discard, total - 1, open, high, low, close, &outBegIdx, &outNbElement,   \
              dst + m_discard);                                                          \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                \
-        if (outBegIdx > m_discard) {                                                    \
-            memmove(dst + outBegIdx, dst + m_discard, outNbElement * sizeof(double));   \
-            double null_double = Null<double>();                                        \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                            \
-                _set(null_double, i);                                                   \
-            }                                                                           \
-            m_discard = outBegIdx;                                                      \
-        }                                                                               \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);    \
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func() {                                                          \
@@ -718,8 +667,7 @@
         m_discard = lookback;                                                           \
         func(m_discard, total - 1, open, high, low, close, &outBegIdx, &outNbElement,   \
              outbuf.get());                                                             \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                \
-        m_discard = outBegIdx;                                                          \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);    \
         auto *dst = this->data() + outBegIdx;                                           \
         for (size_t i = 0; i < outNbElement; ++i) {                                     \
             dst[i] = outbuf[i];                                                         \
@@ -785,10 +733,10 @@
         std::unique_ptr<int[]> outbuf = std::make_unique<int[]>(total);                           \
         int outBegIdx;                                                                            \
         int outNbElement;                                                                         \
+        m_discard = lookback;                                                                     \
         func(m_discard, total - 1, open, high, low, close, getParam<double>(#param1), &outBegIdx, \
              &outNbElement, outbuf.get());                                                        \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                          \
-        m_discard = outBegIdx;                                                                    \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);              \
         auto *dst = this->data() + outBegIdx;                                                     \
         for (size_t i = 0; i < outNbElement; ++i) {                                               \
             dst[i] = outbuf[i];                                                                   \
@@ -820,9 +768,7 @@
                                                                                         \
         KData k = getContext();                                                         \
         size_t total = k.size();                                                        \
-        if (total == 0) {                                                               \
-            return;                                                                     \
-        }                                                                               \
+        HKU_IF_RETURN(total == 0, void());                                              \
                                                                                         \
         _readyBuffer(total, 1);                                                         \
         int lookback = func_lookback();                                                 \
@@ -850,15 +796,7 @@
         m_discard = lookback;                                                           \
         func(m_discard, total - 1, high, low, close, vol, &outBegIdx, &outNbElement,    \
              dst + m_discard);                                                          \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                \
-        if (outBegIdx > m_discard) {                                                    \
-            memmove(dst + outBegIdx, dst + m_discard, outNbElement * sizeof(double));   \
-            double null_double = Null<double>();                                        \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                            \
-                _set(null_double, i);                                                   \
-            }                                                                           \
-            m_discard = outBegIdx;                                                      \
-        }                                                                               \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);    \
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func() {                                                          \
@@ -906,15 +844,7 @@
         int outNbElement;                                                                  \
         m_discard = lookback;                                                              \
         func(m_discard, total - 1, high, low, &outBegIdx, &outNbElement, dst + m_discard); \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                   \
-        if (outBegIdx > m_discard) {                                                       \
-            memmove(dst + outBegIdx, dst + m_discard, outNbElement * sizeof(double));      \
-            double null_double = Null<double>();                                           \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                               \
-                _set(null_double, i);                                                      \
-            }                                                                              \
-            m_discard = outBegIdx;                                                         \
-        }                                                                                  \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);       \
     }                                                                                      \
                                                                                            \
     Indicator HKU_API func() {                                                             \
@@ -962,15 +892,7 @@
         int outNbElement;                                                                   \
         m_discard = lookback;                                                               \
         func(m_discard, total - 1, close, vol, &outBegIdx, &outNbElement, dst + m_discard); \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                    \
-        if (outBegIdx > m_discard) {                                                        \
-            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);       \
-            double null_double = Null<double>();                                            \
-            for (size_t i = 0; i < outBegIdx; ++i) {                                        \
-                _set(null_double, i);                                                       \
-            }                                                                               \
-            m_discard = outBegIdx;                                                          \
-        }                                                                                   \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);        \
     }                                                                                       \
                                                                                             \
     Indicator HKU_API func() {                                                              \
@@ -1020,15 +942,7 @@
         int outBegIdx;                                                                            \
         int outNbElement;                                                                         \
         func(m_discard, total - 1, high, low, close, &outBegIdx, &outNbElement, dst + m_discard); \
-        HKU_ASSERT((outBegIdx + outNbElement) <= total);                                          \
-        if (outBegIdx > m_discard) {                                                              \
-            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);             \
-            double null_double = Null<double>();                                                  \
-            for (size_t i = 0; i < outBegIdx; ++i) {                                              \
-                _set(null_double, i);                                                             \
-            }                                                                                     \
-            m_discard = outBegIdx;                                                                \
-        }                                                                                         \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);              \
     }                                                                                             \
                                                                                                   \
     Indicator HKU_API func() {                                                                    \
@@ -1090,14 +1004,7 @@
         int outNbElement;                                                               \
         func(m_discard, total - 1, high, low, close, n, &outBegIdx, &outNbElement,      \
              dst + m_discard);                                                          \
-        if (outBegIdx != m_discard) {                                                   \
-            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);   \
-            double null_double = Null<double>();                                        \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                            \
-                _set(null_double, i);                                                   \
-            }                                                                           \
-            m_discard = outBegIdx;                                                      \
-        }                                                                               \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);    \
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func(int n) {                                                     \
@@ -1165,14 +1072,7 @@
         int outNbElement;                                                               \
         func(m_discard, total - 1, high, low, close, vol, n, &outBegIdx, &outNbElement, \
              dst + m_discard);                                                          \
-        if (outBegIdx != m_discard) {                                                   \
-            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);   \
-            double null_double = Null<double>();                                        \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                            \
-                _set(null_double, i);                                                   \
-            }                                                                           \
-            m_discard = outBegIdx;                                                      \
-        }                                                                               \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);    \
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func(int n) {                                                     \
@@ -1234,14 +1134,7 @@
         int outBegIdx;                                                                        \
         int outNbElement;                                                                     \
         func(m_discard, total - 1, high, low, n, &outBegIdx, &outNbElement, dst + m_discard); \
-        if (outBegIdx != m_discard) {                                                         \
-            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);         \
-            double null_double = Null<double>();                                              \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                                  \
-                _set(null_double, i);                                                         \
-            }                                                                                 \
-            m_discard = outBegIdx;                                                            \
-        }                                                                                     \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);          \
     }                                                                                         \
                                                                                               \
     Indicator HKU_API func(int n) {                                                           \
@@ -1305,16 +1198,7 @@
         int outNbElement;                                                                     \
         func(m_discard, total - 1, high, low, n, &outBegIdx, &outNbElement, dst0 + m_discard, \
              dst1 + m_discard);                                                               \
-        if (outBegIdx != m_discard) {                                                         \
-            memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement);       \
-            memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement);       \
-            double null_double = Null<double>();                                              \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                                  \
-                _set(null_double, i, 0);                                                      \
-                _set(null_double, i, 1);                                                      \
-            }                                                                                 \
-            m_discard = outBegIdx;                                                            \
-        }                                                                                     \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);          \
     }                                                                                         \
                                                                                               \
     Indicator HKU_API func(int n) {                                                           \
@@ -1381,18 +1265,7 @@
         int outNbElement;                                                               \
         func(m_discard, total - 1, high, low, close, n, &outBegIdx, &outNbElement,      \
              dst0 + m_discard, dst1 + m_discard, dst2 + m_discard);                     \
-        if (outBegIdx != m_discard) {                                                   \
-            memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement); \
-            memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement); \
-            memmove(dst2 + outBegIdx, dst2 + m_discard, sizeof(double) * outNbElement); \
-            double null_double = Null<double>();                                        \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                            \
-                _set(null_double, i, 0);                                                \
-                _set(null_double, i, 1);                                                \
-                _set(null_double, i, 2);                                                \
-            }                                                                           \
-            m_discard = outBegIdx;                                                      \
-        }                                                                               \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);    \
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func(int n) {                                                     \
@@ -1454,14 +1327,7 @@
         int outBegIdx;                                                                          \
         int outNbElement;                                                                       \
         func(m_discard, total - 1, open, close, n, &outBegIdx, &outNbElement, dst + m_discard); \
-        if (outBegIdx != m_discard) {                                                           \
-            memmove(dst + outBegIdx, dst + m_discard, sizeof(double) * outNbElement);           \
-            double null_double = Null<double>();                                                \
-            for (size_t i = m_discard; i < outBegIdx; ++i) {                                    \
-                _set(null_double, i);                                                           \
-            }                                                                                   \
-            m_discard = outBegIdx;                                                              \
-        }                                                                                       \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);            \
     }                                                                                           \
                                                                                                 \
     Indicator HKU_API func(int n) {                                                             \

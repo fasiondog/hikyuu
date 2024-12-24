@@ -60,17 +60,7 @@ void TaStochrsi::_calculate(const Indicator& data) {
     int outNbElement;
     TA_STOCHRSI(m_discard, total - 1, src, n, fastk_n, fastd_n, matype, &outBegIdx, &outNbElement,
                 dst0 + m_discard, dst1 + m_discard);
-    HKU_ASSERT((outBegIdx + outNbElement) <= total);
-    if (outBegIdx > m_discard) {
-        memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement);
-        memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement);
-        double null_double = Null<double>();
-        for (size_t i = m_discard; i < outBegIdx; ++i) {
-            _set(null_double, i, 0);
-            _set(null_double, i, 1);
-        }
-        m_discard = outBegIdx;
-    }
+    HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
 Indicator HKU_API TA_STOCHRSI(int n, int fastk_n, int fastd_n, int matype) {

@@ -53,7 +53,7 @@ void TaStochf::_calculate(const Indicator& data) {
     int fastd_n = getParam<int>("fastd_n");
     TA_MAType fastd_matype = (TA_MAType)getParam<int>("fastd_matype");
     int back = TA_STOCHF_Lookback(fastk_n, fastd_n, fastd_matype);
-    if (back < 0) {
+    if (back < 0 || back >= total) {
         m_discard = total;
         return;
     }
@@ -76,6 +76,7 @@ void TaStochf::_calculate(const Indicator& data) {
     int outNbElement;
     TA_STOCHF(m_discard, total - 1, high, low, close, fastk_n, fastd_n, fastd_matype, &outBegIdx,
               &outNbElement, dst0 + m_discard, dst1 + m_discard);
+    HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
 Indicator HKU_API TA_STOCHF(int fastk_n, int fastd_n, int fastd_matype) {

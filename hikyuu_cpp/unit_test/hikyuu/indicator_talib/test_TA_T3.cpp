@@ -15,45 +15,40 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_TA_SAREXT test_indicator_TA_SAREXT
+ * @defgroup test_indicator_TA_T3 test_indicator_TA_T3
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-TEST_CASE("test_TA_SAREXT") {
-    KData kdata = getKData("sz000001", KQuery(-10));
+TEST_CASE("test_TA_T3") {
+    KData kdata = getKData("sh000001", KQuery(-15));
+    Indicator c = CLOSE(kdata);
 
     /** @arg 非法参数 */
-    CHECK_THROWS(TA_SAREXT(kdata, Null<double>()));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, -1.0));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, 0, 0, -1.));
-
-    /** @arg KData 为空 */
-    Indicator result = TA_SAREXT(KData());
-    CHECK_EQ(result.name(), "TA_SAREXT");
-    CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result.size(), 0);
-
-    /** @arg KData 长度小于默认参数抛弃数量 */
-    result = TA_SAREXT(getKData("sh000001", KQuery(-1)));
-    CHECK_EQ(result.discard(), 1);
-    CHECK_EQ(result.size(), 1);
+    CHECK_THROWS(TA_T3(c, 1));
+    CHECK_THROWS(TA_T3(c, 100001));
+    CHECK_THROWS(TA_T3(c, 5, -0.1));
+    CHECK_THROWS(TA_T3(c, 5, 1.1));
 
     /** @arg 正常情况 */
-    result = TA_SAREXT(kdata);
-    CHECK_EQ(result.name(), "TA_SAREXT");
-    CHECK_EQ(result.discard(), 1);
+    Indicator result = TA_T3(c, 2);
+    CHECK_EQ(result.name(), "TA_T3");
+    CHECK_EQ(result.discard(), 6);
     CHECK_EQ(result.size(), kdata.size());
     CHECK_EQ(result.getResultNumber(), 1);
-    CHECK_UNARY(std::isnan(result[0]));
-    CHECK_EQ(result[1], doctest::Approx(15.72).epsilon(0.00001));
-    CHECK_EQ(result[9], doctest::Approx(15.4958).epsilon(0.00001));
+    CHECK_EQ(result[6], doctest::Approx(2396.84113).epsilon(0.0001));
+    CHECK_EQ(result[14], doctest::Approx(2331.71384).epsilon(0.0001));
+
+    /** @arg 计算数据的 discard 不为0 */
+    auto data = TA_MA(c, 3);
+    CHECK_EQ(data.discard(), 2);
+    result = TA_T3(data, 2);
+    CHECK_EQ(result.size(), kdata.size());
+    CHECK_EQ(result.getResultNumber(), 1);
+    CHECK_EQ(result.discard(), 8);
+    CHECK_EQ(result[8], doctest::Approx(2388.75209).epsilon(0.0001));
+    CHECK_EQ(result[14], doctest::Approx(2348.35577).epsilon(0.0001));
 }
 
 //-----------------------------------------------------------------------------
@@ -62,14 +57,14 @@ TEST_CASE("test_TA_SAREXT") {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-TEST_CASE("test_TA_SAREXT_export") {
+TEST_CASE("test_TA_T3_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/TA_SAREXT.xml";
+    filename += "/TA_T3.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = TA_SAREXT(kdata);
+    Indicator x1 = TA_T3(CLOSE(kdata));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

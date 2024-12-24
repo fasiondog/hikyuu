@@ -15,45 +15,38 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_TA_SAREXT test_indicator_TA_SAREXT
+ * @defgroup test_indicator_TA_STDDEV test_indicator_TA_STDDEV
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-TEST_CASE("test_TA_SAREXT") {
-    KData kdata = getKData("sz000001", KQuery(-10));
+TEST_CASE("test_TA_STDDEV") {
+    KData kdata = getKData("sh000001", KQuery(-10));
+    Indicator c = CLOSE(kdata);
 
     /** @arg 非法参数 */
-    CHECK_THROWS(TA_SAREXT(kdata, Null<double>()));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, -1.0));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, 0, -1.));
-    CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, 0, 0, -1.));
-
-    /** @arg KData 为空 */
-    Indicator result = TA_SAREXT(KData());
-    CHECK_EQ(result.name(), "TA_SAREXT");
-    CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result.size(), 0);
-
-    /** @arg KData 长度小于默认参数抛弃数量 */
-    result = TA_SAREXT(getKData("sh000001", KQuery(-1)));
-    CHECK_EQ(result.discard(), 1);
-    CHECK_EQ(result.size(), 1);
+    CHECK_THROWS(TA_STDDEV(c, 1));
+    CHECK_THROWS(TA_STDDEV(c, 100001));
+    CHECK_THROWS(TA_STDDEV(c, 2, Null<double>()));
 
     /** @arg 正常情况 */
-    result = TA_SAREXT(kdata);
-    CHECK_EQ(result.name(), "TA_SAREXT");
+    Indicator result = TA_STDDEV(c, 2);
+    CHECK_EQ(result.name(), "TA_STDDEV");
     CHECK_EQ(result.discard(), 1);
     CHECK_EQ(result.size(), kdata.size());
     CHECK_EQ(result.getResultNumber(), 1);
-    CHECK_UNARY(std::isnan(result[0]));
-    CHECK_EQ(result[1], doctest::Approx(15.72).epsilon(0.00001));
-    CHECK_EQ(result[9], doctest::Approx(15.4958).epsilon(0.00001));
+    CHECK_EQ(result[1], doctest::Approx(1.24449).epsilon(0.0001));
+    CHECK_EQ(result[9], doctest::Approx(3.662).epsilon(0.0001));
+
+    /** @arg 计算数据的 discard 不为0 */
+    auto data = TA_MA(c, 3);
+    CHECK_EQ(data.discard(), 2);
+    result = TA_STDDEV(data, 2);
+    CHECK_EQ(result.size(), kdata.size());
+    CHECK_EQ(result.discard(), 3);
+    CHECK_EQ(result[3], doctest::Approx(2.00516).epsilon(0.0001));
+    CHECK_EQ(result[9], doctest::Approx(10.15916).epsilon(0.0001));
 }
 
 //-----------------------------------------------------------------------------
@@ -62,14 +55,14 @@ TEST_CASE("test_TA_SAREXT") {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-TEST_CASE("test_TA_SAREXT_export") {
+TEST_CASE("test_TA_STDDEV_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/TA_SAREXT.xml";
+    filename += "/TA_STDDEV.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = TA_SAREXT(kdata);
+    Indicator x1 = TA_STDDEV(CLOSE(kdata));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

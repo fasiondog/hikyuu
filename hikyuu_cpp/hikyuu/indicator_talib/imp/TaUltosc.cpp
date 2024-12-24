@@ -41,9 +41,7 @@ void TaUltosc::_calculate(const Indicator& data) {
 
     KData k = getContext();
     size_t total = k.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
 
@@ -51,7 +49,7 @@ void TaUltosc::_calculate(const Indicator& data) {
     int n2 = getParam<int>("n2");
     int n3 = getParam<int>("n3");
     int back = TA_ULTOSC_Lookback(n1, n2, n3);
-    if (back < 0) {
+    if (back < 0 || back >= total) {
         m_discard = total;
         return;
     }
@@ -73,6 +71,7 @@ void TaUltosc::_calculate(const Indicator& data) {
     int outNbElement;
     TA_ULTOSC(m_discard, total - 1, high, low, close, n1, n2, n3, &outBegIdx, &outNbElement,
               dst + m_discard);
+    HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
 Indicator HKU_API TA_ULTOSC(int n1, int n2, int n3) {
