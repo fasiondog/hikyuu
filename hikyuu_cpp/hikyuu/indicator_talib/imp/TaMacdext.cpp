@@ -67,17 +67,7 @@ void TaMacdext::_calculate(const Indicator& data) {
     TA_MACDEXT(m_discard, total - 1, src, fast_n, fast_matype, slow_n, slow_matype, signal_n,
                signal_matype, &outBegIdx, &outNbElement, dst0 + m_discard, dst1 + m_discard,
                dst2 + m_discard);
-    HKU_ASSERT((outBegIdx + outNbElement) <= total);
-    if (outBegIdx > m_discard) {
-        memmove(dst0 + outBegIdx, dst0 + m_discard, sizeof(double) * outNbElement);
-        memmove(dst1 + outBegIdx, dst1 + m_discard, sizeof(double) * outNbElement);
-        memmove(dst2 + outBegIdx, dst2 + m_discard, sizeof(double) * outNbElement);
-        double null_double = Null<double>();
-        for (size_t i = m_discard; i < outBegIdx; ++i) {
-            _set(null_double, i);
-        }
-        m_discard = outBegIdx;
-    }
+    HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
 Indicator HKU_API TA_MACDEXT(int fast_n, int slow_n, int signal_n, int fast_matype, int slow_matype,

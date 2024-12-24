@@ -403,6 +403,76 @@
         return Indicator(p);                                                               \
     }
 
+#define TA_IN1_OUT3_N_IMP(func, func_lookback, period, period_min, period_max)             \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 3) {                                    \
+        setParam<int>("n", period);                                                        \
+    }                                                                                      \
+    Cls_##func::~Cls_##func() {}                                                           \
+                                                                                           \
+    void Cls_##func::_checkParam(const string &name) const {                               \
+        if (name == "n") {                                                                 \
+            int n = getParam<int>("n");                                                    \
+            HKU_ASSERT(n >= period_min && n <= period_max);                                \
+        }                                                                                  \
+    }                                                                                      \
+                                                                                           \
+    void Cls_##func::_calculate(const Indicator &data) {                                   \
+        int n = getParam<int>("n");                                                        \
+        size_t total = data.size();                                                        \
+        int lookback = func_lookback(n);                                                   \
+        if (lookback < 0) {                                                                \
+            m_discard = total;                                                             \
+            return;                                                                        \
+        }                                                                                  \
+        m_discard = data.discard() + lookback;                                             \
+        if (m_discard >= total) {                                                          \
+            m_discard = total;                                                             \
+            return;                                                                        \
+        }                                                                                  \
+                                                                                           \
+        auto const *src = data.data();                                                     \
+        auto *dst0 = this->data(0);                                                        \
+        auto *dst1 = this->data(1);                                                        \
+        auto *dst2 = this->data(2);                                                        \
+                                                                                           \
+        int outBegIdx;                                                                     \
+        int outNbElement;                                                                  \
+        func(m_discard, total - 1, src, n, &outBegIdx, &outNbElement, dst0 + m_discard,    \
+             dst1 + m_discard, dst2 + m_discard);                                          \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);       \
+    }                                                                                      \
+                                                                                           \
+    void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
+        int back = func_lookback(step);                                                    \
+        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+                                                                                           \
+        std::unique_ptr<double[]> buf = std::make_unique<double[]>(3 * curPos);            \
+        double *dst0 = buf.get();                                                          \
+        double *ds1 = dst0 + curPos;                                                       \
+        double *ds2 = ds1 + curPos;                                                        \
+        auto const *src = ind.data();                                                      \
+        int outBegIdx;                                                                     \
+        int outNbElement;                                                                  \
+        func(ind.discard(), curPos, src, step, &outBegIdx, &outNbElement, dst0, ds1, ds2); \
+        if (outNbElement >= 1) {                                                           \
+            _set(dst0[outNbElement - 1], curPos, 0);                                       \
+            _set(ds1[outNbElement - 1], curPos, 1);                                        \
+            _set(ds2[outNbElement - 1], curPos, 2);                                        \
+        }                                                                                  \
+    }                                                                                      \
+                                                                                           \
+    Indicator HKU_API func(int n) {                                                        \
+        auto p = make_shared<Cls_##func>();                                                \
+        p->setParam<int>("n", n);                                                          \
+        return Indicator(p);                                                               \
+    }                                                                                      \
+                                                                                           \
+    Indicator HKU_API func(const IndParam &n) {                                            \
+        IndicatorImpPtr p = make_shared<Cls_##func>();                                     \
+        p->setIndParam("n", n);                                                            \
+        return Indicator(p);                                                               \
+    }
+
 #define TA_IN2_OUT1_IMP(func, func_lookback)                                                \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                    \
     Cls_##func::Cls_##func(const Indicator &ref_ind)                                        \

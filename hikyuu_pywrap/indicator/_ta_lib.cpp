@@ -209,9 +209,7 @@ void export_Indicator_ta_lib(py::module& m) {
           py::arg("data"), py::arg("fast_n") = 30, py::arg("slow_n") = 26, py::arg("signal_n") = 9,
           py::arg("fast_matype") = 0, py::arg("slow_matype") = 0, py::arg("signal_matype") = 0);
 
-    m.def("TA_MACDFIX", py::overload_cast<int>(TA_MACDFIX), py::arg("n") = 9);
-    m.def("TA_MACDFIX", py::overload_cast<const Indicator&, int>(TA_MACDFIX), py::arg("data"),
-          py::arg("n") = 9);
+    TA_IN1_OUT_N_PY(TA_MACDFIX, 9)
 
     m.def("TA_MAMA", py::overload_cast<double, double>(TA_MAMA),
           py::arg("fast_limit") = 5.000000e-1, py::arg("slow_limit") = 5.000000e-2);

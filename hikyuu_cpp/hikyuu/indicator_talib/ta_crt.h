@@ -201,10 +201,7 @@ inline Indicator TA_MACDEXT(const Indicator& ind, int fast_n = 12, int slow_n = 
     return TA_MACDEXT(fast_n, slow_n, signal_n, fast_matype, slow_matype, signal_matype)(ind);
 }
 
-Indicator HKU_API TA_MACDFIX(int n = 9);
-inline Indicator TA_MACDFIX(const Indicator& ind, int n = 9) {
-    return TA_MACDFIX(n)(ind);
-}
+TA_IN1_OUT_N_CRT(TA_MACDFIX, 9)
 
 Indicator HKU_API TA_MAMA(double fast_limit = 5.000000e-1, double slow_limit = 5.000000e-2);
 inline Indicator TA_MAMA(const Indicator& ind, double fast_limit = 5.000000e-1,
