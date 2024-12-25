@@ -35,9 +35,9 @@
     m.def(#func, py::overload_cast<const Indicator&, const Indicator&, int>(func), \
           py::arg("ind1"), py::arg("ind2"), py::arg("n") = period, description);
 
-#define TA_K_OUT_PY(func)                    \
+#define TA_K_OUT_PY(func, doc)               \
     m.def(#func, py::overload_cast<>(func)); \
-    m.def(#func, py::overload_cast<const KData&>(func), py::arg("data"));
+    m.def(#func, py::overload_cast<const KData&>(func), py::arg("data"), doc);
 
 #define TA_K_OUT_N_PY(func, period, doc)                                      \
     m.def(#func, py::overload_cast<int>(func), py::arg("n") = period);        \
@@ -59,7 +59,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :param int n: Number of period (From 2 to 100000))")
 
     TA_IN1_OUT_PY(TA_ACOS, "TA_ACOS - Vector Trigonometric ACos")
-    TA_K_OUT_PY(TA_AD)
+    TA_K_OUT_PY(TA_AD, "TA_AD - Chaikin A/D Line")
     TA_IN2_OUT_PY(TA_ADD, "TA_ADD - Vector Arithmetic Add")
 
     m.def("TA_ADOSC", py::overload_cast<int, int>(TA_ADOSC), py::arg("fast_n") = 3,
@@ -117,7 +117,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :param Indicator data: input data
 :param int n: Number of period (From 2 to 100000))")
 
-    TA_K_OUT_PY(TA_AVGPRICE)
+    TA_K_OUT_PY(TA_AVGPRICE, "TA_AVGPRICE - Average Price")
 
     m.def("TA_BBANDS", py::overload_cast<int, double, double, int>(TA_BBANDS), py::arg("n") = 5,
           py::arg("nbdevup") = 2., py::arg("nbdevdn") = 2., py::arg("matype") = 0);
@@ -141,42 +141,42 @@ void export_Indicator_ta_lib(py::module& m) {
 :param Indicator ind2: input2
 :param int n: Number of periode (From 1 to 100000))")
 
-    TA_K_OUT_PY(TA_BOP)
+    TA_K_OUT_PY(TA_BOP, "TA_BOP - Balance Of Power")
 
     TA_K_OUT_N_PY(TA_CCI, 14, R"(TA_CCI - Commodity Channel Index
 
 :param KData data: input KData
 :param int n: Number of period (From 2 to 100000))")
 
-    TA_K_OUT_PY(TA_CDL2CROWS)
-    TA_K_OUT_PY(TA_CDL3BLACKCROWS)
-    TA_K_OUT_PY(TA_CDL3INSIDE)
-    TA_K_OUT_PY(TA_CDL3LINESTRIKE)
-    TA_K_OUT_PY(TA_CDL3OUTSIDE)
-    TA_K_OUT_PY(TA_CDL3STARSINSOUTH)
-    TA_K_OUT_PY(TA_CDL3WHITESOLDIERS)
+    TA_K_OUT_PY(TA_CDL2CROWS, "TA_CDL2CROWS - Two Crows")
+    TA_K_OUT_PY(TA_CDL3BLACKCROWS, "TA_CDL3BLACKCROWS - Three Black Crows")
+    TA_K_OUT_PY(TA_CDL3INSIDE, "TA_CDL3INSIDE - Three Inside Up/Down")
+    TA_K_OUT_PY(TA_CDL3LINESTRIKE, "TA_CDL3LINESTRIKE - Three-Line Strike")
+    TA_K_OUT_PY(TA_CDL3OUTSIDE, "TA_CDL3OUTSIDE - Three Outside Up/Down")
+    TA_K_OUT_PY(TA_CDL3STARSINSOUTH, "TA_CDL3STARSINSOUTH - Three Stars In The South")
+    TA_K_OUT_PY(TA_CDL3WHITESOLDIERS, "TA_CDL3WHITESOLDIERS - Three Advancing White Soldiers")
     TA_K_OUT_P_D_PY(TA_CDLABANDONEDBABY, penetration, 3.000000e-1,
                     R"(TA_CDLABANDONEDBABY - Abandoned Baby
 
 :param KData data: input KData
 :param float penetration: Percentage of penetration of a candle within another candle (>=0))")
 
-    TA_K_OUT_PY(TA_CDLADVANCEBLOCK)
-    TA_K_OUT_PY(TA_CDLBELTHOLD)
-    TA_K_OUT_PY(TA_CDLBREAKAWAY)
-    TA_K_OUT_PY(TA_CDLCLOSINGMARUBOZU)
-    TA_K_OUT_PY(TA_CDLCONCEALBABYSWALL)
-    TA_K_OUT_PY(TA_CDLCOUNTERATTACK)
+    TA_K_OUT_PY(TA_CDLADVANCEBLOCK, "TA_CDLADVANCEBLOCK - Advance Block")
+    TA_K_OUT_PY(TA_CDLBELTHOLD, "TA_CDLBELTHOLD - Belt-hold")
+    TA_K_OUT_PY(TA_CDLBREAKAWAY, "TA_CDLBREAKAWAY - Breakaway")
+    TA_K_OUT_PY(TA_CDLCLOSINGMARUBOZU, "TA_CDLCLOSINGMARUBOZU - Closing Marubozu")
+    TA_K_OUT_PY(TA_CDLCONCEALBABYSWALL, "TA_CDLCONCEALBABYSWALL - Concealing Baby Swallow")
+    TA_K_OUT_PY(TA_CDLCOUNTERATTACK, "TA_CDLCOUNTERATTACK - Counterattack")
     TA_K_OUT_P_D_PY(TA_CDLDARKCLOUDCOVER, penetration, 5.000000e-1,
                     R"(TA_CDLDARKCLOUDCOVER - Dark Cloud Cover
 
 :param KData data: input KData
 :param float penetration: Percentage of penetration of a candle within another candle (>=0))")
 
-    TA_K_OUT_PY(TA_CDLDOJI)
-    TA_K_OUT_PY(TA_CDLDOJISTAR)
-    TA_K_OUT_PY(TA_CDLDRAGONFLYDOJI)
-    TA_K_OUT_PY(TA_CDLENGULFING)
+    TA_K_OUT_PY(TA_CDLDOJI, "TA_CDLDOJI - Doji")
+    TA_K_OUT_PY(TA_CDLDOJISTAR, "TA_CDLDOJISTAR - Doji Star")
+    TA_K_OUT_PY(TA_CDLDRAGONFLYDOJI, "TA_CDLDRAGONFLYDOJI - Dragonfly Doji")
+    TA_K_OUT_PY(TA_CDLENGULFING, "TA_CDLENGULFING - Engulfing Pattern")
     TA_K_OUT_P_D_PY(TA_CDLEVENINGDOJISTAR, penetration, 3.000000e-1,
                     R"(TA_CDLEVENINGDOJISTAR - Evening Doji Star
 
@@ -189,26 +189,28 @@ void export_Indicator_ta_lib(py::module& m) {
 :param KData data: input KData
 :param float penetration: Percentage of penetration of a candle within another candle (>=0))")
 
-    TA_K_OUT_PY(TA_CDLGAPSIDESIDEWHITE)
-    TA_K_OUT_PY(TA_CDLGRAVESTONEDOJI)
-    TA_K_OUT_PY(TA_CDLHAMMER)
-    TA_K_OUT_PY(TA_CDLHANGINGMAN)
-    TA_K_OUT_PY(TA_CDLHARAMI)
-    TA_K_OUT_PY(TA_CDLHARAMICROSS)
-    TA_K_OUT_PY(TA_CDLHIGHWAVE)
-    TA_K_OUT_PY(TA_CDLHIKKAKE)
-    TA_K_OUT_PY(TA_CDLHIKKAKEMOD)
-    TA_K_OUT_PY(TA_CDLHOMINGPIGEON)
-    TA_K_OUT_PY(TA_CDLIDENTICAL3CROWS)
-    TA_K_OUT_PY(TA_CDLINNECK)
-    TA_K_OUT_PY(TA_CDLINVERTEDHAMMER)
-    TA_K_OUT_PY(TA_CDLKICKING)
-    TA_K_OUT_PY(TA_CDLKICKINGBYLENGTH)
-    TA_K_OUT_PY(TA_CDLLADDERBOTTOM)
-    TA_K_OUT_PY(TA_CDLLONGLEGGEDDOJI)
-    TA_K_OUT_PY(TA_CDLLONGLINE)
-    TA_K_OUT_PY(TA_CDLMARUBOZU)
-    TA_K_OUT_PY(TA_CDLMATCHINGLOW)
+    TA_K_OUT_PY(TA_CDLGAPSIDESIDEWHITE,
+                "TA_CDLGAPSIDESIDEWHITE - Up/Down-gap side-by-side white lines")
+    TA_K_OUT_PY(TA_CDLGRAVESTONEDOJI, "TA_CDLGRAVESTONEDOJI - Gravestone Doji")
+    TA_K_OUT_PY(TA_CDLHAMMER, "TA_CDLHAMMER - Hammer")
+    TA_K_OUT_PY(TA_CDLHANGINGMAN, "TA_CDLHANGINGMAN - Hanging Man")
+    TA_K_OUT_PY(TA_CDLHARAMI, "TA_CDLHARAMI - Harami Pattern")
+    TA_K_OUT_PY(TA_CDLHARAMICROSS, "TA_CDLHARAMICROSS - Harami Cross Pattern")
+    TA_K_OUT_PY(TA_CDLHIGHWAVE, "TA_CDLHIGHWAVE - High-Wave Candle")
+    TA_K_OUT_PY(TA_CDLHIKKAKE, "TA_CDLHIKKAKE - Hikkake Pattern")
+    TA_K_OUT_PY(TA_CDLHIKKAKEMOD, "TA_CDLHIKKAKEMOD - Modified Hikkake Pattern")
+    TA_K_OUT_PY(TA_CDLHOMINGPIGEON, "TA_CDLHOMINGPIGEON - Homing Pigeon")
+    TA_K_OUT_PY(TA_CDLIDENTICAL3CROWS, "TA_CDLIDENTICAL3CROWS - Identical Three Crows")
+    TA_K_OUT_PY(TA_CDLINNECK, "TA_CDLINNECK - In-Neck Pattern")
+    TA_K_OUT_PY(TA_CDLINVERTEDHAMMER, "TA_CDLINVERTEDHAMMER - Inverted Hammer")
+    TA_K_OUT_PY(TA_CDLKICKING, "TA_CDLKICKING - Kicking")
+    TA_K_OUT_PY(TA_CDLKICKINGBYLENGTH,
+                "TA_CDLKICKINGBYLENGTH - Kicking - bull/bear determined by the longer marubozu")
+    TA_K_OUT_PY(TA_CDLLADDERBOTTOM, "TA_CDLLADDERBOTTOM - Ladder Bottom")
+    TA_K_OUT_PY(TA_CDLLONGLEGGEDDOJI, "TA_CDLLONGLEGGEDDOJI - Long Legged Doji")
+    TA_K_OUT_PY(TA_CDLLONGLINE, "TA_CDLLONGLINE - Long Line Candle")
+    TA_K_OUT_PY(TA_CDLMARUBOZU, "TA_CDLMARUBOZU - Marubozu")
+    TA_K_OUT_PY(TA_CDLMATCHINGLOW, "TA_CDLMATCHINGLOW - Matching Low")
     TA_K_OUT_P_D_PY(TA_CDLMATHOLD, penetration, 5.000000e-1, R"(TA_CDLMATHOLD - Mat Hold
 
 :param KData data: input KData
@@ -225,23 +227,24 @@ void export_Indicator_ta_lib(py::module& m) {
 :param KData data: input KData
 :param float penetration: Percentage of penetration of a candle within another candle (>=0))")
 
-    TA_K_OUT_PY(TA_CDLONNECK)
-    TA_K_OUT_PY(TA_CDLPIERCING)
-    TA_K_OUT_PY(TA_CDLRICKSHAWMAN)
-    TA_K_OUT_PY(TA_CDLRISEFALL3METHODS)
-    TA_K_OUT_PY(TA_CDLSEPARATINGLINES)
-    TA_K_OUT_PY(TA_CDLSHOOTINGSTAR)
-    TA_K_OUT_PY(TA_CDLSHORTLINE)
-    TA_K_OUT_PY(TA_CDLSPINNINGTOP)
-    TA_K_OUT_PY(TA_CDLSTALLEDPATTERN)
-    TA_K_OUT_PY(TA_CDLSTICKSANDWICH)
-    TA_K_OUT_PY(TA_CDLTAKURI)
-    TA_K_OUT_PY(TA_CDLTASUKIGAP)
-    TA_K_OUT_PY(TA_CDLTHRUSTING)
-    TA_K_OUT_PY(TA_CDLTRISTAR)
-    TA_K_OUT_PY(TA_CDLUNIQUE3RIVER)
-    TA_K_OUT_PY(TA_CDLUPSIDEGAP2CROWS)
-    TA_K_OUT_PY(TA_CDLXSIDEGAP3METHODS)
+    TA_K_OUT_PY(TA_CDLONNECK, "TA_CDLONNECK - On-Neck Pattern")
+    TA_K_OUT_PY(TA_CDLPIERCING, "TA_CDLPIERCING - Piercing Pattern")
+    TA_K_OUT_PY(TA_CDLRICKSHAWMAN, "TA_CDLRICKSHAWMAN - Rickshaw Man")
+    TA_K_OUT_PY(TA_CDLRISEFALL3METHODS, "TA_CDLRISEFALL3METHODS - Rising/Falling Three Methods")
+    TA_K_OUT_PY(TA_CDLSEPARATINGLINES, "TA_CDLSEPARATINGLINES - Separating Lines")
+    TA_K_OUT_PY(TA_CDLSHOOTINGSTAR, "TA_CDLSHOOTINGSTAR - Shooting Star")
+    TA_K_OUT_PY(TA_CDLSHORTLINE, "TA_CDLSHORTLINE - Short Line Candle")
+    TA_K_OUT_PY(TA_CDLSPINNINGTOP, "TA_CDLSPINNINGTOP - Spinning Top")
+    TA_K_OUT_PY(TA_CDLSTALLEDPATTERN, "TA_CDLSTALLEDPATTERN - Stalled Pattern")
+    TA_K_OUT_PY(TA_CDLSTICKSANDWICH, "TA_CDLSTICKSANDWICH - Stick Sandwich")
+    TA_K_OUT_PY(TA_CDLTAKURI, "TA_CDLTAKURI - Takuri (Dragonfly Doji with very long lower shadow)")
+    TA_K_OUT_PY(TA_CDLTASUKIGAP, "TA_CDLTASUKIGAP - Tasuki Gap")
+    TA_K_OUT_PY(TA_CDLTHRUSTING, "TA_CDLTHRUSTING - Thrusting Pattern")
+    TA_K_OUT_PY(TA_CDLTRISTAR, "TA_CDLTRISTAR - Tristar Pattern")
+    TA_K_OUT_PY(TA_CDLUNIQUE3RIVER, "TA_CDLUNIQUE3RIVER - Unique 3 River")
+    TA_K_OUT_PY(TA_CDLUPSIDEGAP2CROWS, "TA_CDLUPSIDEGAP2CROWS - Upside Gap Two Crows")
+    TA_K_OUT_PY(TA_CDLXSIDEGAP3METHODS,
+                "TA_CDLXSIDEGAP3METHODS - Upside/Downside Gap Three Methods")
 
     TA_IN1_OUT_PY(TA_CEIL, "TA_CEIL - Vector Ceil")
 
@@ -399,7 +402,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :param Indicator data: input data
 :param int n: Number of period (From 2 to 100000))")
 
-    TA_K_OUT_PY(TA_MEDPRICE)
+    TA_K_OUT_PY(TA_MEDPRICE, "TA_MEDPRICE - Median Price")
     TA_K_OUT_N_PY(TA_MFI, 14, R"(TA_MFI - Money Flow Index
 
 :param KData data: input KData
@@ -472,7 +475,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :param KData data: input KData
 :param int n: Number of period (From 1 to 100000))")
 
-    TA_K_OUT_PY(TA_OBV)
+    TA_K_OUT_PY(TA_OBV, "TA_OBV - On Balance Volume")
     TA_K_OUT_N_PY(TA_PLUS_DI, 14, R"(TA_PLUS_DI - Plus Directional Indicator
 
 :param KData data: input KData
@@ -630,7 +633,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :param Indicator data: input data
 :param int n: Number of period (From 2 to 100000))")
 
-    TA_K_OUT_PY(TA_TRANGE)
+    TA_K_OUT_PY(TA_TRANGE, "TA_TRANGE - True Range")
     TA_IN1_OUT_N_PY(TA_TRIMA, 30, R"(TA_TRIMA - Triangular Moving Average
 
 :param Indicator data: input data
@@ -646,7 +649,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :param Indicator data: input data
 :param int n: Number of period (From 2 to 100000))")
 
-    TA_K_OUT_PY(TA_TYPPRICE)
+    TA_K_OUT_PY(TA_TYPPRICE, "TA_TYPPRICE - Typical Price")
 
     m.def("TA_ULTOSC", py::overload_cast<int, int, int>(TA_ULTOSC), py::arg("n1") = 7,
           py::arg("n2") = 14, py::arg("n3") = 28);
@@ -668,7 +671,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :param int n: Number of period (From 1 to 100000)
 :param float nbdev: Nb of deviations)");
 
-    TA_K_OUT_PY(TA_WCLPRICE)
+    TA_K_OUT_PY(TA_WCLPRICE, "TA_WCLPRICE - Weighted Close Price")
     TA_K_OUT_N_PY(TA_WILLR, 14, R"(TA_WILLR - Williams' %R
     
 :param KData data: input KData object
