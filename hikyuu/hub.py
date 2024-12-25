@@ -266,7 +266,7 @@ class HubManager(metaclass=SingletonType):
         # 检查仓库目录名称是否与其他 python 模块存在冲突
         tmp = importlib.import_module(os.path.basename(local_path))
         checkif(
-            tmp.__path__[0] != local_path,
+            tmp.__path__[0] != local_path if sys.platform == 'win32' else tmp.__path__[0].lower() != local_path.lower(),
             name,
             ModuleConflictError,
             conflict_module=tmp.__path__[0],
