@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/indicator/crt/ALIGN.h"
+#include "hikyuu/indicator/crt/PRICELIST.h"
 #include "IPriceList.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -38,18 +40,34 @@ void IPriceList::_checkParam(const string& name) const {
 void IPriceList::_calculate(const Indicator& data) {
     // 如果在叶子节点，直接取自身的data参数
     if (isLeaf()) {
+        DatetimeList align_dates =
+          haveParam("align_date_list") ? getParam<DatetimeList>("align_date_list") : DatetimeList();
         PriceList x = getParam<PriceList>("data");
         int x_discard = getParam<int>("discard");
         size_t x_total = x.size();
 
-        // 如果指定了上下文，则按上下文数值右对齐，保证和上下文等长
-        size_t total = x_total;
         auto k = getContext();
+        size_t total = x_total;
         if (k.size() > 0) {
             total = k.size();
         }
 
         _readyBuffer(total, 1);
+
+        if (k != Null<KData>() && align_dates.size() > 0) {
+            // 如果本身是时间序列，则使用时间进行对齐
+            auto tmp = ALIGN(PRICELIST(x, align_dates, x_discard), k);
+            HKU_ASSERT(tmp.size() == total);
+            auto* dst = this->data();
+            auto* src = x.data();
+            for (size_t i = tmp.discard(); i < total; ++i) {
+                dst[i] = src[i];
+            }
+            m_discard = tmp.discard();
+            return;
+        }
+
+        // 如果指定了上下文，则按上下文数值右对齐，保证和上下文等长
         if (x_discard >= x_total) {
             m_discard = total;
             return;
