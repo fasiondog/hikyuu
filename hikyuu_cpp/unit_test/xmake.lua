@@ -80,6 +80,9 @@ target("unit-test")
     if get_config("mysql") then
         add_packages("mysql")
     end
+    if has_config("ta_lib") then
+        add_packages("ta-lib")
+    end
 
     add_includedirs("..")
 

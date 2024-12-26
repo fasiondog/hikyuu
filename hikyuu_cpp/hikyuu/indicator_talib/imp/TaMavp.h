@@ -14,7 +14,6 @@ namespace hku {
 class TaMavp : public IndicatorImp {
 public:
     TaMavp();
-    explicit TaMavp(int min_n, int max_n, int matype);
     TaMavp(const Indicator& ref_ind, int min_n, int max_n, int matype);
     virtual ~TaMavp();
 
