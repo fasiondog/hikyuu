@@ -27,6 +27,8 @@ void IWma::_checkParam(const string& name) const {
 
 void IWma::_calculate(const Indicator& ind) {
     size_t total = ind.size();
+    HKU_IF_RETURN(total == 0, void());
+
     int n = getParam<int>("n");
     m_discard = ind.discard() + n - 1;
     if (m_discard >= total) {
@@ -38,7 +40,7 @@ void IWma::_calculate(const Indicator& ind) {
     auto* dst = this->data();
 
     if (n == 1) {
-        memcpy(dst, src, total * sizeof(price_t));
+        memcpy(dst, src, total * sizeof(value_t));
         return;
     }
 
