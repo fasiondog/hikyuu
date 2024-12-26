@@ -39,18 +39,39 @@ void IPriceList::_calculate(const Indicator& data) {
     // 如果在叶子节点，直接取自身的data参数
     if (isLeaf()) {
         PriceList x = getParam<PriceList>("data");
-        int discard = getParam<int>("discard");
+        int x_discard = getParam<int>("discard");
+        size_t x_total = x.size();
 
-        size_t total = x.size();
+        // 如果指定了上下文，则按上下文数值右对齐，保证和上下文等长
+        size_t total = x_total;
+        auto k = getContext();
+        if (k.size() > 0) {
+            total = k.size();
+        }
+
         _readyBuffer(total, 1);
+        if (x_discard >= x_total) {
+            m_discard = total;
+            return;
+        }
 
-        // 更新抛弃数量
-        m_discard = discard > total ? total : discard;
-
+        size_t x_start = x_discard;
         auto* dst = this->data();
-        for (size_t i = m_discard; i < total; ++i) {
+        if (x_total < total) {
+            dst = dst + total + x_discard - x_total;
+        } else if (x_total > total) {
+            x_start = x_total - total;
+            dst = dst - x_start;
+            if (x_discard > x_start) {
+                x_start = x_discard;
+                dst = dst + x_discard - x_start;
+            }
+        }
+
+        for (size_t i = x_start; i < x_total; ++i) {
             dst[i] = x[i];
         }
+        m_discard = total + x_start - x_total;
         return;
     }
 
