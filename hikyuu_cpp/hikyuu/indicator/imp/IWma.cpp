@@ -74,7 +74,7 @@ void IWma::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     }
 
     size_t start = _get_step_start(curPos, step, ind.discard());
-    if (curPos + 1 - start < step) {
+    if (curPos + 1 < step + start) {
         _set(Null<value_t>(), curPos);
         return;
     }
