@@ -148,9 +148,9 @@ add_requires("boost " .. boost_version, {
   },
 })
 
-add_requires("fmt", {configs = {header_only = true}})
+add_requires("fmt " .. fmt_version, {configs = {header_only = true}})
 add_requires("spdlog", {configs = {header_only = true, fmt_external = true}})
-add_requireconfs("spdlog.fmt", {override = true, configs = {header_only = true}})
+add_requireconfs("spdlog.fmt", {override = true, version=fmt_version, configs = {header_only = true}})
 add_requires("sqlite3 " .. sqlite_version, {configs = {shared = true, safe_mode="2", cxflags = "-fPIC"}})
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {runtimes = get_config("runtimes")}})
 add_requires("nng " .. nng_version, {configs = {NNG_ENABLE_TLS = has_config("http_client_ssl"), cxflags = "-fPIC"}})

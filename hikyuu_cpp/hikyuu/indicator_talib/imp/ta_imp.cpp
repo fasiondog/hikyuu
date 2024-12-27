@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "ta_func.h"
+#include <ta-lib/ta_func.h>
 #include "ta_defines.h"
 #include "ta_imp.h"
 #include "hikyuu/indicator/crt/ALIGN.h"

@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "ta_func.h"
+#include <ta-lib/ta_func.h>
 #include "TaMacd.h"
 
 #if HKU_SUPPORT_SERIALIZATION

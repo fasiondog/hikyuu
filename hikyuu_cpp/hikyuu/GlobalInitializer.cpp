@@ -21,7 +21,7 @@
 #endif
 
 #if HKU_ENABLE_TA_LIB
-#include <ta_libc.h>
+#include <ta-lib/ta_libc.h>
 #endif
 
 #include "utilities/Log.h"
