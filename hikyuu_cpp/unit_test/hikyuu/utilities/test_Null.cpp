@@ -20,7 +20,7 @@ TEST_CASE("test_Null_size_t") {
 
 TEST_CASE("test_Null_double_float") {
     CHECK_UNARY(std::isnan(Null<double>()));
-    CHECK_UNARY(std::isnan(Null<price_t>()));
+    CHECK_UNARY(std::isnan(Null<float>()));
 
     double null_double = Null<double>();
     double null_float = Null<float>();
