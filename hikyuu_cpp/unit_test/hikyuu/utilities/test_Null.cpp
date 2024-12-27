@@ -38,6 +38,15 @@ TEST_CASE("test_Null_double_float") {
     CHECK_UNARY(Null<float>() == null_float);
     CHECK_UNARY(null_float == Null<double>());
     CHECK_UNARY(Null<double>() == null_float);
+
+    CHECK_NE(Null<double>(), 0.3);
+    CHECK_NE(Null<float>(), 0.3);
+    CHECK_NE(Null<double>(), 0.3f);
+    CHECK_NE(Null<float>(), 0.3f);
+    CHECK_NE(0.3, Null<double>());
+    CHECK_NE(0.3, Null<float>());
+    CHECK_NE(0.3f, Null<double>());
+    CHECK_NE(0.3f, Null<float>());
 }
 
 TEST_CASE("test_Null_price_t") {
@@ -49,4 +58,9 @@ TEST_CASE("test_Null_price_t") {
     CHECK_EQ(null_price, Null<price_t>());
     CHECK_UNARY(null_price == Null<price_t>());
     CHECK_UNARY(Null<price_t>() == null_price);
+
+    CHECK_NE(Null<price_t>(), 0.3);
+    CHECK_NE(Null<price_t>(), 0.3f);
+    CHECK_NE(0.3, Null<price_t>());
+    CHECK_NE(0.3f, Null<price_t>());
 }
