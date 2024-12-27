@@ -209,9 +209,11 @@ inline Indicator TA_MAMA(const Indicator& ind, double fast_limit = 5.000000e-1,
     return TA_MAMA(fast_limit, slow_limit)(ind);
 }
 
-Indicator HKU_API TA_MAVP(const Indicator& ind1, const Indicator& ind2, int min_n = 2,
-                          int max_n = 30, int matype = 0);
 Indicator HKU_API TA_MAVP(const Indicator& ref_ind, int min_n = 2, int max_n = 30, int matype = 0);
+inline Indicator TA_MAVP(const Indicator& ind1, const Indicator& ind2, int min_n = 2,
+                         int max_n = 30, int matype = 0) {
+    return TA_MAVP(ind2, min_n, max_n, matype)(ind1);
+}
 
 TA_IN1_OUT_N_CRT(TA_MAX, 30)
 TA_IN1_OUT_N_CRT(TA_MAXINDEX, 30)

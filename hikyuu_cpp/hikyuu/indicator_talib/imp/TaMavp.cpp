@@ -9,6 +9,7 @@
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/CVAL.h"
 #include "hikyuu/indicator/crt/SLICE.h"
+#include "hikyuu/indicator/crt/PRICELIST.h"
 #include "TaMavp.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -50,6 +51,8 @@ IndicatorImpPtr TaMavp::_clone() {
 }
 
 void TaMavp::_calculate(const Indicator& ind) {
+    // HKU_INFO("TaMavp::_calculate");
+    // HKU_INFO("ind: {}", ind);
     size_t total = ind.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -73,28 +76,31 @@ void TaMavp::_calculate(const Indicator& ind) {
     DatetimeList ref_dates = ref.getDatetimeList();
 
     if ((in_k == null_k && in_dates.empty()) || (ref_k == null_k && ref_dates.empty())) {
-        // 上下文无效，按时间无关序列计算
+        // 上下文无效且无对齐日期，按时间无关序列计算并对齐
         if (ref.size() > ind.size()) {
+            HKU_INFO("1");
             ref = SLICE(ref, ref.size() - ind.size(), ref.size());
         } else if (ref.size() < ind.size()) {
             // 右对齐
             ref = CVAL(ind, 0.) + ref;
-        }  // else 长度相等无需再处理
-    } else if (ref_k != in_k) {
-        // ref = ALIGN(ref, in_k, false);
-        // 参考指标存在上下文，则使用输入上下文的查询条件
+            HKU_INFO("2");
+            // HKU_INFO("ind: {}, ref: {}", ind, ref);
+        } else {  // else 长度相等无需再处理
+            HKU_INFO("3");
+        }
+    } else if (ref_k != null_k && ref_k != in_k) {
+        // 参考指标为独立的上下文，则使用输入上下文的查询条件
+        HKU_INFO("4");
         auto ref_stk = ref_k.getStock();
         ref = m_ref_ind(ref_stk.getKData(in_k.getQuery()));
         ref = ALIGN(ref, in_k, false);
     } else if (ref_k.size() != ref.size()) {
         // ref_k 和 ref 长度不相等，ref是独立的时间序列
+        HKU_INFO("5");
         ref = ALIGN(ref, in_k);
+    } else {
+        HKU_INFO("6");
     }
-
-    // Indicator use_ind;
-    // if (ind.size() != in_k.size()) {
-    //     use_ind = ALIGN(ind, in_k, )
-    // }
 
     int min_n = getParam<int>("min_n");
     int max_n = getParam<int>("max_n");
@@ -106,6 +112,7 @@ void TaMavp::_calculate(const Indicator& ind) {
     }
 
     m_discard = lookback + std::max(ind.discard(), ref.discard());
+    HKU_INFO("m_discard: {}, lookback: {}", m_discard, lookback);
     if (m_discard >= total) {
         m_discard = total;
         return;
@@ -123,13 +130,6 @@ void TaMavp::_calculate(const Indicator& ind) {
 
 Indicator HKU_API TA_MAVP(const Indicator& ref_ind, int min_n, int max_n, int matype) {
     return Indicator(make_shared<TaMavp>(ref_ind, min_n, max_n, matype));
-}
-
-Indicator HKU_API TA_MAVP(const Indicator& ind1, const Indicator& ind2, int min_n, int max_n,
-                          int matype) {
-    auto p = make_shared<TaMavp>(ind2, min_n, max_n, matype);
-    Indicator result(p);
-    return result(ind1);
 }
 
 }  // namespace hku
