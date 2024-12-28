@@ -80,11 +80,14 @@ void IContext::_calculate(const Indicator& ind) {
                 // 右对齐
                 ref = CVAL(0.)(in_k) + ref;
             }  // else 长度相等无需再处理
-        } else {
+        } else if (self_k != null_k) {
             // 如果参考指标是时间序列，自按当前上下文日期查询条件查询后按日期对齐
             auto self_stk = self_k.getStock();
             ref = m_ref_ind(self_stk.getKData(in_k.getQuery()));
-            ref = ALIGN(ref, in_k, false);
+            ref = ALIGN(ref, in_k);
+        } else if (self_dates.size() > 1) {
+            // 无上下文的时间序列
+            ref = ALIGN(ref, in_k);
         }
     }
 
