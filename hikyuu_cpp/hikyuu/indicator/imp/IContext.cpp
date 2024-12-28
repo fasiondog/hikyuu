@@ -60,10 +60,11 @@ string IContext::formula() const {
 void IContext::_calculate(const Indicator& ind) {
     HKU_ASSERT(isLeaf());
 
-    auto null_k = Null<KData>();
     auto in_k = getContext();
-
     auto self_k = m_ref_ind.getContext();
+    HKU_IF_RETURN(self_k == in_k && this->size() != 0, void());
+
+    auto null_k = Null<KData>();
     auto self_dates = m_ref_ind.getDatetimeList();
     HKU_WARN_IF((self_k == null_k && m_ref_ind.empty() && self_dates.empty()),
                 "The data length of context is zero! ");
