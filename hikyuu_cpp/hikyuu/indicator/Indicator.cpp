@@ -99,13 +99,14 @@ Indicator Indicator::getResult(size_t num) const {
 Indicator Indicator::operator()(const Indicator& ind) {
     HKU_IF_RETURN(!m_imp, Indicator());
     HKU_IF_RETURN(!ind.getImp(), Indicator(m_imp));
-    IndicatorImpPtr p = m_imp->clone();
 
     IndicatorImp* context_ptr = dynamic_cast<IContext*>(m_imp.get());
     if (context_ptr != nullptr) {
-        return Indicator(make_shared<IContext>(ind));
+        auto p = make_shared<IContext>(ind);
+        return p->calculate();
     }
 
+    IndicatorImpPtr p = m_imp->clone();
     if (m_imp->alike(*ind.getImp())) {
         return Indicator(p);
     }

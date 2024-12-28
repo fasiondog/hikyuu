@@ -28,16 +28,45 @@ IndicatorImpPtr IContext::_clone() {
     return p;
 }
 
+string IContext::str() const {
+    std::ostringstream os;
+    os << "Indicator{\n"
+       << "  context: " << m_ref_ind.getContext().getStock().market_code() << "\n  name: " << name()
+       << "\n  size: " << size() << "\n  discard: " << discard()
+       << "\n  result sets: " << getResultNumber() << "\n  params: " << getParameter()
+       << "\n  support indicator param: " << (supportIndParam() ? "True" : "False");
+    if (supportIndParam()) {
+        os << "\n  ind params: {";
+        const auto& ind_params = getIndParams();
+        for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
+            os << iter->first << ": " << iter->second->formula() << ", ";
+        }
+        os << "}";
+    }
+    os << "\n  formula: " << formula();
+#if !HKU_USE_LOW_PRECISION
+    if (m_pBuffer[0]) {
+        os << "\n  values: " << *m_pBuffer[0];
+    }
+#endif
+    os << "\n}";
+    return os.str();
+}
+
+string IContext::formula() const {
+    return fmt::format("CONTEXT({})", m_ref_ind.formula());
+}
+
 void IContext::_calculate(const Indicator& ind) {
     HKU_ASSERT(isLeaf());
 
     auto null_k = Null<KData>();
+    auto in_k = getContext();
+
     auto self_k = m_ref_ind.getContext();
     auto self_dates = m_ref_ind.getDatetimeList();
     HKU_WARN_IF((self_k == null_k && m_ref_ind.empty() && self_dates.empty()),
                 "The data length of context is zero!");
-
-    auto in_k = getContext();
 
     auto ref = m_ref_ind;
 
@@ -59,6 +88,8 @@ void IContext::_calculate(const Indicator& ind) {
     }
 
     size_t total = ref.size();
+    _readyBuffer(total, ref.getResultNumber());
+
     m_discard = ref.discard();
     if (m_discard >= total) {
         m_discard = total;
@@ -80,7 +111,8 @@ Indicator HKU_API CONTEXT() {
 }
 
 Indicator HKU_API CONTEXT(const Indicator& ind) {
-    return Indicator(make_shared<IContext>(ind));
+    auto p = make_shared<IContext>(ind);
+    return p->calculate();
 }
 
 }  // namespace hku

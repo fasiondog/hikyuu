@@ -115,7 +115,8 @@ public:
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
 
-    string formula() const;
+    virtual string formula() const;
+    virtual string str() const;
 
     bool isLeaf() const;
 

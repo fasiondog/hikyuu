@@ -17,6 +17,8 @@ public:
     IContext(const Indicator& ref_ind);
     virtual ~IContext();
 
+    virtual string str() const override;
+    virtual string formula() const override;
     virtual void _calculate(const Indicator& data) override;
     virtual IndicatorImpPtr _clone() override;
 
