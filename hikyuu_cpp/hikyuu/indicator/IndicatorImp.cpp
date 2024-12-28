@@ -13,6 +13,7 @@
 #include "../Stock.h"
 #include "../GlobalInitializer.h"
 #include "imp/ICval.h"
+#include "imp/IContext.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IndicatorImp)
@@ -1525,6 +1526,9 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
                   false);
 
     const auto &self_id = typeid(*this);
+    const auto &context_id = typeid(IContext);
+    HKU_IF_RETURN(self_id == context_id, false);
+
     const auto &cval_id = typeid(ICval);
     if (self_id == cval_id) {
         HKU_IF_RETURN(isLeaf() && other.isLeaf(), true);
