@@ -66,7 +66,7 @@ void IContext::_calculate(const Indicator& ind) {
     auto self_k = m_ref_ind.getContext();
     auto self_dates = m_ref_ind.getDatetimeList();
     HKU_WARN_IF((self_k == null_k && m_ref_ind.empty() && self_dates.empty()),
-                "The data length of context is zero!");
+                "The data length of context is zero! ");
 
     auto ref = m_ref_ind;
 
@@ -77,7 +77,7 @@ void IContext::_calculate(const Indicator& ind) {
                 ref = SLICE(ref, ref.size() - in_k.size(), ref.size());
             } else if (ref.size() < in_k.size()) {
                 // 右对齐
-                ref = CVAL(ind, 0.) + ref;
+                ref = CVAL(0.)(in_k) + ref;
             }  // else 长度相等无需再处理
         } else {
             // 如果参考指标是时间序列，自按当前上下文日期查询条件查询后按日期对齐
