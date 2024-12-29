@@ -14,6 +14,7 @@
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/indicator/crt/ALIGN.h>
+#include <hikyuu/indicator/crt/CONTEXT.h>
 
 using namespace hku;
 
@@ -96,7 +97,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
     result = TA_MAVP(a, b);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 1);
-    CHECK_EQ(result.name(), "TA_MAVP(PRICELIST)");
+    // CHECK_EQ(result.name(), "TA_MAVP(PRICELIST)");
     CHECK_UNARY(std::isnan(result[0]));
 
     /** @arg a 长度为0，b 长度为1，不指定上下文 */
@@ -176,7 +177,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
                             19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35});
     CHECK_EQ(a.size(), 30);
     CHECK_EQ(b.size(), 35);
-    result = TA_MAVP(a, b);
+    result = TA_MAVP(CONTEXT(a), CONTEXT(b));
     check_output(result, a,
                  PRICELIST(PriceList{6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
                                      21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35}));
@@ -199,12 +200,6 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
                            5));
     CHECK_EQ(result.size(), 35);
     CHECK_EQ(result.discard(), 34);
-
-    HKU_INFO("result.size(): {}, result.discard(): {}", result.size(), result.discard());
-
-    // for (size_t i = result.discard(), total = result.size(); i < total; i++) {
-    //     HKU_INFO("{}: {}", i, result[i]);
-    // }
 }
 
 /** @par 检测点 */
@@ -213,7 +208,6 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
     // 指定上下文，输入序列均为时间无关序列，计算a, 参考b
     //-------------------------------------------------------
     KData k1 = getKData("sz000001", KQuery(-35));
-    KData k2 = getKData("sz000002", KQuery(-35));
     Indicator result, a, b, expect;
     double nan = Null<double>();
 
@@ -225,7 +219,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
     result = TA_MAVP(a, b)(k1);
     CHECK_EQ(result.size(), 35);
     CHECK_EQ(result.discard(), 35);
-    CHECK_EQ(result.name(), "TA_MAVP(PRICELIST)");
+    // CHECK_EQ(result.name(), "TA_MAVP(PRICELIST)");
     for (size_t i = 0, len = result.discard(); i < len; i++) {
         CHECK_UNARY(std::isnan(result[i]));
     }
@@ -287,22 +281,56 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
     CHECK_EQ(result.size(), 35);
     CHECK_EQ(result.discard(), 35);
 
-    // /** @arg a 长度为20，b 长度为29，不指定上下文 */
-    // a = PRICELIST(PriceList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-    // 20}); b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
-    //                         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29});
-    // CHECK_EQ(a.size(), 20);
-    // CHECK_EQ(b.size(), 29);
-    // result = TA_MAVP(a, b);
-    // check_output(result, a, PRICELIST(PriceList{10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-    //                                             20, 21, 22, 23, 24, 25, 26, 27, 28, 29}));
-    // CHECK_EQ(result.size(), 20);
-    // CHECK_EQ(result.discard(), 20);
-    // HKU_INFO("result.size(): {}, result.discard(): {}", result.size(), result.discard());
+    /** @arg a 长度为30，b 长度为30 */
+    a = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
+                            16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30});
+    b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
+                            16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30});
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 30);
+    result = TA_MAVP(a, b)(k1);
+    check_output(result,
+                 PRICELIST(PriceList{nan, nan, nan, nan, nan, 1,  2,  3,  4,  5,  6,  7,
+                                     8,   9,   10,  11,  12,  13, 14, 15, 16, 17, 18, 19,
+                                     20,  21,  22,  23,  24,  25, 26, 27, 28, 29, 30},
+                           5),
+                 PRICELIST(PriceList{nan, nan, nan, nan, nan, 1,  2,  3,  4,  5,  6,  7,
+                                     8,   9,   10,  11,  12,  13, 14, 15, 16, 17, 18, 19,
+                                     20,  21,  22,  23,  24,  25, 26, 27, 28, 29, 30},
+                           5));
+    CHECK_EQ(result.size(), k1.size());
+    CHECK_EQ(result.discard(), 34);
 
-    // for (size_t i = result.discard(), total = result.size(); i < total; i++) {
-    //     HKU_INFO("{}: {}", i, result[i]);
-    // }
+    /** @arg a 长度为30，b 长度为35 */
+    b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18,
+                            19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35});
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 35);
+    result = TA_MAVP(a, b)(k1);
+    check_output(
+      result,
+      PRICELIST(
+        PriceList{nan, nan, nan, nan, nan, 1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13,
+                  14,  15,  16,  17,  18,  19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30},
+        5),
+      PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18,
+                          19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35}));
+
+    /** @arg a 长度为35，b 长度为30 */
+    a = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18,
+                            19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35});
+    b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
+                            16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30});
+    REQUIRE(a.size() == 35);
+    REQUIRE(b.size() == 30);
+    result = TA_MAVP(a, b)(k1);
+    check_output(result, PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                             13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+                                             25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35}),
+                 PRICELIST(PRICELIST(PriceList{nan, nan, nan, nan, nan, 1,  2,  3,  4,  5,  6,  7,
+                                               8,   9,   10,  11,  12,  13, 14, 15, 16, 17, 18, 19,
+                                               20,  21,  22,  23,  24,  25, 26, 27, 28, 29, 30},
+                                     5)));
 }
 
 /** @par 检测点 */

@@ -10,6 +10,8 @@
 #include "hikyuu/indicator/crt/CVAL.h"
 #include "hikyuu/indicator/crt/SLICE.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
+#include "hikyuu/indicator/imp/IContext.h"
+#include "hikyuu/indicator/crt/CONTEXT.h"
 #include "TaMavp.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -51,8 +53,7 @@ IndicatorImpPtr TaMavp::_clone() {
 }
 
 void TaMavp::_calculate(const Indicator& ind) {
-    // HKU_INFO("TaMavp::_calculate");
-    // HKU_INFO("ind: {}", ind);
+#if 1
     size_t total = ind.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -102,6 +103,26 @@ void TaMavp::_calculate(const Indicator& ind) {
         HKU_INFO("6");
     }
 
+#else
+    auto k = getContext();
+    m_ref_ind.setContext(k);
+    Indicator ref = m_ref_ind;
+    auto dates = ref.getDatetimeList();
+    if (dates.empty()) {
+        if (ref.size() > ind.size()) {
+            ref = SLICE(ref, ref.size() - ind.size(), ref.size());
+        } else if (ref.size() < ind.size()) {
+            ref = CVAL(ind, 0.) + ref;
+        }
+    } else if (m_ref_ind.size() != ind.size()) {
+        ref = ALIGN(m_ref_ind, ind);
+    }
+
+    size_t total = ind.size();
+    _readyBuffer(total, 2);
+    HKU_IF_RETURN(total == 0, void());
+#endif
+
     int min_n = getParam<int>("min_n");
     int max_n = getParam<int>("max_n");
     TA_MAType matype = (TA_MAType)getParam<int>("matype");
@@ -129,7 +150,18 @@ void TaMavp::_calculate(const Indicator& ind) {
 }
 
 Indicator HKU_API TA_MAVP(const Indicator& ref_ind, int min_n, int max_n, int matype) {
+#if 1
     return Indicator(make_shared<TaMavp>(ref_ind, min_n, max_n, matype));
+#else
+    auto imp = ref_ind.getImp();
+    if (imp) {
+        IContext* p = dynamic_cast<IContext*>(imp.get());
+        if (p == nullptr) {
+            return Indicator(make_shared<TaMavp>(CONTEXT(ref_ind), min_n, max_n, matype));
+        }
+    }
+    return Indicator(make_shared<TaMavp>(ref_ind, min_n, max_n, matype));
+#endif
 }
 
 }  // namespace hku
