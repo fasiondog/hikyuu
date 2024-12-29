@@ -57,14 +57,18 @@ string IContext::formula() const {
     return fmt::format("CONTEXT({})", m_ref_ind.formula());
 }
 
+KData IContext::getContextKdata() const {
+    return m_ref_ind.getContext();
+}
+
 void IContext::_calculate(const Indicator& ind) {
     HKU_ASSERT(isLeaf());
 
+    auto null_k = Null<KData>();
     auto in_k = getContext();
     auto self_k = m_ref_ind.getContext();
-    HKU_IF_RETURN(self_k == in_k && this->size() != 0, void());
+    HKU_IF_RETURN((self_k == in_k || in_k == null_k) && this->size() != 0, void());
 
-    auto null_k = Null<KData>();
     auto self_dates = m_ref_ind.getDatetimeList();
     HKU_WARN_IF((self_k == null_k && m_ref_ind.empty() && self_dates.empty()),
                 "The data length of context is zero! ");
@@ -84,7 +88,7 @@ void IContext::_calculate(const Indicator& ind) {
             // 如果参考指标是时间序列，自按当前上下文日期查询条件查询后按日期对齐
             auto self_stk = self_k.getStock();
             ref = m_ref_ind(self_stk.getKData(in_k.getQuery()));
-            ref = ALIGN(ref, in_k);
+            ref = ALIGN(ref, in_k, true);
         } else if (self_dates.size() > 1) {
             // 无上下文的时间序列
             ref = ALIGN(ref, in_k);
@@ -117,6 +121,15 @@ Indicator HKU_API CONTEXT() {
 Indicator HKU_API CONTEXT(const Indicator& ind) {
     auto p = make_shared<IContext>(ind);
     return p->calculate();
+}
+
+KData HKU_API CONTEXT_K(const Indicator& ind) {
+    auto imp = ind.getImp();
+    IContext* p = dynamic_cast<IContext*>(imp.get());
+    if (p != nullptr) {
+        return p->getContextKdata();
+    }
+    return ind.getContext();
 }
 
 }  // namespace hku

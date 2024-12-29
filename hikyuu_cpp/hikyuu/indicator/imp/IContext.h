@@ -22,6 +22,8 @@ public:
     virtual void _calculate(const Indicator& data) override;
     virtual IndicatorImpPtr _clone() override;
 
+    KData getContextKdata() const;
+
 private:
     Indicator m_ref_ind;
 

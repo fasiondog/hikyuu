@@ -14,4 +14,6 @@ namespace hku {
 Indicator HKU_API CONTEXT(const Indicator& ind);
 Indicator HKU_API CONTEXT();
 
+KData HKU_API CONTEXT_K(const Indicator& ind);
+
 }  // namespace hku
