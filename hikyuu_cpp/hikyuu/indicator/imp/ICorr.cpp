@@ -20,10 +20,6 @@ ICorr::ICorr() : IndicatorImp("CORR") {
     setParam<int>("n", 10);
 }
 
-ICorr::ICorr(int n) : IndicatorImp("CORR") {
-    setParam<int>("n", n);
-}
-
 ICorr::ICorr(const Indicator& ref_ind, int n) : IndicatorImp("CORR"), m_ref_ind(ref_ind) {
     setParam<int>("n", n);
 }
@@ -122,8 +118,8 @@ void ICorr::_calculate(const Indicator& ind) {
     m_discard = (m_discard + 2 < total) ? m_discard + 2 : total;
 }
 
-Indicator HKU_API CORR(int n) {
-    return Indicator(make_shared<ICorr>(n));
+Indicator HKU_API CORR(const Indicator& ref_ind, int n) {
+    return Indicator(make_shared<ICorr>(ref_ind, n));
 }
 
 Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n) {
