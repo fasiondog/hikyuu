@@ -15,6 +15,9 @@
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/indicator/crt/ALIGN.h>
 #include <hikyuu/indicator/crt/CONTEXT.h>
+#include <hikyuu/indicator/crt/SLICE.h>
+#include <hikyuu/indicator/crt/MA.h>
+#include <hikyuu/indicator/crt/EMA.h>
 
 using namespace hku;
 
@@ -42,15 +45,19 @@ static Indicator expect_output(const Indicator& in1, const Indicator& in2, int m
 
 static void check_output(const Indicator& result, const Indicator& in1, const Indicator& in2) {
     Indicator expect = expect_output(in1, in2);
-    for (size_t i = expect.discard(); i < expect.size(); i++) {
-        HKU_INFO("{}: {}", i, expect[i]);
-    }
+    // for (size_t i = expect.discard(); i < expect.size(); i++) {
+    //     HKU_INFO("{}: {} {}", i, result[i], expect[i]);
+    // }
     for (size_t i = 0; i < result.discard(); i++) {
         CHECK_UNARY(std::isnan(result.get(i)));
     }
     for (size_t i = result.discard(), total = result.size(); i < total; i++) {
         // HKU_INFO("{}: {}", i, result[i]);
-        CHECK_EQ(result.get(i), expect.get(i));
+        if (std::isnan(result.get(i))) {
+            CHECK_UNARY(std::isnan(expect.get(i)));
+        } else {
+            CHECK_EQ(result.get(i), expect.get(i));
+        }
     }
     CHECK_EQ(result.size(), expect.size());
     CHECK_EQ(result.discard(), expect.discard());
@@ -894,19 +901,127 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") 
 }
 
 /** @par 检测点 */
-TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_without_context") {
+TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_context") {
     //-------------------------------------------------------
-    // 不指定上下文, 参考指标为时间序列且为公式原型，计算指标为时间序列, 计算a, 参考b
+    // 不指定上下文, 参考指标为时间序列且为公式，计算指标为时间序列, 计算a, 参考b
     //-------------------------------------------------------
+    Stock stk1 = getStock("sz000001");
+    Stock stk2 = getStock("sz000002");
+    KData k1, k2;
+    Indicator result, a, b, expect;
+    double nan = Null<double>();
 
-    /** @arg a,b 长度都为1 (长度相等且小于2)，不指定上下文 */
-    /** @arg a 长度为0，b 长度为1，不指定上下文 */
-    /** @arg a 长度为2，b 长度为2，不指定上下文 */
-    /** @arg a 长度为29，b 长度为20，不指定上下文 */
-    /** @arg a 长度为20，b 长度为29，不指定上下文 */
-    /** @arg a 长度为30，b 长度为30，不指定上下文 */
-    /** @arg a 长度为30，b 长度为35，不指定上下文 */
-    /** @arg a 长度为35，b 长度为30，不指定上下文 */
+    /** @arg a,b 长度都为1 (长度相等且小于2) */
+    k1 = stk1.getKData(KQuery(-1));
+    a = k1.close();
+    k2 = stk2.getKData(KQuery(-1));
+    b = k2.close();
+    REQUIRE(a.size() == 1);
+    REQUIRE(b.size() == 1);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, a, b);
+    CHECK_EQ(result.size(), 1);
+    CHECK_EQ(result.discard(), 1);
+
+    /** @arg a 长度为0，b 长度为1 */
+    k1 = stk1.getKData(KQueryByDate(Datetime(20240101)));
+    a = k1.close();
+    k2 = stk2.getKData(KQuery(-1));
+    b = k2.close();
+    REQUIRE(a.size() == 0);
+    REQUIRE(b.size() == 1);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, a, PRICELIST());
+    CHECK_EQ(result.size(), 0);
+    CHECK_EQ(result.discard(), 0);
+
+    /** @arg a 长度为2，b 长度为2 */
+    k1 = stk1.getKData(KQuery(-2));
+    a = k1.close();
+    k2 = stk2.getKData(KQuery(-2));
+    b = k2.close();
+    REQUIRE(a.size() == 2);
+    REQUIRE(b.size() == 2);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, a, b);
+    CHECK_EQ(result.size(), 2);
+    CHECK_EQ(result.discard(), 2);
+
+    /** @arg a 长度为29，b 长度为20 */
+    k1 = stk1.getKData(KQuery(-29));
+    a = k1.close();
+    k2 = stk2.getKData(KQuery(-20));
+    b = k2.close();
+    REQUIRE(a.size() == 29);
+    REQUIRE(b.size() == 20);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, a, CVAL(0)(k1) + b);
+    CHECK_EQ(result.size(), 29);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为20，b 长度为29 */
+    k1 = stk1.getKData(KQuery(-20));
+    a = k1.close();
+    k2 = stk2.getKData(KQuery(-29));
+    b = k2.close();
+    REQUIRE(a.size() == 20);
+    REQUIRE(b.size() == 29);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, a, SLICE(b, 9, 29));
+    CHECK_EQ(result.size(), 20);
+    CHECK_EQ(result.discard(), 20);
+
+    /** @arg a 长度为30，b 长度为30 */
+    k1 = stk1.getKData(KQuery(-30));
+    a = k1.close();
+    k2 = stk2.getKData(KQuery(-30));
+    b = k2.close();
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 30);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, a, b);
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为30，b 长度为35 */
+    k1 = stk1.getKData(KQuery(-30));
+    a = k1.close();
+    k2 = stk2.getKData(KQuery(-35));
+    b = k2.close();
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 35);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, a, SLICE(b, 5, 35));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为35，b 长度为30 */
+    k1 = stk1.getKData(KQuery(-35));
+    a = k1.close();
+    k2 = stk2.getKData(KQuery(-30));
+    b = k2.close();
+    REQUIRE(a.size() == 35);
+    REQUIRE(b.size() == 30);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, a, CVAL(0)(k1) + b);
+    CHECK_EQ(result.size(), 35);
+    CHECK_EQ(result.discard(), 34);
 }
 
 /** @par 检测点 */
@@ -914,47 +1029,604 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     //-------------------------------------------------------
     // 指定上下文, 参考指标为时间序列且为公式原型，计算指标为时间序列, 计算a, 参考b
     //-------------------------------------------------------
+    Stock stk1 = getStock("sz000001");
+    Stock stk2 = getStock("sz000002");
+    Stock stk3 = getStock("sh000001");
+    KData k1, k2, k3;
+    Indicator result, a, b;
+    double nan = Null<double>();
 
     /** @arg a,b 长度都为1 (长度相等且小于2)，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-1));
+    a = MA(k1.close(), 2);
+    k2 = stk2.getKData(KQuery(-1));
+    b = EMA(k2.close(), 2);
+    REQUIRE(a.size() == 1);
+    REQUIRE(b.size() == 1);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-1));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 1);
+    CHECK_EQ(result.discard(), 1);
+
     /** @arg a 长度为0，b 长度为1，不指定上下文 */
+    k1 = stk1.getKData(KQueryByDate(Datetime(20240101)));
+    a = MA(k1.close(), 2);
+    k2 = stk2.getKData(KQuery(-1));
+    b = EMA(k2.close(), 2);
+    REQUIRE(a.size() == 0);
+    REQUIRE(b.size() == 1);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQueryByDate(Datetime(20240101)));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 0);
+    CHECK_EQ(result.discard(), 0);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
     /** @arg a 长度为2，b 长度为2，不指定上下文 */
-    /** @arg a 长度为29，b 长度为20，不指定上下文 */
-    /** @arg a 长度为20，b 长度为29，不指定上下文 */
-    /** @arg a 长度为30，b 长度为30，不指定上下文 */
-    /** @arg a 长度为30，b 长度为35，不指定上下文 */
-    /** @arg a 长度为35，b 长度为30，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-2));
+    a = MA(k1.close(), 2);
+    k2 = stk2.getKData(KQuery(-2));
+    b = EMA(k2.close(), 2);
+    REQUIRE(a.size() == 2);
+    REQUIRE(b.size() == 2);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-2));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 2);
+    CHECK_EQ(result.discard(), 2);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为29，b 长度为20 */
+    k1 = stk1.getKData(KQuery(-29));
+    a = MA(k1.close(), 2);
+    k2 = stk2.getKData(KQuery(-20));
+    b = EMA(k2.close(), 2);
+    REQUIRE(a.size() == 29);
+    REQUIRE(b.size() == 20);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-29));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 29);
+    CHECK_EQ(result.discard(), 29);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为20，b 长度为29 */
+    k1 = stk1.getKData(KQuery(-20));
+    a = MA(k1.close(), 2);
+    k2 = stk2.getKData(KQuery(-29));
+    b = EMA(k2.close(), 2);
+    REQUIRE(a.size() == 20);
+    REQUIRE(b.size() == 29);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-20));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 20);
+    CHECK_EQ(result.discard(), 20);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为30，b 长度为30 */
+    k1 = stk1.getKData(KQuery(-30));
+    a = MA(k1.close(), 2);
+    k2 = stk2.getKData(KQuery(-30));
+    b = EMA(k2.close(), 2);
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 30);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为30，b 长度为35 */
+    k1 = stk1.getKData(KQuery(-30));
+    a = MA(k1.close(), 2);
+    k2 = stk2.getKData(KQuery(-35));
+    b = EMA(k2.close(), 2);
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 35);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-35));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 35);
+    CHECK_EQ(result.discard(), 29);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为35，b 长度为30 */
+    k1 = stk1.getKData(KQuery(-35));
+    a = MA(k1.close(), 2);
+    k2 = stk2.getKData(KQuery(-30));
+    b = EMA(k2.close(), 2);
+    REQUIRE(a.size() == 35);
+    REQUIRE(b.size() == 30);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-35));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 35);
+    CHECK_EQ(result.discard(), 29);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
 }
 
 /** @par 检测点 */
-TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context") {
+TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_context") {
     //-------------------------------------------------------
-    // 不指定上下文, 参考指标为时间序列且为独立上下文，计算指标为时间序列, 计算a, 参考b
+    // 指定上下文, 参考指标为时间序列且为独立上下文，计算指标为时间序列(无独立上下文), 计算a,
+    // 参考b
     //-------------------------------------------------------
+    Stock stk1 = getStock("sz000001");
+    Stock stk2 = getStock("sz000002");
+    Stock stk3 = getStock("sh000001");
+    KData k1, k2, k3;
+    Indicator result, a, b;
+    double nan = Null<double>();
 
     /** @arg a,b 长度都为1 (长度相等且小于2)，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-1));
+    a = MA(k1.close(), 2);
+    k2 = stk2.getKData(KQuery(-1));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 1);
+    REQUIRE(b.size() == 1);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-1));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(b, 2));
+    CHECK_EQ(result.size(), 1);
+    CHECK_EQ(result.discard(), 1);
+
     /** @arg a 长度为0，b 长度为1，不指定上下文 */
+    a = MA(CLOSE(), 2);
+    k2 = stk2.getKData(KQuery(-1));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 0);
+    REQUIRE(b.size() == 1);
+    REQUIRE(a.getContext() == Null<KData>());
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQueryByDate(Datetime(20240101)));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), PRICELIST());
+    CHECK_EQ(result.size(), 0);
+    CHECK_EQ(result.discard(), 0);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-30));
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
     /** @arg a 长度为2，b 长度为2，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-2));
+    a = MA(CLOSE(k1), 2);
+    k2 = stk2.getKData(KQuery(-2));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 2);
+    REQUIRE(b.size() == 2);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-2));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 2);
+    CHECK_EQ(result.discard(), 2);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-30));
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
     /** @arg a 长度为29，b 长度为20，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-29));
+    a = MA(CLOSE(k1), 2);
+    k2 = stk2.getKData(KQuery(-20));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 29);
+    REQUIRE(b.size() == 20);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-29));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-29));
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 29);
+    CHECK_EQ(result.discard(), 29);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-30));
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
     /** @arg a 长度为20，b 长度为29，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-20));
+    a = MA(CLOSE(k1), 2);
+    k2 = stk2.getKData(KQuery(-29));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 20);
+    REQUIRE(b.size() == 29);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-20));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-20));
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 20);
+    CHECK_EQ(result.discard(), 20);
+
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-30));
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
     /** @arg a 长度为30，b 长度为30，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-30));
+    a = MA(CLOSE(k1), 2);
+    k2 = stk2.getKData(KQuery(-30));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 30);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-30));
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
     /** @arg a 长度为30，b 长度为35，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-30));
+    a = MA(CLOSE(k1), 2);
+    k2 = stk2.getKData(KQuery(-35));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 35);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-30));
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
     /** @arg a 长度为35，b 长度为30，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-35));
+    a = MA(CLOSE(k1), 2);
+    k2 = stk2.getKData(KQuery(-30));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 35);
+    REQUIRE(b.size() == 30);
+    REQUIRE(a.getContext() == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-30));
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
 }
 
 /** @par 检测点 */
-TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context") {
+TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_context") {
     //-------------------------------------------------------
-    // 指定上下文, 参考指标为时间序列且为独立上下文，计算指标为时间序列, 计算a, 参考b
+    // 不指定上下文, 参考指标为时间序列且为独立上下文，计算指标为时间序列(且独立上下文), 计算a,
+    // 参考b
     //-------------------------------------------------------
+    Stock stk1 = getStock("sz000001");
+    Stock stk2 = getStock("sz000002");
+    KData k1, k2;
+    Indicator result, a, b;
+    KQuery query;
+    double nan = Null<double>();
 
-    /** @arg a,b 长度都为1 (长度相等且小于2)，不指定上下文 */
-    /** @arg a 长度为0，b 长度为1，不指定上下文 */
+    /** @arg a,b 长度都为1 (长度相等且小于2) */
+    k1 = stk1.getKData(KQuery(-1));
+    a = CONTEXT(MA(k1.close(), 2));
+    k2 = stk2.getKData(KQuery(-1));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 1);
+    REQUIRE(b.size() == 1);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, MA(a, 2), EMA(b, 2));
+    CHECK_EQ(result.size(), 1);
+    CHECK_EQ(result.discard(), 1);
+
+    /** @arg a 长度为0，b 长度为1 */
+    a = CONTEXT(MA(CLOSE(), 2));
+    k2 = stk2.getKData(KQuery(-1));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 0);
+    REQUIRE(b.size() == 1);
+    REQUIRE(CONTEXT_K(a) == Null<KData>());
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, PRICELIST(), PRICELIST());
+    CHECK_EQ(result.size(), 0);
+    CHECK_EQ(result.discard(), 0);
+
     /** @arg a 长度为2，b 长度为2，不指定上下文 */
-    /** @arg a 长度为29，b 长度为20，不指定上下文 */
-    /** @arg a 长度为20，b 长度为29，不指定上下文 */
-    /** @arg a 长度为30，b 长度为30，不指定上下文 */
-    /** @arg a 长度为30，b 长度为35，不指定上下文 */
-    /** @arg a 长度为35，b 长度为30，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-2));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-2));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 2);
+    REQUIRE(b.size() == 2);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, a, b);
+    CHECK_EQ(result.size(), 2);
+    CHECK_EQ(result.discard(), 2);
+
+    /** @arg a 长度为29，b 长度为20 */
+    k1 = stk1.getKData(KQuery(-29));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-20));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 29);
+    REQUIRE(b.size() == 20);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    k2 = stk2.getKData(KQuery(-29));
+    check_output(result, MA(k1.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 29);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为20，b 长度为29 */
+    k1 = stk1.getKData(KQuery(-20));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-29));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 20);
+    REQUIRE(b.size() == 29);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    k2 = stk2.getKData(KQuery(-20));
+    check_output(result, MA(k1.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 20);
+    CHECK_EQ(result.discard(), 20);
+
+    /** @arg a 长度为30，b 长度为30 */
+    k1 = stk1.getKData(KQuery(-30));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-30));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 30);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, MA(k1.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为30，b 长度为35 */
+    k1 = stk1.getKData(KQuery(-30));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-35));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 35);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    k2 = stk2.getKData(KQuery(-30));
+    check_output(result, MA(k1.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为35，b 长度为30 */
+    k1 = stk1.getKData(KQuery(-35));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-30));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 35);
+    REQUIRE(b.size() == 30);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    result = TA_MAVP(a, b);
+    check_output(result, MA(k1.close(), 2), CVAL(0.)(k1) + EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 35);
+    CHECK_EQ(result.discard(), 34);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_context") {
+    //-------------------------------------------------------
+    // 指定上下文, 参考指标为时间序列且为独立上下文，计算指标为时间序列且有独立上下文, 计算a, 参考b
+    //-------------------------------------------------------
+    Stock stk1 = getStock("sz000001");
+    Stock stk2 = getStock("sz000002");
+    Stock stk3 = getStock("sh000001");
+    KData k1, k2, k3;
+    Indicator result, a, b;
+    KQuery query;
+    double nan = Null<double>();
+
+    /** @arg a,b 长度都为1 (长度相等且小于2) */
+    k1 = stk1.getKData(KQuery(-1));
+    a = CONTEXT(MA(k1.close(), 2));
+    k2 = stk2.getKData(KQuery(-1));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 1);
+    REQUIRE(b.size() == 1);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-1));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, MA(a, 2), EMA(b, 2));
+    CHECK_EQ(result.size(), 1);
+    CHECK_EQ(result.discard(), 1);
+
+    /** @arg a 长度为0，b 长度为1 */
+    a = CONTEXT(MA(CLOSE(), 2));
+    k2 = stk2.getKData(KQuery(-1));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 0);
+    REQUIRE(b.size() == 1);
+    REQUIRE(CONTEXT_K(a) == Null<KData>());
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQueryByDate(Datetime(20240101)));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, PRICELIST(), PRICELIST());
+    CHECK_EQ(result.size(), 0);
+    CHECK_EQ(result.discard(), 0);
+
+    /** @arg a 长度为2，b 长度为2，不指定上下文 */
+    k1 = stk1.getKData(KQuery(-2));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-2));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 2);
+    REQUIRE(b.size() == 2);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-2));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, a, b);
+    CHECK_EQ(result.size(), 2);
+    CHECK_EQ(result.discard(), 2);
+
+    /** @arg a 长度为29，b 长度为20 */
+    k1 = stk1.getKData(KQuery(-29));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-20));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 29);
+    REQUIRE(b.size() == 20);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-29));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-29));
+    check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 29);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为20，b 长度为29 */
+    k1 = stk1.getKData(KQuery(-20));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-29));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 20);
+    REQUIRE(b.size() == 29);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-20));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-20));
+    check_output(result, MA(k1.close(), 2), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 20);
+    CHECK_EQ(result.discard(), 20);
+
+    /** @arg a 长度为30，b 长度为30 */
+    k1 = stk1.getKData(KQuery(-30));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-30));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 30);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, ALIGN(MA(k1.close(), 2), k3), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为30，b 长度为35 */
+    k1 = stk1.getKData(KQuery(-30));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-35));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 30);
+    REQUIRE(b.size() == 35);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-30));
+    result = TA_MAVP(a, b)(k3);
+    k2 = stk2.getKData(KQuery(-30));
+    check_output(result, ALIGN(MA(k1.close(), 2), k3), EMA(k2.close(), 2));
+    CHECK_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 29);
+
+    /** @arg a 长度为35，b 长度为30 */
+    k1 = stk1.getKData(KQuery(-35));
+    a = CONTEXT(MA(CLOSE(k1), 2));
+    k2 = stk2.getKData(KQuery(-30));
+    b = CONTEXT(EMA(k2.close(), 2));
+    REQUIRE(a.size() == 35);
+    REQUIRE(b.size() == 30);
+    REQUIRE(CONTEXT_K(a) == k1);
+    REQUIRE(CONTEXT_K(b) == k2);
+    k3 = stk3.getKData(KQuery(-35));
+    result = TA_MAVP(a, b)(k3);
+    check_output(result, CONTEXT(MA(k1.close(), 2))(k3), CONTEXT(EMA(k2.close(), 2))(k3));
+    CHECK_EQ(result.size(), 35);
+    CHECK_EQ(result.discard(), 29);
 }
 
 //-----------------------------------------------------------------------------

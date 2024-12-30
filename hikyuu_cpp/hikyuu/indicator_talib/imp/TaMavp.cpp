@@ -53,57 +53,6 @@ IndicatorImpPtr TaMavp::_clone() {
 }
 
 void TaMavp::_calculate(const Indicator& ind) {
-#if 0
-    size_t total = ind.size();
-    HKU_IF_RETURN(total == 0, void());
-
-    KData in_k = ind.getContext();
-    KData ref_k = m_ref_ind.getContext();
-    KData null_k = Null<KData>();
-
-    Indicator ref = m_ref_ind;
-
-    // 可能是原型公式
-    if (ref.empty() && ref_k == null_k) {
-        ref = m_ref_ind(in_k);
-        if (!ref.empty()) {
-            ref_k = in_k;
-        } else {
-            ref = m_ref_ind;
-        }
-    }
-
-    DatetimeList in_dates = ind.getDatetimeList();
-    DatetimeList ref_dates = ref.getDatetimeList();
-
-    if ((in_k == null_k && in_dates.empty()) || (ref_k == null_k && ref_dates.empty())) {
-        // 上下文无效且无对齐日期，按时间无关序列计算并对齐
-        if (ref.size() > ind.size()) {
-            HKU_INFO("1");
-            ref = SLICE(ref, ref.size() - ind.size(), ref.size());
-        } else if (ref.size() < ind.size()) {
-            // 右对齐
-            ref = CVAL(ind, 0.) + ref;
-            HKU_INFO("2");
-            // HKU_INFO("ind: {}, ref: {}", ind, ref);
-        } else {  // else 长度相等无需再处理
-            HKU_INFO("3");
-        }
-    } else if (ref_k != null_k && ref_k != in_k) {
-        // 参考指标为独立的上下文，则使用输入上下文的查询条件
-        HKU_INFO("4");
-        auto ref_stk = ref_k.getStock();
-        ref = m_ref_ind(ref_stk.getKData(in_k.getQuery()));
-        ref = ALIGN(ref, in_k, false);
-    } else if (ref_k.size() != ref.size()) {
-        // ref_k 和 ref 长度不相等，ref是独立的时间序列
-        HKU_INFO("5");
-        ref = ALIGN(ref, in_k);
-    } else {
-        HKU_INFO("6");
-    }
-
-#else
     auto k = getContext();
     m_ref_ind.setContext(k);
     Indicator ref = m_ref_ind;
@@ -121,7 +70,6 @@ void TaMavp::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     _readyBuffer(total, 2);
     HKU_IF_RETURN(total == 0, void());
-#endif
 
     int min_n = getParam<int>("min_n");
     int max_n = getParam<int>("max_n");
@@ -149,18 +97,7 @@ void TaMavp::_calculate(const Indicator& ind) {
 }
 
 Indicator HKU_API TA_MAVP(const Indicator& ref_ind, int min_n, int max_n, int matype) {
-#if 1
     return Indicator(make_shared<TaMavp>(ref_ind, min_n, max_n, matype));
-#else
-    auto imp = ref_ind.getImp();
-    if (imp) {
-        IContext* p = dynamic_cast<IContext*>(imp.get());
-        if (p == nullptr) {
-            return Indicator(make_shared<TaMavp>(CONTEXT(ref_ind), min_n, max_n, matype));
-        }
-    }
-    return Indicator(make_shared<TaMavp>(ref_ind, min_n, max_n, matype));
-#endif
 }
 
 }  // namespace hku
