@@ -208,30 +208,30 @@ private:
                 type = "double";
                 double x = boost::any_cast<double>(arg);
                 value = boost::lexical_cast<string>(x);
-            } else if (arg.type() == typeid(string)) {
+            } else if (strcmp(arg.type().name(), typeid(string).name()) == 0) {
                 type = "string";
                 value = boost::any_cast<string>(arg);
-            } else if (arg.type() == typeid(Stock)) {
+            } else if (strcmp(arg.type().name(), typeid(Stock).name()) == 0) {
                 type = "stock";
                 value = "stock";
                 stock = boost::any_cast<Stock>(arg);
-            } else if (arg.type() == typeid(Block)) {
+            } else if (strcmp(arg.type().name(), typeid(Block).name()) == 0) {
                 type = "block";
                 value = "block";
                 block = boost::any_cast<Block>(arg);
-            } else if (arg.type() == typeid(KQuery)) {
+            } else if (strcmp(arg.type().name(), typeid(KQuery).name()) == 0) {
                 type = "query";
                 value = "query";
                 query = boost::any_cast<KQuery>(arg);
-            } else if (arg.type() == typeid(KData)) {
+            } else if (strcmp(arg.type().name(), typeid(KData).name()) == 0) {
                 type = "kdata";
                 value = "kdata";
                 kdata = boost::any_cast<KData>(arg);
-            } else if (arg.type() == typeid(PriceList)) {
+            } else if (strcmp(arg.type().name(), typeid(PriceList).name()) == 0) {
                 type = "PriceList";
                 value = "price_list";
                 price_list = boost::any_cast<PriceList>(arg);
-            } else if (arg.type() == typeid(DatetimeList)) {
+            } else if (strcmp(arg.type().name(), typeid(DatetimeList).name()) == 0) {
                 type = "DatetimeList";
                 value = "date_list";
                 date_list = boost::any_cast<DatetimeList>(arg);
