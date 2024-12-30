@@ -53,6 +53,11 @@ IndicatorImpPtr TaMavp::_clone() {
 }
 
 void TaMavp::_calculate(const Indicator& ind) {
+    size_t total = ind.size();
+    HKU_IF_RETURN(total == 0, void());
+
+    _readyBuffer(total, 2);
+
     auto k = getContext();
     m_ref_ind.setContext(k);
     Indicator ref = m_ref_ind;
@@ -66,10 +71,6 @@ void TaMavp::_calculate(const Indicator& ind) {
     } else if (m_ref_ind.size() != ind.size()) {
         ref = ALIGN(m_ref_ind, ind);
     }
-
-    size_t total = ind.size();
-    _readyBuffer(total, 2);
-    HKU_IF_RETURN(total == 0, void());
 
     int min_n = getParam<int>("min_n");
     int max_n = getParam<int>("max_n");
