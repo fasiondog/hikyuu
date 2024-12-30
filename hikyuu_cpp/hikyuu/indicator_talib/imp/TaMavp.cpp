@@ -53,7 +53,7 @@ IndicatorImpPtr TaMavp::_clone() {
 }
 
 void TaMavp::_calculate(const Indicator& ind) {
-#if 1
+#if 0
     size_t total = ind.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -133,7 +133,6 @@ void TaMavp::_calculate(const Indicator& ind) {
     }
 
     m_discard = lookback + std::max(ind.discard(), ref.discard());
-    HKU_INFO("m_discard: {}, lookback: {}", m_discard, lookback);
     if (m_discard >= total) {
         m_discard = total;
         return;
