@@ -5,10 +5,12 @@
  *      Author: fasiondog
  */
 
-#include "ta_func.h"
+#include <ta-lib/ta_func.h>
 #include "ta_defines.h"
 #include "ta_imp.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
+#include "hikyuu/indicator/crt/CVAL.h"
+#include "hikyuu/indicator/crt/SLICE.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 EXPOERT_TA_FUNC(TA_ACCBANDS)

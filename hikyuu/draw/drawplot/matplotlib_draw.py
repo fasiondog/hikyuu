@@ -347,6 +347,7 @@ def iplot(
     text_color='k',
     zero_on=False,
     label=None,
+    linestyle='-',
     *args,
     **kwargs
 ):
@@ -377,7 +378,7 @@ def iplot(
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
 
     py_indicatr = [None if x == constant.null_price else x for x in indicator]
-    axes.plot(py_indicatr, '-', label=label, *args, **kwargs)
+    axes.plot(py_indicatr, linestyle=linestyle, label=label, *args, **kwargs)
 
     if legend_on:
         leg = axes.legend(loc='upper left')

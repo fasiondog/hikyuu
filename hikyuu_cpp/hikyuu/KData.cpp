@@ -35,7 +35,8 @@ KData::KData(const Stock& stock, const KQuery& query)
 
 bool KData::operator==(const KData& thr) const {
     return this == &thr || m_imp == thr.m_imp ||
-           (getStock() == thr.getStock() && getQuery() == thr.getQuery());
+           (getStock() == thr.getStock() && getQuery() == thr.getQuery()) ||
+           (getStock().isNull() && thr.getStock().isNull());
 }
 
 size_t KData::getPosInStock(Datetime datetime) const {

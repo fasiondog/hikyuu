@@ -488,10 +488,10 @@ Indicator (*ZHBOND10_2)(const DatetimeList&, double) = ZHBOND10;
 Indicator (*ZHBOND10_3)(const KData& k, double) = ZHBOND10;
 Indicator (*ZHBOND10_4)(const Indicator&, double) = ZHBOND10;
 
-Indicator (*CORR_1)(int) = CORR;
+Indicator (*CORR_1)(const Indicator&, int) = CORR;
 Indicator (*CORR_2)(const Indicator&, const Indicator&, int) = CORR;
 
-Indicator (*SPEARMAN_1)(int) = SPEARMAN;
+Indicator (*SPEARMAN_1)(const Indicator&, int) = SPEARMAN;
 Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int) = SPEARMAN;
 
 Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
@@ -662,6 +662,9 @@ void export_Indicator_build_in(py::module& m) {
 
     :param data: 输入数据 KData
     :rtype: Indicator)");
+
+    m.def("CONTEXT", py::overload_cast<>(hku::CONTEXT));
+    m.def("CONTEXT", py::overload_cast<const Indicator&>(hku::CONTEXT));
 
     m.def(
       "PRICELIST",
@@ -947,14 +950,15 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind2: 指标2
     :rtype: Indicator)");
 
-    m.def("CORR", CORR_1, py::arg("n") = 10);
-    m.def("CORR", CORR_2, py::arg("ind1"), py::arg("ind2"), py::arg("n") = 10,
-          R"(CORR(ind1, ind2, n)
+    m.def("CORR", CORR_1, py::arg("ref_ind"), py::arg("n") = 10);
+    m.def("CORR", CORR_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 10,
+          R"(CORR(ind, ref_ind, n)
 
-    计算 ind1 和 ind2 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
+    计算 ind 和 ref_ind 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
+    与 CORR(ref_ind, n)(ind) 等效。
 
-    :param Indicator ind1: 指标1
-    :param Indicator ind2: 指标2
+    :param Indicator ind: 指标1
+    :param Indicator ref_ind: 指标2
     :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
     :rtype: Indicator)");
 
@@ -1747,14 +1751,14 @@ void export_Indicator_build_in(py::module& m) {
     :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
     :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值)");
 
-    m.def("SPEARMAN", SPEARMAN_1, py::arg("n") = 0);
-    m.def("SPEARMAN", SPEARMAN_2, py::arg("ind1"), py::arg("ind2"), py::arg("n") = 0,
-          R"(SPEARMAN(ind1, ind2[, n])
+    m.def("SPEARMAN", SPEARMAN_1, py::arg("ref_ind"), py::arg("n") = 0);
+    m.def("SPEARMAN", SPEARMAN_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 0,
+          R"(SPEARMAN(ind, ref_ind[, n])
 
-    Spearman 相关系数
+    Spearman 相关系数。与 SPEARMAN(ref_ind, n)(ind) 等效。
 
-    :param Indicator ind1: 输入参数1
-    :param Indicator ind2: 输入参数2
+    :param Indicator ind: 输入参数1
+    :param Indicator ref_ind: 输入参数2
     :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度)");
 
     // IR(const Indicator& p, const Indicator& b, int n = 100)

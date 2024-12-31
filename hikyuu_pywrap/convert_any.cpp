@@ -14,6 +14,11 @@ Datetime pydatetime_to_Datetime(const pybind11::object& source) {
         return value;
     }
 
+    if (pybind11::isinstance<Datetime>(source)) {
+        value = source.cast<Datetime>();
+        return value;
+    }
+
     if (!PyDateTimeAPI) {
         PyDateTime_IMPORT;
     }
@@ -44,8 +49,6 @@ Datetime pydatetime_to_Datetime(const pybind11::object& source) {
         year = 1400;  // earliest available date for Datetime, not Python datetime
         microsecond = PyDateTime_TIME_GET_MICROSECOND(src);
 
-    } else if (pybind11::isinstance<Datetime>(source)) {
-        value = source.cast<Datetime>();
     } else {
         throw std::invalid_argument("Can't convert this python object to Datetime!");
     }

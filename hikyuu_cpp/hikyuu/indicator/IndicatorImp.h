@@ -115,7 +115,8 @@ public:
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
 
-    string formula() const;
+    virtual string formula() const;
+    virtual string str() const;
 
     bool isLeaf() const;
 
@@ -148,7 +149,9 @@ public:
     // ===================
     //  子类接口
     // ===================
-    virtual void _calculate(const Indicator&) {}
+    virtual void _calculate(const Indicator&) {
+        HKU_WARN("{} will be empty always!", m_name);
+    }
 
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 

@@ -12,6 +12,11 @@
 
 namespace hku {
 
+template <class T>
+static bool isType(const boost::any& value) {
+    return strcmp(value.type().name(), typeid(T).name()) == 0;
+}
+
 HKU_API std::ostream& operator<<(std::ostream& os, const Parameter& param) {
     // os << std::fixed;
     // os.precision(4);
@@ -28,15 +33,15 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Parameter& param) {
             os << "(bool): " << boost::any_cast<bool>(iter->second) << strip;
         } else if (iter->second.type() == typeid(double)) {
             os << "(double): " << boost::any_cast<double>(iter->second) << strip;
-        } else if (iter->second.type() == typeid(string)) {
+        } else if (isType<string>(iter->second)) {
             os << "(string): " << boost::any_cast<string>(iter->second) << strip;
-        } else if (iter->second.type() == typeid(Stock)) {
+        } else if (isType<Stock>(iter->second)) {
             os << "(Stock): " << boost::any_cast<Stock>(iter->second).market_code() << strip;
-        } else if (iter->second.type() == typeid(Block)) {
+        } else if (isType<Block>(iter->second)) {
             os << "(Block): " << boost::any_cast<const Block&>(iter->second) << strip;
-        } else if (iter->second.type() == typeid(KQuery)) {
+        } else if (isType<KQuery>(iter->second)) {
             os << "(Query): " << boost::any_cast<KQuery>(iter->second) << strip;
-        } else if (iter->second.type() == typeid(KData)) {
+        } else if (isType<KData>(iter->second)) {
             os << "(KData): ";
             Stock stk = boost::any_cast<KData>(iter->second).getStock();
             if (stk.isNull()) {
@@ -44,9 +49,10 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Parameter& param) {
             } else {
                 os << stk.market_code() << strip;
             }
-        } else if (iter->second.type() == typeid(PriceList)) {
+        } else if (isType<PriceList>(iter->second)) {
             os << "(PriceList): " << boost::any_cast<PriceList>(iter->second).size() << strip;
-        } else if (iter->second.type() == typeid(DatetimeList)) {
+        } else if (isType<DatetimeList>(iter->second)) {  // (strcmp(iter->second.type().name(),
+                                                          // typeid(DatetimeList).name()) == 0) {
             os << "(DatetimeList): " << boost::any_cast<DatetimeList>(iter->second).size() << strip;
         } else {
             os << "Unsupported" << strip;
@@ -74,13 +80,9 @@ Parameter& Parameter::operator=(const Parameter& p) {
 bool Parameter::support(const boost::any& value) {
     return value.type() == typeid(int) || value.type() == typeid(int64_t) ||
            value.type() == typeid(bool) || value.type() == typeid(double) ||
-           strcmp(value.type().name(), typeid(string).name()) == 0 ||
-           strcmp(value.type().name(), typeid(Stock).name()) == 0 ||
-           strcmp(value.type().name(), typeid(Block).name()) == 0 ||
-           strcmp(value.type().name(), typeid(KQuery).name()) == 0 ||
-           strcmp(value.type().name(), typeid(KData).name()) == 0 ||
-           strcmp(value.type().name(), typeid(PriceList).name()) == 0 ||
-           strcmp(value.type().name(), typeid(DatetimeList).name()) == 0;
+           isType<string>(value) || isType<Stock>(value) || isType<Block>(value) ||
+           isType<KQuery>(value) || isType<KData>(value) || isType<PriceList>(value) ||
+           isType<DatetimeList>(value);
 }
 
 string Parameter::type(const string& name) const {
@@ -91,13 +93,13 @@ string Parameter::type(const string& name) const {
     HKU_IF_RETURN(iter->second.type() == typeid(int64_t), "int64");
     HKU_IF_RETURN(iter->second.type() == typeid(bool), "bool");
     HKU_IF_RETURN(iter->second.type() == typeid(double), "double");
-    HKU_IF_RETURN(iter->second.type() == typeid(string), "string");
-    HKU_IF_RETURN(iter->second.type() == typeid(Stock), "Stock");
-    HKU_IF_RETURN(iter->second.type() == typeid(Block), "Block");
-    HKU_IF_RETURN(iter->second.type() == typeid(KQuery), "KQuery");
-    HKU_IF_RETURN(iter->second.type() == typeid(KData), "KData");
-    HKU_IF_RETURN(iter->second.type() == typeid(PriceList), "PriceList");
-    HKU_IF_RETURN(iter->second.type() == typeid(DatetimeList), "DatetimeList");
+    HKU_IF_RETURN(isType<string>(iter->second), "string");
+    HKU_IF_RETURN(isType<Stock>(iter->second), "Stock");
+    HKU_IF_RETURN(isType<Block>(iter->second), "Block");
+    HKU_IF_RETURN(isType<KQuery>(iter->second), "KQuery");
+    HKU_IF_RETURN(isType<KData>(iter->second), "KData");
+    HKU_IF_RETURN(isType<PriceList>(iter->second), "PriceList");
+    HKU_IF_RETURN(isType<DatetimeList>(iter->second), "DatetimeList");
     return "Unknown";
 }
 
@@ -124,20 +126,24 @@ string Parameter::getNameValueList() const {
             os << iter->first << equal << boost::any_cast<bool>(iter->second);
         } else if (iter->second.type() == typeid(double)) {
             os << iter->first << equal << boost::any_cast<double>(iter->second);
-        } else if (iter->second.type() == typeid(string)) {
+        } else if (isType<string>(iter->second)) {
             os << "\"" << iter->first << "\"" << equal << boost::any_cast<string>(iter->second);
-        } else if (iter->second.type() == typeid(Stock)) {
+        } else if (isType<Stock>(iter->second)) {
             os << iter->first << equal << boost::any_cast<Stock>(iter->second);
-        } else if (iter->second.type() == typeid(Block)) {
+        } else if (isType<Block>(iter->second)) {
             os << iter->first << equal << boost::any_cast<const Block&>(iter->second);
-        } else if (iter->second.type() == typeid(KQuery)) {
+        } else if (isType<KQuery>(iter->second)) {
             os << iter->first << equal << boost::any_cast<KQuery>(iter->second);
-        } else if (iter->second.type() == typeid(KData)) {
-            //    os << iter->first << equal
-            //       << boost::any_cast<KData>(iter->second);
-        } else if (iter->second.type() == typeid(PriceList)) {
+        } else if (isType<KData>(iter->second)) {
+            Stock stk = boost::any_cast<KData>(iter->second).getStock();
+            if (stk.isNull()) {
+                os << iter->first << equal << "KData(Null)";
+            } else {
+                os << iter->first << equal << "KData(" << stk.market_code() << "...)";
+            }
+        } else if (isType<PriceList>(iter->second)) {
             os << iter->first << equal << "PriceList(...)";
-        } else if (iter->second.type() == typeid(DatetimeList)) {
+        } else if (isType<DatetimeList>(iter->second)) {
             os << iter->first << equal << "DatetimeList(...)";
         } else {
             os << "Unsupported";

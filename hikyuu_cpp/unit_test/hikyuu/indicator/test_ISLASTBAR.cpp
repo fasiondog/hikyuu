@@ -42,9 +42,9 @@ TEST_CASE("test_ISLASTBAR") {
     CHECK_EQ(result[9], 1.);
 
     /** @arg 输入数据全部需抛弃 */
-    std::vector<Indicator::value_t> src;
+    PriceList src;
     for (size_t i = 0; i < 10; ++i) {
-        src.push_back(Null<Indicator::value_t>());
+        src.push_back(Null<PriceList::value_type>());
     }
     data = PRICELIST(src, src.size());
     result = ISLASTBAR(data);

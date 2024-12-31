@@ -380,8 +380,8 @@ void export_Indicator_ta_lib(py::module& m) {
 :param float fast_limit: Fast limit (From 0.01 to 0.99)
 :param float slow_limit: Slow limit (From 0.01 to 0.99))");
 
-    m.def("TA_MAVP", py::overload_cast<int, int, int>(TA_MAVP), py::arg("min_n") = 2,
-          py::arg("max_n") = 30, py::arg("matype") = 0);
+    m.def("TA_MAVP", py::overload_cast<const Indicator&, int, int, int>(TA_MAVP),
+          py::arg("ref_ind"), py::arg("min_n") = 2, py::arg("max_n") = 30, py::arg("matype") = 0);
     m.def("TA_MAVP", py::overload_cast<const Indicator&, const Indicator&, int, int, int>(TA_MAVP),
           py::arg("ind1"), py::arg("ind2"), py::arg("min_n") = 2, py::arg("max_n") = 30,
           py::arg("matype") = 0, R"(TA_MAVP - Moving average with variable period
