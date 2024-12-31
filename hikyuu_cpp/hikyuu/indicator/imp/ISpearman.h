@@ -14,7 +14,6 @@ namespace hku {
 class ISpearman : public IndicatorImp {
 public:
     ISpearman();
-    explicit ISpearman(int n);
     ISpearman(const Indicator& ref_ind, int n);
     virtual ~ISpearman();
 

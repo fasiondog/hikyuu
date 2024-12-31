@@ -21,6 +21,48 @@ using namespace hku;
  */
 
 /** @par 检测点 */
+TEST_CASE("test_KData_equal") {
+    /** @arg kdata为空 */
+    KData null_k = Null<KData>();
+    KData k1, k2;
+    CHECK_EQ(k1, null_k);
+    CHECK_EQ(k1, k2);
+
+    /** @arg KData的query不同，但 stock 为空 */
+    Stock stk1, stk2;
+    k1 = stk1.getKData(KQueryByIndex(0, 10, KQuery::DAY));
+    CHECK_UNARY(stk1.isNull());
+    CHECK_NE(k1.getQuery(), null_k.getQuery());
+    CHECK_EQ(k1, null_k);
+
+    /** @arg stk相同且非空 KData 比较 */
+    stk1 = getStock("sh000001");
+    k1 = stk1.getKData(KQueryByIndex(0, 10, KQuery::DAY));
+    k2 = k1;
+    CHECK_EQ(k1, k2);
+    k2 = stk1.getKData(KQueryByIndex(0, 10, KQuery::DAY));
+    CHECK_EQ(k1, k2);
+    k2 = stk1.getKData(KQueryByIndex(1, 10, KQuery::DAY));
+    CHECK_NE(k1, k2);
+
+    /** @arg stk不同且非空 KData 比较 */
+    stk2 = getStock("sz000001");
+    auto query = KQuery(0, 10, KQuery::DAY);
+    CHECK_NE(stk1, stk2);
+    k1 = stk1.getKData(query);
+    k2 = stk2.getKData(query);
+    CHECK_NE(k1, k2);
+
+    /** @arg stk1为空，stk2非空 */
+    stk1 = Stock();
+    CHECK_UNARY(stk1.isNull());
+    CHECK_UNARY(!stk2.isNull());
+    k1 = stk1.getKData(query);
+    k2 = stk2.getKData(query);
+    CHECK_NE(k1, k2);
+}
+
+/** @par 检测点 */
 TEST_CASE("test_getDatetimeList") {
     StockManager& sm = StockManager::instance();
     Stock stock;

@@ -19,6 +19,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n = 10);
-Indicator HKU_API CORR(int n = 10);
+Indicator HKU_API CORR(const Indicator& ref_ind, int n = 10);
 
 }  // namespace hku

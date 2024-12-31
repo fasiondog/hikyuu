@@ -6,6 +6,8 @@
  */
 
 #include "hikyuu/indicator/crt/ALIGN.h"
+#include "hikyuu/indicator/crt/CVAL.h"
+#include "hikyuu/indicator/crt/SLICE.h"
 #include "ISpearman.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -16,10 +18,6 @@ namespace hku {
 
 ISpearman::ISpearman() : IndicatorImp("SPEARMAN") {
     setParam<int>("n", 0);
-}
-
-ISpearman::ISpearman(int n) : IndicatorImp("SPEARMAN") {
-    setParam<int>("n", n);
 }
 
 ISpearman::ISpearman(const Indicator &ref_ind, int n)
@@ -77,16 +75,24 @@ static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value
 }
 
 void ISpearman::_calculate(const Indicator &ind) {
+    size_t total = ind.size();
+    HKU_IF_RETURN(total == 0, void());
+
+    _readyBuffer(total, 2);
+
     auto k = getContext();
     m_ref_ind.setContext(k);
     Indicator ref = m_ref_ind;
-    if (m_ref_ind.size() != ind.size()) {
+    auto dates = ref.getDatetimeList();
+    if (dates.empty()) {
+        if (ref.size() > ind.size()) {
+            ref = SLICE(ref, ref.size() - ind.size(), ref.size());
+        } else if (ref.size() < ind.size()) {
+            ref = CVAL(ind, 0.) + ref;
+        }
+    } else if (m_ref_ind.size() != ind.size()) {
         ref = ALIGN(m_ref_ind, ind);
     }
-
-    size_t total = ind.size();
-    _readyBuffer(total, 1);
-    HKU_IF_RETURN(total == 0, void());
 
     int n = getParam<int>("n");
     if (n == 0) {
@@ -141,14 +147,14 @@ void ISpearman::_calculate(const Indicator &ind) {
     }
 }
 
-Indicator HKU_API SPEARMAN(int n) {
-    return Indicator(make_shared<ISpearman>(n));
+Indicator HKU_API SPEARMAN(const Indicator &ref_ind, int n) {
+    return Indicator(make_shared<ISpearman>(ref_ind, n));
 }
 
-Indicator HKU_API SPEARMAN(const Indicator &ind1, const Indicator &ind2, int n) {
-    auto p = make_shared<ISpearman>(ind2, n);
+Indicator HKU_API SPEARMAN(const Indicator &ind, const Indicator &ref_ind, int n) {
+    auto p = make_shared<ISpearman>(ref_ind, n);
     Indicator result(p);
-    return result(ind1);
+    return result(ind);
 }
 
 }  // namespace hku

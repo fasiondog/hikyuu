@@ -41,9 +41,6 @@ TEST_CASE("test_TA_MACDFIX") {
     CHECK_EQ(result[34], doctest::Approx(-23.164119).epsilon(0.0001));
     CHECK_EQ(result.get(34, 1), doctest::Approx(-19.43500).epsilon(0.0001));
     CHECK_EQ(result.get(34, 2), doctest::Approx(-3.729116).epsilon(0.0001));
-    for (size_t i = result.discard(); i < result.size(); ++i) {
-        HKU_INFO("{}: {} {} {}", i, result.get(i, 0), result.get(i, 1), result.get(i, 2));
-    }
 }
 
 //-----------------------------------------------------------------------------

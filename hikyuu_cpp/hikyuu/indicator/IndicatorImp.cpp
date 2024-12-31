@@ -13,6 +13,7 @@
 #include "../Stock.h"
 #include "../GlobalInitializer.h"
 #include "imp/ICval.h"
+#include "imp/IContext.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IndicatorImp)
@@ -123,25 +124,7 @@ void IndicatorImp::releaseDynEngine() {
 }
 
 HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
-    os << "Indicator{\n"
-       << "  name: " << imp.name() << "\n  size: " << imp.size() << "\n  discard: " << imp.discard()
-       << "\n  result sets: " << imp.getResultNumber() << "\n  params: " << imp.getParameter()
-       << "\n  support indicator param: " << (imp.supportIndParam() ? "True" : "False");
-    if (imp.supportIndParam()) {
-        os << "\n  ind params: {";
-        const auto &ind_params = imp.getIndParams();
-        for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
-            os << iter->first << ": " << iter->second->formula() << ", ";
-        }
-        os << "}";
-    }
-    os << "\n  formula: " << imp.formula();
-#if !HKU_USE_LOW_PRECISION
-    if (imp.m_pBuffer[0]) {
-        os << "\n  values: " << *imp.m_pBuffer[0];
-    }
-#endif
-    os << "\n}";
+    os << imp.str();
     return os;
 }
 
@@ -149,7 +132,7 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
     if (!imp) {
         os << "Indicator {}";
     } else {
-        os << *imp;
+        os << imp->str();
     }
     return os;
 }
@@ -294,6 +277,30 @@ IndicatorImp::~IndicatorImp() {
     for (size_t i = 0; i < m_result_num; ++i) {
         delete m_pBuffer[i];
     }
+}
+
+string IndicatorImp::str() const {
+    std::ostringstream os;
+    os << "Indicator{\n"
+       << "  name: " << name() << "\n  size: " << size() << "\n  discard: " << discard()
+       << "\n  result sets: " << getResultNumber() << "\n  params: " << getParameter()
+       << "\n  support indicator param: " << (supportIndParam() ? "True" : "False");
+    if (supportIndParam()) {
+        os << "\n  ind params: {";
+        const auto &ind_params = getIndParams();
+        for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
+            os << iter->first << ": " << iter->second->formula() << ", ";
+        }
+        os << "}";
+    }
+    os << "\n  formula: " << formula();
+#if !HKU_USE_LOW_PRECISION
+    if (m_pBuffer[0]) {
+        os << "\n  values: " << *m_pBuffer[0];
+    }
+#endif
+    os << "\n}";
+    return os.str();
 }
 
 IndicatorImpPtr IndicatorImp::clone() {
@@ -1525,6 +1532,9 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
                   false);
 
     const auto &self_id = typeid(*this);
+    const auto &context_id = typeid(IContext);
+    HKU_IF_RETURN(self_id == context_id, false);
+
     const auto &cval_id = typeid(ICval);
     if (self_id == cval_id) {
         HKU_IF_RETURN(isLeaf() && other.isLeaf(), true);

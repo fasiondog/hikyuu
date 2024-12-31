@@ -1,25 +1,28 @@
 /*
  *  Copyright (c) 2024 hikyuu.org
  *
- *  Created on: 2024-03-10
+ *  Created on: 2024-12-28
  *      Author: fasiondog
  */
 
 #pragma once
 
-#include "hikyuu/indicator/Indicator.h"
+#include "../Indicator.h"
 
 namespace hku {
 
-class TaMavp : public IndicatorImp {
+class IContext : public IndicatorImp {
 public:
-    TaMavp();
-    TaMavp(const Indicator& ref_ind, int min_n, int max_n, int matype);
-    virtual ~TaMavp();
+    IContext();
+    IContext(const Indicator& ref_ind);
+    virtual ~IContext();
 
-    virtual void _checkParam(const string& name) const override;
+    virtual string str() const override;
+    virtual string formula() const override;
     virtual void _calculate(const Indicator& data) override;
     virtual IndicatorImpPtr _clone() override;
+
+    KData getContextKdata() const;
 
 private:
     Indicator m_ref_ind;
