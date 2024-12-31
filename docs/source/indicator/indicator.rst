@@ -221,6 +221,12 @@
     :param Indicator ind: 指标对象
     :rtype: Indicator
 
+.. py:function:: CONTEXT_K(ind)
+
+    获取指标上下文。Indicator::getContext()方法获取的是当前的上下文，但对于 CONTEXT 独立上下文指标无法获取其指定的独立上下文，需用此方法获取
+
+    :param Indicator ind: 指标对象
+    :rtype: KData
 
 .. py:function:: CORR(ind1, ind2, n)
 

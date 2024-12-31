@@ -673,6 +673,13 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind: 指标对象
     :rtype: Indicator)");
 
+    m.def("CONTEXT_K", CONTEXT_K, R"(CONTEXT_K(ind)
+
+    获取指标上下文。Indicator::getContext()方法获取的是当前的上下文，但对于 CONTEXT 独立上下文指标无法获取其指定的独立上下文，需用此方法获取
+
+    :param Indicator ind: 指标对象
+    :rtype: KData)");
+
     m.def(
       "PRICELIST",
       [](const py::object& obj, int result_index = 0, int discard = 0,
