@@ -52,7 +52,7 @@ TEST_CASE("test_CONTEXT") {
     price_t nan = Null<price_t>();
 
     /** @arg 空对象 */
-    auto ctx = CONTEXT();
+    auto ctx = hku::CONTEXT();
     CHECK_UNARY(ctx.empty());
     CHECK_EQ(CONTEXT_K(ctx), Null<KData>());
     CHECK_EQ(ctx.getContext(), Null<KData>());
@@ -62,7 +62,7 @@ TEST_CASE("test_CONTEXT") {
     CHECK_EQ(ctx.name(), "CONTEXT");
 
     /** @arg 公式原型（无数据序列） */
-    ctx = CONTEXT(MA(CLOSE()));
+    ctx = hku::CONTEXT(MA(CLOSE()));
     CHECK_UNARY(ctx.empty());
     CHECK_EQ(CONTEXT_K(ctx), Null<KData>());
     CHECK_EQ(ctx.getContext(), Null<KData>());
@@ -70,7 +70,7 @@ TEST_CASE("test_CONTEXT") {
 
     /** @arg 时间无关序列 */
     Indicator a = PRICELIST(PriceList{nan, nan, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 2);
-    ctx = CONTEXT(a);
+    ctx = hku::CONTEXT(a);
     CHECK_EQ(CONTEXT_K(ctx), Null<KData>());
     check_output(ctx, a);
 
@@ -107,7 +107,7 @@ TEST_CASE("test_CONTEXT") {
     /** @arg 无上下文的，时间序列 */
     auto dates = getStock("sz000001").getDatetimeList(KQuery(-12));
     a = PRICELIST(PriceList{nan, nan, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, dates, 2);
-    ctx = CONTEXT(a);
+    ctx = hku::CONTEXT(a);
     CHECK_EQ(CONTEXT_K(ctx), Null<KData>());
     CHECK_EQ(ctx.getContext(), Null<KData>());
     check_output(ctx, a);
@@ -120,7 +120,7 @@ TEST_CASE("test_CONTEXT") {
     check_output(result, CVAL(0.)(k1) + a);
 
     a = PRICELIST(PriceList{nan, nan, 1, 2, 3, 4, 5, nan, 7, 8, 9, 10}, dates, 2);
-    ctx = CONTEXT(a);
+    ctx = hku::CONTEXT(a);
     CHECK_EQ(CONTEXT_K(ctx), Null<KData>());
     CHECK_EQ(ctx.getContext(), Null<KData>());
     check_output(ctx, a);
@@ -132,7 +132,7 @@ TEST_CASE("test_CONTEXT") {
 
     /** @arg 带上下文的时间序列 */
     a = k2.close();
-    ctx = CONTEXT(a);
+    ctx = hku::CONTEXT(a);
     CHECK_EQ(CONTEXT_K(ctx), k2);
     CHECK_EQ(ctx.getContext(), Null<KData>());
     check_output(ctx, a);
@@ -149,14 +149,14 @@ TEST_CASE("test_CONTEXT") {
     check_output(result, ALIGN(stk2.getKData(q1).close(), k1));
 
     a = k1.close();
-    result = CONTEXT(a)(k3);
+    result = hku::CONTEXT(a)(k3);
     CHECK_EQ(CONTEXT_K(result), k1);
     CHECK_EQ(result.getContext(), k3);
     CHECK_EQ(result.size(), k3.size());
     check_output(result, ALIGN(stk1.getKData(q3).close(), k3));
 
     /** @arg 复杂公式 */
-    result = (CLOSE(k1) + CONTEXT(MA(k3.close(), 2)))(k2);
+    result = (CLOSE(k1) + hku::CONTEXT(MA(k3.close(), 2)))(k2);
     CHECK_EQ(result.size(), k2.size());
     auto expect = k2.close() + MA(stk3.getKData(q2).close(), 2);
     check_output(result, expect);
@@ -175,7 +175,7 @@ TEST_CASE("test_CONTEXT_export") {
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = CONTEXT(MA(CLOSE(kdata), 3));
+    Indicator x1 = hku::CONTEXT(MA(CLOSE(kdata), 3));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

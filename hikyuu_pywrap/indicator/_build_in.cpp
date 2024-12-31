@@ -663,8 +663,8 @@ void export_Indicator_build_in(py::module& m) {
     :param data: 输入数据 KData
     :rtype: Indicator)");
 
-    m.def("CONTEXT", py::overload_cast<>(CONTEXT));
-    m.def("CONTEXT", py::overload_cast<const Indicator&>(CONTEXT));
+    m.def("CONTEXT", py::overload_cast<>(hku::CONTEXT));
+    m.def("CONTEXT", py::overload_cast<const Indicator&>(hku::CONTEXT));
 
     m.def(
       "PRICELIST",
