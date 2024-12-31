@@ -664,31 +664,38 @@ void export_Indicator_build_in(py::module& m) {
     :rtype: Indicator)");
 
     m.def("CONTEXT", py::overload_cast<>(hku::CONTEXT));
-    m.def("CONTEXT", py::overload_cast<const Indicator&>(hku::CONTEXT));
+    m.def("CONTEXT", py::overload_cast<const Indicator&>(hku::CONTEXT), "CONTEXT(ind)
+    
+    独立上下文。使用 ind 自带的上下文。当指定新的上下文时，不会改变已有的上下文。
+    例如：ind = CLOSE(k1), 当指定新的上下文 ind = ind(k2) 时，使用的是 k2 的收盘价。如想仍使用 k1 收盘价，
+    则需使用 ind = CONTEXT(CLOSE(k1)), 此时 ind(k2) 将仍旧使用 k1 的收盘价。
+    
+    :param Indicator ind: 指标对象
+    :rtype: Indicator");
 
     m.def(
       "PRICELIST",
       [](const py::object& obj, int result_index = 0, int discard = 0,
          const py::object& pyalign_dates = py::none()) {
-          if (py::isinstance<Indicator>(obj)) {
-              Indicator data = obj.cast<Indicator>();
-              return PRICELIST(data, result_index);
-          } else if (py::isinstance<py::sequence>(obj)) {
-              const auto& x = obj.cast<py::sequence>();
-              auto values = python_list_to_vector<price_t>(x);
-              if (pyalign_dates.is_none()) {
-                  return PRICELIST(values, discard);
-              } else {
-                  py::sequence align_dates = pyalign_dates.cast<py::sequence>();
-                  auto total = len(align_dates);
-                  DatetimeList dates(total);
-                  for (auto i = 0; i < total; ++i) {
-                      dates[i] = pydatetime_to_Datetime(align_dates[i]);
-                  }
-                  return PRICELIST(values, dates, discard);
-              }
-          }
-          HKU_THROW("Invalid input data type!");
+        if (py::isinstance<Indicator>(obj)) {
+            Indicator data = obj.cast<Indicator>();
+            return PRICELIST(data, result_index);
+        } else if (py::isinstance<py::sequence>(obj)) {
+            const auto& x = obj.cast<py::sequence>();
+            auto values = python_list_to_vector<price_t>(x);
+            if (pyalign_dates.is_none()) {
+                return PRICELIST(values, discard);
+            } else {
+                py::sequence align_dates = pyalign_dates.cast<py::sequence>();
+                auto total = len(align_dates);
+                DatetimeList dates(total);
+                for (auto i = 0; i < total; ++i) {
+                    dates[i] = pydatetime_to_Datetime(align_dates[i]);
+                }
+                return PRICELIST(values, dates, discard);
+            }
+        }
+        HKU_THROW("Invalid input data type!");
       },
       py::arg("data"), py::arg("result_index") = 0, py::arg("discard") = 0,
       py::arg("align_dates") = py::none());
@@ -1784,17 +1791,17 @@ void export_Indicator_build_in(py::module& m) {
       "IC",
       [](const Indicator& ind, const py::object& stks, const KQuery& query, const Stock& ref_stk,
          int n, bool spearman) {
-          if (py::isinstance<Block>(stks)) {
-              const auto& blk = stks.cast<Block&>();
-              return IC(ind, blk, query, ref_stk, n, spearman);
-          }
+        if (py::isinstance<Block>(stks)) {
+            const auto& blk = stks.cast<Block&>();
+            return IC(ind, blk, query, ref_stk, n, spearman);
+        }
 
-          if (py::isinstance<py::sequence>(stks)) {
-              StockList c_stks = python_list_to_vector<Stock>(stks);
-              return IC(ind, c_stks, query, ref_stk, n, spearman);
-          }
+        if (py::isinstance<py::sequence>(stks)) {
+            StockList c_stks = python_list_to_vector<Stock>(stks);
+            return IC(ind, c_stks, query, ref_stk, n, spearman);
+        }
 
-          HKU_THROW("Input stks must be Block or sequenc(Stock)!");
+        HKU_THROW("Input stks must be Block or sequenc(Stock)!");
       },
       py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("n") = 1,
       py::arg("spearman") = true,
@@ -1813,17 +1820,17 @@ void export_Indicator_build_in(py::module& m) {
       "ICIR",
       [](const Indicator& ind, const py::object& stks, const KQuery& query, const Stock& ref_stk,
          int n, int rolling_n, bool spearman) {
-          if (py::isinstance<Block>(stks)) {
-              const auto& blk = stks.cast<Block&>();
-              return ICIR(ind, blk, query, ref_stk, n, rolling_n, spearman);
-          }
+        if (py::isinstance<Block>(stks)) {
+            const auto& blk = stks.cast<Block&>();
+            return ICIR(ind, blk, query, ref_stk, n, rolling_n, spearman);
+        }
 
-          if (py::isinstance<py::sequence>(stks)) {
-              StockList c_stks = python_list_to_vector<Stock>(stks);
-              return ICIR(ind, c_stks, query, ref_stk, n, rolling_n, spearman);
-          }
+        if (py::isinstance<py::sequence>(stks)) {
+            StockList c_stks = python_list_to_vector<Stock>(stks);
+            return ICIR(ind, c_stks, query, ref_stk, n, rolling_n, spearman);
+        }
 
-          HKU_THROW("Input stks must be Block or sequenc(Stock)!");
+        HKU_THROW("Input stks must be Block or sequenc(Stock)!");
       },
       py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("n") = 1,
       py::arg("rolling_n") = 120, py::arg("spearman") = true,
@@ -1899,17 +1906,17 @@ void export_Indicator_build_in(py::module& m) {
     m.def(
       "BLOCKSETNUM",
       [](const py::sequence& stks) {
-          Block blk;
-          blk.add(python_list_to_vector<Stock>(stks));
-          return BLOCKSETNUM(blk);
+        Block blk;
+        blk.add(python_list_to_vector<Stock>(stks));
+        return BLOCKSETNUM(blk);
       },
       py::arg("stks"));
     m.def(
       "BLOCKSETNUM",
       [](const py::sequence& stks, const KQuery& query) {
-          Block blk;
-          blk.add(python_list_to_vector<Stock>(stks));
-          return BLOCKSETNUM(blk, query);
+        Block blk;
+        blk.add(python_list_to_vector<Stock>(stks));
+        return BLOCKSETNUM(blk, query);
       },
       py::arg("stks"), py::arg("query"), R"(BLOCKSETNUM(block, query)
     
@@ -1935,17 +1942,17 @@ void export_Indicator_build_in(py::module& m) {
     m.def(
       "INSUM",
       [](const py::sequence stks, const Indicator& ind, int mode) {
-          Block blk;
-          blk.add(python_list_to_vector<Stock>(stks));
-          return INSUM(blk, ind, mode);
+        Block blk;
+        blk.add(python_list_to_vector<Stock>(stks));
+        return INSUM(blk, ind, mode);
       },
       py::arg("stks"), py::arg("ind"), py::arg("mode"));
     m.def(
       "INSUM",
       [](const py::sequence stks, const KQuery& query, const Indicator& ind, int mode) {
-          Block blk;
-          blk.add(python_list_to_vector<Stock>(stks));
-          return INSUM(blk, query, ind, mode);
+        Block blk;
+        blk.add(python_list_to_vector<Stock>(stks));
+        return INSUM(blk, query, ind, mode);
       },
       py::arg("stks"), py::arg("query"), py::arg("ind"), py::arg("mode"),
       R"(INSUM(stks, query, ind, mode)
