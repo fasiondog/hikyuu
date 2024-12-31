@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1131</width>
+    <width>1269</width>
     <height>690</height>
    </rect>
   </property>
@@ -375,12 +375,12 @@
               <widget class="QDateEdit" name="min5_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>0</hour>
+                 <hour>16</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
                  <month>12</month>
-                 <day>31</day>
+                 <day>30</day>
                 </datetime>
                </property>
                <property name="calendarPopup">
@@ -427,12 +427,12 @@
               <widget class="QDateEdit" name="day_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>0</hour>
+                 <hour>16</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
                  <month>12</month>
-                 <day>31</day>
+                 <day>30</day>
                 </datetime>
                </property>
                <property name="calendarPopup">

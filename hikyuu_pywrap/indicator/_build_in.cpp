@@ -664,7 +664,14 @@ void export_Indicator_build_in(py::module& m) {
     :rtype: Indicator)");
 
     m.def("CONTEXT", py::overload_cast<>(hku::CONTEXT));
-    m.def("CONTEXT", py::overload_cast<const Indicator&>(hku::CONTEXT));
+    m.def("CONTEXT", py::overload_cast<const Indicator&>(hku::CONTEXT), R"(CONTEXT(ind)
+    
+    独立上下文。使用 ind 自带的上下文。当指定新的上下文时，不会改变已有的上下文。
+    例如：ind = CLOSE(k1), 当指定新的上下文 ind = ind(k2) 时，使用的是 k2 的收盘价。如想仍使用 k1 收盘价，
+    则需使用 ind = CONTEXT(CLOSE(k1)), 此时 ind(k2) 将仍旧使用 k1 的收盘价。
+    
+    :param Indicator ind: 指标对象
+    :rtype: Indicator)");
 
     m.def(
       "PRICELIST",
