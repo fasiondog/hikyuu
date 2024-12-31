@@ -98,7 +98,7 @@ target("core")
             os.trycp(target:targetdir() .. '/*.so', dst_dir)
             os.trycp(target:targetdir() .. '/*.so.*', dst_dir)
             if not is_plat("cross") then
-                os.trymv(target:targetdir() .. '/core.so', dst_obj .. ".so")
+                os.trymv(dst_dir .. '/core.so', dst_obj .. ".so")
             end
         end
 
