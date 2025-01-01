@@ -125,7 +125,7 @@ Indicator HKU_API CONTEXT(const Indicator& ind) {
 
 KData HKU_API CONTEXT_K(const Indicator& ind) {
     auto imp = ind.getImp();
-    IContext* p = dynamic_cast<IContext*>(imp.get());
+    IContext const* p = dynamic_cast<IContext const*>(imp.get());
     if (p != nullptr) {
         return p->getContextKdata();
     }

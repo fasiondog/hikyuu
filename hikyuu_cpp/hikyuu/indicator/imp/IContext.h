@@ -14,7 +14,7 @@ namespace hku {
 class IContext : public IndicatorImp {
 public:
     IContext();
-    IContext(const Indicator& ref_ind);
+    explicit IContext(const Indicator& ref_ind);
     virtual ~IContext();
 
     virtual string str() const override;

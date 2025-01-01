@@ -26,7 +26,7 @@ void IIsLastBar::_calculate(const Indicator &data) {
     size_t total = data.size();
     if (isLeaf()) {
         KData k = getContext();
-        size_t total = k.size();
+        total = k.size();
         _readyBuffer(total, 1);
         if (total >= 1) {
             auto *dst = this->data();

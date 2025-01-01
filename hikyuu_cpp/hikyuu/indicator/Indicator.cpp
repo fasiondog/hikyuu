@@ -100,7 +100,7 @@ Indicator Indicator::operator()(const Indicator& ind) {
     HKU_IF_RETURN(!m_imp, Indicator());
     HKU_IF_RETURN(!ind.getImp(), Indicator(m_imp));
 
-    IndicatorImp* context_ptr = dynamic_cast<IContext*>(m_imp.get());
+    IndicatorImp const* context_ptr = dynamic_cast<IContext const*>(m_imp.get());
     if (context_ptr != nullptr) {
         auto p = make_shared<IContext>(ind);
         return p->calculate();
