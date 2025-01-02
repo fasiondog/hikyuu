@@ -361,7 +361,7 @@ Indicator MultiFactorBase::getIC(int ndays) {
 
     result.setDiscard(discard);
 
-    Indicator (*spearman)(const Indicator&, const Indicator&, int) = hku::SPEARMAN;
+    Indicator (*spearman)(const Indicator&, const Indicator&, int, bool) = hku::SPEARMAN;
     if (!getParam<bool>("use_spearman")) {
         spearman = hku::CORR;
     }
@@ -376,7 +376,7 @@ Indicator MultiFactorBase::getIC(int ndays) {
         }
         auto a = PRICELIST(tmp);
         auto b = PRICELIST(tmp_return);
-        auto ic = spearman(a, b, ind_count);
+        auto ic = spearman(a, b, ind_count, true);
         dst[i] = ic[ic.size() - 1];
     }
 

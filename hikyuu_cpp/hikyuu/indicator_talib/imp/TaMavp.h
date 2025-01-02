@@ -14,7 +14,7 @@ namespace hku {
 class TaMavp : public IndicatorImp {
 public:
     TaMavp();
-    TaMavp(const Indicator& ref_ind, int min_n, int max_n, int matype);
+    TaMavp(const Indicator& ref_ind, int min_n, int max_n, int matype, bool fill_null);
     virtual ~TaMavp();
 
     virtual void _checkParam(const string& name) const override;

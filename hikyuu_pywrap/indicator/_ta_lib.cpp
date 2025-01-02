@@ -24,16 +24,18 @@
     m.def(#func, py::overload_cast<const Indicator&, int>(func), py::arg("data"), \
           py::arg("n") = period, doc);
 
-#define TA_IN2_OUT_PY(func, description)                                                       \
-    m.def(#func, py::overload_cast<>(func));                                                   \
-    m.def(#func, py::overload_cast<const Indicator&, const Indicator&>(func), py::arg("ind1"), \
-          py::arg("ind2"),                                                                     \
+#define TA_IN2_OUT_PY(func, description)                                            \
+    m.def(#func, py::overload_cast<bool>(func), py::arg("fill_null") = true);       \
+    m.def(#func, py::overload_cast<const Indicator&, const Indicator&, bool>(func), \
+          py::arg("ind1"), py::arg("ind2"), py::arg("fill_null") = true,            \
           description "\n\n:param Indicator ind1: input1\n:param Indicator ind2: input2");
 
-#define TA_IN2_OUT_N_PY(func, period, description)                                 \
-    m.def(#func, py::overload_cast<int>(func), py::arg("n") = period);             \
-    m.def(#func, py::overload_cast<const Indicator&, const Indicator&, int>(func), \
-          py::arg("ind1"), py::arg("ind2"), py::arg("n") = period, description);
+#define TA_IN2_OUT_N_PY(func, period, description)                                              \
+    m.def(#func, py::overload_cast<int, bool>(func), py::arg("n") = period,                     \
+          py::arg("fill_null") = true);                                                         \
+    m.def(#func, py::overload_cast<const Indicator&, const Indicator&, int, bool>(func),        \
+          py::arg("ind1"), py::arg("ind2"), py::arg("n") = period, py::arg("fill_null") = true, \
+          description);
 
 #define TA_K_OUT_PY(func, doc)               \
     m.def(#func, py::overload_cast<>(func)); \
@@ -380,17 +382,21 @@ void export_Indicator_ta_lib(py::module& m) {
 :param float fast_limit: Fast limit (From 0.01 to 0.99)
 :param float slow_limit: Slow limit (From 0.01 to 0.99))");
 
-    m.def("TA_MAVP", py::overload_cast<const Indicator&, int, int, int>(TA_MAVP),
-          py::arg("ref_ind"), py::arg("min_n") = 2, py::arg("max_n") = 30, py::arg("matype") = 0);
-    m.def("TA_MAVP", py::overload_cast<const Indicator&, const Indicator&, int, int, int>(TA_MAVP),
+    m.def("TA_MAVP", py::overload_cast<const Indicator&, int, int, int, bool>(TA_MAVP),
+          py::arg("ref_ind"), py::arg("min_n") = 2, py::arg("max_n") = 30, py::arg("matype") = 0,
+          py::arg("fill_null") = true);
+    m.def("TA_MAVP",
+          py::overload_cast<const Indicator&, const Indicator&, int, int, int, bool>(TA_MAVP),
           py::arg("ind1"), py::arg("ind2"), py::arg("min_n") = 2, py::arg("max_n") = 30,
-          py::arg("matype") = 0, R"(TA_MAVP - Moving average with variable period
+          py::arg("fill_null") = true, py::arg("matype") = 0,
+          R"(TA_MAVP - Moving average with variable period
 
 :param Indicator ind1: input1
 :param Indicator ind2: input2
 :param int min_n: Value less than minimum will be changed to Minimum period (From 2 to 100000)
 :param int max_n: Value higher than maximum will be changed to Maximum period (From 2 to 100000)
-:param int matype: Type of Moving Average)");
+:param int matype: Type of Moving Average
+:param bool fill_null: 日期对齐时，缺失日期数据填充nan值)");
 
     TA_IN1_OUT_N_PY(TA_MAX, 30, R"(TA_MAX - Highest value over a specified period
 

@@ -18,10 +18,13 @@ namespace hku {
 
 ICorr::ICorr() : IndicatorImp("CORR") {
     setParam<int>("n", 10);
+    setParam<bool>("fill_null", true);
 }
 
-ICorr::ICorr(const Indicator& ref_ind, int n) : IndicatorImp("CORR"), m_ref_ind(ref_ind) {
+ICorr::ICorr(const Indicator& ref_ind, int n, bool fill_null)
+: IndicatorImp("CORR"), m_ref_ind(ref_ind) {
     setParam<int>("n", n);
+    setParam<bool>("fill_null", fill_null);
 }
 
 ICorr::~ICorr() {}
@@ -118,12 +121,12 @@ void ICorr::_calculate(const Indicator& ind) {
     m_discard = (m_discard + 2 < total) ? m_discard + 2 : total;
 }
 
-Indicator HKU_API CORR(const Indicator& ref_ind, int n) {
-    return Indicator(make_shared<ICorr>(ref_ind, n));
+Indicator HKU_API CORR(const Indicator& ref_ind, int n, bool fill_null) {
+    return Indicator(make_shared<ICorr>(ref_ind, n, fill_null));
 }
 
-Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n) {
-    auto p = make_shared<ICorr>(ind2, n);
+Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n, bool fill_null) {
+    auto p = make_shared<ICorr>(ind2, n, fill_null);
     Indicator result(p);
     return result(ind1);
 }

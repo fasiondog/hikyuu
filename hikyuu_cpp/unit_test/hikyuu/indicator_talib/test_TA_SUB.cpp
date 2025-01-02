@@ -11,7 +11,6 @@
 #include <hikyuu/indicator_talib/ta_crt.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
-#include <hikyuu/indicator/crt/ALIGN.h>
 
 using namespace hku;
 

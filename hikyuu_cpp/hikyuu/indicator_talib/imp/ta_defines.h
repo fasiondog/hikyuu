@@ -35,7 +35,7 @@
     class Cls_##func : public IndicatorImp {                       \
     public:                                                        \
         Cls_##func();                                              \
-        Cls_##func(const Indicator& ref_ind);                      \
+        Cls_##func(const Indicator& ref_ind, bool fill_null);      \
         virtual ~Cls_##func();                                     \
         virtual void _calculate(const Indicator& data) override;   \
         virtual IndicatorImpPtr _clone() override;                 \
@@ -56,8 +56,8 @@
     class Cls_##func : public IndicatorImp {                         \
     public:                                                          \
         Cls_##func();                                                \
-        explicit Cls_##func(int n);                                  \
-        Cls_##func(const Indicator& ref_ind, int n);                 \
+        explicit Cls_##func(int n, bool fill_null);                  \
+        Cls_##func(const Indicator& ref_ind, int n, bool fill_null); \
         virtual ~Cls_##func();                                       \
         virtual void _checkParam(const string& name) const override; \
         virtual void _calculate(const Indicator& data) override;     \

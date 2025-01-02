@@ -19,12 +19,14 @@ IPriceList::IPriceList() : IndicatorImp("PRICELIST", 1) {
     setParam<int>("result_index", 0);
     setParam<PriceList>("data", PriceList());
     setParam<int>("discard", 0);
+    setParam<bool>("fill_null", true);
 }
 
 IPriceList::IPriceList(const PriceList& data, int in_discard) : IndicatorImp("PRICELIST", 1) {
     setParam<int>("result_index", 0);
     setParam<PriceList>("data", data);
     setParam<int>("discard", in_discard);
+    setParam<bool>("fill_null", true);
 }
 
 IPriceList::~IPriceList() {}
@@ -56,7 +58,7 @@ void IPriceList::_calculate(const Indicator& data) {
 
         if (k != Null<KData>() && align_dates.size() > 0) {
             // 如果本身是时间序列，则使用时间进行对齐
-            auto tmp = ALIGN(PRICELIST(x, align_dates, x_discard), k);
+            auto tmp = ALIGN(PRICELIST(x, align_dates, x_discard), k, getParam<bool>("fill_null"));
             HKU_ASSERT(tmp.size() == total);
             auto* dst = this->data();
             auto* src = x.data();

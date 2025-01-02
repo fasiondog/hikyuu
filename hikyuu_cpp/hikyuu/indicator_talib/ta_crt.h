@@ -35,13 +35,14 @@
         return func(IndParam(n))(data);                                \
     }
 
-#define TA_IN2_OUT_CRT(func)                                              \
-    Indicator HKU_API func(const Indicator& ind1, const Indicator& ind2); \
-    Indicator HKU_API func();
+#define TA_IN2_OUT_CRT(func)                                                                     \
+    Indicator HKU_API func(const Indicator& ind1, const Indicator& ind2, bool fill_null = true); \
+    Indicator HKU_API func(bool fill_null = true);
 
-#define TA_IN2_OUT_N_CRT(func, period)                                                    \
-    Indicator HKU_API func(const Indicator& ind1, const Indicator& ind2, int n = period); \
-    Indicator HKU_API func(int n = period);
+#define TA_IN2_OUT_N_CRT(func, period)                                                   \
+    Indicator HKU_API func(const Indicator& ind1, const Indicator& ind2, int n = period, \
+                           bool fill_null = true);                                       \
+    Indicator HKU_API func(int n = period, bool fill_null = true);
 
 #define TA_K_OUT_CRT(func)    \
     Indicator HKU_API func(); \
@@ -209,10 +210,11 @@ inline Indicator TA_MAMA(const Indicator& ind, double fast_limit = 5.000000e-1,
     return TA_MAMA(fast_limit, slow_limit)(ind);
 }
 
-Indicator HKU_API TA_MAVP(const Indicator& ref_ind, int min_n = 2, int max_n = 30, int matype = 0);
+Indicator HKU_API TA_MAVP(const Indicator& ref_ind, int min_n = 2, int max_n = 30, int matype = 0,
+                          bool fill_null = true);
 inline Indicator TA_MAVP(const Indicator& ind1, const Indicator& ind2, int min_n = 2,
-                         int max_n = 30, int matype = 0) {
-    return TA_MAVP(ind2, min_n, max_n, matype)(ind1);
+                         int max_n = 30, int matype = 0, bool fill_null = true) {
+    return TA_MAVP(ind2, min_n, max_n, matype, fill_null)(ind1);
 }
 
 TA_IN1_OUT_N_CRT(TA_MAX, 30)

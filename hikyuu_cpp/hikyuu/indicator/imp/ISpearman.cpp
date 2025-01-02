@@ -18,11 +18,13 @@ namespace hku {
 
 ISpearman::ISpearman() : IndicatorImp("SPEARMAN") {
     setParam<int>("n", 0);
+    setParam<bool>("fill_null", true);
 }
 
-ISpearman::ISpearman(const Indicator &ref_ind, int n)
+ISpearman::ISpearman(const Indicator &ref_ind, int n, bool fill_null)
 : IndicatorImp("SPEARMAN"), m_ref_ind(ref_ind) {
     setParam<int>("n", n);
+    setParam<bool>("fill_null", fill_null);
 }
 
 ISpearman::~ISpearman() {}
@@ -91,7 +93,7 @@ void ISpearman::_calculate(const Indicator &ind) {
             ref = CVAL(ind, 0.) + ref;
         }
     } else if (m_ref_ind.size() != ind.size()) {
-        ref = ALIGN(m_ref_ind, ind);
+        ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));
     }
 
     int n = getParam<int>("n");
@@ -147,12 +149,12 @@ void ISpearman::_calculate(const Indicator &ind) {
     }
 }
 
-Indicator HKU_API SPEARMAN(const Indicator &ref_ind, int n) {
-    return Indicator(make_shared<ISpearman>(ref_ind, n));
+Indicator HKU_API SPEARMAN(const Indicator &ref_ind, int n, bool fill_null) {
+    return Indicator(make_shared<ISpearman>(ref_ind, n, fill_null));
 }
 
-Indicator HKU_API SPEARMAN(const Indicator &ind, const Indicator &ref_ind, int n) {
-    auto p = make_shared<ISpearman>(ref_ind, n);
+Indicator HKU_API SPEARMAN(const Indicator &ind, const Indicator &ref_ind, int n, bool fill_null) {
+    auto p = make_shared<ISpearman>(ref_ind, n, fill_null);
     Indicator result(p);
     return result(ind);
 }

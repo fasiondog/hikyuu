@@ -16,9 +16,13 @@ BOOST_CLASS_EXPORT(hku::IContext)
 
 namespace hku {
 
-IContext::IContext() : IndicatorImp("CONTEXT") {}
+IContext::IContext() : IndicatorImp("CONTEXT") {
+    setParam<bool>("fill_null", true);
+}
 
-IContext::IContext(const Indicator& ref_ind) : IndicatorImp("CONTEXT"), m_ref_ind(ref_ind) {}
+IContext::IContext(const Indicator& ref_ind) : IndicatorImp("CONTEXT"), m_ref_ind(ref_ind) {
+    setParam<bool>("fill_null", true);
+}
 
 IContext::~IContext() {}
 
@@ -88,10 +92,10 @@ void IContext::_calculate(const Indicator& ind) {
             // 如果参考指标是时间序列，自按当前上下文日期查询条件查询后按日期对齐
             auto self_stk = self_k.getStock();
             ref = m_ref_ind(self_stk.getKData(in_k.getQuery()));
-            ref = ALIGN(ref, in_k, true);
+            ref = ALIGN(ref, in_k, getParam<bool>("fill_null"));
         } else if (self_dates.size() > 1) {
             // 无上下文的时间序列
-            ref = ALIGN(ref, in_k);
+            ref = ALIGN(ref, in_k, getParam<bool>("fill_null"));
         }
     }
 
@@ -114,12 +118,15 @@ void IContext::_calculate(const Indicator& ind) {
     }
 }
 
-Indicator HKU_API CONTEXT() {
-    return Indicator(make_shared<IContext>());
+Indicator HKU_API CONTEXT(bool fill_null) {
+    auto p = make_shared<IContext>();
+    p->setParam<bool>("fill_null", fill_null);
+    return Indicator(p);
 }
 
-Indicator HKU_API CONTEXT(const Indicator& ind) {
+Indicator HKU_API CONTEXT(const Indicator& ind, bool fill_null) {
     auto p = make_shared<IContext>(ind);
+    p->setParam<bool>("fill_null", fill_null);
     return p->calculate();
 }
 

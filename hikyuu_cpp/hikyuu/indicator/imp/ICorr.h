@@ -14,7 +14,7 @@ namespace hku {
 class ICorr : public IndicatorImp {
 public:
     ICorr();
-    ICorr(const Indicator& ref_ind, int n);
+    ICorr(const Indicator& ref_ind, int n, bool fill_null);
     virtual ~ICorr();
 
     virtual void _checkParam(const string& name) const override;

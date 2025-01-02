@@ -15,8 +15,8 @@ namespace hku {
  * 独立上下文指标
  * @ingroup Indicator
  */
-Indicator HKU_API CONTEXT(const Indicator& ind);
-Indicator HKU_API CONTEXT();
+Indicator HKU_API CONTEXT(const Indicator& ind, bool fill_null = true);
+Indicator HKU_API CONTEXT(bool fill_null = true);
 
 /**
  * 获取指标上下文

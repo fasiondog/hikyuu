@@ -92,7 +92,7 @@ void IIc::_calculate(const Indicator& inputInd) {
     m_discard = discard;
     HKU_IF_RETURN(m_discard >= days_total, void());
 
-    Indicator (*spearman)(const Indicator&, const Indicator&, int) = hku::SPEARMAN;
+    Indicator (*spearman)(const Indicator&, const Indicator&, int, bool) = hku::SPEARMAN;
     if (!getParam<bool>("use_spearman")) {
         spearman = hku::CORR;
     }
@@ -108,7 +108,7 @@ void IIc::_calculate(const Indicator& inputInd) {
         }
         auto a = PRICELIST(tmp);
         auto b = PRICELIST(tmp_return);
-        auto ic = spearman(a, b, stk_count);
+        auto ic = spearman(a, b, stk_count, true);
         dst[i] = ic[ic.size() - 1];
     }
 

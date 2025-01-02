@@ -488,11 +488,11 @@ Indicator (*ZHBOND10_2)(const DatetimeList&, double) = ZHBOND10;
 Indicator (*ZHBOND10_3)(const KData& k, double) = ZHBOND10;
 Indicator (*ZHBOND10_4)(const Indicator&, double) = ZHBOND10;
 
-Indicator (*CORR_1)(const Indicator&, int) = CORR;
-Indicator (*CORR_2)(const Indicator&, const Indicator&, int) = CORR;
+Indicator (*CORR_1)(const Indicator&, int, bool) = CORR;
+Indicator (*CORR_2)(const Indicator&, const Indicator&, int, bool) = CORR;
 
-Indicator (*SPEARMAN_1)(const Indicator&, int) = SPEARMAN;
-Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int) = SPEARMAN;
+Indicator (*SPEARMAN_1)(const Indicator&, int, bool) = SPEARMAN;
+Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int, bool) = SPEARMAN;
 
 Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
 Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
@@ -663,14 +663,16 @@ void export_Indicator_build_in(py::module& m) {
     :param data: 输入数据 KData
     :rtype: Indicator)");
 
-    m.def("CONTEXT", py::overload_cast<>(hku::CONTEXT));
-    m.def("CONTEXT", py::overload_cast<const Indicator&>(hku::CONTEXT), R"(CONTEXT(ind)
+    m.def("CONTEXT", py::overload_cast<bool>(hku::CONTEXT), py::arg("fill_null") = true);
+    m.def("CONTEXT", py::overload_cast<const Indicator&, bool>(hku::CONTEXT), py::arg("ind"),
+          py::arg("fill_null") = true, R"(CONTEXT(ind)
     
     独立上下文。使用 ind 自带的上下文。当指定新的上下文时，不会改变已有的上下文。
     例如：ind = CLOSE(k1), 当指定新的上下文 ind = ind(k2) 时，使用的是 k2 的收盘价。如想仍使用 k1 收盘价，
     则需使用 ind = CONTEXT(CLOSE(k1)), 此时 ind(k2) 将仍旧使用 k1 的收盘价。
     
     :param Indicator ind: 指标对象
+    :param bool fill_null: 日期对齐时，缺失日期对应填充空值
     :rtype: Indicator)");
 
     m.def("CONTEXT_K", CONTEXT_K, R"(CONTEXT_K(ind)
@@ -964,8 +966,9 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind2: 指标2
     :rtype: Indicator)");
 
-    m.def("CORR", CORR_1, py::arg("ref_ind"), py::arg("n") = 10);
+    m.def("CORR", CORR_1, py::arg("ref_ind"), py::arg("n") = 10, py::arg("fill_null") = true);
     m.def("CORR", CORR_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 10,
+          py::arg("fill_null") = true,
           R"(CORR(ind, ref_ind, n)
 
     计算 ind 和 ref_ind 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
@@ -974,6 +977,7 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind: 指标1
     :param Indicator ref_ind: 指标2
     :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
+    :param bool fill_null: 日期对齐时缺失日期填充nan值
     :rtype: Indicator)");
 
     m.def("IF", IF_1);
@@ -1765,15 +1769,18 @@ void export_Indicator_build_in(py::module& m) {
     :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
     :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值)");
 
-    m.def("SPEARMAN", SPEARMAN_1, py::arg("ref_ind"), py::arg("n") = 0);
+    m.def("SPEARMAN", SPEARMAN_1, py::arg("ref_ind"), py::arg("n") = 0,
+          py::arg("fill_null") = true);
     m.def("SPEARMAN", SPEARMAN_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 0,
+          py::arg("fill_null") = true,
           R"(SPEARMAN(ind, ref_ind[, n])
 
     Spearman 相关系数。与 SPEARMAN(ref_ind, n)(ind) 等效。
 
     :param Indicator ind: 输入参数1
     :param Indicator ref_ind: 输入参数2
-    :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度)");
+    :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度
+    :param bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据)");
 
     // IR(const Indicator& p, const Indicator& b, int n = 100)
     m.def("IR", IR, py::arg("p"), py::arg("b"), py::arg("n") = 100, R"(IR(p, b[, n])

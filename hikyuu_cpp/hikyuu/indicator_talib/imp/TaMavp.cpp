@@ -24,14 +24,15 @@ TaMavp::TaMavp() : IndicatorImp("TA_MAVP", 1) {
     setParam<int>("min_n", 2);
     setParam<int>("max_n", 30);
     setParam<int>("matype", 0);
+    setParam<bool>("fill_null", true);
 }
 
-TaMavp::TaMavp(const Indicator& ref_ind, int min_n, int max_n, int matype)
+TaMavp::TaMavp(const Indicator& ref_ind, int min_n, int max_n, int matype, bool fill_null)
 : IndicatorImp("TA_MAVP", 1), m_ref_ind(ref_ind) {
     setParam<int>("min_n", min_n);
     setParam<int>("max_n", max_n);
     setParam<int>("matype", matype);
-    m_name = fmt::format("TA_MAVP({})", ref_ind.formula());
+    setParam<bool>("fill_null", fill_null);
 }
 
 TaMavp::~TaMavp() {}
@@ -69,7 +70,7 @@ void TaMavp::_calculate(const Indicator& ind) {
             ref = CVAL(ind, 0.) + ref;
         }
     } else if (m_ref_ind.size() != ind.size()) {
-        ref = ALIGN(m_ref_ind, ind);
+        ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));
     }
 
     int min_n = getParam<int>("min_n");
@@ -97,8 +98,9 @@ void TaMavp::_calculate(const Indicator& ind) {
     HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 
-Indicator HKU_API TA_MAVP(const Indicator& ref_ind, int min_n, int max_n, int matype) {
-    return Indicator(make_shared<TaMavp>(ref_ind, min_n, max_n, matype));
+Indicator HKU_API TA_MAVP(const Indicator& ref_ind, int min_n, int max_n, int matype,
+                          bool fill_null) {
+    return Indicator(make_shared<TaMavp>(ref_ind, min_n, max_n, matype, fill_null));
 }
 
 }  // namespace hku

@@ -447,81 +447,90 @@
         return Indicator(p);                                                               \
     }
 
-#define TA_IN2_OUT1_IMP(func, func_lookback)                                                \
-    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                    \
-    Cls_##func::Cls_##func(const Indicator &ref_ind)                                        \
-    : IndicatorImp(#func, 1), m_ref_ind(ref_ind) {}                                         \
-    Cls_##func::~Cls_##func() {}                                                            \
-    IndicatorImpPtr Cls_##func::_clone() {                                                  \
-        auto p = make_shared<Cls_##func>();                                                 \
-        p->m_ref_ind = m_ref_ind.clone();                                                   \
-        return p;                                                                           \
-    }                                                                                       \
-                                                                                            \
-    void Cls_##func::_calculate(const Indicator &ind) {                                     \
-        size_t total = ind.size();                                                          \
-        HKU_IF_RETURN(total == 0, void());                                                  \
-                                                                                            \
-        _readyBuffer(total, 1);                                                             \
-                                                                                            \
-        auto k = getContext();                                                              \
-        m_ref_ind.setContext(k);                                                            \
-        Indicator ref = m_ref_ind;                                                          \
-        auto dates = ref.getDatetimeList();                                                 \
-        if (dates.empty()) {                                                                \
-            if (ref.size() > ind.size()) {                                                  \
-                ref = SLICE(ref, ref.size() - ind.size(), ref.size());                      \
-            } else if (ref.size() < ind.size()) {                                           \
-                ref = CVAL(ind, 0.) + ref;                                                  \
-            }                                                                               \
-        } else if (m_ref_ind.size() != ind.size()) {                                        \
-            ref = ALIGN(m_ref_ind, ind);                                                    \
-        }                                                                                   \
-                                                                                            \
-        int lookback = func_lookback();                                                     \
-        if (lookback < 0) {                                                                 \
-            m_discard = total;                                                              \
-            return;                                                                         \
-        }                                                                                   \
-                                                                                            \
-        size_t in_discard = std::max(ind.discard(), ref.discard());                         \
-        m_discard = lookback + in_discard;                                                  \
-        if (m_discard >= total) {                                                           \
-            m_discard = total;                                                              \
-            return;                                                                         \
-        }                                                                                   \
-                                                                                            \
-        const auto *src0 = ind.data();                                                      \
-        const auto *src1 = ref.data();                                                      \
-        auto *dst = this->data();                                                           \
-        int outBegIdx;                                                                      \
-        int outNbElement;                                                                   \
-        func(m_discard, total - 1, src0, src1, &outBegIdx, &outNbElement, dst + m_discard); \
-        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);        \
-    }                                                                                       \
-                                                                                            \
-    Indicator HKU_API func() {                                                              \
-        return Indicator(make_shared<Cls_##func>());                                        \
-    }                                                                                       \
-                                                                                            \
-    Indicator HKU_API func(const Indicator &ind1, const Indicator &ind2) {                  \
-        auto p = make_shared<Cls_##func>(ind2);                                             \
-        Indicator result(p);                                                                \
-        return result(ind1);                                                                \
+#define TA_IN2_OUT1_IMP(func, func_lookback)                                                      \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                           \
+        setParam<bool>("fill_null", true);                                                        \
+    }                                                                                             \
+    Cls_##func::Cls_##func(const Indicator &ref_ind, bool fill_null)                              \
+    : IndicatorImp(#func, 1), m_ref_ind(ref_ind) {                                                \
+        setParam<bool>("fill_null", fill_null);                                                   \
+    }                                                                                             \
+    Cls_##func::~Cls_##func() {}                                                                  \
+    IndicatorImpPtr Cls_##func::_clone() {                                                        \
+        auto p = make_shared<Cls_##func>();                                                       \
+        p->m_ref_ind = m_ref_ind.clone();                                                         \
+        return p;                                                                                 \
+    }                                                                                             \
+                                                                                                  \
+    void Cls_##func::_calculate(const Indicator &ind) {                                           \
+        size_t total = ind.size();                                                                \
+        HKU_IF_RETURN(total == 0, void());                                                        \
+                                                                                                  \
+        _readyBuffer(total, 1);                                                                   \
+                                                                                                  \
+        auto k = getContext();                                                                    \
+        m_ref_ind.setContext(k);                                                                  \
+        Indicator ref = m_ref_ind;                                                                \
+        auto dates = ref.getDatetimeList();                                                       \
+        if (dates.empty()) {                                                                      \
+            if (ref.size() > ind.size()) {                                                        \
+                ref = SLICE(ref, ref.size() - ind.size(), ref.size());                            \
+            } else if (ref.size() < ind.size()) {                                                 \
+                ref = CVAL(ind, 0.) + ref;                                                        \
+            }                                                                                     \
+        } else if (m_ref_ind.size() != ind.size()) {                                              \
+            ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));                             \
+        }                                                                                         \
+                                                                                                  \
+        int lookback = func_lookback();                                                           \
+        if (lookback < 0) {                                                                       \
+            m_discard = total;                                                                    \
+            return;                                                                               \
+        }                                                                                         \
+                                                                                                  \
+        size_t in_discard = std::max(ind.discard(), ref.discard());                               \
+        m_discard = lookback + in_discard;                                                        \
+        if (m_discard >= total) {                                                                 \
+            m_discard = total;                                                                    \
+            return;                                                                               \
+        }                                                                                         \
+                                                                                                  \
+        const auto *src0 = ind.data();                                                            \
+        const auto *src1 = ref.data();                                                            \
+        auto *dst = this->data();                                                                 \
+        int outBegIdx;                                                                            \
+        int outNbElement;                                                                         \
+        func(m_discard, total - 1, src0, src1, &outBegIdx, &outNbElement, dst + m_discard);       \
+        HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);              \
+    }                                                                                             \
+                                                                                                  \
+    Indicator HKU_API func(bool fill_null = true) {                                               \
+        auto p = make_shared<Cls_##func>();                                                       \
+        p->setParam<bool>("fill_null", fill_null);                                                \
+        return Indicator(p);                                                                      \
+    }                                                                                             \
+                                                                                                  \
+    Indicator HKU_API func(const Indicator &ind1, const Indicator &ind2, bool fill_null = true) { \
+        auto p = make_shared<Cls_##func>(ind2, fill_null);                                        \
+        Indicator result(p);                                                                      \
+        return result(ind1);                                                                      \
     }
 
 #define TA_IN2_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)                 \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                        \
         setParam<int>("n", period);                                                            \
+        setParam<bool>("fill_null", true);                                                     \
     }                                                                                          \
                                                                                                \
-    Cls_##func::Cls_##func(int n) : IndicatorImp(#func, 1) {                                   \
+    Cls_##func::Cls_##func(int n, bool fill_null) : IndicatorImp(#func, 1) {                   \
         setParam<int>("n", n);                                                                 \
+        setParam<bool>("fill_null", fill_null);                                                \
     }                                                                                          \
                                                                                                \
-    Cls_##func::Cls_##func(const Indicator &ref_ind, int n)                                    \
+    Cls_##func::Cls_##func(const Indicator &ref_ind, int n, bool fill_null)                    \
     : IndicatorImp(#func, 1), m_ref_ind(ref_ind) {                                             \
         setParam<int>("n", n);                                                                 \
+        setParam<bool>("fill_null", fill_null);                                                \
     }                                                                                          \
                                                                                                \
     Cls_##func::~Cls_##func() {}                                                               \
@@ -556,7 +565,7 @@
                 ref = CVAL(ind, 0.) + ref;                                                     \
             }                                                                                  \
         } else if (m_ref_ind.size() != ind.size()) {                                           \
-            ref = ALIGN(m_ref_ind, ind);                                                       \
+            ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));                          \
         }                                                                                      \
                                                                                                \
         int n = getParam<int>("n");                                                            \
@@ -582,12 +591,13 @@
         HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);           \
     }                                                                                          \
                                                                                                \
-    Indicator HKU_API func(int n) {                                                            \
-        return Indicator(make_shared<Cls_##func>(n));                                          \
+    Indicator HKU_API func(int n, bool fill_null = true) {                                     \
+        return Indicator(make_shared<Cls_##func>(n, fill_null));                               \
     }                                                                                          \
                                                                                                \
-    Indicator HKU_API func(const Indicator &ind1, const Indicator &ind2, int n) {              \
-        auto p = make_shared<Cls_##func>(ind2, n);                                             \
+    Indicator HKU_API func(const Indicator &ind1, const Indicator &ind2, int n,                \
+                           bool fill_null = true) {                                            \
+        auto p = make_shared<Cls_##func>(ind2, n, fill_null);                                  \
         HKU_WARN_IF(ind2.size() == 0, "The lenght of ind2 is zero!");                          \
         Indicator result(p);                                                                   \
         return result(ind1);                                                                   \
