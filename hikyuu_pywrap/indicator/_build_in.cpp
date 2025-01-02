@@ -969,7 +969,7 @@ void export_Indicator_build_in(py::module& m) {
     m.def("CORR", CORR_1, py::arg("ref_ind"), py::arg("n") = 10, py::arg("fill_null") = true);
     m.def("CORR", CORR_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 10,
           py::arg("fill_null") = true,
-          R"(CORR(ind, ref_ind, n)
+          R"(CORR(ind, ref_ind[, n=10, fill_null=True])
 
     计算 ind 和 ref_ind 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
     与 CORR(ref_ind, n)(ind) 等效。
@@ -1778,7 +1778,7 @@ void export_Indicator_build_in(py::module& m) {
           py::arg("fill_null") = true);
     m.def("SPEARMAN", SPEARMAN_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 0,
           py::arg("fill_null") = true,
-          R"(SPEARMAN(ind, ref_ind[, n])
+          R"(SPEARMAN(ind, ref_ind[, n=0, fill_null=True])
 
     Spearman 相关系数。与 SPEARMAN(ref_ind, n)(ind) 等效。
 
