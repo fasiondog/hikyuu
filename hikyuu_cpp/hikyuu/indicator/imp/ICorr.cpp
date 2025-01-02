@@ -59,7 +59,7 @@ void ICorr::_calculate(const Indicator& ind) {
             ref = CVAL(ind, 0.) + ref;
         }
     } else if (m_ref_ind.size() != ind.size()) {
-        ref = ALIGN(m_ref_ind, ind);
+        ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));
     }
 
     int n = getParam<int>("n");

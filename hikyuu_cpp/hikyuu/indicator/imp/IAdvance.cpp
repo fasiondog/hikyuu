@@ -25,6 +25,7 @@ IAdvance::IAdvance() : IndicatorImp("ADVANCE", 1) {
     setParam<string>("market", "SH");
     setParam<int>("stk_type", STOCKTYPE_A);
     setParam<bool>("ignore_context", false);
+    setParam<bool>("fill_null", true);
 }
 
 IAdvance::~IAdvance() {}
@@ -71,7 +72,7 @@ void IAdvance::_calculate(const Indicator& ind) {
     _readyBuffer(total, 1);
 
     auto* dst = this->data();
-    Indicator x = ALIGN(CLOSE() > REF(CLOSE(), 1), dates);
+    Indicator x = ALIGN(CLOSE() > REF(CLOSE(), 1), dates, getParam<bool>("fill_null"));
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
         if ((stk_type <= STOCKTYPE_TMP && iter->type() != stk_type) ||
             (market != "" && iter->market() != market)) {
@@ -92,12 +93,13 @@ void IAdvance::_calculate(const Indicator& ind) {
 }
 
 Indicator HKU_API ADVANCE(const KQuery& query, const string& market, int stk_type,
-                          bool ignore_context) {
+                          bool ignore_context, bool fill_null) {
     IndicatorImpPtr p = make_shared<IAdvance>();
     p->setParam<KQuery>("query", query);
     p->setParam<string>("market", market);
     p->setParam<int>("stk_type", stk_type);
     p->setParam<bool>("ignore_context", ignore_context);
+    p->setParam<bool>("fill_null", fill_null);
     p->calculate();
     return Indicator(p);
 }
