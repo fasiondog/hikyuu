@@ -228,7 +228,7 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
     示例：
     #选出涨停股
     C = CLOSE()
-    x = select(C / REF(C, 1) - 1 >= 0.0995))
+    x = select(C / REF(C, 1) - 1 >= 0.0995)
 
     :param Indicator cond: 条件指标
     :param Datetime start: 起始日期
@@ -248,9 +248,11 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
 
         q = Query(start, end)
         k = s.get_kdata(q)
+        if len(k) == 0 or k[-1].datetime != d[-1]:
+            continue
+
         cond.set_context(k)
-        if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k
-                                                                                      ) > 0 and k[-1].datetime == d[-1]:
+        if len(cond) > 0 and not isnan(cond[-1]) and cond[-1] > 0:
             result.append(s)
             if print_out:
                 print(d[-1], s)
