@@ -1564,7 +1564,7 @@ void export_Indicator_build_in(py::module& m) {
     :param KData k: 上下文
     :rtype: Indicator)");
 
-    m.def("DMA", DMA, R"(DMA(ind, a)
+    m.def("DMA", DMA, R"(DMA(ind, a[, fill_null=True])
 
     动态移动平均
 
@@ -1576,6 +1576,7 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator ind: 输入数据
     :param Indicator a: 动态系数
+    :param bool fill_null: 日期对齐时缺失数据填充 nan 值。
     :rtype: Indicator)");
 
     m.def("AVEDEV", AVEDEV_1, py::arg("data"), py::arg("n") = 22);
