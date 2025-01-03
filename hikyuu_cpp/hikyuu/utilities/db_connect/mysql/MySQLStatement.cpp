@@ -84,7 +84,8 @@ void MySQLStatement::_prepare(DBConnectBase* driver) {
     std::string stmt_errorstr(mysql_stmt_error(m_stmt));
     mysql_stmt_close(m_stmt);
     m_stmt = nullptr;
-    HKU_THROW("Failed prepare statement: {}! error msg: {}!", m_sql_string, stmt_errorstr);
+    HKU_THROW("Failed prepare statement: {}! ret: {}, error msg: {}!", m_sql_string, ret,
+              stmt_errorstr);
 }
 
 void MySQLStatement::_reset() {
