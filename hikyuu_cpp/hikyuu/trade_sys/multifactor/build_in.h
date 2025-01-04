@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "crt/MF_Weight.h"
 #include "crt/MF_EqualWeight.h"
 #include "crt/MF_ICWeight.h"
 #include "crt/MF_ICIRWeight.h"
