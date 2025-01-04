@@ -31,6 +31,7 @@ void IResult::_checkParam(const string& name) const {
 
 void IResult::_calculate(const Indicator& ind) {
     int result_ix = getParam<int>("result_ix");
+    HKU_IF_RETURN(ind.empty(), void());  // 为公式时，ind 可能尚无计算，此时还没有结果数据
     HKU_CHECK(result_ix < ind.getResultNumber(),
               "The input indicator has only {} results, but result_ix({}) is out_of range!",
               ind.getResultNumber(), result_ix);
