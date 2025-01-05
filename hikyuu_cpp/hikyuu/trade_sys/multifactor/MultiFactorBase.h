@@ -10,7 +10,7 @@
 #include "hikyuu/KData.h"
 #include "ScoreRecord.h"
 
-#define MF_USE_MULTI_THREAD 0
+#define MF_USE_MULTI_THREAD 1
 
 namespace hku {
 

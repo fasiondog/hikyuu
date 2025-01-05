@@ -33,10 +33,17 @@ vector<Indicator> WeightMultiFactor::_calculate(const vector<vector<Indicator>>&
     vector<price_t> sumByDate(days_total);
     vector<Indicator> all_factors(stk_count);
     for (size_t si = 0; si < stk_count; si++) {
-        memset(sumByDate.data(), 0, sizeof(price_t) * days_total);
+        memset(sumByDate.data(), Null<price_t>(), sizeof(price_t) * days_total);
 
+        size_t discard = 0;
         const auto& curStkInds = all_stk_inds[si];
-        for (size_t di = 0; di < days_total; di++) {
+        for (size_t ii = 0; ii < ind_count; ii++) {
+            if (curStkInds[ii].discard() > discard) {
+                discard = curStkInds[ii].discard();
+            }
+        }
+
+        for (size_t di = discard; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
                 const auto& value = curStkInds[ii][di];
                 if (!std::isnan(value)) {
@@ -49,7 +56,7 @@ vector<Indicator> WeightMultiFactor::_calculate(const vector<vector<Indicator>>&
         all_factors[si].name("IC");
 
         // 更新 discard
-        for (size_t di = 0; di < days_total; di++) {
+        for (size_t di = discard; di < days_total; di++) {
             if (!std::isnan(all_factors[si][di])) {
                 all_factors[si].setDiscard(di);
                 break;
@@ -66,8 +73,15 @@ vector<Indicator> WeightMultiFactor::_calculate(const vector<vector<Indicator>>&
     return parallel_for_index(0, stk_count, [&](size_t si) {
         vector<price_t> sumByDate(days_total);
 
+        size_t discard = 0;
         const auto& curStkInds = all_stk_inds[si];
-        for (size_t di = 0; di < days_total; di++) {
+        for (size_t ii = 0; ii < ind_count; ii++) {
+            if (curStkInds[ii].discard() > discard) {
+                discard = curStkInds[ii].discard();
+            }
+        }
+
+        for (size_t di = discard; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
                 const auto& value = curStkInds[ii][di];
                 if (!std::isnan(value)) {
@@ -80,7 +94,7 @@ vector<Indicator> WeightMultiFactor::_calculate(const vector<vector<Indicator>>&
         ret.name("IC");
 
         // 更新 discard
-        for (size_t di = 0; di < days_total; di++) {
+        for (size_t di = discard; di < days_total; di++) {
             if (!std::isnan(ret[di])) {
                 ret.setDiscard(di);
                 break;
