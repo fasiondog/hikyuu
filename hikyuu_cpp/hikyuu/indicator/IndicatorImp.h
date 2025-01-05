@@ -115,7 +115,8 @@ public:
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
 
-    string formula() const;
+    virtual string formula() const;
+    virtual string str() const;
 
     bool isLeaf() const;
 
@@ -142,13 +143,15 @@ public:
     typedef std::map<string, IndicatorImpPtr> ind_param_map_t;
     const ind_param_map_t& getIndParams() const;
 
-    value_t* data(size_t result_num = 0);
-    value_t const* data(size_t result_num = 0) const;
+    value_t* data(size_t result_idx = 0);
+    value_t const* data(size_t result_idx = 0) const;
 
     // ===================
     //  子类接口
     // ===================
-    virtual void _calculate(const Indicator&) {}
+    virtual void _calculate(const Indicator&) {
+        HKU_WARN("{} will be empty always!", m_name);
+    }
 
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
@@ -391,12 +394,12 @@ inline bool IndicatorImp::haveIndParam(const string& name) const {
     return m_ind_params.find(name) != m_ind_params.end();
 }
 
-inline IndicatorImp::value_t* IndicatorImp::data(size_t result_num) {
-    return m_pBuffer[result_num] ? m_pBuffer[result_num]->data() : nullptr;
+inline IndicatorImp::value_t* IndicatorImp::data(size_t result_idx) {
+    return m_pBuffer[result_idx] ? m_pBuffer[result_idx]->data() : nullptr;
 }
 
-inline IndicatorImp::value_t const* IndicatorImp::data(size_t result_num) const {
-    return m_pBuffer[result_num] ? m_pBuffer[result_num]->data() : nullptr;
+inline IndicatorImp::value_t const* IndicatorImp::data(size_t result_idx) const {
+    return m_pBuffer[result_idx] ? m_pBuffer[result_idx]->data() : nullptr;
 }
 
 inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t discard) {

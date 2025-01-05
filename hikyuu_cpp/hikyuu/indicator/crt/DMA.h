@@ -25,9 +25,10 @@ namespace hku {
  * </pre>
  * @param ind1 待计算的数据
  * @param a 动态系数
+ * @param fill_null 日期对齐时缺失数据填充nan值
  * @ingroup Indicator
  */
-Indicator HKU_API DMA(const Indicator& x, const Indicator& a);
+Indicator HKU_API DMA(const Indicator& x, const Indicator& a, bool fill_null = true);
 
 }  // namespace hku
 

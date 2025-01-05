@@ -24,21 +24,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-#===============================================================================
+# ===============================================================================
 # history:
 # 1. 20100220, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 from .drawplot import (use_draw_engine,
                        get_current_draw_engine,
                        show_gcf,
-                       create_figure, 
+                       create_figure,
                        ax_set_locator_formatter,
                        adjust_axes_show,
                        ax_draw_macd,
                        ax_draw_macd2,
                        gca,
                        gcf)
+from .drawplot import (RGB, DRAWNULL, STICKLINE, DRAWBAND, PLOYLINE, DRAWLINE,
+                       DRAWTEXT, DRAWNUMBER, DRAWTEXT_FIX, DRAWNUMBER_FIX, DRAWSL, DRAWIMG,
+                       DRAWICON, DRAWBMP, SHOWICONS, DRAWRECTREL)
 
 from . import volume as vl
 from . import elder as el
@@ -49,11 +52,14 @@ __all__ = [
     'vl', 'el', 'kf',
     'use_draw_engine',
     'get_current_draw_engine',
-    'create_figure', 
+    'create_figure',
     'ax_set_locator_formatter',
     'adjust_axes_show',
     'ax_draw_macd',
     'ax_draw_macd2',
     'gcf', 'gca',
-    'show_gcf'
-    ]
+    'show_gcf',
+    'DRAWNULL', 'STICKLINE',
+    'DRAWBAND', 'RGB', 'PLOYLINE', 'DRAWLINE', 'DRAWTEXT', 'DRAWNUMBER', 'DRAWTEXT_FIX',
+    'DRAWNUMBER_FIX', 'DRAWSL', 'DRAWIMG', 'DRAWICON', 'DRAWBMP', 'SHOWICONS', 'DRAWRECTREL'
+]

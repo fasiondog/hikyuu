@@ -20,7 +20,7 @@ namespace hku {
 class IDma : public IndicatorImp {
 public:
     IDma();
-    explicit IDma(const Indicator& ref_a);
+    explicit IDma(const Indicator& ref_a, bool fill_null);
     virtual ~IDma();
 
     virtual void _checkParam(const string& name) const override;
@@ -28,7 +28,7 @@ public:
     virtual IndicatorImpPtr _clone() override;
 
 private:
-    Indicator m_ref_a;
+    Indicator m_ref_ind;
 
 //============================================
 // 序列化支持
@@ -39,7 +39,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(IndicatorImp);
-        ar& BOOST_SERIALIZATION_NVP(m_ref_a);
+        ar& BOOST_SERIALIZATION_NVP(m_ref_ind);
     }
 #endif
 };

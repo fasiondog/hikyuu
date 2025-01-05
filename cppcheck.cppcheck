@@ -11,6 +11,10 @@
         <define name="TABLE_BIND6"/>
         <define name="TABLE_BIND3"/>
         <define name="TABLE_BIND4"/>
+        <define name="HKU_ENABLE_INI_PARSER=1"/>
+        <define name="HKU_SUPPORT_DATETIME=1"/>
+        <define name="HKU_ENABLE_HTTP_CLIENT=1"/>
+        <define name="HKU_ENABLE_MO=1"/>
     </defines>
     <undefines>
         <undefine>int64_t</undefine>

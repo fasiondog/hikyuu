@@ -8,6 +8,7 @@
 
 * :py:func:`ALIGN` - 按指定的参考日期对齐
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
+* :py:func:`CONTEXT` - 独立上下文
 * :py:func:`DROPNA` - 删除 nan 值
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
 * :py:func:`RESULT` - 以指标公式的方式返回指定指标中相应的结果集

@@ -7,6 +7,7 @@
 
 #include "Indicator.h"
 #include "crt/CVAL.h"
+#include "imp/IContext.h"
 
 namespace hku {
 
@@ -98,6 +99,13 @@ Indicator Indicator::getResult(size_t num) const {
 Indicator Indicator::operator()(const Indicator& ind) {
     HKU_IF_RETURN(!m_imp, Indicator());
     HKU_IF_RETURN(!ind.getImp(), Indicator(m_imp));
+
+    IndicatorImp const* context_ptr = dynamic_cast<IContext const*>(m_imp.get());
+    if (context_ptr != nullptr) {
+        auto p = make_shared<IContext>(ind);
+        return p->calculate();
+    }
+
     IndicatorImpPtr p = m_imp->clone();
     if (m_imp->alike(*ind.getImp())) {
         return Indicator(p);

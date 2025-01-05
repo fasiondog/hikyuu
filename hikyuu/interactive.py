@@ -176,8 +176,8 @@ for s in blocksz:
         blockzxb.add(s)
 zsbk_zxb = blockzxb
 
-zsbk_sz50 = sm.get_block("指数板块", "上证50")
-zsbk_sz180 = sm.get_block("指数板块", "上证180")
+zsbk_sh50 = sm.get_block("指数板块", "上证50")
+zsbk_sh180 = sm.get_block("指数板块", "上证180")
 zsbk_hs300 = sm.get_block("指数板块", "沪深300")
 zsbk_zz100 = sm.get_block("指数板块", "中证100")
 
@@ -228,7 +228,7 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
     示例：
     #选出涨停股
     C = CLOSE()
-    x = select(C / REF(C, 1) - 1 >= 0.0995))
+    x = select(C / REF(C, 1) - 1 >= 0.0995)
 
     :param Indicator cond: 条件指标
     :param Datetime start: 起始日期
@@ -248,9 +248,11 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
 
         q = Query(start, end)
         k = s.get_kdata(q)
+        if len(k) == 0 or k[-1].datetime != d[-1]:
+            continue
+
         cond.set_context(k)
-        if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k
-                                                                                      ) > 0 and k[-1].datetime == d[-1]:
+        if len(cond) > 0 and not isnan(cond[-1]) and cond[-1] > 0:
             result.append(s)
             if print_out:
                 print(d[-1], s)

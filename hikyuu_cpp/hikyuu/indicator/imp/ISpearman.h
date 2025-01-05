@@ -14,8 +14,7 @@ namespace hku {
 class ISpearman : public IndicatorImp {
 public:
     ISpearman();
-    explicit ISpearman(int n);
-    ISpearman(const Indicator& ref_ind, int n);
+    ISpearman(const Indicator& ref_ind, int n, bool fill_null);
     virtual ~ISpearman();
 
     virtual void _checkParam(const string& name) const override;

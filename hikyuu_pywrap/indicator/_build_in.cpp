@@ -488,11 +488,11 @@ Indicator (*ZHBOND10_2)(const DatetimeList&, double) = ZHBOND10;
 Indicator (*ZHBOND10_3)(const KData& k, double) = ZHBOND10;
 Indicator (*ZHBOND10_4)(const Indicator&, double) = ZHBOND10;
 
-Indicator (*CORR_1)(int) = CORR;
-Indicator (*CORR_2)(const Indicator&, const Indicator&, int) = CORR;
+Indicator (*CORR_1)(const Indicator&, int, bool) = CORR;
+Indicator (*CORR_2)(const Indicator&, const Indicator&, int, bool) = CORR;
 
-Indicator (*SPEARMAN_1)(int) = SPEARMAN;
-Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int) = SPEARMAN;
+Indicator (*SPEARMAN_1)(const Indicator&, int, bool) = SPEARMAN;
+Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int, bool) = SPEARMAN;
 
 Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
 Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
@@ -662,6 +662,25 @@ void export_Indicator_build_in(py::module& m) {
 
     :param data: 输入数据 KData
     :rtype: Indicator)");
+
+    m.def("CONTEXT", py::overload_cast<bool>(hku::CONTEXT), py::arg("fill_null") = true);
+    m.def("CONTEXT", py::overload_cast<const Indicator&, bool>(hku::CONTEXT), py::arg("ind"),
+          py::arg("fill_null") = true, R"(CONTEXT(ind)
+    
+    独立上下文。使用 ind 自带的上下文。当指定新的上下文时，不会改变已有的上下文。
+    例如：ind = CLOSE(k1), 当指定新的上下文 ind = ind(k2) 时，使用的是 k2 的收盘价。如想仍使用 k1 收盘价，
+    则需使用 ind = CONTEXT(CLOSE(k1)), 此时 ind(k2) 将仍旧使用 k1 的收盘价。
+    
+    :param Indicator ind: 指标对象
+    :param bool fill_null: 日期对齐时，缺失日期对应填充空值
+    :rtype: Indicator)");
+
+    m.def("CONTEXT_K", CONTEXT_K, R"(CONTEXT_K(ind)
+
+    获取指标上下文。Indicator::getContext()方法获取的是当前的上下文，但对于 CONTEXT 独立上下文指标无法获取其指定的独立上下文，需用此方法获取
+
+    :param Indicator ind: 指标对象
+    :rtype: KData)");
 
     m.def(
       "PRICELIST",
@@ -947,15 +966,18 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind2: 指标2
     :rtype: Indicator)");
 
-    m.def("CORR", CORR_1, py::arg("n") = 10);
-    m.def("CORR", CORR_2, py::arg("ind1"), py::arg("ind2"), py::arg("n") = 10,
-          R"(CORR(ind1, ind2, n)
+    m.def("CORR", CORR_1, py::arg("ref_ind"), py::arg("n") = 10, py::arg("fill_null") = true);
+    m.def("CORR", CORR_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 10,
+          py::arg("fill_null") = true,
+          R"(CORR(ind, ref_ind[, n=10, fill_null=True])
 
-    计算 ind1 和 ind2 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
+    计算 ind 和 ref_ind 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
+    与 CORR(ref_ind, n)(ind) 等效。
 
-    :param Indicator ind1: 指标1
-    :param Indicator ind2: 指标2
+    :param Indicator ind: 指标1
+    :param Indicator ref_ind: 指标2
     :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
+    :param bool fill_null: 日期对齐时缺失日期填充nan值
     :rtype: Indicator)");
 
     m.def("IF", IF_1);
@@ -1542,7 +1564,7 @@ void export_Indicator_build_in(py::module& m) {
     :param KData k: 上下文
     :rtype: Indicator)");
 
-    m.def("DMA", DMA, R"(DMA(ind, a)
+    m.def("DMA", DMA, R"(DMA(ind, a[, fill_null=True])
 
     动态移动平均
 
@@ -1554,6 +1576,7 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator ind: 输入数据
     :param Indicator a: 动态系数
+    :param bool fill_null: 日期对齐时缺失数据填充 nan 值。
     :rtype: Indicator)");
 
     m.def("AVEDEV", AVEDEV_1, py::arg("data"), py::arg("n") = 22);
@@ -1670,6 +1693,7 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def("ADVANCE", ADVANCE, py::arg("query") = KQueryByIndex(-100), py::arg("market") = "SH",
           py::arg("stk_type") = STOCKTYPE_A, py::arg("ignore_context") = false,
+          py::arg("fill_null") = true,
           R"(ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
 
     上涨家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
@@ -1678,10 +1702,12 @@ void export_Indicator_build_in(py::module& m) {
     :param str market: 所属市场，等于 "" 时，获取所有市场
     :param int stk_type: 证券类型, 大于 constant.STOCKTYPE_TMP 时，获取所有类型证券
     :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
+    :para. bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据
     :rtype: Indicator)");
 
     m.def("DECLINE", DECLINE, py::arg("query") = KQueryByIndex(-100), py::arg("market") = "SH",
           py::arg("stk_type") = STOCKTYPE_A, py::arg("ignore_context") = false,
+          py::arg("fill_null") = true,
           R"(DECLINE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
 
     下跌家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
@@ -1690,6 +1716,7 @@ void export_Indicator_build_in(py::module& m) {
     :param str market: 所属市场，等于 "" 时，获取所有市场
     :param int stk_type: 证券类型, 大于 constant.STOCKTYPE_TMP 时，获取所有类型证券
     :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
+    :param bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据
     :rtype: Indicator)");
 
     m.def("SLICE", SLICE_1, py::arg("data"), py::arg("start"), py::arg("end"));
@@ -1747,15 +1774,18 @@ void export_Indicator_build_in(py::module& m) {
     :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
     :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值)");
 
-    m.def("SPEARMAN", SPEARMAN_1, py::arg("n") = 0);
-    m.def("SPEARMAN", SPEARMAN_2, py::arg("ind1"), py::arg("ind2"), py::arg("n") = 0,
-          R"(SPEARMAN(ind1, ind2[, n])
+    m.def("SPEARMAN", SPEARMAN_1, py::arg("ref_ind"), py::arg("n") = 0,
+          py::arg("fill_null") = true);
+    m.def("SPEARMAN", SPEARMAN_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 0,
+          py::arg("fill_null") = true,
+          R"(SPEARMAN(ind, ref_ind[, n=0, fill_null=True])
 
-    Spearman 相关系数
+    Spearman 相关系数。与 SPEARMAN(ref_ind, n)(ind) 等效。
 
-    :param Indicator ind1: 输入参数1
-    :param Indicator ind2: 输入参数2
-    :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度)");
+    :param Indicator ind: 输入参数1
+    :param Indicator ref_ind: 输入参数2
+    :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度
+    :param bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据)");
 
     // IR(const Indicator& p, const Indicator& b, int n = 100)
     m.def("IR", IR, py::arg("p"), py::arg("b"), py::arg("n") = 100, R"(IR(p, b[, n])
@@ -1914,11 +1944,13 @@ void export_Indicator_build_in(py::module& m) {
     :param Sequence stks: stock list
     :param Query query: 统计范围)");
 
-    m.def("INSUM", py::overload_cast<const Block&, const Indicator&, int>(INSUM), py::arg("block"),
-          py::arg("ind"), py::arg("mode"));
-    m.def("INSUM", py::overload_cast<const Block&, const KQuery&, const Indicator&, int>(INSUM),
+    m.def("INSUM", py::overload_cast<const Block&, const Indicator&, int, bool>(INSUM),
+          py::arg("block"), py::arg("ind"), py::arg("mode"), py::arg("fill_null") = true);
+    m.def("INSUM",
+          py::overload_cast<const Block&, const KQuery&, const Indicator&, int, bool>(INSUM),
           py::arg("block"), py::arg("query"), py::arg("ind"), py::arg("mode"),
-          R"(INSUM(block, query, ind, mode)
+          py::arg("fill_null") = true,
+          R"(INSUM(block, query, ind, mode[, fill_null=True])
 
     返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
 
@@ -1926,25 +1958,28 @@ void export_Indicator_build_in(py::module& m) {
     :param Query query: 指定范围
     :param Indicator ind: 指定指标
     :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    :param bool fill_null: 日期对齐时缺失数据填充 nan 值。
     :rtype: Indicator)");
 
     m.def(
       "INSUM",
-      [](const py::sequence stks, const Indicator& ind, int mode) {
+      [](const py::sequence stks, const Indicator& ind, int mode, bool fill_null) {
           Block blk;
           blk.add(python_list_to_vector<Stock>(stks));
           return INSUM(blk, ind, mode);
       },
-      py::arg("stks"), py::arg("ind"), py::arg("mode"));
+      py::arg("stks"), py::arg("ind"), py::arg("mode"), py::arg("fill_null") = true);
     m.def(
       "INSUM",
-      [](const py::sequence stks, const KQuery& query, const Indicator& ind, int mode) {
+      [](const py::sequence stks, const KQuery& query, const Indicator& ind, int mode,
+         bool fill_null) {
           Block blk;
           blk.add(python_list_to_vector<Stock>(stks));
           return INSUM(blk, query, ind, mode);
       },
       py::arg("stks"), py::arg("query"), py::arg("ind"), py::arg("mode"),
-      R"(INSUM(stks, query, ind, mode)
+      py::arg("fill_null") = true,
+      R"(INSUM(stks, query, ind, mode[, fill_null=True])
 
     返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
 
@@ -1952,5 +1987,16 @@ void export_Indicator_build_in(py::module& m) {
     :param Query query: 指定范围
     :param Indicator ind: 指定指标
     :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    :param bool fill_null: 日期对齐时缺失数据填充 nan 值。
+    :rtype: Indicator)");
+
+    m.def("ISLASTBAR", py::overload_cast<>(ISLASTBAR));
+    m.def("ISLASTBAR", py::overload_cast<const KData&>(ISLASTBAR), py::arg("data"));
+    m.def("ISLASTBAR", py::overload_cast<const Indicator&>(ISLASTBAR), py::arg("data"),
+          R"(ISLASTBAR(ind)
+
+    判断当前数据是否为最后一个数据，若为最后一个数据，则返回1，否则返回0.
+
+    :param Indicator|KData data: 指定指标
     :rtype: Indicator)");
 }

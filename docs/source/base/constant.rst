@@ -27,7 +27,31 @@
     
 .. py:data:: blockg
 
-    :py:class:`Block` 实例，包含全部创业板股票    
+    :py:class:`Block` 实例，包含全部创业板股票
+
+.. py:data:: blockstart
+
+    :py:class:`Block` 实例，科创板
+
+.. py:data:: blockzxb
+
+    :py:class:`Block` 实例，中小板
+
+.. py:data:: zsbk_sh50
+
+    :py:class:`Block` 实例，上证500
+
+.. py:data:: zsbk_sh180
+
+    :py:class:`Block` 实例，上证180
+
+.. py:data:: zsbk_hs300
+
+    :py:class:`Block` 实例，沪深300
+
+.. py:data:: zsbk_zz100
+
+    :py:class:`Block` 实例，中证100
 
 
 Null 值及证券类别

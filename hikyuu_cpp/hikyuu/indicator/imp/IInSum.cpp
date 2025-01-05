@@ -25,6 +25,7 @@ IInSum::IInSum() : IndicatorImp("INSUM", 1) {
     setParam<int>("mode", 0);
     setParam<string>("market", "SH");
     setParam<bool>("ignore_context", false);
+    setParam<bool>("fill_null", false);
 }
 
 IInSum::~IInSum() {}
@@ -41,20 +42,21 @@ void IInSum::_checkParam(const string& name) const {
 }
 
 static IndicatorList getAllIndicators(const Block& block, const KQuery& query,
-                                      const DatetimeList& dates, const Indicator& ind) {
+                                      const DatetimeList& dates, const Indicator& ind,
+                                      bool fill_null) {
 #if 0                                        
     IndicatorList ret;
     for (auto iter = block.begin(); iter != block.end(); ++iter) {
         auto k = iter->getKData(query);
-        ret.emplace_back(ALIGN(ind, dates)(k));
+        ret.emplace_back(ALIGN(ind, dates, fill_null)(k));
     }
     return ret;
 #else
     auto stks = block.getStockList();
     return parallel_for_index(0, stks.size(),
-                              [nind = ind.clone(), &stks, &query, &dates](size_t index) {
+                              [nind = ind.clone(), fill_null, &stks, &query, &dates](size_t index) {
                                   auto k = stks[index].getKData(query);
-                                  return ALIGN(nind, dates)(k);
+                                  return ALIGN(nind, dates, fill_null)(k);
                               });
 #endif
 }
@@ -181,7 +183,7 @@ void IInSum::_calculate(const Indicator& ind) {
     HKU_IF_RETURN(total == 0, void());
 
     int mode = getParam<int>("mode");
-    auto inds = getAllIndicators(block, q, dates, ind);
+    auto inds = getAllIndicators(block, q, dates, ind, getParam<bool>("fill_null"));
     auto* dst = this->data();
 
     if (0 == mode) {
@@ -204,17 +206,19 @@ void IInSum::_calculate(const Indicator& ind) {
     }
 }
 
-Indicator HKU_API INSUM(const Block& block, const KQuery& query, const Indicator& ind, int mode) {
+Indicator HKU_API INSUM(const Block& block, const KQuery& query, const Indicator& ind, int mode,
+                        bool fill_null) {
     IndicatorImpPtr p = make_shared<IInSum>();
     p->setParam<KQuery>("query", query);
     p->setParam<Block>("block", block);
     p->setParam<int>("mode", mode);
     p->setParam<bool>("ignore_context", false);
+    p->setParam<bool>("fill_null", fill_null);
     return Indicator(p)(ind);
 }
 
-Indicator HKU_API INSUM(const Block& block, const Indicator& ind, int mode) {
-    return INSUM(block, KQuery(0, 0), ind, mode);
+Indicator HKU_API INSUM(const Block& block, const Indicator& ind, int mode, bool fill_null) {
+    return INSUM(block, KQuery(0, 0), ind, mode, fill_null);
 }
 
 } /* namespace hku */

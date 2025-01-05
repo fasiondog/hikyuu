@@ -20,16 +20,21 @@ void initInnerTask() {
 void reloadHikyuuTask() {
     // 先停止行情接收
     auto* agent = getGlobalSpotAgent();
-    agent->stop();
+    bool agent_running = agent->isRunning();
+    if (agent_running) {
+        agent->stop();
+    }
 
     // 重新加载数据
     StockManager::instance().reload();
 
     // 重新启动行情接收
-    bool print = agent->getPrintFlag();
-    size_t work_num = agent->getWorkerNum();
-    const string& addr = agent->getServerAddr();
-    startSpotAgent(print, work_num, addr);
+    if (agent_running) {
+        bool print = agent->getPrintFlag();
+        size_t work_num = agent->getWorkerNum();
+        const string& addr = agent->getServerAddr();
+        startSpotAgent(print, work_num, addr);
+    }
 }
 
 }  // namespace hku

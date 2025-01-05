@@ -1,6 +1,28 @@
 版本发布说明
 =======================
 
+2.3.0 - 2025年1月1日
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. 新增特性
+    - C++ 直接内建全部 ta-lib 指标，以 "TA_XXX" 方式命名
+    - matplotlib 绘图增加通达信兼容绘图函数: STICKLINE、DRAWBAND 等
+    - 新增 WMA 指标公式
+    - 新增 CONTEXT 指标，用于指标在不同上下文中进行计算
+
+2. 其他缺陷修复与优化
+    - fixed 动态指标参数增加nan保护处理
+    - fixed windows 下 hub 路径大小写比较
+    - fixed pydatetime_to_Datetime 在传入 Datetime 类型时转换错误
+    - 改进 CORR/SPEARMAN 指标
+    - 改进 clang 下 Parameter 类型比较
+    - 改进 PRICELIST, 在指定上下文时按上下文右对齐，保证等长; 在自身为时间序列时，指定上下文时按日期对齐
+    - 改进 Null, 以便 double/float 类型可以使用 val == Null<double>() 形式判断空值
+    - KData 相等比较时补充 stock 为空但 query 不同的情况，此时认为相等
+    - 消除 matplotlib 下指标绘制时出现的 "linestyle" 告警
+    - 更换项目 logo, 改进 HikyuuTdx 任务栏图标显示
+
+
 2.2.4 - 2024年12月8日
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

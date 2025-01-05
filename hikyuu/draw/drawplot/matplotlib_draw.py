@@ -4,19 +4,27 @@
 交互模式下绘制相关图形，如K线图，美式K线图
 """
 import sys
+import os
 import datetime
 import logging
 import numpy as np
 import matplotlib
-from pylab import Rectangle, gca, figure, ylabel, axes, draw
+import math
+from typing import Union
+from matplotlib.pylab import Rectangle, gca, gcf, figure, ylabel, axes, draw
 from matplotlib import rcParams
 from matplotlib.font_manager import FontManager, _log as fm_logger
 from matplotlib.lines import Line2D, TICKLEFT, TICKRIGHT
 from matplotlib.ticker import FuncFormatter, FixedLocator
+from matplotlib.image import imread
 
 from hikyuu import *
+from hikyuu import constant, isnan, Indicator, KData, IF
 
 from .common import get_draw_title
+
+
+ICON_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 def set_mpl_params():
@@ -63,7 +71,7 @@ def create_two_axes_figure(figsize=(10, 8)):
     """生成一个含有2个坐标轴的figure，并返回坐标轴列表
 
     :param figsize: (宽, 高)
-    :return: (ax1, ax2)    
+    :return: (ax1, ax2)
     """
     rect1 = [0.05, 0.35, 0.9, 0.60]
     rect2 = [0.05, 0.05, 0.9, 0.30]
@@ -339,6 +347,7 @@ def iplot(
     text_color='k',
     zero_on=False,
     label=None,
+    linestyle='-',
     *args,
     **kwargs
 ):
@@ -369,7 +378,7 @@ def iplot(
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
 
     py_indicatr = [None if x == constant.null_price else x for x in indicator]
-    axes.plot(py_indicatr, '-', label=label, *args, **kwargs)
+    axes.plot(py_indicatr, linestyle=linestyle, label=label, *args, **kwargs)
 
     if legend_on:
         leg = axes.legend(loc='upper left')
@@ -835,3 +844,538 @@ def sys_performance(sys, ref_stk=None):
     ax3.xaxis.set_visible(False)
     ax3.yaxis.set_visible(False)
     ax3.set_frame_on(False)
+
+
+# ============================================================================
+# 通达信画图函数
+# ============================================================================
+
+DRAWNULL = constant.null_price
+
+
+def RGB(r: int, g: int, b: int):
+    hku_check(0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255, "r,g,b must in [0,255]!")
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def STICKLINE(cond: Indicator, price1: Indicator, price2: Indicator, width: int = 2.0,
+              empty: bool = False, color='m', alpha=1.0, kdata=None, new=False, axes=None):
+    """在满足cond的条件下，在 price1 和 price2 之间绘制一个宽度为 width 的柱状图。
+
+    注意: cond, price1, price2 应含有数据，否则请指定 kdata 作为指标计算的上下文
+
+    参数说明:
+        cond (Indicator): 条件表达式，用于确定是否绘制柱状线
+        price1 (Indicator): 第一个价格
+        price2 (Indicator): 第二个价格
+        width (int, optional): 柱状宽度. Defaults to 2.0.
+        empty (bool, optional): 空心. Defaults to False.
+        kdata (_type_, optional): 指定的上下文K线. Defaults to None.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 在指定的坐标轴中绘制. Defaults to None.
+        color (str, optional): 颜色. Defaults to 'm'.
+        alpha (float, optional): 透明度. Defaults to 1.0.
+    """
+    hku_check(cond is not None and price1 is not None and price2 is not None, "cond, price1, price2 cannot be None")
+
+    if kdata is not None:
+        cond = cond(kdata)
+        price1 = price1(kdata)
+        price2 = price2(kdata)
+    hku_check(len(cond) == len(price1) == len(price2), "cond, price1, price2 length not match")
+    hku_warn_if(len(cond) <= 0, "cond, price1, price2 length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    width = 0.3 * width
+    OFFSET = width / 2.0
+    for i in range(len(cond)):
+        if cond[i] > 0.:
+            height = abs(price1[i] - price2[i])
+            lower = min(price1[i], price2[i])
+            rect = Rectangle(xy=(i - OFFSET, lower), width=width, height=height,
+                             facecolor=color, edgecolor=color, fill=(not empty))
+            rect.set_alpha(alpha)
+            axes.add_patch(rect)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond) + 1)
+
+
+def DRAWBAND(val1: Indicator, color1='m', val2: Indicator = None, color2='b', kdata=None, alpha=0.2, new=False, axes=None, linestyle='-'):
+    """画出带状线
+
+    用法:DRAWBAND(val1, color1, val2, color2), 当 val1 > val2 时,在 val1 和 val2 之间填充 color1;
+    当 val1 < val2 时,填充 color2,这里的颜色均使用 matplotlib 颜色代码.
+    例如:DRAWBAND(OPEN, 'r', CLOSE, 'b')
+
+    Args:
+        val1 (Indicator): 指标1
+        color1 (str, optional): 颜色1. Defaults to 'm'.
+        val2 (Indicator, optional): 指标2. Defaults to None.
+        color2 (str, optional): 颜色2. Defaults to 'b'.
+        kdata (_type_, optional): 指定指标上下文. Defaults to None.
+        alpha (float, optional): 透明度. Defaults to 0.2.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 在指定的坐标轴中绘制. Defaults to None.
+        linestyle (str, optional): 包络线类型. Defaults to '-'.
+    """
+    hku_check(val1 is not None, "val1 cannot be None")
+
+    if kdata is not None:
+        val1 = val1(kdata)
+        if val2 is not None:
+            val2 = val2(kdata)
+
+    if val2 is None:
+        val2 = CVAL(val1, 0.)
+
+    hku_check(len(val1) == len(val2), "val1, val2 length not match")
+    hku_warn_if(len(val1) <= 0, "val1, val2 length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    cond = IF(val1 <= val2, val1, val2)
+    axes.fill_between(range(cond.discard, len(val1)), val1[cond.discard:], cond[cond.discard:], alpha=alpha,
+                      color=color1, facecolor=color1, edgecolor=color1, linestyle=linestyle)
+
+    cond = IF(val1 > val2, val1, val2)
+    axes.fill_between(range(cond.discard, len(val1)), val1[cond.discard:], cond[cond.discard:], alpha=alpha,
+                      color=color2, facecolor=color2, edgecolor=color2, linestyle=linestyle)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(val1) + 1)
+
+
+def PLOYLINE(cond: Indicator, price: Indicator, kdata: KData = None, color: str = 'm', linewidth=1.0, new=False, axes=None, *args, **kwargs):
+    """在图形上绘制折线段。
+
+    用法：PLOYLINE(COND，PRICE)，当COND条件满足时，以PRICE位置为顶点画折线连接。
+    例如：PLOYLINE(HIGH>=HHV(HIGH,20),HIGH, kdata=k)表示在创20天新高点之间画折线。
+
+    Args:
+        cond (Indicator): 指定条件
+        price (Indicator): 位置
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 颜色. Defaults to 'b'.
+        linewidth (float, optional): 宽度. Defaults to 1.0.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的axes. Defaults to None.
+    """
+    hku_check(cond is not None and price is not None, "cond, price cannot be None")
+
+    ind = IF(cond, price, constant.null_price)
+    if kdata is not None:
+        ind = ind(kdata)
+        price = price(kdata)
+    hku_check(len(ind) == len(price), "cond, price length not match!")
+    hku_warn_if(len(ind) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    # ind.plot(new=new, axes=axes, color=color, linewidth=linewidth, *args, **kwargs)
+    x, y = [], []
+    for i in range(ind.discard, len(ind)):
+        val = ind[i]
+        if not isnan(val):
+            x.append(i)
+            y.append(val)
+    if len(x) > 0:
+        axes.plot(x, y, color=color, linewidth=linewidth, *args, **kwargs)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(ind) + 1)
+
+
+def DRAWLINE(cond1: Indicator, price1: Indicator, cond2: Indicator, price2: Indicator, expand: int = 0, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """在图形上绘制直线段。
+
+    用法：DRAWLINE(cond1, price1, cond2, price2, expand)
+    当COND1条件满足时，在PRICE1位置画直线起点，当COND2条件满足时，在PRICE2位置画直线终点，EXPAND为延长类型。
+    例如：DRAWLINE(HIGH>=HHV(HIGH,20),HIGH,LOW<=LLV(LOW,20),LOW,1)表示在创20天新高与创20天新低之间画直线并且向右延长
+
+    Args:
+        cond1 (Indicator): 条件1
+        price1 (Indicator): 位置1
+        cond2 (Indicator): 条件2
+        price2 (Indicator): 位置2
+        expand (int, optional): 0: 不延长 | 1: 向右延长 | 10: 向左延长 | 11: 双向延长. Defaults to 0.
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 指定颜色. Defaults to 'm'.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+    """
+    hku_check(cond1 is not None and cond2 is not None and price1 is not None and price2 is not None,
+              "cond1, cond2, price1, price2 cannot be None")
+    hku_check(expand in (0, 1, 10, 11), "expand must be 0, 1, 10 or 11")
+
+    if kdata is not None:
+        cond1 = cond1(kdata)
+        price1 = price1(kdata)
+        cond2 = cond2(kdata)
+        price2 = price2(kdata)
+    hku_check(len(cond1) == len(cond2) == len(price1) == len(price2), "cond1, cond2, price1, price2 length not match")
+    hku_warn_if(len(cond1) <= 0, "cond1, cond2, price1, price2 length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    length = len(cond1)
+    x1, y1 = None, None
+    for i in range(cond1.discard, length):
+        cond1_val = cond1[i]
+        if cond1_val > 0.:
+            if x1 is None:
+                x1, y1 = i, price1[i]
+            else:
+                x1, y1 = None, None
+        cond2_val = cond2[i]
+        if cond2_val > 0.:
+            if x1 is not None:
+                if expand == 0:
+                    x = [x1, i]
+                    y = [y1, price2[i]]
+                elif expand == 1:
+                    x = [n for n in range(i, length)]
+                    x.insert(0, x1)
+                    val = price2[i]
+                    y = [val for n in range(i, length)]
+                    y.insert(0, y1)
+                elif expand == 10:
+                    x = [n for n in range(0, i+1)]
+                    val = price2[i]
+                    y = [val for n in range(0, i+1)]
+                elif expand == 11:
+                    x = [n for n in range(0, length)]
+                    val = price2[i]
+                    y = [val for n in range(0, length)]
+                axes.plot(x, y, color=color, *args, **kwargs)
+                x1, y1 = None, None
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond1) + 1)
+
+
+def DRAWTEXT(cond: Indicator, price: Indicator, text: str, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """在图形上显示文字。
+
+    用法: DRAWTEXT(cond, price, text), 当 cond 条件满足时, 在 price 位置书写文字 text。
+    例如: DRAWTEXT(CLOSE/OPEN>1.08,LOW,'大阳线')表示当日实体阳线大于8%时在最低价位置显示'大阳线'字样.
+
+    Args:
+        cond (Indicator): 条件
+        price (Indicator): 显示位置
+        text (str): 待显示文字
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 指定颜色. Defaults to 'm'.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+    """
+    hku_check(cond is not None and price is not None, "cond, price cannot be None")
+
+    if kdata is not None:
+        cond = cond(kdata)
+        price = price(kdata)
+    hku_check(len(cond) == len(price), "cond, price length not match")
+    hku_warn_if(len(cond) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    for i in range(cond.discard, len(cond)):
+        if cond[i] > 0.:
+            axes.text(i, price[i], text, color=color, *args, **kwargs)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond) + 1)
+
+
+def DRAWTEXT_FIX(cond: Indicator, x: float, y: float,  type: int, text: str, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """固定位置显示文字
+
+    用法:DRAWTEXT_FIX(cond,x y, text), cond 中一般需要加 ISLASTBAR,当 cond 条件满足时,
+    在当前指标窗口内(X,Y)位置书写文字TEXT,X,Y为书写点在窗口中相对于左上角的百分比
+
+    例如:DRAWTEXT_FIX(ISLASTBAR() & (CLOSE/OPEN>1.08),0.5,0.5,0,'大阳线')表示最后一个交易日实体阳线
+    大于8%时在窗口中间位置显示'大阳线'字样.
+
+    Args:
+        cond (Indicator): 条件
+        x (float): x轴坐标
+        y (float): y轴坐标
+        type (int, optional): 0 左对齐 | 1 右对齐. 
+        text (str): 待显示文字
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 指定颜色. Defaults to 'm'.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定坐标轴. Defaults to None.
+    """
+    hku_check(cond is not None, "cond cannot be None")
+    if kdata is not None:
+        cond = cond(kdata)
+    hku_warn_if(len(cond) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    for i in range(cond.discard, len(cond)):
+        if cond[i] > 0.:
+            axes.text(x, 1-y, text, horizontalalignment='left' if type == 0 else 'right', verticalalignment='top',
+                      transform=axes.transAxes, color=color, *args, **kwargs)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond) + 1)
+
+
+def DRAWNUMBER(cond: Indicator, price: Indicator, number: Indicator, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """画出数字.
+
+    用法:DRAWNUMBER(cond, price, number),当 cond 条件满足时,在 price 位置书写数字 number.
+    例如:DRAWNUMBER(CLOSE/OPEN>1.08,LOW,C)表示当日实体阳线大于8%时在最低价位置显示收盘价。
+
+    Args:
+        cond (Indicator): 条件
+        price (Indicator): 绘制位置
+        number (Indicator): 待绘制数字
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 指定颜色. Defaults to 'm'.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+    """
+    hku_check(cond is not None and price is not None, "cond, price cannot be None")
+
+    if kdata is not None:
+        cond = cond(kdata)
+        price = price(kdata)
+        number = number(kdata)
+    hku_check(len(cond) == len(price), "cond, price, number length not match")
+    hku_warn_if(len(cond) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    for i in range(cond.discard, len(cond)):
+        if cond[i] > 0.:
+            axes.text(i, price[i], str(number[i]), color=color, *args, **kwargs)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond) + 1)
+
+
+def DRAWNUMBER_FIX(cond: Indicator, x: float, y: float, type: int, number: float, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """固定位置显示数字.
+
+    用法:DRAWNUMBER_FIX(cond,x,y,type,number), cond 中一般需要加 ISLASTBAR, 当 cond 条件满足时,
+    在当前指标窗口内 (x, y) 位置书写数字 number, x,y为书写点在窗口中相对于左上角的百分比,type:0为左对齐,1为右对齐。
+
+    例如:DRAWNUMBER_FIX(ISLASTBAR() & (CLOSE/OPEN>1.08), 0.5,0.5,0,C)表示最后一个交易日实体阳线大于8%时在窗口中间位置显示收盘价
+
+    Args:
+        cond (Indicator): _description_
+        x (float): _description_
+        y (float): _description_
+        type (int): _description_
+        number (Indicator): _description_
+        kdata (KData, optional): _description_. Defaults to None.
+        color (str, optional): _description_. Defaults to 'm'.
+        new (bool, optional): _description_. Defaults to False.
+        axes (_type_, optional): _description_. Defaults to None.
+    """
+    DRAWTEXT_FIX(cond, x, y, type, str(number), kdata, color, new, axes, *args, **kwargs)
+
+
+def DRAWSL(cond: Indicator, price: Indicator, slope: Union[Indicator, float, int], length: Union[Indicator, float, int], direct: int, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
+    """绘制斜线.
+
+    用法:DRAWSL(cond,price,slope,length,diect),当 cond 条件满足时,在 price 位置画斜线, slope 为斜率, 
+    lengh为长度, direct 为0向右延伸,1向左延伸,2双向延伸。
+
+    注意:
+    1. K线间的纵向高度差为 slope;
+    2. slope 为 0 时, 为水平线;
+    3. slope 为 10000 时, 为垂直线, length 为向上的像素高度, direct 表示向上或向下延伸
+    4. slope 和 length 支持变量;
+
+    Args:
+        cond (Indicator): 条件指标
+        price (Indicator): 价格
+        slope (int|float|Indicator): 斜率
+        length (int|float|Indicator): 长度
+        direct (int): 方向
+        kdata (KData, optional): 指定的上下文. Defaults to None.
+        color (str, optional): 颜色. Defaults to 'm'.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+    """
+    hku_check(cond is not None and price is not None, "cond, price cannot be None")
+    hku_check(direct in (0, 1, 2), "direct must be 0,1,2")
+
+    if kdata is not None:
+        cond = cond(kdata)
+        price = price(kdata)
+        slope = slope(kdata) if isinstance(slope, Indicator) else [slope for i in range(len(kdata))]
+        length = length(kdata) if isinstance(length, Indicator) else [length for i in range(len(kdata))]
+
+    hku_check(len(cond) == len(price), "cond, price length not match")
+    hku_warn_if(len(cond) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    for i in range(cond.discard, len(cond)):
+        val = price[i]
+        if not isnan(val):
+            if slope[i] < 10000:
+                x = length[i] / math.sqrt(1+slope[i]**2)
+                y = x * slope[i]
+                if direct == 0:
+                    axes.plot([i, i+x], [val, val+y], color=color, *args, **kwargs)
+                elif direct == 1:
+                    axes.plot([i-x, i], [val-y, val], color=color, *args, **kwargs)
+                else:
+                    axes.plot([i-x*0.5, i, i+x*0.5], [val-y*0.5, val, val+y*0.5], color=color, *args, **kwargs)
+            else:
+                y = length[i]
+                if direct == 0:
+                    axes.plot([i, i], [val, val+y], color=color, *args, **kwargs)
+                elif direct == 1:
+                    axes.plot([i, i], [val, val-y], color=color, *args, **kwargs)
+                else:
+                    axes.plot([i, i, i], [val-y*0.5, val, val+y*0.5], color=color, *args, **kwargs)
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(cond) + 1)
+
+
+def DRAWIMG(cond: Indicator, price: Indicator, img: str, kdata: KData = None, new=False, axes=None, *args, **kwargs):
+    """画图片
+
+    用法:DRAWIMG(cond,price,'图像文件文件名'),当条件 cond 满足时,在 price 位置画指定的图片
+    例如:DRAWIMG(O>C,CLOSE, '123.png')。
+
+    Args:
+        cond (Indicator): 指定条件
+        price (Indicator): 指定价格
+        img (str): 图像文件名
+        kdata (KData, optional): 指定上下文. Defaults to None.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 在指定坐标轴中绘制. Defaults to None.
+    """
+    hku_check(cond is not None and price is not None, "cond, price cannot be None")
+
+    if kdata is not None:
+        cond = cond(kdata)
+        price = price(kdata)
+    hku_check(len(cond) == len(price), "cond, price length not match")
+    hku_warn_if(len(cond) <= 0, "cond length <=0")
+
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    image = imread(img)
+
+    p = axes.get_window_extent()
+    pw = p.x1 - p.x0
+    ph = p.y1 - p.y0
+    x0, x1 = axes.get_xlim()
+    y0, y1 = axes.get_ylim()
+    xw = x1 - x0
+    yh = y1 - y0
+    pixel = 20.  # 显示像素大小
+    w = xw / pw * pixel
+    h = yh / ph * pixel
+    for i in range(cond.discard, len(cond)):
+        if cond[i] > 0.:
+            axes.imshow(image, extent=[i-w, i+w, price[i]-h, price[i]+h], *args, **kwargs)
+
+    axes.set_aspect('auto')
+    axes.autoscale_view()
+    axes.set_ylim(y0, y1)
+    axes.set_xlim(-1, len(cond) + 1)
+
+
+DRAWBMP = DRAWIMG
+
+
+def DRAWICON(cond: Indicator, price: Indicator, type: int, kdata: KData = None, new=False, axes=None, *args, **kwargs):
+    DRAWIMG(cond, price, f'{ICON_PATH}/icon/{type}.png', kdata, new, axes, *args, **kwargs)
+
+
+def SHOWICONS():
+    """显示所有内置图标"""
+    axes = create_one_axes_figure([8, 6])
+    p = axes.get_window_extent()
+    pw = p.x1 - p.x0
+    ph = p.y1 - p.y0
+    x0, x1 = axes.get_xlim()
+    y0, y1 = axes.get_ylim()
+    xw = x1 - x0
+    yh = y1 - y0
+    pixel = 100.  # 显示像素大小
+    w = xw / pw * pixel
+    h = yh / ph * pixel
+
+    row, col = 5, 10
+    for i in range(row):
+        for j in range(col):
+            n = i*col+j + 1
+            name = f'{ICON_PATH}/icon/{n}.png'
+            if os.path.exists(name):
+                try:
+                    x = j*w
+                    y = i*h
+                    axes.imshow(imread(name), extent=[x, x+w, 1-(y+h), 1-y])
+                except:
+                    pass
+    axes.set_aspect('auto')
+    axes.autoscale_view()
+    axes.set_ylim(y0, y1)
+    axes.set_xlim(x0, x1)
+
+
+def DRAWRECTREL(left: int, top: int, right: int, bottom: int, color='m', frame=True, fill=True, alpha=0.1, new=False, axes=None, *args, **kwargs):
+    """相对位置上画矩形.
+
+    注意：原点为坐标轴左上角(0, 0)，和 matplotlib 不同。
+    用法: DRAWRECTREL(left,top,right,bottom,color), 以图形窗口 (left, top) 为左上角, (right, bottom) 为
+         右下角绘制矩形, 坐标单位是窗口沿水平和垂直方向的1/1000,取值范围是0—999,超出范围则可能显示在图形窗口外,矩形
+         中间填充颜色COLOR,COLOR为0表示不填充.
+    例如:DRAWRECTREL(0,0,500,500,RGB(255,255,0)) 表示在图形最左上部1/4位置用黄色绘制矩形
+
+    Args:
+        left (int): 左上角x
+        top (int): 左上角y
+        right (int): 右下角x
+        bottom (int): 右下角y
+        color (str, optional): 指定颜色. Defaults to 'm'.
+        frame (bool, optional): 添加边框. Defaults to False.
+        fill (bool, optional): 颜色填充. Defaults to True.
+        alpha (float, optional): 透明度. Defaults to 0.1.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+    """
+    if axes is None:
+        axes = create_figure() if new else gca()
+
+    x0, x1 = axes.get_xlim()
+    y0, y1 = axes.get_ylim()
+    w = x1 - x0
+    h = y1 - y0
+
+    limit = 1000
+    cx = w / limit
+    cy = h / limit
+    x = left * cx + x0
+    y = (limit - bottom) * cy + y0
+    width = (right - left) * cx
+    height = (bottom - top) * cy
+    print(x, y, width, height)
+    if frame:
+        rect = Rectangle(xy=(x, y), width=width, height=height, facecolor=color, edgecolor=color, fill=fill)
+    else:
+        rect = Rectangle(xy=(x, y), width=width, height=height, facecolor=color, fill=fill)
+    rect.set_alpha(alpha)
+    axes.add_patch(rect)

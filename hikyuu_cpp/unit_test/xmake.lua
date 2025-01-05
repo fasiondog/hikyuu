@@ -63,9 +63,25 @@ target("unit-test")
     set_kind("binary")
     set_default(false)
 
+    if get_config("leak_check") then
+        if is_plat("macosx") then
+            add_cxflags("-fsanitize=address")
+            add_ldflags("-fsanitize=address")
+        elseif is_plat("linux") then
+            -- 需要 export LD_PRELOAD=libasan.so
+            set_policy("build.sanitizer.address", true)
+            set_policy("build.sanitizer.leak", true)
+            -- set_policy("build.sanitizer.memory", true)
+            -- set_policy("build.sanitizer.thread", true)
+        end
+    end
+
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
         add_packages("mysql")
+    end
+    if has_config("ta_lib") then
+        add_packages("ta-lib")
     end
 
     add_includedirs("..")
@@ -90,7 +106,11 @@ target("unit-test")
     end
 
     -- add files
-    add_files("**.cpp|hikyuu/real_data/**")
+    add_files("**.cpp|hikyuu/real_data/**|hikyuu/indicator_talib/**.cpp")
+    
+    if has_config("ta_lib") then
+        add_files("hikyuu/indicator_talib/**.cpp")
+    end
 
     before_run(prepare_run)
     after_run(coverage_report)

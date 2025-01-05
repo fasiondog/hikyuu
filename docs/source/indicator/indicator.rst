@@ -212,6 +212,21 @@
     :param data: 输入数据
     :rtype: Indicator
    
+.. py:function:: CONTEXT(ind)
+    
+    独立上下文。使用 ind 自带的上下文。当指定新的上下文时，不会改变已有的上下文。
+    例如：ind = CLOSE(k1), 当指定新的上下文 ind = ind(k2) 时，使用的是 k2 的收盘价。如想仍使用 k1 收盘价，
+    则需使用 ind = CONTEXT(CLOSE(k1)), 此时 ind(k2) 将仍旧使用 k1 的收盘价。
+    
+    :param Indicator ind: 指标对象
+    :rtype: Indicator
+
+.. py:function:: CONTEXT_K(ind)
+
+    获取指标上下文。Indicator::getContext()方法获取的是当前的上下文，但对于 CONTEXT 独立上下文指标无法获取其指定的独立上下文，需用此方法获取
+
+    :param Indicator ind: 指标对象
+    :rtype: KData
 
 .. py:function:: CORR(ind1, ind2, n)
 
