@@ -29,9 +29,8 @@ void IAcos::_calculate(const Indicator &data) {
 
     auto const *src = data.data();
     auto *dst = this->data();
-    value_t null_value = Null<value_t>();
     for (size_t i = m_discard; i < total; ++i) {
-        dst[i] = (src[i] > -1. && src[i] < 1.0) ? std::acos(src[i]) : null_value;
+        dst[i] = std::acos(src[i]);
     }
 }
 

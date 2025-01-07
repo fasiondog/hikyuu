@@ -36,7 +36,7 @@ TEST_CASE("test_LN") {
     CHECK_EQ(result.name(), "LN");
     CHECK_EQ(result.size(), 11);
     CHECK_EQ(result.discard(), 0);
-    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_EQ(result[0], -std::numeric_limits<price_t>::infinity());
     for (int i = 1; i < 10; ++i) {
         CHECK_EQ(result[i], doctest::Approx(std::log(i)));
     }

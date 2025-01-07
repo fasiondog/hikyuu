@@ -28,7 +28,7 @@ TEST_CASE("test_ACOS") {
 
     PriceList a;
     for (int i = 0; i < 10; ++i) {
-        a.push_back(i / 10);
+        a.push_back(i / 9.);
     }
 
     Indicator data = PRICELIST(a);
@@ -44,6 +44,12 @@ TEST_CASE("test_ACOS") {
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result[0], doctest::Approx(std::acos(-0.1)));
+
+    result = ACOS(-1.1);
+    CHECK_UNARY(std::isnan(result[0]));
+
+    result = ACOS(2.1);
+    CHECK_UNARY(std::isnan(result[0]));
 }
 
 //-----------------------------------------------------------------------------
