@@ -67,6 +67,7 @@ struct Constant {
     Constant()
     : null_datetime(Null<Datetime>()),
       inf(std::numeric_limits<double>::infinity()),
+      infa(-std::numeric_limits<double>::infinity()),
       nan(std::numeric_limits<double>::quiet_NaN()),
       null_double(Null<double>()),
       max_double(std::numeric_limits<double>::max()),
@@ -96,6 +97,7 @@ struct Constant {
 
     Datetime null_datetime;
     double inf;
+    double infa;  // 负无穷大
     double nan;
     double null_double;
     double max_double;
@@ -123,7 +125,8 @@ struct Constant {
 void export_Constant(py::module& m) {
     py::class_<Constant>(m, "Constant")
       .def_readonly("null_datetime", &Constant::null_datetime, "无效Datetime")
-      .def_readonly("inf", &Constant::inf, "无穷大或无穷小")
+      .def_readonly("inf", &Constant::inf, "无穷大")
+      .def_readonly("infa", &Constant::infa, "负无穷大")
       .def_readonly("nan", &Constant::nan, "非数字")
       .def_readonly("null_double", &Constant::null_double, "同 nan")
       .def_readonly("max_double", &Constant::max_double, "最大double值")
