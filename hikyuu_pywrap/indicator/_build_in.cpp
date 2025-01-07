@@ -1999,4 +1999,31 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator|KData data: 指定指标
     :rtype: Indicator)");
+
+    m.def("ISNA", py::overload_cast<bool>(ISNA), py::arg("ignore_discard") = false);
+    m.def("ISNA", py::overload_cast<const Indicator&, bool>(ISNA), py::arg("ind"),
+          py::arg("ignore_discard") = false, R"(ISNA(ind[, ignore_discard=False])
+
+    判断指标是否为 nan 值，若为 nan 值, 则返回1, 否则返回0.
+
+    :param Indicator ind: 指定指标
+    :param bool ignore_discard: 忽略指标丢弃数据)");
+
+    m.def("ISINF", py::overload_cast<>(ISINF));
+    m.def("ISINF", py::overload_cast<const Indicator&>(ISINF), py::arg("ind"),
+          R"(ISINF(ind)
+
+    判断指标是否为正无穷大 (+inf) 值，若为 +inf 值, 则返回1, 否则返回0。如判断负无穷大, 使用 ISINFA。
+
+    :param Indicator ind: 指定指标
+    :rtype: Indicator)");
+
+    m.def("ISINFA", py::overload_cast<>(ISINFA));
+    m.def("ISINFA", py::overload_cast<const Indicator&>(ISINFA), py::arg("ind"),
+          R"(ISINFA(ind)
+
+    判断指标是否为负无穷大 (-inf) 值，若为 -inf 值, 则返回1, 否则返回0。如判断正无穷大, 使用 ISINF。
+
+    :param Indicator ind: 指定指标
+    :rtype: Indicator)");
 }
