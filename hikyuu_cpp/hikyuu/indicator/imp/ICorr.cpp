@@ -67,14 +67,19 @@ void ICorr::_calculate(const Indicator& ind) {
         n = total;
     }
 
-    m_discard = std::max(ind.discard(), ref.discard());
-    size_t startPos = m_discard;
+    size_t startPos = std::max(ind.discard(), ref.discard());
+    m_discard = startPos + n - 1;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
     size_t first_end = startPos + n >= total ? total : startPos + n;
 
     auto const* datax = ind.data();
     auto const* datay = ref.data();
-    value_t kx = datax[m_discard];
-    value_t ky = datay[m_discard];
+    value_t kx = datax[startPos];
+    value_t ky = datay[startPos];
     value_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
     value_t ex2 = 0.0, ey2 = 0.0;
     value_t ix, iy;
@@ -86,19 +91,16 @@ void ICorr::_calculate(const Indicator& ind) {
         iy = datay[i] - ky;
         ex += ix;
         ey += iy;
-        value_t powx2 = ix * ix;
-        value_t powy2 = iy * iy;
-        value_t powxy = ix * iy;
-        exy += powxy;
-        ex2 += powx2;
-        ey2 += powy2;
-        size_t nobs = i - startPos;
-        varx = ex2 - powx2 / nobs;
-        vary = ey2 - powy2 / nobs;
-        cov = exy - powxy / nobs;
-        dst0[i] = cov / std::sqrt(varx * vary);
-        dst1[i] = cov / (nobs - 1);
+        ex2 += ix * ix;
+        ey2 += iy * iy;
+        exy += ix * iy;
     }
+
+    varx = ex2 - ex * ex / n;
+    vary = ey2 - ey * ey / n;
+    cov = exy - ex * ey / n;
+    dst0[first_end - 1] = cov / std::sqrt(varx * vary);
+    dst1[first_end - 1] = cov / (n - 1);
 
     for (size_t i = first_end; i < total; i++) {
         ix = datax[i] - kx;
@@ -116,9 +118,6 @@ void ICorr::_calculate(const Indicator& ind) {
         dst0[i] = cov / std::sqrt(varx * vary);
         dst1[i] = cov / (n - 1);
     }
-
-    // 修正 discard
-    m_discard = (m_discard + 2 < total) ? m_discard + 2 : total;
 }
 
 Indicator HKU_API CORR(const Indicator& ref_ind, int n, bool fill_null) {
