@@ -24,8 +24,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import pandas as pd
 from hikyuu.data.hku_config_template import generate_default_config
 from .draw import *
+
+
 __copyright__ = """
 MIT License
 
@@ -246,7 +249,6 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
         if not s.valid:
             continue
 
-        q = Query(start, end)
         k = s.get_kdata(q)
         if len(k) == 0 or k[-1].datetime != d[-1]:
             continue
@@ -258,6 +260,56 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
                 print(d[-1], s)
 
     return result
+
+
+def select2(inds, start=Datetime(201801010000), end=Datetime.now(), stks=None):
+    """导出最后时刻指定证券的所有指定指标值
+
+    如：
+        select2([CLOSE(), VOLUME()], stks=blocka)
+
+    返回一个DataFrame, 列名是指标名称, 行是证券代码和证券名称:
+
+        证券代码  证券名称  CLOSE  VOLUME
+        SH600000 浦发银行  14.09   1000
+        SH600001 中国平安  13.09   2000
+        SZ000001 平安银行  13.09   3000
+        ...
+
+    :param Indicator inds: 指标列表
+    :param Datetime start: 起始日期
+    :param Datetime end: 结束日期（不包括该日期）
+    :param list stks: 指定的证券列表
+    :rtype: pandas.DataFrame
+    """
+    q = Query(start, end)
+    d = sm.get_trading_calendar(q, 'SH')
+    if len(d) == 0:
+        return
+
+    if stks is None:
+        stks = sm
+
+    ind_cols = {'证券代码': [], '证券名称': []}
+    for ind in inds:
+        ind_cols[ind.name] = []
+
+    for s in stks:
+        if not s.valid:
+            continue
+
+        k = s.get_kdata(q)
+        if len(k) == 0 or k[-1].datetime != d[-1]:
+            continue
+
+        ind_cols['证券代码'].append(s.market_code)
+        ind_cols['证券名称'].append(s.name)
+        for ind in inds:
+            x = ind(k)
+            ind_cols[ind.name].append(x[-1])
+
+    df = pd.DataFrame(ind_cols)
+    return df
 
 
 # ==============================================================================
