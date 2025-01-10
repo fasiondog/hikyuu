@@ -24,63 +24,74 @@ IVar::~IVar() {}
 
 void IVar::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 2);
+        int n = getParam<int>(name);
+        HKU_ASSERT(n >= 2 || n == 0);
     }
 }
 
 void IVar::_calculate(const Indicator& data) {
     size_t total = data.size();
-    m_discard = data.discard();
+    HKU_IF_RETURN(total == 0, void());
+
+    int n = getParam<int>("n");
+    if (n == 0) {
+        n = total;
+    }
+
+    m_discard = data.discard() + n - 1;
     if (m_discard >= total) {
         m_discard = total;
         return;
     }
 
-    int n = getParam<int>("n");
-
     auto const* src = data.data();
     auto* dst = this->data();
 
     vector<price_t> pow_buf(data.size());
-    price_t ex = 0.0, ex2 = 0.0;
-    size_t num = 0;
-    size_t start_pos = m_discard;
+
+    size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
-    price_t k = src[start_pos];
+    value_t ex = 0.0, ex2 = 0.0;
+
+    value_t k = src[start_pos];
     for (size_t i = start_pos; i < first_end; i++) {
-        num++;
-        price_t d = src[i] - k;
+        value_t d = src[i] - k;
         ex += d;
-        price_t d_pow = std::pow(d, 2);
+        value_t d_pow = d * d;
         pow_buf[i] = d_pow;
         ex2 += d_pow;
-        dst[i] = num == 1 ? 0. : (ex2 - std::pow(ex, 2) / num) / (num - 1);
     }
 
-    for (size_t i = first_end; i < total; i++) {
-        ex -= src[i - n] - k;
-        ex2 -= pow_buf[i - n];
-        price_t d = src[i] - k;
+    value_t p1 = 1. / (n - 1);
+    value_t p2 = 1. / (n * (n - 1.));
+    dst[first_end - 1] = ex2 * p1 - ex * ex * p2;
+
+    for (size_t i = first_end, pre_ix = first_end - n; i < total; i++, pre_ix++) {
+        ex -= src[pre_ix] - k;
+        ex2 -= pow_buf[pre_ix];
+        value_t d = src[i] - k;
         ex += d;
-        price_t d_pow = std::pow(d, 2);
+        value_t d_pow = d * d;
         pow_buf[i] = d_pow;
         ex2 += d_pow;
-        dst[i] = (ex2 - std::pow(ex, 2) / n) / (n - 1);
+        dst[i] = ex2 * p1 - ex * ex * p2;
     }
 }
 
 void IVar::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    HKU_IF_RETURN(step < 2, void());
+
     size_t start = _get_step_start(curPos, step, ind.discard());
-    size_t num = 0;
+    HKU_IF_RETURN(start != curPos + 1 - step, void());
+
     price_t ex = 0.0, ex2 = 0.0;
     price_t k = ind[start];
     for (size_t i = start; i <= curPos; i++) {
-        num++;
         price_t d = ind[i] - k;
         ex += d;
-        ex2 += std::pow(d, 2);
+        ex2 += d * d;
     }
-    _set(num <= 1 ? 0.0 : (ex2 - std::pow(ex, 2) / num) / (num - 1), curPos);
+    _set((ex2 - ex * ex / step) / (step - 1), curPos);
 }
 
 Indicator HKU_API VAR(int n) {
