@@ -2027,11 +2027,11 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind: 指定指标
     :rtype: Indicator)");
 
-    m.def("REPLACE", py::overload_cast<double, double, bool>(REPLACE),
-          py::arg("old_value") = Null<double>(), py::arg("new_value") = 0.0,
-          py::arg("ignore_discard") = false);
+    double nan = Null<double>();
+    m.def("REPLACE", py::overload_cast<double, double, bool>(REPLACE), py::arg("old_value") = nan,
+          py::arg("new_value") = 0.0, py::arg("ignore_discard") = false);
     m.def("REPLACE", py::overload_cast<const Indicator&, double, double, bool>(REPLACE),
-          py::arg("ind"), py::arg("old_value") = Null<double>(), py::arg("new_value") = 0.0,
+          py::arg("ind"), py::arg("old_value") = nan, py::arg("new_value") = 0.0,
           py::arg("ignore_discard") = false,
           R"(REPLACE(ind, [old_value=constant.nan, new_value=0.0, ignore_discard=False]
           
