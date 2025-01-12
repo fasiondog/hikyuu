@@ -3,6 +3,7 @@
 *.xml
 *.bak
 *.pyc
+*.pyi
 *.pyd
 *.so
 *.log
@@ -78,4 +79,5 @@ hikyuu/cpp/libhku_hdf5.so.200
 hikyuu/cpp/libhku_hdf5.so.200.2.0
 hikyuu/include
 .virtual_documents
+venv
 hikyuu_cpp/hikyuu/utilities/config.h

@@ -69,6 +69,7 @@ from .echarts_draw import sysplot as ec_sysplot
 from .echarts_draw import iplot as ec_iplot
 from .echarts_draw import ibar as ec_ibar
 from .echarts_draw import kplot as ec_kplot
+from .echarts_draw import sys_performance as ec_sys_performance
 
 g_draw_engine = 'matplotlib'
 
@@ -140,6 +141,8 @@ def use_draw_with_echarts():
     Indicator.bar = ec_ibar
 
     System.plot = ec_sysplot
+    System.performance = ec_sys_performance
+    Portfolio.performance = ec_sys_performance
 
 
 def create_figure(n=1, figsize=None):
