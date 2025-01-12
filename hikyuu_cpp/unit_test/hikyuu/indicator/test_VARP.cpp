@@ -39,11 +39,16 @@ TEST_CASE("test_VARP") {
     Indicator dev = VARP(ind, 10);
     CHECK_EQ(dev.name(), "VARP");
     CHECK_EQ(dev.size(), 15);
+    CHECK_EQ(dev.discard(), 9);
 
-    vector<price_t> expected{0.,      0.25, 0.666667, 1.25, 2.0,  1.80556, 3.34694, 2.9375,
-                             5.33333, 7.69, 8.89,     7.21, 9.61, 12.01,   14.41};
-    for (size_t i = 0; i < dev.size(); i++) {
-        CHECK_EQ(expected[i], doctest::Approx(dev[i]).epsilon(0.001));
+    price_t nan = Null<price_t>();
+    vector<price_t> expected{nan, nan,  nan,  nan,  nan,  nan,   nan,  nan,
+                             nan, 7.69, 8.89, 7.21, 9.61, 12.01, 14.41};
+    for (size_t i = 0; i < dev.discard(); i++) {
+        CHECK_UNARY(std::isnan(dev[i]));
+    }
+    for (size_t i = dev.discard(); i < dev.size(); i++) {
+        CHECK_EQ(expected[i], doctest::Approx(dev[i]).epsilon(0.0001));
     }
 
     /** @arg n = 1时 */
@@ -57,6 +62,12 @@ TEST_CASE("test_VARP") {
     for (size_t i = result.discard(); i < expect.size(); ++i) {
         CHECK_EQ(result[i], expect[i]);
     }
+
+    /** @arg n =0 时 */
+    dev = VARP(ind, 0);
+    CHECK_EQ(dev.size(), 15);
+    CHECK_EQ(dev.discard(), 14);
+    CHECK_EQ(dev[14], doctest::Approx(19.0933).epsilon(0.0001));
 }
 
 /** @par 检测点 */

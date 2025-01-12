@@ -81,6 +81,7 @@
 #include "crt/PRICELIST.h"
 #include "crt/RECOVER.h"
 #include "crt/REF.h"
+#include "crt/REPLACE.h"
 #include "crt/RESULT.h"
 #include "crt/REVERSE.h"
 #include "crt/ROC.h"
