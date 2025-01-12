@@ -10,6 +10,20 @@
 内建对因子合成算法
 --------------------------------
 
+.. py:function:: MF_Weight(inds, weights, stks, query, ref_stk[, ic_n=5, spearman=True])
+
+    按指定权重合成因子 = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn
+
+    :param sequense(Indicator) inds: 原始因子列表
+    :param sequense(float) weights: 权重列表(需和 inds 等长)
+    :param sequense(stock) stks: 计算证券列表
+    :param Query query: 日期范围
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param int ic_n: 默认 IC 对应的 N 日收益率
+    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+    :rtype: MultiFactorBase
+
+
 .. py:function:: MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, spearman=True])
 
     等权重合成因子
