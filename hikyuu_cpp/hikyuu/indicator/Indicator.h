@@ -138,6 +138,9 @@ public:
      */
     PriceList getResultAsPriceList(size_t num) const;
 
+    /** 指定结果集中是否包含 nan 值 */
+    bool existNan(size_t result_idx) const;
+
     /**
      * 获取 DatetimeList
      */
@@ -257,6 +260,10 @@ inline Indicator Indicator::clone() const {
 
 inline DatetimeList Indicator::getDatetimeList() const {
     return m_imp ? m_imp->getDatetimeList() : DatetimeList();
+}
+
+inline bool Indicator::existNan(size_t result_idx) const {
+    return m_imp ? m_imp->existNan(result_idx) : false;
 }
 
 inline Indicator::value_t Indicator::getByDate(Datetime date, size_t num) const {
