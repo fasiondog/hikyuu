@@ -1999,4 +1999,47 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator|KData data: 指定指标
     :rtype: Indicator)");
+
+    m.def("ISNA", py::overload_cast<bool>(ISNA), py::arg("ignore_discard") = false);
+    m.def("ISNA", py::overload_cast<const Indicator&, bool>(ISNA), py::arg("ind"),
+          py::arg("ignore_discard") = false, R"(ISNA(ind[, ignore_discard=False])
+
+    判断指标是否为 nan 值，若为 nan 值, 则返回1, 否则返回0.
+
+    :param Indicator ind: 指定指标
+    :param bool ignore_discard: 忽略指标丢弃数据)");
+
+    m.def("ISINF", py::overload_cast<>(ISINF));
+    m.def("ISINF", py::overload_cast<const Indicator&>(ISINF), py::arg("ind"),
+          R"(ISINF(ind)
+
+    判断指标是否为正无穷大 (+inf) 值，若为 +inf 值, 则返回1, 否则返回0。如判断负无穷大, 使用 ISINFA。
+
+    :param Indicator ind: 指定指标
+    :rtype: Indicator)");
+
+    m.def("ISINFA", py::overload_cast<>(ISINFA));
+    m.def("ISINFA", py::overload_cast<const Indicator&>(ISINFA), py::arg("ind"),
+          R"(ISINFA(ind)
+
+    判断指标是否为负无穷大 (-inf) 值，若为 -inf 值, 则返回1, 否则返回0。如判断正无穷大, 使用 ISINF。
+
+    :param Indicator ind: 指定指标
+    :rtype: Indicator)");
+
+    double nan = Null<double>();
+    m.def("REPLACE", py::overload_cast<double, double, bool>(REPLACE), py::arg("old_value") = nan,
+          py::arg("new_value") = 0.0, py::arg("ignore_discard") = false);
+    m.def("REPLACE", py::overload_cast<const Indicator&, double, double, bool>(REPLACE),
+          py::arg("ind"), py::arg("old_value") = nan, py::arg("new_value") = 0.0,
+          py::arg("ignore_discard") = false,
+          R"(REPLACE(ind, [old_value=constant.nan, new_value=0.0, ignore_discard=False]
+          
+    替换指标中指定值，默认为替换 nan 值为 0.0。
+
+    :param Indicator ind: 指定指标
+    :param double old_value: 指定值
+    :param double new_value: 替换值
+    :param bool ignore_discard: 忽略指标丢弃数据
+    :rtype: Indicator)");
 }

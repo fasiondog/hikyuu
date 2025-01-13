@@ -215,6 +215,33 @@ void export_MultiFactor(py::module& m) {
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :rtype: MultiFactor)");
 
+    m.def("MF_Weight", py::overload_cast<>(MF_Weight));
+    m.def(
+      "MF_Weight",
+      [](const py::sequence& inds, const py::sequence& stks, const py::sequence& weights,
+         const KQuery& query, const py::object& ref_stk, int ic_n, bool spearman) {
+          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
+          StockList c_stks = python_list_to_vector<Stock>(stks);
+          PriceList c_weights = python_list_to_vector<price_t>(weights);
+          return MF_Weight(c_inds, c_weights, c_stks, query,
+                           ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(), ic_n,
+                           spearman);
+      },
+      py::arg("inds"), py::arg("weights"), py::arg("stks"), py::arg("query"),
+      py::arg("ref_stk") = py::none(), py::arg("ic_n") = 5, py::arg("spearman") = true,
+      R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5])
+
+    按指定权重合成因子 = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn
+
+    :param sequense(Indicator) inds: 原始因子列表
+    :param sequense(float) weights: 权重列表(需和 inds 等长)
+    :param sequense(stock) stks: 计算证券列表
+    :param Query query: 日期范围
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param int ic_n: 默认 IC 对应的 N 日收益率
+    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+    :rtype: MultiFactor)");
+
     m.def("MF_ICWeight", py::overload_cast<>(MF_ICWeight));
     m.def(
       "MF_ICWeight",

@@ -27,13 +27,8 @@ void ILn::_calculate(const Indicator& data) {
 
     auto const* src = data.data();
     auto* dst = this->data();
-    value_t null_value = Null<value_t>();
     for (size_t i = m_discard; i < total; ++i) {
-        if (data[i] <= 0.0) {
-            dst[i] = null_value;
-        } else {
-            dst[i] = std::log(src[i]);
-        }
+        dst[i] = std::log(src[i]);
     }
 }
 

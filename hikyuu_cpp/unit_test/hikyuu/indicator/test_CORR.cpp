@@ -45,16 +45,17 @@ TEST_CASE("test_CORR") {
     CHECK_THROWS_AS(CORR(x, y, -1), std::exception);
     CHECK_THROWS_AS(CORR(x, y, 1), std::exception);
 
-    // 正常情况
+    // 正常情况，n = 0
     result = CORR(x, y, 0);
     CHECK_EQ(result.name(), "CORR");
-    CHECK_EQ(result.discard(), 2);
+    CHECK_EQ(result.discard(), 9);
     CHECK_EQ(result.size(), a.size());
 
-    PriceList expect_corr{Null<price_t>(), Null<price_t>(), -0.39631,  -0.27821,  -0.452627,
-                          -0.338777,       -0.298335,       -0.268853, -0.148295, -0.180677};
-    PriceList expect_cov{Null<price_t>(), Null<price_t>(), -0.159915, -0.258501, -0.481946,
-                         -0.377705,       -0.296786,       -0.243565, -0.128369, -0.146947};
+    price_t nan = Null<price_t>();
+    Indicator expect_corr =
+      PRICELIST(PriceList{nan, nan, nan, nan, nan, nan, nan, nan, nan, 0.385553});
+    Indicator expect_cov =
+      PRICELIST(PriceList{nan, nan, nan, nan, nan, nan, nan, nan, nan, 0.162894});
 
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
@@ -63,6 +64,30 @@ TEST_CASE("test_CORR") {
     }
 
     Indicator cov = result.getResult(1);
+    CHECK_UNARY(std::isnan(cov[0]));
+    CHECK_UNARY(std::isnan(cov[1]));
+    for (int i = cov.discard(); i < expect_cov.size(); ++i) {
+        CHECK_EQ(cov[i], doctest::Approx(expect_cov[i]).epsilon(0.00001));
+    }
+
+    // 正常情况，n = 8
+    result = CORR(x, y, 8);
+    CHECK_EQ(result.name(), "CORR");
+    CHECK_EQ(result.discard(), 7);
+    CHECK_EQ(result.size(), a.size());
+
+    expect_corr =
+      PRICELIST(PriceList{nan, nan, nan, nan, nan, nan, nan, 0.379682, 0.504541, 0.572872}, 7);
+    expect_cov =
+      PRICELIST(PriceList{nan, nan, nan, nan, nan, nan, nan, 0.157144, 0.250266, 0.268253}, 7);
+
+    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_UNARY(std::isnan(result[1]));
+    for (int i = result.discard(); i < expect_corr.size(); ++i) {
+        CHECK_EQ(result[i], doctest::Approx(expect_corr[i]).epsilon(0.00001));
+    }
+
+    cov = result.getResult(1);
     CHECK_UNARY(std::isnan(cov[0]));
     CHECK_UNARY(std::isnan(cov[1]));
     for (int i = cov.discard(); i < expect_cov.size(); ++i) {
