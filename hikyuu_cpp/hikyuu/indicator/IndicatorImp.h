@@ -109,6 +109,9 @@ public:
      */
     void _readyBuffer(size_t len, size_t result_num);
 
+    /** 数据中是否包含 nan 值 */
+    bool existNan(size_t result_idx = 0) const;
+
     const string& name() const;
     void name(const string& name);
 
