@@ -11,78 +11,38 @@
 
 namespace hku {
 
-/** 大盘开盘价 */
-inline Indicator INDEXO() {
-    KData k = getKData("SH000001", KQueryByIndex(-1));
-    return CONTEXT(k.open());
-}
+// 这里的大盘都指 sh000001
 
-inline Indicator INDEXO(const KQuery& query) {
-    KData k = getKData("SH000001", query);
-    return CONTEXT(k.open());
-}
+/** 大盘开盘价 */
+Indicator HKU_API INDEXO();
+Indicator HKU_API INDEXO(const KQuery& query);
 
 /** 大盘最高价盘价 */
-inline Indicator INDEXH() {
-    KData k = getKData("SH000001", KQueryByIndex(-1));
-    return CONTEXT(k.high());
-}
-
-inline Indicator INDEXH(const KQuery& query) {
-    KData k = getKData("SH000001", query);
-    return CONTEXT(k.high());
-}
+Indicator HKU_API INDEXH();
+Indicator HKU_API INDEXH(const KQuery& query);
 
 /** 大盘最低价 */
-inline Indicator INDEXL() {
-    KData k = getKData("SH000001", KQueryByIndex(-1));
-    return CONTEXT(k.low());
-}
-
-inline Indicator INDEXL(const KQuery& query) {
-    KData k = getKData("SH000001", query);
-    return CONTEXT(k.low());
-}
+Indicator HKU_API INDEXL();
+Indicator HKU_API INDEXL(const KQuery& query);
 
 /** 大盘收盘价 */
-inline Indicator INDEXC() {
-    KData k = getKData("SH000001", KQueryByIndex(-1));
-    return CONTEXT(k.close());
-}
-
-inline Indicator INDEXC(const KQuery& query) {
-    KData k = getKData("SH000001", query);
-    return CONTEXT(k.close());
-}
+Indicator HKU_API INDEXC();
+Indicator HKU_API INDEXC(const KQuery& query);
 
 /** 大盘成交额 */
-inline Indicator INDEXA() {
-    KData k = getKData("SH000001", KQueryByIndex(-1));
-    return CONTEXT(k.amo());
-}
-
-inline Indicator INDEXA(const KQuery& query) {
-    KData k = getKData("SH000001", query);
-    return CONTEXT(k.amo());
-}
+Indicator HKU_API INDEXA();
+Indicator HKU_API INDEXA(const KQuery& query);
 
 /** 大盘成交量 */
-inline Indicator INDEXV() {
-    KData k = getKData("SH000001", KQueryByIndex(-1));
-    return CONTEXT(k.vol());
-}
+Indicator HKU_API INDEXV();
+Indicator HKU_API INDEXV(const KQuery& query);
 
-inline Indicator INDEXV(const KQuery& query) {
-    KData k = getKData("SH000001", query);
-    return CONTEXT(k.vol());
-}
-
-#if 0
-/** 大盘上涨家数 */
+/** 大盘上涨家数, 使用通达信 SH880005，可能无法用于实盘 */
 Indicator HKU_API INDEXADV();
+Indicator HKU_API INDEXADV(const KQuery& query);
 
-/** 大盘下跌家数 */
+/** 大盘下跌家数， 使用通达信 SH880005，可能无法用于实盘 */
 Indicator HKU_API INDEXDEC();
-#endif
+Indicator HKU_API INDEXDEC(const KQuery& query);
 
 }  // namespace hku

@@ -2072,4 +2072,14 @@ void export_Indicator_build_in(py::module& m) {
     m.def("INDEXA", py::overload_cast<const KQuery&>(INDEXA), R"(INDEXA([query])
     
     大盘成交额)");
+
+    m.def("INDEXADV", py::overload_cast<>(INDEXADV));
+    m.def("INDEXADV", py::overload_cast<const KQuery&>(INDEXADV), R"(INDEXADV([query])
+    
+    通达信 880005 大盘上涨家数, 可能无法盘中更新!)");
+
+    m.def("INDEXDEC", py::overload_cast<>(INDEXDEC));
+    m.def("INDEXDEC", py::overload_cast<const KQuery&>(INDEXDEC), R"(INDEXDEC([query])
+    
+    通达信 880005 大盘下跌家数, 可能无法盘中更新!)");
 }
