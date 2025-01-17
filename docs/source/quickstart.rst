@@ -185,6 +185,6 @@ Ubuntu wayland 平台上 QT 不可用
 PyCharm 等 IDE 无法正常提示帮助信息
 -----------------------------------
 
-1. 安装 pybind11_stubgen，使用命令 pip install pybind11_stubgen
-2. 运行 pybind11_stubgen hikyuu 命令，即可正常提示帮助信息。
+1. 安装 pybind11-stubgen，使用命令 pip install pybind11-stubgen
+2. 运行 pybind11-stubgen hikyuu 命令，即可正常提示帮助信息。
         
