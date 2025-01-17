@@ -6,8 +6,6 @@ import os.path
 import sys, time
 from configparser import ConfigParser
 
-from PyQt5.Qt import QCoreApplication
-
 from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 from hikyuu.data.common_pytdx import search_best_tdx
 
@@ -66,8 +64,6 @@ class HKUImportDataCMD:
                 status = msg[2]
                 if status == 'FAILURE':
                     self.details.append(msg[3])
-                self.hdf5_import_thread.terminate()
-                self.hdf5_import_thread = None
                 print("\n导入完毕, 共耗时 {:>.2f} 分钟".format(self.time_escaped()))
                 print('\n=========================================================')
                 print("导入详情:")
@@ -75,7 +71,6 @@ class HKUImportDataCMD:
                     print(info)
                 print('=========================================================')
                 self.import_running = False
-                QCoreApplication.quit()
 
             elif msg_task_name == 'IMPORT_KDATA':
                 ktype, progress = msg[2:4]
@@ -139,7 +134,6 @@ class HKUImportDataCMD:
         self.import_running = True
 
         print("正在启动任务....")
-        QCoreApplication.processEvents()
 
         if config.getboolean('tdx', 'enable'):
             self.hdf5_import_thread = UseTdxImportToH5Thread(None, config)
@@ -147,14 +141,12 @@ class HKUImportDataCMD:
             self.hdf5_import_thread = UsePytdxImportToH5Thread(None, config)
 
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
-        self.hdf5_import_thread.start()
+        self.hdf5_import_thread.run()
 
 
 def main():
-    app = QCoreApplication(sys.argv)
     x = HKUImportDataCMD()
     x.start_import_data()
-    sys.exit(app.exec())
 
 
 if __name__ == '__main__':
