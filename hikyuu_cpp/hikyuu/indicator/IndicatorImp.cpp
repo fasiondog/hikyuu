@@ -471,6 +471,17 @@ size_t IndicatorImp::getPos(Datetime date) const {
     return getContext().getPos(date);
 }
 
+bool IndicatorImp::existNan(size_t result_idx) const {
+    HKU_CHECK(result_idx < m_result_num, "result_idx: {}", result_idx);
+    const value_t *src = data(result_idx);
+    for (size_t i = m_discard, total = size(); i < total; i++) {
+        if (std::isnan(src[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
 string IndicatorImp::formula() const {
     std::stringstream buf;
 
