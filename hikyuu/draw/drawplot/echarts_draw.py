@@ -13,7 +13,6 @@ from hikyuu import *
 class MultiLineTextChart(ChartBase):
     def __init__(self, init_opts: opts.InitOpts = opts.InitOpts()):
         super().__init__(init_opts=init_opts)
-        self._text_data = []  # 存储多行文本数据
         self._last_x = 50  # 默认起始 x 坐标
         self._last_y = 5  # 默认起始 y 坐标
         self._line_height = 20  # 默认行高
@@ -24,13 +23,7 @@ class MultiLineTextChart(ChartBase):
         if y is not None:
             self._last_y = y
 
-    def add(
-        self,
-        text: str,
-        x = None,
-        y = None,
-        text_style = None,
-    ):
+    def add(self, text: str, x = None, y = None, text_style = None):
         """
         添加多行文本
 
@@ -203,7 +196,7 @@ def kplot_line(kdata: KData):
                     xaxis_index=[0, 1],  # 同时控制k线图和volume图的x轴缩放
                     type_="slider",
                     pos_top="85%",
-                    range_start=200 * 100 / len(datetimes),
+                    range_start=(100 - 200 * 100 / len(datetimes)) if len(datetimes) > 200 else 0,
                     range_end=100,
                 ),
             ],
@@ -363,7 +356,7 @@ def iplot(indicator, kref: KData = None, chart=None, ilongname=False):
                     xaxis_index=0,
                     type_="slider",
                     pos_top="92%",
-                    range_start=200 * 100 / len(datetimes) if len(datetimes) > 200 else 0,
+                    range_start=(100 - 200 * 100 / len(datetimes)) if len(datetimes) > 200 else 0,
                     range_end=100,
                 )
             ],
@@ -572,13 +565,13 @@ def sys_performance(sys, ref_stk=None):
 
     line = iplot(ref_return, ref_k)
     line = iplot(funds_return, ref_k, line)
-    line.set_global_opts(datazoom_opts=[
+    line.get_options().update(dataZoom=[
         opts.DataZoomOpts(
             is_show=len(ref_dates) > 500,
             xaxis_index=0,
             type_="slider",
             pos_top="92%",
-            range_start=500 * 100 / len(ref_dates) if len(ref_dates) > 500 else 0,
+            range_start=(100 - 500 * 100 / len(ref_dates)) if len(ref_dates) > 500 else 0,
             range_end=100,
         ),
     ])
