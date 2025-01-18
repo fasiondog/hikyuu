@@ -1,6 +1,31 @@
 版本发布说明
 =======================
 
+2.3.1 - 2025年1月18日
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. 新增特性
+    - HikyuuTdx 新增添加部分 tdx 880指数导入: 880001/880002 等
+    - 新增 INDEXO/INDEXH/INDEXL/INDEXC/INDEXA/INDEXV 大盘指标
+    - 新增 REPLACE/ISNA/ISINF/ISINFA 辅助数据处理指标
+    - interactive 工具新增 select2 快捷方法，用于导出最后时刻指定证券的所有指定指标值为 DataFrame
+    - 新增 MF_Weight 指定权重评分板
+
+2. 功能优化
+    - echarts 绘图引擎改进，支持 sys performance 绘制
+    - interactive 工具中 zsbk_sz50/zsbk_sz180 命名调整为zsbk_sh50/zsbk_sh180
+    - 部分涉及日期对齐的指标添加 fill_null 参数, CORR/ADVANCE/DECLINE/INSUM等
+    - 改进 DMA 实现时数据对齐
+    - 调整 LOG/LN 计算值为 0 时为 -inf
+    - python constant 常量中添加 infa 表示负无穷大
+    - 优化 VAR、VARP, 采取抛弃方式
+
+3. 缺陷修复
+    - fixed spot_server隔夜后会将未要求启动的spot_agent 启动起来
+    - fixed RESULT 输入为原型公式时可能因尚无结果集数据导致指定上下文时计算失败
+    - fixed CORR 初值计算, 导致n=0时结果不正确, 同时采用抛弃策略
+
+
 2.3.0 - 2025年1月1日
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

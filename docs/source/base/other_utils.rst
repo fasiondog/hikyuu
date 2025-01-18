@@ -7,19 +7,40 @@
 函数
 ------
 
-.. py:function:: select()
+.. py:function:: select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=True)
 
     示例::
     
         #选出涨停股
         C = CLOSE()
-        x = select(C / REF(C, 1) - 1 >= 0.0995))
+        x = select(C / REF(C, 1) - 1 >= 0.0995)
 
     :param Indicator cond: 条件指标
     :param Datetime start: 起始日期
     :param Datetime end: 结束日期
     :param bool print_out: 打印选中的股票
     :rtype: 选中的股票列表
+
+
+.. py:function:: select2(inds, start=Datetime(201801010000), end=Datetime.now(), stks=None)
+
+    导出最后时刻指定证券的所有指定指标值
+
+    如：
+        select2([CLOSE(), VOLUME()], stks=blocka)
+    返回一个DataFrame, 列名是指标名称, 行是证券代码和证券名称:
+        证券代码  证券名称  CLOSE  VOLUME
+        SH600000 浦发银行  14.09   1000
+        SH600001 中国平安  13.09   2000
+        SZ000001 平安银行  13.09   3000
+        ...
+
+    :param Indicator inds: 指标列表
+    :param Datetime start: 起始日期
+    :param Datetime end: 结束日期（不包括该日期）
+    :param list stks: 指定的证券列表
+    :rtype: pandas.DataFrame
+
 
 .. py:function:: get_log_level()
 
@@ -65,7 +86,7 @@
     :return: 处理过的数据
     
     
-.. py:function:: getDateRange(start, end)
+.. py:function:: get_date_range(start, end)
 
     获取指定 [start, end) 日期时间范围的自然日日历日期列表，仅支持到日
     

@@ -213,7 +213,7 @@ void export_MultiFactor(py::module& m) {
     :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :rtype: MultiFactor)");
+    :rtype: MultiFactorBase)");
 
     m.def("MF_Weight", py::overload_cast<>(MF_Weight));
     m.def(
@@ -240,7 +240,7 @@ void export_MultiFactor(py::module& m) {
     :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :rtype: MultiFactor)");
+    :rtype: MultiFactorBase)");
 
     m.def("MF_ICWeight", py::overload_cast<>(MF_ICWeight));
     m.def(
@@ -266,7 +266,7 @@ void export_MultiFactor(py::module& m) {
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :rtype: MultiFactor)");
+    :rtype: MultiFactorBase)");
 
     m.def("MF_ICIRWeight", py::overload_cast<>(MF_ICIRWeight));
     m.def(
@@ -292,5 +292,5 @@ void export_MultiFactor(py::module& m) {
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :rtype: MultiFactor)");
+    :rtype: MultiFactorBase)");
 }
