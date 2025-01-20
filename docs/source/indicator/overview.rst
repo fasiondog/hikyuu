@@ -10,7 +10,11 @@
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
 * :py:func:`CONTEXT` - 独立上下文
 * :py:func:`DROPNA` - 删除 nan 值
+* :py:func:`ISNA` - 判断是否为 nan 值
+* :py:func:`ISINF` - 判断是否为 +inf 值
+* :py:func:`ISINFA` - 判断是否为 -inf 值
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
+* :py:func:`REPLACE` - 替换指标中指定值，默认为替换 nan 值为 0.0
 * :py:func:`RESULT` - 以指标公式的方式返回指定指标中相应的结果集
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
 * :py:func:`ZSCORE` - ZScore 标准化

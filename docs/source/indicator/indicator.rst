@@ -571,6 +571,30 @@
     :param data: 输入数据
     :rtype: Indicator
 
+
+.. py:function:: ISNA(ind[, ignore_discard=False])
+
+    判断指标是否为 nan 值，若为 nan 值, 则返回1, 否则返回0.
+
+    :param Indicator ind: 指定指标
+    :param bool ignore_discard: 忽略指标丢弃数据
+
+
+.. py:function:: ISINF(ind)
+
+    判断指标是否为正无穷大 (+inf) 值，若为 +inf 值, 则返回1, 否则返回0。如判断负无穷大, 使用 ISINFA。
+
+    :param Indicator ind: 指定指标
+    :rtype: Indicator
+
+
+.. py:function:: ISINFA(ind)
+
+    判断指标是否为负无穷大 (-inf) 值，若为 -inf 值, 则返回1, 否则返回0。如判断正无穷大, 使用 ISINF。
+
+    :param Indicator ind: 指定指标
+    :rtype: Indicator
+
     
 .. py:function:: KDATA([data])
 
@@ -851,6 +875,17 @@
     对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比前向复权
 
     :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :rtype: Indicator
+
+
+.. py:function:: REPLACE(ind, [old_value=constant.nan, new_value=0.0, ignore_discard=False]
+          
+    替换指标中指定值，默认为替换 nan 值为 0.0。
+
+    :param Indicator ind: 指定指标
+    :param double old_value: 指定值
+    :param double new_value: 替换值
+    :param bool ignore_discard: 忽略指标丢弃数据
     :rtype: Indicator
 
 

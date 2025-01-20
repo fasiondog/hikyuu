@@ -108,5 +108,12 @@ void export_Datetime(py::module& m) {
 
         DEF_PICKLE(Datetime);
 
-    m.def("get_date_range", getDateRange, py::arg("start"), py::arg("end"));
+    m.def("get_date_range", getDateRange, py::arg("start"), py::arg("end"),
+          R"(get_date_range(start, end)
+
+    获取指定 [start, end) 日期时间范围的自然日日历日期列表，仅支持到日
+    
+    :param Datetime start: 起始日期
+    :param Datetime end: 结束日期
+    :rtype: DatetimeList)");
 }

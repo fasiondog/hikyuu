@@ -180,4 +180,11 @@ Ubuntu wayland 平台上 QT 不可用
 -----------------------------------
 
 使用 wayland 的 ubuntu, 可能需要设置 QT_QPA_PLATFORM=wayland 环境变量，通常可以在 .bashrc 中 添加 export QT_QPA_PLATFORM=wayland 进行设置
+
+
+PyCharm 等 IDE 无法正常提示帮助信息
+-----------------------------------
+
+1. 安装 pybind11-stubgen，使用命令 pip install pybind11-stubgen
+2. 运行 pybind11-stubgen hikyuu 命令，即可正常提示帮助信息。
         
