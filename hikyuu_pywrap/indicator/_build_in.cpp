@@ -1564,7 +1564,8 @@ void export_Indicator_build_in(py::module& m) {
     :param KData k: 上下文
     :rtype: Indicator)");
 
-    m.def("DMA", DMA, R"(DMA(ind, a[, fill_null=True])
+    m.def("DMA", DMA, py::arg("x"), py::arg("a"), py::arg("fill_null") = true,
+          R"(DMA(ind, a[, fill_null=True])
 
     动态移动平均
 
