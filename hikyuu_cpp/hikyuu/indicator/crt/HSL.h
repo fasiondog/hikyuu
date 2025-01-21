@@ -23,17 +23,5 @@ namespace hku {
 Indicator HSL(const KData& k);
 Indicator HSL();
 
-inline Indicator HSL() {
-    Indicator hsl = VOL() / LIUTONGPAN();
-    hsl.name("HSL");
-    return hsl;
-}
-
-inline Indicator HSL(const KData& k) {
-    Indicator hsl = HSL();
-    hsl.setContext(k);
-    return hsl;
-}
-
 }  // namespace hku
 #endif /* INDICATOR_CRT_HSL_H_ */
