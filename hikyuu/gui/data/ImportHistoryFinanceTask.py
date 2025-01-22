@@ -48,9 +48,8 @@ class ImportHistoryFinanceTask:
 
     def connect(self):
         self.api = TdxHq_API()
-        hosts = search_best_tdx()
-        hku_check(self.api.connect(hosts[0][2], hosts[0][3]), "failed connect pytdx {}:{}!", hosts[0][2], hosts[0][3])
-        #hku_check(self.api.connect('120.76.152.87', 7709), "failed connect pytdx!")
+        # 不是所有服务器都提供下载
+        hku_check(self.api.connect('120.76.152.87', 7709), "failed connect pytdx!")
 
     def get_list_info(self):
         result = []
