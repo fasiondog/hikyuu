@@ -2083,4 +2083,8 @@ void export_Indicator_build_in(py::module& m) {
     m.def("INDEXDEC", py::overload_cast<const KQuery&>(INDEXDEC), R"(INDEXDEC([query])
     
     通达信 880005 大盘下跌家数, 可能无法盘中更新!)");
+
+    m.def("WINNER", py::overload_cast<>(WINNER));
+    m.def("WINNER", py::overload_cast<const Indicator&>(WINNER));
+    m.def("WINNER", py::overload_cast<Indicator::value_t>(WINNER));
 }
