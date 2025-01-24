@@ -20,15 +20,42 @@ using namespace hku;
 
 /** @par 检测点 */
 TEST_CASE("test_LIUTONGPAN") {
-    StockManager& sm = StockManager::instance();
+    KData k;
+    Indicator liutong;
 
+    /** @arg 查询指数的流通盘, 没有流通盘数据 */
+    k = getKData("sh000001", KQueryByIndex(-100));
+    REQUIRE(k.size() > 0);
+    liutong = LIUTONGPAN(k);
+    CHECK_EQ(liutong.name(), "LIUTONGPAN");
+    CHECK_EQ(liutong.size(), k.size());
+    CHECK_EQ(liutong.discard(), k.size());
+
+    /** @arg 查询股票流通盘，日线 */
     Stock stk = getStock("SH600004");
     KQuery query = KQueryByDate(Datetime(200301010000), Datetime(200708250000));
-    KData k = stk.getKData(query);
+    k = stk.getKData(query);
 
-    Indicator liutong = LIUTONGPAN(k);
+    liutong = LIUTONGPAN(k);
     CHECK_EQ(liutong.size(), k.size());
     size_t total = k.size();
+    for (int i = 0; i < total; i++) {
+        if (k[i].datetime < Datetime(200512200000)) {
+            CHECK_EQ(liutong[i], 40000);
+        } else if (k[i].datetime >= Datetime(200512200000) &&
+                   k[i].datetime < Datetime(200612200000)) {
+            CHECK_EQ(liutong[i], 47600);
+        } else {
+            CHECK_EQ(liutong[i], 49696);
+        }
+    }
+
+    /** @arg 查询股票流通盘，5分钟线 */
+    query = KQueryByDate(Datetime(200301010000), Datetime(200708250000), KQuery::MIN5);
+    k = stk.getKData(query);
+    liutong = LIUTONGPAN(k);
+    CHECK_EQ(liutong.size(), k.size());
+    total = k.size();
     for (int i = 0; i < total; i++) {
         if (k[i].datetime < Datetime(200512200000)) {
             CHECK_EQ(liutong[i], 40000);
