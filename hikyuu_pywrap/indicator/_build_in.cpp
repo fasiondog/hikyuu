@@ -953,7 +953,7 @@ void export_Indicator_build_in(py::module& m) {
     m.def("HSL", HSL_1);
     m.def("HSL", HSL_2, R"(HSL(kdata)
 
-    获取换手率，等于 VOL(k) / CAPITAL(k)
+    获取换手率(百分比x%)，等于 VOL(k) / CAPITAL(k)
 
     :param KData kdata: k线数据
     :rtype: Indicator)");

@@ -482,7 +482,7 @@
 
 .. py:function:: HSL(kdata)
 
-    获取换手率，等于 VOL(k) / CAPITAL(k)
+    获取换手率(百分比 x%)，等于 VOL(k) / CAPITAL(k)
     
     :param KData kdata: k线数据
     :rtype: Indicator
