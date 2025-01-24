@@ -88,7 +88,8 @@ void ICost::_calculate(const Indicator& data) {
             const KRecord& krecord = kdata[pos];
             if (krecord.datetime >= pre_sw_date) {
                 x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
-                a = krecord.transCount / pre_free_count;
+                // transCount 为手数，流通股为万股
+                a = krecord.transCount / pre_free_count * 0.01;
                 dst[pos] = pos > 0 ? a * x + (1 - a) * dst[pos - 1] : x;
             }
             pos++;
@@ -111,7 +112,7 @@ void ICost::_calculate(const Indicator& data) {
     for (; pos < total; pos++) {
         const KRecord& krecord = kdata[pos];
         x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
-        a = krecord.transCount / pre_free_count;
+        a = krecord.transCount / pre_free_count * 0.01;
         dst[pos] = a * x + (1 - a) * dst[pos - 1];
     }
 
