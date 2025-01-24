@@ -43,45 +43,69 @@ void ICost::_calculate(const Indicator& data) {
 
     KData k = getContext();
     size_t total = k.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
 
+    // 先将 discard 设为全部，后续更新
+    m_discard = total;
+
     Stock stock = k.getStock();
-    StockWeightList sw_list = stock.getWeight();
-    if (sw_list.size() == 0) {
-        return;
+    auto* kdata = k.data();
+    Datetime lastdate = kdata[total - 1].datetime.startOfDay();
+
+    StockWeightList sw_list = stock.getWeight(Datetime::min(), lastdate + Days(1));
+    HKU_IF_RETURN(sw_list.empty(), void());
+
+    // 寻找第一个流通盘不为0的权息
+    price_t pre_free_count = 0.0;
+    Datetime pre_sw_date;
+    auto sw_iter = sw_list.begin();
+    for (; sw_iter != sw_list.end(); ++sw_iter) {
+        if (sw_iter->freeCount() > 0) {
+            pre_free_count = sw_iter->freeCount();
+            pre_sw_date = sw_iter->datetime();
+            break;
+        }
     }
 
-    value_t percent = getParam<double>("percent") * 0.01;
+    // 没有流通盘相关权息数据, 或者该权息日期大于最后一根K线日期, 直接返回
+    HKU_IF_RETURN(sw_iter == sw_list.end() || pre_sw_date > lastdate, void());
 
-    auto* kdata = k.data();
     auto* dst = this->data();
 
+    value_t percent = getParam<double>("percent") * 0.01;
     size_t pos = 0;
-    auto sw_iter = sw_list.begin();
-    price_t pre_free_count = sw_iter->freeCount();
-    value_t a = 0.0, x = 0.0;
+    value_t x, a;
     for (; sw_iter != sw_list.end(); ++sw_iter) {
         price_t free_count = sw_iter->freeCount();
-        if (free_count == 0) {
+        Datetime cur_sw_date = sw_iter->datetime();
+        if (free_count <= 0.0) {
             continue;  // 忽略流通盘为0的权息
         }
 
-        while (pos < total && kdata[pos].datetime < sw_iter->datetime()) {
+        while (pos < total && kdata[pos].datetime < cur_sw_date) {
             const KRecord& krecord = kdata[pos];
-            x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
-            a = krecord.transCount / pre_free_count;
-            dst[pos] = pos >= 1 ? a * x + (1 - a) * dst[pos - 1] : a * x;
+            if (krecord.datetime >= pre_sw_date) {
+                x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
+                a = krecord.transCount / pre_free_count;
+                dst[pos] = pos > 0 ? a * x + (1 - a) * dst[pos - 1] : x;
+            }
             pos++;
         }
 
         pre_free_count = free_count;
+        pre_sw_date = cur_sw_date;
         if (pos >= total) {
             break;
         }
+    }
+
+    if (pos == 0) {
+        const KRecord& krecord = kdata[pos];
+        x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
+        dst[pos] = x;
+        pos++;
     }
 
     for (; pos < total; pos++) {
@@ -89,6 +113,14 @@ void ICost::_calculate(const Indicator& data) {
         x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
         a = krecord.transCount / pre_free_count;
         dst[pos] = a * x + (1 - a) * dst[pos - 1];
+    }
+
+    // 更新 discard
+    for (size_t i = 0; i < total; i++) {
+        if (!std::isnan(dst[i])) {
+            m_discard = i;
+            break;
+        }
     }
 }
 
