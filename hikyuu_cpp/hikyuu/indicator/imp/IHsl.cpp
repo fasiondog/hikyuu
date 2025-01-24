@@ -68,7 +68,8 @@ void IHsl::_calculate(const Indicator& data) {
 
         while (pos < total && kdata[pos].datetime < cur_sw_date) {
             if (kdata[pos].datetime >= pre_sw_date) {
-                dst[pos] = kdata[pos].transCount / pre_free_count;
+                // transCount 单位为手数，流通盘单位为万股
+                dst[pos] = kdata[pos].transCount / pre_free_count * 0.01;
             }
             pos++;
         }
@@ -81,7 +82,7 @@ void IHsl::_calculate(const Indicator& data) {
     }
 
     for (; pos < total; pos++) {
-        dst[pos] = kdata[pos].transCount / pre_free_count;
+        dst[pos] = kdata[pos].transCount / pre_free_count * 0.01;
     }
 
     // 更新 discard

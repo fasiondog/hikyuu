@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 获取换手率 p% (百分比），等于 VOL(k) / CAPITAL(k)
+ * 获取换手率, 乘以 100 才是百分比，等于 VOL(k) / CAPITAL(k) * 0.01
  * @param k 关联的K线数据
  * @ingroup Indicator
  */

@@ -5,10 +5,6 @@
  *     Author: fasiondog
  */
 
-#include "../crt/COST.h"
-#include "../crt/DMA.h"
-#include "../crt/COST.h"
-
 #include "ICost.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -133,19 +129,6 @@ Indicator HKU_API COST(double x) {
 
 Indicator HKU_API COST(const KData& k, double x) {
     return Indicator(make_shared<ICost>(k, x));
-}
-
-Indicator HKU_API COST2(double x) {
-    Indicator ind = DMA(CLOSE() + (HIGH() - LOW()) * x / 100.0, COST());
-    ind.name("COST");
-    ind.setParam<double>("x", x);
-    return ind;
-}
-
-Indicator HKU_API COST2(const KData& k, double x) {
-    Indicator ind = COST(x);
-    ind.setContext(k);
-    return ind;
 }
 
 }  // namespace hku
