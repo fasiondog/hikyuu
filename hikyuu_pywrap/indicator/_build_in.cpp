@@ -1661,11 +1661,9 @@ void export_Indicator_build_in(py::module& m) {
     m.def("COST", COST_1, py::arg("x") = 10.0);
     m.def("COST", COST_2, py::arg("k"), py::arg("x") = 10.0, R"(COST(k[, x=10.0])
 
-    成本分布
-
+    成本分布。该函数仅对日线分析周期有效，对不能存在流通盘权息数据的指数、ETF等无效。
     用法：COST(k, X) 表示X%获利盘的价格是多少
-
-    例如：COST(k, 10),表示10%获利盘的价格是多少，即有10%的持仓量在该价格以下，其余90%在该价格以上，为套牢盘 该函数仅对日线分析周期有效
+    例如：COST(k, 10),表示10%获利盘的价格是多少，即有10%的持仓量在该价格以下，其余90%在该价格以上，为套牢盘
 
     :param KData k: 关联的K线数据
     :param float x: x%获利价格, 0~100
@@ -2086,5 +2084,10 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def("WINNER", py::overload_cast<>(WINNER));
     m.def("WINNER", py::overload_cast<const Indicator&>(WINNER));
-    m.def("WINNER", py::overload_cast<Indicator::value_t>(WINNER));
+    m.def("WINNER", py::overload_cast<Indicator::value_t>(WINNER), R"(WINNER([ind])
+    
+    获利盘比例
+    用法: WINNER(CLOSE)　表示以当前收市价卖出的获利盘比例。
+    例如: 返回0.1表示10%获利盘;WINNER(10.5)表示10.5元价格的获利盘比例
+    该函数仅对日线分析周期有效，且仅对存在流通盘权息数据的证券有效，对指数、基金等无效。)");
 }

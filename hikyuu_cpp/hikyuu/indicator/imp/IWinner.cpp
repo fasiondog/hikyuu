@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/utilities/thread/algorithm.h"
 #include "hikyuu/indicator/crt/COST.h"
 #include "IWinner.h"
 
@@ -29,17 +30,22 @@ void IWinner::_calculate(const Indicator &data) {
     // 获取输入指标的上下文
     auto context = data.getContext();
     if (context == Null<KData>()) {
-        HKU_ERROR("The context of input indicator is Nullt!");
         m_discard = total;
         return;
     }
 
     IndicatorList cost_list(101);
     value_t const *cost_data[101];
-    for (size_t i = 0; i < 101; ++i) {
+
+    cost_list[0] = COST(0)(context);
+    m_discard = cost_list[0].discard();
+    HKU_IF_RETURN(m_discard >= total, void());
+    cost_data[0] = cost_list[0].data();
+
+    parallel_for_index_void(1, 101, [&cost_data, &cost_list, &context](size_t i) {
         cost_list[i] = COST(i)(context);
         cost_data[i] = cost_list[i].data();
-    }
+    });
 
     auto const *src = data.data();
     auto *dst = this->data();
@@ -52,30 +58,27 @@ void IWinner::_calculate(const Indicator &data) {
             value_t low = cost_data[low_idx][i];
             mid_idx = (high_idx + low_idx) / 2;
             value_t mid = cost_data[mid_idx][i];
-            // HKU_INFO("{}: {}, {}, {}, {}, {}, {}, {}", i, src[i], low, mid, high, low_idx,
-            // mid_idx,
-            //          high_idx);
             if (src[i] >= high) {
-                dst[i] = high_idx;
+                dst[i] = high_idx * 0.01;
                 break;
             } else if (src[i] <= low) {
-                dst[i] = low_idx;
+                dst[i] = low_idx * 0.01;
                 break;
             } else if (src[i] == mid) {
-                dst[i] = mid_idx;
+                dst[i] = mid_idx * 0.01;
                 break;
             }
 
             if (src[i] > mid) {
                 low_idx = mid_idx + 1;
                 if (low_idx >= high_idx) {
-                    dst[i] = low_idx;
+                    dst[i] = low_idx * 0.01;
                     break;
                 }
             } else {
                 high_idx = mid_idx - 1;
                 if (high_idx <= low_idx) {
-                    dst[i] = low_idx;
+                    dst[i] = low_idx * 0.01;
                     break;
                 }
             }
