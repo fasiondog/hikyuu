@@ -15,6 +15,7 @@
 
 namespace hku {
 
+/** 流通盘，单位万股 */
 Indicator HKU_API LIUTONGPAN();
 Indicator HKU_API LIUTONGPAN(const KData&);
 

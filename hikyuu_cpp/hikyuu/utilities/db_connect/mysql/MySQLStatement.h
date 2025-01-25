@@ -60,7 +60,7 @@ public:
     virtual void sub_getColumnAsBlob(int idx, std::vector<char> &item) override;
 
 private:
-    void _prepare(DBConnectBase *driver);
+    bool _prepare(DBConnectBase *driver) noexcept;
     void _reset();
     void _bindResult();
 
