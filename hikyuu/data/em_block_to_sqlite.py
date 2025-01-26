@@ -75,7 +75,7 @@ def em_import_block_to_sqlite(connect, code_market_dict, categorys=('行业板�
     hku_info("更新数据库")
     cur = connect.cursor()
     if len(blks) == 1:
-        sql = f"delete from block where category in ({blks[0]})"
+        sql = f"delete from block where category in ('{blks[0]}')"
     else:
         sql = f"delete from block where category in {tuple(blks)}"
     hku_info(sql)
@@ -90,6 +90,7 @@ def em_import_block_to_sqlite(connect, code_market_dict, categorys=('行业板�
 
     if insert_records:
         sql = "insert into block (category, name, market_code) values (?,?,?)"
+        hku_info(f"insert block records: {len(insert_records)}")
         cur.executemany(sql, insert_records)
 
     connect.commit()
@@ -101,7 +102,8 @@ if __name__ == "__main__":
     from hikyuu.data.common_sqlite3 import create_database
 
     # dest_dir = "/home/fasiondog/stock"
-    dest_dir = "d:\\stock"
+    dest_dir = "/Users/fasiondog/stock"
+    # dest_dir = "d:\\stock"
 
     connect = sqlite3.connect(dest_dir + "/stock.db")
     create_database(connect)
@@ -112,6 +114,6 @@ if __name__ == "__main__":
         code_market_dict[v["code"]] = MARKET.SH
     # print(code_market_dict)
 
-    em_import_block_to_sqlite(connect, code_market_dict)
+    em_import_block_to_sqlite(connect, code_market_dict, categorys=('行业板块', '指数板块',))
 
     connect.close()

@@ -74,7 +74,7 @@ def em_import_block_to_mysql(connect, code_market_dict, categorys=('行业板块
     hku_info("更新数据库")
     cur = connect.cursor()
     if len(blks) == 1:
-        sql = f"delete from hku_base.block where category in ({blks[0]})"
+        sql = f"delete from hku_base.block where category in ('{blks[0]}')"
     else:
         sql = f"delete from hku_base.block where category in {tuple(blks)}"
     cur.execute(sql)
@@ -88,6 +88,7 @@ def em_import_block_to_mysql(connect, code_market_dict, categorys=('行业板块
 
     if insert_records:
         sql = "insert into hku_base.block (category, name, market_code) values (%s,%s,%s)"
+        hku_info(f"insert block records: {len(insert_records)}")
         cur.executemany(sql, insert_records)
 
     connect.commit()
