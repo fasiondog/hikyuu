@@ -2096,4 +2096,9 @@ void export_Indicator_build_in(py::module& m) {
     用法: WINNER(CLOSE)　表示以当前收市价卖出的获利盘比例。
     例如: 返回0.1表示10%获利盘;WINNER(10.5)表示10.5元价格的获利盘比例
     该函数仅对日线分析周期有效，且仅对存在流通盘权息数据的证券有效，对指数、基金等无效。)");
+
+    m.def("INBLOCK", py::overload_cast<const string&, const string&>(INBLOCK), py::arg("category"),
+          py::arg("name"));
+    m.def("INBLOCK", py::overload_cast<const KData&, const string&, const string&>(INBLOCK),
+          py::arg("data"), py::arg("category"), py::arg("name"));
 }
