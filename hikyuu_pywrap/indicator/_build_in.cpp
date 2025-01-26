@@ -2042,35 +2042,41 @@ void export_Indicator_build_in(py::module& m) {
     :param bool ignore_discard: 忽略指标丢弃数据
     :rtype: Indicator)");
 
-    m.def("INDEXO", py::overload_cast<>(INDEXO));
-    m.def("INDEXO", py::overload_cast<const KQuery&>(INDEXO), R"(INDEXO([query])
+    m.def("INDEXO", py::overload_cast<bool>(INDEXO), py::arg("fill_null") = true);
+    m.def("INDEXO", py::overload_cast<const KData&, bool>(INDEXO), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXO([query])
     
-    大盘开盘价)");
+    返回对应的大盘开盘价,分别是上证指数,深证成指,科创50,创业板指)");
 
-    m.def("INDEXH", py::overload_cast<>(INDEXH));
-    m.def("INDEXH", py::overload_cast<const KQuery&>(INDEXH), R"(INDEXH([query])
+    m.def("INDEXH", py::overload_cast<bool>(INDEXH), py::arg("fill_null") = true);
+    m.def("INDEXH", py::overload_cast<const KData&, bool>(INDEXH), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXH([query])
     
-    大盘最高价)");
+    返回对应的大盘最高价,分别是上证指数,深证成指,科创50,创业板指)");
 
-    m.def("INDEXL", py::overload_cast<>(INDEXL));
-    m.def("INDEXL", py::overload_cast<const KQuery&>(INDEXL), R"(INDEXL([query])
+    m.def("INDEXL", py::overload_cast<bool>(INDEXL), py::arg("fill_null") = true);
+    m.def("INDEXL", py::overload_cast<const KData&, bool>(INDEXL), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXL([query])
     
-    大盘最低价)");
+    返回对应的大盘最低价,分别是上证指数,深证成指,科创50,创业板指)");
 
-    m.def("INDEXC", py::overload_cast<>(INDEXC));
-    m.def("INDEXC", py::overload_cast<const KQuery&>(INDEXC), R"(INDEXC([query])
+    m.def("INDEXC", py::overload_cast<bool>(INDEXC), py::arg("fill_null") = true);
+    m.def("INDEXC", py::overload_cast<const KData&, bool>(INDEXC), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXC([query])
     
-    大盘收盘价)");
+    返回对应的大盘收盘价,分别是上证指数,深证成指,科创50,创业板指)");
 
-    m.def("INDEXV", py::overload_cast<>(INDEXV));
-    m.def("INDEXV", py::overload_cast<const KQuery&>(INDEXV), R"(INDEXV([query])
+    m.def("INDEXV", py::overload_cast<bool>(INDEXV), py::arg("fill_null") = true);
+    m.def("INDEXV", py::overload_cast<const KData&, bool>(INDEXV), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXV([query])
     
-    大盘成交量)");
+    返回对应的大盘成交量,分别是上证指数,深证成指,科创50,创业板指)");
 
-    m.def("INDEXA", py::overload_cast<>(INDEXA));
-    m.def("INDEXA", py::overload_cast<const KQuery&>(INDEXA), R"(INDEXA([query])
+    m.def("INDEXA", py::overload_cast<bool>(INDEXA), py::arg("fill_null") = true);
+    m.def("INDEXA", py::overload_cast<const KData&, bool>(INDEXA), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXA([query])
     
-    大盘成交额)");
+    返回对应的大盘成交金额,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXADV", py::overload_cast<>(INDEXADV));
     m.def("INDEXADV", py::overload_cast<const KQuery&>(INDEXADV), R"(INDEXADV([query])
