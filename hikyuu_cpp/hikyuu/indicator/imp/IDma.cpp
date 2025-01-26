@@ -38,7 +38,7 @@ void IDma::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(total == 0, void());
 
-    _readyBuffer(total, 2);
+    _readyBuffer(total, 1);
 
     auto k = getContext();
     m_ref_ind.setContext(k);
