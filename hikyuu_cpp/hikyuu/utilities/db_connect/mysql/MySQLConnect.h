@@ -41,13 +41,17 @@ public:
     virtual void commit() override;
     virtual void rollback() noexcept override;
 
+public:
+    MYSQL *getRawMYSQL() const noexcept {
+        return m_mysql;
+    }
+
 private:
     bool tryConnect() noexcept;
     void connect();
     void close();
 
 private:
-    friend class MySQLStatement;
     MYSQL *m_mysql;
 };
 
