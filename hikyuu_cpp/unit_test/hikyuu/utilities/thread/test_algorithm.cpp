@@ -10,7 +10,131 @@
 
 using namespace hku;
 
+/**
+ * @defgroup test_hikyuu_algorithm test_hikyuu_algorithm
+ * @ingroup test_hikyuu_utilities
+ * @{
+ */
+
+/** @par 检测点 */
 TEST_CASE("test_parallelIndexRange") {
+    /** @arg start=0, end=0 */
+    std::vector<range_t> ranges = parallelIndexRange(0, 0);
+    CHECK_UNARY(ranges.empty());
+
+    /** @arg start=2, end=2 */
+    ranges = parallelIndexRange(2, 2);
+    CHECK_UNARY(ranges.empty());
+
+    /** @arg start=1, end=0 */
+    ranges = parallelIndexRange(1, 0);
+    CHECK_UNARY(ranges.empty());
+
+    /** @arg start=0, end=3 */
+    ranges = parallelIndexRange(0, 3);
+    CHECK_UNARY(ranges.size() > 0);
+
+    std::vector<size_t> expect(3);
+    for (size_t i = 0; i < expect.size(); ++i) {
+        expect[i] = i;
+    }
+
+    std::vector<size_t> result;
+    for (const auto& r : ranges) {
+        for (size_t i = r.first; i < r.second; ++i) {
+            result.push_back(i);
+        }
+    }
+
+    CHECK_EQ(result.size(), expect.size());
+    for (size_t i = 0; i < expect.size(); i++) {
+        CHECK_EQ(result[i], expect[i]);
+    }
+
+    /** @arg start=0, end=100 */
+    ranges = parallelIndexRange(0, 100);
+    CHECK_UNARY(ranges.size() > 0);
+
+    expect.resize(100);
+    for (size_t i = 0; i < expect.size(); ++i) {
+        expect[i] = i;
+    }
+
+    result.clear();
+    for (const auto& r : ranges) {
+        for (size_t i = r.first; i < r.second; ++i) {
+            result.push_back(i);
+        }
+    }
+
+    CHECK_EQ(result.size(), expect.size());
+    for (size_t i = 0; i < expect.size(); i++) {
+        CHECK_EQ(result[i], expect[i]);
+    }
+
+    /** @arg start=1, end=100 */
+    ranges = parallelIndexRange(1, 100);
+    CHECK_UNARY(ranges.size() > 0);
+
+    expect.resize(99);
+    for (size_t i = 0; i < expect.size(); ++i) {
+        expect[i] = i + 1;
+    }
+
+    result.clear();
+    for (const auto& r : ranges) {
+        for (size_t i = r.first; i < r.second; ++i) {
+            result.push_back(i);
+        }
+    }
+
+    CHECK_EQ(result.size(), expect.size());
+    for (size_t i = 0; i < expect.size(); i++) {
+        CHECK_EQ(result[i], expect[i]);
+    }
+
+    /** @arg start=99, end=100 */
+    ranges = parallelIndexRange(99, 100);
+    CHECK_UNARY(ranges.size() > 0);
+
+    expect.resize(1);
+    expect[0] = 99;
+
+    result.clear();
+    for (const auto& r : ranges) {
+        for (size_t i = r.first; i < r.second; ++i) {
+            result.push_back(i);
+        }
+    }
+
+    CHECK_EQ(result.size(), expect.size());
+    for (size_t i = 0; i < expect.size(); i++) {
+        CHECK_EQ(result[i], expect[i]);
+    }
+
+    /** @arg start=99, end=100 */
+    ranges = parallelIndexRange(17, 50);
+    CHECK_UNARY(ranges.size() > 0);
+
+    expect.resize(50 - 17);
+    for (size_t i = 0; i < expect.size(); ++i) {
+        expect[i] = i + 17;
+    }
+
+    result.clear();
+    for (const auto& r : ranges) {
+        for (size_t i = r.first; i < r.second; ++i) {
+            result.push_back(i);
+        }
+    }
+
+    CHECK_EQ(result.size(), expect.size());
+    for (size_t i = 0; i < expect.size(); i++) {
+        CHECK_EQ(result[i], expect[i]);
+    }
+}
+
+TEST_CASE("test_parallelIndexRange2") {
     std::vector<std::pair<size_t, size_t>> expect{{0, 2}};
     auto result = parallelIndexRange(0, 2);
     CHECK_EQ(result.size(), 1);
@@ -31,7 +155,8 @@ TEST_CASE("test_parallelIndexRange") {
 
     } else if (cpu_num == 8) {
         result = parallelIndexRange(0, 35);
-        expect = {{0, 8}, {8, 16}, {16, 24}, {24, 32}, {32, 33}, {33, 34}, {34, 35}};
+        expect = {{0, 4},   {4, 8},   {8, 12},  {12, 16}, {16, 20}, {20, 24},
+                  {24, 28}, {28, 32}, {32, 33}, {33, 34}, {34, 35}};
         CHECK_EQ(result.size(), expect.size());
         for (size_t i = 0, len = expect.size(); i < len; i++) {
             CHECK_EQ(result[i].first, expect[i].first);
@@ -57,3 +182,5 @@ TEST_CASE("test_parallel_for_index") {
         CHECK_EQ(result[i], expect[i]);
     }
 }
+
+/** @} */
