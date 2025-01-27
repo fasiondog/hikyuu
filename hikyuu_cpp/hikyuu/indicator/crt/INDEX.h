@@ -13,29 +13,41 @@ namespace hku {
 
 // 这里的大盘都指 sh000001
 
-/** 大盘开盘价 */
-Indicator HKU_API INDEXO();
-Indicator HKU_API INDEXO(const KQuery& query);
+/** 对应的大盘开盘价,分别是上证指数,深证成指,科创50,创业板指 */
+Indicator HKU_API INDEXO(bool fill_null = true);
+inline Indicator INDEXO(const KData& k, bool fill_null = true) {
+    return INDEXO(fill_null)(k);
+}
 
-/** 大盘最高价盘价 */
-Indicator HKU_API INDEXH();
-Indicator HKU_API INDEXH(const KQuery& query);
+/** 对应的大盘最高价,分别是上证指数,深证成指,科创50,创业板指 */
+Indicator HKU_API INDEXH(bool fill_null = true);
+inline Indicator INDEXH(const KData& k, bool fill_null = true) {
+    return INDEXH(fill_null)(k);
+}
 
-/** 大盘最低价 */
-Indicator HKU_API INDEXL();
-Indicator HKU_API INDEXL(const KQuery& query);
+/** 对应的大盘最低价,分别是上证指数,深证成指,科创50,创业板指 */
+Indicator HKU_API INDEXL(bool fill_null = true);
+inline Indicator INDEXL(const KData& k, bool fill_null = true) {
+    return INDEXL(fill_null)(k);
+}
 
-/** 大盘收盘价 */
-Indicator HKU_API INDEXC();
-Indicator HKU_API INDEXC(const KQuery& query);
+/** 对应的大盘收盘价,分别是上证指数,深证成指,科创50,创业板指 */
+Indicator HKU_API INDEXC(bool fill_null = true);
+inline Indicator INDEXC(const KData& k, bool fill_null = true) {
+    return INDEXC(fill_null)(k);
+}
 
-/** 大盘成交额 */
-Indicator HKU_API INDEXA();
-Indicator HKU_API INDEXA(const KQuery& query);
+/** 对应的大盘成交金额,分别是上证指数,深证成指,科创50,创业板指 */
+Indicator HKU_API INDEXA(bool fill_null = true);
+inline Indicator INDEXA(const KData& k, bool fill_null = true) {
+    return INDEXA(fill_null)(k);
+}
 
-/** 大盘成交量 */
-Indicator HKU_API INDEXV();
-Indicator HKU_API INDEXV(const KQuery& query);
+/** 对应的大盘成交量,分别是上证指数,深证成指,科创50,创业板指 */
+Indicator HKU_API INDEXV(bool fill_null = true);
+inline Indicator INDEXV(const KData& k, bool fill_null = true) {
+    return INDEXV(fill_null)(k);
+}
 
 /** 大盘上涨家数, 使用通达信 SH880005，可能无法用于实盘 */
 Indicator HKU_API INDEXADV();

@@ -165,7 +165,7 @@ target("real-test")
     set_kind("binary")
     set_default(false)
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "mysql")
     if get_config("mysql") then
         if is_plat("macosx") then
             add_packages("mysqlclient")
@@ -194,11 +194,6 @@ target("real-test")
     if is_plat("linux") or is_plat("macosx") then
         add_links("sqlite3")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
-    end
-
-    if is_plat("macosx") then
-        add_includedirs("/usr/local/opt/mysql-client/include")
-        add_linkdirs("/usr/local/opt/mysql-client/lib")
     end
 
     -- add files

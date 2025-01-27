@@ -953,7 +953,7 @@ void export_Indicator_build_in(py::module& m) {
     m.def("HSL", HSL_1);
     m.def("HSL", HSL_2, R"(HSL(kdata)
 
-    获取换手率，等于 VOL(k) / CAPITAL(k)
+    获取换手率, 乘以 100 才是百分比，等于 VOL(k) / CAPITAL(k) * 0.01
 
     :param KData kdata: k线数据
     :rtype: Indicator)");
@@ -1564,7 +1564,8 @@ void export_Indicator_build_in(py::module& m) {
     :param KData k: 上下文
     :rtype: Indicator)");
 
-    m.def("DMA", DMA, R"(DMA(ind, a[, fill_null=True])
+    m.def("DMA", DMA, py::arg("x"), py::arg("a"), py::arg("fill_null") = true,
+          R"(DMA(ind, a[, fill_null=True])
 
     动态移动平均
 
@@ -1660,11 +1661,9 @@ void export_Indicator_build_in(py::module& m) {
     m.def("COST", COST_1, py::arg("x") = 10.0);
     m.def("COST", COST_2, py::arg("k"), py::arg("x") = 10.0, R"(COST(k[, x=10.0])
 
-    成本分布
-
+    成本分布。该函数仅对日线分析周期有效，对不能存在流通盘权息数据的指数、ETF等无效。
     用法：COST(k, X) 表示X%获利盘的价格是多少
-
-    例如：COST(k, 10),表示10%获利盘的价格是多少，即有10%的持仓量在该价格以下，其余90%在该价格以上，为套牢盘 该函数仅对日线分析周期有效
+    例如：COST(k, 10),表示10%获利盘的价格是多少，即有10%的持仓量在该价格以下，其余90%在该价格以上，为套牢盘
 
     :param KData k: 关联的K线数据
     :param float x: x%获利价格, 0~100
@@ -2043,35 +2042,41 @@ void export_Indicator_build_in(py::module& m) {
     :param bool ignore_discard: 忽略指标丢弃数据
     :rtype: Indicator)");
 
-    m.def("INDEXO", py::overload_cast<>(INDEXO));
-    m.def("INDEXO", py::overload_cast<const KQuery&>(INDEXO), R"(INDEXO([query])
+    m.def("INDEXO", py::overload_cast<bool>(INDEXO), py::arg("fill_null") = true);
+    m.def("INDEXO", py::overload_cast<const KData&, bool>(INDEXO), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXO([query])
     
-    大盘开盘价)");
+    返回对应的大盘开盘价,分别是上证指数,深证成指,科创50,创业板指)");
 
-    m.def("INDEXH", py::overload_cast<>(INDEXH));
-    m.def("INDEXH", py::overload_cast<const KQuery&>(INDEXH), R"(INDEXH([query])
+    m.def("INDEXH", py::overload_cast<bool>(INDEXH), py::arg("fill_null") = true);
+    m.def("INDEXH", py::overload_cast<const KData&, bool>(INDEXH), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXH([query])
     
-    大盘最高价)");
+    返回对应的大盘最高价,分别是上证指数,深证成指,科创50,创业板指)");
 
-    m.def("INDEXL", py::overload_cast<>(INDEXL));
-    m.def("INDEXL", py::overload_cast<const KQuery&>(INDEXL), R"(INDEXL([query])
+    m.def("INDEXL", py::overload_cast<bool>(INDEXL), py::arg("fill_null") = true);
+    m.def("INDEXL", py::overload_cast<const KData&, bool>(INDEXL), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXL([query])
     
-    大盘最低价)");
+    返回对应的大盘最低价,分别是上证指数,深证成指,科创50,创业板指)");
 
-    m.def("INDEXC", py::overload_cast<>(INDEXC));
-    m.def("INDEXC", py::overload_cast<const KQuery&>(INDEXC), R"(INDEXC([query])
+    m.def("INDEXC", py::overload_cast<bool>(INDEXC), py::arg("fill_null") = true);
+    m.def("INDEXC", py::overload_cast<const KData&, bool>(INDEXC), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXC([query])
     
-    大盘收盘价)");
+    返回对应的大盘收盘价,分别是上证指数,深证成指,科创50,创业板指)");
 
-    m.def("INDEXV", py::overload_cast<>(INDEXV));
-    m.def("INDEXV", py::overload_cast<const KQuery&>(INDEXV), R"(INDEXV([query])
+    m.def("INDEXV", py::overload_cast<bool>(INDEXV), py::arg("fill_null") = true);
+    m.def("INDEXV", py::overload_cast<const KData&, bool>(INDEXV), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXV([query])
     
-    大盘成交量)");
+    返回对应的大盘成交量,分别是上证指数,深证成指,科创50,创业板指)");
 
-    m.def("INDEXA", py::overload_cast<>(INDEXA));
-    m.def("INDEXA", py::overload_cast<const KQuery&>(INDEXA), R"(INDEXA([query])
+    m.def("INDEXA", py::overload_cast<bool>(INDEXA), py::arg("fill_null") = true);
+    m.def("INDEXA", py::overload_cast<const KData&, bool>(INDEXA), py::arg("kdata"),
+          py::arg("fill_null") = true, R"(INDEXA([query])
     
-    大盘成交额)");
+    返回对应的大盘成交金额,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXADV", py::overload_cast<>(INDEXADV));
     m.def("INDEXADV", py::overload_cast<const KQuery&>(INDEXADV), R"(INDEXADV([query])
@@ -2082,4 +2087,18 @@ void export_Indicator_build_in(py::module& m) {
     m.def("INDEXDEC", py::overload_cast<const KQuery&>(INDEXDEC), R"(INDEXDEC([query])
     
     通达信 880005 大盘下跌家数, 可能无法盘中更新!)");
+
+    m.def("WINNER", py::overload_cast<>(WINNER));
+    m.def("WINNER", py::overload_cast<const Indicator&>(WINNER));
+    m.def("WINNER", py::overload_cast<Indicator::value_t>(WINNER), R"(WINNER([ind])
+    
+    获利盘比例
+    用法: WINNER(CLOSE)　表示以当前收市价卖出的获利盘比例。
+    例如: 返回0.1表示10%获利盘;WINNER(10.5)表示10.5元价格的获利盘比例
+    该函数仅对日线分析周期有效，且仅对存在流通盘权息数据的证券有效，对指数、基金等无效。)");
+
+    m.def("INBLOCK", py::overload_cast<const string&, const string&>(INBLOCK), py::arg("category"),
+          py::arg("name"));
+    m.def("INBLOCK", py::overload_cast<const KData&, const string&, const string&>(INBLOCK),
+          py::arg("data"), py::arg("category"), py::arg("name"));
 }

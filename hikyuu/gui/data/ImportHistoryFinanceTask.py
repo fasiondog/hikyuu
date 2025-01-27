@@ -30,6 +30,7 @@ import mysql.connector
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_finance_to_mysql import history_finance_import_mysql
 from hikyuu.data.pytdx_finance_to_sqlite import history_finance_import_sqlite
+from hikyuu.data.common_pytdx import search_best_tdx
 from hikyuu.util import *
 
 
@@ -47,6 +48,7 @@ class ImportHistoryFinanceTask:
 
     def connect(self):
         self.api = TdxHq_API()
+        # 不是所有服务器都提供下载
         hku_check(self.api.connect('120.76.152.87', 7709), "failed connect pytdx!")
 
     def get_list_info(self):

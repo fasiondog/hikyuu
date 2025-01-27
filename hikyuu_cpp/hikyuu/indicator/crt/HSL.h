@@ -16,24 +16,12 @@
 namespace hku {
 
 /**
- * 获取换手率，等于 VOL(k) / CAPITAL(k)
+ * 获取换手率, 乘以 100 才是百分比，等于 VOL(k) / CAPITAL(k) * 0.01
  * @param k 关联的K线数据
  * @ingroup Indicator
  */
 Indicator HSL(const KData& k);
 Indicator HSL();
-
-inline Indicator HSL() {
-    Indicator hsl = VOL() / LIUTONGPAN();
-    hsl.name("HSL");
-    return hsl;
-}
-
-inline Indicator HSL(const KData& k) {
-    Indicator hsl = HSL();
-    hsl.setContext(k);
-    return hsl;
-}
 
 }  // namespace hku
 #endif /* INDICATOR_CRT_HSL_H_ */

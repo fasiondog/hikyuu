@@ -25,11 +25,16 @@ namespace hku {
 
 MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_statement)
 : SQLStatementBase(driver, sql_statement),
-  m_db((dynamic_cast<MySQLConnect*>(driver))->m_mysql),
+  m_db(nullptr),
   m_stmt(nullptr),
   m_meta_result(nullptr),
   m_needs_reset(false),
   m_has_bind_result(false) {
+    MySQLConnect* connect = dynamic_cast<MySQLConnect*>(driver);
+    HKU_CHECK(connect, "Failed create statement: {}! Failed dynamic_cast<MySQLConnect*>!",
+              sql_statement);
+
+    m_db = connect->getRawMYSQL();
     _prepare(driver);
 
     auto param_count = mysql_stmt_param_count(m_stmt);
@@ -58,7 +63,7 @@ MySQLStatement::~MySQLStatement() {
 
 void MySQLStatement::_prepare(DBConnectBase* driver) {
     m_stmt = mysql_stmt_init(m_db);
-    HKU_CHECK(m_stmt, "Failed mysql_stmt_init!");
+    HKU_CHECK(m_stmt, "Failed mysql_stmt_init! SQL: {}", m_sql_string);
 
     int ret = mysql_stmt_prepare(m_stmt, m_sql_string.c_str(), m_sql_string.size());
     HKU_IF_RETURN(0 == ret, void());
@@ -68,13 +73,14 @@ void MySQLStatement::_prepare(DBConnectBase* driver) {
 
     // 如果是服务器异常，尝试重连服务器
     if (CR_SERVER_LOST == ret || CR_SERVER_GONE_ERROR == ret) {
-        if ((dynamic_cast<MySQLConnect*>(driver))->ping()) {
-            m_db = (dynamic_cast<MySQLConnect*>(driver))->m_mysql;
+        MySQLConnect* connect = dynamic_cast<MySQLConnect*>(driver);
+        if (connect && connect->ping()) {
+            m_db = connect->getRawMYSQL();
         } else {
-            HKU_THROW("Failed reconnect mysql!");
+            HKU_THROW("Failed reconnect mysql! SQL: {}", m_sql_string);
         }
     } else if (CR_OUT_OF_MEMORY == ret) {
-        HKU_THROW("Out of memory!");
+        HKU_THROW("Out of memory! SQL: {}", m_sql_string);
     }
 
     m_stmt = mysql_stmt_init(m_db);

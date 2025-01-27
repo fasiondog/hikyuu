@@ -1,28 +1,28 @@
 /*
- * ILiuTongPang.cpp
+ *  Copyright (c) 2025 hikyuu.org
  *
- *  Created on: 2019年3月6日
+ *  Created on: 2025-01-22
  *      Author: fasiondog
  */
 
-#include "ILiuTongPan.h"
+#include "IHsl.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::ILiuTongPan)
+BOOST_CLASS_EXPORT(hku::IHsl)
 #endif
 
 namespace hku {
 
-ILiuTongPan::ILiuTongPan() : IndicatorImp("LIUTONGPAN", 1) {}
+IHsl::IHsl() : IndicatorImp("HSL", 1) {}
 
-ILiuTongPan::~ILiuTongPan() {}
+IHsl::~IHsl() {}
 
-ILiuTongPan::ILiuTongPan(const KData& k) : IndicatorImp("LIUTONGPAN", 1) {
+IHsl::IHsl(const KData& k) : IndicatorImp("HSL", 1) {
     setParam<KData>("kdata", k);
-    ILiuTongPan::_calculate(Indicator());
+    IHsl::_calculate(Indicator());
 }
 
-void ILiuTongPan::_calculate(const Indicator& data) {
+void IHsl::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
@@ -68,7 +68,8 @@ void ILiuTongPan::_calculate(const Indicator& data) {
 
         while (pos < total && kdata[pos].datetime < cur_sw_date) {
             if (kdata[pos].datetime >= pre_sw_date) {
-                dst[pos] = pre_free_count;
+                // transCount 单位为手数，流通盘单位为万股
+                dst[pos] = kdata[pos].transCount / pre_free_count * 0.01;
             }
             pos++;
         }
@@ -81,7 +82,7 @@ void ILiuTongPan::_calculate(const Indicator& data) {
     }
 
     for (; pos < total; pos++) {
-        dst[pos] = pre_free_count;
+        dst[pos] = kdata[pos].transCount / pre_free_count * 0.01;
     }
 
     // 更新 discard
@@ -93,12 +94,12 @@ void ILiuTongPan::_calculate(const Indicator& data) {
     }
 }
 
-Indicator HKU_API LIUTONGPAN() {
-    return make_shared<ILiuTongPan>()->calculate();
+Indicator HKU_API HSL() {
+    return make_shared<IHsl>()->calculate();
 }
 
-Indicator HKU_API LIUTONGPAN(const KData& k) {
-    return Indicator(make_shared<ILiuTongPan>(k));
+Indicator HKU_API HSL(const KData& k) {
+    return Indicator(make_shared<IHsl>(k));
 }
 
 } /* namespace hku */
