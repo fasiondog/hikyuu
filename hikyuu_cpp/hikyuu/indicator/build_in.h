@@ -38,6 +38,7 @@
 #include "crt/DECLINE.h"
 #include "crt/DEVSQ.h"
 #include "crt/DIFF.h"
+#include "crt/DISCARD.h"
 #include "crt/DMA.h"
 #include "crt/DOWNNDAY.h"
 #include "crt/DROPNA.h"
