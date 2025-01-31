@@ -2100,5 +2100,23 @@ void export_Indicator_build_in(py::module& m) {
     m.def("INBLOCK", py::overload_cast<const string&, const string&>(INBLOCK), py::arg("category"),
           py::arg("name"));
     m.def("INBLOCK", py::overload_cast<const KData&, const string&, const string&>(INBLOCK),
-          py::arg("data"), py::arg("category"), py::arg("name"));
+          py::arg("data"), py::arg("category"), py::arg("name"),
+          R"(INBLOCK(data, category, name)        
+
+    当前上下文证券是否在指定的板块中。
+
+    :param KData data: 指定的K线数据(上下文)
+    :param string category: 板块类别
+    :param string name: 板块名称
+    :rtype: Indicator)");
+
+    m.def("DISCARD", py::overload_cast<int>(DISCARD), py::arg("discard"));
+    m.def("DISCARD", py::overload_cast<const Indicator&, int>(DISCARD), py::arg("ind"),
+          py::arg("discard"), R"(DISCARD(data, discard)
+    
+    以指标公式的方式设置指标结果的丢弃数据量。
+
+    :param Indicator data: 指标
+    :param int discard: 丢弃数据量
+    :rtype: Indicator)");
 }
