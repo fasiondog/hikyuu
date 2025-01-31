@@ -9,7 +9,7 @@
 #ifndef INDICATOR_CRT_CONST_H_
 #define INDICATOR_CRT_CONST_H_
 
-#include "CVAL.h"
+#include "../Indicator.h"
 
 namespace hku {
 
