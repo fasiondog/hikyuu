@@ -32,6 +32,7 @@ void ICost::_checkParam(const string& name) const {
     }
 }
 
+// 假设成本分布：DMA(x, HSL=A) = A*X+(1-A)*Y'
 // 实际算法：DMA(CLOSE() + (HIGH() - LOW()) * x / 100.0, HSL());
 void ICost::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),

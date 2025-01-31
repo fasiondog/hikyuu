@@ -2112,11 +2112,21 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def("DISCARD", py::overload_cast<int>(DISCARD), py::arg("discard"));
     m.def("DISCARD", py::overload_cast<const Indicator&, int>(DISCARD), py::arg("ind"),
-          py::arg("discard"), R"(DISCARD(ind, discard)
+          py::arg("discard"), R"(DISCARD(data, discard)
     
     以指标公式的方式设置指标结果的丢弃数据量。
 
-    :param Indicator ind: 指标
+    :param Indicator data: 指标
     :param int discard: 丢弃数据量
+    :rtype: Indicator)");
+
+    m.def("CONST", py::overload_cast<>(CONST));
+    m.def("CONST", py::overload_cast<const Indicator&>(CONST), py::arg("data"),
+          R"(CONST(value)
+    
+    取值设为常数
+    用法: CONST(A) 取A最后的值为常量。(未来函数)
+
+    :param Indicator data: 输入指标
     :rtype: Indicator)");
 }

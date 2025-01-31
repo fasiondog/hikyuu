@@ -1,7 +1,7 @@
 /*
- * IDiscard.cpp
+ *  Copyright (c) 2025 hikyuu.org
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2025-01-31
  *      Author: fasiondog
  */
 
