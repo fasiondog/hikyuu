@@ -8,6 +8,7 @@
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/CVAL.h"
 #include "hikyuu/indicator/crt/SLICE.h"
+#include "hikyuu/indicator/crt/CONTEXT.h"
 #include "IDma.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -45,12 +46,14 @@ void IDma::_calculate(const Indicator& ind) {
     Indicator ref = m_ref_ind;
     auto dates = ref.getDatetimeList();
     if (dates.empty()) {
+        // 如果不是时间序列，则以 ind 为基准，按右端对齐，不足用 nan 填充, 超长则截断左端
         if (ref.size() > ind.size()) {
             ref = SLICE(ref, ref.size() - ind.size(), ref.size());
         } else if (ref.size() < ind.size()) {
             ref = CVAL(ind, 0.) + ref;
         }
-    } else if (m_ref_ind.size() != ind.size()) {
+    } else if (k != ind.getContext()) {
+        // 如果是时间序列，当两者的上下文不同，则按日期对齐
         ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));
     }
 

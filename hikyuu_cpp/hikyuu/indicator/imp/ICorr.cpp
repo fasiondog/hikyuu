@@ -58,7 +58,7 @@ void ICorr::_calculate(const Indicator& ind) {
         } else if (ref.size() < ind.size()) {
             ref = CVAL(ind, 0.) + ref;
         }
-    } else if (m_ref_ind.size() != ind.size()) {
+    } else if (k != ind.getContext()) {
         ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));
     }
 
