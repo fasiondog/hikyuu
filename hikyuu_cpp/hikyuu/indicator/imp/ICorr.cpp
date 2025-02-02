@@ -5,9 +5,6 @@
  *      Author: fasiondog
  */
 
-#include "hikyuu/indicator/crt/ALIGN.h"
-#include "hikyuu/indicator/crt/CVAL.h"
-#include "hikyuu/indicator/crt/SLICE.h"
 #include "ICorr.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -16,15 +13,13 @@ BOOST_CLASS_EXPORT(hku::ICorr)
 
 namespace hku {
 
-ICorr::ICorr() : IndicatorImp("CORR") {
+ICorr::ICorr() : Indicator2InImp("CORR") {
     setParam<int>("n", 10);
-    setParam<bool>("fill_null", true);
 }
 
 ICorr::ICorr(const Indicator& ref_ind, int n, bool fill_null)
-: IndicatorImp("CORR"), m_ref_ind(ref_ind) {
+: Indicator2InImp("CORR", ref_ind, fill_null, 2) {
     setParam<int>("n", n);
-    setParam<bool>("fill_null", fill_null);
 }
 
 ICorr::~ICorr() {}
@@ -36,31 +31,11 @@ void ICorr::_checkParam(const string& name) const {
     }
 }
 
-IndicatorImpPtr ICorr::_clone() {
-    auto p = make_shared<ICorr>();
-    p->m_ref_ind = m_ref_ind.clone();
-    return p;
-}
-
 void ICorr::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(total == 0, void());
 
-    _readyBuffer(total, 2);
-
-    auto k = getContext();
-    m_ref_ind.setContext(k);
-    Indicator ref = m_ref_ind;
-    auto dates = ref.getDatetimeList();
-    if (dates.empty()) {
-        if (ref.size() > ind.size()) {
-            ref = SLICE(ref, ref.size() - ind.size(), ref.size());
-        } else if (ref.size() < ind.size()) {
-            ref = CVAL(ind, 0.) + ref;
-        }
-    } else if (k != ind.getContext()) {
-        ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));
-    }
+    Indicator ref = prepare(ind);
 
     int n = getParam<int>("n");
     if (n == 0) {
