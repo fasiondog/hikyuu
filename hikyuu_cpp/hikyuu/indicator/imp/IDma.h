@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "../Indicator2InImp.h"
 
 namespace hku {
 
@@ -17,31 +17,14 @@ namespace hku {
  * 算法：若Y=DMA(X,A) 则 Y=A*X+(1-A)*Y',其中Y'表示上一周期Y值。
  * 例如：DMA(CLOSE,VOL/CAPITAL)表示求以换手率作平滑因子的平均价
  */
-class IDma : public IndicatorImp {
+class IDma : public Indicator2InImp {
+    INDICATOR2IN_IMP(IDma)
+    INDICATOR2IN_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
+
 public:
     IDma();
     explicit IDma(const Indicator& ref_a, bool fill_null);
     virtual ~IDma();
-
-    virtual void _checkParam(const string& name) const override;
-    virtual void _calculate(const Indicator& data) override;
-    virtual IndicatorImpPtr _clone() override;
-
-private:
-    Indicator m_ref_ind;
-
-//============================================
-// 序列化支持
-//============================================
-#if HKU_SUPPORT_SERIALIZATION
-private:
-    friend class boost::serialization::access;
-    template <class Archive>
-    void serialize(Archive& ar, const unsigned int version) {
-        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(IndicatorImp);
-        ar& BOOST_SERIALIZATION_NVP(m_ref_ind);
-    }
-#endif
 };
 
-}
+}  // namespace hku

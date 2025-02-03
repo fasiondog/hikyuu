@@ -8,6 +8,7 @@
 #pragma once
 
 #include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/indicator/Indicator2InImp.h"
 
 #define TA_IN1_OUT_DEF(func)                          \
     class Cls_##func : public IndicatorImp {          \
@@ -30,79 +31,27 @@
         virtual void _checkParam(const string& name) const override; \
     };
 
-#if HKU_SUPPORT_SERIALIZATION
-#define TA_IN2_OUT_DEF(func)                                       \
-    class Cls_##func : public IndicatorImp {                       \
-    public:                                                        \
-        Cls_##func();                                              \
-        Cls_##func(const Indicator& ref_ind, bool fill_null);      \
-        virtual ~Cls_##func();                                     \
-        virtual void _calculate(const Indicator& data) override;   \
-        virtual IndicatorImpPtr _clone() override;                 \
-                                                                   \
-    private:                                                       \
-        Indicator m_ref_ind;                                       \
-                                                                   \
-    private:                                                       \
-        friend class boost::serialization::access;                 \
-        template <class Archive>                                   \
-        void serialize(Archive& ar, const unsigned int version) {  \
-            ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(IndicatorImp); \
-            ar& BOOST_SERIALIZATION_NVP(m_ref_ind);                \
-        }                                                          \
+#define TA_IN2_OUT_DEF(func)                                  \
+    class Cls_##func : public Indicator2InImp {               \
+        INDICATOR2IN_IMP(Cls_##func)                          \
+        INDICATOR2IN_IMP_NO_PRIVATE_MEMBER_SERIALIZATION      \
+    public:                                                   \
+        Cls_##func();                                         \
+        Cls_##func(const Indicator& ref_ind, bool fill_null); \
+        virtual ~Cls_##func();                                \
     };
 
 #define TA_IN2_OUT_N_DEF(func)                                       \
-    class Cls_##func : public IndicatorImp {                         \
+    class Cls_##func : public Indicator2InImp {                      \
+        INDICATOR2IN_IMP(Cls_##func)                                 \
+        INDICATOR2IN_IMP_NO_PRIVATE_MEMBER_SERIALIZATION             \
     public:                                                          \
         Cls_##func();                                                \
         explicit Cls_##func(int n, bool fill_null);                  \
         Cls_##func(const Indicator& ref_ind, int n, bool fill_null); \
         virtual ~Cls_##func();                                       \
         virtual void _checkParam(const string& name) const override; \
-        virtual void _calculate(const Indicator& data) override;     \
-        virtual IndicatorImpPtr _clone() override;                   \
-                                                                     \
-    private:                                                         \
-        Indicator m_ref_ind;                                         \
-                                                                     \
-    private:                                                         \
-        friend class boost::serialization::access;                   \
-        template <class Archive>                                     \
-        void serialize(Archive& ar, const unsigned int version) {    \
-            ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(IndicatorImp);   \
-            ar& BOOST_SERIALIZATION_NVP(m_ref_ind);                  \
-        }                                                            \
     };
-#else
-#define TA_IN2_OUT_DEF(func)                                     \
-    class Cls_##func : public IndicatorImp {                     \
-    public:                                                      \
-        Cls_##func();                                            \
-        Cls_##func(const Indicator& ref_ind);                    \
-        virtual ~Cls_##func();                                   \
-        virtual void _calculate(const Indicator& data) override; \
-        virtual IndicatorImpPtr _clone() override;               \
-                                                                 \
-    private:                                                     \
-        Indicator m_ref_ind;                                     \
-    };
-
-#define TA_IN2_OUT_N_DEF(func)                                       \
-    class Cls_##func : public IndicatorImp {                         \
-    public:                                                          \
-        Cls_##func();                                                \
-        explicit Cls_##func(int n);                                  \
-        Cls_##func(const Indicator& ref_ind, int n);                 \
-        virtual ~Cls_##func();                                       \
-        virtual void _checkParam(const string& name) const override; \
-        virtual void _calculate(const Indicator& data) override;     \
-        virtual IndicatorImpPtr _clone() override;                   \
-                                                                     \
-    private:                                                         \
-        Indicator m_ref_ind;                                         \
-    };
-#endif
 
 #define TA_K_OUT_DEF(func)                            \
     class Cls_##func : public IndicatorImp {          \
