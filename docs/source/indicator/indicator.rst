@@ -335,6 +335,15 @@
     :rtype: Indicator
 
 
+.. py:function:: DISCARD(data, discard)
+    
+    以指标公式的方式设置指标结果的丢弃数据量。
+
+    :param Indicator data: 指标
+    :param int discard: 丢弃数据量
+    :rtype: Indicator
+
+
 .. py:function:: DMA(ind, a)
 
     动态移动平均
@@ -547,6 +556,56 @@
     :rtype: Indicator
     
 
+.. py:function:: INBLOCK(data, category, name)        
+
+    当前上下文证券是否在指定的板块中。
+
+    :param KData data: 指定的K线数据(上下文)
+    :param string category: 板块类别
+    :param string name: 板块名称
+    :rtype: Indicator
+
+
+.. py:function:: INDEXC([kdata])
+    
+    返回对应的大盘收盘价,分别是上证指数,深证成指,科创50,创业板指
+
+
+.. py:function:: INDEXH([kdata])
+    
+    返回对应的大盘最高价,分别是上证指数,深证成指,科创50,创业板指
+
+
+.. py:function:: INDEXL([kdata])
+
+    返回对应的大盘最低价,分别是上证指数,深证成指,科创50,创业板指
+
+
+.. py:function:: INDEXO([kdata])
+    
+    返回对应的大盘开盘价,分别是上证指数,深证成指,科创50,创业板指
+
+
+.. py:function:: INDEXA([kdata])
+    
+    返回对应的大盘成交金额,分别是上证指数,深证成指,科创50,创业板指
+
+
+.. py:function:: INDEXV([kdata])
+
+    返回对应的大盘成交量,分别是上证指数,深证成指,科创50,创业板指
+
+
+.. py:function:: INDEXADV([query])
+    
+    通达信 880005 大盘上涨家数, 可能无法盘中更新!
+
+
+.. py:function:: INDEXDEC([query])
+    
+    通达信 880005 大盘下跌家数, 可能无法盘中更新!
+
+
 .. py:function:: INSUM(block, query, ind, mode)
 
     返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
@@ -642,6 +701,15 @@
     :param data: 输入数据
     :param int m: m周期
     :param int n: n周期
+    :rtype: Indicator
+
+
+.. py:function:: LASTVALUE(ind, [ignore_discard=False])
+
+    等同于通达信CONST指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
+
+    :param Indicator ind: 指标
+    :param bool ignore_discard: 忽略指标丢弃数据
     :rtype: Indicator
 
 
@@ -1203,6 +1271,17 @@
 
     :param data: 输入数据 KData
     :rtype: Indicator
+
+
+.. py:function:: WINNER([ind])
+    
+    获利盘比例
+
+    用法: WINNER(CLOSE)　表示以当前收市价卖出的获利盘比例。
+
+    例如: 返回0.1表示10%获利盘;WINNER(10.5)表示10.5元价格的获利盘比例
+
+    该函数仅对日线分析周期有效，且仅对存在流通盘权息数据的证券有效，对指数、基金等无效。
 
 
 .. py:function:: YEAR([data])

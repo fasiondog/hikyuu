@@ -9,10 +9,13 @@
 * :py:func:`ALIGN` - 按指定的参考日期对齐
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
 * :py:func:`CONTEXT` - 独立上下文
+* :py:func:`DISCARD` - 以指标公式的方式设置指标结果的丢弃数据量。
 * :py:func:`DROPNA` - 删除 nan 值
+* :py:func:`INBLOCK` - 当前上下文证券是否在指定的板块中。
 * :py:func:`ISNA` - 判断是否为 nan 值
 * :py:func:`ISINF` - 判断是否为 +inf 值
 * :py:func:`ISINFA` - 判断是否为 -inf 值
+* :py:func:`LASTVALUE` - 等同于通达信 CONST 指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
 * :py:func:`REPLACE` - 替换指标中指定值，默认为替换 nan 值为 0.0
 * :py:func:`RESULT` - 以指标公式的方式返回指定指标中相应的结果集
@@ -47,6 +50,15 @@
 
 * :py:func:`ADVANCE` - 上涨家数
 * :py:func:`DECLINE` - 下跌家数
+* :py:func:`INDEXO` - 返回对应的大盘开盘价,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXH` - 返回对应的大盘最高价,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXL` - 返回对应的大盘最低价,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXC` - 返回对应的大盘收盘价,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXA` - 返回对应的大盘成交金额,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXV` - 返回对应的大盘成交量,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXADV` - 通达信 880005 大盘上涨家数, 可能无法盘中更新!
+* :py:func:`INDEXDEC` - 通达信 880005 大盘下跌家数, 可能无法盘中更新!
+
 
 **逻辑算术函数**
 
