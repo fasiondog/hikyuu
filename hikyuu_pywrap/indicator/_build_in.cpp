@@ -2119,4 +2119,14 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator data: 指标
     :param int discard: 丢弃数据量
     :rtype: Indicator)");
+
+    m.def("LASTVALUE", py::overload_cast<bool>(LASTVALUE), py::arg("ignore_discard") = false);
+    m.def("LASTVALUE", py::overload_cast<const Indicator&, bool>(LASTVALUE), py::arg("ind"),
+          py::arg("ignore_discard") = false, R"(LASTVALUE(ind, [ignore_discard=False])
+
+    等同于通达信CONST指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
+
+    :param Indicator ind: 指标
+    :param bool ignore_discard: 忽略指标丢弃数据
+    :rtype: Indicator)");
 }

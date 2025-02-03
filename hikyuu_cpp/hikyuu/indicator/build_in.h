@@ -64,6 +64,7 @@
 #include "crt/ISLASTBAR.h"
 #include "crt/ISNA.h"
 #include "crt/LAST.h"
+#include "crt/LASTVALUE.h"
 #include "crt/LIUTONGPAN.h"
 #include "crt/LLV.h"
 #include "crt/LLVBARS.h"
