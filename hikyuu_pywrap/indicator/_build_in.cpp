@@ -2044,37 +2044,37 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def("INDEXO", py::overload_cast<bool>(INDEXO), py::arg("fill_null") = true);
     m.def("INDEXO", py::overload_cast<const KData&, bool>(INDEXO), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXO([query])
+          py::arg("fill_null") = true, R"(INDEXO([kdata])
     
     返回对应的大盘开盘价,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXH", py::overload_cast<bool>(INDEXH), py::arg("fill_null") = true);
     m.def("INDEXH", py::overload_cast<const KData&, bool>(INDEXH), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXH([query])
+          py::arg("fill_null") = true, R"(INDEXH([kdata])
     
     返回对应的大盘最高价,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXL", py::overload_cast<bool>(INDEXL), py::arg("fill_null") = true);
     m.def("INDEXL", py::overload_cast<const KData&, bool>(INDEXL), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXL([query])
+          py::arg("fill_null") = true, R"(INDEXL([kdata])
     
     返回对应的大盘最低价,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXC", py::overload_cast<bool>(INDEXC), py::arg("fill_null") = true);
     m.def("INDEXC", py::overload_cast<const KData&, bool>(INDEXC), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXC([query])
+          py::arg("fill_null") = true, R"(INDEXC([kdata])
     
     返回对应的大盘收盘价,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXV", py::overload_cast<bool>(INDEXV), py::arg("fill_null") = true);
     m.def("INDEXV", py::overload_cast<const KData&, bool>(INDEXV), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXV([query])
+          py::arg("fill_null") = true, R"(INDEXV([kdata])
     
     返回对应的大盘成交量,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXA", py::overload_cast<bool>(INDEXA), py::arg("fill_null") = true);
     m.def("INDEXA", py::overload_cast<const KData&, bool>(INDEXA), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXA([query])
+          py::arg("fill_null") = true, R"(INDEXA([kdata])
     
     返回对应的大盘成交金额,分别是上证指数,深证成指,科创50,创业板指)");
 
@@ -2100,5 +2100,33 @@ void export_Indicator_build_in(py::module& m) {
     m.def("INBLOCK", py::overload_cast<const string&, const string&>(INBLOCK), py::arg("category"),
           py::arg("name"));
     m.def("INBLOCK", py::overload_cast<const KData&, const string&, const string&>(INBLOCK),
-          py::arg("data"), py::arg("category"), py::arg("name"));
+          py::arg("data"), py::arg("category"), py::arg("name"),
+          R"(INBLOCK(data, category, name)        
+
+    当前上下文证券是否在指定的板块中。
+
+    :param KData data: 指定的K线数据(上下文)
+    :param string category: 板块类别
+    :param string name: 板块名称
+    :rtype: Indicator)");
+
+    m.def("DISCARD", py::overload_cast<int>(DISCARD), py::arg("discard"));
+    m.def("DISCARD", py::overload_cast<const Indicator&, int>(DISCARD), py::arg("ind"),
+          py::arg("discard"), R"(DISCARD(data, discard)
+    
+    以指标公式的方式设置指标结果的丢弃数据量。
+
+    :param Indicator data: 指标
+    :param int discard: 丢弃数据量
+    :rtype: Indicator)");
+
+    m.def("LASTVALUE", py::overload_cast<bool>(LASTVALUE), py::arg("ignore_discard") = false);
+    m.def("LASTVALUE", py::overload_cast<const Indicator&, bool>(LASTVALUE), py::arg("ind"),
+          py::arg("ignore_discard") = false, R"(LASTVALUE(ind, [ignore_discard=False])
+
+    等同于通达信CONST指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
+
+    :param Indicator ind: 指标
+    :param bool ignore_discard: 忽略指标丢弃数据
+    :rtype: Indicator)");
 }

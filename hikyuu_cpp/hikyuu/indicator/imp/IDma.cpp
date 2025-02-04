@@ -5,9 +5,6 @@
  *      Author: fasiondog
  */
 
-#include "hikyuu/indicator/crt/ALIGN.h"
-#include "hikyuu/indicator/crt/CVAL.h"
-#include "hikyuu/indicator/crt/SLICE.h"
 #include "IDma.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -16,43 +13,18 @@ BOOST_CLASS_EXPORT(hku::IDma)
 
 namespace hku {
 
-IDma::IDma() : IndicatorImp("DMA") {
-    setParam<bool>("fill_null", true);
-}
+IDma::IDma() : Indicator2InImp("DMA") {}
 
-IDma::IDma(const Indicator& ref_ind, bool fill_null) : IndicatorImp("DMA"), m_ref_ind(ref_ind) {
-    setParam<bool>("fill_null", fill_null);
-}
+IDma::IDma(const Indicator& ref_ind, bool fill_null)
+: Indicator2InImp("DMA", ref_ind, fill_null, 1) {}
 
 IDma::~IDma() {}
-
-void IDma::_checkParam(const string& name) const {}
-
-IndicatorImpPtr IDma::_clone() {
-    auto p = make_shared<IDma>();
-    p->m_ref_ind = m_ref_ind.clone();
-    return p;
-}
 
 void IDma::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(total == 0, void());
 
-    _readyBuffer(total, 1);
-
-    auto k = getContext();
-    m_ref_ind.setContext(k);
-    Indicator ref = m_ref_ind;
-    auto dates = ref.getDatetimeList();
-    if (dates.empty()) {
-        if (ref.size() > ind.size()) {
-            ref = SLICE(ref, ref.size() - ind.size(), ref.size());
-        } else if (ref.size() < ind.size()) {
-            ref = CVAL(ind, 0.) + ref;
-        }
-    } else if (m_ref_ind.size() != ind.size()) {
-        ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));
-    }
+    Indicator ref = prepare(ind);
 
     m_discard = std::max(ind.discard(), ref.discard());
     auto* y = this->data();

@@ -5,9 +5,6 @@
  *      Author: fasiondog
  */
 
-#include "hikyuu/indicator/crt/ALIGN.h"
-#include "hikyuu/indicator/crt/CVAL.h"
-#include "hikyuu/indicator/crt/SLICE.h"
 #include "ISpearman.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -16,15 +13,13 @@ BOOST_CLASS_EXPORT(hku::ISpearman)
 
 namespace hku {
 
-ISpearman::ISpearman() : IndicatorImp("SPEARMAN") {
+ISpearman::ISpearman() : Indicator2InImp("SPEARMAN") {
     setParam<int>("n", 0);
-    setParam<bool>("fill_null", true);
 }
 
 ISpearman::ISpearman(const Indicator &ref_ind, int n, bool fill_null)
-: IndicatorImp("SPEARMAN"), m_ref_ind(ref_ind) {
+: Indicator2InImp("SPEARMAN", ref_ind, fill_null, 1) {
     setParam<int>("n", n);
-    setParam<bool>("fill_null", fill_null);
 }
 
 ISpearman::~ISpearman() {}
@@ -34,12 +29,6 @@ void ISpearman::_checkParam(const string &name) const {
         int n = getParam<int>("n");
         HKU_ASSERT(n == 0 || n >= 2);
     }
-}
-
-IndicatorImpPtr ISpearman::_clone() {
-    auto p = make_shared<ISpearman>();
-    p->m_ref_ind = m_ref_ind.clone();
-    return p;
 }
 
 static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value_t *level,
@@ -80,21 +69,7 @@ void ISpearman::_calculate(const Indicator &ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(total == 0, void());
 
-    _readyBuffer(total, 2);
-
-    auto k = getContext();
-    m_ref_ind.setContext(k);
-    Indicator ref = m_ref_ind;
-    auto dates = ref.getDatetimeList();
-    if (dates.empty()) {
-        if (ref.size() > ind.size()) {
-            ref = SLICE(ref, ref.size() - ind.size(), ref.size());
-        } else if (ref.size() < ind.size()) {
-            ref = CVAL(ind, 0.) + ref;
-        }
-    } else if (m_ref_ind.size() != ind.size()) {
-        ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));
-    }
+    Indicator ref = prepare(ind);
 
     int n = getParam<int>("n");
     if (n == 0) {
