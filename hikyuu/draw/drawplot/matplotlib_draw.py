@@ -858,7 +858,7 @@ def RGB(r: int, g: int, b: int):
     return f"#{r:02x}{g:02x}{b:02x}"
 
 
-def STICKLINE(cond: Indicator, price1: Indicator, price2: Indicator, width: int = 2.0,
+def STICKLINE(cond: Indicator, price1: Indicator, price2: Indicator, width: float = 2.0,
               empty: bool = False, color='m', alpha=1.0, kdata=None, new=False, axes=None):
     """在满足cond的条件下，在 price1 和 price2 之间绘制一个宽度为 width 的柱状图。
 
@@ -868,7 +868,7 @@ def STICKLINE(cond: Indicator, price1: Indicator, price2: Indicator, width: int 
         cond (Indicator): 条件表达式，用于确定是否绘制柱状线
         price1 (Indicator): 第一个价格
         price2 (Indicator): 第二个价格
-        width (int, optional): 柱状宽度. Defaults to 2.0.
+        width (float, optional): 柱状宽度. Defaults to 2.0.
         empty (bool, optional): 空心. Defaults to False.
         kdata (_type_, optional): 指定的上下文K线. Defaults to None.
         new (bool, optional): 在新窗口中绘制. Defaults to False.
