@@ -114,6 +114,7 @@ set_configvar("HKU_ENABLE_NODE", 1)
 local boost_version = "1.87.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "11.1.3"
+local spdlog_version = "1.15.1"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.8.0"
 local sqlite_version = "3.48.0+0"
@@ -149,7 +150,7 @@ add_requires("boost " .. boost_version, {
 })
 
 add_requires("fmt " .. fmt_version, {configs = {header_only = true}})
-add_requires("spdlog", {configs = {header_only = true, fmt_external = true}})
+add_requires("spdlog " .. spdlog_version, {configs = {header_only = true, fmt_external = true}})
 add_requireconfs("spdlog.fmt", {override = true, version=fmt_version, configs = {header_only = true}})
 add_requires("sqlite3 " .. sqlite_version, {configs = {shared = true, safe_mode="2", cxflags = "-fPIC"}})
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {runtimes = get_config("runtimes")}})
