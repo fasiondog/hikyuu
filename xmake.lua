@@ -113,10 +113,10 @@ set_configvar("HKU_ENABLE_NODE", 1)
 
 local boost_version = "1.87.0"
 local hdf5_version = "1.12.2"
-local fmt_version = "11.0.2"
+local fmt_version = "11.1.3"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.8.0"
-local sqlite_version = "3.46.0+100"
+local sqlite_version = "3.48.0+0"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
     mysql_version = "8.0.21" 
