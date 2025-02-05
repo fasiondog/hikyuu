@@ -109,6 +109,7 @@ TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_parallel") {
 
     /** @arg 只有一个候选系统, 使用 SE_MaxFundsOptimal */
     auto se = SE_MaxFundsOptimal();
+    se->setParam<bool>("trace", true);
     auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20, se);
     CHECK_EQ(sys->name(), "SYS_WalkForward");
     query = KQueryByIndex(-125);

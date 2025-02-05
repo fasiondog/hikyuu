@@ -2044,37 +2044,37 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def("INDEXO", py::overload_cast<bool>(INDEXO), py::arg("fill_null") = true);
     m.def("INDEXO", py::overload_cast<const KData&, bool>(INDEXO), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXO([query])
+          py::arg("fill_null") = true, R"(INDEXO([kdata])
     
     返回对应的大盘开盘价,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXH", py::overload_cast<bool>(INDEXH), py::arg("fill_null") = true);
     m.def("INDEXH", py::overload_cast<const KData&, bool>(INDEXH), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXH([query])
+          py::arg("fill_null") = true, R"(INDEXH([kdata])
     
     返回对应的大盘最高价,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXL", py::overload_cast<bool>(INDEXL), py::arg("fill_null") = true);
     m.def("INDEXL", py::overload_cast<const KData&, bool>(INDEXL), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXL([query])
+          py::arg("fill_null") = true, R"(INDEXL([kdata])
     
     返回对应的大盘最低价,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXC", py::overload_cast<bool>(INDEXC), py::arg("fill_null") = true);
     m.def("INDEXC", py::overload_cast<const KData&, bool>(INDEXC), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXC([query])
+          py::arg("fill_null") = true, R"(INDEXC([kdata])
     
     返回对应的大盘收盘价,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXV", py::overload_cast<bool>(INDEXV), py::arg("fill_null") = true);
     m.def("INDEXV", py::overload_cast<const KData&, bool>(INDEXV), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXV([query])
+          py::arg("fill_null") = true, R"(INDEXV([kdata])
     
     返回对应的大盘成交量,分别是上证指数,深证成指,科创50,创业板指)");
 
     m.def("INDEXA", py::overload_cast<bool>(INDEXA), py::arg("fill_null") = true);
     m.def("INDEXA", py::overload_cast<const KData&, bool>(INDEXA), py::arg("kdata"),
-          py::arg("fill_null") = true, R"(INDEXA([query])
+          py::arg("fill_null") = true, R"(INDEXA([kdata])
     
     返回对应的大盘成交金额,分别是上证指数,深证成指,科创50,创业板指)");
 

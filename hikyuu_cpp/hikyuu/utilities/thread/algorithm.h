@@ -26,16 +26,22 @@ inline std::vector<range_t> parallelIndexRange(size_t start, size_t end) {
     }
 
     size_t total = end - start;
+    if (total == 0) {
+        return ret;
+    }
+
     size_t cpu_num = std::thread::hardware_concurrency();
-    if (total <= cpu_num) {
+    if (cpu_num == 1) {
         ret.emplace_back(start, end);
         return ret;
     }
 
     size_t per_num = total / cpu_num;
-    for (size_t i = 0; i < cpu_num; i++) {
-        size_t first = i * per_num + start;
-        ret.emplace_back(first, first + per_num);
+    if (per_num > 0) {
+        for (size_t i = 0; i < cpu_num; i++) {
+            size_t first = i * per_num + start;
+            ret.emplace_back(first, first + per_num);
+        }
     }
 
     for (size_t i = per_num * cpu_num + start; i < end; i++) {
