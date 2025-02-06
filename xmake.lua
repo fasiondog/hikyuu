@@ -41,20 +41,7 @@ option("leak_check", {description = "Enable leak check for test", default = fals
 -- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
 -- windows下如果使用 serialize 且希望使用动态库，需要设置 runtimes 参数为 "MD"
 -- "MT" 方式下，serialize 会挂
--- option("serialize", {description = "Enable support serialize object and pickle in python", default = true})
-option("serialize")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable support serialize object and pickle in python")
-    after_check(function (option)
-      -- macosx 下，serialize 不支持动态库 
-      if is_plat("macosx") and get_config("kind") == "shared" then
-          cprint('${red}[warning] "serialize" will be disable on Macosx with shared kind!')
-          option:enable(false)
-      end
-    end)        
-option_end()
+option("serialize", {description = "Enable support serialize object and pickle in python", default = true})
 
 -- 和 hku_utils 编译选项保持一致，以便互相替换
 option("mo", {description = "International language support", default = false})
