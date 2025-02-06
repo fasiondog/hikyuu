@@ -111,6 +111,15 @@ target("core")
             end
             os.run(format("install_name_tool -change libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_obj))
             os.run(format("install_name_tool -change libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_obj))
+
+            if get_config("kind") == "shared" then
+                dst_obj = dst_dir .. "libhikyuu.dylib"
+                os.run(format("install_name_tool -change libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_obj))
+                os.run(format("install_name_tool -change libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_obj))
+            -- else
+            --     os.cp(target:targetdir() .. '/libhikyuu.a', dst_dir)
+            end
+
             filename = "libmysqlclient.21.dylib"
             os.run(format("install_name_tool -change @loader_path/../lib/libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_dir .. filename))
             os.run(format("install_name_tool -change @loader_path/../lib/libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_dir .. filename))
