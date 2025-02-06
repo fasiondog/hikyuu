@@ -50,7 +50,7 @@ private:                                                          \
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(Indicator2InImp); \
     }
 #else
-#define INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
+#define INDICATOR2IN_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
 #define INDICATOR2IN_IMP(classname)                          \
