@@ -1627,7 +1627,8 @@ void TradeManager::tocsv(const string& path) {
                  << record.number << sep << record.cost.commission << sep << record.cost.stamptax
                  << sep << record.cost.transferfee << sep << record.cost.others << sep
                  << record.cost.total << sep << record.stoploss << sep << record.cash << sep
-                 << getSystemPartName(record.from) << std::endl;
+                 << getSystemPartName(record.from) << sep << sep << sep << sep << sep << sep << sep
+                 << std::endl;
         } else {
             file << record.datetime << sep << record.stock.market_code() << sep
                  << record.stock.name() << sep << getBusinessName(record.business) << sep
@@ -1642,7 +1643,11 @@ void TradeManager::tocsv(const string& path) {
                     file << kdata.datetime << sep << kdata.openPrice << sep << kdata.highPrice
                          << sep << kdata.lowPrice << sep << kdata.closePrice << sep
                          << kdata.transAmount << sep << kdata.transCount;
+                } else {
+                    file << sep << sep << sep << sep << sep << sep << sep;
                 }
+            } else {
+                file << sep << sep << sep << sep << sep << sep;
             }
             file << std::endl;
         }
@@ -1811,6 +1816,7 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     m_cash = roundEx(m_cash - money - tr.cost.total, precision);
     new_tr.cash = m_cash;
     m_trade_list.push_back(new_tr);
+    HKU_INFO("{}", new_tr);
 
     // 更新当前持仓记录
     position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
