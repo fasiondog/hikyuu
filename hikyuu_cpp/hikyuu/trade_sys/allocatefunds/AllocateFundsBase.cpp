@@ -57,6 +57,12 @@ void AllocateFundsBase::initParam() {
     //          即，保留分为5份后，仅在2份中保持相对比例
     setParam<bool>("ignore_zero_weight", false);
 
+    // 忽略选中系统列表中的系统得分为 null 的系统
+    setParam<bool>("ignore_se_score_is_null", true);
+
+    // 忽略选中系统列表中的系统得分小于等于 0 的系统
+    setParam<bool>("ignore_se_score_lt_zero", false);
+
     setParam<double>("reserve_percent", 0.0);  // 保留不参与重分配的资产比例
     setParam<bool>("trace", false);            // 打印跟踪
 }
@@ -103,11 +109,24 @@ AFPtr AllocateFundsBase::clone() {
 SystemWeightList AllocateFundsBase::adjustFunds(const Datetime& date,
                                                 const SystemWeightList& se_list,
                                                 const std::unordered_set<SYSPtr>& running_list) {
+    bool ignore_se_score_is_null = getParam<bool>("ignore_se_score_is_null");
+    bool ignore_se_score_lt_zero = getParam<bool>("ignore_se_score_lt_zero");
+    SystemWeightList filtered_se_list;
+    for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
+        if (ignore_se_score_is_null && std::isnan(iter->weight)) {
+            continue;
+        }
+        if (ignore_se_score_lt_zero && iter->weight <= 0.0) {
+            continue;
+        }
+        filtered_se_list.emplace_back(*iter);
+    }
+
     SystemWeightList result;
     if (getParam<bool>("adjust_running_sys")) {
-        result = _adjust_with_running(date, se_list, running_list);
+        result = _adjust_with_running(date, filtered_se_list, running_list);
     } else {
-        _adjust_without_running(date, se_list, running_list);
+        _adjust_without_running(date, filtered_se_list, running_list);
     }
     return result;
 }

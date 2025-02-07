@@ -43,9 +43,7 @@ SystemWeightList FixedWeightListAllocateFunds ::_allocateWeight(const Datetime& 
     size_t w_total = weights.size();
     size_t wi = 0;
     for (auto iter = se_list.begin(); iter != se_list.end() && wi < w_total; ++iter) {
-        if (iter->weight > 0) {
-            result.emplace_back(iter->sys, weights[wi++]);
-        }
+        result.emplace_back(iter->sys, weights[wi++]);
     }
 
     return result;

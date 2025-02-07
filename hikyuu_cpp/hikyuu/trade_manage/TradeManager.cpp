@@ -1816,7 +1816,6 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     m_cash = roundEx(m_cash - money - tr.cost.total, precision);
     new_tr.cash = m_cash;
     m_trade_list.push_back(new_tr);
-    HKU_INFO("{}", new_tr);
 
     // 更新当前持仓记录
     position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
