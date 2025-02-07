@@ -108,13 +108,18 @@ void export_Signal(py::module& m) {
 
     :rtype: DatetimeList)")
 
-      .def("_add_buy_signal", &SignalBase::_addBuySignal, R"(_add_buy_signal(self, datetime)
+      .def("_add_signal", &SignalBase::_addSignal, py::arg("datetime"), py::arg("value"), R"()")
+
+      .def("_add_buy_signal", &SignalBase::_addBuySignal, py::arg("datetime"),
+           py::arg("value") = 1.0,
+           R"(_add_buy_signal(self, datetime)
 
     加入买入信号，在_calculate中调用
 
     :param Datetime datetime: 指示买入的日期)")
 
-      .def("_add_sell_signal", &SignalBase::_addSellSignal, R"(_add_sell_signal(self, datetime)
+      .def("_add_sell_signal", &SignalBase::_addSellSignal, py::arg("datetime"),
+           py::arg("value") = -1.0, R"(_add_sell_signal(self, datetime)
 
     加入卖出信号，在_calculate中调用
 
