@@ -135,7 +135,7 @@ double SignalBase::getSellValue(const Datetime& datetime) const {
 }
 
 void SignalBase::_addSignal(const Datetime& datetime, double value) {
-    HKU_IF_RETURN(iszero(value), void());
+    HKU_IF_RETURN(iszero(value) || std::isnan(value), void());
 
     double new_value = value + getBuyValue(datetime) + getSellValue(datetime);
     HKU_IF_RETURN(iszero(new_value), void());

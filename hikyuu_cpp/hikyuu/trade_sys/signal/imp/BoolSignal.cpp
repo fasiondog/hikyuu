@@ -5,7 +5,8 @@
  *      Author: fasiondog
  */
 
-#include "../../../indicator/crt/KDATA.h"
+#include "hikyuu/indicator/crt/ALIGN.h"
+#include "hikyuu/indicator/crt/KDATA.h"
 #include "BoolSignal.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -29,8 +30,8 @@ SignalPtr BoolSignal::_clone() {
 }
 
 void BoolSignal::_calculate(const KData& kdata) {
-    Indicator buy = m_bool_buy(kdata);
-    Indicator sell = m_bool_sell(kdata);
+    Indicator buy = ALIGN(m_bool_buy(kdata), kdata);
+    Indicator sell = ALIGN(m_bool_sell(kdata), kdata);
     HKU_ERROR_IF_RETURN(buy.size() != sell.size(), void(), "buy.size() != sell.size()");
 
     size_t discard = buy.discard() > sell.discard() ? buy.discard() : sell.discard();
@@ -46,8 +47,10 @@ void BoolSignal::_calculate(const KData& kdata) {
     }
 }
 
-SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell) {
-    return make_shared<BoolSignal>(buy, sell);
+SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell, bool alternate) {
+    auto p = make_shared<BoolSignal>(buy, sell);
+    p->setParam<bool>("alternate", alternate);
+    return p;
 }
 
 } /* namespace hku */

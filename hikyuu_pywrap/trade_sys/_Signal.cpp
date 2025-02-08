@@ -133,15 +133,32 @@ void export_Signal(py::module& m) {
 
       .def("_reset", &SignalBase::_reset, "【重载接口】子类复位接口，复位内部私有变量")
 
+      .def("__add__", [](const SignalPtr& self, const SignalPtr& other) { return self + other; })
+      .def("__add__", [](const SignalPtr& self, double other) { return self + other; })
+      .def("__radd__", [](const SignalPtr& self, double other) { return other + self; })
+      .def("__sub__", [](const SignalPtr& self, const SignalPtr& other) { return self - other; })
+      .def("__sub__", [](const SignalPtr& self, double other) { return self - other; })
+      .def("__rsub__", [](const SignalPtr& self, double other) { return other - self; })
+      .def("__mul__", [](const SignalPtr& self, const SignalPtr& other) { return self * other; })
+      .def("__mul__", [](const SignalPtr& self, double other) { return self * other; })
+      .def("__rmul__", [](const SignalPtr& self, double other) { return other * self; })
+      .def("__truediv__",
+           [](const SignalPtr& self, const SignalPtr& other) { return self / other; })
+      .def("__truediv__", [](const SignalPtr& self, double other) { return self / other; })
+      .def("__rtruediv__", [](const SignalPtr& self, double other) { return other / self; })
+      .def("__and__", [](const SignalPtr& self, const SignalPtr& other) { return self & other; })
+      .def("__or__", [](const SignalPtr& self, const SignalPtr& other) { return self | other; })
+
         DEF_PICKLE(SGPtr);
 
-    m.def("SG_Bool", SG_Bool, py::arg("buy"), py::arg("sell"),
+    m.def("SG_Bool", SG_Bool, py::arg("buy"), py::arg("sell"), py::arg("alternate") = true,
           R"(SG_Bool(buy, sell)
 
     布尔信号指示器，使用运算结果为类似bool数组的Indicator分别作为买入、卖出指示。
 
     :param Indicator buy: 买入指示（结果Indicator中相应位置>0则代表买入）
     :param Indicator sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
+    :param bool alternate: 是否交替买入卖出，默认为True
     :return: 信号指示器)");
 
     m.def("SG_Single", SG_Single, py::arg("ind"), py::arg("filter_n") = 10,
