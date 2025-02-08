@@ -1,0 +1,44 @@
+/*
+ *  Copyright (c) 2025 hikyuu.org
+ *
+ *  Created on: 2025-02-08
+ *      Author: fasiondog
+ */
+
+#include "OperatorSignal.h"
+
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::OperatorSignal)
+#endif
+
+namespace hku {
+
+OperatorSignal::OperatorSignal() : SignalBase("SG_Operator") {}
+OperatorSignal::OperatorSignal(const string& name) : SignalBase(name) {}
+
+OperatorSignal::OperatorSignal(const string& name, const SignalPtr& sg1, const SignalPtr& sg2)
+: SignalBase(name) {
+    if (sg1) {
+        m_sg1 = sg1->clone();
+    }
+    if (sg2) {
+        m_sg2 = sg2->clone();
+    }
+}
+
+OperatorSignal::~OperatorSignal() {}
+
+void OperatorSignal::_reset() {
+    if (m_sg1) {
+        m_sg1->reset();
+    }
+    if (m_sg2) {
+        m_sg2->reset();
+    }
+}
+
+SignalPtr OperatorSignal::_clone() {
+    return make_shared<OperatorSignal>(m_name, m_sg1, m_sg2);
+}
+
+} /* namespace hku */

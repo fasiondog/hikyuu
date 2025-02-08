@@ -5,15 +5,15 @@
  *      Author: fasiondog
  */
 
-#include "AddSignal.h"
+#include "SubSignal.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::AddSignal)
+BOOST_CLASS_EXPORT(hku::SubSignal)
 #endif
 
 namespace hku {
 
-void AddSignal::_calculate(const KData& kdata) {
+void SubSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg1 && !m_sg2, void());
 
     auto const* ks = kdata.data();
@@ -31,7 +31,7 @@ void AddSignal::_calculate(const KData& kdata) {
     if (!m_sg1 && m_sg2) {
         m_sg2->_calculate(kdata);
         for (size_t i = 0; i < total; i++) {
-            double value = m_sg2->getValue(ks[i].datetime);
+            double value = 0.0 - m_sg2->getValue(ks[i].datetime);
             _addSignal(ks[i].datetime, value);
             return;
         }
@@ -40,13 +40,13 @@ void AddSignal::_calculate(const KData& kdata) {
     m_sg1->_calculate(kdata);
     m_sg2->_calculate(kdata);
     for (size_t i = 0; i < total; ++i) {
-        double value = m_sg1->getValue(ks[i].datetime) + m_sg2->getValue(ks[i].datetime);
+        double value = m_sg1->getValue(ks[i].datetime) - m_sg2->getValue(ks[i].datetime);
         _addSignal(ks[i].datetime, value);
     }
 }
 
-HKU_API SignalPtr operator+(const SignalPtr& sg1, const SignalPtr& sg2) {
-    return make_shared<AddSignal>(sg1, sg2);
+HKU_API SignalPtr operator-(const SignalPtr& sg1, const SignalPtr& sg2) {
+    return make_shared<SubSignal>(sg1, sg2);
 }
 
 } /* namespace hku */

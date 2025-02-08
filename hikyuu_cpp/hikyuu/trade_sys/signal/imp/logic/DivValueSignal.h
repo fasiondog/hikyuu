@@ -7,13 +7,16 @@
 
 #pragma once
 
-#include "OperatorSignal.h"
+#include "OperatorValueSignal.h"
 
 namespace hku {
 
-class AddSignal : public OperatorSignal {
-    OPERATOR_SIGNAL_IMP(AddSignal, "SG_Add")
+class DivValueSignal : public OperatorValueSignal {
+    OPERATOR_SIGNAL_IMP(DivValueSignal, "SG_DivValue")
     OPERATOR_SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
+
+public:
+    DivValueSignal(double value, const SignalPtr& sg);
 };
 
 } /* namespace hku */

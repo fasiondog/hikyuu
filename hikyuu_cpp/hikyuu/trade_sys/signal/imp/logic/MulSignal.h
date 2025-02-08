@@ -11,8 +11,8 @@
 
 namespace hku {
 
-class AddSignal : public OperatorSignal {
-    OPERATOR_SIGNAL_IMP(AddSignal, "SG_Add")
+class MulSignal : public OperatorSignal {
+    OPERATOR_SIGNAL_IMP(MulSignal, "SG_Mul")
     OPERATOR_SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
 };
 
