@@ -30,21 +30,33 @@ void SubValueSignal::_calculate(const KData& kdata) {
             }
         } else {
             for (size_t i = 0; i < total; ++i) {
-                _addSignal(ks[i].datetime, -(m_sg->getValue(ks[i].datetime)));
+                _addSignal(ks[i].datetime, 0.0 - (m_sg->getValue(ks[i].datetime)));
             }
         }
 
     } else {
         if (m_mode == 0) {
             for (size_t i = 0; i < total; ++i) {
-                double buy_value = m_sg->getBuyValue(ks[i].datetime) - m_value;
-                double sell_value = m_sg->getSellValue(ks[i].datetime) + m_value;
+                double buy_value = m_sg->getBuyValue(ks[i].datetime);
+                if (buy_value > 0.0) {
+                    buy_value -= m_value;
+                }
+                double sell_value = m_sg->getSellValue(ks[i].datetime);
+                if (sell_value < 0.0) {
+                    sell_value -= m_value;
+                }
                 _addSignal(ks[i].datetime, buy_value + sell_value);
             }
         } else {
             for (size_t i = 0; i < total; ++i) {
-                double buy_value = m_value - m_sg->getBuyValue(ks[i].datetime);
-                double sell_value = m_sg->getSellValue(ks[i].datetime) + m_value;
+                double buy_value = m_sg->getBuyValue(ks[i].datetime);
+                if (buy_value > 0.0) {
+                    buy_value = m_value - buy_value;
+                }
+                double sell_value = m_sg->getSellValue(ks[i].datetime);
+                if (sell_value < 0.0) {
+                    sell_value -= sell_value;
+                }
                 _addSignal(ks[i].datetime, buy_value + sell_value);
             }
         }

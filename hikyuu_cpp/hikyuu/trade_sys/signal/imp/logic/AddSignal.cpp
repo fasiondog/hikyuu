@@ -22,8 +22,7 @@ void AddSignal::_calculate(const KData& kdata) {
     if (m_sg1 && !m_sg2) {
         m_sg1->_calculate(kdata);
         for (size_t i = 0; i < total; ++i) {
-            double value = m_sg1->getValue(ks[i].datetime);
-            _addSignal(ks[i].datetime, value);
+            _addSignal(ks[i].datetime, m_sg1->getValue(ks[i].datetime));
         }
         return;
     }
@@ -31,10 +30,9 @@ void AddSignal::_calculate(const KData& kdata) {
     if (!m_sg1 && m_sg2) {
         m_sg2->_calculate(kdata);
         for (size_t i = 0; i < total; i++) {
-            double value = m_sg2->getValue(ks[i].datetime);
-            _addSignal(ks[i].datetime, value);
-            return;
+            _addSignal(ks[i].datetime, m_sg2->getValue(ks[i].datetime));
         }
+        return;
     }
 
     m_sg1->_calculate(kdata);

@@ -14,30 +14,10 @@ BOOST_CLASS_EXPORT(hku::DivSignal)
 namespace hku {
 
 void DivSignal::_calculate(const KData& kdata) {
-    HKU_IF_RETURN(!m_sg1 && !m_sg2, void());
+    HKU_IF_RETURN(!m_sg1 || !m_sg2, void());
 
     auto const* ks = kdata.data();
     size_t total = kdata.size();
-
-    if (m_sg1 && !m_sg2) {
-        m_sg1->_calculate(kdata);
-        for (size_t i = 0; i < total; ++i) {
-            double value = m_sg1->getValue(ks[i].datetime);
-            _addSignal(ks[i].datetime, value);
-        }
-        return;
-    }
-
-    if (!m_sg1 && m_sg2) {
-        m_sg2->_calculate(kdata);
-        for (size_t i = 0; i < total; i++) {
-            double value = m_sg2->getValue(ks[i].datetime);
-            if (value != 0.0) {
-                _addSignal(ks[i].datetime, 1.0 / value);
-            }
-            return;
-        }
-    }
 
     m_sg1->_calculate(kdata);
     m_sg2->_calculate(kdata);

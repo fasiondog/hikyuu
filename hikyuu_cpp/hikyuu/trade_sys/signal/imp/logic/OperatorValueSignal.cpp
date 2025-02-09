@@ -22,12 +22,14 @@ OperatorValueSignal::OperatorValueSignal(const string& name, const SignalPtr& sg
     if (sg) {
         m_sg = sg->clone();
     }
+    if (std::isnan(m_value)) {
+        m_value = 0.0;
+    }
 }
 
 OperatorValueSignal::~OperatorValueSignal() {}
 
 void OperatorValueSignal::_reset() {
-    m_value = 0.0;
     if (m_sg) {
         m_sg->reset();
     }

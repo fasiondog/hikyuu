@@ -24,7 +24,7 @@ void MulSignal::_calculate(const KData& kdata) {
     for (size_t i = 0; i < total; ++i) {
         double buy_value = m_sg1->getBuyValue(ks[i].datetime) * m_sg2->getBuyValue(ks[i].datetime);
         double sell_value =
-          m_sg1->getSellValue(ks[i].datetime) * m_sg2->getSellValue(ks[i].datetime);
+          0.0 - m_sg1->getSellValue(ks[i].datetime) * m_sg2->getSellValue(ks[i].datetime);
         _addSignal(ks[i].datetime, buy_value + sell_value);
     }
 }
