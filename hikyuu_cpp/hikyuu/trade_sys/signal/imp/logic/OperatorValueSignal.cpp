@@ -21,6 +21,8 @@ OperatorValueSignal::OperatorValueSignal(const string& name, const SignalPtr& sg
 : SignalBase(name), m_value(value), m_mode(mode) {
     if (sg) {
         m_sg = sg->clone();
+        // cycle 属性保持和子 sg 一致
+        setParam<bool>("cycle", m_sg->getParam<bool>("cycle"));
     }
     if (std::isnan(m_value)) {
         m_value = 0.0;

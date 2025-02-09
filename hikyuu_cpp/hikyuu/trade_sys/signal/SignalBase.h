@@ -147,6 +147,7 @@ protected:
 
     Datetime m_cycle_start;
     Datetime m_cycle_end;
+    bool m_ignore_cycle{false};  // 特殊用途，用于 OperatorSignal
 
 //============================================
 // 序列化支持
@@ -162,6 +163,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
+        ar& BOOST_SERIALIZATION_NVP(m_ignore_cycle);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
@@ -174,6 +176,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
+        ar& BOOST_SERIALIZATION_NVP(m_ignore_cycle);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }

@@ -19,8 +19,8 @@ void MulSignal::_calculate(const KData& kdata) {
     auto const* ks = kdata.data();
     size_t total = kdata.size();
 
-    m_sg1->_calculate(kdata);
-    m_sg2->_calculate(kdata);
+    sub_sg_calculate(m_sg1, kdata);
+    sub_sg_calculate(m_sg2, kdata);
     for (size_t i = 0; i < total; ++i) {
         double buy_value = m_sg1->getBuyValue(ks[i].datetime) * m_sg2->getBuyValue(ks[i].datetime);
         double sell_value =

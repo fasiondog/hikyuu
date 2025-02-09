@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::CycleSignal)
 
 namespace hku {
 
-CycleSignal::CycleSignal() : SignalBase("SG_AllwaysBuy") {
+CycleSignal::CycleSignal() : SignalBase("SG_Cycle") {
     setParam<bool>("cycle", true);
     setParam<bool>("alternate", false);
 }

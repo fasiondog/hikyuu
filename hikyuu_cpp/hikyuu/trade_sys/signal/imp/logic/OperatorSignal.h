@@ -23,6 +23,9 @@ public:
     virtual void _calculate(const KData& kdata) override {}
 
 protected:
+    void sub_sg_calculate(SignalPtr& sg, const KData& kdata);
+
+protected:
     SignalPtr m_sg1;
     SignalPtr m_sg2;
 

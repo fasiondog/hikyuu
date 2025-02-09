@@ -19,8 +19,8 @@ void DivSignal::_calculate(const KData& kdata) {
     auto const* ks = kdata.data();
     size_t total = kdata.size();
 
-    m_sg1->_calculate(kdata);
-    m_sg2->_calculate(kdata);
+    sub_sg_calculate(m_sg1, kdata);
+    sub_sg_calculate(m_sg2, kdata);
     for (size_t i = 0; i < total; ++i) {
         double buy_value1 = m_sg1->getBuyValue(ks[i].datetime);
         double buy_value2 = m_sg2->getBuyValue(ks[i].datetime);

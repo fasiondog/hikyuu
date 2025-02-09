@@ -13,11 +13,16 @@ BOOST_CLASS_EXPORT(hku::OperatorSignal)
 
 namespace hku {
 
-OperatorSignal::OperatorSignal() : SignalBase("SG_Operator") {}
-OperatorSignal::OperatorSignal(const string& name) : SignalBase(name) {}
+OperatorSignal::OperatorSignal() : SignalBase("SG_Operator") {
+    m_ignore_cycle = true;
+}
+OperatorSignal::OperatorSignal(const string& name) : SignalBase(name) {
+    m_ignore_cycle = true;
+}
 
 OperatorSignal::OperatorSignal(const string& name, const SignalPtr& sg1, const SignalPtr& sg2)
 : SignalBase(name) {
+    m_ignore_cycle = true;
     if (sg1) {
         m_sg1 = sg1->clone();
     }
@@ -34,6 +39,17 @@ void OperatorSignal::_reset() {
     }
     if (m_sg2) {
         m_sg2->reset();
+    }
+}
+
+void OperatorSignal::sub_sg_calculate(SignalPtr& sg, const KData& kdata) {
+    HKU_IF_RETURN(!sg, void());
+    bool cycle = sg->getParam<bool>("cycle");
+    if (m_kdata == kdata && !cycle) {
+        sg->_calculate(kdata);
+    } else if (m_kdata != kdata && cycle) {
+        sg->startCycle(m_cycle_start, m_cycle_end);
+        sg->_calculate(kdata);
     }
 }
 
