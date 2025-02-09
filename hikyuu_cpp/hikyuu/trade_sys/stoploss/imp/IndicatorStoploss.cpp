@@ -14,25 +14,12 @@ BOOST_CLASS_EXPORT(hku::IndicatorStoploss)
 
 namespace hku {
 
-IndicatorStoploss::IndicatorStoploss() : StoplossBase("IndicatorStoploss") {
-    setParam<string>("kpart", "CLOSE");
-}
+IndicatorStoploss::IndicatorStoploss() : StoplossBase("ST_Indicator") {}
 
-IndicatorStoploss::IndicatorStoploss(const Indicator& op, const string& kdata_part)
-: StoplossBase("IndicatorStoploss"), m_op(op) {
-    setParam<string>("kpart", "CLOSE");
-    checkParam("kpart");
-}
+IndicatorStoploss::IndicatorStoploss(const Indicator& op)
+: StoplossBase("ST_Indicator"), m_ind(op) {}
 
 IndicatorStoploss::~IndicatorStoploss() {}
-
-void IndicatorStoploss::_checkParam(const string& name) const {
-    if ("kpart" == name) {
-        string kpart = getParam<string>("kpart");
-        HKU_ASSERT("CLOSE" == kpart || "OPEN" == kpart || "HIGH" == kpart || "LOW" == kpart ||
-                   "AMO" == kpart || "VOL" == kpart);
-    }
-}
 
 price_t IndicatorStoploss::getPrice(const Datetime& datetime, price_t price) {
     return m_result.count(datetime) ? m_result[datetime] : 0.0;
@@ -43,13 +30,14 @@ void IndicatorStoploss::_reset() {
 }
 
 StoplossPtr IndicatorStoploss::_clone() {
-    auto p = make_shared<IndicatorStoploss>(m_op.clone(), getParam<string>("kpart"));
+    auto p = make_shared<IndicatorStoploss>();
+    p->m_ind = m_ind;
     p->m_result = m_result;
     return p;
 }
 
 void IndicatorStoploss::_calculate() {
-    Indicator ind = m_op(KDATA_PART(m_kdata, getParam<string>("kpart")));
+    Indicator ind = m_ind(m_kdata);
     size_t total = ind.size();
     auto const* ind_data = ind.data();
     auto const* ks = m_kdata.data();
@@ -58,8 +46,8 @@ void IndicatorStoploss::_calculate() {
     }
 }
 
-StoplossPtr HKU_API ST_Indicator(const Indicator& op, const string& kpart) {
-    return make_shared<IndicatorStoploss>(op, kpart);
+StoplossPtr HKU_API ST_Indicator(const Indicator& ind) {
+    return make_shared<IndicatorStoploss>(ind);
 }
 
 } /* namespace hku */
