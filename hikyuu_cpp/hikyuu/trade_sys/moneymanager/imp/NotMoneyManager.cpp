@@ -26,7 +26,7 @@ double NotMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& st
         m_tm->getHoldNumber(datetime, stock) > 0.) {
         return 0.0;
     }
-    return m_tm->cash(datetime, m_query.kType()) / price;
+    return m_tm->currentCash() / price;
 }
 
 MoneyManagerPtr HKU_API MM_Nothing() {
