@@ -62,7 +62,9 @@ TEST_CASE("test_Signal") {
         CHECK_EQ(p->shouldBuy(Datetime(200101010000)), false);
         p->_addBuySignal(Datetime(200101010000));
         CHECK_EQ(p->shouldBuy(Datetime(200101010000)), true);
+        CHECK_EQ(p->getBuyValue(Datetime(200101010000)), 1.0);
         CHECK_EQ(p->shouldSell(Datetime(200101030000)), false);
+        CHECK_EQ(p->getSellValue(Datetime(200101030000)), 0.0);
         p->_addSellSignal(Datetime(200101030000));
         CHECK_EQ(p->shouldSell(Datetime(200101030000)), true);
 
@@ -74,6 +76,72 @@ TEST_CASE("test_Signal") {
         CHECK_EQ(p_src->getX(), 10);
         CHECK_EQ(p_clone->shouldBuy(Datetime(200101010000)), true);
         CHECK_EQ(p_clone->shouldSell(Datetime(200101030000)), true);
+
+        /** @arg 插入重复买入日期 */
+        p->reset();
+        p->setParam<bool>("alternate", true);
+        REQUIRE(!p->shouldBuy(Datetime(200201010000)));
+        p->_addBuySignal(Datetime(200201010000));
+        CHECK_UNARY(p->shouldBuy(Datetime(200201010000)));
+        p->_addBuySignal(Datetime(200201010000));
+        CHECK_UNARY(p->shouldBuy(Datetime(200201010000)));
+
+        p->reset();
+        p->setParam<bool>("alternate", false);
+        REQUIRE(!p->shouldBuy(Datetime(200201010000)));
+        p->_addBuySignal(Datetime(200201010000));
+        CHECK_UNARY(p->shouldBuy(Datetime(200201010000)));
+        p->_addBuySignal(Datetime(200201010000));
+        CHECK_UNARY(p->shouldBuy(Datetime(200201010000)));
+
+        /** @arg 插入重复卖出日期 */
+        p->reset();
+        p->setParam<bool>("alternate", true);
+        p->_addBuySignal(Datetime(200201010000));
+        REQUIRE(!p->shouldSell(Datetime(200201020000)));
+        p->_addSellSignal(Datetime(200201020000));
+        CHECK_UNARY(p->shouldSell(Datetime(200201020000)));
+        p->_addSellSignal(Datetime(200201020000));
+        CHECK_UNARY(p->shouldSell(Datetime(200201020000)));
+
+        p->reset();
+        p->setParam<bool>("alternate", false);
+        REQUIRE(!p->shouldSell(Datetime(200201020000)));
+        p->_addSellSignal(Datetime(200201020000));
+        CHECK_UNARY(p->shouldSell(Datetime(200201020000)));
+        p->_addSellSignal(Datetime(200201020000));
+        CHECK_UNARY(p->shouldSell(Datetime(200201020000)));
+
+        /** @arg 插入买入日期已经存在卖出指示 */
+        p->reset();
+        p->setParam<bool>("alternate", false);
+        p->_addSellSignal(Datetime(200202010000));
+        REQUIRE(p->shouldSell(Datetime(200202010000)));
+        p->_addBuySignal(Datetime(200202010000));
+        CHECK_UNARY(!p->shouldBuy(Datetime(200202010000)));
+
+        p->reset();
+        p->setParam<bool>("alternate", true);
+        p->_addBuySignal(Datetime(200201010000));
+        p->_addSellSignal(Datetime(200202010000));
+        REQUIRE(p->shouldSell(Datetime(200202010000)));
+        p->_addBuySignal(Datetime(200202010000));
+        CHECK_UNARY(!p->shouldBuy(Datetime(200202010000)));
+
+        /** @arg 插入卖出日期已经存在买入指示 */
+        p->reset();
+        p->setParam<bool>("alternate", false);
+        p->_addBuySignal(Datetime(200202010000));
+        p->_addSellSignal(Datetime(200202010000));
+        CHECK_UNARY(p->shouldBuy(Datetime(200202010000)));
+        CHECK_UNARY(!p->shouldSell(Datetime(200202010000)));
+
+        p->reset();
+        p->setParam<bool>("alternate", true);
+        p->_addBuySignal(Datetime(200202010000));
+        p->_addSellSignal(Datetime(200202010000));
+        CHECK_UNARY(p->shouldBuy(Datetime(200202010000)));
+        CHECK_UNARY(!p->shouldSell(Datetime(200202010000)));
     }
 
     SUBCASE("Short sell") {

@@ -152,9 +152,7 @@ public:
     // ===================
     //  子类接口
     // ===================
-    virtual void _calculate(const Indicator&) {
-        HKU_WARN("{} will be empty always!", m_name);
-    }
+    virtual void _calculate(const Indicator&);
 
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
