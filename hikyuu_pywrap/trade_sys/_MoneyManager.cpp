@@ -22,12 +22,12 @@ public:
         PYBIND11_OVERLOAD(void, MoneyManagerBase, _reset, );
     }
 
-    void buyNotify(const TradeRecord& tr) override {
-        PYBIND11_OVERLOAD_NAME(void, MoneyManagerBase, "buy_notify", buyNotify, tr);
+    void _buyNotify(const TradeRecord& tr) override {
+        PYBIND11_OVERLOAD_NAME(void, MoneyManagerBase, "_buy_notify", _buyNotify, tr);
     }
 
-    void sellNotify(const TradeRecord& tr) override {
-        PYBIND11_OVERLOAD_NAME(void, MoneyManagerBase, "sell_notify", sellNotify, tr);
+    void _sellNotify(const TradeRecord& tr) override {
+        PYBIND11_OVERLOAD_NAME(void, MoneyManagerBase, "_sell_notify", _sellNotify, tr);
     }
 
     double _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
@@ -113,15 +113,15 @@ void export_MoneyManager(py::module& m) {
       .def("reset", &MoneyManagerBase::reset, "复位操作")
       .def("clone", &MoneyManagerBase::clone, "克隆操作")
 
-      .def("buy_notify", &MoneyManagerBase::buyNotify,
-           R"(buy_notify(self, trade_record)
+      .def("_buy_notify", &MoneyManagerBase::_buyNotify,
+           R"(_buy_notify(self, trade_record)
 
     【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
 
     :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录)")
 
-      .def("sell_notify", &MoneyManagerBase::sellNotify,
-           R"(sell_notify(self, trade_record)
+      .def("_sell_notify", &MoneyManagerBase::_sellNotify,
+           R"(_sell_notify(self, trade_record)
 
     【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
 
