@@ -107,6 +107,9 @@ public:
     void startCycle(const Datetime& start, const Datetime& end);
     const Datetime& getCycleStart() const;
     const Datetime& getCycleEnd() const;
+    bool ignoreCycle() const {
+        return m_ignore_cycle;
+    }
 
     /** 复位操作 */
     void reset();

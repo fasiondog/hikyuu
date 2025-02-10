@@ -47,7 +47,7 @@ void OperatorSignal::sub_sg_calculate(SignalPtr& sg, const KData& kdata) {
     bool cycle = sg->getParam<bool>("cycle");
     if (m_kdata == kdata && !cycle) {
         sg->_calculate(kdata);
-    } else if (m_kdata != kdata && cycle) {
+    } else if (m_kdata != Null<KData>() && m_kdata != kdata && cycle) {
         sg->startCycle(m_cycle_start, m_cycle_end);
         sg->_calculate(kdata);
     }

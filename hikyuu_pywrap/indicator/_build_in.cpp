@@ -2129,4 +2129,20 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind: 指标
     :param bool ignore_discard: 忽略指标丢弃数据
     :rtype: Indicator)");
+
+    m.def("JUMPUP", py::overload_cast<>(JUMPUP));
+    m.def("JUMPUP", py::overload_cast<const Indicator&>(JUMPUP), R"(JUMPUP([ind])
+    
+    边缘跳变，从小于等于0.0，跳变到 > 0.0
+    
+    :param Indicator ind: 指标
+    :rtype: Indicator)");
+
+    m.def("JUMPDOWN", py::overload_cast<>(JUMPDOWN));
+    m.def("JUMPDOWN", py::overload_cast<const Indicator&>(JUMPDOWN), R"(JUMPDOWN([ind])
+    
+    边缘跳变，从大于0.0，跳变到 <= 0.0
+
+    :param Indicator ind: 指标
+    :rtype: Indicator)");
 }
