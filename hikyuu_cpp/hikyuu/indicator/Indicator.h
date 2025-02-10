@@ -44,7 +44,7 @@ public:
     typedef IndicatorImp::value_t value_t;
 
 public:
-    Indicator() {}
+    Indicator() : m_imp(make_shared<IndicatorImp>()) {}
     Indicator(const IndicatorImpPtr& imp);
     Indicator(const Indicator& ind);
     Indicator(Indicator&& ind) noexcept;

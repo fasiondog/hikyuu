@@ -127,6 +127,11 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_
         cmd = "xmake f {} -c -y -m {} --feedback={} -k {} --low_precision={} --log_level={}".format(
             "-v -D" if verbose else "", mode, feedback, kind, low_precision,
             2 if mode == 'release' else 0)
+
+        # macosx 下动态库不支持 serialize, 静态库太大不适合打包（hub中使用C++需要使用)
+        # 静态库在 macosx 下支持 hub，也很麻烦，暂时搁置
+        # if sys.platform == 'darwin':
+        #     cmd += " --serialize=n"
         print(cmd)
         os.system(cmd)
 

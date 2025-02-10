@@ -2129,4 +2129,35 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind: 指标
     :param bool ignore_discard: 忽略指标丢弃数据
     :rtype: Indicator)");
+
+    m.def("JUMPUP", py::overload_cast<>(JUMPUP));
+    m.def("JUMPUP", py::overload_cast<const Indicator&>(JUMPUP), R"(JUMPUP([ind])
+    
+    边缘跳变，从小于等于0.0，跳变到 > 0.0
+    
+    :param Indicator ind: 指标
+    :rtype: Indicator)");
+
+    m.def("JUMPDOWN", py::overload_cast<>(JUMPDOWN));
+    m.def("JUMPDOWN", py::overload_cast<const Indicator&>(JUMPDOWN), R"(JUMPDOWN([ind])
+    
+    边缘跳变，从大于0.0，跳变到 <= 0.0
+
+    :param Indicator ind: 指标
+    :rtype: Indicator)");
+
+    m.def("CYCLE", py::overload_cast<int, const string&, bool>(CYCLE), py::arg("adjust_cycle") = 1,
+          py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true);
+    m.def("CYCLE", py::overload_cast<const KData&, int, const string&, bool>(CYCLE),
+          py::arg("kdata"), py::arg("adjust_cycle") = 1, py::arg("adjust_mode") = "query",
+          py::arg("delay_to_trading_day") = true,
+          R"(CYCLE(kdata, [adjust_cycle=1], [adjust_mode='query'], [delay_to_trading_day=True])
+          
+    PF调仓周期指标，主要用于PF调仓日验证，及作为SG
+
+    :param KData kdata: K线数据
+    :param int adjust_cycle: 调整周期
+    :param string adjust_mode: 调整方式
+    :param bool delay_to_trading_day: 调整周期是否延至交易日
+    :rtype: Indicator)");
 }

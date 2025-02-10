@@ -34,9 +34,9 @@ public:
 };
 
 void export_AllocateFunds(py::module& m) {
-    py::class_<AllocateFundsBase, AFPtr, PyAllocateFundsBase>(
-      m, "AllocateFundsBase", py::dynamic_attr(),
-      R"(资产分配算法基类, 子类接口：
+    py::class_<AllocateFundsBase, AFPtr, PyAllocateFundsBase>(m, "AllocateFundsBase",
+                                                              py::dynamic_attr(),
+                                                              R"(资产分配算法基类, 子类接口：
 
     - _allocateWeight : 【必须】子类资产分配调整实现
     - _clone : 【必须】克隆接口
@@ -98,6 +98,13 @@ void export_AllocateFunds(py::module& m) {
     固定比例资产分配
 
     :param float weight:  指定的资产比例 [0, 1])");
+
+    m.def("AF_FixedWeightList", AF_FixedWeightList, py::arg("weights"),
+          R"(AF_FixedWeightList(weights)
+    
+    固定比例资产分配列表
+
+    :param float weights:  指定的资产比例列表)");
 
     m.def("AF_MultiFactor", AF_MultiFactor, R"(AF_MultiFactor()
       

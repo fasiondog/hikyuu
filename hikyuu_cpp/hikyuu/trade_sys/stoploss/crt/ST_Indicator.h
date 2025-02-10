@@ -14,7 +14,7 @@
 
 namespace hku {
 
-StoplossPtr HKU_API ST_Indicator(const Indicator& op, const string& kpart = "CLOSE");
+StoplossPtr HKU_API ST_Indicator(const Indicator& ind);
 
 } /* namespace hku */
 

@@ -48,9 +48,17 @@ void MoneyManagerBase::baseCheckParam(const string& name) const {
 
 void MoneyManagerBase::paramChanged() {}
 
-void MoneyManagerBase::buyNotify(const TradeRecord&) {}
+void MoneyManagerBase::buyNotify(const TradeRecord& tr) {
+    m_buyCount++;
+    m_sellCount = 0;
+    _buyNotify(tr);
+}
 
-void MoneyManagerBase::sellNotify(const TradeRecord&) {}
+void MoneyManagerBase::sellNotify(const TradeRecord& tr) {
+    m_sellCount++;
+    m_buyCount = 0;
+    _sellNotify(tr);
+}
 
 void MoneyManagerBase::reset() {
     m_query = Null<KQuery>();

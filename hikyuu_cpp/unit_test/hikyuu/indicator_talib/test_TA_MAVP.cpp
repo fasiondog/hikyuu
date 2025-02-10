@@ -83,8 +83,8 @@ TEST_CASE("test_TA_MAVP_params") {
 
     /** @arg 输入两个空指标, 指定上下文 */
     result = TA_MAVP(Indicator(), Indicator())(k1);
-    CHECK_EQ(result.size(), 0);
-    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result.size(), k1.size());
+    CHECK_EQ(result.discard(), k1.size());
     // CHECK_EQ(result.name(), "TA_MAVP(Indicator)");
 }
 

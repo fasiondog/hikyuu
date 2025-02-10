@@ -18,10 +18,11 @@ namespace hku {
  * 布尔信号指示器
  * @param buy 买入指示（结果Indicator中相应位置>0则代表买入）
  * @param sell 卖出指示（结果Indicator中相应位置>0则代表卖出）
+ * @param alternate 买入与卖出信号是否交替出现，默认为true
  * @return 信号指示器
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell);
+SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell, bool alternate = true);
 
 } /* namespace hku */
 

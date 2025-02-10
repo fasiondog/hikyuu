@@ -78,7 +78,7 @@ void SignalBase::setTO(const KData& kdata) {
     m_cycle_start = kdata[0].datetime;
     HKU_IF_RETURN(cycle, void());
 
-    if (!cycle) {
+    if (m_ignore_cycle || !cycle) {
         _calculate(kdata);
     }
 }
@@ -95,8 +95,10 @@ void SignalBase::reset() {
 }
 
 void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
-    HKU_IF_RETURN(!getParam<bool>("cycle"), void());
-    HKU_ASSERT(start != Null<Datetime>() && close != Null<Datetime>() && start < close);
+    HKU_IF_RETURN(!m_ignore_cycle && !getParam<bool>("cycle"), void());
+    HKU_INFO("m_cycle_start: {}, m_cycle_end: {}", m_cycle_start, m_cycle_end);
+    HKU_CHECK(start != Null<Datetime>() && close != Null<Datetime>() && start < close, "{}",
+              m_name);
     HKU_CHECK(start >= m_cycle_end || m_cycle_end == Null<Datetime>(),
               "curretn start: {}, pre cycle end: {}", start, m_cycle_end);
     m_cycle_start = start;
@@ -108,42 +110,87 @@ void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
 }
 
 DatetimeList SignalBase::getBuySignal() const {
-    DatetimeList result(m_buySig.size());
-    std::copy(m_buySig.begin(), m_buySig.end(), result.begin());
+    DatetimeList result;
+    result.reserve(m_buySig.size());
+    for (auto iter = m_buySig.begin(); iter != m_buySig.end(); ++iter) {
+        result.emplace_back(iter->first);
+    }
     return result;
 }
 
 DatetimeList SignalBase::getSellSignal() const {
-    DatetimeList result(m_sellSig.size());
-    std::copy(m_sellSig.begin(), m_sellSig.end(), result.begin());
+    DatetimeList result;
+    result.reserve(m_sellSig.size());
+    for (auto iter = m_sellSig.begin(); iter != m_sellSig.end(); ++iter) {
+        result.emplace_back(iter->first);
+    }
     return result;
 }
 
-void SignalBase::_addBuySignal(const Datetime& datetime) {
-    if (!getParam<bool>("alternate")) {
-        m_buySig.insert(datetime);
-    } else {
+double SignalBase::getBuyValue(const Datetime& datetime) const {
+    auto iter = m_buySig.find(datetime);
+    return iter != m_buySig.end() ? iter->second : 0.0;
+}
+double SignalBase::getSellValue(const Datetime& datetime) const {
+    auto iter = m_sellSig.find(datetime);
+    return iter != m_sellSig.end() ? iter->second : 0.0;
+}
+
+void SignalBase::_addSignal(const Datetime& datetime, double value) {
+    HKU_IF_RETURN(iszero(value) || std::isnan(value), void());
+
+    double new_value = value + getBuyValue(datetime) + getSellValue(datetime);
+    HKU_IF_RETURN(iszero(new_value), void());
+
+    if (new_value > 0.0) {
+        auto iter = m_buySig.find(datetime);
+        if (!getParam<bool>("alternate")) {
+            if (iter != m_buySig.end()) {
+                iter->second += new_value;
+            } else {
+                m_buySig.insert({datetime, new_value});
+            }
+            return;
+        }
+
         if (!m_hold_long) {
-            m_buySig.insert(datetime);
+            if (iter != m_buySig.end()) {
+                iter->second += new_value;
+            } else {
+                m_buySig.insert({datetime, new_value});
+            }
             if (getParam<bool>("support_borrow_stock") && m_hold_short) {
                 m_hold_short = false;
             } else {
                 m_hold_long = true;
             }
         }
-    }
-}
 
-void SignalBase::_addSellSignal(const Datetime& datetime) {
-    if (!getParam<bool>("alternate")) {
-        m_sellSig.insert(datetime);
     } else {
+        auto iter = m_sellSig.find(datetime);
+        if (!getParam<bool>("alternate")) {
+            if (iter != m_sellSig.end()) {
+                iter->second += new_value;
+            } else {
+                m_sellSig.insert({datetime, new_value});
+            }
+            return;
+        }
+
         if (!m_hold_short) {
             if (m_hold_long) {
-                m_sellSig.insert(datetime);
+                if (iter != m_sellSig.end()) {
+                    iter->second += new_value;
+                } else {
+                    m_sellSig.insert({datetime, new_value});
+                }
                 m_hold_long = false;
             } else if (getParam<bool>("support_borrow_stock")) {
-                m_sellSig.insert(datetime);
+                if (iter != m_sellSig.end()) {
+                    iter->second += new_value;
+                } else {
+                    m_sellSig.insert({datetime, new_value});
+                }
                 m_hold_short = true;
             }
         }

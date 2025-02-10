@@ -100,7 +100,7 @@ public:
                 }
                 value = vect;
 
-            } else if (isinstance<price_t>(pyseq[0])) {
+            } else if (PyFloat_Check(pyseq[0].ptr()) || PyLong_Check(pyseq[0].ptr())) {
                 std::vector<price_t> vect(total);
                 for (size_t i = 0; i < total; i++) {
                     vect[i] = pyseq[i].cast<price_t>();
@@ -214,12 +214,12 @@ public:
             return o;
 
         } else if (x.type() == typeid(PriceList)) {
-            const PriceList& price_list = boost::any_cast<PriceList>(x);
+            PriceList price_list = boost::any_cast<PriceList>(x);
             list o;
             for (auto iter = price_list.begin(); iter != price_list.end(); ++iter) {
                 o.append(*iter);
             }
-            // o.inc_ref();
+            o.inc_ref();
             return o;
 
         } else if (x.type() == typeid(DatetimeList)) {
@@ -228,7 +228,7 @@ public:
             for (auto iter = date_list.begin(); iter != date_list.end(); ++iter) {
                 o.append(*iter);
             }
-            // o.inc_ref();
+            o.inc_ref();
             return o;
         }
 

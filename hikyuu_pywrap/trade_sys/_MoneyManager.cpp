@@ -22,12 +22,12 @@ public:
         PYBIND11_OVERLOAD(void, MoneyManagerBase, _reset, );
     }
 
-    void buyNotify(const TradeRecord& tr) override {
-        PYBIND11_OVERLOAD_NAME(void, MoneyManagerBase, "buy_notify", buyNotify, tr);
+    void _buyNotify(const TradeRecord& tr) override {
+        PYBIND11_OVERLOAD_NAME(void, MoneyManagerBase, "_buy_notify", _buyNotify, tr);
     }
 
-    void sellNotify(const TradeRecord& tr) override {
-        PYBIND11_OVERLOAD_NAME(void, MoneyManagerBase, "sell_notify", sellNotify, tr);
+    void _sellNotify(const TradeRecord& tr) override {
+        PYBIND11_OVERLOAD_NAME(void, MoneyManagerBase, "_sell_notify", _sellNotify, tr);
     }
 
     double _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
@@ -69,8 +69,8 @@ void export_MoneyManager(py::module& m) {
 
 自定义资金管理策略接口：
 
-    - buyNotify : 【可选】接收实际买入通知，预留用于多次增减仓处理
-    - sellNotify : 【可选】接收实际卖出通知，预留用于多次增减仓处理
+    - _buyNotify : 【可选】接收实际买入通知，预留用于多次增减仓处理
+    - _sellNotify : 【可选】接收实际卖出通知，预留用于多次增减仓处理
     - _getBuyNumber : 【必须】获取指定交易对象可买入的数量
     - _getSellNumber : 【可选】获取指定交易对象可卖出的数量，如未重载，默认为卖出全部已持仓数量
     - _reset : 【可选】重置私有属性
@@ -91,6 +91,10 @@ void export_MoneyManager(py::module& m) {
                     "设置或获取交易管理对象")
       .def_property("query", &MoneyManagerBase::getQuery, &MoneyManagerBase::setQuery,
                     py::return_value_policy::copy, "设置或获取查询条件")
+      .def_property_readonly("current_buy_count", &MoneyManagerBase::currentBuyCount,
+                             "当前连续买入计数")
+      .def_property_readonly("current_sell_count", &MoneyManagerBase::currentSellCount,
+                             "当前连续卖出计数")
 
       .def("get_param", &MoneyManagerBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -113,15 +117,15 @@ void export_MoneyManager(py::module& m) {
       .def("reset", &MoneyManagerBase::reset, "复位操作")
       .def("clone", &MoneyManagerBase::clone, "克隆操作")
 
-      .def("buy_notify", &MoneyManagerBase::buyNotify,
-           R"(buy_notify(self, trade_record)
+      .def("_buy_notify", &MoneyManagerBase::_buyNotify,
+           R"(_buy_notify(self, trade_record)
 
     【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
 
     :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录)")
 
-      .def("sell_notify", &MoneyManagerBase::sellNotify,
-           R"(sell_notify(self, trade_record)
+      .def("_sell_notify", &MoneyManagerBase::_sellNotify,
+           R"(_sell_notify(self, trade_record)
 
     【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
 

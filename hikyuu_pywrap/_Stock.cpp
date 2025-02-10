@@ -205,6 +205,15 @@ void export_Stock(py::module& m) {
         
         获取所有历史财务信息历史记录)")
 
+      .def("get_trading_calendar", &Stock::getTradingCalendar, py::arg("query"),
+           R"(get_trading_calendar(self, query)
+
+        获取自身市场的交易日日历（（不是本身的交易日期）
+
+        :param KQuery query: Query查询条件
+        :return: 日期列表
+        :rtype: DatetimeList)")
+
       .def("load_kdata_to_buffer", &Stock::loadKDataToBuffer, R"(load_kdata_to_buffer(self,
           ktype)
 
