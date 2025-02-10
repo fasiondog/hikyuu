@@ -28,6 +28,7 @@
 #include "crt/BETWEEN.h"
 #include "crt/BLOCKSETNUM.h"
 #include "crt/CEILING.h"
+#include "crt/CYCLE.h"
 #include "crt/CONTEXT.h"
 #include "crt/CORR.h"
 #include "crt/COS.h"

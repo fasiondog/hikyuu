@@ -974,6 +974,10 @@ const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {
     return m_data->m_history_finance;
 }
 
+DatetimeList Stock::getTradingCalendar(const KQuery& query) const {
+    return StockManager::instance().getTradingCalendar(query, market());
+}
+
 Stock HKU_API getStock(const string& querystr) {
     const StockManager& sm = StockManager::instance();
     return sm.getStock(querystr);
