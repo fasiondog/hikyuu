@@ -211,7 +211,6 @@ void export_Stock(py::module& m) {
         获取自身市场的交易日日历（（不是本身的交易日期）
 
         :param KQuery query: Query查询条件
-        :param str market: 市场简称
         :return: 日期列表
         :rtype: DatetimeList)")
 

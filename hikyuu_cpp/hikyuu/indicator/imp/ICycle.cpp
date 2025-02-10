@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/indicator/crt/ALIGN.h"
+#include "hikyuu/indicator/crt/PRICELIST.h"
 #include "ICycle.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -58,6 +60,168 @@ void ICycle::_checkParam(const string& name) const {
     }
 }
 
+static void calculate_no_delay(const DatetimeList& datelist, int adjust_cycle, const string& mode,
+                               PriceList& buf) {
+    if ("week" == mode) {
+        Datetime cur_cycle_end = datelist.front().nextWeek();
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            bool adjust = (date.dayOfWeek() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextWeek();
+            }
+            if (cur_cycle_end >= datelist.back()) {
+                cur_cycle_end = datelist.back() + Seconds(1);
+            }
+            buf[i] = adjust;
+        }
+    } else if ("month" == mode) {
+        Datetime cur_cycle_end = datelist.front().nextMonth();
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            bool adjust = (date.day() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextMonth();
+            }
+            if (cur_cycle_end >= datelist.back()) {
+                cur_cycle_end = datelist.back() + Seconds(1);
+            }
+            buf[i] = adjust;
+        }
+    } else if ("quarter" == mode) {
+        Datetime cur_cycle_end = datelist.front().nextQuarter();
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            bool adjust = (date.day() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextQuarter();
+            }
+            if (cur_cycle_end >= datelist.back()) {
+                cur_cycle_end = datelist.back() + Seconds(1);
+            }
+            buf[i] = adjust;
+        }
+    } else if ("year" == mode) {
+        Datetime cur_cycle_end = datelist.front().nextYear();
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            bool adjust = (date.dayOfYear() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextYear();
+            }
+            if (cur_cycle_end >= datelist.back()) {
+                cur_cycle_end = datelist.back() + Seconds(1);
+            }
+            buf[i] = adjust;
+        }
+    }
+}
+
+static void calculate_delay(const DatetimeList& datelist, int adjust_cycle, const string& mode,
+                            PriceList& buf) {
+    std::set<Datetime> adjust_date_set;
+    if ("week" == mode) {
+        Datetime cur_cycle_end = datelist.front().nextWeek();
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            Datetime adjust_date = date.startOfWeek() + Days(adjust_cycle - 1);
+            bool adjust = false;
+            if (date == adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            }
+
+            if (adjust) {
+                cur_cycle_end = date.nextWeek();
+            }
+            if (cur_cycle_end >= datelist.back()) {
+                cur_cycle_end = datelist.back() + Seconds(1);
+            }
+
+            buf[i] = adjust;
+        }
+
+    } else if ("month" == mode) {
+        Datetime cur_cycle_end = datelist.front().nextMonth();
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            Datetime adjust_date = date.startOfMonth() + Days(adjust_cycle - 1);
+            bool adjust = false;
+            if (date == adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            }
+
+            if (adjust) {
+                cur_cycle_end = date.nextMonth();
+            }
+            if (cur_cycle_end >= datelist.back()) {
+                cur_cycle_end = datelist.back() + Seconds(1);
+            }
+
+            buf[i] = adjust;
+        }
+
+    } else if ("quarter" == mode) {
+        Datetime cur_cycle_end = datelist.front().nextQuarter();
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            Datetime adjust_date = date.startOfQuarter() + Days(adjust_cycle - 1);
+            bool adjust = false;
+            if (date == adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            }
+
+            if (adjust) {
+                cur_cycle_end = date.nextQuarter();
+            }
+            if (cur_cycle_end >= datelist.back()) {
+                cur_cycle_end = datelist.back() + Seconds(1);
+            }
+
+            buf[i] = adjust;
+        }
+
+    } else if ("year" == mode) {
+        Datetime cur_cycle_end = datelist.front().nextYear();
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            const auto& date = datelist[i];
+            Datetime adjust_date = date.startOfYear() + Days(adjust_cycle - 1);
+            bool adjust = false;
+            if (date == adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            }
+
+            if (adjust) {
+                cur_cycle_end = date.nextYear();
+            }
+            if (cur_cycle_end >= datelist.back()) {
+                cur_cycle_end = datelist.back() + Seconds(1);
+            }
+
+            buf[i] = adjust;
+        }
+    }
+}
+
 void ICycle::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
@@ -67,14 +231,57 @@ void ICycle::_calculate(const Indicator& data) {
     HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
+
+    DatetimeList datelist = k.getStock().getTradingCalendar(k.getQuery());
+    HKU_IF_RETURN(datelist.empty(), void());
+
+    int adjust_cycle = getParam<int>("adjust_cycle");
+    string adjust_mode = getParam<string>("adjust_mode");
+    bool delay_to_trading_day = getParam<bool>("delay_to_trading_day");
+
+    PriceList buf(datelist.size());
+    if ("query" == adjust_mode || "day" == adjust_mode) {
+        size_t cur_adjust_ix = 0;
+        Datetime cur_cycle_end;
+        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+            bool adjust = false;
+            if (i == cur_adjust_ix) {
+                adjust = true;
+                cur_adjust_ix += adjust_cycle;
+                cur_cycle_end =
+                  cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Seconds(1);
+            }
+            buf[i] = adjust;
+        }
+
+    } else if (delay_to_trading_day) {
+        calculate_delay(datelist, adjust_cycle, adjust_mode, buf);
+    } else {
+        calculate_no_delay(datelist, adjust_cycle, adjust_mode, buf);
+    }
+
+    Indicator tmpind = ALIGN(PRICELIST(buf, datelist), k);
+    const auto* src = tmpind.data();
+    auto* dst = this->data();
+    HKU_ASSERT(tmpind.size() == total);
+    memcpy(dst, src, sizeof(value_t) * total);
 }
 
-Indicator HKU_API CYCLE() {
-    return make_shared<ICycle>()->calculate();
+Indicator HKU_API CYCLE(int adjust_cycle, const string& adjust_mode, bool delay_to_trading_day) {
+    auto p = make_shared<ICycle>();
+    p->setParam<int>("adjust_cycle", adjust_cycle);
+    p->setParam<string>("adjust_mode", adjust_mode);
+    p->setParam<bool>("delay_to_trading_day", delay_to_trading_day);
+    return Indicator(p);
 }
 
-Indicator HKU_API CYCLE(const KData& k) {
-    return Indicator(make_shared<ICycle>(k));
+Indicator HKU_API CYCLE(const KData& k, int adjust_cycle, const string& adjust_mode,
+                        bool delay_to_trading_day) {
+    auto p = make_shared<ICycle>(k);
+    p->setParam<int>("adjust_cycle", adjust_cycle);
+    p->setParam<string>("adjust_mode", adjust_mode);
+    p->setParam<bool>("delay_to_trading_day", delay_to_trading_day);
+    return p->calculate();
 }
 
 } /* namespace hku */
