@@ -140,12 +140,12 @@ void Strategy::start(bool autoRecieveSpot) {
 
 void Strategy::onChange(std::function<void(const Stock&, const SpotRecord& spot)>&& changeFunc) {
     HKU_CHECK(changeFunc, "Invalid changeFunc!");
-    m_on_change = changeFunc;
+    m_on_change = std::move(changeFunc);
 }
 
 void Strategy::onReceivedSpot(std::function<void(const Datetime&)>&& recievedFucn) {
     HKU_CHECK(recievedFucn, "Invalid recievedFucn!");
-    m_on_recieved_spot = recievedFucn;
+    m_on_recieved_spot = std::move(recievedFucn);
 }
 
 void Strategy::_receivedSpot(const SpotRecord& spot) {
