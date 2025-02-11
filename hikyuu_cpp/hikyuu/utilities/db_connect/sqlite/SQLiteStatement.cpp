@@ -40,7 +40,7 @@ void SQLiteStatement::_reset() {
         int status = sqlite3_reset(m_stmt);
         if (status != SQLITE_OK) {
             m_step_status = SQLITE_DONE;
-            SQL_THROW(status, sqlite3_errmsg(m_db));
+            SQL_THROW(status, "{}", sqlite3_errmsg(m_db));
         }
         m_needs_reset = false;
         m_step_status = SQLITE_DONE;
@@ -53,7 +53,7 @@ void SQLiteStatement::sub_exec() {
     m_step_status = sqlite3_step(m_stmt);
     m_needs_reset = true;
     if (m_step_status != SQLITE_DONE && m_step_status != SQLITE_ROW) {
-        SQL_THROW(m_step_status, sqlite3_errmsg(m_db));
+        SQL_THROW(m_step_status, "{}", sqlite3_errmsg(m_db));
     }
 }
 
@@ -69,7 +69,7 @@ bool SQLiteStatement::sub_moveNext() {
             } else if (m_step_status == SQLITE_ROW) {
                 return true;
             } else {
-                SQL_THROW(m_step_status, sqlite3_errmsg(m_db));
+                SQL_THROW(m_step_status, "{}", sqlite3_errmsg(m_db));
             }
         }
     } else {
@@ -86,13 +86,13 @@ int SQLiteStatement::sub_getNumColumns() const {
 void SQLiteStatement::sub_bindNull(int idx) {
     _reset();
     int status = sqlite3_bind_null(m_stmt, idx + 1);
-    SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
+    SQL_CHECK(status == SQLITE_OK, status, "{}", sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_bindInt(int idx, int64_t value) {
     _reset();
     int status = sqlite3_bind_int64(m_stmt, idx + 1, value);
-    SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
+    SQL_CHECK(status == SQLITE_OK, status, "{}", sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_bindDatetime(int idx, const Datetime &item) {
@@ -107,33 +107,33 @@ void SQLiteStatement::sub_bindText(int idx, const std::string &item) {
     _reset();
     int status =
       sqlite3_bind_text(m_stmt, idx + 1, item.c_str(), (int)item.size(), SQLITE_TRANSIENT);
-    SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
+    SQL_CHECK(status == SQLITE_OK, status, "{}", sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_bindText(int idx, const char *item, size_t len) {
     _reset();
     int status = sqlite3_bind_text(m_stmt, idx + 1, item, (int)len, SQLITE_TRANSIENT);
-    SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
+    SQL_CHECK(status == SQLITE_OK, status, "{}", sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_bindDouble(int idx, double item) {
     _reset();
     int status = sqlite3_bind_double(m_stmt, idx + 1, item);
-    SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
+    SQL_CHECK(status == SQLITE_OK, status, "{}", sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_bindBlob(int idx, const std::string &item) {
     _reset();
     int status =
       sqlite3_bind_blob(m_stmt, idx + 1, item.data(), (int)item.size(), SQLITE_TRANSIENT);
-    SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
+    SQL_CHECK(status == SQLITE_OK, status, "{}", sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_bindBlob(int idx, const std::vector<char> &item) {
     _reset();
     int status =
       sqlite3_bind_blob(m_stmt, idx + 1, item.data(), (int)item.size(), SQLITE_TRANSIENT);
-    SQL_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
+    SQL_CHECK(status == SQLITE_OK, status, "{}", sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_getColumnAsInt64(int idx, int64_t &item) {

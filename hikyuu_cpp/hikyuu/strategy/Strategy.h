@@ -133,8 +133,8 @@ private:
 
     /** 向线程池提交任务 */
     template <typename FunctionType>
-    event_handle<typename std::result_of<FunctionType()>::type> event(FunctionType f) {
-        typedef typename std::result_of<FunctionType()>::type result_type;
+    auto event(FunctionType f) {
+        typedef typename std::invoke_result<FunctionType>::type result_type;
         std::packaged_task<result_type()> task(f);
         event_handle<result_type> res(task.get_future());
         m_event_queue.push(std::move(task));

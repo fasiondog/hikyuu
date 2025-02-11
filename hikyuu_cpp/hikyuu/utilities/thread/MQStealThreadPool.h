@@ -104,12 +104,12 @@ public:
 
     /** 向线程池提交任务 */
     template <typename FunctionType>
-    task_handle<typename std::result_of<FunctionType()>::type> submit(FunctionType f) {
+    auto submit(FunctionType f) {
         if (m_thread_need_stop.isSet() || m_done) {
             throw std::logic_error("You can't submit a task to the stopped MQStealThreadPool!");
         }
 
-        typedef typename std::result_of<FunctionType()>::type result_type;
+        typedef typename std::invoke_result<FunctionType>::type result_type;
         std::packaged_task<result_type()> task(f);
         task_handle<result_type> res(task.get_future());
 

@@ -155,15 +155,16 @@ void IAma::_dyn_calculate(const Indicator& ind) {
         if (first >= total) {
             break;
         }
-        tasks.push_back(ms_tg->submit([=, &ind, &n, &fast_n, &slow_n]() {
-            size_t endPos = first + circleLength;
-            if (endPos > total) {
-                endPos = total;
-            }
-            for (size_t i = circleLength * group; i < endPos; i++) {
-                _dyn_one_circle(ind, i, n[i], fast_n[i], slow_n[i]);
-            }
-        }));
+        tasks.push_back(
+          ms_tg->submit([this, &ind, &n, &fast_n, &slow_n, first, circleLength, total, group]() {
+              size_t endPos = first + circleLength;
+              if (endPos > total) {
+                  endPos = total;
+              }
+              for (size_t i = circleLength * group; i < endPos; i++) {
+                  _dyn_one_circle(ind, i, n[i], fast_n[i], slow_n[i]);
+              }
+          }));
     }
 
     for (auto& task : tasks) {

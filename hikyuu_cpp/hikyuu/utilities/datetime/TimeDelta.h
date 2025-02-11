@@ -59,7 +59,7 @@ public:
     explicit TimeDelta(bt::time_duration td);
 
     /** 从字符串构造，格式：-1 days, hh:mm:ss.000000) */
-    explicit TimeDelta(const std::string& delta);
+    explicit TimeDelta(const std::string &delta);
 
     /** 赋值构造函数 */
     TimeDelta(const TimeDelta &) = default;
@@ -329,7 +329,7 @@ inline string to_string(const hku::TimeDelta &delta) {
 #if FMT_VERSION >= 90000
 template <>
 struct fmt::formatter<hku::TimeDelta> {
-    constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) {
+    FMT_CONSTEXPR auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) {
         return ctx.end();
     }
 

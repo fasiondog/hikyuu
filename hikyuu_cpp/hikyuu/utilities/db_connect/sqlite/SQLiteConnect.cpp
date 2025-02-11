@@ -33,7 +33,7 @@ SQLiteConnect::SQLiteConnect(const Parameter &param) : DBConnectBase(param), m_d
         }
 
         int rc = sqlite3_open_v2(m_dbname.c_str(), &m_db, flags, NULL);
-        SQL_CHECK(rc == SQLITE_OK, rc, sqlite3_errmsg(m_db));
+        SQL_CHECK(rc == SQLITE_OK, rc, "{}", sqlite3_errmsg(m_db));
 
 #if HKU_ENABLE_SQLCIPHER
         if (haveParam("key")) {
