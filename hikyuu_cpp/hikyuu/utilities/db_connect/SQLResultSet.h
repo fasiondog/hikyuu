@@ -154,7 +154,7 @@ private:
         if (m_connect && page != m_current_page) {
             m_buffer.clear();
             m_connect->batchLoad(
-              m_buffer, fmt::format(m_sql_template, TableT::getTableName(), m_where,
+              m_buffer, fmt::format(fmt::runtime(m_sql_template), TableT::getTableName(), m_where,
                                     m_orderby_inner, page_size, page * page_size, m_orderby_outer));
             m_current_page = page;
         }
@@ -179,7 +179,7 @@ private:
 };
 
 template <class TableT, size_t page_size>
-class SQLResultSetIterator : public std::iterator<std::forward_iterator_tag, TableT> {
+class SQLResultSetIterator {
 public:
     using ResultSet = SQLResultSet<TableT, page_size>;
 

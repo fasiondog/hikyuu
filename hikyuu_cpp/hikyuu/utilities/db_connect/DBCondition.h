@@ -245,4 +245,8 @@ inline DBCondition operator==(const Field &field, const char *val) {
     return DBCondition(fmt::format(R"(({}="{}"))", field.name, val));
 }
 
+inline DBCondition operator!=(const Field &field, const char *val) {
+    return DBCondition(fmt::format(R"(({}<>"{}"))", field.name, val));
+}
+
 }  // namespace hku

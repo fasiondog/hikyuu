@@ -101,7 +101,7 @@ void ISma::_dyn_calculate(const Indicator& ind) {
         if (first >= total) {
             break;
         }
-        tasks.push_back(ms_tg->submit([=, &ind, &n, &m]() {
+        tasks.push_back(ms_tg->submit([this, &ind, &n, &m, first, circleLength, group, total]() {
             size_t endPos = first + circleLength;
             if (endPos > total) {
                 endPos = total;

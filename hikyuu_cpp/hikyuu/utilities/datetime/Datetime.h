@@ -424,7 +424,7 @@ inline string to_string(const hku::Datetime &date) {
 #if FMT_VERSION >= 90000
 template <>
 struct fmt::formatter<hku::Datetime> {
-    constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) {
+    FMT_CONSTEXPR auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) {
         return ctx.end();
     }
 

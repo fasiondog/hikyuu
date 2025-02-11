@@ -249,10 +249,10 @@ public:
      * @param data 事件附加信息
      */
     void dispatch(const EventT& event, const any_t& data) {
-        m_tg->submit([=] {
+        m_tg->submit([this, event, data] {
             auto iter = m_trees.find(event);
             HKU_WARN_IF_RETURN(iter == m_trees.end(), void(),
-                              "There is no matching handling method for the event({})!", event);
+                               "There is no matching handling method for the event({})!", event);
             iter->second->run(data);
         });
     }

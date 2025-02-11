@@ -90,7 +90,7 @@ void MySQLConnect::connect() {
         close();
         const char* errmsg = "Failed create MySQLConnect instance! Unknown error";
         HKU_ERROR(errmsg);
-        HKU_THROW(errmsg);
+        HKU_THROW("{}", errmsg);
     }
 }
 

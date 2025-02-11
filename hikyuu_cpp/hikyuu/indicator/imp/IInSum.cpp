@@ -67,8 +67,8 @@ static void insum_cum(const IndicatorList& inds, Indicator::value_t* dst, size_t
             continue;
         }
         if (value.size() != len) {
-            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}, stk: {}",
-                     value.getContext().getStock().name(), value.size(), len);
+            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}",
+                     value.getContext().getStock().market_code(), value.size(), len);
             continue;
         }
         const auto* data = value.data();
@@ -91,8 +91,8 @@ static void insum_mean(const IndicatorList& inds, Indicator::value_t* dst, size_
             continue;
         }
         if (value.size() != len) {
-            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}, stk: {}",
-                     value.getContext().getStock().name(), value.size(), len);
+            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}",
+                     value.getContext().getStock().market_code(), value.size(), len);
             continue;
         }
         const auto* data = value.data();
@@ -121,8 +121,8 @@ static void insum_max(const IndicatorList& inds, Indicator::value_t* dst, size_t
             continue;
         }
         if (value.size() != len) {
-            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}, stk: {}",
-                     value.getContext().getStock().name(), value.size(), len);
+            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}",
+                     value.getContext().getStock().market_code(), value.size(), len);
             continue;
         }
         const auto* data = value.data();
@@ -144,8 +144,8 @@ static void insum_min(const IndicatorList& inds, Indicator::value_t* dst, size_t
             continue;
         }
         if (value.size() != len) {
-            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}, stk: {}",
-                     value.getContext().getStock().name(), value.size(), len);
+            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}",
+                     value.getContext().getStock().market_code(), value.size(), len);
             continue;
         }
         const auto* data = value.data();
