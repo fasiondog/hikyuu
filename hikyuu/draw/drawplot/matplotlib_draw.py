@@ -1289,7 +1289,6 @@ def DRAWIMG(cond: Indicator, price: Indicator, img: str, kdata: KData = None, ne
     h = yh / ph * pixel
     for i in range(cond.discard, len(cond)):
         if (not isnan(cond[i])) and cond[i] > 0. and (not isinf(cond[i])) and (not isnan(price[i])) and (not isinf(price[i])):
-            print(i, i-w, i+w, price[i]-h, price[i]+h)
             axes.imshow(image, extent=[i-w, i+w, price[i]-h, price[i]+h], *args, **kwargs)
 
     axes.set_aspect('auto')
