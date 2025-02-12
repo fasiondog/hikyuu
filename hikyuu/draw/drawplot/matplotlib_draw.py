@@ -1301,6 +1301,21 @@ DRAWBMP = DRAWIMG
 
 
 def DRAWICON(cond: Indicator, price: Indicator, type: int, kdata: KData = None, new=False, axes=None, *args, **kwargs):
+    """绘制内置 icon
+
+    用法:DRAWICON(cond,price,1),当条件 cond 满足时,在 price 位置编号为1的内置图标
+    例如:DRAWICON(O>C,CLOSE, 1)。
+
+    可以使用 SHOWICONS() 显示所有内置图标。
+
+    Args:
+        cond (Indicator): 指定条件
+        price (Indicator): 指定价格
+        type (int): icon 编号
+        kdata (KData, optional): 指定上下文. Defaults to None.
+        new (bool, optional): 在新窗口中绘制. Defaults to False.
+        axes (_type_, optional): 在指定坐标轴中绘制. Defaults to None.
+    """
     DRAWIMG(cond, price, f'{ICON_PATH}/icon/{type}.png', kdata, new, axes, *args, **kwargs)
 
 
