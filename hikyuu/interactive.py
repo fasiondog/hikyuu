@@ -26,7 +26,7 @@
 
 from hikyuu import *
 
-load()
+load_hikyuu()
 
 blocka = Block("A", "ALL")
 for s in sm:
