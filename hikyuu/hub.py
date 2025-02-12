@@ -490,7 +490,7 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def get_current_hub(self, filename):
-        """用于在仓库part.py中获取当前所在的仓库名
+        """用于在仓库part.py中获取当前所在的仓库名。如果找不到，将使用 "default" 仓库, 并给出告警。
 
         示例： get_current_hub(__file__)
         """
@@ -498,7 +498,10 @@ class HubManager(metaclass=SingletonType):
         path_parts = pathlib.Path(abs_path).parts
         local_base = path_parts[-4] if path_parts[-3] in ('pf', 'sys', 'ind', 'other') else path_parts[-5]
         hub_model = self._session.query(HubModel.name).filter_by(local_base=local_base).first()
-        checkif(hub_model is None, local_base, HubNotFoundError)
+        if hub_model is None:
+            HubManager().logger.warning('未找到仓库，将使用 "default" 仓库！！！')
+            hub_model = self._session.query(HubModel.name).filter_by(local_base='default').first()
+            checkif(hub_model is None, local_base, HubNotFoundError)
         return hub_model.name
 
 
@@ -590,7 +593,7 @@ def get_part_name_list(hub=None, part_type=None):
 
 
 def get_current_hub(filename):
-    """用于在仓库part.py中获取当前所在的仓库名
+    """用于在仓库part.py中获取当前所在的仓库名。如果找不到，将尝试使用 "default" 仓库, 并给出告警。
 
     示例： get_current_hub(__file__)
     """
