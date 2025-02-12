@@ -4,9 +4,15 @@
 
 # 优先加载 hikyuu 库，防止 windows 公共依赖库不同导致DLL初始化失败
 from .core import *
-import numpy as np
-import pandas as pd
-from datetime import *
+
+# 过滤掉 numpy 告警
+import os
+os.environ["NUMEXPR_MAX_THREADS"] = str(os.cpu_count())
+
+from datetime import *  # NOQA: E402
+import numpy as np  # NOQA: E402
+import pandas as pd  # NOQA: E402
+
 
 # ------------------------------------------------------------------
 # 增加Datetime、Stock的hash支持，以便可做为dict的key
