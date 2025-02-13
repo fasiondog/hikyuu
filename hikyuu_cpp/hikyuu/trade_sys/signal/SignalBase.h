@@ -139,6 +139,8 @@ private:
 protected:
     string m_name;
     KData m_kdata;
+    bool m_calculated{false};  // 仅针对 setTO 时的计算
+
     /* 多头持仓 */
     bool m_hold_long;
     /* 空头持仓 */
@@ -169,6 +171,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_ignore_cycle);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
+        // ar & BOOST_SERIALIZATION_NVP(m_calculated);
     }
 
     template <class Archive>
@@ -182,6 +185,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_ignore_cycle);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
+        // ar & BOOST_SERIALIZATION_NVP(m_calculated);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
