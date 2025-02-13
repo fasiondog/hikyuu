@@ -1,5 +1,6 @@
 
 add_requires("pybind11", {system = false, alias = "pybind11"})
+add_requires("python")
 
 target("core")
     set_kind("shared")
@@ -10,7 +11,7 @@ target("core")
     -- end
 
     add_deps("hikyuu")
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "python")
     if is_plat("windows") then
         set_filename("core.pyd")
         add_cxflags("-wd4251")
