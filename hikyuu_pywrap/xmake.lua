@@ -1,6 +1,5 @@
 
 add_requires("pybind11", {system = false, alias = "pybind11"})
-add_requires("python")
 
 target("core")
     set_kind("shared")
@@ -11,7 +10,7 @@ target("core")
     -- end
 
     add_deps("hikyuu")
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "python")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11")
     if is_plat("windows") then
         set_filename("core.pyd")
         add_cxflags("-wd4251")
@@ -73,8 +72,16 @@ target("core")
         end
     
         -- get python include directory.
-        local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
-        target:add("cxflags", pydir)
+        local pydir = nil;
+        if os.getenv("CONDA_PREFIX") ~= nil then
+            print("CONDA_PREFIX: " .. os.getenv("CONDA_PREFIX"))
+            local py3config = os.getenv("CONDA_PREFIX") .. "/bin/python3-config"
+            pydir = os.iorun(py3config .. " --includes"):trim()
+        else
+            pydir = os.iorun("python3-config --includes"):trim()
+        end
+        assert(pydir, "python3-config not found!")
+        target:add("cxflags", pydir)           
     end)
 
     after_build(function(target)
