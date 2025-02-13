@@ -19,5 +19,6 @@
 #include "crt/SG_Band.h"
 #include "crt/SG_Logic.h"
 #include "crt/SG_Manual.h"
+#include "crt/SG_OneSide.h"
 
 #endif /* SIGNAL_BUILD_IN_H_ */
