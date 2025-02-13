@@ -74,7 +74,6 @@ target("core")
         -- get python include directory.
         local pydir = nil;
         if os.getenv("CONDA_PREFIX") ~= nil then
-            print("CONDA_PREFIX: " .. os.getenv("CONDA_PREFIX"))
             local py3config = os.getenv("CONDA_PREFIX") .. "/bin/python3-config"
             pydir = os.iorun(py3config .. " --includes"):trim()
         else
