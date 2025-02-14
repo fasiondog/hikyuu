@@ -17,7 +17,8 @@ namespace hku {
 MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
     // 只选择发出买入信号的系统，此时选中的系统会变成资产平均分配，参考 AF 参数：ignore_zero_weight
     setParam<bool>("only_should_buy", false);
-    setParam<bool>("ignore_null", true);  // 是否忽略 MF 中 score 值为 nan 的证券
+    setParam<bool>("ignore_null", true);      // 忽略 MF 中 score 值为 nan 的证券
+    setParam<bool>("ignore_le_zero", false);  // 忽略 MF 中 score 值小于等于 0 的证券
     setParam<int>("topn", 10);
     setParam<bool>("reverse", false);  // 逆序，此时 topn 代表最末尾的几个，相当于按最低值排序
     setParam<int>("ic_n", 5);
@@ -32,6 +33,7 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     HKU_CHECK(mf, "mf is null!");
     setParam<bool>("only_should_buy", false);
     setParam<bool>("ignore_null", true);
+    setParam<bool>("ignore_le_zero", false);
     setParam<int>("topn", topn);
     setParam<bool>("reverse", false);
 
@@ -89,14 +91,23 @@ SystemWeightList MultiFactorSelector::getSelected(Datetime date) {
 
     ScoreRecordList scores;
     if (!getParam<bool>("reverse")) {
+        // 正序排列
         if (getParam<bool>("ignore_null")) {
             scores = m_mf->getScores(date, 0, topn,
                                      [](const ScoreRecord& sc) { return !std::isnan(sc.value); });
+        } else if (getParam<bool>("ignore_le_zero")) {
+            scores =
+              m_mf->getScores(date, 0, topn, [](const ScoreRecord& sc) { return sc.value > 0; });
         } else {
             scores = m_mf->getScores(date, 0, topn);
         }
+
     } else {
-        ScoreRecordList raw_scores = m_mf->getScores(date);
+        // 倒序排列
+        ScoreRecordList raw_scores =
+          getParam<bool>("ignore_le_zero")
+            ? m_mf->getScores(date, 0, topn, [](const ScoreRecord& sc) { return sc.value > 0; })
+            : m_mf->getScores(date);
         auto iter = raw_scores.rbegin();
         for (size_t count = 0; count < topn && iter != raw_scores.rend(); ++iter) {
             if (!std::isnan(iter->value)) {
