@@ -31,6 +31,13 @@ public:
     }
 
 private:
+    ScoreRecordList filterOnlyShouldBuy(Datetime date, const ScoreRecordList& scores, size_t topn);
+    ScoreRecordList filterTopN(Datetime date, const ScoreRecordList& raw_scores, size_t topn,
+                               bool only_should_buy);
+    ScoreRecordList filterTopNReverse(Datetime date, const ScoreRecordList& raw_scores, size_t topn,
+                                      bool only_should_buy, bool ignore_null);
+
+private:
     IndicatorList m_inds;
     MFPtr m_mf;
     unordered_map<Stock, SYSPtr> m_stk_sys_dict;
