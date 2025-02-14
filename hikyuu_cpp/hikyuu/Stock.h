@@ -204,6 +204,13 @@ public:
      */
     const vector<HistoryFinanceInfo>& getHistoryFinance() const;
 
+    /**
+     * 获取自身市场的交易日日历（不是本身的交易日期）
+     * @param query
+     * @return DatetimeList
+     */
+    DatetimeList getTradingCalendar(const KQuery& query) const;
+
     /** 设置权息信息, 仅供初始化时调用 */
     void setWeightList(const StockWeightList&);
 

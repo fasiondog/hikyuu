@@ -490,8 +490,7 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def get_current_hub(self, filename):
-        """用于在仓库part.py中获取当前所在的仓库名
-
+        """用于在仓库part.py中获取当前所在的仓库名。
         示例： get_current_hub(__file__)
         """
         abs_path = os.path.abspath(filename)  # 当前文件的绝对路径
@@ -590,8 +589,7 @@ def get_part_name_list(hub=None, part_type=None):
 
 
 def get_current_hub(filename):
-    """用于在仓库part.py中获取当前所在的仓库名
-
+    """用于在仓库part.py中获取当前所在的仓库名。
     示例： get_current_hub(__file__)
     """
     return HubManager().get_current_hub(filename)

@@ -107,12 +107,12 @@ public:
 
     /** 向线程池提交任务 */
     template <typename FunctionType>
-    task_handle<typename std::result_of<FunctionType()>::type> submit(FunctionType f) {
+    auto submit(FunctionType f) {
         if (m_thread_need_stop.isSet() || m_done) {
             throw std::logic_error("You can't submit a task to the stopped StealThreadPool!!");
         }
 
-        typedef typename std::result_of<FunctionType()>::type result_type;
+        typedef typename std::invoke_result<FunctionType>::type result_type;
         std::packaged_task<result_type()> task(f);
         task_handle<result_type> res(task.get_future());
         if (m_local_work_queue) {
@@ -241,8 +241,8 @@ private:
     // 线程本地变量
 #if CPP_STANDARD >= CPP_STANDARD_17
     inline static thread_local WorkStealQueue* m_local_work_queue = nullptr;  // 本地任务队列
-    inline static thread_local int m_index = -1;                  // 在线程池中的序号
-    inline static thread_local InterruptFlag m_thread_need_stop;  // 线程停止运行指示
+    inline static thread_local int m_index = -1;                              // 在线程池中的序号
+    inline static thread_local InterruptFlag m_thread_need_stop;              // 线程停止运行指示
 #else
     static thread_local WorkStealQueue* m_local_work_queue;  // 本地任务队列
     static thread_local int m_index;                         // 在线程池中的序号
@@ -280,7 +280,7 @@ private:
             task();
         } else {
             std::unique_lock<std::mutex> lk(m_cv_mutex);
-            m_cv.wait(lk, [=] { return this->m_done || !this->m_master_work_queue.empty(); });
+            m_cv.wait(lk, [this] { return this->m_done || !this->m_master_work_queue.empty(); });
         }
     }
 

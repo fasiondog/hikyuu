@@ -17,6 +17,7 @@
 *.so.*
 *.so.*.*
 *.dylib
+*.a
 .metadata
 .settings
 .cproject

@@ -375,7 +375,7 @@
               <widget class="QDateEdit" name="min5_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>16</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -427,7 +427,7 @@
               <widget class="QDateEdit" name="day_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>16</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -739,6 +739,29 @@
         <string>执行导入</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <spacer name="verticalSpacer_20">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>9</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_43">
+          <property name="text">
+           <string>    注：HDF5存储导入时，请关闭其他 hikyuu 进程，HDF5不支持同时读写！</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_11">
           <property name="leftMargin">

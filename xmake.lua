@@ -113,10 +113,11 @@ set_configvar("HKU_ENABLE_NODE", 1)
 
 local boost_version = "1.87.0"
 local hdf5_version = "1.12.2"
-local fmt_version = "11.0.2"
+local fmt_version = "11.1.3"
+local spdlog_version = "1.15.1"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.8.0"
-local sqlite_version = "3.46.0+100"
+local sqlite_version = "3.48.0+0"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
     mysql_version = "8.0.21" 
@@ -148,20 +149,20 @@ add_requires("boost " .. boost_version, {
   },
 })
 
-add_requires("fmt " .. fmt_version, {configs = {header_only = true}})
-add_requires("spdlog", {configs = {header_only = true, fmt_external = true}})
-add_requireconfs("spdlog.fmt", {override = true, version=fmt_version, configs = {header_only = true}})
+add_requires("fmt " .. fmt_version, {system = false, configs = {header_only = true}})
+add_requires("spdlog " .. spdlog_version, {system = false, configs = {header_only = true, fmt_external = true}})
+add_requireconfs("spdlog.fmt", {override = true, version=fmt_version, system = false, configs = {header_only = true}})
 add_requires("sqlite3 " .. sqlite_version, {configs = {shared = true, safe_mode="2", cxflags = "-fPIC"}})
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {runtimes = get_config("runtimes")}})
-add_requires("nng " .. nng_version, {configs = {NNG_ENABLE_TLS = has_config("http_client_ssl"), cxflags = "-fPIC"}})
-add_requires("nlohmann_json")
+add_requires("nng " .. nng_version, {system = false, configs = {NNG_ENABLE_TLS = has_config("http_client_ssl"), cxflags = "-fPIC"}})
+add_requires("nlohmann_json", {system = false})
 
 if has_config("http_client_zip") then
-    add_requires("gzip-hpp")
+    add_requires("gzip-hpp", {system = false})
 end
 
 if has_config("ta_lib") then
-    add_requires("ta-lib")
+    add_requires("ta-lib", {system = false})
 end
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger

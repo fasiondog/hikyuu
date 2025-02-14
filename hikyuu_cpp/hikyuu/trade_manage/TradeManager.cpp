@@ -1627,7 +1627,8 @@ void TradeManager::tocsv(const string& path) {
                  << record.number << sep << record.cost.commission << sep << record.cost.stamptax
                  << sep << record.cost.transferfee << sep << record.cost.others << sep
                  << record.cost.total << sep << record.stoploss << sep << record.cash << sep
-                 << getSystemPartName(record.from) << std::endl;
+                 << getSystemPartName(record.from) << sep << sep << sep << sep << sep << sep << sep
+                 << std::endl;
         } else {
             file << record.datetime << sep << record.stock.market_code() << sep
                  << record.stock.name() << sep << getBusinessName(record.business) << sep
@@ -1642,7 +1643,11 @@ void TradeManager::tocsv(const string& path) {
                     file << kdata.datetime << sep << kdata.openPrice << sep << kdata.highPrice
                          << sep << kdata.lowPrice << sep << kdata.closePrice << sep
                          << kdata.transAmount << sep << kdata.transCount;
+                } else {
+                    file << sep << sep << sep << sep << sep << sep << sep;
                 }
+            } else {
+                file << sep << sep << sep << sep << sep << sep;
             }
             file << std::endl;
         }

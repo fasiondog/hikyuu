@@ -138,15 +138,16 @@ void IMacd::_dyn_calculate(const Indicator& ind) {
         if (first >= total) {
             break;
         }
-        tasks.push_back(ms_tg->submit([=, &ind, &n1, &n2, &n3]() {
-            size_t endPos = first + circleLength;
-            if (endPos > total) {
-                endPos = total;
-            }
-            for (size_t i = circleLength * group; i < endPos; i++) {
-                _dyn_one_circle(ind, i, n1[i], n2[i], n3[i]);
-            }
-        }));
+        tasks.push_back(
+          ms_tg->submit([this, &ind, &n1, &n2, &n3, first, circleLength, total, group]() {
+              size_t endPos = first + circleLength;
+              if (endPos > total) {
+                  endPos = total;
+              }
+              for (size_t i = circleLength * group; i < endPos; i++) {
+                  _dyn_one_circle(ind, i, n1[i], n2[i], n3[i]);
+              }
+          }));
     }
 
     for (auto& task : tasks) {

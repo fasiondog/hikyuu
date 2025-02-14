@@ -203,11 +203,11 @@ private:
             nng_ctx_send(work->ctx, work->aio);
 
         } catch (const NodeNngError& e) {
-            CLS_FATAL(e.what());
+            CLS_FATAL("{}", e.what());
             work->state = Work::FINISH;
 
         } catch (const NodeError& e) {
-            CLS_ERROR(e.what());
+            CLS_ERROR("{}", e.what());
             res["ret"] = e.errcode();
             res["msg"] = e.what();
             encodeMsg(msg, res);
@@ -216,7 +216,7 @@ private:
             nng_ctx_send(work->ctx, work->aio);
 
         } catch (const std::exception& e) {
-            CLS_ERROR(e.what());
+            CLS_ERROR("{}", e.what());
             res["ret"] = NodeErrorCode::UNKNOWN_ERROR;
             res["msg"] = e.what();
             encodeMsg(msg, res);
@@ -226,7 +226,7 @@ private:
 
         } catch (...) {
             std::string errmsg = "Unknown error!";
-            CLS_ERROR(errmsg);
+            CLS_ERROR("{}", errmsg);
             res["ret"] = NodeErrorCode::UNKNOWN_ERROR;
             res["msg"] = errmsg;
             nng_aio_set_msg(work->aio, msg);

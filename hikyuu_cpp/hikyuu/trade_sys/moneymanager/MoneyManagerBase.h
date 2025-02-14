@@ -71,11 +71,17 @@ public:
     /** 克隆操作 */
     MoneyManagerPtr clone();
 
-    /** 接收实际交易变化情况，一般存在多次增减仓的情况才需要重载 */
-    virtual void buyNotify(const TradeRecord&);
+    /** 接收实际交易变化情况 */
+    void buyNotify(const TradeRecord&);
 
-    /** 接收实际交易变化情况，一般存在多次增减仓的情况才需要重载 */
-    virtual void sellNotify(const TradeRecord&);
+    /** 子类接收实际交易变化情况接口，一般存在多次增减仓的情况才需要重载 */
+    virtual void _buyNotify(const TradeRecord&) {}
+
+    /** 接收实际交易变化情况 */
+    void sellNotify(const TradeRecord&);
+
+    /** 子类接收实际交易变化情况接口，一般存在多次增减仓的情况才需要重载 */
+    virtual void _sellNotify(const TradeRecord&) {}
 
     /**
      * 获取指定交易对象可卖出的数量
@@ -122,6 +128,16 @@ public:
     double getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                         SystemPart from);
 
+    /** 当前买入交易次数, 连续买入计数，一旦接收卖出将恢复置0 */
+    int currentBuyCount() const {
+        return m_buyCount;
+    }
+
+    /** 当前卖出交易次数，连续卖出计数，一旦接收买入将恢复置0 */
+    int currentSellCount() const {
+        return m_sellCount;
+    }
+
     virtual double _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                  price_t risk, SystemPart from) = 0;
 
@@ -144,6 +160,8 @@ protected:
     string m_name;
     KQuery m_query;
     TradeManagerPtr m_tm;
+    int m_buyCount{0};
+    int m_sellCount{0};
 
 //============================================
 // 序列化支持

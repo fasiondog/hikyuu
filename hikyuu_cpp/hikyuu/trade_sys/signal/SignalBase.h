@@ -45,6 +45,22 @@ public:
     bool shouldSell(const Datetime& datetime) const;
 
     /**
+     * 获取指定时刻的买入信号数值，返回值小于等于0时，表示无买入信号
+     * @param datetime
+     * @return double
+     */
+    double getBuyValue(const Datetime& datetime) const;
+
+    /**
+     * 获取指定时刻的买出信号数值，返回值大于等于0时，表示无卖出信号
+     * @param datetime
+     * @return double
+     */
+    double getSellValue(const Datetime& datetime) const;
+
+    double getValue(const Datetime& datetime) const;
+
+    /**
      * 下一时刻是否可以买入，相当于最后时刻是否指示买入
      */
     bool nextTimeShouldBuy() const;
@@ -60,17 +76,21 @@ public:
     /** 获取所有卖出指示日期列表 */
     DatetimeList getSellSignal() const;
 
+    void _addSignal(const Datetime& datetime, double value);
+
     /**
      * 加入买入信号，在_calculate中调用
      * @param datetime 发生买入信号的日期
+     * @param value 信号值，默认为1.0, 必须大于0，否则抛出异常
      */
-    void _addBuySignal(const Datetime& datetime);
+    void _addBuySignal(const Datetime& datetime, double value = 1.0);
 
     /**
      * 加入卖出信号，在_calculate中调用
      * @param datetime
+     * @param value 信号值，默认为-1.0，必须小于0，否则抛出异常
      */
-    void _addSellSignal(const Datetime& datetime);
+    void _addSellSignal(const Datetime& datetime, double value = -1.0);
 
     /**
      * 指定交易对象，指K线数据
@@ -87,6 +107,9 @@ public:
     void startCycle(const Datetime& start, const Datetime& end);
     const Datetime& getCycleStart() const;
     const Datetime& getCycleEnd() const;
+    bool ignoreCycle() const {
+        return m_ignore_cycle;
+    }
 
     /** 复位操作 */
     void reset();
@@ -116,17 +139,20 @@ private:
 protected:
     string m_name;
     KData m_kdata;
+    bool m_calculated{false};  // 仅针对 setTO 时的计算
+
     /* 多头持仓 */
     bool m_hold_long;
     /* 空头持仓 */
     bool m_hold_short;
 
-    // 用 set 保存，以便获取是能保持顺序
-    std::set<Datetime> m_buySig;
-    std::set<Datetime> m_sellSig;
+    // 用 map 保存，以便获取是能保持顺序
+    std::map<Datetime, double> m_buySig;
+    std::map<Datetime, double> m_sellSig;
 
     Datetime m_cycle_start;
     Datetime m_cycle_end;
+    bool m_ignore_cycle{false};  // 特殊用途，用于 OperatorSignal
 
 //============================================
 // 序列化支持
@@ -142,8 +168,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
+        ar& BOOST_SERIALIZATION_NVP(m_ignore_cycle);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
+        // ar & BOOST_SERIALIZATION_NVP(m_calculated);
     }
 
     template <class Archive>
@@ -154,8 +182,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
+        ar& BOOST_SERIALIZATION_NVP(m_ignore_cycle);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
+        // ar & BOOST_SERIALIZATION_NVP(m_calculated);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -234,6 +264,22 @@ inline const Datetime& SignalBase::getCycleStart() const {
 
 inline const Datetime& SignalBase::getCycleEnd() const {
     return m_cycle_end;
+}
+
+inline double SignalBase::getValue(const Datetime& datetime) const {
+    return getBuyValue(datetime) + getSellValue(datetime);
+}
+
+inline void SignalBase::_addBuySignal(const Datetime& datetime, double value) {
+    HKU_IF_RETURN(std::isnan(value), void());
+    HKU_CHECK(value > 0.0, "buy value muse be > 0", value);
+    _addSignal(datetime, value);
+}
+
+inline void SignalBase::_addSellSignal(const Datetime& datetime, double value) {
+    HKU_IF_RETURN(std::isnan(value), void());
+    HKU_CHECK(value < 0.0, "sell value muse be > 0", value);
+    _addSignal(datetime, value);
 }
 
 } /* namespace hku */

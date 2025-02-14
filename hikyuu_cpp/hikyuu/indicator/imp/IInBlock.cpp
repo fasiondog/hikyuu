@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/Block.h"
 #include "IInBlock.h"
 
 #if HKU_SUPPORT_SERIALIZATION
