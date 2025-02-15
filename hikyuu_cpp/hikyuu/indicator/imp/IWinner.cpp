@@ -52,11 +52,10 @@ void IWinner::_calculate(const Indicator &data) {
     for (size_t i = m_discard; i < total; ++i) {
         int high_idx = 100;
         int low_idx = 0;
-        int mid_idx = 0;
         while (low_idx <= high_idx) {
             value_t high = cost_data[high_idx][i];
             value_t low = cost_data[low_idx][i];
-            mid_idx = (high_idx + low_idx) / 2;
+            int mid_idx = (high_idx + low_idx) / 2;
             value_t mid = cost_data[mid_idx][i];
             if (src[i] >= high) {
                 dst[i] = high_idx * 0.01;

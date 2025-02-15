@@ -80,7 +80,6 @@ void SignalBase::setTO(const KData& kdata) {
 
     bool cycle = getParam<bool>("cycle");
     m_cycle_start = kdata[0].datetime;
-    HKU_IF_RETURN(cycle, void());
 
     if (m_ignore_cycle || !cycle) {
         _calculate(kdata);

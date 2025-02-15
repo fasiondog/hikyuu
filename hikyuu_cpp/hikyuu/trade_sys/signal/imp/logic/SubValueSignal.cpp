@@ -55,7 +55,7 @@ void SubValueSignal::_calculate(const KData& kdata) {
                 }
                 double sell_value = m_sg->getSellValue(ks[i].datetime);
                 if (sell_value < 0.0) {
-                    sell_value -= sell_value;
+                    sell_value = m_value - sell_value;
                 }
                 _addSignal(ks[i].datetime, buy_value + sell_value);
             }

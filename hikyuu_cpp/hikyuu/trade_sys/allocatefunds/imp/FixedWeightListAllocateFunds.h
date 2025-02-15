@@ -17,7 +17,7 @@ class FixedWeightListAllocateFunds : public AllocateFundsBase {
 
 public:
     FixedWeightListAllocateFunds();
-    FixedWeightListAllocateFunds(const PriceList& weights);
+    explicit FixedWeightListAllocateFunds(const PriceList& weights);
     virtual ~FixedWeightListAllocateFunds();
     virtual void _checkParam(const string& name) const override;
 };

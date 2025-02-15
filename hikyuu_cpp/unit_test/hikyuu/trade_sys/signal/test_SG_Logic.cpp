@@ -697,6 +697,29 @@ TEST_CASE("test_SG_SubValue") {
     ret->setParam<bool>("alternate", true);
     ret->setTO(k);
     reset_expect(expect);
+    expect[Datetime(20111115)] = 5.0;
+    check_result(ret, expect);
+
+    ret = 2.0 - sg;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
+    reset_expect(expect);
+    expect[Datetime(20111115)] = 5.0;
+    check_result(ret, expect);
+
+    ret = -2.0 - sg;
+    ret->setParam<bool>("alternate", true);
+    ret->setTO(k);
+    reset_expect(expect);
+    expect[Datetime(20111115)] = 1.0;
+    check_result(ret, expect);
+
+    ret = -2.0 - sg;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
+    reset_expect(expect);
+    expect[Datetime(20111110)] = -4.0;
+    expect[Datetime(20111115)] = 1.0;
     check_result(ret, expect);
 }
 
