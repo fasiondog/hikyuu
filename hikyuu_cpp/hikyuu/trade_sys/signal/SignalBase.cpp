@@ -41,7 +41,9 @@ void SignalBase::initParam() {
 }
 
 void SignalBase::baseCheckParam(const string& name) const {}
-void SignalBase::paramChanged() {}
+void SignalBase::paramChanged() {
+    m_calculated = false;
+}
 
 SignalPtr SignalBase::clone() {
     SignalPtr p;
@@ -60,6 +62,7 @@ SignalPtr SignalBase::clone() {
     p->m_name = m_name;
     p->m_params = m_params;
     p->m_kdata = m_kdata;
+    p->m_calculated = m_calculated;
     p->m_hold_long = m_hold_long;
     p->m_hold_short = m_hold_short;
     p->m_buySig = m_buySig;
@@ -70,8 +73,9 @@ SignalPtr SignalBase::clone() {
 }
 
 void SignalBase::setTO(const KData& kdata) {
-    HKU_IF_RETURN(m_kdata == kdata, void());
+    HKU_IF_RETURN(m_calculated && m_kdata == kdata, void());
     m_kdata = kdata;
+    m_calculated = false;
     HKU_IF_RETURN(kdata.empty(), void());
 
     bool cycle = getParam<bool>("cycle");
@@ -96,7 +100,6 @@ void SignalBase::reset() {
 
 void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
     HKU_IF_RETURN(!m_ignore_cycle && !getParam<bool>("cycle"), void());
-    HKU_INFO("m_cycle_start: {}, m_cycle_end: {}", m_cycle_start, m_cycle_end);
     HKU_CHECK(start != Null<Datetime>() && close != Null<Datetime>() && start < close, "{}",
               m_name);
     HKU_CHECK(start >= m_cycle_end || m_cycle_end == Null<Datetime>(),

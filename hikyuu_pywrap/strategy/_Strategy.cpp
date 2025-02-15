@@ -58,6 +58,11 @@ void export_Strategy(py::module& m) {
             auto new_func = [=](const Stock& stk, const SpotRecord& spot) {
                 try {
                     c_func(stk, spot);
+                } catch (py::error_already_set& e) {
+                    if (e.matches(PyExc_KeyboardInterrupt)) {
+                        HKU_INFO("KeyboardInterrupt");
+                        raise(SIGTERM);
+                    }
                 } catch (const std::exception& e) {
                     HKU_ERROR(e.what());
                 } catch (...) {
@@ -80,6 +85,11 @@ void export_Strategy(py::module& m) {
             auto new_func = [=](Datetime revTime) {
                 try {
                     c_func(revTime);
+                } catch (py::error_already_set& e) {
+                    if (e.matches(PyExc_KeyboardInterrupt)) {
+                        HKU_INFO("KeyboardInterrupt");
+                        raise(SIGTERM);
+                    }
                 } catch (const std::exception& e) {
                     HKU_ERROR(e.what());
                 } catch (...) {
@@ -135,6 +145,11 @@ void export_Strategy(py::module& m) {
             auto new_func = [=]() {
                 try {
                     c_func();
+                } catch (py::error_already_set& e) {
+                    if (e.matches(PyExc_KeyboardInterrupt)) {
+                        HKU_INFO("KeyboardInterrupt");
+                        raise(SIGTERM);
+                    }
                 } catch (const std::exception& e) {
                     HKU_ERROR(e.what());
                 } catch (...) {

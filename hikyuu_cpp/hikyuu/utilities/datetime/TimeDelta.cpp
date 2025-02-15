@@ -45,10 +45,10 @@ TimeDelta::TimeDelta(const std::string& delta) {
     std::string errmsg(fmt::format("Invalid format: {}", delta));
     to_lower(val);
     auto vals = split(val, ' ');
-    HKU_CHECK(vals.size() == 3, errmsg);
+    HKU_CHECK(vals.size() == 3, "{}", errmsg);
     int64_t days = std::stoll(std::string(vals[0]));
     vals = split(vals[2], ':');
-    HKU_CHECK(vals.size() == 3, errmsg);
+    HKU_CHECK(vals.size() == 3, "{}", errmsg);
     int64_t hours = std::stoll(std::string(vals[0]));
     int64_t minutes = std::stoll(std::string(vals[1]));
     int64_t microseconds = static_cast<int64_t>(std::stod(std::string(vals[2])) * 1000000.0);

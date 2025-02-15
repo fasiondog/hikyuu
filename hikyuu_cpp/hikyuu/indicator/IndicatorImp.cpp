@@ -1520,20 +1520,21 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
         if (first >= total) {
             break;
         }
-        tasks.push_back(ms_tg->submit([=, &ind]() {
-            size_t endPos = first + circleLength;
-            if (endPos > total) {
-                endPos = total;
-            }
-            for (size_t i = circleLength * group; i < endPos; i++) {
-                if (std::isnan(param_data[i])) {
-                    _set(Null<value_t>(), i);
-                } else {
-                    size_t step = size_t(param_data[i]);
-                    _dyn_run_one_step(ind, i, step);
-                }
-            }
-        }));
+        tasks.push_back(
+          ms_tg->submit([this, &ind, first, circleLength, total, group, param_data]() {
+              size_t endPos = first + circleLength;
+              if (endPos > total) {
+                  endPos = total;
+              }
+              for (size_t i = circleLength * group; i < endPos; i++) {
+                  if (std::isnan(param_data[i])) {
+                      _set(Null<value_t>(), i);
+                  } else {
+                      size_t step = size_t(param_data[i]);
+                      _dyn_run_one_step(ind, i, step);
+                  }
+              }
+          }));
     }
 
     for (auto &task : tasks) {
