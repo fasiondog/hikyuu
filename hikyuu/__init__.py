@@ -115,13 +115,14 @@ class iodog:
 
 
 if in_interactive_session():
+    hku_info("runing in interactive session")
     set_python_in_interactive(True)
 
 
 # 如果是在 jupyter 环境中运行，重定向C++ stdout/stderr输出至python
 if in_ipython_frontend():
     set_python_in_jupyter(True)
-    hku_info("hikyuu version: {}", get_version_with_build())
+    hku_info("running in jupyter")
     iodog.open()
 
 
