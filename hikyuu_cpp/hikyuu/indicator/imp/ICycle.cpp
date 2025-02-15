@@ -242,14 +242,11 @@ void ICycle::_calculate(const Indicator& data) {
     PriceList buf(datelist.size());
     if ("query" == adjust_mode || "day" == adjust_mode) {
         size_t cur_adjust_ix = 0;
-        Datetime cur_cycle_end;
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             bool adjust = false;
             if (i == cur_adjust_ix) {
                 adjust = true;
                 cur_adjust_ix += adjust_cycle;
-                cur_cycle_end =
-                  cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Seconds(1);
             }
             buf[i] = adjust;
         }
