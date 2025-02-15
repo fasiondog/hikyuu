@@ -7,6 +7,7 @@
 **辅助类指标**
 
 * :py:func:`ALIGN` - 按指定的参考日期对齐
+* :py:func:`CYCLE` - PF调仓周期指标，主要用于PF调仓日验证，及作为SG
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
 * :py:func:`CONTEXT` - 独立上下文
 * :py:func:`DISCARD` - 以指标公式的方式设置指标结果的丢弃数据量。
@@ -15,6 +16,9 @@
 * :py:func:`ISNA` - 判断是否为 nan 值
 * :py:func:`ISINF` - 判断是否为 +inf 值
 * :py:func:`ISINFA` - 判断是否为 -inf 值
+* :py:func:`JUMPDOWN` - 边缘跳变，从小于等于0.0，跳变到 > 0.0
+* :py:func:`JUMPUP` - 边缘跳变，从大于0.0，跳变到 <= 0.0
+* :py:func:`LAST` - 等同于通达信 LAST 指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
 * :py:func:`LASTVALUE` - 等同于通达信 CONST 指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
 * :py:func:`REPLACE` - 替换指标中指定值，默认为替换 nan 值为 0.0

@@ -36,7 +36,7 @@ xmake >= 2.8.2，网址：`<https://github.com/xmake-io/xmake>`_
 
 .. code-block:: shell
 
-    git clone https://github.com/fasiondog/hikyuu.git --recursive
+    git clone https://github.com/fasiondog/hikyuu.git
 
 
 4、Linux下安装依赖软件包
@@ -53,9 +53,17 @@ MacOsx 下需要使用 brew 安装 sqlite3, hdf5, mysqlclient 的开发包（具
 5、转 Visual Studio 工程
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+请先试用 python setup.py build 直接编译过一次后，在转换。
+
 Windows 下，习惯用 msvc 调试的，可以使用  xmake project -k vsxmake -m "debug,release" 命令生成 VS 工程。命令执行后，会在当前目录下生成如 vsxmake2022 的子目录，VS工程位于其内。
 
 在 VS 内，可以将 demo 设为启动工程，进行调试。
+
+6、Macosx 下编译注意事项
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. 编译前请安装 xcode 及其命令行工具。
+2. Macosx 下使用 Anaconda 中的虚拟环境，请先在虚拟环境下编译后，切换回 base 环境，然后执行 xmake -b core 重新编译 python 包装部分，之后再切换回虚拟环境下，方可正常只用。只要在虚拟环境执行过编译，都需要切回 base 重新 xmake -b core 然后再切回去。
     
 
 编译与安装
@@ -72,5 +80,8 @@ Windows 下，习惯用 msvc 调试的，可以使用  xmake project -k vsxmake 
 - python setup.py test        -- 执行单元测试（可带参数 --compile=1，先执行编译）
 - python setup.py clear       -- 清除本地编译结果
 - python setup.py wheel       -- 生成wheel安装包
+
+
+各命令参数，可以 执行 python setup.py commond --help 查看, 如: python setup.py build --help
 
 

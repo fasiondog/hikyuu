@@ -212,6 +212,18 @@
     :param data: 输入数据
     :rtype: Indicator
    
+
+.. py:function:: CYCLE(kdata, [adjust_cycle=1], [adjust_mode='query'], [delay_to_trading_day=True])
+          
+    PF调仓周期指标，主要用于PF调仓日验证，及作为SG
+
+    :param KData kdata: K线数据
+    :param int adjust_cycle: 调整周期
+    :param string adjust_mode: 调整方式
+    :param bool delay_to_trading_day: 调整周期是否延至交易日
+    :rtype: Indicator
+
+
 .. py:function:: CONTEXT(ind)
     
     独立上下文。使用 ind 自带的上下文。当指定新的上下文时，不会改变已有的上下文。
@@ -652,6 +664,22 @@
     判断指标是否为负无穷大 (-inf) 值，若为 -inf 值, 则返回1, 否则返回0。如判断正无穷大, 使用 ISINF。
 
     :param Indicator ind: 指定指标
+    :rtype: Indicator
+
+
+.. py:function:: JUMPDOWN([ind])
+
+    边缘跳变，从小于等于0.0，跳变到 > 0.0
+    
+    :param Indicator ind: 指标
+    :rtype: Indicator
+
+
+.. py:function:: JUMPUP([ind])
+    
+    边缘跳变，从大于0.0，跳变到 <= 0.0
+    
+    :param Indicator ind: 指标
     :rtype: Indicator
 
     
