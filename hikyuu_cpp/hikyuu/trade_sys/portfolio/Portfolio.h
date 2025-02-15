@@ -116,8 +116,12 @@ private:
 
     /** 运行前准备 */
     void _readyForRun();
+    void _readyForRunWithAF();
+    void _readyForRunWithoutAF();
 
     void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust);
+    void _runMomentWithAF(const Datetime& date, const Datetime& nextCycle, bool adjust);
+    void _runMomentWithoutAF(const Datetime& date, const Datetime& nextCycle, bool adjust);
 
     void _runOnMode(const DatetimeList& datelist, int adjust_cycle, const string& mode);
 
@@ -138,10 +142,13 @@ protected:
 
     // 用于中间计算的临时数据
     std::unordered_set<SYSPtr> m_running_sys_set;
-    SystemList m_dlist_sys_list;  // 因证券退市，无法执行买入的系统（资产全部损失）
+    SystemList m_dlist_sys_list;               // 因证券退市，无法执行买入的系统（资产全部损失）
     SystemWeightList m_delay_adjust_sys_list;  // 延迟调仓卖出的系统列表
     SystemWeightList m_tmp_selected_list;
     SystemWeightList m_tmp_will_remove_sys;
+
+    // 仅在无资金分配模式下使用，无资金分配模式仅支持买入/卖出方式相同的系统集
+    bool m_delay_mode{false};
 
 //============================================
 // 序列化支持

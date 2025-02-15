@@ -59,7 +59,7 @@ void Portfolio::initParam() {
     setParam<string>("adjust_mode", "query");      // 调仓模式
     setParam<bool>("delay_to_trading_day", true);  // 延迟至交易日
     setParam<bool>("trace", false);                // 打印跟踪
-    setParam<int>("trace_max_num", 10);  // 打印跟踪时，显示当前持仓证券最大数量
+    setParam<int>("trace_max_num", 10);            // 打印跟踪时，显示当前持仓证券最大数量
 }
 
 void Portfolio::baseCheckParam(const string& name) const {
@@ -135,10 +135,92 @@ PortfolioPtr Portfolio::clone() {
 }
 
 void Portfolio::_readyForRun() {
-    SPEND_TIME(Portfolio_readyForRun);
+    if (m_af) {
+        _readyForRunWithAF();
+    } else {
+        _readyForRunWithoutAF();
+    }
+}
+
+void Portfolio::_readyForRunWithoutAF() {
     HKU_CHECK(m_se, "m_se is null!");
     HKU_CHECK(m_tm, "m_tm is null!");
-    HKU_CHECK(m_af, "m_am is null!");
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+    try {
+        OptimalSelectorBase const* _ = dynamic_cast<OptimalSelectorBase*>(m_se.get());
+        HKU_THROW("Can't use is OptimalSelectorBase type m_se in PF!");
+    } catch (...) {
+        // do nothing
+    }
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
+#if 1
+    // 从 se 获取原型系统列表
+    auto pro_sys_list = m_se->getProtoSystemList();
+    HKU_CHECK(!pro_sys_list.empty(), "Can't fetch proto_sys_lsit from Selector!");
+
+    reset();
+
+    // 仅支持都是延迟买卖或都是立刻买卖模式
+    const auto& first_sys = pro_sys_list.front();
+    bool buy_delay = first_sys->getParam<bool>("buy_delay");
+    bool sell_delay = first_sys->getParam<bool>("sell_delay");
+    HKU_CHECK(buy_delay == sell_delay,
+              "The buy_delay or sell_delay of proto_sys is not same! Not support this mode!");
+    m_delay_mode = buy_delay;
+
+    // 将 se 设置为依赖原型系统
+    m_se->setParam<bool>("depend_on_proto_sys", true);
+
+    size_t total = pro_sys_list.size();
+    m_real_sys_list.reserve(total);
+    for (size_t i = 0; i < total; i++) {
+        SystemPtr& pro_sys = pro_sys_list[i];
+        HKU_CHECK((pro_sys->getParam<bool>("buy_delay") == m_delay_mode ||
+                   pro_sys->getParam<bool>("sell_delay") == m_delay_mode),
+                  "The buy_delay or sell_delay of proto_sys is not same! Not support this mode!");
+
+        SystemPtr sys = pro_sys->clone();
+        m_se->bindRealToProto(sys, pro_sys);
+        m_real_sys_list.emplace_back(sys);
+
+        // 计算各原型系统
+        pro_sys->setParam<bool>("shared_tm", false);
+        if (!pro_sys->getTM()) {
+            pro_sys->setTM(m_tm->clone());
+        }
+        pro_sys->readyForRun();
+        KData k = pro_sys->getStock().getKData(m_query);
+        pro_sys->setTO(k);
+
+        // 实际子系统设置共享账户
+        sys->setParam<bool>("shared_tm", true);
+        sys->setTM(m_tm);
+        string sys_name = fmt::format("{}_{}_{}", sys->name(), sys->getStock().market_code(),
+                                      sys->getStock().name());
+        sys->name(fmt::format("PF_{}", sys_name));
+
+        sys->readyForRun();
+        // KData k = sys->getStock().getKData(m_query);
+        sys->setTO(k);
+    }
+
+    // 告知 se 计算伴生原型系统
+    m_se->calculate_proto(m_query);
+#endif
+}
+
+void Portfolio::_readyForRunWithAF() {
+    // SPEND_TIME(Portfolio_readyForRun);
+    HKU_CHECK(m_se, "m_se is null!");
+    HKU_CHECK(m_tm, "m_tm is null!");
+    HKU_CHECK(m_af, "m_af is null!");
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -162,7 +244,7 @@ void Portfolio::_readyForRun() {
     HKU_CHECK(funds.total_assets() > 0.0, "The current tm is zero assets!");
 
     // 从 se 获取原型系统列表
-    auto pro_sys_list = m_se->getProtoSystemList();
+    const auto& pro_sys_list = m_se->getProtoSystemList();
     HKU_CHECK(!pro_sys_list.empty(), "Can't fetch proto_sys_lsit from Selector!");
 
     reset();
@@ -180,7 +262,7 @@ void Portfolio::_readyForRun() {
     size_t total = pro_sys_list.size();
     m_real_sys_list.reserve(total);
     for (size_t i = 0; i < total; i++) {
-        SystemPtr& pro_sys = pro_sys_list[i];
+        const SystemPtr& pro_sys = pro_sys_list[i];
         if (pro_sys) {
             SystemPtr sys = pro_sys->clone();
             m_se->bindRealToProto(sys, pro_sys);
@@ -421,6 +503,14 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
 }
 
 void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
+    if (m_af) {
+        _runMomentWithAF(date, nextCycle, adjust);
+    } else {
+        _runMomentWithoutAF(date, nextCycle, adjust);
+    }
+}
+
+void Portfolio::_runMomentWithAF(const Datetime& date, const Datetime& nextCycle, bool adjust) {
     // 当前日期小于账户建立日期，直接忽略
     HKU_IF_RETURN(date < m_cash_tm->initDatetime(), void());
 
@@ -667,6 +757,80 @@ void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool
                 break;
             }
             // clang-format on
+        }
+    }
+}
+
+void Portfolio::_runMomentWithoutAF(const Datetime& date, const Datetime& nextCycle, bool adjust) {
+    // 当前日期小于账户建立日期，直接忽略
+    HKU_IF_RETURN(date < m_cash_tm->initDatetime(), void());
+
+    bool trace = getParam<bool>("trace");
+    HKU_INFO_IF(trace, "{} ===========================================================", date);
+    if (trace && adjust) {
+        HKU_INFO("****************************************************");
+        HKU_INFO("**                                                **");
+        HKU_INFO("**  [PF] Position adjustment will be made today.  **");
+        HKU_INFO("**                                                **");
+        HKU_INFO("****************************************************");
+    }
+    HKU_INFO_IF(trace, "[PF] current running system size: {}", m_running_sys_set.size());
+
+    // 开盘前，调整账户权息
+    m_tm->updateWithWeight(date);
+
+    //---------------------------------------------------
+    // 调仓日，重新选择系统池
+    //---------------------------------------------------
+    std::list<SYSPtr> tmp_remove_sys;
+    if (adjust) {
+        m_tmp_selected_list = m_se->getSelected(date);
+
+        // 从当前运行池中移除不在选中系统池中的系统
+        std::unordered_set<SYSPtr> tmp_selected_set;
+        for (auto& sw : m_tmp_selected_list) {
+            tmp_selected_set.insert(sw.sys);
+        }
+
+        for (auto& sys : m_running_sys_set) {
+            if (tmp_selected_set.find(sys) == tmp_selected_set.end()) {
+                tmp_remove_sys.emplace_back(sys);
+            }
+        }
+
+        for (auto& sys : tmp_remove_sys) {
+            HKU_INFO_IF(trace, "[PF] remove system: {}", sys->name());
+            m_running_sys_set.erase(sys);
+        }
+
+        // 移除的系统如果有持仓，则强制立刻卖出，且为立即执行模式
+        if (!m_delay_mode) {
+            for (auto& sys : tmp_remove_sys) {
+                auto stk = sys->getStock();
+                auto num = m_tm->getHoldNumber(date, stk);
+                sys->sellForceOnOpen(date, num, PART_PORTFOLIO);
+            }
+        }
+
+        // 设置调仓周期
+        for (auto& sw : m_tmp_selected_list) {
+            auto sg = sw.sys->getSG();
+            sg->startCycle(date, nextCycle);
+        }
+    }
+
+    //----------------------------------------------------------------------------
+    // 依次执行当前池内所有系统
+    //----------------------------------------------------------------------------
+    for (auto& sys : m_tmp_selected_list) {
+        sys.sys->runMoment(date);
+    }
+
+    if (m_delay_mode) {
+        for (auto& sys : tmp_remove_sys) {
+            auto stk = sys->getStock();
+            auto num = m_tm->getHoldNumber(date, stk);
+            sys->sellForceOnOpen(date, num, PART_PORTFOLIO);
         }
     }
 }
