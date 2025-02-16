@@ -285,11 +285,12 @@ void Portfolio::_readyForRunWithAF() {
     m_se->calculate(m_real_sys_list, m_query);
 }
 
-void Portfolio::run(const KQuery& query, int adjust_cycle, bool force, const string& adjust_mode,
-                    bool delay_to_trading_day) {
+void Portfolio::run(const KQuery& query, bool force) {
     SPEND_TIME(Portfolio_run);
 
-    string mode = adjust_mode;
+    int adjust_cycle = getParam<int>("adjust_cycle");
+    string mode = getParam<string>("adjust_mode");
+    bool delay_to_trading_day = getParam<bool>("delay_to_trading_day");
     to_lower(mode);
     if (mode != "query") {
         HKU_CHECK(query.kType() == KQuery::DAY,
@@ -297,9 +298,6 @@ void Portfolio::run(const KQuery& query, int adjust_cycle, bool force, const str
                   query.kType());
     }
 
-    setParam<int>("adjust_cycle", adjust_cycle);
-    setParam<string>("adjust_mode", adjust_mode);
-    setParam<bool>("delay_to_trading_day", delay_to_trading_day);
     setQuery(query);
 
     if (force) {

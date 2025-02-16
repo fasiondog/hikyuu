@@ -15,8 +15,8 @@ namespace hku {
 class HKU_API RunPortfolioInStrategy {
 public:
     RunPortfolioInStrategy() = default;
-    RunPortfolioInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
-                           const OrderBrokerPtr& broker, const TradeCostPtr& costfunc);
+    RunPortfolioInStrategy(const PFPtr& pf, const KQuery& query, const OrderBrokerPtr& broker,
+                           const TradeCostPtr& costfunc);
     virtual ~RunPortfolioInStrategy() = default;
 
     void run();
@@ -25,10 +25,9 @@ private:
     PFPtr m_pf;
     OrderBrokerPtr m_broker;
     KQuery m_query;
-    int m_adjust_cycle = 1;
 };
 
-StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
+StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query,
                                   const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
                                   const string& name = "PFStrategy",
                                   const std::vector<OrderBrokerPtr>& other_brokers = {},
