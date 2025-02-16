@@ -29,7 +29,7 @@ void IIsInf::_calculate(const Indicator &data) {
     auto *dst = this->data();
     value_t positive_inf = std::numeric_limits<value_t>::infinity();
     for (size_t i = m_discard; i < total; ++i) {
-        dst[i] = (src[i] == positive_inf);
+        dst[i] = (src[i] == positive_inf) ? 1.0 : 0.0;
     }
 }
 

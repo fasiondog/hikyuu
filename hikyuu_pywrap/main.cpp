@@ -63,6 +63,8 @@ PYBIND11_MODULE(core313, m) {
 PYBIND11_MODULE(core, m) {
 #endif
 
+    HKU_INFO("current python version: {}", PY_VERSION);
+
     py::register_exception<hku::exception>(m, "HKUException");
 
     // 设置系统运行状态
