@@ -29,12 +29,12 @@ from pathlib import Path
 import mysql.connector
 
 from hikyuu.data.common import get_stktype_list, get_new_holidays
-from hikyuu.util import hku_debug
+from hikyuu.util import hku_debug, hku_info
 
 
 def get_mysql_connect_version():
     m, n, _ = mysql.connector.__version__.split('.')
-    return int(m) + float(n) * 0.9
+    return int(m) + float(n) * 0.1
 
 
 def is_exist_db(connect):
@@ -61,16 +61,18 @@ def create_database(connect):
     """创建数据库"""
     sql_dir = os.path.dirname(__file__) + "/mysql_upgrade"
     cur = connect.cursor()
+    mysql_version = get_mysql_connect_version()
     if not is_exist_db(connect):
         filename = sql_dir + "/createdb.sql"
         with open(filename, 'r', encoding='utf8') as f:
             sql = f.read()
-        mysql_version = get_mysql_connect_version()
         if mysql_version >= 9.2:
             cur.execute(sql)
+            _ = cur.fetchall()
+            while cur.nextset():
+                _ = cur.fetchall()
         else:
             for x in cur.execute(sql, multi=True):
-                # print(x.statement)
                 pass
 
     db_version = get_db_version(connect)
@@ -80,11 +82,13 @@ def create_database(connect):
              and x.name != '__init__.py'
              and int(x.stem) > db_version and not x.is_dir()]
     files.sort()
-    mysql_version = get_mysql_connect_version()
     for file in files:
         sql = file.read_text(encoding='utf8')
         if mysql_version >= 9.2:
-            cur.execute(sql)
+            cur.execute(sql, map_results=False)
+            _ = cur.fetchall()
+            while cur.nextset():
+                _ = cur.fetchall()
         else:
             for x in cur.execute(sql, multi=True):
                 # print(x.statement)
