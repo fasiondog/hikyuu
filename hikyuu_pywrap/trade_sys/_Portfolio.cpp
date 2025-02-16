@@ -77,10 +77,12 @@ void export_Portfolio(py::module& m) {
 
         DEF_PICKLE(Portfolio);
 
-    m.def("PF_Simple", PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
-          py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
-          py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
-          R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
+    m.def(
+      "PF_Simple", PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+      py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+      py::arg("trade_on_close_without_af") = true,
+      R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close_without_af=True])
 
     创建一个多标的、单系统策略的投资组合
 
@@ -99,5 +101,6 @@ void export_Portfolio(py::module& m) {
     :param AllocateFundsBase af: 资金分配算法
     :param int adjust_cycle: 调仓周期
     :param str adjust_mode: 调仓模式
-    :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日)");
+    :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
+    :param bool trade_on_close_without_af: 在无资金分配算法时，在收盘时执行交易)");
 }

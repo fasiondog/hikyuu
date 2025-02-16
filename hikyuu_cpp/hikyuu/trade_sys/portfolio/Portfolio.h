@@ -95,6 +95,7 @@ public:
 
 private:
     void initParam();
+    bool isAFNothing() const;
 
     /** 运行前准备 */
     void _readyForRun();
@@ -128,9 +129,6 @@ protected:
     SystemWeightList m_delay_adjust_sys_list;  // 延迟调仓卖出的系统列表
     SystemWeightList m_tmp_selected_list;
     SystemWeightList m_tmp_will_remove_sys;
-
-    // 仅在无资金分配模式下使用，无资金分配模式仅支持买入/卖出方式相同的系统集
-    bool m_delay_mode{false};
 
 //============================================
 // 序列化支持

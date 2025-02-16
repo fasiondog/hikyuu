@@ -47,18 +47,8 @@ WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list, const
     CLS_ASSERT(!candidate_sys_list.empty());
     CLS_ASSERT(se);
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#endif
-    try {
-        OptimalSelectorBase const* _ = dynamic_cast<OptimalSelectorBase*>(se.get());
-    } catch (...) {
-        CLS_THROW("Only the OptimalSelectorBase type is accepted!");
-    }
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
+    OptimalSelectorBase const* se_ptr = dynamic_cast<OptimalSelectorBase*>(se.get());
+    CLS_CHECK(se_ptr != nullptr, "Only the OptimalSelectorBase type is accepted!");
 
     initParam();
     m_se = se;

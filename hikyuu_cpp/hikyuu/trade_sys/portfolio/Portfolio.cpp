@@ -8,6 +8,7 @@
 #include "hikyuu/global/sysinfo.h"
 #include "hikyuu/trade_manage/crt/crtTM.h"
 #include "hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h"
+#include "hikyuu/trade_sys/allocatefunds/imp/NothingAllocateFunds.h"
 
 #include "Portfolio.h"
 
@@ -55,11 +56,13 @@ Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFP
 Portfolio::~Portfolio() {}
 
 void Portfolio::initParam() {
-    setParam<int>("adjust_cycle", 1);              // 调仓周期
-    setParam<string>("adjust_mode", "query");      // 调仓模式
-    setParam<bool>("delay_to_trading_day", true);  // 延迟至交易日
-    setParam<bool>("trace", false);                // 打印跟踪
-    setParam<int>("trace_max_num", 10);            // 打印跟踪时，显示当前持仓证券最大数量
+    setParam<int>("adjust_cycle", 1);                   // 调仓周期
+    setParam<string>("adjust_mode", "query");           // 调仓模式
+    setParam<bool>("delay_to_trading_day", true);       // 延迟至交易日
+    setParam<bool>("trade_on_close_without_af", true);  // 无AF时，在收盘时交易
+    setParam<bool>("proto_sys_use_self_tm", false);     // 无AF时，原型系统计算时使用自身附带的tm
+    setParam<bool>("trace", false);                     // 打印跟踪
+    setParam<int>("trace_max_num", 10);                 // 打印跟踪时，显示当前持仓证券最大数量
 }
 
 void Portfolio::baseCheckParam(const string& name) const {
@@ -134,33 +137,29 @@ PortfolioPtr Portfolio::clone() {
     return p;
 }
 
-void Portfolio::_readyForRun() {
+bool Portfolio::isAFNothing() const {
     if (m_af) {
-        _readyForRunWithAF();
-    } else {
+        NothingAllocateFunds const* ptr = dynamic_cast<NothingAllocateFunds const*>(m_af.get());
+        return ptr != nullptr;
+    }
+    return true;
+}
+
+void Portfolio::_readyForRun() {
+    HKU_CHECK(m_se, "m_se is null!");
+    HKU_CHECK(m_tm, "m_tm is null!");
+
+    OptimalSelectorBase const* optse_ptr = dynamic_cast<OptimalSelectorBase const*>(m_se.get());
+    HKU_CHECK(optse_ptr == nullptr, "Can't use is OptimalSelectorBase type m_se in PF!");
+
+    if (isAFNothing()) {
         _readyForRunWithoutAF();
+    } else {
+        _readyForRunWithAF();
     }
 }
 
 void Portfolio::_readyForRunWithoutAF() {
-    HKU_CHECK(m_se, "m_se is null!");
-    HKU_CHECK(m_tm, "m_tm is null!");
-
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#endif
-    try {
-        OptimalSelectorBase const* _ = dynamic_cast<OptimalSelectorBase*>(m_se.get());
-        HKU_THROW("Can't use is OptimalSelectorBase type m_se in PF!");
-    } catch (...) {
-        // do nothing
-    }
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
-
-#if 1
     // 从 se 获取原型系统列表
     auto pro_sys_list = m_se->getProtoSystemList();
     HKU_CHECK(!pro_sys_list.empty(), "Can't fetch proto_sys_lsit from Selector!");
@@ -168,12 +167,8 @@ void Portfolio::_readyForRunWithoutAF() {
     reset();
 
     // 仅支持都是延迟买卖或都是立刻买卖模式
-    const auto& first_sys = pro_sys_list.front();
-    bool buy_delay = first_sys->getParam<bool>("buy_delay");
-    bool sell_delay = first_sys->getParam<bool>("sell_delay");
-    HKU_CHECK(buy_delay == sell_delay,
-              "The buy_delay or sell_delay of proto_sys is not same! Not support this mode!");
-    m_delay_mode = buy_delay;
+    bool trade_on_close_without_af = getParam<bool>("trade_on_close_without_af");
+    bool proto_sys_use_self_tm = getParam<bool>("proto_sys_use_self_tm");
 
     // 将 se 设置为依赖原型系统
     m_se->setParam<bool>("depend_on_proto_sys", true);
@@ -182,9 +177,8 @@ void Portfolio::_readyForRunWithoutAF() {
     m_real_sys_list.reserve(total);
     for (size_t i = 0; i < total; i++) {
         SystemPtr& pro_sys = pro_sys_list[i];
-        HKU_CHECK((pro_sys->getParam<bool>("buy_delay") == m_delay_mode ||
-                   pro_sys->getParam<bool>("sell_delay") == m_delay_mode),
-                  "The buy_delay or sell_delay of proto_sys is not same! Not support this mode!");
+        pro_sys->setParam<bool>("buy_delay", trade_on_close_without_af);
+        pro_sys->setParam<bool>("sell_delay", trade_on_close_without_af);
 
         SystemPtr sys = pro_sys->clone();
         m_se->bindRealToProto(sys, pro_sys);
@@ -192,7 +186,8 @@ void Portfolio::_readyForRunWithoutAF() {
 
         // 计算各原型系统
         pro_sys->setParam<bool>("shared_tm", false);
-        if (!pro_sys->getTM()) {
+        if (!proto_sys_use_self_tm || !pro_sys->getTM()) {
+            // 使用自身 tm 或自身无tm 时，复制使用 pf tm
             pro_sys->setTM(m_tm->clone());
         }
         pro_sys->readyForRun();
@@ -213,29 +208,9 @@ void Portfolio::_readyForRunWithoutAF() {
 
     // 告知 se 计算伴生原型系统
     m_se->calculate_proto(m_query);
-#endif
 }
 
 void Portfolio::_readyForRunWithAF() {
-    // SPEND_TIME(Portfolio_readyForRun);
-    HKU_CHECK(m_se, "m_se is null!");
-    HKU_CHECK(m_tm, "m_tm is null!");
-    HKU_CHECK(m_af, "m_af is null!");
-
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#endif
-    try {
-        OptimalSelectorBase const* _ = dynamic_cast<OptimalSelectorBase*>(m_se.get());
-        HKU_THROW("Can't use is OptimalSelectorBase type m_se in PF!");
-    } catch (...) {
-        // do nothing
-    }
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
-
     // se算法和af算法不匹配
     HKU_CHECK(m_se->isMatchAF(m_af), "The current SE and AF do not match!");
 
@@ -501,10 +476,10 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
 }
 
 void Portfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
-    if (m_af) {
-        _runMomentWithAF(date, nextCycle, adjust);
-    } else {
+    if (isAFNothing()) {
         _runMomentWithoutAF(date, nextCycle, adjust);
+    } else {
+        _runMomentWithAF(date, nextCycle, adjust);
     }
 }
 
@@ -780,6 +755,7 @@ void Portfolio::_runMomentWithoutAF(const Datetime& date, const Datetime& nextCy
     //---------------------------------------------------
     // 调仓日，重新选择系统池
     //---------------------------------------------------
+    bool trade_on_close_without_af = getParam<bool>("trade_on_close_without_af");
     std::list<SYSPtr> tmp_remove_sys;
     if (adjust) {
         m_tmp_selected_list = m_se->getSelected(date);
@@ -802,7 +778,7 @@ void Portfolio::_runMomentWithoutAF(const Datetime& date, const Datetime& nextCy
         }
 
         // 移除的系统如果有持仓，则强制立刻卖出，且为立即执行模式
-        if (!m_delay_mode) {
+        if (!trade_on_close_without_af) {
             for (auto& sys : tmp_remove_sys) {
                 auto stk = sys->getStock();
                 auto num = m_tm->getHoldNumber(date, stk);
@@ -824,7 +800,7 @@ void Portfolio::_runMomentWithoutAF(const Datetime& date, const Datetime& nextCy
         sys.sys->runMoment(date);
     }
 
-    if (m_delay_mode) {
+    if (trade_on_close_without_af) {
         for (auto& sys : tmp_remove_sys) {
             auto stk = sys->getStock();
             auto num = m_tm->getHoldNumber(date, stk);
