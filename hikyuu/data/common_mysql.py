@@ -32,6 +32,11 @@ from hikyuu.data.common import get_stktype_list, get_new_holidays
 from hikyuu.util import hku_debug
 
 
+def get_mysql_connect_version():
+    m, n, _ = mysql.connector.__version__.split('.')
+    return int(m) + float(n) * 0.9
+
+
 def is_exist_db(connect):
     """数据库是否已存在"""
     cur = connect.cursor()
@@ -60,9 +65,13 @@ def create_database(connect):
         filename = sql_dir + "/createdb.sql"
         with open(filename, 'r', encoding='utf8') as f:
             sql = f.read()
-        for x in cur.execute(sql, multi=True):
-            # print(x.statement)
-            pass
+        mysql_version = get_mysql_connect_version()
+        if mysql_version >= 9.2:
+            cur.execute(sql)
+        else:
+            for x in cur.execute(sql, multi=True):
+                # print(x.statement)
+                pass
 
     db_version = get_db_version(connect)
     files = [x for x in Path(sql_dir).iterdir()
@@ -71,11 +80,15 @@ def create_database(connect):
              and x.name != '__init__.py'
              and int(x.stem) > db_version and not x.is_dir()]
     files.sort()
+    mysql_version = get_mysql_connect_version()
     for file in files:
         sql = file.read_text(encoding='utf8')
-        for x in cur.execute(sql, multi=True):
-            # print(x.statement)
-            pass
+        if mysql_version >= 9.2:
+            cur.execute(sql)
+        else:
+            for x in cur.execute(sql, multi=True):
+                # print(x.statement)
+                pass
 
     connect.commit()
     cur.close()
