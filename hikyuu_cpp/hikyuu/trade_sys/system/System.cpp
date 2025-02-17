@@ -99,8 +99,8 @@ void System::initParam() {
 
     // 延迟操作的情况下，是使用当前的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
     setParam<bool>("delay_use_current_price", true);
-    setParam<bool>("tp_monotonic", true);  // 止赢单调递增
-    setParam<int>("tp_delay_n", 1);        // 止赢延迟判断天数
+    setParam<bool>("tp_monotonic", true);     // 止赢单调递增
+    setParam<int>("tp_delay_n", 1);           // 止赢延迟判断天数
     setParam<bool>("ignore_sell_sg", false);  // 忽略卖出信号，只使用止损/止赢等其他方式卖出
 
     // 最高价等于最低价时，是否可进行交易
@@ -789,6 +789,8 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
     record =
       m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss, position.goalPrice,
                  on_open ? src_krecord.openPrice : src_krecord.closePrice, from);
+    HKU_WARN_IF_RETURN(record == Null<TradeRecord>(), record, "[{}] Failed force sell {} by {}",
+                       name(), num, getSystemPartName(from));
 
     // 如果已未持仓，最后的止赢价初始为0
     if (!m_tm->have(m_stock)) {

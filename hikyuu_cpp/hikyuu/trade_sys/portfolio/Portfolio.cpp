@@ -61,6 +61,7 @@ void Portfolio::initParam() {
     setParam<bool>("delay_to_trading_day", true);       // 延迟至交易日
     setParam<bool>("trade_on_close_without_af", true);  // 无AF时，在收盘时交易
     setParam<bool>("proto_sys_use_self_tm", false);     // 无AF时，原型系统计算时使用自身附带的tm
+    setParam<bool>("sell_on_not_selected", false);      // 无AF时，强制卖出在选股日未选中的持仓
     setParam<bool>("trace", false);                     // 打印跟踪
     setParam<int>("trace_max_num", 10);                 // 打印跟踪时，显示当前持仓证券最大数量
 }
@@ -108,6 +109,7 @@ void Portfolio::reset() {
     m_delay_adjust_sys_list.clear();
     m_tmp_selected_list.clear();
     m_tmp_will_remove_sys.clear();
+    m_se_sys_to_pf_sys_dict.clear();
     if (m_tm)
         m_tm->reset();
     if (m_cash_tm)
@@ -124,7 +126,6 @@ PortfolioPtr Portfolio::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_query = m_query;
-    p->m_real_sys_list = m_real_sys_list;
     p->m_need_calculate = true;
     if (m_se)
         p->m_se = m_se->clone();
@@ -175,39 +176,44 @@ void Portfolio::_readyForRunWithoutAF() {
 
     size_t total = pro_sys_list.size();
     m_real_sys_list.reserve(total);
+    SystemList se_sys_list;
+    se_sys_list.reserve(total);
     for (size_t i = 0; i < total; i++) {
         SystemPtr& pro_sys = pro_sys_list[i];
-        pro_sys->setParam<bool>("buy_delay", trade_on_close_without_af);
-        pro_sys->setParam<bool>("sell_delay", trade_on_close_without_af);
+        if (pro_sys) {
+            auto sys = pro_sys->clone();
+            sys->setParam<bool>("buy_delay", trade_on_close_without_af);
+            sys->setParam<bool>("sell_delay", trade_on_close_without_af);
+            sys->setParam<bool>("shared_tm", true);
 
-        SystemPtr sys = pro_sys->clone();
-        m_se->bindRealToProto(sys, pro_sys);
-        m_real_sys_list.emplace_back(sys);
+            auto se_sys = sys->clone();
+            se_sys->setParam<bool>("shared_tm", false);
+            if (!proto_sys_use_self_tm || !se_sys->getTM()) {
+                // 使用自身 tm 或自身无tm 时，复制使用 pf tm
+                se_sys->setTM(m_tm->clone());
+                se_sys_list.emplace_back(se_sys);
+            }
 
-        // 计算各原型系统
-        pro_sys->setParam<bool>("shared_tm", false);
-        if (!proto_sys_use_self_tm || !pro_sys->getTM()) {
-            // 使用自身 tm 或自身无tm 时，复制使用 pf tm
-            pro_sys->setTM(m_tm->clone());
+            m_se->bindRealToProto(se_sys, pro_sys);
+            m_real_sys_list.emplace_back(sys);
+            m_se_sys_to_pf_sys_dict[se_sys] = sys;
+
+            KData k = sys->getStock().getKData(m_query);
+            se_sys->readyForRun();
+            se_sys->setTO(k);
+            se_sys->setParam<bool>("trace", true);
+
+            sys->setTM(m_tm);
+            string sys_name = fmt::format("{}_{}_{}", sys->name(), sys->getStock().market_code(),
+                                          sys->getStock().name());
+            sys->name(fmt::format("PF_{}", sys_name));
+            sys->readyForRun();
+            sys->setTO(k);
         }
-        pro_sys->readyForRun();
-        KData k = pro_sys->getStock().getKData(m_query);
-        pro_sys->setTO(k);
-
-        // 实际子系统设置共享账户
-        sys->setParam<bool>("shared_tm", true);
-        sys->setTM(m_tm);
-        string sys_name = fmt::format("{}_{}_{}", sys->name(), sys->getStock().market_code(),
-                                      sys->getStock().name());
-        sys->name(fmt::format("PF_{}", sys_name));
-
-        sys->readyForRun();
-        // KData k = sys->getStock().getKData(m_query);
-        sys->setTO(k);
     }
 
-    // 告知 se 计算伴生原型系统
-    m_se->calculate_proto(m_query);
+    // 告知 se 计算
+    m_se->calculate(se_sys_list, m_query);
 }
 
 void Portfolio::_readyForRunWithAF() {
@@ -698,40 +704,7 @@ void Portfolio::_runMomentWithAF(const Datetime& date, const Datetime& nextCycle
     //----------------------------------------------------------------------
     // 跟踪打印持仓情况
     //----------------------------------------------------------------------
-    if (trace && !m_running_sys_set.empty()) {
-        // clang-format off
-        HKU_INFO(
-          "+------------+------------+------------+--------------+--------------+-------------+-------------+");
-        HKU_INFO(
-          "| code       | name       | position   | market value | remain cash  | open price  | close price  |");
-        HKU_INFO(
-          "+------------+------------+------------+--------------+--------------+-------------+-------------+");
-        // clang-format on
-
-        size_t count = 0;
-        for (const auto& sys : m_running_sys_set) {
-            Stock stk = sys->getStock();
-            auto funds = sys->getTM()->getFunds(date, m_query.kType());
-            size_t position = sys->getTM()->getHoldNumber(date, stk);
-            KRecord krecord = stk.getKRecord(date, m_query.kType());
-            auto stk_name = stk.name();
-            HKU_INFO("| {:<11}| {:<11}| {:<11}| {:<13.2f}| {:<13.2f}| {:<12.2f}| {:<12.2f}|",
-                     stk.market_code(), stk_name, position, funds.market_value, funds.cash,
-                     krecord.openPrice, krecord.closePrice);
-            // clang-format off
-            HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
-            count++;
-            int trace_max_num = getParam<int>("trace_max_num");
-            if (count >= trace_max_num) {
-                if (m_running_sys_set.size() > trace_max_num) {
-                    HKU_INFO("+ ... ... more                                                                                   +");
-                    HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
-                }
-                break;
-            }
-            // clang-format on
-        }
-    }
+    traceMomentTM(date);
 }
 
 void Portfolio::_runMomentWithoutAF(const Datetime& date, const Datetime& nextCycle, bool adjust) {
@@ -752,13 +725,37 @@ void Portfolio::_runMomentWithoutAF(const Datetime& date, const Datetime& nextCy
     // 开盘前，调整账户权息
     m_tm->updateWithWeight(date);
 
+    // 开盘时处理之前强制卖出失败的情况（和买入、卖出模式无关）
+    for (auto iter = m_delay_adjust_sys_list.begin(); iter != m_delay_adjust_sys_list.end();) {
+        auto& sys = iter->sys;
+        auto stk = sys->getStock();
+        auto num = m_tm->getHoldNumber(date, stk);
+        if (iszero(num)) {
+            iter = m_delay_adjust_sys_list.erase(iter);
+        } else {
+            auto tr = sys->sellForceOnClose(date, num, PART_PORTFOLIO);
+            if (tr == Null<TradeRecord>()) {
+                // 强制卖出失败加入延迟列表
+                m_delay_adjust_sys_list.emplace_back(*iter);
+            }
+            ++iter;
+        }
+    }
+
     //---------------------------------------------------
     // 调仓日，重新选择系统池
     //---------------------------------------------------
     bool trade_on_close_without_af = getParam<bool>("trade_on_close_without_af");
-    std::list<SYSPtr> tmp_remove_sys;
     if (adjust) {
         m_tmp_selected_list = m_se->getSelected(date);
+        HKU_INFO_IF(trace, "[PF] current seleect system count: {}", m_tmp_selected_list.size());
+
+        // 将选中系统池中的系统转换为PF系统池中的系统
+        SystemWeightList tmp_list;
+        for (auto& sw : m_tmp_selected_list) {
+            tmp_list.emplace_back(m_se_sys_to_pf_sys_dict[sw.sys], sw.weight);
+        }
+        m_tmp_selected_list.swap(tmp_list);
 
         // 从当前运行池中移除不在选中系统池中的系统
         std::unordered_set<SYSPtr> tmp_selected_set;
@@ -766,46 +763,100 @@ void Portfolio::_runMomentWithoutAF(const Datetime& date, const Datetime& nextCy
             tmp_selected_set.insert(sw.sys);
         }
 
+        m_tmp_will_remove_sys.clear();
         for (auto& sys : m_running_sys_set) {
             if (tmp_selected_set.find(sys) == tmp_selected_set.end()) {
-                tmp_remove_sys.emplace_back(sys);
+                m_tmp_will_remove_sys.emplace_back(sys, 1.0);
             }
         }
 
-        for (auto& sys : tmp_remove_sys) {
-            HKU_INFO_IF(trace, "[PF] remove system: {}", sys->name());
-            m_running_sys_set.erase(sys);
+        for (auto& sw : m_tmp_will_remove_sys) {
+            HKU_INFO_IF(trace, "[PF] remove system: {}", sw.sys->name());
+            m_running_sys_set.erase(sw.sys);
         }
 
-        // 移除的系统如果有持仓，则强制立刻卖出，且为立即执行模式
+        // 移除的系统如果有持仓，则强制立刻卖出，且为开盘时执行
         if (!trade_on_close_without_af) {
-            for (auto& sys : tmp_remove_sys) {
-                auto stk = sys->getStock();
+            for (auto& sw : m_tmp_will_remove_sys) {
+                auto stk = sw.sys->getStock();
                 auto num = m_tm->getHoldNumber(date, stk);
-                sys->sellForceOnOpen(date, num, PART_PORTFOLIO);
+                auto tr = sw.sys->sellForceOnOpen(date, num, PART_PORTFOLIO);
+                if (tr == Null<TradeRecord>()) {
+                    // 强制卖出失败加入延迟列表
+                    m_delay_adjust_sys_list.emplace_back(sw);
+                }
             }
         }
 
-        // 设置调仓周期
+        // 加入当前运行系统集合，并设置调仓周期
         for (auto& sw : m_tmp_selected_list) {
+            m_running_sys_set.insert(sw.sys);
             auto sg = sw.sys->getSG();
             sg->startCycle(date, nextCycle);
         }
     }
 
     //----------------------------------------------------------------------------
-    // 依次执行当前池内所有系统
+    // 依次执行运行中所有系统
     //----------------------------------------------------------------------------
-    for (auto& sys : m_tmp_selected_list) {
-        sys.sys->runMoment(date);
+    for (auto& sys : m_running_sys_set) {
+        sys->runMoment(date);
     }
 
+    // 如果是收盘时执行模式，则将待移除系统中的持仓卖出
     if (trade_on_close_without_af) {
-        for (auto& sys : tmp_remove_sys) {
-            auto stk = sys->getStock();
+        for (auto& sw : m_tmp_will_remove_sys) {
+            auto stk = sw.sys->getStock();
             auto num = m_tm->getHoldNumber(date, stk);
-            sys->sellForceOnOpen(date, num, PART_PORTFOLIO);
+            auto tr = sw.sys->sellForceOnClose(date, num, PART_PORTFOLIO);
+            if (tr == Null<TradeRecord>()) {
+                // 强制卖出失败加入延迟列表
+                m_delay_adjust_sys_list.emplace_back(sw);
+            }
         }
+        m_tmp_will_remove_sys.clear();
+    }
+
+    //----------------------------------------------------------------------
+    // 跟踪打印持仓情况
+    //----------------------------------------------------------------------
+    traceMomentTM(date);
+}
+
+void Portfolio::traceMomentTM(const Datetime& date) {
+    HKU_IF_RETURN(!getParam<bool>("trace") || m_running_sys_set.empty(), void());
+
+    //----------------------------------------------------------------------
+    // 跟踪打印持仓情况
+    //----------------------------------------------------------------------
+    // clang-format off
+    HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
+    HKU_INFO("| code       | name       | position   | market value | remain cash  | open price  | close price  |");
+    HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
+    // clang-format on
+
+    size_t count = 0;
+    for (const auto& sys : m_running_sys_set) {
+        Stock stk = sys->getStock();
+        auto funds = sys->getTM()->getFunds(date, m_query.kType());
+        size_t position = sys->getTM()->getHoldNumber(date, stk);
+        KRecord krecord = stk.getKRecord(date, m_query.kType());
+        auto stk_name = stk.name();
+        HKU_INFO("| {:<11}| {:<11}| {:<11}| {:<13.2f}| {:<13.2f}| {:<12.2f}| {:<12.2f}|",
+                 stk.market_code(), stk_name, position, funds.market_value, funds.cash,
+                 krecord.openPrice, krecord.closePrice);
+        // clang-format off
+        HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
+        count++;
+        int trace_max_num = getParam<int>("trace_max_num");
+        if (count >= trace_max_num) {
+            if (m_running_sys_set.size() > trace_max_num) {
+                HKU_INFO("+ ... ... more                                                                                   +");
+                HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");
+            }
+            break;
+        }
+        // clang-format on
     }
 }
 
