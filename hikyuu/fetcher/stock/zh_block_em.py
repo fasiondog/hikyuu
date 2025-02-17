@@ -5,7 +5,9 @@
 #    Author: fasiondog
 
 import requests
+import math
 import akshare as ak
+import pandas as pd
 from hikyuu.util import *
 
 
@@ -47,13 +49,13 @@ def get_all_gnbk_info(code_market_dict, sep=""):
     return ret
 
 
-@hku_catch(ret={}, trace=True)
-def get_all_dybk_info(code_market_dict, sep=""):
-    """获取所有地域板块列表"""
+@hku_catch(ret=[], trace=True)
+def get_dybk_names():
+    """获取所有地域板块名称列表"""
     url = "http://13.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "50000",
+        "pz": "200",
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -62,17 +64,35 @@ def get_all_dybk_info(code_market_dict, sep=""):
         "fid": "f3",
         "fs": "m:90+t:1+f:!50",
         "fields": "f12,f14",
-        # "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,"
-        #           "f136,f115,f152",
         "_": "1623833739532",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, timeout=15)
     data_json = r.json()
-    data_json = data_json["data"]["diff"]
+    hku_check(data_json['data'] is not None, "获取地域板块名称列表失败!")
+    ret = []
+    for v in data_json["data"]["diff"]:
+        ret.append((v["f12"], v["f14"]))
 
+    total_page = math.ceil(data_json["data"]["total"] / 200)
+    for page in range(2, total_page + 1):
+        params["pn"] = page
+        r = requests.get(url, params=params, timeout=15)
+        data_json = r.json()
+        if data_json["data"] is not None:
+            for v in data_json["data"]["diff"]:
+                ret.append((v["f12"], v["f14"]))
+    return ret
+
+
+@hku_catch(ret={}, trace=True)
+def get_all_dybk_info(code_market_dict, sep=""):
+    """获取所有地域板块列表"""
+    blk_list = get_dybk_names()
+
+    url = "http://13.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "2000",
+        "pz": "200",
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -85,24 +105,38 @@ def get_all_dybk_info(code_market_dict, sep=""):
     }
 
     ret = {}
-    for v in data_json:
-        # print(v)
-        blk_code = v["f12"]
-        blk_name = v["f14"]
-        # print(blk_name)
+    for v in blk_list:
+        blk_code, blk_name = v[0], v[1]
+        hku_info(f'获取{blk_name}详情')
         ret[blk_name] = []
         params["fs"] = f"b:{blk_code} f:!50"
-        r = requests.get(url, params=params)
+        params["pn"] = 1
+        r = requests.get(url, params=params, timeout=15)
+        data = r.json()
+        if data["data"] is None:
+            continue
+
         stk_json = r.json()
         stk_json = stk_json["data"]["diff"]
-
         for item in stk_json:
             stk_code = item["f12"]
             try:
                 ret[blk_name].append(f"{code_market_dict[stk_code]}{sep}{stk_code}")
             except:
-                # print(stk_code)
                 pass
+
+        total_page = math.ceil(data["data"]["total"] / 200)
+        for page in range(2, total_page + 1):
+            params["pn"] = page
+            r = requests.get(url, params=params, timeout=15)
+            stk_json = r.json()
+            stk_json = stk_json["data"]["diff"]
+            for item in stk_json:
+                stk_code = item["f12"]
+                try:
+                    ret[blk_name].append(f"{code_market_dict[stk_code]}{sep}{stk_code}")
+                except:
+                    pass
     return ret
 
 
@@ -138,3 +172,8 @@ def get_all_zsbk_info(code_market_dict, sep=""):
             # print("Failed!", blk_code, blk_name)
             pass
     return ret
+
+
+if __name__ == "__main__":
+    blks = get_dybk_names()
+    print(blks)
