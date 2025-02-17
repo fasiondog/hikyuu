@@ -83,7 +83,7 @@ def search_best_tdx():
     for host in x:
         api = TdxHq_API(multithread=False)
         if api.connect(host[2], host[3]):
-            x = api.get_security_bars(9, 0, '000001', 0, 1)
+            x = api.get_security_bars(9, 0, '159915', 0, 1)
             if x and len(x) > 0:
                 if x[0]['close'] not in values:
                     values[x[0]['close']] = [host]
