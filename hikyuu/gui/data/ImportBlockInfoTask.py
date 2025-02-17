@@ -39,17 +39,18 @@ class ImportBlockInfoTask:
             connect = mysql.connector.connect(**db_config)
             import_block = em_import_block_to_mysql
 
+        count = 0
         try:
             code_market_dict = {}
             for market in (MARKET.SH, MARKET.SZ, MARKET.BJ):
                 x = get_stk_code_name_list(market)
                 for v in x:
                     code_market_dict[v["code"]] = market
-            import_block(connect, code_market_dict, self.categorys)
+            count = import_block(connect, code_market_dict, self.categorys)
         except Exception as e:
             hku_error(str(e))
 
         connect.close()
 
-        self.queue.put([self.task_name, "BLOCKINFO", f"{self.categorys}板块信息下载完毕", None, None])
+        self.queue.put([self.task_name, "BLOCKINFO", f"{self.categorys}板块信息下载完毕: {count}", None, None])
         self.status = "finished"
