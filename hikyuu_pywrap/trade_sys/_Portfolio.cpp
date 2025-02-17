@@ -81,8 +81,8 @@ void export_Portfolio(py::module& m) {
       "PF_Simple", PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
       py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
       py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
-      py::arg("trade_on_close_without_af") = true,
-      R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close_without_af=True])
+      py::arg("trade_on_close_without_af") = true, py::arg("proto_sys_use_self_tm") = false,
+      R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close_without_af=True, proto_sys_use_self_tm=False])
 
     创建一个多标的、单系统策略的投资组合
 
@@ -102,5 +102,6 @@ void export_Portfolio(py::module& m) {
     :param int adjust_cycle: 调仓周期
     :param str adjust_mode: 调仓模式
     :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
-    :param bool trade_on_close_without_af: 在无资金分配算法时，在收盘时执行交易)");
+    :param bool trade_on_close_without_af: 在无资金分配算法时，在收盘时执行交易
+    :param bool proto_sys_use_self_tm: 使用组合自身交易账户进行计算(仅在无资金分配模式下有效）)");
 }

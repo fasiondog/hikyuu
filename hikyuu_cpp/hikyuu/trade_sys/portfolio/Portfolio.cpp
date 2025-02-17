@@ -736,7 +736,7 @@ void Portfolio::_runMomentWithAF(const Datetime& date, const Datetime& nextCycle
 
 void Portfolio::_runMomentWithoutAF(const Datetime& date, const Datetime& nextCycle, bool adjust) {
     // 当前日期小于账户建立日期，直接忽略
-    HKU_IF_RETURN(date < m_cash_tm->initDatetime(), void());
+    HKU_IF_RETURN(date < m_tm->initDatetime(), void());
 
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "{} ===========================================================", date);
