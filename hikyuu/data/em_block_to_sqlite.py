@@ -114,6 +114,6 @@ if __name__ == "__main__":
         code_market_dict[v["code"]] = MARKET.SH
     # print(code_market_dict)
 
-    em_import_block_to_sqlite(connect, code_market_dict, categorys=('行业板块', '指数板块',))
+    em_import_block_to_sqlite(connect, code_market_dict, categorys=('地域板块', ))
 
     connect.close()
