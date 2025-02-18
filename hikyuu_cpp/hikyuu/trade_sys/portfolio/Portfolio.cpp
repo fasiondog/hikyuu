@@ -114,6 +114,7 @@ void Portfolio::reset() {
     if (m_af)
         m_af->reset();
     m_need_calculate = true;
+    m_real_sys_list.clear();
     m_running_sys_set.clear();
     _reset();
 }
@@ -138,7 +139,34 @@ PortfolioPtr Portfolio::clone() const {
 void Portfolio::readyForRun() {
     HKU_CHECK(m_se, "m_se is null!");
     HKU_CHECK(m_tm, "m_tm is null!");
+    reset();
     _readyForRun();
+}
+
+void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
+    // 当前日期小于账户建立日期，直接忽略
+    HKU_IF_RETURN(date < m_tm->initDatetime(), void());
+
+    bool trace = getParam<bool>("trace");
+    HKU_INFO_IF(trace, "{} ===========================================================", date);
+    if (trace && adjust) {
+        HKU_INFO("****************************************************");
+        HKU_INFO("**                                                **");
+        HKU_INFO("**  [PF] Position adjustment will be made today.  **");
+        HKU_INFO("**                                                **");
+        HKU_INFO("****************************************************");
+    }
+    HKU_INFO_IF(trace, "[PF] current running system size: {}", m_running_sys_set.size());
+
+    // 开盘前，调整账户权息
+    m_tm->updateWithWeight(date);
+
+    _runMoment(date, nextCycle, adjust);
+
+    //----------------------------------------------------------------------
+    // 跟踪打印持仓情况
+    //----------------------------------------------------------------------
+    traceMomentTM(date);
 }
 
 void Portfolio::run(const KQuery& query, bool force) {
@@ -163,6 +191,12 @@ void Portfolio::run(const KQuery& query, bool force) {
 
     _readyForRun();
 
+    if (m_real_sys_list.empty()) {
+        HKU_WARN("There is no system in portfolio!");
+        m_need_calculate = true;
+        return;
+    }
+
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     HKU_IF_RETURN(datelist.empty(), void());
 
@@ -179,7 +213,7 @@ void Portfolio::run(const KQuery& query, bool force) {
             }
 
             const auto& date = datelist[i];
-            _runMoment(date, cur_cycle_end, adjust);
+            runMoment(date, cur_cycle_end, adjust);
         }
 
     } else if (delay_to_trading_day) {
@@ -203,7 +237,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
             if (cur_cycle_end >= datelist.back()) {
                 cur_cycle_end = datelist.back() + Seconds(1);
             }
-            _runMoment(date, cur_cycle_end, adjust);
+            runMoment(date, cur_cycle_end, adjust);
         }
     } else if ("month" == mode) {
         Datetime cur_cycle_end = datelist.front().nextMonth();
@@ -216,7 +250,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
             if (cur_cycle_end >= datelist.back()) {
                 cur_cycle_end = datelist.back() + Seconds(1);
             }
-            _runMoment(date, cur_cycle_end, adjust);
+            runMoment(date, cur_cycle_end, adjust);
         }
     } else if ("quarter" == mode) {
         Datetime cur_cycle_end = datelist.front().nextQuarter();
@@ -229,7 +263,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
             if (cur_cycle_end >= datelist.back()) {
                 cur_cycle_end = datelist.back() + Seconds(1);
             }
-            _runMoment(date, cur_cycle_end, adjust);
+            runMoment(date, cur_cycle_end, adjust);
         }
     } else if ("year" == mode) {
         Datetime cur_cycle_end = datelist.front().nextYear();
@@ -242,7 +276,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
             if (cur_cycle_end >= datelist.back()) {
                 cur_cycle_end = datelist.back() + Seconds(1);
             }
-            _runMoment(date, cur_cycle_end, adjust);
+            runMoment(date, cur_cycle_end, adjust);
         }
     }
 }
@@ -272,7 +306,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = datelist.back() + Seconds(1);
             }
 
-            _runMoment(date, cur_cycle_end, adjust);
+            runMoment(date, cur_cycle_end, adjust);
         }
 
     } else if ("month" == mode) {
@@ -297,7 +331,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = datelist.back() + Seconds(1);
             }
 
-            _runMoment(date, cur_cycle_end, adjust);
+            runMoment(date, cur_cycle_end, adjust);
         }
 
     } else if ("quarter" == mode) {
@@ -322,7 +356,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = datelist.back() + Seconds(1);
             }
 
-            _runMoment(date, cur_cycle_end, adjust);
+            runMoment(date, cur_cycle_end, adjust);
         }
 
     } else if ("year" == mode) {
@@ -347,7 +381,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = datelist.back() + Seconds(1);
             }
 
-            _runMoment(date, cur_cycle_end, adjust);
+            runMoment(date, cur_cycle_end, adjust);
         }
     }
 }

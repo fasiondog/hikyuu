@@ -29,7 +29,6 @@ public:
     virtual ~SimplePortfolio();
 
 private:
-    SystemList m_real_sys_list;
     SystemList m_dlist_sys_list;               // 因证券退市，无法执行卖出的系统（资产全部损失）
     SystemWeightList m_delay_adjust_sys_list;  // 延迟调仓卖出的系统列表
     SystemWeightList m_tmp_selected_list;

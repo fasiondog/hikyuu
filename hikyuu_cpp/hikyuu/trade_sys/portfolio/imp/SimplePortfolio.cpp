@@ -25,7 +25,6 @@ SimplePortfolio::SimplePortfolio(const TradeManagerPtr& tm, const SelectorPtr& s
 SimplePortfolio::~SimplePortfolio() {}
 
 void SimplePortfolio::_reset() {
-    m_real_sys_list.clear();
     m_dlist_sys_list.clear();
     m_delay_adjust_sys_list.clear();
     m_tmp_selected_list.clear();
@@ -44,9 +43,7 @@ void SimplePortfolio::_readyForRun() {
 
     // 从 se 获取原型系统列表
     const auto& pro_sys_list = m_se->getProtoSystemList();
-    HKU_CHECK(!pro_sys_list.empty(), "Can't fetch proto_sys_lsit from Selector!");
-
-    reset();
+    HKU_WARN_IF_RETURN(pro_sys_list.empty(), void(), "Can't fetch proto_sys_lsit from Selector!");
 
     // 生成资金账户
     m_cash_tm = m_tm->clone();
@@ -82,27 +79,9 @@ void SimplePortfolio::_readyForRun() {
 
     // 告知 se 当前实际运行的系统列表
     m_se->calculate(m_real_sys_list, m_query);
-
-    // 释放掉临时数据占用的内存
-    m_tmp_selected_list = SystemWeightList();
-    m_tmp_will_remove_sys = SystemWeightList();
 }
 
 void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
-    // 当前日期小于账户建立日期，直接忽略
-    HKU_IF_RETURN(date < m_cash_tm->initDatetime(), void());
-
-    bool trace = getParam<bool>("trace");
-    HKU_INFO_IF(trace, "{} ===========================================================", date);
-    if (trace && adjust) {
-        HKU_INFO("****************************************************");
-        HKU_INFO("**                                                **");
-        HKU_INFO("**  [PF] Position adjustment will be made today.  **");
-        HKU_INFO("**                                                **");
-        HKU_INFO("****************************************************");
-    }
-    HKU_INFO_IF(trace, "[PF] current running system size: {}", m_running_sys_set.size());
-
     //---------------------------------------------------
     // 检测运行系统中是否存在已退市的证券
     //---------------------------------------------------
@@ -134,9 +113,8 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
         sum_cash += sub_tm->currentCash();
     }
 
-    // 开盘前，调整账户权息，并进行轧差处理（平衡 sub_sys, cash_tm, tm 之间的误差）
-    m_tm->updateWithWeight(date);
-
+    // 开盘前，进行轧差处理（平衡 sub_sys, cash_tm, tm 之间的误差）
+    bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "[PF] The sum cash of sub_tm: {}, cash tm: {}, tm cash: {}", sum_cash,
                 m_cash_tm->currentCash(), m_tm->currentCash());
     sum_cash += m_cash_tm->currentCash();
@@ -299,11 +277,6 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
         HKU_INFO("[PF] [after run] - total funds: {},  cash: {}, market_value: {}",
                  funds.cash + funds.market_value, funds.cash, funds.market_value);
     }
-
-    //----------------------------------------------------------------------
-    // 跟踪打印持仓情况
-    //----------------------------------------------------------------------
-    traceMomentTM(date);
 }
 
 PortfolioPtr HKU_API PF_Simple(const TMPtr& tm, const SEPtr& st, const AFPtr& af, int adjust_cycle,

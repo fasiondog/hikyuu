@@ -81,6 +81,8 @@ public:
     /** 设置资产分配算法 */
     void setAF(const AFPtr& af);
 
+    const SystemList& getRealSystemList() const;
+
     /** 复位操作 */
     void reset();
 
@@ -90,6 +92,8 @@ public:
 
     /** 运行前准备 */
     void readyForRun();
+
+    void runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust);
 
     /** 用于打印输出 */
     virtual string str() const;
@@ -124,6 +128,8 @@ protected:
     KQuery m_query;         // 关联的查询条件
     bool m_need_calculate;  // 是否需要计算标志
 
+    SystemList m_real_sys_list;  // 所有实际运行的子系统列表
+
     // 用于中间计算的临时数据
     std::unordered_set<SYSPtr> m_running_sys_set;
 
@@ -142,7 +148,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        // ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
     }
 
     template <class Archive>
@@ -154,7 +159,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        // ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -234,6 +238,10 @@ inline void Portfolio::setAF(const AFPtr& af) {
         m_af = af;
         m_need_calculate = true;
     }
+}
+
+inline const SystemList& Portfolio::getRealSystemList() const {
+    return m_real_sys_list;
 }
 
 } /* namespace hku */

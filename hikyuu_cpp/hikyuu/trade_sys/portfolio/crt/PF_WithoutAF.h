@@ -36,8 +36,8 @@ namespace hku {
  * @param adjust_cycle 调仓周期（受 adjust_mode 影响）, 默认为1
  * @param adjust_mode 调仓模式 "query" | "day" | "week" | "month" | "year"
  * @param delay_to_trading_day true 时，如果当日不是交易日将会被顺延至当前周期内的第一个交易日
- * @param trade_on_close_without_af true 时，在无资金分配算法时，在收盘时执行交易
- * @param proto_sys_use_self_tm 使用组合自身交易账户进行计算（仅在无资金分配模式下有效），默认 false
+ * @param trade_on_close true 时，在无资金分配算法时，在收盘时执行交易
+ * @param sys_use_self_tm 使用原型系统自身交易账户进行计算（仅在无资金分配模式下有效），默认 false
  * @return 组合实例
  */
 PortfolioPtr HKU_API PF_WithoutAF(const TMPtr& tm = TradeManagerPtr(), const SEPtr& se = SE_Fixed(),
