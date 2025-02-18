@@ -33,11 +33,13 @@ public:
 
     /**
      * @brief 构造函数
+     * @param name 组合名称
      * @param tm 账户
      * @param se 选择器
      * @param af 资产分配算法
      */
-    Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFPtr& af);
+    Portfolio(const string& name, const TradeManagerPtr& tm, const SelectorPtr& se,
+              const AFPtr& af);
 
     /** 析构函数 */
     virtual ~Portfolio();
@@ -82,35 +84,33 @@ public:
     /** 复位操作 */
     void reset();
 
-    typedef shared_ptr<Portfolio> PortfolioPtr;
-
     /** 克隆操作 */
-    PortfolioPtr clone();
+    typedef shared_ptr<Portfolio> PortfolioPtr;
+    PortfolioPtr clone() const;
 
-    /** 获取所有原型系统列表，与 SE 同 */
-    const SystemList& getSystemList() const;
+    /** 运行前准备 */
+    void readyForRun();
 
-    /** 获取所有实际运行的系统列表，与 SE 同 */
-    const SystemList& getRealSystemList() const;
+    /** 用于打印输出 */
+    virtual string str() const;
+
+    virtual void _reset() {}
+    virtual PortfolioPtr _clone() const {
+        return std::make_shared<Portfolio>();
+    }
+
+    virtual void _readyForRun() {}
+    virtual void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
 
 private:
     void initParam();
-    bool isAFNothing() const;
-
-    /** 运行前准备 */
-    void _readyForRun();
-    void _readyForRunWithAF();
-    void _readyForRunWithoutAF();
-
-    void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust);
-    void _runMomentWithAF(const Datetime& date, const Datetime& nextCycle, bool adjust);
-    void _runMomentWithoutAF(const Datetime& date, const Datetime& nextCycle, bool adjust);
 
     void _runOnMode(const DatetimeList& datelist, int adjust_cycle, const string& mode);
 
     void _runOnModeDelayToTradingDay(const DatetimeList& datelist, int adjust_cycle,
                                      const string& mode);
 
+protected:
     // 跟踪打印当前TM持仓情况
     void traceMomentTM(const Datetime& date);
 
@@ -124,17 +124,8 @@ protected:
     KQuery m_query;         // 关联的查询条件
     bool m_need_calculate;  // 是否需要计算标志
 
-    SystemList m_real_sys_list;  // 所有实际运行的子系统列表
-
     // 用于中间计算的临时数据
     std::unordered_set<SYSPtr> m_running_sys_set;
-    SystemList m_dlist_sys_list;               // 因证券退市，无法执行卖出的系统（资产全部损失）
-    SystemWeightList m_delay_adjust_sys_list;  // 延迟调仓卖出的系统列表
-    SystemWeightList m_tmp_selected_list;
-    SystemWeightList m_tmp_will_remove_sys;
-
-    // 仅用于无 AF 模式，记录指派给SE的系统到内部实际系统映射
-    unordered_map<SYSPtr, SYSPtr> m_se_sys_to_pf_sys_dict;
 
 //============================================
 // 序列化支持
@@ -169,6 +160,19 @@ private:
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
+
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(Portfolio)
+#endif
+
+#define PORTFOLIO_IMP(classname)                   \
+public:                                            \
+    virtual PortfolioPtr _clone() const override { \
+        return std::make_shared<classname>();      \
+    }                                              \
+    virtual void _reset() override;                \
+    virtual void _readyForRun() override;          \
+    virtual void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) override;
 
 /**
  * 客户程序都应使用该指针类型
@@ -230,10 +234,6 @@ inline void Portfolio::setAF(const AFPtr& af) {
         m_af = af;
         m_need_calculate = true;
     }
-}
-
-inline const SystemList& Portfolio::getRealSystemList() const {
-    return m_real_sys_list;
 }
 
 } /* namespace hku */

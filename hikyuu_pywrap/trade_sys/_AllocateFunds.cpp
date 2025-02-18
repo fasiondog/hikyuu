@@ -109,8 +109,4 @@ void export_AllocateFunds(py::module& m) {
     m.def("AF_MultiFactor", AF_MultiFactor, R"(AF_MultiFactor()
       
     创建 MultiFactor 评分权重的资产分配算法实例)");
-
-    m.def("AF_Nothing", AF_Nothing, R"(AF_Nothing()
-
-    创建不做资产分配的资产分配器)");
 }
