@@ -207,8 +207,16 @@ void export_MoneyManager(py::module& m) {
     m.def("MM_FixedCapital", MM_FixedCapital, py::arg("capital") = 10000.00,
           R"(MM_FixedCapital([capital = 10000.0])
 
-    固定资本资金管理策略。买入数量 = 当前现金 / capital
+    固定资金管理策略。买入数量 = 当前现金 / capital
 
+    :param float capital: 固定资本单位
+    :return: 资金管理策略实例)");
+
+    m.def("MM_FixedCapitalFunds", MM_FixedCapitalFunds, py::arg("capital") = 10000.00,
+          R"(MM_FixedCapitalFunds([capital = 10000.0]) 
+
+    固定资本管理策略。买入数量 = 当前总资产 / capital
+  
     :param float capital: 固定资本单位
     :return: 资金管理策略实例)");
 
