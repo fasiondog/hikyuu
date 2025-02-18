@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * @brief 创建资产组合
+ * @brief 无资金分配算法的投资组合
  * @details
  * <pre>
  * 调仓模式 adjust_mode 说明：
@@ -29,14 +29,13 @@ namespace hku {
  *    将会顺延至当前周期内的第一个交易日，如指定每月第1日调仓，但当月1日不是交易日，则将顺延至当月
  *    的第一个交易日
  * </pre>
- * @note
- * 由于各个组件可能存在参数变化的情况，无法自动感知判断是否需要重新计算，此时需要手工指定强制计算
+ * @note 无资金分配算法模式下，仅支持全部在开盘时买卖或全部在收盘时买卖！
  * @param tm 交易账户
  * @param se 系统选择器
  * @param adjust_cycle 调仓周期（受 adjust_mode 影响）, 默认为1
  * @param adjust_mode 调仓模式 "query" | "day" | "week" | "month" | "year"
  * @param delay_to_trading_day true 时，如果当日不是交易日将会被顺延至当前周期内的第一个交易日
- * @param trade_on_close true 时，在无资金分配算法时，在收盘时执行交易
+ * @param trade_on_close 在收盘时执行交易
  * @param sys_use_self_tm 使用原型系统自身交易账户进行计算（仅在无资金分配模式下有效），默认 false
  * @return 组合实例
  */

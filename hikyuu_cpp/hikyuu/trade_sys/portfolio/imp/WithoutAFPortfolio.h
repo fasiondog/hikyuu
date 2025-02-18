@@ -14,7 +14,7 @@
 namespace hku {
 
 /*
- * 资产组合
+ * 无资金分配算法的资产组合
  * @ingroup WithoutAFPortfolio
  */
 class HKU_API WithoutAFPortfolio : public Portfolio {
