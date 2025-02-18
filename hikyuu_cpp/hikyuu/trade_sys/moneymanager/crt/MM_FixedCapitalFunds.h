@@ -1,8 +1,8 @@
 /*
- * MM_FixedCapital.h
+ *  Copyright (c) 2025 hikyuu.org
  *
- *  Created on: 2016年5月3日
- *      Author: Administrator
+ *  Created on: 2025-02-19
+ *      Author: fasiondog
  */
 
 #pragma once

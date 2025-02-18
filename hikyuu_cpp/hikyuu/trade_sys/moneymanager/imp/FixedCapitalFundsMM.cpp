@@ -33,7 +33,7 @@ double FixedCapitalFundsMM ::_getBuyNumber(const Datetime& datetime, const Stock
     return funds.total_assets() / capital;
 }
 
-MoneyManagerPtr HKU_API MM_FixedCapitalFundsFunds(double capital) {
+MoneyManagerPtr HKU_API MM_FixedCapitalFunds(double capital) {
     MoneyManagerPtr p = make_shared<FixedCapitalFundsMM>();
     p->setParam<double>("capital", capital);
     return p;

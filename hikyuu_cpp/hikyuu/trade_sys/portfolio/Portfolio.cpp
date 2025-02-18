@@ -170,9 +170,9 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
 
     // 跟踪打印当前账户资产
     if (trace) {
-        auto funds = m_tm->getFunds(date, m_query.kType());
-        HKU_INFO("[PF] current cash: {:<.2f}, market value: {:<.2f}", funds.cash,
-                 funds.market_value);
+        FundsRecord funds = m_tm->getFunds(date, m_query.kType());
+        HKU_INFO("[PF] total asset: {:.2f}, current cash: {:<.2f}, market value: {:<.2f}",
+                 funds.total_assets(), funds.cash, funds.market_value);
     }
 }
 
