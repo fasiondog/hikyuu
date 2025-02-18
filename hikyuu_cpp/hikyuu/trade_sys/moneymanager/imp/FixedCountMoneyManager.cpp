@@ -26,8 +26,8 @@ void FixedCountMoneyManager::_checkParam(const string& name) const {
     }
 }
 
-double FixedCountMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-                                              price_t price, price_t risk, SystemPart from) {
+double FixedCountMoneyManager::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+                                             price_t price, price_t risk, SystemPart from) {
     return getParam<double>("n");
 }
 

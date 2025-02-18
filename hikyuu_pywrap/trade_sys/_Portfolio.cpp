@@ -105,8 +105,8 @@ void export_Portfolio(py::module& m) {
       "PF_WithoutAF", PF_WithoutAF, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
       py::arg("adjust_cycle") = 1, py::arg("adjust_mode") = "query",
       py::arg("delay_to_trading_day") = true, py::arg("trade_on_close") = true,
-      py::arg("sys_use_self_tm") = false,
-      R"(PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False])
+      py::arg("sys_use_self_tm") = false, py::arg("sell_at_not_selected") = false,
+      R"(PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False,sell_at_not_selected=False])
     
     创建无资金分配算法的投资组合，所有单系统策略使用共同的 tm 管理账户
 
@@ -126,5 +126,6 @@ void export_Portfolio(py::module& m) {
     :param str adjust_mode: 调仓模式
     :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
     :param bool trade_on_close: 交易是否在收盘时进行
-    :param bool sys_use_self_tm: 原型系统使用自身附带的tm进行计算)");
+    :param bool sys_use_self_tm: 原型系统使用自身附带的tm进行计算
+    :param bool sell_at_not_selected: 调仓日未选中的股票是否强制卖出)");
 }

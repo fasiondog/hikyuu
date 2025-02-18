@@ -54,8 +54,8 @@ void WithoutAFPortfolio::_readyForRun() {
         SystemPtr& pro_sys = pro_sys_list[i];
         if (pro_sys) {
             auto sys = pro_sys->clone();
-            sys->setParam<bool>("buy_delay", trade_on_close);
-            sys->setParam<bool>("sell_delay", trade_on_close);
+            sys->setParam<bool>("buy_delay", !trade_on_close);
+            sys->setParam<bool>("sell_delay", !trade_on_close);
             sys->setParam<bool>("shared_tm", true);
 
             auto se_sys = sys->clone();
@@ -73,8 +73,8 @@ void WithoutAFPortfolio::_readyForRun() {
             KData k = sys->getStock().getKData(m_query);
             se_sys->readyForRun();
             se_sys->setTO(k);
-            // se_sys->setParam<bool>("trace", true);
 
+            sys->setParam<bool>("trace", true);
             sys->setTM(m_tm);
             string sys_name = fmt::format("{}_{}_{}", sys->name(), sys->getStock().market_code(),
                                           sys->getStock().name());
@@ -181,6 +181,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
             auto sg = sys->getSG();
             sg->startCycle(date, nextCycle);
         }
+
         //----------------------------------------------------------------------------
         // 依次执行运行中所有系统
         //----------------------------------------------------------------------------
@@ -299,13 +300,15 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
 
 PortfolioPtr HKU_API PF_WithoutAF(const TMPtr& tm, const SEPtr& se, int adjust_cycle,
                                   const string& adjust_mode, bool delay_to_trading_day,
-                                  bool trade_on_close, bool sys_use_self_tm) {
+                                  bool trade_on_close, bool sys_use_self_tm,
+                                  bool sell_at_not_selected) {
     PortfolioPtr ret = make_shared<WithoutAFPortfolio>(tm, se);
     ret->setParam<int>("adjust_cycle", adjust_cycle);
     ret->setParam<string>("adjust_mode", adjust_mode);
     ret->setParam<bool>("delay_to_trading_day", delay_to_trading_day);
     ret->setParam<bool>("trade_on_close", trade_on_close);
     ret->setParam<bool>("sys_use_self_tm", sys_use_self_tm);
+    ret->setParam<bool>("sell_at_not_selected", sell_at_not_selected);
     return ret;
 }
 

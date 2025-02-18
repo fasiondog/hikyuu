@@ -164,9 +164,16 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
     _runMoment(date, nextCycle, adjust);
 
     //----------------------------------------------------------------------
-    // 跟踪打印持仓情况
+    // 跟踪打印各运行中子系统持仓情况
     //----------------------------------------------------------------------
     traceMomentTM(date);
+
+    // 跟踪打印当前账户资产
+    if (trace) {
+        auto funds = m_tm->getFunds(date, m_query.kType());
+        HKU_INFO("[PF] current cash: {:<.2f}, market value: {:<.2f}", funds.cash,
+                 funds.market_value);
+    }
 }
 
 void Portfolio::run(const KQuery& query, bool force) {

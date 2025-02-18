@@ -655,15 +655,21 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     price_t stoploss = _getStoplossPrice(today, src_today, today.closePrice);
 
     // 如果计划的价格已经小于等于止损价，放弃交易
+    bool trace = getParam<bool>("trace");
     if (planPrice <= stoploss) {
+        HKU_INFO_IF(trace, "[{}] buy failed, planPrice: {} <= stoploss: {}", name(), planPrice,
+                    stoploss);
         return result;
     }
 
     // 获取可买入数量
     double number = _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, from);
     double min_num = m_stock.minTradeNumber();
+    HKU_ASSERT(min_num != 0.0);
     number = int64_t(number / min_num) * min_num;
-    if (number == 0 || number > m_stock.maxTradeNumber()) {
+    if (iszero(number) || number > m_stock.maxTradeNumber()) {
+        HKU_INFO_IF(trace, "[{}] buy failed, number: {} == 0 or > maxTradeNumber: {}, {}", name(),
+                    number, m_stock.maxTradeNumber(), m_mm);
         return result;
     }
 
@@ -672,6 +678,7 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     TradeRecord record =
       m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_BUY != record.business) {
+        HKU_INFO_IF(trace, "[{}] buy failed, {}", name(), record);
         return result;
     }
 

@@ -37,12 +37,13 @@ namespace hku {
  * @param delay_to_trading_day true 时，如果当日不是交易日将会被顺延至当前周期内的第一个交易日
  * @param trade_on_close 在收盘时执行交易
  * @param sys_use_self_tm 使用原型系统自身交易账户进行计算（仅在无资金分配模式下有效），默认 false
+ * @param sell_at_not_selected 调仓日未选中的股票是否强制卖出，默认 false
  * @return 组合实例
  */
 PortfolioPtr HKU_API PF_WithoutAF(const TMPtr& tm = TradeManagerPtr(), const SEPtr& se = SE_Fixed(),
                                   int adjust_cycle = 1, const string& adjust_mode = "query",
                                   bool delay_to_trading_day = true, bool trade_on_close = true,
-                                  bool sys_use_self_tm = false);
+                                  bool sys_use_self_tm = false, bool sell_at_not_selected = false);
 
 } /* namespace hku */
 
