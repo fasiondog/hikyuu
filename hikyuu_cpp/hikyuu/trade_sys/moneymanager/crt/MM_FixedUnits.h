@@ -13,6 +13,12 @@
 
 namespace hku {
 
+/**
+ * 固定单位资金管理策略
+ * 公式: 买入数量 = 当前现金 / n / 当前风险risk
+ * @param n
+ * @return MoneyManagerPtr
+ */
 MoneyManagerPtr HKU_API MM_FixedUnits(int n = 33);
 
 }  // namespace hku
