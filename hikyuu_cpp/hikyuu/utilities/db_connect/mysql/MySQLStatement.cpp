@@ -30,7 +30,7 @@ MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_sta
   m_meta_result(nullptr),
   m_needs_reset(false),
   m_has_bind_result(false) {
-    MySQLConnect* connect = dynamic_cast<MySQLConnect*>(driver);
+    const MySQLConnect* connect = dynamic_cast<MySQLConnect*>(driver);
     HKU_CHECK(connect, "Failed create statement: {}! Failed dynamic_cast<MySQLConnect*>!",
               sql_statement);
 

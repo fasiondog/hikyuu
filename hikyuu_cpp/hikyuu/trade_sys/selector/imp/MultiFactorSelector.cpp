@@ -15,9 +15,9 @@ BOOST_CLASS_EXPORT(hku::MultiFactorSelector)
 namespace hku {
 
 MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
-    // 只选择发出买入信号的系统，此时选中的系统会变成资产平均分配，参考 AF 参数：ignore_zero_weight
-    setParam<bool>("only_should_buy", false);
-    setParam<bool>("ignore_null", true);  // 是否忽略 MF 中 score 值为 nan 的证券
+    setParam<bool>("only_should_buy", false);  // 只选择同时发出买入信号的系统
+    setParam<bool>("ignore_null", true);       // 忽略 MF 中 score 值为 nan 的证券
+    setParam<bool>("ignore_le_zero", false);   // 忽略 MF 中 score 值小于等于 0 的证券
     setParam<int>("topn", 10);
     setParam<bool>("reverse", false);  // 逆序，此时 topn 代表最末尾的几个，相当于按最低值排序
     setParam<int>("ic_n", 5);
@@ -32,6 +32,7 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     HKU_CHECK(mf, "mf is null!");
     setParam<bool>("only_should_buy", false);
     setParam<bool>("ignore_null", true);
+    setParam<bool>("ignore_le_zero", false);
     setParam<int>("topn", topn);
     setParam<bool>("reverse", false);
 
@@ -80,56 +81,98 @@ bool MultiFactorSelector::isMatchAF(const AFPtr& af) {
     return true;
 }
 
+ScoreRecordList MultiFactorSelector::filterOnlyShouldBuy(Datetime date,
+                                                         const ScoreRecordList& scores,
+                                                         size_t topn) {
+    ScoreRecordList ret;
+    size_t i = 0, cnt = 0, total = scores.size();
+    while (i < total && cnt < topn) {
+        auto const& sc = scores[i];
+        auto sys = m_stk_sys_dict[sc.stock];
+        if (sys->getSG()->shouldBuy(date)) {
+            ret.emplace_back(sc);
+            cnt++;
+        }
+        i++;
+    }
+    return ret;
+}
+
+ScoreRecordList MultiFactorSelector::filterTopNReverse(Datetime date,
+                                                       const ScoreRecordList& raw_scores,
+                                                       size_t topn, bool only_should_buy,
+                                                       bool ignore_null) {
+    ScoreRecordList scores;
+    auto iter = raw_scores.rbegin();
+    for (size_t count = 0; count < topn && iter != raw_scores.rend(); ++iter) {
+        if (!std::isnan(iter->value)) {
+            scores.emplace_back(*iter);
+            count++;
+        }
+    }
+    if (scores.size() < topn && !ignore_null) {
+        size_t lack = topn - scores.size();
+        iter = raw_scores.rbegin();
+        for (size_t count = 0; count < lack && iter != raw_scores.rend(); ++iter) {
+            if (std::isnan(iter->value)) {
+                scores.emplace_back(*iter);
+                count++;
+            } else {
+                break;
+            }
+        }
+    }
+    if (only_should_buy) {
+        scores = filterOnlyShouldBuy(date, scores, topn);
+    }
+
+    return scores;
+}
+
+ScoreRecordList MultiFactorSelector::filterTopN(Datetime date, const ScoreRecordList& raw_scores,
+                                                size_t topn, bool only_should_buy) {
+    ScoreRecordList scores;
+    if (only_should_buy) {
+        scores = filterOnlyShouldBuy(date, raw_scores, topn);
+    } else {
+        scores.assign(raw_scores.begin(), raw_scores.begin() + std::min(topn, raw_scores.size()));
+    }
+    return scores;
+}
+
 SystemWeightList MultiFactorSelector::getSelected(Datetime date) {
-    SystemWeightList ret;
-    int topn = getParam<int>("topn");
-    if (topn <= 0) {
-        topn = std::numeric_limits<int>::max();
+    bool ignore_null = getParam<bool>("ignore_null");
+    bool ignore_le_zero = getParam<bool>("ignore_le_zero");
+    bool only_should_buy = getParam<bool>("only_should_buy");
+    bool reverse = getParam<bool>("reverse");
+
+    ScoreRecordList raw_scores = m_mf->getScores(date);
+    raw_scores.erase(std::remove_if(raw_scores.begin(), raw_scores.end(),
+                                    [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
+                                        return (ignore_null && std::isnan(sc.value)) ||
+                                               (ignore_le_zero && sc.value <= 0.0);
+                                    }),
+                     raw_scores.end());
+
+    int param_topn = getParam<int>("topn");
+    size_t topn = param_topn > 0 ? static_cast<size_t>(param_topn) : raw_scores.size();
+    if (topn > raw_scores.size()) {
+        topn = raw_scores.size();
     }
 
     ScoreRecordList scores;
-    if (!getParam<bool>("reverse")) {
-        if (getParam<bool>("ignore_null")) {
-            scores = m_mf->getScores(date, 0, topn,
-                                     [](const ScoreRecord& sc) { return !std::isnan(sc.value); });
-        } else {
-            scores = m_mf->getScores(date, 0, topn);
-        }
+    if (!reverse) {
+        // 正序排列
+        scores = filterTopN(date, raw_scores, topn, only_should_buy);
+
     } else {
-        ScoreRecordList raw_scores = m_mf->getScores(date);
-        auto iter = raw_scores.rbegin();
-        for (size_t count = 0; count < topn && iter != raw_scores.rend(); ++iter) {
-            if (!std::isnan(iter->value)) {
-                scores.emplace_back(*iter);
-                count++;
-            }
-        }
-        if (scores.size() < topn && !getParam<bool>("ignore_null")) {
-            size_t lack = topn - scores.size();
-            iter = raw_scores.rbegin();
-            for (size_t count = 0; count < lack && iter != raw_scores.rend(); ++iter) {
-                if (std::isnan(iter->value)) {
-                    scores.emplace_back(*iter);
-                    count++;
-                } else {
-                    break;
-                }
-            }
-        }
+        // 倒序排列
+        scores = filterTopNReverse(date, raw_scores, topn, only_should_buy, ignore_null);
     }
 
-    if (getParam<bool>("only_should_buy")) {
-        for (const auto& sc : scores) {
-            auto sys = m_stk_sys_dict[sc.stock];
-            if (sys->getSG()->shouldBuy(date)) {
-                ret.emplace_back(sys, sc.value);
-            }
-        }
-
-    } else {
-        for (const auto& sc : scores) {
-            ret.emplace_back(m_stk_sys_dict[sc.stock], sc.value);
-        }
+    SystemWeightList ret;
+    for (const auto& sc : scores) {
+        ret.emplace_back(m_stk_sys_dict[sc.stock], sc.value);
     }
     return ret;
 }
@@ -174,7 +217,7 @@ void MultiFactorSelector::_calculate() {
     }
 
     for (const auto& sys : m_real_sys_list) {
-        m_stk_sys_dict[sys->getStock()] = sys;
+        m_stk_sys_dict.insert({sys->getStock(), sys});
     }
 }
 

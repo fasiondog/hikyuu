@@ -77,7 +77,23 @@ def search_best_tdx():
         res = executor.map(ping2, hosts, timeout=2)
     x = [i for i in res if i[0] == True]
     x.sort(key=lambda item: item[1])
-    return x
+
+    # 校验 host 是否存在错误，取同样数据，相同结果最多的集合
+    values = {}
+    for host in x:
+        api = TdxHq_API(multithread=False)
+        if api.connect(host[2], host[3]):
+            x = api.get_security_bars(9, 0, '159915', 0, 1)
+            if x and len(x) > 0:
+                if x[0]['close'] not in values:
+                    values[x[0]['close']] = [host]
+                else:
+                    values[x[0]['close']].append(host)
+    ret = []
+    for _, host in values.items():
+        if len(host) > len(ret):
+            ret = host
+    return ret
 
 
 def pytdx_get_day_trans(api, pymarket, code, date):

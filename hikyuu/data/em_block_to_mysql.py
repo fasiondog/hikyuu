@@ -93,7 +93,7 @@ def em_import_block_to_mysql(connect, code_market_dict, categorys=('行业板块
 
     connect.commit()
     cur.close()
-    pass
+    return len(insert_records)
 
 
 if __name__ == "__main__":

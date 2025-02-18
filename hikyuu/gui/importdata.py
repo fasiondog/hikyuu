@@ -3,15 +3,12 @@
 # cp936
 
 import os.path
-import sys
+import sys, time
 from configparser import ConfigParser
-
-from PyQt5.Qt import QCoreApplication
 
 from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 from hikyuu.data.common_pytdx import search_best_tdx
 
-from hikyuu.gui.data.EscapetimeThread import EscapetimeThread
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 
@@ -31,19 +28,25 @@ class HKUImportDataCMD:
         return import_config
 
     def initThreads(self):
-        self.escape_time_thread = None
         self.hdf5_import_thread = None
         self.mysql_import_thread = None
         self.import_running = False
         self.progress = {'DAY': 0, '1MIN': 0, '5MIN': 0, 'TRANS': 0, 'TIME': 0}
         self.info_type = {'DAY': '日线数据', '1MIN': '一分钟线', '5MIN': '五分钟线', 'TRANS': '历史分笔', 'TIME': '分时数据'}
-        self.escape_time = 0.0
+        self.start_import_time = time.time()
         self.details = []
+
+    def time_escaped(self, unit='min'):
+        if unit.lower() == 'min':
+            return (time.time() - self.start_import_time) / 60
+        if unit.lower() == 'hour':
+            return (time.time() - self.start_import_time) / 3600
+        return time.time() - self.start_import_time
 
     def print_progress(self, ktype, progress):
         if progress != self.progress[ktype]:
             print(
-                'import progress: {}%  - {} - 已耗时 {:>.2f} 分钟'.format(progress, self.info_type[ktype], self.escape_time)
+                'import progress: {}%  - {} - 已耗时 {:>.2f} 分钟'.format(progress, self.info_type[ktype], self.time_escaped())
             )
             self.progress[ktype] = progress
 
@@ -53,10 +56,7 @@ class HKUImportDataCMD:
             return
 
         msg_name, msg_task_name = msg[:2]
-        if msg_name == 'ESCAPE_TIME':
-            self.escape_time = msg_task_name / 60
-
-        elif msg_name == 'HDF5_IMPORT':
+        if msg_name == 'HDF5_IMPORT':
             if msg_task_name == 'INFO':
                 print(msg[2])
 
@@ -64,18 +64,13 @@ class HKUImportDataCMD:
                 status = msg[2]
                 if status == 'FAILURE':
                     self.details.append(msg[3])
-                self.hdf5_import_thread.terminate()
-                self.hdf5_import_thread = None
-                self.escape_time_thread.stop()
-                self.escape_time_thread = None
-                print("\n导入完毕, 共耗时 {:>.2f} 分钟".format(self.escape_time))
+                print("\n导入完毕, 共耗时 {:>.2f} 分钟".format(self.time_escaped()))
                 print('\n=========================================================')
                 print("导入详情:")
                 for info in self.details:
                     print(info)
                 print('=========================================================')
                 self.import_running = False
-                QCoreApplication.quit()
 
             elif msg_task_name == 'IMPORT_KDATA':
                 ktype, progress = msg[2:4]
@@ -139,7 +134,6 @@ class HKUImportDataCMD:
         self.import_running = True
 
         print("正在启动任务....")
-        QCoreApplication.processEvents()
 
         if config.getboolean('tdx', 'enable'):
             self.hdf5_import_thread = UseTdxImportToH5Thread(None, config)
@@ -147,19 +141,12 @@ class HKUImportDataCMD:
             self.hdf5_import_thread = UsePytdxImportToH5Thread(None, config)
 
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
-        self.hdf5_import_thread.start()
-
-        self.escape_time = 0.0
-        self.escape_time_thread = EscapetimeThread()
-        self.escape_time_thread.message.connect(self.on_message_from_thread)
-        self.escape_time_thread.start()
+        self.hdf5_import_thread.run()
 
 
 def main():
-    app = QCoreApplication(sys.argv)
     x = HKUImportDataCMD()
     x.start_import_data()
-    sys.exit(app.exec())
 
 
 if __name__ == '__main__':
