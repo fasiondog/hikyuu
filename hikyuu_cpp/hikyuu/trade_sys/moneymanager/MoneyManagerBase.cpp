@@ -48,21 +48,10 @@ void MoneyManagerBase::baseCheckParam(const string& name) const {
 
 void MoneyManagerBase::paramChanged() {}
 
-void MoneyManagerBase::buyNotify(const TradeRecord& tr) {
-    m_buyCount++;
-    m_sellCount = 0;
-    _buyNotify(tr);
-}
-
-void MoneyManagerBase::sellNotify(const TradeRecord& tr) {
-    m_sellCount++;
-    m_buyCount = 0;
-    _sellNotify(tr);
-}
-
 void MoneyManagerBase::reset() {
     m_query = Null<KQuery>();
     m_tm.reset();
+    m_buy_sell_counts.clear();
     _reset();
 }
 
@@ -82,8 +71,9 @@ MoneyManagerPtr MoneyManagerBase::clone() {
 
     p->m_params = m_params;
     p->m_name = m_name;
-    // p->m_tm = m_tm;
+    p->m_tm = m_tm;
     p->m_query = m_query;
+    p->m_buy_sell_counts = m_buy_sell_counts;
     return p;
 }
 
@@ -200,6 +190,38 @@ double MoneyManagerBase::_getBuyShortNumber(const Datetime& datetime, const Stoc
                                             price_t price, price_t risk, SystemPart from) {
     // 默认全部平仓
     return MAX_DOUBLE;
+}
+
+size_t MoneyManagerBase::currentBuyCount(const Stock& stk) const {
+    const auto iter = m_buy_sell_counts.find(stk);
+    return iter == m_buy_sell_counts.cend() ? 0 : iter->second.first;
+}
+
+size_t MoneyManagerBase::currentSellCount(const Stock& stk) const {
+    const auto iter = m_buy_sell_counts.find(stk);
+    return iter == m_buy_sell_counts.cend() ? 0 : iter->second.second;
+}
+
+void MoneyManagerBase::buyNotify(const TradeRecord& tr) {
+    auto iter = m_buy_sell_counts.find(tr.stock);
+    if (iter == m_buy_sell_counts.end()) {
+        m_buy_sell_counts[tr.stock] = std::make_pair<size_t, size_t>(1, 0);
+    } else {
+        iter->second.first++;
+        iter->second.second = 0;
+    }
+    _buyNotify(tr);
+}
+
+void MoneyManagerBase::sellNotify(const TradeRecord& tr) {
+    auto iter = m_buy_sell_counts.find(tr.stock);
+    if (iter == m_buy_sell_counts.end()) {
+        m_buy_sell_counts[tr.stock] = std::make_pair<size_t, size_t>(0, 1);
+    } else {
+        iter->second.first = 0;
+        iter->second.second++;
+    }
+    _sellNotify(tr);
 }
 
 } /* namespace hku */

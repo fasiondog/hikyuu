@@ -91,10 +91,9 @@ void export_MoneyManager(py::module& m) {
                     "设置或获取交易管理对象")
       .def_property("query", &MoneyManagerBase::getQuery, &MoneyManagerBase::setQuery,
                     py::return_value_policy::copy, "设置或获取查询条件")
-      .def_property_readonly("current_buy_count", &MoneyManagerBase::currentBuyCount,
-                             "当前连续买入计数")
-      .def_property_readonly("current_sell_count", &MoneyManagerBase::currentSellCount,
-                             "当前连续卖出计数")
+
+      .def("current_buy_count", &MoneyManagerBase::currentBuyCount, "当前连续买入计数")
+      .def("current_sell_count", &MoneyManagerBase::currentSellCount, "当前连续卖出计数")
 
       .def("get_param", &MoneyManagerBase::getParam<boost::any>, R"(get_param(self, name)
 
