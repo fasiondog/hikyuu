@@ -90,20 +90,23 @@ void WithoutAFPortfolio::_readyForRun() {
 
 void WithoutAFPortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
     if (getParam<bool>("sell_at_not_selected")) {
-        _runMomentWithoutAFNotForceSell(date, nextCycle, adjust);
-    } else {
         _runMomentWithoutAFForceSell(date, nextCycle, adjust);
+    } else {
+        _runMomentWithoutAFNotForceSell(date, nextCycle, adjust);
     }
 }
 
 void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
                                                          const Datetime& nextCycle, bool adjust) {
+    // m_force_sell_sys_list 此处用于缓存本轮未选中但仍在运行中的系统
     // 开盘时处理不在本轮选中系统但仍在持仓的系统，如果以没有持仓则清除
+    bool trace = getParam<bool>("trace");
     for (auto iter = m_force_sell_sys_list.begin(); iter != m_force_sell_sys_list.end();) {
         auto& sys = *iter;
         auto stk = sys->getStock();
         auto num = m_tm->getHoldNumber(date, stk);
         if (iszero(num)) {
+            HKU_INFO_IF(trace, "[PF] removed system {}", sys->name());
             iter = m_force_sell_sys_list.erase(iter);
         } else {
             ++iter;
@@ -131,9 +134,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
     //---------------------------------------------------
     // 调仓日，重新选择系统池
     //---------------------------------------------------
-    bool trace = getParam<bool>("trace");
     bool trade_on_close = getParam<bool>("trade_on_close");
-
     if (adjust) {
         auto current_selected_list = m_se->getSelected(date);
         HKU_INFO_IF(trace, "[PF] current seleect system count: {}", current_selected_list.size());
@@ -157,7 +158,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
         }
 
         for (auto& sys : will_remove_sys_list) {
-            HKU_INFO_IF(trace, "[PF] remove system: {}", sys->name());
+            HKU_INFO_IF(trace, "[PF] will remove system: {}", sys->name());
             m_running_sys_set.erase(sys);
             m_running_sys_list.remove(sys);
         }
@@ -205,6 +206,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
 
 void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
                                                       const Datetime& nextCycle, bool adjust) {
+    bool trace = getParam<bool>("trace");
     // 开盘时处理强制卖出系统列表，如果以没有持仓，则从列表中删除，否则执行卖出且保留（下一交易日判断是否仍有持仓）
     for (auto iter = m_force_sell_sys_list.begin(); iter != m_force_sell_sys_list.end();) {
         auto& sys = *iter;
@@ -213,7 +215,8 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
         if (iszero(num)) {
             iter = m_force_sell_sys_list.erase(iter);
         } else {
-            auto _ = sys->sellForceOnOpen(date, num, PART_PORTFOLIO);
+            auto tr = sys->sellForceOnOpen(date, num, PART_PORTFOLIO);
+            HKU_INFO_IF(trace && !tr.isNull(), "[PF] force sell not selected sys {}", sys->name());
             ++iter;
         }
     }
@@ -231,9 +234,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
     //---------------------------------------------------
     // 调仓日，重新选择系统池
     //---------------------------------------------------
-    bool trace = getParam<bool>("trace");
     bool trade_on_close = getParam<bool>("trade_on_close");
-
     if (adjust) {
         auto current_selected_list = m_se->getSelected(date);
         HKU_INFO_IF(trace, "[PF] current seleect system count: {}", current_selected_list.size());
@@ -291,8 +292,12 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
             for (auto& sys : will_remove_sys_list) {
                 auto stk = sys->getStock();
                 auto num = m_tm->getHoldNumber(date, stk);
-                auto _ = sys->sellForceOnClose(date, num, PART_PORTFOLIO);
-                m_force_sell_sys_list.emplace_back(sys);
+                if (!iszero(num)) {
+                    auto tr = sys->sellForceOnClose(date, num, PART_PORTFOLIO);
+                    HKU_INFO_IF(trace && !tr.isNull(), "[PF] force sell not selected sys {}",
+                                sys->name());
+                    m_force_sell_sys_list.emplace_back(sys);
+                }
             }
         }
     }
