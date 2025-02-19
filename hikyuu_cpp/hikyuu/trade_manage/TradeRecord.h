@@ -78,7 +78,7 @@ public:
     CostRecord cost;    ///< 交易成本
     price_t stoploss;   ///< 止损价
     price_t cash;       ///< 现金余额
-    SystemPart from;  ///< 辅助记录交易系统部件，区别是哪个部件发出的指示，Null<int>()表示无效
+    SystemPart from;    ///< 辅助记录交易系统部件，区别是哪个部件发出的指示，Null<int>()表示无效
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -140,6 +140,10 @@ typedef vector<TradeRecord> TradeRecordList;
 HKU_API std::ostream& operator<<(std::ostream&, const TradeRecord&);
 
 bool HKU_API operator==(const TradeRecord& d1, const TradeRecord& d2);
+
+inline bool operator!=(const TradeRecord& d1, const TradeRecord& d2) {
+    return !(d1 == d2);
+}
 
 } /* namespace hku */
 

@@ -126,9 +126,9 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
 
     double n = _getBuyNumber(datetime, stock, price, risk, from);
     double min_trade = stock.minTradeNumber();
-    HKU_TRACE_IF_RETURN(n < min_trade, 0.0,
-                        "Ignore! Is less than the minimum number of transactions({:<.4f}<{}) {}", n,
-                        min_trade, stock.market_code());
+    HKU_WARN_IF_RETURN(n < min_trade, 0.0,
+                       "Ignore! Is less than the minimum number of transactions({:<.4f}<{}) {}", n,
+                       min_trade, stock.market_code());
 
     // 转换为最小交易量的整数倍
     n = int64_t(n / min_trade) * min_trade;
@@ -155,7 +155,9 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
             cost = m_tm->getBuyCost(datetime, stock, price, n);
             need_cash = n * price + cost.total;
         }
-        n = need_cash > current_cash ? 0 : n;
+        if (need_cash > current_cash) {
+            n = 0.0;
+        }
     }
 
     return n;
