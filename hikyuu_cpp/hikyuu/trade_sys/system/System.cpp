@@ -99,8 +99,8 @@ void System::initParam() {
 
     // 延迟操作的情况下，是使用当前的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
     setParam<bool>("delay_use_current_price", true);
-    setParam<bool>("tp_monotonic", true);  // 止赢单调递增
-    setParam<int>("tp_delay_n", 1);        // 止赢延迟判断天数
+    setParam<bool>("tp_monotonic", true);     // 止赢单调递增
+    setParam<int>("tp_delay_n", 1);           // 止赢延迟判断天数
     setParam<bool>("ignore_sell_sg", false);  // 忽略卖出信号，只使用止损/止赢等其他方式卖出
 
     // 最高价等于最低价时，是否可进行交易
@@ -655,15 +655,21 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     price_t stoploss = _getStoplossPrice(today, src_today, today.closePrice);
 
     // 如果计划的价格已经小于等于止损价，放弃交易
+    bool trace = getParam<bool>("trace");
     if (planPrice <= stoploss) {
+        HKU_INFO_IF(trace, "[{}] buy failed, planPrice: {} <= stoploss: {}", name(), planPrice,
+                    stoploss);
         return result;
     }
 
     // 获取可买入数量
     double number = _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, from);
     double min_num = m_stock.minTradeNumber();
+    HKU_ASSERT(min_num != 0.0);
     number = int64_t(number / min_num) * min_num;
-    if (number == 0 || number > m_stock.maxTradeNumber()) {
+    if (iszero(number) || number > m_stock.maxTradeNumber()) {
+        HKU_INFO_IF(trace, "[{}] buy failed, number: {} == 0 or > maxTradeNumber: {}, {}", name(),
+                    number, m_stock.maxTradeNumber(), m_mm);
         return result;
     }
 
@@ -672,6 +678,7 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     TradeRecord record =
       m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_BUY != record.business) {
+        HKU_INFO_IF(trace, "[{}] buy failed, {}", name(), record);
         return result;
     }
 
@@ -789,6 +796,8 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
     record =
       m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss, position.goalPrice,
                  on_open ? src_krecord.openPrice : src_krecord.closePrice, from);
+    HKU_WARN_IF_RETURN(record == Null<TradeRecord>(), record, "[{}] Failed force sell {} by {}",
+                       name(), num, getSystemPartName(from));
 
     // 如果已未持仓，最后的止赢价初始为0
     if (!m_tm->have(m_stock)) {

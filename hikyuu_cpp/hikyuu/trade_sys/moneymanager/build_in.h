@@ -13,7 +13,9 @@
 #include "crt/MM_FixedPercent.h"
 #include "crt/MM_FixedRisk.h"
 #include "crt/MM_FixedCapital.h"
+#include "crt/MM_FixedCapitalFunds.h"
 #include "crt/MM_FixedCount.h"
+#include "crt/MM_FixedCountTps.h"
 #include "crt/MM_FixedUnits.h"
 #include "crt/MM_WilliamsFixedRisk.h"
 
