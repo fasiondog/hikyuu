@@ -91,10 +91,9 @@ void export_MoneyManager(py::module& m) {
                     "设置或获取交易管理对象")
       .def_property("query", &MoneyManagerBase::getQuery, &MoneyManagerBase::setQuery,
                     py::return_value_policy::copy, "设置或获取查询条件")
-      .def_property_readonly("current_buy_count", &MoneyManagerBase::currentBuyCount,
-                             "当前连续买入计数")
-      .def_property_readonly("current_sell_count", &MoneyManagerBase::currentSellCount,
-                             "当前连续卖出计数")
+
+      .def("current_buy_count", &MoneyManagerBase::currentBuyCount, "当前连续买入计数")
+      .def("current_sell_count", &MoneyManagerBase::currentSellCount, "当前连续卖出计数")
 
       .def("get_param", &MoneyManagerBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -249,5 +248,14 @@ void export_MoneyManager(py::module& m) {
 
     :param float p: 风险百分比
     :param float max_loss: 最大损失
+    :return: 资金管理策略实例)");
+
+    m.def("MM_FixedCountTps", MM_FixedCountTps, py::arg("buy_counts"), py::arg("sell_counts"),
+          R"(MM_FixedCountTps([buy_counts, sell_counts])
+          
+    连续买入/卖出固定数量资金管理策略。
+    
+    :param list buy_counts: 买入数量列表
+    :param list sell_counts: 卖出数量列表
     :return: 资金管理策略实例)");
 }
