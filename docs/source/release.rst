@@ -1,7 +1,7 @@
 版本发布说明
 =======================
 
-2.x.x - 
+2.5.0 - 2025年2月20日
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. 新增特性
@@ -31,7 +31,7 @@
     - fixed pyecharts 绘图 dataZoom opts issure
     - fixed DMA python 导出 fill_null 默认参数
     - fixed parallelIndexRange
-    - fix: 修复demo2自定义资金管理获取卖出数量未被调用问题
+    - fixed 修复demo2自定义资金管理获取卖出数量未被调用问题
     - fixed IDma result_num
     - fixed compile for serialize=n
     - fixed Parameter python <--> c++ 互转
