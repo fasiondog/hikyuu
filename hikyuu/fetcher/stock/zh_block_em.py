@@ -158,7 +158,7 @@ def get_all_dybk_info(code_market_dict, sep=""):
         stk_json = r.json()
         stk_json = stk_json["data"]["diff"]
         ret[blk_name] = [
-            f"{code_market_dict[v["f12"]]}{sep}{v["f12"]}" for v in stk_json if v["f12"] in code_market_dict]
+            f"{code_market_dict[v['f12']]}{sep}{v['f12']}" for v in stk_json if v['f12'] in code_market_dict]
 
         total_page = math.ceil(data["data"]["total"] / 200)
         for page in range(2, total_page + 1):
