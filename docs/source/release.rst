@@ -1,6 +1,47 @@
 版本发布说明
 =======================
 
+2.x.x - 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. 新增特性
+    - 新增指标 WINNER/INBLOCK/DISCARD/LASTVALUE(CONST)/CYCLE/JUMPUP/JUMPDOWN
+    - add AF_FixedWeightList
+    - SG增强，支持逻辑及四则运算SG增强，支持逻辑及四则运算(continue)
+    - 调整 MM 子类接口 buyNotify、sellNotify 为_buyNotify、_sellNotify；增加连续交易计数
+    - add MM_FixedCapitalFunds
+    - add MM_FixedCountTps
+    - PF 增加无资金分配模式,调整 PF run接口，参数在创建时指定，方便固定模板
+    - add SG_OneSide
+
+2. 功能优化
+    - HikyuuTDX 优化 增加提示信息: HDF5存储不可同时读写; 数据导入尝试对增加对服务器的校验，防止错误数据导入; 更新地域板块获取详情,优化板块导入; 添加及调整北证50指数导入
+    - 调整库加载方式, 支持直接导入库，通过 load_hikyuu 进行数据加载
+    - 改进 HSL, COST, LIUTONGPAN 指标计算
+    - 优化 INDEXC/INDEXO 等为使用对应的大盘指数
+    - HSL换手率结果调整为比例, 如需要百分比, 需自行乘以100
+    - STICKLINE width 参数类型改为 float
+    - 优化 TradeManager.tocsv, 如果列数长度不一致，有些软件无法正常显示csv
+    - Stock 增加 getTradingCalendar 便捷方法，根据自身所属市场获取市场交易日历
+    - MF_MultiFactor 增加 ignore_le_zero 参数
+    - AF添加公共参数ignore_se_score_is_null, ignore_se_score_lt_zero
+    - 优化 SE_MultiFactor 调整 only_should_buy 只选择同时存在买入信号的参与排序
+
+3. 缺陷修复
+    - fixed: the importdata can not stop automatically after task finished!
+    - fixed pyecharts 绘图 dataZoom opts issure
+    - fixed DMA python 导出 fill_null 默认参数
+    - fixed parallelIndexRange
+    - fix: 修复demo2自定义资金管理获取卖出数量未被调用问题
+    - fixed IDma result_num
+    - fixed compile for serialize=n
+    - fixed Parameter python <--> c++ 互转
+    - fixed ST_Indicator 取消 OP 后遗留未调整修改部分
+    - fixed DRAWIMG 添加 nan 保护
+    - fixed SG参数变化后重新计算时参数未生效
+    - fixed xmake.lua 查找python路径(影响 MacOsx 下编译)
+
+
 2.3.1 - 2025年1月18日
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
