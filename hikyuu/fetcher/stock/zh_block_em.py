@@ -167,7 +167,7 @@ def get_all_dybk_info(code_market_dict, sep=""):
             stk_json = r.json()
             stk_json = stk_json["data"]["diff"]
             ret[blk_name].extend(
-                [f"{code_market_dict[v["f12"]]}{sep}{v["f12"]}" for v in stk_json if v["f12"] in code_market_dict])
+                [f"{code_market_dict[v['f12']]}{sep}{v['f12']}" for v in stk_json if v["f12"] in code_market_dict])
         hku_info(f'获取地域板块{blk_name}成分: {len(ret[blk_name])}')
 
     return ret
