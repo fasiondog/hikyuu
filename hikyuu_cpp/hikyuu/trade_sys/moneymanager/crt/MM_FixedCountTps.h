@@ -13,6 +13,12 @@
 
 namespace hku {
 
+/**
+ * @brief 连续买入/卖出固定数量资金管理策略。
+ * @param buy_counts 依次买入数量
+ * @param sell_counts 依次卖出数量
+ * @return MoneyManagerPtr
+ */
 MoneyManagerPtr HKU_API MM_FixedCountTps(const vector<double>& buy_counts,
                                          const vector<double>& sell_counts);
 
