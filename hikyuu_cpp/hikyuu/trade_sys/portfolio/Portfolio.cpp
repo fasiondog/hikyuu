@@ -14,8 +14,6 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Portfolio& pf) {
-    string strip(",\n");
-    string space("  ");
     os << pf.str();
     return os;
 }
