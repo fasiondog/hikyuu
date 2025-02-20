@@ -6,22 +6,21 @@
 
 1. 新增特性
     - 新增指标 WINNER/INBLOCK/DISCARD/LASTVALUE(CONST)/CYCLE/JUMPUP/JUMPDOWN
-    - add AF_FixedWeightList
-    - SG增强，支持逻辑及四则运算SG增强，支持逻辑及四则运算(continue)
-    - 调整 MM 子类接口 buyNotify、sellNotify 为_buyNotify、_sellNotify；增加连续交易计数
-    - add MM_FixedCapitalFunds
-    - add MM_FixedCountTps
-    - PF 增加无资金分配模式,调整 PF run接口，参数在创建时指定，方便固定模板
-    - add SG_OneSide
+    - PF 增加无资金分配模式,调整 PF_WithoutAF; 同时调整了 run接口, 参数改为在创建PF时指定, 以便 hub 组件固定模板
+    - SG 增强, 支持值(强度), 加减乘除四则运算及与或逻辑运算
+    - 新增资金管理算法: MM_FixedCapitalFunds, MM_FixedCountTps
+    - 新增 SG_OneSide 单边信号，主要用于 SG 四则运算
+    - 新增 AF_FixedWeightList
 
 2. 功能优化
     - HikyuuTDX 优化 增加提示信息: HDF5存储不可同时读写; 数据导入尝试对增加对服务器的校验，防止错误数据导入; 更新地域板块获取详情,优化板块导入; 添加及调整北证50指数导入
     - 调整库加载方式, 支持直接导入库，通过 load_hikyuu 进行数据加载
+    - 调整 MM 子类接口 buyNotify、sellNotify 为_buyNotify、_sellNotify, 增加连续交易计数
     - 改进 HSL, COST, LIUTONGPAN 指标计算
     - 优化 INDEXC/INDEXO 等为使用对应的大盘指数
     - HSL换手率结果调整为比例, 如需要百分比, 需自行乘以100
     - STICKLINE width 参数类型改为 float
-    - 优化 TradeManager.tocsv, 如果列数长度不一致，有些软件无法正常显示csv
+    - 优化 TradeManager.tocsv, 如果列数长度不一致, 有些软件无法正常显示csv
     - Stock 增加 getTradingCalendar 便捷方法，根据自身所属市场获取市场交易日历
     - MF_MultiFactor 增加 ignore_le_zero 参数
     - AF添加公共参数ignore_se_score_is_null, ignore_se_score_lt_zero
