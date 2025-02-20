@@ -13,6 +13,12 @@
 
 namespace hku {
 
+/**
+ * 固定资金管理策略
+ * 公式: 买入数量 = 当前现金 / capital
+ * @param capital
+ * @return MoneyManagerPtr
+ */
 MoneyManagerPtr HKU_API MM_FixedCapital(double capital = 10000.00);
 
 } /* namespace hku */

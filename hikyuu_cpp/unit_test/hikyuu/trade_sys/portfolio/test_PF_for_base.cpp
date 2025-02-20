@@ -20,7 +20,7 @@ using namespace hku;
 /** @par 检测点 Portfolio基础操作 */
 TEST_CASE("test_PF_for_base") {
     PortfolioPtr pf = PF_Simple();
-    CHECK_EQ(pf->name(), "Portfolio");
+    CHECK_EQ(pf->name(), "PF_Simple");
 
     /** @arg 克隆操作 */
     PFPtr pf2 = pf->clone();

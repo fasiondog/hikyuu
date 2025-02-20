@@ -135,7 +135,7 @@ bool TradeRecord::isNull() const {
 }
 
 bool HKU_API operator==(const TradeRecord& d1, const TradeRecord& d2) {
-    return d1.stock == d2.stock && d1.datetime == d2.datetime && d1.business == d2.business &&
+    return d1.business == d2.business && d1.stock == d2.stock && d1.datetime == d2.datetime &&
            fabs(d1.planPrice - d2.planPrice) < 0.0001 &&
            fabs(d1.realPrice - d2.realPrice) < 0.0001 &&
            ((std::isnan(d1.goalPrice) && std::isnan(d2.goalPrice)) ||

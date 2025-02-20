@@ -207,8 +207,16 @@ void export_MoneyManager(py::module& m) {
     m.def("MM_FixedCapital", MM_FixedCapital, py::arg("capital") = 10000.00,
           R"(MM_FixedCapital([capital = 10000.0])
 
-    固定资本资金管理策略
+    固定资金管理策略。买入数量 = 当前现金 / capital
 
+    :param float capital: 固定资本单位
+    :return: 资金管理策略实例)");
+
+    m.def("MM_FixedCapitalFunds", MM_FixedCapitalFunds, py::arg("capital") = 10000.00,
+          R"(MM_FixedCapitalFunds([capital = 10000.0]) 
+
+    固定资本管理策略。买入数量 = 当前总资产 / capital
+  
     :param float capital: 固定资本单位
     :return: 资金管理策略实例)");
 
@@ -228,7 +236,7 @@ void export_MoneyManager(py::module& m) {
 
     m.def("MM_FixedUnits", MM_FixedUnits, py::arg("n") = 33, R"(MM_FixedUnits([n = 33])
 
-    固定单位资金管理策略
+    固定单位资金管理策略。公式: 买入数量 = 当前现金 / n / 当前风险risk
 
     :param int n: n个资金单位
     :return: 资金管理策略实例)");
@@ -237,5 +245,9 @@ void export_MoneyManager(py::module& m) {
           py::arg("max_loss") = 1000.0,
           R"( MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    威廉斯固定风险资金管理策略)");
+    威廉斯固定风险资金管理策略。买入数量 =（账户余额 × 风险百分比p）÷ 最大损失(max_loss)
+
+    :param float p: 风险百分比
+    :param float max_loss: 最大损失
+    :return: 资金管理策略实例)");
 }

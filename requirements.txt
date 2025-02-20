@@ -1,5 +1,5 @@
 click
-numpy<=1.26.4
+numpy
 matplotlib
 pandas>=0.17.1
 pytdx

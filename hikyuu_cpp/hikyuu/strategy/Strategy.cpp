@@ -339,8 +339,8 @@ void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& qu
     sys->run(stk, query);
 }
 
-void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
-                           const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
+void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, const OrderBrokerPtr& broker,
+                           const TradeCostPtr& costfunc,
                            const std::vector<OrderBrokerPtr>& other_brokers) {
     HKU_ASSERT(pf && broker && pf->getTM());
     HKU_ASSERT(query != Null<KQuery>());
@@ -357,7 +357,7 @@ void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycl
     auto tm = crtBrokerTM(broker, costfunc, pf->name(), other_brokers);
     tm->fetchAssetInfoFromBroker(broker);
     pf->setTM(tm);
-    pf->run(query, adjust_cycle, true);
+    pf->run(query, true);
 }
 
 void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& stklist,

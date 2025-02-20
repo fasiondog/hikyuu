@@ -5,26 +5,77 @@
 #    Author: fasiondog
 
 import requests
+import math
 import akshare as ak
+import pandas as pd
 from hikyuu.util import *
+
+
+@hku_catch(ret=[], trace=True)
+def get_hybk_names():
+    """获取所有行业(板块代码,板块名称)列表"""
+    url = "https://19.push2.eastmoney.com/api/qt/clist/get"
+    params = {
+        "pn": "1",
+        "pz": "200",
+        "po": "1",
+        "np": "1",
+        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+        "fltt": "2",
+        "invt": "2",
+        "fid": "f3",
+        "fs": "m:90 t:2 f:!50",
+        "fields": "f12,f14",
+        "_": "1626075887768",
+    }
+    r = requests.get(url, params=params, timeout=15)
+    data_json = r.json()
+    ret = [(v['f12'], v['f14']) for v in data_json["data"]["diff"]]
+    return ret
+
+
+@hku_catch(ret=[], trace=True)
+def get_hybk_cons_code(blk_code):
+    "获取指定行业板块成分代码列表"
+    url = "http://30.push2.eastmoney.com/api/qt/clist/get"
+    params = {
+        "pn": "1",
+        "pz": "200",
+        "po": "1",
+        "np": "1",
+        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+        "fltt": "2",
+        "invt": "2",
+        "fid": "f3",
+        "fs": f"b:{blk_code} f:!50",
+        "fields": "f12",
+        "_": "1626081702127",
+    }
+    r = requests.get(url, params=params, timeout=15)
+    data_json = r.json()
+    ret = [v['f12'] for v in data_json["data"]["diff"]]
+    total_page = math.ceil(data_json["data"]["total"] / 200)
+    for page in range(2, total_page + 1):
+        params["pn"] = page
+        r = requests.get(url, params=params, timeout=15)
+        data_json = r.json()
+        if data_json["data"] is None:
+            continue
+        tmp = [v['f12'] for v in data_json["data"]['diff']]
+        ret.extend(tmp)
+    return ret
 
 
 @hku_catch(ret={}, trace=True)
 def get_all_hybk_info(code_market_dict, sep=""):
     """获取所有行业板块列表"""
-    blk_names = ak.stock_board_industry_name_em()['板块名称']
+    blk_list = get_hybk_names()
     ret = {}
-    for blk_name in blk_names:
-        # print(blk_name)
-        ret[blk_name] = []
-        stk_codes = ak.stock_board_industry_cons_em(blk_name)
-        stk_codes = stk_codes['代码'].to_list()
-        for stk_code in stk_codes:
-            try:
-                ret[blk_name].append(f"{code_market_dict[stk_code]}{sep}{stk_code}")
-            except:
-                # print(stk_code)
-                pass
+    for blk in blk_list:
+        stk_codes = get_hybk_cons_code(blk[0])
+        hku_info(f"获取行业板块{blk[1]}成分: {len(stk_codes)}")
+        ret[blk[1]] = [
+            f"{code_market_dict[stk_code]}{sep}{stk_code}" for stk_code in stk_codes if stk_code in code_market_dict]
     return ret
 
 
@@ -34,26 +85,21 @@ def get_all_gnbk_info(code_market_dict, sep=""):
     blk_names = ak.stock_board_concept_name_em()['板块名称']
     ret = {}
     for blk_name in blk_names:
-        # print(blk_name)
-        ret[blk_name] = []
         stk_codes = ak.stock_board_concept_cons_em(blk_name)
         stk_codes = stk_codes['代码'].to_list()
-        for stk_code in stk_codes:
-            try:
-                ret[blk_name].append(f"{code_market_dict[stk_code]}{sep}{stk_code}")
-            except:
-                # print(stk_code)
-                pass
+        hku_info(f"获取概念板块{blk_name}成分: {len(stk_codes)}")
+        ret[blk_name] = [
+            f"{code_market_dict[stk_code]}{sep}{stk_code}" for stk_code in stk_codes if stk_code in code_market_dict]
     return ret
 
 
-@hku_catch(ret={}, trace=True)
-def get_all_dybk_info(code_market_dict, sep=""):
-    """获取所有地域板块列表"""
+@hku_catch(ret=[], trace=True)
+def get_dybk_names():
+    """获取所有地域板块名称列表"""
     url = "http://13.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "50000",
+        "pz": "200",
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -62,17 +108,32 @@ def get_all_dybk_info(code_market_dict, sep=""):
         "fid": "f3",
         "fs": "m:90+t:1+f:!50",
         "fields": "f12,f14",
-        # "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,"
-        #           "f136,f115,f152",
         "_": "1623833739532",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, timeout=15)
     data_json = r.json()
-    data_json = data_json["data"]["diff"]
+    hku_check(data_json['data'] is not None, "获取地域板块名称列表失败!")
+    ret = [(v["f12"], v["f14"]) for v in data_json["data"]["diff"]]
 
+    total_page = math.ceil(data_json["data"]["total"] / 200)
+    for page in range(2, total_page + 1):
+        params["pn"] = page
+        r = requests.get(url, params=params, timeout=15)
+        data_json = r.json()
+        if data_json["data"] is not None:
+            ret.extend([(v["f12"], v["f14"]) for v in data_json["data"]["diff"]])
+    return ret
+
+
+@hku_catch(ret={}, trace=True)
+def get_all_dybk_info(code_market_dict, sep=""):
+    """获取所有地域板块列表"""
+    blk_list = get_dybk_names()
+
+    url = "http://13.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "2000",
+        "pz": "200",
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -85,24 +146,30 @@ def get_all_dybk_info(code_market_dict, sep=""):
     }
 
     ret = {}
-    for v in data_json:
-        # print(v)
-        blk_code = v["f12"]
-        blk_name = v["f14"]
-        # print(blk_name)
-        ret[blk_name] = []
+    for v in blk_list:
+        blk_code, blk_name = v[0], v[1]
         params["fs"] = f"b:{blk_code} f:!50"
-        r = requests.get(url, params=params)
+        params["pn"] = 1
+        r = requests.get(url, params=params, timeout=15)
+        data = r.json()
+        if data["data"] is None:
+            continue
+
         stk_json = r.json()
         stk_json = stk_json["data"]["diff"]
+        ret[blk_name] = [
+            f"{code_market_dict[v["f12"]]}{sep}{v["f12"]}" for v in stk_json if v["f12"] in code_market_dict]
 
-        for item in stk_json:
-            stk_code = item["f12"]
-            try:
-                ret[blk_name].append(f"{code_market_dict[stk_code]}{sep}{stk_code}")
-            except:
-                # print(stk_code)
-                pass
+        total_page = math.ceil(data["data"]["total"] / 200)
+        for page in range(2, total_page + 1):
+            params["pn"] = page
+            r = requests.get(url, params=params, timeout=15)
+            stk_json = r.json()
+            stk_json = stk_json["data"]["diff"]
+            ret[blk_name].extend(
+                [f"{code_market_dict[v["f12"]]}{sep}{v["f12"]}" for v in stk_json if v["f12"] in code_market_dict])
+        hku_info(f'获取地域板块{blk_name}成分: {len(ret[blk_name])}')
+
     return ret
 
 
@@ -117,24 +184,24 @@ def get_all_zsbk_info(code_market_dict, sep=""):
     for i in range(total):
         blk_name = blk_names[i]
         blk_code = blk_codes[i]
-        hku_info("{} 获取指数板块 {} 详情", i, blk_name)
         # print(i, blk_name)
         # 沪深指数有重复，避免深指覆盖
         if blk_name in ret:
             continue
         try:
-            ret[blk_name] = []
             stk_codes = ak.index_stock_cons_csindex(symbol=blk_code)
             stk_codes = stk_codes['成分券代码'].to_list()
-            for stk_code in stk_codes:
-                try:
-                    ret[blk_name].append(f"{code_market_dict[stk_code]}{sep}{stk_code}")
-                except:
-                    # print(stk_code)
-                    pass
+            hku_info("{} 获取指数板块{}成分: {}", i, blk_name, len(stk_codes))
+            ret[blk_name] = [
+                f"{code_market_dict[stk_code]}{sep}{stk_code}" for stk_code in stk_codes if stk_code in code_market_dict]
         except KeyboardInterrupt:
             break
         except:
             # print("Failed!", blk_code, blk_name)
             pass
     return ret
+
+
+if __name__ == "__main__":
+    blks = get_hybk_cons_code('BK0475')
+    print(blks)

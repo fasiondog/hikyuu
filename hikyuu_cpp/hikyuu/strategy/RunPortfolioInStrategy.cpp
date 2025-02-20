@@ -11,9 +11,9 @@
 namespace hku {
 
 RunPortfolioInStrategy::RunPortfolioInStrategy(const PFPtr& pf, const KQuery& query,
-                                               int adjust_cycle, const OrderBrokerPtr& broker,
+                                               const OrderBrokerPtr& broker,
                                                const TradeCostPtr& costfunc)
-: m_pf(pf), m_broker(broker), m_adjust_cycle(adjust_cycle) {
+: m_pf(pf), m_broker(broker) {
     HKU_ASSERT(pf && broker);
 
     if (query.queryType() == KQuery::INDEX) {
@@ -40,16 +40,16 @@ RunPortfolioInStrategy::RunPortfolioInStrategy(const PFPtr& pf, const KQuery& qu
 
 void RunPortfolioInStrategy::run() {
     m_pf->getTM()->fetchAssetInfoFromBroker(m_broker);
-    m_pf->run(m_query, m_adjust_cycle, true);
+    m_pf->run(m_query, true);
 }
 
-StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query, int adjust_cycle,
+StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query,
                                   const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
                                   const string& name,
                                   const std::vector<OrderBrokerPtr>& other_brokers,
                                   const string& config_file) {
     std::shared_ptr<RunPortfolioInStrategy> runner =
-      std::make_shared<RunPortfolioInStrategy>(pf, query, adjust_cycle, broker, costfunc);
+      std::make_shared<RunPortfolioInStrategy>(pf, query, broker, costfunc);
 
     auto tm = pf->getTM();
     for (const auto& brk : other_brokers) {
