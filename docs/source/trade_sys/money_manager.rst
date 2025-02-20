@@ -178,14 +178,22 @@
         :param System.Part part_from: 来源系统组件
         :return: 可卖出数量
         :rtype: float
+
+    .. py:method:: current_buy_count(self, stock)
+
+        当前连续买入计数
+
+    .. py:method:: current_sell_count(self, stock)
+
+        当前连续卖出计数
         
-    .. py:method:: buy_notify(self, trade_record)
+    .. py:method:: _buy_notify(self, trade_record)
     
         【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
         
         :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录
         
-    .. py:method:: sell_notify(self, trade_record)
+    .. py:method:: _sell_notify(self, trade_record)
     
         【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
         
