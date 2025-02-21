@@ -713,12 +713,13 @@ def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
     if axes is None:
         if new:
             axes = create_figure()
-            if only_draw_close:
-                iplot(kdata.close, axes=axes)
-            else:
-                kplot(kdata, axes=axes)
         else:
             axes = gca()
+
+    if only_draw_close:
+        iplot(kdata.close, axes=axes)
+    else:
+        kplot(kdata, axes=axes)
 
     ylim = axes.get_ylim()
     height = ylim[1] - ylim[0]
