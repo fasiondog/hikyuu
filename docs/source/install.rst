@@ -21,9 +21,9 @@
 pip 安装
 ----------
 
-安装：pip install hikyuu
+安装：python -m pip install hikyuu
 
-版本升级：pip install hikyuu -U
+版本升级：python -m pip install hikyuu -U
 
 .. figure:: _static/20000-install.png
 
@@ -35,4 +35,4 @@ pip 安装
 源码编译安装
 ----------------
 
-Linux上建议使用源码方式安装，参见 :ref:`developer` 。
+Ubuntu22.04及以上支持 pip 安装，其他Linux及macsox上建议使用源码方式安装，参见 :ref:`developer` 。

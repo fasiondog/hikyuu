@@ -33,6 +33,14 @@
     :param float n: 每次买入的数量（应该是交易对象最小交易数量的整数，此处程序没有此进行判断）
     :return: 资金管理策略实例
 
+.. py:function:: MM_FixedCountTps([buy_counts, sell_counts])
+          
+    连续买入/卖出固定数量资金管理策略。
+    
+    :param list buy_counts: 买入数量列表
+    :param list sell_counts: 卖出数量列表
+    :return: 资金管理策略实例
+
 
 固定风险资金管理策略
 ^^^^^^^^^^^^^^^^^^^^
@@ -50,22 +58,25 @@
 
 .. py:function:: MM_FixedCapital([capital = 10000.0])
 
-    固定资本资金管理策略, 即控制每次买入投入的总资金
+    固定资金管理策略, 即控制每次买入投入的总资金。买入数量 = 当前现金 / capital
 
     :param float capital: 固定资本单位
     :return: 资金管理策略实例
 
+.. py:function:: MM_FixedCapitalFunds([capital = 10000.0])
 
-固定比例资金管理策略
-^^^^^^^^^^^^^^^^^^^^
+    固定资本管理策略。买入数量 = 当前总资产 / capital
+
+    :param float capital: 固定资本单位
+    :return: 资金管理策略实例    
 
 
-固定单位资金管理策略
-^^^^^^^^^^^^^^^^^^^^
+固定单位资金风险管理策略
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: MM_FixedUnits([n = 33])
 
-    固定单位资金管理策略
+    固定单位资金管理策略。公式: 买入数量 = 当前现金 / n / 当前风险risk
 
     :param int n: n个资金单位
     :return: 资金管理策略实例
@@ -76,9 +87,12 @@
 
 .. py:function:: MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    威廉斯固定风险资金管理策略
+    威廉斯固定风险资金管理策略，买入数量 =（账户余额 × 风险百分比p）÷ 最大损失(max_loss)
     
-    
+    :param float p: 风险百分比
+    :param float max_loss: 最大损失
+    :return: 资金管理策略实例
+
     
 固定百分比资金管理策略
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -178,14 +192,22 @@
         :param System.Part part_from: 来源系统组件
         :return: 可卖出数量
         :rtype: float
+
+    .. py:method:: current_buy_count(self, stock)
+
+        当前连续买入计数
+
+    .. py:method:: current_sell_count(self, stock)
+
+        当前连续卖出计数
         
-    .. py:method:: buy_notify(self, trade_record)
+    .. py:method:: _buy_notify(self, trade_record)
     
         【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
         
         :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录
         
-    .. py:method:: sell_notify(self, trade_record)
+    .. py:method:: _sell_notify(self, trade_record)
     
         【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
         

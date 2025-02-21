@@ -176,6 +176,16 @@ matplotlib 默认每次绘图后，都要调用 plt.show() 显示图形，这在
     interactive  : True
 
 
+在 jupyter 中使用 matplotlib ipywidgets 后端
+-------------------------------------------------------
+
+默认的 matplotlib 绘图较慢且无法自由缩放，在 jupyter 环境中，可以使用 pip 安装 ipympl, 让 matplotlib 使用 web 方式绘图。
+
+在 jupyter 中开头使用 %matplotlib widget 命令，即可使用 ipympl 绘图。
+
+如果使用 ipympl 绘图时，出现 "Loading widgets ..." 后，不显示图像，可能是依赖包版本不兼容，可尝试使用 pip 更新 jupyterlab, notebook, ipywidgets 包。
+
+
 Ubuntu wayland 平台上 QT 不可用
 -----------------------------------
 
@@ -187,4 +197,8 @@ PyCharm 等 IDE 无法正常提示帮助信息
 
 1. 安装 pybind11-stubgen，使用命令 pip install pybind11-stubgen
 2. 运行 pybind11-stubgen hikyuu 命令，即可正常提示帮助信息。
+
+.. note::
+
+    2.3.1 版本开始，hikyuu 打包时已经默认生成 pyi 文件
         
