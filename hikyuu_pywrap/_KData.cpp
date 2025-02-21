@@ -63,9 +63,39 @@ void export_KData(py::module& m) {
         :param Datetime datetime: 指定的日期
         :rtype: KRecord)")
 
-      .def("_getPos", &KData::getPos)  // python中需要将Null的情况改写为None
+      .def(
+        "get_pos",
+        [](const KData& self, const Datetime& d) {
+            size_t pos = self.getPos(d);
+            py::object ret = py::none();
+            if (pos != Null<size_t>()) {
+                ret = py::int_(pos);
+            }
+            return ret;
+        },
+        R"(get_pos(self, datetime)
 
-      .def("_getPosInStock", &KData::getPosInStock)
+        获取指定时间的K线记录的索引位置, 如果不在数据范围内，则返回 None
+        
+        :param Datetime datetime: 指定的日期
+        :rtype: int)")
+
+      .def(
+        "get_pos_in_stock",
+        [](const KData& self, Datetime datetime) {
+            size_t pos = self.getPosInStock(datetime);
+            py::object ret = py::none();
+            if (pos != Null<size_t>()) {
+                ret = py::int_(pos);
+            }
+            return ret;
+        },
+        R"(get_pos_in_stock(self, datetime) 
+        
+        获取指定时间对应的原始K线中的索引位置
+
+        :param Datetime datetime: 指定的时间
+        :return: 对应的索引位置，如果不在数据范围内，则返回 None)")
 
       .def("empty", &KData::empty, R"(empty(self)
 
