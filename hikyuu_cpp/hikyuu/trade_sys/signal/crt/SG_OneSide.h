@@ -23,6 +23,16 @@ namespace hku {
  */
 SignalPtr HKU_API SG_OneSide(const Indicator& ind, bool is_buy);
 
+/** 生成单边买入信号 */
+inline SignalPtr SG_Buy(const Indicator& ind) {
+    return SG_OneSide(ind, true);
+}
+
+/** 生成单边卖出信号 */
+inline SignalPtr SG_Sell(const Indicator& ind) {
+    return SG_OneSide(ind, false);
+}
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_SIGNAL_CRT_SG_ONESIDE_H_ */

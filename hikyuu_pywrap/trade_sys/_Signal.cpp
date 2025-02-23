@@ -250,9 +250,23 @@ void export_Signal(py::module& m) {
     m.def("SG_OneSide", SG_OneSide, py::arg("ind"), py::arg("is_buy"),
           R"(SG_OneSide(ind, is_buy)
           
-    根据输入指标构建单边信号（单纯的只包含买入或卖出信号），如果指标值大于0，则加入信号
+    根据输入指标构建单边信号（单纯的只包含买入或卖出信号），如果指标值大于0，则加入信号。也可以使用 SG_Buy 或 SG_Sell 函数。
     
     :param Indicator ind: 输入指标
     :param bool is_buy: 构建的是买入信号，否则为卖出信号
+    :return: 信号指示器)");
+
+    m.def("SG_Buy", SG_Buy, py::arg("ind"), R"(SG_Buy(ind)
+    
+    生成单边买入信号
+
+    :param Indicator ind: 输入指标
+    :return: 信号指示器)");
+
+    m.def("SG_Sell", SG_Sell, py::arg("ind"), R"(SG_Sell(ind)
+    
+    生成单边卖出信号
+
+    :param Indicator ind: 输入指标
     :return: 信号指示器)");
 }
