@@ -107,9 +107,6 @@ public:
     void startCycle(const Datetime& start, const Datetime& end);
     const Datetime& getCycleStart() const;
     const Datetime& getCycleEnd() const;
-    bool ignoreCycle() const {
-        return m_ignore_cycle;
-    }
 
     /** 复位操作 */
     void reset();
@@ -146,13 +143,12 @@ protected:
     /* 空头持仓 */
     bool m_hold_short;
 
-    // 用 map 保存，以便获取是能保持顺序
+    // 用 map 保存，以便获取时能保持顺序
     std::map<Datetime, double> m_buySig;
     std::map<Datetime, double> m_sellSig;
 
     Datetime m_cycle_start;
     Datetime m_cycle_end;
-    bool m_ignore_cycle{false};  // 特殊用途，用于 OperatorSignal
 
 //============================================
 // 序列化支持
@@ -168,7 +164,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
-        ar& BOOST_SERIALIZATION_NVP(m_ignore_cycle);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
         // ar & BOOST_SERIALIZATION_NVP(m_calculated);
@@ -182,7 +177,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
-        ar& BOOST_SERIALIZATION_NVP(m_ignore_cycle);
         // m_kdata都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
         // ar & BOOST_SERIALIZATION_NVP(m_calculated);
