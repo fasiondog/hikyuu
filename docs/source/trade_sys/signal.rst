@@ -65,6 +65,16 @@
                 <td>根据输入指标构建单边信号（单纯的只包含买入或卖出信号），<br>如果指标值大于0，则加入信号</td>
             </tr>
             <tr>
+                <td><a href="#target-section">SG_Buy</a></td>
+                <td>单边买入信号指示器</td>
+                <td>SG_OneSide 简化模式</td>
+            </tr>
+            <tr>
+                <td><a href="#target-section">SG_OneSell</a></td>
+                <td>单边卖出信号指示器</td>
+                <td>SG_OneSide简化模式</td>
+            </tr>
+            <tr>
                 <td><a href="#target-section">SG_Band</a></td>
                 <td>区间突破信号指示器</td>
                 <td>指标区间指示器, 当指标超过上轨时，买入；<br>当指标低于下轨时，卖出。</td>
@@ -78,7 +88,12 @@
                 <td><a href="#target-section">SG_Cycle</a></td>
                 <td>PF调仓周期买入信号指示器</td>
                 <td>一个特殊的SG，配合PF使用，以 PF 调仓周期为买入信号</td>
-            </tr>                     
+            </tr>
+            <tr>
+                <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
+                <td>SG运算辅助</td>
+                <td>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题</td>
+            </tr>        
         </tbody>
     </table>
     <p></p>
@@ -179,6 +194,22 @@
     
     :param Indicator ind: 输入指标
     :param bool is_buy: 构建的是买入信号，否则为卖出信号
+
+
+.. py:function:: SG_Buy(ind)
+
+    单边买入信号, SG_OneSide 简化
+
+    :param Indicator ind: 输入指标
+    :return: 信号指示器
+
+
+.. py:function:: SG_Sell(ind)
+
+    单边卖出信号, SG_OneSide 简化
+
+    :param Indicator ind: 输入指标
+    :return: 信号指示器
 
 
 区间突破信号指示器
