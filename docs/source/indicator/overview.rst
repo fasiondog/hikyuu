@@ -18,7 +18,6 @@
 * :py:func:`ISINFA` - 判断是否为 -inf 值
 * :py:func:`JUMPDOWN` - 边缘跳变，从小于等于0.0，跳变到 > 0.0
 * :py:func:`JUMPUP` - 边缘跳变，从大于0.0，跳变到 <= 0.0
-* :py:func:`LAST` - 等同于通达信 LAST 指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
 * :py:func:`LASTVALUE` - 等同于通达信 CONST 指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
 * :py:func:`REPLACE` - 替换指标中指定值，默认为替换 nan 值为 0.0

@@ -18,7 +18,8 @@ public:
     OperatorSignal(const string& name, const SignalPtr& sg1, const SignalPtr& sg2);
     virtual ~OperatorSignal();
 
-    virtual void _reset() override;
+    virtual void _reset() override final;
+
     virtual SignalPtr _clone() override;
     virtual void _calculate(const KData& kdata) override {}
 

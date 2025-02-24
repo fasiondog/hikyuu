@@ -81,9 +81,11 @@ void SignalBase::setTO(const KData& kdata) {
     bool cycle = getParam<bool>("cycle");
     m_cycle_start = kdata[0].datetime;
 
-    if (m_ignore_cycle || !cycle) {
+    if (!cycle) {
         _calculate(kdata);
     }
+
+    m_calculated = true;
 }
 
 void SignalBase::reset() {
@@ -98,7 +100,7 @@ void SignalBase::reset() {
 }
 
 void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
-    HKU_IF_RETURN(!m_ignore_cycle && !getParam<bool>("cycle"), void());
+    HKU_IF_RETURN(!getParam<bool>("cycle"), void());
     HKU_CHECK(start != Null<Datetime>() && close != Null<Datetime>() && start < close, "{}",
               m_name);
     HKU_CHECK(start >= m_cycle_end || m_cycle_end == Null<Datetime>(),

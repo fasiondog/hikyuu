@@ -250,9 +250,73 @@ void export_Signal(py::module& m) {
     m.def("SG_OneSide", SG_OneSide, py::arg("ind"), py::arg("is_buy"),
           R"(SG_OneSide(ind, is_buy)
           
-    根据输入指标构建单边信号（单纯的只包含买入或卖出信号），如果指标值大于0，则加入信号
+    根据输入指标构建单边信号（单纯的只包含买入或卖出信号），如果指标值大于0，则加入信号。也可以使用 SG_Buy 或 SG_Sell 函数。
     
     :param Indicator ind: 输入指标
     :param bool is_buy: 构建的是买入信号，否则为卖出信号
     :return: 信号指示器)");
+
+    m.def("SG_Buy", SG_Buy, py::arg("ind"), R"(SG_Buy(ind)
+    
+    生成单边买入信号
+
+    :param Indicator ind: 输入指标
+    :return: 信号指示器)");
+
+    m.def("SG_Sell", SG_Sell, py::arg("ind"), R"(SG_Sell(ind)
+    
+    生成单边卖出信号
+
+    :param Indicator ind: 输入指标
+    :return: 信号指示器)");
+
+    m.def("SG_Add", SG_Add, py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
+          R"(SG_Add(sg1, sg2, alternate)
+
+    生成两个指标之和的信号
+
+    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
+    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+
+    :param SignalBase sg1: 输入信号1
+    :param SignalBase sg2: 输入信号2
+    :param bool alternate: 是否交替买入卖出，默认为True
+    :return: 信号指示器)");
+
+    m.def("SG_Sub", SG_Sub, py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
+          R"(SG_Sub(sg1, sg2, alternate)
+
+    生成两个指标之差的信号
+
+    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
+    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+
+    :param SignalBase sg1: 输入信号1
+    :param SignalBase sg2: 输入信号2
+    :param bool alternate: 是否交替买入卖出，默认为True
+    :return: 信号指示器)");
+
+    m.def("SG_Mul", SG_Mul, py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
+          R"(SG_Mul(sg1, sg2, alternate)
+
+    生成两个指标之差的信号
+
+    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
+    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+
+    :param SignalBase sg1: 输入信号1
+    :param SignalBase sg2: 输入信号2
+    :param bool alternate: 是否交替买入卖出，默认为True)");
+
+    m.def("SG_Div", SG_Div, py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
+          R"(SG_Div(sg1, sg2, alternate)
+
+    生成两个指标之差的信号
+
+    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
+    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+
+    :param SignalBase sg1: 输入信号1
+    :param SignalBase sg2: 输入信号2
+    :param bool alternate: 是否交替买入卖出，默认为True)");
 }

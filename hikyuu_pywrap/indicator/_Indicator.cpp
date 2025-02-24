@@ -102,9 +102,19 @@ void export_Indicator(py::module& m) {
     :param int result_index: 指定的结果集
     :rtype: float)")
 
-      .def("get_pos", &Indicator::getPos, R"(get_pos(self, date):
+      .def(
+        "get_pos",
+        [](const Indicator& self, const Datetime& d) {
+            size_t pos = self.getPos(d);
+            py::object ret = py::none();
+            if (pos != Null<size_t>()) {
+                ret = py::int_(pos);
+            }
+            return ret;
+        },
+        R"(get_pos(self, date):
 
-    获取指定日期相应的索引位置
+    获取指定日期相应的索引位置, 如果没有对应位置返回 None
 
     :param Datetime date: 指定日期
     :rtype: int)")

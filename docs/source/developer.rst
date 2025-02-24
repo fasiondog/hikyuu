@@ -3,10 +3,11 @@
 
     为了顺利编译代码， 请勿使用从 github 直接下载源码包的方式编译。 原因是 git 上传时部分文件的换行符被置换为Linux式的换行符，将导致直接下载的部分代码在Windows下无法顺利编译。
 
-C++ API参考：`<http://fasiondog.cn/hikyuu/cpp_ref/index.html>`_。
+C++ API参考, 使用下面的命令生成 Doxygen 文档:
 
-C++测试工程参考：`<http://fasiondog.cn/hikyuu/test_doc/index.html>`_
+.. code-block:: shell
 
+    xmake doxygen -F hikyuu_cpp/Doxygen
 
 .. _developer:
 

@@ -186,32 +186,8 @@ def KData_iter(kdata):
         yield kdata[i]
 
 
-def KData_getPos(kdata, datetime):
-    """
-    获取指定时间对应的索引位置
-
-    :param Datetime datetime: 指定的时间
-    :return: 对应的索引位置，如果不在数据范围内，则返回 None
-    """
-    pos = kdata._getPos(datetime)
-    return pos if pos != constant.null_size else None
-
-
-def KData_getPosInStock(kdata, datetime):
-    """
-    获取指定时间对应的原始K线中的索引位置
-
-    :param Datetime datetime: 指定的时间
-    :return: 对应的索引位置，如果不在数据范围内，则返回 None
-    """
-    pos = kdata._getPosInStock(datetime)
-    return pos if pos != constant.null_size else None
-
-
 KData.__getitem__ = KData_getitem
 KData.__iter__ = KData_iter
-KData.get_pos = KData_getPos
-KData.get_pos_in_stock = KData_getPosInStock
 
 
 # ------------------------------------------------------------------

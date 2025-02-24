@@ -28,6 +28,11 @@ public:
     /** 仅用于python的__str__ */
     string str() const;
 
+    /** 盈利 = 买入资金 - 累计交易总成本 - 卖出资金 */
+    price_t totalProfit() const {
+        return buyMoney - totalCost - sellMoney;
+    }
+
     Stock stock;              ///< 交易对象
     Datetime takeDatetime;    ///< 初次建仓日期
     Datetime cleanDatetime;   ///< 平仓日期，当前持仓记录中为Null<Datetime>()
@@ -37,8 +42,8 @@ public:
     double totalNumber{0.0};  ///< 累计持仓数量
     price_t buyMoney{0.0};    ///< 累计买入资金
     price_t totalCost{0.0};   ///< 累计交易总成本
-    price_t totalRisk{0.0};  ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
-    price_t sellMoney{0.0};  ///< 累计卖出资金
+    price_t totalRisk{0.0};   ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
+    price_t sellMoney{0.0};   ///< 累计卖出资金
 
 //===================
 // 序列化支持

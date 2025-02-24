@@ -74,6 +74,7 @@ TEST_CASE("test_SG_OneSide") {
 
     /** @arg 单边买入 + 单边卖出 */
     sg = sg_buy + sg_sell;
+    sg->setParam<bool>("alternate", true);
     sg->setTO(k);
     auto sg_expect = SG_Bool(CLOSE() > REF(CLOSE(), 1), CLOSE() < REF(CLOSE(), 1));
     sg_expect->setTO(k);

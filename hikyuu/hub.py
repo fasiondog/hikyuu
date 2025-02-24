@@ -427,6 +427,30 @@ class HubManager(metaclass=SingletonType):
         return part
 
     @dbsession
+    def get_part_module(self, name):
+        """获取指定策略部件
+
+        :param str name: 策略部件名称
+        :param kwargs: 其他部件相关参数
+        """
+        name_parts = name.split('.')
+        checkif(
+            len(name_parts) < 2
+            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mf', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'pf', 'sys', 'ind', 'other')),
+            name, PartNameError
+        )
+
+        # 未指定仓库名，则默认使用 'default' 仓库
+        part_name = 'default.{}'.format(name) if len(name_parts) == 2 else name
+        part_model = self._session.query(PartModel).filter_by(name=part_name).first()
+        checkif(part_model is None, part_name, PartNotFoundError, cause='仓库中不存在')
+        try:
+            part_module = importlib.import_module(part_model.module_name)
+        except ModuleNotFoundError:
+            raise PartNotFoundError(part_name, '请检查部件对应路径是否存在')
+        return part_module
+
+    @dbsession
     def get_part_info(self, name):
         """获取策略部件信息
 
@@ -434,11 +458,15 @@ class HubManager(metaclass=SingletonType):
         """
         part_model = self._session.query(PartModel).filter_by(name=name).first()
         checkif(part_model is None, name, PartNotFoundError, cause='仓库中不存在')
+        try:
+            part_module = importlib.import_module(part_model.module_name)
+        except ModuleNotFoundError:
+            raise PartNotFoundError(name, '请检查部件对应路径是否存在')
         return {
             'name': name,
             'author': part_model.author,
             'version': part_model.version,
-            'doc': part_model.doc,
+            'doc': part_module.part.__doc__,
         }
 
     def print_part_info(self, name):
@@ -450,10 +478,7 @@ class HubManager(metaclass=SingletonType):
         print('+---------+------------------------------------------------')
         print('| version | ', info['version'])
         print('+---------+------------------------------------------------')
-        # print('\n')
         print(info['doc'])
-        # print('\n')
-        # print('----------------------------------------------------------')
 
     @dbsession
     def get_hub_path(self, name):
@@ -575,6 +600,9 @@ def print_part_info(name):
     HubManager().print_part_info(name)
 
 
+help_part = print_part_info
+
+
 def get_hub_name_list():
     """返回仓库名称列表"""
     return HubManager().get_hub_name_list()
@@ -586,6 +614,15 @@ def get_part_name_list(hub=None, part_type=None):
     :param str part_type: 部件类型
     """
     return HubManager().get_part_name_list(hub, part_type)
+
+
+def get_part_module(part_name: str):
+    """获取部件模块
+    :param str part_name: 部件名称
+    :return: 部件模块
+    :rtype: module
+    """
+    return HubManager().get_part_module(part_name)
 
 
 def get_current_hub(filename):
@@ -607,9 +644,11 @@ __all__ = [
     'update_hub',
     'remove_hub',
     'build_hub',
+    'help_part',
     'get_part',
     'get_hub_path',
     'get_part_info',
+    'get_part_module',
     'print_part_info',
     'get_hub_name_list',
     'get_part_name_list',
