@@ -19,6 +19,7 @@ import shutil
 import pathlib
 import logging
 import importlib
+import inspect
 from configparser import ConfigParser
 
 # 引入 git 前需设置环境变量，否则某些情况下会报错失败
@@ -462,11 +463,21 @@ class HubManager(metaclass=SingletonType):
             part_module = importlib.import_module(part_model.module_name)
         except ModuleNotFoundError:
             raise PartNotFoundError(name, '请检查部件对应路径是否存在')
+        signature = inspect.signature(part_module.part)
+        func_name = f'\npart("{name}",'
+        for param_name, param in signature.parameters.items():
+            if param.default is param.empty:
+                func_name += f"{param_name}, "
+            else:
+                default_value = param.default
+                func_name += f"{param_name}={default_value}, "
+        func_name += ")\n"
+        func_name += part_module.part.__doc__
         return {
             'name': name,
             'author': part_model.author,
             'version': part_model.version,
-            'doc': part_module.part.__doc__,
+            'doc': func_name  # part_module.part.__doc__,
         }
 
     def print_part_info(self, name):
