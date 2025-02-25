@@ -49,7 +49,7 @@ TEST_CASE("test_Stock_Relational_comparison") {
     CHECK_NE(s1, Null<Stock>());
 
     /** @arg 相等比较 */
-    Stock s2 = sm.getStock("sh000001");
+    Stock s2 = sm.getStock("000001.sh");
     CHECK_EQ(s1, s2);
 
     /** @arg 不等比较 */

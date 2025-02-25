@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef STOCKMANAGER_H_
 #define STOCKMANAGER_H_
 
@@ -278,7 +279,7 @@ private:
     static StockManager* m_sm;
     std::atomic_bool m_initializing;
     std::atomic_bool m_data_ready;  // 用于指示是否所有数据准备完毕
-    std::thread::id m_thread_id;  // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
+    std::thread::id m_thread_id;    // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
     string m_tmpdir;
     string m_datadir;
     BaseInfoDriverPtr m_baseInfoDriver;
