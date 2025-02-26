@@ -475,6 +475,11 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
         return result;
     }
 
+    if (iszero(today.transAmount) || iszero(today.transCount)) {
+        HKU_INFO_IF(trace, "[{}] ignore current amount == 0 or count == 0", name());
+        return result;
+    }
+
     // 处理当前已有的交易请求
     result = _processRequest(today, src_today);
 

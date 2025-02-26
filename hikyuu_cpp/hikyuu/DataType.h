@@ -149,8 +149,7 @@ using std::isinf;
 using std::isnan;
 
 inline bool iszero(price_t num) {
-    const price_t epsilon = std::numeric_limits<price_t>::epsilon();
-    return std::abs(num) < epsilon;
+    return std::abs(num) < std::numeric_limits<price_t>::epsilon();
 }
 
 using fmt::format;
