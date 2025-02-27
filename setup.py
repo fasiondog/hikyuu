@@ -293,6 +293,7 @@ def copy_include(install_dir):
         os.makedirs(dst_path)
     shutil.copy('hikyuu_pywrap/pybind_utils.h', dst_path)
     shutil.copy('hikyuu_pywrap/pickle_support.h', dst_path)
+    shutil.copy('hikyuu_pywrap/convert_any.h', dst_path)
     shutil.copy('hikyuu/cpp/__init__.py', dst_path)
     shutil.copy('hikyuu/cpp/__init__.py', f'{install_dir}/include')
     shutil.copy('hikyuu/cpp/__init__.py', f'{install_dir}/include/hikyuu')

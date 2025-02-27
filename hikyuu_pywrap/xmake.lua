@@ -123,8 +123,8 @@ target("core")
                 dst_obj = dst_dir .. "libhikyuu.dylib"
                 os.run(format("install_name_tool -change libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_obj))
                 os.run(format("install_name_tool -change libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_obj))
-            -- else
-            --     os.cp(target:targetdir() .. '/libhikyuu.a', dst_dir)
+            else
+                os.cp(target:targetdir() .. '/*.a', dst_dir)
             end
 
             filename = "libmysqlclient.21.dylib"
