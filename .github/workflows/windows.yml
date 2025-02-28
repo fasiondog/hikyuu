@@ -33,7 +33,7 @@ jobs:
     - name: configure
       shell: cmd
       run: |
-        xmake f -c --feedback=n -y -vD
+        xmake f -c --feedback=n -y -vD --vs_sdkver=10.0.19041.0
 
     - name: build
       shell: cmd

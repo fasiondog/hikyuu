@@ -33,7 +33,7 @@ jobs:
     - name: configure
       shell: cmd
       run: |
-        xmake f -c -k shared -y --runtimes="MD"
+        xmake f -c -k shared -y --runtimes="MD" --vs_sdkver=10.0.19041.0
 
     - name: build
       shell: cmd
