@@ -38,6 +38,10 @@ void export_PositionRecord(py::module& m) {
                      "累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本")
       .def_readwrite("sell_money", &PositionRecord::sellMoney, "累计卖出资金（float）")
       .def_property_readonly("total_profit", &PositionRecord::totalProfit,
-                             "累计盈利 = 累计卖出资金 - 累计买入资金 - 累计交易成本")
+                             R"(total_profit(self):
+
+    累计盈利 = 累计卖出资金 - 累计买入资金 - 累计交易成本
+    注意: 只对已清仓的记录有效, 未清仓的记录返回0  )")
+
         DEF_PICKLE(PositionRecord);
 }

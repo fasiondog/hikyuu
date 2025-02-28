@@ -94,6 +94,14 @@ string PositionRecord::str() const {
     return os.str();
 }
 
+price_t PositionRecord::totalProfit() const {
+    if (cleanDatetime == Null<Datetime>()) {
+        HKU_ERROR("The profit cannot be calculated without cleaned records!");
+        return 0.0;
+    }
+    return buyMoney - totalCost - sellMoney;
+}
+
 bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2) {
     return d1.stock == d2.stock && d1.takeDatetime == d2.takeDatetime &&
            d1.cleanDatetime == d2.cleanDatetime && fabs(d1.number - d2.number) < 0.00001 &&
