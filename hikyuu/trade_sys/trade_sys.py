@@ -87,12 +87,12 @@ def crtEV(func, params={}, name='crtEV'):
 # ------------------------------------------------------------------
 # moneymanager
 # ------------------------------------------------------------------
-def crtMM(get_buy_num, get_sell_num, params={}, name='crtMM', buy_notify=None, sell_notify=None):
+def crtMM(get_buy_num, get_sell_num=None, params={}, name='crtMM', buy_notify=None, sell_notify=None):
     """
     快速创建资金管理策略
 
     :param get_buy_num: 买入数量接口
-    :param sell_buy_num: 卖出数量接口
+    :param get_sell_num: 卖出数量接口, 默认为 None(卖出全部)
     :param {} params: 参数字典
     :param str name: 自定义名称
     :param buy_notify: 接收买入交易记录通知
@@ -101,7 +101,8 @@ def crtMM(get_buy_num, get_sell_num, params={}, name='crtMM', buy_notify=None, s
     """
     meta_x = type(name, (MoneyManagerBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._get_buy_num = get_buy_num
-    meta_x._get_sell_num = get_sell_num
+    if get_sell_num is not None:
+        meta_x._get_sell_num = get_sell_num
     if buy_notify is not None:
         meta_x._buy_notify = buy_notify
     if sell_notify is not None:
