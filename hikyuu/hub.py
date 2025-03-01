@@ -536,6 +536,23 @@ class HubManager(metaclass=SingletonType):
         checkif(hub_model is None, local_base, HubNotFoundError)
         return hub_model.name
 
+    @dbsession
+    def search_part(self, name: str, hub: str = None, part_type: str = None):
+        """搜索部件
+        :param str name: 部件名称
+        :param str hub: 仓库名
+        :param str part_type: 部件类型
+        :return: 部件名称列表
+        :rtype: list
+        """
+        parts = self._session.query(PartModel).filter(PartModel.name.like(f'%{name}%'))
+        if hub is not None:
+            parts = parts.filter(PartModel.hub_name.like(f'%{hub}%'))
+        if part_type is not None:
+            parts = parts.filter(PartModel.part.like(f'%{part_type}%'))
+        records = parts.all()
+        return [record.name for record in records]
+
 
 def add_remote_hub(name, url, branch='main'):
     """增加远程策略仓库
@@ -643,6 +660,18 @@ def get_current_hub(filename):
     return HubManager().get_current_hub(filename)
 
 
+def search_part(name: str, hub: str = None, part_type: str = None):
+    """搜索部件
+
+    :param str name: 部件名称
+    :param str hub: 仓库名
+    :param str part_type: 部件类型
+    :return: 部件名称列表
+    :rtype: list
+    """
+    return HubManager().search_part(name, hub, part_type)
+
+
 # 初始化仓库
 try:
     HubManager().setup_hub()
@@ -664,6 +693,7 @@ __all__ = [
     'get_hub_name_list',
     'get_part_name_list',
     'get_current_hub',
+    'search_part',
 ]
 
 if __name__ == "__main__":
