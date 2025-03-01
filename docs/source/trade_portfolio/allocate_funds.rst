@@ -4,8 +4,69 @@
 资产分配算法组件
 ================
 
+资产分配算法组件，用于对选中的系统进行资产分配。
+
+公共参数:
+
+    * **adjust_running_sys** *(bool|True)* : 是否调整之前已经持仓策略的持仓。不调整时，仅使用总账户当前剩余资金进行分配，否则将使用总市值进行分配。
+    
+        - True: 主动根据资产分配对已持仓策略进行增减仓, 
+        - False: 不会根据当前分配权重对已持仓策略进行强制加减仓
+
+    * **auto_adjust_weight** *(bool|True)* : 自动调整权重，此时认为传入的权重为各证券的相互比例（详见ignore_zero_weight说明）。否则，以传入的权重为指定权重不做调整（此时传入的各个权重需要小于1）。
+
+    * **ignore_zero_weight** *(bool|False)* : 该参数在 auto_adjust_weight 为 True 时生效。是否过滤子类返回的比例权重列表中的 0 值（包含小于0）和 nan 值。
+   
+        :: 
+        
+            如: 子类返回权重比例列表 [6, 2, 0, 0, 0], 则
+               - 过滤 0 值, 则实际调整后的权重为 Xi / sum(Xi): [6/8, 2/8]
+               - 不过滤, m 设为非零元素个数, n为总元素个数, (Xi / Sum(Xi)) * (m / n):
+                  [(6/8)*(2/5), (2/8)*(2/5), 0, 0, 0] 即保留分为5份后, 仅在2份中保持相对比例
+
+    * **ignore_se_score_is_null** *(bool|False)* : 忽略选中系统列表中的系统得分为 null 的系统。 **注意: 某些SE(如SE_MultiFactor)本身可能也存在类似控制**
+    * **ignore_se_score_lt_zero** *(bool|False)* : 忽略选中系统列表中的系统得分小于等于 0 的系统
+    * **reserve_percent** *(float|0.0)* : 资产占比保留比例，小于该比例的资产将被忽略。
+    * **trace** *(bool|False)* : 打印跟踪信息
+
+
 内建资产分配算法
 ------------------
+
+.. raw:: html
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>代码</th>
+                <th>名称</th>
+                <th>描述</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#target-section">AF_FixedWeight</a></td>
+                <td>固定比例资产分配</td>
+                <td>每个选中的资产都只占总资产固定的比例</td>
+            </tr>
+            <tr>
+                <td><a href="#target-section">AF_FixedWeightList</td>
+                <td>固定比例资产分配列表</td>
+                <td>按指定的权重列表对选中系统进行资产分配</td>
+            </tr>
+            <tr>
+                <td><a href="#target-section">AF_EqualWeight</td>
+                <td>固定比例资产分配</td>
+                <td>对选中的资产进行等比例分配</td>
+            </tr>
+            <tr>
+                <td><a href="#target-section">AF_MultiFactor</td>
+                <td>多因子评分权重资产分配</td>
+                <td>根据系统得分进行资产分配，对选中的系统进行得分排序，按得分从高到低进行资产分配，得分为0的系统将被忽略。</td>
+            </tr>    
+        </tbody>
+    </table>
+    <p></p>
 
 .. py:function:: AF_FixedWeight(weight)
 
@@ -13,10 +74,21 @@
 
     :param float weight:  指定的资产比例 [0, 1]
 
+.. py:function:: AF_FixedWeightList(weights)
+
+    固定比例资产分配列表.
+
+    :param float weights:  指定的资产比例列表
+
 
 .. py:function:: AF_EqualWeight()
 
     固定比例资产分配，对选中的资产进行等比例分配
+
+
+.. py:function:: AF_MultiFactor()
+
+    根据系统得分进行资产分配，对选中的系统进行得分排序，按得分从高到低进行资产分配，得分为0的系统将被忽略。
 
 
 系统权重系数结构

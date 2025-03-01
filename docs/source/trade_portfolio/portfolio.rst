@@ -8,6 +8,39 @@
 
 在 Hikyuu 中 Portfolio 投资组合是以系统交易策略为单位的，Hikyuu 即可以使用不同目标同一交易策略的组合，未来也可以使用不同目标不同交易逻辑的系统策略进行组合（需要 tm 和各组件支持），和常见程序化交易中的多目标但策略逻辑相同的投资组合并不完全相同。
 
+PF部件说明:
+
+.. raw:: html
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>部件命名规范</th>
+                <th>部件说明</th>
+                <th>部件用途</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>MF_Xxx</td>
+                <td>多因子合成（时间截面评分板）</td>
+                <td>多因子本质是在时间截面上对候选标的进行评分，所以实际需要配合 Selector (策略选择算法) 使用。</td>
+            </tr>
+            <tr>
+                <td>SE_Xxx</td>
+                <td>系统选择算法</td>
+                <td>实现标的、系统策略的评估和选取算法。<br>注意：滚动寻优系统中的寻优选择器同样以 SE 为前缀命名，但不能再这里。</td>
+            </tr>
+            <tr>
+                <td>AF_Xxx</td>
+                <td>资产分配算法</td>
+                <td>用于对时间截面上选中的系统进行资产分配。</td>
+            </tr>            
+        </tbody>
+    </table>
+    <p></p>
+
+
 .. py:function:: PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
 
     创建一个多标的、单系统策略的投资组合
@@ -30,7 +63,7 @@
     :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
 
 
-.. py:function:: PF_WithoutAFPF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False,sell_at_not_selected=False])
+.. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False,sell_at_not_selected=False])
     
     创建无资金分配算法的投资组合，所有单系统策略使用共同的 tm 管理账户
 
