@@ -958,12 +958,41 @@ void export_Indicator_build_in(py::module& m) {
     :param KData kdata: k线数据
     :rtype: Indicator)");
 
-    m.def("WEAVE", WEAVE, R"(WEAVE(ind1, ind2)
+    m.def("WEAVE", [](const py::sequence& seq) {
+        size_t total = len(seq);
+        HKU_CHECK(total >= 2 && total <= 6, "WEAVE: total must be 2 to 6");
+        Indicator ind1 = seq[0].cast<Indicator>();
+        Indicator ind2 = seq[1].cast<Indicator>();
+        Indicator tmp = WEAVE(ind1, ind2);
+        for (size_t i = 2; i < total; i++) {
+            tmp = WEAVE(tmp, seq[i].cast<Indicator>());
+        }
+        return tmp;
+    });
+    m.def("WEAVE", [](const Indicator& ind1, const Indicator& ind2) { return WEAVE(ind1, ind2); });
+    m.def("WEAVE", [](const Indicator& ind1, const Indicator& ind2, const Indicator& ind3) {
+        return WEAVE(ind1, ind2, ind3);
+    });
+    m.def("WEAVE", [](const Indicator& ind1, const Indicator& ind2, const Indicator& ind3,
+                      const Indicator& ind4) { return WEAVE(ind1, ind2, ind3, ind4); });
+    m.def("WEAVE", [](const Indicator& ind1, const Indicator& ind2, const Indicator& ind3,
+                      const Indicator& ind4,
+                      const Indicator& ind5) { return WEAVE(ind1, ind2, ind3, ind4, ind5); });
+    m.def(
+      "WEAVE",
+      [](const Indicator& ind1, const Indicator& ind2, const Indicator& ind3, const Indicator& ind4,
+         const Indicator& ind5,
+         const Indicator& ind6) { return WEAVE(ind1, ind2, ind3, ind4, ind5, ind6); },
+      R"(WEAVE(ind1, ind2[, ind3, ind4, ind5, ind6])
 
-    将ind1和ind2的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
+    将最多6个Indicator的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
     
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
+    :param Indicator ind3: 指标3, 可省略
+    :param Indicator ind4: 指标4, 可省略
+    :param Indicator ind5: 指标5, 可省略
+    :param Indicator ind6: 指标6, 可省略
     :rtype: Indicator)");
 
     m.def("CORR", CORR_1, py::arg("ref_ind"), py::arg("n") = 10, py::arg("fill_null") = true);
