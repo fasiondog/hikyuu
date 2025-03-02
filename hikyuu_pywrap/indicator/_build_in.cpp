@@ -2189,4 +2189,16 @@ void export_Indicator_build_in(py::module& m) {
     :param string adjust_mode: 调整方式
     :param bool delay_to_trading_day: 调整周期是否延至交易日
     :rtype: Indicator)");
+
+    m.def("KALMAN", py::overload_cast<double, double>(KALMAN), py::arg("q") = 0.01,
+          py::arg("r") = 0.1);
+    m.def("KALMAN", py::overload_cast<const Indicator&, double, double>(KALMAN), py::arg("ind"),
+          py::arg("q") = 0.01, py::arg("r") = 0.1, R"(KALMAN(ind, [q=0.01], [r=0.1])
+
+    Kalman滤波器, 用于平滑指标, 可设置平滑系数q和r, 默认q=0.01, r=0.1
+
+    :param Indicator ind: 指标
+    :param float q: 平滑系数
+    :param float r: 噪声系数
+    :rtype: Indicator)");
 }
