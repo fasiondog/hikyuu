@@ -10,14 +10,7 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const MarketInfo& market) {
-    if (Null<MarketInfo>() == market) {
-        os << "MarketInfo()";
-        return os;
-    }
-
-    string sp(", ");
-    os << "MarketInfo(" << market.market() << sp << market.name() << sp << market.description()
-       << sp << market.code() << sp << market.lastDate() << ")";
+    os << market.toString();
     return os;
 }
 
@@ -30,8 +23,10 @@ string MarketInfo::toString() const {
 
     string sp(", ");
     os << "MarketInfo(" << m_market << sp << m_name << sp << m_description << sp << m_code << sp
-       << m_lastDate << sp << m_openTime1.minutes() << sp << m_closeTime1.minutes() << sp
-       << m_openTime2.minutes() << sp << m_closeTime2.minutes() << ")";
+       << m_lastDate << sp << m_openTime1.hours() << ":" << m_openTime1.minutes() << sp
+       << m_closeTime1.hours() << ":" << m_closeTime1.minutes() << sp << m_openTime2.hours() << ":"
+       << m_openTime2.minutes() << sp << m_closeTime2.hours() << ":" << m_closeTime2.minutes()
+       << ")";
     return os.str();
 }
 

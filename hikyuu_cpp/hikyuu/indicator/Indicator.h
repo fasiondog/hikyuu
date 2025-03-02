@@ -383,6 +383,13 @@ HKU_API Indicator operator|(Indicator::value_t, const Indicator&);
  */
 Indicator HKU_API WEAVE(const Indicator& ind1, const Indicator& ind2);
 
+template <typename... Args>
+inline Indicator WEAVE(const Indicator& ind1, const Indicator& ind2, const Args&... others) {
+    HKU_CHECK(sizeof...(others) <= 4, "WEAVE() only support 6 Indicator!");
+    Indicator tmp = WEAVE(ind1, ind2);
+    return WEAVE(std::move(tmp), others...);
+}
+
 /**
  * 条件函数, 根据条件求不同的值。
  * @details

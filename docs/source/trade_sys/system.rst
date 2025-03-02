@@ -29,7 +29,58 @@
     * **shared_tp=False** *(bool)*: tp 部件是否为共享部件
     * **shared_pg=False** *(bool)*: pg 部件是否为共享部件
     * **shared_sp=False** *(bool)*: sp 部件是否为共享部件
-    
+
+
+.. raw:: html
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>部件命名规范</th>
+                <th>部件说明</th>
+                <th>部件用途</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>EV_Xxx</td>
+                <td>市场环境判定策略</td>
+                <td>用于判断市场环境，只有当市场有效时，才会实际发生交易。该策略通常可在不同的系统策略实例中共享，以减少计算量。</td>
+            </tr>
+            <tr>
+                <td>CN_Xxx</td>
+                <td>系统有效条件</td>
+                <td>用于判断系统本身适用条件，只有当条件有效时，才会实际发生交易。</td>
+            </tr>
+            <tr>
+                <td>SG_Xxx</td>
+                <td>信号指示器</td>
+                <td>负责产生买入、卖出信号。</td>
+            </tr>            
+            <tr>
+                <td>ST_Xxx</td>
+                <td>止损/止盈策略</td>
+                <td>止损：仅在交易发生亏损时生效，用于终止交易<br>止盈：仅在交易已盈利时生效，通过系统公共参数 tp_monotonic 控制是否保证递增</td>
+            </tr>
+            <tr>
+                <td>MM_Xxx</td>
+                <td>资金管理策略</td>
+                <td>用于控制交易风险，决定交易每次的买卖数量</td>
+            </tr>            
+            <tr>
+                <td>PG_Xxx</td>
+                <td>盈利目标策略</td>
+                <td>在交易达到盈利目标时退出交易，本质是一种特殊的止盈策略</td>
+            </tr>
+            <tr>
+                <td>SP_Xxx</td>
+                <td>移滑价差算法</td>
+                <td>仅用于回测，在回测时模拟实际交易时发生的计划价格和实际价格差异</td>
+            </tr>              
+        </tbody>
+    </table>
+    <p></p>
+
     
 创建系统并执行回测
 -----------------------

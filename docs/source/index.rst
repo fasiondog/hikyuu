@@ -17,6 +17,7 @@ Welcome to Hikyuu's documentation!
    :maxdepth: 1
    :caption: Python指南
 
+   hub.rst
    interactive/index
    base/index
    stock_manager

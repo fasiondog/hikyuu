@@ -917,6 +917,11 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
 }
 
 void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
+    HKU_CHECK(
+      isNull(),
+      "The stock is Null, can't set kdata! Please create a stock using the format Stock(market, "
+      "code, name)! Calling Stock() will create a special null instance.");
+
     HKU_IF_RETURN(ks.empty(), void());
     string nktype(ktype);
     to_upper(nktype);
@@ -941,6 +946,11 @@ void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
 }
 
 void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
+    HKU_CHECK(
+      isNull(),
+      "The stock is Null, can't set kdata! Please create a stock using the format Stock(market, "
+      "code, name)! Calling Stock() will create a special null instance.");
+
     HKU_IF_RETURN(ks.empty(), void());
     string nktype(ktype);
     to_upper(nktype);

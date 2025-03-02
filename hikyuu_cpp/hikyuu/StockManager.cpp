@@ -227,6 +227,13 @@ Stock StockManager::getStock(const string& querystr) const {
     Stock result;
     string query_str = querystr;
     to_upper(query_str);
+    size_t pos = query_str.find('.');
+    if (pos != string::npos) {
+        // 后缀表示法
+        std::string suffix = query_str.substr(pos + 1);
+        std::string prefix = query_str.substr(0, pos);
+        query_str = suffix + prefix;
+    }
     std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.find(query_str);
     return (iter != m_stockDict.end()) ? iter->second : result;

@@ -19,6 +19,8 @@ import shutil
 import pathlib
 import logging
 import importlib
+import inspect
+import sqlalchemy
 from configparser import ConfigParser
 
 # 引入 git 前需设置环境变量，否则某些情况下会报错失败
@@ -79,6 +81,10 @@ class PartModel(Base):
     version = Column(String)  # 版本
     doc = Column(String)  # 帮助说明
     module_name = Column(String)  # 实际策略导入模块名
+    label = Column(String)  # 标签
+    __table_args__ = (
+        UniqueConstraint('name', name='uq_part_model_name'),
+    )
 
     def __str__(self):
         return 'PartModel(id={}, hub_name={}, part={}, name={}, author={}, module_name={})'.format(
@@ -173,6 +179,25 @@ class HubManager(metaclass=SingletonType):
 
         # 创建仓库数据库
         engine = create_engine("sqlite:///{}/.hikyuu/hub.db".format(usr_dir))
+
+        inspector = sqlalchemy.inspect(engine)
+        if inspector.has_table(PartModel.__tablename__):
+            columns = inspector.get_columns(PartModel.__tablename__)
+            column_exists = any(column['name'] == 'label' for column in columns)
+            if not column_exists:
+                add_column_sql = sqlalchemy.text(
+                    f"ALTER TABLE {PartModel.__tablename__} ADD COLUMN label TEXT;")
+                with engine.connect() as connection:
+                    connection.execute(add_column_sql)
+
+            indexes = inspector.get_indexes(PartModel.__tablename__)
+            index_exists = any(index['name'] == "uq_part_model_name" for index in indexes)
+            if not index_exists:
+                create_index_sql = sqlalchemy.text(
+                    f"CREATE INDEX uq_part_model_name ON {PartModel.__tablename__} (name);")
+                with engine.connect() as connection:
+                    connection.execute(create_index_sql)
+
         Base.metadata.create_all(engine)
         self._scoped_Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
         self._session = None
@@ -365,8 +390,8 @@ class HubManager(metaclass=SingletonType):
                             except ModuleNotFoundError:
                                 self.logger.error('{} 缺失 part.py 文件, 位置："{}"！'.format(module_name, entry.path))
                                 continue
-                            except:
-                                self.logger.error('{} 无法导入该文件: {}'.format(module_name, entry.path))
+                            except Exception as e:
+                                self.logger.error('{} 无法导入该文件: {}! {}'.format(module_name, entry.path, str(e)))
                                 continue
 
                             module_vars = vars(part_module)
@@ -386,7 +411,8 @@ class HubManager(metaclass=SingletonType):
                                     module_name=module_name,
                                     author=part_module.author.strip() if 'author' in module_vars else 'None',
                                     version=part_module.version.strip() if 'version' in module_vars else 'None',
-                                    doc=part_module.part.__doc__.strip() if part_module.part.__doc__ else "None"
+                                    doc=part_module.part.__doc__.strip() if part_module.part.__doc__ else "None",
+                                    label=part_module.label.strip() if 'label' in module_vars else 'None',
                                 )
                                 self._session.add(part_model)
                             except Exception as e:
@@ -462,11 +488,21 @@ class HubManager(metaclass=SingletonType):
             part_module = importlib.import_module(part_model.module_name)
         except ModuleNotFoundError:
             raise PartNotFoundError(name, '请检查部件对应路径是否存在')
+        signature = inspect.signature(part_module.part)
+        func_name = f'\npart("{name}",'
+        for param_name, param in signature.parameters.items():
+            if param.default is param.empty:
+                func_name += f"{param_name}, "
+            else:
+                default_value = param.default
+                func_name += f"{param_name}={default_value}, "
+        func_name += ")\n"
+        func_name += part_module.part.__doc__
         return {
             'name': name,
             'author': part_model.author,
             'version': part_model.version,
-            'doc': part_module.part.__doc__,
+            'doc': func_name  # part_module.part.__doc__,
         }
 
     def print_part_info(self, name):
@@ -524,6 +560,37 @@ class HubManager(metaclass=SingletonType):
         hub_model = self._session.query(HubModel.name).filter_by(local_base=local_base).first()
         checkif(hub_model is None, local_base, HubNotFoundError)
         return hub_model.name
+
+    @dbsession
+    def search_part(self, name: str = None, hub: str = None, part_type: str = None, label=None):
+        """搜索部件
+        :param str name: 部件名称
+        :param str hub: 仓库名
+        :param str part_type: 部件类型
+        :param str label: 标签
+        :return: 部件名称列表
+        :rtype: list
+        """
+        parts = None
+        if name is not None:
+            parts = self._session.query(PartModel).filter(PartModel.name.like(f'%{name}%'))
+        if hub is not None:
+            if parts is None:
+                parts = self._session.query(PartModel).fileter(PartModel.hub_name.like(f'%{hub}%'))
+            else:
+                parts = parts.filter(PartModel.hub_name.like(f'%{hub}%'))
+        if part_type is not None:
+            if parts is None:
+                parts = self._session.query(PartModel).filter(PartModel.part.like(f'%{part_type}%'))
+            else:
+                parts = parts.filter(PartModel.part.like(f'%{part_type}%'))
+        if label is not None:
+            if parts is None:
+                parts = self._session.query(PartModel).filter(PartModel.label.like(f'%{label}%'))
+            else:
+                parts = parts.filter(PartModel.label.like(f'%{label}%'))
+        records = parts.all() if parts is not None else []
+        return [record.name for record in records]
 
 
 def add_remote_hub(name, url, branch='main'):
@@ -632,6 +699,19 @@ def get_current_hub(filename):
     return HubManager().get_current_hub(filename)
 
 
+def search_part(name: str = None, hub: str = None, part_type: str = None, label: str = None):
+    """搜索部件
+
+    :param str name: 部件名称
+    :param str hub: 仓库名
+    :param str part_type: 部件类型
+    :param str label: 标签
+    :return: 部件名称列表
+    :rtype: list
+    """
+    return HubManager().search_part(name, hub, part_type, label)
+
+
 # 初始化仓库
 try:
     HubManager().setup_hub()
@@ -653,6 +733,7 @@ __all__ = [
     'get_hub_name_list',
     'get_part_name_list',
     'get_current_hub',
+    'search_part',
 ]
 
 if __name__ == "__main__":

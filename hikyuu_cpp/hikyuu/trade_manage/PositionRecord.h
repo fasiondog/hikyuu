@@ -28,10 +28,11 @@ public:
     /** 仅用于python的__str__ */
     string str() const;
 
-    /** 盈利 = 买入资金 - 累计交易总成本 - 卖出资金 */
-    price_t totalProfit() const {
-        return buyMoney - totalCost - sellMoney;
-    }
+    /**
+     * @brief 盈亏 = 买入资金 - 累计交易总成本 - 卖出资金
+     * @note 只对已清仓的记录有效，未清仓将返回0.0
+     */
+    price_t totalProfit() const;
 
     Stock stock;              ///< 交易对象
     Datetime takeDatetime;    ///< 初次建仓日期
