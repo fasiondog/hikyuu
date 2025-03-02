@@ -66,6 +66,7 @@
 #include "crt/ISNA.h"
 #include "crt/JUMPUP.h"
 #include "crt/JUMPDOWN.h"
+#include "crt/KALMAN.h"
 #include "crt/LAST.h"
 #include "crt/LASTVALUE.h"
 #include "crt/LIUTONGPAN.h"
