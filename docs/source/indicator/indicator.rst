@@ -682,6 +682,16 @@
     :param Indicator ind: 指标
     :rtype: Indicator
 
+
+.. py:function:: KALMAN(ind, [q=0.01], [r=0.1])
+
+    Kalman滤波器, 用于平滑指标, 可设置平滑系数q和r, 默认q=0.01, r=0.1
+
+    :param Indicator ind: 指标
+    :param float q: 平滑系数
+    :param float r: 噪声系数
+    :rtype: Indicator
+
     
 .. py:function:: KDATA([data])
 

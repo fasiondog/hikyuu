@@ -139,6 +139,7 @@
 * :py:func:`FILTER` - 信号过滤, 过滤连续出现的信号
 * :py:func:`HHV` - N日内最高价
 * :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
+* :py:func:`KALMAN` - 卡尔曼滤波
 * :py:func:`KDJ` - 经典随机指标
 * :py:func:`LLV` - N日内最低价
 * :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
