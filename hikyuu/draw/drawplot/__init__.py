@@ -29,7 +29,7 @@
 # 1. 20171122, Added by fasiondog
 # ===============================================================================
 
-from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, EnvironmentBase, System, Portfolio
+from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, EnvironmentBase, System, Portfolio, TradeManager
 
 import matplotlib
 from matplotlib.pylab import gca as mpl_gca
@@ -49,6 +49,8 @@ from .matplotlib_draw import ax_draw_macd2 as mpl_ax_draw_macd2
 from .matplotlib_draw import ax_set_locator_formatter as mpl_ax_set_locator_formatter
 from .matplotlib_draw import adjust_axes_show as mpl_adjust_axes_show
 from .matplotlib_draw import sys_performance as mpl_sys_performance
+from .matplotlib_draw import tm_heatmap as mpl_tm_heatmap
+from .matplotlib_draw import sys_heatmap as mpl_sys_heatmap
 from .matplotlib_draw import (DRAWNULL, STICKLINE, DRAWBAND, RGB, PLOYLINE,
                               DRAWLINE, DRAWTEXT, DRAWNUMBER, DRAWTEXT_FIX, DRAWNUMBER_FIX, DRAWSL,
                               DRAWIMG, DRAWICON, DRAWBMP, SHOWICONS, DRAWRECTREL)
@@ -128,6 +130,9 @@ def use_draw_with_matplotlib():
     System.plot = mpl_sysplot
     System.performance = mpl_sys_performance
     Portfolio.performance = mpl_sys_performance
+    TradeManager.heatmap = mpl_tm_heatmap
+    System.heatmap = mpl_sys_heatmap
+    Portfolio.heatmap = mpl_sys_heatmap
 
 
 def use_draw_with_echarts():

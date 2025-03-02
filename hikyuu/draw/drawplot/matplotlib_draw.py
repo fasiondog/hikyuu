@@ -5,10 +5,10 @@
 """
 import sys
 import os
-import datetime
 import logging
 import numpy as np
 import matplotlib
+import seaborn as sns
 import math
 from typing import Union
 from matplotlib.pylab import Rectangle, gca, gcf, figure, ylabel, axes, draw
@@ -770,6 +770,13 @@ def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
 
 
 def sys_performance(sys, ref_stk=None):
+    """
+    绘制系统绩效，即账户累积收益率曲线
+
+    :param SystemBase | PortfolioBase sys: SYS或PF实例
+    :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
+    :return: None
+    """
     if ref_stk is None:
         ref_stk = get_stock('sh000300')
 
@@ -847,10 +854,65 @@ def sys_performance(sys, ref_stk=None):
     ax3.set_frame_on(False)
 
 
+def tm_heatmap(tm, start_date, end_date=None, axes=None):
+    """
+    绘制账户收益年-月收益热力图
+
+    :param tm: 交易账户
+    :param start_date: 开始日期
+    :param end_date: 结束日期，默认为今天
+    :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :return: None
+    """
+    if end_date is None:
+        end_date = Datetime.today() + Days(1)
+
+    dates = get_date_range(start_date, end_date)
+    if len(dates) == 0:
+        hku_error("没有数据，请检查日期范围！start_date={}, end_date={}", start_date, end_date)
+        return
+
+    profit = tm.get_funds_curve(dates)
+    if len(profit) == 0:
+        hku_error("获取 tm 收益曲线失败，请检查 tm 初始日期！tm.init_datetime={} start_date={}, end_date={}",
+                  tm.init_datetime, start_date, end_date)
+        return
+
+    data = pd.DataFrame({'date': dates, 'value': profit})
+
+    # 提取年月信息
+    data['year'] = data['date'].apply(lambda v: v.year)
+    data['month'] = data['date'].apply(lambda v: v.month)
+
+    # 获取每个月的收益
+    monthly = data.groupby(['year', 'month']).last()['value'].reset_index()
+    monthly['return'] = ((monthly['value'] - monthly['value'].shift(1)) / monthly['value'].shift(1)) * 100.
+
+    pivot_data = monthly.pivot_table(index='year', columns='month', values='return')
+
+    if axes is None:
+        axes = create_figure()
+
+    sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
+    # 设置标题和坐标轴标签
+    axes.set_title('年-月度收益率(%)热力图')
+    axes.set_xlabel('月度')
+    axes.set_ylabel('年份')
+
+
+def sys_heatmap(sys, axes=None):
+    """
+    绘制系统收益年-月收益热力图
+    """
+    hku_check(sys.tm is not None, "系统未初始化交易账户")
+    query = sys.query
+    k = get_kdata('sh000001', query)
+    tm_heatmap(sys.tm, k[0].datetime, k[-1].datetime, axes)
+
+
 # ============================================================================
 # 通达信画图函数
 # ============================================================================
-
 DRAWNULL = constant.null_price
 
 
