@@ -1284,12 +1284,16 @@
     :rtype: Indicator
 
 
-.. py:function:: WEAVE(ind1, ind2)
+.. py:function:: WEAVE(ind1, ind2[, ind3, ind4, ind5, ind6])
 
-    将ind1和ind2的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
+    将最多6个Indicator的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
     
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
+    :param Indicator ind3: 指标3, 可省略
+    :param Indicator ind4: 指标4, 可省略
+    :param Indicator ind5: 指标5, 可省略
+    :param Indicator ind6: 指标6, 可省略
     :rtype: Indicator
 
 
