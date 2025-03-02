@@ -96,7 +96,7 @@ HUB 指的是量化交易策略部件的平台，用于：
     :param str name: 部件名称
 
 
-.. py:function:: search_part(name: str, hub: str = None, part_type: str = None)
+.. py:function:: search_part(name: str=None, hub: str = None, part_type: str = None, label=None)
 
     搜索策略部件
 
@@ -105,6 +105,7 @@ HUB 指的是量化交易策略部件的平台，用于：
     :param str name: 部件名称
     :param str hub: 仓库名称
     :param str part_type: 部件类型
+    :param str label: 标签
     :return: 策略部件名称列表
 
 
