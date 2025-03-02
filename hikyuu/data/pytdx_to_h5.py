@@ -282,10 +282,13 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
 
         for bar in bar_list:
             try:
-                tmp = datetime.date(bar['year'], bar['month'], bar['day'])
-                bar_datetime = (tmp.year * 10000 + tmp.month * 100 + tmp.day) * 10000
-                if ktype != 'DAY':
-                    bar_datetime += bar['hour'] * 100 + bar['minute']
+                if ktype == "DAY":
+                    tmp = datetime.date(bar["year"], bar["month"], bar["day"])
+                    bar_datetime = (tmp.year * 10000 + tmp.month * 100 + tmp.day) * 10000
+                else:
+                    tmp = datetime.datetime(bar["year"], bar["month"], bar["day"], bar['hour'], bar['minute'])
+                    bar_datetime = (tmp.year * 10000 + tmp.month * 100 + tmp.day) * \
+                        10000 + bar["hour"] * 100 + bar["minute"]
             except Exception as e:
                 hku_error("Failed translate datetime: {}, from {}! {}".format(bar, api.ip, e))
                 continue
