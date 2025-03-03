@@ -872,13 +872,14 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None):
         hku_error("没有数据，请检查日期范围！start_date={}, end_date={}", start_date, end_date)
         return
 
-    profit = tm.get_funds_curve(dates)
-    if len(profit) == 0:
+    funds = tm.get_funds_curve(dates)
+    if len(funds) == 0:
         hku_error("获取 tm 收益曲线失败，请检查 tm 初始日期！tm.init_datetime={} start_date={}, end_date={}",
                   tm.init_datetime, start_date, end_date)
         return
 
-    data = pd.DataFrame({'date': dates, 'value': profit})
+    data = pd.DataFrame({'date': dates, 'value': funds})
+    data = data[(data[['value']] != 0).all(axis=1)]
 
     # 提取年月信息
     data['year'] = data['date'].apply(lambda v: v.year)
