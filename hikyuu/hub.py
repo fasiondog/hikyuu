@@ -21,7 +21,7 @@ import logging
 import importlib
 import inspect
 import sqlalchemy
-from configparser import ConfigParser
+from functools import lru_cache
 
 # 引入 git 前需设置环境变量，否则某些情况下会报错失败
 os.environ['GIT_PYTHON_REFRESH'] = 'quiet'
@@ -637,6 +637,7 @@ def remove_hub(name):
     HubManager().remove_hub(name)
 
 
+@lru_cache
 def get_part(name, *args, **kwargs):
     """获取指定策略部件
 
@@ -645,6 +646,17 @@ def get_part(name, *args, **kwargs):
     :param kwargs: 其他部件相关参数
     """
     return HubManager().get_part(name, *args, **kwargs)
+
+
+def get_part_list(name_list):
+    """
+    获取指定策略部件列表
+
+    :param list name_list: 部件名称列表
+    :return: 部件列表
+    :rtype: list
+    """
+    return [get_part(name) for name in name_list]
 
 
 def get_hub_path(name):
@@ -692,6 +704,7 @@ def get_part_module(part_name: str):
     return HubManager().get_part_module(part_name)
 
 
+@lru_cache
 def get_current_hub(filename):
     """用于在仓库part.py中获取当前所在的仓库名。
     示例： get_current_hub(__file__)
@@ -726,6 +739,7 @@ __all__ = [
     'build_hub',
     'help_part',
     'get_part',
+    'get_part_list',
     'get_hub_path',
     'get_part_info',
     'get_part_module',
