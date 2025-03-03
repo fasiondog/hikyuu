@@ -194,7 +194,7 @@ void Portfolio::run(const KQuery& query, bool force) {
     }
     HKU_IF_RETURN(!m_need_calculate, void());
 
-    _readyForRun();
+    readyForRun();
 
     if (m_real_sys_list.empty()) {
         HKU_WARN("There is no system in portfolio!");
