@@ -51,6 +51,7 @@ from .matplotlib_draw import adjust_axes_show as mpl_adjust_axes_show
 from .matplotlib_draw import sys_performance as mpl_sys_performance
 from .matplotlib_draw import tm_heatmap as mpl_tm_heatmap
 from .matplotlib_draw import sys_heatmap as mpl_sys_heatmap
+from .matplotlib_draw import iheatmap as mpl_iheatmap
 from .matplotlib_draw import (DRAWNULL, STICKLINE, DRAWBAND, RGB, PLOYLINE,
                               DRAWLINE, DRAWTEXT, DRAWNUMBER, DRAWTEXT_FIX, DRAWNUMBER_FIX, DRAWSL,
                               DRAWIMG, DRAWICON, DRAWBMP, SHOWICONS, DRAWRECTREL)
@@ -121,6 +122,7 @@ def use_draw_with_matplotlib():
 
     Indicator.plot = mpl_iplot
     Indicator.bar = mpl_ibar
+    Indicator.heatmap = mpl_iheatmap
 
     SignalBase.plot = mpl_sgplot
 

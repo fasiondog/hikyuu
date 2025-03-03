@@ -499,6 +499,50 @@ def ibar(
     # draw()
 
 
+def iheatmap(ind, axes=None):
+    """
+    绘制指标收益年-月收益热力图
+
+    指标收益率 = (当前月末值 - 上月末值) / 上月末值 * 100
+
+    指标应已计算（即有值），且为时间序列
+
+    :param ind: 指定指标
+    :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :return: None
+    """
+    if len(ind) == 0:
+        hku_error("指标长度为0, 指标应已计算（即有值")
+        return
+
+    dates = ind.get_datetime_list()
+    if len(dates) == 0:
+        hku_error("获取日期列表失败！指标应为时间序列")
+        return
+
+    data = pd.DataFrame({'date': dates, 'value': ind.to_np()})
+    data = data[(data[['value']] != 0).all(axis=1)]
+
+    # 提取年月信息
+    data['year'] = data['date'].apply(lambda v: v.year)
+    data['month'] = data['date'].apply(lambda v: v.month)
+
+    # 获取每个月的收益
+    monthly = data.groupby(['year', 'month']).last()['value'].reset_index()
+    monthly['return'] = ((monthly['value'] - monthly['value'].shift(1)) / monthly['value'].shift(1)) * 100.
+
+    pivot_data = monthly.pivot_table(index='year', columns='month', values='return')
+
+    if axes is None:
+        axes = create_figure()
+
+    sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
+    # 设置标题和坐标轴标签
+    axes.set_title('年-月度收益率(%)热力图')
+    axes.set_xlabel('月度')
+    axes.set_ylabel('年份')
+
+
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
 
