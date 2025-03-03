@@ -165,10 +165,6 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
-#if HKU_SUPPORT_SERIALIZATION
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(Portfolio)
-#endif
-
 #define PORTFOLIO_IMP(classname)                   \
 public:                                            \
     virtual PortfolioPtr _clone() const override { \

@@ -11,6 +11,10 @@
 
 #include "Portfolio.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::Portfolio)
+#endif
+
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Portfolio& pf) {
