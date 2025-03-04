@@ -8,6 +8,10 @@
 #include "hikyuu/global/sysinfo.h"
 #include "System.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::System)
+#endif
+
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const System& sys) {
