@@ -82,12 +82,6 @@ Indicator (*AMA_3)(const Indicator&, int, int, int) = AMA;
 Indicator (*AMA_4)(const Indicator&, const IndParam&, const IndParam&, const IndParam&) = AMA;
 Indicator (*AMA_5)(const Indicator&, const Indicator&, const Indicator&, const Indicator&) = AMA;
 
-Indicator (*ATR_1)(int) = ATR;
-Indicator (*ATR_2)(const IndParam&) = ATR;
-Indicator (*ATR_3)(const Indicator&, const IndParam&) = ATR;
-Indicator (*ATR_4)(const Indicator&, const Indicator&) = ATR;
-Indicator (*ATR_5)(const Indicator&, int) = ATR;
-
 Indicator (*DIFF_1)() = DIFF;
 Indicator (*DIFF_2)(const Indicator&) = DIFF;
 
@@ -785,16 +779,14 @@ void export_Indicator_build_in(py::module& m) {
     * result(0): AMA
     * result(1): ER)");
 
-    m.def("ATR", ATR_1, py::arg("n") = 14);
-    m.def("ATR", ATR_2, py::arg("n"));
-    m.def("ATR", ATR_3, py::arg("data"), py::arg("n"));
-    m.def("ATR", ATR_4, py::arg("data"), py::arg("n"));
-    m.def("ATR", ATR_5, py::arg("data"), py::arg("n") = 14, R"(ATR([data, n=14])
+    m.def("ATR", py::overload_cast<int>(ATR), py::arg("n") = 14);
+    m.def("ATR", py::overload_cast<const KData&, int>(ATR), py::arg("kdata"), py::arg("n") = 14,
+          R"(ATR([kdata, n=14])
 
-    平均真实波幅(Average True Range)
+    平均真实波幅(Average True Range), 真实波动幅度 TR 的简单移动均值
 
-    :param Indicator data 待计算的源数据
-    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于1的整数
+    :param KData kdata 待计算的源数据
+    :param int n: 计算均值的周期窗口，必须为大于1的整数
     :rtype: Indicator)");
 
     m.def("MACD", MACD_1, py::arg("n1") = 12, py::arg("n2") = 26, py::arg("n3") = 9);

@@ -19,6 +19,12 @@ IAtr::IAtr() : IndicatorImp("ATR", 1) {
     setParam<int>("n", 14);
 }
 
+IAtr::IAtr(const KData& k, int n) : IndicatorImp("ATR", 1) {
+    setParam<int>("n", n);
+    setParam<KData>("kdata", k);
+    IAtr::_calculate(Indicator());
+}
+
 IAtr::~IAtr() {}
 
 void IAtr::_checkParam(const string& name) const {
@@ -27,45 +33,54 @@ void IAtr::_checkParam(const string& name) const {
     }
 }
 
-void IAtr::_calculate(const Indicator& indicator) {
-    size_t total = indicator.size();
-    m_discard = indicator.discard();
+void IAtr::_calculate(const Indicator& data) {
+    HKU_WARN_IF(!isLeaf() && !data.empty(),
+                "The input is ignored because {} depends on the context!", m_name);
+
+    KData kdata = getContext();
+    size_t total = kdata.size();
+    HKU_IF_RETURN(total == 0, void());
+
+    _readyBuffer(total, 1);
+
+    int n = getParam<int>("n");
+    m_discard = n + 1;
     if (m_discard >= total) {
         m_discard = total;
         return;
     }
 
-    int n = getParam<int>("n");
-    size_t startPos = discard();
-
-    auto const* src = indicator.data();
-    auto* dst = this->data();
-    dst[startPos] = src[startPos];
-    value_t multiplier = 2.0 / (n + 1);
-    for (size_t i = startPos + 1; i < total; ++i) {
-        dst[i] = (src[i] - dst[i - 1]) * multiplier + dst[i - 1];
+    auto* k = kdata.data();
+    vector<value_t> buf(total);
+    for (size_t i = 1; i < total; ++i) {
+        value_t v1 = k[i].highPrice - k[i].lowPrice;
+        value_t v2 = std::abs(k[i].highPrice - k[i - 1].closePrice);
+        value_t v3 = std::abs(k[i].lowPrice - k[i - 1].closePrice);
+        buf[i] = std::max(std::max(v1, v2), v3);
     }
-}
 
-void IAtr::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
-    HKU_IF_RETURN(step < 1, void());
-    Indicator slice = SLICE(ind, 0, curPos + 1);
-    Indicator atr = ATR(slice, step);
-    if (atr.size() > 0) {
-        _set(atr[atr.size() - 1], curPos);
+    value_t sum = 0.0;
+    for (size_t i = 1, end = n + 1; i < end; ++i) {
+        sum += buf[i];
+    }
+
+    auto* dst = this->data();
+    dst[n] = sum / n;
+
+    for (size_t i = n + 1; i < total; ++i) {
+        sum = buf[i] + sum - buf[i - n];
+        dst[i] = sum / n;
     }
 }
 
 Indicator HKU_API ATR(int n) {
-    IndicatorImpPtr p = make_shared<IAtr>();
+    auto p = make_shared<IAtr>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
-Indicator HKU_API ATR(const IndParam& n) {
-    IndicatorImpPtr p = make_shared<IAtr>();
-    p->setIndParam("n", n);
-    return Indicator(p);
+Indicator HKU_API ATR(const KData& kdata, int n) {
+    return Indicator(make_shared<IAtr>(kdata, n));
 }
 
 } /* namespace hku */
