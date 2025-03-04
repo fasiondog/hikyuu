@@ -87,11 +87,11 @@
     :rtype: Indicator
 
 
-.. py:function:: ATR([data, n=14])
+.. py:function:: ATR([kdata, n=14])
 
-    平均真实波幅(Average True Range)
+    平均真实波幅(Average True Range), 真实波动幅度 TR 的简单移动均值
 
-    :param Indicator data 待计算的源数据
+    :param KData kdata 待计算的源数据
     :param int n: 计算均值的周期窗口，必须为大于1的整数
     :rtype: Indicator
 
@@ -1245,6 +1245,17 @@
     分时成交量数据
 
     :param KData k: 上下文
+    :rtype: Indicator
+
+
+.. py:function:: TR([kdata])
+
+    真实波动幅度(TR)是以下三个值中的最大值:
+    1. 当前周期最高价与最低价之差
+    2. 当前周期最高价与前一周期收盘价之差的绝对值
+    3. 当前周期最低价与前一周期收盘价之差的绝对值
+
+    :param KData kdata: K线数据
     :rtype: Indicator
 
 
