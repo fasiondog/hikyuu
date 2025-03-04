@@ -2201,4 +2201,15 @@ void export_Indicator_build_in(py::module& m) {
     :param float q: 平滑系数
     :param float r: 噪声系数
     :rtype: Indicator)");
+
+    m.def("TR", py::overload_cast<>(TR));
+    m.def("TR", py::overload_cast<const KData&>(TR), py::arg("kdata"), R"(TR([kdata])
+
+    真实波动幅度(TR)是以下三个值中的最大值:
+    1. 当前周期最高价与最低价之差
+    2. 当前周期最高价与前一周期收盘价之差的绝对值
+    3. 当前周期最低价与前一周期收盘价之差的绝对值
+
+    :param KData kdata: K线数据
+    :rtype: Indicator)");
 }
