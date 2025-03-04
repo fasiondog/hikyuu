@@ -1,41 +1,44 @@
 /*
- * test_ACOS.cpp
+ * test_TR.cpp
  *
- *  Copyright (c) 2019 hikyuu.org
- *
- *  Created on: 2019-5-1
+ *  Created on: 2019-3-29
  *      Author: fasiondog
  */
 
 #include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/ATR.h>
 #include <hikyuu/indicator/crt/TR.h>
-#include <hikyuu/indicator/crt/MA.h>
-#include <hikyuu/indicator/crt/DISCARD.h>
-#include <hikyuu/indicator/crt/KDATA.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_ATR test_indicator_ATR
+ * @defgroup test_indicator_TR test_indicator_TR
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-TEST_CASE("test_ATR") {
-    auto k = getKData("sh000001", KQuery(-30));
+TEST_CASE("test_TR") {
+    KData k;
 
-    auto atr = ATR(k, 10);
-    CHECK_EQ(atr.name(), "ATR");
-    CHECK_EQ(atr.size(), k.size());
-    CHECK_EQ(atr.discard(), 11);
+    /** @arg k 为空 */
+    auto ret = TR(k);
+    CHECK_EQ(ret.size(), 0);
+    CHECK_EQ(ret.discard(), 0);
+    CHECK_EQ(ret.name(), "TR");
 
-    auto expect = DISCARD(MA(TR(), 10), 11)(k);
-    for (size_t i = atr.discard(); i < atr.size(); ++i) {
-        CHECK_EQ(atr[i], doctest::Approx(expect[i]));
+    /** @arg 正常k */
+    k = getKData("sh000001", KQueryByIndex(-10));
+    REQUIRE(k.size() > 0);
+    ret = ret(k);
+    CHECK_EQ(ret.name(), "TR");
+    CHECK_EQ(ret.size(), k.size());
+    CHECK_EQ(ret.discard(), 1);
+    PriceList expect = {0.0,      39.02399,  31.32,  24.671,    30.29199,
+                        92.95299, 90.144999, 42.014, 35.516999, 23.07400};
+    for (size_t i = 1; i < ret.size(); ++i) {
+        CHECK_EQ(ret[i], doctest::Approx(expect[i]).epsilon(0.0001));
     }
 }
 
@@ -43,16 +46,17 @@ TEST_CASE("test_ATR") {
 // benchmark
 //-----------------------------------------------------------------------------
 #if ENABLE_BENCHMARK_TEST
-TEST_CASE("test_ATR_benchmark") {
+TEST_CASE("test_TR_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
+    Indicator c = kdata.close();
     int cycle = 1000;  // 测试循环次数
 
     {
-        BENCHMARK_TIME_MSG(test_ATR_benchmark, cycle, fmt::format("data len: {}", kdata.size()));
+        BENCHMARK_TIME_MSG(test_TR_benchmark, cycle, fmt::format("data len: {}", c.size()));
         SPEND_TIME_CONTROL(false);
         for (int i = 0; i < cycle; i++) {
-            Indicator ind = ATR();
+            Indicator ind = TR();
             Indicator result = ind(kdata);
         }
     }
@@ -65,14 +69,15 @@ TEST_CASE("test_ATR_benchmark") {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-TEST_CASE("test_ATR_export") {
+TEST_CASE("test_TR_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/ATR.xml";
+    filename += "/TR.xml";
 
-    Stock stock = sm.getStock("sh000001");
-    KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = ATR(kdata);
+    KData k = getStock("SH600000").getKData(KQuery(-10));
+    Indicator x1 = TR(k);
+    x1.setContext(k);
+
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -86,7 +91,7 @@ TEST_CASE("test_ATR_export") {
         ia >> BOOST_SERIALIZATION_NVP(x2);
     }
 
-    CHECK_EQ(x2.name(), "ATR");
+    CHECK_EQ(x2.name(), "TR");
     CHECK_EQ(x1.size(), x2.size());
     CHECK_EQ(x1.discard(), x2.discard());
     CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
