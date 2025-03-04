@@ -1547,9 +1547,13 @@ void TradeManager::_saveAction(const TradeRecord& record) {
     switch (record.business) {
         case BUSINESS_INIT:
             buf << "my_tm = crtTM(datetime=Datetime('" << record.datetime.str() << "'), "
-                << "initCash=" << record.cash << sep << "costFunc=" << m_costfunc->name() << "("
-                << m_costfunc->getParameter().getNameValueList() << "), " << "name='" << m_name
-                << "'" << ")";
+                << "initCash=" << record.cash << sep << "costFunc=";
+            if (m_costfunc) {
+                buf << m_costfunc->name() << "(" << m_costfunc->getParameter().getNameValueList()
+                    << "), " << "name='" << m_name << "'" << ")";
+            } else {
+                buf << "TC_Zero()";
+            }
             break;
 
         case BUSINESS_CHECKIN:
