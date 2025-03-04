@@ -511,6 +511,9 @@ def iheatmap(ind, axes=None):
     :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
     :return: None
     """
+    if axes is None:
+        axes = create_figure()
+
     if len(ind) == 0:
         hku_error("指标长度为0, 指标应已计算（即有值")
         return
@@ -529,12 +532,13 @@ def iheatmap(ind, axes=None):
 
     # 获取每个月的收益
     monthly = data.groupby(['year', 'month']).last()['value'].reset_index()
+    if len(monthly) < 2:
+        hku_warn("月数据不足！")
+        return
+
     monthly['return'] = ((monthly['value'] - monthly['value'].shift(1)) / monthly['value'].shift(1)) * 100.
 
     pivot_data = monthly.pivot_table(index='year', columns='month', values='return')
-
-    if axes is None:
-        axes = create_figure()
 
     sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
     # 设置标题和坐标轴标签
@@ -908,6 +912,9 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None):
     :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
     :return: None
     """
+    if axes is None:
+        axes = create_figure()
+
     if end_date is None:
         end_date = Datetime.today() + Days(1)
 
@@ -931,12 +938,13 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None):
 
     # 获取每个月的收益
     monthly = data.groupby(['year', 'month']).last()['value'].reset_index()
+    if len(monthly) < 2:
+        hku_warn("月数据不足！")
+        return
+
     monthly['return'] = ((monthly['value'] - monthly['value'].shift(1)) / monthly['value'].shift(1)) * 100.
 
     pivot_data = monthly.pivot_table(index='year', columns='month', values='return')
-
-    if axes is None:
-        axes = create_figure()
 
     sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
     # 设置标题和坐标轴标签
