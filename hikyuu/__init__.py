@@ -208,6 +208,7 @@ def load_hikyuu(**kwargs):
     options = {
         "stock_list": ["sh000001"],
         "ktype_list": ["day"],
+        "preload_num: {"day_max": 100000}
         "load_history_finance": False,
         "load_weight": False,
         "start_spot": False,
@@ -223,6 +224,7 @@ def load_hikyuu(**kwargs):
                     支持的K线类型有:
                     'day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5',
                     'min15', 'min30', 'min60', 'hour2'
+        preload_num (dict): {'day_max': 100000, 'week_max': 100000, 'month_max': 100000, ...}
         load_history_finance (boolean): 预加载历史财务数至内存，默认为 True
         load_weight (boolean): 加载权息数据，默认为 True
 
@@ -295,8 +297,10 @@ def load_hikyuu(**kwargs):
     # 优先使用传入参数作为加载上下文
     if 'stock_list' in kwargs:
         context.stock_list = kwargs['stock_list']
-    if 'ktype_list' in os.environ:
+    if 'ktype_list' in kwargs:
         context.ktype_list = kwargs['ktype_list']
+    if 'preload_num' in kwargs:
+        context.preload_num = kwargs['preload_num']
     if 'load_history_finance' in kwargs:
         hku_param.set("load_history_finance", kwargs['load_history_finance'])
     if 'load_weight' in kwargs:
