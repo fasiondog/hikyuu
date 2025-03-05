@@ -689,13 +689,16 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
         )
 
 
-def evplot(ev, ref_kdata, new=True, axes=None):
+def evplot(ev, ref_kdata, new=True, axes=None, upcolor='red', downcolor='blue', alpha=0.2):
     """绘制市场有效判断
 
     :param EnvironmentBase cn: 系统有效条件
     :param KData ref_kdata: 用于日期参考
     :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
     :param axes: 指定在那个轴对象中进行绘制
+    :param upcolor: 有效时的颜色
+    :param downcolor: 无效时的颜色
+    :param alpha: 透明度
     """
     refdates = ref_kdata.get_datetime_list()
     if axes is None:
@@ -709,11 +712,11 @@ def evplot(ev, ref_kdata, new=True, axes=None):
     x = np.array([i for i in range(len(refdates))])
     y1 = np.array([1 if ev.is_valid(d) else -1 for d in refdates])
     y2 = np.array([-1 if ev.is_valid(d) else 1 for d in refdates])
-    axes.fill_between(x, y1, y2, where=y2 > y1, facecolor='blue', alpha=0.6)
-    axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
+    axes.fill_between(x, y1, y2, where=y2 > y1, facecolor=downcolor, alpha=alpha)
+    axes.fill_between(x, y1, y2, where=y2 < y1, facecolor=upcolor, alpha=alpha)
 
 
-def cnplot(cn, new=True, axes=None, kdata=None):
+def cnplot(cn, new=True, axes=None, kdata=None, upcolor='red', downcolor='blue', alpha=0.2):
     """绘制系统有效条件
 
     :param ConditionBase cn: 系统有效条件
@@ -721,6 +724,9 @@ def cnplot(cn, new=True, axes=None, kdata=None):
     :param axes: 指定在那个轴对象中进行绘制
     :param KData kdata: 指定的KData，如该值为None，则认为该系统有效条件已经
                         指定了交易对象，否则，使用该参数作为交易对象
+    :param upcolor: 有效数时的颜色
+    :param downcolor: 无效时的颜色
+    :param alpha: 透明度
     """
     if kdata is None:
         kdata = cn.to
@@ -739,8 +745,8 @@ def cnplot(cn, new=True, axes=None, kdata=None):
     x = np.array([i for i in range(len(refdates))])
     y1 = np.array([1 if cn.is_valid(d) else -1 for d in refdates])
     y2 = np.array([-1 if cn.is_valid(d) else 1 for d in refdates])
-    axes.fill_between(x, y1, y2, where=y2 > y1, facecolor='blue', alpha=0.6)
-    axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
+    axes.fill_between(x, y1, y2, where=y2 > y1, facecolor=downcolor, alpha=alpha)
+    axes.fill_between(x, y1, y2, where=y2 < y1, facecolor=upcolor, alpha=alpha)
 
 
 def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
