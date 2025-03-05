@@ -387,7 +387,7 @@ Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建�
     :param KData kdata: 指定的KData（即信号发生器的交易对象），如该值为None，则认为该信号发生器已经指定了交易对象，否则，使用该参数作为交易对象
 
 
-.. py:function:: cnplot(cn[, new=True, axes=None, kdata=None])
+.. py:function:: cnplot(cn[, new=True, axes=None, kdata=None, upcolor='red', downcolor='blue', alpha=0.2])
 
     绘制系统有效条件
 
@@ -395,6 +395,22 @@ Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建�
     :param new:  仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
     :param axes: 指定在那个轴对象中进行绘制
     :param KData kdata: 指定的KData，如该值为None，则认为该系统有效条件已经指定了交易对象，否则，使用该参数作为交易对象
+    :param upcolor: 有效数时的颜色
+    :param downcolor: 无效时的颜色
+    :param alpha: 透明度    
+
+
+.. py:function:: evplot(ev, ref_kdata, new=True, axes=None, upcolor='red', downcolor='blue', alpha=0.2)
+
+    绘制市场有效判断
+
+    :param EnvironmentBase cn: 系统有效条件
+    :param KData ref_kdata: 用于日期参考
+    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+    :param axes: 指定在那个轴对象中进行绘制
+    :param upcolor: 有效时的颜色
+    :param downcolor: 无效时的颜色
+    :param alpha: 透明度
 
     
 .. py:function:: sysplot(sys[, new=True, axes=None, style=1])
