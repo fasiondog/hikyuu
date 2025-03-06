@@ -66,7 +66,10 @@ public:
     /** 获取系统有效的日期列表，注意：和交易对象不等长 */
     DatetimeList getDatetimeList() const;
 
-    /** 以指标的形式获取实际值，与交易对象等长，0表示无效，1表示系统有效 */
+    /**
+     * 以指标的形式获取实际值，与交易对象等长，<=0表示无效，>0表示系统有效
+     * @note 带日期的时间序列指标
+     */
     Indicator getValues() const;
 
     /**
