@@ -351,4 +351,44 @@ void export_Signal(py::module& m) {
     :param SignalBase sg1: 输入信号1
     :param SignalBase sg2: 输入信号2
     :param bool alternate: 是否交替买入卖出，默认为True)");
+
+    m.def(
+      "SG_And",
+      [](const py::sequence& sg_list, bool alternate) {
+          vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
+          return SG_And(sg_vec, alternate);
+      },
+      py::arg("sg_list"), py::arg("alternate"));
+    m.def("SG_And", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_And),
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
+          R"(SG_And(sg1, sg2, alternate)
+
+    生成两个指标与的信号
+
+    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
+    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+
+    :param SignalBase sg1: 输入信号1
+    :param SignalBase sg2: 输入信号2
+    :param bool alternate: 是否交替买入卖出，默认为True)");
+
+    m.def(
+      "SG_Or",
+      [](const py::sequence& sg_list, bool alternate) {
+          vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
+          return SG_Or(sg_vec, alternate);
+      },
+      py::arg("sg_list"), py::arg("alternate"));
+    m.def("SG_Or", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Or),
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
+          R"(SG_Or(sg1, sg2, alternate)
+
+    生成两个指标与的信号
+
+    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
+    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+
+    :param SignalBase sg1: 输入信号1
+    :param SignalBase sg2: 输入信号2
+    :param bool alternate: 是否交替买入卖出，默认为True)");
 }
