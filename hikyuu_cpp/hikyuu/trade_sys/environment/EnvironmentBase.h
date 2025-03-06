@@ -13,6 +13,7 @@
 #include <shared_mutex>
 #include "../../KQuery.h"
 #include "../../utilities/Parameter.h"
+#include "hikyuu/indicator/Indicator.h"
 
 namespace hku {
 
@@ -64,15 +65,24 @@ public:
     /**
      * 加入有效时间，在_calculate中调用
      * @param datetime 系统有效日期
+     * @param value 默认为1.0，大于0表示有效，小于等于0表示无效
      */
-    void _addValid(const Datetime& datetime);
+    void _addValid(const Datetime& datetime, price_t value = 1.0);
 
     /**
      * 判断指定日期的外部环境是否有效
      * @param datetime 指定日期
      * @return true 有效 | false 无效
      */
-    bool isValid(const Datetime& datetime);
+    bool isValid(const Datetime& datetime) const;
+
+    price_t getValue(const Datetime& datetime) const;
+
+    /**
+     * 以指标的形式获取实际值，与交易对象等长，<=0表示无效，>0表示系统有效
+     * @note 带日期的时间序列指标
+     */
+    Indicator getValues() const;
 
     /** 子类计算接口 */
     virtual void _calculate() = 0;
@@ -86,8 +96,9 @@ public:
 protected:
     string m_name;
     KQuery m_query;
-    std::set<Datetime> m_valid;
-    std::shared_mutex m_mutex;
+    map<Datetime, size_t> m_date_index;
+    vector<price_t> m_values;
+    mutable std::shared_mutex m_mutex;
 
 //============================================
 // 序列化支持
@@ -101,14 +112,17 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         // ev可能多个系统共享，保留m_query可能用于查错
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_date_index);
+        ar& BOOST_SERIALIZATION_NVP(m_values);
     }
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_date_index);
+        ar& BOOST_SERIALIZATION_NVP(m_values);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
