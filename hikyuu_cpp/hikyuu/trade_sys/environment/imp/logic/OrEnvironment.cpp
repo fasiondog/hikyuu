@@ -53,7 +53,7 @@ void OrEnvironment::_calculate() {
         for (size_t i = 0; i < total; i++) {
             if (values[i] > 0.0) {
                 m_date_index[dates[i]] = m_values.size();
-                m_values[i] = 1.0;
+                m_values.push_back(1.0);
             }
         }
         return;
@@ -65,7 +65,7 @@ void OrEnvironment::_calculate() {
     for (size_t i = 0; i < total; i++) {
         if (values[i] > 0.0) {
             m_date_index[dates[i]] = m_values.size();
-            m_values[i] = 1.0;
+            m_values.push_back(1.0);
         }
     }
 

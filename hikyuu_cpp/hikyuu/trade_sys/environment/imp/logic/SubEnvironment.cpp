@@ -50,29 +50,26 @@ void SubEnvironment::_calculate() {
         m_values.resize(total);
         for (size_t i = 0; i < total; i++) {
             m_date_index[dates[i]] = i;
-            m_values[i] = values[i];
+            m_values[i] = -values[i];
         }
         return;
     }
 
-    auto values1 = m_ev1->getValues();
-    auto dates1 = values1.getDatetimeList();
-    unordered_map<Datetime, price_t> value1_map;
-    const auto* src1 = values1.data();
-    for (size_t i = 0, total = dates1.size(); i < total; i++) {
-        value1_map[dates1[i]] = src1[i];
+    auto values = m_ev1->getValues();
+    auto dates = values.getDatetimeList();
+    size_t total = dates.size();
+    m_values.resize(total);
+    for (size_t i = 0; i < total; i++) {
+        m_date_index[dates[i]] = i;
+        m_values[i] = values[i];
     }
 
-    auto value2 = m_ev2->getValues();
-    auto dates2 = value2.getDatetimeList();
-    const auto* src2 = value2.data();
-    for (size_t i = 0, total = dates2.size(); i < total; i++) {
-        auto iter = value1_map.find(dates2[i]);
-        if (iter != value1_map.end()) {
-            _addValid(iter->first, iter->second - src2[i]);
-        } else {
-            _addValid(dates2[i], -src2[i]);
-        }
+    values = m_ev2->getValues();
+    dates = values.getDatetimeList();
+    total = dates.size();
+    const auto* src = values.data();
+    for (size_t i = 0; i < total; i++) {
+        _addValid(dates[i], -src[i]);
     }
 }
 
