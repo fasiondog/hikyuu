@@ -1,6 +1,38 @@
 版本发布说明
 =======================
 
+2.5.3 - 2025年3月7日
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. 新增特性
+    - 调整数据加载策略, load_hikyuu 中传入的加载参数优先于默认配置文件, 同时增加 preload_num 参数控制预加载数量
+    - 新增指标 KALMAN(卡尔曼滤波), TR(真实波动幅度)
+    - 优化 Hub 功能
+        - 改进 help_part 以便 get_part 默认参数
+        - 增加 label 参数, 并支持搜索
+        - 添加 get_part_list 函数
+        - 优化 get_part 性能
+
+    - EV 支持加、减、乘、除、与、或等逻辑运算
+    - 支持后缀表示法 000001.sh
+    - sys, pf 添加 heatmap 方法，绘制系统收益的年-月热力图功能
+
+2. 功能优化
+    - WEAVE、SG 支持多参数或列表输入
+    - 优化 crtMM 函数的卖出数量接口, get_sell_num 增加默认值, 可为 None
+    - Hikyuutdx 分钟级数据导入时增加保护; 补充创业板302段
+    - 为 evplot 和 cnplot 函数增加颜色和透明度参数
+    - 支持macosx下 hub 使用c++部件
+    - 对 null stock 调用 setKRecordList 增加保护
+
+3. 缺陷修复
+    - fixed ATR 计算
+    - fixed PF_WithoutAF 在未指定 tm 时崩溃
+    - fixed serielize 多重继承时可能造成内存泄露
+    - fix: TradeManager 在保存交易动作记录时, 如果m_costfunc为空导致崩溃
+
+
+
 2.5.2 - 2025年2月24日
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

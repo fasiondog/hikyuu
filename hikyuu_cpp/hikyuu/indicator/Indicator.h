@@ -198,6 +198,8 @@ public:
         return !m_imp && m_imp == other.m_imp;
     }
 
+    string str() const;
+
 protected:
     IndicatorImpPtr m_imp;
 
@@ -408,6 +410,21 @@ Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t 
 Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b);
 
 } /* namespace hku */
+
+namespace std {
+template <>
+class hash<hku::Indicator> {
+public:
+    size_t operator()(hku::Indicator const& ind) const noexcept {
+        auto imp = ind.getImp();
+        return imp.get() ? std::hash<hku::IndicatorImpPtr>()(imp) : 0;
+    }
+};
+
+inline string to_string(const hku::Indicator& ind) {
+    return ind.str();
+}
+}  // namespace std
 
 #if FMT_VERSION >= 90000
 template <>

@@ -36,9 +36,9 @@ public:
 };
 
 void export_Environment(py::module& m) {
-    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(
-      m, "EnvironmentBase", py::dynamic_attr(),
-      R"(市场环境判定策略基类
+    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(m, "EnvironmentBase",
+                                                                   py::dynamic_attr(),
+                                                                   R"(市场环境判定策略基类
 
 自定义市场环境判定策略接口：
 
@@ -93,6 +93,24 @@ void export_Environment(py::module& m) {
       .def("clone", &EnvironmentBase::clone, "克隆操作")
       .def("_reset", &EnvironmentBase::_reset, "【重载接口】子类复位接口，用于复位内部私有变量")
       .def("_calculate", &EnvironmentBase::_calculate, "【重载接口】子类计算接口")
+
+      .def("__and__",
+           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self & other; })
+
+      .def("__or__",
+           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self | other; })
+
+      .def("__add__",
+           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self + other; })
+
+      .def("__sub__",
+           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self - other; })
+
+      .def("__mul__",
+           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self * other; })
+
+      .def("__truediv__",
+           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self / other; })
 
         DEF_PICKLE(EnvironmentPtr);
 

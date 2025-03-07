@@ -1,6 +1,7 @@
 click
 numpy
 matplotlib
+seaborn
 pandas>=0.17.1
 pytdx
 PyQt5

@@ -49,9 +49,25 @@ StrategyContext::StrategyContext(const vector<string>& stockCodeList) {
 }
 
 StrategyContext::StrategyContext(const vector<string>& stockCodeList,
-                                 const vector<KQuery::KType>& ktypeList) {
+                                 const vector<KQuery::KType>& ktypeList,
+                                 const unordered_map<string, int>& preloadNum) {
     _removeDuplicateCode(stockCodeList);
     _checkAndRemoveDuplicateKType(ktypeList);
+    setPreloadNum(preloadNum);
+}
+
+void StrategyContext::setPreloadNum(const unordered_map<string, int>& preloadNum) {
+    m_preloadNum.clear();
+    m_preloadNum.reserve(preloadNum.size());
+    for (auto it = preloadNum.cbegin(); it != preloadNum.cend(); ++it) {
+        string key = it->first;
+        to_lower(key);
+        if (it->second > 0) {
+            m_preloadNum[key] = it->second;
+        } else {
+            HKU_WARN("Invalid preload number {}: {}", key, it->second);
+        }
+    }
 }
 
 void StrategyContext::_removeDuplicateCode(const vector<string>& stockCodeList) {

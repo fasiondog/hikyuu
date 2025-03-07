@@ -128,6 +128,7 @@
 **技术指标**
 
 * :py:func:`AD` - 累积/派发线
+* :py:func:`ATR` - 平均真实波动幅度，真实波动幅度 TR 的简单移动均值
 * :py:func:`BACKSET` - 向前赋值将当前位置到若干周期前的数据设为1
 * :py:func:`BARSCOUNT` - 有效值周期数, 求总的周期数。
 * :py:func:`BARSLAST` - 上一次条件成立位置, 上一次条件成立到当前的周期数
@@ -139,6 +140,7 @@
 * :py:func:`FILTER` - 信号过滤, 过滤连续出现的信号
 * :py:func:`HHV` - N日内最高价
 * :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
+* :py:func:`KALMAN` - 卡尔曼滤波
 * :py:func:`KDJ` - 经典随机指标
 * :py:func:`LLV` - N日内最低价
 * :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
@@ -156,6 +158,7 @@
 * :py:func:`SAFTYLOSS` - 亚历山大 艾尔德安全地带止损线
 * :py:func:`SUM` - 求总和
 * :py:func:`SUMBARS` - 累加到指定周期数, 向前累加到指定值到现在的周期数
+* :py:func:`TR` - 真实波动幅度
 * :py:func:`VIGOR` - 亚历山大.艾尔德力度指数
 
 

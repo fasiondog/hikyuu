@@ -16,7 +16,14 @@ namespace hku {
 AddCondition::AddCondition() : ConditionBase("CN_Add") {}
 
 AddCondition::AddCondition(const ConditionPtr& cond1, const ConditionPtr& cond2)
-: ConditionBase("CN_Add"), m_cond1(cond1), m_cond2(cond2) {}
+: ConditionBase("CN_Add") {
+    if (cond1) {
+        m_cond1 = cond1->clone();
+    }
+    if (cond2) {
+        m_cond2 = cond2->clone();
+    }
+}
 
 AddCondition::~AddCondition() {}
 

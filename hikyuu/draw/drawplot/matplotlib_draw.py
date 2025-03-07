@@ -5,10 +5,10 @@
 """
 import sys
 import os
-import datetime
 import logging
 import numpy as np
 import matplotlib
+import seaborn as sns
 import math
 from typing import Union
 from matplotlib.pylab import Rectangle, gca, gcf, figure, ylabel, axes, draw
@@ -499,6 +499,54 @@ def ibar(
     # draw()
 
 
+def iheatmap(ind, axes=None):
+    """
+    绘制指标收益年-月收益热力图
+
+    指标收益率 = (当前月末值 - 上月末值) / 上月末值 * 100
+
+    指标应已计算（即有值），且为时间序列
+
+    :param ind: 指定指标
+    :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :return: None
+    """
+    if axes is None:
+        axes = create_figure()
+
+    if len(ind) == 0:
+        hku_error("指标长度为0, 指标应已计算（即有值")
+        return
+
+    dates = ind.get_datetime_list()
+    if len(dates) == 0:
+        hku_error("获取日期列表失败！指标应为时间序列")
+        return
+
+    data = pd.DataFrame({'date': dates, 'value': ind.to_np()})
+    data = data[(data[['value']] != 0).all(axis=1)]
+
+    # 提取年月信息
+    data['year'] = data['date'].apply(lambda v: v.year)
+    data['month'] = data['date'].apply(lambda v: v.month)
+
+    # 获取每个月的收益
+    monthly = data.groupby(['year', 'month']).last()['value'].reset_index()
+    if len(monthly) < 2:
+        hku_warn("月数据不足！")
+        return
+
+    monthly['return'] = ((monthly['value'] - monthly['value'].shift(1)) / monthly['value'].shift(1)) * 100.
+
+    pivot_data = monthly.pivot_table(index='year', columns='month', values='return')
+
+    sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
+    # 设置标题和坐标轴标签
+    axes.set_title('年-月度收益率(%)热力图')
+    axes.set_xlabel('月度')
+    axes.set_ylabel('年份')
+
+
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
 
@@ -641,13 +689,16 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
         )
 
 
-def evplot(ev, ref_kdata, new=True, axes=None):
+def evplot(ev, ref_kdata, new=True, axes=None, upcolor='red', downcolor='blue', alpha=0.2):
     """绘制市场有效判断
 
     :param EnvironmentBase cn: 系统有效条件
     :param KData ref_kdata: 用于日期参考
     :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
     :param axes: 指定在那个轴对象中进行绘制
+    :param upcolor: 有效时的颜色
+    :param downcolor: 无效时的颜色
+    :param alpha: 透明度
     """
     refdates = ref_kdata.get_datetime_list()
     if axes is None:
@@ -661,11 +712,11 @@ def evplot(ev, ref_kdata, new=True, axes=None):
     x = np.array([i for i in range(len(refdates))])
     y1 = np.array([1 if ev.is_valid(d) else -1 for d in refdates])
     y2 = np.array([-1 if ev.is_valid(d) else 1 for d in refdates])
-    axes.fill_between(x, y1, y2, where=y2 > y1, facecolor='blue', alpha=0.6)
-    axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
+    axes.fill_between(x, y1, y2, where=y2 > y1, facecolor=downcolor, alpha=alpha)
+    axes.fill_between(x, y1, y2, where=y2 < y1, facecolor=upcolor, alpha=alpha)
 
 
-def cnplot(cn, new=True, axes=None, kdata=None):
+def cnplot(cn, new=True, axes=None, kdata=None, upcolor='red', downcolor='blue', alpha=0.2):
     """绘制系统有效条件
 
     :param ConditionBase cn: 系统有效条件
@@ -673,6 +724,9 @@ def cnplot(cn, new=True, axes=None, kdata=None):
     :param axes: 指定在那个轴对象中进行绘制
     :param KData kdata: 指定的KData，如该值为None，则认为该系统有效条件已经
                         指定了交易对象，否则，使用该参数作为交易对象
+    :param upcolor: 有效数时的颜色
+    :param downcolor: 无效时的颜色
+    :param alpha: 透明度
     """
     if kdata is None:
         kdata = cn.to
@@ -691,8 +745,8 @@ def cnplot(cn, new=True, axes=None, kdata=None):
     x = np.array([i for i in range(len(refdates))])
     y1 = np.array([1 if cn.is_valid(d) else -1 for d in refdates])
     y2 = np.array([-1 if cn.is_valid(d) else 1 for d in refdates])
-    axes.fill_between(x, y1, y2, where=y2 > y1, facecolor='blue', alpha=0.6)
-    axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
+    axes.fill_between(x, y1, y2, where=y2 > y1, facecolor=downcolor, alpha=alpha)
+    axes.fill_between(x, y1, y2, where=y2 < y1, facecolor=upcolor, alpha=alpha)
 
 
 def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
@@ -770,6 +824,13 @@ def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
 
 
 def sys_performance(sys, ref_stk=None):
+    """
+    绘制系统绩效，即账户累积收益率曲线
+
+    :param SystemBase | PortfolioBase sys: SYS或PF实例
+    :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
+    :return: None
+    """
     if ref_stk is None:
         ref_stk = get_stock('sh000300')
 
@@ -847,10 +908,70 @@ def sys_performance(sys, ref_stk=None):
     ax3.set_frame_on(False)
 
 
+def tm_heatmap(tm, start_date, end_date=None, axes=None):
+    """
+    绘制账户收益年-月收益热力图
+
+    :param tm: 交易账户
+    :param start_date: 开始日期
+    :param end_date: 结束日期，默认为今天
+    :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :return: None
+    """
+    if axes is None:
+        axes = create_figure()
+
+    if end_date is None:
+        end_date = Datetime.today() + Days(1)
+
+    dates = get_date_range(start_date, end_date)
+    if len(dates) == 0:
+        hku_error("没有数据，请检查日期范围！start_date={}, end_date={}", start_date, end_date)
+        return
+
+    funds = tm.get_funds_curve(dates)
+    if len(funds) == 0:
+        hku_error("获取 tm 收益曲线失败，请检查 tm 初始日期！tm.init_datetime={} start_date={}, end_date={}",
+                  tm.init_datetime, start_date, end_date)
+        return
+
+    data = pd.DataFrame({'date': dates, 'value': funds})
+    data = data[(data[['value']] != 0).all(axis=1)]
+
+    # 提取年月信息
+    data['year'] = data['date'].apply(lambda v: v.year)
+    data['month'] = data['date'].apply(lambda v: v.month)
+
+    # 获取每个月的收益
+    monthly = data.groupby(['year', 'month']).last()['value'].reset_index()
+    if len(monthly) < 2:
+        hku_warn("月数据不足！")
+        return
+
+    monthly['return'] = ((monthly['value'] - monthly['value'].shift(1)) / monthly['value'].shift(1)) * 100.
+
+    pivot_data = monthly.pivot_table(index='year', columns='month', values='return')
+
+    sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
+    # 设置标题和坐标轴标签
+    axes.set_title('年-月度收益率(%)热力图')
+    axes.set_xlabel('月度')
+    axes.set_ylabel('年份')
+
+
+def sys_heatmap(sys, axes=None):
+    """
+    绘制系统收益年-月收益热力图
+    """
+    hku_check(sys.tm is not None, "系统未初始化交易账户")
+    query = sys.query
+    k = get_kdata('sh000001', query)
+    tm_heatmap(sys.tm, k[0].datetime, k[-1].datetime, axes)
+
+
 # ============================================================================
 # 通达信画图函数
 # ============================================================================
-
 DRAWNULL = constant.null_price
 
 

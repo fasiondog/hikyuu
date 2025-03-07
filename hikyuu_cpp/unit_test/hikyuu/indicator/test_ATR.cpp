@@ -11,8 +11,10 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/ATR.h>
+#include <hikyuu/indicator/crt/TR.h>
+#include <hikyuu/indicator/crt/MA.h>
+#include <hikyuu/indicator/crt/DISCARD.h>
 #include <hikyuu/indicator/crt/KDATA.h>
-#include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
@@ -24,24 +26,16 @@ using namespace hku;
 
 /** @par 检测点 */
 TEST_CASE("test_ATR") {
-    Indicator result;
+    auto k = getKData("sh000001", KQuery(-30));
 
-    PriceList a;
-    for (int i = 0; i < 10; ++i) {
-        a.push_back(i / 2.);
-    }
+    auto atr = ATR(k, 10);
+    CHECK_EQ(atr.name(), "ATR");
+    CHECK_EQ(atr.size(), k.size());
+    CHECK_EQ(atr.discard(), 11);
 
-    vector<Indicator::value_t> expect = {0.,      0.333333, 0.77778, 1.25926, 1.75309,
-                                         2.25103, 2.75034,  3.25011, 3.75004, 4.25001};
-
-    Indicator data = PRICELIST(a);
-
-    result = ATR(data, 2);
-    CHECK_EQ(result.name(), "ATR");
-    CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result.size(), data.size());
-    for (int i = 0, len = data.size(); i < len; ++i) {
-        CHECK_EQ(result[i], doctest::Approx(expect[i]));
+    auto expect = DISCARD(MA(TR(), 10), 11)(k);
+    for (size_t i = atr.discard(); i < atr.size(); ++i) {
+        CHECK_EQ(atr[i], doctest::Approx(expect[i]));
     }
 }
 
@@ -52,15 +46,14 @@ TEST_CASE("test_ATR") {
 TEST_CASE("test_ATR_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
-    Indicator c = kdata.close();
     int cycle = 1000;  // 测试循环次数
 
     {
-        BENCHMARK_TIME_MSG(test_ATR_benchmark, cycle, fmt::format("data len: {}", c.size()));
+        BENCHMARK_TIME_MSG(test_ATR_benchmark, cycle, fmt::format("data len: {}", kdata.size()));
         SPEND_TIME_CONTROL(false);
         for (int i = 0; i < cycle; i++) {
             Indicator ind = ATR();
-            Indicator result = ind(c);
+            Indicator result = ind(kdata);
         }
     }
 }
@@ -79,7 +72,7 @@ TEST_CASE("test_ATR_export") {
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = ATR(CLOSE(kdata));
+    Indicator x1 = ATR(kdata);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

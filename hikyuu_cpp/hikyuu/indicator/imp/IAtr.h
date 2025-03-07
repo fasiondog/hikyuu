@@ -14,11 +14,13 @@
 namespace hku {
 
 class IAtr : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IAtr)
+    INDICATOR_IMP(IAtr)
+    INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     IAtr();
+    explicit IAtr(const KData&, int n);
     virtual ~IAtr();
     virtual void _checkParam(const string& name) const override;
 };

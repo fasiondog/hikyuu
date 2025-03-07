@@ -74,7 +74,6 @@ void WithoutAFPortfolio::_readyForRun() {
             se_sys->readyForRun();
             se_sys->setTO(k);
 
-            sys->setParam<bool>("trace", true);
             sys->setTM(m_tm);
             string sys_name = fmt::format("{}_{}_{}", sys->name(), sys->getStock().market_code(),
                                           sys->getStock().name());
