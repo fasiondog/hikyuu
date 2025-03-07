@@ -12,8 +12,12 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Indicator& indicator) {
-    os << indicator.m_imp;
+    os << indicator.str();
     return os;
+}
+
+string Indicator::str() const {
+    return m_imp ? m_imp->str() : "Indicator{}";
 }
 
 Indicator::Indicator(const IndicatorImpPtr& imp) : m_imp(imp) {}

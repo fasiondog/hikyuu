@@ -11,6 +11,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session, declarative_base
 from sqlalchemy import (create_engine, Sequence, Column, Integer, String, and_, UniqueConstraint)
 from hikyuu.util.singleton import SingletonType
 from hikyuu.util.check import checkif
+from hikyuu.util import hku_info
 import os
 import stat
 import errno
@@ -637,7 +638,6 @@ def remove_hub(name):
     HubManager().remove_hub(name)
 
 
-@lru_cache
 def get_part(name, *args, **kwargs):
     """获取指定策略部件
 
@@ -645,7 +645,18 @@ def get_part(name, *args, **kwargs):
     :param args: 其他部件相关参数
     :param kwargs: 其他部件相关参数
     """
-    return HubManager().get_part(name, *args, **kwargs)
+    @lru_cache
+    def _get_part(name, *args, **kwargs):
+        return HubManager().get_part(name, *args, **kwargs)
+
+    try:
+        return _get_part(name, *args, **kwargs)
+    except TypeError as e:
+        if "unhashable type" in str(e):
+            hku_info("{}! 该对象不可hash无法缓存, 可考虑优化", str(e))
+            return HubManager().get_part(name, *args, **kwargs)
+        else:
+            raise e
 
 
 def get_part_list(name_list):
