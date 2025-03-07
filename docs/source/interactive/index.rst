@@ -363,6 +363,19 @@ Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建�
     :param kwargs:     pylab plot参数
 
     
+.. py:function:: iheatmap(ind, axes=None):
+
+    绘制指标收益年-月收益热力图。并非所有指标均可绘制出热力图，详见热力图公式:
+
+    指标收益率 = (当前月末值 - 上月末值) / 上月末值 * 100
+
+    指标应已计算（即有值），且为时间序列
+
+    :param ind: 指定指标
+    :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :return: None
+
+
 .. py:function:: sgplot(sg[, new = True, axes = None,  style = 1, kdata = None])
 
     绘制买入/卖出信号
@@ -374,7 +387,7 @@ Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建�
     :param KData kdata: 指定的KData（即信号发生器的交易对象），如该值为None，则认为该信号发生器已经指定了交易对象，否则，使用该参数作为交易对象
 
 
-.. py:function:: cnplot(cn[, new=True, axes=None, kdata=None])
+.. py:function:: cnplot(cn[, new=True, axes=None, kdata=None, upcolor='red', downcolor='blue', alpha=0.2])
 
     绘制系统有效条件
 
@@ -382,6 +395,22 @@ Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建�
     :param new:  仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
     :param axes: 指定在那个轴对象中进行绘制
     :param KData kdata: 指定的KData，如该值为None，则认为该系统有效条件已经指定了交易对象，否则，使用该参数作为交易对象
+    :param upcolor: 有效数时的颜色
+    :param downcolor: 无效时的颜色
+    :param alpha: 透明度    
+
+
+.. py:function:: evplot(ev, ref_kdata, new=True, axes=None, upcolor='red', downcolor='blue', alpha=0.2)
+
+    绘制市场有效判断
+
+    :param EnvironmentBase cn: 系统有效条件
+    :param KData ref_kdata: 用于日期参考
+    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+    :param axes: 指定在那个轴对象中进行绘制
+    :param upcolor: 有效时的颜色
+    :param downcolor: 无效时的颜色
+    :param alpha: 透明度
 
     
 .. py:function:: sysplot(sys[, new=True, axes=None, style=1])
@@ -393,7 +422,23 @@ Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建�
     :param axes:  指定在那个轴对象中进行绘制
     :param style: 1 | 2 信号箭头绘制样式
 
+
+.. py:function:: sys_performance(sys, ref_stk=None)
+
+    绘制系统绩效，即账户累积收益率曲线。通常不直接调用，而是在 sys, pf 计算完成后，查看绩效详情。
+    如: sys.performance()
+
+    :param SystemBase | PortfolioBase sys: SYS或PF实例
+    :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
     
+
+.. py:function:: sys_heatmap(sys, axes=None):
+
+    绘制系统收益年-月收益热力图
+
+    :param sys: SYS 或 PF 实例
+    :param axes: 绘制的轴对象, 默认为None, 表示创建新的轴对象
+
 
 内建示例
 ----------

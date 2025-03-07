@@ -87,11 +87,11 @@
     :rtype: Indicator
 
 
-.. py:function:: ATR([data, n=14])
+.. py:function:: ATR([kdata, n=14])
 
-    平均真实波幅(Average True Range)
+    平均真实波幅(Average True Range), 真实波动幅度 TR 的简单移动均值
 
-    :param Indicator data 待计算的源数据
+    :param KData kdata 待计算的源数据
     :param int n: 计算均值的周期窗口，必须为大于1的整数
     :rtype: Indicator
 
@@ -682,6 +682,16 @@
     :param Indicator ind: 指标
     :rtype: Indicator
 
+
+.. py:function:: KALMAN(ind, [q=0.01], [r=0.1])
+
+    Kalman滤波器, 用于平滑指标, 可设置平滑系数q和r, 默认q=0.01, r=0.1
+
+    :param Indicator ind: 指标
+    :param float q: 平滑系数
+    :param float r: 噪声系数
+    :rtype: Indicator
+
     
 .. py:function:: KDATA([data])
 
@@ -1238,6 +1248,17 @@
     :rtype: Indicator
 
 
+.. py:function:: TR([kdata])
+
+    真实波动幅度(TR)是以下三个值中的最大值:
+    1. 当前周期最高价与最低价之差
+    2. 当前周期最高价与前一周期收盘价之差的绝对值
+    3. 当前周期最低价与前一周期收盘价之差的绝对值
+
+    :param KData kdata: K线数据
+    :rtype: Indicator
+
+
 .. py:function:: UPNDAY(data[, n=3])
 
     连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期
@@ -1284,12 +1305,16 @@
     :rtype: Indicator
 
 
-.. py:function:: WEAVE(ind1, ind2)
+.. py:function:: WEAVE(ind1, ind2[, ind3, ind4, ind5, ind6])
 
-    将ind1和ind2的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
+    将最多6个Indicator的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
     
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
+    :param Indicator ind3: 指标3, 可省略
+    :param Indicator ind4: 指标4, 可省略
+    :param Indicator ind5: 指标5, 可省略
+    :param Indicator ind6: 指标6, 可省略
     :rtype: Indicator
 
 
