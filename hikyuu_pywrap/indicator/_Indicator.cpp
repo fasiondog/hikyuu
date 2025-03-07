@@ -28,8 +28,8 @@ void export_Indicator(py::module& m) {
     py::class_<Indicator>(m, "Indicator", "技术指标")
       .def(py::init<>())
       .def(py::init<IndicatorImpPtr>(), py::keep_alive<1, 2>())
-      .def("__str__", to_py_str<Indicator>)
-      .def("__repr__", to_py_str<Indicator>)
+      .def("__str__", &Indicator::str)
+      .def("__repr__", &Indicator::str)
 
       .def_property("name", ind_read_name, ind_write_name, "指标名称")
       .def_property_readonly("long_name", &Indicator::long_name,
@@ -193,6 +193,8 @@ set_context(self, stock, query)
       .def("__call__", ind_call_1)
       .def("__call__", ind_call_2)
       .def("__call__", ind_call_3)
+
+      .def("__hash__", [](const Indicator& self) { return std::hash<Indicator>()(self); })
 
       .def(
         "to_np",
