@@ -22,6 +22,7 @@
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
 * :py:func:`REPLACE` - 替换指标中指定值，默认为替换 nan 值为 0.0
 * :py:func:`RESULT` - 以指标公式的方式返回指定指标中相应的结果集
+* :py:func:`SLICE` - 获取某指标中指定范围 [start, end) 的数据，生成新的指标
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
 * :py:func:`ZSCORE` - ZScore 标准化
 
