@@ -16,7 +16,14 @@ namespace hku {
 MultiEnvironment::MultiEnvironment() : EnvironmentBase("EV_Multi") {}
 
 MultiEnvironment::MultiEnvironment(const EnvironmentPtr& ev1, const EnvironmentPtr& ev2)
-: EnvironmentBase("EV_Multi"), m_ev1(ev1), m_ev2(ev2) {}
+: EnvironmentBase("EV_Multi") {
+    if (ev1) {
+        m_ev1 = ev1->clone();
+    }
+    if (ev2) {
+        m_ev2 = ev2->clone();
+    }
+}
 
 MultiEnvironment::~MultiEnvironment() {}
 

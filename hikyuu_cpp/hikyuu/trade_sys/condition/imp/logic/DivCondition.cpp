@@ -16,7 +16,14 @@ namespace hku {
 DivCondition::DivCondition() : ConditionBase("CN_Div") {}
 
 DivCondition::DivCondition(const ConditionPtr& cond1, const ConditionPtr& cond2)
-: ConditionBase("CN_Div"), m_cond1(cond1), m_cond2(cond2) {}
+: ConditionBase("CN_Div") {
+    if (cond1) {
+        m_cond1 = cond1->clone();
+    }
+    if (cond2) {
+        m_cond2 = cond2->clone();
+    }
+}
 
 DivCondition::~DivCondition() {}
 

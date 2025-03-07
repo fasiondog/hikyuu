@@ -16,7 +16,14 @@ namespace hku {
 AndCondition::AndCondition() : ConditionBase("CN_And") {}
 
 AndCondition::AndCondition(const ConditionPtr& cond1, const ConditionPtr& cond2)
-: ConditionBase("CN_And"), m_cond1(cond1), m_cond2(cond2) {}
+: ConditionBase("CN_And") {
+    if (cond1) {
+        m_cond1 = cond1->clone();
+    }
+    if (cond2) {
+        m_cond2 = cond2->clone();
+    }
+}
 
 AndCondition::~AndCondition() {}
 

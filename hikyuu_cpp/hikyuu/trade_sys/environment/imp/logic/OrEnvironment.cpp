@@ -16,7 +16,14 @@ namespace hku {
 OrEnvironment::OrEnvironment() : EnvironmentBase("EV_Or") {}
 
 OrEnvironment::OrEnvironment(const EnvironmentPtr& ev1, const EnvironmentPtr& ev2)
-: EnvironmentBase("EV_Or"), m_ev1(ev1), m_ev2(ev2) {}
+: EnvironmentBase("EV_Or") {
+    if (ev1) {
+        m_ev1 = ev1->clone();
+    }
+    if (ev2) {
+        m_ev2 = ev2->clone();
+    }
+}
 
 OrEnvironment::~OrEnvironment() {}
 

@@ -16,7 +16,14 @@ namespace hku {
 AndEnvironment::AndEnvironment() : EnvironmentBase("EV_And") {}
 
 AndEnvironment::AndEnvironment(const EnvironmentPtr& ev1, const EnvironmentPtr& ev2)
-: EnvironmentBase("EV_And"), m_ev1(ev1), m_ev2(ev2) {}
+: EnvironmentBase("EV_And") {
+    if (ev1) {
+        m_ev1 = ev1->clone();
+    }
+    if (ev2) {
+        m_ev2 = ev2->clone();
+    }
+}
 
 AndEnvironment::~AndEnvironment() {}
 

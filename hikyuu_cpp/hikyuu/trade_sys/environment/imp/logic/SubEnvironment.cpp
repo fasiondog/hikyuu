@@ -16,7 +16,14 @@ namespace hku {
 SubEnvironment::SubEnvironment() : EnvironmentBase("EV_Sub") {}
 
 SubEnvironment::SubEnvironment(const EnvironmentPtr& ev1, const EnvironmentPtr& ev2)
-: EnvironmentBase("EV_Sub"), m_ev1(ev1), m_ev2(ev2) {}
+: EnvironmentBase("EV_Sub") {
+    if (ev1) {
+        m_ev1 = ev1->clone();
+    }
+    if (ev2) {
+        m_ev2 = ev2->clone();
+    }
+}
 
 SubEnvironment::~SubEnvironment() {}
 

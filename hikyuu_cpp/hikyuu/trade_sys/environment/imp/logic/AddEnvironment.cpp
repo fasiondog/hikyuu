@@ -16,7 +16,14 @@ namespace hku {
 AddEnvironment::AddEnvironment() : EnvironmentBase("EV_Add") {}
 
 AddEnvironment::AddEnvironment(const EnvironmentPtr& ev1, const EnvironmentPtr& ev2)
-: EnvironmentBase("EV_Add"), m_ev1(ev1), m_ev2(ev2) {}
+: EnvironmentBase("EV_Add") {
+    if (ev1) {
+        m_ev1 = ev1->clone();
+    }
+    if (ev2) {
+        m_ev2 = ev2->clone();
+    }
+}
 
 AddEnvironment::~AddEnvironment() {}
 
