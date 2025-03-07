@@ -107,7 +107,18 @@ DatetimeList ConditionBase::getDatetimeList() const {
 }
 
 Indicator ConditionBase::getValues() const {
-    return PRICELIST(m_values);
+    DatetimeList dates;
+    PriceList values;
+    for (const auto& d : m_date_index) {
+        dates.push_back(d.first);
+    }
+
+    values.reserve(dates.size());
+    for (const auto& d : dates) {
+        values.push_back(m_values[m_date_index.at(d)]);
+    }
+
+    return PRICELIST(values, dates);
 }
 
 } /* namespace hku */

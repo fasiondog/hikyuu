@@ -794,4 +794,218 @@ TEST_CASE("test_SG_DivValue") {
     check_result(ret, expect);
 }
 
+/** @par 检测点 */
+TEST_CASE("test_SG_Or") {
+    auto k = getKData("sz000001", KQueryByDate(Datetime(20111108), Datetime(20111125)));
+    std::map<Datetime, double> expect;
+    for (size_t i = 0; i < k.size(); i++) {
+        expect[k[i].datetime] = 0.0;
+    }
+
+    /** @arg 输入的 sg 都为空 */
+    SGPtr sg1, sg2;
+    auto ret = sg1 | sg2;
+    ret->setTO(k);
+    reset_expect(expect);
+    check_result(ret, expect);
+
+    /** @arg 其中一个 sg 为空 */
+    sg1 = SG_Manual();
+    sg1->_addBuySignal(Datetime(20111110));
+    sg1->_addSellSignal(Datetime(20111115));
+
+    ret = sg1 | sg2;
+    ret->setTO(k);
+
+    reset_expect(expect);
+    expect[Datetime(20111110)] = 1.0;
+    expect[Datetime(20111115)] = -1.0;
+    check_result(ret, expect);
+
+    ret = sg2 | sg1;
+    ret->setTO(k);
+    check_result(ret, expect);
+
+    /** @arg 交替模式，sg1, sg2 不存在重叠 */
+    sg1 = SG_Manual();
+    sg1->_addBuySignal(Datetime(20111110));
+    sg1->_addSellSignal(Datetime(20111115));
+
+    sg2 = SG_Manual();
+    sg2->_addBuySignal(Datetime(20111114));
+    sg2->_addSellSignal(Datetime(20111116));
+
+    ret = sg1 | sg2;
+    ret->setParam<bool>("alternate", true);
+    ret->setTO(k);
+
+    expect[Datetime(20111110)] = 1.0;
+    expect[Datetime(20111114)] = 0.0;
+    expect[Datetime(20111115)] = -1.0;
+    expect[Datetime(20111116)] = 0.0;
+    check_result(ret, expect);
+
+    /** @arg 非交替模式，sg1, sg2 不存在重叠 */
+    ret = sg1 | sg2;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
+
+    expect[Datetime(20111110)] = 1.0;
+    expect[Datetime(20111114)] = 1.0;
+    expect[Datetime(20111115)] = -1.0;
+    expect[Datetime(20111116)] = -1.0;
+    check_result(ret, expect);
+
+    /** @arg 交替模式，sg1, sg2 存在重叠 */
+    sg1->reset();
+    sg2->reset();
+    sg1->setParam<bool>("alternate", false);
+    sg2->setParam<bool>("alternate", false);
+    sg1->_addBuySignal(Datetime(20111110));
+    sg1->_addSellSignal(Datetime(20111114));
+    sg1->_addSellSignal(Datetime(20111115));
+    REQUIRE(sg1->getValue(Datetime(20111115)) == -1.0);
+    sg2->_addBuySignal(Datetime(20111110));
+    sg2->_addBuySignal(Datetime(20111114));
+    sg2->_addSellSignal(Datetime(20111116));
+
+    reset_expect(expect);
+    expect[Datetime(20111110)] = 1.0;
+    expect[Datetime(20111114)] = 0.0;
+    expect[Datetime(20111115)] = -1.0;
+    expect[Datetime(20111116)] = 0.0;
+
+    ret = sg1 | sg2;
+    ret->setParam<bool>("alternate", true);
+    ret->setTO(k);
+    check_result(ret, expect);
+
+    /** @arg 非交替模式，sg1, sg2 存在重叠 */
+    sg1->reset();
+    sg2->reset();
+    sg1->setParam<bool>("alternate", false);
+    sg2->setParam<bool>("alternate", false);
+    sg1->_addBuySignal(Datetime(20111110));
+    sg1->_addSellSignal(Datetime(20111114));
+    sg1->_addSellSignal(Datetime(20111115));
+    REQUIRE(sg1->getValue(Datetime(20111115)) == -1.0);
+    sg2->_addBuySignal(Datetime(20111110));
+    sg2->_addBuySignal(Datetime(20111114));
+    sg2->_addSellSignal(Datetime(20111116));
+    REQUIRE(sg2->getValue(Datetime(20111116)) == -1.0);
+
+    reset_expect(expect);
+    expect[Datetime(20111110)] = 1.0;
+    expect[Datetime(20111114)] = 0.0;
+    expect[Datetime(20111115)] = -1.0;
+    expect[Datetime(20111116)] = -1.0;
+
+    ret = sg1 | sg2;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
+    check_result(ret, expect);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_SG_And") {
+    auto k = getKData("sz000001", KQueryByDate(Datetime(20111108), Datetime(20111125)));
+    std::map<Datetime, double> expect;
+    for (size_t i = 0; i < k.size(); i++) {
+        expect[k[i].datetime] = 0.0;
+    }
+
+    /** @arg 输入的 sg 都为空 */
+    SGPtr sg1, sg2;
+    auto ret = sg1 & sg2;
+    ret->setTO(k);
+    reset_expect(expect);
+    check_result(ret, expect);
+
+    /** @arg 其中一个 sg 为空 */
+    sg1 = SG_Manual();
+    sg1->_addBuySignal(Datetime(20111110));
+    sg1->_addSellSignal(Datetime(20111115));
+
+    REQUIRE(!sg2);
+    ret = sg1 & sg2;
+    ret->setTO(k);
+    reset_expect(expect);
+    check_result(ret, expect);
+
+    ret = sg2 & sg1;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
+    reset_expect(expect);
+    check_result(ret, expect);
+
+    /** @arg 交替模式，sg1, sg2 不存在重叠 */
+    sg1 = SG_Manual();
+    sg1->_addBuySignal(Datetime(20111110));
+    sg1->_addSellSignal(Datetime(20111115));
+
+    sg2 = SG_Manual();
+    sg2->_addBuySignal(Datetime(20111114));
+    sg2->_addSellSignal(Datetime(20111116));
+
+    ret = sg1 & sg2;
+    ret->setParam<bool>("alternate", true);
+    ret->setTO(k);
+
+    reset_expect(expect);
+    check_result(ret, expect);
+
+    /** @arg 非交替模式，sg1, sg2 不存在重叠 */
+    ret = sg1 & sg2;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
+    reset_expect(expect);
+    check_result(ret, expect);
+
+    /** @arg 交替模式，sg1, sg2 存在重叠 */
+    sg1->reset();
+    sg2->reset();
+    sg1->setParam<bool>("alternate", false);
+    sg2->setParam<bool>("alternate", false);
+    sg1->_addBuySignal(Datetime(20111110));
+    sg1->_addSellSignal(Datetime(20111114));
+    sg1->_addSellSignal(Datetime(20111115));
+    REQUIRE(sg1->getValue(Datetime(20111115)) == -1.0);
+    sg2->_addBuySignal(Datetime(20111110));
+    sg2->_addBuySignal(Datetime(20111114));
+    sg2->_addSellSignal(Datetime(20111116));
+
+    ret = sg1 & sg2;
+    ret->setParam<bool>("alternate", true);
+    ret->setTO(k);
+    reset_expect(expect);
+    expect[Datetime(20111110)] = 1.0;
+    expect[Datetime(20111114)] = 0.0;
+    expect[Datetime(20111115)] = 0.0;
+    expect[Datetime(20111116)] = 0.0;
+    check_result(ret, expect);
+
+    /** @arg 非交替模式，sg1, sg2 存在重叠 */
+    sg1->reset();
+    sg2->reset();
+    sg1->setParam<bool>("alternate", false);
+    sg2->setParam<bool>("alternate", false);
+    sg1->_addBuySignal(Datetime(20111110));
+    sg1->_addSellSignal(Datetime(20111114));
+    sg1->_addSellSignal(Datetime(20111115));
+    sg1->_addSellSignal(Datetime(20111116));
+    sg2->_addBuySignal(Datetime(20111110));
+    sg2->_addBuySignal(Datetime(20111114));
+    sg2->_addSellSignal(Datetime(20111116));
+
+    ret = sg1 & sg2;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
+    reset_expect(expect);
+    expect[Datetime(20111110)] = 1.0;
+    expect[Datetime(20111114)] = 0.0;
+    expect[Datetime(20111115)] = 0.0;
+    expect[Datetime(20111116)] = -1.0;
+    check_result(ret, expect);
+}
+
 /** @} */
