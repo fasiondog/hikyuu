@@ -50,7 +50,7 @@ public:
     }
 };
 
-void check_expect(const EVPtr& ev, const std::vector<std::pair<Datetime, price_t>>& expect) {
+static void check_expect(const EVPtr& ev, const std::vector<std::pair<Datetime, price_t>>& expect) {
     for (auto& p : expect) {
         CHECK_EQ(ev->getValue(p.first), p.second);
     }
