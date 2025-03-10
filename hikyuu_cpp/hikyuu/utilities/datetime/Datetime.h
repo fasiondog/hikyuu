@@ -298,7 +298,8 @@ HKU_UTILS_API std::ostream &operator<<(std::ostream &, const Datetime &);
 typedef std::vector<Datetime> DatetimeList;
 
 /**
- * 获取指定范围的日历日期列表[start, end)，仅仅是日，不含时分秒
+ * 获取指定范围的日历日期列表[start,end)，仅仅是日，不含时分秒。
+ * @note 为防止内存占用过大，end如果超出系统明日日期，则强制为系统明日日期
  * @param start 起始日期
  * @param end 结束日期
  * @return [start, end)范围内的日历日期

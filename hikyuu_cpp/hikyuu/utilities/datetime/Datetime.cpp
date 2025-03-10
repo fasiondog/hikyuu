@@ -360,7 +360,9 @@ Datetime Datetime::today() {
 DatetimeList HKU_UTILS_API getDateRange(const Datetime &start, const Datetime &end) {
     DatetimeList result;
     bd::date start_day = start.date();
-    bd::date end_day = end.date();
+    Datetime today = Datetime::today() + Days(1);
+    // 防止索取的日历过大
+    bd::date end_day = (end < today) ? end.date() : today.date();
     bd::date_period dp(start_day, end_day);
     bd::day_iterator iter = dp.begin();
     for (; iter != dp.end(); ++iter) {
