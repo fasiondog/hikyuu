@@ -10,6 +10,8 @@ import akshare as ak
 import pandas as pd
 from hikyuu.util import *
 
+em_num_per_page = 100
+
 
 @hku_catch(ret=[], trace=True)
 def get_hybk_names():
@@ -17,7 +19,7 @@ def get_hybk_names():
     url = "https://19.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "200",
+        "pz": str(em_num_per_page),
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -31,6 +33,15 @@ def get_hybk_names():
     r = requests.get(url, params=params, timeout=15)
     data_json = r.json()
     ret = [(v['f12'], v['f14']) for v in data_json["data"]["diff"]]
+    total_page = math.ceil(data_json["data"]["total"] / em_num_per_page)
+    for page in range(2, total_page + 1):
+        params["pn"] = page
+        r = requests.get(url, params=params, timeout=15)
+        data_json = r.json()
+        if data_json["data"] is None:
+            continue
+        tmp = [(v['f12'], v['f14']) for v in data_json["data"]["diff"]]
+        ret.extend(tmp)
     return ret
 
 
@@ -40,7 +51,7 @@ def get_hybk_cons_code(blk_code):
     url = "http://30.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "200",
+        "pz": str(em_num_per_page),
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -54,7 +65,7 @@ def get_hybk_cons_code(blk_code):
     r = requests.get(url, params=params, timeout=15)
     data_json = r.json()
     ret = [v['f12'] for v in data_json["data"]["diff"]]
-    total_page = math.ceil(data_json["data"]["total"] / 200)
+    total_page = math.ceil(data_json["data"]["total"] / em_num_per_page)
     for page in range(2, total_page + 1):
         params["pn"] = page
         r = requests.get(url, params=params, timeout=15)
@@ -99,7 +110,7 @@ def get_dybk_names():
     url = "http://13.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "200",
+        "pz": str(em_num_per_page),
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -115,7 +126,7 @@ def get_dybk_names():
     hku_check(data_json['data'] is not None, "获取地域板块名称列表失败!")
     ret = [(v["f12"], v["f14"]) for v in data_json["data"]["diff"]]
 
-    total_page = math.ceil(data_json["data"]["total"] / 200)
+    total_page = math.ceil(data_json["data"]["total"] / em_num_per_page)
     for page in range(2, total_page + 1):
         params["pn"] = page
         r = requests.get(url, params=params, timeout=15)
@@ -133,7 +144,7 @@ def get_all_dybk_info(code_market_dict, sep=""):
     url = "http://13.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "200",
+        "pz": str(em_num_per_page),
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -160,7 +171,7 @@ def get_all_dybk_info(code_market_dict, sep=""):
         ret[blk_name] = [
             f"{code_market_dict[v['f12']]}{sep}{v['f12']}" for v in stk_json if v['f12'] in code_market_dict]
 
-        total_page = math.ceil(data["data"]["total"] / 200)
+        total_page = math.ceil(data["data"]["total"] / em_num_per_page)
         for page in range(2, total_page + 1):
             params["pn"] = page
             r = requests.get(url, params=params, timeout=15)
