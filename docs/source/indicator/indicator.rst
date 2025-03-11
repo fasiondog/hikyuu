@@ -984,7 +984,7 @@
     :rtype: Indicator
 
 
-.. py:function:: REPLACE(ind, [old_value=constant.nan, new_value=0.0, ignore_discard=False]
+.. py:function:: REPLACE(ind, [old_value=constant.nan, new_value=0.0, ignore_discard=False])
           
     替换指标中指定值，默认为替换 nan 值为 0.0。
 

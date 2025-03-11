@@ -112,6 +112,7 @@ void export_Datetime(py::module& m) {
           R"(get_date_range(start, end)
 
     获取指定 [start, end) 日期时间范围的自然日日历日期列表，仅支持到日
+    为防止内存占用过大，end如果超出系统明日日期，则强制为系统明日日期。
     
     :param Datetime start: 起始日期
     :param Datetime end: 结束日期

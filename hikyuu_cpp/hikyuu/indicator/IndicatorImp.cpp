@@ -1548,8 +1548,9 @@ void IndicatorImp::_update_discard() {
     size_t total = size();
     for (size_t result_index = 0; result_index < m_result_num; result_index++) {
         size_t discard = m_discard;
+        const auto *dst = this->data(result_index);
         for (size_t i = m_discard; i < total; i++) {
-            if (!std::isnan(get(i, result_index))) {
+            if (!std::isnan(dst[i])) {
                 break;
             }
             discard++;

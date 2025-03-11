@@ -1512,6 +1512,19 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
+    m.def("BARSSINCEN", py::overload_cast<int>(BARSSINCEN), py::arg("n"));
+    m.def("BARSSINCEN", py::overload_cast<const Indicator&, int>(BARSSINCEN), py::arg("cond"),
+          py::arg("n"), R"(BARSSINCEN(cond, n)
+    
+    N周期内第一个条件成立到当前的周期数
+
+    用法：BARSSINCEN(X,N):N周期内第一次X不为0到现在的周期数,N为常量BARSSINCEN(X,N)
+    例如：BARSSINCEN(HIGH>10,10)表示10个周期内股价超过10元时到当前的周期数
+
+    :param Indicator cond: 条件
+    :param int|Indicator n: 时间窗口
+    :rtype: Indicator)");
+
     m.def("BARSLAST", BARSLAST_1);
     m.def("BARSLAST", BARSLAST_2);
     m.def("BARSLAST", BARSLAST_3, R"(BARSLAST([data])
