@@ -134,6 +134,14 @@ public:
         m_tm = tm;
     }
 
+    SlippagePtr getSP() const noexcept {
+        return m_sp;
+    }
+
+    void setSP(const SlippagePtr& slippage) noexcept {
+        m_sp = slippage;
+    }
+
 private:
     string m_name;
     string m_config_file;
@@ -169,6 +177,7 @@ private:
     TimeDelta m_backtesting_minutes;
     KQuery::KType m_backtesting_ktype;
     TradeManagerPtr m_tm;
+    SlippagePtr m_sp;
     DatetimeList m_backtesting_datetimes;
     size_t m_backtesting_idx{0};
     int m_backtesting_mode{0};  // 0: 当前bar收盘价执行买卖操作；1: 下一bar开盘价执行买卖操作;
