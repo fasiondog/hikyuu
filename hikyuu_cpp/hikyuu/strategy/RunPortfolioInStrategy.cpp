@@ -72,8 +72,8 @@ StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query,
     }
 
     KQuery::KType ktype = query.kType();
-    StrategyPtr stg =
-      std::make_shared<Strategy>(code_list, vector<KQuery::KType>{ktype}, name, config_file);
+    StrategyPtr stg = std::make_shared<Strategy>(code_list, vector<KQuery::KType>{ktype},
+                                                 unordered_map<string, int>{}, name, config_file);
 
     int32_t m = KQuery::getKTypeInMin(ktype);
     if (m < KQuery::getKTypeInMin(KQuery::DAY)) {

@@ -34,7 +34,8 @@ public:
     Strategy();
     explicit Strategy(const string& name, const string& config_file = "");
     Strategy(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
-             const string& name = "Strategy", const string& config_file = "");
+             const unordered_map<string, int>& preloadNum = {}, const string& name = "Strategy",
+             const string& config_file = "");
     explicit Strategy(const StrategyContext& context, const string& name = "Strategy",
                       const string& config_file = "");
 
@@ -105,6 +106,10 @@ public:
                   const Datetime& start_date, const Datetime& end_date = Null<Datetime>(),
                   const KQuery::KType& ktype = KQuery::DAY, const string& ref_market = "SH",
                   int mode = 0);
+
+    bool isBacktesting() const {
+        return m_backtesting;
+    }
 
     Datetime today() const;
     Datetime now() const;

@@ -250,6 +250,7 @@ void export_Stock(py::module& m) {
       :param krecord_list: KRecordList or list of KRecord
       :param Query.KType ktype: K线类别)")
 
+      .def(py::hash(py::self))
       .def(py::self == py::self)
       .def(py::self != py::self)
 

@@ -46,11 +46,13 @@ Strategy::Strategy(const string& name, const string& config_file)
 }
 
 Strategy::Strategy(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
-                   const string& name, const string& config_file)
+                   const unordered_map<string, int>& preloadNum, const string& name,
+                   const string& config_file)
 : Strategy(name, config_file) {
     _initParam();
     m_context.setStockCodeList(codeList);
     m_context.setKTypeList(ktypeList);
+    m_context.setPreloadNum(preloadNum);
 }
 
 Strategy::Strategy(const StrategyContext& context, const string& name, const string& config_file)

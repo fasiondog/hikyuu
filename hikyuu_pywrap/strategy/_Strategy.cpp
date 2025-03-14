@@ -28,9 +28,10 @@ void export_Strategy(py::module& m) {
     Datetime null_date;
     py::class_<Strategy, StrategyPtr>(m, "Strategy")
       .def(py::init<>())
-      .def(py::init<const vector<string>&, const vector<KQuery::KType>&, const std::string&,
-                    const std::string&>(),
-           py::arg("code_list"), py::arg("ktype_list"), py::arg("name") = "Strategy",
+      .def(py::init<const vector<string>&, const vector<KQuery::KType>&,
+                    const unordered_map<string, int>&, const std::string&, const std::string&>(),
+           py::arg("code_list"), py::arg("ktype_list"),
+           py::arg("preload_num") = unordered_map<string, int>(), py::arg("name") = "Strategy",
            py::arg("config") = "", R"(创建策略运行时
            
     :param list code_list: 证券代码列表，如：["sz000001", "sz000002"], "all" 代表全部证券
@@ -52,6 +53,9 @@ void export_Strategy(py::module& m) {
 
       .def_property_readonly("context", &Strategy::context, py::return_value_policy::copy,
                              "获取策略上下文")
+      .def_property("tm", &Strategy::getTM, &Strategy::setTM, "关联的交易管理实例")
+      .def_property("sp", &Strategy::getSP, &Strategy::setSP, "移滑价差算法")
+      .def_property_readonly("is_backtesting", &Strategy::isBacktesting, "回测状态")
 
       .def(
         "start",
@@ -232,7 +236,18 @@ void export_Strategy(py::module& m) {
            py::overload_cast<const Stock&, size_t, const KQuery::KType&, KQuery::RecoverType>(
              &Strategy::getLastKData, py::const_),
            py::arg("stk"), py::arg("lastnum"), py::arg("ktype"),
-           py::arg("recover_type") = KQuery::NO_RECOVER);
+           py::arg("recover_type") = KQuery::NO_RECOVER)
+
+      .def("buy",
+           py::overload_cast<const Stock&, price_t, double, double, double, SystemPart>(
+             &Strategy::buy),
+           py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
+           py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL)
+      .def("sell",
+           py::overload_cast<const Stock&, price_t, double, double, double, SystemPart>(
+             &Strategy::sell),
+           py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
+           py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL);
 
     m.def("crtBrokerTM", crtBrokerTM, py::arg("broker"), py::arg("cost_func") = TC_Zero(),
           py::arg("name") = "SYS", py::arg("other_brokers") = std::vector<OrderBrokerPtr>());
