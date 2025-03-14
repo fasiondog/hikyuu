@@ -8,6 +8,7 @@
 #pragma once
 
 #include <future>
+#include <forward_list>
 #include "hikyuu/DataType.h"
 #include "hikyuu/StrategyContext.h"
 #include "hikyuu/global/SpotRecord.h"
