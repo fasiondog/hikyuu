@@ -82,3 +82,5 @@ hikyuu/include
 .virtual_documents
 venv
 hikyuu_cpp/hikyuu/utilities/config.h
+data_server_docker_file
+hikyuu.ini
