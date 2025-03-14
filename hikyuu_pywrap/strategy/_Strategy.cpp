@@ -36,6 +36,7 @@ void export_Strategy(py::module& m) {
            
     :param list code_list: 证券代码列表，如：["sz000001", "sz000002"], "all" 代表全部证券
     :param list ktype_list: K线类型列表, 如: ["day", "min"]
+    :param dict preload_num: 预加载的K线数量，如：{"day_max": 1000, "min_max": 2000}
     :param str name: 策略名称
     :param str config: 配置文件名称(如需要使用独立的配置文件，否则为空时使用默认的hikyuu配置文件))")
 
