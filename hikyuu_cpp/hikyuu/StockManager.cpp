@@ -139,7 +139,9 @@ void StockManager::loadAllKData() {
         // 使用上下文预加载参数覆盖全局预加载参数
         ktypes = context_ktypes;
         for (const auto& ktype : ktypes) {
-            m_preloadParam.set<bool>(ktype, true);
+            auto low_ktype = ktype;
+            to_lower(low_ktype);
+            m_preloadParam.set<bool>(low_ktype, true);
         }
     }
 
@@ -148,9 +150,6 @@ void StockManager::loadAllKData() {
     for (const auto& ktype : ktypes) {
         auto& back = low_ktypes.emplace_back(ktype);
         to_lower(back);
-
-        // 强制将预加载改为小写, 同时相当于使用 context 的 Ktype 进行预加载
-        m_preloadParam.set<bool>(back, true);
 
         // 判断上下文是否指定了预加载数量，如果指定了，则覆盖默认值
         string preload_key = fmt::format("{}_max", back);
