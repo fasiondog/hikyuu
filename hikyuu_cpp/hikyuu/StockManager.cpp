@@ -149,6 +149,9 @@ void StockManager::loadAllKData() {
         auto& back = low_ktypes.emplace_back(ktype);
         to_lower(back);
 
+        // 强制将预加载改为小写, 同时相当于使用 context 的 Ktype 进行预加载
+        m_preloadParam.set<bool>(back, true);
+
         // 判断上下文是否指定了预加载数量，如果指定了，则覆盖默认值
         string preload_key = fmt::format("{}_max", back);
         auto context_iter = context_preload_num.find(preload_key);
@@ -156,8 +159,9 @@ void StockManager::loadAllKData() {
             m_preloadParam.set<int>(preload_key, context_iter->second);
         }
 
-        HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false), "Preloading all {} kdata to buffer !",
-                    back);
+        HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false),
+                    "Preloading {} kdata to buffer (max: {})!", back,
+                    m_preloadParam.tryGet<int>(preload_key, 0));
     }
 
     // 先加载同类K线
