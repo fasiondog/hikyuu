@@ -139,7 +139,9 @@ void StockManager::loadAllKData() {
         // 使用上下文预加载参数覆盖全局预加载参数
         ktypes = context_ktypes;
         for (const auto& ktype : ktypes) {
-            m_preloadParam.set<bool>(ktype, true);
+            auto low_ktype = ktype;
+            to_lower(low_ktype);
+            m_preloadParam.set<bool>(low_ktype, true);
         }
     }
 
@@ -156,8 +158,9 @@ void StockManager::loadAllKData() {
             m_preloadParam.set<int>(preload_key, context_iter->second);
         }
 
-        HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false), "Preloading all {} kdata to buffer !",
-                    back);
+        HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false),
+                    "Preloading {} kdata to buffer (max: {})!", back,
+                    m_preloadParam.tryGet<int>(preload_key, 0));
     }
 
     // 先加载同类K线
