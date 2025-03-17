@@ -125,6 +125,7 @@ void export_TimeDelta(py::module& m) {
     :param int ticks: 微秒数
     :rtype: TimeDelta)")
 
+      .def(py::hash(py::self))
       .def(py::self == py::self)
       .def(py::self != py::self)
       .def(py::self >= py::self)

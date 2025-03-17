@@ -299,9 +299,9 @@ typedef std::vector<Datetime> DatetimeList;
 
 /**
  * 获取指定范围的日历日期列表[start,end)，仅仅是日，不含时分秒。
- * @note 为防止内存占用过大，end如果超出系统明日日期，则强制为系统明日日期
+ * @note 如果指定的结束日期过大，可能会耗费大量内存
  * @param start 起始日期
- * @param end 结束日期
+ * @param end 结束日期, 如果为空，将使用 Datetime::max
  * @return [start, end)范围内的日历日期
  */
 DatetimeList HKU_UTILS_API getDateRange(const Datetime &start, const Datetime &end);
@@ -412,7 +412,7 @@ template <>
 class hash<hku::Datetime> {
 public:
     size_t operator()(hku::Datetime const &d) const noexcept {
-        return d.ticks();  // or use boost::hash_combine
+        return std::hash<uint64_t>()(d.ticks());
     }
 };
 
