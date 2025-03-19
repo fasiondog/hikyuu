@@ -29,9 +29,13 @@ namespace hku {
 class HKU_UTILS_API PluginLoader final {
 public:
     PluginLoader() = default;
+    explicit PluginLoader(const std::string& path) : m_path(path) {}
+    PluginLoader(const PluginLoader&) = delete;
+    PluginLoader(PluginLoader&&) = delete;
+
     ~PluginLoader();
 
-    bool load(const std::string& filename) noexcept;
+    bool load(const std::string& pluginname) noexcept;
 
     template <typename T>
     T* instance() const noexcept {
@@ -42,14 +46,15 @@ public:
 private:
     void unload() noexcept;
     void* getFunciton(const char* symbol) noexcept;
+    std::string getFileName(const std::string& pluginname) const noexcept;
 
 private:
-    mutable std::mutex m_mutex;
 #if HKU_OS_WINDOWS
     HMODULE m_handle{nullptr};
 #else
     void* m_handle{nullptr};
 #endif
+    std::string m_path;
     std::unique_ptr<PluginBase> m_plugin{nullptr};
 };
 

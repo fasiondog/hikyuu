@@ -16,9 +16,11 @@ namespace hku {
 class TestPluginInterface {
 public:
     TestPluginInterface() {
-        m_loader = std::make_unique<PluginLoader>();
+        m_loader = std::make_unique<PluginLoader>(
+          "/Users/fasiondog/workspace/hikyuu/build/release/macosx/arm64/lib");
+        m_loader->load("testplugin");
         // m_loader->load("/Users/fasiondog/workspace/hikyuu/hikyuu/cpp/libtestplugin.dylib");
-        m_loader->load(R"(D:\workspace\hikyuu\build\release\windows\x64\lib\testplugin.dll)");
+        // m_loader->load(R"(D:\workspace\hikyuu\build\release\windows\x64\lib\testplugin.dll)");
         m_impl = m_loader->instance<TestPlugin>();
     }
     virtual ~TestPluginInterface() = default;

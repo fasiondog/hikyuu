@@ -18,7 +18,18 @@
 namespace hku {
 
 PluginLoader::~PluginLoader() {
+    // std::this_thread::sleep_for(std::chrono::milliseconds(80));
     unload();
+}
+
+std::string PluginLoader::getFileName(const std::string& pluginname) const noexcept {
+#if HKU_OS_WINDOWS
+    return fmt::format("{}/{}.dll", m_path, pluginname);
+#elif HKU_OS_LINUX
+    return fmt::format("{}/lib{}.so", m_path, pluginname);
+#elif HKU_OS_OSX
+    return fmt::format("{}/lib{}.dylib", m_path, pluginname);
+#endif
 }
 
 void* PluginLoader::getFunciton(const char* symbol) noexcept {
@@ -30,7 +41,8 @@ void* PluginLoader::getFunciton(const char* symbol) noexcept {
     return func;
 }
 
-bool PluginLoader::load(const std::string& filename) noexcept {
+bool PluginLoader::load(const std::string& pluginname) noexcept {
+    std::string filename = getFileName(pluginname);
     HKU_WARN_IF_RETURN(!existFile(filename), false, "file({}) not exist!", filename);
 
 #if HKU_OS_WINDOWS
