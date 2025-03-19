@@ -26,4 +26,6 @@ public:
 
 }  // namespace hku
 
-extern "C" hku::PluginBase* HKU_API createPlugin();
+// extern "C" {
+// __declspec(dllexport) hku::PluginBase* createPlugin();
+// }

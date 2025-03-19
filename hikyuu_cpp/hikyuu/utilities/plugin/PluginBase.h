@@ -10,15 +10,12 @@
 #define HKU_UTILS_PLUGIN_BASE_H_
 
 #include "hikyuu/utilities/config.h"
+#include "hikyuu/utilities/osdef.h"
 #include "hikyuu/utilities/Parameter.h"
-
-#ifndef HKU_UTILS_API
-#define HKU_UTILS_API
-#endif
 
 namespace hku {
 
-class HKU_UTILS_API PluginBase {
+class PluginBase {
     PARAMETER_SUPPORT
 
 public:
@@ -27,5 +24,17 @@ public:
 };
 
 }  // namespace hku
+
+#if HKU_OS_WINDOWS
+#define HKU_PLUGIN_EXPORT_ENTRY(plugin)                                \
+    extern "C" __declspec(dllexport) hku::PluginBase* createPlugin() { \
+        return new plugin();                                           \
+    }
+#else
+#define HKU_PLUGIN_EXPORT_ENTRY(plugin)          \
+    extern "C" hku::PluginBase* createPlugin() { \
+        return new plugin();                     \
+    }
+#endif
 
 #endif /* HKU_UTILS_PLUGIN_BASE_H_ */

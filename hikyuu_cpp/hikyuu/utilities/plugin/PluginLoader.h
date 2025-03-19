@@ -13,7 +13,12 @@
 #include <string>
 #include <memory>
 #include "hikyuu/utilities/config.h"
+#include "hikyuu/utilities/osdef.h"
 #include "PluginBase.h"
+
+#if HKU_OS_WINDOWS
+#include <windows.h>
+#endif
 
 #ifndef HKU_UTILS_API
 #define HKU_UTILS_API
@@ -40,7 +45,11 @@ private:
 
 private:
     mutable std::mutex m_mutex;
+#if HKU_OS_WINDOWS
+    HMODULE m_handle{nullptr};
+#else
     void* m_handle{nullptr};
+#endif
     std::unique_ptr<PluginBase> m_plugin{nullptr};
 };
 

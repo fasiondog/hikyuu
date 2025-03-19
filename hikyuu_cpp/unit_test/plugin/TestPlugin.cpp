@@ -29,6 +29,4 @@ public:
 
 }  // namespace hku
 
-extern "C" hku::PluginBase* HKU_API createPlugin() {
-    return new hku::TestPluginImp();
-}
+HKU_PLUGIN_EXPORT_ENTRY(hku::TestPluginImp)
