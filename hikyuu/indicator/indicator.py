@@ -90,7 +90,7 @@ def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
     示例:
         query = Query(-200)
         k_list = [stk.get_kdata(query) for stk in [sm['sz000001'], sm['sz000002']]]
-        ma_list = [MA(k) for k in k_list]
+        ma_list = [MA(CLOSE(k)) for k in k_list]
         concat_to_df(sm.get_trading_calendar(query), ma_list, head_stock_code=True, head_ind_name=False)
 
     输出：
