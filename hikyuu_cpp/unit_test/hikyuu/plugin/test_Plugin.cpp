@@ -8,6 +8,7 @@
 #include "../test_config.h"
 #include "hikyuu/utilities/plugin/PluginLoader.h"
 #include "../../plugin/TestPlugin.h"
+#include <cstdlib>
 
 using namespace hku;
 
@@ -16,11 +17,8 @@ namespace hku {
 class TestPluginInterface {
 public:
     TestPluginInterface() {
-        m_loader = std::make_unique<PluginLoader>(
-          "/Users/fasiondog/workspace/hikyuu/build/release/macosx/arm64/lib");
+        m_loader = std::make_unique<PluginLoader>("/Users/fasiondog/.hikyuu/plugin");
         m_loader->load("testplugin");
-        // m_loader->load("/Users/fasiondog/workspace/hikyuu/hikyuu/cpp/libtestplugin.dylib");
-        // m_loader->load(R"(D:\workspace\hikyuu\build\release\windows\x64\lib\testplugin.dll)");
         m_impl = m_loader->instance<TestPlugin>();
     }
     virtual ~TestPluginInterface() = default;

@@ -17,8 +17,11 @@
 
 namespace hku {
 
+PluginLoader::PluginLoader() : PluginLoader(".") {}
+
+PluginLoader::PluginLoader(const std::string& path) : m_path(path) {}
+
 PluginLoader::~PluginLoader() {
-    // std::this_thread::sleep_for(std::chrono::milliseconds(80));
     unload();
 }
 

@@ -28,8 +28,8 @@ namespace hku {
 
 class HKU_UTILS_API PluginLoader final {
 public:
-    PluginLoader() = default;
-    explicit PluginLoader(const std::string& path) : m_path(path) {}
+    PluginLoader();
+    explicit PluginLoader(const std::string& path);
     PluginLoader(const PluginLoader&) = delete;
     PluginLoader(PluginLoader&&) = delete;
 
