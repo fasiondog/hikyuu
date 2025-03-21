@@ -45,6 +45,7 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     }
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
     setParam<string>("mode", mf->name());
+    setIndicators(mf->getRefIndicators());
 }
 
 MultiFactorSelector::~MultiFactorSelector() {}
