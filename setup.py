@@ -371,7 +371,7 @@ def wheel(feedback, j, low_precision, clear):
     elif current_plat == 'darwin' and cpu_arch != 'arm64' and current_bits == 64:
         plat = "macosx_x86_64"
     elif current_plat == 'darwin' and cpu_arch == 'arm64':
-        plat = "macosx_11_1_arm64"
+        plat = "macosx_11_0_arm64"
     else:
         print("*********尚未实现该平台的支持*******")
         return

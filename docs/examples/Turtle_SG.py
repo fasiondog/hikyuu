@@ -10,7 +10,7 @@
 from hikyuu import *
 
 
-class TurtleSignal(SignalBase, k):
+class TurtleSignal(SignalBase):
     def __init__(self, n=20):
         super(TurtleSignal, self).__init__("TurtleSignal")
         self.set_param("n", 20)
@@ -18,7 +18,7 @@ class TurtleSignal(SignalBase, k):
     def _clone(self):
         return TurtleSignal()
 
-    def _calculate(self):
+    def _calculate(self, k):
         n = self.get_param("n")
         c = CLOSE(k)
         h = REF(HHV(c, n), 1)  # 前n日高点

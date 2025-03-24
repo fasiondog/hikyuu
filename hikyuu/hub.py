@@ -344,6 +344,10 @@ class HubManager(metaclass=SingletonType):
         self._session.query(PartModel).filter_by(hub_name=name).delete()
         self._session.query(HubModel).filter_by(name=name).delete()
 
+    @lru_cache
+    def _get_module(self, module_name):
+        return importlib.import_module(module_name)
+
     @dbsession
     def import_part_to_db(self, hub_model):
         part_dict = {
@@ -387,7 +391,8 @@ class HubManager(metaclass=SingletonType):
 
                             # 导入模块
                             try:
-                                part_module = importlib.import_module(module_name)
+                                # part_module = importlib.import_module(module_name)
+                                part_module = self._get_module(module_name)
                             except ModuleNotFoundError:
                                 self.logger.error('{} 缺失 part.py 文件, 位置："{}"！'.format(module_name, entry.path))
                                 continue
@@ -645,18 +650,7 @@ def get_part(name, *args, **kwargs):
     :param args: 其他部件相关参数
     :param kwargs: 其他部件相关参数
     """
-    @lru_cache
-    def _get_part(name, *args, **kwargs):
-        return HubManager().get_part(name, *args, **kwargs)
-
-    try:
-        return _get_part(name, *args, **kwargs)
-    except TypeError as e:
-        if "unhashable type" in str(e):
-            hku_info("{}! 该对象不可hash无法缓存, 可考虑优化", str(e))
-            return HubManager().get_part(name, *args, **kwargs)
-        else:
-            raise e
+    return HubManager().get_part(name, *args, **kwargs)
 
 
 def get_part_list(name_list):

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <forward_list>
 #include "hikyuu/utilities/Log.h"
+#include "hikyuu/global/sysinfo.h"
 #include "Indicator.h"
 #include "IndParam.h"
 #include "../Stock.h"
@@ -830,9 +831,15 @@ Indicator IndicatorImp::calculate() {
 
     try {
         result = shared_from_this();
-    } catch (...) {
-        // Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
-        result = clone();
+    } catch (const std::exception &e) {
+        if (runningInPython()) {
+            // Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
+            // 切换至 pybind11 后，目前应已不在出现，目前保留观察
+            result = clone();
+        } else {
+            HKU_ERROR("IndicatorImp::calculate() error! {}", e.what());
+            throw e;
+        }
     }
 
     return Indicator(result);

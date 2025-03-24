@@ -320,6 +320,14 @@ inline TimeDelta Microseconds(int64_t microsecs) {
 
 namespace std {
 
+template <>
+class hash<hku::TimeDelta> {
+public:
+    size_t operator()(hku::TimeDelta const &d) const noexcept {
+        return std::hash<int64_t>()(d.ticks());
+    }
+};
+
 inline string to_string(const hku::TimeDelta &delta) {
     return delta.str();
 }

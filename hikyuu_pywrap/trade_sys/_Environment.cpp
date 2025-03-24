@@ -83,11 +83,13 @@ void export_Environment(py::module& m) {
     :param Datetime datetime: 指定时间
     :return: True 有效 | False 无效)")
 
-      .def("_add_valid", &EnvironmentBase::_addValid, R"(_add_valid(self, datetime)
+      .def("_add_valid", &EnvironmentBase::_addValid, py::arg("datetime"), py::arg("value") = 1.0,
+           R"(_add_valid(self, datetime)
 
     加入有效时间，在_calculate中调用
 
-    :param Datetime datetime: 有效时间)")
+    :param Datetime datetime: 有效时间
+    :param float value: 默认值为1.0, 大于0表示有效, 小于等于0表示无效)")
 
       .def("reset", &EnvironmentBase::reset, "复位操作")
       .def("clone", &EnvironmentBase::clone, "克隆操作")
