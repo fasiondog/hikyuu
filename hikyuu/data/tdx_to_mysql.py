@@ -35,7 +35,7 @@ from io import SEEK_END, SEEK_SET
 
 from hikyuu.data.common import get_stktype_list, MARKETID
 from hikyuu.data.common_mysql import (
-    create_database, get_marketid, get_codepre_list, get_table, get_lastdatetime
+    create_database, get_marketid, get_codepre_list, get_table, get_lastdatetime, update_extern_data
 )
 
 from hikyuu.data.weight_to_mysql import qianlong_import_weight
@@ -122,14 +122,14 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
                 length = len(codepre[0])
                 if code[:length] == codepre[0]:
                     count += 1
-                    #print(market, code, newStockDict[code], codepre)
+                    # print(market, code, newStockDict[code], codepre)
                     sql = "insert into `hku_base`.`stock` (marketid, code, name, type, valid, startDate, endDate) \
                            values (%s, '%s', '%s', %s, %s, %s, %s)" \
                           % (marketid, code, newStockDict[code], codepre[1], 1, today, 99999999)
                     cur.execute(sql)
                     break
 
-    #print('%s新增股票数：%i' % (market.upper(), count))
+    # print('%s新增股票数：%i' % (market.upper(), count))
     connect.commit()
     cur.close()
     return count
@@ -177,9 +177,9 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
                 continue
 
             if record[2] >= record[1] >= record[3] > 0 \
-                     and record[2] >= record[4] >= record[3] > 0 \
-                     and record[5] >= 0 \
-                     and record[6] >= 0:
+                    and record[2] >= record[4] >= record[3] > 0 \
+                    and record[5] >= 0 \
+                    and record[6] >= 0:
                 buf.append(
                     (
                         record[0] * 10000, record[1] * 0.01, record[2] * 0.01, record[3] * 0.01,
@@ -197,7 +197,7 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
         cur.executemany(sql, buf)
         connect.commit()
 
-        #更新基础信息数据库中股票对应的起止日期及其有效标志
+        # 更新基础信息数据库中股票对应的起止日期及其有效标志
         if valid == 0:
             sql = "update `hku_base`.`stock` set valid=1, " \
                   "startdate=(select min(date)/10000 from {table}), " \
@@ -206,7 +206,7 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
             cur.execute("sql")
             connect.commit()
 
-        #记录最新更新日期
+        # 记录最新更新日期
         if (code == '000001' and marketid == MARKETID.SH) \
                 or (code == '399001' and marketid == MARKETID.SZ):
             sql = "update `hku_base`.`market` set lastdate=(select max(date)/10000 from {table}) " \
@@ -217,7 +217,7 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
                 print(sql)
             connect.commit()
 
-        #connect.commit()
+        # connect.commit()
 
     cur.close()
     return add_record_count
@@ -299,9 +299,9 @@ def tdx_import_min_data_from_file(connect, filename, ktype, market, stock_record
             while data:
                 record = struct.unpack('HHfffffii', data)
                 if record[3] >= record[2] >= record[4] > 0\
-                        and record[3] >= record[5] >= record[4] >0\
-                        and record[5] >=0 \
-                        and record[6] >=0:
+                        and record[3] >= record[5] >= record[4] > 0\
+                        and record[5] >= 0 \
+                        and record[6] >= 0:
                     sql = "INSERT INTO {tablename} (date, open, high, low, close, amount, count) " \
                           "VALUES (%s, %s, %s, %s, %s, %s, %s)".format(tablename=table)
                     cur.execute(
@@ -368,10 +368,10 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, progress=Progre
         add_record_count += this_count
         if this_count > 0:
             if ktype == 'DAY':
-                #update_hdf5_extern_data(h5file, market.upper() + stock[2], 'DAY')
+                update_extern_data(connect, market.upper(), stock[2], "DAY")
                 pass
             elif ktype == '5MIN':
-                #update_hdf5_extern_data(h5file, market.upper() + stock[2], '5MIN')
+                update_extern_data(connect, market.upper(), stock[2], "5MIN")
                 pass
         if progress:
             progress(i, total)
@@ -391,7 +391,7 @@ if __name__ == '__main__':
     pwd = ''
 
     src_dir = "D:\\TdxW_HuaTai"
-    quotations = ['stock', 'fund']  #通达信盘后数据没有债券
+    quotations = ['stock', 'fund']  # 通达信盘后数据没有债券
 
     connect = mysql.connector.connect(user=usr, password=pwd, host=host, port=port)
     create_database(connect)
