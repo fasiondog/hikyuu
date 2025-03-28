@@ -6,6 +6,7 @@
  */
 
 #include "../test_config.h"
+#include "hikyuu/utilities/os.h"
 #include "hikyuu/utilities/plugin/PluginLoader.h"
 #include "../../plugin/TestPlugin.h"
 #include <cstdlib>
@@ -17,7 +18,7 @@ namespace hku {
 class TestPluginInterface {
 public:
     TestPluginInterface() {
-        m_loader = std::make_unique<PluginLoader>("/Users/fasiondog/.hikyuu/plugin");
+        m_loader = std::make_unique<PluginLoader>(fmt::format("{}/.hikyuu/plugin", getUserDir()));
         m_loader->load("testplugin");
         m_impl = m_loader->instance<TestPlugin>();
     }
