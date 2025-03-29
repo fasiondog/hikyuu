@@ -145,8 +145,8 @@ class UseTdxImportToH5Thread(QThread):
         connect = sqlite3.connect(dest_dir + "/stock.db")
         create_database(connect)
 
-        tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', self.quotations)
-        tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', self.quotations)
+        tdx_import_stock_name_from_file(connect, src_dir + "/T0002/hq_cache/shm.tnf", 'SH', self.quotations)
+        tdx_import_stock_name_from_file(connect, src_dir + "/T0002/hq_cache/szm.tnf", 'SZ', self.quotations)
 
         self.send_message(['FINISHED_IMPORT_CODE'])
 
