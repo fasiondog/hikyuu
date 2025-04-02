@@ -193,7 +193,7 @@ private:
     std::vector<InterruptFlag*> m_interrupt_flags;   // 线程中断标志
 
     // 线程本地变量
-#if CPP_STANDARD >= CPP_STANDARD_17
+#if CPP_STANDARD >= CPP_STANDARD_17 && !defined(__clang__)
     inline static thread_local InterruptFlag m_thread_need_stop;  // 线程停止运行指示
     inline static thread_local int m_index = -1;                  // 在线程池中的序号
 #else

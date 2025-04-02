@@ -12,7 +12,7 @@
 
 namespace hku {
 
-#if CPP_STANDARD < CPP_STANDARD_17
+#if CPP_STANDARD < CPP_STANDARD_17 || defined(__clang__)
 thread_local InterruptFlag ThreadPool::m_thread_need_stop;
 thread_local int ThreadPool::m_index = -1;
 
