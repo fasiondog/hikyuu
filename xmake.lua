@@ -116,7 +116,7 @@ set_configvar("HKU_ENABLE_NODE", 1)
 local boost_version = "1.87.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "11.1.4"
-local spdlog_version = "1.15.1"
+local spdlog_version = "1.15.2"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.10.1"
 local sqlite_version = "3.49.0+100"
