@@ -61,6 +61,7 @@ function prepare_run(target)
 
 target("testplugin") 
     set_kind("shared")
+    set_default(false)
     add_deps("hikyuu")
     add_packages("boost", "fmt", "spdlog")
     add_includedirs("..")

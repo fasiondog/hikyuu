@@ -11,13 +11,11 @@ namespace hku {
 
 class TestPluginImp : public TestPlugin {
 public:
-    TestPluginImp() {
-        setParam<std::string>("name", "TestPlugin");
-    }
+    TestPluginImp() {}
     virtual ~TestPluginImp() = default;
 
     virtual std::string name() const override {
-        return getParam<std::string>("name");
+        return "test_plugin";
     }
     // virtual std::string version() const override;
     // virtual std::string description() const override;

@@ -11,13 +11,10 @@
 
 #include "hikyuu/utilities/config.h"
 #include "hikyuu/utilities/osdef.h"
-#include "hikyuu/utilities/Parameter.h"
 
 namespace hku {
 
 class PluginBase {
-    PARAMETER_SUPPORT
-
 public:
     PluginBase() = default;
     virtual ~PluginBase() = default;

@@ -14,6 +14,7 @@
 #include <memory>
 #include "hikyuu/utilities/config.h"
 #include "hikyuu/utilities/osdef.h"
+#include "hikyuu/utilities/Log.h"
 #include "PluginBase.h"
 
 #if HKU_OS_WINDOWS

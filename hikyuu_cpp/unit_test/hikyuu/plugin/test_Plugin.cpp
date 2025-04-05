@@ -18,7 +18,9 @@ namespace hku {
 class TestPluginInterface {
 public:
     TestPluginInterface() {
-        m_loader = std::make_unique<PluginLoader>(fmt::format("{}/.hikyuu/plugin", getUserDir()));
+        // m_loader = std::make_unique<PluginLoader>(fmt::format("{}/.hikyuu/plugin",
+        // getUserDir()));
+        m_loader = std::make_unique<PluginLoader>(".");
         m_loader->load("testplugin");
         m_impl = m_loader->instance<TestPlugin>();
     }
