@@ -4,8 +4,7 @@ target("hikyuu")
 
     if get_config("leak_check") then
         if is_plat("macosx") then
-            add_cxflags("-fsanitize=address")
-            add_ldflags("-fsanitize=address")
+            set_policy("build.sanitizer.address", true)
         elseif is_plat("linux") then
             -- 需要 export LD_PRELOAD=libasan.so
             set_policy("build.sanitizer.address", true)

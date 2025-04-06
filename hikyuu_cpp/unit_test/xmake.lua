@@ -59,14 +59,6 @@ function prepare_run(target)
     end
   end
 
-target("testplugin") 
-    set_kind("shared")
-    set_default(false)
-    add_deps("hikyuu")
-    add_packages("boost", "fmt", "spdlog")
-    add_includedirs("..")
-    add_files("plugin/*.cpp")
-target_end()
 
 target("unit-test")
     set_kind("binary")
@@ -74,8 +66,7 @@ target("unit-test")
 
     if get_config("leak_check") then
         if is_plat("macosx") then
-            add_cxflags("-fsanitize=address")
-            add_ldflags("-fsanitize=address")
+            set_policy("build.sanitizer.address", true)
         elseif is_plat("linux") then
             -- 需要 export LD_PRELOAD=libasan.so
             set_policy("build.sanitizer.address", true)
