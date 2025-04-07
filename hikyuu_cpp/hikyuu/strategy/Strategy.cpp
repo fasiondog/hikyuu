@@ -334,6 +334,23 @@ void Strategy::_startEventLoop() {
     }
 }
 
+KData Strategy::getLastKData(const Stock& stk, size_t lastnum, const KQuery::KType& ktype,
+                             KQuery::RecoverType recover_type) const {
+    KData ret;
+    KQuery query = KQueryByDate(Datetime::min(), nextDatetime(), ktype);
+    size_t out_start = 0, out_end = 0;
+    HKU_IF_RETURN(!stk.getIndexRange(query, out_start, out_end), ret);
+
+    int64_t startidx = 0, endidx = 0;
+    endidx = out_end;
+    int64_t num = static_cast<int64_t>(lastnum);
+    startidx = (endidx > num) ? endidx - num : out_start;
+
+    query = KQueryByIndex(startidx, endidx, ktype, recover_type);
+    ret = stk.getKData(query);
+    return ret;
+}
+
 void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
                            const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
                            const std::vector<OrderBrokerPtr>& other_brokers) {

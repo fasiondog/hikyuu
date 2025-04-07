@@ -56,6 +56,7 @@ void export_Strategy(py::module& m) {
                              "获取策略上下文")
       .def_property("tm", &Strategy::getTM, &Strategy::setTM, "关联的交易管理实例")
       .def_property("sp", &Strategy::getSP, &Strategy::setSP, "移滑价差算法")
+      .def_property_readonly("is_backtesting", &Strategy::isBacktesting, "回测状态")
 
       .def(
         "start",
@@ -204,7 +205,36 @@ void export_Strategy(py::module& m) {
 
     :param func: 可调用对象如普通函数，func(stg: Strategy)
     :param TimeDelta time: 执行时刻，如每日15点：TimeDelta(0, 15)
-    :param ignore_holiday: 节假日不执行)");
+    :param ignore_holiday: 节假日不执行)")
+
+      .def("today", &Strategy::today)
+      .def("now", &Strategy::now)
+      .def("next_datetime", &Strategy::nextDatetime)
+      .def("get_kdata", &Strategy::getKData, py::arg("stk"), py::arg("start_date"),
+           py::arg("end_date"), py::arg("ktype"), py::arg("recover_type") = KQuery::NO_RECOVER)
+
+      .def(
+        "get_last_kdata",
+        py::overload_cast<const Stock&, const Datetime&, const KQuery::KType&, KQuery::RecoverType>(
+          &Strategy::getLastKData, py::const_),
+        py::arg("stk"), py::arg("start_date"), py::arg("ktype"),
+        py::arg("recover_type") = KQuery::NO_RECOVER)
+      .def("get_last_kdata",
+           py::overload_cast<const Stock&, size_t, const KQuery::KType&, KQuery::RecoverType>(
+             &Strategy::getLastKData, py::const_),
+           py::arg("stk"), py::arg("lastnum"), py::arg("ktype"),
+           py::arg("recover_type") = KQuery::NO_RECOVER)
+
+      .def("buy",
+           py::overload_cast<const Stock&, price_t, double, double, double, SystemPart>(
+             &Strategy::buy),
+           py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
+           py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL)
+      .def("sell",
+           py::overload_cast<const Stock&, price_t, double, double, double, SystemPart>(
+             &Strategy::sell),
+           py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
+           py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL);
 
     m.def("crtBrokerTM", crtBrokerTM, py::arg("broker"), py::arg("cost_func") = TC_Zero(),
           py::arg("name") = "SYS", py::arg("other_brokers") = std::vector<OrderBrokerPtr>());

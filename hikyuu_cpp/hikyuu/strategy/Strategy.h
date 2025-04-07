@@ -97,6 +97,54 @@ public:
      */
     void start(bool autoRecieveSpot = true);
 
+    //==========================================================================
+    // 以下为策略运行时对外接口，建议使用这些接口代替同名其他功能函数，已保证回测和实盘一致
+    //==========================================================================
+
+    virtual Datetime today() const {
+        return Datetime::today();
+    }
+
+    virtual Datetime now() const {
+        return Datetime::now();
+    }
+
+    virtual Datetime nextDatetime() const {
+        return Null<Datetime>();
+    }
+
+    KData getKData(const Stock& stk, const Datetime& start_date, const Datetime& end_date,
+                   const KQuery::KType& ktype,
+                   KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const {
+        return stk.getKData(KQueryByDate(start_date, end_date, ktype, recover_type));
+    }
+
+    KData getLastKData(const Stock& stk, const Datetime& start_date, const KQuery::KType& ktype,
+                       KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const {
+        return getKData(stk, start_date, Null<Datetime>(), ktype, recover_type);
+    }
+
+    virtual KData getLastKData(const Stock& stk, size_t lastnum, const KQuery::KType& ktype,
+                               KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const;
+
+    virtual TradeRecord buy(const Stock& stk, price_t price, double num, double stoploss = 0.0,
+                            double goal_price = 0.0,
+                            SystemPart part_from = SystemPart::PART_SIGNAL) {
+        HKU_ASSERT(m_tm);
+        return m_tm->buy(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from);
+    }
+
+    virtual TradeRecord sell(const Stock& stk, price_t price, double num, price_t stoploss = 0.0,
+                             price_t goal_price = 0.0,
+                             SystemPart part_from = SystemPart::PART_SIGNAL) {
+        HKU_ASSERT(m_tm);
+        return m_tm->sell(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from);
+    }
+
+    virtual bool isBacktesting() const {
+        return false;
+    }
+
     TradeManagerPtr getTM() const noexcept {
         return m_tm;
     }
