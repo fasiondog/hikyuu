@@ -58,7 +58,7 @@ StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query,
         }
     }
 
-    std::function<void()> func = [=]() { runner->run(); };
+    std::function<void(const Strategy&)> func = [=](const Strategy&) { runner->run(); };
 
     vector<string> code_list;
     std::set<int64_t> stk_set;
@@ -72,8 +72,8 @@ StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query,
     }
 
     KQuery::KType ktype = query.kType();
-    StrategyPtr stg =
-      std::make_shared<Strategy>(code_list, vector<KQuery::KType>{ktype}, name, config_file);
+    StrategyPtr stg = std::make_shared<Strategy>(code_list, vector<KQuery::KType>{ktype},
+                                                 unordered_map<string, int>{}, name, config_file);
 
     int32_t m = KQuery::getKTypeInMin(ktype);
     if (m < KQuery::getKTypeInMin(KQuery::DAY)) {

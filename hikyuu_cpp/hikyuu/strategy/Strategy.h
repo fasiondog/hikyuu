@@ -8,6 +8,7 @@
 #pragma once
 
 #include <future>
+#include <forward_list>
 #include "hikyuu/DataType.h"
 #include "hikyuu/StrategyContext.h"
 #include "hikyuu/global/SpotRecord.h"
@@ -34,7 +35,8 @@ public:
     Strategy();
     explicit Strategy(const string& name, const string& config_file = "");
     Strategy(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
-             const string& name = "Strategy", const string& config_file = "");
+             const unordered_map<string, int>& preloadNum = {}, const string& name = "Strategy",
+             const string& config_file = "");
     explicit Strategy(const StrategyContext& context, const string& name = "Strategy",
                       const string& config_file = "");
 
@@ -59,10 +61,10 @@ public:
      * 每日开盘时间内，以 delta 为周期循环定时执行指定任务
      * @param func 待执行的任务
      * @param delta 间隔时间
-     * @param market 指定的市场
+     * @param market 指定的市场, 用于获取开/收盘时间
      * @param ignoreMarket 是否忽略市场时间限制，如为 true，则为定时循环不受开闭市时间限制
      */
-    void runDaily(std::function<void()>&& func, const TimeDelta& delta,
+    void runDaily(std::function<void(const Strategy&)>&& func, const TimeDelta& delta,
                   const std::string& market = "SH", bool ignoreMarket = false);
 
     /**
@@ -71,7 +73,7 @@ public:
      * @param delta 指定时刻
      * @param ignoreHoliday 忽略节假日，即节假日不执行
      */
-    void runDailyAt(std::function<void()>&& func, const TimeDelta& delta,
+    void runDailyAt(std::function<void(const Strategy&)>&& func, const TimeDelta& delta,
                     bool ignoreHoliday = true);
 
     /**
@@ -79,7 +81,8 @@ public:
      * @note 通常用于调试。且只要收到行情采集消息就会触发，不受开、闭市时间限制
      * @param changeFunc 回调函数
      */
-    void onChange(std::function<void(const Stock&, const SpotRecord& spot)>&& changeFunc);
+    void onChange(
+      std::function<void(const Strategy&, const Stock&, const SpotRecord& spot)>&& changeFunc);
 
     /**
      * 一批行情数据接受完毕后通知
@@ -87,26 +90,46 @@ public:
      *       且只要收到行情采集消息就会触发，不受开、闭市时间限制。
      * @param recievedFucn 回调函数
      */
-    void onReceivedSpot(std::function<void(const Datetime&)>&& recievedFucn);
+    void onReceivedSpot(std::function<void(const Strategy&, const Datetime&)>&& recievedFucn);
 
     /**
      * 启动策略执行，必须在已注册相关处理函数后执行
      */
     void start(bool autoRecieveSpot = true);
 
+    TradeManagerPtr getTM() const noexcept {
+        return m_tm;
+    }
+
+    void setTM(const TradeManagerPtr& tm) noexcept {
+        m_tm = tm;
+    }
+
+    /** 仅在回测状态下使用 */
+    SlippagePtr getSP() const noexcept {
+        return m_sp;
+    }
+
+    void setSP(const SlippagePtr& slippage) noexcept {
+        m_sp = slippage;
+    }
+
 private:
     string m_name;
     string m_config_file;
     StrategyContext m_context;
-    std::function<void(const Datetime&)> m_on_recieved_spot;
-    std::function<void(const Stock&, const SpotRecord& spot)> m_on_change;
+    std::function<void(const Strategy&, const Datetime&)> m_on_recieved_spot;
+    std::function<void(const Strategy&, const Stock&, const SpotRecord& spot)> m_on_change;
 
-    std::function<void()> m_run_daily_func;
-    TimeDelta m_run_daily_delta;
-    string m_run_daily_market;
-    bool m_ignoreMarket{false};
+    struct RunDailyAt {
+        std::function<void()> func;
+        TimeDelta delta;
+        string market;
+        bool ignoreMarket{false};
+    };
+    std::forward_list<RunDailyAt> m_run_daily_at_list;
 
-    std::map<TimeDelta, std::function<void()>> m_run_daily_at_funcs;
+    std::unordered_map<TimeDelta, std::function<void()>> m_run_daily_at_funcs;
 
 private:
     void _initParam();
@@ -121,6 +144,9 @@ private:
 
     typedef FuncWrapper event_type;
     ThreadSafeQueue<event_type> m_event_queue;  // 消息队列
+
+    TradeManagerPtr m_tm;
+    SlippagePtr m_sp;
 
     /** 先消息队列提交任务后返回的对应 future 的类型 */
     template <typename ResultType>
