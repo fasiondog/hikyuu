@@ -101,16 +101,21 @@ public:
     // 以下为策略运行时对外接口，建议使用这些接口代替同名其他功能函数，已保证回测和实盘一致
     //==========================================================================
 
-    virtual Datetime today() const {
-        return Datetime::today();
+    TradeManagerPtr getTM() const noexcept {
+        return m_tm;
     }
 
-    virtual Datetime now() const {
-        return Datetime::now();
+    void setTM(const TradeManagerPtr& tm) noexcept {
+        m_tm = tm;
     }
 
-    virtual Datetime nextDatetime() const {
-        return Null<Datetime>();
+    /** 仅在回测状态下使用 */
+    SlippagePtr getSP() const noexcept {
+        return m_sp;
+    }
+
+    void setSP(const SlippagePtr& slippage) noexcept {
+        m_sp = slippage;
     }
 
     KData getKData(const Stock& stk, const Datetime& start_date, const Datetime& end_date,
@@ -124,8 +129,20 @@ public:
         return getKData(stk, start_date, Null<Datetime>(), ktype, recover_type);
     }
 
-    virtual KData getLastKData(const Stock& stk, size_t lastnum, const KQuery::KType& ktype,
-                               KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const;
+    KData getLastKData(const Stock& stk, size_t lastnum, const KQuery::KType& ktype,
+                       KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const;
+
+    virtual Datetime today() const {
+        return Datetime::today();
+    }
+
+    virtual Datetime now() const {
+        return Datetime::now();
+    }
+
+    virtual Datetime nextDatetime() const {
+        return Null<Datetime>();
+    }
 
     virtual TradeRecord buy(const Stock& stk, price_t price, double num, double stoploss = 0.0,
                             double goal_price = 0.0,
@@ -145,27 +162,13 @@ public:
         return false;
     }
 
-    TradeManagerPtr getTM() const noexcept {
-        return m_tm;
-    }
-
-    void setTM(const TradeManagerPtr& tm) noexcept {
-        m_tm = tm;
-    }
-
-    /** 仅在回测状态下使用 */
-    SlippagePtr getSP() const noexcept {
-        return m_sp;
-    }
-
-    void setSP(const SlippagePtr& slippage) noexcept {
-        m_sp = slippage;
-    }
-
-private:
+protected:
     string m_name;
     string m_config_file;
     StrategyContext m_context;
+    TradeManagerPtr m_tm;
+    SlippagePtr m_sp;
+
     std::function<void(const Strategy&, const Datetime&)> m_on_recieved_spot;
     std::function<void(const Strategy&, const Stock&, const SpotRecord& spot)> m_on_change;
 
@@ -179,22 +182,23 @@ private:
 
     std::unordered_map<TimeDelta, std::function<void()>> m_run_daily_at_funcs;
 
+protected:
+    static std::atomic_bool ms_keep_running;
+
+protected:
+    void _init();
+
 private:
     void _initParam();
-    void _init();
     void _receivedSpot(const SpotRecord& spot);
     void _runDaily();
     void _runDailyAt();
 
 private:
-    static std::atomic_bool ms_keep_running;
     static void sig_handler(int sig);
 
     typedef FuncWrapper event_type;
     ThreadSafeQueue<event_type> m_event_queue;  // 消息队列
-
-    TradeManagerPtr m_tm;
-    SlippagePtr m_sp;
 
     /** 先消息队列提交任务后返回的对应 future 的类型 */
     template <typename ResultType>
