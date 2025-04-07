@@ -59,14 +59,14 @@ function prepare_run(target)
     end
   end
 
+
 target("unit-test")
     set_kind("binary")
     set_default(false)
 
     if get_config("leak_check") then
         if is_plat("macosx") then
-            add_cxflags("-fsanitize=address")
-            add_ldflags("-fsanitize=address")
+            set_policy("build.sanitizer.address", true)
         elseif is_plat("linux") then
             -- 需要 export LD_PRELOAD=libasan.so
             set_policy("build.sanitizer.address", true)
@@ -106,7 +106,7 @@ target("unit-test")
     end
 
     -- add files
-    add_files("**.cpp|hikyuu/real_data/**|hikyuu/indicator_talib/**.cpp")
+    add_files("hikyuu/**.cpp|hikyuu/real_data/**|hikyuu/indicator_talib/**.cpp")
     
     if has_config("ta_lib") then
         add_files("hikyuu/indicator_talib/**.cpp")

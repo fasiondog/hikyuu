@@ -239,7 +239,7 @@ private:
     std::vector<std::thread> m_threads;                      // 工作线程
 
     // 线程本地变量
-#if CPP_STANDARD >= CPP_STANDARD_17
+#if CPP_STANDARD >= CPP_STANDARD_17 && !defined(__clang__)
     inline static thread_local WorkStealQueue* m_local_work_queue = nullptr;  // 本地任务队列
     inline static thread_local int m_index = -1;                              // 在线程池中的序号
     inline static thread_local InterruptFlag m_thread_need_stop;              // 线程停止运行指示

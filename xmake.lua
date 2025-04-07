@@ -70,6 +70,8 @@ option_end()
 local log_level = get_config("log_level")
 if log_level == nil then
     log_level = 2
+else
+    log_level = log_level + 0
 end
 add_defines("SPDLOG_ACTIVE_LEVEL=" .. log_level)
 
@@ -104,7 +106,7 @@ set_configvar("HKU_ENABLE_INI_PARSER", 1)
 set_configvar("HKU_ENABLE_STACK_TRACE", get_config("stacktrace") and 1 or 0)
 set_configvar("HKU_CLOSE_SPEND_TIME", get_config("spend_time") and 0 or 1)
 set_configvar("HKU_USE_SPDLOG_ASYNC_LOGGER", get_config("async_log") and 1 or 0)
-set_configvar("HKU_LOG_ACTIVE_LEVEL", get_config("log_level"))
+set_configvar("HKU_LOG_ACTIVE_LEVEL", log_level)
 set_configvar("HKU_ENABLE_MO", get_config("mo") and 1 or 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT", 1)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", get_config("http_client_ssl") and 1 or 0)
@@ -114,7 +116,7 @@ set_configvar("HKU_ENABLE_NODE", 1)
 local boost_version = "1.87.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "11.1.4"
-local spdlog_version = "1.15.1"
+local spdlog_version = "1.15.2"
 local flatbuffers_version = "24.3.25"
 local nng_version = "1.10.1"
 local sqlite_version = "3.49.0+100"
