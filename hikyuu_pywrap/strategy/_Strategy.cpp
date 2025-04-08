@@ -71,6 +71,8 @@ void export_Strategy(py::module& m) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
                         raise(SIGTERM);
+                    } else {
+                        HKU_ERROR(e.what());
                     }
                 } catch (...) {
                     // do nothing
@@ -99,6 +101,8 @@ void export_Strategy(py::module& m) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
                         raise(SIGTERM);
+                    } else {
+                        HKU_ERROR(e.what());
                     }
                 } catch (const std::exception& e) {
                     HKU_ERROR(e.what());
@@ -127,6 +131,8 @@ void export_Strategy(py::module& m) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
                         raise(SIGTERM);
+                    } else {
+                        HKU_ERROR(e.what());
                     }
                 } catch (const std::exception& e) {
                     HKU_ERROR(e.what());
@@ -156,6 +162,8 @@ void export_Strategy(py::module& m) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
                         raise(SIGTERM);
+                    } else {
+                        HKU_ERROR(e.what());
                     }
                 } catch (const std::exception& e) {
                     HKU_ERROR(e.what());
@@ -189,6 +197,8 @@ void export_Strategy(py::module& m) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
                         raise(SIGTERM);
+                    } else {
+                        HKU_ERROR(e.what());
                     }
                 } catch (const std::exception& e) {
                     HKU_ERROR(e.what());
