@@ -134,13 +134,13 @@ void Strategy::start(bool autoRecieveSpot) {
 }
 
 void Strategy::onChange(
-  std::function<void(const Strategy&, const Stock&, const SpotRecord& spot)>&& changeFunc) {
+  const std::function<void(const Strategy&, const Stock&, const SpotRecord& spot)>& changeFunc) {
     HKU_CHECK(changeFunc, "Invalid changeFunc!");
     m_on_change = std::move(changeFunc);
 }
 
 void Strategy::onReceivedSpot(
-  std::function<void(const Strategy&, const Datetime&)>&& recievedFucn) {
+  const std::function<void(const Strategy&, const Datetime&)>& recievedFucn) {
     HKU_CHECK(recievedFucn, "Invalid recievedFucn!");
     m_on_recieved_spot = std::move(recievedFucn);
 }
@@ -154,7 +154,7 @@ void Strategy::_receivedSpot(const SpotRecord& spot) {
     }
 }
 
-void Strategy::runDaily(std::function<void(const Strategy&)>&& func, const TimeDelta& delta,
+void Strategy::runDaily(const std::function<void(const Strategy&)>& func, const TimeDelta& delta,
                         const std::string& market, bool ignoreMarket) {
     HKU_CHECK(func, "Invalid func!");
     HKU_CHECK(!market.empty(), "The market can not be empty!");
@@ -280,7 +280,7 @@ void Strategy::_runDaily() {
     }
 }
 
-void Strategy::runDailyAt(std::function<void(const Strategy&)>&& func, const TimeDelta& delta,
+void Strategy::runDailyAt(const std::function<void(const Strategy&)>& func, const TimeDelta& delta,
                           bool ignoreHoliday) {
     HKU_CHECK(func, "Invalid func!");
     HKU_CHECK(delta < Days(1), "TimeDelta must < Days(1)!");
