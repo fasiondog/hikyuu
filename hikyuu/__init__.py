@@ -101,6 +101,7 @@ SOFTWARE.
 __version__ = get_version()
 
 sm = StockManager.instance()
+sm.set_plugin_path(os.path.join(os.path.dirname(__file__), 'plugin'))
 
 
 class iodog:
@@ -252,6 +253,12 @@ def load_hikyuu(**kwargs):
     hku_param["datadir"] = ini.get('hikyuu', 'datadir')
     if ini.has_option('hikyuu', 'quotation_server'):
         hku_param["quotation_server"] = ini['hikyuu']['quotation_server']
+    hku_param["load_history_finance"] = ini.getboolean("hikyuu", "load_history_finance", fallback=True)
+    hku_param["load_stock_weight"] = ini.getboolean("hikyuu", "load_stock_weight", fallback=True)
+    if ini.has_option('hikyuu', 'plugindir'):
+        hku_param["plugindir"] = ini.get('hikyuu', 'plugindir')
+    else:
+        hku_param["plugindir"] = os.path.join(os.path.dirname(__file__), "plugin")
 
     base_param = Parameter()
     base_info_config = ini.options('baseinfo')

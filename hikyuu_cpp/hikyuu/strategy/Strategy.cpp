@@ -13,6 +13,7 @@
 #include "hikyuu/global/GlobalSpotAgent.h"
 #include "hikyuu/global/schedule/scheduler.h"
 #include "hikyuu/global/sysinfo.h"
+#include "hikyuu/plugin/plugins.h"
 #include "hikyuu/hikyuu.h"
 #include "Strategy.h"
 
@@ -453,6 +454,15 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
     } catch (...) {
         HKU_ERROR_UNKNOWN;
     }
+}
+
+void backtest(const StrategyContext& context, const std::function<void(const Strategy&)>& on_bar,
+              const TradeManagerPtr& tm, const Datetime& start_date, const Datetime& end_date,
+              const KQuery::KType& ktype, const string& ref_market, int mode) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<BackTestPluginInterface>(HKU_PLUGIN_BACKTEST);
+    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find backtest plugin!");
+    plugin->backtest(context, on_bar, tm, start_date, end_date, ktype, ref_market, mode);
 }
 
 }  // namespace hku

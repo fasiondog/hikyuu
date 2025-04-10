@@ -57,6 +57,8 @@ void export_StockManager(py::module& m) {
       .def("get_context", &StockManager::getStrategyContext, py::return_value_policy::copy,
            "获取当前上下文")
 
+      .def("set_plugin_path", &StockManager::setPluginPath, R"(set_plugin_path(self, path))")
+
       .def("get_market_list", &StockManager::getAllMarket, R"(get_market_list(self)
 
     获取市场简称列表

@@ -13,6 +13,7 @@
 #include <thread>
 #include "hikyuu/utilities/Parameter.h"
 #include "hikyuu/utilities/thread/thread.h"
+#include "hikyuu/utilities/plugin/PluginManager.h"
 #include "hikyuu/data_driver/DataDriverFactory.h"
 #include "Block.h"
 #include "MarketInfo.h"
@@ -235,6 +236,11 @@ public:
         return m_load_tg.get();
     }
 
+    void setPluginPath(const std::string& path);
+
+    template <typename PluginInterfaceT>
+    PluginInterfaceT* getPlugin(const std::string& pluginname) noexcept;
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
@@ -312,6 +318,8 @@ private:
     StrategyContext m_context;
 
     std::unique_ptr<ThreadPool> m_load_tg;  // 异步数据加载辅助线程组
+
+    PluginManager m_plugin_manager;
 };
 
 inline size_t StockManager::size() const {
@@ -365,6 +373,15 @@ inline size_t StockManager::getHistoryFinanceFieldIndex(const string& name) cons
 inline vector<HistoryFinanceInfo> StockManager::getHistoryFinance(const Stock& stk, Datetime start,
                                                                   Datetime end) {
     return m_baseInfoDriver->getHistoryFinance(stk.market(), stk.code(), start, end);
+}
+
+inline void StockManager::setPluginPath(const std::string& path) {
+    m_plugin_manager.pluginPath(path);
+}
+
+template <typename PluginInterfaceT>
+inline PluginInterfaceT* StockManager::getPlugin(const std::string& pluginname) noexcept {
+    return m_plugin_manager.getPlugin<PluginInterfaceT>(pluginname);
 }
 
 }  // namespace hku
