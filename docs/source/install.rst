@@ -35,4 +35,4 @@ pip 安装
 源码编译安装
 ----------------
 
-Ubuntu22.04及以上支持 pip 安装，其他Linux及macsox上建议使用源码方式安装，参见 :ref:`developer` 。
+Ubuntu24.04及以上支持 pip 安装，其他Linux及macsox上建议使用源码方式安装，参见 :ref:`developer` 。
