@@ -64,7 +64,7 @@ void export_Strategy(py::module& m) {
             // python 中在 start 之前，强制加入一个空函数，用于捕获 KeyboardInterrupt 来终止策略
             py::object func = py::eval("lambda stg: None");
             HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
-            auto new_func = [=](const Strategy& stg) {
+            auto new_func = [=](Strategy* stg) {
                 try {
                     func(stg);
                 } catch (py::error_already_set& e) {
@@ -94,7 +94,7 @@ void export_Strategy(py::module& m) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 3), "Number of parameters does not match!");
             py::object c_func = func.attr("__call__");
-            auto new_func = [=](const Strategy& stg, const Stock& stk, const SpotRecord& spot) {
+            auto new_func = [=](Strategy* stg, const Stock& stk, const SpotRecord& spot) {
                 try {
                     c_func(stg, stk, spot);
                 } catch (py::error_already_set& e) {
@@ -124,7 +124,7 @@ void export_Strategy(py::module& m) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 2), "Number of parameters does not match!");
             py::object c_func = func.attr("__call__");
-            auto new_func = [=](const Strategy& stg, Datetime revTime) {
+            auto new_func = [=](Strategy* stg, Datetime revTime) {
                 try {
                     c_func(stg, revTime);
                 } catch (py::error_already_set& e) {
@@ -155,7 +155,7 @@ void export_Strategy(py::module& m) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
             py::object c_func = func.attr("__call__");
-            auto new_func = [=](const Strategy& stg) {
+            auto new_func = [=](Strategy* stg) {
                 try {
                     c_func(stg);
                 } catch (py::error_already_set& e) {
@@ -190,7 +190,7 @@ void export_Strategy(py::module& m) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
             py::object c_func = func.attr("__call__");
-            auto new_func = [=](const Strategy& stg) {
+            auto new_func = [=](Strategy* stg) {
                 try {
                     c_func(stg);
                 } catch (py::error_already_set& e) {
@@ -301,7 +301,7 @@ void export_Strategy(py::module& m) {
           HKU_CHECK(py::hasattr(on_bar, "__call__"), "func is not callable!");
           HKU_CHECK(check_pyfunction_arg_num(on_bar, 1), "Number of parameters does not match!");
           py::object c_func = on_bar.attr("__call__");
-          auto new_func = [=](const Strategy& stg) {
+          auto new_func = [=](Strategy* stg) {
               try {
                   c_func(stg);
               } catch (py::error_already_set& e) {

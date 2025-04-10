@@ -75,7 +75,7 @@ StrategyPtr HKU_API crtSysStrategy(const SYSPtr& sys, const string& stk_market_c
         }
     }
 
-    std::function<void(const Strategy&)> func = [=](const Strategy&) {
+    std::function<void(Strategy*)> func = [=](Strategy*) {
         runner->run(getStock(stk_market_code));
     };
 

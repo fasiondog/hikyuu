@@ -64,7 +64,7 @@ public:
      * @param market 指定的市场, 用于获取开/收盘时间
      * @param ignoreMarket 是否忽略市场时间限制，如为 true，则为定时循环不受开闭市时间限制
      */
-    void runDaily(const std::function<void(const Strategy&)>& func, const TimeDelta& delta,
+    void runDaily(const std::function<void(Strategy*)>& func, const TimeDelta& delta,
                   const std::string& market = "SH", bool ignoreMarket = false);
 
     /**
@@ -73,7 +73,7 @@ public:
      * @param delta 指定时刻
      * @param ignoreHoliday 忽略节假日，即节假日不执行
      */
-    void runDailyAt(const std::function<void(const Strategy&)>& func, const TimeDelta& delta,
+    void runDailyAt(const std::function<void(Strategy*)>& func, const TimeDelta& delta,
                     bool ignoreHoliday = true);
 
     /**
@@ -82,7 +82,7 @@ public:
      * @param changeFunc 回调函数
      */
     void onChange(
-      const std::function<void(const Strategy&, const Stock&, const SpotRecord& spot)>& changeFunc);
+      const std::function<void(Strategy*, const Stock&, const SpotRecord& spot)>& changeFunc);
 
     /**
      * 一批行情数据接受完毕后通知
@@ -90,7 +90,7 @@ public:
      *       且只要收到行情采集消息就会触发，不受开、闭市时间限制。
      * @param recievedFucn 回调函数
      */
-    void onReceivedSpot(const std::function<void(const Strategy&, const Datetime&)>& recievedFucn);
+    void onReceivedSpot(const std::function<void(Strategy*, const Datetime&)>& recievedFucn);
 
     /**
      * 启动策略执行，必须在已注册相关处理函数后执行
@@ -169,8 +169,8 @@ protected:
     TradeManagerPtr m_tm;
     SlippagePtr m_sp;
 
-    std::function<void(const Strategy&, const Datetime&)> m_on_recieved_spot;
-    std::function<void(const Strategy&, const Stock&, const SpotRecord& spot)> m_on_change;
+    std::function<void(Strategy*, const Datetime&)> m_on_recieved_spot;
+    std::function<void(Strategy*, const Stock&, const SpotRecord& spot)> m_on_change;
 
     struct RunDailyAt {
         std::function<void()> func;
@@ -276,7 +276,7 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
  * @param ref_market 所属市场
  * @param mode 模式  0: 当前bar收盘价执行买卖操作；1: 下一bar开盘价执行买卖操作;
  */
-void backtest(const StrategyContext& context, const std::function<void(const Strategy&)>& on_bar,
+void backtest(const StrategyContext& context, const std::function<void(Strategy*)>& on_bar,
               const TradeManagerPtr& tm, const Datetime& start_date,
               const Datetime& end_date = Null<Datetime>(), const KQuery::KType& ktype = KQuery::DAY,
               const string& ref_market = "SH", int mode = 0);

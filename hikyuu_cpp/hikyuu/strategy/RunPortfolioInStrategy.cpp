@@ -58,7 +58,7 @@ StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query,
         }
     }
 
-    std::function<void(const Strategy&)> func = [=](const Strategy&) { runner->run(); };
+    std::function<void(Strategy*)> func = [=](Strategy*) { runner->run(); };
 
     vector<string> code_list;
     std::set<int64_t> stk_set;

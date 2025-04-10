@@ -121,7 +121,7 @@ void Strategy::start(bool autoRecieveSpot) {
         agent.addProcess([this](const SpotRecord& spot) { _receivedSpot(spot); });
         agent.addPostProcess([this](Datetime revTime) {
             if (m_on_recieved_spot) {
-                event([this, revTime]() { m_on_recieved_spot(*this, revTime); });
+                event([this, revTime]() { m_on_recieved_spot(this, revTime); });
             }
         });
         startSpotAgent(true, getParam<int>("spot_worker_num"),
@@ -135,13 +135,12 @@ void Strategy::start(bool autoRecieveSpot) {
 }
 
 void Strategy::onChange(
-  const std::function<void(const Strategy&, const Stock&, const SpotRecord& spot)>& changeFunc) {
+  const std::function<void(Strategy*, const Stock&, const SpotRecord& spot)>& changeFunc) {
     HKU_CHECK(changeFunc, "Invalid changeFunc!");
     m_on_change = std::move(changeFunc);
 }
 
-void Strategy::onReceivedSpot(
-  const std::function<void(const Strategy&, const Datetime&)>& recievedFucn) {
+void Strategy::onReceivedSpot(const std::function<void(Strategy*, const Datetime&)>& recievedFucn) {
     HKU_CHECK(recievedFucn, "Invalid recievedFucn!");
     m_on_recieved_spot = std::move(recievedFucn);
 }
@@ -150,12 +149,12 @@ void Strategy::_receivedSpot(const SpotRecord& spot) {
     Stock stk = getStock(format("{}{}", spot.market, spot.code));
     if (!stk.isNull()) {
         if (m_on_change) {
-            event([this, stk, spot]() { m_on_change(*this, stk, spot); });
+            event([this, stk, spot]() { m_on_change(this, stk, spot); });
         }
     }
 }
 
-void Strategy::runDaily(const std::function<void(const Strategy&)>& func, const TimeDelta& delta,
+void Strategy::runDaily(const std::function<void(Strategy*)>& func, const TimeDelta& delta,
                         const std::string& market, bool ignoreMarket) {
     HKU_CHECK(func, "Invalid func!");
     HKU_CHECK(!market.empty(), "The market can not be empty!");
@@ -167,7 +166,7 @@ void Strategy::runDaily(const std::function<void(const Strategy&)>& func, const 
     run_at.ignoreMarket = ignoreMarket;
 
     if (ignoreMarket) {
-        run_at.func = [this, f = std::move(func)]() { event([this, f]() { f(*this); }); };
+        run_at.func = [this, f = std::move(func)]() { event([this, f]() { f(this); }); };
 
     } else {
         run_at.func = [this, market = run_at.market, f = std::move(func)]() {
@@ -185,7 +184,7 @@ void Strategy::runDaily(const std::function<void(const Strategy&)>& func, const 
             Datetime close2 = today + market_info.closeTime2();
             Datetime now = Datetime::now();
             if ((now >= open1 && now <= close1) || (now >= open2 && now <= close2)) {
-                event([this, f]() { f(*this); });
+                event([this, f]() { f(this); });
             }
         };
     }
@@ -283,7 +282,7 @@ void Strategy::_runDaily() {
     }
 }
 
-void Strategy::runDailyAt(const std::function<void(const Strategy&)>& func, const TimeDelta& delta,
+void Strategy::runDailyAt(const std::function<void(Strategy*)>& func, const TimeDelta& delta,
                           bool ignoreHoliday) {
     HKU_CHECK(func, "Invalid func!");
     HKU_CHECK(delta < Days(1), "TimeDelta must < Days(1)!");
@@ -297,12 +296,12 @@ void Strategy::runDailyAt(const std::function<void(const Strategy&)>& func, cons
             auto today = Datetime::today();
             int day = today.dayOfWeek();
             if (day != 0 && day != 6 && !sm.isHoliday(today)) {
-                event([this, f]() { f(*this); });
+                event([this, f]() { f(this); });
             }
         };
 
     } else {
-        new_func = [this, f = std::move(func)]() { event([this, f]() { f(*this); }); };
+        new_func = [this, f = std::move(func)]() { event([this, f]() { f(this); }); };
     }
 
     m_run_daily_at_funcs[delta] = new_func;
@@ -458,7 +457,7 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
     }
 }
 
-void backtest(const StrategyContext& context, const std::function<void(const Strategy&)>& on_bar,
+void backtest(const StrategyContext& context, const std::function<void(Strategy*)>& on_bar,
               const TradeManagerPtr& tm, const Datetime& start_date, const Datetime& end_date,
               const KQuery::KType& ktype, const string& ref_market, int mode) {
     auto& sm = StockManager::instance();
