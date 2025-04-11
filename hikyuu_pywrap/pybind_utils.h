@@ -98,6 +98,14 @@ public:                                                                      \
         return std::shared_ptr<classname>(keep_python_state_alive, ptr);     \
     }
 
+// 用于检查已 py::object 方式传递的函数参数个数是否符合预期
+inline bool check_pyfunction_arg_num(py::object& func, size_t arg_num) {
+    py::module_ inspect = py::module_::import("inspect");
+    py::object sig = inspect.attr("signature")(func);
+    py::object params = sig.attr("parameters");
+    return len(params) == arg_num;
+}
+
 }  // namespace hku
 
 #endif  // HIKYUU_PYTHON_BIND_UTILS_H
