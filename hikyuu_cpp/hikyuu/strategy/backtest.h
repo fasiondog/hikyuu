@@ -27,4 +27,10 @@ void backtest(const StrategyContext& context, const std::function<void(Strategy*
               const Datetime& end_date = Null<Datetime>(), const KQuery::KType& ktype = KQuery::DAY,
               const string& ref_market = "SH", int mode = 0);
 
+// 仅在 sm.init 之后使用
+void backtest(const std::function<void(Strategy*)>& on_bar, const TradeManagerPtr& tm,
+              const Datetime& start_date, const Datetime& end_date = Null<Datetime>(),
+              const KQuery::KType& ktype = KQuery::DAY, const string& ref_market = "SH",
+              int mode = 0);
+
 }  // namespace hku
