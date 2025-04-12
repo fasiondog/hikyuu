@@ -742,15 +742,8 @@ Indicator IndicatorImp::calculate() {
 
         case OP: {
             m_right->calculate();
-            Indicator tmp_ind(m_right);
-            for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
-                if (iter->second->m_ind_params.empty()) {
-                    iter->second->_calculate(tmp_ind);
-                } else {
-                    iter->second->_dyn_calculate(tmp_ind);
-                }
-            }
             _readyBuffer(m_right->size(), m_result_num);
+            Indicator tmp_ind(m_right);
             if (m_ind_params.empty()) {
                 _calculate(tmp_ind);
             } else {
