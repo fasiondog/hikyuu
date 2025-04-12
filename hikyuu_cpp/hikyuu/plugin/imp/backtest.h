@@ -6,7 +6,7 @@
  */
 
 #pragma once
-#include "Strategy.h"
+#include "hikyuu/strategy/Strategy.h"
 
 namespace hku {
 
