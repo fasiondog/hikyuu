@@ -7,13 +7,14 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/HHVBARS.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator/crt/REF.h>
 
 using namespace hku;
 
@@ -167,6 +168,20 @@ TEST_CASE("test_HHVBARS_dyn") {
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_HHVBARS_dyn2") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    auto XGTS = HHVBARS(HIGH(), 20);
+    auto XDJ = REF(LOW(), XGTS);
+
+    auto result = XDJ(kdata);
+
+    auto x = PRICELIST(XGTS(kdata));
+    auto expect = REF(LOW(kdata), x);
+    check_indicator(result, expect);
 }
 
 //-----------------------------------------------------------------------------
