@@ -6,21 +6,14 @@
  */
 
 #include <csignal>
-#include <hikyuu/plugin/device.h>
 #include <hikyuu/plugin/backtest.h>
-#include "pybind_utils.h"
+#include "../pybind_utils.h"
 
 namespace py = pybind11;
 using namespace hku;
 
-void export_plugin(py::module& m) {
+void export_plugin_backtest(py::module& m) {
     Datetime null_date;
-    m.def("activate_device", activateDevice, R"(activate_device(active_code: str)
-        
-    VIP功能授权码激活设备
-    
-    :param str active_code: 授权码)");
-
     m.def(
       "backtest",
       [](const StrategyContext& context, py::object on_bar, const TradeManagerPtr& tm,
