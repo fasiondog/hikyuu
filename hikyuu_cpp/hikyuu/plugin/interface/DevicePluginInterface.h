@@ -17,6 +17,7 @@ public:
     virtual ~DevicePluginInterface() = default;
 
     virtual void activate(const std::string& active_code) noexcept = 0;
+    virtual void viewLicense() noexcept = 0;
 };
 
 }  // namespace hku

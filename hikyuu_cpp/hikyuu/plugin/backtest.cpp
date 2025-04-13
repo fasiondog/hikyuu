@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "hikyuu/plugin/plugins.h"
+#include "interface/plugins.h"
 #include "backtest.h"
 
 namespace hku {

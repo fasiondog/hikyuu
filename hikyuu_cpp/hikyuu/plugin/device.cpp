@@ -6,7 +6,7 @@
  */
 
 #include "hikyuu/StockManager.h"
-#include "hikyuu/plugin/plugins.h"
+#include "interface/plugins.h"
 #include "device.h"
 
 namespace hku {

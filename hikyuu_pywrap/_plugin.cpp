@@ -6,8 +6,8 @@
  */
 
 #include <csignal>
-#include <hikyuu/plugin/imp/device.h>
-#include <hikyuu/plugin/imp/backtest.h>
+#include <hikyuu/plugin/device.h>
+#include <hikyuu/plugin/backtest.h>
 #include "pybind_utils.h"
 
 namespace py = pybind11;
