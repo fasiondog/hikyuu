@@ -79,6 +79,10 @@ void Strategy::baseCheckParam(const string& name) const {
 
 void Strategy::paramChanged() {}
 
+bool Strategy::running() const {
+    return ms_keep_running;
+}
+
 void Strategy::_init() {
     StockManager& sm = StockManager::instance();
 

@@ -10,14 +10,14 @@
 
 namespace hku {
 
-void startDataServer(const std::string& addr, size_t work_num) {
+void HKU_API startDataServer(const std::string& addr, size_t work_num) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DataServerPluginInterface>(HKU_PLUGIN_DATASERVER);
     HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DATASERVER);
     plugin->start(addr, work_num);
 }
 
-void stopDataServer() {
+void HKU_API stopDataServer() {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DataServerPluginInterface>(HKU_PLUGIN_DATASERVER);
     HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DATASERVER);

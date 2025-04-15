@@ -46,6 +46,7 @@ void export_Strategy(py::module& m) {
                     py::overload_cast<const string&>(&Strategy::name),
                     py::return_value_policy::copy, "策略名称")
 
+      .def_property_readonly("running", &Strategy::running, "获取当前运行状态")
       .def_property_readonly("context", &Strategy::context, py::return_value_policy::copy,
                              "获取策略上下文")
       .def_property("tm", &Strategy::getTM, &Strategy::setTM, "关联的交易管理实例")

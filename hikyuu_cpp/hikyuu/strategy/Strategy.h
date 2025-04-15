@@ -57,6 +57,8 @@ public:
         return m_context;
     }
 
+    bool running() const;
+
     /**
      * 每日开盘时间内，以 delta 为周期循环定时执行指定任务
      * @param func 待执行的任务

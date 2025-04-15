@@ -11,8 +11,8 @@
 
 namespace hku {
 
-void startDataServer(const std::string& addr = "tcp://0.0.0.0:9201", size_t work_num = 2);
+void HKU_API startDataServer(const std::string& addr = "tcp://0.0.0.0:9201", size_t work_num = 2);
 
-void stopDataServer();
+void HKU_API stopDataServer();
 
 }  // namespace hku

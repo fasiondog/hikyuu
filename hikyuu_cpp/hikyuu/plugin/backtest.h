@@ -22,15 +22,16 @@ namespace hku {
  * @param ref_market 所属市场
  * @param mode 模式  0: 当前bar收盘价执行买卖操作；1: 下一bar开盘价执行买卖操作;
  */
-void backtest(const StrategyContext& context, const std::function<void(Strategy*)>& on_bar,
-              const TradeManagerPtr& tm, const Datetime& start_date,
-              const Datetime& end_date = Null<Datetime>(), const KQuery::KType& ktype = KQuery::DAY,
-              const string& ref_market = "SH", int mode = 0);
+void HKU_API backtest(const StrategyContext& context, const std::function<void(Strategy*)>& on_bar,
+                      const TradeManagerPtr& tm, const Datetime& start_date,
+                      const Datetime& end_date = Null<Datetime>(),
+                      const KQuery::KType& ktype = KQuery::DAY, const string& ref_market = "SH",
+                      int mode = 0);
 
 // 仅在 sm.init 之后使用
-void backtest(const std::function<void(Strategy*)>& on_bar, const TradeManagerPtr& tm,
-              const Datetime& start_date, const Datetime& end_date = Null<Datetime>(),
-              const KQuery::KType& ktype = KQuery::DAY, const string& ref_market = "SH",
-              int mode = 0);
+void HKU_API backtest(const std::function<void(Strategy*)>& on_bar, const TradeManagerPtr& tm,
+                      const Datetime& start_date, const Datetime& end_date = Null<Datetime>(),
+                      const KQuery::KType& ktype = KQuery::DAY, const string& ref_market = "SH",
+                      int mode = 0);
 
 }  // namespace hku
