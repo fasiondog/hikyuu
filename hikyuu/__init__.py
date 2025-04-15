@@ -52,6 +52,7 @@ import traceback
 import sys
 import pickle
 import os
+from pathlib import Path
 
 try:
     from .util import *
@@ -101,7 +102,14 @@ SOFTWARE.
 __version__ = get_version()
 
 sm = StockManager.instance()
-sm.set_plugin_path(os.path.join(os.path.dirname(__file__), 'plugin'))
+
+plugin_path = Path.home() / '.hikyuu' / 'plugin'
+if plugin_path.exists():
+    plugin_path = str(plugin_path)
+else:
+    plugin_path = os.path.join(os.path.dirname(__file__), 'plugin')
+sm.set_plugin_path(plugin_path)
+print(f"current plugin path: {plugin_path}")
 
 
 class iodog:

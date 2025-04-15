@@ -57,7 +57,14 @@ void export_StockManager(py::module& m) {
       .def("get_context", &StockManager::getStrategyContext, py::return_value_policy::copy,
            "获取当前上下文")
 
-      .def("set_plugin_path", &StockManager::setPluginPath, R"(set_plugin_path(self, path))")
+      .def("set_plugin_path", &StockManager::setPluginPath, R"(set_plugin_path(self, path)
+        
+    设置插件路径，仅在初始化之前设置有效)")
+
+      .def("get_plugin_path", &StockManager::getPluginPath, py::return_value_policy::copy,
+           R"(get_plugin_path(self)
+
+    获取插件路径)")
 
       .def("get_market_list", &StockManager::getAllMarket, R"(get_market_list(self)
 

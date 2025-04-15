@@ -10,6 +10,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <mutex>
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/plugin/PluginLoader.h"
 
@@ -31,8 +32,8 @@ public:
     }
 
     void pluginPath(const std::string& plugin_path) noexcept {
-        HKU_WARN_IF_RETURN(!m_plugins.empty(), void(),
-                           "Existing loaded plugins, Ignore set plugin path: {}, ", plugin_path);
+        HKU_TRACE_IF_RETURN(!m_plugins.empty(), void(),
+                            "Existing loaded plugins, Ignore set plugin path: {}, ", plugin_path);
         m_plugin_path = plugin_path;
     }
 
@@ -42,6 +43,7 @@ public:
 private:
     std::unordered_map<std::string, std::unique_ptr<PluginLoader>>::iterator load(
       const std::string& pluginname) noexcept {
+        std::lock_guard<std::mutex> lock(m_mutex);
         std::unique_ptr<PluginLoader> loader = std::make_unique<PluginLoader>(m_plugin_path);
         if (loader->load(pluginname)) {
             auto [it, success] = m_plugins.insert(std::make_pair(pluginname, std::move(loader)));
@@ -55,6 +57,7 @@ private:
 private:
     std::string m_plugin_path;
     std::unordered_map<std::string, std::unique_ptr<PluginLoader>> m_plugins;
+    std::mutex m_mutex;
 };
 
 template <typename PluginInterfaceT>

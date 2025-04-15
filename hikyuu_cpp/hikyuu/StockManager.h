@@ -236,7 +236,13 @@ public:
         return m_load_tg.get();
     }
 
+    /** 设置插件路径（仅在初始化之前有效） */
     void setPluginPath(const std::string& path);
+
+    /** 获取当前插件路径 */
+    const string& getPluginPath() const {
+        return m_plugin_manager.pluginPath();
+    }
 
     template <typename PluginInterfaceT>
     PluginInterfaceT* getPlugin(const std::string& pluginname) noexcept;

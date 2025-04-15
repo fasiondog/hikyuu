@@ -11,8 +11,10 @@ namespace py = pybind11;
 
 void export_plugin_device(py::module& m);
 void export_plugin_backtest(py::module& m);
+void export_plugin_dataserver(py::module& m);
 
 void export_plugin(py::module& m) {
     export_plugin_device(m);
     export_plugin_backtest(m);
+    export_plugin_dataserver(m);
 }
