@@ -185,23 +185,23 @@ HttpResponse HttpClient::_readResChunk(const std::string& method, const std::str
         }
     }
 
-    HKU_IF_RETURN(res.status() != NNG_HTTP_STATUS_OK, res);
-
     void* data;
     size_t len;
     nng_http_res_get_data(res.get(), &data, &len);
 
+    if (len > 0) {
 #if HKU_ENABLE_HTTP_CLIENT_ZIP
-    if (res.getHeader("Content-Encoding") == "gzip") {
-        res.m_body = gzip::decompress((const char*)data, len);
-    } else {
+        if (res.getHeader("Content-Encoding") == "gzip") {
+            res.m_body = gzip::decompress((const char*)data, len);
+        } else {
+            res._resizeBody(len);
+            memcpy(res.m_body.data(), data, len);
+        }
+#else
         res._resizeBody(len);
         memcpy(res.m_body.data(), data, len);
-    }
-#else
-    res._resizeBody(len);
-    memcpy(res.m_body.data(), data, len);
 #endif
+    }
 
     return res;
 }
