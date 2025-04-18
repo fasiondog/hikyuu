@@ -18,6 +18,7 @@ public:
 
     virtual void activate(const std::string& active_code) noexcept = 0;
     virtual void viewLicense() noexcept = 0;
+    virtual void removeLicense() noexcept = 0;
 };
 
 }  // namespace hku

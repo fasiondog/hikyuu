@@ -25,4 +25,11 @@ void HKU_API viewLicense() {
     plugin->viewLicense();
 }
 
+void HKU_API removeLicense() {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
+    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DEVICE);
+    plugin->removeLicense();
+}
+
 }  // namespace hku

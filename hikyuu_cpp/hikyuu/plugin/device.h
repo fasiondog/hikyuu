@@ -20,4 +20,7 @@ void HKU_API activateDevice(const std::string& active_code);
 // 查看当前授权
 void HKU_API viewLicense();
 
+// 移除授权
+void HKU_API removeLicense();
+
 }  // namespace hku

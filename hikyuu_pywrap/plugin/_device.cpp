@@ -22,4 +22,8 @@ void export_plugin_device(py::module& m) {
     m.def("view_license", viewLicense, R"(view_license()
         
     查看设备授权信息)");
+
+    m.def("remove_license", removeLicense, R"(remove_license()
+        
+    移除当前授权)");
 }
