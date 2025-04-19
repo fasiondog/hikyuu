@@ -26,4 +26,10 @@ void export_plugin_device(py::module& m) {
     m.def("remove_license", removeLicense, R"(remove_license()
         
     移除当前授权)");
+
+    m.def("fetch_trial_license", fetchTrialLicense, R"(fetch_trial_license(email: str)
+        
+    获取试用授权码
+    
+    :param str email: 邮箱地址)");
 }

@@ -23,4 +23,7 @@ void HKU_API viewLicense();
 // 移除授权
 void HKU_API removeLicense();
 
+// 获取试用授权
+void HKU_API fetchTrialLicense(const std::string& email);
+
 }  // namespace hku
