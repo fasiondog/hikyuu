@@ -33,10 +33,9 @@
 
     使用技术指标作为止损价。如使用10日EMA作为止损：::
     
-        ST_Indicator(OP(EMA(n=10)))
+        ST_Indicator(EMA(CLOSE(), n=10))
 
-    :param Indicator op:
-    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
+    :param Indicator ind: 指标公式
     :return: 止损/止赢策略实例
 
 亚历山大.艾尔德安全地带止损
