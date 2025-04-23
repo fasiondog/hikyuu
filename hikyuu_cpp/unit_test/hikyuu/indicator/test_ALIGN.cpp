@@ -300,19 +300,31 @@ TEST_CASE("test_ALIGN_not_fill_null") {
     ref.push_back(Datetime(201111230000));
     ref.push_back(Datetime(201111240000));
     ref.push_back(Datetime(201111260000));
+    ref.push_back(Datetime(201111270000));
     ref.push_back(Datetime(201112060000));
     ref.push_back(Datetime(201112070000));
     ref.push_back(Datetime(201112100000));
     data = CLOSE(k);
+    for (size_t i = 0; i < data.size(); i++) {
+        HKU_INFO("{}: {}", k[i].datetime, data[i]);
+    }
     result = ALIGN(data, ref, false);
     REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), 1);
     std::vector<Indicator::value_t> expect{
-      Null<Indicator::value_t>(), 2395.0650, 2397.5540, 2380.2240, 2325.9050, 2325.9050, 2325.9050,
+      Null<Indicator::value_t>(),
+      2395.0650,
+      2397.5540,
+      2380.2240,
+      2380.2240,
+      2325.9050,
+      2325.9050,
+      2325.9050,
     };
     for (size_t i = result.discard(); i < result.size(); i++) {
+        HKU_INFO("{} {}: {}", i, result.getDatetime(i), result[i]);
         CHECK_EQ(result.getDatetime(i), ref[i]);
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
