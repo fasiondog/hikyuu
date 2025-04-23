@@ -823,6 +823,86 @@ def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
         )
 
 
+def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None):
+    """
+    绘制系统绩效，即账户累积收益率曲线
+
+    :param SystemBase | PortfolioBase sys: SYS或PF实例
+    :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
+    :return: None
+    """
+    if ref_stk is None:
+        ref_stk = get_stock('sh000300')
+
+    sh000001_k = get_kdata('sh000001', query)
+    ref_dates = sh000001_k.get_datetime_list()
+
+    ref_k = ref_stk.get_kdata(query)
+
+    funds_list = tm.get_funds_list(ref_dates)
+    funds = [f.total_assets for f in funds_list]
+    funds = VALUE(funds)
+    funds_return = [f.total_assets / f.total_base if f.total_base != 0.0 else constant.null_price for f in funds_list]
+    funds_return = VALUE(funds_return, align_dates=ref_dates)
+    funds_return.name = "系统累积收益率"
+    ref_return = ALIGN(ROCR(ref_k.close, 0), ref_dates)
+    ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"
+
+    per = Performance()
+    text = per.report(tm, sh000001_k[-1].datetime)
+
+    # 计算最大回撤
+    max_pullback = min(MDD(funds).to_np())
+
+    # 计算 sharp
+    bond = ZHBOND10(ref_dates)
+    sigma = STDEV(ROCP(funds), len(ref_dates))
+    sigma = 15.874507866387544 * sigma[-1]  # 15.874 = sqrt(252)
+    sharp = (per['帐户平均年收益率%'] - bond[-1]) * 0.01 / sigma if sigma != 0.0 else 0.0
+
+    invest_total = per['累计投入本金'] + per['累计投入资产']
+    cur_fund = per['当前总资产']
+    t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
+        invest_total, cur_fund, cur_fund - invest_total)
+    t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%'.format(
+        funds_return[-1]*100 - 100, per["帐户平均年收益率%"], max_pullback)
+    t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
+        per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
+
+    import matplotlib.pyplot as plt
+    fg = plt.figure(figsize=(15, 10))
+    gs = fg.add_gridspec(5, 4)
+    ax1 = fg.add_subplot(gs[:4, :3])
+    ax2 = fg.add_subplot(gs[:, 3:])
+    ax3 = fg.add_subplot(gs[4:, :3])
+    ref_return.plot(axes=ax1, legend_on=True)
+    funds_return.plot(axes=ax1, legend_on=True)
+    ax1.set_title(f"账户({tm.name}) 累积收益率")
+    label = t1 + '\n\n' + t2 + '\n\n' + t3
+    ax2.text(0,
+             1,
+             text,
+             horizontalalignment='left',
+             verticalalignment='top',
+             transform=ax2.transAxes,
+             # color='r'
+             )
+    ax3.text(0.02,
+             0.9,
+             label,
+             horizontalalignment='left',
+             verticalalignment='top',
+             transform=ax3.transAxes,
+             # color='r'
+             )
+    ax2.xaxis.set_visible(False)
+    ax2.yaxis.set_visible(False)
+    ax2.set_frame_on(False)
+    ax3.xaxis.set_visible(False)
+    ax3.yaxis.set_visible(False)
+    ax3.set_frame_on(False)
+
+
 def sys_performance(sys, ref_stk=None):
     """
     绘制系统绩效，即账户累积收益率曲线

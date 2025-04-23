@@ -49,6 +49,7 @@ from .matplotlib_draw import ax_draw_macd2 as mpl_ax_draw_macd2
 from .matplotlib_draw import ax_set_locator_formatter as mpl_ax_set_locator_formatter
 from .matplotlib_draw import adjust_axes_show as mpl_adjust_axes_show
 from .matplotlib_draw import sys_performance as mpl_sys_performance
+from .matplotlib_draw import tm_performance as mpl_tm_performance
 from .matplotlib_draw import tm_heatmap as mpl_tm_heatmap
 from .matplotlib_draw import sys_heatmap as mpl_sys_heatmap
 from .matplotlib_draw import iheatmap as mpl_iheatmap
@@ -129,6 +130,7 @@ def use_draw_with_matplotlib():
     EnvironmentBase.plot = mpl_evplot
     ConditionBase.plot = mpl_cnplot
 
+    TradeManager.performance = mpl_tm_performance
     System.plot = mpl_sysplot
     System.performance = mpl_sys_performance
     Portfolio.performance = mpl_sys_performance
