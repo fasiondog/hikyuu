@@ -17,7 +17,7 @@ namespace hku {
 
 IAlign::IAlign() : IndicatorImp("ALIGN") {
     setParam<DatetimeList>("align_date_list", DatetimeList());  // 要对齐的日期序列（须已升序排列）
-    setParam<bool>("fill_null", true);  // 缺失的数据是否使用 nan 填充
+    setParam<bool>("fill_null", true);                          // 缺失的数据是否使用 nan 填充
 }
 
 IAlign::~IAlign() {}
@@ -89,55 +89,88 @@ void IAlign::_calculate(const Indicator& ind) {
     // 1. 如果没有刚好相等的日期，则取小于对应日期且最靠近对应日期的数据
     // 2. 如果有对应的日期，取对应日期的数据
     size_t ind_idx = ind.discard();
-    for (size_t i = 0; i < total; i++) {
-        if (ind_idx >= ind_total) {
-            if (!fill_null) {
-                size_t pos = ind_total - 1;
-                for (size_t r = 0; r < m_result_num; r++) {
-                    for (size_t j = i; j < total; j++) {
-                        _set(ind.get(pos, r), j, r);
-                    }
-                }
-            }
-            break;
-        }
-
-        const Datetime& ind_date = ind_dates[ind_idx];
-        if (ind_date == dates[i]) {
-            for (size_t r = 0; r < m_result_num; r++) {
-                _set(ind.get(ind_idx, r), i, r);
-            }
-            ind_idx++;
-
-        } else if (ind_date < dates[i]) {
-            size_t j = ind_idx + 1;
-            while (j < ind_total && ind_dates[j] < dates[i]) {
-                j++;
-            }
-
-            if (j >= ind_total) {
-                if (!fill_null) {
-                    for (size_t r = 0; r < m_result_num; r++) {
-                        price_t val = ind.get(j - 1, r);
-                        for (; i < total; i++) {
-                            _set(val, i, r);
-                        }
-                    }
-                }
+    if (fill_null) {
+        for (size_t i = 0; i < total; i++) {
+            if (ind_idx >= ind_total) {
                 break;
             }
 
-            if (ind_dates[j] == dates[i]) {
+            const Datetime& ind_date = ind_dates[ind_idx];
+            if (ind_date == dates[i]) {
                 for (size_t r = 0; r < m_result_num; r++) {
-                    _set(ind.get(j, r), i, r);
+                    _set(ind.get(ind_idx, r), i, r);
                 }
-            } else if (!fill_null) {
-                for (size_t r = 0; r < m_result_num; r++) {
-                    _set(ind.get(j - 1, r), i, r);
+                ind_idx++;
+
+            } else if (ind_date < dates[i]) {
+                size_t j = ind_idx + 1;
+                while (j < ind_total && ind_dates[j] < dates[i]) {
+                    j++;
+                }
+
+                if (j >= ind_total) {
+                    break;
+                }
+
+                if (ind_dates[j] == dates[i]) {
+                    for (size_t r = 0; r < m_result_num; r++) {
+                        _set(ind.get(j, r), i, r);
+                    }
+                }
+
+                ind_idx = j + 1;
+            }
+        }
+
+    } else {
+        if (ind_dates[0] > dates[total - 1]) {
+            // 如果第一个数据日期 > 最后一个参考日期，则全部忽略
+            m_discard = total;
+            return;
+
+        } else if (dates[0] > ind_dates[ind_total - 1]) {
+            // 如果参考日期都大于 ind_dates 的最后一个日期，则直接使用 ind_dates 的最后一个数据
+            for (size_t r = 0; r < m_result_num; r++) {
+                value_t val = ind.get(ind_total - 1, r);
+                auto* dst = this->data(r);
+                for (size_t i = 0; i < total; i++) {
+                    dst[i] = val;
                 }
             }
 
-            ind_idx = j + 1;
+        } else {
+            size_t pos = 0;
+            for (size_t i = 0; i < total; i++) {
+                if (dates[i] >= ind_dates[0]) {
+                    pos = i;
+                    break;
+                }
+            }
+            for (size_t ind_idx = 0; ind_idx < ind_total; ind_idx++) {
+                const Datetime& ind_date = ind_dates[ind_idx];
+                for (size_t i = pos; i < total; i++) {
+                    if (dates[i] < ind_date) {
+                        for (size_t r = 0; r < m_result_num; r++) {
+                            _set(ind.get(ind_idx - 1, r), i, r);
+                        }
+                    } else if (dates[i] == ind_date) {
+                        for (size_t r = 0; r < m_result_num; r++) {
+                            _set(ind.get(ind_idx, r), i, r);
+                        }
+                    } else {
+                        pos = i;
+                        break;
+                    }
+                }
+            }
+            if (pos < total - 1) {
+                for (size_t r = 0; r < m_result_num; r++) {
+                    auto* dst = this->data(r);
+                    for (size_t i = pos; i < total; i++) {
+                        dst[i] = dst[i - 1];
+                    }
+                }
+            }
         }
     }
 

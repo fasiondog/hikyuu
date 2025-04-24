@@ -106,7 +106,7 @@
     
     双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。如：5日MA上穿10日MA时买入，5日MA线下穿MA10日线时卖出:: 
 
-        SG_Cross(MA(CLOSE(), n=10), OP(MA(n=30)))
+        SG_Cross(MA(CLOSE(), n=10), MA(CLOSE(), n=30))
 
     :param Indicator fast: 快线
     :param Indicator slow: 慢线
