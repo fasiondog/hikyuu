@@ -203,7 +203,8 @@ void export_Stock(py::module& m) {
         },
         R"(get_history_finance(self)
         
-        获取所有历史财务信息历史记录)")
+        获取所有历史财务信息历史记录， 字段信息可参考 StockManager 中的相关方法: get_history_finance_all_fields/get_history_finance_field_index/get_history_finance_field_name 方法
+        日常建议直接使用指标 FINANCE 获取财务数据)")
 
       .def("get_trading_calendar", &Stock::getTradingCalendar, py::arg("query"),
            R"(get_trading_calendar(self, query)
