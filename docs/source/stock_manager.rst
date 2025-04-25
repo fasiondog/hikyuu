@@ -402,9 +402,11 @@ StockManager/Block/Stock
         
         :rtype: Parameter
         
-    .. py:method:: get_history_finance_info(self, date)
+    .. py:method:: get_history_finance(self)
     
-        获取历史财务信息, 字段含义参见：`<https://hikyuu.org/finance_fields.html>`_
+        获取所有历史财务信息列表，字段信息可参考 StockManager 中的相关方法: get_history_finance_all_fields/get_history_finance_field_index/get_history_finance_field_name 方法
+        
+        日常建议直接使用指标 FINANCE 获取财务数据
         
         :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
         :rtype: list
