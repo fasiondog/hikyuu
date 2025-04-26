@@ -13,7 +13,7 @@ namespace py = pybind11;
 using namespace hku;
 
 void export_plugin_device(py::module& m) {
-    m.def("activate_device", activateDevice, R"(activate_device(active_code: str)
+    m.def("active_device", activeDevice, R"(active_device(active_code: str)
         
     VIP功能授权码激活设备
     
