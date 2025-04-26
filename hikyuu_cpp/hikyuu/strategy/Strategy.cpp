@@ -62,7 +62,8 @@ Strategy::Strategy(const StrategyContext& context, const string& name, const str
 }
 
 Strategy::~Strategy() {
-    ms_keep_running = false;
+    // ms_keep_running 用于全局 ctrl-c 终止，不能在释放时释放，否则新创建的策略对象将运行
+    // ms_keep_running = false;
     event([]() {});
 }
 
