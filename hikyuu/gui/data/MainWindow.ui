@@ -27,7 +27,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
@@ -375,12 +375,12 @@
               <widget class="QDateEdit" name="min5_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>8</hour>
+                 <hour>16</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
                  <month>12</month>
-                 <day>30</day>
+                 <day>29</day>
                 </datetime>
                </property>
                <property name="calendarPopup">
@@ -427,12 +427,12 @@
               <widget class="QDateEdit" name="day_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>8</hour>
+                 <hour>16</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
                  <month>12</month>
-                 <day>30</day>
+                 <day>29</day>
                 </datetime>
                </property>
                <property name="calendarPopup">
@@ -1750,6 +1750,69 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </layout>
         </item>
        </layout>
+      </widget>
+      <widget class="QWidget" name="tab_star">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <attribute name="title">
+        <string>加入星球</string>
+       </attribute>
+       <widget class="QLabel" name="label_44">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>50</y>
+          <width>291</width>
+          <height>171</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>../images/star.png</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>300</y>
+          <width>113</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_45">
+        <property name="geometry">
+         <rect>
+          <x>60</x>
+          <y>300</y>
+          <width>54</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>email:</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>290</y>
+          <width>121</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>申请试用许可</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
