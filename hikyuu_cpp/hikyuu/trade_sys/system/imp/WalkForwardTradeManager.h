@@ -437,8 +437,9 @@ public:
      * 从订单代理实例同步当前账户资产信息（包含资金、持仓等）
      * @param broker 订单代理实例
      */
-    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) override {
-        m_tm->fetchAssetInfoFromBroker(broker);
+    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
+                                          const Datetime& datetime = Null<Datetime>()) override {
+        m_tm->fetchAssetInfoFromBroker(broker, datetime);
     }
 
 private:
