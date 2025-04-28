@@ -61,16 +61,6 @@ void export_Portfolio(py::module& m) {
     
     运行投资组合策略。在查询条件及各组件没有变化时，PF在第二次执行时，默认不会实际进行计算。
     但由于各个组件的参数可能改变，此种情况无法自动判断是否需要重计算，可以手工指定进行强制计算。
-
-    调仓模式 adjust_mode 说明：
-    - "query" 模式，跟随输入参数 query 中的 ktype，此时 adjust_cycle 为以 query 中的 ktype
-      决定周期间隔；
-    - "day" 模式，adjust_cycle 为调仓间隔天数
-    - "week" | "month" | "quarter" | "year" 模式时，adjust_cycle
-      为对应的每周第N日、每月第n日、每季度第n日、每年第n日，在 delay_to_trading_day 为 false 时
-      如果当日不是交易日将会被跳过调仓；当 delay_to_trading_day 为 true时，如果当日不是交易日
-      将会顺延至当前周期内的第一个交易日，如指定每月第1日调仓，但当月1日不是交易日，则将顺延至当月
-      的第一个交易日。
         
     :param Query query: 查询条件
     :param bool force: 强制重新计算)")
