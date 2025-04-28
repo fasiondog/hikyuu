@@ -25,6 +25,7 @@ private:
     PFPtr m_pf;
     OrderBrokerPtr m_broker;
     KQuery m_query;
+    std::unordered_set<Stock> m_stocks;
 };
 
 StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query,

@@ -33,12 +33,14 @@ shared_ptr<TradeManagerBase> BrokerTradeManager::_clone() {
     return shared_ptr<TradeManagerBase>(p);
 }
 
-void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) {
+void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
+                                                  const Datetime& datetime) {
     HKU_CHECK(broker, "broker is null!");
 
     auto brk_asset = broker->getAssetInfo();
     if (brk_asset.empty()) {
-        m_datetime = Datetime::now();
+        HKU_WARN("Failed fetch asset info from broker!");
+        m_datetime = firstDatetime().isNull() && !datetime.isNull() ? datetime : Datetime::now();
         m_cash = 0.0;
         m_position.clear();
         return;
@@ -49,6 +51,9 @@ void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) 
         m_datetime = asset.contains("datetime")
                        ? m_datetime = Datetime(asset["datetime"].get<string>())
                        : m_datetime = Datetime::now();
+        if (firstDatetime().isNull() && !datetime.isNull()) {
+            m_datetime = datetime;
+        }
         m_cash = asset["cash"].get<price_t>();
 
         auto& positions = asset["positions"];
