@@ -23,7 +23,8 @@ public:
 
     virtual shared_ptr<TradeManagerBase> _clone() override;
 
-    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) override;
+    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
+                                          const Datetime& datetime = Null<Datetime>()) override;
 
     /**
      * 根据权息信息更新当前持仓与交易情况
