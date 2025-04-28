@@ -228,9 +228,9 @@ public:
         PYBIND11_OVERLOAD(void, TradeManagerBase, tocsv, path);
     }
 
-    void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) override {
+    void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker, const Datetime& datetime) override {
         PYBIND11_OVERRIDE_NAME(void, TradeManagerBase, "fetch_asset_info_from_broker",
-                               fetchAssetInfoFromBroker, broker);
+                               fetchAssetInfoFromBroker, broker, datetime);
     }
 };
 

@@ -697,8 +697,10 @@ public:
     /**
      * 从订单代理实例同步当前账户资产信息（包含资金、持仓等）
      * @param broker 订单代理实例
+     * @param datetime 同步时，通常为当前时间（Null)，也可以强制为指定的时间点
      */
-    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker) {
+    virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
+                                          const Datetime& datetime = Null<Datetime>()) {
         HKU_WARN("The subclass does not implement this method");
     }
 
@@ -706,7 +708,7 @@ protected:
     string m_name;            // 账户名称
     TradeCostPtr m_costfunc;  // 成本算法
 
-    Datetime m_broker_last_datetime;  // 订单代理最近一次执行操作的时刻,当前启动运行时间
+    Datetime m_broker_last_datetime;     // 订单代理最近一次执行操作的时刻,当前启动运行时间
     list<OrderBrokerPtr> m_broker_list;  // 订单代理列表
 
 //============================================
