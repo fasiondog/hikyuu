@@ -375,7 +375,7 @@
               <widget class="QDateEdit" name="min5_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>16</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -427,7 +427,7 @@
               <widget class="QDateEdit" name="day_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>16</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -1762,7 +1762,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <property name="geometry">
          <rect>
           <x>40</x>
-          <y>440</y>
+          <y>370</y>
           <width>291</width>
           <height>171</height>
          </rect>
@@ -1775,42 +1775,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </property>
         <property name="scaledContents">
          <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="lineEdit">
-        <property name="geometry">
-         <rect>
-          <x>140</x>
-          <y>300</y>
-          <width>171</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_45">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>300</y>
-          <width>101</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>电子邮件地址:</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton">
-        <property name="geometry">
-         <rect>
-          <x>350</x>
-          <y>300</y>
-          <width>121</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>申请试用许可</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_46">
@@ -1830,7 +1794,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <property name="geometry">
          <rect>
           <x>30</x>
-          <y>240</y>
+          <y>200</y>
           <width>531</width>
           <height>16</height>
          </rect>
@@ -1843,7 +1807,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <property name="geometry">
          <rect>
           <x>40</x>
-          <y>270</y>
+          <y>230</y>
           <width>121</width>
           <height>16</height>
          </rect>
@@ -1856,7 +1820,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <property name="geometry">
          <rect>
           <x>30</x>
-          <y>350</y>
+          <y>310</y>
           <width>531</width>
           <height>16</height>
          </rect>
@@ -1869,7 +1833,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <property name="geometry">
          <rect>
           <x>40</x>
-          <y>390</y>
+          <y>340</y>
           <width>211</width>
           <height>16</height>
          </rect>
@@ -1877,6 +1841,74 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <property name="text">
          <string>加入知识星球，获取星球许可</string>
         </property>
+       </widget>
+       <widget class="Line" name="line_4">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>560</y>
+          <width>531</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_49">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>580</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>当前授权信息</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_license">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>610</y>
+          <width>521</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>260</y>
+          <width>511</width>
+          <height>33</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_20">
+         <item>
+          <widget class="QLabel" name="label_45">
+           <property name="text">
+            <string>电子邮件地址:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="email_lineEdit"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="fetch_trial_pushButton">
+           <property name="text">
+            <string>申请试用许可</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
      </widget>

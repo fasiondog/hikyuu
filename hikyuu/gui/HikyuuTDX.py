@@ -33,7 +33,7 @@ from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
 
-from hikyuu import can_upgrade, get_last_version
+from hikyuu import can_upgrade, get_last_version, fetch_trial_license, view_license
 from hikyuu.data import hku_config_template
 from hikyuu.util import *
 
@@ -270,6 +270,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         icon = QIcon(f"{current_dir}/images/hikyuu_small.png")
         star_img = QPixmap(f"{current_dir}/images/star.png")
         self.label_44.setPixmap(star_img)
+        self.label_license.setText(view_license())
+        if os.path.exists(self.getUserConfigDir() + '/.hikyuu.lic'):
+            self.fetch_trial_pushButton.setEnabled(False)
 
         self.setWindowIcon(icon)
         QApplication.instance().setWindowIcon(icon)
@@ -496,6 +499,18 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             '1MIN': self.hdf5_min_progressBar,
             '5MIN': self.hdf5_5min_progressBar
         }
+
+    @pyqtSlot()
+    def on_fetch_trial_pushButton_clicked(self):
+        email = self.email_lineEdit.text()
+        info = fetch_trial_license(email)
+        QMessageBox.about(self, "保存配置信息失败", info)
+        self.label_license.setText(view_license())
+        # try:
+        #     self.saveConfig()
+        # except Exception as e:
+        #     QMessageBox.about(self, "保存配置信息失败", str(e))
+        #     return
 
     @pyqtSlot()
     def on_pytdx_radioButton_clicked(self):

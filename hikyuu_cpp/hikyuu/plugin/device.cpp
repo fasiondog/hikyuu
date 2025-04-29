@@ -18,11 +18,13 @@ void HKU_API activeDevice(const std::string& active_code) {
     plugin->activate(active_code);
 }
 
-void HKU_API viewLicense() {
+std::string HKU_API viewLicense() {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
-    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DEVICE);
-    plugin->viewLicense();
+    if (!plugin) {
+        return fmt::format("Can't find {} plugin!", HKU_PLUGIN_DEVICE);
+    }
+    return plugin->viewLicense();
 }
 
 void HKU_API removeLicense() {
@@ -32,11 +34,13 @@ void HKU_API removeLicense() {
     plugin->removeLicense();
 }
 
-void HKU_API fetchTrialLicense(const std::string& email) {
+std::string HKU_API fetchTrialLicense(const std::string& email) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
-    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DEVICE);
-    plugin->fetchTrialLicense(email);
+    if (!plugin) {
+        return fmt::format("Can't find {} plugin!", HKU_PLUGIN_DEVICE);
+    }
+    return plugin->fetchTrialLicense(email);
 }
 
 }  // namespace hku
