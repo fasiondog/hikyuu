@@ -375,7 +375,7 @@
               <widget class="QDateEdit" name="min5_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>16</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -427,7 +427,7 @@
               <widget class="QDateEdit" name="day_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>16</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -1811,6 +1811,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </property>
         <property name="text">
          <string>申请试用许可</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_46">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>360</y>
+          <width>521</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;隐私声明&lt;/span&gt;&lt;/p&gt;&lt;p&gt;许可授权是针对用户设备的授权，将会采集设备硬件信息进行识别，对于无法识别的设备无法授权。&lt;br/&gt;如介意勿申请，申请将默认视为同意 hikyuu 采集硬件识别信息。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </widget>
