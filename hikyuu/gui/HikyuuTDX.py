@@ -16,7 +16,7 @@ import PyQt5
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot, QObject, pyqtSignal
-from PyQt5.QtGui import QIcon, QTextCursor, QFont, QPalette
+from PyQt5.QtGui import QIcon, QTextCursor, QFont, QPalette, QPixmap
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -267,7 +267,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.log_textEdit.document().setMaximumBlockCount(1000)
 
         current_dir = os.path.dirname(__file__)
-        icon = QIcon(f"{current_dir}/hikyuu_small.png")
+        icon = QIcon(f"{current_dir}/images/hikyuu_small.png")
+        star_img = QPixmap(f"{current_dir}/images/star.png")
+        self.label_44.setPixmap(star_img)
+
         self.setWindowIcon(icon)
         QApplication.instance().setWindowIcon(icon)
         self.import_detail_textEdit.clear()
