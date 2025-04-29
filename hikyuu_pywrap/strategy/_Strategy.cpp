@@ -286,5 +286,10 @@ void export_Strategy(py::module& m) {
           py::arg("cost_func"), py::arg("name") = "PFStrategy",
           py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("config") = "");
 
-    m.def("get_data_from_buffer_server", getDataFromBufferServer);
+    m.def("get_data_from_buffer_server", getDataFromBufferServer,
+          R"(get_data_from_buffer_server(addr: str, stklist: list, ktype: Query.KType)
+          
+    :param str addr: 数据服务器地址
+    :param list stklist: 需要获取数据的股票列表
+    :param Query.KType ktype: 数据类型)");
 }
