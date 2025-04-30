@@ -47,6 +47,8 @@ void export_analysis_main(py::module& m);
 void export_StrategeContext(py::module& m);
 void export_strategy_main(py::module& m);
 
+void export_plugin(py::module& m);
+
 #if PY_MINOR_VERSION == 8
 PYBIND11_MODULE(core38, m) {
 #elif PY_MINOR_VERSION == 9
@@ -108,6 +110,8 @@ PYBIND11_MODULE(core, m) {
 
     export_global_main(m);
     export_io_redirect(m);
+
+    export_plugin(m);
 
     m.def("set_python_in_jupyter", setPythonInJupyter);
     m.def("set_python_in_interactive", setPythonInInteractive);
