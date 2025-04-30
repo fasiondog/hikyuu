@@ -504,13 +504,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_fetch_trial_pushButton_clicked(self):
         email = self.email_lineEdit.text()
         info = fetch_trial_license(email)
-        QMessageBox.about(self, "保存配置信息失败", info)
+        QMessageBox.about(self, "获取试用许可", info)
         self.label_license.setText(view_license())
-        # try:
-        #     self.saveConfig()
-        # except Exception as e:
-        #     QMessageBox.about(self, "保存配置信息失败", str(e))
-        #     return
+        if os.path.exists(self.getUserConfigDir() + '/.hikyuu.lic'):
+            self.fetch_trial_pushButton.setEnabled(False)
 
     @pyqtSlot()
     def on_pytdx_radioButton_clicked(self):
