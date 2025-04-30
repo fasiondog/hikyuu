@@ -270,6 +270,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         icon = QIcon(f"{current_dir}/images/hikyuu_small.png")
         star_img = QPixmap(f"{current_dir}/images/star.png")
         self.label_44.setPixmap(star_img)
+        self.label_46.setOpenExternalLinks(True)
         self.label_license.setText(view_license())
         if os.path.exists(self.getUserConfigDir() + '/.hikyuu.lic'):
             self.fetch_trial_pushButton.setEnabled(False)
