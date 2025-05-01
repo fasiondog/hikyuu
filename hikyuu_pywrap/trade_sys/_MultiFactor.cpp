@@ -227,7 +227,7 @@ void export_MultiFactor(py::module& m) {
                            ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(), ic_n,
                            spearman);
       },
-      py::arg("inds"), py::arg("weights"), py::arg("stks"), py::arg("query"),
+      py::arg("inds"), py::arg("stks"), py::arg("weights"), py::arg("query"),
       py::arg("ref_stk") = py::none(), py::arg("ic_n") = 5, py::arg("spearman") = true,
       R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5])
 
