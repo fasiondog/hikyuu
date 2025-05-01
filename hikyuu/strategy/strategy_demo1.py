@@ -7,24 +7,23 @@
 #      供自行实现程序化交易时参考，请自行负责程序化交易可能造成的损失。
 #
 
-from hikyuu import Strategy, Query, Datetime, Seconds, Minutes
-from hikyuu import sm
+from hikyuu import *
 
 
-def on_change(stk, spot):
+def on_change(stg: Strategy, stk: Stock, spot: SpotRecord):
     print("[on_change]:", stk.market_code, stk.name, spot.close, spot.bid1, spot.ask1)
 
 
-def on_spot(rev_time):
+def on_spot(stg: Strategy, rev_time: Datetime):
     print("[on_received_spot] rev_time:", rev_time)
 
 
-def my_func1():
-    print("[my_func1]", str(Datetime.now()))
+def my_func1(stg: Strategy):
+    print("[my_func1]", str(stg.now()))
 
 
-def my_func2():
-    print("[my_func2] calculate:", Datetime.now())
+def my_func2(stg: Strategy):
+    print("[my_func2] calculate:", stg.now())
     for s in sm:
         print(s)
 

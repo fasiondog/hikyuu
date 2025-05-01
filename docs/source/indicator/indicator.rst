@@ -931,13 +931,13 @@
     :rtype: Indicator
 
 
-.. py:function:: PRICELIST(data[, result_index=0, discard=0])
+.. py:function:: PRICELIST([data=None, discard=0, align_dates=None])
     
     将 list、tuple、Indicator 转化为普通的 Indicator
     
-    :param data: 输入数据，可以为 list、tuple、Indicator
-    :param int result_index: 当data为Indicator实例时，指示Indicator的第几个结果集
-    :param int discard: 在 data 为 Indicator类型时无效。表示前端抛弃的数据点数，抛弃的值使用 constant.null_price 填充
+    :param sequence data: 输入数据
+    :param int discard: 丢弃前多少个数据
+    :param sequence align_dates: 对齐日期列表，如果为空则不进行对齐
     :rtype: Indicator
  
  

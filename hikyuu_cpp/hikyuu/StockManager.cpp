@@ -92,7 +92,14 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
         m_kdataDriverParam = driver->getPrototype()->getParameter();
     }
 
+    // 设置插件路径
+    m_plugin_manager.pluginPath(
+      m_hikyuuParam.tryGet<string>("plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
+
+    // 加载数据
     loadData();
+
+    // 初始化内部定时任务（重加载）
     initInnerTask();
 
     m_initializing = false;

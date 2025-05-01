@@ -52,6 +52,7 @@ import traceback
 import sys
 import pickle
 import os
+from pathlib import Path
 
 try:
     from .util import *
@@ -101,6 +102,14 @@ SOFTWARE.
 __version__ = get_version()
 
 sm = StockManager.instance()
+
+plugin_path = Path.home() / '.hikyuu' / 'plugin'
+if plugin_path.exists():
+    plugin_path = str(plugin_path)
+else:
+    plugin_path = os.path.join(os.path.dirname(__file__), 'plugin')
+sm.set_plugin_path(plugin_path)
+print(f"current plugin path: {plugin_path}")
 
 
 class iodog:
@@ -252,6 +261,12 @@ def load_hikyuu(**kwargs):
     hku_param["datadir"] = ini.get('hikyuu', 'datadir')
     if ini.has_option('hikyuu', 'quotation_server'):
         hku_param["quotation_server"] = ini['hikyuu']['quotation_server']
+    hku_param["load_history_finance"] = ini.getboolean("hikyuu", "load_history_finance", fallback=True)
+    hku_param["load_stock_weight"] = ini.getboolean("hikyuu", "load_stock_weight", fallback=True)
+    if ini.has_option('hikyuu', 'plugindir'):
+        hku_param["plugindir"] = ini.get('hikyuu', 'plugindir')
+    else:
+        hku_param["plugindir"] = os.path.join(os.path.dirname(__file__), "plugin")
 
     base_param = Parameter()
     base_info_config = ini.options('baseinfo')

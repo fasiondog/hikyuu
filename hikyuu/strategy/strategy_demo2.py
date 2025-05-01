@@ -24,7 +24,7 @@ sys.set_param("sell_delay", False)
 
 
 # 执行策略主体
-def my_func():
+def my_func(stg: Strategy):
     # 这里示例使用的是 TC_Zero() 零成本算法，但实际建议使用接近实际的成本算法
     # 因为 sys 不依赖于成交单中的实际成本，而是使用成本算法预算需要买入的数量
     run_in_strategy(sys, sm['sz000001'], Query(Datetime(20240101)), broker, TC_Zero())

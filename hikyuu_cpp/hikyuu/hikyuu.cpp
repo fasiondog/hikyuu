@@ -53,6 +53,10 @@ void HKU_API getConfigFromIni(const string& config_file_name, Parameter& basePar
     hkuParam.set<bool>("load_history_finance",
                        config.getBool("hikyuu", "load_history_finance", "True"));
 
+    // 插件目录
+    hkuParam.set<string>("plugindir",
+                         config.get("hikyuu", "plugindir", fmt::format("{}/plugin", getUserDir())));
+
     IniParser::StringListPtr option = config.getOptionList("baseinfo");
     for (auto iter = option->begin(); iter != option->end(); ++iter) {
         string value = config.get("baseinfo", *iter);

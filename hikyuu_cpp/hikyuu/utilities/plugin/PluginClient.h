@@ -17,7 +17,7 @@ public:
     PluginClient() = delete;
     PluginClient(const std::string &path, const std::string &filename) {
         m_loader = std::make_unique<PluginLoader>(path);
-        m_loader->load(filename);
+        HKU_CHECK(m_loader->load(filename), "load plugin failed! {}/{}", path, filename);
         m_impl = m_loader->instance<InterfaceT>();
     }
     virtual ~PluginClient() = default;
@@ -46,7 +46,7 @@ public:
     }
 
 protected:
-    InterfaceT *m_impl;
+    InterfaceT *m_impl{nullptr};
 
 protected:
     std::unique_ptr<PluginLoader> m_loader;

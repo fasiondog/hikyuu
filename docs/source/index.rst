@@ -32,10 +32,19 @@ Welcome to Hikyuu's documentation!
 
 .. toctree::
    :maxdepth: 1
+   :caption: VIP功能
+   :name: VIP features
+
+   vip/index.rst
+
+
+.. toctree::
+   :maxdepth: 1
    :caption: C++开发指南
    :name: C++ Develop Guide
 
    developer.rst
+
 
 .. toctree::
    :maxdepth: 1

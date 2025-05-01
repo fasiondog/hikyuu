@@ -420,6 +420,9 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     HKU_IF_RETURN(stk_count == 0, all_stk_inds);
     all_stk_inds.resize(stk_count);
 
+    size_t days_total = m_ref_dates.size();
+    auto null_ind = PRICELIST(PriceList(days_total, Null<price_t>()), m_ref_dates);
+
     bool fill_null = getParam<bool>("fill_null");
     size_t ind_count = m_inds.size();
     for (size_t i = 0; i < stk_count; i++) {
@@ -428,14 +431,18 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
         auto& cur_stk_inds = all_stk_inds[i];
         cur_stk_inds.resize(ind_count);
         for (size_t j = 0; j < ind_count; j++) {
-            cur_stk_inds[j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
+            if (kdata.size() == 0) {
+                cur_stk_inds[j] = null_ind;
+            } else {
+                cur_stk_inds[j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
+            }
             cur_stk_inds[j].name(m_inds[j].name());
         }
     }
 
     // 每日截面归一化
     if (getParam<bool>("enable_min_max_normalize")) {
-        for (size_t di = 0, days_total = m_ref_dates.size(); di < days_total; di++) {
+        for (size_t di = 0; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
                 Indicator::value_t min_value = std::numeric_limits<Indicator::value_t>::max();
                 Indicator::value_t max_value = std::numeric_limits<Indicator::value_t>::min();
@@ -470,7 +477,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     // 每日截面标准化
     if (getParam<bool>("enable_zscore")) {
         Indicator one_day = PRICELIST(PriceList(stk_count, Null<price_t>()));
-        for (size_t di = 0, days_total = m_ref_dates.size(); di < days_total; di++) {
+        for (size_t di = 0; di < days_total; di++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
                 auto* one_day_data = one_day.data();
                 for (size_t si = 0; si < stk_count; si++) {

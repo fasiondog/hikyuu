@@ -123,6 +123,7 @@ setup(
         'console_scripts': [
             'HikyuuTDX=hikyuu.gui.HikyuuTDX:start',
             'importdata=hikyuu.gui.importdata:main',
+            'dataserver=hikyuu.gui.dataserver:main',
         ]
     },
     install_requires=requirements,

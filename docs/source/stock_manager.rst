@@ -365,15 +365,6 @@ StockManager/Block/Stock
         :param Query query: 查询条件
         :rtype: DatetimeList
 
-        get_datetime_list(self, start, end, ktype)
-    
-        获取日期列表
-        
-        :param int start: 起始位置
-        :param ind end: 结束位置
-        :param Query.KType ktype: K线类型
-        :rtype: DatetimeList
-        
     .. py:method:: get_timeline_list(self, query)
     
         获取分时线数据
