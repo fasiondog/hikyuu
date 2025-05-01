@@ -23,21 +23,7 @@ namespace hku {
  */
 Indicator HKU_API PRICELIST(const PriceList& data, int discard = 0);
 Indicator HKU_API PRICELIST(const PriceList& data, const DatetimeList& ds, int discard = 0);
-
-/**
- * 将某指标转化为PRICELIST
- * @param ind 源数据
- * @param result_index 源数据中指定的结果集
- * @ingroup Indicator
- */
-Indicator HKU_API PRICELIST(const Indicator& ind, int result_index = 0);
-
-/**
- * 将某指标转化为PRICELIST
- * @param result_index 源数据中指定的结果集
- * @ingroup Indicator
- */
-Indicator HKU_API PRICELIST(int result_index = 0);
+Indicator HKU_API PRICELIST();
 
 /**
  * 包装数组成Indicator，用于计算其他指标

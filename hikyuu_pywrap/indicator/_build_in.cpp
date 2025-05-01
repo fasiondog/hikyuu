@@ -678,11 +678,10 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def(
       "PRICELIST",
-      [](const py::object& obj, int result_index = 0, int discard = 0,
+      [](const py::object& obj = py::none(), int discard = 0,
          const py::object& pyalign_dates = py::none()) {
-          if (py::isinstance<Indicator>(obj)) {
-              Indicator data = obj.cast<Indicator>();
-              return PRICELIST(data, result_index);
+          if (obj.is_none()) {
+              return PRICELIST();
           } else if (py::isinstance<py::sequence>(obj)) {
               const auto& x = obj.cast<py::sequence>();
               auto values = python_list_to_vector<price_t>(x);
@@ -697,11 +696,19 @@ void export_Indicator_build_in(py::module& m) {
                   }
                   return PRICELIST(values, dates, discard);
               }
+          } else {
+              HKU_THROW("Invalid input data type!");
           }
-          HKU_THROW("Invalid input data type!");
       },
-      py::arg("data"), py::arg("result_index") = 0, py::arg("discard") = 0,
-      py::arg("align_dates") = py::none());
+      py::arg("data") = py::none(), py::arg("discard") = 0, py::arg("align_dates") = py::none(),
+      R"(PRICELIST([data=None, discard=0, align_dates=None])
+      
+    将python数组（如 list, tuple, numpy.array）转换为Indicator对象。
+    
+    :param sequence data: 输入数据
+    :param int discard: 丢弃前多少个数据
+    :param sequence align_dates: 对齐日期列表，如果为空则不进行对齐
+    :rtype: Indicator)");
 
     m.def("SMA", SMA_1, py::arg("n") = 22, py::arg("m") = 2.0);
     m.def("SMA", SMA_2, py::arg("n"), py::arg("m"));

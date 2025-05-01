@@ -179,7 +179,8 @@ TEST_CASE("test_HHVBARS_dyn2") {
 
     auto result = XDJ(kdata);
 
-    auto x = PRICELIST(XGTS(kdata));
+    // auto x = PRICELIST(XGTS(kdata));
+    auto x = XGTS(kdata);
     auto expect = REF(LOW(kdata), x);
     check_indicator(result, expect);
 }
