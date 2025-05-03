@@ -3,7 +3,8 @@
 # cp936
 
 import os.path
-import sys, time
+import sys
+import time
 from configparser import ConfigParser
 
 from hikyuu.data.weight_to_sqlite import qianlong_import_weight
@@ -14,7 +15,8 @@ from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 
 
 class HKUImportDataCMD:
-    def __init__(self):
+    def __init__(self, ignore_kdata=False):
+        self.ignore_kdata = ignore_kdata  # 忽略K线数据导入
         self.initThreads()
 
     def getUserConfigDir(self):
@@ -25,6 +27,12 @@ class HKUImportDataCMD:
         this_dir = self.getUserConfigDir()
         import_config = ConfigParser()
         import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
+        if self.ignore_kdata:
+            import_config.set('ktype', 'day', 'False')
+            import_config.set('ktype', 'min', 'False')
+            import_config.set('ktype', 'min5', 'False')
+            import_config.set('ktype', 'trans', 'False')
+            import_config.set('ktype', 'time', 'False')
         return import_config
 
     def initThreads(self):
@@ -46,7 +54,8 @@ class HKUImportDataCMD:
     def print_progress(self, ktype, progress):
         if progress != self.progress[ktype]:
             print(
-                'import progress: {}%  - {} - 已耗时 {:>.2f} 分钟'.format(progress, self.info_type[ktype], self.time_escaped())
+                'import progress: {}%  - {} - 已耗时 {:>.2f} 分钟'.format(progress,
+                                                                     self.info_type[ktype], self.time_escaped())
             )
             self.progress[ktype] = progress
 
@@ -65,11 +74,12 @@ class HKUImportDataCMD:
                 if status == 'FAILURE':
                     self.details.append(msg[3])
                 print("\n导入完毕, 共耗时 {:>.2f} 分钟".format(self.time_escaped()))
-                print('\n=========================================================')
-                print("导入详情:")
-                for info in self.details:
-                    print(info)
-                print('=========================================================')
+                if not self.ignore_kdata:
+                    print('\n=========================================================')
+                    print("导入详情:")
+                    for info in self.details:
+                        print(info)
+                    print('=========================================================')
                 self.import_running = False
 
             elif msg_task_name == 'IMPORT_KDATA':
@@ -144,10 +154,13 @@ class HKUImportDataCMD:
         self.hdf5_import_thread.run()
 
 
-def main():
-    x = HKUImportDataCMD()
+def main(ignore_kdata=False):
+    x = HKUImportDataCMD(ignore_kdata=ignore_kdata)
     x.start_import_data()
 
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == '--ignore-kdata':
+        main(ignore_kdata=True)
+    else:
+        main(ignore_kdata=False)
