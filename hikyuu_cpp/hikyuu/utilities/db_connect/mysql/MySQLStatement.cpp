@@ -72,7 +72,8 @@ void MySQLStatement::_prepare(DBConnectBase* driver) {
     m_stmt = nullptr;
 
     // 如果是服务器异常，尝试重连服务器
-    if (CR_SERVER_LOST == ret || CR_SERVER_GONE_ERROR == ret) {
+    // 1 是 Lost connection to MySQL server during query，但 MYSQL 没有错误码定义
+    if (1 == ret || CR_SERVER_LOST == ret || CR_SERVER_GONE_ERROR == ret) {
         MySQLConnect* connect = dynamic_cast<MySQLConnect*>(driver);
         if (connect && connect->ping()) {
             m_db = connect->getRawMYSQL();
