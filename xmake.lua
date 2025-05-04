@@ -113,7 +113,7 @@ set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", get_config("http_client_ssl") and 1 
 set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", get_config("http_client_zip") and 1 or 0)
 set_configvar("HKU_ENABLE_NODE", 1)
 
-local boost_version = "1.87.0"
+local boost_version = "1.88.0"
 local hdf5_version = "1.12.2"
 local fmt_version = "11.1.4"
 local spdlog_version = "1.15.2"
