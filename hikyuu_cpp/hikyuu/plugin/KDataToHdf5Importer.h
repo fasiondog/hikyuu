@@ -27,7 +27,7 @@ public:
     void updateIndex(const string& market, const string& code, const KQuery::KType& ktype);
 
 private:
-    ImportKDataToHdf5PluginInterface* m_plugin;
+    ImportKDataToHdf5PluginInterface* m_plugin{nullptr};
 };
 
 }  // namespace hku

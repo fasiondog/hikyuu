@@ -12,11 +12,11 @@ namespace py = pybind11;
 using namespace hku;
 
 void export_plugin_KDataToHdf5Importer(py::module& m) {
-    // py::class_<ImportKDataToHdf5>(m, "Block", "板块类，可视为证券的容器")
-    //   .def(py::init<>())
-    //   .def(py::init<const string&, const string&>())
-    //   .def(py::init<const Block&>())
-
-    //   .def("__str__", to_py_str<Block>)
-    //   .def("__repr__", to_py_str<Block>);
+    py::class_<KDataToHdf5Importer>(m, "KDataToHdf5Importer", "K线数据导入器")
+      .def(py::init<>())
+      .def("set_config", &KDataToHdf5Importer::setConfig, "设置数据保存路径和数据源列表")
+      .def("get_last_datetime", &KDataToHdf5Importer::getLastDatetime,
+           "获取指定市场指定证券最后K线时间")
+      .def("add_krecord_list", &KDataToHdf5Importer::addKRecordList, "添加K线数据")
+      .def("update_index", &KDataToHdf5Importer::updateIndex, "更新索引");
 }
