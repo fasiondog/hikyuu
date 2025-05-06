@@ -792,6 +792,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         elif self.use_download == 'pytdx':
             self.hdf5_import_thread = UsePytdxImportToH5Thread(self, config)
         elif self.use_download == 'qmt':
+            if sys.platform != 'win32':
+                QMessageBox.about(self, "错误", "qmt导入功能仅支持Windows系统！")
+                return
+            try:
+                import xtquant
+            except ImportError:
+                QMessageBox.about(self, "错误", "请安装xtquant后再次尝试！")
+                return
             self.hdf5_import_thread = UseQmtImportToH5Thread(self, config)
 
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)

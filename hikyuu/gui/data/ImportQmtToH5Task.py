@@ -50,27 +50,6 @@ class ImportQmtToH5Task:
         self.market = market.upper()
         self.ktype = ktype.upper()
         self.quotations = quotations
-        if self.market == 'SH':
-            if self.ktype == 'DAY':
-                self.src_dir = src_dir + "/vipdoc/sh/lday"
-            elif self.ktype == '1MIN':
-                self.src_dir = src_dir + "/vipdoc/sh/minline"
-            elif self.ktype == '5MIN':
-                self.src_dir = src_dir + "/vipdoc/sh/fzline"
-        elif self.market == 'SZ':
-            if self.ktype == 'DAY':
-                self.src_dir = src_dir + "/vipdoc/sz/lday"
-            elif self.ktype == '1MIN':
-                self.src_dir = src_dir + "/vipdoc/sz/minline"
-            elif self.ktype == '5MIN':
-                self.src_dir = src_dir + "/vipdoc/sz/fzline"
-        elif self.market == 'BJ':
-            if self.ktype == 'DAY':
-                self.src_dir = src_dir + "/vipdoc/bj/lday"
-            elif self.ktype == '1MIN':
-                self.src_dir = src_dir + "/vipdoc/bj/minline"
-            elif self.ktype == '5MIN':
-                self.src_dir = src_dir + "/vipdoc/bj/fzline"
         self.dest_dir = dest_dir
         self.status = "no run"
 
