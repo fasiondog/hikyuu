@@ -165,7 +165,7 @@ class ImportQmtToH5Task:
                     continue
                 count = delta.days * count_per_day
                 # get_market_data(field_list=[], stock_list=[], period='1d', start_time='', end_time='', count=-1, dividend_type='none', fill_data=True)
-                xtdata.get_market_data(field_list=['time', 'open', 'high', 'low', 'close', 'amount', 'volume'], stock_list=[f'{code}.{market}'], period='1d', start_time='',
+                xtdata.get_market_data(field_list=[s'open', 'high', 'low', 'close', 'amount', 'volume'], stock_list=[f'{code}.{market}'], period='1d', start_time='',
                                        end_time='', count=count, dividend_type='none', fill_data=False)
 
 
