@@ -86,27 +86,16 @@ class UseQmtImportToH5Thread(QThread):
         dest_dir = config['hdf5']['dir']
 
         self.tasks = []
-        if self.config.getboolean('finance', 'enable', fallback=True):
-            self.tasks.append(
-                ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
+        # if self.config.getboolean('finance', 'enable', fallback=True):
+        #     self.tasks.append(
+        #         ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
 
-        self.tasks.append(ImportBlockInfoTask(self.log_queue, self.queue,
-                          self.config, ('行业板块', '概念板块', '地域板块', '指数板块')))
-        self.tasks.append(ImportZhBond10Task(self.log_queue, self.queue, self.config))
+        # self.tasks.append(ImportBlockInfoTask(self.log_queue, self.queue,
+        #                   self.config, ('行业板块', '概念板块', '地域板块', '指数板块')))
+        # self.tasks.append(ImportZhBond10Task(self.log_queue, self.queue, self.config))
 
         task_count = 0
         market_count = len(g_market_list)
-        if self.config.getboolean('ktype', 'day', fallback=False):
-            task_count += market_count
-        if self.config.getboolean('ktype', 'min5', fallback=False):
-            task_count += market_count
-        if self.config.getboolean('ktype', 'min', fallback=False):
-            task_count += market_count
-        # 本地暂不支持分时和分笔导入
-        # if self.config.getboolean('ktype', 'trans', fallback=False):
-        #     task_count += market_count
-        # if self.config.getboolean('ktype', 'time', fallback=False):
-        #     task_count += market_count
         if self.config.getboolean('weight', 'enable', fallback=False):
             task_count += (market_count*2)
 
@@ -154,39 +143,26 @@ class UseQmtImportToH5Thread(QThread):
                 if cur_host >= len(self.hosts):
                     cur_host = 0
 
-        if self.config.getboolean('finance', 'enable', fallback=True):
-            self.tasks.append(ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
+        ktype_list = []
         if self.config.getboolean('ktype', 'day', fallback=False):
-            self.tasks.append(
-                ImportQmtToH5Task(self.log_queue, self.queue, config, 'BJ', 'DAY', self.quotations, src_dir, dest_dir)
-            )
-            self.tasks.append(
-                ImportQmtToH5Task(self.log_queue, self.queue, config, 'SH', 'DAY', self.quotations, src_dir, dest_dir)
-            )
-            self.tasks.append(
-                ImportQmtToH5Task(self.log_queue, self.queue, config, 'SZ', 'DAY', self.quotations, src_dir, dest_dir)
-            )
-
-        if self.config.getboolean('ktype', 'min5', fallback=False):
-            self.tasks.append(
-                ImportQmtToH5Task(self.log_queue, self.queue, config, 'BJ', '5MIN', self.quotations, src_dir, dest_dir)
-            )
-            self.tasks.append(
-                ImportQmtToH5Task(self.log_queue, self.queue, config, 'SH', '5MIN', self.quotations, src_dir, dest_dir)
-            )
-            self.tasks.append(
-                ImportQmtToH5Task(self.log_queue, self.queue, config, 'SZ', '5MIN', self.quotations, src_dir, dest_dir)
-            )
+            ktype_list.append('DAY')
         if self.config.getboolean('ktype', 'min', fallback=False):
-            self.tasks.append(
-                ImportQmtToH5Task(self.log_queue, self.queue, config, 'BJ', '1MIN', self.quotations, src_dir, dest_dir)
-            )
-            self.tasks.append(
-                ImportQmtToH5Task(self.log_queue, self.queue, config, 'SH', '1MIN', self.quotations, src_dir, dest_dir)
-            )
-            self.tasks.append(
-                ImportQmtToH5Task(self.log_queue, self.queue, config, 'SZ', '1MIN', self.quotations, src_dir, dest_dir)
-            )
+            ktype_list.append('1MIN')
+        if self.config.getboolean('ktype', 'min5', fallback=False):
+            ktype_list.append('5MIN')
+        if len(ktype_list) > 0:
+            self.tasks.append(ImportQmtToH5Task(self.log_queue, self.queue, self.config,
+                                                ktype_list, self.quotations, dest_dir))
+
+        # if self.config.getboolean('ktype', 'day', fallback=False):
+        #     self.tasks.append(ImportQmtToH5Task(self.log_queue, self.queue, self.config,
+        #                                         'DAY', self.quotations, dest_dir))
+        # if self.config.getboolean('ktype', 'min', fallback=False):
+        #     self.tasks.append(ImportQmtToH5Task(self.log_queue, self.queue, self.config,
+        #                                         '1MIN', self.quotations, dest_dir))
+        # if self.config.getboolean('ktype', 'min5', fallback=False):
+        #     self.tasks.append(ImportQmtToH5Task(self.log_queue, self.queue, self.config,
+        #                                         '5MIN', self.quotations, dest_dir))
 
     def run(self):
         try:

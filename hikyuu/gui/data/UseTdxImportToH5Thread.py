@@ -154,8 +154,6 @@ class UseTdxImportToH5Thread(QThread):
                 if cur_host >= len(self.hosts):
                     cur_host = 0
 
-        if self.config.getboolean('finance', 'enable', fallback=True):
-            self.tasks.append(ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
         if self.config.getboolean('ktype', 'day', fallback=False):
             self.tasks.append(
                 ImportTdxToH5Task(self.log_queue, self.queue, config, 'BJ', 'DAY', self.quotations, src_dir, dest_dir)

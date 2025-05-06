@@ -701,7 +701,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 if ktype != 'FINISHED':
                     self.hdf5_import_progress_bar[ktype].setValue(progress)
                 else:
-                    self.import_detail_textEdit.append('导入 {} {} 记录数：{}'.format(msg[3], msg[4], msg[5]))
+                    if self.use_download == 'qmt':
+                        self.import_detail_textEdit.append('导入 {} 记录数：{}'.format(msg[4], msg[5]))
+                    else:
+                        self.import_detail_textEdit.append('导入 {} {} 记录数：{}'.format(msg[3], msg[4], msg[5]))
 
             elif msg_task_name == 'IMPORT_TRANS':
                 ktype, progress = msg[2:4]
