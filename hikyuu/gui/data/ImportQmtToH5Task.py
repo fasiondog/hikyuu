@@ -86,7 +86,7 @@ class ImportQmtToH5Task:
     @hku_catch(trace=True)
     def __call__(self):
         self.status = "no run"
-        # capture_multiprocess_all_logger(self.log_queue)
+        capture_multiprocess_all_logger(self.log_queue)
         use_hdf = False
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
@@ -120,7 +120,7 @@ class ImportQmtToH5Task:
                     code_list.extend(tmp_list)
                     tmp_list = [f'{stock[2]}' for stock in stock_list]
                     only_code_list.extend(tmp_list)
-                    xtdata.download_history_data2(code_list, period=ktype_to_qmt_period(ktype), start_time='', end_time='',
+                    xtdata.download_history_data2(code_list[:1], period=ktype_to_qmt_period(ktype), start_time='', end_time='',
                                                   callback=process, incrementally=True)
                 except Exception as e:
                     self.logger.error(e)
@@ -134,7 +134,7 @@ class ImportQmtToH5Task:
 
                 total += process.total
 
-                self.import_qmt_to_h5(market, only_code_list, ktype, self.dest_dir)
+                self.import_qmt_to_h5(market, only_code_list[:1], ktype, self.dest_dir)
 
         if self.queue:
             self.queue.put([self.task_name, 'ALL', 'ALL', None, total])
@@ -175,7 +175,7 @@ class ImportQmtToH5Task:
                                            stock_list=[f"{code}.{market}",], period=ktype_to_qmt_period(ktype),
                                            dividend_type='none', fill_data=False)
 
-            if df is not None and len(df) > 0:
+            if df:
                 df = df[f"{code}.{market}"]
                 ks = KRecordList()
                 for index, row in df.iterrows():
@@ -183,7 +183,8 @@ class ImportQmtToH5Task:
                     k.datetime = Datetime(index) if ktype == 'DAY' else Datetime(index/100)
                     k.open, k.high, k.low, k.close, k.volume, k.amount = row
                     ks.append(k)
-                im.add_krecord_list(market, code, ks, nktype)
+                if len(ks) > 0:
+                    im.add_krecord_list(market, code, ks, nktype)
                 if nktype in (Query.DAY, Query.MIN5):
                     im.update_index(market, code, nktype)
 
