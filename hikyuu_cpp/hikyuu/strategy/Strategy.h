@@ -122,9 +122,7 @@ public:
 
     KData getKData(const Stock& stk, const Datetime& start_date, const Datetime& end_date,
                    const KQuery::KType& ktype,
-                   KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const {
-        return stk.getKData(KQueryByDate(start_date, end_date, ktype, recover_type));
-    }
+                   KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const;
 
     KData getLastKData(const Stock& stk, const Datetime& start_date, const KQuery::KType& ktype,
                        KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const {
