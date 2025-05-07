@@ -33,7 +33,7 @@ from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
 from hikyuu.data.common import g_market_list
 from hikyuu.data.common_sqlite3 import get_stock_list as sqlite_get_stock_list
 from hikyuu.data.common_mysql import get_stock_list as mysql_get_stock_list
-from hikyuu import KDataToHdf5Importer, Query, KRecord, Datetime
+from hikyuu import KDataToHdf5Importer, Query, KRecord, Datetime, KRecordList
 
 
 def ktype_to_qmt_period(ktype):
@@ -120,8 +120,8 @@ class ImportQmtToH5Task:
                     code_list.extend(tmp_list)
                     tmp_list = [f'{stock[2]}' for stock in stock_list]
                     only_code_list.extend(tmp_list)
-                    xtdata.download_history_data2(code_list[:2], period=ktype_to_qmt_period(ktype), start_time='', end_time='',
-                                                  callback=process, incrementally=None)
+                    xtdata.download_history_data2(code_list, period=ktype_to_qmt_period(ktype), start_time='', end_time='',
+                                                  callback=process, incrementally=True)
                 except Exception as e:
                     self.logger.error(e)
 
@@ -134,10 +134,10 @@ class ImportQmtToH5Task:
 
                 total += process.total
 
-                self.import_qmt_to_h5(market, only_code_list[:2], ktype, self.dest_dir)
+                self.import_qmt_to_h5(market, only_code_list, ktype, self.dest_dir)
 
         if self.queue:
-            self.queue.put([self.task_name, 'ALL', self.ktype, None, total])
+            self.queue.put([self.task_name, 'ALL', 'ALL', None, total])
 
         self.status = "finished"
 
@@ -158,6 +158,7 @@ class ImportQmtToH5Task:
             return
         total = len(code_list)
         cnt = 0
+        from xtquant import xtdata
         for code in code_list:
             last_date = im.get_last_datetime(market, code, nktype)
             if not last_date.is_null():
@@ -187,7 +188,7 @@ class ImportQmtToH5Task:
                     im.update_index(market, code, nktype)
 
             cnt += 1
-            print(f"已导入 {cnt}, 总数: {total}, {market}{code}")
+            print(f"导入hikyuu 已完成: {cnt}, 总数: {total}, {market}{code}")
 
 
 if __name__ == '__main__':
