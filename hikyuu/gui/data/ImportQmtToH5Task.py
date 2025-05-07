@@ -33,7 +33,7 @@ from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
 from hikyuu.data.common import g_market_list
 from hikyuu.data.common_sqlite3 import get_stock_list as sqlite_get_stock_list
 from hikyuu.data.common_mysql import get_stock_list as mysql_get_stock_list
-from hikyuu import KDataToHdf5Importer, Query, Datetime
+from hikyuu import KDataToHdf5Importer, Query, KRecord, Datetime
 
 
 def ktype_to_qmt_period(ktype):
@@ -86,7 +86,7 @@ class ImportQmtToH5Task:
     @hku_catch(trace=True)
     def __call__(self):
         self.status = "no run"
-        capture_multiprocess_all_logger(self.log_queue)
+        # capture_multiprocess_all_logger(self.log_queue)
         use_hdf = False
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
@@ -109,14 +109,18 @@ class ImportQmtToH5Task:
         total = 0
         for ktype in self.ktype_list:
             for market in g_market_list:
+                import time
                 start_time = time.time()
                 process = ProgressBar(self, market, ktype)
                 try:
                     code_list = []
+                    only_code_list = []
                     stock_list = get_stock_list(connect, market, self.quotations)
                     tmp_list = [f'{stock[2]}.{market}' for stock in stock_list]
                     code_list.extend(tmp_list)
-                    xtdata.download_history_data2(code_list, period=ktype_to_qmt_period(ktype), start_time='', end_time='',
+                    tmp_list = [f'{stock[2]}' for stock in stock_list]
+                    only_code_list.extend(tmp_list)
+                    xtdata.download_history_data2(code_list[:2], period=ktype_to_qmt_period(ktype), start_time='', end_time='',
                                                   callback=process, incrementally=None)
                 except Exception as e:
                     self.logger.error(e)
@@ -130,46 +134,64 @@ class ImportQmtToH5Task:
 
                 total += process.total
 
+                self.import_qmt_to_h5(market, only_code_list[:2], ktype, self.dest_dir)
+
         if self.queue:
             self.queue.put([self.task_name, 'ALL', self.ktype, None, total])
 
         self.status = "finished"
 
-        @hku_catch(trace=True)
-        def import_qmt_to_h5(market, ktype, code_list, dest_dir):
-            today = Datetime.today()
-            im = KDataToHdf5Importer()
-            if not im.set_config(dest_dir, market):
-                self.logger.error('KDataToHdf5Importer set config error! Maybe no license!')
-                return
-
-            count_per_day = 0
-            if ktype == '1MIN':
-                nktype = Query.MIN
-                count_per_day = 240
-            elif ktype == '5MIN':
-                nktype = Query.MIN5
-                count_per_day = 48
-            elif ktype == 'DAY':
-                nktype = Query.DAY
-                count_per_day = 1
-            else:
-                self.logger.error(f'Error ktype! {ktype}')
-                return
-
-            from xtquant import xtdata
-            for code in code_list:
-                last_date = im.get_last_datetime(market, code, nktype)
-                delta = today - last_date.start_of_day()
-                if delta.days <= 0:
+    @hku_catch(trace=True)
+    def import_qmt_to_h5(self, market, code_list, ktype, dest_dir):
+        im = KDataToHdf5Importer()
+        if not im.set_config(dest_dir, [market]):
+            self.logger.error('KDataToHdf5Importer set config error! Maybe no license!')
+            return
+        if ktype == '1MIN':
+            nktype = Query.MIN
+        elif ktype == '5MIN':
+            nktype = Query.MIN5
+        elif ktype == 'DAY':
+            nktype = Query.DAY
+        else:
+            self.logger.error(f'Error ktype! {ktype}')
+            return
+        total = len(code_list)
+        cnt = 0
+        for code in code_list:
+            last_date = im.get_last_datetime(market, code, nktype)
+            if not last_date.is_null():
+                if last_date >= Datetime.today():
+                    cnt += 1
+                    print(f"已导入 {cnt}, 总数: {total}, {market}{code}")
                     continue
-                count = delta.days * count_per_day
-                # get_market_data(field_list=[], stock_list=[], period='1d', start_time='', end_time='', count=-1, dividend_type='none', fill_data=True)
-                xtdata.get_market_data(field_list=[s'open', 'high', 'low', 'close', 'amount', 'volume'], stock_list=[f'{code}.{market}'], period='1d', start_time='',
-                                       end_time='', count=count, dividend_type='none', fill_data=False)
+                df = xtdata.get_local_data(field_list=['open', 'high', 'low', 'close', 'amount', 'volume'],
+                                           stock_list=[f"{code}.{market}",], period=ktype_to_qmt_period(ktype),
+                                           start_time=str(last_date.number*100+1),
+                                           end_time='', count=-1, dividend_type='none', fill_data=False)
+            else:
+                df = xtdata.get_local_data(field_list=['open', 'high', 'low', 'close', 'amount', 'volume'],
+                                           stock_list=[f"{code}.{market}",], period=ktype_to_qmt_period(ktype),
+                                           dividend_type='none', fill_data=False)
+
+            if df is not None and len(df) > 0:
+                df = df[f"{code}.{market}"]
+                ks = KRecordList()
+                for index, row in df.iterrows():
+                    k = KRecord()
+                    k.datetime = Datetime(index) if ktype == 'DAY' else Datetime(index/100)
+                    k.open, k.high, k.low, k.close, k.volume, k.amount = row
+                    ks.append(k)
+                im.add_krecord_list(market, code, ks, nktype)
+                if nktype in (Query.DAY, Query.MIN5):
+                    im.update_index(market, code, nktype)
+
+            cnt += 1
+            print(f"已导入 {cnt}, 总数: {total}, {market}{code}")
 
 
 if __name__ == '__main__':
+    from hikyuu import *
     from configparser import ConfigParser
     import os
 
@@ -181,5 +203,5 @@ if __name__ == '__main__':
     # get_default_logger()
 
     # self, log_queue, queue, config, ktype, quotations, dest_dir
-    task = ImportQmtToH5Task(None, None, import_config, 'day', ['stock', 'fund'], 'd:\\tmp\\stock')
+    task = ImportQmtToH5Task(None, None, import_config, ['DAY'], ['stock', 'fund'], 'd:\\tmp\\stock')
     task()
