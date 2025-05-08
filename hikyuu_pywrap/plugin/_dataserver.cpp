@@ -5,7 +5,6 @@
  *      Author: fasiondog
  */
 
-#include <csignal>
 #include <hikyuu/plugin/dataserver.h>
 #include "../pybind_utils.h"
 

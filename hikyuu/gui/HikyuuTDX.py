@@ -27,6 +27,7 @@ from hikyuu.gui.data.EscapetimeThread import EscapetimeThread
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from hikyuu.gui.data.ImportTdxToH5Task import ImportTdxToH5Task
 from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
+from hikyuu.gui.data.UseQmtImportToH5Thread import UseQmtImportToH5Thread
 # from hikyuu.gui.data.CollectToMySQLThread import CollectToMySQLThread
 # from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
 from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
@@ -316,10 +317,22 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.tdx_dir_lineEdit.setEnabled(tdx_enable)
         self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
         self.tdx_dir_lineEdit.setText(tdx_dir)
+        if tdx_enable:
+            self.use_download = 'tdx'
 
         # 初始化pytdx配置及显示
-        self.pytdx_radioButton.setChecked(import_config.getboolean('pytdx', 'enable', fallback=True))
+        use_pytdx_download = import_config.getboolean('pytdx', 'enable', fallback=True)
+        self.pytdx_radioButton.setChecked(use_pytdx_download)
+        if use_pytdx_download:
+            self.use_download = 'pytdx'
         self.use_tdx_number_spinBox.setValue(import_config.getint('pytdx', 'use_tdx_number', fallback=10))
+
+        # 屏蔽，qmt下载缓慢到发指，且容易中断
+        # use_qmt_download = import_config.getboolean('qmt', 'enable', fallback=False)
+        # self.qmt_radioButton.setChecked(use_qmt_download)
+        # if use_qmt_download:
+        #     self.use_download = 'qmt'
+        self.qmt_radioButton.setEnabled(False)
 
         self.on_tdx_or_pytdx_toggled()
 
@@ -434,6 +447,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'enable': self.pytdx_radioButton.isChecked(),
             'use_tdx_number': self.use_tdx_number_spinBox.value()
         }
+        import_config['qmt'] = {'enable': self.qmt_radioButton.isChecked()}
         import_config['hdf5'] = {
             'enable': self.enable_hdf55_radioButton.isChecked(),
             'dir': self.hdf5_dir_lineEdit.text()
@@ -514,23 +528,50 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_pytdx_radioButton_clicked(self):
         if self.pytdx_radioButton.isChecked():
             self.tdx_radioButton.setChecked(False)
+            self.qmt_radioButton.setChecked(False)
+            self.use_download = 'pytdx'
         self.on_tdx_or_pytdx_toggled()
 
     @pyqtSlot()
     def on_tdx_radioButton_clicked(self):
         if self.tdx_radioButton.isChecked():
             self.pytdx_radioButton.setChecked(False)
+            self.qmt_radioButton.setChecked(False)
+            self.use_download = 'tdx'
+        self.on_tdx_or_pytdx_toggled()
+
+    def on_qmt_radioButton_clicked(self):
+        if self.qmt_radioButton.isChecked():
+            self.tdx_radioButton.setChecked(False)
+            self.pytdx_radioButton.setChecked(False)
+            self.use_download = 'qmt'
         self.on_tdx_or_pytdx_toggled()
 
     def on_tdx_or_pytdx_toggled(self):
-        tdx_enable = self.tdx_radioButton.isChecked()
-        self.tdx_dir_lineEdit.setEnabled(tdx_enable)
-        self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
-        self.import_trans_checkBox.setEnabled(not tdx_enable)
-        self.import_time_checkBox.setEnabled(not tdx_enable)
-        self.trans_start_dateEdit.setEnabled(not tdx_enable)
-        self.time_start_dateEdit.setEnabled(not tdx_enable)
-        self.use_tdx_number_spinBox.setEnabled(not tdx_enable)
+        if self.use_download == 'tdx':
+            self.tdx_dir_lineEdit.setEnabled(True)
+            self.select_tdx_dir_pushButton.setEnabled(True)
+            self.import_trans_checkBox.setEnabled(False)
+            self.import_time_checkBox.setEnabled(False)
+            self.trans_start_dateEdit.setEnabled(False)
+            self.time_start_dateEdit.setEnabled(False)
+            self.use_tdx_number_spinBox.setEnabled(False)
+        elif self.use_download == 'pytdx':
+            self.tdx_dir_lineEdit.setEnabled(False)
+            self.select_tdx_dir_pushButton.setEnabled(False)
+            self.import_trans_checkBox.setEnabled(True)
+            self.import_time_checkBox.setEnabled(True)
+            self.trans_start_dateEdit.setEnabled(True)
+            self.time_start_dateEdit.setEnabled(True)
+            self.use_tdx_number_spinBox.setEnabled(True)
+        elif self.use_download == 'qmt':
+            self.tdx_dir_lineEdit.setEnabled(False)
+            self.select_tdx_dir_pushButton.setEnabled(False)
+            self.import_trans_checkBox.setEnabled(False)
+            self.import_time_checkBox.setEnabled(False)
+            self.trans_start_dateEdit.setEnabled(False)
+            self.time_start_dateEdit.setEnabled(False)
+            self.use_tdx_number_spinBox.setEnabled(False)
 
     @pyqtSlot()
     def on_select_tdx_dir_pushButton_clicked(self):
@@ -662,7 +703,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 if ktype != 'FINISHED':
                     self.hdf5_import_progress_bar[ktype].setValue(progress)
                 else:
-                    self.import_detail_textEdit.append('导入 {} {} 记录数：{}'.format(msg[3], msg[4], msg[5]))
+                    if self.use_download == 'qmt':
+                        self.import_detail_textEdit.append('导入 {} 记录数：{}'.format(msg[4], msg[5]))
+                    else:
+                        self.import_detail_textEdit.append('导入 {} {} 记录数：{}'.format(msg[3], msg[4], msg[5]))
 
             elif msg_task_name == 'IMPORT_TRANS':
                 ktype, progress = msg[2:4]
@@ -748,10 +792,20 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.import_status_label.setText("正在启动任务....")
         QApplication.processEvents()
 
-        if self.tdx_radioButton.isChecked():
+        if self.use_download == 'tdx':
             self.hdf5_import_thread = UseTdxImportToH5Thread(self, config)
-        else:
+        elif self.use_download == 'pytdx':
             self.hdf5_import_thread = UsePytdxImportToH5Thread(self, config)
+        elif self.use_download == 'qmt':
+            if sys.platform != 'win32':
+                QMessageBox.about(self, "错误", "qmt导入功能仅支持Windows系统！")
+                return
+            try:
+                import xtquant
+            except ImportError:
+                QMessageBox.about(self, "错误", "请安装xtquant后再次尝试！")
+                return
+            self.hdf5_import_thread = UseQmtImportToH5Thread(self, config)
 
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
         self.hdf5_import_thread.start()
