@@ -327,10 +327,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.use_download = 'pytdx'
         self.use_tdx_number_spinBox.setValue(import_config.getint('pytdx', 'use_tdx_number', fallback=10))
 
-        use_qmt_download = import_config.getboolean('qmt', 'enable', fallback=False)
-        self.qmt_radioButton.setChecked(use_qmt_download)
-        if use_qmt_download:
-            self.use_download = 'qmt'
+        # 屏蔽，qmt下载缓慢到发指，且容易中断
+        # use_qmt_download = import_config.getboolean('qmt', 'enable', fallback=False)
+        # self.qmt_radioButton.setChecked(use_qmt_download)
+        # if use_qmt_download:
+        #     self.use_download = 'qmt'
+        self.qmt_radioButton.setEnabled(False)
 
         self.on_tdx_or_pytdx_toggled()
 
