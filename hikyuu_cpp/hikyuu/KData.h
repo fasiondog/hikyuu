@@ -117,6 +117,7 @@ public:
     const_iterator cbegin() const;
     const_iterator cend() const;
     const KRecord* data() const;
+    KRecord* data();  // 谨慎使用（用于强制调整数据）
 
 private:
     static KRecord ms_null_krecord;
@@ -258,6 +259,10 @@ inline KData::const_iterator KData::cend() const {
 }
 
 inline const KRecord* KData::data() const {
+    return m_imp->data();
+}
+
+inline KRecord* KData::data() {
     return m_imp->data();
 }
 

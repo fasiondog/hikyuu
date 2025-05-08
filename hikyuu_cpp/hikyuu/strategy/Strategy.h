@@ -120,10 +120,6 @@ public:
         m_sp = slippage;
     }
 
-    KData getKData(const Stock& stk, const Datetime& start_date, const Datetime& end_date,
-                   const KQuery::KType& ktype,
-                   KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const;
-
     KData getLastKData(const Stock& stk, const Datetime& start_date, const KQuery::KType& ktype,
                        KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const {
         return getKData(stk, start_date, Null<Datetime>(), ktype, recover_type);
@@ -132,6 +128,9 @@ public:
     KData getLastKData(const Stock& stk, size_t lastnum, const KQuery::KType& ktype,
                        KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const;
 
+    virtual KData getKData(const Stock& stk, const Datetime& start_date, const Datetime& end_date,
+                           const KQuery::KType& ktype,
+                           KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const;
     virtual Datetime today() const {
         return Datetime::today();
     }
