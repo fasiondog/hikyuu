@@ -76,10 +76,8 @@ Indicator HKU_API CVAL(double value, size_t discard) {
 }
 
 Indicator HKU_API CVAL(const Indicator& ind, double value, int discard) {
-    IndicatorImpPtr p = make_shared<ICval>();
-    p->setParam<double>("value", value);
-    p->setParam<int>("discard", discard);
-    return Indicator(p)(ind);
+    auto p = make_shared<ICval>(value, discard);
+    return ind.empty() ? Indicator(p) : Indicator(p)(ind);
 }
 
 } /* namespace hku */
