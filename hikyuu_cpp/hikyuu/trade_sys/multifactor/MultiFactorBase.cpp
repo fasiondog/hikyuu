@@ -425,6 +425,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
     bool fill_null = getParam<bool>("fill_null");
     size_t ind_count = m_inds.size();
+#if 0    
     for (size_t i = 0; i < stk_count; i++) {
         const auto& stk = m_stks[i];
         auto kdata = stk.getKData(m_query);
@@ -439,6 +440,23 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
             cur_stk_inds[j].name(m_inds[j].name());
         }
     }
+#else
+    parallel_for_index_void(
+      0, stk_count, [this, &all_stk_inds, &null_ind, &ind_count, &fill_null](size_t i) {
+          const auto& stk = m_stks[i];
+          auto kdata = stk.getKData(m_query);
+          auto& cur_stk_inds = all_stk_inds[i];
+          cur_stk_inds.resize(ind_count);
+          for (size_t j = 0; j < ind_count; j++) {
+              if (kdata.size() == 0) {
+                  cur_stk_inds[j] = null_ind;
+              } else {
+                  cur_stk_inds[j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
+              }
+              cur_stk_inds[j].name(m_inds[j].name());
+          }
+      });
+#endif
 
     // 每日截面归一化
     if (getParam<bool>("enable_min_max_normalize")) {
