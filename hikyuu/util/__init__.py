@@ -16,6 +16,7 @@ from .notebook import *
 
 __all__ = [
     'spend_time',
+    'hku_benchmark',
     'timeout',
     'hku_logger',
     'class_logger',

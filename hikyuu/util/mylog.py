@@ -15,15 +15,42 @@ import multiprocessing
 def spend_time(func):
     @functools.wraps(func)
     def wrappedFunc(*args, **kargs):
-        starttime = time.time()
+        starttime = time.perf_counter()
         try:
             print("\nCalling: %s" % func.__name__)
             return func(*args, **kargs)
         finally:
-            endtime = time.time()
-            print("spend time: %.4fs, %.2fm" % (endtime - starttime, (endtime - starttime) / 60))
+            endtime = time.perf_counter()
+            print("spend time: %.6fs, %.4fm" % (endtime - starttime, (endtime - starttime) / 60))
 
     return wrappedFunc
+
+# 统计函数运行时间
+
+
+def hku_benchmark(count=10):
+    def hku_benchmark_wrap(func):
+        @functools.wraps(func)
+        def wrappedFunc(*args, **kargs):
+            starttime = time.perf_counter()
+            try:
+                print(f"\nstart benchmark: {func.__name__}")
+                for i in range(count):
+                    ret = func(*args, **kargs)
+                return ret
+            finally:
+                endtime = time.perf_counter()
+                total_sec = endtime - starttime
+                total_min = total_sec / 60.0
+                seconds = total_sec / count
+                minutes = seconds / 60.0
+                print("+--------------------------------------------------------------------------")
+                print(f"|  run count: {count}")
+                print(f"|  total time: {total_sec: <.6f}s, {total_min: <.4f}m")
+                print(f"|  mean time: {seconds: <.6f}s, {minutes: <.4f}m")
+                print("+--------------------------------------------------------------------------")
+        return wrappedFunc
+    return hku_benchmark_wrap
 
 
 FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s [%(name)s::%(funcName)s]'
