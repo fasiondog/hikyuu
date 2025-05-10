@@ -11,7 +11,7 @@
 #ifndef INDICATOR_CRT_DISCARD_H_
 #define INDICATOR_CRT_DISCARD_H_
 
-#include "CVAL.h"
+#include "../Indicator.h"
 
 namespace hku {
 

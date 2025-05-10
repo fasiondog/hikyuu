@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef COUNT_H_
-#define COUNT_H_
+#ifndef INDICATOR_CRT_COUNT_H_
+#define INDICATOR_CRT_COUNT_H_
 
 #include "../Indicator.h"
 
@@ -51,4 +51,4 @@ inline Indicator HKU_API COUNT(const Indicator& ind, const Indicator& n) {
 
 }  // namespace hku
 
-#endif /* CVAL_H_ */
+#endif /* INDICATOR_CRT_COUNT_H_ */

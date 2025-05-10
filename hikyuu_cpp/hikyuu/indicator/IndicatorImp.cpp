@@ -1450,6 +1450,9 @@ void IndicatorImp::execute_if() {
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
+    if (discard < m_three->discard()) {
+        discard = m_three->discard();
+    }
 
     if (m_three->size() >= maxp->size()) {
         total = m_three->size();

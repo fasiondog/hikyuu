@@ -9,7 +9,6 @@
 #include "ta_defines.h"
 #include "ta_imp.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
-#include "hikyuu/indicator/crt/CVAL.h"
 #include "hikyuu/indicator/crt/SLICE.h"
 
 #if HKU_SUPPORT_SERIALIZATION
