@@ -77,7 +77,14 @@ Indicator HKU_API CVAL(double value, size_t discard) {
 
 Indicator HKU_API CVAL(const Indicator& ind, double value, int discard) {
     auto p = make_shared<ICval>(value, discard);
-    return ind.empty() ? Indicator(p) : Indicator(p)(ind);
+    if (ind.getContext() == Null<KData>()) {
+        // 传入的ind没有上下文时，如果忽略的数据长度和输入数据长度一致，则直接作为叶子节点
+        // 因为 ind 底层可能包含了其他CVAL，但CVAL没有上下文时，size为1，类似的还有 PRICELIST
+        return ind.discard() == ind.size() ? Indicator(p) : Indicator(p)(ind);
+    }
+
+    p->setContext(ind.getContext());
+    return Indicator(p);
 }
 
 } /* namespace hku */
