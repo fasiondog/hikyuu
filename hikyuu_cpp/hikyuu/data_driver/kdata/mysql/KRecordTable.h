@@ -9,6 +9,7 @@
 #define HIKYUU_DATA_DRIVER_KDATA_MYSQL_KRECORDTABLE_H
 
 #include "../../../KQuery.h"
+#include "../../../KRecord.h"
 #include "../../../utilities/db_connect/SQLStatementBase.h"
 
 namespace hku {
@@ -31,6 +32,45 @@ public:
         // m_db_name = fmt::format("{}_{}", market, KQuery::getKTypeName(ktype));
         to_lower(m_db_name);
     };
+
+    KRecordTable(const string& market, const string& code, const KQuery::KType& ktype,
+                 const KRecord& record)
+    : KRecordTable(market, code, ktype) {
+        m_date = record.datetime.ymdhm();
+        m_open = record.openPrice;
+        m_high = record.highPrice;
+        m_low = record.lowPrice;
+        m_close = record.closePrice;
+        m_count = record.transCount;
+        m_amount = record.transAmount;
+    }
+
+    KRecordTable(const KRecordTable&) = default;
+    KRecordTable& operator=(const KRecordTable&) = default;
+    KRecordTable(KRecordTable&& rhs)
+    : m_db_name(std::move(rhs.m_db_name)),
+      m_code(std::move(rhs.m_code)),
+      m_date(rhs.m_date),
+      m_open(rhs.m_open),
+      m_high(rhs.m_high),
+      m_low(rhs.m_low),
+      m_close(rhs.m_close),
+      m_amount(rhs.m_amount),
+      m_count(rhs.m_count) {}
+
+    KRecordTable& operator=(KRecordTable&& rhs) {
+        if (&rhs != this) {
+            m_db_name = std::move(rhs.m_db_name);
+            m_code = std::move(rhs.m_code);
+            m_date = rhs.m_date;
+            m_open = rhs.m_open;
+            m_high = rhs.m_high;
+            m_low = rhs.m_low;
+            m_close = rhs.m_close;
+            m_amount = rhs.m_amount;
+        }
+        return *this;
+    }
 
     Datetime date() const {
         return m_date == 0 ? Null<Datetime>() : Datetime((uint64_t)m_date);
@@ -90,8 +130,7 @@ public:
 
     string getSelectSQLNoDB() {
         return fmt::format(
-          "select `date`,`open`,`high`, `low`, `close`, `amount`, `count` from `{}`",
-          m_code);
+          "select `date`,`open`,`high`, `low`, `close`, `amount`, `count` from `{}`", m_code);
     }
 
     void save(const SQLStatementPtr& st) const {

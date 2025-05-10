@@ -39,7 +39,7 @@ inline Indicator LAST(int m = 10, int n = 5) {
 
 inline Indicator LAST(const IndParam& m, int n = 5) {
     Indicator ind_m = m.get();
-    Indicator ind_n = CVAL(ind_m, 5);
+    Indicator ind_n = CVAL(ind_m, n);
     Indicator max = MAX(ind_m, ind_n);
     Indicator min = MIN(ind_m, ind_n);
     Indicator result = REF(EVERY(max - min + 1), min);
@@ -49,7 +49,7 @@ inline Indicator LAST(const IndParam& m, int n = 5) {
 
 inline Indicator LAST(int m, const IndParam& n) {
     Indicator ind_n = n.get();
-    Indicator ind_m = CVAL(ind_n, 5);
+    Indicator ind_m = CVAL(ind_n, m);
     Indicator max = MAX(ind_m, ind_n);
     Indicator min = MIN(ind_m, ind_n);
     Indicator result = REF(EVERY(max - min + 1), min);

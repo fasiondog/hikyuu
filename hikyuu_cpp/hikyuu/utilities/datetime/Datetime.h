@@ -94,6 +94,7 @@ public:
      * <pre>
      *     1、YYYYMMDDhhmm，如 200101010000
      *     2、YYYYMMDD, 如 20010101
+     *     3、YYYYMMDDhhmmss，如 20010101000000
      * </pre>
      */
     explicit Datetime(unsigned long long);

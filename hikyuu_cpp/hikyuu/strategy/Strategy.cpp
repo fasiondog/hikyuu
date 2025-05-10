@@ -340,6 +340,15 @@ void Strategy::_startEventLoop() {
     }
 }
 
+KData Strategy::getKData(const Stock& stk, const Datetime& start_date, const Datetime& end_date,
+                         const KQuery::KType& ktype, KQuery::RecoverType recover_type) const {
+    Datetime new_end_date = end_date;
+    if (end_date.isNull() || end_date > now()) {
+        new_end_date = nextDatetime();
+    }
+    return stk.getKData(KQueryByDate(start_date, new_end_date, ktype, recover_type));
+}
+
 KData Strategy::getLastKData(const Stock& stk, size_t lastnum, const KQuery::KType& ktype,
                              KQuery::RecoverType recover_type) const {
     KData ret;

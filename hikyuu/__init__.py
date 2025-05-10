@@ -1,31 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 # cp936
-#
-# The MIT License (MIT)
-#
-# Copyright (c) 2010-2017 fasiondog
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 
+from pathlib import Path
+import pickle
+import traceback
 __copyright__ = """
-MIT License
+Apache License Version 2.0
 
 Copyright (c) 2010-2017 fasiondog
 
@@ -48,11 +29,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import traceback
 import sys
-import pickle
 import os
-from pathlib import Path
+BASE_DIR = os.path.dirname(__file__)
+if sys.platform == 'win32':
+    # add_dll_directory() 有时不生效
+    os.add_dll_directory(os.path.join(os.path.dirname(__file__), 'cpp'))
+    # 添加动态库所在的目录路径
+    current_path = os.environ.get('PATH', '')
+    dll_directory = os.path.join(BASE_DIR, 'cpp')
+    new_path = f"{dll_directory};{current_path}"
+    os.environ['PATH'] = new_path
+else:
+    current_path = os.environ.get('LD_LIBRARY_PATH', '')
+    dll_directory = os.path.join(BASE_DIR, 'cpp')
+    new_path = f"{dll_directory}:{current_path}" if current_path else dll_directory
+    os.environ['LD_LIBRARY_PATH'] = new_path
+
 
 try:
     from .util import *
@@ -74,30 +67,6 @@ except Exception as e:
 上提交 issue，同时附上 "用户目录/.hikyuu" 下的 hikyuu_py.log 和 hikyuu.log 日志文件 """)
     raise e
 
-
-__copyright__ = """
-MIT License
-
-Copyright (c) 2010-2017 fasiondog
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""
 
 __version__ = get_version()
 

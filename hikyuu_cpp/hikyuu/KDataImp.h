@@ -49,6 +49,10 @@ public:
         return m_buffer.data();
     }
 
+    KRecord* data() {
+        return m_buffer.data();
+    }
+
     DatetimeList getDatetimeList() const;
 
 public:
