@@ -189,11 +189,15 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
         // 从选股策略获取选中的系统列表
         m_tmp_selected_list = m_se->getSelected(date);
 
-        // 如果选中的系统不在已有列表中, 则先清除其延迟买入操作，防止在调仓日出现未来信号
-        for (auto& sys : m_tmp_selected_list) {
-            if (sys.sys) {
-                if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
-                    sys.sys->clearDelayBuyRequest();
+        // 如果 AF 为对已持仓系统进行权重调整，则对为选中的运行系统的延迟请求进行处理
+        // 否则，认为已运行系统自行控制卖出，不受当前是否选中的影响
+        if (m_af->getParam<bool>("adjust_running_sys")) {
+            // 如果选中的系统不在已有列表中, 则先清除其延迟买入操作，防止在调仓日出现未来信号
+            for (auto& sys : m_tmp_selected_list) {
+                if (sys.sys) {
+                    if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
+                        sys.sys->clearDelayBuyRequest();
+                    }
                 }
             }
         }
