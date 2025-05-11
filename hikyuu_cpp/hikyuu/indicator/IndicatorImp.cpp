@@ -1486,6 +1486,7 @@ void IndicatorImp::execute_if() {
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {
     // SPEND_TIME(IndicatorImp__dyn_calculate);
     const auto &ind_param = getIndParamImp("n");
+    // CVAL或PRICELIST可能会大于ind.size()
     HKU_CHECK(ind_param->size() >= ind.size(), "ind_param->size()={}, ind.size()={}!",
               ind_param->size(), ind.size());
     m_discard = std::max(ind.discard(), ind_param->discard());
