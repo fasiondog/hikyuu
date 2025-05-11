@@ -88,8 +88,8 @@ void IAlign::_calculate(const Indicator& ind) {
     // 其它有上下文日期对应的指标数据
     // 1. 如果没有刚好相等的日期，则取小于对应日期且最靠近对应日期的数据
     // 2. 如果有对应的日期，取对应日期的数据
-    size_t ind_idx = ind.discard();
     if (fill_null) {
+        size_t ind_idx = ind.discard();
         for (size_t i = 0; i < total; i++) {
             if (ind_idx >= ind_total) {
                 break;
