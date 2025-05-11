@@ -142,7 +142,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     }
 
     //----------------------------------------------------------------------
-    // 开盘时，优先处理上一交易日遗留的延迟调仓卖出的系统
+    // 开盘时，优先处理上一交易日遗留的调仓卖出失败的系统
     //----------------------------------------------------------------------
     HKU_INFO_IF(trace, "[PF] process delay adjust sys, size: {}", m_delay_adjust_sys_list.size());
     SystemWeightList tmp_continue_adjust_sys_list;
@@ -172,15 +172,29 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     m_delay_adjust_sys_list.swap(tmp_continue_adjust_sys_list);
 
     //---------------------------------------------------
-    // 检测当前运行中的系统是否存在延迟卖出信号，并在开盘时有效处理
+    // 检测当前运行中的系统是否存在延迟买卖信号（即开盘时买卖的系统）
     //---------------------------------------------------
     for (auto& sys : m_running_sys_set) {
         auto tr = sys->pfProcessDelaySellRequest(date);
         if (!tr.isNull()) {
-            HKU_INFO_IF(trace, "[PF] sell delay {}", tr);
+            HKU_INFO_IF(trace, "[PF] sell delay on open {}", tr);
             m_tm->addTradeRecord(tr);
         }
+        tr = sys->pfProcessDelayBuyRequest(date);
+        if (!tr.isNull()) {
+            HKU_INFO_IF(trace, "[PF] buy delay on open {}", tr);
+            m_tm->addTradeRecord(tr);
+        }
+        // if (sys->getParam<bool>("buy_delay")) {
+        //     auto tr = sys->runMoment(date);
+        //     if (!tr.isNull()) {
+        //         HKU_INFO_IF(trace, "[PF] {}", tr);
+        //         m_tm->addTradeRecord(tr);
+        //     }
+        // }
     }
+
+    traceMomentTMAfterRunAtOpen(date);
 
     //---------------------------------------------------
     // 调仓日，进行资金分配调整
@@ -189,7 +203,19 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
         // 从选股策略获取选中的系统列表
         m_tmp_selected_list = m_se->getSelected(date);
 
-        // 如果 AF 为对已持仓系统进行权重调整，则对为选中的运行系统的延迟请求进行处理
+        // SystemWeightList tmp;
+        // tmp.reserve(m_tmp_selected_list.size());
+        // for (const auto& sw : m_tmp_selected_list) {
+        //     if (!sw.sys->getParam<bool>("buy_delay")) {
+        //         tmp.emplace_back(sw);
+        //     } else {
+        //         HKU_INFO_IF(trace, "[PF] selected but removed(ignore future): {}",
+        //         sw.sys->name())
+        //     }
+        // }
+        // m_tmp_selected_list.swap(tmp);
+
+        // 如果 AF 为 对已持仓系统进行权重调整，则对未选中的运行系统的延迟请求进行处理
         // 否则，认为已运行系统自行控制卖出，不受当前是否选中的影响
         if (m_af->getParam<bool>("adjust_running_sys")) {
             // 如果选中的系统不在已有列表中, 则先清除其延迟买入操作，防止在调仓日出现未来信号
@@ -209,7 +235,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
             }
         }
 
-        // 资产分配算法调整各子系统资产分配
+        // 资产分配算法调整各子系统资产分配，AF统一在收盘时进行调仓，返回的是收盘调仓失败时的系统（需要延迟到一下开盘时继续执行）
         tmp_continue_adjust_sys_list =
           m_af->adjustFunds(date, m_tmp_selected_list, m_running_sys_set);
 
@@ -258,19 +284,38 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     //----------------------------------------------------------------------------
     // 执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
     //----------------------------------------------------------------------------
+    std::unordered_set<System*> delay_adjust_sys_set;
+    for (auto& sw : m_delay_adjust_sys_list) {
+        delay_adjust_sys_set.insert(sw.sys.get());
+    }
+
     for (auto& sub_sys : m_running_sys_set) {
-        HKU_INFO_IF(trace, "[PF] run: {}", sub_sys->name());
+        // HKU_INFO_IF(trace, "[PF] run: {}", sub_sys->name());
         if (adjust) {
             auto sg = sub_sys->getSG();
             sg->startCycle(date, nextCycle);
-            HKU_INFO_IF(trace, "[PF] sg should buy: {}", sg->shouldBuy(date));
+            if (trace) {
+                if (delay_adjust_sys_set.find(sub_sys.get()) == delay_adjust_sys_set.end()) {
+                    if (sub_sys->getParam<bool>("buy_delay")) {
+                        HKU_INFO_IF(sg->shouldBuy(date), "[PF] {} sg will buy on next open",
+                                    sub_sys->name());
+                    } else {
+                        HKU_INFO_IF(sg->shouldBuy(date), "[PF] {} sg will buy on current close",
+                                    sub_sys->name());
+                    }
+                } else {
+                    HKU_INFO("[PF] {} will adjust sell on next open", sub_sys->name());
+                }
+            }
         }
 
+        // if (!sub_sys->getParam<bool>("buy_delay")) {
         auto tr = sub_sys->runMoment(date);
         if (!tr.isNull()) {
             HKU_INFO_IF(trace, "[PF] {}", tr);
             m_tm->addTradeRecord(tr);
         }
+        // }
     }
 
     //----------------------------------------------------------------------
@@ -278,7 +323,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     //----------------------------------------------------------------------
     if (trace) {
         auto funds = m_tm->getFunds(date, m_query.kType());
-        HKU_INFO("[PF] [after run] - total funds: {},  cash: {}, market_value: {}",
+        HKU_INFO("[PF] [after run at close] - total funds: {},  cash: {}, market_value: {}",
                  funds.cash + funds.market_value, funds.cash, funds.market_value);
     }
 }

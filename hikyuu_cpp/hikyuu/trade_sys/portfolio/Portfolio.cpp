@@ -168,7 +168,7 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
     //----------------------------------------------------------------------
     // 跟踪打印各运行中子系统持仓情况
     //----------------------------------------------------------------------
-    traceMomentTM(date);
+    traceMomentTMAfterRunAtClose(date);
 
     // 跟踪打印当前账户资产
     if (trace) {
@@ -395,7 +395,42 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
     }
 }
 
-void Portfolio::traceMomentTM(const Datetime& date) {
+void Portfolio::traceMomentTMAfterRunAtOpen(const Datetime& date) {
+    HKU_IF_RETURN(!getParam<bool>("trace") || m_running_sys_set.empty(), void());
+
+    //----------------------------------------------------------------------
+    // 跟踪打印持仓情况
+    //----------------------------------------------------------------------
+    // clang-format off
+    HKU_INFO("+------------+------------+------------+--------------+--------------+");
+    HKU_INFO("| code       | name       | position   | market value |  open price  |");
+    HKU_INFO("+------------+------------+------------+--------------+--------------+");
+    // clang-format on
+
+    size_t count = 0;
+    for (const auto& sys : m_running_sys_set) {
+        Stock stk = sys->getStock();
+        size_t position = sys->getTM()->getHoldNumber(date, stk);
+        KRecord krecord = stk.getKRecord(date, m_query.kType());
+        auto stk_name = stk.name();
+        HKU_INFO("| {:<11}| {:<11}| {:<11}| {:<13.2f}| {:<12.2f}|", stk.market_code(), stk_name,
+                 position, position * krecord.openPrice, krecord.openPrice);
+        // clang-format off
+        HKU_INFO("+------------+------------+------------+--------------+--------------+");
+        count++;
+        int trace_max_num = getParam<int>("trace_max_num");
+        if (count >= trace_max_num) {
+            if (m_running_sys_set.size() > trace_max_num) {
+                HKU_INFO("+ ... ... more                                                        +");
+                HKU_INFO("+------------+------------+------------+--------------+--------------++");
+            }
+            break;
+        }
+        // clang-format on
+    }
+}
+
+void Portfolio::traceMomentTMAfterRunAtClose(const Datetime& date) {
     HKU_IF_RETURN(!getParam<bool>("trace") || m_running_sys_set.empty(), void());
 
     //----------------------------------------------------------------------
