@@ -106,10 +106,11 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
                         datetime, stock.market_code(), price, risk);
     HKU_ERROR_IF_RETURN(stock.isNull(), 0.0, "stock is Null!");
 
-    HKU_ERROR_IF_RETURN(
-      risk <= 0.0, 0.0,
-      "risk is negative! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f}) Part({})", datetime,
-      stock.market_code(), price, risk, getSystemPartName(from));
+    HKU_INFO_IF_RETURN(risk <= 0.0, 0.0,
+                       "risk less zero (Mayby single-line price board, can ignored)! "
+                       "Datetime({}) Stock({} {}) price({:<.3f}) risk({:<.2f}) Part({})",
+                       datetime, stock.market_code(), stock.name(), price, risk,
+                       getSystemPartName(from));
 
     HKU_TRACE_IF_RETURN(m_tm->getStockNumber() >= getParam<int>("max-stock"), 0.0,
                         "Ignore! TM had max-stock number!");
