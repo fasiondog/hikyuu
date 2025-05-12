@@ -256,6 +256,9 @@ public:
     // 处理延迟买入请求，仅供 PF 调用
     virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date);
 
+    // 处理延迟买入请求，仅供 PF 调用
+    virtual TradeRecord pfProcessDelayBuyRequest(const Datetime& date);
+
 private:
     bool _environmentIsValid(const Datetime& datetime);
     bool _conditionIsValid(const Datetime& datetime);
@@ -329,8 +332,8 @@ protected:
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
 
-    int m_buy_days;         // 每一次买入清零，计算一次加1，即买入后的天数
-    int m_sell_short_days;  // 每一次卖空清零
+    int m_buy_days;                 // 每一次买入清零，计算一次加1，即买入后的天数
+    int m_sell_short_days;          // 每一次卖空清零
     TradeRecordList m_trade_list;   // 保存实际执行的交易记录
     price_t m_lastTakeProfit;       // 上一次多头止损价，用于保证止赢价单调递增
     price_t m_lastShortTakeProfit;  // 上一次空头止赢价

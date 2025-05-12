@@ -1243,6 +1243,15 @@ TradeRecord System::pfProcessDelaySellRequest(const Datetime& date) {
     return _sellDelay(today, src_today);
 }
 
+TradeRecord System::pfProcessDelayBuyRequest(const Datetime& date) {
+    HKU_IF_RETURN(!m_buyRequest.valid, TradeRecord());
+    size_t pos = m_kdata.getPos(date);
+    HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
+    KRecord today = m_kdata.getKRecord(pos);
+    KRecord src_today = m_src_kdata.getKRecord(pos);
+    return _buyDelay(today, src_today);
+}
+
 price_t System::_getStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price) {
     HKU_IF_RETURN(!m_st, 0.0);
     HKU_IF_RETURN(today.highPrice == today.lowPrice, src_today.lowPrice);

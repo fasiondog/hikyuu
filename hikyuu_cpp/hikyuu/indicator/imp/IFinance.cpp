@@ -73,7 +73,7 @@ void IFinance::_calculate(const Indicator& data) {
 
     bool dynamic = getParam<bool>("dynamic");
     auto* dst = this->data();
-    auto* k = kdata.data();
+    const auto* k = kdata.data();
 
     size_t finances_total = finances.size();
     size_t cur_kix = 0;
