@@ -8,6 +8,7 @@
 
 公共参数：
 
+    * **get_n** *(int | 0)* : 仅取选中的前 get_n 个系统，小于等于0时为取全部
     * **depend_on_proto_sys** *(bool |False)* : 需要原型系统可独立运行
 
         ::
