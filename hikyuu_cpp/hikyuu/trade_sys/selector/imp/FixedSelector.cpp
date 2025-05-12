@@ -27,7 +27,7 @@ bool FixedSelector::isMatchAF(const AFPtr& af) {
     return true;
 }
 
-SystemWeightList FixedSelector::getSelected(Datetime date) {
+SystemWeightList FixedSelector::_getSelected(Datetime date) {
     auto weight = getParam<double>("weight");
     SystemWeightList result;
     for (auto& sys : m_real_sys_list) {

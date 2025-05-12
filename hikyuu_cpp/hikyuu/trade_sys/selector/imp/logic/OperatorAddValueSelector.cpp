@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::OperatorAddValueSelector)
 
 namespace hku {
 
-SystemWeightList OperatorAddValueSelector::getSelected(Datetime date) {
+SystemWeightList OperatorAddValueSelector::_getSelected(Datetime date) {
     SystemWeightList ret;
     HKU_IF_RETURN(!m_se, ret);
 

@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::OperatorAddSelector)
 
 namespace hku {
 
-SystemWeightList OperatorAddSelector::getSelected(Datetime date) {
+SystemWeightList OperatorAddSelector::_getSelected(Datetime date) {
     return getUnionSelected(date, [](double w1, double w2) { return w1 + w2; });
 }
 

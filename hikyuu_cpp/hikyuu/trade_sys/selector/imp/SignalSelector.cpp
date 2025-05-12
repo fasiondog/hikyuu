@@ -24,7 +24,7 @@ bool SignalSelector::isMatchAF(const AFPtr& af) {
     return true;
 }
 
-SystemWeightList SignalSelector::getSelected(Datetime date) {
+SystemWeightList SignalSelector::_getSelected(Datetime date) {
     auto iter = m_sys_dict.find(date);
     return iter != m_sys_dict.end() ? iter->second : SystemWeightList();
 }

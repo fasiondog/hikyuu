@@ -54,7 +54,7 @@ void OptimalSelectorBase::_checkParam(const string& name) const {
     }
 }
 
-SystemWeightList OptimalSelectorBase::getSelected(Datetime date) {
+SystemWeightList OptimalSelectorBase::_getSelected(Datetime date) {
     SystemWeightList ret;
     auto iter = m_sys_dict.find(date);
     if (iter != m_sys_dict.end()) {

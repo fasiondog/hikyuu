@@ -22,7 +22,7 @@ public:
     virtual SelectorPtr _clone() override;
     virtual bool isMatchAF(const AFPtr& af) override;
     virtual void _calculate() override;
-    virtual SystemWeightList getSelected(Datetime date) override {
+    virtual SystemWeightList _getSelected(Datetime date) override {
         return SystemWeightList();
     }
 
@@ -68,7 +68,7 @@ public:                                                                         
     classname(const SelectorPtr& se, double value) : OperatorValueSelector(name, se, value) {} \
     virtual ~classname() {}                                                                    \
                                                                                                \
-    virtual SystemWeightList getSelected(Datetime date) override;                              \
+    virtual SystemWeightList _getSelected(Datetime date) override;                             \
                                                                                                \
     virtual SelectorPtr _clone() override {                                                    \
         auto p = std::make_shared<classname>();                                                \

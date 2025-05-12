@@ -141,7 +141,7 @@ ScoreRecordList MultiFactorSelector::filterTopN(Datetime date, const ScoreRecord
     return scores;
 }
 
-SystemWeightList MultiFactorSelector::getSelected(Datetime date) {
+SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
     bool ignore_null = getParam<bool>("ignore_null");
     bool ignore_le_zero = getParam<bool>("ignore_le_zero");
     bool only_should_buy = getParam<bool>("only_should_buy");

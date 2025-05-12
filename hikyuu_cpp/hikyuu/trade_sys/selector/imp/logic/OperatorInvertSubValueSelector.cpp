@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::OperatorInvertSubValueSelector)
 
 namespace hku {
 
-SystemWeightList OperatorInvertSubValueSelector::getSelected(Datetime date) {
+SystemWeightList OperatorInvertSubValueSelector::_getSelected(Datetime date) {
     SystemWeightList ret;
     HKU_IF_RETURN(!m_se, ret);
 

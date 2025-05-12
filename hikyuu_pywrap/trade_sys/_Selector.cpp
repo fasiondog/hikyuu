@@ -35,7 +35,7 @@ public:
         PYBIND11_OVERLOAD(void, SelectorBase, _removeAll, );
     }
 
-    SystemWeightList getSelected(Datetime date) override {
+    SystemWeightList _getSelected(Datetime date) override {
         // PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected", getSelected,
         //                             date);
         auto self = py::cast(this);
