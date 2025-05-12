@@ -244,6 +244,10 @@ def clear_build():
     for file in lib_files:
         if file not in ("__init__.py", "__pycache__"):
             os.remove(f'hikyuu/cpp/{file}')
+    plugin_files = os.listdir('hikyuu/plugin')
+    for file in plugin_files:
+        if file not in ("__init__.py", "__pycache__"):
+            os.remove(f'hikyuu/plugin/{file}')
     print('clear finished!')
 
 
