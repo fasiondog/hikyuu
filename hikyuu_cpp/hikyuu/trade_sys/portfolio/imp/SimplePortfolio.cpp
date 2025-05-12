@@ -185,13 +185,6 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
             HKU_INFO_IF(trace, "[PF] buy delay on open {}", tr);
             m_tm->addTradeRecord(tr);
         }
-        // if (sys->getParam<bool>("buy_delay")) {
-        //     auto tr = sys->runMoment(date);
-        //     if (!tr.isNull()) {
-        //         HKU_INFO_IF(trace, "[PF] {}", tr);
-        //         m_tm->addTradeRecord(tr);
-        //     }
-        // }
     }
 
     traceMomentTMAfterRunAtOpen(date);
@@ -202,18 +195,6 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     if (adjust) {
         // 从选股策略获取选中的系统列表
         m_tmp_selected_list = m_se->getSelected(date);
-
-        // SystemWeightList tmp;
-        // tmp.reserve(m_tmp_selected_list.size());
-        // for (const auto& sw : m_tmp_selected_list) {
-        //     if (!sw.sys->getParam<bool>("buy_delay")) {
-        //         tmp.emplace_back(sw);
-        //     } else {
-        //         HKU_INFO_IF(trace, "[PF] selected but removed(ignore future): {}",
-        //         sw.sys->name())
-        //     }
-        // }
-        // m_tmp_selected_list.swap(tmp);
 
         // 如果 AF 为 对已持仓系统进行权重调整，则对未选中的运行系统的延迟请求进行处理
         // 否则，认为已运行系统自行控制卖出，不受当前是否选中的影响
@@ -309,13 +290,11 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
             }
         }
 
-        // if (!sub_sys->getParam<bool>("buy_delay")) {
         auto tr = sub_sys->runMoment(date);
         if (!tr.isNull()) {
             HKU_INFO_IF(trace, "[PF] {}", tr);
             m_tm->addTradeRecord(tr);
         }
-        // }
     }
 
     //----------------------------------------------------------------------
