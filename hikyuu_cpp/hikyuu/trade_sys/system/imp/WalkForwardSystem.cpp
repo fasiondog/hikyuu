@@ -308,10 +308,6 @@ void WalkForwardSystem::clearDelayBuyRequest() {
     }
 }
 
-bool WalkForwardSystem::haveDelaySellRequest() const {
-    return m_sellRequest.valid;
-}
-
 TradeRecord WalkForwardSystem::pfProcessDelaySellRequest(const Datetime& date) {
     TradeRecord ret;
     if (m_cur_sys) {

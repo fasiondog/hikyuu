@@ -251,7 +251,13 @@ public:
     virtual void clearDelayBuyRequest();
 
     // 当前是否存在延迟的操作请求，供Portfolio
-    virtual bool haveDelaySellRequest() const;
+    bool haveDelaySellRequest() const {
+        return m_sellRequest.valid;
+    }
+
+    bool haveDelayBuyRequest() const {
+        return m_buyRequest.valid;
+    }
 
     // 处理延迟买入请求，仅供 PF 调用
     virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date);

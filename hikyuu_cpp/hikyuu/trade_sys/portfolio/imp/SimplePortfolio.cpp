@@ -200,10 +200,12 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
         // 否则，认为已运行系统自行控制卖出，不受当前是否选中的影响
         if (m_af->getParam<bool>("adjust_running_sys")) {
             // 如果选中的系统不在已有列表中, 则先清除其延迟买入操作，防止在调仓日出现未来信号
-            for (auto& sys : m_tmp_selected_list) {
-                if (sys.sys) {
-                    if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
-                        sys.sys->clearDelayBuyRequest();
+            for (auto& sw : m_tmp_selected_list) {
+                if (sw.sys) {
+                    if (m_running_sys_set.find(sw.sys) == m_running_sys_set.end()) {
+                        HKU_INFO_IF(trace, "[PF] clear delay buy request(future): {}",
+                                    sw.sys->name());
+                        sw.sys->clearDelayBuyRequest();
                     }
                 }
             }
@@ -239,12 +241,22 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
             }
         }
 
-        // 从已运行系统列表中立即移除已没有持仓且没有资金的系统
+        // 从已运行系统列表中立即移除已没有持仓且没有资金的系统及没有持仓且没有延迟买卖信号的系统
         m_tmp_will_remove_sys.clear();
         for (auto& sys : m_running_sys_set) {
             auto sub_tm = sys->getTM();
-            if (sub_tm->currentCash() < 1.0 && 0 == sub_tm->getHoldNumber(date, sys->getStock())) {
-                m_tmp_will_remove_sys.emplace_back(sys, 0.0);
+            // 没有持仓
+            if (0 == sub_tm->getHoldNumber(date, sys->getStock())) {
+                if (sub_tm->currentCash() < 1.0) {
+                    // 没有现金
+                    HKU_INFO_IF(trace, "[PF] remove sys: {}", sys->name());
+                    m_tmp_will_remove_sys.emplace_back(sys, 0.0);
+                } else if ((sys->getParam<bool>("buy_delay") && !sys->haveDelayBuyRequest()) &&
+                           (sys->getParam<bool>("sell_delay") && !sys->haveDelayBuyRequest())) {
+                    // 没有延迟买卖信号
+                    HKU_INFO_IF(trace, "[PF] remove no signal delay sys: {}", sys->name());
+                    m_tmp_will_remove_sys.emplace_back(sys, 0.0);
+                }
             }
         }
 

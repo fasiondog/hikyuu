@@ -28,7 +28,6 @@ public:
     virtual TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) override;
     virtual TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) override;
     virtual void clearDelayBuyRequest() override;
-    virtual bool haveDelaySellRequest() const override;
     virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date) override;
 
 private:

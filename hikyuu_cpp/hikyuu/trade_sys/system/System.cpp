@@ -446,10 +446,6 @@ void System::clearDelayBuyRequest() {
     m_buyRequest.clear();
 }
 
-bool System::haveDelaySellRequest() const {
-    return m_sellRequest.valid;
-}
-
 TradeRecord System::runMoment(const Datetime& datetime) {
     size_t pos = m_kdata.getPos(datetime);
     HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
