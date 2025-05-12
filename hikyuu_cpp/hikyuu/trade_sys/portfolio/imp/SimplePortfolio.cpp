@@ -193,6 +193,29 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     // 调仓日，进行资金分配调整
     //---------------------------------------------------
     if (adjust) {
+        // 先从已运行系统列表中立即移除已没有持仓且没有延迟买卖信号的系统, 并回笼资金
+        m_tmp_will_remove_sys.clear();
+        for (auto& sys : m_running_sys_set) {
+            auto sub_tm = sys->getTM();
+            // 没有持仓
+            if (0 == sub_tm->getHoldNumber(date, sys->getStock()) &&
+                ((sys->getParam<bool>("buy_delay") && !sys->haveDelayBuyRequest()) &&
+                 (sys->getParam<bool>("sell_delay") && !sys->haveDelayBuyRequest()))) {
+                // 没有延迟买卖信号
+                HKU_INFO_IF(trace, "[PF] remove no signal delay sys: {}", sys->name());
+                m_tmp_will_remove_sys.emplace_back(sys, 0.0);
+
+                auto sub_cash = sub_tm->currentCash();
+                if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
+                    m_cash_tm->checkin(date, sub_cash);
+                }
+            }
+        }
+
+        for (auto& sw : m_tmp_will_remove_sys) {
+            m_running_sys_set.erase(sw.sys);
+        }
+
         // 从选股策略获取选中的系统列表
         m_tmp_selected_list = m_se->getSelected(date);
 
@@ -246,17 +269,10 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
         for (auto& sys : m_running_sys_set) {
             auto sub_tm = sys->getTM();
             // 没有持仓
-            if (0 == sub_tm->getHoldNumber(date, sys->getStock())) {
-                if (sub_tm->currentCash() < 1.0) {
-                    // 没有现金
-                    HKU_INFO_IF(trace, "[PF] remove sys: {}", sys->name());
-                    m_tmp_will_remove_sys.emplace_back(sys, 0.0);
-                } else if ((sys->getParam<bool>("buy_delay") && !sys->haveDelayBuyRequest()) &&
-                           (sys->getParam<bool>("sell_delay") && !sys->haveDelayBuyRequest())) {
-                    // 没有延迟买卖信号
-                    HKU_INFO_IF(trace, "[PF] remove no signal delay sys: {}", sys->name());
-                    m_tmp_will_remove_sys.emplace_back(sys, 0.0);
-                }
+            if (sub_tm->currentCash() < 1.0 && 0 == sub_tm->getHoldNumber(date, sys->getStock())) {
+                // 没有现金
+                HKU_INFO_IF(trace, "[PF] remove sys: {}", sys->name());
+                m_tmp_will_remove_sys.emplace_back(sys, 0.0);
             }
         }
 
