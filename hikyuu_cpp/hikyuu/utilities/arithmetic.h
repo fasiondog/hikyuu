@@ -85,29 +85,39 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput);
 template <typename ValueT>
 ValueT roundEx(ValueT number, int ndigits = 0) {
     // 切换至：ROUND_HALF_EVEN 银行家舍入法
-    ValueT pow1, pow2, y, z;
-    ValueT x = number;
-    if (ndigits >= 0) {
-        pow1 = pow(ValueT(10.0), ValueT(ndigits));
-        pow2 = 1.0;
-        y = (x * pow1) * pow2;
-    } else {
-        pow1 = pow(ValueT(10.0), ValueT(-ndigits));
-        pow2 = 1.0;
-        y = x / pow1;
-    }
+    // ValueT pow1, pow2, y, z;
+    // ValueT x = number;
+    // if (ndigits >= 0) {
+    //     pow1 = pow(ValueT(10.0), ValueT(ndigits));
+    //     pow2 = 1.0;
+    //     y = (x * pow1) * pow2;
+    // } else {
+    //     pow1 = pow(ValueT(10.0), ValueT(-ndigits));
+    //     pow2 = 1.0;
+    //     y = x / pow1;
+    // }
 
-    z = std::round(y);
-    if (std::fabs(y - z) == 0.5)
-        /* halfway between two integers; use round-half-even */
-        z = 2.0 * std::round(y / 2.0);
+    // z = std::round(y);
+    // if (std::fabs(y - z) == 0.5)
+    //     /* halfway between two integers; use round-half-even */
+    //     z = 2.0 * std::round(y / 2.0);
 
-    if (ndigits >= 0)
-        z = (z / pow2) / pow1;
+    // if (ndigits >= 0)
+    //     z = (z / pow2) / pow1;
+    // else
+    //     z *= pow1;
+
+    // 国内一般使用传统四舍五入法
+    if (ndigits < 0)
+        return number;  // 无效位数直接返回原值
+
+    const double factor = std::pow(10.0, ndigits);
+    const double epsilon = 1e-10 * factor;  // 动态调整epsilon避免精度误差
+
+    if (number >= 0)
+        return static_cast<ValueT>(std::floor(number * factor + 0.5 + epsilon) / factor);
     else
-        z *= pow1;
-
-    return z;
+        return static_cast<ValueT>(std::ceil(number * factor - 0.5 - epsilon) / factor);
 }
 
 /**

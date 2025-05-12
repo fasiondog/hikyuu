@@ -1295,7 +1295,7 @@ TEST_CASE("test_getKData_recover") {
     CHECK_EQ(kdata[657],
              KRecord(Datetime(200208210000), 18.35, 18.75, 18.18, 18.55, 36409.8, 197640));
     CHECK_EQ(kdata[658],
-             KRecord(Datetime(200208220000), 18.77, 18.89, 18.62, 18.81, 13101.3, 106872));
+             KRecord(Datetime(200208220000), 18.77, 18.89, 18.62, 18.82, 13101.3, 106872));
 
     /** @arg 前向等比复权*/
     query = KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::EQUAL_FORWARD);

@@ -38,7 +38,7 @@ TEST_CASE("test_ROUND") {
     CHECK_EQ(result.size(), 4);
     CHECK_EQ(result[0], doctest::Approx(1.32));
     CHECK_EQ(result[1], doctest::Approx(0.30));
-    CHECK_EQ(result[2], doctest::Approx(0.30));
+    CHECK_EQ(result[2], doctest::Approx(0.31));
     CHECK_EQ(result[3], doctest::Approx(2.68));
 
     result = ROUND(-11.15, 1);
