@@ -13,10 +13,14 @@ namespace hku {
 
 /**
  * 独立上下文指标
+ * @param ind 待包装指标
+ * @param fill_null 是否填充空值，默认为 false
  * @ingroup Indicator
  */
-Indicator HKU_API CONTEXT(const Indicator& ind, bool fill_null = true);
-Indicator HKU_API CONTEXT(bool fill_null = true);
+Indicator HKU_API CONTEXT(const Indicator& ind, bool fill_null = false, bool use_self_ktype = false,
+                          bool use_self_recover_type = false);
+Indicator HKU_API CONTEXT(bool fill_null = false, bool use_self_ktype = false,
+                          bool use_self_recover_type = false);
 
 /**
  * 获取指标上下文
