@@ -224,13 +224,16 @@
     :rtype: Indicator
 
 
-.. py:function:: CONTEXT(ind)
+.. py:function:: CONTEXT([ind, fill_null=False, use_self_ktype=False, use_self_recover_type=False])
     
     独立上下文。使用 ind 自带的上下文。当指定新的上下文时，不会改变已有的上下文。
     例如：ind = CLOSE(k1), 当指定新的上下文 ind = ind(k2) 时，使用的是 k2 的收盘价。如想仍使用 k1 收盘价，
     则需使用 ind = CONTEXT(CLOSE(k1)), 此时 ind(k2) 将仍旧使用 k1 的收盘价。
     
     :param Indicator ind: 指标对象
+    :param bool fill_null: 日期对齐时，缺失日期对应填充空值，否则使用前值填充。
+    :param bool use_self_ktype: 公式计算时使用自身独立上下文中的KTYPE
+    :param bool use_self_recover_type: 公式计算时使用自身独立上下文中的RECOVER_TYPE
     :rtype: Indicator
 
 .. py:function:: CONTEXT_K(ind)
