@@ -1997,7 +1997,7 @@ void export_Indicator_build_in(py::module& m) {
           py::arg("fill_null") = true,
           R"(INSUM(block, query, ind, mode[, fill_null=True])
 
-    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-排名.
 
     :param Block block: 指定板块
     :param Query query: 指定范围
@@ -2228,5 +2228,15 @@ void export_Indicator_build_in(py::module& m) {
     3. 当前周期最低价与前一周期收盘价之差的绝对值
 
     :param KData kdata: K线数据
+    :rtype: Indicator)");
+
+    m.def("EXTDATA", py::overload_cast<const string&, const string&>(EXTDATA), py::arg("targetfield"),py::arg("file_path") );
+    m.def("EXTDATA", py::overload_cast<const Indicator&,const string&, const string&>(EXTDATA), py::arg("data"), py::arg("targetfield"),py::arg("file_path"), R"(EXTDATA([kdata])
+    
+    外部数据读取
+    
+    :param KData kdata: K线数据
+    :param string targetfield: 读取HDF5的列名称
+    :param string file_path: 数据文件路径
     :rtype: Indicator)");
 }
