@@ -55,7 +55,7 @@ dataserver 需要配合行情采集服务使用，可以和行情采集服务所
 
 ::
 
-    get_data_from_buffer_server("tcp://192.168.1.3:9201", ["sh000001", "sh000002"], KQuery.DAY)
+    get_data_from_buffer_server("tcp://192.168.1.3:9201", [sm["sh000001"], sm["sh000002"]], KQuery.DAY)
 
 
 使用此方法的其他 hikyuu 进程，可以通过 load_hikyuu 中的参数 “start_spot” 或 Strategy.start 方法参数，禁用自己的行情接收，节省机器资源占用。
