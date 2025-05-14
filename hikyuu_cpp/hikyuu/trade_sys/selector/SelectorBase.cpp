@@ -47,6 +47,7 @@ void SelectorBase::initParam() {
     // 此时，需要在自身计算之前执行原型系统，然后SE自行时可以使用。
     // 而对于实际系统和被跟随的系统完全不一样的情况，可以自行设计特殊的SE。
     setParam<bool>("depend_on_proto_sys", false);  // 此种情况，需要原型系统可独立运行
+    setParam<int>("get_n", 0);                     // getSelected时只取前面多少个
 }
 
 void SelectorBase::baseCheckParam(const string& name) const {}
@@ -172,6 +173,18 @@ void SelectorBase::addStockList(const StockList& stkList, const SystemPtr& proto
     for (const auto& stk : stkList) {
         addStock(stk, protoSys);
     }
+}
+
+SystemWeightList SelectorBase::getSelected(Datetime date) {
+    if (getParam<int>("get_n") <= 0) {
+        return _getSelected(date);
+    }
+
+    SystemWeightList ret = _getSelected(date);
+    if (ret.size() > getParam<int>("get_n")) {
+        ret.resize(getParam<int>("get_n"));
+    }
+    return ret;
 }
 
 } /* namespace hku */

@@ -101,10 +101,6 @@ void DelegateSystem::clearDelayBuyRequest() {
     m_buyRequest.clear();
 }
 
-bool DelegateSystem::haveDelaySellRequest() const {
-    return m_sellRequest.valid;
-}
-
 TradeRecord DelegateSystem::pfProcessDelaySellRequest(const Datetime& date) {
     TradeRecord ret;
     HKU_WARN_IF_RETURN(!m_sys, ret, "No delegated system is specified!");

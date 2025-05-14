@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::OperatorDivSelector)
 
 namespace hku {
 
-SystemWeightList OperatorDivSelector::getSelected(Datetime date) {
+SystemWeightList OperatorDivSelector::_getSelected(Datetime date) {
     return getIntersectionSelected(date, [](double w1, double w2) { return w1 / w2; });
 }
 

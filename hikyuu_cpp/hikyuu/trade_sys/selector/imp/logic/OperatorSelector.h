@@ -22,7 +22,7 @@ public:
     virtual SelectorPtr _clone() override;
     virtual bool isMatchAF(const AFPtr& af) override;
     virtual void _calculate() override;
-    virtual SystemWeightList getSelected(Datetime date) override {
+    virtual SystemWeightList _getSelected(Datetime date) override {
         return SystemWeightList();
     }
 
@@ -80,17 +80,17 @@ private:
 #endif
 };
 
-#define OPERATOR_SELECTOR_IMP(classname, name)                    \
-public:                                                           \
-    classname() : OperatorSelector(name) {}                       \
-    classname(const SelectorPtr& se1, const SelectorPtr& se2)     \
-    : OperatorSelector(name, se1, se2) {}                         \
-    virtual ~classname() {}                                       \
-                                                                  \
-    virtual SystemWeightList getSelected(Datetime date) override; \
-                                                                  \
-    virtual SelectorPtr _clone() override {                       \
-        HKU_THROW("OperatorSelector Could't support clone!");     \
+#define OPERATOR_SELECTOR_IMP(classname, name)                     \
+public:                                                            \
+    classname() : OperatorSelector(name) {}                        \
+    classname(const SelectorPtr& se1, const SelectorPtr& se2)      \
+    : OperatorSelector(name, se1, se2) {}                          \
+    virtual ~classname() {}                                        \
+                                                                   \
+    virtual SystemWeightList _getSelected(Datetime date) override; \
+                                                                   \
+    virtual SelectorPtr _clone() override {                        \
+        HKU_THROW("OperatorSelector Could't support clone!");      \
     }
 
 #if HKU_SUPPORT_SERIALIZATION

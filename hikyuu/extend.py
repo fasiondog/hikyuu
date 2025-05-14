@@ -353,17 +353,3 @@ Parameter.__iter__ = Parameter_iter
 Parameter.keys = Parameter_keys
 Parameter.items = Parameter_items
 Parameter.to_dict = Parameter_to_dict
-
-# ------------------------------------------------------------------
-# 增强 StrategyContext
-# ------------------------------------------------------------------
-__old_StrategyContext_init__ = StrategyContext.__init__
-
-
-def __new_StrategyContext_init__(self, stock_code_list=None):
-    __old_StrategyContext_init__(self)
-    if stock_code_list is not None:
-        self.stock_list = stock_code_list
-
-
-StrategyContext.__init__ = __new_StrategyContext_init__

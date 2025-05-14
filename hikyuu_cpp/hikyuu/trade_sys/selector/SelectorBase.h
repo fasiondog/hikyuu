@@ -87,6 +87,9 @@ public:
      */
     const SystemList& getRealSystemList() const;
 
+    /** 获取指定时刻收盘时选中的标的 */
+    SystemWeightList getSelected(Datetime date);
+
     /**
      * @brief 复位
      * @note 复位不会清除已有的原型系统
@@ -111,7 +114,7 @@ public:
     virtual void _calculate() = 0;
 
     /** 子类获取指定时刻收盘时选中的标的 */
-    virtual SystemWeightList getSelected(Datetime date) = 0;
+    virtual SystemWeightList _getSelected(Datetime date) = 0;
 
     virtual bool isMatchAF(const AFPtr& af) = 0;
 
@@ -141,7 +144,7 @@ protected:
     KQuery m_query;
     KQuery m_proto_query;
 
-    SystemList m_pro_sys_list;  // 原型系统列表
+    SystemList m_pro_sys_list;   // 原型系统列表
     SystemList m_real_sys_list;  // PF组合中实际运行的系统，有PF执行时设定，顺序与原型列表一一对应
 
 //============================================
@@ -197,13 +200,13 @@ private:                                                       \
 #define SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define SELECTOR_IMP(classname)                                   \
-public:                                                           \
-    virtual SelectorPtr _clone() override {                       \
-        return std::make_shared<classname>();                     \
-    }                                                             \
-    virtual SystemWeightList getSelected(Datetime date) override; \
-    virtual bool isMatchAF(const AFPtr& af) override;             \
+#define SELECTOR_IMP(classname)                                    \
+public:                                                            \
+    virtual SelectorPtr _clone() override {                        \
+        return std::make_shared<classname>();                      \
+    }                                                              \
+    virtual SystemWeightList _getSelected(Datetime date) override; \
+    virtual bool isMatchAF(const AFPtr& af) override;              \
     virtual void _calculate() override;
 
 /**

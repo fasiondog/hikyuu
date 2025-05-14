@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::OperatorMulSelector)
 
 namespace hku {
 
-SystemWeightList OperatorMulSelector::getSelected(Datetime date) {
+SystemWeightList OperatorMulSelector::_getSelected(Datetime date) {
     return getIntersectionSelected(date, [](double w1, double w2) { return w1 * w2; });
 }
 

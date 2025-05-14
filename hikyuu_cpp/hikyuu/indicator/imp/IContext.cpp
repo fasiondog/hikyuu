@@ -17,11 +17,15 @@ BOOST_CLASS_EXPORT(hku::IContext)
 namespace hku {
 
 IContext::IContext() : IndicatorImp("CONTEXT") {
-    setParam<bool>("fill_null", true);
+    setParam<bool>("fill_null", false);
+    setParam<bool>("use_self_ktype", false);         // 使用自身独立上下文的K线类型
+    setParam<bool>("use_self_recover_type", false);  // 使用自身独立上下文的复权类型
 }
 
 IContext::IContext(const Indicator& ref_ind) : IndicatorImp("CONTEXT"), m_ref_ind(ref_ind) {
-    setParam<bool>("fill_null", true);
+    setParam<bool>("fill_null", false);
+    setParam<bool>("use_self_ktype", false);
+    setParam<bool>("use_self_recover_type", false);
 }
 
 IContext::~IContext() {}
@@ -88,10 +92,30 @@ void IContext::_calculate(const Indicator& ind) {
                 // 右对齐
                 ref = CVAL(0.)(in_k) + ref;
             }  // else 长度相等无需再处理
+
         } else if (self_k != null_k) {
             // 如果参考指标是时间序列，自按当前上下文日期查询条件查询后按日期对齐
+            bool use_self_ktype = getParam<bool>("use_self_ktype");
+            bool use_self_recover_type = getParam<bool>("use_self_recover_type");
             auto self_stk = self_k.getStock();
-            ref = m_ref_ind(self_stk.getKData(in_k.getQuery()));
+            if (use_self_ktype || use_self_recover_type) {
+                const auto& self_query = self_k.getQuery();
+                const auto& in_query = in_k.getQuery();
+                auto ktype = use_self_ktype ? self_query.kType() : in_query.kType();
+                auto recover_type =
+                  use_self_recover_type ? self_query.recoverType() : in_query.recoverType();
+                KQuery query;
+                if (in_query.queryType() == KQuery::DATE) {
+                    query = KQueryByDate(in_query.startDatetime(), in_query.endDatetime(), ktype,
+                                         recover_type);
+                } else {
+                    query = KQueryByIndex(in_query.start(), in_query.end(), ktype, recover_type);
+                }
+                ref = m_ref_ind(self_stk.getKData(query));
+
+            } else {
+                ref = m_ref_ind(self_stk.getKData(in_k.getQuery()));
+            }
             ref = ALIGN(ref, in_k, getParam<bool>("fill_null"));
         } else if (self_dates.size() > 1) {
             // 无上下文的时间序列
@@ -118,15 +142,20 @@ void IContext::_calculate(const Indicator& ind) {
     }
 }
 
-Indicator HKU_API CONTEXT(bool fill_null) {
+Indicator HKU_API CONTEXT(bool fill_null, bool use_self_ktype, bool use_self_recover_type) {
     auto p = make_shared<IContext>();
     p->setParam<bool>("fill_null", fill_null);
+    p->setParam<bool>("use_self_ktype", use_self_ktype);
+    p->setParam<bool>("use_self_recover_type", use_self_recover_type);
     return Indicator(p);
 }
 
-Indicator HKU_API CONTEXT(const Indicator& ind, bool fill_null) {
+Indicator HKU_API CONTEXT(const Indicator& ind, bool fill_null, bool use_self_ktype,
+                          bool use_self_recover_type) {
     auto p = make_shared<IContext>(ind);
     p->setParam<bool>("fill_null", fill_null);
+    p->setParam<bool>("use_self_ktype", use_self_ktype);
+    p->setParam<bool>("use_self_recover_type", use_self_recover_type);
     return p->calculate();
 }
 

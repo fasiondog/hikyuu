@@ -116,7 +116,8 @@ private:
 
 protected:
     // 跟踪打印当前TM持仓情况
-    void traceMomentTM(const Datetime& date);
+    void traceMomentTMAfterRunAtOpen(const Datetime& date);
+    void traceMomentTMAfterRunAtClose(const Datetime& date);
 
 protected:
     string m_name;

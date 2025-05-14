@@ -31,7 +31,7 @@ void PerformanceOptimalSelector::_checkParam(const string& name) const {
     }
 }
 
-SystemWeightList PerformanceOptimalSelector::getSelected(Datetime date) {
+SystemWeightList PerformanceOptimalSelector::_getSelected(Datetime date) {
     SystemWeightList ret;
     auto iter = this->m_sys_dict.find(date);
     if (iter != this->m_sys_dict.end()) {
