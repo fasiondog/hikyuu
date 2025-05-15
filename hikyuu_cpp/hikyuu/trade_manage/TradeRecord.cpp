@@ -100,7 +100,8 @@ TradeRecord::TradeRecord()
 
 TradeRecord::TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS business,
                          price_t planPrice, price_t realPrice, price_t goalPrice, double number,
-                         const CostRecord& cost, price_t stoploss, price_t cash, SystemPart from)
+                         const CostRecord& cost, price_t stoploss, price_t cash, SystemPart from,
+                         const string& remark)
 : stock(stock),
   datetime(datetime),
   business(business),
@@ -111,7 +112,44 @@ TradeRecord::TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS 
   cost(cost),
   stoploss(stoploss),
   cash(cash),
-  from(from) {}
+  from(from),
+  remark(remark) {}
+
+TradeRecord::TradeRecord(TradeRecord&& rhs)
+: stock(std::move(rhs.stock)),
+  datetime(std::move(rhs.datetime)),
+  business(rhs.business),
+  planPrice(rhs.planPrice),
+  realPrice(rhs.realPrice),
+  goalPrice(rhs.goalPrice),
+  number(rhs.number),
+  cost(std::move(rhs.cost)),
+  stoploss(rhs.stoploss),
+  cash(rhs.cash),
+  from(rhs.from),
+  remark(std::move(rhs.remark)) {
+    rhs.business = BUSINESS_INVALID;
+}
+
+TradeRecord& TradeRecord::operator=(TradeRecord&& rhs) {
+    if (&rhs != this) {
+        stock = std::move(rhs.stock);
+        datetime = std::move(rhs.datetime);
+        business = rhs.business;
+        planPrice = rhs.planPrice;
+        realPrice = rhs.realPrice;
+        goalPrice = rhs.goalPrice;
+        number = rhs.number;
+        cost = std::move(rhs.cost);
+        stoploss = rhs.stoploss;
+        cash = rhs.cash;
+        from = rhs.from;
+        remark = std::move(rhs.remark);
+
+        rhs.business = BUSINESS_INVALID;
+    }
+    return *this;
+}
 
 HKU_API std::ostream& operator<<(std::ostream& os, const TradeRecord& record) {
     os << record.toString();

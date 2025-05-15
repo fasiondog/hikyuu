@@ -61,7 +61,12 @@ public:
     TradeRecord();
     TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS business, price_t planPrice,
                 price_t realPrice, price_t goalPrice, double number, const CostRecord& cost,
-                price_t stoploss, price_t cash, SystemPart from);
+                price_t stoploss, price_t cash, SystemPart from, const string& remark = "");
+    TradeRecord(const TradeRecord&) = default;
+    TradeRecord& operator=(const TradeRecord&) = default;
+
+    TradeRecord(TradeRecord&&);
+    TradeRecord& operator=(TradeRecord&&);
 
     /** 仅用于python的__str__ */
     string toString() const;
@@ -79,6 +84,7 @@ public:
     price_t stoploss;   ///< 止损价
     price_t cash;       ///< 现金余额
     SystemPart from;    ///< 辅助记录交易系统部件，区别是哪个部件发出的指示，Null<int>()表示无效
+    string remark;      ///< 备注
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

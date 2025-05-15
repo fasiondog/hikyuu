@@ -764,7 +764,7 @@ bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, pri
 
 TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
                               double number, price_t stoploss, price_t goalPrice, price_t planPrice,
-                              SystemPart from) {
+                              SystemPart from, const string& remark) {
     TradeRecord result;
     result.business = BUSINESS_INVALID;
 
@@ -836,7 +836,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     // 加入交易记录
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
-                         cost, stoploss, m_cash, from);
+                         cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
     // 更新当前持仓记录
@@ -876,7 +876,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
 TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                double number, price_t stoploss, price_t goalPrice,
-                               price_t planPrice, SystemPart from) {
+                               price_t planPrice, SystemPart from, const string& remark) {
     HKU_CHECK(!std::isnan(number), "sell number should be a valid double!");
     TradeRecord result;
 
@@ -924,7 +924,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     // 更新交易记录
     result = TradeRecord(stock, datetime, BUSINESS_SELL, planPrice, realPrice, goalPrice,
-                         real_number, cost, stoploss, m_cash, from);
+                         real_number, cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
     // 更新当前持仓情况

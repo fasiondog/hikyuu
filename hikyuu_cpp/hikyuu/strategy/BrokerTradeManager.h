@@ -258,7 +258,8 @@ public:
      */
     virtual TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
                             double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                            price_t planPrice = 0.0, SystemPart from = PART_INVALID) override;
+                            price_t planPrice = 0.0, SystemPart from = PART_INVALID,
+                            const string& remark = "") override;
 
     /**
      * 卖出操作
@@ -275,7 +276,7 @@ public:
     virtual TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                              double number = MAX_DOUBLE, price_t stoploss = 0.0,
                              price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                             SystemPart from = PART_INVALID) override;
+                             SystemPart from = PART_INVALID, const string& remark = "") override;
 
     /**
      * 卖空
