@@ -78,7 +78,16 @@ void IWithKType::_calculate(const Indicator& ind) {
             new_query =
               KQueryByDate(query.startDatetime(), query.endDatetime(), ktype, query.recoverType());
         } else {
-            new_query = KQueryByIndex(query.start(), query.end(), ktype, query.recoverType());
+            int32_t old_mins = KQuery::getKTypeInMin(query.kType());
+            int32_t new_mins = KQuery::getKTypeInMin(ktype);
+            if (new_mins >= old_mins) {
+                new_query = KQueryByIndex(query.start(), query.end(), ktype, query.recoverType());
+            } else {
+                size_t len = self_k.size();
+                new_query =
+                  KQueryByDate(self_k[0].datetime, self_k[len - 1].datetime + Minutes(new_mins),
+                               ktype, query.recoverType());
+            }
         }
 
         auto new_self_k = self_k.getStock().getKData(new_query);
