@@ -1632,7 +1632,7 @@ void TradeManager::tocsv(const string& path) {
                  << sep << record.cost.transferfee << sep << record.cost.others << sep
                  << record.cost.total << sep << record.stoploss << sep << record.cash << sep
                  << getSystemPartName(record.from) << sep << sep << sep << sep << sep << sep << sep
-                 << std::endl;
+                 << sep << record.remark << std::endl;
         } else {
             file << record.datetime << sep << record.stock.market_code() << sep
                  << record.stock.name() << sep << getBusinessName(record.business) << sep
@@ -1646,12 +1646,12 @@ void TradeManager::tocsv(const string& path) {
                 if (kdata.isValid()) {
                     file << kdata.datetime << sep << kdata.openPrice << sep << kdata.highPrice
                          << sep << kdata.lowPrice << sep << kdata.closePrice << sep
-                         << kdata.transAmount << sep << kdata.transCount;
+                         << kdata.transAmount << sep << kdata.transCount << sep << record.remark;
                 } else {
-                    file << sep << sep << sep << sep << sep << sep << sep;
+                    file << sep << sep << sep << sep << sep << sep << sep << sep << record.remark;
                 }
             } else {
-                file << sep << sep << sep << sep << sep << sep;
+                file << sep << sep << sep << sep << sep << sep << sep << record.remark;
             }
             file << std::endl;
         }
@@ -1662,7 +1662,7 @@ void TradeManager::tocsv(const string& path) {
     file.open(filename2.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename2);
     file << "#建仓日期,平仓日期,证券代码,证券名称,累计持仓数量,"
-            "累计花费资金,累计交易成本,已转化资金,总盈利,累积风险"
+            "累计花费资金,累计交易成本,已转化资金,总盈利,累积风险,赢亏比率,持仓天数"
          << std::endl;
     PositionRecordList::const_iterator history_iter = m_position_history.begin();
     for (; history_iter != m_position_history.end(); ++history_iter) {
@@ -1671,7 +1671,9 @@ void TradeManager::tocsv(const string& path) {
              << record.stock.market_code() << sep << record.stock.name() << sep
              << record.totalNumber << sep << record.buyMoney << sep << record.totalCost << sep
              << record.sellMoney << sep << record.sellMoney - record.totalCost - record.buyMoney
-             << sep << record.totalRisk << std::endl;
+             << sep << record.totalRisk << sep
+             << record.totalProfit() / (record.buyMoney + record.totalCost) << sep
+             << (record.cleanDatetime - record.takeDatetime).days() << std::endl;
     }
     file.close();
 
@@ -1680,7 +1682,7 @@ void TradeManager::tocsv(const string& path) {
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename3);
     file << "#建仓日期,平仓日期,证券代码,证券名称,当前持仓数量,累计持仓数量,"
             "累计花费资金,累计交易成本,已转化资金,累积风险,"
-            "累计浮动盈亏,当前盈亏成本价"
+            "累计浮动盈亏,当前盈亏成本价, 浮动盈亏比率"
          << std::endl;
     position_map_type::const_iterator position_iter = m_position.begin();
     for (; position_iter != m_position.end(); ++position_iter) {
@@ -1693,7 +1695,12 @@ void TradeManager::tocsv(const string& path) {
         if (pos != 0) {
             KRecord krecord = record.stock.getKRecord(pos - 1, KQuery::DAY);
             price_t bonus = record.buyMoney - record.sellMoney - record.totalCost;
+            auto sellCost =
+              getSellCost(krecord.datetime, record.stock, krecord.closePrice, record.number);
+            price_t profit = record.number * krecord.closePrice + record.sellMoney -
+                             record.buyMoney - record.totalCost - sellCost.total;
             file << record.number * krecord.closePrice - bonus << sep << bonus / record.number
+                 << sep << profit / (record.buyMoney + record.totalCost + sellCost.total)
                  << std::endl;
         }
     }
