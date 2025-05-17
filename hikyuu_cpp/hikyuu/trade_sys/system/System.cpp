@@ -606,8 +606,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
             tr = _sell(today, src_today, PART_PROFITGOAL);
 
         } else {
-            price_t current_take_profile =
-              _getTakeProfitPrice(today.datetime, src_today.closePrice);
+            price_t current_take_profile = _getTakeProfitPrice(today.datetime, current_price);
             if (current_take_profile != 0.0) {
                 if (current_take_profile < m_lastTakeProfit) {
                     current_take_profile = m_lastTakeProfit;
