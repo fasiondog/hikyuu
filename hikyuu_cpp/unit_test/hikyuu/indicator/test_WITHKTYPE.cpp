@@ -10,9 +10,8 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/WITHKTYPE.h>
 #include <hikyuu/indicator/crt/KDATA.h>
-#include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator_talib/ta_crt.h>
 #include <hikyuu/indicator/crt/MA.h>
-#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/ALIGN.h>
 
 using namespace hku;
@@ -57,6 +56,43 @@ TEST_CASE("test_WITHKTYPE_equal_ktype") {
 
     ret = WITHWEEK(CLOSE())(wk);
     check_indicator(ret, wk.close());
+}
+
+/** @par 检测点 */
+TEST_CASE("test_WITHKTYPE") {
+    auto k = getKData("sh000001", KQuery(-30));
+    auto wk =
+      getKData("sh000001", KQueryByDate(Datetime(20111021), Null<Datetime>(), KQuery::WEEK));
+    Indicator ret, expect;
+
+    ret = WITHWEEK(CLOSE());
+    CHECK_EQ(ret.name(), "WITHKTYPE");
+    CHECK_EQ(ret.size(), 0);
+    CHECK_EQ(ret.discard(), 0);
+
+    ret = ret(k);
+    expect = ALIGN(CLOSE(wk), k, false);
+    check_indicator(ret, expect);
+
+    ret = WITHWEEK(CLOSE())(k);
+    expect = ALIGN(CLOSE(wk), k, false);
+    check_indicator(ret, expect);
+
+    ret = WITHWEEK(CLOSE(k));
+    expect = ALIGN(CLOSE(wk), k, false);
+    check_indicator(ret, expect);
+
+    ret = WITHWEEK(TA_MA(CLOSE(), 3))(k);
+    expect = ALIGN(TA_MA(CLOSE(wk), 3), k, false);
+    // WITHKTYPE query 为 INDEX 索引时会夺取一些数据，会造成 discard 有所不同
+    // check_indicator(ret, expect);
+    for (size_t i = expect.discard(); i < ret.size(); ++i) {
+        CHECK_EQ(ret[i], doctest::Approx(expect[i]).epsilon(0.00001));
+    }
+
+    wk = getKData("sh000001", KQuery(-30, Null<int64_t>(), KQuery::WEEK));
+    expect = ALIGN(TA_MA(CLOSE(wk), 3), k, false);
+    check_indicator(ret, expect);
 }
 
 //-----------------------------------------------------------------------------

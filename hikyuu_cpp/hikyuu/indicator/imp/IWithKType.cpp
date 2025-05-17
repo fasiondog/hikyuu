@@ -59,13 +59,14 @@ string IWithKType::formula() const {
 void IWithKType::_calculate(const Indicator& ind) {
     HKU_ASSERT(isLeaf());
 
-    HKU_INFO("1  WITHKTYPE");
-
     auto null_k = Null<KData>();
     auto in_k = getContext();
     auto self_k = m_ref_ind.getContext();
     if (self_k == null_k) {
         self_k = in_k;
+    }
+    if (in_k == null_k) {
+        in_k = self_k;
     }
     HKU_IF_RETURN(self_k.empty(), void());
 
@@ -76,61 +77,42 @@ void IWithKType::_calculate(const Indicator& ind) {
         if (query.queryType() == KQuery::DATE) {
             new_query =
               KQueryByDate(query.startDatetime(), query.endDatetime(), ktype, query.recoverType());
-            HKU_INFO("1.1  WITHKTYPE");
         } else {
             new_query = KQueryByIndex(query.start(), query.end(), ktype, query.recoverType());
-            HKU_INFO("1.2  WITHKTYPE");
         }
 
         auto new_self_k = self_k.getStock().getKData(new_query);
         self_k = std::move(new_self_k);
     }
 
-    HKU_INFO("2  WITHKTYPE");
-
     auto ref = m_ref_ind(self_k);
     auto self_dates = ref.getDatetimeList();
 
-    HKU_INFO("3  WITHKTYPE");
-    if (in_k != null_k && in_k != self_k) {
-        if (self_dates.empty()) {
-            // 上下文无效且无对齐日期，按时间无关序列计算并对齐
-            if (ref.size() > in_k.size()) {
-                ref = SLICE(ref, ref.size() - in_k.size(), ref.size());
-                HKU_INFO("3.1  WITHKTYPE");
-            } else if (ref.size() < in_k.size()) {
-                // 右对齐
-                ref = CVAL(0.)(in_k) + ref;
-                HKU_INFO("3.2  WITHKTYPE");
-            }  // else 长度相等无需再处理
+    if (self_dates.empty()) {
+        // 上下文无效且无对齐日期，按时间无关序列计算并对齐
+        if (ref.size() > in_k.size()) {
+            ref = SLICE(ref, ref.size() - in_k.size(), ref.size());
+        } else if (ref.size() < in_k.size()) {
+            // 右对齐
+            ref = CVAL(0.)(in_k) + ref;
+        }  // else 长度相等无需再处理
 
-            HKU_INFO("3.3  WITHKTYPE");
-
-        } else if (self_k != null_k) {
-            // 如果参考指标是时间序列，自按当前上下文日期查询条件查询后按日期对齐
-            ref = ALIGN(ref, in_k, getParam<bool>("fill_null"));
-            HKU_INFO("3.4  WITHKTYPE");
-        } else if (self_dates.size() > 1) {
-            // 无上下文的时间序列
-            ref = ALIGN(ref, in_k, getParam<bool>("fill_null"));
-            HKU_INFO("3.5  WITHKTYPE");
-        }
-
-        HKU_INFO("3.6  WITHKTYPE");
+    } else if (self_k != null_k) {
+        // 如果参考指标是时间序列，自按当前上下文日期查询条件查询后按日期对齐
+        ref = ALIGN(ref, in_k, getParam<bool>("fill_null"));
+    } else if (self_dates.size() > 1) {
+        // 无上下文的时间序列
+        ref = ALIGN(ref, in_k, getParam<bool>("fill_null"));
     }
 
-    HKU_INFO("4  WITHKTYPE");
     size_t total = ref.size();
     _readyBuffer(total, ref.getResultNumber());
-    HKU_INFO("{}, {}, {}", total, ref.getResultNumber(), ref.discard());
 
     m_discard = ref.discard();
     if (m_discard >= total) {
         m_discard = total;
         return;
     }
-
-    HKU_INFO("5  WITHKTYPE");
 
     size_t rtotal = ref.getResultNumber();
     _readyBuffer(total, rtotal);
