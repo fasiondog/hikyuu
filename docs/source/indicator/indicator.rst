@@ -1340,6 +1340,15 @@
     该函数仅对日线分析周期有效，且仅对存在流通盘权息数据的证券有效，对指数、基金等无效。
 
 
+.. py:function:: WITHKTYPE([ind, ktype, fill_null=False])
+
+    将指标数据转换到指定的K线类型。相关便捷函数: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
+
+    :param Indicator ind: 指标数据
+    :param bool fill_null: 是否填充空值
+    :rtype: Indicator
+
+
 .. py:function:: YEAR([data])
 
     取得该周期的年份。

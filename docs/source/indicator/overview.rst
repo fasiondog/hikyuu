@@ -24,6 +24,7 @@
 * :py:func:`RESULT` - 以指标公式的方式返回指定指标中相应的结果集
 * :py:func:`SLICE` - 获取某指标中指定范围 [start, end) 的数据，生成新的指标
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
+* :py:func:`WITHKTYPE` - 将指标数据转换到指定的K线类型。相关便捷函数: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
 * :py:func:`ZSCORE` - ZScore 标准化
 
 
