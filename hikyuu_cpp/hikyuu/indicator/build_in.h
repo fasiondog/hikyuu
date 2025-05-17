@@ -124,6 +124,7 @@
 #include "crt/VIGOR.h"
 #include "crt/WINNER.h"
 #include "crt/WMA.h"
+#include "crt/WITHKTYPE.h"
 #include "crt/ZHBOND10.h"
 #include "crt/ZONGGUBEN.h"
 #include "crt/ZSCORE.h"
