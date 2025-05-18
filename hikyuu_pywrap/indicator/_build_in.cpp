@@ -2229,14 +2229,4 @@ void export_Indicator_build_in(py::module& m) {
 
     :param KData kdata: K线数据
     :rtype: Indicator)");
-
-    m.def("EXTDATA", py::overload_cast<const string&, const string&>(EXTDATA), py::arg("targetfield"),py::arg("file_path") );
-    m.def("EXTDATA", py::overload_cast<const Indicator&,const string&, const string&>(EXTDATA), py::arg("data"), py::arg("targetfield"),py::arg("file_path"), R"(EXTDATA([kdata])
-    
-    外部数据读取
-    
-    :param KData kdata: K线数据
-    :param string targetfield: 读取HDF5的列名称
-    :param string file_path: 数据文件路径
-    :rtype: Indicator)");
 }

@@ -127,6 +127,5 @@
 #include "crt/ZHBOND10.h"
 #include "crt/ZONGGUBEN.h"
 #include "crt/ZSCORE.h"
-#include "crt/EXTDATA.h"
 
 #endif /* INDICATOR_BUILD_IN_H_ */
