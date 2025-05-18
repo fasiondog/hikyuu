@@ -15,6 +15,8 @@ using namespace hku;
 
 #define ENABLE_BENCHMARK_TEST 0  // 是否开启性能测试相关用例执行，默认不开启
 
+#define ENABLE_WITH_PLUGIN_TEST 0  // 包含插件测试，默认不包含
+
 inline void check_indicator(const Indicator& result, const Indicator& expect) {
     CHECK_EQ(result.size(), expect.size());
     CHECK_EQ(result.discard(), expect.discard());
