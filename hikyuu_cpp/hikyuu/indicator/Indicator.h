@@ -198,6 +198,11 @@ public:
         return !m_imp && m_imp == other.m_imp;
     }
 
+    /** 判断指标公式中是否包含指定名称的指标（特殊用途） */
+    bool contains(const string& name) const {
+        return m_imp ? m_imp->contains(name) : false;
+    }
+
     string str() const;
 
 protected:
