@@ -162,10 +162,10 @@ string TradeRecord::toString() const {
         market_code = stock.market_code();
         name = stock.name();
     }
-    return fmt::format("Trade({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", datetime,
+    return fmt::format("Trade({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", datetime,
                        market_code, name, getBusinessName(business), planPrice, realPrice,
                        goalPrice, number, cost.commission, cost.stamptax, cost.transferfee,
-                       cost.others, getSystemPartName(from));
+                       cost.others, getSystemPartName(from), remark);
 }
 
 bool TradeRecord::isNull() const {

@@ -171,16 +171,18 @@ public:
 
     TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                           double number, price_t stoploss, price_t goalPrice, price_t planPrice,
-                          SystemPart from) override {
+                          SystemPart from, const string& remark) override {
         PYBIND11_OVERRIDE_NAME(TradeRecord, TradeManagerBase, "sell_short", sellShort, datetime,
-                               stock, realPrice, number, stoploss, goalPrice, planPrice, from);
+                               stock, realPrice, number, stoploss, goalPrice, planPrice, from,
+                               remark);
     }
 
     TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                          double number, price_t stoploss, price_t goalPrice, price_t planPrice,
-                         SystemPart from) override {
+                         SystemPart from, const string& remark) override {
         PYBIND11_OVERRIDE_NAME(TradeRecord, TradeManagerBase, "buy_short", buyShort, datetime,
-                               stock, realPrice, number, stoploss, goalPrice, planPrice, from);
+                               stock, realPrice, number, stoploss, goalPrice, planPrice, from,
+                               remark);
     }
 
     bool borrowCash(const Datetime& datetime, price_t cash) override {

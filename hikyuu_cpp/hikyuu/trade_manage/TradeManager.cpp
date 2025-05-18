@@ -862,7 +862,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
             (*broker_iter)
               ->buy(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
-                    from);
+                    from, remark);
             if (datetime > m_broker_last_datetime) {
                 m_broker_last_datetime = datetime;
             }
@@ -952,7 +952,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
             (*broker_iter)
               ->sell(datetime, stock.market(), stock.code(), realPrice, real_number, stoploss,
-                     goalPrice, from);
+                     goalPrice, from, remark);
             if (datetime > m_broker_last_datetime) {
                 m_broker_last_datetime = datetime;
             }
@@ -966,7 +966,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
 TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                     double number, price_t stoploss, price_t goalPrice,
-                                    price_t planPrice, SystemPart from) {
+                                    price_t planPrice, SystemPart from, const string& remark) {
     TradeRecord result;
     result.business = BUSINESS_INVALID;
 
@@ -1040,7 +1040,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
     // 加入交易记录
     result = TradeRecord(stock, datetime, BUSINESS_SELL_SHORT, planPrice, realPrice, goalPrice,
-                         sell_num, cost, stoploss, m_cash, from);
+                         sell_num, cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
     // 更新当前空头持仓记录
@@ -1067,7 +1067,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
             (*broker_iter)
               ->sell(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
-                     from);
+                     from, remark);
             if (datetime > m_broker_last_datetime) {
                 m_broker_last_datetime = datetime;
             }
@@ -1081,7 +1081,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
 TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                    double number, price_t stoploss, price_t goalPrice,
-                                   price_t planPrice, SystemPart from) {
+                                   price_t planPrice, SystemPart from, const string& remark) {
     TradeRecord result;
     HKU_ERROR_IF_RETURN(stock.isNull(), result, "{} Stock is Null!", datetime);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
@@ -1120,7 +1120,7 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
 
     // 更新交易记录
     result = TradeRecord(stock, datetime, BUSINESS_BUY_SHORT, planPrice, realPrice, goalPrice,
-                         real_number, cost, stoploss, m_cash, from);
+                         real_number, cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
     // 更新当前空头持仓情况
@@ -1141,7 +1141,7 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
             (*broker_iter)
               ->buy(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
-                    from);
+                    from, remark);
             if (datetime > m_broker_last_datetime) {
                 m_broker_last_datetime = datetime;
             }
@@ -1570,14 +1570,14 @@ void TradeManager::_saveAction(const TradeRecord& record) {
             buf << my_tm << "buy(Datetime('" << record.datetime.str() << "'), " << "sm['"
                 << record.stock.market_code() << "'], " << record.realPrice << sep << record.number
                 << sep << record.stoploss << sep << record.goalPrice << sep << record.planPrice
-                << sep << record.from << ")";
+                << sep << record.from << sep << "\"" << record.remark << "\")";
             break;
 
         case BUSINESS_SELL:
             buf << my_tm << "sell(Datetime('" << record.datetime.str() << "')," << "sm['"
                 << record.stock.market_code() << "'], " << record.realPrice << sep << record.number
                 << sep << record.stoploss << sep << record.goalPrice << sep << record.planPrice
-                << sep << record.from << ")";
+                << sep << record.from << sep << "\"" << record.remark << "\")";
             break;
 
         default:

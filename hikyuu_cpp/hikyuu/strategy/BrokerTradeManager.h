@@ -292,8 +292,8 @@ public:
      */
     virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                   double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                                  price_t planPrice = 0.0,
-                                  SystemPart from = PART_INVALID) override {
+                                  price_t planPrice = 0.0, SystemPart from = PART_INVALID,
+                                  const string& remark = "") override {
         HKU_WARN("The subclass does not implement this method");
         return TradeRecord();
     }
@@ -313,7 +313,8 @@ public:
     virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                  double number = MAX_DOUBLE, price_t stoploss = 0.0,
                                  price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                                 SystemPart from = PART_INVALID) override {
+                                 SystemPart from = PART_INVALID,
+                                 const string& remark = "") override {
         HKU_WARN("The subclass does not implement this method");
         return TradeRecord();
     }

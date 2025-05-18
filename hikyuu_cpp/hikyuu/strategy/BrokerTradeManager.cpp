@@ -166,7 +166,7 @@ TradeRecord BrokerTradeManager::buy(const Datetime& datetime, const Stock& stock
     for (; broker_iter != m_broker_list.end(); ++broker_iter) {
         (*broker_iter)
           ->buy(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
-                from);
+                from, "");
         if (datetime > m_broker_last_datetime) {
             m_broker_last_datetime = datetime;
         }
@@ -239,7 +239,7 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
     for (; broker_iter != m_broker_list.end(); ++broker_iter) {
         (*broker_iter)
           ->sell(datetime, stock.market(), stock.code(), realPrice, real_number, stoploss,
-                 goalPrice, from);
+                 goalPrice, from, "");
         if (datetime > m_broker_last_datetime) {
             m_broker_last_datetime = datetime;
         }

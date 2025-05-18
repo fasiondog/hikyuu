@@ -263,7 +263,8 @@ public:
      */
     virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                   double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                                  price_t planPrice = 0.0, SystemPart from = PART_INVALID) override;
+                                  price_t planPrice = 0.0, SystemPart from = PART_INVALID,
+                                  const string& remark = "") override;
 
     /**
      * 卖空后回补
@@ -280,7 +281,8 @@ public:
     virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                  double number = MAX_DOUBLE, price_t stoploss = 0.0,
                                  price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                                 SystemPart from = PART_INVALID) override;
+                                 SystemPart from = PART_INVALID,
+                                 const string& remark = "") override;
 
     /**
      * 借入资金，从其他来源借取的资金，如融资

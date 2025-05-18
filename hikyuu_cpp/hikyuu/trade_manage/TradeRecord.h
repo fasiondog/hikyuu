@@ -104,6 +104,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(cost);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(cash);
+        ar& BOOST_SERIALIZATION_NVP(remark);
         string part_name(getSystemPartName(from));
         ar& bs::make_nvp<string>("from", part_name);
     }
@@ -125,6 +126,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(cost);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(cash);
+        ar& BOOST_SERIALIZATION_NVP(remark);
         string part_name;
         ar& bs::make_nvp<string>("from", part_name);
         from = getSystemPartEnum(part_name);
