@@ -183,7 +183,7 @@ static void insum_rank(const IndicatorList& inds, Indicator::value_t* dst, const
 
         for (size_t i = 0; i < len; i++) {
             if (!std::isnan(data[i])) {
-                if (data[i] < data_ind[i]) {  // 如果比dst_tmp值小,则排名+1,如果比dst_tmp值大,则不变
+                if (data[i] > data_ind[i]) {  // 如果比dst_tmp值小,则排名+1,如果比dst_tmp值大,则不变
                     dst[i]++;
                 }
             }
