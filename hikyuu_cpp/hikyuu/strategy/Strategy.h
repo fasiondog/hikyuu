@@ -144,17 +144,20 @@ public:
     }
 
     virtual TradeRecord buy(const Stock& stk, price_t price, double num, double stoploss = 0.0,
-                            double goal_price = 0.0,
-                            SystemPart part_from = SystemPart::PART_SIGNAL) {
+                            double goal_price = 0.0, SystemPart part_from = SystemPart::PART_SIGNAL,
+                            const string& remark = "") {
         HKU_ASSERT(m_tm);
-        return m_tm->buy(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from);
+        return m_tm->buy(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from,
+                         remark);
     }
 
     virtual TradeRecord sell(const Stock& stk, price_t price, double num, price_t stoploss = 0.0,
                              price_t goal_price = 0.0,
-                             SystemPart part_from = SystemPart::PART_SIGNAL) {
+                             SystemPart part_from = SystemPart::PART_SIGNAL,
+                             const string& remark = "") {
         HKU_ASSERT(m_tm);
-        return m_tm->sell(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from);
+        return m_tm->sell(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from,
+                          remark);
     }
 
     virtual bool isBacktesting() const {
