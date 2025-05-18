@@ -623,7 +623,7 @@
 
 .. py:function:: INSUM(block, query, ind, mode)
 
-    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-排名(从1开始).
 
     用法:
     
@@ -634,7 +634,7 @@
     :param Block block | sequence stks: 指定板块 或 证券列表
     :param Query query: 指定范围
     :param Indicator ind: 指定指标
-    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-排名(从1开始).
     :rtype: Indicator    
 
 
