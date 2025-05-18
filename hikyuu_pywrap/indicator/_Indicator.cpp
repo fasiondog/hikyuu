@@ -185,6 +185,13 @@ set_context(self, stock, query)
 
     :rtype: KData)")
 
+      .def("contains", &Indicator::contains, R"(contains(self, name)
+        
+    获取指标公式中是否包含指定名称的指标
+    
+    :param str name: 指定的指标名称
+    :rtype: bool)")
+
       .def("equal", &Indicator::equal)
       .def("is_same", &Indicator::isSame)
       .def("get_imp", &Indicator::getImp)

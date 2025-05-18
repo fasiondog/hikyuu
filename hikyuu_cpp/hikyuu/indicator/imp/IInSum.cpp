@@ -37,14 +37,14 @@ void IInSum::_checkParam(const string& name) const {
         HKU_CHECK(market_info != Null<MarketInfo>(), "Invalid market: {}", market);
     } else if ("mode" == name) {
         int mode = getParam<int>("mode");
-        HKU_ASSERT(mode == 0 || mode == 1 || mode == 2 || mode == 3);
+        HKU_ASSERT(mode == 0 || mode == 1 || mode == 2 || mode == 3 || mode == 4);
     }
 }
 
 static IndicatorList getAllIndicators(const Block& block, const KQuery& query,
                                       const DatetimeList& dates, const Indicator& ind,
                                       bool fill_null) {
-#if 0                                        
+#if 0
     IndicatorList ret;
     for (auto iter = block.begin(); iter != block.end(); ++iter) {
         auto k = iter->getKData(query);
@@ -149,12 +149,42 @@ static void insum_min(const IndicatorList& inds, Indicator::value_t* dst, size_t
             continue;
         }
         const auto* data = value.data();
+        // 遍历所有数据data,dst为空则等于data[i],data[i]小于原来值则为data[i]
         for (size_t i = 0; i < len; i++) {
             if (!std::isnan(data[i])) {
                 if (std::isnan(dst[i])) {
                     dst[i] = data[i];
                 } else if (data[i] < dst[i]) {
                     dst[i] = data[i];
+                }
+            }
+        }
+    }
+}
+
+static void insum_rank(const IndicatorList& inds, Indicator::value_t* dst, const Indicator& ind,
+                       size_t len) {
+    for (size_t i = 0; i < len; i++) {
+        if (std::isnan(dst[i])) {
+            dst[i] = 1;  // 相当于初始化
+        }
+    }
+    for (const auto& value : inds) {  // 单个ind
+        if (value.empty()) {
+            continue;
+        }
+        if (value.size() != len) {
+            HKU_WARN("Ignore stock: {}, value len: {}, dst len: {}",
+                     value.getContext().getStock().market_code(), value.size(), len);
+            continue;
+        }
+        const auto* data = value.data();    // 对比股的数据
+        const auto* data_ind = ind.data();  // 本股数据
+
+        for (size_t i = 0; i < len; i++) {
+            if (!std::isnan(data[i])) {
+                if (data[i] < data_ind[i]) {  // 如果比dst_tmp值小,则排名+1,如果比dst_tmp值大,则不变
+                    dst[i]++;
                 }
             }
         }
@@ -194,6 +224,8 @@ void IInSum::_calculate(const Indicator& ind) {
         insum_max(inds, dst, total);
     } else if (3 == mode) {
         insum_min(inds, dst, total);
+    } else if (4 == mode) {
+        insum_rank(inds, dst, ind, total);
     } else {
         HKU_ERROR("Not support mode: {}", mode);
     }

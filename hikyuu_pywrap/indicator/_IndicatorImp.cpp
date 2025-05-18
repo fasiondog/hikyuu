@@ -96,6 +96,7 @@ void export_IndicatorImp(py::module& m) {
       .def("is_need_context", &IndicatorImp::isNeedContext)
       .def("is_leaf", &IndicatorImp::isLeaf)
       .def("is_serial", &IndicatorImp::isSerial)
+      .def("contains", &IndicatorImp::contains)
 
         DEF_PICKLE(IndicatorImpPtr);
 }
