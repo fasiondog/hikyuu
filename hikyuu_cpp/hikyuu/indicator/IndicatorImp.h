@@ -95,6 +95,9 @@ public:
     /** 判断是否和另一个指标等效，即计算效果相同 */
     bool alike(const IndicatorImp& other) const;
 
+    /** 判断指标公式中是否包含指定名称的指标（特殊用途） */
+    bool contains(const string& name) const;
+
     /**
      * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数,
      * 未做越界保护
@@ -195,7 +198,7 @@ private:
     void execute_weave();
     void execute_if();
 
-    std::vector<IndicatorImpPtr> getAllSubNodes();
+    std::vector<IndicatorImpPtr> getAllSubNodes() const;
     void repeatALikeNodes();
 
 protected:
