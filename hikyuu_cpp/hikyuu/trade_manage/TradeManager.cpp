@@ -1620,7 +1620,7 @@ void TradeManager::tocsv(const string& path) {
     file << "#成交日期,证券代码,证券名称,业务名称,计划交易价格,"
             "实际成交价格,目标价格,成交数量,佣金,印花税,过户费,其他成本,交易总成本,"
             "止损价,现金余额,信号来源,日期,开盘价,最高价,最低价,收盘价,"
-            "成交金额,成交量"
+            "成交金额,成交量,备注"
          << std::endl;
     TradeRecordList::const_iterator trade_iter = m_trade_list.begin();
     for (; trade_iter != m_trade_list.end(); ++trade_iter) {
