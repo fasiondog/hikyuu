@@ -28,11 +28,12 @@ public:
     Datetime datetime;
     price_t stoploss{0.0};
     price_t goal{0.0};
-    double number{0.0};  // 计划的买入/卖出数量，使用发出请求时刻的收盘价，
-                         // 用于避免实际买入时需用重新计算数量时，人工执行速度较慢
-                         // 可通过系统参数进行设置，是否使用
+    double number{0.0};             // 计划的买入/卖出数量，使用发出请求时刻的收盘价，
+                                    // 用于避免实际买入时需用重新计算数量时，人工执行速度较慢
+                                    // 可通过系统参数进行设置，是否使用
     SystemPart from{PART_INVALID};  // 记录SystemBase::Part
-    int count{0};                   // 因操作失败，连续延迟的次数
+    string remark;
+    int count{0};  // 因操作失败，连续延迟的次数
     KRecord krecord;
 
 //============================================
@@ -54,6 +55,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(number);
         string from_name(getSystemPartName(from));
         ar& bs::make_nvp<string>("from", from_name);
+        ar& BOOST_SERIALIZATION_NVP(remark);
         ar& BOOST_SERIALIZATION_NVP(count);
         ar& BOOST_SERIALIZATION_NVP(krecord);
     }
@@ -74,6 +76,7 @@ private:
         string from_name;
         ar& bs::make_nvp<string>("from", from_name);
         from = getSystemPartEnum(from_name);
+        ar& BOOST_SERIALIZATION_NVP(remark);
         ar& BOOST_SERIALIZATION_NVP(count);
         ar& BOOST_SERIALIZATION_NVP(krecord);
     }

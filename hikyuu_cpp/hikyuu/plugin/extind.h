@@ -1,18 +1,22 @@
 /*
  *  Copyright (c) 2025 hikyuu.org
  *
- *  Created on: 2025-05-17
+ *  Created on: 2025-05-19
  *      Author: fasiondog
  */
 
 #pragma once
-#ifndef INDICATOR_CRT_WITHKTYPE_H_
-#define INDICATOR_CRT_WITHKTYPE_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
 
 namespace hku {
 
+/**
+ * @brief 将指标数据转换到指定周期
+ * @param ktype 指定周期
+ * @param fill_null 扩展时填充null数据，否则为使用最近值填充
+ * @return Indicator
+ */
 Indicator HKU_API WITHKTYPE(const KQuery::KType& ktype, bool fill_null = false);
 
 Indicator HKU_API WITHKTYPE(const Indicator& ind, const KQuery::KType& ktype,
@@ -131,5 +135,3 @@ inline Indicator WITHHOUR4(const Indicator& ind, bool fill_null = false) {
 }
 
 }  // namespace hku
-
-#endif /* INDICATOR_CRT_WITHKTYPE_H_ */

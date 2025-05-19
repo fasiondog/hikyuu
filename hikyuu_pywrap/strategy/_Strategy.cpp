@@ -230,16 +230,26 @@ void export_Strategy(py::module& m) {
            py::arg("stk"), py::arg("lastnum"), py::arg("ktype"),
            py::arg("recover_type") = KQuery::NO_RECOVER)
 
-      .def("buy",
-           py::overload_cast<const Stock&, price_t, double, double, double, SystemPart>(
-             &Strategy::buy),
-           py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
-           py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL)
-      .def("sell",
-           py::overload_cast<const Stock&, price_t, double, double, double, SystemPart>(
-             &Strategy::sell),
-           py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
-           py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL);
+      .def("order", py::overload_cast<const Stock&, double, const string&>(&Strategy::order),
+           py::arg("stock"), py::arg("price"), py::arg("remark") = "")
+      .def("order_value",
+           py::overload_cast<const Stock&, price_t, const string&>(&Strategy::orderValue),
+           py::arg("stock"), py::arg("price"), py::arg("remark") = "")
+
+      .def(
+        "buy",
+        py::overload_cast<const Stock&, price_t, double, double, double, SystemPart, const string&>(
+          &Strategy::buy),
+        py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL,
+        py::arg("remark") = "")
+      .def(
+        "sell",
+        py::overload_cast<const Stock&, price_t, double, double, double, SystemPart, const string&>(
+          &Strategy::sell),
+        py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL,
+        py::arg("remark") = "");
 
     m.def("crtBrokerTM", crtBrokerTM, py::arg("broker"), py::arg("cost_func") = TC_Zero(),
           py::arg("name") = "SYS", py::arg("other_brokers") = std::vector<OrderBrokerPtr>());

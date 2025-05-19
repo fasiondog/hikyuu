@@ -64,5 +64,7 @@ void export_TradeRecord(py::module& m) {
       .def_readwrite("part", &TradeRecord::from,
                      "交易指示来源，区别是交易系统哪个部件发出的指示，参见： "
                      ":py:class:`System.Part`")  // python中不能用from关键字
-      DEF_PICKLE(TradeRecord);
+      .def_readwrite("remark", &TradeRecord::remark, "备注")
+
+        DEF_PICKLE(TradeRecord);
 }

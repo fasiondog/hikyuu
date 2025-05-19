@@ -764,7 +764,7 @@ bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, pri
 
 TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
                               double number, price_t stoploss, price_t goalPrice, price_t planPrice,
-                              SystemPart from) {
+                              SystemPart from, const string& remark) {
     TradeRecord result;
     result.business = BUSINESS_INVALID;
 
@@ -836,7 +836,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     // 加入交易记录
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
-                         cost, stoploss, m_cash, from);
+                         cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
     // 更新当前持仓记录
@@ -862,7 +862,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
             (*broker_iter)
               ->buy(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
-                    from);
+                    from, remark);
             if (datetime > m_broker_last_datetime) {
                 m_broker_last_datetime = datetime;
             }
@@ -876,7 +876,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
 TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                double number, price_t stoploss, price_t goalPrice,
-                               price_t planPrice, SystemPart from) {
+                               price_t planPrice, SystemPart from, const string& remark) {
     HKU_CHECK(!std::isnan(number), "sell number should be a valid double!");
     TradeRecord result;
 
@@ -924,7 +924,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     // 更新交易记录
     result = TradeRecord(stock, datetime, BUSINESS_SELL, planPrice, realPrice, goalPrice,
-                         real_number, cost, stoploss, m_cash, from);
+                         real_number, cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
     // 更新当前持仓情况
@@ -952,7 +952,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
             (*broker_iter)
               ->sell(datetime, stock.market(), stock.code(), realPrice, real_number, stoploss,
-                     goalPrice, from);
+                     goalPrice, from, remark);
             if (datetime > m_broker_last_datetime) {
                 m_broker_last_datetime = datetime;
             }
@@ -966,7 +966,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
 TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                     double number, price_t stoploss, price_t goalPrice,
-                                    price_t planPrice, SystemPart from) {
+                                    price_t planPrice, SystemPart from, const string& remark) {
     TradeRecord result;
     result.business = BUSINESS_INVALID;
 
@@ -1040,7 +1040,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
     // 加入交易记录
     result = TradeRecord(stock, datetime, BUSINESS_SELL_SHORT, planPrice, realPrice, goalPrice,
-                         sell_num, cost, stoploss, m_cash, from);
+                         sell_num, cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
     // 更新当前空头持仓记录
@@ -1067,7 +1067,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
             (*broker_iter)
               ->sell(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
-                     from);
+                     from, remark);
             if (datetime > m_broker_last_datetime) {
                 m_broker_last_datetime = datetime;
             }
@@ -1081,7 +1081,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
 TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                    double number, price_t stoploss, price_t goalPrice,
-                                   price_t planPrice, SystemPart from) {
+                                   price_t planPrice, SystemPart from, const string& remark) {
     TradeRecord result;
     HKU_ERROR_IF_RETURN(stock.isNull(), result, "{} Stock is Null!", datetime);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
@@ -1120,7 +1120,7 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
 
     // 更新交易记录
     result = TradeRecord(stock, datetime, BUSINESS_BUY_SHORT, planPrice, realPrice, goalPrice,
-                         real_number, cost, stoploss, m_cash, from);
+                         real_number, cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
     // 更新当前空头持仓情况
@@ -1141,7 +1141,7 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
             (*broker_iter)
               ->buy(datetime, stock.market(), stock.code(), realPrice, number, stoploss, goalPrice,
-                    from);
+                    from, remark);
             if (datetime > m_broker_last_datetime) {
                 m_broker_last_datetime = datetime;
             }
@@ -1570,14 +1570,14 @@ void TradeManager::_saveAction(const TradeRecord& record) {
             buf << my_tm << "buy(Datetime('" << record.datetime.str() << "'), " << "sm['"
                 << record.stock.market_code() << "'], " << record.realPrice << sep << record.number
                 << sep << record.stoploss << sep << record.goalPrice << sep << record.planPrice
-                << sep << record.from << ")";
+                << sep << record.from << sep << "\"" << record.remark << "\")";
             break;
 
         case BUSINESS_SELL:
             buf << my_tm << "sell(Datetime('" << record.datetime.str() << "')," << "sm['"
                 << record.stock.market_code() << "'], " << record.realPrice << sep << record.number
                 << sep << record.stoploss << sep << record.goalPrice << sep << record.planPrice
-                << sep << record.from << ")";
+                << sep << record.from << sep << "\"" << record.remark << "\")";
             break;
 
         default:
@@ -1620,7 +1620,7 @@ void TradeManager::tocsv(const string& path) {
     file << "#成交日期,证券代码,证券名称,业务名称,计划交易价格,"
             "实际成交价格,目标价格,成交数量,佣金,印花税,过户费,其他成本,交易总成本,"
             "止损价,现金余额,信号来源,日期,开盘价,最高价,最低价,收盘价,"
-            "成交金额,成交量"
+            "成交金额,成交量,备注"
          << std::endl;
     TradeRecordList::const_iterator trade_iter = m_trade_list.begin();
     for (; trade_iter != m_trade_list.end(); ++trade_iter) {
@@ -1632,7 +1632,7 @@ void TradeManager::tocsv(const string& path) {
                  << sep << record.cost.transferfee << sep << record.cost.others << sep
                  << record.cost.total << sep << record.stoploss << sep << record.cash << sep
                  << getSystemPartName(record.from) << sep << sep << sep << sep << sep << sep << sep
-                 << std::endl;
+                 << sep << record.remark << std::endl;
         } else {
             file << record.datetime << sep << record.stock.market_code() << sep
                  << record.stock.name() << sep << getBusinessName(record.business) << sep
@@ -1646,12 +1646,12 @@ void TradeManager::tocsv(const string& path) {
                 if (kdata.isValid()) {
                     file << kdata.datetime << sep << kdata.openPrice << sep << kdata.highPrice
                          << sep << kdata.lowPrice << sep << kdata.closePrice << sep
-                         << kdata.transAmount << sep << kdata.transCount;
+                         << kdata.transAmount << sep << kdata.transCount << sep << record.remark;
                 } else {
-                    file << sep << sep << sep << sep << sep << sep << sep;
+                    file << sep << sep << sep << sep << sep << sep << sep << sep << record.remark;
                 }
             } else {
-                file << sep << sep << sep << sep << sep << sep;
+                file << sep << sep << sep << sep << sep << sep << sep << record.remark;
             }
             file << std::endl;
         }
@@ -1662,7 +1662,7 @@ void TradeManager::tocsv(const string& path) {
     file.open(filename2.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename2);
     file << "#建仓日期,平仓日期,证券代码,证券名称,累计持仓数量,"
-            "累计花费资金,累计交易成本,已转化资金,总盈利,累积风险"
+            "累计花费资金,累计交易成本,已转化资金,总盈利,累积风险,赢亏比率,持仓天数"
          << std::endl;
     PositionRecordList::const_iterator history_iter = m_position_history.begin();
     for (; history_iter != m_position_history.end(); ++history_iter) {
@@ -1671,7 +1671,9 @@ void TradeManager::tocsv(const string& path) {
              << record.stock.market_code() << sep << record.stock.name() << sep
              << record.totalNumber << sep << record.buyMoney << sep << record.totalCost << sep
              << record.sellMoney << sep << record.sellMoney - record.totalCost - record.buyMoney
-             << sep << record.totalRisk << std::endl;
+             << sep << record.totalRisk << sep
+             << record.totalProfit() / (record.buyMoney + record.totalCost) << sep
+             << (record.cleanDatetime - record.takeDatetime).days() << std::endl;
     }
     file.close();
 
@@ -1680,7 +1682,7 @@ void TradeManager::tocsv(const string& path) {
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename3);
     file << "#建仓日期,平仓日期,证券代码,证券名称,当前持仓数量,累计持仓数量,"
             "累计花费资金,累计交易成本,已转化资金,累积风险,"
-            "累计浮动盈亏,当前盈亏成本价"
+            "累计浮动盈亏,当前盈亏成本价, 浮动盈亏比率"
          << std::endl;
     position_map_type::const_iterator position_iter = m_position.begin();
     for (; position_iter != m_position.end(); ++position_iter) {
@@ -1693,7 +1695,12 @@ void TradeManager::tocsv(const string& path) {
         if (pos != 0) {
             KRecord krecord = record.stock.getKRecord(pos - 1, KQuery::DAY);
             price_t bonus = record.buyMoney - record.sellMoney - record.totalCost;
+            auto sellCost =
+              getSellCost(krecord.datetime, record.stock, krecord.closePrice, record.number);
+            price_t profit = record.number * krecord.closePrice + record.sellMoney -
+                             record.buyMoney - record.totalCost - sellCost.total;
             file << record.number * krecord.closePrice - bonus << sep << bonus / record.number
+                 << sep << profit / (record.buyMoney + record.totalCost + sellCost.total)
                  << std::endl;
         }
     }
