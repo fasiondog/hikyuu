@@ -1610,7 +1610,18 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
     return true;
 }
 
-std::vector<IndicatorImpPtr> IndicatorImp::getAllSubNodes() {
+bool IndicatorImp::contains(const string &name) const {
+    HKU_IF_RETURN(m_name == name, true);
+    auto all_nodes = getAllSubNodes();
+    for (const auto &node : all_nodes) {
+        if (node->name() == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::vector<IndicatorImpPtr> IndicatorImp::getAllSubNodes() const {
     std::vector<IndicatorImpPtr> result;
     // 需要按下面的顺序进行
     if (m_three) {

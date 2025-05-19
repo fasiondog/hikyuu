@@ -427,22 +427,16 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     bool fill_null = getParam<bool>("fill_null");
     size_t ind_count = m_inds.size();
 
-    if (!getParam<bool>("parallel")) {
-        for (size_t i = 0; i < stk_count; i++) {
-            const auto& stk = m_stks[i];
-            auto kdata = stk.getKData(m_query);
-            auto& cur_stk_inds = all_stk_inds[i];
-            cur_stk_inds.resize(ind_count);
-            for (size_t j = 0; j < ind_count; j++) {
-                if (kdata.size() == 0) {
-                    cur_stk_inds[j] = null_ind;
-                } else {
-                    cur_stk_inds[j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
-                }
-                cur_stk_inds[j].name(m_inds[j].name());
-            }
+    bool parallel = getParam<bool>("parallel");
+    // 检测是否可并行（防止和INSUM/RANK类指标冲突）
+    for (const auto& ind : m_inds) {
+        if (ind.contains("INSUM")) {
+            parallel = false;
+            break;
         }
-    } else {
+    }
+
+    if (parallel) {
         parallel_for_index_void(
           0, stk_count, [this, &all_stk_inds, &null_ind, &ind_count, &fill_null](size_t i) {
               const auto& stk = m_stks[i];
@@ -458,6 +452,22 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   cur_stk_inds[j].name(m_inds[j].name());
               }
           });
+
+    } else {
+        for (size_t i = 0; i < stk_count; i++) {
+            const auto& stk = m_stks[i];
+            auto kdata = stk.getKData(m_query);
+            auto& cur_stk_inds = all_stk_inds[i];
+            cur_stk_inds.resize(ind_count);
+            for (size_t j = 0; j < ind_count; j++) {
+                if (kdata.size() == 0) {
+                    cur_stk_inds[j] = null_ind;
+                } else {
+                    cur_stk_inds[j] = ALIGN(m_inds[j](kdata), m_ref_dates, fill_null);
+                }
+                cur_stk_inds[j].name(m_inds[j].name());
+            }
+        }
     }
 
     // 每日截面归一化
