@@ -6,15 +6,16 @@
  */
 
 #include "../test_config.h"
+
+#if ENABLE_WITH_PLUGIN_TEST
+
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/WITHKTYPE.h>
+#include <hikyuu/plugin/extind.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator_talib/ta_crt.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/ALIGN.h>
-
-#if ENABLE_WITH_PLUGIN_TEST
 
 using namespace hku;
 
