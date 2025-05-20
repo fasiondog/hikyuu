@@ -23,6 +23,12 @@ using namespace hku;
  * @{
  */
 
+TEST_CASE("test_MAX_DOUBLE") {
+    // 测试 负MAX_DOUBLE 取绝对值后是否等于 MAX_DOUBLE
+    double x = -MAX_DOUBLE;
+    CHECK_EQ(std::abs(x), MAX_DOUBLE);
+}
+
 /** @par 检测点 */
 TEST_CASE("test_TradeManager_init") {
     StockManager& sm = StockManager::instance();
@@ -113,7 +119,7 @@ TEST_CASE("test_TradeManager_can_not_buy") {
     result = tm->buy(Datetime(199001010000), stock, 26.36, 100, 0, 26.36, 26.36);
     CHECK_EQ(result, Null<TradeRecord>());
 
-#if 0  //取消了该限制
+#if 0  // 取消了该限制
     /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但指定日期该证券不能进行交易，如非交易日 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911130000), stock, 27.2, 100, 0, 27.2, 27.2);

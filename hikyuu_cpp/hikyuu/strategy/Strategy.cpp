@@ -384,7 +384,7 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
 
     } else {
         double sell_num = std::abs(num);
-        if (sell_num > max_trade_num) {
+        if (sell_num > max_trade_num && sell_num != MAX_DOUBLE) {
             sell_num = max_trade_num;
         } else if (sell_num < min_trade_num) {
             sell_num = MAX_DOUBLE;  // 指示卖出剩余全部
