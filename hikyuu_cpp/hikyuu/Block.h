@@ -43,13 +43,9 @@ public:
         return iter;
     }
 
-    bool operator==(const Block& blk) const {
-        return m_data == blk.m_data;
-    }
-
-    bool operator!=(const Block& blk) const {
-        return m_data != blk.m_data;
-    }
+    /** 相等比较，注意：仅依靠板块分类与板块名判断 */
+    bool operator==(const Block& blk) const;
+    bool operator!=(const Block& blk) const;
 
     /** 获取板块类别 */
     string category() const {
@@ -169,5 +165,15 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Block&);
 HKU_API Block getBlock(const string& category, const string& name);
 
 } /* namespace hku */
+
+namespace std {
+template <>
+class hash<hku::Block> {
+public:
+    size_t operator()(hku::Block const& blk) const noexcept {
+        return std::hash<string>{}(fmt::format("{}_{}", blk.category(), blk.name()));
+    }
+};
+}  // namespace std
 
 #endif /* BLOCK_H_ */
