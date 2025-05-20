@@ -256,9 +256,17 @@ void IInSum::_calculate(const Indicator& ind) {
     } else if (3 == mode) {
         insum_min(inds, dst, total);
     } else if (4 == mode) {
-        insum_rank_asc(inds, dst, ind, total);
+        auto nind = ind;
+        if (ind.size() != total) {
+            nind = ALIGN(ind, dates, getParam<bool>("fill_null"));
+        }
+        insum_rank_asc(inds, dst, nind, total);
     } else if (5 == mode) {
-        insum_rank_desc(inds, dst, ind, total);
+        auto nind = ind;
+        if (ind.size() != total) {
+            nind = ALIGN(ind, dates, getParam<bool>("fill_null"));
+        }
+        insum_rank_desc(inds, dst, nind, total);
     } else {
         HKU_ERROR("Not support mode: {}", mode);
     }
