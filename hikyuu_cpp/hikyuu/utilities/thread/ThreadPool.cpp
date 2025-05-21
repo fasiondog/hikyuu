@@ -13,7 +13,7 @@
 namespace hku {
 
 #if CPP_STANDARD < CPP_STANDARD_17 || defined(__clang__)
-thread_local InterruptFlag ThreadPool::m_thread_need_stop;
+// thread_local InterruptFlag ThreadPool::m_thread_need_stop;
 
 thread_local ThreadSafeQueue<MQThreadPool::task_type>* MQThreadPool::m_local_work_queue = nullptr;
 thread_local InterruptFlag MQThreadPool::m_thread_need_stop;

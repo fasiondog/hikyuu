@@ -196,7 +196,7 @@ private:
 #if CPP_STANDARD >= CPP_STANDARD_17 && !defined(__clang__)
     inline static thread_local InterruptFlag m_thread_need_stop;  // 线程停止运行指示
 #else
-    static thread_local InterruptFlag m_thread_need_stop;  // 线程停止运行指示
+    InterruptFlag m_thread_need_stop;  // 线程停止运行指示
 #endif
 
     void worker_thread(int index) {
