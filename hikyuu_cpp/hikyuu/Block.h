@@ -43,9 +43,21 @@ public:
         return iter;
     }
 
-    /** 相等比较，注意：仅依靠板块分类与板块名判断 */
-    bool operator==(const Block& blk) const;
-    bool operator!=(const Block& blk) const;
+    bool isNull() const {
+        return !m_data;
+    }
+
+    uint64_t id() const {
+        return m_data ? (uint64_t)m_data.get() : 0;
+    }
+
+    bool operator==(const Block& blk) const {
+        return m_data == blk.m_data;
+    }
+
+    bool operator!=(const Block& blk) const {
+        return m_data != blk.m_data;
+    }
 
     /** 获取板块类别 */
     string category() const {
@@ -171,7 +183,7 @@ template <>
 class hash<hku::Block> {
 public:
     size_t operator()(hku::Block const& blk) const noexcept {
-        return std::hash<string>{}(fmt::format("{}_{}", blk.category(), blk.name()));
+        return blk.id();
     }
 };
 }  // namespace std

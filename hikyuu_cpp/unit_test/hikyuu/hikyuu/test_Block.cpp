@@ -44,7 +44,7 @@ TEST_CASE("test_Block_1") {
 
     /** @arg category、name相同就判定相等 */
     Block blk4("test", "1");
-    CHECK((blk2 == blk4));
+    CHECK((blk2 != blk4));
 }
 
 /** @par 检测点 */

@@ -57,18 +57,6 @@ Block& Block::operator=(Block&& block) noexcept {
     return *this;
 }
 
-bool Block::operator==(const Block& blk) const {
-    HKU_IF_RETURN(m_data == blk.m_data, true);
-    HKU_IF_RETURN(!m_data || !blk.m_data, false);
-    return m_data->m_category == blk.m_data->m_category && m_data->m_name == blk.m_data->m_name;
-}
-
-bool Block::operator!=(const Block& blk) const {
-    HKU_IF_RETURN(m_data == blk.m_data, false);
-    HKU_IF_RETURN(!m_data || !blk.m_data, true);
-    return m_data->m_category != blk.m_data->m_category || m_data->m_name != blk.m_data->m_name;
-}
-
 bool Block::have(const string& market_code) const {
     HKU_IF_RETURN(!m_data, false);
     string query_str = market_code;
