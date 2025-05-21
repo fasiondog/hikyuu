@@ -134,4 +134,7 @@ inline Indicator WITHHOUR4(const Indicator& ind, bool fill_null = false) {
     return WITHKTYPE(ind, KQuery::HOUR4, fill_null);
 }
 
+Indicator HKU_API RANK(const Block& block, const Indicator& ref_ind, int mode = 0,
+                       bool fill_null = true, const string& market = "SH");
+
 }  // namespace hku

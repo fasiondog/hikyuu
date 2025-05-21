@@ -175,4 +175,18 @@ void export_extend_Indicator(py::module& m) {
     :param Indicator ind: 指标数据
     :param bool fill_null: 是否填充空值
     :rtype: Indicator)");
+
+    m.def("RANK", py::overload_cast<const Block&, const Indicator&, int, bool, const string&>(RANK),
+          py::arg("block"), py::arg("ref_ind"), py::arg("mode") = 0, py::arg("fill_null") = true,
+          py::arg("market") = "SH");
+    m.def(
+      "RANK",
+      [](const py::sequence stks, const Indicator& ref_ind, int mode, bool fill_null,
+         const string& market) {
+          Block blk;
+          blk.add(python_list_to_vector<Stock>(stks));
+          return RANK(blk, ref_ind, mode, fill_null, market);
+      },
+      py::arg("stks"), py::arg("ref_ind"), py::arg("mode") = 0, py::arg("fill_null") = true,
+      py::arg("market") = "SH");
 }
