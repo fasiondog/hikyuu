@@ -16,15 +16,17 @@ public:
     using OrderBrokerBase::OrderBrokerBase;
 
     void _buy(Datetime datetime, const string& market, const string& code, price_t price,
-              double num, price_t stoploss, price_t goalPrice, SystemPart from) override {
+              double num, price_t stoploss, price_t goalPrice, SystemPart from,
+              const string& remark) override {
         PYBIND11_OVERLOAD_PURE(void, OrderBrokerBase, _buy, datetime, market, code, price, num,
-                               stoploss, goalPrice, from);
+                               stoploss, goalPrice, from, remark);
     }
 
     void _sell(Datetime datetime, const string& market, const string& code, price_t price,
-               double num, price_t stoploss, price_t goalPrice, SystemPart from) override {
+               double num, price_t stoploss, price_t goalPrice, SystemPart from,
+               const string& remark) override {
         PYBIND11_OVERLOAD_PURE(void, OrderBrokerBase, _sell, datetime, market, code, price, num,
-                               stoploss, goalPrice, from);
+                               stoploss, goalPrice, from, remark);
     }
 
     string _getAssetInfo() override {
@@ -64,8 +66,9 @@ void export_OrderBroker(py::module& m) {
       .def("sell", &OrderBrokerBase::sell, "详情见子类实现接口: _sell")
       .def("get_asset_info", &OrderBrokerBase::getAssetInfo, "详情见子类实现接口: _get_asset_info")
 
-      .def("_buy", &OrderBrokerBase::_buy,
-           R"(_buy(self, datetime, market, code, price, num, stoploss, goal_price, part_from)
+      .def(
+        "_buy", &OrderBrokerBase::_buy,
+        R"(_buy(self, datetime, market, code, price, num, stoploss, goal_price, part_from, remark)
 
     【子类接口】执行买入操作
 
@@ -76,10 +79,12 @@ void export_OrderBroker(py::module& m) {
     :param float num: 买入数量
     :param float stoploss: 计划止损价
     :param float goal_price: 计划盈利目标价
-    :param SystemPart part_from: 信号来源)")
+    :param SystemPart part_from: 信号来源,
+    :param str remark: 订单备注)")
 
-      .def("_sell", &OrderBrokerBase::_sell,
-           R"(_sell(self, datetime, market, code, price, num, stoploss, goal_price, part_from)
+      .def(
+        "_sell", &OrderBrokerBase::_sell,
+        R"(_sell(self, datetime, market, code, price, num, stoploss, goal_price, part_from, remark)
 
     【子类接口】执行卖出操作
 
@@ -90,7 +95,8 @@ void export_OrderBroker(py::module& m) {
     :param float num: 卖出数量
     :param float stoploss: 计划止损价
     :param float goal_price: 计划盈利目标价
-    :param SystemPart part_from: 信号来源)")
+    :param SystemPart part_from: 信号来源
+    :param str remark: 订单备注)")
 
       .def("_get_asset_info", &OrderBrokerBase::_getAssetInfo, R"(_get_asset_info(self)
 

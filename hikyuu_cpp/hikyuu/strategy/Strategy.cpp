@@ -366,6 +366,83 @@ KData Strategy::getLastKData(const Stock& stk, size_t lastnum, const KQuery::KTy
     return ret;
 }
 
+TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) {
+    TradeRecord ret;
+    HKU_WARN_IF_RETURN(num == 0.0, ret, "{} {} order num is zero!", stk.market_code(), stk.name());
+
+    double min_trade_num = stk.minTradeNumber();
+    double max_trade_num = stk.maxTradeNumber();
+    if (num > 0.0) {
+        HKU_WARN_IF_RETURN(num < min_trade_num, ret,
+                           "{} {} order num({}) is less than min trade number({})!",
+                           stk.market_code(), stk.name(), num, min_trade_num);
+        double buy_num = num;
+        if (buy_num > max_trade_num) {
+            buy_num = max_trade_num;
+        }
+        ret = buy(stk, 0.0, num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
+
+    } else {
+        double sell_num = std::abs(num);
+        if (sell_num > max_trade_num && sell_num != MAX_DOUBLE) {
+            sell_num = max_trade_num;
+        } else if (sell_num < min_trade_num) {
+            sell_num = MAX_DOUBLE;  // 指示卖出剩余全部
+        }
+        ret = sell(stk, 0.0, sell_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
+    }
+
+    return ret;
+}
+
+TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& remark) {
+    TradeRecord ret;
+    HKU_WARN_IF_RETURN(value == 0.0, ret, "{} {} order value is zero!", stk.market_code(),
+                       stk.name());
+
+    auto k = getLastKData(stk, 1, KQuery::DAY, KQuery::NO_RECOVER);  // 取日线当前价
+    HKU_IF_RETURN(k.empty() || k[0].datetime.startOfDay() != today(), ret);
+
+    price_t price = k[0].closePrice;
+    if (value > 0.0) {
+        double n = value / price;
+        CostRecord cost = m_tm->getBuyCost(now(), stk, price, n);
+        price_t need_cash = n * price + cost.total;
+        price_t current_cash = m_tm->currentCash();
+        double min_trade = stk.minTradeNumber();
+        while (n > min_trade && need_cash > current_cash) {
+            n = n - min_trade;
+            cost = m_tm->getBuyCost(now(), stk, price, n);
+            need_cash = n * price + cost.total;
+        }
+        if (need_cash > current_cash) {
+            n = 0.0;
+        }
+        if (n == 0.0) {
+            HKU_WARN("{} {} can buy number is zero!", stk.market_code(), stk.name());
+        } else {
+            ret = order(stk, n, remark);
+        }
+    } else {
+        ret = order(stk, value / price, remark);
+    }
+    return ret;
+}
+
+TradeRecord Strategy::buy(const Stock& stk, price_t price, double num, double stoploss,
+                          double goal_price, SystemPart part_from, const string& remark) {
+    HKU_ASSERT(m_tm);
+    return m_tm->buy(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from,
+                     remark);
+}
+
+TradeRecord Strategy::sell(const Stock& stk, price_t price, double num, price_t stoploss,
+                           price_t goal_price, SystemPart part_from, const string& remark) {
+    HKU_ASSERT(m_tm);
+    return m_tm->sell(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from,
+                      remark);
+}
+
 void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
                            const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
                            const std::vector<OrderBrokerPtr>& other_brokers) {

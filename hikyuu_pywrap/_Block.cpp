@@ -34,6 +34,10 @@ void export_Block(py::module& m) {
       .def_property("index_stock", &Block::getIndexStock, &Block::setIndexStock,
                     py::return_value_policy::copy, "对应指数")
 
+      .def("is_null", &Block::isNull, R"(is_null(self)
+        
+    是否为null值)")
+
       .def("empty", &Block::empty, R"(empty(self)
     
     是否为空)")
@@ -132,6 +136,10 @@ void export_Block(py::module& m) {
     获取证券列表
 
     :param func filter: 输入参数为 stock, 返回 True | False 的过滤函数)")
+
+      .def(py::hash(py::self))
+      .def(py::self == py::self)
+      .def(py::self != py::self)
 
         DEF_PICKLE(Block);
 }

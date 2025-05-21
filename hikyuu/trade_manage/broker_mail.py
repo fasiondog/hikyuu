@@ -72,7 +72,7 @@ class MailOrderBroker:
         smtpObj.login(self._sender, self._pwd)
         smtpObj.sendmail(self._sender, self._receivers, message.as_string())
 
-    def buy(self, market, code, price, num, stoploss, goal_price, part_from):
+    def buy(self, market, code, price, num, stoploss, goal_price, part_from, remark=""):
         """执行买入操作，向指定的邮箱发送邮件，格式如下::
 
             邮件标题：【Hkyuu提醒】买入 证券代码
@@ -86,7 +86,7 @@ class MailOrderBroker:
         title = "【Hkyuu提醒】买入 {}".format(code)
         self._sendmail(title, action)
 
-    def sell(self, market, code, price, num, stoploss, goal_price, part_from):
+    def sell(self, market, code, price, num, stoploss, goal_price, part_from, remark=""):
         """执行卖出操作，向指定的邮箱发送邮件，格式如下::
 
             邮件标题：【Hkyuu提醒】卖出 证券代码

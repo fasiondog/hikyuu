@@ -99,7 +99,7 @@ price_t PositionRecord::totalProfit() const {
         HKU_ERROR("The profit cannot be calculated without cleaned records!");
         return 0.0;
     }
-    return buyMoney - totalCost - sellMoney;
+    return sellMoney - buyMoney - totalCost;
 }
 
 bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2) {
