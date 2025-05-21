@@ -153,6 +153,8 @@ public:
     /** 设置对应的指数 */
     void setIndexStock(const Stock& stk);
 
+    uint64_t strongHash() const;
+
 private:
     struct HKU_API Data {
         string m_category;
