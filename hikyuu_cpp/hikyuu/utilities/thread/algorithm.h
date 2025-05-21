@@ -15,6 +15,11 @@
 #include "MQThreadPool.h"
 #include "MQStealThreadPool.h"
 
+//----------------------------------------------------------------
+// Note: 除 ThreadPool 外，其他线程池在C++17标准以下或clang中，由于使用
+//       了 thread_local，本质为全局变量，只适合全局单例的方式使用
+//----------------------------------------------------------------
+
 namespace hku {
 
 typedef std::pair<size_t, size_t> range_t;
@@ -51,7 +56,7 @@ inline std::vector<range_t> parallelIndexRange(size_t start, size_t end) {
     return ret;
 }
 
-template <typename FunctionType, class TaskGroup = MQStealThreadPool>
+template <typename FunctionType, class TaskGroup = ThreadPool>
 void parallel_for_index_void(size_t start, size_t end, FunctionType f) {
     auto ranges = parallelIndexRange(start, end);
     TaskGroup tg;
@@ -66,7 +71,7 @@ void parallel_for_index_void(size_t start, size_t end, FunctionType f) {
     return;
 }
 
-template <typename FunctionType, class TaskGroup = MQStealThreadPool>
+template <typename FunctionType, class TaskGroup = ThreadPool>
 auto parallel_for_index(size_t start, size_t end, FunctionType f) {
     auto ranges = parallelIndexRange(start, end);
     TaskGroup tg;
@@ -93,7 +98,7 @@ auto parallel_for_index(size_t start, size_t end, FunctionType f) {
     return ret;
 }
 
-template <typename FunctionType, class TaskGroup = MQStealThreadPool>
+template <typename FunctionType, class TaskGroup = ThreadPool>
 auto parallel_for_range(size_t start, size_t end, FunctionType f) {
     auto ranges = parallelIndexRange(start, end);
     TaskGroup tg;

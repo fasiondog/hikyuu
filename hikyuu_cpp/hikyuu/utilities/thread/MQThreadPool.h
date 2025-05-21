@@ -238,23 +238,20 @@ private:
 #if CPP_STANDARD >= CPP_STANDARD_17 && !defined(__clang__)
     inline static thread_local ThreadSafeQueue<task_type>* m_local_work_queue =
       nullptr;                                                    // 本地任务队列
-    inline static thread_local int m_index = -1;                  // 在线程池中的序号
     inline static thread_local InterruptFlag m_thread_need_stop;  // 线程停止运行指示
 #else
     static thread_local ThreadSafeQueue<task_type>* m_local_work_queue;  // 本地任务队列
-    static thread_local int m_index;                                     // 在线程池中的序号
     static thread_local InterruptFlag m_thread_need_stop;                // 线程停止运行指示
 #endif
 
     void worker_thread(int index) {
-        m_index = index;
         m_interrupt_flags[index] = &m_thread_need_stop;
-        m_local_work_queue = m_queues[m_index].get();
+        m_local_work_queue = m_queues[index].get();
         while (!m_thread_need_stop.isSet() || !m_done) {
             run_pending_task();
         }
         m_local_work_queue = nullptr;
-        m_interrupt_flags[m_index] = nullptr;
+        m_interrupt_flags[index] = nullptr;
     }
 
     static void run_pending_task() {

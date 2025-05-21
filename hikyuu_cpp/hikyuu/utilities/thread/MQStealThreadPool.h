@@ -256,13 +256,12 @@ private:
     void worker_thread(int index) {
         m_index = index;
         m_interrupt_flags[index] = &m_thread_need_stop;
-        m_local_work_queue = m_queues[m_index].get();
+        m_local_work_queue = m_queues[index].get();
         while (!m_thread_need_stop.isSet() && !m_done) {
             run_pending_task();
         }
-        m_interrupt_flags[m_index] = nullptr;
+        m_interrupt_flags[index] = nullptr;
         m_local_work_queue = nullptr;
-        // printf("%zu thread (%lld) finished!\n", m_index, std::this_thread::get_id());
     }
 
     void run_pending_task() {

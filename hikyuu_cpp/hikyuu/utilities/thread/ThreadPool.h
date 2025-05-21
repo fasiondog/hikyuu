@@ -195,14 +195,11 @@ private:
     // 线程本地变量
 #if CPP_STANDARD >= CPP_STANDARD_17 && !defined(__clang__)
     inline static thread_local InterruptFlag m_thread_need_stop;  // 线程停止运行指示
-    inline static thread_local int m_index = -1;                  // 在线程池中的序号
 #else
     static thread_local InterruptFlag m_thread_need_stop;  // 线程停止运行指示
-    static thread_local int m_index;                       // 在线程池中的序号
 #endif
 
     void worker_thread(int index) {
-        m_index = index;
         m_interrupt_flags[index] = &m_thread_need_stop;
         while (!m_thread_need_stop.isSet() && !m_done) {
             run_pending_task();
