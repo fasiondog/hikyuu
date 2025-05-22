@@ -19,6 +19,7 @@
 #include "ThreadSafeQueue.h"
 #include "InterruptFlag.h"
 #include "../cppdef.h"
+#include "../Log.h"
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -150,22 +151,11 @@ public:
         }
 
         m_done = true;
+        m_master_work_queue.setNotifyAll(true);
 
         // 仍旧有可能某个线程没有获取到，导致没有终止
-        for (size_t i = 0; i < m_worker_num; i++) {
+        for (size_t i = 0; i < 2 * m_worker_num; i++) {
             m_master_work_queue.push(FuncWrapper());
-        }
-
-        // 等待线程结束
-        for (size_t i = 0; i < m_worker_num; i++) {
-            if (m_threads[i].joinable()) {
-                // join可能因为未接收到空任务包而导致无法终止
-                // m_threads[i].join();
-                for (size_t i = 0; i < m_worker_num; i++) {
-                    m_master_work_queue.push(FuncWrapper());
-                }
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            }
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
