@@ -179,7 +179,7 @@ public:
      * K线数据行为不一致，所以除非知道自己的使用场景，否则勿使用此方法
      * @return size_t
      */
-    size_t hash() const;
+    uint64_t hash() const;
 
     /** 获取queryType名称，用于显示输出 */
     static string getQueryTypeName(QueryType);

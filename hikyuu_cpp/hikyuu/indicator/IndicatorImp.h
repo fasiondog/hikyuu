@@ -12,7 +12,7 @@
 #include "../config.h"
 #include "../KData.h"
 #include "../utilities/Parameter.h"
-#include "../utilities/thread/StealThreadPool.h"
+#include "../utilities/thread/thread.h"
 
 namespace hku {
 
@@ -227,7 +227,7 @@ public:
     static void releaseDynEngine();
 
 protected:
-    static StealThreadPool* ms_tg;
+    static ThreadPool* ms_tg;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

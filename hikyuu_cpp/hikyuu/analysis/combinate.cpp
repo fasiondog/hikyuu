@@ -76,7 +76,7 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
     HKU_IF_RETURN(total == 0, result);
 
     auto work_num = std::thread::hardware_concurrency();
-    MQStealThreadPool tg(work_num);
+    ThreadPool tg(work_num);
     vector<std::future<vector<CombinateAnalysisOutput>>> tasks;
 
     vector<Stock> buf;

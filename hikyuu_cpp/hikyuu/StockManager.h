@@ -114,6 +114,12 @@ public:
     MarketInfo getMarketInfo(const string& market) const;
 
     /**
+     * 获取指定市场代表指数证券
+     * @param market 指定的市场标识
+     */
+    Stock getMarketStock(const string& market) const;
+
+    /**
      * 获取相应的证券类型详细信息
      * @param type 证券类型
      * @return 对应的证券类型信息，如果不存在，则返回Null<StockTypeInf>()

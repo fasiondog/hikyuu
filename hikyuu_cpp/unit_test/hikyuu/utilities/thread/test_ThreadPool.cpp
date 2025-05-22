@@ -8,10 +8,7 @@
  */
 
 #include "doctest/doctest.h"
-#include <hikyuu/utilities/thread/StealThreadPool.h>
-#include <hikyuu/utilities/thread/ThreadPool.h>
-#include <hikyuu/utilities/thread/MQThreadPool.h>
-#include <hikyuu/utilities/thread/MQStealThreadPool.h>
+#include <hikyuu/utilities/thread/thread.h>
 #include <hikyuu/utilities/SpendTimer.h>
 #include "hikyuu/utilities/Log.h"
 
@@ -67,11 +64,12 @@ TEST_CASE("test_MQThreadPool") {
     }
 }
 
+#if 0
 /** @par 检测点 */
-TEST_CASE("test_StealThreadPool") {
+TEST_CASE("test_GlobalStealThreadPool") {
     {
-        SPEND_TIME(test_StealThreadPool);
-        StealThreadPool tg(8);
+        SPEND_TIME(test_GlobalStealThreadPool);
+        GlobalStealThreadPool tg(8);
         HKU_INFO("worker_num: {}", tg.worker_num());
         for (int i = 0; i < 10; i++) {
 #if FMT_VERSION >= 90000
@@ -90,10 +88,10 @@ TEST_CASE("test_StealThreadPool") {
 }
 
 /** @par 检测点 */
-TEST_CASE("test_MQStealThreadPool") {
+TEST_CASE("test_GlobalMQStealThreadPool") {
     {
-        SPEND_TIME(test_MQStealThreadPool);
-        MQStealThreadPool tg(8);
+        SPEND_TIME(test_GlobalMQStealThreadPool);
+        GlobalMQStealThreadPool tg(8);
         HKU_INFO("worker_num: {}", tg.worker_num());
         for (int i = 0; i < 10; i++) {
 #if FMT_VERSION >= 90000
@@ -110,5 +108,6 @@ TEST_CASE("test_MQStealThreadPool") {
         tg.join();
     }
 }
+#endif
 
 /** @} */

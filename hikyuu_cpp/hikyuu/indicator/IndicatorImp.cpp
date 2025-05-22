@@ -22,7 +22,7 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 
 namespace hku {
 
-StealThreadPool *IndicatorImp::ms_tg = nullptr;
+ThreadPool *IndicatorImp::ms_tg = nullptr;
 
 string HKU_API getOPTypeName(IndicatorImp::OPType op) {
     string name;
@@ -111,7 +111,7 @@ void IndicatorImp::initDynEngine() {
     } else if (cpu_num > 1) {
         cpu_num--;
     }
-    ms_tg = new StealThreadPool(cpu_num);
+    ms_tg = new ThreadPool(cpu_num);
     HKU_CHECK(ms_tg, "Failed init indicator dynamic engine");
 }
 
