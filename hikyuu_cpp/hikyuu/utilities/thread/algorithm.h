@@ -30,10 +30,6 @@ inline std::vector<range_t> parallelIndexRange(size_t start, size_t end) {
     }
 
     size_t total = end - start;
-    if (total == 0) {
-        return ret;
-    }
-
     size_t cpu_num = std::thread::hardware_concurrency();
     if (cpu_num == 1) {
         ret.emplace_back(start, end);
