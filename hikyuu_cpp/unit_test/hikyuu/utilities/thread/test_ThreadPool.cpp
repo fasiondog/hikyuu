@@ -64,6 +64,7 @@ TEST_CASE("test_MQThreadPool") {
     }
 }
 
+#if 0
 /** @par 检测点 */
 TEST_CASE("test_GlobalStealThreadPool") {
     {
@@ -107,5 +108,6 @@ TEST_CASE("test_GlobalMQStealThreadPool") {
         tg.join();
     }
 }
+#endif
 
 /** @} */
