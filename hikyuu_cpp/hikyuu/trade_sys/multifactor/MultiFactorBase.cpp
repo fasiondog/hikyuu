@@ -216,6 +216,11 @@ void MultiFactorBase::setRefIndicators(const IndicatorList& inds) {
     m_calculated = false;
 }
 
+const DatetimeList& MultiFactorBase::getDatetimeList() {
+    calculate();
+    return m_ref_dates;
+}
+
 const Indicator& MultiFactorBase::getFactor(const Stock& stk) {
     calculate();
     const auto iter = m_stk_map.find(stk);
@@ -428,14 +433,6 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     size_t ind_count = m_inds.size();
 
     bool parallel = getParam<bool>("parallel");
-    // 检测是否可并行（防止和INSUM/RANK类指标冲突）
-    for (const auto& ind : m_inds) {
-        if (ind.contains("INSUM")) {
-            parallel = false;
-            break;
-        }
-    }
-
     if (parallel) {
         parallel_for_index_void(
           0, stk_count, [this, &all_stk_inds, &null_ind, &ind_count, &fill_null](size_t i) {
@@ -561,7 +558,6 @@ void MultiFactorBase::_buildIndex() {
 }
 
 void MultiFactorBase::calculate() {
-    // SPEND_TIME(MultiFactorBase_calculate);
     std::lock_guard<std::mutex> lock(m_mutex);
     HKU_IF_RETURN(m_calculated, void());
 

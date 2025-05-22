@@ -293,6 +293,11 @@ MarketInfo StockManager::getMarketInfo(const string& market) const {
     return result;
 }
 
+Stock StockManager::getMarketStock(const string& market) const {
+    auto market_info = getMarketInfo(market);
+    return getStock(fmt::format("{}{}", market_info.market(), market_info.code()));
+}
+
 StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
     StockTypeInfo result;
     std::shared_lock<std::shared_mutex> lock(*m_stockTypeInfo_mutex);

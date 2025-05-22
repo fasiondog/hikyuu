@@ -42,7 +42,7 @@ TEST_CASE("test_Block_1") {
     Block blk3 = blk2;
     CHECK((blk2 == blk3));
 
-    /** @arg category、name相同但指向不同，判定不相等 */
+    /** @arg category、name相同就判定相等 */
     Block blk4("test", "1");
     CHECK((blk2 != blk4));
 }

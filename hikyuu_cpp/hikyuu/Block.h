@@ -43,6 +43,14 @@ public:
         return iter;
     }
 
+    bool isNull() const {
+        return !m_data;
+    }
+
+    uint64_t id() const {
+        return m_data ? (uint64_t)m_data.get() : 0;
+    }
+
     bool operator==(const Block& blk) const {
         return m_data == blk.m_data;
     }
@@ -145,6 +153,8 @@ public:
     /** 设置对应的指数 */
     void setIndexStock(const Stock& stk);
 
+    uint64_t strongHash() const;
+
 private:
     struct HKU_API Data {
         string m_category;
@@ -169,5 +179,15 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Block&);
 HKU_API Block getBlock(const string& category, const string& name);
 
 } /* namespace hku */
+
+namespace std {
+template <>
+class hash<hku::Block> {
+public:
+    size_t operator()(hku::Block const& blk) const noexcept {
+        return blk.id();
+    }
+};
+}  // namespace std
 
 #endif /* BLOCK_H_ */

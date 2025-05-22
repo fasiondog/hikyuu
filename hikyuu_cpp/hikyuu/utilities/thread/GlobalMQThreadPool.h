@@ -1,5 +1,5 @@
 /*
- * StealMQThreadPool.h
+ * StealGlobalMQThreadPool.h
  *
  *  Copyright (c) 2019 hikyuu.org
  *
@@ -30,31 +30,30 @@
 namespace hku {
 
 /**
- * @brief 普通多任务队列线程池，任务之间彼此独立不能互相等待
- * @note 任务运行之间如存在先后顺序，请使用 StealThreadPool。
+ * @brief 全局分布式线程池，只适合程序运行期内一直保持运行的情况
  * @details
- * @ingroup MQThreadPool
+ * @ingroup GlobalMQThreadPool
  */
 #ifdef _MSC_VER
-class MQThreadPool {
+class GlobalMQThreadPool {
 #else
-class HKU_UTILS_API MQThreadPool {
+class HKU_UTILS_API GlobalMQThreadPool {
 #endif
 public:
     /**
      * 默认构造函数，创建和当前系统CPU数一致的线程数
      */
-    MQThreadPool() : MQThreadPool(std::thread::hardware_concurrency()) {}
+    GlobalMQThreadPool() : GlobalMQThreadPool(std::thread::hardware_concurrency()) {}
 
     /**
      * 构造函数，创建指定数量的线程
      * @param n 指定的线程数
      * @param until_empty 任务队列为空时，自动停止运行
      */
-    explicit MQThreadPool(size_t n, bool until_empty = true)
+    explicit GlobalMQThreadPool(size_t n, bool until_empty = true)
     : m_done(false), m_worker_num(n), m_runnging_until_empty(until_empty) {
         try {
-            m_thread_need_stop.resize(m_worker_num);
+            m_interrupt_flags.resize(m_worker_num, nullptr);
             for (int i = 0; i < m_worker_num; i++) {
                 // 创建工作线程及其任务队列
                 m_queues.push_back(
@@ -62,7 +61,7 @@ public:
             }
             // 初始完毕所有线程资源后再启动线程
             for (int i = 0; i < m_worker_num; i++) {
-                m_threads.push_back(std::thread(&MQThreadPool::worker_thread, this, i));
+                m_threads.push_back(std::thread(&GlobalMQThreadPool::worker_thread, this, i));
             }
         } catch (...) {
             m_done = true;
@@ -73,9 +72,9 @@ public:
     /**
      * 析构函数，等待并阻塞至线程池内所有任务完成
      */
-    ~MQThreadPool() {
+    ~GlobalMQThreadPool() {
         if (!m_done) {
-            join();
+            stop();
         }
     }
 
@@ -105,8 +104,8 @@ public:
     /** 向线程池提交任务 */
     template <typename FunctionType>
     auto submit(FunctionType f) {
-        if (m_done) {
-            throw std::logic_error("You can't submit a task to the stopped MQThreadPool!");
+        if (m_thread_need_stop.isSet() || m_done) {
+            throw std::logic_error("You can't submit a task to the stopped GlobalMQThreadPool!");
         }
 
         typedef typename std::invoke_result<FunctionType>::type result_type;
@@ -117,17 +116,15 @@ public:
         size_t min_count = std::numeric_limits<size_t>::max();
         int index = 0;
         for (int i = 0; i < m_worker_num; ++i) {
-            if (!m_thread_need_stop[i].isSet()) {
-                size_t cur_count = m_queues[i]->size();
-                if (cur_count == 0) {
-                    index = i;
-                    break;
-                }
+            size_t cur_count = m_queues[i]->size();
+            if (cur_count == 0) {
+                index = i;
+                break;
+            }
 
-                if (cur_count < min_count) {
-                    min_count = cur_count;
-                    index = i;
-                }
+            if (cur_count < min_count) {
+                min_count = cur_count;
+                index = i;
             }
         }
 
@@ -148,12 +145,17 @@ public:
      * 等待各线程完成当前执行的任务后立即结束退出
      */
     void stop() {
-        if (m_done.exchange(true, std::memory_order_relaxed)) {
+        if (m_done) {
             return;
         }
 
+        m_done = true;
+
+        // 同时加入结束任务指示，以便在dll退出时也能够终止
         for (size_t i = 0; i < m_worker_num; i++) {
-            m_thread_need_stop[i].set();
+            if (m_interrupt_flags[i]) {
+                m_interrupt_flags[i]->set();
+            }
             m_queues[i]->push(FuncWrapper());
         }
 
@@ -178,13 +180,33 @@ public:
         }
 
         // 指示各工作线程在未获取到工作任务时，停止运行
-        if (!m_runnging_until_empty) {
+        if (m_runnging_until_empty) {
+            while (true) {
+                bool can_quit = true;
+                for (size_t i = 0; i < m_worker_num; i++) {
+                    if (m_queues[i]->size() != 0) {
+                        can_quit = false;
+                        break;
+                    }
+                }
+
+                if (can_quit) {
+                    break;
+                }
+
+                std::this_thread::yield();
+            }
+
             m_done = true;
+            for (size_t i = 0; i < m_worker_num; i++) {
+                if (m_interrupt_flags[i]) {
+                    m_interrupt_flags[i]->set();
+                }
+            }
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
             m_queues[i]->push(FuncWrapper());
-            m_queues[i]->notify_all();
         }
 
         // 等待线程结束
@@ -192,10 +214,6 @@ public:
             if (m_threads[i].joinable()) {
                 m_threads[i].join();
             }
-        }
-
-        for (size_t i = 0; i < m_worker_num; i++) {
-            m_thread_need_stop[i].set();
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -212,19 +230,35 @@ private:
     bool m_runnging_until_empty;  // 运行直到队列空时停止
 
     std::vector<std::unique_ptr<ThreadSafeQueue<task_type>>> m_queues;  // 线程任务队列
-    std::vector<InterruptFlag> m_thread_need_stop;                      // 线程终止标志
+    std::vector<InterruptFlag*> m_interrupt_flags;                      // 线程终止标志
     std::vector<std::thread> m_threads;                                 // 工作线程
 
+    // 线程本地变量
+#if CPP_STANDARD >= CPP_STANDARD_17 && !defined(__clang__)
+    inline static thread_local ThreadSafeQueue<task_type>* m_local_work_queue =
+      nullptr;                                                    // 本地任务队列
+    inline static thread_local InterruptFlag m_thread_need_stop;  // 线程停止运行指示
+#else
+    static thread_local ThreadSafeQueue<task_type>* m_local_work_queue;  // 本地任务队列
+    static thread_local InterruptFlag m_thread_need_stop;                // 线程停止运行指示
+#endif
+
     void worker_thread(int index) {
-        auto *local_queue = m_queues[index].get();
-        auto *local_stop_flag = &m_thread_need_stop[index];
-        while (!local_stop_flag->isSet() || !m_done) {
-            task_type task;
-            local_queue->wait_and_pop(task);
-            if (task.isNullTask()) {
-                local_stop_flag->set();
-                break;
-            }
+        m_interrupt_flags[index] = &m_thread_need_stop;
+        m_local_work_queue = m_queues[index].get();
+        while (!m_thread_need_stop.isSet() || !m_done) {
+            run_pending_task();
+        }
+        m_local_work_queue = nullptr;
+        m_interrupt_flags[index] = nullptr;
+    }
+
+    static void run_pending_task() {
+        task_type task;
+        m_local_work_queue->wait_and_pop(task);
+        if (task.isNullTask()) {
+            m_thread_need_stop.set();
+        } else {
             task();
         }
     }

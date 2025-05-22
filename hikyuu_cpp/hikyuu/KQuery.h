@@ -173,6 +173,14 @@ public:
         m_recoverType = recoverType;
     }
 
+    /**
+     * @brief 哈希值（谨慎）
+     * @note 由于 end 为 null 时，获取
+     * K线数据行为不一致，所以除非知道自己的使用场景，否则勿使用此方法
+     * @return size_t
+     */
+    uint64_t hash() const;
+
     /** 获取queryType名称，用于显示输出 */
     static string getQueryTypeName(QueryType);
 

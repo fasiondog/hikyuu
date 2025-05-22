@@ -90,6 +90,10 @@ public:
         m_queue.swap(tmp);
     }
 
+    void notify_all() {
+        m_cond.notify_all();
+    }
+
 private:
     mutable std::mutex m_mutex;
     std::queue<T> m_queue;

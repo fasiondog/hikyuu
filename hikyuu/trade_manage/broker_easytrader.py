@@ -17,13 +17,13 @@ class EasyTraderOrderBroker:
         self.user = user
         self.buffer = {}
 
-    def buy(self, market, code, price, num, stoploss, goal_price, part_from):
+    def buy(self, market, code, price, num, stoploss, goal_price, part_from, remark=""):
         # self.user.buy(code, price=price, amount=num)
         market_code = f"{market}{code}"
         print(f"计划买入：{market_code}  {price}  {num}")
         self.buffer[market_code] = (num, stoploss, goal_price)
 
-    def sell(self, market, code, price, num, stoploss, goal_price, part_from):
+    def sell(self, market, code, price, num, stoploss, goal_price, part_from, remark=""):
         # self.user.sell(code, price=price, amount=num)
         market_code = f"{market}{code}"
         print(f"计划卖出：{market_code}  {price}  {num}")
@@ -59,5 +59,5 @@ class EasyTraderOrderBroker:
                              number=v['可用余额'], stoploss=stoploss, goal_price=goal_price, cost_price=v['成本价']))
 
         ret = dict(datetime=str(Datetime.now()), cash=cash, positions=positions)
-        print(ret)
+        # print(ret)
         return ret

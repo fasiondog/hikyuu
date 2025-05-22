@@ -156,31 +156,33 @@ public:
     }
 
     TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice, double number,
-                    price_t stoploss, price_t goalPrice, price_t planPrice,
-                    SystemPart from) override {
+                    price_t stoploss, price_t goalPrice, price_t planPrice, SystemPart from,
+                    const string& remark) override {
         PYBIND11_OVERLOAD(TradeRecord, TradeManagerBase, buy, datetime, stock, realPrice, number,
-                          stoploss, goalPrice, planPrice, from);
+                          stoploss, goalPrice, planPrice, from, remark);
     }
 
     TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice, double number,
-                     price_t stoploss, price_t goalPrice, price_t planPrice,
-                     SystemPart from) override {
+                     price_t stoploss, price_t goalPrice, price_t planPrice, SystemPart from,
+                     const string& remark) override {
         PYBIND11_OVERLOAD(TradeRecord, TradeManagerBase, sell, datetime, stock, realPrice, number,
-                          stoploss, goalPrice, planPrice, from);
+                          stoploss, goalPrice, planPrice, from, remark);
     }
 
     TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                           double number, price_t stoploss, price_t goalPrice, price_t planPrice,
-                          SystemPart from) override {
+                          SystemPart from, const string& remark) override {
         PYBIND11_OVERRIDE_NAME(TradeRecord, TradeManagerBase, "sell_short", sellShort, datetime,
-                               stock, realPrice, number, stoploss, goalPrice, planPrice, from);
+                               stock, realPrice, number, stoploss, goalPrice, planPrice, from,
+                               remark);
     }
 
     TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                          double number, price_t stoploss, price_t goalPrice, price_t planPrice,
-                         SystemPart from) override {
+                         SystemPart from, const string& remark) override {
         PYBIND11_OVERRIDE_NAME(TradeRecord, TradeManagerBase, "buy_short", buyShort, datetime,
-                               stock, realPrice, number, stoploss, goalPrice, planPrice, from);
+                               stock, realPrice, number, stoploss, goalPrice, planPrice, from,
+                               remark);
     }
 
     bool borrowCash(const Datetime& datetime, price_t cash) override {
@@ -500,8 +502,8 @@ void export_TradeManager(py::module& m) {
       .def(
         "buy", &TradeManagerBase::buy, py::arg("datetime"), py::arg("stock"), py::arg("real_price"),
         py::arg("num"), py::arg("stoploss") = 0.0, py::arg("goal_price") = 0.0,
-        py::arg("plan_price") = 0.0, py::arg("part") = PART_INVALID,
-        R"(buy(self, datetime, stock, real_price, number[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID])
+        py::arg("plan_price") = 0.0, py::arg("part") = PART_INVALID, py::arg("remark") = "",
+        R"(buy(self, datetime, stock, real_price, number[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
 
     买入操作
 
@@ -513,13 +515,15 @@ void export_TradeManager(py::module& m) {
     :param float goal_price:  目标价格
     :param float plan_price:  计划买入价格
     :param SystemPart part:   交易指示来源
+    :param string remark:     备注信息
     :rtype: TradeRecord)")
 
       .def(
         "sell", &TradeManagerBase::sell, py::arg("datetime"), py::arg("stock"),
         py::arg("real_price"), py::arg("num") = MAX_DOUBLE, py::arg("stoploss") = 0.0,
         py::arg("goal_price") = 0.0, py::arg("plan_price") = 0.0, py::arg("part") = PART_INVALID,
-        R"(sell(self, datetime, stock, realPrice[, number=constant.max_double, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID])
+        py::arg("remark") = "",
+        R"(sell(self, datetime, stock, realPrice[, number=constant.max_double, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
 
     卖出操作
 
@@ -531,6 +535,7 @@ void export_TradeManager(py::module& m) {
     :param float goal_price:  新的目标价格
     :param float plan_price:  原计划卖出价格
     :param SystemPart part:   交易指示来源
+    :param string remark:     交易备注
     :rtype: TradeRecord)")
 
       .def("buy_short", &TradeManagerBase::buyShort)

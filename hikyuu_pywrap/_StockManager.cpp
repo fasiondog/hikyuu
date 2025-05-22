@@ -80,6 +80,14 @@ void export_StockManager(py::module& m) {
     :return: 相应的市场信息，如果相应的市场信息不存在，则返回Null<MarketInfo>()
     :rtype: MarketInfo)")
 
+      .def("get_market_stock", &StockManager::getMarketStock, R"(get_market_stock(self, market)
+
+    获取指定市场的代表指数（可能为空）
+
+    :param string market: 指定的市场标识（市场简称）
+    :return: 相应的市场代表指数，如果相应的市场信息不存在，则返回Null<Stock>()
+    :rtype: Stock)")
+
       .def("get_stock_type_info", &StockManager::getStockTypeInfo,
            R"(get_stock_type_info(self, stk_type)
 

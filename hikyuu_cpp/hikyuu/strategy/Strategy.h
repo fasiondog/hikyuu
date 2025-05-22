@@ -128,6 +128,24 @@ public:
     KData getLastKData(const Stock& stk, size_t lastnum, const KQuery::KType& ktype,
                        KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const;
 
+    /**
+     * @brief 按股下单，+正数买入，-负数卖出
+     * @param stk 交易标的
+     * @param num 交易数量
+     * @param remark 交易备注
+     * @return TradeRecord
+     */
+    virtual TradeRecord order(const Stock& stk, double num, const string& remark = "");
+
+    /**
+     * @brief 按价值下单，即买入指定资金数量的股票
+     * @param stk 交易标的
+     * @param value 价值
+     * @param remark 交易备注
+     * @return TradeRecord
+     */
+    virtual TradeRecord orderValue(const Stock& stk, price_t value, const string& remark = "");
+
     virtual KData getKData(const Stock& stk, const Datetime& start_date, const Datetime& end_date,
                            const KQuery::KType& ktype,
                            KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const;
@@ -144,18 +162,13 @@ public:
     }
 
     virtual TradeRecord buy(const Stock& stk, price_t price, double num, double stoploss = 0.0,
-                            double goal_price = 0.0,
-                            SystemPart part_from = SystemPart::PART_SIGNAL) {
-        HKU_ASSERT(m_tm);
-        return m_tm->buy(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from);
-    }
+                            double goal_price = 0.0, SystemPart part_from = SystemPart::PART_SIGNAL,
+                            const string& remark = "");
 
     virtual TradeRecord sell(const Stock& stk, price_t price, double num, price_t stoploss = 0.0,
                              price_t goal_price = 0.0,
-                             SystemPart part_from = SystemPart::PART_SIGNAL) {
-        HKU_ASSERT(m_tm);
-        return m_tm->sell(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from);
-    }
+                             SystemPart part_from = SystemPart::PART_SIGNAL,
+                             const string& remark = "");
 
     virtual bool isBacktesting() const {
         return false;

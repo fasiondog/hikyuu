@@ -20,7 +20,8 @@ namespace hku {
  * @ingroup Indicator
  */
 inline Indicator RSI(int n = 14) {
-    Indicator diff = REF(0) - REF(1);
+    Indicator data = Indicator();
+    Indicator diff = REF(data, 0) - REF(data, 1);
     Indicator u = IF(diff > 0, diff, 0);
     Indicator d = IF(diff < 0, (-1) * diff, 0);
     Indicator ema_u = EMA(u, n);
@@ -31,10 +32,10 @@ inline Indicator RSI(int n = 14) {
     Indicator rsi = (_1 - _1 / (_1 + rs)) * CVAL(100);
     rsi.name("RSI");
     rsi.setParam<int>("n", n);
-    return rsi;
+    return rsi(data);
 }
 
-inline Indicator RSI(const Indicator& data, int n) {
+inline Indicator RSI(const Indicator& data, int n = 14) {
     return RSI(n)(data);
 }
 

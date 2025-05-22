@@ -1,18 +1,22 @@
 /*
  *  Copyright (c) 2025 hikyuu.org
  *
- *  Created on: 2025-05-17
+ *  Created on: 2025-05-19
  *      Author: fasiondog
  */
 
 #pragma once
-#ifndef INDICATOR_CRT_WITHKTYPE_H_
-#define INDICATOR_CRT_WITHKTYPE_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
 
 namespace hku {
 
+/**
+ * @brief 将指标数据转换到指定周期
+ * @param ktype 指定周期
+ * @param fill_null 扩展时填充null数据，否则为使用最近值填充
+ * @return Indicator
+ */
 Indicator HKU_API WITHKTYPE(const KQuery::KType& ktype, bool fill_null = false);
 
 Indicator HKU_API WITHKTYPE(const Indicator& ind, const KQuery::KType& ktype,
@@ -130,6 +134,17 @@ inline Indicator WITHHOUR4(const Indicator& ind, bool fill_null = false) {
     return WITHKTYPE(ind, KQuery::HOUR4, fill_null);
 }
 
-}  // namespace hku
+/**
+ * @brief 计算指标值在指定板块中的排名
+ * @param block 指定板块
+ * @param ref_ind 指标
+ * @param mode 排名模式，0-降序排名(最高值排名为1), 1-升序排名(最低值排名为1), 2-降序排名百分比,
+ * 3-升序排名百分比
+ * @param fill_null 是否填充null数据
+ * @param market 指定市场（对齐日期）
+ * @return Indicator
+ */
+Indicator HKU_API RANK(const Block& block, const Indicator& ref_ind, int mode = 0,
+                       bool fill_null = true, const string& market = "SH");
 
-#endif /* INDICATOR_CRT_WITHKTYPE_H_ */
+}  // namespace hku

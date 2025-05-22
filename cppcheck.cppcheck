@@ -27,6 +27,12 @@
     <paths>
         <dir name="hikyuu_cpp/hikyuu"/>
         <dir name="hikyuu_cpp/hikyuu_server"/>
+        <dir name="../hku_plugin/plugin_extind/src"/>
+        <dir name="../hku_plugin/plugin_backtest/src"/>
+        <dir name="../hku_plugin/lic"/>
+        <dir name="../hku_plugin/plugin_dataserver/src"/>
+        <dir name="../hku_plugin/plugin_device/src"/>
+        <dir name="../hku_plugin/plugin_import2hdf5/src"/>
     </paths>
     <libraries>
         <library>boost</library>

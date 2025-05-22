@@ -35,7 +35,7 @@
 
 from hikyuu import (
     Query, StockManager, AMA, STDEV, CVAL, PRICELIST, EMA, CLOSE, HIGH, LOW, OPEN, KDATA, POS, SG_Single, SG_Cross,
-    SG_Flex, BUSINESS
+    SG_Flex, RESULT
 )
 from .drawplot import (show_gcf, create_figure, ax_set_locator_formatter, adjust_axes_show, ax_draw_macd)
 
@@ -175,7 +175,7 @@ def draw2(
     CVAL(c, 0.2).plot(axes=ax2, color='r', linestyle='--', kref=kdata)
 
     if ama1.name == "AMA":
-        cer = PRICELIST(cama, 1)
+        cer = RESULT(cama, 1)
         label = "ER(%s)" % cer[-1]
         cer.plot(axes=ax3, color='b', marker='.', label=label, legend_on=False, text_on=True, kref=kdata)
         CVAL(c, 0.8).plot(axes=ax3, color='r', linestyle='--', kref=kdata)

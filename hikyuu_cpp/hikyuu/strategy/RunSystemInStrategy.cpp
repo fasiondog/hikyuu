@@ -36,7 +36,7 @@ void RunSystemInStrategy::run(const Stock& stock) {
         const auto& stock = m_sys->getStock();
         m_broker->buy(m_buyRequest.datetime, stock.market(), stock.code(), 10.0,
                       m_buyRequest.number, m_buyRequest.stoploss, m_buyRequest.goal,
-                      m_buyRequest.from);
+                      m_buyRequest.from, "");
     }
 
     if (m_sys->getParam<bool>("sell_delay") && m_sellRequest.valid) {
@@ -45,7 +45,7 @@ void RunSystemInStrategy::run(const Stock& stock) {
         const auto& stock = m_sys->getStock();
         m_broker->sell(m_sellRequest.datetime, stock.market(), stock.code(), 10.0,
                        m_sellRequest.number, m_sellRequest.stoploss, m_sellRequest.goal,
-                       m_sellRequest.from);
+                       m_sellRequest.from, "");
     }
 
     m_sys->getTM()->fetchAssetInfoFromBroker(m_broker);

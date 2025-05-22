@@ -229,7 +229,8 @@ public:
      */
     virtual TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
                             double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                            price_t planPrice = 0.0, SystemPart from = PART_INVALID) override;
+                            price_t planPrice = 0.0, SystemPart from = PART_INVALID,
+                            const string& remark = "") override;
 
     /**
      * 卖出操作
@@ -246,7 +247,7 @@ public:
     virtual TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                              double number = MAX_DOUBLE, price_t stoploss = 0.0,
                              price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                             SystemPart from = PART_INVALID) override;
+                             SystemPart from = PART_INVALID, const string& remark = "") override;
 
     /**
      * 卖空
@@ -262,7 +263,8 @@ public:
      */
     virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                   double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                                  price_t planPrice = 0.0, SystemPart from = PART_INVALID) override;
+                                  price_t planPrice = 0.0, SystemPart from = PART_INVALID,
+                                  const string& remark = "") override;
 
     /**
      * 卖空后回补
@@ -279,7 +281,8 @@ public:
     virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                  double number = MAX_DOUBLE, price_t stoploss = 0.0,
                                  price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                                 SystemPart from = PART_INVALID) override;
+                                 SystemPart from = PART_INVALID,
+                                 const string& remark = "") override;
 
     /**
      * 借入资金，从其他来源借取的资金，如融资
@@ -400,7 +403,7 @@ private:
     TradeRecordList m_trade_list;  // 交易记录
 
     typedef map<uint64_t, PositionRecord> position_map_type;
-    position_map_type m_position;  // 当前持仓交易对象的持仓记录 ["sh000001"-> ]
+    position_map_type m_position;                 // 当前持仓交易对象的持仓记录 ["sh000001"-> ]
     PositionRecordList m_position_history;        // 持仓历史记录
     position_map_type m_short_position;           // 空头仓位记录
     PositionRecordList m_short_position_history;  // 空头仓位历史记录

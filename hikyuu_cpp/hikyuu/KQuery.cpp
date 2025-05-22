@@ -5,7 +5,8 @@
  *      Author: fasiondog
  */
 
-#include <boost/algorithm/string.hpp>
+#include <boost/functional/hash.hpp>
+#include <xxhash.h>
 #include "KQuery.h"
 
 namespace hku {
@@ -97,6 +98,24 @@ Datetime KQuery::endDatetime() const {
     uint64_t number = (uint64_t)(m_end / 100);
     Datetime d(number);
     return Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), m_end - number * 100);
+}
+
+uint64_t KQuery::hash() const {
+    XXH64_state_t* state = XXH64_createState();
+    HKU_IF_RETURN(!state, 0);
+
+    uint64_t seed = 0;
+    XXH64_reset(state, seed);
+    XXH64_update(state, &m_start, sizeof(m_start));
+    XXH64_update(state, &m_end, sizeof(m_end));
+    XXH64_update(state, &m_queryType, sizeof(m_queryType));
+    XXH64_update(state, &m_recoverType, sizeof(m_recoverType));
+    XXH64_update(state, m_dataType.data(), m_dataType.size());
+
+    // 获取最终哈希值
+    uint64_t result = XXH64_digest(state);
+    XXH64_freeState(state);
+    return result;
 }
 
 string KQuery::getQueryTypeName(QueryType queryType) {

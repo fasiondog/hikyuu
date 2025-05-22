@@ -345,7 +345,7 @@ template <>
 class hash<hku::Stock> {
 public:
     size_t operator()(hku::Stock const& stk) const noexcept {
-        return stk.id();  // or use boost::hash_combine
+        return stk.id();
     }
 };
 }  // namespace std

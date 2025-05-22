@@ -8,3 +8,7 @@
 #pragma once
 
 #include "algorithm.h"
+#include "GlobalThreadPool.h"
+#include "GlobalMQThreadPool.h"
+#include "GlobalStealThreadPool.h"
+#include "GlobalMQStealThreadPool.h"

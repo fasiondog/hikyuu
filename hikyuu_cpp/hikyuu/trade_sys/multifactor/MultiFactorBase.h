@@ -44,9 +44,7 @@ public:
     }
 
     /** 获取参考日期列表 */
-    const DatetimeList& getDatetimeList() const {
-        return m_ref_dates;
-    }
+    const DatetimeList& getDatetimeList();
 
     /** 获取查询范围 */
     const KQuery& getQuery() const {
@@ -89,7 +87,7 @@ public:
     const Indicator& getFactor(const Stock&);
 
     /**
-     * 获取所有证券合成后的新因子，顺序与传入的证券组合相同
+     * 获取所有证券合成后的新因子，顺序与传入的证券组合相同, 谨慎使用，非线程安全
      */
     const IndicatorList& getAllFactors();
 
