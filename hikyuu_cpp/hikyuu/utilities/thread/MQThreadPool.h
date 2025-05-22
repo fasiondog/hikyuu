@@ -184,6 +184,7 @@ public:
 
         for (size_t i = 0; i < m_worker_num; i++) {
             m_queues[i]->push(FuncWrapper());
+            m_queues[i]->notify_all();
         }
 
         // 等待线程结束
@@ -191,6 +192,10 @@ public:
             if (m_threads[i].joinable()) {
                 m_threads[i].join();
             }
+        }
+
+        for (size_t i = 0; i < m_worker_num; i++) {
+            m_thread_need_stop[i].set();
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
