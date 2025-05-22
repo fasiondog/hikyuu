@@ -11,13 +11,12 @@
 #include <functional>
 #include <vector>
 #include "ThreadPool.h"
-#include "StealThreadPool.h"
 #include "MQThreadPool.h"
-#include "MQStealThreadPool.h"
 
 //----------------------------------------------------------------
-// Note: 除 ThreadPool 外，其他线程池在C++17标准以下或clang中，由于使用
-//       了 thread_local，本质为全局变量，只适合全局单例的方式使用
+// Note: 除 ThreadPool/MQThreadPool 外，其他线程池由于使用
+//       了 thread_local，本质为全局变量，只适合全局单例的方式使用,
+//       否则会出现不同线程池示例互相影响导致出错。
 //----------------------------------------------------------------
 
 namespace hku {

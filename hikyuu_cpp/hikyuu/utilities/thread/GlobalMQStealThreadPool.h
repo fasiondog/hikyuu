@@ -1,5 +1,5 @@
 /*
- * StealMQStealThreadPool.h
+ * StealGlobalMQStealThreadPool.h
  *
  *  Copyright (c) 2019 hikyuu.org
  *
@@ -30,25 +30,25 @@ namespace hku {
 
 /**
  * @brief 无集中队列多队列偷取任务池
- * @ingroup MQStealThreadPool
+ * @ingroup GlobalMQStealThreadPool
  */
 #ifdef _MSC_VER
-class MQStealThreadPool {
+class GlobalMQStealThreadPool {
 #else
-class HKU_UTILS_API MQStealThreadPool {
+class HKU_UTILS_API GlobalMQStealThreadPool {
 #endif
 public:
     /**
      * 默认构造函数，创建和当前系统CPU数一致的线程数
      */
-    MQStealThreadPool() : MQStealThreadPool(std::thread::hardware_concurrency()) {}
+    GlobalMQStealThreadPool() : GlobalMQStealThreadPool(std::thread::hardware_concurrency()) {}
 
     /**
      * 构造函数，创建指定数量的线程
      * @param n 指定的线程数
      * @param until_empty 任务队列为空时，自动停止运行
      */
-    explicit MQStealThreadPool(size_t n, bool until_empty = true)
+    explicit GlobalMQStealThreadPool(size_t n, bool until_empty = true)
     : m_done(false), m_worker_num(n), m_runnging_until_empty(until_empty) {
         try {
             m_interrupt_flags.resize(m_worker_num, nullptr);
@@ -58,7 +58,7 @@ public:
             }
             // 初始完毕所有线程资源后再启动线程
             for (int i = 0; i < m_worker_num; i++) {
-                m_threads.emplace_back(&MQStealThreadPool::worker_thread, this, i);
+                m_threads.emplace_back(&GlobalMQStealThreadPool::worker_thread, this, i);
             }
         } catch (...) {
             m_done = true;
@@ -69,7 +69,7 @@ public:
     /**
      * 析构函数，等待并阻塞至线程池内所有任务完成
      */
-    ~MQStealThreadPool() {
+    ~GlobalMQStealThreadPool() {
         if (!m_done) {
             join();
         }
@@ -106,7 +106,8 @@ public:
     template <typename FunctionType>
     auto submit(FunctionType f) {
         if (m_thread_need_stop.isSet() || m_done) {
-            throw std::logic_error("You can't submit a task to the stopped MQStealThreadPool!");
+            throw std::logic_error(
+              "You can't submit a task to the stopped GlobalMQStealThreadPool!");
         }
 
         typedef typename std::invoke_result<FunctionType>::type result_type;

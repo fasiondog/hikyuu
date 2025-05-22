@@ -1,5 +1,5 @@
 /*
- * StealThreadPool.h
+ * GlobalStealThreadPool.h
  *
  *  Copyright (c) 2019 hikyuu.org
  *
@@ -37,22 +37,22 @@ namespace hku {
  * @ingroup ThreadPool
  */
 #ifdef _MSC_VER
-class StealThreadPool {
+class GlobalStealThreadPool {
 #else
-class HKU_UTILS_API StealThreadPool {
+class HKU_UTILS_API GlobalStealThreadPool {
 #endif
 public:
     /**
      * 默认构造函数，创建和当前系统CPU数一致的线程数
      */
-    StealThreadPool() : StealThreadPool(std::thread::hardware_concurrency()) {}
+    GlobalStealThreadPool() : GlobalStealThreadPool(std::thread::hardware_concurrency()) {}
 
     /**
      * 构造函数，创建指定数量的线程
      * @param n 指定的线程数
      * @param until_empty 任务队列为空时，自动停止运行
      */
-    explicit StealThreadPool(size_t n, bool until_empty = true)
+    explicit GlobalStealThreadPool(size_t n, bool until_empty = true)
     : m_done(false), m_worker_num(n), m_running_until_empty(until_empty) {
         try {
             m_interrupt_flags.resize(m_worker_num, nullptr);
@@ -62,7 +62,7 @@ public:
             }
             // 初始完毕所有线程资源后再启动线程
             for (int i = 0; i < m_worker_num; i++) {
-                m_threads.emplace_back(&StealThreadPool::worker_thread, this, i);
+                m_threads.emplace_back(&GlobalStealThreadPool::worker_thread, this, i);
             }
         } catch (...) {
             m_done = true;
@@ -73,7 +73,7 @@ public:
     /**
      * 析构函数，等待并阻塞至线程池内所有任务完成
      */
-    ~StealThreadPool() {
+    ~GlobalStealThreadPool() {
         if (!m_done) {
             join();
         }
@@ -109,7 +109,8 @@ public:
     template <typename FunctionType>
     auto submit(FunctionType f) {
         if (m_thread_need_stop.isSet() || m_done) {
-            throw std::logic_error("You can't submit a task to the stopped StealThreadPool!!");
+            throw std::logic_error(
+              "You can't submit a task to the stopped GlobalStealThreadPool!!");
         }
 
         typedef typename std::invoke_result<FunctionType>::type result_type;
