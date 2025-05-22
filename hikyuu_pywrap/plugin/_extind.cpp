@@ -188,5 +188,15 @@ void export_extend_Indicator(py::module& m) {
           return RANK(blk, ref_ind, mode, fill_null, market);
       },
       py::arg("stks"), py::arg("ref_ind"), py::arg("mode") = 0, py::arg("fill_null") = true,
-      py::arg("market") = "SH");
+      py::arg("market") = "SH", R"(RANK(stks, ref_ind, mode = 0, fill_null = true, market = 'SH')
+      
+    计算指标值在指定板块中的排名
+
+    :param stks: 指定证券列表 或 Block
+    :param ref_ind: 参考指标
+    :param mode: 排序方式: 0-降序排名(最高值排名为1), 1-升序排名(最低值排名为1), 2-降序排名百分比, 3-升序排名百分比
+    :param fill_null: 是否填充缺失值
+    :param market: 板块所属市场
+    :return: 指标值在指定板块中的排名
+    :rtype: Indicator)");
 }
