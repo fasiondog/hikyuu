@@ -24,7 +24,7 @@
 * :py:func:`RESULT` - 以指标公式的方式返回指定指标中相应的结果集
 * :py:func:`SLICE` - 获取某指标中指定范围 [start, end) 的数据，生成新的指标
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
-* :py:func:`WITHKTYPE` - 将指标数据转换到指定的K线类型。相关便捷函数: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
+* :py:func:`WITHKTYPE` - [VIP]将指标数据转换到指定的K线类型。相关便捷函数: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
 * :py:func:`ZSCORE` - ZScore 标准化
 
 
@@ -113,6 +113,7 @@
 
 * :py:func:`AVEDEV` - 平均绝对偏差
 * :py:func:`DEVSQ` - 数据偏差平方和
+* :py:func:`RANK` - [VIP]计算指标值在指定板块中的排名
 * :py:func:`STD` - 估算标准差，同 STDEV
 * :py:func:`STDEV` - 计算N周期内样本标准差
 * :py:func:`STDP` - 总体标准差
