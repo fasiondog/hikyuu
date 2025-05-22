@@ -148,13 +148,10 @@ public:
      * 等待各线程完成当前执行的任务后立即结束退出
      */
     void stop() {
-        if (m_done) {
+        if (m_done.exchange(true, std::memory_order_relaxed)) {
             return;
         }
 
-        m_done = true;
-
-        // 同时加入结束任务指示，以便在dll退出时也能够终止
         for (size_t i = 0; i < m_worker_num; i++) {
             m_thread_need_stop[i].set();
             m_queues[i]->push(FuncWrapper());
@@ -181,27 +178,8 @@ public:
         }
 
         // 指示各工作线程在未获取到工作任务时，停止运行
-        if (m_runnging_until_empty) {
-            while (true) {
-                bool can_quit = true;
-                for (size_t i = 0; i < m_worker_num; i++) {
-                    if (m_queues[i]->size() != 0) {
-                        can_quit = false;
-                        break;
-                    }
-                }
-
-                if (can_quit) {
-                    break;
-                }
-
-                std::this_thread::yield();
-            }
-
+        if (!m_runnging_until_empty) {
             m_done = true;
-            for (size_t i = 0; i < m_worker_num; i++) {
-                m_thread_need_stop[i].set();
-            }
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -233,17 +211,15 @@ private:
     std::vector<std::thread> m_threads;                                 // 工作线程
 
     void worker_thread(int index) {
-        while (!m_thread_need_stop[index].isSet() || !m_done) {
-            run_pending_task(index);
-        }
-    }
-
-    void run_pending_task(int index) {
-        task_type task;
-        m_queues[index]->wait_and_pop(task);
-        if (task.isNullTask()) {
-            m_thread_need_stop[index].set();
-        } else {
+        auto *local_queue = m_queues[index].get();
+        auto *local_stop_flag = &m_thread_need_stop[index];
+        while (!local_stop_flag->isSet() || !m_done) {
+            task_type task;
+            local_queue->wait_and_pop(task);
+            if (task.isNullTask()) {
+                local_stop_flag->set();
+                break;
+            }
             task();
         }
     }

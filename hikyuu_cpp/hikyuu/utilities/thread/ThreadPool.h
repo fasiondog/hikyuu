@@ -114,16 +114,16 @@ public:
      * 等待各线程完成当前执行的任务后立即结束退出
      */
     void stop() {
-        if (m_done) {
+        if (m_done.exchange(true, std::memory_order_relaxed)) {
             return;
         }
-
-        m_done = true;
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
         for (size_t i = 0; i < m_worker_num; i++) {
             m_master_work_queue.push(FuncWrapper());
         }
+
+        m_master_work_queue.notify_all();
 
         for (size_t i = 0; i < m_worker_num; i++) {
             if (m_threads[i].joinable()) {
@@ -144,19 +144,16 @@ public:
         }
 
         // 指示各工作线程在未获取到工作任务时，停止运行
-        if (m_running_until_empty) {
-            while (m_master_work_queue.size() > 0) {
-                std::this_thread::yield();
-            }
+        if (!m_running_until_empty) {
+            m_done = true;
         }
-
-        m_done = true;
-        m_master_work_queue.setNotifyAll(true);
 
         // 仍旧有可能某个线程没有获取到，导致没有终止
         for (size_t i = 0; i < 2 * m_worker_num; i++) {
             m_master_work_queue.push(FuncWrapper());
         }
+
+        m_master_work_queue.notify_all();
 
         for (size_t i = 0; i < m_worker_num; i++) {
             if (m_threads[i].joinable()) {
@@ -164,8 +161,8 @@ public:
             }
         }
 
-        m_master_work_queue.clear();
         m_done = true;
+        m_master_work_queue.clear();
     }
 
 private:
@@ -179,20 +176,15 @@ private:
 
     void worker_thread(int index) {
         while (!m_done) {
-            run_pending_task();
-            // std::this_thread::yield();
-        }
-    }
-
-    void run_pending_task() {
-        task_type task;
-        m_master_work_queue.wait_and_pop(task);
-        if (task.isNullTask()) {
-            m_done = true;
-        } else {
+            task_type task;
+            m_master_work_queue.wait_and_pop(task);
+            if (task.isNullTask()) {
+                break;
+            }
             task();
         }
     }
+
 };  // namespace hku
 
 } /* namespace hku */

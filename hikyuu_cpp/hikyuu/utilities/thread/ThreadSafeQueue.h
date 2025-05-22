@@ -30,11 +30,7 @@ public:
     void push(T&& item) {
         std::lock_guard<std::mutex> lk(m_mutex);
         m_queue.push(std::move(item));
-        if (m_notify_all) {
-            m_cond.notify_all();
-        } else {
-            m_cond.notify_one();
-        }
+        m_cond.notify_one();
     }
 
     /** 等待直到从队列头部取出一个元素 */
@@ -94,16 +90,14 @@ public:
         m_queue.swap(tmp);
     }
 
-    void setNotifyAll(bool flag) {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_notify_all = flag;
+    void notify_all() {
+        m_cond.notify_all();
     }
 
 private:
     mutable std::mutex m_mutex;
     std::queue<T> m_queue;
     std::condition_variable m_cond;
-    bool m_notify_all{false};
 };
 
 } /* namespace hku */
