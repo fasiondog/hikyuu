@@ -533,7 +533,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 }
 
 void MultiFactorBase::_buildIndex() {
-    SPEND_TIME(MultiFactor_buildIndex)
+    // SPEND_TIME(MultiFactor_buildIndex)
     int mode = getParam<int>("mode");
     if (0 == mode) {
         _buildIndexDesc();
