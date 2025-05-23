@@ -78,12 +78,14 @@ MultiFactorBase::MultiFactorBase(const MultiFactorBase& base)
 
 MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stks,
                                  const KQuery& query, const Stock& ref_stk, const string& name,
-                                 int ic_n, bool spearman)
+                                 int ic_n, bool spearman, int mode)
 : m_name(name), m_inds(inds), m_stks(stks), m_ref_stk(ref_stk), m_query(query) {
     initParam();
-    setParam<bool>("spearman", spearman);
+    setParam<bool>("use_spearman", spearman);
     setParam<int>("ic_n", ic_n);
+    setParam<int>("mode", mode);
     checkParam("ic_n");
+    checkParam("mode");
     _checkData();
 }
 
@@ -97,6 +99,7 @@ void MultiFactorBase::initParam() {
     setParam<double>("zscore_nsigma", 3.0);
     setParam<bool>("use_spearman", true);  // 默认使用SPEARMAN计算相关系数, 否则使用pearson相关系数
     setParam<bool>("parallel", true);
+    setParam<int>("mode", 0);  // 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
 }
 
 void MultiFactorBase::baseCheckParam(const string& name) const {
@@ -104,6 +107,9 @@ void MultiFactorBase::baseCheckParam(const string& name) const {
         HKU_ASSERT(getParam<int>("ic_n") >= 1);
     } else if ("zscore_nsigma" == name) {
         HKU_ASSERT(getParam<double>("zscore_nsigma") > 0.0);
+    } else if ("mode" == name) {
+        int mode = getParam<int>("mode");
+        HKU_ASSERT(mode == 0 || mode == 1 || mode == 2);
     }
 }
 
@@ -527,6 +533,18 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 }
 
 void MultiFactorBase::_buildIndex() {
+    SPEND_TIME(MultiFactor_buildIndex)
+    int mode = getParam<int>("mode");
+    if (0 == mode) {
+        _buildIndexDesc();
+    } else if (1 == mode) {
+        _buildIndexAsc();
+    } else {
+        _buildIndexNone();
+    }
+}
+
+void MultiFactorBase::_buildIndexDesc() {
     size_t stk_count = m_stks.size();
     HKU_ASSERT(stk_count == m_all_factors.size());
     for (size_t i = 0; i < stk_count; i++) {
@@ -552,6 +570,58 @@ void MultiFactorBase::_buildIndex() {
             }
             return a.value > b.value;
         });
+        m_stk_factor_by_date[i] = std::move(one_day);
+        m_date_index[m_ref_dates[i]] = i;
+    }
+}
+
+void MultiFactorBase::_buildIndexAsc() {
+    size_t stk_count = m_stks.size();
+    HKU_ASSERT(stk_count == m_all_factors.size());
+    for (size_t i = 0; i < stk_count; i++) {
+        m_stk_map[m_stks[i]] = i;
+    }
+
+    // 建立每日截面的索引，并每日升序排序
+    size_t days_total = m_ref_dates.size();
+    m_stk_factor_by_date.resize(days_total);
+    ScoreRecordList one_day;
+    for (size_t i = 0; i < days_total; i++) {
+        one_day.resize(stk_count);
+        for (size_t j = 0; j < stk_count; j++) {
+            one_day[j] = ScoreRecord(m_stks[j], m_all_factors[j][i]);
+        }
+        std::sort(one_day.begin(), one_day.end(), [](const ScoreRecord& a, const ScoreRecord& b) {
+            if (std::isnan(a.value) && std::isnan(b.value)) {
+                return false;
+            } else if (!std::isnan(a.value) && std::isnan(b.value)) {
+                return true;
+            } else if (std::isnan(a.value) && !std::isnan(b.value)) {
+                return false;
+            }
+            return a.value < b.value;
+        });
+        m_stk_factor_by_date[i] = std::move(one_day);
+        m_date_index[m_ref_dates[i]] = i;
+    }
+}
+
+void MultiFactorBase::_buildIndexNone() {
+    size_t stk_count = m_stks.size();
+    HKU_ASSERT(stk_count == m_all_factors.size());
+    for (size_t i = 0; i < stk_count; i++) {
+        m_stk_map[m_stks[i]] = i;
+    }
+
+    // 建立每日截面的索引，不排序
+    size_t days_total = m_ref_dates.size();
+    m_stk_factor_by_date.resize(days_total);
+    ScoreRecordList one_day;
+    for (size_t i = 0; i < days_total; i++) {
+        one_day.resize(stk_count);
+        for (size_t j = 0; j < stk_count; j++) {
+            one_day[j] = ScoreRecord(m_stks[j], m_all_factors[j][i]);
+        }
         m_stk_factor_by_date[i] = std::move(one_day);
         m_date_index[m_ref_dates[i]] = i;
     }

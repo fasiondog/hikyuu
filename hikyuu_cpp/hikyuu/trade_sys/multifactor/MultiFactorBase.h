@@ -29,7 +29,7 @@ public:
     MultiFactorBase();
     explicit MultiFactorBase(const string& name);
     MultiFactorBase(const IndicatorList& inds, const StockList& stks, const KQuery& query,
-                    const Stock& ref_stk, const string& name, int ic_n, bool spearman);
+                    const Stock& ref_stk, const string& name, int ic_n, bool spearman, int mode);
     MultiFactorBase(const MultiFactorBase&);
     virtual ~MultiFactorBase() = default;
 
@@ -151,7 +151,11 @@ private:
     void initParam();
 
 protected:
-    void _buildIndex();  // 计算完成后创建截面索引
+    void _buildIndex();      // 计算完成后创建截面索引
+    void _buildIndexDesc();  // 创建降序排列的索引
+    void _buildIndexAsc();   // 创建升序排列的索引
+    void _buildIndexNone();  // build index when no index
+
     IndicatorList _getAllReturns(int ndays) const;
     void _checkData();
 

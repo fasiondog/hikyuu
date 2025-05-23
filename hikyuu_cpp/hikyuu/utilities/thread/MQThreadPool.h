@@ -180,6 +180,9 @@ public:
         // 指示各工作线程在未获取到工作任务时，停止运行
         if (!m_runnging_until_empty) {
             m_done = true;
+            for (size_t i = 0; i < m_worker_num; i++) {
+                m_thread_need_stop[i].set();
+            }
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -192,14 +195,6 @@ public:
             if (m_threads[i].joinable()) {
                 m_threads[i].join();
             }
-        }
-
-        for (size_t i = 0; i < m_worker_num; i++) {
-            m_thread_need_stop[i].set();
-        }
-
-        for (size_t i = 0; i < m_worker_num; i++) {
-            m_queues[i]->clear();
         }
 
         m_done = true;

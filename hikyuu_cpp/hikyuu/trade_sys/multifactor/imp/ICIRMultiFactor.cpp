@@ -23,8 +23,8 @@ ICIRMultiFactor::ICIRMultiFactor() : MultiFactorBase("MF_ICIRWeight") {
 
 ICIRMultiFactor::ICIRMultiFactor(const vector<Indicator>& inds, const StockList& stks,
                                  const KQuery& query, const Stock& ref_stk, int ic_n,
-                                 int ic_rolling_n, bool spearman)
-: MultiFactorBase(inds, stks, query, ref_stk, "MF_ICIRWeight", ic_n, spearman) {
+                                 int ic_rolling_n, bool spearman, int mode)
+: MultiFactorBase(inds, stks, query, ref_stk, "MF_ICIRWeight", ic_n, spearman, mode) {
     setParam<int>("ic_rolling_n", ic_rolling_n);
     checkParam("ic_rolling_n");
 }
@@ -148,8 +148,9 @@ MultiFactorPtr HKU_API MF_ICIRWeight() {
 
 MultiFactorPtr HKU_API MF_ICIRWeight(const IndicatorList& inds, const StockList& stks,
                                      const KQuery& query, const Stock& ref_stk, int ic_n,
-                                     int ic_rolling_n, bool spearman) {
-    return make_shared<ICIRMultiFactor>(inds, stks, query, ref_stk, ic_n, ic_rolling_n, spearman);
+                                     int ic_rolling_n, bool spearman, int mode) {
+    return make_shared<ICIRMultiFactor>(inds, stks, query, ref_stk, ic_n, ic_rolling_n, spearman,
+                                        mode);
 }
 
 }  // namespace hku
