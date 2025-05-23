@@ -193,7 +193,7 @@ static void insum_rank_desc(const IndicatorList& inds, Indicator::value_t* dst,
     }
 }
 
-// 排名按升序，指标值最低的排名为1
+// 排名按升序，指标值最低的排名为1，指标值越高排名值越高
 static void insum_rank_asc(const IndicatorList& inds, Indicator::value_t* dst, const Indicator& ind,
                            size_t len) {
     size_t discard = ind.discard();
@@ -266,6 +266,7 @@ void IInSum::_calculate(const Indicator& ind) {
     } else if (3 == mode) {
         insum_min(inds, dst, total);
     } else if (4 == mode) {
+        // 指标值越高排名值越高
         auto nind = ind;
         if (ind.size() != total) {
             nind = ALIGN(ind, dates, getParam<bool>("fill_null"));
@@ -273,6 +274,7 @@ void IInSum::_calculate(const Indicator& ind) {
         }
         insum_rank_asc(inds, dst, nind, total);
     } else if (5 == mode) {
+        // 指标值越大排名值越低，即最大的值对应排名为1
         auto nind = ind;
         if (ind.size() != total) {
             nind = ALIGN(ind, dates, getParam<bool>("fill_null"));
