@@ -266,21 +266,21 @@ void IInSum::_calculate(const Indicator& ind) {
     } else if (3 == mode) {
         insum_min(inds, dst, total);
     } else if (4 == mode) {
-        // 指标值越高排名值越高
-        auto nind = ind;
-        if (ind.size() != total) {
-            nind = ALIGN(ind, dates, getParam<bool>("fill_null"));
-            HKU_CHECK(nind.size() == total, "ind size: {}  != total: {}", ind.size(), total);
-        }
-        insum_rank_asc(inds, dst, nind, total);
-    } else if (5 == mode) {
-        // 指标值越大排名值越低，即最大的值对应排名为1
+        // 指标值越大排名值越低，即指标最大的值对应排名值为1
         auto nind = ind;
         if (ind.size() != total) {
             nind = ALIGN(ind, dates, getParam<bool>("fill_null"));
             HKU_CHECK(nind.size() == total, "ind size: {}  != total: {}", ind.size(), total);
         }
         insum_rank_desc(inds, dst, nind, total);
+    } else if (5 == mode) {
+        // 指标值越高排名值越高，即指标值最低的排名值为1
+        auto nind = ind;
+        if (ind.size() != total) {
+            nind = ALIGN(ind, dates, getParam<bool>("fill_null"));
+            HKU_CHECK(nind.size() == total, "ind size: {}  != total: {}", ind.size(), total);
+        }
+        insum_rank_asc(inds, dst, nind, total);
     } else {
         HKU_ERROR("Not support mode: {}", mode);
     }

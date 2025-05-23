@@ -18,8 +18,8 @@ namespace hku {
  * @param block 指定板块
  * @param query 指定范围
  * @param ind 指定指标
- * @param mode 计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-升序排名(指标值越高排名值越高),
- * 5-降序排名(指标值最高的排名为1)
+ * @param mode 计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-降序排名(指标值最高的排名值为1)
+ * 5-升序排名(指标值最低的排名值为1),
  * @param fill_null 日期对齐时缺失数据填充 nan 值。
  * @return Indicator
  */
