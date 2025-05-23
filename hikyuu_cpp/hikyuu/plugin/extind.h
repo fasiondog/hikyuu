@@ -138,8 +138,8 @@ inline Indicator WITHHOUR4(const Indicator& ind, bool fill_null = false) {
  * @brief 计算指标值在指定板块中的排名
  * @param block 指定板块
  * @param ref_ind 指标
- * @param mode 排名模式，0-降序排名(最高值排名为1), 1-升序排名(最低值排名为1), 2-降序排名百分比,
- * 3-升序排名百分比
+ * @param mode 排名模式，0-升序排名(指标值越大排名值越大), 1-降序排名(指标值最高值排名为1),
+ * 2-升序排名百分比, 3-降序排名百分比
  * @param fill_null 是否填充null数据
  * @param market 指定市场（对齐日期）
  * @return Indicator
