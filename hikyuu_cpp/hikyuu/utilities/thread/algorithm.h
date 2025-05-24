@@ -11,9 +11,13 @@
 #include <functional>
 #include <vector>
 #include "ThreadPool.h"
-#include "StealThreadPool.h"
 #include "MQThreadPool.h"
-#include "MQStealThreadPool.h"
+
+//----------------------------------------------------------------
+// Note: 除 ThreadPool/MQThreadPool 外，其他线程池由于使用
+//       了 thread_local，本质为全局变量，只适合全局单例的方式使用,
+//       否则会出现不同线程池示例互相影响导致出错。
+//----------------------------------------------------------------
 
 namespace hku {
 
@@ -26,10 +30,6 @@ inline std::vector<range_t> parallelIndexRange(size_t start, size_t end) {
     }
 
     size_t total = end - start;
-    if (total == 0) {
-        return ret;
-    }
-
     size_t cpu_num = std::thread::hardware_concurrency();
     if (cpu_num == 1) {
         ret.emplace_back(start, end);
@@ -51,7 +51,7 @@ inline std::vector<range_t> parallelIndexRange(size_t start, size_t end) {
     return ret;
 }
 
-template <typename FunctionType, class TaskGroup = MQStealThreadPool>
+template <typename FunctionType, class TaskGroup = MQThreadPool>
 void parallel_for_index_void(size_t start, size_t end, FunctionType f) {
     auto ranges = parallelIndexRange(start, end);
     TaskGroup tg;
@@ -66,7 +66,7 @@ void parallel_for_index_void(size_t start, size_t end, FunctionType f) {
     return;
 }
 
-template <typename FunctionType, class TaskGroup = MQStealThreadPool>
+template <typename FunctionType, class TaskGroup = MQThreadPool>
 auto parallel_for_index(size_t start, size_t end, FunctionType f) {
     auto ranges = parallelIndexRange(start, end);
     TaskGroup tg;
@@ -93,7 +93,7 @@ auto parallel_for_index(size_t start, size_t end, FunctionType f) {
     return ret;
 }
 
-template <typename FunctionType, class TaskGroup = MQStealThreadPool>
+template <typename FunctionType, class TaskGroup = MQThreadPool>
 auto parallel_for_range(size_t start, size_t end, FunctionType f) {
     auto ranges = parallelIndexRange(start, end);
     TaskGroup tg;

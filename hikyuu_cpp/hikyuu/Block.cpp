@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include "xxhash.h"
 #include "StockManager.h"
 
 namespace hku {
@@ -153,6 +154,30 @@ void Block::setIndexStock(const Stock& stk) {
     if (!m_data)
         m_data = make_shared<Data>();
     m_data->m_indexStock = stk;
+}
+
+uint64_t Block::strongHash() const {
+    HKU_IF_RETURN(!m_data, 0);
+
+    XXH64_state_t* state = XXH64_createState();
+    HKU_IF_RETURN(!state, 0);
+
+    uint64_t seed = 0;
+    XXH64_reset(state, seed);
+
+    XXH64_update(state, m_data->m_category.data(), m_data->m_category.size());
+    XXH64_update(state, m_data->m_name.data(), m_data->m_name.size());
+
+    StockList stocks = getStockList();
+    for (const auto& stk : stocks) {
+        auto stkid = stk.id();
+        XXH64_update(state, &stkid, sizeof(stkid));
+    }
+
+    // 获取最终哈希值
+    uint64_t result = XXH64_digest(state);
+    XXH64_freeState(state);
+    return result;
 }
 
 HKU_API Block getBlock(const string& category, const string& name) {

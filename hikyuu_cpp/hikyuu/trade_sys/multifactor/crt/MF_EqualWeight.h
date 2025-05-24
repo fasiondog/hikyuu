@@ -18,11 +18,12 @@ namespace hku {
  * @param ref_stk 参考证券
  * @param ic_n 默认 IC 对应的 N 日收益率
  * @param spearman 默认使用 spearman 计算相关系数，否则为 pearson
+ * @param mode 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
  * @return MultiFactorPtr
  */
 MultiFactorPtr HKU_API MF_EqualWeight(const IndicatorList& inds, const StockList& stks,
                                       const KQuery& query, const Stock& ref_stk, int ic_n = 5,
-                                      bool spearman = true);
+                                      bool spearman = true, int mode = 0);
 
 MultiFactorPtr HKU_API MF_EqualWeight();
 

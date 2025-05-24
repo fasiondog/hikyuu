@@ -29,7 +29,7 @@ public:
     MultiFactorBase();
     explicit MultiFactorBase(const string& name);
     MultiFactorBase(const IndicatorList& inds, const StockList& stks, const KQuery& query,
-                    const Stock& ref_stk, const string& name, int ic_n, bool spearman);
+                    const Stock& ref_stk, const string& name, int ic_n, bool spearman, int mode);
     MultiFactorBase(const MultiFactorBase&);
     virtual ~MultiFactorBase() = default;
 
@@ -44,9 +44,7 @@ public:
     }
 
     /** 获取参考日期列表 */
-    const DatetimeList& getDatetimeList() const {
-        return m_ref_dates;
-    }
+    const DatetimeList& getDatetimeList();
 
     /** 获取查询范围 */
     const KQuery& getQuery() const {
@@ -89,7 +87,7 @@ public:
     const Indicator& getFactor(const Stock&);
 
     /**
-     * 获取所有证券合成后的新因子，顺序与传入的证券组合相同
+     * 获取所有证券合成后的新因子，顺序与传入的证券组合相同, 谨慎使用，非线程安全
      */
     const IndicatorList& getAllFactors();
 
@@ -153,7 +151,11 @@ private:
     void initParam();
 
 protected:
-    void _buildIndex();  // 计算完成后创建截面索引
+    void _buildIndex();      // 计算完成后创建截面索引
+    void _buildIndexDesc();  // 创建降序排列的索引
+    void _buildIndexAsc();   // 创建升序排列的索引
+    void _buildIndexNone();  // build index when no index
+
     IndicatorList _getAllReturns(int ndays) const;
     void _checkData();
 

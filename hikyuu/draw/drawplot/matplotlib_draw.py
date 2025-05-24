@@ -573,6 +573,17 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     axt = axes.twinx()
     axt.grid(False)
     axt.set_yticks([])
+
+    # 计算MACD柱和DIF/DEA的y轴极值,并对齐
+    y_all = np.concatenate([np.asarray(bmacd), np.asarray(fmacd), np.asarray(smacd)])
+    y_min = np.nanmin(y_all)
+    y_max = np.nanmax(y_all)
+    y_pad = (y_max - y_min) * 0.1  # 上下各留10%空白
+    y_min -= y_pad
+    y_max += y_pad
+    axes.set_ylim(y_min, y_max) # 设置MACD柱y轴范围
+    axt.set_ylim(y_min, y_max)  # 设置DIF/DEA的y轴范围
+
     fmacd.plot(axes=axt, linestyle='--', legend_on=False, text_on=False)
     smacd.plot(axes=axt, legend_on=False, text_on=False)
 
@@ -621,6 +632,17 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     axt = axes.twinx()
     axt.grid(False)
     axt.set_yticks([])
+    
+    # 计算MACD柱和DIF/DEA的y轴极值,并对齐
+    y_all = np.concatenate([np.asarray(bmacd), np.asarray(fmacd), np.asarray(smacd)])
+    y_min = np.nanmin(y_all)
+    y_max = np.nanmax(y_all)
+    y_pad = (y_max - y_min) * 0.1  # 上下各留10%空白
+    y_min -= y_pad
+    y_max += y_pad
+    axes.set_ylim(y_min, y_max) # 设置MACD柱y轴范围
+    axt.set_ylim(y_min, y_max)  # 设置DIF/DEA的y轴范围
+
     fmacd.plot(axes=axt, linestyle='--', legend_on=False, text_on=False)
     smacd.plot(axes=axt, legend_on=False, text_on=False)
 

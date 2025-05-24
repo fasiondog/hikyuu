@@ -2015,12 +2015,14 @@ void export_Indicator_build_in(py::module& m) {
       py::arg("fill_null") = true,
       R"(INSUM(stks, query, ind, mode[, fill_null=True])
 
-    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-排名(1对应指标值最低), 5-排名(从1开始对应指标值最高).
+    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-降序排名,5-升序排名.
+
+    注意: INSUM使用模式4/5时相当于RANK功能, 但不适合在MF中使用, 在 MF 中使用时计算量为 N x N 级别, 计算缓慢。如果希望在 MF 中使用，建议直接使用 RANK[VIP] 指标。
 
     :param Sequence stks: stock list
     :param Query query: 指定范围
     :param Indicator ind: 指定指标
-    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-排名(1对应指标值最低), 5-排名(从1开始对应指标值最高).
+    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-降序排名(指标值最高的排名为1), 5-升序排名(指标值越高排名值越高)
     :param bool fill_null: 日期对齐时缺失数据填充 nan 值。
     :rtype: Indicator)");
 
