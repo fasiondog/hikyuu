@@ -21,7 +21,7 @@ public:
     WeightMultiFactor();
     WeightMultiFactor(const vector<Indicator>& inds, const PriceList& weights,
                       const StockList& stks, const KQuery& query, const Stock& ref_stk, int ic_n,
-                      bool spearman);
+                      bool spearman, int mode);
     virtual ~WeightMultiFactor() = default;
 
 private:

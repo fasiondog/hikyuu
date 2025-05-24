@@ -22,8 +22,9 @@ ICMultiFactor::ICMultiFactor() : MultiFactorBase("MF_ICWeight") {
 }
 
 ICMultiFactor::ICMultiFactor(const IndicatorList& inds, const StockList& stks, const KQuery& query,
-                             const Stock& ref_stk, int ic_n, int ic_rolling_n, bool spearman)
-: MultiFactorBase(inds, stks, query, ref_stk, "MF_ICWeight", ic_n, spearman) {
+                             const Stock& ref_stk, int ic_n, int ic_rolling_n, bool spearman,
+                             int mode)
+: MultiFactorBase(inds, stks, query, ref_stk, "MF_ICWeight", ic_n, spearman, mode) {
     setParam<int>("ic_rolling_n", ic_rolling_n);
     checkParam("ic_rolling_n");
 }
@@ -149,9 +150,9 @@ MultiFactorPtr HKU_API MF_ICWeight() {
 
 MultiFactorPtr HKU_API MF_ICWeight(const IndicatorList& inds, const StockList& stks,
                                    const KQuery& query, const Stock& ref_stk, int ic_n,
-                                   int ic_rolling_n, bool spearman) {
-    return std::make_shared<ICMultiFactor>(inds, stks, query, ref_stk, ic_n, ic_rolling_n,
-                                           spearman);
+                                   int ic_rolling_n, bool spearman, int mode) {
+    return std::make_shared<ICMultiFactor>(inds, stks, query, ref_stk, ic_n, ic_rolling_n, spearman,
+                                           mode);
 }
 
 }  // namespace hku

@@ -19,8 +19,8 @@ EqualWeightMultiFactor::EqualWeightMultiFactor() : MultiFactorBase("MF_EqualWeig
 
 EqualWeightMultiFactor::EqualWeightMultiFactor(const vector<Indicator>& inds, const StockList& stks,
                                                const KQuery& query, const Stock& ref_stk, int ic_n,
-                                               bool spearman)
-: MultiFactorBase(inds, stks, query, ref_stk, "MF_EqualWeight", ic_n, spearman) {}
+                                               bool spearman, int mode)
+: MultiFactorBase(inds, stks, query, ref_stk, "MF_EqualWeight", ic_n, spearman, mode) {}
 
 vector<Indicator> EqualWeightMultiFactor::_calculate(
   const vector<vector<Indicator>>& all_stk_inds) {
@@ -115,8 +115,8 @@ MultiFactorPtr HKU_API MF_EqualWeight() {
 
 MultiFactorPtr HKU_API MF_EqualWeight(const IndicatorList& inds, const StockList& stks,
                                       const KQuery& query, const Stock& ref_stk, int ic_n,
-                                      bool spearman) {
-    return make_shared<EqualWeightMultiFactor>(inds, stks, query, ref_stk, ic_n, spearman);
+                                      bool spearman, int mode) {
+    return make_shared<EqualWeightMultiFactor>(inds, stks, query, ref_stk, ic_n, spearman, mode);
 }
 
 }  // namespace hku
