@@ -24,6 +24,9 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     .. py:attribute:: name 名称
     .. py:attribute:: context 策略上下文
 
+    .. py:attribute:: tm 当前交易账户
+    .. py:attribute:: sp 移滑价差算法（回测时使用）
+
     .. py:method:: start(self)
 
         启动策略执行，请在完成相关回调设置后执行。
@@ -58,4 +61,64 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
 
         :param func: 可调用对象如普通函数，没有参数
         :param TimeDelta time: 执行时刻，如每日15点：TimeDelta(0, 15)
-        :param ignore_holiday: 节假日不执行        
+        :param ignore_holiday: 节假日不执行   
+
+
+    .. py:method:: today(self)
+
+        获取当前交易日日期（使用该方法而不是 Datatime.today(), 以便回测和实盘一直）
+
+        :return: 当前交易日日期
+
+    .. py:method:: now(self)   
+
+        获取当前时间（使用该方法而不是 Datatime.now(), 以便回测和实盘一直）
+
+        :return: 当前时间
+
+    .. py:method:: next_datetime(self)
+
+        下一交易时间点（回测使用）
+
+    .. py:method:: get_last_kdata(self, stk, start_date, ktype, recover_type)
+
+        获取指定证券从指定日期开始到当前时间的对应K线数据(为保证实盘和回测一致，请使用本方法获取K线数据)
+
+        或 指定当前能获取到的最后 last_num 条 K线数据(为保证实盘和回测一致，请使用本方法获取K线数据)
+
+        :param Stock stk: 指定的证券
+        :param Datetime start_date: 开始日期  (或为 int 类型，表示从当前日期往前推多少个交易日)
+        :param KQuery.KType ktype: K线类型
+        :param KQuery.RecoverType recover_type: 恢复方式
+        :return: K线数据
+        :rtype: KData
+
+    .. py:method:: get_kdata(self, stk, start_date, end_date, ktype, recover_type)
+
+        获取指定证券指定日期范围内的K线数据(为保证实盘和回测一致，请使用本方法获取K线数据)
+
+        :param Stock stk: 指定的证券
+        :param Datetime start_date: 开始日期
+        :param Datetime end_date: 结束日期
+        :param KQuery.KType ktype: K线类型
+        :param KQuery.RecoverType recover_type: 恢复方式
+        :return: K线数据
+        :rtype: KData
+
+    .. py:method:: order(self, stk, num, remark='')
+
+        按数量下单（正数为买入，负数为卖出）
+
+        :param Stock stk: 指定的证券
+        :param int num: 下单数量
+        :param str remark: 下单备注
+
+    .. py:method:: order_value(self, stk, value, remark='')
+
+        按预期的证劵市值下单，即希望买入多少钱的证券（正数为买入，负数为卖出）
+
+        :param Stock stk: 指定的证券
+        :param float value: 投入买入资金
+        :param str remark: 下单备注
+
+    
