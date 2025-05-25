@@ -623,7 +623,9 @@
 
 .. py:function:: INSUM(block, query, ind, mode)
 
-    返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    返回板块各成分该指标相应输出按计算类型得到的计算值.
+
+    注意: INSUM使用模式4/5时相当于RANK功能, 但不适合在MF中使用, 在 MF 中使用时计算量为 N x N 级别, 计算缓慢。如果希望在 MF 中使用，建议直接使用 RANK[VIP] 指标。
 
     用法:
     
@@ -634,7 +636,7 @@
     :param Block block | sequence stks: 指定板块 或 证券列表
     :param Query query: 指定范围
     :param Indicator ind: 指定指标
-    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值.
+    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-降序排名(指标值最高的排名为1), 5-升序排名(指标值越高排名值越高)
     :rtype: Indicator    
 
 
@@ -942,7 +944,20 @@
     :param int discard: 丢弃前多少个数据
     :param sequence align_dates: 对齐日期列表，如果为空则不进行对齐
     :rtype: Indicator
- 
+
+
+.. py:function:: RANK(stks, ref_ind[, mode = 0, fill_null = true, market = 'SH'])
+
+    计算指标值在指定板块中的排名
+
+    :param stks: 指定证券列表 或 Block
+    :param ref_ind: 参考指标
+    :param mode: 排序方式: 0-降序排名(指标值最高值排名为1), 1-升序排名(指标值越大排名值越大), 2-降序排名百分比, 3-升序排名百分比
+    :param fill_null: 是否填充缺失值
+    :param market: 板块所属市场
+    :return: 指标值在指定板块中的排名
+    :rtype: Indicato
+
  
 .. py:function:: REF([data, n])
 
@@ -1338,6 +1353,15 @@
     例如: 返回0.1表示10%获利盘;WINNER(10.5)表示10.5元价格的获利盘比例
 
     该函数仅对日线分析周期有效，且仅对存在流通盘权息数据的证券有效，对指数、基金等无效。
+
+
+.. py:function:: WITHKTYPE([ind, ktype, fill_null=False])
+
+    将指标数据转换到指定的K线类型。相关便捷函数: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
+
+    :param Indicator ind: 指标数据
+    :param bool fill_null: 是否填充空值
+    :rtype: Indicator
 
 
 .. py:function:: YEAR([data])
