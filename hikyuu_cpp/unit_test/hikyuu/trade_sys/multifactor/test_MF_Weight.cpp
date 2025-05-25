@@ -177,6 +177,7 @@ TEST_CASE("test_MF_Weight_export") {
     filename += "/MF_Weight.xml";
 
     auto mf1 = MF_Weight(src_inds, PriceList{0.1, 0.3, 0.6}, stks, query, ref_stk);
+    mf1->setParam<bool>("save_all_factors", true);
     auto ic1 = mf1->getIC();
     {
         std::ofstream ofs(filename);

@@ -199,6 +199,7 @@ TEST_CASE("test_MF_EqualWeight_export") {
     filename += "/MF_EqualWeight.xml";
 
     auto mf1 = MF_EqualWeight(src_inds, stks, query, ref_stk);
+    mf1->setParam<bool>("save_all_factors", true);
     auto ic1 = mf1->getIC();
     {
         std::ofstream ofs(filename);
