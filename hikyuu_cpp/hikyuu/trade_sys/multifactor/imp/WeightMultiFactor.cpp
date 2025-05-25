@@ -19,8 +19,9 @@ WeightMultiFactor::WeightMultiFactor() : MultiFactorBase("MF_Weight") {}
 
 WeightMultiFactor::WeightMultiFactor(const vector<Indicator>& inds, const PriceList& weights,
                                      const StockList& stks, const KQuery& query,
-                                     const Stock& ref_stk, int ic_n, bool spearman, int mode)
-: MultiFactorBase(inds, stks, query, ref_stk, "MF_Weight", ic_n, spearman, mode),
+                                     const Stock& ref_stk, int ic_n, bool spearman, int mode,
+                                     bool save_all_factors)
+: MultiFactorBase(inds, stks, query, ref_stk, "MF_Weight", ic_n, spearman, mode, save_all_factors),
   m_weights(weights) {
     HKU_ASSERT(inds.size() == weights.size());
 }
@@ -114,13 +115,13 @@ MultiFactorPtr HKU_API MF_Weight() {
 
 MultiFactorPtr HKU_API MF_Weight(const IndicatorList& inds, const PriceList& weights,
                                  const StockList& stks, const KQuery& query, const Stock& ref_stk,
-                                 int ic_n, bool spearman, int mode) {
+                                 int ic_n, bool spearman, int mode, bool save_all_factors) {
     HKU_CHECK(
       weights.size() == inds.size(),
       "The size of weight is not equal to the size of inds! weights.size()={}, inds.size()={}",
       weights.size(), inds.size());
-    return make_shared<WeightMultiFactor>(inds, weights, stks, query, ref_stk, ic_n, spearman,
-                                          mode);
+    return make_shared<WeightMultiFactor>(inds, weights, stks, query, ref_stk, ic_n, spearman, mode,
+                                          save_all_factors);
 }
 
 }  // namespace hku

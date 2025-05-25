@@ -73,7 +73,7 @@ void export_plugin_backtest(py::module& m) {
       },
       py::arg("on_bar"), py::arg("tm"), py::arg("start_date"), py::arg("end_date") = null_date,
       py::arg("ktype") = KQuery::DAY, py::arg("ref_market") = "SH", py::arg("mode") = 0,
-      py::arg("support_short"),
+      py::arg("support_short") = false,
       R"(backtest([context], on_bar, tm, start_date, end_date, ktype, ref_market, mode)
 
     事件驱动式回测, 通常直接测试 Strategy 中的主体函数

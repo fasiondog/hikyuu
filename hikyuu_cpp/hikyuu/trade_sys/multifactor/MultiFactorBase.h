@@ -29,7 +29,8 @@ public:
     MultiFactorBase();
     explicit MultiFactorBase(const string& name);
     MultiFactorBase(const IndicatorList& inds, const StockList& stks, const KQuery& query,
-                    const Stock& ref_stk, const string& name, int ic_n, bool spearman, int mode);
+                    const Stock& ref_stk, const string& name, int ic_n, bool spearman, int mode,
+                    bool save_all_factors);
     MultiFactorBase(const MultiFactorBase&);
     virtual ~MultiFactorBase() = default;
 
@@ -87,7 +88,7 @@ public:
     const Indicator& getFactor(const Stock&);
 
     /**
-     * 获取所有证券合成后的新因子，顺序与传入的证券组合相同, 谨慎使用，非线程安全
+     * 获取所有证券合成后的新因子，顺序与传入的证券组合相同
      */
     const IndicatorList& getAllFactors();
 
