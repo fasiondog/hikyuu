@@ -201,6 +201,8 @@ private:
     std::vector<IndicatorImpPtr> getAllSubNodes() const;
     void repeatALikeNodes();
 
+    void _clearBuffer();
+
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
 

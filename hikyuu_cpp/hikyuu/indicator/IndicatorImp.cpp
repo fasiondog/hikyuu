@@ -244,6 +244,16 @@ void IndicatorImp::setContext(const KData &k) {
 
     // 启动重新计算
     calculate();
+
+    // 清理根节点之下所有节点中间计算数据
+    if (!m_parent) {
+        auto nodes = getAllSubNodes();
+        for (const auto &node : nodes) {
+            if (!node->m_need_calculate && node->size() > 0) {
+                node->_clearBuffer();
+            }
+        }
+    }
 }
 
 void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
@@ -266,12 +276,22 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
     }
 
     for (size_t i = result_num; i < m_result_num; ++i) {
-        if (m_pBuffer[i])
+        if (m_pBuffer[i]) {
             delete m_pBuffer[i];
-        m_pBuffer[i] = NULL;
+            m_pBuffer[i] = NULL;
+        }
     }
 
     m_result_num = result_num;
+}
+
+void IndicatorImp::_clearBuffer() {
+    for (size_t i = 0; i < m_result_num; ++i) {
+        if (m_pBuffer[i]) {
+            delete m_pBuffer[i];
+            m_pBuffer[i] = NULL;
+        }
+    }
 }
 
 IndicatorImp::~IndicatorImp() {
