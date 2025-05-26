@@ -45,6 +45,7 @@ TEST_CASE("test_MF_ICIRWeight") {
 
     /** @arg 正常计算 */
     auto mf = MF_ICIRWeight(src_inds, stks, query, ref_stk, ndays, ic_rolling_n);
+    mf->setParam<bool>("save_all_factors", true);
     CHECK_EQ(mf->name(), "MF_ICIRWeight");
     CHECK_THROWS_AS(mf->getFactor(sm["sh600000"]), std::exception);
     CHECK_THROWS_AS(mf->setParam<int>("ic_n", -1), std::exception);

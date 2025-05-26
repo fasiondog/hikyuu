@@ -21,6 +21,8 @@
     :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
+    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法    
     :rtype: MultiFactorBase
 
 
@@ -34,6 +36,8 @@
     :param Stock ref_stk: 参考证券
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
+    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法    
     :rtype: MultiFactorBase
 
 
@@ -48,6 +52,8 @@
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
+    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法    
     :rtype: MultiFactorBase
 
 
@@ -62,6 +68,8 @@
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
+    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法    
     :rtype: MultiFactorBase
 
 
@@ -150,13 +158,13 @@
 
     .. py:method:: get_factor(self, stock)
 
-        获取指定证券合成后的新因子
+        获取指定证券合成后的新因子, 仅在 save_all_factors=True 时有效
 
         :param Stock stock: 指定证券
 
     .. py:method:: get_all_factors(self)
 
-        获取所有证券合成后的因子列表
+        获取所有证券合成后的因子列表, 仅在 save_all_factors=True 时有效
 
         :return: [factor1, factor2, ...] 顺序与参考证券顺序相同
 

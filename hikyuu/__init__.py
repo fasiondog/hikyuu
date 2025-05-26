@@ -292,7 +292,7 @@ def load_hikyuu(**kwargs):
 
     sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
 
-    start_spot = False
+    start_spot = True
     if 'HKU_START_SPOT' in os.environ:
         spot_str = os.environ['HKU_START_SPOT'].upper()
         start_spot = spot_str in ('1', 'TRUE')

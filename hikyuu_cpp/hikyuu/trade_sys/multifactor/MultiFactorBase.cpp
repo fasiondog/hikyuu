@@ -78,12 +78,13 @@ MultiFactorBase::MultiFactorBase(const MultiFactorBase& base)
 
 MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stks,
                                  const KQuery& query, const Stock& ref_stk, const string& name,
-                                 int ic_n, bool spearman, int mode)
+                                 int ic_n, bool spearman, int mode, bool save_all_factors)
 : m_name(name), m_inds(inds), m_stks(stks), m_ref_stk(ref_stk), m_query(query) {
     initParam();
     setParam<bool>("use_spearman", spearman);
     setParam<int>("ic_n", ic_n);
     setParam<int>("mode", mode);
+    setParam<bool>("save_all_factors", save_all_factors);
     checkParam("ic_n");
     checkParam("mode");
     _checkData();
@@ -99,7 +100,9 @@ void MultiFactorBase::initParam() {
     setParam<double>("zscore_nsigma", 3.0);
     setParam<bool>("use_spearman", true);  // 默认使用SPEARMAN计算相关系数, 否则使用pearson相关系数
     setParam<bool>("parallel", true);
-    setParam<int>("mode", 0);  // 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
+    setParam<int>("mode", 0);                   // 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
+    setParam<bool>("save_all_factors", false);  // 计算完后保留所有因子数据，否则将被清除，影响
+                                                // getAllFactors/getFactor 方法
 }
 
 void MultiFactorBase::baseCheckParam(const string& name) const {
@@ -228,6 +231,8 @@ const DatetimeList& MultiFactorBase::getDatetimeList() {
 }
 
 const Indicator& MultiFactorBase::getFactor(const Stock& stk) {
+    HKU_CHECK(getParam<bool>("save_all_factors"),
+              "param \"save_all_factors\" is false, can't get all factors!");
     calculate();
     const auto iter = m_stk_map.find(stk);
     HKU_CHECK(iter != m_stk_map.cend(), "Could not find this stock: {}", stk);
@@ -235,7 +240,11 @@ const Indicator& MultiFactorBase::getFactor(const Stock& stk) {
 }
 
 const IndicatorList& MultiFactorBase::getAllFactors() {
-    calculate();
+    if (getParam<bool>("save_all_factors")) {
+        calculate();
+    } else {
+        HKU_WARN("param \"save_all_factors\" is false, can't get all factors!");
+    }
     return m_all_factors;
 }
 
@@ -533,7 +542,6 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 }
 
 void MultiFactorBase::_buildIndex() {
-    SPEND_TIME(MultiFactor_buildIndex)
     int mode = getParam<int>("mode");
     if (0 == mode) {
         _buildIndexDesc();
@@ -657,6 +665,11 @@ void MultiFactorBase::calculate() {
         HKU_ERROR(e.what());
     } catch (...) {
         HKU_ERROR_UNKNOWN;
+    }
+
+    if (!getParam<bool>("save_all_factors")) {
+        IndicatorList().swap(m_all_factors);
+        unordered_map<Stock, size_t>().swap(m_stk_map);
     }
 
     // 更新计算状态

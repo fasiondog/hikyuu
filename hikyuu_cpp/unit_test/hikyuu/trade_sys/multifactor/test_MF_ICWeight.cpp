@@ -38,6 +38,7 @@ TEST_CASE("test_MF_ICWeight") {
     KData ref_k = ref_stk.getKData(query);
     DatetimeList ref_dates = ref_k.getDatetimeList();
     auto mf = MF_ICWeight(src_inds, stks, query, ref_stk, ndays, ic_rolling_n);
+    mf->setParam<bool>("save_all_factors", true);
     CHECK_EQ(mf->name(), "MF_ICWeight");
     CHECK_THROWS_AS(mf->getFactor(sm["sh600000"]), std::exception);
 

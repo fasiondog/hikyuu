@@ -18,7 +18,7 @@ void export_plugin_backtest(py::module& m) {
       "backtest",
       [](const StrategyContext& context, py::object on_bar, const TradeManagerPtr& tm,
          const Datetime& start_date, const Datetime& end_date, const KQuery::KType& ktype,
-         const string& ref_market, int mode) {
+         const string& ref_market, int mode, bool support_short) {
           HKU_CHECK(py::hasattr(on_bar, "__call__"), "func is not callable!");
           HKU_CHECK(check_pyfunction_arg_num(on_bar, 1), "Number of parameters does not match!");
           py::object c_func = on_bar.attr("__call__");
@@ -38,16 +38,18 @@ void export_plugin_backtest(py::module& m) {
                   HKU_ERROR("Unknown error!");
               }
           };
-          backtest(context, new_func, tm, start_date, end_date, ktype, ref_market, mode);
+          backtest(context, new_func, tm, start_date, end_date, ktype, ref_market, mode,
+                   support_short);
       },
       py::arg("context"), py::arg("on_bar"), py::arg("tm"), py::arg("start_date"),
       py::arg("end_date") = null_date, py::arg("ktype") = KQuery::DAY, py::arg("ref_market") = "SH",
-      py::arg("mode") = 0);
+      py::arg("mode") = 0, py::arg("support_short") = false);
 
     m.def(
       "backtest",
       [](py::object on_bar, const TradeManagerPtr& tm, const Datetime& start_date,
-         const Datetime& end_date, const KQuery::KType& ktype, const string& ref_market, int mode) {
+         const Datetime& end_date, const KQuery::KType& ktype, const string& ref_market, int mode,
+         bool support_short) {
           HKU_CHECK(py::hasattr(on_bar, "__call__"), "func is not callable!");
           HKU_CHECK(check_pyfunction_arg_num(on_bar, 1), "Number of parameters does not match!");
           py::object c_func = on_bar.attr("__call__");
@@ -67,10 +69,11 @@ void export_plugin_backtest(py::module& m) {
                   HKU_ERROR("Unknown error!");
               }
           };
-          backtest(new_func, tm, start_date, end_date, ktype, ref_market, mode);
+          backtest(new_func, tm, start_date, end_date, ktype, ref_market, mode, support_short);
       },
       py::arg("on_bar"), py::arg("tm"), py::arg("start_date"), py::arg("end_date") = null_date,
       py::arg("ktype") = KQuery::DAY, py::arg("ref_market") = "SH", py::arg("mode") = 0,
+      py::arg("support_short") = false,
       R"(backtest([context], on_bar, tm, start_date, end_date, ktype, ref_market, mode)
 
     事件驱动式回测, 通常直接测试 Strategy 中的主体函数
@@ -85,5 +88,6 @@ void export_plugin_backtest(py::module& m) {
     :param Datetime end_date: 结束日期（不包含其本身）
     :param Query.KType ktype: K线类型(按该类型逐 Bar 执行测试)
     :param str ref_market: 所属市场
-    :param mode 模式  0: 当前bar收盘价执行买卖操作; 1: 下一bar开盘价执行买卖操作)");
+    :param mode 模式  0: 当前bar收盘价执行买卖操作; 1: 下一bar开盘价执行买卖操作
+    :param support_short: 是否支持卖空)");
 }

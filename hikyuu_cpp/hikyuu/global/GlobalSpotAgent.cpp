@@ -181,9 +181,11 @@ void HKU_API startSpotAgent(bool print, size_t worker_num, const string& addr) {
     agent.setWorkerNum(worker_num);
     agent.setPrintFlag(print);
 
-    // 防止调用 stopSpotAgent 后重新 startSpotAgent
+    // 防止调用 stopSpotAgent 后重新 startSpotAgent 时重复加入处理函数
     static std::atomic_bool g_init_spot_agent{false};
     if (!g_init_spot_agent) {
+        g_init_spot_agent = true;
+
         const auto& preloadParam = sm.getPreloadParameter();
         if (preloadParam.tryGet<bool>("min", false)) {
             agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN));

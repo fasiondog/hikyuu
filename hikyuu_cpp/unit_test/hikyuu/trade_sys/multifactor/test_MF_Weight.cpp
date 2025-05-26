@@ -65,6 +65,7 @@ TEST_CASE("test_MF_Weight") {
     ref_k = ref_stk.getKData(query);
     ref_dates = ref_k.getDatetimeList();
     auto mf = MF_Weight(src_inds, PriceList{1.0}, stks, query, ref_stk);
+    mf->setParam<bool>("save_all_factors", true);
     CHECK_EQ(mf->name(), "MF_Weight");
     CHECK_THROWS_AS(mf->getFactor(sm["sz000001"]), std::exception);
     CHECK_EQ(mf->getDatetimeList(), ref_dates);
@@ -107,6 +108,7 @@ TEST_CASE("test_MF_Weight") {
     ref_k = ref_stk.getKData(query);
     ref_dates = ref_k.getDatetimeList();
     mf = MF_Weight(src_inds, weights, stks, query, ref_stk, ndays);
+    mf->setParam<bool>("save_all_factors", true);
     CHECK_EQ(mf->name(), "MF_Weight");
     CHECK_THROWS_AS(mf->getFactor(sm["sh600000"]), std::exception);
 
@@ -175,6 +177,7 @@ TEST_CASE("test_MF_Weight_export") {
     filename += "/MF_Weight.xml";
 
     auto mf1 = MF_Weight(src_inds, PriceList{0.1, 0.3, 0.6}, stks, query, ref_stk);
+    mf1->setParam<bool>("save_all_factors", true);
     auto ic1 = mf1->getIC();
     {
         std::ofstream ofs(filename);

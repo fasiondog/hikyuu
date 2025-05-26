@@ -212,11 +212,30 @@ void export_Strategy(py::module& m) {
     :param TimeDelta time: 执行时刻，如每日15点：TimeDelta(0, 15)
     :param ignore_holiday: 节假日不执行)")
 
-      .def("today", &Strategy::today)
-      .def("now", &Strategy::now)
-      .def("next_datetime", &Strategy::nextDatetime)
+      .def("today", &Strategy::today, R"(today(self)
+
+    获取当前交易日日期（使用该方法而不是 Datatime.today(), 以便回测和实盘一直）)")
+
+      .def("now", &Strategy::now, R"(now(self)   
+
+    获取当前时间（使用该方法而不是 Datatime.now(), 以便回测和实盘一直）)")
+
+      .def("next_datetime", &Strategy::nextDatetime, R"(next_datetime(self)
+
+    下一交易时间点（回测使用）)")
+
       .def("get_kdata", &Strategy::getKData, py::arg("stk"), py::arg("start_date"),
-           py::arg("end_date"), py::arg("ktype"), py::arg("recover_type") = KQuery::NO_RECOVER)
+           py::arg("end_date"), py::arg("ktype"), py::arg("recover_type") = KQuery::NO_RECOVER,
+           R"(get_kdata(self, stk, start_date, end_date, ktype, recover_type)
+
+    获取指定证券指定日期范围内的K线数据(为保证实盘和回测一致，请使用本方法获取K线数据)
+    :param Stock stk: 指定的证券
+    :param Datetime start_date: 开始日期
+    :param Datetime end_date: 结束日期
+    :param KQuery.KType ktype: K线类型
+    :param KQuery.RecoverType recover_type: 恢复方式
+    :return: K线数据
+    :rtype: KData)")
 
       .def(
         "get_last_kdata",
@@ -228,13 +247,38 @@ void export_Strategy(py::module& m) {
            py::overload_cast<const Stock&, size_t, const KQuery::KType&, KQuery::RecoverType>(
              &Strategy::getLastKData, py::const_),
            py::arg("stk"), py::arg("lastnum"), py::arg("ktype"),
-           py::arg("recover_type") = KQuery::NO_RECOVER)
+           py::arg("recover_type") = KQuery::NO_RECOVER,
+           R"(get_last_kdata(self, stk, start_date, ktype, recover_type)
+
+    获取指定证券从指定日期开始到当前时间的对应K线数据(为保证实盘和回测一致，请使用本方法获取K线数据)
+
+    或 指定当前能获取到的最后 last_num 条 K线数据(为保证实盘和回测一致，请使用本方法获取K线数据)
+
+    :param Stock stk: 指定的证券
+    :param Datetime start_date: 开始日期  (或为 int 类型，表示从当前日期往前推多少个交易日)
+    :param KQuery.KType ktype: K线类型
+    :param KQuery.RecoverType recover_type: 恢复方式
+    :return: K线数据
+    :rtype: KData)")
 
       .def("order", py::overload_cast<const Stock&, double, const string&>(&Strategy::order),
-           py::arg("stock"), py::arg("price"), py::arg("remark") = "")
+           py::arg("stock"), py::arg("num"), py::arg("remark") = "",
+           R"(order(self, stk, num, remark='')
+
+    按数量下单（正数为买入，负数为卖出）
+    :param Stock stk: 指定的证券
+    :param int num: 下单数量
+    :param str remark: 下单备注)")
+
       .def("order_value",
            py::overload_cast<const Stock&, price_t, const string&>(&Strategy::orderValue),
-           py::arg("stock"), py::arg("price"), py::arg("remark") = "")
+           py::arg("stock"), py::arg("price"), py::arg("remark") = "",
+           R"(order_value(self, stk, value, remark='')
+
+    按预期的证劵市值下单，即希望买入多少钱的证券（正数为买入，负数为卖出）
+    :param Stock stk: 指定的证券
+    :param float value: 投入买入资金
+    :param str remark: 下单备注)")
 
       .def(
         "buy",
