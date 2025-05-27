@@ -14,6 +14,7 @@ void export_plugin_backtest(py::module& m);
 void export_plugin_dataserver(py::module& m);
 void export_plugin_KDataToHdf5Importer(py::module& m);
 void export_extend_Indicator(py::module& m);
+void export_plugin_tmreport(py::module& m);
 
 void export_plugin(py::module& m) {
     export_plugin_device(m);
@@ -21,4 +22,5 @@ void export_plugin(py::module& m) {
     export_plugin_dataserver(m);
     export_plugin_KDataToHdf5Importer(m);
     export_extend_Indicator(m);
+    export_plugin_tmreport(m);
 }
