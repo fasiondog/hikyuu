@@ -42,4 +42,7 @@ getPositionExtInfoList(const TMPtr& tm, const Datetime& current_time,
 std::vector<PositionExtInfo> HKU_API getHistoryPositionExtInfoList(
   const TMPtr& tm, const KQuery::KType& ktype = KQuery::DAY, int trade_mode = 0);
 
+Performance HKU_API getExtPerformance(const TMPtr& tm, const Datetime& datetime = Datetime::now(),
+                                      const KQuery::KType& ktype = KQuery::DAY);
+
 }  // namespace hku

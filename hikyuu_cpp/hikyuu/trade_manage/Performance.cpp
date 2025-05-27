@@ -119,6 +119,11 @@ PriceList Performance::values() const {
     return result;
 }
 
+void Performance::add(const string& key, double value) {
+    ms_keys.push_back(key);
+    m_result[key] = value;
+}
+
 string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) {
     std::stringstream buf;
     HKU_INFO_IF_RETURN(!tm, buf.str(), "TradeManagerPtr is Null!");

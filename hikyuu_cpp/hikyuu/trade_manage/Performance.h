@@ -71,6 +71,12 @@ public:
     typedef map_type::iterator iterator;
     typedef map_type::const_iterator const_iterator;
 
+    const map_type& getAll() const {
+        return m_result;
+    }
+
+    void add(const string& key, double value);
+
 private:
     map_type m_result;
     static StringList ms_keys;  // 保存统计项顺序, map/unordered_map都不能保持按插入顺序遍历

@@ -38,4 +38,13 @@ std::vector<PositionExtInfo> HKU_API getHistoryPositionExtInfoList(const TMPtr& 
     return plugin->getHistoryPositionExtInfoList(tm, ktype, trade_mode);
 }
 
+Performance HKU_API getExtPerformance(const TMPtr& tm, const Datetime& datetime,
+                                      const KQuery::KType& ktype) {
+    Performance ret;
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<TMReportPluginInterface>(HKU_PLUGIN_TMREPORT);
+    HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_TMREPORT);
+    return plugin->getExtPerformance(tm, datetime, ktype);
+}
+
 }  // namespace hku
