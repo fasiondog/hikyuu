@@ -655,7 +655,7 @@ void export_TradeManager(py::module& m) {
  
     :param Query.KType ktype: k线类型
     :param int trade_mode: 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
-    :return: 持仓扩展详情列表)");
+    :return: 持仓扩展详情列表)")
 
-    DEF_PICKLE(TradeManagerPtr);
+        DEF_PICKLE(TradeManagerPtr);
 }
