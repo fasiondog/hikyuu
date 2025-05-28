@@ -157,9 +157,12 @@ public:
             m_queues[i]->push(FuncWrapper());
         }
 
-        for (size_t i = 0; i < m_worker_num; i++) {
-            if (m_threads[i].joinable()) {
-                m_threads[i].join();
+        {
+            std::lock_guard<std::mutex> lock(m_mutex_join);
+            for (size_t i = 0; i < m_worker_num; i++) {
+                if (m_threads[i].joinable()) {
+                    m_threads[i].join();
+                }
             }
         }
 
@@ -190,10 +193,12 @@ public:
             m_queues[i]->notify_all();
         }
 
-        // 等待线程结束
-        for (size_t i = 0; i < m_worker_num; i++) {
-            if (m_threads[i].joinable()) {
-                m_threads[i].join();
+        {  // 等待线程结束
+            std::lock_guard<std::mutex> lock(m_mutex_join);
+            for (size_t i = 0; i < m_worker_num; i++) {
+                if (m_threads[i].joinable()) {
+                    m_threads[i].join();
+                }
             }
         }
 
@@ -209,6 +214,7 @@ private:
     std::vector<std::unique_ptr<ThreadSafeQueue<task_type>>> m_queues;  // 线程任务队列
     std::vector<InterruptFlag> m_thread_need_stop;                      // 线程终止标志
     std::vector<std::thread> m_threads;                                 // 工作线程
+    std::mutex m_mutex_join;                                            // 用于保护 joinable
 
     void worker_thread(int index) {
         auto *local_queue = m_queues[index].get();
