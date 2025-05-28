@@ -125,9 +125,12 @@ public:
 
         m_master_work_queue.notify_all();
 
-        for (size_t i = 0; i < m_worker_num; i++) {
-            if (m_threads[i].joinable()) {
-                m_threads[i].join();
+        {
+            std::lock_guard<std::mutex> lock(m_mutex_join);
+            for (size_t i = 0; i < m_worker_num; i++) {
+                if (m_threads[i].joinable()) {
+                    m_threads[i].join();
+                }
             }
         }
 
@@ -155,9 +158,12 @@ public:
 
         m_master_work_queue.notify_all();
 
-        for (size_t i = 0; i < m_worker_num; i++) {
-            if (m_threads[i].joinable()) {
-                m_threads[i].join();
+        {
+            std::lock_guard<std::mutex> lock(m_mutex_join);
+            for (size_t i = 0; i < m_worker_num; i++) {
+                if (m_threads[i].joinable()) {
+                    m_threads[i].join();
+                }
             }
         }
 
@@ -173,6 +179,7 @@ private:
 
     ThreadSafeQueue<task_type> m_master_work_queue;  // 主线程任务队列
     std::vector<std::thread> m_threads;              // 工作线程
+    std::mutex m_mutex_join;                         // 用于保护 joinable
 
     void worker_thread(int index) {
         while (!m_done) {
