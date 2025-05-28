@@ -9,7 +9,7 @@ from .core import *
 import os
 os.environ["NUMEXPR_MAX_THREADS"] = str(os.cpu_count())
 
-from datetime import *  # NOQA: E402
+from datetime import datetime, timedelta, date  # NOQA: E402
 import numpy as np  # NOQA: E402
 import pandas as pd  # NOQA: E402
 

@@ -185,11 +185,14 @@ void SpotAgent::work_thread() {
     HKU_ERROR_IF_RETURN(rv != 0, void(), "Failed set receive timeout option!");
 
     rv = -1;
+    Datetime pretime = Datetime::now();
     while (!m_stop && rv != 0) {
         rv = nng_dial(sock, ms_pubUrl.c_str(), nullptr, 0);
-        HKU_WARN_IF(m_print && rv != 0,
+        auto now = Datetime::now();
+        HKU_WARN_IF(m_print && rv != 0 && (now - pretime) > Seconds(5),
                     "Faied connect quotation server {}, will retry after 5 seconds!", ms_pubUrl);
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        pretime = now;
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
 
     HKU_INFO_IF(!m_stop && m_print, "Ready to receive quotation from {} ...", ms_pubUrl);
