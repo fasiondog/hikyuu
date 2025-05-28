@@ -97,10 +97,6 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystem(const SystemList& sys_list, 
 
     HKU_ERROR_IF_RETURN(stk.isNull(), result, "stock is null!");
 
-    string statistic_key = sort_key.empty() ? "帐户平均年收益率%" : sort_key;
-    HKU_ERROR_IF_RETURN(!Performance::exist(statistic_key), result,
-                        "Invalid sort key: {}! A statistical item does not exist!", statistic_key);
-
     // 保证只统计到 query 指定的最后日期，而不是默认到现在，否则仍有持仓的系统收益不合适
     auto date_list = StockManager::instance().getTradingCalendar(query);
     HKU_IF_RETURN(date_list.empty(), result);
@@ -146,10 +142,6 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystemMulti(const SystemList& sys_l
     HKU_IF_RETURN(0 == total, result);
 
     HKU_ERROR_IF_RETURN(stk.isNull(), result, "stock is null!");
-
-    string statistic_key = sort_key.empty() ? "帐户平均年收益率%" : sort_key;
-    HKU_ERROR_IF_RETURN(!Performance::exist(statistic_key), result,
-                        "Invalid sort key: {}! A statistical item does not exist!", statistic_key);
 
     // 保证只统计到 query 指定的最后日期，而不是默认到现在，否则仍有持仓的系统收益不合适
     auto date_list = StockManager::instance().getTradingCalendar(query);

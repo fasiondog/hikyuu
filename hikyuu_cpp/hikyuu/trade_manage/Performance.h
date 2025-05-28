@@ -30,7 +30,7 @@ public:
     Performance& operator=(Performance&& other);
 
     /** 是否为合法的统计项 */
-    static bool exist(const string& key);
+    bool exist(const string& key);
 
     /** 复位，清除已计算的结果 */
     void reset();
@@ -61,7 +61,7 @@ public:
 
     /** 获取所有统计项名称，顺序与 values 相同 */
     const StringList& names() const {
-        return ms_keys;
+        return m_keys;
     }
 
     /** 获取所有统计项值，顺序与 names 相同*/
@@ -80,7 +80,7 @@ public:
 
 private:
     map_type m_result;
-    static StringList ms_keys;  // 保存统计项顺序, map/unordered_map都不能保持按插入顺序遍历
+    StringList m_keys;  // 保存统计项顺序, map/unordered_map都不能保持按插入顺序遍历
 };
 
 } /* namespace hku */

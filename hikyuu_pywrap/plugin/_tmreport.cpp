@@ -62,7 +62,7 @@ void export_plugin_tmreport(py::module& m) {
     m.def(
       "get_position_ext_info_list", getPositionExtInfoList, py::arg("tm"), py::arg("current_time"),
       py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
-      R"(getPositionExtInfoList(tm, current_time, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
+      R"(get_position_ext_info_list(tm, current_time, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
           
     获取账户最后交易时刻之后指定时间的持仓详情（未平常记录）
  
@@ -75,7 +75,7 @@ void export_plugin_tmreport(py::module& m) {
     m.def(
       "get_history_position_ext_info_list", getHistoryPositionExtInfoList, py::arg("tm"),
       py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
-      R"(getHistoryPositionExtInfoList(tm, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
+      R"(get_history_position_ext_info_list(tm, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
           
     获取账户历史持仓扩展详情（已平仓记录）
  
@@ -86,7 +86,7 @@ void export_plugin_tmreport(py::module& m) {
 
     m.def("get_ext_performance", getExtPerformance, py::arg("tm"),
           py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
-          R"(getExtPerformance(tm, datetime=Datetime.now(), ktype=Query.DAY) -> Performance)
+          R"(get_ext_performance(tm, datetime=Datetime.now(), ktype=Query.DAY) -> Performance)
 
     获取账户指定时刻的账户扩展表现
  
