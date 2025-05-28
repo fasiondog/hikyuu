@@ -50,7 +50,7 @@ void export_plugin_tmreport(py::module& m) {
 
     m.def("get_max_pull_back", getMaxPullBack, py::arg("tm"), py::arg("date"),
           py::arg("ktype") = KQuery::DAY,
-          R"(get_max_pull_back(tm, date, ktype=KQuery.DAY) -> price_t
+          R"(get_max_pull_back(tm, date, ktype=Query.DAY) -> price_t
     
     获取指定时刻时账户的最大回撤百分比（负数）
 
@@ -60,9 +60,9 @@ void export_plugin_tmreport(py::module& m) {
     :return: 最大回撤百分比)");
 
     m.def(
-      "getPositionExtInfoList", getPositionExtInfoList, py::arg("tm"), py::arg("current_time"),
+      "get_position_ext_info_list", getPositionExtInfoList, py::arg("tm"), py::arg("current_time"),
       py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
-      R"(getPositionExtInfoList(tm, current_time, ktype=KQuery.DAY, trade_mode=0) -> list[PositionExtInfo])
+      R"(getPositionExtInfoList(tm, current_time, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
           
     获取账户最后交易时刻之后指定时间的持仓详情（未平常记录）
  
@@ -73,9 +73,9 @@ void export_plugin_tmreport(py::module& m) {
     :return: 持仓扩展详情列表)");
 
     m.def(
-      "getHistoryPositionExtInfoList", getHistoryPositionExtInfoList, py::arg("tm"),
+      "get_history_position_ext_info_list", getHistoryPositionExtInfoList, py::arg("tm"),
       py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
-      R"(getHistoryPositionExtInfoList(tm, ktype=KQuery.DAY, trade_mode=0) -> list[PositionExtInfo])
+      R"(getHistoryPositionExtInfoList(tm, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
           
     获取账户历史持仓扩展详情（已平仓记录）
  
@@ -83,4 +83,15 @@ void export_plugin_tmreport(py::module& m) {
     :param Query.KType ktype: k线类型
     :param int trade_mode: 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
     :return: 持仓扩展详情列表)");
+
+    m.def("get_ext_performance", getExtPerformance, py::arg("tm"),
+          py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
+          R"(getExtPerformance(tm, datetime=Datetime.now(), ktype=Query.DAY) -> Performance)
+
+    获取账户指定时刻的账户扩展表现
+ 
+    :param TradeManager tm: 账户
+    :param Datetime datetime: 指定时刻
+    :param Query.KType ktype: k线类型
+    :return: 账户扩展表现)");
 }

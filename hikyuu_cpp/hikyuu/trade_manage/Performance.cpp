@@ -119,8 +119,12 @@ PriceList Performance::values() const {
     return result;
 }
 
-void Performance::add(const string& key, double value) {
+void Performance::addKey(const string& key) {
     ms_keys.push_back(key);
+    m_result[key] = 0.0;
+}
+
+void Performance::setValue(const string& key, double value) {
     m_result[key] = value;
 }
 

@@ -75,7 +75,8 @@ public:
         return m_result;
     }
 
-    void add(const string& key, double value);
+    void addKey(const string& key);
+    void setValue(const string& key, double value);
 
 private:
     map_type m_result;

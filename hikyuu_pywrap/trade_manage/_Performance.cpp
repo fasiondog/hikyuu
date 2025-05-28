@@ -46,6 +46,8 @@ void export_Performance(py::module& m) {
       
       获取所有统计项值，顺序与 names 相同)")
 
+      .def("get_all", &Performance::getAll, py::return_value_policy::copy)
+
       .def("__getitem__", &Performance::get,
            R"(按指标名称获取指标值，必须在运行 statistics 或 report 之后生效
         
