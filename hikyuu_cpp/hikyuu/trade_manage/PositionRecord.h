@@ -25,11 +25,17 @@ public:
                    double number, price_t stoploss, price_t goalPrice, double totalNumber,
                    price_t buyMoney, price_t totalCost, price_t totalRisk, price_t sellMoney);
 
+    PositionRecord(const PositionRecord& ths) = default;
+    PositionRecord& operator=(const PositionRecord& ths) = default;
+
+    PositionRecord(PositionRecord&& rhs);
+    PositionRecord& operator=(PositionRecord&& rhs);
+
     /** 仅用于python的__str__ */
     string str() const;
 
     /**
-     * @brief 盈亏 = 买入资金 - 累计交易总成本 - 卖出资金
+     * @brief 盈亏 = 卖出资金 - 累计交易总成本 - 买入资金
      * @note 只对已清仓的记录有效，未清仓将返回0.0
      */
     price_t totalProfit() const;

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <hikyuu/plugin/tmreport.h>
 #include <hikyuu/trade_manage/build_in.h>
 #include "../pybind_utils.h"
 
@@ -570,6 +571,91 @@ void export_TradeManager(py::module& m) {
       :param Datetime date: 当前时刻)")
 
       .def("fetch_asset_info_from_broker", &TradeManagerBase::fetchAssetInfoFromBroker)
+
+      .def(
+        "get_performance",
+        [](TradeManagerPtr& self, const Datetime& datetime) {
+            Performance per;
+            per.statistics(self, datetime);
+            py::dict result;
+            StringList names = per.names();
+            for (const auto& name : names) {
+                result[py::str(name)] = per.get(name);
+            }
+            return result;
+        },
+        py::arg("datetime") = Datetime::now(),
+        R"(get_performance(self, datetime=Datetime.now()) -> dict)
+        
+    获取账户指定时刻的账户表现
+
+    :param TradeManager tm: 账户
+    :param Datetime datetime: 指定时刻
+    :return: 账户表现)")
+
+      .def(
+        "get_ext_performance",
+        [](TradeManagerPtr& self, const Datetime& datetime, const KQuery::KType& ktype) {
+            auto per = getExtPerformance(self, datetime, ktype);
+            py::dict result;
+            StringList names = per.names();
+            for (const auto& name : names) {
+                result[py::str(name)] = per.get(name);
+            }
+            return result;
+        },
+        py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
+        R"(get_ext_performance(self, datetime=Datetime.now(), ktype=Query.DAY) -> Performance)
+
+    获取账户指定时刻的账户扩展表现
+ 
+    :param Datetime datetime: 指定时刻
+    :param Query.KType ktype: k线类型
+    :return: 账户扩展表现)")
+
+      .def(
+        "get_max_pull_back",
+        [](TradeManagerPtr& self, const Datetime& date, const KQuery::KType& ktype) {
+            return getMaxPullBack(self, date);
+        },
+        py::arg("date") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
+        R"(get_max_pull_back(self, date, ktype=Query.DAY) -> price_t
+    
+    获取指定时刻时账户的最大回撤百分比（负数）
+
+    :param Datetime date: 指定日期（包含该时刻）
+    :param Query.KType ktype: k线类型
+    :return: 最大回撤百分比)")
+
+      .def(
+        "get_position_ext_info_list",
+        [](TradeManagerPtr& self, const Datetime& current_time, const KQuery::KType& ktype,
+           int trade_mode) {
+            return getPositionExtInfoList(self, current_time, ktype, trade_mode);
+        },
+        py::arg("current_time"), py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
+        R"(get_position_ext_info_list(self, current_time, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
+          
+    获取账户最后交易时刻之后指定时间的持仓详情（未平常记录）
+ 
+    :param Datetime current_time: 当前时刻（需大于等于最后交易时刻）
+    :param Query.KType ktype: k线类型
+    :param int trade_mode: 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+    :return: 持仓扩展详情列表)")
+
+      .def(
+        "get_history_position_ext_info_list",
+        [](TradeManagerPtr& self, const KQuery::KType& ktype, int trade_mode) {
+            return getHistoryPositionExtInfoList(self, ktype, trade_mode);
+        },
+        py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
+        R"(get_history_position_ext_info_list(self, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
+          
+    获取账户历史持仓扩展详情（已平仓记录）
+ 
+    :param Query.KType ktype: k线类型
+    :param int trade_mode: 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+    :return: 持仓扩展详情列表)")
 
         DEF_PICKLE(TradeManagerPtr);
 }

@@ -14,7 +14,7 @@ namespace py = pybind11;
 void export_Performance(py::module& m) {
     py::class_<Performance>(m, "Performance", "简单绩效统计")
       .def(py::init<>())
-      .def_static("exist", &Performance::exist)
+      .def("exist", &Performance::exist)
 
       .def("reset", &Performance::reset, R"(reset(self)
 
@@ -45,6 +45,16 @@ void export_Performance(py::module& m) {
       .def("values", &Performance::values, R"(values(self)
       
       获取所有统计项值，顺序与 names 相同)")
+
+      .def("to_dict",
+           [](Performance& self) {
+               py::dict result;
+               StringList names = self.names();
+               for (const auto& name : names) {
+                   result[py::str(name)] = self.get(name);
+               }
+               return result;
+           })
 
       .def("__getitem__", &Performance::get,
            R"(按指标名称获取指标值，必须在运行 statistics 或 report 之后生效
