@@ -135,6 +135,24 @@ public:
      */
     virtual Performance getExtPerformance(const TMPtr& tm, const Datetime& datetime,
                                           const KQuery::KType& ktype) = 0;
+
+    /**
+     * @brief 获取指定截止时间前各月的收益百分比
+     * @param tm
+     * @param datetime
+     * @return std::vector<std::pair<Datetime, double>>
+     */
+    virtual std::vector<std::pair<Datetime, double>> getProfitPercentMonthly(
+      const TMPtr& tm, const Datetime& datetime) = 0;
+
+    /**
+     * @brief 获取指定截止时间前各年的收益百分比
+     * @param tm
+     * @param datetime
+     * @return std::vector<std::pair<Datetime, double>>
+     */
+    virtual std::vector<std::pair<Datetime, double>> getProfitPercentYearly(
+      const TMPtr& tm, const Datetime& datetime) = 0;
 };
 
 }  // namespace hku
