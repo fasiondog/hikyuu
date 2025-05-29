@@ -47,4 +47,22 @@ Performance HKU_API getExtPerformance(const TMPtr& tm, const Datetime& datetime,
     return plugin->getExtPerformance(tm, datetime, ktype);
 }
 
+std::vector<std::pair<Datetime, double>> HKU_API getProfitPercentMonthly(const TMPtr& tm,
+                                                                         const Datetime& datetime) {
+    std::vector<std::pair<Datetime, double>> ret;
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<TMReportPluginInterface>(HKU_PLUGIN_TMREPORT);
+    HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_TMREPORT);
+    return plugin->getProfitPercentMonthly(tm, datetime);
+}
+
+std::vector<std::pair<Datetime, double>> HKU_API getProfitPercentYearly(const TMPtr& tm,
+                                                                        const Datetime& datetime) {
+    std::vector<std::pair<Datetime, double>> ret;
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<TMReportPluginInterface>(HKU_PLUGIN_TMREPORT);
+    HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_TMREPORT);
+    return plugin->getProfitPercentYearly(tm, datetime);
+}
+
 }  // namespace hku

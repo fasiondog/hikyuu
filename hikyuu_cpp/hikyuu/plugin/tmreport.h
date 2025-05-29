@@ -42,7 +42,31 @@ getPositionExtInfoList(const TMPtr& tm, const Datetime& current_time,
 std::vector<PositionExtInfo> HKU_API getHistoryPositionExtInfoList(
   const TMPtr& tm, const KQuery::KType& ktype = KQuery::DAY, int trade_mode = 0);
 
+/**
+ * 统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime，
+ * 以便用于计算当前市值
+ * @param tm 指定的交易管理实例
+ * @param datetime 统计截止时刻
+ */
 Performance HKU_API getExtPerformance(const TMPtr& tm, const Datetime& datetime = Datetime::now(),
                                       const KQuery::KType& ktype = KQuery::DAY);
+
+/**
+ * @brief 获取指定截止时间前各月的收益百分比
+ * @param tm
+ * @param datetime
+ * @return std::vector<std::pair<Datetime, double>>
+ */
+std::vector<std::pair<Datetime, double>> HKU_API getProfitPercentMonthly(const TMPtr& tm,
+                                                                         const Datetime& datetime);
+
+/**
+ * @brief 获取指定截止时间前各年的收益百分比
+ * @param tm
+ * @param datetime
+ * @return std::vector<std::pair<Datetime, double>>
+ */
+std::vector<std::pair<Datetime, double>> HKU_API getProfitPercentYearly(const TMPtr& tm,
+                                                                        const Datetime& datetime);
 
 }  // namespace hku

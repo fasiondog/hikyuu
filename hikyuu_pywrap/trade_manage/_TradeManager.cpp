@@ -657,5 +657,39 @@ void export_TradeManager(py::module& m) {
     :param int trade_mode: 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
     :return: 持仓扩展详情列表)")
 
+      .def(
+        "get_profit_percent_monthly",
+        [](TradeManagerPtr& self, const Datetime& datetime) {
+            auto percents = getProfitPercentMonthly(self, datetime);
+            py::list result;
+            for (auto& item : percents) {
+                result.append(py::make_tuple(item.first, item.second));
+            }
+        },
+        py::arg("datetime") = Datetime::now(),
+        R"(get_profit_percent_monthly(self, datetime=Datetime.now()) -> list[tuple[Datetime, double]])
+
+    获取账户指定截止时刻的账户收益百分比（月度）
+
+    :param Datetime datetime: 指定截止时刻
+    :return: 账户收益百分比（月度）)")
+
+      .def(
+        "get_profit_percent_yearly",
+        [](TradeManagerPtr& self, const Datetime& datetime) {
+            auto percents = getProfitPercentYearly(self, datetime);
+            py::list result;
+            for (auto& item : percents) {
+                result.append(py::make_tuple(item.first, item.second));
+            }
+        },
+        py::arg("datetime") = Datetime::now(),
+        R"(get_profit_percent_yearly(self, datetime=Datetime.now()) -> list[tuple[Datetime, double]])
+
+    获取账户指定截止时刻的账户收益百分比（年度）
+
+    :param Datetime datetime: 指定截止时刻
+    :return: 账户收益百分比（年度）)")
+
         DEF_PICKLE(TradeManagerPtr);
 }
