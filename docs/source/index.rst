@@ -32,7 +32,7 @@ Welcome to Hikyuu's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: VIP说明
+   :caption: VIP捐赠
    :name: VIP features
 
    vip/vip-plan.md
