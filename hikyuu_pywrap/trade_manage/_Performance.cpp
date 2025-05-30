@@ -20,13 +20,12 @@ void export_Performance(py::module& m) {
 
         复位，清除已计算的结果)")
 
-      .def("report", &Performance::report, py::arg("tm"), py::arg("datetime") = Datetime::now(),
-           R"(report(self, tm[, datetime=Datetime.now()])
+      .def("report", &Performance::report,
+           R"(report(self)
 
         简单的文本统计报告，用于直接输出打印
+        只有运行 statistics 后或 Performance 本身为从 TM 获取的结果时才生效
 
-        :param TradeManager tm: 指定的交易管理实例
-        :param Datetime datetime: 统计截止时刻
         :rtype: str)")
 
       .def("statistics", &Performance::statistics, py::arg("tm"),

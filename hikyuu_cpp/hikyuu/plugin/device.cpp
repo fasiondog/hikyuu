@@ -45,6 +45,13 @@ std::string HKU_API fetchTrialLicense(const std::string& email) {
 
 bool HKU_API isValidLicense() {
     auto& sm = StockManager::instance();
+    const auto& plugin_path = sm.getPluginPath();
+    PluginLoader loader(plugin_path);
+    auto plugin_name = loader.getFileName(HKU_PLUGIN_DEVICE);
+    if (!existFile(plugin_name)) {
+        return false;
+    }
+
     auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
     if (!plugin) {
         return false;
