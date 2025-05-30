@@ -63,6 +63,9 @@ void WalkForwardSystem::initParam() {
     setParam<int>("test_len", 20);
     setParam<bool>("parallel", false);
     setParam<bool>("se_trace", false);
+
+    // 当前选中的系统和上次的系统不一致时，在开盘时清空已有持仓
+    setParam<bool>("clean_hold_when_select_changed", true);
 }
 
 void WalkForwardSystem::_checkParam(const string& name) const {
@@ -197,6 +200,7 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     }
 
     bool trace = getParam<bool>("trace");
+    SYSPtr pre_selected_sys;
     for (size_t i = 0, total = m_train_kdata_list.size(); i < total; i++) {
         const auto& run_kdata = m_train_kdata_list[i];
         if (run_kdata.empty()) {
@@ -228,12 +232,31 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
               name(), i + 1, total, m_run_ranges[i].run_start,
               run_kdata[run_kdata.size() - 1].datetime, sys->name());
 
+            if (getParam<bool>("clean_hold_when_select_changed")) {
+                if (sys != pre_selected_sys && m_tm->have(m_stock)) {
+                    const KRecord* kr = run_kdata.data();
+                    const KRecord* kr_end = kr + run_kdata.size();
+                    KRecord temp;
+                    temp.datetime = m_run_ranges[i].run_start;
+                    const auto* it = std::lower_bound(
+                      kr, kr_end, temp,
+                      [](const KRecord& a, const KRecord& b) { return a.datetime < b.datetime; });
+                    if (it != kr_end) {
+                        auto tr = m_tm->sell(it->datetime, m_stock, it->openPrice, MAX_DOUBLE);
+                        if (!tr.isNull()) {
+                            CLS_INFO_IF(trace, "clean_hold_when_select_changed on open: {}", tr);
+                        }
+                    }
+                }
+            }
+
             sys->setParam<bool>("shared_tm", true);
             sys->setParam<bool>("trace", trace);
             sys->setTM(crtWalkForwardTM(getTM(), m_run_ranges[i].run_start));
             syncDataToSystem(sys);
             sys->run(run_kdata, false, false);
             syncDataFromSystem(sys, false);
+            pre_selected_sys = sys;
 
         } else {
             CLS_INFO_IF(trace,
@@ -246,6 +269,24 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
                         "\n+======================================================================="
                         "\n",
                         name(), i + 1, total);
+
+            if (getParam<bool>("clean_hold_when_select_changed")) {
+                if (m_tm->have(m_stock)) {
+                    const KRecord* kr = run_kdata.data();
+                    const KRecord* kr_end = kr + run_kdata.size();
+                    KRecord temp;
+                    temp.datetime = m_run_ranges[i].run_start;
+                    const auto* it = std::lower_bound(
+                      kr, kr_end, temp,
+                      [](const KRecord& a, const KRecord& b) { return a.datetime < b.datetime; });
+                    if (it != kr_end) {
+                        auto tr = m_tm->sell(it->datetime, m_stock, it->openPrice, MAX_DOUBLE);
+                        if (!tr.isNull()) {
+                            CLS_INFO_IF(trace, "clean_hold_when_select_changed on open: {}", tr);
+                        }
+                    }
+                }
+            }
         }
     }
 
