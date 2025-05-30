@@ -85,12 +85,14 @@ bool Performance::exist(const string& key) {
 Performance& Performance::operator=(const Performance& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_result = other.m_result;
+    m_keys = other.m_keys;
     return *this;
 }
 
 Performance& Performance::operator=(Performance&& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_result = std::move(other.m_result);
+    m_keys = std::move(other.m_keys);
     return *this;
 }
 
@@ -130,17 +132,14 @@ void Performance::setValue(const string& key, double value) {
     m_result[key] = value;
 }
 
-string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) {
+string Performance::report() {
     std::stringstream buf;
-    HKU_INFO_IF_RETURN(!tm, buf.str(), "TradeManagerPtr is Null!");
-
-    statistics(tm, datetime);
 
     buf << std::fixed;
     buf.precision(2);
 
     buf.setf(std::ios_base::fixed);
-    buf.precision(tm->precision());
+    buf.precision(2);
     for (const auto& key : m_keys) {
         buf << key << ": " << m_result.at(key) << std::endl;
     }

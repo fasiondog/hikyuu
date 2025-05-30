@@ -10,6 +10,7 @@
 #include "../utilities/Parameter.h"
 #include "TradeRecord.h"
 #include "PositionRecord.h"
+#include "PositionExtInfo.h"
 #include "BorrowRecord.h"
 #include "FundsRecord.h"
 #include "LoanRecord.h"
@@ -18,6 +19,8 @@
 #include "crt/TC_Zero.h"
 
 namespace hku {
+
+class HKU_API Performance;
 
 /**
  * 账户交易管理基类，管理帐户的交易记录及资金使用情况
@@ -28,7 +31,7 @@ namespace hku {
  * </pre>
  * @ingroup TradeManagerClass
  */
-class HKU_API TradeManagerBase {
+class HKU_API TradeManagerBase : public enable_shared_from_this<TradeManagerBase> {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:
@@ -705,6 +708,62 @@ public:
                                           const Datetime& datetime = Null<Datetime>()) {
         HKU_WARN("The subclass does not implement this method");
     }
+
+    //-------------------------------------------------------------
+    // 以下为可能需要授权的功能
+    //-------------------------------------------------------------
+    /**
+     * 统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime，
+     * 以便用于计算当前市值
+     * @param datetime 统计截止时刻
+     */
+    Performance getPerformance(const Datetime& datetime = Datetime::now(),
+                               const KQuery::KType& ktype = KQuery::DAY);
+
+    /**
+     * @brief 获取指定时刻时账户的最大回撤百分比（负数）（仅根据收盘价计算）
+     * @param tm 指定账户
+     * @param date 指定日期（包含该时刻）
+     * @param ktype k线类型
+     * @return price_t
+     */
+    price_t getMaxPullBack(const Datetime& date, const KQuery::KType& ktype = KQuery::DAY);
+
+    /**
+     * @brief 获取账户历史持仓扩展详情
+     * @param ktype k线类型
+     * @param trade_mode 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+     * @return std::vector<PositionExtInfo>
+     */
+    std::vector<PositionExtInfo> getHistoryPositionExtInfoList(
+      const KQuery::KType& ktype = KQuery::DAY, int trade_mode = 0);
+
+    /**
+     * @brief 获取账户最后交易时刻后持仓详情
+     * @param current_time 当前时刻（需大于等于最后交易时刻）
+     * @param ktype k线类型
+     * @param trade_mode 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+     * @return std::vector<PositionExtInfo>
+     */
+    std::vector<PositionExtInfo> getPositionExtInfoList(
+      const Datetime& current_time = Datetime::now(), const KQuery::KType& ktype = KQuery::DAY,
+      int trade_mode = 0);
+
+    /**
+     * @brief 获取指定截止时间前各月的收益百分比
+     * @param datetime
+     * @return std::vector<std::pair<Datetime, double>>
+     */
+    std::vector<std::pair<Datetime, double>> getProfitPercentMonthly(
+      const Datetime& datetime = Datetime::now());
+
+    /**
+     * @brief 获取指定截止时间前各年的收益百分比
+     * @param datetime
+     * @return std::vector<std::pair<Datetime, double>>
+     */
+    std::vector<std::pair<Datetime, double>> getProfitPercentYearly(
+      const Datetime& datetime = Datetime::now());
 
 protected:
     string m_name;            // 账户名称

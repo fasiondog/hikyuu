@@ -10,7 +10,7 @@
 #define PERFORMANCE_H_
 
 #include <boost/function.hpp>
-#include "TradeManager.h"
+#include "TradeManagerBase.h"
 
 namespace hku {
 
@@ -23,8 +23,9 @@ public:
     Performance();
     virtual ~Performance();
 
-    Performance(const Performance& other) : m_result(other.m_result) {}
-    Performance(Performance&& other) : m_result(std::move(other.m_result)) {}
+    Performance(const Performance& other) = default;
+    Performance(Performance&& other)
+    : m_result(std::move(other.m_result)), m_keys(std::move(other.m_keys)) {}
 
     Performance& operator=(const Performance& other);
     Performance& operator=(Performance&& other);
@@ -44,12 +45,12 @@ public:
     }
 
     /**
-     * 简单的文本统计报告，用于直接输出打印
-     * @param tm
+     * 简单的文本统计报告，用于直接输出打印。
+     * @note 只有运行 statistics 后或 Performance 本身为从 TM 获取的结果时才生效
      * @param datetime 指定的截止时刻
      * @return
      */
-    string report(const TradeManagerPtr& tm, const Datetime& datetime = Datetime::now());
+    string report();
 
     /**
      * 根据交易记录，统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime，

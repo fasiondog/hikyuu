@@ -5,8 +5,8 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/plugin/tmreport.h>
 #include <hikyuu/trade_manage/build_in.h>
+#include <hikyuu/trade_manage/Performance.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -572,54 +572,19 @@ void export_TradeManager(py::module& m) {
 
       .def("fetch_asset_info_from_broker", &TradeManagerBase::fetchAssetInfoFromBroker)
 
-      .def(
-        "get_performance",
-        [](TradeManagerPtr& self, const Datetime& datetime) {
-            Performance per;
-            per.statistics(self, datetime);
-            py::dict result;
-            StringList names = per.names();
-            for (const auto& name : names) {
-                result[py::str(name)] = per.get(name);
-            }
-            return result;
-        },
-        py::arg("datetime") = Datetime::now(),
-        R"(get_performance(self, datetime=Datetime.now()) -> dict)
+      .def("get_performance", &TradeManagerBase::getPerformance,
+           py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
+           R"(get_performance(self[, datetime=Datetime.now(), ktype=Query.DAY]) -> dict)
         
     获取账户指定时刻的账户表现
 
-    :param TradeManager tm: 账户
     :param Datetime datetime: 指定时刻
+    :param Query.KType ktype: K线类型
     :return: 账户表现)")
 
-      .def(
-        "get_ext_performance",
-        [](TradeManagerPtr& self, const Datetime& datetime, const KQuery::KType& ktype) {
-            auto per = getExtPerformance(self, datetime, ktype);
-            py::dict result;
-            StringList names = per.names();
-            for (const auto& name : names) {
-                result[py::str(name)] = per.get(name);
-            }
-            return result;
-        },
-        py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
-        R"(get_ext_performance(self, datetime=Datetime.now(), ktype=Query.DAY) -> Performance)
-
-    获取账户指定时刻的账户扩展表现
- 
-    :param Datetime datetime: 指定时刻
-    :param Query.KType ktype: k线类型
-    :return: 账户扩展表现)")
-
-      .def(
-        "get_max_pull_back",
-        [](TradeManagerPtr& self, const Datetime& date, const KQuery::KType& ktype) {
-            return getMaxPullBack(self, date);
-        },
-        py::arg("date") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
-        R"(get_max_pull_back(self, date, ktype=Query.DAY) -> price_t
+      .def("get_max_pull_back", &TradeManagerBase::getMaxPullBack,
+           py::arg("date") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
+           R"(get_max_pull_back(self, date, ktype=Query.DAY) -> price_t
     
     获取指定时刻时账户的最大回撤百分比（负数）
 
@@ -628,11 +593,7 @@ void export_TradeManager(py::module& m) {
     :return: 最大回撤百分比)")
 
       .def(
-        "get_position_ext_info_list",
-        [](TradeManagerPtr& self, const Datetime& current_time, const KQuery::KType& ktype,
-           int trade_mode) {
-            return getPositionExtInfoList(self, current_time, ktype, trade_mode);
-        },
+        "get_position_ext_info_list", &TradeManagerBase::getPositionExtInfoList,
         py::arg("current_time"), py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
         R"(get_position_ext_info_list(self, current_time, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
           
@@ -644,10 +605,7 @@ void export_TradeManager(py::module& m) {
     :return: 持仓扩展详情列表)")
 
       .def(
-        "get_history_position_ext_info_list",
-        [](TradeManagerPtr& self, const KQuery::KType& ktype, int trade_mode) {
-            return getHistoryPositionExtInfoList(self, ktype, trade_mode);
-        },
+        "get_history_position_ext_info_list", &TradeManagerBase::getHistoryPositionExtInfoList,
         py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
         R"(get_history_position_ext_info_list(self, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
           
@@ -656,6 +614,26 @@ void export_TradeManager(py::module& m) {
     :param Query.KType ktype: k线类型
     :param int trade_mode: 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
     :return: 持仓扩展详情列表)")
+
+      .def(
+        "get_profit_percent_monthly", &TradeManagerBase::getProfitPercentMonthly,
+        py::arg("datetime") = Datetime::now(),
+        R"(get_profit_percent_monthly(self, datetime=Datetime.now()) -> list[tuple[Datetime, double]])
+
+    获取账户指定截止时刻的账户收益百分比（月度）
+
+    :param Datetime datetime: 指定截止时刻
+    :return: 账户收益百分比（月度）)")
+
+      .def(
+        "get_profit_percent_yearly", &TradeManagerBase::getProfitPercentYearly,
+        py::arg("datetime") = Datetime::now(),
+        R"(get_profit_percent_yearly(self, datetime=Datetime.now()) -> list[tuple[Datetime, double]])
+
+    获取账户指定截止时刻的账户收益百分比（年度）
+
+    :param Datetime datetime: 指定截止时刻
+    :return: 账户收益百分比（年度）)")
 
         DEF_PICKLE(TradeManagerPtr);
 }

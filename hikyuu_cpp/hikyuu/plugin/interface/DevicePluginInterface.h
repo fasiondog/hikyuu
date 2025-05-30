@@ -20,6 +20,7 @@ public:
     virtual std::string viewLicense() noexcept = 0;
     virtual void removeLicense() noexcept = 0;
     virtual std::string fetchTrialLicense(const std::string& email) noexcept = 0;
+    virtual bool isValidLicsense() noexcept = 0;
 };
 
 }  // namespace hku

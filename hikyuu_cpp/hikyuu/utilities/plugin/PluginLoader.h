@@ -71,6 +71,16 @@ public:
         return true;
     }
 
+    std::string getFileName(const std::string& pluginname) const noexcept {
+#if HKU_OS_WINDOWS
+        return fmt::format("{}/{}.dll", m_path, pluginname);
+#elif HKU_OS_LINUX
+        return fmt::format("{}/lib{}.so", m_path, pluginname);
+#elif HKU_OS_OSX
+        return fmt::format("{}/lib{}.dylib", m_path, pluginname);
+#endif
+    }
+
 private:
     void unload() noexcept {
         m_plugin.reset();
@@ -90,16 +100,6 @@ private:
         void* func = dlsym(m_handle, symbol);
 #endif
         return func;
-    }
-
-    std::string getFileName(const std::string& pluginname) const noexcept {
-#if HKU_OS_WINDOWS
-        return fmt::format("{}/{}.dll", m_path, pluginname);
-#elif HKU_OS_LINUX
-        return fmt::format("{}/lib{}.so", m_path, pluginname);
-#elif HKU_OS_OSX
-        return fmt::format("{}/lib{}.dylib", m_path, pluginname);
-#endif
     }
 
 private:
