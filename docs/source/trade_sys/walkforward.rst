@@ -39,4 +39,10 @@ PF（投资组合）中的 SE，则是在调仓日对所有候选系统进行排
     使用 Performance 统计结果进行寻优的选择器
 
     :param string key: Performance 统计项
-    :param int mode:  0 取统计结果最大的值系统 | 1 取统计结果为最小值的系统    
+    :param int mode:  0 取统计结果最大的值系统 | 1 取统计结果为最小值的系统
+
+.. py:function:: SE_EvaluateOptimal(evalulate_func)
+
+    使用自定义函数进行寻优的选择器
+
+    :param func: 一个可调用对象，接收参数为 (sys, lastdate)，返回一个 float 数值
