@@ -43,4 +43,13 @@ std::string HKU_API fetchTrialLicense(const std::string& email) {
     return plugin->fetchTrialLicense(email);
 }
 
+bool HKU_API isValidLicense() {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
+    if (!plugin) {
+        return false;
+    }
+    return plugin->isValidLicsense();
+}
+
 }  // namespace hku

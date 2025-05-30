@@ -17,13 +17,16 @@ namespace hku {
  */
 void HKU_API activeDevice(const std::string& active_code);
 
-// 查看当前授权
+/** 查看授权信息 */
 std::string HKU_API viewLicense();
 
-// 移除授权
+/** 移除授权 */
 void HKU_API removeLicense();
 
-// 获取试用授权
+/** 获取 trial 授权 */
 std::string HKU_API fetchTrialLicense(const std::string& email);
+
+/** 检查授权是否有效 */
+bool HKU_API isValidLicense();
 
 }  // namespace hku
