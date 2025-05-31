@@ -2,7 +2,7 @@ click
 numpy
 matplotlib
 seaborn
-pandas>=0.17.1
+pandas
 pytdx
 PyQt5
 tables
