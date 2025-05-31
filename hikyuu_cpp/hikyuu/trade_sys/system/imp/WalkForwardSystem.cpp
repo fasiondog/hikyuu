@@ -227,10 +227,11 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
               "\n|  name: {} "
               "\n|  iteration {}|{}: {}, {}"
               "\n|  use sys: {}"
+              "\n|  sys score: {}"
               "\n|"
               "\n+=======================================================================\n",
               name(), i + 1, total, m_run_ranges[i].run_start,
-              run_kdata[run_kdata.size() - 1].datetime, sys->name());
+              run_kdata[run_kdata.size() - 1].datetime, sys->name(), sw_list.front().weight);
 
             if (getParam<bool>("clean_hold_when_select_changed")) {
                 if (sys != pre_selected_sys && m_tm->have(m_stock)) {
@@ -242,7 +243,9 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
                       kr, kr_end, temp,
                       [](const KRecord& a, const KRecord& b) { return a.datetime < b.datetime; });
                     if (it != kr_end) {
-                        auto tr = m_tm->sell(it->datetime, m_stock, it->openPrice, MAX_DOUBLE);
+                        KRecord src_kr = stock.getKRecord(it->datetime);
+                        auto tr =
+                          m_tm->sell(src_kr.datetime, m_stock, src_kr.openPrice, MAX_DOUBLE);
                         if (!tr.isNull()) {
                             CLS_INFO_IF(trace, "clean_hold_when_select_changed on open: {}", tr);
                         }
@@ -280,7 +283,9 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
                       kr, kr_end, temp,
                       [](const KRecord& a, const KRecord& b) { return a.datetime < b.datetime; });
                     if (it != kr_end) {
-                        auto tr = m_tm->sell(it->datetime, m_stock, it->openPrice, MAX_DOUBLE);
+                        KRecord src_kr = stock.getKRecord(it->datetime);
+                        auto tr =
+                          m_tm->sell(src_kr.datetime, m_stock, src_kr.openPrice, MAX_DOUBLE);
                         if (!tr.isNull()) {
                             CLS_INFO_IF(trace, "clean_hold_when_select_changed on open: {}", tr);
                         }
