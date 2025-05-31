@@ -2220,4 +2220,14 @@ void export_Indicator_build_in(py::module& m) {
 
     :param KData kdata: K线数据
     :rtype: Indicator)");
+
+    m.def("BARSLASTCOUNT", py::overload_cast<>(BARSLASTCOUNT));
+    m.def("BARSLASTCOUNT", py::overload_cast<const Indicator&>(BARSLASTCOUNT), py::arg("data"),
+          R"(BARSLASTCOUNT([data])
+
+    用于统计连续满足条件的周期数
+    BARSLASTCOUNT(X), 其中X为条件表达式。例如, BARSLASTCOUNT(CLOSE>OPEN)表示统计连续收阳的周期数
+
+    :param Indicator data: 条件指标
+    :rtype: Indicator)");
 }

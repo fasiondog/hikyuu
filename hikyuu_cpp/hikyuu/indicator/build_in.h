@@ -24,6 +24,7 @@
 #include "crt/BACKSET.h"
 #include "crt/BARSCOUNT.h"
 #include "crt/BARSLAST.h"
+#include "crt/BARSLASTCOUNT.h"
 #include "crt/BARSSINCE.h"
 #include "crt/BETWEEN.h"
 #include "crt/BLOCKSETNUM.h"
