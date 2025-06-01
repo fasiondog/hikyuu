@@ -135,6 +135,7 @@
 * :py:func:`BACKSET` - 向前赋值将当前位置到若干周期前的数据设为1
 * :py:func:`BARSCOUNT` - 有效值周期数, 求总的周期数。
 * :py:func:`BARSLAST` - 上一次条件成立位置, 上一次条件成立到当前的周期数
+* :py:func:`BARSLASTCOUNT` - 统计连续满足条件的周期数
 * :py:func:`BARSSINCE` - 第一个条件成立位置到当前的周期数
 * :py:func:`COUNT` - 统计满足条件的周期数
 * :py:func:`COST` - 成本分布
