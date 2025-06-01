@@ -43,6 +43,7 @@ public:
     // 以便继承子类只需要实现 _clone 和 该接口即可
     // 该接口实现系统绩效评估，getSelected 时将取评估结果最大的系统
     // 使用 std::function 的话，在 C++ 中无法序列化，所以使用继承
+    // 返回 Null<double> 时，将不被评估选中
     virtual double evaluate(const SYSPtr& sys, const Datetime& endDate) noexcept {
         return Null<double>();
     }

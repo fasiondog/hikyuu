@@ -570,11 +570,18 @@ void export_TradeManager(py::module& m) {
 
       :param Datetime date: 当前时刻)")
 
-      .def("fetch_asset_info_from_broker", &TradeManagerBase::fetchAssetInfoFromBroker)
+      .def("fetch_asset_info_from_broker", &TradeManagerBase::fetchAssetInfoFromBroker,
+           py::arg("broker"), py::arg("date") = Datetime(),
+           R"(fetch_asset_info_from_broker(self, date)
+
+      从Broker同步当前时刻的资产信息，必须按时间顺序被调用
+
+      :param broker 订单代理实例
+      :param datetime 同步时，通常为当前时间（Null)，也可以强制为指定的时间点)")
 
       .def("get_performance", &TradeManagerBase::getPerformance,
            py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
-           R"(get_performance(self[, datetime=Datetime.now(), ktype=Query.DAY]) -> dict)
+           R"(get_performance(self[, datetime=Datetime.now(), ktype=Query.DAY]) -> Performance)
         
     获取账户指定时刻的账户表现
 
@@ -584,7 +591,7 @@ void export_TradeManager(py::module& m) {
 
       .def("get_max_pull_back", &TradeManagerBase::getMaxPullBack,
            py::arg("date") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
-           R"(get_max_pull_back(self, date, ktype=Query.DAY) -> price_t
+           R"(get_max_pull_back(self, date, ktype=Query.DAY) -> float
     
     获取指定时刻时账户的最大回撤百分比（负数）
 
