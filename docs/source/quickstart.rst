@@ -57,11 +57,11 @@ pip 安装 Hikyuu 后，可在命令行终端中执行 hikyuutdx 命令，启动
 ::
 
     #在交互式环境下使用hikyuu，首先需引入hikyuu交互工具
-    from hikyuu.interactive.interactive import *
+    from hikyuu.interactive import *
     
 .. note::
 
-    Hikyuu本身是普通的Python包，而 hikyuu.interactive.interactive 为 Hikyuu 包中包含的交互式工具。如希望基于 hikyuu 包开发自己的其他程序而不是作为交互式程序使用，可以参考 hikyuu/interactive/interactive.py 实现 hikyuu 的正常初始化。
+    Hikyuu本身是普通的Python包，而 hikyuu.interactive 为 Hikyuu 包中包含的交互式工具。如希望基于 hikyuu 包开发自己的其他程序而不是作为交互式程序使用，可以参考 hikyuu/interactive/interactive.py 实现 hikyuu 的正常初始化。
 
 
 使用 Jupyter notebook 编辑和运行
