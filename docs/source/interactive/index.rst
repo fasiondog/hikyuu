@@ -1,7 +1,7 @@
 交互工具
 =========
 
-Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建自己的客户端程序。而Hikyuu库本身自带一个交互式工具，可以在Python Shell环境下进行探索，可以从在Python shell中使用 “from hikyuu.interactive.interactive” 引入该工具。该工具主要提供基于 matplotlib 的图形绘制函数，便于在交互式环境下绘制K线、指标、信号等。
+Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建自己的客户端程序。而Hikyuu库本身自带一个交互式工具，可以在Python Shell环境下进行探索，可以从在Python shell中使用 “from hikyuu.interactive” 引入该工具。该工具主要提供基于 matplotlib 的图形绘制函数，便于在交互式环境下绘制K线、指标、信号等。
 
 使用 matplotlib 绘制图形，必须了解 matplotlib 绘图中的两个基本对象：figure、axes。窗口（figure）是坐标轴（axes）对象的容器，绘图时首先需指定窗口，在窗口中绘制相应的坐标轴，然后在坐标轴中绘制图形。在 matplotlib 中绘制图形需要指定图形在哪个坐标轴中进行绘制。当绘图函数中没有指定坐标轴时，将默认使用当前的坐标轴，如果不存在任何一个坐标轴时，matplotlib 将创建自动创建一个窗口及其包含的坐标轴。
 

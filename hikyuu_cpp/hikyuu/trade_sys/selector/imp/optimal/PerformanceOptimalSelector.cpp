@@ -25,9 +25,6 @@ void PerformanceOptimalSelector::_checkParam(const string& name) const {
     if ("mode" == name) {
         int mode = getParam<int>(name);
         HKU_ASSERT(0 == mode || 1 == mode);
-    } else if ("key" == name) {
-        string key = getParam<string>("key");
-        HKU_CHECK(Performance::exist(key), R"(Invalid key("{}") in Performance!)", key);
     }
 }
 

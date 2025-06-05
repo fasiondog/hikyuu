@@ -55,6 +55,7 @@ TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_not_parallel") {
     CHECK_EQ(sys->name(), "SYS_WalkForward");
     query = KQueryByIndex(-125);
     sys->setParam<bool>("parallel", false);
+    sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->run(stk, query);
 
     auto delay_request = sys->getBuyTradeRequest();
@@ -83,6 +84,7 @@ TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_not_parallel") {
     sys = SYS_WalkForward(sys_list, tm, 30, 20, se);
     query = KQueryByIndex(-125);
     sys->setParam<bool>("parallel", false);
+    sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->run(stk, query);
 
     delay_request = sys->getBuyTradeRequest();
@@ -113,6 +115,7 @@ TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_parallel") {
     auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20, se);
     CHECK_EQ(sys->name(), "SYS_WalkForward");
     query = KQueryByIndex(-125);
+    sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->setParam<bool>("parallel", true);
     sys->run(stk, query);
 
@@ -141,6 +144,7 @@ TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_parallel") {
     REQUIRE(tm->getTradeList().size() == 1);
     sys = SYS_WalkForward(sys_list, tm, 30, 20, se);
     query = KQueryByIndex(-125);
+    sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->setParam<bool>("parallel", true);
     sys->run(stk, query);
 
@@ -171,6 +175,7 @@ TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_not_parallel") {
     auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20, se);
     CHECK_EQ(sys->name(), "SYS_WalkForward");
     query = KQueryByIndex(-125);
+    sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->setParam<bool>("parallel", false);
     sys->run(stk, query);
 
@@ -199,6 +204,7 @@ TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_not_parallel") {
     REQUIRE(tm->getTradeList().size() == 1);
     sys = SYS_WalkForward(sys_list, tm, 30, 20, se);
     query = KQueryByIndex(-125);
+    sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->setParam<bool>("parallel", false);
     sys->run(stk, query);
 
@@ -229,6 +235,7 @@ TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_parallel") {
     auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20, se);
     CHECK_EQ(sys->name(), "SYS_WalkForward");
     query = KQueryByIndex(-125);
+    sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->setParam<bool>("parallel", true);
     sys->run(stk, query);
 
@@ -257,6 +264,7 @@ TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_parallel") {
     REQUIRE(tm->getTradeList().size() == 1);
     sys = SYS_WalkForward(sys_list, tm, 30, 20, se);
     query = KQueryByIndex(-125);
+    sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->setParam<bool>("parallel", true);
     sys->run(stk, query);
 

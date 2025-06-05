@@ -35,6 +35,37 @@ PositionRecord::PositionRecord(const Stock& stock, const Datetime& takeDatetime,
   totalRisk(totalRisk),
   sellMoney(sellMoney) {}
 
+PositionRecord::PositionRecord(PositionRecord&& rhs)
+: stock(std::move(rhs.stock)),
+  takeDatetime(rhs.takeDatetime),
+  cleanDatetime(rhs.cleanDatetime),
+  number(rhs.number),
+  stoploss(rhs.stoploss),
+  goalPrice(rhs.goalPrice),
+  totalNumber(rhs.totalNumber),
+  buyMoney(rhs.buyMoney),
+  totalCost(rhs.totalCost),
+  totalRisk(rhs.totalRisk),
+  sellMoney(rhs.sellMoney) {}
+
+PositionRecord& PositionRecord::operator=(PositionRecord&& rhs) {
+    if (this != &rhs) {
+        stock = std::move(rhs.stock);
+        takeDatetime = rhs.takeDatetime;
+        cleanDatetime = rhs.cleanDatetime;
+        number = rhs.number;
+        stoploss = rhs.stoploss;
+        goalPrice = rhs.goalPrice;
+        totalNumber = rhs.totalNumber;
+        buyMoney = rhs.buyMoney;
+        sellMoney = rhs.sellMoney;
+        totalCost = rhs.totalCost;
+        totalRisk = rhs.totalRisk;
+        sellMoney = rhs.sellMoney;
+    }
+    return *this;
+}
+
 HKU_API std::ostream& operator<<(std::ostream& os, const PositionRecord& record) {
     Stock stock = record.stock;
     int precision = 2;

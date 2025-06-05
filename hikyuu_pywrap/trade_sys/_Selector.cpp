@@ -298,4 +298,20 @@ void export_Selector(py::module& m) {
 
     :param string key: Performance 统计项
     :param int mode:  0 取统计结果最大的值系统 | 1 取统计结果为最小值的系统)");
+
+    m.def(
+      "SE_EvaluateOptimal",
+      [](py::object evalulate_func) {
+          py::object pyfunc = evalulate_func.attr("__call__");
+          check_pyfunction_arg_num(pyfunc, 2);
+          return SE_EvaluateOptimal([=](const SystemPtr& sys, const Datetime& enddate) {
+              py::object pyfunc = evalulate_func.attr("__call__");
+              return pyfunc(sys, enddate).cast<double>();
+          });
+      },
+      R"(SE_EvaluateOptimal(evalulate_func)
+
+    使用自定义函数进行寻优的选择器
+
+    :param func: 一个可调用对象，接收参数为 (sys, lastdate)，返回一个 float 数值)");
 }

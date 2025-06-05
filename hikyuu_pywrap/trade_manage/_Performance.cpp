@@ -14,19 +14,18 @@ namespace py = pybind11;
 void export_Performance(py::module& m) {
     py::class_<Performance>(m, "Performance", "简单绩效统计")
       .def(py::init<>())
-      .def_static("exist", &Performance::exist)
+      .def("exist", &Performance::exist)
 
       .def("reset", &Performance::reset, R"(reset(self)
 
         复位，清除已计算的结果)")
 
-      .def("report", &Performance::report, py::arg("tm"), py::arg("datetime") = Datetime::now(),
-           R"(report(self, tm[, datetime=Datetime.now()])
+      .def("report", &Performance::report,
+           R"(report(self)
 
         简单的文本统计报告，用于直接输出打印
+        只有运行 statistics 后或 Performance 本身为从 TM 获取的结果时才生效
 
-        :param TradeManager tm: 指定的交易管理实例
-        :param Datetime datetime: 统计截止时刻
         :rtype: str)")
 
       .def("statistics", &Performance::statistics, py::arg("tm"),
@@ -45,6 +44,16 @@ void export_Performance(py::module& m) {
       .def("values", &Performance::values, R"(values(self)
       
       获取所有统计项值，顺序与 names 相同)")
+
+      .def("to_dict",
+           [](Performance& self) {
+               py::dict result;
+               StringList names = self.names();
+               for (const auto& name : names) {
+                   result[py::str(name)] = self.get(name);
+               }
+               return result;
+           })
 
       .def("__getitem__", &Performance::get,
            R"(按指标名称获取指标值，必须在运行 statistics 或 report 之后生效

@@ -1,7 +1,6 @@
 VIP功能
 ========
 
-
 .. toctree::
 
    indicator

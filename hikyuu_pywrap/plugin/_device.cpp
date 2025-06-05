@@ -31,4 +31,8 @@ void export_plugin_device(py::module& m) {
     获取试用授权码
     
     :param str email: 邮箱地址)");
+
+    m.def("is_valid_license", isValidLicense, R"(is_valid_license()
+        
+    查看当前设备是否授权)");
 }

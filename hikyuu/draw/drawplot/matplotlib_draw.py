@@ -581,7 +581,7 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     y_pad = (y_max - y_min) * 0.1  # 上下各留10%空白
     y_min -= y_pad
     y_max += y_pad
-    axes.set_ylim(y_min, y_max) # 设置MACD柱y轴范围
+    axes.set_ylim(y_min, y_max)  # 设置MACD柱y轴范围
     axt.set_ylim(y_min, y_max)  # 设置DIF/DEA的y轴范围
 
     fmacd.plot(axes=axt, linestyle='--', legend_on=False, text_on=False)
@@ -632,7 +632,7 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     axt = axes.twinx()
     axt.grid(False)
     axt.set_yticks([])
-    
+
     # 计算MACD柱和DIF/DEA的y轴极值,并对齐
     y_all = np.concatenate([np.asarray(bmacd), np.asarray(fmacd), np.asarray(smacd)])
     y_min = np.nanmin(y_all)
@@ -640,7 +640,7 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     y_pad = (y_max - y_min) * 0.1  # 上下各留10%空白
     y_min -= y_pad
     y_max += y_pad
-    axes.set_ylim(y_min, y_max) # 设置MACD柱y轴范围
+    axes.set_ylim(y_min, y_max)  # 设置MACD柱y轴范围
     axt.set_ylim(y_min, y_max)  # 设置DIF/DEA的y轴范围
 
     fmacd.plot(axes=axt, linestyle='--', legend_on=False, text_on=False)
@@ -870,8 +870,8 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None):
     ref_return = ALIGN(ROCR(ref_k.close, 0), ref_dates)
     ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"
 
-    per = Performance()
-    text = per.report(tm, sh000001_k[-1].datetime)
+    per = tm.get_performance(sh000001_k[-1].datetime)
+    text = per.report()
 
     # 计算最大回撤
     max_pullback = min(MDD(funds).to_np())
@@ -951,8 +951,8 @@ def sys_performance(sys, ref_stk=None):
     ref_return = ALIGN(ROCR(ref_k.close, 0), ref_dates)
     ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"
 
-    per = Performance()
-    text = per.report(sys.tm, sh000001_k[-1].datetime)
+    per = sys.tm.get_performance(sh000001_k[-1].datetime)
+    text = per.report()
 
     # 计算最大回撤
     max_pullback = min(MDD(funds).to_np())
