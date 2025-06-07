@@ -38,6 +38,10 @@ Datetime Datetime::fromHex(uint64_t time) {
     return Datetime((long)year, (long)month, (long)day, (long)hour, (long)minute, (long)second);
 }
 
+Datetime Datetime::fromTimestamp(int64_t timestamp) {
+    return TimeDelta::fromTicks(timestamp) + Datetime(1970, 1, 1);
+}
+
 Datetime::Datetime(long year, long month, long day, long hh, long mm, long sec, long millisec,
                    long microsec) {
     HKU_CHECK(millisec >= 0 && millisec <= 999, "Out of range! millisec: {}", millisec);
@@ -288,6 +292,20 @@ uint64_t Datetime::ticks() const noexcept {
     try {
         HKU_IF_RETURN(isNull(), Null<uint64_t>());
         TimeDelta d = (*this) - Datetime::min();
+        return d.ticks();
+    } catch (const std::exception &e) {
+        HKU_ERROR(e.what());
+        return Null<uint64_t>();
+    } catch (...) {
+        HKU_ERROR("Unknown error!");
+        return Null<uint64_t>();
+    }
+}
+
+int64_t Datetime::timestamp() const noexcept {
+    try {
+        HKU_IF_RETURN(isNull(), Null<uint64_t>());
+        TimeDelta d = (*this) - Datetime(1970, 1, 1);
         return d.ticks();
     } catch (const std::exception &e) {
         HKU_ERROR(e.what());
