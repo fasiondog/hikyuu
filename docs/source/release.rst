@@ -1017,7 +1017,7 @@ fixed MySQL引擎只能导入数据，但实际无法使用
 
 1. 完善Python帮助，以便在Shell中直接使用 help(cmd) 查询
 2. 修改数据驱动，支持直接使用Python编写数据驱动。实现使用 pytdx 作为K线数据驱动的示例，详见安装目录下“data_driver\pytdx_data_driver.py”。如有需要使用MySQL、CSV等存储K线数据的，可参考该示例自行实现。
-3. 优化了初始化过程，可不使用ini文件进行初始化，如实现自己的客户端，可参考“interactive.interactive.py”中初始化过程。
+3. 优化了初始化过程，可不使用ini文件进行初始化，如实现自己的客户端，可参考“interactive.py”中初始化过程。
 4. 简化了数据配置文件， **如安装了1.0.5及其之前的版本，需要重新运行 python hku_config.py 进行配置，或手工修改配置文件** 。 
 5. 修复Bug，TradeManager::getProfitCurve未对长度为0的dates进行保护
 6. 修正系统止损策略部件的缩写不一致问题
