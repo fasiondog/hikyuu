@@ -20,7 +20,7 @@ CREATE TABLE hku_base.n_market (
 );
 INSERT INTO hku_base.n_market (id,marketid,market,name,description,code,lastDate,opentime1,closetime1,opentime2,closetime2) VALUES (631152000000000,1,'SH','上海证券交易所','上海市场','000001',19901219,930,1130,1300,1500);
 INSERT INTO hku_base.n_market (id,marketid,market,name,description,code,lastDate,opentime1,closetime1,opentime2,closetime2) VALUES (631152000001000,2,'SZ','深圳证券交易所','深圳市场','399001',19901219,930,1130,1300,1500);
-INSERT INTO hku_base.n_market (id,marketid,market,name,description,code,lastDate,opentime1,closetime1,opentime2,closetime2) VALUES (631152000002000,2,'BJ','北京证券交易所','北京市场','899050',19901219,930,1130,1300,1500);
+INSERT INTO hku_base.n_market (id,marketid,market,name,description,code,lastDate,opentime1,closetime1,opentime2,closetime2) VALUES (631152000002000,3,'BJ','北京证券交易所','北京市场','899050',19901219,930,1130,1300,1500);
 
 create table hku_base.n_stock (
     stockid TIMESTAMP,

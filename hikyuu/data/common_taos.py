@@ -87,9 +87,9 @@ def create_database(connect):
 
 def get_marketid(connect, market):
     cur = connect.cursor()
-    cur.execute("select marketid, market from `hku_base`.`market` where market='{}'".format(market.upper()))
-    marketid = cur.fetchone()
-    marketid = marketid[0]
+    cur.execute("select marketid, market from hku_base.n_market where market='{}'".format(market.upper()))
+    marketid = [v for v in cur]
+    marketid = marketid[0][0]
     cur.close()
     return marketid
 
@@ -97,12 +97,12 @@ def get_marketid(connect, market):
 def get_codepre_list(connect, marketid, quotations):
     """获取前缀代码表"""
     stktype_list = get_stktype_list(quotations)
-    sql = "select codepre, type from `hku_base`.`coderuletype` " \
+    sql = "select codepre, type from `hku_base`.`n_coderuletype` " \
           "where marketid={marketid} and type in {type_list} ORDER by length(codepre) DESC"\
         .format(marketid=marketid, type_list=stktype_list)
     cur = connect.cursor()
     cur.execute(sql)
-    a = cur.fetchall()
+    a = [v for v in cur]
     cur.close()
     return sorted(a, key=lambda k: len(k[0]), reverse=True)
 
