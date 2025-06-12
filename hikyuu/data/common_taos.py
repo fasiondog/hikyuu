@@ -508,11 +508,11 @@ if __name__ == '__main__':
     # connect.execute("drop database if exists sh_day")
     # print(is_exist_db(connect))
 
-    # create_database(connect)
-    # print(is_exist_db(connect))
+    create_database(connect)
+    print(is_exist_db(connect))
 
-    # x = get_db_version(connect)
-    # print(x)
+    x = get_db_version(connect)
+    print(x)
 
     # get_table(connect, "SH", "000001", "DAY")
 
