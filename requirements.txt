@@ -20,3 +20,4 @@ pyecharts
 pipdeptree
 h5py
 tdqm
+taospy
