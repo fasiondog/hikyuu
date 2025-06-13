@@ -131,40 +131,30 @@ def import_stock_name(connect, api, market, quotations=None):
     stktype_list.remove(STOCKTYPE.INDEX)  # 移除指数类型
     stktype_list = tuple(stktype_list)
     cur.execute(
-        "select cast(stockid as bigint), code, name, valid from hku_base.n_stock where marketid={} and type in {}".format(
+        "select cast(stockid as bigint), marketid, code, name, type, valid, startDate, endDate from hku_base.n_stock where marketid={} and type in {}".format(
             marketid, stktype_list
         )
     )
     a = [v for v in cur]
-    print(a)
     oldStockDict = {}
     for oldstock in a:
-        oldstockid, oldcode, oldname, oldvalid = (
-            oldstock[0],
-            oldstock[1],
-            oldstock[2],
-            int(oldstock[3]),
-        )
+        oldstockid, oldmarketid, oldcode, oldname, oldtype, oldvalid, oldstartDate, oldendDate = oldstock
         oldStockDict[oldcode] = oldstockid
 
-        # # 新的代码表中无此股票，则置为无效
-        # if (oldvalid == 1) and ((oldcode not in newStockDict) or oldcode in deSet):
-        #     cur.execute(
-        #         "update `hku_base`.`stock` set valid=0 where stockid=%i" % oldstockid
-        #     )
+        # 新的代码表中无此股票，则置为无效
+        if (oldvalid == 1) and ((oldcode not in newStockDict) or oldcode in deSet):
+            cur.execute(
+                f"insert into hku_base.n_stock (stockid, marketid, code, name, type, valid, startDate, endDate) values ({oldstockid}, {oldmarketid}, '{oldcode}', '{oldname}', {oldtype}, 0, {oldstartDate}, {oldendDate})"
+            )
 
-        # # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
-        # if oldcode in newStockDict:
-        #     if oldname != newStockDict[oldcode]:
-        #         cur.execute(
-        #             "update `hku_base`.`stock` set name='%s' where stockid=%i"
-        #             % (newStockDict[oldcode], oldstockid)
-        #         )
-        #     if oldvalid == 0:
-        #         cur.execute(
-        #             "update `hku_base`.`stock` set valid=1, endDate=99999999 where stockid=%i"
-        #             % oldstockid
-        #         )
+        # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
+        if oldcode in newStockDict:
+            if oldname != newStockDict[oldcode]:
+                cur.execute(
+                    f"insert into hku_base.n_stock (stockid, marketid, code, name, type, valid, startDate, endDate) values ({oldstockid}, {oldmarketid}, '{oldcode}', '{newStockDict[oldcode]}', {oldtype}, {oldvalid}, {oldstartDate}, {oldendDate})")
+            if oldvalid == 0:
+                cur.execute(
+                    f"insert into hku_base.n_stock (stockid, marketid, code, name, type, valid, startDate, endDate) values ({oldstockid}, {oldmarketid}, '{oldcode}', '{oldname}', {oldtype}, 1, {oldstartDate}, 99999999)")
 
     # 处理新出现的股票
     codepre_list = get_codepre_list(connect, marketid, quotations)
@@ -197,9 +187,8 @@ def import_stock_name(connect, api, market, quotations=None):
                     count += 1
                     break
 
-    # # print('%s新增股票数：%i' % (market.upper(), count))
-    # connect.commit()
-    # cur.close()
+    # print('%s新增股票数：%i' % (market.upper(), count))
+    cur.close()
     return count
 
 
