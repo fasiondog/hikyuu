@@ -8,6 +8,7 @@
  */
 
 #include <cstdint>
+#include <ctime>
 #include "TimeDelta.h"
 #include "hikyuu/utilities/arithmetic.h"
 #include "hikyuu/utilities/Log.h"
@@ -188,6 +189,24 @@ double TimeDelta::operator/(TimeDelta td) const {
 TimeDelta TimeDelta::operator%(TimeDelta td) const {
     HKU_CHECK(td.ticks() != 0, "Attemp to divide(mod) by zero TimeDelta!");
     return TimeDelta::fromTicks(ticks() % td.ticks());
+}
+
+TimeDelta HKU_UTILS_API UTCOffset() {
+    // 获取当前时间戳
+    time_t now = time(nullptr);
+
+    // 转换为本地时间结构体
+    struct tm* local_tm = localtime(&now);
+
+    // 转换为 UTC 时间结构体
+    struct tm* utc_tm = gmtime(&now);
+
+    // 计算本地时间和 UTC 时间的时间戳差值
+    time_t local_time = mktime(local_tm);
+    time_t utc_time = mktime(utc_tm);
+
+    // 计算偏移量（秒）
+    return Seconds(local_time - utc_time);
 }
 
 } /* namespace hku */
