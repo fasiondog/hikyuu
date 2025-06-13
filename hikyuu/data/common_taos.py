@@ -27,9 +27,9 @@ import datetime
 from pathlib import Path
 
 import taos
-from hikyuu import Query
+from hikyuu import Datetime
 from hikyuu.data.common import get_stktype_list, get_new_holidays
-from hikyuu.util import hku_debug, hku_info
+from hikyuu.util import hku_debug, hku_catch
 
 
 def is_exist_db(connect):
@@ -110,12 +110,11 @@ def get_codepre_list(connect, marketid, quotations):
 def get_stock_list(connect, market, quotations):
     marketid = get_marketid(connect, market)
     stktype_list = get_stktype_list(quotations)
-    sql = "select stockid, marketid, code, valid, type from `hku_base`.`stock` where marketid={} and type in {}"\
+    sql = "select cast(stockid as bigint), marketid, code, valid, type from hku_base.n_stock where marketid={} and type in {}"\
         .format(marketid, stktype_list)
     cur = connect.cursor()
     cur.execute(sql)
-    a = cur.fetchall()
-    connect.commit()
+    a = [v for v in cur]
     cur.close()
     return a
 
@@ -123,15 +122,15 @@ def get_stock_list(connect, market, quotations):
 def import_new_holidays(connect):
     """导入新的交易所休假日历"""
     cur = connect.cursor()
-    cur.execute("select date from `hku_base`.`holiday` order by date desc limit 1")
-    a = cur.fetchall()
+    cur.execute("select date from `hku_base`.`z_zh_holiday` order by date desc limit 1")
+    a = [v for v in cur]
     last_date = a[0][0] if a else 19901219
     holidays = get_new_holidays()
     new_holidays = [(int(v), ) for v in holidays if int(v) > last_date]
-    if new_holidays:
-        cur.executemany("insert into `hku_base`.`holiday` (date) values (%s)", new_holidays)
-        connect.commit()
-        cur.close()
+    now_id = int(datetime.datetime.now().timestamp()*1000)
+    for i, v in enumerate(new_holidays):
+        cur.execute(f"insert into `hku_base`.`z_zh_holiday` (id, date) values ({now_id+i}, {v[0]})")
+    cur.close()
 
 
 def get_table(connect, market, code, ktype):
@@ -155,46 +154,56 @@ def get_table(connect, market, code, ktype):
         'min15': 'min15',
         'min30': 'min30',
         'min60': 'min60',
+        'timeline': 'timeline',
+        'transdata': 'transdata',
     }
-    schema = "{market}_{ktype}".format(market=market, ktype=ktype_dict[ktype.lower()]).lower()
-    cur.execute("SELECT name FROM information_schema.ins_databases WHERE name='{}'".format(schema))
+    schema = "hku_data"
+    cur.execute(
+        "SELECT name FROM information_schema.ins_databases WHERE name='{}'".format(schema))
+    nktype = ktype_dict[ktype.lower()]
+    nmarket = market.lower()
+    stable = nktype if nktype in ('timeline', 'transdata') else 'kdata'
     a = [x for x in cur]
     if not a:
-        cur.execute("CREATE DATABASE IF NOT EXISTS {} KEEP 365000 WAL_LEVEL 2".format(schema))
-        sql = """
+        sql = f"CREATE DATABASE IF NOT EXISTS {schema} PRECISION 'us' KEEP 365000 WAL_LEVEL 2"
+        cur.execute(sql)
+        sql = f"CREATE STABLE `{schema}`.timeline (id timestamp, price DOUBLE, vol DOUBLE) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));"
+        cur.execute(sql)
+        sql = f"CREATE STABLE `{schema}`.transdata (id timestamp, price DOUBLE, vol DOUBLE, direct int) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));"
+        cur.execute(sql)
+        sql = f"""
                 CREATE STABLE `{schema}`.kdata (
-                    `date` timestamp,
+                    `id` timestamp,
                     `open` DOUBLE,
                     `high` DOUBLE,
                     `low` DOUBLE,
                     `close` DOUBLE,
                     `amount` DOUBLE,
-                    `count` DOUBLE
-                ) TAGS (code VARCHAR(20));
-              """.format(schema=schema)
+                    `volume` DOUBLE
+                ) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));
+              """
         cur.execute(sql)
 
-    tablename = code.lower()
+    ncode = code.lower()
+    tablename = f"{nmarket}_{nktype}_{ncode}"
     cur.execute(
-        "SELECT 1 FROM information_schema.ins_tables "
-        "where db_name='{schema}' and table_name='{name}'".format(schema=schema, name=tablename)
-    )
+        f"SELECT 1 FROM information_schema.ins_tables where db_name='{schema}' and table_name='{tablename}'")
     a = [x for x in cur]
     if not a:
-        sql = "CREATE TABLE `{schema}`.`{name}` using `{schema}`.`kdata` (code) TAGS('{code}');".format(
-            schema=schema, name=tablename, code=code)
+        sql = f"CREATE TABLE `{schema}`.`{tablename}` using `{schema}`.{stable} (market, code, ktype) TAGS('{nmarket}', '{ncode}', '{nktype}');"
         cur.execute(sql)
         connect.commit()
 
     cur.close()
-    return "`{schema}`.`{name}`".format(schema=schema, name=tablename)
+    return f"`{schema}`.`{tablename}`"
 
 
+@hku_catch(ret=None)
 def get_lastdatetime(connect, tablename):
-    cur = connect.cursor()
-    cur.execute("select max(date) from {}".format(tablename))
-    a = cur.fetchone()
-    return a[0]
+    # print(tablename)
+    tmp = connect.query("select LAST_ROW(id) from {}".format(tablename))
+    a = tmp.fetch_all()
+    return Datetime(a[0][0]) if a and len(a[0]) > 0 else None
 
 
 def update_extern_data(connect, market, code, data_type):
@@ -511,9 +520,14 @@ if __name__ == '__main__':
     create_database(connect)
     print(is_exist_db(connect))
 
+    # import_new_holidays(connect)
+
     x = get_db_version(connect)
     print(x)
 
     # get_table(connect, "SH", "000001", "DAY")
+
+    d = get_lastdatetime(connect, "hku_data.sh_day_000001")
+    print(d)
 
     connect.close()

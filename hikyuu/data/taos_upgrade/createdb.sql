@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS hku_base.n_block (
     market_code VARCHAR(30)
 );
 
-CREATE STABLE IF NOT EXISTS hku_base.s_stkWeight (
+CREATE STABLE IF NOT EXISTS hku_base.s_stkweight (
 	date TIMESTAMP, 
 	countAsGift DOUBLE, 
 	countForSell DOUBLE, 
@@ -47,7 +47,8 @@ CREATE STABLE IF NOT EXISTS hku_base.s_stkWeight (
 	bonus DOUBLE, 
 	countOfIncreasement DOUBLE, 
 	totalCount DOUBLE, 
-	freeCount DOUBLE
+	freeCount DOUBLE,
+	suogu DOUBLE
 ) TAGS (stockid TIMESTAMP);
 
 CREATE TABLE IF NOT EXISTS hku_base.n_coderuletype (
@@ -755,100 +756,101 @@ CREATE STABLE IF NOT EXISTS hku_base.s_stkfinance (
 	`baoliu2` DOUBLE
 ) TAGS (stockid BIGINT);
 
-CREATE TABLE IF NOT EXISTS hku_base.n_holiday (
+CREATE STABLE IF NOT EXISTS hku_base.s_holiday (
 	`id` TIMESTAMP,
     `date` INT
-);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000000000, 20210101);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000001000, 20210211);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000002000, 20210212);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000003000, 20210215);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000004000, 20210216);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000005000, 20210217);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000006000, 20210405);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000007000, 20210501);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000008000, 20210503);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000009000, 20210504);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000010000, 20210505);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000011000, 20210614);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000012000, 20210920);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000013000, 20210921);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000014000, 20211001);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000015000, 20211004);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000016000, 20211005);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000017000, 20211006);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000018000, 20211007);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000019000, 20220103);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000020000, 20220131);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000021000, 20220201);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000022000, 20220202);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000023000, 20220203);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000024000, 20220204);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000025000, 20220205);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000026000, 20220404);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000027000, 20220405);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000028000, 20220502);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000029000, 20220503);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000030000, 20220504);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000031000, 20220603);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000032000, 20220912);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000033000, 20221003);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000034000, 20221004);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000035000, 20221005);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000036000, 20221006);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000037000, 20221007);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000038000, 20230102);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000039000, 20230123);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000040000, 20230124);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000041000, 20230125);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000042000, 20230126);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000043000, 20230127);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000044000, 20230405);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000045000, 20230501);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000046000, 20230502);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000047000, 20230503);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000048000, 20230622);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000049000, 20230623);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000050000, 20230929);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000051000, 20231002);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000052000, 20231003);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000053000, 20231004);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000054000, 20231005);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000055000, 20231006);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000056000, 20240101);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000057000, 20240212);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000058000, 20240213);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000059000, 20240214);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000060000, 20240215);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000061000, 20240216);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000062000, 20240404);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000063000, 20240405);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000064000, 20240501);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000065000, 20240502);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000066000, 20240503);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000067000, 20240610);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000068000, 20240916);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000069000, 20240917);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000070000, 20241001);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000071000, 20241002);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000072000, 20241003);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000073000, 20241004);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000074000, 20241007);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000075000, 20250101);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000076000, 20250128);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000077000, 20250129);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000078000, 20250130);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000079000, 20250131);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000080000, 20250203);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000081000, 20250204);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000082000, 20250404);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000083000, 20250501);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000084000, 20250502);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000085000, 20250505);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000086000, 20250602);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000087000, 20251001);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000088000, 20251002);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000089000, 20251003);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000090000, 20251006);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000091000, 20251007);
-INSERT INTO hku_base.n_holiday (`id`, `date`) VALUES (631152000092000, 20251008);
+) TAGS (market VARCHAR(10));
+CREATE TABLE hku_base.z_zh_holiday using hku_base.s_holiday (market) tags ('SH');
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000000000, 20210101);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000001000, 20210211);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000002000, 20210212);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000003000, 20210215);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000004000, 20210216);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000005000, 20210217);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000006000, 20210405);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000007000, 20210501);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000008000, 20210503);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000009000, 20210504);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000010000, 20210505);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000011000, 20210614);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000012000, 20210920);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000013000, 20210921);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000014000, 20211001);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000015000, 20211004);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000016000, 20211005);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000017000, 20211006);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000018000, 20211007);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000019000, 20220103);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000020000, 20220131);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000021000, 20220201);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000022000, 20220202);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000023000, 20220203);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000024000, 20220204);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000025000, 20220205);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000026000, 20220404);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000027000, 20220405);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000028000, 20220502);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000029000, 20220503);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000030000, 20220504);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000031000, 20220603);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000032000, 20220912);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000033000, 20221003);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000034000, 20221004);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000035000, 20221005);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000036000, 20221006);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000037000, 20221007);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000038000, 20230102);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000039000, 20230123);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000040000, 20230124);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000041000, 20230125);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000042000, 20230126);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000043000, 20230127);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000044000, 20230405);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000045000, 20230501);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000046000, 20230502);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000047000, 20230503);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000048000, 20230622);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000049000, 20230623);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000050000, 20230929);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000051000, 20231002);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000052000, 20231003);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000053000, 20231004);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000054000, 20231005);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000055000, 20231006);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000056000, 20240101);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000057000, 20240212);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000058000, 20240213);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000059000, 20240214);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000060000, 20240215);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000061000, 20240216);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000062000, 20240404);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000063000, 20240405);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000064000, 20240501);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000065000, 20240502);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000066000, 20240503);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000067000, 20240610);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000068000, 20240916);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000069000, 20240917);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000070000, 20241001);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000071000, 20241002);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000072000, 20241003);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000073000, 20241004);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000074000, 20241007);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000075000, 20250101);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000076000, 20250128);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000077000, 20250129);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000078000, 20250130);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000079000, 20250131);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000080000, 20250203);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000081000, 20250204);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000082000, 20250404);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000083000, 20250501);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000084000, 20250502);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000085000, 20250505);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000086000, 20250602);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000087000, 20251001);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000088000, 20251002);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000089000, 20251003);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000090000, 20251006);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000091000, 20251007);
+INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000092000, 20251008);

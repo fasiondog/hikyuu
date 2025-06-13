@@ -206,7 +206,7 @@ if __name__ == '__main__':
     connect = taos.connect(
         user=user, password=password, host=host, port=port)
 
-    # import_index_name(connect)
+    import_index_name(connect)
 
     import_stock_name(connect, None, MARKET.SH, None)
 
