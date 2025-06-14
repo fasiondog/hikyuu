@@ -110,7 +110,7 @@ def get_codepre_list(connect, marketid, quotations):
 def get_stock_list(connect, market, quotations):
     marketid = get_marketid(connect, market)
     stktype_list = get_stktype_list(quotations)
-    sql = "select cast(stockid as bigint), marketid, code, valid, type from hku_base.n_stock where marketid={} and type in {}"\
+    sql = "select cast(stockid as bigint), marketid, code, name, type, valid, startDate, endDate from hku_base.n_stock where marketid={} and type in {}"\
         .format(marketid, stktype_list)
     cur = connect.cursor()
     cur.execute(sql)
@@ -204,6 +204,18 @@ def get_lastdatetime(connect, tablename):
     tmp = connect.query("select LAST_ROW(id) from {}".format(tablename))
     a = tmp.fetch_all()
     return Datetime(a[0][0]) if a and len(a[0]) > 0 else None
+
+
+def get_last_krecord(connect, tablename):
+    """获取最后一条K线记录
+    返回：(date, open, close, high, low, amount, volume)
+    """
+    tmp = connect.query("select LAST_ROW(*) from {}".format(tablename))
+    a = tmp.fetch_all()
+    if not a:
+        return None
+    a = a[0]
+    return (Datetime(a[0]), a[1], a[2], a[3], a[4], a[5], a[6])
 
 
 def update_extern_data(connect, market, code, data_type):
@@ -526,6 +538,12 @@ if __name__ == '__main__':
     print(x)
 
     # get_table(connect, "SH", "000001", "DAY")
+
+    marketid = get_marketid(connect, "SH")
+    print(marketid)
+
+    x = get_stock_list(connect, "SH", ["stock"])
+    print(x)
 
     d = get_lastdatetime(connect, "hku_data.sh_day_000001")
     print(d)

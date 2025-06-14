@@ -13,6 +13,7 @@ from hikyuu.util.mylog import hku_error, hku_debug
 
 import taos
 
+from hikyuu import Datetime, UTCOffset
 from hikyuu.data.common import *
 from hikyuu.data.common_pytdx import to_pytdx_market, pytdx_get_day_trans
 from hikyuu.data.common_taos import (
@@ -22,6 +23,7 @@ from hikyuu.data.common_taos import (
     get_stock_list,
     get_table,
     get_lastdatetime,
+    get_last_krecord,
     update_extern_data,
 )
 
@@ -192,6 +194,204 @@ def import_stock_name(connect, api, market, quotations=None):
     return count
 
 
+def guess_day_n_step(last_datetime):
+    last_date = int(last_datetime // 10000)
+    today = datetime.date.today()
+
+    last_y = last_date // 10000
+    n = int((today.year - last_y + 1) * 250 // 800)
+
+    step = 800
+    if n < 1:
+        last_m = last_date // 100 - last_y * 100
+        last_d = last_date - (last_y * 10000 + last_m * 100)
+        step = (today - datetime.date(last_y, last_m, last_d)).days
+
+    return (n, step)
+
+
+def guess_1min_n_step(last_datetime):
+    last_date = int(last_datetime // 10000)
+    today = datetime.date.today()
+
+    last_y = last_date // 10000
+    last_m = last_date // 100 - last_y * 100
+    last_d = last_date - (last_y * 10000 + last_m * 100)
+
+    n = int((today - datetime.date(last_y, last_m, last_d)).days * 240 // 800)
+    step = 800
+    if n < 1:
+        step = (today - datetime.date(last_y, last_m, last_d)).days * 240
+    elif n > 99:
+        n = 99
+
+    return (n, step)
+
+
+def guess_5min_n_step(last_datetime):
+    last_date = int(last_datetime // 10000)
+    today = datetime.date.today()
+
+    last_y = last_date // 10000
+    last_m = last_date // 100 - last_y * 100
+    last_d = last_date - (last_y * 10000 + last_m * 100)
+
+    n = int((today - datetime.date(last_y, last_m, last_d)).days * 48 // 800)
+    step = 800
+    if n < 1:
+        step = (today - datetime.date(last_y, last_m, last_d)).days * 48
+    elif n > 99:
+        n = 99
+
+    return (n, step)
+
+
+def import_one_stock_data(
+    connect, api, market, ktype, stock_record, startDate=199012191500
+):
+    market = market.upper()
+    pytdx_market = to_pytdx_market(market)
+
+    # stockid, marketid, code, name, type, valid, startDate, endDate
+    stockid, marketid, code, name, stktype, valid, stk_startDate, stk_endDate = stock_record
+    hku_debug("{}{}".format(market, code))
+    table = get_table(connect, market, code, ktype)
+
+    last_krecord = get_last_krecord(connect, table)
+    last_datetime = startDate if last_krecord is None else last_krecord[0].ymdhm
+
+    today = datetime.date.today()
+    if ktype == "DAY":
+        n, step = guess_day_n_step(last_datetime)
+        pytdx_kline_type = TDXParams.KLINE_TYPE_RI_K
+        today_datetime = (today.year * 10000 + today.month * 100 + today.day) * 10000
+
+    elif ktype == "1MIN":
+        n, step = guess_1min_n_step(last_datetime)
+        pytdx_kline_type = TDXParams.KLINE_TYPE_1MIN
+        today_datetime = (
+            today.year * 10000 + today.month * 100 + today.day
+        ) * 10000 + 1500
+
+    elif ktype == "5MIN":
+        n, step = guess_5min_n_step(last_datetime)
+        pytdx_kline_type = TDXParams.KLINE_TYPE_5MIN
+        today_datetime = (
+            today.year * 10000 + today.month * 100 + today.day
+        ) * 10000 + 1500
+    else:
+        return 0
+
+    if today_datetime <= last_datetime:
+        return 0
+
+    get_bars = (
+        api.get_index_bars if stktype == STOCKTYPE.INDEX else api.get_security_bars
+    )
+
+    if last_krecord is not None:
+        bars = get_bars(pytdx_kline_type, pytdx_market, code, 0, 1)
+        if not bars:
+            return 0
+        bar = bars[0]
+        if last_krecord[0] != Datetime(bar["year"], bar["month"], bar["day"]) \
+                or last_krecord[1] != bar["open"] or last_krecord[2] != bar["high"] \
+                or last_krecord[3] != bar["low"] or last_krecord[4] != bar["close"] \
+                or abs(last_krecord[5] - bar["amount"]*0.001) > 0.01 or last_krecord[6] != bar["vol"]:
+            hku_error("fetch data from tdx error!")
+            print(last_krecord[0], Datetime(bar["year"], bar["month"], bar["day"]))
+            print(last_krecord[1], bar["open"])
+            print(last_krecord[2], bar["high"])
+            print(last_krecord[3], bar["low"])
+            print(last_krecord[4], bar["close"])
+            print(last_krecord[5], bar["amount"])
+            print(last_krecord[6], bar["vol"])
+            return 0
+
+    buf = []
+    while n >= 0:
+        bar_list = get_bars(pytdx_kline_type, pytdx_market, code, n * 800, step)
+        n -= 1
+        if bar_list is None:
+            # print(code, "invalid!!")
+            continue
+
+        for bar in bar_list:
+            try:
+                if ktype == "DAY":
+                    tmp = datetime.date(bar["year"], bar["month"], bar["day"])
+                    bar_datetime = (tmp.year * 10000 + tmp.month * 100 + tmp.day) * 10000
+                else:
+                    tmp = datetime.datetime(bar["year"], bar["month"], bar["day"], bar['hour'], bar['minute'])
+                    bar_datetime = (tmp.year * 10000 + tmp.month * 100 + tmp.day) * \
+                        10000 + bar["hour"] * 100 + bar["minute"]
+            except Exception as e:
+                hku_error("Failed translate datetime: {}, from {}! {}".format(bar, api.ip, e))
+                continue
+
+            if (
+                today_datetime >= bar_datetime > last_datetime
+                and bar["high"] >= bar["open"] >= bar["low"] > 0
+                and bar["high"] >= bar["close"] >= bar["low"] > 0
+                and bar["vol"] >= 0
+                and bar["amount"] >= 0
+            ):
+                try:
+                    buf.append(
+                        (
+                            bar_datetime,
+                            bar["open"],
+                            bar["high"],
+                            bar["low"],
+                            bar["close"],
+                            bar["amount"] * 0.001,
+                            bar["vol"]
+                            # bar['vol'] if stktype == 2 else round(bar['vol'] * 0.01)
+                        )
+                    )
+                except Exception as e:
+                    hku_error("Can't trans record({}), {}".format(bar, e))
+                last_datetime = bar_datetime
+
+    if len(buf) > 0:
+        cur = connect.cursor()
+        rawsql = f"INSERT INTO {table} using hku_data.kdata TAGS ('{market.lower()}', '{code}', '{ktype.lower()}') VALUES "
+        sql = rawsql
+        for i, r in enumerate(buf):
+            sql += f"({(Datetime(r[0])-UTCOffset()).timestamp()}, {r[1]}, {r[2]}, {r[3]}, {r[4]}, {r[5]}, {r[6]})"
+            if i > 0 and i % 8000 == 0:
+                cur.execute(sql)
+                sql = rawsql
+        if sql != rawsql:
+            cur.execute(sql)
+
+        if ktype == "DAY":
+            # 更新基础信息数据库中股票对应的起止日期及其有效标志
+            # stockid, marketid, code, name, type, valid, startDate, endDate
+            cur.execute(f"select FIRST(id) from {table}")
+            a = [v for v in cur]
+            first_date = Datetime(a[0][0]).ymd
+            sql = f"INSERT INTO hku_base.n_stock (stockid, marketid, code, name, type, valid, startDate, endDate) VALUES ({stockid}, {marketid}, '{code}', '{name}', {stktype}, 1, {first_date}, {stk_endDate})"
+            print(sql)
+            cur.execute(sql)
+
+            # 记录最新更新日期
+            if (
+                (code == "000001" and marketid == MARKETID.SH)
+                or (code == "399001" and marketid == MARKETID.SZ)
+                or (code == "830799" and marketid == MARKETID.BJ)
+            ):
+                cur.execute(f"select cast(id as bigint) from hku_base.n_market where marketid={marketid}")
+                a = [v for v in cur]
+                id = a[0][0]
+                sql = f"INSERT INTO hku_base.n_market (id, marketid, lastdate) VALUES ({id}, {marketid}, {buf[-1][0]//10000})"
+                # print(sql)
+                cur.execute(sql)
+        cur.close()
+
+    return len(buf)
+
+
 if __name__ == '__main__':
     import os
     from configparser import ConfigParser
@@ -203,11 +403,32 @@ if __name__ == '__main__':
     host = dev_config.get(db, 'host')
     port = dev_config.getint(db, 'port')
 
+    tdx_server = '180.101.48.170'
+    tdx_port = 7709
+
+    from pytdx.hq import TdxHq_API, TDXParams
+
+    api = TdxHq_API()
+    api.connect(tdx_server, tdx_port)
+
     connect = taos.connect(
         user=user, password=password, host=host, port=port)
 
     import_index_name(connect)
 
-    import_stock_name(connect, None, MARKET.SH, None)
+    # import_stock_name(connect, None, MARKET.SZ, None)
 
+    quotations = ["stock", "fund"]
+    stock_list = get_stock_list(connect, "SH", quotations)
+    stock_record = None
+    for r in stock_list:
+        if r[2] == "000001":
+            stock_record = r
+            break
+    print(stock_record)
+    # print(stock_list)
+
+    import_one_stock_data(connect, api, "SH", "DAY", stock_record, startDate=199012191500)
+
+    api.close()
     connect.close()
