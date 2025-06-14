@@ -712,15 +712,14 @@ INSERT INTO hku_base.n_historyfinancefield (`ts`, `id`, `name`) VALUES(631152000
 INSERT INTO hku_base.n_historyfinancefield (`ts`, `id`, `name`) VALUES(631152000580000, 581, '使用权资产折旧（万元）');
 
 CREATE STABLE IF NOT EXISTS hku_base.s_historyfinance (
-    `id` TIMESTAMP,
-    file_date INT,
+    file_date TIMESTAMP,
     report_date INT,
     `values` VARCHAR(15360)
 ) TAGS (market_code VARCHAR(60));
 
 CREATE STABLE IF NOT EXISTS hku_base.s_stkfinance (
 	`updated_date` TIMESTAMP, 
-	`ipo_date` BIGINT,       --42.上市日期
+	`ipo_date` INT,       --42.上市日期
 	`province` DOUBLE, 
     `industry` DOUBLE,
 	`zongguben` DOUBLE,      --1.总股本(股)
@@ -754,7 +753,7 @@ CREATE STABLE IF NOT EXISTS hku_base.s_stkfinance (
 	`weifenpeilirun` DOUBLE, --31.未分配利润
 	`meigujingzichan` DOUBLE, --34.每股净资产
 	`baoliu2` DOUBLE
-) TAGS (stockid BIGINT);
+) TAGS (stockid TIMESTAMP);
 
 CREATE STABLE IF NOT EXISTS hku_base.s_holiday (
 	`id` TIMESTAMP,
