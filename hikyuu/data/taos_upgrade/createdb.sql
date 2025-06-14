@@ -32,12 +32,10 @@ create table hku_base.n_stock (
     startDate INT,
     endDate INT);
 
-CREATE TABLE IF NOT EXISTS hku_base.n_block (
+CREATE TABLE IF NOT EXISTS hku_base.s_block (
 	id timestamp,
-    category VARCHAR(100),
-    name VARCHAR(100),
     market_code VARCHAR(30)
-);
+) TAGS (category VARCHAR(100), name VARCHAR(100), index_code VARCHAR(30));
 
 CREATE STABLE IF NOT EXISTS hku_base.s_stkweight (
 	date TIMESTAMP, 

@@ -4,7 +4,10 @@
 # Create on: 20240102
 #    Author: fasiondog
 
+import zlib
+import taos
 from concurrent.futures import ThreadPoolExecutor
+from hikyuu import Datetime, UTCOffset
 from hikyuu.data.common import MARKET, get_stk_code_name_list
 from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_block_em import *
@@ -16,109 +19,83 @@ def em_import_block_to_taos(connect, code_market_dict, categorys=('行业板块'
     if not categorys:
         return
 
-    with ThreadPoolExecutor(4) as executor:
-        if '行业板块' in categorys:
-            t1 = executor.submit(get_all_hybk_info, code_market_dict)
+    if '行业板块' in categorys:
+        all_block_info["行业板块"] = get_all_hybk_info(code_market_dict)
 
-        if '概念板块' in categorys:
-            t2 = executor.submit(get_all_gnbk_info, code_market_dict)
+    if '概念板块' in categorys:
+        all_block_info["概念板块"] = get_all_gnbk_info(code_market_dict)
 
-        if '地域板块' in categorys:
-            t3 = executor.submit(get_all_dybk_info, code_market_dict)
+    if '地域板块' in categorys:
+        all_block_info["地域板块"] = get_all_dybk_info(code_market_dict)
 
-        if '指数板块' in categorys:
-            t4 = executor.submit(get_all_zsbk_info, code_market_dict)
-
-        success_fetch_hy = False
-        if '行业板块' in categorys:
-            x = t1.result()
-            hku_info("获取行业板块信息完毕")
-            if x:
-                all_block_info["行业板块"] = x
-                success_fetch_hy = True
-
-        success_fetch_gn = False
-        if '概念板块' in categorys:
-            x = t2.result()
-            hku_info("获取概念板块信息完毕")
-            if x:
-                all_block_info["概念板块"] = x
-                success_fetch_gn = True
-
-        success_fetch_dy = False
-        if '地域板块' in categorys:
-            x = t3.result()
-            hku_info("获取地域板块信息完毕")
-            if x:
-                all_block_info["地域板块"] = x
-                success_fetch_dy = True
-
-        success_fetch_zs = False
-        if '指数板块' in categorys:
-            x = t4.result()
-            hku_info("获取指数板块信息完毕")
-            if x:
-                all_block_info["指数板块"] = x
-                success_fetch_zs = True
-
-    blks = []
-    if success_fetch_hy:
-        blks.append('行业板块')
-    if success_fetch_gn:
-        blks.append('概念板块')
-    if success_fetch_dy:
-        blks.append('地域板块')
-    if success_fetch_zs:
-        blks.append('指数板块')
-
-    print(blks)
-
-    if not blks:
-        return
+    if '指数板块' in categorys:
+        all_block_info["指数板块"] = get_all_zsbk_info(code_market_dict)
 
     hku_info("更新数据库")
+
     cur = connect.cursor()
-    if len(blks) == 1:
-        sql = f"delete from block where category in ('{blks[0]}')"
-    else:
-        sql = f"delete from block where category in {tuple(blks)}"
-    hku_info(sql)
-    cur.execute(sql)
-
-    insert_records = []
-
+    insert_records = 0
     for category in all_block_info:
         for name in all_block_info[category]:
-            for code in all_block_info[category][name]:
-                insert_records.append((category, name, code))
+            x = f"{category}_{name}"
+            hash_value = zlib.crc32(x.encode("utf-8"))
+            tbname = f"z_blk_{hash_value}"
+            cur.execute(
+                f"create table if not exists hku_base.{tbname} using hku_base.s_block (category, name) TAGS ('{category}', '{name}')")
+            cur.execute(f"delete from hku_base.{tbname}")
+            codes = all_block_info[category][name]
+            # print(hash_value)
+            id = (Datetime.from_timestamp(hash_value*1000)-UTCOffset()).timestamp()
+            rawsql = f"insert into hku_base.{tbname} (id, market_code) values "
+            sql = rawsql
+            for i, code in enumerate(codes):
+                sql += f"({id+i}, '{code}')"
+                if i > 0 and i % 3000 == 0:
+                    cur.execute(sql)
+                    sql = rawsql
+            if sql != rawsql:
+                cur.execute(sql)
+            insert_records += len(codes)
 
-    if insert_records:
-        sql = "insert into block (category, name, market_code) values (?,?,?)"
-        hku_info(f"insert block records: {len(insert_records)}")
-        cur.executemany(sql, insert_records)
-
-    connect.commit()
     cur.close()
-    return len(insert_records)
+    return insert_records
 
 
 if __name__ == "__main__":
-    import sqlite3
-    from hikyuu.data.common_sqlite3 import create_database
+    import os
+    from configparser import ConfigParser
+    dev_config = ConfigParser()
+    dev_config.read(os.path.expanduser("~") + '/workspace/dev.ini')
+    db = 'taos54'
+    user = dev_config.get(db, 'user')
+    password = dev_config.get(db, 'pwd')
+    host = dev_config.get(db, 'host')
+    port = dev_config.getint(db, 'port')
 
-    # dest_dir = "/home/fasiondog/stock"
-    dest_dir = "/Users/fasiondog/stock"
-    # dest_dir = "d:\\stock"
+    tdx_server = '180.101.48.170'
+    tdx_port = 7709
 
-    connect = sqlite3.connect(dest_dir + "/stock.db")
-    create_database(connect)
+    connect = taos.connect(
+        user=user, password=password, host=host, port=port)
+
+    import time
+    starttime = time.time()
+
+    from pytdx.hq import TdxHq_API, TDXParams
+    api = TdxHq_API()
+    api.connect(tdx_server, tdx_port)
 
     x = get_stk_code_name_list(MARKET.SH)
     code_market_dict = {}
     for v in x:
         code_market_dict[v["code"]] = MARKET.SH
-    # print(code_market_dict)
 
-    em_import_block_to_sqlite(connect, code_market_dict, categorys=('地域板块',))
+    print('数量:', em_import_block_to_taos(connect, code_market_dict, categorys=('行业板块', '地域板块', '指数板块')))
 
+    api.disconnect()
     connect.close()
+
+    endtime = time.time()
+    print("\nTotal time:")
+    print("%.2fs" % (endtime - starttime))
+    print("%.2fm" % ((endtime - starttime) / 60))
