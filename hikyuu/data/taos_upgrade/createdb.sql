@@ -851,3 +851,25 @@ INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000089000, 202510
 INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000090000, 20251006);
 INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000091000, 20251007);
 INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000092000, 20251008);
+
+CREATE DATABASE IF NOT EXISTS hku_data PRECISION 'us' KEEP 365000 WAL_LEVEL 2;
+CREATE STABLE hku_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));
+CREATE STABLE hku_data.timeline (
+	`date` timestamp, 
+	`price` DOUBLE, 
+	`vol` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+CREATE STABLE hku_data.transdata (
+	`date` timestamp, 
+	`price` DOUBLE, 
+	`vol` DOUBLE, 
+	`direct` int
+) TAGS (market VARCHAR(10), code VARCHAR(20));

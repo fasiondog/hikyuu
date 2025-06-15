@@ -13,7 +13,7 @@ from hikyuu.util.mylog import hku_error, hku_debug
 
 import taos
 
-from hikyuu import Datetime, UTCOffset
+from hikyuu import Datetime, UTCOffset, Days
 from hikyuu.data.common import *
 from hikyuu.data.common_pytdx import to_pytdx_market, pytdx_get_day_trans
 from hikyuu.data.common_taos import (
@@ -26,6 +26,13 @@ from hikyuu.data.common_taos import (
     get_last_krecord,
     update_extern_data,
 )
+
+
+def ProgressBar(cur, total):
+    percent = "{:.0%}".format(cur / total)
+    sys.stdout.write("\r")
+    sys.stdout.write("[%-50s] %s" % ("=" * int(math.floor(cur * 50 / total)), percent))
+    sys.stdout.flush()
 
 
 @hku_catch(ret=0, trace=True)
@@ -290,23 +297,38 @@ def import_one_stock_data(
     )
 
     if last_krecord is not None:
-        bars = get_bars(pytdx_kline_type, pytdx_market, code, 0, 1)
-        if not bars:
-            return 0
-        bar = bars[0]
-        if last_krecord[0] != Datetime(bar["year"], bar["month"], bar["day"]) \
-                or last_krecord[1] != bar["open"] or last_krecord[2] != bar["high"] \
-                or last_krecord[3] != bar["low"] or last_krecord[4] != bar["close"] \
-                or abs(last_krecord[5] - bar["amount"]*0.001) > 0.01 or last_krecord[6] != bar["vol"]:
-            hku_error("fetch data from tdx error!")
-            print(last_krecord[0], Datetime(bar["year"], bar["month"], bar["day"]))
-            print(last_krecord[1], bar["open"])
-            print(last_krecord[2], bar["high"])
-            print(last_krecord[3], bar["low"])
-            print(last_krecord[4], bar["close"])
-            print(last_krecord[5], bar["amount"])
-            print(last_krecord[6], bar["vol"])
-            return 0
+        days = (Datetime.today() - last_krecord[0]).days
+        if days > 0:
+            bars = get_bars(pytdx_kline_type, pytdx_market, code, 0, days+1)
+            if not bars:
+                return 0
+            bar = bars[-1]
+            # print(bar)
+            if last_krecord[0] == Datetime(bar["year"], bar["month"], bar["day"]):
+                if abs(last_krecord[1] - bar["open"]) / last_krecord[1] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord: {last_krecord[1]}, bar: {bar['open']}")
+                    return 0
+                if abs(last_krecord[2] - bar["high"]) / last_krecord[2] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord: {last_krecord[2]}, bar: {bar['high']}")
+                    return 0
+                if abs(last_krecord[3] - bar["low"]) / last_krecord[3] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord: {last_krecord[3]}, bar: {bar['low']}")
+                    return 0
+                if abs(last_krecord[4] - bar["close"]) / last_krecord[4] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord: {last_krecord[4]}, bar: {bar['close']}")
+                    return 0
+                if abs(last_krecord[5] - bar["amount"]*0.001) / last_krecord[5] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord: {last_krecord[5]}, bar: {bar['amount']*0.001}")
+                    return 0
+                if abs(last_krecord[6] - bar["vol"]) / last_krecord[6] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord: {last_krecord[6]}, bar: {bar['vol']}")
+                    return 0
 
     buf = []
     while n >= 0:
@@ -368,11 +390,11 @@ def import_one_stock_data(
         if ktype == "DAY":
             # 更新基础信息数据库中股票对应的起止日期及其有效标志
             # stockid, marketid, code, name, type, valid, startDate, endDate
-            cur.execute(f"select FIRST(id) from {table}")
+            cur.execute(f"select FIRST(date) from {table}")
             a = [v for v in cur]
             first_date = Datetime(a[0][0]).ymd
             sql = f"INSERT INTO hku_base.n_stock (stockid, marketid, code, name, type, valid, startDate, endDate) VALUES ({stockid}, {marketid}, '{code}', '{name}', {stktype}, 1, {first_date}, {stk_endDate})"
-            print(sql)
+            # print(sql)
             cur.execute(sql)
 
             # 记录最新更新日期
@@ -390,6 +412,154 @@ def import_one_stock_data(
         cur.close()
 
     return len(buf)
+
+
+@hku_catch(trace=True, re_raise=True)
+def import_data(
+    connect,
+    market,
+    ktype,
+    quotations,
+    api,
+    dest_dir=None,
+    startDate=199012190000,
+    progress=ProgressBar,
+):
+    """导入通达信指定盘后数据路径中的K线数据。注：只导入基础信息数据库中存在的股票。
+
+    :param connect   : sqlit3链接
+    :param market    : 'SH' | 'SZ'
+    :param ktype     : 'DAY' | '1MIN' | '5MIN'
+    :param quotations: 'stock' | 'fund' | 'bond'
+    :param src_dir   : 盘后K线数据路径，如上证5分钟线：D:\\Tdx\\vipdoc\\sh\\fzline
+    :param dest_dir  : HDF5数据文件所在目录
+    :param progress  : 进度显示函数
+    :return: 导入记录数
+    """
+    add_record_count = 0
+    market = market.upper()
+
+    # stockid, marketid, code, name, type, valid, startDate, endDate
+    stock_list = get_stock_list(connect, market, quotations)
+
+    total = len(stock_list)
+    for i, stock in enumerate(stock_list):
+        if stock[5] == 0 or len(stock[2]) != 6:
+            if progress:
+                progress(i, total)
+            continue
+
+        this_count = import_one_stock_data(
+            connect, api, market, ktype, stock, startDate
+        )
+        add_record_count += this_count
+        if this_count > 0:
+            if ktype == "DAY":
+                update_extern_data(connect, market.upper(), stock[2], "DAY")
+            elif ktype == "5MIN":
+                update_extern_data(connect, market.upper(), stock[2], "5MIN")
+
+        if progress:
+            progress(i, total)
+
+    connect.commit()
+    return add_record_count
+
+
+@hku_catch(trace=True)
+def import_on_stock_trans(connect, api, market, stock_record, max_days):
+    market = market.upper()
+    pytdx_market = to_pytdx_market(market)
+
+    # stockid, marketid, code, name, type, valid, startDate, endDate
+    stockid, marketid, code, name, stktype, valid = stock_record[:6]
+    hku_debug("{}{}".format(market, code))
+    table = f'hku_data.{market}_transdata_{code}'.lower()
+    last_datetime = get_lastdatetime(connect, table)
+
+    today = Datetime.today()
+    if last_datetime is not None:
+        # yyyymmddHHMMSS
+        last_date = last_datetime.start_of_day()
+        need_days = (today - last_date).days
+    else:
+        need_days = max_days
+
+    date_list = []
+    for i in range(need_days):
+        cur_date = today - Days(i)
+        if cur_date.day_of_week not in (0, 6):
+            date_list.append(cur_date.ymd)
+    date_list.reverse()
+
+    trans_buf = []
+    for cur_date in date_list:
+        buf = pytdx_get_day_trans(api, pytdx_market, code, cur_date)
+        if not buf:
+            continue
+
+        second = 2
+        pre_minute = 900
+
+        for record in buf:
+            try:
+                minute = int(record["time"][0:2]) * 100 + int(record["time"][3:])
+                if minute != pre_minute:
+                    second = 0 if minute == 1500 else 2
+                    pre_minute = minute
+                else:
+                    second += 3
+                if second > 59:
+                    continue
+
+                trans_buf.append(
+                    (
+                        cur_date * 1000000 + minute * 100 + second,
+                        record["price"],
+                        record["vol"],
+                        record["buyorsell"],
+                    )
+                )
+            except Exception as e:
+                hku_error("Failed trans to record! {}", e)
+
+    if trans_buf:
+        cur = connect.cursor()
+        rawsql = f"INSERT INTO {table} using hku_data.transdata TAGS ('{market.lower()}', '{code}') VALUES "
+        sql = rawsql
+        for i, r in enumerate(trans_buf):
+            sql += f"({(Datetime(r[0])-UTCOffset()).timestamp()}, {r[1]}, {r[2]}, {r[3]})"
+            if i > 0 and i % 15000 == 0:
+                cur.execute(sql)
+                sql = rawsql
+        if sql != rawsql:
+            cur.execute(sql)
+        cur.close()
+    return len(trans_buf)
+
+
+def import_trans(
+    connect, market, quotations, api, dest_dir=None, max_days=30, progress=ProgressBar
+):
+    add_record_count = 0
+    market = market.upper()
+
+    stock_list = get_stock_list(connect, market, quotations)
+    total = len(stock_list)
+    a_stktype_list = get_a_stktype_list()
+    for i, stock in enumerate(stock_list):
+        # stockid, marketid, code, name, type, valid, startDate, endDate
+        if stock[5] == 0 or len(stock[2]) != 6 or stock[4] not in a_stktype_list:
+            if progress:
+                progress(i, total)
+            continue
+
+        this_count = import_on_stock_trans(connect, api, market, stock, max_days)
+        add_record_count += this_count
+        if progress:
+            progress(i, total)
+
+    return add_record_count
 
 
 if __name__ == '__main__':
@@ -416,19 +586,25 @@ if __name__ == '__main__':
 
     import_index_name(connect)
 
-    # import_stock_name(connect, None, MARKET.SZ, None)
+    import_stock_name(connect, None, MARKET.SH, None)
 
     quotations = ["stock", "fund"]
-    stock_list = get_stock_list(connect, "SH", quotations)
-    stock_record = None
-    for r in stock_list:
-        if r[2] == "000001":
-            stock_record = r
-            break
-    print(stock_record)
-    # print(stock_list)
 
-    import_one_stock_data(connect, api, "SH", "DAY", stock_record, startDate=199012191500)
+    # stock_list = get_stock_list(connect, "SH", quotations)
+    # stock_record = None
+    # for r in stock_list:
+    #     if r[2] == "000001":
+    #         stock_record = r
+    #         break
+    # print(stock_record)
+
+    # import_one_stock_data(connect, api, "SH", "DAY", stock_record, startDate=199012191500)
+
+    # print("\n导入上证日线数据")
+    # add_count = import_data(connect, "SH", "DAY", quotations, api, progress=ProgressBar)
+    # print("\n导入数量：", add_count)
+
+    import_trans(connect, "SH", quotations, api)
 
     api.close()
     connect.close()

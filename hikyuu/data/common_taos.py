@@ -27,7 +27,7 @@ import datetime
 from pathlib import Path
 
 import taos
-from hikyuu import Datetime
+from hikyuu import Datetime, UTCOffset
 from hikyuu.data.common import get_stktype_list, get_new_holidays
 from hikyuu.util import hku_debug, hku_catch
 
@@ -167,13 +167,13 @@ def get_table(connect, market, code, ktype):
     if not a:
         sql = f"CREATE DATABASE IF NOT EXISTS {schema} PRECISION 'us' KEEP 365000 WAL_LEVEL 2"
         cur.execute(sql)
-        sql = f"CREATE STABLE `{schema}`.timeline (id timestamp, price DOUBLE, vol DOUBLE) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));"
+        sql = f"CREATE STABLE `{schema}`.timeline (date timestamp, price DOUBLE, vol DOUBLE) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));"
         cur.execute(sql)
-        sql = f"CREATE STABLE `{schema}`.transdata (id timestamp, price DOUBLE, vol DOUBLE, direct int) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));"
+        sql = f"CREATE STABLE `{schema}`.transdata (date timestamp, price DOUBLE, vol DOUBLE, direct int) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));"
         cur.execute(sql)
         sql = f"""
                 CREATE STABLE `{schema}`.kdata (
-                    `id` timestamp,
+                    `date` timestamp,
                     `open` DOUBLE,
                     `high` DOUBLE,
                     `low` DOUBLE,
@@ -201,7 +201,7 @@ def get_table(connect, market, code, ktype):
 @hku_catch(ret=None)
 def get_lastdatetime(connect, tablename):
     # print(tablename)
-    tmp = connect.query("select LAST_ROW(id) from {}".format(tablename))
+    tmp = connect.query("select LAST_ROW(date) from {}".format(tablename))
     a = tmp.fetch_all()
     return Datetime(a[0][0]) if a and len(a[0]) > 0 else None
 
@@ -404,26 +404,25 @@ def update_extern_data(connect, market, code, data_type):
     if base_lastdate is None:
         return
 
+    cur = connect.cursor()
     for index_type in index_list:
         hku_debug("{}{} update {} index".format(market, code, index_type))
         index_table = get_table(connect, market, code, index_type)
         index_last_date = get_lastdatetime(connect, index_table)
 
         # 获取当前日期大于等于索引表最大日期的基础表日期列表
-        cur = connect.cursor()
         if index_last_date is None:
             cur.execute(
-                'select date, open, high, low, close, amount, count from {} order by date asc '.format(base_table)
+                'select date, open, high, low, close, amount, volume from {} order by date asc '.format(base_table)
             )
         else:
-            start_date, _ = getNewDate(index_type, index_last_date)
+            start_date, _ = getNewDate(index_type, index_last_date.ymdhm)
             cur.execute(
-                'select date, open, high, low, close, amount, count from {} where date>={}'.format(
-                    base_table, start_date
+                'select date, open, high, low, close, amount, volume from {} where date>={}'.format(
+                    base_table, (Datetime(start_date) - UTCOffset()).timestamp()
                 )
             )
         base_list = [x for x in cur]
-        cur.close()
 
         last_start_date = 199012010000
         last_end_date = 199012010000
@@ -433,27 +432,18 @@ def update_extern_data(connect, market, code, data_type):
         # for current_base in base_list:
         length_base_all = len(base_list)
         for x in range(length_base_all):
-            current_date = base_list[x][0]
+            current_date = Datetime(base_list[x][0]).ymdhm
             if current_date <= last_end_date:
                 continue
             last_start_date, last_end_date = getNewDate(index_type, current_date)
 
-            # cur = connect.cursor()
-            # cur.execute(
-            #    'select date, open, high, low, close, amount, count from {} \
-            #    where date>={} and date<={} order by date asc'.format(
-            #        base_table, last_start_date, last_end_date
-            #    )
-            # )
-            # base_record_list = [r for r in cur]
-            # cur.close()
             base_record_list = []
             start_ix = x
             ix_date = current_date
             while start_ix < length_base_all and \
                     ix_date >= last_start_date and ix_date <= last_end_date:
                 base_record_list.append(base_list[start_ix])
-                ix_date = base_list[start_ix][0]
+                ix_date = Datetime(base_list[start_ix][0]).ymdhm
                 start_ix += 1
 
             if not base_record_list:
@@ -473,27 +463,35 @@ def update_extern_data(connect, market, code, data_type):
                     low_price = base_record_list[i][3]
                 amount += base_record_list[i][5]
                 count += base_record_list[i][6]
-            if last_end_date == index_last_date:
-                update_buffer.append((open_price, high_price, low_price, close_price, amount, count, last_end_date))
-            else:
-                insert_buffer.append((last_end_date, open_price, high_price, low_price, close_price, amount, count))
+            # if last_end_date == index_last_date:
+            #     update_buffer.append((open_price, high_price, low_price, close_price, amount, count, last_end_date))
+            # else:
+            #     insert_buffer.append((last_end_date, open_price, high_price, low_price, close_price, amount, count))
+            insert_buffer.append((last_end_date, open_price, high_price, low_price, close_price, amount, count))
 
-        if update_buffer:
-            cur = connect.cursor()
-            cur.executemany(
-                "update {} set open=%s, high=%s, low=%s, close=%s, amount=%s, count=%s \
-                 where date=%s".format(index_table), update_buffer
-            )
-            connect.commit()
-            cur.close()
+        # if update_buffer:
+        #     cur = connect.cursor()
+        #     cur.executemany(
+        #         "update {} set open=%s, high=%s, low=%s, close=%s, amount=%s, count=%s \
+        #          where date=%s".format(index_table), update_buffer
+        #     )
+        #     connect.commit()
+        #     cur.close()
         if insert_buffer:
-            cur = connect.cursor()
-            cur.executemany(
-                "insert into {} (date, open, high, low, close, amount, count) \
-                 values (%s, %s, %s, %s, %s, %s, %s)".format(index_table), insert_buffer
-            )
-            connect.commit()
-            cur.close()
+            rawsql = f"insert into {index_table} (date, open, high, low, close, amount, volume) VALUES "
+            sql = rawsql
+            for i, v in enumerate(insert_buffer):
+                sql += f"({(Datetime(v[0])-UTCOffset()).timestamp()}, {v[1]}, {v[2]}, {v[3]}, {v[4]}, {v[5]}, {v[6]})"
+                if i > 0 and i % 8000 == 0:
+                    cur.execute(sql)
+                    sql = rawsql
+            if sql != rawsql:
+                cur.execute(sql)
+            # cur.executemany(
+            #     "insert into {} (date, open, high, low, close, amount, count) \
+            #      values (%s, %s, %s, %s, %s, %s, %s)".format(index_table), insert_buffer
+            # )
+    cur.close()
 
 
 if __name__ == '__main__':
