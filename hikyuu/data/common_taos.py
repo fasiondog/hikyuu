@@ -198,12 +198,14 @@ def get_table(connect, market, code, ktype):
     return f"`{schema}`.`{tablename}`"
 
 
-@hku_catch(ret=None)
 def get_lastdatetime(connect, tablename):
     # print(tablename)
-    tmp = connect.query("select LAST_ROW(date) from {}".format(tablename))
-    a = tmp.fetch_all()
-    return Datetime(a[0][0]) if a and len(a[0]) > 0 else None
+    try:
+        tmp = connect.query("select LAST_ROW(date) from {}".format(tablename))
+        a = tmp.fetch_all()
+        return Datetime(a[0][0]) if a and len(a[0]) > 0 else None
+    except:
+        return None
 
 
 def get_last_krecord(connect, tablename):

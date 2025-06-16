@@ -562,6 +562,92 @@ def import_trans(
     return add_record_count
 
 
+@hku_catch(trace=True)
+def import_on_stock_time(connect, api, market, stock_record, max_days):
+    market = market.upper()
+    pytdx_market = to_pytdx_market(market)
+
+    # stockid, marketid, code, name, type, valid, startDate, endDate
+    stockid, marketid, code, name, stktype, valid = stock_record[:6]
+    hku_debug("{}{}".format(market, code))
+    table = f'hku_data.{market}_timeline_{code}'.lower()
+    last_datetime = get_lastdatetime(connect, table)
+
+    today = Datetime.today()
+    if last_datetime is not None:
+        # yyyymmddHHMM
+        last_date = last_datetime.start_of_day()
+        need_days = (today - last_date).days
+    else:
+        need_days = max_days
+
+    date_list = []
+    for i in range(need_days):
+        cur_date = today - Days(i)
+        if cur_date.day_of_week() not in (0, 6):
+            date_list.append(cur_date.ymd)
+    date_list.reverse()
+
+    time_buf = []
+    for cur_date in date_list:
+        buf = api.get_history_minute_time_data(pytdx_market, code, cur_date)
+        if buf is None or len(buf) != 240:
+            # print(cur_date, "获取的分时线长度不为240!", stock_record[1], stock_record[2])
+            continue
+        this_date = cur_date * 10000
+        time = 930
+        for record in buf:
+            if time == 960:
+                time = 1000
+            elif time == 1060:
+                time = 1100
+            elif time == 1130:
+                time = 1300
+            elif time == 1360:
+                time = 1400
+            try:
+                time_buf.append((this_date + time, record['price'], record['vol']))
+                time += 1
+            except Exception as e:
+                hku_error("Failed trans record {}! {}".format(record, e))
+
+    if time_buf:
+        cur = connect.cursor()
+        rawsql = f"INSERT INTO {table} using hku_data.timeline TAGS ('{market.lower()}', '{code}') VALUES "
+        sql = rawsql
+        for i, r in enumerate(time_buf):
+            sql += f"({(Datetime(r[0])-UTCOffset()).timestamp()}, {r[1]}, {r[2]})"
+            if i > 0 and i % 16000 == 0:
+                cur.execute(sql)
+                sql = rawsql
+        if sql != rawsql:
+            cur.execute(sql)
+        cur.close()
+
+    return len(time_buf)
+
+
+def import_time(connect, market, quotations, api, dest_dir=None, max_days=9000, progress=ProgressBar):
+    add_record_count = 0
+    market = market.upper()
+
+    stock_list = get_stock_list(connect, market, quotations)
+    total = len(stock_list)
+    for i, stock in enumerate(stock_list):
+        # stockid, marketid, code, name, type, valid, startDate, endDate
+        if stock[5] == 0 or len(stock[2]) != 6:
+            if progress:
+                progress(i, total)
+            continue
+
+        this_count = import_on_stock_time(connect, api, market, stock, max_days)
+        add_record_count += this_count
+        if progress:
+            progress(i, total)
+
+    return add_record_count
+
+
 if __name__ == '__main__':
     import os
     from configparser import ConfigParser
@@ -604,7 +690,7 @@ if __name__ == '__main__':
     # add_count = import_data(connect, "SH", "DAY", quotations, api, progress=ProgressBar)
     # print("\n导入数量：", add_count)
 
-    import_trans(connect, "SH", quotations, api)
+    import_time(connect, "SH", quotations, api, max_days=30)
 
     api.close()
     connect.close()
