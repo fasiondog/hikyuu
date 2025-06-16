@@ -90,7 +90,8 @@ if __name__ == "__main__":
     for v in x:
         code_market_dict[v["code"]] = MARKET.SH
 
-    print('数量:', em_import_block_to_taos(connect, code_market_dict, categorys=('行业板块', '地域板块', '指数板块')))
+    # print('数量:', em_import_block_to_taos(connect, code_market_dict, categorys=('行业板块', '地域板块', '指数板块')))
+    print('数量:', em_import_block_to_taos(connect, code_market_dict, categorys=('概念板块',)))
 
     api.disconnect()
     connect.close()
