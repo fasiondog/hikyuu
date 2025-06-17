@@ -30,6 +30,7 @@ import mysql.connector
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_finance_to_mysql import history_finance_import_mysql
 from hikyuu.data.pytdx_finance_to_sqlite import history_finance_import_sqlite
+from hikyuu.data.pytdx_finance_to_taos import history_finance_import_taos
 from hikyuu.data.common_pytdx import search_best_tdx
 from hikyuu.util import *
 
@@ -67,7 +68,7 @@ class ImportHistoryFinanceTask:
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
             connect = sqlite3.connect(sqlite_file, timeout=1800)
             history_finance_import = history_finance_import_sqlite
-        else:
+        elif self.config.getboolean('mysql', 'enable', fallback=True):
             db_config = {
                 'user': self.config['mysql']['usr'],
                 'password': self.config['mysql']['pwd'],
@@ -76,6 +77,16 @@ class ImportHistoryFinanceTask:
             }
             connect = mysql.connector.connect(**db_config)
             history_finance_import = history_finance_import_mysql
+        elif self.config.getboolean('taos', 'enable', fallback=True):
+            db_config = {
+                'user': self.config['taos']['usr'],
+                'password': self.config['taos']['pwd'],
+                'host': self.config['taos']['host'],
+                'port': int(self.config['taos']['port'])
+            }
+            import taos
+            connect = taos.connect(**db_config)
+            history_finance_import = history_finance_import_taos
 
         try:
             history_finance_import(connect, filename)

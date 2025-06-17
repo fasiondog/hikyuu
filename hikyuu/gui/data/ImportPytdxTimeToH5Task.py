@@ -28,6 +28,7 @@ import mysql.connector
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_time as h5_import_time
 from hikyuu.data.pytdx_to_mysql import import_time as mysql_import_time
+from hikyuu.data.pytdx_to_taos import import_time as taos_import_time
 from hikyuu.util import *
 
 
@@ -64,7 +65,7 @@ class ImportPytdxTimeToH5:
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
             connect = sqlite3.connect(sqlite_file, timeout=1800)
             import_time = h5_import_time
-        else:
+        elif self.config.getboolean('mysql', 'enable', fallback=True):
             db_config = {
                 'user': self.config['mysql']['usr'],
                 'password': self.config['mysql']['pwd'],
@@ -73,6 +74,16 @@ class ImportPytdxTimeToH5:
             }
             connect = mysql.connector.connect(**db_config)
             import_time = mysql_import_time
+        elif self.config.getboolean('taos', 'enable', fallback=True):
+            db_config = {
+                'user': self.config['taos']['usr'],
+                'password': self.config['taos']['pwd'],
+                'host': self.config['taos']['host'],
+                'port': int(self.config['taos']['port'])
+            }
+            import taos
+            connect = taos.connect(**db_config)
+            import_time = taos_import_time
 
         count = 0
         try:

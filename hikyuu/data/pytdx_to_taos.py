@@ -377,7 +377,8 @@ def import_one_stock_data(
 
     if len(buf) > 0:
         cur = connect.cursor()
-        rawsql = f"INSERT INTO {table} using hku_data.kdata TAGS ('{market.lower()}', '{code}', '{ktype.lower()}') VALUES "
+        _, _, nktype, _ = table.split("_")
+        rawsql = f"INSERT INTO {table} using hku_data.kdata TAGS ('{market.lower()}', '{code}', '{nktype}') VALUES "
         sql = rawsql
         for i, r in enumerate(buf):
             sql += f"({(Datetime(r[0])-UTCOffset()).timestamp()}, {r[1]}, {r[2]}, {r[3]}, {r[4]}, {r[5]}, {r[6]})"

@@ -190,7 +190,10 @@ def get_table(connect, market, code, ktype):
         f"SELECT 1 FROM information_schema.ins_tables where db_name='{schema}' and table_name='{tablename}'")
     a = [x for x in cur]
     if not a:
-        sql = f"CREATE TABLE `{schema}`.`{tablename}` using `{schema}`.{stable} (market, code, ktype) TAGS('{nmarket}', '{ncode}', '{nktype}');"
+        if stable == 'kdata':
+            sql = f"CREATE TABLE `{schema}`.`{tablename}` using `{schema}`.{stable} (market, code, ktype) TAGS('{nmarket}', '{ncode}', '{nktype}');"
+        else:
+            sql = f"CREATE TABLE `{schema}`.`{tablename}` using `{schema}`.{stable} (market, code) TAGS('{nmarket}', '{ncode}');"
         cur.execute(sql)
         connect.commit()
 
@@ -480,7 +483,7 @@ def update_extern_data(connect, market, code, data_type):
         #     connect.commit()
         #     cur.close()
         if insert_buffer:
-            rawsql = f"insert into {index_table} (date, open, high, low, close, amount, volume) VALUES "
+            rawsql = f"insert into {index_table} using hku_data.kdata TAGS('{market.lower()}', '{code}', '{index_type}') VALUES "
             sql = rawsql
             for i, v in enumerate(insert_buffer):
                 sql += f"({(Datetime(v[0])-UTCOffset()).timestamp()}, {v[1]}, {v[2]}, {v[3]}, {v[4]}, {v[5]}, {v[6]})"
@@ -524,10 +527,6 @@ if __name__ == '__main__':
     # df["ts_utc"] = df["id"].dt.tz_localize(None)  # 移除时区信息
     # df["ts_str"] = df["ts_utc"].dt.strftime("%Y-%m-%d %H:%M:%S")
     # print(df)
-
-    # connect.execute("drop database if exists sh_day")
-    # connect.execute("drop database if exists sh_day")
-    # print(is_exist_db(connect))
 
     create_database(connect)
     print(is_exist_db(connect))
