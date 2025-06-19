@@ -157,54 +157,13 @@ def get_table(connect, market, code, ktype):
         'timeline': 'timeline',
         'transdata': 'transdata',
     }
-    schema = "hku_data"
-    cur.execute(
-        "SELECT name FROM information_schema.ins_databases WHERE name='{}'".format(schema))
-    nktype = ktype_dict[ktype.lower()]
-    nmarket = market.lower()
-    stable = nktype if nktype in ('timeline', 'transdata') else 'kdata'
-    a = [x for x in cur]
-    if not a:
-        sql = f"CREATE DATABASE IF NOT EXISTS {schema} PRECISION 'us' KEEP 365000 WAL_LEVEL 2"
-        cur.execute(sql)
-        sql = f"CREATE STABLE `{schema}`.timeline (date timestamp, price DOUBLE, vol DOUBLE) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));"
-        cur.execute(sql)
-        sql = f"CREATE STABLE `{schema}`.transdata (date timestamp, price DOUBLE, vol DOUBLE, direct int) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));"
-        cur.execute(sql)
-        sql = f"""
-                CREATE STABLE `{schema}`.kdata (
-                    `date` timestamp,
-                    `open` DOUBLE,
-                    `high` DOUBLE,
-                    `low` DOUBLE,
-                    `close` DOUBLE,
-                    `amount` DOUBLE,
-                    `volume` DOUBLE
-                ) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));
-              """
-        cur.execute(sql)
-
-    ncode = code.lower()
-    tablename = f"{nmarket}_{nktype}_{ncode}"
-    cur.execute(
-        f"SELECT 1 FROM information_schema.ins_tables where db_name='{schema}' and table_name='{tablename}'")
-    a = [x for x in cur]
-    if not a:
-        if stable == 'kdata':
-            sql = f"CREATE TABLE `{schema}`.`{tablename}` using `{schema}`.{stable} (market, code, ktype) TAGS('{nmarket}', '{ncode}', '{nktype}');"
-        else:
-            sql = f"CREATE TABLE `{schema}`.`{tablename}` using `{schema}`.{stable} (market, code) TAGS('{nmarket}', '{ncode}');"
-        cur.execute(sql)
-        connect.commit()
-
-    cur.close()
-    return f"`{schema}`.`{tablename}`"
+    return f"hku_data.{market}_{ktype_dict[ktype.lower()]}_{code}".lower()
 
 
 def get_lastdatetime(connect, tablename):
     # print(tablename)
     try:
-        tmp = connect.query("select LAST_ROW(date) from {}".format(tablename))
+        tmp = connect.query("select LAST(date) from {}".format(tablename))
         a = tmp.fetch_all()
         return Datetime(a[0][0]) if a and len(a[0]) > 0 else None
     except:
@@ -215,12 +174,15 @@ def get_last_krecord(connect, tablename):
     """获取最后一条K线记录
     返回：(date, open, close, high, low, amount, volume)
     """
-    tmp = connect.query("select LAST_ROW(*) from {}".format(tablename))
-    a = tmp.fetch_all()
-    if not a:
+    try:
+        tmp = connect.query("select LAST_ROW(*) from {}".format(tablename))
+        a = tmp.fetch_all()
+        if not a:
+            return None
+        a = a[0]
+        return (Datetime(a[0]), a[1], a[2], a[3], a[4], a[5], a[6])
+    except:
         return None
-    a = a[0]
-    return (Datetime(a[0]), a[1], a[2], a[3], a[4], a[5], a[6])
 
 
 def update_extern_data(connect, market, code, data_type):
@@ -520,7 +482,7 @@ if __name__ == '__main__':
     #     print(Datetime(row[0]))
 
     connect.execute("drop database if exists hku_base")
-    connect.execute("drop database if exists hku_data")
+    # connect.execute("drop database if exists hku_data")
 
     # import pandas as pd
     # df = pd.read_sql("SELECT id FROM hku_data.sh_day_000001", connect)

@@ -388,28 +388,28 @@ def import_one_stock_data(
         if sql != rawsql:
             cur.execute(sql)
 
-        if ktype == "DAY":
-            # 更新基础信息数据库中股票对应的起止日期及其有效标志
-            # stockid, marketid, code, name, type, valid, startDate, endDate
-            cur.execute(f"select FIRST(date) from {table}")
-            a = [v for v in cur]
-            first_date = Datetime(a[0][0]).ymd
-            sql = f"INSERT INTO hku_base.n_stock (stockid, marketid, code, name, type, valid, startDate, endDate) VALUES ({stockid}, {marketid}, '{code}', '{name}', {stktype}, 1, {first_date}, {stk_endDate})"
-            # print(sql)
-            cur.execute(sql)
+        # if ktype == "DAY":
+        #     # 更新基础信息数据库中股票对应的起止日期及其有效标志
+        #     # stockid, marketid, code, name, type, valid, startDate, endDate
+        #     cur.execute(f"select FIRST(date) from {table}")
+        #     a = [v for v in cur]
+        #     first_date = Datetime(a[0][0]).ymd
+        #     sql = f"INSERT INTO hku_base.n_stock (stockid, marketid, code, name, type, valid, startDate, endDate) VALUES ({stockid}, {marketid}, '{code}', '{name}', {stktype}, 1, {first_date}, {stk_endDate})"
+        #     # print(sql)
+        #     cur.execute(sql)
 
-            # 记录最新更新日期
-            if (
-                (code == "000001" and marketid == MARKETID.SH)
-                or (code == "399001" and marketid == MARKETID.SZ)
-                or (code == "830799" and marketid == MARKETID.BJ)
-            ):
-                cur.execute(f"select cast(id as bigint) from hku_base.n_market where marketid={marketid}")
-                a = [v for v in cur]
-                id = a[0][0]
-                sql = f"INSERT INTO hku_base.n_market (id, marketid, lastdate) VALUES ({id}, {marketid}, {buf[-1][0]//10000})"
-                # print(sql)
-                cur.execute(sql)
+        #     # 记录最新更新日期
+        #     if (
+        #         (code == "000001" and marketid == MARKETID.SH)
+        #         or (code == "399001" and marketid == MARKETID.SZ)
+        #         or (code == "830799" and marketid == MARKETID.BJ)
+        #     ):
+        #         cur.execute(f"select cast(id as bigint) from hku_base.n_market where marketid={marketid}")
+        #         a = [v for v in cur]
+        #         id = a[0][0]
+        #         sql = f"INSERT INTO hku_base.n_market (id, marketid, lastdate) VALUES ({id}, {marketid}, {buf[-1][0]//10000})"
+        #         # print(sql)
+        #         cur.execute(sql)
         cur.close()
 
     return len(buf)

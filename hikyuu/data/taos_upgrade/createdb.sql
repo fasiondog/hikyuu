@@ -712,7 +712,7 @@ INSERT INTO hku_base.n_historyfinancefield (`ts`, `id`, `name`) VALUES(631152000
 CREATE STABLE IF NOT EXISTS hku_base.s_historyfinance (
     file_date TIMESTAMP,
     report_date INT,
-    `values` VARCHAR(15360)
+    `values` VARBINARY(5000)
 ) TAGS (market_code VARCHAR(60));
 
 CREATE STABLE IF NOT EXISTS hku_base.s_stkfinance (
@@ -853,7 +853,7 @@ INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000091000, 202510
 INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000092000, 20251008);
 
 CREATE DATABASE IF NOT EXISTS hku_data PRECISION 'us' KEEP 365000 WAL_LEVEL 2;
-CREATE STABLE hku_data.kdata (
+CREATE STABLE IF NOT EXISTS hku_data.kdata (
     `date` timestamp,
     `open` DOUBLE,
     `high` DOUBLE,
@@ -862,12 +862,12 @@ CREATE STABLE hku_data.kdata (
     `amount` DOUBLE,
     `volume` DOUBLE
 ) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));
-CREATE STABLE hku_data.timeline (
+CREATE STABLE IF NOT EXISTS hku_data.timeline (
 	`date` timestamp, 
 	`price` DOUBLE, 
 	`vol` DOUBLE
 ) TAGS (market VARCHAR(10), code VARCHAR(20));
-CREATE STABLE hku_data.transdata (
+CREATE STABLE IF NOT EXISTS hku_data.transdata (
 	`date` timestamp, 
 	`price` DOUBLE, 
 	`vol` DOUBLE, 

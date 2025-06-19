@@ -117,6 +117,7 @@ class ImportHistoryFinanceTask:
         data_list = self.get_list_info()
         self.total_count = len(data_list)
         count = 0
+        data_list.sort(key=lambda x: x['filename'])
         for item in data_list:
             try:
                 dest_file = '{}/{}'.format(self.dest_dir, item['filename'])
@@ -133,6 +134,7 @@ class ImportHistoryFinanceTask:
                         shutil.unpack_archive(dest_file, extract_dir=self.dest_dir)
                         filename = item['filename']
                         filename = f'{self.dest_dir}/{filename[0:-4]}.dat'
+                        hku_info(f"Importing finance file: {filename}")
                         self.import_to_db(filename)
                         hku_info(f"Import finance file: {filename}")
                 count += 1

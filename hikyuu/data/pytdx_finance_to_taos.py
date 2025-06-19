@@ -5,10 +5,10 @@
 #    Author: fasiondog
 
 import taos
-import base64
 from hikyuu import Datetime, UTCOffset
 from hikyuu.data.common import MARKETID, STOCKTYPE, historyfinancialreader, get_a_stktype_list
 from hikyuu.data.common_taos import get_marketid, create_database
+from hikyuu.util import hku_info
 
 
 def pytdx_import_finance_to_taos(db_connect, pytdx_connect, market):
@@ -71,12 +71,18 @@ def pytdx_import_finance_to_taos(db_connect, pytdx_connect, market):
 
 def history_finance_import_taos(connect, filename):
     ret = historyfinancialreader(filename)
-    cur = connect.cursor()
-    for i, r in enumerate(ret):
+    for r in ret:
         marketcode = r[1].lower()
-        sql = f"INSERT INTO hku_base.z_his_fin_{marketcode} using hku_base.s_historyfinance TAGS ('{marketcode}') VALUES ({(Datetime(r[0]) - UTCOffset()).timestamp()}, {r[2]}, '{base64.b64encode(r[3]).decode('ascii')}')"
-        cur.execute(sql)
-    cur.close()
+        stmt = connect.statement("INSERT INTO ? using hku_base.s_historyfinance tags(?) VALUES (?,?,?)")
+        tags = taos.new_bind_params(1)
+        tags[0].binary(marketcode)
+        stmt.set_tbname_tags(f'hku_base.z_his_fin_{marketcode}', tags)
+        params = taos.new_bind_params(3)
+        params[0].timestamp((Datetime(r[0]) - UTCOffset()).timestamp(), taos.PrecisionEnum.Microseconds)
+        params[1].int(r[2])
+        params[2].varbinary(bytearray(r[3]))
+        stmt.bind_param(params)
+        stmt.execute()
 
 
 if __name__ == '__main__':
