@@ -11,8 +11,6 @@ from pytdx.hq import TDXParams
 
 from hikyuu.util.mylog import hku_error, hku_debug
 
-import taos
-
 from hikyuu import Datetime, UTCOffset, Days
 from hikyuu.data.common import *
 from hikyuu.data.common_pytdx import to_pytdx_market, pytdx_get_day_trans
@@ -668,7 +666,8 @@ if __name__ == '__main__':
     api = TdxHq_API()
     api.connect(tdx_server, tdx_port)
 
-    connect = taos.connect(
+    from hikyuu.data.common_taos import get_taos
+    connect = get_taos().connect(
         user=user, password=password, host=host, port=port)
 
     import_index_name(connect)

@@ -4,7 +4,6 @@
 # Create on: 2025-06-14
 #    Author: fasiondog
 
-import taos
 from hikyuu import Datetime, UTCOffset
 from pytdx.hq import TDXParams
 from hikyuu.data.common_pytdx import to_pytdx_market
@@ -159,7 +158,8 @@ if __name__ == '__main__':
     tdx_server = '180.101.48.170'
     tdx_port = 7709
 
-    connect = taos.connect(
+    from hikyuu.data.common_taos import get_taos
+    connect = get_taos().connect(
         user=user, password=password, host=host, port=port)
 
     import time

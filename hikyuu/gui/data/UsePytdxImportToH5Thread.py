@@ -52,6 +52,7 @@ from hikyuu.data.common_taos import create_database as taos_create_database
 from hikyuu.data.common_taos import import_new_holidays as taos_import_new_holidays
 from hikyuu.data.pytdx_to_taos import import_index_name as taos_import_index_name
 from hikyuu.data.pytdx_to_taos import import_stock_name as taos_import_stock_name
+from hikyuu.data.common_taos import get_taos
 from hikyuu.util.mylog import class_logger
 
 
@@ -274,8 +275,7 @@ class UsePytdxImportToH5Thread(QThread):
                 'host': self.config['taos']['host'],
                 'port': int(self.config['taos']['port'])
             }
-            import taos
-            connect = taos.connect(**db_config)
+            connect = get_taos().connect(**db_config)
             create_database = taos_create_database
             import_new_holidays = taos_import_new_holidays
             import_index_name = taos_import_index_name
@@ -301,6 +301,7 @@ class UsePytdxImportToH5Thread(QThread):
                 self.logger.info("{} 新增股票数: {}".format(market, count))
                 self.send_message(
                     ['INFO', '{} 新增股票数：{}'.format(market, count)])
+        connect.close()
 
         self.process_list.clear()
         for task in self.tasks:

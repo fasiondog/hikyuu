@@ -9,6 +9,7 @@ import mysql.connector
 from hikyuu.data.zh_bond10_to_mysql import import_zh_bond10_to_mysql
 from hikyuu.data.zh_bond10_to_sqlite import import_zh_bond10_to_sqlite
 from hikyuu.data.zh_bond10_to_taos import import_zh_bond10_to_taos
+from hikyuu.data.common_taos import get_taos
 from hikyuu.util import *
 
 
@@ -44,8 +45,7 @@ class ImportZhBond10Task:
                 'host': self.config['taos']['host'],
                 'port': int(self.config['taos']['port'])
             }
-            import taos
-            connect = taos.connect(**db_config)
+            connect = get_taos().connect(**db_config)
             import_zh_bond10 = import_zh_bond10_to_taos
 
         try:

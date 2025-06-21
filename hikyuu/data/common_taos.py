@@ -26,10 +26,31 @@ import os
 import datetime
 from pathlib import Path
 
-import taos
 from hikyuu import Datetime, UTCOffset
 from hikyuu.data.common import get_stktype_list, get_new_holidays
-from hikyuu.util import hku_debug, hku_catch
+from hikyuu.util import hku_debug, hku_catch, hku_info
+
+import importlib
+
+_g_taos = None
+
+
+def get_taos():
+    try:
+        global _g_taos
+        if _g_taos is not None:
+            return _g_taos
+        _g_taos = importlib.import_module('taos')
+        return _g_taos
+    except:
+        hku_info("Failed import taos.")
+        return None
+
+
+def reload_taos():
+    global _g_taos
+    if _g_taos is not None:
+        importlib.reload(_g_taos)
 
 
 def is_exist_db(connect):
@@ -471,7 +492,7 @@ if __name__ == '__main__':
     host = dev_config.get(db, 'host')
     port = dev_config.getint(db, 'port')
 
-    connect = taos.connect(
+    connect = get_taos().connect(
         user=user, password=password, host=host, port=port)
 
     # sql = "select LAST_ROW(date) from bj_data.day_430017"
@@ -482,7 +503,7 @@ if __name__ == '__main__':
     #     print(Datetime(row[0]))
 
     connect.execute("drop database if exists hku_base")
-    # connect.execute("drop database if exists hku_data")
+    connect.execute("drop database if exists hku_data")
 
     # import pandas as pd
     # df = pd.read_sql("SELECT id FROM hku_data.sh_day_000001", connect)

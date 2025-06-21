@@ -4,8 +4,6 @@
 # Create on: 2024-03-01
 #    Author: fasiondog
 
-import taos
-import datetime
 from hikyuu import Datetime, Days, UTCOffset
 from hikyuu.data.common import get_china_bond10_rate
 from hikyuu.util import *
@@ -47,7 +45,8 @@ if __name__ == '__main__':
     host = dev_config.get(db, 'host')
     port = dev_config.getint(db, 'port')
 
-    connect = taos.connect(
+    from hikyuu.data.common_taos import get_taos
+    connect = get_taos().connect(
         user=user, password=password, host=host, port=port)
 
     import_zh_bond10_to_taos(connect)

@@ -29,6 +29,7 @@ from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_trans as h5_import_trans
 from hikyuu.data.pytdx_to_mysql import import_trans as mysql_import_trans
 from hikyuu.data.pytdx_to_mysql import import_trans as taos_import_trans
+from hikyuu.data.common_taos import get_taos
 from hikyuu.util import *
 
 
@@ -81,8 +82,7 @@ class ImportPytdxTransToH5:
                 'host': self.config['taos']['host'],
                 'port': int(self.config['taos']['port'])
             }
-            import taos
-            connect = taos.connect(**db_config)
+            connect = get_taos().connect(**db_config)
             import_trans = taos_import_trans
 
         count = 0

@@ -5,7 +5,6 @@
 #    Author: fasiondog
 
 import zlib
-import taos
 from concurrent.futures import ThreadPoolExecutor
 from hikyuu import Datetime, UTCOffset
 from hikyuu.data.common import MARKET, get_stk_code_name_list
@@ -75,7 +74,8 @@ if __name__ == "__main__":
     tdx_server = '180.101.48.170'
     tdx_port = 7709
 
-    connect = taos.connect(
+    from hikyuu.data.common_taos import get_taos
+    connect = get_taos().connect(
         user=user, password=password, host=host, port=port)
 
     import time

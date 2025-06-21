@@ -10,6 +10,7 @@ from hikyuu.data.common import MARKET, get_stk_code_name_list
 from hikyuu.data.em_block_to_mysql import em_import_block_to_mysql
 from hikyuu.data.em_block_to_sqlite import em_import_block_to_sqlite
 from hikyuu.data.em_block_to_taos import em_import_block_to_taos
+from hikyuu.data.common_taos import get_taos
 from hikyuu.util import *
 
 
@@ -46,8 +47,7 @@ class ImportBlockInfoTask:
                 'host': self.config['taos']['host'],
                 'port': int(self.config['taos']['port'])
             }
-            import taos
-            connect = taos.connect(**db_config)
+            connect = get_taos().connect(**db_config)
             import_block = em_import_block_to_taos
 
         count = 0

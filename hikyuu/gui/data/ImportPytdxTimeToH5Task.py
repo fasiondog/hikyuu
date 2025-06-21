@@ -29,6 +29,7 @@ from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_time as h5_import_time
 from hikyuu.data.pytdx_to_mysql import import_time as mysql_import_time
 from hikyuu.data.pytdx_to_taos import import_time as taos_import_time
+from hikyuu.data.common_taos import get_taos
 from hikyuu.util import *
 
 
@@ -81,8 +82,7 @@ class ImportPytdxTimeToH5:
                 'host': self.config['taos']['host'],
                 'port': int(self.config['taos']['port'])
             }
-            import taos
-            connect = taos.connect(**db_config)
+            connect = get_taos().connect(**db_config)
             import_time = taos_import_time
 
         count = 0

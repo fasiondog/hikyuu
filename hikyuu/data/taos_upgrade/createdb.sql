@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS hku_base PRECISION 'us' KEEP 365000 WAL_LEVEL 2;
+CREATE DATABASE IF NOT EXISTS hku_base PRECISION 'us' KEEP 365000;
 CREATE TABLE IF NOT EXISTS hku_base.version (
 	id timestamp,
     version INT 
@@ -712,7 +712,7 @@ INSERT INTO hku_base.n_historyfinancefield (`ts`, `id`, `name`) VALUES(631152000
 CREATE STABLE IF NOT EXISTS hku_base.s_historyfinance (
     file_date TIMESTAMP,
     report_date INT,
-    `values` VARBINARY(5000)
+    `values` VARBINARY(3072)
 ) TAGS (market_code VARCHAR(60));
 
 CREATE STABLE IF NOT EXISTS hku_base.s_stkfinance (
@@ -852,7 +852,7 @@ INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000090000, 202510
 INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000091000, 20251007);
 INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000092000, 20251008);
 
-CREATE DATABASE IF NOT EXISTS hku_data PRECISION 'us' KEEP 365000 WAL_LEVEL 2;
+CREATE DATABASE IF NOT EXISTS hku_data PRECISION 'us' KEEP 365000;
 CREATE STABLE IF NOT EXISTS hku_data.kdata (
     `date` timestamp,
     `open` DOUBLE,
