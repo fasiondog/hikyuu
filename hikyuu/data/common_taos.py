@@ -392,13 +392,13 @@ def update_extern_data(connect, market, code, data_type):
     if base_lastdate is None:
         return
 
-    cur = connect.cursor()
     for index_type in index_list:
         hku_debug("{}{} update {} index".format(market, code, index_type))
         index_table = get_table(connect, market, code, index_type)
         index_last_date = get_lastdatetime(connect, index_table)
 
         # 获取当前日期大于等于索引表最大日期的基础表日期列表
+        cur = connect.cursor()
         if index_last_date is None:
             cur.execute(
                 'select date, open, high, low, close, amount, volume from {} order by date asc '.format(base_table)
@@ -411,6 +411,7 @@ def update_extern_data(connect, market, code, data_type):
                 )
             )
         base_list = [x for x in cur]
+        cur.close()
 
         last_start_date = 199012010000
         last_end_date = 199012010000
@@ -466,20 +467,20 @@ def update_extern_data(connect, market, code, data_type):
         #     connect.commit()
         #     cur.close()
         if insert_buffer:
+            hku_info(f"update index: {market.lower()}{code}")
             rawsql = f"insert into {index_table} using hku_data.kdata TAGS('{market.lower()}', '{code}', '{index_type}') VALUES "
             sql = rawsql
             for i, v in enumerate(insert_buffer):
                 sql += f"({(Datetime(v[0])-UTCOffset()).timestamp()}, {v[1]}, {v[2]}, {v[3]}, {v[4]}, {v[5]}, {v[6]})"
                 if i > 0 and i % 8000 == 0:
-                    cur.execute(sql)
+                    connect.execute(sql)
                     sql = rawsql
             if sql != rawsql:
-                cur.execute(sql)
+                connect.execute(sql)
             # cur.executemany(
             #     "insert into {} (date, open, high, low, close, amount, count) \
             #      values (%s, %s, %s, %s, %s, %s, %s)".format(index_table), insert_buffer
             # )
-    cur.close()
 
 
 if __name__ == '__main__':

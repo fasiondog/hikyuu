@@ -452,11 +452,11 @@ def import_data(
             connect, api, market, ktype, stock, startDate
         )
         add_record_count += this_count
-        if this_count > 0:
-            if ktype == "DAY":
-                update_extern_data(connect, market.upper(), stock[2], "DAY")
-            elif ktype == "5MIN":
-                update_extern_data(connect, market.upper(), stock[2], "5MIN")
+        # if this_count > 0:
+        #     if ktype == "DAY":
+        #         update_extern_data(connect, market.upper(), stock[2], "DAY")
+        #     elif ktype == "5MIN":
+        #         update_extern_data(connect, market.upper(), stock[2], "5MIN")
 
         if progress:
             progress(i, total)
