@@ -209,7 +209,26 @@ def get_lastdatetime(connect, tablename):
     cur = connect.cursor()
     cur.execute("select max(date) from {}".format(tablename))
     a = cur.fetchone()
+    cur.close()
     return a[0]
+
+
+def get_last_krecord(connect, tablename):
+    """获取最后一条K线记录
+    返回：(date, open, close, high, low, amount, volume)
+    """
+    try:
+        cur = connect.cursor()
+        cur.execute(
+            "select `date`, `open`, `high`, `low`, `close`, `amount`, `count` from {} order by date desc limit 1".format(tablename))
+        a = cur.fetchone()
+        cur.close()
+        # hku_info(f"{tablename} {a}")
+        if not a:
+            return None
+        return (a[0], a[1], a[2], a[3], a[4], a[5], a[6])
+    except:
+        return None
 
 
 def update_extern_data(connect, market, code, data_type):

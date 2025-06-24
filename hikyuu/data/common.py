@@ -227,7 +227,7 @@ def historyfinancialreader(filepath):
     stock_header = struct.unpack(header_pack_format, data_header)
     max_count = stock_header[2]
     file_date = stock_header[1]
-    print(file_date)
+    # print(file_date)
     report_size = stock_header[4]
     report_fields_count = int(report_size / 4)
     report_pack_format = '<{}f'.format(report_fields_count)
