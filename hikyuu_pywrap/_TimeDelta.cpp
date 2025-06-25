@@ -188,4 +188,10 @@ void export_TimeDelta(py::module& m) {
 
       :param int microsecs: 微秒数
       :rtype: TimeDelta)");
+
+    m.def("UTCOffset", UTCOffset, R"(UTCOffset()
+
+      获取当前系统 UTC 偏移量
+
+      :rtype: TimeDelta)");
 }

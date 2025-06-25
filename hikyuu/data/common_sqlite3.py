@@ -27,6 +27,7 @@ import sqlite3
 from pathlib import Path
 
 from .common import MARKETID, get_stktype_list, get_new_holidays
+from hikyuu.util import hku_info
 
 
 def is_exist_db(connect):
