@@ -193,7 +193,23 @@ TimeDelta TimeDelta::operator%(TimeDelta td) const {
 
 TimeDelta HKU_UTILS_API UTCOffset() {
     // 获取当前时间戳
-    time_t now = time(nullptr);
+    time_t now = std::time(nullptr);
+
+#ifdef _MSC_VER
+    // 在 Windows 上使用 gmtime_s
+    struct tm local_tm;
+    struct tm utc_tm;
+    errno_t err = gmtime_s(&utc_tm, &now);
+    HKU_CHECK(err == 0, "gmtime_s error!");
+    err = localtime_s(&local_tm, &now);
+    HKU_CHECK(err == 0, "gmtime_s error!");
+
+    time_t local_time = mktime(&local_tm);
+    time_t utc_time = mktime(&utc_tm);
+#else
+    // 在 Linux 上使用 gmtime_r
+    struct tm* local_tm = localtime(&now);
+    struct tm* utc_tm = gmtime(&now);
 
     // 转换为本地时间结构体
     struct tm* local_tm = localtime(&now);
@@ -204,6 +220,7 @@ TimeDelta HKU_UTILS_API UTCOffset() {
     // 计算本地时间和 UTC 时间的时间戳差值
     time_t local_time = mktime(local_tm);
     time_t utc_time = mktime(utc_tm);
+#endif
 
     // 计算偏移量（秒）
     return Seconds(local_time - utc_time);
