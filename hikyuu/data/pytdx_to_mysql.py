@@ -31,6 +31,7 @@ from hikyuu.util.mylog import hku_error, hku_debug
 
 import mysql.connector
 
+from hikyuu import Datetime
 from .common import *
 from .common_pytdx import to_pytdx_market, pytdx_get_day_trans
 from .common_mysql import (
@@ -40,6 +41,7 @@ from .common_mysql import (
     get_stock_list,
     get_table,
     get_lastdatetime,
+    get_last_krecord,
     update_extern_data,
 )
 from .weight_to_mysql import qianlong_import_weight
@@ -288,9 +290,11 @@ def import_one_stock_data(
     stockid, marketid, code, valid, stktype = stock_record[:5]
     hku_debug("{}{}".format(market, code))
     table = get_table(connect, market, code, ktype)
-    last_datetime = get_lastdatetime(connect, table)
-    if last_datetime is None:
-        last_datetime = startDate
+    last_krecord = get_last_krecord(connect, table)
+    last_datetime = startDate if last_krecord is None else last_krecord[0]
+    # last_datetime = get_lastdatetime(connect, table)
+    # if last_datetime is None:
+    #     last_datetime = startDate
 
     today = datetime.date.today()
     if ktype == "DAY":
@@ -320,6 +324,40 @@ def import_one_stock_data(
     get_bars = (
         api.get_index_bars if stktype == STOCKTYPE.INDEX else api.get_security_bars
     )
+
+    if last_krecord is not None:
+        days = (Datetime.today() - Datetime(last_krecord[0])).days
+        if days > 0:
+            bars = get_bars(pytdx_kline_type, pytdx_market, code, 0, days+1)
+            if not bars:
+                return 0
+            bar = bars[-1]
+            # print(bar)
+            if Datetime(last_krecord[0]) == Datetime(bar["year"], bar["month"], bar["day"]):
+                if abs(last_krecord[1] - bar["open"]) / last_krecord[1] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord open: {last_krecord[1]}, bar: {bar['open']}")
+                    return 0
+                if abs(last_krecord[2] - bar["high"]) / last_krecord[2] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord high: {last_krecord[2]}, bar: {bar['high']}")
+                    return 0
+                if abs(last_krecord[3] - bar["low"]) / last_krecord[3] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord low: {last_krecord[3]}, bar: {bar['low']}")
+                    return 0
+                if abs(last_krecord[4] - bar["close"]) / last_krecord[4] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord close: {last_krecord[4]}, bar: {bar['close']}")
+                    return 0
+                if abs(last_krecord[5] - bar["amount"]*0.001) / last_krecord[5] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord amount: {last_krecord[5]}, bar: {bar['amount']*0.001}")
+                    return 0
+                if abs(last_krecord[6] - bar["vol"]) / last_krecord[6] > 0.001:
+                    hku_error(
+                        f"fetch data from tdx error! {market}{code} last_krecord count: {last_krecord[6]}, bar: {bar['vol']}")
+                    return 0
 
     buf = []
     while n >= 0:
