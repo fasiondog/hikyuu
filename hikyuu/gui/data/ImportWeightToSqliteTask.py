@@ -120,6 +120,7 @@ class ImportWeightToSqliteTask:
             # self.queue.put([self.msg_name, str(e), -1, 0, total_count])
             self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])
         finally:
+            api.close()
             connect.commit()
             connect.close()
 

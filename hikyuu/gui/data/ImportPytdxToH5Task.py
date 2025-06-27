@@ -103,6 +103,7 @@ class ImportPytdxToH5:
             self.logger.error("ImportPytdxToH5Task failed! {}".format(e))
             # self.queue.put([self.task_name, self.market, self.ktype, str(e), count])
         finally:
+            api.close()
             connect.commit()
             connect.close()
 

@@ -98,6 +98,7 @@ class ImportPytdxTransToH5:
         except Exception as e:
             self.logger.error(e)
         finally:
+            api.close()
             connect.commit()
             connect.close()
 

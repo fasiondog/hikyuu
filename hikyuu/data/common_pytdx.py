@@ -61,6 +61,7 @@ def ping(ip, port=7709, multithread=False, timeout=1):
             x = api.get_security_bars(7, 0, '000001', 800, 100)
             if x:
                 success = True
+            api.close()
     except Exception as e:
         print(e)
         pass
@@ -89,6 +90,7 @@ def search_best_tdx():
                     values[x[0]['close']] = [host]
                 else:
                     values[x[0]['close']].append(host)
+            api.close()
     ret = []
     for _, host in values.items():
         if len(host) > len(ret):
