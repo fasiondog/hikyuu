@@ -39,6 +39,7 @@ from hikyuu.data.pytdx_weight_to_taos import pytdx_import_weight_to_taos
 from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance_to_sqlite
 from hikyuu.data.pytdx_finance_to_mysql import pytdx_import_finance_to_mysql
 from hikyuu.data.pytdx_finance_to_taos import pytdx_import_finance_to_taos
+from hikyuu.data.common_taos import get_taos
 from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
 from hikyuu.util.check import hku_catch, hku_check
 
@@ -87,7 +88,7 @@ class ImportWeightToSqliteTask:
                     'host': self.config['taos']['host'],
                     'port': int(self.config['taos']['port'])
                 }
-                connect = mysql.connector.connect(**db_config)
+                connect = get_taos().connect(**db_config)
                 pytdx_import_weight = pytdx_import_weight_to_taos
                 pytdx_import_finance = pytdx_import_finance_to_taos
 

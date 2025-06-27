@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS hku_base PRECISION 'us' KEEP 365000;
+CREATE DATABASE IF NOT EXISTS hku_base PRECISION 'us' KEEP 365000 DURATION 120;
 CREATE TABLE IF NOT EXISTS hku_base.version (
 	id timestamp,
     version INT 
@@ -852,8 +852,8 @@ INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000090000, 202510
 INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000091000, 20251007);
 INSERT INTO hku_base.z_zh_holiday (`id`, `date`) VALUES (631152000092000, 20251008);
 
-CREATE DATABASE IF NOT EXISTS hku_data PRECISION 'us' KEEP 365000;
-CREATE STABLE IF NOT EXISTS hku_data.kdata (
+CREATE DATABASE IF NOT EXISTS day_data PRECISION 'us' KEEP 365000 DURATION 120;
+CREATE STABLE IF NOT EXISTS day_data.kdata (
     `date` timestamp,
     `open` DOUBLE,
     `high` DOUBLE,
@@ -861,13 +861,127 @@ CREATE STABLE IF NOT EXISTS hku_data.kdata (
     `close` DOUBLE,
     `amount` DOUBLE,
     `volume` DOUBLE
-) TAGS (market VARCHAR(10), code VARCHAR(20), ktype VARCHAR(10));
-CREATE STABLE IF NOT EXISTS hku_data.timeline (
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS week_data PRECISION 'us' KEEP 365000 DURATION 120;
+CREATE STABLE IF NOT EXISTS week_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS month_data PRECISION 'us' KEEP 365000 DURATION 120;
+CREATE STABLE IF NOT EXISTS month_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS quarter_data PRECISION 'us' KEEP 365000 DURATION 120;
+CREATE STABLE IF NOT EXISTS quarter_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS halfyear_data PRECISION 'us' KEEP 365000 DURATION 120;
+CREATE STABLE IF NOT EXISTS halfyear_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS year_data PRECISION 'us' KEEP 365000 DURATION 120;
+CREATE STABLE IF NOT EXISTS year_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS min_data PRECISION 'us' KEEP 365000 DURATION 60;
+CREATE STABLE IF NOT EXISTS min_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS min5_data PRECISION 'us' KEEP 365000 DURATION 60;
+CREATE STABLE IF NOT EXISTS min5_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS min15_data PRECISION 'us' KEEP 365000 DURATION 60;
+CREATE STABLE IF NOT EXISTS min15_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS min30_data PRECISION 'us' KEEP 365000 DURATION 60;
+CREATE STABLE IF NOT EXISTS min30_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS min60_data PRECISION 'us' KEEP 365000 DURATION 60;
+CREATE STABLE IF NOT EXISTS min60_data.kdata (
+    `date` timestamp,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) TAGS (market VARCHAR(10), code VARCHAR(20));
+
+CREATE DATABASE IF NOT EXISTS timeline_data PRECISION 'us' KEEP 365000 DURATION 60;
+CREATE STABLE IF NOT EXISTS timeline_data.timeline (
 	`date` timestamp, 
 	`price` DOUBLE, 
 	`vol` DOUBLE
 ) TAGS (market VARCHAR(10), code VARCHAR(20));
-CREATE STABLE IF NOT EXISTS hku_data.transdata (
+
+CREATE DATABASE IF NOT EXISTS transdata_data PRECISION 'us' KEEP 365000 DURATION 60;
+CREATE STABLE IF NOT EXISTS transdata_data.transdata (
 	`date` timestamp, 
 	`price` DOUBLE, 
 	`vol` DOUBLE, 

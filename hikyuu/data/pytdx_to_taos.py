@@ -267,11 +267,13 @@ def import_one_stock_data(
 
     today = datetime.date.today()
     if ktype == "DAY":
+        nktype = "day"
         n, step = guess_day_n_step(last_datetime)
         pytdx_kline_type = TDXParams.KLINE_TYPE_RI_K
         today_datetime = (today.year * 10000 + today.month * 100 + today.day) * 10000
 
     elif ktype == "1MIN":
+        nktype = "min"
         n, step = guess_1min_n_step(last_datetime)
         pytdx_kline_type = TDXParams.KLINE_TYPE_1MIN
         today_datetime = (
@@ -279,6 +281,7 @@ def import_one_stock_data(
         ) * 10000 + 1500
 
     elif ktype == "5MIN":
+        nktype = "min5"
         n, step = guess_5min_n_step(last_datetime)
         pytdx_kline_type = TDXParams.KLINE_TYPE_5MIN
         today_datetime = (
@@ -375,8 +378,7 @@ def import_one_stock_data(
 
     if len(buf) > 0:
         cur = connect.cursor()
-        _, _, nktype, _ = table.split("_")
-        rawsql = f"INSERT INTO {table} using hku_data.kdata TAGS ('{market.lower()}', '{code}', '{nktype}') VALUES "
+        rawsql = f"INSERT INTO {table} using {nktype}_data.kdata TAGS ('{market.lower()}', '{code}') VALUES "
         sql = rawsql
         for i, r in enumerate(buf):
             sql += f"({(Datetime(r[0])-UTCOffset()).timestamp()}, {r[1]}, {r[2]}, {r[3]}, {r[4]}, {r[5]}, {r[6]})"
@@ -386,28 +388,28 @@ def import_one_stock_data(
         if sql != rawsql:
             cur.execute(sql)
 
-        # if ktype == "DAY":
-        #     # 更新基础信息数据库中股票对应的起止日期及其有效标志
-        #     # stockid, marketid, code, name, type, valid, startDate, endDate
-        #     cur.execute(f"select FIRST(date) from {table}")
-        #     a = [v for v in cur]
-        #     first_date = Datetime(a[0][0]).ymd
-        #     sql = f"INSERT INTO hku_base.n_stock (stockid, marketid, code, name, type, valid, startDate, endDate) VALUES ({stockid}, {marketid}, '{code}', '{name}', {stktype}, 1, {first_date}, {stk_endDate})"
-        #     # print(sql)
-        #     cur.execute(sql)
+        if ktype == "DAY":
+            # 更新基础信息数据库中股票对应的起止日期及其有效标志
+            # stockid, marketid, code, name, type, valid, startDate, endDate
+            cur.execute(f"select FIRST(date) from {table}")
+            a = [v for v in cur]
+            first_date = Datetime(a[0][0]).ymd
+            sql = f"INSERT INTO hku_base.n_stock (stockid, marketid, code, name, type, valid, startDate, endDate) VALUES ({stockid}, {marketid}, '{code}', '{name}', {stktype}, 1, {first_date}, {stk_endDate})"
+            # print(sql)
+            cur.execute(sql)
 
-        #     # 记录最新更新日期
-        #     if (
-        #         (code == "000001" and marketid == MARKETID.SH)
-        #         or (code == "399001" and marketid == MARKETID.SZ)
-        #         or (code == "830799" and marketid == MARKETID.BJ)
-        #     ):
-        #         cur.execute(f"select cast(id as bigint) from hku_base.n_market where marketid={marketid}")
-        #         a = [v for v in cur]
-        #         id = a[0][0]
-        #         sql = f"INSERT INTO hku_base.n_market (id, marketid, lastdate) VALUES ({id}, {marketid}, {buf[-1][0]//10000})"
-        #         # print(sql)
-        #         cur.execute(sql)
+            # 记录最新更新日期
+            if (
+                (code == "000001" and marketid == MARKETID.SH)
+                or (code == "399001" and marketid == MARKETID.SZ)
+                or (code == "830799" and marketid == MARKETID.BJ)
+            ):
+                cur.execute(f"select cast(id as bigint) from hku_base.n_market where marketid={marketid}")
+                a = [v for v in cur]
+                id = a[0][0]
+                sql = f"INSERT INTO hku_base.n_market (id, marketid, lastdate) VALUES ({id}, {marketid}, {buf[-1][0]//10000})"
+                # print(sql)
+                cur.execute(sql)
         cur.close()
 
     return len(buf)
@@ -452,11 +454,11 @@ def import_data(
             connect, api, market, ktype, stock, startDate
         )
         add_record_count += this_count
-        # if this_count > 0:
-        #     if ktype == "DAY":
-        #         update_extern_data(connect, market.upper(), stock[2], "DAY")
-        #     elif ktype == "5MIN":
-        #         update_extern_data(connect, market.upper(), stock[2], "5MIN")
+        if this_count > 0:
+            if ktype == "DAY":
+                update_extern_data(connect, market.upper(), stock[2], "DAY")
+            elif ktype == "5MIN":
+                update_extern_data(connect, market.upper(), stock[2], "5MIN")
 
         if progress:
             progress(i, total)
@@ -473,7 +475,7 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
     # stockid, marketid, code, name, type, valid, startDate, endDate
     stockid, marketid, code, name, stktype, valid = stock_record[:6]
     hku_debug("{}{}".format(market, code))
-    table = f'hku_data.{market}_transdata_{code}'.lower()
+    table = get_table(connect, market, code, 'transdata')
     last_datetime = get_lastdatetime(connect, table)
 
     today = Datetime.today()
@@ -524,7 +526,7 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
 
     if trans_buf:
         cur = connect.cursor()
-        rawsql = f"INSERT INTO {table} using hku_data.transdata TAGS ('{market.lower()}', '{code}') VALUES "
+        rawsql = f"INSERT INTO {table} using transdata_data.transdata TAGS ('{market.lower()}', '{code}') VALUES "
         sql = rawsql
         for i, r in enumerate(trans_buf):
             sql += f"({(Datetime(r[0])-UTCOffset()).timestamp()}, {r[1]}, {r[2]}, {r[3]})"
@@ -569,7 +571,7 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
     # stockid, marketid, code, name, type, valid, startDate, endDate
     stockid, marketid, code, name, stktype, valid = stock_record[:6]
     hku_debug("{}{}".format(market, code))
-    table = f'hku_data.{market}_timeline_{code}'.lower()
+    table = get_table(connect, market, code, 'timeline')
     last_datetime = get_lastdatetime(connect, table)
 
     today = Datetime.today()
@@ -612,7 +614,7 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
 
     if time_buf:
         cur = connect.cursor()
-        rawsql = f"INSERT INTO {table} using hku_data.timeline TAGS ('{market.lower()}', '{code}') VALUES "
+        rawsql = f"INSERT INTO {table} using timeline_data.timeline TAGS ('{market.lower()}', '{code}') VALUES "
         sql = rawsql
         for i, r in enumerate(time_buf):
             sql += f"({(Datetime(r[0])-UTCOffset()).timestamp()}, {r[1]}, {r[2]})"
@@ -676,21 +678,21 @@ if __name__ == '__main__':
 
     quotations = ["stock", "fund"]
 
-    # stock_list = get_stock_list(connect, "SH", quotations)
-    # stock_record = None
-    # for r in stock_list:
-    #     if r[2] == "000001":
-    #         stock_record = r
-    #         break
-    # print(stock_record)
+    stock_list = get_stock_list(connect, "SH", quotations)
+    stock_record = None
+    for r in stock_list:
+        if r[2] == "000001":
+            stock_record = r
+            break
+    print(stock_record)
 
-    # import_one_stock_data(connect, api, "SH", "DAY", stock_record, startDate=199012191500)
+    import_one_stock_data(connect, api, "SH", "DAY", stock_record, startDate=199012191500)
 
     # print("\n导入上证日线数据")
     # add_count = import_data(connect, "SH", "DAY", quotations, api, progress=ProgressBar)
     # print("\n导入数量：", add_count)
 
-    import_time(connect, "SH", quotations, api, max_days=30)
+    # import_time(connect, "SH", quotations, api, max_days=30)
 
     api.close()
     connect.close()

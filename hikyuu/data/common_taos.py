@@ -155,7 +155,6 @@ def import_new_holidays(connect):
 
 
 def get_table(connect, market, code, ktype):
-    cur = connect.cursor()
     ktype_dict = {
         'day': 'day',
         'week': 'week',
@@ -178,7 +177,7 @@ def get_table(connect, market, code, ktype):
         'timeline': 'timeline',
         'transdata': 'transdata',
     }
-    return f"hku_data.{market}_{ktype_dict[ktype.lower()]}_{code}".lower()
+    return f"{ktype_dict[ktype.lower()]}_data.{market}{code}".lower()
 
 
 def get_lastdatetime(connect, tablename):
@@ -384,7 +383,7 @@ def update_extern_data(connect, market, code, data_type):
         index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
         base_table = get_table(connect, market, code, 'day')
     else:
-        index_list = ('min15', 'min30', 'min60', 'hour2')
+        index_list = ('min15', 'min30', 'min60')  # , 'hour2')
         # index_list = ('min15', )
         base_table = get_table(connect, market, code, 'min5')
 
@@ -393,7 +392,7 @@ def update_extern_data(connect, market, code, data_type):
         return
 
     for index_type in index_list:
-        hku_debug("{}{} update {} index".format(market, code, index_type))
+        # hku_debug("{}{} update {} index".format(market, code, index_type))
         index_table = get_table(connect, market, code, index_type)
         index_last_date = get_lastdatetime(connect, index_table)
 
@@ -416,9 +415,7 @@ def update_extern_data(connect, market, code, data_type):
         last_start_date = 199012010000
         last_end_date = 199012010000
 
-        update_buffer = []
         insert_buffer = []
-        # for current_base in base_list:
         length_base_all = len(base_list)
         for x in range(length_base_all):
             current_date = Datetime(base_list[x][0]).ymdhm
@@ -452,23 +449,11 @@ def update_extern_data(connect, market, code, data_type):
                     low_price = base_record_list[i][3]
                 amount += base_record_list[i][5]
                 count += base_record_list[i][6]
-            # if last_end_date == index_last_date:
-            #     update_buffer.append((open_price, high_price, low_price, close_price, amount, count, last_end_date))
-            # else:
-            #     insert_buffer.append((last_end_date, open_price, high_price, low_price, close_price, amount, count))
             insert_buffer.append((last_end_date, open_price, high_price, low_price, close_price, amount, count))
 
-        # if update_buffer:
-        #     cur = connect.cursor()
-        #     cur.executemany(
-        #         "update {} set open=%s, high=%s, low=%s, close=%s, amount=%s, count=%s \
-        #          where date=%s".format(index_table), update_buffer
-        #     )
-        #     connect.commit()
-        #     cur.close()
         if insert_buffer:
-            hku_info(f"update index: {market.lower()}{code}")
-            rawsql = f"insert into {index_table} using hku_data.kdata TAGS('{market.lower()}', '{code}', '{index_type}') VALUES "
+            # hku_info(f"update index: {market.lower()}{code}")
+            rawsql = f"insert into {index_table} using {index_type}_data.kdata TAGS('{market.lower()}', '{code}') VALUES "
             sql = rawsql
             for i, v in enumerate(insert_buffer):
                 sql += f"({(Datetime(v[0])-UTCOffset()).timestamp()}, {v[1]}, {v[2]}, {v[3]}, {v[4]}, {v[5]}, {v[6]})"
@@ -477,10 +462,6 @@ def update_extern_data(connect, market, code, data_type):
                     sql = rawsql
             if sql != rawsql:
                 connect.execute(sql)
-            # cur.executemany(
-            #     "insert into {} (date, open, high, low, close, amount, count) \
-            #      values (%s, %s, %s, %s, %s, %s, %s)".format(index_table), insert_buffer
-            # )
 
 
 if __name__ == '__main__':
@@ -504,7 +485,6 @@ if __name__ == '__main__':
     #     print(Datetime(row[0]))
 
     connect.execute("drop database if exists hku_base")
-    connect.execute("drop database if exists hku_data")
 
     # import pandas as pd
     # df = pd.read_sql("SELECT id FROM hku_data.sh_day_000001", connect)
@@ -528,7 +508,7 @@ if __name__ == '__main__':
     x = get_stock_list(connect, "SH", ["stock"])
     print(x)
 
-    d = get_lastdatetime(connect, "hku_data.sh_day_000001")
+    d = get_lastdatetime(connect, "day_data.sh000001")
     print(d)
 
     connect.close()

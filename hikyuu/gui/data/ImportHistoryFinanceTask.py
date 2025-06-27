@@ -178,6 +178,7 @@ class ImportHistoryFinanceTask:
                 res = executor.map(save_to_db, params, timeout=60)
             x = [i for i in res]
             hku_info(f"导入历史财务信息数据: {sum(x)}")
+            self.queue.put([self.task_name, None, None, 100, self.total_count])
 
         else:
             self.connect_db()
