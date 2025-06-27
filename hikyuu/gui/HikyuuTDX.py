@@ -367,6 +367,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         # 初始化权息与财务数据设置
         self.import_weight_checkBox.setChecked(import_config.getboolean('weight', 'enable', fallback=True))
+        self.import_history_finance_checkBox.setChecked(import_config.getboolean('finance', 'enable', fallback=True))
+        self.import_block_checkBox.setChecked(import_config.getboolean('block', 'enable', fallback=True))
 
         # 初始化通道信目录配置
         tdx_enable = import_config.getboolean('tdx', 'enable', fallback=False)
@@ -521,6 +523,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         }
         import_config['weight'] = {
             'enable': self.import_weight_checkBox.isChecked(),
+        }
+        import_config['finance'] = {
+            'enable': self.import_history_finance_checkBox.isChecked(),
+        }
+        import_config['block'] = {
+            'enable': self.import_block_checkBox.isChecked(),
         }
         import_config['tdx'] = {'enable': self.tdx_radioButton.isChecked(), 'dir': self.tdx_dir_lineEdit.text()}
         import_config['pytdx'] = {

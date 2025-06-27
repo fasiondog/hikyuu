@@ -236,6 +236,20 @@
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QCheckBox" name="import_history_finance_checkBox">
+               <property name="text">
+                <string>下载历史财务数据</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="import_block_checkBox">
+               <property name="text">
+                <string>下载行业与指数板块</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
            <item>
@@ -392,7 +406,7 @@
               <widget class="QDateEdit" name="min5_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>16</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -444,7 +458,7 @@
               <widget class="QDateEdit" name="day_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>16</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>

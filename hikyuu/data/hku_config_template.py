@@ -221,6 +221,12 @@ time_start_date = 2023-12-11
 [weight]
 enable = True
 
+[finance]
+enable = True
+
+[block]
+enable = True
+
 [tdx]
 enable = False
 ;dir = d:/TdxW_HuaTai
