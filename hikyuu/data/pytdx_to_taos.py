@@ -694,5 +694,5 @@ if __name__ == '__main__':
 
     # import_time(connect, "SH", quotations, api, max_days=30)
 
-    api.close()
+    api.disconnect()
     connect.close()

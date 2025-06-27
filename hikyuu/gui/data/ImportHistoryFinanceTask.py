@@ -58,7 +58,7 @@ def save_to_db(params):
         hku_info(f"Download finance file: {filename}")
         with open(dest_file_name, 'wb') as f:
             f.write(data)
-        api.close()
+        api.disconnect()
     shutil.unpack_archive(dest_file_name, extract_dir=dest_dir)
     connect = get_taos().connect(**db_config)
 
@@ -151,7 +151,7 @@ class ImportHistoryFinanceTask:
             hku_info(f"Download finance file: {filename}")
             with open(dest_file_name, 'wb') as f:
                 f.write(data)
-            api.close()
+            api.disconnect()
 
         shutil.unpack_archive(dest_file_name, extract_dir=dest_dir)
         self.import_to_db(f'{dest_dir}/{filename[0:-4]}.dat')
@@ -168,6 +168,7 @@ class ImportHistoryFinanceTask:
         data_list.sort(key=lambda x: x['filename'])
 
         if self.config.getboolean('taos', 'enable', fallback=True):
+            self.api.disconnect()
             taos_db_config = {
                 'user': self.config['taos']['usr'],
                 'password': self.config['taos']['pwd'],
@@ -192,6 +193,7 @@ class ImportHistoryFinanceTask:
                 except Exception as e:
                     hku_error(str(e))
             self.db_connect.close()
+            self.api.disconnect()
 
         self.queue.put([self.task_name, None, None, None, self.total_count])
         self.status = "finished"

@@ -99,6 +99,7 @@ class ImportPytdxToH5:
                 connect, self.market, self.ktype, self.quotations, api, self.dest_dir, self.startDatetime, progress
             )
             self.logger.info("导入 {} {} 记录数: {}".format(self.market, self.ktype, count))
+            api.disconnect()
         except Exception as e:
             self.logger.error("ImportPytdxToH5Task failed! {}".format(e))
             # self.queue.put([self.task_name, self.market, self.ktype, str(e), count])

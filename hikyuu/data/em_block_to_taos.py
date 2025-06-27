@@ -44,7 +44,7 @@ def em_import_block_to_taos(connect, code_market_dict, categorys=('行业板块'
             cur.execute(f"delete from hku_base.{tbname}")
             codes = all_block_info[category][name]
             # print(hash_value)
-            id = (Datetime.from_timestamp(hash_value*1000)-UTCOffset()).timestamp()
+            id = (Datetime.from_timestamp(hash_value*10000)-UTCOffset()).timestamp()
             rawsql = f"insert into hku_base.{tbname} (id, market_code) values "
             sql = rawsql
             for i, code in enumerate(codes):

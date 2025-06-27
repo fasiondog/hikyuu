@@ -95,6 +95,7 @@ class ImportPytdxTransToH5:
                 connect, self.market, self.quotations, api, self.dest_dir, max_days=self.max_days, progress=progress
             )
             self.logger.info("导入 {} 分笔记录数: {}".format(self.market, count))
+            api.disconnect()
         except Exception as e:
             self.logger.error(e)
         finally:

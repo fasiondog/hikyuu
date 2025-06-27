@@ -38,9 +38,9 @@ def pytdx_import_weight_to_taos(pytdx_api, connect, market):
         last_db_weight = None
         if a:
             a = list(a[0])
-            db_last_date = Datetime.from_timestamp(a[0]).ymd
-            last_db_weight = [0, stockid].append(a)
+            db_last_date = (Datetime.from_timestamp(a[0]) + UTCOffset()).ymd
             last_total_count, last_free_count = a[6:8]
+            last_db_weight = [a[0], stockid] + a
         else:
             last_db_weight = None
             db_last_date, last_total_count, last_free_count = (0, 0, 0)
@@ -124,8 +124,7 @@ def pytdx_import_weight_to_taos(pytdx_api, connect, market):
 
         if update_last_db_weight:
             x = new_last_db_weight
-            # print(tbname, x)
-            sql = f"INSERT INTO hku_base.{tbname} using hku_base.s_stkweight TAGS ({stockid}) VALUES ({x[0]}, {x[3]}, {x[4]}, {x[5]}, {x[6]}, {x[8]}, {x[9]}, {x[10]})"
+            sql = f"INSERT INTO hku_base.{tbname} using hku_base.s_stkweight TAGS ({stockid}) VALUES ({x[0]}, {x[3]}, {x[4]}, {x[5]}, {x[6]}, {x[7]}, {x[8]}, {x[9]}, {x[10]})"
             cur.execute(sql)
 
         if records:

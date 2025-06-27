@@ -229,6 +229,7 @@ class UseQmtImportToH5Thread(QThread):
                 self.logger.info("{} 新增股票数: {}".format(market, count))
                 self.send_message(
                     ['INFO', '{} 新增股票数：{}'.format(market, count)])
+        pytdx_api.disconnect()
 
         self.process_list.clear()
         for task in self.tasks:
