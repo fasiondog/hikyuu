@@ -191,7 +191,10 @@ def guess_day_n_step(last_datetime):
     if n < 1:
         last_m = last_date // 100 - last_y * 100
         last_d = last_date - (last_y * 10000 + last_m * 100)
-        step = (today - datetime.date(last_y, last_m, last_d)).days
+        step = (today - datetime.date(last_y, last_m, last_d)).days + 1
+        if step > 800:
+            n = 1
+            step = 800
 
     return (n, step)
 
@@ -204,10 +207,10 @@ def guess_1min_n_step(last_datetime):
     last_m = last_date // 100 - last_y * 100
     last_d = last_date - (last_y * 10000 + last_m * 100)
 
-    n = int((today - datetime.date(last_y, last_m, last_d)).days * 240 // 800)
+    n = int(((today - datetime.date(last_y, last_m, last_d)).days * 240 + 1) // 800)
     step = 800
     if n < 1:
-        step = (today - datetime.date(last_y, last_m, last_d)).days * 240
+        step = (today - datetime.date(last_y, last_m, last_d)).days * 240 + 1
     elif n > 99:
         n = 99
 
@@ -222,10 +225,10 @@ def guess_5min_n_step(last_datetime):
     last_m = last_date // 100 - last_y * 100
     last_d = last_date - (last_y * 10000 + last_m * 100)
 
-    n = int((today - datetime.date(last_y, last_m, last_d)).days * 48 // 800)
+    n = int(((today - datetime.date(last_y, last_m, last_d)).days * 48 + 1) // 800)
     step = 800
     if n < 1:
-        step = (today - datetime.date(last_y, last_m, last_d)).days * 48
+        step = (today - datetime.date(last_y, last_m, last_d)).days * 48 + 1
     elif n > 99:
         n = 99
 
@@ -270,51 +273,11 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
 
     get_bars = api.get_index_bars if stktype == STOCKTYPE.INDEX else api.get_security_bars
 
+    need_check = False
+    last_krecord = None
     if table.nrows > 0:
+        need_check = True
         last_krecord = table[-1]
-        if ktype == 'DAY':
-            days = (Datetime.today() - Datetime(int(last_datetime))).days
-            num = days + 1
-        elif ktype == '1MIN':
-            days = (Datetime.today() - Datetime(int(last_datetime)).start_of_day()).days
-            num = days*240+1
-        elif ktype == '5MIN':
-            days = (Datetime.today() - Datetime(int(last_datetime)).start_of_day()).days
-            num = days*48+1
-        if num >= 1:
-            bars = get_bars(pytdx_kline_type, pytdx_market, code, 0, num)
-            if not bars:
-                return 0
-            bar = bars[-1]
-            if ktype == 'DAY':
-                bardate = Datetime(bar["year"], bar["month"], bar["day"])
-            else:
-                bardate = Datetime(bar["year"], bar["month"], bar["day"], bar['hour'], bar['minute'])
-            if Datetime(int(last_datetime)) == bardate:
-                if abs(last_krecord['openPrice']*0.001 - bar["open"]) / (last_krecord['openPrice']*0.001) > 0.02:
-                    hku_error(
-                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord open: {last_krecord['openPrice']*0.001}, bar: {bar['open']}")
-                    return 0
-                if abs(last_krecord['highPrice']*0.001 - bar["high"]) / (last_krecord['highPrice']*0.001) > 0.02:
-                    hku_error(
-                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord high: {last_krecord['highPrice']*0.001}, bar: {bar['high']}")
-                    return 0
-                if abs(last_krecord['lowPrice']*0.001 - bar["low"]) / (last_krecord['lowPrice']*0.001) > 0.02:
-                    hku_error(
-                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord low: {last_krecord['lowPrice']*0.001}, bar: {bar['low']}")
-                    return 0
-                if abs(last_krecord['closePrice']*0.001 - bar["close"]) / (last_krecord['closePrice']*0.001) > 0.02:
-                    hku_error(
-                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord close: {last_krecord['closePrice']*0.001}, bar: {bar['close']}")
-                    return 0
-                if ktype == 'DAY' and last_krecord['transAmount'] != 0.0 and abs(last_krecord['transAmount'] - round(bar["amount"]*0.001)) / last_krecord['transAmount'] > 0.1:
-                    hku_error(
-                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord amount: {last_krecord['transAmount']}, bar: {bar['amount']*0.001}")
-                    return 0
-                if ktype == 'DAY' and last_krecord['transAmount'] != 0.0 and abs(last_krecord['transCount'] - round(bar["vol"])) / last_krecord['transCount'] > 0.1:
-                    hku_error(
-                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord count: {last_krecord['transCount']}, bar: {bar['vol']}")
-                    return 0
 
     add_record_count = 0
 
@@ -323,7 +286,7 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
         bar_list = get_bars(pytdx_kline_type, pytdx_market, code, n * 800, step)
         n -= 1
         if bar_list is None:
-            # print(code, "invalid!!")
+            print(code, "invalid!!")
             continue
 
         for bar in bar_list:
@@ -337,6 +300,34 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
                         10000 + bar["hour"] * 100 + bar["minute"]
             except Exception as e:
                 hku_error("Failed translate datetime: {}, from {}! {}".format(bar, api.ip, e))
+                continue
+
+            if need_check and bar_datetime == last_datetime:
+                # print(f'{bar_datetime} {ktype} {market}{code}')
+                if abs(last_krecord['openPrice']*0.001 - bar["open"]) / (last_krecord['openPrice']*0.001) > 0.02:
+                    hku_error(
+                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord open: {last_krecord['openPrice']*0.001}, bar: {bar['open']}")
+                    return 0
+                if abs(last_krecord['highPrice']*0.001 - bar["high"]) / (last_krecord['highPrice']*0.001) > 0.02:
+                    hku_error(
+                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord high: {last_krecord['highPrice']*0.001}, bar: {bar['high']}")
+                    return 0
+                if abs(last_krecord['lowPrice']*0.001 - bar["low"]) / (last_krecord['lowPrice']*0.001) > 0.02:
+                    hku_error(
+                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord low: {last_krecord['lowPrice']*0.001}, bar: {bar['low']}")
+                    return 0
+                if abs(last_krecord['closePrice']*0.001 - bar["close"]) / (last_krecord['closePrice']*0.001) > 0.02:
+                    hku_error(
+                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord close: {last_krecord['closePrice']*0.001}, bar: {bar['close']}")
+                    return 0
+                if ktype == 'DAY' and last_krecord['transAmount'] != 0.0 and abs(last_krecord['transAmount'] - round(bar["amount"]*0.001)) / last_krecord['transAmount'] > 0.1:
+                    hku_error(
+                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord amount: {last_krecord['transAmount']}, bar: {bar['amount']*0.001}")
+                    return 0
+                if ktype == 'DAY' and last_krecord['transAmount'] != 0.0 and abs(last_krecord['transCount'] - round(bar["vol"])) / last_krecord['transCount'] > 0.1:
+                    hku_error(
+                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord count: {last_krecord['transCount']}, bar: {bar['vol']}")
+                    return 0
                 continue
 
             if today_datetime >= bar_datetime > last_datetime \
@@ -630,7 +621,7 @@ if __name__ == '__main__':
     starttime = time.time()
 
     dest_dir = "d:\\stock"
-    tdx_server = '119.147.212.81'
+    tdx_server = '180.101.48.170'
     tdx_port = 7709
     quotations = ['stock', 'fund']
 
@@ -647,10 +638,11 @@ if __name__ == '__main__':
     add_count = import_index_name(connect)
     print("指数个数：", add_count)
     """
-    print("导入股票代码表")
-    add_count = import_stock_name(connect, api, 'SH', quotations)
-    # add_count += import_stock_name(connect, api, 'SZ', quotations)
-    print("新增股票数：", add_count)
+    # print("导入股票代码表")
+    # add_count = import_stock_name(connect, api, 'SH', quotations)
+    # # add_count += import_stock_name(connect, api, 'SZ', quotations)
+    # print("新增股票数：", add_count)
+
     """
     print("\n导入上证日线数据")
     add_count = import_data(connect, 'SH', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
@@ -659,11 +651,13 @@ if __name__ == '__main__':
     print("\n导入深证日线数据")
     add_count = import_data(connect, 'SZ', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
     print("\n导入数量：", add_count)
+    """
 
     print("\n导入上证5分钟线数据")
-    add_count = import_data(connect, 'SH', '5MIN', quotations, api, dest_dir, progress=ProgressBar)
+    add_count = import_data(connect, 'SH', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
     print("\n导入数量：", add_count)
 
+    """
     print("\n导入深证5分钟线数据")
     add_count = import_data(connect, 'SZ', '5MIN', quotations, api, dest_dir, progress=ProgressBar)
     print("\n导入数量：", add_count)
