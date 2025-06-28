@@ -196,7 +196,7 @@ TimeDelta HKU_UTILS_API UTCOffset() {
     // 获取当前时间戳
     time_t now = std::time(nullptr);
 
-#ifdef __MSVC__
+#if defined(_MSVC_VER)
     // 在 Windows 上使用 gmtime_s
     struct tm local_tm;
     struct tm utc_tm;
