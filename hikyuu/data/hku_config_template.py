@@ -145,6 +145,60 @@ pwd = {pwd}
 
 """
 
+taos_template = """
+[hikyuu]
+tmpdir = {dir}
+datadir = {dir}
+quotation_server = {quotation_server}
+
+[block]
+type = taos
+host = {host}
+port = {port}
+usr = {usr}
+pwd = {pwd}
+
+[preload]
+day = {day}
+week = {week}
+month = {month}
+quarter = {quarter}
+halfyear = {halfyear}
+year = {year}
+min = {min1}
+min5 = {min5}
+min15 = {min15}
+min30 = {min30}
+min60 = {min60}
+hour2 = {hour2}
+day_max = {day_max}
+week_max = {week_max}
+month_max = {month_max}
+quarter_max = {quarter_max}
+halfyear_max = {halfyear_max}
+year_max = {year_max}
+min_max = {min1_max}
+min5_max = {min5_max}
+min15_max = {min15_max}
+min30_max = {min30_max}
+min60_max = {min60_max}
+hour2_max = {hour2_max}
+
+[baseinfo]
+type = taos
+host = {host}
+port = {port}
+usr = {usr}
+pwd = {pwd}
+
+[kdata]
+type = taos
+host = {host}
+port = {port}
+usr = {usr}
+pwd = {pwd}
+
+"""
 
 import_config_template = """
 [quotation]
@@ -167,6 +221,12 @@ time_start_date = 2023-12-11
 [weight]
 enable = True
 
+[finance]
+enable = True
+
+[block]
+enable = True
+
 [tdx]
 enable = False
 ;dir = d:/TdxW_HuaTai
@@ -184,6 +244,14 @@ enable = False
 ;tmpdir = D:/stock
 ;host = 127.0.0.1
 ;port = 3306
+;usr = root
+;pwd = 
+
+[taos]
+enable = False
+;tmpdir = D:/stock
+;host = 127.0.0.1
+;port = 6030
 ;usr = root
 ;pwd = 
 

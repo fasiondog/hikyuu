@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <ctime>
+#include <ctime>
 #include "TimeDelta.h"
 #include "hikyuu/utilities/arithmetic.h"
 #include "hikyuu/utilities/Log.h"

@@ -272,37 +272,48 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
 
     if table.nrows > 0:
         last_krecord = table[-1]
-        days = (Datetime.today() - Datetime(int(last_datetime))).days
-        if days > 0:
-            bars = get_bars(pytdx_kline_type, pytdx_market, code, 0, days+1)
+        if ktype == 'DAY':
+            days = (Datetime.today() - Datetime(int(last_datetime))).days
+            num = days + 1
+        elif ktype == '1MIN':
+            days = (Datetime.today() - Datetime(int(last_datetime)).start_of_day()).days
+            num = days*240+1
+        elif ktype == '5MIN':
+            days = (Datetime.today() - Datetime(int(last_datetime)).start_of_day()).days
+            num = days*48+1
+        if num >= 1:
+            bars = get_bars(pytdx_kline_type, pytdx_market, code, 0, num)
             if not bars:
                 return 0
             bar = bars[-1]
-            # print(bar)
-            if Datetime(int(last_datetime)) == Datetime(bar["year"], bar["month"], bar["day"]):
-                if abs(last_krecord['openPrice']*0.001 - bar["open"]) / (last_krecord['openPrice']*0.001) > 0.001:
+            if ktype == 'DAY':
+                bardate = Datetime(bar["year"], bar["month"], bar["day"])
+            else:
+                bardate = Datetime(bar["year"], bar["month"], bar["day"], bar['hour'], bar['minute'])
+            if Datetime(int(last_datetime)) == bardate:
+                if abs(last_krecord['openPrice']*0.001 - bar["open"]) / (last_krecord['openPrice']*0.001) > 0.02:
                     hku_error(
-                        f"fetch data from tdx error! {market}{code} last_krecord open: {last_krecord['openPrice']*0.001}, bar: {bar['open']}")
+                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord open: {last_krecord['openPrice']*0.001}, bar: {bar['open']}")
                     return 0
-                if abs(last_krecord['highPrice']*0.001 - bar["high"]) / (last_krecord['highPrice']*0.001) > 0.001:
+                if abs(last_krecord['highPrice']*0.001 - bar["high"]) / (last_krecord['highPrice']*0.001) > 0.02:
                     hku_error(
-                        f"fetch data from tdx error! {market}{code} last_krecord high: {last_krecord['highPrice']*0.001}, bar: {bar['high']}")
+                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord high: {last_krecord['highPrice']*0.001}, bar: {bar['high']}")
                     return 0
-                if abs(last_krecord['lowPrice']*0.001 - bar["low"]) / (last_krecord['lowPrice']*0.001) > 0.001:
+                if abs(last_krecord['lowPrice']*0.001 - bar["low"]) / (last_krecord['lowPrice']*0.001) > 0.02:
                     hku_error(
-                        f"fetch data from tdx error! {market}{code} last_krecord low: {last_krecord['lowPrice']*0.001}, bar: {bar['low']}")
+                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord low: {last_krecord['lowPrice']*0.001}, bar: {bar['low']}")
                     return 0
-                if abs(last_krecord['closePrice']*0.001 - bar["close"]) / (last_krecord['closePrice']*0.001) > 0.001:
+                if abs(last_krecord['closePrice']*0.001 - bar["close"]) / (last_krecord['closePrice']*0.001) > 0.02:
                     hku_error(
-                        f"fetch data from tdx error! {market}{code} last_krecord close: {last_krecord['closePrice']*0.001}, bar: {bar['close']}")
+                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord close: {last_krecord['closePrice']*0.001}, bar: {bar['close']}")
                     return 0
-                if abs(last_krecord['transAmount'] - round(bar["amount"]*0.001)) / last_krecord['transAmount'] > 0.1:
+                if ktype == 'DAY' and last_krecord['transAmount'] != 0.0 and abs(last_krecord['transAmount'] - round(bar["amount"]*0.001)) / last_krecord['transAmount'] > 0.1:
                     hku_error(
-                        f"fetch data from tdx error! {market}{code} last_krecord amount: {last_krecord['transAmount']}, bar: {bar['amount']*0.001}")
+                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord amount: {last_krecord['transAmount']}, bar: {bar['amount']*0.001}")
                     return 0
-                if abs(last_krecord['transCount'] - round(bar["vol"])) / last_krecord['transCount'] > 0.1:
+                if ktype == 'DAY' and last_krecord['transAmount'] != 0.0 and abs(last_krecord['transCount'] - round(bar["vol"])) / last_krecord['transCount'] > 0.1:
                     hku_error(
-                        f"fetch data from tdx error! {market}{code} last_krecord count: {last_krecord['transCount']}, bar: {bar['vol']}")
+                        f"fetch data from tdx error! {bardate} {ktype} {market}{code} last_krecord count: {last_krecord['transCount']}, bar: {bar['vol']}")
                     return 0
 
     add_record_count = 0

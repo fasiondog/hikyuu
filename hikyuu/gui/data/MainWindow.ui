@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1269</width>
-    <height>797</height>
+    <width>1303</width>
+    <height>822</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -236,6 +236,20 @@
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QCheckBox" name="import_history_finance_checkBox">
+               <property name="text">
+                <string>下载历史财务数据</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="import_block_checkBox">
+               <property name="text">
+                <string>下载行业与指数板块</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
            <item>
@@ -392,12 +406,12 @@
               <widget class="QDateEdit" name="min5_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>0</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
                  <month>12</month>
-                 <day>27</day>
+                 <day>26</day>
                 </datetime>
                </property>
                <property name="calendarPopup">
@@ -444,12 +458,12 @@
               <widget class="QDateEdit" name="day_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>0</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
                  <month>12</month>
-                 <day>27</day>
+                 <day>26</day>
                 </datetime>
                </property>
                <property name="calendarPopup">
@@ -536,6 +550,13 @@
               <widget class="QRadioButton" name="enable_mysql_radioButton">
                <property name="text">
                 <string>使用MYSQL</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="enable_taos_radioButton">
+               <property name="text">
+                <string>使用TDEngine(捐赠用户权益)</string>
                </property>
               </widget>
              </item>
@@ -639,6 +660,12 @@
           <property name="title">
            <string>MYSQL存储设置</string>
           </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
             <layout class="QGridLayout" name="gridLayout_5">
@@ -651,38 +678,35 @@
              <property name="bottomMargin">
               <number>10</number>
              </property>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_18">
-               <property name="text">
-                <string>主机名/IP：</string>
-               </property>
-              </widget>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="mysql_usr_lineEdit"/>
              </item>
-             <item row="5" column="1">
-              <widget class="QLineEdit" name="mysql_pwd_lineEdit"/>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_20">
-               <property name="text">
-                <string>临时文件目录：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLineEdit" name="mysql_ip_lineEdit"/>
-             </item>
-             <item row="4" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="label_11">
                <property name="text">
                 <string>用户名：</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="2" column="1">
               <widget class="QLineEdit" name="mysql_port_lineEdit"/>
              </item>
-             <item row="4" column="1">
-              <widget class="QLineEdit" name="mysql_usr_lineEdit"/>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_19">
+               <property name="text">
+                <string>端口号：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="mysql_ip_lineEdit"/>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_13">
+               <property name="text">
+                <string>密码</string>
+               </property>
+              </widget>
              </item>
              <item row="0" column="1">
               <widget class="QLineEdit" name="mysql_tmpdir_lineEdit"/>
@@ -694,60 +718,152 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="2">
+             <item row="2" column="2">
               <widget class="QPushButton" name="mysql_test_pushButton">
                <property name="text">
                 <string>测试连接</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_19">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_20">
+               <property name="text">
+                <string>临时文件目录：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_18">
+               <property name="text">
+                <string>主机名/IP：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLineEdit" name="mysql_pwd_lineEdit"/>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_22">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_8">
+          <property name="title">
+           <string>TDEngine存储设置(捐赠用户权益)</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_8">
+           <item row="0" column="0">
+            <layout class="QGridLayout" name="gridLayout_7">
+             <property name="leftMargin">
+              <number>10</number>
+             </property>
+             <property name="topMargin">
+              <number>10</number>
+             </property>
+             <property name="bottomMargin">
+              <number>10</number>
+             </property>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="taos_port_lineEdit"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_53">
                <property name="text">
                 <string>端口号：</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_13">
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_52">
+               <property name="text">
+                <string>用户名：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="taos_tmpdir_lineEdit"/>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="taos_usr_lineEdit"/>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_54">
                <property name="text">
                 <string>密码</string>
                </property>
               </widget>
              </item>
+             <item row="2" column="2">
+              <widget class="QPushButton" name="taos_test_pushButton">
+               <property name="text">
+                <string>测试连接</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="taos_ip_lineEdit"/>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLineEdit" name="taos_pwd_lineEdit"/>
+             </item>
+             <item row="0" column="2">
+              <widget class="QPushButton" name="taos_tmpdir_pushButton">
+               <property name="text">
+                <string>选择</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_51">
+               <property name="text">
+                <string>临时文件目录：</string>
+               </property>
+              </widget>
+             </item>
              <item row="1" column="0">
-              <spacer name="verticalSpacer_12">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
+              <widget class="QLabel" name="label_50">
+               <property name="text">
+                <string>主机名/IP：</string>
                </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
+              </widget>
              </item>
             </layout>
            </item>
-           <item>
-            <spacer name="verticalSpacer_13">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
           </layout>
          </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_21">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </widget>
@@ -1773,7 +1889,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <bool>true</bool>
        </property>
        <attribute name="title">
-        <string>项目VIP</string>
+        <string>项目捐赠</string>
        </attribute>
        <widget class="QLabel" name="label_44">
         <property name="geometry">
@@ -1804,7 +1920,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </rect>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Hikyuu 作为长期持续维护的开源项目，&lt;span style=&quot; font-weight:700;&quot;&gt;专注于量化交易领域的核心技术构建，涵盖交易模型开发、极速计算引擎、高效回测框架及实盘拓展能力&lt;/span&gt;，定位为量化交易的基础设施级计算引擎，为量化交易爱好者和专业提供高性能底层架构支持。随着社区规模扩大，项目持续迭代及技术支持事务逐渐分散了作者在策略研究上的精力。为保障项目的专注度与可持续性，现推出 &amp;quot;VIP计划&amp;quot;，通过提供部分VIP功能作为回馈，构建良性的项目发展生态。诚挚期待社区伙伴的支持，您的参与都将直接助力 Hikyuu 的技术创新，共同推动量化交易基础设施的迭代升级。&lt;/p&gt;&lt;p&gt;VIP功能以插件的方式提供，采用独立授权许可，完全在 hikyuu 之外，对喜欢自行编译扩展的朋友没有影响。因插件许可授权需要采集硬件信息，如有疑虑只要不申请试用许可和正式许可授权，不会触发硬件信息采集。&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;正式许可授权除资金支持外，亦可通过其他方式获取，详情参见：&lt;/span&gt;&lt;a href=&quot;https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#3586ff;&quot;&gt;VIP计划&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-weight:700;&quot;&gt; 中 &amp;quot;如何获取免费授权和延长授权时间&amp;quot; 章节，已提供的VIP功能亦在其中，可自行查看，感谢大家的支持！&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Hikyuu &lt;span style=&quot; font-weight:700;&quot;&gt;专注于量化交易领域的核心技术构建，涵盖交易模型开发、极速计算引擎、高效回测框架及实盘拓展能力&lt;/span&gt;，定位为量化交易的基础设施级计算引擎，为量化交易爱好者和专业提供高性能底层架构支持。随着社区规模扩大，项目持续迭代及技术支持事务逐渐分散了作者在策略研究上的精力。为保障项目的专注度与可持续性，现对捐赠用户提供部分额外功能作为回馈。诚挚期待社区伙伴的支持，您的参与都将直接助力 Hikyuu 的技术创新，共同推动量化交易基础设施的迭代升级。&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;捐赠功能以插件的方式提供，采用独立授权许可，完全在 hikyuu 之外，对喜欢自行编译扩展的朋友没有影响。因插件许可授权需要采集硬件信息，如有疑虑只要不申请试用许可和正式许可授权，不会触发硬件信息采集，如申请，视为同意采集。&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;详情参见：&lt;/span&gt;&lt;a href=&quot;https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#3586ff;&quot;&gt;捐赠权益&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-weight:700;&quot;&gt; ，感谢大家的支持！&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

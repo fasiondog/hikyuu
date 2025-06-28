@@ -91,7 +91,7 @@ class UseTdxImportToH5Thread(QThread):
                 ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
 
         self.tasks.append(ImportBlockInfoTask(self.log_queue, self.queue,
-                          self.config, ('行业板块', '概念板块', '地域板块', '指数板块')))
+                          self.config, ('行业板块', '指数板块')))  # '概念板块', '地域板块'
         self.tasks.append(ImportZhBond10Task(self.log_queue, self.queue, self.config))
 
         task_count = 0
@@ -251,6 +251,7 @@ class UseTdxImportToH5Thread(QThread):
                 self.logger.info("{} 新增股票数: {}".format(market, count))
                 self.send_message(
                     ['INFO', '{} 新增股票数：{}'.format(market, count)])
+        pytdx_api.disconnect()
 
         self.process_list.clear()
         for task in self.tasks:
