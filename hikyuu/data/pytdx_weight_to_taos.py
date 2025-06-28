@@ -19,7 +19,7 @@ def pytdx_import_weight_to_taos(pytdx_api, connect, market):
 
     total_count = 0
     cur.execute(
-        f"select cast(stockid as bigint), code from hku_base.n_stock where marketid={marketid} and valid=1")
+        f"select cast(stockid as bigint), code from hku_base.n_stock where market='{market}' and valid=1")
     stockid_list = [x for x in cur]
 
     for stockrecord in stockid_list:
@@ -31,7 +31,7 @@ def pytdx_import_weight_to_taos(pytdx_api, connect, market):
         cur.execute(
             f"select cast(date as bigint), countAsGift, countForSell, priceForSell, \
                     bonus, countOfIncreasement, totalCount, \
-                    freeCount, suogu from hku_base.s_stkweight where stockid={stockid} \
+                    freeCount, suogu from hku_base.s_stkweight where market='{market}' and code='{code}' \
                     order by date desc limit 1"
         )
         a = [x for x in cur]
@@ -124,11 +124,11 @@ def pytdx_import_weight_to_taos(pytdx_api, connect, market):
 
         if update_last_db_weight:
             x = new_last_db_weight
-            sql = f"INSERT INTO hku_base.{tbname} using hku_base.s_stkweight TAGS ({stockid}) VALUES ({x[0]}, {x[3]}, {x[4]}, {x[5]}, {x[6]}, {x[7]}, {x[8]}, {x[9]}, {x[10]})"
+            sql = f"INSERT INTO hku_base.{tbname} using hku_base.s_stkweight TAGS ('{market}', '{code}') VALUES ({x[0]}, {x[3]}, {x[4]}, {x[5]}, {x[6]}, {x[7]}, {x[8]}, {x[9]}, {x[10]})"
             cur.execute(sql)
 
         if records:
-            rawsql = f"INSERT INTO hku_base.{tbname} using hku_base.s_stkweight TAGS ({stockid}) VALUES "
+            rawsql = f"INSERT INTO hku_base.{tbname} using hku_base.s_stkweight TAGS ('{market}', '{code}') VALUES "
             sql = rawsql
             for i, r in enumerate(records.values()):
                 sql += f"({(Datetime(r[1])-UTCOffset()).timestamp()}, {r[2]}, {r[3]}, {r[4]}, {r[5]}, {r[6]}, {r[7]}, {r[8]}, {r[9]})"

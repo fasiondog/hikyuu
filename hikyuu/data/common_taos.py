@@ -129,10 +129,9 @@ def get_codepre_list(connect, marketid, quotations):
 
 
 def get_stock_list(connect, market, quotations):
-    marketid = get_marketid(connect, market)
     stktype_list = get_stktype_list(quotations)
-    sql = "select cast(stockid as bigint), marketid, code, name, type, valid, startDate, endDate from hku_base.n_stock where marketid={} and type in {}"\
-        .format(marketid, stktype_list)
+    sql = "select cast(stockid as bigint), market, code, name, type, valid, startDate, endDate from hku_base.n_stock where market='{}' and type in {}"\
+        .format(market.upper(), stktype_list)
     cur = connect.cursor()
     cur.execute(sql)
     a = [v for v in cur]
@@ -453,7 +452,7 @@ def update_extern_data(connect, market, code, data_type):
 
         if insert_buffer:
             # hku_info(f"update index: {market.lower()}{code}")
-            rawsql = f"insert into {index_table} using {index_type}_data.kdata TAGS('{market.lower()}', '{code}') VALUES "
+            rawsql = f"insert into {index_table} using {index_type}_data.kdata TAGS('{market}', '{code}') VALUES "
             sql = rawsql
             for i, v in enumerate(insert_buffer):
                 sql += f"({(Datetime(v[0])-UTCOffset()).timestamp()}, {v[1]}, {v[2]}, {v[3]}, {v[4]}, {v[5]}, {v[6]})"
@@ -509,6 +508,9 @@ if __name__ == '__main__':
     print(x)
 
     d = get_lastdatetime(connect, "day_data.sh000001")
+    print(d)
+
+    d = get_last_krecord(connect, "day_data.sh000001")
     print(d)
 
     connect.close()

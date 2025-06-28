@@ -24,7 +24,7 @@ INSERT INTO hku_base.n_market (id,marketid,market,name,description,code,lastDate
 
 create table hku_base.n_stock (
     stockid TIMESTAMP,
-    marketid INT,
+    market VARCHAR(10),
     code VARCHAR(20),
     name VARCHAR(60),
     type INT,
@@ -47,7 +47,7 @@ CREATE STABLE IF NOT EXISTS hku_base.s_stkweight (
 	totalCount DOUBLE, 
 	freeCount DOUBLE,
 	suogu DOUBLE
-) TAGS (stockid TIMESTAMP);
+) TAGS (market VARCHAR(10), code VARCHAR(20));
 
 CREATE TABLE IF NOT EXISTS hku_base.n_coderuletype (
 	id timestamp,
@@ -713,7 +713,7 @@ CREATE STABLE IF NOT EXISTS hku_base.s_historyfinance (
     file_date TIMESTAMP,
     report_date INT,
     `values` VARBINARY(3072)
-) TAGS (market_code VARCHAR(60));
+) TAGS (market_code VARCHAR(30));
 
 CREATE STABLE IF NOT EXISTS hku_base.s_stkfinance (
 	`updated_date` TIMESTAMP, 
@@ -751,7 +751,7 @@ CREATE STABLE IF NOT EXISTS hku_base.s_stkfinance (
 	`weifenpeilirun` DOUBLE, --31.未分配利润
 	`meigujingzichan` DOUBLE, --34.每股净资产
 	`baoliu2` DOUBLE
-) TAGS (stockid TIMESTAMP);
+) TAGS (market VARCHAR(10), code VARCHAR(20));
 
 CREATE STABLE IF NOT EXISTS hku_base.s_holiday (
 	`id` TIMESTAMP,
