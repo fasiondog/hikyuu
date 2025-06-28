@@ -12,6 +12,7 @@
 #include <ctime>
 #include "TimeDelta.h"
 #include "hikyuu/utilities/arithmetic.h"
+#include "hikyuu/utilities/osdef.h"
 #include "hikyuu/utilities/Log.h"
 
 namespace hku {
@@ -196,7 +197,7 @@ TimeDelta HKU_UTILS_API UTCOffset() {
     // 获取当前时间戳
     time_t now = std::time(nullptr);
 
-#if defined(_MSVC_VER)
+#if HKU_OS_WINDOWS
     // 在 Windows 上使用 gmtime_s
     struct tm local_tm;
     struct tm utc_tm;
