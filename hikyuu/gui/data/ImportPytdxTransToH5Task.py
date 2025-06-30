@@ -28,6 +28,8 @@ import mysql.connector
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_trans as h5_import_trans
 from hikyuu.data.pytdx_to_mysql import import_trans as mysql_import_trans
+from hikyuu.data.pytdx_to_taos import import_trans as taos_import_trans
+from hikyuu.data.common_taos import get_taos
 from hikyuu.util import *
 
 
@@ -64,7 +66,7 @@ class ImportPytdxTransToH5:
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
             connect = sqlite3.connect(sqlite_file, timeout=1800)
             import_trans = h5_import_trans
-        else:
+        elif self.config.getboolean('mysql', 'enable', fallback=True):
             db_config = {
                 'user': self.config['mysql']['usr'],
                 'password': self.config['mysql']['pwd'],
@@ -73,6 +75,15 @@ class ImportPytdxTransToH5:
             }
             connect = mysql.connector.connect(**db_config)
             import_trans = mysql_import_trans
+        elif self.config.getboolean('taos', 'enable', fallback=True):
+            db_config = {
+                'user': self.config['taos']['usr'],
+                'password': self.config['taos']['pwd'],
+                'host': self.config['taos']['host'],
+                'port': int(self.config['taos']['port'])
+            }
+            connect = get_taos().connect(**db_config)
+            import_trans = taos_import_trans
 
         count = 0
         try:
@@ -84,9 +95,11 @@ class ImportPytdxTransToH5:
                 connect, self.market, self.quotations, api, self.dest_dir, max_days=self.max_days, progress=progress
             )
             self.logger.info("导入 {} 分笔记录数: {}".format(self.market, count))
+            api.disconnect()
         except Exception as e:
             self.logger.error(e)
         finally:
+            api.close()
             connect.commit()
             connect.close()
 

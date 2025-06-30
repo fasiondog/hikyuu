@@ -35,8 +35,11 @@ from hikyuu.data.common_pytdx import search_best_tdx
 from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 from hikyuu.data.pytdx_weight_to_sqlite import pytdx_import_weight_to_sqlite
 from hikyuu.data.pytdx_weight_to_mysql import pytdx_import_weight_to_mysql
+from hikyuu.data.pytdx_weight_to_taos import pytdx_import_weight_to_taos
 from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance_to_sqlite
 from hikyuu.data.pytdx_finance_to_mysql import pytdx_import_finance_to_mysql
+from hikyuu.data.pytdx_finance_to_taos import pytdx_import_finance_to_taos
+from hikyuu.data.common_taos import get_taos
 from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
 from hikyuu.util.check import hku_catch, hku_check
 
@@ -67,7 +70,7 @@ class ImportWeightToSqliteTask:
                 pytdx_import_weight = pytdx_import_weight_to_sqlite
                 pytdx_import_finance = pytdx_import_finance_to_sqlite
                 self.logger.debug('use sqlite import weight')
-            else:
+            elif self.config.getboolean('mysql', 'enable', fallback=True):
                 db_config = {
                     'user': self.config['mysql']['usr'],
                     'password': self.config['mysql']['pwd'],
@@ -78,6 +81,16 @@ class ImportWeightToSqliteTask:
                 pytdx_import_weight = pytdx_import_weight_to_mysql
                 pytdx_import_finance = pytdx_import_finance_to_mysql
                 self.logger.debug('use mysql import weight')
+            elif self.config.getboolean('taos', 'enable', fallback=True):
+                db_config = {
+                    'user': self.config['taos']['usr'],
+                    'password': self.config['taos']['pwd'],
+                    'host': self.config['taos']['host'],
+                    'port': int(self.config['taos']['port'])
+                }
+                connect = get_taos().connect(**db_config)
+                pytdx_import_weight = pytdx_import_weight_to_taos
+                pytdx_import_finance = pytdx_import_finance_to_taos
 
         except Exception as e:
             # self.queue.put([self.msg_name, str(e), -1, 0, total_count])
@@ -107,6 +120,7 @@ class ImportWeightToSqliteTask:
             # self.queue.put([self.msg_name, str(e), -1, 0, total_count])
             self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])
         finally:
+            api.close()
             connect.commit()
             connect.close()
 

@@ -316,6 +316,12 @@ inline TimeDelta Microseconds(int64_t microsecs) {
     return TimeDelta::fromTicks(microsecs);
 }
 
+/**
+ * 获取当前 UTC 时间偏移
+ * @return TimeDelta
+ */
+TimeDelta HKU_UTILS_API UTCOffset();
+
 } /* namespace hku */
 
 namespace std {

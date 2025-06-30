@@ -13,22 +13,23 @@ namespace hku {
 void HKU_API backtest(const StrategyContext& context, const std::function<void(Strategy*)>& on_bar,
                       const TradeManagerPtr& tm, const Datetime& start_date,
                       const Datetime& end_date, const KQuery::KType& ktype,
-                      const string& ref_market, int mode, bool support_short) {
+                      const string& ref_market, int mode, bool support_short, SlippagePtr slip) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<BackTestPluginInterface>(HKU_PLUGIN_BACKTEST);
     HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_BACKTEST);
     plugin->backtest(context, on_bar, tm, start_date, end_date, ktype, ref_market, mode,
-                     support_short);
+                     support_short, slip);
 }
 
 void HKU_API backtest(const std::function<void(Strategy*)>& on_bar, const TradeManagerPtr& tm,
                       const Datetime& start_date, const Datetime& end_date,
                       const KQuery::KType& ktype, const string& ref_market, int mode,
-                      bool support_short) {
+                      bool support_short, SlippagePtr slip) {
     const StrategyContext& context = StockManager::instance().getStrategyContext();
     HKU_ERROR_IF_RETURN(context.empty(), void(),
                         "Unable to obtain context. hikyuu may not be initialized. Please check!");
-    backtest(context, on_bar, tm, start_date, end_date, ktype, ref_market, mode, support_short);
+    backtest(context, on_bar, tm, start_date, end_date, ktype, ref_market, mode, support_short,
+             slip);
 }
 
 }  // namespace hku

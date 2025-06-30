@@ -48,6 +48,11 @@ from hikyuu.data.common_mysql import create_database as mysql_create_database
 from hikyuu.data.common_mysql import import_new_holidays as mysql_import_new_holidays
 from hikyuu.data.pytdx_to_mysql import import_index_name as mysql_import_index_name
 from hikyuu.data.pytdx_to_mysql import import_stock_name as mysql_import_stock_name
+from hikyuu.data.common_taos import create_database as taos_create_database
+from hikyuu.data.common_taos import import_new_holidays as taos_import_new_holidays
+from hikyuu.data.pytdx_to_taos import import_index_name as taos_import_index_name
+from hikyuu.data.pytdx_to_taos import import_stock_name as taos_import_stock_name
+from hikyuu.data.common_taos import get_taos
 from hikyuu.util.mylog import class_logger
 
 
@@ -90,8 +95,10 @@ class UsePytdxImportToH5Thread(QThread):
             self.tasks.append(
                 ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
 
-        self.tasks.append(ImportBlockInfoTask(self.log_queue, self.queue,
-                          self.config, ('行业板块', '概念板块', '地域板块', '指数板块')))
+        if self.config.getboolean('block', 'enable', fallback=True):
+            self.tasks.append(ImportBlockInfoTask(self.log_queue, self.queue,
+                                                  self.config, ('行业板块', '指数板块')))  # '概念板块', '地域板块',
+
         self.tasks.append(ImportZhBond10Task(self.log_queue, self.queue, self.config))
 
         task_count = 0
@@ -251,7 +258,7 @@ class UsePytdxImportToH5Thread(QThread):
             import_new_holidays = sqlite_import_new_holidays
             import_index_name = sqlite_import_index_name
             import_stock_name = sqlite_import_stock_name
-        else:
+        elif self.config.getboolean('mysql', 'enable', fallback=True):
             db_config = {
                 'user': self.config['mysql']['usr'],
                 'password': self.config['mysql']['pwd'],
@@ -263,6 +270,18 @@ class UsePytdxImportToH5Thread(QThread):
             import_new_holidays = mysql_import_new_holidays
             import_index_name = mysql_import_index_name
             import_stock_name = mysql_import_stock_name
+        elif self.config.getboolean('taos', 'enable', fallback=True):
+            db_config = {
+                'user': self.config['taos']['usr'],
+                'password': self.config['taos']['pwd'],
+                'host': self.config['taos']['host'],
+                'port': int(self.config['taos']['port'])
+            }
+            connect = get_taos().connect(**db_config)
+            create_database = taos_create_database
+            import_new_holidays = taos_import_new_holidays
+            import_index_name = taos_import_index_name
+            import_stock_name = taos_import_stock_name
 
         create_database(connect)
 
@@ -284,6 +303,8 @@ class UsePytdxImportToH5Thread(QThread):
                 self.logger.info("{} 新增股票数: {}".format(market, count))
                 self.send_message(
                     ['INFO', '{} 新增股票数：{}'.format(market, count)])
+        pytdx_api.disconnect()
+        connect.close()
 
         self.process_list.clear()
         for task in self.tasks:

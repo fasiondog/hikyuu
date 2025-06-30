@@ -27,12 +27,12 @@ void HKU_API backtest(const StrategyContext& context, const std::function<void(S
                       const TradeManagerPtr& tm, const Datetime& start_date,
                       const Datetime& end_date = Null<Datetime>(),
                       const KQuery::KType& ktype = KQuery::DAY, const string& ref_market = "SH",
-                      int mode = 0, bool support_short = false);
+                      int mode = 0, bool support_short = false, SlippagePtr slip = SlippagePtr());
 
 // 仅在 sm.init 之后使用
 void HKU_API backtest(const std::function<void(Strategy*)>& on_bar, const TradeManagerPtr& tm,
                       const Datetime& start_date, const Datetime& end_date = Null<Datetime>(),
                       const KQuery::KType& ktype = KQuery::DAY, const string& ref_market = "SH",
-                      int mode = 0, bool support_short = false);
+                      int mode = 0, bool support_short = false, SlippagePtr slip = SlippagePtr());
 
 }  // namespace hku

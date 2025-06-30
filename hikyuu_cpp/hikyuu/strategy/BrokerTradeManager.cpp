@@ -56,6 +56,7 @@ void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
         }
         m_cash = asset["cash"].get<price_t>();
 
+        m_position.clear();
         auto& positions = asset["positions"];
         for (auto iter = positions.cbegin(); iter != positions.cend(); ++iter) {
             try {

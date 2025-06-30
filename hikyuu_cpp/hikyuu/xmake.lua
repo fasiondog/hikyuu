@@ -114,7 +114,7 @@ target("hikyuu")
     end
 
     after_build(function(target)
-        local destpath = get_config("buildir") .. "/" .. get_config("mode") .. "/" .. get_config("plat") .. "/" .. get_config("arch")
+        local destpath = get_config("builddir") .. "/" .. get_config("mode") .. "/" .. get_config("plat") .. "/" .. get_config("arch")
         print(destpath)
         import("core.project.task")
         task.run("copy_dependents", {}, target, destpath, true)

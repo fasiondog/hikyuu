@@ -26,22 +26,38 @@ import os
 import datetime
 from pathlib import Path
 
-import mysql.connector
-
+from hikyuu import Datetime, UTCOffset
 from hikyuu.data.common import get_stktype_list, get_new_holidays
-from hikyuu.util import hku_debug, hku_info
+from hikyuu.util import hku_debug, hku_catch, hku_info
+
+import importlib
+
+_g_taos = None
 
 
-def get_mysql_connect_version():
-    m, n, _ = mysql.connector.__version__.split('.')
-    return int(m) + float(n) * 0.1
+def get_taos():
+    try:
+        global _g_taos
+        if _g_taos is not None:
+            return _g_taos
+        _g_taos = importlib.import_module('taos')
+        return _g_taos
+    except:
+        hku_info("Failed import taos.")
+        return None
+
+
+def reload_taos():
+    global _g_taos
+    if _g_taos is not None:
+        importlib.reload(_g_taos)
 
 
 def is_exist_db(connect):
     """数据库是否已存在"""
     cur = connect.cursor()
-    cur.execute("SELECT 1 FROM information_schema.SCHEMATA where SCHEMA_NAME='hku_base'")
-    a = cur.fetchone()
+    cur.execute("SELECT name FROM information_schema.ins_databases WHERE name='hku_base'")
+    a = [x for x in cur]
     cur.close()
     return True if a else False
 
@@ -50,30 +66,26 @@ def get_db_version(connect):
     try:
         cur = connect.cursor()
         cur.execute("select `version` from `hku_base`.`version`")
-        a = cur.fetchone()
+        a = [x for x in cur]
         cur.close()
-        return a[0] if a else 0
+        return a[0][0] if a else 0
     except:
         return 0
 
 
 def create_database(connect):
     """创建数据库"""
-    sql_dir = os.path.dirname(__file__) + "/mysql_upgrade"
+    sql_dir = os.path.dirname(__file__) + "/taos_upgrade"
     cur = connect.cursor()
-    mysql_version = get_mysql_connect_version()
     if not is_exist_db(connect):
         filename = sql_dir + "/createdb.sql"
         with open(filename, 'r', encoding='utf8') as f:
             sql = f.read()
-        if mysql_version >= 9.2:
-            cur.execute(sql)
-            _ = cur.fetchall()
-            while cur.nextset():
-                _ = cur.fetchall()
-        else:
-            for x in cur.execute(sql, multi=True):
-                pass
+        x = sql.split(';')
+        for v in x:
+            sql = v.strip()
+            if sql and sql[0] != '-':
+                cur.execute(v)
 
     db_version = get_db_version(connect)
     files = [x for x in Path(sql_dir).iterdir()
@@ -84,15 +96,11 @@ def create_database(connect):
     files.sort()
     for file in files:
         sql = file.read_text(encoding='utf8')
-        if mysql_version >= 9.2:
-            cur.execute(sql, map_results=False)
-            _ = cur.fetchall()
-            while cur.nextset():
-                _ = cur.fetchall()
-        else:
-            for x in cur.execute(sql, multi=True):
-                # print(x.statement)
-                pass
+        sqls = sql.split(';')
+        for v in sqls:
+            sql = v.strip()
+            if sql and sql[0] != '-':
+                cur.execute(sql)
 
     connect.commit()
     cur.close()
@@ -100,9 +108,9 @@ def create_database(connect):
 
 def get_marketid(connect, market):
     cur = connect.cursor()
-    cur.execute("select marketid, market from `hku_base`.`market` where market='{}'".format(market.upper()))
-    marketid = cur.fetchone()
-    marketid = marketid[0]
+    cur.execute("select marketid, market from hku_base.n_market where market='{}'".format(market.upper()))
+    marketid = [v for v in cur]
+    marketid = marketid[0][0]
     cur.close()
     return marketid
 
@@ -110,25 +118,23 @@ def get_marketid(connect, market):
 def get_codepre_list(connect, marketid, quotations):
     """获取前缀代码表"""
     stktype_list = get_stktype_list(quotations)
-    sql = "select codepre, type from `hku_base`.`coderuletype` " \
+    sql = "select codepre, type from `hku_base`.`n_coderuletype` " \
           "where marketid={marketid} and type in {type_list} ORDER by length(codepre) DESC"\
         .format(marketid=marketid, type_list=stktype_list)
     cur = connect.cursor()
     cur.execute(sql)
-    a = cur.fetchall()
+    a = [v for v in cur]
     cur.close()
     return sorted(a, key=lambda k: len(k[0]), reverse=True)
 
 
 def get_stock_list(connect, market, quotations):
-    marketid = get_marketid(connect, market)
     stktype_list = get_stktype_list(quotations)
-    sql = "select stockid, marketid, code, valid, type from `hku_base`.`stock` where marketid={} and type in {}"\
-        .format(marketid, stktype_list)
+    sql = "select cast(stockid as bigint), market, code, name, type, valid, startDate, endDate from hku_base.n_stock where market='{}' and type in {}"\
+        .format(market.upper(), stktype_list)
     cur = connect.cursor()
     cur.execute(sql)
-    a = cur.fetchall()
-    connect.commit()
+    a = [v for v in cur]
     cur.close()
     return a
 
@@ -136,19 +142,18 @@ def get_stock_list(connect, market, quotations):
 def import_new_holidays(connect):
     """导入新的交易所休假日历"""
     cur = connect.cursor()
-    cur.execute("select date from `hku_base`.`holiday` order by date desc limit 1")
-    a = cur.fetchall()
+    cur.execute("select date from `hku_base`.`z_zh_holiday` order by date desc limit 1")
+    a = [v for v in cur]
     last_date = a[0][0] if a else 19901219
     holidays = get_new_holidays()
     new_holidays = [(int(v), ) for v in holidays if int(v) > last_date]
-    if new_holidays:
-        cur.executemany("insert into `hku_base`.`holiday` (date) values (%s)", new_holidays)
-        connect.commit()
-        cur.close()
+    now_id = int(datetime.datetime.now().timestamp()*1000)
+    for i, v in enumerate(new_holidays):
+        cur.execute(f"insert into `hku_base`.`z_zh_holiday` (id, date) values ({now_id+i}, {v[0]})")
+    cur.close()
 
 
 def get_table(connect, market, code, ktype):
-    cur = connect.cursor()
     ktype_dict = {
         'day': 'day',
         'week': 'week',
@@ -168,49 +173,20 @@ def get_table(connect, market, code, ktype):
         'min15': 'min15',
         'min30': 'min30',
         'min60': 'min60',
+        'timeline': 'timeline',
+        'transdata': 'transdata',
     }
-    schema = "{market}_{ktype}".format(market=market, ktype=ktype_dict[ktype.lower()]).lower()
-    cur.execute("SELECT 1 FROM information_schema.SCHEMATA where SCHEMA_NAME='{}'".format(schema))
-    a = cur.fetchone()
-    if not a:
-        cur.execute("CREATE SCHEMA `{}`".format(schema))
-        connect.commit()
-
-    tablename = code.lower()
-    cur.execute(
-        "SELECT 1 FROM information_schema.tables "
-        "where table_schema='{schema}' and table_name='{name}'".format(schema=schema, name=tablename)
-    )
-    a = cur.fetchone()
-    if not a:
-        sql = """
-                CREATE TABLE `{schema}`.`{name}` (
-                    `date` BIGINT(20) UNSIGNED NOT NULL,
-                    `open` DOUBLE UNSIGNED NOT NULL,
-                    `high` DOUBLE UNSIGNED NOT NULL,
-                    `low` DOUBLE UNSIGNED NOT NULL,
-                    `close` DOUBLE UNSIGNED NOT NULL,
-                    `amount` DOUBLE UNSIGNED NOT NULL,
-                    `count` DOUBLE UNSIGNED NOT NULL,
-                    PRIMARY KEY (`date`)
-                )
-                COLLATE='utf8mb4_general_ci'
-                ENGINE=MyISAM
-                ;
-              """.format(schema=schema, name=tablename)
-        cur.execute(sql)
-        connect.commit()
-
-    cur.close()
-    return "`{schema}`.`{name}`".format(schema=schema, name=tablename)
+    return f"{ktype_dict[ktype.lower()]}_data.{market}{code}".lower()
 
 
 def get_lastdatetime(connect, tablename):
-    cur = connect.cursor()
-    cur.execute("select max(date) from {}".format(tablename))
-    a = cur.fetchone()
-    cur.close()
-    return a[0]
+    # print(tablename)
+    try:
+        tmp = connect.query("select LAST(date) from {}".format(tablename))
+        a = tmp.fetch_all()
+        return Datetime(a[0][0]) if a and len(a[0]) > 0 else None
+    except:
+        return None
 
 
 def get_last_krecord(connect, tablename):
@@ -218,15 +194,12 @@ def get_last_krecord(connect, tablename):
     返回：(date, open, close, high, low, amount, volume)
     """
     try:
-        cur = connect.cursor()
-        cur.execute(
-            "select `date`, `open`, `high`, `low`, `close`, `amount`, `count` from {} order by date desc limit 1".format(tablename))
-        a = cur.fetchone()
-        cur.close()
-        # hku_info(f"{tablename} {a}")
+        tmp = connect.query("select LAST_ROW(*) from {}".format(tablename))
+        a = tmp.fetch_all()
         if not a:
             return None
-        return (a[0], a[1], a[2], a[3], a[4], a[5], a[6])
+        a = a[0]
+        return (Datetime(a[0]), a[1], a[2], a[3], a[4], a[5], a[6])
     except:
         return None
 
@@ -409,7 +382,7 @@ def update_extern_data(connect, market, code, data_type):
         index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
         base_table = get_table(connect, market, code, 'day')
     else:
-        index_list = ('min15', 'min30', 'min60', 'hour2')
+        index_list = ('min15', 'min30', 'min60')  # , 'hour2')
         # index_list = ('min15', )
         base_table = get_table(connect, market, code, 'min5')
 
@@ -418,7 +391,7 @@ def update_extern_data(connect, market, code, data_type):
         return
 
     for index_type in index_list:
-        hku_debug("{}{} update {} index".format(market, code, index_type))
+        # hku_debug("{}{} update {} index".format(market, code, index_type))
         index_table = get_table(connect, market, code, index_type)
         index_last_date = get_lastdatetime(connect, index_table)
 
@@ -426,13 +399,13 @@ def update_extern_data(connect, market, code, data_type):
         cur = connect.cursor()
         if index_last_date is None:
             cur.execute(
-                'select date, open, high, low, close, amount, count from {} order by date asc '.format(base_table)
+                'select date, open, high, low, close, amount, volume from {} order by date asc '.format(base_table)
             )
         else:
-            start_date, _ = getNewDate(index_type, index_last_date)
+            start_date, _ = getNewDate(index_type, index_last_date.ymdhm)
             cur.execute(
-                'select date, open, high, low, close, amount, count from {} where date>={}'.format(
-                    base_table, start_date
+                'select date, open, high, low, close, amount, volume from {} where date>={}'.format(
+                    base_table, (Datetime(start_date) - UTCOffset()).timestamp()
                 )
             )
         base_list = [x for x in cur]
@@ -441,32 +414,21 @@ def update_extern_data(connect, market, code, data_type):
         last_start_date = 199012010000
         last_end_date = 199012010000
 
-        update_buffer = []
         insert_buffer = []
-        # for current_base in base_list:
         length_base_all = len(base_list)
         for x in range(length_base_all):
-            current_date = base_list[x][0]
+            current_date = Datetime(base_list[x][0]).ymdhm
             if current_date <= last_end_date:
                 continue
             last_start_date, last_end_date = getNewDate(index_type, current_date)
 
-            # cur = connect.cursor()
-            # cur.execute(
-            #    'select date, open, high, low, close, amount, count from {} \
-            #    where date>={} and date<={} order by date asc'.format(
-            #        base_table, last_start_date, last_end_date
-            #    )
-            # )
-            # base_record_list = [r for r in cur]
-            # cur.close()
             base_record_list = []
             start_ix = x
             ix_date = current_date
             while start_ix < length_base_all and \
                     ix_date >= last_start_date and ix_date <= last_end_date:
                 base_record_list.append(base_list[start_ix])
-                ix_date = base_list[start_ix][0]
+                ix_date = Datetime(base_list[start_ix][0]).ymdhm
                 start_ix += 1
 
             if not base_record_list:
@@ -486,36 +448,69 @@ def update_extern_data(connect, market, code, data_type):
                     low_price = base_record_list[i][3]
                 amount += base_record_list[i][5]
                 count += base_record_list[i][6]
-            if last_end_date == index_last_date:
-                update_buffer.append((open_price, high_price, low_price, close_price, amount, count, last_end_date))
-            else:
-                insert_buffer.append((last_end_date, open_price, high_price, low_price, close_price, amount, count))
+            insert_buffer.append((last_end_date, open_price, high_price, low_price, close_price, amount, count))
 
-        if update_buffer:
-            cur = connect.cursor()
-            cur.executemany(
-                "update {} set open=%s, high=%s, low=%s, close=%s, amount=%s, count=%s \
-                 where date=%s".format(index_table), update_buffer
-            )
-            connect.commit()
-            cur.close()
         if insert_buffer:
-            cur = connect.cursor()
-            cur.executemany(
-                "insert into {} (date, open, high, low, close, amount, count) \
-                 values (%s, %s, %s, %s, %s, %s, %s)".format(index_table), insert_buffer
-            )
-            connect.commit()
-            cur.close()
+            # hku_info(f"update index: {market.lower()}{code}")
+            rawsql = f"insert into {index_table} using {index_type}_data.kdata TAGS('{market}', '{code}') VALUES "
+            sql = rawsql
+            for i, v in enumerate(insert_buffer):
+                sql += f"({(Datetime(v[0])-UTCOffset()).timestamp()}, {v[1]}, {v[2]}, {v[3]}, {v[4]}, {v[5]}, {v[6]})"
+                if i > 0 and i % 8000 == 0:
+                    connect.execute(sql)
+                    sql = rawsql
+            if sql != rawsql:
+                connect.execute(sql)
 
 
 if __name__ == '__main__':
-    host = '127.0.0.1'
-    port = 3306
-    usr = 'root'
-    pwd = ''
+    from configparser import ConfigParser
+    dev_config = ConfigParser()
+    dev_config.read(os.path.expanduser("~") + '/workspace/dev.ini')
+    db = 'taos54'
+    user = dev_config.get(db, 'user')
+    password = dev_config.get(db, 'pwd')
+    host = dev_config.get(db, 'host')
+    port = dev_config.getint(db, 'port')
 
-    cnx = mysql.connector.connect(user=usr, password=pwd, host=host, port=port)
+    connect = get_taos().connect(
+        user=user, password=password, host=host, port=port)
 
-    update_extern_data(cnx, 'SH', '000001', 'day')
-    cnx.close()
+    # sql = "select LAST_ROW(date) from bj_data.day_430017"
+    # result = connect.query(sql)
+    # data = result.fetch_all()
+    # from hikyuu import Datetime
+    # for row in data:
+    #     print(Datetime(row[0]))
+
+    connect.execute("drop database if exists hku_base")
+
+    # import pandas as pd
+    # df = pd.read_sql("SELECT id FROM hku_data.sh_day_000001", connect)
+    # df["ts_utc"] = df["id"].dt.tz_localize(None)  # 移除时区信息
+    # df["ts_str"] = df["ts_utc"].dt.strftime("%Y-%m-%d %H:%M:%S")
+    # print(df)
+
+    create_database(connect)
+    print(is_exist_db(connect))
+
+    # import_new_holidays(connect)
+
+    x = get_db_version(connect)
+    print(x)
+
+    # get_table(connect, "SH", "000001", "DAY")
+
+    marketid = get_marketid(connect, "SH")
+    print(marketid)
+
+    x = get_stock_list(connect, "SH", ["stock"])
+    print(x)
+
+    d = get_lastdatetime(connect, "day_data.sh000001")
+    print(d)
+
+    d = get_last_krecord(connect, "day_data.sh000001")
+    print(d)
+
+    connect.close()
