@@ -92,7 +92,7 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
                                               const KQuery::KType& ktype, Datetime start_date,
                                               Datetime end_date) {
     KRecordList result;
-    HKU_IF_RETURN(start_date >= end_date, result);
+    HKU_IF_RETURN(start_date.isNull() || (!end_date.isNull() && start_date >= end_date), result);
 
     try {
         KRecordTable r(market, code, ktype);
