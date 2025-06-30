@@ -34,7 +34,7 @@ from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
 
-from hikyuu import can_upgrade, get_last_version, fetch_trial_license, view_license
+from hikyuu import can_upgrade, get_last_version, fetch_trial_license, view_license, is_valid_license
 from hikyuu.data import hku_config_template
 from hikyuu.util import *
 
@@ -428,7 +428,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         # 初始化 tdengine 设置
         taos_enable = import_config.getboolean('taos', 'enable', fallback=False)
-        if hdf5_enable or mysql_enable:
+        if hdf5_enable or mysql_enable or not is_valid_license():
             taos_enable = False
         self.enable_taos_radioButton.setChecked(taos_enable)
         self.taos_tmpdir_lineEdit.setText(import_config.get('taos', 'tmpdir', fallback='d:/stock'))
@@ -549,7 +549,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'pwd': self.mysql_pwd_lineEdit.text()
         }
         import_config['taos'] = {
-            'enable': self.enable_taos_radioButton.isChecked(),
+            'enable': is_valid_license() and self.enable_taos_radioButton.isChecked(),
             'tmpdir': self.taos_tmpdir_lineEdit.text(),
             'host': self.taos_ip_lineEdit.text(),
             'port': self.taos_port_lineEdit.text(),
@@ -705,10 +705,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_enable_taos_radioButton_clicked(self):
-        if self.enable_taos_radioButton.isChecked():
-            self.enable_hdf55_radioButton.setChecked(False)
-            self.enable_mysql_radioButton.setChecked(False)
-        self.on_enable_database_toggled(hdf5=False, mysql=False, taos=True)
+        if is_valid_license():
+            if self.enable_taos_radioButton.isChecked():
+                self.enable_hdf55_radioButton.setChecked(False)
+                self.enable_mysql_radioButton.setChecked(False)
+            self.on_enable_database_toggled(hdf5=False, mysql=False, taos=True)
+        else:
+            QMessageBox.about(self, "提示", "捐赠用户功能，请先获取许可")
 
     def on_enable_database_toggled(self, hdf5, mysql, taos):
         self.hdf5_dir_lineEdit.setEnabled(hdf5)
