@@ -20,6 +20,7 @@
 #include "StockManager.h"
 #include "global/schedule/inner_tasks.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
+#include "plugin/interface/plugins.h"
 
 namespace hku {
 
@@ -79,6 +80,20 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_tmpdir = hikyuuParam.tryGet<string>("tmpdir", ".");
     m_datadir = hikyuuParam.tryGet<string>("datadir", ".");
 
+    // 设置插件路径
+    m_plugin_manager.pluginPath(
+      m_hikyuuParam.tryGet<string>("plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
+
+    string kdrivername = m_kdataDriverParam.tryGet<string>("type", "");
+    to_lower(kdrivername);
+    if (kdrivername == "tdengine") {
+        auto* plugin = getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_TDENGINE_DRIVER);
+        HKU_CHECK(plugin, "Can not find {} plugin!", HKU_PLUGIN_TDENGINE_DRIVER);
+        auto kdriver = plugin->getKDataDriver();
+        HKU_CHECK(kdriver, "Can not get tengine driver! Check your license!");
+        DataDriverFactory::regKDataDriver(kdriver);
+    }
+
     // 加载证券基本信息
     m_baseInfoDriver = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
     HKU_CHECK(m_baseInfoDriver, "Failed get base info driver!");
@@ -91,10 +106,6 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     if (m_kdataDriverParam != driver->getPrototype()->getParameter()) {
         m_kdataDriverParam = driver->getPrototype()->getParameter();
     }
-
-    // 设置插件路径
-    m_plugin_manager.pluginPath(
-      m_hikyuuParam.tryGet<string>("plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
 
     // 加载数据
     loadData();
