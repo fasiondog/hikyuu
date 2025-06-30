@@ -15,6 +15,7 @@ ${define HKU_ENABLE_MYSQL}
 
 ${define HKU_ENABLE_SQLITE}
 ${define HKU_ENABLE_SQLCIPHER}
+${define HKU_ENABLE_TDENGINE}
 ${define HKU_SQL_TRACE}
 
 ${define HKU_SUPPORT_DATETIME}

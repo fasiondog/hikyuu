@@ -27,4 +27,8 @@
 #include "sqlite/SQLiteUtil.h"
 #endif
 
+#if HKU_ENABLE_TDENGINE
+#include "tdengine/TDengineConnect.h"
+#endif
+
 #endif /* HIKYUU_DB_CONNECT_H */

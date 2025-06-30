@@ -106,6 +106,9 @@ target("hikyuu")
     if get_config("mysql") then
         add_files("./utilities/db_connect/mysql/**.cpp")
     end
+    if get_config("tdengine") then
+        add_files("./utilities/db_connect/tdengine/**.cpp")
+    end    
     if has_config("mo") then
         add_files("./utilities/mo/**.cpp")
     end

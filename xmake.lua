@@ -27,6 +27,7 @@ option_end()
 option("hdf5", {description = "Enable hdf5 kdata engine.", default = true})
 option("sqlite", {description = "Enable sqlite kdata engine.", default = true})
 option("tdx", {description = "Enable tdx kdata engine.", default = true})
+option("tdengine", {description = "Enable tdegine kdata engine.", default = true})
 option("sql_trace", {description = "trace print sql", default = false})
 
 -- 注意：stacktrace 在 windows 下会严重影响性能
@@ -95,6 +96,7 @@ set_configvar("HKU_ENABLE_MYSQL_KDATA", get_config("mysql") and 1 or 0)
 set_configvar("HKU_ENABLE_SQLITE", (get_config("sqlite") or get_config("hdf5")) and 1 or 0)
 set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
 set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
+set_configvar("HKU_ENABLE_TDENGINE", get_config("tdengine") and 1 or 0)
 
 set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
 set_configvar("HKU_ENABLE_TA_LIB", get_config("ta_lib") and 1 or 0)
