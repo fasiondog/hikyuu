@@ -40,16 +40,24 @@ TDengineStatement::~TDengineStatement() {
 void TDengineStatement::sub_exec() {
     m_query_result = TDEngineDll::taos_query(m_taos, m_sql_string.c_str());
     int code = TDEngineDll::taos_errno(m_query_result);
-    SQL_CHECK(m_query_result != nullptr && code == 0, TDEngineDll::taos_errno(m_query_result),
-              "Failed taos_query: {}! {}", TDEngineDll::taos_errstr(m_query_result), m_sql_string);
+    SQL_CHECK(m_query_result != nullptr && code == 0, code, "Failed taos_query: {}! {}",
+              TDEngineDll::taos_errstr(m_query_result), m_sql_string);
+    m_num_fields = TDEngineDll::taos_num_fields(m_query_result);
+    m_fields = TDEngineDll::taos_fetch_fields(m_query_result);
+    HKU_CHECK(m_fields, "Failed taos_fetch_fields!");
 }
 
 bool TDengineStatement::sub_moveNext() {
     HKU_IF_RETURN(!m_query_result, false);
-    m_num_fields = TDEngineDll::taos_num_fields(m_query_result);
-    m_fields = TDEngineDll::taos_fetch_fields(m_query_result);
     m_row = TDEngineDll::taos_fetch_row(m_query_result);
-    return m_row != nullptr;
+    if (m_row == nullptr) {
+        TDEngineDll::taos_free_result(m_query_result);
+        m_num_fields = 0;
+        m_fields = nullptr;
+        m_query_result = nullptr;
+        return false;
+    }
+    return true;
 }
 
 int TDengineStatement::sub_getNumColumns() const {
@@ -161,7 +169,7 @@ void TDengineStatement::sub_getColumnAsDatetime(int idx, Datetime &item) {
     try {
         if (m_fields[idx].type == TSDB_DATA_TYPE_TIMESTAMP) {
             int64_t tmp = *((int64_t *)m_row[idx]);
-            item = Datetime::fromTimestamp(tmp);
+            item = Datetime::fromTimestampUTC(tmp);
         } else {
             HKU_THROW("Field type mismatch! idx: {}", idx);
         }

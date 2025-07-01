@@ -84,6 +84,16 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_plugin_manager.pluginPath(
       m_hikyuuParam.tryGet<string>("plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
 
+    string basedrivername = m_baseInfoDriverParam.tryGet<string>("type", "");
+    to_lower(basedrivername);
+    if (basedrivername == "tdengine") {
+        auto* plugin = getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_TDENGINE_DRIVER);
+        HKU_CHECK(plugin, "Can not find {} plugin!", HKU_PLUGIN_TDENGINE_DRIVER);
+        auto driver = plugin->getBaseInfoDriver();
+        HKU_CHECK(driver, "Can not get tengine driver! Check your license!");
+        DataDriverFactory::regBaseInfoDriver(driver);
+    }
+
     string kdrivername = m_kdataDriverParam.tryGet<string>("type", "");
     to_lower(kdrivername);
     if (kdrivername == "tdengine") {
@@ -92,6 +102,16 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
         auto kdriver = plugin->getKDataDriver();
         HKU_CHECK(kdriver, "Can not get tengine driver! Check your license!");
         DataDriverFactory::regKDataDriver(kdriver);
+    }
+
+    string blockdrivername = m_blockDriverParam.tryGet<string>("type", "");
+    to_lower(blockdrivername);
+    if (blockdrivername == "tdengine") {
+        auto* plugin = getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_TDENGINE_DRIVER);
+        HKU_CHECK(plugin, "Can not find {} plugin!", HKU_PLUGIN_TDENGINE_DRIVER);
+        auto driver = plugin->getBlockInfoDriver();
+        HKU_CHECK(driver, "Can not get tengine driver! Check your license!");
+        DataDriverFactory::regBlockDriver(driver);
     }
 
     // 加载证券基本信息

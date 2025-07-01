@@ -17,10 +17,9 @@ namespace hku {
 
 class TDEngineDll final {
 public:
-    TDEngineDll();
-    ~TDEngineDll();
-
     static TDEngineDll &instance();
+
+    static void release();
 
     static int taos_init(void);
     static void taos_cleanup(void);
@@ -131,8 +130,15 @@ private:
     taos_stmt_errstr_func m_taos_stmt_errstr{nullptr};
 
 private:
+    TDEngineDll();
+    ~TDEngineDll();
+
+private:
     DllLoader m_loader;
     std::atomic_bool m_loaded{false};
+
+private:
+    static TDEngineDll *ms_instance;
 };
 
 }  // namespace hku

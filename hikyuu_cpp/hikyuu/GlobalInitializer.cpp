@@ -33,6 +33,7 @@
 #include "global/schedule/scheduler.h"
 #include "indicator/IndicatorImp.h"
 #include "global/sysinfo.h"
+#include "utilities/db_connect/tdengine/TDEngineDll.h"
 #include "debug.h"
 
 namespace hku {
@@ -116,6 +117,7 @@ void GlobalInitializer::clean() {
 #endif
 
     DataDriverFactory::release();
+    TDEngineDll::release();
 
 #if HKU_ENABLE_HDF5_KDATA
     H5close();

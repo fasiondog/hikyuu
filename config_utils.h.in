@@ -6,6 +6,8 @@
 
 // clang-format off
 
+#define RUNING_IN_HIKYUU 1
+
 ${define HKU_ENABLE_MYSQL}
 #if HKU_ENABLE_MYSQL && HKU_OS_WINDOWS
 #ifndef NOMINMAX

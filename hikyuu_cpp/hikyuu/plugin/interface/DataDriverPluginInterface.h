@@ -8,6 +8,8 @@
 #pragma once
 
 #include "hikyuu/data_driver/KDataDriver.h"
+#include "hikyuu/data_driver/BlockInfoDriver.h"
+#include "hikyuu/data_driver/BaseInfoDriver.h"
 #include "hikyuu/utilities/plugin/PluginBase.h"
 
 namespace hku {
@@ -18,6 +20,8 @@ public:
     virtual ~DataDriverPluginInterface() = default;
 
     virtual KDataDriverPtr getKDataDriver() = 0;
+    virtual BlockInfoDriverPtr getBlockInfoDriver() = 0;
+    virtual BaseInfoDriverPtr getBaseInfoDriver() = 0;
 };
 
 }  // namespace hku

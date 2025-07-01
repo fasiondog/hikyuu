@@ -5,9 +5,30 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/utilities/config.h"
+#if RUNING_IN_HIKYUU
+#include "hikyuu/GlobalInitializer.h"
+#endif
+
 #include "TDEngineDll.h"
 
 namespace hku {
+
+TDEngineDll *TDEngineDll::ms_instance{nullptr};
+
+TDEngineDll &TDEngineDll::instance() {
+    if (!ms_instance) {
+        ms_instance = new TDEngineDll();
+    }
+    return *ms_instance;
+}
+
+void TDEngineDll::release() {
+    if (ms_instance) {
+        delete ms_instance;
+        ms_instance = nullptr;
+    }
+}
 
 TDEngineDll::TDEngineDll() {
     m_loaded = m_loader.load("taos");
@@ -109,11 +130,6 @@ TDEngineDll::~TDEngineDll() {
         instance().m_taos_cleanup();
     }
     m_loader.unload();
-}
-
-TDEngineDll &TDEngineDll::instance() {
-    static TDEngineDll instance;
-    return instance;
 }
 
 int TDEngineDll::taos_init(void) {
