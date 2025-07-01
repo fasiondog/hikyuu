@@ -21,7 +21,7 @@ public:
                           const std::function<void(Strategy*)>& on_bar, const TradeManagerPtr& tm,
                           const Datetime& start_date, const Datetime& end_date,
                           const KQuery::KType& ktype, const string& ref_market, int mode,
-                          bool support_short) = 0;
+                          bool support_short, SlippagePtr slip) = 0;
 };
 
 }  // namespace hku

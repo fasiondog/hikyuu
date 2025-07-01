@@ -1,4 +1,4 @@
-set_xmakever("2.8.2")
+set_xmakever("3.0.0")
 
 -- project
 set_project("hikyuu")
@@ -170,8 +170,8 @@ end
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
-set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
-set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
+set_objectdir("$(builddir)/$(mode)/$(plat)/$(arch)/.objs")
+set_targetdir("$(builddir)/$(mode)/$(plat)/$(arch)/lib")
 
 -- on windows dll, must use runtimes MD
 if is_plat("windows") and get_config("kind") == "shared" then 

@@ -64,7 +64,7 @@ def parse_one_result(quotes):
     return result
 
 
-@ hku_catch(ret=[], trace=True)
+@hku_catch(ret=[], trace=True)
 def request_data(api, stklist, parse_one_result):
     """请求失败将抛出异常"""
     quotes_list = api.get_security_quotes(stklist)
@@ -103,6 +103,7 @@ def inner_get_spot(stocklist, ip, port, batch_func=None):
                 batch_func(phase_result)
         else:
             err_list.extend(tmplist)
+    api.disconnect()
     return result, err_list
 
 
