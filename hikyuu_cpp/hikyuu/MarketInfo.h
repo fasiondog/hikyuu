@@ -37,6 +37,12 @@ public:
                const string& code, const Datetime& lastDate, TimeDelta openTime1,
                TimeDelta closeTime1, TimeDelta openTime2, TimeDelta closeTime2);
 
+    MarketInfo(const MarketInfo&) = default;
+    MarketInfo& operator=(const MarketInfo&) = default;
+
+    MarketInfo(MarketInfo&&);
+    MarketInfo& operator=(MarketInfo&&);
+
     /** 获取市场简称 */
     const string& market() const {
         return m_market;

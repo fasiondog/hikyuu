@@ -100,8 +100,8 @@ CREATE TABLE IF NOT EXISTS hku_base.n_stocktypeinfo (
     `precision` INT, 
     `tick` DOUBLE, 
     `tickValue` DOUBLE ,
-    `minTradeNumber` INT, 
-    `maxTradeNumber` INT, 
+    `minTradeNumber` DOUBLE, 
+    `maxTradeNumber` DOUBLE, 
     `description` VARCHAR(100)
 );
 INSERT INTO hku_base.n_stocktypeinfo (`id`, `type`, `precision`, `tick`, `tickValue`, `minTradeNumber`, `maxTradeNumber`, `description`) VALUES (631152000000000, 0, 2, 100, 100, 100, 1000000, 'Block');
