@@ -28,8 +28,6 @@ import mysql.connector
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_data as h5_import_data
 from hikyuu.data.pytdx_to_mysql import import_data as mysql_import_data
-from hikyuu.data.pytdx_to_taos import import_data as taos_import_data
-from hikyuu.data.common_taos import get_taos
 from hikyuu.util import *
 
 
@@ -78,16 +76,6 @@ class ImportPytdxToH5:
             connect = mysql.connector.connect(**db_config)
             import_data = mysql_import_data
             self.logger.debug('use mysql import kdata')
-        elif self.config.getboolean('taos', 'enable', fallback=True):
-            db_config = {
-                'user': self.config['taos']['usr'],
-                'password': self.config['taos']['pwd'],
-                'host': self.config['taos']['host'],
-                'port': int(self.config['taos']['port'])
-            }
-            connect = get_taos().connect(**db_config)
-            import_data = taos_import_data
-            self.logger.debug('use taos import kdata')
 
         count = 0
         try:

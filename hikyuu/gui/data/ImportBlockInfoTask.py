@@ -9,8 +9,6 @@ import mysql.connector
 from hikyuu.data.common import MARKET, get_stk_code_name_list
 from hikyuu.data.em_block_to_mysql import em_import_block_to_mysql
 from hikyuu.data.em_block_to_sqlite import em_import_block_to_sqlite
-from hikyuu.data.em_block_to_taos import em_import_block_to_taos
-from hikyuu.data.common_taos import get_taos
 from hikyuu.util import *
 
 
@@ -40,15 +38,6 @@ class ImportBlockInfoTask:
             }
             connect = mysql.connector.connect(**db_config)
             import_block = em_import_block_to_mysql
-        elif self.config.getboolean('taos', 'enable', fallback=True):
-            db_config = {
-                'user': self.config['taos']['usr'],
-                'password': self.config['taos']['pwd'],
-                'host': self.config['taos']['host'],
-                'port': int(self.config['taos']['port'])
-            }
-            connect = get_taos().connect(**db_config)
-            import_block = em_import_block_to_taos
 
         count = 0
         try:

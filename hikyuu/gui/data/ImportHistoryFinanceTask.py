@@ -30,45 +30,7 @@ import mysql.connector
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_finance_to_mysql import history_finance_import_mysql
 from hikyuu.data.pytdx_finance_to_sqlite import history_finance_import_sqlite
-from hikyuu.data.pytdx_finance_to_taos import history_finance_import_taos
-from hikyuu.data.common_pytdx import search_best_tdx
-from hikyuu.data.common_taos import get_taos, reload_taos
 from hikyuu.util import *
-
-
-@hku_catch(ret=0)
-def save_to_db(params):
-    db_config, item, dest_dir, idx, total = params
-    filename = item['filename']
-    dest_file_name = dest_dir + "/" + filename
-    need_download = False
-    if not os.path.exists(dest_file_name):
-        need_download = True
-    else:
-        old_md5 = ''
-        with open(dest_file_name, 'rb') as f:
-            old_md5 = hashlib.md5(f.read()).hexdigest()
-        if old_md5 != item['hash']:
-            need_download = True
-    if need_download:
-        api = TdxHq_API()
-        # 不是所有服务器都提供下载
-        hku_check(api.connect('120.76.152.87', 7709), "failed connect pytdx!")
-        data = api.get_report_file_by_size(f'tdxfin/{filename}', 0)
-        hku_info(f"Download finance file: {filename}")
-        with open(dest_file_name, 'wb') as f:
-            f.write(data)
-        api.disconnect()
-    shutil.unpack_archive(dest_file_name, extract_dir=dest_dir)
-    connect = get_taos().connect(**db_config)
-
-    try:
-        ret = history_finance_import_taos(connect, f'{dest_dir}/{filename[0:-4]}.dat')
-    except Exception as e:
-        hku_error(str(e))
-    connect.close()
-    hku_info(f"Import finance file [{idx}/{total}]: {dest_dir}/{filename[0:-4]}.dat")
-    return ret
 
 
 class ImportHistoryFinanceTask:
@@ -115,14 +77,6 @@ class ImportHistoryFinanceTask:
             self.db_connect = mysql.connector.connect(**db_config)
             self.history_finance_import = history_finance_import_mysql
             self.engine = 'mysql'
-        elif self.config.getboolean('taos', 'enable', fallback=True):
-            self.taos_db_config = {
-                'user': self.config['taos']['usr'],
-                'password': self.config['taos']['pwd'],
-                'host': self.config['taos']['host'],
-                'port': int(self.config['taos']['port'])
-            }
-            self.engine = 'taos'
 
     def import_to_db(self, filename):
         try:
@@ -167,33 +121,16 @@ class ImportHistoryFinanceTask:
         count = 0
         data_list.sort(key=lambda x: x['filename'])
 
-        if self.config.getboolean('taos', 'enable', fallback=True):
-            self.api.disconnect()
-            taos_db_config = {
-                'user': self.config['taos']['usr'],
-                'password': self.config['taos']['pwd'],
-                'host': self.config['taos']['host'],
-                'port': int(self.config['taos']['port'])
-            }
-            params = [(taos_db_config, item, self.dest_dir, i, len(data_list)) for i, item in enumerate(data_list)]
-            from concurrent import futures
-            with futures.ProcessPoolExecutor(4) as executor:
-                res = executor.map(save_to_db, params, timeout=60)
-            x = [i for i in res]
-            hku_info(f"导入历史财务信息数据: {sum(x)}")
-            self.queue.put([self.task_name, None, None, 100, self.total_count])
-
-        else:
-            self.connect_db()
-            for item in data_list:
-                try:
-                    self.download_file(item, self.dest_dir)
-                    count += 1
-                    self.queue.put([self.task_name, None, None, int(100 * count / self.total_count), self.total_count])
-                except Exception as e:
-                    hku_error(str(e))
-            self.db_connect.close()
-            self.api.disconnect()
+        self.connect_db()
+        for item in data_list:
+            try:
+                self.download_file(item, self.dest_dir)
+                count += 1
+                self.queue.put([self.task_name, None, None, int(100 * count / self.total_count), self.total_count])
+            except Exception as e:
+                hku_error(str(e))
+        self.db_connect.close()
+        self.api.disconnect()
 
         self.queue.put([self.task_name, None, None, None, self.total_count])
         self.status = "finished"
