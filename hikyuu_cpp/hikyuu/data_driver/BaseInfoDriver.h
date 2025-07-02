@@ -32,6 +32,41 @@ struct StockInfo {
       minTradeNumber(0.0),
       maxTradeNumber(0.0) {}
 
+    StockInfo(const StockInfo&) = default;
+    StockInfo& operator=(const StockInfo&) = default;
+
+    StockInfo(StockInfo&& rhs)
+    : market(std::move(rhs.market)),
+      code(std::move(rhs.code)),
+      name(std::move(rhs.name)),
+      type(rhs.type),
+      valid(rhs.valid),
+      startDate(rhs.startDate),
+      endDate(rhs.endDate),
+      precision(rhs.precision),
+      tick(rhs.tick),
+      tickValue(rhs.tickValue),
+      minTradeNumber(rhs.minTradeNumber),
+      maxTradeNumber(rhs.maxTradeNumber) {}
+
+    StockInfo& operator=(StockInfo&& rhs) {
+        if (this != &rhs) {
+            market = std::move(rhs.market);
+            code = std::move(rhs.code);
+            name = std::move(rhs.name);
+            type = rhs.type;
+            valid = rhs.valid;
+            startDate = rhs.startDate;
+            endDate = rhs.endDate;
+            precision = rhs.precision;
+            tick = rhs.tick;
+            tickValue = rhs.tickValue;
+            minTradeNumber = rhs.minTradeNumber;
+            maxTradeNumber = rhs.maxTradeNumber;
+        }
+        return *this;
+    }
+
     static const char* getSelectSQL() {
         return "select c.market, a.code, a.name, a.type, a.valid, a.startDate, a.endDate, b.tick, "
                "b.tickValue, b.precision, b.minTradeNumber, b.maxTradeNumber from stock a, "

@@ -152,7 +152,7 @@ datadir = {dir}
 quotation_server = {quotation_server}
 
 [block]
-type = taos
+type = tdengine
 host = {host}
 port = {port}
 usr = {usr}
@@ -185,14 +185,14 @@ min60_max = {min60_max}
 hour2_max = {hour2_max}
 
 [baseinfo]
-type = taos
+type = tdengine
 host = {host}
 port = {port}
 usr = {usr}
 pwd = {pwd}
 
 [kdata]
-type = taos
+type = tdengine
 host = {host}
 port = {port}
 usr = {usr}
