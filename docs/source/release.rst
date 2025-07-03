@@ -1,6 +1,27 @@
 版本发布说明
 =======================
 
+2.6.5 - 2025年7月3日
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. 新增功能与优化
+    - hikyuutdx 中下载历史财务与板块信息可选
+    - hikyuutdx 按网友维新提供的思路增加数据校验
+    - 新增指标 BARSLASTCOUNT
+    - 优化行情服务器连接重试逻辑, 防止数据未加载完毕时退出需要等待较长时间
+    - 新增 SE_EvaluateOptimal 选择器，允许用户使用自定义评估函数进行寻优
+    - 更新历史假期数据至 2025 年
+    - WalkForwardSystem 新增参数 clean_hold_when_select_changed 添加切换系统时清空持仓的功能
+    - 优化python datetime 模块导入，避免潜在的命名空间污染问题
+    - TM 支持获取月度和年度收益百分比(捐赠权益)
+    - backtest: 添加滑点算法支持(捐赠权益)
+ 
+2. 缺陷修复
+    - fixed mysql _getTransListByIndex 缺失 buyorsell 字段读取
+    - fix(thread): 在数据未加载完毕后退出时, 会报thread::join 异常
+    - fix(strategy): 清空持仓信息后更新最新持仓
+
+
 2.6.3 - 2025年5月25日
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
