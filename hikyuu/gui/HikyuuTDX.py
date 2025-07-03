@@ -282,8 +282,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                     sys.stderr = self._stream
         self.log_textEdit.document().setMaximumBlockCount(1000)
 
-        if is_valid_license():
-            self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(0 if is_valid_license() else 5)
 
         current_dir = os.path.dirname(__file__)
         icon = QIcon(f"{current_dir}/images/hikyuu_small.png")
