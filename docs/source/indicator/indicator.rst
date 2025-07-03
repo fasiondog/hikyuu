@@ -142,6 +142,18 @@
     :rtype: Indicator
 
 
+.. py:function:: BARSLASTCOUNT([data])
+
+    统计连续满足条件的周期数
+
+    用法：ARSLASTCOUNT(X)，其中X为条件表达式。
+
+    例如：BARSLASTCOUNT(CLOSE>OPEN)表示统计连续收阳的周期数
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
 .. py:function:: BARSSINCE([data])
 
     第一个条件成立位置到当前的周期数。
