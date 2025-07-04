@@ -43,6 +43,9 @@ function prepare_run(target)
       print("copying test_data ...")
       os.rm("$(builddir)/$(mode)/$(plat)/$(arch)/lib/test_data")
       os.cp("$(projectdir)/test_data", "$(builddir)/$(mode)/$(plat)/$(arch)/lib/")
+      if get_config("mo") then
+        os.cp("$(projectdir)/i8n", "$(builddir)/$(mode)/$(plat)/$(arch)/lib/")
+      end
       print("copy finished")
     end
 end

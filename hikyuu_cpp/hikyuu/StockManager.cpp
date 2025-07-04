@@ -21,6 +21,10 @@
 #include "global/schedule/inner_tasks.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
 
+#if HKU_ENABLE_MO
+#include "hikyuu/utilities/mo/mo.h"
+#endif
+
 namespace hku {
 
 StockManager* StockManager::m_sm = nullptr;
@@ -67,6 +71,12 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_initializing = true;
     m_thread_id = std::this_thread::get_id();
     HKU_CHECK(!context.empty(), "No stock code list is included in the context!");
+
+    HKU_INFO("dll path: {}", getDllSelfDir());
+
+#if HKU_ENABLE_MO
+    mo::init(fmt::format("{}/i8n", getDllSelfDir()));
+#endif
 
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
@@ -494,7 +504,7 @@ void StockManager::loadAllStocks() {
 }
 
 void StockManager::loadAllMarketInfos() {
-    HKU_INFO("Loading market information...");
+    HKU_INFO(_tr("Loading market information..."));
     auto marketInfos = m_baseInfoDriver->getAllMarketInfo();
     std::unique_lock<std::shared_mutex> lock(*m_marketInfoDict_mutex);
     m_marketInfoDict.clear();

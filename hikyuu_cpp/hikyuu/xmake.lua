@@ -106,9 +106,12 @@ target("hikyuu")
     if get_config("mysql") then
         add_files("./utilities/db_connect/mysql/**.cpp")
     end
-    if has_config("mo") then
-        add_files("./utilities/mo/**.cpp")
-    end
+    if get_config("mo") then
+        if is_plat("macosx") then
+            add_frameworks("CoreFoundation")
+        end
+        add_files("./utilities/mo/*.cpp")
+    end    
     if has_config("ta_lib") then
         add_files("./indicator_talib/**.cpp")
     end

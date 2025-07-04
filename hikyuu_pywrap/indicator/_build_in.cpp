@@ -964,7 +964,7 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def("WEAVE", [](const py::sequence& seq) {
         size_t total = len(seq);
-        HKU_CHECK(total >= 2 && total <= 6, "WEAVE: total must be 2 to 6");
+        HKU_CHECK(total >= 2 && total <= 6, _tr("WEAVE: total must be 2 to 6"));
         Indicator ind1 = seq[0].cast<Indicator>();
         Indicator ind2 = seq[1].cast<Indicator>();
         Indicator tmp = WEAVE(ind1, ind2);

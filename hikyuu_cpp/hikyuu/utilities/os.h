@@ -79,6 +79,8 @@ std::string HKU_UTILS_API getUserDir();
  */
 std::string HKU_UTILS_API getCurrentDir();
 
+std::string HKU_UTILS_API getDllSelfDir();
+
 /**
  * 输出终端是否支持彩色控制字符
  */
