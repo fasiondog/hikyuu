@@ -20,7 +20,7 @@
 
 
 
-.. py:function:: backtest([context], on_bar, tm, start_date, end_date, ktype, ref_market, mode)
+.. py:function:: backtest([context], on_bar, tm, start_date, end_date, ktype, ref_market, mode, support_short, sp)
 
     事件驱动式回测, 通常直接测试 Strategy 中的主体函数
 
