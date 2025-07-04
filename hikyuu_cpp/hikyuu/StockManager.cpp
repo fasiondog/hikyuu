@@ -72,10 +72,12 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_thread_id = std::this_thread::get_id();
     HKU_CHECK(!context.empty(), "No stock code list is included in the context!");
 
-    HKU_INFO("dll path: {}", getDllSelfDir());
-
 #if HKU_ENABLE_MO
-    mo::init(fmt::format("{}/i8n", getDllSelfDir()));
+    if (m_i8n_path.empty()) {
+        mo::init(fmt::format("{}/i8n", getDllSelfDir()));
+    } else {
+        mo::init(m_i8n_path);
+    }
 #endif
 
     m_baseInfoDriverParam = baseInfoParam;
