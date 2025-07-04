@@ -349,19 +349,19 @@ def import_one_stock_data(
                 continue
 
             if last_krecord is not None and bar_datetime == last_datetime:
-                if abs(last_krecord[1] - bar["open"]) / last_krecord[1] > 0.02:
+                if abs(last_krecord[1] - bar["open"]) / last_krecord[1] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord open: {last_krecord[1]}, bar: {bar['open']}")
                     return 0
-                if abs(last_krecord[2] - bar["high"]) / last_krecord[2] > 0.02:
+                if abs(last_krecord[2] - bar["high"]) / last_krecord[2] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord high: {last_krecord[2]}, bar: {bar['high']}")
                     return 0
-                if abs(last_krecord[3] - bar["low"]) / last_krecord[3] > 0.02:
+                if abs(last_krecord[3] - bar["low"]) / last_krecord[3] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord low: {last_krecord[3]}, bar: {bar['low']}")
                     return 0
-                if abs(last_krecord[4] - bar["close"]) / last_krecord[4] > 0.02:
+                if abs(last_krecord[4] - bar["close"]) / last_krecord[4] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord close: {last_krecord[4]}, bar: {bar['close']}")
                     return 0
