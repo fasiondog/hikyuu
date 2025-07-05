@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-07-05 13:35+0800\n"
-"PO-Revision-Date: 2025-07-05 13:36+0800\n"
+"POT-Creation-Date: 2025-07-05 14:06+0800\n"
+"PO-Revision-Date: 2025-07-05 14:11+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -56,6 +56,10 @@ msgstr "加载权息数据……"
 #: hikyuu_cpp/hikyuu/global/agent/SpotAgent.cpp:38
 msgid "Start spot agent."
 msgstr "启动行情接收."
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:157
+msgid "**  [PF] Position adjustment will be made today.  **"
+msgstr "**  [PF] 调仓日, 进行调仓处理                     **"
 
 #: hikyuu_pywrap/indicator/_build_in.cpp:967
 msgid "WEAVE: total must be 2 to 6"
