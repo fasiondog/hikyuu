@@ -17,6 +17,8 @@
 #include <unistd.h>
 #include <array>
 #include <dirent.h>
+#include <dlfcn.h>
+#include <libgen.h>
 #endif
 
 #if HKU_OS_LINUX || HKU_OS_ANDROID
@@ -259,6 +261,47 @@ std::string HKU_UTILS_API getCurrentDir() {
         free(buffer);
     }
     return ret;
+}
+
+std::string HKU_UTILS_API getDllSelfDir() {
+    std::string libraryPath;
+
+#if HKU_OS_WINDOWS
+    char buffer[MAX_PATH];
+    HMODULE hModule = GetModuleHandle(NULL);
+    if (hModule != NULL) {
+        if (GetModuleFileNameA(hModule, buffer, MAX_PATH) > 0) {
+            libraryPath = buffer;
+        }
+    }
+#else
+    void *handle = dlopen(NULL, RTLD_LAZY);
+    Dl_info info;
+
+    if (dladdr((void *)getDllSelfDir, &info) && info.dli_fname) {
+        libraryPath = info.dli_fname;
+    }
+    dlclose(handle);
+#endif
+
+    // 提取目录部分（不包含文件名）
+    if (!libraryPath.empty()) {
+#if HKU_OS_WINDOWS
+        // Windows路径处理
+        size_t pos = libraryPath.find_last_of("\\/");
+        if (pos != std::string::npos) {
+            return libraryPath.substr(0, pos);
+        }
+#else
+        // Unix路径处理
+        char *dir = dirname(const_cast<char *>(libraryPath.c_str()));
+        if (dir) {
+            return dir;
+        }
+#endif
+    }
+
+    return libraryPath;
 }
 
 uint64_t HKU_UTILS_API getDiskFreeSpace(const char *path) {

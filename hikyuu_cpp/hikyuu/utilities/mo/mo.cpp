@@ -60,6 +60,9 @@ std::string HKU_UTILS_API getSystemLanguage() {
 
     ret = std::string(lang);
     to_lower(ret);
+    if (ret == "zh") {
+        ret = "zh_cn";
+    }
     return ret;
 }
 
