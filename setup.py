@@ -242,7 +242,7 @@ def clear_build():
         os.remove('compile_info')
     lib_files = os.listdir('hikyuu/cpp')
     for file in lib_files:
-        if file not in ("__init__.py", "__pycache__"):
+        if file not in ("__init__.py", "__pycache__", "i8n"):
             os.remove(f'hikyuu/cpp/{file}')
     plugin_files = os.listdir('hikyuu/plugin')
     for file in plugin_files:
