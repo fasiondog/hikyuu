@@ -129,11 +129,11 @@ void StockManager::loadData() {
     loadAllZhBond10();
     loadHistoryFinanceField();
 
-    HKU_INFO("Loading block...");
+    HKU_INFO(_tr("Loading block..."));
     m_blockDriver->load();
 
     // 获取K线数据驱动并预加载指定的数据
-    HKU_INFO("Loading KData...");
+    HKU_INFO(_tr("Loading KData..."));
 
     auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
 
@@ -141,7 +141,7 @@ void StockManager::loadData() {
     loadAllKData();
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
-    HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
+    HKU_INFO(_tr("{:<.2f}s Loaded Data."), sec.count());
 }
 
 void StockManager::loadAllKData() {
@@ -178,7 +178,7 @@ void StockManager::loadAllKData() {
         }
 
         HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false),
-                    "Preloading {} kdata to buffer (max: {})!", back,
+                    _tr("Preloading {} kdata to buffer (max: {})!"), back,
                     m_preloadParam.tryGet<int>(preload_key, 0));
     }
 
@@ -426,7 +426,7 @@ void StockManager::removeStock(const string& market_code) {
 }
 
 void StockManager::loadAllStocks() {
-    HKU_INFO("Loading stock information...");
+    HKU_INFO(_tr("Loading stock information..."));
     vector<StockInfo> stockInfos;
     if (m_context.isAll()) {
         stockInfos = m_baseInfoDriver->getAllStockInfo();
@@ -524,7 +524,7 @@ void StockManager::loadAllMarketInfos() {
 }
 
 void StockManager::loadAllStockTypeInfo() {
-    HKU_INFO("Loading stock type information...");
+    HKU_INFO(_tr("Loading stock type information..."));
     auto stkTypeInfos = m_baseInfoDriver->getAllStockTypeInfo();
     std::unique_lock<std::shared_mutex> lock(*m_stockTypeInfo_mutex);
     m_stockTypeInfo.clear();
@@ -542,7 +542,7 @@ void StockManager::loadAllHolidays() {
 
 void StockManager::loadAllStockWeights() {
     HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("load_stock_weight", true), void());
-    HKU_INFO("Loading stock weight...");
+    HKU_INFO(_tr("Loading stock weight..."));
     if (m_context.isAll()) {
         auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
         std::shared_lock<std::shared_mutex> lock1(*m_stockDict_mutex);

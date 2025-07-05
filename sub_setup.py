@@ -79,7 +79,7 @@ setup(
     package_data={
         '': [
             '*.rst', '*.pyd', '*.png', '*.md', '*.ipynb', '*.ini', '*.sql', '*.properties', '*.xml',
-            'LICENSE.txt', '*.dll', '*.exe', '*.ico', '*.so', '*.dylib', '*.h', '*.lib',
+            'LICENSE.txt', '*.dll', '*.exe', '*.ico', '*.so', '*.dylib', '*.h', '*.lib', '*.mo',
             '*.so.*', '*.qm', 'libboost_serialization*', 'libboost_python{}*'.format(py_version),
             '*.png'
         ],

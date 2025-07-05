@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-07-05 01:58+0800\n"
-"PO-Revision-Date: 2025-07-05 02:22+0800\n"
+"POT-Creation-Date: 2025-07-05 13:35+0800\n"
+"PO-Revision-Date: 2025-07-05 13:36+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -19,9 +19,43 @@ msgstr ""
 "X-Poedit-SearchPath-1: hikyuu_pywrap\n"
 "X-Poedit-SearchPathExcluded-0: hikyuu_cpp/hikyuu/utilities\n"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:503
+#: hikyuu_cpp/hikyuu/StockManager.cpp:132
+msgid "Loading block..."
+msgstr "加载板块信息……"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:136
+msgid "Loading KData..."
+msgstr "加载K线数据……"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:144
+#, c++-format
+msgid "{:<.2f}s Loaded Data."
+msgstr "{:<.2f} 秒数据加载完毕."
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:181
+#, c++-format
+msgid "Preloading {} kdata to buffer (max: {})!"
+msgstr "预加载 {} K线数据至缓存 (最大数量: {})!"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:429
+msgid "Loading stock information..."
+msgstr "加载证券信息……"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:509
 msgid "Loading market information..."
 msgstr "加载市场信息……"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:527
+msgid "Loading stock type information..."
+msgstr "加载证券类型信息……"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:545
+msgid "Loading stock weight..."
+msgstr "加载权息数据……"
+
+#: hikyuu_cpp/hikyuu/global/agent/SpotAgent.cpp:38
+msgid "Start spot agent."
+msgstr "启动行情接收."
 
 #: hikyuu_pywrap/indicator/_build_in.cpp:967
 msgid "WEAVE: total must be 2 to 6"
