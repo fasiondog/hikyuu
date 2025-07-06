@@ -26,23 +26,39 @@
 #endif
 
 namespace hku {
+namespace mo {
 
-class HKU_UTILS_API MOHelper {
-public:
-    static void init();
+/**
+ * @brief 初始化多语言支持
+ * @param path 翻译文件路径
+ */
+void HKU_UTILS_API init(const std::string &path = "i8n");
 
-    static std::string translate(const std::string &lang, const char *id) {
-        auto iter = ms_dict.find(lang);
-        return iter != ms_dict.end() ? ms_dict[lang].Lookup(id) : std::string(id);
-    }
+/**
+ * @brief 按指定语言获取翻译
+ * @param lang
+ * @param id
+ * @return std::string
+ */
+std::string HKU_UTILS_API translate(const std::string &lang, const char *id);
 
-    static std::string translate(const std::string &lang, const char *ctx, const char *id) {
-        auto iter = ms_dict.find(lang);
-        return iter != ms_dict.end() ? ms_dict[lang].LookupWithContext(ctx, id) : std::string(id);
-    }
+/**
+ * @brief 按指定语言和上下文获取翻译
+ * @param lang
+ * @param ctx
+ * @param id
+ * @return std::string
+ */
+std::string HKU_UTILS_API translate(const std::string &lang, const char *ctx, const char *id);
 
-private:
-    static std::unordered_map<std::string, moFileLib::moFileReader> ms_dict;
-};
+/** 获取系统语言 */
+std::string HKU_UTILS_API getSystemLanguage();
 
+/** 按系统语言获取翻译 */
+std::string HKU_UTILS_API _tr(const char *id);
+
+/** 按系统语言和上下文获取翻译 */
+std::string HKU_UTILS_API _ctr(const char *ctx, const char *id);
+
+}  // namespace mo
 }  // namespace hku

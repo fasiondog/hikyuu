@@ -134,6 +134,10 @@ target("core")
             os.run(format("install_name_tool -change @loader_path/../lib/libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_dir .. filename))
             os.run(format("install_name_tool -change @loader_path/../lib/libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_dir .. filename))
         end
+
+        if get_config("mo") then
+            os.cp("$(projectdir)/i8n/*.mo", "$(projectdir)/hikyuu/cpp/i8n/")
+        end
     end)
 
 

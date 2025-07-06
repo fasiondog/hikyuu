@@ -4,6 +4,18 @@
 滚动交易系统
 =============
 
+滚动交易系统是使用多个交易系统进行交易，并使用滚动评估系统性能，并使用滚动评估系统性能所选择的系统进行交易。
+
+公共参数(除 SYS 继承的公共参数外，自身其他公共参数):
+
+    * **market='SH'** *(str)* : 指定市场, 用于交易日期对齐
+    * **train_len=100** *(int)* : 滚动评估系统绩效时使用的数据长度
+    * **test_len=20** *(int)* : 使用在 train_len 中选出的最优系统执行的数据长度
+    * **clean_hold_when_select_changed=True** *(bool)* : 当前选中的系统和上次的系统不一致时，在开盘时清空已有持仓
+    * **parallel=False** *(bool)* : 并行计算, 如果评估函数为纯python函数时, 可能不能使用并行计算，否则会因 GIL 引起崩溃
+    * **se_trace=False** *(bool)* : 跟踪打印 SE 的日志信息
+    
+
 创建滚动交易系统
 ------------------
 
@@ -39,4 +51,10 @@ PF（投资组合）中的 SE，则是在调仓日对所有候选系统进行排
     使用 Performance 统计结果进行寻优的选择器
 
     :param string key: Performance 统计项
-    :param int mode:  0 取统计结果最大的值系统 | 1 取统计结果为最小值的系统    
+    :param int mode:  0 取统计结果最大的值系统 | 1 取统计结果为最小值的系统
+
+.. py:function:: SE_EvaluateOptimal(evalulate_func)
+
+    使用自定义函数进行寻优的选择器
+
+    :param func: 一个可调用对象，接收参数为 (sys, lastdate)，返回一个 float 数值

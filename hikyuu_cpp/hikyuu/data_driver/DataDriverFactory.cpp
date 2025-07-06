@@ -83,21 +83,29 @@ void DataDriverFactory::init() {
 }
 
 void DataDriverFactory::release() {
-    m_baseInfoDrivers->clear();
-    delete m_baseInfoDrivers;
-    m_baseInfoDrivers = nullptr;
+    if (m_baseInfoDrivers) {
+        m_baseInfoDrivers->clear();
+        delete m_baseInfoDrivers;
+        m_baseInfoDrivers = nullptr;
+    }
 
-    m_blockDrivers->clear();
-    delete m_blockDrivers;
-    m_blockDrivers = nullptr;
+    if (m_blockDrivers) {
+        m_blockDrivers->clear();
+        delete m_blockDrivers;
+        m_blockDrivers = nullptr;
+    }
 
-    m_kdataPrototypeDrivers->clear();
-    delete m_kdataPrototypeDrivers;
-    m_kdataPrototypeDrivers = nullptr;
+    if (m_kdataPrototypeDrivers) {
+        m_kdataPrototypeDrivers->clear();
+        delete m_kdataPrototypeDrivers;
+        m_kdataPrototypeDrivers = nullptr;
+    }
 
-    m_kdataDriverPools->clear();
-    delete m_kdataDriverPools;
-    m_kdataDriverPools = nullptr;
+    if (m_kdataDriverPools) {
+        m_kdataDriverPools->clear();
+        delete m_kdataDriverPools;
+        m_kdataDriverPools = nullptr;
+    }
 }
 
 void DataDriverFactory::regBaseInfoDriver(const BaseInfoDriverPtr& driver) {

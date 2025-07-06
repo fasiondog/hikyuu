@@ -6,7 +6,7 @@ set_project("hikyuu")
 add_rules("mode.debug", "mode.release")
 
 -- version
-set_version("2.6.3", {build = "%Y%m%d%H%M"})
+set_version("2.6.5", {build = "%Y%m%d%H%M"})
 
 set_warnings("all")
 
@@ -44,7 +44,7 @@ option("leak_check", {description = "Enable leak check for test", default = fals
 option("serialize", {description = "Enable support serialize object and pickle in python", default = true})
 
 -- 和 hku_utils 编译选项保持一致，以便互相替换
-option("mo", {description = "International language support", default = false})
+option("mo", {description = "International language support", default = true})
 -- option("http_client", {description = "use http client", default = true})
 option("http_client_ssl", {description = "enable https support for http client", default = false})
 option("http_client_zip", {description = "enable http support gzip", default = false})

@@ -278,4 +278,51 @@
     .. py:method:: clear_broker(self)
 
         清空所有已注册订单代理
+
+    .. py:method:: get_performance(self[, datetime=Datetime.now(), ktype=Query.DAY]) -> dict)
+        
+        获取账户指定时刻的账户表现
+
+        :param Datetime datetime: 指定时刻
+        :param Query.KType ktype: K线类型
+        :return: 账户表现
+
+    ..  py:method:: get_max_pull_back(self, date, ktype=Query.DAY) -> float
+    
+        获取指定时刻时账户的最大回撤百分比（负数）
+
+        :param Datetime date: 指定日期（包含该时刻）
+        :param Query.KType ktype: k线类型
+        :return: 最大回撤百分比
+
+    ..  py:method:: get_position_ext_info_list(self, current_time, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
+          
+        获取账户最后交易时刻之后指定时间的持仓详情（未平常记录）
+    
+        :param Datetime current_time: 当前时刻（需大于等于最后交易时刻）
+        :param Query.KType ktype: k线类型
+        :param int trade_mode: 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+        :return: 持仓扩展详情列表
+
+    .. py:method:: get_history_position_ext_info_list(self, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
+          
+        获取账户历史持仓扩展详情（已平仓记录）
+    
+        :param Query.KType ktype: k线类型
+        :param int trade_mode: 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+        :return: 持仓扩展详情列表
+
+    .. py:method:: get_profit_percent_monthly(self, datetime=Datetime.now()) -> list[tuple[Datetime, double]])
+
+        获取账户指定截止时刻的账户收益百分比（月度）
+
+        :param Datetime datetime: 指定截止时刻
+        :return: 账户收益百分比（月度）
+
+    .. py:method:: get_profit_percent_yearly(self, datetime=Datetime.now()) -> list[tuple[Datetime, double]])
+
+        获取账户指定截止时刻的账户收益百分比（年度）
+
+        :param Datetime datetime: 指定截止时刻
+        :return: 账户收益百分比（年度）
         

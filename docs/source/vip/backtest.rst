@@ -20,7 +20,7 @@
 
 
 
-.. py:function:: backtest([context], on_bar, tm, start_date, end_date, ktype, ref_market, mode)
+.. py:function:: backtest([context], on_bar, tm, start_date, end_date, ktype, ref_market, mode, support_short, sp)
 
     事件驱动式回测, 通常直接测试 Strategy 中的主体函数
 
@@ -34,7 +34,9 @@
     :param Datetime end_date: 结束日期（不包含其本身）
     :param Query.KType ktype: K线类型(按该类型逐 Bar 执行测试)
     :param str ref_market: 所属市场
-    :param mode 模式  0: 当前bar收盘价执行买卖操作; 1: 下一bar开盘价执行买卖操作
+    :param int mode: 0 - 当前bar收盘价执行买卖操作; 1 - 下一bar开盘价执行买卖操作
+    :param support_short: 是否支持卖空
+    :param Slippage sp: 滑点算法
 
 
 示例1 (在已使用 load_hikyuu 加载数据的环境下，可省略 context 参数)

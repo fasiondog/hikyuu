@@ -253,6 +253,9 @@ public:
     template <typename PluginInterfaceT>
     PluginInterfaceT* getPlugin(const std::string& pluginname) noexcept;
 
+    /** 设置多语言支持路径（仅在初始化之前有效） */
+    void setLanguagePath(const std::string& path);
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
@@ -332,6 +335,7 @@ private:
     std::unique_ptr<ThreadPool> m_load_tg;  // 异步数据加载辅助线程组
 
     PluginManager m_plugin_manager;
+    std::string m_i8n_path;
 };
 
 inline size_t StockManager::size() const {
@@ -394,6 +398,10 @@ inline void StockManager::setPluginPath(const std::string& path) {
 template <typename PluginInterfaceT>
 inline PluginInterfaceT* StockManager::getPlugin(const std::string& pluginname) noexcept {
     return m_plugin_manager.getPlugin<PluginInterfaceT>(pluginname);
+}
+
+inline void StockManager::setLanguagePath(const std::string& path) {
+    m_i8n_path = path;
 }
 
 }  // namespace hku

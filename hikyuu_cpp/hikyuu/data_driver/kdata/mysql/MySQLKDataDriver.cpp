@@ -92,7 +92,7 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
                                               const KQuery::KType& ktype, Datetime start_date,
                                               Datetime end_date) {
     KRecordList result;
-    HKU_IF_RETURN(start_date >= end_date, result);
+    HKU_IF_RETURN(start_date.isNull() || (!end_date.isNull() && start_date >= end_date), result);
 
     try {
         KRecordTable r(market, code, ktype);
@@ -359,7 +359,7 @@ TransList MySQLKDataDriver::_getTransListByIndex(const string& market, const str
                     uint64_t date = 0;
                     double price = 0.0, vol = 0.0;
                     int direct = 0;
-                    st->getColumn(0, date, price, vol);
+                    st->getColumn(0, date, price, vol, direct);
                     result.emplace_back(Datetime(date), price, vol,
                                         static_cast<TransRecord::DIRECT>(direct));
                 } catch (const std::exception& e) {

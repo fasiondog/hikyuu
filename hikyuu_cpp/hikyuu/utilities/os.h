@@ -80,6 +80,12 @@ std::string HKU_UTILS_API getUserDir();
 std::string HKU_UTILS_API getCurrentDir();
 
 /**
+ * 获取dll自身所在目录
+ * @note 仅支持linux/macos。windows下获取的是exe所在路径！
+ */
+std::string HKU_UTILS_API getDllSelfDir();
+
+/**
  * 输出终端是否支持彩色控制字符
  */
 bool HKU_UTILS_API isColorTerminal() noexcept;

@@ -32,7 +32,8 @@ void IBarsLastCount::_calculate(const Indicator& ind) {
     } else {
         dst[m_discard] = 0;
     }
-    for (size_t i = m_discard; i < total; ++i) {
+
+    for (size_t i = m_discard + 1; i < total; ++i) {
         if (src[i] > 0.0) {
             dst[i] = dst[i - 1] + 1.0;
         } else {

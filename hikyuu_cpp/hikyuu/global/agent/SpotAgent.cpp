@@ -35,7 +35,7 @@ void SpotAgent::setQuotationServer(const string& server) {
 }
 
 void SpotAgent::start() {
-    HKU_INFO("Start spot agent.");
+    HKU_INFO(_tr("Start spot agent."));
     stop();
     if (m_stop) {
         m_stop = false;

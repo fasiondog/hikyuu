@@ -69,6 +69,13 @@ public:
      */
     static Datetime fromTimestamp(int64_t timestamp);
 
+    /**
+     * @brief 从时间戳（微秒）创建Datetime对象，并加上本地UTC时间偏差
+     * @param timestamp 微妙级别的时间戳(从1970年1月1日0时0分0秒开始)
+     * @return Datetime
+     */
+    static Datetime fromTimestampUTC(int64_t timestamp);
+
 public:
     /** 默认构造函数，Null<Datetime> */
     Datetime();
@@ -187,6 +194,9 @@ public:
 
     /** 时间戳，距离1970-01-01 00:00:00的微秒数 */
     int64_t timestamp() const noexcept;
+
+    /** 时间戳，距离1970-01-01 00:00:00的微秒数, 并扣除本地 UTC 偏差时间 */
+    int64_t timestampUTC() const noexcept;
 
     /**
      * 转化为字符串，供打印阅读，格式：

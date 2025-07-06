@@ -45,4 +45,30 @@ MarketInfo::MarketInfo(const string& market, const string& name, const string& d
   m_openTime2(openTime2),
   m_closeTime2(closeTime2) {}
 
+MarketInfo::MarketInfo(MarketInfo&& rhs)
+: m_market(std::move(rhs.m_market)),
+  m_name(std::move(rhs.m_name)),
+  m_description(std::move(rhs.m_description)),
+  m_code(std::move(rhs.m_code)),
+  m_lastDate(std::move(rhs.m_lastDate)),
+  m_openTime1(std::move(rhs.m_openTime1)),
+  m_closeTime1(std::move(rhs.m_closeTime1)),
+  m_openTime2(std::move(rhs.m_openTime2)),
+  m_closeTime2(std::move(rhs.m_closeTime2)) {}
+
+MarketInfo& MarketInfo::operator=(MarketInfo&& rhs) {
+    if (this != &rhs) {
+        m_market = std::move(rhs.m_market);
+        m_name = std::move(rhs.m_name);
+        m_description = std::move(rhs.m_description);
+        m_code = std::move(rhs.m_code);
+        m_lastDate = std::move(rhs.m_lastDate);
+        m_openTime1 = std::move(rhs.m_openTime1);
+        m_closeTime1 = std::move(rhs.m_closeTime1);
+        m_openTime2 = std::move(rhs.m_openTime2);
+        m_closeTime2 = std::move(rhs.m_closeTime2);
+    }
+    return *this;
+}
+
 }  // namespace hku

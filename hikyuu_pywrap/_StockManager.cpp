@@ -66,6 +66,10 @@ void export_StockManager(py::module& m) {
 
     获取插件路径)")
 
+      .def("set_language_path", &StockManager::setLanguagePath, R"(set_language_path(self, path)
+      
+    设置多语言支持的翻译文件所在路径，仅在初始化之前设置有效)")
+
       .def("get_market_list", &StockManager::getAllMarket, R"(get_market_list(self)
 
     获取市场简称列表

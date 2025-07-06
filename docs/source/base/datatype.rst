@@ -477,7 +477,7 @@ K线数据
 
 .. py:class:: TimeLineList
 
-    通过 Stock.getTimeLineList 获取的分时线数据，由 TimeLineRecord 组成的数组，可象 list 一样进行遍历
+    通过 Stock.get_timeline_list 获取的分时线数据，由 TimeLineRecord 组成的数组，可象 list 一样进行遍历
     
     .. py:method:: to_np()
     

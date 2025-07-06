@@ -1,0 +1,70 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Hikyuu\n"
+"POT-Creation-Date: 2025-07-05 14:06+0800\n"
+"PO-Revision-Date: 2025-07-05 14:11+0800\n"
+"Last-Translator: \n"
+"Language-Team: hikyuu.org\n"
+"Language: zh\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.6\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: _tr;_ctr:1c,2\n"
+"X-Poedit-SearchPath-0: hikyuu_cpp/hikyuu\n"
+"X-Poedit-SearchPath-1: hikyuu_pywrap\n"
+"X-Poedit-SearchPathExcluded-0: hikyuu_cpp/hikyuu/utilities\n"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:132
+msgid "Loading block..."
+msgstr "加载板块信息……"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:136
+msgid "Loading KData..."
+msgstr "加载K线数据……"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:144
+#, c++-format
+msgid "{:<.2f}s Loaded Data."
+msgstr "{:<.2f} 秒数据加载完毕."
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:181
+#, c++-format
+msgid "Preloading {} kdata to buffer (max: {})!"
+msgstr "预加载 {} K线数据至缓存 (最大数量: {})!"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:429
+msgid "Loading stock information..."
+msgstr "加载证券信息……"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:509
+msgid "Loading market information..."
+msgstr "加载市场信息……"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:527
+msgid "Loading stock type information..."
+msgstr "加载证券类型信息……"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:545
+msgid "Loading stock weight..."
+msgstr "加载权息数据……"
+
+#: hikyuu_cpp/hikyuu/global/agent/SpotAgent.cpp:38
+msgid "Start spot agent."
+msgstr "启动行情接收."
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:157
+msgid "**  [PF] Position adjustment will be made today.  **"
+msgstr "**  [PF] 调仓日, 进行调仓处理                     **"
+
+#: hikyuu_pywrap/indicator/_build_in.cpp:967
+msgid "WEAVE: total must be 2 to 6"
+msgstr "WEAVE指标输入参数数量需大于等2并小于等于6"
+
+#: hikyuu_pywrap/plugin/_backtest.cpp:22
+msgid "on_bar is not callable!"
+msgstr "on_bar 不可调用！"

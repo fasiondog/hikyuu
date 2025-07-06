@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 # cp936
 
+import io
 from pathlib import Path
 import pickle
 import traceback
@@ -80,6 +81,8 @@ else:
 sm.set_plugin_path(plugin_path)
 print(f"current plugin path: {plugin_path}")
 
+sm.set_language_path(f'{BASE_DIR}/cpp/i8n')
+
 
 class iodog:
     # Only for compatibility with old code
@@ -103,6 +106,9 @@ if in_ipython_frontend():
     hku_info("running in jupyter")
     iodog.open()
 
+# windows 终端下执行无法正常显示 c++ 输出中文
+if sys.platform == 'win32' and not in_ipython_frontend():
+    os.system('chcp 65001 > nul')
 
 use_draw_engine('matplotlib')
 

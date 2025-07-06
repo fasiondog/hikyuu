@@ -34,7 +34,7 @@ from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
 
-from hikyuu import can_upgrade, get_last_version, fetch_trial_license, view_license
+from hikyuu import can_upgrade, get_last_version, fetch_trial_license, view_license, is_valid_license
 from hikyuu.data import hku_config_template
 from hikyuu.util import *
 
@@ -187,49 +187,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         hour2_max=current_config.getint('preload', 'hour2_max', fallback=4096),
                     )
                 )
-        else:
-            data_dir = current_config['taos']['tmpdir']
-            if not os.path.lexists(data_dir + '/tmp'):
-                try:
-                    os.mkdir(data_dir + '/tmp')
-                except:
-                    pass
-            with open(filename, 'w', encoding="utf-8") as f:
-                f.write(
-                    hku_config_template.taos_template.format(
-                        dir=data_dir,
-                        quotation_server=current_config.get(
-                            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
-                        host=current_config['taos']['host'],
-                        port=current_config['taos']['port'],
-                        usr=current_config['taos']['usr'],
-                        pwd=current_config['taos']['pwd'],
-                        day=current_config.getboolean('preload', 'day', fallback=True),
-                        week=current_config.getboolean('preload', 'week', fallback=False),
-                        month=current_config.getboolean('preload', 'month', fallback=False),
-                        quarter=current_config.getboolean('preload', 'quarter', fallback=False),
-                        halfyear=current_config.getboolean('preload', 'halfyear', fallback=False),
-                        year=current_config.getboolean('preload', 'year', fallback=False),
-                        min1=current_config.getboolean('preload', 'min', fallback=False),
-                        min5=current_config.getboolean('preload', 'min5', fallback=False),
-                        min15=current_config.getboolean('preload', 'min15', fallback=False),
-                        min30=current_config.getboolean('preload', 'min30', fallback=False),
-                        min60=current_config.getboolean('preload', 'min60', fallback=False),
-                        hour2=current_config.getboolean('preload', 'hour2', fallback=False),
-                        day_max=current_config.getint('preload', 'day_max', fallback=100000),
-                        week_max=current_config.getint('preload', 'week_max', fallback=100000),
-                        month_max=current_config.getint('preload', 'month_max', fallback=100000),
-                        quarter_max=current_config.getint('preload', 'quarter_max', fallback=100000),
-                        halfyear_max=current_config.getint('preload', 'halfyear_max', fallback=100000),
-                        year_max=current_config.getint('preload', 'year_max', fallback=100000),
-                        min1_max=current_config.getint('preload', 'min_max', fallback=4096),
-                        min5_max=current_config.getint('preload', 'min5_max', fallback=4096),
-                        min15_max=current_config.getint('preload', 'min15_max', fallback=4096),
-                        min30_max=current_config.getint('preload', 'min30_max', fallback=4096),
-                        min60_max=current_config.getint('preload', 'min60_max', fallback=4096),
-                        hour2_max=current_config.getint('preload', 'hour2_max', fallback=4096),
-                    )
-                )
 
         try:
             if not data_dir and not os.path.lexists(data_dir):
@@ -324,6 +281,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 if sys.stderr:
                     sys.stderr = self._stream
         self.log_textEdit.document().setMaximumBlockCount(1000)
+
+        self.tabWidget.setCurrentIndex(0 if is_valid_license() else 5)
 
         current_dir = os.path.dirname(__file__)
         icon = QIcon(f"{current_dir}/images/hikyuu_small.png")
@@ -426,27 +385,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_pwd_lineEdit.setEnabled(mysql_enable)
         self.mysql_test_pushButton.setEnabled(mysql_enable)
 
-        # 初始化 tdengine 设置
-        taos_enable = import_config.getboolean('taos', 'enable', fallback=False)
-        if hdf5_enable or mysql_enable:
-            taos_enable = False
-        self.enable_taos_radioButton.setChecked(taos_enable)
-        self.taos_tmpdir_lineEdit.setText(import_config.get('taos', 'tmpdir', fallback='d:/stock'))
-        self.taos_tmpdir_pushButton.setEnabled(taos_enable)
-        taos_ip = import_config.get('taos', 'host', fallback='127.0.0.1')
-        self.taos_ip_lineEdit.setText(taos_ip)
-        self.taos_ip_lineEdit.setEnabled(taos_enable)
-        taos_port = import_config.get('taos', 'port', fallback='6030')
-        self.taos_port_lineEdit.setText(taos_port)
-        self.taos_port_lineEdit.setEnabled(taos_enable)
-        taos_user = import_config.get('taos', 'user', fallback='root')
-        self.taos_usr_lineEdit.setText(taos_user)
-        self.taos_usr_lineEdit.setEnabled(taos_enable)
-        taos_pwd = import_config.get('taos', 'pwd', fallback='taosdata')
-        self.taos_pwd_lineEdit.setText(taos_pwd)
-        self.taos_pwd_lineEdit.setEnabled(taos_enable)
-        self.taos_test_pushButton.setEnabled(taos_enable)
-
         self.sched_import_timeEdit.setTime(
             datetime.time.fromisoformat(import_config.get('schec', 'time', fallback='18:00'))
         )
@@ -547,14 +485,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'port': self.mysql_port_lineEdit.text(),
             'usr': self.mysql_usr_lineEdit.text(),
             'pwd': self.mysql_pwd_lineEdit.text()
-        }
-        import_config['taos'] = {
-            'enable': self.enable_taos_radioButton.isChecked(),
-            'tmpdir': self.taos_tmpdir_lineEdit.text(),
-            'host': self.taos_ip_lineEdit.text(),
-            'port': self.taos_port_lineEdit.text(),
-            'usr': self.taos_usr_lineEdit.text(),
-            'pwd': self.taos_pwd_lineEdit.text()
         }
         import_config['sched'] = {
             'time': self.sched_import_timeEdit.time().toString(),
@@ -693,24 +623,15 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_enable_hdf55_radioButton_clicked(self):
         if self.enable_hdf55_radioButton.isChecked():
             self.enable_mysql_radioButton.setChecked(False)
-            self.enable_taos_radioButton.setChecked(False)
-        self.on_enable_database_toggled(hdf5=True, mysql=False, taos=False)
+        self.on_enable_database_toggled(hdf5=True, mysql=False)
 
     @pyqtSlot()
     def on_enable_mysql_radioButton_clicked(self):
         if self.enable_mysql_radioButton.isChecked():
             self.enable_hdf55_radioButton.setChecked(False)
-            self.enable_taos_radioButton.setChecked(False)
-        self.on_enable_database_toggled(hdf5=False, mysql=True, taos=False)
+        self.on_enable_database_toggled(hdf5=False, mysql=True)
 
-    @pyqtSlot()
-    def on_enable_taos_radioButton_clicked(self):
-        if self.enable_taos_radioButton.isChecked():
-            self.enable_hdf55_radioButton.setChecked(False)
-            self.enable_mysql_radioButton.setChecked(False)
-        self.on_enable_database_toggled(hdf5=False, mysql=False, taos=True)
-
-    def on_enable_database_toggled(self, hdf5, mysql, taos):
+    def on_enable_database_toggled(self, hdf5, mysql):
         self.hdf5_dir_lineEdit.setEnabled(hdf5)
         self.mysql_ip_lineEdit.setEnabled(mysql)
         self.mysql_port_lineEdit.setEnabled(mysql)
@@ -718,12 +639,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_pwd_lineEdit.setEnabled(mysql)
         self.mysql_test_pushButton.setEnabled(mysql)
         self.mysql_tmpdir_pushButton.setEnabled(mysql)
-        self.taos_ip_lineEdit.setEnabled(taos)
-        self.taos_port_lineEdit.setEnabled(taos)
-        self.taos_usr_lineEdit.setEnabled(taos)
-        self.taos_pwd_lineEdit.setEnabled(taos)
-        self.taos_test_pushButton.setEnabled(taos)
-        self.taos_tmpdir_pushButton.setEnabled(taos)
 
     @pyqtSlot()
     def on_mysql_tmpdir_pushButton_clicked(self):
@@ -755,36 +670,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 QMessageBox.critical(self, "测试数据库连接", "MySQL数据库不存在！")
             else:
                 QMessageBox.critical(self, "测试数据库连接", err.msg)
-            return
-
-        QMessageBox.about(self, "测试数据库连接", " 连接成功！")
-
-    @pyqtSlot()
-    def on_taos_tmpdir_pushButton_clicked(self):
-        dlg = QFileDialog()
-        dlg.setFileMode(QFileDialog.Directory)
-        config = self.getCurrentConfig()
-        dlg.setDirectory(config['taos']['tmpdir'])
-        if dlg.exec_():
-            dirname = dlg.selectedFiles()
-            self.taos_tmpdir_lineEdit.setText(dirname[0])
-
-    @pyqtSlot()
-    def on_taos_test_pushButton_clicked(self):
-        """测试数据库连接"""
-        db_config = {
-            'user': self.taos_usr_lineEdit.text(),
-            'password': self.taos_pwd_lineEdit.text(),
-            'host': self.taos_ip_lineEdit.text(),
-            'port': int(self.taos_port_lineEdit.text())
-        }
-
-        try:
-            import taos
-            cnx = taos.connect(**db_config)
-            cnx.close()
-        except Exception as err:
-            QMessageBox.critical(self, "测试数据库连接", err.msg)
             return
 
         QMessageBox.about(self, "测试数据库连接", " 连接成功！")
