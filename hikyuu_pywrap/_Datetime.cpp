@@ -88,14 +88,15 @@ void export_Datetime(py::module& m) {
       .def("start_of_year", &Datetime::startOfYear, "\n返回年度起始日期")
       .def("endOfYear", &Datetime::endOfYear, "\n返回年度结束日期")
       .def("timestamp", &Datetime::timestamp, "\n返回时间戳(微妙级别)")
-      .def("timestamp_utc", &Datetime::timestamp, "\n返回时间戳(微妙级别), 并扣除本地 UTC 偏差时间")
+      .def("timestamp_utc", &Datetime::timestampUTC,
+           "\n返回时间戳(微妙级别), 并扣除本地 UTC 偏差时间")
       .def_static("min", &Datetime::min, "\n获取支持的最小日期, Datetime(1400, 1, 1)")
       .def_static("max", &Datetime::max, "\n获取支持的最大日期, Datetime(9999, 12, 31)")
       .def_static("now", &Datetime::now, "\n获取系统当前日期时间")
       .def_static("today", &Datetime::today, "\n获取当前的日期")
       .def_static("from_hex", &Datetime::fromHex, "\n兼容oracle用后7个字节表示的datetime")
       .def_static("from_timestamp", &Datetime::fromTimestamp, "\n从时间戳(微秒)创建Datetime对象")
-      .def_static("from_timestamp_utc", &Datetime::fromTimestamp,
+      .def_static("from_timestamp_utc", &Datetime::fromTimestampUTC,
                   "\n从时间戳（微秒）创建Datetime对象，并加上本地UTC时间偏差")
 
       .def(py::hash(py::self))
