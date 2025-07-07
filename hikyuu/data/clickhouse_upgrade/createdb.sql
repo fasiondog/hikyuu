@@ -51,11 +51,10 @@ CREATE TABLE IF NOT EXISTS hku_base.stkweight (
 
 CREATE TABLE IF NOT EXISTS hku_base.historyfinance (
     file_date Int32,
-    market String,
-    code String,
+    market_code String,
     report_date Int32,
     `values` String,
-    PRIMARY KEY (market, code, report_date)
+    PRIMARY KEY (market_code, report_date)
 ) ENGINE = MergeTree();
 
 CREATE TABLE IF NOT EXISTS hku_base.stkfinance (

@@ -98,7 +98,8 @@ def get_stock_list(connect, market, quotations):
     stktype_list = get_stktype_list(quotations)
     sql = "select market, code, valid, type from `hku_base`.`stock` where market='{}' and type in {}"\
         .format(market, stktype_list)
-    return connect.query(sql)
+    a = connect.query(sql)
+    return a.result_rows
 
 
 def import_new_holidays(connect):
@@ -106,12 +107,11 @@ def import_new_holidays(connect):
     last_date = connect.command("select date from `hku_base`.`holiday` order by date desc limit 1")
     last_date = last_date if type(last_date) == int else 19901219
     holidays = get_new_holidays()
-    new_holidays = [int(v) for v in holidays if int(v) > last_date]
+    new_holidays = [(int(v),) for v in holidays if int(v) > last_date]
     if new_holidays:
-        sql = "insert into `hku_base`.`holiday` (date) values "
-        for v in new_holidays:
-            sql += f"({v}),"
-        connect.command(sql[:-1])
+        ic = connect.create_insert_context(table='holiday', database='hku_base',
+                                           data=new_holidays)
+        connect.insert(context=ic)
 
 
 def get_table(connect, market, code, ktype):
@@ -147,7 +147,7 @@ def get_table(connect, market, code, ktype):
                     `date` DateTime,
                     `price` DOUBLE,
                     `vol` DOUBLE
-                ) 
+                )
                 ENGINE = MergeTree()
                 PRIMARY KEY (market, code, date);
                 """
@@ -164,7 +164,7 @@ def get_table(connect, market, code, ktype):
                     `price` DOUBLE,
                     `vol` DOUBLE,
                     `buyorsell` int
-                ) 
+                )
                 ENGINE = MergeTree()
                 PRIMARY KEY (market, code, date);
                 """
@@ -184,7 +184,7 @@ def get_table(connect, market, code, ktype):
                     `close` DOUBLE,
                     `amount` DOUBLE,
                     `volume` DOUBLE
-                ) 
+                )
                 ENGINE = MergeTree()
                 PRIMARY KEY (market, code, date);
                 """
@@ -199,6 +199,22 @@ def get_lastdatetime(connect, tablename):
         tablename[0], tablename[1], tablename[2]))
     tmp = Datetime(tmp)
     return None if tmp == Datetime(1970, 1, 1) else tmp + UTCOffset()
+
+
+def get_last_krecord(connect, tablename):
+    """获取最后一条K线记录
+    返回：(date, open, close, high, low, amount, volume)
+    """
+    try:
+        a = connect.query(
+            "select toUInt32(date), open, high, low, close, amount, volume from {} where market='{}' and code='{}' order by date desc limit 1".format(tablename[0], tablename[1], tablename[2]))
+        a = a.result_rows
+        # hku_info(f"{tablename} {a}")
+        if not a:
+            return None
+        return (Datetime.from_timestamp_utc(a[0][0]*1000000).ymdhm, a[0][1], a[0][2], a[0][3], a[0][4], a[0][5], a[0][6])
+    except:
+        return None
 
 
 def update_extern_data(connect, market, code, data_type):
@@ -393,27 +409,20 @@ def update_extern_data(connect, market, code, data_type):
         index_last_date = get_lastdatetime(connect, index_table)
 
         # 获取当前日期大于等于索引表最大日期的基础表日期列表
-        cur = connect.cursor()
         if index_last_date is None:
-            cur.execute(
-                'select date, open, high, low, close, amount, count from {} order by date asc '.format(base_table)
-            )
+            sql = f"select toUInt32(date), open, high, low, close, amount, volume from {base_table[0]} where market='{base_table[1]}' and code='{base_table[2]}' order by date asc"
         else:
+            index_last_date = index_last_date.ymdhm
             start_date, _ = getNewDate(index_type, index_last_date)
-            cur.execute(
-                'select date, open, high, low, close, amount, count from {} where date>={}'.format(
-                    base_table, start_date
-                )
-            )
-        base_list = [x for x in cur]
-        cur.close()
+            start_date = Datetime(start_date).timestamp_utc() // 1000000
+            sql = f"select toUInt32(date), open, high, low, close, amount, volume from {base_table[0]} where market='{base_table[1]}' and code='{base_table[2]}' and date>={start_date}"
+        a = connect.query(sql)
+        base_list = a.result_rows
 
         last_start_date = 199012010000
         last_end_date = 199012010000
 
-        update_buffer = []
         insert_buffer = []
-        # for current_base in base_list:
         length_base_all = len(base_list)
         for x in range(length_base_all):
             current_date = base_list[x][0]
@@ -421,15 +430,6 @@ def update_extern_data(connect, market, code, data_type):
                 continue
             last_start_date, last_end_date = getNewDate(index_type, current_date)
 
-            # cur = connect.cursor()
-            # cur.execute(
-            #    'select date, open, high, low, close, amount, count from {} \
-            #    where date>={} and date<={} order by date asc'.format(
-            #        base_table, last_start_date, last_end_date
-            #    )
-            # )
-            # base_record_list = [r for r in cur]
-            # cur.close()
             base_record_list = []
             start_ix = x
             ix_date = current_date
@@ -456,27 +456,18 @@ def update_extern_data(connect, market, code, data_type):
                     low_price = base_record_list[i][3]
                 amount += base_record_list[i][5]
                 count += base_record_list[i][6]
-            if last_end_date == index_last_date:
-                update_buffer.append((open_price, high_price, low_price, close_price, amount, count, last_end_date))
-            else:
-                insert_buffer.append((last_end_date, open_price, high_price, low_price, close_price, amount, count))
 
-        if update_buffer:
-            cur = connect.cursor()
-            cur.executemany(
-                "update {} set open=%s, high=%s, low=%s, close=%s, amount=%s, count=%s \
-                 where date=%s".format(index_table), update_buffer
-            )
-            connect.commit()
-            cur.close()
+            last_timestamp = Datetime(last_end_date).timestamp_utc()//1000000
+            if last_end_date == index_last_date:
+                connect.command(
+                    f"delete from {index_table[0]} where market='{index_table[1]}' and code='{index_table[2]}' and date={last_timestamp}")
+            insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
+                                  high_price, low_price, close_price, amount, count))
+
         if insert_buffer:
-            cur = connect.cursor()
-            cur.executemany(
-                "insert into {} (date, open, high, low, close, amount, count) \
-                 values (%s, %s, %s, %s, %s, %s, %s)".format(index_table), insert_buffer
-            )
-            connect.commit()
-            cur.close()
+            ic = connect.create_insert_context(table=index_table[0],
+                                               data=insert_buffer)
+            connect.insert(context=ic)
 
 
 if __name__ == '__main__':
@@ -500,7 +491,9 @@ if __name__ == '__main__':
     # x = get_codepre_list(client, 'SH', ['stock',  'fund'])
     # print(x)
 
-    import_new_holidays(client)
+    # import_new_holidays(client)
+    x = get_last_krecord(client, ('hku_data.min_k', 'SH', '000001'))
+    print(x)
 
     # update_extern_data(client, 'SH', '000001', 'day')
     client.close()

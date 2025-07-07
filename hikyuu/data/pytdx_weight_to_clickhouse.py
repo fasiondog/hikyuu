@@ -131,10 +131,16 @@ def pytdx_import_weight_to_clickhouse(pytdx_api, connect, market):
             connect.command(sql)
 
         if records:
-            sql = f"INSERT INTO `hku_base`.`stkweight` (market, code, date, countAsGift, countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount, suogu) VALUES "
+            insert_records = []
             for v in records.values():
-                sql += f"('{market}','{code}', {v[0]}, {v[1]}, {v[2]}, {v[3]}, {v[4]}, {v[5]}, {v[6]}, {v[7]}, {v[8]}),"
-            connect.command(sql)
+                tmp = [market, code]
+                tmp.extend(v)
+                insert_records.append(tmp)
+            ic = connect.create_insert_context(table='stkweight', database='hku_base',
+                                               column_names=['market', 'code', 'date', 'countAsGift', 'countForSell',
+                                                             'priceForSell', 'bonus', 'countOfIncreasement', 'totalCount', 'freeCount', 'suogu'],
+                                               data=insert_records)
+            connect.insert(context=ic)
             total_count += len(records)
 
     return total_count

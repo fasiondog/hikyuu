@@ -86,11 +86,10 @@ def em_import_block_to_clickhouse(connect, code_market_dict, categorys=('行业�
                 insert_records.append((category, name, code))
 
     if insert_records:
-        sql = "insert into hku_base.block (category, name, market_code) values "
-        for v in insert_records:
-            sql += f"('{v[0]}', '{v[1]}', '{v[2]}'),"
-        hku_info(f"insert block records: {len(insert_records)}")
-        connect.command(sql)
+        ic = connect.create_insert_context(table='block', database='hku_base',
+                                           column_names=['category', 'name', 'market_code'],
+                                           data=insert_records)
+        connect.insert(context=ic)
 
     return len(insert_records)
 

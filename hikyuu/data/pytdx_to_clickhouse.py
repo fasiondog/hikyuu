@@ -38,6 +38,7 @@ from hikyuu.data.common_clickhouse import (
     get_stock_list,
     get_table,
     get_lastdatetime,
+    get_last_krecord,
     update_extern_data,
 )
 # from hikyuu.data.weight_to_clickhouse import qianlong_import_weight
@@ -75,6 +76,7 @@ def import_index_name(connect):
     today = datetime.date.today()
     today = today.year * 10000 + today.month * 100 + today.day
     # index_set = set()
+    insert_records = []
     for index in index_list:
         market_code = index["market_code"]
         market, code = market_code[:2], market_code[2:]
@@ -83,13 +85,21 @@ def import_index_name(connect):
             old = oldStockDict[market_code]
             if old[4] == 0:
                 connect.command(f"delete from hku_base.stock where market='{market}' and code='{code}'")
-                connect.command(
-                    f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{code}', '{old[2]}', {old[3]}, 1, {old[5]}, {old[6]})")
+                # connect.command(
+                #     f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{code}', '{old[2]}', {old[3]}, 1, {old[5]}, {old[6]})")
+                insert_records.append((market, code, old[2], old[3], 1, old[5], old[6]))
         else:
-            name = index["name"]
-            sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{code}', '{name}', {STOCKTYPE.INDEX}, 1, {today}, 99999999)"
-            connect.command(sql)
+            # name = index["name"]
+            # sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{code}', '{name}', {STOCKTYPE.INDEX}, 1, {today}, 99999999)"
+            # connect.command(sql)
+            insert_records.append((market, code, index["name"], STOCKTYPE.INDEX, 1, today, 99999999))
 
+    if insert_records:
+        ic = connect.create_insert_context(table='stock', database='hku_base',
+                                           column_names=['market', 'code', 'name',
+                                                         'type', 'valid', 'startDate', 'endDate'],
+                                           data=insert_records)
+        connect.insert(context=ic)
     # for oldcode, old in oldStockDict.items():
     #     if oldcode not in index_set:
     #         print(f"待删除指数 {oldcode}")
@@ -142,6 +152,7 @@ def import_stock_name(connect, api, market, quotations=None):
     a = connect.query(sql)
     a = a.result_rows
     oldStockDict = {}
+    insert_records = []
     for oldstock in a:
         oldcode = oldstock[1]
         oldStockDict[oldcode] = oldstock
@@ -153,16 +164,19 @@ def import_stock_name(connect, api, market, quotations=None):
         if (oldvalid == 1) and ((oldcode not in newStockDict) or oldcode in deSet):
             sql = f"delete from hku_base.stock where market='{market}' and code='{oldcode}'"
             connect.command(sql)
-            sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{oldcode}', '{oldname}', {oldstock[3]}, 0, {oldstock[5]}, {oldstock[6]})"
-            connect.command(sql)
+            insert_records.append((market, oldcode, oldname, oldstock[3], 0, oldstock[5], oldstock[6]))
+            # sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{oldcode}', '{oldname}', {oldstock[3]}, 0, {oldstock[5]}, {oldstock[6]})"
+            # connect.command(sql)
 
         # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
         if oldcode in newStockDict:
             if oldname != newStockDict[oldcode] or oldvalid == 0:
                 sql = f"delete from `hku_base`.`stock` where market='{market}' and code='{oldcode}'"
                 connect.command(sql)
-                sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{oldcode}', '{newStockDict[oldcode]}', {oldstock[3]}, 1, {oldstock[5]}, {oldstock[6]})"
-                connect.command(sql)
+                insert_records.append(
+                    (market, oldcode, newStockDict[oldcode], oldstock[3], 1, oldstock[5], oldstock[6]))
+                # sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{oldcode}', '{newStockDict[oldcode]}', {oldstock[3]}, 1, {oldstock[5]}, {oldstock[6]})"
+                # connect.command(sql)
 
     # 处理新出现的股票
     codepre_list = get_codepre_list(connect, market, quotations)
@@ -176,11 +190,18 @@ def import_stock_name(connect, api, market, quotations=None):
                 length = len(codepre[0])
                 if code[:length] == codepre[0]:
                     count += 1
+                    insert_records.append((market, code, newStockDict[code], codepre[1], 1, today, 99999999))
                     # print(market, code, newStockDict[code], codepre)
-                    sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{code}', '{newStockDict[code]}', {codepre[1]}, 1, {today}, 99999999)"
-                    connect.command(sql)
+                    # sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{code}', '{newStockDict[code]}', {codepre[1]}, 1, {today}, 99999999)"
+                    # connect.command(sql)
                     break
 
+    if insert_records:
+        ic = connect.create_insert_context(table='stock', database='hku_base',
+                                           column_names=['market', 'code', 'name',
+                                                         'type', 'valid', 'startDate', 'endDate'],
+                                           data=insert_records)
+        connect.insert(context=ic)
     # print('%s新增股票数：%i' % (market.upper(), count))
     return count
 
@@ -239,20 +260,44 @@ def guess_5min_n_step(last_datetime):
     return (n, step)
 
 
+def update_stock_info(connect, market, code):
+    sql = f"select toUInt32(min(date)), toUInt32(max(date)) from hku_data.day_k where market='{market}' and code='{code}'"
+    a = connect.query(sql)
+    a = a.result_rows
+    if a:
+        sql = f"select valid, startDate, endDate from hku_base.stock where market='{market}' and code='{code}'"
+        b = connect.query(sql)
+        b = b.result_rows
+        if b:
+            valid, startDate, endDate = b[0]
+            ticks = 1000000
+            now_start = Datetime.from_timestamp_utc(a[0][0]*ticks).ymd
+            now_end = Datetime.from_timestamp_utc(a[0][1]*ticks).ymd
+            if valid == 1 and now_start != startDate:
+                sql = f"alter table hku_base.stock update startDate={now_start}, endDate=99999999 where market='{market}' and code='{code}'"
+                connect.command(sql)
+            elif valid == 0 and now_end != endDate:
+                sql = f"alter table hku_base.stock update startDate={now_start}, endDate={now_end} where market='{market}' and code='{code}'"
+                connect.command(sql)
+
+            if ((code == "000001" and market == MARKET.SH)
+                or (code == "399001" and market == MARKET.SZ)
+                    or (code == "830799" and market == MARKET.BJ)):
+                sql = f"alter table hku_base.market update lastDate={now_end} where market='{market}'"
+                connect.command(sql)
+
+
 def import_one_stock_data(
     connect, api, market, ktype, stock_record, startDate=199012191500
 ):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
 
-    stockid, marketid, code, valid, stktype = stock_record[:5]
+    market, code, valid, stktype = stock_record[:5]
     hku_debug("{}{}".format(market, code))
     table = get_table(connect, market, code, ktype)
     last_krecord = get_last_krecord(connect, table)
     last_datetime = startDate if last_krecord is None else last_krecord[0]
-    # last_datetime = get_lastdatetime(connect, table)
-    # if last_datetime is None:
-    #     last_datetime = startDate
 
     today = datetime.date.today()
     if ktype == "DAY":
@@ -341,7 +386,8 @@ def import_one_stock_data(
                 try:
                     buf.append(
                         (
-                            bar_datetime,
+                            table[1], table[2],
+                            Datetime(bar_datetime).timestamp_utc()//1000000,
                             bar["open"],
                             bar["high"],
                             bar["low"],
@@ -356,41 +402,12 @@ def import_one_stock_data(
                 last_datetime = bar_datetime
 
     if len(buf) > 0:
-        cur = connect.cursor()
-        sql = (
-            "INSERT INTO {tablename} (date, open, high, low, close, amount, count) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s)".format(tablename=table)
-        )
-        cur.executemany(sql, buf)
-        # connect.commit()
-        # print(market, stock_record)
+        ic = connect.create_insert_context(table=table[0],
+                                           data=buf)
+        connect.insert(context=ic)
 
         if ktype == "DAY":
-            # 更新基础信息数据库中股票对应的起止日期及其有效标志
-            sql = (
-                "update `hku_base`.`stock` set valid=1, "
-                "startdate=(select min(date)/10000 from {table}), "
-                "enddate=99999999 "
-                "where stockid={stockid}".format(table=table, stockid=stockid)
-            )
-            cur.execute(sql)
-
-            # 记录最新更新日期
-            if (
-                (code == "000001" and marketid == MARKETID.SH)
-                or (code == "399001" and marketid == MARKETID.SZ)
-                or (code == "830799" and marketid == MARKETID.BJ)
-            ):
-                sql = "update `hku_base`.`market` set lastdate=(select max(date)/10000 from {table})  where marketid={marketid}".format(
-                    table=table, marketid=marketid
-                )
-                try:
-                    cur.execute(sql)
-                except:
-                    print(sql)
-
-        connect.commit()
-        cur.close()
+            update_stock_info(connect, market, code)
 
     return len(buf)
 
@@ -423,8 +440,9 @@ def import_data(
     stock_list = get_stock_list(connect, market, quotations)
 
     total = len(stock_list)
+    # market, code, valid, type
     for i, stock in enumerate(stock_list):
-        if stock[3] == 0 or len(stock[2]) != 6:
+        if stock[2] == 0 or len(stock[1]) != 6:
             if progress:
                 progress(i, total)
             continue
@@ -435,59 +453,19 @@ def import_data(
         add_record_count += this_count
         if this_count > 0:
             if ktype == "DAY":
-                update_extern_data(connect, market.upper(), stock[2], "DAY")
+                update_extern_data(connect, market, stock[1], "DAY")
             elif ktype == "5MIN":
-                update_extern_data(connect, market.upper(), stock[2], "5MIN")
+                update_extern_data(connect, market, stock[1], "5MIN")
 
         if progress:
             progress(i, total)
 
-    connect.commit()
     return add_record_count
 
 
 @hku_catch(trace=True, re_raise=True)
 def get_trans_table(connect, market, code):
-    cur = connect.cursor()
-    schema = "{market}_trans".format(market=market).lower()
-    cur.execute(
-        "SELECT 1 FROM information_schema.SCHEMATA where SCHEMA_NAME='{}'".format(
-            schema
-        )
-    )
-    a = cur.fetchone()
-    if not a:
-        cur.execute("CREATE SCHEMA `{}`".format(schema))
-        connect.commit()
-
-    tablename = code.lower()
-    cur.execute(
-        "SELECT 1 FROM information_schema.tables "
-        "where table_schema='{schema}' and table_name='{name}'".format(
-            schema=schema, name=tablename
-        )
-    )
-    a = cur.fetchone()
-    if not a:
-        sql = """
-                CREATE TABLE `{schema}`.`{name}` (
-                    `date` BIGINT(20) UNSIGNED NOT NULL,
-                    `price` DOUBLE NOT NULL,
-                    `vol` DOUBLE NOT NULL,
-                    `buyorsell` INT NOT NULL,
-                    PRIMARY KEY (`date`)
-                )
-                COLLATE='utf8mb4_general_ci'
-                ENGINE=MyISAM
-                ;
-              """.format(
-            schema=schema, name=tablename
-        )
-        cur.execute(sql)
-        connect.commit()
-
-    cur.close()
-    return "`{schema}`.`{name}`".format(schema=schema, name=tablename)
+    return get_table(connect, market, code, 'transdata')
 
 
 @hku_catch(trace=True)
@@ -495,7 +473,7 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
 
-    stockid, marketid, code, valid, stktype = stock_record[:5]
+    market, code, valid, stktype = stock_record
     hku_debug("{}{}".format(market, code))
     table = get_trans_table(connect, market, code)
     last_datetime = get_lastdatetime(connect, table)
@@ -503,9 +481,9 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
     today = datetime.date.today()
     if last_datetime is not None:
         # yyyymmddHHMMSS
-        last_y = int(last_datetime // 10000000000)
-        last_m = int(last_datetime // 100000000 - last_y * 100)
-        last_d = int(last_datetime // 1000000 - (last_y * 10000 + last_m * 100))
+        last_y = last_datetime.year
+        last_m = last_datetime.month
+        last_d = last_datetime.day
         last_date = datetime.date(last_y, last_m, last_d)
         need_days = (today - last_date).days
     else:
@@ -522,7 +500,7 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
 
     trans_buf = []
     for cur_date in date_list:
-        buf = pytdx_get_day_trans(api, pytdx_market, stock_record[2], cur_date)
+        buf = pytdx_get_day_trans(api, pytdx_market, code, cur_date)
         if not buf:
             continue
 
@@ -542,7 +520,8 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
 
                 trans_buf.append(
                     (
-                        cur_date * 1000000 + minute * 100 + second,
+                        market, code,
+                        Datetime(cur_date * 1000000 + minute * 100 + second).timestamp_utc()//1000000,
                         record["price"],
                         record["vol"],
                         record["buyorsell"],
@@ -552,13 +531,8 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
                 hku_error("Failed trans to record! {}", e)
 
     if trans_buf:
-        cur = connect.cursor()
-        sql = (
-            f"INSERT INTO {table} (date, price, vol, buyorsell) VALUES (%s, %s, %s, %s)"
-        )
-        cur.executemany(sql, trans_buf)
-        connect.commit()
-        cur.close()
+        ic = connect.create_insert_context(table=table[0], data=trans_buf)
+        connect.insert(context=ic)
     return len(trans_buf)
 
 
@@ -572,7 +546,8 @@ def import_trans(
     total = len(stock_list)
     a_stktype_list = get_a_stktype_list()
     for i, stock in enumerate(stock_list):
-        if stock[3] == 0 or len(stock[2]) != 6 or stock[4] not in a_stktype_list:
+        market, code, valid, stype = stock
+        if valid == 0 or len(code) != 6 or stype not in a_stktype_list:
             if progress:
                 progress(i, total)
             continue
@@ -586,45 +561,7 @@ def import_trans(
 
 
 def get_time_table(connect, market, code):
-    cur = connect.cursor()
-    schema = "{market}_time".format(market=market).lower()
-    cur.execute(
-        "SELECT 1 FROM information_schema.SCHEMATA where SCHEMA_NAME='{}'".format(
-            schema
-        )
-    )
-    a = cur.fetchone()
-    if not a:
-        cur.execute("CREATE SCHEMA `{}`".format(schema))
-        connect.commit()
-
-    tablename = code.lower()
-    cur.execute(
-        "SELECT 1 FROM information_schema.tables "
-        "where table_schema='{schema}' and table_name='{name}'".format(
-            schema=schema, name=tablename
-        )
-    )
-    a = cur.fetchone()
-    if not a:
-        sql = """
-                CREATE TABLE `{schema}`.`{name}` (
-                    `date` BIGINT(20) UNSIGNED NOT NULL,
-                    `price` DOUBLE NOT NULL,
-                    `vol` DOUBLE NOT NULL,
-                    PRIMARY KEY (`date`)
-                )
-                COLLATE='utf8mb4_general_ci'
-                ENGINE=MyISAM
-                ;
-              """.format(
-            schema=schema, name=tablename
-        )
-        cur.execute(sql)
-        connect.commit()
-
-    cur.close()
-    return "`{schema}`.`{name}`".format(schema=schema, name=tablename)
+    return get_table(connect, market, code, 'timeline')
 
 
 @hku_catch(trace=True)
@@ -632,7 +569,7 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
 
-    stockid, marketid, code, valid, stktype = stock_record[:5]
+    market, code, valid, type = stock_record
     hku_debug("{}{}".format(market, code))
     table = get_time_table(connect, market, code)
     last_datetime = get_lastdatetime(connect, table)
@@ -640,9 +577,9 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
     today = datetime.date.today()
     if last_datetime is not None:
         # yyyymmddHHMM
-        last_y = int(last_datetime // 100000000)
-        last_m = int(last_datetime // 1000000 - last_y * 100)
-        last_d = int(last_datetime // 10000 - (last_y * 10000 + last_m*100))
+        last_y = last_datetime.year
+        last_m = last_datetime.month
+        last_d = last_datetime.day
         last_date = datetime.date(last_y, last_m, last_d)
         need_days = (today - last_date).days
     else:
@@ -655,9 +592,10 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
             date_list.append(cur_date.year * 10000 + cur_date.month * 100 + cur_date.day)
     date_list.reverse()
 
+    ticks = 1000000
     time_buf = []
     for cur_date in date_list:
-        buf = api.get_history_minute_time_data(pytdx_market, stock_record[2], cur_date)
+        buf = api.get_history_minute_time_data(pytdx_market, code, cur_date)
         if buf is None or len(buf) != 240:
             # print(cur_date, "获取的分时线长度不为240!", stock_record[1], stock_record[2])
             continue
@@ -673,19 +611,15 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
             elif time == 1360:
                 time = 1400
             try:
-                time_buf.append((this_date + time, record['price'], record['vol']))
+                time_buf.append((market, code, Datetime(this_date + time).timestamp_utc() //
+                                ticks, record['price'], record['vol']))
                 time += 1
             except Exception as e:
                 hku_error("Failed trans record {}! {}".format(record, e))
 
     if time_buf:
-        cur = connect.cursor()
-        sql = (
-            f"INSERT INTO {table} (date, price, vol) VALUES (%s, %s, %s)"
-        )
-        cur.executemany(sql, time_buf)
-        connect.commit()
-        cur.close()
+        ic = connect.create_insert_context(table=table[0], data=time_buf)
+        connect.insert(context=ic)
 
     return len(time_buf)
 
@@ -694,10 +628,12 @@ def import_time(connect, market, quotations, api, dest_dir, max_days=9000, progr
     add_record_count = 0
     market = market.upper()
 
+    # market, code, valid, type
     stock_list = get_stock_list(connect, market, quotations)
     total = len(stock_list)
     for i, stock in enumerate(stock_list):
-        if stock[3] == 0 or len(stock[2]) != 6:
+        market, code, valid, stype = stock
+        if valid == 0 or len(code) != 6:
             if progress:
                 progress(i, total)
             continue
@@ -725,7 +661,7 @@ if __name__ == "__main__":
     client = clickhouse_connect.get_client(
         host=host, username=user, password=password)
 
-    tdx_server = "119.147.212.81"
+    tdx_server = "180.101.48.170"
     tdx_port = 7709
     quotations = ["stock", "fund"]
 
@@ -741,16 +677,16 @@ if __name__ == "__main__":
 
     add_count = 0
 
-    print("导入股票代码表")
-    # add_count = import_index_name(client)
-    add_count = import_stock_name(client, api, 'SH', quotations)
-    add_count += import_stock_name(client, api, 'SZ', quotations)
-    add_count += import_stock_name(client, api, 'BJ', quotations)
-    print("新增股票数：", add_count)
+    # print("导入股票代码表")
+    # # add_count = import_index_name(client)
+    # add_count = import_stock_name(client, api, 'SH', quotations)
+    # add_count += import_stock_name(client, api, 'SZ', quotations)
+    # add_count += import_stock_name(client, api, 'BJ', quotations)
+    # print("新增股票数：", add_count)
 
-    # print("\n导入上证日线数据")
-    # add_count = import_data(connect, "SH", "DAY", quotations, api, progress=ProgressBar)
-    # print("\n导入数量：", add_count)
+    print("\n导入上证日线数据")
+    # add_count = import_data(client, "SH", "DAY", quotations, api, "", progress=ProgressBar)
+    print("\n导入数量：", add_count)
     """
     print("\n导入深证日线数据")
     add_count = import_data(connect, 'SZ', 'DAY', quotations, api, dest_dir, progress=ProgressBar)

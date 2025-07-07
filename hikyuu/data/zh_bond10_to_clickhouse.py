@@ -23,10 +23,10 @@ def import_zh_bond10_to_clickhouse(connect):
         start_date = (datetime.date(year, month, day) + datetime.timedelta(1)).strftime('%Y%m%d')
     rates = get_china_bond10_rate(start_date)
     if rates:
-        sql = "INSERT INTO hku_base.zh_bond10(date, value) VALUES "
-        for rate in rates:
-            sql += f"({rate[0]},{rate[1]}),"
-        connect.command(sql)
+        ic = connect.create_insert_context(table='zh_bond10', database='hku_base',
+                                           column_names=['date', 'value'],
+                                           data=rates)
+        connect.insert(context=ic)
 
 
 if __name__ == "__main__":
