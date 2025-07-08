@@ -99,7 +99,6 @@ CREATE TABLE IF NOT EXISTS hku_base.stkfinance (
 ) ENGINE = MergeTree();
 
 CREATE TABLE IF NOT EXISTS hku_base.stocktypeinfo (
-    id Int32,
     type Int32,
     precision Int32,
     tickValue Float64,
@@ -107,20 +106,20 @@ CREATE TABLE IF NOT EXISTS hku_base.stocktypeinfo (
     minTradeNumber Float64,
     maxTradeNumber Float64,
     description String,
-    PRIMARY KEY (id)
+    PRIMARY KEY (type)
 ) ENGINE = MergeTree();
-INSERT INTO `hku_base`.`stocktypeinfo` (`id`, `type`, `precision`, `tick`, `tickValue`, `minTradeNumber`, `maxTradeNumber`, `description`) VALUES 
-(1, 0, 2, 100, 100, 100, 1000000, 'Block'),
-(2, 1, 2, 0.01, 0.01, 100, 1000000, 'A股'),
-(3, 2, 3, 0.001, 0.001, 1, 1000000, '指数'),
-(4, 3, 3, 0.001, 0.001, 100, 1000000, 'B股'),
-(5, 4, 3, 0.001, 0.001, 100, 1000000, '基金（不含ETF）'),
-(6, 5, 3, 0.001, 0.001, 1000, 1000000, 'ETF'),
-(7, 6, 2, 0.01, 0.01, 10, 10000, '国债'),
-(8, 7, 2, 0.01, 0.01, 10, 10000, '其他债券'),
-(9, 8, 2, 0.01, 0.01, 100, 1000000, '创业板'),
-(10, 9, 2, 0.01, 0.01, 1, 1000000, '科创板'),
-(11, 11, 2, 0.01, 0.01, 1, 1000000, '北交所');
+INSERT INTO `hku_base`.`stocktypeinfo` (`type`, `precision`, `tick`, `tickValue`, `minTradeNumber`, `maxTradeNumber`, `description`) VALUES 
+(0, 2, 100, 100, 100, 1000000, 'Block'),
+(1, 2, 0.01, 0.01, 100, 1000000, 'A股'),
+(2, 3, 0.001, 0.001, 1, 1000000, '指数'),
+(3, 3, 0.001, 0.001, 100, 1000000, 'B股'),
+(4, 3, 0.001, 0.001, 100, 1000000, '基金（不含ETF）'),
+(5, 3, 0.001, 0.001, 1000, 1000000, 'ETF'),
+(6, 2, 0.01, 0.01, 10, 10000, '国债'),
+(7, 2, 0.01, 0.01, 10, 10000, '其他债券'),
+(8, 2, 0.01, 0.01, 100, 1000000, '创业板'),
+(9, 2, 0.01, 0.01, 1, 1000000, '科创板'),
+(11, 2, 0.01, 0.01, 1, 1000000, '北交所');
 
 CREATE TABLE IF NOT EXISTS hku_base.coderuletype (
     id Int32,
