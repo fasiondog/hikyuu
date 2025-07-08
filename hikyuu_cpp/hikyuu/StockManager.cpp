@@ -166,8 +166,6 @@ void StockManager::loadData() {
     // 获取K线数据驱动并预加载指定的数据
     HKU_INFO(_tr("Loading KData..."));
 
-    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
-
     // 加载K线及历史财务信息
     loadAllKData();
 
