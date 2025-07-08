@@ -28,6 +28,7 @@ import mysql.connector
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_trans as h5_import_trans
 from hikyuu.data.pytdx_to_mysql import import_trans as mysql_import_trans
+from hikyuu.data.pytdx_to_clickhouse import import_trans as clickhouse_import_trans
 from hikyuu.util import *
 
 
@@ -73,6 +74,16 @@ class ImportPytdxTransToH5:
             }
             connect = mysql.connector.connect(**db_config)
             import_trans = mysql_import_trans
+        elif self.config.getboolean('clickhouse', 'enable', fallback=True):
+            db_config = {
+                'username': self.config['clickhouse']['usr'],
+                'password': self.config['clickhouse']['pwd'],
+                'host': self.config['clickhouse']['host'],
+                'port': self.config['clickhouse']['http_port']
+            }
+            import clickhouse_connect
+            connect = clickhouse_connect.get_client(**db_config)
+            import_trans = clickhouse_import_trans
 
         count = 0
         try:
@@ -89,7 +100,6 @@ class ImportPytdxTransToH5:
             self.logger.error(e)
         finally:
             api.close()
-            connect.commit()
             connect.close()
 
         self.queue.put([self.task_name, self.market, 'TRANS', None, count])

@@ -27,9 +27,11 @@ import shutil
 import hashlib
 import sqlite3
 import mysql.connector
+import clickhouse_connect
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_finance_to_mysql import history_finance_import_mysql
 from hikyuu.data.pytdx_finance_to_sqlite import history_finance_import_sqlite
+from hikyuu.data.pytdx_finance_to_clickhouse import history_finance_import_clickhouse
 from hikyuu.util import *
 
 
@@ -77,6 +79,16 @@ class ImportHistoryFinanceTask:
             self.db_connect = mysql.connector.connect(**db_config)
             self.history_finance_import = history_finance_import_mysql
             self.engine = 'mysql'
+        elif self.config.getboolean('clickhouse', 'enable', fallback=True):
+            db_config = {
+                'username': self.config['clickhouse']['usr'],
+                'password': self.config['clickhouse']['pwd'],
+                'host': self.config['clickhouse']['host'],
+                'port': self.config['clickhouse']['http_port']
+            }
+            self.db_connect = clickhouse_connect.get_client(**db_config)
+            self.history_finance_import = history_finance_import_clickhouse
+            self.engine = 'clickhouse'
 
     def import_to_db(self, filename):
         try:
@@ -142,6 +154,6 @@ if __name__ == "__main__":
     this_dir = os.path.expanduser('~') + '/.hikyuu'
     import_config = ConfigParser()
     import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
-    task = ImportHistoryFinanceTask(None, None, None, "/Users/fasiondog/stock")
+    task = ImportHistoryFinanceTask(None, None, import_config, "/Users/fasiondog/stock")
     task()
     print("over!")

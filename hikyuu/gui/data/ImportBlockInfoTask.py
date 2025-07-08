@@ -9,6 +9,7 @@ import mysql.connector
 from hikyuu.data.common import MARKET, get_stk_code_name_list
 from hikyuu.data.em_block_to_mysql import em_import_block_to_mysql
 from hikyuu.data.em_block_to_sqlite import em_import_block_to_sqlite
+from hikyuu.data.em_block_to_clickhouse import em_import_block_to_clickhouse
 from hikyuu.util import *
 
 
@@ -38,6 +39,16 @@ class ImportBlockInfoTask:
             }
             connect = mysql.connector.connect(**db_config)
             import_block = em_import_block_to_mysql
+        elif self.config.getboolean('clickhouse', 'enable', fallback=True):
+            db_config = {
+                'username': self.config['clickhouse']['usr'],
+                'password': self.config['clickhouse']['pwd'],
+                'host': self.config['clickhouse']['host'],
+                'port': self.config['clickhouse']['http_port']
+            }
+            import clickhouse_connect
+            connect = clickhouse_connect.get_client(**db_config)
+            import_block = em_import_block_to_clickhouse
 
         count = 0
         try:

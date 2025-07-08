@@ -6,8 +6,10 @@
 
 import sqlite3
 import mysql.connector
+import clickhouse_connect
 from hikyuu.data.zh_bond10_to_mysql import import_zh_bond10_to_mysql
 from hikyuu.data.zh_bond10_to_sqlite import import_zh_bond10_to_sqlite
+from hikyuu.data.zh_bond10_to_clickhouse import import_zh_bond10_to_clickhouse
 from hikyuu.util import *
 
 
@@ -36,6 +38,15 @@ class ImportZhBond10Task:
             }
             connect = mysql.connector.connect(**db_config)
             import_zh_bond10 = import_zh_bond10_to_mysql
+        elif self.config.getboolean('clickhouse', 'enable', fallback=True):
+            db_config = {
+                'username': self.config['clickhouse']['usr'],
+                'password': self.config['clickhouse']['pwd'],
+                'host': self.config['clickhouse']['host'],
+                'port': self.config['clickhouse']['http_port']
+            }
+            connect = clickhouse_connect.get_client(**db_config)
+            import_zh_bond10 = import_zh_bond10_to_clickhouse
 
         try:
             import_zh_bond10(connect)

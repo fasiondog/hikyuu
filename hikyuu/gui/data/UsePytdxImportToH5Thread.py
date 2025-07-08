@@ -48,6 +48,12 @@ from hikyuu.data.common_mysql import create_database as mysql_create_database
 from hikyuu.data.common_mysql import import_new_holidays as mysql_import_new_holidays
 from hikyuu.data.pytdx_to_mysql import import_index_name as mysql_import_index_name
 from hikyuu.data.pytdx_to_mysql import import_stock_name as mysql_import_stock_name
+
+from hikyuu.data.common_clickhouse import create_database as clickhouse_create_database
+from hikyuu.data.common_clickhouse import import_new_holidays as clickhouse_import_new_holidays
+from hikyuu.data.pytdx_to_clickhouse import import_index_name as clickhouse_import_index_name
+from hikyuu.data.pytdx_to_clickhouse import import_stock_name as clickhouse_import_stock_name
+
 from hikyuu.util.mylog import class_logger
 
 
@@ -265,6 +271,19 @@ class UsePytdxImportToH5Thread(QThread):
             import_new_holidays = mysql_import_new_holidays
             import_index_name = mysql_import_index_name
             import_stock_name = mysql_import_stock_name
+        elif self.config.getboolean('clickhouse', 'enable', fallback=True):
+            db_config = {
+                'username': self.config['clickhouse']['usr'],
+                'password': self.config['clickhouse']['pwd'],
+                'host': self.config['clickhouse']['host'],
+                'port': self.config['clickhouse']['http_port']
+            }
+            import clickhouse_connect
+            connect = clickhouse_connect.get_client(**db_config)
+            create_database = clickhouse_create_database
+            import_new_holidays = clickhouse_import_new_holidays
+            import_index_name = clickhouse_import_index_name
+            import_stock_name = clickhouse_import_stock_name
 
         create_database(connect)
 

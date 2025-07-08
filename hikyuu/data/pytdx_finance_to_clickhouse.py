@@ -61,7 +61,7 @@ def pytdx_import_finance_to_clickhouse(db_connect, pytdx_connect, market):
         ic = db_connect.create_insert_context(table='stkfinance', database='hku_base',
                                               data=records)
         db_connect.insert(context=ic)
-        return len(records)
+    return len(records)
 
 
 def history_finance_import_clickhouse(connect, filename):
