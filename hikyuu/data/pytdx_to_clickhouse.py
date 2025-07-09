@@ -63,11 +63,9 @@ def import_index_name(connect):
     if not index_list:
         return 0
 
-    print("query")
     sql = f"select market, code, name, type, valid, startDate, endDate from hku_base.stock where type={STOCKTYPE.INDEX}"
     a = connect.query(sql)
     a = a.result_rows
-    print("query finish")
     oldStockDict = {}
     for oldstock in a:
         oldcode = f"{oldstock[0]}{oldstock[1]}"

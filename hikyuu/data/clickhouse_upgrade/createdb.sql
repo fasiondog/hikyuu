@@ -637,12 +637,15 @@ INSERT INTO `hku_base`.`historyfinancefield` (`id`, `name`) VALUES (580, '现金
 INSERT INTO `hku_base`.`historyfinancefield` (`id`, `name`) VALUES (581, '使用权资产折旧（万元）');
 
 CREATE TABLE IF NOT EXISTS hku_base.historyfinance (
-    file_date Int32,
-    market_code String,
+    market String,
+    code String,
     report_date Int32,
     `values` String,
-    PRIMARY KEY (market_code, report_date)
-) ENGINE = MergeTree();
+    file_date Int32,
+    PRIMARY KEY (market, code, report_date)
+) ENGINE = MergeTree()
+PARTITION BY market
+ORDER BY (market, code, report_date);
 
 CREATE TABLE IF NOT EXISTS hku_base.stkfinance (
     market String,
@@ -873,3 +876,189 @@ INSERT INTO `hku_base`.`holiday` (`date`) VALUES
 (20251006),
 (20251007),
 (20251008);
+
+CREATE DATABASE IF NOT EXISTS hku_data;
+CREATE table if not exists hku_data.day_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PARTITION BY (market, sipHash64(code) % 32)
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.week_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PARTITION BY (market)
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.month_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.quarter_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.halfyear_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.year_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.min_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PARTITION BY (market, sipHash64(code) % 32)
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.min5_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PARTITION BY (market, sipHash64(code) % 32)
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.min15_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PARTITION BY (market, sipHash64(code) % 32)
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.min30_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PARTITION BY (market, sipHash64(code) % 32)
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.min60_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PARTITION BY (market, sipHash64(code) % 32)
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.timeline (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `price` DOUBLE,
+    `vol` DOUBLE
+) 
+ENGINE = MergeTree()
+PARTITION BY (market, sipHash64(code) % 32)
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.transdata (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `price` DOUBLE,
+    `vol` DOUBLE,
+    `buyorsell` int
+) 
+ENGINE = MergeTree()
+PARTITION BY (market, sipHash64(code) % 32)
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);

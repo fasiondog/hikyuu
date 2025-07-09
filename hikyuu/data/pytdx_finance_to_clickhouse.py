@@ -67,11 +67,14 @@ def pytdx_import_finance_to_clickhouse(db_connect, pytdx_connect, market):
 def history_finance_import_clickhouse(connect, filename):
     file_date = filename[-12:-4]
     ret = historyfinancialreader(filename)
+    buf = []
+    for v in ret:
+        buf.append((v[1][:2], v[1][2:], v[2], v[3], file_date))
     if len(ret) > 0:
         connect.command(f"delete from hku_base.historyfinance where file_date={file_date}")
         ic = connect.create_insert_context(table='historyfinance', database='hku_base',
-                                           column_names=['file_date', 'market_code', 'report_date', 'values'],
-                                           data=ret)
+                                           column_names=['market', 'code', 'report_date', 'values', 'file_date'],
+                                           data=buf)
         connect.insert(context=ic)
 
 
@@ -98,7 +101,7 @@ if __name__ == "__main__":
     api = TdxHq_API()
     api.connect(tdx_server, tdx_port)
 
-    pytdx_import_finance_to_clickhouse(client, api, "BJ")
-    # history_finance_import_clickhouse(client, "/Users/fasiondog/stock/downloads/finance/gpcw20121231.dat")
+    # pytdx_import_finance_to_clickhouse(client, api, "BJ")
+    history_finance_import_clickhouse(client, "/Users/fasiondog/stock/downloads/finance/gpcw20121231.dat")
 
     client.close()

@@ -42,7 +42,6 @@ def is_exist_db(connect):
 @hku_catch(ret=0)
 def get_db_version(connect):
     version = connect.command("select `version` from `hku_base`.`version`")
-    print(version)
     return version if type(version) == int else 0
 
 
@@ -58,12 +57,11 @@ def create_database(connect):
             stmt = stmt.strip()
             if stmt:  # 跳过空语句
                 try:
-                    client.command(stmt)
+                    connect.command(stmt)
                 except Exception as e:
                     print(f"执行失败: {stmt[:30]}... 错误: {e}")
 
     db_version = get_db_version(connect)
-    print(db_version)
     files = [x for x in Path(sql_dir).iterdir()
              if x.is_file()
              and x.name != 'createdb.sql'
@@ -79,7 +77,7 @@ def create_database(connect):
             stmt = stmt.strip()
             if stmt:  # 跳过空语句
                 try:
-                    client.command(stmt)
+                    connect.command(stmt)
                 except Exception as e:
                     print(f"执行失败: {stmt[:30]}... 错误: {e}")
 

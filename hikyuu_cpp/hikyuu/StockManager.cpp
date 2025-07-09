@@ -602,12 +602,10 @@ void StockManager::loadAllZhBond10() {
 }
 
 void StockManager::loadHistoryFinanceField() {
-    if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
-        auto fields = m_baseInfoDriver->getHistoryFinanceField();
-        for (const auto& field : fields) {
-            m_field_ix_to_name[field.first - 1] = field.second;
-            m_field_name_to_ix[field.second] = field.first - 1;
-        }
+    auto fields = m_baseInfoDriver->getHistoryFinanceField();
+    for (const auto& field : fields) {
+        m_field_ix_to_name[field.first - 1] = field.second;
+        m_field_name_to_ix[field.second] = field.first - 1;
     }
 }
 
