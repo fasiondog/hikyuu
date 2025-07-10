@@ -135,8 +135,6 @@ void StockManager::loadData() {
     // 获取K线数据驱动并预加载指定的数据
     HKU_INFO(_tr("Loading KData..."));
 
-    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
-
     // 加载K线及历史财务信息
     loadAllKData();
 
@@ -573,12 +571,10 @@ void StockManager::loadAllZhBond10() {
 }
 
 void StockManager::loadHistoryFinanceField() {
-    if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
-        auto fields = m_baseInfoDriver->getHistoryFinanceField();
-        for (const auto& field : fields) {
-            m_field_ix_to_name[field.first - 1] = field.second;
-            m_field_name_to_ix[field.second] = field.first - 1;
-        }
+    auto fields = m_baseInfoDriver->getHistoryFinanceField();
+    for (const auto& field : fields) {
+        m_field_ix_to_name[field.first - 1] = field.second;
+        m_field_name_to_ix[field.second] = field.first - 1;
     }
 }
 
