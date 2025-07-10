@@ -141,6 +141,8 @@ class ImportHistoryFinanceTask:
                 self.queue.put([self.task_name, None, None, int(100 * count / self.total_count), self.total_count])
             except Exception as e:
                 hku_error(str(e))
+        if self.engine == 'clickhouse':
+            self.db_connect.command("OPTIMIZE TABLE hku_base.historyfinance FINAL")
         self.db_connect.close()
         self.api.disconnect()
 
