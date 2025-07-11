@@ -93,7 +93,7 @@ void GlobalInitializer::clean() {
     }
 #endif
 
-#ifdef HKU_OS_OSX
+#if HKU_OS_OSX
     // 主动停止异步数据加载任务组，否则 hdf5 在 linux 下会报关闭异常
     auto *tg = StockManager::instance().getLoadTaskGroup();
     if (tg) {
@@ -106,7 +106,7 @@ void GlobalInitializer::clean() {
 
     IndicatorImp::releaseDynEngine();
 
-#ifdef !HKU_OS_OSX
+#if !HKU_OS_OSX
     // 主动停止异步数据加载任务组，否则 hdf5 在 linux 下会报关闭异常
     auto *tg = StockManager::instance().getLoadTaskGroup();
     if (tg) {
