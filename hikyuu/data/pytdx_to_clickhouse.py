@@ -451,6 +451,7 @@ def import_data(
         add_record_count += this_count
         if this_count > 0:
             if ktype == "DAY":
+                connect.command('OPTIMIZE TABLE hku_data.day_k FINAL')
                 update_extern_data(connect, market, stock[1], "DAY")
             elif ktype == "5MIN":
                 update_extern_data(connect, market, stock[1], "5MIN")
