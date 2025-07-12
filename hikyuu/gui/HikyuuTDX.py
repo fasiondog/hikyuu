@@ -432,7 +432,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         # 初始化clickhouse设置
         clickhouse_enable = import_config.getboolean('clickhouse', 'enable', fallback=False)
-        if hdf5_enable or mysql_enable:
+        if (not is_valid_license()) or hdf5_enable or mysql_enable:
             clickhouse_enable = False
         self.enable_clickhouse_radioButton.setChecked(clickhouse_enable)
         self.clickhouse_tmpdir_lineEdit.setText(import_config.get('clickhouse', 'tmpdir', fallback='d:/stock'))
@@ -556,7 +556,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'pwd': self.mysql_pwd_lineEdit.text()
         }
         import_config['clickhouse'] = {
-            'enable': self.enable_clickhouse_radioButton.isChecked(),
+            'enable': is_valid_license() and self.enable_clickhouse_radioButton.isChecked(),
             'tmpdir': self.clickhouse_tmpdir_lineEdit.text(),
             'host': self.clickhouse_ip_lineEdit.text(),
             'http_port': self.clickhouse_http_port_lineEdit.text(),
@@ -746,6 +746,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_clickhouse_tmpdir_pushButton_clicked(self):
+        if not is_valid_license():
+            QMessageBox.critical(self, "clickhouse引擎", "需要捐赠授权才能使用clickhouse引擎")
+            return
+
         dlg = QFileDialog()
         dlg.setFileMode(QFileDialog.Directory)
         config = self.getCurrentConfig()
