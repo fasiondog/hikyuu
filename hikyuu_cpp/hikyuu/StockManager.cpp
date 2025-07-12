@@ -20,6 +20,7 @@
 #include "StockManager.h"
 #include "global/schedule/inner_tasks.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
+#include "plugin/interface/plugins.h"
 
 #if HKU_ENABLE_MO
 #include "hikyuu/utilities/mo/mo.h"
@@ -91,6 +92,40 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_tmpdir = hikyuuParam.tryGet<string>("tmpdir", ".");
     m_datadir = hikyuuParam.tryGet<string>("datadir", ".");
 
+    // 设置插件路径
+    m_plugin_manager.pluginPath(
+      m_hikyuuParam.tryGet<string>("plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
+
+    string basedrivername = m_baseInfoDriverParam.tryGet<string>("type", "");
+    to_lower(basedrivername);
+    if (basedrivername == "clickhouse") {
+        auto* plugin = getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+        HKU_CHECK(plugin, "Can not find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER);
+        auto driver = plugin->getBaseInfoDriver();
+        HKU_CHECK(driver, "Can not get clickhouse driver! Check your license!");
+        DataDriverFactory::regBaseInfoDriver(driver);
+    }
+
+    string kdrivername = m_kdataDriverParam.tryGet<string>("type", "");
+    to_lower(kdrivername);
+    if (kdrivername == "clickhouse") {
+        auto* plugin = getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+        HKU_CHECK(plugin, "Can not find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER);
+        auto kdriver = plugin->getKDataDriver();
+        HKU_CHECK(kdriver, "Can not get clickhouse driver! Check your license!");
+        DataDriverFactory::regKDataDriver(kdriver);
+    }
+
+    string blockdrivername = m_blockDriverParam.tryGet<string>("type", "");
+    to_lower(blockdrivername);
+    if (blockdrivername == "clickhouse") {
+        auto* plugin = getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+        HKU_CHECK(plugin, "Can not find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER);
+        auto driver = plugin->getBlockInfoDriver();
+        HKU_CHECK(driver, "Can not get clickhouse driver! Check your license!");
+        DataDriverFactory::regBlockDriver(driver);
+    }
+
     // 加载证券基本信息
     m_baseInfoDriver = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
     HKU_CHECK(m_baseInfoDriver, "Failed get base info driver!");
@@ -103,10 +138,6 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     if (m_kdataDriverParam != driver->getPrototype()->getParameter()) {
         m_kdataDriverParam = driver->getPrototype()->getParameter();
     }
-
-    // 设置插件路径
-    m_plugin_manager.pluginPath(
-      m_hikyuuParam.tryGet<string>("plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
 
     // 加载数据
     loadData();

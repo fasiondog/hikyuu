@@ -25,9 +25,11 @@
 import logging
 import sqlite3
 import mysql.connector
+import clickhouse_connect
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_time as h5_import_time
 from hikyuu.data.pytdx_to_mysql import import_time as mysql_import_time
+from hikyuu.data.pytdx_to_clickhouse import import_time as clickhouse_import_time
 from hikyuu.util import *
 
 
@@ -73,6 +75,15 @@ class ImportPytdxTimeToH5:
             }
             connect = mysql.connector.connect(**db_config)
             import_time = mysql_import_time
+        elif self.config.getboolean('clickhouse', 'enable', fallback=True):
+            db_config = {
+                'username': self.config['clickhouse']['usr'],
+                'password': self.config['clickhouse']['pwd'],
+                'host': self.config['clickhouse']['host'],
+                'port': self.config['clickhouse']['http_port']
+            }
+            connect = clickhouse_connect.get_client(**db_config)
+            import_time = clickhouse_import_time
 
         count = 0
         try:
@@ -89,7 +100,6 @@ class ImportPytdxTimeToH5:
             self.logger.error(e)
         finally:
             api.close()
-            connect.commit()
             connect.close()
 
         self.queue.put([self.task_name, self.market, 'TIME', None, count])

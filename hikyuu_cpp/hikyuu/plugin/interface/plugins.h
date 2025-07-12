@@ -13,6 +13,7 @@
 #include "ImportKDataToHdf5PluginInterface.h"
 #include "ExtendIndicatorsPluginInterface.h"
 #include "TMReportPluginInterface.h"
+#include "DataDriverPluginInterface.h"
 
 namespace hku {
 
@@ -22,5 +23,6 @@ namespace hku {
 #define HKU_PLUGIN_IMPORTKDATATOHDF5 "import2hdf5"
 #define HKU_PLUGIN_EXTEND_INDICATOR "extind"
 #define HKU_PLUGIN_TMREPORT "tmreport"
+#define HKU_PLUGIN_CLICKHOUSE_DRIVER "clickhousedriver"
 
 }

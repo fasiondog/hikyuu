@@ -27,7 +27,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
@@ -411,7 +411,7 @@
                  <second>0</second>
                  <year>1989</year>
                  <month>12</month>
-                 <day>24</day>
+                 <day>23</day>
                 </datetime>
                </property>
                <property name="calendarPopup">
@@ -463,7 +463,7 @@
                  <second>0</second>
                  <year>1989</year>
                  <month>12</month>
-                 <day>24</day>
+                 <day>23</day>
                 </datetime>
                </property>
                <property name="calendarPopup">
@@ -550,6 +550,13 @@
               <widget class="QRadioButton" name="enable_mysql_radioButton">
                <property name="text">
                 <string>使用MYSQL</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="enable_clickhouse_radioButton">
+               <property name="text">
+                <string>使用Clickhouse(捐赠权益）</string>
                </property>
               </widget>
              </item>
@@ -721,7 +728,7 @@
              <item row="0" column="0">
               <widget class="QLabel" name="label_20">
                <property name="text">
-                <string>临时文件目录：</string>
+                <string>临本机时文件目录：</string>
                </property>
               </widget>
              </item>
@@ -741,12 +748,12 @@
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_22">
+         <spacer name="verticalSpacer_12">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Expanding</enum>
+           <enum>QSizePolicy::Fixed</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -755,6 +762,108 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_8">
+          <property name="title">
+           <string>Clickhouse设置(捐赠权益)</string>
+          </property>
+          <widget class="QWidget" name="layoutWidget_2">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>30</y>
+             <width>511</width>
+             <height>208</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <property name="leftMargin">
+             <number>10</number>
+            </property>
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <property name="bottomMargin">
+             <number>10</number>
+            </property>
+            <item row="2" column="2">
+             <widget class="QPushButton" name="clickhouse_test_pushButton">
+              <property name="text">
+               <string>测试连接</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="label_52">
+              <property name="text">
+               <string>密码</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_54">
+              <property name="text">
+               <string>主机名/IP：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_51">
+              <property name="text">
+               <string>HTTP端口号：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_53">
+              <property name="text">
+               <string>本机临时文件目录：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QLineEdit" name="clickhouse_pwd_lineEdit"/>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="clickhouse_http_port_lineEdit"/>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLineEdit" name="clickhouse_usr_lineEdit"/>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="clickhouse_tmpdir_lineEdit"/>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="clickhouse_ip_lineEdit"/>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="clickhouse_tmpdir_pushButton">
+              <property name="text">
+               <string>选择</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_50">
+              <property name="text">
+               <string>用户名：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_55">
+              <property name="text">
+               <string>TCP端口号</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLineEdit" name="clickhouse_port_lineEdit"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -1043,19 +1152,19 @@ p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入上证日线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入深证日线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入上证5分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入深证5分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入上证1分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入深证1分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入上证分笔记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入深证分笔记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入上证分时数据：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入深证分时数据：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入权息数据数：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;导入完毕！&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入上证日线记录：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入深证日线记录：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入上证5分钟线记录：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入深证5分钟线记录：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入上证1分钟线记录：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入深证1分钟线记录：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入上证分笔记录：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入深证分笔记录：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入上证分时数据：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入深证分时数据：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入权息数据数：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;导入完毕！&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
@@ -1761,13 +1870,13 @@ p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;注：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;1、行情采集服务仅对预加载数据有效&lt;/span&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;，在行情采集服务运行期间，hikyuu.interactive运行时将自动连接采集服务获取行情数据，并更新预加载的内容数据。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'SimSun';&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;2、如使用芝麻代理（&lt;/span&gt;&lt;a href=&quot;http://h.zhimaruanjian.com/&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; text-decoration: underline; color:#0000ff;&quot;&gt;http://h.zhimaruanjian.com/&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;），请自行申请（需付费），并确保ip为其白名单。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'SimSun';&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-weight:696; color:#0000ff;&quot;&gt;3、此处采集为网络采集，更推荐直接运行安装目录下gui子目录下的 start_qmt.py ,使用miniqmt 实时服务。该程序独立运行，不用关闭，和这里的采集效果一样。注意：miniqmt需要QMT交易端配合，且在同一机器上执行。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;注：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;1、行情采集服务仅对预加载数据有效&lt;/span&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;，在行情采集服务运行期间，hikyuu.interactive运行时将自动连接采集服务获取行情数据，并更新预加载的内容数据。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'SimSun'; font-size:9pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;2、如使用芝麻代理（&lt;/span&gt;&lt;a href=&quot;http://h.zhimaruanjian.com/&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt; text-decoration: underline; color:#0000ff;&quot;&gt;http://h.zhimaruanjian.com/&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;），请自行申请（需付费），并确保ip为其白名单。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'SimSun'; font-size:9pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:696; color:#0000ff;&quot;&gt;3、此处采集为网络采集，更推荐直接运行安装目录下gui子目录下的 start_qmt.py ,使用miniqmt 实时服务。该程序独立运行，不用关闭，和这里的采集效果一样。注意：miniqmt需要QMT交易端配合，且在同一机器上执行。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
@@ -1854,7 +1963,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </font>
         </property>
         <property name="text">
-         <string>申请试用许可（30天试用）</string>
+         <string>申请捐赠试用（30天试用）</string>
         </property>
        </widget>
        <widget class="Line" name="line_3">
@@ -1885,7 +1994,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </font>
         </property>
         <property name="text">
-         <string>加入知识星球，获取星球许可（可同时在3台设备上使用）</string>
+         <string>加入知识星球进行捐赠，可同时在3台设备上使用）</string>
         </property>
        </widget>
        <widget class="Line" name="line_4">
@@ -1916,7 +2025,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </font>
         </property>
         <property name="text">
-         <string>当前授权信息</string>
+         <string>当前捐赠授权信息</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_license">
