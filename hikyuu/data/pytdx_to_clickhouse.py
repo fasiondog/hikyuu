@@ -404,9 +404,6 @@ def import_one_stock_data(
                                            data=buf)
         connect.insert(context=ic)
 
-        if ktype == "DAY":
-            update_stock_info(connect, market, code)
-
     return len(buf)
 
 
@@ -451,7 +448,7 @@ def import_data(
         add_record_count += this_count
         if this_count > 0:
             if ktype == "DAY":
-                connect.command('OPTIMIZE TABLE hku_data.day_k FINAL')
+                update_stock_info(connect, market, stock[1])
                 update_extern_data(connect, market, stock[1], "DAY")
             elif ktype == "5MIN":
                 update_extern_data(connect, market, stock[1], "5MIN")
@@ -459,6 +456,8 @@ def import_data(
         if progress:
             progress(i, total)
 
+    if ktype == "DAY":
+        connect.command('OPTIMIZE TABLE hku_data.day_k FINAL')
     return add_record_count
 
 

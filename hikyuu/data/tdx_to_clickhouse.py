@@ -34,7 +34,7 @@ import tables as tb
 from io import SEEK_END, SEEK_SET
 
 from hikyuu import Datetime
-from hikyuu.data.common import get_stktype_list, MARKETID
+from hikyuu.data.common import get_stktype_list, MARKET
 from hikyuu.data.common_clickhouse import (
     create_database, get_codepre_list, get_table, get_lastdatetime, update_extern_data
 )
@@ -89,7 +89,6 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
 
         # 新的代码表中无此股票，则置为无效
         if (oldvalid == 1) and (oldcode not in newStockDict):
-            # cur.execute("update `hku_base`.`stock` set valid=0 where stockid=%i" % oldstockid)
             connect.command(f"delete from hku_base.stock where market='{market}' and code='{oldcode}'")
             buf.append((market, oldcode, oldname, oldtype,  0, today, 99999999))
 
@@ -179,13 +178,12 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
         return add_record_count
 
     # market, code, name, type, valid, startDate, endDate
-    code, name, stktype, valid, oldstartDate, oldendDate = stock_record[1], stock_record[2], stock_record[
-        3], stock_record[4], stock_record[5], stock_record[6]
+    code, stktype = stock_record[1], stock_record[3]
 
     table = get_table(connect, market, code, ktype)
     lastdatetime = get_lastdatetime(connect, table)
     if lastdatetime is not None:
-        lastdatetime = lastdatetime / 10000
+        lastdatetime = lastdatetime.ymd
 
     buf = []
     with open(filename, 'rb') as src_file:
@@ -209,38 +207,11 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
                     )
                 )
                 add_record_count += 1
-
             data = src_file.read(32)
 
-    # base_buf = []
-    # if add_record_count > 0:
-    #     ic = connect.create_insert_context(table=table[0], data=buf)
-    #     connect.insert(context=ic)
-
-    #     # 更新基础信息数据库中股票对应的起止日期及其有效标志
-    #     if valid == 0 and oldendDate == 99999999:
-    #         base_buf.append((market, code, name, stktype, valid, oldstartDate, oldendDate))
-    #         sql = "update `hku_base`.`stock` set valid=1, " \
-    #               "startdate=(select min(date)/10000 from {table}), " \
-    #               "enddate=(select max(date)/10000 from {table}) " \
-    #               "where stockid={stockid}".format(table=table, stockid=stockid)
-    #         cur.execute("sql")
-    #         connect.commit()
-
-    #     # 记录最新更新日期
-    #     if (code == '000001' and marketid == MARKETID.SH) \
-    #             or (code == '399001' and marketid == MARKETID.SZ):
-    #         sql = "update `hku_base`.`market` set lastdate=(select max(date)/10000 from {table}) " \
-    #               "where marketid={marketid}".format(table=table, marketid=marketid)
-    #         try:
-    #             cur.execute(sql)
-    #         except:
-    #             print(sql)
-    #         connect.commit()
-
-    #     # connect.commit()
-
-    # cur.close()
+    if len(buf) > 0:
+        ic = connect.create_insert_context(table=table[0], data=buf)
+        connect.insert(context=ic)
     return add_record_count
 
 
@@ -257,13 +228,15 @@ def tdx_import_min_data_from_file(connect, filename, ktype, market, stock_record
     if not os.path.exists(filename):
         return add_record_count
 
-    stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[
-        2], stock_record[3], stock_record[4]
+    # market, code, name, type, valid, startDate, endDate
+    code, stktype = stock_record[1], stock_record[3]
 
     table = get_table(connect, market, code, to_clickhouse_ktype(ktype))
     lastdatetime = get_lastdatetime(connect, table)
+    if lastdatetime is not None:
+        lastdatetime = lastdatetime.ymdhm
 
-    cur = connect.cursor()
+    buf = []
     with open(filename, 'rb') as src_file:
 
         def trans_date(yymm, hhmm):
@@ -323,24 +296,17 @@ def tdx_import_min_data_from_file(connect, filename, ktype, market, stock_record
                         and record[3] >= record[5] >= record[4] > 0\
                         and record[5] >= 0 \
                         and record[6] >= 0:
-                    sql = "INSERT INTO {tablename} (date, open, high, low, close, amount, count) " \
-                          "VALUES (%s, %s, %s, %s, %s, %s, %s)".format(tablename=table)
-                    cur.execute(
-                        sql, (
-                            trans_date(record[0], record[1]), round(record[2], 2),
-                            round(record[3], 2), round(record[4], 2), round(record[5],
-                                                                            2), record[6] * 0.001,
-                            record[7] if stktype == 2 else round(record[7] * 0.01)
-                        )
-                    )
+                    buf.append(market, code, trans_date(record[0], record[1]), round(record[2], 2),
+                               round(record[3], 2), round(record[4], 2), round(record[5],
+                                                                               2), record[6] * 0.001,
+                               record[7] if stktype == 2 else round(record[7] * 0.01))
                     add_record_count += 1
 
                 data = src_file.read(32)
 
-    if add_record_count > 0:
-        connect.commit()
-
-    cur.close()
+    if len(buf) > 0:
+        ic = connect.create_insert_context(table=table[0], data=buf)
+        connect.insert(context=ic)
     return add_record_count
 
 
@@ -369,8 +335,7 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, progress=Progre
         func_import_from_file = tdx_import_min_data_from_file
 
     stktype_list = get_stktype_list(quotations)
-    sql = f"select market, code, name, type, valid, startDate, endDate from `hku_base`.`stock` " \
-        "where market={market} and type in {stktype_list}"
+    sql = f"select market, code, name, type, valid, startDate, endDate from hku_base.stock where market='{market}' and type in {stktype_list}"
     a = connect.query(sql)
     a = a.result_rows
 
@@ -386,14 +351,16 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, progress=Progre
         add_record_count += this_count
         if this_count > 0:
             if ktype == 'DAY':
+                stock[1]
+                update_stock_info(connect, market.upper(), stock[1])
                 update_extern_data(connect, market.upper(), stock[1], "DAY")
-                pass
             elif ktype == '5MIN':
                 update_extern_data(connect, market.upper(), stock[1], "5MIN")
-                pass
         if progress:
             progress(i, total)
 
+    if ktype == "DAY":
+        connect.command('OPTIMIZE TABLE hku_data.day_k FINAL')
     return add_record_count
 
 

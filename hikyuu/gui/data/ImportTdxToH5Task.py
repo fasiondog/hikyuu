@@ -30,6 +30,7 @@ from hikyuu.util.check import hku_catch
 from hikyuu.util.mylog import class_logger
 from hikyuu.data.tdx_to_h5 import tdx_import_data as h5_import_data
 from hikyuu.data.tdx_to_mysql import tdx_import_data as mysql_import_data
+from hikyuu.data.tdx_to_clickhouse import tdx_import_data as clickhouse_import_data
 from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
 
 
@@ -91,7 +92,7 @@ class ImportTdxToH5Task:
             import_data = h5_import_data
             self.logger.debug('use hdf5 import kdata')
             use_hdf = True
-        else:
+        elif self.config.getboolean('mysql', 'enable', fallback=True):
             db_config = {
                 'user': self.config['mysql']['usr'],
                 'password': self.config['mysql']['pwd'],
@@ -101,6 +102,17 @@ class ImportTdxToH5Task:
             connect = mysql.connector.connect(**db_config)
             import_data = mysql_import_data
             self.logger.debug('use mysql import kdata')
+        elif self.config.getboolean('clickhouse', 'enable', fallback=True):
+            db_config = {
+                'username': self.config['clickhouse']['usr'],
+                'password': self.config['clickhouse']['pwd'],
+                'host': self.config['clickhouse']['host'],
+                'port': self.config['clickhouse']['http_port']
+            }
+            import clickhouse_connect
+            connect = clickhouse_connect.get_client(**db_config)
+            import_data = clickhouse_import_data
+            self.logger.debug('use clickhouse import kdata')
 
         count = 0
         try:
