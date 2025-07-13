@@ -99,26 +99,41 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
         result->close = spot->close();
         result->amount = spot->amount();
         result->volume = spot->volume();
-        result->bid1 = spot->bid1();
-        result->bid1_amount = spot->bid1_amount();
-        result->bid2 = spot->bid2();
-        result->bid2_amount = spot->bid2_amount();
-        result->bid3 = spot->bid3();
-        result->bid3_amount = spot->bid3_amount();
-        result->bid4 = spot->bid4();
-        result->bid4_amount = spot->bid4_amount();
-        result->bid5 = spot->bid5();
-        result->bid5_amount = spot->bid5_amount();
-        result->ask1 = spot->ask1();
-        result->ask1_amount = spot->ask1_amount();
-        result->ask2 = spot->ask2();
-        result->ask2_amount = spot->ask2_amount();
-        result->ask3 = spot->ask3();
-        result->ask3_amount = spot->ask3_amount();
-        result->ask4 = spot->ask4();
-        result->ask4_amount = spot->ask4_amount();
-        result->ask5 = spot->ask5();
-        result->ask5_amount = spot->ask5_amount();
+        auto* bids = spot->bid();
+        if (bids) {
+            size_t length = bids->Length();
+            result->bid.resize(length);
+            for (size_t i = 0; i < length; i++) {
+                result->bid[i] = bids->Get(i);
+            }
+        }
+
+        auto* bid_amounts = spot->bid_amount();
+        if (bid_amounts) {
+            size_t length = bid_amounts->Length();
+            result->bid_amount.resize(length);
+            for (size_t i = 0; i < length; i++) {
+                result->bid_amount[i] = bid_amounts->Get(i);
+            }
+        }
+
+        auto* asks = spot->ask();
+        if (asks) {
+            size_t length = asks->Length();
+            result->ask.resize(length);
+            for (size_t i = 0; i < length; i++) {
+                result->ask[i] = asks->Get(i);
+            }
+        }
+
+        auto* asks_amounts = spot->ask_amount();
+        if (asks_amounts) {
+            size_t length = asks_amounts->Length();
+            result->ask_amount.resize(length);
+            for (size_t i = 0; i < length; i++) {
+                result->ask_amount[i] = asks_amounts->Get(i);
+            }
+        }
 
     } catch (std::exception& e) {
         result = nullptr;
@@ -162,7 +177,7 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     for (auto& task : tasks) {
         task.get();
     }
-    HKU_TRACE_IF(m_print, "received count: {}", total);
+    HKU_INFO_IF(m_print, "received count: {}", total);
     for (const auto& postProcess : m_postProcessList) {
         postProcess(ms_start_rev_time);
     }

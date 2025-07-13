@@ -102,147 +102,115 @@ class Spot(object):
         return 0.0
 
     # Spot
-    def Bid1(self):
+    def Bid(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
+            a = self._tab.Vector(o)
+            return self._tab.Get(flatbuffers.number_types.Float64Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8))
+        return 0
 
     # Spot
-    def Bid1Amount(self):
+    def BidAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
+        if o != 0:
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Float64Flags, o)
+        return 0
+
+    # Spot
+    def BidLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Spot
+    def BidIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
+        return o == 0
+
+    # Spot
+    def BidAmount(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(28))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
+            a = self._tab.Vector(o)
+            return self._tab.Get(flatbuffers.number_types.Float64Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8))
+        return 0
 
     # Spot
-    def Bid2(self):
+    def BidAmountAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(28))
+        if o != 0:
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Float64Flags, o)
+        return 0
+
+    # Spot
+    def BidAmountLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(28))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Spot
+    def BidAmountIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(28))
+        return o == 0
+
+    # Spot
+    def Ask(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(30))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
+            a = self._tab.Vector(o)
+            return self._tab.Get(flatbuffers.number_types.Float64Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8))
+        return 0
 
     # Spot
-    def Bid2Amount(self):
+    def AskAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(30))
+        if o != 0:
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Float64Flags, o)
+        return 0
+
+    # Spot
+    def AskLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(30))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Spot
+    def AskIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(30))
+        return o == 0
+
+    # Spot
+    def AskAmount(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(32))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
+            a = self._tab.Vector(o)
+            return self._tab.Get(flatbuffers.number_types.Float64Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8))
+        return 0
 
     # Spot
-    def Bid3(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(34))
+    def AskAmountAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(32))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Float64Flags, o)
+        return 0
 
     # Spot
-    def Bid3Amount(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(36))
+    def AskAmountLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(32))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
+            return self._tab.VectorLen(o)
+        return 0
 
     # Spot
-    def Bid4(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(38))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Bid4Amount(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(40))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Bid5(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(42))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Bid5Amount(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(44))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Ask1(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(46))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Ask1Amount(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(48))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Ask2(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(50))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Ask2Amount(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(52))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Ask3(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(54))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Ask3Amount(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(56))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Ask4(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(58))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Ask4Amount(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(60))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Ask5(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(62))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
-
-    # Spot
-    def Ask5Amount(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(64))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
-        return 0.0
+    def AskAmountIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(32))
+        return o == 0
 
 def SpotStart(builder):
-    builder.StartObject(31)
+    builder.StartObject(15)
 
 def Start(builder):
     SpotStart(builder)
@@ -313,125 +281,53 @@ def SpotAddVolume(builder, volume):
 def AddVolume(builder, volume):
     SpotAddVolume(builder, volume)
 
-def SpotAddBid1(builder, bid1):
-    builder.PrependFloat64Slot(11, bid1, 0.0)
+def SpotAddBid(builder, bid):
+    builder.PrependUOffsetTRelativeSlot(11, flatbuffers.number_types.UOffsetTFlags.py_type(bid), 0)
 
-def AddBid1(builder, bid1):
-    SpotAddBid1(builder, bid1)
+def AddBid(builder, bid):
+    SpotAddBid(builder, bid)
 
-def SpotAddBid1Amount(builder, bid1Amount):
-    builder.PrependFloat64Slot(12, bid1Amount, 0.0)
+def SpotStartBidVector(builder, numElems):
+    return builder.StartVector(8, numElems, 8)
 
-def AddBid1Amount(builder, bid1Amount):
-    SpotAddBid1Amount(builder, bid1Amount)
+def StartBidVector(builder, numElems):
+    return SpotStartBidVector(builder, numElems)
 
-def SpotAddBid2(builder, bid2):
-    builder.PrependFloat64Slot(13, bid2, 0.0)
+def SpotAddBidAmount(builder, bidAmount):
+    builder.PrependUOffsetTRelativeSlot(12, flatbuffers.number_types.UOffsetTFlags.py_type(bidAmount), 0)
 
-def AddBid2(builder, bid2):
-    SpotAddBid2(builder, bid2)
+def AddBidAmount(builder, bidAmount):
+    SpotAddBidAmount(builder, bidAmount)
 
-def SpotAddBid2Amount(builder, bid2Amount):
-    builder.PrependFloat64Slot(14, bid2Amount, 0.0)
+def SpotStartBidAmountVector(builder, numElems):
+    return builder.StartVector(8, numElems, 8)
 
-def AddBid2Amount(builder, bid2Amount):
-    SpotAddBid2Amount(builder, bid2Amount)
+def StartBidAmountVector(builder, numElems):
+    return SpotStartBidAmountVector(builder, numElems)
 
-def SpotAddBid3(builder, bid3):
-    builder.PrependFloat64Slot(15, bid3, 0.0)
+def SpotAddAsk(builder, ask):
+    builder.PrependUOffsetTRelativeSlot(13, flatbuffers.number_types.UOffsetTFlags.py_type(ask), 0)
 
-def AddBid3(builder, bid3):
-    SpotAddBid3(builder, bid3)
+def AddAsk(builder, ask):
+    SpotAddAsk(builder, ask)
 
-def SpotAddBid3Amount(builder, bid3Amount):
-    builder.PrependFloat64Slot(16, bid3Amount, 0.0)
+def SpotStartAskVector(builder, numElems):
+    return builder.StartVector(8, numElems, 8)
 
-def AddBid3Amount(builder, bid3Amount):
-    SpotAddBid3Amount(builder, bid3Amount)
+def StartAskVector(builder, numElems):
+    return SpotStartAskVector(builder, numElems)
 
-def SpotAddBid4(builder, bid4):
-    builder.PrependFloat64Slot(17, bid4, 0.0)
+def SpotAddAskAmount(builder, askAmount):
+    builder.PrependUOffsetTRelativeSlot(14, flatbuffers.number_types.UOffsetTFlags.py_type(askAmount), 0)
 
-def AddBid4(builder, bid4):
-    SpotAddBid4(builder, bid4)
+def AddAskAmount(builder, askAmount):
+    SpotAddAskAmount(builder, askAmount)
 
-def SpotAddBid4Amount(builder, bid4Amount):
-    builder.PrependFloat64Slot(18, bid4Amount, 0.0)
+def SpotStartAskAmountVector(builder, numElems):
+    return builder.StartVector(8, numElems, 8)
 
-def AddBid4Amount(builder, bid4Amount):
-    SpotAddBid4Amount(builder, bid4Amount)
-
-def SpotAddBid5(builder, bid5):
-    builder.PrependFloat64Slot(19, bid5, 0.0)
-
-def AddBid5(builder, bid5):
-    SpotAddBid5(builder, bid5)
-
-def SpotAddBid5Amount(builder, bid5Amount):
-    builder.PrependFloat64Slot(20, bid5Amount, 0.0)
-
-def AddBid5Amount(builder, bid5Amount):
-    SpotAddBid5Amount(builder, bid5Amount)
-
-def SpotAddAsk1(builder, ask1):
-    builder.PrependFloat64Slot(21, ask1, 0.0)
-
-def AddAsk1(builder, ask1):
-    SpotAddAsk1(builder, ask1)
-
-def SpotAddAsk1Amount(builder, ask1Amount):
-    builder.PrependFloat64Slot(22, ask1Amount, 0.0)
-
-def AddAsk1Amount(builder, ask1Amount):
-    SpotAddAsk1Amount(builder, ask1Amount)
-
-def SpotAddAsk2(builder, ask2):
-    builder.PrependFloat64Slot(23, ask2, 0.0)
-
-def AddAsk2(builder, ask2):
-    SpotAddAsk2(builder, ask2)
-
-def SpotAddAsk2Amount(builder, ask2Amount):
-    builder.PrependFloat64Slot(24, ask2Amount, 0.0)
-
-def AddAsk2Amount(builder, ask2Amount):
-    SpotAddAsk2Amount(builder, ask2Amount)
-
-def SpotAddAsk3(builder, ask3):
-    builder.PrependFloat64Slot(25, ask3, 0.0)
-
-def AddAsk3(builder, ask3):
-    SpotAddAsk3(builder, ask3)
-
-def SpotAddAsk3Amount(builder, ask3Amount):
-    builder.PrependFloat64Slot(26, ask3Amount, 0.0)
-
-def AddAsk3Amount(builder, ask3Amount):
-    SpotAddAsk3Amount(builder, ask3Amount)
-
-def SpotAddAsk4(builder, ask4):
-    builder.PrependFloat64Slot(27, ask4, 0.0)
-
-def AddAsk4(builder, ask4):
-    SpotAddAsk4(builder, ask4)
-
-def SpotAddAsk4Amount(builder, ask4Amount):
-    builder.PrependFloat64Slot(28, ask4Amount, 0.0)
-
-def AddAsk4Amount(builder, ask4Amount):
-    SpotAddAsk4Amount(builder, ask4Amount)
-
-def SpotAddAsk5(builder, ask5):
-    builder.PrependFloat64Slot(29, ask5, 0.0)
-
-def AddAsk5(builder, ask5):
-    SpotAddAsk5(builder, ask5)
-
-def SpotAddAsk5Amount(builder, ask5Amount):
-    builder.PrependFloat64Slot(30, ask5Amount, 0.0)
-
-def AddAsk5Amount(builder, ask5Amount):
-    SpotAddAsk5Amount(builder, ask5Amount)
+def StartAskAmountVector(builder, numElems):
+    return SpotStartAskAmountVector(builder, numElems)
 
 def SpotEnd(builder):
     return builder.EndObject()
