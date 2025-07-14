@@ -85,7 +85,6 @@ def parse_one_result_qq(resultstr):
     for i in range(9, 18, 2):
         bid.append(float(a[i]))
         bid_amount.append(float(a[i + 1]))
-    bid_amount.append(float(a[10]))
     result['bid'] = bid
     result['bid_amount'] = bid_amount
     ask = []
