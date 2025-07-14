@@ -28,6 +28,7 @@ import hashlib
 import sqlite3
 import urllib.request
 import mysql.connector
+import clickhouse_connect
 
 from pytdx.hq import TdxHq_API
 from hikyuu.data.common import MARKET, g_market_list
@@ -37,6 +38,8 @@ from hikyuu.data.pytdx_weight_to_sqlite import pytdx_import_weight_to_sqlite
 from hikyuu.data.pytdx_weight_to_mysql import pytdx_import_weight_to_mysql
 from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance_to_sqlite
 from hikyuu.data.pytdx_finance_to_mysql import pytdx_import_finance_to_mysql
+from hikyuu.data.pytdx_finance_to_clickhouse import pytdx_import_finance_to_clickhouse
+from hikyuu.data.pytdx_weight_to_clickhouse import pytdx_import_weight_to_clickhouse
 from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
 from hikyuu.util.check import hku_catch, hku_check
 
@@ -78,6 +81,17 @@ class ImportWeightToSqliteTask:
                 pytdx_import_weight = pytdx_import_weight_to_mysql
                 pytdx_import_finance = pytdx_import_finance_to_mysql
                 self.logger.debug('use mysql import weight')
+            elif self.config.getboolean('clickhouse', 'enable', fallback=True):
+                db_config = {
+                    'username': self.config['clickhouse']['usr'],
+                    'password': self.config['clickhouse']['pwd'],
+                    'host': self.config['clickhouse']['host'],
+                    'port': self.config['clickhouse']['http_port']
+                }
+                connect = clickhouse_connect.get_client(**db_config)
+                pytdx_import_weight = pytdx_import_weight_to_clickhouse
+                pytdx_import_finance = pytdx_import_finance_to_clickhouse
+                self.logger.debug('use clickhouse import weight')
 
         except Exception as e:
             # self.queue.put([self.msg_name, str(e), -1, 0, total_count])
@@ -108,7 +122,6 @@ class ImportWeightToSqliteTask:
             self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])
         finally:
             api.close()
-            connect.commit()
             connect.close()
 
         self.queue.put([self.msg_name, '', 0, None, total_count])

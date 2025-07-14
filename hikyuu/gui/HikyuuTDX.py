@@ -22,6 +22,8 @@ import mysql.connector
 from mysql.connector import errorcode
 from mysql.connector.locales.eng import client_error  # 此句仅为pyinstaller打包时能够自动引入
 
+import clickhouse_connect
+
 from hikyuu.gui.data.MainWindow import *
 from hikyuu.gui.data.EscapetimeThread import EscapetimeThread
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
@@ -161,6 +163,49 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         port=current_config['mysql']['port'],
                         usr=current_config['mysql']['usr'],
                         pwd=current_config['mysql']['pwd'],
+                        day=current_config.getboolean('preload', 'day', fallback=True),
+                        week=current_config.getboolean('preload', 'week', fallback=False),
+                        month=current_config.getboolean('preload', 'month', fallback=False),
+                        quarter=current_config.getboolean('preload', 'quarter', fallback=False),
+                        halfyear=current_config.getboolean('preload', 'halfyear', fallback=False),
+                        year=current_config.getboolean('preload', 'year', fallback=False),
+                        min1=current_config.getboolean('preload', 'min', fallback=False),
+                        min5=current_config.getboolean('preload', 'min5', fallback=False),
+                        min15=current_config.getboolean('preload', 'min15', fallback=False),
+                        min30=current_config.getboolean('preload', 'min30', fallback=False),
+                        min60=current_config.getboolean('preload', 'min60', fallback=False),
+                        hour2=current_config.getboolean('preload', 'hour2', fallback=False),
+                        day_max=current_config.getint('preload', 'day_max', fallback=100000),
+                        week_max=current_config.getint('preload', 'week_max', fallback=100000),
+                        month_max=current_config.getint('preload', 'month_max', fallback=100000),
+                        quarter_max=current_config.getint('preload', 'quarter_max', fallback=100000),
+                        halfyear_max=current_config.getint('preload', 'halfyear_max', fallback=100000),
+                        year_max=current_config.getint('preload', 'year_max', fallback=100000),
+                        min1_max=current_config.getint('preload', 'min_max', fallback=4096),
+                        min5_max=current_config.getint('preload', 'min5_max', fallback=4096),
+                        min15_max=current_config.getint('preload', 'min15_max', fallback=4096),
+                        min30_max=current_config.getint('preload', 'min30_max', fallback=4096),
+                        min60_max=current_config.getint('preload', 'min60_max', fallback=4096),
+                        hour2_max=current_config.getint('preload', 'hour2_max', fallback=4096),
+                    )
+                )
+        elif current_config.getboolean('clickhouse', 'enable', fallback=True):
+            data_dir = current_config['clickhouse']['tmpdir']
+            if not os.path.lexists(data_dir + '/tmp'):
+                try:
+                    os.mkdir(data_dir + '/tmp')
+                except:
+                    pass
+            with open(filename, 'w', encoding="utf-8") as f:
+                f.write(
+                    hku_config_template.clickhouse_template.format(
+                        dir=data_dir,
+                        quotation_server=current_config.get(
+                            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
+                        host=current_config['clickhouse']['host'],
+                        port=current_config['clickhouse']['port'],
+                        usr=current_config['clickhouse']['usr'],
+                        pwd=current_config['clickhouse']['pwd'],
                         day=current_config.getboolean('preload', 'day', fallback=True),
                         week=current_config.getboolean('preload', 'week', fallback=False),
                         month=current_config.getboolean('preload', 'month', fallback=False),
@@ -385,6 +430,30 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_pwd_lineEdit.setEnabled(mysql_enable)
         self.mysql_test_pushButton.setEnabled(mysql_enable)
 
+        # 初始化clickhouse设置
+        clickhouse_enable = import_config.getboolean('clickhouse', 'enable', fallback=False)
+        if (not is_valid_license()) or hdf5_enable or mysql_enable:
+            clickhouse_enable = False
+        self.enable_clickhouse_radioButton.setChecked(clickhouse_enable)
+        self.clickhouse_tmpdir_lineEdit.setText(import_config.get('clickhouse', 'tmpdir', fallback='d:/stock'))
+        self.clickhouse_tmpdir_pushButton.setEnabled(clickhouse_enable)
+        clickhouse_ip = import_config.get('clickhouse', 'host', fallback='127.0.0.1')
+        self.clickhouse_ip_lineEdit.setText(clickhouse_ip)
+        self.clickhouse_ip_lineEdit.setEnabled(clickhouse_enable)
+        clickhouse_port = import_config.get('clickhouse', 'port', fallback='9000')
+        self.clickhouse_port_lineEdit.setText(clickhouse_port)
+        self.clickhouse_port_lineEdit.setEnabled(clickhouse_enable)
+        clickhouse_http_port = import_config.get('clickhouse', 'http_port', fallback='8123')
+        self.clickhouse_http_port_lineEdit.setText(clickhouse_http_port)
+        self.clickhouse_http_port_lineEdit.setEnabled(clickhouse_enable)
+        clickhouse_usr = import_config.get('clickhouse', 'usr', fallback='default')
+        self.clickhouse_usr_lineEdit.setText(clickhouse_usr)
+        self.clickhouse_usr_lineEdit.setEnabled(clickhouse_enable)
+        clickhouse_pwd = import_config.get('clickhouse', 'pwd', fallback='test')
+        self.clickhouse_pwd_lineEdit.setText(clickhouse_pwd)
+        self.clickhouse_pwd_lineEdit.setEnabled(clickhouse_enable)
+        self.clickhouse_test_pushButton.setEnabled(clickhouse_enable)
+
         self.sched_import_timeEdit.setTime(
             datetime.time.fromisoformat(import_config.get('schec', 'time', fallback='18:00'))
         )
@@ -485,6 +554,15 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'port': self.mysql_port_lineEdit.text(),
             'usr': self.mysql_usr_lineEdit.text(),
             'pwd': self.mysql_pwd_lineEdit.text()
+        }
+        import_config['clickhouse'] = {
+            'enable': is_valid_license() and self.enable_clickhouse_radioButton.isChecked(),
+            'tmpdir': self.clickhouse_tmpdir_lineEdit.text(),
+            'host': self.clickhouse_ip_lineEdit.text(),
+            'http_port': self.clickhouse_http_port_lineEdit.text(),
+            'port': self.clickhouse_port_lineEdit.text(),
+            'usr': self.clickhouse_usr_lineEdit.text(),
+            'pwd': self.clickhouse_pwd_lineEdit.text()
         }
         import_config['sched'] = {
             'time': self.sched_import_timeEdit.time().toString(),
@@ -623,15 +701,24 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_enable_hdf55_radioButton_clicked(self):
         if self.enable_hdf55_radioButton.isChecked():
             self.enable_mysql_radioButton.setChecked(False)
-        self.on_enable_database_toggled(hdf5=True, mysql=False)
+            self.enable_clickhouse_radioButton.setChecked(False)
+        self.on_enable_database_toggled(hdf5=True, mysql=False, clickhouse=False)
 
     @pyqtSlot()
     def on_enable_mysql_radioButton_clicked(self):
         if self.enable_mysql_radioButton.isChecked():
             self.enable_hdf55_radioButton.setChecked(False)
-        self.on_enable_database_toggled(hdf5=False, mysql=True)
+            self.enable_clickhouse_radioButton.setChecked(False)
+        self.on_enable_database_toggled(hdf5=False, mysql=True, clickhouse=False)
 
-    def on_enable_database_toggled(self, hdf5, mysql):
+    @pyqtSlot()
+    def on_enable_clickhouse_radioButton_clicked(self):
+        if self.enable_clickhouse_radioButton.isChecked():
+            self.enable_hdf55_radioButton.setChecked(False)
+            self.enable_mysql_radioButton.setChecked(False)
+        self.on_enable_database_toggled(hdf5=False, mysql=False, clickhouse=True)
+
+    def on_enable_database_toggled(self, hdf5, mysql, clickhouse):
         self.hdf5_dir_lineEdit.setEnabled(hdf5)
         self.mysql_ip_lineEdit.setEnabled(mysql)
         self.mysql_port_lineEdit.setEnabled(mysql)
@@ -639,6 +726,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_pwd_lineEdit.setEnabled(mysql)
         self.mysql_test_pushButton.setEnabled(mysql)
         self.mysql_tmpdir_pushButton.setEnabled(mysql)
+        self.clickhouse_ip_lineEdit.setEnabled(clickhouse)
+        self.clickhouse_http_port_lineEdit.setEnabled(clickhouse)
+        self.clickhouse_port_lineEdit.setEnabled(clickhouse)
+        self.clickhouse_usr_lineEdit.setEnabled(clickhouse)
+        self.clickhouse_pwd_lineEdit.setEnabled(clickhouse)
+        self.clickhouse_test_pushButton.setEnabled(clickhouse)
+        self.clickhouse_tmpdir_pushButton.setEnabled(clickhouse)
 
     @pyqtSlot()
     def on_mysql_tmpdir_pushButton_clicked(self):
@@ -649,6 +743,20 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if dlg.exec_():
             dirname = dlg.selectedFiles()
             self.mysql_tmpdir_lineEdit.setText(dirname[0])
+
+    @pyqtSlot()
+    def on_clickhouse_tmpdir_pushButton_clicked(self):
+        if not is_valid_license():
+            QMessageBox.critical(self, "clickhouse引擎", "需要捐赠授权才能使用clickhouse引擎")
+            return
+
+        dlg = QFileDialog()
+        dlg.setFileMode(QFileDialog.Directory)
+        config = self.getCurrentConfig()
+        dlg.setDirectory(config['clickhouse']['tmpdir'])
+        if dlg.exec_():
+            dirname = dlg.selectedFiles()
+            self.clickhouse_tmpdir_lineEdit.setText(dirname[0])
 
     @pyqtSlot()
     def on_mysql_test_pushButton_clicked(self):
@@ -670,6 +778,25 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 QMessageBox.critical(self, "测试数据库连接", "MySQL数据库不存在！")
             else:
                 QMessageBox.critical(self, "测试数据库连接", err.msg)
+            return
+
+        QMessageBox.about(self, "测试数据库连接", " 连接成功！")
+
+    @pyqtSlot()
+    def on_clickhouse_test_pushButton_clicked(self):
+        """测试数据库连接"""
+        db_config = {
+            'username': self.clickhouse_usr_lineEdit.text(),
+            'password': self.clickhouse_pwd_lineEdit.text(),
+            'host': self.clickhouse_ip_lineEdit.text(),
+            'port': self.clickhouse_http_port_lineEdit.text()
+        }
+
+        try:
+            cnx = clickhouse_connect.get_client(**db_config)
+            cnx.close()
+        except Exception as err:
+            QMessageBox.critical(self, "测试数据库连接失败", str(err))
             return
 
         QMessageBox.about(self, "测试数据库连接", " 连接成功！")

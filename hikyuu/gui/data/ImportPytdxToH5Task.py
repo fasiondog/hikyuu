@@ -28,6 +28,7 @@ import mysql.connector
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_data as h5_import_data
 from hikyuu.data.pytdx_to_mysql import import_data as mysql_import_data
+from hikyuu.data.pytdx_to_clickhouse import import_data as clickhouse_import_data
 from hikyuu.util import *
 
 
@@ -76,6 +77,17 @@ class ImportPytdxToH5:
             connect = mysql.connector.connect(**db_config)
             import_data = mysql_import_data
             self.logger.debug('use mysql import kdata')
+        elif self.config.getboolean('clickhouse', 'enable', fallback=True):
+            db_config = {
+                'username': self.config['clickhouse']['usr'],
+                'password': self.config['clickhouse']['pwd'],
+                'host': self.config['clickhouse']['host'],
+                'port': int(self.config['clickhouse']['http_port'])
+            }
+            import clickhouse_connect
+            connect = clickhouse_connect.get_client(**db_config)
+            import_data = clickhouse_import_data
+            self.logger.debug('use mysql import kdata')
 
         count = 0
         try:
@@ -93,7 +105,6 @@ class ImportPytdxToH5:
             # self.queue.put([self.task_name, self.market, self.ktype, str(e), count])
         finally:
             api.close()
-            connect.commit()
             connect.close()
 
         self.queue.put([self.task_name, self.market, self.ktype, None, count])

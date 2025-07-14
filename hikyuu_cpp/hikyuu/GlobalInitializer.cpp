@@ -93,16 +93,26 @@ void GlobalInitializer::clean() {
     }
 #endif
 
-    releaseScheduler();
-    releaseGlobalSpotAgent();
-
-    IndicatorImp::releaseDynEngine();
-
+#if HKU_OS_OSX
     // 主动停止异步数据加载任务组，否则 hdf5 在 linux 下会报关闭异常
     auto *tg = StockManager::instance().getLoadTaskGroup();
     if (tg) {
         tg->stop();
     }
+#endif
+
+    releaseScheduler();
+    releaseGlobalSpotAgent();
+
+    IndicatorImp::releaseDynEngine();
+
+#if !HKU_OS_OSX
+    // 主动停止异步数据加载任务组，否则 hdf5 在 linux 下会报关闭异常
+    auto *tg = StockManager::instance().getLoadTaskGroup();
+    if (tg) {
+        tg->stop();
+    }
+#endif
 
 #if HKU_ENABLE_TA_LIB
     TA_Shutdown();
