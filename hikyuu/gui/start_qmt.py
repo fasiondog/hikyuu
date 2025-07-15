@@ -38,6 +38,10 @@ if __name__ == "__main__":
     hku_param["datadir"] = ini.get('hikyuu', 'datadir')
     if ini.has_option('hikyuu', 'quotation_server'):
         hku_param["quotation_server"] = ini['hikyuu']['quotation_server']
+    if ini.has_option('hikyuu', 'plugindir'):
+        hku_param["plugindir"] = ini.get('hikyuu', 'plugindir')
+    else:
+        hku_param["plugindir"] = plugin_path
 
     # 不加载历史财务信息及权息数据
     hku_param["load_history_finance"] = False
