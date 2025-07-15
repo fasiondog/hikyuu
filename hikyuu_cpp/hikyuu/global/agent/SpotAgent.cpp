@@ -101,7 +101,7 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
         result->volume = spot->volume();
         auto* bids = spot->bid();
         if (bids) {
-            size_t length = bids->Length();
+            size_t length = bids->size();
             result->bid.resize(length);
             for (size_t i = 0; i < length; i++) {
                 result->bid[i] = bids->Get(i);
@@ -110,7 +110,7 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
 
         auto* bid_amounts = spot->bid_amount();
         if (bid_amounts) {
-            size_t length = bid_amounts->Length();
+            size_t length = bid_amounts->size();
             result->bid_amount.resize(length);
             for (size_t i = 0; i < length; i++) {
                 result->bid_amount[i] = bid_amounts->Get(i);
@@ -119,7 +119,7 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
 
         auto* asks = spot->ask();
         if (asks) {
-            size_t length = asks->Length();
+            size_t length = asks->size();
             result->ask.resize(length);
             for (size_t i = 0; i < length; i++) {
                 result->ask[i] = asks->Get(i);
@@ -128,7 +128,7 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
 
         auto* asks_amounts = spot->ask_amount();
         if (asks_amounts) {
-            size_t length = asks_amounts->Length();
+            size_t length = asks_amounts->size();
             result->ask_amount.resize(length);
             for (size_t i = 0; i < length; i++) {
                 result->ask_amount[i] = asks_amounts->Get(i);
