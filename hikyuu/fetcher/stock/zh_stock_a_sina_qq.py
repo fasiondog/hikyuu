@@ -80,26 +80,21 @@ def parse_one_result_qq(resultstr):
     # result['amount'] = float(a[6])  # 成交量
     # 7: 外盘 ？
     # 8：内盘 ？
-    result['bid1'] = float(a[9])  # “买一”报价
-    result['bid1_amount'] = float(a[10])  # “买一”申请4695股，即47手
-    result['bid2'] = float(a[11])
-    result['bid2_amount'] = float(a[12])
-    result['bid3'] = float(a[13])
-    result['bid3_amount'] = float(a[14])
-    result['bid4'] = float(a[15])
-    result['bid4_amount'] = float(a[16])
-    result['bid5'] = float(a[17])
-    result['bid5_amount'] = float(a[18])
-    result['ask1'] = float(a[19])  # “卖一”报价
-    result['ask1_amount'] = float(a[20])  # “卖一”申报3100股，即31手
-    result['ask2'] = float(a[21])
-    result['ask2_amount'] = float(a[22])
-    result['ask3'] = float(a[23])
-    result['ask3_amount'] = float(a[24])
-    result['ask4'] = float(a[25])
-    result['ask4_amount'] = float(a[26])
-    result['ask5'] = float(a[27])
-    result['ask5_amount'] = float(a[28])
+    bid = []
+    bid_amount = []
+    for i in range(9, 18, 2):
+        bid.append(float(a[i]))
+        bid_amount.append(float(a[i + 1]))
+    result['bid'] = bid
+    result['bid_amount'] = bid_amount
+    ask = []
+    ask_amount = []
+    for i in range(19, 28, 2):
+        ask.append(float(a[i]))
+        ask_amount.append(float(a[i + 1]))
+    result['ask'] = ask
+    result['ask_amount'] = ask_amount
+
     # result['最近逐笔成交'] = float(a[29])
     x = a[30]
     result['datetime'] = datetime.datetime(
@@ -139,46 +134,6 @@ def request_data(querystr, parse_one_result, use_proxy=False):
     return result
 
 
-def get_spotV1(stocklist, source='qq', use_proxy=False, batch_func=None):
-    """获取实时数据，获取失败时，抛出异常
-
-    :param list stocklist: 股票名称列表，股票名称示例：sh000001, sz000001
-    :param str source: 使用 sina 还是 qq 作为数据来源
-    :param boolean: use_proxy: 是否使用代理
-    :param function batch_func: 当网络请求返回一个批次数据时，调用该函数，通常用于向数据库写入数据
-    """
-    if source == 'sina':
-        queryStr = "http://hq.sinajs.cn/list="
-        max_size = 140
-        parse_one_result = parse_one_result_sina
-        hku_error("新浪接口已不再支持！")
-    else:
-        queryStr = "http://qt.gtimg.cn/q="
-        max_size = 60
-        parse_one_result = parse_one_result_qq
-    count = 0
-    tmpstr = queryStr
-    result = []
-    for stock in stocklist:
-        tmpstr += ("%s,") % (stock)
-        count += 1
-        if count >= max_size:
-            phase_result = request_data(tmpstr, parse_one_result, use_proxy)
-            if phase_result:
-                result.extend(phase_result)
-                if batch_func:
-                    batch_func(phase_result)
-            count = 0
-            tmpstr = queryStr
-    if tmpstr != queryStr:
-        phase_result = request_data(tmpstr, parse_one_result, use_proxy)
-        if phase_result:
-            result.extend(phase_result)
-            if batch_func:
-                batch_func(phase_result)
-    return result
-
-
 def get_spot(stocklist, source='sina', use_proxy=False, batch_func=None):
     """并发网络请求获取实时数据，获取失败时，抛出异常
 
@@ -188,6 +143,7 @@ def get_spot(stocklist, source='sina', use_proxy=False, batch_func=None):
     :param function batch_func: 当网络请求返回一个批次数据时，调用该函数，通常用于向数据库写入数据
     """
     if source == 'sina':
+        raise Exception("新浪数据源已不支持")
         queryStr = "http://hq.sinajs.cn/list="
         max_size = 140
         parse_one_result = parse_one_result_sina

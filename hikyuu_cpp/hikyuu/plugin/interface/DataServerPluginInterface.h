@@ -16,7 +16,8 @@ public:
     DataServerPluginInterface() = default;
     virtual ~DataServerPluginInterface() = default;
 
-    virtual void start(const std::string& addr, size_t work_num) noexcept = 0;
+    virtual void start(const std::string& addr, size_t work_num, bool save_tick,
+                       bool buf_tick) noexcept = 0;
     virtual void stop() noexcept = 0;
 };
 

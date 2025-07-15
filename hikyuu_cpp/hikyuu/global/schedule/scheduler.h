@@ -14,7 +14,7 @@ namespace hku {
 /**
  * 获取全局调度实例指针
  */
-TimerManager *getScheduler();
+HKU_API TimerManager* getScheduler();
 
 /**
  * 用于程序退出时释放全局调度实例，仅内部使用

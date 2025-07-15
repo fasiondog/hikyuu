@@ -36,26 +36,10 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_CLOSE = 20,
     VT_AMOUNT = 22,
     VT_VOLUME = 24,
-    VT_BID1 = 26,
-    VT_BID1_AMOUNT = 28,
-    VT_BID2 = 30,
-    VT_BID2_AMOUNT = 32,
-    VT_BID3 = 34,
-    VT_BID3_AMOUNT = 36,
-    VT_BID4 = 38,
-    VT_BID4_AMOUNT = 40,
-    VT_BID5 = 42,
-    VT_BID5_AMOUNT = 44,
-    VT_ASK1 = 46,
-    VT_ASK1_AMOUNT = 48,
-    VT_ASK2 = 50,
-    VT_ASK2_AMOUNT = 52,
-    VT_ASK3 = 54,
-    VT_ASK3_AMOUNT = 56,
-    VT_ASK4 = 58,
-    VT_ASK4_AMOUNT = 60,
-    VT_ASK5 = 62,
-    VT_ASK5_AMOUNT = 64
+    VT_BID = 26,
+    VT_BID_AMOUNT = 28,
+    VT_ASK = 30,
+    VT_ASK_AMOUNT = 32
   };
   const ::flatbuffers::String *market() const {
     return GetPointer<const ::flatbuffers::String *>(VT_MARKET);
@@ -90,65 +74,17 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   double volume() const {
     return GetField<double>(VT_VOLUME, 0.0);
   }
-  double bid1() const {
-    return GetField<double>(VT_BID1, 0.0);
+  const ::flatbuffers::Vector<double> *bid() const {
+    return GetPointer<const ::flatbuffers::Vector<double> *>(VT_BID);
   }
-  double bid1_amount() const {
-    return GetField<double>(VT_BID1_AMOUNT, 0.0);
+  const ::flatbuffers::Vector<double> *bid_amount() const {
+    return GetPointer<const ::flatbuffers::Vector<double> *>(VT_BID_AMOUNT);
   }
-  double bid2() const {
-    return GetField<double>(VT_BID2, 0.0);
+  const ::flatbuffers::Vector<double> *ask() const {
+    return GetPointer<const ::flatbuffers::Vector<double> *>(VT_ASK);
   }
-  double bid2_amount() const {
-    return GetField<double>(VT_BID2_AMOUNT, 0.0);
-  }
-  double bid3() const {
-    return GetField<double>(VT_BID3, 0.0);
-  }
-  double bid3_amount() const {
-    return GetField<double>(VT_BID3_AMOUNT, 0.0);
-  }
-  double bid4() const {
-    return GetField<double>(VT_BID4, 0.0);
-  }
-  double bid4_amount() const {
-    return GetField<double>(VT_BID4_AMOUNT, 0.0);
-  }
-  double bid5() const {
-    return GetField<double>(VT_BID5, 0.0);
-  }
-  double bid5_amount() const {
-    return GetField<double>(VT_BID5_AMOUNT, 0.0);
-  }
-  double ask1() const {
-    return GetField<double>(VT_ASK1, 0.0);
-  }
-  double ask1_amount() const {
-    return GetField<double>(VT_ASK1_AMOUNT, 0.0);
-  }
-  double ask2() const {
-    return GetField<double>(VT_ASK2, 0.0);
-  }
-  double ask2_amount() const {
-    return GetField<double>(VT_ASK2_AMOUNT, 0.0);
-  }
-  double ask3() const {
-    return GetField<double>(VT_ASK3, 0.0);
-  }
-  double ask3_amount() const {
-    return GetField<double>(VT_ASK3_AMOUNT, 0.0);
-  }
-  double ask4() const {
-    return GetField<double>(VT_ASK4, 0.0);
-  }
-  double ask4_amount() const {
-    return GetField<double>(VT_ASK4_AMOUNT, 0.0);
-  }
-  double ask5() const {
-    return GetField<double>(VT_ASK5, 0.0);
-  }
-  double ask5_amount() const {
-    return GetField<double>(VT_ASK5_AMOUNT, 0.0);
+  const ::flatbuffers::Vector<double> *ask_amount() const {
+    return GetPointer<const ::flatbuffers::Vector<double> *>(VT_ASK_AMOUNT);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -167,26 +103,14 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<double>(verifier, VT_CLOSE, 8) &&
            VerifyField<double>(verifier, VT_AMOUNT, 8) &&
            VerifyField<double>(verifier, VT_VOLUME, 8) &&
-           VerifyField<double>(verifier, VT_BID1, 8) &&
-           VerifyField<double>(verifier, VT_BID1_AMOUNT, 8) &&
-           VerifyField<double>(verifier, VT_BID2, 8) &&
-           VerifyField<double>(verifier, VT_BID2_AMOUNT, 8) &&
-           VerifyField<double>(verifier, VT_BID3, 8) &&
-           VerifyField<double>(verifier, VT_BID3_AMOUNT, 8) &&
-           VerifyField<double>(verifier, VT_BID4, 8) &&
-           VerifyField<double>(verifier, VT_BID4_AMOUNT, 8) &&
-           VerifyField<double>(verifier, VT_BID5, 8) &&
-           VerifyField<double>(verifier, VT_BID5_AMOUNT, 8) &&
-           VerifyField<double>(verifier, VT_ASK1, 8) &&
-           VerifyField<double>(verifier, VT_ASK1_AMOUNT, 8) &&
-           VerifyField<double>(verifier, VT_ASK2, 8) &&
-           VerifyField<double>(verifier, VT_ASK2_AMOUNT, 8) &&
-           VerifyField<double>(verifier, VT_ASK3, 8) &&
-           VerifyField<double>(verifier, VT_ASK3_AMOUNT, 8) &&
-           VerifyField<double>(verifier, VT_ASK4, 8) &&
-           VerifyField<double>(verifier, VT_ASK4_AMOUNT, 8) &&
-           VerifyField<double>(verifier, VT_ASK5, 8) &&
-           VerifyField<double>(verifier, VT_ASK5_AMOUNT, 8) &&
+           VerifyOffset(verifier, VT_BID) &&
+           verifier.VerifyVector(bid()) &&
+           VerifyOffset(verifier, VT_BID_AMOUNT) &&
+           verifier.VerifyVector(bid_amount()) &&
+           VerifyOffset(verifier, VT_ASK) &&
+           verifier.VerifyVector(ask()) &&
+           VerifyOffset(verifier, VT_ASK_AMOUNT) &&
+           verifier.VerifyVector(ask_amount()) &&
            verifier.EndTable();
   }
 };
@@ -228,65 +152,17 @@ struct SpotBuilder {
   void add_volume(double volume) {
     fbb_.AddElement<double>(Spot::VT_VOLUME, volume, 0.0);
   }
-  void add_bid1(double bid1) {
-    fbb_.AddElement<double>(Spot::VT_BID1, bid1, 0.0);
+  void add_bid(::flatbuffers::Offset<::flatbuffers::Vector<double>> bid) {
+    fbb_.AddOffset(Spot::VT_BID, bid);
   }
-  void add_bid1_amount(double bid1_amount) {
-    fbb_.AddElement<double>(Spot::VT_BID1_AMOUNT, bid1_amount, 0.0);
+  void add_bid_amount(::flatbuffers::Offset<::flatbuffers::Vector<double>> bid_amount) {
+    fbb_.AddOffset(Spot::VT_BID_AMOUNT, bid_amount);
   }
-  void add_bid2(double bid2) {
-    fbb_.AddElement<double>(Spot::VT_BID2, bid2, 0.0);
+  void add_ask(::flatbuffers::Offset<::flatbuffers::Vector<double>> ask) {
+    fbb_.AddOffset(Spot::VT_ASK, ask);
   }
-  void add_bid2_amount(double bid2_amount) {
-    fbb_.AddElement<double>(Spot::VT_BID2_AMOUNT, bid2_amount, 0.0);
-  }
-  void add_bid3(double bid3) {
-    fbb_.AddElement<double>(Spot::VT_BID3, bid3, 0.0);
-  }
-  void add_bid3_amount(double bid3_amount) {
-    fbb_.AddElement<double>(Spot::VT_BID3_AMOUNT, bid3_amount, 0.0);
-  }
-  void add_bid4(double bid4) {
-    fbb_.AddElement<double>(Spot::VT_BID4, bid4, 0.0);
-  }
-  void add_bid4_amount(double bid4_amount) {
-    fbb_.AddElement<double>(Spot::VT_BID4_AMOUNT, bid4_amount, 0.0);
-  }
-  void add_bid5(double bid5) {
-    fbb_.AddElement<double>(Spot::VT_BID5, bid5, 0.0);
-  }
-  void add_bid5_amount(double bid5_amount) {
-    fbb_.AddElement<double>(Spot::VT_BID5_AMOUNT, bid5_amount, 0.0);
-  }
-  void add_ask1(double ask1) {
-    fbb_.AddElement<double>(Spot::VT_ASK1, ask1, 0.0);
-  }
-  void add_ask1_amount(double ask1_amount) {
-    fbb_.AddElement<double>(Spot::VT_ASK1_AMOUNT, ask1_amount, 0.0);
-  }
-  void add_ask2(double ask2) {
-    fbb_.AddElement<double>(Spot::VT_ASK2, ask2, 0.0);
-  }
-  void add_ask2_amount(double ask2_amount) {
-    fbb_.AddElement<double>(Spot::VT_ASK2_AMOUNT, ask2_amount, 0.0);
-  }
-  void add_ask3(double ask3) {
-    fbb_.AddElement<double>(Spot::VT_ASK3, ask3, 0.0);
-  }
-  void add_ask3_amount(double ask3_amount) {
-    fbb_.AddElement<double>(Spot::VT_ASK3_AMOUNT, ask3_amount, 0.0);
-  }
-  void add_ask4(double ask4) {
-    fbb_.AddElement<double>(Spot::VT_ASK4, ask4, 0.0);
-  }
-  void add_ask4_amount(double ask4_amount) {
-    fbb_.AddElement<double>(Spot::VT_ASK4_AMOUNT, ask4_amount, 0.0);
-  }
-  void add_ask5(double ask5) {
-    fbb_.AddElement<double>(Spot::VT_ASK5, ask5, 0.0);
-  }
-  void add_ask5_amount(double ask5_amount) {
-    fbb_.AddElement<double>(Spot::VT_ASK5_AMOUNT, ask5_amount, 0.0);
+  void add_ask_amount(::flatbuffers::Offset<::flatbuffers::Vector<double>> ask_amount) {
+    fbb_.AddOffset(Spot::VT_ASK_AMOUNT, ask_amount);
   }
   explicit SpotBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -312,47 +188,11 @@ inline ::flatbuffers::Offset<Spot> CreateSpot(
     double close = 0.0,
     double amount = 0.0,
     double volume = 0.0,
-    double bid1 = 0.0,
-    double bid1_amount = 0.0,
-    double bid2 = 0.0,
-    double bid2_amount = 0.0,
-    double bid3 = 0.0,
-    double bid3_amount = 0.0,
-    double bid4 = 0.0,
-    double bid4_amount = 0.0,
-    double bid5 = 0.0,
-    double bid5_amount = 0.0,
-    double ask1 = 0.0,
-    double ask1_amount = 0.0,
-    double ask2 = 0.0,
-    double ask2_amount = 0.0,
-    double ask3 = 0.0,
-    double ask3_amount = 0.0,
-    double ask4 = 0.0,
-    double ask4_amount = 0.0,
-    double ask5 = 0.0,
-    double ask5_amount = 0.0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<double>> bid = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<double>> bid_amount = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<double>> ask = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<double>> ask_amount = 0) {
   SpotBuilder builder_(_fbb);
-  builder_.add_ask5_amount(ask5_amount);
-  builder_.add_ask5(ask5);
-  builder_.add_ask4_amount(ask4_amount);
-  builder_.add_ask4(ask4);
-  builder_.add_ask3_amount(ask3_amount);
-  builder_.add_ask3(ask3);
-  builder_.add_ask2_amount(ask2_amount);
-  builder_.add_ask2(ask2);
-  builder_.add_ask1_amount(ask1_amount);
-  builder_.add_ask1(ask1);
-  builder_.add_bid5_amount(bid5_amount);
-  builder_.add_bid5(bid5);
-  builder_.add_bid4_amount(bid4_amount);
-  builder_.add_bid4(bid4);
-  builder_.add_bid3_amount(bid3_amount);
-  builder_.add_bid3(bid3);
-  builder_.add_bid2_amount(bid2_amount);
-  builder_.add_bid2(bid2);
-  builder_.add_bid1_amount(bid1_amount);
-  builder_.add_bid1(bid1);
   builder_.add_volume(volume);
   builder_.add_amount(amount);
   builder_.add_close(close);
@@ -360,6 +200,10 @@ inline ::flatbuffers::Offset<Spot> CreateSpot(
   builder_.add_high(high);
   builder_.add_open(open);
   builder_.add_yesterday_close(yesterday_close);
+  builder_.add_ask_amount(ask_amount);
+  builder_.add_ask(ask);
+  builder_.add_bid_amount(bid_amount);
+  builder_.add_bid(bid);
   builder_.add_datetime(datetime);
   builder_.add_name(name);
   builder_.add_code(code);
@@ -380,30 +224,18 @@ inline ::flatbuffers::Offset<Spot> CreateSpotDirect(
     double close = 0.0,
     double amount = 0.0,
     double volume = 0.0,
-    double bid1 = 0.0,
-    double bid1_amount = 0.0,
-    double bid2 = 0.0,
-    double bid2_amount = 0.0,
-    double bid3 = 0.0,
-    double bid3_amount = 0.0,
-    double bid4 = 0.0,
-    double bid4_amount = 0.0,
-    double bid5 = 0.0,
-    double bid5_amount = 0.0,
-    double ask1 = 0.0,
-    double ask1_amount = 0.0,
-    double ask2 = 0.0,
-    double ask2_amount = 0.0,
-    double ask3 = 0.0,
-    double ask3_amount = 0.0,
-    double ask4 = 0.0,
-    double ask4_amount = 0.0,
-    double ask5 = 0.0,
-    double ask5_amount = 0.0) {
+    const std::vector<double> *bid = nullptr,
+    const std::vector<double> *bid_amount = nullptr,
+    const std::vector<double> *ask = nullptr,
+    const std::vector<double> *ask_amount = nullptr) {
   auto market__ = market ? _fbb.CreateString(market) : 0;
   auto code__ = code ? _fbb.CreateString(code) : 0;
   auto name__ = name ? _fbb.CreateString(name) : 0;
   auto datetime__ = datetime ? _fbb.CreateString(datetime) : 0;
+  auto bid__ = bid ? _fbb.CreateVector<double>(*bid) : 0;
+  auto bid_amount__ = bid_amount ? _fbb.CreateVector<double>(*bid_amount) : 0;
+  auto ask__ = ask ? _fbb.CreateVector<double>(*ask) : 0;
+  auto ask_amount__ = ask_amount ? _fbb.CreateVector<double>(*ask_amount) : 0;
   return hikyuu::flat::CreateSpot(
       _fbb,
       market__,
@@ -417,26 +249,10 @@ inline ::flatbuffers::Offset<Spot> CreateSpotDirect(
       close,
       amount,
       volume,
-      bid1,
-      bid1_amount,
-      bid2,
-      bid2_amount,
-      bid3,
-      bid3_amount,
-      bid4,
-      bid4_amount,
-      bid5,
-      bid5_amount,
-      ask1,
-      ask1_amount,
-      ask2,
-      ask2_amount,
-      ask3,
-      ask3_amount,
-      ask4,
-      ask4_amount,
-      ask5,
-      ask5_amount);
+      bid__,
+      bid_amount__,
+      ask__,
+      ask_amount__);
 }
 
 struct SpotList FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
