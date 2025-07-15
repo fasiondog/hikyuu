@@ -645,7 +645,8 @@ CREATE TABLE IF NOT EXISTS hku_base.historyfinance (
     PRIMARY KEY (market, code, report_date)
 ) ENGINE = MergeTree()
 PARTITION BY market
-ORDER BY (market, code, report_date);
+ORDER BY (market, code, report_date)
+SETTINGS index_granularity = 1024;
 
 CREATE TABLE IF NOT EXISTS hku_base.stkfinance (
     market String,
