@@ -33,11 +33,10 @@ try:
         result['amount'] = data['amount'] * 0.0001  # 转千元
         result['volume'] = data['pvolume'] * 0.01  # 转手数
 
-        for i in range(5):
-            result[f'bid{i+1}'] = data['bidPrice'][i]
-            result[f'bid{i+1}_amount'] = data['bidVol'][i]
-            result[f'ask{i+1}'] = data['askPrice'][i]
-            result[f'ask{i+1}_amount'] = data['askVol'][i]
+        result['bid'] = data['bidPrice']
+        result['bid_amount'] = data['bidVol']
+        result['ask'] = data['askPrice']
+        result['ask_amount'] = data['askVol']
         return result
 
     def get_spot(stocklist, unused1=None, unused2=None, batch_func=None):

@@ -41,26 +41,15 @@ def parse_one_result(quotes):
     else:
         result['volume'] = float(quotes['vol'])  # 成交的股票手数
     result['amount'] = round(quotes['amount'] * 0.0001, 2)  # 成交金额，单位为“元”，若要以“万元”为成交金额的单位，需要把该值除以一万
-    result['bid1_amount'] = float(quotes['bid_vol1'])  # “买一”申请4695股，即47手
-    result['bid1'] = float(quotes['bid1'])  # “买一”报价
-    result['bid2_amount'] = float(quotes['bid_vol2'])
-    result['bid2'] = float(quotes['bid2'])
-    result['bid3_amount'] = float(quotes['bid_vol3'])
-    result['bid3'] = float(quotes['bid3'])
-    result['bid4_amount'] = float(quotes['bid_vol4'])
-    result['bid4'] = float(quotes['bid4'])
-    result['bid5_amount'] = float(quotes['bid_vol5'])
-    result['bid5'] = float(quotes['bid5'])
-    result['ask1_amount'] = float(quotes['ask_vol1'])  # “卖一”申报3100股，即31手
-    result['ask1'] = float(quotes['ask1'])  # “卖一”报价
-    result['ask2_amount'] = float(quotes['ask_vol2'])
-    result['ask2'] = float(quotes['ask2'])
-    result['ask3_amount'] = float(quotes['ask_vol3'])
-    result['ask3'] = float(quotes['ask3'])
-    result['ask4_amount'] = float(quotes['ask_vol4'])
-    result['ask4'] = float(quotes['ask4'])
-    result['ask5_amount'] = float(quotes['ask_vol5'])
-    result['ask5'] = float(quotes['ask5'])
+
+    result['bid'] = [float(quotes['bid1']), float(quotes['bid2']), float(
+        quotes['bid3']), float(quotes['bid4']), float(quotes['bid5'])]
+    result['bid_amount'] = [float(quotes['bid_vol1']), float(quotes['bid_vol2']), float(
+        quotes['bid_vol3']), float(quotes['bid_vol4']), float(quotes['bid_vol5'])]
+    result['ask'] = [float(quotes['ask1']), float(quotes['ask2']), float(
+        quotes['ask3']), float(quotes['ask4']), float(quotes['ask5'])]
+    result['ask_amount'] = [float(quotes['ask_vol1']), float(quotes['ask_vol2']), float(
+        quotes['ask_vol3']), float(quotes['ask_vol4']), float(quotes['ask_vol5'])]
     return result
 
 

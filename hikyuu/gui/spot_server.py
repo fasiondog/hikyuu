@@ -29,6 +29,26 @@ def create_fb_spot_record(builder, record):
     name = builder.CreateString(record['name'])
     datetime = builder.CreateString(str(record['datetime']))
 
+    builder.StartVector(8, len(record['bid']), 8)  # 8 字节 = double
+    for value in reversed(record['bid']):  # 必须逆序添加元素
+        builder.PrependFloat64(value)
+    bid = builder.EndVector(len(record['bid']))
+
+    builder.StartVector(8, len(record['bid_amount']), 8)
+    for value in reversed(record['bid_amount']):
+        builder.PrependFloat64(value)
+    bid_amount = builder.EndVector(len(record['bid_amount']))
+
+    builder.StartVector(8, len(record['ask']), 8)
+    for value in reversed(record['ask']):
+        builder.PrependFloat64(value)
+    ask = builder.EndVector(len(record['ask']))
+
+    builder.StartVector(8, len(record['ask_amount']), 8)
+    for value in reversed(record['ask_amount']):
+        builder.PrependFloat64(value)
+    ask_amount = builder.EndVector(len(record['ask_amount']))
+
     fb.SpotStart(builder)
     fb.SpotAddMarket(builder, market)
     fb.SpotAddCode(builder, code)
@@ -41,29 +61,15 @@ def create_fb_spot_record(builder, record):
     fb.SpotAddClose(builder, record['close'])
     fb.SpotAddAmount(builder, record['amount'])
     fb.SpotAddVolume(builder, record['volume'])
-    fb.SpotAddBid1(builder, record['bid1'])
-    fb.SpotAddBid1Amount(builder, record['bid1_amount'])
-    fb.SpotAddBid2(builder, record['bid2'])
-    fb.SpotAddBid2Amount(builder, record['bid2_amount'])
-    fb.SpotAddBid3(builder, record['bid3'])
-    fb.SpotAddBid3Amount(builder, record['bid3_amount'])
-    fb.SpotAddBid4(builder, record['bid4'])
-    fb.SpotAddBid4Amount(builder, record['bid4_amount'])
-    fb.SpotAddBid5(builder, record['bid5'])
-    fb.SpotAddBid5Amount(builder, record['bid5_amount'])
-    fb.SpotAddAsk1(builder, record['ask1'])
-    fb.SpotAddAsk1Amount(builder, record['ask1_amount'])
-    fb.SpotAddAsk2(builder, record['ask2'])
-    fb.SpotAddAsk2Amount(builder, record['ask2_amount'])
-    fb.SpotAddAsk3(builder, record['ask3'])
-    fb.SpotAddAsk3Amount(builder, record['ask3_amount'])
-    fb.SpotAddAsk4(builder, record['ask4'])
-    fb.SpotAddAsk4Amount(builder, record['ask4_amount'])
-    fb.SpotAddAsk5(builder, record['ask5'])
-    fb.SpotAddAsk5Amount(builder, record['ask5_amount'])
+
+    fb.SpotAddBid(builder, bid)
+    fb.SpotAddBidAmount(builder, bid_amount)
+    fb.SpotAddAsk(builder, ask)
+    fb.SpotAddAskAmount(builder, ask_amount)
     return fb.SpotEnd(builder)
 
 
+@hku_catch(trace=True)
 def create_fb_spot(records):
     builder = flatbuffers.Builder(0)
     end = None
@@ -100,26 +106,10 @@ def print_spot(spot):
     print(spot.Close())
     print(spot.Amount())
     print(spot.volume())
-    print(spot.Bid1())
-    print(spot.Bid1Amount())
-    print(spot.Bid2())
-    print(spot.Bid2Amount())
-    print(spot.Bid3())
-    print(spot.Bid3Amount())
-    print(spot.Bid4())
-    print(spot.Bid4Amount())
-    print(spot.Bid5())
-    print(spot.Bid5Amount())
-    print(spot.Ask1())
-    print(spot.Ask1Amount())
-    print(spot.Ask2())
-    print(spot.Ask2Amount())
-    print(spot.Ask3())
-    print(spot.Ask3Amount())
-    print(spot.Ask4())
-    print(spot.Ask4Amount())
-    print(spot.Ask5())
-    print(spot.Ask5Amount())
+    print(spot.Bid())
+    print(spot.BidAmount())
+    print(spot.Ask())
+    print(spot.AskAmount())
 
 
 def print_spot_list(buf):

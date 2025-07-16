@@ -26,7 +26,7 @@ void HKU_API startSpotAgent(bool print = true, size_t worker_num = 1,
  */
 void HKU_API stopSpotAgent();
 
-SpotAgent* getGlobalSpotAgent();
+HKU_API SpotAgent* getGlobalSpotAgent();
 
 void HKU_API releaseGlobalSpotAgent();
 
