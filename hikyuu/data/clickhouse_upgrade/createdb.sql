@@ -893,7 +893,8 @@ CREATE table if not exists hku_data.day_k (
 ENGINE = MergeTree()
 PARTITION BY market
 PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
+ORDER BY (market, code, date)
+SETTINGS index_granularity = 2048;
 CREATE table if not exists hku_data.week_k (
     `market` String,
     `code` String,

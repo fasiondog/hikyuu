@@ -458,9 +458,10 @@ def update_extern_data(connect, market, code, data_type):
             last_timestamp = Datetime(last_end_date).timestamp_utc()//1000000
             if last_end_date == index_last_date:
                 connect.command(
-                    f"delete from {index_table[0]} where market='{index_table[1]}' and code='{index_table[2]}' and date={last_timestamp}")
-            insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
-                                  high_price, low_price, close_price, amount, count))
+                    f"alter table {index_table[0]} update open={open_price}, high={high_price}, low={low_price}, close={close_price}, amount={amount}, volume={count} where market='{index_table[1]}' and code='{index_table[2]}' and date={last_timestamp}")
+            else:
+                insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
+                                      high_price, low_price, close_price, amount, count))
 
         if insert_buffer:
             ic = connect.create_insert_context(table=index_table[0],
