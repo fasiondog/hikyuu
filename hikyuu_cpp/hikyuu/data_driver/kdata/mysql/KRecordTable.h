@@ -68,6 +68,7 @@ public:
             m_low = rhs.m_low;
             m_close = rhs.m_close;
             m_amount = rhs.m_amount;
+            m_count = rhs.m_count;
         }
         return *this;
     }
