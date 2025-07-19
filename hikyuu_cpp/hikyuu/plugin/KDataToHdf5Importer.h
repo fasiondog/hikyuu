@@ -26,6 +26,9 @@ public:
 
     void updateIndex(const string& market, const string& code, const KQuery::KType& ktype);
 
+    void remove(const string& market, const string& code, const KQuery::KType& ktype,
+                Datetime start);
+
 private:
     ImportKDataToHdf5PluginInterface* m_plugin{nullptr};
 };
