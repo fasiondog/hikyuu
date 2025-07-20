@@ -74,10 +74,10 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     HKU_CHECK(!context.empty(), "No stock code list is included in the context!");
 
 #if HKU_ENABLE_MO
-    if (m_i8n_path.empty()) {
-        mo::init(fmt::format("{}/i8n", getDllSelfDir()));
+    if (m_i18n_path.empty()) {
+        mo::init(fmt::format("{}/i18n", getDllSelfDir()));
     } else {
-        mo::init(m_i8n_path);
+        mo::init(m_i18n_path);
     }
 #endif
 

@@ -81,7 +81,7 @@ else:
 sm.set_plugin_path(plugin_path)
 print(f"current plugin path: {plugin_path}")
 
-sm.set_language_path(f'{BASE_DIR}/cpp/i8n')
+sm.set_language_path(f'{BASE_DIR}/cpp/i18n')
 
 
 class iodog:

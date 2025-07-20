@@ -136,7 +136,7 @@ target("core")
         end
 
         if get_config("mo") then
-            os.cp("$(projectdir)/i8n/*.mo", "$(projectdir)/hikyuu/cpp/i8n/")
+            os.cp("$(projectdir)/i18n/*.mo", "$(projectdir)/hikyuu/cpp/i18n/")
         end
     end)
 
