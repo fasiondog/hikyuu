@@ -16,7 +16,7 @@ public:
     DevicePluginInterface() = default;
     virtual ~DevicePluginInterface() = default;
 
-    virtual void activate(const std::string& active_code) noexcept = 0;
+    virtual void activate(const std::string& active_code, bool replace) noexcept = 0;
     virtual std::string viewLicense() noexcept = 0;
     virtual void removeLicense() noexcept = 0;
     virtual std::string fetchTrialLicense(const std::string& email) noexcept = 0;
