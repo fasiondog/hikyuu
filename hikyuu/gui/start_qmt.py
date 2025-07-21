@@ -4,13 +4,14 @@
 
 from hikyuu.fetcher.stock.zh_stock_a_qmt import parse_one_result_qmt, get_spot
 from hikyuu.gui.spot_server import release_nng_senders, start_send_spot, end_send_spot, send_spot
+from hikyuu.util import hku_info
 
 
 def callback(datas):
     records = []
     for stock_code, data in datas.items():
         records.append(parse_one_result_qmt(stock_code, data))
-    # print(len(records))
+    hku_info(f"接收: {len(records)}")
 
     if records:
         start_send_spot()
@@ -79,7 +80,7 @@ if __name__ == "__main__":
     hku_info("waiting all data loaded ...")
     while not sm.data_ready:
         import time
-        time.sleep(100)
+        time.sleep(1)
 
     stk_list = [s for s in sm if s.valid and s.type in (
         constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF,
@@ -88,7 +89,19 @@ if __name__ == "__main__":
     hku_info("start xtquant")
     code_list = [f'{s.code}.{s.market}' for s in stk_list]
     from xtquant import xtdata
-    xtdata.subscribe_whole_quote(code_list, callback)
+    import time
+    # xtdata.subscribe_whole_quote(['SH', 'SZ', 'BJ'], callback)
+    batch_size = 250
+    n = len(code_list) // batch_size
+    for i in range(n):
+        codes = code_list[i * batch_size: (i + 1) * batch_size]
+        v = xtdata.subscribe_whole_quote(codes, callback)
+        hku_info_if(v < 0, "订阅失败")
+        time.sleep(0.5)
+    codes = code_list[n * batch_size:]
+    if codes:
+        v = xtdata.subscribe_whole_quote(codes, callback)
+        hku_info_if(v < 0, "订阅失败")
 
     # 每日 9:30 时，主动读取行情一次，以便 hikyuu 生成当日首个分钟线
     while True:
