@@ -81,7 +81,7 @@ def import_index_name(connect):
             old = oldStockDict[market_code]
             if old[4] == 0:
                 connect.command(
-                    f"alter table hku_base.stock update valid=1, name='{index["name"]}' where market='{market}' and code='{code}'")
+                    f"alter table hku_base.stock update valid=1, name='{index['name']}' where market='{market}' and code='{code}'")
         else:
             insert_records.append((market, code, index["name"], STOCKTYPE.INDEX, 1, today, 99999999))
 
@@ -241,33 +241,6 @@ def guess_5min_n_step(last_datetime):
     return (n, step)
 
 
-def update_stock_info(connect, market, code):
-    sql = f"select toUInt32(min(date)), toUInt32(max(date)) from hku_data.day_k where market='{market}' and code='{code}'"
-    a = connect.query(sql)
-    a = a.result_rows
-    if a:
-        sql = f"select valid, startDate, endDate from hku_base.stock where market='{market}' and code='{code}'"
-        b = connect.query(sql)
-        b = b.result_rows
-        if b:
-            valid, startDate, endDate = b[0]
-            ticks = 1000000
-            now_start = Datetime.from_timestamp_utc(a[0][0]*ticks).ymd
-            now_end = Datetime.from_timestamp_utc(a[0][1]*ticks).ymd
-            if valid == 1 and now_start != startDate:
-                sql = f"alter table hku_base.stock update startDate={now_start}, endDate=99999999 where market='{market}' and code='{code}'"
-                connect.command(sql)
-            elif valid == 0 and now_end != endDate:
-                sql = f"alter table hku_base.stock update startDate={now_start}, endDate={now_end} where market='{market}' and code='{code}'"
-                connect.command(sql)
-
-            if ((code == "000001" and market == MARKET.SH)
-                or (code == "399001" and market == MARKET.SZ)
-                    or (code == "830799" and market == MARKET.BJ)):
-                sql = f"alter table hku_base.market update lastDate={now_end} where market='{market}'"
-                connect.command(sql)
-
-
 def import_one_stock_data(
     connect, api, market, ktype, stock_record, startDate=199012191500
 ):
@@ -390,6 +363,41 @@ def import_one_stock_data(
     return len(buf)
 
 
+def update_stock_info(connect, market):
+    sql = f"""SELECT a.code, a.valid, a.startDate, a.endDate, b.min_date, b.max_date 
+FROM hku_base.stock a 
+JOIN (
+    SELECT 
+        market, 
+        code, 
+        toInt32(min(date)) AS min_date,
+        toInt32(max(date)) AS max_date
+    FROM hku_data.day_k 
+    WHERE market = '{market}' 
+    GROUP BY market, code
+) b 
+ON a.market = b.market AND a.code = b.code;
+"""
+    a = connect.query(sql)
+    a = a.result_rows
+    ticks = 1000000
+    for v in a:
+        code, valid, startDate, endDate, min_date, max_date = v
+        now_start = Datetime.from_timestamp_utc(min_date*ticks).ymd
+        now_end = Datetime.from_timestamp_utc(max_date*ticks).ymd
+        if valid == 1 and now_start != startDate:
+            sql = f"alter table hku_base.stock update startDate={now_start}, endDate=99999999 where market='{market}' and code='{code}'"
+            connect.command(sql)
+        elif valid == 0 and now_end != endDate:
+            sql = f"alter table hku_base.stock update startDate={now_start}, endDate={now_end} where market='{market}' and code='{code}'"
+            connect.command(sql)
+        if ((code == "000001" and market == MARKET.SH)
+            or (code == "399001" and market == MARKET.SZ)
+                or (code == "830799" and market == MARKET.BJ)):
+            sql = f"alter table hku_base.market update lastDate={now_end} where market='{market}'"
+            connect.command(sql)
+
+
 @hku_catch(trace=True, re_raise=True)
 def import_data(
     connect,
@@ -431,7 +439,7 @@ def import_data(
         add_record_count += this_count
         if this_count > 0:
             if ktype == "DAY":
-                update_stock_info(connect, market, stock[1])
+                # update_stock_info(connect, market, stock[1])
                 update_extern_data(connect, market, stock[1], "DAY")
             elif ktype == "5MIN":
                 update_extern_data(connect, market, stock[1], "5MIN")
@@ -439,8 +447,23 @@ def import_data(
         if progress:
             progress(i, total)
 
-    if ktype == "DAY":
-        connect.command('OPTIMIZE TABLE hku_data.day_k FINAL')
+    cur_year = Datetime.now().year
+    if ktype == "DAY" and add_record_count > 0:
+        update_stock_info(connect, market)
+        connect.command(f"OPTIMIZE TABLE hku_data.day_k PARTITION ('{market}'")
+        connect.command(f"OPTIMIZE TABLE hku_data.week_k PARTITION '{market}'")
+        connect.command(f"OPTIMIZE TABLE hku_data.month_k PARTITION '{market}'")
+        connect.command(f"OPTIMIZE TABLE hku_data.quarter_k PARTITION '{market}'")
+        connect.command(f"OPTIMIZE TABLE hku_data.halfyear_k PARTITION '{market}'")
+        connect.command(f"OPTIMIZE TABLE hku_data.year_k PARTITION '{market}'")
+    if ktype == "5MIN" and add_record_count > 0:
+        connect.command(f"OPTIMIZE TABLE hku_data.min5_k PARTITION '{market}'")
+        connect.command(f"OPTIMIZE TABLE hku_data.min15_k PARTITION '{market}'")
+        connect.command(f"OPTIMIZE TABLE hku_data.min30_k PARTITION '{market}'")
+        connect.command(f"OPTIMIZE TABLE hku_data.min60_k PARTITION '{market}'")
+        connect.command(f"OPTIMIZE TABLE hku_data.hour2_k PARTITION '{market}'")
+    if ktype == "1MIN" and add_record_count > 0:
+        connect.command(f"OPTIMIZE TABLE hku_data.min_k PARTITION '{market}'")
     return add_record_count
 
 
@@ -538,6 +561,8 @@ def import_trans(
         if progress:
             progress(i, total)
 
+    if add_record_count > 0:
+        connect.command('OPTIMIZE TABLE hku_data.transdata')
     return add_record_count
 
 
@@ -624,6 +649,8 @@ def import_time(connect, market, quotations, api, dest_dir, max_days=9000, progr
         if progress:
             progress(i, total)
 
+    if add_record_count > 0:
+        connect.command('OPTIMIZE TABLE hku_data.timeline')
     return add_record_count
 
 
