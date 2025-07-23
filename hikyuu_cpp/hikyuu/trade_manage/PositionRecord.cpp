@@ -58,7 +58,6 @@ PositionRecord& PositionRecord::operator=(PositionRecord&& rhs) {
         goalPrice = rhs.goalPrice;
         totalNumber = rhs.totalNumber;
         buyMoney = rhs.buyMoney;
-        sellMoney = rhs.sellMoney;
         totalCost = rhs.totalCost;
         totalRisk = rhs.totalRisk;
         sellMoney = rhs.sellMoney;

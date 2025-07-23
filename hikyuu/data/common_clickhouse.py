@@ -389,12 +389,10 @@ def update_extern_data(connect, market, code, data_type):
             return None
 
     if data_type.lower() == 'day':
-        # index_list = ('week', 'month', 'year')
         index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
         base_table = get_table(connect, market, code, 'day')
     else:
         index_list = ('min15', 'min30', 'min60', 'hour2')
-        # index_list = ('min15', )
         base_table = get_table(connect, market, code, 'min5')
 
     base_lastdate = get_lastdatetime(connect, base_table)
@@ -423,7 +421,7 @@ def update_extern_data(connect, market, code, data_type):
         insert_buffer = []
         length_base_all = len(base_list)
         for x in range(length_base_all):
-            current_date = base_list[x][0]
+            current_date = Datetime.from_timestamp_utc(base_list[x][0] * 1000000).ymdhm
             if current_date <= last_end_date:
                 continue
             last_start_date, last_end_date = getNewDate(index_type, current_date)
@@ -434,7 +432,7 @@ def update_extern_data(connect, market, code, data_type):
             while start_ix < length_base_all and \
                     ix_date >= last_start_date and ix_date <= last_end_date:
                 base_record_list.append(base_list[start_ix])
-                ix_date = base_list[start_ix][0]
+                ix_date = Datetime.from_timestamp_utc(base_list[start_ix][0]*1000000).ymdhm
                 start_ix += 1
 
             if not base_record_list:
@@ -458,9 +456,10 @@ def update_extern_data(connect, market, code, data_type):
             last_timestamp = Datetime(last_end_date).timestamp_utc()//1000000
             if last_end_date == index_last_date:
                 connect.command(
-                    f"delete from {index_table[0]} where market='{index_table[1]}' and code='{index_table[2]}' and date={last_timestamp}")
-            insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
-                                  high_price, low_price, close_price, amount, count))
+                    f"alter table {index_table[0]} update open={open_price}, high={high_price}, low={low_price}, close={close_price}, amount={amount}, volume={count} where market='{index_table[1]}' and code='{index_table[2]}' and date={last_timestamp}")
+            else:
+                insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
+                                      high_price, low_price, close_price, amount, count))
 
         if insert_buffer:
             ic = connect.create_insert_context(table=index_table[0],
@@ -471,7 +470,8 @@ def update_extern_data(connect, market, code, data_type):
 if __name__ == '__main__':
     from configparser import ConfigParser
     dev_config = ConfigParser()
-    dev_config.read(os.path.expanduser("~") + '/workspace/dev.ini')
+    # dev_config.read(os.path.expanduser("~") + '/workspace/dev.ini')
+    dev_config.read('d:/workspace/dev.ini')
     db = 'clickhouse54-http'
     user = dev_config.get(db, 'user')
     password = dev_config.get(db, 'pwd')
@@ -493,5 +493,5 @@ if __name__ == '__main__':
     x = get_last_krecord(client, ('hku_data.min_k', 'SH', '000001'))
     print(x)
 
-    # update_extern_data(client, 'SH', '000001', 'day')
+    update_extern_data(client, 'SH', '000001', 'min5')
     client.close()

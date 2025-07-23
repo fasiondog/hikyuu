@@ -18,5 +18,6 @@ void export_plugin_KDataToHdf5Importer(py::module& m) {
       .def("get_last_datetime", &KDataToHdf5Importer::getLastDatetime,
            "获取指定市场指定证券最后K线时间")
       .def("add_krecord_list", &KDataToHdf5Importer::addKRecordList, "添加K线数据")
-      .def("update_index", &KDataToHdf5Importer::updateIndex, "更新索引");
+      .def("update_index", &KDataToHdf5Importer::updateIndex, "更新索引")
+      .def("remove", &KDataToHdf5Importer::remove, "删除指定时间及其之后的K线数据");
 }

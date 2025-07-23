@@ -25,14 +25,14 @@ namespace hku {
 
 #if HKU_ENABLE_SQLITE
 static bool isSQLite(DBConnectBase *db) {
-    SQLiteConnect *sqlite = dynamic_cast<SQLiteConnect *>(db);
+    const SQLiteConnect *sqlite = dynamic_cast<SQLiteConnect *>(db);
     return sqlite != nullptr;
 }
 #endif
 
 #if HKU_ENABLE_MYSQL
 static bool isMySQL(DBConnectBase *db) {
-    MySQLConnect *mysql = dynamic_cast<MySQLConnect *>(db);
+    const MySQLConnect *mysql = dynamic_cast<MySQLConnect *>(db);
     return mysql != nullptr;
 }
 #endif

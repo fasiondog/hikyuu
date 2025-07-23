@@ -11,11 +11,11 @@
 
 namespace hku {
 
-void HKU_API activeDevice(const std::string& active_code) {
+void HKU_API activeDevice(const std::string& active_code, bool replace) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
     HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DEVICE);
-    plugin->activate(active_code);
+    plugin->activate(active_code, replace);
 }
 
 std::string HKU_API viewLicense() {

@@ -12,11 +12,13 @@ namespace py = pybind11;
 using namespace hku;
 
 void export_plugin_device(py::module& m) {
-    m.def("active_device", activeDevice, R"(active_device(active_code: str)
+    m.def("active_device", activeDevice, py::arg("code"), py::arg("replace") = false,
+          R"(active_device(active_code: str)
         
     VIP功能授权码激活设备
     
-    :param str active_code: 授权码)");
+    :param str code: 授权码
+    :param bool replace: 超出设备数量限制时强制替换最早激活设备)");
 
     m.def("view_license", viewLicense, R"(view_license()
         

@@ -335,7 +335,7 @@ private:
     std::unique_ptr<ThreadPool> m_load_tg;  // 异步数据加载辅助线程组
 
     PluginManager m_plugin_manager;
-    std::string m_i8n_path;
+    std::string m_i18n_path;
 };
 
 inline size_t StockManager::size() const {
@@ -401,7 +401,7 @@ inline PluginInterfaceT* StockManager::getPlugin(const std::string& pluginname) 
 }
 
 inline void StockManager::setLanguagePath(const std::string& path) {
-    m_i8n_path = path;
+    m_i18n_path = path;
 }
 
 }  // namespace hku

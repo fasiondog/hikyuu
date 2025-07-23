@@ -87,7 +87,7 @@ class ImportPytdxToH5:
             import clickhouse_connect
             connect = clickhouse_connect.get_client(**db_config)
             import_data = clickhouse_import_data
-            self.logger.debug('use mysql import kdata')
+            self.logger.debug('use clickhouse import kdata')
 
         count = 0
         try:

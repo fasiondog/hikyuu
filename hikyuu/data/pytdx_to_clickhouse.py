@@ -73,23 +73,16 @@ def import_index_name(connect):
 
     today = datetime.date.today()
     today = today.year * 10000 + today.month * 100 + today.day
-    # index_set = set()
     insert_records = []
     for index in index_list:
         market_code = index["market_code"]
         market, code = market_code[:2], market_code[2:]
-        # index_set.add(market_code)
         if market_code in oldStockDict:
             old = oldStockDict[market_code]
             if old[4] == 0:
-                connect.command(f"delete from hku_base.stock where market='{market}' and code='{code}'")
-                # connect.command(
-                #     f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{code}', '{old[2]}', {old[3]}, 1, {old[5]}, {old[6]})")
-                insert_records.append((market, code, old[2], old[3], 1, old[5], old[6]))
+                connect.command(
+                    f"alter table hku_base.stock update valid=1, name='{index["name"]}' where market='{market}' and code='{code}'")
         else:
-            # name = index["name"]
-            # sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{code}', '{name}', {STOCKTYPE.INDEX}, 1, {today}, 99999999)"
-            # connect.command(sql)
             insert_records.append((market, code, index["name"], STOCKTYPE.INDEX, 1, today, 99999999))
 
     if insert_records:
@@ -98,9 +91,6 @@ def import_index_name(connect):
                                                          'type', 'valid', 'startDate', 'endDate'],
                                            data=insert_records)
         connect.insert(context=ic)
-    # for oldcode, old in oldStockDict.items():
-    #     if oldcode not in index_set:
-    #         print(f"待删除指数 {oldcode}")
     return len(index_list)
 
 
@@ -160,21 +150,14 @@ def import_stock_name(connect, api, market, quotations=None):
         # 新的代码表中无此股票，则置为无效
         # if (oldvalid == 1) and (oldcode not in newStockDict):
         if (oldvalid == 1) and ((oldcode not in newStockDict) or oldcode in deSet):
-            sql = f"delete from hku_base.stock where market='{market}' and code='{oldcode}'"
+            sql = f"alter table hku_base.stock update valid=0 where market='{market}' and code='{oldcode}'"
             connect.command(sql)
-            insert_records.append((market, oldcode, oldname, oldstock[3], 0, oldstock[5], oldstock[6]))
-            # sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{oldcode}', '{oldname}', {oldstock[3]}, 0, {oldstock[5]}, {oldstock[6]})"
-            # connect.command(sql)
 
         # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
         if oldcode in newStockDict:
             if oldname != newStockDict[oldcode] or oldvalid == 0:
-                sql = f"delete from `hku_base`.`stock` where market='{market}' and code='{oldcode}'"
+                sql = f"alter table hku_base.stock update valid=1, name='{newStockDict[oldcode]}' where market='{market}' and code='{oldcode}'"
                 connect.command(sql)
-                insert_records.append(
-                    (market, oldcode, newStockDict[oldcode], oldstock[3], 1, oldstock[5], oldstock[6]))
-                # sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{oldcode}', '{newStockDict[oldcode]}', {oldstock[3]}, 1, {oldstock[5]}, {oldstock[6]})"
-                # connect.command(sql)
 
     # 处理新出现的股票
     codepre_list = get_codepre_list(connect, market, quotations)

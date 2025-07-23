@@ -44,4 +44,11 @@ void KDataToHdf5Importer::updateIndex(const string& market, const string& code,
     }
 }
 
+void KDataToHdf5Importer::remove(const string& market, const string& code,
+                                 const KQuery::KType& ktype, Datetime start) {
+    if (m_plugin) {
+        m_plugin->remove(market, code, ktype, start);
+    }
+}
+
 }  // namespace hku

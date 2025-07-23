@@ -32,7 +32,7 @@ namespace mo {
  * @brief 初始化多语言支持
  * @param path 翻译文件路径
  */
-void HKU_UTILS_API init(const std::string &path = "i8n");
+void HKU_UTILS_API init(const std::string &path = "i18n");
 
 /**
  * @brief 按指定语言获取翻译

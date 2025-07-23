@@ -28,6 +28,9 @@ public:
 
     virtual void updateIndex(const string& market, const string& code,
                              const KQuery::KType& ktype) = 0;
+
+    virtual void remove(const string& market, const string& code, const KQuery::KType& ktype,
+                        Datetime start) = 0;
 };
 
 }  // namespace hku
