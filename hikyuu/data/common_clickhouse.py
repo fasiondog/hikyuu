@@ -215,179 +215,189 @@ def get_last_krecord(connect, tablename):
         return None
 
 
+def getWeekDate(olddate):
+    y = olddate // 100000000
+    m = olddate // 1000000 - y * 100
+    d = olddate // 10000 - (y * 10000 + m * 100)
+    tempdate = datetime.date(y, m, d)
+    # python中周一是第0天，周五的第4天
+    startdate = tempdate + datetime.timedelta(0 - tempdate.weekday())
+    enddate = tempdate + datetime.timedelta(4 - tempdate.weekday())
+    return (
+        startdate.year * 100000000 + startdate.month * 1000000 + startdate.day * 10000,
+        enddate.year * 100000000 + enddate.month * 1000000 + enddate.day * 10000
+    )
+
+
+def getMonthDate(olddate):
+    y = olddate // 100000000
+    m = olddate // 1000000 - y * 100
+    import calendar
+    _, d = calendar.monthrange(y, m)
+    return (y * 100000000 + m * 1000000 + 10000, y * 100000000 + m * 1000000 + d * 10000)
+
+
+def getQuarterDate(olddate):
+    startDict = {1: 1, 2: 1, 3: 1, 4: 4, 5: 4, 6: 4, 7: 7, 8: 7, 9: 7, 10: 10, 11: 10, 12: 10}
+    endDict = {1: 3, 2: 3, 3: 3, 4: 6, 5: 6, 6: 6, 7: 9, 8: 9, 9: 9, 10: 12, 11: 12, 12: 12}
+    d_dict = {3: 310000, 6: 300000, 9: 300000, 12: 310000}
+    y = olddate // 100000000
+    m = olddate // 1000000 - y * 100
+    start_m = startDict[m]
+    end_m = endDict[m]
+    return (y * 100000000 + start_m * 1000000 + 10000, y * 100000000 + end_m * 1000000 + d_dict[end_m])
+
+
+def getHalfyearDate(olddate):
+    y = olddate // 100000000
+    m = olddate // 1000000 - y * 100
+    return (y * 100000000 + (1010000 if m < 7 else 7010000), y * 100000000 + (6300000 if m < 7 else 12310000))
+
+
+def getYearDate(olddate):
+    y = olddate // 100000000
+    return (y * 100000000 + 1010000, y * 100000000 + 12310000)
+
+
+def getMin60Date(olddate):
+    mint = olddate - olddate // 10000 * 10000
+    newdate = olddate // 10000 * 10000
+    if mint <= 1030:
+        startdate = newdate + 931
+        enddate = newdate + 1030
+    elif mint <= 1130:
+        startdate = newdate + 1031
+        enddate = newdate + 1130
+    elif mint <= 1400:
+        startdate = newdate + 1301
+        enddate = newdate + 1400
+    else:
+        startdate = newdate + 1401
+        enddate = newdate + 1500
+    return (startdate, enddate)
+
+
+def getHour2Date(olddate):
+    mint = olddate - olddate // 10000 * 10000
+    newdate = olddate // 10000 * 10000
+    if mint <= 1130:
+        startdate = newdate + 931
+        enddate = newdate + 1130
+    else:
+        startdate = newdate + 1301
+        enddate = newdate + 1500
+    return (startdate, enddate)
+
+
+def getMin15Date(olddate):
+    mint = olddate - olddate // 10000 * 10000
+    newdate = olddate // 10000 * 10000
+    if mint <= 945:
+        startdate = newdate + 931
+        enddate = newdate + 945
+    elif mint <= 1000:
+        startdate = newdate + 946
+        enddate = newdate + 1000
+    elif mint <= 1015:
+        startdate = newdate + 1001
+        enddate = newdate + 1015
+    elif mint <= 1030:
+        startdate = newdate + 1016
+        enddate = newdate + 1030
+    elif mint <= 1045:
+        startdate = newdate + 1031
+        enddate = newdate + 1045
+    elif mint <= 1100:
+        startdate = newdate + 1046
+        enddate = newdate + 1100
+    elif mint <= 1115:
+        startdate = newdate + 1101
+        enddate = newdate + 1115
+    elif mint <= 1130:
+        startdate = newdate + 1116
+        enddate = newdate + 1130
+    elif mint <= 1315:
+        startdate = newdate + 1301
+        enddate = newdate + 1315
+    elif mint <= 1330:
+        startdate = newdate + 1316
+        enddate = newdate + 1330
+    elif mint <= 1345:
+        startdate = newdate + 1331
+        enddate = newdate + 1345
+    elif mint <= 1400:
+        startdate = newdate + 1346
+        enddate = newdate + 1400
+    elif mint <= 1415:
+        startdate = newdate + 1401
+        enddate = newdate + 1415
+    elif mint <= 1430:
+        startdate = newdate + 1416
+        enddate = newdate + 1430
+    elif mint <= 1445:
+        startdate = newdate + 1431
+        enddate = newdate + 1445
+    else:
+        startdate = newdate + 1446
+        enddate = newdate + 1500
+    return (startdate, enddate)
+
+
+def getMin30Date(olddate):
+    mint = olddate - olddate // 10000 * 10000
+    newdate = olddate // 10000 * 10000
+    if mint <= 1000:
+        startdate = newdate + 931
+        enddate = newdate + 1000
+    elif mint <= 1030:
+        startdate = newdate + 1001
+        enddate = newdate + 1030
+    elif mint <= 1100:
+        startdate = newdate + 1031
+        enddate = newdate + 1100
+    elif mint <= 1130:
+        startdate = newdate + 1101
+        enddate = newdate + 1130
+    elif mint <= 1330:
+        startdate = newdate + 1301
+        enddate = newdate + 1330
+    elif mint <= 1400:
+        startdate = newdate + 1331
+        enddate = newdate + 1400
+    elif mint <= 1430:
+        startdate = newdate + 1401
+        enddate = newdate + 1430
+    else:
+        startdate = newdate + 1431
+        enddate = newdate + 1500
+    return (startdate, enddate)
+
+
+def getNewDate(index_type, olddate):
+    if index_type == 'week':
+        return getWeekDate(olddate)
+    elif index_type == 'month':
+        return getMonthDate(olddate)
+    elif index_type == 'quarter':
+        return getQuarterDate(olddate)
+    elif index_type == 'halfyear':
+        return getHalfyearDate(olddate)
+    elif index_type == 'year':
+        return getYearDate(olddate)
+    elif index_type == 'min15':
+        return getMin15Date(olddate)
+    elif index_type == 'min30':
+        return getMin30Date(olddate)
+    elif index_type == 'min60':
+        return getMin60Date(olddate)
+    elif index_type == 'hour2':
+        return getHour2Date(olddate)
+    else:
+        return None
+
+
 def update_extern_data(connect, market, code, data_type):
     """更新周线、月线、15分钟线等扩展数据索引"""
-    def getWeekDate(olddate):
-        y = olddate // 100000000
-        m = olddate // 1000000 - y * 100
-        d = olddate // 10000 - (y * 10000 + m * 100)
-        tempdate = datetime.date(y, m, d)
-        # python中周一是第0天，周五的第4天
-        startdate = tempdate + datetime.timedelta(0 - tempdate.weekday())
-        enddate = tempdate + datetime.timedelta(4 - tempdate.weekday())
-        return (
-            startdate.year * 100000000 + startdate.month * 1000000 + startdate.day * 10000,
-            enddate.year * 100000000 + enddate.month * 1000000 + enddate.day * 10000
-        )
-
-    def getMonthDate(olddate):
-        y = olddate // 100000000
-        m = olddate // 1000000 - y * 100
-        import calendar
-        _, d = calendar.monthrange(y, m)
-        return (y * 100000000 + m * 1000000 + 10000, y * 100000000 + m * 1000000 + d * 10000)
-
-    def getQuarterDate(olddate):
-        startDict = {1: 1, 2: 1, 3: 1, 4: 4, 5: 4, 6: 4, 7: 7, 8: 7, 9: 7, 10: 10, 11: 10, 12: 10}
-        endDict = {1: 3, 2: 3, 3: 3, 4: 6, 5: 6, 6: 6, 7: 9, 8: 9, 9: 9, 10: 12, 11: 12, 12: 12}
-        d_dict = {3: 310000, 6: 300000, 9: 300000, 12: 310000}
-        y = olddate // 100000000
-        m = olddate // 1000000 - y * 100
-        start_m = startDict[m]
-        end_m = endDict[m]
-        return (y * 100000000 + start_m * 1000000 + 10000, y * 100000000 + end_m * 1000000 + d_dict[end_m])
-
-    def getHalfyearDate(olddate):
-        y = olddate // 100000000
-        m = olddate // 1000000 - y * 100
-        return (y * 100000000 + (1010000 if m < 7 else 7010000), y * 100000000 + (6300000 if m < 7 else 12310000))
-
-    def getYearDate(olddate):
-        y = olddate // 100000000
-        return (y * 100000000 + 1010000, y * 100000000 + 12310000)
-
-    def getMin60Date(olddate):
-        mint = olddate - olddate // 10000 * 10000
-        newdate = olddate // 10000 * 10000
-        if mint <= 1030:
-            startdate = newdate + 931
-            enddate = newdate + 1030
-        elif mint <= 1130:
-            startdate = newdate + 1031
-            enddate = newdate + 1130
-        elif mint <= 1400:
-            startdate = newdate + 1301
-            enddate = newdate + 1400
-        else:
-            startdate = newdate + 1401
-            enddate = newdate + 1500
-        return (startdate, enddate)
-
-    def getHour2Date(olddate):
-        mint = olddate - olddate // 10000 * 10000
-        newdate = olddate // 10000 * 10000
-        if mint <= 1130:
-            startdate = newdate + 931
-            enddate = newdate + 1130
-        else:
-            startdate = newdate + 1301
-            enddate = newdate + 1500
-        return (startdate, enddate)
-
-    def getMin15Date(olddate):
-        mint = olddate - olddate // 10000 * 10000
-        newdate = olddate // 10000 * 10000
-        if mint <= 945:
-            startdate = newdate + 931
-            enddate = newdate + 945
-        elif mint <= 1000:
-            startdate = newdate + 946
-            enddate = newdate + 1000
-        elif mint <= 1015:
-            startdate = newdate + 1001
-            enddate = newdate + 1015
-        elif mint <= 1030:
-            startdate = newdate + 1016
-            enddate = newdate + 1030
-        elif mint <= 1045:
-            startdate = newdate + 1031
-            enddate = newdate + 1045
-        elif mint <= 1100:
-            startdate = newdate + 1046
-            enddate = newdate + 1100
-        elif mint <= 1115:
-            startdate = newdate + 1101
-            enddate = newdate + 1115
-        elif mint <= 1130:
-            startdate = newdate + 1116
-            enddate = newdate + 1130
-        elif mint <= 1315:
-            startdate = newdate + 1301
-            enddate = newdate + 1315
-        elif mint <= 1330:
-            startdate = newdate + 1316
-            enddate = newdate + 1330
-        elif mint <= 1345:
-            startdate = newdate + 1331
-            enddate = newdate + 1345
-        elif mint <= 1400:
-            startdate = newdate + 1346
-            enddate = newdate + 1400
-        elif mint <= 1415:
-            startdate = newdate + 1401
-            enddate = newdate + 1415
-        elif mint <= 1430:
-            startdate = newdate + 1416
-            enddate = newdate + 1430
-        elif mint <= 1445:
-            startdate = newdate + 1431
-            enddate = newdate + 1445
-        else:
-            startdate = newdate + 1446
-            enddate = newdate + 1500
-        return (startdate, enddate)
-
-    def getMin30Date(olddate):
-        mint = olddate - olddate // 10000 * 10000
-        newdate = olddate // 10000 * 10000
-        if mint <= 1000:
-            startdate = newdate + 931
-            enddate = newdate + 1000
-        elif mint <= 1030:
-            startdate = newdate + 1001
-            enddate = newdate + 1030
-        elif mint <= 1100:
-            startdate = newdate + 1031
-            enddate = newdate + 1100
-        elif mint <= 1130:
-            startdate = newdate + 1101
-            enddate = newdate + 1130
-        elif mint <= 1330:
-            startdate = newdate + 1301
-            enddate = newdate + 1330
-        elif mint <= 1400:
-            startdate = newdate + 1331
-            enddate = newdate + 1400
-        elif mint <= 1430:
-            startdate = newdate + 1401
-            enddate = newdate + 1430
-        else:
-            startdate = newdate + 1431
-            enddate = newdate + 1500
-        return (startdate, enddate)
-
-    def getNewDate(index_type, olddate):
-        if index_type == 'week':
-            return getWeekDate(olddate)
-        elif index_type == 'month':
-            return getMonthDate(olddate)
-        elif index_type == 'quarter':
-            return getQuarterDate(olddate)
-        elif index_type == 'halfyear':
-            return getHalfyearDate(olddate)
-        elif index_type == 'year':
-            return getYearDate(olddate)
-        elif index_type == 'min15':
-            return getMin15Date(olddate)
-        elif index_type == 'min30':
-            return getMin30Date(olddate)
-        elif index_type == 'min60':
-            return getMin60Date(olddate)
-        elif index_type == 'hour2':
-            return getHour2Date(olddate)
-        else:
-            return None
-
     if data_type.lower() == 'day':
         index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
         base_table = get_table(connect, market, code, 'day')
@@ -411,7 +421,7 @@ def update_extern_data(connect, market, code, data_type):
             index_last_date = index_last_date.ymdhm
             start_date, _ = getNewDate(index_type, index_last_date)
             start_date = Datetime(start_date).timestamp_utc() // 1000000
-            sql = f"select toUInt32(date), open, high, low, close, amount, volume from {base_table[0]} where market='{base_table[1]}' and code='{base_table[2]}' and date>={start_date}"
+            sql = f"select toUInt32(date), open, high, low, close, amount, volume from {base_table[0]} where market='{base_table[1]}' and code='{base_table[2]}' and date>={start_date} order by date asc"
         a = connect.query(sql)
         base_list = a.result_rows
 
@@ -454,12 +464,8 @@ def update_extern_data(connect, market, code, data_type):
                 count += base_record_list[i][6]
 
             last_timestamp = Datetime(last_end_date).timestamp_utc()//1000000
-            if last_end_date == index_last_date:
-                connect.command(
-                    f"alter table {index_table[0]} update open={open_price}, high={high_price}, low={low_price}, close={close_price}, amount={amount}, volume={count} where market='{index_table[1]}' and code='{index_table[2]}' and date={last_timestamp}")
-            else:
-                insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
-                                      high_price, low_price, close_price, amount, count))
+            insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
+                                  high_price, low_price, close_price, amount, count))
 
         if insert_buffer:
             ic = connect.create_insert_context(table=index_table[0],
@@ -470,8 +476,8 @@ def update_extern_data(connect, market, code, data_type):
 if __name__ == '__main__':
     from configparser import ConfigParser
     dev_config = ConfigParser()
-    # dev_config.read(os.path.expanduser("~") + '/workspace/dev.ini')
-    dev_config.read('d:/workspace/dev.ini')
+    dev_config.read(os.path.expanduser("~") + '/workspace/dev.ini')
+    # dev_config.read('d:/workspace/dev.ini')
     db = 'clickhouse54-http'
     user = dev_config.get(db, 'user')
     password = dev_config.get(db, 'pwd')
@@ -493,5 +499,5 @@ if __name__ == '__main__':
     x = get_last_krecord(client, ('hku_data.min_k', 'SH', '000001'))
     print(x)
 
-    update_extern_data(client, 'SH', '000001', 'min5')
+    update_extern_data(client, 'BJ', '430017', 'DAY')
     client.close()

@@ -33,6 +33,7 @@ def pytdx_import_weight_to_clickhouse(pytdx_api, connect, market):
     pytdx_market = to_pytdx_market(market)
 
     total_count = 0
+    update_count = 0
     stock_list = connect.query(f"select code from `hku_base`.`stock` where market='{market}' and valid=1")
     stockid_list = stock_list.result_rows
 
@@ -124,11 +125,12 @@ def pytdx_import_weight_to_clickhouse(pytdx_api, connect, market):
                 print("{}{} xdxr: {} last_db_weigth:{}".format(market, code, xdxr, new_last_db_weight))
                 raise e
 
-        if update_last_db_weight:
+        if update_last_db_weight and new_last_db_weight != last_db_weight:
             v = new_last_db_weight
-            # alter table hku_base.`version` update `version`=5 where id=0;
-            sql = f"alter table hku_base.stkweight update countAsGift={v[1]}, countForSell={v[2]}, priceForSell={v[3]}, bonus={v[4]}, totalCount={v[5]}, freeCount={v[6]}, suogu={v[7]} where market='{market}' and code='{code}' and date={v[0]}"
+            sql = f"delete from hku_base.stkweight where market='{market}' and code='{code}' and date={v[0]}"
             connect.command(sql)
+            records[v[0]] = v
+            update_count += 1
 
         if records:
             insert_records = []
@@ -143,7 +145,8 @@ def pytdx_import_weight_to_clickhouse(pytdx_api, connect, market):
             connect.insert(context=ic)
             total_count += len(records)
 
-    return total_count
+    total_count = total_count - update_count
+    return total_count if total_count > 0 else 0
 
 
 if __name__ == '__main__':

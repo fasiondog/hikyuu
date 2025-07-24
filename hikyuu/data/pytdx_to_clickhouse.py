@@ -39,6 +39,7 @@ from hikyuu.data.common_clickhouse import (
     get_table,
     get_lastdatetime,
     get_last_krecord,
+    getNewDate,
     update_extern_data,
 )
 # from hikyuu.data.weight_to_clickhouse import qianlong_import_weight
@@ -80,8 +81,11 @@ def import_index_name(connect):
         if market_code in oldStockDict:
             old = oldStockDict[market_code]
             if old[4] == 0:
+                # connect.command(
+                #     f"alter table hku_base.stock update valid=1, name='{index['name']}' where market='{market}' and code='{code}'")
                 connect.command(
-                    f"alter table hku_base.stock update valid=1, name='{index['name']}' where market='{market}' and code='{code}'")
+                    f"delete from hku_base.stock where market='{market}' and code='{code}'")
+                insert_records.append((market, code, index["name"], STOCKTYPE.INDEX, 1, today, 99999999))
         else:
             insert_records.append((market, code, index["name"], STOCKTYPE.INDEX, 1, today, 99999999))
 
@@ -145,19 +149,21 @@ def import_stock_name(connect, api, market, quotations=None):
         oldcode = oldstock[1]
         oldStockDict[oldcode] = oldstock
 
-        oldname, oldvalid = oldstock[2], oldstock[4]
+        oldname, oldtype, oldvalid, oldstartDate, oldendDate = oldstock[2], oldstock[3], oldstock[4], oldstock[5], oldstock[6]
 
         # 新的代码表中无此股票，则置为无效
         # if (oldvalid == 1) and (oldcode not in newStockDict):
         if (oldvalid == 1) and ((oldcode not in newStockDict) or oldcode in deSet):
-            sql = f"alter table hku_base.stock update valid=0 where market='{market}' and code='{oldcode}'"
+            sql = f"delete from hku_base.stock where market='{market}' and code='{oldcode}'"
             connect.command(sql)
+            insert_records.append((market, oldcode, oldname, oldtype, 0, oldstartDate, oldendDate))
 
         # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
         if oldcode in newStockDict:
             if oldname != newStockDict[oldcode] or oldvalid == 0:
-                sql = f"alter table hku_base.stock update valid=1, name='{newStockDict[oldcode]}' where market='{market}' and code='{oldcode}'"
+                sql = f"delete from hku_base.stock where market='{market}' and code='{oldcode}'"
                 connect.command(sql)
+                insert_records.append((market, oldcode, newStockDict[oldcode], oldtype, 1, oldstartDate, 99999999))
 
     # 处理新出现的股票
     codepre_list = get_codepre_list(connect, market, quotations)
@@ -172,9 +178,6 @@ def import_stock_name(connect, api, market, quotations=None):
                 if code[:length] == codepre[0]:
                     count += 1
                     insert_records.append((market, code, newStockDict[code], codepre[1], 1, today, 99999999))
-                    # print(market, code, newStockDict[code], codepre)
-                    # sql = f"insert into hku_base.stock (market, code, name, type, valid, startDate, endDate) values ('{market}', '{code}', '{newStockDict[code]}', {codepre[1]}, 1, {today}, 99999999)"
-                    # connect.command(sql)
                     break
 
     if insert_records:
@@ -364,20 +367,8 @@ def import_one_stock_data(
 
 
 def update_stock_info(connect, market):
-    sql = f"""SELECT a.code, a.valid, a.startDate, a.endDate, b.min_date, b.max_date 
-FROM hku_base.stock a 
-JOIN (
-    SELECT 
-        market, 
-        code, 
-        toInt32(min(date)) AS min_date,
-        toInt32(max(date)) AS max_date
-    FROM hku_data.day_k 
-    WHERE market = '{market}' 
-    GROUP BY market, code
-) b 
-ON a.market = b.market AND a.code = b.code;
-"""
+    sql = f"SELECT a.code, a.valid, a.startDate, a.endDate, b.min_date, b.max_date FROM hku_base.stock a JOIN (SELECT market, code, toInt32(min(date)) AS min_date, toInt32(max(date)) AS max_date FROM hku_data.day_k WHERE market = '{market}' GROUP BY market, code) b ON a.market = b.market AND a.code = b.code"
+    # hku_info(sql)
     a = connect.query(sql)
     a = a.result_rows
     ticks = 1000000
@@ -396,6 +387,32 @@ ON a.market = b.market AND a.code = b.code;
                 or (code == "830799" and market == MARKET.BJ)):
             sql = f"alter table hku_base.market update lastDate={now_end} where market='{market}'"
             connect.command(sql)
+
+
+def clear_extern_data(connect, market, data_type):
+    if market == MARKET.SH:
+        code = '000001'
+    elif market == MARKET.SZ:
+        code = '399001'
+    elif market == MARKET.BJ:
+        code = '830799'
+
+    if data_type.lower() == 'day':
+        index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
+    else:
+        index_list = ('min15', 'min30', 'min60', 'hour2')
+
+    lastdate = connect.command(
+        f"select toInt32(max(date)) from hku_data.day_k where market='{market}' and code='{code}'")
+    lastdate = Datetime.from_timestamp_utc(lastdate*1000000).ymdhm
+
+    for index_type in index_list:
+        _, last_index_date = getNewDate(index_type, lastdate)
+        last_index_date = Datetime(last_index_date).timestamp_utc()//1000000
+        sql = f"delete from hku_data.{index_type}_k where market='{market}' and date>={last_index_date}"
+        hku_info(sql)
+        connect.command(sql)
+        connect.command(f"OPTIMIZE TABLE hku_data.{index_type}_k")
 
 
 @hku_catch(trace=True, re_raise=True)
@@ -437,33 +454,23 @@ def import_data(
             connect, api, market, ktype, stock, startDate
         )
         add_record_count += this_count
-        if this_count > 0:
-            if ktype == "DAY":
-                # update_stock_info(connect, market, stock[1])
-                update_extern_data(connect, market, stock[1], "DAY")
-            elif ktype == "5MIN":
-                update_extern_data(connect, market, stock[1], "5MIN")
+        if ktype == "DAY":
+            update_extern_data(connect, market, stock[1], "DAY")
+        elif ktype == "5MIN":
+            update_extern_data(connect, market, stock[1], "5MIN")
 
         if progress:
             progress(i, total)
 
-    cur_year = Datetime.now().year
-    if ktype == "DAY" and add_record_count > 0:
-        update_stock_info(connect, market)
-        connect.command(f"OPTIMIZE TABLE hku_data.day_k PARTITION ('{market}'")
-        connect.command(f"OPTIMIZE TABLE hku_data.week_k PARTITION '{market}'")
-        connect.command(f"OPTIMIZE TABLE hku_data.month_k PARTITION '{market}'")
-        connect.command(f"OPTIMIZE TABLE hku_data.quarter_k PARTITION '{market}'")
-        connect.command(f"OPTIMIZE TABLE hku_data.halfyear_k PARTITION '{market}'")
-        connect.command(f"OPTIMIZE TABLE hku_data.year_k PARTITION '{market}'")
-    if ktype == "5MIN" and add_record_count > 0:
-        connect.command(f"OPTIMIZE TABLE hku_data.min5_k PARTITION '{market}'")
-        connect.command(f"OPTIMIZE TABLE hku_data.min15_k PARTITION '{market}'")
-        connect.command(f"OPTIMIZE TABLE hku_data.min30_k PARTITION '{market}'")
-        connect.command(f"OPTIMIZE TABLE hku_data.min60_k PARTITION '{market}'")
-        connect.command(f"OPTIMIZE TABLE hku_data.hour2_k PARTITION '{market}'")
-    if ktype == "1MIN" and add_record_count > 0:
-        connect.command(f"OPTIMIZE TABLE hku_data.min_k PARTITION '{market}'")
+    if add_record_count > 0 and ktype in ("DAY", "5MIN"):
+        hku_info(f"合成更新 {market} {ktype} 以上数据...")
+        clear_extern_data(connect, market, ktype)
+        for i, stock in enumerate(stock_list):
+            if stock[2] == 0 or len(stock[1]) != 6:
+                continue
+            update_extern_data(connect, market, stock[1], ktype)
+        hku_info(f"合成更新 {market} {ktype} 以上数据完毕")
+
     return add_record_count
 
 
