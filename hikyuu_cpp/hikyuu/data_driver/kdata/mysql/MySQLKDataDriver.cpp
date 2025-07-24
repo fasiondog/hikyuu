@@ -60,28 +60,39 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
     HKU_IF_RETURN(start_ix >= end_ix, result);
 
     try {
-        KRecordTable r(market, code, kType);
-        SQLStatementPtr st = m_connect->getStatement(fmt::format(
-          "{} order by date limit {}, {}", r.getSelectSQL(), start_ix, end_ix - start_ix));
+        size_t total = getCount(market, code, kType);
+        HKU_IF_RETURN(total == 0, result);
 
+        size_t mid_total = total / 2;
+        if (end_ix == Null<size_t>()) {
+            end_ix = total;
+        }
+        std::string sql;
+        if (start_ix < mid_total) {
+            sql = fmt::format(
+              "select date, open, high, low, close, amount, `count` from {} order by date limit "
+              "{}, {}",
+              _getTableName(market, code, kType), start_ix, end_ix - start_ix);
+        } else {
+            sql = fmt::format(
+              "select * from (select date as date, open, high, low, close, amount, `count` from {} "
+              "order by date desc limit {}) a order by date limit 0, {}",
+              _getTableName(market, code, kType), total - start_ix, end_ix - start_ix);
+        }
+
+        uint64_t date;
+        price_t open, high, low, close, amount, count;
+        SQLStatementPtr st = m_connect->getStatement(sql);
         st->exec();
         while (st->moveNext()) {
-            KRecordTable record;
             try {
-                record.load(st);
-                KRecord k;
-                k.datetime = record.date();
-                k.openPrice = record.open();
-                k.highPrice = record.high();
-                k.lowPrice = record.low();
-                k.closePrice = record.close();
-                k.transAmount = record.amount();
-                k.transCount = record.count();
-                result.push_back(k);
+                st->getColumn(0, date, open, high, low, close, amount, count);
+                result.emplace_back(Datetime(date), open, high, low, close, amount, count);
             } catch (...) {
-                HKU_ERROR("Failed get record: {}", record.str());
+                HKU_ERROR("Failed get krecord: {}{} {}", market, code, kType);
             }
         }
+
     } catch (...) {
         // 表可能不存在
     }
@@ -150,12 +161,17 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
 
     string tablename = _getTableName(market, code, query.kType());
     try {
-        out_start = m_connect->queryInt(fmt::format("select count(1) from {} where date<{}",
-                                                    tablename, query.startDatetime().number()),
-                                        0);
-        out_end = m_connect->queryInt(fmt::format("select count(1) from {} where date<{}",
-                                                  tablename, query.endDatetime().number()),
-                                      0);
+        string sql = fmt::format(
+          "select sum(CASE WHEN date<{} THEN 1 ELSE 0 END) AS startix, sum(CASE WHEN date<{} THEN "
+          "1 ELSE 0 END) AS endix from {}",
+          query.startDatetime().number(), query.endDatetime().number(), tablename);
+        SQLStatementPtr st = m_connect->getStatement(sql);
+
+        st->exec();
+        if (st->moveNext()) {
+            st->getColumn(0, out_start, out_end);
+        }
+
     } catch (...) {
         // 表可能不存在, 不打印异常信息
         out_start = 0;
@@ -240,10 +256,24 @@ TimeLineList MySQLKDataDriver::_getTimeLineListByIndex(const string& market, con
                 endix = 0;
         }
 
+        if (endix == Null<int64_t>()) {
+            endix = total;
+        }
+
         if (startix < endix) {
-            SQLStatementPtr st = m_connect->getStatement(
-              fmt::format("select `date`, `price`, `vol` from {} order by date limit {}, {}", table,
-                          startix, endix - startix));
+            int64_t mid_total = total / 2;
+            string sql;
+            if (startix < mid_total) {
+                sql =
+                  fmt::format("select `date`, `price`, `vol` from {} order by date limit {}, {}",
+                              table, startix, endix - startix);
+            } else {
+                sql = fmt::format(
+                  "select * from (select `date`, `price`, `vol` from {} order by date desc limit "
+                  "{}) a order by date limit 0, {}",
+                  table, total - startix, endix - startix);
+            }
+            SQLStatementPtr st = m_connect->getStatement(sql);
 
             st->exec();
             while (st->moveNext()) {
@@ -348,10 +378,24 @@ TransList MySQLKDataDriver::_getTransListByIndex(const string& market, const str
                 endix = 0;
         }
 
+        if (endix == Null<int64_t>()) {
+            endix = total;
+        }
+
         if (startix < endix) {
-            SQLStatementPtr st = m_connect->getStatement(fmt::format(
-              "select `date`, `price`, `vol`, `buyorsell` from {} order by date limit {}, {}",
-              table, startix, endix - startix));
+            int64_t mid_total = total / 2;
+            string sql;
+            if (startix < mid_total) {
+                sql = fmt::format(
+                  "select `date`, `price`, `vol`, `buyorsell` from {} order by date limit {}, {}",
+                  table, startix, endix - startix);
+            } else {
+                sql = fmt::format(
+                  "select * from (select `date`, `price`, `vol`, `buyorsell` from {} order by date "
+                  "desc limit {}) a order by date limit 0, {}",
+                  table, total - startix, endix - startix);
+            }
+            SQLStatementPtr st = m_connect->getStatement(sql);
 
             st->exec();
             while (st->moveNext()) {
