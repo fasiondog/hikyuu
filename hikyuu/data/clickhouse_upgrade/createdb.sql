@@ -982,7 +982,7 @@ CREATE table if not exists hku_data.min_k (
     `volume` DOUBLE
 ) 
 ENGINE = MergeTree()
-PARTITION BY (market, sipHash64(code) % 32)
+PARTITION BY market
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.min5_k (
@@ -1031,6 +1031,21 @@ PARTITION BY market
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.min60_k (
+    `market` String,
+    `code` String,
+    `date` DateTime,
+    `open` DOUBLE,
+    `high` DOUBLE,
+    `low` DOUBLE,
+    `close` DOUBLE,
+    `amount` DOUBLE,
+    `volume` DOUBLE
+) 
+ENGINE = MergeTree()
+PARTITION BY market
+PRIMARY KEY (market, code, date)
+ORDER BY (market, code, date);
+CREATE table if not exists hku_data.hour2_k (
     `market` String,
     `code` String,
     `date` DateTime,
