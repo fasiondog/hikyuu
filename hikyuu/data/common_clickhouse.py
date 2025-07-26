@@ -205,7 +205,7 @@ def get_last_krecord(connect, tablename):
     """
     try:
         a = connect.query(
-            "select toUInt32(date), open, high, low, close, amount, volume from {} where market='{}' and code='{}' order by date desc limit 1".format(tablename[0], tablename[1], tablename[2]))
+            "select toUInt32(date), open, high, low, close, amount, volume from {} where market='{}' and code='{}' order by date desc limit 1".format(tablename[0], tablename[1], tablename[2]), settings={'optimize_skip_merged_partitions': 1})
         a = a.result_rows
         # hku_info(f"{tablename} {a}")
         if not a:
@@ -422,7 +422,7 @@ def update_extern_data(connect, market, code, data_type):
             start_date, _ = getNewDate(index_type, index_last_date)
             start_date = Datetime(start_date).timestamp_utc() // 1000000
             sql = f"select toUInt32(date), open, high, low, close, amount, volume from {base_table[0]} where market='{base_table[1]}' and code='{base_table[2]}' and date>={start_date} order by date asc"
-        a = connect.query(sql)
+        a = connect.query(sql, settings={'optimize_skip_merged_partitions': 1})
         base_list = a.result_rows
 
         last_start_date = 199012010000
@@ -464,13 +464,17 @@ def update_extern_data(connect, market, code, data_type):
                 count += base_record_list[i][6]
 
             last_timestamp = Datetime(last_end_date).timestamp_utc()//1000000
-            insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
-                                  high_price, low_price, close_price, amount, count))
+            # if last_end_date == index_last_date:
+            #     sql = f"delete from hku_data.{index_type}_k where market='{market}' and code='{code}' and date>={last_timestamp}"
+            #     connect.command(sql, settings={"mutations_sync": 0})
+            if last_end_date != index_last_date:
+                insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
+                                      high_price, low_price, close_price, amount, count))
 
         if insert_buffer:
             ic = connect.create_insert_context(table=index_table[0],
                                                data=insert_buffer)
-            connect.insert(context=ic)
+            connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
 
 
 if __name__ == '__main__':

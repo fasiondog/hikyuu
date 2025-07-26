@@ -142,7 +142,7 @@ class ImportHistoryFinanceTask:
             except Exception as e:
                 hku_error(str(e))
         if self.engine == 'clickhouse':
-            self.db_connect.command("OPTIMIZE TABLE hku_base.historyfinance FINAL")
+            hku_run_ignore_exception(self.db_connect.command, "OPTIMIZE TABLE hku_base.historyfinance FINAL")
         self.db_connect.close()
         self.api.disconnect()
 
