@@ -396,6 +396,7 @@ def getNewDate(index_type, olddate):
         return None
 
 
+@hku_catch(ret={'week': [], 'month': [], 'quarter': [], 'halfyear': [], 'year': [], 'min15': [], 'min30': [], 'min60': [], 'hour2': []}, trace=True)
 def update_extern_data(connect, market, code, data_type):
     """更新周线、月线、15分钟线等扩展数据索引"""
     if data_type.lower() == 'day':
@@ -405,9 +406,13 @@ def update_extern_data(connect, market, code, data_type):
         index_list = ('min15', 'min30', 'min60', 'hour2')
         base_table = get_table(connect, market, code, 'min5')
 
+    index_data = {}
+    for index_type in index_list:
+        index_data[index_type] = []
+
     base_lastdate = get_lastdatetime(connect, base_table)
     if base_lastdate is None:
-        return
+        return index_data
 
     for index_type in index_list:
         hku_debug("{}{} update {} index".format(market, code, index_type))
@@ -428,7 +433,7 @@ def update_extern_data(connect, market, code, data_type):
         last_start_date = 199012010000
         last_end_date = 199012010000
 
-        insert_buffer = []
+        insert_buffer = index_data[index_type]
         length_base_all = len(base_list)
         for x in range(length_base_all):
             current_date = Datetime.from_timestamp_utc(base_list[x][0] * 1000000).ymdhm
@@ -464,17 +469,17 @@ def update_extern_data(connect, market, code, data_type):
                 count += base_record_list[i][6]
 
             last_timestamp = Datetime(last_end_date).timestamp_utc()//1000000
-            # if last_end_date == index_last_date:
-            #     sql = f"delete from hku_data.{index_type}_k where market='{market}' and code='{code}' and date>={last_timestamp}"
-            #     connect.command(sql, settings={"mutations_sync": 0})
             if last_end_date != index_last_date:
                 insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
                                       high_price, low_price, close_price, amount, count))
 
-        if insert_buffer:
+        if len(insert_buffer) > 200000:
+            hku_info(f"写入 {market} {index_table[0]} 扩展数据: {len(insert_buffer)} ...")
             ic = connect.create_insert_context(table=index_table[0],
                                                data=insert_buffer)
             connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
+            insert_buffer.clear()
+    return index_data
 
 
 if __name__ == '__main__':

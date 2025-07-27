@@ -388,17 +388,18 @@ def update_stock_info(connect, market):
 
 
 def clear_extern_data(connect, market, data_type):
-    if data_type.lower() == 'day':
+    if data_type == 'DAY':
         index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
         lastdate = connect.command(
             f"select toInt32(max(date)) from hku_data.day_k where market='SH' and code='000001'")
         for index_type in index_list:
             sql = f"delete from hku_data.{index_type}_k where market='{market}' and date>={lastdate}"
-            hku_info(
-                f"delete from hku_data.{index_type}_k where market='{market}' and date>={Datetime.from_timestamp_utc(lastdate*1000000)}")
-            connect.command(sql)
-            hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.{index_type}_k")
-            hku_info(f"清理 {index_type} 扩展数据完毕")
+            # hku_info(
+            #     f"delete from hku_data.{index_type}_k where market='{market}' and date>={Datetime.from_timestamp_utc(lastdate*1000000)}")
+            connect.command(sql, settings={"mutations_sync": 0})
+            # hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.{index_type}_k", settings={
+            #                          "mutations_sync": 0})
+        hku_info(f"清理 {market} {data_type} 线扩展数据完毕")
 
     else:
         index_list = ('min15', 'min30', 'min60', 'hour2')
@@ -408,10 +409,11 @@ def clear_extern_data(connect, market, data_type):
         last_timestamp = Datetime(lastdate).timestamp_utc()//1000000
         for index_type in index_list:
             sql = f"delete from hku_data.{index_type}_k where market='{market}' and date>={last_timestamp}"
-            hku_info(f"delete from hku_data.{index_type}_k where market='{market}' and date>={lastdate}")
-            connect.command(sql)
-            hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.{index_type}_k")
-            hku_info(f"清理 {index_type} 扩展数据完毕")
+            # hku_info(f"delete from hku_data.{index_type}_k where market='{market}' and date>={lastdate}")
+            connect.command(sql, settings={"mutations_sync": 0})
+            # hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.{index_type}_k", settings={
+            #                          "mutations_sync": 0})
+        hku_info(f"清理 {market} {data_type} 线扩展数据完毕")
 
 
 @hku_catch(trace=True, re_raise=True)
@@ -443,6 +445,16 @@ def import_data(
 
     if ktype in ("DAY", "5MIN"):
         clear_extern_data(connect, market, ktype)
+        if ktype == "DAY":
+            index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
+            update_data = {}
+            for index_type in index_list:
+                update_data[index_type] = []
+        elif ktype == "5MIN":
+            index_list = ('min15', 'min30', 'min60', 'hour2')
+            update_data = {}
+            for index_type in index_list:
+                update_data[index_type] = []
 
     total = len(stock_list)
     # market, code, valid, type
@@ -456,59 +468,65 @@ def import_data(
             connect, api, market, ktype, stock, startDate
         )
         add_record_count += this_count
-        # if this_count > 0:
-        if ktype == "DAY":
-            update_extern_data(connect, market, stock[1], "DAY")
-        elif ktype == "5MIN":
-            update_extern_data(connect, market, stock[1], "5MIN")
+        if ktype in ("DAY", "5MIN"):
+            if ktype == "DAY":
+                index_data = update_extern_data(connect, market, stock[1], "DAY")
+            elif ktype == "5MIN":
+                index_data = update_extern_data(connect, market, stock[1], "5MIN")
+            for index_type in index_list:
+                update_data[index_type].extend(index_data[index_type])
+                if len(update_data[index_type]) > 200000:
+                    index_table = get_table(connect, market, stock[1], index_type)
+                    # hku_info(f"写入 {market} {index_table[0]} 扩展数据: {len(update_data[index_type])} ...")
+                    ic = connect.create_insert_context(table=index_table[0],
+                                                       data=update_data[index_type])
+                    connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
+                    update_data[index_type].clear()
 
         if progress:
             progress(i, total)
 
-    # if add_record_count > 0 and ktype in ("DAY", "5MIN"):
-    #     # if ktype in ("DAY", "5MIN"):
-    #     hku_info(f"合成更新 {market} {ktype} 以上数据...")
-    #     clear_extern_data(connect, market, ktype)
-    #     for i, stock in enumerate(stock_list):
-    #         if stock[2] == 0 or len(stock[1]) != 6:
-    #             continue
-    #         update_extern_data(connect, market, stock[1], ktype)
-    #     hku_info(f"合成更新 {market} {ktype} 以上数据完毕")
+    if ktype in ("DAY", "5MIN"):
+        for index_type in index_list:
+            if len(update_data[index_type]) > 0:
+                index_table = get_table(connect, market, stock[1], index_type)
+                # hku_info(f"写入 {market} {index_table[0]} 扩展数据: {len(update_data[index_type])} ...")
+                ic = connect.create_insert_context(table=index_table[0],
+                                                   data=update_data[index_type])
+                connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
+                update_data[index_type].clear()
+        update_data.clear()
 
     cur_year = Datetime.today().year
     if ktype == "DAY":
-        hku_info(f"更新 {market} 股票信息...")
         update_stock_info(connect, market)
         hku_info(f"更新 {market} 股票信息完毕")
-        hku_info(f"优化 {market} 日线及以上表数据...")
-        connect.command(f"OPTIMIZE TABLE hku_data.day_k PARTITION '{market}' FINAL", settings={
-                        "mutations_sync": 0})
-        connect.command(f"OPTIMIZE TABLE hku_data.week_k PARTITION '{market}' FINAL", settings={
-                        "mutations_sync": 0})
-        connect.command(f"OPTIMIZE TABLE hku_data.month_k PARTITION '{market}' FINAL", settings={
-                        "mutations_sync": 0})
-        connect.command(f"OPTIMIZE TABLE hku_data.quarter_k PARTITION '{market}' FINAL", settings={
+        connect.command(f"OPTIMIZE TABLE hku_data.year_k PARTITION '{market}' FINAL", settings={
                         "mutations_sync": 0})
         connect.command(f"OPTIMIZE TABLE hku_data.halfyear_k PARTITION '{market}' FINAL", settings={
                         "mutations_sync": 0})
-        connect.command(f"OPTIMIZE TABLE hku_data.year_k PARTITION '{market}' FINAL", settings={
+        connect.command(f"OPTIMIZE TABLE hku_data.quarter_k PARTITION '{market}' FINAL", settings={
                         "mutations_sync": 0})
-        hku_info(f"优化 {market} 日线及以上表数据完毕")
+        connect.command(f"OPTIMIZE TABLE hku_data.month_k PARTITION '{market}' FINAL", settings={
+                        "mutations_sync": 0})
+        connect.command(f"OPTIMIZE TABLE hku_data.week_k PARTITION '{market}' FINAL", settings={
+                        "mutations_sync": 0})
+        connect.command(f"OPTIMIZE TABLE hku_data.day_k PARTITION '{market}' FINAL", settings={
+                        "mutations_sync": 0})
+        hku_info(f"优化 {market} 日线及扩展表数据完毕")
     if ktype == "5MIN":
-        hku_info(f"优化 {market} 5分钟线表数据...")
+        hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.hour2_k PARTITION '{market}' FINAL", settings={
+            "mutations_sync": 0, "optimize_skip_merged_partitions": 1})
         hku_run_ignore_exception(connect.command,
-                                 f"OPTIMIZE TABLE hku_data.min5_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
+                                 f"OPTIMIZE TABLE hku_data.min30_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
         hku_run_ignore_exception(connect.command,
                                  f"OPTIMIZE TABLE hku_data.min15_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
         hku_run_ignore_exception(connect.command,
-                                 f"OPTIMIZE TABLE hku_data.min30_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
+                                 f"OPTIMIZE TABLE hku_data.min5_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
         hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.min60_k PARTITION '{market}' FINAL", settings={
             "mutations_sync": 0, "optimize_skip_merged_partitions": 1})
-        hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.hour2_k PARTITION '{market}' FINAL", settings={
-            "mutations_sync": 0, "optimize_skip_merged_partitions": 1})
-        hku_info(f"优化 {market} 5分钟线表数据完毕")
+        hku_info(f"优化 {market} 5分钟线及扩展表完毕")
     if ktype == "1MIN":
-        hku_info(f"优化 {market} 1分钟线表数据...")
         hku_run_ignore_exception(connect.command,
                                  f"OPTIMIZE TABLE hku_data.min_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
         hku_info(f"优化 {market} 1分钟线表数据完毕")
@@ -520,7 +538,7 @@ def get_trans_table(connect, market, code):
     return get_table(connect, market, code, 'transdata')
 
 
-@hku_catch(trace=True)
+@hku_catch(ret=[], trace=True)
 def import_on_stock_trans(connect, api, market, stock_record, max_days):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
@@ -582,10 +600,7 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
             except Exception as e:
                 hku_error("Failed trans to record! {}", e)
 
-    if trans_buf:
-        ic = connect.create_insert_context(table=table[0], data=trans_buf)
-        connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
-    return len(trans_buf)
+    return trans_buf
 
 
 def import_trans(
@@ -597,6 +612,7 @@ def import_trans(
     stock_list = get_stock_list(connect, market, quotations)
     total = len(stock_list)
     a_stktype_list = get_a_stktype_list()
+    buf = []
     for i, stock in enumerate(stock_list):
         market, code, valid, stype = stock
         if valid == 0 or len(code) != 6 or stype not in a_stktype_list:
@@ -604,10 +620,25 @@ def import_trans(
                 progress(i, total)
             continue
 
-        this_count = import_on_stock_trans(connect, api, market, stock, max_days)
-        add_record_count += this_count
+        data = import_on_stock_trans(connect, api, market, stock, max_days)
+        add_record_count += len(data)
+        if len(data) > 0:
+            buf.extend(data)
+            if len(buf) > 500000:
+                table = get_trans_table(connect, market, code)
+                ic = connect.create_insert_context(table=table[0], data=buf)
+                connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
+                buf.clear()
+                # hku_info(f"写入 {market} {table[0]} 分笔数据: {len(buf)} ...")
+
         if progress:
             progress(i, total)
+
+    if len(buf) > 0:
+        ic = connect.create_insert_context(table='hku_data.transdata', data=buf)
+        connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
+        buf.clear()
+        # hku_info(f"写入 {market} hku_data.transdata 分笔数据: {len(buf)} ...")
 
     cur_year = Datetime.today().year
     hku_run_ignore_exception(connect.command,
@@ -619,7 +650,7 @@ def get_time_table(connect, market, code):
     return get_table(connect, market, code, 'timeline')
 
 
-@hku_catch(trace=True)
+@hku_catch(ret=[], trace=True)
 def import_on_stock_time(connect, api, market, stock_record, max_days):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
@@ -672,11 +703,7 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
             except Exception as e:
                 hku_error("Failed trans record {}! {}".format(record, e))
 
-    if time_buf:
-        ic = connect.create_insert_context(table=table[0], data=time_buf)
-        connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
-
-    return len(time_buf)
+    return time_buf
 
 
 def import_time(connect, market, quotations, api, dest_dir, max_days=9000, progress=ProgressBar):
@@ -686,6 +713,7 @@ def import_time(connect, market, quotations, api, dest_dir, max_days=9000, progr
     # market, code, valid, type
     stock_list = get_stock_list(connect, market, quotations)
     total = len(stock_list)
+    buf = []
     for i, stock in enumerate(stock_list):
         market, code, valid, stype = stock
         if valid == 0 or len(code) != 6:
@@ -693,10 +721,25 @@ def import_time(connect, market, quotations, api, dest_dir, max_days=9000, progr
                 progress(i, total)
             continue
 
-        this_count = import_on_stock_time(connect, api, market, stock, max_days)
-        add_record_count += this_count
+        data = import_on_stock_time(connect, api, market, stock, max_days)
+        add_record_count += len(data)
+        if len(data) > 0:
+            buf.extend(data)
+            if len(buf) > 500000:
+                table = get_time_table(connect, market, code)
+                ic = connect.create_insert_context(table=table[0], data=buf)
+                connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
+                buf.clear()
+                # hku_info(f"写入 {market} {table[0]} 分时数据: {len(buf)} ...")
+
         if progress:
             progress(i, total)
+
+    if len(buf) > 0:
+        ic = connect.create_insert_context(table='hku_data.timeline', data=buf)
+        connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
+        buf.clear()
+        # hku_info(f"写入 {market} hku_data.timeline 分时数据: {len(buf)} ...")
 
     cur_year = Datetime.today().year
     hku_run_ignore_exception(connect.command,
