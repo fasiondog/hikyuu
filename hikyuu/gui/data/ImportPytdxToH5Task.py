@@ -82,7 +82,8 @@ class ImportPytdxToH5:
                 'username': self.config['clickhouse']['usr'],
                 'password': self.config['clickhouse']['pwd'],
                 'host': self.config['clickhouse']['host'],
-                'port': int(self.config['clickhouse']['http_port'])
+                'port': int(self.config['clickhouse']['http_port']),
+                'send_receive_timeout': 60,
             }
             import clickhouse_connect
             connect = clickhouse_connect.get_client(**db_config)

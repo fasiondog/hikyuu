@@ -151,3 +151,11 @@ def hku_to_async(func):
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, func, *args, **kwargs)
     return async_func
+
+
+def hku_run_ignore_exception(func, *args, **kwargs):
+    """运行函数并忽略异常"""
+    try:
+        return func(*args, **kwargs)
+    except:
+        return None

@@ -146,6 +146,32 @@ class UsePytdxImportToH5Thread(QThread):
         cur_host = 0
 
         # 以下按数据量从大到小依次使用速度从高到低的TDX服务器
+        if self.config.getboolean('ktype', 'min5', fallback=False):
+            start_date = datetime.datetime.strptime(
+                config['ktype']['min5_start_date'], '%Y-%m-%d').date()
+            for market in g_market_list:
+                self.tasks.append(
+                    ImportPytdxToH5(
+                        self.log_queue, self.queue, self.config, market,
+                        '5MIN', self.quotations, use_hosts[cur_host][0],
+                        use_hosts[cur_host][1], dest_dir,
+                        start_date.year * 100000000 +
+                        start_date.month * 1000000 + start_date.day * 10000))
+                cur_host += 1
+
+        if self.config.getboolean('ktype', 'day', fallback=False):
+            start_date = datetime.datetime.strptime(
+                config['ktype']['day_start_date'], '%Y-%m-%d').date()
+            for market in g_market_list:
+                self.tasks.append(
+                    ImportPytdxToH5(
+                        self.log_queue, self.queue, self.config, market, 'DAY',
+                        self.quotations, use_hosts[cur_host][0],
+                        use_hosts[cur_host][1], dest_dir,
+                        start_date.year * 100000000 +
+                        start_date.month * 1000000 + start_date.day * 10000))
+                cur_host += 1
+
         if self.config.getboolean('ktype', 'trans', fallback=False):
             today = datetime.date.today()
             trans_start_date = datetime.datetime.strptime(
@@ -186,32 +212,6 @@ class UsePytdxImportToH5Thread(QThread):
                                         use_hosts[cur_host][0],
                                         use_hosts[cur_host][1], dest_dir,
                                         time_max_days))
-                cur_host += 1
-
-        if self.config.getboolean('ktype', 'min5', fallback=False):
-            start_date = datetime.datetime.strptime(
-                config['ktype']['min5_start_date'], '%Y-%m-%d').date()
-            for market in g_market_list:
-                self.tasks.append(
-                    ImportPytdxToH5(
-                        self.log_queue, self.queue, self.config, market,
-                        '5MIN', self.quotations, use_hosts[cur_host][0],
-                        use_hosts[cur_host][1], dest_dir,
-                        start_date.year * 100000000 +
-                        start_date.month * 1000000 + start_date.day * 10000))
-                cur_host += 1
-
-        if self.config.getboolean('ktype', 'day', fallback=False):
-            start_date = datetime.datetime.strptime(
-                config['ktype']['day_start_date'], '%Y-%m-%d').date()
-            for market in g_market_list:
-                self.tasks.append(
-                    ImportPytdxToH5(
-                        self.log_queue, self.queue, self.config, market, 'DAY',
-                        self.quotations, use_hosts[cur_host][0],
-                        use_hosts[cur_host][1], dest_dir,
-                        start_date.year * 100000000 +
-                        start_date.month * 1000000 + start_date.day * 10000))
                 cur_host += 1
 
         if self.config.getboolean('weight', 'enable', fallback=False):

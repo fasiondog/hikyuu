@@ -27,6 +27,7 @@ __all__ = [
     'hku_check_ignore',
     'hku_catch',
     'hku_to_async',
+    "hku_run_ignore_exception",
     'hku_trace',
     'hku_debug',
     'hku_info',
