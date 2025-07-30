@@ -17,7 +17,8 @@ public:
     KDataToHdf5Importer();
     virtual ~KDataToHdf5Importer();
 
-    bool setConfig(const string& datapath, const vector<string>& markets = {"SH", "SZ", "BJ"});
+    bool setConfig(const string& datapath, const vector<string>& markets = {"SH", "SZ", "BJ"},
+                   const vector<string>& ktypes = {"DAY", "MIN", "MIN5", "TIMELINE", "TRANSDATA"});
 
     Datetime getLastDatetime(const string& market, const string& code, const KQuery::KType& ktype);
 

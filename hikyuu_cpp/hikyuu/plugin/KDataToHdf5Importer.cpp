@@ -20,8 +20,9 @@ KDataToHdf5Importer::KDataToHdf5Importer() {
 
 KDataToHdf5Importer::~KDataToHdf5Importer() {}
 
-bool KDataToHdf5Importer::setConfig(const string& datapath, const vector<string>& markets) {
-    return m_plugin ? m_plugin->setConfig(datapath, markets) : false;
+bool KDataToHdf5Importer::setConfig(const string& datapath, const vector<string>& markets,
+                                    const vector<string>& ktypes) {
+    return m_plugin ? m_plugin->setConfig(datapath, markets, ktypes) : false;
 }
 
 Datetime KDataToHdf5Importer::getLastDatetime(const string& market, const string& code,

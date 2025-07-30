@@ -18,7 +18,8 @@ public:
     ImportKDataToHdf5PluginInterface() = default;
     virtual ~ImportKDataToHdf5PluginInterface() = default;
 
-    virtual bool setConfig(const string& datapath, const vector<string>& markets) = 0;
+    virtual bool setConfig(const string& datapath, const vector<string>& markets,
+                           const vector<string>& ktypes) = 0;
 
     virtual Datetime getLastDatetime(const string& market, const string& code,
                                      const KQuery::KType& ktype) = 0;
