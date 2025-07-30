@@ -177,7 +177,7 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     for (auto& task : tasks) {
         task.get();
     }
-    HKU_INFO_IF(m_print, "received count: {}", total);
+    HKU_DEBUG("received count: {}", total);
     for (const auto& postProcess : m_postProcessList) {
         postProcess(ms_start_rev_time);
     }
