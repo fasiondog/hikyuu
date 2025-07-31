@@ -20,8 +20,9 @@ KDataToHdf5Importer::KDataToHdf5Importer() {
 
 KDataToHdf5Importer::~KDataToHdf5Importer() {}
 
-bool KDataToHdf5Importer::setConfig(const string& datapath, const vector<string>& markets) {
-    return m_plugin ? m_plugin->setConfig(datapath, markets) : false;
+bool KDataToHdf5Importer::setConfig(const string& datapath, const vector<string>& markets,
+                                    const vector<string>& ktypes) {
+    return m_plugin ? m_plugin->setConfig(datapath, markets, ktypes) : false;
 }
 
 Datetime KDataToHdf5Importer::getLastDatetime(const string& market, const string& code,
@@ -48,6 +49,20 @@ void KDataToHdf5Importer::remove(const string& market, const string& code,
                                  const KQuery::KType& ktype, Datetime start) {
     if (m_plugin) {
         m_plugin->remove(market, code, ktype, start);
+    }
+}
+
+void KDataToHdf5Importer::addTimeLineList(const string& market, const string& code,
+                                          const TimeLineList& timeline) {
+    if (m_plugin) {
+        m_plugin->addTimeLineList(market, code, timeline);
+    }
+}
+
+void KDataToHdf5Importer::addTransList(const string& market, const string& code,
+                                       const TransRecordList& translist) {
+    if (m_plugin) {
+        m_plugin->addTransList(market, code, translist);
     }
 }
 
