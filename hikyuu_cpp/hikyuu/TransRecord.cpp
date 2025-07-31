@@ -35,9 +35,9 @@ bool HKU_API operator==(const TransRecord& d1, const TransRecord& d2) {
             (std::fabs(d1.vol - d2.vol) < 0.0001) && (d1.direct == d2.direct));
 }
 
-TransRecord::TransRecord() : datetime(Datetime()), price(0.0), vol(0.0), direct(BUY) {}
+TransRecord::TransRecord() : datetime(Datetime()), price(0.0), vol(0.0), direct(0) {}
 
-TransRecord::TransRecord(const Datetime& datetime, price_t price, price_t vol, DIRECT direct)
+TransRecord::TransRecord(const Datetime& datetime, price_t price, price_t vol, int direct)
 : datetime(datetime), price(price), vol(vol), direct(direct) {}
 
 bool TransRecord::isValid() const {

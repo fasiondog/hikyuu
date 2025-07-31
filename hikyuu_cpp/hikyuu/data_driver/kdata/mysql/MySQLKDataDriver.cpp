@@ -334,8 +334,7 @@ TransList MySQLKDataDriver::_getTransListByDate(const string& market, const stri
                 double price = 0.0, vol = 0.0;
                 int direct = 0;
                 st->getColumn(0, date, price, vol, direct);
-                result.emplace_back(Datetime(date), price, vol,
-                                    static_cast<TransRecord::DIRECT>(direct));
+                result.emplace_back(Datetime(date), price, vol, direct);
             } catch (const std::exception& e) {
                 HKU_ERROR("Failed get {} trans! {}", table, e.what());
             } catch (...) {
@@ -404,8 +403,7 @@ TransList MySQLKDataDriver::_getTransListByIndex(const string& market, const str
                     double price = 0.0, vol = 0.0;
                     int direct = 0;
                     st->getColumn(0, date, price, vol, direct);
-                    result.emplace_back(Datetime(date), price, vol,
-                                        static_cast<TransRecord::DIRECT>(direct));
+                    result.emplace_back(Datetime(date), price, vol, direct);
                 } catch (const std::exception& e) {
                     HKU_ERROR("Failed get {} trans! {}", table, e.what());
                 } catch (...) {

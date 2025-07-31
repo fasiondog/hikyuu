@@ -18,19 +18,15 @@ namespace py = pybind11;
 void export_TransRecord(py::module& m) {
     py::class_<TransRecord>(m, "TransRecord")
       .def(py::init<>())
-      .def(py::init<const Datetime&, price_t, price_t, TransRecord::DIRECT>())
+      .def(py::init<const Datetime&, price_t, price_t, int>())
       .def("__str__", to_py_str<TransRecord>)
       .def("__repr__", to_py_str<TransRecord>)
       .def_readwrite("date", &TransRecord::datetime, "时间")
       .def_readwrite("price", &TransRecord::price, "价格")
       .def_readwrite("vol", &TransRecord::vol, "成交量")
-      .def_readwrite("direct", &TransRecord::direct, "买卖盘性质, 参见: TransRecord.DIRECT")
+      .def_readwrite("direct", &TransRecord::direct,
+                     "买卖盘性质: 1--sell 0--buy 2--集合竞价 其他未知")
       .def(py::self == py::self)
 
         DEF_PICKLE(TransRecord);
-
-    py::enum_<TransRecord::DIRECT>(m, "DIRECT")
-      .value("BUY", TransRecord::BUY)
-      .value("SELL", TransRecord::SELL)
-      .value("AUCTION", TransRecord::AUCTION);
 }
