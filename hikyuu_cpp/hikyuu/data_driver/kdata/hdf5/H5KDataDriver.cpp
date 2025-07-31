@@ -970,7 +970,7 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
               Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), (long)second);
             record.price = price_t(pBuf[i].price) * 0.001;
             record.vol = price_t(pBuf[i].vol);
-            record.direct = TransRecord::DIRECT(pBuf[i].buyorsell);
+            record.direct = int(pBuf[i].buyorsell);
             result.push_back(record);
         }
 
@@ -1118,7 +1118,7 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
               Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), (long)second);
             record.price = price_t(pBuf[i].price) * 0.001;
             record.vol = price_t(pBuf[i].vol);
-            record.direct = TransRecord::DIRECT(pBuf[i].buyorsell);
+            record.direct = int(pBuf[i].buyorsell);
             result.push_back(record);
         }
 
