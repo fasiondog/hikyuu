@@ -25,6 +25,10 @@ public:
     void addKRecordList(const string& market, const string& code, const vector<KRecord>& krecords,
                         const KQuery::KType& ktype);
 
+    void addTimeLineList(const string& market, const string& code, const TimeLineList& timeline);
+
+    void addTransList(const string& market, const string& code, const TransRecordList& translist);
+
     void updateIndex(const string& market, const string& code, const KQuery::KType& ktype);
 
     void remove(const string& market, const string& code, const KQuery::KType& ktype,
