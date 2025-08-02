@@ -247,33 +247,11 @@ Query.__init__ = new_Query_init
 # ------------------------------------------------------------------
 # 增加转化为 np.array、pandas.DataFrame 的功能
 # ------------------------------------------------------------------
-def KData_to_np(kdata):
-    """转化为numpy结构数组"""
-    if kdata.get_query().ktype in ('DAY', 'WEEK', 'MONTH', 'QUARTER', 'HALFYEAR', 'YEAR'):
-        k_type = np.dtype(
-            {
-                'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
-                'formats': ['datetime64[D]', 'd', 'd', 'd', 'd', 'd', 'd']
-            }
-        )
-    else:
-        k_type = np.dtype(
-            {
-                'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
-                'formats': ['datetime64[ms]', 'd', 'd', 'd', 'd', 'd', 'd']
-            }
-        )
-    return np.array(
-        [(k.datetime.datetime(), k.open, k.high, k.low, k.close, k.amount, k.volume) for k in kdata], dtype=k_type
-    )
-
-
 def KData_to_df(kdata):
     """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(KData_to_np(kdata), index='datetime')
+    return pd.DataFrame.from_records(kdata.to_np())
 
 
-KData.to_np = KData_to_np
 KData.to_df = KData_to_df
 
 
