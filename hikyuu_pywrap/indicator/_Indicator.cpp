@@ -203,6 +203,60 @@ set_context(self, stock, query)
 
       .def("__hash__", [](const Indicator& self) { return std::hash<Indicator>()(self); })
 
+      .def("__getitem__",
+           [](const Indicator& self, py::object obj) {
+               py::object ret;
+               if (py::isinstance<py::int_>(obj)) {
+                   int64_t i = obj.cast<int64_t>();
+                   int64_t length = self.size();
+                   int64_t index = i < 0 ? length + i : i;
+                   if (index < 0 || index >= length)
+                       throw std::out_of_range(fmt::format("index out of range: {}", i));
+                   ret = py::cast(self[index]);
+                   return ret;
+               } else if (py::isinstance<Datetime>(obj)) {
+                   Datetime dt = py::cast<Datetime>(obj);
+                   auto val = self[dt];
+                   if (val == Null<Indicator::value_t>()) {
+                       throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
+                   }
+                   ret = py::cast(val);
+                   return ret;
+               } else if (py::isinstance<py::str>(obj)) {
+                   Datetime dt = Datetime(py::cast<std::string>(obj));
+                   auto val = self[dt];
+                   if (val == Null<Indicator::value_t>()) {
+                       throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
+                   }
+                   ret = py::cast(val);
+                   return ret;
+               } else if (py::isinstance<py::slice>(obj)) {
+                   py::slice slice = py::cast<py::slice>(obj);
+                   ssize_t start, stop, step, length;
+
+                   if (!slice.compute(self.size(), &start, &stop, &step, &length)) {
+                       throw std::invalid_argument("无效的切片参数");
+                   }
+
+                   std::vector<Indicator::value_t> result;
+                   result.reserve(length);
+                   for (ssize_t i = 0; i < length; ++i) {
+                       ssize_t index = start + i * step;
+                       result.push_back(self[static_cast<size_t>(index)]);
+                   }
+
+                   ret = py::cast(result);
+                   return ret;
+               }
+
+               throw std::out_of_range("Error index type");
+           })
+
+      .def(
+        "__iter__",
+        [](const Indicator& self) { return py::make_iterator(self.begin(), self.end()); },
+        py::keep_alive<0, 1>())
+
       .def(
         "to_np",
         [](const Indicator& self) {

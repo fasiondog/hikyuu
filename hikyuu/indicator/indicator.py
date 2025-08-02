@@ -29,39 +29,6 @@ from hikyuu import Datetime
 import pandas as pd
 
 
-def indicator_iter(indicator):
-    for i in range(len(indicator)):
-        yield indicator[i]
-
-
-def indicator_getitem(data, i):
-    """
-    :param i: int | Datetime | slice | str 类型
-    """
-    if isinstance(i, int):
-        length = len(data)
-        index = length + i if i < 0 else i
-        if index < 0 or index >= length:
-            raise IndexError("index out of range: %d" % i)
-        return data.get(index)
-
-    elif isinstance(i, slice):
-        return [data.get(x) for x in range(*i.indices(len(data)))]
-
-    elif isinstance(i, Datetime):
-        return data.get_by_datetime(i)
-
-    elif isinstance(i, str):
-        return data.get_by_datetime(Datetime(i))
-
-    else:
-        raise IndexError("Error index type")
-
-
-Indicator.__getitem__ = indicator_getitem
-Indicator.__iter__ = indicator_iter
-
-
 def indicator_to_df(indicator):
     """转化为pandas.DataFrame"""
     return pd.DataFrame.from_records(indicator.to_np())

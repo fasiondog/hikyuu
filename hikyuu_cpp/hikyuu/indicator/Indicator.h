@@ -205,6 +205,43 @@ public:
 
     string str() const;
 
+public:
+    class Iterator {
+    private:
+        const Indicator& container;
+        size_t index;
+
+    public:
+        Iterator(const Indicator& cont, size_t idx) : container(cont), index(idx) {}
+
+        Iterator& operator++() {
+            index++;
+            return *this;
+        }
+
+        value_t operator*() const {
+            return container.get(index);
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return index != other.index;
+        }
+
+        bool operator==(const Iterator& other) const {
+            return index == other.index;
+        }
+    };
+
+    Iterator begin() const {
+        return Iterator(*this, 0);
+    }
+
+    Iterator end() const {
+        return Iterator(*this, size());
+    }
+
+    typedef Iterator iterator;
+
 protected:
     IndicatorImpPtr m_imp;
 
