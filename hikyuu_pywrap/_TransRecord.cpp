@@ -29,4 +29,40 @@ void export_TransRecord(py::module& m) {
       .def(py::self == py::self)
 
         DEF_PICKLE(TransRecord);
+
+    m.def(
+      "translist_to_np",
+      [](const TransList& trans) {
+          struct RawData {
+              int64_t datetime;  // 转换后的毫秒时间戳
+              double price;
+              double vol;
+              int64_t direct;
+          };
+
+          std::vector<RawData> data;
+          data.resize(trans.size());
+          for (size_t i = 0; i < trans.size(); i++) {
+              const TransRecord& record = trans[i];
+              data[i].datetime = record.datetime.timestamp() / 1000;
+              data[i].price = record.price;
+              data[i].vol = record.vol;
+              data[i].direct = record.direct;
+          }
+
+          // 定义NumPy结构化数据类型
+          auto dtype =
+            py::dtype(vector_to_python_list<string>({"datetime", "price", "vol", "direct"}),
+                      vector_to_python_list<string>({"datetime64[ms]", "d", "d", "i8"}),
+                      vector_to_python_list<int64_t>({0, 8, 16, 24}), 32);
+
+          // 创建NumPy数组并复制数据
+          // py::array_t<RawData> arr(static_cast<ssize_t>(data.size()), data.data(), dtype);
+          // return arr;
+          // 创建numpy数组
+
+          // 使用buffer_info创建数组
+          return py::array(dtype, data.size(), data.data());
+      },
+      "将分笔记录转换为NumPy元组");
 }

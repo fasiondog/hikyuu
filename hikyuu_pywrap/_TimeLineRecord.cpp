@@ -6,6 +6,8 @@
  */
 
 #include <hikyuu/serialization/TimeLineRecord_serialization.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include "pybind_utils.h"
 
 using namespace hku;
@@ -27,4 +29,31 @@ void export_TimeLineReord(py::module& m) {
       .def(py::self == py::self)
 
         DEF_PICKLE(TimeLineRecord);
+
+    m.def(
+      "timeline_to_np",
+      [](const TimeLineList& timeline) {
+          struct RawData {
+              int64_t datetime;  // 转换后的毫秒时间戳
+              double price;
+              double vol;
+          };
+
+          std::vector<RawData> data;
+          data.resize(timeline.size());
+          for (size_t i = 0; i < timeline.size(); i++) {
+              const TimeLineRecord& record = timeline[i];
+              data[i].datetime = record.datetime.timestamp() / 1000;
+              data[i].price = record.price;
+              data[i].vol = record.vol;
+          }
+
+          // 定义NumPy结构化数据类型
+          auto dtype = py::dtype(vector_to_python_list<string>({"datetime", "price", "vol"}),
+                                 vector_to_python_list<string>({"datetime64[ms]", "d", "d"}),
+                                 vector_to_python_list<int64_t>({0, 8, 16}), 24);
+
+          return py::array(dtype, data.size(), data.data());
+      },
+      "将分时线记录转换为NumPy元组");
 }

@@ -277,14 +277,24 @@ KData.to_np = KData_to_np
 KData.to_df = KData_to_df
 
 
-def DatetimeList_to_np(data):
-    """仅在安装了numpy模块时生效，转换为numpy.array"""
-    return np.array(data, dtype='datetime64[D]')
+def DatetimeList_to_np(data: DatetimeList, unit: str = 'ms'):
+    """
+    DatetimeList转化为numpy结构数组
+
+    :param unit: 'Y' | 'M' | 'D' | 'W' | 'h' | 'ms' | 'us' | 's'
+    :return: numpy结构数组
+    """
+    return dates_to_np(data, unit)
 
 
-def DatetimeList_to_df(data):
-    """仅在安装了pandas模块时生效，转换为pandas.DataFrame"""
-    return pd.DataFrame(data.to_np(), columns=('Datetime', ))
+def DatetimeList_to_df(data: DatetimeList, unit: str = 'ms'):
+    """
+    DatetimeList转化为pandas的DataFrame
+
+    :param unit: 'Y' | 'M' | 'D' | 'W' | 'h' | 'ms' | 'us' | 's'
+    :return: pandas的DataFrame
+    """
+    return pd.DataFrame.from_records(dates_to_np(data, unit))
 
 
 DatetimeList.to_np = DatetimeList_to_np
@@ -293,13 +303,12 @@ DatetimeList.to_df = DatetimeList_to_df
 
 def TimeLine_to_np(data):
     """转化为numpy结构数组"""
-    t_type = np.dtype({'names': ['datetime', 'price', 'vol'], 'formats': ['datetime64[ms]', 'd', 'd']})
-    return np.array([(t.date.datetime(), t.price, t.vol) for t in data], dtype=t_type)
+    return timeline_to_np(data)
 
 
-def TimeLine_to_df(kdata):
+def TimeLine_to_df(data):
     """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(TimeLine_to_np(kdata), index='datetime')
+    return pd.DataFrame.from_records(timeline_to_np(data))
 
 
 TimeLineList.to_np = TimeLine_to_np
@@ -308,18 +317,12 @@ TimeLineList.to_df = TimeLine_to_df
 
 def TransList_to_np(data):
     """转化为numpy结构数组"""
-    t_type = np.dtype(
-        {
-            'names': ['datetime', 'price', 'vol', 'direct'],
-            'formats': ['datetime64[ms]', 'd', 'd', 'd']
-        }
-    )
-    return np.array([(t.date.datetime(), t.price, t.vol, t.direct) for t in data], dtype=t_type)
+    return translist_to_np(data)
 
 
-def TransList_to_df(kdata):
+def TransList_to_df(data):
     """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(TransList_to_np(kdata), index='datetime')
+    return pd.DataFrame.from_records(translist_to_np(data))
 
 
 TransList.to_np = TransList_to_np
