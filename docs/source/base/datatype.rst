@@ -502,7 +502,7 @@ K线数据
     .. py:attribute:: date : 时间
     .. py:attribute:: price : 价格
     .. py:attribute:: vol : 成交量
-    .. py:attribute:: direct : 买卖盘性质
+    .. py:attribute:: direct : 买卖盘性质: 1--sell 0--buy 2--集合竞价 其他未知
     
 .. py:class:: TransList
 
