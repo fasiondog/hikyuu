@@ -206,13 +206,87 @@ set_context(self, stock, query)
       .def(
         "to_np",
         [](const Indicator& self) {
-            py::array_t<Indicator::value_t> ret;
+            py::array ret;
             auto imp = self.getImp();
             HKU_IF_RETURN(!imp, ret);
-            ret = py::array_t<Indicator::value_t>(self.size(), imp->data(0));
+            size_t ret_num = imp->getResultNumber();
+            std::unique_ptr<uint64_t[]> buffer(new uint64_t[self.size() * (ret_num + 1)]);
+            std::vector<string> names{"datetime"};
+            std::vector<string> fields{"datetime64[ms]"};
+            std::vector<int64_t> offsets{0};
+            for (size_t i = 0; i < ret_num; i++) {
+                names.push_back(fmt::format("value{}", i + 1));
+                fields.push_back("d");
+                offsets.push_back(offsets.back() + sizeof(Indicator::value_t));
+            }
+
+            auto dtype =
+              py::dtype(vector_to_python_list<string>(names), vector_to_python_list<string>(fields),
+                        vector_to_python_list<int64_t>(offsets),
+                        sizeof(Indicator::value_t) + ret_num * sizeof(Indicator::value_t));
+
+            auto dates = imp->getDatetimeList();
+
+            std::vector<const Indicator::value_t*> src(ret_num);
+            for (size_t i = 0; i < ret_num; i++) {
+                src[i] = imp->data(i);
+            }
+
+            uint64_t* data = (uint64_t*)buffer.get();
+            double* val = (double*)buffer.get();
+            size_t x = ret_num + 1;
+            for (size_t i = 0, total = imp->size(); i < total; i++) {
+                data[i * x] = dates[i].timestamp() / 1000LL;
+                for (size_t j = 0; j < ret_num; j++) {
+                    val[i * x + j + 1] = src[j][i];
+                }
+            }
+            ret = py::array(dtype, self.size(), data);
             return ret;
         },
-        "转化为np.array，如果indicator存在多个值，只返回第一个")
+        "转化为np.array, 含 datetime 日期列")
+
+      .def(
+        "value_to_np",
+        [](const Indicator& self) {
+            py::array ret;
+            auto imp = self.getImp();
+            HKU_IF_RETURN(!imp, ret);
+            size_t ret_num = imp->getResultNumber();
+            std::unique_ptr<double[]> buffer(new double[self.size() * ret_num]);
+            std::vector<string> names;
+            std::vector<string> fields;
+            std::vector<int64_t> offsets;
+            for (size_t i = 0; i < ret_num; i++) {
+                names.push_back(fmt::format("value{}", i + 1));
+                fields.push_back("d");
+                if (i == 0) {
+                    offsets.push_back(0);
+                } else {
+                    offsets.push_back(offsets.back() + sizeof(Indicator::value_t));
+                }
+            }
+
+            auto dtype = py::dtype(
+              vector_to_python_list<string>(names), vector_to_python_list<string>(fields),
+              vector_to_python_list<int64_t>(offsets), ret_num * sizeof(Indicator::value_t));
+
+            std::vector<const Indicator::value_t*> src(ret_num);
+            for (size_t i = 0; i < ret_num; i++) {
+                src[i] = imp->data(i);
+            }
+
+            double* val = buffer.get();
+            size_t x = ret_num;
+            for (size_t i = 0, total = imp->size(); i < total; i++) {
+                for (size_t j = 0; j < ret_num; j++) {
+                    val[i * x + j] = src[j][i];
+                }
+            }
+            ret = py::array(dtype, self.size(), val);
+            return ret;
+        },
+        "仅转化值为np.array, 不包含日期列")
 
       .def(py::self + py::self)
       .def(py::self + Indicator::value_t())
