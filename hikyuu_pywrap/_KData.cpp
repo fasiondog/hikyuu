@@ -134,6 +134,63 @@ void export_KData(py::module& m) {
       .def(py::self == py::self)
       .def(py::self != py::self)
 
+      .def("__getitem__",
+           [](const KData& self, py::object obj) {
+               py::object ret;
+               if (py::isinstance<py::int_>(obj)) {
+                   int64_t i = obj.cast<int64_t>();
+                   int64_t length = self.size();
+                   int64_t index = i < 0 ? length + i : i;
+                   if (index < 0 || index >= length)
+                       throw std::out_of_range(fmt::format("index out of range: {}", i));
+                   ret = py::cast(self.getKRecord(index));
+                   return ret;
+               } else if (py::isinstance<Datetime>(obj)) {
+                   Datetime dt = py::cast<Datetime>(obj);
+                   auto krecord = self.getKRecord(dt);
+                   if (krecord == Null<KRecord>()) {
+                       throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
+                   }
+                   ret = py::cast(krecord);
+                   return ret;
+               } else if (py::isinstance<py::str>(obj)) {
+                   Datetime dt = Datetime(py::cast<std::string>(obj));
+                   auto krecord = self.getKRecord(dt);
+                   if (krecord == Null<KRecord>()) {
+                       throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
+                   }
+                   ret = py::cast(krecord);
+                   return ret;
+               } else if (py::isinstance<py::slice>(obj)) {
+                   py::slice slice = py::cast<py::slice>(obj);
+                   ssize_t start, stop, step, length;
+
+                   if (!slice.compute(self.size(), &start, &stop, &step, &length)) {
+                       throw std::invalid_argument("无效的切片参数");
+                   }
+
+                   KRecordList result;
+                   result.reserve(length);
+                   for (ssize_t i = 0; i < length; ++i) {
+                       ssize_t index = start + i * step;
+                       result.push_back(self[static_cast<size_t>(index)]);
+                   }
+
+                   ret = py::cast(result);
+                   return ret;
+               }
+
+               throw std::out_of_range("Error index type");
+           })
+
+      .def(
+        "__iter__",
+        [](const KData& self) {
+            return py::make_iterator<py::return_value_policy::reference_internal>(self.cbegin(),
+                                                                                  self.cend());
+        },
+        py::keep_alive<0, 1>())
+
       .def(
         "to_np",
         [](const KData& kdata) {

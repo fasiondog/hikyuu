@@ -152,43 +152,6 @@ TimeDelta.__add__ = __new_TimeDelta_add__
 TimeDelta.__sub__ = __new_TimeDelta_sub__
 TimeDelta.timedelta = TimeDelta_timedelta
 
-# ------------------------------------------------------------------
-# 增强 KData 的遍历
-# ------------------------------------------------------------------
-
-
-def KData_getitem(kdata, i):
-    """
-    :param i: int | Datetime | slice | str 类型
-    """
-    if isinstance(i, int):
-        length = len(kdata)
-        index = length + i if i < 0 else i
-        if index < 0 or index >= length:
-            raise IndexError("index out of range: %d" % i)
-        return kdata.get(index)
-
-    elif isinstance(i, Datetime):
-        return kdata.get_by_datetime(i)
-
-    elif isinstance(i, str):
-        return kdata.get_by_datetime(Datetime(i))
-
-    elif isinstance(i, slice):
-        return [kdata.get(x) for x in range(*i.indices(len(kdata)))]
-
-    else:
-        raise IndexError("Error index type")
-
-
-def KData_iter(kdata):
-    for i in range(len(kdata)):
-        yield kdata[i]
-
-
-KData.__getitem__ = KData_getitem
-KData.__iter__ = KData_iter
-
 
 # ------------------------------------------------------------------
 # 重定义Query
