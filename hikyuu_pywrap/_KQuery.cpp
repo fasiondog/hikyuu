@@ -29,7 +29,7 @@ void export_KQuery(py::module& m) {
       .def_property_readonly("ktype", &KQuery::kType, "查询的K线类型")
       .def_property_readonly("recover_type", py::overload_cast<>(&KQuery::recoverType, py::const_),
                              "复权类别")
-      .def("get_all_ktype", &KQuery::getAllKType, "获取所有KType")
+      .def("get_all_base_ktype", &KQuery::getAllBaseKType, "获取所有基础KType")
       .def("get_ktype_in_min", &KQuery::getKTypeInMin, "获取ktype对应的分钟数")
 
         DEF_PICKLE(KQuery);

@@ -14,6 +14,6 @@ namespace py = pybind11;
 
 void export_KExtra(py::module& m) {
     m.def("register_ktype_extra", &registerKTypeExtra);
-    m.def("is_ktype_extra", &isKTypeExtra);
+    m.def("is_extra_ktype", &isExtraKType);
     m.def("release_ktype_extra", &releaseKExtra);
 }

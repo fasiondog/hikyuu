@@ -63,7 +63,7 @@ Stock::Data::Data()
   m_precision(default_precision),
   m_minTradeNumber(default_minTradeNumber),
   m_maxTradeNumber(default_maxTradeNumber) {
-    const auto& ktype_list = KQuery::getAllKType();
+    const auto& ktype_list = KQuery::getAllBaseKType();
     for (const auto& ktype : ktype_list) {
         pKData[ktype] = nullptr;
         pMutex[ktype] = nullptr;
@@ -95,7 +95,7 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
     to_upper(m_market);
     m_market_code = marketCode();
 
-    const auto& ktype_list = KQuery::getAllKType();
+    const auto& ktype_list = KQuery::getAllBaseKType();
     for (const auto& ktype : ktype_list) {
         pMutex[ktype] = new std::shared_mutex();
         pKData[ktype] = nullptr;
@@ -379,7 +379,7 @@ void Stock::setKDataDriver(const KDataDriverConnectPoolPtr& kdataDriver) {
     HKU_CHECK(kdataDriver, "kdataDriver is nullptr!");
     m_kdataDriver = kdataDriver;
     if (m_data) {
-        auto& ktype_list = KQuery::getAllKType();
+        auto& ktype_list = KQuery::getAllBaseKType();
         for (auto& ktype : ktype_list) {
             std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
             delete m_data->pKData[ktype];
@@ -764,7 +764,7 @@ KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
 
 KRecordList Stock::getKRecordList(const KQuery& query) const {
     KRecordList result;
-    if (KQuery::isKType(query.kType())) {
+    if (KQuery::isBaseKType(query.kType())) {
         result = _getKRecordList(query);
     } else {
         HKU_CHECK(query.queryType() == KQuery::DATE, "extra kdata only support DATE queryType!");

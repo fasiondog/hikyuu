@@ -32,7 +32,7 @@ void HKU_API registerKTypeExtra(const string& ktype, const string& basetype,
                                 const std::function<Datetime(const Datetime&)>& getPhaseEnd,
                                 const std::function<int32_t()>& getMinutes);
 
-bool HKU_API isKTypeExtra(const string& ktype);
+bool HKU_API isExtraKType(const string& ktype);
 
 void HKU_API releaseKExtra();
 

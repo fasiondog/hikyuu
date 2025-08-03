@@ -181,7 +181,7 @@ void StockManager::loadAllKData() {
     // 如果上下文指定了 ktype list，则按上下文指定的 ktype 顺序加载，否则按默认顺序加载
     const auto& context_ktypes = m_context.getKTypeList();
     if (context_ktypes.empty()) {
-        ktypes = KQuery::getAllKType();
+        ktypes = KQuery::getAllBaseKType();
 
     } else {
         // 使用上下文预加载参数覆盖全局预加载参数

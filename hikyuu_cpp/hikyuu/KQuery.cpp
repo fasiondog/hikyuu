@@ -8,6 +8,7 @@
 #include <boost/functional/hash.hpp>
 #include <xxhash.h>
 #include "KQuery.h"
+#include "KExtra.h"
 
 namespace hku {
 
@@ -29,10 +30,10 @@ const string KQuery::HOUR6("HOUR6");
 const string KQuery::HOUR12("HOUR12");
 // const string KQuery::INVALID_KTYPE("Z");
 
-static vector<string> g_all_ktype{KQuery::MIN,     KQuery::MIN5,     KQuery::MIN15, KQuery::MIN30,
-                                  KQuery::MIN60,   KQuery::DAY,      KQuery::WEEK,  KQuery::MONTH,
-                                  KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::HOUR2,
-                                  KQuery::HOUR4,   KQuery::HOUR6,    KQuery::HOUR12};
+// 所有基础K线类型（即有实际物理存储的K线类型）
+static vector<string> g_all_base_ktype{
+  KQuery::MIN,  KQuery::MIN5,  KQuery::MIN15,   KQuery::MIN30,    KQuery::MIN60, KQuery::DAY,
+  KQuery::WEEK, KQuery::MONTH, KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::HOUR2};
 
 static const unordered_map<string, int32_t> g_ktype2min{
   {KQuery::MIN, 1},
@@ -56,18 +57,24 @@ static const unordered_map<string, int32_t> g_ktype2min{
 };
 
 // 获取所有的 KType
-const vector<KQuery::KType>& KQuery::getAllKType() {
-    return g_all_ktype;
+const vector<KQuery::KType>& KQuery::getAllBaseKType() {
+    return g_all_base_ktype;
 }
 
 int32_t KQuery::getKTypeInMin(KType ktype) {
-    return g_ktype2min.at(ktype);
-}
-
-bool KQuery::isKType(const string& ktype) {
     string nktype(ktype);
     to_upper(nktype);
-    for (const auto& v : g_all_ktype) {
+    if (isExtraKType(nktype)) {
+        const KExtra& extra = getKExtra(nktype);
+        return extra.getMinutes();
+    }
+    return g_ktype2min.at(nktype);
+}
+
+bool KQuery::isBaseKType(const string& ktype) {
+    string nktype(ktype);
+    to_upper(nktype);
+    for (const auto& v : g_all_base_ktype) {
         if (nktype == v) {
             return true;
         }

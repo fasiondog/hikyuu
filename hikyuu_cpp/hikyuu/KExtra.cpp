@@ -66,14 +66,14 @@ void HKU_API registerKTypeExtra(const string& ktype, const string& basetype,
 
     string nktype(ktype);
     to_upper(nktype);
-    HKU_CHECK(!KQuery::isKType(nktype), "Invalid ktype: {}! It's bastktype.", ktype);
+    HKU_CHECK(!KQuery::isBaseKType(nktype), _tr("Invalid ktype: {}! It's bastktype."), ktype);
 
     string nbasetype(basetype);
     to_upper(nbasetype);
-    HKU_CHECK(KQuery::isKType(nbasetype), "Invalid basetype: {}!", basetype);
+    HKU_CHECK(KQuery::isBaseKType(nbasetype), _tr("Invalid basetype: {}!"), basetype);
 
     auto iter = g_ktype_extra.find(nktype);
-    HKU_CHECK(iter == g_ktype_extra.end(), "ktype: {} is already registered!", ktype);
+    HKU_CHECK(iter == g_ktype_extra.end(), _tr("ktype: {} is already registered!"), ktype);
 
     KExtra extra;
     extra.ktype = nktype;
@@ -83,7 +83,7 @@ void HKU_API registerKTypeExtra(const string& ktype, const string& basetype,
     g_ktype_extra.insert(std::make_pair(nktype, std::move(extra)));
 }
 
-bool HKU_API isKTypeExtra(const string& ktype) {
+bool HKU_API isExtraKType(const string& ktype) {
     string nktype(ktype);
     to_upper(nktype);
     auto iter = g_ktype_extra.find(nktype);
@@ -94,7 +94,7 @@ const KExtra& getKExtra(const string& ktype) {
     string nktype(ktype);
     to_upper(nktype);
     auto iter = g_ktype_extra.find(nktype);
-    HKU_CHECK(iter != g_ktype_extra.end(), "Not register extra ktype: {}!", ktype);
+    HKU_CHECK(iter != g_ktype_extra.end(), _tr("Not register extra ktype: {}!"), ktype);
     return iter->second;
 }
 

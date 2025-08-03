@@ -70,12 +70,12 @@ public:
     // static const string INVALID_KTYPE;
 
     /** 获取所有的 KType */
-    static const vector<KType>& getAllKType();
+    static const vector<KType>& getAllBaseKType();
 
     static int32_t getKTypeInMin(KType);
 
     /** 判断是否为有效 ktype */
-    static bool isKType(const string& ktype);
+    static bool isBaseKType(const string& ktype);
 
     /**
      * 复权类型
