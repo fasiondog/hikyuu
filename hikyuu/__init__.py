@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 # cp936
 
+import atexit
 import io
 from pathlib import Path
 import pickle
@@ -70,6 +71,14 @@ except Exception as e:
 
 
 __version__ = get_version()
+
+
+def hku_cleanup():
+    release_ktype_extra()
+
+
+atexit.register(hku_cleanup)
+
 
 sm = StockManager.instance()
 

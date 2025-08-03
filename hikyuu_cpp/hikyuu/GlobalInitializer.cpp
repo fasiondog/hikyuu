@@ -33,6 +33,7 @@
 #include "global/schedule/scheduler.h"
 #include "indicator/IndicatorImp.h"
 #include "global/sysinfo.h"
+#include "KExtra.h"
 #include "debug.h"
 
 namespace hku {
@@ -101,6 +102,7 @@ void GlobalInitializer::clean() {
     }
 #endif
 
+    releaseKExtra();
     releaseScheduler();
     releaseGlobalSpotAgent();
 

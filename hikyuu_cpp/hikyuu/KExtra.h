@@ -29,11 +29,13 @@ struct KExtra {
 };
 
 void HKU_API registerKTypeExtra(const string& ktype, const string& basetype,
-                                std::function<Datetime(const Datetime&)>&& getPhaseEnd,
-                                std::function<int32_t()>&& getMinutes);
+                                const std::function<Datetime(const Datetime&)>& getPhaseEnd,
+                                const std::function<int32_t()>& getMinutes);
 
 bool HKU_API isKTypeExtra(const string& ktype);
 
-HKU_API const KExtra& getKExtra(const string& ktype);
+void HKU_API releaseKExtra();
+
+const KExtra& getKExtra(const string& ktype);
 
 }  // namespace hku

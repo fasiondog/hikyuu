@@ -60,8 +60,8 @@ KRecordList KExtra::getExtraKRecordList(const KRecordList& kdata) const {
 }
 
 void HKU_API registerKTypeExtra(const string& ktype, const string& basetype,
-                                std::function<Datetime(const Datetime&)>&& getPhaseEnd,
-                                std::function<int32_t()>&& getMinutes) {
+                                const std::function<Datetime(const Datetime&)>& getPhaseEnd,
+                                const std::function<int32_t()>& getMinutes) {
     HKU_CHECK(getPhaseEnd && getMinutes, "Invalid function getPhaseEnd or getMinutes!");
 
     string nktype(ktype);
@@ -73,13 +73,13 @@ void HKU_API registerKTypeExtra(const string& ktype, const string& basetype,
     HKU_CHECK(KQuery::isKType(nbasetype), "Invalid basetype: {}!", basetype);
 
     auto iter = g_ktype_extra.find(nktype);
-    HKU_CHECK(iter != g_ktype_extra.end(), "ktype: {} is already registered!", ktype);
+    HKU_CHECK(iter == g_ktype_extra.end(), "ktype: {} is already registered!", ktype);
 
     KExtra extra;
     extra.ktype = nktype;
     extra.basetype = nbasetype;
-    extra.getPhaseEnd = std::move(getPhaseEnd);
-    extra.getMinutes = std::move(getMinutes);
+    extra.getPhaseEnd = getPhaseEnd;
+    extra.getMinutes = getMinutes;
     g_ktype_extra.insert(std::make_pair(nktype, std::move(extra)));
 }
 
@@ -90,12 +90,16 @@ bool HKU_API isKTypeExtra(const string& ktype) {
     return iter != g_ktype_extra.end();
 }
 
-HKU_API const KExtra& getKExtra(const string& ktype) {
+const KExtra& getKExtra(const string& ktype) {
     string nktype(ktype);
     to_upper(nktype);
     auto iter = g_ktype_extra.find(nktype);
     HKU_CHECK(iter != g_ktype_extra.end(), "Not register extra ktype: {}!", ktype);
     return iter->second;
+}
+
+void HKU_API releaseKExtra() {
+    g_ktype_extra.clear();
 }
 
 }  // namespace hku

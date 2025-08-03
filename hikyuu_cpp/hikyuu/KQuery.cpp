@@ -31,8 +31,8 @@ const string KQuery::HOUR12("HOUR12");
 
 static vector<string> g_all_ktype{KQuery::MIN,     KQuery::MIN5,     KQuery::MIN15, KQuery::MIN30,
                                   KQuery::MIN60,   KQuery::DAY,      KQuery::WEEK,  KQuery::MONTH,
-                                  KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::MIN3,
-                                  KQuery::HOUR2,   KQuery::HOUR4,    KQuery::HOUR6, KQuery::HOUR12};
+                                  KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::HOUR2,
+                                  KQuery::HOUR4,   KQuery::HOUR6,    KQuery::HOUR12};
 
 static const unordered_map<string, int32_t> g_ktype2min{
   {KQuery::MIN, 1},
