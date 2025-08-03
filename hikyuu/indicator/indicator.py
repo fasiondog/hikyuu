@@ -98,10 +98,10 @@ def df_to_ind(df, col_name, col_date=None):
     :return: Indicator
     """
     if col_date is not None:
-        dates = df[col_date].to_list()
+        dates = df[col_date]
         dates = DatetimeList([Datetime(x) for x in dates])
-        return PRICELIST(df[col_name].to_list(), align_dates=dates)
-    return PRICELIST(df[col_name].to_list())
+        return PRICELIST(df[col_name], align_dates=dates)
+    return PRICELIST(df[col_name])
 
 
 # 避免 python 中公式原型必须加括号
