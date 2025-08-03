@@ -29,50 +29,9 @@ from hikyuu import Datetime
 import pandas as pd
 
 
-def indicator_iter(indicator):
-    for i in range(len(indicator)):
-        yield indicator[i]
-
-
-def indicator_getitem(data, i):
-    """
-    :param i: int | Datetime | slice | str 类型
-    """
-    if isinstance(i, int):
-        length = len(data)
-        index = length + i if i < 0 else i
-        if index < 0 or index >= length:
-            raise IndexError("index out of range: %d" % i)
-        return data.get(index)
-
-    elif isinstance(i, slice):
-        return [data.get(x) for x in range(*i.indices(len(data)))]
-
-    elif isinstance(i, Datetime):
-        return data.get_by_datetime(i)
-
-    elif isinstance(i, str):
-        return data.get_by_datetime(Datetime(i))
-
-    else:
-        raise IndexError("Error index type")
-
-
-Indicator.__getitem__ = indicator_getitem
-Indicator.__iter__ = indicator_iter
-
-
 def indicator_to_df(indicator):
     """转化为pandas.DataFrame"""
-    if indicator.get_result_num() == 1:
-        return pd.DataFrame(indicator.to_np(), columns=[indicator.name])
-    data = {}
-    name = indicator.name
-    columns = []
-    for i in range(indicator.get_result_num()):
-        data[name + str(i)] = indicator.get_result(i)
-        columns.append(name + str(i + 1))
-    return pd.DataFrame(data, columns=columns)
+    return pd.DataFrame.from_records(indicator.to_np())
 
 
 Indicator.to_df = indicator_to_df
@@ -107,17 +66,19 @@ def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
         198	2024-03-06 00:00:00	10.070455	9.776818
         199	2024-03-07 00:00:00	10.101364	9.738182
     """
-    df = pd.DataFrame(dates, columns=['date'])
-    for ind in ind_list:
-        x = ALIGN(ind, dates)
+    df = dates.to_df('ms')
+    if not ind_list:
+        return df
+    for i in range(len(ind_list)):
+        ind = ind_list[i]
         if head_ind_name and head_stock_code:
-            x.name = f"{ind.name}/{ind.get_context().get_stock().market_code}"
+            name = f"{ind.name}/{ind.get_context().get_stock().market_code}"
         elif head_ind_name:
-            x.name = ind.name
+            name = f'{ind.name}{i}'
         else:
-            x.name = ind.get_context().get_stock().market_code
-        df = pd.concat([df, x.to_df()], axis=1)
-    df.set_index('date')
+            name = ind.get_context().get_stock().market_code
+        df = pd.merge(df, ind.to_df()[['datetime', 'value1']].rename(
+            columns={'value1': name}), on='datetime', how='left')
     return df
 
 
