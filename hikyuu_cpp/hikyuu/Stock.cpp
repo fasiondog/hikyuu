@@ -9,6 +9,7 @@
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
 #include "KData.h"
+#include "KExtra.h"
 
 namespace hku {
 
@@ -762,6 +763,21 @@ KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
 }
 
 KRecordList Stock::getKRecordList(const KQuery& query) const {
+    KRecordList result;
+    if (KQuery::isKType(query.kType())) {
+        result = _getKRecordList(query);
+    } else {
+        HKU_CHECK(query.queryType() == KQuery::DATE, "extra kdata only support DATE queryType!");
+        const KExtra& ketra = getKExtra(query.kType());
+        KQuery base_query = KQueryByDate(query.startDatetime(), query.endDatetime(), ketra.basetype,
+                                         query.recoverType());
+        auto base_ks = _getKRecordList(base_query);
+        result = ketra.getExtraKRecordList(base_ks);
+    }
+    return result;
+}
+
+KRecordList Stock::_getKRecordList(const KQuery& query) const {
     KRecordList result;
     HKU_IF_RETURN(isNull(), result);
 

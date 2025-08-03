@@ -264,6 +264,8 @@ private:
                                           KQuery::KType ktype) const;
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;
 
+    KRecordList _getKRecordList(const KQuery& query) const;
+
 private:
     struct HKU_API Data;
     shared_ptr<Data> m_data;
