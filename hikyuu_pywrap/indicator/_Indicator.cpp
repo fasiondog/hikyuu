@@ -265,21 +265,39 @@ set_context(self, stock, query)
             HKU_IF_RETURN(!imp, ret);
             size_t ret_num = imp->getResultNumber();
             std::unique_ptr<uint64_t[]> buffer(new uint64_t[self.size() * (ret_num + 1)]);
-            std::vector<string> names{"datetime"};
-            std::vector<string> fields{"datetime64[ms]"};
-            std::vector<int64_t> offsets{0};
-            for (size_t i = 0; i < ret_num; i++) {
-                names.push_back(fmt::format("value{}", i + 1));
-                fields.push_back("d");
-                offsets.push_back(offsets.back() + sizeof(Indicator::value_t));
+
+            std::vector<string> names;
+            std::vector<string> fields;
+            std::vector<int64_t> offsets;
+
+            auto dates = imp->getDatetimeList();
+            size_t bytes_size;
+            if (!dates.empty()) {
+                names.push_back("datetime");
+                fields.push_back("datetime64[ms]");
+                offsets.push_back(0);
+                for (size_t i = 0; i < ret_num; i++) {
+                    names.push_back(fmt::format("value{}", i + 1));
+                    fields.push_back("d");
+                    offsets.push_back(offsets.back() + sizeof(Indicator::value_t));
+                }
+                bytes_size = sizeof(Datetime) + ret_num * sizeof(Indicator::value_t);
+            } else {
+                for (size_t i = 0; i < ret_num; i++) {
+                    names.push_back(fmt::format("value{}", i + 1));
+                    fields.push_back("d");
+                    if (i == 0) {
+                        offsets.push_back(0);
+                    } else {
+                        offsets.push_back(offsets.back() + sizeof(Indicator::value_t));
+                    }
+                }
+                bytes_size = ret_num * sizeof(Indicator::value_t);
             }
 
             auto dtype =
               py::dtype(vector_to_python_list<string>(names), vector_to_python_list<string>(fields),
-                        vector_to_python_list<int64_t>(offsets),
-                        sizeof(Indicator::value_t) + ret_num * sizeof(Indicator::value_t));
-
-            auto dates = imp->getDatetimeList();
+                        vector_to_python_list<int64_t>(offsets), bytes_size);
 
             std::vector<const Indicator::value_t*> src(ret_num);
             for (size_t i = 0; i < ret_num; i++) {
@@ -288,17 +306,25 @@ set_context(self, stock, query)
 
             uint64_t* data = (uint64_t*)buffer.get();
             double* val = (double*)buffer.get();
-            size_t x = ret_num + 1;
-            for (size_t i = 0, total = imp->size(); i < total; i++) {
-                data[i * x] = dates[i].timestamp() / 1000LL;
-                for (size_t j = 0; j < ret_num; j++) {
-                    val[i * x + j + 1] = src[j][i];
+            if (!dates.empty()) {
+                size_t x = ret_num + 1;
+                for (size_t i = 0, total = imp->size(); i < total; i++) {
+                    data[i * x] = dates[i].timestamp() / 1000LL;
+                    for (size_t j = 0; j < ret_num; j++) {
+                        val[i * x + j + 1] = src[j][i];
+                    }
+                }
+            } else {
+                for (size_t i = 0, total = imp->size(); i < total; i++) {
+                    for (size_t j = 0; j < ret_num; j++) {
+                        val[i * ret_num + j] = src[j][i];
+                    }
                 }
             }
             ret = py::array(dtype, self.size(), data);
             return ret;
         },
-        "转化为np.array, 含 datetime 日期列")
+        "转化为np.array, 如果为时间序列, 则包含 datetime 日期列")
 
       .def(
         "value_to_np",
