@@ -12,6 +12,14 @@
 
 namespace hku {
 
+void HKU_API registerKTypeExtra(const string& ktype, const string& basetype,
+                                const std::function<Datetime(const Datetime&)>& getPhaseEnd,
+                                const std::function<int32_t()>& getMinutes);
+
+bool HKU_API isExtraKType(const string& ktype);
+
+void HKU_API releaseKExtra();
+
 struct KExtra {
     string ktype;
     string basetype;
@@ -27,14 +35,6 @@ struct KExtra {
 
     KRecordList getExtraKRecordList(const KRecordList& kdata) const;
 };
-
-void HKU_API registerKTypeExtra(const string& ktype, const string& basetype,
-                                const std::function<Datetime(const Datetime&)>& getPhaseEnd,
-                                const std::function<int32_t()>& getMinutes);
-
-bool HKU_API isExtraKType(const string& ktype);
-
-void HKU_API releaseKExtra();
 
 const KExtra& getKExtra(const string& ktype);
 

@@ -181,7 +181,7 @@ void StockManager::loadAllKData() {
     // 如果上下文指定了 ktype list，则按上下文指定的 ktype 顺序加载，否则按默认顺序加载
     const auto& context_ktypes = m_context.getKTypeList();
     if (context_ktypes.empty()) {
-        ktypes = KQuery::getAllBaseKType();
+        ktypes = KQuery::getBaseKTypeList();
 
     } else {
         // 使用上下文预加载参数覆盖全局预加载参数
@@ -479,6 +479,16 @@ void StockManager::loadAllStocks() {
         }
     }
 
+    auto base_ktypes = KQuery::getBaseKTypeList();
+    vector<KQuery::KType> preload_ktypes;
+    for (auto& ktype : base_ktypes) {
+        auto nktype = ktype;
+        to_lower(nktype);
+        if (m_preloadParam.tryGet<bool>(nktype, false)) {
+            preload_ktypes.push_back(ktype);
+        }
+    }
+
     auto kdriver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
 
     std::unique_lock<std::shared_mutex> lock(*m_stockDict_mutex);
@@ -504,6 +514,7 @@ void StockManager::loadAllStocks() {
                          endDate, info.tick, info.tickValue, info.precision, info.minTradeNumber,
                          info.maxTradeNumber);
             _stock.setKDataDriver(kdriver);
+            _stock.setPreload(preload_ktypes);
             m_stockDict[market_code] = std::move(_stock);
         } else {
             Stock& stock = iter->second;
@@ -526,7 +537,12 @@ void StockManager::loadAllStocks() {
                 stock.m_data->m_minTradeNumber = info.minTradeNumber;
                 stock.m_data->m_maxTradeNumber = info.maxTradeNumber;
                 stock.m_data->m_history_finance_ready = false;
+                // 强制释放所有已缓存K线数据
+                for (const auto& ktype : base_ktypes) {
+                    stock.releaseKDataBuffer(ktype);
+                }
             }
+            stock.setPreload(preload_ktypes);
             if (!stock.getKDataDirver()) {
                 stock.setKDataDriver(kdriver);
             }

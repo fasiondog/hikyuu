@@ -34,6 +34,7 @@ public:
         MIN15    = 2,  ///<15分钟线
         MIN30    = 3,  ///<30分钟线
         MIN60    = 4,  ///<60分钟线
+        HOUR2    = 12,  ///<2小时线
         DAY      = 5,  ///<日线
         WEEK     = 6,  ///<周线
         MONTH    = 7,  ///<月线
@@ -43,7 +44,6 @@ public:
 
         //BTC扩展
         MIN3     = 11,  ///<3分钟线
-        HOUR2    = 12,  ///<2小时线
         HOUR4    = 13,  ///<4小时线
         HOUR6    = 14,  ///<6小时线
         HOUR12   = 15,  ///<12小时线
@@ -70,7 +70,7 @@ public:
     // static const string INVALID_KTYPE;
 
     /** 获取所有的 KType */
-    static const vector<KType>& getAllBaseKType();
+    static const vector<KType>& getBaseKTypeList();
 
     static int32_t getKTypeInMin(KType);
 
