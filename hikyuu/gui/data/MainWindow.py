@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1178, 941)
+        MainWindow.resize(1178, 719)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_12 = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -172,7 +172,7 @@ class Ui_MainWindow(object):
         self.label_6.setObjectName("label_6")
         self.gridLayout_4.addWidget(self.label_6, 3, 0, 1, 1)
         self.min5_start_dateEdit = QtWidgets.QDateEdit(self.groupBox_7)
-        self.min5_start_dateEdit.setMinimumDateTime(QtCore.QDateTime(QtCore.QDate(1989, 12, 23), QtCore.QTime(0, 0, 0)))
+        self.min5_start_dateEdit.setMinimumDateTime(QtCore.QDateTime(QtCore.QDate(1989, 12, 22), QtCore.QTime(16, 0, 0)))
         self.min5_start_dateEdit.setCalendarPopup(True)
         self.min5_start_dateEdit.setObjectName("min5_start_dateEdit")
         self.gridLayout_4.addWidget(self.min5_start_dateEdit, 1, 1, 1, 1)
@@ -194,7 +194,7 @@ class Ui_MainWindow(object):
         self.trans_start_dateEdit.setObjectName("trans_start_dateEdit")
         self.gridLayout_4.addWidget(self.trans_start_dateEdit, 3, 1, 1, 1)
         self.day_start_dateEdit = QtWidgets.QDateEdit(self.groupBox_7)
-        self.day_start_dateEdit.setMinimumDateTime(QtCore.QDateTime(QtCore.QDate(1989, 12, 23), QtCore.QTime(0, 0, 0)))
+        self.day_start_dateEdit.setMinimumDateTime(QtCore.QDateTime(QtCore.QDate(1989, 12, 22), QtCore.QTime(16, 0, 0)))
         self.day_start_dateEdit.setCalendarPopup(True)
         self.day_start_dateEdit.setObjectName("day_start_dateEdit")
         self.gridLayout_4.addWidget(self.day_start_dateEdit, 0, 1, 1, 1)
@@ -834,7 +834,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(5)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

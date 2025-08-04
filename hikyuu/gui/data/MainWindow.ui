@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1178</width>
-    <height>941</height>
+    <height>719</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
@@ -361,12 +361,12 @@
               <widget class="QDateEdit" name="min5_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>0</hour>
+                 <hour>16</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
                  <month>12</month>
-                 <day>23</day>
+                 <day>22</day>
                 </datetime>
                </property>
                <property name="calendarPopup">
@@ -413,12 +413,12 @@
               <widget class="QDateEdit" name="day_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>0</hour>
+                 <hour>16</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
                  <month>12</month>
-                 <day>23</day>
+                 <day>22</day>
                 </datetime>
                </property>
                <property name="calendarPopup">
