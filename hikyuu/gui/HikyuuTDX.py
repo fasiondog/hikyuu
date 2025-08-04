@@ -335,8 +335,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.label_44.setPixmap(star_img)
         self.label_46.setOpenExternalLinks(True)
         self.label_license.setText(view_license())
-        if os.path.exists(self.getUserConfigDir() + '/.hikyuu.lic'):
-            self.fetch_trial_pushButton.setEnabled(False)
+        self.fetch_trial_pushButton.setEnabled(not is_valid_license())
 
         self.setWindowIcon(icon)
         QApplication.instance().setWindowIcon(icon)
@@ -625,8 +624,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         info = fetch_trial_license(email)
         QMessageBox.about(self, "获取试用许可", info)
         self.label_license.setText(view_license())
-        if os.path.exists(self.getUserConfigDir() + '/.hikyuu.lic'):
-            self.fetch_trial_pushButton.setEnabled(False)
+        self.fetch_trial_pushButton.setEnabled(not is_valid_license())
 
     @pyqtSlot()
     def on_pytdx_radioButton_clicked(self):

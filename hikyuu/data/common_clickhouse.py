@@ -136,58 +136,11 @@ def get_table(connect, market, code, ktype):
         'transdata': 'transdata',
     }
     nktype = ktype_dict[ktype.lower()]
-    connect.command(f"create database if not exists hku_data")
     if nktype == 'timeline':
-        sql = f"""
-                CREATE table if not exists hku_data.timeline (
-                    `market` String,
-                    `code` String,
-                    `date` DateTime,
-                    `price` DOUBLE,
-                    `vol` DOUBLE
-                )
-                ENGINE = MergeTree()
-                PRIMARY KEY (market, code, date);
-                """
-        # print(sql)
-        connect.command(sql)
         return (f'hku_data.timeline', market.upper(), code.upper())
-
     elif nktype == 'transdata':
-        sql = f"""
-                CREATE table if not exists hku_data.transdata (
-                    `market` String,
-                    `code` String,
-                    `date` DateTime,
-                    `price` DOUBLE,
-                    `vol` DOUBLE,
-                    `buyorsell` int
-                )
-                ENGINE = MergeTree()
-                PRIMARY KEY (market, code, date);
-                """
-        # print(sql)
-        connect.command(sql)
         return (f'hku_data.transdata', market.upper(), code.upper())
-
     else:
-        sql = f"""
-                CREATE table if not exists hku_data.{nktype}_k (
-                    `market` String,
-                    `code` String,
-                    `date` DateTime,
-                    `open` DOUBLE,
-                    `high` DOUBLE,
-                    `low` DOUBLE,
-                    `close` DOUBLE,
-                    `amount` DOUBLE,
-                    `volume` DOUBLE
-                )
-                ENGINE = MergeTree()
-                PRIMARY KEY (market, code, date);
-                """
-        # print(sql)
-        connect.command(sql)
         return (f'hku_data.{nktype}_k', market.upper(), code.upper())
 
 

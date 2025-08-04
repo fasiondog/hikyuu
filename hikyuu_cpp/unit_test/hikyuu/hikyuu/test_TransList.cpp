@@ -43,15 +43,15 @@ TEST_CASE("test_TransList_query_by_index") {
     query = KQuery(1, 3);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 2);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 1, 9, 30, 2), 11.21, 1339, TransRecord::BUY));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 1, 9, 30, 5), 11.21, 5263, TransRecord::BUY));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 1, 9, 30, 2), 11.21, 1339, 0));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 1, 9, 30, 5), 11.21, 5263, 0));
 
     /** @arg start < end < 0*/
     query = KQuery(-3, -1);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 2);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
 
     /** @arg start < end == 0*/
     query = KQuery(-3, 0);
@@ -62,47 +62,47 @@ TEST_CASE("test_TransList_query_by_index") {
     query = KQuery();
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 8884);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 1, 9, 25, 2), 11.20, 15714, TransRecord::AUCTION));
-    CHECK_EQ(result[563], TransRecord(Datetime(2019, 2, 1, 9, 58, 47), 11.04, 91, TransRecord::BUY));
-    CHECK_EQ(result[8883], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, TransRecord::AUCTION));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 1, 9, 25, 2), 11.20, 15714, 2));
+    CHECK_EQ(result[563], TransRecord(Datetime(2019, 2, 1, 9, 58, 47), 11.04, 91, 0));
+    CHECK_EQ(result[8883], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
     /** @arg 未指定end*/
     query = KQuery(-3);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
-    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, TransRecord::AUCTION));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
+    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
     query = KQuery(8881);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
-    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, TransRecord::AUCTION));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
+    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
     /** @arg end 等于总数*/
     query = KQuery(8881, 8884);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
-    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, TransRecord::AUCTION));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
+    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
     /** @arg end 比总数少1*/
     query = KQuery(8881, 8883);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 2);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
 
     /** @arg end 大于总数*/
     query = KQuery(8881, 8885);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
-    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, TransRecord::AUCTION));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
+    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
     /** @arg start 等于总数*/
     query = KQuery(8884);
@@ -113,7 +113,7 @@ TEST_CASE("test_TransList_query_by_index") {
     query = KQuery(8883);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, TransRecord::AUCTION));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
     /** @arg start 大于总数*/
     query = KQuery(8885);
@@ -124,15 +124,15 @@ TEST_CASE("test_TransList_query_by_index") {
     query = KQuery(8881, -1);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 2);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
 
     /** @arg start<0, end>0, 且两者有交集*/
     query = KQuery(-3, 8883);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 2);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
 }
 
 /** @par 检测点 */
@@ -146,25 +146,25 @@ TEST_CASE("test_TransList_query_by_date") {
     query = KQueryByDate(Datetime(201812030000));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 8884);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 1, 9, 25, 2), 11.20, 15714, TransRecord::AUCTION));
-    CHECK_EQ(result[563], TransRecord(Datetime(2019, 2, 1, 9, 58, 47), 11.04, 91, TransRecord::BUY));
-    CHECK_EQ(result[8883], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, TransRecord::AUCTION));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 1, 9, 25, 2), 11.20, 15714, 2));
+    CHECK_EQ(result[563], TransRecord(Datetime(2019, 2, 1, 9, 58, 47), 11.04, 91, 0));
+    CHECK_EQ(result[8883], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
     /** @arg start 等于数据起始日期，未指定end*/
     query = KQueryByDate(Datetime(2019, 2, 1, 9, 25, 2));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 8884);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 1, 9, 25, 2), 11.20, 15714, TransRecord::AUCTION));
-    CHECK_EQ(result[563], TransRecord(Datetime(2019, 2, 1, 9, 58, 47), 11.04, 91, TransRecord::BUY));
-    CHECK_EQ(result[8883], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, TransRecord::AUCTION));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 1, 9, 25, 2), 11.20, 15714, 2));
+    CHECK_EQ(result[563], TransRecord(Datetime(2019, 2, 1, 9, 58, 47), 11.04, 91, 0));
+    CHECK_EQ(result[8883], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
     /** @arg start大于数据起始日期，未指定end*/
     query = KQueryByDate(Datetime(2019, 2, 11, 14, 56, 59));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
-    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, TransRecord::AUCTION));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
+    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
     /** @arg start 等于 end*/
     query = KQueryByDate(Datetime(2019, 2, 11, 14, 56, 59), Datetime(2019, 2, 11, 14, 56, 59));
@@ -175,16 +175,16 @@ TEST_CASE("test_TransList_query_by_date") {
     query = KQueryByDate(Datetime(2019, 2, 11, 14, 56, 59), Datetime(2019, 2, 11, 15, 0, 0));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 2);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
 
     /** @arg start 在数据范围内, end大于最后一条记录日期 */
     query = KQueryByDate(Datetime(2019, 2, 11, 14, 56, 59), Datetime(201902120000));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);
-    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, TransRecord::SELL));
-    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, TransRecord::SELL));
-    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, TransRecord::AUCTION));
+    CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
+    CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
+    CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 }
 
 /** @} */

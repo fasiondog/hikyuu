@@ -27,7 +27,7 @@ TEST_CASE("test_TransRecord_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/TransRecord.xml";
 
-    TransRecord t1(Datetime(201101010000), 10.0, 80, TransRecord::SELL);
+    TransRecord t1(Datetime(201101010000), 10.0, 80, 1);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -50,9 +50,9 @@ TEST_CASE("test_TransList_serialize") {
     filename += "/TransList.xml";
 
     TransList line1;
-    line1.push_back(TransRecord(Datetime(201101010000), 10.0, 80, TransRecord::BUY));
-    line1.push_back(TransRecord(Datetime(201101020000), 20.0, 90, TransRecord::SELL));
-    line1.push_back(TransRecord(Datetime(201101030000), 20.0, 100, TransRecord::AUCTION));
+    line1.push_back(TransRecord(Datetime(201101010000), 10.0, 80, 0));
+    line1.push_back(TransRecord(Datetime(201101020000), 20.0, 90, 1));
+    line1.push_back(TransRecord(Datetime(201101030000), 20.0, 100, 2));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

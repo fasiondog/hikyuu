@@ -84,5 +84,4 @@ venv
 hikyuu_cpp/hikyuu/utilities/config.h
 data_server_docker_file
 hikyuu.ini
-i18n/zh_CN.mo
 hikyuu/cpp/i18n/zh_CN.mo
