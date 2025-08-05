@@ -77,6 +77,9 @@ public:
     /** 判断是否为有效 ktype */
     static bool isBaseKType(const string& ktype);
 
+    /** 判断是否为扩展 ktype */
+    static bool isExtraKType(const string& ktype);
+
     /**
      * 复权类型
      * @note 日线以上，如周线/月线不支持复权

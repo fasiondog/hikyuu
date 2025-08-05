@@ -33,7 +33,6 @@ void export_KReord(py::module& m);
 void export_TimeLineReord(py::module& m);
 void export_TransRecord(py::module& m);
 void export_KData(py::module& m);
-void export_KExtra(py::module& m);
 void export_Parameter(py::module& m);
 void export_io_redirect(py::module& m);
 
@@ -95,7 +94,6 @@ PYBIND11_MODULE(core, m) {
     export_TimeLineReord(m);
     export_TransRecord(m);
     export_KData(m);
-    export_KExtra(m);
     export_Stock(m);
     export_Block(m);
     export_Parameter(m);

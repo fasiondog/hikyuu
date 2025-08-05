@@ -7,8 +7,8 @@
 
 #include <boost/functional/hash.hpp>
 #include <xxhash.h>
+#include "plugin/hkuextra.h"
 #include "KQuery.h"
-#include "KExtra.h"
 
 namespace hku {
 
@@ -65,8 +65,7 @@ int32_t KQuery::getKTypeInMin(KType ktype) {
     string nktype(ktype);
     to_upper(nktype);
     if (isExtraKType(nktype)) {
-        const KExtra& extra = getKExtra(nktype);
-        return extra.getMinutes();
+        return getKTypeExtraMinutes(nktype);
     }
     return g_ktype2min.at(nktype);
 }
@@ -80,6 +79,10 @@ bool KQuery::isBaseKType(const string& ktype) {
         }
     }
     return false;
+}
+
+bool KQuery::isExtraKType(const string& ktype) {
+    return hku::isExtraKType(ktype);
 }
 
 KQuery::KQuery(Datetime start, Datetime end, const KType& ktype, RecoverType recoverType)
