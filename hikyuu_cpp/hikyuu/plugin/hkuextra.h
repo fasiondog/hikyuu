@@ -18,7 +18,7 @@ namespace hku {
  * @param minutes 每根K线所包含的分钟数
  * @param getPhaseEnd 获取K线所属的阶段结束时间
  */
-void HKU_API registerKTypeExtra(const string& ktype, const string& basetype, int32_t minutes,
+void HKU_API registerExtraKType(const string& ktype, const string& basetype, int32_t minutes,
                                 std::function<Datetime(const Datetime&)> getPhaseEnd);
 
 /**
@@ -27,14 +27,14 @@ void HKU_API registerKTypeExtra(const string& ktype, const string& basetype, int
  * @param basetype 对应的基础 K 线类型
  * @param nbars 每根K线所包含的基础K线数
  */
-void HKU_API registerKTypeExtra(const string& ktype, const string& basetype, int32_t nbars);
+void HKU_API registerExtraKType(const string& ktype, const string& basetype, int32_t nbars);
 
 /**
  * 释放扩展K线
  * @note 某些情况下，注册扩展K线时，使用了 python 定义的周期结束日期转换函数，退出时可能引起 python
  * GIL 报错，需手工提前释放扩展K线
  */
-void HKU_API releaseKExtra();
+void HKU_API releaseExtraKType();
 
 //-------------------------------
 // 以下函数为内部使用，无需引出

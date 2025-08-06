@@ -10,7 +10,7 @@
 
 namespace hku {
 
-void HKU_API registerKTypeExtra(const string& ktype, const string& basetype, int32_t minutes,
+void HKU_API registerExtraKType(const string& ktype, const string& basetype, int32_t minutes,
                                 std::function<Datetime(const Datetime&)> getPhaseEnd) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
@@ -18,14 +18,14 @@ void HKU_API registerKTypeExtra(const string& ktype, const string& basetype, int
     plugin->registerKTypeExtra(ktype, basetype, minutes, getPhaseEnd);
 }
 
-void HKU_API registerKTypeExtra(const string& ktype, const string& basetype, int32_t nbars) {
+void HKU_API registerExtraKType(const string& ktype, const string& basetype, int32_t nbars) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
     HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA);
     plugin->registerKTypeExtra(ktype, basetype, nbars, std::function<Datetime(const Datetime&)>());
 }
 
-void HKU_API releaseKExtra() {
+void HKU_API releaseExtraKType() {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
     HKU_IF_RETURN(!plugin, void());
