@@ -77,13 +77,13 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 ![weixin](docs/source/_static/weixin.jpg)
 
-## QQ交流群：114910869, 或扫码加入
+## QQ交流群：114910869, 或扫码加入（微信为主)
 
 ![img](docs/source/_static/10003-qq.png)
 
 ## 项目依赖说明
 
-Hikyuu直接依赖以下开源项目（由以下项目间接依赖的项目未列出），感谢所有开源作者的贡献：
+Hikyuu C++部分直接依赖以下开源项目（由以下项目间接依赖的项目及 python 项目未列出， python依赖项目请参考 requirements.txt），感谢所有开源作者的贡献：
 
 | 名称          | 项目地址                                                                    | License                                                                               |
 | ------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
@@ -102,3 +102,4 @@ Hikyuu直接依赖以下开源项目（由以下项目间接依赖的项目未�
 | gzip-hpp      | [https://github.com/mapbox/gzip-hpp](https://github.com/mapbox/gzip-hpp)       | BSD-2-Clause license                                                                  |
 | doctest       | [https://github.com/doctest/doctest](https://github.com/doctest/doctest)       | MIT                                                                                   |
 | ta-lib        | [https://github.com/TA-Lib/ta-lib.git]()                                       | BSD-3-Clause license                                                                  |
+| clickhouse    | [https://github.com/ClickHouse/ClickHouse]()                                   | Apache 2.0                                                                            |
