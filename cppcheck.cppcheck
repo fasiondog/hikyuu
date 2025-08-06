@@ -33,6 +33,9 @@
         <dir name="../hku_plugin/plugin_dataserver/src"/>
         <dir name="../hku_plugin/plugin_device/src"/>
         <dir name="../hku_plugin/plugin_import2hdf5/src"/>
+        <dir name="../hku_plugin/plugin_hkuextra/src"/>
+        <dir name="../hku_plugin/plugin_clickhouse/src"/>
+        <dir name="../hku_plugin/plugin_tmreport/src"/>
     </paths>
     <libraries>
         <library>boost</library>
