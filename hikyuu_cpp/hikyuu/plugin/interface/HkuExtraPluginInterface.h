@@ -28,6 +28,11 @@ public:
     virtual int32_t getKTypeExtraMinutes(const string& ktype) = 0;
 
     virtual KRecordList getExtraKRecordList(const Stock& stk, const KQuery& query) = 0;
+
+    virtual size_t getStockExtraCount(const Stock& stk, const string& ktype) = 0;
+
+    virtual bool getStockExtraIndexRange(const Stock& stk, const KQuery& query, size_t& out_start,
+                                         size_t& out_end) = 0;
 };
 
 }  // namespace hku

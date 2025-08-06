@@ -69,16 +69,22 @@ public:
     static const string HOUR12;
     // static const string INVALID_KTYPE;
 
-    /** 获取所有的 KType */
-    static const vector<KType>& getBaseKTypeList();
-
-    static int32_t getKTypeInMin(KType);
+    /** 判断指定的K线类型是否有效 */
+    static bool isValidKType(const string& ktype);
 
     /** 判断是否为有效 ktype */
     static bool isBaseKType(const string& ktype);
 
     /** 判断是否为扩展 ktype */
     static bool isExtraKType(const string& ktype);
+
+    /** 获取所有的 KType */
+    static vector<KType> getBaseKTypeList();
+
+    /** 获取所有扩展 KType */
+    static vector<KType> getExtraKTypeList();
+
+    static int32_t getKTypeInMin(KType);
 
     /**
      * 复权类型

@@ -31,7 +31,7 @@ const string KQuery::HOUR12("HOUR12");
 // const string KQuery::INVALID_KTYPE("Z");
 
 // 所有基础K线类型（即有实际物理存储的K线类型）
-static vector<string> g_all_base_ktype{
+static std::unordered_set<string> g_all_base_ktype{
   KQuery::MIN,  KQuery::MIN5,  KQuery::MIN15,   KQuery::MIN30,    KQuery::MIN60, KQuery::DAY,
   KQuery::WEEK, KQuery::MONTH, KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::HOUR2};
 
@@ -57,8 +57,16 @@ static const unordered_map<string, int32_t> g_ktype2min{
 };
 
 // 获取所有的 KType
-const vector<KQuery::KType>& KQuery::getBaseKTypeList() {
-    return g_all_base_ktype;
+vector<KQuery::KType> KQuery::getBaseKTypeList() {
+    vector<KQuery::KType> ret;
+    for (const auto& v : g_all_base_ktype) {
+        ret.push_back(v);
+    }
+    return ret;
+}
+
+vector<KQuery::KType> KQuery::getExtraKTypeList() {
+    return hku::getExtraKTypeList();
 }
 
 int32_t KQuery::getKTypeInMin(KType ktype) {
@@ -70,15 +78,15 @@ int32_t KQuery::getKTypeInMin(KType ktype) {
     return g_ktype2min.at(nktype);
 }
 
+bool KQuery::isValidKType(const string& ktype) {
+    return isBaseKType(ktype) || isExtraKType(ktype);
+}
+
 bool KQuery::isBaseKType(const string& ktype) {
     string nktype(ktype);
     to_upper(nktype);
-    for (const auto& v : g_all_base_ktype) {
-        if (nktype == v) {
-            return true;
-        }
-    }
-    return false;
+    auto iter = g_all_base_ktype.find(nktype);
+    return iter != g_all_base_ktype.end();
 }
 
 bool KQuery::isExtraKType(const string& ktype) {

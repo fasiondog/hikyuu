@@ -18,41 +18,56 @@ void HKU_API registerKTypeExtra(const string& ktype, const string& basetype, int
     plugin->registerKTypeExtra(ktype, basetype, minutes, getPhaseEnd);
 }
 
-bool HKU_API isExtraKType(const string& ktype) {
+void HKU_API releaseKExtra() {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
-    HKU_ERROR_IF_RETURN(!plugin, false, "Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA);
+    HKU_IF_RETURN(!plugin, void());
+    plugin->releaseKExtra();
+}
+
+bool isExtraKType(const string& ktype) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
+    HKU_IF_RETURN(!plugin, false);
     return plugin->isExtraKType(ktype);
 }
 
-int32_t HKU_API getKTypeExtraMinutes(const string& ktype) {
+int32_t getKTypeExtraMinutes(const string& ktype) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
     HKU_ERROR_IF_RETURN(!plugin, 0, "Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA);
     return plugin->getKTypeExtraMinutes(ktype);
 }
 
-std::vector<string> HKU_API getExtraKTypeList() {
+std::vector<string> getExtraKTypeList() {
     std::vector<string> ret;
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
-    HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA);
+    HKU_IF_RETURN(!plugin, ret);
     ret = plugin->getExtraKTypeList();
     return ret;
 }
 
-void HKU_API releaseKExtra() {
+KRecordList getExtraKRecordList(const Stock& stk, const KQuery& query) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
-    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA);
-    plugin->releaseKExtra();
+    HKU_IF_RETURN(!plugin, KRecordList());
+    return plugin->getExtraKRecordList(stk, query);
 }
 
-KRecordList HKU_API getExtraKRecordList(const Stock& stk, const KQuery& query) {
+size_t getStockExtraCount(const Stock& stk, const string& ktype) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
-    HKU_ERROR_IF_RETURN(!plugin, KRecordList(), "Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA);
-    return plugin->getExtraKRecordList(stk, query);
+    HKU_IF_RETURN(!plugin, 0);
+    return plugin->getStockExtraCount(stk, ktype);
+}
+
+bool getStockExtraIndexRange(const Stock& stk, const KQuery& query, size_t& out_start,
+                             size_t& out_end) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
+    HKU_IF_RETURN(!plugin, false);
+    return plugin->getStockExtraIndexRange(stk, query, out_start, out_end);
 }
 
 }  // namespace hku
