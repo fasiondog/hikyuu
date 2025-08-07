@@ -535,7 +535,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
     to_upper(ktype);
 
     if (KQuery::isExtraKType(ktype)) {
-        KQuery query = KQueryByDate(datetime, datetime + Seconds(1), ktype);
+        KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
         auto k_list = getKRecordList(query);
         if (k_list.size() > 0 && k_list[0].datetime == datetime) {
             return k_list[0].closePrice;
@@ -583,7 +583,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
         // 未在缓存中，且日期优先的情况下
         // 先尝试获取等于该日期的K线数据
         // 如未找到，则获取小于该日期的最后一条记录
-        KQuery query = KQueryByDate(datetime, datetime + Seconds(1), ktype);
+        KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
         auto k_list = getKRecordList(query);
         if (k_list.size() > 0 && k_list[0].datetime == datetime) {
             return k_list[0].closePrice;
@@ -801,7 +801,7 @@ KRecord Stock::getKRecord(const Datetime& datetime, const KQuery::KType& ktype) 
     HKU_IF_RETURN(isNull(), result);
 
     if (KQuery::isExtraKType(ktype)) {
-        auto ks = getExtraKRecordList(*this, KQueryByDate(datetime, datetime + Seconds(1), ktype));
+        auto ks = getExtraKRecordList(*this, KQueryByDate(datetime, datetime + Minutes(1), ktype));
         return ks.empty() ? Null<KRecord>() : ks[0];
 
     } else if (KQuery::isBaseKType(ktype)) {
