@@ -218,7 +218,7 @@ void Portfolio::run(const KQuery& query, bool force) {
                 adjust = true;
                 cur_adjust_ix += adjust_cycle;
                 cur_cycle_end =
-                  cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Seconds(1);
+                  cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Minutes(1);
             }
 
             const auto& date = datelist[i];
@@ -244,7 +244,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
                 cur_cycle_end = date.nextWeek();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             runMoment(date, cur_cycle_end, adjust);
         }
@@ -257,7 +257,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
                 cur_cycle_end = date.nextMonth();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             runMoment(date, cur_cycle_end, adjust);
         }
@@ -270,7 +270,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
                 cur_cycle_end = date.nextQuarter();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             runMoment(date, cur_cycle_end, adjust);
         }
@@ -283,7 +283,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
                 cur_cycle_end = date.nextYear();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             runMoment(date, cur_cycle_end, adjust);
         }
@@ -312,7 +312,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = date.nextWeek();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             runMoment(date, cur_cycle_end, adjust);
@@ -337,7 +337,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = date.nextMonth();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             runMoment(date, cur_cycle_end, adjust);
@@ -362,7 +362,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = date.nextQuarter();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             runMoment(date, cur_cycle_end, adjust);
@@ -387,7 +387,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = date.nextYear();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             runMoment(date, cur_cycle_end, adjust);
