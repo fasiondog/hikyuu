@@ -12,13 +12,14 @@
 #include <hikyuu/KData.h>
 #include <hikyuu/Stock.h>
 #include <hikyuu/plugin/interface/plugins.h>
+#include <hikyuu/plugin/device.h>
 
 using namespace hku;
 
 static bool pluginValid() {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
-    return plugin != nullptr;
+    return plugin && isValidLicense();
 }
 
 /**

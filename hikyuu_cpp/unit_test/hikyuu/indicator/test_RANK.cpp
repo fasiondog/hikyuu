@@ -13,13 +13,14 @@
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/plugin/interface/plugins.h>
+#include <hikyuu/plugin/device.h>
 
 using namespace hku;
 
 static bool pluginValid() {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
-    return plugin != nullptr;
+    return plugin && isValidLicense();
 }
 
 /**
