@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 # cp936
 
+import atexit
 import io
 from pathlib import Path
 import pickle
@@ -70,6 +71,15 @@ except Exception as e:
 
 
 __version__ = get_version()
+
+
+def hku_cleanup():
+    # 释放所有K线数据, 用于防止python实现的扩展K线转换函数由于GIL导致退出时异常
+    release_extra_ktype()
+
+
+atexit.register(hku_cleanup)
+
 
 sm = StockManager.instance()
 

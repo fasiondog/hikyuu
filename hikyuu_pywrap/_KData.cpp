@@ -134,5 +134,121 @@ void export_KData(py::module& m) {
       .def(py::self == py::self)
       .def(py::self != py::self)
 
+      .def("__getitem__",
+           [](const KData& self, py::object obj) {
+               py::object ret;
+               if (py::isinstance<py::int_>(obj)) {
+                   int64_t i = obj.cast<int64_t>();
+                   int64_t length = self.size();
+                   int64_t index = i < 0 ? length + i : i;
+                   if (index < 0 || index >= length)
+                       throw std::out_of_range(fmt::format("index out of range: {}", i));
+                   ret = py::cast(self.getKRecord(index));
+                   return ret;
+               } else if (py::isinstance<Datetime>(obj)) {
+                   Datetime dt = py::cast<Datetime>(obj);
+                   auto krecord = self.getKRecord(dt);
+                   if (krecord == Null<KRecord>()) {
+                       throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
+                   }
+                   ret = py::cast(krecord);
+                   return ret;
+               } else if (py::isinstance<py::str>(obj)) {
+                   Datetime dt = Datetime(py::cast<std::string>(obj));
+                   auto krecord = self.getKRecord(dt);
+                   if (krecord == Null<KRecord>()) {
+                       throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
+                   }
+                   ret = py::cast(krecord);
+                   return ret;
+               } else if (py::isinstance<py::slice>(obj)) {
+                   py::slice slice = py::cast<py::slice>(obj);
+                   size_t start, stop, step, length;
+
+                   if (!slice.compute(self.size(), &start, &stop, &step, &length)) {
+                       throw std::invalid_argument("无效的切片参数");
+                   }
+
+                   KRecordList result;
+                   result.reserve(length);
+                   for (size_t i = 0; i < length; ++i) {
+                       size_t index = start + i * step;
+                       result.push_back(self[static_cast<size_t>(index)]);
+                   }
+
+                   ret = py::cast(result);
+                   return ret;
+               }
+
+               throw std::out_of_range("Error index type");
+           })
+
+      .def(
+        "__iter__",
+        [](const KData& self) {
+            return py::make_iterator<py::return_value_policy::reference_internal>(self.cbegin(),
+                                                                                  self.cend());
+        },
+        py::keep_alive<0, 1>())
+
+      .def(
+        "to_np",
+        [](const KData& kdata) {
+            struct RawData {
+                int64_t datetime;  // 转换后的毫秒时间戳
+                double open;
+                double high;
+                double low;
+                double close;
+                double amount;
+                double volume;
+            };
+            std::vector<RawData> data;
+            data.resize(kdata.size());
+
+            py::dtype dtype;
+            auto minutes = KQuery::getKTypeInMin(kdata.getQuery().kType());
+            if (minutes >= KQuery::getKTypeInMin(KQuery::DAY)) {
+                for (size_t i = 0, total = kdata.size(); i < total; i++) {
+                    const KRecord& k = kdata[i];
+                    data[i].datetime = (k.datetime - Datetime(1970, 1, 1)).days();
+                    data[i].open = k.openPrice;
+                    data[i].high = k.highPrice;
+                    data[i].low = k.lowPrice;
+                    data[i].close = k.closePrice;
+                    data[i].amount = k.transAmount;
+                    data[i].volume = k.transCount;
+                }
+
+                // 定义NumPy结构化数据类型
+                dtype = py::dtype(
+                  vector_to_python_list<string>(
+                    {"datetime", "open", "high", "low", "close", "amount", "volume"}),
+                  vector_to_python_list<string>({"datetime64[D]", "d", "d", "d", "d", "d", "d"}),
+                  vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48}), 56);
+            } else {
+                for (size_t i = 0, total = kdata.size(); i < total; i++) {
+                    const KRecord& k = kdata[i];
+                    data[i].datetime = k.datetime.timestamp() / 1000LL;
+                    data[i].open = k.openPrice;
+                    data[i].high = k.highPrice;
+                    data[i].low = k.lowPrice;
+                    data[i].close = k.closePrice;
+                    data[i].amount = k.transAmount;
+                    data[i].volume = k.transCount;
+                }
+
+                // 定义NumPy结构化数据类型
+                dtype = py::dtype(
+                  vector_to_python_list<string>(
+                    {"datetime", "open", "high", "low", "close", "amount", "volume"}),
+                  vector_to_python_list<string>({"datetime64[ms]", "d", "d", "d", "d", "d", "d"}),
+                  vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48}), 56);
+            }
+
+            return py::array(dtype, data.size(), data.data());
+        },
+        "将 KData 转换为 NumPy 数组")
+
         DEF_PICKLE(KData);
 }

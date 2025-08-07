@@ -124,4 +124,65 @@ void export_Datetime(py::module& m) {
     :param Datetime start: 起始日期
     :param Datetime end: 结束日期
     :rtype: DatetimeList)");
+
+    m.def(
+      "dates_to_np",
+      [](const DatetimeList& datelist, const string& unit) {
+          std::vector<int64_t> data;
+          data.resize(datelist.size());
+          if (unit == "ms") {
+              // 毫秒级别
+              for (size_t i = 0; i < datelist.size(); i++) {
+                  data[i] = datelist[i].timestamp() / 1000LL;
+              }
+          } else if (unit == "s") {
+              // 秒级别
+              for (size_t i = 0; i < datelist.size(); i++) {
+                  data[i] = datelist[i].timestamp() / 1000000;
+              }
+          } else if (unit == "us") {
+              // 微秒级别
+              for (size_t i = 0; i < datelist.size(); i++) {
+                  data[i] = datelist[i].timestamp();
+              }
+          } else if (unit == "D") {
+              // 天级别
+              for (size_t i = 0; i < datelist.size(); i++) {
+                  data[i] = (datelist[i] - Datetime(1970, 1, 1)).days();
+              }
+          } else if (unit == "h") {
+              // 小时级别
+              for (size_t i = 0; i < datelist.size(); i++) {
+                  data[i] = (datelist[i] - Datetime(1970, 1, 1)).ticks() / 3600000000LL;
+              }
+          } else if (unit == "m") {
+              // 分钟级别
+              for (size_t i = 0; i < datelist.size(); i++) {
+                  data[i] = (datelist[i] - Datetime(1970, 1, 1)).ticks() / 60000000LL;
+              }
+          } else if (unit == "Y") {
+              for (size_t i = 0; i < datelist.size(); i++) {
+                  data[i] = (datelist[i].year() - 1970);
+              }
+          } else if (unit == "M") {
+              for (size_t i = 0; i < datelist.size(); i++) {
+                  data[i] = (datelist[i].year() - 1970) * 12 + datelist[i].month() - 1;
+              }
+          } else if (unit == "W") {
+              for (size_t i = 0; i < datelist.size(); i++) {
+                  data[i] = (datelist[i] - Datetime(1970, 1, 1)).days() / 7;
+              }
+          } else {
+              throw py::value_error("Unsupported unit: " + unit);
+          }
+
+          // 定义NumPy结构化数据类型
+          py::dtype dtype;
+          dtype = py::dtype(vector_to_python_list<string>({"datetime"}),
+                            vector_to_python_list<string>({fmt::format("datetime64[{}]", unit)}),
+                            vector_to_python_list<int64_t>({0}), 8);
+
+          return py::array(dtype, data.size(), data.data());
+      },
+      py::arg("datelist"), py::arg("unit") = "ms", "将 DatetimeList 转换为 NumPy 元组");
 }

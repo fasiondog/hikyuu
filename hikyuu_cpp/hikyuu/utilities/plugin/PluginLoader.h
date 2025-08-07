@@ -46,7 +46,8 @@ public:
 
     bool load(const std::string& pluginname) noexcept {
         std::string filename = getFileName(pluginname);
-        HKU_WARN_IF_RETURN(!existFile(filename), false, "file({}) not exist!", filename);
+        // HKU_WARN_IF_RETURN(!existFile(filename), false, "file({}) not exist!", filename);
+        HKU_DEBUG_IF_RETURN(!existFile(filename), false, "file({}) not exist!", filename);
 
 #if HKU_OS_WINDOWS
         m_handle = LoadLibrary(HKU_PATH(filename).c_str());
