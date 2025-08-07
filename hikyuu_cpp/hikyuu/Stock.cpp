@@ -535,16 +535,18 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
     to_upper(ktype);
 
     if (KQuery::isExtraKType(ktype)) {
-        KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
-        auto k_list = getKRecordList(query);
-        if (k_list.size() > 0 && k_list[0].datetime == datetime) {
-            return k_list[0].closePrice;
-        }
-
-        query = KQueryByDate(startDatetime(), datetime, ktype);
-        k_list = getKRecordList(query);
-        if (k_list.size() > 0) {
-            return k_list[k_list.size() - 1].closePrice;
+        KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
+        size_t out_start, out_end;
+        if (getIndexRange(query, out_start, out_end)) {
+            // 找到的是>=datetime的记录
+            KRecord k = getKRecord(out_start, ktype);
+            if (k.datetime == datetime) {
+                return k.closePrice;
+            }
+            if (out_start != 0) {
+                k = getKRecord(out_start - 1, ktype);
+                return k.closePrice;
+            }
         }
 
         // 没有找到，则取最后一条记录

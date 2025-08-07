@@ -67,8 +67,48 @@ TEST_CASE("test_Stock_extra_ktype") {
 
     CHECK_EQ(kday3[0], stk.getKRecord(0, KQuery::DAY3));
     CHECK_EQ(kday3[100], stk.getKRecord(100, KQuery::DAY3));
-    // HKU_INFO("{}", kday3[100]);
     CHECK_EQ(kday3[100], stk.getKRecord(Datetime(199203050000), KQuery::DAY3));
+
+    CHECK_EQ(stk.getMarketValue(Datetime(199203050000), KQuery::DAY),
+             stk.getKRecord(Datetime(199203050000), KQuery::DAY).closePrice);
+    CHECK_EQ(stk.getMarketValue(Datetime(199203050000), KQuery::DAY3), kday3[100].closePrice);
+
+    size_t startix = 0, endix = 0;
+    bool success = stk.getIndexRange(
+      KQueryByDate(Datetime(199203050000), Null<Datetime>(), KQuery::DAY3), startix, endix);
+    HKU_INFO("{}, {}, {}", success, startix, endix);
+
+    kday3 = stk.getKData(KQueryByIndex(100, 120, KQuery::DAY3));
+    auto kday3_2 =
+      stk.getKData(KQueryByDate(Datetime(199203050000), Datetime(199205270001), KQuery::DAY3));
+    CHECK_EQ(kday3.size(), kday3_2.size());
+    for (size_t i = 0; i < kday3.size(); i++) {
+        CHECK_EQ(kday3[i], kday3_2[i]);
+    }
+
+    /** @arg 检测周期转换类别的扩展K线数据 */
+    auto kmin1 = stk.getKData(KQuery(0, Null<int64_t>(), KQuery::MIN));
+    auto kmin3 = stk.getKData(KQuery(0, Null<int64_t>(), KQuery::MIN3));
+    CHECK_EQ(kmin3.size(), stk.getCount(KQuery::MIN3));
+
+    REQUIRE(kmin1[0].datetime == Datetime(200001040931));
+    CHECK_EQ(kmin3[0].datetime, kmin1[2].datetime);
+    CHECK_EQ(kmin3[0].openPrice, kmin1[0].openPrice);
+    CHECK_EQ(kmin3[0].closePrice, kmin1[2].closePrice);
+    high = kmin1[0].highPrice;
+    low = kmin1[0].lowPrice;
+    sum_amount = kmin1[0].transAmount;
+    sum_volume = kmin1[0].transCount;
+    for (size_t i = 1; i < 3; i++) {
+        high = std::max(high, kmin1[i].highPrice);
+        low = std::min(low, kmin1[i].lowPrice);
+        sum_amount += kmin1[i].transAmount;
+        sum_volume += kmin1[i].transCount;
+    }
+    CHECK_EQ(kmin3[0].highPrice, high);
+    CHECK_EQ(kmin3[0].lowPrice, low);
+    CHECK_EQ(kmin3[0].transAmount, doctest::Approx(sum_amount).epsilon(0.001));
+    CHECK_EQ(kmin3[0].transCount, doctest::Approx(sum_volume).epsilon(0.001));
 }
 
 /** @} */
