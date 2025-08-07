@@ -439,7 +439,7 @@ void Stock::releaseKDataBuffer(KQuery::KType inkType) const {
 
 // 仅在初始化时调用
 void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
-    HKU_IF_RETURN(!m_data || !m_kdataDriver || isBuffer(inkType), void());
+    HKU_IF_RETURN(!m_data || !m_kdataDriver, void());
 
     string kType(inkType);
     to_upper(kType);
