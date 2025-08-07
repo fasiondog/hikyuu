@@ -21,6 +21,8 @@
 #include "global/schedule/inner_tasks.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
 #include "plugin/interface/plugins.h"
+#include "plugin/device.h"
+#include "plugin/hkuextra.h"
 
 #if HKU_ENABLE_MO
 #include "hikyuu/utilities/mo/mo.h"
@@ -59,6 +61,23 @@ StockManager& StockManager::instance() {
     return (*m_sm);
 }
 
+static void registerPredefinedExtraKType() {
+    if (isValidLicense()) {
+        registerExtraKType(KQuery::DAY3, KQuery::DAY, 3);
+        registerExtraKType(KQuery::DAY5, KQuery::DAY, 5);
+        registerExtraKType(KQuery::DAY7, KQuery::DAY, 7);
+
+        registerExtraKType(KQuery::MIN3, KQuery::MIN, 3, [](const Datetime& d) {
+            auto m = d.minute();
+            if (m % 3 == 0) {
+                return d;
+            }
+            m = (m / 3 + 1) * 3;
+            return Datetime(d.year(), d.month(), d.day(), d.hour(), m);
+        });
+    }
+}
+
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam, const StrategyContext& context) {
@@ -80,6 +99,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
         mo::init(m_i18n_path);
     }
 #endif
+
+    // 注册扩展K线处理
+    registerPredefinedExtraKType();
 
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;

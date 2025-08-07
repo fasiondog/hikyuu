@@ -23,6 +23,10 @@ const string KQuery::MONTH("MONTH");
 const string KQuery::QUARTER("QUARTER");
 const string KQuery::HALFYEAR("HALFYEAR");
 const string KQuery::YEAR("YEAR");
+
+const string KQuery::DAY3{"DAY3"};
+const string KQuery::DAY5{"DAY5"};
+const string KQuery::DAY7{"DAY7"};
 const string KQuery::MIN3("MIN3");
 const string KQuery::HOUR2("HOUR2");
 const string KQuery::HOUR4("HOUR4");

@@ -43,6 +43,9 @@ public:
     static const string YEAR;
 
     // 扩展K线类型
+    static const string DAY3;
+    static const string DAY5;
+    static const string DAY7;
     static const string MIN3;
     static const string HOUR4;
     static const string HOUR6;

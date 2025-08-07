@@ -74,7 +74,8 @@ __version__ = get_version()
 
 
 def hku_cleanup():
-    release_ktype_extra()
+    # 释放所有K线数据, 用于防止python实现的扩展K线转换函数由于GIL导致退出时异常
+    release_extra_ktype()
 
 
 atexit.register(hku_cleanup)

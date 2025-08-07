@@ -76,8 +76,12 @@ void export_KQuery(py::module& m) {
     kquery.attr("MIN15") = "MIN15";
     kquery.attr("MIN30") = "MIN30";
     kquery.attr("MIN60") = "MIN60";
-    kquery.attr("MIN3") = "MIN3";
     kquery.attr("HOUR2") = "HOUR2";
+
+    kquery.attr("DAY3") = "DAY3";
+    kquery.attr("DAY5") = "DAY5";
+    kquery.attr("DAY7") = "DAY7";
+    kquery.attr("MIN3") = "MIN3";
     kquery.attr("HOUR4") = "HOUR4";
     kquery.attr("HOUR6") = "HOUR6";
     kquery.attr("HOUR12") = "HOUR12";
