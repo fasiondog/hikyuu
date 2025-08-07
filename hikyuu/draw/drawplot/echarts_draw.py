@@ -23,7 +23,7 @@ class MultiLineTextChart(ChartBase):
         if y is not None:
             self._last_y = y
 
-    def add(self, text: str, x = None, y = None, text_style = None):
+    def add(self, text: str, x=None, y=None, text_style=None):
         """
         添加多行文本
 
@@ -60,7 +60,7 @@ class MultiLineTextChart(ChartBase):
                         font=text_style.get("fontFamily", "sans-serif"),
                         font_size=text_style.get("font_size", 14),
                         graphic_basicstyle_opts=opts.GraphicBasicStyleOpts(
-                        fill=text_style.get("color", "#000"))
+                            fill=text_style.get("color", "#000"))
                     )
                 )
             )
@@ -68,7 +68,6 @@ class MultiLineTextChart(ChartBase):
             self._last_y = y + i * (text_style.get("font_size", 14) + 5)
 
         self.options.update(graphic=graphic_elements)
-
 
     def _split_text(self, text: str, width: int, font_size: int):
         """
@@ -103,7 +102,8 @@ grid_pos = [
 
 
 def _get_js_data_var(kdata):
-    datas = [[round(r.open, 2), round(r.close, 2), round(r.low, 2), round(r.high, 2), round(r.volume, 2)] for r in kdata]
+    datas = [[round(r.open, 2), round(r.close, 2), round(r.low, 2), round(r.high, 2), round(r.volume, 2)]
+             for r in kdata]
     return datas
 
 
@@ -152,7 +152,7 @@ def get_series_name(kdata):
     return stitle
 
 
-def simple_datetime_list(datetimes: list, ktype:str=None):
+def simple_datetime_list(datetimes: list, ktype: str = None):
     if ktype is None:
         return [
             sd.split(' ')[0] if sd.endswith('00:00:00') else
@@ -335,7 +335,8 @@ def iplot(indicator, kref: KData = None, chart=None, ilongname=False):
         return chart.overlap(line)
     else:
         line.set_global_opts(
-            title_opts=opts.TitleOpts(title="%s %.2f" % (indicator.long_name if ilongname else indicator.name, indicator[-1])),
+            title_opts=opts.TitleOpts(title="%s %.2f" % (
+                indicator.long_name if ilongname else indicator.name, indicator[-1])),
             yaxis_opts=opts.AxisOpts(
                 is_scale=True,
                 splitarea_opts=opts.SplitAreaOpts(
@@ -546,7 +547,7 @@ def sys_performance(sys, ref_stk=None):
     text = per.report(sys.tm, sh000001_k[-1].datetime)
 
     # 计算最大回撤
-    max_pullback = min(MDD(funds).to_np())
+    max_pullback = min(MDD(funds))
 
     # 计算 sharp
     bond = ZHBOND10(ref_dates)
@@ -580,7 +581,7 @@ def sys_performance(sys, ref_stk=None):
     page.add(line)
 
     tchart = MultiLineTextChart(opts.InitOpts(height='65px'))
-    tchart.add(t1, y = 5)
+    tchart.add(t1, y=5)
     tchart.add(t2)
     tchart.add(t3)
     page.add(tchart)
