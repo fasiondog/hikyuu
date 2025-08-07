@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
 
         // 调整所有类型K线为预加载且预加载数量为1天的量
         Parameter new_preloadParam;
-        auto ktypes = KQuery::getAllKType();
+        auto ktypes = KQuery::getBaseKTypeList();
         for (auto& ktype : ktypes) {
             auto minutes = KQuery::getKTypeInMin(ktype);
             to_lower(ktype);

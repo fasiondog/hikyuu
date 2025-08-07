@@ -21,6 +21,8 @@
 #include "global/schedule/inner_tasks.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
 #include "plugin/interface/plugins.h"
+#include "plugin/device.h"
+#include "plugin/hkuextra.h"
 
 #if HKU_ENABLE_MO
 #include "hikyuu/utilities/mo/mo.h"
@@ -59,6 +61,23 @@ StockManager& StockManager::instance() {
     return (*m_sm);
 }
 
+static void registerPredefinedExtraKType() {
+    if (isValidLicense()) {
+        registerExtraKType(KQuery::DAY3, KQuery::DAY, 3);
+        registerExtraKType(KQuery::DAY5, KQuery::DAY, 5);
+        registerExtraKType(KQuery::DAY7, KQuery::DAY, 7);
+
+        registerExtraKType(KQuery::MIN3, KQuery::MIN, 3, [](const Datetime& d) {
+            auto m = d.minute();
+            if (m % 3 == 0) {
+                return d;
+            }
+            m = (m / 3 + 1) * 3;
+            return Datetime(d.year(), d.month(), d.day(), d.hour(), m);
+        });
+    }
+}
+
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam, const StrategyContext& context) {
@@ -80,6 +99,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
         mo::init(m_i18n_path);
     }
 #endif
+
+    // 注册扩展K线处理
+    registerPredefinedExtraKType();
 
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
@@ -181,7 +203,7 @@ void StockManager::loadAllKData() {
     // 如果上下文指定了 ktype list，则按上下文指定的 ktype 顺序加载，否则按默认顺序加载
     const auto& context_ktypes = m_context.getKTypeList();
     if (context_ktypes.empty()) {
-        ktypes = KQuery::getAllKType();
+        ktypes = KQuery::getBaseKTypeList();
 
     } else {
         // 使用上下文预加载参数覆盖全局预加载参数
@@ -479,6 +501,16 @@ void StockManager::loadAllStocks() {
         }
     }
 
+    auto base_ktypes = KQuery::getBaseKTypeList();
+    vector<KQuery::KType> preload_ktypes;
+    for (auto& ktype : base_ktypes) {
+        auto nktype = ktype;
+        to_lower(nktype);
+        if (m_preloadParam.tryGet<bool>(nktype, false)) {
+            preload_ktypes.push_back(ktype);
+        }
+    }
+
     auto kdriver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
 
     std::unique_lock<std::shared_mutex> lock(*m_stockDict_mutex);
@@ -504,6 +536,7 @@ void StockManager::loadAllStocks() {
                          endDate, info.tick, info.tickValue, info.precision, info.minTradeNumber,
                          info.maxTradeNumber);
             _stock.setKDataDriver(kdriver);
+            _stock.setPreload(preload_ktypes);
             m_stockDict[market_code] = std::move(_stock);
         } else {
             Stock& stock = iter->second;
@@ -526,7 +559,12 @@ void StockManager::loadAllStocks() {
                 stock.m_data->m_minTradeNumber = info.minTradeNumber;
                 stock.m_data->m_maxTradeNumber = info.maxTradeNumber;
                 stock.m_data->m_history_finance_ready = false;
+                // 强制释放所有已缓存K线数据
+                for (const auto& ktype : base_ktypes) {
+                    stock.releaseKDataBuffer(ktype);
+                }
             }
+            stock.setPreload(preload_ktypes);
             if (!stock.getKDataDirver()) {
                 stock.setKDataDriver(kdriver);
             }
