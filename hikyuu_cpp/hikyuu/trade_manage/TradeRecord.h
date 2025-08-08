@@ -84,7 +84,7 @@ public:
     price_t stoploss;   ///< 止损价
     price_t cash;       ///< 现金余额
     SystemPart from;    ///< 辅助记录交易系统部件，区别是哪个部件发出的指示，Null<int>()表示无效
-    string remark;      ///< 备注
+    string remark;      ///< 备注(最大100编码字符)
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
