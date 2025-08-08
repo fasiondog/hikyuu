@@ -56,12 +56,6 @@ void export_TransRecord(py::module& m) {
                       vector_to_python_list<string>({"datetime64[ms]", "d", "d", "i8"}),
                       vector_to_python_list<int64_t>({0, 8, 16, 24}), 32);
 
-          // 创建NumPy数组并复制数据
-          // py::array_t<RawData> arr(static_cast<ssize_t>(data.size()), data.data(), dtype);
-          // return arr;
-          // 创建numpy数组
-
-          // 使用buffer_info创建数组
           return py::array(dtype, data.size(), data.data());
       },
       "将分笔记录转换为NumPy元组");
