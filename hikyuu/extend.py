@@ -269,6 +269,20 @@ def TransList_to_df(data):
 TransList.to_np = TransList_to_np
 TransList.to_df = TransList_to_df
 
+
+def StockWeightList_to_np(data):
+    """转化为numpy结构数组"""
+    return weights_to_np(data)
+
+
+def StockWeightList_to_df(data):
+    """转化为pandas的DataFrame"""
+    return pd.DataFrame.from_records(weights_to_np(data))
+
+
+StockWeightList.to_np = StockWeightList_to_np
+StockWeightList.to_df = StockWeightList_to_df
+
 # ------------------------------------------------------------------
 # 增强 Parameter
 # ------------------------------------------------------------------

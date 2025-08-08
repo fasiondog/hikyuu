@@ -36,4 +36,41 @@ void export_StockWeight(py::module& m) {
       .def_property_readonly("suogu", &StockWeight::suogu, "扩缩股比例")
 
         DEF_PICKLE(StockWeight);
+
+    m.def("weights_to_np", [](const StockWeightList& sw) {
+        struct RawData {
+            int64_t date;  // 日期(仅到天)
+            double countAsGift;
+            double countForSell;
+            double priceForSell;
+            double bonus;
+            double countOfIncreasement;
+            double totalCount;
+            double freeCount;
+            double suogu;
+        };
+        std::vector<RawData> data;
+        data.resize(sw.size());
+
+        for (size_t i = 0, total = sw.size(); i < total; i++) {
+            const StockWeight& w = sw[i];
+            data[i].date = (w.datetime() - Datetime(1970, 1, 1)).days();
+            data[i].countAsGift = w.countAsGift();
+            data[i].countForSell = w.countForSell();
+            data[i].priceForSell = w.priceForSell();
+            data[i].bonus = w.bonus();
+            data[i].countOfIncreasement = w.increasement();
+            data[i].totalCount = w.totalCount();
+            data[i].freeCount = w.freeCount();
+            data[i].suogu = w.suogu();
+        }
+
+        py::dtype dtype = py::dtype(
+          vector_to_python_list<string>({"date", "countAsGift", "countForSell", "priceForSell",
+                                         "bonus", "countOfIncreasement", "totalCount", "freeCount",
+                                         "suogu"}),
+          vector_to_python_list<string>({"datetime64[D]", "d", "d", "d", "d", "d", "d", "d", "d"}),
+          vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48, 56, 64}), 72);
+        return py::array(dtype, data.size(), data.data());
+    });
 }
