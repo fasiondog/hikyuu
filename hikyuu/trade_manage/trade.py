@@ -70,33 +70,12 @@ TradeRecordList.to_df = TradeList_to_df
 
 def PositionList_to_np(pos_list):
     """转化为numpy结构数组"""
-    t_type = np.dtype(
-        {
-            'names': ['证券代码', '证券名称', '买入日期', '已持仓天数', '持仓数量', '投入金额', '当前市值', '盈亏金额', '盈亏比例'],
-            'formats': ['U10', 'U20', 'datetime64[D]', 'i', 'i', 'd', 'd', 'd', 'd']
-        }
-    )
-    sm = StockManager.instance()
-    query = Query(-1)
-    data = []
-    for pos in pos_list:
-        invest = pos.buy_money - pos.sell_money + pos.total_cost
-        k = pos.stock.get_kdata(query)
-        cur_val = k[0].close * pos.number
-        bonus = cur_val - invest
-        date_list = sm.get_trading_calendar(Query(Datetime(pos.take_datetime.date())))
-        data.append(
-            (
-                pos.stock.market_code, pos.stock.name, pos.take_datetime, len(date_list), pos.number, invest,
-                cur_val, bonus, 100 * bonus / invest
-            )
-        )
-    return np.array(data, dtype=t_type)
+    return positions_to_np(pos_list)
 
 
 def PositionList_to_df(pos_list):
     """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(PositionList_to_np(pos_list), index='证券代码')
+    return pd.DataFrame.from_records(positions_to_np(pos_list))
 
 
 PositionRecordList.to_np = PositionList_to_np

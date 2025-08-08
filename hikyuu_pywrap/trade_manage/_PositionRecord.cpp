@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#include <codecvt>
+#include <locale>
 #include <hikyuu/trade_manage/PositionRecord.h>
 #include "../pybind_utils.h"
 
@@ -14,6 +16,25 @@ namespace py = pybind11;
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #endif
+
+// 将 UTF-8 字符串转换为 UTF-32 编码的字节序列（存储在 std::string 中）
+// 返回的字符串包含 max_len 个 wchar_t（每个 4 字节），不足补 L'\0'
+static std::string utf8_to_utf32(const std::string& str, size_t max_len) {
+    // 转换 UTF-8 到 UTF-32（wstring 存储）
+    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+    std::wstring wstr = converter.from_bytes(str);
+
+    // 截断或填充到指定长度（max_len 个字符）
+    if (wstr.size() > max_len) {
+        wstr = wstr.substr(0, max_len);
+    } else {
+        wstr.resize(max_len, L'\0');  // 不足补空字符
+    }
+
+    // 将 wchar_t 数组的字节直接复制到 std::string 中
+    // 注意：std::string 在这里仅作为字节容器，不表示字符含义
+    return std::string(reinterpret_cast<const char*>(wstr.data()), wstr.size() * sizeof(wchar_t));
+}
 
 void export_PositionRecord(py::module& m) {
     py::class_<PositionRecord>(m, "PositionRecord", "持仓记录")
@@ -44,4 +65,80 @@ void export_PositionRecord(py::module& m) {
     注意: 只对已清仓的记录有效, 未清仓的记录返回0  )")
 
         DEF_PICKLE(PositionRecord);
+
+    m.def("positions_to_np", [](const PositionRecordList& positions) {
+        struct RawData {
+            char code[40];
+            char name[80];
+            int64_t take_datetime;        // 买入日期
+            int64_t hold_days;            // 已持仓天数
+            double number;                // 当前持仓数量
+            double invest;                // 当前投入金额
+            double current_market_value;  // 当前市值
+            double profit;                // 当前盈亏金额
+            double profit_ratio;          // 当前盈亏比例
+            double stoploss;              // 当前止损价
+            double goal_price;            // 当前的目标价格
+            int64_t clean_datetime;       // 卖出日期
+            double total_number;          // 累计持仓数量
+            double total_cost;            // 累计交易成本
+            double total_risk;  // 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
+            double buy_money;   // 累计投入金额
+            double sell_money;  // 累计卖出资金
+        };
+
+        std::vector<RawData> data;
+        data.resize(positions.size());
+        for (size_t i = 0, total = positions.size(); i < total; i++) {
+            const PositionRecord& p = positions[i];
+            // data[i].code = p.stock.market_code();
+            // data[i].name = p.stock.name();
+            auto ucode = utf8_to_utf32(p.stock.market_code(), 10);
+            auto uname = utf8_to_utf32(p.stock.name(), 20);
+            memset(data[i].code, 0, 40);
+            memset(data[i].name, 0, 80);
+            memcpy(data[i].code, ucode.c_str(), ucode.size() > 40 ? 40 : ucode.size());
+            memcpy(data[i].name, uname.c_str(), uname.size() > 80 ? 80 : uname.size());
+            data[i].take_datetime = p.takeDatetime.timestamp() / 1000LL;
+            data[i].number = p.number;
+            data[i].invest = p.buyMoney - p.sellMoney + p.totalCost;
+            if (p.cleanDatetime.isNull()) {
+                data[i].hold_days = (Datetime::now() - p.takeDatetime).days();
+                double cur_price = p.stock.getMarketValue(Datetime::now(), KQuery::DAY);
+                data[i].current_market_value = cur_price * p.number;
+                data[i].profit = data[i].current_market_value - data[i].invest;
+            } else {
+                data[i].hold_days = (p.cleanDatetime - p.takeDatetime).days();
+                data[i].current_market_value = 0.0;
+                data[i].profit = p.totalProfit();
+            }
+            data[i].profit_ratio =
+              roundEx(100. * (data[i].invest != 0.0 ? data[i].profit / data[i].invest : 0), 2);
+            data[i].stoploss = p.stoploss;
+            data[i].goal_price = p.goalPrice;
+            data[i].clean_datetime = p.cleanDatetime.isNull()
+                                       ? std::numeric_limits<int64_t>::min()
+                                       : p.cleanDatetime.timestamp() / 1000LL;
+            data[i].total_number = p.totalNumber;
+            data[i].total_cost = p.totalCost;
+            data[i].total_risk = p.totalRisk;
+            data[i].buy_money = p.buyMoney;
+            data[i].sell_money = p.sellMoney;
+        }
+
+        py::dtype dtype = py::dtype(
+          vector_to_python_list<string>({_tr("market_code"), _tr("name"), _tr("take_time"),
+                                         _tr("hold_days"), _tr("hold_number"), "invest",
+                                         _tr("market_value"), _tr("profit"), _tr("profit_percent"),
+                                         _tr("stoploss"), _tr("goal_price"), _tr("clean_time"),
+                                         _tr("total_number"), _tr("total_cost"), _tr("total_risk"),
+                                         _tr("buy_money"), _tr("sell_money")}),
+          vector_to_python_list<string>({"U10", "U20", "datetime64[ms]", "i8", "d", "d", "d", "d",
+                                         "d", "d", "d", "datetime64[ms]", "d", "d", "d", "d", "d"}),
+          vector_to_python_list<int64_t>(
+            {0, 40, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232}),
+          240);
+
+        return py::array(dtype, data.size(), data.data());
+    });
 }
