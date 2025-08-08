@@ -39,4 +39,36 @@ void export_KReord(py::module& m) {
       .def("__ne__", krecord_ne)
 
         DEF_PICKLE(KRecord);
+
+    m.def("krecords_to_np", [](const KRecordList& kdata) {
+        struct RawData {
+            int64_t datetime;  // 转换后的毫秒时间戳
+            double open;
+            double high;
+            double low;
+            double close;
+            double amount;
+            double volume;
+        };
+        std::vector<RawData> data;
+        data.resize(kdata.size());
+        for (size_t i = 0, total = kdata.size(); i < total; i++) {
+            const KRecord& k = kdata[i];
+            data[i].datetime = k.datetime.timestamp() / 1000LL;
+            data[i].open = k.openPrice;
+            data[i].high = k.highPrice;
+            data[i].low = k.lowPrice;
+            data[i].close = k.closePrice;
+            data[i].amount = k.transAmount;
+            data[i].volume = k.transCount;
+        }
+        // 定义NumPy结构化数据类型
+        py::dtype dtype =
+          py::dtype(vector_to_python_list<string>(
+                      {"datetime", "open", "high", "low", "close", "amount", "volume"}),
+                    vector_to_python_list<string>({"datetime64[ms]", "d", "d", "d", "d", "d", "d"}),
+                    vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48}), 56);
+
+        return py::array(dtype, data.size(), data.data());
+    });
 }
