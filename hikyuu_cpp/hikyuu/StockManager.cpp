@@ -100,9 +100,6 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     }
 #endif
 
-    // 注册扩展K线处理
-    registerPredefinedExtraKType();
-
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
     m_kdataDriverParam = kdataParam;
@@ -117,6 +114,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 设置插件路径
     m_plugin_manager.pluginPath(
       m_hikyuuParam.tryGet<string>("plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
+
+    // 注册扩展K线处理
+    registerPredefinedExtraKType();
 
     string basedrivername = m_baseInfoDriverParam.tryGet<string>("type", "");
     to_lower(basedrivername);
