@@ -35,33 +35,14 @@ import numpy as np
 import pandas as pd
 
 
-def TradeList_to_np(t_list):
+def TradeList_to_np(data):
     """转化为numpy结构数组"""
-    t_type = np.dtype(
-        {
-            'names': [
-                '交易日期', '证券代码', '证券名称', '业务名称', '计划交易价格', '实际成交价格', '目标价格', '成交数量', '佣金', '印花税', '过户费', '其它成本',
-                '交易总成本', '止损价', '现金余额', '信号来源'
-            ],
-            'formats':
-            ['datetime64[D]', 'U10', 'U20', 'U10', 'd', 'd', 'd', 'i', 'd', 'd', 'd', 'd', 'd', 'd', 'd', 'U5']
-        }
-    )
-    return np.array(
-        [
-            (
-                t.datetime, t.stock.market_code, t.stock.name, get_business_name(t.business), t.plan_price,
-                t.real_price, t.goal_price, t.number, t.cost.commission, t.cost.stamptax, t.cost.transferfee,
-                t.cost.others, t.cost.total, t.stoploss, t.cash, get_system_part_name(t.part)
-            ) for t in t_list
-        ],
-        dtype=t_type
-    )
+    return trades_to_np(data)
 
 
-def TradeList_to_df(t):
+def TradeList_to_df(data):
     """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(TradeList_to_np(t), index='交易日期')
+    return pd.DataFrame.from_records(trades_to_np(data))
 
 
 TradeRecordList.to_np = TradeList_to_np

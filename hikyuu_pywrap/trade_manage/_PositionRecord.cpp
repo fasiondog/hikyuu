@@ -5,8 +5,6 @@
  *      Author: fasiondog
  */
 
-#include <codecvt>
-#include <locale>
 #include <hikyuu/trade_manage/PositionRecord.h>
 #include "../pybind_utils.h"
 
@@ -16,25 +14,6 @@ namespace py = pybind11;
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #endif
-
-// 将 UTF-8 字符串转换为 UTF-32 编码的字节序列（存储在 std::string 中）
-// 返回的字符串包含 max_len 个 wchar_t（每个 4 字节），不足补 L'\0'
-static std::string utf8_to_utf32(const std::string& str, size_t max_len) {
-    // 转换 UTF-8 到 UTF-32（wstring 存储）
-    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-    std::wstring wstr = converter.from_bytes(str);
-
-    // 截断或填充到指定长度（max_len 个字符）
-    if (wstr.size() > max_len) {
-        wstr = wstr.substr(0, max_len);
-    } else {
-        wstr.resize(max_len, L'\0');  // 不足补空字符
-    }
-
-    // 将 wchar_t 数组的字节直接复制到 std::string 中
-    // 注意：std::string 在这里仅作为字节容器，不表示字符含义
-    return std::string(reinterpret_cast<const char*>(wstr.data()), wstr.size() * sizeof(wchar_t));
-}
 
 void export_PositionRecord(py::module& m) {
     py::class_<PositionRecord>(m, "PositionRecord", "持仓记录")
@@ -91,8 +70,6 @@ void export_PositionRecord(py::module& m) {
         data.resize(positions.size());
         for (size_t i = 0, total = positions.size(); i < total; i++) {
             const PositionRecord& p = positions[i];
-            // data[i].code = p.stock.market_code();
-            // data[i].name = p.stock.name();
             auto ucode = utf8_to_utf32(p.stock.market_code(), 10);
             auto uname = utf8_to_utf32(p.stock.name(), 20);
             memset(data[i].code, 0, 40);
@@ -128,7 +105,7 @@ void export_PositionRecord(py::module& m) {
 
         py::dtype dtype = py::dtype(
           vector_to_python_list<string>({_tr("market_code"), _tr("name"), _tr("take_time"),
-                                         _tr("hold_days"), _tr("hold_number"), "invest",
+                                         _tr("hold_days"), _tr("hold_number"), _tr("invest"),
                                          _tr("market_value"), _tr("profit"), _tr("profit_percent"),
                                          _tr("stoploss"), _tr("goal_price"), _tr("clean_time"),
                                          _tr("total_number"), _tr("total_cost"), _tr("total_risk"),

@@ -67,4 +67,75 @@ void export_TradeRecord(py::module& m) {
       .def_readwrite("remark", &TradeRecord::remark, "备注")
 
         DEF_PICKLE(TradeRecord);
+
+    m.def("trades_to_np", [](const TradeRecordList& trades) {
+        struct RawData {
+            char code[40];
+            char name[80];
+            int64_t datetime;         // 交易日期
+            char business[80];        // 业务类型
+            double planPrice;         // 计划交易价格
+            double realPrice;         // 实际交易价格
+            double goalPrice;         // 目标价位，如果为0或Null表示未限定目标
+            double number;            // 成交数量
+            double stoploss;          // 止损价
+            double cash;              // 现金余额
+            double cost_total;        // 总成本
+            double cost_commission;   // 佣金
+            double cost_stamptax;     // 印花税
+            double cost_transferfee;  // 过户费
+            double cost_others;       // 其他费用
+            char sig_from[80];        // 信号部件来源
+            char remark[400];         // 备注
+        };
+
+        std::vector<RawData> data;
+        data.resize(trades.size());
+        for (size_t i = 0, total = trades.size(); i < total; i++) {
+            const TradeRecord& t = trades[i];
+            memset(data[i].code, 0, 40);
+            memset(data[i].name, 0, 80);
+            if (!t.stock.isNull()) {
+                auto ucode = utf8_to_utf32(t.stock.market_code(), 10);
+                auto uname = utf8_to_utf32(t.stock.name(), 20);
+                memcpy(data[i].code, ucode.c_str(), ucode.size() > 40 ? 40 : ucode.size());
+                memcpy(data[i].name, uname.c_str(), uname.size() > 80 ? 80 : uname.size());
+            }
+            data[i].datetime = t.datetime.timestamp() / 1000LL;
+            auto business = utf8_to_utf32(getBusinessName(t.business), 20);
+            memset(data[i].business, 0, 80);
+            memcpy(data[i].business, business.c_str(), business.size() > 80 ? 80 : business.size());
+            data[i].planPrice = t.planPrice;
+            data[i].realPrice = t.realPrice;
+            data[i].goalPrice = t.goalPrice;
+            data[i].number = t.number;
+            data[i].stoploss = t.stoploss;
+            data[i].cash = t.cash;
+            data[i].cost_total = t.cost.total;
+            data[i].cost_commission = t.cost.commission;
+            data[i].cost_stamptax = t.cost.stamptax;
+            data[i].cost_transferfee = t.cost.transferfee;
+            data[i].cost_others = t.cost.others;
+            auto sig = utf8_to_utf32(getSystemPartName(t.from), 20);
+            memset(data[i].sig_from, 0, 80);
+            memcpy(data[i].sig_from, sig.c_str(), sig.size() > 80 ? 80 : sig.size());
+            auto remark = utf8_to_utf32(t.remark, 100);
+            memset(data[i].remark, 0, 400);
+            memcpy(data[i].remark, remark.c_str(), remark.size() > 400 ? 400 : remark.size());
+        }
+
+        py::dtype dtype = py::dtype(
+          vector_to_python_list<string>(
+            {_tr("market_code"), _tr("name"), _tr("datetime"), _tr("business"), _tr("planPrice"),
+             _tr("realPrice"), _tr("goalPrice"), _tr("number"), _tr("stoploss"), _tr("cash"),
+             _tr("cost_total"), _tr("cost_commission"), _tr("cost_stamptax"),
+             _tr("cost_transferfee"), _tr("cost_others"), _tr("part_from"), _tr("remark")}),
+          vector_to_python_list<string>({"U10", "U20", "datetime64[ms]", "U20", "d", "d", "d", "d",
+                                         "d", "d", "d", "d", "d", "d", "d", "U20", "U100"}),
+          vector_to_python_list<int64_t>(
+            {0, 40, 120, 128, 208, 216, 224, 232, 240, 248, 256, 264, 272, 280, 288, 296, 376}),
+          776);
+
+        return py::array(dtype, data.size(), data.data());
+    });
 }
