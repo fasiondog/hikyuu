@@ -72,11 +72,19 @@ TEST_CASE("test_Stock_extra_ktype") {
     CHECK_EQ(stk.getMarketValue(Datetime(199203050000), KQuery::DAY),
              stk.getKRecord(Datetime(199203050000), KQuery::DAY).closePrice);
     CHECK_EQ(stk.getMarketValue(Datetime(199203050000), KQuery::DAY3), kday3[100].closePrice);
+    CHECK_EQ(stk.getMarketValue(Datetime(199203040000), KQuery::DAY3), kday3[99].closePrice);
 
     size_t startix = 0, endix = 0;
     bool success = stk.getIndexRange(
       KQueryByDate(Datetime(199203050000), Null<Datetime>(), KQuery::DAY3), startix, endix);
-    HKU_INFO("{}, {}, {}", success, startix, endix);
+    CHECK_UNARY(success);
+    CHECK_EQ(startix, 100);
+    CHECK_EQ(endix, 1707);
+    success = stk.getIndexRange(
+      KQueryByDate(Datetime(199203050000), Datetime(199204160000), KQuery::DAY3), startix, endix);
+    CHECK_UNARY(success);
+    CHECK_EQ(startix, 100);
+    CHECK_EQ(endix, 110);
 
     kday3 = stk.getKData(KQueryByIndex(100, 120, KQuery::DAY3));
     auto kday3_2 =
@@ -109,6 +117,34 @@ TEST_CASE("test_Stock_extra_ktype") {
     CHECK_EQ(kmin3[0].lowPrice, low);
     CHECK_EQ(kmin3[0].transAmount, doctest::Approx(sum_amount).epsilon(0.001));
     CHECK_EQ(kmin3[0].transCount, doctest::Approx(sum_volume).epsilon(0.001));
+
+    CHECK_EQ(kmin3[0], stk.getKRecord(0, KQuery::MIN3));
+    CHECK_EQ(kmin3[100], stk.getKRecord(100, KQuery::MIN3));
+    CHECK_EQ(kmin3[100], stk.getKRecord(Datetime(200001051033), KQuery::MIN3));
+
+    CHECK_EQ(stk.getMarketValue(Datetime(200001040931), KQuery::MIN),
+             stk.getKRecord(Datetime(200001040931), KQuery::MIN).closePrice);
+    CHECK_EQ(stk.getMarketValue(Datetime(200001051033), KQuery::MIN3), kmin3[100].closePrice);
+    CHECK_EQ(stk.getMarketValue(Datetime(200001051032), KQuery::MIN3), kmin3[99].closePrice);
+
+    success = stk.getIndexRange(
+      KQueryByDate(Datetime(200001051033), Null<Datetime>(), KQuery::MIN3), startix, endix);
+    CHECK_UNARY(success);
+    CHECK_EQ(startix, 100);
+    CHECK_EQ(endix, 228099);
+    success = stk.getIndexRange(
+      KQueryByDate(Datetime(200001051033), Datetime(200001051103), KQuery::MIN3), startix, endix);
+    CHECK_UNARY(success);
+    CHECK_EQ(startix, 100);
+    CHECK_EQ(endix, 110);
+
+    kmin3 = stk.getKData(KQueryByIndex(100, 120, KQuery::MIN3));
+    auto kmin3_2 =
+      stk.getKData(KQueryByDate(Datetime(200001051033), Datetime(200001051130), KQuery::MIN3));
+    CHECK_EQ(kmin3.size(), kmin3_2.size());
+    for (size_t i = 0; i < kmin3.size(); i++) {
+        CHECK_EQ(kmin3[i], kmin3_2[i]);
+    }
 }
 
 /** @} */
