@@ -363,7 +363,7 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
                 progress(i, total)
             continue
 
-        filename = src_dir + "\\" + market.lower() + stock[2] + suffix
+        filename = os.path.join(src_dir, f"{market.lower()}{stock[2]}{suffix}")
         this_count = func_import_from_file(connect, filename, h5file, market, stock)
         add_record_count += this_count
         if this_count > 0:
