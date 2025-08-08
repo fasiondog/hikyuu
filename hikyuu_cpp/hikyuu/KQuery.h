@@ -26,56 +26,48 @@ public:
         INVALID = 2
     };
 
-    /// 查询K线类型：日线/周线等
-    /*enum KType {
-        //notes: 如添加新类型，请注意按大小顺序添加，否则可能出错
-        MIN      = 0,  ///<1分钟线
-        MIN5     = 1,  ///<5分钟线
-        MIN15    = 2,  ///<15分钟线
-        MIN30    = 3,  ///<30分钟线
-        MIN60    = 4,  ///<60分钟线
-        DAY      = 5,  ///<日线
-        WEEK     = 6,  ///<周线
-        MONTH    = 7,  ///<月线
-        QUARTER  = 8,  ///<季线
-        HALFYEAR = 9,  ///<半年线
-        YEAR     = 10, ///<年线
-
-        //BTC扩展
-        MIN3     = 11,  ///<3分钟线
-        HOUR2    = 12,  ///<2小时线
-        HOUR4    = 13,  ///<4小时线
-        HOUR6    = 14,  ///<6小时线
-        HOUR12   = 15,  ///<12小时线
-        INVALID_KTYPE = 16
-    };*/
     typedef string KType;
 
+    // 基础K线类型
     static const string MIN;
     static const string MIN5;
     static const string MIN15;
     static const string MIN30;
     static const string MIN60;
+    static const string HOUR2;
     static const string DAY;
     static const string WEEK;
     static const string MONTH;
     static const string QUARTER;
     static const string HALFYEAR;
     static const string YEAR;
+
+    // 扩展K线类型
+    static const string DAY3;
+    static const string DAY5;
+    static const string DAY7;
     static const string MIN3;
-    static const string HOUR2;
     static const string HOUR4;
     static const string HOUR6;
     static const string HOUR12;
     // static const string INVALID_KTYPE;
 
-    /** 获取所有的 KType */
-    static const vector<KType>& getAllKType();
-
-    static int32_t getKTypeInMin(KType);
+    /** 判断指定的K线类型是否有效 */
+    static bool isValidKType(const string& ktype);
 
     /** 判断是否为有效 ktype */
-    static bool isKType(const string& ktype);
+    static bool isBaseKType(const string& ktype);
+
+    /** 判断是否为扩展 ktype */
+    static bool isExtraKType(const string& ktype);
+
+    /** 获取所有的 KType */
+    static vector<KType> getBaseKTypeList();
+
+    /** 获取所有扩展 KType */
+    static vector<KType> getExtraKTypeList();
+
+    static int32_t getKTypeInMin(KType);
 
     /**
      * 复权类型

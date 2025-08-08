@@ -24,7 +24,7 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload,
     Parameter baseParam, blockParam, kdataParam, preloadParam, hkuParam;
     getConfigFromIni(config_file_name, baseParam, blockParam, kdataParam, preloadParam, hkuParam);
     if (ignore_preload) {
-        const auto& ktypes = KQuery::getAllKType();
+        const auto& ktypes = KQuery::getBaseKTypeList();
         for (const auto& ktype : ktypes) {
             string low_ktype = ktype;
             to_lower(low_ktype);
@@ -78,7 +78,7 @@ void HKU_API getConfigFromIni(const string& config_file_name, Parameter& basePar
         kdataParam.set<string>(*iter, config.get("kdata", *iter));
     }
 
-    const auto& ktypes = KQuery::getAllKType();
+    const auto& ktypes = KQuery::getBaseKTypeList();
     for (const auto& ktype : ktypes) {
         string low_ktype = ktype;
         to_lower(low_ktype);

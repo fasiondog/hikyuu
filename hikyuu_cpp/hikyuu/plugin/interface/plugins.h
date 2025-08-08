@@ -14,6 +14,7 @@
 #include "ExtendIndicatorsPluginInterface.h"
 #include "TMReportPluginInterface.h"
 #include "DataDriverPluginInterface.h"
+#include "HkuExtraPluginInterface.h"
 
 namespace hku {
 
@@ -24,5 +25,6 @@ namespace hku {
 #define HKU_PLUGIN_EXTEND_INDICATOR "extind"
 #define HKU_PLUGIN_TMREPORT "tmreport"
 #define HKU_PLUGIN_CLICKHOUSE_DRIVER "clickhousedriver"
+#define HKU_PLUGIN_HKU_EXTRA "hkuextra"
 
 }

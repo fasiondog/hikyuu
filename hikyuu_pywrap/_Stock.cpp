@@ -218,7 +218,7 @@ void export_Stock(py::module& m) {
       .def("load_kdata_to_buffer", &Stock::loadKDataToBuffer, R"(load_kdata_to_buffer(self,
           ktype)
 
-        将指定类别的K线数据加载至内存缓存
+        将指定类别的K线数据加载至内存缓存, 如果已经存在缓存，需要先 release_kdata_buffer
 
         :param Query.KType ktype: K线类型)")
 

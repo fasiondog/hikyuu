@@ -29,7 +29,11 @@ void export_KQuery(py::module& m) {
       .def_property_readonly("ktype", &KQuery::kType, "查询的K线类型")
       .def_property_readonly("recover_type", py::overload_cast<>(&KQuery::recoverType, py::const_),
                              "复权类别")
-      .def("get_all_ktype", &KQuery::getAllKType, "获取所有KType")
+      .def("is_valid_ktype", &KQuery::isValidKType, "判断KType是否有效")
+      .def("is_base_ktype", &KQuery::isBaseKType, "判断是否为基础KType")
+      .def("is_extra_ktype", &KQuery::isExtraKType, "判断是否为扩展KType")
+      .def("get_base_ktype_list", &KQuery::getBaseKTypeList, "获取所有基础KType")
+      .def("get_extra_ktype_list", &KQuery::getExtraKTypeList, "获取所有扩展KType")
       .def("get_ktype_in_min", &KQuery::getKTypeInMin, "获取ktype对应的分钟数")
 
         DEF_PICKLE(KQuery);
@@ -72,8 +76,12 @@ void export_KQuery(py::module& m) {
     kquery.attr("MIN15") = "MIN15";
     kquery.attr("MIN30") = "MIN30";
     kquery.attr("MIN60") = "MIN60";
-    kquery.attr("MIN3") = "MIN3";
     kquery.attr("HOUR2") = "HOUR2";
+
+    kquery.attr("DAY3") = "DAY3";
+    kquery.attr("DAY5") = "DAY5";
+    kquery.attr("DAY7") = "DAY7";
+    kquery.attr("MIN3") = "MIN3";
     kquery.attr("HOUR4") = "HOUR4";
     kquery.attr("HOUR6") = "HOUR6";
     kquery.attr("HOUR12") = "HOUR12";

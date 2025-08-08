@@ -230,10 +230,10 @@ public:
      * 将K线数据做自身缓存
      *  @note 一般不主动调用，谨慎
      */
-    void loadKDataToBuffer(KQuery::KType);
+    void loadKDataToBuffer(KQuery::KType) const;
 
     /** 释放对应的K线缓存 */
-    void releaseKDataBuffer(KQuery::KType);
+    void releaseKDataBuffer(KQuery::KType) const;
 
     /** 指定类型的K线数据是否被缓存 */
     bool isBuffer(KQuery::KType) const;
@@ -258,11 +258,18 @@ private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
 
     // 以下函数属于基础操作添加了读锁
-    size_t _getCountFromBuffer(KQuery::KType ktype) const;
+    size_t _getCountFromBuffer(const KQuery::KType& ktype) const;
     KRecord _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
     KRecordList _getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                                           KQuery::KType ktype) const;
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;
+
+    KRecordList _getKRecordList(const KQuery& query) const;
+
+    // 仅供 StockManager 初始化时调用
+    void setPreload(vector<KQuery::KType>& preload_ktypes);
+
+    bool isPreload(KQuery::KType ktype) const;
 
 private:
     struct HKU_API Data;
@@ -295,6 +302,7 @@ struct HKU_API Stock::Data {
     double m_minTradeNumber;
     double m_maxTradeNumber;
 
+    std::unordered_set<string> m_ktype_preload;  // 记录当前证券的K线数据是否需要预加载
     unordered_map<string, KRecordList*> pKData;
     unordered_map<string, std::shared_mutex*> pMutex;
 
@@ -336,6 +344,10 @@ inline uint64_t Stock::id() const {
 
 inline bool Stock::operator!=(const Stock& stock) const {
     return !(*this == stock);
+}
+
+inline bool Stock::isNull() const {
+    return !m_data || !m_kdataDriver;
 }
 
 }  // namespace hku

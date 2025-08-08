@@ -523,7 +523,7 @@ def iheatmap(ind, axes=None):
         hku_error("获取日期列表失败！指标应为时间序列")
         return
 
-    data = pd.DataFrame({'date': dates, 'value': ind.to_np()})
+    data = pd.DataFrame({'date': dates, 'value': ind.value_to_np()})
     data = data[(data[['value']] != 0).all(axis=1)]
 
     # 提取年月信息
@@ -874,7 +874,7 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None):
     text = per.report()
 
     # 计算最大回撤
-    max_pullback = min(MDD(funds).to_np())
+    max_pullback = min(MDD(funds))
 
     # 计算 sharp
     bond = ZHBOND10(ref_dates)
@@ -955,7 +955,7 @@ def sys_performance(sys, ref_stk=None):
     text = per.report()
 
     # 计算最大回撤
-    max_pullback = min(MDD(funds).to_np())
+    max_pullback = min(MDD(funds))
 
     # 计算 sharp
     bond = ZHBOND10(ref_dates)

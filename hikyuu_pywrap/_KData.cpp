@@ -163,7 +163,7 @@ void export_KData(py::module& m) {
                    return ret;
                } else if (py::isinstance<py::slice>(obj)) {
                    py::slice slice = py::cast<py::slice>(obj);
-                   ssize_t start, stop, step, length;
+                   size_t start, stop, step, length;
 
                    if (!slice.compute(self.size(), &start, &stop, &step, &length)) {
                        throw std::invalid_argument("无效的切片参数");
@@ -171,8 +171,8 @@ void export_KData(py::module& m) {
 
                    KRecordList result;
                    result.reserve(length);
-                   for (ssize_t i = 0; i < length; ++i) {
-                       ssize_t index = start + i * step;
+                   for (size_t i = 0; i < length; ++i) {
+                       size_t index = start + i * step;
                        result.push_back(self[static_cast<size_t>(index)]);
                    }
 
