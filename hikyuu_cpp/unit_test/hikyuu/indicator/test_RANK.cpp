@@ -7,15 +7,21 @@
 
 #include "../test_config.h"
 
-#if ENABLE_WITH_PLUGIN_TEST
-
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/plugin/extind.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/plugin/interface/plugins.h>
+#include <hikyuu/plugin/device.h>
 
 using namespace hku;
+
+static bool pluginValid() {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
+    return plugin && isValidLicense();
+}
 
 /**
  * @defgroup test_indicator_RANK test_indicator_RANK
@@ -25,6 +31,8 @@ using namespace hku;
 
 /** @par 检测点 */
 TEST_CASE("test_RANK") {
+    HKU_IF_RETURN(!pluginValid(), void());
+
     auto k = getKData("sz000001", KQuery(-5));
     Indicator ret;
 
@@ -79,7 +87,5 @@ TEST_CASE("test_RANK") {
 //     }
 // }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
-
-#endif /** #if ENABLE_WITH_PLUGIN_TEST */
 
 /** @} */

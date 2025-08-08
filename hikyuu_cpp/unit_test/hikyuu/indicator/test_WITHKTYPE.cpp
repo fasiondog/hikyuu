@@ -7,8 +7,6 @@
 
 #include "../test_config.h"
 
-#if ENABLE_WITH_PLUGIN_TEST
-
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/plugin/extind.h>
@@ -16,8 +14,16 @@
 #include <hikyuu/indicator_talib/ta_crt.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/ALIGN.h>
+#include <hikyuu/plugin/interface/plugins.h>
+#include <hikyuu/plugin/device.h>
 
 using namespace hku;
+
+static bool pluginValid() {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
+    return plugin && isValidLicense();
+}
 
 /**
  * @defgroup test_indicator_WITHKTYPE test_indicator_WITHKTYPE
@@ -27,6 +33,8 @@ using namespace hku;
 
 /** @par 检测点 */
 TEST_CASE("test_WITHKTYPE_equal_ktype") {
+    HKU_IF_RETURN(!pluginValid(), void());
+
     auto k = getKData("sh000001", KQuery(-30));
     Indicator ret;
 
@@ -63,6 +71,8 @@ TEST_CASE("test_WITHKTYPE_equal_ktype") {
 
 /** @par 检测点 */
 TEST_CASE("test_WITHKTYPE_extent") {
+    HKU_IF_RETURN(!pluginValid(), void());
+
     auto k = getKData("sh000001", KQuery(-30));
     auto wk =
       getKData("sh000001", KQueryByDate(Datetime(20111021), Null<Datetime>(), KQuery::WEEK));
@@ -100,6 +110,8 @@ TEST_CASE("test_WITHKTYPE_extent") {
 
 /** @par 检测点 */
 TEST_CASE("test_WITHKTYPE_sample") {
+    HKU_IF_RETURN(!pluginValid(), void());
+
     auto wk =
       getKData("sh000001", KQueryByDate(Datetime(20110513), Datetime(20111209), KQuery::WEEK));
     auto k =
@@ -146,7 +158,5 @@ TEST_CASE("test_WITHKTYPE_sample") {
 //     }
 // }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
-
-#endif /** #if ENABLE_WITH_PLUGIN_TEST */
 
 /** @} */
