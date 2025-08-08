@@ -83,7 +83,7 @@ def draw(
     else:
         print("sg_type only in ('CORSS', 'SINGLE')")
 
-    cer = PRICELIST(cama, 1)
+    cer = RESULT(cama, 1)
     label = "ER(%s)" % cer[-1]
     cer.plot(axes=ax2, color='b', marker='o', label=label, legend_on=False, text_on=True, kref=kdata)
 
