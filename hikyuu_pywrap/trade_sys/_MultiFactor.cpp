@@ -38,6 +38,34 @@ void export_MultiFactor(py::module& m) {
       .def_readwrite("stock", &ScoreRecord::stock, "证券")
       .def_readwrite("value", &ScoreRecord::value, "分值");
 
+    m.def("scorerecords_to_np", [](const ScoreRecordList& scs) {
+        struct RawData {
+            char code[40];
+            char name[80];
+            double value;
+        };
+        std::vector<RawData> data;
+        data.resize(scs.size());
+        std::string ucode, uname;
+        for (size_t i = 0, total = scs.size(); i < total; i++) {
+            const ScoreRecord& sc = scs[i];
+            ucode = utf8_to_utf32(sc.stock.market_code(), 10);
+            uname = utf8_to_utf32(sc.stock.name(), 20);
+            memset(data[i].code, 0, 40);
+            memset(data[i].name, 0, 80);
+            memcpy(data[i].code, ucode.c_str(), ucode.size() > 40 ? 40 : ucode.size());
+            memcpy(data[i].name, uname.c_str(), uname.size() > 80 ? 80 : uname.size());
+            data[i].value = sc.value;
+        }
+        // 定义NumPy结构化数据类型
+        py::dtype dtype =
+          py::dtype(vector_to_python_list<string>({htr("market_code"), htr("name"), htr("score")}),
+                    vector_to_python_list<string>({"U10", "U20", "d"}),
+                    vector_to_python_list<int64_t>({0, 40, 120}), 128);
+
+        return py::array(dtype, data.size(), data.data());
+    });
+
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",
                                                                py::dynamic_attr(),
                                                                R"(市场环境判定策略基类

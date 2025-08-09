@@ -29,7 +29,6 @@
 # 1. 20130213, Added by fasiondog
 # ===============================================================================
 
-from hikyuu.util.slice import list_getitem
 from hikyuu import *
 import numpy as np
 import pandas as pd

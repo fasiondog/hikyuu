@@ -106,6 +106,42 @@ void export_Selector(py::module& m) {
 
         DEF_PICKLE(SystemWeight);
 
+    m.def("systemweights_to_np", [](const SystemWeightList& swl) {
+        struct RawData {
+            char sys_name[80];
+            char code[40];
+            char name[80];
+            double weight;
+        };
+        std::vector<RawData> data;
+        data.resize(swl.size());
+        std::string sys_name, ucode, uname;
+        for (size_t i = 0, total = swl.size(); i < total; i++) {
+            const SystemWeight& sw = swl[i];
+            memset(data[i].sys_name, 0, 80);
+            memset(data[i].code, 0, 40);
+            memset(data[i].name, 0, 80);
+            if (sw.sys) {
+                sys_name = utf8_to_utf32(sw.sys->name(), 20);
+                ucode = utf8_to_utf32(sw.sys->getStock().market_code(), 10);
+                uname = utf8_to_utf32(sw.sys->getStock().name(), 20);
+                memcpy(data[i].sys_name, sys_name.c_str(),
+                       sys_name.size() > 80 ? 80 : sys_name.size());
+                memcpy(data[i].code, ucode.c_str(), ucode.size() > 40 ? 40 : ucode.size());
+                memcpy(data[i].name, uname.c_str(), uname.size() > 80 ? 80 : uname.size());
+            }
+            data[i].weight = sw.weight;
+        }
+        // 定义NumPy结构化数据类型
+        py::dtype dtype =
+          py::dtype(vector_to_python_list<string>(
+                      {htr("sys_name"), htr("market_code"), htr("stock_name"), htr("weight")}),
+                    vector_to_python_list<string>({"U20", "U10", "U20", "d"}),
+                    vector_to_python_list<int64_t>({0, 80, 120, 200}), 208);
+
+        return py::array(dtype, data.size(), data.data());
+    });
+
     py::class_<SelectorBase, SEPtr, PySelectorBase>(
       m, "SelectorBase",
       R"(选择器策略基类，实现标的、系统策略的评估和选取算法，自定义选择器策略子类接口：

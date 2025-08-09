@@ -68,10 +68,11 @@ void export_PositionRecord(py::module& m) {
 
         std::vector<RawData> data;
         data.resize(positions.size());
+        std::string ucode, uname;
         for (size_t i = 0, total = positions.size(); i < total; i++) {
             const PositionRecord& p = positions[i];
-            auto ucode = utf8_to_utf32(p.stock.market_code(), 10);
-            auto uname = utf8_to_utf32(p.stock.name(), 20);
+            ucode = utf8_to_utf32(p.stock.market_code(), 10);
+            uname = utf8_to_utf32(p.stock.name(), 20);
             memset(data[i].code, 0, 40);
             memset(data[i].name, 0, 80);
             memcpy(data[i].code, ucode.c_str(), ucode.size() > 40 ? 40 : ucode.size());

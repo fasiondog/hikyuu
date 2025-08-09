@@ -91,18 +91,19 @@ void export_TradeRecord(py::module& m) {
 
         std::vector<RawData> data;
         data.resize(trades.size());
+        string ucode, uname, business, sig, remark;
         for (size_t i = 0, total = trades.size(); i < total; i++) {
             const TradeRecord& t = trades[i];
             memset(data[i].code, 0, 40);
             memset(data[i].name, 0, 80);
             if (!t.stock.isNull()) {
-                auto ucode = utf8_to_utf32(t.stock.market_code(), 10);
-                auto uname = utf8_to_utf32(t.stock.name(), 20);
+                ucode = utf8_to_utf32(t.stock.market_code(), 10);
+                uname = utf8_to_utf32(t.stock.name(), 20);
                 memcpy(data[i].code, ucode.c_str(), ucode.size() > 40 ? 40 : ucode.size());
                 memcpy(data[i].name, uname.c_str(), uname.size() > 80 ? 80 : uname.size());
             }
             data[i].datetime = t.datetime.timestamp() / 1000LL;
-            auto business = utf8_to_utf32(getBusinessName(t.business), 20);
+            business = utf8_to_utf32(getBusinessName(t.business), 20);
             memset(data[i].business, 0, 80);
             memcpy(data[i].business, business.c_str(), business.size() > 80 ? 80 : business.size());
             data[i].planPrice = t.planPrice;
@@ -116,10 +117,10 @@ void export_TradeRecord(py::module& m) {
             data[i].cost_stamptax = t.cost.stamptax;
             data[i].cost_transferfee = t.cost.transferfee;
             data[i].cost_others = t.cost.others;
-            auto sig = utf8_to_utf32(getSystemPartName(t.from), 20);
+            sig = utf8_to_utf32(getSystemPartName(t.from), 20);
             memset(data[i].sig_from, 0, 80);
             memcpy(data[i].sig_from, sig.c_str(), sig.size() > 80 ? 80 : sig.size());
-            auto remark = utf8_to_utf32(t.remark, 100);
+            remark = utf8_to_utf32(t.remark, 100);
             memset(data[i].remark, 0, 400);
             memcpy(data[i].remark, remark.c_str(), remark.size() > 400 ? 400 : remark.size());
         }
