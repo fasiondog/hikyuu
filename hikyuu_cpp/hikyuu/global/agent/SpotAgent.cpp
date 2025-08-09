@@ -9,6 +9,7 @@
 #include <nng/nng.h>
 #include <nng/protocol/pubsub0/sub.h>
 #include "hikyuu/StockManager.h"
+#include "hikyuu/lang.h"
 #include "spot_generated.h"
 #include "SpotAgent.h"
 
@@ -35,7 +36,7 @@ void SpotAgent::setQuotationServer(const string& server) {
 }
 
 void SpotAgent::start() {
-    HKU_INFO(_tr("Start spot agent."));
+    HKU_INFO(htr("Start spot agent."));
     stop();
     if (m_stop) {
         m_stop = false;

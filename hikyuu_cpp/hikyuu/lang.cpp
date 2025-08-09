@@ -1,0 +1,42 @@
+/*
+ *  Copyright (c) 2025 hikyuu.org
+ *
+ *  Created on: 2025-08-09
+ *      Author: fasiondog
+ */
+
+#include "hikyuu/utilities/os.h"
+#include "hikyuu/utilities/arithmetic.h"
+#include "hikyuu/utilities/Log.h"
+#include "hikyuu/utilities/moFileReader.h"
+
+#include "hikyuu/utilities/osdef.h"
+#if HKU_OS_WINDOWS
+#include <windows.h>
+#elif HKU_OS_OSX
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
+#include "lang.h"
+
+namespace hku {
+
+void loadLocalLanguage(const std::string &path) {
+    std::string lang = getSystemLanguage();
+    if (lang == "zh_cn") {
+        std::string lang_file = fmt::format("{}/zh_CN/hikyuu.mo", path);
+        auto &reader = moFileLib::moFileReaderSingleton::GetInstance();
+        reader.ClearTable();
+        reader.ReadFile(lang_file.c_str());
+    }
+}
+
+std::string HKU_API htr(const char *id) {
+    return moFileLib::moFileReaderSingleton::GetInstance().Lookup(id);
+}
+
+std::string HKU_API hctr(const char *ctx, const char *id) {
+    return moFileLib::moFileReaderSingleton::GetInstance().LookupWithContext(ctx, id);
+}
+
+}  // namespace hku

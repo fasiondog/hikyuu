@@ -86,3 +86,5 @@ data_server_docker_file
 hikyuu.ini
 hikyuu/cpp/i18n/zh_CN.mo
 GEMINI.md
+hikyuu/cpp/i18n/zh_CN/hikyuu.mo
+i18n/zh_CN.mo

@@ -154,7 +154,7 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
     if (trace && adjust) {
         HKU_INFO("****************************************************");
         HKU_INFO("**                                                **");
-        HKU_INFO(_tr("**  [PF] Position adjustment will be made today.  **"));
+        HKU_INFO(htr("**  [PF] Position adjustment will be made today.  **"));
         HKU_INFO("**                                                **");
         HKU_INFO("****************************************************");
     }

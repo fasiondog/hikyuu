@@ -126,10 +126,10 @@ void export_TradeRecord(py::module& m) {
 
         py::dtype dtype = py::dtype(
           vector_to_python_list<string>(
-            {_tr("market_code"), _tr("name"), _tr("datetime"), _tr("business"), _tr("planPrice"),
-             _tr("realPrice"), _tr("goalPrice"), _tr("number"), _tr("stoploss"), _tr("cash"),
-             _tr("cost_total"), _tr("cost_commission"), _tr("cost_stamptax"),
-             _tr("cost_transferfee"), _tr("cost_others"), _tr("part_from"), _tr("remark")}),
+            {htr("market_code"), htr("name"), htr("datetime"), htr("business"), htr("planPrice"),
+             htr("realPrice"), htr("goalPrice"), htr("number"), htr("stoploss"), htr("cash"),
+             htr("cost_total"), htr("cost_commission"), htr("cost_stamptax"),
+             htr("cost_transferfee"), htr("cost_others"), htr("part_from"), htr("remark")}),
           vector_to_python_list<string>({"U10", "U20", "datetime64[ms]", "U20", "d", "d", "d", "d",
                                          "d", "d", "d", "d", "d", "d", "d", "U20", "U100"}),
           vector_to_python_list<int64_t>(
