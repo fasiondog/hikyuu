@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-08-10 02:53+0800\n"
-"PO-Revision-Date: 2025-08-10 03:16+0800\n"
+"POT-Creation-Date: 2025-08-10 03:51+0800\n"
+"PO-Revision-Date: 2025-08-10 03:53+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -58,6 +58,7 @@ msgid "Start spot agent."
 msgstr "启动行情接收."
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:100
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:157
 msgid "You can't trace in jupyter!"
 msgstr "无法在 jupyter 中进行跟踪打印!"
 
@@ -199,6 +200,140 @@ msgstr "[PF] 当前选中系统数量: {}"
 #, c++-format
 msgid "[PF] remove system: {}"
 msgstr "[PF] 移除系统: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:273
+msgid "You are using forward or equal_forward kdata, which is a future function!"
+msgstr "你正在使用前复权或等比前向数据运行系统，这相当于使用了未来函数!"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:462
+#, c++-format
+msgid "[{}] cal today {}"
+msgstr "[{}] 当日计算价(复权价) {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:464
+#, c++-format
+msgid "[{}] raw today {}"
+msgstr "[{}] 当日原始价(不复权) {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:490
+#, c++-format
+msgid "[{}] current EV is invalid"
+msgstr "[{}] 当前市场环境有效"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:495
+#, c++-format
+msgid "[{}] EV to sell"
+msgstr "[{}] 市场环境指示卖出"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:504
+#, c++-format
+msgid "[{}] EV status from invalid to valid"
+msgstr "[{}] 市场环境状态从无效转为有效"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:508
+#, c++-format
+msgid "[{}] EV to buy"
+msgstr "[{}] 市场环境指示买入"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:525
+#, c++-format
+msgid "[{}] current CN is invalid"
+msgstr "[{}] 当前系统条件有效"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:530
+#, c++-format
+msgid "[{}] CN to sell"
+msgstr "[{}] 系统条件指示卖出"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:539
+#, c++-format
+msgid "[{}] CN status from invalid to valid"
+msgstr "[{}] 系统条件从无效转为有效"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:543
+#, c++-format
+msgid "[{}] CN to buy"
+msgstr "[{}] 系统条件指示买入"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:560
+#, c++-format
+msgid "[{}] SG to buy short"
+msgstr "[{}] 信号指示买空"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:564
+#, c++-format
+msgid "[{}] SG to buy"
+msgstr "[{}] 信号指示买入"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:574
+#, c++-format
+msgid "[{}] SG to sell"
+msgstr "[{}] 信号指示卖出"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:578
+#, c++-format
+msgid "[{}] SG to sell short"
+msgstr "[{}] 信号指示卖空"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:594
+#, c++-format
+msgid "[{}] current postion: {}"
+msgstr "[{}] 当前持仓数量: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:598
+#, c++-format
+msgid "[{}] ST to sell, current price: {}, stoploss: {}"
+msgstr "[{}] 止损指示卖出, 当前价: {}, 止损价: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:603
+#, c++-format
+msgid "[{}] PG to sell, current price: {}, goal: {}"
+msgstr "[{}] 赢利目标指示卖出, 当前价: {}, 目标价: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:625
+#, c++-format
+msgid "[{}] TP to sell, current price after restoration: {}, take_profit: {}"
+msgstr "[{}] 止盈指示卖出, 当前价(复权价）: {}, 止盈价(复权价）: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:646
+#, c++-format
+msgid "[{}] will be delay to buy"
+msgstr "[{}] 延迟至下一开盘时买入"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:653
+#, c++-format
+msgid "[{}] buy one-price board"
+msgstr "[{}] 一字板买入"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:660
+#, c++-format
+msgid "[{}] delay to buy, one-price board"
+msgstr "[{}] 因一字板，延迟至下一开盘买入"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:667
+#, c++-format
+msgid "[{}] delay to buy, one-price up-limit board"
+msgstr "[{}] 因一字涨停板，延迟至下一开盘买入"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:675
+#, c++-format
+msgid "[{}] delay to buy, current amount == 0 or count == 0"
+msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时买入"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:695
+#, c++-format
+msgid "[{}] buy failed, planPrice: {} <= stoploss: {}"
+msgstr "[{}] 买入失败, 计划买入价格: {} <= 止损价: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:706
+#, c++-format
+msgid "[{}] buy failed, number: {} == 0 or > maxTradeNumber: {}, {}"
+msgstr "[{}] 买入失败, 买入数量: {} == 0 or > 允许的单笔交易数量: {}, {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:716
+#, c++-format
+msgid "[{}] buy failed, {}"
+msgstr "[{}] 买入失败，{}"
 
 #: hikyuu_pywrap/indicator/_build_in.cpp:967
 msgid "WEAVE: total must be 2 to 6"
