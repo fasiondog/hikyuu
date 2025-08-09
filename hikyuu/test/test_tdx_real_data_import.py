@@ -74,6 +74,7 @@ if project_root not in sys.path:
 
 from hikyuu.gui.data.ImportTdxToH5Task import ImportTdxToH5Task
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
+from hikyuu.test.test_init import get_real_tdx_filepath
 
 # ------------------------------------------------------------------------------
 # Test Helper Classes (与 test_tdx_import.py 相同)
@@ -112,11 +113,6 @@ class TestTdxRealDataImport(unittest.TestCase):
     """
     封装了使用真实 .day 文件进行导入测试的用例。
     """
-
-    @classmethod
-    def setUpClass(cls):
-        # 获取 test_data 目录的绝对路径
-        cls.test_data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'test_data'))
 
     def setUp(self):
         """初始化一个全新的、隔离的测试环境。"""
@@ -187,7 +183,7 @@ class TestTdxRealDataImport(unittest.TestCase):
             self.skipTest("h5py 或 numpy 未安装, 跳过此核心功能测试")
 
         # --- 1. 准备测试数据 ---
-        source_day_file = os.path.join(self.test_data_dir, 'sh000001.day')
+        source_day_file = get_real_tdx_filepath('000001', 'sh')
         if not os.path.exists(source_day_file):
             self.skipTest(f"未找到通达信数据文件: {source_day_file}, 请将文件复制到该目录后再进行测试。")
 

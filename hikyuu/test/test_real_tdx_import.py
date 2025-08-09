@@ -17,7 +17,7 @@
 - `test_tdx_real_data_import.py`: 使用 **真实数据** 对核心转换函数 `tdx_import_day_data_from_file` 进行集成测试, 关注的是数据转换结果的准确性, 运行速度稍慢且依赖于一个真实的 .day 文件。
 
 使用前提:
-- 需要一个真实的通达信 .day 文件。测试默认会寻找环境变量 `HKU_REAL_TDX_FILE_PATH` 指定的文件,
+- 需要一个真实的通达信 .day 文件。测试默认会寻找环境变量 `HKU_real_tdx_file_path` 指定的文件,
   如果未指定, 则会尝试读取 `/mnt/d1581/tdx/vipdoc/sh/lday/sh600000.day`。
   如果文件不存在, 所有测试将被自动跳过。
 """
@@ -30,43 +30,25 @@ from datetime import datetime
 import pytest
 import tables as tb
 
+import unittest.mock
+unittest.mock.patch('hikyuu.hku_cleanup', lambda: None).start()
+
 from hikyuu.data.common_h5 import H5Record, get_h5table, open_h5file
 # 假设要测试的函数位于以下模块
 from hikyuu.data.tdx_to_h5 import tdx_import_day_data_from_file
+from hikyuu.test.test_init import get_real_tdx_filepath
 
 stcode = '600000'  # 示例股票代码
 
 
-def _get_real_tdx_filepath(code):
-    """
-    获取真实的通达信.day文件路径。
-    
-    该函数按以下顺序确定文件路径:
-    1. 检查环境变量 `HKU_REAL_TDX_FILE_PATH` 是否被设置。
-    2. 如果未设置, 使用默认的主路径, 如 /mnt/d1581/tdx/vipdoc/sh/lday/sh<stcode>.day。
-    3. 检查上述路径的文件是否存在。
-    4. 如果文件不存在, 则自动回退到在项目根目录下的 `test_data` 文件夹中寻找同名文件作为备用。
-    
-    这使得测试既能适应有权访问生产数据环境的开发者, 也能让其他贡献者使用
-    项目内提供的样本数据来运行测试, 避免了因路径问题导致的测试挂起或失败。
-    
-    :param code: 股票代码
-    :return: 最终确定的文件路径 (可能不存在, 由调用方处理)
-    """
-    primary_path = os.environ.get('HKU_REAL_TDX_FILE_PATH', f"/mnt/d1581/tdx/vipdoc/sh/lday/sh{code}.day")
-    if os.path.exists(primary_path):
-        return primary_path
-
-    # 如果主路径文件不存在, 则尝试从 test_data 目录寻找同名文件作为备用
-    fallback_filename = os.path.basename(primary_path)
-    # __file__ 指向 hikyuu/test/test_real_tdx_import.py, 因此需要上溯两级到项目根目录
-    test_data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'test_data'))
-    fallback_path = os.path.join(test_data_dir, fallback_filename)
-    return fallback_path
+@pytest.fixture(scope="module")
+def real_tdx_file_path():
+    """为当前模块的测试提供 sh600000.day 的路径"""
+    return get_real_tdx_filepath(stcode, market='sh')
 
 
 # 用户提供的真实数据文件路径, 通过函数动态获取
-REAL_TDX_FILE_PATH = _get_real_tdx_filepath(stcode)
+# real_tdx_file_path = _get_real_tdx_filepath(stcode)
 
 
 def _read_raw_tdx_day_file(filename):
@@ -109,7 +91,7 @@ def _read_raw_tdx_day_file(filename):
 
 
 @pytest.fixture
-def imported_data(request):
+def imported_data(request, real_tdx_file_path):
     """
     一个 Module 级别的 Pytest Fixture, 它在当前测试模块的所有测试用例执行前, 
     仅运行一次。它负责:
@@ -147,7 +129,7 @@ def imported_data(request):
     h5file = open_h5file(data_dir, market, 'DAY')
     
     imported_count = tdx_import_day_data_from_file(
-        connect=db_connect, filename=REAL_TDX_FILE_PATH, h5file=h5file, market=market, stock_record=stock_record
+        connect=db_connect, filename=real_tdx_file_path, h5file=h5file, market=market, stock_record=stock_record
     )
 
     # 3. 使用 yield 将必要信息打包返回给测试用例
@@ -166,8 +148,9 @@ def imported_data(request):
 
 # 使用 pytest.mark.skipif 装饰器, 如果指定的条件为真, 则跳过该测试。
 # 这里用于检查真实的 .day 文件是否存在, 如果不存在, 测试将不会执行, 并给出友好提示。
-@pytest.mark.skipif(not os.path.exists(REAL_TDX_FILE_PATH), reason=f"TDX file not found: {REAL_TDX_FILE_PATH}")
-def test_import_and_verify_output(imported_data):
+def test_import_and_verify_output(imported_data, real_tdx_file_path):
+    if not os.path.exists(real_tdx_file_path):
+        pytest.skip(f"TDX file not found: {real_tdx_file_path}")
     """
     测试目标: 验证导入流程能成功执行, 并对导入结果进行一次快速的、人工友好的抽样检查。
     测试方法:
@@ -176,7 +159,7 @@ def test_import_and_verify_output(imported_data):
     预期结果:
       - 测试通过, 并在控制台输出清晰的首末记录, 方便人工核对。
     """
-    print(f"\n成功从 {os.path.basename(REAL_TDX_FILE_PATH)} 导入了 {imported_data['imported_count']} 条记录。")
+    print(f"\n成功从 {os.path.basename(real_tdx_file_path)} 导入了 {imported_data['imported_count']} 条记录。")
     assert imported_data['imported_count'] > 0
 
     table = get_h5table(imported_data['h5file'], imported_data['market'], imported_data['stock_code'])
@@ -207,8 +190,9 @@ def test_import_and_verify_output(imported_data):
     print(f"共有 {len(table)} 条记录。")
 
 
-@pytest.mark.skipif(not os.path.exists(REAL_TDX_FILE_PATH), reason=f"TDX file not found: {REAL_TDX_FILE_PATH}")
-def test_compare_imported_data_with_source(imported_data):
+def test_compare_imported_data_with_source(imported_data, real_tdx_file_path):
+    if not os.path.exists(real_tdx_file_path):
+        pytest.skip(f"TDX file not found: {real_tdx_file_path}")
     """
     测试目标: 对比 HDF5 中的数据和原始 .day 文件的数据, 确保 **全量数据** 的精确一致性。
     测试方法:
@@ -223,7 +207,7 @@ def test_compare_imported_data_with_source(imported_data):
     h5_table = get_h5table(imported_data['h5file'], imported_data['market'], imported_data['stock_code'])
     
     # 2. 从原始.day文件直接读取数据
-    raw_records = _read_raw_tdx_day_file(REAL_TDX_FILE_PATH)
+    raw_records = _read_raw_tdx_day_file(real_tdx_file_path)
     
     # 3. 断言记录数量一致
     assert len(h5_table) == len(raw_records), "导入后的记录数与源文件不一致！"
@@ -242,8 +226,9 @@ def test_compare_imported_data_with_source(imported_data):
     print(f"\n成功校验 {len(h5_table)} 条记录，HDF5数据与源文件完全一致。")
 
 
-@pytest.mark.skipif(not os.path.exists(REAL_TDX_FILE_PATH), reason=f"TDX file not found: {REAL_TDX_FILE_PATH}")
-def test_compare_common_data_with_source(imported_data):
+def test_compare_common_data_with_source(imported_data, real_tdx_file_path):
+    if not os.path.exists(real_tdx_file_path):
+        pytest.skip(f"TDX file not found: {real_tdx_file_path}")
     """
     测试目标: 对比 HDF5 和 .day 文件的数据, 确保 **交集部分** 的数据精确一致性。
     测试方法:
@@ -260,7 +245,7 @@ def test_compare_common_data_with_source(imported_data):
     h5_records_map = {row['datetime']: {col: row[col] for col in h5_table.colnames} for row in h5_table.iterrows()}
 
     # 2. 从原始.day文件直接读取数据并也转换为字典
-    raw_records_list = _read_raw_tdx_day_file(REAL_TDX_FILE_PATH)
+    raw_records_list = _read_raw_tdx_day_file(real_tdx_file_path)
     raw_records_map = {row['datetime']: row for row in raw_records_list}
 
     # 3. 打印数据源信息, 方便调试
@@ -302,8 +287,9 @@ def test_compare_common_data_with_source(imported_data):
     print(f"\n成功校验 {len(common_dates)} 条共同记录，数据完全一致。")
 
 
-@pytest.mark.skipif(not os.path.exists(REAL_TDX_FILE_PATH), reason=f"TDX file not found: {REAL_TDX_FILE_PATH}")
-def test_mismatched_data_is_detected(imported_data):
+def test_mismatched_data_is_detected(imported_data, real_tdx_file_path):
+    if not os.path.exists(real_tdx_file_path):
+        pytest.skip(f"TDX file not found: {real_tdx_file_path}")
     """
     测试目标: 验证我们的对比断言逻辑是可靠的, 能够在数据不一致时 **按预期失败**。
     测试方法 (故障注入):
@@ -319,7 +305,7 @@ def test_mismatched_data_is_detected(imported_data):
     # 1. 准备数据
     h5_table = get_h5table(imported_data['h5file'], imported_data['market'], imported_data['stock_code'])
     h5_records_map = {row['datetime']: {col: row[col] for col in h5_table.colnames} for row in h5_table.iterrows()}
-    raw_records_list = _read_raw_tdx_day_file(REAL_TDX_FILE_PATH)
+    raw_records_list = _read_raw_tdx_day_file(real_tdx_file_path)
     raw_records_map = {row['datetime']: row for row in raw_records_list}
     common_dates = sorted(list(set(h5_records_map.keys()).intersection(set(raw_records_map.keys()))))
     
