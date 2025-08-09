@@ -73,13 +73,14 @@ target("hikyuu")
 
     if is_plat("macosx") then
         add_links("iconv", "sqlite3")
+        add_frameworks("CoreFoundation")
     end
 
     add_headerfiles("../(hikyuu/**.h)|**doc.h")
 
     -- add files
     -- add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp")
-    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|utilities/mo/**.cpp|indicator_talib/**.cpp")
+    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|indicator_talib/**.cpp")
     add_files("./data_driver/*.cpp")
     if get_config("hdf5") or get_config("sqlite") then
         add_files("./data_driver/base_info/sqlite/**.cpp")
@@ -106,12 +107,6 @@ target("hikyuu")
     if get_config("mysql") then
         add_files("./utilities/db_connect/mysql/**.cpp")
     end
-    if get_config("mo") then
-        if is_plat("macosx") then
-            add_frameworks("CoreFoundation")
-        end
-        add_files("./utilities/mo/*.cpp")
-    end    
     if has_config("ta_lib") then
         add_files("./indicator_talib/**.cpp")
     end

@@ -40,10 +40,7 @@
 #include "utilities/arithmetic.h"
 #include "utilities/SpendTimer.h"
 #include "utilities/config.h"
-
-#if HKU_ENABLE_MO
-#include "utilities/mo/mo.h"
-#endif
+#include "lang.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/nvp.hpp>
@@ -148,12 +145,6 @@ using std::vector;
 
 typedef vector<price_t> PriceList;
 typedef vector<string> StringList;
-
-#if HKU_ENABLE_MO
-using mo::_tr;
-#else
-#define _tr(x) x
-#endif
 
 using std::isfinite;
 using std::isinf;
