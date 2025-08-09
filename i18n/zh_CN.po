@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-08-10 03:51+0800\n"
-"PO-Revision-Date: 2025-08-10 03:53+0800\n"
+"POT-Creation-Date: 2025-08-10 04:14+0800\n"
+"PO-Revision-Date: 2025-08-10 04:14+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -208,7 +208,7 @@ msgstr "你正在使用前复权或等比前向数据运行系统，这相当于
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:462
 #, c++-format
 msgid "[{}] cal today {}"
-msgstr "[{}] 当日计算价(复权价) {}"
+msgstr "[{}] 当日计算价(可能复权) {}"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:464
 #, c++-format
@@ -306,16 +306,19 @@ msgid "[{}] buy one-price board"
 msgstr "[{}] 一字板买入"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:660
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:741
 #, c++-format
 msgid "[{}] delay to buy, one-price board"
 msgstr "[{}] 因一字板，延迟至下一开盘买入"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:667
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:748
 #, c++-format
 msgid "[{}] delay to buy, one-price up-limit board"
 msgstr "[{}] 因一字涨停板，延迟至下一开盘买入"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:675
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:732
 #, c++-format
 msgid "[{}] delay to buy, current amount == 0 or count == 0"
 msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时买入"
@@ -334,6 +337,96 @@ msgstr "[{}] 买入失败, 买入数量: {} == 0 or > 允许的单笔交易数�
 #, c++-format
 msgid "[{}] buy failed, {}"
 msgstr "[{}] 买入失败，{}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:826
+#, c++-format
+msgid "[{}] force sell {} by {}"
+msgstr "[{}] 强制卖出 {}，来自 {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:855
+#, c++-format
+msgid "[{}] Failed force sell {} by {}"
+msgstr "[{}] 强制卖出失败 {}，来自 {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:873
+#, c++-format
+msgid "[{}] will be delay to sell"
+msgstr "[{}] 延迟至下一开盘时卖出"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:880
+#, c++-format
+msgid "[{}] sell one-price board"
+msgstr "[{}] 一字板卖出"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:887
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:964
+#, c++-format
+msgid "[{}] delay to sell, one-price board"
+msgstr "[{}] 因一字板，延迟至下一开盘卖出"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:894
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:971
+#, c++-format
+msgid "[{}] delay to sell, one-price donw-limint board"
+msgstr "[{}] 因一字跌停板，延迟至下一开盘卖出"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:901
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:955
+#, c++-format
+msgid "[{}] delay to sell, current amount == 0 or count == 0"
+msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时卖出"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:907
+#, c++-format
+msgid "[{}] sell now: {}"
+msgstr "[{}] 立刻卖出: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1062
+#, c++-format
+msgid "[{}] will buy short next bar open"
+msgstr "[PF] {} 信号指示下一开盘时买空"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1069
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1258
+#, c++-format
+msgid "[{}] buy short one-price board"
+msgstr "[{}] 一字板买空"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1076
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1156
+#, c++-format
+msgid "[{}] delay to buy short, one-price board"
+msgstr "[{}] 因一字板，延迟至下一开盘买空"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1083
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1163
+#, c++-format
+msgid "[{}] delay to buy short, one-price up-limint board"
+msgstr "[{}] 因一字涨停板，延迟至下一开盘买空"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1090
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1146
+#, c++-format
+msgid "[{}] delay to buy short, current amount == 0 or count == 0"
+msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时买空"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1264
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1337
+#, c++-format
+msgid "[{}] delay to sell short, one-price board"
+msgstr "[{}] 因一字板，延迟至下一开盘卖空"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1271
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1344
+#, c++-format
+msgid "[{}] delay to sell short, one-price down-limint board"
+msgstr "[{}] 因一字跌停板，延迟至下一开盘卖空"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1279
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1328
+#, c++-format
+msgid "[{}] delay to sell short, current amount == 0 or count == 0"
+msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时卖空"
 
 #: hikyuu_pywrap/indicator/_build_in.cpp:967
 msgid "WEAVE: total must be 2 to 6"
