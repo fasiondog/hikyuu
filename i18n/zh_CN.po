@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-08-10 02:10+0800\n"
-"PO-Revision-Date: 2025-08-10 02:13+0800\n"
+"POT-Creation-Date: 2025-08-10 02:53+0800\n"
+"PO-Revision-Date: 2025-08-10 03:16+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -57,9 +57,148 @@ msgstr "加载权息数据……"
 msgid "Start spot agent."
 msgstr "启动行情接收."
 
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:100
+msgid "You can't trace in jupyter!"
+msgstr "无法在 jupyter 中进行跟踪打印!"
+
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:157
 msgid "**  [PF] Position adjustment will be made today.  **"
 msgstr "**  [PF] 调仓日, 进行调仓处理                     **"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:161
+#, c++-format
+msgid "[PF] current running system size: {}"
+msgstr "[PF] 当前运行系统数量: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:176
+#, c++-format
+msgid "[PF] total asset: {:.2f}, current cash: {:<.2f}, market value: {:<.2f}"
+msgstr "[PF] 总资产: {:.2f}, 现金: {:<.2f}, 市值: {:<.2f}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:190
+#, c++-format
+msgid "The kType of query({}) must be DAY when adjust_mode is not \"query\"!"
+msgstr "adjust_mode 为 “query” 时，仅支持日线，但当前K线类型为: {}!"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:204
+msgid "There is no system in portfolio!"
+msgstr "当前资产组合中无系统策略！"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:118
+#, c++-format
+msgid "[PF] The sum cash of sub_tm: {}, cash tm: {}, tm cash: {}"
+msgstr "[PF] 子账户现金总和: {}, 现金账户: {}, 总账户现金: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:132
+#, c++-format
+msgid "After compensate: the sum cash of sub_tm: {}, cash tm: {}, tm cash: {}"
+msgstr "轧差补偿后: 子账号现金总和: {}, 现金账户: {}, 总账户现金: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:141
+#, c++-format
+msgid "[PF] [beforce adjust] - total funds: {},  cash: {}, market_value: {}"
+msgstr "[PF] [调仓前] - 总资产: {},  现金: {}, 市值: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:148
+#, c++-format
+msgid "[PF] process delay adjust sys, size: {}"
+msgstr "[PF] 延迟处理系统数: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:154
+#, c++-format
+msgid "[PF] Delay adjust sell: {}"
+msgstr "[PF] 延迟卖出: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:168
+#, c++-format
+msgid "[{}] failed to force sell, delay to next day"
+msgstr "[{}] 延迟卖出失败，延迟至下一交易日"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:182
+#, c++-format
+msgid "[PF] sell delay on open {}"
+msgstr "[PF] 开盘时处理延迟卖出 {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:187
+#, c++-format
+msgid "[PF] buy delay on open {}"
+msgstr "[PF] 开盘时处理延迟买入 {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:207
+#, c++-format
+msgid "[PF] remove no signal delay sys: {}"
+msgstr "[PF] 移除无信号的延迟处理系统: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:231
+#, c++-format
+msgid "[PF] clear delay buy request(future): {}"
+msgstr "[PF] 清除已不再选择系统的延迟买入请求: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:241
+#, c++-format
+msgid "[PF] select: {}, score: {:<.4f}"
+msgstr "[PF] 选中: {}, 分值: {:<.4f}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:276
+#, c++-format
+msgid "[PF] remove sys: {}"
+msgstr "[PF] 移除系统: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:291
+#, c++-format
+msgid "[PF] [after adjust] - total funds: {},  cash: {}, market_value: {}"
+msgstr "[PF] [调仓后] - 总资产: {},  现金: {}, 市值: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:311
+#, c++-format
+msgid "[PF] {} sg will buy on next open"
+msgstr "[PF] {} 信号指示下一开盘时买入"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:315
+#, c++-format
+msgid "[PF] {} sg will buy on current close"
+msgstr "[PF] {} 信号指示当前收盘时买入"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:318
+#, c++-format
+msgid "[PF] {} will adjust sell on next open"
+msgstr "[PF] {} 将在下一开盘时调仓卖出"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:335
+#, c++-format
+msgid "[PF] [after run at close] - total funds: {},  cash: {}, market_value: {}"
+msgstr "[PF] [收盘时执行后] - 总资产: {}, 现金: {}, 市值: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:108
+#, c++-format
+msgid "[PF] removed system {}"
+msgstr "[PF] 被移除的系统 {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:138
+#, c++-format
+msgid "[PF] current select system count: {}"
+msgstr "[PF] 当前选中系统数: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:159
+#, c++-format
+msgid "[PF] will remove system: {}"
+msgstr "[PF] 将被移除的系统: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:216
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:294
+#, c++-format
+msgid "[PF] force sell not selected sys {}"
+msgstr "[PF] 强制卖出未被选中的系统 {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:237
+#, c++-format
+msgid "[PF] current seleect system count: {}"
+msgstr "[PF] 当前选中系统数量: {}"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:258
+#, c++-format
+msgid "[PF] remove system: {}"
+msgstr "[PF] 移除系统: {}"
 
 #: hikyuu_pywrap/indicator/_build_in.cpp:967
 msgid "WEAVE: total must be 2 to 6"
