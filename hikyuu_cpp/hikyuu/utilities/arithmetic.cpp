@@ -210,11 +210,7 @@ std::string HKU_UTILS_API utf8_to_utf32(const std::string &str, size_t max_len) 
     std::wstring wstr = converter.from_bytes(str);
 
     // 截断或填充到指定长度（max_len 个字符）
-    if (wstr.size() > max_len) {
-        wstr = wstr.substr(0, max_len);
-    } else {
-        wstr.resize(max_len, L'\0');  // 不足补空字符
-    }
+    wstr.resize(max_len, L'\0');  // 不足补空字符
 
     // 将 wchar_t 数组的字节直接复制到 std::string 中
     // 注意：std::string 在这里仅作为字节容器，不表示字符含义
