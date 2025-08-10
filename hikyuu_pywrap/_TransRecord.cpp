@@ -34,7 +34,7 @@ void export_TransRecord(py::module& m) {
       "translist_to_np",
       [](const TransList& trans) {
           struct RawData {
-              int64_t datetime;  // 转换后的毫秒时间戳
+              int64_t datetime;
               double price;
               double vol;
               int64_t direct;
@@ -44,7 +44,7 @@ void export_TransRecord(py::module& m) {
           data.resize(trans.size());
           for (size_t i = 0; i < trans.size(); i++) {
               const TransRecord& record = trans[i];
-              data[i].datetime = record.datetime.timestamp() / 1000;
+              data[i].datetime = record.datetime.timestamp() * 1000LL;
               data[i].price = record.price;
               data[i].vol = record.vol;
               data[i].direct = record.direct;
@@ -53,10 +53,39 @@ void export_TransRecord(py::module& m) {
           // 定义NumPy结构化数据类型
           auto dtype =
             py::dtype(vector_to_python_list<string>({"datetime", "price", "vol", "direct"}),
-                      vector_to_python_list<string>({"datetime64[ms]", "d", "d", "i8"}),
+                      vector_to_python_list<string>({"datetime64[ns]", "d", "d", "i8"}),
                       vector_to_python_list<int64_t>({0, 8, 16, 24}), 32);
 
           return py::array(dtype, data.size(), data.data());
       },
       "将分笔记录转换为NumPy元组");
+
+    m.def(
+      "translist_to_df",
+      [](const TransList& trans) {
+          size_t total = trans.size();
+          if (total == 0) {
+              return py::module_::import("pandas").attr("DataFrame")();
+          }
+
+          std::vector<int64_t> datetime(total), direct(total);
+          std::vector<double> price(total), vol(total);
+
+          for (size_t i = 0; i < trans.size(); i++) {
+              const TransRecord& record = trans[i];
+              datetime[i] = record.datetime.timestamp() * 1000LL;
+              price[i] = record.price;
+              vol[i] = record.vol;
+              direct[i] = record.direct;
+          }
+
+          py::dict columns;
+          columns["datetime"] =
+            py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
+          columns["price"] = py::array_t<price_t>(total, price.data(), py::dtype("float64"));
+          columns["vol"] = py::array_t<price_t>(total, vol.data(), py::dtype("float64"));
+          columns["direct"] = py::array_t<int64_t>(total, direct.data(), py::dtype("i8"));
+          return py::module_::import("pandas").attr("DataFrame")(columns);
+      },
+      "将分笔记录转换为 DataFrame");
 }

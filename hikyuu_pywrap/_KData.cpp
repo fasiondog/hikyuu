@@ -194,6 +194,10 @@ void export_KData(py::module& m) {
       .def(
         "to_np",
         [](const KData& kdata) {
+            py::array ret;
+            size_t total = kdata.size();
+            HKU_IF_RETURN(total == 0, ret);
+
             struct RawData {
                 int64_t datetime;  // 转换后的毫秒时间戳
                 double open;
@@ -203,52 +207,63 @@ void export_KData(py::module& m) {
                 double amount;
                 double volume;
             };
-            std::vector<RawData> data;
-            data.resize(kdata.size());
-
-            py::dtype dtype;
-            auto minutes = KQuery::getKTypeInMin(kdata.getQuery().kType());
-            if (minutes >= KQuery::getKTypeInMin(KQuery::DAY)) {
-                for (size_t i = 0, total = kdata.size(); i < total; i++) {
-                    const KRecord& k = kdata[i];
-                    data[i].datetime = (k.datetime - Datetime(1970, 1, 1)).days();
-                    data[i].open = k.openPrice;
-                    data[i].high = k.highPrice;
-                    data[i].low = k.lowPrice;
-                    data[i].close = k.closePrice;
-                    data[i].amount = k.transAmount;
-                    data[i].volume = k.transCount;
-                }
-
-                // 定义NumPy结构化数据类型
-                dtype = py::dtype(
-                  vector_to_python_list<string>(
-                    {"datetime", "open", "high", "low", "close", "amount", "volume"}),
-                  vector_to_python_list<string>({"datetime64[D]", "d", "d", "d", "d", "d", "d"}),
-                  vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48}), 56);
-            } else {
-                for (size_t i = 0, total = kdata.size(); i < total; i++) {
-                    const KRecord& k = kdata[i];
-                    data[i].datetime = k.datetime.timestamp() / 1000LL;
-                    data[i].open = k.openPrice;
-                    data[i].high = k.highPrice;
-                    data[i].low = k.lowPrice;
-                    data[i].close = k.closePrice;
-                    data[i].amount = k.transAmount;
-                    data[i].volume = k.transCount;
-                }
-
-                // 定义NumPy结构化数据类型
-                dtype = py::dtype(
-                  vector_to_python_list<string>(
-                    {"datetime", "open", "high", "low", "close", "amount", "volume"}),
-                  vector_to_python_list<string>({"datetime64[ms]", "d", "d", "d", "d", "d", "d"}),
-                  vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48}), 56);
+            std::vector<RawData> data(total);
+            for (size_t i = 0; i < total; i++) {
+                const KRecord& k = kdata[i];
+                data[i].datetime = k.datetime.timestamp() / 1000LL;
+                data[i].open = k.openPrice;
+                data[i].high = k.highPrice;
+                data[i].low = k.lowPrice;
+                data[i].close = k.closePrice;
+                data[i].amount = k.transAmount;
+                data[i].volume = k.transCount;
             }
 
-            return py::array(dtype, data.size(), data.data());
+            // 定义NumPy结构化数据类型
+            auto dtype = py::dtype(
+              vector_to_python_list<string>(
+                {"datetime", "open", "high", "low", "close", "amount", "volume"}),
+              vector_to_python_list<string>({"datetime64[ns]", "d", "d", "d", "d", "d", "d"}),
+              vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48}), 56);
+
+            ret = py::array(dtype, data.size(), data.data());
+            return ret;
         },
         "将 KData 转换为 NumPy 数组")
+
+      .def("to_df",
+           [](const KData& self) {
+               size_t total = self.size();
+               if (total == 0) {
+                   return py::module_::import("pandas").attr("DataFrame")();
+               }
+
+               std::vector<int64_t> datetime(total);
+               std::vector<double> open(total), high(total), low(total), close(total),
+                 amount(total), vol(total);
+
+               auto* ks = self.data();
+               for (size_t i = 0, len = self.size(); i < len; i++) {
+                   datetime[i] = ks[i].datetime.timestamp() * 1000LL;
+                   open[i] = ks[i].openPrice;
+                   high[i] = ks[i].highPrice;
+                   low[i] = ks[i].lowPrice;
+                   close[i] = ks[i].closePrice;
+                   amount[i] = ks[i].transAmount;
+                   vol[i] = ks[i].transCount;
+               }
+
+               py::dict columns;
+               columns["datetime"] =
+                 py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
+               columns["open"] = py::array_t<price_t>(total, open.data(), py::dtype("float64"));
+               columns["high"] = py::array_t<price_t>(total, high.data(), py::dtype("float64"));
+               columns["low"] = py::array_t<price_t>(total, low.data(), py::dtype("float64"));
+               columns["close"] = py::array_t<price_t>(total, close.data(), py::dtype("float64"));
+               columns["amount"] = py::array_t<price_t>(total, amount.data(), py::dtype("float64"));
+               columns["volume"] = py::array_t<price_t>(total, vol.data(), py::dtype("float64"));
+               return py::module_::import("pandas").attr("DataFrame")(columns);
+           })
 
         DEF_PICKLE(KData);
 }

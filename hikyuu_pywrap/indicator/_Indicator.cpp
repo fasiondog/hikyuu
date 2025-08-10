@@ -368,6 +368,29 @@ set_context(self, stock, query)
         },
         "仅转化值为np.array, 不包含日期列")
 
+      .def(
+        "to_df",
+        [](const Indicator& self) {
+            size_t total = self.size();
+            if (total == 0) {
+                return py::module_::import("pandas").attr("DataFrame")();
+            }
+
+            py::dict columns;
+            auto dates = self.getDatetimeList();
+            if (!dates.empty()) {
+                std::vector<int64_t> datetime(total);
+                for (size_t i = 0; i < total; i++) {
+                    datetime[i] = dates[i].timestamp() * 1000LL;
+                }
+                columns["datetime"] =
+                  py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
+            }
+
+            return py::module_::import("pandas").attr("DataFrame")(columns);
+        },
+        "转换为 DataFrame")
+
       .def(py::self + py::self)
       .def(py::self + Indicator::value_t())
       .def(Indicator::value_t() + py::self)

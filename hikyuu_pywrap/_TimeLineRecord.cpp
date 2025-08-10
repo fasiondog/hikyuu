@@ -43,17 +43,47 @@ void export_TimeLineReord(py::module& m) {
           data.resize(timeline.size());
           for (size_t i = 0; i < timeline.size(); i++) {
               const TimeLineRecord& record = timeline[i];
-              data[i].datetime = record.datetime.timestamp() / 1000;
+              data[i].datetime = record.datetime.timestamp() * 1000LL;
               data[i].price = record.price;
               data[i].vol = record.vol;
           }
 
           // 定义NumPy结构化数据类型
           auto dtype = py::dtype(vector_to_python_list<string>({"datetime", "price", "vol"}),
-                                 vector_to_python_list<string>({"datetime64[ms]", "d", "d"}),
+                                 vector_to_python_list<string>({"datetime64[ns]", "d", "d"}),
                                  vector_to_python_list<int64_t>({0, 8, 16}), 24);
 
           return py::array(dtype, data.size(), data.data());
       },
       "将分时线记录转换为NumPy元组");
+
+    m.def(
+      "timeline_to_df",
+      [](const TimeLineList& timeline) {
+          size_t total = timeline.size();
+          if (total == 0) {
+              return py::module_::import("pandas").attr("DataFrame")();
+          }
+
+          std::vector<int64_t> datetime;
+          std::vector<double> price, vol;
+          datetime.resize(total);
+          price.resize(total);
+          vol.resize(total);
+
+          for (size_t i = 0; i < timeline.size(); i++) {
+              const TimeLineRecord& record = timeline[i];
+              datetime[i] = record.datetime.timestamp() * 1000LL;
+              price[i] = record.price;
+              vol[i] = record.vol;
+          }
+
+          py::dict columns;
+          columns["datetime"] =
+            py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
+          columns["price"] = py::array_t<price_t>(total, price.data(), py::dtype("float64"));
+          columns["vol"] = py::array_t<price_t>(total, vol.data(), py::dtype("float64"));
+          return py::module_::import("pandas").attr("DataFrame")(columns);
+      },
+      "将分时线记录转换为 DataFrame");
 }
