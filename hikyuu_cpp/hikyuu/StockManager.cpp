@@ -105,8 +105,11 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_datadir = hikyuuParam.tryGet<string>("datadir", ".");
 
     // 设置插件路径
-    m_plugin_manager.pluginPath(
-      m_hikyuuParam.tryGet<string>("plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
+    auto plugin_path = getPluginPath();
+    if (plugin_path.empty() && plugin_path == ".") {
+        m_plugin_manager.pluginPath(m_hikyuuParam.tryGet<string>(
+          "plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
+    }
 
     // 注册扩展K线处理
     registerPredefinedExtraKType();
