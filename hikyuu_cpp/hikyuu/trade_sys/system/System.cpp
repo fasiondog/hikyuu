@@ -154,7 +154,7 @@ void System::baseCheckParam(const string& name) const {
         HKU_ASSERT(getParam<int>("tp_delay_n") >= 0);
     } else if ("trace" == name) {
         if (getParam<bool>("trace") && pythonInJupyter()) {
-            HKU_THROW("You can't trace in jupyter!");
+            HKU_THROW(htr("You can't trace in jupyter!"));
         }
     }
 }
@@ -270,7 +270,7 @@ void System::setTO(const KData& kdata) {
 
     HKU_WARN_IF(
       query.recoverType() == KQuery::FORWARD || query.recoverType() == KQuery::EQUAL_FORWARD,
-      "You are using forward or equal_forward kdata, which is a future function!");
+      htr("You are using forward or equal_forward kdata, which is a future function!"));
 
     // sg->setTO必须在cn->setTO之前，cn会使用到sg，防止sg被计算两次
     if (m_sg)
@@ -459,10 +459,9 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     bool trace = getParam<bool>("trace");
     if (trace) {
         HKU_INFO("{} ------------------------------------------------------", today.datetime);
-        HKU_INFO("[{}] cal today {} ", name(), today);
-        HKU_INFO("[{}] raw today {} ", name(), src_today);
-        HKU_INFO_IF(m_kdata.getQuery().recoverType() != KQuery::NO_RECOVER, "[{}] Restitution {} ",
-                    name(), src_today);
+        HKU_INFO(htr("[{}] cal today {}"), name(), today);
+        HKU_INFO_IF(m_kdata.getQuery().recoverType() != KQuery::NO_RECOVER,
+                    htr("[{}] raw today {}"), name(), src_today);
     }
 
     m_buy_days++;
@@ -488,12 +487,12 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     // 如果当前环境无效
     if (!current_ev_valid) {
-        HKU_INFO_IF(trace, "[{}] current EV is invalid", name());
+        HKU_INFO_IF(trace, htr("[{}] current EV is invalid"), name());
         TradeRecord tr;
         // 如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
             tr = _sell(today, src_today, PART_ENVIRONMENT);
-            HKU_INFO_IF(trace, "[{}] EV to sell", name());
+            HKU_INFO_IF(trace, htr("[{}] EV to sell"), name());
         }
 
         m_pre_ev_valid = current_ev_valid;
@@ -502,11 +501,11 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     // 环境是从无效变为有效时
     if (!m_pre_ev_valid) {
-        HKU_INFO_IF(trace, "[{}] EV status from invalid to valid", name());
+        HKU_INFO_IF(trace, htr("[{}] EV status from invalid to valid"), name());
 
         // 如果使用环境判定策略进行初始建仓
         if (getParam<bool>("ev_open_position")) {
-            HKU_INFO_IF(trace, "[{}] EV to buy", name());
+            HKU_INFO_IF(trace, htr("[{}] EV to buy"), name());
             TradeRecord tr = _buy(today, src_today, PART_ENVIRONMENT);
             m_pre_ev_valid = current_ev_valid;
             return tr.isNull() ? result : tr;
@@ -523,12 +522,12 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     // 如果系统当前无效
     if (!current_cn_valid) {
-        HKU_INFO_IF(trace, "[{}] current CN is invalid", name());
+        HKU_INFO_IF(trace, htr("[{}] current CN is invalid"), name());
         TradeRecord tr;
         // 如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
             tr = _sell(today, src_today, PART_CONDITION);
-            HKU_INFO_IF(trace, "[{}] CN to sell", name());
+            HKU_INFO_IF(trace, htr("[{}] CN to sell"), name());
         }
 
         m_pre_cn_valid = current_cn_valid;
@@ -537,11 +536,11 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     // 如果系统从无效变为有效
     if (!m_pre_cn_valid) {
-        HKU_INFO_IF(trace, "[{}] CN status from invalid to valid", name());
+        HKU_INFO_IF(trace, htr("[{}] CN status from invalid to valid"), name());
 
         // 如果使用环境判定策略进行初始建仓
         if (getParam<bool>("cn_open_position")) {
-            HKU_INFO_IF(trace, "[{}] CN to buy", name());
+            HKU_INFO_IF(trace, htr("[{}] CN to buy"), name());
             TradeRecord tr = _buy(today, src_today, PART_CONDITION);
             m_pre_cn_valid = current_cn_valid;
             return tr.isNull() ? result : tr;
@@ -558,11 +557,11 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     if (m_sg->shouldBuy(today.datetime)) {
         TradeRecord tr;
         if (m_tm->haveShort(m_stock)) {
-            HKU_INFO_IF(trace, "[{}] SG to buy short", name());
+            HKU_INFO_IF(trace, htr("[{}] SG to buy short"), name());
             tr = _buyShort(today, src_today, PART_SIGNAL);
 
         } else {
-            HKU_INFO_IF(trace, "[{}] SG to buy", name());
+            HKU_INFO_IF(trace, htr("[{}] SG to buy"), name());
             tr = _buy(today, src_today, PART_SIGNAL);
         }
         return tr.isNull() ? result : tr;
@@ -572,11 +571,11 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     if (m_sg->shouldSell(today.datetime)) {
         TradeRecord tr;
         if (m_tm->have(m_stock)) {
-            HKU_INFO_IF(trace, "[{}] SG to sell", name());
+            HKU_INFO_IF(trace, htr("[{}] SG to sell"), name());
             tr = _sell(today, src_today, PART_SIGNAL);
 
         } else {
-            HKU_INFO_IF(trace, "[{}] SG to sell short", name());
+            HKU_INFO_IF(trace, htr("[{}] SG to sell short"), name());
             tr = _sellShort(today, src_today, PART_SIGNAL);
         }
         return tr.isNull() ? result : tr;
@@ -592,16 +591,16 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     price_t src_current_price = src_today.closePrice;  // 未复权的原始价格
 
     PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
-    HKU_INFO_IF(trace, "[{}] current postion: {}", name(), position.number);
+    HKU_INFO_IF(trace, htr("[{}] current postion: {}"), name(), position.number);
     if (position.number != 0) {
         TradeRecord tr;
         if (src_current_price <= position.stoploss) {
-            HKU_INFO_IF(trace, "[{}] ST to sell, current price: {}, stoploss: {}", name(),
+            HKU_INFO_IF(trace, htr("[{}] ST to sell, current price: {}, stoploss: {}"), name(),
                         src_current_price, position.stoploss);
             tr = _sell(today, src_today, PART_STOPLOSS);
 
         } else if (src_current_price >= _getGoalPrice(today.datetime, src_current_price)) {
-            HKU_INFO_IF(trace, "[{}] PG to sell, current price: {}, goal: {} ", name(),
+            HKU_INFO_IF(trace, htr("[{}] PG to sell, current price: {}, goal: {}"), name(),
                         src_current_price, _getGoalPrice(today.datetime, src_current_price));
             tr = _sell(today, src_today, PART_PROFITGOAL);
 
@@ -623,7 +622,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
                     profit > (position.buyMoney - position.sellMoney)) {
                     HKU_INFO_IF(
                       trace,
-                      "[{}] TP to sell, current price after restoration: {}, take_profit: {}",
+                      htr("[{}] TP to sell, current price after restoration: {}, take_profit: {}"),
                       name(), current_price, current_take_profile);
                     tr = _sell(today, src_today, PART_TAKEPROFIT);
                 }
@@ -644,28 +643,28 @@ TradeRecord System::_buy(const KRecord& today, const KRecord& src_today, Part fr
     // 延迟买入
     if (getParam<bool>("buy_delay")) {
         _submitBuyRequest(today, src_today, from);
-        HKU_INFO_IF(trace, "[{}] will be delay to buy", name());
+        HKU_INFO_IF(trace, htr("[{}] will be delay to buy"), name());
         return result;
     }
 
     // 检查是否为一字涨停板
     if (today.highPrice == today.lowPrice) {
         if (getParam<bool>("can_trade_when_high_eq_low")) {
-            HKU_WARN_IF(trace, "[{}] buy one-price board", name());
+            HKU_WARN_IF(trace, htr("[{}] buy one-price board"), name());
             return _buyNow(today, src_today, from);
         }
 
         // 获取昨日收盘价，检查是否为一字板涨停
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
-            HKU_INFO_IF(trace, "[{}] delay to buy, one-price board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to buy, one-price board"), name());
             _submitBuyRequest(today, src_today, from);
             return result;
         }
 
         const auto& pre_day = m_kdata.getKRecord(pos - 1);
         if (today.closePrice > pre_day.closePrice) {
-            HKU_INFO_IF(trace, "[{}] delay to buy, one-price up-limit board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to buy, one-price up-limit board"), name());
             _submitBuyRequest(today, src_today, from);
             return result;
         }
@@ -673,7 +672,7 @@ TradeRecord System::_buy(const KRecord& today, const KRecord& src_today, Part fr
 
     // 如果成交量和成交金额为0，延迟交易
     if (iszero(today.transAmount) || iszero(today.transCount)) {
-        HKU_INFO_IF(trace, "[{}] delay to buy, current amount == 0 or count == 0", name());
+        HKU_INFO_IF(trace, htr("[{}] delay to buy, current amount == 0 or count == 0"), name());
         _submitBuyRequest(today, src_today, from);
         return result;
     }
@@ -693,7 +692,7 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     // 如果计划的价格已经小于等于止损价，放弃交易
     bool trace = getParam<bool>("trace");
     if (planPrice <= stoploss) {
-        HKU_INFO_IF(trace, "[{}] buy failed, planPrice: {} <= stoploss: {}", name(), planPrice,
+        HKU_INFO_IF(trace, htr("[{}] buy failed, planPrice: {} <= stoploss: {}"), name(), planPrice,
                     stoploss);
         return result;
     }
@@ -704,8 +703,8 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     HKU_ASSERT(min_num != 0.0);
     number = int64_t(number / min_num) * min_num;
     if (iszero(number) || number > m_stock.maxTradeNumber()) {
-        HKU_INFO_IF(trace, "[{}] buy failed, number: {} == 0 or > maxTradeNumber: {}, {}", name(),
-                    number, m_stock.maxTradeNumber(), m_mm);
+        HKU_INFO_IF(trace, htr("[{}] buy failed, number: {} == 0 or > maxTradeNumber: {}, {}"),
+                    name(), number, m_stock.maxTradeNumber(), m_mm);
         return result;
     }
 
@@ -714,7 +713,7 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     TradeRecord record =
       m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_BUY != record.business) {
-        HKU_INFO_IF(trace, "[{}] buy failed, {}", name(), record);
+        HKU_INFO_IF(trace, htr("[{}] buy failed, {}"), name(), record);
         return result;
     }
 
@@ -730,7 +729,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
 
     // 如果成交量和成交金额为0，延迟交易
     if (iszero(today.transAmount) || iszero(today.transCount)) {
-        HKU_INFO_IF(trace, "[{}] delay to buy, current amount == 0 or count == 0", name());
+        HKU_INFO_IF(trace, htr("[{}] delay to buy, current amount == 0 or count == 0"), name());
         _submitBuyRequest(today, src_today, m_buyRequest.from);
         return result;
     }
@@ -739,14 +738,14 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
         // 获取昨日收盘价，检查是否为一字板涨停
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
-            HKU_INFO_IF(trace, "[{}] delay to buy, one-price board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to buy, one-price board"), name());
             _submitBuyRequest(today, src_today, m_buyRequest.from);
             return result;
         }
 
         const auto& pre_day = m_kdata.getKRecord(pos - 1);
         if (today.closePrice > pre_day.closePrice) {
-            HKU_INFO_IF(trace, "[{}] delay to buy, one-price up-limit board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to buy, one-price up-limit board"), name());
             _submitBuyRequest(today, src_today, m_buyRequest.from);
             return result;
         }
@@ -824,7 +823,7 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
 
 TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool on_open) {
     bool trace = getParam<bool>("trace");
-    HKU_INFO_IF(trace, "[{}] force sell {} by {}", name(), num, getSystemPartName(from));
+    HKU_INFO_IF(trace, htr("[{}] force sell {} by {}"), name(), num, getSystemPartName(from));
 
     TradeRecord record;
     size_t pos = m_kdata.getPos(date);
@@ -852,8 +851,9 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
     record =
       m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss, position.goalPrice,
                  on_open ? src_krecord.openPrice : src_krecord.closePrice, from);
-    HKU_WARN_IF_RETURN(record == Null<TradeRecord>(), record, "[{}] Failed force sell {} by {}",
-                       name(), num, getSystemPartName(from));
+    HKU_WARN_IF_RETURN(record == Null<TradeRecord>(), record,
+                       htr("[{}] Failed force sell {} by {}"), name(), num,
+                       getSystemPartName(from));
 
     // 如果已未持仓，最后的止赢价初始为0
     if (!m_tm->have(m_stock)) {
@@ -870,41 +870,41 @@ TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part f
     TradeRecord result;
     if (getParam<bool>("sell_delay")) {
         _submitSellRequest(today, src_today, from);
-        HKU_INFO_IF(trace, "[{}] will be delay to sell", name());
+        HKU_INFO_IF(trace, htr("[{}] will be delay to sell"), name());
         return result;
     }
 
     // 检查是否可能为一字跌停
     if (today.highPrice == today.lowPrice) {
         if (getParam<bool>("can_trade_when_high_eq_low")) {
-            HKU_WARN_IF(trace, "[{}] sell one-price board", name());
+            HKU_WARN_IF(trace, htr("[{}] sell one-price board"), name());
             return _sellNow(today, src_today, from);
         }
 
         // 获取昨日数据，检查是否为一字跌停, 一字跌停，则延迟卖出
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
-            HKU_INFO_IF(trace, "[{}] delay to sell, one-price board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to sell, one-price board"), name());
             _submitSellRequest(today, src_today, from);
             return result;
         }
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice < preday.closePrice) {
-            HKU_INFO_IF(trace, "[{}] delay to sell, one-price donw-limint board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to sell, one-price donw-limint board"), name());
             _submitSellRequest(today, src_today, from);
             return result;
         }
     }
 
     if (iszero(today.transAmount) || iszero(today.transCount)) {
-        HKU_INFO_IF(trace, "[{}] delay to sell, current amount == 0 or count == 0", name());
+        HKU_INFO_IF(trace, htr("[{}] delay to sell, current amount == 0 or count == 0"), name());
         _submitSellRequest(today, src_today, from);
         return result;
     }
 
     result = _sellNow(today, src_today, from);
-    HKU_INFO_IF(trace, "[{}] sell now: {}", name(), result);
+    HKU_INFO_IF(trace, htr("[{}] sell now: {}"), name(), result);
     return result;
 }
 
@@ -952,7 +952,7 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
     bool trace = getParam<bool>("trace");
     TradeRecord result;
     if (iszero(today.transAmount) || iszero(today.transCount)) {
-        HKU_INFO_IF(trace, "[{}] delay to sell, current amount == 0 or count == 0", name());
+        HKU_INFO_IF(trace, htr("[{}] delay to sell, current amount == 0 or count == 0"), name());
         _submitSellRequest(today, src_today, m_sellRequest.from);
         return result;
     }
@@ -961,14 +961,14 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
         // 获取昨日数据，检查是否为一字跌停, 一字跌停，则延迟卖出
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
-            HKU_INFO_IF(trace, "[{}] delay to sell, one-price board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to sell, one-price board"), name());
             _submitSellRequest(today, src_today, m_sellRequest.from);
             return result;
         }
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice < preday.closePrice) {
-            HKU_INFO_IF(trace, "[{}] delay to sell, one-price donw-limint board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to sell, one-price donw-limint board"), name());
             _submitSellRequest(today, src_today, m_sellRequest.from);
             return result;
         }
@@ -1059,35 +1059,36 @@ TradeRecord System::_buyShort(const KRecord& today, const KRecord& src_today, Pa
     bool trace = getParam<bool>("trace");
     if (getParam<bool>("buy_delay")) {
         _submitBuyShortRequest(today, src_today, from);
-        HKU_INFO_IF(trace, "[{}] will buy short next bar open", name());
+        HKU_INFO_IF(trace, htr("[{}] will buy short next bar open"), name());
         return result;
     }
 
     // 一字板情况
     if (today.highPrice == today.lowPrice) {
         if (getParam<bool>("can_trade_when_high_eq_low")) {
-            HKU_WARN_IF(trace, "[{}] buy short one-price board", name());
+            HKU_WARN_IF(trace, htr("[{}] buy short one-price board"), name());
             return _buyShortNow(today, src_today, from);
         }
 
         // 获取昨日数据，检查是否为一字涨停,、
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
-            HKU_INFO_IF(trace, "[{}] delay to buy short, one-price board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to buy short, one-price board"), name());
             _submitBuyShortRequest(today, src_today, from);
             return result;
         }
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice > preday.closePrice) {
-            HKU_INFO_IF(trace, "[{}] delay to buy short, one-price up-limint board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to buy short, one-price up-limint board"), name());
             _submitBuyShortRequest(today, src_today, from);
             return result;
         }
     }
 
     if (iszero(today.transAmount) || iszero(today.transCount)) {
-        HKU_INFO_IF(trace, "[{}] delay to buy short, current amount == 0 or count == 0", name());
+        HKU_INFO_IF(trace, htr("[{}] delay to buy short, current amount == 0 or count == 0"),
+                    name());
         _submitBuyShortRequest(today, src_today, from);
         return result;
     }
@@ -1142,7 +1143,8 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
     TradeRecord result;
     bool trace = getParam<bool>("trace");
     if (iszero(today.transAmount) || iszero(today.transCount)) {
-        HKU_INFO_IF(trace, "[{}] delay to buy short, current amount == 0 or count == 0", name());
+        HKU_INFO_IF(trace, htr("[{}] delay to buy short, current amount == 0 or count == 0"),
+                    name());
         _submitBuyShortRequest(today, src_today, m_buyShortRequest.from);
         return result;
     }
@@ -1151,14 +1153,14 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
         // 获取昨日数据，检查是否为一字涨停,、
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
-            HKU_INFO_IF(trace, "[{}] delay to buy short, one-price board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to buy short, one-price board"), name());
             _submitBuyShortRequest(today, src_today, m_buyShortRequest.from);
             return result;
         }
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice > preday.closePrice) {
-            HKU_INFO_IF(trace, "[{}] delay to buy short, one-price up-limint board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to buy short, one-price up-limint board"), name());
             _submitBuyShortRequest(today, src_today, m_buyShortRequest.from);
             return result;
         }
@@ -1253,27 +1255,29 @@ TradeRecord System::_sellShort(const KRecord& today, const KRecord& src_today, P
 
     if (today.highPrice == today.lowPrice) {
         if (getParam<bool>("can_trade_when_high_eq_low")) {
-            HKU_WARN_IF(trace, "[{}] buy short one-price board", name());
+            HKU_WARN_IF(trace, htr("[{}] buy short one-price board"), name());
             return _sellShortNow(today, src_today, from);
         }
 
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
-            HKU_INFO_IF(trace, "[{}] delay to sell short, one-price board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to sell short, one-price board"), name());
             _submitSellShortRequest(today, src_today, from);
             return result;
         }
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice < preday.closePrice) {
-            HKU_INFO_IF(trace, "[{}] delay to sell short, one-price down-limint board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to sell short, one-price down-limint board"),
+                        name());
             _submitSellShortRequest(today, src_today, from);
             return result;
         }
     }
 
     if (iszero(today.transAmount) || iszero(today.transCount)) {
-        HKU_INFO_IF(trace, "[{}] delay to sell short, current amount == 0 or count == 0", name());
+        HKU_INFO_IF(trace, htr("[{}] delay to sell short, current amount == 0 or count == 0"),
+                    name());
         _submitSellShortRequest(today, src_today, from);
         return result;
     }
@@ -1321,7 +1325,8 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
     TradeRecord result;
     bool trace = getParam<bool>("trace");
     if (iszero(today.transAmount) || iszero(today.transCount)) {
-        HKU_INFO_IF(trace, "[{}] delay to sell short, current amount == 0 or count == 0", name());
+        HKU_INFO_IF(trace, htr("[{}] delay to sell short, current amount == 0 or count == 0"),
+                    name());
         _submitSellShortRequest(today, src_today, m_sellShortRequest.from);
         return result;
     }
@@ -1329,14 +1334,15 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
     if (today.highPrice == today.lowPrice && !getParam<bool>("can_trade_when_high_eq_low")) {
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
-            HKU_INFO_IF(trace, "[{}] delay to sell short, one-price board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to sell short, one-price board"), name());
             _submitSellShortRequest(today, src_today, m_sellShortRequest.from);
             return result;
         }
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice < preday.closePrice) {
-            HKU_INFO_IF(trace, "[{}] delay to sell short, one-price down-limint board", name());
+            HKU_INFO_IF(trace, htr("[{}] delay to sell short, one-price down-limint board"),
+                        name());
             _submitSellShortRequest(today, src_today, m_sellShortRequest.from);
             return result;
         }

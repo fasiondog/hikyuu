@@ -27,6 +27,7 @@
 
 #if HKU_OS_OSX || HKU_OS_IOS
 #include <sys/mount.h>
+#include <CoreFoundation/CoreFoundation.h>
 #endif
 
 #include <cstring>
@@ -361,6 +362,68 @@ std::string HKU_UTILS_API getCpuArch() {
 #endif
     return ret;
 }
+
+#if HKU_OS_WINDOWS
+std::string HKU_UTILS_API getSystemLanguage() {
+    LCID lcid = GetUserDefaultUILanguage();
+    char lang[256];
+
+    std::string ret;
+    if (GetLocaleInfoA(lcid, LOCALE_SISO639LANGNAME, lang, sizeof(lang)) == 0) {
+        return ret;
+    }
+
+    ret = std::string(lang);
+    to_lower(ret);
+    if (ret == "zh") {
+        ret = "zh_cn";
+    }
+    return ret;
+}
+
+#elif HKU_OS_LINUX
+std::string HKU_UTILS_API getSystemLanguage() {
+    std::string ret;
+    const char *langEnv = std::getenv("LANG");
+    HKU_IF_RETURN(langEnv == nullptr, ret);
+
+    std::string lang(langEnv);
+    auto ss = split(lang, '.');
+    ret = std::string(ss[0]);
+    to_lower(ret);
+    return ret;
+}
+
+#elif HKU_OS_OSX
+std::string HKU_UTILS_API getSystemLanguage() {
+    CFLocaleRef currentLocale = CFLocaleCopyCurrent();
+
+    // 显式类型转换
+    CFStringRef languageCode = (CFStringRef)CFLocaleGetValue(currentLocale, kCFLocaleLanguageCode);
+
+    if (languageCode == nullptr || !(CFStringGetTypeID() == CFGetTypeID(languageCode))) {
+        CFRelease(currentLocale);
+        return "";
+    }
+
+    CFIndex length = CFStringGetLength(languageCode);
+    CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
+    std::unique_ptr<char[]> buffer(new char[maxSize]);
+
+    if (CFStringGetCString(languageCode, buffer.get(), maxSize, kCFStringEncodingUTF8)) {
+        std::string result(buffer.get());
+        CFRelease(currentLocale);
+        to_lower(result);
+        if (result == "zh") {
+            result = "zh_cn";
+        }
+        return result;
+    }
+
+    CFRelease(currentLocale);
+    return "";
+}
+#endif
 
 }  // namespace hku
 

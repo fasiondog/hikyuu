@@ -135,9 +135,7 @@ target("core")
             os.run(format("install_name_tool -change @loader_path/../lib/libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_dir .. filename))
         end
 
-        if get_config("mo") then
-            os.cp("$(projectdir)/i18n/*.mo", "$(projectdir)/hikyuu/cpp/i18n/")
-        end
+        os.cp("$(projectdir)/i18n/zh_CN/*.mo", "$(projectdir)/hikyuu/cpp/i18n/zh_CN/")
     end)
 
 

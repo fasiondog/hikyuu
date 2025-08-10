@@ -91,18 +91,19 @@ void export_TradeRecord(py::module& m) {
 
         std::vector<RawData> data;
         data.resize(trades.size());
+        string ucode, uname, business, sig, remark;
         for (size_t i = 0, total = trades.size(); i < total; i++) {
             const TradeRecord& t = trades[i];
             memset(data[i].code, 0, 40);
             memset(data[i].name, 0, 80);
             if (!t.stock.isNull()) {
-                auto ucode = utf8_to_utf32(t.stock.market_code(), 10);
-                auto uname = utf8_to_utf32(t.stock.name(), 20);
+                ucode = utf8_to_utf32(t.stock.market_code(), 10);
+                uname = utf8_to_utf32(t.stock.name(), 20);
                 memcpy(data[i].code, ucode.c_str(), ucode.size() > 40 ? 40 : ucode.size());
                 memcpy(data[i].name, uname.c_str(), uname.size() > 80 ? 80 : uname.size());
             }
             data[i].datetime = t.datetime.timestamp() / 1000LL;
-            auto business = utf8_to_utf32(getBusinessName(t.business), 20);
+            business = utf8_to_utf32(getBusinessName(t.business), 20);
             memset(data[i].business, 0, 80);
             memcpy(data[i].business, business.c_str(), business.size() > 80 ? 80 : business.size());
             data[i].planPrice = t.planPrice;
@@ -116,20 +117,20 @@ void export_TradeRecord(py::module& m) {
             data[i].cost_stamptax = t.cost.stamptax;
             data[i].cost_transferfee = t.cost.transferfee;
             data[i].cost_others = t.cost.others;
-            auto sig = utf8_to_utf32(getSystemPartName(t.from), 20);
+            sig = utf8_to_utf32(getSystemPartName(t.from), 20);
             memset(data[i].sig_from, 0, 80);
             memcpy(data[i].sig_from, sig.c_str(), sig.size() > 80 ? 80 : sig.size());
-            auto remark = utf8_to_utf32(t.remark, 100);
+            remark = utf8_to_utf32(t.remark, 100);
             memset(data[i].remark, 0, 400);
             memcpy(data[i].remark, remark.c_str(), remark.size() > 400 ? 400 : remark.size());
         }
 
         py::dtype dtype = py::dtype(
           vector_to_python_list<string>(
-            {_tr("market_code"), _tr("name"), _tr("datetime"), _tr("business"), _tr("planPrice"),
-             _tr("realPrice"), _tr("goalPrice"), _tr("number"), _tr("stoploss"), _tr("cash"),
-             _tr("cost_total"), _tr("cost_commission"), _tr("cost_stamptax"),
-             _tr("cost_transferfee"), _tr("cost_others"), _tr("part_from"), _tr("remark")}),
+            {htr("market_code"), htr("name"), htr("datetime"), htr("business"), htr("planPrice"),
+             htr("realPrice"), htr("goalPrice"), htr("number"), htr("stoploss"), htr("cash"),
+             htr("cost_total"), htr("cost_commission"), htr("cost_stamptax"),
+             htr("cost_transferfee"), htr("cost_others"), htr("part_from"), htr("remark")}),
           vector_to_python_list<string>({"U10", "U20", "datetime64[ms]", "U20", "d", "d", "d", "d",
                                          "d", "d", "d", "d", "d", "d", "d", "U20", "U100"}),
           vector_to_python_list<int64_t>(

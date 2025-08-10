@@ -43,8 +43,6 @@ option("leak_check", {description = "Enable leak check for test", default = fals
 -- "MT" 方式下，serialize 会挂
 option("serialize", {description = "Enable support serialize object and pickle in python", default = true})
 
--- 和 hku_utils 编译选项保持一致，以便互相替换
-option("mo", {description = "International language support", default = true})
 -- option("http_client", {description = "use http client", default = true})
 option("http_client_ssl", {description = "enable https support for http client", default = false})
 option("http_client_zip", {description = "enable http support gzip", default = false})
@@ -107,7 +105,6 @@ set_configvar("HKU_ENABLE_STACK_TRACE", get_config("stacktrace") and 1 or 0)
 set_configvar("HKU_CLOSE_SPEND_TIME", get_config("spend_time") and 0 or 1)
 set_configvar("HKU_USE_SPDLOG_ASYNC_LOGGER", get_config("async_log") and 1 or 0)
 set_configvar("HKU_LOG_ACTIVE_LEVEL", log_level)
-set_configvar("HKU_ENABLE_MO", get_config("mo") and 1 or 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT", 1)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_SSL", get_config("http_client_ssl") and 1 or 0)
 set_configvar("HKU_ENABLE_HTTP_CLIENT_ZIP", get_config("http_client_zip") and 1 or 0)

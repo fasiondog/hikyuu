@@ -105,7 +105,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
         auto stk = sys->getStock();
         auto num = m_tm->getHoldNumber(date, stk);
         if (iszero(num)) {
-            HKU_INFO_IF(trace, "[PF] removed system {}", sys->name());
+            HKU_INFO_IF(trace, htr("[PF] removed system {}"), sys->name());
             iter = m_force_sell_sys_list.erase(iter);
         } else {
             ++iter;
@@ -135,7 +135,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
     //---------------------------------------------------
     bool trade_on_close = getParam<bool>("trade_on_close");
     auto current_selected_list = m_se->getSelected(date);
-    HKU_INFO_IF(trace, "[PF] current seleect system count: {}", current_selected_list.size());
+    HKU_INFO_IF(trace, htr("[PF] current select system count: {}"), current_selected_list.size());
 
     m_selected_list.clear();
     for (auto& sw : current_selected_list) {
@@ -156,7 +156,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
     }
 
     for (auto& sys : will_remove_sys_list) {
-        HKU_INFO_IF(trace, "[PF] will remove system: {}", sys->name());
+        HKU_INFO_IF(trace, htr("[PF] will remove system: {}"), sys->name());
         m_running_sys_set.erase(sys);
         m_running_sys_list.remove(sys);
     }
@@ -213,7 +213,8 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
             iter = m_force_sell_sys_list.erase(iter);
         } else {
             auto tr = sys->sellForceOnOpen(date, num, PART_PORTFOLIO);
-            HKU_INFO_IF(trace && !tr.isNull(), "[PF] force sell not selected sys {}", sys->name());
+            HKU_INFO_IF(trace && !tr.isNull(), htr("[PF] force sell not selected sys {}"),
+                        sys->name());
             ++iter;
         }
     }
@@ -233,7 +234,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
     //---------------------------------------------------
     bool trade_on_close = getParam<bool>("trade_on_close");
     auto current_selected_list = m_se->getSelected(date);
-    HKU_INFO_IF(trace, "[PF] current seleect system count: {}", current_selected_list.size());
+    HKU_INFO_IF(trace, htr("[PF] current seleect system count: {}"), current_selected_list.size());
 
     m_selected_list.clear();
     for (auto& sw : current_selected_list) {
@@ -254,7 +255,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
     }
 
     for (auto& sys : will_remove_sys_list) {
-        HKU_INFO_IF(trace, "[PF] remove system: {}", sys->name());
+        HKU_INFO_IF(trace, htr("[PF] remove system: {}"), sys->name());
         m_running_sys_set.erase(sys);
         m_running_sys_list.remove(sys);
     }
@@ -290,7 +291,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
             auto num = m_tm->getHoldNumber(date, stk);
             if (!iszero(num)) {
                 auto tr = sys->sellForceOnClose(date, num, PART_PORTFOLIO);
-                HKU_INFO_IF(trace && !tr.isNull(), "[PF] force sell not selected sys {}",
+                HKU_INFO_IF(trace && !tr.isNull(), htr("[PF] force sell not selected sys {}"),
                             sys->name());
                 m_force_sell_sys_list.emplace_back(sys);
             }

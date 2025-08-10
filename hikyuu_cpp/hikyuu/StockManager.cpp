@@ -24,12 +24,7 @@
 #include "plugin/device.h"
 #include "plugin/hkuextra.h"
 
-#if HKU_ENABLE_MO
-#include "hikyuu/utilities/mo/mo.h"
-#endif
-
 namespace hku {
-
 StockManager* StockManager::m_sm = nullptr;
 
 void StockManager::quit() {
@@ -92,13 +87,11 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_thread_id = std::this_thread::get_id();
     HKU_CHECK(!context.empty(), "No stock code list is included in the context!");
 
-#if HKU_ENABLE_MO
     if (m_i18n_path.empty()) {
-        mo::init(fmt::format("{}/i18n", getDllSelfDir()));
+        loadLocalLanguage(fmt::format("{}/i18n", getDllSelfDir()));
     } else {
-        mo::init(m_i18n_path);
+        loadLocalLanguage(m_i18n_path);
     }
-#endif
 
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
@@ -112,8 +105,11 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_datadir = hikyuuParam.tryGet<string>("datadir", ".");
 
     // 设置插件路径
-    m_plugin_manager.pluginPath(
-      m_hikyuuParam.tryGet<string>("plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
+    auto plugin_path = getPluginPath();
+    if (plugin_path.empty() && plugin_path == ".") {
+        m_plugin_manager.pluginPath(m_hikyuuParam.tryGet<string>(
+          "plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
+    }
 
     // 注册扩展K线处理
     registerPredefinedExtraKType();
@@ -182,17 +178,17 @@ void StockManager::loadData() {
     loadAllZhBond10();
     loadHistoryFinanceField();
 
-    HKU_INFO(_tr("Loading block..."));
+    HKU_INFO(htr("Loading block..."));
     m_blockDriver->load();
 
     // 获取K线数据驱动并预加载指定的数据
-    HKU_INFO(_tr("Loading KData..."));
+    HKU_INFO(htr("Loading KData..."));
 
     // 加载K线及历史财务信息
     loadAllKData();
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
-    HKU_INFO(_tr("{:<.2f}s Loaded Data."), sec.count());
+    HKU_INFO(htr("{:<.2f}s Loaded Data."), sec.count());
 }
 
 void StockManager::loadAllKData() {
@@ -229,7 +225,7 @@ void StockManager::loadAllKData() {
         }
 
         HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false),
-                    _tr("Preloading {} kdata to buffer (max: {})!"), back,
+                    htr("Preloading {} kdata to buffer (max: {})!"), back,
                     m_preloadParam.tryGet<int>(preload_key, 0));
     }
 
@@ -477,7 +473,7 @@ void StockManager::removeStock(const string& market_code) {
 }
 
 void StockManager::loadAllStocks() {
-    HKU_INFO(_tr("Loading stock information..."));
+    HKU_INFO(htr("Loading stock information..."));
     vector<StockInfo> stockInfos;
     if (m_context.isAll()) {
         stockInfos = m_baseInfoDriver->getAllStockInfo();
@@ -573,7 +569,7 @@ void StockManager::loadAllStocks() {
 }
 
 void StockManager::loadAllMarketInfos() {
-    HKU_INFO(_tr("Loading market information..."));
+    HKU_INFO(htr("Loading market information..."));
     auto marketInfos = m_baseInfoDriver->getAllMarketInfo();
     std::unique_lock<std::shared_mutex> lock(*m_marketInfoDict_mutex);
     m_marketInfoDict.clear();
@@ -591,7 +587,7 @@ void StockManager::loadAllMarketInfos() {
 }
 
 void StockManager::loadAllStockTypeInfo() {
-    HKU_INFO(_tr("Loading stock type information..."));
+    HKU_INFO(htr("Loading stock type information..."));
     auto stkTypeInfos = m_baseInfoDriver->getAllStockTypeInfo();
     std::unique_lock<std::shared_mutex> lock(*m_stockTypeInfo_mutex);
     m_stockTypeInfo.clear();
@@ -609,7 +605,7 @@ void StockManager::loadAllHolidays() {
 
 void StockManager::loadAllStockWeights() {
     HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("load_stock_weight", true), void());
-    HKU_INFO(_tr("Loading stock weight..."));
+    HKU_INFO(htr("Loading stock weight..."));
     if (m_context.isAll()) {
         auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
         std::shared_lock<std::shared_mutex> lock1(*m_stockDict_mutex);

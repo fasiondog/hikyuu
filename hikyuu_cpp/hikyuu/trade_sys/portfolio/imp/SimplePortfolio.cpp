@@ -115,7 +115,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
 
     // 开盘前，进行轧差处理（平衡 sub_sys, cash_tm, tm 之间的误差）
     bool trace = getParam<bool>("trace");
-    HKU_INFO_IF(trace, "[PF] The sum cash of sub_tm: {}, cash tm: {}, tm cash: {}", sum_cash,
+    HKU_INFO_IF(trace, htr("[PF] The sum cash of sub_tm: {}, cash tm: {}, tm cash: {}"), sum_cash,
                 m_cash_tm->currentCash(), m_tm->currentCash());
     sum_cash += m_cash_tm->currentCash();
 
@@ -128,7 +128,8 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
                 m_cash_tm->checkout(date, m_cash_tm->currentCash() - diff);
             }
         }
-        HKU_INFO_IF(trace, "After compensate: the sum cash of sub_tm: {}, cash tm: {}, tm cash: {}",
+        HKU_INFO_IF(trace,
+                    htr("After compensate: the sum cash of sub_tm: {}, cash tm: {}, tm cash: {}"),
                     sum_cash, m_cash_tm->currentCash(), m_tm->currentCash());
     }
 
@@ -137,19 +138,20 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     //----------------------------------------------------------------------
     if (trace) {
         auto funds = m_tm->getFunds(date, m_query.kType());
-        HKU_INFO("[PF] [beforce adjust] - total funds: {},  cash: {}, market_value: {}",
+        HKU_INFO(htr("[PF] [beforce adjust] - total funds: {},  cash: {}, market_value: {}"),
                  funds.cash + funds.market_value, funds.cash, funds.market_value);
     }
 
     //----------------------------------------------------------------------
     // 开盘时，优先处理上一交易日遗留的调仓卖出失败的系统
     //----------------------------------------------------------------------
-    HKU_INFO_IF(trace, "[PF] process delay adjust sys, size: {}", m_delay_adjust_sys_list.size());
+    HKU_INFO_IF(trace, htr("[PF] process delay adjust sys, size: {}"),
+                m_delay_adjust_sys_list.size());
     SystemWeightList tmp_continue_adjust_sys_list;
     for (auto& sys : m_delay_adjust_sys_list) {
         auto tr = sys.sys->sellForceOnOpen(date, sys.weight, PART_PORTFOLIO);
         if (!tr.isNull()) {
-            HKU_INFO_IF(trace, "[PF] Delay adjust sell: {}", tr);
+            HKU_INFO_IF(trace, htr("[PF] Delay adjust sell: {}"), tr);
             m_tm->addTradeRecord(tr);
 
             // 卖出后，尝试将资金取出转移至影子总账户
@@ -163,7 +165,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
             // 强制卖出失败的情况下，如果当前仍有持仓，则需要下一交易日继续进行处理
             PositionRecord position = sys.sys->getTM()->getPosition(date, sys.sys->getStock());
             if (position.number > 0.0) {
-                HKU_INFO_IF(trace, "[{}] failed to force sell, delay to next day", name());
+                HKU_INFO_IF(trace, htr("[{}] failed to force sell, delay to next day"), name());
                 tmp_continue_adjust_sys_list.emplace_back(sys);
             }
         }
@@ -177,12 +179,12 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     for (auto& sys : m_running_sys_set) {
         auto tr = sys->pfProcessDelaySellRequest(date);
         if (!tr.isNull()) {
-            HKU_INFO_IF(trace, "[PF] sell delay on open {}", tr);
+            HKU_INFO_IF(trace, htr("[PF] sell delay on open {}"), tr);
             m_tm->addTradeRecord(tr);
         }
         tr = sys->pfProcessDelayBuyRequest(date);
         if (!tr.isNull()) {
-            HKU_INFO_IF(trace, "[PF] buy delay on open {}", tr);
+            HKU_INFO_IF(trace, htr("[PF] buy delay on open {}"), tr);
             m_tm->addTradeRecord(tr);
         }
     }
@@ -202,7 +204,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
                 ((sys->getParam<bool>("buy_delay") && !sys->haveDelayBuyRequest()) &&
                  (sys->getParam<bool>("sell_delay") && !sys->haveDelayBuyRequest()))) {
                 // 没有延迟买卖信号
-                HKU_INFO_IF(trace, "[PF] remove no signal delay sys: {}", sys->name());
+                HKU_INFO_IF(trace, htr("[PF] remove no signal delay sys: {}"), sys->name());
                 m_tmp_will_remove_sys.emplace_back(sys, 0.0);
 
                 auto sub_cash = sub_tm->currentCash();
@@ -226,7 +228,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
             for (auto& sw : m_tmp_selected_list) {
                 if (sw.sys) {
                     if (m_running_sys_set.find(sw.sys) == m_running_sys_set.end()) {
-                        HKU_INFO_IF(trace, "[PF] clear delay buy request(future): {}",
+                        HKU_INFO_IF(trace, htr("[PF] clear delay buy request(future): {}"),
                                     sw.sys->name());
                         sw.sys->clearDelayBuyRequest();
                     }
@@ -236,7 +238,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
 
         if (trace && !m_tmp_selected_list.empty()) {
             for (auto& sys : m_tmp_selected_list) {
-                HKU_INFO_IF(sys.sys, "[PF] select: {}, score: {:<.4f}", sys.sys->name(),
+                HKU_INFO_IF(sys.sys, htr("[PF] select: {}, score: {:<.4f}"), sys.sys->name(),
                             sys.weight);
             }
         }
@@ -271,7 +273,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
             // 没有持仓
             if (sub_tm->currentCash() < 1.0 && 0 == sub_tm->getHoldNumber(date, sys->getStock())) {
                 // 没有现金
-                HKU_INFO_IF(trace, "[PF] remove sys: {}", sys->name());
+                HKU_INFO_IF(trace, htr("[PF] remove sys: {}"), sys->name());
                 m_tmp_will_remove_sys.emplace_back(sys, 0.0);
             }
         }
@@ -286,7 +288,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     //----------------------------------------------------------------------
     if (trace) {
         auto funds = m_tm->getFunds(date, m_query.kType());
-        HKU_INFO("[PF] [after adjust] - total funds: {},  cash: {}, market_value: {}",
+        HKU_INFO(htr("[PF] [after adjust] - total funds: {},  cash: {}, market_value: {}"),
                  funds.total_assets(), funds.cash, funds.market_value);
     }
 
@@ -306,14 +308,14 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
             if (trace) {
                 if (delay_adjust_sys_set.find(sub_sys.get()) == delay_adjust_sys_set.end()) {
                     if (sub_sys->getParam<bool>("buy_delay")) {
-                        HKU_INFO_IF(sg->shouldBuy(date), "[PF] {} sg will buy on next open",
+                        HKU_INFO_IF(sg->shouldBuy(date), htr("[PF] {} sg will buy on next open"),
                                     sub_sys->name());
                     } else {
-                        HKU_INFO_IF(sg->shouldBuy(date), "[PF] {} sg will buy on current close",
-                                    sub_sys->name());
+                        HKU_INFO_IF(sg->shouldBuy(date),
+                                    htr("[PF] {} sg will buy on current close"), sub_sys->name());
                     }
                 } else {
-                    HKU_INFO("[PF] {} will adjust sell on next open", sub_sys->name());
+                    HKU_INFO(htr("[PF] {} will adjust sell on next open"), sub_sys->name());
                 }
             }
         }
@@ -330,7 +332,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     //----------------------------------------------------------------------
     if (trace) {
         auto funds = m_tm->getFunds(date, m_query.kType());
-        HKU_INFO("[PF] [after run at close] - total funds: {},  cash: {}, market_value: {}",
+        HKU_INFO(htr("[PF] [after run at close] - total funds: {},  cash: {}, market_value: {}"),
                  funds.cash + funds.market_value, funds.cash, funds.market_value);
     }
 }

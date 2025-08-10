@@ -68,10 +68,11 @@ void export_PositionRecord(py::module& m) {
 
         std::vector<RawData> data;
         data.resize(positions.size());
+        std::string ucode, uname;
         for (size_t i = 0, total = positions.size(); i < total; i++) {
             const PositionRecord& p = positions[i];
-            auto ucode = utf8_to_utf32(p.stock.market_code(), 10);
-            auto uname = utf8_to_utf32(p.stock.name(), 20);
+            ucode = utf8_to_utf32(p.stock.market_code(), 10);
+            uname = utf8_to_utf32(p.stock.name(), 20);
             memset(data[i].code, 0, 40);
             memset(data[i].name, 0, 80);
             memcpy(data[i].code, ucode.c_str(), ucode.size() > 40 ? 40 : ucode.size());
@@ -104,12 +105,12 @@ void export_PositionRecord(py::module& m) {
         }
 
         py::dtype dtype = py::dtype(
-          vector_to_python_list<string>({_tr("market_code"), _tr("name"), _tr("take_time"),
-                                         _tr("hold_days"), _tr("hold_number"), _tr("invest"),
-                                         _tr("market_value"), _tr("profit"), _tr("profit_percent"),
-                                         _tr("stoploss"), _tr("goal_price"), _tr("clean_time"),
-                                         _tr("total_number"), _tr("total_cost"), _tr("total_risk"),
-                                         _tr("buy_money"), _tr("sell_money")}),
+          vector_to_python_list<string>({htr("market_code"), htr("name"), htr("take_time"),
+                                         htr("hold_days"), htr("hold_number"), htr("invest"),
+                                         htr("market_value"), htr("profit"), htr("profit_percent"),
+                                         htr("stoploss"), htr("goal_price"), htr("clean_time"),
+                                         htr("total_number"), htr("total_cost"), htr("total_risk"),
+                                         htr("buy_money"), htr("sell_money")}),
           vector_to_python_list<string>({"U10", "U20", "datetime64[ms]", "i8", "d", "d", "d", "d",
                                          "d", "d", "d", "datetime64[ms]", "d", "d", "d", "d", "d"}),
           vector_to_python_list<int64_t>(

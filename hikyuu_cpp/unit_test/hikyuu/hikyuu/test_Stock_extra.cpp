@@ -19,6 +19,8 @@ using namespace hku;
 static bool pluginValid() {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
+    HKU_INFO("{} {}", plugin != nullptr, isValidLicense());
+    HKU_INFO("{}", sm.getPluginPath());
     return plugin && isValidLicense();
 }
 
