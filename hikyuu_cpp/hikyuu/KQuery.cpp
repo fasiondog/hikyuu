@@ -70,12 +70,18 @@ vector<KQuery::KType> KQuery::getExtraKTypeList() {
     return hku::getExtraKTypeList();
 }
 
-int32_t KQuery::getKTypeInMin(KType ktype) {
+int32_t KQuery::getKTypeInMin(const KType& ktype) {
     string nktype(ktype);
     to_upper(nktype);
-    if (isExtraKType(nktype)) {
-        return getKTypeExtraMinutes(nktype);
-    }
+    auto iter = g_ktype2min.find(nktype);
+    HKU_IF_RETURN(iter != g_ktype2min.end(), iter->second);
+
+    return getKTypeExtraMinutes(nktype);
+}
+
+int32_t KQuery::getBaseKTypeInMin(const KType& ktype) {
+    string nktype(ktype);
+    to_upper(nktype);
     return g_ktype2min.at(nktype);
 }
 

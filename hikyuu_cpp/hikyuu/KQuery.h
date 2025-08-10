@@ -67,7 +67,9 @@ public:
     /** 获取所有扩展 KType */
     static vector<KType> getExtraKTypeList();
 
-    static int32_t getKTypeInMin(KType);
+    static int32_t getKTypeInMin(const KType& ktype);
+
+    static int32_t getBaseKTypeInMin(const KType& ktype);
 
     /**
      * 复权类型
