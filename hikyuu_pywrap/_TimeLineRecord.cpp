@@ -41,7 +41,7 @@ void export_TimeLineReord(py::module& m) {
 
           std::vector<RawData> data;
           data.resize(timeline.size());
-          for (size_t i = 0; i < timeline.size(); i++) {
+          for (size_t i = 0, len = timeline.size(); i < len; i++) {
               const TimeLineRecord& record = timeline[i];
               data[i].datetime = record.datetime.timestamp() * 1000LL;
               data[i].price = record.price;
@@ -65,13 +65,10 @@ void export_TimeLineReord(py::module& m) {
               return py::module_::import("pandas").attr("DataFrame")();
           }
 
-          std::vector<int64_t> datetime;
-          std::vector<double> price, vol;
-          datetime.resize(total);
-          price.resize(total);
-          vol.resize(total);
+          std::vector<int64_t> datetime(total);
+          std::vector<double> price(total), vol(total);
 
-          for (size_t i = 0; i < timeline.size(); i++) {
+          for (size_t i = 0; i < total; i++) {
               const TimeLineRecord& record = timeline[i];
               datetime[i] = record.datetime.timestamp() * 1000LL;
               price[i] = record.price;
@@ -81,8 +78,8 @@ void export_TimeLineReord(py::module& m) {
           py::dict columns;
           columns["datetime"] =
             py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
-          columns["price"] = py::array_t<price_t>(total, price.data(), py::dtype("float64"));
-          columns["vol"] = py::array_t<price_t>(total, vol.data(), py::dtype("float64"));
+          columns["price"] = py::array_t<double>(total, price.data(), py::dtype("float64"));
+          columns["vol"] = py::array_t<double>(total, vol.data(), py::dtype("float64"));
           return py::module_::import("pandas").attr("DataFrame")(columns);
       },
       "将分时线记录转换为 DataFrame");

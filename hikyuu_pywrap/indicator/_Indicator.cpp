@@ -274,7 +274,7 @@ set_context(self, stock, query)
             size_t bytes_size;
             if (!dates.empty()) {
                 names.push_back("datetime");
-                fields.push_back("datetime64[ms]");
+                fields.push_back("datetime64[ns]");
                 offsets.push_back(0);
                 for (size_t i = 0; i < ret_num; i++) {
                     names.push_back(fmt::format("value{}", i + 1));
@@ -309,7 +309,7 @@ set_context(self, stock, query)
             if (!dates.empty()) {
                 size_t x = ret_num + 1;
                 for (size_t i = 0, total = imp->size(); i < total; i++) {
-                    data[i * x] = dates[i].timestamp() / 1000LL;
+                    data[i * x] = dates[i].timestamp() * 1000LL;
                     for (size_t j = 0; j < ret_num; j++) {
                         val[i * x + j + 1] = src[j][i];
                     }
@@ -338,7 +338,7 @@ set_context(self, stock, query)
             std::vector<string> fields;
             std::vector<int64_t> offsets;
             for (size_t i = 0; i < ret_num; i++) {
-                names.push_back(fmt::format("value{}", i + 1));
+                names.push_back(fmt::format("value{}", i));
                 fields.push_back("d");
                 if (i == 0) {
                     offsets.push_back(0);
@@ -385,6 +385,17 @@ set_context(self, stock, query)
                 }
                 columns["datetime"] =
                   py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
+            }
+
+            size_t ret_num = self.getResultNumber();
+            std::vector<double> value(total);
+            for (size_t i = 0; i < ret_num; i++) {
+                const auto* src = self.data(i);
+                for (size_t j = 0; j < total; j++) {
+                    value[j] = src[j];
+                }
+                columns[fmt::format("value{}", i).c_str()] =
+                  py::array_t<double>(total, value.data(), py::dtype("float64"));
             }
 
             return py::module_::import("pandas").attr("DataFrame")(columns);

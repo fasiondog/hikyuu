@@ -37,12 +37,12 @@ void export_TransRecord(py::module& m) {
               int64_t datetime;
               double price;
               double vol;
-              int64_t direct;
+              int32_t direct;
           };
 
           std::vector<RawData> data;
           data.resize(trans.size());
-          for (size_t i = 0; i < trans.size(); i++) {
+          for (size_t i = 0, len = trans.size(); i < len; i++) {
               const TransRecord& record = trans[i];
               data[i].datetime = record.datetime.timestamp() * 1000LL;
               data[i].price = record.price;
@@ -53,8 +53,8 @@ void export_TransRecord(py::module& m) {
           // 定义NumPy结构化数据类型
           auto dtype =
             py::dtype(vector_to_python_list<string>({"datetime", "price", "vol", "direct"}),
-                      vector_to_python_list<string>({"datetime64[ns]", "d", "d", "i8"}),
-                      vector_to_python_list<int64_t>({0, 8, 16, 24}), 32);
+                      vector_to_python_list<string>({"datetime64[ns]", "d", "d", "i4"}),
+                      vector_to_python_list<int64_t>({0, 8, 16, 24}), 28);
 
           return py::array(dtype, data.size(), data.data());
       },
@@ -68,10 +68,11 @@ void export_TransRecord(py::module& m) {
               return py::module_::import("pandas").attr("DataFrame")();
           }
 
-          std::vector<int64_t> datetime(total), direct(total);
+          std::vector<int64_t> datetime(total);
           std::vector<double> price(total), vol(total);
+          std::vector<int32_t> direct(total);
 
-          for (size_t i = 0; i < trans.size(); i++) {
+          for (size_t i = 0; i < total; i++) {
               const TransRecord& record = trans[i];
               datetime[i] = record.datetime.timestamp() * 1000LL;
               price[i] = record.price;
@@ -82,9 +83,9 @@ void export_TransRecord(py::module& m) {
           py::dict columns;
           columns["datetime"] =
             py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
-          columns["price"] = py::array_t<price_t>(total, price.data(), py::dtype("float64"));
-          columns["vol"] = py::array_t<price_t>(total, vol.data(), py::dtype("float64"));
-          columns["direct"] = py::array_t<int64_t>(total, direct.data(), py::dtype("i8"));
+          columns["price"] = py::array_t<double>(total, price.data(), py::dtype("float64"));
+          columns["vol"] = py::array_t<double>(total, vol.data(), py::dtype("float64"));
+          columns["direct"] = py::array_t<int32_t>(total, direct.data(), py::dtype("i4"));
           return py::module_::import("pandas").attr("DataFrame")(columns);
       },
       "将分笔记录转换为 DataFrame");

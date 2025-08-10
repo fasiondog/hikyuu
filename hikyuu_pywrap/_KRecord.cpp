@@ -41,6 +41,9 @@ void export_KReord(py::module& m) {
         DEF_PICKLE(KRecord);
 
     m.def("krecords_to_np", [](const KRecordList& kdata) {
+        size_t total = kdata.size();
+        HKU_IF_RETURN(total == 0, py::array());
+
         struct RawData {
             int64_t datetime;  // 转换后的毫秒时间戳
             double open;
@@ -50,9 +53,8 @@ void export_KReord(py::module& m) {
             double amount;
             double volume;
         };
-        std::vector<RawData> data;
-        data.resize(kdata.size());
-        for (size_t i = 0, total = kdata.size(); i < total; i++) {
+        std::vector<RawData> data(total);
+        for (size_t i = 0; i < total; i++) {
             const KRecord& k = kdata[i];
             data[i].datetime = k.datetime.timestamp() / 1000LL;
             data[i].open = k.openPrice;
@@ -69,7 +71,7 @@ void export_KReord(py::module& m) {
                     vector_to_python_list<string>({"datetime64[ms]", "d", "d", "d", "d", "d", "d"}),
                     vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48}), 56);
 
-        return py::array(dtype, data.size(), data.data());
+        return py::array(dtype, total, data.data());
     });
 
     m.def("krecords_to_df", [](const KRecordList& kdata) {
@@ -78,19 +80,12 @@ void export_KReord(py::module& m) {
             return py::module_::import("pandas").attr("DataFrame")();
         }
 
-        std::vector<int64_t> datetime;
-        std::vector<double> open, high, low, close, amount, vol;
-
-        datetime.resize(total);
-        open.resize(total);
-        high.resize(total);
-        low.resize(total);
-        close.resize(total);
-        amount.resize(total);
-        vol.resize(total);
+        std::vector<int64_t> datetime(total);
+        std::vector<double> open(total), high(total), low(total), close(total), amount(total),
+          vol(total);
 
         auto* ks = kdata.data();
-        for (size_t i = 0, len = kdata.size(); i < len; i++) {
+        for (size_t i = 0; i < total; i++) {
             datetime[i] = ks[i].datetime.timestamp() * 1000LL;
             open[i] = ks[i].openPrice;
             high[i] = ks[i].highPrice;
@@ -103,12 +98,12 @@ void export_KReord(py::module& m) {
         py::dict columns;
         columns["datetime"] =
           py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
-        columns["open"] = py::array_t<price_t>(total, open.data(), py::dtype("float64"));
-        columns["high"] = py::array_t<price_t>(total, high.data(), py::dtype("float64"));
-        columns["low"] = py::array_t<price_t>(total, low.data(), py::dtype("float64"));
-        columns["close"] = py::array_t<price_t>(total, close.data(), py::dtype("float64"));
-        columns["amount"] = py::array_t<price_t>(total, amount.data(), py::dtype("float64"));
-        columns["volume"] = py::array_t<price_t>(total, vol.data(), py::dtype("float64"));
+        columns["open"] = py::array_t<double>(total, open.data(), py::dtype("float64"));
+        columns["high"] = py::array_t<double>(total, high.data(), py::dtype("float64"));
+        columns["low"] = py::array_t<double>(total, low.data(), py::dtype("float64"));
+        columns["close"] = py::array_t<double>(total, close.data(), py::dtype("float64"));
+        columns["amount"] = py::array_t<double>(total, amount.data(), py::dtype("float64"));
+        columns["volume"] = py::array_t<double>(total, vol.data(), py::dtype("float64"));
         return py::module_::import("pandas").attr("DataFrame")(columns);
     });
 }

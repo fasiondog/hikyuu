@@ -243,7 +243,7 @@ void export_KData(py::module& m) {
                  amount(total), vol(total);
 
                auto* ks = self.data();
-               for (size_t i = 0, len = self.size(); i < len; i++) {
+               for (size_t i = 0; i < total; i++) {
                    datetime[i] = ks[i].datetime.timestamp() * 1000LL;
                    open[i] = ks[i].openPrice;
                    high[i] = ks[i].highPrice;
@@ -256,12 +256,12 @@ void export_KData(py::module& m) {
                py::dict columns;
                columns["datetime"] =
                  py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
-               columns["open"] = py::array_t<price_t>(total, open.data(), py::dtype("float64"));
-               columns["high"] = py::array_t<price_t>(total, high.data(), py::dtype("float64"));
-               columns["low"] = py::array_t<price_t>(total, low.data(), py::dtype("float64"));
-               columns["close"] = py::array_t<price_t>(total, close.data(), py::dtype("float64"));
-               columns["amount"] = py::array_t<price_t>(total, amount.data(), py::dtype("float64"));
-               columns["volume"] = py::array_t<price_t>(total, vol.data(), py::dtype("float64"));
+               columns["open"] = py::array_t<double>(total, open.data(), py::dtype("float64"));
+               columns["high"] = py::array_t<double>(total, high.data(), py::dtype("float64"));
+               columns["low"] = py::array_t<double>(total, low.data(), py::dtype("float64"));
+               columns["close"] = py::array_t<double>(total, close.data(), py::dtype("float64"));
+               columns["amount"] = py::array_t<double>(total, amount.data(), py::dtype("float64"));
+               columns["volume"] = py::array_t<double>(total, vol.data(), py::dtype("float64"));
                return py::module_::import("pandas").attr("DataFrame")(columns);
            })
 

@@ -80,21 +80,12 @@ void export_StockWeight(py::module& m) {
             return py::module_::import("pandas").attr("DataFrame")();
         }
 
-        std::vector<int64_t> datetime;
-        std::vector<double> countAsGift, countForSell, priceForSell, bonus, countOfIncreasement,
-          totalCount, freeCount, suogu;
+        std::vector<int64_t> datetime(total);
+        std::vector<double> countAsGift(total), countForSell(total), priceForSell(total),
+          bonus(total), countOfIncreasement(total), totalCount(total), freeCount(total),
+          suogu(total);
 
-        datetime.resize(total);
-        countAsGift.resize(total);
-        countForSell.resize(total);
-        priceForSell.resize(total);
-        bonus.resize(total);
-        countOfIncreasement.resize(total);
-        totalCount.resize(total);
-        freeCount.resize(total);
-        suogu.resize(total);
-
-        for (size_t i = 0, total = sw.size(); i < total; i++) {
+        for (size_t i = 0; i < total; i++) {
             const StockWeight& w = sw[i];
             datetime[i] = w.datetime().timestamp() * 1000LL;
             countAsGift[i] = w.countAsGift();
@@ -111,18 +102,17 @@ void export_StockWeight(py::module& m) {
         columns["datetime"] =
           py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
         columns["countAsGift"] =
-          py::array_t<price_t>(total, countAsGift.data(), py::dtype("float64"));
+          py::array_t<double>(total, countAsGift.data(), py::dtype("float64"));
         columns["countForSell"] =
-          py::array_t<price_t>(total, countForSell.data(), py::dtype("float64"));
+          py::array_t<double>(total, countForSell.data(), py::dtype("float64"));
         columns["priceForSell"] =
-          py::array_t<price_t>(total, priceForSell.data(), py::dtype("float64"));
-        columns["bonus"] = py::array_t<price_t>(total, bonus.data(), py::dtype("float64"));
+          py::array_t<double>(total, priceForSell.data(), py::dtype("float64"));
+        columns["bonus"] = py::array_t<double>(total, bonus.data(), py::dtype("float64"));
         columns["countOfIncreasement"] =
-          py::array_t<price_t>(total, countOfIncreasement.data(), py::dtype("float64"));
-        columns["totalCount"] =
-          py::array_t<price_t>(total, totalCount.data(), py::dtype("float64"));
-        columns["freeCount"] = py::array_t<price_t>(total, freeCount.data(), py::dtype("float64"));
-        columns["suogu"] = py::array_t<price_t>(total, suogu.data(), py::dtype("float64"));
+          py::array_t<double>(total, countOfIncreasement.data(), py::dtype("float64"));
+        columns["totalCount"] = py::array_t<double>(total, totalCount.data(), py::dtype("float64"));
+        columns["freeCount"] = py::array_t<double>(total, freeCount.data(), py::dtype("float64"));
+        columns["suogu"] = py::array_t<double>(total, suogu.data(), py::dtype("float64"));
 
         return py::module_::import("pandas").attr("DataFrame")(columns);
     });
