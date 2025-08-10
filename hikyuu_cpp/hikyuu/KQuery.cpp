@@ -48,9 +48,6 @@ static const unordered_map<string, int32_t> g_ktype2min{
   {KQuery::MIN30, 30},
   {KQuery::MIN60, 60},
   {KQuery::HOUR2, 60 * 2},
-  {KQuery::HOUR4, 60 * 4},
-  {KQuery::HOUR6, 60 * 6},
-  {KQuery::HOUR12, 60 * 12},
 
   {KQuery::DAY, 60 * 24},
   {KQuery::WEEK, 60 * 24 * 7},
