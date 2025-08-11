@@ -234,7 +234,6 @@ void export_KData(py::module& m) {
       .def(
         "to_df",
         [](const KData& self, bool with_stock) {
-            SPEND_TIME(to_df);
             size_t total = self.size();
             if (total == 0) {
                 return py::module_::import("pandas").attr("DataFrame")();
