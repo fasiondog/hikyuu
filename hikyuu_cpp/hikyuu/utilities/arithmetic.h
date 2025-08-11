@@ -71,23 +71,6 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput);
 #define HKU_CPATH(s) (s)
 #endif
 
-/**
- * 将utf8编码的字符串转换为utf32编码
- * @param str 待转换的字符串
- * @param max_len 最大转换长度(为编码字符长度，非字节长度)
- * @return 转换后的utf32编码字符串
- */
-std::string HKU_UTILS_API utf8_to_utf32(const std::string &str, size_t max_len);
-
-/**
- * @brief 将utf8编码的字符串转换为utf32编码
- * @param utf8_str 待转换字符串
- * @param out 输出缓冲区（须自行预先分配）
- * @param out_len 输出缓冲器长度
- * @return size_t 实际转换的码点数
- */
-size_t HKU_UTILS_API utf8_to_utf32(const std::string &utf8_str, int32_t *out, size_t out_len);
-
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4244)

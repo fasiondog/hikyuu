@@ -93,12 +93,15 @@ void export_MultiFactor(py::module& m) {
         }
 
         // 构建 DataFrame
+        auto pandas = py::module_::import("pandas");
         py::dict columns;
-        columns[htr("market_code").c_str()] = code_list;
-        columns[htr("name").c_str()] = name_list;
+        columns[htr("market_code").c_str()] =
+          pandas.attr("Series")(code_list, py::arg("dtype") = "string");
+        columns[htr("name").c_str()] =
+          pandas.attr("Series")(name_list, py::arg("dtype") = "string");
         columns["score"] = value_arr;
 
-        return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
+        return pandas.attr("DataFrame")(columns, py::arg("copy") = false);
     });
 
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",

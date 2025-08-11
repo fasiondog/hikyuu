@@ -10,7 +10,7 @@ target("core")
     -- end
 
     add_deps("hikyuu")
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "utf8proc")
     if is_plat("windows") then
         set_filename("core.pyd")
         add_cxflags("-wd4251")

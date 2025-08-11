@@ -73,32 +73,30 @@ void export_TradeRecord(py::module& m) {
         HKU_IF_RETURN(total == 0, py::array());
 
         struct alignas(8) RawData {
-            int32_t code[10] = {0};
-            int32_t name[20] = {0};
-            int64_t datetime;            // 交易日期
-            int32_t business[20] = {0};  // 业务类型
-            double planPrice;            // 计划交易价格
-            double realPrice;            // 实际交易价格
-            double goalPrice;            // 目标价位，如果为0或Null表示未限定目标
-            double number;               // 成交数量
-            double stoploss;             // 止损价
-            double cash;                 // 现金余额
-            double cost_total;           // 总成本
-            double cost_commission;      // 佣金
-            double cost_stamptax;        // 印花税
-            double cost_transferfee;     // 过户费
-            double cost_others;          // 其他费用
-            int32_t sig_from[20] = {0};  // 信号部件来源
-            int32_t remark[100] = {0};   // 备注
+            int32_t code[10]{0};
+            int32_t name[20]{0};
+            int64_t datetime;         // 交易日期
+            int32_t business[20]{0};  // 业务类型
+            double planPrice;         // 计划交易价格
+            double realPrice;         // 实际交易价格
+            double goalPrice;         // 目标价位，如果为0或Null表示未限定目标
+            double number;            // 成交数量
+            double stoploss;          // 止损价
+            double cash;              // 现金余额
+            double cost_total;        // 总成本
+            double cost_commission;   // 佣金
+            double cost_stamptax;     // 印花税
+            double cost_transferfee;  // 过户费
+            double cost_others;       // 其他费用
+            int32_t sig_from[20]{0};  // 信号部件来源
+            int32_t remark[100]{0};   // 备注
         };
 
         RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
         for (size_t i = 0, total = trades.size(); i < total; i++) {
             const TradeRecord& t = trades[i];
-            if (!t.stock.isNull()) {
-                utf8_to_utf32(t.stock.market_code(), data[i].code, 10);
-                utf8_to_utf32(t.stock.name(), data[i].name, 20);
-            }
+            utf8_to_utf32(t.stock.market_code(), data[i].code, 10);
+            utf8_to_utf32(t.stock.name(), data[i].name, 20);
             data[i].datetime = t.datetime.timestamp() * 1000LL;
             utf8_to_utf32(getBusinessName(t.business), data[i].business, 20);
             data[i].planPrice = t.planPrice;
@@ -214,11 +212,15 @@ void export_TradeRecord(py::module& m) {
           }
 
           // 构建 DataFrame
+          auto pandas = py::module_::import("pandas");
           py::dict columns;
-          columns[htr("market_code").c_str()] = code_list;
-          columns[htr("name").c_str()] = name_list;
+          columns[htr("market_code").c_str()] =
+            pandas.attr("Series")(code_list, py::arg("dtype") = "string");
+          columns[htr("name").c_str()] =
+            pandas.attr("Series")(name_list, py::arg("dtype") = "string");
           columns[htr("datetime").c_str()] = datetime_arr.attr("astype")("datetime64[ns]");
-          columns[htr("business").c_str()] = business_list;
+          columns[htr("business").c_str()] =
+            pandas.attr("Series")(business_list, py::arg("dtype") = "string");
           columns[htr("planPrice").c_str()] = planPrice_arr;
           columns[htr("realPrice").c_str()] = realPrice_arr;
           columns[htr("goalPrice").c_str()] = goalPrice_arr;
@@ -230,10 +232,12 @@ void export_TradeRecord(py::module& m) {
           columns[htr("cost_stamptax").c_str()] = cost_stamptax_arr;
           columns[htr("cost_transferfee").c_str()] = cost_transferfee_arr;
           columns[htr("cost_others").c_str()] = cost_others_arr;
-          columns[htr("part_from").c_str()] = part_from_list;
-          columns[htr("remark").c_str()] = remark_list;
+          columns[htr("part_from").c_str()] =
+            pandas.attr("Series")(part_from_list, py::arg("dtype") = "string");
+          columns[htr("remark").c_str()] =
+            pandas.attr("Series")(remark_list, py::arg("dtype") = "string");
 
-          return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
+          return pandas.attr("DataFrame")(columns, py::arg("copy") = false);
       },
       R"(trades_to_df(trades)
 

@@ -50,8 +50,8 @@ void export_PositionRecord(py::module& m) {
         HKU_IF_RETURN(total == 0, py::array());
 
         struct alignas(8) RawData {
-            int32_t code[10] = {0};
-            int32_t name[20] = {0};
+            int32_t code[10];
+            int32_t name[20];
             int64_t take_datetime;        // 买入日期
             int64_t hold_days;            // 已持仓天数
             double number;                // 当前持仓数量
@@ -231,9 +231,12 @@ void export_PositionRecord(py::module& m) {
           }
 
           // 构建 DataFrame
+          auto pandas = py::module_::import("pandas");
           py::dict columns;
-          columns[htr("market_code").c_str()] = code_list;
-          columns[htr("name").c_str()] = name_list;
+          columns[htr("market_code").c_str()] =
+            pandas.attr("Series")(code_list, py::arg("dtype") = "string");
+          columns[htr("name").c_str()] =
+            pandas.attr("Series")(name_list, py::arg("dtype") = "string");
           columns[htr("take_time").c_str()] = take_time_arr.attr("astype")("datetime64[ns]");
           columns[htr("hold_days").c_str()] = hold_days_arr;
           columns[htr("hold_number").c_str()] = hold_number_arr;
@@ -250,7 +253,7 @@ void export_PositionRecord(py::module& m) {
           columns[htr("buy_money").c_str()] = buy_money_arr;
           columns[htr("sell_money").c_str()] = sell_money_arr;
 
-          return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
+          return pandas.attr("DataFrame")(columns, py::arg("copy") = false);
       },
       R"(positions_to_df(positions)
 
