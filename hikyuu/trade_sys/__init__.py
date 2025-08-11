@@ -26,7 +26,7 @@
 
 import pandas as pd
 from .trade_sys import *
-from hikyuu.core import ScoreRecordList, scorerecords_to_np, SystemWeightList, systemweights_to_np
+from hikyuu.core import (ScoreRecordList, scorerecords_to_np, scorerecords_to_df, SystemWeightList, systemweights_to_np)
 
 
 def ScoreRecordList_to_np(data):
@@ -40,7 +40,7 @@ def ScoreRecordList_to_df(data):
 
 
 ScoreRecordList.to_np = ScoreRecordList_to_np
-ScoreRecordList.to_df = ScoreRecordList_to_df
+ScoreRecordList.to_df = lambda self: scorerecords_to_df(self)
 
 
 def SystemWeightList_to_np(data):

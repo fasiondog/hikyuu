@@ -128,9 +128,12 @@ void export_Datetime(py::module& m) {
     m.def(
       "dates_to_np",
       [](const DatetimeList& datelist) {
-          std::vector<int64_t> data;
-          data.resize(datelist.size());
-          for (size_t i = 0; i < datelist.size(); i++) {
+          size_t total = datelist.size();
+          HKU_IF_RETURN(total == 0, py::array());
+
+          // 使用 malloc 分配内存
+          int64_t* data = static_cast<int64_t*>(std::malloc(total * sizeof(int64_t)));
+          for (size_t i = 0; i < total; i++) {
               data[i] = datelist[i].timestamp() * 1000LL;
           }
 
@@ -140,7 +143,8 @@ void export_Datetime(py::module& m) {
                             vector_to_python_list<string>({"datetime64[ns]"}),
                             vector_to_python_list<int64_t>({0}), 8);
 
-          return py::array(dtype, data.size(), data.data());
+          // 使用 capsule 管理内存
+          return py::array(dtype, total, data, py::capsule(data, [](void* p) { std::free(p); }));
       },
       "将 DatetimeList 转换为 NumPy 元组");
 }

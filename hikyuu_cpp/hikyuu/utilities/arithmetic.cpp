@@ -6,6 +6,7 @@
  */
 
 #include <stdexcept>
+#include <utf8proc.h>
 #include "arithmetic.h"
 
 #if defined(_MSC_VER)
@@ -218,5 +219,37 @@ std::string HKU_UTILS_API utf8_to_utf32(const std::string &str, size_t max_len) 
 }
 
 #endif /* defined(_MSC_VER) */
+
+// 将UTF-8字符串转换为UTF-32码点
+size_t HKU_UTILS_API utf8_to_utf32(const std::string &utf8_str, int32_t *out, size_t out_len) {
+    // 检查输出缓冲区有效性
+    if (out == nullptr || out_len == 0) {
+        return 0;
+    }
+
+    const uint8_t *input = reinterpret_cast<const uint8_t *>(utf8_str.data());
+    size_t input_len = utf8_str.size();
+    size_t pos = 0;
+    size_t converted = 0;
+
+    // 循环处理每个UTF-8码点
+    while (pos < input_len && converted < out_len) {
+        int32_t codepoint;
+        ssize_t bytes_processed = utf8proc_iterate(input + pos, input_len - pos, &codepoint);
+
+        if (bytes_processed < 0) {
+            throw std::runtime_error("Invalid UTF-8 sequence at position " + std::to_string(pos));
+        }
+        if (bytes_processed == 0) {
+            break;  // 正常结束
+        }
+
+        // 存储转换后的码点并更新计数
+        out[converted++] = codepoint;
+        pos += bytes_processed;
+    }
+
+    return converted;
+}
 
 }  // namespace hku

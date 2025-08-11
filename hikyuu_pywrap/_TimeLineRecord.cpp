@@ -33,14 +33,17 @@ void export_TimeLineReord(py::module& m) {
     m.def(
       "timeline_to_np",
       [](const TimeLineList& timeline) {
+          size_t total = timeline.size();
+          HKU_IF_RETURN(total == 0, py::array());
+
           struct RawData {
               int64_t datetime;  // 转换后的毫秒时间戳
               double price;
               double vol;
           };
 
-          std::vector<RawData> data;
-          data.resize(timeline.size());
+          // 使用 malloc 分配内存
+          RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
           for (size_t i = 0, len = timeline.size(); i < len; i++) {
               const TimeLineRecord& record = timeline[i];
               data[i].datetime = record.datetime.timestamp() * 1000LL;
@@ -53,7 +56,9 @@ void export_TimeLineReord(py::module& m) {
                                  vector_to_python_list<string>({"datetime64[ns]", "d", "d"}),
                                  vector_to_python_list<int64_t>({0, 8, 16}), 24);
 
-          return py::array(dtype, data.size(), data.data());
+          // 使用 capsule 管理内存
+          return py::array(dtype, total, static_cast<RawData*>(data),
+                           py::capsule(data, [](void* p) { std::free(p); }));
       },
       "将分时线记录转换为NumPy元组");
 
@@ -65,21 +70,33 @@ void export_TimeLineReord(py::module& m) {
               return py::module_::import("pandas").attr("DataFrame")();
           }
 
-          std::vector<int64_t> datetime(total);
-          std::vector<double> price(total), vol(total);
+          // 创建数组
+          py::array_t<int64_t> datetime_arr(total);
+          py::array_t<double> price_arr(total);
+          py::array_t<double> vol_arr(total);
+
+          // 获取缓冲区并填充数据
+          auto datetime_buf = datetime_arr.request();
+          auto price_buf = price_arr.request();
+          auto vol_buf = vol_arr.request();
+
+          int64_t* datetime_ptr = static_cast<int64_t*>(datetime_buf.ptr);
+          double* price_ptr = static_cast<double*>(price_buf.ptr);
+          double* vol_ptr = static_cast<double*>(vol_buf.ptr);
 
           for (size_t i = 0; i < total; i++) {
               const TimeLineRecord& record = timeline[i];
-              datetime[i] = record.datetime.timestamp() * 1000LL;
-              price[i] = record.price;
-              vol[i] = record.vol;
+              datetime_ptr[i] = record.datetime.timestamp() * 1000LL;
+              price_ptr[i] = record.price;
+              vol_ptr[i] = record.vol;
           }
 
+          // 构建 DataFrame
           py::dict columns;
-          columns["datetime"] =
-            py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
-          columns["price"] = py::array_t<double>(total, price.data(), py::dtype("float64"));
-          columns["vol"] = py::array_t<double>(total, vol.data(), py::dtype("float64"));
+          columns["datetime"] = datetime_arr.attr("astype")("datetime64[ns]");
+          columns["price"] = price_arr;
+          columns["vol"] = vol_arr;
+
           return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
       },
       "将分时线记录转换为 DataFrame");

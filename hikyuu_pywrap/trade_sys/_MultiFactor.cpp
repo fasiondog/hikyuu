@@ -39,31 +39,66 @@ void export_MultiFactor(py::module& m) {
       .def_readwrite("value", &ScoreRecord::value, "分值");
 
     m.def("scorerecords_to_np", [](const ScoreRecordList& scs) {
-        struct RawData {
-            char code[40];
-            char name[80];
+        size_t total = scs.size();
+        HKU_IF_RETURN(total == 0, py::array());
+
+        struct alignas(8) RawData {
+            int32_t code[10] = {0};
+            int32_t name[20] = {0};
             double value;
         };
-        std::vector<RawData> data;
-        data.resize(scs.size());
+
+        // 使用 malloc 分配内存
+        RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
         std::string ucode, uname;
-        for (size_t i = 0, total = scs.size(); i < total; i++) {
+        for (size_t i = 0, len = scs.size(); i < len; i++) {
             const ScoreRecord& sc = scs[i];
-            ucode = utf8_to_utf32(sc.stock.market_code(), 10);
-            uname = utf8_to_utf32(sc.stock.name(), 20);
-            memset(data[i].code, 0, 40);
-            memset(data[i].name, 0, 80);
-            memcpy(data[i].code, ucode.c_str(), ucode.size() > 40 ? 40 : ucode.size());
-            memcpy(data[i].name, uname.c_str(), uname.size() > 80 ? 80 : uname.size());
+            utf8_to_utf32(sc.stock.market_code(), data[i].code, 10);
+            utf8_to_utf32(sc.stock.name(), data[i].name, 20);
             data[i].value = sc.value;
         }
+
         // 定义NumPy结构化数据类型
         py::dtype dtype =
           py::dtype(vector_to_python_list<string>({htr("market_code"), htr("name"), htr("score")}),
                     vector_to_python_list<string>({"U10", "U20", "d"}),
-                    vector_to_python_list<int64_t>({0, 40, 120}), 128);
+                    vector_to_python_list<int64_t>({0, 40, 120}), sizeof(RawData));
 
-        return py::array(dtype, data.size(), data.data());
+        // 使用 capsule 管理内存
+        return py::array(dtype, total, static_cast<RawData*>(data),
+                         py::capsule(data, [](void* p) { std::free(p); }));
+    });
+
+    m.def("scorerecords_to_df", [](const ScoreRecordList& scs) {
+        size_t total = scs.size();
+        if (total == 0) {
+            return py::module_::import("pandas").attr("DataFrame")();
+        }
+
+        // 创建 Python 字符串对象数组
+        py::list code_list(total);
+        py::list name_list(total);
+        py::array_t<double> value_arr(total);
+
+        // 获取 value 数组缓冲区
+        auto value_buf = value_arr.request();
+        double* value_ptr = static_cast<double*>(value_buf.ptr);
+
+        // 填充数据
+        for (size_t i = 0; i < total; i++) {
+            const ScoreRecord& sc = scs[i];
+            code_list[i] = py::str(sc.stock.market_code());
+            name_list[i] = py::str(sc.stock.name());
+            value_ptr[i] = sc.value;
+        }
+
+        // 构建 DataFrame
+        py::dict columns;
+        columns[htr("market_code").c_str()] = code_list;
+        columns[htr("name").c_str()] = name_list;
+        columns["score"] = value_arr;
+
+        return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
     });
 
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",

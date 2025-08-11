@@ -156,6 +156,7 @@ add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {
 add_requires("nng " .. nng_version, {system = false, configs = {NNG_ENABLE_TLS = has_config("http_client_ssl"), cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("xxhash", {system = false})
+add_requires("utf8proc", {system = false})
 
 if has_config("http_client_zip") then
     add_requires("gzip-hpp", {system = false})
