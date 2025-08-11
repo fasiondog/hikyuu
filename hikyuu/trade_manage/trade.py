@@ -34,32 +34,12 @@ import numpy as np
 import pandas as pd
 
 
-def TradeList_to_np(data):
-    """转化为numpy结构数组"""
-    return trades_to_np(data)
+TradeRecordList.to_np = lambda self: trades_to_np(self)
+TradeRecordList.to_df = lambda self: trades_to_df(self)
 
 
-def TradeList_to_df(data):
-    """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(trades_to_np(data))
-
-
-TradeRecordList.to_np = TradeList_to_np
-TradeRecordList.to_df = TradeList_to_df
-
-
-def PositionList_to_np(pos_list):
-    """转化为numpy结构数组"""
-    return positions_to_np(pos_list)
-
-
-def PositionList_to_df(pos_list):
-    """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(positions_to_np(pos_list))
-
-
-PositionRecordList.to_np = PositionList_to_np
-PositionRecordList.to_df = PositionList_to_df
+PositionRecordList.to_np = lambda self: positions_to_np(self)
+PositionRecordList.to_df = lambda self: positions_to_df(self)
 
 
 def Performance_to_df(per):

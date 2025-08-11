@@ -29,17 +29,7 @@ from .trade_sys import *
 from hikyuu.core import (ScoreRecordList, scorerecords_to_np, scorerecords_to_df, SystemWeightList, systemweights_to_np)
 
 
-def ScoreRecordList_to_np(data):
-    """ScoreRecordList 转换为 numpy.array"""
-    return scorerecords_to_np(data)
-
-
-def ScoreRecordList_to_df(data):
-    """ScoreRecordList 转换为 pandas.DataFrame"""
-    return pd.DataFrame.from_records(scorerecords_to_np(data))
-
-
-ScoreRecordList.to_np = ScoreRecordList_to_np
+ScoreRecordList.to_np = lambda self: scorerecords_to_np(self)
 ScoreRecordList.to_df = lambda self: scorerecords_to_df(self)
 
 

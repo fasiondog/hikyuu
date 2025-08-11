@@ -69,43 +69,38 @@ void export_TradeRecord(py::module& m) {
         DEF_PICKLE(TradeRecord);
 
     m.def("trades_to_np", [](const TradeRecordList& trades) {
-        struct RawData {
-            char code[40];
-            char name[80];
-            int64_t datetime;         // 交易日期
-            char business[80];        // 业务类型
-            double planPrice;         // 计划交易价格
-            double realPrice;         // 实际交易价格
-            double goalPrice;         // 目标价位，如果为0或Null表示未限定目标
-            double number;            // 成交数量
-            double stoploss;          // 止损价
-            double cash;              // 现金余额
-            double cost_total;        // 总成本
-            double cost_commission;   // 佣金
-            double cost_stamptax;     // 印花税
-            double cost_transferfee;  // 过户费
-            double cost_others;       // 其他费用
-            char sig_from[80];        // 信号部件来源
-            char remark[400];         // 备注
+        size_t total = trades.size();
+        HKU_IF_RETURN(total == 0, py::array());
+
+        struct alignas(8) RawData {
+            int32_t code[10] = {0};
+            int32_t name[20] = {0};
+            int64_t datetime;            // 交易日期
+            int32_t business[20] = {0};  // 业务类型
+            double planPrice;            // 计划交易价格
+            double realPrice;            // 实际交易价格
+            double goalPrice;            // 目标价位，如果为0或Null表示未限定目标
+            double number;               // 成交数量
+            double stoploss;             // 止损价
+            double cash;                 // 现金余额
+            double cost_total;           // 总成本
+            double cost_commission;      // 佣金
+            double cost_stamptax;        // 印花税
+            double cost_transferfee;     // 过户费
+            double cost_others;          // 其他费用
+            int32_t sig_from[20] = {0};  // 信号部件来源
+            int32_t remark[100] = {0};   // 备注
         };
 
-        std::vector<RawData> data;
-        data.resize(trades.size());
-        string ucode, uname, business, sig, remark;
+        RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
         for (size_t i = 0, total = trades.size(); i < total; i++) {
             const TradeRecord& t = trades[i];
-            memset(data[i].code, 0, 40);
-            memset(data[i].name, 0, 80);
             if (!t.stock.isNull()) {
-                ucode = utf8_to_utf32(t.stock.market_code(), 10);
-                uname = utf8_to_utf32(t.stock.name(), 20);
-                memcpy(data[i].code, ucode.c_str(), ucode.size() > 40 ? 40 : ucode.size());
-                memcpy(data[i].name, uname.c_str(), uname.size() > 80 ? 80 : uname.size());
+                utf8_to_utf32(t.stock.market_code(), data[i].code, 10);
+                utf8_to_utf32(t.stock.name(), data[i].name, 20);
             }
-            data[i].datetime = t.datetime.timestamp() / 1000LL;
-            business = utf8_to_utf32(getBusinessName(t.business), 20);
-            memset(data[i].business, 0, 80);
-            memcpy(data[i].business, business.c_str(), business.size() > 80 ? 80 : business.size());
+            data[i].datetime = t.datetime.timestamp() * 1000LL;
+            utf8_to_utf32(getBusinessName(t.business), data[i].business, 20);
             data[i].planPrice = t.planPrice;
             data[i].realPrice = t.realPrice;
             data[i].goalPrice = t.goalPrice;
@@ -117,12 +112,8 @@ void export_TradeRecord(py::module& m) {
             data[i].cost_stamptax = t.cost.stamptax;
             data[i].cost_transferfee = t.cost.transferfee;
             data[i].cost_others = t.cost.others;
-            sig = utf8_to_utf32(getSystemPartName(t.from), 20);
-            memset(data[i].sig_from, 0, 80);
-            memcpy(data[i].sig_from, sig.c_str(), sig.size() > 80 ? 80 : sig.size());
-            remark = utf8_to_utf32(t.remark, 100);
-            memset(data[i].remark, 0, 400);
-            memcpy(data[i].remark, remark.c_str(), remark.size() > 400 ? 400 : remark.size());
+            utf8_to_utf32(getSystemPartName(t.from), data[i].sig_from, 20);
+            utf8_to_utf32(t.remark, data[i].remark, 100);
         }
 
         py::dtype dtype = py::dtype(
@@ -131,12 +122,124 @@ void export_TradeRecord(py::module& m) {
              htr("realPrice"), htr("goalPrice"), htr("number"), htr("stoploss"), htr("cash"),
              htr("cost_total"), htr("cost_commission"), htr("cost_stamptax"),
              htr("cost_transferfee"), htr("cost_others"), htr("part_from"), htr("remark")}),
-          vector_to_python_list<string>({"U10", "U20", "datetime64[ms]", "U20", "d", "d", "d", "d",
+          vector_to_python_list<string>({"U10", "U20", "datetime64[ns]", "U20", "d", "d", "d", "d",
                                          "d", "d", "d", "d", "d", "d", "d", "U20", "U100"}),
           vector_to_python_list<int64_t>(
             {0, 40, 120, 128, 208, 216, 224, 232, 240, 248, 256, 264, 272, 280, 288, 296, 376}),
           776);
 
-        return py::array(dtype, data.size(), data.data());
+        return py::array(dtype, total, static_cast<RawData*>(data),
+                         py::capsule(data, [](void* p) { std::free(p); }));
     });
+
+    m.def(
+      "trades_to_df",
+      [](const TradeRecordList& trades) {
+          size_t total = trades.size();
+          if (total == 0) {
+              return py::module_::import("pandas").attr("DataFrame")();
+          }
+
+          // 创建各列数据容器
+          py::list code_list(total);
+          py::list name_list(total);
+          py::array_t<int64_t> datetime_arr(total);
+          py::list business_list(total);
+          py::array_t<double> planPrice_arr(total);
+          py::array_t<double> realPrice_arr(total);
+          py::array_t<double> goalPrice_arr(total);
+          py::array_t<double> number_arr(total);
+          py::array_t<double> stoploss_arr(total);
+          py::array_t<double> cash_arr(total);
+          py::array_t<double> cost_total_arr(total);
+          py::array_t<double> cost_commission_arr(total);
+          py::array_t<double> cost_stamptax_arr(total);
+          py::array_t<double> cost_transferfee_arr(total);
+          py::array_t<double> cost_others_arr(total);
+          py::list part_from_list(total);
+          py::list remark_list(total);
+
+          // 获取各数组缓冲区
+          auto datetime_buf = datetime_arr.request();
+          auto planPrice_buf = planPrice_arr.request();
+          auto realPrice_buf = realPrice_arr.request();
+          auto goalPrice_buf = goalPrice_arr.request();
+          auto number_buf = number_arr.request();
+          auto stoploss_buf = stoploss_arr.request();
+          auto cash_buf = cash_arr.request();
+          auto cost_total_buf = cost_total_arr.request();
+          auto cost_commission_buf = cost_commission_arr.request();
+          auto cost_stamptax_buf = cost_stamptax_arr.request();
+          auto cost_transferfee_buf = cost_transferfee_arr.request();
+          auto cost_others_buf = cost_others_arr.request();
+
+          int64_t* datetime_ptr = static_cast<int64_t*>(datetime_buf.ptr);
+          double* planPrice_ptr = static_cast<double*>(planPrice_buf.ptr);
+          double* realPrice_ptr = static_cast<double*>(realPrice_buf.ptr);
+          double* goalPrice_ptr = static_cast<double*>(goalPrice_buf.ptr);
+          double* number_ptr = static_cast<double*>(number_buf.ptr);
+          double* stoploss_ptr = static_cast<double*>(stoploss_buf.ptr);
+          double* cash_ptr = static_cast<double*>(cash_buf.ptr);
+          double* cost_total_ptr = static_cast<double*>(cost_total_buf.ptr);
+          double* cost_commission_ptr = static_cast<double*>(cost_commission_buf.ptr);
+          double* cost_stamptax_ptr = static_cast<double*>(cost_stamptax_buf.ptr);
+          double* cost_transferfee_ptr = static_cast<double*>(cost_transferfee_buf.ptr);
+          double* cost_others_ptr = static_cast<double*>(cost_others_buf.ptr);
+
+          // 填充数据
+          for (size_t i = 0; i < total; i++) {
+              const TradeRecord& t = trades[i];
+              if (!t.stock.isNull()) {
+                  code_list[i] = py::str(t.stock.market_code());
+                  name_list[i] = py::str(t.stock.name());
+              } else {
+                  code_list[i] = py::str("");
+                  name_list[i] = py::str("");
+              }
+              datetime_ptr[i] = t.datetime.timestamp() * 1000LL;
+              business_list[i] = py::str(getBusinessName(t.business));
+              planPrice_ptr[i] = t.planPrice;
+              realPrice_ptr[i] = t.realPrice;
+              goalPrice_ptr[i] = t.goalPrice;
+              number_ptr[i] = t.number;
+              stoploss_ptr[i] = t.stoploss;
+              cash_ptr[i] = t.cash;
+              cost_total_ptr[i] = t.cost.total;
+              cost_commission_ptr[i] = t.cost.commission;
+              cost_stamptax_ptr[i] = t.cost.stamptax;
+              cost_transferfee_ptr[i] = t.cost.transferfee;
+              cost_others_ptr[i] = t.cost.others;
+              part_from_list[i] = py::str(getSystemPartName(t.from));
+              remark_list[i] = py::str(t.remark);
+          }
+
+          // 构建 DataFrame
+          py::dict columns;
+          columns[htr("market_code").c_str()] = code_list;
+          columns[htr("name").c_str()] = name_list;
+          columns[htr("datetime").c_str()] = datetime_arr.attr("astype")("datetime64[ns]");
+          columns[htr("business").c_str()] = business_list;
+          columns[htr("planPrice").c_str()] = planPrice_arr;
+          columns[htr("realPrice").c_str()] = realPrice_arr;
+          columns[htr("goalPrice").c_str()] = goalPrice_arr;
+          columns[htr("number").c_str()] = number_arr;
+          columns[htr("stoploss").c_str()] = stoploss_arr;
+          columns[htr("cash").c_str()] = cash_arr;
+          columns[htr("cost_total").c_str()] = cost_total_arr;
+          columns[htr("cost_commission").c_str()] = cost_commission_arr;
+          columns[htr("cost_stamptax").c_str()] = cost_stamptax_arr;
+          columns[htr("cost_transferfee").c_str()] = cost_transferfee_arr;
+          columns[htr("cost_others").c_str()] = cost_others_arr;
+          columns[htr("part_from").c_str()] = part_from_list;
+          columns[htr("remark").c_str()] = remark_list;
+
+          return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
+      },
+      R"(trades_to_df(trades)
+
+    将交易记录列表转换为 pandas DataFrame
+
+    :param TradeRecordList trades: 交易记录列表
+    :return: 包含交易记录的 pandas DataFrame
+    :rtype: pandas.DataFrame)");
 }
