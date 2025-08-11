@@ -72,10 +72,8 @@ void export_PositionRecord(py::module& m) {
         RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
         for (size_t i = 0, total = positions.size(); i < total; i++) {
             const PositionRecord& p = positions[i];
-            if (!p.stock.isNull()) {
-                utf8_to_utf32(p.stock.market_code(), data[i].code, 10);
-                utf8_to_utf32(p.stock.name(), data[i].name, 20);
-            }
+            utf8_to_utf32(p.stock.market_code(), data[i].code, 10);
+            utf8_to_utf32(p.stock.name(), data[i].name, 20);
             data[i].take_datetime = p.takeDatetime.timestamp() * 1000LL;
             data[i].number = p.number;
             data[i].invest = p.buyMoney - p.sellMoney + p.totalCost;

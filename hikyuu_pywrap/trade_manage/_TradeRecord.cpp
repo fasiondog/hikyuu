@@ -73,10 +73,10 @@ void export_TradeRecord(py::module& m) {
         HKU_IF_RETURN(total == 0, py::array());
 
         struct alignas(8) RawData {
-            int32_t code[10]{0};
-            int32_t name[20]{0};
+            int32_t code[10];
+            int32_t name[20];
             int64_t datetime;         // 交易日期
-            int32_t business[20]{0};  // 业务类型
+            int32_t business[20];     // 业务类型
             double planPrice;         // 计划交易价格
             double realPrice;         // 实际交易价格
             double goalPrice;         // 目标价位，如果为0或Null表示未限定目标
@@ -88,8 +88,8 @@ void export_TradeRecord(py::module& m) {
             double cost_stamptax;     // 印花税
             double cost_transferfee;  // 过户费
             double cost_others;       // 其他费用
-            int32_t sig_from[20]{0};  // 信号部件来源
-            int32_t remark[100]{0};   // 备注
+            int32_t sig_from[20];     // 信号部件来源
+            int32_t remark[100];      // 备注
         };
 
         RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));

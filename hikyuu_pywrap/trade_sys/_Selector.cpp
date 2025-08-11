@@ -124,6 +124,10 @@ void export_Selector(py::module& m) {
                 utf8_to_utf32(sw.sys->name(), data[i].sys_name, 20);
                 utf8_to_utf32(sw.sys->getStock().market_code(), data[i].code, 10);
                 utf8_to_utf32(sw.sys->getStock().name(), data[i].name, 20);
+            } else {
+                memset(data[i].sys_name, 0, 20 * sizeof(int32_t));
+                memset(data[i].code, 0, 10 * sizeof(int32_t));
+                memset(data[i].name, 0, 20 * sizeof(int32_t));
             }
             data[i].weight = sw.weight;
         }

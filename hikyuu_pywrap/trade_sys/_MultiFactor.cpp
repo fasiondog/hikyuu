@@ -43,8 +43,8 @@ void export_MultiFactor(py::module& m) {
         HKU_IF_RETURN(total == 0, py::array());
 
         struct alignas(8) RawData {
-            int32_t code[10] = {0};
-            int32_t name[20] = {0};
+            int32_t code[10];
+            int32_t name[20];
             double value;
         };
 
