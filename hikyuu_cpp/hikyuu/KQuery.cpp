@@ -86,7 +86,7 @@ int32_t KQuery::getBaseKTypeInMin(const KType& ktype) {
 }
 
 bool KQuery::isValidKType(const string& ktype) {
-    return isBaseKType(ktype) || isExtraKType(ktype);
+    return isBaseKType(ktype) || hku::isExtraKType(ktype);
 }
 
 bool KQuery::isBaseKType(const string& ktype) {
