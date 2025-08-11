@@ -106,6 +106,15 @@ inline bool check_pyfunction_arg_num(py::object& func, size_t arg_num) {
     return len(params) == arg_num;
 }
 
+/*
+ * 将utf8编码的字符串转换为utf32编码
+ * @param utf8_str 待转换的字符串
+ * @param out 存储转换结果的数组(需自行预先分配内存)
+ * @param out_len out数组的长度
+ * @return 实际转码点数
+ */
+size_t utf8_to_utf32(const std::string& utf8_str, int32_t* out, size_t out_len) noexcept;
+
 }  // namespace hku
 
 #endif  // HIKYUU_PYTHON_BIND_UTILS_H

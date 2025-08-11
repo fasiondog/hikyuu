@@ -26,32 +26,13 @@
 
 import pandas as pd
 from .trade_sys import *
-from hikyuu.core import ScoreRecordList, scorerecords_to_np, SystemWeightList, systemweights_to_np
+from hikyuu.core import (ScoreRecordList, scorerecords_to_np, scorerecords_to_df,
+                         SystemWeightList, systemweights_to_np, systemweights_to_df)
 
 
-def ScoreRecordList_to_np(data):
-    """ScoreRecordList 转换为 numpy.array"""
-    return scorerecords_to_np(data)
+ScoreRecordList.to_np = lambda self: scorerecords_to_np(self)
+ScoreRecordList.to_df = lambda self: scorerecords_to_df(self)
 
 
-def ScoreRecordList_to_df(data):
-    """ScoreRecordList 转换为 pandas.DataFrame"""
-    return pd.DataFrame.from_records(scorerecords_to_np(data))
-
-
-ScoreRecordList.to_np = ScoreRecordList_to_np
-ScoreRecordList.to_df = ScoreRecordList_to_df
-
-
-def SystemWeightList_to_np(data):
-    """SystemWeightList 转换为 numpy.array"""
-    return systemweights_to_np(data)
-
-
-def SystemWeightList_to_df(data):
-    """SystemWeightList 转换为 pandas.DataFrame"""
-    return pd.DataFrame.from_records(systemweights_to_np(data))
-
-
-SystemWeightList.to_np = SystemWeightList_to_np
-SystemWeightList.to_df = SystemWeightList_to_df
+SystemWeightList.to_np = lambda self: systemweights_to_np(self)
+SystemWeightList.to_df = lambda self: systemweights_to_df(self)

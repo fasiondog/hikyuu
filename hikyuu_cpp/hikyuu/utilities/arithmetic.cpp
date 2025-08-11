@@ -14,8 +14,6 @@
 #include <iconv.h>
 #include <string.h>
 #include <iostream>
-#include <codecvt>
-#include <locale>
 #endif
 
 namespace hku {
@@ -121,56 +119,6 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput) {
     return gb_to_utf8(szinput.c_str());
 }
 
-std::string HKU_UTILS_API utf8_to_utf32(const std::string &utf8_str, size_t max_len) {
-    // 步骤 1：UTF-8 → UTF-16（Windows 原生宽字符）
-    int utf16_len = MultiByteToWideChar(CP_UTF8,           // 源编码：UTF-8
-                                        0,                 // 转换标志
-                                        utf8_str.c_str(),  // 输入 UTF-8 字符串
-                                        -1,                // 自动计算长度（包含空终止符）
-                                        nullptr,           // 输出缓冲区（先获取长度）
-                                        0                  // 输出缓冲区大小
-    );
-    if (utf16_len == 0) {
-        throw std::runtime_error("Failed convert UTF-8 to UTF-16!");
-    }
-
-    std::vector<wchar_t> utf16_buf(utf16_len);
-    if (!MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), -1, utf16_buf.data(), utf16_len)) {
-        throw std::runtime_error("Failed convert UTF-8 to UTF-16!");
-    }
-
-    // 步骤 2：UTF-16 → UTF-32（与 NumPy U 类型匹配）
-    std::vector<uint32_t> utf32_chars;
-    for (size_t i = 0; i < utf16_len - 1; ++i) {  // 排除最后的空终止符
-        wchar_t c = utf16_buf[i];
-        if (c >= 0xD800 && c <= 0xDBFF) {  // 高代理项
-            if (i + 1 < utf16_len - 1) {
-                wchar_t c2 = utf16_buf[i + 1];
-                if (c2 >= 0xDC00 && c2 <= 0xDFFF) {  // 低代理项
-                    // 组合为 UTF-32 字符
-                    uint32_t code = 0x10000 + ((c - 0xD800) << 10) + (c2 - 0xDC00);
-                    utf32_chars.push_back(code);
-                    i++;  // 跳过已处理的低代理项
-                    continue;
-                }
-            }
-        }
-        // 普通字符直接转换
-        utf32_chars.push_back(static_cast<uint32_t>(c));
-    }
-
-    // 步骤 3：截断或填充到 max_len 个字符（每个字符 4 字节）
-    if (utf32_chars.size() > max_len) {
-        utf32_chars.resize(max_len);
-    } else {
-        utf32_chars.resize(max_len, 0);  // 不足补 0（对应 L'\0'）
-    }
-
-    // 步骤 4：将 UTF-32 字符数组转为 std::string（存储原始字节）
-    return std::string(reinterpret_cast<const char *>(utf32_chars.data()),
-                       utf32_chars.size() * sizeof(uint32_t));
-}
-
 #else /* else for defined(_MSC_VER) */
 std::string HKU_UTILS_API utf8_to_gb(const std::string &szinput) {
     char *inbuf = const_cast<char *>(szinput.c_str());
@@ -202,19 +150,6 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput) {
     std::string result(outbuf);
     free(outbuf);
     return result;
-}
-
-std::string HKU_UTILS_API utf8_to_utf32(const std::string &str, size_t max_len) {
-    // 转换 UTF-8 到 UTF-32（wstring 存储）
-    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-    std::wstring wstr = converter.from_bytes(str);
-
-    // 截断或填充到指定长度（max_len 个字符）
-    wstr.resize(max_len, L'\0');  // 不足补空字符
-
-    // 将 wchar_t 数组的字节直接复制到 std::string 中
-    // 注意：std::string 在这里仅作为字节容器，不表示字符含义
-    return std::string(reinterpret_cast<const char *>(wstr.data()), wstr.size() * sizeof(wchar_t));
 }
 
 #endif /* defined(_MSC_VER) */

@@ -39,7 +39,7 @@ static std::unordered_set<string> g_all_base_ktype{
   KQuery::MIN,  KQuery::MIN5,  KQuery::MIN15,   KQuery::MIN30,    KQuery::MIN60, KQuery::DAY,
   KQuery::WEEK, KQuery::MONTH, KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::HOUR2};
 
-static const unordered_map<string, int32_t> g_ktype2min{
+static unordered_map<string, int32_t> g_ktype2min{
   {KQuery::MIN, 1},
   {KQuery::MIN3, 3},
 
@@ -48,9 +48,6 @@ static const unordered_map<string, int32_t> g_ktype2min{
   {KQuery::MIN30, 30},
   {KQuery::MIN60, 60},
   {KQuery::HOUR2, 60 * 2},
-  {KQuery::HOUR4, 60 * 4},
-  {KQuery::HOUR6, 60 * 6},
-  {KQuery::HOUR12, 60 * 12},
 
   {KQuery::DAY, 60 * 24},
   {KQuery::WEEK, 60 * 24 * 7},
@@ -73,17 +70,23 @@ vector<KQuery::KType> KQuery::getExtraKTypeList() {
     return hku::getExtraKTypeList();
 }
 
-int32_t KQuery::getKTypeInMin(KType ktype) {
+int32_t KQuery::getKTypeInMin(const KType& ktype) {
     string nktype(ktype);
     to_upper(nktype);
-    if (isExtraKType(nktype)) {
-        return getKTypeExtraMinutes(nktype);
-    }
+    auto iter = g_ktype2min.find(nktype);
+    HKU_IF_RETURN(iter != g_ktype2min.end(), iter->second);
+
+    return getKTypeExtraMinutes(nktype);
+}
+
+int32_t KQuery::getBaseKTypeInMin(const KType& ktype) {
+    string nktype(ktype);
+    to_upper(nktype);
     return g_ktype2min.at(nktype);
 }
 
 bool KQuery::isValidKType(const string& ktype) {
-    return isBaseKType(ktype) || isExtraKType(ktype);
+    return isBaseKType(ktype) || hku::isExtraKType(ktype);
 }
 
 bool KQuery::isBaseKType(const string& ktype) {
