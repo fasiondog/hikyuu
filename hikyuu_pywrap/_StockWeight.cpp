@@ -114,6 +114,6 @@ void export_StockWeight(py::module& m) {
         columns["freeCount"] = py::array_t<double>(total, freeCount.data(), py::dtype("float64"));
         columns["suogu"] = py::array_t<double>(total, suogu.data(), py::dtype("float64"));
 
-        return py::module_::import("pandas").attr("DataFrame")(columns);
+        return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
     });
 }

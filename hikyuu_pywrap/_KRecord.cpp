@@ -75,6 +75,7 @@ void export_KReord(py::module& m) {
     });
 
     m.def("krecords_to_df", [](const KRecordList& kdata) {
+        SPEND_TIME(to_df);
         size_t total = kdata.size();
         if (total == 0) {
             return py::module_::import("pandas").attr("DataFrame")();
@@ -104,6 +105,6 @@ void export_KReord(py::module& m) {
         columns["close"] = py::array_t<double>(total, close.data(), py::dtype("float64"));
         columns["amount"] = py::array_t<double>(total, amount.data(), py::dtype("float64"));
         columns["volume"] = py::array_t<double>(total, vol.data(), py::dtype("float64"));
-        return py::module_::import("pandas").attr("DataFrame")(columns);
+        return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
     });
 }

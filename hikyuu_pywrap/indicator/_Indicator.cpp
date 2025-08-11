@@ -338,7 +338,7 @@ set_context(self, stock, query)
             std::vector<string> fields;
             std::vector<int64_t> offsets;
             for (size_t i = 0; i < ret_num; i++) {
-                names.push_back(fmt::format("value{}", i));
+                names.push_back(fmt::format("value{}", i + 1));
                 fields.push_back("d");
                 if (i == 0) {
                     offsets.push_back(0);
@@ -394,11 +394,12 @@ set_context(self, stock, query)
                 for (size_t j = 0; j < total; j++) {
                     value[j] = src[j];
                 }
-                columns[fmt::format("value{}", i).c_str()] =
+                columns[fmt::format("value{}", i + 1).c_str()] =
                   py::array_t<double>(total, value.data(), py::dtype("float64"));
             }
 
-            return py::module_::import("pandas").attr("DataFrame")(columns);
+            return py::module_::import("pandas").attr("DataFrame")(columns,
+                                                                   py::arg("copy") = false);
         },
         "转换为 DataFrame")
 

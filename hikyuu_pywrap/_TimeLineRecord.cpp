@@ -80,7 +80,7 @@ void export_TimeLineReord(py::module& m) {
             py::array_t<int64_t>(total, datetime.data()).attr("astype")("datetime64[ns]");
           columns["price"] = py::array_t<double>(total, price.data(), py::dtype("float64"));
           columns["vol"] = py::array_t<double>(total, vol.data(), py::dtype("float64"));
-          return py::module_::import("pandas").attr("DataFrame")(columns);
+          return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
       },
       "将分时线记录转换为 DataFrame");
 }
