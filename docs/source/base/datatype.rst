@@ -456,10 +456,11 @@ K线数据
     
         :rtype: numpy.array
         
-    .. py:method:: to_df()
+    .. py:method:: to_df(with_stock=False)
     
         转化为pandas的DataFrame
         
+        :param bool with_stock: 包含Stock的代码与名称
         :rtype: pandas.DataFrame
 
 

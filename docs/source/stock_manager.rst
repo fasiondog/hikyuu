@@ -176,6 +176,13 @@ StockManager/Block/Stock
         :param int stk_type: 证券类型，参见： :py:data:`constant`
         :return: 对应的证券类型信息，如果不存在，则返回Null<StockTypeInfo>()
         :rtype: StockTypeInfo
+
+    .. py:method:: get_stock_type_list(self)
+
+        获取所有证券类型详细信息
+
+        :return: 所有证券类型详细信息
+        :rtype: DataFrame
         
     .. py:method:: get_stock(self, querystr)
     
