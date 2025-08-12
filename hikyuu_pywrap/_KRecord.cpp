@@ -32,6 +32,8 @@ void export_KReord(py::module& m) {
       .def_readwrite("amount", &KRecord::transAmount, "成交金额")
       .def_readwrite("volume", &KRecord::transCount, "成交量")
 
+      .def("is_valid", &KRecord::isValid, "KRecord是否有效")
+
       .def(py::self == py::self)
       .def(py::self != py::self)
 
