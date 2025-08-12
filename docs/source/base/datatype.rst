@@ -367,6 +367,10 @@ K线数据
     .. py:attribute:: amount   : 成交金额
     .. py:attribute:: volume   : 成交量
 
+    .. py:method:: is_valid(self)
+
+        判断该K线记录是否有效
+
     
 .. py:class:: KData
 

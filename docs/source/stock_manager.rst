@@ -409,11 +409,23 @@ StockManager/Block/Stock
         :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
         :rtype: list
     
-    .. py:method:: set_krecord_list(self, krecord_list)
+    .. py:method:: set_krecord_list(self, krecord_list[, ktype=Query.DAY])
 
         谨慎调用！！！直接设置当前内存 KRecordList, 仅供需临时增加的外部 Stock 设置 K 线数据
+        如果数据格式为 pandas.DataFrame, 可以使用 set_kdata_from_df 方法。
 
         :param sequence krecord_list: 一个可迭代变量获取 KRecord 实例的对象，如: list (仅包含 KRecord 实例)
+        :param Query.KType ktype: K线类别
+
+    .. py::method: set_kdata_from_df(self, df, cols, [ktype=Query.DAY])
+
+        谨慎调用！！！直接设置当前内存数据，意味着 Stock 的基础数据变更。
+        从 DataFrame 中获取 KRecordList, 并设置给当前Stock。df, 必须按顺序指定列名，默认为: ("datetime", "open", "high", "low", "close", "amount", "volume"))")
+
+        :param DataFrame df: 输入数据
+        :param list cols: 列名
+        :param Query.KType ktype: K线类别
+
 
     .. py:method:: realtime_update(self, krecord)
     
