@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-08-11 22:16+0800\n"
-"PO-Revision-Date: 2025-08-11 22:41+0800\n"
+"POT-Creation-Date: 2025-08-13 01:05+0800\n"
+"PO-Revision-Date: 2025-08-13 01:10+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -37,19 +37,19 @@ msgstr "{:<.2f} 秒数据加载完毕."
 msgid "Preloading {} kdata to buffer (max: {})!"
 msgstr "预加载 {} K线数据至缓存 (最大数量: {})!"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:476
+#: hikyuu_cpp/hikyuu/StockManager.cpp:486
 msgid "Loading stock information..."
 msgstr "加载证券信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:572
+#: hikyuu_cpp/hikyuu/StockManager.cpp:582
 msgid "Loading market information..."
 msgstr "加载市场信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:590
+#: hikyuu_cpp/hikyuu/StockManager.cpp:600
 msgid "Loading stock type information..."
 msgstr "加载证券类型信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:608
+#: hikyuu_cpp/hikyuu/StockManager.cpp:618
 msgid "Loading stock weight..."
 msgstr "加载权息数据……"
 
@@ -427,6 +427,34 @@ msgstr "[{}] 因一字跌停板，延迟至下一开盘卖空"
 #, c++-format
 msgid "[{}] delay to sell short, current amount == 0 or count == 0"
 msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时卖空"
+
+#: hikyuu_pywrap/_StockManager.cpp:155
+msgid "type"
+msgstr "证券类型"
+
+#: hikyuu_pywrap/_StockManager.cpp:156
+msgid "description"
+msgstr "描述说明"
+
+#: hikyuu_pywrap/_StockManager.cpp:159
+msgid "tick_value"
+msgstr "每tick价格"
+
+#: hikyuu_pywrap/_StockManager.cpp:160
+msgid "unit"
+msgstr "每单位价格"
+
+#: hikyuu_pywrap/_StockManager.cpp:161
+msgid "precision"
+msgstr "价格精度"
+
+#: hikyuu_pywrap/_StockManager.cpp:162
+msgid "minTradeNumber"
+msgstr "每笔最小交易数量"
+
+#: hikyuu_pywrap/_StockManager.cpp:163
+msgid "maxTradeNumber"
+msgstr "每笔最大交易数量"
 
 #: hikyuu_pywrap/indicator/_build_in.cpp:967
 msgid "WEAVE: total must be 2 to 6"

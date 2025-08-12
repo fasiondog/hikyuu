@@ -22,8 +22,6 @@
 
 namespace hku {
 
-typedef vector<string> MarketList;
-
 /**
  * 证券信息统一管理类
  * @ingroup StockManage
@@ -126,8 +124,11 @@ public:
      */
     StockTypeInfo getStockTypeInfo(uint32_t type) const;
 
+    /** 获取所有证券类型信息 */
+    vector<StockTypeInfo> getStockTypeInfoList() const;
+
     /** 获取市场简称列表 */
-    MarketList getAllMarket() const;
+    StringList getAllMarket() const;
 
     /**
      * 获取预定义的板块
