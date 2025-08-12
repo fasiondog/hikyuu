@@ -508,10 +508,7 @@ size_t Stock::getCount(KQuery::KType ktype) const {
     HKU_IF_RETURN(isNull(), 0);
     to_upper(ktype);
 
-    if (isExtraKType(ktype)) {
-        return getStockExtraCount(*this, ktype);
-
-    } else if (KQuery::isBaseKType(ktype)) {
+    if (KQuery::isBaseKType(ktype)) {
         if (isPreload(ktype) && !isBuffer(ktype)) {
             loadKDataToBuffer(ktype);
         }
@@ -523,7 +520,11 @@ size_t Stock::getCount(KQuery::KType ktype) const {
         return m_kdataDriver->getConnect()->getCount(market(), code(), ktype);
     }
 
-    HKU_ERROR("Invalid ktype: {}!", ktype);
+    if (isExtraKType(ktype)) {
+        return getStockExtraCount(*this, ktype);
+    }
+
+    HKU_ERROR("Invalid ktype: {}", ktype);
     return 0;
 }
 
@@ -534,17 +535,42 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
     string ktype(inktype);
     to_upper(ktype);
 
-    if (KQuery::isExtraKType(ktype)) {
-        KQuery query = KQueryByDate(datetime, datetime + Seconds(1), ktype);
-        auto k_list = getKRecordList(query);
-        if (k_list.size() > 0 && k_list[0].datetime == datetime) {
-            return k_list[0].closePrice;
+    if (KQuery::isBaseKType(ktype)) {
+        if (isPreload(ktype) && !isBuffer(ktype)) {
+            loadKDataToBuffer(ktype);
         }
 
-        query = KQueryByDate(startDatetime(), datetime, ktype);
-        k_list = getKRecordList(query);
-        if (k_list.size() > 0) {
-            return k_list[k_list.size() - 1].closePrice;
+        // 如果为内存缓存或者数据驱动为索引优先，则按索引方式获取
+        if (isBuffer(ktype) || m_kdataDriver->getConnect()->isIndexFirst()) {
+            KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
+            size_t out_start, out_end;
+            if (getIndexRange(query, out_start, out_end)) {
+                // 找到的是>=datetime的记录
+                KRecord k = getKRecord(out_start, ktype);
+                if (k.datetime == datetime) {
+                    return k.closePrice;
+                }
+                if (out_start != 0) {
+                    k = getKRecord(out_start - 1, ktype);
+                    return k.closePrice;
+                }
+            }
+
+        } else {
+            // 未在缓存中，且日期优先的情况下
+            // 先尝试获取等于该日期的K线数据
+            // 如未找到，则获取小于该日期的最后一条记录
+            KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
+            auto k_list = getKRecordList(query);
+            if (k_list.size() > 0 && k_list[0].datetime == datetime) {
+                return k_list[0].closePrice;
+            }
+
+            query = KQueryByDate(startDatetime(), datetime, ktype);
+            k_list = getKRecordList(query);
+            if (k_list.size() > 0) {
+                return k_list[k_list.size() - 1].closePrice;
+            }
         }
 
         // 没有找到，则取最后一条记录
@@ -557,14 +583,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
         return price;
     }
 
-    HKU_ERROR_IF_RETURN(!KQuery::isBaseKType(ktype), 0.0, "Invalid ktype: {}", ktype);
-
-    if (isPreload(ktype) && !isBuffer(ktype)) {
-        loadKDataToBuffer(ktype);
-    }
-
-    // 如果为内存缓存或者数据驱动为索引优先，则按索引方式获取
-    if (isBuffer(ktype) || m_kdataDriver->getConnect()->isIndexFirst()) {
+    if (KQuery::isExtraKType(ktype)) {
         KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
         size_t out_start, out_end;
         if (getIndexRange(query, out_start, out_end)) {
@@ -579,31 +598,18 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
             }
         }
 
-    } else {
-        // 未在缓存中，且日期优先的情况下
-        // 先尝试获取等于该日期的K线数据
-        // 如未找到，则获取小于该日期的最后一条记录
-        KQuery query = KQueryByDate(datetime, datetime + Seconds(1), ktype);
-        auto k_list = getKRecordList(query);
-        if (k_list.size() > 0 && k_list[0].datetime == datetime) {
-            return k_list[0].closePrice;
+        // 没有找到，则取最后一条记录
+        price_t price = 0.0;
+        size_t total = getCount(ktype);
+        if (total > 0) {
+            price = getKRecord(total - 1, ktype).closePrice;
         }
 
-        query = KQueryByDate(startDatetime(), datetime, ktype);
-        k_list = getKRecordList(query);
-        if (k_list.size() > 0) {
-            return k_list[k_list.size() - 1].closePrice;
-        }
+        return price;
     }
 
-    // 没有找到，则取最后一条记录
-    price_t price = 0.0;
-    size_t total = getCount(ktype);
-    if (total > 0) {
-        price = getKRecord(total - 1, ktype).closePrice;
-    }
-
-    return price;
+    HKU_ERROR("Invalid ktype: {}", ktype);
+    return 0.0;
 }
 
 bool Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end) const {
@@ -611,10 +617,7 @@ bool Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_en
     out_end = 0;
     HKU_IF_RETURN(!m_data || !m_kdataDriver, false);
 
-    if (KQuery::isExtraKType(query.kType())) {
-        return getStockExtraIndexRange(*this, query, out_start, out_end);
-
-    } else if (KQuery::isBaseKType(query.kType())) {
+    if (KQuery::isBaseKType(query.kType())) {
         if (isPreload(query.kType()) && !isBuffer(query.kType())) {
             loadKDataToBuffer(query.kType());
         }
@@ -637,6 +640,10 @@ bool Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_en
         }
 
         return true;
+    }
+
+    if (KQuery::isExtraKType(query.kType())) {
+        return getStockExtraIndexRange(*this, query, out_start, out_end);
     }
 
     HKU_ERROR("Invalid query type: {}", query.kType());
@@ -773,11 +780,7 @@ KRecord Stock::_getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) con
 KRecord Stock::getKRecord(size_t pos, const KQuery::KType& kType) const {
     HKU_IF_RETURN(!m_data, Null<KRecord>());
 
-    if (KQuery::isExtraKType(kType)) {
-        auto ks = getExtraKRecordList(*this, KQueryByIndex(pos, pos + 1, kType));
-        return ks.empty() ? Null<KRecord>() : ks[0];
-
-    } else if (KQuery::isBaseKType(kType)) {
+    if (KQuery::isBaseKType(kType)) {
         if (isPreload(kType) && !isBuffer(kType)) {
             loadKDataToBuffer(kType);
         }
@@ -792,6 +795,11 @@ KRecord Stock::getKRecord(size_t pos, const KQuery::KType& kType) const {
         return klist.size() > 0 ? klist[0] : Null<KRecord>();
     }
 
+    if (KQuery::isExtraKType(kType)) {
+        auto ks = getExtraKRecordList(*this, KQueryByIndex(pos, pos + 1, kType));
+        return ks.empty() ? Null<KRecord>() : ks[0];
+    }
+
     HKU_ERROR("Invalid KType: {}", kType);
     return Null<KRecord>();
 }
@@ -800,11 +808,7 @@ KRecord Stock::getKRecord(const Datetime& datetime, const KQuery::KType& ktype) 
     KRecord result;
     HKU_IF_RETURN(isNull(), result);
 
-    if (KQuery::isExtraKType(ktype)) {
-        auto ks = getExtraKRecordList(*this, KQueryByDate(datetime, datetime + Seconds(1), ktype));
-        return ks.empty() ? Null<KRecord>() : ks[0];
-
-    } else if (KQuery::isBaseKType(ktype)) {
+    if (KQuery::isBaseKType(ktype)) {
         if (isPreload(ktype) && !isBuffer(ktype)) {
             loadKDataToBuffer(ktype);
         }
@@ -819,6 +823,11 @@ KRecord Stock::getKRecord(const Datetime& datetime, const KQuery::KType& ktype) 
 
         auto klist = driver->getKRecordList(market(), code(), query);
         return klist.size() > 0 ? klist[0] : Null<KRecord>();
+    }
+
+    if (KQuery::isExtraKType(ktype)) {
+        auto ks = getExtraKRecordList(*this, KQueryByDate(datetime, datetime + Minutes(1), ktype));
+        return ks.empty() ? Null<KRecord>() : ks[0];
     }
 
     HKU_ERROR("Invalid ktype: {}", ktype);

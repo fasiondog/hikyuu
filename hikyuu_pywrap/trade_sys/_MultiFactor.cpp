@@ -38,6 +38,72 @@ void export_MultiFactor(py::module& m) {
       .def_readwrite("stock", &ScoreRecord::stock, "证券")
       .def_readwrite("value", &ScoreRecord::value, "分值");
 
+    m.def("scorerecords_to_np", [](const ScoreRecordList& scs) {
+        size_t total = scs.size();
+        HKU_IF_RETURN(total == 0, py::array());
+
+        struct alignas(8) RawData {
+            int32_t code[10];
+            int32_t name[20];
+            double value;
+        };
+
+        // 使用 malloc 分配内存
+        RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+        std::string ucode, uname;
+        for (size_t i = 0, len = scs.size(); i < len; i++) {
+            const ScoreRecord& sc = scs[i];
+            utf8_to_utf32(sc.stock.market_code(), data[i].code, 10);
+            utf8_to_utf32(sc.stock.name(), data[i].name, 20);
+            data[i].value = sc.value;
+        }
+
+        // 定义NumPy结构化数据类型
+        py::dtype dtype =
+          py::dtype(vector_to_python_list<string>({htr("market_code"), htr("name"), htr("score")}),
+                    vector_to_python_list<string>({"U10", "U20", "d"}),
+                    vector_to_python_list<int64_t>({0, 40, 120}), sizeof(RawData));
+
+        // 使用 capsule 管理内存
+        return py::array(dtype, total, static_cast<RawData*>(data),
+                         py::capsule(data, [](void* p) { std::free(p); }));
+    });
+
+    m.def("scorerecords_to_df", [](const ScoreRecordList& scs) {
+        size_t total = scs.size();
+        if (total == 0) {
+            return py::module_::import("pandas").attr("DataFrame")();
+        }
+
+        // 创建 Python 字符串对象数组
+        py::list code_list(total);
+        py::list name_list(total);
+        py::array_t<double> value_arr(total);
+
+        // 获取 value 数组缓冲区
+        auto value_buf = value_arr.request();
+        double* value_ptr = static_cast<double*>(value_buf.ptr);
+
+        // 填充数据
+        for (size_t i = 0; i < total; i++) {
+            const ScoreRecord& sc = scs[i];
+            code_list[i] = py::str(sc.stock.market_code());
+            name_list[i] = py::str(sc.stock.name());
+            value_ptr[i] = sc.value;
+        }
+
+        // 构建 DataFrame
+        auto pandas = py::module_::import("pandas");
+        py::dict columns;
+        columns[htr("market_code").c_str()] =
+          pandas.attr("Series")(code_list, py::arg("dtype") = "string");
+        columns[htr("name").c_str()] =
+          pandas.attr("Series")(name_list, py::arg("dtype") = "string");
+        columns["score"] = value_arr;
+
+        return pandas.attr("DataFrame")(columns, py::arg("copy") = false);
+    });
+
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",
                                                                py::dynamic_attr(),
                                                                R"(市场环境判定策略基类

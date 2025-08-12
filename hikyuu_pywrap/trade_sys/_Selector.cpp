@@ -106,6 +106,88 @@ void export_Selector(py::module& m) {
 
         DEF_PICKLE(SystemWeight);
 
+    m.def("systemweights_to_np", [](const SystemWeightList& swl) {
+        size_t total = swl.size();
+        HKU_IF_RETURN(total == 0, py::array());
+
+        struct alignas(8) RawData {
+            int32_t sys_name[20];
+            int32_t code[10];
+            int32_t name[20];
+            double weight;
+        };
+
+        RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+        for (size_t i = 0, total = swl.size(); i < total; i++) {
+            const SystemWeight& sw = swl[i];
+            if (sw.sys) {
+                utf8_to_utf32(sw.sys->name(), data[i].sys_name, 20);
+                utf8_to_utf32(sw.sys->getStock().market_code(), data[i].code, 10);
+                utf8_to_utf32(sw.sys->getStock().name(), data[i].name, 20);
+            } else {
+                memset(data[i].sys_name, 0, 20 * sizeof(int32_t));
+                memset(data[i].code, 0, 10 * sizeof(int32_t));
+                memset(data[i].name, 0, 20 * sizeof(int32_t));
+            }
+            data[i].weight = sw.weight;
+        }
+        // 定义NumPy结构化数据类型
+        py::dtype dtype =
+          py::dtype(vector_to_python_list<string>(
+                      {htr("sys_name"), htr("market_code"), htr("stock_name"), htr("weight")}),
+                    vector_to_python_list<string>({"U20", "U10", "U20", "d"}),
+                    vector_to_python_list<int64_t>({0, 80, 120, 200}), 208);
+
+        return py::array(dtype, total, static_cast<RawData*>(data),
+                         py::capsule(data, [](void* p) { std::free(p); }));
+    });
+
+    m.def("systemweights_to_df", [](const SystemWeightList& sws) {
+        size_t total = sws.size();
+        if (total == 0) {
+            return py::module_::import("pandas").attr("DataFrame")();
+        }
+
+        // 创建 Python 字符串对象数组
+        py::list sysname_list(total);
+        py::list code_list(total);
+        py::list name_list(total);
+        py::array_t<double> value_arr(total);
+
+        // 获取 value 数组缓冲区
+        auto value_buf = value_arr.request();
+        double* value_ptr = static_cast<double*>(value_buf.ptr);
+
+        // 填充数据
+        for (size_t i = 0; i < total; i++) {
+            const SystemWeight& sw = sws[i];
+            if (sw.sys) {
+                sysname_list[i] = py::str(sw.sys->name());
+                code_list[i] = py::str(sw.sys->getStock().market_code());
+                name_list[i] = py::str(sw.sys->getStock().name());
+                value_ptr[i] = sw.weight;
+            } else {
+                sysname_list[i] = py::str("");
+                code_list[i] = py::str("");
+                name_list[i] = py::str("");
+                value_ptr[i] = Null<double>();
+            }
+        }
+
+        // 构建 DataFrame
+        auto pandas = py::module_::import("pandas");
+        py::dict columns;
+        columns[htr("sys_name").c_str()] =
+          pandas.attr("Series")(sysname_list, py::arg("dtype") = "string");
+        columns[htr("market_code").c_str()] =
+          pandas.attr("Series")(code_list, py::arg("dtype") = "string");
+        columns[htr("stock_name").c_str()] =
+          pandas.attr("Series")(name_list, py::arg("dtype") = "string");
+        columns["weight"] = value_arr;
+
+        return pandas.attr("DataFrame")(columns, py::arg("copy") = false);
+    });
+
     py::class_<SelectorBase, SEPtr, PySelectorBase>(
       m, "SelectorBase",
       R"(选择器策略基类，实现标的、系统策略的评估和选取算法，自定义选择器策略子类接口：

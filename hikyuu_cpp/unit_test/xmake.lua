@@ -43,9 +43,8 @@ function prepare_run(target)
       print("copying test_data ...")
       os.rm("$(builddir)/$(mode)/$(plat)/$(arch)/lib/test_data")
       os.cp("$(projectdir)/test_data", "$(builddir)/$(mode)/$(plat)/$(arch)/lib/")
-      if get_config("mo") then
-        os.cp("$(projectdir)/i18n", "$(builddir)/$(mode)/$(plat)/$(arch)/lib/")
-      end
+      os.cp("$(projectdir)/hikyuu/plugin", "$(builddir)/$(mode)/$(plat)/$(arch)/lib/")
+      os.cp("$(projectdir)/i18n", "$(builddir)/$(mode)/$(plat)/$(arch)/lib/")
       print("copy finished")
     end
 end

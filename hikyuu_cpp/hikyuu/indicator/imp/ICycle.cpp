@@ -71,7 +71,7 @@ static void calculate_no_delay(const DatetimeList& datelist, int adjust_cycle, c
                 cur_cycle_end = date.nextWeek();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             buf[i] = adjust;
         }
@@ -84,7 +84,7 @@ static void calculate_no_delay(const DatetimeList& datelist, int adjust_cycle, c
                 cur_cycle_end = date.nextMonth();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             buf[i] = adjust;
         }
@@ -97,7 +97,7 @@ static void calculate_no_delay(const DatetimeList& datelist, int adjust_cycle, c
                 cur_cycle_end = date.nextQuarter();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             buf[i] = adjust;
         }
@@ -110,7 +110,7 @@ static void calculate_no_delay(const DatetimeList& datelist, int adjust_cycle, c
                 cur_cycle_end = date.nextYear();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             buf[i] = adjust;
         }
@@ -139,7 +139,7 @@ static void calculate_delay(const DatetimeList& datelist, int adjust_cycle, cons
                 cur_cycle_end = date.nextWeek();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             buf[i] = adjust;
@@ -164,7 +164,7 @@ static void calculate_delay(const DatetimeList& datelist, int adjust_cycle, cons
                 cur_cycle_end = date.nextMonth();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             buf[i] = adjust;
@@ -189,7 +189,7 @@ static void calculate_delay(const DatetimeList& datelist, int adjust_cycle, cons
                 cur_cycle_end = date.nextQuarter();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             buf[i] = adjust;
@@ -214,7 +214,7 @@ static void calculate_delay(const DatetimeList& datelist, int adjust_cycle, cons
                 cur_cycle_end = date.nextYear();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             buf[i] = adjust;

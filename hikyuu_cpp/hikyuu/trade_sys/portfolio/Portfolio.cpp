@@ -97,7 +97,7 @@ void Portfolio::baseCheckParam(const string& name) const {
 
     } else if ("trace" == name) {
         if (getParam<bool>("trace") && pythonInJupyter()) {
-            HKU_THROW("You can't trace in jupyter!");
+            HKU_THROW(htr("You can't trace in jupyter!"));
         }
     }
 }
@@ -154,11 +154,11 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
     if (trace && adjust) {
         HKU_INFO("****************************************************");
         HKU_INFO("**                                                **");
-        HKU_INFO(_tr("**  [PF] Position adjustment will be made today.  **"));
+        HKU_INFO(htr("**  [PF] Position adjustment will be made today.  **"));
         HKU_INFO("**                                                **");
         HKU_INFO("****************************************************");
     }
-    HKU_INFO_IF(trace, "[PF] current running system size: {}", m_running_sys_set.size());
+    HKU_INFO_IF(trace, htr("[PF] current running system size: {}"), m_running_sys_set.size());
 
     // 开盘前，调整账户权息
     m_tm->updateWithWeight(date);
@@ -173,7 +173,7 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
     // 跟踪打印当前账户资产
     if (trace) {
         FundsRecord funds = m_tm->getFunds(date, m_query.kType());
-        HKU_INFO("[PF] total asset: {:.2f}, current cash: {:<.2f}, market value: {:<.2f}",
+        HKU_INFO(htr("[PF] total asset: {:.2f}, current cash: {:<.2f}, market value: {:<.2f}"),
                  funds.total_assets(), funds.cash, funds.market_value);
     }
 }
@@ -187,7 +187,7 @@ void Portfolio::run(const KQuery& query, bool force) {
     to_lower(mode);
     if (mode != "query") {
         HKU_CHECK(query.kType() == KQuery::DAY,
-                  R"(The kType of query({}) must be DAY when adjust_mode is not "query"!)",
+                  htr("The kType of query({}) must be DAY when adjust_mode is not \"query\"!"),
                   query.kType());
     }
 
@@ -201,7 +201,7 @@ void Portfolio::run(const KQuery& query, bool force) {
     readyForRun();
 
     if (m_real_sys_list.empty()) {
-        HKU_WARN("There is no system in portfolio!");
+        HKU_WARN(htr("There is no system in portfolio!"));
         m_need_calculate = true;
         return;
     }
@@ -218,7 +218,7 @@ void Portfolio::run(const KQuery& query, bool force) {
                 adjust = true;
                 cur_adjust_ix += adjust_cycle;
                 cur_cycle_end =
-                  cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Seconds(1);
+                  cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Minutes(1);
             }
 
             const auto& date = datelist[i];
@@ -244,7 +244,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
                 cur_cycle_end = date.nextWeek();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             runMoment(date, cur_cycle_end, adjust);
         }
@@ -257,7 +257,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
                 cur_cycle_end = date.nextMonth();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             runMoment(date, cur_cycle_end, adjust);
         }
@@ -270,7 +270,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
                 cur_cycle_end = date.nextQuarter();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             runMoment(date, cur_cycle_end, adjust);
         }
@@ -283,7 +283,7 @@ void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const
                 cur_cycle_end = date.nextYear();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
             runMoment(date, cur_cycle_end, adjust);
         }
@@ -312,7 +312,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = date.nextWeek();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             runMoment(date, cur_cycle_end, adjust);
@@ -337,7 +337,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = date.nextMonth();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             runMoment(date, cur_cycle_end, adjust);
@@ -362,7 +362,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = date.nextQuarter();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             runMoment(date, cur_cycle_end, adjust);
@@ -387,7 +387,7 @@ void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int ad
                 cur_cycle_end = date.nextYear();
             }
             if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Seconds(1);
+                cur_cycle_end = datelist.back() + Minutes(1);
             }
 
             runMoment(date, cur_cycle_end, adjust);

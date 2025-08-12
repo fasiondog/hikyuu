@@ -24,4 +24,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import pandas as pd
 from .trade_sys import *
+from hikyuu.core import (ScoreRecordList, scorerecords_to_np, scorerecords_to_df,
+                         SystemWeightList, systemweights_to_np, systemweights_to_df)
+
+
+ScoreRecordList.to_np = lambda self: scorerecords_to_np(self)
+ScoreRecordList.to_df = lambda self: scorerecords_to_df(self)
+
+
+SystemWeightList.to_np = lambda self: systemweights_to_np(self)
+SystemWeightList.to_df = lambda self: systemweights_to_df(self)

@@ -105,4 +105,7 @@ std::string HKU_UTILS_API getPlatform();
 /** 获取当前CPU架构名称 */
 std::string HKU_UTILS_API getCpuArch();
 
+/** 获取当前系统语言名称(全部小写返回) */
+std::string HKU_UTILS_API getSystemLanguage();
+
 }  // namespace hku

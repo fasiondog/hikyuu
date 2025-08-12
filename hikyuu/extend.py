@@ -210,64 +210,32 @@ Query.__init__ = new_Query_init
 # ------------------------------------------------------------------
 # 增加转化为 np.array、pandas.DataFrame 的功能
 # ------------------------------------------------------------------
-def KData_to_df(kdata):
-    """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(kdata.to_np())
+def DatetimeList_to_np(data: DatetimeList):
+    return dates_to_np(data)
 
 
-KData.to_df = KData_to_df
-
-
-def DatetimeList_to_np(data: DatetimeList, unit: str = 'ms'):
-    """
-    DatetimeList转化为numpy结构数组
-
-    :param unit: 'Y' | 'M' | 'D' | 'W' | 'h' | 'ms' | 'us' | 's'
-    :return: numpy结构数组
-    """
-    return dates_to_np(data, unit)
-
-
-def DatetimeList_to_df(data: DatetimeList, unit: str = 'ms'):
-    """
-    DatetimeList转化为pandas的DataFrame
-
-    :param unit: 'Y' | 'M' | 'D' | 'W' | 'h' | 'ms' | 'us' | 's'
-    :return: pandas的DataFrame
-    """
-    return pd.DataFrame.from_records(dates_to_np(data, unit))
+def DatetimeList_to_df(data: DatetimeList):
+    return pd.DataFrame.from_records(dates_to_np(data))
 
 
 DatetimeList.to_np = DatetimeList_to_np
 DatetimeList.to_df = DatetimeList_to_df
 
 
-def TimeLine_to_np(data):
-    """转化为numpy结构数组"""
-    return timeline_to_np(data)
+TimeLineList.to_np = lambda data: timeline_to_np(data)
+TimeLineList.to_df = lambda data: timeline_to_df(data)
 
 
-def TimeLine_to_df(data):
-    """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(timeline_to_np(data))
+TransList.to_np = lambda data: translist_to_np(data)
+TransList.to_df = lambda data: translist_to_df(data)
 
 
-TimeLineList.to_np = TimeLine_to_np
-TimeLineList.to_df = TimeLine_to_df
+StockWeightList.to_np = lambda data: weights_to_np(data)
+StockWeightList.to_df = lambda data: weights_to_df(data)
 
 
-def TransList_to_np(data):
-    """转化为numpy结构数组"""
-    return translist_to_np(data)
-
-
-def TransList_to_df(data):
-    """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(translist_to_np(data))
-
-
-TransList.to_np = TransList_to_np
-TransList.to_df = TransList_to_df
+KRecordList.to_np = lambda data: krecords_to_np(data)
+KRecordList.to_df = lambda data: krecords_to_df(data)
 
 # ------------------------------------------------------------------
 # 增强 Parameter

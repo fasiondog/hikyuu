@@ -102,6 +102,8 @@ void GlobalInitializer::clean() {
 #endif
 
     releaseScheduler();
+
+    nng_fini();
     releaseGlobalSpotAgent();
 
     IndicatorImp::releaseDynEngine();

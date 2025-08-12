@@ -44,8 +44,12 @@ void init_hikyuu_test() {
     std::string config_file(fmt::format("{}/hikyuu_linux.ini", current));
 #endif
 
+    auto plugin_path = fmt::format("{}/plugin", getCurrentDir());
+    StockManager::instance().setPluginPath(plugin_path);
+
     fmt::print("configure file: {}\n", config_file);
     hikyuu_init(config_file);
+    fmt::print("current plugin path: {}\n", StockManager::instance().getPluginPath());
 
     std::string tmp_dir(fmt::format("{}/tmp", current));
     createDir(tmp_dir);

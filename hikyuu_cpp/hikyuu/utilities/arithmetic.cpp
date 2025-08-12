@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <stdexcept>
 #include "arithmetic.h"
 
 #if defined(_MSC_VER)
