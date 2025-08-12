@@ -304,7 +304,12 @@ void export_KData(py::module& m) {
 
             return pandas.attr("DataFrame")(columns, py::arg("copy") = false);
         },
-        py::arg("with_stock") = false)
+        py::arg("with_stock") = false, R"(to_df(self, with_stock=False) -> pandas.DataFrame
+
+    转化为pandas的DataFrame
+        
+    :param bool with_stock: 包含Stock的代码与名称
+    :rtype: pandas.DataFrame)")
 
         DEF_PICKLE(KData);
 }
