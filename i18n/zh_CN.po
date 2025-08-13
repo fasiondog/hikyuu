@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-08-13 01:05+0800\n"
-"PO-Revision-Date: 2025-08-13 01:10+0800\n"
+"POT-Creation-Date: 2025-08-13 17:36+0800\n"
+"PO-Revision-Date: 2025-08-13 17:47+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -428,6 +428,88 @@ msgstr "[{}] 因一字跌停板，延迟至下一开盘卖空"
 msgid "[{}] delay to sell short, current amount == 0 or count == 0"
 msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时卖空"
 
+#: hikyuu_pywrap/_MarketView.cpp:104
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:105
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:234
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:217
+#: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:63
+#: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:98
+#: hikyuu_pywrap/trade_sys/_Selector.cpp:137
+#: hikyuu_pywrap/trade_sys/_Selector.cpp:182
+msgid "market_code"
+msgstr "证券代码"
+
+#: hikyuu_pywrap/_MarketView.cpp:106
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:105
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:236
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:219
+#: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:63
+#: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:100
+msgid "name"
+msgstr "证券名称"
+
+#: hikyuu_pywrap/_MarketView.cpp:108
+msgid "date"
+msgstr "日期"
+
+#: hikyuu_pywrap/_MarketView.cpp:109
+msgid "open"
+msgstr "开盘价"
+
+#: hikyuu_pywrap/_MarketView.cpp:110
+msgid "high"
+msgstr "最高价"
+
+#: hikyuu_pywrap/_MarketView.cpp:111
+msgid "low"
+msgstr "最低价"
+
+#: hikyuu_pywrap/_MarketView.cpp:112
+msgid "close"
+msgstr "收盘价"
+
+#: hikyuu_pywrap/_MarketView.cpp:113
+msgid "amount"
+msgstr "成交金额"
+
+#: hikyuu_pywrap/_MarketView.cpp:114
+msgid "volume"
+msgstr "成交量"
+
+#: hikyuu_pywrap/_MarketView.cpp:115
+msgid "yesterday_close"
+msgstr "昨收价"
+
+#: hikyuu_pywrap/_MarketView.cpp:116
+msgid "price_change(%)"
+msgstr "涨跌幅（%）"
+
+#: hikyuu_pywrap/_MarketView.cpp:117
+msgid "amplitude(%)"
+msgstr "振幅(%)"
+
+#: hikyuu_pywrap/_MarketView.cpp:118
+msgid "turnover(%)"
+msgstr "换手率(%)"
+
+#: hikyuu_pywrap/_MarketView.cpp:119
+msgid "total_market_cap(W)"
+msgstr "总市值"
+
+#: hikyuu_pywrap/_MarketView.cpp:120
+msgid "circulating_market_cap(W)"
+msgstr "流通市值"
+
+#: hikyuu_pywrap/_MarketView.cpp:121
+msgid "pb"
+msgstr "市净率"
+
+#: hikyuu_pywrap/_MarketView.cpp:122
+msgid "pe"
+msgstr "动态市盈率"
+
 #: hikyuu_pywrap/_StockManager.cpp:155
 msgid "type"
 msgstr "证券类型"
@@ -463,26 +545,6 @@ msgstr "WEAVE指标输入参数数量需大于等2并小于等于6"
 #: hikyuu_pywrap/plugin/_backtest.cpp:22
 msgid "on_bar is not callable!"
 msgstr "on_bar 不可调用！"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:105
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:234
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:217
-#: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:63
-#: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:98
-#: hikyuu_pywrap/trade_sys/_Selector.cpp:137
-#: hikyuu_pywrap/trade_sys/_Selector.cpp:182
-msgid "market_code"
-msgstr "证券代码"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:105
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:236
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:219
-#: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:63
-#: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:100
-msgid "name"
-msgstr "证券名称"
 
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:105
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:238
