@@ -40,6 +40,7 @@ void export_hkuextra(py::module& m) {
     1. Hikyuu 已内建了基于Bar数量的的DAY3、DAY5、DAY7, 和基于时间转换的 MIN3 扩展K线
     2. 建议使用 hub c++ 部件的方式创建自定义K线类型周期结束点计算转换函数, 因为 python 带有 GIL 锁, 
        创建转换函数时将可能导致无法使用多线程进行计算
+    3. 注册动态K线是非线程安全的, 请在注册完毕后再进行其他操作
     
     :param str ktype: 扩展K线类型名称
     :param str basetype: 基础K线类型名称

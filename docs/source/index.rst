@@ -35,7 +35,6 @@ Welcome to Hikyuu's documentation!
    :caption: VIP捐赠
    :name: VIP features
 
-   vip/vip-plan.md
    vip/index.rst
 
 
