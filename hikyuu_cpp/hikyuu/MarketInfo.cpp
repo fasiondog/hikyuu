@@ -56,7 +56,7 @@ MarketInfo::MarketInfo(MarketInfo&& rhs)
   m_openTime2(std::move(rhs.m_openTime2)),
   m_closeTime2(std::move(rhs.m_closeTime2)) {}
 
-MarketInfo& MarketInfo::operator=(MarketInfo&& rhs) {
+MarketInfo& MarketInfo::operator=(MarketInfo&& rhs) noexcept {
     if (this != &rhs) {
         m_market = std::move(rhs.m_market);
         m_name = std::move(rhs.m_name);

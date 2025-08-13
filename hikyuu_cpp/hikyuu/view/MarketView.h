@@ -37,7 +37,18 @@ struct HKU_API MarketViewRecord {
 using MarketView = vector<MarketViewRecord>;
 
 /**
- * @brief 获取指定股票的行情数据（最后交易日数据），不包含停牌无最后交易日的股票数据
+ * 获取指定股票集合在指定交易日的行情数据，不包含当日停牌无数据的股票
+ * @ingroup View
+ * @param stks 股票列表
+ * @param date 交易日
+ * @param market 市场代码（用于获取交易日历）
+ * @return MarketView
+ */
+MarketView HKU_API getMarketView(const StockList& stks, const Datetime& date,
+                                 const string& market = "SH");
+
+/**
+ * 获取指定股票集合在最后交易日的行情数据，不包含当日停牌无数据的股票。如自动接收行情数据，则为实时行情数据
  * @ingroup View
  * @param stks 股票列表
  * @param market 市场代码（用于获取交易日历）

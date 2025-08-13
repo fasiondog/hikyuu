@@ -15,10 +15,24 @@
 
 namespace hku {
 
-MarketView HKU_API getMarketView(const StockList& stks, const string& market) {
+MarketView HKU_API getMarketView(const StockList& stks, const Datetime& date,
+                                 const string& market) {
     MarketView ret;
-    DatetimeList dates = StockManager::instance().getTradingCalendar(KQueryByIndex(-2), market);
-    HKU_IF_RETURN(dates.size() < 2, ret);  // 小于两个交易日暂时不处理
+    auto& sm = StockManager::instance();
+    MarketInfo info = sm.getMarketInfo(market);
+    HKU_IF_RETURN(info.code().empty(), ret);
+
+    Stock market_stk = sm.getStock(fmt::format("{}{}", market, info.code()));
+    HKU_IF_RETURN(market_stk.isNull(), ret);
+
+    size_t start_pos, end_pos;
+    HKU_IF_RETURN(!market_stk.getIndexRange(KQueryByDate(date.startOfDay(), date.nextDay()),
+                                            start_pos, end_pos),
+                  ret);
+    HKU_IF_RETURN(start_pos < 1, ret);
+
+    DatetimeList dates = market_stk.getDatetimeList(KQueryByIndex(start_pos - 1, start_pos + 1));
+    HKU_CHECK(dates.size() == 2, "Invalid index!");
 
     Datetime yesterday = dates[0];
     Datetime today = dates[1];
@@ -111,6 +125,15 @@ MarketView HKU_API getMarketView(const StockList& stks, const string& market) {
         }
     }
     ret.resize(idx);
+    return ret;
+}
+
+MarketView HKU_API getMarketView(const StockList& stks, const string& market) {
+    MarketView ret;
+    DatetimeList dates = StockManager::instance().getTradingCalendar(KQueryByIndex(-1), market);
+    HKU_IF_RETURN(dates.empty(), ret);
+
+    ret = getMarketView(stks, dates.back(), market);
     return ret;
 }
 
