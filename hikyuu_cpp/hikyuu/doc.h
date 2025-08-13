@@ -156,6 +156,10 @@
  *
  * @defgroup ThreadPool Thread Pool 线程池
  * @ingroup Utilities
+ *
+ * @defgroup View View数据视图
+ * 数据视图, 属于用于显示、打印数据
+ * @ingroup View
  */
 
 /**

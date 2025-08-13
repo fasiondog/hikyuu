@@ -10,7 +10,7 @@
 #include "hikyuu/indicator/crt/HSL.h"
 #include "hikyuu/indicator/crt/ZONGGUBEN.h"
 #include "hikyuu/indicator/crt/LIUTONGPAN.h"
-#include "StockManager.h"
+#include "hikyuu/StockManager.h"
 #include "MarketView.h"
 
 namespace hku {

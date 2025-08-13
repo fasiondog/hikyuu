@@ -33,7 +33,6 @@ void export_KReord(py::module& m);
 void export_TimeLineReord(py::module& m);
 void export_TransRecord(py::module& m);
 void export_KData(py::module& m);
-void export_MarketView(py::module& m);
 void export_Parameter(py::module& m);
 void export_io_redirect(py::module& m);
 
@@ -44,6 +43,7 @@ void export_trade_manage_main(py::module& m);
 void export_trade_sys_main(py::module& m);
 void export_global_main(py::module& m);
 void export_analysis_main(py::module& m);
+void export_view_main(py::module& m);
 
 void export_StrategeContext(py::module& m);
 void export_strategy_main(py::module& m);
@@ -97,7 +97,6 @@ PYBIND11_MODULE(core, m) {
     export_KData(m);
     export_Stock(m);
     export_Block(m);
-    export_MarketView(m);
     export_Parameter(m);
 
     export_data_driver_main(m);
@@ -109,6 +108,8 @@ PYBIND11_MODULE(core, m) {
 
     export_analysis_main(m);
     export_strategy_main(m);
+
+    export_view_main(m);
 
     export_global_main(m);
     export_io_redirect(m);

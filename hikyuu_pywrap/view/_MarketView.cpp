@@ -5,8 +5,8 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/MarketView.h>
-#include "pybind_utils.h"
+#include <hikyuu/view/MarketView.h>
+#include "../pybind_utils.h"
 
 using namespace hku;
 namespace py = pybind11;

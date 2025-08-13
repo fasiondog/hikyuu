@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include "Stock.h"
+#include "hikyuu/Stock.h"
 
 namespace hku {
 
 /**
  * 实时行情记录(用于显示打印)
- * @ingroup StockManage
+ * @ingroup View
  */
 struct HKU_API MarketViewRecord {
     Stock stock;                                      ///< 证券
@@ -38,7 +38,7 @@ using MarketView = vector<MarketViewRecord>;
 
 /**
  * @brief 获取指定股票的行情数据（最后交易日数据），不包含停牌无最后交易日的股票数据
- * @ingroup StockManage
+ * @ingroup View
  * @param stks 股票列表
  * @param market 市场代码（用于获取交易日历）
  * @return MarketView
