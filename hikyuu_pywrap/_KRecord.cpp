@@ -6,7 +6,7 @@
  */
 
 #include <hikyuu/serialization/KRecord_serialization.h>
-#include "pybind_utils.h"
+#include "df_to_ks.h"
 
 using namespace hku;
 namespace py = pybind11;
@@ -14,9 +14,6 @@ namespace py = pybind11;
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #endif
-
-bool (*krecord_eq)(const KRecord&, const KRecord&) = operator==;
-bool (*krecord_ne)(const KRecord&, const KRecord&) = operator!=;
 
 void export_KReord(py::module& m) {
     py::class_<KRecord>(m, "KRecord", "K线记录，组成K线数据，属性可读写")
@@ -35,8 +32,10 @@ void export_KReord(py::module& m) {
       .def_readwrite("amount", &KRecord::transAmount, "成交金额")
       .def_readwrite("volume", &KRecord::transCount, "成交量")
 
-      .def("__eq__", krecord_eq)
-      .def("__ne__", krecord_ne)
+      .def("is_valid", &KRecord::isValid, "KRecord是否有效")
+
+      .def(py::self == py::self)
+      .def(py::self != py::self)
 
         DEF_PICKLE(KRecord);
 
@@ -132,4 +131,16 @@ void export_KReord(py::module& m) {
 
         return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
     });
+
+    m.def("df_to_krecords", df_to_krecords,
+          R"(df_to_krecords(df: pd.DataFrame[, columns: dict]) -> KRecordList
+          
+    将DataFrame转换为KRecordList, 必须按顺序指定列名，默认为: ("datetime", "open", "high", "low", "close", "amount", "volume")
+
+    :param DataFrame df: 输入的DataFrame
+    :param dict columns: 指定DataFrame的列名，对应KRecord的成员变量名称
+    :return: 转换后的KRecordList)",
+          py::arg("df"),
+          py::arg("columns") =
+            StringList{"datetime", "open", "high", "low", "close", "amount", "volume"});
 }

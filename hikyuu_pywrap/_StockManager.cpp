@@ -101,6 +101,76 @@ void export_StockManager(py::module& m) {
     :return: 对应的证券类型信息，如果不存在，则返回Null<StockTypeInfo>()
     :rtype: StockTypeInfo)")
 
+      .def(
+        "get_stock_type_info_list",
+        [](const StockManager& self) {
+            auto stk_type_info_list = self.getStockTypeInfoList();
+            size_t total = stk_type_info_list.size();
+            if (total == 0) {
+                return py::module_::import("pandas").attr("DataFrame")();
+            }
+
+            // 创建数组
+            py::array_t<uint32_t> type_arr(total);
+            py::array_t<double> tick_arr(total);
+            py::array_t<double> tickvalue_arr(total);
+            py::array_t<double> unit_arr(total);
+            py::array_t<int> precision_arr(total);
+            py::array_t<double> minTradeNumber_arr(total);
+            py::array_t<double> maxTradeNumber_arr(total);
+
+            // 获取缓冲区并填充数据
+            auto type_buf = type_arr.request();
+            auto tick_buf = tick_arr.request();
+            auto tickvalue_buf = tickvalue_arr.request();
+            auto unit_buf = unit_arr.request();
+            auto precision_buf = precision_arr.request();
+            auto minTradeNumber_buf = minTradeNumber_arr.request();
+            auto maxTradeNumber_buf = maxTradeNumber_arr.request();
+
+            uint32_t* type_ptr = static_cast<uint32_t*>(type_buf.ptr);
+            double* tick_ptr = static_cast<double*>(tick_buf.ptr);
+            double* tickvalue_ptr = static_cast<double*>(tickvalue_buf.ptr);
+            double* unit_ptr = static_cast<double*>(unit_buf.ptr);
+            int* precision_ptr = static_cast<int*>(precision_buf.ptr);
+            double* minTradeNumber_ptr = static_cast<double*>(minTradeNumber_buf.ptr);
+            double* maxTradeNumber_ptr = static_cast<double*>(maxTradeNumber_buf.ptr);
+
+            py::list desc_list(total);
+
+            auto* ts = stk_type_info_list.data();
+            for (size_t i = 0; i < total; i++) {
+                type_ptr[i] = ts[i].type();
+                tick_ptr[i] = ts[i].tick();
+                tickvalue_ptr[i] = ts[i].tickValue();
+                unit_ptr[i] = ts[i].unit();
+                precision_ptr[i] = ts[i].precision();
+                minTradeNumber_ptr[i] = ts[i].minTradeNumber();
+                maxTradeNumber_ptr[i] = ts[i].maxTradeNumber();
+                desc_list[i] = ts[i].description();
+            }
+
+            auto pandas = py::module_::import("pandas");
+            py::dict columns;
+            columns[htr("type").c_str()] = type_arr;
+            columns[htr("description").c_str()] =
+              pandas.attr("Series")(desc_list, py::arg("dtype") = "string");
+            columns["tick"] = tick_arr;
+            columns[htr("tick_value").c_str()] = tickvalue_arr;
+            columns[htr("unit").c_str()] = unit_arr;
+            columns[htr("precision").c_str()] = precision_arr;
+            columns[htr("minTradeNumber").c_str()] = minTradeNumber_arr;
+            columns[htr("maxTradeNumber").c_str()] = maxTradeNumber_arr;
+
+            return pandas.attr("DataFrame")(columns, py::arg("copy") = false);
+        },
+        R"(get_stock_type_info_list(self)
+
+    获取所有证券类型详细信息
+
+    :return: 所有证券类型详细信息
+    :rtype: DataFrame)")
+
       .def("get_stock", &StockManager::getStock, R"(get_stock(self, querystr)
 
     根据"市场简称证券代码"获取对应的证券实例

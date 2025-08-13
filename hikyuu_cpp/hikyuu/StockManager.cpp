@@ -372,8 +372,18 @@ StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
     return result;
 }
 
-MarketList StockManager::getAllMarket() const {
-    MarketList result;
+vector<StockTypeInfo> StockManager::getStockTypeInfoList() const {
+    vector<StockTypeInfo> result;
+    std::shared_lock<std::shared_mutex> lock(*m_stockTypeInfo_mutex);
+    result.reserve(m_stockTypeInfo.size());
+    for (auto& item : m_stockTypeInfo) {
+        result.push_back(item.second);
+    }
+    return result;
+}
+
+StringList StockManager::getAllMarket() const {
+    StringList result;
     std::shared_lock<std::shared_mutex> lock(*m_marketInfoDict_mutex);
     auto iter = m_marketInfoDict.begin();
     for (; iter != m_marketInfoDict.end(); ++iter) {

@@ -132,7 +132,7 @@ TEST_CASE("test_StockManager_getAllMarket") {
     StockManager& sm = StockManager::instance();
 
     /** @arg 检测测试数据中的Market */
-    MarketList result(sm.getAllMarket());
+    StringList result(sm.getAllMarket());
     std::vector<string> want_list{"TMP", "SH", "SZ"};
     for (auto want : want_list) {
         bool found = false;

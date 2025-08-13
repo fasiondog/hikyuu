@@ -38,6 +38,12 @@ public:
     StockTypeInfo();
     StockTypeInfo(uint32_t, const string&, price_t, price_t, int, double, double);
 
+    StockTypeInfo(const StockTypeInfo&) = default;
+    StockTypeInfo& operator=(const StockTypeInfo&) = default;
+
+    StockTypeInfo(StockTypeInfo&&);
+    StockTypeInfo& operator=(StockTypeInfo&&) noexcept;
+
     /** 获取证券类型 */
     uint32_t type() const {
         return m_type;
