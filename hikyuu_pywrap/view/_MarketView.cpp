@@ -15,7 +15,6 @@ void export_MarketView(py::module& m) {
     m.def(
       "get_market_view",
       [](const py::sequence& stks, const Datetime& date, const string& market) {
-          SPEND_TIME(get_market_view);
           StockList stks_list = python_list_to_vector<Stock>(stks);
           MarketView view;
           if (date.isNull()) {

@@ -27,6 +27,7 @@ Welcome to Hikyuu's documentation!
    trade_portfolio/trade_portfolio
    trade_sys/walkforward
    strategy
+   others
    reference
 
 
