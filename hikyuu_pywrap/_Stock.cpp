@@ -7,7 +7,7 @@
 
 #include <hikyuu/serialization/Stock_serialization.h>
 #include <hikyuu/KData.h>
-#include "pybind_utils.h"
+#include "df_to_ks.h"
 
 using namespace hku;
 namespace py = pybind11;
@@ -244,12 +244,24 @@ void export_Stock(py::module& m) {
             }
         },
         py::arg("krecord_list"), py::arg("ktype") = KQuery::DAY,
-        R"(set_krecord_list(self, krecord_list, [ktype=Query.DAY])
+        R"(set_krecord_list(self, krecord_list[, ktype=Query.DAY])
 
       "谨慎调用！！！直接设置当前内存 KRecordList, 仅供需临时增加的外部 Stock 设置 K 线数据
 
       :param krecord_list: KRecordList or list of KRecord
       :param Query.KType ktype: K线类别)")
+
+      .def(
+        "set_kdata_from_df",
+        [](Stock& self, const py::object& df, const StringList& cols, const KQuery::KType& ktype) {
+            auto ks = df_to_krecords(df, cols);
+            self.setKRecordList(ks, ktype);
+        },
+        py::arg("df"), py::arg("cols"), py::arg("ktype") = KQuery::DAY,
+        R"(set_kdata_from_df(self, df, cols, [ktype=Query.DAY])
+
+      谨慎调用！！！直接设置当前内存数据，意味着 Stock 的基础数据变更。
+      从 DataFrame 中获取 KRecordList, 并设置给当前Stock。df, 必须按顺序指定列名，默认为: ("datetime", "open", "high", "low", "close", "amount", "volume"))")
 
       .def(py::hash(py::self))
       .def(py::self == py::self)

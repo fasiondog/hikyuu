@@ -13,6 +13,9 @@ from datetime import datetime, timedelta, date  # NOQA: E402
 import numpy as np  # NOQA: E402
 import pandas as pd  # NOQA: E402
 
+# 解决中文对齐问题
+pd.set_option('display.unicode.ambiguous_as_wide', True)
+pd.set_option('display.unicode.east_asian_width', True)
 
 # ------------------------------------------------------------------
 # 增加Datetime、Stock的hash支持，以便可做为dict的key

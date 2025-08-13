@@ -30,7 +30,7 @@ void export_hkuextra(py::module& m) {
     :param func get_phase_end: 日期转换函数，参数为日期，返回该日期对应的周期结束日期
     :return: None)");
 
-    m.def("release_extra_ktype", &releaseExtraKType, R"(release_ktype_extra()
+    m.def("release_extra_ktype", releaseExtraKType, R"(release_ktype_extra()
         
     释放扩展K线类型)");
 }
