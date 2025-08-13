@@ -14,10 +14,15 @@ namespace py = pybind11;
 void export_MarketView(py::module& m) {
     m.def(
       "get_market_view",
-      [](const py::sequence& stks, const string& market) {
+      [](const py::sequence& stks, const Datetime& date, const string& market) {
           SPEND_TIME(get_market_view);
           StockList stks_list = python_list_to_vector<Stock>(stks);
-          auto view = getMarketView(stks_list, market);
+          MarketView view;
+          if (date.isNull()) {
+              view = getMarketView(stks_list, market);
+          } else {
+              view = getMarketView(stks_list, date, market);
+          }
 
           size_t total = view.size();
           if (total == 0) {
@@ -123,12 +128,14 @@ void export_MarketView(py::module& m) {
 
           return pandas.attr("DataFrame")(columns, py::arg("copy") = false);
       },
-      py::arg("stks"), py::arg("market") = "SH",
-      R"(get_market_view(stks, market) -> pandas.DataFrame
+      py::arg("stks"), py::arg("date") = Datetime(), py::arg("market") = "SH",
+      R"(get_market_view(stks[, date=Datetime(), market='SH']) -> pandas.DataFrame
 
-    获取指定股票列表最后行情数据，不包含停牌无最后交易日的股票数据
+    获取指定股票集合在指定交易日的行情数据，不包含当日停牌无数据的股票。如未指定日期，则返回最后交易日行情数据，
+    如同时接收了行情数据，则为实时行情。
     
     :param list[Stock] stks: 股票列表
+    :param Datetime date: 获取指定日期的行情数据
     :param str market: 市场代码
     :return: 指定股票列表最后行情数据
     :rtype: pandas.DataFrame)");

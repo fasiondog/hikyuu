@@ -41,7 +41,7 @@ public:
     MarketInfo& operator=(const MarketInfo&) = default;
 
     MarketInfo(MarketInfo&&);
-    MarketInfo& operator=(MarketInfo&&);
+    MarketInfo& operator=(MarketInfo&&) noexcept;
 
     /** 获取市场简称 */
     const string& market() const {
