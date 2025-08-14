@@ -103,7 +103,10 @@ void GlobalInitializer::clean() {
 
     releaseScheduler();
 
+#if !HKU_OS_WINDOWS
+    // windows 反而会卡死
     nng_fini();
+#endif
     releaseGlobalSpotAgent();
 
     IndicatorImp::releaseDynEngine();

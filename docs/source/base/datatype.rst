@@ -367,6 +367,10 @@ K线数据
     .. py:attribute:: amount   : 成交金额
     .. py:attribute:: volume   : 成交量
 
+    .. py:method:: is_valid(self)
+
+        判断该K线记录是否有效
+
     
 .. py:class:: KData
 
@@ -456,10 +460,11 @@ K线数据
     
         :rtype: numpy.array
         
-    .. py:method:: to_df()
+    .. py:method:: to_df(with_stock=False)
     
         转化为pandas的DataFrame
         
+        :param bool with_stock: 包含Stock的代码与名称
         :rtype: pandas.DataFrame
 
 
@@ -502,7 +507,7 @@ K线数据
     .. py:attribute:: date : 时间
     .. py:attribute:: price : 价格
     .. py:attribute:: vol : 成交量
-    .. py:attribute:: direct : 买卖盘性质
+    .. py:attribute:: direct : 买卖盘性质: 1--sell 0--buy 2--集合竞价 其他未知
     
 .. py:class:: TransList
 

@@ -15,7 +15,6 @@ void export_MarketView(py::module& m) {
     m.def(
       "get_market_view",
       [](const py::sequence& stks, const Datetime& date, const string& market) {
-          SPEND_TIME(get_market_view);
           StockList stks_list = python_list_to_vector<Stock>(stks);
           MarketView view;
           if (date.isNull()) {
@@ -133,6 +132,8 @@ void export_MarketView(py::module& m) {
 
     获取指定股票集合在指定交易日的行情数据，不包含当日停牌无数据的股票。如未指定日期，则返回最后交易日行情数据，
     如同时接收了行情数据，则为实时行情。
+
+    注: 此函数依赖于日线数据
     
     :param list[Stock] stks: 股票列表
     :param Datetime date: 获取指定日期的行情数据
