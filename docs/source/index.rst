@@ -27,6 +27,7 @@ Welcome to Hikyuu's documentation!
    trade_portfolio/trade_portfolio
    trade_sys/walkforward
    strategy
+   others
    reference
 
 
@@ -35,7 +36,6 @@ Welcome to Hikyuu's documentation!
    :caption: VIP捐赠
    :name: VIP features
 
-   vip/vip-plan.md
    vip/index.rst
 
 
