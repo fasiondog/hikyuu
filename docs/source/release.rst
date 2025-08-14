@@ -1,18 +1,18 @@
 版本发布说明
 =======================
 
-2.6.7 - 
+2.6.7 - 2025年8月15日
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. 新增功能与优化
-    - 优化Indicator/KData/KRecordList/TimeLineList/TransList/StockWeight/DatetimeList/PositionList/TradeList 转np与df性能
+    - 提升核心结构转 numpy 与 pandas DataFrame 性能, 方便其他 python 库对接(Indicator/KData/KRecordList/TimeLineList/TransList/StockWeight/DatetimeList/PositionList/TradeList)
     - 支持自定义动态周期K线(捐赠权益), 新增 DAY3、DAY5、DAY7 和 MIN3 扩展K线
     - 优化K线预加载, 保证预加载期间获取数据和加载完毕后获取数据一致
     - 新增 get_market_view 返回 DataFrame 格式的实时行情或某日行情数据
     - Stock 新增 set_kdata_from_df 便捷方法，功能同 set_krecord_list
     - 优化本地化, SYS 和 Portolio 跟踪打印时显示中文
     - 优化退出时等待 spot 时间有时过长的的问题
-    - test(data): 增加针对真实通达信数据导入的集成测试 为验证和保障通达信 文件导
+    - test(data): 增加针对真实通达信数据导入的集成测试
 
 2. 缺陷修复
     - fixed HikyuuTdx 无法申请试用许可，字体显示过大
