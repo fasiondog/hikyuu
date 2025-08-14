@@ -15,131 +15,8 @@
 
 namespace hku {
 
-MarketView HKU_API getMarketView(const StockList& stks, const Datetime& date,
-                                 const string& market) {
-    MarketView ret;
-    auto& sm = StockManager::instance();
-    MarketInfo info = sm.getMarketInfo(market);
-    HKU_IF_RETURN(info.code().empty(), ret);
-
-    Stock market_stk = sm.getStock(fmt::format("{}{}", market, info.code()));
-    HKU_IF_RETURN(market_stk.isNull(), ret);
-
-    size_t start_pos, end_pos;
-    HKU_IF_RETURN(!market_stk.getIndexRange(KQueryByDate(date.startOfDay(), date.nextDay()),
-                                            start_pos, end_pos),
-                  ret);
-    HKU_IF_RETURN(start_pos < 1, ret);
-
-    DatetimeList dates = market_stk.getDatetimeList(KQueryByIndex(start_pos - 1, start_pos + 1));
-    HKU_CHECK(dates.size() == 2, "Invalid index!");
-
-    Datetime yesterday = dates[0];
-    Datetime today = dates[1];
-    Datetime tomorrow = today.nextDay();
-
-    Indicator EPS = FINANCE(0);
-    EPS.setParam("dynamic", true);
-    Indicator PE = CLOSE() / EPS;
-    Indicator PB = CLOSE() / FINANCE(3);  // 市净率
-
-    size_t total = stks.size();
-    ret.resize(stks.size());
-    size_t idx = 0;
-    for (size_t i = 0; i < total; i++) {
-        const Stock& stk = stks[i];
-        if (!stk.isNull()) {
-            auto kdata = stk.getKData(KQueryByDate(yesterday, tomorrow));
-            if (kdata.size() == 2) {
-                auto& mr = ret[idx++];
-                mr.stock = stk;
-                mr.date = kdata[1].datetime;
-                mr.open = kdata[1].openPrice;
-                mr.high = kdata[1].highPrice;
-                mr.low = kdata[1].lowPrice;
-                mr.close = kdata[1].closePrice;
-                mr.amount = kdata[1].transAmount;
-                mr.volume = kdata[1].transCount;
-                mr.yesterday_close = kdata[0].closePrice;
-                Indicator::value_t hsl = HSL(kdata)[1];
-                if (hsl != Null<Indicator::value_t>()) {
-                    mr.turnover = hsl * 100.0;
-                }
-                mr.amplitude =
-                  mr.open != 0.0 ? ((mr.high - mr.low) / mr.open) * 100.0 : Null<price_t>();
-                mr.price_change = mr.yesterday_close != 0.0
-                                    ? ((mr.close - mr.yesterday_close) / mr.yesterday_close) * 100.0
-                                    : Null<price_t>();
-                Indicator::value_t zongguben = ZONGGUBEN(kdata)[1];
-                if (zongguben != Null<Indicator::value_t>()) {
-                    mr.total_market_cap = zongguben * mr.close;
-                }
-                Indicator::value_t liutongpan = LIUTONGPAN(kdata)[1];
-                if (liutongpan != Null<Indicator::value_t>()) {
-                    mr.circulating_market_cap = liutongpan * mr.close;
-                }
-                Indicator::value_t pe = PE(kdata)[1];
-                if (pe != Null<Indicator::value_t>()) {
-                    mr.pe = pe;
-                }
-                Indicator::value_t pb = PB(kdata)[1];
-                if (pb != Null<Indicator::value_t>()) {
-                    mr.pb = pb;
-                }
-            } else if (kdata.size() == 1 && kdata[0].datetime == dates[1]) {
-                auto& mr = ret[idx++];
-                mr.stock = stk;
-                mr.date = kdata[0].datetime;
-                mr.open = kdata[0].openPrice;
-                mr.high = kdata[0].highPrice;
-                mr.low = kdata[0].lowPrice;
-                mr.close = kdata[0].closePrice;
-                mr.amount = kdata[0].transAmount;
-                mr.volume = kdata[0].transCount;
-                mr.yesterday_close = Null<price_t>();
-                Indicator::value_t hsl = HSL(kdata)[0];
-                if (hsl != Null<Indicator::value_t>()) {
-                    mr.turnover = hsl * 100.0;
-                }
-                mr.amplitude =
-                  mr.open != 0.0 ? ((mr.high - mr.low) / mr.open) * 100.0 : Null<price_t>();
-                mr.price_change =
-                  mr.open != 0.0 ? ((mr.close - mr.open) / mr.open) * 100.0 : Null<price_t>();
-                Indicator::value_t zongguben = ZONGGUBEN(kdata)[0];
-                if (zongguben != Null<Indicator::value_t>()) {
-                    mr.total_market_cap = zongguben * mr.close;
-                }
-                Indicator::value_t liutongpan = LIUTONGPAN(kdata)[0];
-                if (liutongpan != Null<Indicator::value_t>()) {
-                    mr.circulating_market_cap = liutongpan * mr.close;
-                }
-                Indicator::value_t pe = PE(kdata)[0];
-                if (pe != Null<Indicator::value_t>()) {
-                    mr.pe = pe;
-                }
-                Indicator::value_t pb = PB(kdata)[0];
-                if (pb != Null<Indicator::value_t>()) {
-                    mr.pb = pb;
-                }
-            }
-        }
-    }
-    ret.resize(idx);
-    return ret;
-}
-
-MarketView HKU_API getMarketView(const StockList& stks, const string& market) {
-    MarketView ret;
-    DatetimeList dates = StockManager::instance().getTradingCalendar(KQueryByIndex(-1), market);
-    HKU_IF_RETURN(dates.empty(), ret);
-
-    ret = getMarketView(stks, dates.back(), market);
-    return ret;
-}
-
-std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& stks,
-                                                              const Datetime& date,
-                                                              const string& market) {
+std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const Datetime& date,
+                                                    const string& market) {
     std::shared_ptr<arrow::Table> ret;
     auto& sm = StockManager::instance();
     MarketInfo info = sm.getMarketInfo(market);
@@ -167,8 +44,7 @@ std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& s
     Indicator PB = CLOSE() / FINANCE(3);  // 市净率
 
     arrow::StringBuilder code_builder, name_builder;
-    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO, "UTC"),
-                                         arrow::default_memory_pool());
+    arrow::Date64Builder date_builder;
     arrow::DoubleBuilder open_builder, high_builder, low_builder, close_builder, amount_builder,
       volume_builder, yesterday_close_builder, turnover_builder, amplitude_builder,
       price_change_builder, total_market_cap_builder, circulating_market_cap_builder, pe_builder,
@@ -209,7 +85,7 @@ std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& s
             if (kdata.size() == 2) {
                 HKU_ASSERT(code_builder.Append(stk.market_code()).ok());
                 HKU_ASSERT(name_builder.Append(stk.name()).ok());
-                HKU_ASSERT(date_builder.Append(kdata[1].datetime.timestampUTC() * 1000LL).ok());
+                HKU_ASSERT(date_builder.Append(kdata[1].datetime.timestamp() / 1000LL).ok());
                 HKU_ASSERT(open_builder.Append(kdata[1].openPrice).ok());
                 HKU_ASSERT(high_builder.Append(kdata[1].highPrice).ok());
                 HKU_ASSERT(low_builder.Append(kdata[1].lowPrice).ok());
@@ -242,7 +118,42 @@ std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& s
                 HKU_ASSERT(pb_builder.Append(pe).ok());
                 Indicator::value_t pb = PB(kdata)[1];
                 HKU_ASSERT(pe_builder.Append(pb).ok());
+
             } else if (kdata.size() == 1 && kdata[0].datetime == dates[1]) {
+                HKU_ASSERT(code_builder.Append(stk.market_code()).ok());
+                HKU_ASSERT(name_builder.Append(stk.name()).ok());
+                HKU_ASSERT(date_builder.Append(dates[1].timestamp() / 1000LL).ok());
+                HKU_ASSERT(open_builder.Append(kdata[0].openPrice).ok());
+                HKU_ASSERT(high_builder.Append(kdata[0].highPrice).ok());
+                HKU_ASSERT(low_builder.Append(kdata[0].lowPrice).ok());
+                HKU_ASSERT(close_builder.Append(kdata[0].closePrice).ok());
+                HKU_ASSERT(amount_builder.Append(kdata[0].transAmount).ok());
+                HKU_ASSERT(volume_builder.Append(kdata[0].transCount).ok());
+                Indicator::value_t hsl = HSL(kdata)[0];
+                HKU_ASSERT(turnover_builder.Append(hsl * 100.).ok());
+                HKU_ASSERT(
+                  amplitude_builder
+                    .Append(kdata[0].openPrice != 0.0
+                              ? ((kdata[0].highPrice - kdata[0].lowPrice) / kdata[0].openPrice) *
+                                  100.0
+                              : Null<price_t>())
+                    .ok());
+                HKU_ASSERT(
+                  price_change_builder
+                    .Append(kdata[0].openPrice != 0.0
+                              ? ((kdata[0].closePrice - kdata[0].openPrice) / kdata[0].openPrice) *
+                                  100.0
+                              : Null<price_t>())
+                    .ok());
+                Indicator::value_t zongguben = ZONGGUBEN(kdata)[0];
+                HKU_ASSERT(total_market_cap_builder.Append(zongguben * kdata[0].closePrice).ok());
+                Indicator::value_t liutongpan = LIUTONGPAN(kdata)[0];
+                HKU_ASSERT(
+                  circulating_market_cap_builder.Append(liutongpan * kdata[0].closePrice).ok());
+                Indicator::value_t pe = PE(kdata)[0];
+                HKU_ASSERT(pb_builder.Append(pe).ok());
+                Indicator::value_t pb = PB(kdata)[0];
+                HKU_ASSERT(pe_builder.Append(pb).ok());
             }
         }
     }
@@ -280,29 +191,29 @@ std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& s
 
     // 创建Schema
     auto schema = arrow::schema({
-      arrow::field("code", arrow::utf8()),
-      arrow::field("name", arrow::utf8()),
-      //   arrow::field("date", arrow::timestamp(arrow::TimeUnit::NANO, "UTC")),
-      arrow::field("open", arrow::float64()),
-      arrow::field("high", arrow::float64()),
-      arrow::field("low", arrow::float64()),
-      arrow::field("close", arrow::float64()),
-      arrow::field("amount", arrow::float64()),
-      arrow::field("volume", arrow::float64()),
-      arrow::field("yesterday_close", arrow::float64()),
-      arrow::field("turnover", arrow::float64()),
-      arrow::field("amplitude", arrow::float64()),
-      arrow::field("price_change", arrow::float64()),
-      arrow::field("total_market_cap", arrow::float64()),
-      arrow::field("circulating_market_cap", arrow::float64()),
-      arrow::field("pe", arrow::float64()),
-      arrow::field("pb", arrow::float64()),
+      arrow::field(htr("market_code"), arrow::utf8()),
+      arrow::field(htr("name"), arrow::utf8()),
+      arrow::field(htr("date"), arrow::date64()),
+      arrow::field(htr("open"), arrow::float64()),
+      arrow::field(htr("high"), arrow::float64()),
+      arrow::field(htr("low"), arrow::float64()),
+      arrow::field(htr("close"), arrow::float64()),
+      arrow::field(htr("amount"), arrow::float64()),
+      arrow::field(htr("volume"), arrow::float64()),
+      arrow::field(htr("yesterday_close"), arrow::float64()),
+      arrow::field(htr("turnover"), arrow::float64()),
+      arrow::field(htr("amplitude"), arrow::float64()),
+      arrow::field(htr("price_change"), arrow::float64()),
+      arrow::field(htr("total_market_cap"), arrow::float64()),
+      arrow::field(htr("circulating_market_cap"), arrow::float64()),
+      arrow::field(htr("pe"), arrow::float64()),
+      arrow::field(htr("pb"), arrow::float64()),
     });
 
     ret = arrow::Table::Make(schema, {
                                        code_arr,
                                        name_arr,
-                                       //    date_arr,
+                                       date_arr,
                                        open_arr,
                                        high_arr,
                                        low_arr,
@@ -321,6 +232,15 @@ std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& s
 
     HKU_ASSERT(ret);
 
+    return ret;
+}
+
+std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const string& market) {
+    std::shared_ptr<arrow::Table> ret;
+    DatetimeList dates = StockManager::instance().getTradingCalendar(KQueryByIndex(-1), market);
+    HKU_IF_RETURN(dates.empty(), ret);
+
+    ret = getMarketView(stks, dates.back(), market);
     return ret;
 }
 
