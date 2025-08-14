@@ -137,4 +137,109 @@ MarketView HKU_API getMarketView(const StockList& stks, const string& market) {
     return ret;
 }
 
+std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& stks,
+                                                              const Datetime& date,
+                                                              const string& market) {
+    std::shared_ptr<arrow::Table> ret;
+    auto& sm = StockManager::instance();
+    MarketInfo info = sm.getMarketInfo(market);
+    HKU_IF_RETURN(info.code().empty(), ret);
+
+    Stock market_stk = sm.getStock(fmt::format("{}{}", market, info.code()));
+    HKU_IF_RETURN(market_stk.isNull(), ret);
+
+    size_t start_pos, end_pos;
+    HKU_IF_RETURN(!market_stk.getIndexRange(KQueryByDate(date.startOfDay(), date.nextDay()),
+                                            start_pos, end_pos),
+                  ret);
+    HKU_IF_RETURN(start_pos < 1, ret);
+
+    DatetimeList dates = market_stk.getDatetimeList(KQueryByIndex(start_pos - 1, start_pos + 1));
+    HKU_CHECK(dates.size() == 2, "Invalid index!");
+
+    Datetime yesterday = dates[0];
+    Datetime today = dates[1];
+    Datetime tomorrow = today.nextDay();
+
+    Indicator EPS = FINANCE(0);
+    EPS.setParam("dynamic", true);
+    Indicator PE = CLOSE() / EPS;
+    Indicator PB = CLOSE() / FINANCE(3);  // 市净率
+
+    arrow::StringBuilder code_builder, name_builder;
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO, "UTC"),
+                                         arrow::default_memory_pool());
+    // arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO, "UTC"));
+    arrow::DoubleBuilder open_builder, high_builder, low_builder, close_builder, amount_builder,
+      volume_builder, yesterday_close_builder, turnover_builder, amplitude_builder,
+      price_change_builder, total_market_cap_builder, circulating_market_cap_builder, pe_builder,
+      pb_builder;
+
+    size_t total = stks.size();
+    HKU_IF_RETURN(!code_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!name_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!date_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!open_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!high_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!low_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!close_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!amount_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!volume_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!yesterday_close_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!turnover_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!amplitude_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!price_change_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!total_market_cap_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!circulating_market_cap_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!pe_builder.Reserve(total).ok(), ret);
+    HKU_IF_RETURN(!pb_builder.Reserve(total).ok(), ret);
+
+    for (size_t i = 0; i < total; i++) {
+        const Stock& stk = stks[i];
+        if (!stk.isNull()) {
+            auto kdata = stk.getKData(KQueryByDate(yesterday, tomorrow));
+            if (kdata.size() == 2) {
+                HKU_ASSERT(code_builder.Append(stk.market_code()).ok());
+                HKU_ASSERT(name_builder.Append(stk.name()).ok());
+                HKU_ASSERT(date_builder.Append(kdata[1].datetime.timestampUTC()).ok());
+                HKU_ASSERT(open_builder.Append(kdata[1].openPrice).ok());
+                HKU_ASSERT(high_builder.Append(kdata[1].highPrice).ok());
+                HKU_ASSERT(low_builder.Append(kdata[1].lowPrice).ok());
+                HKU_ASSERT(close_builder.Append(kdata[1].closePrice).ok());
+                HKU_ASSERT(amount_builder.Append(kdata[1].transAmount).ok());
+                HKU_ASSERT(volume_builder.Append(kdata[1].transCount).ok());
+                HKU_ASSERT(yesterday_close_builder.Append(kdata[0].closePrice).ok());
+                Indicator::value_t hsl = HSL(kdata)[1];
+                HKU_ASSERT(turnover_builder.Append(hsl * 100.0).ok());
+                HKU_ASSERT(
+                  amplitude_builder
+                    .Append(kdata[1].openPrice != 0.0
+                              ? ((kdata[1].highPrice - kdata[1].lowPrice) / kdata[1].openPrice) *
+                                  100.0
+                              : Null<price_t>())
+                    .ok());
+                HKU_ASSERT(price_change_builder
+                             .Append(kdata[0].closePrice != 0.0
+                                       ? ((kdata[1].closePrice - kdata[0].closePrice) /
+                                          kdata[0].closePrice) *
+                                           100.0
+                                       : Null<price_t>())
+                             .ok());
+                Indicator::value_t zongguben = ZONGGUBEN(kdata)[1];
+                HKU_ASSERT(total_market_cap_builder.Append(zongguben * kdata[1].closePrice).ok());
+                Indicator::value_t liutongpan = LIUTONGPAN(kdata)[1];
+                HKU_ASSERT(
+                  circulating_market_cap_builder.Append(liutongpan * kdata[1].closePrice).ok());
+                Indicator::value_t pe = PE(kdata)[1];
+                HKU_ASSERT(pb_builder.Append(pe).ok());
+                Indicator::value_t pb = PB(kdata)[1];
+                HKU_ASSERT(pe_builder.Append(pb).ok());
+            } else if (kdata.size() == 1 && kdata[0].datetime == dates[1]) {
+            }
+        }
+    }
+
+    return ret;
+}
+
 }  // namespace hku

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <arrow/api.h>
 #include "hikyuu/Stock.h"
 
 namespace hku {
@@ -55,5 +56,9 @@ MarketView HKU_API getMarketView(const StockList& stks, const Datetime& date,
  * @return MarketView
  */
 MarketView HKU_API getMarketView(const StockList& stks, const string& market = "SH");
+
+std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& stks,
+                                                              const Datetime& date,
+                                                              const string& market = "SH");
 
 }  // namespace hku

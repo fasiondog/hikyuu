@@ -157,6 +157,7 @@ add_requires("nng " .. nng_version, {system = false, configs = {NNG_ENABLE_TLS =
 add_requires("nlohmann_json", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc", {system = false})
+add_requires("arrow", {system = false})
 
 if has_config("http_client_zip") then
     add_requires("gzip-hpp", {system = false})
