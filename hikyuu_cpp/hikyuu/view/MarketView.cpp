@@ -169,30 +169,38 @@ std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& s
     arrow::StringBuilder code_builder, name_builder;
     arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO, "UTC"),
                                          arrow::default_memory_pool());
-    // arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO, "UTC"));
     arrow::DoubleBuilder open_builder, high_builder, low_builder, close_builder, amount_builder,
       volume_builder, yesterday_close_builder, turnover_builder, amplitude_builder,
       price_change_builder, total_market_cap_builder, circulating_market_cap_builder, pe_builder,
       pb_builder;
 
     size_t total = stks.size();
-    HKU_IF_RETURN(!code_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!name_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!date_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!open_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!high_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!low_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!close_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!amount_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!volume_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!yesterday_close_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!turnover_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!amplitude_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!price_change_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!total_market_cap_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!circulating_market_cap_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!pe_builder.Reserve(total).ok(), ret);
-    HKU_IF_RETURN(!pb_builder.Reserve(total).ok(), ret);
+    HKU_ERROR_IF_RETURN(!code_builder.Reserve(total).ok(), ret, "Failed to reserve code_builder!");
+    HKU_ERROR_IF_RETURN(!name_builder.Reserve(total).ok(), ret, "Failed to reserve name_builder!");
+    HKU_ERROR_IF_RETURN(!date_builder.Reserve(total).ok(), ret, "Failed to reserve date_builder!");
+    HKU_ERROR_IF_RETURN(!open_builder.Reserve(total).ok(), ret, "Failed to reserve open_builder!");
+    HKU_ERROR_IF_RETURN(!high_builder.Reserve(total).ok(), ret, "Failed to reserve high_builder!");
+    HKU_ERROR_IF_RETURN(!low_builder.Reserve(total).ok(), ret, "Failed to reserve low_builder!");
+    HKU_ERROR_IF_RETURN(!close_builder.Reserve(total).ok(), ret,
+                        "Failed to reserve close_builder!");
+    HKU_ERROR_IF_RETURN(!amount_builder.Reserve(total).ok(), ret,
+                        "Failed to reserve amount_builder!");
+    HKU_ERROR_IF_RETURN(!volume_builder.Reserve(total).ok(), ret,
+                        "Failed to reserve volume_builder!");
+    HKU_ERROR_IF_RETURN(!yesterday_close_builder.Reserve(total).ok(), ret,
+                        "Failed to reserve yesterday_close_builder!");
+    HKU_ERROR_IF_RETURN(!turnover_builder.Reserve(total).ok(), ret,
+                        "Failed to reserve turnover_builder!");
+    HKU_ERROR_IF_RETURN(!amplitude_builder.Reserve(total).ok(), ret,
+                        "Failed to reserve amplitude_builder!");
+    HKU_ERROR_IF_RETURN(!price_change_builder.Reserve(total).ok(), ret,
+                        "Failed to reserve price_change_builder!");
+    HKU_ERROR_IF_RETURN(!total_market_cap_builder.Reserve(total).ok(), ret,
+                        "Failed to reserve total_market_cap_builder!");
+    HKU_ERROR_IF_RETURN(!circulating_market_cap_builder.Reserve(total).ok(), ret,
+                        "Failed to reserve circulating_market_cap_builder!");
+    HKU_ERROR_IF_RETURN(!pe_builder.Reserve(total).ok(), ret, "Failed to reserve pe_builder!");
+    HKU_ERROR_IF_RETURN(!pb_builder.Reserve(total).ok(), ret, "Failed to reserve pb_builder!");
 
     for (size_t i = 0; i < total; i++) {
         const Stock& stk = stks[i];
@@ -201,7 +209,7 @@ std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& s
             if (kdata.size() == 2) {
                 HKU_ASSERT(code_builder.Append(stk.market_code()).ok());
                 HKU_ASSERT(name_builder.Append(stk.name()).ok());
-                HKU_ASSERT(date_builder.Append(kdata[1].datetime.timestampUTC()).ok());
+                HKU_ASSERT(date_builder.Append(kdata[1].datetime.timestampUTC() * 1000LL).ok());
                 HKU_ASSERT(open_builder.Append(kdata[1].openPrice).ok());
                 HKU_ASSERT(high_builder.Append(kdata[1].highPrice).ok());
                 HKU_ASSERT(low_builder.Append(kdata[1].lowPrice).ok());
@@ -238,6 +246,80 @@ std::shared_ptr<arrow::Table> HKU_API getMarketViewArrowTable(const StockList& s
             }
         }
     }
+
+    std::shared_ptr<arrow::Array> code_arr, name_arr, date_arr, open_arr, high_arr, low_arr,
+      close_arr, amount_arr, volume_arr, yesterday_close_arr, turnover_arr, amplitude_arr,
+      price_change_arr, total_market_cap_arr, circulating_market_cap_arr, pe_arr, pb_arr;
+
+    HKU_ERROR_IF_RETURN(!code_builder.Finish(&code_arr).ok(), ret, "Failed to build code array!");
+    HKU_ERROR_IF_RETURN(!name_builder.Finish(&name_arr).ok(), ret, "Failed to build name array!");
+    HKU_ERROR_IF_RETURN(!date_builder.Finish(&date_arr).ok(), ret, "Failed to build date array!");
+    HKU_ERROR_IF_RETURN(!open_builder.Finish(&open_arr).ok(), ret, "Failed to build open array!");
+    HKU_ERROR_IF_RETURN(!high_builder.Finish(&high_arr).ok(), ret, "Failed to build high array!");
+    HKU_ERROR_IF_RETURN(!low_builder.Finish(&low_arr).ok(), ret, "Failed to build low array!");
+    HKU_ERROR_IF_RETURN(!close_builder.Finish(&close_arr).ok(), ret,
+                        "Failed to build close array!");
+    HKU_ERROR_IF_RETURN(!amount_builder.Finish(&amount_arr).ok(), ret,
+                        "Failed to build amount array!");
+    HKU_ERROR_IF_RETURN(!volume_builder.Finish(&volume_arr).ok(), ret,
+                        "Failed to build volume array!");
+    HKU_ERROR_IF_RETURN(!yesterday_close_builder.Finish(&yesterday_close_arr).ok(), ret,
+                        "Failed to build yesterday_close array!");
+    HKU_ERROR_IF_RETURN(!turnover_builder.Finish(&turnover_arr).ok(), ret,
+                        "Failed to build turnover array!");
+    HKU_ERROR_IF_RETURN(!amplitude_builder.Finish(&amplitude_arr).ok(), ret,
+                        "Failed to build amplitude array!");
+    HKU_ERROR_IF_RETURN(!price_change_builder.Finish(&price_change_arr).ok(), ret,
+                        "Failed to build price_change array!");
+    HKU_ERROR_IF_RETURN(!total_market_cap_builder.Finish(&total_market_cap_arr).ok(), ret,
+                        "Failed to build total_market_cap array!");
+    HKU_ERROR_IF_RETURN(!circulating_market_cap_builder.Finish(&circulating_market_cap_arr).ok(),
+                        ret, "Failed to build circulating_market_cap array!");
+    HKU_ERROR_IF_RETURN(!pe_builder.Finish(&pe_arr).ok(), ret, "Failed to build pe array!");
+    HKU_ERROR_IF_RETURN(!pb_builder.Finish(&pb_arr).ok(), ret, "Failed to build pb array!");
+
+    // 创建Schema
+    auto schema = arrow::schema({
+      arrow::field("code", arrow::utf8()),
+      arrow::field("name", arrow::utf8()),
+      //   arrow::field("date", arrow::timestamp(arrow::TimeUnit::NANO, "UTC")),
+      arrow::field("open", arrow::float64()),
+      arrow::field("high", arrow::float64()),
+      arrow::field("low", arrow::float64()),
+      arrow::field("close", arrow::float64()),
+      arrow::field("amount", arrow::float64()),
+      arrow::field("volume", arrow::float64()),
+      arrow::field("yesterday_close", arrow::float64()),
+      arrow::field("turnover", arrow::float64()),
+      arrow::field("amplitude", arrow::float64()),
+      arrow::field("price_change", arrow::float64()),
+      arrow::field("total_market_cap", arrow::float64()),
+      arrow::field("circulating_market_cap", arrow::float64()),
+      arrow::field("pe", arrow::float64()),
+      arrow::field("pb", arrow::float64()),
+    });
+
+    ret = arrow::Table::Make(schema, {
+                                       code_arr,
+                                       name_arr,
+                                       //    date_arr,
+                                       open_arr,
+                                       high_arr,
+                                       low_arr,
+                                       close_arr,
+                                       amount_arr,
+                                       volume_arr,
+                                       yesterday_close_arr,
+                                       turnover_arr,
+                                       amplitude_arr,
+                                       price_change_arr,
+                                       total_market_cap_arr,
+                                       circulating_market_cap_arr,
+                                       pe_arr,
+                                       pb_arr,
+                                     });
+
+    HKU_ASSERT(ret);
 
     return ret;
 }

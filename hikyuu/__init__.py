@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 # cp936
 
+import pyarrow as pa
 import atexit
 import io
 from pathlib import Path

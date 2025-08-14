@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <arrow/python/pyarrow.h>
 #include <hikyuu/view/MarketView.h>
 #include "../pybind_utils.h"
 
@@ -15,7 +16,7 @@ void export_MarketView(py::module& m) {
     m.def(
       "get_market_view",
       [](const py::sequence& stks, const Datetime& date, const string& market) {
-          SPEND_TIME(get_market_view);
+          // SPEND_TIME(get_market_view);
           StockList stks_list = python_list_to_vector<Stock>(stks);
           MarketView view;
           if (date.isNull()) {
@@ -139,4 +140,22 @@ void export_MarketView(py::module& m) {
     :param str market: 市场代码
     :return: 指定股票列表最后行情数据
     :rtype: pandas.DataFrame)");
+
+    m.def("get_market_view_arrow",
+          [](const StockList& stks, const Datetime& date, const string& market) {
+              // SPEND_TIME(get_market_view_arrow);
+              auto view = getMarketViewArrowTable(stks, date, market);
+              HKU_ASSERT(view);
+
+              arrow::py::import_pyarrow();
+
+              // 使用Arrow的Python绑定将Table转换为Python对象
+              PyObject* raw_obj = arrow::py::wrap_table(view);
+              if (raw_obj == nullptr) {
+                  throw std::runtime_error("wrap_table返回空指针");
+              }
+
+              auto t = py::reinterpret_borrow<py::object>(raw_obj);
+              return t.attr("to_pandas")(py::arg("engine") = "pyarrow");
+          });
 }
