@@ -69,7 +69,9 @@ target("core")
             target:add("includedirs", pydir .. "/include")
             target:add("linkdirs", pydir .. "/libs")
 
-            local pyarrow = os.iorun("python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
+            local pyarrow = nil;
+            pyarrow = os.iorun("python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
+            assert(pyarrow, "Need pyarrow, but not found!")
             target:add("includedirs", pyarrow .. "/include")
             target:add("linkdirs", pyarrow)
             target:add("links", "arrow_python")
@@ -77,14 +79,16 @@ target("core")
         end
     
         -- get python include directory.
-        local pydir = nil;
+        local pydir_include = nil;
+        local pydir_lib = nil;
+        local pyarrow = nil;
         if os.getenv("CONDA_PREFIX") ~= nil then
             print("CONDA_PREFIX: " .. os.getenv("CONDA_PREFIX"))
             local py3config = os.getenv("CONDA_PREFIX") .. "/bin/python3-config"
             pydir_include = os.iorun(py3config .. " --includes"):trim()
             pydir_lib = os.iorun(py3config .. " --libs"):trim()
 
-            local pyarrow = os.iorun(os.getenv("CONDA_PREFIX") .. "/bin/python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
+            pyarrow = os.iorun(os.getenv("CONDA_PREFIX") .. "/bin/python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
             target:add("includedirs", pyarrow .. "/include")
             target:add("linkdirs", pyarrow)
             target:add("links", "arrow_python")
@@ -92,12 +96,13 @@ target("core")
             pydir_include = os.iorun("python3-config --includes"):trim()
             pydir_lib = os.iorun("python3-config --libs"):trim()
 
-            local pyarrow = os.iorun("python3 -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
+            pyarrow = os.iorun("python3 -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
             target:add("includedirs", pyarrow .. "/include")
             target:add("linkdirs", pyarrow)
             target:add("links", "arrow_python")
         end
         assert(pydir_include, "python3-config not found!")
+        assert(pyarrow, "Need pyarrow, but not found!")
         target:add("cxflags", pydir_include, pydir_lib)    
 
     end)
