@@ -69,9 +69,7 @@ target("core")
             target:add("includedirs", pydir .. "/include")
             target:add("linkdirs", pydir .. "/libs")
 
-            local pyarrow = nil;
-            pyarrow = os.iorun("python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
-            assert(pyarrow, "Need pyarrow, but not found!")
+            local pyarrow = os.iorun("python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
             target:add("includedirs", pyarrow .. "/include")
             target:add("linkdirs", pyarrow)
             target:add("links", "arrow_python")
@@ -102,7 +100,6 @@ target("core")
             target:add("links", "arrow_python")
         end
         assert(pydir_include, "python3-config not found!")
-        assert(pyarrow, "Need pyarrow, but not found!")
         target:add("cxflags", pydir_include, pydir_lib)    
 
     end)
