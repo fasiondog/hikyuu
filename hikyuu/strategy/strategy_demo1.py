@@ -11,7 +11,7 @@ from hikyuu import *
 
 
 def on_change(stg: Strategy, stk: Stock, spot: SpotRecord):
-    print("[on_change]:", stk.market_code, stk.name, spot.close, spot.bid1, spot.ask1)
+    print("[on_change]:", stk.market_code, stk.name, spot.close, spot.bid[0], spot.ask[0])
 
 
 def on_spot(stg: Strategy, rev_time: Datetime):
