@@ -7,6 +7,7 @@
 
 #include <arrow/python/pyarrow.h>
 #include <hikyuu/arrow/MarketView.h>
+#include <hikyuu/arrow/arrow_print.h>
 #include "../pybind_utils.h"
 
 using namespace hku;
