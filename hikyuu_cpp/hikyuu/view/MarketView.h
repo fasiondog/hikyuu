@@ -40,4 +40,8 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
 getIndicatorsView(const StockList& stks, const IndicatorList& inds, const KQuery& query,
                   const string& market = "SH");
 
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getIndicatorsView(
+  const StockList& stks, const IndicatorList& inds, const Datetime& date, size_t cal_len = 100,
+  const KQuery::KType& ktype = KQuery::DAY, const string& market = "SH");
+
 }  // namespace hku

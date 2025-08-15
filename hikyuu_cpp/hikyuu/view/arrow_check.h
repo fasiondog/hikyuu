@@ -8,9 +8,18 @@
 #pragma once
 
 #include <arrow/api.h>
+#include "hikyuu/config.h"
 #include "hikyuu/utilities/Log.h"
 
 namespace hku {
+
+#if HKU_USE_LOW_PRECISION
+#define HKU_ARROW_PRICE_FIELD arrow::float32()
+#define HKU_ARROW_PRICE_BUILDER arrow::Float32Builder
+#else
+#define HKU_ARROW_PRICE_FIELD arrow::float64()
+#define HKU_ARROW_PRICE_BUILDER arrow::DoubleBuilder
+#endif
 
 #define HKU_ARROW_TABLE_CHECK(arrow_ret)                                                 \
     do {                                                                                 \

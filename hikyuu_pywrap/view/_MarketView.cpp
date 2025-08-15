@@ -50,19 +50,42 @@ void export_MarketView(py::module& m) {
     :return: 指定股票列表最后行情数据
     :rtype: pandas.DataFrame)");
 
-    m.def("get_inds_view", [](const StockList& stks, const IndicatorList& inds, const KQuery& query,
-                              const string& market) {
-        SPEND_TIME(get_inds_view);
-        auto view = getIndicatorsView(stks, inds, query, market);
-        HKU_ARROW_TABLE_CHECK(view);
+    m.def(
+      "get_inds_view",
+      [](const StockList& stks, const IndicatorList& inds, const KQuery& query,
+         const string& market) {
+          SPEND_TIME(get_inds_view);
+          auto view = getIndicatorsView(stks, inds, query, market);
+          HKU_ARROW_TABLE_CHECK(view);
 
-        arrow::py::import_pyarrow();
-        PyObject* raw_obj = arrow::py::wrap_table(*view);
-        if (raw_obj == nullptr) {
-            throw std::runtime_error("wrap_table返回空指针");
-        }
+          arrow::py::import_pyarrow();
+          PyObject* raw_obj = arrow::py::wrap_table(*view);
+          if (raw_obj == nullptr) {
+              throw std::runtime_error("wrap_table返回空指针");
+          }
 
-        auto t = py::reinterpret_borrow<py::object>(raw_obj);
-        return t.attr("to_pandas")();
-    });
+          auto t = py::reinterpret_borrow<py::object>(raw_obj);
+          return t.attr("to_pandas")();
+      },
+      py::arg("stks"), py::arg("inds"), py::arg("query"), py::arg("market") = "SH");
+
+    m.def(
+      "get_inds_view",
+      [](const StockList& stks, const IndicatorList& inds, const Datetime& date, size_t cal_len,
+         const KQuery::KType& ktype, const string& market) {
+          SPEND_TIME(get_inds_view);
+          auto view = getIndicatorsView(stks, inds, date, cal_len, ktype, market);
+          HKU_ARROW_TABLE_CHECK(view);
+
+          arrow::py::import_pyarrow();
+          PyObject* raw_obj = arrow::py::wrap_table(*view);
+          if (raw_obj == nullptr) {
+              throw std::runtime_error("wrap_table返回空指针");
+          }
+
+          auto t = py::reinterpret_borrow<py::object>(raw_obj);
+          return t.attr("to_pandas")();
+      },
+      py::arg("stks"), py::arg("inds"), py::arg("date"), py::arg("cal_len") = 100,
+      py::arg("ktype") = KQuery::DAY, py::arg("market") = "SH");
 }

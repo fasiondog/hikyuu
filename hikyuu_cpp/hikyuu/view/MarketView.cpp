@@ -231,7 +231,6 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
         fields.emplace_back(arrow::field(ind.name(), arrow::float64()));
     }
 
-    vector<double> null_values(inds.size(), Null<double>());
     arrow::StringBuilder code_builder, name_builder;
     arrow::Date64Builder date_builder;
     std::vector<arrow::DoubleBuilder> builders(inds.size());
@@ -253,6 +252,90 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
                 HKU_ARROW_RETURN_NOT_OK(code_builder.Append(stk.market_code()));
                 HKU_ARROW_RETURN_NOT_OK(name_builder.Append(stk.name()));
                 HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates[i].timestamp() / 1000LL));
+            }
+        }
+    }
+
+    vector<std::shared_ptr<arrow::Array>> arrs;
+    arrs.reserve(inds.size() + 3);
+
+    auto code_arr = code_builder.Finish();
+    HKU_ARROW_RETURN_NOT_OK2(code_arr);
+    arrs.push_back(*code_arr);
+
+    auto name_arr = name_builder.Finish();
+    HKU_ARROW_RETURN_NOT_OK2(name_arr);
+    arrs.push_back(*name_arr);
+
+    auto date_arr = date_builder.Finish();
+    HKU_ARROW_RETURN_NOT_OK2(date_arr);
+    arrs.push_back(*date_arr);
+
+    for (size_t i = 0; i < inds.size(); ++i) {
+        auto arr = builders[i].Finish();
+        HKU_ARROW_RETURN_NOT_OK2(arr);
+        arrs.push_back(*arr);
+    }
+
+    auto schema = arrow::schema(fields);
+    return arrow::Table::Make(schema, arrs);
+}
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Datetime& date,
+                  size_t cal_len, const KQuery::KType& ktype, const string& market) {
+    auto& sm = StockManager::instance();
+    MarketInfo info = sm.getMarketInfo(market);
+    HKU_ARROW_ERROR_IF_RETURN(info.code().empty(), "Can not find market info for {}!", market);
+
+    Stock market_stk = sm.getStock(fmt::format("{}{}", market, info.code()));
+    HKU_ARROW_ERROR_IF_RETURN(market_stk.isNull(), "Can not find market stock for {}!", market);
+
+    std::vector<std::shared_ptr<arrow::Field>> fields;
+    fields.reserve(inds.size() + 3);
+    fields.emplace_back(arrow::field(htr("market_code"), arrow::utf8()));
+    fields.emplace_back(arrow::field(htr("stock_name"), arrow::utf8()));
+    fields.emplace_back(arrow::field(htr("date"), arrow::date64()));
+    for (auto& ind : inds) {
+        fields.emplace_back(arrow::field(ind.name(), HKU_ARROW_PRICE_FIELD));
+    }
+
+    arrow::StringBuilder code_builder, name_builder;
+    arrow::Date64Builder date_builder;
+    std::vector<HKU_ARROW_PRICE_BUILDER> builders(inds.size());
+
+    size_t start_pos, end_pos;
+
+    bool success = market_stk.getIndexRange(
+      KQueryByDate(date, date + Minutes(KQuery::getKTypeInMin(ktype)), ktype), start_pos, end_pos);
+
+    if (success) {
+        if (start_pos > cal_len) {
+            start_pos -= cal_len;
+        }
+
+        DatetimeList dates = market_stk.getDatetimeList(KQueryByIndex(start_pos, end_pos, ktype));
+        if (!dates.empty() && date == dates.back()) {
+            KQuery query =
+              KQueryByDate(dates.front(), date + Minutes(KQuery::getKTypeInMin(ktype)), ktype);
+
+            for (const auto& stk : stks) {
+                auto kdata = stk.getKData(query);
+                bool have_data = true;
+                for (size_t i = 0; i < inds.size(); ++i) {
+                    auto x = ALIGN(inds[i], dates, true)(kdata);
+                    if (x.size() != dates.size()) {
+                        have_data = false;
+                    } else {
+                        HKU_ARROW_RETURN_NOT_OK(builders[i].Append(x[dates.size() - 1]));
+                    }
+                }
+
+                if (have_data) {
+                    HKU_ARROW_RETURN_NOT_OK(code_builder.Append(stk.market_code()));
+                    HKU_ARROW_RETURN_NOT_OK(name_builder.Append(stk.name()));
+                    HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates.back().timestamp() / 1000LL));
+                }
             }
         }
     }
