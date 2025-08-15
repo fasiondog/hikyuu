@@ -192,7 +192,7 @@ std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const
     // 创建Schema
     auto schema = arrow::schema({
       arrow::field(htr("market_code"), arrow::utf8()),
-      arrow::field(htr("name"), arrow::utf8()),
+      arrow::field(htr("stock_name"), arrow::utf8()),
       arrow::field(htr("date"), arrow::date64()),
       arrow::field(htr("open"), arrow::float64()),
       arrow::field(htr("high"), arrow::float64()),
@@ -241,6 +241,21 @@ std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const
     HKU_IF_RETURN(dates.empty(), ret);
 
     ret = getMarketView(stks, dates.back(), market);
+    return ret;
+}
+
+std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
+                                                        const IndicatorList& inds,
+                                                        const Datetime& date,
+                                                        const string& market) {
+    std::shared_ptr<arrow::Table> ret;
+    auto& sm = StockManager::instance();
+    MarketInfo info = sm.getMarketInfo(market);
+    HKU_IF_RETURN(info.code().empty(), ret);
+
+    Stock market_stk = sm.getStock(fmt::format("{}{}", market, info.code()));
+    HKU_IF_RETURN(market_stk.isNull(), ret);
+
     return ret;
 }
 

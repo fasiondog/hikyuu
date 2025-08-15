@@ -33,4 +33,9 @@ std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const
 std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks,
                                                     const string& market = "SH");
 
+std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
+                                                        const IndicatorList& inds,
+                                                        const Datetime& date,
+                                                        const string& market = "SH");
+
 }  // namespace hku
