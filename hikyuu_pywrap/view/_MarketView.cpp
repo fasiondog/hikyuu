@@ -17,18 +17,18 @@ void export_MarketView(py::module& m) {
       "get_market_view",
       [](const py::sequence& stks, const Datetime& date, const string& market) {
           StockList stks_list = python_list_to_vector<Stock>(stks);
-          std::shared_ptr<arrow::Table> view;
+          arrow::Result<std::shared_ptr<arrow::Table>> view;
           if (date.isNull()) {
               view = getMarketView(stks_list, market);
           } else {
               view = getMarketView(stks_list, date, market);
           }
-          HKU_ASSERT(view);
+          HKU_ARROW_TABLE_CHECK(view);
 
           arrow::py::import_pyarrow();
 
           // 使用Arrow的Python绑定将Table转换为Python对象
-          PyObject* raw_obj = arrow::py::wrap_table(view);
+          PyObject* raw_obj = arrow::py::wrap_table(*view);
           if (raw_obj == nullptr) {
               throw std::runtime_error("wrap_table返回空指针");
           }

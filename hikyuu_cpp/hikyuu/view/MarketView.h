@@ -8,7 +8,9 @@
 #pragma once
 
 #include <arrow/api.h>
+#include "arrow_check.h"
 #include "hikyuu/Stock.h"
+#include "hikyuu/indicator/Indicator.h"
 
 namespace hku {
 
@@ -20,8 +22,9 @@ namespace hku {
  * @param market 市场代码（用于获取交易日历）
  * @return
  */
-std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const Datetime& date,
-                                                    const string& market = "SH");
+arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockList& stks,
+                                                                   const Datetime& date,
+                                                                   const string& market = "SH");
 
 /**
  * 获取指定股票集合在最后交易日的行情数据，不包含当日停牌无数据的股票。如自动接收行情数据，则为实时行情数据
@@ -30,12 +33,11 @@ std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const
  * @param market 市场代码（用于获取交易日历）
  * @return
  */
-std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks,
-                                                    const string& market = "SH");
+arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockList& stks,
+                                                                   const string& market = "SH");
 
-std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
-                                                        const IndicatorList& inds,
-                                                        const Datetime& date,
-                                                        const string& market = "SH");
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getIndicatorsView(const StockList& stks, const IndicatorList& inds, const KQuery& query,
+                  const string& market = "SH");
 
 }  // namespace hku
