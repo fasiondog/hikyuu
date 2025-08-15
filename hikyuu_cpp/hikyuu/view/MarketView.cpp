@@ -36,7 +36,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
     HKU_ARROW_ERROR_IF_RETURN(start_pos < 1, "At least 2 trading days are required!");
 
     DatetimeList dates = market_stk.getDatetimeList(KQueryByIndex(start_pos - 1, start_pos + 1));
-    HKU_ARROW_ERROR_IF_RETURN(dates.size() == 2, "At least 2 trading days are required!");
+    HKU_ARROW_ERROR_IF_RETURN(dates.size() < 2, "At least 2 trading days are required!");
 
     Datetime yesterday = dates[0];
     Datetime today = dates[1];
@@ -231,14 +231,55 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
         fields.emplace_back(arrow::field(ind.name(), arrow::float64()));
     }
 
+    vector<double> null_values(inds.size(), Null<double>());
+    arrow::StringBuilder code_builder, name_builder;
+    arrow::Date64Builder date_builder;
+    std::vector<arrow::DoubleBuilder> builders(inds.size());
     for (const auto& stk : stks) {
         auto kdata = stk.getKData(query);
-        for (const auto& ind : inds) {
-            auto x = ALIGN(ind, dates, true)(kdata);
+        bool have_data = true;
+        for (size_t i = 0; i < inds.size(); ++i) {
+            auto x = ALIGN(inds[i], dates, true)(kdata);
+            if (x.size() != dates.size()) {
+                have_data = false;
+            } else {
+                const auto* x_ptr = x.data();
+                HKU_ARROW_RETURN_NOT_OK(builders[i].AppendValues(x_ptr, x.size()));
+            }
+        }
+
+        if (have_data) {
+            for (size_t i = 0; i < dates.size(); ++i) {
+                HKU_ARROW_RETURN_NOT_OK(code_builder.Append(stk.market_code()));
+                HKU_ARROW_RETURN_NOT_OK(name_builder.Append(stk.name()));
+                HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates[i].timestamp() / 1000LL));
+            }
         }
     }
 
-    return arrow::Result<std::shared_ptr<arrow::Table>>();
+    vector<std::shared_ptr<arrow::Array>> arrs;
+    arrs.reserve(inds.size() + 3);
+
+    auto code_arr = code_builder.Finish();
+    HKU_ARROW_RETURN_NOT_OK2(code_arr);
+    arrs.push_back(*code_arr);
+
+    auto name_arr = name_builder.Finish();
+    HKU_ARROW_RETURN_NOT_OK2(name_arr);
+    arrs.push_back(*name_arr);
+
+    auto date_arr = date_builder.Finish();
+    HKU_ARROW_RETURN_NOT_OK2(date_arr);
+    arrs.push_back(*date_arr);
+
+    for (size_t i = 0; i < inds.size(); ++i) {
+        auto arr = builders[i].Finish();
+        HKU_ARROW_RETURN_NOT_OK2(arr);
+        arrs.push_back(*arr);
+    }
+
+    auto schema = arrow::schema(fields);
+    return arrow::Table::Make(schema, arrs);
 }
 
 }  // namespace hku

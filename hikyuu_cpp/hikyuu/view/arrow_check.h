@@ -32,6 +32,14 @@ namespace hku {
         }                                                   \
     } while (false)
 
+#define HKU_ARROW_RETURN_NOT_OK2(arrow_ret)          \
+    do {                                             \
+        if (!arrow_ret.ok()) {                       \
+            HKU_ERROR(arrow_ret.status().message()); \
+            return arrow_ret.status();               \
+        }                                            \
+    } while (false)
+
 #define HKU_ARROW_IF_RETURN(expr)            \
     do {                                     \
         if (expr) {                          \
