@@ -12,7 +12,7 @@
 #include "hikyuu/indicator/crt/LIUTONGPAN.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/StockManager.h"
-#include "MarketView.h"
+#include "arrow_views.h"
 
 namespace hku {
 
@@ -226,7 +226,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
     fields.reserve(inds.size() + 3);
     fields.emplace_back(arrow::field(htr("market_code"), arrow::utf8()));
     fields.emplace_back(arrow::field(htr("stock_name"), arrow::utf8()));
-    fields.emplace_back(arrow::field(htr("date"), arrow::date64()));
+    fields.emplace_back(arrow::field(htr("datetime"), arrow::date64()));
     for (auto& ind : inds) {
         fields.emplace_back(arrow::field(ind.name(), arrow::float64()));
     }
@@ -234,6 +234,15 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
     arrow::StringBuilder code_builder, name_builder;
     arrow::Date64Builder date_builder;
     std::vector<arrow::DoubleBuilder> builders(inds.size());
+
+    size_t total = stks.size() * dates.size();
+    HKU_ARROW_RETURN_NOT_OK(code_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(name_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Reserve(total));
+    for (auto& builder : builders) {
+        HKU_ARROW_RETURN_NOT_OK(builder.Reserve(total));
+    }
+
     for (const auto& stk : stks) {
         auto kdata = stk.getKData(query);
         bool have_data = true;
@@ -295,7 +304,7 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Dateti
     fields.reserve(inds.size() + 3);
     fields.emplace_back(arrow::field(htr("market_code"), arrow::utf8()));
     fields.emplace_back(arrow::field(htr("stock_name"), arrow::utf8()));
-    fields.emplace_back(arrow::field(htr("date"), arrow::date64()));
+    fields.emplace_back(arrow::field(htr("datetime"), arrow::date64()));
     for (auto& ind : inds) {
         fields.emplace_back(arrow::field(ind.name(), HKU_ARROW_PRICE_FIELD));
     }
@@ -363,6 +372,63 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Dateti
 
     auto schema = arrow::schema(fields);
     return arrow::Table::Make(schema, arrs);
+}
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getKRecordListView(const KRecordList& ks) {
+    std::vector<std::shared_ptr<arrow::Field>> fields;
+    fields.emplace_back(arrow::field("datetime", arrow::date64()));
+    fields.emplace_back(arrow::field("open", arrow::float64()));
+    fields.emplace_back(arrow::field("high", arrow::float64()));
+    fields.emplace_back(arrow::field("low", arrow::float64()));
+    fields.emplace_back(arrow::field("close", arrow::float64()));
+    fields.emplace_back(arrow::field("amount", arrow::float64()));
+    fields.emplace_back(arrow::field("volume", arrow::float64()));
+
+    arrow::Date64Builder date_builder;
+    arrow::DoubleBuilder open_builder, high_builder, low_builder, close_builder, amount_builder,
+      volume_builder;
+    size_t total = ks.size();
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(open_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(high_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(low_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(close_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(amount_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(volume_builder.Reserve(total));
+
+    for (auto& k : ks) {
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(k.datetime.timestamp() / 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(open_builder.Append(k.openPrice));
+        HKU_ARROW_RETURN_NOT_OK(high_builder.Append(k.highPrice));
+        HKU_ARROW_RETURN_NOT_OK(low_builder.Append(k.lowPrice));
+        HKU_ARROW_RETURN_NOT_OK(close_builder.Append(k.closePrice));
+        HKU_ARROW_RETURN_NOT_OK(amount_builder.Append(k.transAmount));
+        HKU_ARROW_RETURN_NOT_OK(volume_builder.Append(k.transCount));
+    }
+
+    std::shared_ptr<arrow::Array> date_arr, open_arr, high_arr, low_arr, close_arr, amount_arr,
+      volume_arr;
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Finish(&date_arr));
+    HKU_ARROW_RETURN_NOT_OK(open_builder.Finish(&open_arr));
+    HKU_ARROW_RETURN_NOT_OK(high_builder.Finish(&high_arr));
+    HKU_ARROW_RETURN_NOT_OK(low_builder.Finish(&low_arr));
+    HKU_ARROW_RETURN_NOT_OK(close_builder.Finish(&close_arr));
+    HKU_ARROW_RETURN_NOT_OK(amount_builder.Finish(&amount_arr));
+    HKU_ARROW_RETURN_NOT_OK(volume_builder.Finish(&volume_arr));
+
+    auto schema = arrow::schema({
+      arrow::field("datetime", arrow::date64()),
+      arrow::field("open", arrow::float64()),
+      arrow::field("high", arrow::float64()),
+      arrow::field("low", arrow::float64()),
+      arrow::field("close", arrow::float64()),
+      arrow::field("amount", arrow::float64()),
+      arrow::field("volume", arrow::float64()),
+    });
+
+    return arrow::Table::Make(
+      schema, {date_arr, open_arr, high_arr, low_arr, close_arr, amount_arr, volume_arr});
 }
 
 }  // namespace hku

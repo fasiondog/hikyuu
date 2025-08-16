@@ -6,8 +6,7 @@
  */
 
 #include <arrow/python/pyarrow.h>
-#include <hikyuu/arrow/MarketView.h>
-#include <hikyuu/arrow/arrow_print.h>
+#include <hikyuu/views/arrow_views.h>
 #include "../pybind_utils.h"
 
 using namespace hku;
@@ -25,15 +24,9 @@ void export_MarketView(py::module& m) {
               view = getMarketView(stks_list, date, market);
           }
           HKU_ARROW_TABLE_CHECK(view);
-
           arrow::py::import_pyarrow();
-
-          // 使用Arrow的Python绑定将Table转换为Python对象
           PyObject* raw_obj = arrow::py::wrap_table(*view);
-          if (raw_obj == nullptr) {
-              throw std::runtime_error("wrap_table返回空指针");
-          }
-
+          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
           auto t = py::reinterpret_borrow<py::object>(raw_obj);
           return t.attr("to_pandas")();
       },
@@ -58,13 +51,9 @@ void export_MarketView(py::module& m) {
           SPEND_TIME(get_inds_view);
           auto view = getIndicatorsView(stks, inds, query, market);
           HKU_ARROW_TABLE_CHECK(view);
-
           arrow::py::import_pyarrow();
           PyObject* raw_obj = arrow::py::wrap_table(*view);
-          if (raw_obj == nullptr) {
-              throw std::runtime_error("wrap_table返回空指针");
-          }
-
+          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
           auto t = py::reinterpret_borrow<py::object>(raw_obj);
           return t.attr("to_pandas")();
       },
@@ -77,13 +66,9 @@ void export_MarketView(py::module& m) {
           SPEND_TIME(get_inds_view);
           auto view = getIndicatorsView(stks, inds, date, cal_len, ktype, market);
           HKU_ARROW_TABLE_CHECK(view);
-
           arrow::py::import_pyarrow();
           PyObject* raw_obj = arrow::py::wrap_table(*view);
-          if (raw_obj == nullptr) {
-              throw std::runtime_error("wrap_table返回空指针");
-          }
-
+          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
           auto t = py::reinterpret_borrow<py::object>(raw_obj);
           return t.attr("to_pandas")();
       },

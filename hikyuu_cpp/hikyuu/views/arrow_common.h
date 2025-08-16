@@ -13,6 +13,11 @@
 
 namespace hku {
 
+/**
+ * @ingroup Views
+ * @{
+ */
+
 #if HKU_USE_LOW_PRECISION
 #define HKU_ARROW_PRICE_FIELD arrow::float32()
 #define HKU_ARROW_PRICE_BUILDER arrow::Float32Builder
@@ -101,4 +106,12 @@ namespace hku {
         }                                                 \
     } while (0)
 
+/**
+ * @brief 打印 arrow table
+ * @param table
+ * @param max_rows
+ */
+void printArrowTable(const std::shared_ptr<arrow::Table>& table, int max_rows = 10);
+
+/** @} */
 }  // namespace hku

@@ -9,7 +9,7 @@
 #include <vector>
 #include <iomanip>
 #include "hikyuu/utilities/datetime/Datetime.h"
-#include "arrow_print.h"
+#include "arrow_common.h"
 
 namespace hku {
 
@@ -47,15 +47,49 @@ void printArrowTable(const std::shared_ptr<arrow::Table>& table, int max_rows) {
                     if (chunk->type()->id() == arrow::Type::INT64) {
                         auto int_array = std::static_pointer_cast<arrow::Int64Array>(chunk);
                         value = std::to_string(int_array->Value(row_idx));
+                    } else if (chunk->type()->id() == arrow::Type::INT32) {
+                        auto array = std::static_pointer_cast<arrow::Int32Array>(chunk);
+                        value = std::to_string(array->Value(row_idx));
                     } else if (chunk->type()->id() == arrow::Type::DOUBLE) {
                         auto double_array = std::static_pointer_cast<arrow::DoubleArray>(chunk);
                         value = std::to_string(double_array->Value(row_idx));
+                    } else if (chunk->type()->id() == arrow::Type::FLOAT) {
+                        auto float_array = std::static_pointer_cast<arrow::FloatArray>(chunk);
+                        value = std::to_string(float_array->Value(row_idx));
                     } else if (chunk->type()->id() == arrow::Type::STRING) {
                         auto string_array = std::static_pointer_cast<arrow::StringArray>(chunk);
                         value = string_array->GetString(row_idx);
                     } else if (chunk->type()->id() == arrow::Type::BOOL) {
                         auto bool_array = std::static_pointer_cast<arrow::BooleanArray>(chunk);
                         value = bool_array->Value(row_idx) ? "true" : "false";
+                    } else if (chunk->type()->id() == arrow::Type::DATE64) {
+                        auto array = std::static_pointer_cast<arrow::Date64Array>(chunk);
+                        value = std::to_string(
+                          Datetime::fromTimestamp(array->Value(row_idx) * 1000LL).ymdhms());
+                    } else if (chunk->type()->id() == arrow::Type::TIMESTAMP) {
+                        auto timestamp_array =
+                          std::static_pointer_cast<arrow::TimestampArray>(chunk);
+                        value = std::to_string(timestamp_array->Value(row_idx));
+                        auto timestamp_type =
+                          static_cast<const arrow::TimestampType*>(chunk->type().get());
+                        switch (timestamp_type->unit()) {
+                            case arrow::TimeUnit::NANO:
+                                value += " (ns)";
+                                break;
+                            case arrow::TimeUnit::MICRO:
+                                value += " (us)";
+                                break;
+                            case arrow::TimeUnit::MILLI:
+                                value += " (ms)";
+                                break;
+                            case arrow::TimeUnit::SECOND:
+                                value += " (s)";
+                                break;
+                        }
+                        const std::string& tz = timestamp_type->timezone();
+                        if (!tz.empty()) {
+                            value += " [" + tz + "]";
+                        }
                     } else {
                         value = "[Unsupported type]";
                     }
@@ -100,9 +134,15 @@ void printArrowTable(const std::shared_ptr<arrow::Table>& table, int max_rows) {
                         if (chunk->type()->id() == arrow::Type::INT64) {
                             auto int_array = std::static_pointer_cast<arrow::Int64Array>(chunk);
                             value = std::to_string(int_array->Value(chunk_row_idx));
+                        } else if (chunk->type()->id() == arrow::Type::INT32) {
+                            auto array = std::static_pointer_cast<arrow::Int32Array>(chunk);
+                            value = std::to_string(array->Value(chunk_row_idx));
                         } else if (chunk->type()->id() == arrow::Type::DOUBLE) {
                             auto double_array = std::static_pointer_cast<arrow::DoubleArray>(chunk);
                             value = std::to_string(double_array->Value(chunk_row_idx));
+                        } else if (chunk->type()->id() == arrow::Type::FLOAT) {
+                            auto float_array = std::static_pointer_cast<arrow::FloatArray>(chunk);
+                            value = std::to_string(float_array->Value(chunk_row_idx));
                         } else if (chunk->type()->id() == arrow::Type::STRING) {
                             auto string_array = std::static_pointer_cast<arrow::StringArray>(chunk);
                             value = string_array->GetString(chunk_row_idx);
@@ -114,6 +154,30 @@ void printArrowTable(const std::shared_ptr<arrow::Table>& table, int max_rows) {
                             value = std::to_string(
                               Datetime::fromTimestamp(array->Value(chunk_row_idx) * 1000LL)
                                 .ymdhms());
+                        } else if (chunk->type()->id() == arrow::Type::TIMESTAMP) {
+                            auto timestamp_array =
+                              std::static_pointer_cast<arrow::TimestampArray>(chunk);
+                            value = std::to_string(timestamp_array->Value(chunk_row_idx));
+                            auto timestamp_type =
+                              static_cast<const arrow::TimestampType*>(chunk->type().get());
+                            switch (timestamp_type->unit()) {
+                                case arrow::TimeUnit::NANO:
+                                    value += " (ns)";
+                                    break;
+                                case arrow::TimeUnit::MICRO:
+                                    value += " (us)";
+                                    break;
+                                case arrow::TimeUnit::MILLI:
+                                    value += " (ms)";
+                                    break;
+                                case arrow::TimeUnit::SECOND:
+                                    value += " (s)";
+                                    break;
+                            }
+                            const std::string& tz = timestamp_type->timezone();
+                            if (!tz.empty()) {
+                                value += " [" + tz + "]";
+                            }
                         } else {
                             value = "[Unsupported]";
                         }
