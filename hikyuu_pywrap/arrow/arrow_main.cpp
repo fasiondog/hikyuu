@@ -9,8 +9,8 @@
 
 namespace py = pybind11;
 
-void export_MarketView(py::module& m);
+void export_arrow_views(py::module& m);
 
 void export_arrow_main(py::module& m) {
-    export_MarketView(m);
+    export_arrow_views(m);
 }

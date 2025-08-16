@@ -12,7 +12,7 @@
 using namespace hku;
 namespace py = pybind11;
 
-void export_MarketView(py::module& m) {
+void export_arrow_views(py::module& m) {
     m.def(
       "get_market_view",
       [](const py::sequence& stks, const Datetime& date, const string& market) {
@@ -74,4 +74,29 @@ void export_MarketView(py::module& m) {
       },
       py::arg("stks"), py::arg("inds"), py::arg("date"), py::arg("cal_len") = 100,
       py::arg("ktype") = KQuery::DAY, py::arg("market") = "SH");
+
+    m.def(
+      "krecords_to_pa",
+      [](const KRecordList& ks) {
+          SPEND_TIME(krecords_to_pa);
+          auto view = getKRecordListView(ks);
+          HKU_ARROW_TABLE_CHECK(view);
+          arrow::py::import_pyarrow();
+          PyObject* raw_obj = arrow::py::wrap_table(*view);
+          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+          return py::reinterpret_borrow<py::object>(raw_obj);
+      },
+      "将KRecordList转换为parraw.Table");
+
+    m.def(
+      "timeline_to_pa",
+      [](const TimeLineList& ts) {
+          auto view = getTimeLineListView(ts);
+          HKU_ARROW_TABLE_CHECK(view);
+          arrow::py::import_pyarrow();
+          PyObject* raw_obj = arrow::py::wrap_table(*view);
+          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+          return py::reinterpret_borrow<py::object>(raw_obj);
+      },
+      "将分时线记录转换为 pyarrow.Table 对象");
 }

@@ -5,9 +5,7 @@
  *      Author: fasiondog
  */
 
-#include <arrow/python/pyarrow.h>
 #include <hikyuu/serialization/KRecord_serialization.h>
-#include <hikyuu/views/arrow_views.h>
 #include "df_to_ks.h"
 
 using namespace hku;
@@ -134,19 +132,6 @@ void export_KReord(py::module& m) {
 
         return py::module_::import("pandas").attr("DataFrame")(columns, py::arg("copy") = false);
     });
-
-    m.def(
-      "krecords_to_pa",
-      [](const KRecordList& ks) {
-          SPEND_TIME(krecords_to_pa);
-          auto view = getKRecordListView(ks);
-          HKU_ARROW_TABLE_CHECK(view);
-          arrow::py::import_pyarrow();
-          PyObject* raw_obj = arrow::py::wrap_table(*view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          return py::reinterpret_borrow<py::object>(raw_obj);
-      },
-      "将KRecordList转换为parraw.Table");
 
     m.def("df_to_krecords", df_to_krecords,
           R"(df_to_krecords(df: pd.DataFrame[, columns: dict]) -> KRecordList
