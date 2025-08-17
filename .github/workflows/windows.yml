@@ -33,6 +33,8 @@ jobs:
     - name: configure
       shell: cmd
       run: |
+        export PYTHONPATH=.
+        pip install -r requirements.txt      
         xmake f -c -k shared --feedback=n -y -vD
 
     - name: build

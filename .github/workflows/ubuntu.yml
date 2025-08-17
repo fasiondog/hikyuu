@@ -40,6 +40,8 @@ jobs:
 
     - name: config
       run: |
+        export PYTHONPATH=.
+        pip3 install -r requirements.txt      
         xmake f --feedback=n -k shared -y
 
     - name: build

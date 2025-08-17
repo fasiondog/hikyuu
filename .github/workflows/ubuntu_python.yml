@@ -40,6 +40,8 @@ jobs:
 
     - name: configure
       run: |
+        export PYTHONPATH=.
+        pip install -r requirements.txt      
         xmake f -y -k shared
 
     - name: build

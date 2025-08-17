@@ -46,6 +46,8 @@ jobs:
 
       - name: config
         run: |
+          export PYTHONPATH=.
+          pip install -r requirements.txt
           xmake f -c -k ${{ matrix.kind }} -y -vD --feedback=n
 
       - name: build python
@@ -54,8 +56,6 @@ jobs:
           
       - name: test python
         run: |
-          export PYTHONPATH=.
-          pip install -r requirements.txt
           python hikyuu/test/test.py
 
       - name: build test
