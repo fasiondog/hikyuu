@@ -9,6 +9,7 @@
 #ifndef INDICATOR_H_
 #define INDICATOR_H_
 
+#include "hikyuu/views/arrow_common.h"
 #include "IndicatorImp.h"
 #include "IndParam.h"
 
@@ -204,6 +205,18 @@ public:
     }
 
     string str() const;
+
+    /**
+     * @brief 转换为 Arrow Table，包含时间序列，则带有时间列，否则无时间列
+     * @return arrow::Result<std::shared_ptr<arrow::Table>>
+     */
+    [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> toArrow();
+
+    /**
+     * @brief 仅包含值，不包含时间序列
+     * @return arrow::Result<std::shared_ptr<arrow::Table>>
+     */
+    [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> toArrowOnlyValue();
 
 public:
     class Iterator {

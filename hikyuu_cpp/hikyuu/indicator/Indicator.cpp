@@ -20,6 +20,77 @@ string Indicator::str() const {
     return m_imp ? m_imp->str() : "Indicator{}";
 }
 
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> Indicator::toArrow() {
+    arrow::Date64Builder date_builder;
+    vector<HKU_ARROW_PRICE_BUILDER> value_builders;
+
+    size_t result_num = getResultNumber();
+    for (size_t i = 0; i < result_num; i++) {
+        value_builders.emplace_back();
+    }
+
+    size_t total = size();
+    auto dates = getDatetimeList();
+    if (!dates.empty()) {
+        for (size_t i = 0; i < total; i++) {
+            HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates[i].timestamp() / 1000LL));
+        }
+    }
+
+    for (size_t r = 0; r < result_num; r++) {
+        HKU_ARROW_RETURN_NOT_OK(value_builders[r].AppendValues(data(r), total));
+    }
+
+    std::vector<std::shared_ptr<arrow::Field>> fields;
+    vector<std::shared_ptr<arrow::Array>> arrs;
+
+    if (!dates.empty()) {
+        fields.emplace_back(arrow::field("datetime", arrow::date64()));
+        auto date_arr = date_builder.Finish();
+        HKU_ARROW_RETURN_NOT_OK2(date_arr);
+        arrs.push_back(*date_arr);
+    }
+
+    for (size_t r = 0; r < result_num; r++) {
+        fields.emplace_back(arrow::field(fmt::format("value{}", r + 1), HKU_ARROW_PRICE_FIELD));
+        auto value_arr = value_builders[r].Finish();
+        HKU_ARROW_RETURN_NOT_OK2(value_arr);
+        arrs.push_back(*value_arr);
+    }
+
+    auto schema = arrow::schema(fields);
+    return arrow::Table::Make(schema, arrs);
+}
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> Indicator::toArrowOnlyValue() {
+    vector<HKU_ARROW_PRICE_BUILDER> value_builders;
+
+    size_t result_num = getResultNumber();
+    for (size_t i = 0; i < result_num; i++) {
+        value_builders.emplace_back();
+    }
+
+    size_t total = size();
+    for (size_t r = 0; r < result_num; r++) {
+        HKU_ARROW_RETURN_NOT_OK(value_builders[r].AppendValues(data(r), total));
+    }
+
+    std::vector<std::shared_ptr<arrow::Field>> fields;
+    for (size_t r = 0; r < result_num; r++) {
+        fields.emplace_back(arrow::field(fmt::format("value{}", r + 1), HKU_ARROW_PRICE_FIELD));
+    }
+
+    vector<std::shared_ptr<arrow::Array>> arrs;
+    for (size_t r = 0; r < result_num; r++) {
+        auto value_arr = value_builders[r].Finish();
+        HKU_ARROW_RETURN_NOT_OK2(value_arr);
+        arrs.push_back(*value_arr);
+    }
+
+    auto schema = arrow::schema(fields);
+    return arrow::Table::Make(schema, arrs);
+}
+
 Indicator::Indicator(const IndicatorImpPtr& imp) : m_imp(imp) {}
 
 Indicator::Indicator(const Indicator& indicator) : m_imp(indicator.m_imp) {}

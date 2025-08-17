@@ -375,55 +375,6 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Dateti
 }
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getKRecordListView(const KData& kdata) {
-    arrow::Date64Builder date_builder;
-    arrow::DoubleBuilder open_builder, high_builder, low_builder, close_builder, amount_builder,
-      volume_builder;
-    size_t total = kdata.size();
-    HKU_ARROW_RETURN_NOT_OK(date_builder.Reserve(total));
-    HKU_ARROW_RETURN_NOT_OK(open_builder.Reserve(total));
-    HKU_ARROW_RETURN_NOT_OK(high_builder.Reserve(total));
-    HKU_ARROW_RETURN_NOT_OK(low_builder.Reserve(total));
-    HKU_ARROW_RETURN_NOT_OK(close_builder.Reserve(total));
-    HKU_ARROW_RETURN_NOT_OK(amount_builder.Reserve(total));
-    HKU_ARROW_RETURN_NOT_OK(volume_builder.Reserve(total));
-
-    const auto* ks = kdata.data();
-    for (size_t i = 0; i < total; i++) {
-        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(ks[i].datetime.timestamp() / 1000LL));
-        HKU_ARROW_RETURN_NOT_OK(open_builder.Append(ks[i].openPrice));
-        HKU_ARROW_RETURN_NOT_OK(high_builder.Append(ks[i].highPrice));
-        HKU_ARROW_RETURN_NOT_OK(low_builder.Append(ks[i].lowPrice));
-        HKU_ARROW_RETURN_NOT_OK(close_builder.Append(ks[i].closePrice));
-        HKU_ARROW_RETURN_NOT_OK(amount_builder.Append(ks[i].transAmount));
-        HKU_ARROW_RETURN_NOT_OK(volume_builder.Append(ks[i].transCount));
-    }
-
-    std::shared_ptr<arrow::Array> date_arr, open_arr, high_arr, low_arr, close_arr, amount_arr,
-      volume_arr;
-    HKU_ARROW_RETURN_NOT_OK(date_builder.Finish(&date_arr));
-    HKU_ARROW_RETURN_NOT_OK(open_builder.Finish(&open_arr));
-    HKU_ARROW_RETURN_NOT_OK(high_builder.Finish(&high_arr));
-    HKU_ARROW_RETURN_NOT_OK(low_builder.Finish(&low_arr));
-    HKU_ARROW_RETURN_NOT_OK(close_builder.Finish(&close_arr));
-    HKU_ARROW_RETURN_NOT_OK(amount_builder.Finish(&amount_arr));
-    HKU_ARROW_RETURN_NOT_OK(volume_builder.Finish(&volume_arr));
-
-    auto schema = arrow::schema({
-      arrow::field("datetime", arrow::date64()),
-      arrow::field("open", arrow::float64()),
-      arrow::field("high", arrow::float64()),
-      arrow::field("low", arrow::float64()),
-      arrow::field("close", arrow::float64()),
-      arrow::field("amount", arrow::float64()),
-      arrow::field("volume", arrow::float64()),
-    });
-
-    return arrow::Table::Make(
-      schema, {date_arr, open_arr, high_arr, low_arr, close_arr, amount_arr, volume_arr});
-}
-
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getKRecordListView(const KRecordList& ks) {
     arrow::Date64Builder date_builder;
     arrow::DoubleBuilder open_builder, high_builder, low_builder, close_builder, amount_builder,

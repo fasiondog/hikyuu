@@ -311,5 +311,7 @@ void export_KData(py::module& m) {
     :param bool with_stock: 包含Stock的代码与名称
     :rtype: pandas.DataFrame)")
 
+      .def("to_pa", &KData::toArrow)
+
         DEF_PICKLE(KData);
 }

@@ -9,6 +9,7 @@
 #ifndef KDATA_H_
 #define KDATA_H_
 
+#include "hikyuu/views/arrow_common.h"
 #include "KDataImp.h"
 
 namespace hku {
@@ -108,6 +109,12 @@ public:
 
     /** 成交金额 */
     Indicator amo() const;
+
+    /**
+     * 转换至 arrow table
+     * @return arrow::Result<std::shared_ptr<arrow::Table>>
+     */
+    [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> toArrow();
 
 public:
     typedef KRecordList::iterator iterator;

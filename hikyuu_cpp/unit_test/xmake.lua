@@ -66,7 +66,7 @@ target("unit-test")
         end
     end
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "arrow")
     if get_config("mysql") then
         add_packages("mysql")
     end

@@ -67,9 +67,6 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const KQuery
   const KQuery::KType& ktype = KQuery::DAY, const string& market = "SH");
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getKRecordListView(const KData& kdata);
-
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getKRecordListView(const KRecordList& ks);
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API

@@ -255,6 +255,10 @@ KRecordList.to_numpy = KRecordList.to_np
 KRecordList.to_pandas = KRecordList.to_df
 KRecordList.to_pyarrow = lambda data: krecords_to_pa(data)
 
+KData.to_numpy = KData.to_np
+KData.to_pandas = KData.to_df
+KData.to_pyarrow = KData.to_pa
+
 # ------------------------------------------------------------------
 # 增强 Parameter
 # ------------------------------------------------------------------
