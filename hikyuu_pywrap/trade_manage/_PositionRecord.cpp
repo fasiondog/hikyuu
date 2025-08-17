@@ -45,78 +45,84 @@ void export_PositionRecord(py::module& m) {
 
         DEF_PICKLE(PositionRecord);
 
-    m.def("positions_to_np", [](const PositionRecordList& positions) {
-        size_t total = positions.size();
-        HKU_IF_RETURN(total == 0, py::array());
+    m.def(
+      "positions_to_np",
+      [](const PositionRecordList& positions) {
+          size_t total = positions.size();
+          HKU_IF_RETURN(total == 0, py::array());
 
-        struct alignas(8) RawData {
-            int32_t code[10];
-            int32_t name[20];
-            int64_t take_datetime;        // 买入日期
-            int64_t hold_days;            // 已持仓天数
-            double number;                // 当前持仓数量
-            double invest;                // 当前投入金额
-            double current_market_value;  // 当前市值
-            double profit;                // 当前盈亏金额
-            double profit_ratio;          // 当前盈亏比例
-            double stoploss;              // 当前止损价
-            double goal_price;            // 当前的目标价格
-            int64_t clean_datetime;       // 卖出日期
-            double total_number;          // 累计持仓数量
-            double total_cost;            // 累计交易成本
-            double total_risk;  // 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
-            double buy_money;   // 累计投入金额
-            double sell_money;  // 累计卖出资金
-        };
+          struct alignas(8) RawData {
+              int32_t code[10];
+              int32_t name[20];
+              int64_t take_datetime;        // 买入日期
+              int64_t hold_days;            // 已持仓天数
+              double number;                // 当前持仓数量
+              double invest;                // 当前投入金额
+              double current_market_value;  // 当前市值
+              double profit;                // 当前盈亏金额
+              double profit_ratio;          // 当前盈亏比例
+              double stoploss;              // 当前止损价
+              double goal_price;            // 当前的目标价格
+              int64_t clean_datetime;       // 卖出日期
+              double total_number;          // 累计持仓数量
+              double total_cost;            // 累计交易成本
+              double total_risk;  // 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
+              double buy_money;   // 累计投入金额
+              double sell_money;  // 累计卖出资金
+          };
 
-        RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
-        for (size_t i = 0, total = positions.size(); i < total; i++) {
-            const PositionRecord& p = positions[i];
-            utf8_to_utf32(p.stock.market_code(), data[i].code, 10);
-            utf8_to_utf32(p.stock.name(), data[i].name, 20);
-            data[i].take_datetime = p.takeDatetime.timestamp() * 1000LL;
-            data[i].number = p.number;
-            data[i].invest = p.buyMoney - p.sellMoney + p.totalCost;
-            if (p.cleanDatetime.isNull()) {
-                data[i].hold_days = (Datetime::now() - p.takeDatetime).days();
-                double cur_price = p.stock.getMarketValue(Datetime::now(), KQuery::DAY);
-                data[i].current_market_value = cur_price * p.number;
-                data[i].profit = data[i].current_market_value - data[i].invest;
-            } else {
-                data[i].hold_days = (p.cleanDatetime - p.takeDatetime).days();
-                data[i].current_market_value = 0.0;
-                data[i].profit = p.totalProfit();
-            }
-            data[i].profit_ratio =
-              roundEx(100. * (data[i].invest != 0.0 ? data[i].profit / data[i].invest : 0), 2);
-            data[i].stoploss = p.stoploss;
-            data[i].goal_price = p.goalPrice;
-            data[i].clean_datetime = p.cleanDatetime.isNull()
-                                       ? std::numeric_limits<int64_t>::min()
-                                       : p.cleanDatetime.timestamp() * 1000LL;
-            data[i].total_number = p.totalNumber;
-            data[i].total_cost = p.totalCost;
-            data[i].total_risk = p.totalRisk;
-            data[i].buy_money = p.buyMoney;
-            data[i].sell_money = p.sellMoney;
-        }
+          RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+          for (size_t i = 0, total = positions.size(); i < total; i++) {
+              const PositionRecord& p = positions[i];
+              utf8_to_utf32(p.stock.market_code(), data[i].code, 10);
+              utf8_to_utf32(p.stock.name(), data[i].name, 20);
+              data[i].take_datetime = p.takeDatetime.timestamp() * 1000LL;
+              data[i].number = p.number;
+              data[i].invest = p.buyMoney - p.sellMoney + p.totalCost;
+              if (p.cleanDatetime.isNull()) {
+                  data[i].hold_days = (Datetime::now() - p.takeDatetime).days();
+                  double cur_price = p.stock.getMarketValue(Datetime::now(), KQuery::DAY);
+                  data[i].current_market_value = cur_price * p.number;
+                  data[i].profit = data[i].current_market_value - data[i].invest;
+              } else {
+                  data[i].hold_days = (p.cleanDatetime - p.takeDatetime).days();
+                  data[i].current_market_value = 0.0;
+                  data[i].profit = p.totalProfit();
+              }
+              data[i].profit_ratio =
+                roundEx(100. * (data[i].invest != 0.0 ? data[i].profit / data[i].invest : 0), 2);
+              data[i].stoploss = p.stoploss;
+              data[i].goal_price = p.goalPrice;
+              data[i].clean_datetime = p.cleanDatetime.isNull()
+                                         ? std::numeric_limits<int64_t>::min()
+                                         : p.cleanDatetime.timestamp() * 1000LL;
+              data[i].total_number = p.totalNumber;
+              data[i].total_cost = p.totalCost;
+              data[i].total_risk = p.totalRisk;
+              data[i].buy_money = p.buyMoney;
+              data[i].sell_money = p.sellMoney;
+          }
 
-        py::dtype dtype = py::dtype(
-          vector_to_python_list<string>({htr("market_code"), htr("name"), htr("take_time"),
-                                         htr("hold_days"), htr("hold_number"), htr("invest"),
-                                         htr("market_value"), htr("profit"), htr("profit_percent"),
-                                         htr("stoploss"), htr("goal_price"), htr("clean_time"),
-                                         htr("total_number"), htr("total_cost"), htr("total_risk"),
-                                         htr("buy_money"), htr("sell_money")}),
-          vector_to_python_list<string>({"U10", "U20", "datetime64[ns]", "i8", "d", "d", "d", "d",
-                                         "d", "d", "d", "datetime64[ns]", "d", "d", "d", "d", "d"}),
-          vector_to_python_list<int64_t>(
-            {0, 40, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232}),
-          240);
+          py::dtype dtype =
+            py::dtype(vector_to_python_list<string>(
+                        {htr("market_code"), htr("stock_name"), htr("take_time"), htr("hold_days"),
+                         htr("hold_number"), htr("invest"), htr("market_value"), htr("profit"),
+                         htr("profit_percent"), htr("stoploss"), htr("goal_price"),
+                         htr("clean_time"), htr("total_number"), htr("total_cost"),
+                         htr("total_risk"), htr("buy_money"), htr("sell_money")}),
+                      vector_to_python_list<string>({"U10", "U20", "datetime64[ns]", "i8", "d", "d",
+                                                     "d", "d", "d", "d", "d", "datetime64[ns]", "d",
+                                                     "d", "d", "d", "d"}),
+                      vector_to_python_list<int64_t>({0, 40, 120, 128, 136, 144, 152, 160, 168, 176,
+                                                      184, 192, 200, 208, 216, 224, 232}),
+                      240);
 
-        return py::array(dtype, total, static_cast<RawData*>(data),
-                         py::capsule(data, [](void* p) { std::free(p); }));
-    });
+          return py::array(dtype, total, static_cast<RawData*>(data),
+                           py::capsule(data, [](void* p) { std::free(p); }));
+      },
+      R"(将持仓列表转换为Numpy
+    
+    注意: 其中的当前市值、利润、盈亏等计算值均以日线计算, 如使用日线一下级别回测时, 对未清仓的持仓记录需要自行重新计算！)");
 
     m.def(
       "positions_to_df",
@@ -233,7 +239,7 @@ void export_PositionRecord(py::module& m) {
           py::dict columns;
           columns[htr("market_code").c_str()] =
             pandas.attr("Series")(code_list, py::arg("dtype") = "string");
-          columns[htr("name").c_str()] =
+          columns[htr("stock_name").c_str()] =
             pandas.attr("Series")(name_list, py::arg("dtype") = "string");
           columns[htr("take_time").c_str()] = take_time_arr.attr("astype")("datetime64[ns]");
           columns[htr("hold_days").c_str()] = hold_days_arr;
@@ -256,6 +262,8 @@ void export_PositionRecord(py::module& m) {
       R"(positions_to_df(positions)
 
     将持仓记录列表转换为 pandas DataFrame
+
+    注意: 其中的当前市值、利润、盈亏等计算值均以日线计算, 如使用日线一下级别回测时, 对未清仓的持仓记录需要自行重新计算！
 
     :param PositionRecordList positions: 持仓记录列表
     :return: 包含持仓记录的 pandas DataFrame

@@ -99,4 +99,52 @@ void export_arrow_views(py::module& m) {
           return py::reinterpret_borrow<py::object>(raw_obj);
       },
       "将分时线记录转换为 pyarrow.Table 对象");
+
+    m.def(
+      "translist_to_pa",
+      [](const TransRecordList& ts) {
+          auto view = getTransRecordListView(ts);
+          HKU_ARROW_TABLE_CHECK(view);
+          arrow::py::import_pyarrow();
+          PyObject* raw_obj = arrow::py::wrap_table(*view);
+          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+          return py::reinterpret_borrow<py::object>(raw_obj);
+      },
+      "将分笔记录转换为 pyarrow.Table 对象");
+
+    m.def(
+      "weights_to_pa",
+      [](const StockWeightList& sws) {
+          auto view = getStockWeightListView(sws);
+          HKU_ARROW_TABLE_CHECK(view);
+          arrow::py::import_pyarrow();
+          PyObject* raw_obj = arrow::py::wrap_table(*view);
+          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+          return py::reinterpret_borrow<py::object>(raw_obj);
+      },
+      "将权息记录列表转换为 pyarrow.Table 对象");
+
+    m.def(
+      "dates_to_pa",
+      [](const DatetimeList& dates) {
+          auto view = getDatetimeListView(dates);
+          HKU_ARROW_TABLE_CHECK(view);
+          arrow::py::import_pyarrow();
+          PyObject* raw_obj = arrow::py::wrap_table(*view);
+          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+          return py::reinterpret_borrow<py::object>(raw_obj);
+      },
+      "将日期列表转换为 pyarrow.Table 对象");
+
+    m.def(
+      "trades_to_df",
+      [](const TradeRecordList& trades) {
+          auto view = getTradeRecordListView(trades);
+          HKU_ARROW_TABLE_CHECK(view);
+          arrow::py::import_pyarrow();
+          PyObject* raw_obj = arrow::py::wrap_table(*view);
+          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+          return py::reinterpret_borrow<py::object>(raw_obj);
+      },
+      "将交易记录列表转换为 pyarrow.Table 对象");
 }

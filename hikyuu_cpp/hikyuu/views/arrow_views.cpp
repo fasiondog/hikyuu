@@ -534,4 +534,207 @@ getTransRecordListView(const TransRecordList& ts) {
     return arrow::Table::Make(schema, {date_arr, price_arr, vol_arr, direct_arr});
 }
 
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getStockWeightListView(const StockWeightList& sws) {
+    arrow::Date64Builder date_builder;
+    arrow::DoubleBuilder countAsGift_builder, countForSell_builder, priceForSell_builder,
+      bonus_builder, increasement_builder, totalCount_builder, freeCount_builder, suogu_builder;
+    size_t total = sws.size();
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(countAsGift_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(countForSell_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(priceForSell_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(bonus_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(increasement_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(totalCount_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(freeCount_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(suogu_builder.Reserve(total));
+
+    for (auto& w : sws) {
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(w.datetime().timestamp() / 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(countAsGift_builder.Append(w.countAsGift()));
+        HKU_ARROW_RETURN_NOT_OK(countForSell_builder.Append(w.countForSell()));
+        HKU_ARROW_RETURN_NOT_OK(priceForSell_builder.Append(w.priceForSell()));
+        HKU_ARROW_RETURN_NOT_OK(bonus_builder.Append(w.bonus()));
+        HKU_ARROW_RETURN_NOT_OK(increasement_builder.Append(w.increasement()));
+        HKU_ARROW_RETURN_NOT_OK(totalCount_builder.Append(w.totalCount()));
+        HKU_ARROW_RETURN_NOT_OK(freeCount_builder.Append(w.freeCount()));
+        HKU_ARROW_RETURN_NOT_OK(suogu_builder.Append(w.suogu()));
+    }
+
+    std::shared_ptr<arrow::Array> date_arr, countAsGift_arr, countForSell_arr, priceForSell_arr,
+      bonus_arr, increasement_arr, totalCount_arr, freeCount_arr, suogu_arr;
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Finish(&date_arr));
+    HKU_ARROW_RETURN_NOT_OK(countAsGift_builder.Finish(&countAsGift_arr));
+    HKU_ARROW_RETURN_NOT_OK(countForSell_builder.Finish(&countForSell_arr));
+    HKU_ARROW_RETURN_NOT_OK(priceForSell_builder.Finish(&priceForSell_arr));
+    HKU_ARROW_RETURN_NOT_OK(bonus_builder.Finish(&bonus_arr));
+    HKU_ARROW_RETURN_NOT_OK(increasement_builder.Finish(&increasement_arr));
+    HKU_ARROW_RETURN_NOT_OK(totalCount_builder.Finish(&totalCount_arr));
+    HKU_ARROW_RETURN_NOT_OK(freeCount_builder.Finish(&freeCount_arr));
+    HKU_ARROW_RETURN_NOT_OK(suogu_builder.Finish(&suogu_arr));
+
+    auto schema = arrow::schema({
+      arrow::field("datetime", arrow::date64()),
+      arrow::field("countAsGift", arrow::float64()),
+      arrow::field("countForSell", arrow::float64()),
+      arrow::field("priceForSell", arrow::float64()),
+      arrow::field("bonus", arrow::float64()),
+      arrow::field("increasement", arrow::float64()),
+      arrow::field("totalCount", arrow::float64()),
+      arrow::field("freeCount", arrow::float64()),
+      arrow::field("suogu", arrow::float64()),
+    });
+
+    return arrow::Table::Make(
+      schema, {date_arr, countAsGift_arr, countForSell_arr, priceForSell_arr, bonus_arr,
+               increasement_arr, totalCount_arr, freeCount_arr, suogu_arr});
+}
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getDatetimeListView(const DatetimeList& dates) {
+    arrow::Date64Builder date_builder;
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Reserve(dates.size()));
+
+    for (auto& date : dates) {
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(date.timestamp() / 1000LL));
+    }
+
+    std::shared_ptr<arrow::Array> date_arr;
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Finish(&date_arr));
+
+    auto schema = arrow::schema({arrow::field("datetime", arrow::date64())});
+    return arrow::Table::Make(schema, {date_arr});
+}
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getTradeRecordListView(const TradeRecordList& trades) {
+    arrow::StringBuilder code_builder, name_builder, business_builder, sig_builder, remark_builder;
+    arrow::Date64Builder date_builder;
+    arrow::DoubleBuilder plan_builder, real_builder, goal_builder, stoploss_builder, number_builder,
+      cash_builder, cost_total_builder, cost_commission_builder, cost_stamptax_builder,
+      cost_transferfee_builder, cost_other_builder;
+
+    size_t total = trades.size();
+    HKU_ARROW_RETURN_NOT_OK(code_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(name_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(business_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(plan_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(real_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(goal_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(number_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(stoploss_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(cash_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(cost_total_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(cost_commission_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(cost_stamptax_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(cost_transferfee_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(cost_other_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(sig_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(remark_builder.Reserve(total));
+
+    for (auto& tr : trades) {
+        HKU_ARROW_RETURN_NOT_OK(code_builder.Append(tr.stock.market_code()));
+        HKU_ARROW_RETURN_NOT_OK(name_builder.Append(tr.stock.name()));
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(tr.datetime.timestamp() / 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(business_builder.Append(getBusinessName(tr.business)));
+        HKU_ARROW_RETURN_NOT_OK(plan_builder.Append(tr.planPrice));
+        HKU_ARROW_RETURN_NOT_OK(real_builder.Append(tr.realPrice));
+        HKU_ARROW_RETURN_NOT_OK(goal_builder.Append(tr.goalPrice));
+        HKU_ARROW_RETURN_NOT_OK(number_builder.Append(tr.number));
+        HKU_ARROW_RETURN_NOT_OK(stoploss_builder.Append(tr.stoploss));
+        HKU_ARROW_RETURN_NOT_OK(cash_builder.Append(tr.cash));
+        HKU_ARROW_RETURN_NOT_OK(cost_total_builder.Append(tr.cost.total));
+        HKU_ARROW_RETURN_NOT_OK(cost_commission_builder.Append(tr.cost.commission));
+        HKU_ARROW_RETURN_NOT_OK(cost_stamptax_builder.Append(tr.cost.stamptax));
+        HKU_ARROW_RETURN_NOT_OK(cost_transferfee_builder.Append(tr.cost.transferfee));
+        HKU_ARROW_RETURN_NOT_OK(cost_other_builder.Append(tr.cost.others));
+        HKU_ARROW_RETURN_NOT_OK(sig_builder.Append(getSystemPartName(tr.from)));
+        HKU_ARROW_RETURN_NOT_OK(remark_builder.Append(tr.remark));
+    }
+
+    std::shared_ptr<arrow::Array> code_arr, name_arr, date_arr, business_arr, plan_arr, real_arr,
+      goal_arr, number_arr, stoploss_arr, cash_arr, cost_total_arr, cost_commission_arr,
+      cost_stamptax_arr, cost_transferfee_arr, cost_other_arr, sig_arr, remark_arr;
+
+    HKU_ARROW_RETURN_NOT_OK(code_builder.Finish(&code_arr));
+    HKU_ARROW_RETURN_NOT_OK(name_builder.Finish(&name_arr));
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Finish(&date_arr));
+    HKU_ARROW_RETURN_NOT_OK(business_builder.Finish(&business_arr));
+    HKU_ARROW_RETURN_NOT_OK(plan_builder.Finish(&plan_arr));
+    HKU_ARROW_RETURN_NOT_OK(real_builder.Finish(&real_arr));
+    HKU_ARROW_RETURN_NOT_OK(goal_builder.Finish(&goal_arr));
+    HKU_ARROW_RETURN_NOT_OK(number_builder.Finish(&number_arr));
+    HKU_ARROW_RETURN_NOT_OK(stoploss_builder.Finish(&stoploss_arr));
+    HKU_ARROW_RETURN_NOT_OK(cash_builder.Finish(&cash_arr));
+    HKU_ARROW_RETURN_NOT_OK(cost_total_builder.Finish(&cost_total_arr));
+    HKU_ARROW_RETURN_NOT_OK(cost_commission_builder.Finish(&cost_commission_arr));
+    HKU_ARROW_RETURN_NOT_OK(cost_stamptax_builder.Finish(&cost_stamptax_arr));
+    HKU_ARROW_RETURN_NOT_OK(cost_transferfee_builder.Finish(&cost_transferfee_arr));
+    HKU_ARROW_RETURN_NOT_OK(cost_other_builder.Finish(&cost_other_arr));
+    HKU_ARROW_RETURN_NOT_OK(sig_builder.Finish(&sig_arr));
+    HKU_ARROW_RETURN_NOT_OK(remark_builder.Finish(&remark_arr));
+
+    auto schema = arrow::schema({
+      arrow::field(htr("market_code"), arrow::utf8()),
+      arrow::field(htr("stock_name"), arrow::utf8()),
+      arrow::field(htr("datetime"), arrow::date64()),
+      arrow::field(htr("business"), arrow::utf8()),
+      arrow::field(htr("planPrice"), arrow::float64()),
+      arrow::field(htr("realPrice"), arrow::float64()),
+      arrow::field(htr("goalPrice"), arrow::float64()),
+      arrow::field(htr("number"), arrow::float64()),
+      arrow::field(htr("stoploss"), arrow::float64()),
+      arrow::field(htr("cash"), arrow::float64()),
+      arrow::field(htr("cost_total"), arrow::float64()),
+      arrow::field(htr("cost_commission"), arrow::float64()),
+      arrow::field(htr("cost_stamptax"), arrow::float64()),
+      arrow::field(htr("cost_transferfee"), arrow::float64()),
+      arrow::field(htr("cost_others"), arrow::float64()),
+      arrow::field(htr("part_from"), arrow::utf8()),
+      arrow::field(htr("remark"), arrow::utf8()),
+    });
+
+    return arrow::Table::Make(
+      schema, {code_arr, name_arr, date_arr, business_arr, plan_arr, real_arr, goal_arr, number_arr,
+               stoploss_arr, cash_arr, cost_total_arr, cost_commission_arr, cost_stamptax_arr,
+               cost_transferfee_arr, cost_other_arr, sig_arr, remark_arr});
+}
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getPositionRecordListView(const PositionRecordList& positions) {
+    arrow::StringBuilder code_builder, name_builder;
+    arrow::Date64Builder taketime_builder, cleantime_builder;
+    arrow::Int64Builder hold_days_builder;
+    arrow::DoubleBuilder hold_number_builder, invest_builder, market_value_builder, profit_builder,
+      profit_percent_builder, stoploss_builder, goal_price_builder, total_number_builder,
+      total_cost_builder, total_risk_builder, buy_money_builder, sell_money_builder;
+
+    size_t total = positions.size();
+    HKU_ARROW_RETURN_NOT_OK(code_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(name_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(taketime_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(cleantime_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(hold_days_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(hold_number_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(invest_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(market_value_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(profit_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(profit_percent_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(stoploss_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(goal_price_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(total_number_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(total_cost_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(total_risk_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(buy_money_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(sell_money_builder.Reserve(total));
+
+    for (const auto& p : positions) {
+        HKU_ARROW_RETURN_NOT_OK(code_builder.Append(p.stock.market_code()));
+        HKU_ARROW_RETURN_NOT_OK(name_builder.Append(p.stock.name()));
+        HKU_ARROW_RETURN_NOT_OK(taketime_builder.Append(p.takeDatetime.timestamp() / 1000LL));
+    }
+}
+
 }  // namespace hku

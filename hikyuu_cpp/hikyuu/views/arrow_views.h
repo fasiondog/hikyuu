@@ -10,6 +10,8 @@
 #include "arrow_common.h"
 #include "hikyuu/Stock.h"
 #include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/trade_manage/PositionRecord.h"
+#include "hikyuu/trade_manage/TradeRecord.h"
 
 namespace hku {
 
@@ -75,6 +77,18 @@ getTimeLineListView(const TimeLineList& ts);
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getTransRecordListView(const TransRecordList& ts);
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getStockWeightListView(const StockWeightList& sws);
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getDatetimeListView(const DatetimeList& dates);
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getTradeRecordListView(const TradeRecordList& trades);
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getPositionRecordListView(const PositionRecordList& positions);
 
 /** @} */
 }  // namespace hku

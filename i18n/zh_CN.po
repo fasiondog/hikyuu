@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-08-17 02:32+0800\n"
-"PO-Revision-Date: 2025-08-17 02:32+0800\n"
+"POT-Creation-Date: 2025-08-17 14:41+0800\n"
+"PO-Revision-Date: 2025-08-17 14:41+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -430,9 +430,10 @@ msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时卖空
 
 #: hikyuu_cpp/hikyuu/views/arrow_views.cpp:171
 #: hikyuu_cpp/hikyuu/views/arrow_views.cpp:227
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:296
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:105
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:234
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:305
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:680
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:240
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:217
 #: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:63
@@ -444,7 +445,12 @@ msgstr "证券代码"
 
 #: hikyuu_cpp/hikyuu/views/arrow_views.cpp:172
 #: hikyuu_cpp/hikyuu/views/arrow_views.cpp:228
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:297
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:306
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:681
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:242
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:219
 #: hikyuu_pywrap/trade_sys/_Selector.cpp:137
 #: hikyuu_pywrap/trade_sys/_Selector.cpp:184
 msgid "stock_name"
@@ -511,11 +517,98 @@ msgid "pb"
 msgstr "市净率"
 
 #: hikyuu_cpp/hikyuu/views/arrow_views.cpp:229
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:298
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:307
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:682
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:221
 msgid "datetime"
 msgstr "交易时间"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:683
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:222
+msgid "business"
+msgstr "业务名称"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:684
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:224
+msgid "planPrice"
+msgstr "计划交易价格"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:685
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:225
+msgid "realPrice"
+msgstr "实际成交价格"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:686
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:226
+msgid "goalPrice"
+msgstr "目标价格"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:687
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:227
+msgid "number"
+msgstr "交易数量"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:688
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:110
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:251
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:228
+msgid "stoploss"
+msgstr "止损价"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:689
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:229
+msgid "cash"
+msgstr "现金余额"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:690
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:230
+msgid "cost_total"
+msgstr "交易总成本"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:691
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:231
+msgid "cost_commission"
+msgstr "佣金"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:692
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:232
+msgid "cost_stamptax"
+msgstr "印花税"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:693
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:233
+msgid "cost_transferfee"
+msgstr "过户费"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:694
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:234
+msgid "cost_others"
+msgstr "其它成本"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:695
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:235
+msgid "part_from"
+msgstr "信号来源"
+
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:696
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:237
+msgid "remark"
+msgstr "备注"
 
 #: hikyuu_pywrap/_StockManager.cpp:155
 msgid "type"
@@ -553,156 +646,80 @@ msgstr "WEAVE指标输入参数数量需大于等2并小于等于6"
 msgid "on_bar is not callable!"
 msgstr "on_bar 不可调用！"
 
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:105
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:236
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:219
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:244
+msgid "take_time"
+msgstr "买入时间"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:245
+msgid "hold_days"
+msgstr "持仓天数"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:246
+msgid "hold_number"
+msgstr "持仓数量"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:247
+msgid "invest"
+msgstr "投入金额"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:248
+msgid "market_value"
+msgstr "当前市值"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:249
+msgid "profit"
+msgstr "盈亏金额"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:110
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:250
+msgid "profit_percent"
+msgstr "盈亏百分比"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:110
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:252
+msgid "goal_price"
+msgstr "目标价"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:111
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:253
+msgid "clean_time"
+msgstr "清仓时间"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:111
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:254
+msgid "total_number"
+msgstr "累计持有数量"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:111
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:255
+msgid "total_cost"
+msgstr "累计成本"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:112
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:256
+msgid "total_risk"
+msgstr "累计风险"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:112
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:257
+msgid "buy_money"
+msgstr "累计买入金额"
+
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:112
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:258
+msgid "sell_money"
+msgstr "累计卖出金额"
+
 #: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:63
 #: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:100
 msgid "name"
 msgstr "证券名称"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:105
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:238
-msgid "take_time"
-msgstr "买入时间"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:106
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:239
-msgid "hold_days"
-msgstr "持仓天数"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:106
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:240
-msgid "hold_number"
-msgstr "持仓数量"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:106
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:241
-msgid "invest"
-msgstr "投入金额"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:107
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:242
-msgid "market_value"
-msgstr "当前市值"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:107
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:243
-msgid "profit"
-msgstr "盈亏金额"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:107
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:244
-msgid "profit_percent"
-msgstr "盈亏百分比"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:245
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:228
-msgid "stoploss"
-msgstr "止损价"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:246
-msgid "goal_price"
-msgstr "目标价"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:247
-msgid "clean_time"
-msgstr "清仓时间"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:248
-msgid "total_number"
-msgstr "累计持有数量"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:249
-msgid "total_cost"
-msgstr "累计成本"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:250
-msgid "total_risk"
-msgstr "累计风险"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:110
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:251
-msgid "buy_money"
-msgstr "累计买入金额"
-
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:110
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:252
-msgid "sell_money"
-msgstr "累计卖出金额"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:222
-msgid "business"
-msgstr "业务名称"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:224
-msgid "planPrice"
-msgstr "计划交易价格"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:225
-msgid "realPrice"
-msgstr "实际成交价格"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:226
-msgid "goalPrice"
-msgstr "目标价格"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:227
-msgid "number"
-msgstr "交易数量"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:229
-msgid "cash"
-msgstr "现金余额"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:230
-msgid "cost_total"
-msgstr "交易总成本"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:231
-msgid "cost_commission"
-msgstr "佣金"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:232
-msgid "cost_stamptax"
-msgstr "印花税"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:233
-msgid "cost_transferfee"
-msgstr "过户费"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:234
-msgid "cost_others"
-msgstr "其它成本"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:235
-msgid "part_from"
-msgstr "信号来源"
-
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:237
-msgid "remark"
-msgstr "备注"
 
 #: hikyuu_pywrap/trade_sys/_MultiFactor.cpp:63
 msgid "score"
