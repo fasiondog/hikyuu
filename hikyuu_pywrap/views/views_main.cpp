@@ -11,6 +11,6 @@ namespace py = pybind11;
 
 void export_arrow_views(py::module& m);
 
-void export_arrow_main(py::module& m) {
+void export_views_main(py::module& m) {
     export_arrow_views(m);
 }
