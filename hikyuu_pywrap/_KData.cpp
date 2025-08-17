@@ -7,6 +7,7 @@
 
 #include <hikyuu/serialization/KData_serialization.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <arrow/python/pyarrow.h>
 #include "pybind_utils.h"
 
 using namespace hku;
@@ -311,7 +312,15 @@ void export_KData(py::module& m) {
     :param bool with_stock: 包含Stock的代码与名称
     :rtype: pandas.DataFrame)")
 
-      .def("to_pa", &KData::toArrow)
+      .def("to_pyarrow",
+           [](const KData& self) {
+               auto view = self.toArrow();
+               HKU_ARROW_TABLE_CHECK(view);
+               arrow::py::import_pyarrow();
+               PyObject* raw_obj = arrow::py::wrap_table(*view);
+               HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+               return py::reinterpret_borrow<py::object>(raw_obj);
+           })
 
         DEF_PICKLE(KData);
 }

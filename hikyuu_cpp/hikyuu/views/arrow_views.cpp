@@ -18,7 +18,7 @@ namespace hku {
 
 arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockList& stks,
                                                                    const Datetime& date,
-                                                                   const string& market) {
+                                                                   const string& market) noexcept {
     arrow::Result<std::shared_ptr<arrow::Table>> ret;
     auto& sm = StockManager::instance();
     MarketInfo info = sm.getMarketInfo(market);
@@ -48,7 +48,8 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
     Indicator PB = CLOSE() / FINANCE(3);  // 市净率
 
     arrow::StringBuilder code_builder, name_builder;
-    arrow::Date64Builder date_builder;
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
     arrow::DoubleBuilder open_builder, high_builder, low_builder, close_builder, amount_builder,
       volume_builder, yesterday_close_builder, turnover_builder, amplitude_builder,
       price_change_builder, total_market_cap_builder, circulating_market_cap_builder, pe_builder,
@@ -81,7 +82,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
                 HKU_ARROW_RETURN_NOT_OK(code_builder.Append(stk.market_code()));
                 HKU_ARROW_RETURN_NOT_OK(name_builder.Append(stk.name()));
                 HKU_ARROW_RETURN_NOT_OK(
-                  date_builder.Append(kdata[1].datetime.timestamp() / 1000LL));
+                  date_builder.Append(kdata[1].datetime.timestamp() * 1000LL));
                 HKU_ARROW_RETURN_NOT_OK(open_builder.Append(kdata[1].openPrice));
                 HKU_ARROW_RETURN_NOT_OK(high_builder.Append(kdata[1].highPrice));
                 HKU_ARROW_RETURN_NOT_OK(low_builder.Append(kdata[1].lowPrice));
@@ -170,7 +171,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
     auto schema = arrow::schema({
       arrow::field(htr("market_code"), arrow::utf8()),
       arrow::field(htr("stock_name"), arrow::utf8()),
-      arrow::field(htr("date"), arrow::date64()),
+      arrow::field(htr("date"), arrow::timestamp(arrow::TimeUnit::NANO)),
       arrow::field(htr("open"), arrow::float64()),
       arrow::field(htr("high"), arrow::float64()),
       arrow::field(htr("low"), arrow::float64()),
@@ -187,29 +188,14 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
       arrow::field(htr("pb"), arrow::float64()),
     });
 
-    return arrow::Table::Make(schema, {
-                                        code_arr,
-                                        name_arr,
-                                        date_arr,
-                                        open_arr,
-                                        high_arr,
-                                        low_arr,
-                                        close_arr,
-                                        amount_arr,
-                                        volume_arr,
-                                        yesterday_close_arr,
-                                        turnover_arr,
-                                        amplitude_arr,
-                                        price_change_arr,
-                                        total_market_cap_arr,
-                                        circulating_market_cap_arr,
-                                        pe_arr,
-                                        pb_arr,
-                                      });
+    return arrow::Table::Make(
+      schema, {code_arr, name_arr, date_arr, open_arr, high_arr, low_arr, close_arr, amount_arr,
+               volume_arr, yesterday_close_arr, turnover_arr, amplitude_arr, price_change_arr,
+               total_market_cap_arr, circulating_market_cap_arr, pe_arr, pb_arr});
 }
 
 arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockList& stks,
-                                                                   const string& market) {
+                                                                   const string& market) noexcept {
     arrow::Result<std::shared_ptr<arrow::Table>> ret;
     DatetimeList dates = StockManager::instance().getTradingCalendar(KQueryByIndex(-1), market);
     HKU_ARROW_IF_RETURN(dates.empty());
@@ -217,8 +203,9 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
     return getMarketView(stks, dates.back(), market);
 }
 
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getIndicatorsView(
-  const StockList& stks, const IndicatorList& inds, const KQuery& query, const string& market) {
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getIndicatorsView(const StockList& stks, const IndicatorList& inds, const KQuery& query,
+                  const string& market) noexcept {
     auto& sm = StockManager::instance();
     auto dates = sm.getTradingCalendar(query, market);
 
@@ -226,13 +213,14 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
     fields.reserve(inds.size() + 3);
     fields.emplace_back(arrow::field(htr("market_code"), arrow::utf8()));
     fields.emplace_back(arrow::field(htr("stock_name"), arrow::utf8()));
-    fields.emplace_back(arrow::field(htr("datetime"), arrow::date64()));
+    fields.emplace_back(arrow::field(htr("datetime"), arrow::timestamp(arrow::TimeUnit::NANO)));
     for (auto& ind : inds) {
         fields.emplace_back(arrow::field(ind.name(), arrow::float64()));
     }
 
     arrow::StringBuilder code_builder, name_builder;
-    arrow::Date64Builder date_builder;
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
     std::vector<arrow::DoubleBuilder> builders(inds.size());
 
     size_t total = stks.size() * dates.size();
@@ -260,7 +248,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
             for (size_t i = 0; i < dates.size(); ++i) {
                 HKU_ARROW_RETURN_NOT_OK(code_builder.Append(stk.market_code()));
                 HKU_ARROW_RETURN_NOT_OK(name_builder.Append(stk.name()));
-                HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates[i].timestamp() / 1000LL));
+                HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates[i].timestamp() * 1000LL));
             }
         }
     }
@@ -304,13 +292,14 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Dateti
     fields.reserve(inds.size() + 3);
     fields.emplace_back(arrow::field(htr("market_code"), arrow::utf8()));
     fields.emplace_back(arrow::field(htr("stock_name"), arrow::utf8()));
-    fields.emplace_back(arrow::field(htr("datetime"), arrow::date64()));
+    fields.emplace_back(arrow::field(htr("datetime"), arrow::timestamp(arrow::TimeUnit::NANO)));
     for (auto& ind : inds) {
         fields.emplace_back(arrow::field(ind.name(), HKU_ARROW_PRICE_FIELD));
     }
 
     arrow::StringBuilder code_builder, name_builder;
-    arrow::Date64Builder date_builder;
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
     std::vector<HKU_ARROW_PRICE_BUILDER> builders(inds.size());
 
     size_t start_pos, end_pos;
@@ -343,7 +332,7 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Dateti
                 if (have_data) {
                     HKU_ARROW_RETURN_NOT_OK(code_builder.Append(stk.market_code()));
                     HKU_ARROW_RETURN_NOT_OK(name_builder.Append(stk.name()));
-                    HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates.back().timestamp() / 1000LL));
+                    HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates.back().timestamp() * 1000LL));
                 }
             }
         }
@@ -375,8 +364,9 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Dateti
 }
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getKRecordListView(const KRecordList& ks) {
-    arrow::Date64Builder date_builder;
+getKRecordListView(const KRecordList& ks) noexcept {
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
     arrow::DoubleBuilder open_builder, high_builder, low_builder, close_builder, amount_builder,
       volume_builder;
     size_t total = ks.size();
@@ -389,7 +379,7 @@ getKRecordListView(const KRecordList& ks) {
     HKU_ARROW_RETURN_NOT_OK(volume_builder.Reserve(total));
 
     for (auto& k : ks) {
-        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(k.datetime.timestamp() / 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(k.datetime.timestamp() * 1000LL));
         HKU_ARROW_RETURN_NOT_OK(open_builder.Append(k.openPrice));
         HKU_ARROW_RETURN_NOT_OK(high_builder.Append(k.highPrice));
         HKU_ARROW_RETURN_NOT_OK(low_builder.Append(k.lowPrice));
@@ -409,7 +399,7 @@ getKRecordListView(const KRecordList& ks) {
     HKU_ARROW_RETURN_NOT_OK(volume_builder.Finish(&volume_arr));
 
     auto schema = arrow::schema({
-      arrow::field("datetime", arrow::date64()),
+      arrow::field("datetime", arrow::timestamp(arrow::TimeUnit::NANO)),
       arrow::field("open", arrow::float64()),
       arrow::field("high", arrow::float64()),
       arrow::field("low", arrow::float64()),
@@ -423,8 +413,9 @@ getKRecordListView(const KRecordList& ks) {
 }
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getTimeLineListView(const TimeLineList& ts) {
-    arrow::Date64Builder date_builder;
+getTimeLineListView(const TimeLineList& ts) noexcept {
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
     arrow::DoubleBuilder price_builder, vol_builder;
     size_t total = ts.size();
     HKU_ARROW_RETURN_NOT_OK(date_builder.Reserve(total));
@@ -432,7 +423,7 @@ getTimeLineListView(const TimeLineList& ts) {
     HKU_ARROW_RETURN_NOT_OK(vol_builder.Reserve(total));
 
     for (auto& t : ts) {
-        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(t.datetime.timestamp() / 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(t.datetime.timestamp() * 1000LL));
         HKU_ARROW_RETURN_NOT_OK(price_builder.Append(t.price));
         HKU_ARROW_RETURN_NOT_OK(vol_builder.Append(t.vol));
     }
@@ -443,7 +434,7 @@ getTimeLineListView(const TimeLineList& ts) {
     HKU_ARROW_RETURN_NOT_OK(vol_builder.Finish(&vol_arr));
 
     auto schema = arrow::schema({
-      arrow::field("datetime", arrow::date64()),
+      arrow::field("datetime", arrow::timestamp(arrow::TimeUnit::NANO)),
       arrow::field("price", arrow::float64()),
       arrow::field("vol", arrow::float64()),
     });
@@ -452,8 +443,9 @@ getTimeLineListView(const TimeLineList& ts) {
 }
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getTransRecordListView(const TransRecordList& ts) {
-    arrow::Date64Builder date_builder;
+getTransRecordListView(const TransRecordList& ts) noexcept {
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
     arrow::DoubleBuilder price_builder, vol_builder;
     arrow::Int32Builder direct_builder;
     size_t total = ts.size();
@@ -463,7 +455,7 @@ getTransRecordListView(const TransRecordList& ts) {
     HKU_ARROW_RETURN_NOT_OK(direct_builder.Reserve(total));
 
     for (auto& t : ts) {
-        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(t.datetime.timestamp() / 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(t.datetime.timestamp() * 1000LL));
         HKU_ARROW_RETURN_NOT_OK(price_builder.Append(t.price));
         HKU_ARROW_RETURN_NOT_OK(vol_builder.Append(t.vol));
         HKU_ARROW_RETURN_NOT_OK(direct_builder.Append(t.direct));
@@ -476,7 +468,7 @@ getTransRecordListView(const TransRecordList& ts) {
     HKU_ARROW_RETURN_NOT_OK(direct_builder.Finish(&direct_arr));
 
     auto schema = arrow::schema({
-      arrow::field("datetime", arrow::date64()),
+      arrow::field("datetime", arrow::timestamp(arrow::TimeUnit::NANO)),
       arrow::field("price", arrow::float64()),
       arrow::field("vol", arrow::float64()),
       arrow::field("direct", arrow::int32()),
@@ -486,8 +478,9 @@ getTransRecordListView(const TransRecordList& ts) {
 }
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getStockWeightListView(const StockWeightList& sws) {
-    arrow::Date64Builder date_builder;
+getStockWeightListView(const StockWeightList& sws) noexcept {
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
     arrow::DoubleBuilder countAsGift_builder, countForSell_builder, priceForSell_builder,
       bonus_builder, increasement_builder, totalCount_builder, freeCount_builder, suogu_builder;
     size_t total = sws.size();
@@ -502,7 +495,7 @@ getStockWeightListView(const StockWeightList& sws) {
     HKU_ARROW_RETURN_NOT_OK(suogu_builder.Reserve(total));
 
     for (auto& w : sws) {
-        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(w.datetime().timestamp() / 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(w.datetime().timestamp() * 1000LL));
         HKU_ARROW_RETURN_NOT_OK(countAsGift_builder.Append(w.countAsGift()));
         HKU_ARROW_RETURN_NOT_OK(countForSell_builder.Append(w.countForSell()));
         HKU_ARROW_RETURN_NOT_OK(priceForSell_builder.Append(w.priceForSell()));
@@ -526,7 +519,7 @@ getStockWeightListView(const StockWeightList& sws) {
     HKU_ARROW_RETURN_NOT_OK(suogu_builder.Finish(&suogu_arr));
 
     auto schema = arrow::schema({
-      arrow::field("datetime", arrow::date64()),
+      arrow::field("datetime", arrow::timestamp(arrow::TimeUnit::NANO)),
       arrow::field("countAsGift", arrow::float64()),
       arrow::field("countForSell", arrow::float64()),
       arrow::field("priceForSell", arrow::float64()),
@@ -543,25 +536,28 @@ getStockWeightListView(const StockWeightList& sws) {
 }
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getDatetimeListView(const DatetimeList& dates) {
-    arrow::Date64Builder date_builder;
+getDatetimeListView(const DatetimeList& dates) noexcept {
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
     HKU_ARROW_RETURN_NOT_OK(date_builder.Reserve(dates.size()));
 
     for (auto& date : dates) {
-        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(date.timestamp() / 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(date.timestamp() * 1000LL));
     }
 
     std::shared_ptr<arrow::Array> date_arr;
     HKU_ARROW_RETURN_NOT_OK(date_builder.Finish(&date_arr));
 
-    auto schema = arrow::schema({arrow::field("datetime", arrow::date64())});
+    auto schema =
+      arrow::schema({arrow::field("datetime", arrow::timestamp(arrow::TimeUnit::NANO))});
     return arrow::Table::Make(schema, {date_arr});
 }
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getTradeRecordListView(const TradeRecordList& trades) {
+getTradeRecordListView(const TradeRecordList& trades) noexcept {
     arrow::StringBuilder code_builder, name_builder, business_builder, sig_builder, remark_builder;
-    arrow::Date64Builder date_builder;
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
     arrow::DoubleBuilder plan_builder, real_builder, goal_builder, stoploss_builder, number_builder,
       cash_builder, cost_total_builder, cost_commission_builder, cost_stamptax_builder,
       cost_transferfee_builder, cost_other_builder;
@@ -588,7 +584,7 @@ getTradeRecordListView(const TradeRecordList& trades) {
     for (auto& tr : trades) {
         HKU_ARROW_RETURN_NOT_OK(code_builder.Append(tr.stock.market_code()));
         HKU_ARROW_RETURN_NOT_OK(name_builder.Append(tr.stock.name()));
-        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(tr.datetime.timestamp() / 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(tr.datetime.timestamp() * 1000LL));
         HKU_ARROW_RETURN_NOT_OK(business_builder.Append(getBusinessName(tr.business)));
         HKU_ARROW_RETURN_NOT_OK(plan_builder.Append(tr.planPrice));
         HKU_ARROW_RETURN_NOT_OK(real_builder.Append(tr.realPrice));
@@ -630,7 +626,7 @@ getTradeRecordListView(const TradeRecordList& trades) {
     auto schema = arrow::schema({
       arrow::field(htr("market_code"), arrow::utf8()),
       arrow::field(htr("stock_name"), arrow::utf8()),
-      arrow::field(htr("datetime"), arrow::date64()),
+      arrow::field(htr("datetime"), arrow::timestamp(arrow::TimeUnit::NANO)),
       arrow::field(htr("business"), arrow::utf8()),
       arrow::field(htr("planPrice"), arrow::float64()),
       arrow::field(htr("realPrice"), arrow::float64()),
@@ -654,9 +650,12 @@ getTradeRecordListView(const TradeRecordList& trades) {
 }
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getPositionRecordListView(const PositionRecordList& positions) {
+getPositionRecordListView(const PositionRecordList& positions) noexcept {
     arrow::StringBuilder code_builder, name_builder;
-    arrow::Date64Builder taketime_builder, cleantime_builder;
+    arrow::TimestampBuilder taketime_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                             arrow::default_memory_pool());
+    arrow::TimestampBuilder cleantime_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                              arrow::default_memory_pool());
     arrow::Int64Builder hold_days_builder;
     arrow::DoubleBuilder hold_number_builder, invest_builder, market_value_builder, profit_builder,
       profit_percent_builder, stoploss_builder, goal_price_builder, total_number_builder,
@@ -684,7 +683,7 @@ getPositionRecordListView(const PositionRecordList& positions) {
     for (const auto& p : positions) {
         HKU_ARROW_RETURN_NOT_OK(code_builder.Append(p.stock.market_code()));
         HKU_ARROW_RETURN_NOT_OK(name_builder.Append(p.stock.name()));
-        HKU_ARROW_RETURN_NOT_OK(taketime_builder.Append(p.takeDatetime.timestamp() / 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(taketime_builder.Append(p.takeDatetime.timestamp() * 1000LL));
 
         double invest = p.buyMoney - p.sellMoney + p.totalCost;
         double profit = 0.0;
@@ -697,7 +696,7 @@ getPositionRecordListView(const PositionRecordList& positions) {
             profit = market_value - invest;
             HKU_ARROW_RETURN_NOT_OK(profit_builder.Append(profit));
         } else {
-            HKU_ARROW_RETURN_NOT_OK(cleantime_builder.Append(p.cleanDatetime.timestamp() / 1000LL));
+            HKU_ARROW_RETURN_NOT_OK(cleantime_builder.Append(p.cleanDatetime.timestamp() * 1000LL));
             HKU_ARROW_RETURN_NOT_OK(
               hold_days_builder.Append((p.cleanDatetime - p.takeDatetime).days()));
             HKU_ARROW_RETURN_NOT_OK(market_value_builder.Append(0.0));
@@ -743,7 +742,7 @@ getPositionRecordListView(const PositionRecordList& positions) {
     auto schema = arrow::schema({
       arrow::field(htr("market_code"), arrow::utf8()),
       arrow::field(htr("stock_name"), arrow::utf8()),
-      arrow::field(htr("take_time"), arrow::date64()),
+      arrow::field(htr("take_time"), arrow::timestamp(arrow::TimeUnit::NANO)),
       arrow::field(htr("hold_days"), arrow::int64()),
       arrow::field(htr("hold_number"), arrow::date64()),
       arrow::field(htr("invest"), arrow::float64()),
@@ -752,7 +751,7 @@ getPositionRecordListView(const PositionRecordList& positions) {
       arrow::field(htr("profit_percent"), arrow::float64()),
       arrow::field(htr("stoploss"), arrow::float64()),
       arrow::field(htr("goal_price"), arrow::float64()),
-      arrow::field(htr("clean_time"), arrow::date64()),
+      arrow::field(htr("clean_time"), arrow::timestamp(arrow::TimeUnit::NANO)),
       arrow::field(htr("total_number"), arrow::float64()),
       arrow::field(htr("total_cost"), arrow::float64()),
       arrow::field(htr("total_risk"), arrow::float64()),

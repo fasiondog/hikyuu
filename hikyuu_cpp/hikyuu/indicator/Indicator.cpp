@@ -20,8 +20,9 @@ string Indicator::str() const {
     return m_imp ? m_imp->str() : "Indicator{}";
 }
 
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> Indicator::toArrow() {
-    arrow::Date64Builder date_builder;
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> Indicator::toArrow() const noexcept {
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
     vector<HKU_ARROW_PRICE_BUILDER> value_builders;
 
     size_t result_num = getResultNumber();
@@ -33,7 +34,7 @@ string Indicator::str() const {
     auto dates = getDatetimeList();
     if (!dates.empty()) {
         for (size_t i = 0; i < total; i++) {
-            HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates[i].timestamp() / 1000LL));
+            HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates[i].timestamp() * 1000LL));
         }
     }
 
@@ -45,7 +46,7 @@ string Indicator::str() const {
     vector<std::shared_ptr<arrow::Array>> arrs;
 
     if (!dates.empty()) {
-        fields.emplace_back(arrow::field("datetime", arrow::date64()));
+        fields.emplace_back(arrow::field("datetime", arrow::timestamp(arrow::TimeUnit::NANO)));
         auto date_arr = date_builder.Finish();
         HKU_ARROW_RETURN_NOT_OK2(date_arr);
         arrs.push_back(*date_arr);
@@ -62,7 +63,8 @@ string Indicator::str() const {
     return arrow::Table::Make(schema, arrs);
 }
 
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> Indicator::toArrowOnlyValue() {
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> Indicator::toArrowOnlyValue()
+  const noexcept {
     vector<HKU_ARROW_PRICE_BUILDER> value_builders;
 
     size_t result_num = getResultNumber();

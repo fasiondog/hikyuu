@@ -31,11 +31,9 @@ import pandas as pd
 
 Indicator.to_numpy = Indicator.to_np
 Indicator.to_pandas = Indicator.to_df
-Indicator.to_pyarrow = Indicator.to_pa
 
 Indicator.value_to_numpy = Indicator.value_to_np
 Indicator.value_to_pandas = Indicator.value_to_df
-Indicator.value_to_pyarrow = Indicator.value_to_pa
 
 
 def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):

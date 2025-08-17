@@ -114,7 +114,7 @@ public:
      * 转换至 arrow table
      * @return arrow::Result<std::shared_ptr<arrow::Table>>
      */
-    [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> toArrow();
+    [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> toArrow() const noexcept;
 
 public:
     typedef KRecordList::iterator iterator;

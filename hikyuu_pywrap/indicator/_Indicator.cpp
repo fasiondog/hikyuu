@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/indicator/Indicator.h>
+#include <arrow/python/pyarrow.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -428,8 +429,25 @@ set_context(self, stock, query)
         },
         "转换为 DataFrame, 仅包含值")
 
-      .def("to_pa", &Indicator::toArrow)
-      .def("value_to_pa", &Indicator::toArrowOnlyValue)
+      .def("to_pyarrow",
+           [](const Indicator& self) {
+               auto view = self.toArrow();
+               HKU_ARROW_TABLE_CHECK(view);
+               arrow::py::import_pyarrow();
+               PyObject* raw_obj = arrow::py::wrap_table(*view);
+               HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+               return py::reinterpret_borrow<py::object>(raw_obj);
+           })
+
+      .def("value_to_pyarrow",
+           [](const Indicator& self) {
+               auto view = self.toArrowOnlyValue();
+               HKU_ARROW_TABLE_CHECK(view);
+               arrow::py::import_pyarrow();
+               PyObject* raw_obj = arrow::py::wrap_table(*view);
+               HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+               return py::reinterpret_borrow<py::object>(raw_obj);
+           })
 
       .def(py::self + py::self)
       .def(py::self + Indicator::value_t())

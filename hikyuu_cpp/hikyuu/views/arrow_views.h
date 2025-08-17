@@ -27,9 +27,8 @@ namespace hku {
  * @param market 市场代码（用于获取交易日历）
  * @return
  */
-arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockList& stks,
-                                                                   const Datetime& date,
-                                                                   const string& market = "SH");
+arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getMarketView(const StockList& stks, const Datetime& date, const string& market = "SH") noexcept;
 
 /**
  * 获取指定股票集合在最后交易日的行情数据，不包含当日停牌无数据的股票。如自动接收行情数据，则为实时行情数据
@@ -37,8 +36,8 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
  * @param market 市场代码（用于获取交易日历）
  * @return
  */
-arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockList& stks,
-                                                                   const string& market = "SH");
+arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getMarketView(const StockList& stks, const string& market = "SH") noexcept;
 
 /**
  * @brief 计算指定证券列表的各指标结果，以 arrow table 形式返回
@@ -50,7 +49,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API getMarketView(const StockLi
  */
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getIndicatorsView(const StockList& stks, const IndicatorList& inds, const KQuery& query,
-                  const string& market = "SH");
+                  const string& market = "SH") noexcept;
 
 /**
  * @brief 获取指定日期的各指定证券的各指标视图
@@ -67,25 +66,25 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const KQuery
   const KQuery::KType& ktype = KQuery::DAY, const string& market = "SH");
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getKRecordListView(const KRecordList& ks);
+getKRecordListView(const KRecordList& ks) noexcept;
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getTimeLineListView(const TimeLineList& ts);
+getTimeLineListView(const TimeLineList& ts) noexcept;
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getTransRecordListView(const TransRecordList& ts);
+getTransRecordListView(const TransRecordList& ts) noexcept;
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getStockWeightListView(const StockWeightList& sws);
+getStockWeightListView(const StockWeightList& sws) noexcept;
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getDatetimeListView(const DatetimeList& dates);
+getDatetimeListView(const DatetimeList& dates) noexcept;
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getTradeRecordListView(const TradeRecordList& trades);
+getTradeRecordListView(const TradeRecordList& trades) noexcept;
 
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
-getPositionRecordListView(const PositionRecordList& positions);
+getPositionRecordListView(const PositionRecordList& positions) noexcept;
 
 /** @} */
 }  // namespace hku
