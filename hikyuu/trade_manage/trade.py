@@ -36,10 +36,16 @@ import pandas as pd
 
 TradeRecordList.to_np = lambda self: trades_to_np(self)
 TradeRecordList.to_df = lambda self: trades_to_df(self)
+TradeRecordList.to_numpy = TradeRecordList.to_np
+TradeRecordList.to_pandas = TradeRecordList.to_df
+TradeRecordList.to_pyarrow = lambda self: trades_to_pa(self)
 
 
 PositionRecordList.to_np = lambda self: positions_to_np(self)
 PositionRecordList.to_df = lambda self: positions_to_df(self)
+PositionRecordList.to_numpy = PositionRecordList.to_np
+PositionRecordList.to_pandas = PositionRecordList.to_df
+PositionRecordList.to_pyarrow = lambda self: positions_to_pa(self)
 
 
 def Performance_to_df(per):

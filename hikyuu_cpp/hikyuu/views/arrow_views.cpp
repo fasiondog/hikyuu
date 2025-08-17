@@ -734,7 +734,86 @@ getPositionRecordListView(const PositionRecordList& positions) {
         HKU_ARROW_RETURN_NOT_OK(code_builder.Append(p.stock.market_code()));
         HKU_ARROW_RETURN_NOT_OK(name_builder.Append(p.stock.name()));
         HKU_ARROW_RETURN_NOT_OK(taketime_builder.Append(p.takeDatetime.timestamp() / 1000LL));
+
+        double invest = p.buyMoney - p.sellMoney + p.totalCost;
+        double profit = 0.0;
+        if (p.cleanDatetime.isNull()) {
+            HKU_ARROW_RETURN_NOT_OK(cleantime_builder.AppendNull());
+            double market_value = p.stock.getMarketValue(Datetime::now(), KQuery::DAY) * p.number;
+            HKU_ARROW_RETURN_NOT_OK(
+              hold_days_builder.Append((Datetime::now() - p.takeDatetime).days()));
+            HKU_ARROW_RETURN_NOT_OK(market_value_builder.Append(market_value));
+            profit = market_value - invest;
+            HKU_ARROW_RETURN_NOT_OK(profit_builder.Append(profit));
+        } else {
+            HKU_ARROW_RETURN_NOT_OK(cleantime_builder.Append(p.cleanDatetime.timestamp() / 1000LL));
+            HKU_ARROW_RETURN_NOT_OK(
+              hold_days_builder.Append((p.cleanDatetime - p.takeDatetime).days()));
+            HKU_ARROW_RETURN_NOT_OK(market_value_builder.Append(0.0));
+            profit = p.totalProfit();
+            HKU_ARROW_RETURN_NOT_OK(profit_builder.Append(profit));
+        }
+        HKU_ARROW_RETURN_NOT_OK(hold_number_builder.Append(p.number));
+        HKU_ARROW_RETURN_NOT_OK(invest_builder.Append(invest));
+        HKU_ARROW_RETURN_NOT_OK(profit_percent_builder.Append(
+          invest != 0.0 ? roundEx(100. * (profit / invest), 2) : 0.0));
+        HKU_ARROW_RETURN_NOT_OK(stoploss_builder.Append(p.stoploss));
+        HKU_ARROW_RETURN_NOT_OK(goal_price_builder.Append(p.goalPrice));
+        HKU_ARROW_RETURN_NOT_OK(total_number_builder.Append(p.totalNumber));
+        HKU_ARROW_RETURN_NOT_OK(total_cost_builder.Append(p.totalCost));
+        HKU_ARROW_RETURN_NOT_OK(total_risk_builder.Append(p.totalRisk));
+        HKU_ARROW_RETURN_NOT_OK(buy_money_builder.Append(p.buyMoney));
+        HKU_ARROW_RETURN_NOT_OK(sell_money_builder.Append(p.sellMoney));
     }
+
+    std::shared_ptr<arrow::Array> code_arr, name_arr, taketime_arr, cleantime_arr, hold_days_arr,
+      hold_number_arr, invest_arr, market_value_arr, profit_arr, profit_percent_arr, stoploss_arr,
+      goal_price_arr, total_number_arr, total_cost_arr, total_risk_arr, buy_money_arr,
+      sell_money_arr;
+
+    HKU_ARROW_RETURN_NOT_OK(code_builder.Finish(&code_arr));
+    HKU_ARROW_RETURN_NOT_OK(name_builder.Finish(&name_arr));
+    HKU_ARROW_RETURN_NOT_OK(taketime_builder.Finish(&name_arr));
+    HKU_ARROW_RETURN_NOT_OK(cleantime_builder.Finish(&cleantime_arr));
+    HKU_ARROW_RETURN_NOT_OK(hold_days_builder.Finish(&hold_days_arr));
+    HKU_ARROW_RETURN_NOT_OK(hold_number_builder.Finish(&hold_number_arr));
+    HKU_ARROW_RETURN_NOT_OK(invest_builder.Finish(&invest_arr));
+    HKU_ARROW_RETURN_NOT_OK(market_value_builder.Finish(&market_value_arr));
+    HKU_ARROW_RETURN_NOT_OK(profit_builder.Finish(&profit_arr));
+    HKU_ARROW_RETURN_NOT_OK(profit_percent_builder.Finish(&profit_percent_arr));
+    HKU_ARROW_RETURN_NOT_OK(stoploss_builder.Finish(&stoploss_arr));
+    HKU_ARROW_RETURN_NOT_OK(goal_price_builder.Finish(&goal_price_arr));
+    HKU_ARROW_RETURN_NOT_OK(total_number_builder.Finish(&total_number_arr));
+    HKU_ARROW_RETURN_NOT_OK(total_cost_builder.Finish(&total_cost_arr));
+    HKU_ARROW_RETURN_NOT_OK(total_risk_builder.Finish(&total_risk_arr));
+    HKU_ARROW_RETURN_NOT_OK(buy_money_builder.Finish(&buy_money_arr));
+    HKU_ARROW_RETURN_NOT_OK(sell_money_builder.Finish(&sell_money_arr));
+
+    auto schema = arrow::schema({
+      arrow::field(htr("market_code"), arrow::utf8()),
+      arrow::field(htr("stock_name"), arrow::utf8()),
+      arrow::field(htr("take_time"), arrow::date64()),
+      arrow::field(htr("hold_days"), arrow::int64()),
+      arrow::field(htr("hold_number"), arrow::date64()),
+      arrow::field(htr("invest"), arrow::float64()),
+      arrow::field(htr("market_value"), arrow::float64()),
+      arrow::field(htr("profit"), arrow::float64()),
+      arrow::field(htr("profit_percent"), arrow::float64()),
+      arrow::field(htr("stoploss"), arrow::float64()),
+      arrow::field(htr("goal_price"), arrow::float64()),
+      arrow::field(htr("clean_time"), arrow::date64()),
+      arrow::field(htr("total_number"), arrow::float64()),
+      arrow::field(htr("total_cost"), arrow::float64()),
+      arrow::field(htr("total_risk"), arrow::float64()),
+      arrow::field(htr("buy_money"), arrow::float64()),
+      arrow::field(htr("sell_money"), arrow::float64()),
+    });
+
+    return arrow::Table::Make(
+      schema, {code_arr, name_arr, taketime_arr, hold_days_arr, hold_number_arr, invest_arr,
+               market_value_arr, profit_arr, profit_percent_arr, stoploss_arr, goal_price_arr,
+               cleantime_arr, total_number_arr, total_cost_arr, total_risk_arr, buy_money_arr,
+               sell_money_arr});
 }
 
 }  // namespace hku

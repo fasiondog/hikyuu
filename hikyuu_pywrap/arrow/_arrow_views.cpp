@@ -137,9 +137,21 @@ void export_arrow_views(py::module& m) {
       "将日期列表转换为 pyarrow.Table 对象");
 
     m.def(
-      "trades_to_df",
+      "trades_to_pa",
       [](const TradeRecordList& trades) {
           auto view = getTradeRecordListView(trades);
+          HKU_ARROW_TABLE_CHECK(view);
+          arrow::py::import_pyarrow();
+          PyObject* raw_obj = arrow::py::wrap_table(*view);
+          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+          return py::reinterpret_borrow<py::object>(raw_obj);
+      },
+      "将交易记录列表转换为 pyarrow.Table 对象");
+
+    m.def(
+      "positions_to_pa",
+      [](const PositionRecordList& positions) {
+          auto view = getPositionRecordListView(positions);
           HKU_ARROW_TABLE_CHECK(view);
           arrow::py::import_pyarrow();
           PyObject* raw_obj = arrow::py::wrap_table(*view);
