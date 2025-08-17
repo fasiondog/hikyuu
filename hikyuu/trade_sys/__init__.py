@@ -32,7 +32,11 @@ from hikyuu.core import (ScoreRecordList, scorerecords_to_np, scorerecords_to_df
 
 ScoreRecordList.to_np = lambda self: scorerecords_to_np(self)
 ScoreRecordList.to_df = lambda self: scorerecords_to_df(self)
+ScoreRecordList.to_numpy = ScoreRecordList.to_np
+ScoreRecordList.to_pandas = ScoreRecordList.to_df
 
 
 SystemWeightList.to_np = lambda self: systemweights_to_np(self)
 SystemWeightList.to_df = lambda self: systemweights_to_df(self)
+SystemWeightList.to_numpy = SystemWeightList.to_np
+SystemWeightList.to_pandas = SystemWeightList.to_df
