@@ -95,6 +95,9 @@ target("core")
             pydir_lib = os.iorun("python3-config --libs"):trim()
 
             pyarrow = os.iorun("python3 -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
+            if not pyarrow then
+                pyarrow = os.iorun("python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
+            end
             target:add("includedirs", pyarrow .. "/include")
             target:add("linkdirs", pyarrow)
             target:add("links", "arrow_python")
