@@ -34,11 +34,11 @@ jobs:
 
     - uses: xmake-io/github-action-setup-xmake@v1
       with:
-        xmake-version: 3.0.0
+        xmake-version: 3.0.1
         actions-cache-folder: '.xmake-cache'
         actions-cache-key: 'ubuntu'
 
-    - name: config
+    - name: configure
       run: |
         export PYTHONPATH=.
         pip3 install -r requirements.txt      
@@ -46,8 +46,13 @@ jobs:
 
     - name: build
       run: |
-        xmake -b small-test
-  
+        xmake -b core
+
+    - name: test python
+      run: |
+        export PYTHONPATH=.
+        python3 hikyuu/test/test.py
+        
     - name: test
       run: |
         xmake r small-test

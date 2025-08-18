@@ -58,11 +58,7 @@ jobs:
         run: |
           export PYTHONPATH=.
           python hikyuu/test/test.py
-
-      - name: build test
-        run: |
-          xmake -b small-test
-    
+   
       - name: test
         run: |
           xmake r small-test
