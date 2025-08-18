@@ -363,6 +363,130 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Dateti
     return arrow::Table::Make(schema, arrs);
 }
 
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getIndicatorView(
+  const Indicator& ind) noexcept {
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
+    vector<HKU_ARROW_PRICE_BUILDER> value_builders;
+
+    size_t result_num = ind.getResultNumber();
+    for (size_t i = 0; i < result_num; i++) {
+        value_builders.emplace_back();
+    }
+
+    size_t total = ind.size();
+    auto dates = ind.getDatetimeList();
+    if (!dates.empty()) {
+        for (size_t i = 0; i < total; i++) {
+            HKU_ARROW_RETURN_NOT_OK(date_builder.Append(dates[i].timestamp() * 1000LL));
+        }
+    }
+
+    for (size_t r = 0; r < result_num; r++) {
+        HKU_ARROW_RETURN_NOT_OK(value_builders[r].AppendValues(ind.data(r), total));
+    }
+
+    std::vector<std::shared_ptr<arrow::Field>> fields;
+    vector<std::shared_ptr<arrow::Array>> arrs;
+
+    if (!dates.empty()) {
+        fields.emplace_back(arrow::field("datetime", arrow::timestamp(arrow::TimeUnit::NANO)));
+        auto date_arr = date_builder.Finish();
+        HKU_ARROW_RETURN_NOT_OK2(date_arr);
+        arrs.push_back(*date_arr);
+    }
+
+    for (size_t r = 0; r < result_num; r++) {
+        fields.emplace_back(arrow::field(fmt::format("value{}", r + 1), HKU_ARROW_PRICE_FIELD));
+        auto value_arr = value_builders[r].Finish();
+        HKU_ARROW_RETURN_NOT_OK2(value_arr);
+        arrs.push_back(*value_arr);
+    }
+
+    auto schema = arrow::schema(fields);
+    return arrow::Table::Make(schema, arrs);
+}
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getIndicatorValueView(
+  const Indicator& ind) noexcept {
+    vector<HKU_ARROW_PRICE_BUILDER> value_builders;
+
+    size_t result_num = ind.getResultNumber();
+    for (size_t i = 0; i < result_num; i++) {
+        value_builders.emplace_back();
+    }
+
+    size_t total = ind.size();
+    for (size_t r = 0; r < result_num; r++) {
+        HKU_ARROW_RETURN_NOT_OK(value_builders[r].AppendValues(ind.data(r), total));
+    }
+
+    std::vector<std::shared_ptr<arrow::Field>> fields;
+    for (size_t r = 0; r < result_num; r++) {
+        fields.emplace_back(arrow::field(fmt::format("value{}", r + 1), HKU_ARROW_PRICE_FIELD));
+    }
+
+    vector<std::shared_ptr<arrow::Array>> arrs;
+    for (size_t r = 0; r < result_num; r++) {
+        auto value_arr = value_builders[r].Finish();
+        HKU_ARROW_RETURN_NOT_OK2(value_arr);
+        arrs.push_back(*value_arr);
+    }
+
+    auto schema = arrow::schema(fields);
+    return arrow::Table::Make(schema, arrs);
+}
+
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getKDataView(
+  const KData& kdata) noexcept {
+    arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
+                                         arrow::default_memory_pool());
+    arrow::DoubleBuilder open_builder, high_builder, low_builder, close_builder, amount_builder,
+      volume_builder;
+    size_t total = kdata.size();
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(open_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(high_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(low_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(close_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(amount_builder.Reserve(total));
+    HKU_ARROW_RETURN_NOT_OK(volume_builder.Reserve(total));
+
+    const auto* ks = kdata.data();
+    for (size_t i = 0; i < total; ++i) {
+        HKU_ARROW_RETURN_NOT_OK(date_builder.Append(ks[i].datetime.timestamp() * 1000LL));
+        HKU_ARROW_RETURN_NOT_OK(open_builder.Append(ks[i].openPrice));
+        HKU_ARROW_RETURN_NOT_OK(high_builder.Append(ks[i].highPrice));
+        HKU_ARROW_RETURN_NOT_OK(low_builder.Append(ks[i].lowPrice));
+        HKU_ARROW_RETURN_NOT_OK(close_builder.Append(ks[i].closePrice));
+        HKU_ARROW_RETURN_NOT_OK(amount_builder.Append(ks[i].transAmount));
+        HKU_ARROW_RETURN_NOT_OK(volume_builder.Append(ks[i].transCount));
+    }
+
+    std::shared_ptr<arrow::Array> date_arr, open_arr, high_arr, low_arr, close_arr, amount_arr,
+      volume_arr;
+    HKU_ARROW_RETURN_NOT_OK(date_builder.Finish(&date_arr));
+    HKU_ARROW_RETURN_NOT_OK(open_builder.Finish(&open_arr));
+    HKU_ARROW_RETURN_NOT_OK(high_builder.Finish(&high_arr));
+    HKU_ARROW_RETURN_NOT_OK(low_builder.Finish(&low_arr));
+    HKU_ARROW_RETURN_NOT_OK(close_builder.Finish(&close_arr));
+    HKU_ARROW_RETURN_NOT_OK(amount_builder.Finish(&amount_arr));
+    HKU_ARROW_RETURN_NOT_OK(volume_builder.Finish(&volume_arr));
+
+    auto schema = arrow::schema({
+      arrow::field("datetime", arrow::timestamp(arrow::TimeUnit::NANO)),
+      arrow::field("open", arrow::float64()),
+      arrow::field("high", arrow::float64()),
+      arrow::field("low", arrow::float64()),
+      arrow::field("close", arrow::float64()),
+      arrow::field("amount", arrow::float64()),
+      arrow::field("volume", arrow::float64()),
+    });
+
+    return arrow::Table::Make(
+      schema, {date_arr, open_arr, high_arr, low_arr, close_arr, amount_arr, volume_arr});
+}
+
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getKRecordListView(const KRecordList& ks) noexcept {
     arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),

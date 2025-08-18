@@ -7,6 +7,7 @@
 
 #include <hikyuu/serialization/KData_serialization.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/views/arrow_views.h>
 #include <arrow/python/pyarrow.h>
 #include "pybind_utils.h"
 
@@ -314,7 +315,7 @@ void export_KData(py::module& m) {
 
       .def("to_pyarrow",
            [](const KData& self) {
-               auto view = self.toArrow();
+               auto view = getKDataView(self);
                HKU_ARROW_TABLE_CHECK(view);
                arrow::py::import_pyarrow();
                PyObject* raw_obj = arrow::py::wrap_table(*view);

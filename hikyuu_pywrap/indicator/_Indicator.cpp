@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/indicator/Indicator.h>
+#include <hikyuu/views/arrow_views.h>
 #include <arrow/python/pyarrow.h>
 #include "../pybind_utils.h"
 
@@ -431,7 +432,7 @@ set_context(self, stock, query)
 
       .def("to_pyarrow",
            [](const Indicator& self) {
-               auto view = self.toArrow();
+               auto view = getIndicatorView(self);
                HKU_ARROW_TABLE_CHECK(view);
                arrow::py::import_pyarrow();
                PyObject* raw_obj = arrow::py::wrap_table(*view);
@@ -441,7 +442,7 @@ set_context(self, stock, query)
 
       .def("value_to_pyarrow",
            [](const Indicator& self) {
-               auto view = self.toArrowOnlyValue();
+               auto view = getIndicatorValueView(self);
                HKU_ARROW_TABLE_CHECK(view);
                arrow::py::import_pyarrow();
                PyObject* raw_obj = arrow::py::wrap_table(*view);

@@ -40,7 +40,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getMarketView(const StockList& stks, const string& market = "SH") noexcept;
 
 /**
- * @brief 计算指定证券列表的各指标结果，以 arrow table 形式返回
+ * 计算指定证券列表的各指标结果，以 arrow table 形式返回
  * @param stks 指定证券列表
  * @param inds 指定指标列表
  * @param query 查询条件
@@ -52,7 +52,7 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const KQuery
                   const string& market = "SH") noexcept;
 
 /**
- * @brief 获取指定日期的各指定证券的各指标视图
+ * 获取指定日期的各指定证券的各指标视图
  * @param stks 证券列表
  * @param inds 指标列表
  * @param date 指定日期
@@ -65,24 +65,53 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const KQuery
   const StockList& stks, const IndicatorList& inds, const Datetime& date, size_t cal_len = 100,
   const KQuery::KType& ktype = KQuery::DAY, const string& market = "SH");
 
+/**
+ * Indicator转换为 Arrow Table，包含时间序列，则带有时间列，否则无时间列
+ * @param ind Indicator
+ * @return arrow::Result<std::shared_ptr<arrow::Table>>
+ */
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getIndicatorView(
+  const Indicator& ind) noexcept;
+
+/**
+ * Indicator转换为 Arrow Table，仅包含值，不包含时间序列
+ * @return arrow::Result<std::shared_ptr<arrow::Table>>
+ */
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getIndicatorValueView(
+  const Indicator& ind) noexcept;
+
+/**
+ * KData 转换至 arrow table
+ * @return arrow::Result<std::shared_ptr<arrow::Table>>
+ */
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getKDataView(
+  const KData& kdata) noexcept;
+
+/** KRecordList 转换至 arrow table */
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getKRecordListView(const KRecordList& ks) noexcept;
 
+/** TimeLineList 转换至 arrow table */
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getTimeLineListView(const TimeLineList& ts) noexcept;
 
+/** TransRecordList 转换至 arrow table */
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getTransRecordListView(const TransRecordList& ts) noexcept;
 
+/** StockWeightList 转换至 arrow table */
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getStockWeightListView(const StockWeightList& sws) noexcept;
 
+/** DatetimeList 转换至 arrow table */
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getDatetimeListView(const DatetimeList& dates) noexcept;
 
+/** TradeRecordList 转换至 arrow table */
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getTradeRecordListView(const TradeRecordList& trades) noexcept;
 
+/** PositionList 转换至 arrow table */
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
 getPositionRecordListView(const PositionRecordList& positions) noexcept;
 
