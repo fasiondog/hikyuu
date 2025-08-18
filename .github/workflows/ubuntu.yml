@@ -51,6 +51,7 @@ jobs:
     - name: test python
       run: |
         export PYTHONPATH=.
+        export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
         python3 hikyuu/test/test.py
         
     - name: test
