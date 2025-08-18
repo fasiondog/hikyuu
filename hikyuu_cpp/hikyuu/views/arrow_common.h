@@ -20,7 +20,7 @@ namespace hku {
 
 #if HKU_USE_LOW_PRECISION
 #define HKU_ARROW_PRICE_FIELD arrow::float32()
-#define HKU_ARROW_PRICE_BUILDER arrow::Float32Builder
+#define HKU_ARROW_PRICE_BUILDER arrow::FloatBuilder
 #else
 #define HKU_ARROW_PRICE_FIELD arrow::float64()
 #define HKU_ARROW_PRICE_BUILDER arrow::DoubleBuilder
