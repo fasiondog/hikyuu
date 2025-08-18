@@ -105,3 +105,4 @@ Hikyuu C++部分直接依赖以下开源项目（由以下项目间接依赖的�
 | clickhouse    | [https://github.com/ClickHouse/ClickHouse]()                                   | Apache 2.0                                                                            |
 | xxhash        | [https://github.com/Cyan4973/xxHash]()                                         | BSD 2-Clause License                                                                  |
 | utf8proc      | [https://github.com/JuliaStrings/utf8proc]()                                   | MIT                                                                                   |
+| arrow         | [https://github.com/apache/arrow]()                                            | Apache 2.0                                                                            |
