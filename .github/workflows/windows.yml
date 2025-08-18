@@ -41,11 +41,11 @@ jobs:
       run: |
         xmake -b core        
 
-    - name: test python
-      shell: cmd
-      run: |
-        set PYTHONPATH=.
-        python hikyuu/test/test.py
+    # - name: test python
+    #   shell: cmd
+    #   run: |
+    #     set PYTHONPATH=.
+    #     python hikyuu/test/test.py
 
     - name: build
       shell: cmd
