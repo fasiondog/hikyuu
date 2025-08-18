@@ -98,6 +98,7 @@ target("core")
             if not pyarrow then
                 pyarrow = os.iorun("python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
             end
+            print("pyarrow: " .. pyarrow)
             target:add("includedirs", pyarrow .. "/include")
             target:add("linkdirs", pyarrow)
             target:add("links", "arrow_python")
