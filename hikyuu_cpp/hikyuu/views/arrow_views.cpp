@@ -215,13 +215,13 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const KQuery
     fields.emplace_back(arrow::field(htr("stock_name"), arrow::utf8()));
     fields.emplace_back(arrow::field(htr("datetime"), arrow::timestamp(arrow::TimeUnit::NANO)));
     for (auto& ind : inds) {
-        fields.emplace_back(arrow::field(ind.name(), arrow::float64()));
+        fields.emplace_back(arrow::field(ind.name(), HKU_ARROW_PRICE_FIELD));
     }
 
     arrow::StringBuilder code_builder, name_builder;
     arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
                                          arrow::default_memory_pool());
-    std::vector<arrow::DoubleBuilder> builders(inds.size());
+    std::vector<HKU_ARROW_PRICE_BUILDER> builders(inds.size());
 
     size_t total = stks.size() * dates.size();
     HKU_ARROW_RETURN_NOT_OK(code_builder.Reserve(total));
