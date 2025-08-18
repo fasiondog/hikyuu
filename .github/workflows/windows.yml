@@ -44,6 +44,7 @@ jobs:
     - name: test python
       shell: cmd
       run: |
+        set PYTHONPATH=.
         python hikyuu/test/test.py
 
     - name: build
