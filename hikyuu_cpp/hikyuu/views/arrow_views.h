@@ -70,22 +70,22 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const KQuery
  * @param ind Indicator
  * @return arrow::Result<std::shared_ptr<arrow::Table>>
  */
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getIndicatorView(
-  const Indicator& ind) noexcept;
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getIndicatorView(const Indicator& ind) noexcept;
 
 /**
  * Indicator转换为 Arrow Table，仅包含值，不包含时间序列
  * @return arrow::Result<std::shared_ptr<arrow::Table>>
  */
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getIndicatorValueView(
-  const Indicator& ind) noexcept;
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getIndicatorValueView(const Indicator& ind) noexcept;
 
 /**
  * KData 转换至 arrow table
  * @return arrow::Result<std::shared_ptr<arrow::Table>>
  */
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getKDataView(
-  const KData& kdata) noexcept;
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getKDataView(const KData& kdata) noexcept;
 
 /** KRecordList 转换至 arrow table */
 [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API

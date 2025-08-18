@@ -363,8 +363,8 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Dateti
     return arrow::Table::Make(schema, arrs);
 }
 
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getIndicatorView(
-  const Indicator& ind) noexcept {
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getIndicatorView(const Indicator& ind) noexcept {
     arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
                                          arrow::default_memory_pool());
     vector<HKU_ARROW_PRICE_BUILDER> value_builders;
@@ -407,8 +407,8 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Dateti
     return arrow::Table::Make(schema, arrs);
 }
 
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getIndicatorValueView(
-  const Indicator& ind) noexcept {
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getIndicatorValueView(const Indicator& ind) noexcept {
     vector<HKU_ARROW_PRICE_BUILDER> value_builders;
 
     size_t result_num = ind.getResultNumber();
@@ -437,8 +437,8 @@ getIndicatorsView(const StockList& stks, const IndicatorList& inds, const Dateti
     return arrow::Table::Make(schema, arrs);
 }
 
-[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> getKDataView(
-  const KData& kdata) noexcept {
+[[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> HKU_API
+getKDataView(const KData& kdata) noexcept {
     arrow::TimestampBuilder date_builder(arrow::timestamp(arrow::TimeUnit::NANO),
                                          arrow::default_memory_pool());
     arrow::DoubleBuilder open_builder, high_builder, low_builder, close_builder, amount_builder,
