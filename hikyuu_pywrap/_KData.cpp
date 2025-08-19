@@ -316,9 +316,9 @@ void export_KData(py::module& m) {
       .def("to_pyarrow",
            [](const KData& self) {
                auto view = getKDataView(self);
-               HKU_ARROW_TABLE_CHECK(view);
+               HKU_ASSERT(view);
                arrow::py::import_pyarrow();
-               PyObject* raw_obj = arrow::py::wrap_table(*view);
+               PyObject* raw_obj = arrow::py::wrap_table(view);
                HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
                return py::reinterpret_borrow<py::object>(raw_obj);
            })

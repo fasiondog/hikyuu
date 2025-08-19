@@ -112,6 +112,9 @@ set_configvar("HKU_ENABLE_NODE", 1)
 
 local boost_version = "1.88.0"
 local hdf5_version = "1.12.2"
+if is_plat("windows") then
+    hdf5_version = "1.13.3"
+end
 local fmt_version = "11.1.4"
 local spdlog_version = "1.15.2"
 local flatbuffers_version = "25.2.10"
