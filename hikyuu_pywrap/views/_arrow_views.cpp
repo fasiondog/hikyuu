@@ -16,7 +16,14 @@ void export_arrow_views(py::module& m) {
     m.def(
       "get_market_view",
       [](const py::sequence& stks, const Datetime& date, const string& market) {
-          StockList stks_list = python_list_to_vector<Stock>(stks);
+          StockList stks_list;
+          if (py::isinstance<StockManager>(stks)) {
+              stks_list = StockManager::instance().getStockList();
+          } else if (py::isinstance<Block>(stks)) {
+              stks_list = stks.cast<Block&>().getStockList();
+          } else {
+              stks_list = python_list_to_vector<Stock>(stks);
+          }
           std::shared_ptr<arrow::Table> view;
           if (date.isNull()) {
               view = getMarketView(stks_list, market);
@@ -46,9 +53,17 @@ void export_arrow_views(py::module& m) {
 
     m.def(
       "get_inds_view",
-      [](const StockList& stks, const IndicatorList& inds, const KQuery& query,
+      [](const py::sequence& stks, const IndicatorList& inds, const KQuery& query,
          const string& market) {
-          auto view = getIndicatorsView(stks, inds, query, market);
+          StockList stock_list;
+          if (py::isinstance<StockManager>(stks)) {
+              stock_list = StockManager::instance().getStockList();
+          } else if (py::isinstance<Block>(stks)) {
+              stock_list = stks.cast<Block>().getStockList();
+          } else {
+              stock_list = python_list_to_vector<Stock>(stks);
+          }
+          auto view = getIndicatorsView(stock_list, inds, query, market);
           HKU_ASSERT(view);
           arrow::py::import_pyarrow();
           PyObject* raw_obj = arrow::py::wrap_table(view);
@@ -60,9 +75,17 @@ void export_arrow_views(py::module& m) {
 
     m.def(
       "get_inds_view",
-      [](const StockList& stks, const IndicatorList& inds, const Datetime& date, size_t cal_len,
+      [](const py::sequence& stks, const IndicatorList& inds, const Datetime& date, size_t cal_len,
          const KQuery::KType& ktype, const string& market) {
-          auto view = getIndicatorsView(stks, inds, date, cal_len, ktype, market);
+          StockList stks_list;
+          if (py::isinstance<StockManager>(stks)) {
+              stks_list = StockManager::instance().getStockList();
+          } else if (py::isinstance<Block>(stks)) {
+              stks_list = stks.cast<Block&>().getStockList();
+          } else {
+              stks_list = python_list_to_vector<Stock>(stks);
+          }
+          auto view = getIndicatorsView(stks_list, inds, date, cal_len, ktype, market);
           HKU_ASSERT(view);
           arrow::py::import_pyarrow();
           PyObject* raw_obj = arrow::py::wrap_table(view);
@@ -71,7 +94,24 @@ void export_arrow_views(py::module& m) {
           return t.attr("to_pandas")();
       },
       py::arg("stks"), py::arg("inds"), py::arg("date"), py::arg("cal_len") = 100,
-      py::arg("ktype") = KQuery::DAY, py::arg("market") = "SH");
+      py::arg("ktype") = KQuery::DAY, py::arg("market") = "SH",
+      R"(get_inds_view(stks, inds, date[, cal_len=100, ktype=Query.DAY, market='SH']) -> pandas.DataFrame)
+    
+    方式1: 获取指定日期的各证券的各指标结果
+
+      :param stks: 证券列表
+      :param list[Indicator] inds: 指标列表
+      :param Datetime date: 指定日期
+      :param int cal_len: 计算需要的数据长度
+      :param ktype: k线类型
+      :param market: 指定行情市场（用于日期对齐）
+
+    方式2: 获取按指定Query查询计算的各证券的各指标结果, 结果中将包含指定 Query 包含的所有指定市场交易日日期
+
+      :param stks: 指定证券列表
+      :param list[Indicator] inds: 指定指标列表
+      :param Query query: 查询条件
+      :param str market: 指定行情市场（用于日期对齐）)");
 
     m.def(
       "krecords_to_pa",
@@ -145,18 +185,15 @@ void export_arrow_views(py::module& m) {
       },
       "将交易记录列表转换为 pyarrow.Table 对象");
 
-#if 0
-
     m.def(
       "positions_to_pa",
       [](const PositionRecordList& positions) {
           auto view = getPositionRecordListView(positions);
-          HKU_ARROW_TABLE_CHECK(view);
+          HKU_ASSERT(view);
           arrow::py::import_pyarrow();
-          PyObject* raw_obj = arrow::py::wrap_table(*view);
+          PyObject* raw_obj = arrow::py::wrap_table(view);
           HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
           return py::reinterpret_borrow<py::object>(raw_obj);
       },
       "将交易记录列表转换为 pyarrow.Table 对象");
-#endif
 }
