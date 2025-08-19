@@ -6,6 +6,8 @@
  */
 
 #include <hikyuu/indicator/Indicator.h>
+#include <hikyuu/views/arrow_views.h>
+#include <arrow/python/pyarrow.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -402,6 +404,51 @@ set_context(self, stock, query)
                                                                    py::arg("copy") = false);
         },
         "转换为 DataFrame")
+
+      .def(
+        "value_to_df",
+        [](const Indicator& self) {
+            size_t total = self.size();
+            if (total == 0) {
+                return py::module_::import("pandas").attr("DataFrame")();
+            }
+
+            py::dict columns;
+            size_t ret_num = self.getResultNumber();
+            std::vector<double> value(total);
+            for (size_t i = 0; i < ret_num; i++) {
+                const auto* src = self.data(i);
+                for (size_t j = 0; j < total; j++) {
+                    value[j] = src[j];
+                }
+                columns[fmt::format("value{}", i + 1).c_str()] =
+                  py::array_t<double>(total, value.data(), py::dtype("float64"));
+            }
+
+            return py::module_::import("pandas").attr("DataFrame")(columns,
+                                                                   py::arg("copy") = false);
+        },
+        "转换为 DataFrame, 仅包含值")
+
+      .def("to_pyarrow",
+           [](const Indicator& self) {
+               auto view = getIndicatorView(self);
+               HKU_ASSERT(view);
+               arrow::py::import_pyarrow();
+               PyObject* raw_obj = arrow::py::wrap_table(view);
+               HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+               return py::reinterpret_borrow<py::object>(raw_obj);
+           })
+
+      .def("value_to_pyarrow",
+           [](const Indicator& self) {
+               auto view = getIndicatorValueView(self);
+               HKU_ASSERT(view);
+               arrow::py::import_pyarrow();
+               PyObject* raw_obj = arrow::py::wrap_table(view);
+               HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+               return py::reinterpret_borrow<py::object>(raw_obj);
+           })
 
       .def(py::self + py::self)
       .def(py::self + Indicator::value_t())

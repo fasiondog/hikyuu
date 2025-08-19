@@ -116,9 +116,9 @@ void export_TradeRecord(py::module& m) {
 
         py::dtype dtype = py::dtype(
           vector_to_python_list<string>(
-            {htr("market_code"), htr("name"), htr("datetime"), htr("business"), htr("planPrice"),
-             htr("realPrice"), htr("goalPrice"), htr("number"), htr("stoploss"), htr("cash"),
-             htr("cost_total"), htr("cost_commission"), htr("cost_stamptax"),
+            {htr("market_code"), htr("stock_name"), htr("datetime"), htr("business"),
+             htr("planPrice"), htr("realPrice"), htr("goalPrice"), htr("number"), htr("stoploss"),
+             htr("cash"), htr("cost_total"), htr("cost_commission"), htr("cost_stamptax"),
              htr("cost_transferfee"), htr("cost_others"), htr("part_from"), htr("remark")}),
           vector_to_python_list<string>({"U10", "U20", "datetime64[ns]", "U20", "d", "d", "d", "d",
                                          "d", "d", "d", "d", "d", "d", "d", "U20", "U100"}),
@@ -216,7 +216,7 @@ void export_TradeRecord(py::module& m) {
           py::dict columns;
           columns[htr("market_code").c_str()] =
             pandas.attr("Series")(code_list, py::arg("dtype") = "string");
-          columns[htr("name").c_str()] =
+          columns[htr("stock_name").c_str()] =
             pandas.attr("Series")(name_list, py::arg("dtype") = "string");
           columns[htr("datetime").c_str()] = datetime_arr.attr("astype")("datetime64[ns]");
           columns[htr("business").c_str()] =

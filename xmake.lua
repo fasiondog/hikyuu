@@ -112,6 +112,9 @@ set_configvar("HKU_ENABLE_NODE", 1)
 
 local boost_version = "1.88.0"
 local hdf5_version = "1.12.2"
+if is_plat("windows") then
+    hdf5_version = "1.13.3"
+end
 local fmt_version = "11.1.4"
 local spdlog_version = "1.15.2"
 local flatbuffers_version = "25.2.10"
@@ -157,6 +160,11 @@ add_requires("nng " .. nng_version, {system = false, configs = {NNG_ENABLE_TLS =
 add_requires("nlohmann_json", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc", {system = false})
+if get_config("leak_check") then
+    add_requires("arrow", {system = false, configs = {shared = true}})
+else
+    add_requires("arrow", {system = false})
+end
 
 if has_config("http_client_zip") then
     add_requires("gzip-hpp", {system = false})
@@ -217,6 +225,8 @@ end
 
 includes("./copy_dependents.lua")
 includes("./hikyuu_cpp/hikyuu")
-includes("./hikyuu_pywrap")
-includes("./hikyuu_cpp/unit_test")
 includes("./hikyuu_cpp/demo")
+if not is_plat("cross") then
+  includes("./hikyuu_pywrap")
+  includes("./hikyuu_cpp/unit_test")
+end

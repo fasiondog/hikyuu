@@ -22,10 +22,10 @@ public:
     Datetime datetime;  // 时间
     price_t price;      // 成交均价
     price_t vol;        // 成交量
-    int direct;         // 买卖盘性质：1--sell 0--buy 2--集合竞价 其他未知
+    int32_t direct;     // 买卖盘性质：1--sell 0--buy 2--集合竞价 其他未知
 
     TransRecord();
-    TransRecord(const Datetime& datetime, price_t price, price_t vol, int direct);
+    TransRecord(const Datetime& datetime, price_t price, price_t vol, int32_t direct);
 
     bool isValid() const;
 };

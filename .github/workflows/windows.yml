@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2022]
+        os: [windows-2022, windows-2025]
         arch: [x64] #, arm64]
 
     concurrency:
@@ -26,21 +26,28 @@ jobs:
 
     - uses: xmake-io/github-action-setup-xmake@v1
       with:
-        xmake-version: 3.0.0
+        xmake-version: 3.0.1
         actions-cache-folder: '.xmake-cache'
         actions-cache-key: 'windows'
 
     - name: configure
       shell: cmd
       run: |
+        pip install -r requirements.txt      
         xmake f -c -k shared --feedback=n -y -vD
 
     - name: build
       shell: cmd
       run: |
-        xmake -bvD small-test
+        xmake -b core        
 
-    # - name: test
+    # - name: test python
     #   shell: cmd
     #   run: |
-    #     xmake r small-test
+    #     set PYTHONPATH=.
+    #     python hikyuu/test/test.py
+
+    - name: build
+      shell: cmd
+      run: |
+        xmake r small-test

@@ -10,7 +10,7 @@ target("core")
     -- end
 
     add_deps("hikyuu")
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "utf8proc")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "utf8proc", "arrow")
     if is_plat("windows") then
         set_filename("core.pyd")
         add_cxflags("-wd4251")
@@ -68,19 +68,45 @@ target("core")
             end            
             target:add("includedirs", pydir .. "/include")
             target:add("linkdirs", pydir .. "/libs")
+
+            local pyarrow = os.iorun("python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
+            target:add("includedirs", pyarrow .. "/include")
+            target:add("linkdirs", pyarrow)
+            target:add("links", "arrow_python")
             return
         end
     
         -- get python include directory.
-        local pydir = nil;
+        local pydir_include = nil;
+        local pydir_lib = nil;
+        local pyarrow = nil;
         if os.getenv("CONDA_PREFIX") ~= nil then
+            print("CONDA_PREFIX: " .. os.getenv("CONDA_PREFIX"))
             local py3config = os.getenv("CONDA_PREFIX") .. "/bin/python3-config"
-            pydir = os.iorun(py3config .. " --includes"):trim()
+            pydir_include = os.iorun(py3config .. " --includes"):trim()
+            pydir_lib = os.iorun(py3config .. " --libs"):trim()
+
+            pyarrow = os.iorun(os.getenv("CONDA_PREFIX") .. "/bin/python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
+            target:add("includedirs", pyarrow .. "/include")
+            target:add("linkdirs", pyarrow)
+            target:add("links", "arrow_python")
         else
-            pydir = os.iorun("python3-config --includes"):trim()
+            pydir_include = os.iorun("python3-config --includes"):trim()
+            pydir_lib = os.iorun("python3-config --libs"):trim()
+
+            if is_plat("macosx") then
+                pyarrow = os.iorun("python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
+            else
+                pyarrow = os.iorun("python3 -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
+            end
+            print("pyarrow: " .. pyarrow)
+            target:add("includedirs", pyarrow .. "/include")
+            target:add("linkdirs", pyarrow)
+            target:add("links", "arrow_python")
         end
-        assert(pydir, "python3-config not found!")
-        target:add("cxflags", pydir)           
+        assert(pydir_include, "python3-config not found!")
+        target:add("cxflags", pydir_include, pydir_lib)    
+
     end)
 
     after_build(function(target)

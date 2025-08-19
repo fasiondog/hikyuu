@@ -2,8 +2,10 @@
 # -*- coding: utf8 -*-
 # cp936
 
+import pyarrow as pa
 import atexit
 import io
+import locale
 from pathlib import Path
 import pickle
 import traceback
@@ -118,7 +120,9 @@ if in_ipython_frontend():
 
 # windows 终端下执行无法正常显示 c++ 输出中文
 if sys.platform == 'win32' and not in_ipython_frontend():
-    os.system('chcp 65001 > nul')
+    lang, _ = locale.getdefaultlocale()
+    if lang and 'zh' in lang.lower():
+        os.system('chcp 65001 > nul')
 
 use_draw_engine('matplotlib')
 

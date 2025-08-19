@@ -223,22 +223,41 @@ def DatetimeList_to_df(data: DatetimeList):
 
 DatetimeList.to_np = DatetimeList_to_np
 DatetimeList.to_df = DatetimeList_to_df
+DatetimeList.to_numpy = DatetimeList.to_np
+DatetimeList.to_pandas = DatetimeList.to_df
+DatetimeList.to_pyarrow = lambda data: dates_to_pa(data)
 
 
 TimeLineList.to_np = lambda data: timeline_to_np(data)
 TimeLineList.to_df = lambda data: timeline_to_df(data)
+TimeLineList.to_numpy = TimeLineList.to_np
+TimeLineList.to_pandas = TimeLineList.to_df
+TimeLineList.to_pyarrow = lambda data: timeline_to_pa(data)
 
 
 TransList.to_np = lambda data: translist_to_np(data)
 TransList.to_df = lambda data: translist_to_df(data)
+TransList.to_numpy = TransList.to_np
+TransList.to_pandas = TransList.to_df
+TransList.to_pyarrow = lambda data: translist_to_pa(data)
 
 
 StockWeightList.to_np = lambda data: weights_to_np(data)
 StockWeightList.to_df = lambda data: weights_to_df(data)
+StockWeightList.to_numpy = StockWeightList.to_np
+StockWeightList.to_pandas = StockWeightList.to_df
+StockWeightList.to_pyarrow = lambda data: weights_to_pa(data)
 
 
 KRecordList.to_np = lambda data: krecords_to_np(data)
 KRecordList.to_df = lambda data: krecords_to_df(data)
+KRecordList.to_numpy = KRecordList.to_np
+KRecordList.to_pandas = KRecordList.to_df
+KRecordList.to_pyarrow = lambda data: krecords_to_pa(data)
+
+KData.to_numpy = KData.to_np
+KData.to_pandas = KData.to_df
+
 
 # ------------------------------------------------------------------
 # 增强 Parameter
