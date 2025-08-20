@@ -86,6 +86,29 @@
         199	2024-03-07 00:00:00	10.101364	9.738182
 
 
+.. py:function:: get_inds_view(inds, dates, query, market='SH', parallel=False)
+
+    方式1: 获取指定日期的各证券的各指标结果
+
+      :param stks: 证券列表
+      :param list[Indicator] inds: 指标列表
+      :param Datetime date: 指定日期
+      :param int cal_len: 计算需要的数据长度
+      :param str ktype: k线类型
+      :param str market: 指定行情市场（用于日期对齐）
+      :param bool parallel: 是否并行计算
+
+    方式2: 获取按指定Query查询计算的各证券的各指标结果, 结果中将包含指定 Query 包含的所有指定市场交易日日期
+
+    get_inds_view(stks, inds, date[, cal_len=100, ktype=Query.DAY, market='SH']) -> pandas.DataFrame
+
+      :param stks: 指定证券列表
+      :param list[Indicator] inds: 指定指标列表
+      :param Query query: 查询条件
+      :param str market: 指定行情市场（用于日期对齐）
+      :param bool parallel: 是否并行计算
+
+
 .. py:function:: df_to_ind(df, col_name, col_date=None)
     
     将 pandas.DataFrame 指定列转化为 Indicator
