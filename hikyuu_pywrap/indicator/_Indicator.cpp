@@ -335,52 +335,45 @@ set_context(self, stock, query)
       .def(
         "value_to_np",
         [](const Indicator& self) {
-            py::array ret;
-            auto imp = self.getImp();
-            HKU_IF_RETURN(!imp, ret);
-            size_t ret_num = imp->getResultNumber();
+            size_t ret_num = self.getResultNumber();
 
-            double* buffer = new double[self.size() * ret_num];
+            // 初始化array_t并获取其内部缓冲区
+            py::array_t<double> ret;
+            ret.resize({self.size(), ret_num});  // 二维形状: [size, ret_num]
+            auto buf = ret.request();
+            double* buffer = static_cast<double*>(buf.ptr);  // 从array_t获取指针
 
-            std::vector<string> names;
-            std::vector<string> fields;
+            std::vector<std::string> names;
+            std::vector<std::string> fields;
             std::vector<int64_t> offsets;
             for (size_t i = 0; i < ret_num; i++) {
                 names.push_back(fmt::format("value{}", i + 1));
                 fields.push_back("d");
-                if (i == 0) {
-                    offsets.push_back(0);
-                } else {
-                    offsets.push_back(offsets.back() + sizeof(Indicator::value_t));
-                }
+                offsets.push_back(i * sizeof(Indicator::value_t));  // 简化偏移计算
             }
 
             auto dtype = py::dtype(
-              vector_to_python_list<string>(names), vector_to_python_list<string>(fields),
+              vector_to_python_list<std::string>(names), vector_to_python_list<std::string>(fields),
               vector_to_python_list<int64_t>(offsets), ret_num * sizeof(Indicator::value_t));
 
             std::vector<const Indicator::value_t*> src(ret_num);
             for (size_t i = 0; i < ret_num; i++) {
-                src[i] = imp->data(i);
+                src[i] = self.data(i);
             }
 
-            size_t x = ret_num;
-            for (size_t i = 0, total = imp->size(); i < total; i++) {
+            // 填充数据到array_t的缓冲区
+            for (size_t i = 0, total = self.size(); i < total; i++) {
                 for (size_t j = 0; j < ret_num; j++) {
-                    buffer[i * x + j] = src[j][i];
+                    buffer[i * ret_num + j] = src[j][i];
                 }
             }
 
-            auto capsule =
-              py::capsule(buffer, [](void* ptr) { delete[] static_cast<double*>(ptr); });
-
-            ret = py::array(dtype, self.size(), buffer, capsule);
-            return ret;
+            return py::array(dtype, {self.size()}, {ret_num * sizeof(double)}, buf.ptr, ret);
         },
         "仅转化值为np.array, 不包含日期列")
 
       .def(
-        "value_to_narray",
+        "value_to_array",
         [](const Indicator& self, size_t result_index) {
             HKU_CHECK(result_index < self.getResultNumber(), "result_index out of range");
             auto ret = py::array_t<double>(self.size());
@@ -414,14 +407,15 @@ set_context(self, stock, query)
             }
 
             size_t ret_num = self.getResultNumber();
-            std::vector<double> value(total);
             for (size_t i = 0; i < ret_num; i++) {
+                py::array_t<double> arr(total);
+                auto buf = arr.request();
+                double* dst = static_cast<double*>(buf.ptr);
                 const auto* src = self.data(i);
                 for (size_t j = 0; j < total; j++) {
-                    value[j] = src[j];
+                    dst[j] = src[j];
                 }
-                columns[fmt::format("value{}", i + 1).c_str()] =
-                  py::array_t<double>(total, value.data(), py::dtype("float64"));
+                columns[fmt::format("value{}", i + 1).c_str()] = arr;
             }
 
             return py::module_::import("pandas").attr("DataFrame")(columns,
@@ -439,14 +433,15 @@ set_context(self, stock, query)
 
             py::dict columns;
             size_t ret_num = self.getResultNumber();
-            std::vector<double> value(total);
             for (size_t i = 0; i < ret_num; i++) {
+                py::array_t<double> arr(total);
+                auto buf = arr.request();
+                double* dst = static_cast<double*>(buf.ptr);
                 const auto* src = self.data(i);
                 for (size_t j = 0; j < total; j++) {
-                    value[j] = src[j];
+                    dst[j] = src[j];
                 }
-                columns[fmt::format("value{}", i + 1).c_str()] =
-                  py::array_t<double>(total, value.data(), py::dtype("float64"));
+                columns[fmt::format("value{}", i + 1).c_str()] = arr;
             }
 
             return py::module_::import("pandas").attr("DataFrame")(columns,
