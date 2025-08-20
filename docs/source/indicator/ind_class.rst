@@ -150,3 +150,28 @@ Indicator
 
         :param Stock stock: 指定的 Stock
         :param Query query: 指定的查询条件
+
+    .. py:method:: to_array(self, result_index=0)
+
+        将指定结果集转换为 numpy.array
+
+    .. py:method:: to_numpy(self)
+
+        转换为 numpy 数组, 如果为时间序列，将包含 datetime 列
+
+        :rtype: numpy.ndarray
+
+    .. py:method:: value_to_numpy(self)
+
+        转换为 numpy 数组, 仅包含 value
+
+    .. py:method:: to_pandas(self)
+
+        转换为 pandas DataFrame, 如果为时间序列，将包含 datetime 列
+
+    .. py:method:: value_to_pandas(self)
+
+        转换为 pandas DataFrame, 仅包含 value
+
+
+    
