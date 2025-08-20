@@ -575,6 +575,18 @@ StockManager/Block/Stock
 
     std::vector<StockWeight> 包装，见 :py:class:`StockWeight`
 
+    .. py:method:: to_numpy(self)
+
+        转为 numpy 数组
+
+    .. py:method:: to_pandas(self)
+
+        转为 pandas DataFrame
+
+    .. py:method:: to_pyarrow(self)
+
+        转为 pyarrow Table
+
 
 .. py:class:: MarketInfo
 

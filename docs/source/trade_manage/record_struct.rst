@@ -50,13 +50,17 @@
 
     交易记录列表，C++ std::vector<TradeRecord>包装
     
-    .. py:method:: to_np()
+    .. py:method:: to_numpy()
     
         仅在安装了numpy模块时生效，转换为numpy.array
     
-    .. py:method:: to_df()
+    .. py:method:: to_pandas()
     
         仅在安装了pandas模块时生效，转换为pandas.DataFrame
+
+    .. py:method:: to_pyarrow()
+
+        转换为 pyarrow.Table
 
 .. py:class:: TradeRecord([stock, datetime, business, planPrice, realPrice, goalPrice, number, cost, stoploss, cash, part])
 
@@ -88,13 +92,17 @@
 
     持仓记录列表，C++ std::vector<PositionRecord>包装
     
-    .. py:method:: to_np()
+    .. py:method:: to_numpy()
     
         仅在安装了numpy模块时生效，转换为numpy.array
     
-    .. py:method:: to_df()
+    .. py:method:: to_pandas()
     
         仅在安装了pandas模块时生效，转换为pandas.DataFrame
+
+    .. py:method:: to_pyarrow()
+
+        转换为 pyarrow.Table
         
 
 .. py:class:: PositionRecord([stock, take_datetime, clean_datetime, number, stoploss, goal_price, total_number, buy_money, total_cost, total_risk, sell_money])

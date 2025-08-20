@@ -173,5 +173,17 @@ Indicator
 
         转换为 pandas DataFrame, 仅包含 value
 
+    .. py:method:: to_pyarrow(self)
+
+        转换为 pyarrow Table, 如果为时间序列，将包含 datetime 列
+
+        :rtype: pyarrow.Table
+
+    .. py:method:: value_to_pyarrow(self)
+
+        转换为 pyarrow Table, 仅包含 value
+
+        :rtype: pyarrow.Table
+
 
     

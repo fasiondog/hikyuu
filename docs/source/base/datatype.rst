@@ -484,17 +484,21 @@ K线数据
 
     通过 Stock.get_timeline_list 获取的分时线数据，由 TimeLineRecord 组成的数组，可象 list 一样进行遍历
     
-    .. py:method:: to_np()
+    .. py:method:: to_numpy()
     
         转化为numpy结构数组
     
         :rtype: numpy.array
         
-    .. py:method:: to_df()
+    .. py:method:: to_pandas()
     
         转化为pandas的DataFrame
         
         :rtype: pandas.DataFrame
+
+    .. py:method:: to_pyarrow()
+
+        转换为 pyarrow.Table
         
 
 分笔历史数据
@@ -513,15 +517,19 @@ K线数据
 
     分时线数据列表
     
-    .. py:method:: to_np()
+    .. py:method:: to_numpy()
     
         转化为numpy结构数组
     
         :rtype: numpy.array
         
-    .. py:method:: to_df()
+    .. py:method:: to_pandas()
     
         转化为pandas的DataFrame
         
         :rtype: pandas.DataFrame
+
+    .. py:method:: to_pyarrow()
+
+        转换为 pyarrow.Table
     
