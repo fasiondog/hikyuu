@@ -266,7 +266,8 @@ set_context(self, stock, query)
             auto imp = self.getImp();
             HKU_IF_RETURN(!imp, ret);
             size_t ret_num = imp->getResultNumber();
-            std::unique_ptr<uint64_t[]> buffer(new uint64_t[self.size() * (ret_num + 1)]);
+
+            uint64_t* buffer = new uint64_t[self.size() * (ret_num + 1)];
 
             std::vector<string> names;
             std::vector<string> fields;
@@ -306,8 +307,8 @@ set_context(self, stock, query)
                 src[i] = imp->data(i);
             }
 
-            uint64_t* data = (uint64_t*)buffer.get();
-            double* val = (double*)buffer.get();
+            uint64_t* data = buffer;
+            double* val = (double*)buffer;
             if (!dates.empty()) {
                 size_t x = ret_num + 1;
                 for (size_t i = 0, total = imp->size(); i < total; i++) {
@@ -323,7 +324,10 @@ set_context(self, stock, query)
                     }
                 }
             }
-            ret = py::array(dtype, self.size(), data);
+
+            auto capsule =
+              py::capsule(buffer, [](void* ptr) { delete[] static_cast<uint64_t*>(ptr); });
+            ret = py::array(dtype, self.size(), data, capsule);
             return ret;
         },
         "转化为np.array, 如果为时间序列, 则包含 datetime 日期列")
@@ -335,7 +339,9 @@ set_context(self, stock, query)
             auto imp = self.getImp();
             HKU_IF_RETURN(!imp, ret);
             size_t ret_num = imp->getResultNumber();
-            std::unique_ptr<double[]> buffer(new double[self.size() * ret_num]);
+
+            double* buffer = new double[self.size() * ret_num];
+
             std::vector<string> names;
             std::vector<string> fields;
             std::vector<int64_t> offsets;
@@ -358,14 +364,17 @@ set_context(self, stock, query)
                 src[i] = imp->data(i);
             }
 
-            double* val = buffer.get();
             size_t x = ret_num;
             for (size_t i = 0, total = imp->size(); i < total; i++) {
                 for (size_t j = 0; j < ret_num; j++) {
-                    val[i * x + j] = src[j][i];
+                    buffer[i * x + j] = src[j][i];
                 }
             }
-            ret = py::array(dtype, self.size(), val);
+
+            auto capsule =
+              py::capsule(buffer, [](void* ptr) { delete[] static_cast<double*>(ptr); });
+
+            ret = py::array(dtype, self.size(), buffer, capsule);
             return ret;
         },
         "仅转化值为np.array, 不包含日期列")
