@@ -49,12 +49,14 @@ std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks,
  * @param inds 指定指标列表
  * @param query 查询条件
  * @param market 指定行情市场（用于日期对齐）
+ * @param parallel 并行计算
  * @return * arrow::Result<std::shared_ptr<arrow::Table>>
  */
 std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
                                                         const IndicatorList& inds,
                                                         const KQuery& query,
-                                                        const string& market = "SH");
+                                                        const string& market = "SH",
+                                                        bool parallel = false);
 
 /**
  * 获取指定日期的各指定证券的各指标视图
@@ -64,13 +66,12 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
  * @param cal_len 计算需要的数据长度
  * @param ktype k线类型
  * @param market 指定行情市场（用于日期对齐）
+ * @param parallel 并行计算
  * @return arrow::Result<std::shared_ptr<arrow::Table>>
  */
-std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
-                                                        const IndicatorList& inds,
-                                                        const Datetime& date, size_t cal_len = 100,
-                                                        const KQuery::KType& ktype = KQuery::DAY,
-                                                        const string& market = "SH");
+std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(
+  const StockList& stks, const IndicatorList& inds, const Datetime& date, size_t cal_len = 100,
+  const KQuery::KType& ktype = KQuery::DAY, const string& market = "SH", bool parallel = false);
 
 /**
  * Indicator转换为 Arrow Table，包含时间序列，则带有时间列，否则无时间列

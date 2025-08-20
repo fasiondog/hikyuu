@@ -254,7 +254,9 @@ std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const
 
 std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
                                                         const IndicatorList& inds,
-                                                        const KQuery& query, const string& market) {
+                                                        const KQuery& query, const string& market,
+                                                        bool parallel) {
+    // SPEND_TIME(getIndicatorsView);
     auto& sm = StockManager::instance();
     auto dates = sm.getTradingCalendar(query, market);
 
@@ -280,24 +282,62 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
         HKU_ASSERT(builder.Reserve(total).ok());
     }
 
-    for (const auto& stk : stks) {
-        auto kdata = stk.getKData(query);
-        bool have_data = true;
-        for (size_t i = 0; i < inds.size(); ++i) {
-            auto x = ALIGN(inds[i], dates, true)(kdata);
-            if (x.size() != dates.size()) {
-                have_data = false;
-            } else {
-                const auto* x_ptr = x.data();
-                HKU_ASSERT(builders[i].AppendValues(x_ptr, x.size()).ok());
-            }
+    if (!dates.empty()) {
+        KQuery new_query =
+          KQueryByDate(dates.front(), dates.back() + Minutes(KQuery::getKTypeInMin(query.kType())),
+                       query.kType(), query.recoverType());
+        vector<int64_t> timestamps(dates.size());
+        for (size_t i = 0; i < dates.size(); ++i) {
+            timestamps[i] = dates[i].timestamp() * 1000LL;
         }
 
-        if (have_data) {
-            for (size_t i = 0; i < dates.size(); ++i) {
-                HKU_ASSERT(code_builder.Append(stk.market_code()).ok());
-                HKU_ASSERT(name_builder.Append(stk.name()).ok());
-                HKU_ASSERT(date_builder.Append(dates[i].timestamp() * 1000LL).ok());
+        if (parallel) {
+            auto stk_ind_list = parallel_for_index(0, stks.size(), [&](size_t index) {
+                auto kdata = stks[index].getKData(new_query);
+                IndicatorList rets(inds.size());
+                for (size_t i = 0; i < inds.size(); i++) {
+                    rets[i] = ALIGN(inds[i].clone(), dates, true)(kdata);
+                }
+                return rets;
+            });
+
+            for (size_t i = 0; i < stk_ind_list.size(); i++) {
+                const auto& stk_inds = stk_ind_list[i];
+                for (size_t j = 0; j < stk_inds.size(); j++) {
+                    if (stk_inds[j].size() == dates.size()) {
+                        const auto* x_ptr = stk_inds[j].data();
+                        HKU_ASSERT(builders[j].AppendValues(x_ptr, stk_inds[j].size()).ok());
+                    } else {
+                        HKU_ASSERT(builders[j].AppendNulls(dates.size()).ok());
+                    }
+                }
+                for (size_t n = 0; n < dates.size(); ++n) {
+                    HKU_ASSERT(code_builder.Append(stks[i].market_code()).ok());
+                    HKU_ASSERT(name_builder.Append(stks[i].name()).ok());
+                }
+                HKU_ASSERT(date_builder.AppendValues(timestamps).ok());
+            }
+        } else {
+            for (const auto& stk : stks) {
+                auto kdata = stk.getKData(new_query);
+                if (kdata.empty()) {
+                    continue;
+                }
+                for (size_t i = 0; i < inds.size(); ++i) {
+                    auto x = ALIGN(inds[i], dates, true)(kdata);
+                    if (x.size() != dates.size()) {
+                        HKU_ASSERT(builders[i].AppendNulls(dates.size()).ok());
+                    } else {
+                        const auto* x_ptr = x.data();
+                        HKU_ASSERT(builders[i].AppendValues(x_ptr, x.size()).ok());
+                    }
+                }
+
+                for (size_t i = 0; i < dates.size(); ++i) {
+                    HKU_ASSERT(code_builder.Append(stk.market_code()).ok());
+                    HKU_ASSERT(name_builder.Append(stk.name()).ok());
+                }
+                HKU_ASSERT(date_builder.AppendValues(timestamps).ok());
             }
         }
     }
@@ -331,7 +371,8 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
                                                         const IndicatorList& inds,
                                                         const Datetime& date, size_t cal_len,
                                                         const KQuery::KType& ktype,
-                                                        const string& market) {
+                                                        const string& market, bool parallel) {
+    // SPEND_TIME(getIndicatorsView);
     auto& sm = StockManager::instance();
     Stock market_stk = sm.getMarketStock(market);
     HKU_CHECK(!market_stk.isNull(), "Can not find market stock for {}!", market);
@@ -365,19 +406,42 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
             KQuery query =
               KQueryByDate(dates.front(), date + Minutes(KQuery::getKTypeInMin(ktype)), ktype);
 
-            for (const auto& stk : stks) {
-                auto kdata = stk.getKData(query);
-                bool have_data = true;
-                for (size_t i = 0; i < inds.size(); ++i) {
-                    auto x = ALIGN(inds[i], dates, true)(kdata);
-                    if (x.size() != dates.size()) {
-                        have_data = false;
-                    } else {
-                        HKU_ASSERT(builders[i].Append(x[dates.size() - 1]).ok());
+            if (parallel) {
+                auto stk_ind_list = parallel_for_index(0, stks.size(), [&](size_t index) {
+                    auto kdata = stks[index].getKData(query);
+                    vector<Indicator::value_t> rets(inds.size());
+                    for (size_t i = 0; i < inds.size(); i++) {
+                        auto x = ALIGN(inds[i].clone(), dates, true)(kdata);
+                        if (x.size() == dates.size()) {
+                            rets[i] = x[x.size() - 1];
+                        } else {
+                            rets[i] = Null<Indicator::value_t>();
+                        }
                     }
+                    return rets;
+                });
+
+                for (size_t i = 0; i < stks.size(); ++i) {
+                    for (size_t j = 0; j < inds.size(); ++j) {
+                        HKU_ASSERT(builders[j].Append(stk_ind_list[i][j]).ok());
+                    }
+                    HKU_ASSERT(code_builder.Append(stks[i].market_code()).ok());
+                    HKU_ASSERT(name_builder.Append(stks[i].name()).ok());
+                    HKU_ASSERT(date_builder.Append(dates.back().timestamp() * 1000LL).ok());
                 }
 
-                if (have_data) {
+            } else {
+                for (const auto& stk : stks) {
+                    auto kdata = stk.getKData(query);
+                    for (size_t i = 0; i < inds.size(); ++i) {
+                        auto x = ALIGN(inds[i], dates, true)(kdata);
+                        if (x.size() != dates.size()) {
+                            HKU_ASSERT(builders[i].AppendNull().ok());
+                        } else {
+                            HKU_ASSERT(builders[i].Append(x[dates.size() - 1]).ok());
+                        }
+                    }
+
                     HKU_ASSERT(code_builder.Append(stk.market_code()).ok());
                     HKU_ASSERT(name_builder.Append(stk.name()).ok());
                     HKU_ASSERT(date_builder.Append(dates.back().timestamp() * 1000LL).ok());
