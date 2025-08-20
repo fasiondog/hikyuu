@@ -373,7 +373,7 @@ set_context(self, stock, query)
         "仅转化值为np.array, 不包含日期列")
 
       .def(
-        "value_to_array",
+        "to_array",
         [](const Indicator& self, size_t result_index) {
             HKU_CHECK(result_index < self.getResultNumber(), "result_index out of range");
             auto ret = py::array_t<double>(self.size());
