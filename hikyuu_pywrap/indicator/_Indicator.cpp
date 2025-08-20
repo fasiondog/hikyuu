@@ -371,6 +371,21 @@ set_context(self, stock, query)
         "仅转化值为np.array, 不包含日期列")
 
       .def(
+        "value_to_narray",
+        [](const Indicator& self, size_t result_index) {
+            HKU_CHECK(result_index < self.getResultNumber(), "result_index out of range");
+            auto ret = py::array_t<double>(self.size());
+            auto buf = ret.request();
+            double* ptr = static_cast<double*>(buf.ptr);
+            const auto* src = self.data(result_index);
+            for (size_t i = 0; i < self.size(); i++) {
+                ptr[i] = src[i];
+            }
+            return ret;
+        },
+        py::arg("result_index") = 0, "将指定结果集转化为numpy.array")
+
+      .def(
         "to_df",
         [](const Indicator& self) {
             size_t total = self.size();
