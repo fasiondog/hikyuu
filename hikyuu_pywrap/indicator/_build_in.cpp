@@ -1872,6 +1872,9 @@ void export_Indicator_build_in(py::module& m) {
       R"(IC(ind, stks, query, ref_stk[, n=1])
 
     计算指定的因子相对于参考证券的 IC （实际为 RankIC）
+
+    IC 原本需要 “t 时刻因子值→t+1 时刻收益”，此处改为计算 “t 时刻因子值→t 时刻之前 N 天的收益”（比如过去 5 天的收益）。
+    (否则当前值都会是缺失NA), 相当于原始预测 IC 右移 n 位。
     
     :param Indicator ind: 输入因子
     :param sequence(stock)|Block stks 证券组合
