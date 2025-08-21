@@ -343,7 +343,7 @@ Indicator MultiFactorBase::getIC(int ndays) {
     // 通过IC/ICIR计算权重的情况较多，所以这里直接缓存一份，减少重复计算
     // 实际使用时，最好保证 getIC(ndays) 中的 ndays 和 ic_n 一致
     int ic_n = getParam<int>("ic_n");
-    if (ndays == 0) {
+    if (ndays <= 0) {
         ndays = ic_n;
     }
     HKU_IF_RETURN(ic_n == ndays && !m_ic.empty(), m_ic.clone());
@@ -351,36 +351,16 @@ Indicator MultiFactorBase::getIC(int ndays) {
     size_t days_total = m_ref_dates.size();
     Indicator result = PRICELIST(PriceList(days_total, Null<price_t>()));
     result.name("IC");
-    if (ndays + 1 >= days_total || ndays < 0) {
-        result.setDiscard(days_total);
-        if (ic_n == ndays) {
-            m_ic = result;
-        }
-        return result;
+
+    IndicatorList tmp_ref_inds(m_all_factors.size());
+    for (size_t i = 0; i < m_all_factors.size(); i++) {
+        tmp_ref_inds[i] = REF(m_all_factors[i], ndays);
     }
 
     auto all_returns = _getAllReturns(ndays);
 
     size_t discard = ndays;
     size_t ind_count = m_all_factors.size();
-    for (size_t i = 0; i < ind_count; i++) {
-        if (all_returns[i].discard() > discard) {
-            discard = all_returns[i].discard();
-        }
-        if (m_all_factors[i].discard() > discard) {
-            discard = m_all_factors[i].discard();
-        }
-    }
-
-    if (discard >= days_total) {
-        result.setDiscard(days_total);
-        if (ic_n == ndays) {
-            m_ic = result;
-        }
-        return result;
-    }
-
-    result.setDiscard(discard);
 
     Indicator (*spearman)(const Indicator&, const Indicator&, int, bool) = hku::SPEARMAN;
     if (!getParam<bool>("use_spearman")) {
@@ -390,9 +370,12 @@ Indicator MultiFactorBase::getIC(int ndays) {
     PriceList tmp(ind_count, Null<price_t>());
     PriceList tmp_return(ind_count, Null<price_t>());
     auto* dst = result.data();
+    HKU_INFO("discard: {}, days_total: {}", discard, days_total);
     for (size_t i = discard; i < days_total; i++) {
+        HKU_INFO("{}", i);
         for (size_t j = 0; j < ind_count; j++) {
-            tmp[j] = m_all_factors[j][i];
+            tmp[j] = tmp_ref_inds[j][i];
+            HKU_INFO("{}, {}: ", i, tmp[j]);
             tmp_return[j] = all_returns[j][i];
         }
         auto a = PRICELIST(tmp);
@@ -400,6 +383,14 @@ Indicator MultiFactorBase::getIC(int ndays) {
         auto ic = spearman(a, b, ind_count, true);
         dst[i] = ic[ic.size() - 1];
     }
+
+    for (size_t i = discard; i < days_total; i++) {
+        if (!std::isnan(dst[i])) {
+            discard = i;
+            break;
+        }
+    }
+    result.setDiscard(discard);
 
     // 如果 ndays 和 ic_n 参数相同，缓存计算结果
     if (ic_n == ndays) {
@@ -424,13 +415,13 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     all_returns.reserve(m_stks.size());
     for (const auto& stk : m_stks) {
         auto k = stk.getKData(m_query);
-        all_returns.emplace_back(ALIGN(REF(ROCP(k.close(), ndays), ndays), m_ref_dates, fill_null));
+        all_returns.emplace_back(ALIGN(ROCP(k.close(), ndays), m_ref_dates, fill_null));
     }
     return all_returns;
 #else
     return parallel_for_index(0, m_stks.size(), [this, ndays, fill_null](size_t i) {
         auto k = m_stks[i].getKData(m_query);
-        return ALIGN(REF(ROCP(k.close(), ndays), ndays), m_ref_dates, fill_null);
+        return ALIGN(ROCP(k.close(), ndays), m_ref_dates, fill_null);
     });
 #endif
 }

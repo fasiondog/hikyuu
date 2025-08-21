@@ -76,8 +76,7 @@ void IIc::_calculate(const Indicator& inputInd) {
     }
 
     int n = getParam<int>("n");
-    bool strict_mode = getParam<bool>("strict");
-    HKU_IF_RETURN((n >= days_total), void());
+    HKU_IF_RETURN(n >= days_total, void());
 
     bool fill_null = getParam<bool>("fill_null");
 

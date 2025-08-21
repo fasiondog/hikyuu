@@ -103,7 +103,7 @@ TEST_CASE("test_MF_EqualWeight") {
     ind2 = MA(CLOSE(sm["sh600005"].getKData(query)));
     CHECK_UNARY(ind1.equal(ind2));
     CHECK_UNARY(all_factors[0].equal(ind2));
-    auto ic1 = mf->getIC();
+    auto ic1 = mf->getIC(1);
     auto ic2 = IC(MA(CLOSE()), stks, query, ref_stk, 1);
     CHECK_UNARY(ic1.equal(ic2));
 
