@@ -370,12 +370,9 @@ Indicator MultiFactorBase::getIC(int ndays) {
     PriceList tmp(ind_count, Null<price_t>());
     PriceList tmp_return(ind_count, Null<price_t>());
     auto* dst = result.data();
-    HKU_INFO("discard: {}, days_total: {}", discard, days_total);
     for (size_t i = discard; i < days_total; i++) {
-        HKU_INFO("{}", i);
         for (size_t j = 0; j < ind_count; j++) {
             tmp[j] = tmp_ref_inds[j][i];
-            HKU_INFO("{}, {}: ", i, tmp[j]);
             tmp_return[j] = all_returns[j][i];
         }
         auto a = PRICELIST(tmp);
