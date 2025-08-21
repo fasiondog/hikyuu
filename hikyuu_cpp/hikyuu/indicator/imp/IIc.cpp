@@ -25,13 +25,18 @@ IIc::IIc() : IndicatorImp("IC", 1) {
     // 对齐时是否以 nan 值进行填充，否则以小于当前日期的最后值作为填充
     setParam<bool>("fill_null", true);
     setParam<bool>("use_spearman", true);  // 默认使用SPEARMAN计算相关系数, 否则使用pearson相关系数
+
+    // 严格IC计算，即未来收益不知道时填充NA，相当于非严格情况下左移n
+    setParam<bool>("strict", false);
 }
 
-IIc::IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk, bool spearman)
+IIc::IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk, bool spearman,
+         bool strict)
 : IndicatorImp("IC", 1), m_query(query), m_ref_stk(ref_stk), m_stks(stks) {
     setParam<int>("n", n);
     setParam<bool>("fill_null", true);
     setParam<bool>("use_spearman", spearman);
+    setParam<bool>("strict", strict);
 }
 
 IIc::~IIc() {}
@@ -71,9 +76,8 @@ void IIc::_calculate(const Indicator& inputInd) {
     }
 
     int n = getParam<int>("n");
-    // 由于 ic 是当前收盘价和 n 日后收益的相关系数，需要避免未来函数，最终的 ic 需要右移 n 日
-    // spearman 本身需要数据长度大于等于2，所以 n + 1 >= days_totals 时，直接抛弃
-    HKU_IF_RETURN(n + 1 >= days_total, void());
+    bool strict_mode = getParam<bool>("strict");
+    HKU_IF_RETURN((n >= days_total), void());
 
     bool fill_null = getParam<bool>("fill_null");
 
@@ -81,7 +85,6 @@ void IIc::_calculate(const Indicator& inputInd) {
     vector<Indicator> all_inds(stk_count);     // 保存每支证券对齐后的因子值
     vector<Indicator> all_returns(stk_count);  // 保存每支证券对齐后的 n 日收益率
     Indicator ind = inputInd;
-    size_t discard = n;
     for (size_t i = 0; i < stk_count; i++) {
         auto k = m_stks[i].getKData(m_query);
         // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
@@ -90,8 +93,7 @@ void IIc::_calculate(const Indicator& inputInd) {
         all_returns[i] = ALIGN(ROCP(k.close(), n), ref_dates, fill_null);
     }
 
-    m_discard = discard;
-    HKU_IF_RETURN(m_discard >= days_total, void());
+    m_discard = n;
 
     Indicator (*spearman)(const Indicator&, const Indicator&, int, bool) = hku::SPEARMAN;
     if (!getParam<bool>("use_spearman")) {
@@ -113,6 +115,19 @@ void IIc::_calculate(const Indicator& inputInd) {
         dst[i] = ic[ic.size() - 1];
     }
 
+    if (getParam<bool>("strict")) {
+        // 严格模式，即当前时刻对应未来收益计算结果
+        for (size_t i = m_discard; i < days_total; i++) {
+            dst[i - n] = dst[i];
+        }
+        if (days_total > n) {
+            for (size_t i = days_total - n; i < days_total; i++) {
+                dst[i] = Null<price_t>();
+            }
+        }
+        m_discard = 0;
+    }
+
     for (size_t i = m_discard; i < days_total; i++) {
         if (!std::isnan(dst[i])) {
             m_discard = i;
@@ -122,14 +137,14 @@ void IIc::_calculate(const Indicator& inputInd) {
 }
 
 Indicator HKU_API IC(const StockList& stks, const KQuery& query, const Stock& ref_stk, int n,
-                     bool spearman) {
-    return Indicator(make_shared<IIc>(stks, query, n, ref_stk, spearman));
+                     bool spearman, bool strict) {
+    return Indicator(make_shared<IIc>(stks, query, n, ref_stk, spearman, strict));
 }
 
 Indicator HKU_API IC(const Block& blk, const KQuery& query, const Stock& ref_stk, int n,
-                     bool spearman) {
+                     bool spearman, bool strict) {
     StockList stks = blk.getStockList();
-    return IC(stks, query, ref_stk, n, spearman);
+    return IC(stks, query, ref_stk, n, spearman, strict);
 }
 
 }  // namespace hku
