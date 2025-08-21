@@ -407,20 +407,20 @@ Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
 
 IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     bool fill_null = getParam<bool>("fill_null");
-#if !MF_USE_MULTI_THREAD
-    vector<Indicator> all_returns;
-    all_returns.reserve(m_stks.size());
-    for (const auto& stk : m_stks) {
-        auto k = stk.getKData(m_query);
-        all_returns.emplace_back(ALIGN(ROCP(k.close(), ndays), m_ref_dates, fill_null));
+    if (!getParam<bool>("parallel")) {
+        vector<Indicator> all_returns;
+        all_returns.reserve(m_stks.size());
+        for (const auto& stk : m_stks) {
+            auto k = stk.getKData(m_query);
+            all_returns.emplace_back(ALIGN(ROCP(k.close(), ndays), m_ref_dates, fill_null));
+        }
+        return all_returns;
+    } else {
+        return parallel_for_index(0, m_stks.size(), [this, ndays, fill_null](size_t i) {
+            auto k = m_stks[i].getKData(m_query);
+            return ALIGN(ROCP(k.close(), ndays), m_ref_dates, fill_null);
+        });
     }
-    return all_returns;
-#else
-    return parallel_for_index(0, m_stks.size(), [this, ndays, fill_null](size_t i) {
-        auto k = m_stks[i].getKData(m_query);
-        return ALIGN(ROCP(k.close(), ndays), m_ref_dates, fill_null);
-    });
-#endif
 }
 
 vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
