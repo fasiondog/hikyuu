@@ -1288,6 +1288,15 @@
     :param KData kdata: K线数据
     :rtype: Indicator
 
+.. py:function:: UNSAFE_REF(n: int)
+
+    用于获取指标中第n个周期的值, n为正数时从当前周期向前数, 为负数时从当前周期向后数。
+
+    注意：此函数属于未来函数, 不应被用于回测, 主要用于AI等需要获取未来数据的场景。
+
+    :param Indicator ind: 指标
+    :param int n: 周期数
+
 
 .. py:function:: UPNDAY(data[, n=3])
 
