@@ -1854,51 +1854,57 @@ void export_Indicator_build_in(py::module& m) {
     m.def(
       "IC",
       [](const Indicator& ind, const py::object& stks, const KQuery& query, const Stock& ref_stk,
-         int n, bool spearman) {
+         int n, bool spearman, bool strict) {
           if (py::isinstance<Block>(stks)) {
               const auto& blk = stks.cast<Block&>();
-              return IC(ind, blk, query, ref_stk, n, spearman);
+              return IC(ind, blk, query, ref_stk, n, spearman, strict);
           }
 
           if (py::isinstance<py::sequence>(stks)) {
               StockList c_stks = python_list_to_vector<Stock>(stks);
-              return IC(ind, c_stks, query, ref_stk, n, spearman);
+              return IC(ind, c_stks, query, ref_stk, n, spearman, strict);
           }
 
           HKU_THROW("Input stks must be Block or sequenc(Stock)!");
       },
       py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("n") = 1,
-      py::arg("spearman") = true,
-      R"(IC(ind, stks, query, ref_stk[, n=1])
+      py::arg("spearman") = true, py::arg("strict") = false,
+      R"(IC(ind, stks, query, ref_stk[, n=1, spearman=True, strict=False]) -> Indicator
 
-    计算指定的因子相对于参考证券的 IC （实际为 RankIC）
+    计算指定的因子相对于参考证券的 IC (实际为 RankIC)
+
+    IC 原本需要 “t 时刻因子值→t+1 时刻收益”，此处改为计算 “t 时刻因子值→t 时刻之前 N 天的收益”（比如过去 5 天的收益）。
+    (否则当前值都会是缺失NA), 相当于原始预测 IC 右移 n 位。
+
+    如需严格“t 时刻因子值→t+1 时刻收益“计算，请设置 strict=True (注意此模式下, 后n位为 NA)
     
     :param Indicator ind: 输入因子
     :param sequence(stock)|Block stks 证券组合
     :param Query query: 查询条件
     :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
     :param int n: 时间窗口
-    :param bool spearman: 使用 spearman 相关系数，否则为 pearson)");
+    :param bool spearman: 使用 spearman 相关系数，否则为 pearson
+    :param bool strict: 严格模式)");
 
     m.def(
       "ICIR",
       [](const Indicator& ind, const py::object& stks, const KQuery& query, const Stock& ref_stk,
-         int n, int rolling_n, bool spearman) {
+         int n, int rolling_n, bool spearman, bool strict) {
           if (py::isinstance<Block>(stks)) {
               const auto& blk = stks.cast<Block&>();
-              return ICIR(ind, blk, query, ref_stk, n, rolling_n, spearman);
+              return ICIR(ind, blk, query, ref_stk, n, rolling_n, spearman, strict);
           }
 
           if (py::isinstance<py::sequence>(stks)) {
               StockList c_stks = python_list_to_vector<Stock>(stks);
-              return ICIR(ind, c_stks, query, ref_stk, n, rolling_n, spearman);
+              return ICIR(ind, c_stks, query, ref_stk, n, rolling_n, spearman, strict);
           }
 
           HKU_THROW("Input stks must be Block or sequenc(Stock)!");
       },
       py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("n") = 1,
-      py::arg("rolling_n") = 120, py::arg("spearman") = true,
-      R"(ICIR(ind, stks, query, ref_stk[, n=1, rolling_n=120])
+      py::arg("rolling_n") = 120, py::arg("spearman") = true, py::arg("strict") = false,
+      R"(ICIR(ind, stks, query, ref_stk[, n=1, rolling_n=120, spearman=True, strict=False])
 
     计算 IC 因子 IR = IC的多周期均值/IC的标准方差
 
@@ -1908,7 +1914,8 @@ void export_Indicator_build_in(py::module& m) {
     :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
     :param int n: 计算IC时对应的 n 日收益率
     :param int rolling_n: 滚动周期
-    :param bool spearman: 使用 spearman 相关系数，否则为 pearson)");
+    :param bool spearman: 使用 spearman 相关系数，否则为 pearson
+    :param bool strict: 是否严格IC模式)");
 
     m.def("ZSCORE", ZSCORE_1, py::arg("out_extreme") = false, py::arg("nsigma") = 3.0,
           py::arg("recursive") = false);
@@ -2230,4 +2237,13 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator data: 条件指标
     :rtype: Indicator)");
+
+    m.def("UNSAFE_REF", py::overload_cast<int>(UNSAFE_REF), py::arg("n"));
+    m.def("UNSAFE_REF", py::overload_cast<const Indicator&, int>(UNSAFE_REF), py::arg("ind"),
+          py::arg("n"), R"(UNSAFE_REF(ind, n)
+
+    用于获取指标中第n个周期的值, n为正数时从当前周期向前数, 为负数时从当前周期向后数。
+
+    :param Indicator ind: 指标
+    :param int n: 周期数)");
 }

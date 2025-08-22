@@ -161,9 +161,10 @@ std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const
                     .ok());
                 HKU_ASSERT(price_change_builder
                              .Append(kdata[0].closePrice != 0.0
-                                       ? ((kdata[1].closePrice - kdata[0].closePrice) /
-                                          kdata[0].closePrice) *
-                                           100.0
+                                       ? roundEx(((kdata[1].closePrice - kdata[0].closePrice) /
+                                                  kdata[0].closePrice) *
+                                                   100.0,
+                                                 2)
                                        : Null<price_t>())
                              .ok());
                 Indicator::value_t zongguben = ZONGGUBEN(kdata)[1];
@@ -195,13 +196,7 @@ std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const
                                   100.0
                               : Null<price_t>())
                     .ok());
-                HKU_ASSERT(
-                  price_change_builder
-                    .Append(kdata[0].openPrice != 0.0
-                              ? ((kdata[0].closePrice - kdata[0].openPrice) / kdata[0].openPrice) *
-                                  100.0
-                              : Null<price_t>())
-                    .ok());
+                HKU_ASSERT(price_change_builder.Append(Null<price_t>()).ok());
                 Indicator::value_t zongguben = ZONGGUBEN(kdata)[0];
                 HKU_ASSERT(total_market_cap_builder.Append(zongguben * kdata[0].closePrice).ok());
                 Indicator::value_t liutongpan = LIUTONGPAN(kdata)[0];

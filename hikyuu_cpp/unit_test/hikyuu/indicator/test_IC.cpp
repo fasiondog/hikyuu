@@ -73,8 +73,20 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), 2);
-    CHECK_EQ(result.discard(), result.size());
+    CHECK_EQ(result.discard(), 1);
+    for (size_t i = 0; i < result.size(); i++) {
+        HKU_INFO("{}: {}", i, result[i]);
+    }
     CHECK_UNARY(std::isnan(result[0]));
+    CHECK_EQ(result[1], doctest::Approx(-1.0));
+
+    // 严格模式
+    result = IC(MA(CLOSE()), {sm["sh600004"], sm["sh600005"]}, KQuery(-2), ref_stk, 1, true, true);
+    CHECK_EQ(result.name(), "IC");
+    CHECK_UNARY(!result.empty());
+    CHECK_EQ(result.size(), 2);
+    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result[0], doctest::Approx(-1.0));
     CHECK_UNARY(std::isnan(result[1]));
 
     /** @arg 正常执行 */
@@ -84,8 +96,19 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result.size(), ref_k.size());
     CHECK_EQ(result.discard(), 1);
     CHECK_UNARY(std::isnan(result[0]));
-    CHECK_EQ(result[2], doctest::Approx(0.8));
-    CHECK_EQ(result[99], doctest::Approx(-1));
+    CHECK_EQ(result[3], doctest::Approx(0.4));
+    CHECK_EQ(result[99], doctest::Approx(0.5));
+
+    // 严格模式
+    result = IC(MA(CLOSE()), stks, query, ref_stk, 1, true, true);
+    CHECK_EQ(result.name(), "IC");
+    CHECK_UNARY(!result.empty());
+    CHECK_EQ(result.size(), ref_k.size());
+    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result[0], doctest::Approx(0.8));
+    CHECK_EQ(result[2], doctest::Approx(0.4));
+    CHECK_EQ(result[98], doctest::Approx(0.5));
+    CHECK_EQ(result[99], Null<Indicator::value_t>());
 }
 
 //-----------------------------------------------------------------------------

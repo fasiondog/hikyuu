@@ -14,7 +14,8 @@ namespace hku {
 class IIc : public IndicatorImp {
 public:
     IIc();
-    IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk, bool spearman);
+    IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk, bool spearman,
+        bool strict);
     virtual ~IIc();
 
     virtual void _checkParam(const string& name) const override;

@@ -22,7 +22,11 @@ inline void check_indicator(const Indicator& result, const Indicator& expect) {
         CHECK_UNARY(std::isnan(result[i]));
     }
     for (size_t i = result.discard(), total = result.size(); i < total; ++i) {
-        CHECK_EQ(result[i], doctest::Approx(expect[i]).epsilon(0.00001));
+        if (std::isnan(expect[i])) {
+            CHECK_UNARY(std::isnan(result[i]));
+        } else {
+            CHECK_EQ(result[i], doctest::Approx(expect[i]).epsilon(0.00001));
+        }
     }
 }
 

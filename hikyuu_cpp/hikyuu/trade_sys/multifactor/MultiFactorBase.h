@@ -10,8 +10,6 @@
 #include "hikyuu/KData.h"
 #include "ScoreRecord.h"
 
-#define MF_USE_MULTI_THREAD 1
-
 namespace hku {
 
 /**
@@ -114,7 +112,7 @@ public:
     const vector<ScoreRecordList>& getAllScores();
 
     /**
-     * 获取合成因子的IC, 长度与参考日期同
+     * 获取合成因子的IC, 长度与参考日期同 (非严格IC模式)
      * @note ndays 对于使用 IC/ICIR 加权的新因子，最好保持好 ic_n 一致，
      *       但对于等权计算的新因子，不一定非要使用 ic_n 计算。
      *       所以，ndays 增加了一个特殊值 0, 表示直接使用 ic_n 参数计算 IC

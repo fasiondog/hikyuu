@@ -72,6 +72,20 @@ void export_Stock(py::module& m) {
 
       .def("is_buffer", &Stock::isBuffer, R"(指定类型的K线数据是否被缓存)")
 
+      .def(
+        "get_index_range",
+        [](const Stock& self, const KQuery& query) {
+            size_t start, end;
+            self.getIndexRange(query, start, end);
+            return py::make_tuple(start, end);
+        },
+        R"(get_index_range(self, query) -> (size_t, size_t)
+
+        根据KQuery指定的条件, 获取对应的K线位置范围: [start_pos, end_pos)
+        
+        :param query [in] 指定的查询条件
+        :return (start_pos, end_pos)")
+
       .def("get_kdata", &Stock::getKData, R"(get_kdata(self, query)
 
         获取K线数据
