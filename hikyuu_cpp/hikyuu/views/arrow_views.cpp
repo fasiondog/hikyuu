@@ -251,7 +251,7 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
                                                         const IndicatorList& inds,
                                                         const KQuery& query, const string& market,
                                                         bool parallel) {
-    // SPEND_TIME(getIndicatorsView);
+    SPEND_TIME(getIndicatorsView);
     auto& sm = StockManager::instance();
     auto dates = sm.getTradingCalendar(query, market);
 

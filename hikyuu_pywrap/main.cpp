@@ -10,6 +10,7 @@
 #include <pybind11/stl.h>
 #include <hikyuu/hikyuu.h>
 #include <hikyuu/global/sysinfo.h>
+#include <arrow/python/pyarrow.h>
 #include "pybind_utils.h"
 
 using namespace hku;
@@ -76,6 +77,8 @@ PYBIND11_MODULE(core, m) {
 #if HKU_ENABLE_SEND_FEEDBACK
     sendPythonVersionFeedBack(PY_MAJOR_VERSION, PY_MINOR_VERSION, PY_MICRO_VERSION);
 #endif
+
+    arrow::py::import_pyarrow();
 
     export_bind_stl(m);
     export_DataType(m);

@@ -453,20 +453,18 @@ set_context(self, stock, query)
            [](const Indicator& self) {
                auto view = getIndicatorView(self);
                HKU_ASSERT(view);
-               arrow::py::import_pyarrow();
                PyObject* raw_obj = arrow::py::wrap_table(view);
                HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-               return py::reinterpret_borrow<py::object>(raw_obj);
+               return py::reinterpret_steal<py::object>(raw_obj);
            })
 
       .def("value_to_pyarrow",
            [](const Indicator& self) {
                auto view = getIndicatorValueView(self);
                HKU_ASSERT(view);
-               arrow::py::import_pyarrow();
                PyObject* raw_obj = arrow::py::wrap_table(view);
                HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-               return py::reinterpret_borrow<py::object>(raw_obj);
+               return py::reinterpret_steal<py::object>(raw_obj);
            })
 
       .def(py::self + py::self)
