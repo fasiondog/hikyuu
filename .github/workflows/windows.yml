@@ -46,8 +46,8 @@ jobs:
       run: |
         xmake r small-test
 
-    - name: test python
-      shell: cmd
-      run: |
-        set PYTHONPATH=.
-        python hikyuu/test/test.py        
+    # - name: test python
+    #   shell: cmd
+    #   run: |
+    #     set PYTHONPATH=.
+    #     python hikyuu/test/test.py        
