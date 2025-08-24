@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include <arrow/api.h>
 #include "hikyuu/Stock.h"
+#include "hikyuu/indicator/Indicator.h"
 
 namespace hku {
 
@@ -52,5 +54,19 @@ size_t getStockExtraCount(const Stock& stk, const string& ktype);
 
 bool getStockExtraIndexRange(const Stock& stk, const KQuery& query, size_t& out_start,
                              size_t& out_end);
+
+//-------------------------------
+// Views 扩展
+//-------------------------------
+
+std::shared_ptr<arrow::Table> getIndicatorsViewParallel(const StockList& stks,
+                                                        const IndicatorList& inds,
+                                                        const KQuery& query, const string& market);
+
+std::shared_ptr<arrow::Table> getIndicatorsViewParallel(const StockList& stks,
+                                                        const IndicatorList& inds,
+                                                        const Datetime& date, size_t cal_len,
+                                                        const KQuery::KType& ktype,
+                                                        const string& market);
 
 }  // namespace hku
