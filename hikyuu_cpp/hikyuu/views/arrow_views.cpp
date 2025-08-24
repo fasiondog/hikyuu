@@ -252,7 +252,6 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
                                                         const IndicatorList& inds,
                                                         const KQuery& query, const string& market,
                                                         bool parallel) {
-    SPEND_TIME(getIndicatorsView);
     if (parallel) {
         return getIndicatorsViewParallel(stks, inds, query, market);
     }
@@ -344,7 +343,6 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
                                                         const Datetime& date, size_t cal_len,
                                                         const KQuery::KType& ktype,
                                                         const string& market, bool parallel) {
-    SPEND_TIME(getIndicatorsView);
     if (parallel) {
         return getIndicatorsViewParallel(stks, inds, date, cal_len, ktype, market);
     }
