@@ -87,9 +87,9 @@ namespace hku {
  * @{
  */
 
-// MSVC 的 __cpluscplus 之在 VS2017 之后才有正确的版本号，且只支持 C++17 及以上, 详见：
+// MSVC 的 __cpluscplus 在 VS2017 之后才有正确的版本号，且只支持 C++17 及以上, 详见：
 // https://docs.microsoft.com/zh-cn/cpp/build/reference/zc-cplusplus?view=vs-2019
-#if defined(_MSC_VER) || __cplusplus < 201103L
+#if CPP_STANDARD < CPP_STANDARD_11
 #if !defined(int64_t)
 typedef long long int64_t;
 #endif

@@ -162,9 +162,7 @@ TEST_CASE("test_UNSAFE_REF_export") {
     CHECK_EQ(x1.size(), x2.size());
     CHECK_EQ(x1.discard(), x2.discard());
     CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
-    for (size_t i = x1.discard(); i < x1.size(); ++i) {
-        CHECK_EQ(x1[i], doctest::Approx(x2[i]));
-    }
+    check_indicator(x1, x2);
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 

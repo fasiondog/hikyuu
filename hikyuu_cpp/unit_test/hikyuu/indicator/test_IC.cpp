@@ -74,9 +74,6 @@ TEST_CASE("test_IC") {
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.discard(), 1);
-    for (size_t i = 0; i < result.size(); i++) {
-        HKU_INFO("{}: {}", i, result[i]);
-    }
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_EQ(result[1], doctest::Approx(-1.0));
 

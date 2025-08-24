@@ -407,7 +407,7 @@ bool Stock::isBuffer(KQuery::KType ktype) const {
     return m_data->pKData.find(nktype) != m_data->pKData.end() && m_data->pKData[nktype];
 }
 
-void Stock::setPreload(vector<KQuery::KType>& preload_ktypes) {
+void Stock::setPreload(const vector<KQuery::KType>& preload_ktypes) {
     if (m_data) {
         m_data->m_ktype_preload.clear();
         for (const auto& ktype : preload_ktypes) {

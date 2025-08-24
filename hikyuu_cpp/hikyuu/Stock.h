@@ -267,7 +267,7 @@ private:
     KRecordList _getKRecordList(const KQuery& query) const;
 
     // 仅供 StockManager 初始化时调用
-    void setPreload(vector<KQuery::KType>& preload_ktypes);
+    void setPreload(const vector<KQuery::KType>& preload_ktypes);
 
     bool isPreload(KQuery::KType ktype) const;
 
