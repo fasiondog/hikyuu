@@ -69,4 +69,7 @@ std::shared_ptr<arrow::Table> getIndicatorsViewParallel(const StockList& stks,
                                                         const KQuery::KType& ktype,
                                                         const string& market);
 
+std::shared_ptr<arrow::Table> getMarketViewParallel(const StockList& stks, const Datetime& date,
+                                                    const string& market);
+
 }  // namespace hku

@@ -85,6 +85,11 @@ static std::shared_ptr<arrow::Table> crtEmtpyMarketView() {
 
 std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const Datetime& date,
                                                     const string& market) {
+    SPEND_TIME(getMarketView);
+    if (isValidLicense()) {
+        return getMarketViewParallel(stks, date, market);
+    }
+
     std::shared_ptr<arrow::Table> ret = crtEmtpyMarketView();
     auto& sm = StockManager::instance();
 

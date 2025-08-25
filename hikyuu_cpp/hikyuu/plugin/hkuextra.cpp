@@ -101,4 +101,12 @@ std::shared_ptr<arrow::Table> getIndicatorsViewParallel(const StockList& stks,
     return plugin->getIndicatorsViewParallel(stks, inds, date, cal_len, ktype, market);
 }
 
+std::shared_ptr<arrow::Table> getMarketViewParallel(const StockList& stks, const Datetime& date,
+                                                    const string& market) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
+    HKU_ERROR_IF_RETURN(!plugin, nullptr, "Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA);
+    return plugin->getMarketViewParallel(stks, date, market);
+}
+
 }  // namespace hku
