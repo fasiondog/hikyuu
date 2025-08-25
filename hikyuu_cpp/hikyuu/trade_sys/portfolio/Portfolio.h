@@ -115,6 +115,10 @@ private:
                                      const string& mode);
 
 protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
     // 跟踪打印当前TM持仓情况
     void traceMomentTMAfterRunAtOpen(const Datetime& date);
     void traceMomentTMAfterRunAtClose(const Datetime& date);

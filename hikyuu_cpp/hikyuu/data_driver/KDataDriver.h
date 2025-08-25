@@ -119,6 +119,11 @@ public:
      */
     virtual TransList getTransList(const string& market, const string& code, const KQuery& query);
 
+protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
 private:
     bool checkType();
 

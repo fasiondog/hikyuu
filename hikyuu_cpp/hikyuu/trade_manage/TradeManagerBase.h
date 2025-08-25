@@ -766,6 +766,11 @@ public:
       const Datetime& datetime = Datetime::now());
 
 protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
+protected:
     string m_name;            // 账户名称
     TradeCostPtr m_costfunc;  // 成本算法
 

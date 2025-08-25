@@ -143,6 +143,11 @@ public:
     virtual MultiFactorPtr _clone() = 0;
     virtual IndicatorList _calculate(const vector<IndicatorList>&) = 0;
 
+protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
 private:
     /** 执行计算 */
     void calculate();
