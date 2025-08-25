@@ -53,7 +53,7 @@ void export_arrow_views(py::module& m) {
     m.def(
       "get_inds_view",
       [](const py::sequence& stks, const IndicatorList& inds, const KQuery& query,
-         const string& market, bool parallel) {
+         const string& market) {
           StockList stock_list;
           if (py::isinstance<StockManager>(stks)) {
               stock_list = StockManager::instance().getStockList();
@@ -62,20 +62,19 @@ void export_arrow_views(py::module& m) {
           } else {
               stock_list = python_list_to_vector<Stock>(stks);
           }
-          auto view = getIndicatorsView(stock_list, inds, query, market, parallel);
+          auto view = getIndicatorsView(stock_list, inds, query, market);
           HKU_ASSERT(view);
           PyObject* raw_obj = arrow::py::wrap_table(view);
           HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
           auto t = py::reinterpret_steal<py::object>(raw_obj);
           return t.attr("to_pandas")();
       },
-      py::arg("stks"), py::arg("inds"), py::arg("query"), py::arg("market") = "SH",
-      py::arg("parallel") = false);
+      py::arg("stks"), py::arg("inds"), py::arg("query"), py::arg("market") = "SH");
 
     m.def(
       "get_inds_view",
       [](const py::sequence& stks, const IndicatorList& inds, const Datetime& date, size_t cal_len,
-         const KQuery::KType& ktype, const string& market, bool parallel) {
+         const KQuery::KType& ktype, const string& market) {
           StockList stks_list;
           if (py::isinstance<StockManager>(stks)) {
               stks_list = StockManager::instance().getStockList();
@@ -84,7 +83,7 @@ void export_arrow_views(py::module& m) {
           } else {
               stks_list = python_list_to_vector<Stock>(stks);
           }
-          auto view = getIndicatorsView(stks_list, inds, date, cal_len, ktype, market, parallel);
+          auto view = getIndicatorsView(stks_list, inds, date, cal_len, ktype, market);
           HKU_ASSERT(view);
           PyObject* raw_obj = arrow::py::wrap_table(view);
           HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
@@ -92,8 +91,8 @@ void export_arrow_views(py::module& m) {
           return t.attr("to_pandas")();
       },
       py::arg("stks"), py::arg("inds"), py::arg("date"), py::arg("cal_len") = 100,
-      py::arg("ktype") = KQuery::DAY, py::arg("market") = "SH", py::arg("parallel") = false,
-      R"(get_inds_view(stks, inds, date[, cal_len=100, ktype=Query.DAY, market='SH', parallel=False]) -> pandas.DataFrame)
+      py::arg("ktype") = KQuery::DAY, py::arg("market") = "SH",
+      R"(get_inds_view(stks, inds, date[, cal_len=100, ktype=Query.DAY, market='SH']) -> pandas.DataFrame)
     
     方式1: 获取指定日期的各证券的各指标结果
 
@@ -103,16 +102,14 @@ void export_arrow_views(py::module& m) {
       :param int cal_len: 计算需要的数据长度
       :param str ktype: k线类型
       :param str market: 指定行情市场（用于日期对齐）
-      :param bool parallel: 是否并行计算（需授权用户）
 
     方式2: 获取按指定Query查询计算的各证券的各指标结果, 结果中将包含指定 Query 包含的所有指定市场交易日日期
-    get_inds_view(stks, inds, query, market='SH', parallel=False])
+    get_inds_view(stks, inds, query, market='SH'])
 
       :param stks: 指定证券列表
       :param list[Indicator] inds: 指定指标列表
       :param Query query: 查询条件
-      :param str market: 指定行情市场（用于日期对齐）
-      :param bool parallel: 是否并行计算（需授权用户）)");
+      :param str market: 指定行情市场（用于日期对齐）)");
 
     m.def(
       "krecords_to_pa",

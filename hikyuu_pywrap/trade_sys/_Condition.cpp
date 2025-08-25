@@ -16,6 +16,7 @@ class PyConditionBase : public ConditionBase {
 
 public:
     using ConditionBase::ConditionBase;
+
     PyConditionBase(const ConditionBase& base) : ConditionBase(base) {}
 
     void _calculate() override {
