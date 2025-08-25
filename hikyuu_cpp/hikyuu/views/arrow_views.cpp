@@ -255,9 +255,8 @@ std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const
 
 std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
                                                         const IndicatorList& inds,
-                                                        const KQuery& query, const string& market,
-                                                        bool parallel) {
-    if (parallel) {
+                                                        const KQuery& query, const string& market) {
+    if (isValidLicense()) {
         return getIndicatorsViewParallel(stks, inds, query, market);
     }
 
@@ -347,8 +346,8 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
                                                         const IndicatorList& inds,
                                                         const Datetime& date, size_t cal_len,
                                                         const KQuery::KType& ktype,
-                                                        const string& market, bool parallel) {
-    if (parallel) {
+                                                        const string& market) {
+    if (isValidLicense()) {
         return getIndicatorsViewParallel(stks, inds, date, cal_len, ktype, market);
     }
 
