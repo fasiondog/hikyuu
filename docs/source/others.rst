@@ -86,7 +86,7 @@
         199	2024-03-07 00:00:00	10.101364	9.738182
 
 
-.. py:function:: get_inds_view(inds, dates, query, market='SH', parallel=False)
+.. py:function:: get_inds_view(inds, dates, query, market='SH')
 
     方式1: 获取指定日期的各证券的各指标结果
 
@@ -96,7 +96,6 @@
       :param int cal_len: 计算需要的数据长度
       :param str ktype: k线类型
       :param str market: 指定行情市场（用于日期对齐）
-      :param bool parallel: 是否并行计算（需授权用户）
 
     ::
 
@@ -125,7 +124,6 @@
       :param list[Indicator] inds: 指定指标列表
       :param Query query: 查询条件
       :param str market: 指定行情市场（用于日期对齐）
-      :param bool parallel: 是否并行计算（需授权用户）
 
     ::
 
