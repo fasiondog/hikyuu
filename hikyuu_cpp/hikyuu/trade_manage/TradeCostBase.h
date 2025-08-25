@@ -106,6 +106,11 @@ public:
     /** 继承子类必须实现私有变量的克隆接口 */
     virtual TradeCostPtr _clone() = 0;
 
+protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
 private:
     string m_name;
 

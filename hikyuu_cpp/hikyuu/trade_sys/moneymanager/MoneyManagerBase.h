@@ -153,6 +153,11 @@ public:
     virtual MoneyManagerPtr _clone() = 0;
 
 protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
+protected:
     string m_name;
     KQuery m_query;
     TradeManagerPtr m_tm;

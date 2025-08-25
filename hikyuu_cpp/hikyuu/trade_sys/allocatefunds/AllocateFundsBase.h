@@ -101,6 +101,11 @@ public:
     static void adjustWeight(SystemWeightList& sw_list, double can_allocate_weight,
                              bool auto_adjust, bool ignore_zero);
 
+protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
 private:
     void initParam();
 

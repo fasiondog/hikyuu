@@ -86,16 +86,23 @@ std::string to_py_str(const T& item) {
 // 直接使用 pybind11 重载 _clone，在 C++ 中会丢失 python 中的类型
 // 参考：https://github.com/pybind/pybind11/issues/1049 进行修改
 // PYBIND11_OVERLOAD(IndicatorImpPtr, IndicatorImp, _clone, );
-#define PY_CLONE(pyclassname, classname)                                     \
-public:                                                                      \
-    std::shared_ptr<classname> _clone() override {                           \
-        auto self = py::cast(this);                                          \
-        auto cloned = self.attr("_clone")();                                 \
-                                                                             \
-        auto keep_python_state_alive = std::make_shared<py::object>(cloned); \
-        auto ptr = cloned.cast<pyclassname*>();                              \
-                                                                             \
-        return std::shared_ptr<classname>(keep_python_state_alive, ptr);     \
+#define PY_CLONE(pyclassname, classname)                                         \
+public:                                                                          \
+    std::shared_ptr<classname> _clone() override {                               \
+        if (isPythonObject()) {                                                  \
+            py::gil_scoped_acquire acquire;                                      \
+            auto self = py::cast(this);                                          \
+            auto cloned = self.attr("_clone")();                                 \
+            auto keep_python_state_alive = std::make_shared<py::object>(cloned); \
+            auto ptr = cloned.cast<pyclassname*>();                              \
+            return std::shared_ptr<classname>(keep_python_state_alive, ptr);     \
+        }                                                                        \
+        return this->_clone();                                                   \
+    }                                                                            \
+                                                                                 \
+protected:                                                                       \
+    inline bool isPythonObject() const override {                                \
+        return true;                                                             \
     }
 
 // 用于检查已 py::object 方式传递的函数参数个数是否符合预期

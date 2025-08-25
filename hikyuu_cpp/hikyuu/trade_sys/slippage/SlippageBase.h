@@ -72,6 +72,11 @@ public:
     virtual void _calculate() = 0;
 
 protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
+protected:
     string m_name;
     KData m_kdata;
 

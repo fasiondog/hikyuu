@@ -94,6 +94,11 @@ public:
     virtual EnvironmentPtr _clone() = 0;
 
 protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
+protected:
     string m_name;
     KQuery m_query;
     map<Datetime, size_t> m_date_index;

@@ -265,6 +265,11 @@ public:
     // 处理延迟买入请求，仅供 PF 调用
     virtual TradeRecord pfProcessDelayBuyRequest(const Datetime& date);
 
+protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
 private:
     bool _environmentIsValid(const Datetime& datetime);
     bool _conditionIsValid(const Datetime& datetime);

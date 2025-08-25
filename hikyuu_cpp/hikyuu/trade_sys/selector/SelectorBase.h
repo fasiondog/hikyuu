@@ -134,6 +134,11 @@ public:
 
     virtual string str() const;
 
+protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
 private:
     void initParam();
 
