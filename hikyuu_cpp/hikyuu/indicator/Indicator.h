@@ -110,6 +110,9 @@ public:
      */
     value_t get(size_t pos, size_t num = 0) const;
 
+    value_t front(size_t num = 0) const;
+    value_t back(size_t num = 0) const;
+
     /**
      * 获取指定位置的日期
      * @param pos 结果集中的位置
@@ -320,6 +323,14 @@ inline Indicator::value_t Indicator::operator[](size_t pos) const {
 
 inline Indicator::value_t Indicator::get(size_t pos, size_t num) const {
     return m_imp->get(pos, num);
+}
+
+inline Indicator::value_t Indicator::front(size_t num) const {
+    return m_imp->front(num);
+}
+
+inline Indicator::value_t Indicator::back(size_t num) const {
+    return m_imp->back(num);
 }
 
 inline Datetime Indicator::getDatetime(size_t pos) const {

@@ -450,6 +450,26 @@ IndicatorImp::value_t IndicatorImp::get(size_t pos, size_t num) const {
     return (*m_pBuffer[num])[pos];
 }
 
+IndicatorImp::value_t IndicatorImp::front(size_t num) const {
+#if CHECK_ACCESS_BOUND
+    // cppcheck-suppress [arrayIndexOutOfBoundsCond]
+    HKU_CHECK_THROW((num <= MAX_RESULT_NUM && m_pBuffer[num] && !m_pBuffer[num]->empty()),
+                    std::out_of_range, "Try to access value out of bounds! num: {}, name: {}", num,
+                    name());
+#endif
+    return m_pBuffer[num]->front();
+}
+
+IndicatorImp::value_t IndicatorImp::back(size_t num) const {
+#if CHECK_ACCESS_BOUND
+    // cppcheck-suppress [arrayIndexOutOfBoundsCond]
+    HKU_CHECK_THROW((num <= MAX_RESULT_NUM && m_pBuffer[num] && !m_pBuffer[num]->empty()),
+                    std::out_of_range, "Try to access value out of bounds! num: {}, name: {}", num,
+                    name());
+#endif
+    return m_pBuffer[num]->back();
+}
+
 void IndicatorImp::_set(value_t val, size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
     // cppcheck-suppress [arrayIndexOutOfBoundsCond]

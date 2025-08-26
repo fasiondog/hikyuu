@@ -31,6 +31,14 @@ public:
         return m_buffer[pos];
     }
 
+    const KRecord& front() const {
+        return m_buffer.front();
+    }
+
+    const KRecord& back() const {
+        return m_buffer.back();
+    }
+
     bool empty() const {
         return m_buffer.empty();
     }

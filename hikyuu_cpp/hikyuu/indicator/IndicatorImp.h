@@ -78,6 +78,9 @@ public:
 
     value_t get(size_t pos, size_t num = 0) const;
 
+    value_t front(size_t num = 0) const;
+    value_t back(size_t num = 0) const;
+
     value_t getByDate(Datetime, size_t num = 0);
 
     Datetime getDatetime(size_t pos) const;

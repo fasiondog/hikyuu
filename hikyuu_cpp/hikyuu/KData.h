@@ -57,6 +57,9 @@ public:
         return getKRecord(datetime);
     }
 
+    const KRecord& front() const;
+    const KRecord& back() const;
+
     /**
      * 通过当前 KData 获取一个保持数据类型、复权类型不变的新的 KData
      * @note 新的 KData 并不一定是原 KData 的子集
@@ -224,6 +227,14 @@ inline const KQuery& KData::getQuery() const {
 
 inline const Stock& KData::getStock() const {
     return m_imp->getStock();
+}
+
+inline const KRecord& KData::front() const {
+    return m_imp->front();
+}
+
+inline const KRecord& KData::back() const {
+    return m_imp->back();
 }
 
 inline size_t KData::startPos() const {
