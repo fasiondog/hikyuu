@@ -17,14 +17,28 @@ KRecord KData::ms_null_krecord;
 
 HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata) {
     os << "KData{\n  size : " << kdata.size() << "\n  stock: " << kdata.getStock()
-       << "\n  query: " << kdata.getQuery() << "\n}";
+       << "\n  query: " << kdata.getQuery();
+    if (kdata.size() == 1) {
+        os << "\n  " << kdata.getKRecord(0);
+    } else if (kdata.size() > 1) {
+        os << "\n  first: " << kdata.getKRecord(0);
+        os << "\n  last: " << kdata.getKRecord(kdata.size() - 1);
+    }
+    os << "\n}";
     return os;
 }
 
 string KData::toString() const {
     std::stringstream os;
     os << "KData{\n  size : " << size() << "\n  stock: " << getStock().toString()
-       << ",\n  query: " << getQuery() << "\n}";
+       << ",\n  query: " << getQuery();
+    if (size() == 1) {
+        os << "\n  " << getKRecord(0);
+    } else if (size() > 1) {
+        os << "\n  first: " << getKRecord(0);
+        os << "\n  last: " << getKRecord(size() - 1);
+    }
+    os << "\n}";
     return os.str();
 }
 
