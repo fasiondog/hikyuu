@@ -378,7 +378,9 @@ Indicator MultiFactorBase::getIC(int ndays) {
         auto a = PRICELIST(tmp);
         auto b = PRICELIST(tmp_return);
         auto ic = spearman(a, b, ind_count, true);
-        dst[i] = ic[ic.size() - 1];
+        if (ic.size() > 0) {
+            dst[i] = ic[ic.size() - 1];
+        }
     }
 
     for (size_t i = discard; i < days_total; i++) {
