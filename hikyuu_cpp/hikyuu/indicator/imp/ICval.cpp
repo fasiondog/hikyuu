@@ -65,9 +65,14 @@ void ICval::_calculate(const Indicator& data) {
 
     m_discard = discard > total ? total : discard;
 
-    auto* dst = this->data();
-    for (size_t i = m_discard; i < total; ++i) {
-        dst[i] = value;
+    size_t ret_num = data.getResultNumber();
+    _readyBuffer(total, ret_num);
+
+    for (size_t r = 0; r < ret_num; ++r) {
+        auto* dst = this->data(r);
+        for (size_t i = m_discard; i < total; ++i) {
+            dst[i] = value;
+        }
     }
 }
 
