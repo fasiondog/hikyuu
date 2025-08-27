@@ -14,6 +14,7 @@
 namespace hku {
 
 KRecord KData::ms_null_krecord;
+shared_ptr<KDataImp> KData::ms_null_kdata_imp{make_shared<KDataImp>()};
 
 HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata) {
     os << "KData{\n  size : " << kdata.size() << "\n  stock: " << kdata.getStock()
@@ -42,7 +43,7 @@ string KData::toString() const {
     return os.str();
 }
 
-KData::KData() : m_imp(make_shared<KDataImp>()) {}
+KData::KData() : m_imp(ms_null_kdata_imp) {}
 
 KData::KData(const Stock& stock, const KQuery& query)
 : m_imp(make_shared<KDataImp>(stock, query)) {}

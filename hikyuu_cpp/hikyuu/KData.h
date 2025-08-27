@@ -94,6 +94,8 @@ public:
 
     string toString() const;
 
+    KDataImpPtr getImp() const;
+
     /** 开盘价 */
     Indicator open() const;
 
@@ -124,6 +126,7 @@ public:
 
 private:
     static KRecord ms_null_krecord;
+    static shared_ptr<KDataImp> ms_null_kdata_imp;
 
 private:
     KDataImpPtr m_imp;
@@ -277,7 +280,21 @@ inline KRecord* KData::data() {
     return m_imp->data();
 }
 
+inline KDataImpPtr KData::getImp() const {
+    return m_imp;
+}
+
 } /* namespace hku */
+
+namespace std {
+template <>
+class hash<hku::KData> {
+public:
+    std::size_t operator()(hku::KData const& k) const noexcept {
+        return std::hash<hku::KDataImpPtr>()(k.getImp());
+    }
+};
+}  // namespace std
 
 #if FMT_VERSION >= 90000
 template <>

@@ -21,6 +21,31 @@ using namespace hku;
  */
 
 /** @par 检测点 */
+TEST_CASE("test_KData_hash") {
+    KData k1;
+    KData k2;
+    std::hash<KData> hash_fn;
+    CHECK_EQ(hash_fn(k1), hash_fn(k2));
+    CHECK_EQ(hash_fn(k1), hash_fn(Null<KData>()));
+    CHECK_EQ(hash_fn(Null<KData>()), hash_fn(Null<KData>()));
+
+    KData k3(k1);
+    CHECK_EQ(hash_fn(k1), hash_fn(k3));
+
+    k1 = getKData("sh000001", KQueryByIndex(0, 10, KQuery::DAY));
+    CHECK_NE(hash_fn(k1), hash_fn(k2));
+
+    k2 = k1;
+    CHECK_EQ(hash_fn(k1), hash_fn(k2));
+
+    k2 = getKData("sh000001", KQueryByIndex(0, 10, KQuery::DAY));
+    CHECK_NE(hash_fn(k1), hash_fn(k2));
+
+    k3 = getKData("sh000001", KQueryByIndex(-10));
+    CHECK_NE(hash_fn(k1), hash_fn(k3));
+}
+
+/** @par 检测点 */
 TEST_CASE("test_KData_equal") {
     /** @arg kdata为空 */
     KData null_k = Null<KData>();
