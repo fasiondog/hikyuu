@@ -6,7 +6,6 @@
  */
 
 #include "../crt/ATR.h"
-#include "../crt/SLICE.h"
 #include "IAtr.h"
 
 #if HKU_SUPPORT_SERIALIZATION

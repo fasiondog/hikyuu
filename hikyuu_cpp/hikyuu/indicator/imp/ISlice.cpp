@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::ISlice)
 namespace hku {
 
 ISlice::ISlice() : IndicatorImp("SLICE", 1) {
-    setParam<int>("result_index", 0);
+    setParam<int>("result_index", -1);
     setParam<PriceList>("data", PriceList());
     setParam<int64_t>("start", 0);
     setParam<int64_t>("end", Null<int64_t>());
@@ -30,9 +30,9 @@ ISlice::ISlice(const PriceList& data, int64_t start, int64_t end) : IndicatorImp
 ISlice::~ISlice() {}
 
 void ISlice::_checkParam(const string& name) const {
-    if ("result_index" == name) {
-        HKU_ASSERT(getParam<int>("result_index") >= 0);
-    }
+    // if ("result_index" == name) {
+    //     HKU_ASSERT(getParam<int>("result_index") >= 0);
+    // }
 }
 
 void ISlice::_calculate(const Indicator& data) {
@@ -66,7 +66,7 @@ void ISlice::_calculate(const Indicator& data) {
 
     // 不在叶子节点上，则忽略本身的data参数，认为其输入实际为函数入参中的data
     int result_index = getParam<int>("result_index");
-    HKU_ERROR_IF_RETURN(result_index < 0 || result_index >= data.getResultNumber(), void(),
+    HKU_ERROR_IF_RETURN(result_index >= 0 && result_index >= data.getResultNumber(), void(),
                         "result_index out of range!");
 
     size_t total = data.size();
@@ -84,12 +84,22 @@ void ISlice::_calculate(const Indicator& data) {
     }
     HKU_IF_RETURN(endix < 0 || size_t(endix) > total || startix == endix, void());
 
-    _readyBuffer(endix - startix, 1);
-
-    auto const* src = data.data(result_index);
-    auto* dst = this->data();
-    for (int64_t i = startix; i < endix; ++i) {
-        dst[i - startix] = src[i];
+    if (result_index < 0) {
+        size_t ret_num = data.getResultNumber();
+        if (ret_num == 0) {
+            ret_num = 1;
+        }
+        _readyBuffer(endix - startix, ret_num);
+        for (size_t r = 0; r < ret_num; ++r) {
+            auto const* src = data.data(r) + startix;
+            auto* dst = this->data(r);
+            std::memcpy(dst, src, (endix - startix) * sizeof(value_t));
+        }
+    } else {
+        _readyBuffer(endix - startix, 1);
+        auto const* src = data.data(result_index) + startix;
+        auto* dst = this->data();
+        std::memcpy(dst, src, (endix - startix) * sizeof(value_t));
     }
 
     // 更新抛弃数量
