@@ -66,6 +66,9 @@ void ICval::_calculate(const Indicator& data) {
     m_discard = discard > total ? total : discard;
 
     size_t ret_num = data.getResultNumber();
+    if (ret_num == 0) {
+        ret_num = 1;
+    }
     _readyBuffer(total, ret_num);
 
     for (size_t r = 0; r < ret_num; ++r) {
