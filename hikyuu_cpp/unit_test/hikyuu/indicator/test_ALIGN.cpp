@@ -324,6 +324,17 @@ TEST_CASE("test_ALIGN_not_fill_null") {
         CHECK_EQ(result.getDatetime(i), ref[i]);
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
+
+    /** @arg 分钟线对齐日线 */
+    auto mink = stk.getKData(KQuery(-2400));
+    auto dates = k.getDatetimeList();
+    DatetimeList ref_ds;
+    for (const auto& dt : dates) {
+        ref_ds.push_back(dt.endOfDay());
+    }
+    result = ALIGN(CLOSE(mink), ref_ds, false);
+    CHECK_EQ(result.size(), ref_ds.size());
+    check_indicator(result, k.close());
 }
 
 //-----------------------------------------------------------------------------

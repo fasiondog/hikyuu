@@ -162,12 +162,23 @@ void IAlign::_calculate(const Indicator& ind) {
                         break;
                     }
                 }
+                if (dates[pos] >= ind_dates[ind_total - 1]) {
+                    break;
+                }
             }
-            if (pos < total - 1) {
-                for (size_t r = 0; r < m_result_num; r++) {
-                    auto* dst = this->data(r);
-                    for (size_t i = pos; i < total; i++) {
-                        dst[i] = dst[i - 1];
+            if (pos < total) {
+                if (dates[pos] >= ind_dates[ind_total - 1]) {
+                    for (size_t r = 0; r < m_result_num; r++) {
+                        for (size_t i = pos; i < total; i++) {
+                            _set(ind.get(ind_total - 1, r), i, r);
+                        }
+                    }
+                } else {
+                    for (size_t r = 0; r < m_result_num; r++) {
+                        auto* dst = this->data(r);
+                        for (size_t i = pos; i < total; i++) {
+                            dst[i] = dst[i - 1];
+                        }
                     }
                 }
             }

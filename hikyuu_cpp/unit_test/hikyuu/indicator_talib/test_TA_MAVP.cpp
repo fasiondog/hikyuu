@@ -1593,7 +1593,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     REQUIRE(CONTEXT_K(b) == k2);
     k3 = stk3.getKData(KQuery(-30));
     result = TA_MAVP(a, b)(k3);
-    check_output(result, ALIGN(MA(k1.close(), 2), k3), EMA(k2.close(), 2));
+    check_output(result, ALIGN(MA(k1.close(), 2), k3, false), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
@@ -1609,7 +1609,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     k3 = stk3.getKData(KQuery(-30));
     result = TA_MAVP(a, b)(k3);
     k2 = stk2.getKData(KQuery(-30));
-    check_output(result, ALIGN(MA(k1.close(), 2), k3), EMA(k2.close(), 2));
+    check_output(result, ALIGN(MA(k1.close(), 2), k3, false), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
