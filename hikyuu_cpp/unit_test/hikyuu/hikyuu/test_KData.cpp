@@ -43,6 +43,12 @@ TEST_CASE("test_KData_hash") {
 
     k3 = getKData("sh000001", KQueryByIndex(-10));
     CHECK_NE(hash_fn(k1), hash_fn(k3));
+
+    k1 = k3;
+    k2 = std::move(k3);
+    CHECK_EQ(k1, k2);
+    CHECK_NE(hash_fn(k1), hash_fn(k3));
+    CHECK_EQ(hash_fn(k3), hash_fn(Null<KData>()));
 }
 
 /** @par 检测点 */
