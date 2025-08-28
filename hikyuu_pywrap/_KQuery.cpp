@@ -30,12 +30,12 @@ void export_KQuery(py::module& m) {
       .def_property_readonly("recover_type", py::overload_cast<>(&KQuery::recoverType, py::const_),
                              "复权类别")
       .def("is_right_opening", &KQuery::isRightOpening, "判断是否为右开区间，即未指定结束时间")
-      .def("is_valid_ktype", &KQuery::isValidKType, "判断KType是否有效")
-      .def("is_base_ktype", &KQuery::isBaseKType, "判断是否为基础KType")
-      .def("is_extra_ktype", &KQuery::isExtraKType, "判断是否为扩展KType")
-      .def("get_base_ktype_list", &KQuery::getBaseKTypeList, "获取所有基础KType")
-      .def("get_extra_ktype_list", &KQuery::getExtraKTypeList, "获取所有扩展KType")
-      .def("get_ktype_in_min", &KQuery::getKTypeInMin, "获取ktype对应的分钟数")
+      .def_static("is_valid_ktype", &KQuery::isValidKType, "判断KType是否有效")
+      .def_static("is_base_ktype", &KQuery::isBaseKType, "判断是否为基础KType")
+      .def_static("is_extra_ktype", &KQuery::isExtraKType, "判断是否为扩展KType")
+      .def_static("get_base_ktype_list", &KQuery::getBaseKTypeList, "获取所有基础KType")
+      .def_static("get_extra_ktype_list", &KQuery::getExtraKTypeList, "获取所有扩展KType")
+      .def_static("get_ktype_in_min", &KQuery::getKTypeInMin, "获取ktype对应的分钟数")
 
         DEF_PICKLE(KQuery);
 
