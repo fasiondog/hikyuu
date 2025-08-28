@@ -92,10 +92,57 @@
         - FORWARD         - 前向复权
         - BACKWARD        - 后向复权
         - EQUAL_FORWARD   - 等比前向复权
-        - EQUAL_BACKWARD  - 等比后向复权  
+        - EQUAL_BACKWARD  - 等比后向复权
 
-        
-    
+    .. py:method:: is_right_opening(self)
+
+        判断是否为右开区间，即未指定结束时间
+
+    .. py:method:: is_valid_ktype(self, ktype)
+
+        判断指定的K线类型是否有效
+
+        :param KType ktype: K线类型
+        :return: 是否有效
+        :rtype: bool
+
+    .. py:staticmethod:: is_base_ktype(ktype)
+
+        判断指定的K线类型是否为基础K线类型
+
+        :param KType ktype: K线类型
+        :return: 是否为基础K线类型
+        :rtype: bool
+
+    .. py:staticmethod:: is_extra_ktype(ktype)
+
+        判断指定的K线类型是否为扩展K线类型
+
+        :param KType ktype: K线类型
+        :return: 是否为扩展K线类型
+        :rtype: bool
+
+    .. py:staticmethod:: get_base_ktype_list()
+
+        获取所有基础K线类型
+
+        :return: 基础K线类型列表
+        :rtype: list[Query.KType]
+
+    .. py:staticmethod:: get_extra_ktype_list()
+
+        获取所有扩展K线类型
+
+        :return: 扩展K线类型列表
+        :rtype: list[Query.KType]
+
+    .. py:staticmethod:: get_ktype_in_min(ktype)
+
+        获取指定K线类型对应的分钟数
+
+        :rtype: int
+
+
 StockManager/Block/Stock
 -----------------------------
 
