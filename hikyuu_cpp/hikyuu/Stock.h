@@ -162,7 +162,7 @@ public:
      */
     bool getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end) const;
 
-    /** 获取指定索引的K线数据记录，pos 无效时返回 Null<KRecord> */
+    /** 获取指定索引的K线数据记录，pos 无效时返回 KRecord::NullRecord */
     KRecord getKRecord(size_t pos, const KQuery::KType& dataType = KQuery::DAY) const;
 
     /** 根据数据类型（日线/周线等），获取指定日期的KRecord */
@@ -259,7 +259,7 @@ private:
 
     // 以下函数属于基础操作添加了读锁
     size_t _getCountFromBuffer(const KQuery::KType& ktype) const;
-    KRecord _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
+    const KRecord& _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
     KRecordList _getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                                           KQuery::KType ktype) const;
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;

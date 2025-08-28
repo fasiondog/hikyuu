@@ -150,7 +150,7 @@ void export_KData(py::module& m) {
                } else if (py::isinstance<Datetime>(obj)) {
                    Datetime dt = py::cast<Datetime>(obj);
                    auto krecord = self.getKRecord(dt);
-                   if (krecord == Null<KRecord>()) {
+                   if (!krecord.isValid()) {
                        throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
                    }
                    ret = py::cast(krecord);
@@ -158,7 +158,7 @@ void export_KData(py::module& m) {
                } else if (py::isinstance<py::str>(obj)) {
                    Datetime dt = Datetime(py::cast<std::string>(obj));
                    auto krecord = self.getKRecord(dt);
-                   if (krecord == Null<KRecord>()) {
+                   if (!krecord.isValid()) {
                        throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
                    }
                    ret = py::cast(krecord);

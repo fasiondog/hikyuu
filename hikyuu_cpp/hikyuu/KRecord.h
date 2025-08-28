@@ -58,6 +58,9 @@ public:
     bool isValid() const {
         return datetime == Null<Datetime>() ? false : true;
     }
+
+public:
+    static const KRecord NullKRecord;
 };
 
 /** @ingroup StockManage */
