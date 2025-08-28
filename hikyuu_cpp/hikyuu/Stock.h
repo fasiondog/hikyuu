@@ -29,6 +29,7 @@ typedef shared_ptr<KDataDriverConnectPool> KDataDriverConnectPoolPtr;
 class HKU_API KData;
 class HKU_API Parameter;
 class HKU_API Block;
+class KDataSharedBufferImp;
 
 /**
  * Stock基类，Application中一般使用StockPtr进行操作
@@ -36,6 +37,7 @@ class HKU_API Block;
  */
 class HKU_API Stock {
     friend class StockManager;
+    friend class KDataSharedBufferImp;
 
 private:
     static const string default_market;

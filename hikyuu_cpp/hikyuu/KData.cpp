@@ -7,7 +7,8 @@
 
 #include "KData.h"
 #include "StockManager.h"
-#include "KDataImp.h"
+#include "KDataSharedBufferImp.h"
+#include "KDataPrivatedBufferImp.h"
 #include "indicator/crt/KDATA.h"
 #include <fstream>
 
@@ -45,8 +46,21 @@ string KData::toString() const {
 
 KData::KData() : m_imp(ms_null_kdata_imp) {}
 
+#if 0
 KData::KData(const Stock& stock, const KQuery& query)
 : m_imp(make_shared<KDataImp>(stock, query)) {}
+
+#else
+KData::KData(const Stock& stock, const KQuery& query) {
+    if (query.recoverType() == KQuery::NO_RECOVER && KQuery::isBaseKType(query.kType()) &&
+        !stock.isNull() && stock.isBuffer(query.kType())) {
+        // 当Stock已缓存了该类型的K线数据，且不进行复权
+        m_imp = make_shared<KDataSharedBufferImp>(stock, query);
+    } else {
+        m_imp = make_shared<KDataPrivatedBufferImp>(stock, query);
+    }
+}
+#endif
 
 bool KData::operator==(const KData& thr) const {
     return this == &thr || m_imp == thr.m_imp ||
