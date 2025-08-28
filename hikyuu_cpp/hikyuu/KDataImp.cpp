@@ -100,19 +100,19 @@ void KDataImp::_getPosInStock() {
     m_have_pos_in_stock = true;
 }
 
-size_t KDataImp::getPos(const Datetime& datetime) {
+size_t KDataImp::getPos(const Datetime& datetime) const {
     KRecordList::const_iterator iter;
     KRecord comp_record;
     comp_record.datetime = datetime;
     iter = lower_bound(
-      m_buffer.begin(), m_buffer.end(), comp_record,
+      m_buffer.cbegin(), m_buffer.cend(), comp_record,
       std::bind(std::less<Datetime>(), std::bind(&KRecord::datetime, std::placeholders::_1),
                 std::bind(&KRecord::datetime, std::placeholders::_2)));
-    if (iter == m_buffer.end() || iter->datetime != datetime) {
+    if (iter == m_buffer.cend() || iter->datetime != datetime) {
         return Null<size_t>();
     }
 
-    return (iter - m_buffer.begin());
+    return (iter - m_buffer.cbegin());
 }
 
 void KDataImp::_recoverForUpDay() {

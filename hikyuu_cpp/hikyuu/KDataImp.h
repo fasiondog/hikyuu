@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class HKU_API KDataImp {
+class KDataImp {
 public:
     KDataImp();
     KDataImp(const Stock& stock, const KQuery& query);
@@ -43,7 +43,7 @@ public:
         return m_buffer.empty();
     }
 
-    size_t size() {
+    size_t size() const {
         return m_buffer.size();
     }
 
@@ -51,7 +51,7 @@ public:
     size_t endPos();
     size_t lastPos();
 
-    size_t getPos(const Datetime& datetime);
+    size_t getPos(const Datetime& datetime) const;
 
     const KRecord* data() const {
         return m_buffer.data();
@@ -62,26 +62,6 @@ public:
     }
 
     DatetimeList getDatetimeList() const;
-
-public:
-    typedef KRecordList::iterator iterator;
-    typedef KRecordList::const_iterator const_iterator;
-
-    iterator begin() {
-        return m_buffer.begin();
-    }
-
-    iterator end() {
-        return m_buffer.end();
-    }
-
-    const_iterator cbegin() const {
-        return m_buffer.cbegin();
-    }
-
-    const_iterator cend() const {
-        return m_buffer.cend();
-    }
 
 private:
     void _getPosInStock();

@@ -94,8 +94,6 @@ public:
 
     string toString() const;
 
-    KDataImpPtr getImp() const;
-
     /** 开盘价 */
     Indicator open() const;
 
@@ -115,14 +113,67 @@ public:
     Indicator amo() const;
 
 public:
-    typedef KRecordList::iterator iterator;
-    typedef KRecordList::const_iterator const_iterator;
-    iterator begin();
-    iterator end();
-    const_iterator cbegin() const;
-    const_iterator cend() const;
     const KRecord* data() const;
     KRecord* data();  // 谨慎使用（用于强制调整数据）
+
+    // 常量迭代器定义
+    class const_iterator {
+    public:
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = const KRecord;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const KRecord*;
+        using reference = const KRecord&;
+
+        const_iterator(const KData& container, size_t index)
+        : container_(container), index_(index) {}
+
+        reference operator*() const {
+            return container_[index_];
+        }
+        pointer operator->() const {
+            return &(container_[index_]);
+        }
+
+        const_iterator& operator++() {
+            ++index_;
+            return *this;
+        }
+
+        const_iterator operator++(int) {
+            const_iterator temp = *this;
+            ++index_;
+            return temp;
+        }
+
+        bool operator==(const const_iterator& other) const {
+            return &container_ == &other.container_ && index_ == other.index_;
+        }
+
+        bool operator!=(const const_iterator& other) const {
+            return !(*this == other);
+        }
+
+    private:
+        const KData& container_;  // 常量引用容器
+        size_t index_;            // 当前索引
+    };
+
+    using iterator = const_iterator;
+
+    const_iterator begin() const {
+        return const_iterator(*this, 0);
+    }
+    const_iterator end() const {
+        return const_iterator(*this, size());
+    }
+
+    const_iterator cbegin() const {
+        return const_iterator(*this, 0);
+    }
+    const_iterator cend() const {
+        return const_iterator(*this, size());
+    }
 
 private:
     static KRecord ms_null_krecord;
@@ -259,22 +310,6 @@ inline bool KData::operator!=(const KData& other) const {
     return !(*this == other);
 }
 
-inline KData::iterator KData::begin() {
-    return m_imp->begin();
-}
-
-inline KData::iterator KData::end() {
-    return m_imp->end();
-}
-
-inline KData::const_iterator KData::cbegin() const {
-    return m_imp->cbegin();
-}
-
-inline KData::const_iterator KData::cend() const {
-    return m_imp->cend();
-}
-
 inline const KRecord* KData::data() const {
     return m_imp->data();
 }
@@ -283,21 +318,7 @@ inline KRecord* KData::data() {
     return m_imp->data();
 }
 
-inline KDataImpPtr KData::getImp() const {
-    return m_imp;
-}
-
 } /* namespace hku */
-
-namespace std {
-template <>
-class hash<hku::KData> {
-public:
-    std::size_t operator()(hku::KData const& k) const noexcept {
-        return std::hash<hku::KDataImpPtr>()(k.getImp());
-    }
-};
-}  // namespace std
 
 #if FMT_VERSION >= 90000
 template <>
