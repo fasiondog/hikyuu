@@ -23,12 +23,28 @@ TEST_CASE("test_KQuery") {
     CHECK_UNARY(q1.end() == Null<int64_t>());
     CHECK_UNARY(q1.startDatetime() == Null<Datetime>());
     CHECK_UNARY(q1.endDatetime() == Null<Datetime>());
+    CHECK_UNARY(q1.isRightOpening());
+
+    q1 = KQueryByIndex(10, 30);
+    CHECK_EQ(q1.start(), 10);
+    CHECK_EQ(q1.end(), 30);
+    CHECK_UNARY(q1.startDatetime() == Null<Datetime>());
+    CHECK_UNARY(q1.endDatetime() == Null<Datetime>());
+    CHECK_UNARY(!q1.isRightOpening());
 
     q1 = KQueryByDate(Datetime(20010101), Datetime(20010110));
     CHECK_UNARY(q1.start() == Null<int64_t>());
     CHECK_UNARY(q1.end() == Null<int64_t>());
     CHECK_EQ(q1.startDatetime(), Datetime(20010101));
     CHECK_EQ(q1.endDatetime(), Datetime(20010110));
+    CHECK_UNARY(!q1.isRightOpening());
+
+    q1 = KQueryByDate(Datetime(20010101));
+    CHECK_UNARY(q1.start() == Null<int64_t>());
+    CHECK_UNARY(q1.end() == Null<int64_t>());
+    CHECK_EQ(q1.startDatetime(), Datetime(20010101));
+    CHECK_EQ(q1.endDatetime(), Null<Datetime>());
+    CHECK_UNARY(q1.isRightOpening());
 }
 
 /** @par 检测点 */

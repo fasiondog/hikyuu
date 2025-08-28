@@ -234,10 +234,34 @@ TEST_CASE("test_StockManager_TempCsvStock") {
 /** @par 检测点 */
 TEST_CASE("test_StockManager_isHoliday") {
     auto& sm = StockManager::instance();
+    CHECK_THROWS(sm.isHoliday(Datetime()));
     CHECK_EQ(sm.isHoliday(Datetime(202101010000LL)), true);
-    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL)), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL)), true);  // 周六
+    CHECK_EQ(sm.isHoliday(Datetime(202101030000LL)), true);  // 周日
     CHECK_EQ(sm.isHoliday(Datetime(202110010000LL)), true);
     CHECK_EQ(sm.isHoliday(Datetime(202109300000LL)), false);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_StockManager_isTradingHours") {
+    auto& sm = StockManager::instance();
+    CHECK_THROWS(sm.isTradingHours(Datetime()));
+    CHECK_EQ(sm.isTradingHours(Datetime(202101010000LL)), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202101020000LL)), false);  // 周六
+    CHECK_EQ(sm.isTradingHours(Datetime(202101030000LL)), false);  // 周日
+    CHECK_EQ(sm.isTradingHours(Datetime(202110010000LL)), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109300000LL)), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109300929LL)), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109300930LL)), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301000LL)), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301130LL)), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301131LL)), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301259LL)), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301300LL)), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301301LL)), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301500LL)), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301501LL)), false);
+    CHECK_THROWS(sm.isTradingHours(Datetime(202109301500LL), "invalid"));
 }
 
 /** @par 检测点 */

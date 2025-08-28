@@ -94,6 +94,8 @@ public:
 
     string toString() const;
 
+    KDataImpPtr getImp() const;
+
     /** 开盘价 */
     Indicator open() const;
 
@@ -124,6 +126,7 @@ public:
 
 private:
     static KRecord ms_null_krecord;
+    static shared_ptr<KDataImp> ms_null_kdata_imp;
 
 private:
     KDataImpPtr m_imp;
@@ -180,7 +183,9 @@ KData HKU_API getKData(const string& market_code, int64_t start = 0, int64_t end
 
 inline KData::KData(const KData& x) : m_imp(x.m_imp) {}
 
-inline KData::KData(KData&& x) : m_imp(std::move(x.m_imp)) {}
+inline KData::KData(KData&& x) : m_imp(std::move(x.m_imp)) {
+    x.m_imp = ms_null_kdata_imp;
+}
 
 inline KData& KData::operator=(const KData& x) {
     if (this == &x)
@@ -193,6 +198,7 @@ inline KData& KData::operator=(KData&& x) {
     if (this == &x)
         return *this;
     m_imp = std::move(x.m_imp);
+    x.m_imp = ms_null_kdata_imp;
     return *this;
 }
 
@@ -277,7 +283,21 @@ inline KRecord* KData::data() {
     return m_imp->data();
 }
 
+inline KDataImpPtr KData::getImp() const {
+    return m_imp;
+}
+
 } /* namespace hku */
+
+namespace std {
+template <>
+class hash<hku::KData> {
+public:
+    std::size_t operator()(hku::KData const& k) const noexcept {
+        return std::hash<hku::KDataImpPtr>()(k.getImp());
+    }
+};
+}  // namespace std
 
 #if FMT_VERSION >= 90000
 template <>

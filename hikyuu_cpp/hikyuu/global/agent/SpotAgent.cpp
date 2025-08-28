@@ -63,6 +63,7 @@ void SpotAgent::stop() {
     if (m_tg) {
         m_tg.reset();
     }
+    m_connected = false;
 }
 
 class ProcessTask {
@@ -213,6 +214,7 @@ void SpotAgent::work_thread() {
 
     HKU_INFO_IF(!m_stop && m_print, "Ready to receive quotation from {} ...", ms_pubUrl);
 
+    m_connected = true;
     while (!m_stop) {
         char* buf = nullptr;
         size_t length = 0;
@@ -257,6 +259,7 @@ void SpotAgent::work_thread() {
         }
     }
 
+    m_connected = false;
     nng_close(sock);
 }
 

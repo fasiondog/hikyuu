@@ -68,6 +68,10 @@ public:
         return m_server_addr;
     }
 
+    bool isConnected() const {
+        return m_connected;
+    }
+
     /**
      * 增加收到 Spot 数据时的处理函数
      * @note 仅能在停止状态时执行此操作，否则将抛出异常
@@ -99,9 +103,9 @@ public:
     static void setQuotationServer(const string& server);
 
 private:
-    static string ms_pubUrl;  // 数据发送服务地址
-    static const char* ms_startTag;  // 批次数据接收起始标记，用于判断启动了新的批次数据接收
-    static const char* ms_endTag;  // 批次数据接收接收标记，用于判断该批次数据更新结束
+    static string ms_pubUrl;                 // 数据发送服务地址
+    static const char* ms_startTag;          // 批次数据接收起始标记，用于判断启动了新的批次数据接收
+    static const char* ms_endTag;            // 批次数据接收接收标记，用于判断该批次数据更新结束
     static const char* ms_spotTopic;         // 向数据发送服务订阅的主题
     static const size_t ms_startTagLength;   // 批次数据接收起始标记长度
     static const size_t ms_endTagLength;     // 批次数据接收结束标记长度
@@ -121,9 +125,10 @@ private:
     void work_thread();
 
 private:
-    enum STATUS { WAITING, RECEIVING };  // 等待新的批次数据，正在接收批次数据中
-    enum STATUS m_status = WAITING;      // 当前内部状态
-    std::atomic_bool m_stop = true;      // 结束代理工作标识
+    enum STATUS { WAITING, RECEIVING };    // 等待新的批次数据，正在接收批次数据中
+    enum STATUS m_status = WAITING;        // 当前内部状态
+    std::atomic_bool m_stop = true;        // 结束代理工作标识
+    std::atomic_bool m_connected = false;  // 是否已连接数据服务
 
     int m_revTimeout = 100;                         // 连接数据服务超时时长（毫秒）
     std::thread m_receiveThread;                    // 数据接收线程
@@ -137,7 +142,7 @@ private:
     // 下面属性被修改时需要加锁，以便可以使用多线程方式运行 strategy
     std::mutex m_mutex;
     list<std::function<void(const SpotRecord&)>> m_processList;  // 已注册的 spot 处理函数列表
-    list<std::function<void(Datetime)>> m_postProcessList;  // 已注册的批次后处理函数列表
+    list<std::function<void(Datetime)>> m_postProcessList;       // 已注册的批次后处理函数列表
 };
 
 }  // namespace hku

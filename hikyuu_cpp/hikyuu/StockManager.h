@@ -109,7 +109,7 @@ public:
      * @param market 指定的市场标识
      * @return 相应的市场信息，如果相应的市场信息不存在，则返回Null<MarketInfo>()
      */
-    MarketInfo getMarketInfo(const string& market) const;
+    MarketInfo getMarketInfo(const string& market) const noexcept;
 
     /**
      * 获取指定市场代表指数证券
@@ -183,10 +183,18 @@ public:
     const ZhBond10List& getZhBond10() const;
 
     /**
-     * 判断指定日期是否为节假日
-     * @param d 指定日期
+     * 判断指定时间对应的日期是否为节假日(包含周六、周日)
+     * @note 仅支持中国大陆市场, Null<Datetime>() 将抛出异常
+     * @param d 指定时间
      */
     bool isHoliday(const Datetime& d) const;
+
+    /**
+     * 粗略判断指定时间是否为交易时间
+     * @param d 指定时间，Null<Datetime>() 将抛出异常
+     * @param market 指定市场
+     */
+    bool isTradingHours(const Datetime& d, const string& market = "SH") const;
 
     const string& getHistoryFinanceFieldName(size_t ix) const;
     size_t getHistoryFinanceFieldIndex(const string& name) const;
