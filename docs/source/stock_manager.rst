@@ -283,9 +283,20 @@ StockManager/Block/Stock
         
     .. py:method:: is_holiday(self, d)
 
-        判断日期是否为节假日
+        判断时间对应日期是否为节假日(仅使用A股市场)
 
-        :param Datetime d: 待判定的日期
+        :param Datetime d: 指定的时间
+        :rtype: bool
+
+    .. py:method:: is_trading_hours(self, d: Datetime, market: str)
+
+        判断指定时间对应的日期是否为交易时间
+
+        :param Datetime d: 待判断的时间
+        :param str market: 市场简称
+        :return: 是否为交易时间
+        :rtype: bool
+    
 
     .. py:method:: add_temp_csv_stock(self, code, day_filename, min_filename[, tick=0.01, tick_value=0.01, precision=2, min_trade_num = 1, max_trade_num=1000000])
 
