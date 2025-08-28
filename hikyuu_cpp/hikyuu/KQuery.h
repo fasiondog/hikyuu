@@ -175,6 +175,14 @@ public:
      */
     uint64_t hash() const;
 
+    /** 判断是否为右开区间，即未指定结束时间 */
+    bool isRightOpening() const {
+        if (m_queryType == DATE) {
+            return endDatetime().isNull();
+        }
+        return m_end == Null<int64_t>();
+    }
+
     /** 获取queryType名称，用于显示输出 */
     static string getQueryTypeName(QueryType);
 
