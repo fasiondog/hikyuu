@@ -20,6 +20,7 @@ KDataPrivatedBufferImp::KDataPrivatedBufferImp(const Stock& stock, const KQuery&
     }
 
     m_buffer = m_stock.getKRecordList(query);
+    m_buffer.resize(m_size);
 
     // 不支持复权时，直接返回
     if (query.recoverType() == KQuery::NO_RECOVER)
