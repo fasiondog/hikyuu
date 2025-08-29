@@ -17,6 +17,26 @@ public:
     KDataSharedBufferImp(const Stock& stock, const KQuery& query);
     virtual ~KDataSharedBufferImp();
 
+    virtual bool empty() const override {
+        return m_size == 0;
+    }
+
+    virtual size_t size() const override {
+        return m_size;
+    }
+
+    virtual size_t startPos() const override {
+        return m_start;
+    }
+
+    virtual size_t endPos() const override {
+        return m_end;
+    }
+
+    virtual size_t lastPos() const override {
+        return m_end == 0 ? 0 : m_end - 1;
+    }
+
     virtual size_t getPos(const Datetime& datetime) const override;
 
     virtual const KRecord& getKRecord(size_t pos) const override;
@@ -40,6 +60,9 @@ public:
     virtual DatetimeList getDatetimeList() const override;
 
 private:
+    size_t m_start{0};
+    size_t m_end{0};
+    size_t m_size{0};
     KRecord* m_data{nullptr};
 };
 

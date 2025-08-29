@@ -13,6 +13,14 @@ namespace hku {
 
 KDataSharedBufferImp::KDataSharedBufferImp(const Stock& stock, const KQuery& query)
 : KDataImp(stock, query) {
+    bool sucess = m_stock.getIndexRange(query, m_start, m_end);
+    if (!sucess) {
+        m_start = 0;
+        m_end = 0;
+        return;
+    }
+
+    m_size = m_end - m_start;
     std::shared_lock<std::shared_mutex> lock(*(m_stock.m_data->pMutex[m_query.kType()]));
     m_data = m_stock.m_data->pKData[m_query.kType()]->data() + m_start;
 }

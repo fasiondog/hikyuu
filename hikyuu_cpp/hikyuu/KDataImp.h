@@ -25,24 +25,24 @@ public:
         return m_stock;
     }
 
-    bool empty() const {
-        return m_size == 0;
+    virtual bool empty() const {
+        return true;
     }
 
-    size_t size() const {
-        return m_size;
+    virtual size_t size() const {
+        return 0;
     }
 
-    size_t startPos() const {
-        return m_start;
+    virtual size_t startPos() const {
+        return 0;
     }
 
-    size_t endPos() const {
-        return m_end;
+    virtual size_t endPos() const {
+        return 0;
     }
 
-    size_t lastPos() const {
-        return m_end == 0 ? 0 : m_end - 1;
+    virtual size_t lastPos() const {
+        return 0;
     }
 
     virtual size_t getPos(const Datetime& datetime) const {
@@ -76,9 +76,6 @@ public:
 protected:
     KQuery m_query;
     Stock m_stock;
-    size_t m_start{0};
-    size_t m_end{0};
-    size_t m_size{0};
 };
 
 typedef shared_ptr<KDataImp> KDataImpPtr;

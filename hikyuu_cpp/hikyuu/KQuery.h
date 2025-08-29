@@ -50,7 +50,9 @@ public:
     static const string HOUR4;
     static const string HOUR6;
     static const string HOUR12;
-    // static const string INVALID_KTYPE;
+
+    static const string TIMELINE;  // 分时
+    static const string TRANS;     // 分笔
 
     /** 判断指定的K线类型是否有效 */
     static bool isValidKType(const string& ktype);
@@ -70,6 +72,8 @@ public:
     static int32_t getKTypeInMin(const KType& ktype);
 
     static int32_t getBaseKTypeInMin(const KType& ktype);
+
+    static int64_t getKTypeInSeconds(const KType& ktype);
 
     /**
      * 复权类型
