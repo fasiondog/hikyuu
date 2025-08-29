@@ -106,7 +106,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     // 设置插件路径
     auto plugin_path = getPluginPath();
-    if (plugin_path.empty() && plugin_path == ".") {
+    if (plugin_path.empty() || plugin_path == ".") {
         m_plugin_manager.pluginPath(m_hikyuuParam.tryGet<string>(
           "plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
     }

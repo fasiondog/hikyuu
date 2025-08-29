@@ -252,7 +252,7 @@ void export_Stock(py::module& m) {
             } else if (py::isinstance<py::sequence>(obj)) {
                 auto seq = obj.cast<py::sequence>();
                 auto ks = python_list_to_vector<KRecord>(seq);
-                self.setKRecordList(ks, ktype);
+                self.setKRecordList(std::move(ks), ktype);
             } else {
                 HKU_THROW("Unusable input data type");
             }
@@ -269,7 +269,7 @@ void export_Stock(py::module& m) {
         "set_kdata_from_df",
         [](Stock& self, const py::object& df, const StringList& cols, const KQuery::KType& ktype) {
             auto ks = df_to_krecords(df, cols);
-            self.setKRecordList(ks, ktype);
+            self.setKRecordList(std::move(ks), ktype);
         },
         py::arg("df"), py::arg("cols"), py::arg("ktype") = KQuery::DAY,
         R"(set_kdata_from_df(self, df, cols, [ktype=Query.DAY])

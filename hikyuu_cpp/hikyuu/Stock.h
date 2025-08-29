@@ -246,6 +246,9 @@ public:
     /** （临时函数）只用于更新缓存中的K线数据 **/
     void realtimeUpdate(KRecord, KQuery::KType ktype = KQuery::DAY);
 
+    /** 获取指定K线数据类型最后更新时间 */
+    Datetime getLastUpdateTime(KQuery::KType ktype) const;
+
     /**
      * 部分临时创建的 Stock, 直接设置KRecordList
      * @note 谨慎调用，通常供外部数据源直接设定数据
@@ -307,6 +310,7 @@ struct HKU_API Stock::Data {
     std::unordered_set<string> m_ktype_preload;  // 记录当前证券的K线数据是否需要预加载
     unordered_map<string, KRecordList*> pKData;
     unordered_map<string, std::shared_mutex*> pMutex;
+    unordered_map<string, Datetime> m_lastUpdate;  // 记录各类型K线数据最后更新时间
 
     Data();
     Data(const string& market, const string& code, const string& name, uint32_t type, bool valid,

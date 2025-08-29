@@ -471,6 +471,7 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
         if (total != 0) {
             (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code,
                                                   KQuery(start, Null<int64_t>(), kType));
+            m_data->m_lastUpdate[kType] = Datetime::now();
         }
     }
 }
@@ -1012,13 +1013,22 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
         tmp.closePrice = record.closePrice;
         tmp.transAmount = record.transAmount;
         tmp.transCount = record.transCount;
+        m_data->m_lastUpdate[ktype] = Datetime::now();
 
     } else if (tmp.datetime < record.datetime) {
         m_data->pKData[ktype]->push_back(record);
+        m_data->m_lastUpdate[ktype] = Datetime::now();
+
     } else {
         HKU_DEBUG("Ignore record, datetime({}) < last record.datetime({})! {} {}", record.datetime,
                   tmp.datetime, market_code(), inktype);
     }
+}
+
+Datetime Stock::getLastUpdateTime(KQuery::KType ktype) const {
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    HKU_IF_RETURN(m_data->m_lastUpdate.find(ktype) == m_data->m_lastUpdate.end(), Datetime::min());
+    return m_data->m_lastUpdate.at(ktype);
 }
 
 void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
@@ -1040,6 +1050,7 @@ void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
     }
 
     (*(m_data->pKData[nktype])) = ks;
+    m_data->m_lastUpdate[nktype] = Datetime::now();
 
     Parameter param;
     param.set<string>("type", "DoNothing");
@@ -1069,6 +1080,7 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     }
 
     (*m_data->pKData[nktype]) = std::move(ks);
+    m_data->m_lastUpdate[nktype] = Datetime::now();
 
     Parameter param;
     param.set<string>("type", "DoNothing");

@@ -176,7 +176,6 @@ public:
     }
 
 private:
-    static KRecord ms_null_krecord;
     static shared_ptr<KDataImp> ms_null_kdata_imp;
 
 private:
@@ -263,7 +262,7 @@ inline const KRecord& KData::getKRecord(size_t pos) const {
 
 inline const KRecord& KData::getKRecord(Datetime datetime) const {
     size_t pos = getPos(datetime);
-    return pos != Null<size_t>() ? getKRecord(pos) : ms_null_krecord;
+    return pos != Null<size_t>() ? getKRecord(pos) : KRecord::NullKRecord;
 }
 
 inline size_t KData::getPos(const Datetime& datetime) const {

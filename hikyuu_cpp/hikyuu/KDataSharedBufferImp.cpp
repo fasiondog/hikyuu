@@ -49,8 +49,7 @@ size_t KDataSharedBufferImp::getPos(const Datetime& datetime) const {
         return Null<size_t>();
     }
 
-    KRecord tmp = getKRecord(mid);
-    return tmp.datetime == datetime ? mid : Null<size_t>();
+    return getKRecord(mid).datetime == datetime ? mid : Null<size_t>();
 }
 
 const KRecord& KDataSharedBufferImp::getKRecord(size_t pos) const {
