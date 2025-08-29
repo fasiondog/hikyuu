@@ -17,7 +17,7 @@ namespace hku {
  * K线数据记录
  * @ingroup StockManage
  */
-class KRecord {
+class HKU_API KRecord {
 public:
     Datetime datetime;    ///< 日期，格式：YYYYMMDDHHMM 如：200901010930
     price_t openPrice;    ///< 开盘价
@@ -58,6 +58,9 @@ public:
     bool isValid() const {
         return datetime == Null<Datetime>() ? false : true;
     }
+
+public:
+    static const KRecord NullKRecord;
 };
 
 /** @ingroup StockManage */

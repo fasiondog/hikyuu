@@ -1765,17 +1765,17 @@ void export_Indicator_build_in(py::module& m) {
     :rtype: Indicator)");
 
     m.def("SLICE", SLICE_1, py::arg("data"), py::arg("start"), py::arg("end"));
-    m.def("SLICE", SLICE_2, py::arg("start"), py::arg("end"), py::arg("result_index") = 0);
+    m.def("SLICE", SLICE_2, py::arg("start"), py::arg("end"), py::arg("result_index") = -1);
     m.def("SLICE", SLICE_3, py::arg("data"), py::arg("start"), py::arg("end"),
           py::arg("result_index") = 0,
-          R"(SLICE(data, start, end, result_index=0)
+          R"(SLICE(data, start, end, result_index=-1)
 
     获取某指标中指定范围 [start, end) 的数据，生成新的指标
 
     :param Indicator|PriceList data: 输入数据
     :param int start: 起始位置
     :param int end: 终止位置（不包含本身）
-    :param int result_index: 原输入数据中的结果集)");
+    :param int result_index: 原输入数据中的结果集, 小于0时表示全部结果集)");
 
     m.def("RSI", RSI_1, py::arg("n") = 14);
     m.def("RSI", RSI_2, py::arg("data"), py::arg("n") = 14, R"(RSI([data, n=14])

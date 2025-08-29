@@ -101,10 +101,8 @@ bool KQuery::isExtraKType(const string& ktype) {
 }
 
 KQuery::KQuery(Datetime start, Datetime end, const KType& ktype, RecoverType recoverType)
-: m_start(start == Null<Datetime>() ? (int64_t)start.number()
-                                    : (int64_t)(start.number() * 100 + start.second())),
-  m_end(end == Null<Datetime>() ? (int64_t)end.number()
-                                : (int64_t)(end.number() * 100 + end.second())),
+: m_start(start.ymdhms()),
+  m_end(end.ymdhms()),
   m_queryType(KQuery::DATE),
   m_dataType(ktype),
   m_recoverType(recoverType) {
@@ -113,16 +111,12 @@ KQuery::KQuery(Datetime start, Datetime end, const KType& ktype, RecoverType rec
 
 Datetime KQuery::startDatetime() const {
     HKU_IF_RETURN(m_queryType != DATE || (uint64_t)m_start == Null<uint64_t>(), Null<Datetime>());
-    uint64_t number = (uint64_t)(m_start / 100);
-    Datetime d(number);
-    return Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), m_start - number * 100);
+    return Datetime(m_start);
 }
 
 Datetime KQuery::endDatetime() const {
     HKU_IF_RETURN(m_queryType != DATE || (uint64_t)m_end == Null<uint64_t>(), Null<Datetime>());
-    uint64_t number = (uint64_t)(m_end / 100);
-    Datetime d(number);
-    return Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), m_end - number * 100);
+    return Datetime(m_end);
 }
 
 uint64_t KQuery::hash() const {

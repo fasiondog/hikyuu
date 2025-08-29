@@ -83,14 +83,14 @@ TEST_CASE("test_SLICE") {
     KData kdata = stock.getKData(query);
     Indicator ikdata = KDATA(kdata);
     CHECK_EQ(ikdata.size(), 30);
-    result = SLICE(ikdata, 0, 30);
+    result = SLICE(ikdata, 0, 30, 0);
     CHECK_EQ(result.size(), ikdata.size());
     CHECK_EQ(result.discard(), ikdata.discard());
     for (size_t i = 0; i < result.size(); ++i) {
         CHECK_EQ(result[i], ikdata[i]);
     }
 
-    result = SLICE(ikdata, 2, 5);
+    result = SLICE(ikdata, 2, 5, 0);
     CHECK_EQ(result.size(), 3);
     CHECK_EQ(result[0], ikdata[2]);
     CHECK_EQ(result[1], ikdata[3]);
@@ -103,6 +103,30 @@ TEST_CASE("test_SLICE") {
     for (size_t i = 0; i < result.size(); ++i) {
         CHECK_EQ(result[i], ikdata.get(i, 1));
     }
+
+    /** @arg 待转化数据为Indicator, result_num=-1 */
+    result = SLICE(ikdata, 0, 30, -1);
+    CHECK_EQ(result.getResultNumber(), ikdata.getResultNumber());
+    CHECK_EQ(result.size(), ikdata.size());
+    CHECK_EQ(result.discard(), ikdata.discard());
+    for (size_t r = 0; r < result.getResultNumber(); ++r) {
+        for (size_t i = 0; i < result.size(); ++i) {
+            CHECK_EQ(result.get(i, r), ikdata.get(i, r));
+        }
+    }
+
+    result = SLICE(ikdata, 2, 5, -1);
+    CHECK_EQ(result.getResultNumber(), ikdata.getResultNumber());
+    CHECK_EQ(result.size(), 3);
+    CHECK_EQ(result[0], ikdata[2]);
+    CHECK_EQ(result[1], ikdata[3]);
+    CHECK_EQ(result[2], ikdata[4]);
+    CHECK_EQ(result.get(0, 1), ikdata.get(2, 1));
+    CHECK_EQ(result.get(1, 1), ikdata.get(3, 1));
+    CHECK_EQ(result.get(2, 1), ikdata.get(4, 1));
+    CHECK_EQ(result.get(0, 2), ikdata.get(2, 2));
+    CHECK_EQ(result.get(1, 2), ikdata.get(3, 2));
+    CHECK_EQ(result.get(2, 2), ikdata.get(4, 2));
 }
 
 //-----------------------------------------------------------------------------

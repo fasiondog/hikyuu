@@ -106,7 +106,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     // 设置插件路径
     auto plugin_path = getPluginPath();
-    if (plugin_path.empty() && plugin_path == ".") {
+    if (plugin_path.empty() || plugin_path == ".") {
         m_plugin_manager.pluginPath(m_hikyuuParam.tryGet<string>(
           "plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
     }
@@ -334,7 +334,7 @@ StockList StockManager::getStockList(std::function<bool(const Stock&)>&& filter)
     return ret;
 }
 
-MarketInfo StockManager::getMarketInfo(const string& market) const {
+MarketInfo StockManager::getMarketInfo(const string& market) const noexcept {
     MarketInfo result;
     string market_tmp = market;
     to_upper(market_tmp);
@@ -433,8 +433,20 @@ const ZhBond10List& StockManager::getZhBond10() const {
 }
 
 bool StockManager::isHoliday(const Datetime& d) const {
+    HKU_IF_RETURN(d.dayOfWeek() == 0 || d.dayOfWeek() == 6, true);
     std::shared_lock<std::shared_mutex> lock(*m_holidays_mutex);
-    return m_holidays.count(d);
+    return m_holidays.count(d.startOfDay());
+}
+
+bool StockManager::isTradingHours(const Datetime& d, const string& market) const {
+    HKU_IF_RETURN(isHoliday(d), false);
+    auto hour = d - d.startOfDay();
+    MarketInfo marketinfo = getMarketInfo(market);
+    HKU_CHECK(marketinfo != Null<MarketInfo>(), htr("Not found market info: {}!"), market);
+    HKU_IF_RETURN((hour >= marketinfo.openTime1() && hour <= marketinfo.closeTime1()) ||
+                    (hour >= marketinfo.openTime2() && hour <= marketinfo.closeTime2()),
+                  true);
+    return false;
 }
 
 Stock StockManager::addTempCsvStock(const string& code, const string& day_filename,

@@ -7,31 +7,53 @@
 
 #include "KData.h"
 #include "StockManager.h"
-#include "KDataImp.h"
+#include "KDataSharedBufferImp.h"
+#include "KDataPrivatedBufferImp.h"
 #include "indicator/crt/KDATA.h"
 #include <fstream>
 
 namespace hku {
 
-KRecord KData::ms_null_krecord;
+shared_ptr<KDataImp> KData::ms_null_kdata_imp{make_shared<KDataImp>()};
 
 HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata) {
     os << "KData{\n  size : " << kdata.size() << "\n  stock: " << kdata.getStock()
-       << "\n  query: " << kdata.getQuery() << "\n}";
+       << "\n  query: " << kdata.getQuery();
+    if (kdata.size() == 1) {
+        os << "\n  " << kdata.getKRecord(0);
+    } else if (kdata.size() > 1) {
+        os << "\n  first: " << kdata.getKRecord(0);
+        os << "\n  last: " << kdata.getKRecord(kdata.size() - 1);
+    }
+    os << "\n}";
     return os;
 }
 
 string KData::toString() const {
     std::stringstream os;
     os << "KData{\n  size : " << size() << "\n  stock: " << getStock().toString()
-       << ",\n  query: " << getQuery() << "\n}";
+       << ",\n  query: " << getQuery();
+    if (size() == 1) {
+        os << "\n  " << getKRecord(0);
+    } else if (size() > 1) {
+        os << "\n  first: " << getKRecord(0);
+        os << "\n  last: " << getKRecord(size() - 1);
+    }
+    os << "\n}";
     return os.str();
 }
 
-KData::KData() : m_imp(make_shared<KDataImp>()) {}
+KData::KData() : m_imp(ms_null_kdata_imp) {}
 
-KData::KData(const Stock& stock, const KQuery& query)
-: m_imp(make_shared<KDataImp>(stock, query)) {}
+KData::KData(const Stock& stock, const KQuery& query) {
+    if (query.recoverType() == KQuery::NO_RECOVER && KQuery::isBaseKType(query.kType()) &&
+        !stock.isNull() && stock.isBuffer(query.kType())) {
+        // 当Stock已缓存了该类型的K线数据，且不进行复权
+        m_imp = make_shared<KDataSharedBufferImp>(stock, query);
+    } else {
+        m_imp = make_shared<KDataPrivatedBufferImp>(stock, query);
+    }
+}
 
 bool KData::operator==(const KData& thr) const {
     return this == &thr || m_imp == thr.m_imp ||

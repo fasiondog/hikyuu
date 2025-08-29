@@ -288,9 +288,19 @@ void export_StockManager(py::module& m) {
 
       .def("is_holiday", &StockManager::isHoliday, R"(is_holiday(self, d)
 
-    判断日期是否为节假日
+    判断指定时间对应的日期是否为节假日(仅使用A股市场)
 
-    :param Datetime d: 待判断的日期)")
+    :param Datetime d: 待判断的时间)")
+
+      .def("is_trading_hours", &StockManager::isTradingHours, py::arg("d"),
+           py::arg("market") = "SH", R"(is_trading_hours(self, d)
+
+    判断指定时间对应的日期是否为交易时间
+
+    :param Datetime d: 待判断的时间
+    :param str market: 市场简称
+    :return: 是否为交易时间
+    :rtype: bool)")
 
       .def("get_history_finance_field_name", &StockManager::getHistoryFinanceFieldName,
            py::return_value_policy::copy, R"(get_history_finance_field_name(self, index)

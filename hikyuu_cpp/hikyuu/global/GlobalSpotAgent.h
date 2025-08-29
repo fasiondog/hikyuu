@@ -30,4 +30,12 @@ HKU_API SpotAgent* getGlobalSpotAgent();
 
 void HKU_API releaseGlobalSpotAgent();
 
+inline bool spotAgentIsRunning() {
+    return getGlobalSpotAgent()->isRunning();
+}
+
+inline bool spotAgentIsConnected() {
+    return getGlobalSpotAgent()->isConnected();
+}
+
 }  // namespace hku

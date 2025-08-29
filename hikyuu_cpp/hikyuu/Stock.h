@@ -29,6 +29,7 @@ typedef shared_ptr<KDataDriverConnectPool> KDataDriverConnectPoolPtr;
 class HKU_API KData;
 class HKU_API Parameter;
 class HKU_API Block;
+class HKU_API KDataSharedBufferImp;
 
 /**
  * Stock基类，Application中一般使用StockPtr进行操作
@@ -36,6 +37,7 @@ class HKU_API Block;
  */
 class HKU_API Stock {
     friend class StockManager;
+    friend class KDataSharedBufferImp;
 
 private:
     static const string default_market;
@@ -162,7 +164,7 @@ public:
      */
     bool getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end) const;
 
-    /** 获取指定索引的K线数据记录，pos 无效时返回 Null<KRecord> */
+    /** 获取指定索引的K线数据记录，pos 无效时返回 KRecord::NullRecord */
     KRecord getKRecord(size_t pos, const KQuery::KType& dataType = KQuery::DAY) const;
 
     /** 根据数据类型（日线/周线等），获取指定日期的KRecord */
@@ -244,6 +246,9 @@ public:
     /** （临时函数）只用于更新缓存中的K线数据 **/
     void realtimeUpdate(KRecord, KQuery::KType ktype = KQuery::DAY);
 
+    /** 获取指定K线数据类型最后更新时间 */
+    Datetime getLastUpdateTime(KQuery::KType ktype) const;
+
     /**
      * 部分临时创建的 Stock, 直接设置KRecordList
      * @note 谨慎调用，通常供外部数据源直接设定数据
@@ -259,7 +264,7 @@ private:
 
     // 以下函数属于基础操作添加了读锁
     size_t _getCountFromBuffer(const KQuery::KType& ktype) const;
-    KRecord _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
+    const KRecord& _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
     KRecordList _getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                                           KQuery::KType ktype) const;
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;
@@ -305,6 +310,7 @@ struct HKU_API Stock::Data {
     std::unordered_set<string> m_ktype_preload;  // 记录当前证券的K线数据是否需要预加载
     unordered_map<string, KRecordList*> pKData;
     unordered_map<string, std::shared_mutex*> pMutex;
+    unordered_map<string, Datetime> m_lastUpdate;  // 记录各类型K线数据最后更新时间
 
     Data();
     Data(const string& market, const string& code, const string& name, uint32_t type, bool valid,

@@ -24,20 +24,20 @@ Indicator HKU_API SLICE(const PriceList& data, int64_t start, int64_t end);
  * 获取某指标中指定范围的数据
  * @param start 起始范围，可为负数
  * @param end 终止范围（不包含本身），可为负数
- * @param result_index 源数据中指定的结果集
+ * @param result_index 源数据中指定的结果集, 小于0时表示全部
  * @ingroup Indicator
  */
-Indicator HKU_API SLICE(int64_t start, int64_t end, int result_index = 0);
+Indicator HKU_API SLICE(int64_t start, int64_t end, int result_index = -1);
 
 /**
  * 获取某指标中指定范围的数据
  * @param ind 源数据
  * @param start 起始范围，可为负数
  * @param end 终止范围（不包含本身），可为负数
- * @param result_index 源数据中指定的结果集
+ * @param result_index 源数据中指定的结果集，小于0时表示全部
  * @ingroup Indicator
  */
-inline Indicator SLICE(const Indicator& ind, int64_t start, int64_t end, int result_index = 0) {
+inline Indicator SLICE(const Indicator& ind, int64_t start, int64_t end, int result_index = -1) {
     return SLICE(start, end, result_index)(ind);
 }
 

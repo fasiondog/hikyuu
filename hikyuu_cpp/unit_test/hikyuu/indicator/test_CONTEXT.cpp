@@ -146,14 +146,14 @@ TEST_CASE("test_CONTEXT") {
     CHECK_EQ(CONTEXT_K(result), k2);
     CHECK_EQ(result.getContext(), k1);
     CHECK_EQ(result.size(), k1.size());
-    check_output(result, ALIGN(stk2.getKData(q1).close(), k1));
+    check_output(result, ALIGN(stk2.getKData(q1).close(), k1, false));
 
     a = k1.close();
     result = hku::CONTEXT(a)(k3);
     CHECK_EQ(CONTEXT_K(result), k1);
     CHECK_EQ(result.getContext(), k3);
     CHECK_EQ(result.size(), k3.size());
-    check_output(result, ALIGN(stk1.getKData(q3).close(), k3));
+    check_output(result, ALIGN(stk1.getKData(q3).close(), k3, false));
 
     /** @arg 复杂公式 */
     result = (CLOSE(k1) + hku::CONTEXT(MA(k3.close(), 2)))(k2);

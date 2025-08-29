@@ -111,7 +111,9 @@ void IIc::_calculate(const Indicator& inputInd) {
         auto a = PRICELIST(tmp);
         auto b = PRICELIST(tmp_return);
         auto ic = spearman(a, b, stk_count, true);
-        dst[i] = ic[ic.size() - 1];
+        if (ic.size() > 0) {
+            dst[i] = ic[ic.size() - 1];
+        }
     }
 
     if (getParam<bool>("strict")) {
