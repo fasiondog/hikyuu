@@ -55,6 +55,8 @@ size_t getStockExtraCount(const Stock& stk, const string& ktype);
 bool getStockExtraIndexRange(const Stock& stk, const KQuery& query, size_t& out_start,
                              size_t& out_end);
 
+KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query);
+
 //-------------------------------
 // Views 扩展
 //-------------------------------

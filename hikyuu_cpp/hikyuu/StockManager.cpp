@@ -578,8 +578,14 @@ void StockManager::loadAllStocks() {
                 stock.m_data->m_maxTradeNumber = info.maxTradeNumber;
                 stock.m_data->m_history_finance_ready = false;
                 // 强制释放所有已缓存K线数据
+                stock.m_data->m_lastUpdate.clear();
                 for (const auto& ktype : base_ktypes) {
                     stock.releaseKDataBuffer(ktype);
+                    stock.m_data->m_lastUpdate[ktype] = Datetime::min();
+                }
+                auto ktype_list = KQuery::getExtraKTypeList();
+                for (const auto& ktype : ktype_list) {
+                    stock.m_data->m_lastUpdate[ktype] = Datetime::min();
                 }
             }
             stock.setPreload(preload_ktypes);

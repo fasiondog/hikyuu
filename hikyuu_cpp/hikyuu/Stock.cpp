@@ -63,10 +63,15 @@ Stock::Data::Data()
   m_precision(default_precision),
   m_minTradeNumber(default_minTradeNumber),
   m_maxTradeNumber(default_maxTradeNumber) {
-    const auto& ktype_list = KQuery::getBaseKTypeList();
+    auto ktype_list = KQuery::getBaseKTypeList();
     for (const auto& ktype : ktype_list) {
         pKData[ktype] = nullptr;
         pMutex[ktype] = nullptr;
+        m_lastUpdate[ktype] = Datetime::min();
+    }
+    ktype_list = KQuery::getExtraKTypeList();
+    for (const auto& ktype : ktype_list) {
+        m_lastUpdate[ktype] = Datetime::min();
     }
 }
 
@@ -95,10 +100,15 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
     to_upper(m_market);
     m_market_code = marketCode();
 
-    const auto& ktype_list = KQuery::getBaseKTypeList();
+    auto ktype_list = KQuery::getBaseKTypeList();
     for (const auto& ktype : ktype_list) {
         pMutex[ktype] = new std::shared_mutex();
         pKData[ktype] = nullptr;
+        m_lastUpdate[ktype] = Datetime::min();
+    }
+    ktype_list = KQuery::getExtraKTypeList();
+    for (const auto& ktype : ktype_list) {
+        m_lastUpdate[ktype] = Datetime::min();
     }
 }
 
@@ -403,6 +413,7 @@ bool Stock::isBuffer(KQuery::KType ktype) const {
     HKU_IF_RETURN(!m_data, false);
     string nktype(ktype);
     to_upper(nktype);
+    HKU_IF_RETURN(m_data->pMutex.find(nktype) == m_data->pMutex.end(), false);
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     return m_data->pKData.find(nktype) != m_data->pKData.end() && m_data->pKData[nktype];
 }
@@ -1025,10 +1036,24 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
     }
 }
 
-Datetime Stock::getLastUpdateTime(KQuery::KType ktype) const {
+Datetime Stock::getLastUpdateTime(KQuery::KType inktype) const {
+    auto ktype = inktype;
+    to_upper(ktype);
+    if (m_data->pMutex.find(ktype) == m_data->pMutex.end()) {
+        auto iter = m_data->m_lastUpdate.find(ktype);
+        if (iter == m_data->m_lastUpdate.end()) {
+            // 可能新增的扩展K线类型
+            if (KQuery::isExtraKType(ktype)) {
+                m_data->m_lastUpdate[ktype] = Datetime::min();
+            }
+            return Datetime::min();
+        }
+        return iter->second;
+    }
+
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-    HKU_IF_RETURN(m_data->m_lastUpdate.find(ktype) == m_data->m_lastUpdate.end(), Datetime::min());
-    return m_data->m_lastUpdate.at(ktype);
+    auto iter = m_data->m_lastUpdate.find(ktype);
+    return iter == m_data->m_lastUpdate.end() ? Datetime::min() : iter->second;
 }
 
 void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
