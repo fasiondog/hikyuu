@@ -39,6 +39,12 @@ xmake >= 2.8.2，网址：`<https://github.com/xmake-io/xmake>`_
 
     git clone https://github.com/fasiondog/hikyuu.git
 
+.. note::
+
+    捐赠用户如本地环境已激活（或申请了使用许可且尚未过期）, 请 checkout 已发布的版本分支，并手工从 https://gitee.com/hikyuu-quant/hikyuu_plugin_download  下载对应版本的插件。
+    
+    插件下载后保存在源码 hikyuu/plugin 目录下。
+
 
 4、Linux下安装依赖软件包
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
