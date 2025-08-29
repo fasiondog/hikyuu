@@ -121,4 +121,27 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
         :param float value: 投入买入资金
         :param str remark: 下单备注
 
+
+.. py:function:: start_spot_agent([print=False, worker_num=1, addr=""])
     
+    启动行情数据接收代理
+
+    :param print: 是否打印日志
+    :param worker_num: 工作线程数
+    :param addr: 行情采集服务地址
+
+.. py:function:: stop_spot_agent()
+
+    停止行情数据接收代理
+
+.. py:function:: spot_agent_is_running()
+
+    行情数据接收代理是否正在运行
+
+    :return: True or False
+
+.. py:function:: spot_agent_is_connected()
+
+    行情数据接收代理是否已连接
+
+    :return: True or False
