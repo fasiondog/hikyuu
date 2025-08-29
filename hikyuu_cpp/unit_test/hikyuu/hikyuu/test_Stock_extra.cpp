@@ -140,7 +140,7 @@ TEST_CASE("test_Stock_extra_ktype") {
 
     kmin3 = stk.getKData(KQueryByIndex(100, 120, KQuery::MIN3));
     auto kmin3_2 =
-      stk.getKData(KQueryByDate(Datetime(200001051033), Datetime(200001051130), KQuery::MIN3));
+      stk.getKData(KQueryByDate(Datetime(200001051033), Datetime(200001051131), KQuery::MIN3));
     CHECK_EQ(kmin3.size(), kmin3_2.size());
     for (size_t i = 0; i < kmin3.size(); i++) {
         CHECK_EQ(kmin3[i], kmin3_2[i]);

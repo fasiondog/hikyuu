@@ -7,13 +7,13 @@
 
 #include "KData.h"
 #include "StockManager.h"
-#include "KDataImp.h"
+#include "KDataSharedBufferImp.h"
+#include "KDataPrivatedBufferImp.h"
 #include "indicator/crt/KDATA.h"
 #include <fstream>
 
 namespace hku {
 
-KRecord KData::ms_null_krecord;
 shared_ptr<KDataImp> KData::ms_null_kdata_imp{make_shared<KDataImp>()};
 
 HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata) {
@@ -45,8 +45,15 @@ string KData::toString() const {
 
 KData::KData() : m_imp(ms_null_kdata_imp) {}
 
-KData::KData(const Stock& stock, const KQuery& query)
-: m_imp(make_shared<KDataImp>(stock, query)) {}
+KData::KData(const Stock& stock, const KQuery& query) {
+    if (query.recoverType() == KQuery::NO_RECOVER && KQuery::isBaseKType(query.kType()) &&
+        !stock.isNull() && stock.isBuffer(query.kType())) {
+        // 当Stock已缓存了该类型的K线数据，且不进行复权
+        m_imp = make_shared<KDataSharedBufferImp>(stock, query);
+    } else {
+        m_imp = make_shared<KDataPrivatedBufferImp>(stock, query);
+    }
+}
 
 bool KData::operator==(const KData& thr) const {
     return this == &thr || m_imp == thr.m_imp ||

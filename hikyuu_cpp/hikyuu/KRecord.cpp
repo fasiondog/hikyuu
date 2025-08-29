@@ -9,6 +9,8 @@
 
 namespace hku {
 
+const KRecord KRecord::NullKRecord;
+
 HKU_API std::ostream& operator<<(std::ostream& os, const KRecord& record) {
     string strip(", ");
     os << std::fixed;

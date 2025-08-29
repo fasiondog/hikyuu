@@ -267,10 +267,9 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
             m_pBuffer[i] = new vector<value_t>(len, null_price);
 
         } else {
-            m_pBuffer[i]->clear();
-            m_pBuffer[i]->reserve(len);
+            m_pBuffer[i]->resize(len);
             for (size_t j = 0; j < len; ++j) {
-                m_pBuffer[i]->push_back(null_price);
+                (*m_pBuffer[i])[j] = null_price;
             }
         }
     }

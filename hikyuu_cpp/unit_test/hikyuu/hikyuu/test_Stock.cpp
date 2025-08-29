@@ -1847,7 +1847,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 日期小于第一条记录 */
     record = stock.getKRecord(Datetime(199012180000), KQuery::DAY);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     /** @arg 日期等于第一条记录 */
     record = stock.getKRecord(Datetime(199012190000), KQuery::DAY);
@@ -1861,7 +1861,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 中间不存在对应数据的随机一条数据 */
     record = stock.getKRecord(Datetime(199502180000), KQuery::DAY);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     /** @arg 日期等于最后一条记录 */
     record = stock.getKRecord(Datetime(201112060000), KQuery::DAY);
@@ -1870,7 +1870,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 日期大于最后一条记录 */
     record = stock.getKRecord(Datetime(201112070000), KQuery::DAY);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     ///===================================
     /// 测试周线
@@ -1878,7 +1878,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 日期小于第一条记录 */
     record = stock.getKRecord(Datetime(199012160000), KQuery::WEEK);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     /** @arg 日期等于第一条记录 */
     record = stock.getKRecord(Datetime(199012210000), KQuery::WEEK);
@@ -1892,7 +1892,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 中间不存在对应数据的随机一条数据 */
     record = stock.getKRecord(Datetime(199103120000), KQuery::WEEK);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     /** @arg 日期等于最后一条记录 */
     record = stock.getKRecord(Datetime(201112090000), KQuery::WEEK);
@@ -1901,7 +1901,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 日期大于最后一条记录 */
     record = stock.getKRecord(Datetime(201112100000), KQuery::WEEK);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     ///===================================
     /// 测试月线
@@ -1909,7 +1909,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 日期小于第一条记录 */
     record = stock.getKRecord(Datetime(199011300000), KQuery::MONTH);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     /** @arg 日期等于第一条记录 */
     record = stock.getKRecord(Datetime(199012310000), KQuery::MONTH);
@@ -1923,7 +1923,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 中间不存在对应数据的随机一条数据 */
     record = stock.getKRecord(Datetime(199103120000), KQuery::MONTH);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     /** @arg 日期等于最后一条记录 */
     record = stock.getKRecord(Datetime(201112310000), KQuery::MONTH);
@@ -1932,7 +1932,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 日期大于最后一条记录 */
     record = stock.getKRecord(Datetime(201201010000), KQuery::MONTH);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     ///===================================
     /// 测试15分钟线
@@ -1940,7 +1940,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 日期小于第一条记录 */
     record = stock.getKRecord(Datetime(200001040944), KQuery::MIN15);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     /** @arg 日期等于第一条记录 */
     record = stock.getKRecord(Datetime(200001040945), KQuery::MIN15);
@@ -1954,7 +1954,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 中间不存在对应数据的随机一条数据 */
     record = stock.getKRecord(Datetime(200001071044), KQuery::MIN15);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     /** @arg 日期等于最后一条记录 */
     record = stock.getKRecord(Datetime(201112061500), KQuery::MIN15);
@@ -1963,7 +1963,7 @@ TEST_CASE("test_Stock_getKRecord_By_Date") {
 
     /** @arg 日期大于最后一条记录 */
     record = stock.getKRecord(Datetime(201112061501), KQuery::MIN15);
-    CHECK_EQ(record, Null<KRecord>());
+    CHECK_EQ(record, KRecord::NullKRecord);
 
     MEMORY_CHECK;
 }

@@ -785,7 +785,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     //检查当日是否存在日线数据，不存在则认为不可交易
     bd::date daydate = datetime.date();
     KRecord krecord = stock.getKRecord(daydate, KQuery::DAY);
-    if (krecord == Null<KRecord>()){
+    if (!krecord.isValid()) {
         HKU_ERROR(datetime << " " << stock.market_code()
                 <<" Non-trading day(" << daydate
                 << ") [TradeManager::buy]");
