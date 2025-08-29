@@ -193,10 +193,10 @@ public:
     uint64_t ticks() const noexcept;
 
     /** 时间戳，距离1970-01-01 00:00:00的微秒数 */
-    int64_t timestamp() const noexcept;
+    uint64_t timestamp() const noexcept;
 
     /** 时间戳，距离1970-01-01 00:00:00的微秒数, 并扣除本地 UTC 偏差时间 */
-    int64_t timestampUTC() const noexcept;
+    uint64_t timestampUTC() const noexcept;
 
     /**
      * 转化为字符串，供打印阅读，格式：
