@@ -162,8 +162,8 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
     string tablename = _getTableName(market, code, query.kType());
     try {
         string sql = fmt::format(
-          "select sum(CASE WHEN date<{} THEN 1 ELSE 0 END) AS startix, sum(CASE WHEN date<{} THEN "
-          "1 ELSE 0 END) AS endix from {}",
+          "select COUNT(CASE WHEN date<{} THEN 1 END) AS startix, COUNT(CASE WHEN date<{} THEN 1 "
+          "END) AS endix from {}",
           query.startDatetime().number(), query.endDatetime().number(), tablename);
         SQLStatementPtr st = m_connect->getStatement(sql);
 
