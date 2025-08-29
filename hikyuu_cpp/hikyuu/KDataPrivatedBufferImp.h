@@ -11,7 +11,7 @@
 
 namespace hku {
 
-class KDataPrivatedBufferImp : public KDataImp {
+class HKU_API KDataPrivatedBufferImp : public KDataImp {
 public:
     KDataPrivatedBufferImp();
     KDataPrivatedBufferImp(const Stock& stock, const KQuery& query);

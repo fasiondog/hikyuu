@@ -11,7 +11,7 @@
 
 namespace hku {
 
-class KDataImp {
+class HKU_API KDataImp {
 public:
     KDataImp() = default;
     KDataImp(const Stock& stock, const KQuery& query);

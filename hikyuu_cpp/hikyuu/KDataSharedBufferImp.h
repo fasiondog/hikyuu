@@ -11,7 +11,7 @@
 
 namespace hku {
 
-class KDataSharedBufferImp : public KDataImp {
+class HKU_API KDataSharedBufferImp : public KDataImp {
 public:
     KDataSharedBufferImp() = default;
     KDataSharedBufferImp(const Stock& stock, const KQuery& query);

@@ -29,7 +29,7 @@ typedef shared_ptr<KDataDriverConnectPool> KDataDriverConnectPoolPtr;
 class HKU_API KData;
 class HKU_API Parameter;
 class HKU_API Block;
-class KDataSharedBufferImp;
+class HKU_API KDataSharedBufferImp;
 
 /**
  * Stock基类，Application中一般使用StockPtr进行操作
