@@ -31,6 +31,11 @@ void ICval::_checkParam(const string& name) const {
     }
 }
 
+bool ICval::selfAlike(const IndicatorImp& other) const noexcept {
+    HKU_IF_RETURN(isLeaf() && other.isLeaf(), true);
+    return m_right && m_right->alike(*other.getRightNode());
+}
+
 void ICval::_calculate(const Indicator& data) {
     double value = getParam<double>("value");
     int discard = getParam<int>("discard");

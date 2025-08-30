@@ -247,7 +247,8 @@ void IndicatorImp::setContext(const KData &k) {
 
     // 清理根节点之下所有节点中间计算数据
     if (!m_parent) {
-        auto nodes = getAllSubNodes();
+        vector<IndicatorImpPtr> nodes;
+        getAllSubNodes(nodes);
         for (const auto &node : nodes) {
             if (!node->m_need_calculate && node->size() > 0) {
                 node->_clearBuffer();
@@ -1612,14 +1613,8 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
                     m_ind_params.size() != other.m_ind_params.size() || m_params != other.m_params,
                   false);
 
-    const auto &self_id = typeid(*this);
-    const auto &context_id = typeid(IContext);
-    HKU_IF_RETURN(self_id == context_id, false);
-
-    const auto &cval_id = typeid(ICval);
-    if (self_id == cval_id) {
-        HKU_IF_RETURN(isLeaf() && other.isLeaf(), true);
-        return m_right && m_right->alike(*other.m_right);
+    if (needSelfAlikeCompare()) {
+        return selfAlike(other);
     }
 
     auto iter1 = m_ind_params.cbegin();
@@ -1651,7 +1646,8 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
 
 bool IndicatorImp::contains(const string &name) const {
     HKU_IF_RETURN(m_name == name, true);
-    auto all_nodes = getAllSubNodes();
+    vector<IndicatorImpPtr> all_nodes;
+    getAllSubNodes(all_nodes);
     for (const auto &node : all_nodes) {
         if (node->name() == name) {
             return true;
@@ -1660,29 +1656,24 @@ bool IndicatorImp::contains(const string &name) const {
     return false;
 }
 
-std::vector<IndicatorImpPtr> IndicatorImp::getAllSubNodes() const {
-    std::vector<IndicatorImpPtr> result;
-    // 需要按下面的顺序进行
+void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
     if (m_three) {
-        result.push_back(m_three);
-        auto sub_nodes = m_three->getAllSubNodes();
-        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
+        nodes.push_back(m_three);
+        m_three->getAllSubNodes(nodes);
     }
     if (m_left) {
-        result.push_back(m_left);
-        auto sub_nodes = m_left->getAllSubNodes();
-        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
+        nodes.push_back(m_left);
+        m_left->getAllSubNodes(nodes);
     }
     if (m_right) {
-        result.push_back(m_right);
-        auto sub_nodes = m_right->getAllSubNodes();
-        result.insert(result.end(), sub_nodes.begin(), sub_nodes.end());
+        nodes.push_back(m_right);
+        m_right->getAllSubNodes(nodes);
     }
-    return result;
 }
 
 void IndicatorImp::repeatALikeNodes() {
-    auto sub_nodes = getAllSubNodes();
+    vector<IndicatorImpPtr> sub_nodes, tmp_nodes;
+    getAllSubNodes(sub_nodes);
     size_t total = sub_nodes.size();
     for (size_t i = 0; i < total; i++) {
         const auto &cur = sub_nodes[i];
@@ -1710,7 +1701,8 @@ void IndicatorImp::repeatALikeNodes() {
                         node_parent->m_three = cur;
                     }
 
-                    auto tmp_nodes = node->getAllSubNodes();
+                    tmp_nodes.clear();
+                    node->getAllSubNodes(tmp_nodes);
                     for (const auto &replace_node : tmp_nodes) {
                         for (size_t k = j + 1; k < total; k++) {
                             if (replace_node == sub_nodes[k]) {
@@ -1726,6 +1718,155 @@ void IndicatorImp::repeatALikeNodes() {
                 }
             }
         }
+    }
+}
+
+void IndicatorImp::_printTree(int depth, bool isLast, bool show_long_name) const {
+    // 打印当前节点
+    std::string indent;
+    if (depth > 0) {
+        // 构建层级缩进
+        indent = std::string((depth - 1) * 3, ' ');
+        indent += isLast ? "└─ " : "├─ ";
+    }
+
+    // 打印节点名称
+    std::string name = (show_long_name ? long_name() : this->name());
+    if (m_parent) {
+        if (this == m_parent->m_three.get()) {
+            name = "[T]" + name;
+        } else if (this == m_parent->m_left.get()) {
+            name = "[L]" + name;
+        } else if (this == m_parent->m_right.get()) {
+            name = "[R]" + name;
+        }
+    }
+    std::cout << indent << name;
+
+    // 如果是叶子节点，直接换行
+    if (isLeaf()) {
+        std::cout << std::endl;
+        return;
+    }
+
+    // 有子节点，先换行再打印子节点
+    std::cout << std::endl;
+
+    std::vector<IndicatorImp *> children;
+    if (m_three) {
+        children.emplace_back(m_three.get());
+    }
+    if (m_left) {
+        children.emplace_back(m_left.get());
+    }
+    if (m_right) {
+        children.emplace_back(m_right.get());
+    }
+
+    if (children.empty())
+        return;
+
+    // 递归打印子节点
+    for (size_t i = 0; i < children.size(); ++i) {
+        bool lastChild = (i == children.size() - 1);
+        std::cout << std::string(depth * 3, ' ');
+        children[i]->_printTree(depth + 1, lastChild, show_long_name);
+    }
+}
+
+void IndicatorImp::printTree(bool show_long_name) const {
+    std::cout << "Tree structure starting from root:" << std::endl;
+    _printTree(0, true, show_long_name);
+}
+
+vector<IndicatorImp *> IndicatorImp::getAllSubTrees() const {
+    vector<IndicatorImpPtr> all_nodes;
+    getAllSubNodes(all_nodes);
+    std::unordered_set<IndicatorImpPtr> leaves;
+    for (const auto &node : all_nodes) {
+        if (node->isLeaf()) {
+            leaves.insert(node);
+        }
+    }
+
+    std::unordered_set<IndicatorImp *> tree_set;
+    for (const auto &leaf : leaves) {
+        const IndicatorImp *tree = leaf.get();
+        while (tree->m_parent) {
+            tree_set.insert(tree->m_parent);
+            tree = tree->m_parent;
+        }
+    }
+
+    vector<IndicatorImp *> trees;
+    trees.reserve(leaves.size() + tree_set.size());
+    for (const auto &leaf : leaves) {
+        trees.push_back(leaf.get());
+    }
+    for (const auto &tree : tree_set) {
+        trees.push_back(tree);
+    }
+    return trees;
+}
+
+size_t IndicatorImp::treeSize(IndicatorImp *tree) {
+    HKU_IF_RETURN(tree == nullptr, 0);
+    HKU_IF_RETURN(tree->isLeaf(), 1);
+
+    size_t ret = 1;
+    if (tree->m_three != nullptr) {
+        ret += treeSize(tree->m_three.get());
+    }
+    if (tree->m_left != nullptr) {
+        ret += treeSize(tree->m_left.get());
+    }
+    if (tree->m_right != nullptr) {
+        ret += treeSize(tree->m_right.get());
+    }
+    return ret;
+}
+
+bool IndicatorImp::nodeInTree(IndicatorImp *node, IndicatorImp *tree) {
+    HKU_IF_RETURN(node == nullptr || tree == nullptr, false);
+    HKU_IF_RETURN(node == tree, true);
+    if (tree->m_three) {
+        HKU_IF_RETURN(nodeInTree(node, tree->m_three.get()), true);
+    }
+    if (tree->m_left) {
+        HKU_IF_RETURN(nodeInTree(node, tree->m_left.get()), true);
+    }
+    if (tree->m_right) {
+        HKU_IF_RETURN(nodeInTree(node, tree->m_right.get()), true);
+    }
+    return false;
+}
+
+void IndicatorImp::printAllSubTrees(bool show_long_name) const {
+    std::cout << "All sub trees:" << std::endl;
+    vector<IndicatorImp *> trees = getAllSubTrees();
+    std::sort(trees.begin(), trees.end(),
+              [](IndicatorImp *a, IndicatorImp *b) { return treeSize(a) < treeSize(b); });
+    for (size_t i = 0; i < trees.size(); i++) {
+        std::cout << "-------------------------------------------------------------------------"
+                  << std::endl;
+        std::cout << "Tree " << i << " (size: " << treeSize(trees[i]) << ") :" << std::endl;
+        trees[i]->printTree(show_long_name);
+    }
+}
+
+void IndicatorImp::printLeaves(bool show_long_name) const {
+    vector<IndicatorImpPtr> all_nodes;
+    getAllSubNodes(all_nodes);
+    std::unordered_set<IndicatorImpPtr> leaves;
+    for (const auto &node : all_nodes) {
+        if (node->isLeaf()) {
+            leaves.insert(node);
+        }
+    }
+    size_t ix = 0;
+    for (const auto &leaf : leaves) {
+        std::cout << "Leaf " << ix++ << ": " << (show_long_name ? leaf->long_name() : leaf->name())
+                  << std::endl;
     }
 }
 

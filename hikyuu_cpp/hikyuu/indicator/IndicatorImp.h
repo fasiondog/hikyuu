@@ -155,6 +155,23 @@ public:
     value_t* data(size_t result_idx = 0);
     value_t const* data(size_t result_idx = 0) const;
 
+    IndicatorImpPtr getRightNode() const;
+    IndicatorImpPtr getLeftNode() const;
+    IndicatorImpPtr getThreeNode() const;
+    void printTree(bool show_long_name = false) const;
+    void printAllSubTrees(bool show_long_name = false) const;
+    void printLeaves(bool show_long_name = false) const;
+
+    /** 特殊指标需自己实现 selfAlike 函数的, needSelfAlikeCompare 应返回 true */
+    virtual bool needSelfAlikeCompare() const noexcept {
+        return false;
+    }
+
+    /** 特殊指标需自己实现 selfAlike 函数，返回true表示两个指标等效 */
+    virtual bool selfAlike(const IndicatorImp& other) const noexcept {
+        return false;
+    }
+
     // ===================
     //  子类接口
     // ===================
@@ -201,10 +218,20 @@ private:
     void execute_weave();
     void execute_if();
 
-    std::vector<IndicatorImpPtr> getAllSubNodes() const;
+    void getAllSubNodes(vector<IndicatorImpPtr>& nodes) const;
     void repeatALikeNodes();
 
     void _clearBuffer();
+
+    void _printTree(int depth = 0, bool isLast = true, bool show_long_name = false) const;
+
+    // 获取所有子树
+    vector<IndicatorImp*> getAllSubTrees() const;
+
+    // 获取子树中节点的数量
+    static size_t treeSize(IndicatorImp* tree);
+
+    static bool nodeInTree(IndicatorImp* node, IndicatorImp* tree);
 
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
@@ -419,6 +446,18 @@ inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t disc
 
 inline bool IndicatorImp::isPythonObject() const {
     return false;
+}
+
+inline IndicatorImpPtr IndicatorImp::getRightNode() const {
+    return m_right;
+}
+
+inline IndicatorImpPtr IndicatorImp::getLeftNode() const {
+    return m_left;
+}
+
+inline IndicatorImpPtr IndicatorImp::getThreeNode() const {
+    return m_three;
 }
 
 } /* namespace hku */
