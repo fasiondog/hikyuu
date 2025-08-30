@@ -86,4 +86,6 @@ void export_KQuery(py::module& m) {
     kquery.attr("HOUR4") = "HOUR4";
     kquery.attr("HOUR6") = "HOUR6";
     kquery.attr("HOUR12") = "HOUR12";
+    kquery.attr("TIMELINE") = "TIMELINE";
+    kquery.attr("TRANS") = "TRANS";
 }

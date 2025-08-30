@@ -17,6 +17,18 @@ public:
     KDataPrivatedBufferImp(const Stock& stock, const KQuery& query);
     virtual ~KDataPrivatedBufferImp();
 
+    virtual bool empty() const override {
+        return m_buffer.empty();
+    }
+
+    virtual size_t size() const override {
+        return m_buffer.size();
+    }
+
+    virtual size_t startPos() const override;
+    virtual size_t endPos() const override;
+    virtual size_t lastPos() const override;
+
     virtual size_t getPos(const Datetime& datetime) const override;
 
     virtual const KRecord& getKRecord(size_t pos) const override {
@@ -42,7 +54,7 @@ public:
     virtual DatetimeList getDatetimeList() const override;
 
 private:
-    void _getPosInStock();
+    void _getPosInStock() const;
     void _recoverForward();
     void _recoverBackward();
     void _recoverEqualForward();
@@ -51,6 +63,9 @@ private:
 
 private:
     KRecordList m_buffer;
+    mutable size_t m_start{0};
+    mutable size_t m_end{0};
+    mutable bool m_have_pos_in_stock{false};
 };
 
 typedef shared_ptr<KDataPrivatedBufferImp> KDataPrivatedBufferImpPtr;

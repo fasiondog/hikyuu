@@ -32,12 +32,14 @@ const string KQuery::HOUR2("HOUR2");
 const string KQuery::HOUR4("HOUR4");
 const string KQuery::HOUR6("HOUR6");
 const string KQuery::HOUR12("HOUR12");
-// const string KQuery::INVALID_KTYPE("Z");
+const string KQuery::TIMELINE("TIMELINE");  // 分时
+const string KQuery::TRANS("TRANS");        // 分笔
 
 // 所有基础K线类型（即有实际物理存储的K线类型）
 static std::unordered_set<string> g_all_base_ktype{
-  KQuery::MIN,  KQuery::MIN5,  KQuery::MIN15,   KQuery::MIN30,    KQuery::MIN60, KQuery::DAY,
-  KQuery::WEEK, KQuery::MONTH, KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::HOUR2};
+  KQuery::MIN,  KQuery::MIN5,  KQuery::MIN15,    KQuery::MIN30,   KQuery::MIN60,
+  KQuery::DAY,  KQuery::WEEK,  KQuery::MONTH,    KQuery::QUARTER, KQuery::HALFYEAR,
+  KQuery::YEAR, KQuery::HOUR2, KQuery::TIMELINE, KQuery::TRANS};
 
 static unordered_map<string, int32_t> g_ktype2min{
   {KQuery::MIN, 1},
@@ -55,6 +57,13 @@ static unordered_map<string, int32_t> g_ktype2min{
   {KQuery::QUARTER, 60 * 24 * 30 * 3},
   {KQuery::HALFYEAR, 60 * 24 * 30 * 6},
   {KQuery::YEAR, 60 * 24 * 365},
+
+  {KQuery::TIMELINE, 1},
+  //   {KQuery::TRANS, 1}
+};
+
+static unordered_map<string, int64_t> g_ktype2sec{
+  {KQuery::TRANS, 60 * 24 * 3},
 };
 
 // 获取所有的 KType
@@ -76,13 +85,35 @@ int32_t KQuery::getKTypeInMin(const KType& ktype) {
     auto iter = g_ktype2min.find(nktype);
     HKU_IF_RETURN(iter != g_ktype2min.end(), iter->second);
 
-    return getKTypeExtraMinutes(nktype);
+    int32_t sec = getKTypeExtraMinutes(nktype);
+    HKU_WARN_IF(sec <= 0, "Can't get KType in minutes: {}, will return 0", nktype);
+    return sec;
 }
 
 int32_t KQuery::getBaseKTypeInMin(const KType& ktype) {
     string nktype(ktype);
     to_upper(nktype);
-    return g_ktype2min.at(nktype);
+    auto iter = g_ktype2min.find(nktype);
+    if (iter != g_ktype2min.end()) {
+        return iter->second;
+    }
+    HKU_WARN("Can't get base KType in minutes: {}, will return 0", nktype);
+    return 0;
+}
+
+int64_t KQuery::getKTypeInSeconds(const KType& ktype) {
+    string nktype(ktype);
+    to_upper(nktype);
+    auto iter = g_ktype2min.find(nktype);
+    HKU_IF_RETURN(iter != g_ktype2min.end(), iter->second * 60);
+
+    auto sec = getKTypeExtraMinutes(nktype) * 60;
+    if (sec <= 0) {
+        auto iter = g_ktype2sec.find(nktype);
+        HKU_IF_RETURN(iter != g_ktype2sec.end(), iter->second);
+        HKU_WARN("Can't get KType in seconds: {}, will return 0", nktype);
+    }
+    return sec;
 }
 
 bool KQuery::isValidKType(const string& ktype) {
