@@ -28,4 +28,6 @@ Indicator HKU_API INSUM(const Block& block, const KQuery& query, const Indicator
 
 Indicator HKU_API INSUM(const Block& block, const Indicator& ind, int mode, bool fill_null = true);
 
+Indicator HKU_API INSUM(const Block& block, int mode, bool fill_null);
+
 }  // namespace hku

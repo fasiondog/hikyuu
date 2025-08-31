@@ -293,6 +293,15 @@ void IInSum::_calculate(const Indicator& ind) {
     }
 }
 
+Indicator HKU_API INSUM(const Block& block, int mode, bool fill_null) {
+    IndicatorImpPtr p = make_shared<IInSum>();
+    p->setParam<Block>("block", block);
+    p->setParam<int>("mode", mode);
+    p->setParam<bool>("ignore_context", false);
+    p->setParam<bool>("fill_null", fill_null);
+    return Indicator(p);
+}
+
 Indicator HKU_API INSUM(const Block& block, const KQuery& query, const Indicator& ind, int mode,
                         bool fill_null) {
     IndicatorImpPtr p = make_shared<IInSum>();

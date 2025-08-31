@@ -1996,12 +1996,22 @@ void export_Indicator_build_in(py::module& m) {
     :param Sequence stks: stock list
     :param Query query: 统计范围)");
 
+    m.def("INSUM", py::overload_cast<const Block&, int, bool>(INSUM), py::arg("block"),
+          py::arg("mode"), py::arg("fill_null") = true);
     m.def("INSUM", py::overload_cast<const Block&, const Indicator&, int, bool>(INSUM),
           py::arg("block"), py::arg("ind"), py::arg("mode"), py::arg("fill_null") = true);
     m.def("INSUM",
           py::overload_cast<const Block&, const KQuery&, const Indicator&, int, bool>(INSUM),
           py::arg("block"), py::arg("query"), py::arg("ind"), py::arg("mode"),
           py::arg("fill_null") = true);
+    m.def(
+      "INSUM",
+      [](const py::sequence stks, int mode, bool fill_null) {
+          Block blk;
+          blk.add(python_list_to_vector<Stock>(stks));
+          return INSUM(blk, mode, fill_null);
+      },
+      py::arg("stks"), py::arg("mode"), py::arg("fill_null") = true);
     m.def(
       "INSUM",
       [](const py::sequence stks, const Indicator& ind, int mode, bool fill_null) {
