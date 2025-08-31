@@ -25,6 +25,11 @@ IPriceList::IPriceList(const PriceList& data, int in_discard) : IndicatorImp("PR
     setParam<int>("discard", in_discard);
 }
 
+IPriceList::IPriceList(size_t size, double value, int discard) {
+    setParam<PriceList>("data", PriceList(size, value));
+    setParam<int>("discard", discard);
+}
+
 IPriceList::~IPriceList() {}
 
 void IPriceList::_checkParam(const string& name) const {
@@ -104,6 +109,16 @@ Indicator HKU_API PRICELIST(const PriceList& data, const DatetimeList& ds, int d
 Indicator HKU_API PRICELIST() {
     auto p = make_shared<IPriceList>();
     return Indicator(p);
+}
+
+Indicator HKU_API PRICELIST(size_t size, double value, int discard) {
+    return make_shared<IPriceList>(size, value, discard)->calculate();
+}
+
+Indicator HKU_API PRICELIST(const DatetimeList& dates, double value, int discard) {
+    auto ret = PRICELIST(dates.size(), value, discard);
+    ret.setParam<DatetimeList>("align_date_list", dates);
+    return ret;
 }
 
 } /* namespace hku */

@@ -23,6 +23,8 @@ namespace hku {
  */
 Indicator HKU_API PRICELIST(const PriceList& data, int discard = 0);
 Indicator HKU_API PRICELIST(const PriceList& data, const DatetimeList& ds, int discard = 0);
+Indicator HKU_API PRICELIST(size_t size, double value, int discard = 0);
+Indicator HKU_API PRICELIST(const DatetimeList& dates, double value, int discard = 0);
 Indicator HKU_API PRICELIST();
 
 /**

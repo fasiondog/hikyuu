@@ -683,6 +683,16 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def(
       "PRICELIST",
+      [](const DatetimeList& dates, double value, size_t discard) {
+          return PRICELIST(dates, value, discard);
+      },
+      py::arg("dates"), py::arg("value"), py::arg("discard") = 0);
+    m.def(
+      "PRICELIST",
+      [](size_t size, double value, int discard) { return PRICELIST(size, value, discard); },
+      py::arg("size"), py::arg("value"), py::arg("discard") = 0);
+    m.def(
+      "PRICELIST",
       [](const py::object& obj = py::none(), int discard = 0,
          const py::object& pyalign_dates = py::none()) {
           if (obj.is_none()) {
