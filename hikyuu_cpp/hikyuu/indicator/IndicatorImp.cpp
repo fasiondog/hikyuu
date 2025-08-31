@@ -1673,9 +1673,8 @@ void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
     getSelfInnerNodesWithInputConext(nodes);
 }
 
-void IndicatorImp::repeatALikeNodes() {
-    vector<IndicatorImpPtr> sub_nodes, tmp_nodes;
-    getAllSubNodes(sub_nodes);
+void IndicatorImp::inner_repeatALikeNodes(vector<IndicatorImpPtr> &sub_nodes) {
+    vector<IndicatorImpPtr> tmp_nodes;
     size_t total = sub_nodes.size();
     for (size_t i = 0; i < total; i++) {
         const auto &cur = sub_nodes[i];
@@ -1720,6 +1719,52 @@ void IndicatorImp::repeatALikeNodes() {
                 }
             }
         }
+    }
+}
+
+void IndicatorImp::repeatALikeNodes() {
+    vector<IndicatorImpPtr> sub_nodes;
+    getAllSubNodes(sub_nodes);
+    inner_repeatALikeNodes(sub_nodes);
+    repeatSeparateKTypeLeafALikeNodes();
+}
+
+void IndicatorImp::repeatSeparateKTypeLeafALikeNodes() {
+    // 需要再上层节点已完成优化后，重新获取所有子节点
+    vector<IndicatorImpPtr> all_nodes;
+    getAllSubNodes(all_nodes);
+
+    std::unordered_set<IndicatorImp *> special_set;
+    std::unordered_map<string, vector<IndicatorImpPtr>> special_nodes;
+    for (const auto &node : all_nodes) {
+        if (node->isLeaf() && node->haveParam("ktype")) {
+            if (special_set.find(node.get()) == special_set.end()) {
+                special_set.insert(node.get());
+                string ktype = node->getParam<string>("ktype");
+                auto iter = special_nodes.find(ktype);
+                if (iter == special_nodes.end()) {
+                    special_nodes.insert(std::make_pair(ktype, vector<IndicatorImpPtr>{node}));
+                } else {
+                    iter->second.push_back(node);
+                }
+            }
+        }
+    }
+
+    vector<IndicatorImpPtr> can_merge_nodes;
+    for (const auto &item : special_nodes) {
+        const auto &nodes = item.second;
+        size_t total = nodes.size();
+        // HKU_INFO("first ktype: {}, total: {}", item.first, total);
+        if (total <= 1) {
+            continue;
+        }
+
+        can_merge_nodes.clear();
+        for (size_t i = 0; i < total; i++) {
+            nodes[i]->getSeparateKTypeLeafSubNodes(can_merge_nodes);
+        }
+        inner_repeatALikeNodes(can_merge_nodes);
     }
 }
 

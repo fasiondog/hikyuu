@@ -196,17 +196,21 @@ public:
     void printAllSubTrees(bool show_long_name = false) const;
     void printLeaves(bool show_long_name = false) const;
 
-    /** 特殊指标需自己实现 selfAlike 函数的, needSelfAlikeCompare 应返回 true */
+    /* 特殊指标需自己实现 selfAlike 函数的, needSelfAlikeCompare 应返回 true */
     virtual bool needSelfAlikeCompare() const noexcept {
         return false;
     }
 
-    /** 特殊指标需自己实现 selfAlike 函数，返回true表示两个指标等效 */
+    // 特殊指标需自己实现 selfAlike 函数，返回true表示两个指标等效
     virtual bool selfAlike(const IndicatorImp& other) const noexcept {
         return false;
     }
 
+    // 使用输入上下文的特殊指标获取内部节点，以便合入指标树优化
     virtual void getSelfInnerNodesWithInputConext(vector<IndicatorImpPtr>& nodes) const {}
+
+    // 指定独立 ktype 的叶子节点重载获取内部子节点
+    virtual void getSeparateKTypeLeafSubNodes(vector<IndicatorImpPtr>& nodes) const {}
 
 private:
     void initContext();
@@ -227,7 +231,11 @@ private:
     void execute_weave();
     void execute_if();
 
+    static void inner_repeatALikeNodes(vector<IndicatorImpPtr>& sub_nodes);
     void repeatALikeNodes();
+    void repeatSeparateKTypeLeafALikeNodes();
+
+    void generateSpecialLeafSet();
 
     void _clearBuffer();
 
