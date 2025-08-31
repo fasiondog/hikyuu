@@ -22,6 +22,12 @@ public:
     ICval(double value, size_t discard);
     virtual ~ICval();
     virtual void _checkParam(const string& name) const override;
+
+    virtual bool needSelfAlikeCompare() const noexcept override {
+        return true;
+    }
+
+    virtual bool selfAlike(const IndicatorImp& other) const noexcept override;
 };
 
 } /* namespace hku */

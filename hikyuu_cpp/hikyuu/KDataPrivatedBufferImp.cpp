@@ -15,12 +15,7 @@ KDataPrivatedBufferImp::KDataPrivatedBufferImp() : KDataImp() {}
 
 KDataPrivatedBufferImp::KDataPrivatedBufferImp(const Stock& stock, const KQuery& query)
 : KDataImp(stock, query) {
-    if (m_stock.isNull()) {
-        return;
-    }
-
     m_buffer = m_stock.getKRecordList(query);
-    m_buffer.resize(m_size);
 
     // 不支持复权时，直接返回
     if (query.recoverType() == KQuery::NO_RECOVER)
@@ -70,6 +65,36 @@ DatetimeList KDataPrivatedBufferImp::getDatetimeList() const {
         result.emplace_back(record.datetime);
     }
     return result;
+}
+
+size_t KDataPrivatedBufferImp::startPos() const {
+    if (!m_have_pos_in_stock) {
+        _getPosInStock();
+    }
+    return m_start;
+}
+
+size_t KDataPrivatedBufferImp::endPos() const {
+    if (!m_have_pos_in_stock) {
+        _getPosInStock();
+    }
+    return m_end;
+}
+
+size_t KDataPrivatedBufferImp::lastPos() const {
+    if (!m_have_pos_in_stock) {
+        _getPosInStock();
+    }
+    return m_end == 0 ? 0 : m_end - 1;
+}
+
+void KDataPrivatedBufferImp::_getPosInStock() const {
+    bool sucess = m_stock.getIndexRange(m_query, m_start, m_end);
+    if (!sucess) {
+        m_start = 0;
+        m_end = 0;
+    }
+    m_have_pos_in_stock = true;
 }
 
 size_t KDataPrivatedBufferImp::getPos(const Datetime& datetime) const {

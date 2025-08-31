@@ -35,6 +35,8 @@ public:
     virtual bool getStockExtraIndexRange(const Stock& stk, const KQuery& query, size_t& out_start,
                                          size_t& out_end) = 0;
 
+    virtual KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query) = 0;
+
     virtual std::shared_ptr<arrow::Table> getIndicatorsViewParallel(const StockList& stks,
                                                                     const IndicatorList& inds,
                                                                     const KQuery& query,

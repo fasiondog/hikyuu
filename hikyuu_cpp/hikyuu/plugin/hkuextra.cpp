@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/KDataPrivatedBufferImp.h"
 #include "interface/plugins.h"
 #include "hkuextra.h"
 
@@ -67,6 +68,13 @@ size_t getStockExtraCount(const Stock& stk, const string& ktype) {
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
     HKU_IF_RETURN(!plugin, 0);
     return plugin->getStockExtraCount(stk, ktype);
+}
+
+KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
+    HKU_IF_RETURN(!plugin, make_shared<KDataPrivatedBufferImp>(stk, query));
+    return plugin->getKDataImp(stk, query);
 }
 
 bool getStockExtraIndexRange(const Stock& stk, const KQuery& query, size_t& out_start,

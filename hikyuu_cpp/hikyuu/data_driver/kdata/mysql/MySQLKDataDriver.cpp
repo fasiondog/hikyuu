@@ -36,7 +36,14 @@ bool MySQLKDataDriver::_init() {
 
 string MySQLKDataDriver ::_getTableName(const string& market, const string& code,
                                         const KQuery::KType& ktype) {
-    string table = fmt::format("`{}_{}`.`{}`", market, KQuery::getKTypeName(ktype), code);
+    string table;
+    if (ktype == KQuery::TIMELINE) {
+        table = fmt::format("`{}_time`.`{}`", market, code);
+    } else if (ktype == KQuery::TRANS) {
+        table = fmt::format("`{}_trans`.`{}`", market, code);
+    } else {
+        table = fmt::format("`{}_{}`.`{}`", market, KQuery::getKTypeName(ktype), code);
+    }
     to_lower(table);
     return table;
 }
@@ -44,7 +51,29 @@ string MySQLKDataDriver ::_getTableName(const string& market, const string& code
 KRecordList MySQLKDataDriver::getKRecordList(const string& market, const string& code,
                                              const KQuery& query) {
     KRecordList result;
-    if (query.queryType() == KQuery::INDEX) {
+    auto kType = query.kType();
+    if (kType == KQuery::TIMELINE) {
+        auto timeline = getTimeLineList(market, code, query);
+        size_t total = timeline.size();
+        result.resize(total);
+        for (size_t i = 0; i < total; ++i) {
+            result[i].datetime = timeline[i].datetime;
+            result[i].closePrice = timeline[i].price;
+            result[i].transCount = timeline[i].vol;
+        }
+
+    } else if (kType == KQuery::TRANS) {
+        auto trans = getTransList(market, code, query);
+        size_t total = trans.size();
+        result.resize(total);
+        for (size_t i = 0; i < total; ++i) {
+            result[i].datetime = trans[i].datetime;
+            result[i].closePrice = trans[i].price;
+            result[i].transCount = trans[i].vol;
+            result[i].openPrice = trans[i].direct;
+        }
+
+    } else if (query.queryType() == KQuery::INDEX) {
         result = _getKRecordList(market, code, query.kType(), query.start(), query.end());
     } else {
         result =
@@ -161,12 +190,19 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
 
     string tablename = _getTableName(market, code, query.kType());
     try {
+        uint64_t start, end;
+        if (query.kType() == KQuery::TRANS) {
+            start = query.startDatetime().ymdhms();
+            end = query.endDatetime().ymdhms();
+        } else {
+            start = query.startDatetime().ymdhm();
+            end = query.endDatetime().ymdhm();
+        }
         string sql = fmt::format(
-          "select sum(CASE WHEN date<{} THEN 1 ELSE 0 END) AS startix, sum(CASE WHEN date<{} THEN "
-          "1 ELSE 0 END) AS endix from {}",
-          query.startDatetime().number(), query.endDatetime().number(), tablename);
+          "select COUNT(CASE WHEN date<{} THEN 1 END) AS startix, COUNT(CASE WHEN date<{} THEN 1 "
+          "END) AS endix from {}",
+          start, end, tablename);
         SQLStatementPtr st = m_connect->getStatement(sql);
-
         st->exec();
         if (st->moveNext()) {
             st->getColumn(0, out_start, out_end);

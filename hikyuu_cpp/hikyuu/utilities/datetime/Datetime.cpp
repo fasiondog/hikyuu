@@ -306,7 +306,7 @@ uint64_t Datetime::ticks() const noexcept {
     }
 }
 
-int64_t Datetime::timestamp() const noexcept {
+uint64_t Datetime::timestamp() const noexcept {
     try {
         HKU_IF_RETURN(isNull(), Null<uint64_t>());
         TimeDelta d = (*this) - Datetime(1970, 1, 1);
@@ -320,7 +320,7 @@ int64_t Datetime::timestamp() const noexcept {
     }
 }
 
-int64_t Datetime::timestampUTC() const noexcept {
+uint64_t Datetime::timestampUTC() const noexcept {
     try {
         HKU_IF_RETURN(isNull(), Null<uint64_t>());
         TimeDelta d = (*this) - Datetime(1970, 1, 1) - UTCOffset();

@@ -10,6 +10,7 @@
 #include "KDataSharedBufferImp.h"
 #include "KDataPrivatedBufferImp.h"
 #include "indicator/crt/KDATA.h"
+#include "plugin/hkuextra.h"
 #include <fstream>
 
 namespace hku {
@@ -46,12 +47,14 @@ string KData::toString() const {
 KData::KData() : m_imp(ms_null_kdata_imp) {}
 
 KData::KData(const Stock& stock, const KQuery& query) {
-    if (query.recoverType() == KQuery::NO_RECOVER && KQuery::isBaseKType(query.kType()) &&
-        !stock.isNull() && stock.isBuffer(query.kType())) {
+    // 在重加载或setKDateList时，已存在KData存在数据无效风险（但无内存访问问题)
+    if (stock.isNull()) {
+        m_imp = ms_null_kdata_imp;
+    } else if (query.recoverType() == KQuery::NO_RECOVER && stock.isBuffer(query.kType())) {
         // 当Stock已缓存了该类型的K线数据，且不进行复权
         m_imp = make_shared<KDataSharedBufferImp>(stock, query);
     } else {
-        m_imp = make_shared<KDataPrivatedBufferImp>(stock, query);
+        m_imp = getKDataImp(stock, query);
     }
 }
 

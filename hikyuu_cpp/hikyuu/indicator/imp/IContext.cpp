@@ -69,6 +69,11 @@ KData IContext::getContextKdata() const {
     return m_ref_ind.getContext();
 }
 
+bool IContext::selfAlike(const IndicatorImp& other) const noexcept {
+    const auto& other_ctx = dynamic_cast<const IContext&>(other);
+    return m_ref_ind.getImp()->alike(*other_ctx.m_ref_ind.getImp());
+}
+
 void IContext::_calculate(const Indicator& ind) {
     HKU_ASSERT(isLeaf());
 

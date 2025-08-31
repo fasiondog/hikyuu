@@ -32,8 +32,8 @@ TEST_CASE("test_KData_equal") {
     Stock stk1, stk2;
     k1 = stk1.getKData(KQueryByIndex(0, 10, KQuery::DAY));
     CHECK_UNARY(stk1.isNull());
-    CHECK_NE(k1.getQuery(), null_k.getQuery());
     CHECK_EQ(k1, null_k);
+    CHECK_UNARY(k1.empty());
 
     /** @arg stk相同且非空 KData 比较 */
     stk1 = getStock("sh000001");

@@ -97,6 +97,10 @@ void export_IndicatorImp(py::module& m) {
       .def("is_leaf", &IndicatorImp::isLeaf)
       .def("is_serial", &IndicatorImp::isSerial)
       .def("contains", &IndicatorImp::contains)
+      .def("print_tree", &IndicatorImp::printTree, py::arg("show_long_name") = false)
+      .def("print_all_sub_trees", &IndicatorImp::printAllSubTrees,
+           py::arg("show_long_name") = false)
+      .def("print_leaves", &IndicatorImp::printLeaves, py::arg("show_long_name") = false)
 
         DEF_PICKLE(IndicatorImpPtr);
 }
