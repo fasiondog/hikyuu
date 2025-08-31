@@ -45,6 +45,15 @@ bool Indicator2InImp::selfAlike(const IndicatorImp& other) const noexcept {
     return m_ref_ind.getImp()->alike(*other_ctx.m_ref_ind.getImp());
 }
 
+void Indicator2InImp::getSelfInnerNodesWithInputConext(vector<IndicatorImpPtr>& nodes) const {
+    vector<IndicatorImpPtr> self_nodes;
+    m_ref_ind.getImp()->getAllSubNodes(self_nodes);
+    nodes.emplace_back(m_ref_ind.getImp());
+    for (auto& node : self_nodes) {
+        nodes.emplace_back(node);
+    }
+}
+
 Indicator Indicator2InImp::prepare(const Indicator& ind) {
     auto k = getContext();
     m_ref_ind.setContext(k);

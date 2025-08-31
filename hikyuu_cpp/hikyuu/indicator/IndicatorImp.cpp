@@ -1669,6 +1669,8 @@ void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
         nodes.push_back(m_right);
         m_right->getAllSubNodes(nodes);
     }
+
+    getSelfInnerNodesWithInputConext(nodes);
 }
 
 void IndicatorImp::repeatALikeNodes() {

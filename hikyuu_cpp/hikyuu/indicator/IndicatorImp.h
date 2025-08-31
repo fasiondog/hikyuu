@@ -95,12 +95,6 @@ public:
     /** 以Indicator的方式获取指定的输出集，该方式包含了discard的信息 */
     IndicatorImpPtr getResult(size_t result_num);
 
-    /** 判断是否和另一个指标等效，即计算效果相同 */
-    bool alike(const IndicatorImp& other) const;
-
-    /** 判断指标公式中是否包含指定名称的指标（特殊用途） */
-    bool contains(const string& name) const;
-
     /**
      * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数,
      * 未做越界保护
@@ -152,26 +146,6 @@ public:
     typedef std::map<string, IndicatorImpPtr> ind_param_map_t;
     const ind_param_map_t& getIndParams() const;
 
-    value_t* data(size_t result_idx = 0);
-    value_t const* data(size_t result_idx = 0) const;
-
-    IndicatorImpPtr getRightNode() const;
-    IndicatorImpPtr getLeftNode() const;
-    IndicatorImpPtr getThreeNode() const;
-    void printTree(bool show_long_name = false) const;
-    void printAllSubTrees(bool show_long_name = false) const;
-    void printLeaves(bool show_long_name = false) const;
-
-    /** 特殊指标需自己实现 selfAlike 函数的, needSelfAlikeCompare 应返回 true */
-    virtual bool needSelfAlikeCompare() const noexcept {
-        return false;
-    }
-
-    /** 特殊指标需自己实现 selfAlike 函数，返回true表示两个指标等效 */
-    virtual bool selfAlike(const IndicatorImp& other) const noexcept {
-        return false;
-    }
-
     // ===================
     //  子类接口
     // ===================
@@ -199,6 +173,41 @@ public:
 
     virtual void _dyn_calculate(const Indicator&);
 
+public:
+    // ===================
+    //  内部特殊用途公共接口
+    // ===================
+
+    /** 判断是否和另一个指标等效，即计算效果相同 */
+    bool alike(const IndicatorImp& other) const;
+
+    /** 判断指标公式中是否包含指定名称的指标（特殊用途） */
+    bool contains(const string& name) const;
+
+    value_t* data(size_t result_idx = 0);
+    value_t const* data(size_t result_idx = 0) const;
+
+    void getAllSubNodes(vector<IndicatorImpPtr>& nodes) const;
+
+    IndicatorImpPtr getRightNode() const;
+    IndicatorImpPtr getLeftNode() const;
+    IndicatorImpPtr getThreeNode() const;
+    void printTree(bool show_long_name = false) const;
+    void printAllSubTrees(bool show_long_name = false) const;
+    void printLeaves(bool show_long_name = false) const;
+
+    /** 特殊指标需自己实现 selfAlike 函数的, needSelfAlikeCompare 应返回 true */
+    virtual bool needSelfAlikeCompare() const noexcept {
+        return false;
+    }
+
+    /** 特殊指标需自己实现 selfAlike 函数，返回true表示两个指标等效 */
+    virtual bool selfAlike(const IndicatorImp& other) const noexcept {
+        return false;
+    }
+
+    virtual void getSelfInnerNodesWithInputConext(vector<IndicatorImpPtr>& nodes) const {}
+
 private:
     void initContext();
     bool needCalculate();
@@ -218,7 +227,6 @@ private:
     void execute_weave();
     void execute_if();
 
-    void getAllSubNodes(vector<IndicatorImpPtr>& nodes) const;
     void repeatALikeNodes();
 
     void _clearBuffer();
