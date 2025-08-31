@@ -42,14 +42,18 @@ Indicator HKU_API WITHKTYPE(const Indicator& ind, const KQuery::KType& ktype, bo
     return getExtIndicator("WITHKTYPE", ind, params);
 }
 
-Indicator HKU_API RANK(const Block& block, const Indicator& ref_ind, int mode, bool fill_null,
-                       const string& market) {
+Indicator HKU_API RANK(const Block& block, int mode, bool fill_null, const string& market) {
     Parameter params;
     params.set<Block>("block", block);
     params.set<int>("mode", mode);
     params.set<bool>("fill_null", fill_null);
     params.set<string>("market", market);
-    return getExtIndicator("RANK", ref_ind, params);
+    return getExtIndicator("RANK", params);
+}
+
+Indicator HKU_API RANK(const Block& block, const Indicator& ref_ind, int mode, bool fill_null,
+                       const string& market) {
+    return RANK(block, mode, fill_null, market)(ref_ind);
 }
 
 }  // namespace hku

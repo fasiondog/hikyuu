@@ -22,6 +22,15 @@ class IDropna : public IndicatorImp {
 public:
     IDropna();
     virtual ~IDropna();
+
+    virtual bool needSelfAlikeCompare() const noexcept override {
+        return true;
+    }
+
+    // 禁止子节点合并
+    virtual bool selfAlike(const IndicatorImp& other) const noexcept override {
+        return false;
+    }
 };
 
 } /* namespace hku */
