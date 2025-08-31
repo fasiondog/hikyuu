@@ -40,6 +40,11 @@ IndicatorImpPtr Indicator2InImp::_clone() {
     return p;
 }
 
+bool Indicator2InImp::selfAlike(const IndicatorImp& other) const noexcept {
+    const auto& other_ctx = dynamic_cast<const Indicator2InImp&>(other);
+    return m_ref_ind.getImp()->alike(*other_ctx.m_ref_ind.getImp());
+}
+
 Indicator Indicator2InImp::prepare(const Indicator& ind) {
     auto k = getContext();
     m_ref_ind.setContext(k);
