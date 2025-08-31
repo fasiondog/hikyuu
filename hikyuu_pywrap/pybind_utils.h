@@ -57,7 +57,7 @@ std::vector<T> python_list_to_vector(const py::sequence& obj) {
     auto total = len(obj);
     std::vector<T> vect(total);
     for (auto i = 0; i < total; ++i) {
-        vect[i] = obj[i].cast<T>();
+        vect[i] = py::cast<T>(obj[i]);
     }
     return vect;
 }
