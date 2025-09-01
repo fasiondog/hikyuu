@@ -12,28 +12,70 @@
 using namespace hku;
 namespace py = pybind11;
 
+static py::object get_market_view_pyarrow(const py::sequence& stks, const Datetime& date,
+                                          const string& market) {
+    StockList stks_list;
+    if (py::isinstance<StockManager>(stks)) {
+        stks_list = StockManager::instance().getStockList();
+    } else if (py::isinstance<Block>(stks)) {
+        stks_list = stks.cast<Block&>().getStockList();
+    } else {
+        stks_list = python_list_to_vector<Stock>(stks);
+    }
+    std::shared_ptr<arrow::Table> view;
+    if (date.isNull()) {
+        view = getMarketView(stks_list, market);
+    } else {
+        view = getMarketView(stks_list, date, market);
+    }
+    HKU_ASSERT(view);
+    PyObject* raw_obj = arrow::py::wrap_table(view);
+    HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+    return py::reinterpret_steal<py::object>(raw_obj);
+}
+
+static py::object get_inds_view_pyarrow1(const py::sequence& stks, const IndicatorList& inds,
+                                         const KQuery& query, const string& market) {
+    StockList stock_list;
+    if (py::isinstance<StockManager>(stks)) {
+        stock_list = StockManager::instance().getStockList();
+    } else if (py::isinstance<Block>(stks)) {
+        stock_list = stks.cast<Block>().getStockList();
+    } else {
+        stock_list = python_list_to_vector<Stock>(stks);
+    }
+    auto view = getIndicatorsView(stock_list, inds, query, market);
+    HKU_ASSERT(view);
+    PyObject* raw_obj = arrow::py::wrap_table(view);
+    HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+    return py::reinterpret_steal<py::object>(raw_obj);
+}
+
+static py::object get_inds_view_pyarrow2(const py::sequence& stks, const IndicatorList& inds,
+                                         const Datetime& date, size_t cal_len,
+                                         const KQuery::KType& ktype, const string& market) {
+    StockList stks_list;
+    if (py::isinstance<StockManager>(stks)) {
+        stks_list = StockManager::instance().getStockList();
+    } else if (py::isinstance<Block>(stks)) {
+        stks_list = stks.cast<Block&>().getStockList();
+    } else {
+        stks_list = python_list_to_vector<Stock>(stks);
+    }
+    auto view = getIndicatorsView(stks_list, inds, date, cal_len, ktype, market);
+    HKU_ASSERT(view);
+    PyObject* raw_obj = arrow::py::wrap_table(view);
+    HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
+    return py::reinterpret_steal<py::object>(raw_obj);
+}
+
 void export_arrow_views(py::module& m) {
+    m.def("get_market_view_pyarrow", get_market_view_pyarrow, py::arg("stks"),
+          py::arg("date") = Datetime(), py::arg("market") = "SH");
     m.def(
       "get_market_view",
       [](const py::sequence& stks, const Datetime& date, const string& market) {
-          StockList stks_list;
-          if (py::isinstance<StockManager>(stks)) {
-              stks_list = StockManager::instance().getStockList();
-          } else if (py::isinstance<Block>(stks)) {
-              stks_list = stks.cast<Block&>().getStockList();
-          } else {
-              stks_list = python_list_to_vector<Stock>(stks);
-          }
-          std::shared_ptr<arrow::Table> view;
-          if (date.isNull()) {
-              view = getMarketView(stks_list, market);
-          } else {
-              view = getMarketView(stks_list, date, market);
-          }
-          HKU_ASSERT(view);
-          PyObject* raw_obj = arrow::py::wrap_table(view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          auto t = py::reinterpret_steal<py::object>(raw_obj);
+          auto t = get_market_view_pyarrow(stks, date, market);
           return t.attr("to_pandas")();
       },
       py::arg("stks"), py::arg("date") = Datetime(), py::arg("market") = "SH",
@@ -50,23 +92,16 @@ void export_arrow_views(py::module& m) {
     :return: 指定股票列表最后行情数据
     :rtype: pandas.DataFrame)");
 
+    m.def("get_inds_view_pyarrow", get_inds_view_pyarrow1, py::arg("stks"), py::arg("inds"),
+          py::arg("query"), py::arg("market") = "SH");
+    m.def("get_inds_view_pyarrow", get_inds_view_pyarrow2, py::arg("stks"), py::arg("inds"),
+          py::arg("date"), py::arg("cal_len") = 100, py::arg("ktype") = KQuery::DAY,
+          py::arg("market") = "SH");
     m.def(
       "get_inds_view",
       [](const py::sequence& stks, const IndicatorList& inds, const KQuery& query,
          const string& market) {
-          StockList stock_list;
-          if (py::isinstance<StockManager>(stks)) {
-              stock_list = StockManager::instance().getStockList();
-          } else if (py::isinstance<Block>(stks)) {
-              stock_list = stks.cast<Block>().getStockList();
-          } else {
-              stock_list = python_list_to_vector<Stock>(stks);
-          }
-          auto view = getIndicatorsView(stock_list, inds, query, market);
-          HKU_ASSERT(view);
-          PyObject* raw_obj = arrow::py::wrap_table(view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          auto t = py::reinterpret_steal<py::object>(raw_obj);
+          auto t = get_inds_view_pyarrow1(stks, inds, query, market);
           return t.attr("to_pandas")();
       },
       py::arg("stks"), py::arg("inds"), py::arg("query"), py::arg("market") = "SH");
@@ -75,19 +110,7 @@ void export_arrow_views(py::module& m) {
       "get_inds_view",
       [](const py::sequence& stks, const IndicatorList& inds, const Datetime& date, size_t cal_len,
          const KQuery::KType& ktype, const string& market) {
-          StockList stks_list;
-          if (py::isinstance<StockManager>(stks)) {
-              stks_list = StockManager::instance().getStockList();
-          } else if (py::isinstance<Block>(stks)) {
-              stks_list = stks.cast<Block&>().getStockList();
-          } else {
-              stks_list = python_list_to_vector<Stock>(stks);
-          }
-          auto view = getIndicatorsView(stks_list, inds, date, cal_len, ktype, market);
-          HKU_ASSERT(view);
-          PyObject* raw_obj = arrow::py::wrap_table(view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          auto t = py::reinterpret_steal<py::object>(raw_obj);
+          auto t = get_inds_view_pyarrow2(stks, inds, date, cal_len, ktype, market);
           return t.attr("to_pandas")();
       },
       py::arg("stks"), py::arg("inds"), py::arg("date"), py::arg("cal_len") = 100,
