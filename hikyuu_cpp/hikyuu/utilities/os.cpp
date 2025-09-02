@@ -23,10 +23,15 @@
 
 #if HKU_OS_LINUX || HKU_OS_ANDROID
 #include <sys/statfs.h>
+#include <sys/sysinfo.h>
 #endif
 
 #if HKU_OS_OSX || HKU_OS_IOS
 #include <sys/mount.h>
+#include <sys/sysctl.h>
+#include <mach/mach.h>
+#include <mach/host_info.h>
+#include <mach/mach_host.h>
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
@@ -424,6 +429,72 @@ std::string HKU_UTILS_API getSystemLanguage() {
     return "";
 }
 #endif
+
+uint64_t HKU_UTILS_API getMemoryMaxSize() {
+#if HKU_OS_WINDOWS
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    if (GlobalMemoryStatusEx(&memInfo)) {
+        return static_cast<uint64_t>(memInfo.ullTotalPhys);
+    }
+    return 0;
+
+#elif HKU_OS_LINUX || HKU_OS_ANDROID
+    struct sysinfo memInfo;
+    if (sysinfo(&memInfo) == 0) {
+        return static_cast<uint64_t>(memInfo.totalram) * memInfo.mem_unit;
+    }
+    return 0;
+
+#elif HKU_OS_OSX || HKU_OS_IOS
+    int mib[2] = {CTL_HW, HW_MEMSIZE};
+    uint64_t physicalMemory;
+    size_t length = sizeof(physicalMemory);
+
+    if (sysctl(mib, 2, &physicalMemory, &length, NULL, 0) == 0) {
+        return physicalMemory;
+    }
+    return 0;
+
+#else
+    return 0;
+#endif
+}
+
+uint64_t HKU_UTILS_API getMemoryIdleSize() {
+#if HKU_OS_WINDOWS
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    if (GlobalMemoryStatusEx(&memInfo)) {
+        return static_cast<uint64_t>(memInfo.ullAvailPhys);
+    }
+    return 0;
+
+#elif HKU_OS_LINUX || HKU_OS_ANDROID
+    struct sysinfo memInfo;
+    if (sysinfo(&memInfo) == 0) {
+        return static_cast<uint64_t>(memInfo.freeram) * memInfo.mem_unit;
+    }
+    return 0;
+
+#elif HKU_OS_OSX || HKU_OS_IOS
+    mach_msg_type_number_t count = HOST_VM_INFO_COUNT;
+    vm_statistics_data_t vmstat;
+    mach_port_t hostPort = mach_host_self();
+
+    if (host_statistics(hostPort, HOST_VM_INFO, (host_info_t)&vmstat, &count) == KERN_SUCCESS) {
+        // 计算空闲内存：空闲页 + 非活跃页
+        uint64_t pageSize = static_cast<uint64_t>(vm_page_size);
+        uint64_t freeMemory =
+          static_cast<uint64_t>(vmstat.free_count + vmstat.inactive_count) * pageSize;
+        return freeMemory;
+    }
+    return 0;
+
+#else
+    return 0;
+#endif
+}
 
 }  // namespace hku
 
