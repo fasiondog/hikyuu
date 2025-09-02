@@ -285,9 +285,9 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
     }
 
     if (!dates.empty()) {
-        KQuery new_query =
-          KQueryByDate(dates.front(), dates.back() + Minutes(KQuery::getKTypeInMin(query.kType())),
-                       query.kType(), query.recoverType());
+        KQuery new_query = KQueryByDate(
+          dates.front(), dates.back() + Seconds(KQuery::getKTypeInSeconds(query.kType())),
+          query.kType(), query.recoverType());
         vector<int64_t> timestamps(dates.size());
         for (size_t i = 0; i < dates.size(); ++i) {
             timestamps[i] = dates[i].timestamp() * 1000LL;
@@ -371,7 +371,8 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
     size_t start_pos, end_pos;
 
     bool success = market_stk.getIndexRange(
-      KQueryByDate(date, date + Minutes(KQuery::getKTypeInMin(ktype)), ktype), start_pos, end_pos);
+      KQueryByDate(date, date + Seconds(KQuery::getKTypeInSeconds(ktype)), ktype), start_pos,
+      end_pos);
 
     if (success) {
         if (start_pos > cal_len) {
@@ -381,7 +382,7 @@ std::shared_ptr<arrow::Table> HKU_API getIndicatorsView(const StockList& stks,
         DatetimeList dates = market_stk.getDatetimeList(KQueryByIndex(start_pos, end_pos, ktype));
         if (!dates.empty() && date == dates.back()) {
             KQuery query =
-              KQueryByDate(dates.front(), date + Minutes(KQuery::getKTypeInMin(ktype)), ktype);
+              KQueryByDate(dates.front(), date + Seconds(KQuery::getKTypeInSeconds(ktype)), ktype);
 
             for (const auto& stk : stks) {
                 auto kdata = stk.getKData(query);

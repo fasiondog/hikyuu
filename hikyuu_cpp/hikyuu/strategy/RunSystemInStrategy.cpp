@@ -84,9 +84,9 @@ StrategyPtr HKU_API crtSysStrategy(const SYSPtr& sys, const string& stk_market_c
                                                  vector<KQuery::KType>{ktype},
                                                  unordered_map<string, int>{}, name, config_file);
 
-    int32_t m = KQuery::getKTypeInMin(ktype);
-    if (m < KQuery::getKTypeInMin(KQuery::DAY)) {
-        stg->runDaily(std::move(func), Minutes(m), "SH");
+    int32_t m = KQuery::getKTypeInSeconds(ktype);
+    if (m < KQuery::getKTypeInSeconds(KQuery::DAY)) {
+        stg->runDaily(std::move(func), Seconds(m), "SH");
     } else {
         stg->runDailyAt(std::move(func), TimeDelta(0, 14, 50));
     }
