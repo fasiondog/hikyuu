@@ -63,17 +63,13 @@ private:                                                          \
 #define INDICATOR2IN_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define INDICATOR2IN_IMP(classname)                                             \
-public:                                                                         \
-    virtual void _calculate(const Indicator& data) override;                    \
-    virtual IndicatorImpPtr _clone() override {                                 \
-        auto p = make_shared<classname>();                                      \
-        p->m_ref_ind = m_ref_ind.clone();                                       \
-        return p;                                                               \
-    }                                                                           \
-    virtual bool selfAlike(const IndicatorImp& other) const noexcept override { \
-        const auto& other_ctx = dynamic_cast<const classname&>(other);          \
-        return m_ref_ind.getImp()->alike(*other_ctx.m_ref_ind.getImp());        \
+#define INDICATOR2IN_IMP(classname)                          \
+public:                                                      \
+    virtual void _calculate(const Indicator& data) override; \
+    virtual IndicatorImpPtr _clone() override {              \
+        auto p = make_shared<classname>();                   \
+        p->m_ref_ind = m_ref_ind.clone();                    \
+        return p;                                            \
     }
 
 }  // namespace hku
