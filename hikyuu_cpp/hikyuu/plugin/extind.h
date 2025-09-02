@@ -149,4 +149,13 @@ Indicator HKU_API RANK(const Block& block, const Indicator& ref_ind, int mode = 
 Indicator HKU_API RANK(const Block& block, int mode = 0, bool fill_null = true,
                        const string& market = "SH");
 
+/**
+ * @brief 聚合其他K线周期均值，聚合计算指定K线类型数据均值到以上下文中的K线周期
+ * @param ktype 指定K线周期
+ * @param fill_null 是否填充null数据
+ * @return Indicator
+ */
+Indicator HKU_API AGG_MEAN(const KQuery::KType& ktype = KQuery::MIN, bool fill_null = false);
+Indicator HKU_API AGG_MEAN(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,
+                           bool fill_null = false);
 }  // namespace hku

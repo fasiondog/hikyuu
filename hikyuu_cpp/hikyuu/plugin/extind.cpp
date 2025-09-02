@@ -56,4 +56,18 @@ Indicator HKU_API RANK(const Block& block, const Indicator& ref_ind, int mode, b
     return RANK(block, mode, fill_null, market)(ref_ind);
 }
 
+Indicator HKU_API AGG_MEAN(const KQuery::KType& ktype, bool fill_null) {
+    Parameter params;
+    params.set<string>("ktype", ktype);
+    params.set<bool>("fill_null", fill_null);
+    return getExtIndicator("AGG_MEAN", params);
+}
+
+Indicator HKU_API AGG_MEAN(const Indicator& ind, const KQuery::KType& ktype, bool fill_null) {
+    Parameter params;
+    params.set<string>("ktype", ktype);
+    params.set<bool>("fill_null", fill_null);
+    return getExtIndicator("AGG_MEAN", ind, params);
+}
+
 }  // namespace hku

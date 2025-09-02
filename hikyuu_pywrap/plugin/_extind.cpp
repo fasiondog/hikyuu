@@ -220,4 +220,9 @@ void export_extend_Indicator(py::module& m) {
     :param market: 板块所属市场
     :return: 指标值在指定板块中的排名
     :rtype: Indicator)");
+
+    m.def("AGG_MEAN", py::overload_cast<const KQuery::KType&, bool>(&AGG_MEAN),
+          py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false);
+    m.def("AGG_MEAN", py::overload_cast<const Indicator&, const KQuery::KType&, bool>(&AGG_MEAN),
+          py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false);
 }
