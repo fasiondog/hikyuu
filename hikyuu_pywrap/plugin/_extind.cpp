@@ -8,11 +8,13 @@
 #include "hikyuu/plugin/extind.h"
 #include "../pybind_utils.h"
 
-#define PY_AGG_FUNC_DEFINE(agg_func)                                                             \
-    m.def(#agg_func, py::overload_cast<const KQuery::KType&, bool>(&agg_func),                   \
-          py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false);                         \
-    m.def(#agg_func, py::overload_cast<const Indicator&, const KQuery::KType&, bool>(&agg_func), \
-          py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false);
+#define PY_AGG_FUNC_DEFINE(agg_func)                                                          \
+    m.def(#agg_func, py::overload_cast<const KQuery::KType&, bool, int>(&agg_func),           \
+          py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1); \
+    m.def(#agg_func,                                                                          \
+          py::overload_cast<const Indicator&, const KQuery::KType&, bool, int>(&agg_func),    \
+          py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,       \
+          py::arg("unit") = 1);
 
 void export_extend_Indicator(py::module& m) {
     m.def("WITHKTYPE", py::overload_cast<const KQuery::KType&, bool>(WITHKTYPE), py::arg("ktype"),
@@ -229,4 +231,7 @@ void export_extend_Indicator(py::module& m) {
 
     PY_AGG_FUNC_DEFINE(AGG_MEAN)
     PY_AGG_FUNC_DEFINE(AGG_COUNT)
+    PY_AGG_FUNC_DEFINE(AGG_SUM)
+    PY_AGG_FUNC_DEFINE(AGG_MAX)
+    PY_AGG_FUNC_DEFINE(AGG_MIN)
 }

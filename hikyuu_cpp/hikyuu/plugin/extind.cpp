@@ -58,5 +58,8 @@ Indicator HKU_API RANK(const Block& block, const Indicator& ref_ind, int mode, b
 
 AGG_FUNC_IMP(AGG_MEAN)
 AGG_FUNC_IMP(AGG_COUNT)
+AGG_FUNC_IMP(AGG_SUM)
+AGG_FUNC_IMP(AGG_MAX)
+AGG_FUNC_IMP(AGG_MIN)
 
 }  // namespace hku
