@@ -165,6 +165,21 @@
 * :py:func:`VIGOR` - 亚历山大.艾尔德力度指数
 
 
+**聚合指标**
+
+* :py:func:`AGG_COUNT` - [VIP]聚合函数: 非空值计数
+* :py:func:`AGG_MAD` - [VIP]聚合函数: 平均绝对偏差
+* :py:func:`AGG_MAX` - [VIP]聚合函数: 最大值
+* :py:func:`AGG_MIN` - [VIP]聚合函数: 最大值
+* :py:func:`AGG_MEAN` - [VIP]聚合函数: 平均值
+* :py:func:`AGG_MEDIAN` - [VIP]聚合函数: 中位数
+* :py:func:`AGG_PROD` - [VIP]聚合函数: 乘积
+* :py:func:`AGG_SUM` - [VIP]聚合函数: 总和
+* :py:func:`AGG_STD` - [VIP]聚合函数: 标准差
+* :py:func:`AGG_VAR` - [VIP]聚合函数: 方差
+* :py:func:`AGG_QUANTILE` - [VIP]聚合函数: 分位数
+
+
 **时间指标**
 
 * :py:func:`DATE` - 取得该周期从1900以来的年月日

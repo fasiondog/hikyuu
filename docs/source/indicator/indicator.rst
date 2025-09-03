@@ -39,6 +39,66 @@
     :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
     :rtype: Indicator
 
+.. py:function:: AGG_COUNT
+
+    聚合函数: 非空值计数, 可参考 :func:`AGG_STD`   
+
+.. py:function:: AGG_MAD
+
+    聚合函数: 平均绝对偏差, 可参考 :func:`AGG_STD`
+
+.. py:function:: AGG_MAX
+
+    聚合函数: 最大值, 可参考 :func:`AGG_STD`
+
+.. py:function:: AGG_MEAN
+
+    聚合函数: 平均值, 可参考 :func:`AGG_STD`
+
+.. py:function:: AGG_MEDIAN
+
+    聚合函数: 中位数, 可参考 :func:`AGG_STD`    
+
+.. py:function:: AGG_MIN
+
+    聚合函数: 最小值, 可参考 :func:`AGG_STD`
+
+.. py:function:: AGG_PROD
+
+    聚合函数: 乘积, 可参考 :func:`AGG_STD` 
+
+.. py:function:: AGG_QUANTILE(ind[, ktype=Query.MIN, fill_null=False, unit=1, quantile=0.25])
+
+    聚合其他K线周期分位数, 可参考 AGG_STD 帮助
+
+    :param Indicator ind: 指标数据
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    :param float quantile: 分位数 (0, 1) 之间
+    :return: 指标数据
+    :rtype: Indicator     
+
+.. py:function:: AGG_STD(ind[, ktype=Query.MIN, fill_null=False, unit=1, ddof=1])
+
+    聚合其他K线周期的标准差, 如计算日线时聚合分钟线收盘价的标准差
+
+        >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
+        >>> ind = AGG_STD(CLOSE(), ktype=Query.MIN, fill_null=False, unit=1, ddof=1)
+        >>> ind(k)
+
+    :param Indicator ind: 指标数据
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    :param int ddof: 自由度(1: 样本标准差, 0: 总体标准差)
+    :return: 指标数据
+    :rtype: Indicator
+
+.. py:function:: AGG_VAR
+
+    聚合函数: 方差, 可参考 :func:`AGG_STD`
+
 
 .. py:function:: ALIGN(data, ref[, fill_null=True])
 
