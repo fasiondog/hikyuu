@@ -108,4 +108,8 @@ std::string HKU_UTILS_API getCpuArch();
 /** 获取当前系统语言名称(全部小写返回) */
 std::string HKU_UTILS_API getSystemLanguage();
 
+uint64_t HKU_UTILS_API getMemoryMaxSize();
+
+uint64_t HKU_UTILS_API getMemoryIdleSize();
+
 }  // namespace hku

@@ -21,6 +21,7 @@ class IPriceList : public IndicatorImp {
 public:
     IPriceList();
     IPriceList(const PriceList&, int discard);
+    IPriceList(size_t size, double value, int discard);
     virtual ~IPriceList();
     virtual void _checkParam(const string& name) const override;
 };

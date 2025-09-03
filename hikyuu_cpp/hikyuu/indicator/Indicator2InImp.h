@@ -11,6 +11,7 @@
 
 namespace hku {
 
+/* note: 双输入但同一上下文*/
 class Indicator2InImp : public IndicatorImp {
 public:
     Indicator2InImp();
@@ -20,6 +21,14 @@ public:
     virtual ~Indicator2InImp();
 
     virtual IndicatorImpPtr _clone() override;
+
+    virtual bool needSelfAlikeCompare() const noexcept override {
+        return true;
+    }
+
+    virtual bool selfAlike(const IndicatorImp& other) const noexcept override;
+
+    virtual void getSelfInnerNodesWithInputConext(vector<IndicatorImpPtr>& nodes) const override;
 
 protected:
     Indicator prepare(const Indicator& ind);

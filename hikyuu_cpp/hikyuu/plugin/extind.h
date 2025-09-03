@@ -146,5 +146,7 @@ inline Indicator WITHHOUR4(const Indicator& ind, bool fill_null = false) {
  */
 Indicator HKU_API RANK(const Block& block, const Indicator& ref_ind, int mode = 0,
                        bool fill_null = true, const string& market = "SH");
+Indicator HKU_API RANK(const Block& block, int mode = 0, bool fill_null = true,
+                       const string& market = "SH");
 
 }  // namespace hku

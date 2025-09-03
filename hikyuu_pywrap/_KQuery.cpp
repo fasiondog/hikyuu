@@ -36,6 +36,7 @@ void export_KQuery(py::module& m) {
       .def_static("get_base_ktype_list", &KQuery::getBaseKTypeList, "获取所有基础KType")
       .def_static("get_extra_ktype_list", &KQuery::getExtraKTypeList, "获取所有扩展KType")
       .def_static("get_ktype_in_min", &KQuery::getKTypeInMin, "获取ktype对应的分钟数")
+      .def_static("get_ktype_in_seconds", &KQuery::getKTypeInSeconds, "获取ktype对应的秒数")
 
         DEF_PICKLE(KQuery);
 

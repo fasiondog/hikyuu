@@ -1657,4 +1657,120 @@ TEST_CASE("test_getKRecord_By_Date") {
     CHECK_EQ(result, KRecord::NullKRecord);
 }
 
+/** @par 检测点 */
+TEST_CASE("test_KData_getKData") {
+    KData k1, k2;
+
+    /** @arg k1 为 Null<KData> */
+    k2 = k1.getKData(KQuery::MIN);
+    CHECK_EQ(k2, Null<KData>());
+    k2 = k1.getKData(KQuery::WEEK);
+    CHECK_EQ(k2, Null<KData>());
+
+    /** @arg k1 长度为0 */
+    k1 = getKData("sh000001", KQueryByIndex(10000, 100010, KQuery::DAY, KQuery::FORWARD));
+    REQUIRE(k1.size() == 0);
+    k2 = k1.getKData(KQuery::MIN);
+    CHECK_UNARY(k2.empty());
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::MIN);
+    CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
+
+    /** @arg query k1 为日线，query 为索引方式，非闭合 */
+    k1 = getKData("sh000001", KQuery(-10));
+    REQUIRE(k1.size() > 0);
+
+    k2 = k1.getKData(KQuery::MIN);
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::MIN);
+    CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
+    CHECK_EQ(k2.getQuery().startDatetime(), k1[0].datetime);
+    REQUIRE(k1[0].datetime == Datetime(20111123000000));
+    CHECK_EQ(k2[0].datetime, Datetime(20111123093100));
+
+    k2 = k1.getKData(KQuery::WEEK);
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::WEEK);
+    CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
+    CHECK_EQ(k2.getQuery().startDatetime(), Datetime(20111123000000));
+    REQUIRE(k1[0].datetime == Datetime(20111123000000));
+    CHECK_EQ(k2[0].datetime, Datetime(20111125000000));
+
+    k1 = getKData("sh000001", KQuery(-10, Null<int64_t>(), KQuery::MONTH, KQuery::FORWARD));
+    k2 = k1.getKData(KQuery::DAY);
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::DAY);
+    CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
+    CHECK_EQ(k2.getQuery().startDatetime(), Datetime(20110331000000));
+    CHECK_EQ(k2.getQuery().endDatetime(), Null<Datetime>());
+    REQUIRE(k1.front().datetime == Datetime(20110331000000));
+    CHECK_EQ(k2.front().datetime, Datetime(20110331000000));
+    CHECK_EQ(k2.back().datetime, Datetime(20111206000000));
+
+    k2 = k1.getKData(KQuery::MIN60);
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::MIN60);
+    CHECK_EQ(k2.front().datetime, Datetime(20110331103000));
+    CHECK_EQ(k2.back().datetime, Datetime(20111206150000));
+
+    /** @arg query k1 为日线，query 为索引方式，闭合 */
+    k1 = getKData("sh000001", KQuery(3000, 3010));
+    REQUIRE(k1.size() > 0);
+
+    k2 = k1.getKData(KQuery::MIN);
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::MIN);
+    CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
+    CHECK_EQ(k2.getQuery().startDatetime(), k1[0].datetime);
+    REQUIRE(k1[0].datetime == Datetime(20030318000000));
+    CHECK_EQ(k2[0].datetime, Datetime(20030318093100));
+    REQUIRE(k1.back().datetime == Datetime(20030331000000));
+    CHECK_EQ(k2.back().datetime, Datetime(20030331150000));
+
+    k2 = k1.getKData(KQuery::WEEK);
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::WEEK);
+    CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
+    CHECK_EQ(k2.getQuery().startDatetime(), Datetime(20030318000000));
+    CHECK_EQ(k2.front().datetime, Datetime(20030321000000));
+    CHECK_EQ(k2.back().datetime, Datetime(20030328000000));
+
+    /** @arg query k1 为日线，query 为日期方式，非闭合 */
+    k1 = getKData("sh000001", KQuery(Datetime(201101010000)));
+    REQUIRE(k1.size() > 0);
+
+    k2 = k1.getKData(KQuery::MIN);
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::MIN);
+    CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
+    CHECK_EQ(k2.getQuery().startDatetime(), k1[0].datetime);
+    CHECK_EQ(k2.front().datetime, Datetime(20110104093100));
+    CHECK_EQ(k2.back().datetime, Datetime(20111206150000));
+
+    k2 = k1.getKData(KQuery::WEEK);
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::WEEK);
+    CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
+    CHECK_EQ(k2.front().datetime, Datetime(20110107000000));
+    CHECK_EQ(k2.back().datetime, Datetime(20111209000000));
+
+    /** @arg query k1 为日线，query 为日期方式，闭合 */
+    k1 = getKData("sh000001", KQuery(Datetime(201101010000), Datetime(201112010000)));
+    REQUIRE(k1.size() > 0);
+
+    k2 = k1.getKData(KQuery::MIN);
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::MIN);
+    CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
+    CHECK_EQ(k2.front().datetime, Datetime(20110104093100));
+    CHECK_EQ(k2.back().datetime, Datetime(20111130150000));
+
+    k2 = k1.getKData(KQuery::WEEK);
+    CHECK_EQ(k1.getStock(), k2.getStock());
+    CHECK_EQ(k2.getQuery().kType(), KQuery::WEEK);
+    CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
+    CHECK_EQ(k2.front().datetime, Datetime(20110107000000));
+    CHECK_EQ(k2.back().datetime, Datetime(20111125000000));
+}
+
 /** @} */

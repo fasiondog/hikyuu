@@ -54,10 +54,11 @@ std::vector<T> python_bytes_to_vector(const py::bytes& obj) {
 
 template <typename T>
 std::vector<T> python_list_to_vector(const py::sequence& obj) {
+    // 如果 len(obj) 长度为零，即使类型不是所期望的也可能成功，但无风险
     auto total = len(obj);
     std::vector<T> vect(total);
     for (auto i = 0; i < total; ++i) {
-        vect[i] = obj[i].cast<T>();
+        vect[i] = py::cast<T>(obj[i]);
     }
     return vect;
 }
