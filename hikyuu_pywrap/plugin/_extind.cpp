@@ -8,13 +8,13 @@
 #include "hikyuu/plugin/extind.h"
 #include "../pybind_utils.h"
 
-#define PY_AGG_FUNC_DEFINE(agg_func)                                                          \
-    m.def(#agg_func, py::overload_cast<const KQuery::KType&, bool, int>(&agg_func),           \
-          py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1); \
-    m.def(#agg_func,                                                                          \
-          py::overload_cast<const Indicator&, const KQuery::KType&, bool, int>(&agg_func),    \
-          py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,       \
-          py::arg("unit") = 1);
+#define PY_AGG_FUNC_DEFINE(agg_func, doc)                                                          \
+    m.def(#agg_func, py::overload_cast<const KQuery::KType&, bool, int>(&agg_func),                \
+          py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1, doc); \
+    m.def(#agg_func,                                                                               \
+          py::overload_cast<const Indicator&, const KQuery::KType&, bool, int>(&agg_func),         \
+          py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,            \
+          py::arg("unit") = 1, doc);
 
 void export_extend_Indicator(py::module& m) {
     m.def("WITHKTYPE", py::overload_cast<const KQuery::KType&, bool>(WITHKTYPE), py::arg("ktype"),
@@ -229,14 +229,14 @@ void export_extend_Indicator(py::module& m) {
     :return: 指标值在指定板块中的排名
     :rtype: Indicator)");
 
-    PY_AGG_FUNC_DEFINE(AGG_MEAN)
-    PY_AGG_FUNC_DEFINE(AGG_COUNT)
-    PY_AGG_FUNC_DEFINE(AGG_SUM)
-    PY_AGG_FUNC_DEFINE(AGG_MAX)
-    PY_AGG_FUNC_DEFINE(AGG_MIN)
-    PY_AGG_FUNC_DEFINE(AGG_MAD)
-    PY_AGG_FUNC_DEFINE(AGG_MEDIAN)
-    PY_AGG_FUNC_DEFINE(AGG_PROD)
+    PY_AGG_FUNC_DEFINE(AGG_MEAN, "聚合函数: 平均值, 可参考 AGG_STD 帮助")
+    PY_AGG_FUNC_DEFINE(AGG_COUNT, "聚合函数: 非空值计数, 可参考 AGG_STD 帮助")
+    PY_AGG_FUNC_DEFINE(AGG_SUM, "聚合函数: 总和, 可参考 AGG_STD 帮助")
+    PY_AGG_FUNC_DEFINE(AGG_MAX, "聚合函数: 最大值, 可参考 AGG_STD 帮助")
+    PY_AGG_FUNC_DEFINE(AGG_MIN, "聚合函数: 最小值, 可参考 AGG_STD 帮助")
+    PY_AGG_FUNC_DEFINE(AGG_MAD, "聚合函数: 平均绝对偏差, 可参考 AGG_STD 帮助")
+    PY_AGG_FUNC_DEFINE(AGG_MEDIAN, "聚合函数: 中位数, 可参考 AGG_STD 帮助")
+    PY_AGG_FUNC_DEFINE(AGG_PROD, "聚合函数: 乘积, 可参考 AGG_STD 帮助")
 
     m.def("AGG_STD", py::overload_cast<const KQuery::KType&, bool, int, int>(&AGG_STD),
           py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
@@ -244,7 +244,22 @@ void export_extend_Indicator(py::module& m) {
     m.def("AGG_STD",
           py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, int>(&AGG_STD),
           py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,
-          py::arg("unit") = 1, py::arg("ddof") = 1);
+          py::arg("unit") = 1, py::arg("ddof") = 1,
+          R"(AGG_STD(ind[, ktype=Query.MIN, fill_null=False, unit=1, ddof=1])
+
+    聚合其他K线周期的标准差, 如计算日线时聚合分钟线收盘价的标准差
+
+        >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
+        >>> ind = AGG_STD(CLOSE(), ktype=Query.MIN, fill_null=False, unit=1, ddof=1)
+        >>> ind(k)
+
+    :param Indicator ind: 指标数据
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    :param int ddof: 自由度(1: 样本标准差, 0: 总体标准差)
+    :return: 指标数据
+    :rtype: Indicator)");
 
     m.def("AGG_VAR", py::overload_cast<const KQuery::KType&, bool, int, int>(&AGG_VAR),
           py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
@@ -252,7 +267,22 @@ void export_extend_Indicator(py::module& m) {
     m.def("AGG_VAR",
           py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, int>(&AGG_VAR),
           py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,
-          py::arg("unit") = 1, py::arg("ddof") = 1);
+          py::arg("unit") = 1, py::arg("ddof") = 1,
+          R"(AGG_VAR(ind[, ktype=Query.MIN, fill_null=False, unit=1, ddof=1])
+
+    聚合其他K线周期的方差, 如计算日线时聚合分钟线收盘价的方差
+
+        >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
+        >>> ind = AGG_VAR(CLOSE(), ktype=Query.MIN, fill_null=False, unit=1, ddof=1)
+        >>> ind(k)
+
+    :param Indicator ind: 指标数据
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    :param int ddof: 自由度(1: 样本标准差, 0: 总体标准差)
+    :return: 指标数据
+    :rtype: Indicator)");
 
     m.def("AGG_QUANTILE", py::overload_cast<const KQuery::KType&, bool, int, double>(&AGG_QUANTILE),
           py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
@@ -261,5 +291,16 @@ void export_extend_Indicator(py::module& m) {
       "AGG_QUANTILE",
       py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, double>(&AGG_QUANTILE),
       py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,
-      py::arg("unit") = 1, py::arg("quantile") = 0.25);
+      py::arg("unit") = 1, py::arg("quantile") = 0.25,
+      R"(AGG_QUANTILE(ind[, ktype=Query.MIN, fill_null=False, unit=1, quantile=0.25])
+
+    聚合其他K线周期分位数, 可参考 AGG_STD 帮助
+
+    :param Indicator ind: 指标数据
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    :param float quantile: 分位数 (0, 1) 之间
+    :return: 指标数据
+    :rtype: Indicator)");
 }
