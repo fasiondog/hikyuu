@@ -12,9 +12,10 @@ namespace hku {
 
 /**
  * Spearman 相关系数
- * @param ind1 指标1
- * @param ind2 指标2
+ * @param ind 指标1
+ * @param ref_ind 指标2
  * @param n 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度
+ * @param fill_null 填充缺失值
  * @ingroup Indicator
  */
 Indicator HKU_API SPEARMAN(const Indicator& ind, const Indicator& ref_ind, int n = 0,

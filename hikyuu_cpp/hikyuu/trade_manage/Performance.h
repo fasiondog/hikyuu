@@ -47,7 +47,6 @@ public:
     /**
      * 简单的文本统计报告，用于直接输出打印。
      * @note 只有运行 statistics 后或 Performance 本身为从 TM 获取的结果时才生效
-     * @param datetime 指定的截止时刻
      * @return
      */
     string report();

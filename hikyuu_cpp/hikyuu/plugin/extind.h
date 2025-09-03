@@ -12,6 +12,11 @@
 namespace hku {
 
 /**
+ * @ingroup Indicator
+ * @{
+ */
+
+/**
  * @brief 将指标数据转换到指定周期
  * @param ktype 指定周期
  * @param fill_null 扩展时填充null数据，否则为使用最近值填充
@@ -200,4 +205,5 @@ Indicator HKU_API AGG_QUANTILE(const KQuery::KType& ktype, bool fill_null, int u
 Indicator HKU_API AGG_QUANTILE(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,
                                int unit, double quantile);
 
+/** @} */
 }  // namespace hku

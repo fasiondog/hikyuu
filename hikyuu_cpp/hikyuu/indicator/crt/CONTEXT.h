@@ -15,6 +15,8 @@ namespace hku {
  * 独立上下文指标
  * @param ind 待包装指标
  * @param fill_null 是否填充空值，默认为 false
+ * @param use_self_ktype 使用自身独立上下文的K线类型，否则计算时将使用计算上下文中K线类型
+ * @param use_self_recover_type 使用自身独立上下文的复权类型，否则计算时将使用计算上下文中的复权类型
  * @ingroup Indicator
  */
 Indicator HKU_API CONTEXT(const Indicator& ind, bool fill_null = false, bool use_self_ktype = false,

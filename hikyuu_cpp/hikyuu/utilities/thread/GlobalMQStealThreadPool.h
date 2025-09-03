@@ -30,7 +30,7 @@ namespace hku {
 
 /**
  * @brief 无集中队列多队列偷取任务池
- * @ingroup GlobalMQStealThreadPool
+ * @ingroup ThreadPool
  */
 #ifdef _MSC_VER
 class GlobalMQStealThreadPool {

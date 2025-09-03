@@ -54,6 +54,7 @@ public:
      * 以便用于计算当前市值
      * @param tm 指定的交易管理实例
      * @param datetime 统计截止时刻
+     * @param ktype k线类型
      */
     virtual Performance getExtPerformance(const TMPtr& tm, const Datetime& datetime,
                                           const KQuery::KType& ktype) = 0;
