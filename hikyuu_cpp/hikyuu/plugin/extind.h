@@ -161,20 +161,11 @@ Indicator HKU_API RANK(const Block& block, int mode = 0, bool fill_null = true,
  * @param unit 聚合周期单位，默认为1。按上下文K线 unit 个周期计算
  * @return Indicator
  */
-#define AGG_FUNC_DEFINE(agg_name)                                                                \
-    Indicator HKU_API agg_name(const KQuery::KType& ktype = KQuery::MIN, bool fill_null = false, \
-                               int unit = 1);                                                    \
-    Indicator HKU_API agg_name(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,   \
+#define AGG_FUNC_DEFINE(agg_name)                                                              \
+    Indicator HKU_API agg_name(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN, \
                                bool fill_null = false, int unit = 1);
 
 #define AGG_FUNC_IMP(agg_name)                                                                   \
-    Indicator HKU_API agg_name(const KQuery::KType& ktype, bool fill_null, int unit) {           \
-        Parameter params;                                                                        \
-        params.set<string>("ktype", ktype);                                                      \
-        params.set<bool>("fill_null", fill_null);                                                \
-        params.set<int>("unit", unit);                                                           \
-        return getExtIndicator(#agg_name, params);                                               \
-    }                                                                                            \
     Indicator HKU_API agg_name(const Indicator& ind, const KQuery::KType& ktype, bool fill_null, \
                                int unit) {                                                       \
         Parameter params;                                                                        \
@@ -193,15 +184,10 @@ AGG_FUNC_DEFINE(AGG_MAD)
 AGG_FUNC_DEFINE(AGG_MEDIAN)
 AGG_FUNC_DEFINE(AGG_PROD)
 
-Indicator HKU_API AGG_STD(const KQuery::KType& ktype, bool fill_null, int unit, int ddof);
 Indicator HKU_API AGG_STD(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,
                           int unit, int ddof);
-Indicator HKU_API AGG_VAR(const KQuery::KType& ktype, bool fill_null, int unit, int ddof);
 Indicator HKU_API AGG_VAR(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,
                           int unit, int ddof);
-
-Indicator HKU_API AGG_QUANTILE(const KQuery::KType& ktype, bool fill_null, int unit,
-                               double quantile);
 Indicator HKU_API AGG_QUANTILE(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,
                                int unit, double quantile);
 

@@ -65,15 +65,6 @@ AGG_FUNC_IMP(AGG_MAD)
 AGG_FUNC_IMP(AGG_MEDIAN)
 AGG_FUNC_IMP(AGG_PROD)
 
-Indicator HKU_API AGG_STD(const KQuery::KType& ktype, bool fill_null, int unit, int ddof) {
-    Parameter params;
-    params.set<string>("ktype", ktype);
-    params.set<bool>("fill_null", fill_null);
-    params.set<int>("unit", unit);
-    params.set<int>("ddof", ddof);
-    return getExtIndicator("AGG_STD", params);
-}
-
 Indicator HKU_API AGG_STD(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,
                           int unit, int ddof) {
     Parameter params;
@@ -84,15 +75,6 @@ Indicator HKU_API AGG_STD(const Indicator& ind, const KQuery::KType& ktype, bool
     return getExtIndicator("AGG_STD", ind, params);
 }
 
-Indicator HKU_API AGG_VAR(const KQuery::KType& ktype, bool fill_null, int unit, int ddof) {
-    Parameter params;
-    params.set<string>("ktype", ktype);
-    params.set<bool>("fill_null", fill_null);
-    params.set<int>("unit", unit);
-    params.set<int>("ddof", ddof);
-    return getExtIndicator("AGG_VAR", params);
-}
-
 Indicator HKU_API AGG_VAR(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,
                           int unit, int ddof) {
     Parameter params;
@@ -101,16 +83,6 @@ Indicator HKU_API AGG_VAR(const Indicator& ind, const KQuery::KType& ktype, bool
     params.set<int>("unit", unit);
     params.set<int>("ddof", ddof);
     return getExtIndicator("AGG_VAR", ind, params);
-}
-
-Indicator HKU_API AGG_QUANTILE(const KQuery::KType& ktype, bool fill_null, int unit,
-                               double quantile) {
-    Parameter params;
-    params.set<string>("ktype", ktype);
-    params.set<bool>("fill_null", fill_null);
-    params.set<int>("unit", unit);
-    params.set<double>("quantile", quantile);
-    return getExtIndicator("AGG_QUANTILE", params);
 }
 
 Indicator HKU_API AGG_QUANTILE(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,

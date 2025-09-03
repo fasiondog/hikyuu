@@ -440,6 +440,10 @@ inline KData IndicatorImp::getContext() const {
     return getParam<KData>("kdata");
 }
 
+inline void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
+    setContext(stock.getKData(query));
+}
+
 inline const IndicatorImp::ind_param_map_t& IndicatorImp::getIndParams() const {
     return m_ind_params;
 }
