@@ -234,4 +234,32 @@ void export_extend_Indicator(py::module& m) {
     PY_AGG_FUNC_DEFINE(AGG_SUM)
     PY_AGG_FUNC_DEFINE(AGG_MAX)
     PY_AGG_FUNC_DEFINE(AGG_MIN)
+    PY_AGG_FUNC_DEFINE(AGG_MAD)
+    PY_AGG_FUNC_DEFINE(AGG_MEDIAN)
+    PY_AGG_FUNC_DEFINE(AGG_PROD)
+
+    m.def("AGG_STD", py::overload_cast<const KQuery::KType&, bool, int, int>(&AGG_STD),
+          py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
+          py::arg("ddof") = 1);
+    m.def("AGG_STD",
+          py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, int>(&AGG_STD),
+          py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,
+          py::arg("unit") = 1, py::arg("ddof") = 1);
+
+    m.def("AGG_VAR", py::overload_cast<const KQuery::KType&, bool, int, int>(&AGG_VAR),
+          py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
+          py::arg("ddof") = 1);
+    m.def("AGG_VAR",
+          py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, int>(&AGG_VAR),
+          py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,
+          py::arg("unit") = 1, py::arg("ddof") = 1);
+
+    m.def("AGG_QUANTILE", py::overload_cast<const KQuery::KType&, bool, int, double>(&AGG_QUANTILE),
+          py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
+          py::arg("quantile") = 0.25);
+    m.def(
+      "AGG_QUANTILE",
+      py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, double>(&AGG_QUANTILE),
+      py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,
+      py::arg("unit") = 1, py::arg("quantile") = 0.25);
 }

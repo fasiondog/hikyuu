@@ -184,5 +184,20 @@ AGG_FUNC_DEFINE(AGG_COUNT)
 AGG_FUNC_DEFINE(AGG_SUM)
 AGG_FUNC_DEFINE(AGG_MAX)
 AGG_FUNC_DEFINE(AGG_MIN)
+AGG_FUNC_DEFINE(AGG_MAD)
+AGG_FUNC_DEFINE(AGG_MEDIAN)
+AGG_FUNC_DEFINE(AGG_PROD)
+
+Indicator HKU_API AGG_STD(const KQuery::KType& ktype, bool fill_null, int unit, int ddof);
+Indicator HKU_API AGG_STD(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,
+                          int unit, int ddof);
+Indicator HKU_API AGG_VAR(const KQuery::KType& ktype, bool fill_null, int unit, int ddof);
+Indicator HKU_API AGG_VAR(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,
+                          int unit, int ddof);
+
+Indicator HKU_API AGG_QUANTILE(const KQuery::KType& ktype, bool fill_null, int unit,
+                               double quantile);
+Indicator HKU_API AGG_QUANTILE(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,
+                               int unit, double quantile);
 
 }  // namespace hku
