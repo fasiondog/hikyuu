@@ -47,9 +47,9 @@ public:
     static const string DAY5;
     static const string DAY7;
     static const string MIN3;
-    static const string HOUR4;
-    static const string HOUR6;
-    static const string HOUR12;
+    static const string HOUR4;   // 默认不支持
+    static const string HOUR6;   // 默认不支持
+    static const string HOUR12;  // 默认不支持
 
     static const string TIMELINE;  // 分时
     static const string TRANS;     // 分笔

@@ -79,6 +79,8 @@ int main(int argc, char** argv) {
     context.setOption("no-breaks", true);  // don't break in the debugger when assertions fail
 
     init_hikyuu_test();
+    HKU_INFO("total memory: {}", getMemoryMaxSize());
+    HKU_INFO("idle memory: {}", getMemoryIdleSize());
 
     int res = 0;
     {

@@ -161,7 +161,7 @@ public:                                       \
 
 /**
  * 客户程序都应使用该指针类型，操作止损策略实例
- * @ingroup StopLoss
+ * @ingroup Stoploss
  */
 typedef shared_ptr<StoplossBase> StoplossPtr;
 typedef shared_ptr<StoplossBase> STPtr;

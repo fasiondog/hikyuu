@@ -33,7 +33,7 @@ namespace hku {
  * @brief 普通多任务队列线程池，任务之间彼此独立不能互相等待
  * @note 任务运行之间如存在先后顺序，请使用 StealThreadPool。
  * @details
- * @ingroup MQThreadPool
+ * @ingroup ThreadPool
  */
 #ifdef _MSC_VER
 class MQThreadPool {

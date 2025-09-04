@@ -187,32 +187,6 @@ void IndicatorImp::initContext() {
     setParam<KData>("kdata", KData());
 }
 
-void IndicatorImp::setContext(const Stock &stock, const KQuery &query) {
-    KData kdata = getContext();
-    if (kdata.getStock() == stock && kdata.getQuery() == query) {
-        if (m_need_calculate) {
-            calculate();
-        }
-        return;
-    }
-
-    m_need_calculate = true;
-
-    // 子节点设置上下文
-    if (m_left)
-        m_left->setContext(stock, query);
-    if (m_right)
-        m_right->setContext(stock, query);
-    if (m_three)
-        m_three->setContext(stock, query);
-
-    // 如果上下文有变化则重设上下文
-    setParam<KData>("kdata", stock.getKData(query));
-
-    // 启动重新计算
-    calculate();
-}
-
 void IndicatorImp::setContext(const KData &k) {
     KData old_k = getParam<KData>("kdata");
 
@@ -315,6 +289,11 @@ string IndicatorImp::str() const {
         os << "}";
     }
     os << "\n  formula: " << formula();
+    DatetimeList dates = getDatetimeList();
+    if (!dates.empty()) {
+        os << "\n  first: " << dates.front();
+        os << "\n  last: " << dates.back();
+    }
 #if !HKU_USE_LOW_PRECISION
     if (m_pBuffer[0]) {
         os << "\n  values: " << *m_pBuffer[0];

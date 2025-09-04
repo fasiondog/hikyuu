@@ -185,25 +185,18 @@ void IAlign::_calculate(const Indicator& ind) {
         }
     }
 
-    if (fill_null) {
-        m_discard = total;
-    }
-    size_t i = 0;
-    while (i < total) {
-        size_t not_null_count = 0;
-        for (size_t r = 0; r < m_result_num; r++) {
-            if (!std::isnan(get(i, r))) {
-                not_null_count++;
+    for (size_t r = 0; r < m_result_num; r++) {
+        const auto* src = this->data(r);
+        size_t pos = m_discard;
+        for (size_t i = m_discard; i < total; i++) {
+            if (!std::isnan(src[i])) {
+                break;
             }
+            pos++;
         }
-        if (not_null_count == m_result_num) {
-            m_discard = i;
-            break;
+        if (pos > m_discard) {
+            m_discard = pos;
         }
-        i++;
-    }
-    if (i == total) {
-        m_discard = total;
     }
 }
 

@@ -683,7 +683,7 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def(
       "PRICELIST",
-      [](const DatetimeList& dates, double value, size_t discard) {
+      [](const DatetimeList& dates, double value, int discard) {
           return PRICELIST(dates, value, discard);
       },
       py::arg("dates"), py::arg("value"), py::arg("discard") = 0);

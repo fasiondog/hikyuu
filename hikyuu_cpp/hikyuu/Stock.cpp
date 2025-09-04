@@ -990,7 +990,7 @@ bool Stock::isTransactionTime(Datetime time) {
     return time >= openTime2 && time <= closeTime2 + Seconds(30);
 }
 
-void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
+void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
     HKU_IF_RETURN(!isBuffer(inktype) || record.datetime.isNull() ||
                     StockManager::instance().isHoliday(record.datetime),
                   void());
@@ -1036,7 +1036,7 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
     }
 }
 
-Datetime Stock::getLastUpdateTime(KQuery::KType inktype) const {
+Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
     auto ktype = inktype;
     to_upper(ktype);
     if (m_data->pMutex.find(ktype) == m_data->pMutex.end()) {

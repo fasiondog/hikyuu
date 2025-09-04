@@ -521,6 +521,7 @@ public:
      * @param goalPrice 目标价格
      * @param planPrice 计划买入价格
      * @param from 记录是哪个系统部件发出的买入指示
+     * @param remark 备注
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     virtual TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
@@ -541,6 +542,7 @@ public:
      * @param goalPrice 新的目标价格
      * @param planPrice 原计划卖出价格
      * @param from 记录是哪个系统部件发出的卖出指示
+     * @param remark 卖出备注
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     virtual TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
@@ -561,6 +563,7 @@ public:
      * @param goalPrice 目标价格
      * @param planPrice 计划卖空价格
      * @param from 记录是哪个系统部件发出的买入指示
+     * @param remark 备注
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
@@ -581,6 +584,7 @@ public:
      * @param goalPrice 目标价格
      * @param planPrice 计划买入价格
      * @param from 记录是哪个系统部件发出的卖出指示
+     * @param remark 备注
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
@@ -716,13 +720,13 @@ public:
      * 统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime，
      * 以便用于计算当前市值
      * @param datetime 统计截止时刻
+     * @param ktype k线类型
      */
     Performance getPerformance(const Datetime& datetime = Datetime::now(),
                                const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * @brief 获取指定时刻时账户的最大回撤百分比（负数）（仅根据收盘价计算）
-     * @param tm 指定账户
      * @param date 指定日期（包含该时刻）
      * @param ktype k线类型
      * @return price_t

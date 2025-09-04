@@ -109,8 +109,8 @@ int64_t KQuery::getKTypeInSeconds(const KType& ktype) {
 
     auto sec = getKTypeExtraMinutes(nktype) * 60;
     if (sec <= 0) {
-        auto iter = g_ktype2sec.find(nktype);
-        HKU_IF_RETURN(iter != g_ktype2sec.end(), iter->second);
+        auto sec_iter = g_ktype2sec.find(nktype);
+        HKU_IF_RETURN(sec_iter != g_ktype2sec.end(), sec_iter->second);
         HKU_WARN("Can't get KType in seconds: {}, will return 0", nktype);
     }
     return sec;

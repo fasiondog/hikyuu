@@ -48,7 +48,6 @@ public:
      * 添加备选股票及其交易策略原型
      * @param stock 备选股票
      * @param protoSys 交易系统策略原型
-     * @return 如果 protoSys 无效 或 stock 无效，则返回 false， 否则返回 true
      */
     void addStock(const Stock& stock, const SystemPtr& protoSys);
 
@@ -57,7 +56,6 @@ public:
      * @note 如果存在无效的stock，则自动忽略，不会返回false
      * @param stkList 备选股票列表
      * @param protoSys 交易系统策略原型
-     * @return 如果 protoSys 无效则返回false，否则返回 true
      */
     void addStockList(const StockList& stkList, const SystemPtr& protoSys);
 

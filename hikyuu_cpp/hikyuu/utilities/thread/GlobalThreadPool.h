@@ -35,7 +35,7 @@ namespace hku {
  * @brief 全局集中式任务队列线程池，任务之间彼此独立不能互相等待
  * @note 任务运行之间如存在先后顺序，只适合程序运行期内一直保持运行的情况
  * @details
- * @ingroup GlobalThreadPool
+ * @ingroup ThreadPool
  */
 #ifdef _MSC_VER
 class GlobalThreadPool {

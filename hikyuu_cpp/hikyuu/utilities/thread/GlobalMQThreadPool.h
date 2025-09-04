@@ -32,7 +32,7 @@ namespace hku {
 /**
  * @brief 全局分布式线程池，只适合程序运行期内一直保持运行的情况
  * @details
- * @ingroup GlobalMQThreadPool
+ * @ingroup ThreadPool
  */
 #ifdef _MSC_VER
 class GlobalMQThreadPool {
