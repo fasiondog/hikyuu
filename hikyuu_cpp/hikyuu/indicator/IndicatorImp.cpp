@@ -295,8 +295,8 @@ string IndicatorImp::str() const {
         os << "\n  last: " << dates.back();
     }
 #if !HKU_USE_LOW_PRECISION
-    if (m_pBuffer[0]) {
-        os << "\n  values: " << *m_pBuffer[0];
+    for (size_t r = 0; r < getResultNumber(); ++r) {
+        os << "\n  values" << r << ": " << *m_pBuffer[r];
     }
 #endif
     os << "\n}";
