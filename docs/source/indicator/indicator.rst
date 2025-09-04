@@ -67,7 +67,7 @@
 
     聚合函数: 乘积, 可参考 :func:`AGG_STD` 
 
-.. py:function:: AGG_QUANTILE(ind[, ktype=Query.MIN, fill_null=False, unit=1, quantile=0.25])
+.. py:function:: AGG_QUANTILE(ind[, ktype=Query.MIN, fill_null=False, unit=1, quantile=0.75])
 
     聚合其他K线周期分位数, 可参考 AGG_STD 帮助
 
@@ -90,7 +90,7 @@
     :param Indicator ind: 指标数据
     :param KQuery.KType ktype: 聚合的K线周期
     :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    :param int unit: 聚合周期单位 (滚动聚合单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
     :param int ddof: 自由度(1: 样本标准差, 0: 总体标准差)
     :return: 指标数据
     :rtype: Indicator
