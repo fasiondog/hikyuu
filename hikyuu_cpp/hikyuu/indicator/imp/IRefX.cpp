@@ -5,21 +5,21 @@
  *      Author: fasiondog
  */
 
-#include "IUnsafeRef.h"
+#include "IRefX.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::IUnsafeRef)
+BOOST_CLASS_EXPORT(hku::IRefX)
 #endif
 
 namespace hku {
 
-IUnsafeRef::IUnsafeRef() : IndicatorImp("UNSAFE_REF", 1) {
+IRefX::IRefX() : IndicatorImp("REFX", 1) {
     setParam<int>("n", 1);
 }
 
-IUnsafeRef::~IUnsafeRef() {}
+IRefX::~IRefX() {}
 
-void IUnsafeRef::_calculate(const Indicator &data) {
+void IRefX::_calculate(const Indicator &data) {
     size_t total = data.size();
     int n = getParam<int>("n");
 
@@ -66,8 +66,8 @@ void IUnsafeRef::_calculate(const Indicator &data) {
     }
 }
 
-Indicator HKU_API UNSAFE_REF(int n) {
-    IndicatorImpPtr p = make_shared<IUnsafeRef>();
+Indicator HKU_API REFX(int n) {
+    IndicatorImpPtr p = make_shared<IRefX>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }

@@ -2258,12 +2258,11 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator data: 条件指标
     :rtype: Indicator)");
 
-    m.def("UNSAFE_REF", py::overload_cast<int>(UNSAFE_REF), py::arg("n"));
-    m.def("UNSAFE_REF", py::overload_cast<const Indicator&, int>(UNSAFE_REF), py::arg("ind"),
-          py::arg("n"), R"(UNSAFE_REF(ind, n)
+    m.def("REFX", py::overload_cast<int>(REFX), py::arg("n"));
+    m.def("REFX", py::overload_cast<const Indicator&, int>(REFX), py::arg("ind"), py::arg("n"),
+          R"(REFX(ind, n)
 
-    用于获取指标中第n个周期的值, n为正数时从当前周期向前数, 为负数时从当前周期向后数。
-    注意：此函数属于未来函数, 不应被用于回测, 主要用于AI等需要获取未来数据的场景。
+    REF增强(非安全引用, 勿用于回测)。用于获取指标中第n个周期的值, n为正数时从当前周期向前数, 为负数时从当前周期向后数。
 
     :param Indicator ind: 指标
     :param int n: 周期数)");

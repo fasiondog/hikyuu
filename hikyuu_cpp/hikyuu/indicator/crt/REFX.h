@@ -12,14 +12,14 @@
 namespace hku {
 
 /**
- * 不安全引用, 用于数据左移或右移，周期为整数时，功能同 REF
+ * REF增强（不安全引用）, 用于数据左移或右移，周期为整数时，功能同 REF
  * @note 不应用于回测，通常用于AI模型训练等场景
  * @param n 引用周期
  * @ingroup Indicator
  */
-Indicator HKU_API UNSAFE_REF(int n);
-inline Indicator HKU_API UNSAFE_REF(const Indicator& ind, int n) {
-    return UNSAFE_REF(n)(ind);
+Indicator HKU_API REFX(int n);
+inline Indicator HKU_API REFX(const Indicator& ind, int n) {
+    return REFX(n)(ind);
 }
 
 }  // namespace hku
