@@ -20,6 +20,8 @@
 * :py:func:`JUMPUP` - 边缘跳变，从大于0.0，跳变到 <= 0.0
 * :py:func:`LASTVALUE` - 等同于通达信 CONST 指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
+* :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
+* :py:func:`REFX` - REF增强, 可左移或右移。左移时为未来函数，勿用于回测。
 * :py:func:`REPLACE` - 替换指标中指定值，默认为替换 nan 值为 0.0
 * :py:func:`RESULT` - 以指标公式的方式返回指定指标中相应的结果集
 * :py:func:`SLICE` - 获取某指标中指定范围 [start, end) 的数据，生成新的指标
@@ -151,7 +153,6 @@
 * :py:func:`MACD` - 平滑异同移动平均线
 * :py:func:`AMA` - 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
 * :py:func:`EMA` - 指数移动平均线(Exponential Moving Average)
-* :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
 * :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
 * :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
 * :py:func:`ROCR` - 变动率指标: (price / prevPrice)
