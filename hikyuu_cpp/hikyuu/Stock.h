@@ -244,10 +244,10 @@ public:
     bool isNull() const;
 
     /** （临时函数）只用于更新缓存中的K线数据 **/
-    void realtimeUpdate(KRecord, KQuery::KType ktype = KQuery::DAY);
+    void realtimeUpdate(KRecord, const KQuery::KType& ktype = KQuery::DAY);
 
     /** 获取指定K线数据类型最后更新时间 */
-    Datetime getLastUpdateTime(KQuery::KType ktype) const;
+    Datetime getLastUpdateTime(const KQuery::KType& ktype) const;
 
     /**
      * 部分临时创建的 Stock, 直接设置KRecordList

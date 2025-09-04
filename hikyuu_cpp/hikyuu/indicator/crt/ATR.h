@@ -22,7 +22,7 @@ Indicator HKU_API ATR(int n = 14);
 
 /**
  * 平均真实波幅(Average True Range)
- * @param data 待计算的源数据
+ * @param kdata 待计算的源数据
  * @param n 计算均值的周期窗口，必须为大于1的整数
  * @ingroup Indicator
  */

@@ -116,9 +116,9 @@ Indicator HKU_API PRICELIST(size_t size, double value, int discard) {
 }
 
 Indicator HKU_API PRICELIST(const DatetimeList& dates, double value, int discard) {
-    auto ret = PRICELIST(dates.size(), value, discard);
-    ret.setParam<DatetimeList>("align_date_list", dates);
-    return ret;
+    IndicatorImpPtr ptr = make_shared<IPriceList>(dates.size(), value, discard);
+    ptr->setParam<DatetimeList>("align_date_list", dates);
+    return ptr->calculate();
 }
 
 } /* namespace hku */

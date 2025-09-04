@@ -23,7 +23,7 @@ namespace hku {
  * 算法：若Y=DMA(X,A) 则 Y=A*X+(1-A)*Y',其中Y'表示上一周期Y值。
  * 例如：DMA(CLOSE,VOL/CAPITAL)表示求以换手率作平滑因子的平均价
  * </pre>
- * @param ind1 待计算的数据
+ * @param x 待计算的数据
  * @param a 动态系数
  * @param fill_null 日期对齐时缺失数据填充nan值
  * @ingroup Indicator

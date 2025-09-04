@@ -225,6 +225,7 @@ public:
      * @param goalPrice 目标价格
      * @param planPrice 计划买入价格
      * @param from 记录是哪个系统部件发出的买入指示
+     * @param remark 买入备注
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     virtual TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
@@ -242,6 +243,7 @@ public:
      * @param goalPrice 新的目标价格
      * @param planPrice 原计划卖出价格
      * @param from 记录是哪个系统部件发出的卖出指示
+     * @param remark 卖出备注
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     virtual TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
@@ -259,6 +261,7 @@ public:
      * @param goalPrice 目标价格
      * @param planPrice 计划卖空价格
      * @param from 记录是哪个系统部件发出的买入指示
+     * @param remark 备注
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
@@ -276,6 +279,7 @@ public:
      * @param goalPrice 目标价格
      * @param planPrice 计划买入价格
      * @param from 记录是哪个系统部件发出的卖出指示
+     * @param remark 备注
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
