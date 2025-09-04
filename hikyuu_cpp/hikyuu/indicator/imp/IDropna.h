@@ -27,10 +27,10 @@ public:
         return true;
     }
 
-    // 禁止子节点合并
-    virtual bool selfAlike(const IndicatorImp& other) const noexcept override {
-        return false;
-    }
+    // 禁止子节点合并, 上级默认已为 false
+    // virtual bool selfAlike(const IndicatorImp& other) const noexcept override {
+    //     return false;
+    // }
 };
 
 } /* namespace hku */

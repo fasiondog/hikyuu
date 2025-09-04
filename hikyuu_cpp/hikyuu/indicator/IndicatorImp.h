@@ -344,17 +344,17 @@ private:
             ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
             vector<value_t>& values = *m_pBuffer[i];
             values.resize(count);
-            for (size_t i = 0; i < count; i++) {
+            for (size_t j = 0; j < count; j++) {
                 std::string vstr;
                 ar >> boost::serialization::make_nvp<string>("item", vstr);
                 if (vstr == "nan") {
-                    values[i] = std::numeric_limits<double>::quiet_NaN();
+                    values[j] = std::numeric_limits<double>::quiet_NaN();
                 } else if (vstr == "+inf") {
-                    values[i] = std::numeric_limits<double>::infinity();
+                    values[j] = std::numeric_limits<double>::infinity();
                 } else if (vstr == "-inf") {
-                    values[i] = 0.0 - std::numeric_limits<double>::infinity();
+                    values[j] = 0.0 - std::numeric_limits<double>::infinity();
                 } else {
-                    values[i] = std::atof(vstr.c_str());
+                    values[j] = std::atof(vstr.c_str());
                 }
             }
         }
