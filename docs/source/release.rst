@@ -1,6 +1,44 @@
 版本发布说明
 =======================
 
+2.6.8 - 2025年9月5日
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. 新增功能与优化
+    - get_inds_view
+    - fix(windows): 根据系统语言设置 Windows 终端的编码方式
+    feat(indicator): 添加 Indicator 结果集转换为 numpy.array 的新方法 to_array
+
+fix(indicator): 修复 Indicator 类中 to_numpy 函数的内存泄漏问题
+feat(indicator): 修改 IC 指标计算方法
+
+- 将 IC 指标的计算方法改为使用当前时刻之前的 N 天收益，而不是下一天的收益
+- 这样做可以避免当前值缺失的问题，提供更实时的 IC 计算结果
+- 在 IC.h、IIc.cpp 和 _build_in.cpp 中均进行了相应修改
+
+添加 UNSAFE_REF 未来函数
+改进 py clone, 提升并行处理性能
+feat(StockManager): 增加交易时间判断方法并优化节假日判断方法，在 StockManager 类中添加了 is_trading_hours 方法
+
+fix(indicator): 修复 ALIGN 指标对齐逻辑，修复了当日期超过给定范围时的对齐问题，优化了对齐算法，提高了代码效率
+CVAL、SLICE、REF/ALIGN 多结果集支持
+
+perf(indicator): 优化指标计算过程中的缓冲区准备
+KRecord / KDataImp 全局Null
+KData共享内存、非预加载LRCCache
+
+fixed MySQLKDataDriver 按日期获取索引错误
+feat(data): K线添加分时和分笔数据支持, 在 KQuery 中添加 TIMELINE 和 TRANS 两种新 K 线类型
+Indicaotr优化
+feat(KData): 新增 getKData 方法获取该范围下不同类型 K 线数据
+AGG聚合函数支持
+
+2. 缺陷修复
+
+
+3. VIP扩展
+
+
 2.6.7 - 2025年8月15日
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
