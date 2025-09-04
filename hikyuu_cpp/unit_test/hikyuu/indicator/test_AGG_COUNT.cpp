@@ -34,15 +34,50 @@ TEST_CASE("test_AGG_COUNT") {
     auto mink =
       getKData("sh000001", KQueryByDate(Datetime(20111115), Null<Datetime>(), KQuery::MIN));
 
-    auto ind = AGG_COUNT(CLOSE(), KQuery::MIN)(k);
-    CHECK_EQ(ind.name(), "AGG_COUNT");
-    CHECK_EQ(ind.size(), k.size());
-    CHECK_EQ(ind.discard(), 0);
+    /** @arg 单日聚合分钟线 */
+    auto ind = AGG_COUNT(CLOSE(), KQuery::MIN);
+    auto result = ind(k);
+    CHECK_EQ(result.name(), "AGG_COUNT");
+    CHECK_EQ(result.size(), k.size());
+    CHECK_EQ(result.discard(), 0);
     double sum = 0.0;
-    for (const auto& v : ind) {
+    for (const auto& v : result) {
         sum += v;
     }
     CHECK_EQ(sum, mink.size());
+
+    /** @arg 单日聚合分钟线，复合运算 */
+    auto x = (ind + ind)(k);
+    sum = 0.0;
+    for (const auto& v : x) {
+        sum += v;
+    }
+    CHECK_EQ(sum, 2 * mink.size());
+
+    /** @arg 双日滑动聚合分钟线 */
+    ind = AGG_COUNT(CLOSE(), KQuery::MIN, false, 2);
+    result = ind(k);
+    CHECK_EQ(result.size(), k.size());
+    CHECK_EQ(result.front(), 240);
+    CHECK_EQ(result[1], 480);
+    CHECK_EQ(result[15], 480);
+
+    /** @arg 扩展K线类型 DAY3 聚合分钟线 */
+    k = getKData("sh000001", KQueryByDate(Datetime(20111101), Datetime(20111117), KQuery::DAY3));
+    result = AGG_COUNT(CLOSE(), KQuery::MIN)(k);
+    CHECK_EQ(result.size(), k.size());
+    CHECK_EQ(result.front(), 240);
+    CHECK_EQ(result[1], 720);
+    CHECK_EQ(result[2], 720);
+    CHECK_EQ(result[3], 720);
+    CHECK_EQ(result[4], 240);
+
+    /** @arg 扩展K线类型 MIN3 聚合分笔线 */
+    k = getKData("sh000001", KQueryByDate(Datetime(20111101), Datetime(20111103), KQuery::MIN3));
+    result = AGG_COUNT(CLOSE(), KQuery::MIN)(k);
+    CHECK_EQ(result.size(), k.size());
+    CHECK_EQ(result[0], 3);
+    CHECK_EQ(result[1], 3);
 }
 
 /** @} */
