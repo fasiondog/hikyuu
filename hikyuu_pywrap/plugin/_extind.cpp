@@ -251,7 +251,7 @@ void export_extend_Indicator(py::module& m) {
     :param Indicator ind: 指标数据
     :param KQuery.KType ktype: 聚合的K线周期
     :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    :param int unit: 聚合周期单位 (滚动聚合分组单位, 如使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
     :param int ddof: 自由度(1: 样本标准差, 0: 总体标准差)
     :return: 指标数据
     :rtype: Indicator)");
@@ -280,8 +280,8 @@ void export_extend_Indicator(py::module& m) {
       "AGG_QUANTILE",
       py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, double>(&AGG_QUANTILE),
       py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,
-      py::arg("unit") = 1, py::arg("quantile") = 0.25,
-      R"(AGG_QUANTILE(ind[, ktype=Query.MIN, fill_null=False, unit=1, quantile=0.25])
+      py::arg("unit") = 1, py::arg("quantile") = 0.75,
+      R"(AGG_QUANTILE(ind[, ktype=Query.MIN, fill_null=False, unit=1, quantile=0.75])
 
     聚合其他K线周期分位数, 可参考 AGG_STD 帮助
 
