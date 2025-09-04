@@ -11,13 +11,13 @@
 
 namespace hku {
 
-class IUnsafeRef : public IndicatorImp {
-    INDICATOR_IMP(IUnsafeRef)
+class IRefX : public IndicatorImp {
+    INDICATOR_IMP(IRefX)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    IUnsafeRef();
-    virtual ~IUnsafeRef();
+    IRefX();
+    virtual ~IRefX();
 };
 
 } /* namespace hku */
