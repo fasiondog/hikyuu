@@ -280,14 +280,14 @@ set_context(self, stock, query)
                 fields.push_back("datetime64[ns]");
                 offsets.push_back(0);
                 for (size_t i = 0; i < ret_num; i++) {
-                    names.push_back(fmt::format("value{}", i + 1));
+                    names.push_back(fmt::format("value{}", i));
                     fields.push_back("d");
                     offsets.push_back(offsets.back() + sizeof(Indicator::value_t));
                 }
                 bytes_size = sizeof(Datetime) + ret_num * sizeof(Indicator::value_t);
             } else {
                 for (size_t i = 0; i < ret_num; i++) {
-                    names.push_back(fmt::format("value{}", i + 1));
+                    names.push_back(fmt::format("value{}", i));
                     fields.push_back("d");
                     if (i == 0) {
                         offsets.push_back(0);
@@ -347,7 +347,7 @@ set_context(self, stock, query)
             std::vector<std::string> fields;
             std::vector<int64_t> offsets;
             for (size_t i = 0; i < ret_num; i++) {
-                names.push_back(fmt::format("value{}", i + 1));
+                names.push_back(fmt::format("value{}", i));
                 fields.push_back("d");
                 offsets.push_back(i * sizeof(Indicator::value_t));  // 简化偏移计算
             }
@@ -415,7 +415,7 @@ set_context(self, stock, query)
                 for (size_t j = 0; j < total; j++) {
                     dst[j] = src[j];
                 }
-                columns[fmt::format("value{}", i + 1).c_str()] = arr;
+                columns[fmt::format("value{}", i).c_str()] = arr;
             }
 
             return py::module_::import("pandas").attr("DataFrame")(columns,
@@ -441,7 +441,7 @@ set_context(self, stock, query)
                 for (size_t j = 0; j < total; j++) {
                     dst[j] = src[j];
                 }
-                columns[fmt::format("value{}", i + 1).c_str()] = arr;
+                columns[fmt::format("value{}", i).c_str()] = arr;
             }
 
             return py::module_::import("pandas").attr("DataFrame")(columns,
