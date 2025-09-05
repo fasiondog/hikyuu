@@ -3,6 +3,7 @@
 
 import platform
 import os
+import sys
 try:
     from setuptools import find_packages, setup
 except ImportError:
@@ -15,6 +16,11 @@ def parse_requirements(filename):
 
 
 requirements = parse_requirements('requirements.txt')
+
+current_plat = sys.platform
+cpu_arch = platform.machine()
+if current_plat == 'linux' and cpu_arch in ('aarch64', 'arm64'):
+    requirements.remove('PyQt5')
 
 hku_version = ''
 with open('xmake.lua', 'r', encoding='utf-8') as f:
