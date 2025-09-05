@@ -110,6 +110,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
         m_plugin_manager.pluginPath(m_hikyuuParam.tryGet<string>(
           "plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
     }
+    HKU_INFO("Plugin path: {}", getPluginPath());
 
     // 注册扩展K线处理
     registerPredefinedExtraKType();

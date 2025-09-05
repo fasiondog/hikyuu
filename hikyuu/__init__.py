@@ -91,7 +91,7 @@ if plugin_path.exists():
 else:
     plugin_path = os.path.join(os.path.dirname(__file__), 'plugin')
 sm.set_plugin_path(plugin_path)
-print(f"current plugin path: {plugin_path}")
+# print(f"current plugin path: {plugin_path}")
 
 sm.set_language_path(f'{BASE_DIR}/cpp/i18n')
 
