@@ -1771,6 +1771,100 @@ TEST_CASE("test_KData_getKData") {
     CHECK_EQ(k2.getQuery().recoverType(), k1.getQuery().recoverType());
     CHECK_EQ(k2.front().datetime, Datetime(20110107000000));
     CHECK_EQ(k2.back().datetime, Datetime(20111125000000));
+
+    /** @arg 索引方式查询子集 */
+    k1 = getKData("sh000001", KQuery(-10));
+    k2 = k1.getKData(0, 1);
+    CHECK_EQ(k2.size(), 1);
+    CHECK_EQ(k2[0], k1[0]);
+
+    k2 = k1.getKData(0, 10);
+    CHECK_EQ(k2.size(), 10);
+    for (size_t i = 0; i < k2.size(); i++) {
+        CHECK_EQ(k2[i], k1[i]);
+    }
+
+    k2 = k1.getKData(0, 11);
+    CHECK_EQ(k2.size(), 10);
+    for (size_t i = 0; i < k2.size(); i++) {
+        CHECK_EQ(k2[i], k1[i]);
+    }
+
+    k2 = k1.getKData(0, Null<int64_t>());
+    CHECK_EQ(k2.size(), 10);
+    for (size_t i = 0; i < k2.size(); i++) {
+        CHECK_EQ(k2[i], k1[i]);
+    }
+
+    k2 = k1.getKData(10, Null<int64_t>());
+    CHECK_EQ(k2.size(), 0);
+
+    k2 = k1.getKData(10, 10);
+    CHECK_EQ(k2.size(), 0);
+
+    k2 = k1.getKData(10, 11);
+    CHECK_EQ(k2.size(), 0);
+
+    k2 = k1.getKData(9, 10);
+    CHECK_EQ(k2.size(), 1);
+    CHECK_EQ(k2[0], k1[9]);
+
+    k2 = k1.getKData(9, 11);
+    CHECK_EQ(k2.size(), 1);
+    CHECK_EQ(k2[0], k1[9]);
+
+    k2 = k1.getKData(2, 3);
+    CHECK_EQ(k2.size(), 1);
+    CHECK_EQ(k2[0], k1[2]);
+
+    k2 = k1.getKData(3, 6);
+    CHECK_EQ(k2.size(), 3);
+    for (size_t i = 0; i < k2.size(); i++) {
+        CHECK_EQ(k2[i], k1[i + 3]);
+    }
+
+    k2 = k1.getKData(6, 3);
+    CHECK_EQ(k2.size(), 0);
+
+    k2 = k1.getKData(-1, 0);
+    CHECK_EQ(k2.size(), 0);
+
+    k2 = k1.getKData(-1, 10);
+    CHECK_EQ(k2.size(), 1);
+    CHECK_EQ(k2[0], k1[9]);
+
+    k2 = k1.getKData(-1, Null<int64_t>());
+    CHECK_EQ(k2.size(), 1);
+    CHECK_EQ(k2[0], k1[9]);
+
+    k2 = k1.getKData(-10, Null<int64_t>());
+    CHECK_EQ(k2.size(), 10);
+    for (size_t i = 0; i < k2.size(); i++) {
+        CHECK_EQ(k2[i], k1[i]);
+    }
+
+    k2 = k1.getKData(-1, -2);
+    CHECK_EQ(k2.size(), 0);
+
+    k2 = k1.getKData(-2, -1);
+    CHECK_EQ(k2.size(), 1);
+    CHECK_EQ(k2[0], k1[8]);
+
+    k2 = k1.getKData(-2, -3);
+    CHECK_EQ(k2.size(), 0);
+
+    k2 = k1.getKData(-3, -2);
+    CHECK_EQ(k2.size(), 1);
+    CHECK_EQ(k2[0], k1[7]);
+
+    k2 = k1.getKData(-3, -3);
+    CHECK_EQ(k2.size(), 0);
+
+    k2 = k1.getKData(-7, -3);
+    CHECK_EQ(k2.size(), 4);
+    for (size_t i = 0; i < k2.size(); i++) {
+        CHECK_EQ(k2[i], k1[i + 3]);
+    }
 }
 
 /** @} */

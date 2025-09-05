@@ -75,6 +75,14 @@ public:
      */
     KData getKData(const KQuery::KType& ktype) const;
 
+    /**
+     * 通过索引获取其子集 [star, end)
+     * @param start 起始索引
+     * @param end 结束索引
+     * @return KData
+     */
+    KData getKData(int64_t start, int64_t end = Null<int64_t>()) const;
+
     /** 按日期查询对应的索引位置，注：是 KData 中的位置，不是在 Stock 中原始K记录的位置 */
     size_t getPos(const Datetime& datetime) const;
 
