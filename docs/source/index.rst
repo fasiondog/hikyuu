@@ -51,7 +51,8 @@ Welcome to Hikyuu's documentation!
    :maxdepth: 1
    :caption: Release
 
-   release
+   release.md
+   release_history
 
    
 Indices and tables
