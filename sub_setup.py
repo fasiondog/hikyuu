@@ -18,8 +18,7 @@ def parse_requirements(filename):
 requirements = parse_requirements('requirements.txt')
 
 current_plat = sys.platform
-cpu_arch = platform.machine()
-if current_plat == 'linux' and cpu_arch in ('aarch64', 'arm64'):
+if current_plat == 'linux':
     requirements.remove('PyQt5')
 
 hku_version = ''

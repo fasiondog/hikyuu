@@ -6,6 +6,11 @@
 
 支持的操作系统：64位 Windows7及以上版本、Ubuntu、MacOSX （其中 Windows、Ubuntu 24.04及以上可以直接 pip 安装，其他建议使用源码编译安装）
 
+.. note::
+
+    linux 下 pip 安装时，不安装 PyQt5 依赖, 如需使用 HikyuuTDX, 需自行安装 PyQt5
+
+
 1. Python环境：>= Python3.9 (macosx python >= 3.10)。 推荐使用安装时 python 的主流版本或低一个版本，比如截止 2025年4月1日, python主流版本为 3.12, 建议使用3.12或3.11, 避免因 python 版本低可能导致的其他依赖包互不兼容导致的错误。
 
 .. note:: 
