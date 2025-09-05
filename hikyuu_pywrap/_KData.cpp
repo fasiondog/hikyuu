@@ -18,6 +18,7 @@ const KRecord& (KData::*KData_getKRecord1)(size_t pos) const = &KData::getKRecor
 const KRecord& (KData::*KData_getKRecord2)(Datetime datetime) const = &KData::getKRecord;
 
 void export_KData(py::module& m) {
+    int64_t null_int64 = Null<int64_t>();
     py::class_<KData>(
       m, "KData",
       "通过 Stock.getKData 获取的K线数据，由 KRecord 组成的数组，可象 list 一样进行遍历")
@@ -135,7 +136,7 @@ void export_KData(py::module& m) {
         :rtype: KData)")
 
       .def("get_kdata", py::overload_cast<int64_t, int64_t>(&KData::getKData, py::const_),
-           py::arg("start"), py::arg("end") = Null<int64_t>(),
+           py::arg("start"), py::arg("end") = null_int64,
            R"(get_kdata(self, start, end)
            
         通过索引获取 KData 子集，相当于切片
