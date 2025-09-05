@@ -134,7 +134,7 @@ void KDataPrivatedBufferImp::_recoverForUpDay() {
 
     size_t day_pos = 0;
     size_t day_total = day_list.size();
-    size_t length = size();
+    size_t length = m_buffer.size();
     for (size_t i = 0; i < length; i++) {
         Datetime phase_start_date = startOfPhase(m_buffer[i].datetime);
         Datetime phase_end_date = m_buffer[i].datetime;
