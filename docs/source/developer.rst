@@ -68,6 +68,8 @@ Linux下需安装依赖的开发软件包。如 Ubuntu 下，执行以下命令�
 1. 安装 python 依赖包
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+编译需要 click 和 pyarrow, 如果下述安装依赖时, 无法安装 PyQt5 的，可以只安装 click 和 pyarrow!
+
 .. code-block:: shell
 
     pip install -r requirements.txt
