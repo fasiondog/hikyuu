@@ -368,11 +368,9 @@ def wheel(feedback, j, low_precision, clear):
     elif current_plat == 'win32' and current_bits == 32:
         plat = "win32"
     elif current_plat == 'linux' and current_bits == 64:
-        plat = f"manylinux1_{cpu_arch}"
+        plat = f"manylinux2014_{cpu_arch}"
     elif current_plat == 'linux' and current_bits == 32:
-        plat = f"manylinux1_{cpu_arch}"
-    elif current_plat == 'linux' and cpu_arch == 'arm64':
-        plat = "manylinux2014_aarch64"
+        plat = f"manylinux2014_{cpu_arch}"
     elif current_plat == 'darwin' and cpu_arch != 'arm64' and current_bits == 32:
         plat = "macosx_i686"
     elif current_plat == 'darwin' and cpu_arch != 'arm64' and current_bits == 64:
