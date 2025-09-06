@@ -87,9 +87,6 @@ target("core")
             pydir_lib = os.iorun(py3config .. " --libs"):trim()
 
             pyarrow = os.iorun(os.getenv("CONDA_PREFIX") .. "/bin/python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
-            target:add("includedirs", pyarrow .. "/include")
-            target:add("linkdirs", pyarrow)
-            target:add("links", "arrow_python")
         else
             pydir_include = os.iorun("python3-config --includes"):trim()
             pydir_lib = os.iorun("python3-config --libs"):trim()
@@ -99,14 +96,19 @@ target("core")
             else
                 pyarrow = os.iorun("python3 -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
             end
-            print("pyarrow: " .. pyarrow)
-            target:add("includedirs", pyarrow .. "/include")
-            target:add("linkdirs", pyarrow)
-            target:add("links", "arrow_python")
         end
         assert(pydir_include, "python3-config not found!")
         target:add("cxflags", pydir_include, pydir_lib)    
-
+        print("pyarrow: " .. pyarrow)
+        target:add("includedirs", pyarrow .. "/include")
+        if is_plat("macosx") then
+            target:add("linkdirs", pyarrow)
+            target:add("links", "arrow_python")
+        else
+            -- linux 下 pyarrow 安装包中的 libarrow_python.so 为硬链接会导致安装时无法找到对应版本的 so
+            os.cp(pyarrow .. "/libarrow_python.so", target:targetdir() .. "/libhku_arrow_python.so")
+            target:add("links", "hku_arrow_python")
+        end
     end)
 
     after_build(function(target)
