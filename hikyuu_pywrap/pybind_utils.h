@@ -14,6 +14,7 @@
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
+#include <arrow/api.h>
 #include <vector>
 #include <string>
 #include "convert_any.h"
@@ -122,6 +123,13 @@ inline bool check_pyfunction_arg_num(py::object& func, size_t arg_num) {
  * @return 实际转码点数
  */
 size_t utf8_to_utf32(const std::string& utf8_str, int32_t* out, size_t out_len) noexcept;
+
+/*
+ * 将arrow::Table转换为 pyarrow::Table
+ * @param table 待转换的arrow::Table
+ * @return 转换后的py::object
+ */
+py::object to_pyarrow_table(const std::shared_ptr<arrow::Table>& table);
 
 }  // namespace hku
 

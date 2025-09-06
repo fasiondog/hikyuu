@@ -21,4 +21,4 @@ pipdeptree
 h5py
 tdqm
 clickhouse-connect
-pyarrow
+pyarrow>=15.0.0

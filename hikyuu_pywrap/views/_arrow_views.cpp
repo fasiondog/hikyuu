@@ -5,7 +5,6 @@
  *      Author: fasiondog
  */
 
-#include <arrow/python/pyarrow.h>
 #include <hikyuu/views/arrow_views.h>
 #include "../pybind_utils.h"
 
@@ -28,10 +27,7 @@ static py::object get_market_view_pyarrow(const py::sequence& stks, const Dateti
     } else {
         view = getMarketView(stks_list, date, market);
     }
-    HKU_ASSERT(view);
-    PyObject* raw_obj = arrow::py::wrap_table(view);
-    HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-    return py::reinterpret_steal<py::object>(raw_obj);
+    return to_pyarrow_table(view);
 }
 
 static py::object get_inds_view_pyarrow1(const py::sequence& stks, const IndicatorList& inds,
@@ -45,10 +41,7 @@ static py::object get_inds_view_pyarrow1(const py::sequence& stks, const Indicat
         stock_list = python_list_to_vector<Stock>(stks);
     }
     auto view = getIndicatorsView(stock_list, inds, query, market);
-    HKU_ASSERT(view);
-    PyObject* raw_obj = arrow::py::wrap_table(view);
-    HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-    return py::reinterpret_steal<py::object>(raw_obj);
+    return to_pyarrow_table(view);
 }
 
 static py::object get_inds_view_pyarrow2(const py::sequence& stks, const IndicatorList& inds,
@@ -63,10 +56,7 @@ static py::object get_inds_view_pyarrow2(const py::sequence& stks, const Indicat
         stks_list = python_list_to_vector<Stock>(stks);
     }
     auto view = getIndicatorsView(stks_list, inds, date, cal_len, ktype, market);
-    HKU_ASSERT(view);
-    PyObject* raw_obj = arrow::py::wrap_table(view);
-    HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-    return py::reinterpret_steal<py::object>(raw_obj);
+    return to_pyarrow_table(view);
 }
 
 void export_arrow_views(py::module& m) {
@@ -138,10 +128,7 @@ void export_arrow_views(py::module& m) {
       "krecords_to_pa",
       [](const KRecordList& ks) {
           auto view = getKRecordListView(ks);
-          HKU_ASSERT(view);
-          PyObject* raw_obj = arrow::py::wrap_table(view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          return py::reinterpret_steal<py::object>(raw_obj);
+          return to_pyarrow_table(view);
       },
       "将KRecordList转换为parraw.Table");
 
@@ -149,10 +136,7 @@ void export_arrow_views(py::module& m) {
       "timeline_to_pa",
       [](const TimeLineList& ts) {
           auto view = getTimeLineListView(ts);
-          HKU_ASSERT(view);
-          PyObject* raw_obj = arrow::py::wrap_table(view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          return py::reinterpret_steal<py::object>(raw_obj);
+          return to_pyarrow_table(view);
       },
       "将分时线记录转换为 pyarrow.Table 对象");
 
@@ -160,10 +144,7 @@ void export_arrow_views(py::module& m) {
       "translist_to_pa",
       [](const TransRecordList& ts) {
           auto view = getTransRecordListView(ts);
-          HKU_ASSERT(view);
-          PyObject* raw_obj = arrow::py::wrap_table(view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          return py::reinterpret_steal<py::object>(raw_obj);
+          return to_pyarrow_table(view);
       },
       "将分笔记录转换为 pyarrow.Table 对象");
 
@@ -171,10 +152,7 @@ void export_arrow_views(py::module& m) {
       "weights_to_pa",
       [](const StockWeightList& sws) {
           auto view = getStockWeightListView(sws);
-          HKU_ASSERT(view);
-          PyObject* raw_obj = arrow::py::wrap_table(view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          return py::reinterpret_steal<py::object>(raw_obj);
+          return to_pyarrow_table(view);
       },
       "将权息记录列表转换为 pyarrow.Table 对象");
 
@@ -182,10 +160,7 @@ void export_arrow_views(py::module& m) {
       "dates_to_pa",
       [](const DatetimeList& dates) {
           auto view = getDatetimeListView(dates);
-          HKU_ASSERT(view);
-          PyObject* raw_obj = arrow::py::wrap_table(view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          return py::reinterpret_steal<py::object>(raw_obj);
+          return to_pyarrow_table(view);
       },
       "将日期列表转换为 pyarrow.Table 对象");
 
@@ -193,10 +168,7 @@ void export_arrow_views(py::module& m) {
       "trades_to_pa",
       [](const TradeRecordList& trades) {
           auto view = getTradeRecordListView(trades);
-          HKU_ASSERT(view);
-          PyObject* raw_obj = arrow::py::wrap_table(view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          return py::reinterpret_steal<py::object>(raw_obj);
+          return to_pyarrow_table(view);
       },
       "将交易记录列表转换为 pyarrow.Table 对象");
 
@@ -204,10 +176,7 @@ void export_arrow_views(py::module& m) {
       "positions_to_pa",
       [](const PositionRecordList& positions) {
           auto view = getPositionRecordListView(positions);
-          HKU_ASSERT(view);
-          PyObject* raw_obj = arrow::py::wrap_table(view);
-          HKU_CHECK(raw_obj, "Failed to wrap table to pyobject!");
-          return py::reinterpret_steal<py::object>(raw_obj);
+          return to_pyarrow_table(view);
       },
       "将交易记录列表转换为 pyarrow.Table 对象");
 }
