@@ -161,8 +161,10 @@ TEST_CASE("test_SPEARMAN") {
 
     /** @arg 包含 nan 值 */
     price_t null_value = Null<price_t>();
-    x = PRICELIST({3., 8., null_value, 4., 7., 2., null_value, null_value});
-    y = PRICELIST({null_value, 5., 10., 8., null_value, 10., 6., null_value});
+    a = PriceList{3., 8., null_value, 4., 7., 2., null_value, null_value};
+    b = PriceList{null_value, 5., 10., 8., null_value, 10., 6., null_value};
+    x = PRICELIST(a);
+    y = PRICELIST(b);
     result = SPEARMAN(x, y, 4);
     CHECK_EQ(result.name(), "SPEARMAN");
     CHECK_EQ(result.discard(), 3);
