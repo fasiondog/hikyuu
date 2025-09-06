@@ -75,6 +75,7 @@ setup(
     author=hku_author,
     author_email=hku_author_email,
     license=hku_license,
+    license_files=['LICENSE.txt'],
     keywords=hku_keywords,
     platforms=hku_platforms,
     url=hku_url,
