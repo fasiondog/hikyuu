@@ -68,11 +68,6 @@ target("core")
             end            
             target:add("includedirs", pydir .. "/include")
             target:add("linkdirs", pydir .. "/libs")
-
-            local pyarrow = os.iorun("python -c \"import pyarrow; print(pyarrow.__path__[0])\""):trim()
-            target:add("includedirs", pyarrow .. "/include")
-            target:add("linkdirs", pyarrow)
-            target:add("links", "arrow_python")
             return
         end
     
