@@ -9,6 +9,7 @@ from configparser import ConfigParser
 
 from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 from hikyuu.data.common_pytdx import search_best_tdx
+from hikyuu.data.hku_config_template import generate_default_config
 
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
@@ -26,7 +27,10 @@ class HKUImportDataCMD:
         # 读取保存的配置文件信息，如果不存在，则使用默认配置
         this_dir = self.getUserConfigDir()
         import_config = ConfigParser()
+        if not os.path.exists(this_dir + '/importdata-gui.ini'):
+            generate_default_config()
         import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
+
         if self.ignore_kdata:
             import_config.set('ktype', 'day', 'False')
             import_config.set('ktype', 'min', 'False')
