@@ -17,7 +17,7 @@
 
     - 推荐安装集成了常用数据科学软件包的Python发布版本： `Anaconda <https://www.anaconda.com/>`_ 。国内用户建议从 `清华镜像网站 <https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/>`_ 下载，速度快。
 
-    - linux 下, conda 通常使用自己的 libstdc++.so, 而不是系统默认 libstdc++.so, 可能出现兼容性问题, 如： ImportError: /lib/x86_64-linux-gnu/libstdc++.so.6: cannot allocate memory in static TLS block。 通常的解决办法是保证统一使用系统或者统一使用conda的libstdc++.so，比如手动将conda的lib路径添加到LD_LIBRARY_PATH最前面（优先查找）export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"，然后在启动程序。
+    - linux 下, conda 通常使用自己的 libstdc++.so, 而不是系统默认 libstdc++.so, 可能出现兼容性问题, 如： ImportError: /lib/x86_64-linux-gnu/libstdc++.so.6: cannot allocate memory in static TLS block。 通常的解决办法是保证统一使用系统或者统一使用conda的libstdc++.so，比如手动将conda的lib路径添加到LD_LIBRARY_PATH最前面（优先查找）export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"，然后再启动程序。
 
 2. 安装 git （如使用 hub，必须安装）
 
