@@ -95,6 +95,7 @@ TEST_CASE("test_WITHKTYPE_extent") {
     expect = ALIGN(CLOSE(wk), k, false);
     check_indicator(ret, expect);
 
+#if HKU_ENABLE_TA_LIB
     ret = WITHWEEK(TA_MA(CLOSE(), 3))(k);
     expect = ALIGN(TA_MA(CLOSE(wk), 3), k, false);
     // WITHKTYPE query 为 INDEX 索引时会夺取一些数据，会造成 discard 有所不同
@@ -106,6 +107,7 @@ TEST_CASE("test_WITHKTYPE_extent") {
     wk = getKData("sh000001", KQuery(-30, Null<int64_t>(), KQuery::WEEK));
     expect = ALIGN(TA_MA(CLOSE(wk), 3), k, false);
     check_indicator(ret, expect);
+#endif
 }
 
 /** @par 检测点 */

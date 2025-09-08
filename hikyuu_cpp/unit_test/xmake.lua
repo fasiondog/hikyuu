@@ -96,7 +96,7 @@ target("unit-test")
     end
 
     -- add files
-    add_files("hikyuu/**.cpp|hikyuu/real_data/**|hikyuu/indicator_talib/**.cpp")
+    add_files("./hikyuu/**.cpp|real_data/**|indicator_talib/**.cpp")
     
     if has_config("ta_lib") then
         add_files("hikyuu/indicator_talib/**.cpp")
