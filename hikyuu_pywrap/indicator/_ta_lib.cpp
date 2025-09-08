@@ -5,11 +5,14 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/indicator_talib/ta_crt.h>
+#include "hikyuu/config.h"
+#include "../pybind_utils.h"
+
+namespace py = pybind11;
+using namespace hku;
 
 #if HKU_ENABLE_TA_LIB
-
-#include "../pybind_utils.h"
+#include <hikyuu/indicator_talib/ta_crt.h>
 
 #define TA_IN1_OUT_PY(func, doc)                             \
     m.def(#func, py::overload_cast<>(func));                 \
@@ -50,9 +53,6 @@
     m.def(#func, py::overload_cast<double>(func), py::arg(#param) = param_val);  \
     m.def(#func, py::overload_cast<const KData&, double>(func), py::arg("data"), \
           py::arg(#param) = param_val, doc);
-
-namespace py = pybind11;
-using namespace hku;
 
 void export_Indicator_ta_lib(py::module& m) {
     TA_K_OUT_N_PY(TA_ACCBANDS, 20, R"(TA_ACCBANDS - Acceleration Bands
@@ -688,5 +688,9 @@ void export_Indicator_ta_lib(py::module& m) {
 :param Indicator data: input data
 :param int n: Number of period (From 2 to 100000))")
 }
+
+#else
+
+void export_Indicator_ta_lib(py::module& m) {}
 
 #endif /* HKU_ENABLE_TA_LIB */
