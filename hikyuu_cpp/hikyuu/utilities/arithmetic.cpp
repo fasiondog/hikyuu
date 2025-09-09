@@ -19,7 +19,22 @@
 namespace hku {
 
 template double HKU_UTILS_API roundEx(double number, int ndigits);
-template float HKU_UTILS_API roundEx(float number, int ndigits);
+
+template <>
+float HKU_UTILS_API roundEx(float number, int ndigits) {
+    // 国内一般使用传统四舍五入法
+    if (ndigits < 0)
+        return number;  // 无效位数直接返回原值
+
+    const float factor = std::pow(10.0, ndigits);
+    const float epsilon = 1e-10 * factor;  // 动态调整epsilon避免精度误差
+
+    if (number >= 0)
+        return std::floor(number * factor + 0.5 + epsilon) / factor;
+    else
+        return std::ceil(number * factor - 0.5 - epsilon) / factor;
+}
+
 template double HKU_UTILS_API roundUp(double number, int ndigits);
 template float HKU_UTILS_API roundUp(float number, int ndigits);
 template double HKU_UTILS_API roundDown(double number, int ndigits);
