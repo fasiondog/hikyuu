@@ -31,11 +31,11 @@ void loadLocalLanguage(const std::string &path) {
     }
 }
 
-std::string HKU_API htr(const char *id) {
+std::string HKU_API lang_htr(const char *id) {
     return moFileLib::moFileReaderSingleton::GetInstance().Lookup(id);
 }
 
-std::string HKU_API hctr(const char *ctx, const char *id) {
+std::string HKU_API lang_hctr(const char *ctx, const char *id) {
     return moFileLib::moFileReaderSingleton::GetInstance().LookupWithContext(ctx, id);
 }
 

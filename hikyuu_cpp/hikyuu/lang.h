@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include "hikyuu/utilities/cppdef.h"
 
 #ifndef HKU_API
 #define HKU_API
@@ -19,9 +20,25 @@ namespace hku {
 
 void loadLocalLanguage(const std::string &path = "i8n");
 
-std::string HKU_API htr(const char *id);
+std::string HKU_API lang_htr(const char *id);
 
 // 按上下文获取翻译
-std::string HKU_API hctr(const char *ctx, const char *id);
+std::string HKU_API lang_hctr(const char *ctx, const char *id);
 
+#if CPP_STANDARD >= CPP_STANDARD_20
+template <typename... Args>
+std::string htr(const char *key, Args &&...args) {
+    std::string fmt_str = lang_htr(key);
+    return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+}
+
+template <typename... Args>
+std::string chtr(const char *ctx, const char *key, Args &&...args) {
+    std::string fmt_str = lang_hctr(ctx, key);
+    return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+}
+#else
+#define htr(id) hku::lang_htr(id)
+#define hctr(ctx, id) hku::lang_hctr(ctx, id)
+#endif
 }  // namespace hku
