@@ -19,7 +19,7 @@ void export_plugin_backtest(py::module& m) {
       [](const StrategyContext& context, py::object on_bar, const TradeManagerPtr& tm,
          const Datetime& start_date, const Datetime& end_date, const KQuery::KType& ktype,
          const string& ref_market, int mode, bool support_short, SlippagePtr sp) {
-          HKU_CHECK(py::hasattr(on_bar, "__call__"), htr("on_bar is not callable!"));
+          HKU_CHECK(py::hasattr(on_bar, "__call__"), "{}", htr("on_bar is not callable!"));
           HKU_CHECK(check_pyfunction_arg_num(on_bar, 1), "Number of parameters does not match!");
           py::object c_func = on_bar.attr("__call__");
           auto new_func = [=](Strategy* stg) {

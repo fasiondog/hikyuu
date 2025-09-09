@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-08-28 18:18+0800\n"
-"PO-Revision-Date: 2025-08-28 18:20+0800\n"
+"POT-Creation-Date: 2025-09-10 00:30+0800\n"
+"PO-Revision-Date: 2025-09-10 00:30+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -19,42 +19,41 @@ msgstr ""
 "X-Poedit-SearchPath-1: hikyuu_pywrap\n"
 "X-Poedit-SearchPathExcluded-0: hikyuu_cpp/hikyuu/utilities\n"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:181
+#: hikyuu_cpp/hikyuu/StockManager.cpp:182
 msgid "Loading block..."
 msgstr "加载板块信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:185
+#: hikyuu_cpp/hikyuu/StockManager.cpp:186
 msgid "Loading KData..."
 msgstr "加载K线数据……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:191
+#: hikyuu_cpp/hikyuu/StockManager.cpp:193
 #, c++-format
 msgid "{:<.2f}s Loaded Data."
 msgstr "{:<.2f} 秒数据加载完毕."
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:228
+#: hikyuu_cpp/hikyuu/StockManager.cpp:231
 #, c++-format
 msgid "Preloading {} kdata to buffer (max: {})!"
 msgstr "预加载 {} K线数据至缓存 (最大数量: {})!"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:445
-#, c++-format
-msgid "Not found market info: {}!"
-msgstr "找不到指定的市场信息: {}！"
+#: hikyuu_cpp/hikyuu/StockManager.cpp:447
+msgid "Not found market info"
+msgstr "找不到指定的市场信息"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:498
+#: hikyuu_cpp/hikyuu/StockManager.cpp:500
 msgid "Loading stock information..."
 msgstr "加载证券信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:594
+#: hikyuu_cpp/hikyuu/StockManager.cpp:602
 msgid "Loading market information..."
 msgstr "加载市场信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:612
+#: hikyuu_cpp/hikyuu/StockManager.cpp:620
 msgid "Loading stock type information..."
 msgstr "加载证券类型信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:630
+#: hikyuu_cpp/hikyuu/StockManager.cpp:638
 msgid "Loading stock weight..."
 msgstr "加载权息数据……"
 
@@ -67,113 +66,149 @@ msgstr "启动行情接收."
 msgid "You can't trace in jupyter!"
 msgstr "无法在 jupyter 中进行跟踪打印!"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:157
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:158
 msgid "**  [PF] Position adjustment will be made today.  **"
 msgstr "**  [PF] 调仓日, 进行调仓处理                     **"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:161
-#, c++-format
-msgid "[PF] current running system size: {}"
-msgstr "[PF] 当前运行系统数量: {}"
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:162
+msgid "[PF] current running system size"
+msgstr "[PF] 当前运行系统数量"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:176
-#, c++-format
-msgid "[PF] total asset: {:.2f}, current cash: {:<.2f}, market value: {:<.2f}"
-msgstr "[PF] 总资产: {:.2f}, 现金: {:<.2f}, 市值: {:<.2f}"
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:178
+msgid "total asset"
+msgstr "总资产"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:190
-#, c++-format
-msgid "The kType of query({}) must be DAY when adjust_mode is not \"query\"!"
-msgstr "adjust_mode 为 “query” 时，仅支持日线，但当前K线类型为: {}!"
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:179
+msgid "current cash"
+msgstr "当前现金"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:204
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:179
+msgid "market value"
+msgstr "当前市值"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:193
+msgid "kType of query must be DAY when adjust_mode is not \"query\"!"
+msgstr "查询，但 adjust_mode 为 “query” 时，仅支持日线！"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:206
 msgid "There is no system in portfolio!"
 msgstr "当前资产组合中无系统策略！"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:118
-#, c++-format
-msgid "[PF] The sum cash of sub_tm: {}, cash tm: {}, tm cash: {}"
-msgstr "[PF] 子账户现金总和: {}, 现金账户: {}, 总账户现金: {}"
+msgid "The sum cash of sub_tm"
+msgstr "子账户现金总和"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:119
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:132
+msgid "cash tm"
+msgstr "现金账户"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:119
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:133
+msgid "tm cash"
+msgstr "账户余额"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:132
-#, c++-format
-msgid "After compensate: the sum cash of sub_tm: {}, cash tm: {}, tm cash: {}"
-msgstr "轧差补偿后: 子账号现金总和: {}, 现金账户: {}, 总账户现金: {}"
+msgid "After compensate: the sum cash of sub_tm"
+msgstr "轧差补偿后: 子账号现金总和"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:141
-#, c++-format
-msgid "[PF] [beforce adjust] - total funds: {},  cash: {}, market_value: {}"
-msgstr "[PF] [调仓前] - 总资产: {},  现金: {}, 市值: {}"
+msgid "beforce adjust"
+msgstr "调仓前"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:148
-#, c++-format
-msgid "[PF] process delay adjust sys, size: {}"
-msgstr "[PF] 延迟处理系统数: {}"
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:141
+msgid "total funds"
+msgstr "总资产"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:154
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:142
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:293
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:338
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:816
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
+#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:229
+msgid "cash"
+msgstr "现金余额"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:142
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:293
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:339
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:928
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
+#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:248
+msgid "market_value"
+msgstr "当前市值"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:149
+msgid "process delay adjust sys, size"
+msgstr "[PF] 延迟处理系统数"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:155
 #, c++-format
 msgid "[PF] Delay adjust sell: {}"
 msgstr "[PF] 延迟卖出: {}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:168
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:169
 #, c++-format
 msgid "[{}] failed to force sell, delay to next day"
 msgstr "[{}] 延迟卖出失败，延迟至下一交易日"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:182
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:183
 #, c++-format
 msgid "[PF] sell delay on open {}"
 msgstr "[PF] 开盘时处理延迟卖出 {}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:187
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:188
 #, c++-format
 msgid "[PF] buy delay on open {}"
 msgstr "[PF] 开盘时处理延迟买入 {}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:207
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:208
 #, c++-format
 msgid "[PF] remove no signal delay sys: {}"
 msgstr "[PF] 移除无信号的延迟处理系统: {}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:231
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:233
 #, c++-format
 msgid "[PF] clear delay buy request(future): {}"
 msgstr "[PF] 清除已不再选择系统的延迟买入请求: {}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:241
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:243
 #, c++-format
 msgid "[PF] select: {}, score: {:<.4f}"
 msgstr "[PF] 选中: {}, 分值: {:<.4f}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:276
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:277
 #, c++-format
 msgid "[PF] remove sys: {}"
 msgstr "[PF] 移除系统: {}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:291
-#, c++-format
-msgid "[PF] [after adjust] - total funds: {},  cash: {}, market_value: {}"
-msgstr "[PF] [调仓后] - 总资产: {},  现金: {}, 市值: {}"
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:292
+msgid "after adjust"
+msgstr "调仓后"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:311
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:292
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:338
+msgid "total assets"
+msgstr "总资产"
+
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:314
 #, c++-format
 msgid "[PF] {} sg will buy on next open"
 msgstr "[PF] {} 信号指示下一开盘时买入"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:315
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:317
 #, c++-format
 msgid "[PF] {} sg will buy on current close"
 msgstr "[PF] {} 信号指示当前收盘时买入"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:318
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:320
 #, c++-format
 msgid "[PF] {} will adjust sell on next open"
 msgstr "[PF] {} 将在下一开盘时调仓卖出"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:335
-#, c++-format
-msgid "[PF] [after run at close] - total funds: {},  cash: {}, market_value: {}"
-msgstr "[PF] [收盘时执行后] - 总资产: {}, 现金: {}, 市值: {}"
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:337
+msgid "after run at close"
+msgstr "收盘时运行后"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:108
 #, c++-format
@@ -181,27 +216,25 @@ msgid "[PF] removed system {}"
 msgstr "[PF] 被移除的系统 {}"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:138
-#, c++-format
-msgid "[PF] current select system count: {}"
-msgstr "[PF] 当前选中系统数: {}"
+msgid "current select system count"
+msgstr "当前选中系统数"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:159
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:160
 #, c++-format
 msgid "[PF] will remove system: {}"
 msgstr "[PF] 将被移除的系统: {}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:216
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:294
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:218
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:297
 #, c++-format
 msgid "[PF] force sell not selected sys {}"
 msgstr "[PF] 强制卖出未被选中的系统 {}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:237
-#, c++-format
-msgid "[PF] current seleect system count: {}"
-msgstr "[PF] 当前选中系统数量: {}"
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:238
+msgid "current seleect system count"
+msgstr "当前选中系统数量"
 
-#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:258
+#: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutPortfolio.cpp:260
 #, c++-format
 msgid "[PF] remove system: {}"
 msgstr "[PF] 移除系统: {}"
@@ -291,67 +324,67 @@ msgid "[{}] ST to sell, current price: {}, stoploss: {}"
 msgstr "[{}] 止损指示卖出, 当前价: {}, 止损价: {}"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:603
-#, c++-format
-msgid "[{}] PG to sell, current price: {}, goal: {}"
-msgstr "[{}] 赢利目标指示卖出, 当前价: {}, 目标价: {}"
+msgid "PG to sell, current price"
+msgstr "赢利目标指示卖出, 当前价"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:625
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:604
+msgid "goal price"
+msgstr "目标价"
+
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:626
 #, c++-format
 msgid "[{}] TP to sell, current price after restoration: {}, take_profit: {}"
 msgstr "[{}] 止盈指示卖出, 当前价(复权价）: {}, 止盈价(复权价）: {}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:646
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:647
 #, c++-format
 msgid "[{}] will be delay to buy"
 msgstr "[{}] 延迟至下一开盘时买入"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:653
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:654
 #, c++-format
 msgid "[{}] buy one-price board"
 msgstr "[{}] 一字板买入"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:660
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:741
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:661
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:742
 #, c++-format
 msgid "[{}] delay to buy, one-price board"
 msgstr "[{}] 因一字板，延迟至下一开盘买入"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:667
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:748
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:668
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:749
 #, c++-format
 msgid "[{}] delay to buy, one-price up-limit board"
 msgstr "[{}] 因一字涨停板，延迟至下一开盘买入"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:675
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:732
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:676
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:733
 #, c++-format
 msgid "[{}] delay to buy, current amount == 0 or count == 0"
 msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时买入"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:695
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:696
 #, c++-format
 msgid "[{}] buy failed, planPrice: {} <= stoploss: {}"
 msgstr "[{}] 买入失败, 计划买入价格: {} <= 止损价: {}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:706
-#, c++-format
-msgid "[{}] buy failed, number: {} == 0 or > maxTradeNumber: {}, {}"
-msgstr "[{}] 买入失败, 买入数量: {} == 0 or > 允许的单笔交易数量: {}, {}"
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:708
+msgid "buy failed"
+msgstr "买入失败"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:716
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:717
 #, c++-format
 msgid "[{}] buy failed, {}"
 msgstr "[{}] 买入失败，{}"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:826
-#, c++-format
-msgid "[{}] force sell {} by {}"
-msgstr "[{}] 强制卖出 {}，来自 {}"
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:827
+msgid "force sell"
+msgstr "强制卖出"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:855
-#, c++-format
-msgid "[{}] Failed force sell {} by {}"
-msgstr "[{}] 强制卖出失败 {}，来自 {}"
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:856
+msgid "Failed force sell"
+msgstr "强制卖出失败"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:873
 #, c++-format
@@ -409,8 +442,8 @@ msgstr "[{}] 因一字板，延迟至下一开盘买空"
 msgid "[{}] delay to buy short, one-price up-limint board"
 msgstr "[{}] 因一字涨停板，延迟至下一开盘买空"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1090
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1146
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1091
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1147
 #, c++-format
 msgid "[{}] delay to buy short, current amount == 0 or count == 0"
 msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时买空"
@@ -421,23 +454,23 @@ msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时买空
 msgid "[{}] delay to sell short, one-price board"
 msgstr "[{}] 因一字板，延迟至下一开盘卖空"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1271
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1344
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1272
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1345
 #, c++-format
 msgid "[{}] delay to sell short, one-price down-limint board"
 msgstr "[{}] 因一字跌停板，延迟至下一开盘卖空"
 
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1279
-#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1328
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1280
+#: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1329
 #, c++-format
 msgid "[{}] delay to sell short, current amount == 0 or count == 0"
 msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时卖空"
 
 #: hikyuu_cpp/hikyuu/views/arrow_views.cpp:24
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:267
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:359
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:805
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:920
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:268
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:360
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:807
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:922
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:240
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
@@ -450,10 +483,10 @@ msgid "market_code"
 msgstr "证券代码"
 
 #: hikyuu_cpp/hikyuu/views/arrow_views.cpp:25
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:268
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:360
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:806
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:921
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:269
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:361
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:808
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:923
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:242
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
@@ -523,46 +556,46 @@ msgstr "动态市盈率"
 msgid "pb"
 msgstr "市净率"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:269
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:361
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:807
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:270
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:362
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:809
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:221
 msgid "datetime"
 msgstr "交易时间"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:808
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:810
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:119
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:222
 msgid "business"
 msgstr "业务名称"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:809
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:811
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:224
 msgid "planPrice"
 msgstr "计划交易价格"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:810
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:812
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:225
 msgid "realPrice"
 msgstr "实际成交价格"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:811
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:813
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:226
 msgid "goalPrice"
 msgstr "目标价格"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:812
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:814
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:227
 msgid "number"
 msgstr "交易数量"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:813
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:929
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:815
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:931
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:110
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:251
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:120
@@ -570,133 +603,121 @@ msgstr "交易数量"
 msgid "stoploss"
 msgstr "止损价"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:814
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
-#: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:229
-msgid "cash"
-msgstr "现金余额"
-
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:815
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:817
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:230
 msgid "cost_total"
 msgstr "交易总成本"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:816
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:818
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:231
 msgid "cost_commission"
 msgstr "佣金"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:817
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:819
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:121
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:232
 msgid "cost_stamptax"
 msgstr "印花税"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:818
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:820
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:233
 msgid "cost_transferfee"
 msgstr "过户费"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:819
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:821
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:234
 msgid "cost_others"
 msgstr "其它成本"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:820
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:822
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:235
 msgid "part_from"
 msgstr "信号来源"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:821
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:823
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:122
 #: hikyuu_pywrap/trade_manage/_TradeRecord.cpp:237
 msgid "remark"
 msgstr "备注"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:922
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:924
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:244
 msgid "take_time"
 msgstr "买入时间"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:923
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:925
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:108
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:245
 msgid "hold_days"
 msgstr "持仓天数"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:924
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:926
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:246
 msgid "hold_number"
 msgstr "持仓数量"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:925
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:927
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:247
 msgid "invest"
 msgstr "投入金额"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:926
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
-#: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:248
-msgid "market_value"
-msgstr "当前市值"
-
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:927
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:929
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:109
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:249
 msgid "profit"
 msgstr "盈亏金额"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:928
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:930
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:110
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:250
 msgid "profit_percent"
 msgstr "盈亏百分比"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:930
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:932
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:110
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:252
 msgid "goal_price"
 msgstr "目标价"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:931
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:933
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:111
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:253
 msgid "clean_time"
 msgstr "清仓时间"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:932
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:934
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:111
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:254
 msgid "total_number"
 msgstr "累计持有数量"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:933
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:935
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:111
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:255
 msgid "total_cost"
 msgstr "累计成本"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:934
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:936
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:112
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:256
 msgid "total_risk"
 msgstr "累计风险"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:935
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:937
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:112
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:257
 msgid "buy_money"
 msgstr "累计买入金额"
 
-#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:936
+#: hikyuu_cpp/hikyuu/views/arrow_views.cpp:938
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:112
 #: hikyuu_pywrap/trade_manage/_PositionRecord.cpp:258
 msgid "sell_money"
@@ -730,7 +751,7 @@ msgstr "每笔最小交易数量"
 msgid "maxTradeNumber"
 msgstr "每笔最大交易数量"
 
-#: hikyuu_pywrap/indicator/_build_in.cpp:967
+#: hikyuu_pywrap/indicator/_build_in.cpp:977
 msgid "WEAVE: total must be 2 to 6"
 msgstr "WEAVE指标输入参数数量需大于等2并小于等于6"
 
@@ -755,6 +776,34 @@ msgstr "系统名称"
 #: hikyuu_pywrap/trade_sys/_Selector.cpp:137
 msgid "weight"
 msgstr "权重"
+
+#, c++-format
+#~ msgid "[PF] total asset: {:.2f}, current cash: {:<.2f}, market value: {:<.2f}"
+#~ msgstr "[PF] 总资产: {:.2f}, 现金: {:<.2f}, 市值: {:<.2f}"
+
+#, c++-format
+#~ msgid "[PF] The sum cash of sub_tm: {}, cash tm: {}, tm cash: {}"
+#~ msgstr "[PF] 子账户现金总和: {}, 现金账户: {}, 总账户现金: {}"
+
+#, c++-format
+#~ msgid "[PF] [beforce adjust] - total funds: {},  cash: {}, market_value: {}"
+#~ msgstr "[PF] [调仓前] - 总资产: {},  现金: {}, 市值: {}"
+
+#, c++-format
+#~ msgid "[PF] [after adjust] - total funds: {},  cash: {}, market_value: {}"
+#~ msgstr "[PF] [调仓后] - 总资产: {},  现金: {}, 市值: {}"
+
+#, c++-format
+#~ msgid "[PF] [after run at close] - total funds: {},  cash: {}, market_value: {}"
+#~ msgstr "[PF] [收盘时执行后] - 总资产: {}, 现金: {}, 市值: {}"
+
+#, c++-format
+#~ msgid "[{}] buy failed, number: {} == 0 or > maxTradeNumber: {}, {}"
+#~ msgstr "[{}] 买入失败, 买入数量: {} == 0 or > 允许的单笔交易数量: {}, {}"
+
+#, c++-format
+#~ msgid "[{}] force sell {} by {}"
+#~ msgstr "[{}] 强制卖出 {}，来自 {}"
 
 #~ msgid "price_change(%)"
 #~ msgstr "涨跌幅(%)"
