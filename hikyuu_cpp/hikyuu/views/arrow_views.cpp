@@ -186,13 +186,14 @@ std::shared_ptr<arrow::Table> HKU_API getMarketView(const StockList& stks, const
             } else if (kdata.size() == 1 && kdata[0].datetime == dates[1]) {
                 HKU_ASSERT(code_builder.Append(stk.market_code()).ok());
                 HKU_ASSERT(name_builder.Append(stk.name()).ok());
-                HKU_ASSERT(date_builder.Append(dates[1].timestamp() / 1000LL).ok());
+                HKU_ASSERT(date_builder.Append(dates[0].timestamp() / 1000LL).ok());
                 HKU_ASSERT(open_builder.Append(kdata[0].openPrice).ok());
                 HKU_ASSERT(high_builder.Append(kdata[0].highPrice).ok());
                 HKU_ASSERT(low_builder.Append(kdata[0].lowPrice).ok());
                 HKU_ASSERT(close_builder.Append(kdata[0].closePrice).ok());
                 HKU_ASSERT(amount_builder.Append(kdata[0].transAmount).ok());
                 HKU_ASSERT(volume_builder.Append(kdata[0].transCount).ok());
+                HKU_ASSERT(yesterday_close_builder.AppendNull().ok());
                 Indicator::value_t hsl = HSL(kdata)[0];
                 HKU_ASSERT(turnover_builder.Append(hsl * 100.).ok());
                 HKU_ASSERT(
