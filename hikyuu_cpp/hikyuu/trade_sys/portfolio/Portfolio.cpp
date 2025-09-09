@@ -97,7 +97,7 @@ void Portfolio::baseCheckParam(const string& name) const {
 
     } else if ("trace" == name) {
         if (getParam<bool>("trace") && pythonInJupyter()) {
-            HKU_THROW(htr("You can't trace in jupyter!"));
+            HKU_THROW("{}", htr("You can't trace in jupyter!"));
         }
     }
 }
@@ -150,15 +150,17 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
     HKU_IF_RETURN(date < m_tm->initDatetime(), void());
 
     bool trace = getParam<bool>("trace");
-    HKU_INFO_IF(trace, "{} ===========================================================", date);
-    if (trace && adjust) {
-        HKU_INFO("****************************************************");
-        HKU_INFO("**                                                **");
-        HKU_INFO(htr("**  [PF] Position adjustment will be made today.  **"));
-        HKU_INFO("**                                                **");
-        HKU_INFO("****************************************************");
+    if (trace) {
+        HKU_INFO("{} ===========================================================", date);
+        if (adjust) {
+            HKU_INFO("****************************************************");
+            HKU_INFO("**                                                **");
+            HKU_INFO(htr("**  [PF] Position adjustment will be made today.  **"));
+            HKU_INFO("**                                                **");
+            HKU_INFO("****************************************************");
+        }
+        HKU_INFO("{}: {}", htr("[PF] current running system size"), m_running_sys_set.size());
     }
-    HKU_INFO_IF(trace, htr("[PF] current running system size: {}"), m_running_sys_set.size());
 
     // 开盘前，调整账户权息
     m_tm->updateWithWeight(date);
@@ -173,8 +175,9 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
     // 跟踪打印当前账户资产
     if (trace) {
         FundsRecord funds = m_tm->getFunds(date, m_query.kType());
-        HKU_INFO(htr("[PF] total asset: {:.2f}, current cash: {:<.2f}, market value: {:<.2f}"),
-                 funds.total_assets(), funds.cash, funds.market_value);
+        HKU_INFO("[PF] {}: {:.2f}, {}: {:<.2f}, {}: {:<.2f}", htr("total asset"),
+                 funds.total_assets(), htr("current cash"), funds.cash, htr("market value"),
+                 funds.market_value);
     }
 }
 
@@ -186,9 +189,8 @@ void Portfolio::run(const KQuery& query, bool force) {
     bool delay_to_trading_day = getParam<bool>("delay_to_trading_day");
     to_lower(mode);
     if (mode != "query") {
-        HKU_CHECK(query.kType() == KQuery::DAY,
-                  htr("The kType of query({}) must be DAY when adjust_mode is not \"query\"!"),
-                  query.kType());
+        HKU_CHECK(query.kType() == KQuery::DAY, "{} {}", query.kType(),
+                  htr("kType of query must be DAY when adjust_mode is not \"query\"!"));
     }
 
     setQuery(query);

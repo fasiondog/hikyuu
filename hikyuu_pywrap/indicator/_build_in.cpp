@@ -979,7 +979,7 @@ void export_Indicator_build_in(py::module& m) {
         Indicator ind2 = seq[1].cast<Indicator>();
         Indicator tmp = WEAVE(ind1, ind2);
         for (size_t i = 2; i < total; i++) {
-            tmp = WEAVE(tmp, seq[i].cast<Indicator>());
+            tmp = WEAVE(tmp, seq[i].cast<const Indicator&>());
         }
         return tmp;
     });
