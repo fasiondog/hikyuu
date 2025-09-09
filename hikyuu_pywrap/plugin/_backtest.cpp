@@ -69,7 +69,7 @@ void export_plugin_backtest(py::module& m) {
                   HKU_ERROR("Unknown error!");
               }
           };
-          backtest(new_func, tm, start_date, end_date, ktype, ref_market, mode, support_short);
+          backtest(new_func, tm, start_date, end_date, ktype, ref_market, mode, support_short, sp);
       },
       py::arg("on_bar"), py::arg("tm"), py::arg("start_date"), py::arg("end_date") = null_date,
       py::arg("ktype") = KQuery::DAY, py::arg("ref_market") = "SH", py::arg("mode") = 0,
