@@ -12,7 +12,6 @@ os.environ["NUMEXPR_MAX_THREADS"] = str(os.cpu_count())
 from datetime import datetime, timedelta, date  # NOQA: E402
 import numpy as np  # NOQA: E402
 import pandas as pd  # NOQA: E402
-import pyarrow as pa  # NOQA: E402
 
 # 解决中文对齐问题
 pd.set_option('display.unicode.ambiguous_as_wide', True)
