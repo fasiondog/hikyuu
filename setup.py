@@ -178,7 +178,7 @@ def cli():
               help='使用低精度版本')
 @click.option('-arrow',
               '--arrow',
-              default=False,
+              default=True,
               type=bool,
               help='arrow支持')
 def build(verbose, mode, feedback, j, low_precision, arrow):
@@ -212,7 +212,7 @@ def build(verbose, mode, feedback, j, low_precision, arrow):
               help='使用低精度版本')
 @click.option('-arrow',
               '--arrow',
-              default=False,
+              default=True,
               type=bool,
               help='arrow支持')
 def test(all, compile, verbose, mode, case, feedback, j, low_precision, arrow):
@@ -320,7 +320,7 @@ def copy_include(install_dir):
               help='使用低精度版本')
 @click.option('-arrow',
               '--arrow',
-              default=False,
+              default=True,
               type=bool,
               help='arrow支持')
 def install(j, o, low_precision, arrow):
@@ -359,7 +359,7 @@ def install(j, o, low_precision, arrow):
               help='使用低精度版本')
 @click.option('-arrow',
               '--arrow',
-              default=False,
+              default=True,
               type=bool,
               help='arrow支持')
 @click.option('-c', '--clear', is_flag=False, help='先清除之前编译结果')
@@ -396,12 +396,6 @@ def wheel(feedback, j, low_precision, clear, arrow):
     else:
         print("*********尚未实现该平台的支持*******")
         return
-
-    if low_precision:
-        plat = f"{plat}_low_precision"
-
-    if not arrow:
-        plat = f"{plat}_noarrow"
 
     py_version = get_python_version()
     main_ver, min_ver = py_version.split('.')

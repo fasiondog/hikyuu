@@ -53,6 +53,7 @@ hikyuu/importdata
 hikyuu/.eggs
 Hikyuu.egg-info
 hikyuu.egg-info
+hikyuu_noarrow.egg-info
 dist
 boost_*
 py_version
