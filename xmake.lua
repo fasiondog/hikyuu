@@ -37,6 +37,7 @@ option("low_precision", {description = "Enable low precision.", default = false}
 option("log_level", {description = "set log level.", default = 2, values = {1, 2, 3, 4, 5, 6}})
 option("async_log", {description = "Use async log.", default = false})
 option("leak_check", {description = "Enable leak check for test", default = false})
+option("arrow", {description = "Enable arrow support.", default = true})
 
 -- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
 -- windows下如果使用 serialize 且希望使用动态库，需要设置 runtimes 参数为 "MD"
@@ -96,6 +97,7 @@ set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
 set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
 set_configvar("HKU_ENABLE_TA_LIB", get_config("ta_lib") and 1 or 0)
+set_configvar("HKU_ENABLE_ARROW", get_config("arrow") and 1 or 0)
 
 set_configvar("HKU_SUPPORT_DATETIME", 1)
 set_configvar("HKU_ENABLE_SQLCIPHER", 0)
@@ -155,7 +157,7 @@ add_requires("nng", {system = false, configs = {NNG_ENABLE_TLS = has_config("htt
 add_requires("nlohmann_json", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc", {system = false})
-if get_config("leak_check") then
+if get_config("leak_check") and get_config("arrow") then
     add_requires("arrow", {system = false, configs = {shared = true}})
 else
     add_requires("arrow", {system = false})

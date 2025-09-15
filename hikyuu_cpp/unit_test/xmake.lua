@@ -66,12 +66,15 @@ target("unit-test")
         end
     end
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "arrow")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
         add_packages("mysql")
     end
     if has_config("ta_lib") then
         add_packages("ta-lib")
+    end
+    if has_config("arrow") then
+        add_packages("arrow")
     end
 
     add_includedirs("..")

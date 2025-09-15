@@ -12,7 +12,7 @@
 #include "hikyuu/indicator/crt/LIUTONGPAN.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/StockManager.h"
-#include "hikyuu/plugin/hkuextra.h"
+#include "hikyuu/plugin/hkuviews.h"
 #include "hikyuu/plugin/device.h"
 #include "arrow_views.h"
 

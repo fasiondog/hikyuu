@@ -6,8 +6,11 @@
  */
 
 #include <hikyuu/indicator/Indicator.h>
-#include <hikyuu/views/arrow_views.h>
 #include "../pybind_utils.h"
+
+#if HKU_ENABLE_ARROW
+#include <hikyuu/views/arrow_views.h>
+#endif
 
 namespace py = pybind11;
 using namespace hku;
@@ -448,6 +451,7 @@ set_context(self, stock, query)
         },
         "转换为 DataFrame, 仅包含值")
 
+#if HKU_EANBLE_ARROW
       .def("to_pyarrow",
            [](const Indicator& self) {
                auto view = getIndicatorView(self);
@@ -459,6 +463,7 @@ set_context(self, stock, query)
                auto view = getIndicatorValueView(self);
                return to_pyarrow_table(view);
            })
+#endif
 
       .def(py::self + py::self)
       .def(py::self + Indicator::value_t())

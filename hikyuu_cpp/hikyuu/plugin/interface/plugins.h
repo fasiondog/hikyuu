@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "hikyuu/config.h"
+
 #include "BackTestPluginInterface.h"
 #include "DevicePluginInterface.h"
 #include "DataServerPluginInterface.h"
@@ -15,6 +17,10 @@
 #include "TMReportPluginInterface.h"
 #include "DataDriverPluginInterface.h"
 #include "HkuExtraPluginInterface.h"
+
+#if HKU_ENABLE_ARROW
+#include "HkuViewsPluginInterface.h"
+#endif
 
 namespace hku {
 
@@ -26,5 +32,6 @@ namespace hku {
 #define HKU_PLUGIN_TMREPORT "tmreport"
 #define HKU_PLUGIN_CLICKHOUSE_DRIVER "clickhousedriver"
 #define HKU_PLUGIN_HKU_EXTRA "hkuextra"
+#define HKU_PLUGIN_HKU_VIEWS "hkuviews"
 
-}
+}  // namespace hku

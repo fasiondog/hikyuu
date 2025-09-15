@@ -6,9 +6,12 @@
  */
 
 #include <utf8proc.h>
+#include "pybind_utils.h"
+
+#if HKU_ENABLE_ARROW
 #include <arrow/ipc/writer.h>
 #include <arrow/io/memory.h>
-#include "pybind_utils.h"
+#endif
 
 namespace hku {
 size_t utf8_to_utf32(const std::string& utf8_str, int32_t* out, size_t out_len) noexcept {
@@ -25,6 +28,7 @@ size_t utf8_to_utf32(const std::string& utf8_str, int32_t* out, size_t out_len) 
     return result;
 }
 
+#if HKU_ENABLE_ARROW
 py::object to_pyarrow_table(const std::shared_ptr<arrow::Table>& table) {
     HKU_CHECK(table, "Table is null!");
     auto out = arrow::io::BufferOutputStream::Create().ValueOrDie();
@@ -51,5 +55,6 @@ py::object to_pyarrow_table(const std::shared_ptr<arrow::Table>& table) {
     py::object stream = pa_ipc.attr("open_stream")(reader);
     return stream.attr("read_all")();
 }
+#endif
 
 }  // namespace hku

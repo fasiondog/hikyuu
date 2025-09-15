@@ -14,7 +14,7 @@ target("hikyuu")
         end
     end
 
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "xxhash", "arrow")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "xxhash")
     if is_plat("windows", "linux", "cross", "macosx") then
         if get_config("sqlite") or get_config("hdf5") then
             add_packages("sqlite3")
@@ -27,6 +27,10 @@ target("hikyuu")
 
     if has_config("ta_lib") then
         add_packages("ta-lib")
+    end
+
+    if (has_config("arrow")) then
+        add_packages("arrow")
     end
 
     add_options("mysql")
@@ -80,7 +84,7 @@ target("hikyuu")
 
     -- add files
     -- add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp")
-    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|indicator_talib/**.cpp")
+    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|indicator_talib/**.cpp|views/**.cpp")
     add_files("./data_driver/*.cpp")
     if get_config("hdf5") or get_config("sqlite") then
         add_files("./data_driver/base_info/sqlite/**.cpp")
@@ -109,6 +113,9 @@ target("hikyuu")
     end
     if has_config("ta_lib") then
         add_files("./indicator_talib/**.cpp")
+    end
+    if has_config("arrow") then
+        add_files("./views/**.cpp")
     end
 
     after_build(function(target)

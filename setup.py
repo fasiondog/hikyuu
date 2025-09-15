@@ -105,7 +105,7 @@ def clear_with_python_changed(mode):
 # ------------------------------------------------------------------------------
 # 执行构建
 # ------------------------------------------------------------------------------
-def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_precision=False):
+def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_precision=False, arrow=True):
     """ 执行编译 """
     global g_verbose
     g_verbose = verbose
@@ -115,18 +115,18 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_
 
     current_compile_info = get_current_compile_info()
     current_compile_info['mode'] = mode
-
-    py_version = current_compile_info['py_version']
+    current_compile_info['feedback'] = feedback
+    current_compile_info['low_precision'] = low_precision
+    current_compile_info['arrow'] = arrow
 
     # 如果 python版本或者编译模式发生变化，则重新编译
     history_compile_info = get_history_compile_info()
-    if py_version != history_compile_info[
-            'py_version'] or history_compile_info['mode'] != mode:
+    if current_compile_info != history_compile_info:
         clear_with_python_changed(mode)
         # kind = "shared" if mode == 'release' and sys.platform != 'darwin' else "static"
         kind = "shared" if mode == 'release' else "static"
-        cmd = "xmake f {} -c -y -m {} --feedback={} -k {} --low_precision={} --log_level={}".format(
-            "-v -D" if verbose else "", mode, feedback, kind, low_precision,
+        cmd = "xmake f {} -c -y -m {} --feedback={} -k {} --low_precision={} --arrow={} --log_level={}".format(
+            "-v -D" if verbose else "", mode, feedback, kind, low_precision, arrow,
             2 if mode == 'release' else 0)
 
         # macosx 下动态库不支持 serialize, 静态库太大不适合打包（hub中使用C++需要使用)
@@ -176,14 +176,19 @@ def cli():
               default=False,
               type=bool,
               help='使用低精度版本')
-def build(verbose, mode, feedback, j, low_precision):
+@click.option('-arrow',
+              '--arrow',
+              default=False,
+              type=bool,
+              help='arrow支持')
+def build(verbose, mode, feedback, j, low_precision, arrow):
     """ 执行编译 """
-    start_build(verbose, mode, feedback, j, low_precision)
+    start_build(verbose, mode, feedback, j, low_precision, arrow)
 
 
 @click.command()
 @click.option('-all', "--all", is_flag=True, help="执行全部测试, 否则仅仅进行最小范围测试）")
-@click.option("-compile", "--compile", is_flag=True, help='强制重新编译')
+@click.option("-compile", "--compile", is_flag=False, help='强制重新编译')
 @click.option('-feedback',
               '--feedback',
               default=True,
@@ -205,13 +210,14 @@ def build(verbose, mode, feedback, j, low_precision):
               default=False,
               type=bool,
               help='使用低精度版本')
-def test(all, compile, verbose, mode, case, feedback, j, low_precision):
+@click.option('-arrow',
+              '--arrow',
+              default=False,
+              type=bool,
+              help='arrow支持')
+def test(all, compile, verbose, mode, case, feedback, j, low_precision, arrow):
     """ 执行单元测试 """
-    current_compile_info = get_current_compile_info()
-    current_compile_info['mode'] = mode
-    history_compile_info = get_history_compile_info()
-    if compile or current_compile_info != history_compile_info:
-        start_build(verbose, mode, feedback, j, low_precision)
+    start_build(verbose, mode, feedback, j, low_precision, arrow)
     if all:
         os.system("xmake -j {} -b {} unit-test".format(
             j, "-v -D" if verbose else ""))
@@ -312,7 +318,12 @@ def copy_include(install_dir):
               default=False,
               type=bool,
               help='使用低精度版本')
-def install(j, o, low_precision):
+@click.option('-arrow',
+              '--arrow',
+              default=False,
+              type=bool,
+              help='arrow支持')
+def install(j, o, low_precision, arrow):
     """ 编译并安装 Hikyuu python 库 """
     install_dir = o
     if install_dir is None:
@@ -327,7 +338,7 @@ def install(j, o, low_precision):
             except:
                 pass
 
-    start_build(False, 'release', True, j, low_precision)
+    start_build(False, 'release', True, j, low_precision, arrow)
 
     shutil.copytree("./hikyuu", install_dir)
 
@@ -346,15 +357,20 @@ def install(j, o, low_precision):
               default=False,
               type=bool,
               help='使用低精度版本')
+@click.option('-arrow',
+              '--arrow',
+              default=False,
+              type=bool,
+              help='arrow支持')
 @click.option('-c', '--clear', is_flag=False, help='先清除之前编译结果')
-def wheel(feedback, j, low_precision, clear):
+def wheel(feedback, j, low_precision, clear, arrow):
     """ 生成 python 的 wheel 安装包 """
     # 清理之前遗留的打包产物
     if clear:
         clear_build()
 
     # 尝试编译
-    start_build(False, 'release', feedback, j, low_precision)
+    start_build(False, 'release', feedback, j, low_precision, arrow)
 
     copy_include('hikyuu')
 
@@ -383,6 +399,9 @@ def wheel(feedback, j, low_precision, clear):
 
     if low_precision:
         plat = f"{plat}_low_precision"
+
+    if not arrow:
+        plat = f"{plat}_noarrow"
 
     py_version = get_python_version()
     main_ver, min_ver = py_version.split('.')

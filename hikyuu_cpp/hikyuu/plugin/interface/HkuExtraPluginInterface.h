@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <arrow/api.h>
 #include "hikyuu/utilities/plugin/PluginBase.h"
 
 namespace hku {
@@ -36,19 +35,6 @@ public:
                                          size_t& out_end) = 0;
 
     virtual KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query) = 0;
-
-    virtual std::shared_ptr<arrow::Table> getIndicatorsViewParallel(const StockList& stks,
-                                                                    const IndicatorList& inds,
-                                                                    const KQuery& query,
-                                                                    const string& market) = 0;
-
-    virtual std::shared_ptr<arrow::Table> getIndicatorsViewParallel(
-      const StockList& stks, const IndicatorList& inds, const Datetime& date, size_t cal_len,
-      const KQuery::KType& ktype, const string& market) = 0;
-
-    virtual std::shared_ptr<arrow::Table> getMarketViewParallel(const StockList& stks,
-                                                                const Datetime& date,
-                                                                const string& market) = 0;
 };
 
 }  // namespace hku
