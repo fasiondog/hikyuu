@@ -120,6 +120,11 @@ ValueT roundEx(ValueT number, int ndigits = 0) {
         return static_cast<ValueT>(std::ceil(number * factor - 0.5 - epsilon) / factor);
 }
 
+extern template double HKU_UTILS_API roundEx(double number, int ndigits);
+
+template <>
+float HKU_UTILS_API roundEx(float number, int ndigits);
+
 /**
  * 向上截取，如10.1截取后为11
  * @param number  待处理数据
@@ -193,6 +198,11 @@ ValueT roundDown(ValueT number, int ndigits = 0) {
 
     return number;
 }
+
+extern template double HKU_UTILS_API roundUp(double number, int ndigits);
+extern template float HKU_UTILS_API roundUp(float number, int ndigits);
+extern template double HKU_UTILS_API roundDown(double number, int ndigits);
+extern template float HKU_UTILS_API roundDown(float number, int ndigits);
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
