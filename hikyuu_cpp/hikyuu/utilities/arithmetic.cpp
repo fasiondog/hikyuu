@@ -21,7 +21,7 @@ namespace hku {
 template double HKU_UTILS_API roundEx(double number, int ndigits);
 
 template <>
-float HKU_UTILS_API roundEx(float number, int ndigits) {
+float roundEx(float number, int ndigits) {
     // 国内一般使用传统四舍五入法
     if (ndigits < 0)
         return number;  // 无效位数直接返回原值
