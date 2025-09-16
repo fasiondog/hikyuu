@@ -90,9 +90,12 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
     SpotRecord* result = nullptr;
     try {
         result = new SpotRecord;
-        result->market = spot->market()->str();
-        result->code = spot->code()->str();
-        result->name = spot->name()->str();
+        if (spot->market())
+            result->market = spot->market()->str();
+        if (spot->code())
+            result->code = spot->code()->str();
+        if (spot->name())
+            result->name = spot->name()->str();
         result->datetime = Datetime(spot->datetime()->str());
         result->yesterday_close = spot->yesterday_close();
         result->open = spot->open();
