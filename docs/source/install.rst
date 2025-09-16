@@ -33,6 +33,13 @@ pip 安装
 
 版本升级：python -m pip install hikyuu -U
 
+.. note::
+
+    **2.6.8 版本起，部分不支持 avx 指令集的老旧机器，请使用 pip install hikyuu-noarrow 安装。(不包含arrow相关功能）** windows下可使用 cpuz 等查看 cpu 指令集，如：
+
+    .. figure:: _static/cpuz_avx.png
+
+
 .. figure:: _static/20000-install.png
 
 .. note::
