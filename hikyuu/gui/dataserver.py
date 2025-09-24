@@ -16,6 +16,7 @@ import click
 @click.option('--save', '-save', default=False, type=bool, help='保存行情数据(仅支持clickhouse)')
 @click.option('--buf', '-buf', default=False, type=bool, help='缓存行情数据')
 def main(addr, work_num, save, buf):
+    # 如需其他机器访问，addr 参数需为 tcp://0.0.0.0:port
     try:
         start_data_server(addr, work_num, save_tick=save, buf_tick=buf)
 
