@@ -51,10 +51,13 @@ public:
 
 #if HKU_OS_WINDOWS
         m_handle = LoadLibrary(HKU_PATH(filename).c_str());
+        HKU_WARN_IF_RETURN(!m_handle, false, "load plugin({}) failed! errcode: {}", filename,
+                           GetLastError());
+
 #else
         m_handle = dlopen(filename.c_str(), RTLD_LAZY);
+        HKU_WARN_IF_RETURN(!m_handle, false, "load plugin({}) failed! {}", filename, dlerror());
 #endif
-        HKU_WARN_IF_RETURN(!m_handle, false, "load plugin({}) failed!", filename);
 
         typedef PluginBase* (*CreateFunction)();
         CreateFunction createFunction =
