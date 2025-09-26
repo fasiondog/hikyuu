@@ -34,7 +34,7 @@ def pytdx_import_weight_to_clickhouse(pytdx_api, connect, market):
 
     total_count = 0
     update_count = 0
-    stock_list = connect.query(f"select code from `hku_base`.`stock` where market='{market}' and valid=1")
+    stock_list = connect.query(f"select code from `hku_base`.`stock` where market='{market}'")
     stockid_list = stock_list.result_rows
 
     for stockrecord in stockid_list:
