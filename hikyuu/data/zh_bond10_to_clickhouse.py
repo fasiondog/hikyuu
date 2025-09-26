@@ -13,7 +13,7 @@ from hikyuu.util import *
 def import_zh_bond10_to_clickhouse(connect):
     sql = "select max(date) from hku_base.zh_bond10"
     start_date = connect.command(sql)
-    if type(start_date) == int:
+    if start_date == 0:
         start_date = "19901219"
     else:
         last_date = start_date
