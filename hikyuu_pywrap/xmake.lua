@@ -129,6 +129,7 @@ target("core")
                 -- print(path.filename(filepath))
                 local filename = path.filename(filepath)
                 os.run(format("install_name_tool -change @rpath/%s @loader_path/%s %s", filename, filename, dst_obj))
+                os.run(format("install_name_tool -change %s @loader_path/%s %s", filename, filename, dst_obj))
             end
             os.run(format("install_name_tool -change libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_obj))
             os.run(format("install_name_tool -change libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_obj))

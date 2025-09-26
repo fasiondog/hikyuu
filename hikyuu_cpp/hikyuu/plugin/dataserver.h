@@ -14,7 +14,8 @@
 namespace hku {
 
 void HKU_API startDataServer(const std::string& addr = "tcp://0.0.0.0:9201", size_t work_num = 2,
-                             bool save_tick = false, bool buf_tick = false);
+                             bool save_tick = false, bool buf_tick = false,
+                             const std::string& parquet_path = std::string());
 
 void HKU_API stopDataServer();
 
