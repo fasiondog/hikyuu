@@ -434,6 +434,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if (not is_valid_license()) or hdf5_enable or mysql_enable:
             clickhouse_enable = False
         self.enable_clickhouse_radioButton.setChecked(clickhouse_enable)
+        self.enable_clickhouse_radioButton.setEnabled(is_valid_license())
         self.clickhouse_tmpdir_lineEdit.setText(import_config.get('clickhouse', 'tmpdir', fallback='d:/stock'))
         self.clickhouse_tmpdir_pushButton.setEnabled(clickhouse_enable)
         clickhouse_ip = import_config.get('clickhouse', 'host', fallback='127.0.0.1')
