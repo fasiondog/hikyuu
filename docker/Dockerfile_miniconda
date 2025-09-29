@@ -1,0 +1,89 @@
+# 第一阶段：构建环境（安装所有依赖）
+FROM ubuntu:24.04 AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 安装编译工具（仅构建阶段需要）
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    ca-certificates \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    binutils \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG TARGETARCH
+ENV MINICONDA_VERSION=py313_25.7.0-2
+ENV MINICONDA_PATH=/opt/miniconda3
+
+# 安装Miniconda
+RUN if [ "$TARGETARCH" = "amd64" ]; then \
+        MINICONDA_URL="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh"; \
+    elif [ "$TARGETARCH" = "arm64" ]; then \
+        MINICONDA_URL="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-aarch64.sh"; \
+    else \
+        echo "Unsupported architecture: $TARGETARCH" && exit 1; \
+    fi && \
+    wget --quiet "$MINICONDA_URL" -O miniconda.sh && \
+    bash miniconda.sh -b -p ${MINICONDA_PATH} && \
+    rm miniconda.sh
+
+# 关键修复：接受Anaconda服务条款（必须在conda install前执行）
+RUN ${MINICONDA_PATH}/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    ${MINICONDA_PATH}/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
+# 配置pip镜像 + 安装hikyuu（pip包）
+RUN ${MINICONDA_PATH}/bin/pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
+    ${MINICONDA_PATH}/bin/pip config set global.trusted-host pypi.tuna.tsinghua.edu.cn && \
+    ${MINICONDA_PATH}/bin/pip install --no-cache-dir --upgrade pip && \
+    ${MINICONDA_PATH}/bin/pip install --no-cache-dir hikyuu
+
+# 明确安装conda常用包（numpy/pandas等）
+RUN ${MINICONDA_PATH}/bin/conda install -y \
+    ipython \
+    && ${MINICONDA_PATH}/bin/conda clean -afy  # 清理conda缓存
+
+# 进一步清理冗余文件（减小体积）
+RUN rm -rf ${MINICONDA_PATH}/pkgs/*/info \
+           ${MINICONDA_PATH}/doc \
+           ${MINICONDA_PATH}/examples
+
+
+# 第二阶段：运行环境（仅保留必要文件）
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 仅保留运行时依赖
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libgomp1 \
+    binutils \
+    python3-pyqt5 \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# 设置时区为上海
+ENV TimeZone=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TimeZone /etc/localtime && echo $TimeZone > /etc/timezone && apt-get update -y && apt-get upgrade -y && apt-get install tzdata -y
+
+# 从构建阶段复制Miniconda（包含已安装的所有包：conda包和pip包）
+ENV MINICONDA_PATH=/opt/miniconda3
+COPY --from=builder ${MINICONDA_PATH} ${MINICONDA_PATH}
+
+# 替换 Miniconda 的 libstdc++ 为系统库
+RUN SYSTEM_LIB_PATH=$(find /usr/lib -name "libstdc++.so.6" | grep -E "$(uname -m)" | head -n 1) && \
+    mv $MINICONDA_PATH/lib/libstdc++.so.6 $MINICONDA_PATH/lib/libstdc++.so.6.bak && \
+    ln -s $SYSTEM_LIB_PATH $MINICONDA_PATH/lib/libstdc++.so.6 && \
+    # 验证替换结果
+    strings $MINICONDA_PATH/lib/libstdc++.so.6 | grep GLIBCXX_3.4.30
+
+WORKDIR /app
+
+RUN bash -c "$MINICONDA_PATH/bin/conda init bash" && \  
+    echo "conda activate base" >> /root/.bashrc
+ENV LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/lib/aarch64-linux-gnu:/opt/miniconda3/lib"
+
+
+CMD ["bash", "-l"]
