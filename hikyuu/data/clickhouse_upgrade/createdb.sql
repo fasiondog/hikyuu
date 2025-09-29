@@ -880,15 +880,15 @@ INSERT INTO `hku_base`.`holiday` (`date`) VALUES
 
 CREATE DATABASE IF NOT EXISTS hku_data;
 CREATE table if not exists hku_data.day_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY market
@@ -896,188 +896,188 @@ PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date)
 SETTINGS index_granularity = 2048;
 CREATE table if not exists hku_data.week_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY market
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.month_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY market
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.quarter_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY market
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.halfyear_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY market
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.year_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY market
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.min_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY (market, toYear(date)-toYear(date)%10)
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.min5_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY (market, toYear(date)-toYear(date)%10)
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.min15_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY (market, toYear(date)-toYear(date)%10)
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.min30_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY (market, toYear(date)-toYear(date)%10)
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.min60_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY market
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.hour2_k (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `open` DOUBLE,
-    `high` DOUBLE,
-    `low` DOUBLE,
-    `close` DOUBLE,
-    `amount` DOUBLE,
-    `volume` DOUBLE
+    `open` UInt32,
+    `high` UInt32,
+    `low` UInt32,
+    `close` UInt32,
+    `amount` UInt64,
+    `volume` UInt64
 ) 
 ENGINE = MergeTree()
 PARTITION BY market
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.timeline (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `price` DOUBLE,
-    `vol` DOUBLE
+    `price` UInt32,
+    `vol` UInt32
 ) 
 ENGINE = MergeTree()
 PARTITION BY (market, toYear(date)-toYear(date)%10)
 PRIMARY KEY (market, code, date)
 ORDER BY (market, code, date);
 CREATE table if not exists hku_data.transdata (
-    `market` String,
-    `code` String,
+    `market` FixedString(2),
+    `code` FixedString(6),
     `date` DateTime,
-    `price` DOUBLE,
-    `vol` DOUBLE,
-    `buyorsell` int
+    `price` UInt32,
+    `vol` UInt32,
+    `buyorsell` UInt8
 ) 
 ENGINE = MergeTree()
 PARTITION BY (market, toYear(date))

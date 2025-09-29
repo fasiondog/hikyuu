@@ -15,10 +15,11 @@ import click
 @click.option('--work_num', '-n', default=2, type=int, help='行情接收处理线程数')
 @click.option('--save', '-save', default=False, type=bool, help='保存行情数据(仅支持clickhouse)')
 @click.option('--buf', '-buf', default=False, type=bool, help='缓存行情数据')
-def main(addr, work_num, save, buf):
+@click.option('--parquet_path', '-parquet_path', default="", help='Parquet 文件存储路径, 空字符串表示不保存')
+def main(addr, work_num, save, buf, parquet_path):
     # 如需其他机器访问，addr 参数需为 tcp://0.0.0.0:port
     try:
-        start_data_server(addr, work_num, save_tick=save, buf_tick=buf)
+        start_data_server(addr, work_num, save_tick=save, buf_tick=buf, parquet_path=parquet_path)
 
         while True:
             try:

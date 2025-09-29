@@ -12,11 +12,11 @@
 namespace hku {
 
 void HKU_API startDataServer(const std::string& addr, size_t work_num, bool save_tick,
-                             bool buf_tick) {
+                             bool buf_tick, const std::string& parquet_path) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DataServerPluginInterface>(HKU_PLUGIN_DATASERVER);
     HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DATASERVER);
-    plugin->start(addr, work_num, save_tick, buf_tick);
+    plugin->start(addr, work_num, save_tick, buf_tick, parquet_path);
 }
 
 void HKU_API stopDataServer() {

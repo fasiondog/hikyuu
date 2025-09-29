@@ -29,7 +29,7 @@ from pytdx.hq import TDXParams
 
 from hikyuu.util import hku_error, hku_debug, hku_run_ignore_exception
 
-from hikyuu import Datetime
+from hikyuu import Datetime, roundEx
 from hikyuu.data.common import *
 from hikyuu.data.common_pytdx import to_pytdx_market, pytdx_get_day_trans
 from hikyuu.data.common_clickhouse import (
@@ -325,7 +325,7 @@ def import_one_stock_data(
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord amount: {last_krecord[5]}, bar: {bar['amount']*0.001}")
                     return 0
-                if ktype == 'DAY' and last_krecord[5] != 0.0 and abs(last_krecord[6] - bar["vol"]) / last_krecord[6] > 0.1:
+                if ktype == 'DAY' and last_krecord[6] != 0.0 and last_krecord[5] != 0.0 and abs(last_krecord[6] - bar["vol"]) / last_krecord[6] > 0.1:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord count: {last_krecord[6]}, bar: {bar['vol']}")
                     return 0
@@ -343,12 +343,12 @@ def import_one_stock_data(
                         (
                             table[1], table[2],
                             Datetime(bar_datetime).timestamp_utc()//1000000,
-                            bar["open"],
-                            bar["high"],
-                            bar["low"],
-                            bar["close"],
-                            bar["amount"] * 0.001,
-                            bar["vol"]
+                            int(roundEx(bar["open"], 3)*1000),
+                            int(roundEx(bar["high"], 3)*1000),
+                            int(roundEx(bar["low"], 3)*1000),
+                            int(roundEx(bar["close"], 3)*1000),
+                            int(roundEx(bar["amount"], 0)),
+                            int(roundEx(bar["vol"], 3)*1000)
                             # bar['vol'] if stktype == 2 else round(bar['vol'] * 0.01)
                         )
                     )
@@ -592,8 +592,8 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
                     (
                         market, code,
                         Datetime(cur_date * 1000000 + minute * 100 + second).timestamp_utc()//1000000,
-                        record["price"],
-                        record["vol"],
+                        int(roundEx(record["price"], 3) * 1000.0),
+                        int(record["vol"]),
                         record["buyorsell"],
                     )
                 )
@@ -698,7 +698,7 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
                 time = 1400
             try:
                 time_buf.append((market, code, Datetime(this_date + time).timestamp_utc() //
-                                ticks, record['price'], record['vol']))
+                                ticks, int(roundEx(record['price'], 3) * 1000.0), int(record['vol'])))
                 time += 1
             except Exception as e:
                 hku_error("Failed trans record {}! {}".format(record, e))
