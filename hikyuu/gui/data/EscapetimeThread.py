@@ -3,10 +3,10 @@
 # cp936
 
 import time
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide6.QtCore import QThread, Signal
 
 class EscapetimeThread(QThread):
-    message = pyqtSignal(list)
+    message = Signal(list)
 
     def __init__(self):
         super(self.__class__, self).__init__()
@@ -14,19 +14,13 @@ class EscapetimeThread(QThread):
         self.msg_name = 'ESCAPE_TIME'
         self.init_time = time.time()
 
-    def __del__(self):
-        self.working = False
-        #print("EscapetimeThread", "__del__", time.time() - self.init_time)
-        self.wait()
-
-    def send_message(self, msg):
-        self.message.emit([self.msg_name] + msg)
+    def run(self):
+        while self.working:
+            time.sleep(1)
+            current_time = time.time()
+            self.message.emit([self.msg_name, round(current_time - self.init_time, 1)])
 
     def stop(self):
         self.working = False
+        self.quit()
         self.wait()
-
-    def run(self):
-        while self.working:
-            self.msleep(10)
-            self.send_message([(time.time() - self.init_time),])

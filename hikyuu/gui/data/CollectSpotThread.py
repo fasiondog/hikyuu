@@ -6,7 +6,7 @@ import logging
 import time
 import datetime
 from math import ceil
-from PyQt5.QtCore import QThread, QWaitCondition, QMutex
+from PySide6.QtCore import QThread, QWaitCondition, QMutex
 
 from hikyuu.util import *
 from hikyuu.gui.spot_server import collect, release_nng_senders

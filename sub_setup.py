@@ -18,8 +18,9 @@ def parse_requirements(filename):
 requirements = parse_requirements('requirements.txt')
 
 current_plat = sys.platform
-if current_plat == 'linux':
-    requirements.remove('PyQt5')
+# 移除PyQt5的特殊处理
+# if current_plat == 'linux':
+#     requirements.remove('PyQt5')
 
 hku_version = ''
 with open('xmake.lua', 'r', encoding='utf-8') as f:

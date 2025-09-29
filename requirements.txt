@@ -4,7 +4,7 @@ matplotlib
 seaborn
 pandas>=1.0.4
 pytdx
-PyQt5
+PySide6>=6.0.0
 tables
 bokeh
 gitpython

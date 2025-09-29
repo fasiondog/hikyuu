@@ -12,11 +12,10 @@ from logging.handlers import QueueListener
 # 优先加载，处理 VS 17.10 升级后依赖 dll 不兼容问题
 import hikyuu
 
-import PyQt5
-
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
-from PyQt5.QtCore import pyqtSlot, QObject, pyqtSignal
-from PyQt5.QtGui import QIcon, QTextCursor, QFont, QPalette, QPixmap
+# 替换PyQt5导入为PySide6
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
+from PySide6.QtCore import Slot, QObject, Signal
+from PySide6.QtGui import QIcon, QTextCursor, QFont, QPalette, QPixmap
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -30,6 +29,8 @@ from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from hikyuu.gui.data.ImportTdxToH5Task import ImportTdxToH5Task
 from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 from hikyuu.gui.data.UseQmtImportToH5Thread import UseQmtImportToH5Thread
+# from hikyuu.gui.data.CollectToMySQLThread import CollectToMySQLThread
+# from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
 from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
@@ -41,7 +42,7 @@ from hikyuu.util import *
 
 class EmittingStream(QObject):
     """输出重定向至QT"""
-    textWritten = pyqtSignal(str)
+    textWritten = Signal(str)
 
     def write(self, text):
         self.textWritten.emit(str(text))
@@ -247,7 +248,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         except:
             pass
 
-    @pyqtSlot()
+    @Slot()
     def on_save_pushButton_clicked(self):
         try:
             self.saveConfig()
@@ -617,7 +618,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             '5MIN': self.hdf5_5min_progressBar
         }
 
-    @pyqtSlot()
+    @Slot()
     def on_fetch_trial_pushButton_clicked(self):
         email = self.email_lineEdit.text()
         info = fetch_trial_license(email)
@@ -625,7 +626,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.label_license.setText(view_license())
         self.fetch_trial_pushButton.setEnabled(not is_valid_license())
 
-    @pyqtSlot()
+    @Slot()
     def on_pytdx_radioButton_clicked(self):
         if self.pytdx_radioButton.isChecked():
             self.tdx_radioButton.setChecked(False)
@@ -633,7 +634,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.use_download = 'pytdx'
         self.on_tdx_or_pytdx_toggled()
 
-    @pyqtSlot()
+    @Slot()
     def on_tdx_radioButton_clicked(self):
         if self.tdx_radioButton.isChecked():
             self.pytdx_radioButton.setChecked(False)
@@ -641,6 +642,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.use_download = 'tdx'
         self.on_tdx_or_pytdx_toggled()
 
+    @Slot()
     def on_qmt_radioButton_clicked(self):
         if self.qmt_radioButton.isChecked():
             self.tdx_radioButton.setChecked(False)
@@ -674,7 +676,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.time_start_dateEdit.setEnabled(False)
             self.use_tdx_number_spinBox.setEnabled(False)
 
-    @pyqtSlot()
+    @Slot()
     def on_select_tdx_dir_pushButton_clicked(self):
         dlg = QFileDialog()
         dlg.setFileMode(QFileDialog.Directory)
@@ -684,7 +686,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             dirname = dlg.selectedFiles()
             self.tdx_dir_lineEdit.setText(dirname[0])
 
-    @pyqtSlot()
+    @Slot()
     def on_hdf5_dir_pushButton_clicked(self):
         dlg = QFileDialog()
         dlg.setFileMode(QFileDialog.Directory)
@@ -694,21 +696,21 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             dirname = dlg.selectedFiles()
             self.hdf5_dir_lineEdit.setText(dirname[0])
 
-    @pyqtSlot()
+    @Slot()
     def on_enable_hdf55_radioButton_clicked(self):
         if self.enable_hdf55_radioButton.isChecked():
             self.enable_mysql_radioButton.setChecked(False)
             self.enable_clickhouse_radioButton.setChecked(False)
         self.on_enable_database_toggled(hdf5=True, mysql=False, clickhouse=False)
 
-    @pyqtSlot()
+    @Slot()
     def on_enable_mysql_radioButton_clicked(self):
         if self.enable_mysql_radioButton.isChecked():
             self.enable_hdf55_radioButton.setChecked(False)
             self.enable_clickhouse_radioButton.setChecked(False)
         self.on_enable_database_toggled(hdf5=False, mysql=True, clickhouse=False)
 
-    @pyqtSlot()
+    @Slot()
     def on_enable_clickhouse_radioButton_clicked(self):
         if self.enable_clickhouse_radioButton.isChecked():
             self.enable_hdf55_radioButton.setChecked(False)
@@ -731,7 +733,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.clickhouse_test_pushButton.setEnabled(clickhouse)
         self.clickhouse_tmpdir_pushButton.setEnabled(clickhouse)
 
-    @pyqtSlot()
+    @Slot()
     def on_mysql_tmpdir_pushButton_clicked(self):
         dlg = QFileDialog()
         dlg.setFileMode(QFileDialog.Directory)
@@ -741,7 +743,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             dirname = dlg.selectedFiles()
             self.mysql_tmpdir_lineEdit.setText(dirname[0])
 
-    @pyqtSlot()
+    @Slot()
     def on_clickhouse_tmpdir_pushButton_clicked(self):
         if not is_valid_license():
             QMessageBox.critical(self, "clickhouse引擎", "需要捐赠授权才能使用clickhouse引擎")
@@ -755,7 +757,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             dirname = dlg.selectedFiles()
             self.clickhouse_tmpdir_lineEdit.setText(dirname[0])
 
-    @pyqtSlot()
+    @Slot()
     def on_mysql_test_pushButton_clicked(self):
         """测试数据库连接"""
         db_config = {
@@ -779,7 +781,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         QMessageBox.about(self, "测试数据库连接", " 连接成功！")
 
-    @pyqtSlot()
+    @Slot()
     def on_clickhouse_test_pushButton_clicked(self):
         """测试数据库连接"""
         db_config = {
@@ -889,7 +891,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 if msg[2] != 'FINISHED':
                     self.import_detail_textEdit.append(msg[2])
 
-    @pyqtSlot()
+    @Slot()
     def on_start_import_pushButton_clicked(self):
         try:
             self.saveConfig()
@@ -964,7 +966,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.message.connect(self.on_message_from_thread)
         self.escape_time_thread.start()
 
-    @pyqtSlot()
+    @Slot()
     def on_sched_import_pushButton_clicked(self):
         self.sched_import_pushButton.setEnabled(False)
         if self._is_sched_import_running:
@@ -992,7 +994,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.sched_import_pushButton.setText("停止定时导入")
         self.sched_import_pushButton.setEnabled(True)
 
-    @pyqtSlot()
+    @Slot()
     def on_collect_start_pushButton_clicked(self):
         if self._is_collect_running:
             if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
@@ -1038,10 +1040,6 @@ if __name__ == "__main__":
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("pytdx").setLevel(logging.WARNING)
-
-    # 自适应分辨率，防止字体显示不全
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
 
     app = QApplication(sys.argv)
     f = QFont('SimSun')

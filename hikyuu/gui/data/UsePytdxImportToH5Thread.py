@@ -28,7 +28,7 @@ import datetime
 import mysql.connector
 import queue
 from multiprocessing import Queue, Process
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide6.QtCore import QThread, Signal
 from hikyuu.gui.data.ImportWeightToSqliteTask import ImportWeightToSqliteTask
 from hikyuu.gui.data.ImportPytdxToH5Task import ImportPytdxToH5
 from hikyuu.gui.data.ImportPytdxTransToH5Task import ImportPytdxTransToH5
@@ -58,7 +58,7 @@ from hikyuu.util.mylog import class_logger
 
 
 class UsePytdxImportToH5Thread(QThread):
-    message = pyqtSignal(list)
+    message = Signal(list)
 
     def __init__(self, parent, config):
         super(UsePytdxImportToH5Thread, self).__init__()

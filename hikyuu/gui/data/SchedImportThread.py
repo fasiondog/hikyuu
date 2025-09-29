@@ -6,14 +6,14 @@ import logging
 import time
 import datetime
 from math import ceil
-from PyQt5.QtCore import QThread, QWaitCondition, QMutex, pyqtSignal
+from PySide6.QtCore import QThread, QWaitCondition, QMutex, Signal
 
 from hikyuu.util import *
 from hikyuu import Datetime, TimeDelta
 
 
 class SchedImportThread(QThread):
-    message = pyqtSignal()
+    message = Signal()
 
     def __init__(self, config):
         super(self.__class__, self).__init__()
