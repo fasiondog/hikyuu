@@ -311,7 +311,8 @@ def load_hikyuu(**kwargs):
 
     sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
 
-    start_spot = True
+    # 默认不启动行情接收, 防止启动在开盘后因自身合成缺失导致从 dataserver 获取行情也缺失
+    start_spot = False
     if 'HKU_START_SPOT' in os.environ:
         spot_str = os.environ['HKU_START_SPOT'].upper()
         start_spot = spot_str in ('1', 'TRUE')
