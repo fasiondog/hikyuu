@@ -53,36 +53,33 @@ RUN rm -rf ${MINICONDA_PATH}/pkgs/*/info \
 # 第二阶段：运行环境（仅保留必要文件）
 FROM ubuntu:24.04
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-# 仅保留运行时依赖
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    libgomp1 \
-    binutils \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
 # 设置时区为上海
-ENV TimeZone=Asia/Shanghai
-RUN ln -snf /usr/share/zoneinfo/$TimeZone /etc/localtime && echo $TimeZone > /etc/timezone && apt-get update -y && apt-get upgrade -y && apt-get install tzdata -y
+ENV TimeZone=Asia/Shanghai \
+    DEBIAN_FRONTEND=noninteractive \
+    MINICONDA_PATH=/opt/miniconda3
 
 # 从构建阶段复制Miniconda（包含已安装的所有包：conda包和pip包）
-ENV MINICONDA_PATH=/opt/miniconda3
 COPY --from=builder ${MINICONDA_PATH} ${MINICONDA_PATH}
-
-# 替换 Miniconda 的 libstdc++ 为系统库
-RUN SYSTEM_LIB_PATH=$(find /usr/lib -name "libstdc++.so.6" | grep -E "$(uname -m)" | head -n 1) && \
-    mv $MINICONDA_PATH/lib/libstdc++.so.6 $MINICONDA_PATH/lib/libstdc++.so.6.bak && \
-    ln -s $SYSTEM_LIB_PATH $MINICONDA_PATH/lib/libstdc++.so.6 && \
-    # 验证替换结果
-    strings $MINICONDA_PATH/lib/libstdc++.so.6 | grep GLIBCXX_3.4.30
 
 WORKDIR /app
 
-RUN bash -c "$MINICONDA_PATH/bin/conda init bash" && \  
-    echo "conda activate base" >> /root/.bashrc
-ENV LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/lib/aarch64-linux-gnu:/opt/miniconda3/lib"
-
+RUN ln -snf /usr/share/zoneinfo/$TimeZone /etc/localtime && echo $TimeZone > /etc/timezone && \
+    apt-get update -y && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
+        tzdata \
+        ca-certificates \
+        libgomp1 \
+        binutils \
+        git \
+    && rm -rf /var/lib/apt/lists/* \
+    # 替换 Miniconda 的 libstdc++ 为系统库
+    SYSTEM_LIB_PATH=$(find /usr/lib -name "libstdc++.so.6" | grep -E "$(uname -m)" | head -n 1) && \
+    mv $MINICONDA_PATH/lib/libstdc++.so.6 $MINICONDA_PATH/lib/libstdc++.so.6.bak && \
+    ln -s $SYSTEM_LIB_PATH $MINICONDA_PATH/lib/libstdc++.so.6 && \
+    # 激活 miniconda base
+    bash -c "$MINICONDA_PATH/bin/conda init bash" && \  
+    echo "conda activate base" >> /root/.bashrc && \
+    # 优先加载系统so
+    echo "export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib/aarch64-linux-gnu:/opt/miniconda3/lib" >> /root/.bashrc
 
 CMD ["bash", "-l"]
