@@ -169,4 +169,36 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput) {
 
 #endif /* defined(_MSC_VER) */
 
+bool HKU_UTILS_API isInteger(double num) {
+    // 处理特殊值：NaN（非数值）或无穷大
+    if (std::isnan(num) || std::isinf(num)) {
+        return false;
+    }
+
+    // 计算小数部分（对 1.0 取模）
+    double fractionalPart = num - std::floor(num);  // 等价于 num % 1.0，但处理负数更稳妥
+
+    // 允许微小误差（因浮点数精度问题，如 5.0000000001 应视为 5）
+    const double epsilon = 1e-9;
+    return std::fabs(fractionalPart) < epsilon || std::fabs(fractionalPart - 1.0) < epsilon;
+}
+
+bool HKU_UTILS_API isInteger(float num) {
+    // 处理特殊值：NaN（非数值）或无穷大（使用float专用函数）
+    if (std::isnan(num) || std::isinf(num)) {
+        return false;
+    }
+
+    // 计算小数部分（使用float专用的floor函数）
+    float fractionalPart = num - std::floorf(num);
+
+    // 调整适合float的精度误差（float精度低于double，epsilon需更大）
+    const float epsilon = 1e-5f;  // float典型精度范围内的误差阈值
+    // 判断小数部分是否接近0或1.0（处理类似5.9999997这种情况）
+    return std::fabsf(fractionalPart) < epsilon || std::fabsf(fractionalPart - 1.0f) < epsilon;
+}
+
+template double HKU_UTILS_API get_quantile(const std::vector<double> &vec, double quantile);
+template float HKU_UTILS_API get_quantile(const std::vector<float> &vec, double quantile);
+
 }  // namespace hku

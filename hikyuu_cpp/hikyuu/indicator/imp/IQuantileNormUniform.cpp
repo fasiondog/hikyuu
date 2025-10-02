@@ -44,46 +44,6 @@ void IQuantileNormUniform::_checkParam(const string &name) const {
     }
 }
 
-// 判断 double 是否为整数（考虑精度误差）
-static bool isInteger(double num) {
-    // 处理特殊值：NaN（非数值）或无穷大
-    if (std::isnan(num) || std::isinf(num)) {
-        return false;
-    }
-
-    // 计算小数部分（对 1.0 取模）
-    double fractionalPart = num - std::floor(num);  // 等价于 num % 1.0，但处理负数更稳妥
-
-    // 允许微小误差（因浮点数精度问题，如 5.0000000001 应视为 5）
-    const double epsilon = 1e-9;
-    return std::fabs(fractionalPart) < epsilon || std::fabs(fractionalPart - 1.0) < epsilon;
-}
-
-// 计算已排序vector中第 quantile 位的数值
-static Indicator::value_t get_quantile(const std::vector<IndicatorImp::value_t> &vec,
-                                       double quantile) {
-    HKU_ASSERT(!vec.empty());
-    if (quantile == 0.0) {
-        return vec.front();
-    } else if (quantile == 1.0) {
-        return vec.back();
-    }
-
-    Indicator::value_t ret;
-    double qpos = vec.size() * quantile;
-    if (qpos <= 1.0) {
-        ret = vec[0];
-    } else if (isInteger(qpos)) {
-        size_t pos = static_cast<size_t>(qpos);
-        ret = (vec[pos - 1] + vec[pos]) / 2;
-    } else {
-        size_t pos = static_cast<size_t>(qpos);
-        Indicator::value_t x = qpos - pos;
-        ret = vec[pos - 1] + x * (vec[pos] - vec[pos - 1]);
-    }
-    return ret;
-}
-
 // 替换掉分位数范围外数值
 static vector<Indicator::value_t> quantile_trunc(Indicator::value_t const *src, size_t total,
                                                  double quantile_min, double quantile_max) {
