@@ -189,6 +189,14 @@ void export_MultiFactor(py::module& m) {
 
     :return: [factor1, factor2, ...] 顺序与参考证券顺序相同)")
 
+      .def("add_special_normalize", &MultiFactorBase::addSpecialNormalize,
+           R"(add_special_normalize(self, name, norm)
+        
+    对指定名称的指标应用特定的标准化操作，其他指标使用全局标准化操作。 只有启用了全局标准化时，才会生效。
+
+    :param str name: 特殊归一化方法名称
+    :param Normalize norm: 特殊归一化方法)")
+
       .def("get_ic", &MultiFactorBase::getIC, py::arg("ndays") = 0, R"(get_ic(self[, ndays=0])
 
     获取合成因子的IC, 长度与参考日期同

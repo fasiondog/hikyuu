@@ -18,12 +18,10 @@ NormNothing::NormNothing() : NormalizeBase("NORM_NOTHING") {}
 NormNothing::~NormNothing() {}
 
 PriceList NormNothing::normalize(const PriceList& data) {
-    PriceList result(data.size());
-    std::copy(data.begin(), data.end(), result.begin());
-    return result;
+    return data;
 }
 
-NormPtr HKU_API NORM_NOTHIN() {
+NormPtr HKU_API NORM_NOTHING() {
     return std::make_shared<NormNothing>();
 }
 

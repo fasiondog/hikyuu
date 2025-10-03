@@ -20,6 +20,9 @@ class HKU_API NormalizeBase {
 public:
     NormalizeBase() = default;
     NormalizeBase(const string& name) : m_name(name) {}
+
+    NormalizeBase(const NormalizeBase& other) : m_params(other.m_params), m_name(other.m_name) {}
+
     virtual ~NormalizeBase() = default;
 
     /** 获取名称 */
@@ -38,6 +41,11 @@ public:
     virtual NormPtr _clone() = 0;
 
     virtual PriceList normalize(const PriceList& data) = 0;
+
+protected:
+    virtual bool isPythonObject() const {
+        return false;
+    }
 
 protected:
     string m_name;
@@ -103,4 +111,15 @@ public:                                       \
     }                                         \
     PriceList normalize(const PriceList& data) override;
 
+HKU_API std::ostream& operator<<(std::ostream&, const NormalizeBase&);
+HKU_API std::ostream& operator<<(std::ostream&, const NormalizePtr&);
+
 }  // namespace hku
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::NormalizeBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::NormalizePtr> : ostream_formatter {};
+#endif

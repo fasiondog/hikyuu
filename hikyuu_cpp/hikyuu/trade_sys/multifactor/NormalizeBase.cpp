@@ -9,6 +9,21 @@
 
 namespace hku {
 
+HKU_API std::ostream& operator<<(std::ostream& out, const NormalizeBase& norm) {
+    out << "Normalize{" << "\n  name: " << norm.name() << "\n  params: " << norm.getParameter();
+    out << "\n}";
+    return out;
+}
+
+HKU_API std::ostream& operator<<(std::ostream& out, const NormalizePtr& norm) {
+    if (norm) {
+        out << *norm;
+    } else {
+        out << "Normalize(NULL)";
+    }
+    return out;
+}
+
 void NormalizeBase::paramChanged() {}
 
 void NormalizeBase::baseCheckParam(const string& name) const {}
