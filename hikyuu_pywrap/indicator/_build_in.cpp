@@ -1943,20 +1943,6 @@ void export_Indicator_build_in(py::module& m) {
     :param bool recursive: 是否进行递归剔除极值，默认 False
     :rtype: Indicator)");
 
-    m.def("QUANTILE_NORM_UNIFORM", py::overload_cast<double, double>(QUANTILE_NORM_UNIFORM),
-          py::arg("quantial_min") = 0.01, py::arg("quantial_max") = 0.99);
-    m.def("QUANTILE_NORM_UNIFORM",
-          py::overload_cast<const Indicator&, double, double>(QUANTILE_NORM_UNIFORM),
-          py::arg("data"), py::arg("quantial_min") = 0.01, py::arg("quantial_max") = 0.99,
-          R"(QUANTILE_NORM_UNIFORM(data[, quantial_min=0.01, quantial_max=0.99])
-
-    对数据进行分位数均匀分布标准化（归一）。非窗口滚动。
-
-    :param Indicator data: 输入数据
-    :param float quantial_min: 剔除极值时使用的百分位数下限，默认 0.01
-    :param float quantial_max: 剔除极值时使用的百分位数上限，默认 0.99
-    :rtype: Indicator)");
-
     m.def("QUANTILE_TRUNC", py::overload_cast<int, double, double>(QUANTILE_TRUNC),
           py::arg("n") = 60, py::arg("quantial_min") = 0.01, py::arg("quantial_max") = 0.99);
     m.def("QUANTILE_TRUNC",
