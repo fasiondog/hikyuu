@@ -9,6 +9,7 @@
 
 #include "hikyuu/KData.h"
 #include "ScoreRecord.h"
+#include "buildin_norm.h"
 
 namespace hku {
 
@@ -134,6 +135,14 @@ public:
      */
     vector<IndicatorList> getAllSrcFactors();
 
+    /**
+     * 对指定名称的指标应用特定的标准化操作，其他指标使用全局标准化操作。
+     * @note 只有启用了全局标准化时，才会生效。
+     * @param name 指标名称
+     * @param norm 标准化操作
+     */
+    void addSpecialNormalize(const string& name, NormalizePtr norm);
+
     void reset();
 
     typedef std::shared_ptr<MultiFactorBase> MultiFactorPtr;
@@ -178,6 +187,8 @@ protected:
     vector<ScoreRecordList> m_stk_factor_by_date;
     Indicator m_ic;
 
+    unordered_map<string, NormPtr> m_special_norms;  // 对特定指标执行特定的标准化操作
+
 private:
     std::mutex m_mutex;
     bool m_calculated{false};
@@ -197,6 +208,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_ref_dates);
+        ar& BOOST_SERIALIZATION_NVP(m_nom_special_normsrms);
         // 以下不需要保存，加载后重新计算
         // ar& BOOST_SERIALIZATION_NVP(m_stk_map);
         // ar& BOOST_SERIALIZATION_NVP(m_all_factors);
@@ -215,6 +227,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_ref_dates);
+        ar& BOOST_SERIALIZATION_NVP(m_special_norms);
         // ar& BOOST_SERIALIZATION_NVP(m_stk_map);
         // ar& BOOST_SERIALIZATION_NVP(m_all_factors);
         // ar& BOOST_SERIALIZATION_NVP(m_date_index);

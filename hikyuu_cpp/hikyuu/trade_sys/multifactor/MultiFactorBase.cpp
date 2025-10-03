@@ -16,7 +16,6 @@
 #include "hikyuu/indicator/crt/SPEARMAN.h"
 #include "hikyuu/indicator/crt/CORR.h"
 #include "hikyuu/indicator/crt/ZSCORE.h"
-#include "buildin_norm.h"
 #include "MultiFactorBase.h"
 
 namespace hku {
@@ -100,7 +99,7 @@ void MultiFactorBase::initParam() {
     setParam<bool>("save_all_factors", false);  // 计算完后保留所有因子数据，否则将被清除，影响
                                                 // getAllFactors/getFactor 方法
 
-    setParam<string>("norm_type", "");
+    setParam<string>("norm_type", "");  // zscore, min_max, quantile, quantile_uniform
     setParam<bool>("zscore_out_extreme", false);
     setParam<bool>("zscore_recursive", false);
     setParam<double>("zscore_nsigma", 3.0);
@@ -183,6 +182,7 @@ MultiFactorPtr MultiFactorBase::clone() {
         return shared_from_this();
     }
 
+    p->m_name = m_name;
     p->m_params = m_params;
     p->m_stks = m_stks;
     p->m_ref_stk = m_ref_stk;
@@ -192,6 +192,10 @@ MultiFactorPtr MultiFactorBase::clone() {
     p->m_inds.reserve(m_inds.size());
     for (const auto& ind : m_inds) {
         p->m_inds.emplace_back(ind.clone());
+    }
+
+    for (const auto& [name, norm] : m_special_norms) {
+        p->m_special_norms[name] = norm->clone();
     }
 
     p->m_calculated = false;
@@ -243,6 +247,14 @@ void MultiFactorBase::setRefIndicators(const IndicatorList& inds) {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_inds = inds;
     _reset();
+    m_calculated = false;
+}
+
+void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm) {
+    HKU_CHECK(norm, "The normalize pointer is null!");
+    std::lock_guard<std::mutex> lock(m_mutex);
+    _reset();
+    m_special_norms[name] = norm;
     m_calculated = false;
 }
 
@@ -510,18 +522,63 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     }
 
     if (norm) {
-        PriceList one_day(stk_count, Null<price_t>());
-        for (size_t di = 0; di < days_total; di++) {
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                auto* one_day_data = one_day.data();
-                for (size_t si = 0; si < stk_count; si++) {
-                    one_day_data[si] = all_stk_inds[si][ii][di];
-                }
+        if (parallel) {
+            parallel_for_index_void(
+              0, days_total,
+              [this, stk_count, ind_count, &all_stk_inds, sub_norm = norm->clone()](size_t di) {
+                  NormPtr special_norm;
+                  PriceList one_day(stk_count, Null<price_t>());
+                  PriceList new_value;
+                  for (size_t ii = 0; ii < ind_count; ii++) {
+                      auto* one_day_data = one_day.data();
+                      for (size_t si = 0; si < stk_count; si++) {
+                          one_day_data[si] = all_stk_inds[si][ii][di];
+                      }
 
-                auto new_value = norm->normalize(one_day);
-                for (size_t si = 0; si < stk_count; si++) {
-                    auto* dst = all_stk_inds[si][ii].data();
-                    dst[di] = new_value[si];
+                      auto special_norm_iter = m_special_norms.find(all_stk_inds[0][ii].name());
+                      if (special_norm_iter != m_special_norms.end()) {
+                          special_norm = special_norm_iter->second->clone();
+                      }
+
+                      if (special_norm) {
+                          new_value = special_norm->normalize(one_day);
+                      } else {
+                          new_value = sub_norm->normalize(one_day);
+                      }
+
+                      for (size_t si = 0; si < stk_count; si++) {
+                          auto* dst = all_stk_inds[si][ii].data();
+                          dst[di] = new_value[si];
+                      }
+                  }
+              });
+        } else {
+            NormPtr special_norm;
+            PriceList new_value;
+            PriceList one_day(stk_count, Null<price_t>());
+            for (size_t di = 0; di < days_total; di++) {
+                for (size_t ii = 0; ii < ind_count; ii++) {
+                    auto* one_day_data = one_day.data();
+                    for (size_t si = 0; si < stk_count; si++) {
+                        one_day_data[si] = all_stk_inds[si][ii][di];
+                    }
+
+                    auto special_norm_iter = m_special_norms.find(all_stk_inds[0][ii].name());
+                    if (special_norm_iter != m_special_norms.end()) {
+                        special_norm = special_norm_iter->second;
+                    }
+
+                    if (special_norm) {
+                        new_value = special_norm->normalize(one_day);
+                    } else {
+                        new_value = norm->normalize(one_day);
+                    }
+
+                    new_value = norm->normalize(one_day);
+                    for (size_t si = 0; si < stk_count; si++) {
+                        auto* dst = all_stk_inds[si][ii].data();
+                        dst[di] = new_value[si];
+                    }
                 }
             }
         }
