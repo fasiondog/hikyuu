@@ -44,7 +44,8 @@ void IQuantileTrunc::_checkParam(const string &name) const {
 // 替换掉分位数范围外数值
 static Indicator::value_t quantile_trunc(Indicator::value_t const *src, size_t total,
                                          double quantile_min, double quantile_max) {
-    HKU_IF_RETURN(quantile_min == 0.0 && quantile_max == 1.0, src[total - 1]);
+    Indicator::value_t result = src[total - 1];
+    HKU_IF_RETURN(quantile_min == 0.0 && quantile_max == 1.0, result);
 
     std::vector<IndicatorImp::value_t> tmp;
     tmp.reserve(total);
@@ -53,18 +54,18 @@ static Indicator::value_t quantile_trunc(Indicator::value_t const *src, size_t t
             tmp.push_back(src[i]);
         }
     }
-    HKU_IF_RETURN(tmp.empty(), src[total - 1]);
+    HKU_IF_RETURN(tmp.empty(), result);
 
     std::sort(tmp.begin(), tmp.end());
 
     auto down_limit = get_quantile(tmp, quantile_min);
     auto up_limit = get_quantile(tmp, quantile_max);
-    if (src[total - 1] > up_limit) {
-        return up_limit;
-    } else if (src[total - 1] < down_limit) {
-        return down_limit;
+    if (result > up_limit) {
+        result = up_limit;
+    } else if (result < down_limit) {
+        result = down_limit;
     }
-    return src[total - 1];
+    return result;
 }
 
 void IQuantileTrunc::_calculate(const Indicator &data) {
@@ -79,10 +80,16 @@ void IQuantileTrunc::_calculate(const Indicator &data) {
     double quantile_min = getParam<double>("quantile_min");
     double quantile_max = getParam<double>("quantile_max");
     auto *dst = this->data();
-    for (size_t i = m_discard; i < total; i++) {
-        auto const *src = data.data() + 1 + i - n;
-        dst[i] = quantile_trunc(src, n, quantile_min, quantile_max);
-    }
+    // for (size_t i = m_discard; i < total; i++) {
+    //     auto const *src = data.data() + 1 + i - n;
+    //     dst[i] = quantile_trunc(src, n, quantile_min, quantile_max);
+    // }
+    const auto *data_ptr = data.data();
+    parallel_for_index_void(m_discard, total,
+                            [n, quantile_min, quantile_max, dst, data_ptr](size_t i) {
+                                auto const *src = data_ptr + 1 + i - n;
+                                dst[i] = quantile_trunc(src, n, quantile_min, quantile_max);
+                            });
 }
 
 Indicator HKU_API QUANTILE_TRUNC(int n, double quantile_min, double quantile_max) {
