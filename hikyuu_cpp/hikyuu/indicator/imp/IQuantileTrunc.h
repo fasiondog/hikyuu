@@ -18,7 +18,6 @@ class IQuantileTrunc : public IndicatorImp {
 
 public:
     IQuantileTrunc();
-    IQuantileTrunc(double quantile_min, double quantile_max);
     virtual ~IQuantileTrunc();
     virtual void _checkParam(const string& name) const override;
 };

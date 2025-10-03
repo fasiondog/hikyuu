@@ -14,20 +14,17 @@ BOOST_CLASS_EXPORT(hku::IQuantileTrunc)
 namespace hku {
 
 IQuantileTrunc::IQuantileTrunc() : IndicatorImp("QUANTILE_TRUNC", 1) {
+    setParam<int>("n", 60);
     setParam<double>("quantile_min", 0.01);
     setParam<double>("quantile_max", 0.99);
-}
-
-IQuantileTrunc::IQuantileTrunc(double quantile_min, double quantile_max)
-: IndicatorImp("QUANTILE_TRUNC", 1) {
-    setParam<double>("quantile_min", quantile_min);
-    setParam<double>("quantile_max", quantile_max);
 }
 
 IQuantileTrunc::~IQuantileTrunc() {}
 
 void IQuantileTrunc::_checkParam(const string &name) const {
-    if ("quantile_min" == name) {
+    if ("n" == name) {
+        HKU_ASSERT(getParam<int>("n") > 0);
+    } else if ("quantile_min" == name) {
         double quantile_min = getParam<double>("quantile_min");
         HKU_ASSERT(quantile_min >= 0.0 && quantile_min <= 1.0);
         if (haveParam("quantile_max")) {
@@ -45,9 +42,9 @@ void IQuantileTrunc::_checkParam(const string &name) const {
 }
 
 // 替换掉分位数范围外数值
-static void quantile_trunc(IndicatorImp::value_t *dst, Indicator::value_t const *src, size_t total,
-                           double quantile_min, double quantile_max) {
-    HKU_IF_RETURN(quantile_min == 0.0 && quantile_max == 1.0, void());
+static Indicator::value_t quantile_trunc(Indicator::value_t const *src, size_t total,
+                                         double quantile_min, double quantile_max) {
+    HKU_IF_RETURN(quantile_min == 0.0 && quantile_max == 1.0, src[total - 1]);
 
     std::vector<IndicatorImp::value_t> tmp;
     tmp.reserve(total);
@@ -56,42 +53,44 @@ static void quantile_trunc(IndicatorImp::value_t *dst, Indicator::value_t const 
             tmp.push_back(src[i]);
         }
     }
-    HKU_IF_RETURN(tmp.empty(), void());
+    HKU_IF_RETURN(tmp.empty(), src[total - 1]);
 
     std::sort(tmp.begin(), tmp.end());
 
     auto down_limit = get_quantile(tmp, quantile_min);
     auto up_limit = get_quantile(tmp, quantile_max);
-    HKU_INFO("quantile_min: {}, quantile_max: {}", down_limit, up_limit);
-    for (size_t i = 0; i < total; i++) {
-        if (src[i] > up_limit) {
-            dst[i] = up_limit;
-        } else if (src[i] < down_limit) {
-            dst[i] = down_limit;
-        } else {
-            dst[i] = src[i];
-        }
+    if (src[total - 1] > up_limit) {
+        return up_limit;
+    } else if (src[total - 1] < down_limit) {
+        return down_limit;
     }
+    return src[total - 1];
 }
 
 void IQuantileTrunc::_calculate(const Indicator &data) {
     size_t total = data.size();
-    m_discard = data.discard();
-    if (m_discard + 1 >= total) {
+    int n = getParam<int>("n");
+    m_discard = data.discard() + n - 1;
+    if (m_discard >= total) {
         m_discard = total;
         return;
     }
 
-    auto const *src = data.data() + m_discard;
-    auto *dst = this->data() + m_discard;
-    quantile_trunc(dst, src, total - m_discard, getParam<double>("quantile_min"),
-                   getParam<double>("quantile_max"));
-
-    _update_discard();
+    double quantile_min = getParam<double>("quantile_min");
+    double quantile_max = getParam<double>("quantile_max");
+    auto *dst = this->data();
+    for (size_t i = m_discard; i < total; i++) {
+        auto const *src = data.data() + 1 + i - n;
+        dst[i] = quantile_trunc(src, n, quantile_min, quantile_max);
+    }
 }
 
-Indicator HKU_API QUANTILE_TRUNC(double quantile_min, double quantile_max) {
-    return Indicator(make_shared<IQuantileTrunc>(quantile_min, quantile_max));
+Indicator HKU_API QUANTILE_TRUNC(int n, double quantile_min, double quantile_max) {
+    auto p = make_shared<IQuantileTrunc>();
+    p->setParam<int>("n", n);
+    p->setParam<double>("quantile_min", quantile_min);
+    p->setParam<double>("quantile_max", quantile_max);
+    return Indicator(p);
 }
 
 }  // namespace hku

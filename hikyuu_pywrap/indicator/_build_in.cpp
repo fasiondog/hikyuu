@@ -1957,15 +1957,17 @@ void export_Indicator_build_in(py::module& m) {
     :param float quantial_max: 剔除极值时使用的百分位数上限，默认 0.99
     :rtype: Indicator)");
 
-    m.def("QUANTILE_TRUNC", py::overload_cast<double, double>(QUANTILE_TRUNC),
-          py::arg("quantial_min") = 0.01, py::arg("quantial_max") = 0.99);
-    m.def("QUANTILE_TRUNC", py::overload_cast<const Indicator&, double, double>(QUANTILE_TRUNC),
-          py::arg("data"), py::arg("quantial_min") = 0.01, py::arg("quantial_max") = 0.99,
-          R"(QUANTILE_TRUNC(data[, quantial_min=0.01, quantial_max=0.99])
+    m.def("QUANTILE_TRUNC", py::overload_cast<int, double, double>(QUANTILE_TRUNC),
+          py::arg("n") = 60, py::arg("quantial_min") = 0.01, py::arg("quantial_max") = 0.99);
+    m.def("QUANTILE_TRUNC",
+          py::overload_cast<const Indicator&, int, double, double>(QUANTILE_TRUNC), py::arg("data"),
+          py::arg("n") = 60, py::arg("quantial_min") = 0.01, py::arg("quantial_max") = 0.99,
+          R"(QUANTILE_TRUNC(data[, n=60, quantial_min=0.01, quantial_max=0.99])
 
     对数据进行分位数截断处理。非窗口滚动。
 
     :param Indicator data: 待剔除异常值数据
+    :param int n: 时间窗口
     :param float quantial_min: 剔除极值时使用的百分位数下限，默认 0.01
     :param float quantial_max: 剔除极值时使用的百分位数上限，默认 0.99
     :rtype: Indicator)");
