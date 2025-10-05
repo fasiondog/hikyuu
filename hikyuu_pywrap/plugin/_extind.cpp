@@ -8,11 +8,30 @@
 #include "hikyuu/plugin/extind.h"
 #include "../pybind_utils.h"
 
-#define PY_AGG_FUNC_DEFINE(agg_func, doc)                                                  \
+#define PY_AGG_IND_DEFINE(agg_func, doc)                                                   \
     m.def(#agg_func,                                                                       \
           py::overload_cast<const Indicator&, const KQuery::KType&, bool, int>(&agg_func), \
           py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,    \
           py::arg("unit") = 1, doc);
+
+class PyAggFunc {
+public:
+    PyAggFunc() = default;
+    PyAggFunc(py::object func) : m_func(func) {}
+
+    Indicator::value_t operator()(const Indicator::value_t* src, size_t group_start,
+                                  size_t group_last) const {
+        //   OStreamToPython guard(false);
+        //   py::gil_scoped_release release;
+        std::vector<Indicator::value_t> src_vec(group_last - group_start + 1);
+        std::copy(src + group_start, src + group_last + 1, src_vec.begin());
+        py::object ret = m_func(src_vec);
+        return ret.cast<Indicator::value_t>();
+    }
+
+private:
+    py::object m_func;
+};
 
 void export_extend_Indicator(py::module& m) {
     m.def("WITHKTYPE", py::overload_cast<const KQuery::KType&, bool>(WITHKTYPE), py::arg("ktype"),
@@ -227,14 +246,14 @@ void export_extend_Indicator(py::module& m) {
     :return: 指标值在指定板块中的排名
     :rtype: Indicator)");
 
-    PY_AGG_FUNC_DEFINE(AGG_MEAN, "聚合函数: 平均值, 可参考 AGG_STD 帮助")
-    PY_AGG_FUNC_DEFINE(AGG_COUNT, "聚合函数: 非空值计数, 可参考 AGG_STD 帮助")
-    PY_AGG_FUNC_DEFINE(AGG_SUM, "聚合函数: 总和, 可参考 AGG_STD 帮助")
-    PY_AGG_FUNC_DEFINE(AGG_MAX, "聚合函数: 最大值, 可参考 AGG_STD 帮助")
-    PY_AGG_FUNC_DEFINE(AGG_MIN, "聚合函数: 最小值, 可参考 AGG_STD 帮助")
-    PY_AGG_FUNC_DEFINE(AGG_MAD, "聚合函数: 平均绝对偏差, 可参考 AGG_STD 帮助")
-    PY_AGG_FUNC_DEFINE(AGG_MEDIAN, "聚合函数: 中位数, 可参考 AGG_STD 帮助")
-    PY_AGG_FUNC_DEFINE(AGG_PROD, "聚合函数: 乘积, 可参考 AGG_STD 帮助")
+    PY_AGG_IND_DEFINE(AGG_MEAN, "聚合函数: 平均值, 可参考 AGG_STD 帮助")
+    PY_AGG_IND_DEFINE(AGG_COUNT, "聚合函数: 非空值计数, 可参考 AGG_STD 帮助")
+    PY_AGG_IND_DEFINE(AGG_SUM, "聚合函数: 总和, 可参考 AGG_STD 帮助")
+    PY_AGG_IND_DEFINE(AGG_MAX, "聚合函数: 最大值, 可参考 AGG_STD 帮助")
+    PY_AGG_IND_DEFINE(AGG_MIN, "聚合函数: 最小值, 可参考 AGG_STD 帮助")
+    PY_AGG_IND_DEFINE(AGG_MAD, "聚合函数: 平均绝对偏差, 可参考 AGG_STD 帮助")
+    PY_AGG_IND_DEFINE(AGG_MEDIAN, "聚合函数: 中位数, 可参考 AGG_STD 帮助")
+    PY_AGG_IND_DEFINE(AGG_PROD, "聚合函数: 乘积, 可参考 AGG_STD 帮助")
 
     m.def("AGG_STD",
           py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, int>(&AGG_STD),
@@ -292,4 +311,17 @@ void export_extend_Indicator(py::module& m) {
     :param float quantile: 分位数 (0, 1) 之间
     :return: 指标数据
     :rtype: Indicator)");
+
+    m.def(
+      "AGG_FUNC",
+      [](const Indicator& ind, py::object agg_func, const KQuery::KType& ktype, bool fill_null,
+         int unit) {
+          HKU_CHECK(!agg_func.is_none(), "agg_func is None!");
+          HKU_CHECK(py::hasattr(agg_func, "__call__"), "agg_func not callable!");
+          HKU_CHECK(check_pyfunction_arg_num(agg_func, 1), "Number of parameters does not match!");
+          PyAggFunc agg_func_obj(agg_func.attr("__call__"));
+          return AGG_FUNC(ind, agg_func_obj, ktype, fill_null, unit);
+      },
+      py::arg("ind"), py::arg("agg_func"), py::arg("ktype") = KQuery::MIN,
+      py::arg("fill_null") = false, py::arg("unit") = 1);
 }
