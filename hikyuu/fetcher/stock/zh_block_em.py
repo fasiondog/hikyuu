@@ -87,12 +87,14 @@ def get_hybk_cons_code(blk_code):
 def get_all_hybk_info(code_market_dict, sep=""):
     """获取所有行业板块列表"""
     blk_list = get_hybk_names()
+    time.sleep(random.uniform(1, 3))
     ret = {}
     for blk in blk_list:
         stk_codes = get_hybk_cons_code(blk[0])
         hku_info(f"获取行业板块{blk[1]}成分: {len(stk_codes)}")
         ret[blk[1]] = [
             f"{code_market_dict[stk_code]}{sep}{stk_code}" for stk_code in stk_codes if stk_code in code_market_dict]
+        time.sleep(random.uniform(1, 3))
     return ret
 
 
@@ -522,6 +524,7 @@ def get_all_dybk_info(code_market_dict, sep=""):
             ret[blk_name].extend(
                 [f"{code_market_dict[v['f12']]}{sep}{v['f12']}" for v in stk_json if v["f12"] in code_market_dict])
             time.sleep(random.uniform(1, 3))
+        time.sleep(random.uniform(1, 3))
         hku_info(f'获取地域板块{blk_name}成分: {len(ret[blk_name])}')
 
     return ret
@@ -548,11 +551,12 @@ def get_all_zsbk_info(code_market_dict, sep=""):
             hku_info("{} 获取指数板块{}成分: {}", i, blk_name, len(stk_codes))
             ret[blk_name] = [
                 f"{code_market_dict[stk_code]}{sep}{stk_code}" for stk_code in stk_codes if stk_code in code_market_dict]
+            time.sleep(random.uniform(1, 3))
         except KeyboardInterrupt:
             break
-        except:
-            # print("Failed!", blk_code, blk_name)
-            pass
+        except Exception as e:
+            print(f"Failed! {i}, {blk_code}, {blk_name}")
+            raise e
     return ret
 
 
