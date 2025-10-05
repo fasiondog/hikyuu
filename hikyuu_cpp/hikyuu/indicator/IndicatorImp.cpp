@@ -155,6 +155,7 @@ IndicatorImp::IndicatorImp(const string &name, size_t result_num)
     initContext();
     memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
+    _readyBuffer(0, m_result_num);
 }
 
 void IndicatorImp::baseCheckParam(const string &name) const {}
@@ -294,11 +295,11 @@ string IndicatorImp::str() const {
         os << "\n  first: " << dates.front();
         os << "\n  last: " << dates.back();
     }
-#if !HKU_USE_LOW_PRECISION
     for (size_t r = 0; r < getResultNumber(); ++r) {
-        os << "\n  values" << r << ": " << *m_pBuffer[r];
+        if (m_pBuffer[r]) {
+            os << "\n  values" << r << ": " << *m_pBuffer[r];
+        }
     }
-#endif
     os << "\n}";
     return os.str();
 }

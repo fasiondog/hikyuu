@@ -52,11 +52,11 @@ string IContext::str() const {
         os << "}";
     }
     os << "\n  formula: " << formula();
-#if !HKU_USE_LOW_PRECISION
     for (size_t r = 0; r < getResultNumber(); ++r) {
-        os << "\n  values" << r << ": " << *m_pBuffer[r];
+        if (m_pBuffer[r]) {
+            os << "\n  values" << r << ": " << *m_pBuffer[r];
+        }
     }
-#endif
     os << "\n}";
     return os.str();
 }
