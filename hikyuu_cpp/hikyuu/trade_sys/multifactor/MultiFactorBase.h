@@ -141,7 +141,7 @@ public:
      * @param name 指标名称
      * @param norm 标准化操作
      */
-    void addSpecialNormalize(const string& name, NormalizePtr norm);
+    void addSpecialNormalize(const string& name, NormalizePtr norm, const string& category = "");
 
     void reset();
 
@@ -163,7 +163,9 @@ private:
 
     void initParam();
 
-protected:
+    // 构造每个指标构造行业哑变量，以便进行行业中性化处理
+    unordered_map<string, PriceList> _buildDummyIndex();
+
     void _buildIndex();      // 计算完成后创建截面索引
     void _buildIndexDesc();  // 创建降序排列的索引
     void _buildIndexAsc();   // 创建升序排列的索引
@@ -187,7 +189,8 @@ protected:
     vector<ScoreRecordList> m_stk_factor_by_date;
     Indicator m_ic;
 
-    unordered_map<string, NormPtr> m_special_norms;  // 对特定指标执行特定的标准化操作
+    unordered_map<string, NormPtr> m_special_norms;    // 对特定指标执行特定的标准化操作
+    unordered_map<string, string> m_special_category;  // 对特定指标执行行业中性化时指定的板块分类
 
 private:
     std::mutex m_mutex;
