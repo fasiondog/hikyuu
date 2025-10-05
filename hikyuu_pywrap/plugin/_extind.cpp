@@ -21,8 +21,7 @@ public:
 
     Indicator::value_t operator()(const Indicator::value_t* src, size_t group_start,
                                   size_t group_last) const {
-        //   OStreamToPython guard(false);
-        //   py::gil_scoped_release release;
+        py::gil_scoped_acquire gil;
         std::vector<Indicator::value_t> src_vec(group_last - group_start + 1);
         std::copy(src + group_start, src + group_last + 1, src_vec.begin());
         py::object ret = m_func(src_vec);
@@ -323,5 +322,22 @@ void export_extend_Indicator(py::module& m) {
           return AGG_FUNC(ind, agg_func_obj, ktype, fill_null, unit);
       },
       py::arg("ind"), py::arg("agg_func"), py::arg("ktype") = KQuery::MIN,
-      py::arg("fill_null") = false, py::arg("unit") = 1);
+      py::arg("fill_null") = false, py::arg("unit") = 1,
+      R"(AGG_FUNC(ind, agg_func[, ktype=Query.MIN, fill_null=False, unit=1]
+      
+    使用自定函数聚合其他K线周期的指标。虽然支持python自定义函数, 但python函数需要GIL, 速度会慢。建议最好直接使用 C++ 自定义聚合函数。
+    
+    示例, 计算日线时聚合分钟线收盘价的和:
+
+      >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
+      >>> ind = AGG_FUNC(CLOSE(), lambda x: sum(x))
+      >>> ind(k)
+
+    :param Indicator ind: 待计算指标
+    :param callable agg_func: 自定义聚合函数，输入参数为 list, 返回针对list的聚合结果
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    :return: 聚合结果
+    :rtype: Indicator)");
 }
