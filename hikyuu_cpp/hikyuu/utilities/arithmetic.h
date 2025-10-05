@@ -457,6 +457,9 @@ T get_quantile(const std::vector<T> &vec, double quantile) {
 extern template double HKU_UTILS_API get_quantile(const std::vector<double> &vec, double quantile);
 extern template float HKU_UTILS_API get_quantile(const std::vector<float> &vec, double quantile);
 
+HKU_UTILS_API std::ostream &operator<<(std::ostream &os, const std::vector<double> &p);
+HKU_UTILS_API std::ostream &operator<<(std::ostream &os, const std::vector<float> &p);
+
 /** @} */
 } /* namespace hku */
 

@@ -201,4 +201,46 @@ bool HKU_UTILS_API isInteger(float num) {
 template double HKU_UTILS_API get_quantile(const std::vector<double> &vec, double quantile);
 template float HKU_UTILS_API get_quantile(const std::vector<float> &vec, double quantile);
 
+HKU_UTILS_API std::ostream &operator<<(std::ostream &os, const std::vector<double> &p) {
+    if (p.empty()) {
+        os << "[]";
+        return os;
+    }
+
+    size_t len = p.size();
+    const size_t print = 3;
+    os << "[";
+    for (size_t i = 0; i < len; i++) {
+        if ((i < print) || (i + print >= len)) {
+            os << p[i];
+            if (i + 1 != len)
+                os << ", ";
+        } else if (i == 3)
+            os << "..., ";
+    }
+    os << "]";
+    return os;
+}
+
+HKU_UTILS_API std::ostream &operator<<(std::ostream &os, const std::vector<float> &p) {
+    if (p.empty()) {
+        os << "[]";
+        return os;
+    }
+
+    size_t len = p.size();
+    const size_t print = 3;
+    os << "[";
+    for (size_t i = 0; i < len; i++) {
+        if ((i < print) || (i + print >= len)) {
+            os << p[i];
+            if (i + 1 != len)
+                os << ", ";
+        } else if (i == 3)
+            os << "..., ";
+    }
+    os << "]";
+    return os;
+}
+
 }  // namespace hku
