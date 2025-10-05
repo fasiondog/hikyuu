@@ -129,17 +129,19 @@ public:
     Indicator getICIR(int ir_n, int ic_n = 0);
 
     /**
-     * 获取所有处理过的原始因子值（归一化、标准化）
+     * 获取所有处理过的原始因子值（归一化、标准化）。每次都会计算。
      * @note 考虑到内存占用，该数据没有缓存，一般用与测试或者想查看处理过的原始因子值
      * @return vector<IndicatorList>  stks x inds
      */
     vector<IndicatorList> getAllSrcFactors();
 
     /**
-     * 对指定名称的指标应用特定的标准化操作，其他指标使用全局标准化操作。
+     * 对指定名称的指标应用特定的标准化操作，其他指标使用全局标准化操作。若 norm
+     * 为空或指定category不存在时，抛出异常。
      * @note 只有启用了全局标准化时，才会生效。
      * @param name 指标名称
      * @param norm 标准化操作
+     * @param category 指标所属类别(需要行业中心化时指定)
      */
     void addSpecialNormalize(const string& name, NormalizePtr norm, const string& category = "");
 

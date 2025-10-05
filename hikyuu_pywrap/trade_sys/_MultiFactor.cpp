@@ -189,13 +189,15 @@ void export_MultiFactor(py::module& m) {
 
     :return: [factor1, factor2, ...] 顺序与参考证券顺序相同)")
 
-      .def("add_special_normalize", &MultiFactorBase::addSpecialNormalize,
+      .def("add_special_normalize", &MultiFactorBase::addSpecialNormalize, py::arg("name"),
+           py::arg("norm"), py::arg("category") = "",
            R"(add_special_normalize(self, name, norm)
         
     对指定名称的指标应用特定的标准化操作，其他指标使用全局标准化操作。 只有启用了全局标准化时，才会生效。
 
     :param str name: 特殊归一化方法名称
-    :param Normalize norm: 特殊归一化方法)")
+    :param Normalize norm: 特殊归一化方法)
+    :param str category: 行业中性化时，指定板块类别)")
 
       .def("get_ic", &MultiFactorBase::getIC, py::arg("ndays") = 0, R"(get_ic(self[, ndays=0])
 
@@ -260,7 +262,12 @@ void export_MultiFactor(py::module& m) {
 
     :return: ScoreRecordList)")
 
-      .def("get_all_src_factors", &MultiFactorBase::getAllSrcFactors)
+      .def("get_all_src_factors", &MultiFactorBase::getAllSrcFactors, R"(get_all_src_factors(self)
+
+    获取所有原始因子列表(如果指定了标准化、行业中性化, 返回为已处理的因子列表)
+
+    :rtype: list
+    :return: list IndicatorList stks x inds)")
 
         DEF_PICKLE(MultiFactorPtr);
 
