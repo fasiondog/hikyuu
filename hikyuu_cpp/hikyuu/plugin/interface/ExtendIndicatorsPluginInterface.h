@@ -22,8 +22,9 @@ public:
     virtual Indicator getIndicator(const std::string& name, const Indicator& ref_ind,
                                    const Parameter& params) const = 0;
 
-    using agg_func_t = std::function<Indicator::value_t(const Indicator::value_t* src,
-                                                        size_t group_start, size_t group_last)>;
+    using agg_func_t =
+      std::function<Indicator::value_t(const DatetimeList& src_ds, const Indicator::value_t* src,
+                                       size_t group_start, size_t group_last)>;
     virtual Indicator getAggFuncIndicator(const Indicator& ref_ind, agg_func_t agg_func,
                                           const Parameter& params) const = 0;
 };
