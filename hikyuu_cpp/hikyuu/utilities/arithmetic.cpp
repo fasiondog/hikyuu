@@ -190,12 +190,12 @@ bool HKU_UTILS_API isInteger(float num) {
     }
 
     // 计算小数部分（使用float专用的floor函数）
-    float fractionalPart = num - std::floorf(num);
+    float fractionalPart = num - std::floor(num);
 
     // 调整适合float的精度误差（float精度低于double，epsilon需更大）
     const float epsilon = 1e-5f;  // float典型精度范围内的误差阈值
     // 判断小数部分是否接近0或1.0（处理类似5.9999997这种情况）
-    return std::fabsf(fractionalPart) < epsilon || std::fabsf(fractionalPart - 1.0f) < epsilon;
+    return std::fabs(fractionalPart) < epsilon || std::fabs(fractionalPart - 1.0f) < epsilon;
 }
 
 template double HKU_UTILS_API get_quantile(const std::vector<double> &vec, double quantile);

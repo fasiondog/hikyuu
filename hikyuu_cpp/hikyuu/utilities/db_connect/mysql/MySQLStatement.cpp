@@ -178,6 +178,7 @@ void MySQLStatement::_bindResult() {
             m_result_bind[idx].buffer = boost::any_cast<short>(&buf);
         } else if (field->type == MYSQL_TYPE_DATETIME || field->type == MYSQL_TYPE_DATE) {
             MYSQL_TIME item;
+            std::memset(&item, 0, sizeof(item));
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
             m_result_bind[idx].buffer = boost::any_cast<MYSQL_TIME>(&buf);
