@@ -199,6 +199,8 @@ MultiFactorPtr MultiFactorBase::clone() {
         p->m_special_norms[name] = norm->clone();
     }
 
+    p->m_special_category = m_special_category;
+
     p->m_calculated = false;
     // 强制重算，不克隆以下缓存，避免非线程安全
     // p->m_stk_map = m_stk_map;
