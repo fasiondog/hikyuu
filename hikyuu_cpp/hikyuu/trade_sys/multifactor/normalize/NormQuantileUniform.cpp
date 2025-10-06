@@ -70,7 +70,7 @@ static PriceList quantile_trunc(const PriceList &src, double quantile_min, doubl
 
     auto down_limit = get_quantile(tmp, quantile_min);
     auto up_limit = get_quantile(tmp, quantile_max);
-    HKU_INFO("quantile_min: {}, quantile_max: {}", down_limit, up_limit);
+    // HKU_INFO("quantile_min: {}, quantile_max: {}", down_limit, up_limit);
     for (size_t i = 0; i < total; i++) {
         if (src[i] > up_limit) {
             ret[i] = up_limit;
