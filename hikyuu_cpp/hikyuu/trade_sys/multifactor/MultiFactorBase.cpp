@@ -468,12 +468,14 @@ unordered_map<string, PriceList> MultiFactorBase::_buildDummyIndex() {
         size_t blk_count = blks.size();
         for (size_t i = 0; i < m_stks.size(); i++) {
             bool found = false;
-            for (size_t j = 0; j < blk_count; i++) {
-                if (blks[j].have(m_stks[i])) {
+            size_t j = 0;
+            for (const auto& blk : blks) {
+                if (blk.have(m_stks[i])) {
                     dummy[i] = j;
                     found = true;
                     break;
                 }
+                j++;
             }
             if (!found) {
                 dummy[i] = blk_count;
