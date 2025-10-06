@@ -10,6 +10,7 @@
 
 #if defined(_MSC_VER)
 #include <windows.h>
+#include <iostream>
 #else
 #include <iconv.h>
 #include <string.h>
