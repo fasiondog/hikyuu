@@ -43,7 +43,7 @@ PriceList NormZScore::normalize(const PriceList& data) {
     }
 
     bool outExtreme = getParam<bool>("out-extreme");
-    int nsigma = getParam<int>("nsigma");
+    double nsigma = getParam<double>("nsigma");
     bool recursive = getParam<bool>("recursive");
 
     price_t sum = 0.0;
