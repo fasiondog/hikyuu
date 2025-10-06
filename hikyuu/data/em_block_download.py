@@ -98,4 +98,4 @@ if __name__ == "__main__":
 
     # print(code_market_dict)
 
-    download_em_block(code_market_dict, categorys=('行业板块', ))
+    download_em_block(code_market_dict, categorys=('地域板块', ))

@@ -444,6 +444,7 @@ def get_all_gnbk_info(code_market_dict, sep=""):
         hku_info(f"{i} 获取概念板块{blk_name}成分: {len(stk_codes)}")
         ret[blk_name] = [
             f"{code_market_dict[stk_code]}{sep}{stk_code}" for stk_code in stk_codes if stk_code in code_market_dict]
+        time.sleep(random.uniform(1, 3))
     return ret
 
 
@@ -505,6 +506,7 @@ def get_all_dybk_info(code_market_dict, sep=""):
         blk_code, blk_name = v[0], v[1]
         params["fs"] = f"b:{blk_code} f:!50"
         params["pn"] = 1
+        time.sleep(random.uniform(1, 3))
         r = requests.get(url, params=params, timeout=15)
         data = r.json()
         if data["data"] is None:
@@ -524,7 +526,6 @@ def get_all_dybk_info(code_market_dict, sep=""):
             ret[blk_name].extend(
                 [f"{code_market_dict[v['f12']]}{sep}{v['f12']}" for v in stk_json if v["f12"] in code_market_dict])
             time.sleep(random.uniform(1, 3))
-        time.sleep(random.uniform(1, 3))
         hku_info(f'获取地域板块{blk_name}成分: {len(ret[blk_name])}')
 
     return ret
@@ -545,18 +546,20 @@ def get_all_zsbk_info(code_market_dict, sep=""):
         # 沪深指数有重复，避免深指覆盖
         if blk_name in ret:
             continue
+        # if i >= 312 and i <= 700:
+        #     continue
+        time.sleep(random.uniform(1, 3))
         try:
             stk_codes = ak.index_stock_cons_csindex(symbol=blk_code)
             stk_codes = stk_codes['成分券代码'].to_list()
             hku_info("{} 获取指数板块{}成分: {}", i, blk_name, len(stk_codes))
             ret[blk_name] = [
                 f"{code_market_dict[stk_code]}{sep}{stk_code}" for stk_code in stk_codes if stk_code in code_market_dict]
-            time.sleep(random.uniform(1, 3))
         except KeyboardInterrupt:
             break
         except Exception as e:
             print(f"Failed! {i}, {blk_code}, {blk_name}")
-            raise e
+            # raise e
     return ret
 
 
