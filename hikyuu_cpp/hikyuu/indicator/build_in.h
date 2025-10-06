@@ -129,5 +129,6 @@
 #include "crt/ZHBOND10.h"
 #include "crt/ZONGGUBEN.h"
 #include "crt/ZSCORE.h"
+#include "crt/QUANTILE_TRUNC.h"
 
 #endif /* INDICATOR_BUILD_IN_H_ */

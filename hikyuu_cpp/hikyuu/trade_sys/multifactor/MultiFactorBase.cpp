@@ -16,6 +16,7 @@
 #include "hikyuu/indicator/crt/SPEARMAN.h"
 #include "hikyuu/indicator/crt/CORR.h"
 #include "hikyuu/indicator/crt/ZSCORE.h"
+#include "hikyuu/StockManager.h"
 #include "MultiFactorBase.h"
 
 namespace hku {
@@ -93,26 +94,46 @@ MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stk
 void MultiFactorBase::initParam() {
     setParam<bool>("fill_null", true);
     setParam<int>("ic_n", 1);
-    setParam<bool>("enable_min_max_normalize", false);
-    setParam<bool>("enable_zscore", false);
-    setParam<bool>("zscore_out_extreme", false);
-    setParam<bool>("zscore_recursive", false);
-    setParam<double>("zscore_nsigma", 3.0);
     setParam<bool>("use_spearman", true);  // 默认使用SPEARMAN计算相关系数, 否则使用pearson相关系数
     setParam<bool>("parallel", true);
     setParam<int>("mode", 0);                   // 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
     setParam<bool>("save_all_factors", false);  // 计算完后保留所有因子数据，否则将被清除，影响
                                                 // getAllFactors/getFactor 方法
+
+    setParam<string>("norm_type", "");  // zscore, min_max, quantile, quantile_uniform
+    setParam<bool>("zscore_out_extreme", false);
+    setParam<bool>("zscore_recursive", false);
+    setParam<double>("zscore_nsigma", 3.0);
+    setParam<double>("quantile_min", 0.01);
+    setParam<double>("quantile_max", 0.99);
 }
 
 void MultiFactorBase::baseCheckParam(const string& name) const {
-    if ("ic_n" == name) {
+    if ("norm_type" == name) {
+        string norm_type = getParam<string>("norm_type");
+        HKU_ASSERT(norm_type == "" || norm_type == "min_max" || norm_type == "zscore" ||
+                   norm_type == "quantile" || norm_type == "quantile_uniform");
+    } else if ("ic_n" == name) {
         HKU_ASSERT(getParam<int>("ic_n") >= 1);
     } else if ("zscore_nsigma" == name) {
         HKU_ASSERT(getParam<double>("zscore_nsigma") > 0.0);
     } else if ("mode" == name) {
         int mode = getParam<int>("mode");
         HKU_ASSERT(mode == 0 || mode == 1 || mode == 2);
+    } else if ("quantile_min" == name) {
+        double quantile_min = getParam<double>("quantile_min");
+        HKU_ASSERT(quantile_min > 0.0 && quantile_min < 1.0);
+        if (haveParam("quantile_max")) {
+            double quantile_max = getParam<double>("quantile_max");
+            HKU_ASSERT(quantile_min < quantile_max);
+        }
+    } else if ("quantile_max" == name) {
+        double quantile_max = getParam<double>("quantile_max");
+        HKU_ASSERT(quantile_max > 0.0 && quantile_max < 1.0);
+        if (haveParam("quantile_min")) {
+            double quantile_min = getParam<double>("quantile_min");
+            HKU_ASSERT(quantile_min < quantile_max);
+        }
     }
 }
 
@@ -162,6 +183,7 @@ MultiFactorPtr MultiFactorBase::clone() {
         return shared_from_this();
     }
 
+    p->m_name = m_name;
     p->m_params = m_params;
     p->m_stks = m_stks;
     p->m_ref_stk = m_ref_stk;
@@ -172,6 +194,12 @@ MultiFactorPtr MultiFactorBase::clone() {
     for (const auto& ind : m_inds) {
         p->m_inds.emplace_back(ind.clone());
     }
+
+    for (const auto& [name, norm] : m_special_norms) {
+        p->m_special_norms[name] = norm->clone();
+    }
+
+    p->m_special_category = m_special_category;
 
     p->m_calculated = false;
     // 强制重算，不克隆以下缓存，避免非线程安全
@@ -222,6 +250,22 @@ void MultiFactorBase::setRefIndicators(const IndicatorList& inds) {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_inds = inds;
     _reset();
+    m_calculated = false;
+}
+
+void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
+                                          const string& category) {
+    HKU_CHECK(norm, "The normalize pointer is null!");
+    std::lock_guard<std::mutex> lock(m_mutex);
+    _reset();
+
+    if (!category.empty()) {
+        auto blks = StockManager::instance().getBlockList(category);
+        HKU_CHECK(!blks.empty(), "Can't find block category: {}", category);
+        m_special_category[name] = category;
+    }
+
+    m_special_norms[name] = norm;
     m_calculated = false;
 }
 
@@ -407,6 +451,38 @@ Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
     return x;
 }
 
+unordered_map<string, PriceList> MultiFactorBase::_buildDummyIndex() {
+    // 如果指定了特殊的指标的行业中性化处理，则构建其行业哑变量
+    unordered_map<string, PriceList> stock_dummy_index;
+    for (const auto& [ind_name, catefory] : m_special_category) {
+        stock_dummy_index[ind_name] = PriceList(m_stks.size(), Null<price_t>());
+        auto blks = StockManager::instance().getBlockList(catefory);
+        if (blks.empty()) {
+            HKU_WARN("Block list ({}) is empty, please check your block category!", catefory);
+            continue;
+        }
+
+        auto iter = stock_dummy_index.find(ind_name);
+        auto& dummy = iter->second;
+
+        size_t blk_count = blks.size();
+        for (size_t i = 0; i < m_stks.size(); i++) {
+            bool found = false;
+            for (size_t j = 0; j < blk_count; i++) {
+                if (blks[j].have(m_stks[i])) {
+                    dummy[i] = j;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                dummy[i] = blk_count;
+            }
+        }
+    }
+    return stock_dummy_index;
+}
+
 IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     bool fill_null = getParam<bool>("fill_null");
     if (!getParam<bool>("parallel")) {
@@ -423,6 +499,46 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
             return ALIGN(ROCP(k.close(), ndays), m_ref_dates, fill_null);
         });
     }
+}
+
+// 计算中性化后的因子，y 为因子，x 为行业哑变量
+static PriceList calculate_residuals(const PriceList& y, const PriceList& x) {
+    HKU_ASSERT(y.size() == x.size());
+
+    const size_t n = x.size();
+    PriceList residuals(n, Null<price_t>());
+
+    // 计算核心求和项（仅需Σxy和Σx²）
+    double sum_xy = 0.0, sum_x2 = 0.0;
+    for (size_t i = 0; i < n; ++i) {
+        if (std::isnan(x[i]) || std::isinf(x[i]) || std::isnan(y[i]) || std::isinf(y[i])) {
+            continue;
+        }
+        sum_xy += x[i] * y[i];
+        sum_x2 += x[i] * x[i];
+    }
+
+    // 分母不能为0（避免x全为0的无效数据）
+    if (std::isnan(sum_x2) || std::isinf(sum_x2) || sum_x2 == 0) {
+        return residuals;
+    }
+
+    // 计算斜率β₁（无截距项）
+    double beta1 = sum_xy / sum_x2;
+    if (std::isnan(beta1) || std::isinf(beta1)) {
+        return residuals;
+    }
+
+    PriceList y_hat(x.size());
+    for (size_t i = 0; i < x.size(); ++i) {
+        if (std::isnan(x[i]) || std::isinf(x[i]) || std::isnan(y[i]) || std::isinf(y[i])) {
+            continue;
+        }
+        y_hat[i] = beta1 * x[i];         // 拟合值 = β₁x（无截距）
+        residuals[i] = y[i] - y_hat[i];  // 残差 = 观测值 - 拟合值
+    }
+
+    return residuals;
 }
 
 vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
@@ -472,57 +588,94 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
         }
     }
 
-    // 每日截面归一化
-    if (getParam<bool>("enable_min_max_normalize")) {
-        for (size_t di = 0; di < days_total; di++) {
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                Indicator::value_t min_value = std::numeric_limits<Indicator::value_t>::max();
-                Indicator::value_t max_value = std::numeric_limits<Indicator::value_t>::min();
-                for (size_t si = 0; si < stk_count; si++) {
-                    auto value = all_stk_inds[si][ii][di];
-                    if (!std::isnan(value)) {
-                        if (value > max_value) {
-                            max_value = value;
-                        } else if (value < min_value) {
-                            min_value = value;
-                        }
-                    }
-                }
+    // 时间截面标准化
+    NormalizePtr norm;
+    string norm_type = getParam<string>("norm_type");
+    if ("min_max" == norm_type) {
+        norm = NORM_MIN_MAX();
+    } else if ("zscore" == norm_type) {
+        norm = NORM_ZSCORE(getParam<bool>("zscore_out_extreme"), getParam<double>("zscore_nsigma"),
+                           getParam<bool>("zscore_recursive"));
+    } else if ("quantile" == norm_type) {
+        norm = NORM_QUANTILE(getParam<double>("quantile_min"), getParam<double>("quantile_max"));
 
-                if (max_value == min_value ||
-                    max_value == std::numeric_limits<Indicator::value_t>::max()) {
-                    for (size_t si = 0; si < stk_count; si++) {
-                        auto* dst = all_stk_inds[si][ii].data();
-                        dst[di] = Null<Indicator::value_t>();
-                    }
-                } else {
-                    Indicator::value_t diff = max_value - min_value;
-                    for (size_t si = 0; si < stk_count; si++) {
-                        auto* dst = all_stk_inds[si][ii].data();
-                        dst[di] = (dst[di] - min_value) / diff;
-                    }
-                }
-            }
-        }
+    } else if ("quantile_uniform" == norm_type) {
+        norm =
+          NORM_QUANTILE_UNIFORM(getParam<double>("quantile_min"), getParam<double>("quantile_max"));
     }
 
-    // 每日截面标准化
-    if (getParam<bool>("enable_zscore")) {
-        Indicator one_day = PRICELIST(PriceList(stk_count, Null<price_t>()));
-        for (size_t di = 0; di < days_total; di++) {
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                auto* one_day_data = one_day.data();
-                for (size_t si = 0; si < stk_count; si++) {
-                    one_day_data[si] = all_stk_inds[si][ii][di];
-                }
+    if (norm) {
+        unordered_map<string, PriceList> ind_dummy_dict = _buildDummyIndex();
+        if (parallel) {
+            parallel_for_index_void(
+              0, days_total,
+              [this, stk_count, ind_count, sub_norm = norm->clone(), &all_stk_inds,
+               &ind_dummy_dict](size_t di) {
+                  NormPtr special_norm;
+                  PriceList one_day(stk_count, Null<price_t>());
+                  PriceList new_value;
+                  for (size_t ii = 0; ii < ind_count; ii++) {
+                      auto* one_day_data = one_day.data();
+                      for (size_t si = 0; si < stk_count; si++) {
+                          one_day_data[si] = all_stk_inds[si][ii][di];
+                      }
 
-                auto new_value =
-                  ZSCORE(one_day, getParam<bool>("zscore_out_extreme"),
-                         getParam<double>("zscore_nsigma"), getParam<bool>("zscore_recursive"));
+                      auto special_norm_iter = m_special_norms.find(all_stk_inds[0][ii].name());
+                      if (special_norm_iter != m_special_norms.end()) {
+                          special_norm = special_norm_iter->second->clone();
+                      } else {
+                          special_norm.reset();
+                      }
 
-                for (size_t si = 0; si < stk_count; si++) {
-                    auto* dst = all_stk_inds[si][ii].data();
-                    dst[di] = new_value[si];
+                      if (special_norm) {
+                          new_value = special_norm->normalize(one_day);
+                          auto category_iter = ind_dummy_dict.find(special_norm_iter->first);
+                          if (category_iter != ind_dummy_dict.end()) {
+                              new_value = calculate_residuals(new_value, category_iter->second);
+                          }
+                      } else {
+                          new_value = sub_norm->normalize(one_day);
+                      }
+
+                      for (size_t si = 0; si < stk_count; si++) {
+                          auto* dst = all_stk_inds[si][ii].data();
+                          dst[di] = new_value[si];
+                      }
+                  }
+              });
+        } else {
+            NormPtr special_norm;
+            PriceList new_value;
+            PriceList one_day(stk_count, Null<price_t>());
+            for (size_t di = 0; di < days_total; di++) {
+                for (size_t ii = 0; ii < ind_count; ii++) {
+                    auto* one_day_data = one_day.data();
+                    for (size_t si = 0; si < stk_count; si++) {
+                        one_day_data[si] = all_stk_inds[si][ii][di];
+                    }
+
+                    auto special_norm_iter = m_special_norms.find(all_stk_inds[0][ii].name());
+                    if (special_norm_iter != m_special_norms.end()) {
+                        special_norm = special_norm_iter->second;
+                    } else {
+                        special_norm.reset();
+                    }
+
+                    if (special_norm) {
+                        new_value = special_norm->normalize(one_day);
+                        auto category_iter = ind_dummy_dict.find(special_norm_iter->first);
+                        if (category_iter != ind_dummy_dict.end()) {
+                            new_value = calculate_residuals(new_value, category_iter->second);
+                        }
+                    } else {
+                        new_value = norm->normalize(one_day);
+                    }
+
+                    new_value = norm->normalize(one_day);
+                    for (size_t si = 0; si < stk_count; si++) {
+                        auto* dst = all_stk_inds[si][ii].data();
+                        dst[di] = new_value[si];
+                    }
                 }
             }
         }
