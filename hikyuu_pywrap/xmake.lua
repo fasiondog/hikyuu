@@ -41,7 +41,7 @@ target("core")
         add_linkdirs("/usr/lib")
 
         -- macosx 下不能主动链接 python，所以需要使用如下编译选项
-        add_shflags("-undefined dynamic_lookup")
+        add_shflags("-undefined dynamic_lookup", "-headerpad_max_install_names")
     end    
 
     add_includedirs("../hikyuu_cpp")
