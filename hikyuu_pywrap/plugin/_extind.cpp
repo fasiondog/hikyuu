@@ -26,11 +26,13 @@ public:
     Indicator::value_t operator()(const DatetimeList& src_ds, const Indicator::value_t* src,
                                   size_t group_start, size_t group_last) const {
         py::gil_scoped_acquire gil;
-        DatetimeList ds(group_last + 1 - group_start);
+        size_t total = group_last + 1 - group_start;
+        DatetimeList ds(total);
         std::copy(src_ds.begin() + group_start, src_ds.begin() + group_last + 1, ds.begin());
-        std::vector<Indicator::value_t> src_vec(group_last + 1 - group_start);
-        std::copy(src + group_start, src + group_last + 1, src_vec.begin());
-        py::object ret = m_func(ds, src_vec);
+
+        std::vector<size_t> shape = {total};
+        py::array_t<Indicator::value_t> arr(shape, src + group_start);
+        py::object ret = m_func(ds, arr);
         return ret.cast<Indicator::value_t>();
     }
 
@@ -55,10 +57,14 @@ public:
     void operator()(Indicator::value_t* dst, const DatetimeList& src_ds,
                     const Indicator::value_t* src, size_t group_start, size_t group_last) const {
         py::gil_scoped_acquire gil;
+
         size_t total = group_last + 1 - group_start;
+        DatetimeList ds(total);
+        std::copy(src_ds.begin() + group_start, src_ds.begin() + group_last + 1, ds.begin());
+
         std::vector<size_t> shape = {total};
         py::array_t<Indicator::value_t> arr(shape, src + group_start);
-        py::array_t<Indicator::value_t> ret = m_func(src_ds, arr);
+        py::array_t<Indicator::value_t> ret = m_func(ds, arr);
         auto dim = ret.ndim();
         HKU_CHECK(dim == 1,
                   "The return value of a Python function must be a one-dimensional array!");
@@ -361,7 +367,9 @@ void export_extend_Indicator(py::module& m) {
           HKU_CHECK(py::hasattr(agg_func, "__call__"), "agg_func not callable!");
           HKU_CHECK(check_pyfunction_arg_num(agg_func, 2), "Number of parameters does not match!");
           PyAggFunc agg_func_obj(agg_func.attr("__call__"));
-          return AGG_FUNC(ind, agg_func_obj, ktype, fill_null, unit);
+          auto ret = AGG_FUNC(ind, agg_func_obj, ktype, fill_null, unit);
+          ret.setParam<bool>("parallel", false);
+          return ret;
       },
       py::arg("ind"), py::arg("agg_func"), py::arg("ktype") = KQuery::MIN,
       py::arg("fill_null") = false, py::arg("unit") = 1,
@@ -372,11 +380,11 @@ void export_extend_Indicator(py::module& m) {
     示例, 计算日线时聚合分钟线收盘价的和:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
-      >>> ind = AGG_FUNC(CLOSE(), lambda ds, x: sum(x))
+      >>> ind = AGG_FUNC(CLOSE(), lambda ds, x: np.sum(x))
       >>> ind(k)
 
     :param Indicator ind: 待计算指标
-    :param callable agg_func: 自定义聚合函数，输入参数为 arg1: datetime list, arg2: 分组内值 list, 返回针对list的聚合结果
+    :param callable agg_func: 自定义聚合函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回针对list的聚合结果, 注意是单个值
     :param KQuery.KType ktype: 聚合的K线周期
     :param bool fill_null: 是否填充缺失值
     :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
