@@ -21,7 +21,7 @@ class PyAggFunc {
 #endif
 public:
     PyAggFunc() = default;
-    PyAggFunc(py::object func) : m_func(func) {}
+    explicit PyAggFunc(py::object func) : m_func(func) {}
 
     Indicator::value_t operator()(const DatetimeList& src_ds, const Indicator::value_t* src,
                                   size_t group_start, size_t group_last) const {
@@ -44,27 +44,29 @@ private:
           py::arg("ind"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1, doc);
 
 #if HKU_OS_LINUX
-class __attribute__((visibility("hidden"))) PyGroupFunc {
+class __attribute__((visibility("default"))) PyGroupFunc {
 #else
 class PyGroupFunc {
 #endif
 public:
     PyGroupFunc() = default;
-    PyGroupFunc(py::object func) : m_func(func) {}
+    explicit PyGroupFunc(py::object func) : m_func(func) {}
 
     void operator()(Indicator::value_t* dst, const DatetimeList& src_ds,
                     const Indicator::value_t* src, size_t group_start, size_t group_last) const {
         py::gil_scoped_acquire gil;
-        std::vector<Indicator::value_t> src_vec(group_last + 1 - group_start);
-        std::copy(src + group_start, src + group_last + 1, src_vec.begin());
-        py::sequence ret = m_func(src_ds, src_vec);
-        HKU_CHECK(!ret.is_none(), "The return value of a Python function cannot be None!");
-        HKU_CHECK(
-          len(ret) == src_vec.size(),
-          "The length of the return value of the Python function is inconsistent with the input!");
-        for (size_t i = group_start; i <= group_last; ++i) {
-            dst[i] = py::cast<Indicator::value_t>(ret[group_start - i]);
-        }
+        size_t total = group_last + 1 - group_start;
+        std::vector<size_t> shape = {total};
+        py::array_t<Indicator::value_t> arr(shape, src + group_start);
+        py::array_t<Indicator::value_t> ret = m_func(src_ds, arr);
+        auto dim = ret.ndim();
+        HKU_CHECK(dim == 1,
+                  "The return value of a Python function must be a one-dimensional array!");
+        HKU_CHECK(ret.shape()[0] == shape[0],
+                  "The length of the return value of the Python function is inconsistent with "
+                  "the input!");
+        const Indicator::value_t* data = ret.data();  // 数据指针（直接访问底层内存）
+        memcpy(dst + group_start, data, total * sizeof(Indicator::value_t));
     }
 
 private:
@@ -272,7 +274,8 @@ void export_extend_Indicator(py::module& m) {
           return RANK(blk, ref_ind, mode, fill_null, market);
       },
       py::arg("stks"), py::arg("ref_ind"), py::arg("mode") = 0, py::arg("fill_null") = true,
-      py::arg("market") = "SH", R"(RANK(stks, ref_ind, mode = 0, fill_null = true, market = 'SH')
+      py::arg("market") = "SH",
+      R"(RANK(stks, ref_ind, mode = 0, fill_null = true, market = 'SH')
       
     计算指标值在指定板块中的排名
 
@@ -395,21 +398,23 @@ void export_extend_Indicator(py::module& m) {
           HKU_CHECK(check_pyfunction_arg_num(group_func, 2),
                     "Number of parameters does not match!");
           PyGroupFunc func_obj(group_func.attr("__call__"));
-          return GROUP_FUNC(ind, func_obj, ktype, unit);
+          auto ret = GROUP_FUNC(ind, func_obj, ktype, unit);
+          ret.setParam("parallel", false);
+          return ret;
       },
       py::arg("ind"), py::arg("group_func"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1,
       R"(GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1]
       
-    自定义分组累积计算指标。虽然支持python自定义函数, 但python函数需要GIL, 速度会慢。建议最好直接使用 C++ 自定义分组累积函数。
+    自定义分组累积计算指标。虽然支持python自定义函数, 但python函数需要GIL, 速度较慢。建议最好直接使用 C++ 自定义分组累积函数。
     
     示例, 计算日线时聚合分钟线收盘价的和:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
-      >>> ind = AGG_FUNC(CLOSE(), lambda ds, x: sum(x))
+      >>> ind = GROUP_FUNC(CLOSE(), lambda dates, data: data/2.0)
       >>> ind(k)
 
     :param Indicator ind: 待计算指标
-    :param callable group_func: 自定义分组累积函数，输入参数为 arg1: datetime list, arg2: 分组内值 list, 返回和输入等长的累积计算结果
+    :param callable group_func: 自定义分组累积函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回和输入等长的累积计算结果, 类型同样须为 np.array
     :param KQuery.KType ktype: 分组的K线周期
     :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
     :rtype: Indicator)");
