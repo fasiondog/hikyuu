@@ -14,17 +14,20 @@
 
 using namespace hku;
 
-static bool pluginValid() {
-    auto& sm = StockManager::instance();
-    auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
-    return plugin && isValidLicense();
-}
-
 /**
  * @defgroup test_indicator_AGG_PROD test_indicator_AGG_PROD
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
+
+// 低精度模式下, float 会溢出
+#if !HKU_USE_LOW_PRECISION
+
+static bool pluginValid() {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
+    return plugin && isValidLicense();
+}
 
 /** @par 检测点 */
 TEST_CASE("test_AGG_PROD") {
@@ -63,5 +66,6 @@ TEST_CASE("test_AGG_PROD") {
     }
     CHECK_EQ(result[3], doctest::Approx(sum));
 }
+#endif
 
 /** @} */
