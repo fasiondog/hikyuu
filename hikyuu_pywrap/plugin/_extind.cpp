@@ -14,7 +14,11 @@
           py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,    \
           py::arg("unit") = 1, doc);
 
+#if HKU_OS_LINUX
+class __attribute__((visibility("hidden"))) PyAggFunc {
+#else
 class PyAggFunc {
+#endif
 public:
     PyAggFunc() = default;
     PyAggFunc(py::object func) : m_func(func) {}
