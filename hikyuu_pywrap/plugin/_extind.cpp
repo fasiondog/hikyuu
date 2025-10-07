@@ -38,6 +38,39 @@ private:
     py::object m_func;
 };
 
+#define PY_GROUP_IND_DEFINE(group_func, doc)                                           \
+    m.def(#group_func,                                                                 \
+          py::overload_cast<const Indicator&, const KQuery::KType&, int>(&group_func), \
+          py::arg("ind"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1, doc);
+
+#if HKU_OS_LINUX
+class __attribute__((visibility("hidden"))) PyGroupFunc {
+#else
+class PyGroupFunc {
+#endif
+public:
+    PyGroupFunc() = default;
+    PyGroupFunc(py::object func) : m_func(func) {}
+
+    void operator()(Indicator::value_t* dst, const DatetimeList& src_ds,
+                    const Indicator::value_t* src, size_t group_start, size_t group_last) const {
+        py::gil_scoped_acquire gil;
+        std::vector<Indicator::value_t> src_vec(group_last + 1 - group_start);
+        std::copy(src + group_start, src + group_last + 1, src_vec.begin());
+        py::sequence ret = m_func(src_ds, src_vec);
+        HKU_CHECK(!ret.is_none(), "The return value of a Python function cannot be None!");
+        HKU_CHECK(
+          len(ret) == src_vec.size(),
+          "The length of the return value of the Python function is inconsistent with the input!");
+        for (size_t i = group_start; i <= group_last; ++i) {
+            dst[i] = py::cast<Indicator::value_t>(ret[group_start - i]);
+        }
+    }
+
+private:
+    py::object m_func;
+};
+
 void export_extend_Indicator(py::module& m) {
     m.def("WITHKTYPE", py::overload_cast<const KQuery::KType&, bool>(WITHKTYPE), py::arg("ktype"),
           py::arg("fill_null") = false);
@@ -345,5 +378,39 @@ void export_extend_Indicator(py::module& m) {
     :param bool fill_null: 是否填充缺失值
     :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
     :return: 聚合结果
+    :rtype: Indicator)");
+
+    PY_GROUP_IND_DEFINE(GROUP_COUNT, "分组累积计数")
+    PY_GROUP_IND_DEFINE(GROUP_SUM, "分组累积和")
+    PY_GROUP_IND_DEFINE(GROUP_PROD, "分组累积乘积")
+    PY_GROUP_IND_DEFINE(GROUP_MEAN, "分组累积平均")
+    PY_GROUP_IND_DEFINE(GROUP_MAX, "分组累积最大值")
+    PY_GROUP_IND_DEFINE(GROUP_MIN, "分组累积最小值")
+
+    m.def(
+      "GROUP_FUNC",
+      [](const Indicator& ind, py::object group_func, const KQuery::KType& ktype, int unit) {
+          HKU_CHECK(!group_func.is_none(), "group_func is None!");
+          HKU_CHECK(py::hasattr(group_func, "__call__"), "agg_func not callable!");
+          HKU_CHECK(check_pyfunction_arg_num(group_func, 2),
+                    "Number of parameters does not match!");
+          PyGroupFunc func_obj(group_func.attr("__call__"));
+          return GROUP_FUNC(ind, func_obj, ktype, unit);
+      },
+      py::arg("ind"), py::arg("group_func"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1,
+      R"(GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1]
+      
+    自定义分组累积计算指标。虽然支持python自定义函数, 但python函数需要GIL, 速度会慢。建议最好直接使用 C++ 自定义分组累积函数。
+    
+    示例, 计算日线时聚合分钟线收盘价的和:
+
+      >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
+      >>> ind = AGG_FUNC(CLOSE(), lambda ds, x: sum(x))
+      >>> ind(k)
+
+    :param Indicator ind: 待计算指标
+    :param callable group_func: 自定义分组累积函数，输入参数为 arg1: datetime list, arg2: 分组内值 list, 返回和输入等长的累积计算结果
+    :param KQuery.KType ktype: 分组的K线周期
+    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
     :rtype: Indicator)");
 }

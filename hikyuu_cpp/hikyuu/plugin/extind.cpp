@@ -109,4 +109,24 @@ Indicator HKU_API AGG_FUNC(const Indicator& ind, agg_func_t agg_func, const KQue
     return plugin->getAggFuncIndicator(ind, agg_func, params);
 }
 
+GROUP_FUNC_IMP(GROUP_COUNT)
+GROUP_FUNC_IMP(GROUP_SUM)
+GROUP_FUNC_IMP(GROUP_MEAN)
+GROUP_FUNC_IMP(GROUP_PROD)
+GROUP_FUNC_IMP(GROUP_MIN)
+GROUP_FUNC_IMP(GROUP_MAX)
+
+Indicator HKU_API GROUP_FUNC(const Indicator& ind, group_func_t group_func,
+                             const KQuery::KType& ktype, int unit) {
+    Indicator ret;
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
+    HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_EXTEND_INDICATOR);
+
+    Parameter params;
+    params.set<string>("ktype", ktype);
+    params.set<int>("unit", unit);
+    return plugin->getGroupFuncIndicator(ind, group_func, params);
+}
+
 }  // namespace hku

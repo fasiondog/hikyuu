@@ -197,5 +197,36 @@ Indicator HKU_API AGG_FUNC(const Indicator& ind, agg_func_t agg_func,
                            const KQuery::KType& ktype = KQuery::MIN, bool fill_null = false,
                            int unit = 1);
 
+/**
+ * @brief 按周期分组就散
+ * @param ktype 指定K线周期
+ * @param unit 分组周期单位，默认为1。按 ktype 参数 unit 个周期计算
+ * @return Indicator
+ */
+#define GROUP_FUNC_DEFINE(group_name)                                                            \
+    Indicator HKU_API group_name(const Indicator& ind, const KQuery::KType& ktype = KQuery::DAY, \
+                                 int unit = 1);
+
+#define GROUP_FUNC_IMP(group_name)                                                             \
+    Indicator HKU_API group_name(const Indicator& ind, const KQuery::KType& ktype, int unit) { \
+        Parameter params;                                                                      \
+        params.set<string>("ktype", ktype);                                                    \
+        params.set<int>("unit", unit);                                                         \
+        return getExtIndicator(#group_name, ind, params);                                      \
+    }
+
+GROUP_FUNC_DEFINE(GROUP_COUNT)
+GROUP_FUNC_DEFINE(GROUP_SUM)
+GROUP_FUNC_DEFINE(GROUP_MEAN)
+GROUP_FUNC_DEFINE(GROUP_PROD)
+GROUP_FUNC_DEFINE(GROUP_MIN)
+GROUP_FUNC_DEFINE(GROUP_MAX)
+
+using group_func_t =
+  std::function<void(Indicator::value_t* dst, const DatetimeList& src_ds,
+                     const Indicator::value_t* src, size_t group_start, size_t group_last)>;
+Indicator HKU_API GROUP_FUNC(const Indicator& ind, group_func_t group_func,
+                             const KQuery::KType& ktype = KQuery::DAY, int unit = 1);
+
 /** @} */
 }  // namespace hku
