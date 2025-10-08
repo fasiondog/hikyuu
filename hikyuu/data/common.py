@@ -200,11 +200,11 @@ def get_china_bond10_rate(start_date="19901219"):
 
 
 def modifiy_code(code):
-    if code.startswith(('0', '3')):
+    if code.startswith(('0', '3', '5', '20')):
         return 'SZ' + code
-    if code.startswith(('4', '8', '92')):
+    if code.startswith(('1', '4', '8', '92')):
         return 'BJ' + code
-    if code.startswith('6'):
+    if code.startswith(('6', '900')):
         return 'SH' + code
     else:
         hku_warn("Unknow code: {}", code)
