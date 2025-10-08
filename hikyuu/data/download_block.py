@@ -105,7 +105,7 @@ def down_em_all_dybk_info():
     for i, v in enumerate(blk_list):
         blk_code, blk_name = v[0], v[1]
         filename = f"{save_path}/{blk_name}.txt"
-        if not is_file_can_download(filename, 5 * 24 * 60 * 60):
+        if not is_file_can_download(filename, 10 * 24 * 60 * 60):
             continue
 
         params["fs"] = f"b:{blk_code} f:!50"
@@ -162,8 +162,12 @@ def download_all_zsbk_info():
     # 3. 转换为DataFrame
     blk_info = pd.DataFrame(merged_rows).reset_index(drop=True)
 
-    not_need_blks = set(["000012", "000013", "000188"])  # 000012|国债指数, 000013|上证企业债指数, 000188|中国波指
+    not_need_blks = set(["000012", "000013", "000188", "000817", "000847",
+                        "000849", "000850", "000851", "000853", "000854", "000856",
+                         "000857", "000858", "000923", "000973", "000974", "000996",
+                         "000997", "000999"])
 
+    failed_sina = 0
     blk_set = {}
     blk_codes = blk_info["index_code"]
     blk_names = blk_info["display_name"]
@@ -177,18 +181,20 @@ def download_all_zsbk_info():
 
         market_block_code = f'SH{blk_code}' if blk_code.startswith('0') else f'SZ{blk_code}'
         filename = f"{save_path}/{market_block_code}_{blk_name}.txt"
-        if not is_file_can_download(filename, 7 * 24 * 60 * 60):
+        if not is_file_can_download(filename, 10 * 24 * 60 * 60):
             continue
 
         time.sleep(random.uniform(1, 3))
         try:
             if blk_code[:3] == "399":
-                # stk_codes = ak.index_stock_cons(symbol=blk_code)
-                # stk_codes = stk_codes['品种代码'].to_list()
-                continue
+                if failed_sina >= 5:
+                    continue
+                stk_codes = ak.index_stock_cons(symbol=blk_code)
+                stk_codes = stk_codes['品种代码'].to_list()
             else:
-                stk_codes = ak.index_stock_cons_csindex(symbol=blk_code)
-                stk_codes = stk_codes['成分券代码'].to_list()
+                # stk_codes = ak.index_stock_cons_csindex(symbol=blk_code)
+                # stk_codes = stk_codes['成分券代码'].to_list()
+                continue
 
             stk_codes = [modifiy_code(code) for code in stk_codes]
             stk_codes = [code for code in stk_codes if code is not None]
@@ -198,7 +204,9 @@ def download_all_zsbk_info():
         except KeyboardInterrupt:
             break
         except Exception as e:
-            print(f"Failed! {i}, {blk_code}, {blk_name}")
+            print(f"Failed! {i}, {blk_code}, {blk_name} {str(e)}")
+            if blk_code.startswith("399"):
+                failed_sina += 1
             # raise e
 
 
