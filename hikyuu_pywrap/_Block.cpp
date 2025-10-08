@@ -23,7 +23,9 @@ void (Block::*setName)(const string&) = &Block::name;
 void export_Block(py::module& m) {
     py::class_<Block>(m, "Block", "板块类，可视为证券的容器")
       .def(py::init<>())
-      .def(py::init<const string&, const string&>())
+      .def(py::init<const string&, const string&>(), py::arg("category"), py::arg("name"))
+      .def(py::init<const string&, const string&, const string&>(), py::arg("category"),
+           py::arg("name"), py::arg("index_code"))
       .def(py::init<const Block&>())
 
       .def("__str__", to_py_str<Block>)

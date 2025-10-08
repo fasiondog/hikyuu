@@ -30,7 +30,12 @@ Block::Block(const string& category, const string& name) noexcept : m_data(make_
 Block::Block(const string& category, const string& name, const string& indexCode) noexcept
 : Block(category, name) {
     if (!indexCode.empty()) {
-        m_data->m_indexStock = StockManager::instance().getStock(indexCode);
+        auto stock = StockManager::instance().getStock(indexCode);
+        if (!stock.isNull()) {
+            m_data->m_indexStock = stock;
+        } else {
+            HKU_WARN("Can't find index stock: {}, will ignore!", indexCode);
+        }
     }
 }
 
