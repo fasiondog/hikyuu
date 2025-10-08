@@ -40,7 +40,7 @@ print('current hikyuu version:', hku_version)
 py_version = platform.python_version_tuple()
 py_version = int(py_version[0]) * 10 + int(py_version[1])
 
-hku_name = "hikyuu",  # "hikyuu-noarrow"
+hku_name = "hikyuu"  # "hikyuu-noarrow"
 # hku_version = "1.0.9"
 hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"

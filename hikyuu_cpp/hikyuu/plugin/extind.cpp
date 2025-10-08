@@ -95,4 +95,18 @@ Indicator HKU_API AGG_QUANTILE(const Indicator& ind, const KQuery::KType& ktype,
     return getExtIndicator("AGG_QUANTILE", ind, params);
 }
 
+Indicator HKU_API AGG_FUNC(const Indicator& ind, agg_func_t agg_func, const KQuery::KType& ktype,
+                           bool fill_null, int unit) {
+    Indicator ret;
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
+    HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_EXTEND_INDICATOR);
+
+    Parameter params;
+    params.set<string>("ktype", ktype);
+    params.set<bool>("fill_null", fill_null);
+    params.set<int>("unit", unit);
+    return plugin->getAggFuncIndicator(ind, agg_func, params);
+}
+
 }  // namespace hku

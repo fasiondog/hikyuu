@@ -1933,7 +1933,7 @@ void export_Indicator_build_in(py::module& m) {
           py::arg("nsigma") = 3.0, py::arg("recursive") = false,
           R"(ZSCORE(data[, out_extreme, nsigma, recursive])
 
-    对数据进行标准化（归一），可选进行极值排除
+    对数据进行标准化（归一），可选进行极值处理
 
     注：非窗口滚动，如需窗口滚动的标准化，直接 (x - MA(x, n)) / STDEV(x, n) 即可。
     
@@ -1941,6 +1941,21 @@ void export_Indicator_build_in(py::module& m) {
     :param bool outExtreme: 指示剔除极值，默认 False
     :param float nsigma: 剔除极值时使用的 nsigma 倍 sigma，默认 3.0
     :param bool recursive: 是否进行递归剔除极值，默认 False
+    :rtype: Indicator)");
+
+    m.def("QUANTILE_TRUNC", py::overload_cast<int, double, double>(QUANTILE_TRUNC),
+          py::arg("n") = 60, py::arg("quantial_min") = 0.01, py::arg("quantial_max") = 0.99);
+    m.def("QUANTILE_TRUNC",
+          py::overload_cast<const Indicator&, int, double, double>(QUANTILE_TRUNC), py::arg("data"),
+          py::arg("n") = 60, py::arg("quantial_min") = 0.01, py::arg("quantial_max") = 0.99,
+          R"(QUANTILE_TRUNC(data[, n=60, quantial_min=0.01, quantial_max=0.99])
+
+    对数据进行分位数截断处理。非窗口滚动。
+
+    :param Indicator data: 待剔除异常值数据
+    :param int n: 时间窗口
+    :param float quantial_min: 剔除极值时使用的百分位数下限，默认 0.01
+    :param float quantial_max: 剔除极值时使用的百分位数上限，默认 0.99
     :rtype: Indicator)");
 
     m.def("TURNOVER", py::overload_cast<int>(TURNOVER), py::arg("n") = 1);

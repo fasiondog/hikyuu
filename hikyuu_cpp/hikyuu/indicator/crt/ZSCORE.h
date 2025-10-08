@@ -12,9 +12,9 @@
 namespace hku {
 
 /**
- * 对数据进行ZScore标准化，可选进行极值排除
+ * 对数据进行ZScore标准化(3sigma)进行极值处理
  * @note 非窗口滚动，如需窗口滚动的标准化，直接 (x - MA(x, n)) / STDEV(x, n) 即可
- * @param outExtreme 指示剔除极值
+ * @param outExtreme 指示剔除极值（即截断极值，超过限制的用限制值替代）
  * @param nsigma 剔除极值时使用的 nsigma 倍 sigma
  * @param recursive 是否进行递归剔除极值
  * @return Indicator
