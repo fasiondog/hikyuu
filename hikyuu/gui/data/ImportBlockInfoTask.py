@@ -6,7 +6,6 @@
 
 import sqlite3
 import mysql.connector
-from hikyuu.data.common import MARKET, get_stk_code_name_list
 from hikyuu.data.em_block_to_mysql import em_import_block_to_mysql
 from hikyuu.data.em_block_to_sqlite import em_import_block_to_sqlite
 from hikyuu.data.em_block_to_clickhouse import em_import_block_to_clickhouse
@@ -14,11 +13,10 @@ from hikyuu.util import *
 
 
 class ImportBlockInfoTask:
-    def __init__(self, log_queue, queue, config, categorys):
+    def __init__(self, log_queue, queue, config):
         self.log_queue = log_queue
         self.queue = queue
         self.config = config
-        self.categorys = categorys
         self.task_name = 'IMPORT_BLOCKINFO'
         self.status = "no run"
 
@@ -52,16 +50,11 @@ class ImportBlockInfoTask:
 
         count = 0
         try:
-            code_market_dict = {}
-            for market in (MARKET.SH, MARKET.SZ, MARKET.BJ):
-                x = get_stk_code_name_list(market)
-                for v in x:
-                    code_market_dict[v["code"]] = market
-            count = import_block(connect, code_market_dict, self.categorys)
+            count = import_block(connect)
         except Exception as e:
             hku_error(str(e))
 
         connect.close()
 
-        self.queue.put([self.task_name, "BLOCKINFO", f"{self.categorys}板块信息下载完毕: {count}", None, None])
+        self.queue.put([self.task_name, "BLOCKINFO", f"板块信息下载完毕: {count}", None, None])
         self.status = "finished"

@@ -4,92 +4,51 @@
 # Create on: 20240102
 #    Author: fasiondog
 
-from concurrent.futures import ThreadPoolExecutor
-from hikyuu.data.common import MARKET, get_stk_code_name_list
+
 from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_block_em import *
+from hikyuu.data.download_block import *
 
 
-def em_import_block_to_mysql(connect, code_market_dict, categorys=('行业板块', '概念板块', '地域板块', '指数板块')):
-    all_block_info = {}
+def em_import_block_to_mysql(connect):
+    down_em_all_hybk_info()
+    down_em_all_dybk_info()
+    down_em_all_gnbk_info()
+    download_all_zsbk_info()
 
-    with ThreadPoolExecutor(4) as executor:
-        if '行业板块' in categorys:
-            t1 = executor.submit(get_all_hybk_info, code_market_dict)
-
-        if '概念板块' in categorys:
-            t2 = executor.submit(get_all_gnbk_info, code_market_dict)
-
-        if '地域板块' in categorys:
-            t3 = executor.submit(get_all_dybk_info, code_market_dict)
-
-        if '指数板块' in categorys:
-            t4 = executor.submit(get_all_zsbk_info, code_market_dict)
-
-        success_fetch_hy = False
-        if '行业板块' in categorys:
-            x = t1.result()
-            hku_info("获取行业板块信息完毕")
-            if x:
-                all_block_info["行业板块"] = x
-                success_fetch_hy = True
-
-        success_fetch_gn = False
-        if '概念板块' in categorys:
-            x = t2.result()
-            hku_info("获取概念板块信息完毕")
-            if x:
-                all_block_info["概念板块"] = x
-                success_fetch_gn = True
-
-        success_fetch_dy = False
-        if '地域板块' in categorys:
-            x = t3.result()
-            hku_info("获取地域板块信息完毕")
-            if x:
-                all_block_info["地域板块"] = x
-                success_fetch_dy = True
-
-        success_fetch_zs = False
-        if '指数板块' in categorys:
-            x = t4.result()
-            hku_info("获取指数板块信息完毕")
-            if x:
-                all_block_info["指数板块"] = x
-                success_fetch_zs = True
-
-    blks = []
-    if success_fetch_hy:
-        blks.append('行业板块')
-    if success_fetch_gn:
-        blks.append('概念板块')
-    if success_fetch_dy:
-        blks.append('地域板块')
-    if success_fetch_zs:
-        blks.append('指数板块')
+    blocks_info = read_block_from_path()
+    blks = blocks_info['block']
+    blks_info = blocks_info['block_info']
 
     if not blks:
-        return
+        return 0
 
     hku_info("更新数据库")
     cur = connect.cursor()
-    if len(blks) == 1:
-        sql = f"delete from hku_base.block where category in ('{blks[0]}')"
-    else:
-        sql = f"delete from hku_base.block where category in {tuple(blks)}"
+    sql = f"delete from hku_base.block where category in {tuple(blks.keys())}"
+    cur.execute(sql)
+    sql = f"delete from hku_base.BlockIndex where category in {tuple(blks.keys())}"
     cur.execute(sql)
 
     insert_records = []
 
-    for category in all_block_info:
-        for name in all_block_info[category]:
-            for code in all_block_info[category][name]:
+    for category, blocks in blks.items():
+        for name, codes in blocks.items():
+            for code in codes:
                 insert_records.append((category, name, code))
 
     if insert_records:
         sql = "insert into hku_base.block (category, name, market_code) values (%s,%s,%s)"
-        hku_info(f"insert block records: {len(insert_records)}")
         cur.executemany(sql, insert_records)
+
+    index_records = []
+    for category, blocks in blks_info.items():
+        for name, index_code in blocks.items():
+            if len(index_code) == 8:
+                index_records.append((category, name, index_code))
+    if index_records:
+        sql = "insert into hku_base.BlockIndex (category, name, market_code) values (%s,%s,%s)"
+        cur.executemany(sql, index_records)
 
     connect.commit()
     cur.close()
@@ -111,11 +70,5 @@ if __name__ == "__main__":
     connect = mysql.connector.connect(user=usr, password=pwd, host=host, port=port)
     create_database(connect)
 
-    x = get_stk_code_name_list(MARKET.SH)
-    code_market_dict = {}
-    for v in x:
-        code_market_dict[v["code"]] = MARKET.SH
-    # print(code_market_dict)
-
-    em_import_block_to_mysql(connect, code_market_dict)
+    em_import_block_to_mysql(connect)
     connect.close()

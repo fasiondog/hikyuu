@@ -98,7 +98,7 @@ class UsePytdxImportToH5Thread(QThread):
 
         if self.config.getboolean('block', 'enable', fallback=True):
             self.tasks.append(ImportBlockInfoTask(self.log_queue, self.queue,
-                                                  self.config, ('行业板块', '指数板块')))  # '概念板块', '地域板块',
+                                                  self.config))  # '概念板块', '地域板块',
 
         self.tasks.append(ImportZhBond10Task(self.log_queue, self.queue, self.config))
 

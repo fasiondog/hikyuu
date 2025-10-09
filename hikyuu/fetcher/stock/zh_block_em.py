@@ -17,7 +17,7 @@ from hikyuu.util import *
 em_num_per_page = 100
 
 
-@hku_catch(ret=[], trace=True)
+@hku_catch(ret=[], trace=False)
 def get_hybk_names():
     """获取所有行业(板块代码,板块名称)列表"""
     url = "https://19.push2.eastmoney.com/api/qt/clist/get"
@@ -50,7 +50,7 @@ def get_hybk_names():
     return ret
 
 
-@hku_catch(ret=[], trace=True)
+@hku_catch(ret=[], trace=False)
 def get_hybk_cons_code(blk_code):
     "获取指定行业板块成分代码列表"
     url = "http://30.push2.eastmoney.com/api/qt/clist/get"
@@ -83,7 +83,7 @@ def get_hybk_cons_code(blk_code):
     return ret
 
 
-@hku_catch(ret={}, trace=True)
+@hku_catch(ret={}, trace=False)
 def get_all_hybk_info(code_market_dict, sep=""):
     """获取所有行业板块列表"""
     blk_list = get_hybk_names()
@@ -434,7 +434,7 @@ def stock_board_concept_cons_em(symbol: str = "融资融券") -> pd.DataFrame:
     return temp_df
 
 
-@hku_catch(ret={}, trace=True)
+@hku_catch(ret={}, trace=False)
 def get_all_gnbk_info(code_market_dict, sep=""):
     """获取所有概念版本列表"""
     blk_names = stock_board_concept_name_em()['板块名称']
@@ -450,7 +450,7 @@ def get_all_gnbk_info(code_market_dict, sep=""):
     return ret
 
 
-@hku_catch(ret=[], trace=True)
+@hku_catch(ret=[], trace=False)
 def get_dybk_names():
     """获取所有地域板块名称列表"""
     url = "http://13.push2.eastmoney.com/api/qt/clist/get"
@@ -483,7 +483,7 @@ def get_dybk_names():
     return ret
 
 
-@hku_catch(ret={}, trace=True)
+@hku_catch(ret={}, trace=False)
 def get_all_dybk_info(code_market_dict, sep=""):
     """获取所有地域板块列表"""
     blk_list = get_dybk_names()
@@ -534,7 +534,7 @@ def get_all_dybk_info(code_market_dict, sep=""):
     return ret
 
 
-@hku_catch(ret={}, trace=True)
+@hku_catch(ret={}, trace=False)
 def get_all_zsbk_info(code_market_dict, sep=""):
     """获取所有指数成分股列表"""
     blk_info = ak.index_stock_info()

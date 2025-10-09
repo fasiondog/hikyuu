@@ -34,7 +34,8 @@ Block::Block(const string& category, const string& name, const string& indexCode
         if (!stock.isNull()) {
             m_data->m_indexStock = stock;
         } else {
-            HKU_WARN("Can't find index stock: {}, will ignore!", indexCode);
+            // 直接忽略不再打印
+            HKU_TRACE("Can't find index stock: {}, will ignore!", indexCode);
         }
     }
 }

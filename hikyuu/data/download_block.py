@@ -4,17 +4,76 @@
 # Create on: 2025-10-05
 #    Author: fasiondog
 
-from concurrent.futures import ThreadPoolExecutor
 from hikyuu.data.common import modifiy_code
 from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_block_em import *
-import csv
 import os
 from datetime import datetime
 
 _BLOCK_SAVE_PATH = os.path.expanduser('~') + '/.hikyuu/downloads/block'
 if not os.path.exists(_BLOCK_SAVE_PATH):
     os.makedirs(_BLOCK_SAVE_PATH)
+
+
+def read_block_from_path(block_path=_BLOCK_SAVE_PATH):
+    """
+    从指定目录下读取block信息
+
+    :param block_path: block根目录路径，默认为 _BLOCK_SAVE_PATH
+    :return: 返回格式类似于 {'block': {'category1': {'name1': [code1, code2]}}, 
+                            'block_info': {'category1: {'name1': 'code1', 'name2': ''}}
+    """
+    result = {
+        'block': {},
+        'block_info': {}
+    }
+
+    if not os.path.exists(block_path):
+        return result
+
+    # 遍历所有分类目录
+    for category in os.listdir(block_path):
+        category_path = os.path.join(block_path, category)
+        if not os.path.isdir(category_path):
+            continue
+
+        result['block'][category] = {}
+        result['block_info'][category] = {}
+
+        # 遍历分类目录下的所有.txt文件
+        for file in os.listdir(category_path):
+            if file.endswith('.txt'):
+                file_path = os.path.join(category_path, file)
+                # 文件名作为板块名称（去掉扩展名）
+                block_name = os.path.splitext(file)[0]
+
+                # 解析文件名，格式为 "code_name" 或 "name"
+                if '_' in block_name:
+                    parts = block_name.split('_', 1)  # 只分割第一个下划线
+                    code_part = parts[0]
+                    name_part = parts[1]
+                    # 判断code部分是否为纯数字或字母数字组合
+                    if code_part.replace('_', '').isalnum():
+                        result['block_info'][category][name_part] = code_part
+                        block_key = name_part
+                    else:
+                        result['block_info'][category][block_name] = ""
+                        block_key = block_name
+                else:
+                    result['block_info'][category][block_name] = ""
+                    block_key = block_name
+
+                # 读取文件中的股票代码
+                codes = []
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        code = line.strip()
+                        if code:
+                            codes.append(code)
+
+                result['block'][category][block_key] = codes
+
+    return result
 
 
 def is_file_can_download(filepath, sec_limit=5 * 24 * 60 * 60):
@@ -35,13 +94,13 @@ def save_block(stkcodes: list,  filename: str):
     with open(filename, 'w', encoding='utf-8') as f:
         for code in stkcodes:
             f.write(f"{code}\n")
-    hku_info(f"已保存至 {filename}")
+    # hku_info(f"已保存至 {filename}")
 
 
-@hku_catch(ret={}, trace=True)
+@hku_catch(ret={}, trace=False)
 def down_em_all_hybk_info():
     """下载东财所有行业板块列表"""
-    save_path = f'{_BLOCK_SAVE_PATH}/东财行业板块'
+    save_path = f'{_BLOCK_SAVE_PATH}/行业板块'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     blk_list = get_hybk_names()
@@ -58,15 +117,18 @@ def down_em_all_hybk_info():
             time.sleep(random.uniform(1, 3))
 
 
-@hku_catch(ret={}, trace=True)
+@hku_catch(ret={}, trace=False)
 def down_em_all_gnbk_info():
     """获取所有概念版本列表"""
-    save_path = f'{_BLOCK_SAVE_PATH}/东财概念板块'
+    save_path = f'{_BLOCK_SAVE_PATH}/概念板块'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     blk_names = stock_board_concept_name_em()['板块名称']
+    not_need_blks = set(["昨日连板_含一字", "昨日涨停_含一字", "昨日涨停"])
     total = len(blk_names)
     for i, blk_name in enumerate(blk_names):
+        if blk_name in not_need_blks:
+            continue
         filename = f"{save_path}/{blk_name}.txt"
         if is_file_can_download(filename, 5 * 24 * 60 * 60):
             stk_codes = stock_board_concept_cons_em(blk_name)
@@ -78,10 +140,10 @@ def down_em_all_gnbk_info():
             time.sleep(random.uniform(1, 3))
 
 
-@hku_catch(ret={}, trace=True)
+@hku_catch(ret={}, trace=False)
 def down_em_all_dybk_info():
     """获取所有地域板块列表"""
-    save_path = f'{_BLOCK_SAVE_PATH}/东财地域板块'
+    save_path = f'{_BLOCK_SAVE_PATH}/地域板块'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     blk_list = get_dybk_names()
@@ -135,7 +197,7 @@ def down_em_all_dybk_info():
         hku_info(f'{i+1}|{total} 获取地域板块{blk_name}成分: {len(stk_codes)}')
 
 
-@hku_catch(ret={}, trace=True)
+@hku_catch(ret={}, trace=False)
 def download_all_zsbk_info():
     """获取所有指数成分股列表"""
     save_path = f'{_BLOCK_SAVE_PATH}/指数板块'
@@ -167,7 +229,7 @@ def download_all_zsbk_info():
     not_need_blks = set(["000012", "000013", "000022", "000061", "000101", "000188",
                          "000817", "000847", "000849", "000850", "000851", "000853",
                          "000854", "000856", "000857", "000858", "000923", "000973",
-                         "000974", "000996", "000997", "000999"])
+                         "000974", "000996", "000997", "000999", "399415", "399416"])
 
     failed_sina = 0
     blk_set = {}
@@ -212,17 +274,12 @@ def download_all_zsbk_info():
 
 
 if __name__ == "__main__":
-    from hikyuu.interactive import *
-    code_market_dict = {}
-    for s in sm:
-        if s.valid and s.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_GEM, constant.STOCKTYPE_START, constant.STOCKTYPE_A_BJ):
-            code_market_dict[s.code] = s.market
+    # down_em_all_hybk_info()
+    # down_em_all_dybk_info()
+    # down_em_all_gnbk_info()
+    # download_all_zsbk_info()
 
-    # print(code_market_dict)
-
-    # download_em_block(code_market_dict, categorys=('指数板块', ))
-
-    down_em_all_hybk_info()
-    down_em_all_dybk_info()
-    down_em_all_gnbk_info()
-    download_all_zsbk_info()
+    ret = read_block_from_path()
+    # print(ret['block'])
+    print(ret['block_info'])
+    print(tuple(ret['block'].keys()))
