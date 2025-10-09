@@ -21,17 +21,58 @@ class PyAggFunc {
 #endif
 public:
     PyAggFunc() = default;
-    PyAggFunc(py::object func) : m_func(func) {}
+    explicit PyAggFunc(py::object func) : m_func(func) {}
 
     Indicator::value_t operator()(const DatetimeList& src_ds, const Indicator::value_t* src,
                                   size_t group_start, size_t group_last) const {
         py::gil_scoped_acquire gil;
-        DatetimeList ds(group_last + 1 - group_start);
+        size_t total = group_last + 1 - group_start;
+        DatetimeList ds(total);
         std::copy(src_ds.begin() + group_start, src_ds.begin() + group_last + 1, ds.begin());
-        std::vector<Indicator::value_t> src_vec(group_last + 1 - group_start);
-        std::copy(src + group_start, src + group_last + 1, src_vec.begin());
-        py::object ret = m_func(ds, src_vec);
+
+        std::vector<size_t> shape = {total};
+        py::array_t<Indicator::value_t> arr(shape, src + group_start);
+        py::object ret = m_func(ds, arr);
         return ret.cast<Indicator::value_t>();
+    }
+
+private:
+    py::object m_func;
+};
+
+#define PY_GROUP_IND_DEFINE(group_func, doc)                                           \
+    m.def(#group_func,                                                                 \
+          py::overload_cast<const Indicator&, const KQuery::KType&, int>(&group_func), \
+          py::arg("ind"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1, doc);
+
+#if HKU_OS_LINUX
+class __attribute__((visibility("default"))) PyGroupFunc {
+#else
+class PyGroupFunc {
+#endif
+public:
+    PyGroupFunc() = default;
+    explicit PyGroupFunc(py::object func) : m_func(func) {}
+
+    void operator()(Indicator::value_t* dst, const DatetimeList& src_ds,
+                    const Indicator::value_t* src, size_t group_start, size_t group_last) const {
+        py::gil_scoped_acquire gil;
+
+        size_t total = group_last + 1 - group_start;
+        DatetimeList ds(total);
+        std::copy(src_ds.begin() + group_start, src_ds.begin() + group_last + 1, ds.begin());
+
+        std::vector<size_t> shape = {total};
+        py::array_t<Indicator::value_t> arr(shape, src + group_start);
+        py::array_t<Indicator::value_t> ret = m_func(ds, arr);
+        auto dim = ret.ndim();
+        HKU_CHECK(dim == 1,
+                  "The return value of a Python function must be a one-dimensional array!");
+        HKU_CHECK(ret.shape()[0] == shape[0],
+                  "The length of the return value of the Python function is inconsistent with "
+                  "the input!");
+        const Indicator::value_t* data = ret.data();  // 数据指针（直接访问底层内存）
+        memcpy(dst + group_start, data, total * sizeof(Indicator::value_t));
     }
 
 private:
@@ -239,7 +280,8 @@ void export_extend_Indicator(py::module& m) {
           return RANK(blk, ref_ind, mode, fill_null, market);
       },
       py::arg("stks"), py::arg("ref_ind"), py::arg("mode") = 0, py::arg("fill_null") = true,
-      py::arg("market") = "SH", R"(RANK(stks, ref_ind, mode = 0, fill_null = true, market = 'SH')
+      py::arg("market") = "SH",
+      R"(RANK(stks, ref_ind, mode = 0, fill_null = true, market = 'SH')
       
     计算指标值在指定板块中的排名
 
@@ -325,7 +367,9 @@ void export_extend_Indicator(py::module& m) {
           HKU_CHECK(py::hasattr(agg_func, "__call__"), "agg_func not callable!");
           HKU_CHECK(check_pyfunction_arg_num(agg_func, 2), "Number of parameters does not match!");
           PyAggFunc agg_func_obj(agg_func.attr("__call__"));
-          return AGG_FUNC(ind, agg_func_obj, ktype, fill_null, unit);
+          auto ret = AGG_FUNC(ind, agg_func_obj, ktype, fill_null, unit);
+          ret.setParam<bool>("parallel", false);
+          return ret;
       },
       py::arg("ind"), py::arg("agg_func"), py::arg("ktype") = KQuery::MIN,
       py::arg("fill_null") = false, py::arg("unit") = 1,
@@ -336,14 +380,50 @@ void export_extend_Indicator(py::module& m) {
     示例, 计算日线时聚合分钟线收盘价的和:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
-      >>> ind = AGG_FUNC(CLOSE(), lambda ds, x: sum(x))
+      >>> ind = AGG_FUNC(CLOSE(), lambda ds, x: np.sum(x))
       >>> ind(k)
 
     :param Indicator ind: 待计算指标
-    :param callable agg_func: 自定义聚合函数，输入参数为 arg1: datetime list, arg2: 分组内值 list, 返回针对list的聚合结果
+    :param callable agg_func: 自定义聚合函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回针对list的聚合结果, 注意是单个值
     :param KQuery.KType ktype: 聚合的K线周期
     :param bool fill_null: 是否填充缺失值
     :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
     :return: 聚合结果
+    :rtype: Indicator)");
+
+    PY_GROUP_IND_DEFINE(GROUP_COUNT, "分组累积计数")
+    PY_GROUP_IND_DEFINE(GROUP_SUM, "分组累积和")
+    PY_GROUP_IND_DEFINE(GROUP_PROD, "分组累积乘积")
+    PY_GROUP_IND_DEFINE(GROUP_MEAN, "分组累积平均")
+    PY_GROUP_IND_DEFINE(GROUP_MAX, "分组累积最大值")
+    PY_GROUP_IND_DEFINE(GROUP_MIN, "分组累积最小值")
+
+    m.def(
+      "GROUP_FUNC",
+      [](const Indicator& ind, py::object group_func, const KQuery::KType& ktype, int unit) {
+          HKU_CHECK(!group_func.is_none(), "group_func is None!");
+          HKU_CHECK(py::hasattr(group_func, "__call__"), "agg_func not callable!");
+          HKU_CHECK(check_pyfunction_arg_num(group_func, 2),
+                    "Number of parameters does not match!");
+          PyGroupFunc func_obj(group_func.attr("__call__"));
+          auto ret = GROUP_FUNC(ind, func_obj, ktype, unit);
+          ret.setParam("parallel", false);
+          return ret;
+      },
+      py::arg("ind"), py::arg("group_func"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1,
+      R"(GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1]
+      
+    自定义分组累积计算指标。虽然支持python自定义函数, 但python函数需要GIL, 速度较慢。建议最好直接使用 C++ 自定义分组累积函数。
+    
+    示例, 计算日线时聚合分钟线收盘价的和:
+
+      >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
+      >>> ind = GROUP_FUNC(CLOSE(), lambda dates, data: data/2.0)
+      >>> ind(k)
+
+    :param Indicator ind: 待计算指标
+    :param callable group_func: 自定义分组累积函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回和输入等长的累积计算结果, 类型同样须为 np.array
+    :param KQuery.KType ktype: 分组的K线周期
+    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
     :rtype: Indicator)");
 }
