@@ -143,6 +143,8 @@ def download_all_zsbk_info():
         os.makedirs(save_path)
 
     blk_info = ak.index_stock_info()
+    time.sleep(random.uniform(1, 3))
+
     blk_info['index_code'] = blk_info['index_code'].astype(str)  # 确保是字符串类型
     df_000 = blk_info[blk_info['index_code'].str.startswith('000')].reset_index(drop=True)  # 000前缀
     df_399 = blk_info[blk_info['index_code'].str.startswith('399')].reset_index(drop=True)  # 399前缀
@@ -162,10 +164,10 @@ def download_all_zsbk_info():
     # 3. 转换为DataFrame
     blk_info = pd.DataFrame(merged_rows).reset_index(drop=True)
 
-    not_need_blks = set(["000012", "000013", "000188", "000817", "000847",
-                        "000849", "000850", "000851", "000853", "000854", "000856",
-                         "000857", "000858", "000923", "000973", "000974", "000996",
-                         "000997", "000999"])
+    not_need_blks = set(["000012", "000013", "000022", "000061", "000101", "000188",
+                         "000817", "000847", "000849", "000850", "000851", "000853",
+                         "000854", "000856", "000857", "000858", "000923", "000973",
+                         "000974", "000996", "000997", "000999"])
 
     failed_sina = 0
     blk_set = {}
@@ -184,7 +186,6 @@ def download_all_zsbk_info():
         if not is_file_can_download(filename, 10 * 24 * 60 * 60):
             continue
 
-        time.sleep(random.uniform(1, 3))
         try:
             if blk_code[:3] == "399":
                 if failed_sina >= 5:
@@ -192,9 +193,8 @@ def download_all_zsbk_info():
                 stk_codes = ak.index_stock_cons(symbol=blk_code)
                 stk_codes = stk_codes['品种代码'].to_list()
             else:
-                # stk_codes = ak.index_stock_cons_csindex(symbol=blk_code)
-                # stk_codes = stk_codes['成分券代码'].to_list()
-                continue
+                stk_codes = ak.index_stock_cons_csindex(symbol=blk_code)
+                stk_codes = stk_codes['成分券代码'].to_list()
 
             stk_codes = [modifiy_code(code) for code in stk_codes]
             stk_codes = [code for code in stk_codes if code is not None]
@@ -208,6 +208,7 @@ def download_all_zsbk_info():
             if blk_code.startswith("399"):
                 failed_sina += 1
             # raise e
+        time.sleep(random.uniform(1, 3))
 
 
 if __name__ == "__main__":
@@ -221,7 +222,7 @@ if __name__ == "__main__":
 
     # download_em_block(code_market_dict, categorys=('指数板块', ))
 
-    # down_em_all_hybk_info()
-    # down_em_all_dybk_info()
-    # down_em_all_gnbk_info()
+    down_em_all_hybk_info()
+    down_em_all_dybk_info()
+    down_em_all_gnbk_info()
     download_all_zsbk_info()
