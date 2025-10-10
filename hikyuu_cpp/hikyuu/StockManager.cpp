@@ -34,7 +34,7 @@ void StockManager::quit() {
     }
 }
 
-StockManager::StockManager() : m_initializing(false), m_data_ready(false) {
+StockManager::StockManager() {
     m_stockDict_mutex = new std::shared_mutex;
     m_marketInfoDict_mutex = new std::shared_mutex;
     m_stockTypeInfo_mutex = new std::shared_mutex;
@@ -236,6 +236,7 @@ void StockManager::loadAllKData() {
     if (!driver->getPrototype()->canParallelLoad()) {
         for (size_t i = 0, len = ktypes.size(); i < len; i++) {
             for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+                HKU_IF_RETURN(m_cancel_load, void());
                 const auto& low_ktype = low_ktypes[i];
                 if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
                     iter->second.loadKDataToBuffer(ktypes[i]);
@@ -246,7 +247,11 @@ void StockManager::loadAllKData() {
         if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
             ThreadPool tg;
             for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-                tg.submit([stk = iter->second]() { stk.getHistoryFinance(); });
+                HKU_IF_RETURN(m_cancel_load, void());
+                tg.submit([stk = iter->second, this]() {
+                    HKU_IF_RETURN(m_cancel_load, void());
+                    stk.getHistoryFinance();
+                });
             }
             tg.join();
         }
@@ -256,13 +261,22 @@ void StockManager::loadAllKData() {
     } else {
         // 异步并行加载
         std::thread t = std::thread([this, ktypes, low_ktypes]() {
+            auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes);
+
+            // 加载其他证券K线(可能不同不同K线驱动的证券)
             this->m_load_tg = std::make_unique<ThreadPool>();
             for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+                HKU_IF_RETURN(m_cancel_load, void());
                 std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
                 for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+                    HKU_IF_RETURN(m_cancel_load, void());
+                    if (loaded_codes.find(iter->first) != loaded_codes.end()) {
+                        continue;
+                    }
                     if (m_preloadParam.tryGet<bool>(low_ktypes[i], false)) {
                         m_load_tg->submit(
-                          [stk = iter->second, ktype = std::move(ktypes[i])]() mutable {
+                          [this, stk = iter->second, ktype = std::move(ktypes[i])]() mutable {
+                              HKU_IF_RETURN(m_cancel_load, void());
                               stk.loadKDataToBuffer(ktype);
                           });
                     }
@@ -272,7 +286,14 @@ void StockManager::loadAllKData() {
             if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
                 std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
                 for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-                    m_load_tg->submit([stk = iter->second]() { stk.getHistoryFinance(); });
+                    HKU_IF_RETURN(m_cancel_load, void());
+                    if (loaded_codes.find(iter->first) != loaded_codes.end()) {
+                        continue;
+                    }
+                    m_load_tg->submit([this, stk = iter->second]() {
+                        HKU_IF_RETURN(m_cancel_load, void());
+                        stk.getHistoryFinance();
+                    });
                 }
             }
 
@@ -282,6 +303,83 @@ void StockManager::loadAllKData() {
         });
         t.detach();
     }
+}
+
+std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
+  const vector<KQuery::KType>& ktypes) {
+    std::unordered_set<string> loaded_codes;
+    HKU_IF_RETURN(!m_context.isAll(), loaded_codes);
+    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+    HKU_IF_RETURN(!driver || !driver->getPrototype()->isColumnFirst(), loaded_codes);
+
+    // 尝试优先加载 SH000001 K线
+    Stock sh000001;
+    {
+        std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+        auto sh000001_iter = m_stockDict.find("SH000001");
+        if (sh000001_iter != m_stockDict.end()) {
+            sh000001 = sh000001_iter->second;
+        }
+    }
+
+    HKU_IF_RETURN(!sh000001.valid(), loaded_codes);
+
+    for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+        auto low_ktype = ktypes[i];
+        to_lower(low_ktype);
+        if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
+            sh000001.loadKDataToBuffer(ktypes[i]);
+        }
+    }
+
+    // 主要受带宽限制，无需多线程
+    for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+        if (m_cancel_load) {
+            break;
+        }
+
+        if (ktypes[i] == KQuery::TIMELINE || ktypes[i] == KQuery::TRANS) {
+            continue;
+        }
+
+        auto low_ktype = ktypes[i];
+        to_lower(low_ktype);
+        if (!m_preloadParam.tryGet<bool>(low_ktype, false)) {
+            continue;
+        }
+
+        auto k = sh000001.getKRecord(0, ktypes[i]);
+        if (k.isValid()) {
+            auto datas =
+              driver->getConnect()->getAllKRecordList(ktypes[i], k.datetime, m_cancel_load);
+            {
+                std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+                for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+                    auto date_iter = datas.find(iter->second.market_code());
+                    if (date_iter != datas.end()) {
+                        iter->second.loadKDataToBufferFromKRecordList(ktypes[i],
+                                                                      std::move(date_iter->second));
+                        loaded_codes.insert(iter->second.market_code());
+                    }
+                }
+            }
+        }
+    }
+
+    if (m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
+        auto finances = m_baseInfoDriver->getAllHistoryFinance();
+        {
+            std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+            for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+                auto finance_iter = finances.find(iter->second.market_code());
+                if (finance_iter != finances.end()) {
+                    iter->second.setHistoryFinance(std::move(finance_iter->second));
+                }
+            }
+        }
+    }
+
+    return loaded_codes;
 }
 
 void StockManager::reload() {

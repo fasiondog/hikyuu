@@ -265,6 +265,11 @@ public:
     /** 设置多语言支持路径（仅在初始化之前有效） */
     void setLanguagePath(const std::string& path);
 
+    /** 取消加载，退出时使用 */
+    void cancelLoad() {
+        m_cancel_load = true;
+    }
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
@@ -280,6 +285,7 @@ private:
 
     /* 加载 K线数据至缓存 */
     void loadAllKData();
+    std::unordered_set<string> tryLoadAllKDataFromColumnFirst(const vector<KQuery::KType>& ktypes);
 
     /* 加载节假日信息 */
     void loadAllHolidays();
@@ -307,9 +313,10 @@ private:
 
 private:
     static StockManager* m_sm;
-    std::atomic_bool m_initializing;
-    std::atomic_bool m_data_ready;  // 用于指示是否所有数据准备完毕
-    std::thread::id m_thread_id;    // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
+    std::atomic_bool m_initializing{false};
+    std::atomic_bool m_cancel_load{false};  // 取消加载, 用于退出指示
+    std::atomic_bool m_data_ready{false};   // 用于指示是否所有数据准备完毕
+    std::thread::id m_thread_id;  // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
     string m_tmpdir;
     string m_datadir;
     BaseInfoDriverPtr m_baseInfoDriver;

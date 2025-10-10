@@ -119,6 +119,21 @@ public:
      */
     virtual TransList getTransList(const string& market, const string& code, const KQuery& query);
 
+    //---------------------------------------------------
+    // 以下为列式数据库接口
+    //---------------------------------------------------
+
+    /** 是否列优先(列数据库存储K线数据) */
+    virtual bool isColumnFirst() const {
+        return false;
+    }
+
+    virtual std::unordered_map<std::string, KRecordList> getAllKRecordList(
+      const KQuery::KType& ktype, const Datetime& start_date,
+      const std::atomic<bool>& cancel_flag) {
+        HKU_THROW("Not support getAllKRecordList");
+    }
+
 protected:
     virtual bool isPythonObject() const {
         return false;
@@ -188,6 +203,16 @@ public:
 
     TransList getTransList(const string& market, const string& code, const KQuery& query) {
         return m_driver->getTransList(market, code, query);
+    }
+
+    bool isColumnFirst() const {
+        return m_driver->isColumnFirst();
+    }
+
+    std::unordered_map<std::string, KRecordList> getAllKRecordList(
+      const KQuery::KType& ktype, const Datetime& start_date,
+      const std::atomic<bool>& cancel_flag) {
+        return m_driver->getAllKRecordList(ktype, start_date, cancel_flag);
     }
 
 private:

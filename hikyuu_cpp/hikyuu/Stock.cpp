@@ -487,6 +487,25 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
     }
 }
 
+void Stock::loadKDataToBufferFromKRecordList(const KQuery::KType& inkType, KRecordList&& ks) const {
+    HKU_IF_RETURN(!m_data || !m_kdataDriver, void());
+
+    string kType(inkType);
+    to_upper(kType);
+
+    {
+        std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[kType]));
+        // 需要对是否已缓存进行二次判定，防止加锁之前已被缓存
+        if (m_data->pKData.find(kType) != m_data->pKData.end() && m_data->pKData[kType]) {
+            return;
+        }
+        KRecordList* ptr_klist = new KRecordList;
+        (*ptr_klist) = std::move(ks);
+        m_data->pKData[kType] = ptr_klist;
+        m_data->m_lastUpdate[kType] = Datetime::now();
+    }
+}
+
 StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) const {
     StockWeightList result;
     HKU_IF_RETURN(!m_data || start >= end, result);
@@ -1124,6 +1143,13 @@ const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {
         m_data->m_history_finance_ready = true;
     }
     return m_data->m_history_finance;
+}
+
+void Stock::setHistoryFinance(vector<HistoryFinanceInfo>&& history_finance) {
+    HKU_IF_RETURN(!m_data, void());
+    std::lock_guard<std::mutex> lock(m_data->m_history_finance_mutex);
+    m_data->m_history_finance = std::move(history_finance);
+    m_data->m_history_finance_ready = true;
 }
 
 DatetimeList Stock::getTradingCalendar(const KQuery& query) const {

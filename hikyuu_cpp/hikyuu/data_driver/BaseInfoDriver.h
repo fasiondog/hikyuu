@@ -216,6 +216,14 @@ public:
      */
     virtual ZhBond10List getAllZhBond10() = 0;
 
+    /**
+     * 获取所有历史财务信息, 用于列式存储时数据初始化使用
+     */
+    virtual unordered_map<string, vector<HistoryFinanceInfo>> getAllHistoryFinance() {
+        HKU_ERROR("Not support getAllHistoryFinance()!");
+        return unordered_map<string, vector<HistoryFinanceInfo>>();
+    }
+
 private:
     bool checkType();
 
