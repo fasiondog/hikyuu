@@ -12,7 +12,6 @@ SQLAlchemy
 mysql-connector-python
 pyperclip
 requests
-qdarkstyle
 flatbuffers>=24.3.25
 pynng
 akshare
