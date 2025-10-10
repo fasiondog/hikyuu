@@ -276,6 +276,9 @@ private:
 
     bool isPreload(KQuery::KType ktype) const;
 
+    void loadKDataToBufferFromKRecordList(const KQuery::KType& ktype, KRecordList&& ks) const;
+    void setHistoryFinance(vector<HistoryFinanceInfo>&&);
+
 private:
     struct HKU_API Data;
     shared_ptr<Data> m_data;
