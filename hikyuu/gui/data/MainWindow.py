@@ -250,7 +250,7 @@ class Ui_MainWindow(object):
 
         self.min5_start_dateEdit = QDateEdit(self.groupBox_7)
         self.min5_start_dateEdit.setObjectName(u"min5_start_dateEdit")
-        self.min5_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 22), QTime(0, 0, 0)))
+        self.min5_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 21), QTime(16, 0, 0)))
         self.min5_start_dateEdit.setCalendarPopup(True)
 
         self.gridLayout_4.addWidget(self.min5_start_dateEdit, 1, 1, 1, 1)
@@ -284,7 +284,7 @@ class Ui_MainWindow(object):
 
         self.day_start_dateEdit = QDateEdit(self.groupBox_7)
         self.day_start_dateEdit.setObjectName(u"day_start_dateEdit")
-        self.day_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 22), QTime(0, 0, 0)))
+        self.day_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 21), QTime(16, 0, 0)))
         self.day_start_dateEdit.setCalendarPopup(True)
 
         self.gridLayout_4.addWidget(self.day_start_dateEdit, 0, 1, 1, 1)
@@ -1279,7 +1279,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(5)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1357,22 +1357,22 @@ class Ui_MainWindow(object):
 "hr { height: 1px; border-width: 0; }\n"
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
-"</style></head><body style=\" font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u4e0a\u8bc1\u65e5\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u6df1\u8bc1\u65e5\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-l"
-                        "eft:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u4e0a\u8bc15\u5206\u949f\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u6df1\u8bc15\u5206\u949f\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u4e0a\u8bc11\u5206\u949f\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u6df1\u8bc11\u5206\u949f\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style"
-                        "=\" font-family:'SimSun';\">\u5bfc\u5165\u4e0a\u8bc1\u5206\u7b14\u8bb0\u5f55\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u6df1\u8bc1\u5206\u7b14\u8bb0\u5f55\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u4e0a\u8bc1\u5206\u65f6\u6570\u636e\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u6df1\u8bc1\u5206\u65f6\u6570\u636e\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u6743\u606f\u6570\u636e\u6570\uff1a</span></p>\n"
-"<p style=\" m"
-                        "argin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u5bfc\u5165\u5b8c\u6bd5\uff01</span></p></body></html>", None))
+"</style></head><body style=\" font-size:13pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u4e0a\u8bc1\u65e5\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u6df1\u8bc1\u65e5\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; "
+                        "text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u4e0a\u8bc15\u5206\u949f\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u6df1\u8bc15\u5206\u949f\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u4e0a\u8bc11\u5206\u949f\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u6df1\u8bc11\u5206\u949f\u7ebf\u8bb0\u5f55\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u4e0a\u8bc1\u5206\u7b14\u8bb0\u5f55\uff1a"
+                        "</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u6df1\u8bc1\u5206\u7b14\u8bb0\u5f55\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u4e0a\u8bc1\u5206\u65f6\u6570\u636e\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u6df1\u8bc1\u5206\u65f6\u6570\u636e\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u5bfc\u5165\u6743\u606f\u6570\u636e\u6570\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><s"
+                        "pan style=\" font-size:9pt;\">\u5bfc\u5165\u5b8c\u6bd5\uff01</span></p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"\u6267\u884c\u5bfc\u5165", None))
         self.groupBox_6.setTitle(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u8bbe\u7f6e", None))
         self.label_35.setText(QCoreApplication.translate("MainWindow", u"\u6b64\u5904\u4e3a Hikyuu \u8fd0\u884c\u65f6\u7684\u6570\u636e\u9884\u52a0\u8f7d\u8bbe\u7f6e\uff0c\u8bf7\u6839\u636e\u673a\u5668\u5185\u5b58\u5927\u5c0f\u9009\u62e9", None))
@@ -1421,15 +1421,15 @@ class Ui_MainWindow(object):
 "hr { height: 1px; border-width: 0; }\n"
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
-"</style></head><body style=\" font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">\u6ce8\uff1a</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun'; font-size:10pt; font-weight:600; color:#ff0000;\">1\u3001\u884c\u60c5\u91c7\u96c6\u670d\u52a1\u4ec5\u5bf9\u9884\u52a0\u8f7d\u6570\u636e\u6709\u6548</span><span style=\" "
-                        "font-family:'SimSun';\">\uff0c\u5728\u884c\u60c5\u91c7\u96c6\u670d\u52a1\u8fd0\u884c\u671f\u95f4\uff0chikyuu.interactive\u8fd0\u884c\u65f6\u5c06\u81ea\u52a8\u8fde\u63a5\u91c7\u96c6\u670d\u52a1\u83b7\u53d6\u884c\u60c5\u6570\u636e\uff0c\u5e76\u66f4\u65b0\u9884\u52a0\u8f7d\u7684\u5185\u5bb9\u6570\u636e\u3002</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'SimSun';\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun';\">2\u3001\u5982\u4f7f\u7528\u829d\u9ebb\u4ee3\u7406\uff08</span><a href=\"http://h.zhimaruanjian.com/\"><span style=\" font-family:'SimSun'; text-decoration: underline; color:#0000ff;\">http://h.zhimaruanjian.com/</span></a><span style=\" font-family:'SimSun';\">\uff09\uff0c\u8bf7\u81ea\u884c\u7533\u8bf7\uff08\u9700\u4ed8\u8d39\uff09\uff0c\u5e76\u786e\u4fddip\u4e3a"
-                        "\u5176\u767d\u540d\u5355\u3002</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'SimSun';\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'SimSun'; font-weight:696; color:#0000ff;\">3\u3001\u6b64\u5904\u91c7\u96c6\u4e3a\u7f51\u7edc\u91c7\u96c6\uff0c\u66f4\u63a8\u8350\u76f4\u63a5\u8fd0\u884c\u5b89\u88c5\u76ee\u5f55\u4e0bgui\u5b50\u76ee\u5f55\u4e0b\u7684 start_qmt.py ,\u4f7f\u7528miniqmt \u5b9e\u65f6\u670d\u52a1\u3002\u8be5\u7a0b\u5e8f\u72ec\u7acb\u8fd0\u884c\uff0c\u4e0d\u7528\u5173\u95ed\uff0c\u548c\u8fd9\u91cc\u7684\u91c7\u96c6\u6548\u679c\u4e00\u6837\u3002\u6ce8\u610f\uff1aminiqmt\u9700\u8981QMT\u4ea4\u6613\u7aef\u914d\u5408\uff0c\u4e14\u5728\u540c\u4e00\u673a\u5668\u4e0a\u6267\u884c\u3002</span></p></body></html>", None))
+"</style></head><body style=\" font-size:13pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">\u6ce8\uff1a</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600; color:#ff0000;\">1\u3001\u884c\u60c5\u91c7\u96c6\u670d\u52a1\u4ec5\u5bf9\u9884\u52a0\u8f7d\u6570\u636e\u6709\u6548</span><span style=\" font-size:9pt;\">\uff0c\u5728\u884c\u60c5\u91c7\u96c6\u670d\u52a1"
+                        "\u8fd0\u884c\u671f\u95f4\uff0chikyuu.interactive\u8fd0\u884c\u65f6\u5c06\u81ea\u52a8\u8fde\u63a5\u91c7\u96c6\u670d\u52a1\u83b7\u53d6\u884c\u60c5\u6570\u636e\uff0c\u5e76\u66f4\u65b0\u9884\u52a0\u8f7d\u7684\u5185\u5bb9\u6570\u636e\u3002</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">2\u3001\u5982\u4f7f\u7528\u829d\u9ebb\u4ee3\u7406\uff08</span><a href=\"http://h.zhimaruanjian.com/\"><span style=\" font-size:9pt; text-decoration: underline; color:#0000ff;\">http://h.zhimaruanjian.com/</span></a><span style=\" font-size:9pt;\">\uff09\uff0c\u8bf7\u81ea\u884c\u7533\u8bf7\uff08\u9700\u4ed8\u8d39\uff09\uff0c\u5e76\u786e\u4fddip\u4e3a\u5176\u767d\u540d\u5355\u3002</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0"
+                        "px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt; font-weight:696; color:#0000ff;\">3\u3001\u6b64\u5904\u91c7\u96c6\u4e3a\u7f51\u7edc\u91c7\u96c6\uff0c\u66f4\u63a8\u8350\u76f4\u63a5\u8fd0\u884c\u5b89\u88c5\u76ee\u5f55\u4e0bgui\u5b50\u76ee\u5f55\u4e0b\u7684 start_qmt.py ,\u4f7f\u7528miniqmt \u5b9e\u65f6\u670d\u52a1\u3002\u8be5\u7a0b\u5e8f\u72ec\u7acb\u8fd0\u884c\uff0c\u4e0d\u7528\u5173\u95ed\uff0c\u548c\u8fd9\u91cc\u7684\u91c7\u96c6\u6548\u679c\u4e00\u6837\u3002\u6ce8\u610f\uff1aminiqmt\u9700\u8981QMT\u4ea4\u6613\u7aef\u914d\u5408\uff0c\u4e14\u5728\u540c\u4e00\u673a\u5668\u4e0a\u6267\u884c\u3002</span></p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u884c\u60c5\u91c7\u96c6\u670d\u52a1", None))
         self.label_46.setText(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
@@ -1437,13 +1437,12 @@ class Ui_MainWindow(object):
 "hr { height: 1px; border-width: 0; }\n"
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
-"</style></head><body style=\" font-family:'Arial'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'.AppleSystemUIFont'; font-size:10pt;\">Hikyuu </span><span style=\" font-family:'.AppleSystemUIFont'; font-size:10pt; font-weight:700;\">\u4e13\u6ce8\u4e8e\u91cf\u5316\u4ea4\u6613\u9886\u57df\u7684\u6838\u5fc3\u6280\u672f\u6784\u5efa\uff0c\u6db5\u76d6\u4ea4\u6613\u6a21\u578b\u5f00\u53d1\u3001\u6781\u901f\u8ba1\u7b97\u5f15\u64ce\u3001\u9ad8\u6548\u56de\u6d4b\u6846\u67b6\u53ca"
-                        "\u5b9e\u76d8\u62d3\u5c55\u80fd\u529b</span><span style=\" font-family:'.AppleSystemUIFont'; font-size:10pt;\">\uff0c\u5b9a\u4f4d\u4e3a\u91cf\u5316\u4ea4\u6613\u7684\u57fa\u7840\u8bbe\u65bd\u7ea7\u8ba1\u7b97\u5f15\u64ce\uff0c\u4e3a\u91cf\u5316\u4ea4\u6613\u7231\u597d\u8005\u63d0\u4f9b\u9ad8\u6027\u80fd\u5e95\u5c42\u67b6\u6784\u652f\u6301\u3002\u968f\u7740\u793e\u533a\u89c4\u6a21\u6269\u5927\uff0c\u5206\u6563\u4e86\u4f5c\u8005\u5728\u7b56\u7565\u7814\u7a76\u4e0a\u7684\u7cbe\u529b\u3002\u4e3a\u4fdd\u969c\u9879\u76ee\u7684\u53ef\u6301\u7eed\u6027\uff0c\u73b0\u5bf9\u6350\u8d60\u7528\u6237\u63d0\u4f9b\u90e8\u5206\u989d\u5916\u529f\u80fd\u4f5c\u4e3a\u56de\u9988\uff0c\u611f\u8c22\u793e\u533a\u4f19\u4f34\u7684\u652f\u6301\uff01</span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'.AppleSystemUIFont'; font-size:10pt;\">\u6350\u8d60\u529f\u80fd\u4ee5\u63d2\u4ef6\u7684\u65b9\u5f0f\u63d0\u4f9b\uff0c\u91c7\u7528\u72ec"
-                        "\u7acb\u6388\u6743\u8bb8\u53ef\uff0c\u5b8c\u5168\u5728 hikyuu \u4e4b\u5916\uff0c\u5bf9\u559c\u6b22\u81ea\u884c\u7f16\u8bd1\u6269\u5c55\u7684\u670b\u53cb\u6ca1\u6709\u5f71\u54cd\u3002\u56e0\u63d2\u4ef6\u8bb8\u53ef\u6388\u6743\u9700\u8981\u91c7\u96c6\u786c\u4ef6\u4fe1\u606f\uff0c\u5982\u6709\u7591\u8651\u53ea\u8981\u4e0d\u7533\u8bf7\u8bd5\u7528\u8bb8\u53ef\u548c\u6b63\u5f0f\u8bb8\u53ef\u6388\u6743\uff0c\u4e0d\u4f1a\u89e6\u53d1\u786c\u4ef6\u4fe1\u606f\u91c7\u96c6\uff0c\u5982\u7533\u8bf7\uff0c\u89c6\u4e3a\u540c\u610f\u91c7\u96c6\u3002</span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'.AppleSystemUIFont'; font-size:10pt; font-weight:700;\">\u8be6\u60c5\u53c2\u89c1\uff1a</span><a href=\"https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html\"><span style=\" font-family:'.AppleSystemUIFont'; font-size:10pt; text-decoration: underline; color:#3586ff;\">\u6350\u8d60\u6743\u76ca</span></a><span style"
-                        "=\" font-family:'.AppleSystemUIFont'; font-size:10pt; font-weight:700;\"> \uff0c\u611f\u8c22\u5927\u5bb6\u7684\u652f\u6301\uff01</span></p></body></html>", None))
+"</style></head><body style=\" font-family:'Arial'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt;\">Hikyuu </span><span style=\" font-size:12pt; font-weight:700;\">\u4e13\u6ce8\u4e8e\u91cf\u5316\u4ea4\u6613\u9886\u57df\u7684\u6838\u5fc3\u6280\u672f\u6784\u5efa\uff0c\u6db5\u76d6\u4ea4\u6613\u6a21\u578b\u5f00\u53d1\u3001\u6781\u901f\u8ba1\u7b97\u5f15\u64ce\u3001\u9ad8\u6548\u56de\u6d4b\u6846\u67b6\u53ca\u5b9e\u76d8\u62d3\u5c55\u80fd\u529b</span><span style=\" font-size"
+                        ":12pt;\">\uff0c\u5b9a\u4f4d\u4e3a\u91cf\u5316\u4ea4\u6613\u7684\u57fa\u7840\u8bbe\u65bd\u7ea7\u8ba1\u7b97\u5f15\u64ce\uff0c\u4e3a\u91cf\u5316\u4ea4\u6613\u7231\u597d\u8005\u63d0\u4f9b\u9ad8\u6027\u80fd\u5e95\u5c42\u67b6\u6784\u652f\u6301\u3002\u968f\u7740\u793e\u533a\u89c4\u6a21\u6269\u5927\uff0c\u5206\u6563\u4e86\u4f5c\u8005\u5728\u7b56\u7565\u7814\u7a76\u4e0a\u7684\u7cbe\u529b\u3002\u4e3a\u4fdd\u969c\u9879\u76ee\u7684\u53ef\u6301\u7eed\u6027\uff0c\u73b0\u5bf9\u6350\u8d60\u7528\u6237\u63d0\u4f9b\u90e8\u5206\u989d\u5916\u529f\u80fd\u4f5c\u4e3a\u56de\u9988\uff0c\u611f\u8c22\u793e\u533a\u4f19\u4f34\u7684\u652f\u6301\uff01</span></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt;\">\u6350\u8d60\u529f\u80fd\u4ee5\u63d2\u4ef6\u7684\u65b9\u5f0f\u63d0\u4f9b\uff0c\u91c7\u7528\u72ec\u7acb\u6388\u6743\u8bb8\u53ef\uff0c\u5b8c\u5168\u5728 hikyuu \u4e4b\u5916\uff0c\u5bf9\u559c\u6b22\u81ea\u884c\u7f16\u8bd1\u6269\u5c55"
+                        "\u7684\u670b\u53cb\u6ca1\u6709\u5f71\u54cd\u3002\u56e0\u63d2\u4ef6\u8bb8\u53ef\u6388\u6743\u9700\u8981\u91c7\u96c6\u786c\u4ef6\u4fe1\u606f\uff0c\u5982\u6709\u7591\u8651\u53ea\u8981\u4e0d\u7533\u8bf7\u8bd5\u7528\u8bb8\u53ef\u548c\u6b63\u5f0f\u8bb8\u53ef\u6388\u6743\uff0c\u4e0d\u4f1a\u89e6\u53d1\u786c\u4ef6\u4fe1\u606f\u91c7\u96c6\uff0c\u5982\u7533\u8bf7\uff0c\u89c6\u4e3a\u540c\u610f\u91c7\u96c6\u3002</span></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:700;\">\u8be6\u60c5\u53c2\u89c1\uff1a</span><a href=\"https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html\"><span style=\" font-size:12pt; text-decoration: underline; color:#3586ff;\">\u6350\u8d60\u6743\u76ca</span></a><span style=\" font-size:12pt; font-weight:700;\"> \uff0c\u611f\u8c22\u5927\u5bb6\u7684\u652f\u6301\uff01</span></p></body></html>", None))
         self.label_47.setText(QCoreApplication.translate("MainWindow", u"\u7533\u8bf7\u6350\u8d60\u529f\u80fd\u8bd5\u7528\uff0830\u5929\u8bd5\u7528\uff09", None))
         self.label_45.setText(QCoreApplication.translate("MainWindow", u"\u7535\u5b50\u90ae\u4ef6\u5730\u5740:", None))
         self.fetch_trial_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u7533\u8bf7\u8bd5\u7528\u8bb8\u53ef", None))

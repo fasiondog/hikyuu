@@ -822,7 +822,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if msg_name == 'ESCAPE_TIME':
             self.escape_time = msg_task_name
             self.import_status_label.setText(
-                "耗时：{:>.2f} 秒 （{:>.2f}分钟） {}".format(self.escape_time, self.escape_time / 60, datetime.datetime.now())
+                "耗时：{:>.2f} 秒 （{:>.2f}分钟） {}".format(
+                    self.escape_time, self.escape_time / 60, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             )
 
         elif msg_name == 'HDF5_IMPORT':
@@ -1042,9 +1043,9 @@ if __name__ == "__main__":
     logging.getLogger("pytdx").setLevel(logging.WARNING)
 
     app = QApplication(sys.argv)
-    f = QFont('SimSun')
-    f.setPixelSize(12)
-    app.setFont(f)
+    # f = QFont('SimSun')
+    # f.setPixelSize(12)
+    # app.setFont(f)
 
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
         FORMAT = '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
