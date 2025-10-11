@@ -136,14 +136,21 @@ public:
     vector<IndicatorList> getAllSrcFactors();
 
     /**
-     * 对指定名称的指标应用特定的标准化操作，其他指标使用全局标准化操作。若 norm
-     * 为空或指定category不存在时，抛出异常。
-     * @note 只有启用了全局标准化时，才会生效。
+     * 设置因子标准化/归一化操作
+     * @param norm 标准化操作
+     */
+    void setNormalize(NormPtr norm);
+
+    /**
+     * 对指定名称的指标应用特定的标准化/归一化、行业中性化、风格因子中性化操作。
+     * @note 标准化操作、行业中性化、风格因子中性化彼此无关，可同时指定也可分开指定。
      * @param name 指标名称
      * @param norm 标准化操作
-     * @param category 指标所属类别(需要行业中心化时指定)
+     * @param category 指标所属板块类别(需要中性化指定)
+     * @param style_inds 指标风格列表
      */
-    void addSpecialNormalize(const string& name, NormalizePtr norm, const string& category = "");
+    void addSpecialNormalize(const string& name, NormalizePtr norm, const string& category = "",
+                             const IndicatorList& style_inds = IndicatorList());
 
     void reset();
 
@@ -191,8 +198,11 @@ protected:
     vector<ScoreRecordList> m_stk_factor_by_date;
     Indicator m_ic;
 
+    NormPtr m_norm;                                    // 全局标准化/归一化操作
     unordered_map<string, NormPtr> m_special_norms;    // 对特定指标执行特定的标准化操作
     unordered_map<string, string> m_special_category;  // 对特定指标执行行业中性化时指定的板块分类
+    unordered_map<string, IndicatorList>
+      m_special_style_inds;  // 对特定指标执行风格因子中性化时指定的风格因子
 
 private:
     std::mutex m_mutex;

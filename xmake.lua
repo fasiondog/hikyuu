@@ -171,6 +171,7 @@ add_requires("sqlite3", {system = false, configs = {shared = true, safe_mode="2"
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs= {runtimes = get_config("runtimes")}})
 add_requires("nng", {system = false, configs = {NNG_ENABLE_TLS = has_config("http_client_ssl"), cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
+add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc", {system = false})
 if get_config("leak_check") and get_config("arrow") then

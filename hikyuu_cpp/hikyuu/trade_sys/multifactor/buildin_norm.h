@@ -11,7 +11,9 @@
 
 namespace hku {
 
-NormPtr HKU_API NORM_NOTHING();
+inline NormPtr NORM_NOTHING() {
+    return NormPtr();
+}
 
 /** 最小-最大标准化 */
 NormPtr HKU_API NORM_MIN_MAX();
