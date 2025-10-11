@@ -25,6 +25,7 @@ Performance::Performance()
           "已平仓净利润总额",
           "单笔交易最大占用现金比例%",
           "交易平均占用现金比例%",
+          "未平仓帐户收益率%",
           "已平仓帐户收益率%",
           "帐户年复合收益率%",
           "帐户平均年收益率%",
@@ -64,7 +65,7 @@ Performance::Performance()
           "最大单笔亏损R乘数",
           "最大连续赢利R乘数",
           "最大连续亏损R乘数"}) {
-     for (const auto& key : m_keys) {
+    for (const auto& key : m_keys) {
         m_result[key] = 0.0;
     }
 }
@@ -329,8 +330,10 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     }
 
     if (m_result["累计投入本金"] != 0.0) {
+        m_result["未平仓帐户收益率%"] =
+          100. * (m_result["当前总资产"] / m_result["累计投入本金"] - 1.);
         m_result["已平仓帐户收益率%"] =
-          100 * m_result["已平仓净利润总额"] / m_result["累计投入本金"];
+          100. * m_result["已平仓净利润总额"] / m_result["累计投入本金"];
     }
 
     if (m_result["赢利交易数"] != 0.0) {
