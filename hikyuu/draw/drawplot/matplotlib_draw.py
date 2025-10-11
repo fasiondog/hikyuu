@@ -923,6 +923,7 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None):
     ax3.xaxis.set_visible(False)
     ax3.yaxis.set_visible(False)
     ax3.set_frame_on(False)
+    return ax1  # 返回主图axis
 
 
 def sys_performance(sys, ref_stk=None):
@@ -1008,6 +1009,7 @@ def sys_performance(sys, ref_stk=None):
     ax3.xaxis.set_visible(False)
     ax3.yaxis.set_visible(False)
     ax3.set_frame_on(False)
+    return ax1
 
 
 def tm_heatmap(tm, start_date, end_date=None, axes=None):
