@@ -341,6 +341,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
         end = cross.size();
     }
 
+    ret.reserve(end - start);
     for (size_t i = start; i < end; i++) {
         ret.emplace_back(cross[i]);
     }
@@ -360,6 +361,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
         end = cross.size();
     }
 
+    ret.reserve(end - start);
     if (filter) {
         for (size_t i = start; i < end; i++) {
             if (filter(cross[i])) {
@@ -388,6 +390,7 @@ ScoreRecordList MultiFactorBase::getScores(
         end = cross.size();
     }
 
+    ret.reserve(end - start);
     if (filter) {
         for (size_t i = start; i < end; i++) {
             if (filter(date, cross[i])) {

@@ -25,6 +25,8 @@ MultiFactorSelector2::MultiFactorSelector2() : SelectorBase("SE_MultiFactor2") {
     setParam<Stock>("ref_stk", Stock());
     setParam<bool>("use_spearman", true);
     setParam<string>("mode", "MF_ICIRWeight");
+    setParam<double>("min_price", 0.0);       // 忽略价格小于等于 min_price 的证券
+    setParam<double>("max_price", 100000.0);  // 忽略价格大于等于 max_price 的证券
 }
 
 MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf, int group, int group_index)
@@ -35,6 +37,8 @@ MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf, int group, int group
     setParam<bool>("ignore_le_zero", false);
     setParam<int>("group", group);
     setParam<int>("group_index", group_index);
+    setParam<double>("min_price", 0.0);       // 忽略价格小于等于 min_price 的证券
+    setParam<double>("max_price", 100000.0);  // 忽略价格大于等于 max_price 的证券
 
     setParam<int>("ic_n", mf->getParam<int>("ic_n"));
     setParam<Stock>("ref_stk", mf->getRefStock());
@@ -44,7 +48,7 @@ MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf, int group, int group
         setParam<int>("ic_rolling_n", 120);
     }
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
-    setParam<string>("mode", mf->name());
+    setParam<string>("mode", "CUSTOM");
     setIndicators(mf->getRefIndicators());
 }
 
@@ -57,12 +61,19 @@ void MultiFactorSelector2::_checkParam(const string& name) const {
         HKU_ASSERT(getParam<int>("ic_rolling_n") >= 1);
     } else if ("mode" == name) {
         auto mode = getParam<string>("mode");
-        HKU_ASSERT("MF_ICIRWeight" == mode || "MF_ICWeight" == mode || "MF_EqualWeight" == mode);
+        HKU_ASSERT("MF_ICIRWeight" == mode || "MF_ICWeight" == mode || "MF_EqualWeight" == mode ||
+                   "CUSTOM" == mode);
     } else if ("group" == name) {
         HKU_ASSERT(getParam<int>("group") >= 1);
     } else if ("group_index" == name) {
         HKU_ASSERT(getParam<int>("group_index") >= 0 &&
                    getParam<int>("group_index") < getParam<int>("group"));
+    } else if ("min_price" == name) {
+        double min_price = getParam<double>("min_price");
+        HKU_ASSERT(!std::isnan(min_price));
+    } else if ("max_price" == name) {
+        double max_price = getParam<double>("max_price");
+        HKU_ASSERT(!std::isnan(max_price) && max_price > getParam<double>("min_price"));
     }
 }
 
@@ -141,16 +152,30 @@ SystemWeightList MultiFactorSelector2::_getSelected(Datetime date) {
     bool ignore_le_zero = getParam<bool>("ignore_le_zero");
     bool only_should_buy = getParam<bool>("only_should_buy");
 
-    ScoreRecordList raw_scores = m_mf->getScores(date);
-    raw_scores.erase(std::remove_if(raw_scores.begin(), raw_scores.end(),
-                                    [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
-                                        return (ignore_null && std::isnan(sc.value)) ||
-                                               (ignore_le_zero && sc.value <= 0.0);
-                                    }),
-                     raw_scores.end());
+    ScoreRecordList scores;
+    double min_price = getParam<double>("min_price");
+    double max_price = getParam<double>("max_price");
+    if (min_price > 0.0 || max_price < 100000.0) {
+        auto ktype = m_mf->getQuery().kType();
+        scores = m_mf->getScores(
+          date, 0, Null<size_t>(),
+          [ktype, ignore_null, ignore_le_zero, min_price, max_price](const Datetime& date,
+                                                                     const ScoreRecord& sc) {
+              HKU_IF_RETURN(sc.stock.isNull() || (ignore_null && std::isnan(sc.value)) ||
+                              (ignore_le_zero && sc.value <= 0.0),
+                            false);
+              auto kr = sc.stock.getKRecord(date, ktype);
+              return kr.isValid() && kr.closePrice >= min_price && kr.closePrice <= max_price;
+          });
+    } else {
+        scores = m_mf->getScores(
+          date, 0, Null<size_t>(), [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
+              return !(ignore_null && std::isnan(sc.value)) && !(ignore_le_zero && sc.value <= 0.0);
+          });
+    }
 
     // 按照评分排序
-    std::sort(raw_scores.begin(), raw_scores.end(), [](const ScoreRecord& a, const ScoreRecord& b) {
+    std::sort(scores.begin(), scores.end(), [](const ScoreRecord& a, const ScoreRecord& b) {
         return a.value > b.value;  // 降序排列
     });
 
@@ -158,7 +183,7 @@ SystemWeightList MultiFactorSelector2::_getSelected(Datetime date) {
     int group_index = getParam<int>("group_index");
 
     // 分组并选择指定组
-    ScoreRecordList scores = filterByGroup(date, raw_scores, group, group_index, only_should_buy);
+    scores = filterByGroup(date, scores, group, group_index, only_should_buy);
 
     SystemWeightList ret;
     for (const auto& sc : scores) {

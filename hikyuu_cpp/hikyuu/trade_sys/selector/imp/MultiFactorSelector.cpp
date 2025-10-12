@@ -25,6 +25,8 @@ MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
     setParam<Stock>("ref_stk", Stock());
     setParam<bool>("use_spearman", true);
     setParam<string>("mode", "MF_ICIRWeight");
+    setParam<double>("min_price", 0.0);       // 忽略价格小于等于 min_price 的证券
+    setParam<double>("max_price", 100000.0);  // 忽略价格大于等于 max_price 的证券
 }
 
 MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
@@ -35,6 +37,8 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     setParam<bool>("ignore_le_zero", false);
     setParam<int>("topn", topn);
     setParam<bool>("reverse", false);
+    setParam<double>("min_price", 0.0);       // 忽略价格小于等于 min_price 的证券
+    setParam<double>("max_price", 100000.0);  // 忽略价格大于等于 max_price 的证券
 
     setParam<int>("ic_n", mf->getParam<int>("ic_n"));
     setParam<Stock>("ref_stk", mf->getRefStock());
@@ -44,7 +48,7 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
         setParam<int>("ic_rolling_n", 120);
     }
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
-    setParam<string>("mode", mf->name());
+    setParam<string>("mode", "CUSTOM");
     setIndicators(mf->getRefIndicators());
 }
 
@@ -57,7 +61,8 @@ void MultiFactorSelector::_checkParam(const string& name) const {
         HKU_ASSERT(getParam<int>("ic_rolling_n") >= 1);
     } else if ("mode" == name) {
         auto mode = getParam<string>("mode");
-        HKU_ASSERT("MF_ICIRWeight" == mode || "MF_ICWeight" == mode || "MF_EqualWeight" == mode);
+        HKU_ASSERT("MF_ICIRWeight" == mode || "MF_ICWeight" == mode || "MF_EqualWeight" == mode ||
+                   "CUSTOM" == mode);
     }
 }
 
@@ -147,28 +152,41 @@ SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
     bool only_should_buy = getParam<bool>("only_should_buy");
     bool reverse = getParam<bool>("reverse");
 
-    ScoreRecordList raw_scores = m_mf->getScores(date);
-    raw_scores.erase(std::remove_if(raw_scores.begin(), raw_scores.end(),
-                                    [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
-                                        return (ignore_null && std::isnan(sc.value)) ||
-                                               (ignore_le_zero && sc.value <= 0.0);
-                                    }),
-                     raw_scores.end());
-
-    int param_topn = getParam<int>("topn");
-    size_t topn = param_topn > 0 ? static_cast<size_t>(param_topn) : raw_scores.size();
-    if (topn > raw_scores.size()) {
-        topn = raw_scores.size();
+    ScoreRecordList scores;
+    double min_price = getParam<double>("min_price");
+    double max_price = getParam<double>("max_price");
+    if (min_price > 0.0 || max_price < 100000.0) {
+        auto ktype = m_mf->getQuery().kType();
+        scores = m_mf->getScores(
+          date, 0, Null<size_t>(),
+          [ktype, ignore_null, ignore_le_zero, min_price, max_price](const Datetime& date,
+                                                                     const ScoreRecord& sc) {
+              HKU_IF_RETURN(sc.stock.isNull() || (ignore_null && std::isnan(sc.value)) ||
+                              (ignore_le_zero && sc.value <= 0.0),
+                            false);
+              auto kr = sc.stock.getKRecord(date, ktype);
+              return kr.isValid() && kr.closePrice >= min_price && kr.closePrice <= max_price;
+          });
+    } else {
+        scores = m_mf->getScores(
+          date, 0, Null<size_t>(), [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
+              return !(ignore_null && std::isnan(sc.value)) && !(ignore_le_zero && sc.value <= 0.0);
+          });
     }
 
-    ScoreRecordList scores;
+    int param_topn = getParam<int>("topn");
+    size_t topn = param_topn > 0 ? static_cast<size_t>(param_topn) : scores.size();
+    if (topn > scores.size()) {
+        topn = scores.size();
+    }
+
     if (!reverse) {
         // 正序排列
-        scores = filterTopN(date, raw_scores, topn, only_should_buy);
+        scores = filterTopN(date, scores, topn, only_should_buy);
 
     } else {
         // 倒序排列
-        scores = filterTopNReverse(date, raw_scores, topn, only_should_buy, ignore_null);
+        scores = filterTopNReverse(date, scores, topn, only_should_buy, ignore_null);
     }
 
     SystemWeightList ret;
