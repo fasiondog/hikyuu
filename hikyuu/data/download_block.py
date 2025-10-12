@@ -130,7 +130,7 @@ def down_em_all_gnbk_info():
         if blk_name in not_need_blks:
             continue
         filename = f"{save_path}/{blk_name}.txt"
-        if is_file_can_download(filename, 5 * 24 * 60 * 60):
+        if is_file_can_download(filename, 30 * 24 * 60 * 60):
             stk_codes = stock_board_concept_cons_em(blk_name)
             stk_codes = stk_codes['代码'].to_list()
             stk_codes = [modifiy_code(code) for code in stk_codes]

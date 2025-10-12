@@ -190,6 +190,17 @@ void export_System(py::module& m) {
 
         DEF_PICKLE(System);
 
+    m.def("parallel_run_sys", &parallel_run_sys, py::arg("sys_list"), py::arg("query"),
+          py::arg("reset") = false, py::arg("reset_all") = false,
+          R"(parallel_run_sys(sys_list, query[, reset=False, reset_all=False])
+
+  并行运行多个系系统
+
+  :param sys_list: 系统列表
+  :param query: 查询条件
+  :param bool reset: 执行前是否依据系统部件共享属性复位
+  :param bool reset_all: 强制复位所有部件)");
+
     //--------------------------------------------------------------------------------------
     m.def(
       "SYS_Simple",

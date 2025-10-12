@@ -469,4 +469,12 @@ void Portfolio::traceMomentTMAfterRunAtClose(const Datetime& date) {
     }
 }
 
+void HKU_API parallel_run_pf(const vector<PFPtr>& pf_list, const KQuery& query, bool force) {
+    parallel_for_index_void(0, pf_list.size(), [&](size_t i) {
+        if (pf_list[i]) {
+            pf_list[i]->run(query, force);
+        }
+    });
+}
+
 } /* namespace hku */
