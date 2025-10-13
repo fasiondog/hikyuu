@@ -16,6 +16,12 @@ namespace hku {
  * @{
  */
 
+ScoresFilterPtr HKU_API SCFilter_IgnoreNan();
+
+ScoresFilterPtr HKU_API SCFilter_LessOrEqualValue(double value = 0.0);
+
+ScoresFilterPtr HKU_API SCFilter_TopN(int topn = 10);
+
 /**
  * 过滤掉成交金额在评分列表末尾百分比范围内的截面
  * @note

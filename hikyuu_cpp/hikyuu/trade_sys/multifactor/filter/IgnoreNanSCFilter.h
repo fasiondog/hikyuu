@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2025 hikyuu.org
  *
- *  Created on: 2025-10-13
+ *  Created on: 2025-10-14
  *      Author: fasiondog
  */
 
@@ -11,13 +11,13 @@
 
 namespace hku {
 
-class HKU_API GroupSCFilter : public ScoresFilterBase {
-    SCORESFILTER_IMP(GroupSCFilter)
+class HKU_API IgnoreNanSCFilter : public ScoresFilterBase {
+    SCORESFILTER_IMP(IgnoreNanSCFilter)
     SCORESFILTER_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    GroupSCFilter();
-    virtual ~GroupSCFilter() = default;
+    IgnoreNanSCFilter();
+    virtual ~IgnoreNanSCFilter() = default;
     virtual void _checkParam(const string& name) const override;
 };
 

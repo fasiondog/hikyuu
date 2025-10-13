@@ -26,7 +26,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SelectorPtr& st) {
 
 string SelectorBase::str() const {
     std::ostringstream buf;
-    buf << "Selector(" << name() << ", " << getParameter() << ")";
+    buf << "Selector(" << name() << ", " << getParameter() << ", " << m_sc_filter << ")";
     return buf.str();
 }
 
@@ -95,10 +95,7 @@ SelectorPtr SelectorBase::clone() {
         p->m_pro_sys_list.emplace_back(sys->clone());
     }
 
-    p->m_sc_filters.reserve(m_sc_filters.size());
-    for (const auto& filter : m_sc_filters) {
-        p->m_sc_filters.emplace_back(filter->clone());
-    }
+    p->m_sc_filter = m_sc_filter->clone();
 
     p->m_pf = m_pf;  // 仅为PF的引用，不clone
 
@@ -193,17 +190,6 @@ SystemWeightList SelectorBase::getSelected(Datetime date) {
         ret.resize(getParam<int>("get_n"));
     }
     return ret;
-}
-
-void SelectorBase::addScoresFilter(const ScoresFilterPtr& filter) {
-    HKU_CHECK(filter, "Invalid ScoresFilter!");
-    m_sc_filters.push_back(filter);
-}
-
-void SelectorBase::addScoresFilter(const vector<ScoresFilterPtr>& filters) {
-    for (const auto& filter : filters) {
-        addScoresFilter(filter);
-    }
 }
 
 } /* namespace hku */

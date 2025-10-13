@@ -10,9 +10,14 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& out, const ScoresFilterBase& scfilter) {
-    out << "SCFilter{" << "\n  name: " << scfilter.name()
-        << "\n  params: " << scfilter.getParameter();
-    out << "\n}";
+    out << "SCFilter{";
+    out << scfilter.name() << "(params:" << scfilter.getParameter() << ")";
+    auto child = scfilter.m_child;
+    while (child) {
+        out << " -> " << child->name() << "(params:" << child->getParameter() << ")";
+        child = child->m_child;
+    }
+    out << "}";
     return out;
 }
 
@@ -52,11 +57,12 @@ ScoreRecordList ScoresFilterBase::filter(const ScoreRecordList& scores, const Da
 HKU_API ScoresFilterPtr operator|(const ScoresFilterPtr& a, const ScoresFilterPtr& b) {
     ScoresFilterPtr ret;
     if (a && b) {
-        const auto* node = &a;
-        while ((*node)->m_child) {
-            node = &((*node)->m_child);
+        auto node = a;
+        while (node->m_child) {
+            node = node->m_child;
         }
-        (*node)->m_child = b;
+        node->m_child = b;
+        ret = a;
     } else if (a) {
         HKU_WARN("filter b is null, will be ignored.");
         ret = a;

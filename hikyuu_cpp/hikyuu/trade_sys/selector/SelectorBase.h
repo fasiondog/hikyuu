@@ -144,13 +144,11 @@ public:
 
     virtual string str() const;
 
-    /**
-     * 添加前置过滤器，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤
-     * @note 过滤链是按添加顺序依次过滤
-     * @param filter
-     */
+    /** 设置截面评分记录过滤，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤 */
+    void setScoresFilter(const ScoresFilterPtr& filter);
+
+    /** 在已有过滤基础上追加过滤，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤 */
     void addScoresFilter(const ScoresFilterPtr& filter);
-    void addScoresFilter(const vector<ScoresFilterPtr>& filters);
 
 protected:
     virtual bool isPythonObject() const {
@@ -161,7 +159,7 @@ private:
     void initParam();
 
 protected:
-    vector<ScoresFilterPtr> m_sc_filters;
+    ScoresFilterPtr m_sc_filter;
 
 protected:
     string m_name;
@@ -186,7 +184,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
-        ar& BOOST_SERIALIZATION_NVP(m_sc_filters);
+        ar& BOOST_SERIALIZATION_NVP(m_sc_filter);
     }
 
     template <class Archive>
@@ -194,7 +192,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
-        ar& BOOST_SERIALIZATION_NVP(m_sc_filters);
+        ar& BOOST_SERIALIZATION_NVP(m_sc_filter);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -263,6 +261,14 @@ inline const SystemList& SelectorBase::getRealSystemList() const {
 
 inline const SystemList& SelectorBase::getProtoSystemList() const {
     return m_pro_sys_list;
+}
+
+inline void SelectorBase::setScoresFilter(const ScoresFilterPtr& filter) {
+    m_sc_filter = filter;
+}
+
+inline void SelectorBase::addScoresFilter(const ScoresFilterPtr& filter) {
+    m_sc_filter = m_sc_filter | filter;
 }
 
 } /* namespace hku */

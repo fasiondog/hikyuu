@@ -77,6 +77,22 @@ void export_SCFilter(py::module& m) {
 
         DEF_PICKLE(ScoresFilterPtr);
 
+    m.def("SCFilter_IgnoreNan", &SCFilter_IgnoreNan, R"(SCFilter_IgnoreNan() -> ScoresFilterPtr
+      
+    忽略截面中的NAN值)");
+
+    m.def("SCFilter_LessOrEqualValue", &SCFilter_LessOrEqualValue, py::arg("value") = 0.0,
+          R"(SCFilter_LessOrEqualValue([value = 0.0])
+            
+    过滤掉评分小于等于指定值的截面)");
+
+    m.def("SCFilter_TopN", &SCFilter_TopN, py::arg("topn") = 10,
+          R"(SCFilter_TopN([topn: int=10])
+            
+    获取评分列表中的前 topn 个
+    
+    :param int topn: 前 topn 个)");
+
     m.def("SCFilter_Group", &SCFilter_Group, py::arg("group") = 10, py::arg("group_index") = 0,
           R"(SCFilter_Group([group: int=10, group_index: int=0])
             

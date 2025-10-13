@@ -19,6 +19,7 @@ namespace hku {
  */
 class HKU_API ScoresFilterBase {
     PARAMETER_SUPPORT_WITH_CHECK
+    friend HKU_API std::ostream& operator<<(std::ostream&, const ScoresFilterBase&);
 
 public:
     ScoresFilterBase() = default;
@@ -98,6 +99,7 @@ private:                                                           \
 #endif
 
 typedef std::shared_ptr<ScoresFilterBase> ScoresFilterPtr;
+typedef std::shared_ptr<ScoresFilterBase> SCFilterPtr;
 
 #define SCORESFILTER_IMP(classname)                                                      \
 public:                                                                                  \

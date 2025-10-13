@@ -7,6 +7,10 @@
 
 #include "MinAmountPercentSCFilter.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::MinAmountPercentSCFilter)
+#endif
+
 namespace hku {
 
 MinAmountPercentSCFilter::MinAmountPercentSCFilter() : ScoresFilterBase("SCFilter_AmountLimit") {
