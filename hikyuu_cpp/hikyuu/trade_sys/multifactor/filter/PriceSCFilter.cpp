@@ -14,10 +14,10 @@ PriceSCFilter::PriceSCFilter() : ScoresFilterBase("SCFilter_Price") {
     setParam<double>("max_price", 100000.0);  // 最高价格
 }
 
-PriceSCFilter::PriceSCFilter(double min_price, double max_price)
-: ScoresFilterBase("SCFilter_Price") {
-    setParam<double>("min_price", min_price);  // 最低价格
-    setParam<double>("max_price", max_price);  // 最高价格
+void PriceSCFilter::_checkParam(const string& name) const {
+    if (name == "min_price" || name == "max_price") {
+        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+    }
 }
 
 ScoreRecordList PriceSCFilter::filter(const ScoreRecordList& scores, const Datetime& date,
@@ -67,7 +67,10 @@ ScoreRecordList PriceSCFilter::filter(const ScoreRecordList& scores, const Datet
 
 ScoresFilterPtr HKU_API SCFilter_Price(double min_price, double max_price) {
     HKU_CHECK(max_price > min_price, "max_price must > min_price!");
-    return std::make_shared<PriceSCFilter>(min_price, max_price);
+    auto p = std::make_shared<PriceSCFilter>();
+    p->setParam<double>("min_price", min_price);
+    p->setParam<double>("max_price", max_price);
+    return p;
 }
 
 }  // namespace hku

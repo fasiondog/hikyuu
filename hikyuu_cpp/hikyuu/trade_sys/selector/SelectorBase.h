@@ -146,9 +146,11 @@ public:
 
     /**
      * 添加前置过滤器，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤
+     * @note 过滤链是按添加顺序依次过滤
      * @param filter
      */
     void addScoresFilter(const ScoresFilterPtr& filter);
+    void addScoresFilter(const vector<ScoresFilterPtr>& filters);
 
 protected:
     virtual bool isPythonObject() const {

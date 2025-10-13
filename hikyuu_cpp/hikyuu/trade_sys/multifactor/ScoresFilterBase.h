@@ -98,6 +98,12 @@ public:                                                                         
     virtual ScoreRecordList filter(const ScoreRecordList& scores, const Datetime& date, \
                                    const KQuery& query) override;
 
+vector<ScoresFilterPtr> HKU_API operator|(const ScoresFilterPtr& lhs, const ScoresFilterPtr& rhs);
+vector<ScoresFilterPtr> HKU_API operator|(const vector<ScoresFilterPtr>& lhs,
+                                          const ScoresFilterPtr& rhs);
+vector<ScoresFilterPtr> HKU_API operator|(const ScoresFilterPtr& lhs,
+                                          const vector<ScoresFilterPtr>& rhs);
+
 HKU_API std::ostream& operator<<(std::ostream&, const ScoresFilterBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const ScoresFilterPtr&);
 

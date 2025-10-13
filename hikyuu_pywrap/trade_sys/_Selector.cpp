@@ -282,6 +282,11 @@ void export_Selector(py::module& m) {
       .def("add_sys", &SelectorBase::addSystem)
       .def("add_sys_list", &SelectorBase::addSystemList)
 
+      .def("add_scores_filter",
+           py::overload_cast<const ScoresFilterPtr&>(&SelectorBase::addScoresFilter))
+      .def("add_scores_filter",
+           py::overload_cast<const vector<ScoresFilterPtr>&>(&SelectorBase::addScoresFilter))
+
       .def("__add__",
            [](const SelectorPtr& self, const SelectorPtr& other) { return self + other; })
       .def("__add__", [](const SelectorPtr& self, double other) { return self + other; })

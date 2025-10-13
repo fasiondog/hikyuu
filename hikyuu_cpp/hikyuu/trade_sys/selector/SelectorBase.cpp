@@ -200,4 +200,10 @@ void SelectorBase::addScoresFilter(const ScoresFilterPtr& filter) {
     m_sc_filters.push_back(filter);
 }
 
+void SelectorBase::addScoresFilter(const vector<ScoresFilterPtr>& filters) {
+    for (const auto& filter : filters) {
+        addScoresFilter(filter);
+    }
+}
+
 } /* namespace hku */

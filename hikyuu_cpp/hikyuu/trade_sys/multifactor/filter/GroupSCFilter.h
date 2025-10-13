@@ -11,14 +11,13 @@
 
 namespace hku {
 
-class HKU_API PriceSCFilter : public ScoresFilterBase {
-    SCORESFILTER_IMP(PriceSCFilter)
+class HKU_API GroupSCFilter : public ScoresFilterBase {
+    SCORESFILTER_IMP(GroupSCFilter)
     SCORESFILTER_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    PriceSCFilter();
-    virtual ~PriceSCFilter() = default;
-    virtual void _checkParam(const string& name) const override;
+    GroupSCFilter();
+    virtual ~GroupSCFilter() = default;
 };
 
 }  // namespace hku

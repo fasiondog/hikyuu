@@ -13,11 +13,6 @@ MinAmountPercentSCFilter::MinAmountPercentSCFilter() : ScoresFilterBase("SCFilte
     setParam<double>("min_amount_percent_limit", 0.1);
 }
 
-MinAmountPercentSCFilter::MinAmountPercentSCFilter(double min_amount_percent_limit)
-: ScoresFilterBase("SCFilter_AmountLimit") {
-    setParam<double>("min_amount_percent_limit", min_amount_percent_limit);
-}
-
 void MinAmountPercentSCFilter::_checkParam(const string& name) const {
     if (name == "min_amount_percent_limit") {
         double min_amount_percent_limit = getParam<double>("min_amount_percent_limit");
@@ -72,7 +67,9 @@ ScoreRecordList MinAmountPercentSCFilter::filter(const ScoreRecordList& scores,
 }
 
 ScoresFilterPtr HKU_API SCFilter_AmountLimit(double min_amount_percent_limit) {
-    return std::make_shared<MinAmountPercentSCFilter>(min_amount_percent_limit);
+    auto p = std::make_shared<MinAmountPercentSCFilter>();
+    p->setParam<double>("min_amount_percent_limit", min_amount_percent_limit);
+    return p;
 }
 
 }  // namespace hku
