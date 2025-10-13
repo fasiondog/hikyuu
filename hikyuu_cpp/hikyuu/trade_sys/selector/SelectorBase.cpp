@@ -94,6 +94,14 @@ SelectorPtr SelectorBase::clone() {
     for (const auto& sys : m_pro_sys_list) {
         p->m_pro_sys_list.emplace_back(sys->clone());
     }
+
+    p->m_sc_filters.reserve(m_sc_filters.size());
+    for (const auto& filter : m_sc_filters) {
+        p->m_sc_filters.emplace_back(filter->clone());
+    }
+
+    p->m_pf = m_pf;  // 仅为PF的引用，不clone
+
     return p;
 }
 
@@ -185,6 +193,11 @@ SystemWeightList SelectorBase::getSelected(Datetime date) {
         ret.resize(getParam<int>("get_n"));
     }
     return ret;
+}
+
+void SelectorBase::addScoresFilter(const ScoresFilterPtr& filter) {
+    HKU_CHECK(filter, "Invalid ScoresFilter!");
+    m_sc_filters.push_back(filter);
 }
 
 } /* namespace hku */

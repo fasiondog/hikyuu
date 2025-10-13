@@ -25,8 +25,6 @@ MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
     setParam<Stock>("ref_stk", Stock());
     setParam<bool>("use_spearman", true);
     setParam<string>("mode", "MF_ICIRWeight");
-    setParam<double>("min_price", 0.0);       // 忽略价格小于等于 min_price 的证券
-    setParam<double>("max_price", 100000.0);  // 忽略价格大于等于 max_price 的证券
 }
 
 MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
@@ -37,8 +35,6 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     setParam<bool>("ignore_le_zero", false);
     setParam<int>("topn", topn);
     setParam<bool>("reverse", false);
-    setParam<double>("min_price", 0.0);       // 忽略价格小于等于 min_price 的证券
-    setParam<double>("max_price", 100000.0);  // 忽略价格大于等于 max_price 的证券
 
     setParam<int>("ic_n", mf->getParam<int>("ic_n"));
     setParam<Stock>("ref_stk", mf->getRefStock());
@@ -152,27 +148,10 @@ SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
     bool only_should_buy = getParam<bool>("only_should_buy");
     bool reverse = getParam<bool>("reverse");
 
-    ScoreRecordList scores;
-    double min_price = getParam<double>("min_price");
-    double max_price = getParam<double>("max_price");
-    if (min_price > 0.0 || max_price < 100000.0) {
-        auto ktype = m_mf->getQuery().kType();
-        scores = m_mf->getScores(
-          date, 0, Null<size_t>(),
-          [ktype, ignore_null, ignore_le_zero, min_price, max_price](const Datetime& date,
-                                                                     const ScoreRecord& sc) {
-              HKU_IF_RETURN(sc.stock.isNull() || (ignore_null && std::isnan(sc.value)) ||
-                              (ignore_le_zero && sc.value <= 0.0),
-                            false);
-              auto kr = sc.stock.getKRecord(date, ktype);
-              return kr.isValid() && kr.closePrice >= min_price && kr.closePrice <= max_price;
-          });
-    } else {
-        scores = m_mf->getScores(
-          date, 0, Null<size_t>(), [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
-              return !(ignore_null && std::isnan(sc.value)) && !(ignore_le_zero && sc.value <= 0.0);
-          });
-    }
+    ScoreRecordList scores = m_mf->getScores(
+      date, 0, Null<size_t>(), [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
+          return !(ignore_null && std::isnan(sc.value)) && !(ignore_le_zero && sc.value <= 0.0);
+      });
 
     int param_topn = getParam<int>("topn");
     size_t topn = param_topn > 0 ? static_cast<size_t>(param_topn) : scores.size();

@@ -11,6 +11,11 @@
 
 namespace hku {
 
+/**
+ * @ingroup MultiFactor
+ * @{
+ */
+
 inline NormPtr NORM_NOTHING() {
     return NormPtr();
 }
@@ -27,4 +32,5 @@ NormPtr HKU_API NORM_Quantile(double quantile_min = 0.01, double quantile_max = 
 /** 分位数均匀分布标准化 */
 NormPtr HKU_API NORM_Quantile_Uniform(double quantile_min = 0.01, double quantile_max = 0.99);
 
+/* @} */
 }  // namespace hku

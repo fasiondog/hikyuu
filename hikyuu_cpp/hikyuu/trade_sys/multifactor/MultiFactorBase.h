@@ -8,7 +8,7 @@
 #pragma once
 
 #include "hikyuu/KData.h"
-#include "ScoreRecord.h"
+#include "ScoresFilterBase.h"
 #include "buildin_norm.h"
 
 namespace hku {
@@ -108,6 +108,12 @@ public:
 
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
                               std::function<bool(const Datetime&, const ScoreRecord&)>&& filter);
+
+    ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
+                              const ScoresFilterPtr& filter);
+
+    ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
+                              const vector<ScoresFilterPtr>& filters);
 
     /** 获取所有截面数据，已按降序排列 */
     const vector<ScoreRecordList>& getAllScores();
