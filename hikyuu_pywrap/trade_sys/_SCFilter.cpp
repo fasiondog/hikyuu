@@ -19,9 +19,9 @@ public:
 
     PyScoresFilterBase(const ScoresFilterBase& base) : ScoresFilterBase(base) {}
 
-    virtual ScoreRecordList filter(const ScoreRecordList& scores, const Datetime& date,
-                                   const KQuery& query) override {
-        PYBIND11_OVERRIDE_PURE(ScoreRecordList, ScoresFilterBase, filter, scores, date, query);
+    virtual ScoreRecordList _filter(const ScoreRecordList& scores, const Datetime& date,
+                                    const KQuery& query) override {
+        PYBIND11_OVERRIDE_PURE(ScoreRecordList, ScoresFilterBase, _filter, scores, date, query);
     }
 };
 
@@ -61,7 +61,49 @@ void export_SCFilter(py::module& m) {
 
       .def("clone", &ScoresFilterBase::clone, "克隆操作")
 
-      .def("filter", &ScoresFilterBase::filter, "【重载接口】子类计算接口")
+      .def("filter", &ScoresFilterBase::filter, R"(filter(self, scores, date, query)
+        
+    截面过滤
+    :param list scores: 截面数据
+    :param Datetime date: 截面日期
+    :param KQuery query: 查询参数
+    :return: 截面数据
+    :rtype: ScoreRecordList)")
+
+      .def("_filter", &ScoresFilterBase::_filter, "【重载接口】子类计算接口")
+
+      .def("__or__",
+           [](const ScoresFilterPtr& self, const ScoresFilterPtr& other) { return self | other; })
 
         DEF_PICKLE(ScoresFilterPtr);
+
+    m.def("SCFilter_Group", &SCFilter_Group, py::arg("group") = 10, py::arg("group_index") = 0,
+          R"(SCFilter_Group([group: int=10, group_index: int=0])
+            
+    按截面进行分组过滤
+    :param int group: 分组数量
+    :param int group_index: 分组索引
+    :return: 截面过滤器
+    :rtype: ScoresFilterPtr)");
+
+    m.def("SCFilter_AmountLimit", &SCFilter_AmountLimit, py::arg("min_amount_percent_limit") = 0.1,
+          R"(SCFilter_AmountLimit([min_amount_percent_limit: float = 0.1])
+            
+    过滤掉成交金额在评分列表末尾百分比范围内的截面
+    
+    注意：和传入的截面评分列表顺序相关，如果是降序，过滤的是成交金额较小的系统评分记录；反之，则是金额较大的系统评分记录
+
+    :param double min_amount_percent_limit: 最小金额百分比限制
+    :return: 截面过滤器
+    :rtype: ScoresFilterPtr)");
+
+    m.def("SCFilter_Price", &SCFilter_Price, py::arg("min_price") = 10.,
+          py::arg("max_price") = 100000.,
+          R"(SCFilter_Price([min_price = 10., max_price = 100000.])
+            
+    过滤掉价格在评分列表末尾百分比范围内的截面
+    
+    注意：和传入的截面评分列表顺序相关，如果是降序，过滤的是价格较小的系统评分记录；反之，则是价格较大的系统评分记录
+
+    :param double min_price: 最小价格限制)");
 }

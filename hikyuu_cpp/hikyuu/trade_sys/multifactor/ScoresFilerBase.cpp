@@ -33,29 +33,40 @@ ScoresFilterPtr ScoresFilterBase::clone() {
     auto p = _clone();
     p->m_params = m_params;
     p->m_name = m_name;
+
+    if (m_child) {
+        p->m_child = m_child->clone();
+    }
     return p;
 }
 
-vector<ScoresFilterPtr> HKU_API operator|(const ScoresFilterPtr& lhs, const ScoresFilterPtr& rhs) {
-    return {lhs, rhs};
-}
-
-vector<ScoresFilterPtr> HKU_API operator|(const vector<ScoresFilterPtr>& lhs,
-                                          const ScoresFilterPtr& rhs) {
-    vector<ScoresFilterPtr> result(lhs);
-    result.push_back(rhs);
-    return result;
-}
-
-vector<ScoresFilterPtr> HKU_API operator|(const ScoresFilterPtr& lhs,
-                                          const vector<ScoresFilterPtr>& rhs) {
-    vector<ScoresFilterPtr> result;
-    result.reserve(rhs.size() + 1);
-    result.push_back(lhs);
-    for (auto& item : rhs) {
-        result.push_back(item);
+ScoreRecordList ScoresFilterBase::filter(const ScoreRecordList& scores, const Datetime& date,
+                                         const KQuery& query) {
+    auto ret = _filter(scores, date, query);
+    if (m_child) {
+        ret = m_child->filter(ret, date, query);
     }
-    return result;
+    return ret;
+}
+
+HKU_API ScoresFilterPtr operator|(const ScoresFilterPtr& a, const ScoresFilterPtr& b) {
+    ScoresFilterPtr ret;
+    if (a && b) {
+        const auto* node = &a;
+        while ((*node)->m_child) {
+            node = &((*node)->m_child);
+        }
+        (*node)->m_child = b;
+    } else if (a) {
+        HKU_WARN("filter b is null, will be ignored.");
+        ret = a;
+    } else if (b) {
+        HKU_WARN("filter a is null, will be ignored.");
+        ret = b;
+    } else {
+        HKU_WARN("filter a and b are all null, will be returned null.");
+    }
+    return ret;
 }
 
 }  // namespace hku

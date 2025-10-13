@@ -112,9 +112,6 @@ public:
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
                               const ScoresFilterPtr& filter);
 
-    ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
-                              const vector<ScoresFilterPtr>& filters);
-
     /** 获取所有截面数据，已按降序排列 */
     const vector<ScoreRecordList>& getAllScores();
 

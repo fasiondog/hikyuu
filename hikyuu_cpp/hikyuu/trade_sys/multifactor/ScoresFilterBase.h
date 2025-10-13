@@ -34,13 +34,19 @@ public:
         m_name = name;
     }
 
-    virtual ScoreRecordList filter(const ScoreRecordList& scores, const Datetime& date,
-                                   const KQuery& query) = 0;
+    ScoreRecordList filter(const ScoreRecordList& scores, const Datetime& date,
+                           const KQuery& query);
+
+    virtual ScoreRecordList _filter(const ScoreRecordList& scores, const Datetime& date,
+                                    const KQuery& query) = 0;
 
     typedef std::shared_ptr<ScoresFilterBase> ScoresFilterPtr;
     ScoresFilterPtr clone();
 
     virtual ScoresFilterPtr _clone() = 0;
+
+public:
+    friend HKU_API ScoresFilterPtr operator|(const ScoresFilterPtr& a, const ScoresFilterPtr& b);
 
 protected:
     virtual bool isPythonObject() const {
@@ -49,6 +55,7 @@ protected:
 
 protected:
     string m_name;
+    ScoresFilterPtr m_child;
 
 //============================================
 // 序列化支持
@@ -60,12 +67,14 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_child);
     }
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_child);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -90,22 +99,18 @@ private:                                                           \
 
 typedef std::shared_ptr<ScoresFilterBase> ScoresFilterPtr;
 
-#define SCORESFILTER_IMP(classname)                                                     \
-public:                                                                                 \
-    virtual ScoresFilterPtr _clone() override {                                         \
-        return std::make_shared<classname>();                                           \
-    }                                                                                   \
-    virtual ScoreRecordList filter(const ScoreRecordList& scores, const Datetime& date, \
-                                   const KQuery& query) override;
-
-vector<ScoresFilterPtr> HKU_API operator|(const ScoresFilterPtr& lhs, const ScoresFilterPtr& rhs);
-vector<ScoresFilterPtr> HKU_API operator|(const vector<ScoresFilterPtr>& lhs,
-                                          const ScoresFilterPtr& rhs);
-vector<ScoresFilterPtr> HKU_API operator|(const ScoresFilterPtr& lhs,
-                                          const vector<ScoresFilterPtr>& rhs);
+#define SCORESFILTER_IMP(classname)                                                      \
+public:                                                                                  \
+    virtual ScoresFilterPtr _clone() override {                                          \
+        return std::make_shared<classname>();                                            \
+    }                                                                                    \
+    virtual ScoreRecordList _filter(const ScoreRecordList& scores, const Datetime& date, \
+                                    const KQuery& query) override;
 
 HKU_API std::ostream& operator<<(std::ostream&, const ScoresFilterBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const ScoresFilterPtr&);
+
+HKU_API ScoresFilterPtr operator|(const ScoresFilterPtr& a, const ScoresFilterPtr& b);
 
 }  // namespace hku
 

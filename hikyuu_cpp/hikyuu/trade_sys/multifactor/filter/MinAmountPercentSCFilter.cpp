@@ -21,8 +21,8 @@ void MinAmountPercentSCFilter::_checkParam(const string& name) const {
     }
 }
 
-ScoreRecordList MinAmountPercentSCFilter::filter(const ScoreRecordList& scores,
-                                                 const Datetime& date, const KQuery& query) {
+ScoreRecordList MinAmountPercentSCFilter::_filter(const ScoreRecordList& scores,
+                                                  const Datetime& date, const KQuery& query) {
     ScoreRecordList ret;
     const auto& ktype = query.kType();
 

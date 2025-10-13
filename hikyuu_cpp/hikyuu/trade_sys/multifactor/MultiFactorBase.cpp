@@ -430,32 +430,6 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     return ret;
 }
 
-ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, size_t end,
-                                           const vector<ScoresFilterPtr>& filters) {
-    ScoreRecordList ret;
-    HKU_IF_RETURN(start >= end, ret);
-
-    const auto& cross = getScores(date);
-    HKU_IF_RETURN(cross.empty(), ret);
-
-    if (end == Null<size_t>() || end > cross.size()) {
-        end = cross.size();
-    }
-
-    ret.reserve(end - start);
-    for (size_t i = start; i < end; i++) {
-        ret.emplace_back(cross[i]);
-    }
-
-    for (const auto& filter : filters) {
-        if (filter) {
-            ret = filter->filter(ret, date, m_query);
-        }
-    }
-
-    return ret;
-}
-
 const vector<ScoreRecordList>& MultiFactorBase::getAllScores() {
     calculate();
     return m_stk_factor_by_date;

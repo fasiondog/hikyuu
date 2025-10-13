@@ -14,8 +14,8 @@ GroupSCFilter::GroupSCFilter() : ScoresFilterBase("SCFilter_Group") {
     setParam<int>("group_index", 0);
 }
 
-ScoreRecordList GroupSCFilter::filter(const ScoreRecordList& scores, const Datetime& date,
-                                      const KQuery& query) {
+ScoreRecordList GroupSCFilter::_filter(const ScoreRecordList& scores, const Datetime& date,
+                                       const KQuery& query) {
     ScoreRecordList ret;
 
     // 如果没有数据或分组数为0，直接返回空列表

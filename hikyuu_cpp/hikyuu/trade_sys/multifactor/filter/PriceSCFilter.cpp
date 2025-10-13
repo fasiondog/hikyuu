@@ -20,12 +20,14 @@ void PriceSCFilter::_checkParam(const string& name) const {
     }
 }
 
-ScoreRecordList PriceSCFilter::filter(const ScoreRecordList& scores, const Datetime& date,
-                                      const KQuery& query) {
+ScoreRecordList PriceSCFilter::_filter(const ScoreRecordList& scores, const Datetime& date,
+                                       const KQuery& query) {
     ScoreRecordList ret;
     const auto& ktype = query.kType();
 
-    std::vector<std::pair<size_t, price_t>> amount_list;
+    double min_price = getParam<double>("min_price");
+    double max_price = getParam<double>("max_price");
+
     for (size_t i = 0; i < scores.size(); ++i) {
         if (scores[i].stock.isNull()) {
             continue;
@@ -36,30 +38,9 @@ ScoreRecordList PriceSCFilter::filter(const ScoreRecordList& scores, const Datet
             continue;
         }
 
-        amount_list.emplace_back(i, kr.transAmount);
-    }
-
-    std::sort(amount_list.begin(), amount_list.end(),
-              [](const std::pair<size_t, price_t>& a, const std::pair<size_t, price_t>& b) {
-                  return a.second > b.second;
-              });
-
-    // 计算需要保留的数量(过滤掉后10%)
-    size_t total = amount_list.size();
-    if (total == 0) {
-        return ret;
-    }
-
-    double min_amount_percent_limit = getParam<double>("min_amount_percent_limit");
-    size_t keep_count = total * (1 - min_amount_percent_limit);  // 保留前90%
-    if (keep_count == 0) {
-        keep_count = 1;  // 至少保留一个
-    }
-
-    // 将前keep_count个记录加入结果
-    for (size_t i = 0; i < keep_count && i < amount_list.size(); ++i) {
-        size_t index = amount_list[i].first;
-        ret.emplace_back(scores[index]);
+        if (kr.closePrice >= min_price && kr.closePrice <= max_price) {
+            ret.emplace_back(scores[i]);
+        }
     }
 
     return ret;
