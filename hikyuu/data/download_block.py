@@ -10,6 +10,31 @@ from hikyuu.fetcher.stock.zh_block_em import *
 import os
 from datetime import datetime
 
+
+def sanitize_filename(filename: str) -> str:
+    """
+    将字符串中影响文件创建的相关目录字符替换为下划线
+
+    Args:
+        filename: 输入的文件名字符串
+
+    Returns:
+        处理后的文件名字符串，其中非法字符已被替换为下划线
+    """
+    if not filename:
+        return filename
+
+    # 需要替换的非法字符（Windows和Unix系统中的非法字符）
+    illegal_chars = '<>:"/\\|?*'
+
+    # 替换非法字符为下划线
+    sanitized = filename
+    for char in illegal_chars:
+        sanitized = sanitized.replace(char, '_')
+
+    return sanitized
+
+
 _BLOCK_SAVE_PATH = os.path.expanduser('~') + '/.hikyuu/downloads/block'
 if not os.path.exists(_BLOCK_SAVE_PATH):
     os.makedirs(_BLOCK_SAVE_PATH)
@@ -89,6 +114,7 @@ def is_file_can_download(filepath, sec_limit=5 * 24 * 60 * 60):
     return (now - file_datetime).total_seconds() > sec_limit
 
 
+@hku_catch()
 def save_block(stkcodes: list,  filename: str):
     """将板块数据保存为CSV文件，格式为板块名称/code"""
     with open(filename, 'w', encoding='utf-8') as f:
@@ -129,7 +155,7 @@ def down_em_all_gnbk_info():
     for i, blk_name in enumerate(blk_names):
         if blk_name in not_need_blks:
             continue
-        filename = f"{save_path}/{blk_name}.txt"
+        filename = f"{save_path}/{sanitize_filename(blk_name)}.txt"
         if is_file_can_download(filename, 30 * 24 * 60 * 60):
             stk_codes = stock_board_concept_cons_em(blk_name)
             stk_codes = stk_codes['代码'].to_list()
