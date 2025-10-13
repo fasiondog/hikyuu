@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::NormMinMax)
 
 namespace hku {
 
-NormMinMax::NormMinMax() : NormalizeBase("NORM_MIN_MAX") {}
+NormMinMax::NormMinMax() : NormalizeBase("NORM_MinMax") {}
 
 NormMinMax::~NormMinMax() {}
 
@@ -50,7 +50,7 @@ PriceList NormMinMax::normalize(const PriceList& data) {
     return result;
 }
 
-NormPtr HKU_API NORM_MIN_MAX() {
+NormPtr HKU_API NORM_MinMax() {
     return std::make_shared<NormMinMax>();
 }
 

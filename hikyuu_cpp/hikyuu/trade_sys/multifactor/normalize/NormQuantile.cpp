@@ -14,13 +14,13 @@ BOOST_CLASS_EXPORT(hku::NormQuantile)
 
 namespace hku {
 
-NormQuantile::NormQuantile() : NormalizeBase("NORM_QUANTILE") {
+NormQuantile::NormQuantile() : NormalizeBase("NORM_Quantile") {
     setParam<double>("quantile_min", 0.01);
     setParam<double>("quantile_max", 0.99);
 }
 
 NormQuantile::NormQuantile(double quantile_min, double quantile_max)
-: NormalizeBase("NORM_QUANTILE") {
+: NormalizeBase("NORM_Quantile") {
     setParam<double>("quantile_min", quantile_min);
     setParam<double>("quantile_max", quantile_max);
 }
@@ -166,7 +166,7 @@ PriceList NormQuantile::normalize(const PriceList &src) {
     return result;
 }
 
-NormPtr HKU_API NORM_QUANTILE(double quantile_min, double quantile_max) {
+NormPtr HKU_API NORM_Quantile(double quantile_min, double quantile_max) {
     return std::make_shared<NormQuantile>(quantile_min, quantile_max);
 }
 

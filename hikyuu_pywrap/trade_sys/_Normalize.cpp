@@ -65,11 +65,11 @@ void export_Normlize(py::module& m) {
         DEF_PICKLE(NormalizePtr);
 
     m.def("NORM_NOTHING", &NORM_NOTHING, "无截面标准化操作");
-    m.def("NORM_MIN_MAX", &NORM_MIN_MAX, "最小-最大标准化操作");
-    m.def("NORM_ZSCORE", &NORM_ZSCORE, py::arg("out_extreme") = false, py::arg("nsigma") = 3.0,
+    m.def("NORM_MinMax", &NORM_MinMax, "最小-最大标准化操作");
+    m.def("NORM_Zscore", &NORM_Zscore, py::arg("out_extreme") = false, py::arg("nsigma") = 3.0,
           py::arg("recursive") = false, "Z-score 标准化操作");
-    m.def("NORM_QUANTILE", &NORM_QUANTILE, py::arg("quantile_min") = 0.01,
+    m.def("NORM_Quantile", &NORM_Quantile, py::arg("quantile_min") = 0.01,
           py::arg("quantile_max") = 0.99, "分位数截面标准化操作");
-    m.def("NORM_QUANTILE_UNIFORM", &NORM_QUANTILE_UNIFORM, py::arg("quantile_min") = 0.01,
+    m.def("NORM_Quantile_Uniform", &NORM_Quantile_Uniform, py::arg("quantile_min") = 0.01,
           py::arg("quantile_max") = 0.99, "分位数截面均匀分布标准化操作");
 }
