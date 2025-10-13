@@ -897,7 +897,7 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None):
     ax2 = fg.add_subplot(gs[:, 3:])
     ax3 = fg.add_subplot(gs[4:, :3])
     ref_return.plot(axes=ax1, legend_on=True, label=f'{ref_stk.name}({ref_stk.market_code}) 收益曲线')
-    funds_return.plot(axes=ax1, legend_on=True, label=f'{tm.name} 累积收益率')
+    funds_return.plot(axes=ax1, legend_on=True, label=f'{tm.name} 累积收益率 {funds_return[-1]*100.:<.2f}%')
     ax1.set_title(f"账户({tm.name}) 累积收益率")
     label = t1 + '\n\n' + t2 + '\n\n' + t3
     ax2.text(0,
