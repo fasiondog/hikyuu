@@ -9,6 +9,7 @@
 #ifndef SYSTEMBASE_H_
 #define SYSTEMBASE_H_
 
+#include <nlohmann/json.hpp>
 // #include "../../KData.h"
 // #include "../../utilities/Parameter.h"
 // #include "../../trade_manage/TradeManager.h"
@@ -24,6 +25,8 @@
 #include "../../serialization/KData_serialization.h"
 
 namespace hku {
+
+using json = nlohmann::json;
 
 class HKU_API Portfolio;
 class HKU_API AllocateFundsBase;
@@ -264,6 +267,11 @@ public:
 
     // 处理延迟买入请求，仅供 PF 调用
     virtual TradeRecord pfProcessDelayBuyRequest(const Datetime& date);
+
+    /**
+     * 回测完成后以 JSON 格式获取最新的建议（即当前最后交易和需要延迟的交易）
+     */
+    json lastSuggestion() const;
 
 protected:
     virtual bool isPythonObject() const {
