@@ -13,14 +13,14 @@ BOOST_CLASS_EXPORT(hku::NormZScore)
 
 namespace hku {
 
-NormZScore::NormZScore() : NormalizeBase("NORM_ZSCORE") {
+NormZScore::NormZScore() : NormalizeBase("NORM_Zscore") {
     setParam<double>("nsigma", 3);
     setParam<bool>("out-extreme", false);
     setParam<bool>("recursive", false);
 }
 
 NormZScore::NormZScore(bool outExtreme, double nsigma, bool recursive)
-: NormalizeBase("NORM_ZSCORE") {
+: NormalizeBase("NORM_Zscore") {
     setParam<double>("nsigma", nsigma);
     setParam<bool>("out-extreme", outExtreme);
     setParam<bool>("recursive", recursive);
@@ -103,7 +103,7 @@ PriceList NormZScore::normalize(const PriceList& data) {
     return ret;
 }
 
-NormPtr HKU_API NORM_ZSCORE(bool outExtreme, double nsigma, bool recursive) {
+NormPtr HKU_API NORM_Zscore(bool outExtreme, double nsigma, bool recursive) {
     return std::make_shared<NormZScore>(outExtreme, nsigma, recursive);
 }
 

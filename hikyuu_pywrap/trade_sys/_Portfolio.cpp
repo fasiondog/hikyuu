@@ -67,6 +67,15 @@ void export_Portfolio(py::module& m) {
 
         DEF_PICKLE(Portfolio);
 
+    m.def("parallel_run_pf", &parallel_run_pf, py::arg("pf_list"), py::arg("query"),
+          py::arg("force") = false, R"(parallel_run_pf(pf_list, query[, force=False])
+
+    并行执行多个投资组合策略
+
+    :param list pf_list: 投资组合列表
+    :param Query query: 查询条件
+    :param bool force: 强制重新计算)");
+
     m.def("PF_Simple", PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
           py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
           py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,

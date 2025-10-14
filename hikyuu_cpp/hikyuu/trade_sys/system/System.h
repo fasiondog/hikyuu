@@ -446,6 +446,16 @@ typedef vector<SystemPtr> SystemList;
 HKU_API std::ostream& operator<<(std::ostream& os, const System& sys);
 HKU_API std::ostream& operator<<(std::ostream& os, const SystemPtr& sys);
 
+/**
+ * @brief 并行运行系统
+ * @param system_list 系统列表
+ * @param query 系统运行查询条件
+ * @param reset 执行前是否依据系统部件共享属性复位
+ * @param resetAll 强制复位所有部件
+ */
+void HKU_API parallel_run_sys(const SystemList& system_list, const KQuery& query, bool reset = true,
+                              bool resetAll = false);
+
 inline const string& System::name() const {
     return m_name;
 }

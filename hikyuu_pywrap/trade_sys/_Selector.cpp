@@ -282,6 +282,9 @@ void export_Selector(py::module& m) {
       .def("add_sys", &SelectorBase::addSystem)
       .def("add_sys_list", &SelectorBase::addSystemList)
 
+      .def("set_scores_filter", &SelectorBase::setScoresFilter)
+      .def("add_scores_filter", &SelectorBase::addScoresFilter)
+
       .def("__add__",
            [](const SelectorPtr& self, const SelectorPtr& other) { return self + other; })
       .def("__add__", [](const SelectorPtr& self, double other) { return self + other; })
@@ -365,33 +368,28 @@ void export_Selector(py::module& m) {
       :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
 
-    m.def("SE_MultiFactor2", py::overload_cast<const MFPtr&, int, int>(SE_MultiFactor2),
-          py::arg("mf"), py::arg("group") = 10, py::arg("group_index") = 0);
+    m.def("SE_MultiFactor2", py::overload_cast<const MFPtr&, const SCFilterPtr&>(SE_MultiFactor2),
+          py::arg("mf"), py::arg("filter") = SCFilter_IgnoreNan());
     m.def(
       "SE_MultiFactor2",
-      [](const py::sequence& inds, int group, int group_index, int ic_n, int ic_rolling_n,
-         const py::object& ref_stk, bool spearman, const string& mode) {
+      [](const py::sequence& inds, int ic_n, int ic_rolling_n, const py::object& ref_stk,
+         bool spearman, const string& mode, const SCFilterPtr& filter) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           Stock c_ref_stk = ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>();
-          return SE_MultiFactor2(c_inds, group, group_index, ic_n, ic_rolling_n, c_ref_stk,
-                                 spearman, mode);
+          return SE_MultiFactor2(c_inds, ic_n, ic_rolling_n, c_ref_stk, spearman, mode, filter);
       },
-      py::arg("inds"), py::arg("group") = 10, py::arg("group_index") = 0, py::arg("ic_n") = 5,
-      py::arg("ic_rolling_n") = 120, py::arg("ref_stk") = py::none(), py::arg("spearman") = true,
-      py::arg("mode") = "MF_ICIRWeight",
+      py::arg("inds"), py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
+      py::arg("ref_stk") = py::none(), py::arg("spearman") = true,
+      py::arg("mode") = "MF_ICIRWeight", py::arg("filter") = SCFilter_IgnoreNan(),
       R"(SE_MultiFactor
 
     创建基于多因子评分的选择器，两种创建方式
 
     - 直接指定 MF:
       :param MultiFactorBase mf: 直接指定的多因子合成算法
-      :param int group: 降序排列后分组数量
-      :param int group_index: 分组索引，从 0 开始, 选取指定分组
 
     - 参数直接创建:
       :param sequense(Indicator) inds: 原始因子列表
-      :param int group: 降序排列后分组数量
-      :param int group_index: 分组索引，从 0 开始, 选取指定分组
       :param int ic_n: 默认 IC 对应的 N 日收益率
       :param int ic_rolling_n: IC 滚动周期
       :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)

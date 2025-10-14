@@ -189,6 +189,8 @@ typedef shared_ptr<Portfolio> PFPtr;
 HKU_API std::ostream& operator<<(std::ostream&, const Portfolio&);
 HKU_API std::ostream& operator<<(std::ostream&, const PortfolioPtr&);
 
+void HKU_API parallel_run_pf(const vector<PFPtr>& pf_list, const KQuery& query, bool force = false);
+
 inline const string& Portfolio::name() const {
     return m_name;
 }

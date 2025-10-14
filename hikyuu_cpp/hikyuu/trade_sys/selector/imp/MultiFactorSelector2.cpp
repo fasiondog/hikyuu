@@ -15,11 +15,6 @@ BOOST_CLASS_EXPORT(hku::MultiFactorSelector2)
 namespace hku {
 
 MultiFactorSelector2::MultiFactorSelector2() : SelectorBase("SE_MultiFactor2") {
-    setParam<bool>("only_should_buy", false);  // 只选择同时发出买入信号的系统
-    setParam<bool>("ignore_null", true);       // 忽略 MF 中 score 值为 nan 的证券
-    setParam<bool>("ignore_le_zero", false);   // 忽略 MF 中 score 值小于等于 0 的证券
-    setParam<int>("group", 5);
-    setParam<int>("group_index", 0);
     setParam<int>("ic_n", 5);
     setParam<int>("ic_rolling_n", 120);
     setParam<Stock>("ref_stk", Stock());
@@ -27,15 +22,9 @@ MultiFactorSelector2::MultiFactorSelector2() : SelectorBase("SE_MultiFactor2") {
     setParam<string>("mode", "MF_ICIRWeight");
 }
 
-MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf, int group, int group_index)
+MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf)
 : SelectorBase("SE_MultiFactor2"), m_mf(mf) {
     HKU_CHECK(mf, "mf is null!");
-    setParam<bool>("only_should_buy", false);
-    setParam<bool>("ignore_null", true);
-    setParam<bool>("ignore_le_zero", false);
-    setParam<int>("group", group);
-    setParam<int>("group_index", group_index);
-
     setParam<int>("ic_n", mf->getParam<int>("ic_n"));
     setParam<Stock>("ref_stk", mf->getRefStock());
     if (mf->haveParam("ic_rolling_n")) {
@@ -44,7 +33,7 @@ MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf, int group, int group
         setParam<int>("ic_rolling_n", 120);
     }
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
-    setParam<string>("mode", mf->name());
+    setParam<string>("mode", "CUSTOM");
     setIndicators(mf->getRefIndicators());
 }
 
@@ -57,12 +46,8 @@ void MultiFactorSelector2::_checkParam(const string& name) const {
         HKU_ASSERT(getParam<int>("ic_rolling_n") >= 1);
     } else if ("mode" == name) {
         auto mode = getParam<string>("mode");
-        HKU_ASSERT("MF_ICIRWeight" == mode || "MF_ICWeight" == mode || "MF_EqualWeight" == mode);
-    } else if ("group" == name) {
-        HKU_ASSERT(getParam<int>("group") >= 1);
-    } else if ("group_index" == name) {
-        HKU_ASSERT(getParam<int>("group_index") >= 0 &&
-                   getParam<int>("group_index") < getParam<int>("group"));
+        HKU_ASSERT("MF_ICIRWeight" == mode || "MF_ICWeight" == mode || "MF_EqualWeight" == mode ||
+                   "CUSTOM" == mode);
     }
 }
 
@@ -87,79 +72,8 @@ bool MultiFactorSelector2::isMatchAF(const AFPtr& af) {
     return true;
 }
 
-ScoreRecordList MultiFactorSelector2::filterByGroup(Datetime date,
-                                                    const ScoreRecordList& raw_scores, size_t group,
-                                                    size_t group_index, bool only_should_buy) {
-    ScoreRecordList ret;
-
-    // 如果没有数据或分组数为0，直接返回空列表
-    if (raw_scores.empty() || group == 0) {
-        return ret;
-    }
-
-    // 计算每组应包含的股票数
-    size_t total_count = raw_scores.size();
-    size_t stocks_per_group = (total_count + group - 1) / group;  // 向上取整
-
-    // 检查索引是否有效
-    if (group_index >= group) {
-        return ret;
-    }
-
-    // 计算当前组的起始和结束位置
-    size_t start = group_index * stocks_per_group;
-    size_t end = std::min(start + stocks_per_group, total_count);
-
-    // 如果起始位置超出范围，返回空列表
-    if (start >= total_count) {
-        return ret;
-    }
-
-    // 从原始数据中提取当前组的数据
-    ScoreRecordList group_scores;
-    for (size_t i = start; i < end; i++) {
-        group_scores.emplace_back(raw_scores[i]);
-    }
-
-    // 如果只需要买入信号的股票，则进行过滤
-    if (only_should_buy) {
-        for (const auto& sc : group_scores) {
-            auto sys = m_stk_sys_dict[sc.stock];
-            if (sys->getSG()->shouldBuy(date)) {
-                ret.emplace_back(sc);
-            }
-        }
-    } else {
-        ret = std::move(group_scores);
-    }
-
-    return ret;
-}
-
 SystemWeightList MultiFactorSelector2::_getSelected(Datetime date) {
-    bool ignore_null = getParam<bool>("ignore_null");
-    bool ignore_le_zero = getParam<bool>("ignore_le_zero");
-    bool only_should_buy = getParam<bool>("only_should_buy");
-
-    ScoreRecordList raw_scores = m_mf->getScores(date);
-    raw_scores.erase(std::remove_if(raw_scores.begin(), raw_scores.end(),
-                                    [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
-                                        return (ignore_null && std::isnan(sc.value)) ||
-                                               (ignore_le_zero && sc.value <= 0.0);
-                                    }),
-                     raw_scores.end());
-
-    // 按照评分排序
-    std::sort(raw_scores.begin(), raw_scores.end(), [](const ScoreRecord& a, const ScoreRecord& b) {
-        return a.value > b.value;  // 降序排列
-    });
-
-    int group = getParam<int>("group");
-    int group_index = getParam<int>("group_index");
-
-    // 分组并选择指定组
-    ScoreRecordList scores = filterByGroup(date, raw_scores, group, group_index, only_should_buy);
-
+    ScoreRecordList scores = m_mf->getScores(date, 0, Null<size_t>(), m_sc_filter);
     SystemWeightList ret;
     for (const auto& sc : scores) {
         ret.emplace_back(m_stk_sys_dict[sc.stock], sc.value);
@@ -211,22 +125,23 @@ void MultiFactorSelector2::_calculate() {
     }
 }
 
-SelectorPtr HKU_API SE_MultiFactor2(const MFPtr& mf, int group, int group_index) {
-    return make_shared<MultiFactorSelector2>(mf, group, group_index);
+SelectorPtr HKU_API SE_MultiFactor2(const MFPtr& mf, const ScoresFilterPtr& filter) {
+    auto p = make_shared<MultiFactorSelector2>(mf);
+    p->setScoresFilter(filter);
+    return p;
 }
 
-SelectorPtr HKU_API SE_MultiFactor2(const IndicatorList& src_inds, int group, int group_index,
-                                    int ic_n, int ic_rolling_n, const Stock& ref_stk, bool spearman,
-                                    const string& mode) {
+SelectorPtr HKU_API SE_MultiFactor2(const IndicatorList& src_inds, int ic_n, int ic_rolling_n,
+                                    const Stock& ref_stk, bool spearman, const string& mode,
+                                    const ScoresFilterPtr& filter) {
     auto p = make_shared<MultiFactorSelector2>();
     p->setIndicators(src_inds);
-    p->setParam<int>("group", group);
-    p->setParam<int>("group_index", group_index);
     p->setParam<int>("ic_n", ic_n);
     p->setParam<int>("ic_rolling_n", ic_rolling_n);
     p->setParam<Stock>("ref_stk", ref_stk);
     p->setParam<bool>("use_spearman", spearman);
     p->setParam<string>("mode", mode);
+    p->setScoresFilter(filter);
     return p;
 }
 

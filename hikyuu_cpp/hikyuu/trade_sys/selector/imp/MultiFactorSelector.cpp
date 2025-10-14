@@ -44,7 +44,7 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
         setParam<int>("ic_rolling_n", 120);
     }
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
-    setParam<string>("mode", mf->name());
+    setParam<string>("mode", "CUSTOM");
     setIndicators(mf->getRefIndicators());
 }
 
@@ -57,7 +57,8 @@ void MultiFactorSelector::_checkParam(const string& name) const {
         HKU_ASSERT(getParam<int>("ic_rolling_n") >= 1);
     } else if ("mode" == name) {
         auto mode = getParam<string>("mode");
-        HKU_ASSERT("MF_ICIRWeight" == mode || "MF_ICWeight" == mode || "MF_EqualWeight" == mode);
+        HKU_ASSERT("MF_ICIRWeight" == mode || "MF_ICWeight" == mode || "MF_EqualWeight" == mode ||
+                   "CUSTOM" == mode);
     }
 }
 
@@ -147,28 +148,24 @@ SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
     bool only_should_buy = getParam<bool>("only_should_buy");
     bool reverse = getParam<bool>("reverse");
 
-    ScoreRecordList raw_scores = m_mf->getScores(date);
-    raw_scores.erase(std::remove_if(raw_scores.begin(), raw_scores.end(),
-                                    [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
-                                        return (ignore_null && std::isnan(sc.value)) ||
-                                               (ignore_le_zero && sc.value <= 0.0);
-                                    }),
-                     raw_scores.end());
+    ScoreRecordList scores = m_mf->getScores(
+      date, 0, Null<size_t>(), [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
+          return !(ignore_null && std::isnan(sc.value)) && !(ignore_le_zero && sc.value <= 0.0);
+      });
 
     int param_topn = getParam<int>("topn");
-    size_t topn = param_topn > 0 ? static_cast<size_t>(param_topn) : raw_scores.size();
-    if (topn > raw_scores.size()) {
-        topn = raw_scores.size();
+    size_t topn = param_topn > 0 ? static_cast<size_t>(param_topn) : scores.size();
+    if (topn > scores.size()) {
+        topn = scores.size();
     }
 
-    ScoreRecordList scores;
     if (!reverse) {
         // 正序排列
-        scores = filterTopN(date, raw_scores, topn, only_should_buy);
+        scores = filterTopN(date, scores, topn, only_should_buy);
 
     } else {
         // 倒序排列
-        scores = filterTopNReverse(date, raw_scores, topn, only_should_buy, ignore_null);
+        scores = filterTopNReverse(date, scores, topn, only_should_buy, ignore_null);
     }
 
     SystemWeightList ret;

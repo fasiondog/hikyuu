@@ -341,6 +341,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
         end = cross.size();
     }
 
+    ret.reserve(end - start);
     for (size_t i = start; i < end; i++) {
         ret.emplace_back(cross[i]);
     }
@@ -360,6 +361,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
         end = cross.size();
     }
 
+    ret.reserve(end - start);
     if (filter) {
         for (size_t i = start; i < end; i++) {
             if (filter(cross[i])) {
@@ -388,6 +390,7 @@ ScoreRecordList MultiFactorBase::getScores(
         end = cross.size();
     }
 
+    ret.reserve(end - start);
     if (filter) {
         for (size_t i = start; i < end; i++) {
             if (filter(date, cross[i])) {
@@ -398,6 +401,30 @@ ScoreRecordList MultiFactorBase::getScores(
         for (size_t i = start; i < end; i++) {
             ret.emplace_back(cross[i]);
         }
+    }
+
+    return ret;
+}
+
+ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, size_t end,
+                                           const ScoresFilterPtr& filter) {
+    ScoreRecordList ret;
+    HKU_IF_RETURN(start >= end, ret);
+
+    const auto& cross = getScores(date);
+    HKU_IF_RETURN(cross.empty(), ret);
+
+    if (end == Null<size_t>() || end > cross.size()) {
+        end = cross.size();
+    }
+
+    ret.reserve(end - start);
+    for (size_t i = start; i < end; i++) {
+        ret.emplace_back(cross[i]);
+    }
+
+    if (filter) {
+        ret = filter->filter(ret, date, m_query);
     }
 
     return ret;

@@ -14,7 +14,7 @@ namespace hku {
 class MultiFactorSelector2 : public SelectorBase {
 public:
     MultiFactorSelector2();
-    MultiFactorSelector2(const MFPtr& mf, int group, int group_index);
+    MultiFactorSelector2(const MFPtr& mf);
     virtual ~MultiFactorSelector2();
 
     virtual void _checkParam(const string& name) const override;
@@ -28,10 +28,6 @@ public:
         HKU_ASSERT(!inds.empty());
         m_inds = inds;
     }
-
-private:
-    ScoreRecordList filterByGroup(Datetime date, const ScoreRecordList& raw_scores, size_t group,
-                                  size_t group_index, bool only_should_buy);
 
 private:
     IndicatorList m_inds;

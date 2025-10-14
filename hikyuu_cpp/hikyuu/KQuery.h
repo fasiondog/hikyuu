@@ -157,7 +157,7 @@ public:
 
     /** 获取K线数据类型 */
     // KType kType() const { return m_dataType; }
-    string kType() const {
+    const string& kType() const {
         return m_dataType;
     }
 

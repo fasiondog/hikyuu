@@ -13,9 +13,12 @@
 #include "../../KData.h"
 #include "../../utilities/Parameter.h"
 #include "hikyuu/trade_sys/allocatefunds/AllocateFundsBase.h"
+#include "hikyuu/trade_sys/multifactor/ScoresFilterBase.h"
 #include "SystemWeight.h"
 
 namespace hku {
+
+class HKU_API Portfolio;
 
 /**
  * 交易对象选择模块
@@ -43,6 +46,15 @@ public:
 
     /** 设置算法名称 */
     void name(const string& name);
+
+    using PFPtr = shared_ptr<Portfolio>;
+    PFPtr getPF() const {
+        return m_pf.lock();
+    }
+
+    void setPF(const PFPtr& pf) {
+        m_pf = pf;
+    }
 
     /**
      * 添加备选股票及其交易策略原型
@@ -132,6 +144,12 @@ public:
 
     virtual string str() const;
 
+    /** 设置截面评分记录过滤，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤 */
+    void setScoresFilter(const ScoresFilterPtr& filter);
+
+    /** 在已有过滤基础上追加过滤，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤 */
+    void addScoresFilter(const ScoresFilterPtr& filter);
+
 protected:
     virtual bool isPythonObject() const {
         return false;
@@ -139,6 +157,9 @@ protected:
 
 private:
     void initParam();
+
+protected:
+    ScoresFilterPtr m_sc_filter;
 
 protected:
     string m_name;
@@ -149,6 +170,8 @@ protected:
 
     SystemList m_pro_sys_list;   // 原型系统列表
     SystemList m_real_sys_list;  // PF组合中实际运行的系统，有PF执行时设定，顺序与原型列表一一对应
+
+    std::weak_ptr<Portfolio> m_pf;  // 仅存储不序列化，对 PF 的引用
 
 //============================================
 // 序列化支持
@@ -161,6 +184,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
+        ar& BOOST_SERIALIZATION_NVP(m_sc_filter);
     }
 
     template <class Archive>
@@ -168,6 +192,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
+        ar& BOOST_SERIALIZATION_NVP(m_sc_filter);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -236,6 +261,14 @@ inline const SystemList& SelectorBase::getRealSystemList() const {
 
 inline const SystemList& SelectorBase::getProtoSystemList() const {
     return m_pro_sys_list;
+}
+
+inline void SelectorBase::setScoresFilter(const ScoresFilterPtr& filter) {
+    m_sc_filter = filter;
+}
+
+inline void SelectorBase::addScoresFilter(const ScoresFilterPtr& filter) {
+    m_sc_filter = m_sc_filter | filter;
 }
 
 } /* namespace hku */

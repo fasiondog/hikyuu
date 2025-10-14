@@ -13,13 +13,13 @@ BOOST_CLASS_EXPORT(hku::NormQuantileUniform)
 
 namespace hku {
 
-NormQuantileUniform::NormQuantileUniform() : NormalizeBase("NORM_QUANTILE_UNIFORM") {
+NormQuantileUniform::NormQuantileUniform() : NormalizeBase("NORM_Quantile_Uniform") {
     setParam<double>("quantile_min", 0.01);
     setParam<double>("quantile_max", 0.99);
 }
 
 NormQuantileUniform::NormQuantileUniform(double quantile_min, double quantile_max)
-: NormalizeBase("NORM_QUANTILE_UNIFORM") {
+: NormalizeBase("NORM_Quantile_Uniform") {
     setParam<double>("quantile_min", quantile_min);
     setParam<double>("quantile_max", quantile_max);
 }
@@ -159,7 +159,7 @@ PriceList NormQuantileUniform::normalize(const PriceList &src) {
     return result;
 }
 
-NormPtr HKU_API NORM_QUANTILE_UNIFORM(double quantile_min, double quantile_max) {
+NormPtr HKU_API NORM_Quantile_Uniform(double quantile_min, double quantile_max) {
     return std::make_shared<NormQuantileUniform>(quantile_min, quantile_max);
 }
 

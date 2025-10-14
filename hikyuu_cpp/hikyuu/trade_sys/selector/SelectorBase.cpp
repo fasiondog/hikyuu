@@ -26,7 +26,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SelectorPtr& st) {
 
 string SelectorBase::str() const {
     std::ostringstream buf;
-    buf << "Selector(" << name() << ", " << getParameter() << ")";
+    buf << "Selector(" << name() << ", " << getParameter() << ", " << m_sc_filter << ")";
     return buf.str();
 }
 
@@ -94,6 +94,11 @@ SelectorPtr SelectorBase::clone() {
     for (const auto& sys : m_pro_sys_list) {
         p->m_pro_sys_list.emplace_back(sys->clone());
     }
+
+    p->m_sc_filter = m_sc_filter->clone();
+
+    p->m_pf = m_pf;  // 仅为PF的引用，不clone
+
     return p;
 }
 

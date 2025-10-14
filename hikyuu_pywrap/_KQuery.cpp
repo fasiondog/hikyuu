@@ -26,7 +26,8 @@ void export_KQuery(py::module& m) {
       .def_property_readonly("end_datetime", &KQuery::endDatetime,
                              "结束日期，当按索引查询方式创建时无效")
       .def_property_readonly("query_type", &KQuery::queryType, "查询方式")
-      .def_property_readonly("ktype", &KQuery::kType, "查询的K线类型")
+      .def_property_readonly("ktype", &KQuery::kType, py::return_value_policy::copy,
+                             "查询的K线类型")
       .def_property_readonly("recover_type", py::overload_cast<>(&KQuery::recoverType, py::const_),
                              "复权类别")
       .def("is_right_opening", &KQuery::isRightOpening, "判断是否为右开区间，即未指定结束时间")
