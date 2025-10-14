@@ -184,6 +184,11 @@ public:
     void setTO(const KData& kdata);
 
     /**
+     * 回测完成后，返回最后一天交易记录，以及需要延迟的买入和卖出延迟请求
+     */
+    json lastSuggestion() const;
+
+    /**
      * @brief 不指定stock的方式下run，需要事先通过setStock设定stock
      * @param query 查询条件
      * @param reset 执行前是否依据系统部件共享属性复位
@@ -267,11 +272,6 @@ public:
 
     // 处理延迟买入请求，仅供 PF 调用
     virtual TradeRecord pfProcessDelayBuyRequest(const Datetime& date);
-
-    /**
-     * 回测完成后以 JSON 格式获取最新的建议（即当前最后交易和需要延迟的交易）
-     */
-    json lastSuggestion() const;
 
 protected:
     virtual bool isPythonObject() const {

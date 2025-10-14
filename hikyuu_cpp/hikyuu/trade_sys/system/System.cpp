@@ -1460,16 +1460,20 @@ price_t System ::_getShortStoplossPrice(const KRecord& today, const KRecord& src
 
 json System::lastSuggestion() const {
     json result;
-    if (!m_calculated) {
-        HKU_WARN(htr("[{}] lastSuggestion() called before run()", name()));
-        result["stock"] = m_stock.market_code();
-        result["suggestion"] = nullptr;
+    json sys_json;
+    sys_json["name"] = name();
+    sys_json["stock"] = m_stock.isNull() ? nullptr : m_stock.market_code();
+
+    if (!m_tm) {
+        sys_json["suggestion"] = nullptr;
+        result["sys"] = sys_json;
         return result;
     }
 
     Datetime tm_lastdatetime = m_tm->lastDatetime();
     Datetime kdata_lastdatetime = m_kdata.empty() ? Null<Datetime>() : m_kdata.back().datetime;
 
+    json suggestion;
     if (tm_lastdatetime == kdata_lastdatetime) {
         auto tr_list = m_tm->getTradeList();
         json on_last_close = json::array();
@@ -1500,9 +1504,9 @@ json System::lastSuggestion() const {
                 on_last_close.push_back(rec);
             }
         }
-        result["last_trade_record"] = on_last_close;
+        suggestion["last_trade_record"] = on_last_close;
     } else {
-        result["last_trade_record"] = nullptr;
+        suggestion["last_trade_record"] = nullptr;
     }
 
     json delay_on_next_open = json::array();
@@ -1535,9 +1539,13 @@ json System::lastSuggestion() const {
     }
 
     if (!delay_on_next_open.empty()) {
-        result["delay_on_next_open"] = delay_on_next_open;
+        suggestion["delay_on_next_open"] = delay_on_next_open;
+    } else {
+        suggestion["delay_on_next_open"] = nullptr;
     }
 
+    sys_json["suggestion"] = suggestion;
+    result["sys"] = sys_json;
     return result;
 }
 

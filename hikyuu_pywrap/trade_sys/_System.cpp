@@ -188,15 +188,15 @@ void export_System(py::module& m) {
 
       .def("ready", &System::readyForRun)
 
-      .def("last_suggestion", [](const System& system) {
-          json j = system.lastSuggestion();
-          if (j.find("last_trade_record") == j.end() || j["last_trade_record"].is_null()) {
-              j["last_trade_record"] = nullptr;
-          }
-          std::string json_str = j.dump();
-          py::module json_module = py::module::import("json");
-          return json_module.attr("loads")(json_str);
-      }, "获取最后一次建议的参数")
+      .def(
+        "last_suggestion",
+        [](const System& system) {
+            json j = system.lastSuggestion();
+            std::string json_str = j.dump();
+            py::module json_module = py::module::import("json");
+            return json_module.attr("loads")(json_str);
+        },
+        "回测完成后，返回最后一天交易记录，以及需要延迟的买入和卖出延迟请求")
 
         DEF_PICKLE(System);
 
