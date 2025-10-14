@@ -95,7 +95,9 @@ SelectorPtr SelectorBase::clone() {
         p->m_pro_sys_list.emplace_back(sys->clone());
     }
 
-    p->m_sc_filter = m_sc_filter->clone();
+    if (m_sc_filter) {
+        p->m_sc_filter = m_sc_filter->clone();
+    }
 
     p->m_pf = m_pf;  // 仅为PF的引用，不clone
 
