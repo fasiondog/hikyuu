@@ -455,9 +455,32 @@ TradeRecord System::runMoment(const Datetime& datetime) {
     return _runMoment(today, src_today);
 }
 
+TradeRecord System::runMomentOnOpen(const Datetime& datetime) {
+    size_t pos = m_kdata.getPos(datetime);
+    HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
+
+    KRecord today = m_kdata.getKRecord(pos);
+    KRecord src_today = m_src_kdata.getKRecord(pos);
+    return _runMomentOnOpen(today, src_today);
+}
+
+TradeRecord System::runMomentOnClose(const Datetime& datetime) {
+    size_t pos = m_kdata.getPos(datetime);
+    HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
+
+    KRecord today = m_kdata.getKRecord(pos);
+    KRecord src_today = m_src_kdata.getKRecord(pos);
+    return _runMomentOnClose(today, src_today);
+}
+
 TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
-    bool trace = getParam<bool>("trace");
-    if (trace) {
+    TradeRecord tr_open = _runMomentOnOpen(today, src_today);
+    TradeRecord tr_close = _runMomentOnClose(today, src_today);
+    return tr_close.isNull() ? tr_open : tr_close;
+}
+
+TradeRecord System::_runMomentOnOpen(const KRecord& today, const KRecord& src_today) {
+    if (getParam<bool>("trace")) {
         HKU_INFO("{} ------------------------------------------------------", today.datetime);
         HKU_INFO(htr("[{}] cal today {}", name(), today));
         HKU_INFO_IF(m_kdata.getQuery().recoverType() != KQuery::NO_RECOVER,
@@ -478,11 +501,16 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
     // 处理当前已有的交易请求
     result = _processRequest(today, src_today);
+    return result;
+}
+
+TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_today) {
+    TradeRecord result;
 
     //----------------------------------------------------------
     // 处理市场环境策略
     //----------------------------------------------------------
-
+    bool trace = getParam<bool>("trace");
     bool current_ev_valid = _environmentIsValid(today.datetime);
 
     // 如果当前环境无效

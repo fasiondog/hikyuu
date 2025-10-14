@@ -105,6 +105,8 @@ public:
 
     virtual void _readyForRun() {}
     virtual void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
+    virtual void _runMomentOnOpen(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
+    virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
 
 private:
     void initParam();

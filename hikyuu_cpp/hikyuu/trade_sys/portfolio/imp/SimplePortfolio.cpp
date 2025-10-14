@@ -81,7 +81,8 @@ void SimplePortfolio::_readyForRun() {
     m_se->calculate(m_real_sys_list, m_query);
 }
 
-void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
+void SimplePortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nextCycle,
+                                       bool adjust) {
     //---------------------------------------------------
     // 检测运行系统中是否存在已退市的证券
     //---------------------------------------------------
@@ -191,7 +192,11 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     }
 
     traceMomentTMAfterRunAtOpen(date);
+}
 
+void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& nextCycle,
+                                        bool adjust) {
+    bool trace = getParam<bool>("trace");
     //---------------------------------------------------
     // 调仓日，进行资金分配调整
     //---------------------------------------------------
@@ -245,7 +250,7 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
         }
 
         // 资产分配算法调整各子系统资产分配，AF统一在收盘时进行调仓，返回的是收盘调仓失败时的系统（需要延迟到一下开盘时继续执行）
-        tmp_continue_adjust_sys_list =
+        auto tmp_continue_adjust_sys_list =
           m_af->adjustFunds(date, m_tmp_selected_list, m_running_sys_set);
 
         if (m_delay_adjust_sys_list.empty()) {
@@ -338,6 +343,11 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
                  htr("total assets"), funds.total_assets(), htr("cash"), funds.cash,
                  htr("market_value"), funds.market_value);
     }
+}
+
+void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
+    _runMomentOnOpen(date, nextCycle, adjust);
+    _runMomentOnClose(date, nextCycle, adjust);
 }
 
 PortfolioPtr HKU_API PF_Simple(const TMPtr& tm, const SEPtr& st, const AFPtr& af, int adjust_cycle,

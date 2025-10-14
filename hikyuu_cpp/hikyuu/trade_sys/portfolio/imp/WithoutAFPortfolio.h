@@ -25,6 +25,11 @@ public:
     WithoutAFPortfolio(const TradeManagerPtr& tm, const SelectorPtr& se);
     virtual ~WithoutAFPortfolio();
 
+    virtual void _runMomentOnOpen(const Datetime& date, const Datetime& nextCycle,
+                                  bool adjust) override;
+    virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle,
+                                   bool adjust) override;
+
 private:
     void initParam();
     void _runMomentWithoutAFNotForceSell(const Datetime& date, const Datetime& nextCycle,

@@ -88,10 +88,153 @@ void WithoutAFPortfolio::_readyForRun() {
 }
 
 void WithoutAFPortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
-    if (getParam<bool>("sell_at_not_selected")) {
-        _runMomentWithoutAFForceSell(date, nextCycle, adjust);
-    } else {
-        _runMomentWithoutAFNotForceSell(date, nextCycle, adjust);
+    _runMomentOnOpen(date, nextCycle, adjust);
+    _runMomentOnClose(date, nextCycle, adjust);
+    // if (getParam<bool>("sell_at_not_selected")) {
+    //     _runMomentWithoutAFForceSell(date, nextCycle, adjust);
+    // } else {
+    //     _runMomentWithoutAFNotForceSell(date, nextCycle, adjust);
+    // }
+}
+
+void WithoutAFPortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nextCycle,
+                                          bool adjust) {
+    // m_force_sell_sys_list 此处用于缓存本轮未选中但仍在运行中的系统
+    // 开盘时处理不在本轮选中系统但仍在持仓的系统，如果以没有持仓则清除
+    bool trace = getParam<bool>("trace");
+    for (auto iter = m_force_sell_sys_list.begin(); iter != m_force_sell_sys_list.end();) {
+        auto& sys = *iter;
+        auto stk = sys->getStock();
+        auto num = m_tm->getHoldNumber(date, stk);
+        if (iszero(num)) {
+            HKU_INFO_IF(trace, htr("[PF] removed system {}", sys->name()));
+            iter = m_force_sell_sys_list.erase(iter);
+        } else {
+            if (getParam<bool>("sell_at_not_selected")) {
+                auto tr = sys->sellForceOnOpen(date, num, PART_PORTFOLIO);
+                HKU_INFO_IF(trace && !tr.isNull(),
+                            htr("[PF] force sell not selected sys {}", sys->name()));
+            }
+            ++iter;
+        }
+    }
+
+    if (!adjust) {
+        // 先执行不在选中系统池中的系统，让其执行可能得卖出
+        // 注：如果某些多次买入的系统发出买入暂无法避免
+        if (getParam<bool>("sell_at_not_selected")) {
+            for (auto& sys : m_force_sell_sys_list) {
+                sys->runMomentOnOpen(date);
+            }
+        }
+
+        for (auto& sys : m_running_sys_list) {
+            sys->runMomentOnOpen(date);
+        }
+
+        return;
+    }
+}
+
+void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime& nextCycle,
+                                           bool adjust) {
+    bool trace = getParam<bool>("trace");
+    //---------------------------------------------------
+    // 非调仓日:
+    // 1. 先执行不在选中系统池中的系统，让其执行可能得卖出
+    // 2. 然后依次执行当前运行中的系统
+    //---------------------------------------------------
+    if (!adjust) {
+        // 先执行不在选中系统池中的系统，让其执行可能得卖出
+        // 注：如果某些多次买入的系统发出买入暂无法避免
+        if (getParam<bool>("sell_at_not_selected")) {
+            for (auto& sys : m_force_sell_sys_list) {
+                sys->runMomentOnClose(date);
+            }
+        }
+
+        for (auto& sys : m_running_sys_list) {
+            sys->runMomentOnClose(date);
+        }
+
+        return;
+    }
+
+    //---------------------------------------------------
+    // 调仓日，重新选择系统池
+    //---------------------------------------------------
+    bool trade_on_close = getParam<bool>("trade_on_close");
+    auto current_selected_list = m_se->getSelected(date);
+    HKU_INFO_IF(trace, "[PF] {}: {}", htr("current select system count"),
+                current_selected_list.size());
+
+    m_selected_list.clear();
+    for (auto& sw : current_selected_list) {
+        m_selected_list.push_back(m_se_sys_to_pf_sys_dict[sw.sys]);
+    }
+
+    // 从当前运行池中移除不在选中系统池中的系统
+    std::unordered_set<SYSPtr> tmp_selected_set;
+    for (auto& sys : m_selected_list) {
+        tmp_selected_set.insert(sys);
+    }
+
+    std::unordered_set<SYSPtr> will_remove_sys_list;
+    for (auto& sys : m_running_sys_set) {
+        if (tmp_selected_set.find(sys) == tmp_selected_set.end()) {
+            will_remove_sys_list.insert(sys);
+        }
+    }
+
+    for (auto& sys : will_remove_sys_list) {
+        HKU_INFO_IF(trace, htr("[PF] will remove system: {}", sys->name()));
+        m_running_sys_set.erase(sys);
+        m_running_sys_list.remove(sys);
+    }
+
+    // 移除的系统如果有持仓，则先执行一次让其卖出，将其加入m_force_sell_sys_list
+    if (!trade_on_close) {
+        for (auto& sys : will_remove_sys_list) {
+            auto stk = sys->getStock();
+            auto num = m_tm->getHoldNumber(date, stk);
+            if (!iszero(num)) {
+                sys->runMomentOnClose(date);
+            }
+            m_force_sell_sys_list.emplace_back(sys);
+        }
+    }
+
+    // 加入当前运行系统集合，并设置调仓周期
+    for (auto& sys : m_selected_list) {
+        m_running_sys_set.insert(sys);
+        m_running_sys_list.emplace_back(sys);
+        auto sg = sys->getSG();
+        sg->startCycle(date, nextCycle);
+    }
+
+    //----------------------------------------------------------------------------
+    // 依次执行运行中所有系统
+    //----------------------------------------------------------------------------
+    for (auto& sys : m_running_sys_list) {
+        sys->runMomentOnClose(date);
+    }
+
+    // 如果是收盘时执行模式，则将待移除系统中的持仓卖出
+    if (trade_on_close) {
+        for (auto& sys : will_remove_sys_list) {
+            auto stk = sys->getStock();
+            auto num = m_tm->getHoldNumber(date, stk);
+            if (!iszero(num)) {
+                if (getParam<bool>("sell_at_not_selected")) {
+                    auto _ = sys->sellForceOnClose(date, num, PART_PORTFOLIO);
+                } else {
+                    sys->runMomentOnClose(date);
+                }
+            }
+            if (sys->getTM()->have(stk)) {
+                m_force_sell_sys_list.emplace_back(sys);
+            }
+        }
     }
 }
 

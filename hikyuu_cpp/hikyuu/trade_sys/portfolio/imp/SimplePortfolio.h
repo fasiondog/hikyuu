@@ -28,6 +28,11 @@ public:
     SimplePortfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFPtr& af);
     virtual ~SimplePortfolio();
 
+    virtual void _runMomentOnOpen(const Datetime& date, const Datetime& nextCycle,
+                                  bool adjust) override;
+    virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle,
+                                   bool adjust) override;
+
 private:
     SystemList m_dlist_sys_list;               // 因证券退市，无法执行卖出的系统（资产全部损失）
     SystemWeightList m_delay_adjust_sys_list;  // 延迟调仓卖出的系统列表

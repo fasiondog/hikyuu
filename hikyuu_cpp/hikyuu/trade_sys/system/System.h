@@ -220,6 +220,9 @@ public:
      */
     virtual TradeRecord runMoment(const Datetime& datetime);
 
+    virtual TradeRecord runMomentOnOpen(const Datetime& datetime);
+    virtual TradeRecord runMomentOnClose(const Datetime& datetime);
+
     // 运行前准备工作, 失败将抛出异常
     virtual void readyForRun();
 
@@ -326,7 +329,9 @@ private:
 
     TradeRecord _processRequest(const KRecord& today, const KRecord& src_today);
 
-    TradeRecord _runMoment(const KRecord& record, const KRecord& src_record);
+    TradeRecord _runMoment(const KRecord& today, const KRecord& src_today);
+    TradeRecord _runMomentOnOpen(const KRecord& today, const KRecord& src_today);
+    TradeRecord _runMomentOnClose(const KRecord& today, const KRecord& src_today);
 
     // Portfolio | AllocateFunds 指示立即进行强制卖出，以便对 buy_delay 的系统进行资金调整
     TradeRecord _sellForce(const Datetime& date, double num, Part from, bool on_open);
