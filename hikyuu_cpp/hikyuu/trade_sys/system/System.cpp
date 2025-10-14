@@ -1458,6 +1458,97 @@ price_t System ::_getShortStoplossPrice(const KRecord& today, const KRecord& src
     return adjust >= 0.0 ? adjust : 0.0;
 }
 
+json System::lastSuggestion() const {
+    json result;
+    json sys_json;
+    sys_json["name"] = name();
+    sys_json["stock"] = m_stock.isNull() ? nullptr : m_stock.market_code();
+
+    if (!m_tm) {
+        sys_json["suggestion"] = nullptr;
+        result["sys"] = sys_json;
+        return result;
+    }
+
+    Datetime tm_lastdatetime = m_tm->lastDatetime();
+    Datetime kdata_lastdatetime = m_kdata.empty() ? Null<Datetime>() : m_kdata.back().datetime;
+
+    json suggestion;
+    if (tm_lastdatetime == kdata_lastdatetime) {
+        auto tr_list = m_tm->getTradeList();
+        json on_last_close = json::array();
+        for (const auto& record : tr_list) {
+            if (m_stock == record.stock && record.datetime == kdata_lastdatetime) {
+                json rec;
+                rec["stock"] = record.stock.market_code();
+                rec["datetime"] = record.datetime.str();
+                rec["business"] = getBusinessName(record.business);
+                rec["planPrice"] = record.planPrice;
+                rec["realPrice"] = record.realPrice;
+                rec["goalPrice"] = record.goalPrice;
+                rec["number"] = record.number;
+                rec["stoploss"] = record.stoploss;
+                rec["cash"] = record.cash;
+                rec["from"] = record.from;
+                rec["remark"] = record.remark;
+
+                // 添加cost字段
+                json cost;
+                cost["commission"] = record.cost.commission;
+                cost["stamptax"] = record.cost.stamptax;
+                cost["transferfee"] = record.cost.transferfee;
+                cost["others"] = record.cost.others;
+                cost["total"] = record.cost.total;
+                rec["cost"] = cost;
+
+                on_last_close.push_back(rec);
+            }
+        }
+        suggestion["last_trade_record"] = on_last_close;
+    } else {
+        suggestion["last_trade_record"] = nullptr;
+    }
+
+    json delay_on_next_open = json::array();
+    if (m_buyRequest.valid) {
+        json buy_request;
+        buy_request["stock"] = m_stock.market_code();
+        buy_request["business"] = getBusinessName(m_buyRequest.business);
+        buy_request["datetime"] = m_buyRequest.datetime.str();
+        buy_request["stoploss"] = m_buyRequest.stoploss;
+        buy_request["goal"] = m_buyRequest.goal;
+        buy_request["number"] = m_buyRequest.number;
+        buy_request["from"] = getSystemPartName(m_buyRequest.from);
+        buy_request["remark"] = m_buyRequest.remark;
+        buy_request["count"] = m_buyRequest.count;
+        delay_on_next_open.push_back(buy_request);
+    }
+
+    if (m_sellRequest.valid) {
+        json sell_request;
+        sell_request["stock"] = m_stock.market_code();
+        sell_request["business"] = getBusinessName(m_sellRequest.business);
+        sell_request["datetime"] = m_sellRequest.datetime.str();
+        sell_request["stoploss"] = m_sellRequest.stoploss;
+        sell_request["goal"] = m_sellRequest.goal;
+        sell_request["number"] = m_sellRequest.number;
+        sell_request["from"] = getSystemPartName(m_sellRequest.from);
+        sell_request["remark"] = m_sellRequest.remark;
+        sell_request["count"] = m_sellRequest.count;
+        delay_on_next_open.push_back(sell_request);
+    }
+
+    if (!delay_on_next_open.empty()) {
+        suggestion["delay_on_next_open"] = delay_on_next_open;
+    } else {
+        suggestion["delay_on_next_open"] = nullptr;
+    }
+
+    sys_json["suggestion"] = suggestion;
+    result["sys"] = sys_json;
+    return result;
+}
+
 void HKU_API parallel_run_sys(const SystemList& system_list, const KQuery& query, bool reset,
                               bool resetAll) {
     parallel_for_index_void(0, system_list.size(), [&](size_t i) {

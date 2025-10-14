@@ -9,6 +9,7 @@
 #ifndef SYSTEMBASE_H_
 #define SYSTEMBASE_H_
 
+#include <nlohmann/json.hpp>
 // #include "../../KData.h"
 // #include "../../utilities/Parameter.h"
 // #include "../../trade_manage/TradeManager.h"
@@ -24,6 +25,8 @@
 #include "../../serialization/KData_serialization.h"
 
 namespace hku {
+
+using json = nlohmann::json;
 
 class HKU_API Portfolio;
 class HKU_API AllocateFundsBase;
@@ -179,6 +182,11 @@ public:
      * @note 其中tm, ev没有setTO接口
      */
     void setTO(const KData& kdata);
+
+    /**
+     * 回测完成后，返回最后一天交易记录，以及需要延迟的买入和卖出延迟请求
+     */
+    json lastSuggestion() const;
 
     /**
      * @brief 不指定stock的方式下run，需要事先通过setStock设定stock

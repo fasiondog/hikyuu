@@ -10,7 +10,7 @@ target("core")
     -- end
 
     add_deps("hikyuu")
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "utf8proc")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "utf8proc", "nlohmann_json")
     if has_config("arrow") then
         add_packages("arrow")
     end

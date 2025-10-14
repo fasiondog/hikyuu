@@ -188,6 +188,16 @@ void export_System(py::module& m) {
 
       .def("ready", &System::readyForRun)
 
+      .def(
+        "last_suggestion",
+        [](const System& system) {
+            json j = system.lastSuggestion();
+            std::string json_str = j.dump();
+            py::module json_module = py::module::import("json");
+            return json_module.attr("loads")(json_str);
+        },
+        "回测完成后，返回最后一天交易记录，以及需要延迟的买入和卖出延迟请求")
+
         DEF_PICKLE(System);
 
     m.def("parallel_run_sys", &parallel_run_sys, py::arg("sys_list"), py::arg("query"),
