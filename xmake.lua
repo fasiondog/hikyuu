@@ -174,10 +174,14 @@ add_requires("nlohmann_json", {system = false})
 add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc", {system = false})
-if get_config("leak_check") and get_config("arrow") then
-    add_requires("arrow", {system = false, configs = {shared = true}})
-else
-    add_requires("arrow", {system = false})
+
+local arrow_config = {system = false, configs = {shared = false, parquet=true, shared_dep = false, brotli=true, zstd=true, bzip2=true, snappy=true, lz4=true, zlib=true}}
+if get_config("arrow")  then
+    if is_plat("windows") then
+        add_requires("arrow", {system = false})
+    else
+        add_requires("arrow", arrow_config)
+    end
 end
 
 if has_config("http_client_zip") then
