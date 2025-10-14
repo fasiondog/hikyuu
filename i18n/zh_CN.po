@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-09-10 00:30+0800\n"
-"PO-Revision-Date: 2025-09-10 00:30+0800\n"
+"POT-Creation-Date: 2025-10-14 21:24+0800\n"
+"PO-Revision-Date: 2025-10-14 21:25+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -18,6 +18,10 @@ msgstr ""
 "X-Poedit-SearchPath-0: hikyuu_cpp/hikyuu\n"
 "X-Poedit-SearchPath-1: hikyuu_pywrap\n"
 "X-Poedit-SearchPathExcluded-0: hikyuu_cpp/hikyuu/utilities\n"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:134
+msgid "Can not get clickhouse driver! Check your license!"
+msgstr "获取 clickhouse 驱动失败！ 请检查你的授权许可!"
 
 #: hikyuu_cpp/hikyuu/StockManager.cpp:182
 msgid "Loading block..."
@@ -37,23 +41,23 @@ msgstr "{:<.2f} 秒数据加载完毕."
 msgid "Preloading {} kdata to buffer (max: {})!"
 msgstr "预加载 {} K线数据至缓存 (最大数量: {})!"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:447
+#: hikyuu_cpp/hikyuu/StockManager.cpp:545
 msgid "Not found market info"
 msgstr "找不到指定的市场信息"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:500
+#: hikyuu_cpp/hikyuu/StockManager.cpp:598
 msgid "Loading stock information..."
 msgstr "加载证券信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:602
+#: hikyuu_cpp/hikyuu/StockManager.cpp:700
 msgid "Loading market information..."
 msgstr "加载市场信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:620
+#: hikyuu_cpp/hikyuu/StockManager.cpp:718
 msgid "Loading stock type information..."
 msgstr "加载证券类型信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:638
+#: hikyuu_cpp/hikyuu/StockManager.cpp:736
 msgid "Loading stock weight..."
 msgstr "加载权息数据……"
 
