@@ -20,6 +20,9 @@ public:
 
     void run(const Stock& stock);
 
+    void runMomentOnOpen(const Stock& stock);
+    void runMomentOnClose(const Stock& stock);
+
 private:
     SYSPtr m_sys;
     OrderBrokerPtr m_broker;

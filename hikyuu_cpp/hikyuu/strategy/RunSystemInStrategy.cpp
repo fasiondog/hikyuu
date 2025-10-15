@@ -27,6 +27,7 @@ RunSystemInStrategy::RunSystemInStrategy(const SYSPtr& sys, const OrderBrokerPtr
     auto tm = crtBrokerTM(broker, costfunc, sys->name());
     m_sys->setTM(tm);
     m_sys->setSP(SlippagePtr());  // 清除移滑价差算法
+    m_sys->readyForRun();
 }
 
 void RunSystemInStrategy::run(const Stock& stock) {
@@ -58,6 +59,20 @@ void RunSystemInStrategy::run(const Stock& stock) {
     if (m_sys->getParam<bool>("sell_delay")) {
         m_sellRequest = m_sys->getSellTradeRequest();
     }
+}
+
+void RunSystemInStrategy::runMomentOnOpen(const Stock& stock) {
+    auto k = stock.getKData(m_query);
+    m_sys->setTO(k);
+    m_sys->getTM()->fetchAssetInfoFromBroker(m_broker);
+    m_sys->runMomentOnOpen(k.back().datetime);
+}
+
+void RunSystemInStrategy::runMomentOnClose(const Stock& stock) {
+    auto k = stock.getKData(m_query);
+    m_sys->setTO(k);
+    m_sys->getTM()->fetchAssetInfoFromBroker(m_broker);
+    m_sys->runMomentOnClose(k.back().datetime);
 }
 
 StrategyPtr HKU_API crtSysStrategy(const SYSPtr& sys, const string& stk_market_code,
