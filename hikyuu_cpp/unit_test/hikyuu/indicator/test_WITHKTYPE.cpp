@@ -16,7 +16,7 @@
 #include <hikyuu/indicator/crt/ALIGN.h>
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/device.h>
-#include "plugin_valid.h"
+#include "../plugin_valid.h"
 
 using namespace hku;
 

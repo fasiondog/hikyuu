@@ -5,8 +5,8 @@
  *      Author: fasiondog
  */
 
-#include <ta-lib/ta_func.h>
 #include "TaUltosc.h"
+#include <ta-lib/ta_func.h>
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaUltosc)

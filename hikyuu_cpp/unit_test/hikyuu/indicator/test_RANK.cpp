@@ -14,7 +14,7 @@
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/device.h>
-#include "plugin_valid.h"
+#include "../plugin_valid.h"
 
 using namespace hku;
 

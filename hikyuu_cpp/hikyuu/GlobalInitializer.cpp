@@ -20,10 +20,6 @@
 #include <H5public.h>
 #endif
 
-#if HKU_ENABLE_TA_LIB
-#include <ta-lib/ta_libc.h>
-#endif
-
 #include "utilities/Log.h"
 #include "utilities/os.h"
 #include "hikyuu.h"
@@ -34,6 +30,10 @@
 #include "indicator/IndicatorImp.h"
 #include "global/sysinfo.h"
 #include "debug.h"
+
+#if HKU_ENABLE_TA_LIB
+#include <ta-lib/ta_libc.h>
+#endif
 
 namespace hku {
 

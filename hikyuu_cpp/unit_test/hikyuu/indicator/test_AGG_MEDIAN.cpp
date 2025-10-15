@@ -11,7 +11,7 @@
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/extind.h>
 #include <hikyuu/plugin/device.h>
-#include "plugin_valid.h"
+#include "../plugin_valid.h"
 
 using namespace hku;
 

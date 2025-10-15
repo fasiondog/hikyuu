@@ -42,6 +42,10 @@
 #include "utilities/config.h"
 #include "lang.h"
 
+#if HKU_OS_OSX
+#include <MacTypes.h>
+#endif
+
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/split_free.hpp>
