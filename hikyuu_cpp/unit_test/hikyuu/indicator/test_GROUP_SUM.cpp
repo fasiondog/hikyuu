@@ -39,9 +39,9 @@ TEST_CASE("test_GROUP_SUM") {
     CHECK_EQ(result.name(), "GROUP_SUM");
     CHECK_EQ(result.size(), mink.size());
     CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result[0], mink[0].closePrice);
+    CHECK_EQ(result[0], doctest::Approx(mink[0].closePrice));
     CHECK_EQ(result[1], doctest::Approx(mink[0].closePrice + mink[1].closePrice));
-    CHECK_EQ(result[720], mink[720].closePrice);
+    CHECK_EQ(result[720], doctest::Approx(mink[720].closePrice));
     CHECK_EQ(result[721], doctest::Approx(mink[720].closePrice + mink[721].closePrice));
 }
 

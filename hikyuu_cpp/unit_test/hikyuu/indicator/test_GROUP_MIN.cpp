@@ -39,11 +39,11 @@ TEST_CASE("test_GROUP_MIN") {
     CHECK_EQ(result.name(), "GROUP_MIN");
     CHECK_EQ(result.size(), mink.size());
     CHECK_EQ(result.discard(), 0);
-    CHECK_EQ(result[0], mink[0].closePrice);
+    CHECK_EQ(result[0], doctest::Approx(mink[0].closePrice));
     REQUIRE(result[1] < mink[1].closePrice);
-    CHECK_EQ(result[1], mink[0].closePrice);
+    CHECK_EQ(result[1], doctest::Approx(mink[0].closePrice));
     REQUIRE(result[2] < mink[2].closePrice);
-    CHECK_EQ(result[2], mink[0].closePrice);
+    CHECK_EQ(result[2], doctest::Approx(mink[0].closePrice));
 }
 
 /** @} */
