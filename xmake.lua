@@ -175,7 +175,7 @@ add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc", {system = false})
 
-local arrow_config = {system = false, configs = {shared = false, shared_dep = false, brotli=true, zstd=true, bzip2=true, snappy=true, lz4=true, zlib=true}}
+local arrow_config = {system = false, configs = {shared = false, json=true, shared_dep = false, brotli=true, zstd=true, bzip2=true, snappy=true, lz4=true, zlib=true}}
 if get_config("arrow")  then
     if is_plat("windows") then
         add_requires("arrow", {system = false})
