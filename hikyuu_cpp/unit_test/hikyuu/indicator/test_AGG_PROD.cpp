@@ -11,6 +11,7 @@
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/extind.h>
 #include <hikyuu/plugin/device.h>
+#include "plugin_valid.h"
 
 using namespace hku;
 
@@ -22,12 +23,6 @@ using namespace hku;
 
 // 低精度模式下, float 会溢出
 #if !HKU_USE_LOW_PRECISION
-
-static bool pluginValid() {
-    auto& sm = StockManager::instance();
-    auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
-    return plugin && isValidLicense();
-}
 
 /** @par 检测点 */
 TEST_CASE("test_AGG_PROD") {

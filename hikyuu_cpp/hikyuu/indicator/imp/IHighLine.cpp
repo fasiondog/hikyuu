@@ -102,7 +102,7 @@ void IHighLine::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t st
     _set(max_val, curPos);
 }
 
-Indicator HKU_API HHV(int n = 20) {
+Indicator HKU_API HHV(int n) {
     IndicatorImpPtr p = make_shared<IHighLine>();
     p->setParam<int>("n", n);
     return Indicator(p);

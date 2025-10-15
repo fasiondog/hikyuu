@@ -14,9 +14,9 @@
 namespace hku {
 
 #define IS_ALPHA(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
-#define IS_NUM(c) ((c) >= '0' && (c) <= '9')
-#define IS_ALPHANUM(c) (IS_ALPHA(c) || IS_NUM(c))
-#define IS_HEX(c) (IS_NUM(c) || ((c) >= 'a' && (c) <= 'f') || ((c) >= 'A' && (c) <= 'F'))
+#define IS_NUMBER(c) ((c) >= '0' && (c) <= '9')
+#define IS_ALPHANUM(c) (IS_ALPHA(c) || IS_NUMBER(c))
+#define IS_HEX(c) (IS_NUMBER(c) || ((c) >= 'a' && (c) <= 'f') || ((c) >= 'A' && (c) <= 'F'))
 
 static inline bool is_unambiguous(char c) {
     return IS_ALPHANUM(c) || c == '-' || c == '_' || c == '.' || c == '~';

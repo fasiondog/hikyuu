@@ -16,14 +16,9 @@
 #include <hikyuu/indicator/crt/ALIGN.h>
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/device.h>
+#include "plugin_valid.h"
 
 using namespace hku;
-
-static bool pluginValid() {
-    auto& sm = StockManager::instance();
-    auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
-    return plugin && isValidLicense();
-}
 
 /**
  * @defgroup test_indicator_WITHKTYPE test_indicator_WITHKTYPE

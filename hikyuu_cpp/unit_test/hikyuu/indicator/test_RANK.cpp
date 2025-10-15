@@ -14,14 +14,9 @@
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/device.h>
+#include "plugin_valid.h"
 
 using namespace hku;
-
-static bool pluginValid() {
-    auto& sm = StockManager::instance();
-    auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
-    return plugin && isValidLicense();
-}
 
 /**
  * @defgroup test_indicator_RANK test_indicator_RANK

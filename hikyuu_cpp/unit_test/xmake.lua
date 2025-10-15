@@ -98,11 +98,31 @@ target("unit-test")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
 
-    -- add files
+    -- set_policy("build.optimization.lto", true)
+    add_rules("c++.unity_build", {batchsize = 0})
     add_files("./hikyuu/**.cpp|real_data/**|indicator_talib/**.cpp")
     
+    add_files("./hikyuu/analysis/**.cpp", {unity_group="analysis"})
+    add_files("./hikyuu/hikyuu/**.cpp", {unity_group="hikyuu"})
+    add_files("./hikyuu/indicator/**.cpp", {unity_group="indicator"})
+    add_files("./hikyuu/serialization/**.cpp", {unity_group="serialization"})
+    add_files("./hikyuu/trade_manage/**.cpp", {unity_group="trade_manage"})
+    add_files("./hikyuu/trade_sys/allocatefunds/**.cpp", {unity_group="allocatefunds"})
+    add_files("./hikyuu/trade_sys/condition/**.cpp", {unity_group="condition"})
+    add_files("./hikyuu/trade_sys/environment/**.cpp", {unity_group="environment"})
+    add_files("./hikyuu/trade_sys/moneymanager/**.cpp", {unity_group="moneymanager"})
+    add_files("./hikyuu/trade_sys/multifactor/**.cpp", {unity_group="multifactor"})
+    add_files("./hikyuu/trade_sys/portfolio/**.cpp", {unity_group="portfolio"})
+    add_files("./hikyuu/trade_sys/profitgoal/**.cpp", {unity_group="profitgoal"})
+    add_files("./hikyuu/trade_sys/selector/**.cpp", {unity_group="selector"})
+    add_files("./hikyuu/trade_sys/signal/**.cpp", {unity_group="signal"})
+    add_files("./hikyuu/trade_sys/slippage/**.cpp", {unity_group="slippage"})
+    add_files("./hikyuu/trade_sys/stoploss/**.cpp", {unity_group="stoploss"})
+    add_files("./hikyuu/trade_sys/system/**.cpp", {unity_group="system"})
+    add_files("./hikyuu/utilities/**.cpp", {unity_group="utilities"})
+
     if has_config("ta_lib") then
-        add_files("hikyuu/indicator_talib/**.cpp")
+        add_files("hikyuu/indicator_talib/**.cpp", {unity_group="talib"})
     end
 
     before_run(prepare_run)

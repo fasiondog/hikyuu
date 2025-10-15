@@ -102,7 +102,7 @@ void ILowLine::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t ste
     _set(min_val, curPos);
 }
 
-Indicator HKU_API LLV(int n = 20) {
+Indicator HKU_API LLV(int n) {
     IndicatorImpPtr p = make_shared<ILowLine>();
     p->setParam<int>("n", n);
     return Indicator(p);

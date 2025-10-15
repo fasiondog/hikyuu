@@ -12,8 +12,8 @@
 namespace hku {
 
 class MulValueSignal : public OperatorValueSignal {
-    OPERATOR_SIGNAL_IMP(MulValueSignal, "SG_MulValue")
-    OPERATOR_SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
+    OPERATOR_VALUE_SIGNAL_IMP(MulValueSignal, "SG_MulValue")
+    OPERATOR_VALUE_SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
 };
 
 } /* namespace hku */

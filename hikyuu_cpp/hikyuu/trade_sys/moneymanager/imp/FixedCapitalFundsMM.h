@@ -6,8 +6,6 @@
  */
 
 #pragma once
-#ifndef TRADE_SYS_MONEYMANAGER_IMP_FIXEDCAPITAL_FUNDS_MM_H_
-#define TRADE_SYS_MONEYMANAGER_IMP_FIXEDCAPITAL_FUNDS_MM_H_
 
 #include "../MoneyManagerBase.h"
 
@@ -24,5 +22,3 @@ public:
 };
 
 } /* namespace hku */
-
-#endif /* TRADE_SYS_MONEYMANAGER_IMP_FIXEDCAPITAL_FUNDS_MM_H_ */
