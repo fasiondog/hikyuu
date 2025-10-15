@@ -19,9 +19,9 @@ namespace hku {
  * @param delay_to_trading_day 延迟至交易日，当调仓日为非交易日时，自动延迟至下一个交易日作为调仓日
  * @ingroup Indicator
  */
-Indicator CYCLE(const KData& k, int adjust_cycle = 1, const string& adjust_mode = "query",
-                bool delay_to_trading_day = true);
-Indicator CYCLE(int adjust_cycle = 1, const string& adjust_mode = "query",
-                bool delay_to_trading_day = true);
+Indicator HKU_API CYCLE(const KData& k, int adjust_cycle = 1, const string& adjust_mode = "query",
+                        bool delay_to_trading_day = true);
+Indicator HKU_API CYCLE(int adjust_cycle = 1, const string& adjust_mode = "query",
+                        bool delay_to_trading_day = true);
 
 }  // namespace hku

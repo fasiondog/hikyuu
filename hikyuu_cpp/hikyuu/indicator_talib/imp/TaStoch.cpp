@@ -5,8 +5,8 @@
  *      Author: fasiondog
  */
 
-#include <ta-lib/ta_func.h>
 #include "TaStoch.h"
+#include <ta-lib/ta_func.h>
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaStoch)

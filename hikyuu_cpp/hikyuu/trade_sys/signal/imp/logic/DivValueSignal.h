@@ -12,8 +12,8 @@
 namespace hku {
 
 class DivValueSignal : public OperatorValueSignal {
-    OPERATOR_SIGNAL_IMP(DivValueSignal, "SG_DivValue")
-    OPERATOR_SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
+    OPERATOR_VALUE_SIGNAL_IMP(DivValueSignal, "SG_DivValue")
+    OPERATOR_VALUE_SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     DivValueSignal(double value, const SignalPtr& sg);

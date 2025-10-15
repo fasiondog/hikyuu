@@ -12,8 +12,8 @@
 namespace hku {
 
 class AddValueSignal : public OperatorValueSignal {
-    OPERATOR_SIGNAL_IMP(AddValueSignal, "SG_AddValue")
-    OPERATOR_SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
+    OPERATOR_VALUE_SIGNAL_IMP(AddValueSignal, "SG_AddValue")
+    OPERATOR_VALUE_SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
 };
 
 } /* namespace hku */

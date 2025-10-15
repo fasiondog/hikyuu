@@ -10,12 +10,7 @@
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Optimal.h>
 #include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
-#include <hikyuu/indicator/crt/MA.h>
-#include <hikyuu/indicator/crt/KDATA.h>
-#include <hikyuu/indicator/crt/NOT.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
-#include <hikyuu/trade_sys/signal/crt/SG_Bool.h>
-#include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
+#include "../system/create_test_sys.h"
 
 using namespace hku;
 
@@ -24,15 +19,6 @@ using namespace hku;
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */
-
-static SYSPtr create_test_sys(int fast_n, int slow_n) {
-    auto ind = MA(CLOSE(), fast_n) > MA(CLOSE(), slow_n);
-    auto sg = SG_Bool(ind, NOT(ind));
-    auto tm = crtTM();
-    auto sys = SYS_Simple(tm, MM_Nothing(), EnvironmentPtr(), ConditionPtr(), sg);
-    sys->name(fmt::format("test_sys_{}_{}", fast_n, slow_n));
-    return sys;
-}
 
 /** @par 检测点 */
 TEST_CASE("test_SE_MaxFundsOptimal") {

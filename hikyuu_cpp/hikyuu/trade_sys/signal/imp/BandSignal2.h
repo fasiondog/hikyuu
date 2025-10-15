@@ -6,8 +6,6 @@
  */
 
 #pragma once
-#ifndef TRADE_SYS_SIGNAL_IMP_BANDSIGNAL_H_
-#define TRADE_SYS_SIGNAL_IMP_BANDSIGNAL_H_
 
 #include "../../../indicator/Indicator.h"
 #include "../SignalBase.h"
@@ -43,5 +41,3 @@ private:
 #endif
 };
 }  // namespace hku
-
-#endif

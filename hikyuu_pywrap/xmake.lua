@@ -16,6 +16,7 @@ target("core")
     end
     if is_plat("windows") then
         set_filename("core.pyd")
+        add_cxflags("/bigobj")
         add_cxflags("-wd4251")
     else 
         set_filename("core.so")
@@ -45,10 +46,23 @@ target("core")
     end    
 
     add_includedirs("../hikyuu_cpp")
+
+    -- set_policy("build.optimization.lto", true)
+    add_rules("c++.unity_build", {batchsize = 0})
     add_files("./**.cpp|views/**.cpp")
 
+    add_files("./*.cpp", {unity_group="base"})
+    add_files("./analysis/**.cpp", {unity_group="analysis"})
+    add_files("./data_driver/**.cpp", {unity_group="data_driver"})
+    add_files("./global/**.cpp", {unity_group="global"})
+    add_files("./indicator/**.cpp", {unity_group="indicator"})
+    add_files("./plugin/**.cpp", {unity_group="plugin"})
+    add_files("./strategy/**.cpp", {unity_group="strategy"})
+    add_files("./trade_manage/**.cpp", {unity_group="trade_manage"})
+    add_files("./trade_sys/**.cpp", {unity_group="trade_sys"})
+
     if has_config("arrow") then
-        add_files("./views/**.cpp")
+        add_files("./views/**.cpp", {unity_group="views"})
     end
 
     on_load("windows", "linux", "macosx", function(target)

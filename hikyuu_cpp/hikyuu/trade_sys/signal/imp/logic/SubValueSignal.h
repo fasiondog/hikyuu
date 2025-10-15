@@ -12,8 +12,8 @@
 namespace hku {
 
 class SubValueSignal : public OperatorValueSignal {
-    OPERATOR_SIGNAL_IMP(SubValueSignal, "SG_AddValue")
-    OPERATOR_SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
+    OPERATOR_VALUE_SIGNAL_IMP(SubValueSignal, "SG_AddValue")
+    OPERATOR_VALUE_SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     SubValueSignal(double value, const SignalPtr& sg);

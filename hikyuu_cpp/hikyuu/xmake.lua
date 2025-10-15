@@ -76,46 +76,80 @@ target("hikyuu")
     end
 
     if is_plat("macosx") then
+        add_cxflags("-D__LP64__")
         add_links("iconv", "sqlite3")
         add_frameworks("CoreFoundation")
     end
 
     add_headerfiles("../(hikyuu/**.h)|**doc.h")
 
-    -- add files
-    -- add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp")
+    -- set_policy("build.optimization.lto", true)
+    add_rules("c++.unity_build", {batchsize = 2})
     add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|indicator_talib/**.cpp|views/**.cpp")
-    add_files("./data_driver/*.cpp")
+   
+    add_files("./*.cpp", {unity_group="base"})
+    add_files("./indicator/**.cpp", {unity_group="indicator"})
+
+    add_files("./analysis/**.cpp", {unity_group="analysis"})
+    add_files("./global/**.cpp", {unity_group="global"})
+    add_files("./plugin/**.cpp", {unity_group="plugin"})
+    add_files("./strategy/**.cpp", {unity_group="strategy"})
+    add_files("./trade_manage/**.cpp", {unity_group="trade_manage"})
+    
+    add_files("./trade_sys/**.cpp|allocatefunds/**.cpp|condition/**.cpp|system/**.cpp")
+    add_files("./trade_sys/allocatefunds/**.cpp", {unity_group="allocatefunds"})
+    add_files("./trade_sys/condition/*.cpp", "./trade_sys/condition/imp/logic/*.cpp", {unity_group="condition"})
+    add_files("./trade_sys/condition/imp/*.cpp", {unity_group="condition_imp"})
+    add_files("./trade_sys/environment/*.cpp", "./trade_sys/environment/imp/logic/*.cpp", {unity_group="environment"})
+    add_files("./trade_sys/environment/imp/*.cpp", {unity_group="environment_imp"})
+    add_files("./trade_sys/system/**.cpp", {unity_group="system"})
+    add_files("./trade_sys/moneymanager/**.cpp", {unity_group="moneymanager"})
+    add_files("./trade_sys/multifactor/*.cpp", "./trade_sys/multifactor/imp/*.cpp", {unity_group="multifactor"})
+    add_files("./trade_sys/multifactor/filter/*.cpp", {unity_group="multifactor_filter"})
+    add_files("./trade_sys/multifactor/normalize/*.cpp", {unity_group="multifactor_norm"})
+    add_files("./trade_sys/portfolio/**.cpp", {unity_group="portfolio"})
+    add_files("./trade_sys/profitgoal/**.cpp", {unity_group="profitgoal"})
+    add_files("./trade_sys/selector/*.cpp", "./trade_sys/selector/imp/logic/*.cpp", {unity_group="selector"})
+    add_files("./trade_sys/selector/imp/*.cpp", {unity_group="selector_imp"})
+    add_files("./trade_sys/selector/imp/optimal/*.cpp", {unity_group="selector_optimal"})
+    add_files("./trade_sys/signal/*.cpp", "./trade_sys/signal/crt/*.cpp", "./trade_sys/signal/imp/logic/*.cpp", {unity_group="signal"})
+    add_files("./trade_sys/signal/imp/*.cpp", {unity_group="signal_imp"})
+    add_files("./trade_sys/slippage/**.cpp", {unity_group="slippage"})
+    add_files("./trade_sys/stoploss/**.cpp", {unity_group="stoploss"})
+    add_files("./trade_sys/system/**.cpp", {unity_group="system"})
+
+    add_files("./utilities/**.cpp|utilities/db_connect/**.cpp", {unity_group="utilities"})
+    add_files("./data_driver/*.cpp", {unity_group="data_driver"})
     if get_config("hdf5") or get_config("sqlite") then
-        add_files("./data_driver/base_info/sqlite/**.cpp")
-        add_files("./data_driver/block_info/sqlite/**.cpp")
+        add_files("./data_driver/base_info/sqlite/**.cpp", {unity_group="sqlite"})
+        add_files("./data_driver/block_info/sqlite/**.cpp", {unity_group="sqlite"})
     end
     if get_config("mysql") then
-        add_files("./data_driver/base_info/mysql/**.cpp")
-        add_files("./data_driver/block_info/mysql/**.cpp")
+        add_files("./data_driver/base_info/mysql/**.cpp", {unity_group="mysql"})
+        add_files("./data_driver/block_info/mysql/**.cpp", {unity_group="mysql"})
     end
-    add_files("./data_driver/block_info/qianlong/**.cpp")
-    add_files("./data_driver/kdata/cvs/**.cpp")
+    add_files("./data_driver/block_info/qianlong/**.cpp", {unity_group="qianlong"})
+    add_files("./data_driver/kdata/cvs/**.cpp", {unity_group="csv_driver"})
     if get_config("sqlite") or get_config("hdf5") then
-        add_files("./data_driver/kdata/sqlite/**.cpp")
+        add_files("./data_driver/kdata/sqlite/**.cpp", {unity_group="sqlite"})
     end
     if get_config("hdf5") then
-        add_files("./data_driver/kdata/hdf5/**.cpp")
+        add_files("./data_driver/kdata/hdf5/**.cpp", {unity_group="hdf5"})
     end
     if get_config("mysql") then
-        add_files("./data_driver/kdata/mysql/**.cpp")
+        add_files("./data_driver/kdata/mysql/**.cpp", {unity_group="mysql"})
     end
     if get_config("tdx") then
-        add_files("./data_driver/kdata/tdx/**.cpp")
+        add_files("./data_driver/kdata/tdx/**.cpp", {unity_group="tdx"})
     end
     if get_config("mysql") then
-        add_files("./utilities/db_connect/mysql/**.cpp")
+        add_files("./utilities/db_connect/mysql/**.cpp", {unity_group="mysql"})
     end
     if has_config("ta_lib") then
-        add_files("./indicator_talib/**.cpp")
+        add_files("./indicator_talib/**.cpp", {unity_group="talib"})
     end
     if has_config("arrow") then
-        add_files("./views/**.cpp")
+        add_files("./views/**.cpp", {unity_group="views"})
     end
 
     after_build(function(target)

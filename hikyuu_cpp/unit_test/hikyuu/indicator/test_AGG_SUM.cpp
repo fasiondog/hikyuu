@@ -11,14 +11,9 @@
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/extind.h>
 #include <hikyuu/plugin/device.h>
+#include "../plugin_valid.h"
 
 using namespace hku;
-
-static bool pluginValid() {
-    auto& sm = StockManager::instance();
-    auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
-    return plugin && isValidLicense();
-}
 
 /**
  * @defgroup test_indicator_AGG_SUM test_indicator_AGG_SUM

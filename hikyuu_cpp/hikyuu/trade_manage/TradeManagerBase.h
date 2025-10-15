@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "../utilities/Parameter.h"
 #include "TradeRecord.h"
 #include "PositionRecord.h"
 #include "PositionExtInfo.h"
@@ -17,6 +16,7 @@
 #include "TradeCostBase.h"
 #include "OrderBrokerBase.h"
 #include "crt/TC_Zero.h"
+#include "../utilities/Parameter.h"
 
 namespace hku {
 

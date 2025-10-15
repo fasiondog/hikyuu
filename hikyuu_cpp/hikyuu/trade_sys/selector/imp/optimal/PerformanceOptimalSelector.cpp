@@ -47,7 +47,7 @@ void PerformanceOptimalSelector::_reset() {
 }
 
 void PerformanceOptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& query) {
-    SPEND_TIME(OptimalSelector_calculate);
+    // SPEND_TIME(OptimalSelector_calculate);
     HKU_IF_RETURN(m_calculated && m_query == query, void());
 
     m_query = query;

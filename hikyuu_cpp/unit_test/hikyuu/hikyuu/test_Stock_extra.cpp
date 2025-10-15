@@ -13,14 +13,9 @@
 #include <hikyuu/Stock.h>
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/device.h>
+#include "../plugin_valid.h"
 
 using namespace hku;
-
-static bool pluginValid() {
-    auto& sm = StockManager::instance();
-    auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
-    return plugin && isValidLicense();
-}
 
 /**
  * @defgroup test_hikyuu_Stock_extra test_hikyuu_Stock_extra
