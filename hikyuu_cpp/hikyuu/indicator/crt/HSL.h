@@ -20,8 +20,8 @@ namespace hku {
  * @param k 关联的K线数据
  * @ingroup Indicator
  */
-Indicator HSL(const KData& k);
-Indicator HSL();
+Indicator HKU_API HSL(const KData& k);
+Indicator HKU_API HSL();
 
 }  // namespace hku
 #endif /* INDICATOR_CRT_HSL_H_ */
