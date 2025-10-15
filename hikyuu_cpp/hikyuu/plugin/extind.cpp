@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/StockManager.h"
+#include "hikyuu/global/sysinfo.h"
 #include "interface/plugins.h"
 #include "extind.h"
 
@@ -106,6 +107,7 @@ Indicator HKU_API AGG_FUNC(const Indicator& ind, agg_func_t agg_func, const KQue
     params.set<string>("ktype", ktype);
     params.set<bool>("fill_null", fill_null);
     params.set<int>("unit", unit);
+    params.set<bool>("parallel", !runningInPython());
     return plugin->getAggFuncIndicator(ind, agg_func, params);
 }
 
@@ -126,6 +128,7 @@ Indicator HKU_API GROUP_FUNC(const Indicator& ind, group_func_t group_func,
     Parameter params;
     params.set<string>("ktype", ktype);
     params.set<int>("unit", unit);
+    params.set<bool>("parallel", !runningInPython());
     return plugin->getGroupFuncIndicator(ind, group_func, params);
 }
 
