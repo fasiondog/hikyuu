@@ -34,6 +34,15 @@
 #include <TargetConditionals.h>
 #endif
 
+#ifdef _WIN32
+#include <shlwapi.h>
+#pragma comment(lib, "shlwapi.lib")  // Windows 链接时需要的库
+#define GET_FILENAME(path) PathFindFileNameA(path)
+#else
+#include <libgen.h>
+#define GET_FILENAME(path) basename((char *)path)
+#endif
+
 #ifndef HKU_CLOSE_SPEND_TIME
 #define HKU_CLOSE_SPEND_TIME 1
 #endif
@@ -81,7 +90,7 @@ namespace hku {
  * 代码执行耗时计时器
  * @param id 自定义耗时计时器id
  */
-#define SPEND_TIME(id) hku::SpendTimer test_spend_timer_##id(#id, __FILE__, __LINE__);
+#define SPEND_TIME(id) hku::SpendTimer test_spend_timer_##id(#id, GET_FILENAME(__FILE__), __LINE__);
 
 /**
  * 代码执行耗时计时器，附带输出信息
@@ -90,7 +99,7 @@ namespace hku {
  */
 #define SPEND_TIME_MSG(id, ...)                     \
     std::string msg_##id(fmt::format(__VA_ARGS__)); \
-    hku::SpendTimer test_spend_timer_##id(#id, msg_##id.c_str(), __FILE__, __LINE__);
+    hku::SpendTimer test_spend_timer_##id(#id, msg_##id.c_str(), GET_FILENAME(__FILE__), __LINE__);
 
 /** 秒表计时 */
 #define SPEND_TIME_KEEP(id, ...) test_spend_timer_##id.keep(fmt::format(__VA_ARGS__));
@@ -117,8 +126,8 @@ namespace hku {
  * @param id 自定义耗时计时器id
  * @param cycle  循环运行的次数（仅用于统计打印耗时输出）
  */
-#define BENCHMARK_TIME(id, cycle)                                   \
-    hku::SpendTimer test_spend_timer_##id(#id, __FILE__, __LINE__); \
+#define BENCHMARK_TIME(id, cycle)                                                 \
+    hku::SpendTimer test_spend_timer_##id(#id, GET_FILENAME(__FILE__), __LINE__); \
     test_spend_timer_##id.setCycle(cycle);
 
 /**
@@ -127,9 +136,10 @@ namespace hku {
  * @param cycle  循环运行的次数（仅用于统计打印耗时输出）
  * @param ... 输出信息
  */
-#define BENCHMARK_TIME_MSG(id, cycle, ...)                                            \
-    std::string msg_##id(fmt::format(__VA_ARGS__));                                   \
-    hku::SpendTimer test_spend_timer_##id(#id, msg_##id.c_str(), __FILE__, __LINE__); \
+#define BENCHMARK_TIME_MSG(id, cycle, ...)                                               \
+    std::string msg_##id(fmt::format(__VA_ARGS__));                                      \
+    hku::SpendTimer test_spend_timer_##id(#id, msg_##id.c_str(), GET_FILENAME(__FILE__), \
+                                          __LINE__);                                     \
     test_spend_timer_##id.setCycle(cycle);
 
 #endif /* HKU_CLOSE_SPEND_TIME */
