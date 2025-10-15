@@ -6,10 +6,7 @@
  */
 
 #pragma once
-#ifndef PERFORMANCE_H_
-#define PERFORMANCE_H_
 
-#include <boost/function.hpp>
 #include "TradeManagerBase.h"
 
 namespace hku {
@@ -84,4 +81,3 @@ private:
 };
 
 } /* namespace hku */
-#endif /* PERFORMANCE_H_ */
