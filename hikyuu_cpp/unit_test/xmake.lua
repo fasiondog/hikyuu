@@ -80,6 +80,7 @@ target("unit-test")
     add_includedirs("..")
 
     if is_plat("windows") then
+        add_cxflags("/bigobj")
         add_cxflags("-wd4267", "-wd4996", "-wd4251", "-wd4244", "-wd4805", "-wd4566")
     else
         add_cxflags("-Wno-unused-variable",  "-Wno-missing-braces")

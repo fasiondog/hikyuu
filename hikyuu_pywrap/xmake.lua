@@ -16,6 +16,7 @@ target("core")
     end
     if is_plat("windows") then
         set_filename("core.pyd")
+        add_cxflags("/bigobj")
         add_cxflags("-wd4251")
     else 
         set_filename("core.so")

@@ -13,7 +13,7 @@
 #include <hikyuu/Stock.h>
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/device.h>
-#include "../indicator/plugin_valid.h"
+#include "../plugin_valid.h"
 
 using namespace hku;
 

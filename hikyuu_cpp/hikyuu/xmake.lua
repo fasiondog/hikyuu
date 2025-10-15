@@ -76,6 +76,7 @@ target("hikyuu")
     end
 
     if is_plat("macosx") then
+        add_cxflags("-D__LP64__")
         add_links("iconv", "sqlite3")
         add_frameworks("CoreFoundation")
     end
