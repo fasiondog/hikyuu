@@ -13,7 +13,7 @@
 #include "../../KData.h"
 #include "../../utilities/Parameter.h"
 #include "hikyuu/trade_sys/allocatefunds/AllocateFundsBase.h"
-#include "hikyuu/trade_sys/multifactor/ScoresFilterBase.h"
+#include "hikyuu/trade_sys/multifactor/MultiFactorBase.h"
 #include "SystemWeight.h"
 
 namespace hku {
@@ -144,6 +144,19 @@ public:
 
     virtual string str() const;
 
+public:
+    //------------------------------------------------------------------------
+    // 和 MF 相关的 Selector 才有用，放在这里主要为了 SEPtr 可以直接获取 MF 相关信息
+    // 非 MF 相关的 Selecter 无用
+    //------------------------------------------------------------------------
+    MFPtr getMF() const {
+        return m_mf;
+    }
+
+    ScoresFilterPtr getScoresFilter() const {
+        return m_sc_filter;
+    }
+
     /** 设置截面评分记录过滤，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤 */
     void setScoresFilter(const ScoresFilterPtr& filter);
 
@@ -160,6 +173,7 @@ private:
 
 protected:
     ScoresFilterPtr m_sc_filter;
+    MFPtr m_mf;
 
 protected:
     string m_name;
@@ -185,6 +199,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
         ar& BOOST_SERIALIZATION_NVP(m_sc_filter);
+        ar& BOOST_SERIALIZATION_NVP(m_mf);
     }
 
     template <class Archive>
@@ -193,6 +208,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
         ar& BOOST_SERIALIZATION_NVP(m_sc_filter);
+        ar& BOOST_SERIALIZATION_NVP(m_mf);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

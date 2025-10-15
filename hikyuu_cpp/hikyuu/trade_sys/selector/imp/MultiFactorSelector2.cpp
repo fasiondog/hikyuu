@@ -22,9 +22,9 @@ MultiFactorSelector2::MultiFactorSelector2() : SelectorBase("SE_MultiFactor2") {
     setParam<string>("mode", "MF_ICIRWeight");
 }
 
-MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf)
-: SelectorBase("SE_MultiFactor2"), m_mf(mf) {
+MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf) : SelectorBase("SE_MultiFactor2") {
     HKU_CHECK(mf, "mf is null!");
+    m_mf = mf;
     setParam<int>("ic_n", mf->getParam<int>("ic_n"));
     setParam<Stock>("ref_stk", mf->getRefStock());
     if (mf->haveParam("ic_rolling_n")) {

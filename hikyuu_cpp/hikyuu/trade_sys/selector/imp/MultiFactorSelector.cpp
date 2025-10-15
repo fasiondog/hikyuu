@@ -28,8 +28,9 @@ MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
 }
 
 MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
-: SelectorBase("SE_MultiFactor"), m_mf(mf) {
+: SelectorBase("SE_MultiFactor") {
     HKU_CHECK(mf, "mf is null!");
+    m_mf = mf;
     setParam<bool>("only_should_buy", false);
     setParam<bool>("ignore_null", true);
     setParam<bool>("ignore_le_zero", false);

@@ -31,7 +31,6 @@ public:
 
 private:
     IndicatorList m_inds;
-    MFPtr m_mf;
     unordered_map<Stock, SYSPtr> m_stk_sys_dict;
 
     //============================================
@@ -43,7 +42,6 @@ private:
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase);
         ar& BOOST_SERIALIZATION_NVP(m_inds);
-        ar& BOOST_SERIALIZATION_NVP(m_mf);
     }
 #endif
 };
