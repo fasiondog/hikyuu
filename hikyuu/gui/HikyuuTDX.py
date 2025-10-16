@@ -332,7 +332,22 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         icon = QIcon(f"{current_dir}/images/hikyuu_small.png")
         star_img = QPixmap(f"{current_dir}/images/star.png")
         self.label_44.setPixmap(star_img)
+        # 修改 label_46 的 HTML 文本，直接在 HTML 中设置字体大小
+
+        label_46_txt = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked::marker { content: "\2612"; }
+</style></head><body style="font-weight:400; font-style:normal;">
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>Hikyuu </span><span style="font-weight:700;">专注于量化交易领域的核心技术构建，涵盖交易模型开发、极速计算引擎、高效回测框架及实盘拓展能力</span><span>，定位为量化交易计算引擎，为量化交易爱好者提供高性能底层架构支持。随着社区规模扩大，分散了作者在策略研究上的精力。为保障项目的可持续性，现对捐赠用户提供部分额外功能作为回馈，感谢社区伙伴的支持！</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>捐赠功能以插件的方式提供，采用独立授权许可，完全在 hikyuu 之外，对喜欢自行编译扩展的朋友没有影响。因插件许可授权需要采集硬件信息，如有疑虑只要不申请试用许可和正式许可授权，不会触发硬件信息采集，如申请，视为同意采集。</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>详情参见：</span><a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html"><span style="text-decoration: underline; color:#3586ff;">捐赠权益</span></a><span style="font-weight:700;"> ，感谢大家的支持！</span></p></body></html>
+"""
+        self.label_46.setText(label_46_txt)
         self.label_46.setOpenExternalLinks(True)
+
         self.label_license.setText(view_license())
         self.fetch_trial_pushButton.setEnabled(not is_valid_license())
 
@@ -1035,6 +1050,41 @@ def start():
     sys.exit(app.exec())
 
 
+def is_font_installed(font_name):
+    """检查字体是否安装"""
+    if sys.platform == "win32":
+        try:
+            import winreg
+            # 打开注册表中的字体项
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts")
+            i = 0
+            while True:
+                try:
+                    name, value, _ = winreg.EnumValue(key, i)
+                    if font_name in name:
+                        winreg.CloseKey(key)
+                        return True
+                    i += 1
+                except WindowsError:
+                    break
+            winreg.CloseKey(key)
+        except:
+            # 如果注册表检查失败，则尝试创建字体对象
+            try:
+                f = QFont(font_name)
+                return f.exactMatch()
+            except:
+                pass
+        return False
+    else:
+        # 非Windows系统简单检查
+        try:
+            f = QFont(font_name)
+            return f.exactMatch()
+        except:
+            return False
+
+
 if __name__ == "__main__":
     import requests
     import urllib
@@ -1043,9 +1093,12 @@ if __name__ == "__main__":
     logging.getLogger("pytdx").setLevel(logging.WARNING)
 
     app = QApplication(sys.argv)
-    # f = QFont('SimSun')
-    # f.setPixelSize(12)
-    # app.setFont(f)
+    if sys.platform == 'win32':
+        # 检查Microsoft YaHei字体是否存在
+        if is_font_installed('Microsoft YaHei'):
+            f = QFont('Microsoft YaHei')
+            f.setPixelSize(12)
+            app.setFont(f)
 
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
         FORMAT = '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
