@@ -9,11 +9,29 @@ from hikyuu.interactive import *
 stks = [s for s in blocka if s.valid]
 print('股票数: ', len(stks))
 
-query = Query(start=20180101, end=20251016)
+query = Query(Datetime(20150101), Datetime(20251017))
 
-mf = MF_EqualWeight([MA(CLOSE(), 20)], stks, query, ref_stk=sm["sh000001"])
+ma20 = MA(CLOSE(), 20)
+ma20.name = 'MA20'
+
+ma60 = MA(CLOSE(), 60)
+ma60.name = 'MA60'
+
+mf = MF_EqualWeight([ma20, ma60], stks, query, ref_stk=sm["sh000001"])
 
 scores = mf.get_scores(Datetime(20251016))
 df = scores.to_df()
 
 print(df)
+
+mf.set_normalize(NORM_Zscore())
+scores = mf.get_scores(Datetime(20251016))
+print(scores.to_df())
+
+mf.add_special_normalize("MA20", NORM_Zscore(), category="行业板块")
+scores = mf.get_scores(Datetime(20251016))
+print(scores.to_df())
+
+mf.add_special_normalize("MA20", NORM_Zscore(), style_inds=[LOG(CLOSE()*LIUTONGPAN())])
+scores = mf.get_scores(Datetime(20251016))
+print(scores.to_df())

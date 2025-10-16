@@ -8,7 +8,7 @@
 
    portfolio
    multifactor
-   normalize.md
    selector
-   scfilter.md
    allocate_funds
+   normalize.md
+   scfilter.md
