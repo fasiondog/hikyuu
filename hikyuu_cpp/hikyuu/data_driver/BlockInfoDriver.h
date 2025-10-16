@@ -54,6 +54,12 @@ public:
     virtual bool _init() = 0;
 
     /**
+     * 获取所有板块分类
+     * @return StringList
+     */
+    virtual StringList getAllCategory() = 0;
+
+    /**
      * 获取指定的板块
      * @param category 指定的板块分类
      * @param name 板块名称

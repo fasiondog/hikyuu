@@ -130,6 +130,9 @@ public:
     /** 获取市场简称列表 */
     StringList getAllMarket() const;
 
+    /** 获取所有板块分类 */
+    StringList getAllCategory();
+
     /**
      * 获取预定义的板块
      * @param category 板块分类

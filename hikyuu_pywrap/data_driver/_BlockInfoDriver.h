@@ -22,6 +22,10 @@ public:
         PYBIND11_OVERLOAD_PURE(bool, BlockInfoDriver, _init, );
     }
 
+    StringList getAllCategory() override {
+        PYBIND11_OVERLOAD_PURE(StringList, BlockInfoDriver, getAllCategory, );
+    }
+
     Block getBlock(const string& category, const string& name) override {
         PYBIND11_OVERLOAD_PURE(Block, BlockInfoDriver, getBlock, category, name);
     }

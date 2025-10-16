@@ -93,6 +93,11 @@ Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
     return result;
 }
 
+StringList QLBlockInfoDriver::getAllCategory() {
+    HKU_WARN("Not support getAllCategory!");
+    return StringList();
+}
+
 BlockList QLBlockInfoDriver::getBlockList(const string& category) {
     BlockList result;
     HKU_ERROR_IF_RETURN(!haveParam("dir"), result, "Missing 'dir' param!");

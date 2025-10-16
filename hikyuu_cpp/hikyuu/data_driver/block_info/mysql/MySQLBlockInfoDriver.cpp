@@ -75,6 +75,16 @@ void MySQLBlockInfoDriver::load() {
     }
 }
 
+StringList MySQLBlockInfoDriver::getAllCategory() {
+    StringList ret;
+    std::shared_lock<std::shared_mutex> lock(m_buffer_mutex);
+    ret.reserve(m_buffer.size());
+    for (auto& category_iter : m_buffer) {
+        ret.push_back(category_iter.first);
+    }
+    return ret;
+}
+
 Block MySQLBlockInfoDriver::getBlock(const string& category, const string& name) {
     Block ret;
     std::shared_lock<std::shared_mutex> lock(m_buffer_mutex);

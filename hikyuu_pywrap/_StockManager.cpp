@@ -199,6 +199,13 @@ void export_StockManager(py::module& m) {
 
     :param func filter: 输入参数为 stock, 返回 True | False 的过滤函数)")
 
+      .def("get_category_list", &StockManager::getAllCategory, R"(get_category_list(self)
+
+    获取所有板块分类
+
+    :return: 所有板块分类
+    :rtype: StringList)")
+
       .def("get_block", &StockManager::getBlock, R"(get_block(self, category, name)
 
     获取预定义的板块

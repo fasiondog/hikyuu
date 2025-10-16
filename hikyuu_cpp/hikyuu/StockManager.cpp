@@ -492,6 +492,10 @@ StringList StockManager::getAllMarket() const {
     return result;
 }
 
+StringList StockManager::getAllCategory() {
+    return m_blockDriver ? m_blockDriver->getAllCategory() : StringList();
+}
+
 Block StockManager::getBlock(const string& category, const string& name) {
     return m_blockDriver ? m_blockDriver->getBlock(category, name) : Block();
 }
