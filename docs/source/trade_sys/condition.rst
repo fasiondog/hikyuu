@@ -1,11 +1,11 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-系统有效条件
-============
+系统有效条件|CN
+====================
 
 内建系统有效条件
-----------------
+--------------------
 
 .. py:function:: CN_OPLine(ind)
 

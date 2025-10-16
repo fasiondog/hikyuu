@@ -1,8 +1,8 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-止损/止赢策略
-=============
+止损/止赢策略|ST
+=================
 
 .. Note::
 

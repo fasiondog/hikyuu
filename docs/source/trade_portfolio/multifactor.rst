@@ -1,10 +1,18 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-多因子合成
-============
+多因子合成|MF
+==============
 
 多因子本质是在时间截面上对候选标的进行评分，所以实际需要配合 Selector (策略选择算法) 使用。
+
+公共参数:
+
+    * **fill_null** *(bool|True)*: 数据缺失时是否填充 nan 值, 否则以最近值填充
+    * **ic_n** *(int|5)*: 用于计算合成后因子 IC 时的 ic_n 日收益率
+    * **spearman** *(bool|True)*: 使用 spearman 获取相关系数，否则为 pearson
+    * **mode** *(int|2)*: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
+    * **save_all_factors** *(bool|False)*: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
 
 
 内建对因子合成算法
@@ -200,6 +208,22 @@
         获取所有日期的所有评分，长度与参考日期相同
 
         :return: 每日 ScoreRecordList 结果的 list
+
+
+    .. py:method:: set_normalize(self, norm)
+
+        设置标准化或归一化方法（影响全部因子）
+
+    
+    .. py:method:: add_special_normalize(self, name[, norm=None, category="", style_inds=[]])
+        
+        对指定名称的指标应用特定的标准化/归一化、行业中性化、风格因子中性化操作。标准化操作、行业中性化、风格因子中性化彼此无关，可同时指定也可分开指定。
+
+        :param str name: 特殊归一化方法名称
+        :param Normalize norm: 特殊归一化方法
+        :param str category: 行业中性化时，指定板块类别
+        :param list[Indicator] style_inds: 用于中性化的风格指标列表
+
 
     .. py:method:: _calculate(self, stks_inds)
 

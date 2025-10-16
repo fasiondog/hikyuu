@@ -192,7 +192,9 @@ void export_MultiFactor(py::module& m) {
       .def("set_normalize", &MultiFactorBase::setNormalize, py::arg("norm"),
            R"(set_normalize(self, norm)
 
-    设置标准化或归一化方法（影响全部因子）)")
+    设置标准化或归一化方法（影响全部因子）
+    
+    :param NormalizeBase norm: 标准化或归一化方法实例)")
 
       .def("add_special_normalize", &MultiFactorBase::addSpecialNormalize, py::arg("name"),
            py::arg("norm") = NormPtr(), py::arg("category") = "",

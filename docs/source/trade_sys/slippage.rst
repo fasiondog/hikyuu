@@ -1,8 +1,8 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-移滑价差算法
-============
+移滑价差算法|SP
+===============
 
 内建移滑价差算法
 ----------------

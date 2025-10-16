@@ -1,8 +1,8 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-资产分配算法组件
-================
+资产分配算法组件|AF
+====================
 
 资产分配算法组件，用于对选中的系统进行资产分配。
 

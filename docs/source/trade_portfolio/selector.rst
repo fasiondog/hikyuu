@@ -1,8 +1,8 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-选择器算法组件
-================
+选择器算法组件|SE
+==================
 
 实现标的、系统策略的评估和选取算法。
 
