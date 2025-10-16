@@ -1577,13 +1577,4 @@ json System::lastSuggestion() const {
     return result;
 }
 
-void HKU_API parallel_run_sys(const SystemList& system_list, const KQuery& query, bool reset,
-                              bool resetAll) {
-    parallel_for_index_void(0, system_list.size(), [&](size_t i) {
-        if (system_list[i]) {
-            system_list[i]->run(query, reset, resetAll);
-        }
-    });
-}
-
 } /* namespace hku */
