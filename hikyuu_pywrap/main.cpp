@@ -43,6 +43,7 @@ void export_trade_manage_main(py::module& m);
 void export_trade_sys_main(py::module& m);
 void export_global_main(py::module& m);
 void export_analysis_main(py::module& m);
+void export_misc(py::module& m);
 
 #if HKU_ENABLE_ARROW
 void export_views_main(py::module& m);
@@ -103,6 +104,7 @@ PYBIND11_MODULE(core, m) {
     export_Stock(m);
     export_Block(m);
     export_Parameter(m);
+    export_misc(m);
 
     export_data_driver_main(m);
     export_indicator_main(m);
