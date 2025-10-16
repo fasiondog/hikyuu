@@ -16,7 +16,7 @@ void export_misc(py::module& m) {
           py::arg("reset") = false, py::arg("reset_all") = false,
           R"(parallel_run_sys(sys_list, query[, reset=False, reset_all=False])
 
-  并行运行多个系系统
+  并行运行多个系系统, 并返回 list FundsList, 各账户对应资产（按query时间段）
 
   :param sys_list: 系统列表
   :param query: 查询条件
@@ -26,7 +26,7 @@ void export_misc(py::module& m) {
     m.def("parallel_run_pf", &parallel_run_pf, py::arg("pf_list"), py::arg("query"),
           py::arg("force") = false, R"(parallel_run_pf(pf_list, query[, force=False])
 
-    并行执行多个投资组合策略
+    并行执行多个投资组合策略, 并返回 list FundsList, 各账户对应资产（按query时间段）
 
     :param list pf_list: 投资组合列表
     :param Query query: 查询条件
