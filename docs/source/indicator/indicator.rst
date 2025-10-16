@@ -99,6 +99,24 @@
 
     聚合函数: 方差, 可参考 :func:`AGG_STD`
 
+.. py:function:: AGG_FUNC(ind, agg_func[, ktype=Query.MIN, fill_null=False, unit=1]
+      
+    使用自定函数聚合其他K线周期的指标。虽然支持python自定义函数, 但python函数需要GIL, 速度较慢慢。建议最好直接使用 C++ 自定义聚合函数。
+    
+    示例, 计算日线时聚合分钟线收盘价的和:
+
+      >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
+      >>> ind = AGG_FUNC(CLOSE(), lambda ds, x: np.sum(x))
+      >>> ind(k)
+
+    :param Indicator ind: 待计算指标
+    :param callable agg_func: 自定义聚合函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回针对list的聚合结果, 注意是单个值
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    :return: 聚合结果
+    :rtype: Indicator
+
 
 .. py:function:: ALIGN(data, ref[, fill_null=True])
 
@@ -537,6 +555,67 @@
 
     :param data: 输入数据
     :rtype: Indicator
+
+.. py:function:: GROUP_COUNT(ind[, ktype=Query.DAY,  unit=1])
+      
+    自定义分组累积计数
+
+    :param Indicator ind: 待计算指标
+    :param KQuery.KType ktype: 分组的K线周期
+    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :rtype: Indicator        
+
+.. py:function:: GROUP_MAX(ind[, ktype=Query.DAY,  unit=1])
+      
+    自定义分组累积最大值
+
+    :param Indicator ind: 待计算指标
+    :param KQuery.KType ktype: 分组的K线周期
+    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :rtype: Indicator        
+
+.. py:function:: GROUP_MIN(ind[, ktype=Query.DAY,  unit=1])
+      
+    自定义分组累积计录最小值
+
+    :param Indicator ind: 待计算指标
+    :param KQuery.KType ktype: 分组的K线周期
+    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :rtype: Indicator        
+
+.. py:function:: GROUP_PROD(ind[, ktype=Query.DAY,  unit=1])
+      
+    自定义分组累积乘积
+
+    :param Indicator ind: 待计算指标
+    :param KQuery.KType ktype: 分组的K线周期
+    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :rtype: Indicator
+
+.. py:function:: GROUP_SUM(ind[, ktype=Query.DAY,  unit=1])
+      
+    自定义分组累积和
+
+    :param Indicator ind: 待计算指标
+    :param KQuery.KType ktype: 分组的K线周期
+    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :rtype: Indicator    
+
+.. py:function:: GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1]
+      
+    自定义分组累积计算指标。虽然支持python自定义函数, 但python函数需要GIL, 速度较慢。建议最好直接使用 C++ 自定义分组累积函数。
+    
+    示例, 计算日线时聚合分钟线收盘价的和:
+
+      >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
+      >>> ind = GROUP_FUNC(CLOSE(), lambda dates, data: data/2.0)
+      >>> ind(k)
+
+    :param Indicator ind: 待计算指标
+    :param callable group_func: 自定义分组累积函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回和输入等长的累积计算结果, 类型同样须为 np.array
+    :param KQuery.KType ktype: 分组的K线周期
+    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :rtype: Indicator    
 
 
 .. py:function:: HHV([data, n=20])
