@@ -1,10 +1,65 @@
 # 版本发布说明
 
+## 2.6.9 -
+
+**🚀 新增特性**
+
+* MF多因子评分板支持指定全局因子标准化、对特定因子指定特有标准化和中性化（含行业中性化与风格因子中性化)算法
+
+  ```python
+  # 创建两个因子 ma20, ma60
+  ma20 = MA(CLOSE(), 20)
+  ma20.name = 'MA20'
+
+  ma60 = MA(CLOSE(), 60)
+  ma60.name = 'MA60'
+
+  # 指定证券列表
+  stks = [s for s in blocka]
+
+  # 指定查询范围，并创建一个等权组合的 MF
+  query = Query(Datetime(20150101), Datetime(20251017))
+  mf = MF_EqualWeight([ma20, ma60], stks, query, ref_stk=sm["sh000001"])
+
+  # 添加全局标准化
+  mf.set_normalize(NORM_Zscore())
+
+  # 为 ma20 添加行业中性化以及市场中性化(即按市值风格因子中性化)
+  mf.add_special_normalize("MA20", NORM_Zscore(), category="行业板块", style_inds=[LOG(CLOSE()*LIUTONGPAN())])
+  ```
+* 增加内置因子标准化算法(NORM_Zscore/NORM_MinMax/NORM_Quantile/NORM_Quantile_Uniform)
+* 新增 SE_MultiFactor2 自行指定配置时间截面评分过滤器，内置评分过滤器(SCFilter_TopN/SCFilter_Price/SCFilter_AmountLimit/SCFilter_Group等)
+
+  ```python
+  # 如为 SE_MultiFactor2 实例，设置过滤：分值不为Nan|分成10组取第0组|价格大于等于10元|成交金额不在当日排名末尾20%之内|取前10
+  se.set_scores_filter(SCFilter_IgnoreNan()|SCFilter_Group(10, 0)SCFilter_Price(
+              10.) | SCFilter_AmountLimit(0.2) | SCFilter_TopN(10))
+  ```
+* [vip]新增 GROUP 系列指标(GROUP_MAX/GROUP_MIN/GROUP_SUM/GROUP_FUNC等)，和 AGG 系列指标对应
+* [vip]dateserver 增加 --parquet_path 方式保存 tick data，仅在 --save 同时为 yes 时生效
+* feat(KData): 添加索引方式获取子集功能
+
+**⚡️ 优化改进**
+
+* HikyuuTDX 优化板块信息下载，防止下载失败情况下板块信息丢失
+* [vip]优化 clickhouse 存储引擎，日线整体预加载优化至8秒，目前存储引擎日线整体加载速度: HDF5 6秒 -> clickhouse 8秒 -> mysql 22秒
+* HikyuuTDX 从 PyQt5 迁移至 PySide6
+* feat(hikyuu_cpp): 在 Performance 类中新增"未平仓帐户收益率%"统计项
+* feat(draw): 为 tm_performance 和 sys_performance 函数添加返回主图 axis 的功能，便于用户在绘图后对图表进行进一步的自定义操作和调整。
+
+**🐞 缺陷修复**
+
+* fix(hikyuu): 默认情况下不启动行情接收，防止在开盘后因自身合成缺失导致从 dataserver 获取行情也缺失的问题。
+* fix(datetime): 修复 UTC 偏移量计算在非 Windows 平台下的问题可能不准确。
+* fix(hikyuu): realtime_update 优化实时更新功能中的股票列表获取逻辑
+* fix(data): 修复10年债券收益率数据导入时的日期判断逻辑
+
 ## 2.6.8 - 2025年9月5日
 
 **🚀 新增特性**
 
 - 新增 get_inds_view 方法，用于指定日期或范围内的系列指标结果并返回 pandas.DataFrame 结果。该方法主要用于获取系列指标结果后，使用其他 python 库，进行进一步数据处理，或日常监控打印。
+
   ```python
   In [3]: df = get_inds_view(blocka, [CLOSE(), OPEN(), MA(CLOSE()), AMA(CLOSE()), MA(CLOSE(),n=30)], Datetime(20250822))
 
@@ -26,6 +81,7 @@
   [3472 rows x 8 columns]
   ```
 - 新增 AGG 系列聚合指标（捐赠用户），如日线使用分钟线聚合结果
+
   ```python
   #如计算：每日成交金额 / 日内分钟线最大成交金额
   ind = AGG_MAX(AMO(), ktype=Query.MIN)/AMO()
@@ -37,6 +93,7 @@
 - IC 指标增加 strict 参数，strict 模式下为当前时刻的 N 日后收益，非 strict 模式下为当前时刻之前的 N 天收益
 - 新增 REFX 指标，增强 REF 指标，可进行左移（未来函数， 勿在回测中使用，通常用于其他数据处理）
 - K线添加分时和分笔数据支持, 在 KQuery 中添加 TIMELINE 和 TRANS 两种新 K 线类型，可直接使用指标计算分时和分笔数据
+
   ```python
   In [28]: s = sm['sz000001']
 

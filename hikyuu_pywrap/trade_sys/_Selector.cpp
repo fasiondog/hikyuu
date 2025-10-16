@@ -285,8 +285,17 @@ void export_Selector(py::module& m) {
       .def("add_sys", &SelectorBase::addSystem)
       .def("add_sys_list", &SelectorBase::addSystemList)
 
-      .def("set_scores_filter", &SelectorBase::setScoresFilter)
-      .def("add_scores_filter", &SelectorBase::addScoresFilter)
+      .def("set_scores_filter", &SelectorBase::setScoresFilter, R"(set_scores_filter(self, filter)
+           
+    设置 ScoresFilter, 将替换现有的过滤器. 仅适用于 SE_MultiFactor
+    
+    :param ScoresFilter filter: ScoresFilter)")
+
+      .def("add_scores_filter", &SelectorBase::addScoresFilter, R"(add_scores_filter(self, filter)
+        
+    在已有过滤基础上新增过滤, 仅适用于 SE_MultiFactor    
+
+    :param ScoresFilter filter: 新的过滤器)")
 
       .def("__add__",
            [](const SelectorPtr& self, const SelectorPtr& other) { return self + other; })
@@ -384,7 +393,7 @@ void export_Selector(py::module& m) {
       py::arg("inds"), py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
       py::arg("ref_stk") = py::none(), py::arg("spearman") = true,
       py::arg("mode") = "MF_ICIRWeight", py::arg("filter") = SCFilter_IgnoreNan(),
-      R"(SE_MultiFactor
+      R"(SE_MultiFactor2([inds, ic_n, ic_rolling_n, ref_stk, spearman, mode, filter])
 
     创建基于多因子评分的选择器，两种创建方式
 
