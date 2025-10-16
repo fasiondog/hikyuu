@@ -17,7 +17,7 @@ class HKU_API IgnoreNanSCFilter : public ScoresFilterBase {
 
 public:
     IgnoreNanSCFilter();
-    virtual ~IgnoreNanSCFilter() = default;
+    virtual ~IgnoreNanSCFilter() override = default;
     virtual void _checkParam(const string& name) const override;
 };
 

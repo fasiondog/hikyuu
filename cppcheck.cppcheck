@@ -4,13 +4,13 @@
     <analyze-all-vs-configs>false</analyze-all-vs-configs>
     <check-headers>true</check-headers>
     <check-unused-templates>false</check-unused-templates>
+    <inline-suppression>true</inline-suppression>
     <max-ctu-depth>10</max-ctu-depth>
     <max-template-recursion>1000</max-template-recursion>
     <defines>
         <define name="BOOST_SERIALIZATION_ASSUME_ABSTRACT"/>
         <define name="TABLE_BIND6"/>
         <define name="TABLE_BIND3"/>
-        <define name="TABLE_BIND4"/>
         <define name="HKU_ENABLE_INI_PARSER=1"/>
         <define name="HKU_SUPPORT_DATETIME=1"/>
         <define name="HKU_ENABLE_HTTP_CLIENT=1"/>
@@ -22,6 +22,7 @@
         <undefine>uint32_t</undefine>
         <undefine>uint8_t</undefine>
         <undefine>int8_t</undefine>
+        <undefine>TABLE_BIND4</undefine>
     </undefines>
     <paths>
         <dir name="hikyuu_cpp/hikyuu"/>
@@ -36,9 +37,6 @@
         <dir name="../hku_plugin/plugin_clickhouse/src"/>
         <dir name="../hku_plugin/plugin_tmreport/src"/>
     </paths>
-    <libraries>
-        <library>boost</library>
-    </libraries>
     <suppressions>
         <suppression>unusedFunction</suppression>
         <suppression>ConfigurationNotChecked</suppression>
@@ -50,4 +48,5 @@
         <suppression>shadowFunction</suppression>
         <suppression>useStlAlgorithm</suppression>
     </suppressions>
+    <check-level-normal/>
 </project>

@@ -18,7 +18,7 @@ class NormZScore : public NormalizeBase {
 public:
     NormZScore();
     NormZScore(bool outExtreme, double nsigma, bool recursive);
-    virtual ~NormZScore();
+    virtual ~NormZScore() override;
     virtual void _checkParam(const string& name) const override;
 };
 

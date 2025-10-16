@@ -17,7 +17,7 @@ namespace hku {
 class HKU_API H5KDataDriver : public KDataDriver {
 public:
     H5KDataDriver();
-    virtual ~H5KDataDriver();
+    virtual ~H5KDataDriver() override;
 
     virtual KDataDriverPtr _clone() override {
         return std::make_shared<H5KDataDriver>();

@@ -85,7 +85,7 @@ public:                                                            \
     classname() : OperatorSelector(name) {}                        \
     classname(const SelectorPtr& se1, const SelectorPtr& se2)      \
     : OperatorSelector(name, se1, se2) {}                          \
-    virtual ~classname() {}                                        \
+    virtual ~classname() override {}                               \
                                                                    \
     virtual SystemWeightList _getSelected(Datetime date) override; \
                                                                    \

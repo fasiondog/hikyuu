@@ -17,7 +17,7 @@ class HKU_API IgnoreLessOrEqualValueSCFilter : public ScoresFilterBase {
 
 public:
     IgnoreLessOrEqualValueSCFilter();
-    virtual ~IgnoreLessOrEqualValueSCFilter() = default;
+    virtual ~IgnoreLessOrEqualValueSCFilter() override = default;
     virtual void _checkParam(const string& name) const override;
 };
 

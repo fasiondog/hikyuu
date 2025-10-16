@@ -21,7 +21,7 @@ class KDataTempCsvDriver : public KDataDriver {
 public:
     KDataTempCsvDriver();
     KDataTempCsvDriver(const string& day_filename, const string& min_filename);
-    virtual ~KDataTempCsvDriver();
+    virtual ~KDataTempCsvDriver() override;
 
     void setDayFileName(const string& day_filename) {
         m_day_filename = day_filename;

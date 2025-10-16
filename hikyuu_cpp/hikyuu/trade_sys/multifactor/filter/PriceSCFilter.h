@@ -17,7 +17,7 @@ class HKU_API PriceSCFilter : public ScoresFilterBase {
 
 public:
     PriceSCFilter();
-    virtual ~PriceSCFilter() = default;
+    virtual ~PriceSCFilter() override = default;
     virtual void _checkParam(const string& name) const override;
 };
 

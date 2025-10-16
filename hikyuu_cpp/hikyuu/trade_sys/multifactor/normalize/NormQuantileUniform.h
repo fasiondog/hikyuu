@@ -21,7 +21,7 @@ class NormQuantileUniform : public NormalizeBase {
 public:
     NormQuantileUniform();
     NormQuantileUniform(double quantile_min, double quantile_max);
-    virtual ~NormQuantileUniform();
+    virtual ~NormQuantileUniform() override;
     virtual void _checkParam(const string& name) const override;
 };
 

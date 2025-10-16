@@ -21,7 +21,7 @@ class NormQuantile : public NormalizeBase {
 public:
     NormQuantile();
     NormQuantile(double quantile_min, double quantile_max);
-    virtual ~NormQuantile();
+    virtual ~NormQuantile() override;
     virtual void _checkParam(const string& name) const override;
 };
 

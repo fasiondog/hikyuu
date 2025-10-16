@@ -16,7 +16,7 @@ namespace hku {
 class TdxKDataDriver : public KDataDriver {
 public:
     TdxKDataDriver();
-    virtual ~TdxKDataDriver();
+    virtual ~TdxKDataDriver() override;
 
     virtual KDataDriverPtr _clone() override {
         return std::make_shared<TdxKDataDriver>();

@@ -17,7 +17,7 @@ class HKU_API TopNSCFilter : public ScoresFilterBase {
 
 public:
     TopNSCFilter();
-    virtual ~TopNSCFilter() = default;
+    virtual ~TopNSCFilter() override = default;
     virtual void _checkParam(const string& name) const override;
 };
 

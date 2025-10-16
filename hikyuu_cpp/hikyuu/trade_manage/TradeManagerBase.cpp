@@ -7,8 +7,8 @@
 
 #include "hikyuu/plugin/interface/plugins.h"
 #include "hikyuu/plugin/device.h"
-#include "Performance.h"
 #include "TradeManagerBase.h"
+#include "Performance.h"
 
 namespace hku {
 

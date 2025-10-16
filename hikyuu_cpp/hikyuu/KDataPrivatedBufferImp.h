@@ -15,7 +15,7 @@ class HKU_API KDataPrivatedBufferImp : public KDataImp {
 public:
     KDataPrivatedBufferImp();
     KDataPrivatedBufferImp(const Stock& stock, const KQuery& query);
-    virtual ~KDataPrivatedBufferImp();
+    virtual ~KDataPrivatedBufferImp() override;
 
     virtual bool empty() const override {
         return m_buffer.empty();

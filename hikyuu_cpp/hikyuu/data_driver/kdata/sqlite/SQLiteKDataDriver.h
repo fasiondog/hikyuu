@@ -17,7 +17,7 @@ namespace hku {
 class SQLiteKDataDriver : public KDataDriver {
 public:
     SQLiteKDataDriver();
-    virtual ~SQLiteKDataDriver();
+    virtual ~SQLiteKDataDriver() override;
 
     virtual KDataDriverPtr _clone() override {
         return std::make_shared<SQLiteKDataDriver>();

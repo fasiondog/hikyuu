@@ -16,7 +16,7 @@ namespace hku {
 class QLBlockInfoDriver : public BlockInfoDriver {
 public:
     QLBlockInfoDriver() : BlockInfoDriver("qianlong") {};
-    virtual ~QLBlockInfoDriver();
+    virtual ~QLBlockInfoDriver() override;
 
     virtual bool _init() override;
     virtual Block getBlock(const string&, const string&) override;

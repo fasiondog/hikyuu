@@ -15,7 +15,7 @@ namespace hku {
 class DoNothingKDataDriver : public KDataDriver {
 public:
     DoNothingKDataDriver() : KDataDriver("DoNothing") {}
-    virtual ~DoNothingKDataDriver() = default;
+    virtual ~DoNothingKDataDriver() override = default;
 
     virtual KDataDriverPtr _clone() override {
         return std::make_shared<DoNothingKDataDriver>();

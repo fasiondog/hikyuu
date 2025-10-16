@@ -17,7 +17,7 @@ class HKU_API GroupSCFilter : public ScoresFilterBase {
 
 public:
     GroupSCFilter();
-    virtual ~GroupSCFilter() = default;
+    virtual ~GroupSCFilter() override = default;
     virtual void _checkParam(const string& name) const override;
 };
 

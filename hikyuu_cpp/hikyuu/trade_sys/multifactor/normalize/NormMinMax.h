@@ -17,7 +17,7 @@ class NormMinMax : public NormalizeBase {
 
 public:
     NormMinMax();
-    virtual ~NormMinMax();
+    virtual ~NormMinMax() override;
 };
 
 }  // namespace hku

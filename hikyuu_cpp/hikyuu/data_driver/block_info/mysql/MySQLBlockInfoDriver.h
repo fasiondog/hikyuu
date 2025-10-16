@@ -15,7 +15,7 @@ namespace hku {
 class MySQLBlockInfoDriver : public BlockInfoDriver {
 public:
     MySQLBlockInfoDriver() : BlockInfoDriver("mysql") {};
-    virtual ~MySQLBlockInfoDriver();
+    virtual ~MySQLBlockInfoDriver() override;
 
     virtual void load() override;
     virtual bool _init() override;

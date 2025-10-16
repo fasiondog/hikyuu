@@ -24,7 +24,7 @@ namespace hku {
 class MySQLKDataDriver : public KDataDriver {
 public:
     MySQLKDataDriver();
-    virtual ~MySQLKDataDriver();
+    virtual ~MySQLKDataDriver() override;
 
     virtual KDataDriverPtr _clone() override {
         return std::make_shared<MySQLKDataDriver>();

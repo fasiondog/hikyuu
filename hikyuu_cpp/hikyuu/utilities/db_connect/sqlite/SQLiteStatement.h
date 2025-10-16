@@ -31,7 +31,7 @@ public:
     SQLiteStatement(DBConnectBase *driver, const std::string &sql_statement);
 
     /** 析构函数 */
-    virtual ~SQLiteStatement();
+    virtual ~SQLiteStatement() override;
 
     virtual void sub_exec() override;
     virtual bool sub_moveNext() override;

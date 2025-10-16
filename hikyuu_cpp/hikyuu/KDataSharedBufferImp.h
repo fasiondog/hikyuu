@@ -15,7 +15,7 @@ class HKU_API KDataSharedBufferImp : public KDataImp {
 public:
     KDataSharedBufferImp() = default;
     KDataSharedBufferImp(const Stock& stock, const KQuery& query);
-    virtual ~KDataSharedBufferImp();
+    virtual ~KDataSharedBufferImp() override;
 
     virtual bool empty() const override {
         return m_size == 0;

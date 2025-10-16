@@ -17,7 +17,7 @@ class HKU_API MinAmountPercentSCFilter : public ScoresFilterBase {
 
 public:
     MinAmountPercentSCFilter();
-    virtual ~MinAmountPercentSCFilter() = default;
+    virtual ~MinAmountPercentSCFilter() override = default;
 
     virtual void _checkParam(const string& name) const override;
 };

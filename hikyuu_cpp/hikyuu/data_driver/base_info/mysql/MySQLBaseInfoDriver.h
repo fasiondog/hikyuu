@@ -24,7 +24,7 @@ namespace hku {
 class MySQLBaseInfoDriver : public BaseInfoDriver {
 public:
     MySQLBaseInfoDriver();
-    virtual ~MySQLBaseInfoDriver();
+    virtual ~MySQLBaseInfoDriver() override;
 
     virtual bool _init() override;
     virtual vector<StockInfo> getAllStockInfo() override;

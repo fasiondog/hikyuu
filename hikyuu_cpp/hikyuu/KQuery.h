@@ -191,7 +191,7 @@ public:
     static string getQueryTypeName(QueryType);
 
     /** 获取KType名称，用于显示输出 */
-    static string getKTypeName(KType);
+    static string getKTypeName(const KType&);
 
     /** 获取recoverType名称，用于显示输出 */
     static string getRecoverTypeName(RecoverType);

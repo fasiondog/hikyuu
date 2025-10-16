@@ -15,7 +15,7 @@ namespace hku {
 class SQLiteBlockInfoDriver : public BlockInfoDriver {
 public:
     SQLiteBlockInfoDriver() : BlockInfoDriver("sqlite3") {};
-    virtual ~SQLiteBlockInfoDriver();
+    virtual ~SQLiteBlockInfoDriver() override;
 
     virtual void load() override;
     virtual bool _init() override;

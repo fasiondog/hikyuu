@@ -46,7 +46,7 @@ protected:
 public:                                                                                    \
     classname() : OperatorValueSignal(name) {}                                             \
     classname(const SignalPtr& sg, double value) : OperatorValueSignal(name, sg, value) {} \
-    virtual ~classname() {}                                                                \
+    virtual ~classname() override {}                                                       \
     virtual SignalPtr _clone() override {                                                  \
         return make_shared<classname>(m_sg, m_value);                                      \
     }                                                                                      \

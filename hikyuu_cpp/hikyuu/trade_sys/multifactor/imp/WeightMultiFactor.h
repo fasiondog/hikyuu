@@ -22,7 +22,7 @@ public:
     WeightMultiFactor(const vector<Indicator>& inds, const PriceList& weights,
                       const StockList& stks, const KQuery& query, const Stock& ref_stk, int ic_n,
                       bool spearman, int mode, bool save_all_factors);
-    virtual ~WeightMultiFactor() = default;
+    virtual ~WeightMultiFactor() override = default;
 
 private:
     PriceList m_weights;  // 每个指标权重，与输入 inds 列表等长

@@ -20,7 +20,7 @@ namespace hku {
 class SQLiteBaseInfoDriver : public BaseInfoDriver {
 public:
     SQLiteBaseInfoDriver();
-    virtual ~SQLiteBaseInfoDriver();
+    virtual ~SQLiteBaseInfoDriver() override;
 
     virtual bool _init() override;
     virtual vector<MarketInfo> getAllMarketInfo() override;

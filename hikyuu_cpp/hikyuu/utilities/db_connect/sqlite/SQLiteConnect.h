@@ -40,7 +40,7 @@ public:
     explicit SQLiteConnect(const Parameter &param);
 
     /** 析构函数 */
-    virtual ~SQLiteConnect();
+    virtual ~SQLiteConnect() override;
 
     /** 如果 sqlite 文件无效，返回false */
     virtual bool ping() override;

@@ -11,6 +11,10 @@
 
 namespace hku {
 
+#if defined(_MSC_VER)
+#pragma warning(disable : 4251)
+#endif
+
 /**
  * 简单绩效统计
  * @ingroup Performance

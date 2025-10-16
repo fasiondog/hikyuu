@@ -20,7 +20,7 @@ public:
     EqualWeightMultiFactor(const vector<Indicator>& inds, const StockList& stks,
                            const KQuery& query, const Stock& ref_stk, int ic_n, bool spearman,
                            int mode, bool save_all_factors);
-    virtual ~EqualWeightMultiFactor() = default;
+    virtual ~EqualWeightMultiFactor() override = default;
 };
 
 }  // namespace hku

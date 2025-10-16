@@ -187,7 +187,7 @@ KQuery::QueryType KQuery::getQueryTypeEnum(const string& arg) {
     return INVALID;
 }
 
-string KQuery::getKTypeName(KType dataType) {
+string KQuery::getKTypeName(const KType& dataType) {
     string result(dataType);
     to_upper(result);
     return result;

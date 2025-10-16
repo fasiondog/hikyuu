@@ -36,7 +36,7 @@ class HKU_UTILS_API MySQLStatement : public SQLStatementBase {
 public:
     MySQLStatement() = delete;
     MySQLStatement(DBConnectBase *driver, const std::string &sql_statement);
-    virtual ~MySQLStatement();
+    virtual ~MySQLStatement() override;
 
     virtual void sub_exec() override;
     virtual bool sub_moveNext() override;
