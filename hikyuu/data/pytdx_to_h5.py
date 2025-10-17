@@ -286,7 +286,7 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
         bar_list = get_bars(pytdx_kline_type, pytdx_market, code, n * 800, step)
         n -= 1
         if bar_list is None:
-            print(code, "invalid!!")
+            # print(code, "invalid!!")
             continue
 
         for bar in bar_list:
