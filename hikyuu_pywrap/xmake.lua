@@ -109,12 +109,12 @@ target("core")
             end
             local python_version = os.iorun(stmt):trim()
             local py3config = "python" .. python_version .. "-config"
-            print("py3config: " .. py3config)
+            -- print("py3config: " .. py3config)
             pydir_include = os.iorun(py3config .. " --includes"):trim()
             pydir_lib = os.iorun(py3config .. " --libs"):trim()
         end
         assert(pydir_include, "python3-config not found!")
-        print("pydir_include: " .. pydir_include)
+        -- print("pydir_include: " .. pydir_include)
         -- print("pydir_lib: " .. pydir_lib)
         target:add("cxflags", pydir_include, pydir_lib)    
     end)
