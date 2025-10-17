@@ -57,6 +57,7 @@ jobs:
       - name: test python
         run: |
           export PYTHONPATH=.
+          otool -L hikyuu/cpp/libhikyuu.dylib
           otool -L hikyuu/cpp/core313.so
           python hikyuu/test/test.py
    
