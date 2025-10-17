@@ -469,4 +469,16 @@ void Portfolio::traceMomentTMAfterRunAtClose(const Datetime& date) {
     }
 }
 
+json Portfolio::lastSuggestion() const {
+    json sys_json_list = json::array();
+    for (const auto& sys : m_running_sys_set) {
+        sys_json_list.emplace_back(sys->lastSuggestion());
+    }
+
+    json ret;
+    ret["name"] = name();
+    ret["sys_list"] = sys_json_list;
+    return ret;
+}
+
 } /* namespace hku */

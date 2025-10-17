@@ -30,6 +30,8 @@ public:
     virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle,
                                    bool adjust) override;
 
+    virtual json lastSuggestion() const override;
+
 private:
     void initParam();
     void _runMomentWithoutAFNotForceSell(const Datetime& date, const Datetime& nextCycle,

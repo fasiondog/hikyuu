@@ -65,6 +65,16 @@ void export_Portfolio(py::module& m) {
     :param Query query: 查询条件
     :param bool force: 强制重新计算)")
 
+      .def(
+        "last_suggestion",
+        [](const Portfolio& pf) {
+            json j = pf.lastSuggestion();
+            std::string json_str = j.dump();
+            py::module json_module = py::module::import("json");
+            return json_module.attr("loads")(json_str);
+        },
+        "回测完成后，返回最后一天交易记录，以及需要延迟的买入和卖出延迟请求")
+
         DEF_PICKLE(Portfolio);
 
     m.def("PF_Simple", PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),

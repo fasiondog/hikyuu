@@ -108,6 +108,11 @@ public:
     virtual void _runMomentOnOpen(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
     virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
 
+    /**
+     * 回测完成后，返回最后一天交易记录，以及需要延迟的买入和卖出延迟请求
+     */
+    virtual json lastSuggestion() const;
+
 private:
     void initParam();
 

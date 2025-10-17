@@ -102,7 +102,7 @@ target("core")
             pydir_lib = os.iorun(py3config .. " --libs"):trim()
         else
             local stmt
-            if is_plat("cross") then
+            if is_plat("macosx") then
                 stmt = [[python -c 'import sys; v = sys.version_info; print(f"{str(v.major)}.{str(v.minor)}")']]
             else
                 stmt = [[python3 -c 'import sys; v = sys.version_info; print(f"{str(v.major)}.{str(v.minor)}")']]
@@ -114,7 +114,7 @@ target("core")
             pydir_lib = os.iorun(py3config .. " --libs"):trim()
         end
         assert(pydir_include, "python3-config not found!")
-        -- print("pydir_include: " .. pydir_include)
+        print("pydir_include: " .. pydir_include)
         -- print("pydir_lib: " .. pydir_lib)
         target:add("cxflags", pydir_include, pydir_lib)    
     end)
@@ -125,11 +125,11 @@ target("core")
 
         if not is_plat("cross") then
           local stmt = [[python -c 'import sys; v = sys.version_info; print(str(v.major)+str(v.minor))']]
-          if is_plat("linux", "macosx") then
+          if is_plat("linux") then
             stmt = [[python3 -c 'import sys; v = sys.version_info; print(str(v.major)+str(v.minor))']]
           end
           local python_version = os.iorun(stmt):trim()
-          --print("python_version: " .. python_version)
+          print("python_version: " .. python_version)
           dst_obj = dst_dir .. "core" ..  python_version
         end
 
