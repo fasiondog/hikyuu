@@ -19,6 +19,8 @@ try:
         from .cpp.core312 import *
     elif sys.version_info[1] == 13:
         from .cpp.core313 import *
+    elif sys.version_info[1] == 14:
+        from .cpp.core314 import *
     else:
         from .cpp.core import *
 except:
