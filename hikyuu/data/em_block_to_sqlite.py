@@ -12,10 +12,7 @@ from hikyuu.data.download_block import *
 
 @spend_time
 def em_import_block_to_sqlite(connect):
-    down_em_all_hybk_info()
-    down_em_all_dybk_info()
-    down_em_all_gnbk_info()
-    download_all_zsbk_info()
+    download_block_info()
 
     blocks_info = read_block_from_path()
     blks = blocks_info['block']

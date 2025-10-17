@@ -15,12 +15,13 @@ jobs:
       matrix:
         os: [macos-14]
         arch: [arm64, x86_64]
-        kind: [static]
+        kind: [shared]
+        python-version: ['3.12', '3.13']
 
     runs-on: ${{ matrix.os }}
 
     concurrency:
-        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-macOS-${{ matrix.arch }}-${{ matrix.kind }}
+        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-macOS-${{ matrix.arch }}-${{ matrix.kind }}-py${{ matrix.python-version }}
         cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
@@ -40,15 +41,20 @@ jobs:
 
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          xmake-version: 3.0.1
+          xmake-version: 3.0.4
           actions-cache-folder: '.xmake-cache'
           actions-cache-key: 'macosx-arm64'
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: config
         run: |
           export PYTHONPATH=.
           pip install -r requirements.txt
-          xmake f -c -k ${{ matrix.kind }} -y -vD --feedback=n
+          xmake f -c -k ${{ matrix.kind }} --serialize=n -y -vD --feedback=n
 
       - name: build python
         run: |
@@ -57,6 +63,9 @@ jobs:
       - name: test python
         run: |
           export PYTHONPATH=.
+          python --version
+          python3-config --includes
+          python -c 'import sys; v = sys.version_info; print(str(v.major)+str(v.minor))'
           python hikyuu/test/test.py
    
       - name: test

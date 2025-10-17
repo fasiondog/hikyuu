@@ -21,3 +21,4 @@ h5py
 tdqm
 clickhouse-connect
 pyarrow>=19.0.0
+zstandard>=0.25

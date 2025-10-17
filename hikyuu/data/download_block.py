@@ -299,6 +299,13 @@ def download_all_zsbk_info():
         time.sleep(random.uniform(1, 3))
 
 
+def download_block_info():
+    down_em_all_hybk_info()
+    # down_em_all_dybk_info()
+    # down_em_all_gnbk_info()
+    download_all_zsbk_info()
+    
+
 if __name__ == "__main__":
     # down_em_all_hybk_info()
     # down_em_all_dybk_info()
