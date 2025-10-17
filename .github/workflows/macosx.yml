@@ -48,7 +48,7 @@ jobs:
         run: |
           export PYTHONPATH=.
           pip install -r requirements.txt
-          xmake f -c -k ${{ matrix.kind }} -y -vD --feedback=n
+          xmake f -c -k ${{ matrix.kind }} --serialize=n -y -vD --feedback=n
 
       - name: build python
         run: |
@@ -57,7 +57,7 @@ jobs:
       - name: test python
         run: |
           export PYTHONPATH=.
-          otool -L hikyuu/cpp/core.so
+          otool -L hikyuu/cpp/core313.so
           python hikyuu/test/test.py
    
       - name: test
