@@ -350,6 +350,22 @@ void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle
     _runMomentOnClose(date, nextCycle, adjust);
 }
 
+json SimplePortfolio::lastSuggestion() const {
+    json sys_json_list = json::array();
+    for (const auto& sys : m_running_sys_set) {
+        sys_json_list.emplace_back(sys->lastSuggestion());
+    }
+
+    for (const auto& sw : m_delay_adjust_sys_list) {
+        sys_json_list.emplace_back(sw.sys->lastSuggestion());
+    }
+
+    json ret;
+    ret["name"] = name();
+    ret["sys_list"] = sys_json_list;
+    return ret;
+}
+
 PortfolioPtr HKU_API PF_Simple(const TMPtr& tm, const SEPtr& st, const AFPtr& af, int adjust_cycle,
                                const string& adjust_mode, bool delay_to_trading_day) {
     PortfolioPtr ret = make_shared<SimplePortfolio>(tm, st, af);

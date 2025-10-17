@@ -444,6 +444,21 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
     }
 }
 
+json WithoutAFPortfolio::lastSuggestion() const {
+    json sys_json_list = json::array();
+    for (const auto& sys : m_force_sell_sys_list) {
+        sys_json_list.emplace_back(sys->lastSuggestion());
+    }
+    for (const auto& sys : m_running_sys_set) {
+        sys_json_list.emplace_back(sys->lastSuggestion());
+    }
+
+    json ret;
+    ret["name"] = name();
+    ret["sys_list"] = sys_json_list;
+    return ret;
+}
+
 PortfolioPtr HKU_API PF_WithoutAF(const TMPtr& tm, const SEPtr& se, int adjust_cycle,
                                   const string& adjust_mode, bool delay_to_trading_day,
                                   bool trade_on_close, bool sys_use_self_tm,
