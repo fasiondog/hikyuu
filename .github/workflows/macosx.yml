@@ -16,6 +16,7 @@ jobs:
         os: [macos-14]
         arch: [arm64, x86_64]
         kind: [shared]
+        python-version: ['3.12', '3.13']
 
     runs-on: ${{ matrix.os }}
 
@@ -44,6 +45,11 @@ jobs:
           actions-cache-folder: '.xmake-cache'
           actions-cache-key: 'macosx-arm64'
 
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
       - name: config
         run: |
           export PYTHONPATH=.
@@ -58,11 +64,8 @@ jobs:
         run: |
           export PYTHONPATH=.
           python --version
-          nm -g hikyuu/cpp/core313.so | grep PyInit
           python3-config --includes
           python -c 'import sys; v = sys.version_info; print(str(v.major)+str(v.minor))'
-          otool -L hikyuu/cpp/libhikyuu.dylib
-          otool -L hikyuu/cpp/core313.so
           python hikyuu/test/test.py
    
       - name: test

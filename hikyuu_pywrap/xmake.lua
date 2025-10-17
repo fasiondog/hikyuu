@@ -101,7 +101,12 @@ target("core")
             pydir_include = os.iorun(py3config .. " --includes"):trim()
             pydir_lib = os.iorun(py3config .. " --libs"):trim()
         else
-            local stmt = [[python3 -c 'import sys; v = sys.version_info; print(f"{str(v.major)}.{str(v.minor)}")']]
+            local stmt
+            if is_plat("cross") then
+                stmt = [[python -c 'import sys; v = sys.version_info; print(f"{str(v.major)}.{str(v.minor)}")']]
+            else
+                stmt = [[python3 -c 'import sys; v = sys.version_info; print(f"{str(v.major)}.{str(v.minor)}")']]
+            end
             local python_version = os.iorun(stmt):trim()
             local py3config = "python" .. python_version .. "-config"
             print("py3config: " .. py3config)
@@ -124,7 +129,7 @@ target("core")
             stmt = [[python3 -c 'import sys; v = sys.version_info; print(str(v.major)+str(v.minor))']]
           end
           local python_version = os.iorun(stmt):trim()
-          print("python_version: " .. python_version)
+          --print("python_version: " .. python_version)
           dst_obj = dst_dir .. "core" ..  python_version
         end
 
