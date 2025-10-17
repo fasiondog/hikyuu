@@ -28,7 +28,6 @@
   mf.add_special_normalize("MA20", NORM_Zscore(), category="行业板块", style_inds=[LOG(CLOSE()*LIUTONGPAN())])
   ```
 * 增加内置因子标准化算法(NORM_Zscore/NORM_MinMax/NORM_Quantile/NORM_Quantile_Uniform)
-* 
 * 新增 SE_MultiFactor2 自行指定配置时间截面评分过滤器，内置评分过滤器(SCFilter_TopN/SCFilter_Price/SCFilter_AmountLimit/SCFilter_Group等)
 
   ```python
@@ -39,6 +38,8 @@
 
   如通过 SCFilter_Group 创建过滤器进行因子分组测试：
   ![示例图片](_static/release_269.png)
+
+
 * [vip]新增 GROUP 系列指标(GROUP_MAX/GROUP_MIN/GROUP_SUM/GROUP_FUNC等)，和 AGG 系列指标对应
 * [vip]dateserver 增加 --parquet_path 方式保存 tick data，仅在 --save 同时为 yes 时生效
 * feat(KData): 添加索引方式获取子集功能
