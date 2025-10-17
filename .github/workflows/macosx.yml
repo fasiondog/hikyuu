@@ -59,6 +59,8 @@ jobs:
           export PYTHONPATH=.
           python --version
           nm -g hikyuu/cpp/core313.so | grep PyInit
+          python3-config --includes
+          python -c 'import sys; v = sys.version_info; print(str(v.major)+str(v.minor))'
           otool -L hikyuu/cpp/libhikyuu.dylib
           otool -L hikyuu/cpp/core313.so
           python hikyuu/test/test.py

@@ -105,6 +105,7 @@ target("core")
             pydir_lib = os.iorun("python3-config --libs"):trim()
         end
         assert(pydir_include, "python3-config not found!")
+        print("pydir_include: " .. pydir_include)
         target:add("cxflags", pydir_include, pydir_lib)    
     end)
 
@@ -112,13 +113,13 @@ target("core")
         local dst_dir = "$(projectdir)/hikyuu/cpp/"
         local dst_obj = dst_dir .. "core.so"
 
-        -- need xmake 445e43b40846b29b9abb1293b32b27b7104f54fa
         if not is_plat("cross") then
           local stmt = [[python -c 'import sys; v = sys.version_info; print(str(v.major)+str(v.minor))']]
           if is_plat("linux") then
             stmt = [[python3 -c 'import sys; v = sys.version_info; print(str(v.major)+str(v.minor))']]
           end
           local python_version = os.iorun(stmt):trim()
+          print("python_version: " .. python_version)
           dst_obj = dst_dir .. "core" ..  python_version
         end
 
