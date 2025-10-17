@@ -51,7 +51,7 @@ target("core")
     add_rules("c++.unity_build", {batchsize = 0})
     add_files("./**.cpp|views/**.cpp")
 
-    add_files("./*.cpp|main.cpp", {unity_group="base"})
+    add_files("./*.cpp", {unity_group="base"})
     add_files("./analysis/**.cpp", {unity_group="analysis"})
     add_files("./data_driver/**.cpp", {unity_group="data_driver"})
     add_files("./global/**.cpp", {unity_group="global"})
@@ -115,7 +115,7 @@ target("core")
         end
         assert(pydir_include, "python3-config not found!")
         print("pydir_include: " .. pydir_include)
-        print("pydir_lib: " .. pydir_lib)
+        -- print("pydir_lib: " .. pydir_lib)
         target:add("cxflags", pydir_include, pydir_lib)    
     end)
 
