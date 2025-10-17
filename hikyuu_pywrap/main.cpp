@@ -63,10 +63,13 @@ PYBIND11_MODULE(core310, m) {
 #elif PY_MINOR_VERSION == 11
 PYBIND11_MODULE(core311, m) {
 #elif PY_MINOR_VERSION == 12
+#warning "current python version: 3.12"
 PYBIND11_MODULE(core312, m) {
 #elif PY_MINOR_VERSION == 13
+#warning "current python version: 3.13"
 PYBIND11_MODULE(core313, m) {
 #elif PY_MINOR_VERSION == 14
+#warning "current python version: 3.14"
 PYBIND11_MODULE(core314, m) {
 #else
 PYBIND11_MODULE(core, m) {
