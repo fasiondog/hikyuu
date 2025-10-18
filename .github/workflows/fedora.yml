@@ -37,7 +37,7 @@ jobs:
             -v $GITHUB_WORKSPACE:/app \
             -w /app \
             hikyuu-fedora:latest \
-            sh -c "
+            bash -c "
               # 在容器内执行的命令
               echo 'Fedora version in container:';
               cat /etc/os-release;
