@@ -1,0 +1,35 @@
+name: fedora-build
+
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build hikyuu Fedora image
+      run: |
+        docker build -f docker/Dockerfile_dev_fedora -t hikyuu-fedora:latest . 
+
+    - name: Run steps in hikyuu Fedora container
+      container:
+        image: hikyuu-fedora:latest  # 使用刚构建的自定义镜像
+      run: |
+        # 验证环境（已包含预先安装的工具）
+        echo "Fedora version:"
+        cat /etc/os-release
+        cd hikyuu
+        xmake r small-test
+  
