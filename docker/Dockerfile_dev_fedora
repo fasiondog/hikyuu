@@ -1,6 +1,5 @@
 # 第一阶段：构建环境（安装所有依赖）
-# FROM ubuntu:22.04 AS builder
-FROM ubuntu:24.04 AS builder
+FROM fedora:latest AS builder
 
 WORKDIR /app
 
@@ -13,27 +12,19 @@ ENV TimeZone=Asia/Shanghai \
 
 # 安装编译工具，依赖包    
 RUN ln -snf /usr/share/zoneinfo/$TimeZone /etc/localtime && echo $TimeZone > /etc/timezone \
-    && apt-get update && apt-get install -y --no-install-recommends \
-        tzdata \
-        wget \
-        unzip \
-        ca-certificates \
-        build-essential \
-        libssl-dev \
-        libffi-dev \
-        libgomp1 \
-        binutils \
-        libreadline-dev \
-        git \
-        libmysqlclient-dev \
-        libthrift-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    # 安装xmake（使用官方安装脚本
+    && dnf -y update \
+    && dnf -y install tzdata wget unzip ca-certificates gcc gcc-c++ make openssl-devel \
+        libffi-devel libgomp binutils readline-devel git mysql-devel thrift-devel zlib-ng-compat-static \
+        cmake automake autoconf libtool pkgconf pkgconfig redhat-rpm-config rpm-build \
+    && dnf clean all \
+    # 配置git使用https而非ssl
+    && git config --global http.sslVerify false \
+    # 安装xmake（使用官方安装脚本）
     && wget https://xmake.io/shget.text -O - | bash \
     && echo ". /root/.xmake/profile" >> /root/.bashrc \
     && echo "export XMAKE_ROOT=y" >> /root/.bashrc \
     && echo "export XMAKE_MAIN_REPO=https://gitee.com/tboox/xmake-repo.git" >> /root/.bashrc \
-    # clone hikyuu 源码
+    # clone hikyuu 源码（使用国内镜像源）
     && git clone https://github.com/fasiondog/hikyuu.git \
     # 安装Miniconda
     # 关键修复：接受Anaconda服务条款（必须在conda install前执行）
@@ -67,13 +58,13 @@ RUN ln -snf /usr/share/zoneinfo/$TimeZone /etc/localtime && echo $TimeZone > /et
     # 替换 Miniconda 的 libstdc++ 为系统库
     && bash -c "$MINICONDA_PATH/bin/conda init bash" && \  
     echo "conda activate base" >> /root/.bashrc && \
-    echo "export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib/aarch64-linux-gnu:/opt/miniconda3/lib" >> /root/.bashrc && \
+    echo "export LD_LIBRARY_PATH=/usr/lib64:/opt/miniconda3/lib" >> /root/.bashrc && \
     echo "export PYTHONPATH=/app/hikyuu" >> /root/.bashrc && \
-    SYSTEM_LIB_PATH=$(find /usr/lib -name "libstdc++.so.6" | grep -E "$(uname -m)" | head -n 1) && \
+    SYSTEM_LIB_PATH=$(find /usr/lib64 -name "libstdc++.so.6" | head -n 1) && \
     mv $MINICONDA_PATH/lib/libstdc++.so.6 $MINICONDA_PATH/lib/libstdc++.so.6.bak && \
-    ln -s $SYSTEM_LIB_PATH $MINICONDA_PATH/lib/libstdc++.so.6 && \
+    ln -s $SYSTEM_LIB_PATH $MINICONDA_PATH/lib/libstdc++.so.6 
     # 验证替换结果
-    strings $MINICONDA_PATH/lib/libstdc++.so.6 | grep GLIBCXX_3.4.30
+    # strings $MINICONDA_PATH/lib/libstdc++.so.6 | grep GLIBCXX_3.4.30
 
 # -l表示登录shell，会加载.bashrc中的conda配置
 CMD ["bash", "-c", "cd hikyuu && exec bash -l"]
