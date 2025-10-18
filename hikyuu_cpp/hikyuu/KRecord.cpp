@@ -14,12 +14,12 @@ const KRecord KRecord::NullKRecord;
 HKU_API std::ostream& operator<<(std::ostream& os, const KRecord& record) {
     string strip(", ");
     os << std::fixed;
-    os.precision(4);
+    (void)os.precision(4);
     os << "KRecord(Datetime(" << record.datetime.ymdhms() << ")" << strip << record.openPrice
        << strip << record.highPrice << strip << record.lowPrice << strip << record.closePrice
        << strip << record.transAmount << strip << record.transCount << ")";
     os.unsetf(std::ostream::floatfield);
-    os.precision();
+    (void)os.precision();
     return os;
 }
 

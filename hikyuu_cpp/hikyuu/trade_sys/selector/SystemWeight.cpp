@@ -11,7 +11,7 @@ namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const SystemWeight& sw) {
     os << std::fixed;
-    os.precision(4);
+    (void)os.precision(4);
 
     string name("NULL");
     string stk_name("(Stock(NULL))");
@@ -27,7 +27,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SystemWeight& sw) {
     os << "SystemWeight(sys: " << name << stk_name << ",  weight: " << sw.weight << ")";
 
     os.unsetf(std::ostream::floatfield);
-    os.precision();
+    (void)os.precision();
     return os;
 }
 
