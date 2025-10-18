@@ -304,6 +304,10 @@ def import_one_stock_data(
                 hku_error("Failed translate datetime: {}, from {}! {}".format(bar, api.ip, e))
                 continue
 
+            if 'open' not in bar or 'high' not in bar or 'low' not in bar or 'close' not in bar or 'vol' not in bar or 'amount' not in bar:
+                hku_warn(f"Ignore invalid bar: {bar_datetime}, missing fields!")
+                continue
+
             if last_krecord is not None and bar_datetime == last_datetime:
                 if abs(last_krecord[1] - bar["open"]) / last_krecord[1] > 0.01:
                     hku_error(
