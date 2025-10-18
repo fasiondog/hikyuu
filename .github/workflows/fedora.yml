@@ -35,14 +35,11 @@ jobs:
           # -w：指定容器内的工作目录为/app
           docker run --rm \
             -v $GITHUB_WORKSPACE:/app \
-            -w /app \
+            -w /app/hikyuu \
             hikyuu-fedora:latest \
             bash -ic "
               # 在容器内执行的命令
-              echo 'Fedora version in container:';
-              cat /etc/os-release;
-              cd hikyuu;
-              xmake f -c -k shared --feedback=n -y;
+              xmake f -c -k shared --feedback=n -y -vD;
               xmake -b core;
               python hikyuu/test/test.py;
               xmake r small-test;
