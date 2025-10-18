@@ -42,5 +42,8 @@ jobs:
               echo 'Fedora version in container:';
               cat /etc/os-release;
               cd hikyuu;
+              xmake f -c -k shared --feedback=n -y;
+              xmake -b core;
+              python hikyuu/test/test.py;
               xmake r small-test;
             "
