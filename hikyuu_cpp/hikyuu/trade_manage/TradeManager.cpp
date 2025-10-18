@@ -23,7 +23,7 @@ namespace hku {
 string TradeManager::str() const {
     std::stringstream os;
     os << std::fixed;
-    os.precision(2);
+    (void)os.precision(2);
 
     FundsRecord funds = getFunds();
     string strip(",\n");
@@ -76,7 +76,7 @@ string TradeManager::str() const {
     os << "}";
 
     os.unsetf(std::ostream::floatfield);
-    os.precision();
+    (void)os.precision();
     return os.str();
 }
 

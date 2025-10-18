@@ -83,10 +83,10 @@ target("hikyuu")
     add_headerfiles("../(hikyuu/**.h)|**doc.h")
 
     -- set_policy("build.optimization.lto", true)
-    add_rules("c++.unity_build", {batchsize = 2})
+    add_rules("c++.unity_build", {batchsize = 0})
     add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|indicator_talib/**.cpp|views/**.cpp")
    
-    add_files("./*.cpp", {unity_group="base"})
+    add_files("./*.cpp", "./serialization/*.cpp", {unity_group="base"})
     add_files("./indicator/**.cpp", {unity_group="indicator"})
 
     add_files("./analysis/**.cpp", {unity_group="analysis"})
@@ -117,9 +117,14 @@ target("hikyuu")
     add_files("./trade_sys/stoploss/**.cpp", {unity_group="stoploss"})
     add_files("./trade_sys/system/**.cpp", {unity_group="system"})
 
-    add_files("./utilities/**.cpp|utilities/db_connect/**.cpp", {unity_group="utilities"})
+    add_files("./utilities/*.cpp", "./utilities/datetime/*.cpp", "./utilities/ini_parser/*.cpp", {unity_group="utilities"})
+    add_files("./utilities/thread/*.cpp", "./utilities/db_connect/*.cpp", "./utilities/http_client/*.cpp", {unity_group="utilities"})
+
     add_files("./data_driver/*.cpp", {unity_group="data_driver"})
+    add_files("./data_driver/block_info/qianlong/**.cpp", {unity_group="data_driver"})
+    add_files("./data_driver/kdata/cvs/**.cpp", {unity_group="data_driver"})
     if get_config("hdf5") or get_config("sqlite") then
+        add_files("./utilities/db_connect/sqlite/**.cpp", {unity_group="sqlite"})
         add_files("./data_driver/base_info/sqlite/**.cpp", {unity_group="sqlite"})
         add_files("./data_driver/block_info/sqlite/**.cpp", {unity_group="sqlite"})
     end
@@ -127,8 +132,6 @@ target("hikyuu")
         add_files("./data_driver/base_info/mysql/**.cpp", {unity_group="mysql"})
         add_files("./data_driver/block_info/mysql/**.cpp", {unity_group="mysql"})
     end
-    add_files("./data_driver/block_info/qianlong/**.cpp", {unity_group="qianlong"})
-    add_files("./data_driver/kdata/cvs/**.cpp", {unity_group="csv_driver"})
     if get_config("sqlite") or get_config("hdf5") then
         add_files("./data_driver/kdata/sqlite/**.cpp", {unity_group="sqlite"})
     end

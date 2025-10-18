@@ -1,6 +1,6 @@
 # 第一阶段：构建环境（安装所有依赖）
-# FROM ubuntu:22.04 AS builder
-FROM ubuntu:24.04 AS builder
+# FROM debian:bookworm AS builder
+FROM debian:trixie AS builder
 
 WORKDIR /app
 
@@ -25,7 +25,6 @@ RUN ln -snf /usr/share/zoneinfo/$TimeZone /etc/localtime && echo $TimeZone > /et
         binutils \
         libreadline-dev \
         git \
-        libmysqlclient-dev \
         libthrift-dev \
     && rm -rf /var/lib/apt/lists/* \
     # 安装xmake（使用官方安装脚本

@@ -84,14 +84,14 @@ HKU_API std::ostream& operator<<(std::ostream& os, const PositionRecord& record)
 
     string strip(", ");
     os << std::fixed;
-    os.precision(precision);
+    (void)os.precision(precision);
     os << "Position(" << market << strip << code << strip << name << strip << record.takeDatetime
        << strip << record.cleanDatetime << strip << record.number << strip << costPrice << strip
        << record.stoploss << strip << record.goalPrice << strip << record.totalNumber << strip
        << record.buyMoney << strip << record.totalCost << strip << record.totalRisk << strip
        << record.sellMoney << ")";
     os.unsetf(std::ostream::floatfield);
-    os.precision();
+    (void)os.precision();
     return os;
 }
 
@@ -114,13 +114,13 @@ string PositionRecord::str() const {
     string strip(", ");
     std::stringstream os;
     os << std::fixed;
-    os.precision(precision);
+    (void)os.precision(precision);
     os << "Position(" << market << strip << code << strip << name << strip << takeDatetime << strip
        << cleanDatetime << strip << number << strip << costPrice << strip << stoploss << strip
        << goalPrice << strip << totalNumber << strip << buyMoney << strip << totalCost << strip
        << totalRisk << strip << sellMoney << ")";
     os.unsetf(std::ostream::floatfield);
-    os.precision();
+    (void)os.precision();
     return os.str();
 }
 

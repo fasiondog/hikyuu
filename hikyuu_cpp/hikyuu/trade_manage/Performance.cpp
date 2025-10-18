@@ -144,7 +144,7 @@ string Performance::report() {
     }
 
     buf.unsetf(std::ostream::floatfield);
-    buf.precision();
+    (void)buf.precision();
     return buf.str();
 }
 

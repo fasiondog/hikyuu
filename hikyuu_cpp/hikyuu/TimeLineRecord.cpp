@@ -12,11 +12,11 @@ namespace hku {
 HKU_API std::ostream& operator<<(std::ostream& os, const TimeLineRecord& record) {
     string strip(", ");
     os << std::fixed;
-    os.precision(4);
+    (void)os.precision(4);
     os << "TimeLineRecord(Datetime(" << record.datetime.number() << ")" << strip << record.price
        << strip << record.vol << ")";
     os.unsetf(std::ostream::floatfield);
-    os.precision();
+    (void)os.precision();
     return os;
 }
 

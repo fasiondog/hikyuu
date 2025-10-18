@@ -28,11 +28,11 @@ HKU_API std::ostream& operator<<(std::ostream& os, const CostRecord& record) {
 std::string CostRecord::toString() const {
     std::stringstream os;
     os << std::fixed;
-    os.precision(2);
+    (void)os.precision(2);
     os << "CostRecord(commision: " << commission << ", stamptax: " << stamptax
        << ", transferfee: " << transferfee << ", others: " << others << ", total: " << total << ")";
     os.unsetf(std::ostream::floatfield);
-    os.precision();
+    (void)os.precision();
     return os.str();
 }
 

@@ -11,7 +11,7 @@ namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const FundsRecord& funds) {
     os << std::fixed;
-    os.precision(4);
+    (void)os.precision(4);
 
     string strip(", ");
     os << "FundsRecord(" << funds.cash << strip << funds.market_value << strip
@@ -19,7 +19,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const FundsRecord& funds) {
        << funds.borrow_cash << strip << funds.borrow_asset << ")";
 
     os.unsetf(std::ostream::floatfield);
-    os.precision();
+    (void)os.precision();
     return os;
 }
 
