@@ -42,6 +42,7 @@ jobs:
               ls;
               xmake f -c -k shared --feedback=n -y;
               xmake -b core;
+              export PYTHONPATH=.:$PYTHONPATH;
               python hikyuu/test/test.py;
               xmake r small-test;
             "
