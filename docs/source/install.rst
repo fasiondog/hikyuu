@@ -10,10 +10,8 @@
 
     - **2.6.8 版本起，部分不支持 avx 指令集的老旧机器，请使用 pip install hikyuu-noarrow 安装。(不包含arrow相关功能）**
 
-    - linux 下 pip 安装时，不安装 PyQt5 依赖, 如需使用 HikyuuTDX, 需自行安装 PyQt5
 
-
-1. Python环境：>= Python3.9 (macosx python >= 3.10)。 推荐使用安装时 python 的主流版本或低一个版本，比如截止 2025年4月1日, python主流版本为 3.12, 建议使用3.12或3.11, 避免因 python 版本低可能导致的其他依赖包互不兼容导致的错误。
+1. Python环境：>= Python3.10)。 推荐使用安装时 python 的主流版本或低一个版本，比如截止 2025年4月1日, python主流版本为 3.12, 建议使用3.12或3.11, 避免因 python 版本低可能导致的其他依赖包互不兼容导致的错误。
 
 .. note:: 
 
