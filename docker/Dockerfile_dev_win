@@ -1,0 +1,70 @@
+# Windows版本的hikyuu开发环境Dockerfile
+# 基于Windows Server 2022 Core镜像
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+
+# 设置工作目录
+WORKDIR C:\\app
+
+# 安装Chocolatey包管理器
+RUN powershell -Command \
+    Set-ExecutionPolicy Bypass -Scope Process -Force; \
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; \
+    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+# 安装Git、wget和unzip工具
+RUN choco install -y git wget unzip
+
+# 安装Miniconda3（已包含Python）
+RUN choco install -y miniconda3
+
+# 设置环境变量
+ENV MINICONDA_PATH="C:\tools\miniconda3"
+ENV PATH="C:\tools\miniconda3;C:\tools\miniconda3\Scripts;C:\Program Files\Git\cmd;%PATH%"
+
+# 初始化conda并设置自动激活base环境
+RUN powershell -Command \
+    $env:PATH = \"C:\tools\miniconda3\Scripts;C:\tools\miniconda3;$env:PATH\"; \
+    conda init powershell; \
+    echo \"conda activate base\" >> $PROFILE
+
+# 克隆hikyuu源码
+RUN git clone https://github.com/fasiondog/hikyuu.git
+
+# 配置pip镜像源（使用清华源加速）
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip config set global.trusted-host pypi.tuna.tsinghua.edu.cn
+
+# 升级pip并安装依赖
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r hikyuu\requirements.txt
+
+# 安装Visual Studio Build Tools (包含MSVC编译器)
+RUN powershell -Command \
+    wget https://aka.ms/vs/17/release/vs_BuildTools.exe -OutFile vs_BuildTools.exe; \
+    Start-Process -FilePath .\vs_BuildTools.exe -ArgumentList '--quiet', '--wait', '--norestart', '--nocache', \
+    '--installPath', 'C:\BuildTools', \
+    '--add', 'Microsoft.VisualStudio.Workload.VCTools', \
+    '--add', 'Microsoft.VisualStudio.Component.VC.Tools.x86.x64', \
+    '--add', 'Microsoft.VisualStudio.Component.Windows10SDK.19041' -Wait; \
+    Remove-Item -Path .\vs_BuildTools.exe
+
+# 添加MSVC到环境变量
+ENV PATH="C:\BuildTools\MSBuild\Current\Bin;C:\BuildTools\VC\Tools\MSVC\14.34.31931\bin\Hostx64\x64;C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;%PATH%"
+ENV VCINSTALLDIR="C:\BuildTools\VC\Tools\MSVC\14.34.31931"
+ENV WindowsSdkDir="C:\Program Files (x86)\Windows Kits\10"
+
+# 安装xmake构建工具
+RUN powershell -Command \
+    wget https://github.com/xmake-io/xmake/releases/download/v2.9.8/xmake-windows-x64.exe -OutFile xmake-installer.exe; \
+    Start-Process -FilePath .\xmake-installer.exe -ArgumentList '/S' -Wait; \
+    Remove-Item -Path .\xmake-installer.exe
+
+# 添加xmake到环境变量
+ENV PATH="C:\Program Files\xmake;%PATH%"
+
+# 安装常用的Python包
+RUN conda install -y ipython
+RUN conda clean -afy
+
+# 设置默认命令，使用PowerShell以确保conda环境正确激活
+CMD ["powershell.exe", "-NoExit", "-Command", "Set-Location hikyuu"]

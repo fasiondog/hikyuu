@@ -1,0 +1,43 @@
+# Windows版本的hikyuu Dockerfile
+# 基于Windows Server 2022 Core镜像
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+
+# 设置工作目录
+WORKDIR C:\\hikyuu
+
+# 安装Chocolatey包管理器
+RUN powershell -Command \
+    Set-ExecutionPolicy Bypass -Scope Process -Force; \
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; \
+    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+# 安装Python和Miniconda
+RUN choco install -y python --version=3.11.9
+RUN choco install -y miniconda3
+
+# 设置环境变量
+ENV PATH="C:\tools\miniconda3;C:\tools\miniconda3\Scripts;C:\Python311;C:\Python311\Scripts;%PATH%"
+ENV MINICONDA_PATH="C:\tools\miniconda3"
+
+# 配置pip镜像源（使用清华源加速）
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip config set global.trusted-host pypi.tuna.tsinghua.edu.cn
+
+# 升级pip并安装hikyuu及相关依赖
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir hikyuu
+
+# 安装常用的Python包
+RUN conda install -y ipython numpy pandas matplotlib jupyter
+RUN conda clean -afy
+
+# 设置时区为上海
+RUN powershell -Command \
+    Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation' -Name 'RealTimeIsUniversal' -Value 1; \
+    tzutil /s "China Standard Time"
+
+# 暴露Jupyter端口
+EXPOSE 8888
+
+# 设置默认命令
+CMD ["cmd.exe"]
