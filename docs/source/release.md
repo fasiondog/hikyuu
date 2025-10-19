@@ -1,6 +1,6 @@
 # 版本发布说明
 
-## 2.6.9 -
+## 2.6.9 - 2025年10月19日
 
 **🚀 新增特性**
 
@@ -38,8 +38,6 @@
 
   如通过 SCFilter_Group 创建过滤器进行因子分组测试：
   ![示例图片](_static/release_269.png)
-
-
 * [vip]新增 GROUP 系列指标(GROUP_MAX/GROUP_MIN/GROUP_SUM/GROUP_FUNC等)，和 AGG 系列指标对应
 * [vip]dateserver 增加 --parquet_path 方式保存 tick data，仅在 --save 同时为 yes 时生效
 * feat(KData): 添加索引方式获取子集功能
@@ -51,7 +49,7 @@
 * HikyuuTDX 从 PyQt5 迁移至 PySide6
 * feat(hikyuu_cpp): 在 Performance 类中新增"未平仓帐户收益率%"统计项
 * feat(draw): 为 tm_performance 和 sys_performance 函数添加返回主图 axis 的功能，便于用户在绘图后对图表进行进一步的自定义操作和调整。
-* 编译工程优化，借助xmake合并编译功能，整体编译实际缩短三分之二
+* 编译工程优化，基于xmake合并编译功能，整体编译实际缩短三分之二
 
 **🐞 缺陷修复**
 
