@@ -35,7 +35,7 @@ jobs:
           # -w：指定容器内的工作目录为/app
           docker run --rm \
             -v $GITHUB_WORKSPACE:/app \
-            -w /app/hikyuu \
+            -w /app \
             hikyuu-fedora:latest \
             bash -ic "
               # 在容器内执行的命令
