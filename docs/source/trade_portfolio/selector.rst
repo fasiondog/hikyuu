@@ -1,8 +1,8 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-选择器算法组件
-================
+选择器算法组件|SE
+==================
 
 实现标的、系统策略的评估和选取算法。
 
@@ -18,6 +18,16 @@
             (不过由于仅依赖SG的场景不严谨, 因为原型和实际系统的SG是一样的)
             此时, 需要在自身计算之前执行原型系统, 然后SE自行时可以使用.
             而对于实际系统和被跟随的系统完全不一样的情况, 可以自行设计特殊的SE.
+
+基于多因子评分的选择器, 推荐使用 SE_MultiFactor2, 可以自定义添加对 MF 返回的截面评分记录进行组合过滤。参见：:doc:`scfilter`
+
+::
+
+    # 如为 SE_MultiFactor2 实例，设置过滤：分值不为Nan|分成10组取第0组|价格大于等于10元|成交金额不在当日排名末尾20%之内|取前10
+    se.set_scores_filter(SCFilter_IgnoreNan()|SCFilter_Group(10, 0)SCFilter_Price(
+            10.) | SCFilter_AmountLimit(0.2) | SCFilter_TopN(10))
+
+
 
 内建选择器
 -----------
@@ -54,6 +64,20 @@
     :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
     :return: SE选择器实例
 
+.. py:function:: SE_MultiFactor2([inds, ic_n, ic_rolling_n, ref_stk, spearman, mode, filter])
+
+    创建基于多因子评分的选择器，两种创建方式。:doc:`scfilter`
+
+    - 直接指定 MF: SE_MultiFactor2(mf, filter)
+    - 参数直接创建
+
+      :param sequense(Indicator) inds: 原始因子列表
+      :param int ic_n: 默认 IC 对应的 N 日收益率
+      :param int ic_rolling_n: IC 滚动周期
+      :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+      :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)
+
 
 自定义选择器策略
 --------------------
@@ -61,8 +85,7 @@
 自定义选择器策略接口：
 
 * :py:meth:`SelectorBase.is_match_af` - 【必须】判断是否和AF匹配
-* :py:meth:`SelectorBase.get_selected_on_open` - 【必须】获取指定时刻开盘时选择的系统实例列表
-* :py:meth:`SelectorBase.get_selected_on_close` - 【必须】获取指定时刻收盘时选择的系统实例列表
+* :py:meth:`SelectorBase.get_selected` - 【必须】获取指定时刻的系统实例列表
 * :py:meth:`SelectorBase._calculate` - 【必须】计算接口
 * :py:meth:`SelectorBase._reset` - 【可选】重置私有属性
 * :py:meth:`SelectorBase._clone` - 【必须】克隆接口
@@ -129,6 +152,18 @@
     
         清除所有已加入的原型系统
 
+    .. py:method:: set_scores_filter(self, scfilter)
+
+        设置 ScoresFilter, 将替换现有的过滤器, 仅适用于 SE_MultiFactor
+    
+        :param ScoresFilter filter: ScoresFilter
+
+    .. py:method:: add_scores_filter(self, scfilter)
+
+        在已有过滤基础上新增过滤, 仅适用于 SE_MultiFactor
+
+        :param ScoresFilter filter: 新的过滤器    
+
     .. py:method:: is_match_af(self)
 
         【重载接口】判断是否和 AF 匹配
@@ -136,21 +171,14 @@
         :param AllocateFundsBase af: 资产分配算法
 
 
-    .. py:method:: get_selected_on_open(self, datetime)
+    .. py:method:: get_selected(self, datetime)
     
-        【重载接口】获取指定时刻开盘时选取的系统实例
+        【重载接口】获取指定时刻选取的系统实例
         
         :param Datetime datetime: 指定时刻
         :return: 选取的系统实例列表
         :rtype: SystemList
 
-    .. py:method:: get_selected_on_close(self, datetime)
-    
-        【重载接口】获取指定时刻收盘时选取的系统实例
-        
-        :param Datetime datetime: 指定时刻
-        :return: 选取的系统实例列表
-        :rtype: SystemList
 
      .. py:method:: _calculate(self)
 

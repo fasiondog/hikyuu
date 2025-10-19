@@ -78,6 +78,11 @@ Linux下需安装依赖的开发软件包。如 Ubuntu 下，执行以下命令�
 2. 编译
 ^^^^^^^^^^
 
+.. note::
+
+    **注意** ：长时间没编译，更新代码后进行重编译前，请先执行 python setup.py clear 彻底清除之前的编译缓存。并更新 python 依赖，pip install -r requirements.txt
+
+
 进入源码目录下，执行 python setup.py build -j 10 , 其他支持的 command：
 
 - python setup.py help        -- 查看帮助

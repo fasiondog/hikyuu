@@ -14,9 +14,9 @@ BOOST_CLASS_EXPORT(hku::NormZScore)
 namespace hku {
 
 NormZScore::NormZScore() : NormalizeBase("NORM_Zscore") {
-    setParam<double>("nsigma", 3);
-    setParam<bool>("out-extreme", false);
-    setParam<bool>("recursive", false);
+    setParam<double>("nsigma", 3);         // 异常值判断倍数
+    setParam<bool>("out-extreme", false);  // 去除异常值
+    setParam<bool>("recursive", false);    // 递归去除异常值
 }
 
 NormZScore::NormZScore(bool outExtreme, double nsigma, bool recursive)

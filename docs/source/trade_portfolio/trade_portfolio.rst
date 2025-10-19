@@ -10,3 +10,5 @@
    multifactor
    selector
    allocate_funds
+   normalize.md
+   scfilter.md

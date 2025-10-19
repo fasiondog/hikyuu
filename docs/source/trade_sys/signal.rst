@@ -1,8 +1,8 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-信号指示器
-==========
+信号指示器|SG
+=============
 
 信号指示器负责产生买入、卖出信号。
 

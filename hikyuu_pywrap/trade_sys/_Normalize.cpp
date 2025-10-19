@@ -67,9 +67,21 @@ void export_Normlize(py::module& m) {
     m.def("NORM_NOTHING", &NORM_NOTHING, "无截面标准化操作");
     m.def("NORM_MinMax", &NORM_MinMax, "最小-最大标准化操作");
     m.def("NORM_Zscore", &NORM_Zscore, py::arg("out_extreme") = false, py::arg("nsigma") = 3.0,
-          py::arg("recursive") = false, "Z-score 标准化操作");
+          py::arg("recursive") = false, R"(Z-score 标准化操作
+          
+    :param out_extreme: 是否剔除异常值
+    :param nsigma: 异常值判断倍数±3.0
+    :param recursive: 是否递归处理异常值)");
+
     m.def("NORM_Quantile", &NORM_Quantile, py::arg("quantile_min") = 0.01,
-          py::arg("quantile_max") = 0.99, "分位数截面标准化操作");
+          py::arg("quantile_max") = 0.99, R"(分位数截面标准化操作
+          
+    :param quantile_min: 最小分位数
+    :param quantile_max: 最大分位数)");
+
     m.def("NORM_Quantile_Uniform", &NORM_Quantile_Uniform, py::arg("quantile_min") = 0.01,
-          py::arg("quantile_max") = 0.99, "分位数截面均匀分布标准化操作");
+          py::arg("quantile_max") = 0.99, R"(分位数截面均匀分布标准化操作
+          
+    :param quantile_min: 最小分位数
+    :param quantile_max: 最大分位数)");
 }

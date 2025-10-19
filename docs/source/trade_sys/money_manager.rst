@@ -1,8 +1,8 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-资金管理策略
-============
+资金管理策略|MM
+===============
 
 公共参数：
 

@@ -13,7 +13,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-from recommonmark.parser import CommonMarkParser
 import sphinx_rtd_theme
 import sys
 import os
@@ -29,7 +28,7 @@ copyright = '2017, fasiondog，<a href="https://hikyuu.org/">Hikyuu</a>'
 author = 'fasiondog'
 
 extensions = [
-    'recommonmark',
+    'myst_parser',
     'sphinx_markdown_tables',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.mathjax'
@@ -67,9 +66,6 @@ html_use_index = True
 html_search_language = 'zh'
 htmlhelp_basename = 'Hikyuudoc'
 
-source_parsers = {
-    '.md': CommonMarkParser,
-}
 source_suffix = ['.rst', '.md']
 
 needs_sphinx = '4.2.0'

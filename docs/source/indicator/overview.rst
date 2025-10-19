@@ -179,6 +179,17 @@
 * :py:func:`AGG_STD` - [VIP]聚合函数: 标准差
 * :py:func:`AGG_VAR` - [VIP]聚合函数: 方差
 * :py:func:`AGG_QUANTILE` - [VIP]聚合函数: 分位数
+* :py:func:`AGG_FUNC` - [VIP]聚合函数: 自定义聚合函数
+
+**分组指标**
+
+* :py:func:`GROUP_COUNT` - [VIP]分组函数: 非空值计数
+* :py:func:`GROUP_MAX` - [VIP]分组函数: 分组累计最大值
+* :py:func:`GROUP_MIN` - [VIP]分组函数: 分组累计最小值
+* :py:func:`GROUP_MEAN` - [VIP]分组函数: 分组累计平均值
+* :py:func:`GROUP_PROD` - [VIP]分组函数: 分组累计乘积
+* :py:func:`GROUP_SUM` - [VIP]分组函数: 分组累计总和
+* :py:func:`GROUP_FUNC` - [VIP]分组函数: 自定义分组计算函数
 
 
 **时间指标**

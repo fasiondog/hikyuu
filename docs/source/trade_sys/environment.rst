@@ -1,11 +1,11 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-市场环境判定策略
-================
+市场环境判定策略|EV
+===========================
 
 内建市场环境判定策略
---------------------
+---------------------------
 
 .. py:function:: EV_TwoLine(fast, slow[, market = 'SH'])
 

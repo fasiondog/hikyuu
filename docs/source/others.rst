@@ -160,3 +160,21 @@
         import akshare as ak
         df = ak.bond_zh_us_rate("19901219")
         x = df_to_ind(df, '美国国债收益率10年', '日期')
+
+
+.. py:function:: parallel_run_sys(sys_list, query[, reset=False, reset_all=False]) -> List[FundsList]
+
+    并行运行多个系系统, 并返回 list FundsList, 各账户对应资产（按query时间段）
+
+    :param sys_list: 系统列表
+    :param query: 查询条件
+    :param bool reset: 执行前是否依据系统部件共享属性复位
+    :param bool reset_all: 强制复位所有部件
+
+.. py:function:: parallel_run_pf(pf_list, query[, force=False]) -> List[FundsList]
+
+    并行执行多个投资组合策略, 并返回 list FundsList, 各账户对应资产（按query时间段）
+
+    :param list pf_list: 投资组合列表
+    :param Query query: 查询条件
+    :param bool force: 强制重新计算

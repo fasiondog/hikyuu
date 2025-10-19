@@ -117,9 +117,10 @@ void export_SCFilter(py::module& m) {
           py::arg("max_price") = 100000.,
           R"(SCFilter_Price([min_price = 10., max_price = 100000.])
             
-    过滤掉价格在评分列表末尾百分比范围内的截面
+    仅保留价格在 [min_price, max_price] 之间的标的
     
     注意：和传入的截面评分列表顺序相关，如果是降序，过滤的是价格较小的系统评分记录；反之，则是价格较大的系统评分记录
 
-    :param double min_price: 最小价格限制)");
+    :param double min_price: 最小价格限制
+    :param double max_price: 最大价格限制)");
 }

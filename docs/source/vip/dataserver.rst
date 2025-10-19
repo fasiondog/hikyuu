@@ -5,11 +5,14 @@ pip 安装的，可在 shell 下直接执行 dataserver 命令。或使用 Pytho
 
 ::
     
-    dataserver 可附带参数，默认参数如下：
+    dataserver 参数如下：
 
-    参数1: "tcp://0.0.0.0/9201"  （注：通常用于修改端口号, 前面不用修改）
-    
-    参数2: 2  （接收行情服务时的工作线程数）
+    Options:
+    -addr, --addr TEXT              自身对外提供的服务地址, 如需外部机器访问，请使用 tcp://0.0.0.0:port
+    -n, --work_num INTEGER          行情接收处理线程数
+    -save, --save BOOLEAN           保存行情数据(仅支持clickhouse)
+    -buf, --buf BOOLEAN             缓存行情数据
+    -parquet_path, --parquet_path TEXT  Parquet 文件存储路径
 
 
 dataserver 需要配合行情采集服务使用，可以和行情采集服务所在机器在同一台机器上运行，也可以在两台机器上分别运行，但需要配置好网络。

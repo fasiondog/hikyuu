@@ -1,8 +1,8 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-盈利目标策略
-============
+盈利目标策略|PG
+================
 
 内建盈利目标策略
 ----------------

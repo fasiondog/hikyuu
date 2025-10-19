@@ -411,7 +411,7 @@ void export_extend_Indicator(py::module& m) {
           return ret;
       },
       py::arg("ind"), py::arg("group_func"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1,
-      R"(GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1]
+      R"(GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1])
       
     自定义分组累积计算指标。虽然支持python自定义函数, 但python函数需要GIL, 速度较慢。建议最好直接使用 C++ 自定义分组累积函数。
     
