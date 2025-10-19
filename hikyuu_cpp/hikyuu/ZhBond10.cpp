@@ -12,10 +12,10 @@ namespace hku {
 HKU_API std::ostream& operator<<(std::ostream& os, const ZhBond10& bond) {
     string strip(", ");
     os << std::fixed;
-    os.precision(4);
+    (void)os.precision(4);
     os << "ZhBond10(Datetime(" << bond.date.ymd() << ")" << strip << bond.value << ")";
     os.unsetf(std::ostream::floatfield);
-    os.precision();
+    (void)os.precision();
     return os;
 }
 
