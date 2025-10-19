@@ -15,8 +15,6 @@
 
 namespace hku {
 
-shared_ptr<KDataImp> KData::ms_null_kdata_imp{make_shared<KDataImp>()};
-
 HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata) {
     os << "KData{\n  size : " << kdata.size() << "\n  stock: " << kdata.getStock()
        << "\n  query: " << kdata.getQuery();
@@ -44,12 +42,12 @@ string KData::toString() const {
     return os.str();
 }
 
-KData::KData() : m_imp(ms_null_kdata_imp) {}
+KData::KData() : m_imp(get_null_kdata_imp()) {}
 
 KData::KData(const Stock& stock, const KQuery& query) {
     // 在重加载或setKDateList时，已存在KData存在数据无效风险（但无内存访问问题)
     if (stock.isNull()) {
-        m_imp = ms_null_kdata_imp;
+        m_imp = get_null_kdata_imp();
     } else if (query.recoverType() == KQuery::NO_RECOVER && stock.isBuffer(query.kType())) {
         // 当Stock已缓存了该类型的K线数据，且不进行复权
         m_imp = make_shared<KDataSharedBufferImp>(stock, query);

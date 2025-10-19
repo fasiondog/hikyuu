@@ -14,7 +14,7 @@ HKU_API std::ostream& operator<<(std::ostream& out, const ScoreRecord& td) {
     out.precision(4);
     out << "(" << td.stock.market_code() << ", " << td.value << ")" << std::endl;
     out.unsetf(std::ostream::floatfield);
-    out.precision();
+    (void)out.precision();
     return out;
 }
 
@@ -36,7 +36,7 @@ HKU_API std::ostream& operator<<(std::ostream& out, const ScoreRecordList& td) {
         }
     }
     out.unsetf(std::ostream::floatfield);
-    out.precision();
+    (void)out.precision();
     return out;
 }
 
@@ -59,7 +59,7 @@ HKU_API std::ostream& operator<<(std::ostream& out, const vector<ScoreRecordList
     }
 
     out.unsetf(std::ostream::floatfield);
-    out.precision();
+    (void)out.precision();
     return out;
 }
 

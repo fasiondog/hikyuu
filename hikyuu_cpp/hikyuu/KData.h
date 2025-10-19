@@ -191,7 +191,10 @@ public:
     }
 
 private:
-    static shared_ptr<KDataImp> ms_null_kdata_imp;
+    std::shared_ptr<KDataImp>& get_null_kdata_imp() {
+        static std::shared_ptr<KDataImp> instance = std::make_shared<KDataImp>();  // 第一次调用时初始化
+        return instance;
+    }
 
 private:
     KDataImpPtr m_imp;
@@ -249,7 +252,7 @@ KData HKU_API getKData(const string& market_code, int64_t start = 0, int64_t end
 inline KData::KData(const KData& x) : m_imp(x.m_imp) {}
 
 inline KData::KData(KData&& x) : m_imp(std::move(x.m_imp)) {
-    x.m_imp = ms_null_kdata_imp;
+    x.m_imp = get_null_kdata_imp();
 }
 
 inline KData& KData::operator=(const KData& x) {
@@ -263,7 +266,7 @@ inline KData& KData::operator=(KData&& x) {
     if (this == &x)
         return *this;
     m_imp = std::move(x.m_imp);
-    x.m_imp = ms_null_kdata_imp;
+    x.m_imp = get_null_kdata_imp();
     return *this;
 }
 

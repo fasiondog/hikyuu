@@ -19,7 +19,7 @@ static bool isType(const boost::any& value) {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Parameter& param) {
     // os << std::fixed;
-    // os.precision(4);
+    // (void)os.precision(4);
     os << "params[";
     string strip(", ");
     Parameter::param_map_t::const_iterator iter = param.m_params.begin();
