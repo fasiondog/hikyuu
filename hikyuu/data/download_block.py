@@ -257,8 +257,8 @@ def download_all_zsbk_info():
                          "000854", "000856", "000857", "000858", "000923", "000973",
                          "000974", "000996", "000997", "000999", "399415", "399416"])
 
-    failed_sina = False
-    failed_csindex = False
+    failed_sina = 0
+    failed_csindex = 0
     blk_set = {}
     blk_codes = blk_info["index_code"]
     blk_names = blk_info["display_name"]
@@ -277,15 +277,17 @@ def download_all_zsbk_info():
 
         try:
             if blk_code[:3] == "399":
-                if failed_sina:
+                if failed_sina > 10:
                     continue
                 stk_codes = ak.index_stock_cons(symbol=blk_code)
                 stk_codes = stk_codes['品种代码'].to_list()
+                failed_sina = 0
             else:
-                if failed_csindex:
+                if failed_csindex > 10:
                     continue
                 stk_codes = ak.index_stock_cons_csindex(symbol=blk_code)
                 stk_codes = stk_codes['成分券代码'].to_list()
+                failed_csindex = 0
 
             stk_codes = [modifiy_code(code) for code in stk_codes]
             stk_codes = [code for code in stk_codes if code is not None]
@@ -297,13 +299,16 @@ def download_all_zsbk_info():
         except ConnectionError:
             if blk_code[:3] == "399":
                 hku_warn("ConnectionError! Sina closed!")
-                failed_sina = True
+                failed_sina = 100
             else:
                 hku_warn("ConnectionError! CSIndex closed!")
-                failed_csindex = True
+                failed_csindex = 100
         except Exception as e:
-            pass
-            # print(f"Failed! {i}, {blk_code}, {blk_name} {str(e)}")
+            print(f"Failed! {i}, {blk_code}, {blk_name}! {type(e).__name__}: {str(e)}")
+            if blk_code[:3] == "399":
+                failed_sina += 1
+            else:
+                failed_csindex += 1
             # raise e
         time.sleep(random.uniform(1, 3))
 
