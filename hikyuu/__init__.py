@@ -84,11 +84,32 @@ atexit.register(hku_cleanup)
 
 sm = StockManager.instance()
 
-plugin_path = Path.home() / '.hikyuu' / 'plugin'
-if plugin_path.exists():
-    plugin_path = str(plugin_path)
-else:
-    plugin_path = os.path.join(os.path.dirname(__file__), 'plugin')
+# 尝试寻找 hikyuu_plugin python包，并获取其所在目录
+try:
+    import hikyuu_plugin
+    plugin_path = os.path.dirname(hikyuu_plugin.__file__)
+    plugin_version = hikyuu_plugin.__version__
+
+    # 获取主版本号（格式为x.x.x）
+    def get_major_version(version_str):
+        parts = version_str.split('.')
+        return '.'.join(parts[:3]) if len(parts) >= 3 else version_str
+
+    # 比较hikyuu和hikyuu_plugin的版本号
+    hikyuu_major_version = get_major_version(__version__)
+    plugin_major_version = get_major_version(plugin_version)
+
+    if hikyuu_major_version != plugin_major_version:
+        hku_warn("hikyuu版本 ({}) 与 hikyuu_plugin版本 ({}) 不匹配，请确保使用兼容版本！".format(__version__, plugin_version))
+
+except ImportError:
+    plugin_path = Path.home() / '.hikyuu' / 'plugin'
+    if plugin_path.exists():
+        plugin_path = str(plugin_path)
+    else:
+        plugin_path = os.path.join(os.path.dirname(__file__), 'plugin')
+
+
 sm.set_plugin_path(plugin_path)
 # print(f"current plugin path: {plugin_path}")
 
