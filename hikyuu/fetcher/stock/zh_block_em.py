@@ -17,7 +17,6 @@ from hikyuu.util import *
 em_num_per_page = 100
 
 
-@hku_catch(ret=[], trace=False)
 def get_hybk_names():
     """获取所有行业(板块代码,板块名称)列表"""
     url = "https://19.push2.eastmoney.com/api/qt/clist/get"
@@ -50,7 +49,6 @@ def get_hybk_names():
     return ret
 
 
-@hku_catch(ret=[], trace=False)
 def get_hybk_cons_code(blk_code):
     "获取指定行业板块成分代码列表"
     url = "http://30.push2.eastmoney.com/api/qt/clist/get"
@@ -83,7 +81,6 @@ def get_hybk_cons_code(blk_code):
     return ret
 
 
-@hku_catch(ret={}, trace=False)
 def get_all_hybk_info(code_market_dict, sep=""):
     """获取所有行业板块列表"""
     blk_list = get_hybk_names()
@@ -434,7 +431,6 @@ def stock_board_concept_cons_em(symbol: str = "融资融券") -> pd.DataFrame:
     return temp_df
 
 
-@hku_catch(ret={}, trace=False)
 def get_all_gnbk_info(code_market_dict, sep=""):
     """获取所有概念版本列表"""
     blk_names = stock_board_concept_name_em()['板块名称']
@@ -450,7 +446,6 @@ def get_all_gnbk_info(code_market_dict, sep=""):
     return ret
 
 
-@hku_catch(ret=[], trace=False)
 def get_dybk_names():
     """获取所有地域板块名称列表"""
     url = "http://13.push2.eastmoney.com/api/qt/clist/get"
@@ -483,7 +478,6 @@ def get_dybk_names():
     return ret
 
 
-@hku_catch(ret={}, trace=False)
 def get_all_dybk_info(code_market_dict, sep=""):
     """获取所有地域板块列表"""
     blk_list = get_dybk_names()
@@ -531,60 +525,6 @@ def get_all_dybk_info(code_market_dict, sep=""):
             time.sleep(random.uniform(1, 3))
         hku_info(f'{i}|{total} 获取地域板块{blk_name}成分: {len(ret[blk_name])}')
 
-    return ret
-
-
-@hku_catch(ret={}, trace=False)
-def get_all_zsbk_info(code_market_dict, sep=""):
-    """获取所有指数成分股列表"""
-    blk_info = ak.index_stock_info()
-    blk_info['index_code'] = blk_info['index_code'].astype(str)  # 确保是字符串类型
-    df_000 = blk_info[blk_info['index_code'].str.startswith('000')].reset_index(drop=True)  # 000前缀
-    df_399 = blk_info[blk_info['index_code'].str.startswith('399')].reset_index(drop=True)  # 399前缀
-
-    # 2. 交替合并两个DataFrame
-    merged_rows = []
-    max_length = max(len(df_000), len(df_399))  # 取两个DataFrame的最大长度
-
-    for i in range(max_length):
-        # 先加000前缀的行（如果存在）
-        if i < len(df_000):
-            merged_rows.append(df_000.iloc[i])
-        # 再加399前缀的行（如果存在）
-        if i < len(df_399):
-            merged_rows.append(df_399.iloc[i])
-
-    # 3. 转换为DataFrame
-    blk_info = pd.DataFrame(merged_rows).reset_index(drop=True)
-
-    blk_codes = blk_info["index_code"]
-    blk_names = blk_info["display_name"]
-    ret = {}
-    total = len(blk_codes)
-    for i in range(total):
-        blk_name = blk_names[i]
-        blk_code = blk_codes[i]
-        # print(i, blk_name)
-        # 沪深指数有重复，避免深指覆盖
-        if blk_name in ret:
-            continue
-
-        time.sleep(random.uniform(1, 3))
-        try:
-            if blk_code[:3] == "399":
-                stk_codes = ak.index_stock_cons(symbol=blk_code)
-                stk_codes = stk_codes['品种代码'].to_list()
-            else:
-                stk_codes = ak.index_stock_cons_csindex(symbol=blk_code)
-                stk_codes = stk_codes['成分券代码'].to_list()
-            hku_info("{}|{} 获取指数板块 {}|{} 成分: {}", i, total, blk_code, blk_name, len(stk_codes))
-            ret[blk_name] = [
-                f"{code_market_dict[stk_code]}{sep}{stk_code}" for stk_code in stk_codes if stk_code in code_market_dict]
-        except KeyboardInterrupt:
-            break
-        except Exception as e:
-            print(f"Failed! {i}, {blk_code}, {blk_name}")
-            # raise e
     return ret
 
 
