@@ -37,7 +37,7 @@ option("low_precision", {description = "Enable low precision.", default = false}
 option("log_level", {description = "set log level.", default = 2, values = {1, 2, 3, 4, 5, 6}})
 option("async_log", {description = "Use async log.", default = false})
 option("leak_check", {description = "Enable leak check for test", default = false})
-option("arrow", {description = "Enable arrow support.", default = true})
+option("arrow", {description = "Enable arrow support.", default = false})
 
 -- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
 -- windows下如果使用 serialize 且希望使用动态库，需要设置 runtimes 参数为 "MD"

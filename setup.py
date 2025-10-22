@@ -105,7 +105,7 @@ def clear_with_python_changed(mode):
 # ------------------------------------------------------------------------------
 # 执行构建
 # ------------------------------------------------------------------------------
-def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_precision=False, arrow=True):
+def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_precision=False, arrow=False):
     """ 执行编译 """
     global g_verbose
     g_verbose = verbose
@@ -178,7 +178,7 @@ def cli():
               help='使用低精度版本')
 @click.option('-arrow',
               '--arrow',
-              default=True,
+              default=False,
               type=bool,
               help='arrow支持')
 def build(verbose, mode, feedback, j, low_precision, arrow):
@@ -212,7 +212,7 @@ def build(verbose, mode, feedback, j, low_precision, arrow):
               help='使用低精度版本')
 @click.option('-arrow',
               '--arrow',
-              default=True,
+              default=False,
               type=bool,
               help='arrow支持')
 def test(all, compile, verbose, mode, case, feedback, j, low_precision, arrow):
@@ -320,7 +320,7 @@ def copy_include(install_dir):
               help='使用低精度版本')
 @click.option('-arrow',
               '--arrow',
-              default=True,
+              default=False,
               type=bool,
               help='arrow支持')
 def install(j, o, low_precision, arrow):
@@ -359,7 +359,7 @@ def install(j, o, low_precision, arrow):
               help='使用低精度版本')
 @click.option('-arrow',
               '--arrow',
-              default=True,
+              default=False,
               type=bool,
               help='arrow支持')
 @click.option('-c', '--clear', is_flag=False, help='先清除之前编译结果')
