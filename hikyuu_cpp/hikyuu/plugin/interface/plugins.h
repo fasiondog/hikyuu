@@ -18,10 +18,6 @@
 #include "DataDriverPluginInterface.h"
 #include "HkuExtraPluginInterface.h"
 
-#if HKU_ENABLE_ARROW
-#include "HkuViewsPluginInterface.h"
-#endif
-
 namespace hku {
 
 #define HKU_PLUGIN_BACKTEST "backtest"
@@ -32,6 +28,5 @@ namespace hku {
 #define HKU_PLUGIN_TMREPORT "tmreport"
 #define HKU_PLUGIN_CLICKHOUSE_DRIVER "clickhousedriver"
 #define HKU_PLUGIN_HKU_EXTRA "hkuextra"
-#define HKU_PLUGIN_HKU_VIEWS "hkuviews"
 
 }  // namespace hku

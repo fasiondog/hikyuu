@@ -99,7 +99,6 @@ set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
 set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
 set_configvar("HKU_ENABLE_TA_LIB", get_config("ta_lib") and 1 or 0)
-set_configvar("HKU_ENABLE_ARROW", get_config("arrow") and 1 or 0)
 
 set_configvar("HKU_SUPPORT_DATETIME", 1)
 set_configvar("HKU_ENABLE_SQLCIPHER", 0)
