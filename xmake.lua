@@ -37,7 +37,9 @@ option("low_precision", {description = "Enable low precision.", default = false}
 option("log_level", {description = "set log level.", default = 2, values = {1, 2, 3, 4, 5, 6}})
 option("async_log", {description = "Use async log.", default = false})
 option("leak_check", {description = "Enable leak check for test", default = false})
-option("arrow", {description = "Enable arrow support.", default = false})
+
+-- 不再直接包含 arrow, 此处保留仅作编译兼容，实际不再使用
+option("arrow", {description = "Enable arrow support.(Obsolete, kept only for compatibility)", default = false})
 
 -- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
 -- windows下如果使用 serialize 且希望使用动态库，需要设置 runtimes 参数为 "MD"
@@ -178,15 +180,6 @@ add_requires("nlohmann_json", {system = false})
 add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc", {system = false})
-
-local arrow_config = {system = false, configs = {shared = false, json=true, shared_dep = false, brotli=false, zstd=true, bzip2=true, snappy=true, lz4=true, zlib=true}}
-if get_config("arrow")  then
-    if is_plat("windows") then
-        add_requires("arrow", {system = false})
-    else
-        add_requires("arrow", arrow_config)
-    end
-end
 
 if has_config("http_client_zip") then
     add_requires("gzip-hpp", {system = false})

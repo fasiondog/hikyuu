@@ -73,9 +73,6 @@ target("unit-test")
     if has_config("ta_lib") then
         add_packages("ta-lib")
     end
-    if has_config("arrow") then
-        add_packages("arrow")
-    end
 
     add_includedirs("..")
 
@@ -142,9 +139,6 @@ target("small-test")
             add_packages("mysql")
         end
     end
-    if has_config("arrow") then
-        add_packages("arrow")
-    end
 
     add_includedirs("..")
 
@@ -191,10 +185,6 @@ target("real-test")
         end
     end
     
-    if has_config("arrow") then
-        add_packages("arrow")
-    end
-
     add_includedirs("..")
 
     if is_plat("windows") then

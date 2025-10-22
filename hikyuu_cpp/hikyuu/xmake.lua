@@ -29,10 +29,6 @@ target("hikyuu")
         add_packages("ta-lib")
     end
 
-    if (has_config("arrow")) then
-        add_packages("arrow")
-    end
-
     add_options("mysql")
     add_includedirs("..")
 
@@ -84,7 +80,7 @@ target("hikyuu")
 
     -- set_policy("build.optimization.lto", true)
     add_rules("c++.unity_build", {batchsize = 0})
-    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|indicator_talib/**.cpp|views/**.cpp")
+    add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|indicator_talib/**.cpp")
    
     add_files("./*.cpp", "./serialization/*.cpp", {unity_group="base"})
     add_files("./indicator/**.cpp", {unity_group="indicator"})
@@ -149,9 +145,6 @@ target("hikyuu")
     end
     if has_config("ta_lib") then
         add_files("./indicator_talib/**.cpp", {unity_group="talib"})
-    end
-    if has_config("arrow") then
-        add_files("./views/**.cpp", {unity_group="views"})
     end
 
     after_build(function(target)
