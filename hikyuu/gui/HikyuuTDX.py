@@ -1109,5 +1109,6 @@ if __name__ == "__main__":
     else:
         myWin = MyMainWindow(capture_output=True)
 
+    myWin.resize(1100, 400)
     myWin.show()
     sys.exit(app.exec())

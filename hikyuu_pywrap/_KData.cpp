@@ -9,10 +9,6 @@
 #include <hikyuu/indicator/crt/KDATA.h>
 #include "pybind_utils.h"
 
-#if HKU_ENABLE_ARROW
-#include <hikyuu/views/arrow_views.h>
-#endif
-
 using namespace hku;
 namespace py = pybind11;
 
@@ -334,14 +330,6 @@ void export_KData(py::module& m) {
         
     :param bool with_stock: 包含Stock的代码与名称
     :rtype: pandas.DataFrame)")
-
-#if HKU_ENABLE_ARROW
-      .def("to_pyarrow",
-           [](const KData& self) {
-               auto view = getKDataView(self);
-               return to_pyarrow_table(view);
-           })
-#endif
 
         DEF_PICKLE(KData);
 }

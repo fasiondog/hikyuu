@@ -37,7 +37,9 @@ option("low_precision", {description = "Enable low precision.", default = false}
 option("log_level", {description = "set log level.", default = 2, values = {1, 2, 3, 4, 5, 6}})
 option("async_log", {description = "Use async log.", default = false})
 option("leak_check", {description = "Enable leak check for test", default = false})
-option("arrow", {description = "Enable arrow support.", default = true})
+
+-- 不再直接包含 arrow, 此处保留仅作编译兼容，实际不再使用
+option("arrow", {description = "Enable arrow support.(Obsolete, kept only for compatibility)", default = false})
 
 -- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
 -- windows下如果使用 serialize 且希望使用动态库，需要设置 runtimes 参数为 "MD"
@@ -97,7 +99,6 @@ set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
 set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
 set_configvar("HKU_ENABLE_TA_LIB", get_config("ta_lib") and 1 or 0)
-set_configvar("HKU_ENABLE_ARROW", get_config("arrow") and 1 or 0)
 
 set_configvar("HKU_SUPPORT_DATETIME", 1)
 set_configvar("HKU_ENABLE_SQLCIPHER", 0)
@@ -133,9 +134,7 @@ add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.gi
      add_requires("mysql " .. mysql_version, { system = false })
  end
 
-local boost_config
-if is_plat("windows") then
-    boost_config = {
+local boost_config = {
         system = false,
         debug = is_mode("debug"),
         configs = {
@@ -149,24 +148,7 @@ if is_plat("windows") then
             python = false,
             cmake = false,
     }}
-else
-    boost_config = {
-        system = false,
-        configs = {
-            shared = true, -- is_plat("windows"),
-            runtimes = get_config("runtimes"),
-            multi = true,
-            date_time = true,
-            filesystem = false,
-            serialization = true, --get_config("serialize"),
-            system = true,
-            python = false,
-            thread = true,   -- parquet need
-            chrono = true,   -- parquet need
-            charconv = true, -- parquet need
-            cmake = false,
-    }}
-end
+
 add_requires("boost", boost_config)
 add_requires("fmt", {system = false, configs = {header_only = true}})
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
@@ -178,15 +160,6 @@ add_requires("nlohmann_json", {system = false})
 add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc", {system = false})
-
-local arrow_config = {system = false, configs = {shared = false, json=true, shared_dep = false, brotli=false, zstd=true, bzip2=true, snappy=true, lz4=true, zlib=true}}
-if get_config("arrow")  then
-    if is_plat("windows") then
-        add_requires("arrow", {system = false})
-    else
-        add_requires("arrow", arrow_config)
-    end
-end
 
 if has_config("http_client_zip") then
     add_requires("gzip-hpp", {system = false})

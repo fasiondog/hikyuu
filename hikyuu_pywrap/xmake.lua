@@ -11,9 +11,6 @@ target("core")
 
     add_deps("hikyuu")
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "utf8proc", "nlohmann_json")
-    if has_config("arrow") then
-        add_packages("arrow")
-    end
     if is_plat("windows") then
         set_filename("core.pyd")
         add_cxflags("/bigobj")
@@ -49,7 +46,7 @@ target("core")
 
     -- set_policy("build.optimization.lto", true)
     add_rules("c++.unity_build", {batchsize = 0})
-    add_files("./**.cpp|views/**.cpp")
+    add_files("./**.cpp")
 
     add_files("./*.cpp", {unity_group="base"})
     add_files("./analysis/**.cpp", {unity_group="analysis"})
@@ -60,10 +57,6 @@ target("core")
     add_files("./strategy/**.cpp", {unity_group="strategy"})
     add_files("./trade_manage/**.cpp", {unity_group="trade_manage"})
     add_files("./trade_sys/**.cpp", {unity_group="trade_sys"})
-
-    if has_config("arrow") then
-        add_files("./views/**.cpp", {unity_group="views"})
-    end
 
     on_load("windows", "linux", "macosx", function(target)
         import("lib.detect.find_tool")
