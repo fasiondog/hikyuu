@@ -134,9 +134,7 @@ add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.gi
      add_requires("mysql " .. mysql_version, { system = false })
  end
 
-local boost_config
-if is_plat("windows") then
-    boost_config = {
+local boost_config = {
         system = false,
         debug = is_mode("debug"),
         configs = {
@@ -150,24 +148,7 @@ if is_plat("windows") then
             python = false,
             cmake = false,
     }}
-else
-    boost_config = {
-        system = false,
-        configs = {
-            shared = true, -- is_plat("windows"),
-            runtimes = get_config("runtimes"),
-            multi = true,
-            date_time = true,
-            filesystem = false,
-            serialization = true, --get_config("serialize"),
-            system = true,
-            python = false,
-            thread = true,   -- parquet need
-            chrono = true,   -- parquet need
-            charconv = true, -- parquet need
-            cmake = false,
-    }}
-end
+
 add_requires("boost", boost_config)
 add_requires("fmt", {system = false, configs = {header_only = true}})
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
