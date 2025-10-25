@@ -13,14 +13,14 @@ BOOST_CLASS_EXPORT(hku::FixedValueSlippage)
 
 namespace hku {
 
-FixedValueSlippage::FixedValueSlippage() {
+FixedValueSlippage::FixedValueSlippage() : SlippageBase("SP_FixedValue") {
     setParam<double>("value", 0.01);
 }
 
 FixedValueSlippage::~FixedValueSlippage() {}
 
 void FixedValueSlippage::_checkParam(const string& name) const {
-    if ("p" == name) {
+    if ("value" == name) {
         HKU_ASSERT(getParam<double>(name) >= 0.0);
     }
 }
