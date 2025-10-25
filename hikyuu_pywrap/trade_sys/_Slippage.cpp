@@ -109,7 +109,7 @@ void export_Slippage(py::module& m) {
 
         DEF_PICKLE(SPPtr);
 
-    m.def("SP_FixedPercent", SP_FixedPercent, py::arg("p") = 0.001,
+    m.def("SP_FixedPercent", &SP_FixedPercent, py::arg("p") = 0.001,
           R"(SP_FixedPercent([p=0.001])
 
     固定百分比移滑价差算法，买入实际价格 = 计划买入价格 * (1 + p)，卖出实际价格 = 计划卖出价格 * (1 - p)
@@ -117,10 +117,19 @@ void export_Slippage(py::module& m) {
     :param float p: 偏移的固定百分比
     :return: 移滑价差算法实例)");
 
-    m.def("SP_FixedValue", SP_FixedValue, py::arg("value") = 0.01, R"(SP_FixedValuet([p=0.001])
+    m.def("SP_FixedValue", &SP_FixedValue, py::arg("value") = 0.01, R"(SP_FixedValuet([p=0.001])
 
     固定价格移滑价差算法，买入实际价格 = 计划买入价格 + 偏移价格，卖出实际价格 = 计划卖出价格 - 偏移价格
 
     :param float p: 偏移价格
+    :return: 移滑价差算法实例)");
+
+    m.def("SP_RandomUniform", &SP_RandomUniform, py::arg("min_value") = -0.05,
+          py::arg("max_value") = 0.05, R"(SP_RandomUniform([min_value=-0.05, max_value=0.05])
+
+    均匀分布随机价格移滑价差算法, 买入和卖出操作是价格在[min_value, max_value]范围内的均匀分布随机偏移
+    
+    :param float min_value: 最小偏移价格
+    :param float max_value: 最大偏移价格
     :return: 移滑价差算法实例)");
 }
