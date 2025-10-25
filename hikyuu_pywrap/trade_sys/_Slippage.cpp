@@ -141,4 +141,13 @@ void export_Slippage(py::module& m) {
     :param float mean: 正态分布的均值
     :param float stddev: 正态分布的标准差
     :return: 移滑价差算法实例)");
+
+    m.def("SP_LogNormal", &SP_LogNormal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
+          R"(SP_LogNormal([mean=0.0, stddev=0.05])
+
+    对数正态分布随机价格移滑价差算法, 买入和卖出操作是价格在对数正态分布[mean, stddev]范围内的随机偏移
+
+    :param float mean: 对数正态分布的均值
+    :param float stddev: 对数正态分布的标准差
+    :return: 移滑价差算法实例)");
 }

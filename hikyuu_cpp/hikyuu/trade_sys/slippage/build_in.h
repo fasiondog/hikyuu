@@ -13,5 +13,6 @@
 #include "crt/SP_FixedValue.h"
 #include "crt/SP_RandomUniform.h"
 #include "crt/SP_RandomNormal.h"
+#include "crt/SP_LogNormal.h"
 
 #endif /* SLIPPAGE_BUILD_IN_H_ */
