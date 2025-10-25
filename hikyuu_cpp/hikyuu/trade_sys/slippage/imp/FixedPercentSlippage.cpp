@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::FixedPercentSlippage)
 
 namespace hku {
 
-FixedPercentSlippage::FixedPercentSlippage() : SlippageBase("FixedPercent") {
+FixedPercentSlippage::FixedPercentSlippage() : SlippageBase("SP_FixedPercent") {
     setParam<double>("p", 0.001);
 }
 
