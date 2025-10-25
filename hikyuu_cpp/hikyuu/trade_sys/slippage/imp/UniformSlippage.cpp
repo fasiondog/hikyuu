@@ -38,11 +38,14 @@ price_t UniformSlippage ::getRealBuyPrice(const Datetime& datetime, price_t pric
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
     double value = min_v + (rand() / (RAND_MAX + 1.0)) * (max_v - min_v);
-    return price + value;
+    return price + std::abs(value);
 }
 
 price_t UniformSlippage ::getRealSellPrice(const Datetime& datetime, price_t price) {
-    return getRealBuyPrice(datetime, price);
+    double min_v = getParam<double>("min_value");
+    double max_v = getParam<double>("max_value");
+    double value = min_v + (rand() / (RAND_MAX + 1.0)) * (max_v - min_v);
+    return price - std::abs(value);
 }
 
 void UniformSlippage::_calculate() {}

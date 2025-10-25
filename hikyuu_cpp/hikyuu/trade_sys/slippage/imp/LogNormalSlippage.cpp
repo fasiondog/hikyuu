@@ -14,6 +14,9 @@ BOOST_CLASS_EXPORT(hku::LogNormalSlippage)
 
 namespace hku {
 
+std::random_device LogNormalSlippage::ms_rd;
+std::mt19937 LogNormalSlippage::ms_gen(ms_rd());
+
 LogNormalSlippage::LogNormalSlippage() : SlippageBase("SP_LogNormal") {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
@@ -32,13 +35,10 @@ void LogNormalSlippage::_checkParam(const string& name) const {
 price_t LogNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
-    
-    // 使用静态随机数生成器以避免重复初始化开销
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
+
     std::lognormal_distribution<double> dis(mean, stddev);
-    
-    double value = dis(gen);
+
+    double value = dis(ms_gen);
     // 为了使滑点值在均值附近分布，我们减去exp(mean+stddev^2/2)得到中心化的值
     double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
     // 买入时价格总是变高（不利方向）
@@ -48,13 +48,10 @@ price_t LogNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t pri
 price_t LogNormalSlippage::getRealSellPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
-    
-    // 使用静态随机数生成器以避免重复初始化开销
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
+
     std::lognormal_distribution<double> dis(mean, stddev);
-    
-    double value = dis(gen);
+
+    double value = dis(ms_gen);
     // 为了使滑点值在均值附近分布，我们减去exp(mean+stddev^2/2)得到中心化的值
     double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
     // 卖出时价格总是变低（不利方向）

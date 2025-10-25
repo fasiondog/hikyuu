@@ -152,8 +152,8 @@ void export_Slippage(py::module& m) {
     :return: 移滑价差算法实例)");
 
     m.def("SP_TruncNormal", &SP_TruncNormal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
-          py::arg("min_value") = -0.05, py::arg("max_value") = 0.05,
-          R"(SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.05, max_value=0.05])
+          py::arg("min_value") = -0.11, py::arg("max_value") = 0.1,
+          R"(SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1])
          
     截断正态分布随机价格移滑价差算法, 买入和卖出操作是价格在截断正态分布[mean, stddev, min_value, max_value]范围内的随机偏移
     

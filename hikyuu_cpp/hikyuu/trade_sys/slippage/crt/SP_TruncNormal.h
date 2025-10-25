@@ -19,6 +19,7 @@ namespace hku {
  * @param max_value 截断最大值
  * @return 滑点对象指针
  */
-SlippagePtr HKU_API SP_TruncNormal(double mean, double stddev, double min_value, double max_value);
+SlippagePtr HKU_API SP_TruncNormal(double mean = 0.0, double stddev = 0.05, double min_value = -0.1,
+                                   double max_value = 0.1);
 
 } /* namespace hku */

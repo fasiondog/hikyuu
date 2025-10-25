@@ -19,6 +19,10 @@ public:
     LogNormalSlippage();
     virtual ~LogNormalSlippage();
     virtual void _checkParam(const string& name) const override;
+
+private:
+    static std::random_device ms_rd;
+    static std::mt19937 ms_gen;
 };
 
 } /* namespace hku */

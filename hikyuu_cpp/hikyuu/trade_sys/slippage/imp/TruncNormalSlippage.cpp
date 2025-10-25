@@ -14,6 +14,9 @@ BOOST_CLASS_EXPORT(hku::TruncNormalSlippage)
 
 namespace hku {
 
+std::random_device TruncNormalSlippage::ms_rd;
+std::mt19937 TruncNormalSlippage::ms_gen(ms_rd());
+
 TruncNormalSlippage::TruncNormalSlippage() : SlippageBase("SP_TruncNormal") {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
@@ -46,18 +49,15 @@ price_t TruncNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t p
     double stddev = getParam<double>("stddev");
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
-    
-    // 使用静态随机数生成器以避免重复初始化开销
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
+
     std::normal_distribution<double> dis(mean, stddev);
-    
+
     double value;
     // 生成符合截断范围的值
     do {
-        value = dis(gen);
+        value = dis(ms_gen);
     } while (value < min_v || value > max_v);
-    
+
     // 买入时价格总是变高（不利方向）
     return price + std::abs(value);
 }
@@ -67,18 +67,15 @@ price_t TruncNormalSlippage::getRealSellPrice(const Datetime& datetime, price_t 
     double stddev = getParam<double>("stddev");
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
-    
-    // 使用静态随机数生成器以避免重复初始化开销
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
+
     std::normal_distribution<double> dis(mean, stddev);
-    
+
     double value;
     // 生成符合截断范围的值
     do {
-        value = dis(gen);
+        value = dis(ms_gen);
     } while (value < min_v || value > max_v);
-    
+
     // 卖出时价格总是变低（不利方向）
     return price - std::abs(value);
 }
