@@ -12,5 +12,6 @@
 #include "crt/SP_FixedPercent.h"
 #include "crt/SP_FixedValue.h"
 #include "crt/SP_RandomUniform.h"
+#include "crt/SP_RandomNormal.h"
 
 #endif /* SLIPPAGE_BUILD_IN_H_ */
