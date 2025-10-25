@@ -11,13 +11,13 @@
 
 namespace hku {
 
-class RandomUniformSlippage : public SlippageBase {
-    SLIPPAGE_IMP(RandomUniformSlippage)
+class UniformSlippage : public SlippageBase {
+    SLIPPAGE_IMP(UniformSlippage)
     SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    RandomUniformSlippage();
-    virtual ~RandomUniformSlippage();
+    UniformSlippage();
+    virtual ~UniformSlippage();
     virtual void _checkParam(const string& name) const override;
 };
 

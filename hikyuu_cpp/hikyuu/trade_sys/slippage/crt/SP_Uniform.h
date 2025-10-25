@@ -18,6 +18,6 @@ namespace hku {
  * @param max_value 偏移价格上限
  * @return
  */
-SlippagePtr HKU_API SP_RandomUniform(double min_value = -0.05, double max_value = 0.05);
+SlippagePtr HKU_API SP_Uniform(double min_value = -0.05, double max_value = 0.05);
 
 } /* namespace hku */

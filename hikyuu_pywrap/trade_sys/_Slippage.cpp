@@ -124,8 +124,8 @@ void export_Slippage(py::module& m) {
     :param float p: 偏移价格
     :return: 移滑价差算法实例)");
 
-    m.def("SP_RandomUniform", &SP_RandomUniform, py::arg("min_value") = -0.05,
-          py::arg("max_value") = 0.05, R"(SP_RandomUniform([min_value=-0.05, max_value=0.05])
+    m.def("SP_Uniform", &SP_Uniform, py::arg("min_value") = -0.05, py::arg("max_value") = 0.05,
+          R"(SP_Uniform([min_value=-0.05, max_value=0.05])
 
     均匀分布随机价格移滑价差算法, 买入和卖出操作是价格在[min_value, max_value]范围内的均匀分布随机偏移
     
