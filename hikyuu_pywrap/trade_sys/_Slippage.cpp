@@ -133,8 +133,8 @@ void export_Slippage(py::module& m) {
     :param float max_value: 最大偏移价格
     :return: 移滑价差算法实例)");
 
-    m.def("SP_RandomNormal", &SP_RandomNormal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
-          R"(SP_RandomNormal([mean=0.0, stddev=0.05])
+    m.def("SP_Normal", &SP_Normal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
+          R"(SP_Normal([mean=0.0, stddev=0.05])
 
     正态分布随机价格移滑价差算法, 买入和卖出操作是价格在正态分布[mean, stddev]范围内的随机偏移
     

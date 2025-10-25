@@ -12,7 +12,7 @@
 #include "crt/SP_FixedPercent.h"
 #include "crt/SP_FixedValue.h"
 #include "crt/SP_RandomUniform.h"
-#include "crt/SP_RandomNormal.h"
+#include "crt/SP_Normal.h"
 #include "crt/SP_LogNormal.h"
 #include "crt/SP_TruncNormal.h"
 

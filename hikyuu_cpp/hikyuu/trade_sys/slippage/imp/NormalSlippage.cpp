@@ -1,33 +1,33 @@
 /*
- * RandomNormalSlippage.cpp
+ * NormalSlippage.cpp
  *
  *  Created on: 2025年10月25日
  *      Author: fasiondog
  */
 
 #include <random>
-#include "RandomNormalSlippage.h"
+#include "NormalSlippage.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::RandomNormalSlippage)
+BOOST_CLASS_EXPORT(hku::NormalSlippage)
 #endif
 
 namespace hku {
 
-RandomNormalSlippage::RandomNormalSlippage() : SlippageBase("SP_RandomNormal") {
+NormalSlippage::NormalSlippage() : SlippageBase("SP_Normal") {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
 }
 
-RandomNormalSlippage::~RandomNormalSlippage() {}
+NormalSlippage::~NormalSlippage() {}
 
-void RandomNormalSlippage::_checkParam(const string& name) const {
+void NormalSlippage::_checkParam(const string& name) const {
     if ("stddev" == name) {
         HKU_ASSERT(getParam<double>("stddev") >= 0.0);
     }
 }
 
-price_t RandomNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price) {
+price_t NormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
 
@@ -40,14 +40,14 @@ price_t RandomNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t 
     return price + value;
 }
 
-price_t RandomNormalSlippage::getRealSellPrice(const Datetime& datetime, price_t price) {
+price_t NormalSlippage::getRealSellPrice(const Datetime& datetime, price_t price) {
     return getRealBuyPrice(datetime, price);
 }
 
-void RandomNormalSlippage::_calculate() {}
+void NormalSlippage::_calculate() {}
 
-SlippagePtr HKU_API SP_RandomNormal(double mean, double stddev) {
-    SlippagePtr ptr = make_shared<RandomNormalSlippage>();
+SlippagePtr HKU_API SP_Normal(double mean, double stddev) {
+    SlippagePtr ptr = make_shared<NormalSlippage>();
     ptr->setParam("mean", mean);
     ptr->setParam("stddev", stddev);
     return ptr;

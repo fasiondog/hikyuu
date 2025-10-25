@@ -1,5 +1,5 @@
 /*
- * SP_RandomNormal.h
+ * SP_Normal.h
  *
  *  Created on: 2025年10月25日
  *      Author: fasiondog
@@ -17,6 +17,6 @@ namespace hku {
  * @param stddev 正态分布标准差
  * @return 滑点对象指针
  */
-SlippagePtr HKU_API SP_RandomNormal(double mean = 0.0, double stddev = 0.05);
+SlippagePtr HKU_API SP_Normal(double mean = 0.0, double stddev = 0.05);
 
 } /* namespace hku */
