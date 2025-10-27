@@ -492,6 +492,7 @@ void Stock::loadKDataToBufferFromKRecordList(const KQuery::KType& inkType, KReco
 
     string kType(inkType);
     to_upper(kType);
+    HKU_IF_RETURN(m_data->pKData.find(kType) == m_data->pKData.end(), void());
 
     {
         std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[kType]));
