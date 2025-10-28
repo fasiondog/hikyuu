@@ -322,7 +322,7 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
         }
     }
 
-    HKU_IF_RETURN(!sh000001.valid(), loaded_codes);
+    HKU_IF_RETURN(sh000001.isNull(), loaded_codes);
 
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
         auto low_ktype = ktypes[i];
