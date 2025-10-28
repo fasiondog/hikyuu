@@ -240,6 +240,8 @@ public:
     /** 指定类型的K线数据是否被缓存 */
     bool isBuffer(KQuery::KType) const;
 
+    bool isPreload(KQuery::KType ktype) const;
+
     /** 是否为Null */
     bool isNull() const;
 
@@ -273,8 +275,6 @@ private:
 
     // 仅供 StockManager 初始化时调用
     void setPreload(const vector<KQuery::KType>& preload_ktypes);
-
-    bool isPreload(KQuery::KType ktype) const;
 
     void loadKDataToBufferFromKRecordList(const KQuery::KType& ktype, KRecordList&& ks) const;
     void setHistoryFinance(vector<HistoryFinanceInfo>&&);

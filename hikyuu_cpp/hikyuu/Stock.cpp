@@ -440,11 +440,20 @@ void Stock::releaseKDataBuffer(KQuery::KType inkType) const {
     to_upper(ktype);
     HKU_IF_RETURN(m_data->pMutex.find(ktype) == m_data->pMutex.end(), void());
 
-    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-    auto iter = m_data->pKData.find(ktype);
-    if (iter->second) {
-        delete iter->second;
-        iter->second = nullptr;
+    {
+        std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+        auto iter = m_data->pKData.find(ktype);
+        if (iter->second) {
+            delete iter->second;
+            iter->second = nullptr;
+        }
+    }
+
+    // 同时释放掉历史财务信息，以便重加载时获取最新数据
+    {
+        std::lock_guard<std::mutex> lock(m_data->m_history_finance_mutex);
+        m_data->m_history_finance_ready = false;
+        m_data->m_history_finance.clear();
     }
 }
 
@@ -454,13 +463,15 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
 
     string kType(inkType);
     to_upper(kType);
-    HKU_IF_RETURN(m_data->pKData.find(kType) == m_data->pKData.end(), void());
+    HKU_IF_RETURN(m_data->pMutex.find(kType) == m_data->pMutex.end(), void());
 
     int start = 0;
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
 
     // CSV 直接全部加载至内存，其他类型依据配置的预加载参数进行加载
+    KQuery query = KQuery(0, Null<int64_t>(), kType);
+
     if (driver->name() != "TMPCSV") {
         const auto& param = StockManager::instance().getPreloadParameter();
         string preload_type = fmt::format("{}_max", kType);
@@ -469,6 +480,20 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
         HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type,
                             max_num);
         start = total <= max_num ? 0 : total - max_num;
+        query = KQuery(start, Null<int64_t>(), kType);
+        if (driver->isColumnFirst() && market_code() != "SH000001") {
+            Stock sh000001 = StockManager::instance().getStock("SH000001");
+            if (!sh000001.isNull()) {
+                if (!sh000001.isBuffer(kType)) {
+                    sh000001.loadKDataToBuffer(kType);
+                }
+
+                auto k = sh000001.getKRecord(0, kType);
+                if (k.isValid()) {
+                    query = KQueryByDate(k.datetime, Null<Datetime>(), kType);
+                }
+            }
+        }
     }
 
     {
@@ -480,8 +505,7 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
         KRecordList* ptr_klist = new KRecordList;
         m_data->pKData[kType] = ptr_klist;
         if (total != 0) {
-            (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code,
-                                                  KQuery(start, Null<int64_t>(), kType));
+            (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code, query);
             m_data->m_lastUpdate[kType] = Datetime::now();
         }
     }
@@ -492,11 +516,11 @@ void Stock::loadKDataToBufferFromKRecordList(const KQuery::KType& inkType, KReco
 
     string kType(inkType);
     to_upper(kType);
-    HKU_IF_RETURN(m_data->pKData.find(kType) == m_data->pKData.end(), void());
+
+    HKU_IF_RETURN(m_data->pMutex.find(kType) == m_data->pMutex.end(), void());
 
     {
         std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[kType]));
-        // 需要对是否已缓存进行二次判定，防止加锁之前已被缓存
         if (m_data->pKData.find(kType) != m_data->pKData.end() && m_data->pKData[kType]) {
             return;
         }
@@ -1137,6 +1161,7 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
 }
 
 const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {
+    HKU_ASSERT(m_data);
     std::lock_guard<std::mutex> lock(m_data->m_history_finance_mutex);
     if (!m_data->m_history_finance_ready) {
         m_data->m_history_finance =
@@ -1149,8 +1174,10 @@ const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {
 void Stock::setHistoryFinance(vector<HistoryFinanceInfo>&& history_finance) {
     HKU_IF_RETURN(!m_data, void());
     std::lock_guard<std::mutex> lock(m_data->m_history_finance_mutex);
-    m_data->m_history_finance = std::move(history_finance);
-    m_data->m_history_finance_ready = true;
+    if (!m_data->m_history_finance_ready) {
+        m_data->m_history_finance = std::move(history_finance);
+        m_data->m_history_finance_ready = true;
+    }
 }
 
 DatetimeList Stock::getTradingCalendar(const KQuery& query) const {
