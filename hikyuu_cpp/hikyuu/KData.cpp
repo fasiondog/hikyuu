@@ -48,7 +48,14 @@ KData::KData(const Stock& stock, const KQuery& query) {
     // 在重加载或setKDateList时，已存在KData存在数据无效风险（但无内存访问问题)
     if (stock.isNull()) {
         m_imp = get_null_kdata_imp();
-    } else if (query.recoverType() == KQuery::NO_RECOVER && stock.isBuffer(query.kType())) {
+        return;
+    }
+
+    if (stock.isPreload(query.kType()) && !stock.isBuffer(query.kType())) {
+        stock.loadKDataToBuffer(query.kType());
+    }
+
+    if (query.recoverType() == KQuery::NO_RECOVER && stock.isBuffer(query.kType())) {
         // 当Stock已缓存了该类型的K线数据，且不进行复权
         m_imp = make_shared<KDataSharedBufferImp>(stock, query);
     } else {
