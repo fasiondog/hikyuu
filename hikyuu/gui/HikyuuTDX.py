@@ -313,6 +313,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if os.path.exists(this_dir + '/importdata-gui.ini'):
             import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
 
+        self.use_download = 'pytdx'
         self._is_sched_import_running = False
         self._is_collect_running = False
         self._stream = None
