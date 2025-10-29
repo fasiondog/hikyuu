@@ -11,7 +11,7 @@
 
 namespace hku {
 
-void HKU_API registerEmail(const std::string& email, const std::string& active_code) {
+void HKU_API bindEmail(const std::string& email, const std::string& active_code) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
     HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DEVICE);

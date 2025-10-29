@@ -16,7 +16,7 @@ namespace hku {
  * @param email 邮箱
  * @param active_code 授权码
  */
-void HKU_API registerEmail(const std::string& email, const std::string& active_code);
+void HKU_API bindEmail(const std::string& email, const std::string& active_code);
 
 /**
  * @brief 激活设备
