@@ -12,6 +12,13 @@
 namespace hku {
 
 /**
+ * @brief 绑定授权码
+ * @param email 邮箱
+ * @param active_code 授权码
+ */
+void HKU_API bindEmail(const std::string& email, const std::string& active_code);
+
+/**
  * @brief 激活设备
  * @param active_code 授权码
  * @param replace 超过设备限制时，强制替换最早激活的设备
