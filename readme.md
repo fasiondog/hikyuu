@@ -54,10 +54,8 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
   * Python库（hikyuu），提供了对C++库的包装，同时集成了talib库（如TA_SMA，对应talib.SMA），可以与numpy、pandas数据结构进行互相转换，为使用其他成熟的python数据分析工具提供了便利。
   * hikyuu.interactive 交互式探索工具，提供了K线、指标、系统信号等的基本绘图功能，用于对量化策略的探索和回测。
 * **🍳 代码简洁，探索更便捷、自由** 同时支持面向对象和命令行编程范式。其中，命令行在进行策略探索时，代码简洁、探索更便捷、自由。
-* **💹 安全、自由、隐私，搭建自己的专属云量化平台** 结合 Python + Jupyter 的强大能力与云服务器，可以搭建自己专属的云量化平台。将Jupyter部署在云服务器上，随时随地的访问自己的云平台，即刻实现自己新的想法，如下图所示通过手机访问自己的云平台。结合Python强大成熟的数据分析、人工智能工具（如 numpy、scipy、pandas、TensorFlow)搭建更强大的人工智能平台。
+* **🔐 安全、自由、隐私，搭建自己的专属云量化平台** 结合 Python + Jupyter 的强大能力与云服务器，可以搭建自己专属的云量化平台。将Jupyter部署在云服务器上，随时随地的访问自己的云平台，即刻实现自己新的想法，如下图所示通过手机访问自己的云平台。结合Python强大成熟的数据分析、人工智能工具（如 numpy、scipy、pandas、TensorFlow)搭建更强大的人工智能平台。
 * **🎁 数据存储方式可扩展** 目前支持本地HDF5格式、MySQL存储。默认使用HDF5，数据文件体积小、速度更快、备份更便利。截止至2017年4月21日，沪市日线数据文件149M、深市日线数据文件184M、5分钟线数据各不到2G。
-
-![img](https://api.star-history.com/svg?repos=fasiondog/hikyuu&type=Date "Star History Chart")
 
 # 🍺 想要更多了解Hikyuu？请使用以下方式联系：
 
@@ -69,8 +67,8 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 🎁 [**捐赠计划与附赠参见**：https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html]()
 
-| 说明              | 捐赠链接（与下方二维码同）                                       |
-| --------------------- | --------------------------------------------------------------- |
+| 说明                   | 捐赠链接（与下方二维码同）                                      |
+| ---------------------- | --------------------------------------------------------------- |
 | 请作者加个🍗（10元）   | [https://pay.ldxp.cn/item/bet8w6](https://pay.ldxp.cn/item/bet8w6) |
 | 请作者喝杯☕️（30元） | [https://pay.ldxp.cn/item/gflv3v](https://pay.ldxp.cn/item/gflv3v) |
 | 订阅180天（50元）      | [https://pay.ldxp.cn/item/du4h8s](https://pay.ldxp.cn/item/du4h8s) |
@@ -81,6 +79,10 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 **👉👉👉 或者加入知识星球，获取更多 👉👉👉**
 
 ![知识星球](docs/source/_static/zhishixingqiu.png)
+
+## ⭐️ 来，点亮你的 star
+
+![img](https://api.star-history.com/svg?repos=fasiondog/hikyuu&type=Date "Star History Chart")
 
 ## 项目依赖说明
 
