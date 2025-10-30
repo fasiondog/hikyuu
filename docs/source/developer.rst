@@ -27,7 +27,7 @@ C++ API参考, 使用下面的命令生成 Doxygen 文档:
 
 xmake >= 2.8.2，网址：`<https://github.com/xmake-io/xmake>`_
 
-参见：https://xmake.io/#/zh-cn/guide/installation `<https://xmake.io/#/zh-cn/guide/installation>`
+参见：`<https://xmake.io/#/zh-cn/guide/installation>`_
 
 
 3、克隆 Hikyuu 源码
@@ -41,9 +41,9 @@ xmake >= 2.8.2，网址：`<https://github.com/xmake-io/xmake>`_
 
 .. note::
 
-    捐赠用户如本地环境已激活（或申请了使用许可且尚未过期）, 请 checkout 已发布的版本分支，并手工从 https://gitee.com/hikyuu-quant/hikyuu_plugin_download  下载对应版本的插件。
-    
-    插件下载后保存在源码 hikyuu/plugin 目录下。
+    **捐赠用户如需使用插件，请安装 hikyuu_plugin 包: pip install hikyuu_plugin**
+
+    如最新代码使用插件发生崩溃，建议 checkout release 分支或对应版本分支进行编译。
 
 
 4、Linux下安装依赖软件包
@@ -67,8 +67,6 @@ Linux下需安装依赖的开发软件包。如 Ubuntu 下，执行以下命令�
 
 1. 安装 python 依赖包
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-编译需要 click。 如果下述安装依赖时, 无法安装 PyQt5 的, 可手工删除 requirements.txt 中的 PyQt5 后再继续安装依赖。
 
 .. code-block:: shell
 
@@ -141,3 +139,24 @@ mac 下 conda 编译：
 
 1. 安装 pybind11-stubgen，使用命令 pip install pybind11-stubgen
 2. 运行 pybind11-stubgen hikyuu -o . 命令，即可正常提示帮助信息。
+
+
+Docker 构建
+------------
+
+源码 docker 目录下，提供了基于 Ubuntu/Debain/Fedora 的 Dockerfile_dev 文件，可以用来快速构建 Hikyuu 的编译环境。
+
+.. code-block:: shell
+
+    cd docker
+    docker build -t hikyuu_dev -f Dockerfile_dev .
+
+    docker run -it hikyuu_dev /bin/bash
+
+进入 hikyuu 目录下，其他与源码编译步骤一致。
+
+也可以使用基于 pip 安装 Hikyuu 的 dockerfile, 见 /docker/Dockerfile_miniconda 。
+
+Hikyuu 使用前需要导入数据，Docker镜像不包含界面，可以直接执行 python hikyuu/gui/importdata.py 命令导入数据。
+
+hikyuu 配置文件在 /root/.hikyuu 目录下, 数据文件存储(HDF5)在 /root/stocks 目录下，可自行在创建docker容器时指定挂载目录。
