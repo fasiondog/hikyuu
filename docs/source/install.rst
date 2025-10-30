@@ -6,10 +6,6 @@
 
 支持的操作系统：64位 Windows7及以上版本、Ubuntu、MacOSX （其中 Windows、Ubuntu 24.04及以上可以直接 pip 安装，其他建议使用源码编译安装）
 
-.. note::
-
-    - **2.6.8 版本起，部分不支持 avx 指令集的老旧机器，请使用 pip install hikyuu-noarrow 安装。(不包含arrow相关功能）**
-
 
 1. Python环境：>= Python3.10)。 推荐使用安装时 python 的主流版本或低一个版本，比如截止 2025年4月1日, python主流版本为 3.12, 建议使用3.12或3.11, 避免因 python 版本低可能导致的其他依赖包互不兼容导致的错误。
 
@@ -33,9 +29,7 @@ pip 安装
 
 .. note::
 
-    **2.6.8 版本起，部分不支持 avx 指令集的老旧机器，请使用 pip install hikyuu-noarrow 安装。(不包含arrow相关功能）** windows下可使用 cpuz 等查看 cpu 指令集，如：
-
-    .. figure:: _static/cpuz_avx.png
+    **2.6.8/2.6.9 版本，部分 x86 cpu 不支持 avx 指令集的老旧机器, 会崩溃。建议升级到 2.7.0 以上版本。**
 
 
 .. figure:: _static/20000-install.png

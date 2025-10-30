@@ -45,7 +45,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 完整示例参见：[https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True](https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
 
-# 为什么选择 Hikyuu？
+# 🔥 为什么选择 Hikyuu？
 
 * **💹 组合灵活，分类构建策略资产库** Hikyuu对系统化交易方法进行了良好的抽象：市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法、交易对象选择策略、资金分配策略。可以在此基础上构建自己的策略库，并进行灵活的组合和测试。在进行策略探索时，可以更加专注于某一方面的策略性能与影响。其主要功能模块如下：![img](docs/source/_static/10002-function-arc.png)
 * **🚀 性能保障，打造自己的专属应用** 目前项目包含了3个主要组成部分：基于C++的核心库、对C++进行包装的Python库(hikyuu)、基于Python的交互式工具。
@@ -59,22 +59,22 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 ![img](https://api.star-history.com/svg?repos=fasiondog/hikyuu&type=Date "Star History Chart")
 
-# 想要更多了解Hikyuu？请使用以下方式联系：
+# 🍺 想要更多了解Hikyuu？请使用以下方式联系：
 
-**作者精力有限，仅保证对捐赠用户的有问必答，其他渠道视情况**
+**作者精力有限，仅保证对捐赠用户的有问必答，其他渠道视情况，当然另发红包的除外😁**
 
 ![img](docs/source/_static/qun.png)
 
-## [项目捐赠，感谢大家支持 🎉](https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html)
+## 🎉 项目捐赠，感谢你的支持 🎉
 
 🎁 [**捐赠计划与附赠参见**：https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html]()
 
-| 捐赠说明              | 捐赠链接（与下方二维码同)                                       |
+| 说明              | 捐赠链接（与下方二维码同）                                       |
 | --------------------- | --------------------------------------------------------------- |
-| 请作者加个🍗（10元)   | [https://pay.ldxp.cn/item/bet8w6](https://pay.ldxp.cn/item/bet8w6) |
-| 请作者喝杯☕️（30元) | [https://pay.ldxp.cn/item/gflv3v](https://pay.ldxp.cn/item/gflv3v) |
-| 订阅180天（50元)      | [https://pay.ldxp.cn/item/du4h8s](https://pay.ldxp.cn/item/du4h8s) |
-| 订阅365天（100元)     | [https://pay.ldxp.cn/item/ehbz9b](https://pay.ldxp.cn/item/ehbz9b) |
+| 请作者加个🍗（10元）   | [https://pay.ldxp.cn/item/bet8w6](https://pay.ldxp.cn/item/bet8w6) |
+| 请作者喝杯☕️（30元） | [https://pay.ldxp.cn/item/gflv3v](https://pay.ldxp.cn/item/gflv3v) |
+| 订阅180天（50元）      | [https://pay.ldxp.cn/item/du4h8s](https://pay.ldxp.cn/item/du4h8s) |
+| 订阅365天（100元）     | [https://pay.ldxp.cn/item/ehbz9b](https://pay.ldxp.cn/item/ehbz9b) |
 
 ![img](docs/source/_static/dingyue.png)
 
