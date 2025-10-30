@@ -139,6 +139,7 @@ def down_em_all_hybk_info():
                 stk_codes = get_hybk_cons_code(blk[0])
                 hku_info(f"{i+1}|{total} 获取行业板块{blk[1]}成分: {len(stk_codes)}")
             except (ConnectionError, ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError) as e:
+                hku_error(f"ip 封禁! 请至东财官网首页拖动划窗解锁后重试!")
                 raise e
             except Exception as e:
                 hku_warn(f"Failed! {type(e).__name__}: {str(e)}")
