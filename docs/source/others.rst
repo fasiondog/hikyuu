@@ -1,7 +1,13 @@
 杂项函数
 =============
 
-杂项函数
+.. note::
+
+    get_inds_views, get_market_view 以及 KData.to_pyarrow 等和 arrow 相关功能，需要额外安装 hikyuu_plugin 包支持。
+
+    python -m pip install hikyuu-plugin
+
+    使用前，需 from hikyuu_plugin.extra import * 进行插件导入.
 
 .. py:function:: get_market_view(stks[, date=Datetime(), market='SH']) -> pandas.DataFrame
 
