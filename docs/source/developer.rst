@@ -70,7 +70,7 @@ Linux下需安装依赖的开发软件包。如 Ubuntu 下，执行以下命令�
 
 .. code-block:: shell
 
-    pip install -r requirements.txt
+    pip install -r requirements.txt  或 pip install -r requirements.txt -U  (定期升级依赖包)
 
 
 2. 编译
