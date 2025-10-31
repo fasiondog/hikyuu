@@ -17,16 +17,17 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateEdit,
     QDateTimeEdit, QFrame, QGridLayout, QGroupBox,
-    QHBoxLayout, QLabel, QLineEdit, QMainWindow,
-    QProgressBar, QPushButton, QRadioButton, QSizePolicy,
-    QSpacerItem, QSpinBox, QTabWidget, QTextBrowser,
-    QTextEdit, QTimeEdit, QVBoxLayout, QWidget)
+    QHBoxLayout, QLabel, QLayout, QLineEdit,
+    QMainWindow, QProgressBar, QPushButton, QRadioButton,
+    QSizePolicy, QSpacerItem, QSpinBox, QTabWidget,
+    QTextBrowser, QTextEdit, QTimeEdit, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1178, 719)
+        MainWindow.resize(1139, 713)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout_12 = QHBoxLayout(self.centralwidget)
@@ -250,7 +251,7 @@ class Ui_MainWindow(object):
 
         self.min5_start_dateEdit = QDateEdit(self.groupBox_7)
         self.min5_start_dateEdit.setObjectName(u"min5_start_dateEdit")
-        self.min5_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 21), QTime(16, 0, 0)))
+        self.min5_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 21), QTime(8, 0, 0)))
         self.min5_start_dateEdit.setCalendarPopup(True)
 
         self.gridLayout_4.addWidget(self.min5_start_dateEdit, 1, 1, 1, 1)
@@ -284,7 +285,7 @@ class Ui_MainWindow(object):
 
         self.day_start_dateEdit = QDateEdit(self.groupBox_7)
         self.day_start_dateEdit.setObjectName(u"day_start_dateEdit")
-        self.day_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 21), QTime(16, 0, 0)))
+        self.day_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 21), QTime(8, 0, 0)))
         self.day_start_dateEdit.setCalendarPopup(True)
 
         self.gridLayout_4.addWidget(self.day_start_dateEdit, 0, 1, 1, 1)
@@ -1211,6 +1212,14 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_16.addWidget(self.label_48)
 
+        self.horizontalLayout_22 = QHBoxLayout()
+        self.horizontalLayout_22.setObjectName(u"horizontalLayout_22")
+
+        self.verticalLayout_16.addLayout(self.horizontalLayout_22)
+
+        self.horizontalLayout_26 = QHBoxLayout()
+        self.horizontalLayout_26.setObjectName(u"horizontalLayout_26")
+        self.horizontalLayout_26.setSizeConstraint(QLayout.SetFixedSize)
         self.label_44 = QLabel(self.tab_star)
         self.label_44.setObjectName(u"label_44")
         sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
@@ -1222,7 +1231,19 @@ class Ui_MainWindow(object):
         self.label_44.setPixmap(QPixmap(u"../images/star.png"))
         self.label_44.setScaledContents(True)
 
-        self.verticalLayout_16.addWidget(self.label_44)
+        self.horizontalLayout_26.addWidget(self.label_44, 0, Qt.AlignLeft)
+
+        self.label_56 = QLabel(self.tab_star)
+        self.label_56.setObjectName(u"label_56")
+        self.label_56.setMaximumSize(QSize(160, 160))
+        self.label_56.setFrameShape(QFrame.NoFrame)
+        self.label_56.setPixmap(QPixmap(u"../images/liandongxiaopu.png"))
+        self.label_56.setScaledContents(False)
+
+        self.horizontalLayout_26.addWidget(self.label_56, 0, Qt.AlignLeft)
+
+
+        self.verticalLayout_16.addLayout(self.horizontalLayout_26)
 
 
         self.verticalLayout_18.addLayout(self.verticalLayout_16)
@@ -1446,8 +1467,9 @@ class Ui_MainWindow(object):
         self.label_47.setText(QCoreApplication.translate("MainWindow", u"\u7533\u8bf7\u6350\u8d60\u529f\u80fd\u8bd5\u7528\uff0830\u5929\u8bd5\u7528\uff09", None))
         self.label_45.setText(QCoreApplication.translate("MainWindow", u"\u7535\u5b50\u90ae\u4ef6\u5730\u5740:", None))
         self.fetch_trial_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u7533\u8bf7\u8bd5\u7528\u8bb8\u53ef", None))
-        self.label_48.setText(QCoreApplication.translate("MainWindow", u"\u52a0\u5165\u77e5\u8bc6\u661f\u7403\u8fdb\u884c\u6350\u8d60\uff08\u53ef\u540c\u65f6\u57283\u53f0\u8bbe\u5907\u4e0a\u4f7f\u7528\u6350\u8d60\u529f\u80fd\uff09", None))
+        self.label_48.setText(QCoreApplication.translate("MainWindow", u"\u52a0\u5165\u77e5\u8bc6\u661f\u7403\u8fdb\u884c\u6350\u8d60\uff08\u53ef\u540c\u65f6\u57283\u53f0\u8bbe\u5907\u4e0a\u4f7f\u7528\u6350\u8d60\u529f\u80fd\uff09,\u6216\u8005\u8bf7\u4f5c\u8005\u559d\u676f\u2615\ufe0f\uff0c\u8c22\u8c22", None))
         self.label_44.setText("")
+        self.label_56.setText("")
         self.label_49.setText(QCoreApplication.translate("MainWindow", u"\u5f53\u524d\u6350\u8d60\u6388\u6743\u4fe1\u606f", None))
         self.label_license.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_star), QCoreApplication.translate("MainWindow", u"\u9879\u76ee\u6350\u8d60", None))
