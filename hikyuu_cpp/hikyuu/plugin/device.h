@@ -38,6 +38,6 @@ std::string HKU_API fetchTrialLicense(const std::string& email);
 bool HKU_API isValidLicense();
 
 /** 获取授权到期时间 */
-Datetime getExpireDate();
+Datetime HKU_API getExpireDate();
 
 }  // namespace hku
