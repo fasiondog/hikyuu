@@ -44,4 +44,8 @@ void export_plugin_device(py::module& m) {
     m.def("is_valid_license", &isValidLicense, R"(is_valid_license()
         
     查看当前设备是否授权)");
+
+    m.def("get_expire_date", &getExpireDate, R"(get_expire_date() -> Datetime
+        
+    查看授权到期时间)");
 }

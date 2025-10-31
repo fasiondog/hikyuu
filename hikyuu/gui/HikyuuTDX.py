@@ -35,7 +35,8 @@ from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
 
-from hikyuu import can_upgrade, get_last_version, fetch_trial_license, view_license, is_valid_license
+from hikyuu import (can_upgrade, get_last_version, fetch_trial_license,
+                    view_license, is_valid_license, get_expire_date, Datetime, TimeDelta)
 from hikyuu.data import hku_config_template
 from hikyuu.util import *
 
@@ -333,6 +334,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         icon = QIcon(f"{current_dir}/images/hikyuu_small.png")
         star_img = QPixmap(f"{current_dir}/images/star.png")
         self.label_44.setPixmap(star_img)
+        liandong_img = QPixmap(f"{current_dir}/images/liandongxiaopu.png")
+        self.label_56.setPixmap(liandong_img)
+
         # 修改 label_46 的 HTML 文本，直接在 HTML 中设置字体大小
 
         label_46_txt = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
@@ -864,6 +868,17 @@ li.checked::marker { content: "\2612"; }
                         "Hikyuu 新版本 ({}) 已发布，建议更新".format(get_last_version()))
                     self.import_detail_textEdit.append("更新命令: pip instal hikyuu --upgrade")
                     self.import_detail_textEdit.append("========================================================")
+                if is_valid_license():
+                    expire_date = get_expire_date()
+                    if expire_date != Datetime.min():
+                        delta = expire_date - Datetime.now()
+                        if delta < TimeDelta(3):
+                            self.import_detail_textEdit.append(
+                                "========================================================")
+                            self.import_detail_textEdit.append(
+                                "您的授权即将到期，截止日期：{}!".format(expire_date))
+                            self.import_detail_textEdit.append(
+                                "========================================================")
                 self.import_running = False
 
             elif msg_task_name == 'IMPORT_KDATA':

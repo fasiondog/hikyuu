@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'MainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.1
+## Created by: Qt User Interface Compiler version 6.10.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -251,7 +251,7 @@ class Ui_MainWindow(object):
 
         self.min5_start_dateEdit = QDateEdit(self.groupBox_7)
         self.min5_start_dateEdit.setObjectName(u"min5_start_dateEdit")
-        self.min5_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 21), QTime(8, 0, 0)))
+        self.min5_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 21), QTime(0, 0, 0)))
         self.min5_start_dateEdit.setCalendarPopup(True)
 
         self.gridLayout_4.addWidget(self.min5_start_dateEdit, 1, 1, 1, 1)
@@ -285,7 +285,7 @@ class Ui_MainWindow(object):
 
         self.day_start_dateEdit = QDateEdit(self.groupBox_7)
         self.day_start_dateEdit.setObjectName(u"day_start_dateEdit")
-        self.day_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 21), QTime(8, 0, 0)))
+        self.day_start_dateEdit.setMinimumDateTime(QDateTime(QDate(1989, 12, 21), QTime(0, 0, 0)))
         self.day_start_dateEdit.setCalendarPopup(True)
 
         self.gridLayout_4.addWidget(self.day_start_dateEdit, 0, 1, 1, 1)
@@ -1238,9 +1238,13 @@ class Ui_MainWindow(object):
         self.label_56.setMaximumSize(QSize(160, 160))
         self.label_56.setFrameShape(QFrame.NoFrame)
         self.label_56.setPixmap(QPixmap(u"../images/liandongxiaopu.png"))
-        self.label_56.setScaledContents(False)
+        self.label_56.setScaledContents(True)
 
         self.horizontalLayout_26.addWidget(self.label_56, 0, Qt.AlignLeft)
+
+        self.horizontalSpacer_15 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_26.addItem(self.horizontalSpacer_15)
 
 
         self.verticalLayout_16.addLayout(self.horizontalLayout_26)

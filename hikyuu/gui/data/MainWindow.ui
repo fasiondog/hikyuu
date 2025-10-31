@@ -361,7 +361,7 @@
               <widget class="QDateEdit" name="min5_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>8</hour>
+                 <hour>0</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -413,7 +413,7 @@
               <widget class="QDateEdit" name="day_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>8</hour>
+                 <hour>0</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -1915,7 +1915,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <layout class="QHBoxLayout" name="horizontalLayout_22"/>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_26" stretch="0,0">
+           <layout class="QHBoxLayout" name="horizontalLayout_26" stretch="0,0,0">
             <property name="sizeConstraint">
              <enum>QLayout::SetFixedSize</enum>
             </property>
@@ -1962,9 +1962,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <pixmap>../images/liandongxiaopu.png</pixmap>
               </property>
               <property name="scaledContents">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
              </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_15">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </item>

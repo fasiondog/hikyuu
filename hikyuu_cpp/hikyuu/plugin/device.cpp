@@ -66,4 +66,11 @@ bool HKU_API isValidLicense() {
     return plugin->isValidLicsense();
 }
 
+Datetime getExpireDate() {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
+    HKU_ERROR_IF_RETURN(!plugin, Datetime::min(), "Can't find {} plugin!", HKU_PLUGIN_DEVICE);
+    return plugin->getExpireDate();
+}
+
 }  // namespace hku
