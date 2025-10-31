@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1178</width>
-    <height>719</height>
+    <width>1139</width>
+    <height>713</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -361,7 +361,7 @@
               <widget class="QDateEdit" name="min5_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>16</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -413,7 +413,7 @@
               <widget class="QDateEdit" name="day_start_dateEdit">
                <property name="minimumDateTime">
                 <datetime>
-                 <hour>16</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>1989</year>
@@ -1907,34 +1907,66 @@ li.checked::marker { content: &quot;\2612&quot;; }
              </font>
             </property>
             <property name="text">
-             <string>加入知识星球进行捐赠（可同时在3台设备上使用捐赠功能）</string>
+             <string>加入知识星球进行捐赠（可同时在3台设备上使用捐赠功能）,或者请作者喝杯☕️，谢谢</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_44">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <layout class="QHBoxLayout" name="horizontalLayout_22"/>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_26" stretch="0,0">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>300</width>
-              <height>160</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="pixmap">
-             <pixmap>../images/star.png</pixmap>
-            </property>
-            <property name="scaledContents">
-             <bool>true</bool>
-            </property>
-           </widget>
+            <item alignment="Qt::AlignLeft">
+             <widget class="QLabel" name="label_44">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>300</width>
+                <height>160</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap>../images/star.png</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignLeft">
+             <widget class="QLabel" name="label_56">
+              <property name="maximumSize">
+               <size>
+                <width>160</width>
+                <height>160</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap>../images/liandongxiaopu.png</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
