@@ -20,5 +20,3 @@ pipdeptree
 h5py>=3.14.0
 tqdm>=4.67.1
 clickhouse-connect>=0.9.2
-pyarrow>=19.0.0
-zstandard>=0.25

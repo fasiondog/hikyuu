@@ -2,7 +2,7 @@ target("demo1")
     set_kind("binary")
     set_default(false)
     
-    add_packages("boost", "spdlog", "fmt")
+    add_packages("boost", "spdlog", "fmt", "nlohmann_json")
     add_includedirs("..")
 
     if is_plat("windows") then
@@ -26,7 +26,7 @@ target("demo2")
     set_kind("binary")
     set_default(false)
     
-    add_packages("boost", "spdlog", "fmt")
+    add_packages("boost", "spdlog", "fmt", "nlohmann_json")
     add_includedirs("..")
 
     if is_plat("windows") then
