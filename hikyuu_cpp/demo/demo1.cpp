@@ -33,6 +33,10 @@ int main(int argc, char* argv[]) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
+    // 初始化前，自己设定插件路径（如果需要的话）
+    // 否则，默认为用户目录下 .hikyuu/plugin 目录，可自行copy插件到该目录
+    // StockManager::instance().setPluginPath("./plugin");
+
     // 配置文件的位置自行修改
     hikyuu_init(fmt::format("{}/.hikyuu/hikyuu.ini", getUserDir()));
 
