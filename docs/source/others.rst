@@ -92,7 +92,7 @@
         199	2024-03-07 00:00:00	10.101364	9.738182
 
 
-.. py:function:: get_inds_view(inds, dates, query, market='SH')
+.. py:function:: get_inds_view(stks, inds, date[, cal_len=100, ktype=Query.DAY, market='SH']) -> pandas.DataFrame
 
     方式1: 获取指定日期的各证券的各指标结果
 
@@ -124,7 +124,7 @@
 
     方式2: 获取按指定Query查询计算的各证券的各指标结果, 结果中将包含指定 Query 包含的所有指定市场交易日日期
 
-    get_inds_view(stks, inds, date[, cal_len=100, ktype=Query.DAY, market='SH']) -> pandas.DataFrame
+    get_inds_view(stks, inds, query[, market='SH']) -> pandas.DataFrame
 
       :param stks: 指定证券列表
       :param list[Indicator] inds: 指定指标列表
