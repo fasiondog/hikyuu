@@ -13,8 +13,24 @@
 namespace hku {
 
 void initInnerTask() {
+    int64_t hh = 0, mm = 0;
+    try {
+        auto const& param = StockManager::instance().getHikyuuParameter();
+        string reload_time = param.tryGet<string>("reload_time", "00:00");
+        auto hh_mm = split(reload_time, ":");
+        HKU_CHECK(hh_mm.size() == 2, "reload_time format error: {}", reload_time);
+
+        hh = std::stoll(string(hh_mm[0]));
+        mm = std::stoll(string(hh_mm[1]));
+        HKU_CHECK(hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59, "reload_time format error: {}",
+                  reload_time);
+    } catch (const std::exception& e) {
+        HKU_ERROR(e.what());
+    }
+
     auto* tm = getScheduler();
-    tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(), reloadHikyuuTask);
+    tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(0, hh, mm),
+                              reloadHikyuuTask);
 }
 
 void reloadHikyuuTask() {

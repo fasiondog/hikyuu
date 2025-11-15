@@ -105,6 +105,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         with open(filename, 'w', encoding='utf-8') as f:
             current_config.write(f)
         filename = self.getHikyuuConfigFileName()
+        old_config = ConfigParser()
+        if os.path.exists(filename):
+            old_config.read(filename, encoding='utf-8')
+        old_reload_time = "00:00"
+        if old_config.has_section('hikyuu'):
+            old_reload_time = old_config.get('hikyuu', 'reload_time', fallback="00:00")
+
         if current_config.getboolean('hdf5', 'enable', fallback=True):
             data_dir = current_config['hdf5']['dir']
             if not os.path.lexists(data_dir + '/tmp'):
@@ -116,7 +123,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write(
                     hku_config_template.hdf5_template.format(
-                        dir=data_dir,
+                        dir=data_dir, reload_time=old_reload_time,
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         day=current_config.getboolean('preload', 'day', fallback=True),
@@ -157,6 +164,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 f.write(
                     hku_config_template.mysql_template.format(
                         dir=data_dir,
+                        reload_time=old_reload_time,
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         host=current_config['mysql']['host'],
@@ -200,6 +208,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 f.write(
                     hku_config_template.clickhouse_template.format(
                         dir=data_dir,
+                        reload_time=old_reload_time,
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         host=current_config['clickhouse']['host'],

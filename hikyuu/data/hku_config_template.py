@@ -26,6 +26,7 @@ hdf5_template = """
 [hikyuu]
 tmpdir = {dir}/tmp
 datadir = {dir}
+reload_time = {reload_time}
 quotation_server = {quotation_server}
 
 [block]
@@ -94,6 +95,7 @@ mysql_template = """
 [hikyuu]
 tmpdir = {dir}
 datadir = {dir}
+reload_time = {reload_time}
 quotation_server = {quotation_server}
 
 [block]
@@ -149,6 +151,7 @@ clickhouse_template = """
 [hikyuu]
 tmpdir = {dir}
 datadir = {dir}
+reload_time = {reload_time}
 quotation_server = {quotation_server}
 
 [block]
@@ -304,7 +307,7 @@ def generate_default_config():
     from hikyuu.data.hku_config_template import hdf5_template
     user_dir = os.path.expanduser('~')
     data_dir = "c:\\stock" if sys.platform == 'win32' else f"{user_dir}/stock"
-    hdf5_config = hdf5_template.format(dir=data_dir, quotation_server='ipc:///tmp/hikyuu_real.ipc',
+    hdf5_config = hdf5_template.format(dir=data_dir, reload_time="00:00", quotation_server='ipc:///tmp/hikyuu_real.ipc',
                                        day=True, week=False,
                                        month=False, quarter=False, halfyear=False, year=False,
                                        min1=False, min5=False, min15=False, min30=False,
