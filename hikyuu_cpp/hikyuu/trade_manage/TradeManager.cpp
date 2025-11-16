@@ -1262,7 +1262,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         Stock_Number(const Stock& stock, size_t number) : stock(stock), number(number) {}
 
         Stock stock;
-        size_t number;
+        double number;
     };
 
     price_t checkin_cash = 0.0;
