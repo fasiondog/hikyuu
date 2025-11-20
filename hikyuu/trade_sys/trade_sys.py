@@ -115,17 +115,26 @@ def crtMM(get_buy_num, get_sell_num=None, params={}, name='crtMM', buy_notify=No
 # ------------------------------------------------------------------
 # profitgoal
 # ------------------------------------------------------------------
-def crtPG(func, params={}, name='crtPG'):
+def crtPG(get_goal, calculate=None, params={}, name='crtPG', buy_notify=None, sell_notify=None):
     """
     快速创建盈利目标策略
 
-    :param func: 盈利目标策略函数
+    :param get_goal: 获取目标价格接口
+    :param calculate: 内部计算接口（在指定交易标的时被调用）
     :param {} params: 参数字典
     :param str name: 自定义名称
+    :param buy_notify: 接收买入交易记录通知
+    :param sell_notify: 接收卖出交易记录通知
     :return: 盈利目标策略实例
     """
     meta_x = type(name, (ProfitGoalBase, ), {'__init__': part_init, '_clone': part_clone})
-    meta_x._calculate = func
+    meta_x.get_goal = get_goal
+    if calculate is not None:
+        meta_x._calculate = calculate
+    if buy_notify is not None:
+        meta_x._buy_notify = buy_notify
+    if sell_notify is not None:
+        meta_x._sell_notify = sell_notify
     ret = meta_x(name, params)
     globals().update(dict(_=ret))
     return ret

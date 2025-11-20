@@ -26,8 +26,6 @@ void FixedHoldDays::_checkParam(const string& name) const {
     }
 }
 
-void FixedHoldDays::_calculate() {}
-
 price_t FixedHoldDays::getGoal(const Datetime& datetime, price_t price) {
     Stock stk = m_kdata.getStock();
     PositionRecord position = m_tm->getPosition(datetime, stk);

@@ -17,9 +17,14 @@ FixedPercentProfitGoal::FixedPercentProfitGoal() : ProfitGoalBase("PG_FixedPerce
     setParam<double>("p", 0.2);
 }
 
+/**
+ * @brief 析构函数，释放 FixedPercentProfitGoal 对象资源
+ *
+ * 该析构函数是 FixedPercentProfitGoal 类的默认析构函数实现，
+ * 负责清理对象占用的资源。由于该类没有动态分配的资源，
+ * 因此使用默认的空实现。
+ */
 FixedPercentProfitGoal::~FixedPercentProfitGoal() {}
-
-void FixedPercentProfitGoal::_calculate() {}
 
 void FixedPercentProfitGoal::_checkParam(const string& name) const {
     if ("p" == name) {

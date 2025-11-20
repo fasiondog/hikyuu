@@ -40,7 +40,7 @@ public:
     }
 
     void _calculate() override {
-        PYBIND11_OVERLOAD_PURE(void, ProfitGoalBase, _calculate, );
+        PYBIND11_OVERLOAD_NAME(void, ProfitGoalBase, "_calculate", _calculate, );
     };
 };
 
@@ -108,8 +108,8 @@ void export_ProfitGoal(py::module& m) {
 
     【重载接口】获取盈利目标价格，返回constant.null_price时，表示未限定目标；返回0意味着需要卖出
 
-    :param Datetime datetime: 买入时间
-    :param float price: 买入价格
+    :param Datetime datetime: 当前时间
+    :param float price: 当前价格
     :return: 目标价格
     :rtype: float)")
 

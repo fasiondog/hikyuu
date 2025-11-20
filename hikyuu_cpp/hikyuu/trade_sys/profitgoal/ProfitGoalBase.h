@@ -62,8 +62,8 @@ public:
 
     /**
      * 买入时计算目标价格
-     * @param datetime 买入时间
-     * @param price 买入价格
+     * @param datetime 当前时间
+     * @param price 当前价格
      * @return 返回Null<price_t>时，表示未限定目标; 返回0，意味着需要卖出
      */
     virtual price_t getGoal(const Datetime& datetime, price_t price) = 0;
@@ -80,7 +80,7 @@ public:
     virtual ProfitGoalPtr _clone() = 0;
 
     /** 子类计算接口，由setTO调用 */
-    virtual void _calculate() = 0;
+    virtual void _calculate() {}
 
 protected:
     virtual bool isPythonObject() const {
@@ -143,13 +143,12 @@ private:                                                         \
 #define PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define PROFITGOAL_IMP(classname)                               \
-public:                                                         \
-    virtual ProfitGoalPtr _clone() override {                   \
-        return std::make_shared<classname>();                   \
-    }                                                           \
-    virtual price_t getGoal(const Datetime&, price_t) override; \
-    virtual void _calculate() override;
+#define PROFITGOAL_IMP(classname)             \
+public:                                       \
+    virtual ProfitGoalPtr _clone() override { \
+        return std::make_shared<classname>(); \
+    }                                         \
+    virtual price_t getGoal(const Datetime&, price_t) override;
 
 /**
  * 客户程序都应使用该指针类型
