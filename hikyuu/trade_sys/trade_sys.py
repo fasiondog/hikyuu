@@ -3,7 +3,7 @@
 from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
     ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase, AllocateFundsBase,
-    MultiFactorBase
+    MultiFactorBase, ScoresFilterBase
 )
 
 
@@ -256,6 +256,25 @@ def crtST(func, params={}, name='crtST'):
     """
     meta_x = type(name, (StoplossBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
+
+
+# ------------------------------------------------------------------
+# SCFilter
+# ------------------------------------------------------------------
+def crtSCFilter(filter_func, params={}, name='crtSCFilter'):
+    """
+    快速创建评分过滤器
+
+    :param filter_func: 评分过滤器函数
+    :param {} params: 参数字典
+    :param str name: 自定义名称
+    :return: 评分过滤器实例
+    """
+    meta_x = type(name, (ScoresFilterBase, ), {'__init__': part_init, '_clone': part_clone})
+    meta_x._filter = filter_func
     ret = meta_x(name, params)
     globals().update(dict(_=ret))
     return ret
