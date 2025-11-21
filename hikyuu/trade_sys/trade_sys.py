@@ -3,7 +3,7 @@
 from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
     ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase, AllocateFundsBase,
-    MultiFactorBase, ScoresFilterBase
+    MultiFactorBase, ScoresFilterBase, NormalizeBase
 )
 
 
@@ -275,6 +275,25 @@ def crtSCFilter(filter_func, params={}, name='crtSCFilter'):
     """
     meta_x = type(name, (ScoresFilterBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._filter = filter_func
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
+
+
+# ------------------------------------------------------------------
+# Normalize
+# ------------------------------------------------------------------
+def crtNorm(normalize_func, params={}, name='crtNorm'):
+    """
+    快速创建标准化/归一化等算法函数
+
+    :param normalize_func: 算法函数
+    :param {} params: 参数字典
+    :param str name: 自定义名称
+    :return: 函数实例
+    """
+    meta_x = type(name, (NormalizeBase, ), {'__init__': part_init, '_clone': part_clone})
+    meta_x._normalize = normalize_func
     ret = meta_x(name, params)
     globals().update(dict(_=ret))
     return ret
