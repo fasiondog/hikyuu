@@ -18,6 +18,8 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 👉 **帮助文档：**[https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)
 
+👉 **Wiki文档（AI生成）：**[https://github.com/fasiondog/hikyuu/wiki](https://github.com/fasiondog/hikyuu/wiki)
+
 👉 **入门示例:**  [https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
 
 👉 **策略部件库：**[https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)
