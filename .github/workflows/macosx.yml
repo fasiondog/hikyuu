@@ -26,18 +26,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache packages
-        id: cache-xmake-macosx
-        uses: actions/cache@v5
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.xmake
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+      # - name: Cache packages
+      #   id: cache-xmake-macosx
+      #   uses: actions/cache@v4
+      #   env:
+      #     cache-name: cache-node-modules
+      #   with:
+      #     path: ~/.xmake
+      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      #       ${{ runner.os }}-build-
+      #       ${{ runner.os }}-
 
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
