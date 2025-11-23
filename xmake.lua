@@ -137,6 +137,7 @@ add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.gi
 local boost_config
 if is_plat("windows") then
     boost_config = {
+        version = "1.89.0",
         system = false,
         debug = is_mode("debug"),
         configs = {
@@ -153,6 +154,7 @@ if is_plat("windows") then
 else
     boost_config = {
         system = false,
+        version = "1.89.0",
         configs = {
             shared = true, -- is_plat("windows"),
             runtimes = get_config("runtimes"),
@@ -165,7 +167,10 @@ else
             thread = true,   -- parquet need
             chrono = true,   -- parquet need
             charconv = true, -- parquet need
-            cmake = false,
+            atomic = true,
+            container = true,
+            math = true,
+            cmake = true,
     }}
 end
 
