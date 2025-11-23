@@ -317,7 +317,7 @@ def import_one_stock_data(
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord high: {last_krecord[2]}, bar: {bar['high']}")
                     return 0
-                if abs(last_krecord[3] - bar["low"]) / last_krecord[3] > 0.01:
+                if abs(last_krecord[3] - bar["low"]) / last_krecord[3] > 0.01 and abs(last_krecord[3] - bar["low"]) > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord low: {last_krecord[3]}, bar: {bar['low']}")
                     return 0
