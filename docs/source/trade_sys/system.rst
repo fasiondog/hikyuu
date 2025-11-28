@@ -17,7 +17,7 @@
     * **tp_monotonic=True** *(bool)* : 止赢单调递增
     * **tp_delay_n=3** *(int)* : 止盈延迟开始的天数，即止盈策略判断从实际交易几天后开始生效
     * **ignore_sell_sg=False** *(bool)* : 忽略卖出信号，只使用止损/止赢等其他方式卖出
-    * **can_trade_when_high_eq_low=False** *(bool)* : 当最高价等于最低价时，是否允许买入
+    * **can_trade_when_high_eq_low=False** *(bool)* : 当最高价等于最低价时，是否允许交易
 
     * **ev_open_position=False** *(bool)*: 是否使用市场环境判定进行初始建仓
     * **cn_open_position=False** *(bool)*: 是否使用系统有效性条件进行初始建仓
