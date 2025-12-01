@@ -11,6 +11,8 @@
 
 🐞 缺陷修复
 
+* fixed: 修正 clickhouse 存储 K 线数据中 amount 字段的单位转换问题
+* fixed: 限制日期范围以适配 ClickHouse DateTime 类型
 * fixed: 修改Stock_Number结构体中的number类型为double，windows下容易出现精度错误
 * fixed: 更新盈利目标策略接口参数说明与实现逻辑，移除了部分子类中冗余的 `_calculate` 空实现
 * fixed: HikyuuTdx 在导入股票数据时，增加对低价股低点差异的绝对值判断，避免因价格过低导致的相对误差误判。
