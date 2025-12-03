@@ -154,7 +154,9 @@ def crtSG(func, params={}, name='crtSG'):
     """
     meta_x = type(name, (SignalBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func
-    return meta_x(name, params)
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
 
 
 # ------------------------------------------------------------------
