@@ -134,6 +134,9 @@ def import_stock_name(connect, api, market, quotations=None):
         if code not in deSet:
             newStockDict[code] = stock["name"]
 
+    # 号码前缀
+    codepre_list = get_codepre_list(connect, market, quotations)
+
     stktype_list = get_stktype_list(quotations)
     stktype_list = list(stktype_list)
     stktype_list.remove(STOCKTYPE.INDEX)  # 移除指数类型
@@ -149,23 +152,29 @@ def import_stock_name(connect, api, market, quotations=None):
 
         oldname, oldtype, oldvalid, oldstartDate, oldendDate = oldstock[2], oldstock[3], oldstock[4], oldstock[5], oldstock[6]
 
+        # 检测是否类型发生变化
+        newtype = oldtype
+        for codepre in codepre_list:
+            length = len(codepre[0])
+            if oldcode[:length] == codepre[0]:
+                if oldtype != codepre[1]:
+                    newtype = codepre[1]
+                break
+
         # 新的代码表中无此股票，则置为无效
-        # if (oldvalid == 1) and (oldcode not in newStockDict):
         if (oldvalid == 1) and ((oldcode not in newStockDict) or oldcode in deSet):
             sql = f"delete from hku_base.stock where market='{market}' and code='{oldcode}'"
             connect.command(sql)
-            insert_records.append((market, oldcode, oldname, oldtype, 0, oldstartDate, oldendDate))
+            insert_records.append((market, oldcode, oldname, newtype, 0, oldstartDate, oldendDate))
 
         # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
         if oldcode in newStockDict:
-            if oldname != newStockDict[oldcode] or oldvalid == 0:
+            if oldname != newStockDict[oldcode] or oldvalid == 0 or oldtype != newtype:
                 sql = f"delete from hku_base.stock where market='{market}' and code='{oldcode}'"
                 connect.command(sql)
-                insert_records.append((market, oldcode, newStockDict[oldcode], oldtype, 1, oldstartDate, 99999999))
+                insert_records.append((market, oldcode, newStockDict[oldcode], newtype, 1, oldstartDate, 99999999))
 
     # 处理新出现的股票
-    codepre_list = get_codepre_list(connect, market, quotations)
-
     today = datetime.date.today()
     today = today.year * 10000 + today.month * 100 + today.day
     count = 0
