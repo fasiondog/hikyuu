@@ -506,6 +506,12 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
         m_data->pKData[kType] = ptr_klist;
         if (total != 0) {
             (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code, query);
+            if ((kType == KQuery::TIMELINE || kType == KQuery::TRANS) &&
+                (type() == STOCKTYPE_ETF || type() == STOCKTYPE_FUND || type() == STOCKTYPE_B)) {
+                for (auto& k : *ptr_klist) {
+                    k.closePrice *= 0.1;
+                }
+            }
             m_data->m_lastUpdate[kType] = Datetime::now();
         }
     }
@@ -848,7 +854,14 @@ KRecord Stock::getKRecord(size_t pos, const KQuery::KType& kType) const {
         HKU_IF_RETURN(!m_kdataDriver || pos >= size_t(Null<int64_t>()), KRecord::NullKRecord);
         auto klist = m_kdataDriver->getConnect()->getKRecordList(market(), code(),
                                                                  KQuery(pos, pos + 1, kType));
-        return klist.size() > 0 ? klist[0] : KRecord::NullKRecord;
+        if (klist.size() > 0) {
+            if ((kType == KQuery::TIMELINE || kType == KQuery::TRANS) &&
+                (type() == STOCKTYPE_ETF || type() == STOCKTYPE_FUND || type() == STOCKTYPE_B)) {
+                klist[0].closePrice *= 0.1;
+            }
+            return klist[0];
+        }
+        return KRecord::NullKRecord;
     }
 
     if (KQuery::isExtraKType(kType)) {
@@ -878,7 +891,14 @@ KRecord Stock::getKRecord(const Datetime& datetime, const KQuery::KType& ktype) 
         }
 
         auto klist = driver->getKRecordList(market(), code(), query);
-        return klist.size() > 0 ? klist[0] : KRecord::NullKRecord;
+        if (klist.size() > 0) {
+            if ((ktype == KQuery::TIMELINE || ktype == KQuery::TRANS) &&
+                (type() == STOCKTYPE_ETF || type() == STOCKTYPE_FUND || type() == STOCKTYPE_B)) {
+                klist[0].closePrice *= 0.1;
+            }
+            return klist[0];
+        }
+        return KRecord::NullKRecord;
     }
 
     if (KQuery::isExtraKType(ktype)) {
@@ -966,6 +986,12 @@ KRecordList Stock::_getKRecordList(const KQuery& query) const {
             result = m_kdataDriver->getConnect()->getKRecordList(
               m_data->m_market, m_data->m_code, KQuery(start_ix, end_ix, query.kType()));
         }
+        if ((query.kType() == KQuery::TIMELINE || query.kType() == KQuery::TRANS) &&
+            (type() == STOCKTYPE_ETF || type() == STOCKTYPE_FUND || type() == STOCKTYPE_B)) {
+            for (auto& k : result) {
+                k.closePrice *= 0.1;
+            }
+        }
     }
 
     return result;
@@ -982,13 +1008,27 @@ DatetimeList Stock::getDatetimeList(const KQuery& query) const {
 }
 
 TimeLineList Stock::getTimeLineList(const KQuery& query) const {
-    return m_kdataDriver ? m_kdataDriver->getConnect()->getTimeLineList(market(), code(), query)
-                         : TimeLineList();
+    TimeLineList result;
+    HKU_IF_RETURN(!m_kdataDriver, result);
+    result = m_kdataDriver->getConnect()->getTimeLineList(market(), code(), query);
+    if (type() == STOCKTYPE_ETF || type() == STOCKTYPE_FUND || type() == STOCKTYPE_B) {
+        for (auto& tl : result) {
+            tl.price *= 0.1;
+        }
+    }
+    return result;
 }
 
 TransList Stock::getTransList(const KQuery& query) const {
-    return m_kdataDriver ? m_kdataDriver->getConnect()->getTransList(market(), code(), query)
-                         : TransList();
+    TransList result;
+    HKU_IF_RETURN(!m_kdataDriver, result);
+    result = m_kdataDriver->getConnect()->getTransList(market(), code(), query);
+    if (type() == STOCKTYPE_ETF || type() == STOCKTYPE_FUND || type() == STOCKTYPE_B) {
+        for (auto& t : result) {
+            t.price *= 0.1;
+        }
+    }
+    return result;
 }
 
 Parameter Stock::getFinanceInfo() const {
