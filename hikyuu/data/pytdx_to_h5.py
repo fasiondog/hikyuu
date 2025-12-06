@@ -330,7 +330,7 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
                     return 0
                 if ktype == 'DAY' and last_krecord['transCount'] != 0.0 and abs(last_krecord['transCount'] - bar["vol"]) > 10:
                     hku_error(
-                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord count: {last_krecord['transCount']}, bar: {bar['vol']} {abs(last_krecord['transCount'] - bar["vol"])}")
+                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord count: {last_krecord['transCount']}, bar: {bar['vol']}")
                     return 0
                 continue
 
