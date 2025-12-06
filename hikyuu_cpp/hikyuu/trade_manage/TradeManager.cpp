@@ -1490,7 +1490,7 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         for (; weight_iter != weights.end(); ++weight_iter) {
             // 如果没有红利并且也（派股和转增股数量都为零），则跳过
             if (0.0 == weight_iter->bonus() && 0.0 == weight_iter->countAsGift() &&
-                0.0 == weight_iter->increasement()) {
+                0.0 == weight_iter->increasement() && 0.0 == weight_iter->suogu()) {
                 continue;
             }
 
@@ -1505,7 +1505,7 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
                 new_trade_buffer.push_back(record);
             }
 
-            price_t addcount =
+            double addcount =
               (position.number / 10.0) * (weight_iter->countAsGift() + weight_iter->increasement());
             if (addcount != 0.0) {
                 position.number += addcount;
@@ -1514,6 +1514,18 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
                                    addcount, CostRecord(), 0.0, m_cash, PART_INVALID);
                 new_trade_buffer.push_back(record);
             }
+
+            if (weight_iter->suogu() > 0.0) {
+                double suogu_number = position.number * weight_iter->suogu();
+                if (suogu_number < position.number) {
+                    // 缩股采用上进位
+                    position.number = roundUp(suogu_number, 0);
+                } else if (suogu_number > position.number) {
+                    // 扩股截位法
+                    position.number = roundDown(suogu_number, 0);
+                }
+            }
+
         } /* for weight */
     } /* for position */
 
