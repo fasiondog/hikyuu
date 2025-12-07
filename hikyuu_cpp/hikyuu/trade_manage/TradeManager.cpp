@@ -192,7 +192,7 @@ double TradeManager::getHoldNumber(const Datetime& datetime, const Stock& stock)
 
         if (iter->stock == stock) {
             if (BUSINESS_BUY == iter->business || BUSINESS_GIFT == iter->business ||
-                BUSINESS_CHECKIN_STOCK == iter->business) {
+                BUSINESS_CHECKIN_STOCK == iter->business || BUSINESS_SUOGU == iter->business) {
                 number += iter->number;
 
             } else if (BUSINESS_SELL == iter->business ||
@@ -373,7 +373,7 @@ PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& 
 
         if (iter->stock == stock) {
             if (BUSINESS_BUY == iter->business || BUSINESS_GIFT == iter->business ||
-                BUSINESS_CHECKIN_STOCK == iter->business) {
+                BUSINESS_CHECKIN_STOCK == iter->business || BUSINESS_SUOGU == iter->business) {
                 number += iter->number;
 
             } else if (BUSINESS_SELL == iter->business ||
@@ -1291,6 +1291,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
 
             case BUSINESS_BUY:
             case BUSINESS_GIFT:
+            case BUSINESS_SUOGU:
                 stock_iter = stock_map.find(iter->stock.id());
                 if (stock_iter != stock_map.end()) {
                     stock_iter->second.number += iter->number;
@@ -1517,12 +1518,23 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
 
             if (weight_iter->suogu() > 0.0) {
                 double suogu_number = position.number * weight_iter->suogu();
+                double change_number = 0.0;
                 if (suogu_number < position.number) {
                     // 缩股采用上进位
+                    double old_number = position.number;
                     position.number = roundUp(suogu_number, 0);
+                    change_number = position.number - old_number;
                 } else if (suogu_number > position.number) {
                     // 扩股截位法
+                    double old_number = position.number;
                     position.number = roundDown(suogu_number, 0);
+                    change_number = position.number - old_number;
+                }
+
+                if (change_number != 0.0) {
+                    TradeRecord record(stock, weight_iter->datetime(), BUSINESS_SUOGU, 0.0, 0.0,
+                                       0.0, change_number, CostRecord(), 0.0, m_cash, PART_INVALID);
+                    new_trade_buffer.push_back(record);
                 }
             }
 
@@ -1767,6 +1779,7 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
             return _add_sell_tr(tr);
 
         case BUSINESS_GIFT:
+        case BUSINESS_SUOGU:
             return true;
 
         case BUSINESS_BONUS:

@@ -32,6 +32,7 @@ void export_TradeRecord(py::module& m) {
       .value("RETURN_CASH", BUSINESS_RETURN_CASH)
       .value("BORROW_STOCK", BUSINESS_BORROW_STOCK)
       .value("RETURN_STOCK", BUSINESS_RETURN_STOCK)
+      .value("SUOGU", BUSINESS_SUOGU)
       .value("INVALID", BUSINESS_INVALID);
 
     m.def("get_business_name", getBusinessName, R"(get_business_name(business)

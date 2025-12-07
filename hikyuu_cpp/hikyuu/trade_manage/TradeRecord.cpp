@@ -43,6 +43,8 @@ string HKU_API getBusinessName(BUSINESS business) {
             return "SELL_SHORT";
         case BUSINESS_BUY_SHORT:
             return "BUY_SHORT";
+        case BUSINESS_SUOGU:
+            return "SUOGU";
         default:
             return "UNKNOWN";
     }
@@ -82,6 +84,8 @@ BUSINESS HKU_API getBusinessEnum(const string& arg) {
         return BUSINESS_SELL_SHORT;
     } else if (business_name == "BUY_SHORT") {
         return BUSINESS_BUY_SHORT;
+    } else if (business_name == "SUOGU") {
+        return BUSINESS_SUOGU;
     } else {
         business = BUSINESS_INVALID;
     }
