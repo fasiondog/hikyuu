@@ -13,5 +13,6 @@
 #include "crt/AF_FixedWeight.h"
 #include "crt/AF_FixedWeightList.h"
 #include "crt/AF_MultiFactor.h"
+#include "crt/AF_FixedAmount.h"
 
 #endif /* TRADE_SYS_ALLOCATEFUNDS_BUILD_IN_H_ */

@@ -13,17 +13,19 @@
 </cite>
 
 ## Table of Contents
-1. [Introduction](#introduction)
-2. [Core Component Architecture](#core-component-architecture)
-3. [Signal Components](#signal-components)
-4. [Condition Components](#condition-components)
-5. [Money Management Components](#money-management-components)
-6. [Stop Loss Algorithms](#stop-loss-algorithms)
-7. [Profit Goal Components](#profit-goal-components)
-8. [Slippage Models](#slippage-models)
-9. [Allocation Funds Components](#allocation-funds-components)
-10. [Execution Flow and Strategy Composition](#execution-flow-and-strategy-composition)
-11. [Performance Considerations](#performance-considerations)
+- [Trading System Components](#trading-system-components)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Core Component Architecture](#core-component-architecture)
+  - [Signal Components](#signal-components)
+  - [Condition Components](#condition-components)
+  - [Money Management Components](#money-management-components)
+  - [Stop Loss Algorithms](#stop-loss-algorithms)
+  - [Profit Goal Components](#profit-goal-components)
+  - [Slippage Models](#slippage-models)
+  - [Allocation Funds Components](#allocation-funds-components)
+  - [Execution Flow and Strategy Composition](#execution-flow-and-strategy-composition)
+  - [Performance Considerations](#performance-considerations)
 
 ## Introduction
 The Hikyuu trading system is built on a modular component architecture that allows for flexible strategy development. This document provides comprehensive API documentation for the trading system components, detailing the available implementations, their parameters, and usage patterns. The system follows a component-based design where each aspect of trading logic is encapsulated in specialized classes that can be combined to create complete trading strategies.
@@ -203,6 +205,7 @@ Available allocation implementations include:
 - `AF_FixedWeight`: Fixed weight allocation
 - `AF_FixedWeightList`: Predefined weight list
 - `AF_MultiFactor`: Multi-factor weighted allocation
+- `AF_FixedAmount`: Fixed amount allocation
 
 These components are particularly useful in portfolio management scenarios where capital must be optimally distributed across multiple strategies or asset classes. The allocation algorithm considers various factors such as performance, risk, and correlation to determine the optimal capital distribution.
 
