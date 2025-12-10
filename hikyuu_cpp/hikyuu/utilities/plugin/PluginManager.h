@@ -10,7 +10,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
-#include <mutex>
+#include <shared_mutex>
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/plugin/PluginLoader.h"
 
@@ -38,35 +38,54 @@ public:
     }
 
     template <typename PluginInterfaceT>
-    PluginInterfaceT* getPlugin(const std::string& pluginname) noexcept;
-
-private:
-    std::unordered_map<std::string, std::unique_ptr<PluginLoader>>::iterator load(
-      const std::string& pluginname) noexcept {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        std::unique_ptr<PluginLoader> loader = std::make_unique<PluginLoader>(m_plugin_path);
-        if (loader->load(pluginname)) {
-            auto [it, success] = m_plugins.insert(std::make_pair(pluginname, std::move(loader)));
-            if (success) {
-                return it;
+    PluginInterfaceT* getPlugin(const std::string& pluginname) noexcept {
+        PluginInterfaceT* ret{nullptr};
+        try {
+            {
+                std::shared_lock<std::shared_mutex> read_lock(m_mutex);
+                auto it = m_plugins.find(pluginname);
+                if (it != m_plugins.end()) {
+                    ret = it->second->instance<PluginInterfaceT>();
+                    return ret;
+                }
             }
+
+            std::unique_ptr<PluginLoader> loader = std::make_unique<PluginLoader>(m_plugin_path);
+            if (!loader->load(pluginname)) {
+                HKU_ERROR("Load plugin {} failed: {}", pluginname, loader->getFileName(pluginname));
+                return ret;
+            }
+
+            {
+                std::unique_lock<std::shared_mutex> write_lock(m_mutex);
+                auto it = m_plugins.find(pluginname);
+                if (it != m_plugins.end()) {
+                    // 复用已插入的插件实例
+                    ret = it->second->instance<PluginInterfaceT>();
+                } else {
+                    // 插入新加载的插件
+                    auto [it, success] =
+                      m_plugins.insert(std::make_pair(pluginname, std::move(loader)));
+                    if (success) {
+                        ret = it->second->instance<PluginInterfaceT>();
+                    }
+                }
+                return ret;
+            }
+        } catch (const std::exception& e) {
+            HKU_ERROR("Load plugin {} failed: {}", pluginname, e.what());
+            ret = nullptr;
+        } catch (...) {
+            HKU_ERROR("Load plugin {} failed: unknown exception", pluginname);
+            ret = nullptr;
         }
-        return m_plugins.end();
+        return ret;
     }
 
 private:
     std::string m_plugin_path;
     std::unordered_map<std::string, std::unique_ptr<PluginLoader>> m_plugins;
-    std::mutex m_mutex;
+    std::shared_mutex m_mutex;
 };
-
-template <typename PluginInterfaceT>
-PluginInterfaceT* PluginManager::getPlugin(const std::string& pluginname) noexcept {
-    auto it = m_plugins.find(pluginname);
-    if (it == m_plugins.end()) {
-        it = load(pluginname);
-    }
-    return it != m_plugins.end() ? it->second->instance<PluginInterfaceT>() : nullptr;
-}
 
 }  // namespace hku
