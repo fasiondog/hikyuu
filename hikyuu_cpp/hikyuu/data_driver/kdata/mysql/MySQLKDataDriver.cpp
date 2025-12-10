@@ -116,7 +116,7 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
         while (st->moveNext()) {
             try {
                 st->getColumn(0, date, open, high, low, close, amount, count);
-                result.emplace_back(Datetime(date), open, high, low, close, amount, count);
+                result.emplace_back(Datetime(date), open, high, low, close, amount * 0.1, count);
             } catch (...) {
                 HKU_ERROR("Failed get krecord: {}{} {}", market, code, kType);
             }
@@ -150,7 +150,7 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
                 k.highPrice = record.high();
                 k.lowPrice = record.low();
                 k.closePrice = record.close();
-                k.transAmount = record.amount();
+                k.transAmount = record.amount() * 0.1;
                 k.transCount = record.count();
                 result.push_back(k);
             } catch (...) {
