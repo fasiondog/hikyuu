@@ -23,14 +23,16 @@ namespace hku {
 
 typedef std::pair<size_t, size_t> range_t;
 
-inline std::vector<range_t> parallelIndexRange(size_t start, size_t end) {
+inline std::vector<range_t> parallelIndexRange(size_t start, size_t end, size_t cpu_num = 0) {
     std::vector<std::pair<size_t, size_t>> ret;
     if (start >= end) {
         return ret;
     }
 
     size_t total = end - start;
-    size_t cpu_num = std::thread::hardware_concurrency();
+    if (cpu_num == 0) {
+        cpu_num = std::thread::hardware_concurrency();
+    }
     if (cpu_num == 1) {
         ret.emplace_back(start, end);
         return ret;
@@ -66,10 +68,15 @@ void parallel_for_index_void(size_t start, size_t end, FunctionType f) {
     return;
 }
 
-template <typename FunctionType, class TaskGroup = MQThreadPool>
+template <size_t cpu_num = 0, typename FunctionType, class TaskGroup = MQThreadPool>
 auto parallel_for_index(size_t start, size_t end, FunctionType f) {
-    auto ranges = parallelIndexRange(start, end);
-    TaskGroup tg;
+    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+    auto ranges = parallelIndexRange(start, end, cpu_num);
+    if (ranges.empty()) {
+        return ret;
+    }
+
+    TaskGroup tg(ranges.size());
     std::vector<std::future<std::vector<typename std::invoke_result<FunctionType, size_t>::type>>>
       tasks;
     for (size_t i = 0, total = ranges.size(); i < total; i++) {
@@ -82,7 +89,6 @@ auto parallel_for_index(size_t start, size_t end, FunctionType f) {
         }));
     }
 
-    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
     for (auto& task : tasks) {
         auto one = task.get();
         for (auto&& value : one) {

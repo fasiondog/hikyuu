@@ -193,7 +193,8 @@ KDataDriverConnectPoolPtr DataDriverFactory::getKDataDriverPool(const Parameter&
         HKU_CHECK(prototype_iter != m_kdataPrototypeDrivers->end(), "Unregistered driver：{}",
                   name);
         HKU_CHECK(prototype_iter->second->init(params), "Failed init driver: {}", name);
-        (*m_kdataDriverPools)[name] = make_shared<KDataDriverConnectPool>(prototype_iter->second);
+        (*m_kdataDriverPools)[name] = make_shared<KDataDriverConnectPool>(
+          prototype_iter->second, std::thread::hardware_concurrency() * 2);
         result = (*m_kdataDriverPools)[name];
     }
     return result;
