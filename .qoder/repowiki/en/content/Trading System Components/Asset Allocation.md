@@ -13,17 +13,19 @@
 </cite>
 
 ## Table of Contents
-1. [Introduction](#introduction)
-2. [Core Allocation Methods](#core-allocation-methods)
-3. [AllocateFundsBase Class Interface](#allocatefundsbase-class-interface)
-4. [Equal Weight Allocation](#equal-weight-allocation)
-5. [Fixed Weight Allocation](#fixed-weight-allocation)
-6. [Fixed Weight List Allocation](#fixed-weight-list-allocation)
-7. [Multi-Factor Allocation](#multi-factor-allocation)
-8. [System Weight Data Structure](#system-weight-data-structure)
-9. [Integration with Portfolio Management](#integration-with-portfolio-management)
-10. [Practical Configuration Examples](#practical-configuration-examples)
-11. [Performance and Rebalancing Considerations](#performance-and-rebalancing-considerations)
+- [Asset Allocation](#asset-allocation)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Core Allocation Methods](#core-allocation-methods)
+  - [AllocateFundsBase Class Interface](#allocatefundsbase-class-interface)
+  - [Equal Weight Allocation](#equal-weight-allocation)
+  - [Fixed Weight Allocation](#fixed-weight-allocation)
+  - [Fixed Weight List Allocation](#fixed-weight-list-allocation)
+  - [Multi-Factor Allocation](#multi-factor-allocation)
+  - [System Weight Data Structure](#system-weight-data-structure)
+  - [Integration with Portfolio Management](#integration-with-portfolio-management)
+  - [Practical Configuration Examples](#practical-configuration-examples)
+  - [Performance and Rebalancing Considerations](#performance-and-rebalancing-considerations)
 
 ## Introduction
 Asset allocation in Hikyuu refers to the systematic distribution of capital across multiple trading systems or assets within a portfolio. This process is critical for risk diversification, position sizing, and optimizing returns based on predefined strategies. The framework provides several built-in allocation algorithms that can be customized or extended to meet specific investment objectives. These allocation methods operate by determining the relative weight each selected system should receive in the overall portfolio, based on various criteria such as equal distribution, fixed percentages, or multi-factor scoring models.
@@ -40,6 +42,7 @@ Hikyuu implements four primary asset allocation strategies through dedicated cla
 - **AF_FixedWeight**: Assigns a fixed percentage weight to each system
 - **AF_FixedWeightList**: Applies a predefined list of weights sequentially to selected systems
 - **AF_MultiFactor**: Uses scores from multi-factor analysis as allocation weights
+- **AF_FixedAmount**: Assigns fixed amount to each system
 
 These methods inherit from the base `AllocateFundsBase` class and implement the `_allocateWeight` virtual function to define their specific behavior. Each allocation method can be instantiated through factory functions (e.g., `AF_EqualWeight()`, `AF_FixedWeight()`) that return shared pointers to the respective implementation.
 

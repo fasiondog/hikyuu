@@ -118,6 +118,12 @@ void export_AllocateFunds(py::module& m) {
     
     等权重资产分配，对选中的资产进行等比例分配)");
 
+    m.def("AF_FixedAmount", AF_FixedAmount, py::arg("amount") = 20000.0, R"(AF_FixedAmount(amount)
+    
+    等金额资产分配，对选中的资产进行等金额分配
+
+    :param float amount: 交易最大金额)");
+
     m.def("AF_FixedWeight", AF_FixedWeight, py::arg("weight") = 0.1, R"(AF_FixedWeight(weight)
     
     固定比例资产分配
