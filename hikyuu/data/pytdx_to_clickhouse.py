@@ -336,7 +336,7 @@ def import_one_stock_data(
                     return 0
                 if ktype == 'DAY' and last_krecord[5] != 0.0 and abs(last_krecord[5] - bar["amount"])/last_krecord[5] > 0.1:
                     hku_error(
-                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord amount: {last_krecord[5]}, bar: {bar['amount']*0.001}")
+                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord amount: {last_krecord[5]}, bar: {bar['amount']}")
                     return 0
                 if ktype == 'DAY' and last_krecord[6] != 0.0 and last_krecord[6] != 0.0 and abs(last_krecord[6] - bar["vol"])/last_krecord[6] > 0.1:
                     hku_error(
