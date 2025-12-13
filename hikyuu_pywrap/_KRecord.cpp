@@ -77,7 +77,6 @@ void export_KReord(py::module& m) {
     });
 
     m.def("krecords_to_df", [](const KRecordList& kdata) {
-        SPEND_TIME(krecords_to_df);
         size_t total = kdata.size();
         if (total == 0) {
             return py::module_::import("pandas").attr("DataFrame")();
