@@ -12,7 +12,7 @@
 #define HIKYUU_UTILITIES_THREAD_WORKSTEALQUEUE_H
 
 #include <deque>
-#include <mutex>
+#include <shared_mutex>
 #include "FuncWrapper.h"
 
 namespace hku {
@@ -24,7 +24,7 @@ class WorkStealQueue {
 private:
     typedef FuncWrapper data_type;
     std::deque<data_type> m_queue;
-    mutable std::mutex m_mutex;
+    mutable std::shared_mutex m_mutex;
 
 public:
     /** 构造函数 */
@@ -36,29 +36,30 @@ public:
 
     /** 将数据插入队列头部 */
     void push_front(data_type&& data) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::unique_lock<std::shared_mutex> lock(m_mutex);
         m_queue.push_front(std::move(data));
     }
 
     /** 将数据插入队列尾部 */
     void push_back(data_type&& data) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::unique_lock<std::shared_mutex> lock(m_mutex);
         m_queue.push_back(std::move(data));
     }
 
     /** 队列是否为空 */
     bool empty() const {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::shared_lock<std::shared_mutex> lock(m_mutex);
         return m_queue.empty();
     }
 
     /** 队列大小，！未加锁，谨慎使用 */
     size_t size() const {
+        std::shared_lock<std::shared_mutex> lock(m_mutex);
         return m_queue.size();
     }
 
     void clear() {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::unique_lock<std::shared_mutex> lock(m_mutex);
         auto tmp = std::deque<data_type>();
         m_queue.swap(tmp);
     }
@@ -69,7 +70,7 @@ public:
      * @return 如果原本队列为空返回 false，否则为 true
      */
     bool try_pop(data_type& res) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::unique_lock<std::shared_mutex> lock(m_mutex);
         if (m_queue.empty()) {
             return false;
         }
@@ -85,7 +86,7 @@ public:
      * @return 如果原本队列为空返回 false，否则为 true
      */
     bool try_steal(data_type& res) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::unique_lock<std::shared_mutex> lock(m_mutex);
         if (m_queue.empty()) {
             return false;
         }
