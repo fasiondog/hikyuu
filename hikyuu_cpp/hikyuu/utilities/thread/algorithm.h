@@ -12,6 +12,7 @@
 #include <vector>
 #include "ThreadPool.h"
 #include "MQThreadPool.h"
+#include "StealThreadPool.h"
 
 //----------------------------------------------------------------
 // Note: 除 ThreadPool/MQThreadPool 外，其他线程池由于使用
@@ -122,6 +123,40 @@ auto parallel_for_range(size_t start, size_t end, FunctionType f, size_t cpu_num
         for (auto&& value : one) {
             ret.emplace_back(std::move(value));
         }
+    }
+
+    return ret;
+}
+
+template <typename FunctionType>
+void parallel_for_index_void_steal(size_t start, size_t end, FunctionType f, int cpu_num = 0) {
+    if (start >= end) {
+        return;
+    }
+
+    StealThreadPool tg(cpu_num == 0 ? std::thread::hardware_concurrency() : cpu_num);
+    for (size_t i = start; i < end; i++) {
+        tg.submit([func = f, i]() { func(i); });
+    }
+    tg.join();
+    return;
+}
+
+template <typename FunctionType>
+auto parallel_for_index_steal(size_t start, size_t end, FunctionType f, size_t cpu_num = 0) {
+    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+    if (start >= end) {
+        return ret;
+    }
+
+    StealThreadPool tg(cpu_num == 0 ? std::thread::hardware_concurrency() : cpu_num);
+    std::vector<std::future<typename std::invoke_result<FunctionType, size_t>::type>> tasks;
+    for (size_t i = start; i < end; i++) {
+        tasks.emplace_back(tg.submit([func = f, i]() { return func(i); }));
+    }
+
+    for (auto& task : tasks) {
+        ret.push_back(std::move(task.get()));
     }
 
     return ret;
