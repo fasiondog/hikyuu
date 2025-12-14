@@ -126,8 +126,18 @@ public:
             // 本地线程任务从前部入队列（递归成栈）
             m_queues[index]->push_front(std::move(task));
         } else {
-            m_master_work_queue.push(std::move(task));
-            m_cv.notify_one();
+            bool push_ok = false;
+            for (size_t i = 0; i < m_worker_num; i++) {
+                if (!m_interrupt_flags[i].isSet() && m_queues[i]->empty()) {
+                    m_queues[i]->push_back(std::move(task));
+                    push_ok = true;
+                    break;
+                }
+            }
+            if (!push_ok) {
+                m_master_work_queue.push(std::move(task));
+                m_cv.notify_one();
+            }
         }
         return res;
     }
@@ -187,7 +197,7 @@ public:
                 } else {
                     bool can_quit = true;
                     for (size_t i = 0; i < m_worker_num; i++) {
-                        if (m_queues[i]->size() != 0) {
+                        if (!m_queues[i]->empty()) {
                             can_quit = false;
                             break;
                         }
@@ -236,10 +246,10 @@ private:
     std::condition_variable m_cv;  // 信号量，无任务时阻塞线程并等待
     std::mutex m_cv_mutex;         // 配合信号量的互斥量
 
-    std::vector<InterruptFlag> m_interrupt_flags;            // 工作线程状态
-    ThreadSafeQueue<task_type> m_master_work_queue;          // 主线程任务队列
-    std::vector<std::unique_ptr<WorkStealQueue> > m_queues;  // 任务队列（每个工作线程一个）
-    std::vector<std::thread> m_threads;                      // 工作线程
+    std::vector<InterruptFlag> m_interrupt_flags;           // 工作线程状态
+    ThreadSafeQueue<task_type> m_master_work_queue;         // 主线程任务队列
+    std::vector<std::unique_ptr<WorkStealQueue>> m_queues;  // 任务队列（每个工作线程一个）
+    std::vector<std::thread> m_threads;                     // 工作线程
     std::unordered_map<std::thread::id, int> m_thread_index;
 
     void worker_thread(int index) {
