@@ -126,18 +126,8 @@ public:
             // 本地线程任务从前部入队列（递归成栈）
             m_queues[index]->push_front(std::move(task));
         } else {
-            bool push_ok = false;
-            for (size_t i = 0; i < m_worker_num; i++) {
-                if (!m_interrupt_flags[i].isSet() && m_queues[i]->empty()) {
-                    m_queues[i]->push_back(std::move(task));
-                    push_ok = true;
-                    break;
-                }
-            }
-            if (!push_ok) {
-                m_master_work_queue.push(std::move(task));
-                m_cv.notify_one();
-            }
+            m_master_work_queue.push(std::move(task));
+            m_cv.notify_one();
         }
         return res;
     }
