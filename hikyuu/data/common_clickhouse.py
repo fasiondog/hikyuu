@@ -69,11 +69,9 @@ def create_database(connect):
              and int(x.stem) > db_version and not x.is_dir()]
     files.sort()
     for file in files:
-        print(file)
         sql = file.read_text(encoding='utf8')
         statements = sql.split(';')
         for stmt in statements:
-            print(stmt)
             stmt = stmt.strip()
             if stmt:  # 跳过空语句
                 try:
