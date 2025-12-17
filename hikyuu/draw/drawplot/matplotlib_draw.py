@@ -377,8 +377,14 @@ def iplot(
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
 
-    py_indicatr = [None if x == constant.null_price else x for x in indicator]
-    axes.plot(py_indicatr, linestyle=linestyle, label=label, *args, **kwargs)
+    #解决缺值时无法绘图的问题 by stone 20251217
+    #py_indicatr = [None if x == constant.null_price else x for x in indicator]
+    #axes.plot(py_indicatr, linestyle=linestyle, label=label, *args, **kwargs)
+
+    py_indicatr = np.array([None if x == constant.null_price else x for x in indicator])
+    py_x = np.arange(len(py_indicatr))
+    imask = np.isfinite(py_indicatr)
+    axes.plot(py_x[imask], py_indicatr[imask], linestyle=linestyle, label=label, *args, **kwargs)
 
     if legend_on:
         leg = axes.legend(loc='upper left')
