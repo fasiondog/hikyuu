@@ -479,12 +479,13 @@ def import_on_stock_trans(connect, api, h5file, market, stock_record, max_days):
                     second += 3
                 if second > 59:
                     continue
-                row['datetime'] = cur_date * 1000000 + minute * 100 + second
-                row['price'] = int(record['price'] * 1000)
-                row['vol'] = record['vol']
-                row['buyorsell'] = record['buyorsell']
-                row.append()
-                add_record_count += 1
+                if record['price'] > 0.0 and record['vol'] >= 0.0:
+                    row['datetime'] = cur_date * 1000000 + minute * 100 + second
+                    row['price'] = int(record['price'] * 1000)
+                    row['vol'] = record['vol']
+                    row['buyorsell'] = record['buyorsell']
+                    row.append()
+                    add_record_count += 1
             except Exception as e:
                 hku_error("Failed trans to record! {}", e)
 
@@ -578,12 +579,13 @@ def import_on_stock_time(connect, api, h5file, market, stock_record, max_days):
             elif time == 1360:
                 time = 1400
             try:
-                row['datetime'] = this_date + time
-                row['price'] = int(record['price'] * 1000)
-                row['vol'] = record['vol']
-                row.append()
+                if record['price'] > 0.0 and record['vol'] >= 0.0:
+                    row['datetime'] = this_date + time
+                    row['price'] = int(record['price'] * 1000)
+                    row['vol'] = record['vol']
+                    row.append()
+                    add_record_count += 1
                 time += 1
-                add_record_count += 1
             except Exception as e:
                 hku_error("Failed trans record {}! {}".format(record, e))
 
