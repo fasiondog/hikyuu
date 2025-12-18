@@ -601,15 +601,16 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
                 if second > 59:
                     continue
 
-                trans_buf.append(
-                    (
-                        market, code,
-                        Datetime(cur_date * 1000000 + minute * 100 + second).timestamp_utc()//1000000,
-                        int(roundEx(record["price"], 3) * 1000.0),
-                        int(record["vol"]),
-                        record["buyorsell"],
+                if record['price'] > 0.0:
+                    trans_buf.append(
+                        (
+                            market, code,
+                            Datetime(cur_date * 1000000 + minute * 100 + second).timestamp_utc()//1000000,
+                            int(roundEx(record["price"], 3) * 1000.0),
+                            int(record["vol"]),
+                            record["buyorsell"],
+                        )
                     )
-                )
             except Exception as e:
                 hku_error("Failed trans to record! {}", e)
 
@@ -710,8 +711,9 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
             elif time == 1360:
                 time = 1400
             try:
-                time_buf.append((market, code, Datetime(this_date + time).timestamp_utc() //
-                                ticks, int(roundEx(record['price'], 3) * 1000.0), int(record['vol'])))
+                if record['price'] > 0.0:
+                    time_buf.append((market, code, Datetime(this_date + time).timestamp_utc() //
+                                     ticks, int(roundEx(record['price'], 3) * 1000.0), int(record['vol'])))
                 time += 1
             except Exception as e:
                 hku_error("Failed trans record {}! {}".format(record, e))
