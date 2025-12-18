@@ -128,13 +128,13 @@ auto parallel_for_range(size_t start, size_t end, FunctionType f, size_t cpu_num
     return ret;
 }
 
-template <typename FunctionType>
-void parallel_for_index_void_steal(size_t start, size_t end, FunctionType f, int cpu_num = 0) {
+template <typename FunctionType, class TaskGroup = ThreadPool>
+void parallel_for_index_void_single(size_t start, size_t end, FunctionType f, int cpu_num = 0) {
     if (start >= end) {
         return;
     }
 
-    StealThreadPool tg(cpu_num == 0 ? std::thread::hardware_concurrency() : cpu_num);
+    TaskGroup tg(cpu_num == 0 ? std::thread::hardware_concurrency() : cpu_num);
     for (size_t i = start; i < end; i++) {
         tg.submit([func = f, i]() { func(i); });
     }
@@ -142,14 +142,14 @@ void parallel_for_index_void_steal(size_t start, size_t end, FunctionType f, int
     return;
 }
 
-template <typename FunctionType>
-auto parallel_for_index_steal(size_t start, size_t end, FunctionType f, size_t cpu_num = 0) {
+template <typename FunctionType, class TaskGroup = ThreadPool>
+auto parallel_for_index_single(size_t start, size_t end, FunctionType f, size_t cpu_num = 0) {
     std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
     if (start >= end) {
         return ret;
     }
 
-    StealThreadPool tg(cpu_num == 0 ? std::thread::hardware_concurrency() : cpu_num);
+    TaskGroup tg(cpu_num == 0 ? std::thread::hardware_concurrency() : cpu_num);
     std::vector<std::future<typename std::invoke_result<FunctionType, size_t>::type>> tasks;
     for (size_t i = start; i < end; i++) {
         tasks.emplace_back(tg.submit([func = f, i]() { return func(i); }));
