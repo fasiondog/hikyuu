@@ -17,6 +17,7 @@
 #include "TMReportPluginInterface.h"
 #include "DataDriverPluginInterface.h"
 #include "HkuExtraPluginInterface.h"
+#include "CheckDataPluginInterface.h"
 
 namespace hku {
 
@@ -28,5 +29,6 @@ namespace hku {
 #define HKU_PLUGIN_TMREPORT "tmreport"
 #define HKU_PLUGIN_CLICKHOUSE_DRIVER "clickhousedriver"
 #define HKU_PLUGIN_HKU_EXTRA "hkuextra"
+#define HKU_PLUGIN_CHECK_DATA "checkdata"
 
 }  // namespace hku
