@@ -174,8 +174,8 @@ public:
             }
         }
 
-        m_master_work_queue.clear();
         m_done = true;
+        m_master_work_queue.clear();
     }
 
 private:

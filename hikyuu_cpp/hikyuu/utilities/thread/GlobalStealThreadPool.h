@@ -218,12 +218,11 @@ public:
             }
         }
 
+        m_done = true;
         m_master_work_queue.clear();
         for (size_t i = 0; i < m_worker_num; i++) {
             m_queues[i]->clear();
         }
-
-        m_done = true;
     }
 
 private:

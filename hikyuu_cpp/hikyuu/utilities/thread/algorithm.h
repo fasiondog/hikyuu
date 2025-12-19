@@ -13,6 +13,7 @@
 #include "ThreadPool.h"
 #include "MQThreadPool.h"
 #include "StealThreadPool.h"
+#include "MQStealThreadPool.h"
 
 //----------------------------------------------------------------
 // Note: 除 ThreadPool/MQThreadPool 外，其他线程池由于使用
