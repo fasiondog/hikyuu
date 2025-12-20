@@ -35,6 +35,8 @@ public:
                                          size_t& out_end) = 0;
 
     virtual KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query) = 0;
+
+    virtual bool canLazyLoad(const KQuery::KType& ktype) = 0;
 };
 
 }  // namespace hku

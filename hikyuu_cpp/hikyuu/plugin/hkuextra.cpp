@@ -85,4 +85,11 @@ bool getStockExtraIndexRange(const Stock& stk, const KQuery& query, size_t& out_
     return plugin->getStockExtraIndexRange(stk, query, out_start, out_end);
 }
 
+bool canLazyLoad(const KQuery::KType& ktype) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
+    HKU_IF_RETURN(!plugin, false);
+    return plugin->canLazyLoad(ktype);
+}
+
 }  // namespace hku

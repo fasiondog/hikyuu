@@ -239,14 +239,13 @@ void StockManager::loadAllKData() {
     }
 
     bool lazy_preload = m_hikyuuParam.tryGet<bool>("lazy_preload", false);
-    HKU_INFO_IF(lazy_preload, htr("Use lazy preload!"));
+    HKU_INFO_IF(lazy_preload && canLazyLoad(KQuery::MIN), htr("Use lazy preload!"));
 
     // 先加载同类K线
     auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
     if (!driver->getPrototype()->canParallelLoad()) {
         for (size_t i = 0, len = ktypes.size(); i < len; i++) {
-            if (lazy_preload &&
-                KQuery::getKTypeInSeconds(ktypes[i]) < KQuery::getKTypeInSeconds(KQuery::DAY)) {
+            if (canLazyLoad(ktypes[i])) {
                 continue;
             }
             for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
@@ -274,8 +273,8 @@ void StockManager::loadAllKData() {
 
     } else {
         // 异步并行加载
-        std::thread t = std::thread([this, ktypes, low_ktypes, lazy_preload]() {
-            auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes, lazy_preload);
+        std::thread t = std::thread([this, ktypes, low_ktypes]() {
+            auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes);
 
             // 加载其他证券K线(可能不同不同K线驱动的证券)
             this->m_load_tg = std::make_unique<ThreadPool>();
@@ -287,8 +286,7 @@ void StockManager::loadAllKData() {
                     if (loaded_codes.find(iter->first) != loaded_codes.end()) {
                         continue;
                     }
-                    if (lazy_preload && KQuery::getKTypeInSeconds(ktypes[i]) <
-                                          KQuery::getKTypeInSeconds(KQuery::DAY)) {
+                    if (canLazyLoad(ktypes[i])) {
                         continue;
                     }
                     if (m_preloadParam.tryGet<bool>(low_ktypes[i], false)) {
@@ -324,7 +322,7 @@ void StockManager::loadAllKData() {
 }
 
 std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
-  const vector<KQuery::KType>& ktypes, bool lazy_preload) {
+  const vector<KQuery::KType>& ktypes) {
     std::unordered_set<string> loaded_codes;
     HKU_IF_RETURN(!m_context.isAll(), loaded_codes);
     auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
@@ -356,8 +354,7 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
             break;
         }
 
-        if (lazy_preload &&
-            KQuery::getKTypeInSeconds(ktypes[i]) < KQuery::getKTypeInSeconds(KQuery::DAY)) {
+        if (canLazyLoad(ktypes[i])) {
             continue;
         }
 
