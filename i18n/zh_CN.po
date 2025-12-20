@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-12-20 16:15+0800\n"
-"PO-Revision-Date: 2025-12-20 16:22+0800\n"
+"POT-Creation-Date: 2025-12-20 19:21+0800\n"
+"PO-Revision-Date: 2025-12-20 19:21+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -36,32 +36,37 @@ msgstr "加载K线数据……"
 msgid "{:<.2f}s Loaded Data."
 msgstr "{:<.2f} 秒数据加载完毕."
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:231
+#: hikyuu_cpp/hikyuu/StockManager.cpp:234
+#, c++-format
+msgid "Preloading {} kdata to buffer (max: no limit)!"
+msgstr "预加载 {} K线数据至缓存 (最大数量: 无限制)!"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:237
 #, c++-format
 msgid "Preloading {} kdata to buffer (max: {})!"
 msgstr "预加载 {} K线数据至缓存 (最大数量: {})!"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:235
+#: hikyuu_cpp/hikyuu/StockManager.cpp:242
 msgid "Use lazy preload!"
 msgstr "使用懒加载模式进行数据预加载！"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:552
+#: hikyuu_cpp/hikyuu/StockManager.cpp:572
 msgid "Not found market info"
 msgstr "找不到指定的市场信息"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:605
+#: hikyuu_cpp/hikyuu/StockManager.cpp:625
 msgid "Loading stock information..."
 msgstr "加载证券信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:707
+#: hikyuu_cpp/hikyuu/StockManager.cpp:727
 msgid "Loading market information..."
 msgstr "加载市场信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:725
+#: hikyuu_cpp/hikyuu/StockManager.cpp:745
 msgid "Loading stock type information..."
 msgstr "加载证券类型信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:743
+#: hikyuu_cpp/hikyuu/StockManager.cpp:763
 msgid "Loading stock weight..."
 msgstr "加载权息数据……"
 

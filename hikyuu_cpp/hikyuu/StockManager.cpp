@@ -227,8 +227,15 @@ void StockManager::loadAllKData() {
         }
 
         int64_t preload_max_num = m_preloadParam.tryGet<int64_t>(preload_key, 0);
-        HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false),
-                    htr("Preloading {} kdata to buffer (max: {})!", back, preload_max_num));
+        if (preload_max_num <= 0) {
+            preload_max_num = std::numeric_limits<int64_t>::max();
+            m_preloadParam.set<int64_t>(preload_key, preload_max_num);
+            HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false),
+                        htr("Preloading {} kdata to buffer (max: no limit)!", back));
+        } else {
+            HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false),
+                        htr("Preloading {} kdata to buffer (max: {})!", back, preload_max_num));
+        }
     }
 
     bool lazy_preload = m_hikyuuParam.tryGet<bool>("lazy_preload", false);
