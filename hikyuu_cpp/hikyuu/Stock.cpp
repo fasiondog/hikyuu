@@ -479,7 +479,7 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
         int64_t max_num = param.tryGet<int64_t>(preload_type, 4096);
         HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type,
                             max_num);
-        start = total <= max_num ? 0 : total - max_num;
+        start = total <= (size_t)max_num ? 0 : total - max_num;
         query = KQuery(start, Null<int64_t>(), kType);
         if (driver->isColumnFirst() && market_code() != "SH000001") {
             Stock sh000001 = StockManager::instance().getStock("SH000001");
