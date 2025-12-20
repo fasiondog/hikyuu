@@ -465,7 +465,7 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
     to_upper(kType);
     HKU_IF_RETURN(m_data->pMutex.find(kType) == m_data->pMutex.end(), void());
 
-    int start = 0;
+    int64_t start = 0;
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
 
@@ -476,7 +476,7 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
         const auto& param = StockManager::instance().getPreloadParameter();
         string preload_type = fmt::format("{}_max", kType);
         to_lower(preload_type);
-        int max_num = param.tryGet<int>(preload_type, 4096);
+        int64_t max_num = param.tryGet<int64_t>(preload_type, 4096);
         HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type,
                             max_num);
         start = total <= max_num ? 0 : total - max_num;

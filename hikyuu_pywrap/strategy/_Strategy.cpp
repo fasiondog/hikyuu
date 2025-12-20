@@ -22,11 +22,12 @@ void export_Strategy(py::module& m) {
     Datetime null_date;
     py::class_<Strategy, StrategyPtr>(m, "Strategy")
       .def(py::init<>())
-      .def(py::init<const vector<string>&, const vector<KQuery::KType>&,
-                    const unordered_map<string, int>&, const std::string&, const std::string&>(),
-           py::arg("code_list"), py::arg("ktype_list"),
-           py::arg("preload_num") = unordered_map<string, int>(), py::arg("name") = "Strategy",
-           py::arg("config") = "", R"(创建策略运行时
+      .def(
+        py::init<const vector<string>&, const vector<KQuery::KType>&,
+                 const unordered_map<string, int64_t>&, const std::string&, const std::string&>(),
+        py::arg("code_list"), py::arg("ktype_list"),
+        py::arg("preload_num") = unordered_map<string, int64_t>(), py::arg("name") = "Strategy",
+        py::arg("config") = "", R"(创建策略运行时
            
     :param list code_list: 证券代码列表，如：["sz000001", "sz000002"], "all" 代表全部证券
     :param list ktype_list: K线类型列表, 如: ["day", "min"]

@@ -109,8 +109,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if os.path.exists(filename):
             old_config.read(filename, encoding='utf-8')
         old_reload_time = "00:00"
+        old_lazy_preload = False
         if old_config.has_section('hikyuu'):
             old_reload_time = old_config.get('hikyuu', 'reload_time', fallback="00:00")
+            old_lazy_preload = old_config.getboolean('hikyuu', 'lazy_preload', fallback=False)
 
         if current_config.getboolean('hdf5', 'enable', fallback=True):
             data_dir = current_config['hdf5']['dir']
@@ -123,7 +125,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write(
                     hku_config_template.hdf5_template.format(
-                        dir=data_dir, reload_time=old_reload_time,
+                        dir=data_dir, reload_time=old_reload_time, lazy_preload=old_lazy_preload,
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         day=current_config.getboolean('preload', 'day', fallback=True),
@@ -164,7 +166,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 f.write(
                     hku_config_template.mysql_template.format(
                         dir=data_dir,
-                        reload_time=old_reload_time,
+                        reload_time=old_reload_time, lazy_preload=old_lazy_preload,
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         host=current_config['mysql']['host'],
@@ -208,7 +210,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 f.write(
                     hku_config_template.clickhouse_template.format(
                         dir=data_dir,
-                        reload_time=old_reload_time,
+                        reload_time=old_reload_time, lazy_preload=old_lazy_preload,
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         host=current_config['clickhouse']['host'],

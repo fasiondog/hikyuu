@@ -270,6 +270,7 @@ def load_hikyuu(**kwargs):
     hku_param = Parameter()
     hku_param["tmpdir"] = ini.get('hikyuu', 'tmpdir')
     hku_param["datadir"] = ini.get('hikyuu', 'datadir')
+    hku_param["lazy_preload"] = ini.getboolean("hikyuu", "lazy_preload", fallback=False)
     if ini.has_option('hikyuu', 'quotation_server'):
         hku_param["quotation_server"] = ini['hikyuu']['quotation_server']
     hku_param["load_history_finance"] = ini.getboolean("hikyuu", "load_history_finance", fallback=True)
