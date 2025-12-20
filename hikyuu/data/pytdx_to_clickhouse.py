@@ -26,10 +26,11 @@ import sys
 import math
 import datetime
 from pytdx.hq import TDXParams
+from configparser import ConfigParser
 
 from hikyuu.util import hku_error, hku_debug, hku_run_ignore_exception
 
-from hikyuu import Datetime, roundEx, is_valid_license
+from hikyuu import Datetime, roundEx, is_valid_license, KDataToClickHouseImporter
 from hikyuu.data.common import *
 from hikyuu.data.common_pytdx import to_pytdx_market, pytdx_get_day_trans
 from hikyuu.data.common_clickhouse import (
@@ -48,6 +49,16 @@ def ProgressBar(cur, total):
     sys.stdout.write("\r")
     sys.stdout.write("[%-50s] %s" % ("=" * int(math.floor(cur * 50 / total)), percent))
     sys.stdout.flush()
+
+
+def get_clickhouse_importer():
+    filename = os.path.expanduser('~') + '/.hikyuu/hikyuu.ini'
+    config = ConfigParser()
+    config.read(filename, encoding='utf-8')
+    importer = KDataToClickHouseImporter()
+    importer.set_config(config.get("kdata", "host"), config.getint("kdata", "port", fallback=9000),
+                        config.get("kdata", "usr"), config.get("kdata", "pwd"))
+    return importer
 
 
 @hku_catch(ret=0, trace=True)
@@ -283,10 +294,10 @@ def import_one_stock_data(
             today.year * 10000 + today.month * 100 + today.day
         ) * 10000 + 1500
     else:
-        return (0, True, last_datetime)
+        return (0, True, Datetime(last_datetime))
 
     if today_datetime <= last_datetime:
-        return (0, True, last_datetime)
+        return (0, True, Datetime(last_datetime))
 
     get_bars = (
         api.get_index_bars if stktype == STOCKTYPE.INDEX else api.get_security_bars
@@ -321,15 +332,15 @@ def import_one_stock_data(
                 if abs(last_krecord[1] - bar["open"]) / last_krecord[1] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord open: {last_krecord[1]}, bar: {bar['open']}")
-                    return (0, False, last_datetime)
+                    return (0, False, Datetime(last_datetime))
                 if abs(last_krecord[2] - bar["high"]) / last_krecord[2] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord high: {last_krecord[2]}, bar: {bar['high']}")
-                    return (0, False,  last_datetime)
+                    return (0, False,  Datetime(last_datetime))
                 if abs(last_krecord[3] - bar["low"]) / last_krecord[3] > 0.01 and abs(last_krecord[3] - bar["low"]) > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord low: {last_krecord[3]}, bar: {bar['low']}")
-                    return (0, False, last_datetime)
+                    return (0, False, Datetime(last_datetime))
                 if abs(last_krecord[4] - bar["close"]) / last_krecord[4] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord close: {last_krecord[4]}, bar: {bar['close']}")
@@ -337,11 +348,11 @@ def import_one_stock_data(
                 if ktype == 'DAY' and last_krecord[5] != 0.0 and abs(last_krecord[5] - bar["amount"]) > 10000:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord amount: {last_krecord[5]}, bar: {bar['amount']}")
-                    return (0, False, last_datetime)
+                    return (0, False, Datetime(last_datetime))
                 if ktype == 'DAY' and last_krecord[6] != 0.0 and last_krecord[6] != 0.0 and abs(last_krecord[6] - bar["vol"]) > 10000:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord count: {last_krecord[6]}, bar: {bar['vol']}")
-                    return (0, False, last_datetime)
+                    return (0, False, Datetime(last_datetime))
                 continue
 
             if (
@@ -374,7 +385,7 @@ def import_one_stock_data(
                                            data=buf)
         connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
 
-    return (len(buf), True, last_datetime)
+    return (len(buf), True, Datetime(last_datetime))
 
 
 def update_stock_info(connect, market):
@@ -418,7 +429,7 @@ def clear_extern_data(connect, market, data_type):
         index_list = ('min15', 'min30', 'min60', 'hour2')
         lastdate = connect.command(
             f"select toInt32(max(date)) from hku_data.min5_k where market='SH' and code='000001'")
-        lastdate = Datetime.from_timestamp_utc(lastdate*1000000).start_of_day()
+        lastdate = Datetime.from_timestamp_utc(int(lastdate*1000000)).start_of_day()
         last_timestamp = Datetime(lastdate).timestamp_utc()//1000000
         for index_type in index_list:
             sql = f"delete from hku_data.{index_type}_k where market='{market}' and date>={last_timestamp}"
@@ -485,7 +496,7 @@ def import_data(
         )
         if not success:
             failed_count += 1
-            failed_list.append((stock.market, stock.code, lastdate))
+            failed_list.append((stock[0], stock[1], lastdate))
         if failed_count >= failed_limit:
             hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")
             break
@@ -508,6 +519,9 @@ def import_data(
         if progress:
             progress(i, total)
 
+    if total > 0 and progress:
+        progress(total-1, total)
+
     if ktype in ("DAY", "5MIN"):
         for index_type in index_list:
             if len(update_data[index_type]) > 0:
@@ -520,8 +534,15 @@ def import_data(
         update_data.clear()
 
     if failed_count < failed_limit and not failed_list and is_valid_license():
-        # 删除最后记录
-        pass
+        if not failed_list:
+            # 删除最后记录
+            ch_importer = get_clickhouse_importer()
+            for r in failed_list:
+                ch_importer.remove(r[0], r[1], ktype, r[2])
+
+    if failed_count >= failed_limit:
+        hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")
+        return add_record_count
 
     cur_year = Datetime.today().year
     if ktype == "DAY":
