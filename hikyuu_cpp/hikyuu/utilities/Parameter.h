@@ -503,6 +503,23 @@ inline void Parameter::set(const string& name, const boost::any& value) {
     m_params[name] = value;
 }
 
+template <>
+inline int64_t Parameter::get(const string& name) const {
+    param_map_t::const_iterator iter;
+    iter = m_params.find(name);
+    if (iter == m_params.end()) {
+        throw std::out_of_range("out_of_range in Parameter::get : " + name);
+    }
+    try {
+        if (iter->second.type() == typeid(int)) {
+            return boost::any_cast<int>(iter->second);
+        }
+        return boost::any_cast<int64_t>(iter->second);
+    } catch (...) {
+        throw std::runtime_error("failed conversion param: " + name);
+    }
+}
+
 HKU_API bool operator==(const Parameter&, const Parameter&);
 HKU_API bool operator!=(const Parameter&, const Parameter&);
 HKU_API bool operator<(const Parameter&, const Parameter&);

@@ -223,18 +223,31 @@ void StockManager::loadAllKData() {
         string preload_key = fmt::format("{}_max", back);
         auto context_iter = context_preload_num.find(preload_key);
         if (context_iter != context_preload_num.end()) {
-            m_preloadParam.set<int>(preload_key, context_iter->second);
+            m_preloadParam.set<int64_t>(preload_key, context_iter->second);
         }
 
-        int preload_max_num = m_preloadParam.tryGet<int>(preload_key, 0);
-        HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false),
-                    htr("Preloading {} kdata to buffer (max: {})!", back, preload_max_num));
+        int64_t preload_max_num = m_preloadParam.tryGet<int64_t>(preload_key, 0);
+        if (preload_max_num <= 0) {
+            preload_max_num = std::numeric_limits<int64_t>::max();
+            m_preloadParam.set<int64_t>(preload_key, preload_max_num);
+            HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false),
+                        htr("Preloading {} kdata to buffer (max: no limit)!", back));
+        } else {
+            HKU_INFO_IF(m_preloadParam.tryGet<bool>(back, false),
+                        htr("Preloading {} kdata to buffer (max: {})!", back, preload_max_num));
+        }
     }
+
+    bool lazy_preload = m_hikyuuParam.tryGet<bool>("lazy_preload", false);
+    HKU_INFO_IF(lazy_preload && canLazyLoad(KQuery::MIN), htr("Use lazy preload!"));
 
     // 先加载同类K线
     auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
     if (!driver->getPrototype()->canParallelLoad()) {
         for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+            if (canLazyLoad(ktypes[i])) {
+                continue;
+            }
             for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
                 HKU_IF_RETURN(m_cancel_load, void());
                 const auto& low_ktype = low_ktypes[i];
@@ -271,6 +284,9 @@ void StockManager::loadAllKData() {
                 for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
                     HKU_IF_RETURN(m_cancel_load, void());
                     if (loaded_codes.find(iter->first) != loaded_codes.end()) {
+                        continue;
+                    }
+                    if (canLazyLoad(ktypes[i])) {
                         continue;
                     }
                     if (m_preloadParam.tryGet<bool>(low_ktypes[i], false)) {
@@ -336,6 +352,10 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
         if (m_cancel_load) {
             break;
+        }
+
+        if (canLazyLoad(ktypes[i])) {
+            continue;
         }
 
         if (ktypes[i] == KQuery::TIMELINE || ktypes[i] == KQuery::TRANS) {

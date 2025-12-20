@@ -136,10 +136,10 @@ StrategyPtr HKU_API crtPFStrategy(const PFPtr& pf, const KQuery& query,
     }
 
     KQuery::KType ktype = query.kType();
-    StrategyPtr stg = std::make_shared<Strategy>(code_list, vector<KQuery::KType>{ktype},
-                                                 unordered_map<string, int>{}, name, config_file);
+    StrategyPtr stg = std::make_shared<Strategy>(
+      code_list, vector<KQuery::KType>{ktype}, unordered_map<string, int64_t>{}, name, config_file);
 
-    int32_t m = KQuery::getKTypeInSeconds(ktype);
+    int64_t m = KQuery::getKTypeInSeconds(ktype);
     if (m < KQuery::getKTypeInSeconds(KQuery::DAY)) {
         stg->runDaily(std::move(func), Seconds(m));
     } else {

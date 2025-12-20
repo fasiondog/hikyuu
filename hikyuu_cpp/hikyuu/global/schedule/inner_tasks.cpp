@@ -14,6 +14,7 @@ namespace hku {
 
 void initInnerTask() {
     int64_t hh = 0, mm = 0;
+    bool reload_enable = false;
     try {
         auto const& param = StockManager::instance().getHikyuuParameter();
         string reload_time = param.tryGet<string>("reload_time", "00:00");
@@ -24,13 +25,16 @@ void initInnerTask() {
         mm = std::stoll(string(hh_mm[1]));
         HKU_CHECK(hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59, "reload_time format error: {}",
                   reload_time);
+        reload_enable = true;
     } catch (const std::exception& e) {
-        HKU_ERROR(e.what());
+        HKU_ERROR("Can't auto reload!", e.what());
     }
 
-    auto* tm = getScheduler();
-    tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(0, hh, mm),
-                              reloadHikyuuTask);
+    if (reload_enable) {
+        auto* tm = getScheduler();
+        tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(0, hh, mm),
+                                  reloadHikyuuTask);
+    }
 }
 
 void reloadHikyuuTask() {

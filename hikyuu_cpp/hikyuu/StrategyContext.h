@@ -38,7 +38,7 @@ public:
      * @param preloadNum 指定的预加载数量，如：{{"min_max", 100}, {"day_max", 200}}
      */
     StrategyContext(const vector<string>& stockCodeList, const vector<KQuery::KType>& ktypeList,
-                    const unordered_map<string, int>& preloadNum = {});
+                    const unordered_map<string, int64_t>& preloadNum = {});
 
     // 自定义移动构造与赋值会引起 python 中无法正常退出
     // StrategyContext(const StrategyContext&) = default;
@@ -77,9 +77,9 @@ public:
         return m_ktypeList;
     }
 
-    void setPreloadNum(const unordered_map<string, int>& preloadNum);
+    void setPreloadNum(const unordered_map<string, int64_t>& preloadNum);
 
-    const unordered_map<string, int>& getPreloadNum() const noexcept {
+    const unordered_map<string, int64_t>& getPreloadNum() const noexcept {
         return m_preloadNum;
     }
 
@@ -108,7 +108,7 @@ private:
     vector<string> m_mustLoad{"sh000001", "sh000300"};  // 默认必须加载的 stock
     vector<string> m_stockCodeList;
     vector<KQuery::KType> m_ktypeList;
-    unordered_map<string, int> m_preloadNum;
+    unordered_map<string, int64_t> m_preloadNum;
 };
 
 HKU_API std::ostream& operator<<(std::ostream& os, const StrategyContext& context);

@@ -50,13 +50,13 @@ StrategyContext::StrategyContext(const vector<string>& stockCodeList) {
 
 StrategyContext::StrategyContext(const vector<string>& stockCodeList,
                                  const vector<KQuery::KType>& ktypeList,
-                                 const unordered_map<string, int>& preloadNum) {
+                                 const unordered_map<string, int64_t>& preloadNum) {
     _removeDuplicateCode(stockCodeList);
     _checkAndRemoveDuplicateKType(ktypeList);
     setPreloadNum(preloadNum);
 }
 
-void StrategyContext::setPreloadNum(const unordered_map<string, int>& preloadNum) {
+void StrategyContext::setPreloadNum(const unordered_map<string, int64_t>& preloadNum) {
     m_preloadNum.clear();
     m_preloadNum.reserve(preloadNum.size());
     for (auto it = preloadNum.cbegin(); it != preloadNum.cend(); ++it) {

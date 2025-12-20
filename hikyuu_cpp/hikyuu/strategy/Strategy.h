@@ -35,7 +35,7 @@ public:
     Strategy();
     explicit Strategy(const string& name, const string& config_file = "");
     Strategy(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
-             const unordered_map<string, int>& preloadNum = {}, const string& name = "Strategy",
+             const unordered_map<string, int64_t>& preloadNum = {}, const string& name = "Strategy",
              const string& config_file = "");
     explicit Strategy(const StrategyContext& context, const string& name = "Strategy",
                       const string& config_file = "");

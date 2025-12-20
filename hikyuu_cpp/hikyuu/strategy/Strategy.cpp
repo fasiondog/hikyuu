@@ -45,7 +45,7 @@ Strategy::Strategy(const string& name, const string& config_file)
 }
 
 Strategy::Strategy(const vector<string>& codeList, const vector<KQuery::KType>& ktypeList,
-                   const unordered_map<string, int>& preloadNum, const string& name,
+                   const unordered_map<string, int64_t>& preloadNum, const string& name,
                    const string& config_file)
 : Strategy(name, config_file) {
     _initParam();

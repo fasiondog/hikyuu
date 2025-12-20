@@ -52,7 +52,7 @@ public:
 
             std::unique_ptr<PluginLoader> loader = std::make_unique<PluginLoader>(m_plugin_path);
             if (!loader->load(pluginname)) {
-                HKU_ERROR("Load plugin {} failed: {}", pluginname, loader->getFileName(pluginname));
+                HKU_DEBUG("Load plugin {} failed: {}", pluginname, loader->getFileName(pluginname));
                 return ret;
             }
 

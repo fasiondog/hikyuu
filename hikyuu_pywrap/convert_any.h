@@ -104,12 +104,12 @@ public:
         }
 
         if (PyLong_Check(src)) {
-            int overflow;
-            long tmp = PyLong_AsLongAndOverflow(src, &overflow);
-            if (overflow == 0) {
-                value = static_cast<int>(tmp);
+            long long ll_val = PyLong_AsLongLong(src);
+            if (ll_val < std::numeric_limits<int>::min() ||
+                ll_val > std::numeric_limits<int>::max()) {
+                value = static_cast<int64_t>(ll_val);
             } else {
-                value = PyLong_AsLongLong(src);
+                value = static_cast<int>(ll_val);
             }
             return true;
         }
@@ -192,8 +192,11 @@ public:
             } else {
                 Py_RETURN_FALSE;
             }
+        } else if (x.type() == typeid(int64_t)) {
+            long long ll_val = (long long)boost::any_cast<int64_t>(x);
+            return PyLong_FromLongLong(ll_val);
         } else if (x.type() == typeid(int)) {
-            return Py_BuildValue("n", boost::any_cast<int>(x));
+            return Py_BuildValue("i", boost::any_cast<int>(x));
         } else if (x.type() == typeid(double)) {
             return Py_BuildValue("d", boost::any_cast<double>(x));
         } else if (x.type() == typeid(std::string)) {

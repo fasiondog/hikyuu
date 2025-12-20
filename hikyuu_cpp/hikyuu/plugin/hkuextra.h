@@ -56,4 +56,6 @@ bool getStockExtraIndexRange(const Stock& stk, const KQuery& query, size_t& out_
 
 KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query);
 
+bool canLazyLoad(const KQuery::KType& ktype);
+
 }  // namespace hku
