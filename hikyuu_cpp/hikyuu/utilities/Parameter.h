@@ -478,30 +478,13 @@ void Parameter::set(const string& name, const ValueType& value) {
 }
 
 template <>
-inline boost::any Parameter::get<boost::any>(const std::string& name) const {
-    param_map_t::const_iterator iter;
-    iter = m_params.find(name);
-    if (iter == m_params.end()) {
-        throw std::out_of_range("out_of_range in Parameter::get : " + name);
-    }
-    return iter->second;
-}
+boost::any Parameter::get<boost::any>(const std::string& name) const;
 
 template <>
-inline void Parameter::set(const string& name, const boost::any& value) {
-    if (!have(name)) {
-        m_params[name] = value;
-        return;
-    }
+void Parameter::set(const string& name, const boost::any& value);
 
-    if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
-        throw std::logic_error("Mismatching type! need type " +
-                               string(m_params[name].type().name()) + " but value type is " +
-                               string(value.type().name()));
-    }
-
-    m_params[name] = value;
-}
+template <>
+int64_t Parameter::get(const string& name) const;
 
 HKU_API bool operator==(const Parameter&, const Parameter&);
 HKU_API bool operator!=(const Parameter&, const Parameter&);
