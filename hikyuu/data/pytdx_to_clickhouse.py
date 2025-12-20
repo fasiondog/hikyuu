@@ -491,14 +491,14 @@ def import_data(
                 progress(i, total)
             continue
 
-        (this_count, success, lastdate) = import_one_stock_data(
+        this_count, success, lastdate = import_one_stock_data(
             connect, api, market, ktype, stock, startDate
         )
         if not success:
             failed_count += 1
             failed_list.append((stock[0], stock[1], lastdate))
         if failed_count >= failed_limit:
-            hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")
+            # hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")
             break
         add_record_count += this_count
         if ktype in ("DAY", "5MIN"):
@@ -520,7 +520,7 @@ def import_data(
             progress(i, total)
 
     if total > 0 and progress:
-        progress(total-1, total)
+        progress(total, total)
 
     if ktype in ("DAY", "5MIN"):
         for index_type in index_list:
