@@ -46,6 +46,10 @@ void HKU_API getConfigFromIni(const string& config_file_name, Parameter& basePar
     hkuParam.set<string>("datadir", config.get("hikyuu", "datadir", "."));
     hkuParam.set<string>("quotation_server",
                          config.get("hikyuu", "quotation_server", "ipc:///tmp/hikyuu_real.ipc"));
+
+    hkuParam.set<string>("reload_time", config.get("hikyuu", "reload_time", "00:00"));
+    hkuParam.set<string>("lazy_preload", config.get("hikyuu", "lazy_preload", "False"));
+
     // 加载权息数据
     hkuParam.set<bool>("load_stock_weight", config.getBool("hikyuu", "load_stock_weight", "True"));
 
@@ -84,7 +88,7 @@ void HKU_API getConfigFromIni(const string& config_file_name, Parameter& basePar
         to_lower(low_ktype);
         preloadParam.set<bool>(low_ktype, config.getBool("preload", low_ktype, "False"));
         string num_preload = fmt::format("{}_max", low_ktype);
-        preloadParam.set<int>(num_preload, config.getInt("preload", num_preload, "4096"));
+        preloadParam.set<int64_t>(num_preload, config.getInt("preload", num_preload, "4096"));
     }
 }
 

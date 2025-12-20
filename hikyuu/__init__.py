@@ -232,6 +232,7 @@ def load_hikyuu(**kwargs):
         "start_spot": False,
         "spot_worker_num": 1,
         "reload_time": "00:00",
+        "lazy_preload": False,
     }
     load_hikyuu(**options)
 
@@ -250,6 +251,7 @@ def load_hikyuu(**kwargs):
         start_spot (boolean): 启动行情接收，默认为 True
         spot_worker_num (int): 行情接收数据处理线程数，默认为 1
         reload_time (str): 指定数据重新加载时间(时:分)，格式为 HH:MM, 默认为 00:00
+        lazy_preload (boolean): 日线以下使用懒加载方式进行预加载，默认为 False
     """
     if 'config_file' in kwargs:
         config_file = kwargs['config_file']
@@ -279,6 +281,7 @@ def load_hikyuu(**kwargs):
     else:
         hku_param["plugindir"] = os.path.join(os.path.dirname(__file__), "plugin")
     hku_param["reload_time"] = ini.get('hikyuu', 'reload_time', fallback="00:00")
+    hku_param["lazy_preload"] = ini.getboolean("hikyuu", "lazy_preload", fallback=False)
 
     base_param = Parameter()
     base_info_config = ini.options('baseinfo')

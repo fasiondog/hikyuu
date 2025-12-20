@@ -16,9 +16,9 @@ void export_StrategeContext(py::module& m) {
       .def(py::init<>())
       .def(py::init<const vector<string>&>())
       .def(py::init<const vector<string>&, const vector<KQuery::KType>&,
-                    const unordered_map<string, int>&>(),
+                    const unordered_map<string, int64_t>&>(),
            py::arg("stock_list"), py::arg("ktype_list"),
-           py::arg("preload_num") = unordered_map<string, int>(),
+           py::arg("preload_num") = unordered_map<string, int64_t>(),
            R"(__init__(self, stock_list, ktype_list, [preload_num={}])
         
   创建策略上下文

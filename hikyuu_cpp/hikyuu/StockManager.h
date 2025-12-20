@@ -288,7 +288,8 @@ private:
 
     /* 加载 K线数据至缓存 */
     void loadAllKData();
-    std::unordered_set<string> tryLoadAllKDataFromColumnFirst(const vector<KQuery::KType>& ktypes);
+    std::unordered_set<string> tryLoadAllKDataFromColumnFirst(const vector<KQuery::KType>& ktypes,
+                                                              bool lazy_preload);
 
     /* 加载节假日信息 */
     void loadAllHolidays();

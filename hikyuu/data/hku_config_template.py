@@ -28,6 +28,7 @@ tmpdir = {dir}/tmp
 datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
+lazy_preload = {lazy_preload}
 
 [block]
 type = sqlite3
@@ -97,6 +98,7 @@ tmpdir = {dir}
 datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
+lazy_preload = {lazy_preload}
 
 [block]
 type = mysql
@@ -153,6 +155,7 @@ tmpdir = {dir}
 datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
+lazy_preload = {lazy_preload}
 
 [block]
 type = clickhouse
