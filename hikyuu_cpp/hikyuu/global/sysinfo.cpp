@@ -7,6 +7,7 @@
 
 #include <hikyuu/GlobalInitializer.h>
 #include <stdio.h>
+#include <shared_mutex>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -23,33 +24,49 @@ using json = nlohmann::json;
 
 namespace hku {
 
-std::atomic<int> g_latest_version{0};
-bool g_runningInPython{false};      // 是否是在 python 中运行
-bool g_pythonInInteractive{false};  // python 是否运行在交互模式下
-bool g_pythonInJupyter{false};      // python 是否运行在 Jupyter中
+struct InnerSysInfo {
+    bool runningInPython{false};      // 是否是在 python 中运行
+    bool pythonInInteractive{false};  // python 是否运行在交互模式下
+    bool pythonInJupyter{false};      // python 是否运行在 Jupyter中
+
+    LatestVersionInfo latest_version_info;
+    std::shared_mutex latest_version_mutex;
+};
+
+static InnerSysInfo* g_sys_info;
+
+void sysinfo_init() {
+    g_sys_info = new InnerSysInfo;
+}
+void sysinfo_clean() {
+    if (g_sys_info) {
+        delete g_sys_info;
+        g_sys_info = nullptr;
+    }
+}
 
 bool HKU_API runningInPython() {
-    return g_runningInPython;
+    return g_sys_info->runningInPython;
 }
 
 void HKU_API setRunningInPython(bool inpython) {
-    g_runningInPython = inpython;
+    g_sys_info->runningInPython = inpython;
 }
 
 bool HKU_API pythonInInteractive() {
-    return g_pythonInInteractive;
+    return g_sys_info->pythonInInteractive;
 }
 
 void HKU_API setPythonInInteractive(bool interactive) {
-    g_pythonInInteractive = interactive;
+    g_sys_info->pythonInInteractive = interactive;
 }
 
 bool HKU_API pythonInJupyter() {
-    return g_pythonInJupyter;
+    return g_sys_info->pythonInJupyter;
 }
 
 void HKU_API setPythonInJupyter(bool injupyter) {
-    g_pythonInJupyter = injupyter;
+    g_sys_info->pythonInJupyter = injupyter;
     if (createDir(fmt::format("{}/.hikyuu", getUserDir()))) {
         initLogger(injupyter, fmt::format("{}/.hikyuu/hikyuu.log", getUserDir()));
     } else {
@@ -60,14 +77,22 @@ void HKU_API setPythonInJupyter(bool injupyter) {
 bool HKU_API CanUpgrade() {
     int current_version =
       HKU_VERSION_MAJOR * 1000000 + HKU_VERSION_MINOR * 1000 + HKU_VERSION_ALTER;
-    return g_latest_version > current_version;
+    std::shared_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);
+    return g_sys_info->latest_version_info.version > current_version;
 }
 
 std::string HKU_API getLatestVersion() {
-    int major = g_latest_version / 1000000;
-    int minor = g_latest_version / 1000 - major * 1000;
-    int alter = g_latest_version - (g_latest_version / 1000) * 1000;
+    std::shared_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);
+    int major = g_sys_info->latest_version_info.version / 1000000;
+    int minor = g_sys_info->latest_version_info.version / 1000 - major * 1000;
+    int alter = g_sys_info->latest_version_info.version -
+                (g_sys_info->latest_version_info.version / 1000) * 1000;
     return fmt::format("{}.{}.{}", major, minor, alter);
+}
+
+LatestVersionInfo getLatestVersionInfo() {
+    std::shared_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);
+    return g_sys_info->latest_version_info;
 }
 
 std::string getVersion() {
@@ -126,7 +151,21 @@ void sendFeedback() {
             req["arch"] = getCpuArch();
             auto res = client.post("/hku/visit", req);
             json r = res.json();
-            g_latest_version = r["data"]["last_version"].get<int>();
+            const json& data = r["data"];
+
+            if (g_sys_info) {
+                std::unique_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);
+                g_sys_info->latest_version_info.version = data["last_version"].get<int>();
+                if (data.contains("remark")) {
+                    g_sys_info->latest_version_info.remark = data["remark"].get<std::string>();
+                    g_sys_info->latest_version_info.release_date =
+                      Datetime(data["release_date"].get<std::string>());
+                } else {
+                    g_sys_info->latest_version_info.remark =
+                      "release note: https://hikyuu.readthedocs.io/zh-cn/latest/release.html";
+                    g_sys_info->latest_version_info.release_date = Datetime();
+                }
+            }
 
         } catch (...) {
             // do nothing

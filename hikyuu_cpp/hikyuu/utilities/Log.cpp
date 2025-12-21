@@ -24,8 +24,6 @@ namespace hku {
 
 static LOG_LEVEL g_log_level = LOG_LEVEL::LOG_TRACE;
 
-std::string g_unknown_error_msg{"Unknown error!"};
-
 LOG_LEVEL get_log_level() {
     return g_log_level;
 }

@@ -137,7 +137,14 @@ PYBIND11_MODULE(core, m) {
 
     m.def("get_version_with_build", getVersionWithBuild);
     m.def("get_version_git", getVersionWithGit);
-    m.def("get_last_version", getLatestVersion);
+    m.def("get_latest_version_info", []() {
+        auto info = getLatestVersionInfo();
+        py::dict ret;
+        ret["version"] = info.version;
+        ret["remark"] = info.remark;
+        ret["release_date"] = info.release_date;
+        return ret;
+    });
     m.def("can_upgrade", CanUpgrade);
 
     m.def("get_stock", getStock,

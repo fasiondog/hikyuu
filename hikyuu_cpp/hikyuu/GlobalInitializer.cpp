@@ -66,6 +66,8 @@ void GlobalInitializer::init() {
         initLogger();
     }
 
+    sysinfo_init();
+
 #if HKU_ENABLE_SEND_FEEDBACK
     sendFeedback();
 #endif
@@ -83,13 +85,15 @@ void GlobalInitializer::init() {
 void GlobalInitializer::clean() {
 #if HKU_ENABLE_SEND_FEEDBACK
     if (runningInPython() && CanUpgrade()) {
+        LatestVersionInfo info = getLatestVersionInfo();
         fmt::print(
           "\n====================================================================\n"
           "The new version of Hikyuu is {}, and you can run the upgrade command:\n"
           "Hikyuu 的最新版本是 {}, 您可以运行升级命令:\n"
           "pip install hikyuu --upgrade\n"
+          "{}\n"
           "========================================================\n\n",
-          getLatestVersion(), getLatestVersion());
+          info.version, info.version, info.remark);
     }
 #endif
 
@@ -103,6 +107,7 @@ void GlobalInitializer::clean() {
     }
 #endif
 
+    sysinfo_clean();
     releaseScheduler();
 
 #if !HKU_OS_WINDOWS
