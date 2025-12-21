@@ -23,6 +23,7 @@
 # SOFTWARE.
 
 import sys
+import os
 import math
 import datetime
 from pytdx.hq import TDXParams
@@ -49,16 +50,6 @@ def ProgressBar(cur, total):
     sys.stdout.write("\r")
     sys.stdout.write("[%-50s] %s" % ("=" * int(math.floor(cur * 50 / total)), percent))
     sys.stdout.flush()
-
-
-def get_clickhouse_importer():
-    filename = os.path.expanduser('~') + '/.hikyuu/hikyuu.ini'
-    config = ConfigParser()
-    config.read(filename, encoding='utf-8')
-    importer = KDataToClickHouseImporter()
-    importer.set_config(config.get("kdata", "host"), config.getint("kdata", "port", fallback=9000),
-                        config.get("kdata", "usr"), config.get("kdata", "pwd"))
-    return importer
 
 
 @hku_catch(ret=0, trace=True)
@@ -440,6 +431,16 @@ def clear_extern_data(connect, market, data_type):
         hku_info(f"清理 {market} {data_type} 线扩展数据完毕")
 
 
+@hku_catch(ret=None)
+def get_clickhouse_importer():
+    filename = os.path.expanduser('~') + '/.hikyuu/hikyuu.ini'
+    config = ConfigParser()
+    config.read(filename, encoding='utf-8')
+    importer = KDataToClickHouseImporter()
+    return importer if importer.set_config(config.get("kdata", "host"), config.getint("kdata", "port", fallback=9000),
+                                           config.get("kdata", "usr"), config.get("kdata", "pwd")) else None
+
+
 @hku_catch(trace=True, re_raise=True)
 def import_data(
     connect,
@@ -496,7 +497,7 @@ def import_data(
         )
         if not success:
             failed_count += 1
-            failed_list.append((stock[0], stock[1], lastdate))
+            failed_list.append((market, stock[1], lastdate))
         if failed_count >= failed_limit:
             # hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")
             break
@@ -533,12 +534,19 @@ def import_data(
                 update_data[index_type].clear()
         update_data.clear()
 
-    if failed_count < failed_limit and not failed_list and is_valid_license():
-        if not failed_list:
-            # 删除最后记录
-            ch_importer = get_clickhouse_importer()
+    if 0 < failed_count < failed_limit and is_valid_license():
+        # 删除最后记录
+        ktype_dict = {
+            'DAY': 'DAY',
+            '1MIN': 'MIN',
+            '5MIN': 'MIN5'
+        }
+        nktype = ktype_dict[ktype]
+        ch_importer = get_clickhouse_importer()
+        if ch_importer is not None:
             for r in failed_list:
-                ch_importer.remove(r[0], r[1], ktype, r[2])
+                hku_info(f"remove {r[0]} {r[1]} {nktype} {r[2].start_of_day()}")
+                ch_importer.remove(r[0], r[1], nktype, r[2].start_of_day())
 
     if failed_count >= failed_limit:
         hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")

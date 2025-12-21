@@ -23,6 +23,7 @@
 # SOFTWARE.
 
 import sys
+import os
 import math
 import datetime
 import sqlite3
@@ -236,6 +237,7 @@ def guess_5min_n_step(last_datetime):
     return (n, step)
 
 
+@hku_catch(trace=True)
 def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, startDate=199012191500):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
@@ -247,9 +249,9 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
     table = get_h5table(h5file, market, code)
     if table is None:
         hku_error("Can't get table({}{})".format(market, code))
-        return (0, False, Datetime())
+        return (0, True, Datetime())
 
-    last_datetime = table[-1]['datetime'] if table.nrows > 0 else startDate
+    last_datetime = int(table[-1]['datetime']) if table.nrows > 0 else startDate
 
     today = datetime.date.today()
     if ktype == 'DAY':
@@ -382,13 +384,13 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
     return (add_record_count, True, Datetime(last_datetime))
 
 
+@hku_catch(ret=None)
 def get_hdf5_importer(market, ktype):
     filename = os.path.expanduser('~') + '/.hikyuu/hikyuu.ini'
     config = ConfigParser()
     config.read(filename, encoding='utf-8')
     importer = KDataToHdf5Importer()
-    importer.set_config(config.get("hikyuu", "datadir"), [market], [ktype])
-    return importer
+    return importer if importer.set_config(config.get("hikyuu", "datadir"), [market], [ktype]) else None
 
 
 def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199012190000, progress=ProgressBar):
@@ -424,7 +426,7 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
         this_count, success, lastdate = import_one_stock_data(connect, api, h5file, market, ktype, stock, startDate)
         if not success:
             failed_count += 1
-            failed_list.append((stock[0], stock[1], lastdate))
+            failed_list.append((market, stock[2], lastdate))
         if failed_count >= failed_limit:
             break
         add_record_count += this_count
@@ -442,13 +444,20 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
     connect.commit()
     h5file.close()
 
-    if failed_count < failed_limit and not failed_list and is_valid_license():
-        if not failed_list:
-            # 删除最后记录
-            pass
-            h5_importer = get_hdf5_importer(market, ktype)
+    if 0 < failed_count < failed_limit and is_valid_license():
+        hku_info(f"清理失败股票数据 {market}")
+        # 删除最后记录
+        ktype_dict = {
+            'DAY': 'DAY',
+            '1MIN': 'MIN',
+            '5MIN': 'MIN5'
+        }
+        nktype = ktype_dict[ktype]
+        h5_importer = get_hdf5_importer(market, nktype)
+        if h5_importer is not None:
             for r in failed_list:
-                h5_importer.remove(r[0], r[1], ktype, r[2])
+                hku_info("remove {}{} {}: {}", r[0], r[1], nktype, r[2].start_of_day())
+                h5_importer.remove(r[0], r[1], nktype, r[2].start_of_day())
 
     if failed_count >= failed_limit:
         hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")
@@ -660,7 +669,7 @@ if __name__ == '__main__':
     import time
     starttime = time.time()
 
-    dest_dir = "d:\\stock"
+    dest_dir = "/Users/fasiondog/stock"
     tdx_server = '180.101.48.170'
     tdx_port = 7709
     quotations = ['stock', 'fund']
