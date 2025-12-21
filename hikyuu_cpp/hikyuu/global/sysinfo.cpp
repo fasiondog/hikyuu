@@ -81,16 +81,7 @@ bool HKU_API CanUpgrade() {
     return g_sys_info->latest_version_info.version > current_version;
 }
 
-std::string HKU_API getLatestVersion() {
-    std::shared_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);
-    int major = g_sys_info->latest_version_info.version / 1000000;
-    int minor = g_sys_info->latest_version_info.version / 1000 - major * 1000;
-    int alter = g_sys_info->latest_version_info.version -
-                (g_sys_info->latest_version_info.version / 1000) * 1000;
-    return fmt::format("{}.{}.{}", major, minor, alter);
-}
-
-LatestVersionInfo getLatestVersionInfo() {
+LatestVersionInfo HKU_API getLatestVersionInfo() {
     std::shared_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);
     return g_sys_info->latest_version_info;
 }

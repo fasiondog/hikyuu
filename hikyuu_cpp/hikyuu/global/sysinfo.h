@@ -38,12 +38,6 @@ std::string HKU_API getVersionWithGit();
  */
 bool HKU_API CanUpgrade();
 
-/**
- * 获取当前最新的版本号，用于判断是否升级
- * @return std::string
- */
-std::string HKU_API getLatestVersion();
-
 struct HKU_API LatestVersionInfo {
     int version;
     Datetime release_date;
@@ -63,7 +57,7 @@ struct HKU_API LatestVersionInfo {
     }
 };
 
-LatestVersionInfo getLatestVersionInfo();
+LatestVersionInfo HKU_API getLatestVersionInfo();
 
 /** 发送反馈信息 */
 void HKU_API sendFeedback();
