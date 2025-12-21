@@ -23,13 +23,15 @@
 # SOFTWARE.
 
 import sys
+import os
 import math
 import datetime
 import sqlite3
 from pytdx.hq import TDXParams
+from configparser import ConfigParser
 
 from hikyuu.util.mylog import get_default_logger, hku_error, hku_debug
-from hikyuu import Datetime
+from hikyuu import Datetime, is_valid_license, KDataToHdf5Importer
 from hikyuu.data.common import *
 from hikyuu.data.common_pytdx import to_pytdx_market, pytdx_get_day_trans
 from hikyuu.data.common_sqlite3 import (
@@ -235,6 +237,7 @@ def guess_5min_n_step(last_datetime):
     return (n, step)
 
 
+@hku_catch(trace=True)
 def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, startDate=199012191500):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
@@ -246,9 +249,9 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
     table = get_h5table(h5file, market, code)
     if table is None:
         hku_error("Can't get table({}{})".format(market, code))
-        return 0
+        return (0, True, Datetime())
 
-    last_datetime = table[-1]['datetime'] if table.nrows > 0 else startDate
+    last_datetime = int(table[-1]['datetime']) if table.nrows > 0 else startDate
 
     today = datetime.date.today()
     if ktype == 'DAY':
@@ -266,10 +269,10 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
         pytdx_kline_type = TDXParams.KLINE_TYPE_5MIN
         today_datetime = (today.year * 10000 + today.month * 100 + today.day) * 10000 + 1500
     else:
-        return 0
+        return (0, True, Datetime(last_datetime))
 
     if today_datetime <= last_datetime:
-        return 0
+        return (0, True, Datetime(last_datetime))
 
     get_bars = api.get_index_bars if stktype == STOCKTYPE.INDEX else api.get_security_bars
 
@@ -311,27 +314,27 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
                 if abs(last_krecord['openPrice']*0.001 - bar["open"]) / (last_krecord['openPrice']*0.001) > 0.02:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord open: {last_krecord['openPrice']*0.001}, bar: {bar['open']}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 if abs(last_krecord['highPrice']*0.001 - bar["high"]) / (last_krecord['highPrice']*0.001) > 0.02:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord high: {last_krecord['highPrice']*0.001}, bar: {bar['high']}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 if abs(last_krecord['lowPrice']*0.001 - bar["low"]) / (last_krecord['lowPrice']*0.001) > 0.02:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord low: {last_krecord['lowPrice']*0.001}, bar: {bar['low']}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 if abs(last_krecord['closePrice']*0.001 - bar["close"]) / (last_krecord['closePrice']*0.001) > 0.02:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord close: {last_krecord['closePrice']*0.001}, bar: {bar['close']}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 if ktype == 'DAY' and last_krecord['transAmount'] != 0 and (abs(float(last_krecord['transAmount']) - round(bar["amount"]*0.001))) > 10:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord amount: {float(last_krecord['transAmount'])}, bar: {round(bar['amount']*0.001)}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 if ktype == 'DAY' and last_krecord['transCount'] != 0 and abs(float(last_krecord['transCount']) - bar["vol"]) > 10:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord count: {last_krecord['transCount']}, bar: {bar['vol']}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 continue
 
             if today_datetime >= bar_datetime > last_datetime \
@@ -378,7 +381,16 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
         table.remove()
 
     # table.close()
-    return add_record_count
+    return (add_record_count, True, Datetime(last_datetime))
+
+
+@hku_catch(ret=None)
+def get_hdf5_importer(market, ktype):
+    filename = os.path.expanduser('~') + '/.hikyuu/hikyuu.ini'
+    config = ConfigParser()
+    config.read(filename, encoding='utf-8')
+    importer = KDataToHdf5Importer()
+    return importer if importer.set_config(config.get("hikyuu", "datadir"), [market], [ktype]) else None
 
 
 def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199012190000, progress=ProgressBar):
@@ -401,6 +413,9 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
     if not stock_list:
         return 0
 
+    failed_limit = 20
+    failed_count = 0
+    failed_list = []
     total = len(stock_list)
     for i, stock in enumerate(stock_list):
         if stock[3] == 0 or len(stock[2]) != 6:
@@ -408,7 +423,12 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
                 progress(i, total)
             continue
 
-        this_count = import_one_stock_data(connect, api, h5file, market, ktype, stock, startDate)
+        this_count, success, lastdate = import_one_stock_data(connect, api, h5file, market, ktype, stock, startDate)
+        if not success:
+            failed_count += 1
+            failed_list.append((market, stock[2], lastdate))
+        if failed_count >= failed_limit:
+            break
         add_record_count += this_count
         if this_count > 0:
             if ktype == 'DAY':
@@ -418,8 +438,31 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
         if progress:
             progress(i, total)
 
+    if total > 0 and progress:
+        progress(total, total)
+
     connect.commit()
     h5file.close()
+
+    if 0 < failed_count < failed_limit and is_valid_license():
+        hku_info(f"清理失败股票数据 {market}")
+        # 删除最后记录
+        ktype_dict = {
+            'DAY': 'DAY',
+            '1MIN': 'MIN',
+            '5MIN': 'MIN5'
+        }
+        nktype = ktype_dict[ktype]
+        h5_importer = get_hdf5_importer(market, nktype)
+        if h5_importer is not None:
+            for r in failed_list:
+                hku_info("remove {}{} {}: {}", r[0], r[1], nktype, r[2].start_of_day())
+                h5_importer.remove(r[0], r[1], nktype, r[2].start_of_day())
+
+    if failed_count >= failed_limit:
+        hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")
+        return add_record_count
+
     return add_record_count
 
 
@@ -626,7 +669,7 @@ if __name__ == '__main__':
     import time
     starttime = time.time()
 
-    dest_dir = "d:\\stock"
+    dest_dir = "/Users/fasiondog/stock"
     tdx_server = '180.101.48.170'
     tdx_port = 7709
     quotations = ['stock', 'fund']

@@ -1,0 +1,40 @@
+/*
+ *  Copyright (c) 2025 hikyuu.org
+ *
+ *  Created on: 2025-05-06
+ *      Author: fasiondog
+ */
+
+#pragma once
+
+#include "hikyuu/DataType.h"
+#include "interface/ImportKDataToClickHousePluginInterface.h"
+
+namespace hku {
+
+class HKU_API KDataToClickHouseImporter {
+public:
+    KDataToClickHouseImporter();
+    virtual ~KDataToClickHouseImporter();
+
+    bool setConfig(const string& host, int port, const string& user, const string& pwd);
+
+    Datetime getLastDatetime(const string& market, const string& code, const KQuery::KType& ktype);
+
+    void addKRecordList(const string& market, const string& code, const vector<KRecord>& krecords,
+                        const KQuery::KType& ktype);
+
+    void addTimeLineList(const string& market, const string& code, const TimeLineList& timeline);
+
+    void addTransList(const string& market, const string& code, const TransRecordList& translist);
+
+    void updateIndex(const string& market, const string& code, const KQuery::KType& ktype);
+
+    void remove(const string& market, const string& code, const KQuery::KType& ktype,
+                Datetime start);
+
+private:
+    ImportKDataToClickHousePluginInterface* m_plugin{nullptr};
+};
+
+}  // namespace hku

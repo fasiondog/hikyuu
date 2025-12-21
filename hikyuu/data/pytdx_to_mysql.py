@@ -23,15 +23,17 @@
 # SOFTWARE.
 
 import sys
+import os
 import math
 import datetime
 from pytdx.hq import TDXParams
+from configparser import ConfigParser
 
 from hikyuu.util.mylog import hku_error, hku_debug
 
 import mysql.connector
 
-from hikyuu import Datetime
+from hikyuu import Datetime, is_valid_license, KDataToMySQLImporter
 from .common import *
 from .common_pytdx import to_pytdx_market, pytdx_get_day_trans
 from .common_mysql import (
@@ -318,10 +320,10 @@ def import_one_stock_data(
             today.year * 10000 + today.month * 100 + today.day
         ) * 10000 + 1500
     else:
-        return 0
+        return (0, True, last_datetime)
 
     if today_datetime <= last_datetime:
-        return 0
+        return (0, True, last_datetime)
 
     get_bars = (
         api.get_index_bars if stktype == STOCKTYPE.INDEX else api.get_security_bars
@@ -356,27 +358,27 @@ def import_one_stock_data(
                 if abs(last_krecord[1] - bar["open"]) / last_krecord[1] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord open: {last_krecord[1]}, bar: {bar['open']}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 if abs(last_krecord[2] - bar["high"]) / last_krecord[2] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord high: {last_krecord[2]}, bar: {bar['high']}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 if abs(last_krecord[3] - bar["low"]) / last_krecord[3] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord low: {last_krecord[3]}, bar: {bar['low']}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 if abs(last_krecord[4] - bar["close"]) / last_krecord[4] > 0.01:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord close: {last_krecord[4]}, bar: {bar['close']}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 if ktype == 'DAY' and last_krecord[5] != 0.0 and abs(last_krecord[5] - bar["amount"]*0.001) > 10:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord amount: {last_krecord[5]}, bar: {bar['amount']*0.001}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 if ktype == 'DAY' and last_krecord[6] != 0.0 and abs(last_krecord[6] - bar["vol"]) > 10:
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord count: {last_krecord[6]}, bar: {bar['vol']}")
-                    return 0
+                    return (0, False, Datetime(last_datetime))
                 continue
 
             if (
@@ -440,7 +442,17 @@ def import_one_stock_data(
         connect.commit()
         cur.close()
 
-    return len(buf)
+    return (len(buf), True, Datetime(last_datetime))
+
+
+@hku_catch(ret=None)
+def get_mysql_importer():
+    filename = os.path.expanduser('~') + '/.hikyuu/hikyuu.ini'
+    config = ConfigParser()
+    config.read(filename, encoding='utf-8')
+    importer = KDataToMySQLImporter()
+    return importer if importer.set_config(config.get("kdata", "host"), config.getint("kdata", "port", fallback=3306),
+                                           config.get("kdata", "usr"), config.get("kdata", "pwd")) else None
 
 
 @hku_catch(trace=True, re_raise=True)
@@ -470,6 +482,9 @@ def import_data(
 
     stock_list = get_stock_list(connect, market, quotations)
 
+    failed_limit = 20
+    failed_count = 0
+    failed_list = []
     total = len(stock_list)
     for i, stock in enumerate(stock_list):
         if stock[3] == 0 or len(stock[2]) != 6:
@@ -477,9 +492,14 @@ def import_data(
                 progress(i, total)
             continue
 
-        this_count = import_one_stock_data(
+        this_count, success, lastdate = import_one_stock_data(
             connect, api, market, ktype, stock, startDate
         )
+        if not success:
+            failed_count += 1
+            failed_list.append((market, stock[2], lastdate))
+        if failed_count >= failed_limit:
+            break
         add_record_count += this_count
         if this_count > 0:
             if ktype == "DAY":
@@ -491,6 +511,24 @@ def import_data(
             progress(i, total)
 
     connect.commit()
+
+    if 0 < failed_count < failed_limit and is_valid_license():
+        # 删除最后记录
+        ktype_dict = {
+            'DAY': 'DAY',
+            '1MIN': 'MIN',
+            '5MIN': 'MIN5'
+        }
+        nktype = ktype_dict[ktype]
+        h5_importer = get_mysql_importer(market, nktype)
+        if h5_importer is not None:
+            for r in failed_list:
+                hku_info("remove {}{} {}: {}", r[0], r[1], nktype, r[2].start_of_day())
+                h5_importer.remove(r[0], r[1], nktype, r[2].start_of_day())
+
+    if failed_count >= failed_limit:
+        hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")
+        return add_record_count
     return add_record_count
 
 
