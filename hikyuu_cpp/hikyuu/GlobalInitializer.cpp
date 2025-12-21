@@ -92,7 +92,7 @@ void GlobalInitializer::clean() {
           "Hikyuu 的最新版本是 {}, 您可以运行升级命令:\n"
           "pip install hikyuu --upgrade\n"
           "{}\n"
-          "========================================================\n\n",
+          "====================================================================\n\n",
           info.version, info.version, info.remark);
     }
 #endif
