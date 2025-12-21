@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'MainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.0
+## Created by: Qt User Interface Compiler version 6.10.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -729,6 +729,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.label_36)
 
+        self.lazy_checkBox = QCheckBox(self.groupBox_6)
+        self.lazy_checkBox.setObjectName(u"lazy_checkBox")
+
+        self.verticalLayout.addWidget(self.lazy_checkBox)
+
 
         self.verticalLayout_4.addLayout(self.verticalLayout)
 
@@ -1402,6 +1407,7 @@ class Ui_MainWindow(object):
         self.groupBox_6.setTitle(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u8bbe\u7f6e", None))
         self.label_35.setText(QCoreApplication.translate("MainWindow", u"\u6b64\u5904\u4e3a Hikyuu \u8fd0\u884c\u65f6\u7684\u6570\u636e\u9884\u52a0\u8f7d\u8bbe\u7f6e\uff0c\u8bf7\u6839\u636e\u673a\u5668\u5185\u5b58\u5927\u5c0f\u9009\u62e9", None))
         self.label_36.setText(QCoreApplication.translate("MainWindow", u"\uff08\u76ee\u524d\u52a0\u8f7d\u5168\u90e8\u65e5\u7ebf\u6570\u636e\u76ee\u524d\u9700\u8981\u7ea6\u9700900M\u5185\u5b58\uff09", None))
+        self.lazy_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u4f7f\u7528\u61d2\u52a0\u8f7d\u6a21\u5f0f(\u4ec5\u5bf9\u65e5\u7ebf\u4ee5\u4e0b\u7ea7\u522b\u751f\u6548, \u6350\u8d60\u6743\u76ca)", None))
         self.preload_min5_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d5\u5206\u949f\u7ebf", None))
         self.label_33.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
         self.label_26.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))

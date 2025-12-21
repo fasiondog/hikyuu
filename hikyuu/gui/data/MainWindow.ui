@@ -1120,6 +1120,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QCheckBox" name="lazy_checkBox">
+               <property name="text">
+                <string>使用懒加载模式(仅对日线以下级别生效, 捐赠权益)</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
            <item>

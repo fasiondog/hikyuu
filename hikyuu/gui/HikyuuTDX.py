@@ -109,10 +109,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if os.path.exists(filename):
             old_config.read(filename, encoding='utf-8')
         old_reload_time = "00:00"
-        old_lazy_preload = False
         if old_config.has_section('hikyuu'):
             old_reload_time = old_config.get('hikyuu', 'reload_time', fallback="00:00")
-            old_lazy_preload = old_config.getboolean('hikyuu', 'lazy_preload', fallback=False)
 
         if current_config.getboolean('hdf5', 'enable', fallback=True):
             data_dir = current_config['hdf5']['dir']
@@ -125,7 +123,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write(
                     hku_config_template.hdf5_template.format(
-                        dir=data_dir, reload_time=old_reload_time, lazy_preload=old_lazy_preload,
+                        dir=data_dir, reload_time=old_reload_time,
+                        lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         day=current_config.getboolean('preload', 'day', fallback=True),
@@ -166,7 +165,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 f.write(
                     hku_config_template.mysql_template.format(
                         dir=data_dir,
-                        reload_time=old_reload_time, lazy_preload=old_lazy_preload,
+                        reload_time=old_reload_time,
+                        lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         host=current_config['mysql']['host'],
@@ -210,7 +210,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 f.write(
                     hku_config_template.clickhouse_template.format(
                         dir=data_dir,
-                        reload_time=old_reload_time, lazy_preload=old_lazy_preload,
+                        reload_time=old_reload_time,
+                        lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
                         host=current_config['clickhouse']['host'],
@@ -514,6 +515,8 @@ li.checked::marker { content: "\2612"; }
         )
 
         # 预加载设置
+        self.lazy_checkBox.setChecked(import_config.getboolean('lazy_preload', 'enable', fallback=False))
+        self.lazy_checkBox.setEnabled(is_valid_license())
         self.preload_day_checkBox.setChecked(import_config.getboolean('preload', 'day', fallback=True))
         self.preload_week_checkBox.setChecked(import_config.getboolean('preload', 'week', fallback=False))
         self.preload_month_checkBox.setChecked(import_config.getboolean('preload', 'month', fallback=False))
@@ -606,6 +609,9 @@ li.checked::marker { content: "\2612"; }
             'phase1_end': self.collect_phase1_last_timeEdit.time().toString(),
             'phase2_start': self.collect_phase2_start_timeEdit.time().toString(),
             'phase2_end': self.collect_phase2_last_timeEdit.time().toString(),
+        }
+        import_config['lazy_preload'] = {
+            'enable': self.lazy_checkBox.isChecked(),
         }
         import_config['preload'] = {
             'day': self.preload_day_checkBox.isChecked(),

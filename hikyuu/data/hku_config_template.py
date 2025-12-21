@@ -275,6 +275,9 @@ phase1_end = 11:35:00
 phase2_start = 12:00:00
 phase2_end = 15:05:00
 
+[lazy_preload]
+enable = False
+
 [preload]
 day = True
 week = True
