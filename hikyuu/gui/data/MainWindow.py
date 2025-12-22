@@ -734,6 +734,16 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.lazy_checkBox)
 
+        self.label_57 = QLabel(self.groupBox_6)
+        self.label_57.setObjectName(u"label_57")
+
+        self.verticalLayout.addWidget(self.label_57)
+
+        self.label_58 = QLabel(self.groupBox_6)
+        self.label_58.setObjectName(u"label_58")
+
+        self.verticalLayout.addWidget(self.label_58)
+
 
         self.verticalLayout_4.addLayout(self.verticalLayout)
 
@@ -744,206 +754,211 @@ class Ui_MainWindow(object):
         self.gridLayout_6 = QGridLayout()
         self.gridLayout_6.setObjectName(u"gridLayout_6")
         self.gridLayout_6.setContentsMargins(20, -1, -1, -1)
-        self.preload_month_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_month_spinBox.setObjectName(u"preload_month_spinBox")
-        self.preload_month_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_month_spinBox, 2, 2, 1, 1)
-
-        self.preload_quarter_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_quarter_spinBox.setObjectName(u"preload_quarter_spinBox")
-        self.preload_quarter_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_quarter_spinBox, 3, 2, 1, 1)
-
-        self.preload_min5_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_min5_checkBox.setObjectName(u"preload_min5_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_min5_checkBox, 7, 0, 1, 1)
-
-        self.label_33 = QLabel(self.groupBox_6)
-        self.label_33.setObjectName(u"label_33")
-
-        self.gridLayout_6.addWidget(self.label_33, 9, 1, 1, 1)
-
-        self.label_26 = QLabel(self.groupBox_6)
-        self.label_26.setObjectName(u"label_26")
-
-        self.gridLayout_6.addWidget(self.label_26, 2, 1, 1, 1)
-
-        self.preload_week_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_week_spinBox.setObjectName(u"preload_week_spinBox")
-        self.preload_week_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_week_spinBox, 1, 2, 1, 1)
-
-        self.label_27 = QLabel(self.groupBox_6)
-        self.label_27.setObjectName(u"label_27")
-
-        self.gridLayout_6.addWidget(self.label_27, 3, 1, 1, 1)
-
-        self.preload_year_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_year_checkBox.setObjectName(u"preload_year_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_year_checkBox, 5, 0, 1, 1)
-
-        self.preload_halfyear_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_halfyear_spinBox.setObjectName(u"preload_halfyear_spinBox")
-        self.preload_halfyear_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_halfyear_spinBox, 4, 2, 1, 1)
-
-        self.preload_day_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_day_spinBox.setObjectName(u"preload_day_spinBox")
-        self.preload_day_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_day_spinBox, 0, 2, 1, 1)
-
-        self.preload_min30_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_min30_checkBox.setObjectName(u"preload_min30_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_min30_checkBox, 9, 0, 1, 1)
-
-        self.label_28 = QLabel(self.groupBox_6)
-        self.label_28.setObjectName(u"label_28")
-
-        self.gridLayout_6.addWidget(self.label_28, 4, 1, 1, 1)
-
-        self.preload_min15_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_min15_spinBox.setObjectName(u"preload_min15_spinBox")
-        self.preload_min15_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_min15_spinBox, 8, 2, 1, 1)
-
-        self.save_pushButton = QPushButton(self.groupBox_6)
-        self.save_pushButton.setObjectName(u"save_pushButton")
-
-        self.gridLayout_6.addWidget(self.save_pushButton, 4, 4, 1, 1)
-
-        self.label_34 = QLabel(self.groupBox_6)
-        self.label_34.setObjectName(u"label_34")
-
-        self.gridLayout_6.addWidget(self.label_34, 10, 1, 1, 1)
-
         self.preload_hour2_checkBox = QCheckBox(self.groupBox_6)
         self.preload_hour2_checkBox.setObjectName(u"preload_hour2_checkBox")
 
-        self.gridLayout_6.addWidget(self.preload_hour2_checkBox, 11, 0, 1, 1)
-
-        self.preload_halfyear_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_halfyear_checkBox.setObjectName(u"preload_halfyear_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_halfyear_checkBox, 4, 0, 1, 1)
-
-        self.preload_day_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_day_checkBox.setObjectName(u"preload_day_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_day_checkBox, 0, 0, 1, 1)
-
-        self.label_24 = QLabel(self.groupBox_6)
-        self.label_24.setObjectName(u"label_24")
-
-        self.gridLayout_6.addWidget(self.label_24, 0, 1, 1, 1)
-
-        self.preload_min1_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_min1_checkBox.setObjectName(u"preload_min1_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_min1_checkBox, 6, 0, 1, 1)
-
-        self.preload_min15_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_min15_checkBox.setObjectName(u"preload_min15_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_min15_checkBox, 8, 0, 1, 1)
-
-        self.preload_min1_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_min1_spinBox.setObjectName(u"preload_min1_spinBox")
-        self.preload_min1_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_min1_spinBox, 6, 2, 1, 1)
-
-        self.preload_min60_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_min60_checkBox.setObjectName(u"preload_min60_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_min60_checkBox, 10, 0, 1, 1)
-
-        self.preload_min60_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_min60_spinBox.setObjectName(u"preload_min60_spinBox")
-        self.preload_min60_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_min60_spinBox, 10, 2, 1, 1)
-
-        self.label_29 = QLabel(self.groupBox_6)
-        self.label_29.setObjectName(u"label_29")
-
-        self.gridLayout_6.addWidget(self.label_29, 5, 1, 1, 1)
-
-        self.preload_hour2_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_hour2_spinBox.setObjectName(u"preload_hour2_spinBox")
-        self.preload_hour2_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_hour2_spinBox, 11, 2, 1, 1)
-
-        self.preload_week_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_week_checkBox.setObjectName(u"preload_week_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_week_checkBox, 1, 0, 1, 1)
-
-        self.horizontalSpacer_6 = QSpacerItem(20, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout_6.addItem(self.horizontalSpacer_6, 4, 3, 1, 1)
-
-        self.preload_quarter_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_quarter_checkBox.setObjectName(u"preload_quarter_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_quarter_checkBox, 3, 0, 1, 1)
-
-        self.label_31 = QLabel(self.groupBox_6)
-        self.label_31.setObjectName(u"label_31")
-
-        self.gridLayout_6.addWidget(self.label_31, 7, 1, 1, 1)
-
-        self.label_25 = QLabel(self.groupBox_6)
-        self.label_25.setObjectName(u"label_25")
-
-        self.gridLayout_6.addWidget(self.label_25, 1, 1, 1, 1)
-
-        self.preload_month_checkBox = QCheckBox(self.groupBox_6)
-        self.preload_month_checkBox.setObjectName(u"preload_month_checkBox")
-
-        self.gridLayout_6.addWidget(self.preload_month_checkBox, 2, 0, 1, 1)
-
-        self.label_30 = QLabel(self.groupBox_6)
-        self.label_30.setObjectName(u"label_30")
-
-        self.gridLayout_6.addWidget(self.label_30, 6, 1, 1, 1)
-
-        self.preload_min5_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_min5_spinBox.setObjectName(u"preload_min5_spinBox")
-        self.preload_min5_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_min5_spinBox, 7, 2, 1, 1)
-
-        self.label_42 = QLabel(self.groupBox_6)
-        self.label_42.setObjectName(u"label_42")
-
-        self.gridLayout_6.addWidget(self.label_42, 11, 1, 1, 1)
-
-        self.label_32 = QLabel(self.groupBox_6)
-        self.label_32.setObjectName(u"label_32")
-
-        self.gridLayout_6.addWidget(self.label_32, 8, 1, 1, 1)
-
-        self.preload_min30_spinBox = QSpinBox(self.groupBox_6)
-        self.preload_min30_spinBox.setObjectName(u"preload_min30_spinBox")
-        self.preload_min30_spinBox.setMaximum(999999)
-
-        self.gridLayout_6.addWidget(self.preload_min30_spinBox, 9, 2, 1, 1)
+        self.gridLayout_6.addWidget(self.preload_hour2_checkBox, 12, 0, 1, 1)
 
         self.preload_year_spinBox = QSpinBox(self.groupBox_6)
         self.preload_year_spinBox.setObjectName(u"preload_year_spinBox")
         self.preload_year_spinBox.setMaximum(999999)
 
-        self.gridLayout_6.addWidget(self.preload_year_spinBox, 5, 2, 1, 1)
+        self.gridLayout_6.addWidget(self.preload_year_spinBox, 6, 2, 1, 1)
+
+        self.label_34 = QLabel(self.groupBox_6)
+        self.label_34.setObjectName(u"label_34")
+
+        self.gridLayout_6.addWidget(self.label_34, 11, 1, 1, 1)
+
+        self.label_25 = QLabel(self.groupBox_6)
+        self.label_25.setObjectName(u"label_25")
+
+        self.gridLayout_6.addWidget(self.label_25, 2, 1, 1, 1)
+
+        self.preload_min15_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_min15_spinBox.setObjectName(u"preload_min15_spinBox")
+        self.preload_min15_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_min15_spinBox, 9, 2, 1, 1)
+
+        self.preload_year_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_year_checkBox.setObjectName(u"preload_year_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_year_checkBox, 6, 0, 1, 1)
+
+        self.label_42 = QLabel(self.groupBox_6)
+        self.label_42.setObjectName(u"label_42")
+
+        self.gridLayout_6.addWidget(self.label_42, 12, 1, 1, 1)
+
+        self.preload_week_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_week_spinBox.setObjectName(u"preload_week_spinBox")
+        self.preload_week_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_week_spinBox, 2, 2, 1, 1)
+
+        self.save_pushButton = QPushButton(self.groupBox_6)
+        self.save_pushButton.setObjectName(u"save_pushButton")
+
+        self.gridLayout_6.addWidget(self.save_pushButton, 5, 4, 1, 1)
+
+        self.preload_min15_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_min15_checkBox.setObjectName(u"preload_min15_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_min15_checkBox, 9, 0, 1, 1)
+
+        self.preload_min1_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_min1_spinBox.setObjectName(u"preload_min1_spinBox")
+        self.preload_min1_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_min1_spinBox, 7, 2, 1, 1)
+
+        self.preload_min5_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_min5_spinBox.setObjectName(u"preload_min5_spinBox")
+        self.preload_min5_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_min5_spinBox, 8, 2, 1, 1)
+
+        self.preload_quarter_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_quarter_checkBox.setObjectName(u"preload_quarter_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_quarter_checkBox, 4, 0, 1, 1)
+
+        self.horizontalSpacer_6 = QSpacerItem(20, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+
+        self.gridLayout_6.addItem(self.horizontalSpacer_6, 5, 3, 1, 1)
+
+        self.preload_min30_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_min30_checkBox.setObjectName(u"preload_min30_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_min30_checkBox, 10, 0, 1, 1)
+
+        self.label_26 = QLabel(self.groupBox_6)
+        self.label_26.setObjectName(u"label_26")
+
+        self.gridLayout_6.addWidget(self.label_26, 3, 1, 1, 1)
+
+        self.preload_min30_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_min30_spinBox.setObjectName(u"preload_min30_spinBox")
+        self.preload_min30_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_min30_spinBox, 10, 2, 1, 1)
+
+        self.label_32 = QLabel(self.groupBox_6)
+        self.label_32.setObjectName(u"label_32")
+
+        self.gridLayout_6.addWidget(self.label_32, 9, 1, 1, 1)
+
+        self.preload_month_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_month_checkBox.setObjectName(u"preload_month_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_month_checkBox, 3, 0, 1, 1)
+
+        self.preload_min5_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_min5_checkBox.setObjectName(u"preload_min5_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_min5_checkBox, 8, 0, 1, 1)
+
+        self.preload_halfyear_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_halfyear_spinBox.setObjectName(u"preload_halfyear_spinBox")
+        self.preload_halfyear_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_halfyear_spinBox, 5, 2, 1, 1)
+
+        self.label_27 = QLabel(self.groupBox_6)
+        self.label_27.setObjectName(u"label_27")
+
+        self.gridLayout_6.addWidget(self.label_27, 4, 1, 1, 1)
+
+        self.label_28 = QLabel(self.groupBox_6)
+        self.label_28.setObjectName(u"label_28")
+
+        self.gridLayout_6.addWidget(self.label_28, 5, 1, 1, 1)
+
+        self.preload_day_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_day_checkBox.setObjectName(u"preload_day_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_day_checkBox, 1, 0, 1, 1)
+
+        self.preload_quarter_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_quarter_spinBox.setObjectName(u"preload_quarter_spinBox")
+        self.preload_quarter_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_quarter_spinBox, 4, 2, 1, 1)
+
+        self.label_30 = QLabel(self.groupBox_6)
+        self.label_30.setObjectName(u"label_30")
+
+        self.gridLayout_6.addWidget(self.label_30, 7, 1, 1, 1)
+
+        self.label_29 = QLabel(self.groupBox_6)
+        self.label_29.setObjectName(u"label_29")
+
+        self.gridLayout_6.addWidget(self.label_29, 6, 1, 1, 1)
+
+        self.preload_min60_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_min60_checkBox.setObjectName(u"preload_min60_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_min60_checkBox, 11, 0, 1, 1)
+
+        self.label_33 = QLabel(self.groupBox_6)
+        self.label_33.setObjectName(u"label_33")
+
+        self.gridLayout_6.addWidget(self.label_33, 10, 1, 1, 1)
+
+        self.preload_week_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_week_checkBox.setObjectName(u"preload_week_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_week_checkBox, 2, 0, 1, 1)
+
+        self.preload_halfyear_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_halfyear_checkBox.setObjectName(u"preload_halfyear_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_halfyear_checkBox, 5, 0, 1, 1)
+
+        self.preload_min1_checkBox = QCheckBox(self.groupBox_6)
+        self.preload_min1_checkBox.setObjectName(u"preload_min1_checkBox")
+
+        self.gridLayout_6.addWidget(self.preload_min1_checkBox, 7, 0, 1, 1)
+
+        self.preload_min60_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_min60_spinBox.setObjectName(u"preload_min60_spinBox")
+        self.preload_min60_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_min60_spinBox, 11, 2, 1, 1)
+
+        self.preload_month_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_month_spinBox.setObjectName(u"preload_month_spinBox")
+        self.preload_month_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_month_spinBox, 3, 2, 1, 1)
+
+        self.label_24 = QLabel(self.groupBox_6)
+        self.label_24.setObjectName(u"label_24")
+
+        self.gridLayout_6.addWidget(self.label_24, 1, 1, 1, 1)
+
+        self.preload_hour2_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_hour2_spinBox.setObjectName(u"preload_hour2_spinBox")
+        self.preload_hour2_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_hour2_spinBox, 12, 2, 1, 1)
+
+        self.label_31 = QLabel(self.groupBox_6)
+        self.label_31.setObjectName(u"label_31")
+
+        self.gridLayout_6.addWidget(self.label_31, 8, 1, 1, 1)
+
+        self.preload_day_spinBox = QSpinBox(self.groupBox_6)
+        self.preload_day_spinBox.setObjectName(u"preload_day_spinBox")
+        self.preload_day_spinBox.setMaximum(999999)
+
+        self.gridLayout_6.addWidget(self.preload_day_spinBox, 1, 2, 1, 1)
+
+        self.label_59 = QLabel(self.groupBox_6)
+        self.label_59.setObjectName(u"label_59")
+
+        self.gridLayout_6.addWidget(self.label_59, 0, 0, 1, 1)
 
 
         self.verticalLayout_4.addLayout(self.gridLayout_6)
@@ -1407,32 +1422,35 @@ class Ui_MainWindow(object):
         self.groupBox_6.setTitle(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u8bbe\u7f6e", None))
         self.label_35.setText(QCoreApplication.translate("MainWindow", u"\u6b64\u5904\u4e3a Hikyuu \u8fd0\u884c\u65f6\u7684\u6570\u636e\u9884\u52a0\u8f7d\u8bbe\u7f6e\uff0c\u8bf7\u6839\u636e\u673a\u5668\u5185\u5b58\u5927\u5c0f\u9009\u62e9", None))
         self.label_36.setText(QCoreApplication.translate("MainWindow", u"\uff08\u76ee\u524d\u52a0\u8f7d\u5168\u90e8\u65e5\u7ebf\u6570\u636e\u76ee\u524d\u9700\u8981\u7ea6\u9700900M\u5185\u5b58\uff09", None))
-        self.lazy_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u4f7f\u7528\u61d2\u52a0\u8f7d\u6a21\u5f0f(\u4ec5\u5bf9\u65e5\u7ebf\u4ee5\u4e0b\u7ea7\u522b\u751f\u6548, \u6350\u8d60\u6743\u76ca)", None))
-        self.preload_min5_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d5\u5206\u949f\u7ebf", None))
-        self.label_33.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
-        self.label_26.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
-        self.label_27.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
-        self.preload_year_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u5e74\u7ebf", None))
-        self.preload_min30_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d30\u5206\u949f\u7ebf", None))
-        self.label_28.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
-        self.save_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u8bbe\u7f6e", None))
-        self.label_34.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.lazy_checkBox.setText(QCoreApplication.translate("MainWindow", u"(\u6350\u8d60\u6743\u76ca)\u4f7f\u7528\u61d2\u52a0\u8f7d\u6a21\u5f0f(\u4ec5\u5bf9\u65e5\u7ebf\u4ee5\u4e0b\u7ea7\u522b\u751f\u6548)", None))
+        self.label_57.setText(QCoreApplication.translate("MainWindow", u"\u8c28\u614e!!! \u6b64\u5904\u4e3a\u5168\u5c40\u8bbe\u7f6e\uff0c\u4f7f\u7528\u61d2\u52a0\u8f7d\u5bb9\u6613\u4e0d\u5c0f\u5fc3\u904d\u5386\u8fc7\u591a\u8bc1\u5238\u5bfc\u81f4\u7206\u5185\u5b58\uff01\uff01", None))
+        self.label_58.setText(QCoreApplication.translate("MainWindow", u"\u5efa\u8bae\u901a\u8fc7\u6307\u5b9a load_hikyuu \u53c2\u6570\u7684\u65b9\u5f0f\u4f7f\u7528\u61d2\u52a0\u8f7d", None))
         self.preload_hour2_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d120\u5206\u949f\u7ebf", None))
-        self.preload_halfyear_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u534a\u5e74\u7ebf", None))
-        self.preload_day_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u65e5\u7ebf", None))
-        self.label_24.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
-        self.preload_min1_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d1\u5206\u949f\u7ebf", None))
-        self.preload_min15_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d15\u5206\u949f\u7ebf", None))
-        self.preload_min60_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d60\u5206\u949f\u7ebf", None))
-        self.label_29.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
-        self.preload_week_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u5468\u7ebf", None))
-        self.preload_quarter_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u5b63\u7ebf", None))
-        self.label_31.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.label_34.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
         self.label_25.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
-        self.preload_month_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u6708\u7ebf", None))
-        self.label_30.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.preload_year_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u5e74\u7ebf", None))
         self.label_42.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.save_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u8bbe\u7f6e", None))
+        self.preload_min15_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d15\u5206\u949f\u7ebf", None))
+        self.preload_quarter_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u5b63\u7ebf", None))
+        self.preload_min30_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d30\u5206\u949f\u7ebf", None))
+        self.label_26.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
         self.label_32.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.preload_month_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u6708\u7ebf", None))
+        self.preload_min5_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d5\u5206\u949f\u7ebf", None))
+        self.label_27.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.label_28.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.preload_day_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u65e5\u7ebf", None))
+        self.label_30.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.label_29.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.preload_min60_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d60\u5206\u949f\u7ebf", None))
+        self.label_33.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.preload_week_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u5468\u7ebf", None))
+        self.preload_halfyear_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u534a\u5e74\u7ebf", None))
+        self.preload_min1_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d1\u5206\u949f\u7ebf", None))
+        self.label_24.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.label_31.setText(QCoreApplication.translate("MainWindow", u"\u6700\u5927\u7f13\u5b58\u6570\u91cf\uff1a", None))
+        self.label_59.setText(QCoreApplication.translate("MainWindow", u"0 - \u8868\u793a\u4e0d\u9650\u5236", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("MainWindow", u"\u9884\u52a0\u8f7d\u8bbe\u7f6e", None))
         self.collect_start_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u542f\u52a8\u91c7\u96c6", None))
         self.collect_status_label.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
