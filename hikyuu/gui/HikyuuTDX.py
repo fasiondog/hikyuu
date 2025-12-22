@@ -35,7 +35,7 @@ from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
 
-from hikyuu import (can_upgrade, get_last_version, fetch_trial_license,
+from hikyuu import (can_upgrade, get_latest_version_info, fetch_trial_license,
                     view_license, is_valid_license, get_expire_date, Datetime, TimeDelta)
 from hikyuu.data import hku_config_template
 from hikyuu.util import *
@@ -880,10 +880,12 @@ li.checked::marker { content: "\2612"; }
                 self.import_detail_textEdit.append("导入完毕！")
                 self.hdf5_weight_label.setText("导入完毕!")
                 if can_upgrade():
+                    release_info = get_latest_version_info()
                     self.import_detail_textEdit.append("========================================================")
                     self.import_detail_textEdit.append(
-                        "Hikyuu 新版本 ({}) 已发布，建议更新".format(get_last_version()))
+                        "Hikyuu 新版本 ({}) 已发布，建议更新".format(release_info['version']))
                     self.import_detail_textEdit.append("更新命令: pip instal hikyuu --upgrade")
+                    self.import_detail_textEdit.append(f'{release_info["remark"]}')
                     self.import_detail_textEdit.append("========================================================")
                 if is_valid_license():
                     expire_date = get_expire_date()

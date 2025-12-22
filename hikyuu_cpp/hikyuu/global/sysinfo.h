@@ -8,12 +8,16 @@
 #pragma once
 
 #include <string>
+#include "hikyuu/utilities/datetime/Datetime.h"
 
 #ifndef HKU_API
 #define HKU_API
 #endif
 
 namespace hku {
+
+void sysinfo_init();
+void sysinfo_clean();
 
 /**
  * 获取Hikyuu当前版本号
@@ -34,11 +38,26 @@ std::string HKU_API getVersionWithGit();
  */
 bool HKU_API CanUpgrade();
 
-/**
- * 获取当前最新的版本号，用于判断是否升级
- * @return std::string
- */
-std::string HKU_API getLatestVersion();
+struct HKU_API LatestVersionInfo {
+    int version;
+    Datetime release_date;
+    std::string remark;
+    LatestVersionInfo() = default;
+    LatestVersionInfo(const LatestVersionInfo&) = default;
+    LatestVersionInfo(LatestVersionInfo&& rhs)
+    : version(rhs.version), release_date(rhs.release_date), remark(std::move(rhs.remark)) {}
+    LatestVersionInfo& operator=(LatestVersionInfo&& rhs) {
+        if (this == &rhs) {
+            return *this;
+        }
+        version = rhs.version;
+        release_date = rhs.release_date;
+        remark = std::move(rhs.remark);
+        return *this;
+    }
+};
+
+LatestVersionInfo HKU_API getLatestVersionInfo();
 
 /** 发送反馈信息 */
 void HKU_API sendFeedback();

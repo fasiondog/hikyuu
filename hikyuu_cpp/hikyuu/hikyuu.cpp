@@ -17,8 +17,6 @@
 
 namespace hku {
 
-static Parameter g_hikyuu_context;
-
 void hikyuu_init(const string& config_file_name, bool ignore_preload,
                  const StrategyContext& context) {
     Parameter baseParam, blockParam, kdataParam, preloadParam, hkuParam;
