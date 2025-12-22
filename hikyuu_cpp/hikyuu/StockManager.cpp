@@ -245,6 +245,9 @@ void StockManager::loadAllKData() {
     auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
     if (!driver->getPrototype()->canParallelLoad()) {
         for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+            if (m_cancel_load) {
+                break;
+            }
             if (canLazyLoad(ktypes[i])) {
                 continue;
             }
