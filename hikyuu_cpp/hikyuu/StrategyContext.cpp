@@ -88,11 +88,13 @@ void StrategyContext::_checkAndRemoveDuplicateKType(const vector<KQuery::KType>&
     m_ktypeList.reserve(ktypeList.size());
     std::set<KQuery::KType> ktype_set;
     for (const auto& ktype : ktypeList) {
-        HKU_CHECK(KQuery::isBaseKType(ktype), "Invalid ktype: {}", ktype);
-        if (ktype_set.find(ktype) == ktype_set.end()) {
-            m_ktypeList.push_back(ktype);
+        auto upktype = ktype;
+        to_upper(upktype);
+        HKU_CHECK(KQuery::isBaseKType(upktype), "Invalid ktype: {}", upktype);
+        if (ktype_set.find(upktype) == ktype_set.end()) {
+            m_ktypeList.push_back(upktype);
         } else {
-            ktype_set.insert(ktype);
+            ktype_set.insert(upktype);
         }
     }
 }
