@@ -226,7 +226,7 @@ def load_hikyuu(**kwargs):
     options = {
         "stock_list": ["sh000001"],
         "ktype_list": ["day"],
-        "preload_num: {"day_max": 100000}
+        "preload_num": {"day_max": 100000},
         "load_history_finance": False,
         "load_weight": False,
         "start_spot": False,
