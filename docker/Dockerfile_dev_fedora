@@ -1,6 +1,5 @@
 # 第一阶段：构建环境（安装所有依赖）
-# FROM fedora:latest AS builder
-FROM fedora:42 AS builder
+FROM fedora:latest AS builder
 
 WORKDIR /app
 
@@ -24,7 +23,7 @@ RUN ln -snf /usr/share/zoneinfo/$TimeZone /etc/localtime && echo $TimeZone > /et
     && wget https://xmake.io/shget.text -O - | bash \
     && echo ". /root/.xmake/profile" >> /root/.bashrc \
     && echo "export XMAKE_ROOT=y" >> /root/.bashrc \
-    && echo "export XMAKE_MAIN_REPO=https://gitee.com/tboox/xmake-repo.git" >> /root/.bashrc \
+    # && echo "export XMAKE_MAIN_REPO=https://gitee.com/tboox/xmake-repo.git" >> /root/.bashrc \
     # clone hikyuu 源码（使用国内镜像源）
     && git clone https://github.com/fasiondog/hikyuu.git \
     # 安装Miniconda
