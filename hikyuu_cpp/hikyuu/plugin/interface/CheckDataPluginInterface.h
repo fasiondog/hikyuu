@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "hikyuu/Stock.h"
 #include "hikyuu/utilities/plugin/PluginBase.h"
 
 namespace hku {
