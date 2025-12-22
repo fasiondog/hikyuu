@@ -14,6 +14,7 @@
 #include <nlohmann/json.hpp>
 #include "hikyuu/version.h"
 #include "hikyuu/DataType.h"
+#include "hikyuu/StockManager.h"
 #include "hikyuu/utilities/os.h"
 #include "hikyuu/utilities/http_client/HttpClient.h"
 #include "sysinfo.h"
@@ -143,6 +144,10 @@ void sendFeedback() {
             auto res = client.post("/hku/visit", req);
             json r = res.json();
             const json& data = r["data"];
+
+            if (!g_sys_info || StockManager::instance().hasCancelLoad()) {
+                return;
+            }
 
             if (g_sys_info) {
                 std::unique_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);

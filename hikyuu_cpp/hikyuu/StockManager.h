@@ -273,6 +273,10 @@ public:
         m_cancel_load = true;
     }
 
+    bool hasCancelLoad() const {
+        return m_cancel_load;
+    }
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
