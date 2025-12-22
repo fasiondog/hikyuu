@@ -1,5 +1,6 @@
 # 第一阶段：构建环境（安装所有依赖）
-FROM fedora:latest AS builder
+# FROM fedora:latest AS builder
+FROM fedora:42 AS builder
 
 WORKDIR /app
 
