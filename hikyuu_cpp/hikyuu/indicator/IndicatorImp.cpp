@@ -314,10 +314,10 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_optype = m_optype;
     p->m_parent = m_parent;
 
+    p->_readyBuffer(size(), m_result_num);
     for (size_t i = 0; i < m_result_num; ++i) {
-        if (m_pBuffer[i]) {
-            p->m_pBuffer[i] = new vector<value_t>(m_pBuffer[i]->begin(), m_pBuffer[i]->end());
-        }
+        if (m_pBuffer[i])
+            std::copy(m_pBuffer[i]->begin(), m_pBuffer[i]->end(), p->m_pBuffer[i]->begin());
     }
 
     if (m_left) {
