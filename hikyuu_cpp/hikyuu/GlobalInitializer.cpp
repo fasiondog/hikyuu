@@ -110,12 +110,6 @@ void GlobalInitializer::clean() {
     sysinfo_clean();
     releaseScheduler();
     releaseGlobalSpotAgent();
-
-#if !HKU_OS_WINDOWS
-    // windows 反而会卡死
-    nng_fini();
-#endif
-
     IndicatorImp::releaseDynEngine();
 
 #if !HKU_OS_OSX
@@ -126,10 +120,6 @@ void GlobalInitializer::clean() {
     }
 #endif
 
-#if HKU_ENABLE_TA_LIB
-    TA_Shutdown();
-#endif
-
 #if HKU_ENABLE_LEAK_DETECT || defined(MSVC_LEAKER_DETECT)
     // 非内存泄漏检测时，内存让系统自动释放，避免某些场景下 windows 下退出速度过慢
     StockManager::quit();
@@ -138,6 +128,15 @@ void GlobalInitializer::clean() {
 #endif
 
     DataDriverFactory::release();
+
+#if HKU_ENABLE_TA_LIB
+    TA_Shutdown();
+#endif
+
+#if !HKU_OS_WINDOWS
+    // windows 反而会卡死
+    nng_fini();
+#endif
 
 #if HKU_ENABLE_HDF5_KDATA
     H5close();
