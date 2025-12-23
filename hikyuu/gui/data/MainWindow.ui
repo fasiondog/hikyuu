@@ -217,7 +217,7 @@
              <item>
               <widget class="QCheckBox" name="import_block_checkBox">
                <property name="text">
-                <string>下载行业与指数板块</string>
+                <string>下载指数板块</string>
                </property>
               </widget>
              </item>

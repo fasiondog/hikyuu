@@ -1343,7 +1343,7 @@ class Ui_MainWindow(object):
         self.groupBox_7.setTitle(QCoreApplication.translate("MainWindow", u"\u5bfc\u5165\u8bbe\u7f6e", None))
         self.import_weight_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d\u6743\u606f\u6570\u636e", None))
         self.import_history_finance_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d\u5386\u53f2\u8d22\u52a1\u6570\u636e", None))
-        self.import_block_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d\u884c\u4e1a\u4e0e\u6307\u6570\u677f\u5757", None))
+        self.import_block_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d\u6307\u6570\u677f\u5757", None))
         self.import_stock_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u80a1\u7968", None))
         self.import_fund_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u57fa\u91d1", None))
         self.import_future_checkBox.setText(QCoreApplication.translate("MainWindow", u"\u671f\u8d27", None))
