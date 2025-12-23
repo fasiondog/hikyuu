@@ -320,10 +320,10 @@ def import_one_stock_data(
             today.year * 10000 + today.month * 100 + today.day
         ) * 10000 + 1500
     else:
-        return (0, True, last_datetime)
+        return (0, True, Datetime(last_datetime))
 
     if today_datetime <= last_datetime:
-        return (0, True, last_datetime)
+        return (0, True, Datetime(last_datetime))
 
     get_bars = (
         api.get_index_bars if stktype == STOCKTYPE.INDEX else api.get_security_bars
@@ -511,6 +511,9 @@ def import_data(
             progress(i, total)
 
     connect.commit()
+
+    if total > 0 and progress:
+        progress(total, total)
 
     if 0 < failed_count < failed_limit and is_valid_license():
         # 删除最后记录
