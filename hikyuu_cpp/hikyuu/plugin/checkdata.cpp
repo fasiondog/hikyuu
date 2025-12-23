@@ -17,7 +17,7 @@ std::pair<std::string, vector<std::string>> HKU_API checkData(const StockList& s
     std::pair<std::string, vector<std::string>> ret;
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<CheckDataPluginInterface>(HKU_PLUGIN_CHECK_DATA);
-    HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_CHECK_DATA);
+    HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CHECK_DATA));
     return plugin->checkData(stock_list, start_date, end_date, check_ktype);
 }
 

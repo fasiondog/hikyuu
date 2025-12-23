@@ -24,10 +24,9 @@ namespace hku {
 void loadLocalLanguage(const std::string &path) {
     std::string lang = getSystemLanguage();
     if (lang == "zh_cn") {
-        std::string lang_file = fmt::format("{}/zh_CN/hikyuu.mo", path);
         auto &reader = moFileLib::moFileReaderSingleton::GetInstance();
-        reader.ClearTable();
-        reader.ReadFile(lang_file.c_str());
+        reader.ReadFile(fmt::format("{}/zh_CN/hikyuu.mo", path).c_str());
+        reader.ReadFile(fmt::format("{}/zh_CN/hikyuu_plugin.mo", path).c_str());
     }
 }
 

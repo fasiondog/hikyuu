@@ -15,14 +15,14 @@ void HKU_API registerExtraKType(const string& ktype, const string& basetype, int
                                 std::function<Datetime(const Datetime&)> getPhaseEnd) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
-    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA);
+    HKU_ERROR_IF_RETURN(!plugin, void(), htr("Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA));
     plugin->registerKTypeExtra(ktype, basetype, minutes, getPhaseEnd);
 }
 
 void HKU_API registerExtraKType(const string& ktype, const string& basetype, int32_t nbars) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
-    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA);
+    HKU_ERROR_IF_RETURN(!plugin, void(), htr("Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA));
     plugin->registerKTypeExtra(ktype, basetype, nbars, std::function<Datetime(const Datetime&)>());
 }
 
@@ -43,7 +43,7 @@ bool isExtraKType(const string& ktype) {
 int32_t getKTypeExtraMinutes(const string& ktype) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
-    HKU_ERROR_IF_RETURN(!plugin, 0, "Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA);
+    HKU_ERROR_IF_RETURN(!plugin, 0, htr("Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA));
     return plugin->getKTypeExtraMinutes(ktype);
 }
 

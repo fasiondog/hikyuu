@@ -15,7 +15,7 @@ void HKU_API startDataServer(const std::string& addr, size_t work_num, bool save
                              bool buf_tick, const std::string& parquet_path) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DataServerPluginInterface>(HKU_PLUGIN_DATASERVER);
-    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DATASERVER);
+    HKU_ERROR_IF_RETURN(!plugin, void(), htr("Can't find {} plugin!", HKU_PLUGIN_DATASERVER));
     plugin->start(addr, work_num, save_tick, buf_tick, parquet_path);
 }
 
