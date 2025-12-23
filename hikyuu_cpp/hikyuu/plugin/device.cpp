@@ -14,14 +14,14 @@ namespace hku {
 void HKU_API bindEmail(const std::string& email, const std::string& active_code) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
-    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DEVICE);
+    HKU_ERROR_IF_RETURN(!plugin, void(), htr("Can't find {} plugin!", HKU_PLUGIN_DEVICE));
     plugin->bind(email, active_code);
 }
 
 void HKU_API activeDevice(const std::string& active_code, bool replace) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
-    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DEVICE);
+    HKU_ERROR_IF_RETURN(!plugin, void(), htr("Can't find {} plugin!", HKU_PLUGIN_DEVICE));
     plugin->activate(active_code, replace);
 }
 
@@ -37,7 +37,7 @@ std::string HKU_API viewLicense() {
 void HKU_API removeLicense() {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
-    HKU_ERROR_IF_RETURN(!plugin, void(), "Can't find {} plugin!", HKU_PLUGIN_DEVICE);
+    HKU_ERROR_IF_RETURN(!plugin, void(), htr("Can't find {} plugin!", HKU_PLUGIN_DEVICE));
     plugin->removeLicense();
 }
 
@@ -69,7 +69,7 @@ bool HKU_API isValidLicense() {
 Datetime HKU_API getExpireDate() {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
-    HKU_ERROR_IF_RETURN(!plugin, Datetime::min(), "Can't find {} plugin!", HKU_PLUGIN_DEVICE);
+    HKU_ERROR_IF_RETURN(!plugin, Datetime::min(), htr("Can't find {} plugin!", HKU_PLUGIN_DEVICE));
     return plugin->getExpireDate();
 }
 

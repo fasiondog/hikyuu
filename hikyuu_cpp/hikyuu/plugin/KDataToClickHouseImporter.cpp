@@ -15,7 +15,7 @@ KDataToClickHouseImporter::KDataToClickHouseImporter() {
     m_plugin =
       sm.getPlugin<ImportKDataToClickHousePluginInterface>(HKU_PLUGIN_IMPORTKDATATOCLICKHOUSE);
     if (!m_plugin) {
-        HKU_ERROR("Can't find {} plugin!", HKU_PLUGIN_IMPORTKDATATOCLICKHOUSE);
+        HKU_ERROR(htr("Can't find {} plugin!", HKU_PLUGIN_IMPORTKDATATOCLICKHOUSE));
     }
 }
 

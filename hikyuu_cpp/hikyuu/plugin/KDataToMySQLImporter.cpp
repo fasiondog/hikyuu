@@ -14,7 +14,7 @@ KDataToMySQLImporter::KDataToMySQLImporter() {
     auto& sm = StockManager::instance();
     m_plugin = sm.getPlugin<ImportKDataToMySQLPluginInterface>(HKU_PLUGIN_IMPORTKDATATOMYSQL);
     if (!m_plugin) {
-        HKU_ERROR("Can't find {} plugin!", HKU_PLUGIN_IMPORTKDATATOMYSQL);
+        HKU_ERROR(htr("Can't find {} plugin!", HKU_PLUGIN_IMPORTKDATATOMYSQL));
     }
 }
 

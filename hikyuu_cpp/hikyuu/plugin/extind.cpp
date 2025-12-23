@@ -15,7 +15,7 @@ static Indicator getExtIndicator(const string& name, const Parameter& params) {
     Indicator ret;
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
-    HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_EXTEND_INDICATOR);
+    HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_EXTEND_INDICATOR));
     return plugin->getIndicator(name, params);
 }
 
@@ -24,7 +24,7 @@ static Indicator getExtIndicator(const string& name, const Indicator& ref_ind,
     Indicator ret;
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
-    HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_EXTEND_INDICATOR);
+    HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_EXTEND_INDICATOR));
     return plugin->getIndicator(name, ref_ind, params);
 }
 

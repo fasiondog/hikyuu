@@ -14,7 +14,7 @@ KDataToHdf5Importer::KDataToHdf5Importer() {
     auto& sm = StockManager::instance();
     m_plugin = sm.getPlugin<ImportKDataToHdf5PluginInterface>(HKU_PLUGIN_IMPORTKDATATOHDF5);
     if (!m_plugin) {
-        HKU_ERROR("Can't find {} plugin!", HKU_PLUGIN_IMPORTKDATATOHDF5);
+        HKU_ERROR(htr("Can't find {} plugin!", HKU_PLUGIN_IMPORTKDATATOHDF5));
     }
 }
 

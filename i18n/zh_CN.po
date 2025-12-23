@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-12-20 19:53+0800\n"
-"PO-Revision-Date: 2025-12-20 19:54+0800\n"
+"POT-Creation-Date: 2025-12-24 01:21+0800\n"
+"PO-Revision-Date: 2025-12-24 01:22+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -19,7 +19,21 @@ msgstr ""
 "X-Poedit-SearchPath-1: hikyuu_pywrap\n"
 "X-Poedit-SearchPathExcluded-0: hikyuu_cpp/hikyuu/utilities\n"
 
+#: hikyuu_cpp/hikyuu/StockManager.cpp:113
+#, c++-format
+msgid "Plugin path: {}"
+msgstr "插件路径: {}"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:122
+#: hikyuu_cpp/hikyuu/StockManager.cpp:132
+#: hikyuu_cpp/hikyuu/StockManager.cpp:142
+#, c++-format
+msgid "Can not find {} plugin!"
+msgstr "找不到插件： {}"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:124
 #: hikyuu_cpp/hikyuu/StockManager.cpp:134
+#: hikyuu_cpp/hikyuu/StockManager.cpp:144
 msgid "Can not get clickhouse driver! Check your license!"
 msgstr "获取 clickhouse 驱动失败！ 请检查你的授权许可!"
 
@@ -50,29 +64,52 @@ msgstr "预加载 {} K线数据至缓存 (最大数量: {})!"
 msgid "Use lazy preload!"
 msgstr "使用懒加载模式进行数据预加载！"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:569
+#: hikyuu_cpp/hikyuu/StockManager.cpp:588
 msgid "Not found market info"
 msgstr "找不到指定的市场信息"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:622
+#: hikyuu_cpp/hikyuu/StockManager.cpp:641
 msgid "Loading stock information..."
 msgstr "加载证券信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:724
+#: hikyuu_cpp/hikyuu/StockManager.cpp:743
 msgid "Loading market information..."
 msgstr "加载市场信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:742
+#: hikyuu_cpp/hikyuu/StockManager.cpp:761
 msgid "Loading stock type information..."
 msgstr "加载证券类型信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:760
+#: hikyuu_cpp/hikyuu/StockManager.cpp:779
 msgid "Loading stock weight..."
 msgstr "加载权息数据……"
 
 #: hikyuu_cpp/hikyuu/global/agent/SpotAgent.cpp:39
 msgid "Start spot agent."
 msgstr "启动行情接收."
+
+#: hikyuu_cpp/hikyuu/plugin/KDataToClickHouseImporter.cpp:18
+#: hikyuu_cpp/hikyuu/plugin/KDataToHdf5Importer.cpp:17
+#: hikyuu_cpp/hikyuu/plugin/KDataToMySQLImporter.cpp:17
+#: hikyuu_cpp/hikyuu/plugin/backtest.cpp:19
+#: hikyuu_cpp/hikyuu/plugin/checkdata.cpp:20
+#: hikyuu_cpp/hikyuu/plugin/dataserver.cpp:18
+#: hikyuu_cpp/hikyuu/plugin/device.cpp:17
+#: hikyuu_cpp/hikyuu/plugin/device.cpp:24
+#: hikyuu_cpp/hikyuu/plugin/device.cpp:40
+#: hikyuu_cpp/hikyuu/plugin/device.cpp:72
+#: hikyuu_cpp/hikyuu/plugin/extind.cpp:18
+#: hikyuu_cpp/hikyuu/plugin/extind.cpp:27
+#: hikyuu_cpp/hikyuu/plugin/hkuextra.cpp:18
+#: hikyuu_cpp/hikyuu/plugin/hkuextra.cpp:25
+#: hikyuu_cpp/hikyuu/plugin/hkuextra.cpp:46
+#, c++-format
+msgid "Can't find {} plugin!"
+msgstr "找不到插件： {}"
+
+#: hikyuu_cpp/hikyuu/plugin/backtest.cpp:31
+msgid "Unable to obtain context. hikyuu may not be initialized. Please check!"
+msgstr "无法获取策略上下文，hikyuu可能未初始化。请检查！"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:100
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:157
