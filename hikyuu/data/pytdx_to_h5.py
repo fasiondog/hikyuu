@@ -445,7 +445,6 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
     h5file.close()
 
     if 0 < failed_count < failed_limit and is_valid_license():
-        hku_info(f"清理失败股票数据 {market}")
         # 删除最后记录
         ktype_dict = {
             'DAY': 'DAY',
@@ -456,8 +455,9 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
         h5_importer = get_hdf5_importer(market, nktype)
         if h5_importer is not None:
             for r in failed_list:
-                hku_info("remove {}{} {}: {}", r[0], r[1], nktype, r[2].start_of_day())
+                hku_warn("清理 {}{} {}: {}", r[0], r[1], nktype, r[2].start_of_day())
                 h5_importer.remove(r[0], r[1], nktype, r[2].start_of_day())
+            hku_warn(f"已清理 {market} {failed_count} 个失败股票的最后记录，建议重新导入")
 
     if failed_count >= failed_limit:
         hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")
