@@ -39,7 +39,7 @@ std::string HKU_API getVersionWithGit();
 bool HKU_API CanUpgrade();
 
 struct HKU_API LatestVersionInfo {
-    int version;
+    int version{1003001};
     Datetime release_date;
     std::string remark;
     LatestVersionInfo() = default;

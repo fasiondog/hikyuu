@@ -26,6 +26,9 @@ public:
     MySQLKDataDriver();
     virtual ~MySQLKDataDriver() override;
 
+    MySQLKDataDriver(const MySQLKDataDriver&) = delete;
+    MySQLKDataDriver& operator=(const MySQLKDataDriver&) = delete;
+
     virtual KDataDriverPtr _clone() override {
         return std::make_shared<MySQLKDataDriver>();
     }
@@ -56,7 +59,8 @@ public:
                                    const KQuery& query) override;
 
 private:
-    string _getTableName(const string& market, const string& code, const KQuery::KType& ktype);
+    static string _getTableName(const string& market, const string& code,
+                                const KQuery::KType& ktype);
     KRecordList _getKRecordList(const string& market, const string& code,
                                 const KQuery::KType& kType, size_t start_ix, size_t end_ix);
     KRecordList _getKRecordList(const string& market, const string& code,

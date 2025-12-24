@@ -43,7 +43,7 @@ public:
                                        const KQuery& query) override;
 
 private:
-    string _getTableName(const string& market, const string& code, KQuery::KType ktype);
+    static string _getTableName(const string& market, const string& code, KQuery::KType ktype);
     KRecordList _getKRecordList(const string& market, const string& code,
                                 const KQuery::KType& kType, size_t start_ix, size_t end_ix);
     KRecordList _getKRecordList(const string& market, const string& code,

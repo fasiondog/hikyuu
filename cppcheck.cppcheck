@@ -36,6 +36,12 @@
         <dir name="../hku_plugin/plugin_hkuextra/src"/>
         <dir name="../hku_plugin/plugin_clickhouse/src"/>
         <dir name="../hku_plugin/plugin_tmreport/src"/>
+        <dir name="../hku_plugin/plugin_checkdata/src"/>
+        <dir name="../hku_plugin/plugin_import2ch/src"/>
+        <dir name="../hku_plugin/plugin_import2mysql/src"/>
+        <dir name="../hku_plugin/python_extra"/>
+        <dir name="../hku_plugin/plugin_dataserver_parquet/src"/>
+        <dir name="../hku_plugin/plugin_device/src"/>
     </paths>
     <suppressions>
         <suppression>unusedFunction</suppression>
@@ -48,5 +54,5 @@
         <suppression>shadowFunction</suppression>
         <suppression>useStlAlgorithm</suppression>
     </suppressions>
-    <check-level-normal/>
+    <check-level-exhaustive/>
 </project>

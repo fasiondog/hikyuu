@@ -76,7 +76,7 @@ inline void II(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint
     a += b;
 }
 
-void scramble_block(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t* x) {
+void scramble_block(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, const uint32_t* x) {
     const uint32_t S11 = 7;
     const uint32_t S12 = 12;
     const uint32_t S13 = 17;
