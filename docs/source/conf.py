@@ -19,7 +19,7 @@ import os
 
 sys.path.insert(0, os.path.abspath('.'))
 
-version = '2.7.0'
+version = '2.7.2'
 release = version
 
 # General information about the project.
