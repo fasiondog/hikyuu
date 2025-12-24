@@ -545,8 +545,9 @@ def import_data(
         ch_importer = get_clickhouse_importer()
         if ch_importer is not None:
             for r in failed_list:
-                hku_info(f"remove {r[0]} {r[1]} {nktype} {r[2].start_of_day()}")
+                hku_warn(f"清理 {r[0]} {r[1]} {nktype} {r[2].start_of_day()}")
                 ch_importer.remove(r[0], r[1], nktype, r[2].start_of_day())
+            hku_warn(f"已清理 {market} {failed_count} 个失败股票的最后记录，建议重新导入")
 
     if failed_count >= failed_limit:
         hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")

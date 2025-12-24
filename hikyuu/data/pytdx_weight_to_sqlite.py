@@ -64,6 +64,8 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
         cur.close()
 
         xdxr_list = pytdx_api.get_xdxr_info(pytdx_market, code)
+        if xdxr_list is None:
+            continue
         update_last_db_weight = False
         new_last_db_weight = last_db_weight
         records = {}

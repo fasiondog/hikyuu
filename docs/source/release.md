@@ -1,15 +1,45 @@
 # 版本发布说明
 
+## 2.7.2 - 2025年12月24日
+
+**🚀 新增特性**
+
+* 新增 AF_FixedAmount 等金额资产分配，对选中的资产进行等金额分配
+* 添加 lazy_preload 配置选项，预加载日线以下数据时，支持懒加载模式
+* 支持无限制预加载K线数据, 当 preload_max_num 设置为小于等于 0 时，表示不对预加载的 K 线数量做限制。
+
+**⚡️ 优化改进**
+
+* 调整ETF最小交易量默认配置为100
+* feat(trade): 支持缩扩股业务处理
+* feat(HikyuuTdx): 导入股票交易和时间数据时过滤价格为零的记录
+* feat(HikyuuTdx): 改进股票数据导入逻辑并增强错误处理
+* feat(hikyuu_cpp): 调整对 reload_time 配置的解析和验证，只有当配置正确时才启用自动重载功能
+* 优化预加载加载取消逻辑，避免无效操作
+* 优化调整全局变量初始化与清理顺序
+* 线程池及 PluginManager 优化
+
+**🐞 缺陷修复**
+
+* fix(indicator): 优化指标克隆与序列化缓冲区处理, 防止内存泄漏
+* fix(trade_sys):  crtSG 函数中遗漏将创建的信号指示器对象引入全局的功能
+* fix(data): 修复导入股票数据时交易量比较的错误日志输出，py311不支持f-str双引号嵌套
+* fix(trade_manage): 增加对缩股的处理逻辑
+* fix(mysql): 调整K线数据金额字段精度, KRecord 中的amount保持为万元(原为千元， 和其他存储引擎不一致)
+* fix(hikyuu_cpp): 调整ETF、基金和B股的分时数据价格精度
+* fix(draw): 解决matplotlib绘制指标时内部缺值或异常时无法绘图的问题
+* fix(StrategyContext): 修复 K 线类型去重逻辑中的大小写问题，以便不区分大小写
+
 ## 2.7.1 - 2025年12月1日
 
-🚀 新增特性
+**🚀 新增特性**
 
 * 增加数据重载时间配置项, 新增 `reload_time` 配置项，用于指定每日数据重新加载的时间（格式为 HH:MM），默认值为 "00:00。需手工更改或 hikyuu.ini 或在 load 参数中指定
 * 添加crtSCFilter函数用于快速创建评分过滤器实例
 * 新增 crtNorm 函数用于快速创建标准化/归一化等算法函数
 * 取消行业板块数据下载
 
-🐞 缺陷修复
+**🐞 缺陷修复**
 
 * fixed: 修正 clickhouse 存储 K 线数据中 amount 字段的单位转换问题
 * fixed: 限制日期范围以适配 ClickHouse DateTime 类型
