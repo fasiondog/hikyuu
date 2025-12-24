@@ -50,6 +50,11 @@
                 <td>每个选中的资产都只占总资产固定的比例</td>
             </tr>
             <tr>
+                <td><a href="#target-section">AF_FixedAmount</a></td>
+                <td>固定金额资产分配</td>
+                <td>每个选中的资产都只占总资产固定的金额</td>
+            </tr>            
+            <tr>
                 <td><a href="#target-section">AF_FixedWeightList</td>
                 <td>固定比例资产分配列表</td>
                 <td>按指定的权重列表对选中系统进行资产分配</td>
@@ -74,6 +79,12 @@
 
     :param float weight:  指定的资产比例 [0, 1]
 
+.. py:function:: AF_FixedAmount(amount)
+
+    固定金额资产分配，每个选中的资产都只占总资产固定的金额
+
+    :param float amount:  指定的资产金额
+
 .. py:function:: AF_FixedWeightList(weights)
 
     固定比例资产分配列表.
@@ -89,6 +100,9 @@
 .. py:function:: AF_MultiFactor()
 
     根据系统得分进行资产分配，对选中的系统进行得分排序，按得分从高到低进行资产分配，得分为0的系统将被忽略。
+
+
+
 
 
 系统权重系数结构
