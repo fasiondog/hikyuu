@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/StockManager.h"
+#include "interface/plugins.h"
 #include "checkdata.h"
 
 namespace hku {
