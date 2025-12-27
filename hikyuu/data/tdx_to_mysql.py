@@ -171,7 +171,7 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
     with open(filename, 'rb') as src_file:
         data = src_file.read(32)
         while data:
-            record = struct.unpack('iiiiifii', data)
+            record = struct.unpack('IIIIIfII', data)
             if lastdatetime and record[0] <= lastdatetime:
                 data = src_file.read(32)
                 continue
@@ -297,7 +297,7 @@ def tdx_import_min_data_from_file(connect, filename, ktype, market, stock_record
 
             data = src_file.read(32)
             while data:
-                record = struct.unpack('HHfffffii', data)
+                record = struct.unpack('HHfffffII', data)
                 if record[3] >= record[2] >= record[4] > 0\
                         and record[3] >= record[5] >= record[4] > 0\
                         and record[5] >= 0 \

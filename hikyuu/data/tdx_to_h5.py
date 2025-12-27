@@ -124,14 +124,14 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
                 length = len(codepre[0])
                 if code[:length] == codepre[0]:
                     count += 1
-                    #print(market, code, newStockDict[code], codepre)
+                    # print(market, code, newStockDict[code], codepre)
                     sql = "insert into Stock(marketid, code, name, type, valid, startDate, endDate) \
                            values (%s, '%s', '%s', %s, %s, %s, %s)" \
                           % (marketid, code, newStockDict[code], codepre[1], 1, today, 99999999)
                     cur.execute(sql)
                     break
 
-    #print('%s新增股票数：%i' % (market.upper(), count))
+    # print('%s新增股票数：%i' % (market.upper(), count))
     connect.commit()
     cur.close()
     return count
@@ -163,7 +163,7 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
     with open(filename, 'rb') as src_file:
         data = src_file.read(32)
         while data:
-            record = struct.unpack('iiiiifii', data)
+            record = struct.unpack('IIIIIfII', data)
             if lastdatetime and record[0] <= lastdatetime:
                 data = src_file.read(32)
                 continue
@@ -191,8 +191,8 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
     if add_record_count > 0:
         table.flush()
 
-        #更新基础信息数据库中股票对应的起止日期及其有效标志
-        #if valid == 0:
+        # 更新基础信息数据库中股票对应的起止日期及其有效标志
+        # if valid == 0:
         cur = connect.cursor()
         cur.execute(
             "update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
@@ -201,13 +201,13 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
         connect.commit()
         cur.close()
 
-        #记录最新更新日期
+        # 记录最新更新日期
         if (code == '000001' and marketid == MARKETID.SH) \
-                or (code == '399001' and marketid == MARKETID.SZ)  :
+                or (code == '399001' and marketid == MARKETID.SZ):
             update_last_date(connect, marketid, table[-1]['datetime'] / 10000)
 
     elif table.nrows == 0:
-        #print(market, stock_record)
+        # print(market, stock_record)
         table.remove()
 
     return add_record_count
@@ -290,7 +290,7 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
 
             data = src_file.read(32)
             while data:
-                record = struct.unpack('HHfffffii', data)
+                record = struct.unpack('HHfffffII', data)
                 if 0 not in record[2:6]:
                     if record[3] >= record[2] >= record[4] \
                             and record[3] >= record[5] >= record[4]:
@@ -314,7 +314,7 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
     if add_record_count > 0:
         table.flush()
     elif table.nrows == 0:
-        #print(market, stock_record)
+        # print(market, stock_record)
         table.remove()
 
     return add_record_count
@@ -386,7 +386,7 @@ if __name__ == '__main__':
 
     src_dir = "D:\\TdxW_HuaTai"
     dest_dir = "c:\\stock"
-    quotations = ['stock', 'fund']  #通达信盘后数据没有债券
+    quotations = ['stock', 'fund']  # 通达信盘后数据没有债券
 
     connect = sqlite3.connect(dest_dir + "\\stock.db")
     create_database(connect)
