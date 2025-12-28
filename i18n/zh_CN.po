@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2025-12-24 01:21+0800\n"
-"PO-Revision-Date: 2025-12-24 16:13+0800\n"
+"POT-Creation-Date: 2025-12-29 03:53+0800\n"
+"PO-Revision-Date: 2025-12-29 03:53+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -27,9 +27,8 @@ msgstr "插件路径: {}"
 #: hikyuu_cpp/hikyuu/StockManager.cpp:122
 #: hikyuu_cpp/hikyuu/StockManager.cpp:132
 #: hikyuu_cpp/hikyuu/StockManager.cpp:142
-#, c++-format
-msgid "Can not find {} plugin!"
-msgstr "找不到插件: {}"
+msgid "Can not find plugin"
+msgstr "找不到插件"
 
 #: hikyuu_cpp/hikyuu/StockManager.cpp:124
 #: hikyuu_cpp/hikyuu/StockManager.cpp:134
@@ -92,7 +91,7 @@ msgstr "启动行情接收."
 #: hikyuu_cpp/hikyuu/plugin/KDataToHdf5Importer.cpp:17
 #: hikyuu_cpp/hikyuu/plugin/KDataToMySQLImporter.cpp:17
 #: hikyuu_cpp/hikyuu/plugin/backtest.cpp:19
-#: hikyuu_cpp/hikyuu/plugin/checkdata.cpp:20
+#: hikyuu_cpp/hikyuu/plugin/checkdata.cpp:21
 #: hikyuu_cpp/hikyuu/plugin/dataserver.cpp:18
 #: hikyuu_cpp/hikyuu/plugin/device.cpp:17
 #: hikyuu_cpp/hikyuu/plugin/device.cpp:24

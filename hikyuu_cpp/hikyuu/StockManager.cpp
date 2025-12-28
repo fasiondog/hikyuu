@@ -119,9 +119,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     to_lower(basedrivername);
     if (basedrivername == "clickhouse") {
         auto* plugin = getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
-        HKU_CHECK(plugin, htr("Can not find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+        HKU_CHECK(plugin, "{}: {}", htr("Can not find plugin"), HKU_PLUGIN_CLICKHOUSE_DRIVER);
         auto driver = plugin->getBaseInfoDriver();
-        HKU_CHECK(driver, htr("Can not get clickhouse driver! Check your license!"));
+        HKU_CHECK(driver, "{}", htr("Can not get clickhouse driver! Check your license!"));
         DataDriverFactory::regBaseInfoDriver(driver);
     }
 
@@ -129,9 +129,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     to_lower(kdrivername);
     if (kdrivername == "clickhouse") {
         auto* plugin = getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
-        HKU_CHECK(plugin, htr("Can not find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+        HKU_CHECK(plugin, "{}: {}!", htr("Can not find plugin"), HKU_PLUGIN_CLICKHOUSE_DRIVER);
         auto kdriver = plugin->getKDataDriver();
-        HKU_CHECK(kdriver, htr("Can not get clickhouse driver! Check your license!"));
+        HKU_CHECK(kdriver, "{}", htr("Can not get clickhouse driver! Check your license!"));
         DataDriverFactory::regKDataDriver(kdriver);
     }
 
@@ -139,9 +139,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     to_lower(blockdrivername);
     if (blockdrivername == "clickhouse") {
         auto* plugin = getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
-        HKU_CHECK(plugin, htr("Can not find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+        HKU_CHECK(plugin, "{}: {}!", htr("Can not find plugin"), HKU_PLUGIN_CLICKHOUSE_DRIVER);
         auto driver = plugin->getBlockInfoDriver();
-        HKU_CHECK(driver, htr("Can not get clickhouse driver! Check your license!"));
+        HKU_CHECK(driver, "{}", htr("Can not get clickhouse driver! Check your license!"));
         DataDriverFactory::regBlockDriver(driver);
     }
 
