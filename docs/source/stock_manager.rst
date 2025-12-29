@@ -475,7 +475,7 @@ StockManager/Block/Stock
         :param sequence krecord_list: 一个可迭代变量获取 KRecord 实例的对象，如: list (仅包含 KRecord 实例)
         :param Query.KType ktype: K线类别
 
-    .. py::method: set_kdata_from_df(self, df, cols, [ktype=Query.DAY])
+    .. py::method:: set_kdata_from_df(self, df, cols, [ktype=Query.DAY])
 
         谨慎调用！！！直接设置当前内存数据，意味着 Stock 的基础数据变更。
         从 DataFrame 中获取 KRecordList, 并设置给当前Stock。df, 必须按顺序指定列名，默认为: ("datetime", "open", "high", "low", "close", "amount", "volume"))")
