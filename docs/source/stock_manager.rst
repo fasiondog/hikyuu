@@ -475,10 +475,36 @@ StockManager/Block/Stock
         :param sequence krecord_list: 一个可迭代变量获取 KRecord 实例的对象，如: list (仅包含 KRecord 实例)
         :param Query.KType ktype: K线类别
 
-    .. py::method:: set_kdata_from_df(self, df, cols, [ktype=Query.DAY])
+    .. py:method:: set_kdata_from_df(self, df, cols, [ktype=Query.DAY])
 
         谨慎调用！！！直接设置当前内存数据，意味着 Stock 的基础数据变更。
         从 DataFrame 中获取 KRecordList, 并设置给当前Stock。df, 必须按顺序指定列名，默认为: ("datetime", "open", "high", "low", "close", "amount", "volume"))")
+
+        .. code-block:: python
+
+            import baostock as bs
+            import pandas as pd
+            lg = bs.login()
+
+            rs = bs.query_history_k_data_plus("sh.600246",
+                                            "date,code,open,high,low,close,volume,amount,adjustflag",
+                                            start_date='2020-01-01', end_date='2025-12-31')
+            print('query_history_k_data_plus respond error_code:'+rs.error_code)
+            print('query_history_k_data_plus respond  error_msg:'+rs.error_msg)
+
+            #### 打印结果集 ####
+            data_list = []
+            while (rs.error_code == '0') & rs.next():
+                # 获取一条记录，将记录合并在一起
+                data_list.append(rs.get_row_data())
+            result = pd.DataFrame(data_list, columns=rs.fields)
+            print(result)
+            result['datetime'] = pd.to_datetime(result['date'])
+            print(result)
+
+            stock = Stock('TMP', '600246', 'test')
+            stock.set_kdata_from_df(result)
+            print(stock)        
 
         :param DataFrame df: 输入数据
         :param list cols: 列名
