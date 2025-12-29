@@ -271,7 +271,10 @@ void export_Stock(py::module& m) {
             auto ks = df_to_krecords(df, cols);
             self.setKRecordList(std::move(ks), ktype);
         },
-        py::arg("df"), py::arg("cols"), py::arg("ktype") = KQuery::DAY,
+        py::arg("df"),
+        py::arg("cols") =
+          StringList{"datetime", "open", "high", "low", "close", "amount", "volume"},
+        py::arg("ktype") = KQuery::DAY,
         R"(set_kdata_from_df(self, df, cols, [ktype=Query.DAY])
 
       谨慎调用！！！直接设置当前内存数据，意味着 Stock 的基础数据变更。
