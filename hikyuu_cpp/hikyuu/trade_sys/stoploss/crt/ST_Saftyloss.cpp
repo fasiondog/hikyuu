@@ -7,6 +7,7 @@
 
 #include "ST_Saftyloss.h"
 #include "../../../indicator/crt/SAFTYLOSS.h"
+#include "../../../indicator/crt/KDATA.h"
 
 namespace hku {
 
