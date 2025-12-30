@@ -191,6 +191,9 @@ Indicator HKU_API AGG_VAR(const Indicator& ind, const KQuery::KType& ktype = KQu
 Indicator HKU_API AGG_QUANTILE(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,
                                bool fill_null = false, int unit = 1, double quantile = 0.75);
 
+Indicator HKU_API AGG_VWAP(const KQuery::KType& ktype = KQuery::MIN, bool fill_null = false,
+                           int unit = 1);
+
 using agg_func_t = std::function<double(const DatetimeList& src_ds, const Indicator::value_t* src,
                                         size_t group_start, size_t group_last)>;
 Indicator HKU_API AGG_FUNC(const Indicator& ind, agg_func_t agg_func,
