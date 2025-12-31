@@ -99,6 +99,19 @@
 
     聚合函数: 方差, 可参考 :func:`AGG_STD`
 
+
+.. py:function:: AGG_VWAP([ktype=Query.MIN, fill_null=False, unit=1])
+
+    聚合其他K线成交量加权平均价格(Volume Weighted Average Price)
+    VWAP 是成交量加权的平均价格，计算方式是将每一分钟（或单位时间）的成交量乘以该分钟的成交价格，然后对所有乘积求和，最后除以总成交量。
+
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    :return: 指标数据
+    :rtype: Indicator
+
+
 .. py:function:: AGG_FUNC(ind, agg_func[, ktype=Query.MIN, fill_null=False, unit=1]
       
     使用自定函数聚合其他K线周期的指标。虽然支持python自定义函数, 但python函数需要GIL, 速度较慢慢。建议最好直接使用 C++ 自定义聚合函数。

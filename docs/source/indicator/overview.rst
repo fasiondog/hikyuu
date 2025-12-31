@@ -166,32 +166,6 @@
 * :py:func:`VIGOR` - 亚历山大.艾尔德力度指数
 
 
-**聚合指标**
-
-* :py:func:`AGG_COUNT` - [VIP]聚合函数: 非空值计数
-* :py:func:`AGG_MAD` - [VIP]聚合函数: 平均绝对偏差
-* :py:func:`AGG_MAX` - [VIP]聚合函数: 最大值
-* :py:func:`AGG_MIN` - [VIP]聚合函数: 最大值
-* :py:func:`AGG_MEAN` - [VIP]聚合函数: 平均值
-* :py:func:`AGG_MEDIAN` - [VIP]聚合函数: 中位数
-* :py:func:`AGG_PROD` - [VIP]聚合函数: 乘积
-* :py:func:`AGG_SUM` - [VIP]聚合函数: 总和
-* :py:func:`AGG_STD` - [VIP]聚合函数: 标准差
-* :py:func:`AGG_VAR` - [VIP]聚合函数: 方差
-* :py:func:`AGG_QUANTILE` - [VIP]聚合函数: 分位数
-* :py:func:`AGG_FUNC` - [VIP]聚合函数: 自定义聚合函数
-
-**分组指标**
-
-* :py:func:`GROUP_COUNT` - [VIP]分组函数: 非空值计数
-* :py:func:`GROUP_MAX` - [VIP]分组函数: 分组累计最大值
-* :py:func:`GROUP_MIN` - [VIP]分组函数: 分组累计最小值
-* :py:func:`GROUP_MEAN` - [VIP]分组函数: 分组累计平均值
-* :py:func:`GROUP_PROD` - [VIP]分组函数: 分组累计乘积
-* :py:func:`GROUP_SUM` - [VIP]分组函数: 分组累计总和
-* :py:func:`GROUP_FUNC` - [VIP]分组函数: 自定义分组计算函数
-
-
 **时间指标**
 
 * :py:func:`DATE` - 取得该周期从1900以来的年月日
@@ -208,6 +182,33 @@
 * :py:func:`IC` - 计算因子 IC 值
 * :py:func:`IR` - 用于计算账户收益与参照收益的IR
 * :py:func:`ICIR` - 计算因子 IC 的 IR 值
+
+
+**聚合指标[VIP]**
+
+* :py:func:`AGG_COUNT` - 聚合函数: 非空值计数
+* :py:func:`AGG_MAD` - 聚合函数: 平均绝对偏差
+* :py:func:`AGG_MAX` - 聚合函数: 最大值
+* :py:func:`AGG_MIN` - 聚合函数: 最大值
+* :py:func:`AGG_MEAN` - 聚合函数: 平均值
+* :py:func:`AGG_MEDIAN` - 聚合函数: 中位数
+* :py:func:`AGG_PROD` - 聚合函数: 乘积
+* :py:func:`AGG_SUM` - 聚合函数: 总和
+* :py:func:`AGG_STD` - 聚合函数: 标准差
+* :py:func:`AGG_VAR` - 聚合函数: 方差
+* :py:func:`AGG_QUANTILE` - 聚合函数: 分位数
+* :py:func:`AGG_VWAP` - 聚合函数: 成交量加权平均价
+* :py:func:`AGG_FUNC` - 聚合函数: 自定义聚合函数
+
+**分组指标[VIP]**
+
+* :py:func:`GROUP_COUNT` - 分组函数: 非空值计数
+* :py:func:`GROUP_MAX` - 分组函数: 分组累计最大值
+* :py:func:`GROUP_MIN` - 分组函数: 分组累计最小值
+* :py:func:`GROUP_MEAN` - 分组函数: 分组累计平均值
+* :py:func:`GROUP_PROD` - 分组函数: 分组累计乘积
+* :py:func:`GROUP_SUM` - 分组函数: 分组累计总和
+* :py:func:`GROUP_FUNC` - 分组函数: 自定义分组计算函数
 
 
 **其他转换辅助**
