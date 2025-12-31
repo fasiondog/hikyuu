@@ -371,10 +371,6 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
             continue;
         }
 
-        if (ktypes[i] == KQuery::TIMELINE || ktypes[i] == KQuery::TRANS) {
-            continue;
-        }
-
         auto low_ktype = ktypes[i];
         to_lower(low_ktype);
         if (!m_preloadParam.tryGet<bool>(low_ktype, false)) {

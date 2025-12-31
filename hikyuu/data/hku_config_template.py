@@ -54,6 +54,8 @@ min15 = {min15}
 min30 = {min30}
 min60 = {min60}
 hour2= {hour2}
+timeline = {timeline}
+trans = {trans}
 day_max = {day_max}
 week_max = {week_max}
 month_max = {month_max}
@@ -66,6 +68,8 @@ min15_max = {min15_max}
 min30_max = {min30_max}
 min60_max = {min60_max}
 hour2_max = {hour2_max}
+timeline_max = {timeline_max}
+trans_max = {trans_max}
 
 [baseinfo]
 type = sqlite3
@@ -120,6 +124,8 @@ min15 = {min15}
 min30 = {min30}
 min60 = {min60}
 hour2 = {hour2}
+timeline = {timeline}
+trans = {trans}
 day_max = {day_max}
 week_max = {week_max}
 month_max = {month_max}
@@ -132,6 +138,8 @@ min15_max = {min15_max}
 min30_max = {min30_max}
 min60_max = {min60_max}
 hour2_max = {hour2_max}
+timeline_max = {timeline_max}
+trans_max = {trans_max}
 
 [baseinfo]
 type = mysql
@@ -177,6 +185,8 @@ min15 = {min15}
 min30 = {min30}
 min60 = {min60}
 hour2 = {hour2}
+timeline = {timeline}
+trans = {trans}
 day_max = {day_max}
 week_max = {week_max}
 month_max = {month_max}
@@ -189,6 +199,8 @@ min15_max = {min15_max}
 min30_max = {min30_max}
 min60_max = {min60_max}
 hour2_max = {hour2_max}
+timeline_max = {timeline_max}
+trans_max = {trans_max}
 
 [baseinfo]
 type = clickhouse
@@ -291,6 +303,8 @@ min15 = False
 min30 = False
 min60 = False
 hour2 = False
+timeline = False
+trans = False
 day_max = 100000
 week_max = 100000
 month_max = 100000
@@ -303,6 +317,8 @@ min15_max = 5120
 min30_max = 5120
 min60_max = 5120
 hour2_max = 5120
+timeline_max = 5120
+trans_max = 5120
 """
 
 
@@ -317,10 +333,12 @@ def generate_default_config():
                                        day=True, week=False,
                                        month=False, quarter=False, halfyear=False, year=False,
                                        min1=False, min5=False, min15=False, min30=False,
-                                       min60=False, hour2=False, day_max=100000, week_max=100000,
+                                       min60=False, hour2=False, timeline=False, trans=False,
+                                       day_max=100000, week_max=100000,
                                        month_max=100000, quarter_max=100000, halfyear_max=100000,
                                        year_max=100000, min1_max=5120, min5_max=5120, min15_max=5120,
-                                       min30_max=5120, min60_max=5120, hour2_max=5120)
+                                       min30_max=5120, min60_max=5120, hour2_max=5120,
+                                       timeline_max=5120, trans_max=5120)
     config_dir = f"{user_dir}/.hikyuu"
     if not os.path.lexists(config_dir):
         os.makedirs(config_dir)

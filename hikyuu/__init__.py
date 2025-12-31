@@ -243,7 +243,7 @@ def load_hikyuu(**kwargs):
         ktype_list (list): 指定加载的K线类型列表，默认按配置文件设置加载. 如: ['day', 'week', 'month']
                     支持的K线类型有:
                     'day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5',
-                    'min15', 'min30', 'min60', 'hour2'
+                    'min15', 'min30', 'min60', 'hour2', 'timeline', 'trans'
         preload_num (dict): {'day_max': 100000, 'week_max': 100000, 'month_max': 100000, ...}
         load_history_finance (boolean): 预加载历史财务数至内存，默认为 True
         load_weight (boolean): 加载权息数据，默认为 True
@@ -296,7 +296,7 @@ def load_hikyuu(**kwargs):
     preload_param = Parameter()
     preload_config = ini.options('preload')
     for p in preload_config:
-        if p in ('day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5', 'min15', 'min30', 'min60', 'hour2'):
+        if p in ('day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5', 'min15', 'min30', 'min60', 'hour2', 'timeline', 'trans'):
             preload_param[p] = ini.getboolean('preload', p)
         else:
             preload_param[p] = ini.getint('preload', p)

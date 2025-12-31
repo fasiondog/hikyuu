@@ -1164,45 +1164,31 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <property name="leftMargin">
               <number>20</number>
              </property>
-             <item row="12" column="0">
-              <widget class="QCheckBox" name="preload_hour2_checkBox">
-               <property name="text">
-                <string>预加载120分钟线</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="2">
-              <widget class="QSpinBox" name="preload_year_spinBox">
+             <item row="3" column="2">
+              <widget class="QSpinBox" name="preload_month_spinBox">
                <property name="maximum">
                 <number>999999</number>
                </property>
               </widget>
              </item>
-             <item row="11" column="1">
-              <widget class="QLabel" name="label_34">
-               <property name="text">
-                <string>最大缓存数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="label_25">
-               <property name="text">
-                <string>最大缓存数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="2">
-              <widget class="QSpinBox" name="preload_min15_spinBox">
+             <item row="11" column="2">
+              <widget class="QSpinBox" name="preload_min60_spinBox">
                <property name="maximum">
                 <number>999999</number>
                </property>
               </widget>
              </item>
-             <item row="6" column="0">
-              <widget class="QCheckBox" name="preload_year_checkBox">
+             <item row="8" column="0">
+              <widget class="QCheckBox" name="preload_min5_checkBox">
                <property name="text">
-                <string>预加载年线</string>
+                <string>预加载5分钟线</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QCheckBox" name="preload_min1_checkBox">
+               <property name="text">
+                <string>预加载1分钟线</string>
                </property>
               </widget>
              </item>
@@ -1213,20 +1199,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
                </property>
               </widget>
              </item>
-             <item row="2" column="2">
-              <widget class="QSpinBox" name="preload_week_spinBox">
-               <property name="maximum">
-                <number>999999</number>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="4">
-              <widget class="QPushButton" name="save_pushButton">
-               <property name="text">
-                <string>保存设置</string>
-               </property>
-              </widget>
-             </item>
              <item row="9" column="0">
               <widget class="QCheckBox" name="preload_min15_checkBox">
                <property name="text">
@@ -1234,8 +1206,50 @@ li.checked::marker { content: &quot;\2612&quot;; }
                </property>
               </widget>
              </item>
-             <item row="7" column="2">
-              <widget class="QSpinBox" name="preload_min1_spinBox">
+             <item row="12" column="2">
+              <widget class="QSpinBox" name="preload_hour2_spinBox">
+               <property name="maximum">
+                <number>999999</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QSpinBox" name="preload_week_spinBox">
+               <property name="maximum">
+                <number>999999</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="label_25">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2">
+              <widget class="QSpinBox" name="preload_quarter_spinBox">
+               <property name="maximum">
+                <number>999999</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QCheckBox" name="preload_day_checkBox">
+               <property name="text">
+                <string>预加载日线</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QCheckBox" name="preload_week_checkBox">
+               <property name="text">
+                <string>预加载周线</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QSpinBox" name="preload_day_spinBox">
                <property name="maximum">
                 <number>999999</number>
                </property>
@@ -1248,10 +1262,66 @@ li.checked::marker { content: &quot;\2612&quot;; }
                </property>
               </widget>
              </item>
+             <item row="5" column="4">
+              <widget class="QPushButton" name="save_pushButton">
+               <property name="text">
+                <string>保存设置</string>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="0">
+              <widget class="QCheckBox" name="preload_min30_checkBox">
+               <property name="text">
+                <string>预加载30分钟线</string>
+               </property>
+              </widget>
+             </item>
              <item row="4" column="0">
               <widget class="QCheckBox" name="preload_quarter_checkBox">
                <property name="text">
                 <string>预加载季线</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QLabel" name="label_29">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QLabel" name="label_30">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="label_26">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="2">
+              <widget class="QSpinBox" name="preload_halfyear_spinBox">
+               <property name="maximum">
+                <number>999999</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="label_24">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="2">
+              <widget class="QSpinBox" name="preload_year_spinBox">
+               <property name="maximum">
+                <number>999999</number>
                </property>
               </widget>
              </item>
@@ -1271,155 +1341,15 @@ li.checked::marker { content: &quot;\2612&quot;; }
                </property>
               </spacer>
              </item>
-             <item row="10" column="0">
-              <widget class="QCheckBox" name="preload_min30_checkBox">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_59">
                <property name="text">
-                <string>预加载30分钟线</string>
+                <string>0 - 表示不限制</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
-              <widget class="QLabel" name="label_26">
-               <property name="text">
-                <string>最大缓存数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="10" column="2">
-              <widget class="QSpinBox" name="preload_min30_spinBox">
-               <property name="maximum">
-                <number>999999</number>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="1">
-              <widget class="QLabel" name="label_32">
-               <property name="text">
-                <string>最大缓存数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QCheckBox" name="preload_month_checkBox">
-               <property name="text">
-                <string>预加载月线</string>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="0">
-              <widget class="QCheckBox" name="preload_min5_checkBox">
-               <property name="text">
-                <string>预加载5分钟线</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="2">
-              <widget class="QSpinBox" name="preload_halfyear_spinBox">
-               <property name="maximum">
-                <number>999999</number>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QLabel" name="label_27">
-               <property name="text">
-                <string>最大缓存数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QLabel" name="label_28">
-               <property name="text">
-                <string>最大缓存数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QCheckBox" name="preload_day_checkBox">
-               <property name="text">
-                <string>预加载日线</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="2">
-              <widget class="QSpinBox" name="preload_quarter_spinBox">
-               <property name="maximum">
-                <number>999999</number>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="1">
-              <widget class="QLabel" name="label_30">
-               <property name="text">
-                <string>最大缓存数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
-              <widget class="QLabel" name="label_29">
-               <property name="text">
-                <string>最大缓存数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="11" column="0">
-              <widget class="QCheckBox" name="preload_min60_checkBox">
-               <property name="text">
-                <string>预加载60分钟线</string>
-               </property>
-              </widget>
-             </item>
-             <item row="10" column="1">
-              <widget class="QLabel" name="label_33">
-               <property name="text">
-                <string>最大缓存数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QCheckBox" name="preload_week_checkBox">
-               <property name="text">
-                <string>预加载周线</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QCheckBox" name="preload_halfyear_checkBox">
-               <property name="text">
-                <string>预加载半年线</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
-              <widget class="QCheckBox" name="preload_min1_checkBox">
-               <property name="text">
-                <string>预加载1分钟线</string>
-               </property>
-              </widget>
-             </item>
-             <item row="11" column="2">
-              <widget class="QSpinBox" name="preload_min60_spinBox">
-               <property name="maximum">
-                <number>999999</number>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
-              <widget class="QSpinBox" name="preload_month_spinBox">
-               <property name="maximum">
-                <number>999999</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="label_24">
-               <property name="text">
-                <string>最大缓存数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="12" column="2">
-              <widget class="QSpinBox" name="preload_hour2_spinBox">
+             <item row="9" column="2">
+              <widget class="QSpinBox" name="preload_min15_spinBox">
                <property name="maximum">
                 <number>999999</number>
                </property>
@@ -1432,19 +1362,131 @@ li.checked::marker { content: &quot;\2612&quot;; }
                </property>
               </widget>
              </item>
-             <item row="1" column="2">
-              <widget class="QSpinBox" name="preload_day_spinBox">
+             <item row="13" column="0">
+              <widget class="QCheckBox" name="preload_timeline_checkBox">
+               <property name="text">
+                <string>预加载分时线</string>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="0">
+              <widget class="QCheckBox" name="preload_min60_checkBox">
+               <property name="text">
+                <string>预加载60分钟线</string>
+               </property>
+              </widget>
+             </item>
+             <item row="13" column="2">
+              <widget class="QSpinBox" name="preload_timeline_spinBox">
+                <property name="maximum">
+                <number>999999</number>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLabel" name="label_28">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="0">
+              <widget class="QCheckBox" name="preload_hour2_checkBox">
+               <property name="text">
+                <string>预加载120分钟线</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QCheckBox" name="preload_month_checkBox">
+               <property name="text">
+                <string>预加载月线</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="1">
+              <widget class="QLabel" name="label_32">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QCheckBox" name="preload_year_checkBox">
+               <property name="text">
+                <string>预加载年线</string>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="1">
+              <widget class="QLabel" name="label_34">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="13" column="1">
+              <widget class="QLabel" name="label_60">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLabel" name="label_27">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="2">
+              <widget class="QSpinBox" name="preload_min30_spinBox">
                <property name="maximum">
                 <number>999999</number>
                </property>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_59">
+             <item row="5" column="0">
+              <widget class="QCheckBox" name="preload_halfyear_checkBox">
                <property name="text">
-                <string>0 - 表示不限制</string>
+                <string>预加载半年线</string>
                </property>
               </widget>
+             </item>
+             <item row="7" column="2">
+              <widget class="QSpinBox" name="preload_min1_spinBox">
+               <property name="maximum">
+                <number>999999</number>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="1">
+              <widget class="QLabel" name="label_33">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="0">
+              <widget class="QCheckBox" name="preload_trans_checkBox">
+               <property name="text">
+                <string>预加载分笔</string>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="1">
+              <widget class="QLabel" name="label_61">
+               <property name="text">
+                <string>最大缓存数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="2">
+              <widget class="QSpinBox" name="preload_trans_spinBox">
+               <property name="maximum">
+                <number>999999</number>
+               </property>
+              </widget>              
              </item>
             </layout>
            </item>
