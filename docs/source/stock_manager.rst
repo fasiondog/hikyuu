@@ -271,6 +271,14 @@ StockManager/Block/Stock
         :param str category: 板块分类
         :return: 板块列表
         :rtype: BlockList
+
+    .. py:method:: get_block_list_by_index_stock(self, index_stk)
+
+        获取指定指数的板块列表
+
+        :param Stock index_stk: 指数
+        :return: 板块列表
+        :rtype: BlockList        
     
     .. py:method:: get_trading_calendar(self, query[, market='SH'])
     
