@@ -247,6 +247,16 @@ void export_StockManager(py::module& m) {
     :return: 板块列表
     :rtype: BlockList)")
 
+      .def("get_block_list_by_index_stock", &StockManager::getBlockListByIndexStock,
+           py::arg("index_stk"),
+           R"(get_block_list_by_index_stock(self, index_stk)
+
+    获取指定指数的板块列表
+
+    :param Stock index_stk: 指数
+    :return: 板块列表
+    :rtype: BlockList)")
+
       .def("get_trading_calendar", &StockManager::getTradingCalendar, py::arg("query"),
            py::arg("market") = "SH",
            R"(get_trading_calendar(self, query[, market='SH'])

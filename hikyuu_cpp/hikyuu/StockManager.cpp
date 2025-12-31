@@ -561,6 +561,17 @@ BlockList StockManager::getBlockList() {
     return m_blockDriver ? m_blockDriver->getBlockList() : BlockList();
 }
 
+BlockList StockManager::getBlockListByIndexStock(const Stock& stk) {
+    BlockList all = getBlockList();
+    BlockList result;
+    for (auto& blk : all) {
+        if (blk.getIndexStock() == stk) {
+            result.push_back(blk);
+        }
+    }
+    return result;
+}
+
 BlockList StockManager::getStockBelongs(const Stock& stk, const string& category) {
     return m_blockDriver ? m_blockDriver->getStockBelongs(stk, category) : BlockList();
 }
