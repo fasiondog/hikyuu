@@ -109,6 +109,11 @@ except ImportError:
     else:
         plugin_path = os.path.join(os.path.dirname(__file__), 'plugin')
 
+try:
+    from hikyuu_plugin_private import *
+except ImportError:
+    pass
+
 
 sm.set_plugin_path(plugin_path)
 # print(f"current plugin path: {plugin_path}")
