@@ -212,9 +212,15 @@ TimeDelta HKU_UTILS_API UTCOffset() {
     // 计算偏移量（秒）
     return Seconds(local_time - utc_time);
 #else
-    tzset();  // 初始化时区信息
+    static bool g_tz_set = false;
+    static long int g_timezone = 0;
+    if (!g_tz_set) {
+        g_tz_set = true;
+        tzset();  // 初始化时区信息
+        g_timezone = -timezone;
+    }
     // timezone是"UTC - 本地时间"的秒数（UTC+8时，timezone = -28800）
-    return Seconds(-timezone);
+    return Seconds(g_timezone);
 #endif
 }
 
