@@ -399,8 +399,8 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
     }
 
     if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
-        auto finances = m_baseInfoDriver->getAllHistoryFinance();
-        {
+        auto finances = m_baseInfoDriver->getAllHistoryFinance(m_cancel_load);
+        if (!finances.empty() && !m_cancel_load) {
             std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
             for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
                 if (m_cancel_load) {

@@ -219,7 +219,8 @@ public:
     /**
      * 获取所有历史财务信息, 用于列式存储时数据初始化使用
      */
-    virtual unordered_map<string, vector<HistoryFinanceInfo>> getAllHistoryFinance() {
+    virtual unordered_map<string, vector<HistoryFinanceInfo>> getAllHistoryFinance(
+      const std::atomic<bool>& cancel_flag) {
         HKU_ERROR("Not support getAllHistoryFinance()!");
         return unordered_map<string, vector<HistoryFinanceInfo>>();
     }
