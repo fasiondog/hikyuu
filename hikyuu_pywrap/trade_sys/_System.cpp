@@ -7,6 +7,7 @@
 
 #include <hikyuu/trade_sys/system/build_in.h>
 #include "../pybind_utils.h"
+#include "_System.h"
 
 namespace py = pybind11;
 using namespace hku;
@@ -21,120 +22,111 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
-class HIDDEN PySystem : public System {
-    PY_CLONE(PySystem, System)
+PySystem::PySystem(const System& base) : System(base) {}
 
-public:
-    using System::System;
-    PySystem(const System& base) : System(base) {}
+void PySystem::run(const KData& kdata, bool reset, bool resetAll) {
+    PYBIND11_OVERLOAD(void, System, run, kdata, reset, resetAll);
+}
 
-    virtual void run(const KData& kdata, bool reset, bool resetAll) override {
-        PYBIND11_OVERLOAD(void, System, run, kdata, reset, resetAll);
+TradeRecord PySystem::runMoment(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(TradeRecord, System, runMoment, datetime);
+}
+
+TradeRecord PySystem::runMomentOnOpen(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(TradeRecord, System, runMomentOnOpen, datetime);
+}
+
+TradeRecord PySystem::runMomentOnClose(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(TradeRecord, System, runMomentOnClose, datetime);
+}
+
+void PySystem::readyForRun() {
+    PYBIND11_OVERLOAD(void, System, readyForRun);
+}
+
+void PySystem::_reset() {
+    PYBIND11_OVERLOAD(void, System, _reset);
+}
+
+void PySystem::_forceResetAll() {
+    PYBIND11_OVERLOAD(void, System, _forceResetAll);
+}
+
+string PySystem::str() const {
+    PYBIND11_OVERLOAD(string, System, str);
+}
+
+void PySystem::set_mm(py::object mm) {
+    HKU_IF_RETURN(!mm || mm.is_none(), void());
+    setMM(mm.cast<MMPtr>());
+    if (m_mm && m_mm->isPythonObject()) {
+        m_py_mm = mm;
     }
+}
 
-    virtual TradeRecord runMoment(const Datetime& datetime) override {
-        PYBIND11_OVERLOAD(TradeRecord, System, runMoment, datetime);
+void PySystem::set_ev(py::object ev) {
+    HKU_IF_RETURN(!ev || ev.is_none(), void());
+    setEV(ev.cast<EnvironmentPtr>());
+    if (m_ev && m_ev->isPythonObject()) {
+        m_py_ev = ev;
     }
+}
 
-    virtual TradeRecord runMomentOnOpen(const Datetime& datetime) override {
-        PYBIND11_OVERLOAD(TradeRecord, System, runMomentOnOpen, datetime);
+void PySystem::set_cn(py::object cn) {
+    HKU_IF_RETURN(!cn || cn.is_none(), void());
+    setCN(cn.cast<CNPtr>());
+    if (m_cn && m_cn->isPythonObject()) {
+        m_py_cn = cn;
     }
+}
 
-    virtual TradeRecord runMomentOnClose(const Datetime& datetime) override {
-        PYBIND11_OVERLOAD(TradeRecord, System, runMomentOnClose, datetime);
+void PySystem::set_sg(py::object sg) {
+    HKU_IF_RETURN(!sg || sg.is_none(), void());
+    setSG(sg.cast<SGPtr>());
+    if (m_sg && m_sg->isPythonObject()) {
+        m_py_sg = sg;
     }
+}
 
-    virtual void readyForRun() override {
-        PYBIND11_OVERLOAD(void, System, readyForRun);
+void PySystem::set_st(py::object st) {
+    HKU_IF_RETURN(!st || st.is_none(), void());
+    setST(st.cast<StoplossPtr>());
+    if (m_st && m_st->isPythonObject()) {
+        m_py_st = st;
     }
+}
 
-    virtual void _reset() override {
-        PYBIND11_OVERLOAD(void, System, _reset);
+void PySystem::set_tp(py::object tp) {
+    HKU_IF_RETURN(!tp || tp.is_none(), void());
+    setTP(tp.cast<StoplossPtr>());
+    if (m_tp && m_tp->isPythonObject()) {
+        m_py_tp = tp;
     }
+}
 
-    virtual void _forceResetAll() override {
-        PYBIND11_OVERLOAD(void, System, _forceResetAll);
+void PySystem::set_pg(py::object pg) {
+    HKU_IF_RETURN(!pg || pg.is_none(), void());
+    setPG(pg.cast<PGPtr>());
+    if (m_pg && m_pg->isPythonObject()) {
+        m_py_pg = pg;
     }
+}
 
-    virtual string str() const override {
-        PYBIND11_OVERLOAD(string, System, str);
+void PySystem::set_sp(py::object sp) {
+    HKU_IF_RETURN(!sp || sp.is_none(), void());
+    setSP(sp.cast<SlippagePtr>());
+    if (m_sp && m_sp->isPythonObject()) {
+        m_py_sp = sp;
     }
+}
 
-public:
-    void set_mm(py::object mm) {
-        HKU_IF_RETURN(mm.is_none(), void());
-        setMM(mm.cast<MMPtr>());
-        if (m_mm && m_mm->isPythonObject()) {
-            m_py_mm = mm;
-        }
+void PySystem::set_tm(py::object tm) {
+    HKU_IF_RETURN(!tm || tm.is_none(), void());
+    setTM(tm.cast<TradeManagerPtr>());
+    if (m_tm && m_tm->isPythonObject()) {
+        m_py_tm = tm;
     }
-
-    void set_ev(py::object ev) {
-        HKU_IF_RETURN(ev.is_none(), void());
-        setEV(ev.cast<EnvironmentPtr>());
-        if (m_ev && m_ev->isPythonObject()) {
-            m_py_ev = ev;
-        }
-    }
-
-    void set_cn(py::object cn) {
-        HKU_IF_RETURN(cn.is_none(), void());
-        setCN(cn.cast<CNPtr>());
-        if (m_cn && m_cn->isPythonObject()) {
-            m_py_cn = cn;
-        }
-    }
-
-    void set_sg(py::object sg) {
-        HKU_IF_RETURN(sg.is_none(), void());
-        setSG(sg.cast<SGPtr>());
-        if (m_sg && m_sg->isPythonObject()) {
-            m_py_sg = sg;
-        }
-    }
-
-    void set_st(py::object st) {
-        HKU_IF_RETURN(st.is_none(), void());
-        setST(st.cast<StoplossPtr>());
-        if (m_st && m_st->isPythonObject()) {
-            m_py_st = st;
-        }
-    }
-
-    void set_tp(py::object tp) {
-        HKU_IF_RETURN(tp.is_none(), void());
-        setTP(tp.cast<StoplossPtr>());
-        if (m_tp && m_tp->isPythonObject()) {
-            m_py_tp = tp;
-        }
-    }
-
-    void set_pg(py::object pg) {
-        HKU_IF_RETURN(pg.is_none(), void());
-        setPG(pg.cast<PGPtr>());
-        if (m_pg && m_pg->isPythonObject()) {
-            m_py_pg = pg;
-        }
-    }
-
-    void set_sp(py::object sp) {
-        HKU_IF_RETURN(sp.is_none(), void());
-        setSP(sp.cast<SlippagePtr>());
-        if (m_sp && m_sp->isPythonObject()) {
-            m_py_sp = sp;
-        }
-    }
-
-private:
-    py::object m_py_mm;
-    py::object m_py_ev;
-    py::object m_py_cn;
-    py::object m_py_sg;
-    py::object m_py_st;
-    py::object m_py_tp;
-    py::object m_py_pg;
-    py::object m_py_sp;
-};
+}
 
 void export_System(py::module& m) {
     m.def("get_system_part_name", getSystemPartName, R"(get_system_part_name(part)
@@ -217,11 +209,11 @@ void export_System(py::module& m) {
 
       .def_property("to", &System::getTO, &System::setTO, "交易对象 KData")
 
-      .def_property("tm", &System::getTM, &System::setTM, "关联的交易管理实例")
+      //   .def_property("tm", &System::getTM, &System::setTM, "关联的交易管理实例")
 
-      //   .def_property(
-      //     "tm", &System::getTM, [](PySystem& self, py::object py_tm) { self.set_tm(py_tm); },
-      //     "关联的交易管理实例")
+      .def_property(
+        "tm", &System::getTM, [](PySystem& self, py::object py_tm) { self.set_tm(py_tm); },
+        "关联的交易管理实例")
       .def_property(
         "mm", &System::getMM, [](PySystem& self, py::object py_mm) { self.set_mm(py_mm); },
         "资金管理策略")
@@ -356,9 +348,9 @@ void export_System(py::module& m) {
           }
 
           auto sys = make_shared<System>("SYS_Simple");
-          sys->setTM(ctm);
+          //   sys->setTM(ctm);
           auto* sys_ptr = (PySystem*)sys.get();
-          //   sys_ptr->set_tm(tm);
+          sys_ptr->set_tm(tm);
           sys_ptr->set_mm(mm);
           sys_ptr->set_ev(ev);
           sys_ptr->set_cn(cn);
