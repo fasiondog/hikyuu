@@ -11,9 +11,116 @@
 namespace py = pybind11;
 using namespace hku;
 
+#ifdef _MSC_VER
+#define HIDDEN __declspec(hidden)
+#else
+#define HIDDEN __attribute__((visibility("hidden")))
+#endif
+
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #endif
+
+class HIDDEN PySystem : public System {
+    PY_CLONE(PySystem, System)
+
+public:
+    using System::System;
+    PySystem(const System& base) : System(base) {}
+
+    virtual void run(const KData& kdata, bool reset, bool resetAll) override {
+        PYBIND11_OVERLOAD(void, System, run, kdata, reset, resetAll);
+    }
+
+    virtual TradeRecord runMoment(const Datetime& datetime) override {
+        PYBIND11_OVERLOAD(TradeRecord, System, runMoment, datetime);
+    }
+
+    virtual TradeRecord runMomentOnOpen(const Datetime& datetime) override {
+        PYBIND11_OVERLOAD(TradeRecord, System, runMomentOnOpen, datetime);
+    }
+
+    virtual TradeRecord runMomentOnClose(const Datetime& datetime) override {
+        PYBIND11_OVERLOAD(TradeRecord, System, runMomentOnClose, datetime);
+    }
+
+    virtual void readyForRun() override {
+        PYBIND11_OVERLOAD(void, System, readyForRun);
+    }
+
+    virtual void _reset() override {
+        PYBIND11_OVERLOAD(void, System, _reset);
+    }
+
+    virtual void _forceResetAll() override {
+        PYBIND11_OVERLOAD(void, System, _forceResetAll);
+    }
+
+    virtual string str() const override {
+        PYBIND11_OVERLOAD(string, System, str);
+    }
+
+public:
+    // void set_tm(py::object tm) {
+    //     setTM(tm.cast<TMPtr>());
+    //     if (m_tm->isPythonObject()) {
+    //         m_py_tm = tm;
+    //     }
+    // }
+
+    void set_mm(py::object mm) {
+        m_py_mm = mm;
+        setMM(mm.cast<MMPtr>());
+    }
+
+    void set_ev(py::object ev) {
+        m_py_ev = ev;
+        setEV(ev.cast<EnvironmentPtr>());
+    }
+
+    void set_cn(py::object cn) {
+        m_py_cn = cn;
+        setCN(cn.cast<CNPtr>());
+    }
+
+    void set_sg(py::object sg) {
+        setSG(sg.cast<SGPtr>());
+        if (m_sg && m_sg->isPythonObject()) {
+            m_py_sg = sg;
+        }
+    }
+
+    void set_st(py::object st) {
+        m_py_st = st;
+        setST(st.cast<StoplossPtr>());
+    }
+
+    void set_tp(py::object tp) {
+        m_py_tp = tp;
+        setTP(tp.cast<StoplossPtr>());
+    }
+
+    void set_pg(py::object pg) {
+        m_py_pg = pg;
+        setPG(pg.cast<PGPtr>());
+    }
+
+    void set_sp(py::object sp) {
+        m_py_sp = sp;
+        setSP(sp.cast<SlippagePtr>());
+    }
+
+private:
+    // py::object m_py_tm;
+    py::object m_py_mm;
+    py::object m_py_ev;
+    py::object m_py_cn;
+    py::object m_py_sg;
+    py::object m_py_st;
+    py::object m_py_tp;
+    py::object m_py_pg;
+    py::object m_py_sp;
+};
 
 void export_System(py::module& m) {
     m.def("get_system_part_name", getSystemPartName, R"(get_system_part_name(part)
@@ -64,8 +171,9 @@ void export_System(py::module& m) {
         DEF_PICKLE(TradeRequest);
 
     //--------------------------------------------------------------------------------------
-    py::class_<System, SystemPtr>(m, "System",
-                                  R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
+    py::class_<System, SystemPtr, PySystem>(
+      m, "System",
+      R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
 
 系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
@@ -94,14 +202,30 @@ void export_System(py::module& m) {
       .def_property_readonly("query", &System::getQuery, py::return_value_policy::copy, "查询条件")
       .def_property("tm", &System::getTM, &System::setTM, "关联的交易管理实例")
       .def_property("to", &System::getTO, &System::setTO, "交易对象 KData")
-      .def_property("mm", &System::getMM, &System::setMM, "资金管理策略")
-      .def_property("ev", &System::getEV, &System::setEV, "市场环境判断策略")
-      .def_property("cn", &System::getCN, &System::setCN, "系统有效条件")
-      .def_property("sg", &System::getSG, &System::setSG, "信号指示器")
-      .def_property("st", &System::getST, &System::setST, "止损策略")
-      .def_property("tp", &System::getTP, &System::setTP, "止盈策略")
-      .def_property("pg", &System::getPG, &System::setPG, "盈利目标策略")
-      .def_property("sp", &System::getSP, &System::setSP, "移滑价差算法")
+      .def_property(
+        "mm", &System::getMM, [](PySystem& self, py::object py_mm) { self.set_mm(py_mm); },
+        "资金管理策略")
+      .def_property(
+        "ev", &System::getEV, [](PySystem& self, py::object py_ev) { self.set_ev(py_ev); },
+        "市场环境判断策略")
+      .def_property(
+        "cn", &System::getCN, [](PySystem& self, py::object py_tm) { self.set_cn(py_tm); },
+        "系统有效条件")
+      .def_property(
+        "sg", &System::getSG, [](PySystem& self, py::object py_sig) { self.set_sg(py_sig); },
+        "信号指示器")
+      .def_property(
+        "st", &System::getST, [](PySystem& self, py::object py_st) { self.set_st(py_st); },
+        "止损策略")
+      .def_property(
+        "tp", &System::getTP, [](PySystem& self, py::object py_tp) { self.set_tp(py_tp); },
+        "止盈策略")
+      .def_property(
+        "pg", &System::getPG, [](PySystem& self, py::object py_pg) { self.set_pg(py_pg); },
+        "盈利目标策略")
+      .def_property(
+        "sp", &System::getSP, [](PySystem& self, py::object py_sp) { self.set_sp(py_sp); },
+        "移滑价差算法")
 
       .def("get_param", &System::getParam<boost::any>, R"(get_param(self, name)
 

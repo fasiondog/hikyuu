@@ -130,7 +130,6 @@ public:
     /** 子类计算接口，在setTO中调用 */
     virtual void _calculate(const KData&) = 0;
 
-protected:
     virtual bool isPythonObject() const {
         return false;
     }
