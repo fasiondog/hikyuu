@@ -216,7 +216,6 @@ TimeDelta HKU_UTILS_API UTCOffset() {
     });
 #else
     std::call_once(g_tz_set, []() {
-        g_tz_set = true;
         tzset();  // 初始化时区信息
 
         // timezone是"UTC - 本地时间"的秒数（UTC+8时，timezone = -28800）
