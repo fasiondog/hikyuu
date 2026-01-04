@@ -16,46 +16,30 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
-PySystem::PySystem(const System& base) : System(base) {}
+PySystem::PySystem(const System& base) : System(base) {
+    py::gil_scoped_acquire gil;
+    m_py_ev.release();
+    m_py_cn.release();
+    m_py_st.release();
+    m_py_tp.release();
+    m_py_pg.release();
+    m_py_sp.release();
+    m_py_mm.release();
+    m_py_sg.release();
+    m_py_tm.release();
+}
 
 PySystem::~PySystem() {
     py::gil_scoped_acquire gil;
-
-    if (m_py_ev && !m_py_ev.is_none()) {
-        m_py_ev.release();
-    }
-
-    if (m_py_cn && !m_py_cn.is_none()) {
-        m_py_cn.release();
-    }
-
-    if (m_py_st && !m_py_st.is_none()) {
-        m_py_st.release();
-    }
-
-    if (m_py_tp && !m_py_tp.is_none()) {
-        m_py_tp.release();
-    }
-
-    if (m_py_pg && !m_py_pg.is_none()) {
-        m_py_pg.release();
-    }
-
-    if (m_py_sp && !m_py_sp.is_none()) {
-        m_py_sp.release();
-    }
-
-    if (m_py_mm && !m_py_mm.is_none()) {
-        m_py_mm.release();
-    }
-
-    if (m_py_sg && !m_py_sg.is_none()) {
-        m_py_sg.release();
-    }
-
-    if (m_py_tm && !m_py_tm.is_none()) {
-        m_py_tm.release();
-    }
+    m_py_ev.release();
+    m_py_cn.release();
+    m_py_st.release();
+    m_py_tp.release();
+    m_py_pg.release();
+    m_py_sp.release();
+    m_py_mm.release();
+    m_py_sg.release();
+    m_py_tm.release();
 }
 
 void PySystem::run(const KData& kdata, bool reset, bool resetAll) {
@@ -91,73 +75,91 @@ string PySystem::str() const {
 }
 
 void PySystem::set_mm(py::object mm) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!mm || mm.is_none(), void());
     setMM(mm.cast<MMPtr>());
     if (m_mm && m_mm->isPythonObject()) {
+        m_py_mm.release();
         m_py_mm = mm;
     }
 }
 
 void PySystem::set_ev(py::object ev) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!ev || ev.is_none(), void());
     setEV(ev.cast<EnvironmentPtr>());
     if (m_ev && m_ev->isPythonObject()) {
+        m_py_ev.release();
         m_py_ev = ev;
     }
 }
 
 void PySystem::set_cn(py::object cn) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!cn || cn.is_none(), void());
     setCN(cn.cast<CNPtr>());
     if (m_cn && m_cn->isPythonObject()) {
+        m_py_cn.release();
         m_py_cn = cn;
     }
 }
 
 void PySystem::set_sg(py::object sg) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!sg || sg.is_none(), void());
     setSG(sg.cast<SGPtr>());
     if (m_sg && m_sg->isPythonObject()) {
+        m_py_sg.release();
         m_py_sg = sg;
     }
 }
 
 void PySystem::set_st(py::object st) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!st || st.is_none(), void());
     setST(st.cast<StoplossPtr>());
     if (m_st && m_st->isPythonObject()) {
+        m_py_st.release();
         m_py_st = st;
     }
 }
 
 void PySystem::set_tp(py::object tp) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!tp || tp.is_none(), void());
     setTP(tp.cast<StoplossPtr>());
     if (m_tp && m_tp->isPythonObject()) {
+        m_py_tp.release();
         m_py_tp = tp;
     }
 }
 
 void PySystem::set_pg(py::object pg) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!pg || pg.is_none(), void());
     setPG(pg.cast<PGPtr>());
     if (m_pg && m_pg->isPythonObject()) {
+        m_py_pg.release();
         m_py_pg = pg;
     }
 }
 
 void PySystem::set_sp(py::object sp) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!sp || sp.is_none(), void());
     setSP(sp.cast<SlippagePtr>());
     if (m_sp && m_sp->isPythonObject()) {
+        m_py_sp.release();
         m_py_sp = sp;
     }
 }
 
 void PySystem::set_tm(py::object tm) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!tm || tm.is_none(), void());
     setTM(tm.cast<TradeManagerPtr>());
     if (m_tm && m_tm->isPythonObject()) {
+        m_py_tm.release();
         m_py_tm = tm;
     }
 }

@@ -16,18 +16,18 @@
 namespace py = pybind11;
 using namespace hku;
 
-PyPortfolio::PyPortfolio(const Portfolio& base) : Portfolio(base) {}
+PyPortfolio::PyPortfolio(const Portfolio& base) : Portfolio(base) {
+    py::gil_scoped_acquire gil;
+    m_py_af.release();
+    m_py_se.release();
+    m_py_tm.release();
+}
 
 PyPortfolio::~PyPortfolio() {
-    if (m_py_af && !m_py_af.is_none()) {
-        m_py_af.release();
-    }
-    if (m_py_se && !m_py_se.is_none()) {
-        m_py_se.release();
-    }
-    if (m_py_tm && !m_py_tm.is_none()) {
-        m_py_tm.release();
-    }
+    py::gil_scoped_acquire gil;
+    m_py_af.release();
+    m_py_se.release();
+    m_py_tm.release();
 }
 
 string PyPortfolio::str() const {
@@ -59,17 +59,21 @@ json PyPortfolio::lastSuggestion() const {
 }
 
 void PyPortfolio::set_tm(py::object tm) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!tm || tm.is_none(), void());
     setTM(tm.cast<TradeManagerPtr>());
     if (m_tm && m_tm->isPythonObject()) {
+        m_py_tm.release();
         m_py_tm = tm;
     }
 }
 
 void PyPortfolio::set_se(py::object se) {
+    py::gil_scoped_acquire gil;
     HKU_IF_RETURN(!se || se.is_none(), void());
     setSE(se.cast<SelectorPtr>());
     if (m_se && m_se->isPythonObject()) {
+        m_py_se.release();
         m_py_se = se;
     }
 }
@@ -78,6 +82,7 @@ void PyPortfolio::set_af(py::object af) {
     HKU_IF_RETURN(!af || af.is_none(), void());
     setAF(af.cast<AFPtr>());
     if (m_af && m_af->isPythonObject()) {
+        m_py_af.release();
         m_py_af = af;
     }
 }
