@@ -1,3 +1,11 @@
+/*
+ *  Copyright (c) 2026 hikyuu.org
+ *
+ *  Created on: 2026-01-04
+ *      Author: fasiondog
+ */
+#pragma once
+
 #include <hikyuu/trade_sys/system/build_in.h>
 #include "../pybind_utils.h"
 
@@ -5,7 +13,7 @@ namespace py = pybind11;
 using namespace hku;
 
 #ifdef _MSC_VER
-#define HIDDEN __declspec(hidden)
+#define HIDDEN
 #else
 #define HIDDEN __attribute__((visibility("hidden")))
 #endif
