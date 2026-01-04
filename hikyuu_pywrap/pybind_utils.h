@@ -102,7 +102,7 @@ public:                                                                         
         return this->_clone();                                                   \
     }                                                                            \
                                                                                  \
-protected:                                                                       \
+public:                                                                          \
     inline bool isPythonObject() const override {                                \
         return true;                                                             \
     }

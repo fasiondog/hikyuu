@@ -82,7 +82,6 @@ public:
     /** 子类计算接口，由setTO调用 */
     virtual void _calculate() {}
 
-protected:
     virtual bool isPythonObject() const {
         return false;
     }

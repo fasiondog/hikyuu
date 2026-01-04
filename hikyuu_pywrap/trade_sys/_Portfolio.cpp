@@ -8,14 +8,72 @@
 #include <hikyuu/trade_sys/portfolio/build_in.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_EqualWeight.h>
+#include <hikyuu/trade_sys/portfolio/imp/SimplePortfolio.h>
+#include "_Portfolio.h"
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
 using namespace hku;
 
+PyPortfolio::PyPortfolio(const Portfolio& base) : Portfolio(base) {}
+
+PyPortfolio::~PyPortfolio() {}
+
+string PyPortfolio::str() const {
+    PYBIND11_OVERLOAD(string, PyPortfolio, str);
+}
+
+void PyPortfolio::_reset() {
+    PYBIND11_OVERLOAD(void, PyPortfolio, _reset);
+}
+
+void PyPortfolio::_readyForRun() {
+    PYBIND11_OVERLOAD(void, PyPortfolio, _readyForRun);
+}
+
+void PyPortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
+    PYBIND11_OVERLOAD(void, PyPortfolio, _runMoment, date, nextCycle, adjust);
+}
+
+void PyPortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nextCycle, bool adjust) {
+    PYBIND11_OVERLOAD(void, PyPortfolio, _runMomentOnOpen, date, nextCycle, adjust);
+}
+
+void PyPortfolio::_runMomentOnClose(const Datetime& date, const Datetime& nextCycle, bool adjust) {
+    PYBIND11_OVERLOAD(void, PyPortfolio, _runMomentOnClose, date, nextCycle, adjust);
+}
+
+json PyPortfolio::lastSuggestion() const {
+    PYBIND11_OVERLOAD(json, PyPortfolio, lastSuggestion);
+}
+
+void PyPortfolio::set_tm(py::object tm) {
+    HKU_IF_RETURN(!tm || tm.is_none(), void());
+    setTM(tm.cast<TradeManagerPtr>());
+    if (m_tm && m_tm->isPythonObject()) {
+        m_py_tm = tm;
+    }
+}
+
+void PyPortfolio::set_se(py::object se) {
+    HKU_IF_RETURN(!se || se.is_none(), void());
+    setSE(se.cast<SelectorPtr>());
+    if (m_se && m_se->isPythonObject()) {
+        m_py_se = se;
+    }
+}
+
+void PyPortfolio::set_af(py::object af) {
+    HKU_IF_RETURN(!af || af.is_none(), void());
+    setAF(af.cast<AFPtr>());
+    if (m_af && m_af->isPythonObject()) {
+        m_py_af = af;
+    }
+}
+
 void export_Portfolio(py::module& m) {
-    py::class_<Portfolio, PortfolioPtr>(m, "Portfolio", py::dynamic_attr(),
-                                        R"(实现多标的、多策略的投资组合)")
+    py::class_<Portfolio, PortfolioPtr, PyPortfolio>(m, "Portfolio", py::dynamic_attr(),
+                                                     R"(实现多标的、多策略的投资组合)")
       .def(py::init<>())
       .def(py::init<const string&>())
       .def(py::init<const string&, const TradeManagerPtr&, const SelectorPtr&, const AFPtr&>())
@@ -29,9 +87,15 @@ void export_Portfolio(py::module& m) {
       .def_property("query", &Portfolio::getQuery, &Portfolio::setQuery,
                     py::return_value_policy::copy, "查询条件")
 
-      .def_property("tm", &Portfolio::getTM, &Portfolio::setTM, "设置或获取交易管理对象")
-      .def_property("se", &Portfolio::getSE, &Portfolio::setSE, "设置或获取交易对象选择算法")
-      .def_property("af", &Portfolio::getAF, &Portfolio::setAF, "设置或获取资产分配算法")
+      .def_property(
+        "tm", &Portfolio::getTM, [](PyPortfolio& self, py::object tm) { self.set_tm(tm); },
+        "设置或获取交易管理对象")
+      .def_property(
+        "se", &Portfolio::getSE, [](PyPortfolio& self, py::object se) { self.set_se(se); },
+        "设置或获取交易对象选择算法")
+      .def_property(
+        "af", &Portfolio::getAF, [](PyPortfolio& self, py::object af) { self.set_af(af); },
+        "设置或获取资产分配算法")
       .def_property_readonly("real_sys_list", &Portfolio::getRealSystemList,
                              py::return_value_policy::copy, "由 PF 运行时设定的实际运行系统列表")
 
@@ -77,10 +141,24 @@ void export_Portfolio(py::module& m) {
 
         DEF_PICKLE(Portfolio);
 
-    m.def("PF_Simple", PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
-          py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
-          py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
-          R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
+    m.def(
+      "PF_Simple",
+      [](py::object tm, py::object se, py::object af, int adjust_cycle, const string& adjust_mode,
+         bool delay_to_trading_day) {
+          PortfolioPtr ret = make_shared<SimplePortfolio>();
+          auto* ptr = (PyPortfolio*)ret.get();
+          ptr->set_tm(tm);
+          ptr->set_se(se);
+          ptr->set_af(af);
+          ret->setParam<int>("adjust_cycle", adjust_cycle);
+          ret->setParam<string>("adjust_mode", adjust_mode);
+          ret->setParam<bool>("delay_to_trading_day", delay_to_trading_day);
+          return ret;
+      },
+      py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+      py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+      R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
 
     创建一个多标的、单系统策略的投资组合
 

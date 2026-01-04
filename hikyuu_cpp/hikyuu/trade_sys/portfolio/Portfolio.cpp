@@ -121,7 +121,7 @@ void Portfolio::reset() {
     _reset();
 }
 
-PortfolioPtr Portfolio::clone() const {
+PortfolioPtr Portfolio::clone() {
     PortfolioPtr p = _clone();
     p->m_params = m_params;
     p->m_name = m_name;

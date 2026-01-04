@@ -13,7 +13,7 @@ namespace py = pybind11;
 
 void export_build_in(py::module& m) {
     m.def(
-      "crtTM", crtTM, py::arg("date") = Datetime(199001010000LL), py::arg("init_cash") = 100000,
+      "crtTM", &crtTM, py::arg("date") = Datetime(199001010000LL), py::arg("init_cash") = 100000,
       py::arg("cost_func") = TC_Zero(), py::arg("name") = "SYS",
       R"(crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])
 
