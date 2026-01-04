@@ -24,6 +24,7 @@ class HIDDEN PySystem : public System {
 public:
     using System::System;
     PySystem(const System& base);
+    virtual ~PySystem() override;
 
     virtual void run(const KData& kdata, bool reset, bool resetAll) override;
     virtual TradeRecord runMoment(const Datetime& datetime) override;
@@ -46,13 +47,13 @@ public:
     void set_tm(py::object tm);
 
 private:
-    py::object m_py_mm;
     py::object m_py_ev;
     py::object m_py_cn;
-    py::object m_py_sg;
     py::object m_py_st;
     py::object m_py_tp;
     py::object m_py_pg;
     py::object m_py_sp;
-    py::object m_py_tm;  // 不能放最前面？
+    py::object m_py_mm;
+    py::object m_py_sg;
+    py::object m_py_tm;  // 固定顺序，不能放最前面，mm须在sg之前
 };
