@@ -21,39 +21,39 @@ PySystem::PySystem(const System& base) : System(base) {}
 PySystem::~PySystem() {
     py::gil_scoped_acquire gil;
 
-    if (m_py_ev) {
+    if (m_py_ev && !m_py_ev.is_none()) {
         m_py_ev.release();
     }
 
-    if (m_py_cn) {
+    if (m_py_cn && !m_py_cn.is_none()) {
         m_py_cn.release();
     }
 
-    if (m_py_st) {
+    if (m_py_st && !m_py_st.is_none()) {
         m_py_st.release();
     }
 
-    if (m_py_tp) {
+    if (m_py_tp && !m_py_tp.is_none()) {
         m_py_tp.release();
     }
 
-    if (m_py_pg) {
+    if (m_py_pg && !m_py_pg.is_none()) {
         m_py_pg.release();
     }
 
-    if (m_py_sp) {
+    if (m_py_sp && !m_py_sp.is_none()) {
         m_py_sp.release();
     }
 
-    if (m_py_mm) {
+    if (m_py_mm && !m_py_mm.is_none()) {
         m_py_mm.release();
     }
 
-    if (m_py_sg) {
+    if (m_py_sg && !m_py_sg.is_none()) {
         m_py_sg.release();
     }
 
-    if (m_py_tm) {
+    if (m_py_tm && !m_py_tm.is_none()) {
         m_py_tm.release();
     }
 }

@@ -9,6 +9,7 @@
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_EqualWeight.h>
 #include <hikyuu/trade_sys/portfolio/imp/SimplePortfolio.h>
+#include <hikyuu/trade_sys/portfolio/imp/WithoutAFPortfolio.h>
 #include "_Portfolio.h"
 #include "../pybind_utils.h"
 
@@ -17,7 +18,17 @@ using namespace hku;
 
 PyPortfolio::PyPortfolio(const Portfolio& base) : Portfolio(base) {}
 
-PyPortfolio::~PyPortfolio() {}
+PyPortfolio::~PyPortfolio() {
+    if (m_py_af && !m_py_af.is_none()) {
+        m_py_af.release();
+    }
+    if (m_py_se && !m_py_se.is_none()) {
+        m_py_se.release();
+    }
+    if (m_py_tm && !m_py_tm.is_none()) {
+        m_py_tm.release();
+    }
+}
 
 string PyPortfolio::str() const {
     PYBIND11_OVERLOAD(string, PyPortfolio, str);
@@ -180,10 +191,26 @@ void export_Portfolio(py::module& m) {
     :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日)");
 
     m.def(
-      "PF_WithoutAF", PF_WithoutAF, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
-      py::arg("adjust_cycle") = 1, py::arg("adjust_mode") = "query",
-      py::arg("delay_to_trading_day") = true, py::arg("trade_on_close") = true,
-      py::arg("sys_use_self_tm") = false, py::arg("sell_at_not_selected") = false,
+      "PF_WithoutAF",
+      [](py::object tm, py::object se, int adjust_cycle, const string& adjust_mode,
+         bool delay_to_trading_day, bool trade_on_close, bool sys_use_self_tm,
+         bool sell_at_not_selected) {
+          PortfolioPtr ret = make_shared<WithoutAFPortfolio>();
+          auto* ptr = (PyPortfolio*)ret.get();
+          ptr->set_tm(tm);
+          ptr->set_se(se);
+          ret->setParam<int>("adjust_cycle", adjust_cycle);
+          ret->setParam<string>("adjust_mode", adjust_mode);
+          ret->setParam<bool>("delay_to_trading_day", delay_to_trading_day);
+          ret->setParam<bool>("trade_on_close", trade_on_close);
+          ret->setParam<bool>("sys_use_self_tm", sys_use_self_tm);
+          ret->setParam<bool>("sell_at_not_selected", sell_at_not_selected);
+          return ret;
+      },
+      py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(), py::arg("adjust_cycle") = 1,
+      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+      py::arg("trade_on_close") = true, py::arg("sys_use_self_tm") = false,
+      py::arg("sell_at_not_selected") = false,
       R"(PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False,sell_at_not_selected=False])
     
     创建无资金分配算法的投资组合，所有单系统策略使用共同的 tm 管理账户
