@@ -21,10 +21,6 @@ PySystem::PySystem(const System& base) : System(base) {}
 PySystem::~PySystem() {
     py::gil_scoped_acquire gil;
 
-    if (m_py_ev) {
-        m_py_ev.release();
-    }
-
     if (m_py_cn) {
         m_py_cn.release();
     }
@@ -55,6 +51,46 @@ PySystem::~PySystem() {
 
     if (m_py_tm) {
         m_py_tm.release();
+    }
+
+    if (m_py_ev) {
+        m_py_ev.release();
+    }
+
+    if (m_cn) {
+        m_cn.reset();
+    }
+
+    if (m_st) {
+        m_st.reset();
+    }
+
+    if (m_tp) {
+        m_tp.reset();
+    }
+
+    if (m_pg) {
+        m_pg.reset();
+    }
+
+    if (m_sp) {
+        m_sp.reset();
+    }
+
+    if (m_mm) {
+        m_mm.reset();
+    }
+
+    if (m_sg) {
+        m_sg.reset();
+    }
+
+    if (m_tm) {
+        m_tm.reset();
+    }
+
+    if (m_ev) {
+        m_ev.reset();
     }
 }
 

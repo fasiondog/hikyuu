@@ -47,7 +47,7 @@ public:
     void set_tm(py::object tm);
 
 private:
-    py::object m_py_ev;
+    // 固定顺序，不能放最前面，mm须在sg之前
     py::object m_py_cn;
     py::object m_py_st;
     py::object m_py_tp;
@@ -55,5 +55,6 @@ private:
     py::object m_py_sp;
     py::object m_py_mm;
     py::object m_py_sg;
-    py::object m_py_tm;  // 固定顺序，不能放最前面，mm须在sg之前
+    py::object m_py_tm;
+    py::object m_py_ev;
 };
