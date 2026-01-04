@@ -77,6 +77,7 @@ public:
         if (!m_done) {
             join();
         }
+        m_threads.clear();
     }
 
     /** 获取工作线程数 */
