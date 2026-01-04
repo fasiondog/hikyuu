@@ -18,10 +18,6 @@ using namespace hku;
 #define HIDDEN __attribute__((visibility("hidden")))
 #endif
 
-#if defined(_MSC_VER)
-#pragma warning(disable : 4267)
-#endif
-
 class HIDDEN PySystem : public System {
     PY_CLONE(PySystem, System)
 

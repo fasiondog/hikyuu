@@ -12,12 +12,6 @@
 namespace py = pybind11;
 using namespace hku;
 
-#ifdef _MSC_VER
-#define HIDDEN __declspec(hidden)
-#else
-#define HIDDEN __attribute__((visibility("hidden")))
-#endif
-
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #endif
