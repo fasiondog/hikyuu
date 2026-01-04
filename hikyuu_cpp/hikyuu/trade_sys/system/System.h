@@ -36,7 +36,7 @@ class HKU_API WalkForwardSystem;
  * 交易系统基类
  * @ingroup System
  */
-class HKU_API System {
+class HKU_API System : public enable_shared_from_this<System> {
     PARAMETER_SUPPORT_WITH_CHECK
     friend class HKU_API Portfolio;
     friend class HKU_API AllocateFundsBase;

@@ -6,7 +6,7 @@
  */
 #pragma once
 
-#include <hikyuu/trade_sys/system/build_in.h>
+#include <hikyuu/trade_sys/system/System.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -47,7 +47,7 @@ public:
     void set_tm(py::object tm);
 
 private:
-    // 固定顺序，不能放最前面，mm须在sg之前
+    // 固定顺序很重要, 影响析构
     py::object m_py_cn;
     py::object m_py_st;
     py::object m_py_tp;
