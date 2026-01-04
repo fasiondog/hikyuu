@@ -99,8 +99,10 @@ void GlobalInitializer::clean() {
 
     StockManager &sm = StockManager::instance();
     sm.cancelLoad();
-    while (!sm.dataReady()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    if (sm.initializing()) {
+        while (!sm.dataReady()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
     }
 
 #if HKU_OS_OSX

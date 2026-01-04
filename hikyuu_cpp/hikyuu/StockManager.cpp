@@ -327,8 +327,8 @@ void StockManager::loadAllKData() {
             }
 
             m_load_tg->join();
-            m_load_tg.reset();
             m_data_ready = true;
+            m_load_tg.reset();
         });
         t.detach();
     }
@@ -354,6 +354,9 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
     HKU_IF_RETURN(sh000001.isNull(), loaded_codes);
 
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+        if (m_cancel_load) {
+            break;
+        }
         auto low_ktype = ktypes[i];
         to_lower(low_ktype);
         if (m_preloadParam.tryGet<bool>(low_ktype, false)) {

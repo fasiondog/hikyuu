@@ -90,7 +90,7 @@ public:
 
     /** 是否所有数据准备完毕 */
     bool dataReady() const;
-
+    bool initializing() const;
     /**
      * 根据"市场简称证券代码"获取对应的证券实例
      * @param querystr 格式：“市场简称证券代码”，如"sh000001"
@@ -374,6 +374,10 @@ inline size_t StockManager::size() const {
 
 inline bool StockManager::dataReady() const {
     return m_data_ready;
+}
+
+inline bool StockManager::initializing() const {
+    return m_initializing;
 }
 
 inline Stock StockManager::operator[](const string& query) const {
