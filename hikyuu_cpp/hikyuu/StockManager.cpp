@@ -327,8 +327,8 @@ void StockManager::loadAllKData() {
             }
 
             m_load_tg->join();
-            m_data_ready = true;
             m_load_tg.reset();
+            m_data_ready = true;
         });
         t.detach();
     }
@@ -363,6 +363,8 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
             sh000001.loadKDataToBuffer(ktypes[i]);
         }
     }
+
+    HKU_IF_RETURN(m_cancel_load, loaded_codes);
 
     // 主要受带宽限制，无需多线程
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
