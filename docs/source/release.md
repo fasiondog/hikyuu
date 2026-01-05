@@ -10,7 +10,8 @@
 
 **🐞 缺陷修复**
 
-* feat(datetime): 优化UTC偏移量计算性能，该问题导致 linux 平台下 clickhouse 数据加载比其他平台慢了10倍
+* fixed(datetime): 优化UTC偏移量计算性能，该问题导致 linux 平台下 clickhouse 数据加载比其他平台慢了10倍
+* fixed(python): Python实现的SG等子类在赋值给C++类时可能存在临时变量类型降级的问题，导致 sys.sg = B() 缺失python _clone 实现
 * fix(data): 修复本地数据导入时的可能存在结构体解包格式错误
 * fix(trade_sys): 修复安全止损指标ST_Saftyloss在调用SAFTYLOSS函数时缺少CLOSE()参数
 * feat(_Stock): 为set_kdata_from_df方法添加默认列参数（原和文档说明不符），设置默认的列名参数为["datetime", "open", "high", "low", "close", "amount", "volume"]
