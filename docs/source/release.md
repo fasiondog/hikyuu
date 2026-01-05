@@ -1,5 +1,20 @@
 # 版本发布说明
 
+## 2.7.3 - 2025年1月6日
+
+**🚀 新增特性**
+
+* feat(config): 添加 timeline 和 trans 预加载支持
+* feat(StockManager): 添加根据指数获取板块列表功能
+* feat(plugin_extind): 添加AGG_VWAP指标支持
+
+**🐞 缺陷修复**
+
+* feat(datetime): 优化UTC偏移量计算性能，该问题导致 linux 平台下 clickhouse 数据加载比其他平台慢了10倍
+* fix(data): 修复本地数据导入时的可能存在结构体解包格式错误
+* fix(trade_sys): 修复安全止损指标ST_Saftyloss在调用SAFTYLOSS函数时缺少CLOSE()参数
+* feat(_Stock): 为set_kdata_from_df方法添加默认列参数（原和文档说明不符），设置默认的列名参数为["datetime", "open", "high", "low", "close", "amount", "volume"]
+
 ## 2.7.2 - 2025年12月24日
 
 **🚀 新增特性**
