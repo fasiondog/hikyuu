@@ -38,6 +38,8 @@ static InnerSysInfo* g_sys_info;
 
 void sysinfo_init() {
     g_sys_info = new InnerSysInfo;
+    g_sys_info->latest_version_info.version =
+      HKU_VERSION_MAJOR * 1000000 + HKU_VERSION_MINOR * 1000 + HKU_VERSION_ALTER;
 }
 void sysinfo_clean() {
     if (g_sys_info) {

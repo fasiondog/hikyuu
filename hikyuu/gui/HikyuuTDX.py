@@ -139,6 +139,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         min30=current_config.getboolean('preload', 'min30', fallback=False),
                         min60=current_config.getboolean('preload', 'min60', fallback=False),
                         hour2=current_config.getboolean('preload', 'hour2', fallback=False),
+                        timeline=current_config.getboolean('preload', 'timeline', fallback=False),
+                        trans=current_config.getboolean('preload', 'trans', fallback=False),
                         day_max=current_config.getint('preload', 'day_max', fallback=100000),
                         week_max=current_config.getint('preload', 'week_max', fallback=100000),
                         month_max=current_config.getint('preload', 'month_max', fallback=100000),
@@ -151,6 +153,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         min30_max=current_config.getint('preload', 'min30_max', fallback=4096),
                         min60_max=current_config.getint('preload', 'min60_max', fallback=4096),
                         hour2_max=current_config.getint('preload', 'hour2_max', fallback=4096),
+                        timeline_max=current_config.getint('preload', 'timeline_max', fallback=4096),
+                        trans_max=current_config.getint('preload', 'trans_max', fallback=4096)
                     )
                 )
 
@@ -185,6 +189,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         min30=current_config.getboolean('preload', 'min30', fallback=False),
                         min60=current_config.getboolean('preload', 'min60', fallback=False),
                         hour2=current_config.getboolean('preload', 'hour2', fallback=False),
+                        timeline=current_config.getboolean('preload', 'timeline', fallback=False),
+                        trans=current_config.getboolean('preload', 'trans', fallback=False),
                         day_max=current_config.getint('preload', 'day_max', fallback=100000),
                         week_max=current_config.getint('preload', 'week_max', fallback=100000),
                         month_max=current_config.getint('preload', 'month_max', fallback=100000),
@@ -197,6 +203,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         min30_max=current_config.getint('preload', 'min30_max', fallback=4096),
                         min60_max=current_config.getint('preload', 'min60_max', fallback=4096),
                         hour2_max=current_config.getint('preload', 'hour2_max', fallback=4096),
+                        timeline_max=current_config.getint('preload', 'timeline_max', fallback=4096),
+                        trans_max=current_config.getint('preload', 'trans_max', fallback=4096)
                     )
                 )
         elif current_config.getboolean('clickhouse', 'enable', fallback=True):
@@ -230,6 +238,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         min30=current_config.getboolean('preload', 'min30', fallback=False),
                         min60=current_config.getboolean('preload', 'min60', fallback=False),
                         hour2=current_config.getboolean('preload', 'hour2', fallback=False),
+                        timeline=current_config.getboolean('preload', 'timeline', fallback=False),
+                        trans=current_config.getboolean('preload', 'trans', fallback=False),
                         day_max=current_config.getint('preload', 'day_max', fallback=100000),
                         week_max=current_config.getint('preload', 'week_max', fallback=100000),
                         month_max=current_config.getint('preload', 'month_max', fallback=100000),
@@ -242,6 +252,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         min30_max=current_config.getint('preload', 'min30_max', fallback=4096),
                         min60_max=current_config.getint('preload', 'min60_max', fallback=4096),
                         hour2_max=current_config.getint('preload', 'hour2_max', fallback=4096),
+                        timeline_max=current_config.getint('preload', 'timeline_max', fallback=4096),
+                        trans_max=current_config.getint('preload', 'trans_max', fallback=4096)
                     )
                 )
 
@@ -529,6 +541,8 @@ li.checked::marker { content: "\2612"; }
         self.preload_min30_checkBox.setChecked(import_config.getboolean('preload', 'min30', fallback=False))
         self.preload_min60_checkBox.setChecked(import_config.getboolean('preload', 'min60', fallback=False))
         self.preload_hour2_checkBox.setChecked(import_config.getboolean('preload', 'hour2', fallback=False))
+        self.preload_timeline_checkBox.setChecked(import_config.getboolean('preload', 'timeline', fallback=False))
+        self.preload_trans_checkBox.setChecked(import_config.getboolean('preload', 'trans', fallback=False))
         self.preload_day_spinBox.setValue(import_config.getint('preload', 'day_max', fallback=100000))
         self.preload_week_spinBox.setValue(import_config.getint('preload', 'week_max', fallback=100000))
         self.preload_month_spinBox.setValue(import_config.getint('preload', 'month_max', fallback=100000))
@@ -541,6 +555,8 @@ li.checked::marker { content: "\2612"; }
         self.preload_min30_spinBox.setValue(import_config.getint('preload', 'min30_max', fallback=5120))
         self.preload_min60_spinBox.setValue(import_config.getint('preload', 'min60_max', fallback=5120))
         self.preload_hour2_spinBox.setValue(import_config.getint('preload', 'hour2_max', fallback=5120))
+        self.preload_timeline_spinBox.setValue(import_config.getint('preload', 'timeline_max', fallback=5120))
+        self.preload_trans_spinBox.setValue(import_config.getint('preload', 'trans_max', fallback=5120))
 
     def getCurrentConfig(self):
         import_config = ConfigParser()
@@ -626,6 +642,8 @@ li.checked::marker { content: "\2612"; }
             'min30': self.preload_min30_checkBox.isChecked(),
             'min60': self.preload_min60_checkBox.isChecked(),
             'hour2': self.preload_hour2_checkBox.isChecked(),
+            'timeline': self.preload_timeline_checkBox.isChecked(),
+            'trans': self.preload_trans_checkBox.isChecked(),
             'day_max': self.preload_day_spinBox.value(),
             'week_max': self.preload_week_spinBox.value(),
             'month_max': self.preload_month_spinBox.value(),
@@ -638,6 +656,8 @@ li.checked::marker { content: "\2612"; }
             'min30_max': self.preload_min30_spinBox.value(),
             'min60_max': self.preload_min60_spinBox.value(),
             'hour2_max': self.preload_hour2_spinBox.value(),
+            'timeline_max': self.preload_timeline_spinBox.value(),
+            'trans_max': self.preload_trans_spinBox.value()
         }
         return import_config
 

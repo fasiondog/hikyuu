@@ -354,12 +354,17 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
     HKU_IF_RETURN(sh000001.isNull(), loaded_codes);
 
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+        if (m_cancel_load) {
+            break;
+        }
         auto low_ktype = ktypes[i];
         to_lower(low_ktype);
         if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
             sh000001.loadKDataToBuffer(ktypes[i]);
         }
     }
+
+    HKU_IF_RETURN(m_cancel_load, loaded_codes);
 
     // 主要受带宽限制，无需多线程
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
@@ -368,10 +373,6 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
         }
 
         if (canLazyLoad(ktypes[i])) {
-            continue;
-        }
-
-        if (ktypes[i] == KQuery::TIMELINE || ktypes[i] == KQuery::TRANS) {
             continue;
         }
 
@@ -403,8 +404,8 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
     }
 
     if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
-        auto finances = m_baseInfoDriver->getAllHistoryFinance();
-        {
+        auto finances = m_baseInfoDriver->getAllHistoryFinance(m_cancel_load);
+        if (!finances.empty() && !m_cancel_load) {
             std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
             for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
                 if (m_cancel_load) {
@@ -559,6 +560,17 @@ BlockList StockManager::getBlockList(const string& category) {
 
 BlockList StockManager::getBlockList() {
     return m_blockDriver ? m_blockDriver->getBlockList() : BlockList();
+}
+
+BlockList StockManager::getBlockListByIndexStock(const Stock& stk) {
+    BlockList all = getBlockList();
+    BlockList result;
+    for (auto& blk : all) {
+        if (blk.getIndexStock() == stk) {
+            result.push_back(blk);
+        }
+    }
+    return result;
 }
 
 BlockList StockManager::getStockBelongs(const Stock& stk, const string& category) {

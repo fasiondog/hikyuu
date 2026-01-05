@@ -26,6 +26,7 @@ HttpResponse::HttpResponse() {
 HttpResponse::~HttpResponse() {
     if (m_res) {
         nng_http_res_free(m_res);
+        m_res = nullptr;
     }
 }
 
@@ -177,10 +178,10 @@ HttpResponse HttpClient::_readResChunk(const std::string& method, const std::str
         } else if (NNG_ETIMEDOUT == rv) {
             throw HttpTimeoutException();
         } else if (NNG_ECLOSED == rv || NNG_ECONNSHUT == rv || NNG_ECONNREFUSED == rv) {
-            // HKU_DEBUG("rv: {}", nng_strerror(rv));
             reset();
             res.reset();
         } else {
+            reset();
             HKU_THROW("[NNG_ERROR] {} ", nng_strerror(rv));
         }
     }

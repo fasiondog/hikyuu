@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/StockManager.h"
+#include "hikyuu/indicator/build_in.h"
 #include "interface/plugins.h"
 #include "extind.h"
 
@@ -93,6 +94,14 @@ Indicator HKU_API AGG_QUANTILE(const Indicator& ind, const KQuery::KType& ktype,
     params.set<int>("unit", unit);
     params.set<double>("quantile", quantile);
     return getExtIndicator("AGG_QUANTILE", ind, params);
+}
+
+Indicator HKU_API AGG_VWAP(const KQuery::KType& ktype, bool fill_null, int unit) {
+    Parameter params;
+    params.set<string>("ktype", ktype);
+    params.set<bool>("fill_null", fill_null);
+    params.set<int>("unit", unit);
+    return getExtIndicator("AGG_VWAP", CLOSE(), params);
 }
 
 Indicator HKU_API AGG_FUNC(const Indicator& ind, agg_func_t agg_func, const KQuery::KType& ktype,

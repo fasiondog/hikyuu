@@ -3,7 +3,7 @@
 # cp936
 
 import atexit
-import io
+import time
 import locale
 from pathlib import Path
 import pickle
@@ -66,7 +66,7 @@ except Exception as e:
     print("{}: {}".format(info[0].__name__, info[1]))
     print(traceback.format_exc())
     print("""请使用 pipdeptree -p hikyuu 检查是否存在缺失的依赖包。
-如果没有问题可以在 https://gitee.com/fasiondog/hikyuu 或 https://github.com/fasiondog/hikyuu 
+如果没有问题可以在 https://gitee.com/fasiondog/hikyuu 或 https://github.com/fasiondog/hikyuu
 上提交 issue，同时附上 "用户目录/.hikyuu" 下的 hikyuu_py.log 和 hikyuu.log 日志文件 """)
     raise e
 
@@ -74,15 +74,22 @@ except Exception as e:
 __version__ = get_version()
 
 
+sm = StockManager.instance()
+
+
 def hku_cleanup():
+    # macosx 中clickhouse必须在python中等待退出，其他平台无问题
+    local_sm = StockManager.instance()
+    local_sm.cancel_load()
+    while not local_sm.data_ready:
+        time.sleep(0.1)
+
     # 释放所有K线数据, 用于防止python实现的扩展K线转换函数由于GIL导致退出时异常
     release_extra_ktype()
 
 
 atexit.register(hku_cleanup)
 
-
-sm = StockManager.instance()
 
 # 尝试寻找 hikyuu_plugin python包，并获取其所在目录
 try:
@@ -108,6 +115,11 @@ except ImportError:
         plugin_path = str(plugin_path)
     else:
         plugin_path = os.path.join(os.path.dirname(__file__), 'plugin')
+
+try:
+    from hikyuu_plugin_private import *
+except ImportError:
+    pass
 
 
 sm.set_plugin_path(plugin_path)
@@ -243,7 +255,7 @@ def load_hikyuu(**kwargs):
         ktype_list (list): 指定加载的K线类型列表，默认按配置文件设置加载. 如: ['day', 'week', 'month']
                     支持的K线类型有:
                     'day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5',
-                    'min15', 'min30', 'min60', 'hour2'
+                    'min15', 'min30', 'min60', 'hour2', 'timeline', 'trans'
         preload_num (dict): {'day_max': 100000, 'week_max': 100000, 'month_max': 100000, ...}
         load_history_finance (boolean): 预加载历史财务数至内存，默认为 True
         load_weight (boolean): 加载权息数据，默认为 True
@@ -296,7 +308,7 @@ def load_hikyuu(**kwargs):
     preload_param = Parameter()
     preload_config = ini.options('preload')
     for p in preload_config:
-        if p in ('day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5', 'min15', 'min30', 'min60', 'hour2'):
+        if p in ('day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5', 'min15', 'min30', 'min60', 'hour2', 'timeline', 'trans'):
             preload_param[p] = ini.getboolean('preload', p)
         else:
             preload_param[p] = ini.getint('preload', p)

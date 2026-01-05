@@ -152,7 +152,6 @@ public:
     /** 子类克隆私有变量接口 */
     virtual MoneyManagerPtr _clone() = 0;
 
-protected:
     virtual bool isPythonObject() const {
         return false;
     }

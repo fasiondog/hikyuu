@@ -194,28 +194,36 @@ TimeDelta TimeDelta::operator%(TimeDelta td) const {
 }
 
 TimeDelta HKU_UTILS_API UTCOffset() {
+    static std::once_flag g_tz_set;
+    static long int g_timezone = 0;
 #if HKU_OS_WINDOWS
-    // 获取当前时间戳
-    time_t now = std::time(nullptr);
+    std::call_once(g_tz_set, []() {
+        // 获取当前时间戳
+        time_t now = std::time(nullptr);
 
-    // 在 Windows 上使用 gmtime_s
-    struct tm local_tm;
-    struct tm utc_tm;
-    errno_t err = gmtime_s(&utc_tm, &now);
-    HKU_CHECK(err == 0, "gmtime_s error!");
-    err = localtime_s(&local_tm, &now);
-    HKU_CHECK(err == 0, "gmtime_s error!");
+        // 在 Windows 上使用 gmtime_s
+        struct tm local_tm;
+        struct tm utc_tm;
+        errno_t err = gmtime_s(&utc_tm, &now);
+        HKU_CHECK(err == 0, "gmtime_s error!");
+        err = localtime_s(&local_tm, &now);
+        HKU_CHECK(err == 0, "gmtime_s error!");
 
-    time_t local_time = mktime(&local_tm);
-    time_t utc_time = mktime(&utc_tm);
-
-    // 计算偏移量（秒）
-    return Seconds(local_time - utc_time);
+        time_t local_time = mktime(&local_tm);
+        time_t utc_time = mktime(&utc_tm);
+        // 计算偏移量（秒）
+        g_timezone = local_time - utc_time;
+    });
 #else
-    tzset();  // 初始化时区信息
-    // timezone是"UTC - 本地时间"的秒数（UTC+8时，timezone = -28800）
-    return Seconds(-timezone);
+    std::call_once(g_tz_set, []() {
+        tzset();  // 初始化时区信息
+
+        // timezone是"UTC - 本地时间"的秒数（UTC+8时，timezone = -28800）
+        g_timezone = -timezone;
+    });
 #endif
+
+    return Seconds(g_timezone);
 }
 
 } /* namespace hku */

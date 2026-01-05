@@ -7,6 +7,7 @@
 
 #include <hikyuu/trade_sys/system/build_in.h>
 #include "../pybind_utils.h"
+#include "_System.h"
 
 namespace py = pybind11;
 using namespace hku;
@@ -14,6 +15,154 @@ using namespace hku;
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #endif
+
+PySystem::PySystem(const System& base) : System(base) {
+    py::gil_scoped_acquire gil;
+    m_py_ev.release();
+    m_py_cn.release();
+    m_py_st.release();
+    m_py_tp.release();
+    m_py_pg.release();
+    m_py_sp.release();
+    m_py_mm.release();
+    m_py_sg.release();
+    m_py_tm.release();
+}
+
+PySystem::~PySystem() {
+    py::gil_scoped_acquire gil;
+    m_py_ev.release();
+    m_py_cn.release();
+    m_py_st.release();
+    m_py_tp.release();
+    m_py_pg.release();
+    m_py_sp.release();
+    m_py_mm.release();
+    m_py_sg.release();
+    m_py_tm.release();
+}
+
+void PySystem::run(const KData& kdata, bool reset, bool resetAll) {
+    PYBIND11_OVERLOAD(void, System, run, kdata, reset, resetAll);
+}
+
+TradeRecord PySystem::runMoment(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(TradeRecord, System, runMoment, datetime);
+}
+
+TradeRecord PySystem::runMomentOnOpen(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(TradeRecord, System, runMomentOnOpen, datetime);
+}
+
+TradeRecord PySystem::runMomentOnClose(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(TradeRecord, System, runMomentOnClose, datetime);
+}
+
+void PySystem::readyForRun() {
+    PYBIND11_OVERLOAD(void, System, readyForRun);
+}
+
+void PySystem::_reset() {
+    PYBIND11_OVERLOAD(void, System, _reset);
+}
+
+void PySystem::_forceResetAll() {
+    PYBIND11_OVERLOAD(void, System, _forceResetAll);
+}
+
+string PySystem::str() const {
+    PYBIND11_OVERLOAD(string, System, str);
+}
+
+void PySystem::set_mm(py::object mm) {
+    py::gil_scoped_acquire gil;
+    HKU_IF_RETURN(!mm || mm.is_none(), void());
+    setMM(mm.cast<MMPtr>());
+    if (m_mm && m_mm->isPythonObject()) {
+        m_py_mm.release();
+        m_py_mm = mm;
+    }
+}
+
+void PySystem::set_ev(py::object ev) {
+    py::gil_scoped_acquire gil;
+    HKU_IF_RETURN(!ev || ev.is_none(), void());
+    setEV(ev.cast<EnvironmentPtr>());
+    if (m_ev && m_ev->isPythonObject()) {
+        m_py_ev.release();
+        m_py_ev = ev;
+    }
+}
+
+void PySystem::set_cn(py::object cn) {
+    py::gil_scoped_acquire gil;
+    HKU_IF_RETURN(!cn || cn.is_none(), void());
+    setCN(cn.cast<CNPtr>());
+    if (m_cn && m_cn->isPythonObject()) {
+        m_py_cn.release();
+        m_py_cn = cn;
+    }
+}
+
+void PySystem::set_sg(py::object sg) {
+    py::gil_scoped_acquire gil;
+    HKU_IF_RETURN(!sg || sg.is_none(), void());
+    setSG(sg.cast<SGPtr>());
+    if (m_sg && m_sg->isPythonObject()) {
+        m_py_sg.release();
+        m_py_sg = sg;
+    }
+}
+
+void PySystem::set_st(py::object st) {
+    py::gil_scoped_acquire gil;
+    HKU_IF_RETURN(!st || st.is_none(), void());
+    setST(st.cast<StoplossPtr>());
+    if (m_st && m_st->isPythonObject()) {
+        m_py_st.release();
+        m_py_st = st;
+    }
+}
+
+void PySystem::set_tp(py::object tp) {
+    py::gil_scoped_acquire gil;
+    HKU_IF_RETURN(!tp || tp.is_none(), void());
+    setTP(tp.cast<StoplossPtr>());
+    if (m_tp && m_tp->isPythonObject()) {
+        m_py_tp.release();
+        m_py_tp = tp;
+    }
+}
+
+void PySystem::set_pg(py::object pg) {
+    py::gil_scoped_acquire gil;
+    HKU_IF_RETURN(!pg || pg.is_none(), void());
+    setPG(pg.cast<PGPtr>());
+    if (m_pg && m_pg->isPythonObject()) {
+        m_py_pg.release();
+        m_py_pg = pg;
+    }
+}
+
+void PySystem::set_sp(py::object sp) {
+    py::gil_scoped_acquire gil;
+    HKU_IF_RETURN(!sp || sp.is_none(), void());
+    setSP(sp.cast<SlippagePtr>());
+    if (m_sp && m_sp->isPythonObject()) {
+        m_py_sp.release();
+        m_py_sp = sp;
+    }
+}
+
+void PySystem::set_tm(py::object tm) {
+    py::gil_scoped_acquire gil;
+    HKU_IF_RETURN(!tm || tm.is_none(), void());
+    setTM(tm.cast<TradeManagerPtr>());
+    if (m_tm && m_tm->isPythonObject()) {
+        m_py_tm.release();
+        m_py_tm = tm;
+    }
+}
 
 void export_System(py::module& m) {
     m.def("get_system_part_name", getSystemPartName, R"(get_system_part_name(part)
@@ -64,8 +213,9 @@ void export_System(py::module& m) {
         DEF_PICKLE(TradeRequest);
 
     //--------------------------------------------------------------------------------------
-    py::class_<System, SystemPtr>(m, "System",
-                                  R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
+    py::class_<System, SystemPtr, PySystem>(
+      m, "System", py::dynamic_attr(),
+      R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
 
 系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
@@ -92,16 +242,38 @@ void export_System(py::module& m) {
                     py::overload_cast<const string&>(&System::name), py::return_value_policy::copy,
                     "系统名称")
       .def_property_readonly("query", &System::getQuery, py::return_value_policy::copy, "查询条件")
-      .def_property("tm", &System::getTM, &System::setTM, "关联的交易管理实例")
+
       .def_property("to", &System::getTO, &System::setTO, "交易对象 KData")
-      .def_property("mm", &System::getMM, &System::setMM, "资金管理策略")
-      .def_property("ev", &System::getEV, &System::setEV, "市场环境判断策略")
-      .def_property("cn", &System::getCN, &System::setCN, "系统有效条件")
-      .def_property("sg", &System::getSG, &System::setSG, "信号指示器")
-      .def_property("st", &System::getST, &System::setST, "止损策略")
-      .def_property("tp", &System::getTP, &System::setTP, "止盈策略")
-      .def_property("pg", &System::getPG, &System::setPG, "盈利目标策略")
-      .def_property("sp", &System::getSP, &System::setSP, "移滑价差算法")
+
+      //   .def_property("tm", &System::getTM, &System::setTM, "关联的交易管理实例")
+
+      .def_property(
+        "tm", &System::getTM, [](PySystem& self, py::object py_tm) { self.set_tm(py_tm); },
+        "关联的交易管理实例")
+      .def_property(
+        "mm", &System::getMM, [](PySystem& self, py::object py_mm) { self.set_mm(py_mm); },
+        "资金管理策略")
+      .def_property(
+        "ev", &System::getEV, [](PySystem& self, py::object py_ev) { self.set_ev(py_ev); },
+        "市场环境判断策略")
+      .def_property(
+        "cn", &System::getCN, [](PySystem& self, py::object py_tm) { self.set_cn(py_tm); },
+        "系统有效条件")
+      .def_property(
+        "sg", &System::getSG, [](PySystem& self, py::object py_sig) { self.set_sg(py_sig); },
+        "信号指示器")
+      .def_property(
+        "st", &System::getST, [](PySystem& self, py::object py_st) { self.set_st(py_st); },
+        "止损策略")
+      .def_property(
+        "tp", &System::getTP, [](PySystem& self, py::object py_tp) { self.set_tp(py_tp); },
+        "止盈策略")
+      .def_property(
+        "pg", &System::getPG, [](PySystem& self, py::object py_pg) { self.set_pg(py_pg); },
+        "盈利目标策略")
+      .def_property(
+        "sp", &System::getSP, [](PySystem& self, py::object py_sp) { self.set_sp(py_sp); },
+        "移滑价差算法")
 
       .def("get_param", &System::getParam<boost::any>, R"(get_param(self, name)
 
@@ -206,43 +378,18 @@ void export_System(py::module& m) {
       [](py::object tm = py::none(), py::object mm = py::none(), py::object ev = py::none(),
          py::object cn = py::none(), py::object sg = py::none(), py::object st = py::none(),
          py::object tp = py::none(), py::object pg = py::none(), py::object sp = py::none()) {
-          TradeManagerPtr ctm;
-          if (!tm.is_none()) {
-              ctm = tm.cast<TradeManagerPtr>();
-          }
-          MoneyManagerPtr cmm;
-          if (!mm.is_none()) {
-              cmm = mm.cast<MoneyManagerPtr>();
-          }
-          EnvironmentPtr cev;
-          if (!ev.is_none()) {
-              cev = ev.cast<EnvironmentPtr>();
-          }
-          ConditionPtr ccn;
-          if (!cn.is_none()) {
-              ccn = cn.cast<ConditionPtr>();
-          }
-          SignalPtr csg;
-          if (!sg.is_none()) {
-              csg = sg.cast<SignalPtr>();
-          }
-          StoplossPtr cst;
-          if (!st.is_none()) {
-              cst = st.cast<StoplossPtr>();
-          }
-          StoplossPtr ctp;
-          if (!tp.is_none()) {
-              ctp = tp.cast<StoplossPtr>();
-          }
-          ProfitGoalPtr cpg;
-          if (!pg.is_none()) {
-              cpg = pg.cast<ProfitGoalPtr>();
-          }
-          SlippagePtr csp;
-          if (!sp.is_none()) {
-              csp = sp.cast<SlippagePtr>();
-          }
-          return SYS_Simple(ctm, cmm, cev, ccn, csg, cst, ctp, cpg, csp);
+          auto sys = make_shared<System>("SYS_Simple");
+          auto* sys_ptr = (PySystem*)sys.get();
+          sys_ptr->set_tm(tm);
+          sys_ptr->set_mm(mm);
+          sys_ptr->set_ev(ev);
+          sys_ptr->set_cn(cn);
+          sys_ptr->set_sg(sg);
+          sys_ptr->set_st(st);
+          sys_ptr->set_tp(tp);
+          sys_ptr->set_pg(pg);
+          sys_ptr->set_sp(sp);
+          return sys;
       },
       py::arg("tm") = py::none(), py::arg("mm") = py::none(), py::arg("ev") = py::none(),
       py::arg("cn") = py::none(), py::arg("sg") = py::none(), py::arg("st") = py::none(),

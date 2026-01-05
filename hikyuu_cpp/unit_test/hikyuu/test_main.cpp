@@ -27,9 +27,11 @@ void init_hikyuu_test() {
     set_log_level(LOG_LEVEL::LOG_TRACE);
     std::string config_file(fmt::format("{}/.hikyuu/hikyuu.ini", getUserDir()));
     fmt::print("configure file: {}\n", config_file);
-    hikyuu_init(config_file);
     StockManager& sm = StockManager::instance();
+    // sm.setPluginPath("/Users/fasiondog/workspace/hikyuu/hikyuu/plugin");
+    hikyuu_init(config_file);
     createDir(sm.tmpdir());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 #else
 void init_hikyuu_test() {

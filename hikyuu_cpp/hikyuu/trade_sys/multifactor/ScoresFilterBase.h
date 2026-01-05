@@ -49,7 +49,6 @@ public:
 public:
     friend HKU_API ScoresFilterPtr operator|(const ScoresFilterPtr& a, const ScoresFilterPtr& b);
 
-protected:
     virtual bool isPythonObject() const {
         return false;
     }

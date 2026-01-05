@@ -250,7 +250,7 @@ TradeRecordList (TradeManagerBase::*_getTradeList_2)(const Datetime&, const Date
 
 void export_TradeManager(py::module& m) {
     py::class_<TradeManagerBase, TradeManagerPtr, PyTradeManagerBase>(
-      m, "TradeManager",
+      m, "TradeManager", py::dynamic_attr(),
       R"(交易管理类，可理解为一个模拟账户进行模拟交易。一般使用 crtTM 创建交易管理实例。
 
 交易管理可理解为一个模拟账户进行模拟交易。一般使用 crtTM 创建交易管理实例。

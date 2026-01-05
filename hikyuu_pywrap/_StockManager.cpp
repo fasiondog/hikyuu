@@ -34,6 +34,8 @@ void export_StockManager(py::module& m) {
       .def_property_readonly("data_ready", &StockManager::dataReady,
                              "是否所有数据已准备就绪（加载完毕）")
 
+      .def("cancel_load", &StockManager::cancelLoad, "取消所有数据加载")
+
       .def("reload", &StockManager::reload, "重新加载所有证券数据")
 
       .def("tmpdir", &StockManager::tmpdir, R"(tmpdir(self) -> str
@@ -244,6 +246,16 @@ void export_StockManager(py::module& m) {
     获取指定分类的板块列表
 
     :param str category: 板块分类
+    :return: 板块列表
+    :rtype: BlockList)")
+
+      .def("get_block_list_by_index_stock", &StockManager::getBlockListByIndexStock,
+           py::arg("index_stk"),
+           R"(get_block_list_by_index_stock(self, index_stk)
+
+    获取指定指数的板块列表
+
+    :param Stock index_stk: 指数
     :return: 板块列表
     :rtype: BlockList)")
 

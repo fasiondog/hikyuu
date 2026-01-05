@@ -93,7 +93,6 @@ public:
     /** 子类克隆接口 */
     virtual EnvironmentPtr _clone() = 0;
 
-protected:
     virtual bool isPythonObject() const {
         return false;
     }
