@@ -90,7 +90,7 @@ public:
 
     /** 是否所有数据准备完毕 */
     bool dataReady() const;
-
+    bool initializing() const;
     /**
      * 根据"市场简称证券代码"获取对应的证券实例
      * @param querystr 格式：“市场简称证券代码”，如"sh000001"
@@ -329,7 +329,7 @@ private:
     static StockManager* m_sm;
     std::atomic_bool m_initializing{false};
     std::atomic_bool m_cancel_load{false};  // 取消加载, 用于退出指示
-    std::atomic_bool m_data_ready{false};   // 用于指示是否所有数据准备完毕
+    std::atomic_bool m_data_ready{true};    // 用于指示是否所有数据准备完毕, 如果未初始化则为 true
     std::thread::id m_thread_id;  // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
     string m_tmpdir;
     string m_datadir;
@@ -374,6 +374,10 @@ inline size_t StockManager::size() const {
 
 inline bool StockManager::dataReady() const {
     return m_data_ready;
+}
+
+inline bool StockManager::initializing() const {
+    return m_initializing;
 }
 
 inline Stock StockManager::operator[](const string& query) const {

@@ -769,7 +769,6 @@ public:
     std::vector<std::pair<Datetime, double>> getProfitPercentYearly(
       const Datetime& datetime = Datetime::now());
 
-protected:
     virtual bool isPythonObject() const {
         return false;
     }

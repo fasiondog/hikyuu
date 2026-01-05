@@ -109,7 +109,6 @@ public:
         return m_values.cend();
     }
 
-protected:
     virtual bool isPythonObject() const {
         return false;
     }

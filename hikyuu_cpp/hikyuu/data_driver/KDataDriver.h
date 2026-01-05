@@ -129,8 +129,7 @@ public:
     }
 
     virtual std::unordered_map<std::string, KRecordList> getAllKRecordList(
-      const KQuery::KType& ktype, const Datetime& start_date,
-      const std::atomic<bool>& cancel_flag) {
+      const KQuery::KType& ktype, const Datetime& start_date, const std::atomic_bool& cancel_flag) {
         HKU_THROW("Not support getAllKRecordList");
     }
 
@@ -210,8 +209,7 @@ public:
     }
 
     std::unordered_map<std::string, KRecordList> getAllKRecordList(
-      const KQuery::KType& ktype, const Datetime& start_date,
-      const std::atomic<bool>& cancel_flag) {
+      const KQuery::KType& ktype, const Datetime& start_date, const std::atomic_bool& cancel_flag) {
         return m_driver->getAllKRecordList(ktype, start_date, cancel_flag);
     }
 

@@ -42,7 +42,6 @@ public:
 
     virtual PriceList normalize(const PriceList& data) = 0;
 
-protected:
     virtual bool isPythonObject() const {
         return false;
     }

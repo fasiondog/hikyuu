@@ -11,12 +11,29 @@
 namespace py = pybind11;
 using namespace hku;
 
-class PyMultiFactor : public MultiFactorBase {
+#ifdef _MSC_VER
+#define HIDDEN
+#else
+#define HIDDEN __attribute__((visibility("hidden")))
+#endif
+
+class HIDDEN PyMultiFactor : public MultiFactorBase {
     PY_CLONE(PyMultiFactor, MultiFactorBase)
 
 public:
     using MultiFactorBase::MultiFactorBase;
-    PyMultiFactor(const MultiFactorBase& base) : MultiFactorBase(base) {}
+    PyMultiFactor(const MultiFactorBase& base) : MultiFactorBase(base) {
+        py::gil_scoped_acquire gil;
+        m_py_norm.release();
+    }
+
+    virtual ~PyMultiFactor() override {
+        py::gil_scoped_acquire gil;
+        m_py_norm.release();
+        for (auto& item : m_py_special_norms) {
+            item.second.release();
+        }
+    }
 
     IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) override {
         // PYBIND11_OVERLOAD_PURE_NAME(IndicatorList, MultiFactorBase, "_calculate", _calculate,
@@ -27,6 +44,32 @@ public:
         auto py_ret = func(py_all_stk_inds);
         return py_ret.cast<IndicatorList>();
     }
+
+public:
+    void set_norm(py::object norm) {
+        py::gil_scoped_acquire gil;
+        HKU_IF_RETURN(!norm || norm.is_none(), void());
+        setNormalize(norm.cast<NormPtr>());
+        if (m_norm && m_norm->isPythonObject()) {
+            m_py_norm.release();
+            m_py_norm = norm;
+        }
+    }
+
+    void add_special_norm(const string& name, py::object norm, const string& category,
+                          const IndicatorList& style_inds) {
+        py::gil_scoped_acquire gil;
+        HKU_INFO_IF_RETURN(!norm || norm.is_none(), void(), "norm is None");
+        addSpecialNormalize(name, norm.cast<NormPtr>(), category, style_inds);
+        if (m_special_norms[name] && m_special_norms[name]->isPythonObject()) {
+            m_py_special_norms[name].release();
+            m_py_special_norms[name] = norm;
+        }
+    }
+
+private:
+    py::object m_py_norm;
+    unordered_map<string, py::object> m_py_special_norms;
 };
 
 void export_MultiFactor(py::module& m) {
@@ -189,8 +232,10 @@ void export_MultiFactor(py::module& m) {
 
     :return: [factor1, factor2, ...] 顺序与参考证券顺序相同)")
 
-      .def("set_normalize", &MultiFactorBase::setNormalize, py::arg("norm"),
-           R"(set_normalize(self, norm)
+      .def(
+        "set_normalize", [](PyMultiFactor& self, py::object norm) { self.set_norm(norm); },
+        py::arg("norm"),
+        R"(set_normalize(self, norm)
 
     设置标准化或归一化方法（影响全部因子）
     

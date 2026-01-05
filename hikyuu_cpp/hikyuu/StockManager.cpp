@@ -354,12 +354,17 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
     HKU_IF_RETURN(sh000001.isNull(), loaded_codes);
 
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+        if (m_cancel_load) {
+            break;
+        }
         auto low_ktype = ktypes[i];
         to_lower(low_ktype);
         if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
             sh000001.loadKDataToBuffer(ktypes[i]);
         }
     }
+
+    HKU_IF_RETURN(m_cancel_load, loaded_codes);
 
     // 主要受带宽限制，无需多线程
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {

@@ -88,7 +88,7 @@ public:
 
     /** 克隆操作 */
     typedef shared_ptr<Portfolio> PortfolioPtr;
-    PortfolioPtr clone() const;
+    PortfolioPtr clone();
 
     /** 运行前准备 */
     void readyForRun();
@@ -99,7 +99,7 @@ public:
     virtual string str() const;
 
     virtual void _reset() {}
-    virtual PortfolioPtr _clone() const {
+    virtual PortfolioPtr _clone() {
         return std::make_shared<Portfolio>();
     }
 
@@ -113,6 +113,10 @@ public:
      */
     virtual json lastSuggestion() const;
 
+    virtual bool isPythonObject() const {
+        return false;
+    }
+
 private:
     void initParam();
 
@@ -122,10 +126,6 @@ private:
                                      const string& mode);
 
 protected:
-    virtual bool isPythonObject() const {
-        return false;
-    }
-
     // 跟踪打印当前TM持仓情况
     void traceMomentTMAfterRunAtOpen(const Datetime& date);
     void traceMomentTMAfterRunAtClose(const Datetime& date);
@@ -177,13 +177,13 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
-#define PORTFOLIO_IMP(classname)                   \
-public:                                            \
-    virtual PortfolioPtr _clone() const override { \
-        return std::make_shared<classname>();      \
-    }                                              \
-    virtual void _reset() override;                \
-    virtual void _readyForRun() override;          \
+#define PORTFOLIO_IMP(classname)              \
+public:                                       \
+    virtual PortfolioPtr _clone() override {  \
+        return std::make_shared<classname>(); \
+    }                                         \
+    virtual void _reset() override;           \
+    virtual void _readyForRun() override;     \
     virtual void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) override;
 
 /**
