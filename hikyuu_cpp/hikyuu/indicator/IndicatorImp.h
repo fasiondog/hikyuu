@@ -453,7 +453,7 @@ inline void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
 }
 
 inline void IndicatorImp::onlySetContext(const KData& k) {
-    // onlySetContext(k)
+    m_old_context = m_context;
     m_context = k;
 }
 
