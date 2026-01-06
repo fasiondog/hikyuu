@@ -22,7 +22,7 @@ IKData::IKData(const KData& kdata, const string& part) : IndicatorImp() {
     string part_name(part);
     to_upper(part_name);
     setParam<string>("kpart", part_name);
-    setParam<KData>("kdata", kdata);
+    onlySetContext(kdata);
     IKData::_calculate(Indicator());
 }
 

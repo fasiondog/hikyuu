@@ -18,7 +18,7 @@ ITr::ITr() : IndicatorImp("TR", 1) {}
 ITr::~ITr() {}
 
 ITr::ITr(const KData& k) : IndicatorImp("TR", 1) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     ITr::_calculate(Indicator());
 }
 

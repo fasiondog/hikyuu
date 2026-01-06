@@ -18,7 +18,7 @@ IHsl::IHsl() : IndicatorImp("HSL", 1) {}
 IHsl::~IHsl() {}
 
 IHsl::IHsl(const KData& k) : IndicatorImp("HSL", 1) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     IHsl::_calculate(Indicator());
 }
 

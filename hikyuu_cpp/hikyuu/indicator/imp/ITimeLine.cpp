@@ -23,7 +23,7 @@ ITimeLine::~ITimeLine() {}
 
 ITimeLine::ITimeLine(const KData& k) : IndicatorImp("TIMELINE", 1) {
     setParam<string>("part", "price");
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     ITimeLine::_calculate(Indicator());
 }
 

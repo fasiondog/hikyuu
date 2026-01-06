@@ -24,7 +24,7 @@ ITime::ITime(const KData& k, const string& type) : IndicatorImp() {
     to_upper(type_name);
     m_name = type_name;
     setParam<string>("type", type_name);
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     ITime::_calculate(Indicator());
 }
 

@@ -25,7 +25,7 @@ IInBlock::IInBlock(const KData& kdata, const string& category, const string& nam
 : IndicatorImp("INBLOCK", 1) {
     setParam<string>("category", category);
     setParam<string>("name", name);
-    setParam<KData>("kdata", kdata);
+    onlySetContext(kdata);
     IInBlock::_calculate(Indicator());
 }
 

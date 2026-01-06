@@ -18,7 +18,7 @@ namespace hku {
 IAd::IAd() : IndicatorImp("AD", 1) {}
 
 IAd::IAd(const KData& k) : IndicatorImp("AD", 1) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     IAd::_calculate(Indicator());
 }
 

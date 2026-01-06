@@ -20,7 +20,7 @@ ICost::ICost() : IndicatorImp("COST", 1) {
 ICost::~ICost() {}
 
 ICost::ICost(const KData& k, double percent) : IndicatorImp("COST", 1) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     setParam<double>("percent", percent);
     ICost::_calculate(Indicator());
 }

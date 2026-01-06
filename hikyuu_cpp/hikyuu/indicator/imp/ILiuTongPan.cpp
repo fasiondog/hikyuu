@@ -18,7 +18,7 @@ ILiuTongPan::ILiuTongPan() : IndicatorImp("LIUTONGPAN", 1) {}
 ILiuTongPan::~ILiuTongPan() {}
 
 ILiuTongPan::ILiuTongPan(const KData& k) : IndicatorImp("LIUTONGPAN", 1) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     ILiuTongPan::_calculate(Indicator());
 }
 

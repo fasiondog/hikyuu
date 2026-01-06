@@ -24,7 +24,7 @@ IRecover::IRecover(int recoverType) {
 
 IRecover::IRecover(const KData& kdata, int recoverType) : IndicatorImp("RECOVER") {
     setParam<int>("recover_type", recoverType);
-    setParam<KData>("kdata", kdata);
+    onlySetContext(kdata);
 }
 
 IRecover::~IRecover() {}

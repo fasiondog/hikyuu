@@ -44,7 +44,7 @@ TaSarext::TaSarext(const KData& k, double startvalue, double offsetonreverse,
                    double accelerationinitshort, double accelerationshort,
                    double accelerationmaxshort)
 : IndicatorImp("TA_SAREXT", 1) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     setParam<double>("startvalue", startvalue);
     setParam<double>("offsetonreverse", offsetonreverse);
     setParam<double>("accelerationinitlong", accelerationinitlong);

@@ -22,7 +22,7 @@ TaStochf::TaStochf() : IndicatorImp("TA_STOCHF", 2) {
 
 TaStochf::TaStochf(const KData& k, int fastk_n, int fastd_n, int fastd_matype)
 : IndicatorImp("TA_STOCHF", 2) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     setParam<int>("fastk_n", fastk_n);
     setParam<int>("fastd_n", fastd_n);
     setParam<int>("fastd_matype", fastd_matype);

@@ -140,19 +140,16 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
 
 IndicatorImp::IndicatorImp()
 : m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
-    initContext();
     memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string &name)
 : m_name(name), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
-    initContext();
     memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string &name, size_t result_num)
 : m_name(name), m_discard(0), m_need_calculate(true), m_optype(LEAF) {
-    initContext();
     memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
     _readyBuffer(0, m_result_num);
@@ -184,12 +181,9 @@ const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
     return m_ind_params.at(name);
 }
 
-void IndicatorImp::initContext() {
-    setParam<KData>("kdata", KData());
-}
-
 void IndicatorImp::setContext(const KData &k) {
-    KData old_k = getParam<KData>("kdata");
+    // KData old_k = getParam<KData>("kdata");
+    KData old_k = getContext();
 
     // 上下文没变化的情况下根据自身标识进行计算
     if (old_k == k) {
@@ -215,7 +209,8 @@ void IndicatorImp::setContext(const KData &k) {
     }
 
     // 重设上下文
-    setParam<KData>("kdata", k);
+    // onlySetContext(k)
+    onlySetContext(k);
 
     // 启动重新计算
     calculate();
@@ -310,6 +305,7 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_name = m_name;
     p->m_discard = m_discard;
     p->m_result_num = m_result_num;
+    p->m_context = m_context;
     p->m_need_calculate = m_need_calculate;
     p->m_optype = m_optype;
     p->m_parent = m_parent;
@@ -769,7 +765,7 @@ Indicator IndicatorImp::calculate() {
             } else {
                 _dyn_calculate(tmp_ind);
             }
-            setParam<KData>("kdata", m_right->getParam<KData>("kdata"));
+            onlySetContext(m_right->getContext());
         } break;
 
         case ADD:

@@ -21,7 +21,7 @@ ICycle::ICycle() : IndicatorImp("CYCLE", 1) {
 
 ICycle::ICycle(const KData& k) : IndicatorImp("CYCLE", 1) {
     _initParams();
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     ICycle::_calculate(Indicator());
 }
 

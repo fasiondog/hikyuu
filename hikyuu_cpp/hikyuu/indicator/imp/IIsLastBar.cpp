@@ -16,7 +16,7 @@ namespace hku {
 IIsLastBar::IIsLastBar() : IndicatorImp("ISLASTBAR", 1) {}
 
 IIsLastBar::IIsLastBar(const KData &k) : IndicatorImp("ISLASTBAR", 1) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     IIsLastBar::_calculate(Indicator());
 }
 

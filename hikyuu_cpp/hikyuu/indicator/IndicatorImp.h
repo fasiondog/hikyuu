@@ -129,6 +129,8 @@ public:
 
     void setContext(const KData&);
 
+    void onlySetContext(const KData&);
+
     KData getContext() const;
 
     void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);
@@ -213,7 +215,6 @@ public:
     virtual void getSeparateKTypeLeafSubNodes(vector<IndicatorImpPtr>& nodes) const {}
 
 private:
-    void initContext();
     bool needCalculate();
     void execute_add();
     void execute_sub();
@@ -261,6 +262,8 @@ protected:
     string m_name;
     size_t m_discard;
     size_t m_result_num;
+    KData m_context;
+    KData m_old_context;
     vector<value_t>* m_pBuffer[MAX_RESULT_NUM];
 
     bool m_need_calculate;
@@ -289,6 +292,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_discard);
         ar& BOOST_SERIALIZATION_NVP(m_result_num);
+        ar& BOOST_SERIALIZATION_NVP(m_context);
+        ar& BOOST_SERIALIZATION_NVP(m_old_context);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
         ar& BOOST_SERIALIZATION_NVP(m_left);
@@ -329,6 +334,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_discard);
         ar& BOOST_SERIALIZATION_NVP(m_result_num);
+        ar& BOOST_SERIALIZATION_NVP(m_context);
+        ar& BOOST_SERIALIZATION_NVP(m_old_context);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
         ar& BOOST_SERIALIZATION_NVP(m_left);
@@ -437,11 +444,17 @@ inline bool IndicatorImp::isLeaf() const {
 }
 
 inline KData IndicatorImp::getContext() const {
-    return getParam<KData>("kdata");
+    // return getParam<KData>("kdata");
+    return m_context;
 }
 
 inline void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
     setContext(stock.getKData(query));
+}
+
+inline void IndicatorImp::onlySetContext(const KData& k) {
+    // onlySetContext(k)
+    m_context = k;
 }
 
 inline const IndicatorImp::ind_param_map_t& IndicatorImp::getIndParams() const {

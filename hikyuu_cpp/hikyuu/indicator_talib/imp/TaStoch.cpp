@@ -25,7 +25,7 @@ TaStoch::TaStoch() : IndicatorImp("TA_STOCH", 2) {
 TaStoch::TaStoch(const KData& k, int fastk_n, int slowk_n, int slowk_matype, int slowd_n,
                  int slowd_matype)
 : IndicatorImp("TA_STOCH", 2) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     setParam<int>("fastk_n", fastk_n);
     setParam<int>("slowk_n", slowk_n);
     setParam<int>("slowk_matype", slowk_matype);

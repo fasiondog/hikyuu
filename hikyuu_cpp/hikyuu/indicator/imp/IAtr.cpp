@@ -20,7 +20,7 @@ IAtr::IAtr() : IndicatorImp("ATR", 1) {
 
 IAtr::IAtr(const KData& k, int n) : IndicatorImp("ATR", 1) {
     setParam<int>("n", n);
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     IAtr::_calculate(Indicator());
 }
 

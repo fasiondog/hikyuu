@@ -113,7 +113,7 @@
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
         int back = func_lookback(step);                                                    \
-        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+        HKU_IF_RETURN(back < 0 || back + ind.discard() > curPos, void());                  \
                                                                                            \
         std::unique_ptr<double[]> buf = std::make_unique<double[]>(curPos);                \
         auto const *src = ind.data();                                                      \
@@ -181,7 +181,7 @@
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
         int back = func_lookback(step);                                                    \
-        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+        HKU_IF_RETURN(back < 0 || back + ind.discard() > curPos, void());                  \
                                                                                            \
         std::unique_ptr<int[]> buf = std::make_unique<int[]>(curPos);                      \
         auto const *src = ind.data();                                                      \
@@ -283,7 +283,7 @@
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
         int back = func_lookback(step);                                                    \
-        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+        HKU_IF_RETURN(back < 0 || back + ind.discard() > curPos, void());                  \
                                                                                            \
         std::unique_ptr<int[]> buf = std::make_unique<int[]>(2 * curPos);                  \
         int *buf0 = buf.get();                                                             \
@@ -350,7 +350,7 @@
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
         int back = func_lookback(step);                                                    \
-        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+        HKU_IF_RETURN(back < 0 || back + ind.discard() > curPos, void());                  \
                                                                                            \
         std::unique_ptr<double[]> buf = std::make_unique<double[]>(2 * curPos);            \
         double *dst0 = buf.get();                                                          \
@@ -418,7 +418,7 @@
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
         int back = func_lookback(step);                                                    \
-        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+        HKU_IF_RETURN(back < 0 || back + ind.discard() > curPos, void());                  \
                                                                                            \
         std::unique_ptr<double[]> buf = std::make_unique<double[]>(3 * curPos);            \
         double *dst0 = buf.get();                                                          \
@@ -561,7 +561,7 @@
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
                                                                                         \
     Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                   \
-        setParam<KData>("kdata", k);                                                    \
+        onlySetContext(k);                                                              \
         Cls_##func::_calculate(Indicator());                                            \
     }                                                                                   \
                                                                                         \
@@ -614,7 +614,7 @@
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
                                                                                         \
     Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                   \
-        setParam<KData>("kdata", k);                                                    \
+        onlySetContext(k);                                                              \
         Cls_##func::_calculate(Indicator());                                            \
     }                                                                                   \
                                                                                         \
@@ -675,7 +675,7 @@
     }                                                                                             \
                                                                                                   \
     Cls_##func::Cls_##func(const KData &k, double p) : IndicatorImp(#func, 1) {                   \
-        setParam<KData>("kdata", k);                                                              \
+        onlySetContext(k);                                                                        \
         setParam<double>(#param1, p);                                                             \
         Cls_##func::_calculate(Indicator());                                                      \
     }                                                                                             \
@@ -744,7 +744,7 @@
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
                                                                                         \
     Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                   \
-        setParam<KData>("kdata", k);                                                    \
+        onlySetContext(k);                                                              \
         Cls_##func::_calculate(Indicator());                                            \
     }                                                                                   \
                                                                                         \
@@ -797,7 +797,7 @@
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                   \
                                                                                            \
     Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                      \
-        setParam<KData>("kdata", k);                                                       \
+        onlySetContext(k);                                                                 \
         Cls_##func::_calculate(Indicator());                                               \
     }                                                                                      \
                                                                                            \
@@ -845,7 +845,7 @@
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                    \
                                                                                             \
     Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                       \
-        setParam<KData>("kdata", k);                                                        \
+        onlySetContext(k);                                                                  \
         Cls_##func::_calculate(Indicator());                                                \
     }                                                                                       \
                                                                                             \
@@ -893,7 +893,7 @@
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                          \
                                                                                                   \
     Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                             \
-        setParam<KData>("kdata", k);                                                              \
+        onlySetContext(k);                                                                        \
         Cls_##func::_calculate(Indicator());                                                      \
     }                                                                                             \
                                                                                                   \
@@ -945,7 +945,7 @@
     }                                                                                   \
                                                                                         \
     Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 1) {            \
-        setParam<KData>("kdata", k);                                                    \
+        onlySetContext(k);                                                              \
         setParam<int>("n", n);                                                          \
         Cls_##func::_calculate(Indicator());                                            \
     }                                                                                   \
@@ -1010,7 +1010,7 @@
     }                                                                                   \
                                                                                         \
     Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 1) {            \
-        setParam<KData>("kdata", k);                                                    \
+        onlySetContext(k);                                                              \
         setParam<int>("n", n);                                                          \
         Cls_##func::_calculate(Indicator());                                            \
     }                                                                                   \
@@ -1078,7 +1078,7 @@
     }                                                                                         \
                                                                                               \
     Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 1) {                  \
-        setParam<KData>("kdata", k);                                                          \
+        onlySetContext(k);                                                                    \
         setParam<int>("n", n);                                                                \
         Cls_##func::_calculate(Indicator());                                                  \
     }                                                                                         \
@@ -1140,7 +1140,7 @@
     }                                                                                         \
                                                                                               \
     Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 2) {                  \
-        setParam<KData>("kdata", k);                                                          \
+        onlySetContext(k);                                                                    \
         setParam<int>("n", n);                                                                \
         Cls_##func::_calculate(Indicator());                                                  \
     }                                                                                         \
@@ -1204,7 +1204,7 @@
     }                                                                                   \
                                                                                         \
     Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 3) {            \
-        setParam<KData>("kdata", k);                                                    \
+        onlySetContext(k);                                                              \
         setParam<int>("n", n);                                                          \
         Cls_##func::_calculate(Indicator());                                            \
     }                                                                                   \
@@ -1271,7 +1271,7 @@
     }                                                                                           \
                                                                                                 \
     Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 1) {                    \
-        setParam<KData>("kdata", k);                                                            \
+        onlySetContext(k);                                                                      \
         setParam<int>("n", n);                                                                  \
         Cls_##func::_calculate(Indicator());                                                    \
     }                                                                                           \

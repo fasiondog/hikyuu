@@ -18,7 +18,7 @@ IZongGuBen::IZongGuBen() : IndicatorImp("ZONGGUBEN", 1) {}
 IZongGuBen::~IZongGuBen() {}
 
 IZongGuBen::IZongGuBen(const KData& k) : IndicatorImp("ZONGGUBEN", 1) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     IZongGuBen::_calculate(Indicator());
 }
 

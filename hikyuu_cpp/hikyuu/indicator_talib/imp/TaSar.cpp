@@ -20,7 +20,7 @@ TaSar::TaSar() : IndicatorImp("TA_SAR", 1) {
 }
 
 TaSar::TaSar(const KData& k, double acceleration, double maximum) : IndicatorImp("TA_SAR", 1) {
-    setParam<KData>("kdata", k);
+    onlySetContext(k);
     setParam<double>("acceleration", acceleration);
     setParam<double>("maximum", maximum);
     TaSar::_calculate(Indicator());
