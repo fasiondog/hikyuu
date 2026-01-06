@@ -851,6 +851,7 @@ Indicator IndicatorImp::calculate() {
         }
     }
 
+    m_old_context = KData();
     return Indicator(result);
 }
 
