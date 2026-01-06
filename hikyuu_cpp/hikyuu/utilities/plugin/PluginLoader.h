@@ -55,7 +55,7 @@ public:
                            GetLastError());
 
 #else
-        m_handle = dlopen(filename.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+        m_handle = dlopen(filename.c_str(), RTLD_LAZY);
         HKU_WARN_IF_RETURN(!m_handle, false, "load plugin({}) failed! {}", filename, dlerror());
 #endif
 
