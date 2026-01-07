@@ -60,8 +60,8 @@ void export_Indicator(py::module& m) {
 
       .def("have_param", &Indicator::haveParam, "是否存在指定参数")
 
-      .def("support_ind_param", &Indicator::supportIndParam, "是否支持动态指标参数")
-      .def("have_ind_param", &Indicator::haveIndParam, "是否存在指定的动态指标参数")
+      .def("support_ind_param", &Indicator::supportIndParam, "是否支持动态周期指标参数")
+      .def("have_ind_param", &Indicator::haveIndParam, "是否存在指定的动态周期指标参数")
       .def("get_ind_param", &Indicator::getIndParam, R"(get_ind_param(self, name)
     
     获取指定的动态指标参数

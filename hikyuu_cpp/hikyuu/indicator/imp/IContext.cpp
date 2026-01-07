@@ -41,16 +41,7 @@ string IContext::str() const {
     os << "Indicator{\n"
        << "  context: " << m_ref_ind.getContext().getStock().market_code() << "\n  name: " << name()
        << "\n  size: " << size() << "\n  discard: " << discard()
-       << "\n  result sets: " << getResultNumber() << "\n  params: " << getParameter()
-       << "\n  support indicator param: " << (supportIndParam() ? "True" : "False");
-    if (supportIndParam()) {
-        os << "\n  ind params: {";
-        const auto& ind_params = getIndParams();
-        for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
-            os << iter->first << ": " << iter->second->formula() << ", ";
-        }
-        os << "}";
-    }
+       << "\n  result sets: " << getResultNumber() << "\n  params: " << getParameter();
     os << "\n  formula: " << formula();
     for (size_t r = 0; r < getResultNumber(); ++r) {
         if (m_pBuffer[r]) {
