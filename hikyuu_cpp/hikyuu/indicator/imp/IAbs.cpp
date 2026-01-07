@@ -25,15 +25,15 @@ void IAbs::_calculate(const Indicator &data) {
         return;
     }
 
-    auto const *src = data.data();
-    auto *dst = this->data();
-    for (size_t i = m_discard; i < total; ++i) {
-        dst[i] = std::abs(src[i]);
-    }
+    _increment_calculate(data, m_discard);
 }
 
-void IAbs::_increment_one_cycle(const Indicator &ind, size_t pos, size_t r) {
-    _set(std::abs(ind.get(pos, r)), pos, r);
+void IAbs::_increment_calculate(const Indicator &data, size_t start_pos) {
+    auto const *src = data.data() + start_pos;
+    auto *dst = this->data() + start_pos;
+    for (size_t i = start_pos, end = data.size(); i < end; ++i) {
+        dst[i] = std::abs(src[i]);
+    }
 }
 
 Indicator HKU_API ABS() {

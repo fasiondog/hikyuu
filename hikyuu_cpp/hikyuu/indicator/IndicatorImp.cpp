@@ -843,7 +843,7 @@ bool IndicatorImp::can_increment_calculate(const Indicator &ind) {
         size_t total = m_context.size();
         size_t copy_len = m_old_context.size() - start_pos;
         HKU_ASSERT(copy_len <= total);
-        if (!use_increment_calulate(total, copy_len)) {
+        if (!use_increment_calulate(ind, total, copy_len)) {
             return false;
         }
 
@@ -865,11 +865,7 @@ bool IndicatorImp::can_increment_calculate(const Indicator &ind) {
             start_pos = ind.discard();
         }
 
-        for (size_t r = 0; r < m_result_num; ++r) {
-            for (size_t i = start_pos; i < total; ++i) {
-                _increment_one_cycle(ind, i, r);
-            }
-        }
+        _increment_calculate(ind, start_pos);
     }
 
     _update_discard();

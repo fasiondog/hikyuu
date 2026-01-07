@@ -163,11 +163,11 @@ public:
         return false;
     }
 
-    virtual bool use_increment_calulate(size_t total, size_t overlap_len) {
+    virtual bool use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) {
         return 2 * total <= 3 * overlap_len;
     }
 
-    virtual void _increment_one_cycle(const Indicator& ind, size_t pos, size_t r) {}
+    virtual void _increment_calculate(const Indicator& ind, size_t start_pos) {}
 
     /** 是否必须串行计算 */
     virtual bool isSerial() const {
@@ -414,11 +414,11 @@ public:                                                                         
         return true;                                                                           \
     }
 
-#define INDICATOR_IMP_SUPPORT_INCREMENT                                                     \
-public:                                                                                     \
-    virtual void _increment_one_cycle(const Indicator& ind, size_t pos, size_t r) override; \
-    virtual bool supportIncrementCalculate() const override {                               \
-        return true;                                                                        \
+#define INDICATOR_IMP_SUPPORT_INCREMENT                                                 \
+public:                                                                                 \
+    virtual void _increment_calculate(const Indicator& ind, size_t start_pos) override; \
+    virtual bool supportIncrementCalculate() const override {                           \
+        return true;                                                                    \
     }
 
 #define INDICATOR_NEED_CONTEXT                    \

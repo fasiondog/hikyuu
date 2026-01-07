@@ -26,6 +26,9 @@ void IMa::_checkParam(const string& name) const {
 }
 
 void IMa::_calculate(const Indicator& indicator) {
+    _increment_calculate(indicator, m_discard);
+
+#if 0
     size_t total = indicator.size();
     m_discard = indicator.discard();
     if (m_discard >= total) {
@@ -38,7 +41,7 @@ void IMa::_calculate(const Indicator& indicator) {
 
     int n = getParam<int>("n");
     if (n <= 0) {
-        price_t sum = 0.0;
+        value_t sum = 0.0;
         for (size_t i = m_discard; i < total; i++) {
             if (!std::isnan(src[i])) {
                 sum += src[i];
@@ -49,9 +52,58 @@ void IMa::_calculate(const Indicator& indicator) {
     }
 
     size_t startPos = m_discard;
-    price_t sum = 0.0;
+    value_t sum = 0.0;
     size_t count = 1;
     size_t first_end = startPos + n >= total ? total : startPos + n;
+    for (size_t i = startPos; i < first_end; ++i) {
+        if (!std::isnan(src[i])) {
+            sum += src[i];
+            dst[i] = sum / count++;
+        }
+    }
+
+    for (size_t i = first_end; i < total; ++i) {
+        if (!std::isnan(src[i]) && !std::isnan(src[i - n])) {
+            sum = src[i] + sum - src[i - n];
+            dst[i] = sum / n;
+        }
+    }
+#endif
+}
+
+bool IMa::use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) {
+    int n = getParam<int>("n");
+    return 2 * total <= 3 * overlap_len && (ind.discard() + n > total - overlap_len);
+}
+
+void IMa::_increment_calculate(const Indicator& indicator, size_t startPos) {
+    size_t total = indicator.size();
+    m_discard = indicator.discard();
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
+    auto const* src = indicator.data();
+    auto* dst = this->data();
+
+    int n = getParam<int>("n");
+    if (n <= 0) {
+        value_t sum = startPos <= m_discard || startPos <= 1
+                        ? 0.0
+                        : indicator[startPos - 1] * (startPos - m_discard);
+        for (size_t i = startPos; i < total; i++) {
+            if (!std::isnan(src[i])) {
+                sum += src[i];
+                dst[i] = sum / (i - m_discard + 1);
+            }
+        }
+        return;
+    }
+
+    value_t sum = 0.0;
+    size_t count = 1;
+    size_t first_end = m_discard + n >= total ? total : m_discard + n;
     for (size_t i = startPos; i < first_end; ++i) {
         if (!std::isnan(src[i])) {
             sum += src[i];
