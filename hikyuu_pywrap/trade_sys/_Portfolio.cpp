@@ -60,7 +60,7 @@ json PyPortfolio::lastSuggestion() const {
 
 void PyPortfolio::set_tm(py::object tm) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!tm || tm.is_none(), void());
+    HKU_IF_RETURN(!tm || tm.is_none() || tm.is(m_py_tm), void());
     setTM(tm.cast<TradeManagerPtr>());
     if (m_tm && m_tm->isPythonObject()) {
         m_py_tm.release();
@@ -70,16 +70,17 @@ void PyPortfolio::set_tm(py::object tm) {
 
 void PyPortfolio::set_se(py::object se) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!se || se.is_none(), void());
+    HKU_IF_RETURN(!se || se.is_none() || se.is(m_py_se), void());
     setSE(se.cast<SelectorPtr>());
     if (m_se && m_se->isPythonObject()) {
         m_py_se.release();
         m_py_se = se;
+        m_py_se.release();
     }
 }
 
 void PyPortfolio::set_af(py::object af) {
-    HKU_IF_RETURN(!af || af.is_none(), void());
+    HKU_IF_RETURN(!af || af.is_none() || af.is(m_py_af), void());
     setAF(af.cast<AFPtr>());
     if (m_af && m_af->isPythonObject()) {
         m_py_af.release();

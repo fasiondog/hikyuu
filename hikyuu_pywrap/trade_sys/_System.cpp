@@ -106,11 +106,12 @@ void PySystem::set_cn(py::object cn) {
 
 void PySystem::set_sg(py::object sg) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!sg || sg.is_none(), void());
+    HKU_IF_RETURN(!sg || sg.is_none() || sg.is(m_py_sg), void());
     setSG(sg.cast<SGPtr>());
     if (m_sg && m_sg->isPythonObject()) {
         m_py_sg.release();
         m_py_sg = sg;
+        m_py_sg.release();
     }
 }
 
