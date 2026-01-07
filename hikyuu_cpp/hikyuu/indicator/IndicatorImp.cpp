@@ -181,6 +181,55 @@ const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
     return m_ind_params.at(name);
 }
 
+bool IndicatorImp::fisrt_inner_calculate() {
+    if (m_result_num == 0 || size() == 0 || m_context.empty() || size() < m_context.size()) {
+        return false;
+    }
+
+    if (m_context.front().datetime < m_old_context.front().datetime ||
+        m_context.back().datetime > m_old_context.back().datetime) {
+        return false;
+    }
+
+    if (m_context.getStock() != m_old_context.getStock() ||
+        m_old_context.getQuery().kType() != m_context.getQuery().kType() ||
+        m_old_context.getQuery().recoverType() != m_context.getQuery().recoverType()) {
+        return false;
+    }
+
+    size_t start_pos = m_old_context.getPos(m_context.front().datetime);
+    if (start_pos == Null<size_t>()) {
+        return false;
+    }
+    size_t last_pos = m_old_context.getPos(m_context.back().datetime);
+    if (last_pos == Null<size_t>()) {
+        return false;
+    }
+
+    if (start_pos > last_pos) {
+        return false;
+    }
+
+    size_t total = m_context.size();
+    if (total != last_pos - start_pos + 1) {
+        HKU_INFO("total:{}, last_pos - start_pos + 1:{}", total, last_pos - start_pos + 1);
+        return false;
+    }
+
+    for (size_t r = 0; r < m_result_num; ++r) {
+        auto *dst = this->data(r);
+        if (dst == nullptr) {
+            return false;
+        }
+        memmove(dst, dst + start_pos, sizeof(value_t) * (total));
+        m_pBuffer[r]->resize(total);
+    }
+
+    _update_discard();
+
+    return true;
+}
+
 void IndicatorImp::setContext(const KData &k) {
     // KData old_k = getParam<KData>("kdata");
     KData old_k = getContext();
@@ -190,6 +239,11 @@ void IndicatorImp::setContext(const KData &k) {
         if (m_need_calculate) {
             calculate();
         }
+        return;
+    }
+
+    onlySetContext(k);
+    if (fisrt_inner_calculate()) {
         return;
     }
 
@@ -209,8 +263,7 @@ void IndicatorImp::setContext(const KData &k) {
     }
 
     // 重设上下文
-    // onlySetContext(k)
-    onlySetContext(k);
+    // onlySetContext(k);
 
     // 启动重新计算
     calculate();
@@ -220,7 +273,7 @@ void IndicatorImp::setContext(const KData &k) {
         vector<IndicatorImpPtr> nodes;
         getAllSubNodes(nodes);
         for (const auto &node : nodes) {
-            if (!node->m_need_calculate && node->size() > 0) {
+            if (!node->m_need_calculate && node->size() > 0 && !node->supportDynamicCalculate()) {
                 node->_clearBuffer();
             }
         }
@@ -736,6 +789,94 @@ void IndicatorImp::_calculate(const Indicator &ind) {
     }
 }
 
+bool IndicatorImp::can_cycle_calculate(const Indicator &ind) {
+    if (!supportDynamicCalculate()) {
+        return false;
+    }
+
+    if (m_result_num == 0 || size() == 0 || m_context.empty()) {
+        return false;
+    }
+
+    if (m_context.front().datetime < m_old_context.front().datetime) {
+        return false;
+    }
+
+    if (m_context.getStock() != m_old_context.getStock() ||
+        m_old_context.getQuery().kType() != m_context.getQuery().kType() ||
+        m_old_context.getQuery().recoverType() != m_context.getQuery().recoverType()) {
+        return false;
+    }
+
+    if (m_context.back().datetime <= m_old_context.back().datetime) {
+        size_t start_pos = m_old_context.getPos(m_context.front().datetime);
+        if (start_pos == Null<size_t>()) {
+            return false;
+        }
+
+        size_t last_pos = m_old_context.getPos(m_context.back().datetime);
+        if (last_pos == Null<size_t>()) {
+            return false;
+        }
+
+        if (start_pos > last_pos) {
+            return false;
+        }
+
+        size_t total = m_context.size();
+        if (total != last_pos - start_pos + 1) {
+            return false;
+        }
+
+        for (size_t r = 0; r < m_result_num; ++r) {
+            auto *dst = this->data(r);
+            if (dst == nullptr) {
+                return false;
+            }
+            memmove(dst, dst + start_pos, sizeof(value_t) * (total));
+            m_pBuffer[r]->resize(total);
+        }
+    } else {
+        size_t start_pos = m_old_context.getPos(m_context.front().datetime);
+        if (start_pos == Null<size_t>()) {
+            return false;
+        }
+
+        size_t total = m_context.size();
+        size_t copy_len = m_old_context.size() - start_pos;
+        HKU_ASSERT(copy_len <= total);
+        if (2 * total > 3 * copy_len) {
+            return false;
+        }
+
+        // HKU_INFO("total:{}, copy_len:{}", total, copy_len);
+
+        for (size_t r = 0; r < m_result_num; ++r) {
+            if (m_pBuffer[r] == nullptr) {
+                return false;
+            }
+            m_pBuffer[r]->resize(total);
+            auto *dst = this->data(r);
+            memmove(dst, dst + start_pos, sizeof(value_t) * (copy_len));
+        }
+
+        start_pos = m_context.getPos(m_old_context.back().datetime);
+        if (start_pos == Null<size_t>()) {
+            return false;
+        }
+
+        for (size_t r = 0; r < m_result_num; ++r) {
+            for (size_t i = start_pos; i < total; ++i) {
+                _dynamic_one_cycle(ind, i, r);
+            }
+        }
+    }
+
+    _update_discard();
+
+    return true;
+}
+
 Indicator IndicatorImp::calculate() {
     IndicatorImpPtr result;
     if (!needCalculate()) {
@@ -757,15 +898,19 @@ Indicator IndicatorImp::calculate() {
             break;
 
         case OP: {
-            m_right->calculate();
-            _readyBuffer(m_right->size(), m_result_num);
-            Indicator tmp_ind(m_right);
             if (m_ind_params.empty()) {
-                _calculate(tmp_ind);
+                if (!can_cycle_calculate(Indicator(m_right))) {
+                    m_right->calculate();
+                    _readyBuffer(m_right->size(), m_result_num);
+                    _calculate(Indicator(m_right));
+                    onlySetContext(m_right->getContext());
+                }
             } else {
-                _dyn_calculate(tmp_ind);
+                m_right->calculate();
+                _readyBuffer(m_right->size(), m_result_num);
+                _dyn_calculate(Indicator(m_right));
+                onlySetContext(m_right->getContext());
             }
-            onlySetContext(m_right->getContext());
         } break;
 
         case ADD:

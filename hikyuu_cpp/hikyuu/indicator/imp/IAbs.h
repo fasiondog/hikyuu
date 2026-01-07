@@ -20,6 +20,14 @@ class IAbs : public IndicatorImp {
 public:
     IAbs();
     virtual ~IAbs();
+
+    virtual bool supportDynamicCalculate() const override {
+        return true;
+    }
+
+    virtual void _dynamic_one_cycle(const Indicator& ind, size_t pos, size_t r) override {
+        _set(std::abs(ind.get(pos, r)), pos, r);
+    }
 };
 
 } /* namespace hku */

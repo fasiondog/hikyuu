@@ -160,6 +160,12 @@ public:
         return false;
     }
 
+    virtual bool supportDynamicCalculate() const {
+        return false;
+    }
+
+    virtual void _dynamic_one_cycle(const Indicator& ind, size_t pos, size_t r) {}
+
     /** 是否必须串行计算 */
     virtual bool isSerial() const {
         return false;
@@ -216,6 +222,8 @@ public:
 
 private:
     bool needCalculate();
+    bool fisrt_inner_calculate();
+    bool can_cycle_calculate(const Indicator& ind);
     void execute_add();
     void execute_sub();
     void execute_mul();
