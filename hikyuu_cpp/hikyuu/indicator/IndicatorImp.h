@@ -163,6 +163,10 @@ public:
         return false;
     }
 
+    virtual bool use_increment_calulate(size_t total, size_t overlap_len) {
+        return 2 * total <= 3 * overlap_len;
+    }
+
     virtual void _increment_one_cycle(const Indicator& ind, size_t pos, size_t r) {}
 
     /** 是否必须串行计算 */

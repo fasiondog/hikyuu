@@ -32,6 +32,10 @@ void IAbs::_calculate(const Indicator &data) {
     }
 }
 
+void IAbs::_increment_one_cycle(const Indicator &ind, size_t pos, size_t r) {
+    _set(std::abs(ind.get(pos, r)), pos, r);
+}
+
 Indicator HKU_API ABS() {
     return Indicator(make_shared<IAbs>());
 }

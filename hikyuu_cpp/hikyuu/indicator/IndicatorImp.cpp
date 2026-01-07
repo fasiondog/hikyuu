@@ -843,11 +843,9 @@ bool IndicatorImp::can_increment_calculate(const Indicator &ind) {
         size_t total = m_context.size();
         size_t copy_len = m_old_context.size() - start_pos;
         HKU_ASSERT(copy_len <= total);
-        if (2 * total > 3 * copy_len) {
+        if (!use_increment_calulate(total, copy_len)) {
             return false;
         }
-
-        // HKU_INFO("total:{}, copy_len:{}", total, copy_len);
 
         for (size_t r = 0; r < m_result_num; ++r) {
             if (m_pBuffer[r] == nullptr) {
@@ -861,6 +859,10 @@ bool IndicatorImp::can_increment_calculate(const Indicator &ind) {
         start_pos = m_context.getPos(m_old_context.back().datetime);
         if (start_pos == Null<size_t>()) {
             return false;
+        }
+
+        if (start_pos < ind.discard()) {
+            start_pos = ind.discard();
         }
 
         for (size_t r = 0; r < m_result_num; ++r) {

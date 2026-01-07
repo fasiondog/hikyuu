@@ -34,6 +34,10 @@ void IAcos::_calculate(const Indicator &data) {
     }
 }
 
+void IAcos::_increment_one_cycle(const Indicator &ind, size_t pos, size_t r) {
+    _set(std::acos(ind.get(pos, r)), pos, r);
+}
+
 Indicator HKU_API ACOS() {
     return Indicator(make_shared<IAcos>());
 }
