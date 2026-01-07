@@ -17,7 +17,8 @@ namespace hku {
  * 抛弃数 = 0
  */
 class IEma : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IEma)
+    INDICATOR_IMP(IEma)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

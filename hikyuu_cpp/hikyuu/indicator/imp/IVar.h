@@ -19,7 +19,8 @@ namespace hku {
  * 估算样本方差
  */
 class IVar : public hku::IndicatorImp {
-    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IVar)
+    INDICATOR_IMP(IVar)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

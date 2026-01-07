@@ -22,7 +22,8 @@
 
 #define TA_IN1_OUT_DYN_DEF(func)                                     \
     class Cls_##func : public IndicatorImp {                         \
-        INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(Cls_##func)               \
+        INDICATOR_IMP(Cls_##func)                                    \
+        INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE                          \
         INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION                \
                                                                      \
     public:                                                          \

@@ -16,7 +16,8 @@
 namespace hku {
 
 class IRocp : public hku::IndicatorImp {
-    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IRocp)
+    INDICATOR_IMP(IRocp)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

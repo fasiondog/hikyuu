@@ -20,7 +20,8 @@ namespace hku {
  * 参数： n: N日时间窗口
  */
 class IHighLine : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IHighLine)
+    INDICATOR_IMP(IHighLine)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

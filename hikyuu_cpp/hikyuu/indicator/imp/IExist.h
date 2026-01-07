@@ -19,7 +19,8 @@ namespace hku {
  * 存在, EXIST(X,N) 表示条件X在N周期有存在
  */
 class IExist : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IExist)
+    INDICATOR_IMP(IExist)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

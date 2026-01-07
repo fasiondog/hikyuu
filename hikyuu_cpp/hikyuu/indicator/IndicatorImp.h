@@ -129,8 +129,6 @@ public:
 
     void setContext(const KData&);
 
-    void onlySetContext(const KData&);
-
     KData getContext() const;
 
     void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);
@@ -153,18 +151,19 @@ public:
     // ===================
     virtual void _calculate(const Indicator&);
 
-    virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
-
     /** 是否支持动态周期指标参数 */
     virtual bool supportIndParam() const {
         return false;
     }
 
-    virtual bool supportDynamicCalculate() const {
+    virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
+
+    /** 是否支持增量计算 */
+    virtual bool supportIncrementCalculate() const {
         return false;
     }
 
-    virtual void _dynamic_one_cycle(const Indicator& ind, size_t pos, size_t r) {}
+    virtual void _increment_one_cycle(const Indicator& ind, size_t pos, size_t r) {}
 
     /** 是否必须串行计算 */
     virtual bool isSerial() const {
@@ -222,8 +221,8 @@ public:
 
 private:
     bool needCalculate();
-    bool fisrt_inner_calculate();
-    bool can_cycle_calculate(const Indicator& ind);
+    bool can_inner_calculate();
+    bool can_increment_calculate(const Indicator& ind);
     void execute_add();
     void execute_sub();
     void execute_mul();
@@ -260,6 +259,8 @@ private:
 
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
+
+    void onlySetContext(const KData&);
 
     // 用于动态参数时，更新 discard
     void _update_discard();
@@ -402,15 +403,18 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
-#define INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(classname)                                          \
+#define INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE                                                    \
 public:                                                                                        \
-    virtual void _calculate(const Indicator& ind) override;                                    \
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override; \
     virtual bool supportIndParam() const override {                                            \
         return true;                                                                           \
-    }                                                                                          \
-    virtual IndicatorImpPtr _clone() override {                                                \
-        return make_shared<classname>();                                                       \
+    }
+
+#define INDICATOR_IMP_SUPPORT_INCREMENT                                                     \
+public:                                                                                     \
+    virtual void _increment_one_cycle(const Indicator& ind, size_t pos, size_t r) override; \
+    virtual bool supportIncrementCalculate() const override {                               \
+        return true;                                                                        \
     }
 
 #define INDICATOR_NEED_CONTEXT                    \

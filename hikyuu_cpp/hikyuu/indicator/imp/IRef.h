@@ -20,7 +20,8 @@ namespace hku {
  * 例如：　REF(CLOSE，1)　表示上一周期的收盘价，在日线上就是昨收。
  */
 class IRef : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IRef)
+    INDICATOR_IMP(IRef)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

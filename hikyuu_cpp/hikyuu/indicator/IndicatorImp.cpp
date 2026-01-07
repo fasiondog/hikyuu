@@ -181,7 +181,7 @@ const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
     return m_ind_params.at(name);
 }
 
-bool IndicatorImp::fisrt_inner_calculate() {
+bool IndicatorImp::can_inner_calculate() {
     if (m_result_num == 0 || size() == 0 || m_context.empty() || size() < m_context.size()) {
         return false;
     }
@@ -212,7 +212,6 @@ bool IndicatorImp::fisrt_inner_calculate() {
 
     size_t total = m_context.size();
     if (total != last_pos - start_pos + 1) {
-        HKU_INFO("total:{}, last_pos - start_pos + 1:{}", total, last_pos - start_pos + 1);
         return false;
     }
 
@@ -231,7 +230,6 @@ bool IndicatorImp::fisrt_inner_calculate() {
 }
 
 void IndicatorImp::setContext(const KData &k) {
-    // KData old_k = getParam<KData>("kdata");
     KData old_k = getContext();
 
     // 上下文没变化的情况下根据自身标识进行计算
@@ -243,7 +241,7 @@ void IndicatorImp::setContext(const KData &k) {
     }
 
     onlySetContext(k);
-    if (fisrt_inner_calculate()) {
+    if (can_inner_calculate()) {
         return;
     }
 
@@ -273,7 +271,7 @@ void IndicatorImp::setContext(const KData &k) {
         vector<IndicatorImpPtr> nodes;
         getAllSubNodes(nodes);
         for (const auto &node : nodes) {
-            if (!node->m_need_calculate && node->size() > 0 && !node->supportDynamicCalculate()) {
+            if (!node->m_need_calculate && node->size() > 0 && !node->supportIncrementCalculate()) {
                 node->_clearBuffer();
             }
         }
@@ -789,8 +787,8 @@ void IndicatorImp::_calculate(const Indicator &ind) {
     }
 }
 
-bool IndicatorImp::can_cycle_calculate(const Indicator &ind) {
-    if (!supportDynamicCalculate()) {
+bool IndicatorImp::can_increment_calculate(const Indicator &ind) {
+    if (!supportIncrementCalculate()) {
         return false;
     }
 
@@ -867,7 +865,7 @@ bool IndicatorImp::can_cycle_calculate(const Indicator &ind) {
 
         for (size_t r = 0; r < m_result_num; ++r) {
             for (size_t i = start_pos; i < total; ++i) {
-                _dynamic_one_cycle(ind, i, r);
+                _increment_one_cycle(ind, i, r);
             }
         }
     }
@@ -899,7 +897,7 @@ Indicator IndicatorImp::calculate() {
 
         case OP: {
             if (m_ind_params.empty()) {
-                if (!can_cycle_calculate(Indicator(m_right))) {
+                if (!can_increment_calculate(Indicator(m_right))) {
                     m_right->calculate();
                     _readyBuffer(m_right->size(), m_result_num);
                     _calculate(Indicator(m_right));

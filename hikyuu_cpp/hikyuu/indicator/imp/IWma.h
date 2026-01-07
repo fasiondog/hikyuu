@@ -17,7 +17,8 @@ namespace hku {
  * WMA(X,N):X的N日加权移动平均.算法:Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)。
  */
 class IWma : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IWma)
+    INDICATOR_IMP(IWma)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
