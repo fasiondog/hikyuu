@@ -163,9 +163,8 @@ public:
         return false;
     }
 
-    virtual bool use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) {
-        return 2 * total <= 3 * overlap_len;
-    }
+    virtual bool use_increment_calulate(const Indicator& ind, size_t total,
+                                        size_t overlap_len) const;
 
     virtual void _increment_calculate(const Indicator& ind, size_t start_pos) {}
 

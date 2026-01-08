@@ -787,6 +787,15 @@ void IndicatorImp::_calculate(const Indicator &ind) {
     }
 }
 
+bool IndicatorImp::use_increment_calulate(const Indicator &ind, size_t total,
+                                          size_t overlap_len) const {
+    // 增量部分长度 < 非增量部分的4分之1
+    // (total - overlan_len - ind.discard()) < overlap_len / 4
+    // 4*total - 4*overlap_len- 4*ind.discard() < overlap_len
+    // 4*total < 5 * overlap_len + 4*ind.discard()
+    return total < 1.25 * overlap_len + ind.discard();
+}
+
 bool IndicatorImp::can_increment_calculate(const Indicator &ind) {
     if (!supportIncrementCalculate()) {
         return false;
@@ -1777,7 +1786,7 @@ bool IndicatorImp::contains(const string &name) const {
 void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
     // 使用栈来模拟递归调用，避免深层递归导致的栈溢出
     std::stack<IndicatorImpPtr> nodeStack;
-    
+
     // 将当前节点的子节点入栈（按相反顺序入栈以保持原有处理顺序）
     if (m_three) {
         nodeStack.push(m_three);
@@ -1788,15 +1797,15 @@ void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
     if (m_right) {
         nodeStack.push(m_right);
     }
-    
+
     // 处理栈中的节点
     while (!nodeStack.empty()) {
         IndicatorImpPtr current = nodeStack.top();
         nodeStack.pop();
-        
+
         // 添加当前节点到结果列表
         nodes.push_back(current);
-        
+
         // 将当前节点的子节点入栈（按相反顺序入栈以保持原有处理顺序）
         if (current->m_three) {
             nodeStack.push(current->m_three);
@@ -1807,11 +1816,11 @@ void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
         if (current->m_right) {
             nodeStack.push(current->m_right);
         }
-        
+
         // 添加当前节点的内部节点（如果有的话）
         current->getSelfInnerNodesWithInputConext(nodes);
     }
-    
+
     // 添加当前节点的内部节点
     getSelfInnerNodesWithInputConext(nodes);
 }

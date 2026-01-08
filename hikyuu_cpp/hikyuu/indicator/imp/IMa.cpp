@@ -71,7 +71,7 @@ void IMa::_calculate(const Indicator& indicator) {
 #endif
 }
 
-bool IMa::use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) {
+bool IMa::use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) const {
     int n = getParam<int>("n");
     return 2 * total <= 3 * overlap_len && (ind.discard() + n > total - overlap_len);
 }

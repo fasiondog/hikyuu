@@ -46,7 +46,8 @@ public:
                                supportIncrementCalculate, );
     }
 
-    bool use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) override {
+    bool use_increment_calulate(const Indicator& ind, size_t total,
+                                size_t overlap_len) const override {
         PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "use_increment_calulate", use_increment_calulate,
                                ind, total, overlap_len);
     }

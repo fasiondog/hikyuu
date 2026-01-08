@@ -25,7 +25,7 @@ public:
     virtual void _checkParam(const string& name) const override;
 
     virtual bool use_increment_calulate(const Indicator& ind, size_t total,
-                                        size_t overlap_len) override;
+                                        size_t overlap_len) const override;
 };
 
 } /* namespace hku */
