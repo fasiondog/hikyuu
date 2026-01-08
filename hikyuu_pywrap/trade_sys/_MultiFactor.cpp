@@ -22,18 +22,9 @@ class HIDDEN PyMultiFactor : public MultiFactorBase {
 
 public:
     using MultiFactorBase::MultiFactorBase;
-    PyMultiFactor(const MultiFactorBase& base) : MultiFactorBase(base) {
-        py::gil_scoped_acquire gil;
-        m_py_norm.release();
-    }
+    PyMultiFactor(const MultiFactorBase& base) : MultiFactorBase(base) {}
 
-    virtual ~PyMultiFactor() override {
-        py::gil_scoped_acquire gil;
-        m_py_norm.release();
-        for (auto& item : m_py_special_norms) {
-            item.second.release();
-        }
-    }
+    virtual ~PyMultiFactor() override {}
 
     IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) override {
         // PYBIND11_OVERLOAD_PURE_NAME(IndicatorList, MultiFactorBase, "_calculate", _calculate,
@@ -48,11 +39,14 @@ public:
 public:
     void set_norm(py::object norm) {
         py::gil_scoped_acquire gil;
-        HKU_IF_RETURN(!norm || norm.is_none(), void());
+        if (!norm || norm.is_none()) {
+            setNormalize(NormPtr());
+            return;
+        }
         setNormalize(norm.cast<NormPtr>());
         if (m_norm && m_norm->isPythonObject()) {
-            m_py_norm.release();
-            m_py_norm = norm;
+            auto tmp = norm;
+            tmp.release();
         }
     }
 
@@ -62,8 +56,8 @@ public:
         HKU_INFO_IF_RETURN(!norm || norm.is_none(), void(), "norm is None");
         addSpecialNormalize(name, norm.cast<NormPtr>(), category, style_inds);
         if (m_special_norms[name] && m_special_norms[name]->isPythonObject()) {
-            m_py_special_norms[name].release();
-            m_py_special_norms[name] = norm;
+            auto tmp = norm;
+            tmp.release();
         }
     }
 

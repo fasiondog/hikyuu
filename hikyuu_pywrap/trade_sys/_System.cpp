@@ -16,31 +16,9 @@ using namespace hku;
 #pragma warning(disable : 4267)
 #endif
 
-PySystem::PySystem(const System& base) : System(base) {
-    py::gil_scoped_acquire gil;
-    m_py_ev.release();
-    m_py_cn.release();
-    m_py_st.release();
-    m_py_tp.release();
-    m_py_pg.release();
-    m_py_sp.release();
-    m_py_mm.release();
-    m_py_sg.release();
-    m_py_tm.release();
-}
+PySystem::PySystem(const System& base) : System(base) {}
 
-PySystem::~PySystem() {
-    py::gil_scoped_acquire gil;
-    m_py_ev.release();
-    m_py_cn.release();
-    m_py_st.release();
-    m_py_tp.release();
-    m_py_pg.release();
-    m_py_sp.release();
-    m_py_mm.release();
-    m_py_sg.release();
-    m_py_tm.release();
-}
+PySystem::~PySystem() {}
 
 void PySystem::run(const KData& kdata, bool reset, bool resetAll) {
     PYBIND11_OVERLOAD(void, System, run, kdata, reset, resetAll);
@@ -76,91 +54,118 @@ string PySystem::str() const {
 
 void PySystem::set_mm(py::object mm) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!mm || mm.is_none(), void());
+    if (!mm || mm.is_none()) {
+        setMM(MMPtr());
+        return;
+    }
     setMM(mm.cast<MMPtr>());
     if (m_mm && m_mm->isPythonObject()) {
-        m_py_mm.release();
-        m_py_mm = mm;
+        auto tmp = mm;
+        tmp.release();
     }
 }
 
 void PySystem::set_ev(py::object ev) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!ev || ev.is_none(), void());
+    if (!ev || ev.is_none()) {
+        setEV(EnvironmentPtr());
+        return;
+    }
     setEV(ev.cast<EnvironmentPtr>());
     if (m_ev && m_ev->isPythonObject()) {
-        m_py_ev.release();
-        m_py_ev = ev;
+        auto tmp = ev;
+        tmp.release();
     }
 }
 
 void PySystem::set_cn(py::object cn) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!cn || cn.is_none(), void());
+    if (!cn || cn.is_none()) {
+        setCN(CNPtr());
+        return;
+    }
     setCN(cn.cast<CNPtr>());
     if (m_cn && m_cn->isPythonObject()) {
-        m_py_cn.release();
-        m_py_cn = cn;
+        auto tmp = cn;
+        tmp.release();
     }
 }
 
 void PySystem::set_sg(py::object sg) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!sg || sg.is_none(), void());
+    if (!sg || sg.is_none()) {
+        setSG(SGPtr());
+        return;
+    }
     setSG(sg.cast<SGPtr>());
     if (m_sg && m_sg->isPythonObject()) {
-        m_py_sg.release();
-        m_py_sg = sg;
+        py::object tmp_sg = sg;
+        tmp_sg.release();
     }
 }
 
 void PySystem::set_st(py::object st) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!st || st.is_none(), void());
+    if (!st || st.is_none()) {
+        setST(StoplossPtr());
+        return;
+    }
     setST(st.cast<StoplossPtr>());
     if (m_st && m_st->isPythonObject()) {
-        m_py_st.release();
-        m_py_st = st;
+        auto tmp = st;
+        tmp.release();
     }
 }
 
 void PySystem::set_tp(py::object tp) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!tp || tp.is_none(), void());
+    if (!tp || tp.is_none()) {
+        setTP(StoplossPtr());
+        return;
+    }
     setTP(tp.cast<StoplossPtr>());
     if (m_tp && m_tp->isPythonObject()) {
-        m_py_tp.release();
-        m_py_tp = tp;
+        auto tmp = tp;
+        tmp.release();
     }
 }
 
 void PySystem::set_pg(py::object pg) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!pg || pg.is_none(), void());
+    if (!pg || pg.is_none()) {
+        setPG(PGPtr());
+        return;
+    }
     setPG(pg.cast<PGPtr>());
     if (m_pg && m_pg->isPythonObject()) {
-        m_py_pg.release();
-        m_py_pg = pg;
+        auto tmp = pg;
+        tmp.release();
     }
 }
 
 void PySystem::set_sp(py::object sp) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!sp || sp.is_none(), void());
+    if (!sp || sp.is_none()) {
+        setSP(SlippagePtr());
+        return;
+    }
     setSP(sp.cast<SlippagePtr>());
     if (m_sp && m_sp->isPythonObject()) {
-        m_py_sp.release();
-        m_py_sp = sp;
+        auto tmp = sp;
+        tmp.release();
     }
 }
 
 void PySystem::set_tm(py::object tm) {
     py::gil_scoped_acquire gil;
-    HKU_IF_RETURN(!tm || tm.is_none(), void());
+    if (!tm || tm.is_none()) {
+        setTM(TradeManagerPtr());
+        return;
+    }
     setTM(tm.cast<TradeManagerPtr>());
     if (m_tm && m_tm->isPythonObject()) {
-        m_py_tm.release();
-        m_py_tm = tm;
+        auto tmp = tm;
+        tmp.release();
     }
 }
 

@@ -44,9 +44,4 @@ public:
     void set_tm(py::object tm);
     void set_se(py::object se);
     void set_af(py::object af);
-
-private:
-    py::object m_py_af;
-    py::object m_py_se;
-    py::object m_py_tm;
 };
