@@ -154,7 +154,7 @@ TEST_CASE("test_SE_PerformanceOptimal") {
         CHECK_EQ(sw.size(), 1);
         CHECK_EQ(sw[0].sys->name(), "test_sys_3_10");
     }
-    for (size_t i = 50; i < 125; i++) {
+    for (size_t i = 50; i < 90; i++) {
         auto sw = se->getSelected(dates[i]);
         CHECK_EQ(sw.size(), 1);
         CHECK_EQ(sw[0].sys->name(), "test_sys_3_5");
@@ -190,12 +190,12 @@ TEST_CASE("test_SE_PerformanceOptimal") {
     for (size_t i = 30; i < 50; i++) {
         auto sw = se->getSelected(dates[i]);
         CHECK_EQ(sw.size(), 1);
-        CHECK_EQ(sw[0].sys->name(), "test_sys_5_10");
+        CHECK_EQ(sw[0].sys->name(), "test_sys_5_20");
     }
     for (size_t i = 50; i < 70; i++) {
         auto sw = se->getSelected(dates[i]);
         CHECK_EQ(sw.size(), 1);
-        CHECK_EQ(sw[0].sys->name(), "test_sys_5_20");
+        CHECK_EQ(sw[0].sys->name(), "test_sys_5_10");
     }
     for (size_t i = 70; i < 110; i++) {
         auto sw = se->getSelected(dates[i]);

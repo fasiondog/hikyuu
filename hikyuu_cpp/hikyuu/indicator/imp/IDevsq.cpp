@@ -32,14 +32,15 @@ void IDevsq::_calculate(const Indicator& data) {
     size_t total = data.size();
     int n = getParam<int>("n");
 
-    m_discard = data.discard();
     Indicator ma = MA(data, n);
+    m_discard = ma.discard();
+
     auto const* src = data.data();
     auto const* mean = ma.data();
     auto* dst = this->data();
-    for (size_t i = discard(); i < total; ++i) {
+    for (size_t i = m_discard; i < total; ++i) {
         price_t sum = 0.0;
-        size_t start = i < data.discard() + n ? data.discard() : i + 1 - n;
+        size_t start = i + 1 - n;
         for (size_t j = start; j <= i; ++j) {
             sum += std::pow(src[j] - mean[i], 2);
         }
@@ -49,6 +50,9 @@ void IDevsq::_calculate(const Indicator& data) {
 
 void IDevsq::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     size_t start = _get_step_start(curPos, step, ind.discard());
+    if (curPos + 1 < ind.discard() + step) {
+        return;
+    }
     price_t sum = 0.0;
     for (size_t i = start; i <= curPos; i++) {
         sum += ind[i];

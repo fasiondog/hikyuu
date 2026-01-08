@@ -793,7 +793,8 @@ bool IndicatorImp::use_increment_calulate(const Indicator &ind, size_t total,
     // (total - overlan_len - ind.discard()) < overlap_len / 4
     // 4*total - 4*overlap_len- 4*ind.discard() < overlap_len
     // 4*total < 5 * overlap_len + 4*ind.discard()
-    return total < 1.25 * overlap_len + ind.discard();
+    // return total < 1.25 * overlap_len + ind.discard();
+    return overlap_len > 0;
 }
 
 bool IndicatorImp::can_increment_calculate(const Indicator &ind) {

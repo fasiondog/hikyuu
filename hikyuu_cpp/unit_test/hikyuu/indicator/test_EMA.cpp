@@ -62,7 +62,8 @@ TEST_CASE("test_EMA") {
     ema = EMA(2);
     Indicator result = ema(ma);
     CHECK_EQ(result.size(), expect.size());
-    for (size_t i = 0; i < expect.size(); ++i) {
+    for (size_t i = expect.discard(); i < expect.size(); ++i) {
+        // HKU_INFO("{}: result: {}, expect: {}", i, result[i], expect[i]);
         CHECK_EQ(result[i], expect[i]);
     }
 }

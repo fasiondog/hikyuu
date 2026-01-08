@@ -55,16 +55,10 @@ TEST_CASE("test_MA") {
     ma = MA(open, 10);
     CHECK_EQ(ma.empty(), false);
     CHECK_EQ(ma.size(), kdata.size());
-    CHECK_EQ(ma.discard(), 0);
-    CHECK_EQ(ma[0], doctest::Approx(2415.197));
-    CHECK_EQ(ma[1], doctest::Approx(2397.1715));
-    CHECK_EQ(ma[2], doctest::Approx(2395.890));
-    CHECK_EQ(ma[3], doctest::Approx(2392.89075));
-    CHECK_EQ(ma[4], doctest::Approx(2394.1114));
-    CHECK_EQ(ma[5], doctest::Approx(2396.14767));
-    CHECK_EQ(ma[6], doctest::Approx(2395.62443));
-    CHECK_EQ(ma[7], doctest::Approx(2393.03375));
-    CHECK_EQ(ma[8], doctest::Approx(2389.709));
+    CHECK_EQ(ma.discard(), 9);
+    for (size_t i = 0; i < ma.discard(); ++i) {
+        CHECK_UNARY(std::isnan(ma[i]));
+    }
     CHECK_EQ(ma[9], doctest::Approx(2383.4041));
 
     /** @arg n = 10 且数据大小刚好为9 时, 正常关联数据 */
@@ -73,13 +67,10 @@ TEST_CASE("test_MA") {
     ma = MA(open, 10);
     CHECK_EQ(ma.empty(), false);
     CHECK_EQ(ma.size(), kdata.size());
-    CHECK_EQ(ma.discard(), 0);
-    CHECK_EQ(ma[0], doctest::Approx(2379.146));
-    CHECK_EQ(ma[1], doctest::Approx(2386.2365));
-    CHECK_EQ(ma[2], doctest::Approx(2385.45533));
-    CHECK_EQ(ma[3], doctest::Approx(2388.84));
-    CHECK_EQ(ma[7], doctest::Approx(2386.523));
-    CHECK_EQ(ma[8], doctest::Approx(2379.87156));
+    CHECK_EQ(ma.discard(), 9);
+    for (size_t i = 0; i < ma.discard(); ++i) {
+        CHECK_UNARY(std::isnan(ma[i]));
+    }
 
     /** @arg n = 10 且数据大小为11 时, 正常关联数据 */
     kdata = stock.getKData(KQuery(-11));
@@ -87,9 +78,10 @@ TEST_CASE("test_MA") {
     ma = MA(open, 10);
     CHECK_EQ(ma.empty(), false);
     CHECK_EQ(ma.size(), kdata.size());
-    CHECK_EQ(ma.discard(), 0);
-    CHECK_EQ(ma[0], doctest::Approx(2400.984));
-    CHECK_EQ(ma[8], doctest::Approx(2393.91711));
+    CHECK_EQ(ma.discard(), 9);
+    for (size_t i = 0; i < ma.discard(); ++i) {
+        CHECK_UNARY(std::isnan(ma[i]));
+    }
     CHECK_EQ(ma[9], doctest::Approx(2390.8365));
     CHECK_EQ(ma[10], doctest::Approx(2383.4041));
 
@@ -113,14 +105,14 @@ TEST_CASE("test_MA") {
     Indicator d = PRICELIST(data);
     Indicator ma1 = MA(d, 2);
     Indicator ma2 = MA(ma1, 2);
-    CHECK_EQ(ma1.discard(), 0);
-    CHECK_EQ(ma2.discard(), 0);
-    CHECK_EQ(ma1[0], data[0]);
+    CHECK_EQ(ma1.discard(), 1);
+    CHECK_EQ(ma2.discard(), 2);
+    CHECK_UNARY(std::isnan(ma1[0]));
     CHECK_EQ(ma1[1], (data[0] + data[1]) / 2);
     CHECK_EQ(ma1[2], 1.5);
     CHECK_EQ(ma1[3], 2.5);
-    CHECK_EQ(ma2[0], ma1[0]);
-    CHECK_EQ(ma2[1], (ma1[0] + ma1[1]) / 2);
+    CHECK_UNARY(std::isnan(ma2[0]));
+    CHECK_UNARY(std::isnan(ma2[1]));
     CHECK_EQ(ma2[2], 1.0);
     CHECK_EQ(ma2[3], 2.0);
 
@@ -131,7 +123,7 @@ TEST_CASE("test_MA") {
     CHECK_EQ(ma.size(), 0);
     CHECK_EQ(ma1.size(), 10);
     CHECK_EQ(ma1.size(), ma2.size());
-    for (size_t i = 0; i < ma1.size(); ++i) {
+    for (size_t i = ma1.discard(); i < ma1.size(); ++i) {
         CHECK_EQ(ma1[i], ma2[i]);
     }
 }
