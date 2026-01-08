@@ -789,11 +789,6 @@ void IndicatorImp::_calculate(const Indicator &ind) {
 
 bool IndicatorImp::use_increment_calulate(const Indicator &ind, size_t total,
                                           size_t overlap_len) const {
-    // 增量部分长度 < 非增量部分的4分之1
-    // (total - overlan_len - ind.discard()) < overlap_len / 4
-    // 4*total - 4*overlap_len- 4*ind.discard() < overlap_len
-    // 4*total < 5 * overlap_len + 4*ind.discard()
-    // return total < 1.25 * overlap_len + ind.discard();
     return overlap_len > 0;
 }
 
