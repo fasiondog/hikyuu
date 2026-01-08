@@ -40,6 +40,20 @@ public:
     void _dyn_calculate(const Indicator& ind) override {
         PYBIND11_OVERLOAD(void, IndicatorImp, _dyn_calculate, ind);
     }
+
+    bool supportIncrementCalculate() const override {
+        PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "support_increment_calculate",
+                               supportIncrementCalculate, );
+    }
+
+    bool use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) override {
+        PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "use_increment_calulate", use_increment_calulate,
+                               ind, total, overlap_len);
+    }
+
+    void _increment_calculate(const Indicator& ind, size_t start_pos) override {
+        PYBIND11_OVERLOAD(void, IndicatorImp, _increment_calculate, ind, start_pos);
+    }
 };
 
 const string& (IndicatorImp::*read_name)() const = &IndicatorImp::name;
