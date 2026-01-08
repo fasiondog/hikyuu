@@ -17,6 +17,7 @@ namespace hku {
 
 class ILn : public IndicatorImp {
     INDICATOR_IMP(ILn)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

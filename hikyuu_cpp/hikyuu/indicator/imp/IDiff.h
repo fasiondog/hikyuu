@@ -18,6 +18,7 @@ namespace hku {
  */
 class IDiff : public hku::IndicatorImp {
     INDICATOR_IMP(IDiff)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

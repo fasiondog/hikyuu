@@ -20,6 +20,7 @@ namespace hku {
  */
 class ICeil : public IndicatorImp {
     INDICATOR_IMP(ICeil)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

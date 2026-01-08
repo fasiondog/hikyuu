@@ -25,9 +25,13 @@ void IJumpUp::_calculate(const Indicator& ind) {
         return;
     }
 
+    _increment_calculate(ind, m_discard);
+}
+
+void IJumpUp::_increment_calculate(const Indicator& ind, size_t start_pos) {
     const auto* src = ind.data();
     auto* dst = data();
-    for (size_t i = m_discard; i < total; ++i) {
+    for (size_t i = start_pos, total = ind.size(); i < total; ++i) {
         if (src[i - 1] <= 0.0 && src[i] > 0.0) {
             dst[i] = 1.0;
         } else {

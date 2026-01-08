@@ -19,7 +19,7 @@ ISqrt::ISqrt() : IndicatorImp("SQRT", 1) {}
 
 ISqrt::~ISqrt() {}
 
-void ISqrt::_calculate(const Indicator &data) {
+void ISqrt::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();
     if (m_discard >= total) {
@@ -27,9 +27,13 @@ void ISqrt::_calculate(const Indicator &data) {
         return;
     }
 
-    auto const *src = data.data();
-    auto *dst = this->data();
-    for (size_t i = m_discard; i < total; ++i) {
+    _increment_calculate(data, m_discard);
+}
+
+void ISqrt::_increment_calculate(const Indicator& data, size_t start_pos) {
+    auto const* src = data.data();
+    auto* dst = this->data();
+    for (size_t i = start_pos, total = data.size(); i < total; ++i) {
         dst[i] = std::sqrt(src[i]);
     }
 }

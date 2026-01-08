@@ -17,6 +17,7 @@ namespace hku {
 
 class IExp : public IndicatorImp {
     INDICATOR_IMP(IExp)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

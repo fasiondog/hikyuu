@@ -14,6 +14,7 @@ namespace hku {
 /* 边缘跳变，从大于0.0，跳变到 <= 0.0 */
 class IJumpDown : public IndicatorImp {
     INDICATOR_IMP(IJumpDown)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

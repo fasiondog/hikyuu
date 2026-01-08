@@ -35,9 +35,14 @@ void IRef::_calculate(const Indicator& data) {
         return;
     }
 
+    _increment_calculate(data, m_discard);
+}
+
+void IRef::_increment_calculate(const Indicator& data, size_t start_pos) {
+    int n = getParam<int>("n");
     auto const* src = data.data();
     auto* dst = this->data();
-    for (size_t i = m_discard; i < total; ++i) {
+    for (size_t i = start_pos, total = data.size(); i < total; ++i) {
         dst[i] = src[i - n];
     }
 }

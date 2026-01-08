@@ -19,7 +19,7 @@ IIntpart::IIntpart() : IndicatorImp("INTPART", 1) {}
 
 IIntpart::~IIntpart() {}
 
-void IIntpart::_calculate(const Indicator &data) {
+void IIntpart::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();
     if (m_discard >= total) {
@@ -27,9 +27,13 @@ void IIntpart::_calculate(const Indicator &data) {
         return;
     }
 
-    auto const *src = data.data();
-    auto *dst = this->data();
-    for (size_t i = m_discard; i < total; ++i) {
+    _increment_calculate(data, m_discard);
+}
+
+void IIntpart::_increment_calculate(const Indicator& data, size_t start_pos) {
+    auto const* src = data.data();
+    auto* dst = this->data();
+    for (size_t i = start_pos, end = data.size(); i < end; ++i) {
         dst[i] = int(src[i]);
     }
 }
