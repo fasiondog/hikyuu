@@ -270,9 +270,15 @@ void IndicatorImp::setContext(const KData &k) {
     if (!m_parent) {
         vector<IndicatorImpPtr> nodes;
         getAllSubNodes(nodes);
-        for (const auto &node : nodes) {
-            if (!node->m_need_calculate && node->size() > 0 && !node->supportIncrementCalculate()) {
+        if (supportIncrementCalculate()) {
+            for (const auto &node : nodes) {
                 node->_clearBuffer();
+            }
+        } else {
+            for (const auto &node : nodes) {
+                if (!node->m_need_calculate || !node->supportIncrementCalculate()) {
+                    node->_clearBuffer();
+                }
             }
         }
     }
