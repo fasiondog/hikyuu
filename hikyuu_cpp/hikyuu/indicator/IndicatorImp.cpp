@@ -1775,19 +1775,44 @@ bool IndicatorImp::contains(const string &name) const {
 }
 
 void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
+    // 使用栈来模拟递归调用，避免深层递归导致的栈溢出
+    std::stack<IndicatorImpPtr> nodeStack;
+    
+    // 将当前节点的子节点入栈（按相反顺序入栈以保持原有处理顺序）
     if (m_three) {
-        nodes.push_back(m_three);
-        m_three->getAllSubNodes(nodes);
+        nodeStack.push(m_three);
     }
     if (m_left) {
-        nodes.push_back(m_left);
-        m_left->getAllSubNodes(nodes);
+        nodeStack.push(m_left);
     }
     if (m_right) {
-        nodes.push_back(m_right);
-        m_right->getAllSubNodes(nodes);
+        nodeStack.push(m_right);
     }
-
+    
+    // 处理栈中的节点
+    while (!nodeStack.empty()) {
+        IndicatorImpPtr current = nodeStack.top();
+        nodeStack.pop();
+        
+        // 添加当前节点到结果列表
+        nodes.push_back(current);
+        
+        // 将当前节点的子节点入栈（按相反顺序入栈以保持原有处理顺序）
+        if (current->m_three) {
+            nodeStack.push(current->m_three);
+        }
+        if (current->m_left) {
+            nodeStack.push(current->m_left);
+        }
+        if (current->m_right) {
+            nodeStack.push(current->m_right);
+        }
+        
+        // 添加当前节点的内部节点（如果有的话）
+        current->getSelfInnerNodesWithInputConext(nodes);
+    }
+    
+    // 添加当前节点的内部节点
     getSelfInnerNodesWithInputConext(nodes);
 }
 
