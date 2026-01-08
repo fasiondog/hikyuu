@@ -45,16 +45,4 @@ public:
     void set_pg(py::object pg);
     void set_sp(py::object sp);
     void set_tm(py::object tm);
-
-private:
-    // 固定顺序很重要, 影响析构
-    py::object m_py_cn;
-    py::object m_py_st;
-    py::object m_py_tp;
-    py::object m_py_pg;
-    py::object m_py_sp;
-    py::object m_py_mm;
-    py::object m_py_sg;
-    py::object m_py_tm;
-    py::object m_py_ev;
 };
