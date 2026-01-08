@@ -39,31 +39,19 @@ public:
 public:
     void set_norm(py::object norm) {
         py::gil_scoped_acquire gil;
-        if (!norm || norm.is_none()) {
-            setNormalize(NormPtr());
-            return;
-        }
+        auto tmp = norm;
         setNormalize(norm.cast<NormPtr>());
-        if (m_norm && m_norm->isPythonObject()) {
-            auto tmp = norm;
-            tmp.release();
-        }
+        tmp.release();
     }
 
     void add_special_norm(const string& name, py::object norm, const string& category,
                           const IndicatorList& style_inds) {
         py::gil_scoped_acquire gil;
         HKU_INFO_IF_RETURN(!norm || norm.is_none(), void(), "norm is None");
+        auto tmp = norm;
         addSpecialNormalize(name, norm.cast<NormPtr>(), category, style_inds);
-        if (m_special_norms[name] && m_special_norms[name]->isPythonObject()) {
-            auto tmp = norm;
-            tmp.release();
-        }
+        tmp.release();
     }
-
-private:
-    py::object m_py_norm;
-    unordered_map<string, py::object> m_py_special_norms;
 };
 
 void export_MultiFactor(py::module& m) {

@@ -54,119 +54,65 @@ string PySystem::str() const {
 
 void PySystem::set_mm(py::object mm) {
     py::gil_scoped_acquire gil;
-    if (!mm || mm.is_none()) {
-        setMM(MMPtr());
-        return;
-    }
+    auto tmp_mm = mm;
     setMM(mm.cast<MMPtr>());
-    if (m_mm && m_mm->isPythonObject()) {
-        auto tmp = mm;
-        tmp.release();
-    }
+    tmp_mm.release();
 }
 
 void PySystem::set_ev(py::object ev) {
     py::gil_scoped_acquire gil;
-    if (!ev || ev.is_none()) {
-        setEV(EnvironmentPtr());
-        return;
-    }
+    auto tmp_ev = ev;
     setEV(ev.cast<EnvironmentPtr>());
-    if (m_ev && m_ev->isPythonObject()) {
-        auto tmp = ev;
-        tmp.release();
-    }
+    tmp_ev.release();
 }
 
 void PySystem::set_cn(py::object cn) {
     py::gil_scoped_acquire gil;
-    if (!cn || cn.is_none()) {
-        setCN(CNPtr());
-        return;
-    }
+    auto tmp_cn = cn;
     setCN(cn.cast<CNPtr>());
-    if (m_cn && m_cn->isPythonObject()) {
-        auto tmp = cn;
-        tmp.release();
-    }
+    tmp_cn.release();
 }
 
 void PySystem::set_sg(py::object sg) {
     py::gil_scoped_acquire gil;
-    if (!sg || sg.is_none()) {
-        setSG(SGPtr());
-        return;
-    }
+    auto tmp_sg = sg;
     setSG(sg.cast<SGPtr>());
-    if (m_sg && m_sg->isPythonObject()) {
-        py::object tmp_sg = sg;
-        tmp_sg.release();
-    }
+    tmp_sg.release();
 }
 
 void PySystem::set_st(py::object st) {
     py::gil_scoped_acquire gil;
-    if (!st || st.is_none()) {
-        setST(StoplossPtr());
-        return;
-    }
+    auto tmp_st = st;
     setST(st.cast<StoplossPtr>());
-    if (m_st && m_st->isPythonObject()) {
-        auto tmp = st;
-        tmp.release();
-    }
+    tmp_st.release();
 }
 
 void PySystem::set_tp(py::object tp) {
     py::gil_scoped_acquire gil;
-    if (!tp || tp.is_none()) {
-        setTP(StoplossPtr());
-        return;
-    }
+    auto tmp_tp = tp;
     setTP(tp.cast<StoplossPtr>());
-    if (m_tp && m_tp->isPythonObject()) {
-        auto tmp = tp;
-        tmp.release();
-    }
+    tmp_tp.release();
 }
 
 void PySystem::set_pg(py::object pg) {
     py::gil_scoped_acquire gil;
-    if (!pg || pg.is_none()) {
-        setPG(PGPtr());
-        return;
-    }
+    auto tmp_pg = pg;
     setPG(pg.cast<PGPtr>());
-    if (m_pg && m_pg->isPythonObject()) {
-        auto tmp = pg;
-        tmp.release();
-    }
+    tmp_pg.release();
 }
 
 void PySystem::set_sp(py::object sp) {
     py::gil_scoped_acquire gil;
-    if (!sp || sp.is_none()) {
-        setSP(SlippagePtr());
-        return;
-    }
+    auto tmp_sp = sp;
     setSP(sp.cast<SlippagePtr>());
-    if (m_sp && m_sp->isPythonObject()) {
-        auto tmp = sp;
-        tmp.release();
-    }
+    tmp_sp.release();
 }
 
 void PySystem::set_tm(py::object tm) {
     py::gil_scoped_acquire gil;
-    if (!tm || tm.is_none()) {
-        setTM(TradeManagerPtr());
-        return;
-    }
+    auto tmp_tm = tm;
     setTM(tm.cast<TradeManagerPtr>());
-    if (m_tm && m_tm->isPythonObject()) {
-        auto tmp = tm;
-        tmp.release();
-    }
+    tmp_tm.release();
 }
 
 void export_System(py::module& m) {
