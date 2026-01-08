@@ -75,6 +75,7 @@ void PyPortfolio::set_se(py::object se) {
 }
 
 void PyPortfolio::set_af(py::object af) {
+    py::gil_scoped_acquire gil;
     if (!af || af.is_none()) {
         setAF(AFPtr());
         return;
