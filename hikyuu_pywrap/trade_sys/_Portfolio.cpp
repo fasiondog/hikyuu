@@ -50,41 +50,23 @@ json PyPortfolio::lastSuggestion() const {
 
 void PyPortfolio::set_tm(py::object tm) {
     py::gil_scoped_acquire gil;
-    if (!tm || tm.is_none()) {
-        setTM(TradeManagerPtr());
-        return;
-    }
+    auto tmp_tm = tm;
     setTM(tm.cast<TradeManagerPtr>());
-    if (m_tm && m_tm->isPythonObject()) {
-        auto tmp = tm;
-        tmp.release();
-    }
+    tmp_tm.release();
 }
 
 void PyPortfolio::set_se(py::object se) {
     py::gil_scoped_acquire gil;
-    if (!se || se.is_none()) {
-        setSE(SelectorPtr());
-        return;
-    }
+    auto tmp_se = se;
     setSE(se.cast<SelectorPtr>());
-    if (m_se && m_se->isPythonObject()) {
-        auto tmp = se;
-        tmp.release();
-    }
+    tmp_se.release();
 }
 
 void PyPortfolio::set_af(py::object af) {
     py::gil_scoped_acquire gil;
-    if (!af || af.is_none()) {
-        setAF(AFPtr());
-        return;
-    }
+    auto tmp_af = af;
     setAF(af.cast<AFPtr>());
-    if (m_af && m_af->isPythonObject()) {
-        auto tmp = af;
-        tmp.release();
-    }
+    tmp_af.release();
 }
 
 void export_Portfolio(py::module& m) {
