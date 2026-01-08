@@ -460,7 +460,6 @@ inline bool IndicatorImp::isLeaf() const {
 }
 
 inline KData IndicatorImp::getContext() const {
-    // return getParam<KData>("kdata");
     return m_context;
 }
 
