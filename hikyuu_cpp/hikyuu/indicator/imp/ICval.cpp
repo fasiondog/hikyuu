@@ -84,6 +84,31 @@ void ICval::_calculate(const Indicator& data) {
     }
 }
 
+void ICval::_increment_calculate(const Indicator& data, size_t start_pos) {
+    double value = getParam<double>("value");
+
+    size_t total = 0;
+    if (isLeaf()) {
+        // 叶子节点
+        const KData& k = getContext();
+        total = k.size();
+        if (0 == total) {
+            return;
+        }
+
+    } else {
+        // 非叶子节点
+        total = data.size();
+    }
+
+    for (size_t r = 0; r < m_result_num; ++r) {
+        auto* dst = this->data(r);
+        for (size_t i = start_pos; i < total; ++i) {
+            dst[i] = value;
+        }
+    }
+}
+
 Indicator HKU_API CVAL(double value, size_t discard) {
     return make_shared<ICval>(value, discard)->calculate();
 }
