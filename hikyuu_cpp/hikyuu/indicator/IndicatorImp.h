@@ -225,7 +225,9 @@ public:
 private:
     bool needCalculate();
     bool can_inner_calculate();
-    bool can_increment_calculate(const Indicator& ind);
+    bool can_increment_calculate();
+    bool increment_calculate(const Indicator& ind);
+    size_t increment_calculate(const Indicator& right, const Indicator& left);
     void execute_add();
     void execute_sub();
     void execute_mul();

@@ -226,6 +226,7 @@ bool IndicatorImp::can_inner_calculate() {
     }
 
     _update_discard();
+    m_need_calculate = false;
 
     return true;
 }
@@ -268,15 +269,15 @@ void IndicatorImp::setContext(const KData &k) {
     calculate();
 
     // 清理根节点之下所有节点中间计算数据
-    if (!m_parent) {
-        vector<IndicatorImpPtr> nodes;
-        getAllSubNodes(nodes);
-        for (const auto &node : nodes) {
-            if (!node->m_need_calculate || !node->supportIncrementCalculate()) {
-                node->_clearBuffer();
-            }
-        }
-    }
+    // if (!m_parent) {
+    //     vector<IndicatorImpPtr> nodes;
+    //     getAllSubNodes(nodes);
+    //     for (const auto &node : nodes) {
+    //         if (!node->m_need_calculate || !node->supportIncrementCalculate()) {
+    //             node->_clearBuffer();
+    //         }
+    //     }
+    // }
 }
 
 void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
@@ -793,11 +794,7 @@ bool IndicatorImp::use_increment_calulate(const Indicator &ind, size_t total,
     return overlap_len > 0;
 }
 
-bool IndicatorImp::can_increment_calculate(const Indicator &ind) {
-    if (!supportIncrementCalculate()) {
-        return false;
-    }
-
+bool IndicatorImp::can_increment_calculate() {
     if (m_result_num == 0 || size() == 0 || m_context.empty()) {
         return false;
     }
@@ -813,70 +810,95 @@ bool IndicatorImp::can_increment_calculate(const Indicator &ind) {
     }
 
     if (m_context.back().datetime <= m_old_context.back().datetime) {
-        size_t start_pos = m_old_context.getPos(m_context.front().datetime);
-        if (start_pos == Null<size_t>()) {
-            return false;
-        }
-
-        size_t last_pos = m_old_context.getPos(m_context.back().datetime);
-        if (last_pos == Null<size_t>()) {
-            return false;
-        }
-
-        if (start_pos > last_pos) {
-            return false;
-        }
-
-        size_t total = m_context.size();
-        if (total != last_pos - start_pos + 1) {
-            return false;
-        }
-
-        for (size_t r = 0; r < m_result_num; ++r) {
-            auto *dst = this->data(r);
-            if (dst == nullptr) {
-                return false;
-            }
-            memmove(dst, dst + start_pos, sizeof(value_t) * (total));
-            m_pBuffer[r]->resize(total);
-        }
-    } else {
-        size_t start_pos = m_old_context.getPos(m_context.front().datetime);
-        if (start_pos == Null<size_t>()) {
-            return false;
-        }
-
-        size_t total = m_context.size();
-        size_t copy_len = m_old_context.size() - start_pos;
-        HKU_ASSERT(copy_len <= total);
-        if (!use_increment_calulate(ind, total, copy_len)) {
-            return false;
-        }
-
-        for (size_t r = 0; r < m_result_num; ++r) {
-            if (m_pBuffer[r] == nullptr) {
-                return false;
-            }
-            m_pBuffer[r]->resize(total);
-            auto *dst = this->data(r);
-            memmove(dst, dst + start_pos, sizeof(value_t) * (copy_len));
-        }
-
-        start_pos = m_context.getPos(m_old_context.back().datetime);
-        if (start_pos == Null<size_t>()) {
-            return false;
-        }
-
-        if (start_pos < ind.discard()) {
-            start_pos = ind.discard();
-        }
-
-        _increment_calculate(ind, start_pos);
+        return false;
     }
 
-    _update_discard();
+    HKU_INFO("IndicatorImp::increment_calculate: {}", name());
 
     return true;
+}
+
+bool IndicatorImp::increment_calculate(const Indicator &ind) {
+    if (!supportIncrementCalculate() || !can_increment_calculate()) {
+        return false;
+    }
+
+    size_t start_pos = m_old_context.getPos(m_context.front().datetime);
+    if (start_pos == Null<size_t>()) {
+        return false;
+    }
+
+    size_t total = m_context.size();
+    size_t copy_len = m_old_context.size() - start_pos;
+    HKU_ASSERT(copy_len <= total);
+    if (!use_increment_calulate(ind, total, copy_len)) {
+        return false;
+    }
+
+    for (size_t r = 0; r < m_result_num; ++r) {
+        if (m_pBuffer[r] == nullptr) {
+            return false;
+        }
+        m_pBuffer[r]->resize(total);
+        auto *dst = this->data(r);
+        memmove(dst, dst + start_pos, sizeof(value_t) * (copy_len));
+    }
+
+    start_pos = m_context.getPos(m_old_context.back().datetime);
+    if (start_pos == Null<size_t>()) {
+        return false;
+    }
+
+    if (start_pos < ind.discard()) {
+        start_pos = ind.discard();
+    }
+
+    _increment_calculate(ind, start_pos);
+    return true;
+}
+
+size_t IndicatorImp::increment_calculate(const Indicator &right, const Indicator &left) {
+    size_t null_pos = Null<size_t>();
+    if (right.size() != left.size() || right.size() != m_context.size()) {
+        return null_pos;
+    }
+
+    if (!can_increment_calculate()) {
+        return null_pos;
+    }
+
+    size_t start_pos = m_old_context.getPos(m_context.front().datetime);
+    if (start_pos == null_pos) {
+        return null_pos;
+    }
+
+    size_t total = m_context.size();
+    size_t copy_len = m_old_context.size() - start_pos;
+    HKU_ASSERT(copy_len <= total);
+
+    for (size_t r = 0; r < m_result_num; ++r) {
+        if (m_pBuffer[r] == nullptr) {
+            return null_pos;
+        }
+        m_pBuffer[r]->resize(total);
+        auto *dst = this->data(r);
+        memmove(dst, dst + start_pos, sizeof(value_t) * (copy_len));
+    }
+
+    start_pos = m_context.getPos(m_old_context.back().datetime);
+    if (start_pos == Null<size_t>()) {
+        return null_pos;
+    }
+
+    if (start_pos < right.discard()) {
+        start_pos = right.discard();
+    }
+
+    if (start_pos < left.discard()) {
+        start_pos = left.discard();
+    }
+
+    return start_pos;
 }
 
 Indicator IndicatorImp::calculate() {
@@ -901,7 +923,7 @@ Indicator IndicatorImp::calculate() {
 
         case OP: {
             if (m_ind_params.empty()) {
-                if (!can_increment_calculate(Indicator(m_right))) {
+                if (!increment_calculate(Indicator(m_right))) {
                     m_right->calculate();
                     _readyBuffer(m_right->size(), m_result_num);
                     _calculate(Indicator(m_right));
@@ -1066,8 +1088,12 @@ void IndicatorImp::execute_weave() {
 }
 
 void IndicatorImp::execute_add() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_calculate(m_right, m_left);
+
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
     IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
@@ -1079,15 +1105,21 @@ void IndicatorImp::execute_add() {
     }
 
     size_t total = maxp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
     size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
     size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
-    setDiscard(discard);
+
+    size_t discard = start_pos;
+    if (discard == Null<size_t>()) {
+        discard = maxp->size() - minp->size() + minp->discard();
+        if (discard < maxp->discard()) {
+            discard = maxp->discard();
+        }
+        _readyBuffer(total, result_number);
+        setDiscard(discard);
+    }
+
+    // HKU_INFO("start_pos: {}", start_pos);
+
     for (size_t r = 0; r < result_number; ++r) {
         auto const *data1 = maxp->data(r);
         auto const *data2 = minp->data(r);
