@@ -232,7 +232,7 @@ bool IndicatorImp::can_inner_calculate() {
 }
 
 void IndicatorImp::setContext(const KData &k) {
-    KData old_k = getContext();
+    const KData &old_k = getContext();
 
     // 上下文没变化的情况下根据自身标识进行计算
     if (old_k == k) {
@@ -273,10 +273,8 @@ void IndicatorImp::setContext(const KData &k) {
         vector<IndicatorImpPtr> nodes;
         getAllSubNodes(nodes);
         for (const auto &node : nodes) {
-            if (node->m_optype == LEAF) {
-                if (!node->m_need_calculate && !node->supportIncrementCalculate()) {
-                    node->_clearBuffer();
-                }
+            if (!node->m_need_calculate && !node->supportIncrementCalculate()) {
+                node->_clearBuffer();
             }
         }
     }
@@ -521,7 +519,7 @@ Datetime IndicatorImp::getDatetime(size_t pos) const {
         DatetimeList dates(getParam<DatetimeList>("align_date_list"));
         return pos < dates.size() ? dates[pos] : Null<Datetime>();
     }
-    KData k = getContext();
+    const KData &k = getContext();
     return pos < k.size() ? k[pos].datetime : Null<Datetime>();
 }
 
@@ -768,7 +766,7 @@ bool IndicatorImp::needCalculate() {
 
 void IndicatorImp::_calculate(const Indicator &ind) {
     if (isLeaf()) {
-        auto k = getContext();
+        const auto &k = getContext();
         size_t total = k.size();
         HKU_IF_RETURN(total == 0, void());
         _readyBuffer(total, 1);
@@ -818,8 +816,43 @@ bool IndicatorImp::can_increment_calculate() {
     return true;
 }
 
-bool IndicatorImp::increment_calculate(const Indicator &ind) {
-    if (ind.size() != m_context.size() || !supportIncrementCalculate() ||
+bool IndicatorImp::increment_execute_leaf() {
+    if (!supportIncrementCalculate() || !can_increment_calculate()) {
+        return false;
+    }
+
+    size_t start_pos = m_old_context.getPos(m_context.front().datetime);
+    if (start_pos == Null<size_t>()) {
+        return false;
+    }
+
+    size_t total = m_context.size();
+    size_t copy_len = m_old_context.size() - start_pos;
+    HKU_ASSERT(copy_len <= total);
+    if (!use_increment_calulate(Indicator(), total, copy_len)) {
+        return false;
+    }
+
+    for (size_t r = 0; r < m_result_num; ++r) {
+        if (m_pBuffer[r] == nullptr) {
+            return false;
+        }
+        m_pBuffer[r]->resize(total);
+        auto *dst = this->data(r);
+        memmove(dst, dst + start_pos, sizeof(value_t) * (copy_len));
+    }
+
+    start_pos = m_context.getPos(m_old_context.back().datetime);
+    if (start_pos == Null<size_t>()) {
+        return false;
+    }
+
+    _increment_calculate(Indicator(), start_pos);
+    return true;
+}
+
+bool IndicatorImp::increment_execute_op(const Indicator &ind) {
+    if (!supportIncrementCalculate() || ind.size() != m_context.size() ||
         !can_increment_calculate()) {
         return false;
     }
@@ -872,7 +905,9 @@ Indicator IndicatorImp::calculate() {
     switch (m_optype) {
         case LEAF:
             if (m_ind_params.empty()) {
-                _calculate(Indicator());
+                if (!increment_execute_leaf()) {
+                    _calculate(Indicator());
+                }
             } else {
                 _dyn_calculate(Indicator());
             }
@@ -880,7 +915,7 @@ Indicator IndicatorImp::calculate() {
 
         case OP: {
             if (m_ind_params.empty()) {
-                if (!increment_calculate(Indicator(m_right))) {
+                if (!increment_execute_op(Indicator(m_right))) {
                     m_right->calculate();
                     _readyBuffer(m_right->size(), m_result_num);
                     _calculate(Indicator(m_right));

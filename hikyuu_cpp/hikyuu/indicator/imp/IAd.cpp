@@ -29,7 +29,7 @@ void IAd::_calculate(const Indicator& data) {
                 "The input is ignored because {} depends on the context!", m_name);
 
     m_discard = 0;
-    KData k = getContext();
+    const KData& k = getContext();
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -39,6 +39,22 @@ void IAd::_calculate(const Indicator& data) {
     auto* dst = this->data();
     dst[m_discard] = 0.0;
     for (size_t i = m_discard + 1; i < total; i++) {
+        const KRecord& r = k[i];
+        value_t tmp = r.highPrice - r.lowPrice;
+        if (tmp != 0.0) {
+            // 多空对比 = [（收盘价- 最低价） - （最高价 - 收盘价）] / （最高价 - 最低价）
+            ad += ((r.closePrice + r.closePrice - r.highPrice - r.lowPrice) / tmp) * r.transAmount;
+        }
+        dst[i] = ad;
+    }
+}
+
+void IAd::_increment_calculate(const Indicator& data, size_t start_pos) {
+    const KData& k = getContext();
+    size_t total = k.size();
+    auto* dst = this->data();
+    value_t ad = dst[start_pos - 1];
+    for (size_t i = start_pos; i < total; i++) {
         const KRecord& r = k[i];
         value_t tmp = r.highPrice - r.lowPrice;
         if (tmp != 0.0) {

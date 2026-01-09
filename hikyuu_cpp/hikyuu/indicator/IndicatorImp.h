@@ -130,7 +130,7 @@ public:
 
     void setContext(const KData&);
 
-    KData getContext() const;
+    const KData& getContext() const;
 
     void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);
 
@@ -227,7 +227,8 @@ private:
     bool needCalculate();
     bool can_inner_calculate();
     bool can_increment_calculate();
-    bool increment_calculate(const Indicator& ind);
+    bool increment_execute_leaf();
+    bool increment_execute_op(const Indicator& ind);
     size_t increment_execute();
     void execute_add();
     void execute_sub();
@@ -466,7 +467,7 @@ inline bool IndicatorImp::isLeaf() const {
     return m_optype == LEAF ? true : false;
 }
 
-inline KData IndicatorImp::getContext() const {
+inline const KData& IndicatorImp::getContext() const {
     return m_context;
 }
 
