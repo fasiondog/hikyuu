@@ -17,6 +17,7 @@ namespace hku {
 class IInBlock : public IndicatorImp {
     INDICATOR_IMP(IInBlock)
     INDICATOR_NEED_CONTEXT
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

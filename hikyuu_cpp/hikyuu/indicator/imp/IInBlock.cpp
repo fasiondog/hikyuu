@@ -46,6 +46,17 @@ void IInBlock::_calculate(const Indicator& data) {
     }
 }
 
+void IInBlock::_increment_calculate(const Indicator& data, size_t start_pos) {
+    const KData& k = getContext();
+    size_t total = k.size();
+    Block block = getBlock(getParam<string>("category"), getParam<string>("name"));
+    value_t in = block.have(k.getStock()) ? 1.0 : 0.0;
+    auto* dst = this->data();
+    for (size_t i = start_pos; i < total; ++i) {
+        dst[i] = in;
+    }
+}
+
 Indicator HKU_API INBLOCK(const string& category, const string& name) {
     auto p = make_shared<IInBlock>();
     p->setParam<string>("category", category);

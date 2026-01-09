@@ -30,6 +30,7 @@ void IResult::_checkParam(const string& name) const {
 }
 
 void IResult::_calculate(const Indicator& ind) {
+    SPEND_TIME(_calculate);
     int result_ix = getParam<int>("result_ix");
     HKU_IF_RETURN(ind.empty(), void());  // 为公式时，ind 可能尚无计算，此时还没有结果数据
     HKU_CHECK(result_ix < ind.getResultNumber(),
@@ -41,6 +42,14 @@ void IResult::_calculate(const Indicator& ind) {
     const auto* src = ind.data(result_ix);
     auto* dst = this->data();
     memcpy(dst + m_discard, src + m_discard, sizeof(value_t) * (ind.size() - m_discard));
+}
+
+void IResult::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    SPEND_TIME(_increment_calculate);
+    int result_ix = getParam<int>("result_ix");
+    const auto* src = ind.data(result_ix);
+    auto* dst = this->data();
+    memcpy(dst + start_pos, src + start_pos, sizeof(value_t) * (ind.size() - start_pos));
 }
 
 Indicator HKU_API RESULT(int result_ix) {
