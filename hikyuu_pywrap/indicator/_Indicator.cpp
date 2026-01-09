@@ -35,6 +35,8 @@ void export_Indicator(py::module& m) {
       .def_property_readonly("long_name", &Indicator::long_name,
                              "返回形如：Name(param1_val,param2_val,...)")
       .def_property_readonly("discard", &Indicator::discard, "结果中需抛弃的个数")
+      .def_property_readonly("optype",
+                             [](const Indicator& ind) { return getOPTypeName(ind.getOPType()); })
 
       .def("set_discard", &Indicator::setDiscard, R"(set_discard(self, discard)
     
@@ -184,6 +186,10 @@ set_context(self, stock, query)
     获取上下文
 
     :rtype: KData)")
+
+      .def("extend", &Indicator::extend, R"(extend(self)
+
+    在有上下文时，自动将上下文扩展至当前最新数据并计算)")
 
       .def("contains", &Indicator::contains, R"(contains(self, name)
         

@@ -69,6 +69,7 @@ public:
     IndicatorImpPtr operator()(const Indicator& ind);
 
     size_t getResultNumber() const;
+    OPType getOPType() const;
 
     size_t discard() const;
 
@@ -227,7 +228,7 @@ private:
     bool can_inner_calculate();
     bool can_increment_calculate();
     bool increment_calculate(const Indicator& ind);
-    size_t increment_calculate(const Indicator& right, const Indicator& left);
+    size_t increment_execute();
     void execute_add();
     void execute_sub();
     void execute_mul();
@@ -243,6 +244,7 @@ private:
     void execute_or();
     void execute_weave();
     void execute_if();
+    size_t increment_execute_if();
 
     static void inner_repeatALikeNodes(vector<IndicatorImpPtr>& sub_nodes);
     void repeatALikeNodes();
@@ -435,6 +437,10 @@ typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 
 HKU_API std::ostream& operator<<(std::ostream&, const IndicatorImp&);
 HKU_API std::ostream& operator<<(std::ostream&, const IndicatorImpPtr&);
+
+inline IndicatorImp::OPType IndicatorImp::getOPType() const {
+    return m_optype;
+}
 
 inline size_t IndicatorImp::getResultNumber() const {
     return m_result_num;

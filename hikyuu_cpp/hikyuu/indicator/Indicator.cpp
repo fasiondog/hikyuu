@@ -48,6 +48,19 @@ void Indicator::setContext(const KData& k) {
         m_imp->setContext(k);
 }
 
+void Indicator::extend() {
+    if (m_imp) {
+        auto k = m_imp->getContext();
+        HKU_WARN_IF_RETURN(k.getStock().isNull(), void(), "stock is null!");
+        if (k.empty()) {
+            k = k.getKData(Datetime::today(), Null<Datetime>());
+        } else {
+            k = k.getKData(k[0].datetime, Null<Datetime>());
+        }
+        m_imp->setContext(k);
+    }
+}
+
 KData Indicator::getContext() const {
     return m_imp ? m_imp->getContext() : KData();
 }
