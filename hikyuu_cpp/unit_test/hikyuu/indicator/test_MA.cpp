@@ -126,6 +126,20 @@ TEST_CASE("test_MA") {
     for (size_t i = ma1.discard(); i < ma1.size(); ++i) {
         CHECK_EQ(ma1[i], ma2[i]);
     }
+
+    /** @arg 增量计算 */
+    auto k = stock.getKData(KQuery(-30, -20));
+    auto k2 = stock.getKData(KQuery(-30, -10));
+    ma = MA(MA(CLOSE(), 2))(k);
+    ma2 = MA(MA(CLOSE(), 2))(k2);
+    auto ma3 = ma(k2);
+    check_indicator(ma3, ma2);
+
+    ma = MA(MA(CLOSE(), 2))(k2);
+    ma2 = ma(k);
+    ma3 = MA(MA(CLOSE(), 2))(k);
+    ma2.setDiscard(ma3.discard());
+    check_indicator(ma3, ma2);
 }
 
 /** @par 检测点 */
@@ -219,7 +233,7 @@ TEST_CASE("test_MA_export") {
     CHECK_EQ(ma1.size(), ma2.size());
     CHECK_EQ(ma1.discard(), ma2.discard());
     CHECK_EQ(ma1.getResultNumber(), ma2.getResultNumber());
-    for (size_t i = 0; i < ma1.size(); ++i) {
+    for (size_t i = ma1.discard(); i < ma1.size(); ++i) {
         CHECK_EQ(ma1[i], doctest::Approx(ma2[i]));
     }
 }

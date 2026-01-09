@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <forward_list>
+#include <stack>
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/global/sysinfo.h"
 #include "Indicator.h"
@@ -270,15 +271,9 @@ void IndicatorImp::setContext(const KData &k) {
     if (!m_parent) {
         vector<IndicatorImpPtr> nodes;
         getAllSubNodes(nodes);
-        if (supportIncrementCalculate()) {
-            for (const auto &node : nodes) {
+        for (const auto &node : nodes) {
+            if (!node->m_need_calculate || !node->supportIncrementCalculate()) {
                 node->_clearBuffer();
-            }
-        } else {
-            for (const auto &node : nodes) {
-                if (!node->m_need_calculate || !node->supportIncrementCalculate()) {
-                    node->_clearBuffer();
-                }
             }
         }
     }

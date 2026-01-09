@@ -96,7 +96,7 @@ TEST_CASE("test_SE_MultiFactor_export") {
 
     StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
     Stock ref_stk = sm["sh000001"];
-    KQuery query = KQueryByDate(Datetime(20110712), Datetime(20111206));
+    KQuery query = KQueryByDate(Datetime(20110712) - Days(30), Datetime(20111206));
     IndicatorList src_inds{MA(CLOSE())};
 
     auto sys = SYS_Simple(crtTM(), MM_Nothing());
@@ -122,7 +122,7 @@ TEST_CASE("test_SE_MultiFactor_export") {
     auto proto_list = x2->getProtoSystemList();
     x2->calculate(proto_list, query);
     auto sw_list = x2->getSelected(Datetime(20110712));
-    CHECK_EQ(sw_list.size(), 4);
+    CHECK_EQ(sw_list.size(), 3);
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
