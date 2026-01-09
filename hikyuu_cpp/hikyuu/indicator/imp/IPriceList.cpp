@@ -47,7 +47,7 @@ void IPriceList::_calculate(const Indicator& data) {
     int x_discard = getParam<int>("discard");
     size_t x_total = x.size();
 
-    auto k = getContext();
+    const auto& k = getContext();
     size_t total = x_total;
     if (k.size() > 0) {
         total = k.size();

@@ -32,7 +32,7 @@ IInBlock::IInBlock(const KData& kdata, const string& category, const string& nam
 void IInBlock::_calculate(const Indicator& data) {
     HKU_IF_RETURN(!isLeaf() && !data.empty(), void());
 
-    KData k = getContext();
+    const KData& k = getContext();
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 

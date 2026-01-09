@@ -69,7 +69,7 @@ void IContext::_calculate(const Indicator& ind) {
     HKU_ASSERT(isLeaf());
 
     auto null_k = Null<KData>();
-    auto in_k = getContext();
+    const auto& in_k = getContext();
     auto self_k = m_ref_ind.getContext();
     HKU_IF_RETURN((self_k == in_k || in_k == null_k) && this->size() != 0, void());
 

@@ -47,7 +47,7 @@ void IDecline::_calculate(const Indicator& ind) {
     KQuery q;
     int stk_type = STOCKTYPE_A;
     bool ignore_context = getParam<bool>("ignore_context");
-    KData k = getContext();
+    const KData& k = getContext();
     if (!ignore_context && !k.empty()) {
         q = k.getQuery();
         Stock stk = k.getStock();

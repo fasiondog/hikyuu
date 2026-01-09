@@ -42,7 +42,7 @@ void ITime::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData kdata = getContext();
+    const KData& kdata = getContext();
     size_t total = kdata.size();
     HKU_IF_RETURN(total == 0, void());
 

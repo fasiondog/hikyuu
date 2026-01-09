@@ -38,7 +38,7 @@ void ITimeLine::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData k = getContext();
+    const KData& k = getContext();
     KQuery q = k.getQuery();
     Stock stk = k.getStock();
 

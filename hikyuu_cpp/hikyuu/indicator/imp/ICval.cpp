@@ -43,7 +43,7 @@ void ICval::_calculate(const Indicator& data) {
     size_t total = 0;
     if (isLeaf()) {
         // 叶子节点
-        KData k = getContext();
+        const KData& k = getContext();
         if (k.getStock().isNull()) {
             _readyBuffer(1, 1);
             if (discard < 1) {
