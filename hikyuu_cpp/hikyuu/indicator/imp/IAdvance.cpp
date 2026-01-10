@@ -115,7 +115,7 @@ void IAdvance::_increment_calculate(const Indicator& data, size_t start_pos) {
     }
 
     StockManager& sm = StockManager::instance();
-    auto* dst = this->data() + start_pos - 1;
+    auto* dst = this->data();
     Indicator x = ALIGN(CLOSE() > REF(CLOSE(), 1), dates, getParam<bool>("fill_null"));
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
         if ((stk_type <= STOCKTYPE_TMP && iter->type() != stk_type) ||
@@ -130,7 +130,7 @@ void IAdvance::_increment_calculate(const Indicator& data, size_t start_pos) {
             }
 
             if (xdata[i]) {
-                dst[i] = std::isnan(dst[i]) ? 1 : dst[i] + 1;
+                dst[i - 1] = std::isnan(dst[i - 1]) ? 1 : dst[i - 1] + 1;
             }
         }
     }
