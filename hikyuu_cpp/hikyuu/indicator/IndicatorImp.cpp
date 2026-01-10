@@ -796,8 +796,7 @@ bool IndicatorImp::use_increment_calulate(const Indicator &ind, size_t total,
 }
 
 bool IndicatorImp::can_increment_calculate() {
-    if (m_result_num == 0 || m_context.empty() || size() < m_context.size() ||
-        m_old_context.size() < m_context.size()) {
+    if (m_result_num == 0 || m_context.empty() || m_old_context.empty()) {
         return false;
     }
 
