@@ -75,6 +75,10 @@ void IAdvance::_calculate(const Indicator& ind) {
     m_discard = 1;
     _readyBuffer(total, 1);
 
+    // 需要将 Query 转换为 KQueryByDate
+    q = KQueryByDate(dates.front(), dates.back() + Seconds(KQuery::getKTypeInSeconds(q.kType())),
+                     q.kType(), q.recoverType());
+
     auto* dst = this->data();
     Indicator x = ALIGN(CLOSE() > REF(CLOSE(), 1), dates, getParam<bool>("fill_null"));
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
@@ -84,6 +88,9 @@ void IAdvance::_calculate(const Indicator& ind) {
         }
         x.setContext(*iter, q);
         auto const* xdata = x.data();
+        if (x.empty()) {
+            continue;
+        }
         for (size_t i = x.discard(); i < x.size(); i++) {
             if (x.getDatetime(i) > iter->lastDatetime()) {
                 break;
@@ -103,6 +110,7 @@ bool IAdvance::supportIncrementCalculate() const {
 }
 
 void IAdvance::_increment_calculate(const Indicator& data, size_t start_pos) {
+    SPEND_TIME(_increment_calculate);
     const auto& k = getContext();
     auto q = k.getQuery();
     auto stk = k.getStock();
@@ -113,6 +121,8 @@ void IAdvance::_increment_calculate(const Indicator& data, size_t start_pos) {
     for (size_t i = start_pos - 1; i < old_dates.size(); i++) {
         dates.push_back(old_dates[i]);
     }
+    q = KQueryByDate(dates.front(), dates.back() + Seconds(KQuery::getKTypeInSeconds(q.kType())),
+                     q.kType(), q.recoverType());
 
     StockManager& sm = StockManager::instance();
     auto* dst = this->data();
@@ -124,13 +134,17 @@ void IAdvance::_increment_calculate(const Indicator& data, size_t start_pos) {
         }
         x.setContext(*iter, q);
         auto const* xdata = x.data();
+        if (x.empty()) {
+            continue;
+        }
         for (size_t i = x.discard(); i < x.size(); i++) {
             if (x.getDatetime(i) > iter->lastDatetime()) {
                 break;
             }
 
             if (xdata[i]) {
-                dst[i - 1] = std::isnan(dst[i - 1]) ? 1 : dst[i - 1] + 1;
+                dst[i + start_pos - 1] =
+                  std::isnan(dst[i + start_pos - 1]) ? 1 : dst[i + start_pos - 1] + 1;
             }
         }
     }

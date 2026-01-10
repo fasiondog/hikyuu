@@ -72,6 +72,10 @@ void IDecline::_calculate(const Indicator& ind) {
         return;
     }
 
+    // 需要将 Query 转换为 KQueryByDate
+    q = KQueryByDate(dates.front(), dates.back() + Seconds(KQuery::getKTypeInSeconds(q.kType())),
+                     q.kType(), q.recoverType());
+
     m_discard = 1;
     _readyBuffer(total, 1);
     auto* dst = this->data();
@@ -112,6 +116,8 @@ void IDecline::_increment_calculate(const Indicator& data, size_t start_pos) {
     for (size_t i = start_pos - 1; i < old_dates.size(); i++) {
         dates.push_back(old_dates[i]);
     }
+    q = KQueryByDate(dates.front(), dates.back() + Seconds(KQuery::getKTypeInSeconds(q.kType())),
+                     q.kType(), q.recoverType());
 
     StockManager& sm = StockManager::instance();
     auto* dst = this->data();
@@ -129,7 +135,8 @@ void IDecline::_increment_calculate(const Indicator& data, size_t start_pos) {
             }
 
             if (xdata[i]) {
-                dst[i - 1] = std::isnan(dst[i - 1]) ? 1 : dst[i - 1] + 1;
+                dst[i + start_pos - 1] =
+                  std::isnan(dst[i + start_pos - 1]) ? 1 : dst[i + start_pos - 1] + 1;
             }
         }
     }
