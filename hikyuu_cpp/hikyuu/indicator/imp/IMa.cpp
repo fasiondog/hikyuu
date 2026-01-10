@@ -72,6 +72,11 @@ void IMa::_calculate(const Indicator& indicator) {
     }
 }
 
+bool IMa::supportIncrementCalculate() const {
+    int n = getParam<int>("n");
+    return n > 0;
+}
+
 bool IMa::use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) const {
     int n = getParam<int>("n");
     return (overlap_len > ind.discard() + n) &&
@@ -84,17 +89,6 @@ void IMa::_increment_calculate(const Indicator& indicator, size_t startPos) {
     auto* dst = this->data();
 
     int n = getParam<int>("n");
-    if (n <= 0) {
-        value_t sum = dst[startPos - 1] * startPos;
-        for (size_t i = startPos; i < total; i++) {
-            if (!std::isnan(src[i])) {
-                sum += src[i];
-                dst[i] = sum / (i - m_discard + 1);
-            }
-        }
-        return;
-    }
-
     size_t start = startPos + 1 - n;
     value_t sum = 0.0;
     for (size_t i = start; i <= startPos; ++i) {
