@@ -34,14 +34,20 @@ void IZongGuBen::_calculate(const Indicator& data) {
 
     _readyBuffer(total, 1);
 
+    _increment_calculate(data, 0);
+}
+
+void IZongGuBen::_increment_calculate(const Indicator& data, size_t start_pos) {
+    const KData& k = getContext();
     Stock stock = k.getStock();
+    size_t total = k.size();
     StockWeightList sw_list = stock.getWeight();
     if (sw_list.size() == 0) {
         return;
     }
 
     auto* dst = this->data();
-    size_t pos = 0;
+    size_t pos = start_pos;
     auto sw_iter = sw_list.begin();
     price_t pre_total_count = sw_iter->totalCount();
     for (; sw_iter != sw_list.end(); ++sw_iter) {
