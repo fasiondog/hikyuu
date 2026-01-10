@@ -31,6 +31,12 @@ void export_Indicator(py::module& m) {
       .def("__str__", &Indicator::str)
       .def("__repr__", &Indicator::str)
 
+      .def_property_static(
+        "enable_increment_calculate",
+        [](py::object) { return Indicator::enableIncrementCalculate(); },
+        [](py::object cls, bool flag) { Indicator::enableIncrementCalculate(flag); },
+        "启用/禁用指标增量计算")
+
       .def_property("name", ind_read_name, ind_write_name, "指标名称")
       .def_property_readonly("long_name", &Indicator::long_name,
                              "返回形如：Name(param1_val,param2_val,...)")

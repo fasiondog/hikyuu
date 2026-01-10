@@ -250,6 +250,15 @@ public:
 
     typedef Iterator iterator;
 
+public:
+    static void enableIncrementCalculate(bool flag) {
+        IndicatorImp::enableIncrementCalculate(flag);
+    }
+
+    static bool enableIncrementCalculate() {
+        return IndicatorImp::enableIncrementCalculate();
+    }
+
 protected:
     IndicatorImpPtr m_imp;
 

@@ -185,6 +185,15 @@ public:
     virtual void _dyn_calculate(const Indicator&);
 
 public:
+    static void enableIncrementCalculate(bool flag) {
+        ms_enable_increment_calculate = flag;
+    }
+
+    static bool enableIncrementCalculate() {
+        return ms_enable_increment_calculate;
+    }
+
+public:
     // ===================
     //  内部特殊用途公共接口
     // ===================
@@ -297,6 +306,7 @@ public:
     static void releaseDynEngine();
 
 protected:
+    static bool ms_enable_increment_calculate;
     static ThreadPool* ms_tg;
 
 #if HKU_SUPPORT_SERIALIZATION

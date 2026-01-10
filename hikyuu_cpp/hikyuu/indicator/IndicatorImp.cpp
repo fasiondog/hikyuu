@@ -23,6 +23,7 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 
 namespace hku {
 
+bool IndicatorImp::ms_enable_increment_calculate{true};
 ThreadPool *IndicatorImp::ms_tg = nullptr;
 
 string HKU_API getOPTypeName(IndicatorImp::OPType op) {
@@ -183,8 +184,8 @@ const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
 }
 
 bool IndicatorImp::can_inner_calculate() {
-    if (m_need_calculate || m_result_num == 0 || m_context.empty() || size() < m_context.size() ||
-        m_old_context.size() < m_context.size()) {
+    if (!ms_enable_increment_calculate || m_need_calculate || m_result_num == 0 ||
+        m_context.empty() || size() < m_context.size() || m_old_context.size() < m_context.size()) {
         return false;
     }
 
@@ -273,9 +274,17 @@ void IndicatorImp::setContext(const KData &k) {
     if (!m_parent) {
         vector<IndicatorImpPtr> nodes;
         getAllSubNodes(nodes);
-        for (const auto &node : nodes) {
-            if (!node->m_need_calculate && !node->supportIncrementCalculate()) {
-                node->_clearBuffer();
+        if (ms_enable_increment_calculate) {
+            for (const auto &node : nodes) {
+                if (!node->m_need_calculate && !node->supportIncrementCalculate()) {
+                    node->_clearBuffer();
+                }
+            }
+        } else {
+            for (const auto &node : nodes) {
+                if (!node->m_need_calculate) {
+                    node->_clearBuffer();
+                }
             }
         }
     }
@@ -818,7 +827,8 @@ bool IndicatorImp::can_increment_calculate() {
 }
 
 bool IndicatorImp::increment_execute_leaf() {
-    if (!supportIncrementCalculate() || !can_increment_calculate()) {
+    if (!ms_enable_increment_calculate || !supportIncrementCalculate() ||
+        !can_increment_calculate()) {
         return false;
     }
 
@@ -853,8 +863,8 @@ bool IndicatorImp::increment_execute_leaf() {
 }
 
 bool IndicatorImp::increment_execute_op(const Indicator &ind) {
-    if (!supportIncrementCalculate() || ind.size() != m_context.size() ||
-        !can_increment_calculate()) {
+    if (!ms_enable_increment_calculate || !supportIncrementCalculate() ||
+        ind.size() != m_context.size() || !can_increment_calculate()) {
         return false;
     }
 
@@ -1019,7 +1029,7 @@ Indicator IndicatorImp::calculate() {
 
 size_t IndicatorImp::increment_execute() {
     size_t null_pos = Null<size_t>();
-    if (m_right->m_need_calculate || m_left->m_need_calculate) {
+    if (!ms_enable_increment_calculate || m_right->m_need_calculate || m_left->m_need_calculate) {
         return null_pos;
     }
 
