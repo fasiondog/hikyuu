@@ -46,51 +46,56 @@ void ITime::_calculate(const Indicator& data) {
     size_t total = kdata.size();
     HKU_IF_RETURN(total == 0, void());
 
+    _readyBuffer(total, 1);
+    _increment_calculate(data, 0);
+}
+
+void ITime::_increment_calculate(const Indicator& data, size_t start_pos) {
+    const KData& kdata = getContext();
+    size_t total = kdata.size();
     DatetimeList ds = kdata.getDatetimeList();
 
-    _readyBuffer(total, 1);
     auto* dst = this->data();
-
     string type_name = getParam<string>("type");
     if ("TIME" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             const auto& d = ds[i];
             dst[i] = d.hour() * 10000 + d.minute() * 100 + d.second();
         }
 
     } else if ("DATE" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             const auto& d = ds[i];
             dst[i] = (d.year() - 1900) * 10000 + d.month() * 100 + d.day();
         }
 
     } else if ("YEAR" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].year();
         }
 
     } else if ("MONTH" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].month();
         }
 
     } else if ("WEEK" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].dayOfWeek();
         }
 
     } else if ("DAY" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].day();
         }
 
     } else if ("HOUR" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].hour();
         }
 
     } else if ("MINUTE" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].minute();
         }
     }
