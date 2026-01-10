@@ -185,19 +185,7 @@ void IAlign::_calculate(const Indicator& ind) {
         }
     }
 
-    for (size_t r = 0; r < m_result_num; r++) {
-        const auto* src = this->data(r);
-        size_t pos = m_discard;
-        for (size_t i = m_discard; i < total; i++) {
-            if (!std::isnan(src[i])) {
-                break;
-            }
-            pos++;
-        }
-        if (pos > m_discard) {
-            m_discard = pos;
-        }
-    }
+    _update_discard();
 }
 
 Indicator HKU_API ALIGN(bool fill_null) {

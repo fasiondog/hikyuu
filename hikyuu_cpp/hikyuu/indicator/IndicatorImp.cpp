@@ -1935,6 +1935,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 }
 
 void IndicatorImp::_update_discard() {
+    m_discard = 0;
     size_t total = size();
     for (size_t result_index = 0; result_index < m_result_num; result_index++) {
         size_t discard = m_discard;
