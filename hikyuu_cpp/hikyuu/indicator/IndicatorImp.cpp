@@ -183,7 +183,8 @@ const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
 }
 
 bool IndicatorImp::can_inner_calculate() {
-    if (m_result_num == 0 || size() == 0 || m_context.empty() || size() < m_context.size()) {
+    if (m_need_calculate || m_result_num == 0 || m_context.empty() || size() < m_context.size() ||
+        m_old_context.size() < m_context.size()) {
         return false;
     }
 
@@ -217,10 +218,10 @@ bool IndicatorImp::can_inner_calculate() {
     }
 
     for (size_t r = 0; r < m_result_num; ++r) {
-        auto *dst = this->data(r);
-        if (dst == nullptr) {
+        if (m_pBuffer[r] == nullptr) {
             return false;
         }
+        auto *dst = m_pBuffer[r]->data();
         memmove(dst, dst + start_pos, sizeof(value_t) * (total));
         m_pBuffer[r]->resize(total);
     }
@@ -795,7 +796,8 @@ bool IndicatorImp::use_increment_calulate(const Indicator &ind, size_t total,
 }
 
 bool IndicatorImp::can_increment_calculate() {
-    if (m_result_num == 0 || size() == 0 || m_context.empty()) {
+    if (m_result_num == 0 || m_context.empty() || size() < m_context.size() ||
+        m_old_context.size() < m_context.size()) {
         return false;
     }
 
@@ -838,7 +840,7 @@ bool IndicatorImp::increment_execute_leaf() {
             return false;
         }
         m_pBuffer[r]->resize(total);
-        auto *dst = this->data(r);
+        auto *dst = m_pBuffer[r]->data();
         memmove(dst, dst + start_pos, sizeof(value_t) * (copy_len));
     }
 
