@@ -22,10 +22,22 @@ def em_import_block_to_mysql(connect):
 
     hku_info("更新数据库")
     cur = connect.cursor()
-    sql = f"delete from hku_base.block where category in {tuple(blks.keys())}"
-    cur.execute(sql)
-    sql = f"delete from hku_base.BlockIndex where category in {tuple(blks.keys())}"
-    cur.execute(sql)
+    
+    # 构建参数化的DELETE语句以防止SQL注入
+    categories = tuple(blks.keys())
+    if len(categories) == 1:
+        # 处理只有一个类别的特殊情况
+        placeholders = '%s'
+        params = categories
+    else:
+        placeholders = ','.join(['%s'] * len(categories))  # 创建相应数量的占位符
+        params = categories
+    
+    sql = f"delete from hku_base.block where category in ({placeholders})"
+    cur.execute(sql, params)
+    
+    sql = f"delete from hku_base.BlockIndex where category in ({placeholders})"
+    cur.execute(sql, params)
 
     insert_records = []
 
