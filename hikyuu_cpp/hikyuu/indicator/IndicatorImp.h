@@ -237,8 +237,7 @@ private:
     bool needCalculate();
     bool can_inner_calculate();
     bool can_increment_calculate();
-    bool increment_execute_leaf();
-    bool increment_execute_op(const Indicator& ind);
+    bool increment_execute_leaf_or_op(const Indicator& ind);
     size_t increment_execute();
     void execute_add();
     void execute_sub();

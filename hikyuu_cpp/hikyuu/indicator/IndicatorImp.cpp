@@ -822,43 +822,7 @@ bool IndicatorImp::can_increment_calculate() {
     return true;
 }
 
-bool IndicatorImp::increment_execute_leaf() {
-    if (!ms_enable_increment_calculate || !supportIncrementCalculate() ||
-        !can_increment_calculate()) {
-        return false;
-    }
-
-    size_t start_pos = m_old_context.getPos(m_context.front().datetime);
-    if (start_pos == Null<size_t>()) {
-        return false;
-    }
-
-    size_t total = m_context.size();
-    size_t copy_len = m_old_context.size() - start_pos;
-    if (copy_len == 0) {
-        return false;
-    }
-
-    for (size_t r = 0; r < m_result_num; ++r) {
-        if (m_pBuffer[r] == nullptr) {
-            return false;
-        }
-        m_pBuffer[r]->resize(total, Null<value_t>());
-        auto *dst = m_pBuffer[r]->data();
-        memmove(dst, dst + start_pos, sizeof(value_t) * (copy_len));
-    }
-
-    start_pos = m_context.getPos(m_old_context.back().datetime);
-    if (start_pos == Null<size_t>()) {
-        return false;
-    }
-
-    _increment_calculate(Indicator(), start_pos);
-    _update_discard(true);
-    return true;
-}
-
-bool IndicatorImp::increment_execute_op(const Indicator &ind) {
+bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
     if (!ms_enable_increment_calculate || !supportIncrementCalculate() ||
         !can_increment_calculate()) {
         return false;
@@ -910,6 +874,7 @@ bool IndicatorImp::increment_execute_op(const Indicator &ind) {
 
     if (start_pos < ind.discard()) {
         start_pos = ind.discard();
+        m_discard = start_pos;
     }
 
     _increment_calculate(ind, std::max(start_pos, min_increment_start()));
@@ -931,7 +896,7 @@ Indicator IndicatorImp::calculate() {
     switch (m_optype) {
         case LEAF:
             if (m_ind_params.empty()) {
-                if (!increment_execute_leaf()) {
+                if (!increment_execute_leaf_or_op(Indicator())) {
                     _calculate(Indicator());
                 }
             } else {
@@ -941,7 +906,7 @@ Indicator IndicatorImp::calculate() {
 
         case OP: {
             if (m_ind_params.empty()) {
-                if (!increment_execute_op(Indicator(m_right))) {
+                if (!increment_execute_leaf_or_op(Indicator(m_right))) {
                     m_right->calculate();
                     _readyBuffer(m_right->size(), m_result_num);
                     _calculate(Indicator(m_right));
