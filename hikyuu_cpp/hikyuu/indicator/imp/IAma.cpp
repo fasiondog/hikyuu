@@ -89,13 +89,14 @@ void IAma::_calculate(const Indicator& data) {
     }
 }
 
-bool IAma::use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) const {
+size_t IAma::min_increment_start() const {
     int n = getParam<int>("n");
-    return (total > overlap_len + ind.discard() + n + 1) &&
-           IndicatorImp::use_increment_calulate(ind, total, overlap_len);
+    // start_pos >= n + 1
+    return n + 1;
 }
 
 void IAma::_increment_calculate(const Indicator& data, size_t start_pos) {
+    SPEND_TIME(IAma_increment_calculate);
     size_t total = data.size();
     auto const* src = data.data();
     auto* dst0 = this->data(0);
@@ -104,13 +105,13 @@ void IAma::_increment_calculate(const Indicator& data, size_t start_pos) {
     int n = getParam<int>("n");
     int fast_n = getParam<int>("fast_n");
     int slow_n = getParam<int>("slow_n");
+    HKU_CHECK(start_pos >= n + 1, "start_pos: {}, n: {}", start_pos, n);
 
     price_t fastest = 2.0 / (fast_n + 1);
     price_t slowest = 2.0 / (slow_n + 1);
     price_t delta = fastest - slowest;
 
     price_t prevol = 0.0, vol = 0.0, er = 1.0;
-    HKU_ASSERT(start_pos >= 1 && start_pos + 1 >= n);
     for (size_t i = start_pos + 1 - n; i < start_pos; ++i) {
         vol += std::fabs(src[i] - src[i - 1]);
     }

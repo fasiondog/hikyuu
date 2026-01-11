@@ -77,10 +77,10 @@ bool IMa::supportIncrementCalculate() const {
     return n > 0;
 }
 
-bool IMa::use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) const {
+size_t IMa::min_increment_start() const {
     int n = getParam<int>("n");
-    return (total > overlap_len + ind.discard() + n) &&
-           IndicatorImp::use_increment_calulate(ind, total, overlap_len);
+    // startPos + 1 - n >= 0
+    return n;
 }
 
 void IMa::_increment_calculate(const Indicator& indicator, size_t startPos) {

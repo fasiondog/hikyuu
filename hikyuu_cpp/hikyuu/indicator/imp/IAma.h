@@ -31,8 +31,7 @@ public:
     virtual void _checkParam(const string& name) const override;
     virtual void _dyn_calculate(const Indicator&) override;
 
-    virtual bool use_increment_calulate(const Indicator& ind, size_t total,
-                                        size_t overlap_len) const override;
+    virtual size_t min_increment_start() const override;
 
 private:
     void _dyn_one_circle(const Indicator& ind, size_t curPos, int n, int fast_n, int slow_n);

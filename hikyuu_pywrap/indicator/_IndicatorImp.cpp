@@ -46,10 +46,8 @@ public:
                                supportIncrementCalculate, );
     }
 
-    bool use_increment_calulate(const Indicator& ind, size_t total,
-                                size_t overlap_len) const override {
-        PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "use_increment_calulate", use_increment_calulate,
-                               ind, total, overlap_len);
+    size_t min_increment_start() const override {
+        PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "min_increment_start", min_increment_start);
     }
 
     void _increment_calculate(const Indicator& ind, size_t start_pos) override {

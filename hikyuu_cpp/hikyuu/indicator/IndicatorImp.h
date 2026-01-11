@@ -164,8 +164,9 @@ public:
         return false;
     }
 
-    virtual bool use_increment_calulate(const Indicator& ind, size_t total,
-                                        size_t overlap_len) const;
+    virtual size_t min_increment_start() const {
+        return 0;
+    }
 
     virtual void _increment_calculate(const Indicator& ind, size_t start_pos) {}
 
@@ -280,7 +281,7 @@ protected:
     void onlySetContext(const KData&);
 
     // 用于动态参数时，更新 discard
-    void _update_discard();
+    void _update_discard(bool force = false);
 
     virtual bool isPythonObject() const;
 

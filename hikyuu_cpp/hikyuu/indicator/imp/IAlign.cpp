@@ -185,6 +185,8 @@ void IAlign::_calculate(const Indicator& ind) {
         }
     }
 
+    // 强制重新更新 m_discard
+    m_discard = 0;
     _update_discard();
 }
 
