@@ -79,7 +79,7 @@ bool IMa::supportIncrementCalculate() const {
 
 bool IMa::use_increment_calulate(const Indicator& ind, size_t total, size_t overlap_len) const {
     int n = getParam<int>("n");
-    return (overlap_len > ind.discard() + n) &&
+    return (total > overlap_len + ind.discard() + n) &&
            IndicatorImp::use_increment_calulate(ind, total, overlap_len);
 }
 
@@ -89,6 +89,7 @@ void IMa::_increment_calculate(const Indicator& indicator, size_t startPos) {
     auto* dst = this->data();
 
     int n = getParam<int>("n");
+    HKU_ASSERT(startPos + 1 >= n);
     size_t start = startPos + 1 - n;
     value_t sum = 0.0;
     for (size_t i = start; i <= startPos; ++i) {

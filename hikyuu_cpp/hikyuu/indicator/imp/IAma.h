@@ -21,6 +21,7 @@ namespace hku {
  */
 class IAma : public IndicatorImp {
     INDICATOR_IMP(IAma)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
@@ -29,6 +30,9 @@ public:
 
     virtual void _checkParam(const string& name) const override;
     virtual void _dyn_calculate(const Indicator&) override;
+
+    virtual bool use_increment_calulate(const Indicator& ind, size_t total,
+                                        size_t overlap_len) const override;
 
 private:
     void _dyn_one_circle(const Indicator& ind, size_t curPos, int n, int fast_n, int slow_n);
