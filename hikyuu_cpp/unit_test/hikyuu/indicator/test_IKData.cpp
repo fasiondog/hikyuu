@@ -109,6 +109,74 @@ TEST_CASE("test_IKData") {
     for (size_t i = 0; i < total; ++i) {
         CHECK_EQ(count[i], doctest::Approx(kdata[i].transCount));
     }
+
+    /** @arg 新旧上下文相等 */
+    auto k1 = stock.getKData(KQuery(0, 10));
+    auto k2 = stock.getKData(KQuery(0, 10));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k1));
+
+    /** @arg 新上下文在旧上下文内部 */
+    k1 = stock.getKData(KQuery(0, 10));
+    k2 = stock.getKData(KQuery(0, 9));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
+
+    k2 = stock.getKData(KQuery(1, 10));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
+
+    k2 = stock.getKData(KQuery(1, 9));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
+
+    k2 = stock.getKData(KQuery(2, 8));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
+
+    /** @arg 新上下文起点在旧上下文中，部分在新上下文中 */
+    k1 = stock.getKData(KQuery(1, 5));
+    k2 = stock.getKData(KQuery(1, 6));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
+
+    k2 = stock.getKData(KQuery(4, 7));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
+
+    k2 = stock.getKData(KQuery(3, 6));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
+
+    /** @arg 新上下文起点在旧上下文之前 */
+    k1 = stock.getKData(KQuery(5, 9));
+    k2 = stock.getKData(KQuery(1, 4));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
+
+    k2 = stock.getKData(KQuery(1, 5));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
+
+    k2 = stock.getKData(KQuery(3, 7));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
+
+    k2 = stock.getKData(KQuery(4, 10));
+    close = CLOSE(k1);
+    close.setContext(k2);
+    check_indicator(close, CLOSE(k2));
 }
 
 /** @par 检测点 */
