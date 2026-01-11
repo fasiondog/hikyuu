@@ -330,7 +330,7 @@ def generate_default_config():
     user_dir = os.path.expanduser('~')
     data_dir = "c:\\stock" if sys.platform == 'win32' else f"{user_dir}/stock"
     hdf5_config = hdf5_template.format(dir=data_dir, reload_time="00:00", quotation_server='ipc:///tmp/hikyuu_real.ipc',
-                                       day=True, week=False,
+                                       lazy_preload=False, day=True, week=False,
                                        month=False, quarter=False, halfyear=False, year=False,
                                        min1=False, min5=False, min15=False, min30=False,
                                        min60=False, hour2=False, timeline=False, trans=False,
