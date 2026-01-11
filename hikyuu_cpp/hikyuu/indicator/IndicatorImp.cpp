@@ -1017,27 +1017,44 @@ size_t IndicatorImp::increment_execute() {
         return null_pos;
     }
 
-    size_t start_pos = m_old_context.getPos(m_context.front().datetime);
+    size_t copy_start_pos = m_old_context.getPos(m_context.front().datetime);
+    if (copy_start_pos == null_pos) {
+        return null_pos;
+    }
+
+    size_t start_pos = m_context.getPos(m_old_context.back().datetime);
     if (start_pos == null_pos) {
         return null_pos;
     }
 
     size_t total = m_context.size();
-    // HKU_ASSERT(total >= start_pos);
-    size_t copy_len = m_old_context.size() - start_pos;
-
-    for (size_t r = 0; r < m_result_num; ++r) {
-        if (m_pBuffer[r] == nullptr) {
-            return null_pos;
-        }
-        m_pBuffer[r]->resize(total, Null<value_t>());
-        auto *dst = this->data(r);
-        memmove(dst, dst + start_pos, sizeof(value_t) * (copy_len));
+    size_t copy_len = m_old_context.size() - copy_start_pos;
+    if (copy_len == 0) {
+        return null_pos;
     }
 
-    start_pos = m_context.getPos(m_old_context.back().datetime);
-    if (start_pos == Null<size_t>()) {
-        return null_pos;
+    if (copy_start_pos < m_discard) {
+        size_t old_discard = m_discard;
+        m_discard = m_discard - copy_start_pos;
+        copy_start_pos = old_discard;
+        copy_len = m_old_context.size() - copy_start_pos;
+        for (size_t r = 0; r < m_result_num; ++r) {
+            if (m_pBuffer[r] == nullptr) {
+                return false;
+            }
+            m_pBuffer[r]->resize(total, Null<value_t>());
+            auto *dst = this->data(r);
+            memmove(dst + m_discard, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+        }
+    } else {
+        for (size_t r = 0; r < m_result_num; ++r) {
+            if (m_pBuffer[r] == nullptr) {
+                return false;
+            }
+            m_pBuffer[r]->resize(total, Null<value_t>());
+            auto *dst = this->data(r);
+            memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+        }
     }
 
     return start_pos;
