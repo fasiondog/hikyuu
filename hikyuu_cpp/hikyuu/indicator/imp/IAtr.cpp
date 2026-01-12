@@ -18,12 +18,6 @@ IAtr::IAtr() : IndicatorImp("ATR", 1) {
     setParam<int>("n", 14);
 }
 
-IAtr::IAtr(const KData& k, int n) : IndicatorImp("ATR", 1) {
-    setParam<int>("n", n);
-    onlySetContext(k);
-    IAtr::_calculate(Indicator());
-}
-
 IAtr::~IAtr() {}
 
 void IAtr::_checkParam(const string& name) const {
@@ -43,6 +37,8 @@ void IAtr::_calculate(const Indicator& data) {
     _readyBuffer(total, 1);
 
     int n = getParam<int>("n");
+
+    // 不使用n, 而是使用 n+1, 避免 MA(TR) 和 ATR 首值不一致
     m_discard = n + 1;
     if (m_discard >= total) {
         m_discard = total;
@@ -72,6 +68,31 @@ void IAtr::_calculate(const Indicator& data) {
     }
 }
 
+void IAtr::_increment_calculate(const Indicator& data, size_t start_pos) {
+    const KData& kdata = getContext();
+    size_t total = kdata.size();
+
+    int n = getParam<int>("n");
+
+    auto* k = kdata.data();
+    vector<value_t> buf(total);
+    for (size_t i = start_pos - n; i < total; ++i) {
+        value_t v1 = k[i].highPrice - k[i].lowPrice;
+        value_t v2 = std::abs(k[i].highPrice - k[i - 1].closePrice);
+        value_t v3 = std::abs(k[i].lowPrice - k[i - 1].closePrice);
+        buf[i] = std::max(std::max(v1, v2), v3);
+    }
+
+    auto* dst = this->data();
+
+    value_t sum = dst[start_pos - 1] * n;
+
+    for (size_t i = start_pos; i < total; ++i) {
+        sum = buf[i] + sum - buf[i - n];
+        dst[i] = sum / n;
+    }
+}
+
 Indicator HKU_API ATR(int n) {
     auto p = make_shared<IAtr>();
     p->setParam<int>("n", n);
@@ -79,7 +100,9 @@ Indicator HKU_API ATR(int n) {
 }
 
 Indicator HKU_API ATR(const KData& kdata, int n) {
-    return Indicator(make_shared<IAtr>(kdata, n));
+    Indicator ret = ATR(n);
+    ret.setContext(kdata);
+    return ret;
 }
 
 } /* namespace hku */

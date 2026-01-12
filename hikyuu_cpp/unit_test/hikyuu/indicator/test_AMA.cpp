@@ -90,8 +90,6 @@ TEST_CASE("test_AMA") {
     ama = AMA(CLOSE(), 1, 1, 1)(k1);
     ama = ama(k2);
     auto k3 = stk.getKData(KQuery(19, 25));
-    HKU_INFO("{}", k2);
-    HKU_INFO("{}", k3);
     ama = ama(k3);
 }
 
