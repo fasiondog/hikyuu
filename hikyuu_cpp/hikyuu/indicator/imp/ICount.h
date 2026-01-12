@@ -19,7 +19,8 @@ namespace hku {
  * COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
  */
 class ICount : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(ICount)
+    INDICATOR_IMP(ICount)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

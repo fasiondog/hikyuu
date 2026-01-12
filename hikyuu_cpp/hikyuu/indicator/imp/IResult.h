@@ -13,6 +13,7 @@ namespace hku {
 
 class IResult : public IndicatorImp {
     INDICATOR_IMP(IResult)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

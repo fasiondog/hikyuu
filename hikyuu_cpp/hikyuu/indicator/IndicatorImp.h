@@ -69,6 +69,7 @@ public:
     IndicatorImpPtr operator()(const Indicator& ind);
 
     size_t getResultNumber() const;
+    OPType getOPType() const;
 
     size_t discard() const;
 
@@ -129,7 +130,7 @@ public:
 
     void setContext(const KData&);
 
-    KData getContext() const;
+    const KData& getContext() const;
 
     void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);
 
@@ -151,12 +152,21 @@ public:
     // ===================
     virtual void _calculate(const Indicator&);
 
-    virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
-
-    /** 是否支持指标动态参数 */
+    /** 是否支持动态周期指标参数 */
     virtual bool supportIndParam() const {
         return false;
     }
+
+    virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
+
+    /** 是否支持增量计算 */
+    virtual bool supportIncrementCalculate() const;
+
+    virtual size_t min_increment_start() const {
+        return 0;
+    }
+
+    virtual void _increment_calculate(const Indicator& ind, size_t start_pos) {}
 
     /** 是否必须串行计算 */
     virtual bool isSerial() const {
@@ -172,6 +182,15 @@ public:
     }
 
     virtual void _dyn_calculate(const Indicator&);
+
+public:
+    static void enableIncrementCalculate(bool flag) {
+        ms_enable_increment_calculate = flag;
+    }
+
+    static bool enableIncrementCalculate() {
+        return ms_enable_increment_calculate;
+    }
 
 public:
     // ===================
@@ -213,8 +232,11 @@ public:
     virtual void getSeparateKTypeLeafSubNodes(vector<IndicatorImpPtr>& nodes) const {}
 
 private:
-    void initContext();
     bool needCalculate();
+    bool can_inner_calculate();
+    bool can_increment_calculate();
+    bool increment_execute_leaf_or_op(const Indicator& ind);
+    size_t increment_execute();
     void execute_add();
     void execute_sub();
     void execute_mul();
@@ -230,6 +252,7 @@ private:
     void execute_or();
     void execute_weave();
     void execute_if();
+    size_t increment_execute_if();
 
     static void inner_repeatALikeNodes(vector<IndicatorImpPtr>& sub_nodes);
     void repeatALikeNodes();
@@ -252,19 +275,24 @@ private:
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
 
+    void onlySetContext(const KData&);
+
     // 用于动态参数时，更新 discard
-    void _update_discard();
+    void _update_discard(bool force = false);
 
     virtual bool isPythonObject() const;
 
 protected:
     string m_name;
-    size_t m_discard;
-    size_t m_result_num;
+    size_t m_discard{0};
+    size_t m_result_num{0};
+    KData m_context;
+    KData m_old_context;
     vector<value_t>* m_pBuffer[MAX_RESULT_NUM];
 
-    bool m_need_calculate;
-    OPType m_optype;
+    bool m_need_calculate{true};
+    bool m_param_changed{true};
+    OPType m_optype{LEAF};
     IndicatorImpPtr m_left;
     IndicatorImpPtr m_right;
     IndicatorImpPtr m_three;
@@ -277,6 +305,7 @@ public:
     static void releaseDynEngine();
 
 protected:
+    static bool ms_enable_increment_calculate;
     static ThreadPool* ms_tg;
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -289,7 +318,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_discard);
         ar& BOOST_SERIALIZATION_NVP(m_result_num);
+        ar& BOOST_SERIALIZATION_NVP(m_context);
+        ar& BOOST_SERIALIZATION_NVP(m_old_context);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
+        ar& BOOST_SERIALIZATION_NVP(m_param_changed);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
         ar& BOOST_SERIALIZATION_NVP(m_left);
         ar& BOOST_SERIALIZATION_NVP(m_right);
@@ -329,7 +361,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_discard);
         ar& BOOST_SERIALIZATION_NVP(m_result_num);
+        ar& BOOST_SERIALIZATION_NVP(m_context);
+        ar& BOOST_SERIALIZATION_NVP(m_old_context);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
+        ar& BOOST_SERIALIZATION_NVP(m_param_changed);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
         ar& BOOST_SERIALIZATION_NVP(m_left);
         ar& BOOST_SERIALIZATION_NVP(m_right);
@@ -387,15 +422,18 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
-#define INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(classname)                                          \
+#define INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE                                                    \
 public:                                                                                        \
-    virtual void _calculate(const Indicator& ind) override;                                    \
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override; \
     virtual bool supportIndParam() const override {                                            \
         return true;                                                                           \
-    }                                                                                          \
-    virtual IndicatorImpPtr _clone() override {                                                \
-        return make_shared<classname>();                                                       \
+    }
+
+#define INDICATOR_IMP_SUPPORT_INCREMENT                                                 \
+public:                                                                                 \
+    virtual void _increment_calculate(const Indicator& ind, size_t start_pos) override; \
+    virtual bool supportIncrementCalculate() const override {                           \
+        return true;                                                                    \
     }
 
 #define INDICATOR_NEED_CONTEXT                    \
@@ -411,6 +449,10 @@ typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 
 HKU_API std::ostream& operator<<(std::ostream&, const IndicatorImp&);
 HKU_API std::ostream& operator<<(std::ostream&, const IndicatorImpPtr&);
+
+inline IndicatorImp::OPType IndicatorImp::getOPType() const {
+    return m_optype;
+}
 
 inline size_t IndicatorImp::getResultNumber() const {
     return m_result_num;
@@ -436,12 +478,19 @@ inline bool IndicatorImp::isLeaf() const {
     return m_optype == LEAF ? true : false;
 }
 
-inline KData IndicatorImp::getContext() const {
-    return getParam<KData>("kdata");
+inline const KData& IndicatorImp::getContext() const {
+    return m_context;
 }
 
 inline void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
     setContext(stock.getKData(query));
+}
+
+inline void IndicatorImp::onlySetContext(const KData& k) {
+    if (m_context != k) {
+        m_old_context = m_context;
+        m_context = k;
+    }
 }
 
 inline const IndicatorImp::ind_param_map_t& IndicatorImp::getIndParams() const {

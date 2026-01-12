@@ -37,7 +37,7 @@ void IBlockSetNum::_checkParam(const string& name) const {
 void IBlockSetNum::_calculate(const Indicator& ind) {
     Block block = getParam<Block>("block");
     bool ignore_context = getParam<bool>("ignore_context");
-    KData k = getContext();
+    const KData& k = getContext();
     DatetimeList dates;
     if (!ignore_context && !k.empty()) {
         dates = k.getDatetimeList();

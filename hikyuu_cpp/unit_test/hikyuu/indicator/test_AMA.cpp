@@ -82,6 +82,15 @@ TEST_CASE("test_AMA") {
         CHECK_EQ(result[i], expect[i]);
         CHECK_EQ(result.get(i, 1), expect.get(i, 1));
     }
+
+    /** 增量计算 */
+    Stock stk = getStock("sh000001");
+    auto k1 = stk.getKData(KQuery(0, 20));
+    auto k2 = stk.getKData(KQuery(0, 21));
+    ama = AMA(CLOSE(), 1, 1, 1)(k1);
+    ama = ama(k2);
+    auto k3 = stk.getKData(KQuery(19, 25));
+    ama = ama(k3);
 }
 
 /** @par 检测点 */

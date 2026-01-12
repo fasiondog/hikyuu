@@ -20,14 +20,6 @@ TaUltosc::TaUltosc() : IndicatorImp("TA_ULTOSC", 1) {
     setParam<int>("n3", 28);
 }
 
-TaUltosc::TaUltosc(const KData& k, int n1, int n2, int n3) : IndicatorImp("TA_ULTOSC", 1) {
-    setParam<KData>("kdata", k);
-    setParam<int>("n1", n1);
-    setParam<int>("n2", n2);
-    setParam<int>("n3", n3);
-    TaUltosc::_calculate(Indicator());
-}
-
 void TaUltosc::_checkParam(const string& name) const {
     if (name == "n1" || name == "n2" || name == "n3") {
         int n = getParam<int>(name);
@@ -39,7 +31,7 @@ void TaUltosc::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData k = getContext();
+    const KData& k = getContext();
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -78,13 +70,18 @@ Indicator HKU_API TA_ULTOSC(int n1, int n2, int n3) {
     auto p = make_shared<TaUltosc>();
     p->setParam<int>("n1", n1);
     p->setParam<int>("n2", n2);
-    p->setParam<int>("n2", n3);
+    p->setParam<int>("n3", n3);
     p->calculate();
     return Indicator(p);
 }
 
 Indicator HKU_API TA_ULTOSC(const KData& k, int n1, int n2, int n3) {
-    return Indicator(make_shared<TaUltosc>(k, n1, n2, n3));
+    auto p = make_shared<TaUltosc>();
+    p->setParam<int>("n1", n1);
+    p->setParam<int>("n2", n2);
+    p->setParam<int>("n3", n3);
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

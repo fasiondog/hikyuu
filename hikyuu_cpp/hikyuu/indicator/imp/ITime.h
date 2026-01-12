@@ -19,11 +19,12 @@ namespace hku {
 class ITime : public IndicatorImp {
     INDICATOR_IMP(ITime)
     INDICATOR_NEED_CONTEXT
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     ITime();
-    ITime(const KData&, const string& type);
+    // ITime(const KData&, const string& type);
     virtual ~ITime();
     virtual void _checkParam(const string& name) const override;
 };

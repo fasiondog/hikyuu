@@ -21,9 +21,6 @@ public:
     TaSarext(double startvalue, double offsetonreverse, double accelerationinitlong,
              double accelerationlong, double accelerationmaxlong, double accelerationinitshort,
              double accelerationshort, double accelerationmaxshort);
-    TaSarext(const KData&, double startvalue, double offsetonreverse, double accelerationinitlong,
-             double accelerationlong, double accelerationmaxlong, double accelerationinitshort,
-             double accelerationshort, double accelerationmaxshort);
     virtual ~TaSarext() = default;
     virtual void _checkParam(const string& name) const override;
 };

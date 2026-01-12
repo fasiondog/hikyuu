@@ -20,6 +20,7 @@ namespace hku {
  */
 class IIntpart : public IndicatorImp {
     INDICATOR_IMP(IIntpart)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

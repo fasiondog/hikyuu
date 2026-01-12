@@ -17,6 +17,7 @@ namespace hku {
 
 class IAsin : public IndicatorImp {
     INDICATOR_IMP(IAsin)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

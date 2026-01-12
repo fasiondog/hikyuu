@@ -41,16 +41,7 @@ string IContext::str() const {
     os << "Indicator{\n"
        << "  context: " << m_ref_ind.getContext().getStock().market_code() << "\n  name: " << name()
        << "\n  size: " << size() << "\n  discard: " << discard()
-       << "\n  result sets: " << getResultNumber() << "\n  params: " << getParameter()
-       << "\n  support indicator param: " << (supportIndParam() ? "True" : "False");
-    if (supportIndParam()) {
-        os << "\n  ind params: {";
-        const auto& ind_params = getIndParams();
-        for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
-            os << iter->first << ": " << iter->second->formula() << ", ";
-        }
-        os << "}";
-    }
+       << "\n  result sets: " << getResultNumber() << "\n  params: " << getParameter();
     os << "\n  formula: " << formula();
     for (size_t r = 0; r < getResultNumber(); ++r) {
         if (m_pBuffer[r]) {
@@ -78,7 +69,7 @@ void IContext::_calculate(const Indicator& ind) {
     HKU_ASSERT(isLeaf());
 
     auto null_k = Null<KData>();
-    auto in_k = getContext();
+    const auto& in_k = getContext();
     auto self_k = m_ref_ind.getContext();
     HKU_IF_RETURN((self_k == in_k || in_k == null_k) && this->size() != 0, void());
 

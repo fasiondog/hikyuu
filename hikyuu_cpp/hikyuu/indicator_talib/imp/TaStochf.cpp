@@ -20,15 +20,6 @@ TaStochf::TaStochf() : IndicatorImp("TA_STOCHF", 2) {
     setParam<int>("fastd_matype", 0);
 }
 
-TaStochf::TaStochf(const KData& k, int fastk_n, int fastd_n, int fastd_matype)
-: IndicatorImp("TA_STOCHF", 2) {
-    setParam<KData>("kdata", k);
-    setParam<int>("fastk_n", fastk_n);
-    setParam<int>("fastd_n", fastd_n);
-    setParam<int>("fastd_matype", fastd_matype);
-    TaStochf::_calculate(Indicator());
-}
-
 void TaStochf::_checkParam(const string& name) const {
     if (name == "fastk_n" || name == "fastd_n") {
         int n = getParam<int>(name);
@@ -43,7 +34,7 @@ void TaStochf::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData k = getContext();
+    const KData& k = getContext();
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -89,7 +80,12 @@ Indicator HKU_API TA_STOCHF(int fastk_n, int fastd_n, int fastd_matype) {
 }
 
 Indicator HKU_API TA_STOCHF(const KData& k, int fastk_n, int fastd_n, int fastd_matype) {
-    return Indicator(make_shared<TaStochf>(k, fastk_n, fastd_n, fastd_matype));
+    auto p = make_shared<TaStochf>();
+    p->setParam<int>("fastk_n", fastk_n);
+    p->setParam<int>("fastd_n", fastd_n);
+    p->setParam<int>("fastd_matype", fastd_matype);
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

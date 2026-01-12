@@ -17,11 +17,6 @@ namespace hku {
 
 IAd::IAd() : IndicatorImp("AD", 1) {}
 
-IAd::IAd(const KData& k) : IndicatorImp("AD", 1) {
-    setParam<KData>("kdata", k);
-    IAd::_calculate(Indicator());
-}
-
 IAd::~IAd() {}
 
 void IAd::_calculate(const Indicator& data) {
@@ -29,7 +24,7 @@ void IAd::_calculate(const Indicator& data) {
                 "The input is ignored because {} depends on the context!", m_name);
 
     m_discard = 0;
-    KData k = getContext();
+    const KData& k = getContext();
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -54,7 +49,9 @@ Indicator HKU_API AD() {
 }
 
 Indicator HKU_API AD(const KData& k) {
-    return Indicator(make_shared<IAd>(k));
+    auto p = make_shared<IAd>();
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

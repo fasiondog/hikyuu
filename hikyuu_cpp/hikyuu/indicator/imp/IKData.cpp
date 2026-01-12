@@ -18,14 +18,6 @@ IKData::IKData() : IndicatorImp("KDATA") {
     setParam<string>("kpart", "KDATA");
 }
 
-IKData::IKData(const KData& kdata, const string& part) : IndicatorImp() {
-    string part_name(part);
-    to_upper(part_name);
-    setParam<string>("kpart", part_name);
-    setParam<KData>("kdata", kdata);
-    IKData::_calculate(Indicator());
-}
-
 IKData::~IKData() {}
 
 void IKData::_checkParam(const string& name) const {
@@ -42,23 +34,33 @@ void IKData::_calculate(const Indicator& ind) {
                 "The input is ignored because {} depends on the context!",
                 getParam<string>("kpart"));
 
-    KData kdata = getContext();
+    m_name = getParam<string>("kpart");
+    const KData& kdata = getContext();
     size_t total = kdata.size();
     HKU_IF_RETURN(total == 0, void());
 
-    string part_name = getParam<string>("kpart");
-    auto const* ks = kdata.data();
-
-    if ("KDATA" == part_name) {
-        m_name = "KDATA";
+    if ("KDATA" == m_name) {
         _readyBuffer(total, 6);
+    } else {
+        _readyBuffer(total, 1);
+    }
+    _increment_calculate(ind, 0);
+}
+
+void IKData::_increment_calculate(const Indicator& data, size_t start_pos) {
+    const KData& kdata = getContext();
+    size_t total = kdata.size();
+    HKU_IF_RETURN(total == 0, void());
+
+    auto const* ks = kdata.data();
+    if ("KDATA" == m_name) {
         auto* dst0 = this->data(0);
         auto* dst1 = this->data(1);
         auto* dst2 = this->data(2);
         auto* dst3 = this->data(3);
         auto* dst4 = this->data(4);
         auto* dst5 = this->data(5);
-        for (size_t i = 0; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst0[i] = ks[i].openPrice;
             dst1[i] = ks[i].highPrice;
             dst2[i] = ks[i].lowPrice;
@@ -66,91 +68,95 @@ void IKData::_calculate(const Indicator& ind) {
             dst4[i] = ks[i].transAmount;
             dst5[i] = ks[i].transCount;
         }
-
-    } else if ("OPEN" == part_name) {
-        m_name = "OPEN";
-        _readyBuffer(total, 1);
+    } else if ("OPEN" == m_name) {
         auto* dst = this->data();
-        for (size_t i = 0; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst[i] = ks[i].openPrice;
         }
-
-    } else if ("HIGH" == part_name) {
-        m_name = "HIGH";
-        _readyBuffer(total, 1);
+    } else if ("HIGH" == m_name) {
         auto* dst = this->data();
-        for (size_t i = 0; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst[i] = ks[i].highPrice;
         }
-    } else if ("LOW" == part_name) {
-        m_name = "LOW";
-        _readyBuffer(total, 1);
+    } else if ("LOW" == m_name) {
         auto* dst = this->data();
-        for (size_t i = 0; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst[i] = ks[i].lowPrice;
         }
 
-    } else if ("CLOSE" == part_name) {
-        m_name = "CLOSE";
-        _readyBuffer(total, 1);
+    } else if ("CLOSE" == m_name) {
         auto* dst = this->data();
-        for (size_t i = 0; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst[i] = ks[i].closePrice;
         }
-
-    } else if ("AMO" == part_name) {
-        m_name = "AMO";
-        _readyBuffer(total, 1);
+    } else if ("AMO" == m_name) {
         auto* dst = this->data();
-        for (size_t i = 0; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst[i] = ks[i].transAmount;
         }
 
-    } else if ("VOL" == part_name) {
-        m_name = "VOL";
-        _readyBuffer(total, 1);
+    } else if ("VOL" == m_name) {
         auto* dst = this->data();
-        for (size_t i = 0; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst[i] = ks[i].transCount;
         }
-
-    } else {
-        m_name = "Unknown";
-        m_discard = total;
-        HKU_INFO("Unkown ValueType of KData");
     }
 }
 
 Indicator HKU_API KDATA(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "KDATA"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "KDATA");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API OPEN(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "OPEN"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "OPEN");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API HIGH(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "HIGH"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "HIGH");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API LOW(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "LOW"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "LOW");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API CLOSE(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "CLOSE"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "CLOSE");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API AMO(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "AMO"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "AMO");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API VOL(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "VOL"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "VOL");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API KDATA_PART(const KData& kdata, const string& part) {
-    return Indicator(make_shared<IKData>(kdata, part));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", part);
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 //-----------------------------------------------------------

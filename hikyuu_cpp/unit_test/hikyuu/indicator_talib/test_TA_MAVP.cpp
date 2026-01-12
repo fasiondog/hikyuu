@@ -1070,7 +1070,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     result = TA_MAVP(a, b)(k3);
     check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为2，b 长度为2，不指定上下文 */
     k1 = stk1.getKData(KQuery(-2));
@@ -1091,7 +1091,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     result = TA_MAVP(a, b)(k3);
     check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为29，b 长度为20 */
     k1 = stk1.getKData(KQuery(-29));
@@ -1112,7 +1112,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     result = TA_MAVP(a, b)(k3);
     check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为20，b 长度为29 */
     k1 = stk1.getKData(KQuery(-20));
@@ -1133,7 +1133,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     result = TA_MAVP(a, b)(k3);
     check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为30，b 长度为30 */
     k1 = stk1.getKData(KQuery(-30));
@@ -1148,13 +1148,13 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     result = TA_MAVP(a, b)(k3);
     check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     k3 = stk3.getKData(KQuery(-30));
     result = TA_MAVP(a, b)(k3);
     check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为30，b 长度为35 */
     k1 = stk1.getKData(KQuery(-30));
@@ -1169,13 +1169,13 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     result = TA_MAVP(a, b)(k3);
     check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
     CHECK_EQ(result.size(), 35);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     k3 = stk3.getKData(KQuery(-30));
     result = TA_MAVP(a, b)(k3);
     check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为35，b 长度为30 */
     k1 = stk1.getKData(KQuery(-35));
@@ -1190,13 +1190,13 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     result = TA_MAVP(a, b)(k3);
     check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
     CHECK_EQ(result.size(), 35);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     k3 = stk3.getKData(KQuery(-30));
     result = TA_MAVP(a, b)(k3);
     check_output(result, MA(k3.close(), 2), EMA(k3.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 }
 
 /** @par 检测点 */
@@ -1246,7 +1246,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     k2 = stk2.getKData(KQuery(-30));
     check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为2，b 长度为2，不指定上下文 */
     k1 = stk1.getKData(KQuery(-2));
@@ -1268,7 +1268,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     k2 = stk2.getKData(KQuery(-30));
     check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为29，b 长度为20，不指定上下文 */
     k1 = stk1.getKData(KQuery(-29));
@@ -1291,7 +1291,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     k2 = stk2.getKData(KQuery(-30));
     check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为20，b 长度为29，不指定上下文 */
     k1 = stk1.getKData(KQuery(-20));
@@ -1314,7 +1314,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     k2 = stk2.getKData(KQuery(-30));
     check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为30，b 长度为30，不指定上下文 */
     k1 = stk1.getKData(KQuery(-30));
@@ -1330,7 +1330,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     k2 = stk2.getKData(KQuery(-30));
     check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为30，b 长度为35，不指定上下文 */
     k1 = stk1.getKData(KQuery(-30));
@@ -1346,7 +1346,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     k2 = stk2.getKData(KQuery(-30));
     check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为35，b 长度为30，不指定上下文 */
     k1 = stk1.getKData(KQuery(-35));
@@ -1362,7 +1362,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     k2 = stk2.getKData(KQuery(-30));
     check_output(result, MA(k3.close(), 2), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 }
 
 /** @par 检测点 */
@@ -1461,7 +1461,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     result = TA_MAVP(a, b);
     check_output(result, MA(k1.close(), 2), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为30，b 长度为35 */
     k1 = stk1.getKData(KQuery(-30));
@@ -1476,7 +1476,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     k2 = stk2.getKData(KQuery(-30));
     check_output(result, MA(k1.close(), 2), EMA(k2.close(), 2));
     CHECK_EQ(result.size(), 30);
-    CHECK_EQ(result.discard(), 29);
+    CHECK_EQ(result.discard(), 30);
 
     /** @arg a 长度为35，b 长度为30 */
     k1 = stk1.getKData(KQuery(-35));

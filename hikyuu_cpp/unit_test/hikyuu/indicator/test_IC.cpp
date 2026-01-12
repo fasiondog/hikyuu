@@ -69,7 +69,7 @@ TEST_CASE("test_IC") {
     CHECK_UNARY(std::isnan(result[1]));
 
     /** @arg 传入的 stks 长度为2，query 的长度为2*/
-    result = IC(MA(CLOSE()), {sm["sh600004"], sm["sh600005"]}, KQuery(-2), ref_stk, 1);
+    result = IC(CLOSE(), {sm["sh600004"], sm["sh600005"]}, KQuery(-2), ref_stk, 1);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), 2);
@@ -78,7 +78,7 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result[1], doctest::Approx(-1.0));
 
     // 严格模式
-    result = IC(MA(CLOSE()), {sm["sh600004"], sm["sh600005"]}, KQuery(-2), ref_stk, 1, true, true);
+    result = IC(CLOSE(), {sm["sh600004"], sm["sh600005"]}, KQuery(-2), ref_stk, 1, true, true);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), 2);
@@ -87,7 +87,7 @@ TEST_CASE("test_IC") {
     CHECK_UNARY(std::isnan(result[1]));
 
     /** @arg 正常执行 */
-    result = IC(MA(CLOSE()), stks, query, ref_stk, 1);
+    result = IC(CLOSE(), stks, query, ref_stk, 1);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
@@ -97,7 +97,7 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result[99], doctest::Approx(0.5));
 
     // 严格模式
-    result = IC(MA(CLOSE()), stks, query, ref_stk, 1, true, true);
+    result = IC(CLOSE(), stks, query, ref_stk, 1, true, true);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());

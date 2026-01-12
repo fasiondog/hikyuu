@@ -15,6 +15,7 @@ namespace hku {
 
 class INot : public IndicatorImp {
     INDICATOR_IMP(INot)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

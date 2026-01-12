@@ -17,16 +17,11 @@ IZongGuBen::IZongGuBen() : IndicatorImp("ZONGGUBEN", 1) {}
 
 IZongGuBen::~IZongGuBen() {}
 
-IZongGuBen::IZongGuBen(const KData& k) : IndicatorImp("ZONGGUBEN", 1) {
-    setParam<KData>("kdata", k);
-    IZongGuBen::_calculate(Indicator());
-}
-
 void IZongGuBen::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData k = getContext();
+    const KData& k = getContext();
     size_t total = k.size();
     if (total == 0) {
         return;
@@ -34,14 +29,20 @@ void IZongGuBen::_calculate(const Indicator& data) {
 
     _readyBuffer(total, 1);
 
+    _increment_calculate(data, 0);
+}
+
+void IZongGuBen::_increment_calculate(const Indicator& data, size_t start_pos) {
+    const KData& k = getContext();
     Stock stock = k.getStock();
+    size_t total = k.size();
     StockWeightList sw_list = stock.getWeight();
     if (sw_list.size() == 0) {
         return;
     }
 
     auto* dst = this->data();
-    size_t pos = 0;
+    size_t pos = start_pos;
     auto sw_iter = sw_list.begin();
     price_t pre_total_count = sw_iter->totalCount();
     for (; sw_iter != sw_list.end(); ++sw_iter) {
@@ -71,7 +72,9 @@ Indicator HKU_API ZONGGUBEN() {
 }
 
 Indicator HKU_API ZONGGUBEN(const KData& k) {
-    return Indicator(make_shared<IZongGuBen>(k));
+    auto p = make_shared<IZongGuBen>();
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

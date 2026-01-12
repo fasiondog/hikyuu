@@ -15,6 +15,7 @@ namespace hku {
 
 class IIsInf : public IndicatorImp {
     INDICATOR_IMP(IIsInf)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

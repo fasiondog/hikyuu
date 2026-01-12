@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <forward_list>
+#include <stack>
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/global/sysinfo.h"
 #include "Indicator.h"
@@ -22,6 +23,7 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 
 namespace hku {
 
+bool IndicatorImp::ms_enable_increment_calculate{true};
 ThreadPool *IndicatorImp::ms_tg = nullptr;
 
 string HKU_API getOPTypeName(IndicatorImp::OPType op) {
@@ -138,21 +140,15 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
     return os;
 }
 
-IndicatorImp::IndicatorImp()
-: m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
-    initContext();
+IndicatorImp::IndicatorImp() : m_name("IndicatorImp") {
     memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
 }
 
-IndicatorImp::IndicatorImp(const string &name)
-: m_name(name), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
-    initContext();
+IndicatorImp::IndicatorImp(const string &name) : m_name(name) {
     memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
 }
 
-IndicatorImp::IndicatorImp(const string &name, size_t result_num)
-: m_name(name), m_discard(0), m_need_calculate(true), m_optype(LEAF) {
-    initContext();
+IndicatorImp::IndicatorImp(const string &name, size_t result_num) : m_name(name) {
     memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
     _readyBuffer(0, m_result_num);
@@ -162,6 +158,7 @@ void IndicatorImp::baseCheckParam(const string &name) const {}
 
 void IndicatorImp::paramChanged() {
     m_need_calculate = true;
+    m_param_changed = true;
 }
 
 void IndicatorImp::setIndParam(const string &name, const Indicator &ind) {
@@ -184,18 +181,75 @@ const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
     return m_ind_params.at(name);
 }
 
-void IndicatorImp::initContext() {
-    setParam<KData>("kdata", KData());
+bool IndicatorImp::supportIncrementCalculate() const {
+    return false;
+}
+
+bool IndicatorImp::can_inner_calculate() {
+    if (m_need_calculate || !ms_enable_increment_calculate || m_result_num == 0 ||
+        m_context.empty() || size() < m_context.size() || m_old_context.size() < m_context.size() ||
+        !supportIncrementCalculate()) {
+        return false;
+    }
+
+    if (m_context.front().datetime < m_old_context.front().datetime ||
+        m_context.back().datetime > m_old_context.back().datetime) {
+        return false;
+    }
+
+    if (m_context.getStock() != m_old_context.getStock() ||
+        m_old_context.getQuery().kType() != m_context.getQuery().kType() ||
+        m_old_context.getQuery().recoverType() != m_context.getQuery().recoverType()) {
+        return false;
+    }
+
+    size_t start_pos = m_old_context.getPos(m_context.front().datetime);
+    if (start_pos == Null<size_t>()) {
+        return false;
+    }
+
+    size_t last_pos = m_old_context.getPos(m_context.back().datetime);
+    if (last_pos == Null<size_t>()) {
+        return false;
+    }
+
+    if (start_pos > last_pos) {
+        return false;
+    }
+
+    size_t total = m_context.size();
+    if (total != last_pos - start_pos + 1) {
+        return false;
+    }
+
+    for (size_t r = 0; r < m_result_num; ++r) {
+        if (m_pBuffer[r] == nullptr) {
+            return false;
+        }
+        auto *dst = m_pBuffer[r]->data();
+        memmove(dst, dst + start_pos, sizeof(value_t) * (total));
+        m_pBuffer[r]->resize(total);
+    }
+
+    m_discard = start_pos >= m_discard ? 0 : m_discard - start_pos;
+    m_need_calculate = false;
+
+    return true;
 }
 
 void IndicatorImp::setContext(const KData &k) {
-    KData old_k = getParam<KData>("kdata");
+    const KData &old_k = getContext();
 
     // 上下文没变化的情况下根据自身标识进行计算
     if (old_k == k) {
         if (m_need_calculate) {
             calculate();
         }
+        return;
+    }
+
+    onlySetContext(k);
+    if (can_inner_calculate()) {
         return;
     }
 
@@ -215,7 +269,7 @@ void IndicatorImp::setContext(const KData &k) {
     }
 
     // 重设上下文
-    setParam<KData>("kdata", k);
+    // onlySetContext(k);
 
     // 启动重新计算
     calculate();
@@ -224,9 +278,17 @@ void IndicatorImp::setContext(const KData &k) {
     if (!m_parent) {
         vector<IndicatorImpPtr> nodes;
         getAllSubNodes(nodes);
-        for (const auto &node : nodes) {
-            if (!node->m_need_calculate && node->size() > 0) {
-                node->_clearBuffer();
+        if (ms_enable_increment_calculate) {
+            for (const auto &node : nodes) {
+                if (!node->m_need_calculate && !node->supportIncrementCalculate()) {
+                    node->_clearBuffer();
+                }
+            }
+        } else {
+            for (const auto &node : nodes) {
+                if (!node->m_need_calculate) {
+                    node->_clearBuffer();
+                }
             }
         }
     }
@@ -310,7 +372,9 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_name = m_name;
     p->m_discard = m_discard;
     p->m_result_num = m_result_num;
+    p->m_context = m_context;
     p->m_need_calculate = m_need_calculate;
+    p->m_param_changed = m_param_changed;
     p->m_optype = m_optype;
     p->m_parent = m_parent;
 
@@ -470,7 +534,7 @@ Datetime IndicatorImp::getDatetime(size_t pos) const {
         DatetimeList dates(getParam<DatetimeList>("align_date_list"));
         return pos < dates.size() ? dates[pos] : Null<Datetime>();
     }
-    KData k = getContext();
+    const KData &k = getContext();
     return pos < k.size() ? k[pos].datetime : Null<Datetime>();
 }
 
@@ -717,7 +781,7 @@ bool IndicatorImp::needCalculate() {
 
 void IndicatorImp::_calculate(const Indicator &ind) {
     if (isLeaf()) {
-        auto k = getContext();
+        const auto &k = getContext();
         size_t total = k.size();
         HKU_IF_RETURN(total == 0, void());
         _readyBuffer(total, 1);
@@ -740,6 +804,88 @@ void IndicatorImp::_calculate(const Indicator &ind) {
     }
 }
 
+bool IndicatorImp::can_increment_calculate() {
+    if (m_result_num == 0 || m_context.empty() || m_old_context.empty()) {
+        return false;
+    }
+
+    if (m_context.front().datetime < m_old_context.front().datetime) {
+        return false;
+    }
+
+    if (m_context.getStock() != m_old_context.getStock() ||
+        m_old_context.getQuery().kType() != m_context.getQuery().kType() ||
+        m_old_context.getQuery().recoverType() != m_context.getQuery().recoverType()) {
+        return false;
+    }
+
+    if (m_context.back().datetime <= m_old_context.back().datetime) {
+        return false;
+    }
+
+    return true;
+}
+
+bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
+    if (m_param_changed || !ms_enable_increment_calculate || !supportIncrementCalculate() ||
+        !can_increment_calculate()) {
+        return false;
+    }
+
+    size_t copy_start_pos = m_old_context.getPos(m_context.front().datetime);
+    if (copy_start_pos == Null<size_t>()) {
+        return false;
+    }
+
+    size_t total = m_context.size();
+    size_t copy_len = m_old_context.size() - copy_start_pos;
+    if (copy_len == 0) {
+        return false;
+    }
+
+    size_t start_pos = m_context.getPos(m_old_context.back().datetime);
+    if (start_pos == Null<size_t>()) {
+        return false;
+    }
+
+    if (copy_start_pos < m_discard) {
+        size_t old_discard = m_discard;
+        m_discard = m_discard - copy_start_pos;
+        copy_start_pos = old_discard;
+        copy_len = m_old_context.size() - copy_start_pos;
+        for (size_t r = 0; r < m_result_num; ++r) {
+            if (m_pBuffer[r] == nullptr) {
+                return false;
+            }
+            m_pBuffer[r]->resize(total, Null<value_t>());
+            auto *dst = this->data(r);
+            memmove(dst + m_discard, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+        }
+    } else {
+        for (size_t r = 0; r < m_result_num; ++r) {
+            if (m_pBuffer[r] == nullptr) {
+                return false;
+            }
+            m_pBuffer[r]->resize(total, Null<value_t>());
+            auto *dst = this->data(r);
+            memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+        }
+    }
+
+    if (start_pos < m_discard) {
+        start_pos = m_discard;
+    }
+
+    if (start_pos < ind.discard()) {
+        start_pos = ind.discard();
+        m_discard = start_pos;
+    }
+
+    _increment_calculate(ind, std::max(start_pos, min_increment_start()));
+    _update_discard();
+    return true;
+}
+
 Indicator IndicatorImp::calculate() {
     IndicatorImpPtr result;
     if (!needCalculate()) {
@@ -754,22 +900,28 @@ Indicator IndicatorImp::calculate() {
     switch (m_optype) {
         case LEAF:
             if (m_ind_params.empty()) {
-                _calculate(Indicator());
+                if (!increment_execute_leaf_or_op(Indicator())) {
+                    _calculate(Indicator());
+                }
             } else {
                 _dyn_calculate(Indicator());
             }
             break;
 
         case OP: {
-            m_right->calculate();
-            _readyBuffer(m_right->size(), m_result_num);
-            Indicator tmp_ind(m_right);
             if (m_ind_params.empty()) {
-                _calculate(tmp_ind);
+                if (!increment_execute_leaf_or_op(Indicator(m_right))) {
+                    m_right->calculate();
+                    _readyBuffer(m_right->size(), m_result_num);
+                    _calculate(Indicator(m_right));
+                    onlySetContext(m_right->getContext());
+                }
             } else {
-                _dyn_calculate(tmp_ind);
+                m_right->calculate();
+                _readyBuffer(m_right->size(), m_result_num);
+                _dyn_calculate(Indicator(m_right));
+                onlySetContext(m_right->getContext());
             }
-            setParam<KData>("kdata", m_right->getParam<KData>("kdata"));
         } break;
 
         case ADD:
@@ -842,6 +994,9 @@ Indicator IndicatorImp::calculate() {
         m_need_calculate = false;
     }
 
+    m_param_changed = false;
+    m_old_context = KData();
+
     try {
         result = shared_from_this();
     } catch (const std::exception &e) {
@@ -858,9 +1013,71 @@ Indicator IndicatorImp::calculate() {
     return Indicator(result);
 }
 
+size_t IndicatorImp::increment_execute() {
+    size_t null_pos = Null<size_t>();
+    if (m_param_changed || !ms_enable_increment_calculate || m_right->m_need_calculate ||
+        m_left->m_need_calculate) {
+        return null_pos;
+    }
+
+    if (!can_increment_calculate()) {
+        return null_pos;
+    }
+
+    size_t copy_start_pos = m_old_context.getPos(m_context.front().datetime);
+    if (copy_start_pos == null_pos) {
+        return null_pos;
+    }
+
+    size_t total = m_context.size();
+    size_t copy_len = m_old_context.size() - copy_start_pos;
+    if (copy_len == 0) {
+        return null_pos;
+    }
+
+    size_t start_pos = m_context.getPos(m_old_context.back().datetime);
+    if (start_pos == null_pos) {
+        return null_pos;
+    }
+
+    if (copy_start_pos < m_discard) {
+        size_t old_discard = m_discard;
+        m_discard = m_discard - copy_start_pos;
+        copy_start_pos = old_discard;
+        copy_len = m_old_context.size() - copy_start_pos;
+        for (size_t r = 0; r < m_result_num; ++r) {
+            if (m_pBuffer[r] == nullptr) {
+                return false;
+            }
+            m_pBuffer[r]->resize(total, Null<value_t>());
+            auto *dst = this->data(r);
+            memmove(dst + m_discard, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+        }
+    } else {
+        for (size_t r = 0; r < m_result_num; ++r) {
+            if (m_pBuffer[r] == nullptr) {
+                return false;
+            }
+            m_pBuffer[r]->resize(total, Null<value_t>());
+            auto *dst = this->data(r);
+            memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+        }
+    }
+
+    if (start_pos < m_discard) {
+        start_pos = m_discard;
+    }
+
+    _update_discard();
+    return start_pos;
+}
+
 void IndicatorImp::execute_weave() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
     const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
@@ -871,19 +1088,26 @@ void IndicatorImp::execute_weave() {
         minp = m_right.get();
     }
 
+    size_t diff = maxp->size() - minp->size();
     size_t total = maxp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = minp->getResultNumber() + maxp->getResultNumber();
-    if (result_number > MAX_RESULT_NUM) {
-        result_number = MAX_RESULT_NUM;
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = minp->getResultNumber() + maxp->getResultNumber();
+        if (result_number > MAX_RESULT_NUM) {
+            result_number = MAX_RESULT_NUM;
+        }
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
     }
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+
     setDiscard(discard);
+
     value_t const *src = nullptr;
     value_t *dst = nullptr;
     if (m_left->size() >= m_right->size()) {
@@ -891,14 +1115,14 @@ void IndicatorImp::execute_weave() {
         for (size_t r = 0; r < num; ++r) {
             src = m_left->data(r);
             dst = this->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 dst[i] = src[i];
             }
         }
-        for (size_t r = num; r < result_number; r++) {
+        for (size_t r = num; r < m_result_num; r++) {
             src = m_right->data(r - num);
             dst = this->data(r);
-            for (size_t i = discard; i < total; i++) {
+            for (size_t i = start_pos; i < total; i++) {
                 dst[i] = src[i - diff];
             }
         }
@@ -907,14 +1131,14 @@ void IndicatorImp::execute_weave() {
         for (size_t r = 0; r < num; ++r) {
             src = m_left->data(r);
             dst = this->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 dst[i] = src[i - diff];
             }
         }
-        for (size_t r = num; r < result_number; r++) {
+        for (size_t r = num; r < m_result_num; r++) {
             src = m_right->data(r - num);
             dst = this->data(r);
-            for (size_t i = discard; i < total; i++) {
+            for (size_t i = start_pos; i < total; i++) {
                 dst[i] = src[i];
             }
         }
@@ -922,8 +1146,11 @@ void IndicatorImp::execute_weave() {
 }
 
 void IndicatorImp::execute_add() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
     IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
@@ -935,63 +1162,80 @@ void IndicatorImp::execute_add() {
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
-    for (size_t r = 0; r < result_number; ++r) {
+
+    for (size_t r = 0; r < m_result_num; ++r) {
         auto const *data1 = maxp->data(r);
         auto const *data2 = minp->data(r);
         auto *result = this->data(r);
-        for (size_t i = discard; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             result[i] = data1[i] + data2[i - diff];
         }
     }
 }
 
 void IndicatorImp::execute_sub() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
-    const IndicatorImp *maxp, *minp;
-    if (m_left->size() > m_right->size()) {
-        maxp = m_left.get();
-        minp = m_right.get();
-    } else {
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
+
     if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             auto *data1 = m_left->data(r);
             auto *data2 = m_right->data(r);
             auto *result = this->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 result[i] = data1[i] - data2[i - diff];
             }
         }
     } else {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             auto *data1 = m_left->data(r);
             auto *data2 = m_right->data(r);
             auto *result = this->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 result[i] = data1[i - diff] - data2[i];
             }
         }
@@ -999,8 +1243,11 @@ void IndicatorImp::execute_sub() {
 }
 
 void IndicatorImp::execute_mul() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
     IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
@@ -1012,63 +1259,80 @@ void IndicatorImp::execute_mul() {
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
-    for (size_t r = 0; r < result_number; ++r) {
+
+    for (size_t r = 0; r < m_result_num; ++r) {
         auto const *data1 = maxp->data(r);
         auto const *data2 = minp->data(r);
         auto *result = this->data(r);
-        for (size_t i = discard; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             result[i] = data1[i] * data2[i - diff];
         }
     }
 }
 
 void IndicatorImp::execute_div() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
-    const IndicatorImp *maxp, *minp;
-    if (m_left->size() > m_right->size()) {
-        maxp = m_left.get();
-        minp = m_right.get();
-    } else {
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
+
     if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             auto const *data1 = m_left->data(r);
             auto const *data2 = m_right->data(r);
             auto *result = this->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 result[i] = data1[i] / data2[i - diff];
             }
         }
     } else {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             auto const *data1 = m_left->data(r);
             auto const *data2 = m_right->data(r);
             auto *result = this->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 result[i] = data1[i - diff] / data2[i];
             }
         }
@@ -1076,38 +1340,48 @@ void IndicatorImp::execute_div() {
 }
 
 void IndicatorImp::execute_mod() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
-    const IndicatorImp *maxp, *minp;
-    if (m_left->size() > m_right->size()) {
-        maxp = m_left.get();
-        minp = m_right.get();
-    } else {
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
+
     value_t *dst = nullptr;
     value_t const *left = nullptr;
     value_t const *right = nullptr;
     value_t null_value = Null<value_t>();
     if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 if (right[i - diff] == 0.0) {
                     dst[i] = null_value;
                 } else {
@@ -1116,11 +1390,11 @@ void IndicatorImp::execute_mod() {
             }
         }
     } else {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 if (right[i] == 0.0) {
                     dst[i] = null_value;
                 } else {
@@ -1132,8 +1406,11 @@ void IndicatorImp::execute_mod() {
 }
 
 void IndicatorImp::execute_eq() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
     IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
@@ -1145,28 +1422,38 @@ void IndicatorImp::execute_eq() {
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
-    for (size_t r = 0; r < result_number; ++r) {
+
+    for (size_t r = 0; r < m_result_num; ++r) {
         auto *dst = this->data(r);
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
-        for (size_t i = discard; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst[i] = (maxdata[i] == mindata[i - diff]) ? 1.0 : 0.0;
         }
     }
 }
 
 void IndicatorImp::execute_ne() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
     IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
@@ -1178,66 +1465,83 @@ void IndicatorImp::execute_ne() {
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
-    for (size_t r = 0; r < result_number; ++r) {
+
+    for (size_t r = 0; r < m_result_num; ++r) {
         auto *dst = this->data(r);
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
-        for (size_t i = discard; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst[i] = (maxdata[i] != mindata[i - diff]) ? 1.0 : 0.0;
         }
     }
 }
 
 void IndicatorImp::execute_gt() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
-    const IndicatorImp *maxp, *minp;
-    if (m_left->size() > m_right->size()) {
-        maxp = m_left.get();
-        minp = m_right.get();
-    } else {
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
+
     value_t *dst = nullptr;
     value_t const *left = nullptr;
     value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 dst[i] = (left[i] > right[i - diff]) ? 1.0 : 0.0;
             }
         }
     } else {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 dst[i] = (left[i - diff] > right[i]) ? 1.0 : 0.0;
             }
         }
@@ -1245,46 +1549,56 @@ void IndicatorImp::execute_gt() {
 }
 
 void IndicatorImp::execute_lt() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
-    const IndicatorImp *maxp, *minp;
-    if (m_left->size() > m_right->size()) {
-        maxp = m_left.get();
-        minp = m_right.get();
-    } else {
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
+
     value_t *dst = nullptr;
     value_t const *left = nullptr;
     value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 dst[i] = (left[i] < right[i - diff]) ? 1.0 : 0.0;
             }
         }
     } else {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 dst[i] = left[i - diff] < right[i] ? 1.0 : 0.0;
             }
         }
@@ -1292,46 +1606,56 @@ void IndicatorImp::execute_lt() {
 }
 
 void IndicatorImp::execute_ge() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
-    const IndicatorImp *maxp, *minp;
-    if (m_left->size() > m_right->size()) {
-        maxp = m_left.get();
-        minp = m_right.get();
-    } else {
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
+
     value_t *dst = nullptr;
     value_t const *left = nullptr;
     value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 dst[i] = left[i] >= right[i - diff] ? 1.0 : 0.0;
             }
         }
     } else {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 dst[i] = left[i - diff] >= right[i] ? 1.0 : 0.0;
             }
         }
@@ -1339,46 +1663,56 @@ void IndicatorImp::execute_ge() {
 }
 
 void IndicatorImp::execute_le() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
-    const IndicatorImp *maxp, *minp;
-    if (m_left->size() > m_right->size()) {
-        maxp = m_left.get();
-        minp = m_right.get();
-    } else {
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
+
     value_t *dst = nullptr;
     value_t const *left = nullptr;
     value_t const *right = nullptr;
     if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 dst[i] = left[i] <= right[i - diff] ? 1.0 : 0.0;
             }
         }
     } else {
-        for (size_t r = 0; r < result_number; ++r) {
+        for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
-            for (size_t i = discard; i < total; ++i) {
+            for (size_t i = start_pos; i < total; ++i) {
                 dst[i] = left[i - diff] <= right[i] ? 1.0 : 0.0;
             }
         }
@@ -1386,10 +1720,13 @@ void IndicatorImp::execute_le() {
 }
 
 void IndicatorImp::execute_and() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
-    const IndicatorImp *maxp, *minp;
+    IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1399,30 +1736,40 @@ void IndicatorImp::execute_and() {
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
-    for (size_t r = 0; r < result_number; ++r) {
+
+    for (size_t r = 0; r < m_result_num; ++r) {
         auto *dst = this->data(r);
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
-        for (size_t i = discard; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst[i] = (maxdata[i] > 0.0) && (mindata[i - diff] > 0.0) ? 1.0 : 0.0;
         }
     }
 }
 
 void IndicatorImp::execute_or() {
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute();
+    if (start_pos == Null<size_t>()) {
+        m_right->calculate();
+        m_left->calculate();
+    }
 
-    const IndicatorImp *maxp, *minp;
+    IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
         maxp = m_right.get();
         minp = m_left.get();
@@ -1432,29 +1779,98 @@ void IndicatorImp::execute_or() {
     }
 
     size_t total = maxp->size();
+    size_t diff = maxp->size() - minp->size();
     size_t discard = maxp->size() - minp->size() + minp->discard();
     if (discard < maxp->discard()) {
         discard = maxp->discard();
     }
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    size_t diff = maxp->size() - minp->size();
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+        start_pos = discard;
+    } else if (start_pos < discard) {
+        start_pos = discard;
+    }
+
     setDiscard(discard);
-    for (size_t r = 0; r < result_number; ++r) {
+
+    for (size_t r = 0; r < m_result_num; ++r) {
         auto *dst = this->data(r);
         auto const *maxdata = maxp->data(r);
         auto const *mindata = minp->data(r);
-        for (size_t i = discard; i < total; ++i) {
+        for (size_t i = start_pos; i < total; ++i) {
             dst[i] = (maxdata[i] > 0.0) || (mindata[i - diff] > 0.0) ? 1.0 : 0.0;
         }
     }
 }
 
+size_t IndicatorImp::increment_execute_if() {
+    size_t null_pos = Null<size_t>();
+    if (m_param_changed || !ms_enable_increment_calculate || m_three->m_need_calculate ||
+        m_right->m_need_calculate || m_left->m_need_calculate) {
+        return null_pos;
+    }
+
+    if (!can_increment_calculate()) {
+        return null_pos;
+    }
+
+    size_t copy_start_pos = m_old_context.getPos(m_context.front().datetime);
+    if (copy_start_pos == null_pos) {
+        return null_pos;
+    }
+
+    size_t total = m_context.size();
+    size_t copy_len = m_old_context.size() - copy_start_pos;
+    if (copy_len == 0) {
+        return null_pos;
+    }
+
+    size_t start_pos = m_context.getPos(m_old_context.back().datetime);
+    if (start_pos == null_pos) {
+        return null_pos;
+    }
+
+    if (copy_start_pos < m_discard) {
+        size_t old_discard = m_discard;
+        m_discard = m_discard - copy_start_pos;
+        copy_start_pos = old_discard;
+        copy_len = m_old_context.size() - copy_start_pos;
+        for (size_t r = 0; r < m_result_num; ++r) {
+            if (m_pBuffer[r] == nullptr) {
+                return false;
+            }
+            m_pBuffer[r]->resize(total, Null<value_t>());
+            auto *dst = this->data(r);
+            memmove(dst + m_discard, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+        }
+    } else {
+        for (size_t r = 0; r < m_result_num; ++r) {
+            if (m_pBuffer[r] == nullptr) {
+                return false;
+            }
+            m_pBuffer[r]->resize(total, Null<value_t>());
+            auto *dst = this->data(r);
+            memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+        }
+    }
+
+    if (start_pos < m_discard) {
+        start_pos = m_discard;
+    }
+
+    _update_discard();
+    return start_pos;
+}
+
 void IndicatorImp::execute_if() {
-    m_three->calculate();
-    m_right->calculate();
-    m_left->calculate();
+    size_t start_pos = increment_execute_if();
+    if (start_pos == Null<size_t>()) {
+        m_three->calculate();
+        m_right->calculate();
+        m_left->calculate();
+    }
 
     const IndicatorImp *maxp, *minp;
     if (m_right->size() > m_left->size()) {
@@ -1485,13 +1901,19 @@ void IndicatorImp::execute_if() {
     size_t diff_left = total - m_left->size();
     size_t diff_cond = total - m_three->size();
 
-    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    _readyBuffer(total, result_number);
+    if (start_pos == Null<size_t>()) {
+        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+        _readyBuffer(total, result_number);
+    } else if (start_pos > discard) {
+        discard = start_pos;
+    }
+
     setDiscard(discard);
+
     auto *left = m_left->data(0);
     auto *right = m_right->data(0);
     auto *three = m_three->data(0);
-    for (size_t r = 0; r < result_number; ++r) {
+    for (size_t r = 0; r < m_result_num; ++r) {
         auto *dst = this->data(r);
         for (size_t i = discard; i < total; ++i) {
             if (three[i - diff_cond] > 0.0) {
@@ -1568,7 +1990,10 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
     _update_discard();
 }
 
-void IndicatorImp::_update_discard() {
+void IndicatorImp::_update_discard(bool force) {
+    if (force) {
+        m_discard = 0;
+    }
     size_t total = size();
     for (size_t result_index = 0; result_index < m_result_num; result_index++) {
         size_t discard = m_discard;
@@ -1637,19 +2062,44 @@ bool IndicatorImp::contains(const string &name) const {
 }
 
 void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
+    // 使用栈来模拟递归调用，避免深层递归导致的栈溢出
+    std::stack<IndicatorImpPtr> nodeStack;
+
+    // 将当前节点的子节点入栈（按相反顺序入栈以保持原有处理顺序）
     if (m_three) {
-        nodes.push_back(m_three);
-        m_three->getAllSubNodes(nodes);
+        nodeStack.push(m_three);
     }
     if (m_left) {
-        nodes.push_back(m_left);
-        m_left->getAllSubNodes(nodes);
+        nodeStack.push(m_left);
     }
     if (m_right) {
-        nodes.push_back(m_right);
-        m_right->getAllSubNodes(nodes);
+        nodeStack.push(m_right);
     }
 
+    // 处理栈中的节点
+    while (!nodeStack.empty()) {
+        IndicatorImpPtr current = nodeStack.top();
+        nodeStack.pop();
+
+        // 添加当前节点到结果列表
+        nodes.push_back(current);
+
+        // 将当前节点的子节点入栈（按相反顺序入栈以保持原有处理顺序）
+        if (current->m_three) {
+            nodeStack.push(current->m_three);
+        }
+        if (current->m_left) {
+            nodeStack.push(current->m_left);
+        }
+        if (current->m_right) {
+            nodeStack.push(current->m_right);
+        }
+
+        // 添加当前节点的内部节点（如果有的话）
+        current->getSelfInnerNodesWithInputConext(nodes);
+    }
+
+    // 添加当前节点的内部节点
     getSelfInnerNodesWithInputConext(nodes);
 }
 

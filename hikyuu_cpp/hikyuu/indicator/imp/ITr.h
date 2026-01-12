@@ -22,11 +22,11 @@ namespace hku {
 class ITr : public IndicatorImp {
     INDICATOR_IMP(ITr)
     INDICATOR_NEED_CONTEXT
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     ITr();
-    explicit ITr(const KData&);
     virtual ~ITr();
 };
 

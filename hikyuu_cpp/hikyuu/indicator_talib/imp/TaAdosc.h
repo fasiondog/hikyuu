@@ -18,7 +18,6 @@ class TaAdosc : public IndicatorImp {
 
 public:
     TaAdosc();
-    explicit TaAdosc(const KData&, int fast_n, int slow_n);
     virtual ~TaAdosc() = default;
     virtual void _checkParam(const string& name) const override;
 };

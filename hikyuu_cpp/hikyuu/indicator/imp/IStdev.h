@@ -19,7 +19,8 @@ namespace hku {
  *
  */
 class IStdev : public hku::IndicatorImp {
-    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IStdev)
+    INDICATOR_IMP(IStdev)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

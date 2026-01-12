@@ -66,6 +66,8 @@ public:
     string name() const;
     void name(const string& name);
 
+    IndicatorImp::OPType getOPType() const;
+
     /** 返回形如：Name(param1_val,param2_val,...) */
     string long_name() const;
 
@@ -78,6 +80,9 @@ public:
 
     /** 获取上下文 */
     KData getContext() const;
+
+    /** 在有上下文时，自动将上下文扩展至当前最新数据并计算 */
+    void extend();
 
     /** 显示指标公式 */
     string formula() const;
@@ -245,6 +250,15 @@ public:
 
     typedef Iterator iterator;
 
+public:
+    static void enableIncrementCalculate(bool flag) {
+        IndicatorImp::enableIncrementCalculate(flag);
+    }
+
+    static bool enableIncrementCalculate() {
+        return IndicatorImp::enableIncrementCalculate();
+    }
+
 protected:
     IndicatorImpPtr m_imp;
 
@@ -269,6 +283,10 @@ inline void Indicator::name(const string& name) {
     if (m_imp) {
         m_imp->name(name);
     }
+}
+
+inline IndicatorImp::OPType Indicator::getOPType() const {
+    return m_imp ? m_imp->getOPType() : IndicatorImp::INVALID;
 }
 
 inline string Indicator::long_name() const {

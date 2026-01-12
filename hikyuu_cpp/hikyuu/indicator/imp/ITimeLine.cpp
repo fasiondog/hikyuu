@@ -21,12 +21,6 @@ ITimeLine::ITimeLine() : IndicatorImp("TIMELINE", 1) {
 
 ITimeLine::~ITimeLine() {}
 
-ITimeLine::ITimeLine(const KData& k) : IndicatorImp("TIMELINE", 1) {
-    setParam<string>("part", "price");
-    setParam<KData>("kdata", k);
-    ITimeLine::_calculate(Indicator());
-}
-
 void ITimeLine::_checkParam(const string& name) const {
     if ("part" == name) {
         string part = getParam<string>("part");
@@ -38,7 +32,7 @@ void ITimeLine::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData k = getContext();
+    const KData& k = getContext();
     KQuery q = k.getQuery();
     Stock stk = k.getStock();
 
@@ -66,7 +60,9 @@ Indicator HKU_API TIMELINE() {
 }
 
 Indicator HKU_API TIMELINE(const KData& k) {
-    return Indicator(make_shared<ITimeLine>(k));
+    auto p = make_shared<ITimeLine>();
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

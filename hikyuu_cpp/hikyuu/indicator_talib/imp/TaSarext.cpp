@@ -39,22 +39,6 @@ TaSarext::TaSarext(double startvalue, double offsetonreverse, double acceleratio
     setParam<double>("accelerationshort", accelerationshort);
     setParam<double>("accelerationmaxshort", accelerationmaxshort);
 }
-TaSarext::TaSarext(const KData& k, double startvalue, double offsetonreverse,
-                   double accelerationinitlong, double accelerationlong, double accelerationmaxlong,
-                   double accelerationinitshort, double accelerationshort,
-                   double accelerationmaxshort)
-: IndicatorImp("TA_SAREXT", 1) {
-    setParam<KData>("kdata", k);
-    setParam<double>("startvalue", startvalue);
-    setParam<double>("offsetonreverse", offsetonreverse);
-    setParam<double>("accelerationinitlong", accelerationinitlong);
-    setParam<double>("accelerationlong", accelerationlong);
-    setParam<double>("accelerationmaxlong", accelerationmaxlong);
-    setParam<double>("accelerationinitshort", accelerationinitshort);
-    setParam<double>("accelerationshort", accelerationshort);
-    setParam<double>("accelerationmaxshort", accelerationmaxshort);
-    TaSarext::_calculate(Indicator());
-}
 
 void TaSarext::_checkParam(const string& name) const {
     if (name == "startvalue") {
@@ -72,7 +56,7 @@ void TaSarext::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData k = getContext();
+    const KData& k = getContext();
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -126,9 +110,11 @@ Indicator HKU_API TA_SAREXT(const KData& k, double startvalue, double offsetonre
                             double accelerationinitlong, double accelerationlong,
                             double accelerationmaxlong, double accelerationinitshort,
                             double accelerationshort, double accelerationmaxshort) {
-    return Indicator(make_shared<TaSarext>(
-      k, startvalue, offsetonreverse, accelerationinitlong, accelerationlong, accelerationmaxlong,
-      accelerationinitshort, accelerationshort, accelerationmaxshort));
+    auto p = make_shared<TaSarext>(startvalue, offsetonreverse, accelerationinitlong,
+                                   accelerationlong, accelerationmaxlong, accelerationinitshort,
+                                   accelerationshort, accelerationmaxshort);
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

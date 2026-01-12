@@ -22,7 +22,6 @@ class IAd : public IndicatorImp {
 
 public:
     IAd();
-    explicit IAd(const KData&);
     virtual ~IAd();
 };
 

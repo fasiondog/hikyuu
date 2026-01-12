@@ -18,7 +18,6 @@ class TaSar : public IndicatorImp {
 
 public:
     TaSar();
-    explicit TaSar(const KData&, double acceleration, double maximum);
     virtual ~TaSar() = default;
     virtual void _checkParam(const string& name) const override;
 };

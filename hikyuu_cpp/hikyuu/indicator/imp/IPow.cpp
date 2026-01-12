@@ -31,10 +31,14 @@ void IPow::_calculate(const Indicator& data) {
         return;
     }
 
+    _increment_calculate(data, m_discard);
+}
+
+void IPow::_increment_calculate(const Indicator& data, size_t start_pos) {
     int n = getParam<int>("n");
     auto const* src = data.data();
     auto* dst = this->data();
-    for (size_t i = m_discard; i < total; ++i) {
+    for (size_t i = start_pos; i < data.size(); ++i) {
         dst[i] = std::pow(src[i], n);
     }
 }

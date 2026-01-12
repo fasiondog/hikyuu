@@ -42,8 +42,21 @@ void IEma::_calculate(const Indicator& indicator) {
     size_t startPos = discard();
     dst[startPos] = src[startPos];
 
-    price_t multiplier = 2.0 / (n + 1);
+    value_t multiplier = 2.0 / (n + 1);
     for (size_t i = startPos + 1; i < total; ++i) {
+        dst[i] = (src[i] - dst[i - 1]) * multiplier + dst[i - 1];
+    }
+}
+
+void IEma::_increment_calculate(const Indicator& data, size_t start_pos) {
+    int n = getParam<int>("n");
+    value_t multiplier = 2.0 / (n + 1);
+
+    auto const* src = data.data();
+    auto* dst = this->data();
+
+    size_t total = data.size();
+    for (size_t i = start_pos + 1; i < total; ++i) {
         dst[i] = (src[i] - dst[i - 1]) * multiplier + dst[i - 1];
     }
 }

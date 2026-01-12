@@ -193,7 +193,7 @@ TEST_CASE("test_CONTEXT_export") {
     CHECK_UNARY(x1.size() == x2.size());
     CHECK_UNARY(x1.discard() == x2.discard());
     CHECK_UNARY(x1.getResultNumber() == x2.getResultNumber());
-    for (size_t i = 0; i < x1.size(); ++i) {
+    for (size_t i = x1.discard(); i < x1.size(); ++i) {
         CHECK_EQ(x1[i], doctest::Approx(x2[i]).epsilon(0.00001));
     }
 }

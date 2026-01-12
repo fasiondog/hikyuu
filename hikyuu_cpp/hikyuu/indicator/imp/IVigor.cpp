@@ -37,7 +37,7 @@ void IVigor::_calculate(const Indicator& ind) {
     HKU_WARN_IF(!isLeaf() && !ind.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData kdata = getContext();
+    const KData& kdata = getContext();
     size_t total = kdata.size();
     _readyBuffer(total, 1);
 

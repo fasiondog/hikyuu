@@ -19,14 +19,14 @@ ITime::ITime() : IndicatorImp("TIME") {
 
 ITime::~ITime() {}
 
-ITime::ITime(const KData& k, const string& type) : IndicatorImp() {
-    string type_name(type);
-    to_upper(type_name);
-    m_name = type_name;
-    setParam<string>("type", type_name);
-    setParam<KData>("kdata", k);
-    ITime::_calculate(Indicator());
-}
+// ITime::ITime(const KData& k, const string& type) : IndicatorImp() {
+//     string type_name(type);
+//     to_upper(type_name);
+//     m_name = type_name;
+//     setParam<string>("type", type_name);
+//     onlySetContext(k);
+//     ITime::_calculate(Indicator());
+// }
 
 void ITime::_checkParam(const string& name) const {
     if ("type" == name) {
@@ -42,90 +42,127 @@ void ITime::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData kdata = getContext();
+    const KData& kdata = getContext();
     size_t total = kdata.size();
     HKU_IF_RETURN(total == 0, void());
 
+    _readyBuffer(total, 1);
+    _increment_calculate(data, 0);
+}
+
+void ITime::_increment_calculate(const Indicator& data, size_t start_pos) {
+    const KData& kdata = getContext();
+    size_t total = kdata.size();
     DatetimeList ds = kdata.getDatetimeList();
 
-    _readyBuffer(total, 1);
     auto* dst = this->data();
-
     string type_name = getParam<string>("type");
     if ("TIME" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             const auto& d = ds[i];
             dst[i] = d.hour() * 10000 + d.minute() * 100 + d.second();
         }
 
     } else if ("DATE" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             const auto& d = ds[i];
             dst[i] = (d.year() - 1900) * 10000 + d.month() * 100 + d.day();
         }
 
     } else if ("YEAR" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].year();
         }
 
     } else if ("MONTH" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].month();
         }
 
     } else if ("WEEK" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].dayOfWeek();
         }
 
     } else if ("DAY" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].day();
         }
 
     } else if ("HOUR" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].hour();
         }
 
     } else if ("MINUTE" == type_name) {
-        for (size_t i = 0; i < total; i++) {
+        for (size_t i = start_pos; i < total; i++) {
             dst[i] = ds[i].minute();
         }
     }
 }
 
 Indicator HKU_API DATE(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "DATE"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "DATE");
+    p->name("DATE");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API TIME(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "TIME"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "TIME");
+    p->name("TIME");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API YEAR(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "YEAR"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "YEAR");
+    p->name("YEAR");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API MONTH(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "MONTH"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "MONTH");
+    p->name("MONTH");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API WEEK(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "WEEK"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "WEEK");
+    p->name("WEEK");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API DAY(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "DAY"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "DAY");
+    p->name("DAY");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API HOUR(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "HOUR"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "HOUR");
+    p->name("HOUR");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API MINUTE(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "MINUTE"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "MINUTE");
+    p->name("MINUTE");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 //-----------------------------------------------------------

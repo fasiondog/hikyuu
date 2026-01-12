@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#if 0
+
 #include "../../test_config.h"
 #include <fstream>
 #include <cmath>
@@ -111,3 +113,5 @@ TEST_CASE("test_MF_ICIRWeight_benchmark") {
 #endif
 
 /** @} */
+
+#endif

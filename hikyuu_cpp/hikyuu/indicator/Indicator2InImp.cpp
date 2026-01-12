@@ -55,7 +55,7 @@ void Indicator2InImp::getSelfInnerNodesWithInputConext(vector<IndicatorImpPtr>& 
 }
 
 Indicator Indicator2InImp::prepare(const Indicator& ind) {
-    auto k = getContext();
+    const auto& k = getContext();
     m_ref_ind.setContext(k);
 
     Indicator ref = m_ref_ind;

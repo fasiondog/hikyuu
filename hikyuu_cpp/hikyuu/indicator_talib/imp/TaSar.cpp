@@ -19,13 +19,6 @@ TaSar::TaSar() : IndicatorImp("TA_SAR", 1) {
     setParam<double>("maximum", 0.2);
 }
 
-TaSar::TaSar(const KData& k, double acceleration, double maximum) : IndicatorImp("TA_SAR", 1) {
-    setParam<KData>("kdata", k);
-    setParam<double>("acceleration", acceleration);
-    setParam<double>("maximum", maximum);
-    TaSar::_calculate(Indicator());
-}
-
 void TaSar::_checkParam(const string& name) const {
     if (name == "acceleration" || name == "maximum") {
         double p = getParam<double>(name);
@@ -37,7 +30,7 @@ void TaSar::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData k = getContext();
+    const KData& k = getContext();
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -78,7 +71,11 @@ Indicator HKU_API TA_SAR(double acceleration, double maximum) {
 }
 
 Indicator HKU_API TA_SAR(const KData& k, double acceleration, double maximum) {
-    return Indicator(make_shared<TaSar>(k, acceleration, maximum));
+    auto p = make_shared<TaSar>();
+    p->setParam<double>("acceleration", acceleration);
+    p->setParam<double>("maximum", maximum);
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

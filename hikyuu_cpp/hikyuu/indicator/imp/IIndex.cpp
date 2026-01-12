@@ -41,7 +41,7 @@ void IIndex::_checkParam(const string& name) const {
 }
 
 void IIndex::_calculate(const Indicator& ind) {
-    auto k = getContext();
+    const auto& k = getContext();
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 

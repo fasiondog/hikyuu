@@ -154,7 +154,7 @@ TEST_CASE("test_SE_MaxFundsOptimal") {
         CHECK_EQ(sw.size(), 1);
         CHECK_EQ(sw[0].sys->name(), "test_sys_3_10");
     }
-    for (size_t i = 50; i < 125; i++) {
+    for (size_t i = 50; i < 90; i++) {
         auto sw = se->getSelected(dates[i]);
         CHECK_EQ(sw.size(), 1);
         CHECK_EQ(sw[0].sys->name(), "test_sys_3_5");

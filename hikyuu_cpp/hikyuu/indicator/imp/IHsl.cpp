@@ -17,16 +17,11 @@ IHsl::IHsl() : IndicatorImp("HSL", 1) {}
 
 IHsl::~IHsl() {}
 
-IHsl::IHsl(const KData& k) : IndicatorImp("HSL", 1) {
-    setParam<KData>("kdata", k);
-    IHsl::_calculate(Indicator());
-}
-
 void IHsl::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData k = getContext();
+    const KData& k = getContext();
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -99,7 +94,9 @@ Indicator HKU_API HSL() {
 }
 
 Indicator HKU_API HSL(const KData& k) {
-    return Indicator(make_shared<IHsl>(k));
+    auto p = make_shared<IHsl>();
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

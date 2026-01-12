@@ -19,12 +19,6 @@ ICost::ICost() : IndicatorImp("COST", 1) {
 
 ICost::~ICost() {}
 
-ICost::ICost(const KData& k, double percent) : IndicatorImp("COST", 1) {
-    setParam<KData>("kdata", k);
-    setParam<double>("percent", percent);
-    ICost::_calculate(Indicator());
-}
-
 void ICost::_checkParam(const string& name) const {
     if (name == "percent") {
         double percent = getParam<double>("percent");
@@ -38,7 +32,7 @@ void ICost::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
-    KData k = getContext();
+    const KData& k = getContext();
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -129,7 +123,10 @@ Indicator HKU_API COST(double x) {
 }
 
 Indicator HKU_API COST(const KData& k, double x) {
-    return Indicator(make_shared<ICost>(k, x));
+    auto p = make_shared<ICost>();
+    p->setParam<double>("percent", x);
+    p->setContext(k);
+    return Indicator(p);
 }
 
 }  // namespace hku

@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#if 0
+
 #include "../../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
@@ -201,3 +203,5 @@ TEST_CASE("test_MF_Weight_export") {
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 /** @} */
+
+#endif

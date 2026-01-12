@@ -31,10 +31,18 @@ void export_Indicator(py::module& m) {
       .def("__str__", &Indicator::str)
       .def("__repr__", &Indicator::str)
 
+      .def_property_static(
+        "enable_increment_calculate",
+        [](py::object) { return Indicator::enableIncrementCalculate(); },
+        [](py::object cls, bool flag) { Indicator::enableIncrementCalculate(flag); },
+        "启用/禁用指标增量计算")
+
       .def_property("name", ind_read_name, ind_write_name, "指标名称")
       .def_property_readonly("long_name", &Indicator::long_name,
                              "返回形如：Name(param1_val,param2_val,...)")
       .def_property_readonly("discard", &Indicator::discard, "结果中需抛弃的个数")
+      .def_property_readonly("optype",
+                             [](const Indicator& ind) { return getOPTypeName(ind.getOPType()); })
 
       .def("set_discard", &Indicator::setDiscard, R"(set_discard(self, discard)
     
@@ -60,8 +68,8 @@ void export_Indicator(py::module& m) {
 
       .def("have_param", &Indicator::haveParam, "是否存在指定参数")
 
-      .def("support_ind_param", &Indicator::supportIndParam, "是否支持动态指标参数")
-      .def("have_ind_param", &Indicator::haveIndParam, "是否存在指定的动态指标参数")
+      .def("support_ind_param", &Indicator::supportIndParam, "是否支持动态周期指标参数")
+      .def("have_ind_param", &Indicator::haveIndParam, "是否存在指定的动态周期指标参数")
       .def("get_ind_param", &Indicator::getIndParam, R"(get_ind_param(self, name)
     
     获取指定的动态指标参数
@@ -184,6 +192,10 @@ set_context(self, stock, query)
     获取上下文
 
     :rtype: KData)")
+
+      .def("extend", &Indicator::extend, R"(extend(self)
+
+    在有上下文时，自动将上下文扩展至当前最新数据并计算)")
 
       .def("contains", &Indicator::contains, R"(contains(self, name)
         

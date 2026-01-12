@@ -16,11 +16,11 @@ namespace hku {
 class IKData : public IndicatorImp {
     INDICATOR_IMP(IKData)
     INDICATOR_NEED_CONTEXT
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     IKData();
-    IKData(const KData&, const string&);
     virtual ~IKData();
     virtual void _checkParam(const string& name) const override;
 };

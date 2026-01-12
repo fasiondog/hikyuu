@@ -113,7 +113,7 @@
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
         int back = func_lookback(step);                                                    \
-        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+        HKU_IF_RETURN(back < 0 || back + ind.discard() > curPos, void());                  \
                                                                                            \
         std::unique_ptr<double[]> buf = std::make_unique<double[]>(curPos);                \
         auto const *src = ind.data();                                                      \
@@ -181,7 +181,7 @@
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
         int back = func_lookback(step);                                                    \
-        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+        HKU_IF_RETURN(back < 0 || back + ind.discard() > curPos, void());                  \
                                                                                            \
         std::unique_ptr<int[]> buf = std::make_unique<int[]>(curPos);                      \
         auto const *src = ind.data();                                                      \
@@ -283,7 +283,7 @@
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
         int back = func_lookback(step);                                                    \
-        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+        HKU_IF_RETURN(back < 0 || back + ind.discard() > curPos, void());                  \
                                                                                            \
         std::unique_ptr<int[]> buf = std::make_unique<int[]>(2 * curPos);                  \
         int *buf0 = buf.get();                                                             \
@@ -350,7 +350,7 @@
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
         int back = func_lookback(step);                                                    \
-        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+        HKU_IF_RETURN(back < 0 || back + ind.discard() > curPos, void());                  \
                                                                                            \
         std::unique_ptr<double[]> buf = std::make_unique<double[]>(2 * curPos);            \
         double *dst0 = buf.get();                                                          \
@@ -418,7 +418,7 @@
                                                                                            \
     void Cls_##func::_dyn_run_one_step(const Indicator &ind, size_t curPos, size_t step) { \
         int back = func_lookback(step);                                                    \
-        HKU_IF_RETURN(back<0 || back + ind.discard()> curPos, void());                     \
+        HKU_IF_RETURN(back < 0 || back + ind.discard() > curPos, void());                  \
                                                                                            \
         std::unique_ptr<double[]> buf = std::make_unique<double[]>(3 * curPos);            \
         double *dst0 = buf.get();                                                          \
@@ -560,11 +560,6 @@
 #define TA_OHLC_OUT1_IMP(func, func_lookback)                                           \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
                                                                                         \
-    Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                   \
-        setParam<KData>("kdata", k);                                                    \
-        Cls_##func::_calculate(Indicator());                                            \
-    }                                                                                   \
-                                                                                        \
     void Cls_##func::_calculate(const Indicator &data) {                                \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
                     "The input is ignored because {} depends on the context!", m_name); \
@@ -607,16 +602,13 @@
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func(const KData &k) {                                            \
-        return Indicator(make_shared<Cls_##func>(k));                                   \
+        auto p = make_shared<Cls_##func>();                                             \
+        p->setContext(k);                                                               \
+        return Indicator(p);                                                            \
     }
 
 #define TA_OHLC_OUT1_INT_IMP(func, func_lookback)                                       \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
-                                                                                        \
-    Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                   \
-        setParam<KData>("kdata", k);                                                    \
-        Cls_##func::_calculate(Indicator());                                            \
-    }                                                                                   \
                                                                                         \
     void Cls_##func::_calculate(const Indicator &data) {                                \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
@@ -665,19 +657,15 @@
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func(const KData &k) {                                            \
-        return Indicator(make_shared<Cls_##func>(k));                                   \
+        auto p = make_shared<Cls_##func>();                                             \
+        p->setContext(k);                                                               \
+        return Indicator(p);                                                            \
     }
 
 #define TA_OHLC_OUT1_INT_P1_D_IMP(func, func_lookback, param1, param1_value, param1_min,          \
                                   param1_max)                                                     \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                           \
         setParam<double>(#param1, param1_value);                                                  \
-    }                                                                                             \
-                                                                                                  \
-    Cls_##func::Cls_##func(const KData &k, double p) : IndicatorImp(#func, 1) {                   \
-        setParam<KData>("kdata", k);                                                              \
-        setParam<double>(#param1, p);                                                             \
-        Cls_##func::_calculate(Indicator());                                                      \
     }                                                                                             \
                                                                                                   \
     void Cls_##func::_checkParam(const string &name) const {                                      \
@@ -737,16 +725,14 @@
     }                                                                                             \
                                                                                                   \
     Indicator HKU_API func(const KData &k, double p) {                                            \
-        return Indicator(make_shared<Cls_##func>(k, p));                                          \
+        auto ptr = make_shared<Cls_##func>();                                                     \
+        ptr->setParam<double>(#param1, p);                                                        \
+        ptr->setContext(k);                                                                       \
+        return Indicator(ptr);                                                                    \
     }
 
 #define TA_HLCV_OUT1_IMP(func, func_lookback)                                           \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
-                                                                                        \
-    Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                   \
-        setParam<KData>("kdata", k);                                                    \
-        Cls_##func::_calculate(Indicator());                                            \
-    }                                                                                   \
                                                                                         \
     void Cls_##func::_calculate(const Indicator &data) {                                \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
@@ -790,16 +776,13 @@
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func(const KData &k) {                                            \
-        return Indicator(make_shared<Cls_##func>(k));                                   \
+        auto ptr = make_shared<Cls_##func>();                                           \
+        ptr->setContext(k);                                                             \
+        return Indicator(ptr);                                                          \
     }
 
 #define TA_HL_OUT1_IMP(func, func_lookback)                                                \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                   \
-                                                                                           \
-    Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                      \
-        setParam<KData>("kdata", k);                                                       \
-        Cls_##func::_calculate(Indicator());                                               \
-    }                                                                                      \
                                                                                            \
     void Cls_##func::_calculate(const Indicator &data) {                                   \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                            \
@@ -838,16 +821,13 @@
     }                                                                                      \
                                                                                            \
     Indicator HKU_API func(const KData &k) {                                               \
-        return Indicator(make_shared<Cls_##func>(k));                                      \
+        auto ptr = make_shared<Cls_##func>();                                              \
+        ptr->setContext(k);                                                                \
+        return Indicator(ptr);                                                             \
     }
 
 #define TA_CV_OUT1_IMP(func, func_lookback)                                                 \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                    \
-                                                                                            \
-    Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                       \
-        setParam<KData>("kdata", k);                                                        \
-        Cls_##func::_calculate(Indicator());                                                \
-    }                                                                                       \
                                                                                             \
     void Cls_##func::_calculate(const Indicator &data) {                                    \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                             \
@@ -886,16 +866,13 @@
     }                                                                                       \
                                                                                             \
     Indicator HKU_API func(const KData &k) {                                                \
-        return Indicator(make_shared<Cls_##func>(k));                                       \
+        auto ptr = make_shared<Cls_##func>();                                               \
+        ptr->setContext(k);                                                                 \
+        return Indicator(ptr);                                                              \
     }
 
 #define TA_HLC_OUT1_IMP(func, func_lookback)                                                      \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                          \
-                                                                                                  \
-    Cls_##func::Cls_##func(const KData &k) : IndicatorImp(#func, 1) {                             \
-        setParam<KData>("kdata", k);                                                              \
-        Cls_##func::_calculate(Indicator());                                                      \
-    }                                                                                             \
                                                                                                   \
     void Cls_##func::_calculate(const Indicator &data) {                                          \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                                   \
@@ -936,18 +913,14 @@
     }                                                                                             \
                                                                                                   \
     Indicator HKU_API func(const KData &k) {                                                      \
-        return Indicator(make_shared<Cls_##func>(k));                                             \
+        auto ptr = make_shared<Cls_##func>();                                                     \
+        ptr->setContext(k);                                                                       \
+        return Indicator(ptr);                                                                    \
     }
 
 #define TA_HLC_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)          \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                 \
         setParam<int>("n", period);                                                     \
-    }                                                                                   \
-                                                                                        \
-    Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 1) {            \
-        setParam<KData>("kdata", k);                                                    \
-        setParam<int>("n", n);                                                          \
-        Cls_##func::_calculate(Indicator());                                            \
     }                                                                                   \
                                                                                         \
     void Cls_##func::_checkParam(const string &name) const {                            \
@@ -1001,18 +974,15 @@
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func(const KData &k, int n) {                                     \
-        return Indicator(make_shared<Cls_##func>(k, n));                                \
+        auto p = make_shared<Cls_##func>();                                             \
+        p->setParam<int>("n", n);                                                       \
+        p->setContext(k);                                                               \
+        return Indicator(p);                                                            \
     }
 
 #define TA_HLCV_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)         \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                 \
         setParam<int>("n", period);                                                     \
-    }                                                                                   \
-                                                                                        \
-    Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 1) {            \
-        setParam<KData>("kdata", k);                                                    \
-        setParam<int>("n", n);                                                          \
-        Cls_##func::_calculate(Indicator());                                            \
     }                                                                                   \
                                                                                         \
     void Cls_##func::_checkParam(const string &name) const {                            \
@@ -1069,18 +1039,15 @@
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func(const KData &k, int n) {                                     \
-        return Indicator(make_shared<Cls_##func>(k, n));                                \
+        auto p = make_shared<Cls_##func>();                                             \
+        p->setParam<int>("n", n);                                                       \
+        p->setContext(k);                                                               \
+        return Indicator(p);                                                            \
     }
 
 #define TA_HL_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)                 \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                       \
         setParam<int>("n", period);                                                           \
-    }                                                                                         \
-                                                                                              \
-    Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 1) {                  \
-        setParam<KData>("kdata", k);                                                          \
-        setParam<int>("n", n);                                                                \
-        Cls_##func::_calculate(Indicator());                                                  \
     }                                                                                         \
                                                                                               \
     void Cls_##func::_checkParam(const string &name) const {                                  \
@@ -1131,18 +1098,15 @@
     }                                                                                         \
                                                                                               \
     Indicator HKU_API func(const KData &k, int n) {                                           \
-        return Indicator(make_shared<Cls_##func>(k, n));                                      \
+        auto p = make_shared<Cls_##func>();                                                   \
+        p->setParam<int>("n", n);                                                             \
+        p->setContext(k);                                                                     \
+        return Indicator(p);                                                                  \
     }
 
 #define TA_HL_OUT2_N_IMP(func, func_lookback, period, period_min, period_max)                 \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 2) {                                       \
         setParam<int>("n", period);                                                           \
-    }                                                                                         \
-                                                                                              \
-    Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 2) {                  \
-        setParam<KData>("kdata", k);                                                          \
-        setParam<int>("n", n);                                                                \
-        Cls_##func::_calculate(Indicator());                                                  \
     }                                                                                         \
                                                                                               \
     void Cls_##func::_checkParam(const string &name) const {                                  \
@@ -1195,18 +1159,15 @@
     }                                                                                         \
                                                                                               \
     Indicator HKU_API func(const KData &k, int n) {                                           \
-        return Indicator(make_shared<Cls_##func>(k, n));                                      \
+        auto p = make_shared<Cls_##func>();                                                   \
+        p->setParam<int>("n", n);                                                             \
+        p->setContext(k);                                                                     \
+        return Indicator(p);                                                                  \
     }
 
 #define TA_HLC_OUT3_N_IMP(func, func_lookback, period, period_min, period_max)          \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 3) {                                 \
         setParam<int>("n", period);                                                     \
-    }                                                                                   \
-                                                                                        \
-    Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 3) {            \
-        setParam<KData>("kdata", k);                                                    \
-        setParam<int>("n", n);                                                          \
-        Cls_##func::_calculate(Indicator());                                            \
     }                                                                                   \
                                                                                         \
     void Cls_##func::_checkParam(const string &name) const {                            \
@@ -1262,18 +1223,15 @@
     }                                                                                   \
                                                                                         \
     Indicator HKU_API func(const KData &k, int n) {                                     \
-        return Indicator(make_shared<Cls_##func>(k, n));                                \
+        auto p = make_shared<Cls_##func>();                                             \
+        p->setParam<int>("n", n);                                                       \
+        p->setContext(k);                                                               \
+        return Indicator(p);                                                            \
     }
 
 #define TA_OC_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)                   \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                         \
         setParam<int>("n", period);                                                             \
-    }                                                                                           \
-                                                                                                \
-    Cls_##func::Cls_##func(const KData &k, int n) : IndicatorImp(#func, 1) {                    \
-        setParam<KData>("kdata", k);                                                            \
-        setParam<int>("n", n);                                                                  \
-        Cls_##func::_calculate(Indicator());                                                    \
     }                                                                                           \
                                                                                                 \
     void Cls_##func::_checkParam(const string &name) const {                                    \
@@ -1324,5 +1282,8 @@
     }                                                                                           \
                                                                                                 \
     Indicator HKU_API func(const KData &k, int n) {                                             \
-        return Indicator(make_shared<Cls_##func>(k, n));                                        \
+        auto p = make_shared<Cls_##func>();                                                     \
+        p->setParam<int>("n", n);                                                               \
+        p->setContext(k);                                                                       \
+        return Indicator(p);                                                                    \
     }
