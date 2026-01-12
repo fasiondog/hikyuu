@@ -181,9 +181,20 @@ const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
     return m_ind_params.at(name);
 }
 
+bool IndicatorImp::supportIncrementCalculate() const {
+    if (haveParam("align_date_list")) {
+        const DatetimeList &dates = getParam<const DatetimeList &>("align_date_list");
+        if (dates.empty()) {
+            return false;
+        }
+    }
+    return false;
+}
+
 bool IndicatorImp::can_inner_calculate() {
     if (m_need_calculate || !ms_enable_increment_calculate || m_result_num == 0 ||
-        m_context.empty() || size() < m_context.size() || m_old_context.size() < m_context.size()) {
+        m_context.empty() || size() < m_context.size() || m_old_context.size() < m_context.size() ||
+        !supportIncrementCalculate()) {
         return false;
     }
 

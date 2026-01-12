@@ -160,9 +160,7 @@ public:
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
     /** 是否支持增量计算 */
-    virtual bool supportIncrementCalculate() const {
-        return false;
-    }
+    virtual bool supportIncrementCalculate() const;
 
     virtual size_t min_increment_start() const {
         return 0;
