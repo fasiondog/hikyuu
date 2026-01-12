@@ -17,11 +17,6 @@ ITr::ITr() : IndicatorImp("TR", 1) {}
 
 ITr::~ITr() {}
 
-ITr::ITr(const KData& k) : IndicatorImp("TR", 1) {
-    onlySetContext(k);
-    ITr::_calculate(Indicator());
-}
-
 void ITr::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
@@ -56,7 +51,9 @@ Indicator HKU_API TR() {
 }
 
 Indicator HKU_API TR(const KData& k) {
-    return Indicator(make_shared<ITr>(k));
+    auto p = make_shared<ITr>();
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

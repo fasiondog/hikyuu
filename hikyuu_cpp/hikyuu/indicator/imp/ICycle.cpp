@@ -19,12 +19,6 @@ ICycle::ICycle() : IndicatorImp("CYCLE", 1) {
     _initParams();
 }
 
-ICycle::ICycle(const KData& k) : IndicatorImp("CYCLE", 1) {
-    _initParams();
-    onlySetContext(k);
-    ICycle::_calculate(Indicator());
-}
-
 ICycle::~ICycle() {}
 
 void ICycle::_initParams() {
@@ -274,11 +268,12 @@ Indicator HKU_API CYCLE(int adjust_cycle, const string& adjust_mode, bool delay_
 
 Indicator HKU_API CYCLE(const KData& k, int adjust_cycle, const string& adjust_mode,
                         bool delay_to_trading_day) {
-    auto p = make_shared<ICycle>(k);
+    auto p = make_shared<ICycle>();
     p->setParam<int>("adjust_cycle", adjust_cycle);
     p->setParam<string>("adjust_mode", adjust_mode);
     p->setParam<bool>("delay_to_trading_day", delay_to_trading_day);
-    return p->calculate();
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

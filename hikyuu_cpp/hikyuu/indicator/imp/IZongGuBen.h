@@ -19,7 +19,6 @@ class IZongGuBen : public IndicatorImp {
 
 public:
     IZongGuBen();
-    explicit IZongGuBen(const KData&);
     virtual ~IZongGuBen();
 };
 

@@ -19,7 +19,6 @@ class IIsLastBar : public IndicatorImp {
 
 public:
     IIsLastBar();
-    explicit IIsLastBar(const KData&);
     virtual ~IIsLastBar();
 };
 

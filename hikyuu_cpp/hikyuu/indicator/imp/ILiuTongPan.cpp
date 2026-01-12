@@ -17,11 +17,6 @@ ILiuTongPan::ILiuTongPan() : IndicatorImp("LIUTONGPAN", 1) {}
 
 ILiuTongPan::~ILiuTongPan() {}
 
-ILiuTongPan::ILiuTongPan(const KData& k) : IndicatorImp("LIUTONGPAN", 1) {
-    onlySetContext(k);
-    ILiuTongPan::_calculate(Indicator());
-}
-
 void ILiuTongPan::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
@@ -98,7 +93,9 @@ Indicator HKU_API LIUTONGPAN() {
 }
 
 Indicator HKU_API LIUTONGPAN(const KData& k) {
-    return Indicator(make_shared<ILiuTongPan>(k));
+    auto p = make_shared<ILiuTongPan>();
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

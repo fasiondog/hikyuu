@@ -21,14 +21,6 @@ IInBlock::IInBlock() : IndicatorImp("INBLOCK", 1) {
 
 IInBlock::~IInBlock() {}
 
-IInBlock::IInBlock(const KData& kdata, const string& category, const string& name)
-: IndicatorImp("INBLOCK", 1) {
-    setParam<string>("category", category);
-    setParam<string>("name", name);
-    onlySetContext(kdata);
-    IInBlock::_calculate(Indicator());
-}
-
 void IInBlock::_calculate(const Indicator& data) {
     HKU_IF_RETURN(!isLeaf() && !data.empty(), void());
 
@@ -65,7 +57,11 @@ Indicator HKU_API INBLOCK(const string& category, const string& name) {
 }
 
 Indicator HKU_API INBLOCK(const KData& k, const string& category, const string& name) {
-    return Indicator(make_shared<IInBlock>(k, category, name));
+    auto p = make_shared<IInBlock>();
+    p->setParam<string>("category", category);
+    p->setParam<string>("name", name);
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

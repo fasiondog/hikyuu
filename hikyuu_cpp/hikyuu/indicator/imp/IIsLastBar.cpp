@@ -15,11 +15,6 @@ namespace hku {
 
 IIsLastBar::IIsLastBar() : IndicatorImp("ISLASTBAR", 1) {}
 
-IIsLastBar::IIsLastBar(const KData &k) : IndicatorImp("ISLASTBAR", 1) {
-    onlySetContext(k);
-    IIsLastBar::_calculate(Indicator());
-}
-
 IIsLastBar::~IIsLastBar() {}
 
 void IIsLastBar::_calculate(const Indicator &data) {
@@ -55,7 +50,9 @@ Indicator HKU_API ISLASTBAR() {
 }
 
 Indicator HKU_API ISLASTBAR(const KData &kdata) {
-    return Indicator(make_shared<IIsLastBar>(kdata));
+    auto p = make_shared<IIsLastBar>();
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 } /* namespace hku */

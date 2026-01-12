@@ -17,11 +17,6 @@ IZongGuBen::IZongGuBen() : IndicatorImp("ZONGGUBEN", 1) {}
 
 IZongGuBen::~IZongGuBen() {}
 
-IZongGuBen::IZongGuBen(const KData& k) : IndicatorImp("ZONGGUBEN", 1) {
-    onlySetContext(k);
-    IZongGuBen::_calculate(Indicator());
-}
-
 void IZongGuBen::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
@@ -77,7 +72,9 @@ Indicator HKU_API ZONGGUBEN() {
 }
 
 Indicator HKU_API ZONGGUBEN(const KData& k) {
-    return Indicator(make_shared<IZongGuBen>(k));
+    auto p = make_shared<IZongGuBen>();
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

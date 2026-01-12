@@ -22,7 +22,6 @@ class IInBlock : public IndicatorImp {
 
 public:
     IInBlock();
-    explicit IInBlock(const KData& kdata, const string& category, const string& name);
     virtual ~IInBlock();
 };
 

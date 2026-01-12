@@ -27,7 +27,6 @@ class ITr : public IndicatorImp {
 
 public:
     ITr();
-    explicit ITr(const KData&);
     virtual ~ITr();
 };
 

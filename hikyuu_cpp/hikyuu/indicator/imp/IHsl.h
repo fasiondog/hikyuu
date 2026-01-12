@@ -21,7 +21,6 @@ class IHsl : public IndicatorImp {
 
 public:
     IHsl();
-    explicit IHsl(const KData&);
     virtual ~IHsl();
 };
 

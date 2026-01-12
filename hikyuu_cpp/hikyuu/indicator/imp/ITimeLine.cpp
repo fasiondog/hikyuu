@@ -21,12 +21,6 @@ ITimeLine::ITimeLine() : IndicatorImp("TIMELINE", 1) {
 
 ITimeLine::~ITimeLine() {}
 
-ITimeLine::ITimeLine(const KData& k) : IndicatorImp("TIMELINE", 1) {
-    setParam<string>("part", "price");
-    onlySetContext(k);
-    ITimeLine::_calculate(Indicator());
-}
-
 void ITimeLine::_checkParam(const string& name) const {
     if ("part" == name) {
         string part = getParam<string>("part");
@@ -66,7 +60,9 @@ Indicator HKU_API TIMELINE() {
 }
 
 Indicator HKU_API TIMELINE(const KData& k) {
-    return Indicator(make_shared<ITimeLine>(k));
+    auto p = make_shared<ITimeLine>();
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

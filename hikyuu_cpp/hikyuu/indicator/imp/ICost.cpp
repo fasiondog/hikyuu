@@ -19,12 +19,6 @@ ICost::ICost() : IndicatorImp("COST", 1) {
 
 ICost::~ICost() {}
 
-ICost::ICost(const KData& k, double percent) : IndicatorImp("COST", 1) {
-    onlySetContext(k);
-    setParam<double>("percent", percent);
-    ICost::_calculate(Indicator());
-}
-
 void ICost::_checkParam(const string& name) const {
     if (name == "percent") {
         double percent = getParam<double>("percent");
@@ -129,7 +123,10 @@ Indicator HKU_API COST(double x) {
 }
 
 Indicator HKU_API COST(const KData& k, double x) {
-    return Indicator(make_shared<ICost>(k, x));
+    auto p = make_shared<ICost>();
+    p->setParam<double>("percent", x);
+    p->setContext(k);
+    return Indicator(p);
 }
 
 }  // namespace hku

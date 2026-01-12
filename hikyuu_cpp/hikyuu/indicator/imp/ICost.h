@@ -21,7 +21,6 @@ class ICost : public IndicatorImp {
 
 public:
     ICost();
-    ICost(const KData&, double percent);
     virtual ~ICost();
     virtual void _checkParam(const string& name) const override;
 };

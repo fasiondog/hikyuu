@@ -18,7 +18,6 @@ class IFinance : public IndicatorImp {
 
 public:
     IFinance();
-    explicit IFinance(const KData&);
     virtual ~IFinance() = default;
 };
 
