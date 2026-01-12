@@ -182,12 +182,6 @@ const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
 }
 
 bool IndicatorImp::supportIncrementCalculate() const {
-    if (haveParam("align_date_list")) {
-        const DatetimeList &dates = getParam<const DatetimeList &>("align_date_list");
-        if (!dates.empty()) {
-            return false;
-        }
-    }
     return false;
 }
 
