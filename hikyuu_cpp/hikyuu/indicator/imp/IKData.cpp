@@ -18,14 +18,6 @@ IKData::IKData() : IndicatorImp("KDATA") {
     setParam<string>("kpart", "KDATA");
 }
 
-IKData::IKData(const KData& kdata, const string& part) : IndicatorImp() {
-    string part_name(part);
-    to_upper(part_name);
-    setParam<string>("kpart", part_name);
-    onlySetContext(kdata);
-    IKData::_calculate(Indicator());
-}
-
 IKData::~IKData() {}
 
 void IKData::_checkParam(const string& name) const {
@@ -112,35 +104,59 @@ void IKData::_increment_calculate(const Indicator& data, size_t start_pos) {
 }
 
 Indicator HKU_API KDATA(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "KDATA"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "KDATA");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API OPEN(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "OPEN"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "OPEN");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API HIGH(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "HIGH"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "HIGH");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API LOW(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "LOW"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "LOW");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API CLOSE(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "CLOSE"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "CLOSE");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API AMO(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "AMO"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "AMO");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API VOL(const KData& kdata) {
-    return Indicator(make_shared<IKData>(kdata, "VOL"));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", "VOL");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API KDATA_PART(const KData& kdata, const string& part) {
-    return Indicator(make_shared<IKData>(kdata, part));
+    auto p = make_shared<IKData>();
+    p->setParam<string>("kpart", part);
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 //-----------------------------------------------------------

@@ -19,14 +19,14 @@ ITime::ITime() : IndicatorImp("TIME") {
 
 ITime::~ITime() {}
 
-ITime::ITime(const KData& k, const string& type) : IndicatorImp() {
-    string type_name(type);
-    to_upper(type_name);
-    m_name = type_name;
-    setParam<string>("type", type_name);
-    onlySetContext(k);
-    ITime::_calculate(Indicator());
-}
+// ITime::ITime(const KData& k, const string& type) : IndicatorImp() {
+//     string type_name(type);
+//     to_upper(type_name);
+//     m_name = type_name;
+//     setParam<string>("type", type_name);
+//     onlySetContext(k);
+//     ITime::_calculate(Indicator());
+// }
 
 void ITime::_checkParam(const string& name) const {
     if ("type" == name) {
@@ -102,35 +102,67 @@ void ITime::_increment_calculate(const Indicator& data, size_t start_pos) {
 }
 
 Indicator HKU_API DATE(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "DATE"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "DATE");
+    p->name("DATE");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API TIME(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "TIME"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "TIME");
+    p->name("TIME");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API YEAR(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "YEAR"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "YEAR");
+    p->name("YEAR");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API MONTH(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "MONTH"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "MONTH");
+    p->name("MONTH");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API WEEK(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "WEEK"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "WEEK");
+    p->name("WEEK");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API DAY(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "DAY"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "DAY");
+    p->name("DAY");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API HOUR(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "HOUR"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "HOUR");
+    p->name("HOUR");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 Indicator HKU_API MINUTE(const KData& kdata) {
-    return Indicator(make_shared<ITime>(kdata, "MINUTE"));
+    auto p = make_shared<ITime>();
+    p->setParam<string>("type", "MINUTE");
+    p->name("MINUTE");
+    p->setContext(kdata);
+    return Indicator(p);
 }
 
 //-----------------------------------------------------------
