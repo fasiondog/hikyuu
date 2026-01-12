@@ -17,11 +17,6 @@ namespace hku {
 
 IAd::IAd() : IndicatorImp("AD", 1) {}
 
-IAd::IAd(const KData& k) : IndicatorImp("AD", 1) {
-    onlySetContext(k);
-    IAd::_calculate(Indicator());
-}
-
 IAd::~IAd() {}
 
 void IAd::_calculate(const Indicator& data) {
@@ -49,28 +44,14 @@ void IAd::_calculate(const Indicator& data) {
     }
 }
 
-void IAd::_increment_calculate(const Indicator& data, size_t start_pos) {
-    const KData& k = getContext();
-    size_t total = k.size();
-    auto* dst = this->data();
-    value_t ad = dst[start_pos - 1];
-    for (size_t i = start_pos; i < total; i++) {
-        const KRecord& r = k[i];
-        value_t tmp = r.highPrice - r.lowPrice;
-        if (tmp != 0.0) {
-            // 多空对比 = [（收盘价- 最低价） - （最高价 - 收盘价）] / （最高价 - 最低价）
-            ad += ((r.closePrice + r.closePrice - r.highPrice - r.lowPrice) / tmp) * r.transAmount;
-        }
-        dst[i] = ad;
-    }
-}
-
 Indicator HKU_API AD() {
     return make_shared<IAd>()->calculate();
 }
 
 Indicator HKU_API AD(const KData& k) {
-    return Indicator(make_shared<IAd>(k));
+    auto p = make_shared<IAd>();
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */
