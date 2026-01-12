@@ -18,8 +18,6 @@ class TaStoch : public IndicatorImp {
 
 public:
     TaStoch();
-    explicit TaStoch(const KData&, int fastk_n, int slowk_n, int slowk_matype, int slowd_n,
-                     int slowd_matype);
     virtual ~TaStoch() = default;
     virtual void _checkParam(const string& name) const override;
 };

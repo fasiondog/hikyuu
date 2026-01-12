@@ -19,13 +19,6 @@ TaAdosc::TaAdosc() : IndicatorImp("TA_ADOSC", 1) {
     setParam<int>("slow_n", 10);
 }
 
-TaAdosc::TaAdosc(const KData& k, int fast_n, int slow_n) : IndicatorImp("TA_ADOSC", 1) {
-    onlySetContext(k);
-    setParam<int>("fast_n", fast_n);
-    setParam<int>("slow_n", slow_n);
-    TaAdosc::_calculate(Indicator());
-}
-
 void TaAdosc::_checkParam(const string& name) const {
     if (name == "fast_n") {
         int fast_n = getParam<int>("fast_n");
@@ -87,7 +80,11 @@ Indicator HKU_API TA_ADOSC(int fast_n, int slow_n) {
 }
 
 Indicator HKU_API TA_ADOSC(const KData& k, int fast_n, int slow_n) {
-    return Indicator(make_shared<TaAdosc>(k, fast_n, slow_n));
+    auto p = make_shared<TaAdosc>();
+    p->setParam<int>("fast_n", fast_n);
+    p->setParam<int>("slow_n", slow_n);
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */

@@ -18,7 +18,6 @@ class TaUltosc : public IndicatorImp {
 
 public:
     TaUltosc();
-    explicit TaUltosc(const KData&, int n1, int n2, int n3);
     virtual ~TaUltosc() = default;
     virtual void _checkParam(const string& name) const override;
 };

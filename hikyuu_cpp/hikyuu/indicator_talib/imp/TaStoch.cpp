@@ -22,18 +22,6 @@ TaStoch::TaStoch() : IndicatorImp("TA_STOCH", 2) {
     setParam<int>("slowd_matype", 0);
 }
 
-TaStoch::TaStoch(const KData& k, int fastk_n, int slowk_n, int slowk_matype, int slowd_n,
-                 int slowd_matype)
-: IndicatorImp("TA_STOCH", 2) {
-    onlySetContext(k);
-    setParam<int>("fastk_n", fastk_n);
-    setParam<int>("slowk_n", slowk_n);
-    setParam<int>("slowk_matype", slowk_matype);
-    setParam<int>("slowd_n", slowd_n);
-    setParam<int>("slowd_matype", slowd_matype);
-    TaStoch::_calculate(Indicator());
-}
-
 void TaStoch::_checkParam(const string& name) const {
     if (name == "fastk_n" || name == "slowk_n" || name == "slowd_n") {
         int n = getParam<int>(name);
@@ -100,8 +88,14 @@ Indicator HKU_API TA_STOCH(int fastk_n, int slowk_n, int slowk_matype, int slowd
 
 Indicator HKU_API TA_STOCH(const KData& k, int fastk_n, int slowk_n, int slowk_matype, int slowd_n,
                            int slowd_matype) {
-    return Indicator(
-      make_shared<TaStoch>(k, fastk_n, slowk_n, slowk_matype, slowd_n, slowd_matype));
+    auto p = make_shared<TaStoch>();
+    p->setParam<int>("fastk_n", fastk_n);
+    p->setParam<int>("slowk_n", slowk_n);
+    p->setParam<int>("slowk_matype", slowk_matype);
+    p->setParam<int>("slowd_n", slowd_n);
+    p->setParam<int>("slowd_matype", slowd_matype);
+    p->setContext(k);
+    return Indicator(p);
 }
 
 } /* namespace hku */
