@@ -1800,7 +1800,8 @@ void IndicatorImp::execute_or() {
 
 size_t IndicatorImp::increment_execute_if() {
     size_t null_pos = Null<size_t>();
-    if (m_three->m_need_calculate || m_right->m_need_calculate || m_left->m_need_calculate) {
+    if (!ms_enable_increment_calculate || m_three->m_need_calculate || m_right->m_need_calculate ||
+        m_left->m_need_calculate) {
         return null_pos;
     }
 
