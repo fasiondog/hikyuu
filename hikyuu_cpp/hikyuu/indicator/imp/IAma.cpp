@@ -96,7 +96,6 @@ size_t IAma::min_increment_start() const {
 }
 
 void IAma::_increment_calculate(const Indicator& data, size_t start_pos) {
-    SPEND_TIME(IAma_increment_calculate);
     size_t total = data.size();
     auto const* src = data.data();
     auto* dst0 = this->data(0);
