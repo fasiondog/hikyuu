@@ -140,18 +140,15 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
     return os;
 }
 
-IndicatorImp::IndicatorImp()
-: m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
+IndicatorImp::IndicatorImp() : m_name("IndicatorImp") {
     memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
 }
 
-IndicatorImp::IndicatorImp(const string &name)
-: m_name(name), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
+IndicatorImp::IndicatorImp(const string &name) : m_name(name) {
     memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
 }
 
-IndicatorImp::IndicatorImp(const string &name, size_t result_num)
-: m_name(name), m_discard(0), m_need_calculate(true), m_optype(LEAF) {
+IndicatorImp::IndicatorImp(const string &name, size_t result_num) : m_name(name) {
     memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
     _readyBuffer(0, m_result_num);
@@ -161,6 +158,7 @@ void IndicatorImp::baseCheckParam(const string &name) const {}
 
 void IndicatorImp::paramChanged() {
     m_need_calculate = true;
+    m_param_changed = true;
 }
 
 void IndicatorImp::setIndParam(const string &name, const Indicator &ind) {
@@ -184,7 +182,7 @@ const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
 }
 
 bool IndicatorImp::can_inner_calculate() {
-    if (!ms_enable_increment_calculate || m_need_calculate || m_result_num == 0 ||
+    if (m_need_calculate || !ms_enable_increment_calculate || m_result_num == 0 ||
         m_context.empty() || size() < m_context.size() || m_old_context.size() < m_context.size()) {
         return false;
     }
@@ -371,6 +369,7 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_result_num = m_result_num;
     p->m_context = m_context;
     p->m_need_calculate = m_need_calculate;
+    p->m_param_changed = m_param_changed;
     p->m_optype = m_optype;
     p->m_parent = m_parent;
 
@@ -823,7 +822,7 @@ bool IndicatorImp::can_increment_calculate() {
 }
 
 bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
-    if (!ms_enable_increment_calculate || !supportIncrementCalculate() ||
+    if (m_param_changed || !ms_enable_increment_calculate || !supportIncrementCalculate() ||
         !can_increment_calculate()) {
         return false;
     }
@@ -990,6 +989,9 @@ Indicator IndicatorImp::calculate() {
         m_need_calculate = false;
     }
 
+    m_param_changed = false;
+    m_old_context = KData();
+
     try {
         result = shared_from_this();
     } catch (const std::exception &e) {
@@ -1003,13 +1005,13 @@ Indicator IndicatorImp::calculate() {
         }
     }
 
-    m_old_context = KData();
     return Indicator(result);
 }
 
 size_t IndicatorImp::increment_execute() {
     size_t null_pos = Null<size_t>();
-    if (!ms_enable_increment_calculate || m_right->m_need_calculate || m_left->m_need_calculate) {
+    if (m_param_changed || !ms_enable_increment_calculate || m_right->m_need_calculate ||
+        m_left->m_need_calculate) {
         return null_pos;
     }
 
@@ -1800,8 +1802,8 @@ void IndicatorImp::execute_or() {
 
 size_t IndicatorImp::increment_execute_if() {
     size_t null_pos = Null<size_t>();
-    if (!ms_enable_increment_calculate || m_three->m_need_calculate || m_right->m_need_calculate ||
-        m_left->m_need_calculate) {
+    if (m_param_changed || !ms_enable_increment_calculate || m_three->m_need_calculate ||
+        m_right->m_need_calculate || m_left->m_need_calculate) {
         return null_pos;
     }
 

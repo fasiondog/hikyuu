@@ -286,14 +286,15 @@ protected:
 
 protected:
     string m_name;
-    size_t m_discard;
-    size_t m_result_num;
+    size_t m_discard{0};
+    size_t m_result_num{0};
     KData m_context;
     KData m_old_context;
     vector<value_t>* m_pBuffer[MAX_RESULT_NUM];
 
-    bool m_need_calculate;
-    OPType m_optype;
+    bool m_need_calculate{true};
+    bool m_param_changed{true};
+    OPType m_optype{LEAF};
     IndicatorImpPtr m_left;
     IndicatorImpPtr m_right;
     IndicatorImpPtr m_three;
@@ -322,6 +323,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_context);
         ar& BOOST_SERIALIZATION_NVP(m_old_context);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
+        ar& BOOST_SERIALIZATION_NVP(m_param_changed);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
         ar& BOOST_SERIALIZATION_NVP(m_left);
         ar& BOOST_SERIALIZATION_NVP(m_right);
@@ -364,6 +366,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_context);
         ar& BOOST_SERIALIZATION_NVP(m_old_context);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
+        ar& BOOST_SERIALIZATION_NVP(m_param_changed);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
         ar& BOOST_SERIALIZATION_NVP(m_left);
         ar& BOOST_SERIALIZATION_NVP(m_right);
