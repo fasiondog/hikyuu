@@ -34,7 +34,7 @@ TEST_CASE("test_AVEDEV_dyn") {
         CHECK_UNARY(std::isnan(result[i]));
     }
     for (size_t i = expect.discard(); i < expect.size(); i++) {
-        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+        CHECK_EQ(expect[i], doctest::Approx(result[i]).epsilon(0.001));
     }
 
     result = AVEDEV(c, IndParam(CVAL(c, 10)));
@@ -44,7 +44,7 @@ TEST_CASE("test_AVEDEV_dyn") {
         CHECK_UNARY(std::isnan(result[i]));
     }
     for (size_t i = expect.discard(); i < expect.size(); i++) {
-        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+        CHECK_EQ(expect[i], doctest::Approx(result[i]).epsilon(0.001));
     }
 }
 

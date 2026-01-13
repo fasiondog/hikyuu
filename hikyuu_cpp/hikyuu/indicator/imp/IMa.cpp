@@ -38,7 +38,7 @@ void IMa::_calculate(const Indicator& indicator) {
             return;
         }
 
-        value_t sum = 0.0;
+        price_t sum = 0.0;
         for (size_t i = m_discard; i < total; i++) {
             if (!std::isnan(src[i])) {
                 sum += src[i];
@@ -55,7 +55,7 @@ void IMa::_calculate(const Indicator& indicator) {
     }
 
     size_t startPos = indicator.discard();
-    value_t sum = 0.0;
+    price_t sum = 0.0;
     for (size_t i = startPos; i <= m_discard; ++i) {
         if (!std::isnan(src[i])) {
             sum += src[i];

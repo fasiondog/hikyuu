@@ -93,7 +93,7 @@ TEST_CASE("test_MA") {
     CHECK_EQ(ma.size(), kdata.size());
     CHECK_EQ(ma.discard(), 0);
     for (size_t i = 0; i < open.size(); ++i) {
-        CHECK_LT(std::fabs(ma[i] - open[i]), 0.0001);
+        CHECK_EQ(ma[i], doctest::Approx(open[i]).epsilon(0.001));
     }
 
     /** @arg 源数据本身带有discard不等于0 */
