@@ -91,20 +91,37 @@ TEST_CASE("test_SUM") {
     check_indicator(result, SUM(CLOSE(), 3)(k3));
 
     k3 = stk.getKData(KQuery(-6));
+    result = SUM(CLOSE(), 3)(k1)(k3);
+    check_indicator(result, SUM(CLOSE(), 3)(k3));
+
+    // 重叠长度等于 discard
+    k1 = stk.getKData(KQuery(-10, -4));
+    k3 = stk.getKData(KQuery(-7));
     result = SUM(CLOSE(), 3)(k1);
-    HKU_INFO("-----------------------------------------------------------------------------");
     result.setContext(k3);
-    HKU_INFO("-----------------------------------------------------------------------------");
-    HKU_INFO("{}", result);
-    for (size_t i = 0; i < result.size(); i++) {
-        HKU_INFO("{}: result: {}", i, result[i]);
-        // CHECK_EQ(result[i], doctest::Approx(SUM(CLOSE(), 3)(k4)[i]).epsilon(0.00001));
+    auto expect = SUM(CLOSE(), 3)(k3);
+    CHECK_EQ(result.size(), expect.size());
+    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result[0], doctest::Approx(47.39).epsilon(0.0001));
+    CHECK_EQ(result[1], doctest::Approx(47.41).epsilon(0.0001));
+    for (size_t i = expect.discard(); i < result.size(); i++) {
+        CHECK_EQ(result[i], doctest::Approx(expect[i]).epsilon(0.0001));
     }
-    result = SUM(CLOSE(), 3)(k3);
-    for (size_t i = 0; i < result.size(); i++) {
-        HKU_INFO("{}: result: {}", i, result[i]);
+
+    // 重叠长度大于 discard
+    k1 = stk.getKData(KQuery(-10, -4));
+    k3 = stk.getKData(KQuery(-8));
+    result = SUM(CLOSE(), 3)(k1);
+    result.setContext(k3);
+    expect = SUM(CLOSE(), 3)(k3);
+    CHECK_EQ(result.size(), expect.size());
+    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result[0], doctest::Approx(47.65).epsilon(0.0001));
+    CHECK_EQ(result[1], doctest::Approx(47.39).epsilon(0.0001));
+    CHECK_EQ(result[2], doctest::Approx(47.41).epsilon(0.0001));
+    for (size_t i = expect.discard(); i < result.size(); i++) {
+        CHECK_EQ(result[i], doctest::Approx(expect[i]).epsilon(0.0001));
     }
-    // check_indicator(result, DISCARD(SUM(CLOSE(), 3), 0)(k4));
 }
 
 /** @par 检测点 */

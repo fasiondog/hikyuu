@@ -26,7 +26,6 @@ void ISum::_checkParam(const string& name) const {
 }
 
 void ISum::_calculate(const Indicator& ind) {
-    SPEND_TIME(SUM_calculate);
     size_t total = ind.size();
     if (0 == total || ind.discard() >= total) {
         m_discard = total;
@@ -71,8 +70,6 @@ size_t ISum::min_increment_start() const {
 }
 
 void ISum::_increment_calculate(const Indicator& ind, size_t start_pos) {
-    SPEND_TIME(SUM_increment_calculate);
-    HKU_INFO("start_pos: {}", start_pos);
     size_t total = ind.size();
     auto const* src = ind.data();
     auto* dst = this->data();

@@ -877,11 +877,13 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
         start_pos = m_discard;
     }
 
+    m_discard = 0;
+
     if (start_pos < total) {
         _increment_calculate(ind, start_pos);
     }
 
-    // _update_discard();
+    _update_discard();
     return true;
 }
 
