@@ -18,16 +18,17 @@ function coverage_report(target)
         os.run("lcov -c -d ./ -o cover.info")
 
         -- 合并基准数据和执行测试文件后生成的覆盖率数据
-        os.exec("lcov -a cover-init.info -a cover.info -o cover-total.info")
+        os.exec("lcov --ignore-errors empty -a cover-init.info -a cover.info -o cover-total.info")
 
         -- 删除统计信息中如下的代码或文件，支持正则
-        os.run("lcov --remove cover-total.info '*/usr/include/*' \
-                '*/usr/lib/*' '*/usr/lib64/*' '*/usr/local/include/*' '*/usr/local/lib/*' '*/usr/local/lib64/*' \
-                '*/test/*' '*/.xmake*' '*/boost/*' '*/ffmpeg/*' \
+        os.exec("lcov --ignore-errors unused --remove cover-total.info '*/usr/include/*' \
+                '*/usr/lib/*' '*/usr/local/include/*' '*/usr/local/lib/*' '*/usr/local/lib64/*' \
+                '*/.xmake*' '*/boost/*' '*/ffmpeg/*' \
+                'unit_test/*' 'hikyuu/data_driver/*' 'hikyuu/global/*' 'hikyuu/plugin/*' 'hikyuu/utilities/*' \
                 -o cover-final.info")
         
         -- 生成的html及相关文件的目录名称，--legend 简单的统计信息说明
-        os.exec("genhtml -o cover_report --legend --title 'hikyuu'  --prefix=" .. os.projectdir() .. " cover-final.info")
+        os.exec("genhtml -o cover_report --legend --title 'hikyuu' cover-final.info")
 
         -- 生成 sonar 可读取报告
         if is_plat("linux") then

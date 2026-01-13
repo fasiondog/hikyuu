@@ -3,7 +3,7 @@ set_xmakever("3.0.0")
 -- project
 set_project("hikyuu")
 
-add_rules("mode.debug", "mode.release")
+add_rules("mode.debug", "mode.release", "mode.coverage")
 
 -- version
 set_version("2.7.3", {build = "%Y%m%d%H%M"})
