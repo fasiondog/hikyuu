@@ -881,7 +881,11 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
         m_discard = start_pos;
     }
 
-    _increment_calculate(ind, std::max(start_pos, min_increment_start()));
+    start_pos = min_increment_start();
+    if (start_pos < total) {
+        _increment_calculate(ind, start_pos);
+    }
+
     _update_discard();
     return true;
 }
