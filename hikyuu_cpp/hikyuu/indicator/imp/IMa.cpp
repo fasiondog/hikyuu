@@ -54,6 +54,11 @@ void IMa::_calculate(const Indicator& indicator) {
         return;
     }
 
+    if (n == 1) {
+        memcpy(dst + m_discard, src + m_discard, (total - m_discard) * sizeof(value_t));
+        return;
+    }
+
     size_t startPos = indicator.discard();
     price_t sum = 0.0;
     for (size_t i = startPos; i <= m_discard; ++i) {
@@ -74,12 +79,11 @@ void IMa::_calculate(const Indicator& indicator) {
 
 bool IMa::supportIncrementCalculate() const {
     int n = getParam<int>("n");
-    return n > 0;
+    return n > 1;
 }
 
 size_t IMa::min_increment_start() const {
     int n = getParam<int>("n");
-    // startPos + 1 - n >= 0
     return n;
 }
 

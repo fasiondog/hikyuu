@@ -26,6 +26,7 @@ void ISum::_checkParam(const string& name) const {
 }
 
 void ISum::_calculate(const Indicator& ind) {
+    SPEND_TIME(SUM_calculate);
     size_t total = ind.size();
     if (0 == total || ind.discard() >= total) {
         m_discard = total;
@@ -46,29 +47,54 @@ void ISum::_calculate(const Indicator& ind) {
         return;
     }
 
-    m_discard = ind.discard();
-    if (n == 1) {
-        memcpy(dst, src, total * sizeof(value_t));
+    m_discard = ind.discard() + n - 1;
+    if (m_discard >= total) {
+        m_discard = total;
         return;
     }
 
-    price_t sum = 0.0;
-    for (size_t i = m_discard, len = (m_discard + n) >= total ? total : m_discard + n; i < len;
-         i++) {
-        sum += src[i];
-        dst[i] = sum;
+    if (n == 1) {
+        memcpy(dst + m_discard, src + m_discard, (total - m_discard) * sizeof(value_t));
+        return;
     }
 
-    for (size_t i = m_discard + n; i < total; i++) {
+    _increment_calculate(ind, m_discard);
+    return;
+}
+
+bool ISum::supportIncrementCalculate() const {
+    return getParam<int>("n") > 1;
+}
+
+size_t ISum::min_increment_start() const {
+    return getParam<int>("n") - 1;
+}
+
+void ISum::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    SPEND_TIME(SUM_increment_calculate);
+    HKU_INFO("start_pos: {}", start_pos);
+    size_t total = ind.size();
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
+    int n = getParam<int>("n");
+    price_t sum = 0.0;
+    for (size_t i = start_pos + 1 - n; i <= start_pos; i++) {
+        sum += src[i];
+    }
+    dst[start_pos] = sum;
+
+    for (size_t i = start_pos + 1; i < total; i++) {
         sum = sum - src[i - n] + src[i];
         dst[i] = sum;
     }
-
-    return;
 }
 
 void ISum::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     size_t start = _get_step_start(curPos, step, ind.discard());
+    if (curPos + 1 < ind.discard() + step) {
+        return;
+    }
     price_t sum = 0.0;
     for (size_t i = start; i <= curPos; i++) {
         sum += ind[i];

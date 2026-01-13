@@ -839,7 +839,7 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
 
     size_t total = m_context.size();
     size_t copy_len = m_old_context.size() - copy_start_pos;
-    if (copy_len == 0) {
+    if (copy_len < m_discard) {
         return false;
     }
 
@@ -848,18 +848,19 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
         return false;
     }
 
+    if (start_pos < min_increment_start()) {
+        return false;
+    }
+
     if (copy_start_pos < m_discard) {
-        size_t old_discard = m_discard;
-        m_discard = m_discard - copy_start_pos;
-        copy_start_pos = old_discard;
-        copy_len = m_old_context.size() - copy_start_pos;
+        copy_len = m_old_context.size() - m_discard;
         for (size_t r = 0; r < m_result_num; ++r) {
             if (m_pBuffer[r] == nullptr) {
                 return false;
             }
             m_pBuffer[r]->resize(total, Null<value_t>());
             auto *dst = this->data(r);
-            memmove(dst + m_discard, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+            memmove(dst + copy_start_pos, dst + m_discard, sizeof(value_t) * (copy_len));
         }
     } else {
         for (size_t r = 0; r < m_result_num; ++r) {
@@ -876,17 +877,11 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
         start_pos = m_discard;
     }
 
-    if (start_pos < ind.discard()) {
-        start_pos = ind.discard();
-        m_discard = start_pos;
-    }
-
-    start_pos = min_increment_start();
     if (start_pos < total) {
         _increment_calculate(ind, start_pos);
     }
 
-    _update_discard();
+    // _update_discard();
     return true;
 }
 
