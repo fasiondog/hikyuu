@@ -19,7 +19,7 @@ from matplotlib.ticker import FuncFormatter, FixedLocator
 from matplotlib.image import imread
 
 from hikyuu import *
-from hikyuu import constant, isnan, Indicator, KData, IF
+from hikyuu import constant, isnan, Indicator, KData, IF, ALIGN
 
 from .common import get_draw_title
 
@@ -377,11 +377,13 @@ def iplot(
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
 
-    #解决缺值时无法绘图的问题 by stone 20251217
-    #py_indicatr = [None if x == constant.null_price else x for x in indicator]
-    #axes.plot(py_indicatr, linestyle=linestyle, label=label, *args, **kwargs)
+    py_ind = ALIGN(indicator, kref) if kref is not None else indicator
 
-    py_indicatr = np.array([None if x == constant.null_price else x for x in indicator])
+    # 解决缺值时无法绘图的问题 by stone 20251217
+    # py_indicatr = [None if x == constant.null_price else x for x in indicator]
+    # axes.plot(py_indicatr, linestyle=linestyle, label=label, *args, **kwargs)
+
+    py_indicatr = np.array([None if x == constant.null_price else x for x in py_ind])
     py_x = np.arange(len(py_indicatr))
     imask = np.isfinite(py_indicatr)
     axes.plot(py_x[imask], py_indicatr[imask], linestyle=linestyle, label=label, *args, **kwargs)
@@ -412,7 +414,7 @@ def iplot(
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(indicator) + 1)
-    if kref:
+    if kref is not None:
         ax_set_locator_formatter(axes, kref.get_datetime_list(), kref.get_query().ktype)
     else:
         k = indicator.get_context()
@@ -464,8 +466,10 @@ def ibar(
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
 
-    py_indicatr = [None if x == constant.null_price else x for x in indicator]
-    x = [i - 0.2 for i in range(len(indicator))]
+    py_ind = ALIGN(indicator, kref) if kref is not None else indicator
+
+    py_indicatr = [None if x == constant.null_price else x for x in py_ind]
+    x = [i - 0.2 for i in range(len(py_ind))]
     y = py_indicatr
 
     axes.bar(x, py_indicatr, width=width, color=color, edgecolor=edgecolor, *args, **kwargs)
@@ -496,7 +500,7 @@ def ibar(
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(indicator) + 1)
-    if kref:
+    if kref is not None:
         ax_set_locator_formatter(axes, kref.get_datetime_list(), kref.get_query().ktype)
     else:
         k = indicator.get_context()
