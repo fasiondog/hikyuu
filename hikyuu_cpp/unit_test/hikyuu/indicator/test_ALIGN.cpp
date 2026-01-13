@@ -45,41 +45,53 @@ TEST_CASE("test_ALIGN_fill_null") {
     /** @arg 输入指标本身和上下文无关，和参考日期列表等长 */
     ref = stk.getDatetimeList(KQuery(-10));
     data = PRICELIST(a);
-    result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("fill_null"));
+    result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
-    CHECK_EQ(result.discard(), ref.size());
+    CHECK_EQ(result.discard(), 0);
     DatetimeList result_dates = result.getDatetimeList();
     for (int i = 0; i < result.size(); i++) {
-        CHECK_UNARY(std::isnan(result[i]));
+        CHECK_EQ(result[i], data[i]);
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
     /** @arg 输入指标本身和上下文无关，且长度长于参考日期列表 */
     a.push_back(11);
     data = PRICELIST(a);
-    result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("fill_null"));
+    result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
-    CHECK_EQ(result.discard(), ref.size());
+    CHECK_EQ(result.discard(), 0);
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.size(); i++) {
+        CHECK_EQ(result[i], data[i + 1]);
+        CHECK_EQ(result_dates[i], ref[i]);
+    }
 
     /** @arg 输入指标本身和上下文无关，且长度小于参考日期列表 */
     a.clear();
     a.push_back(1);
     data = PRICELIST(a);
-    result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("fill_null"));
+    result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
-    CHECK_EQ(result.discard(), ref.size());
+    CHECK_EQ(result.discard(), 9);
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+        CHECK_EQ(result_dates[i], ref[i]);
+    }
+    CHECK_EQ(result[9], 1);
+    CHECK_EQ(result_dates[9], ref[9]);
 
     /** @arg 输入指标本身和上下文无关，且长度为0 */
     a.clear();
     data = PRICELIST(a);
-    result = ALIGN(data, ref);
-    REQUIRE(result.getParam<bool>("fill_null"));
+    result = ALIGN(data, ref, false);
+    REQUIRE(!result.getParam<bool>("fill_null"));
     CHECK_EQ(result.name(), "ALIGN");
     CHECK_EQ(result.size(), ref.size());
     CHECK_EQ(result.discard(), ref.size());

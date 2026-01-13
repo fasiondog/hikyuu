@@ -45,16 +45,11 @@ void IAlign::_calculate(const Indicator& ind) {
     bool fill_null = getParam<bool>("fill_null");
 
     // 处理传入的数据本身没有上下文日期的指标，无法对标的情况:
-    // 1.如果 fill_null, 则直接返回，m_discard 标记全部
+    // 1.忽略 fill_null 参数
     // 2.数据长度小于等于日期序列长度，则按右对齐，即最后的数据对应最后的日期，前面缺失的数据做抛弃处理
     // 3.数据长度大于日期序列长度，按右对其，前面超出日期序列的数据丢弃
     DatetimeList ind_dates = ind.getDatetimeList();
     if (ind_dates.size() == 0) {
-        if (fill_null) {
-            m_discard = total;
-            return;
-        }
-
         if (ind_total <= total) {
             size_t offset = total - ind_total;
             m_discard = offset + ind.discard();
