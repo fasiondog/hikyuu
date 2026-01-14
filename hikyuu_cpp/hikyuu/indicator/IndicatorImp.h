@@ -157,11 +157,7 @@ public:
     // ===================
     virtual void _calculate(const Indicator&);
 
-    /** 是否支持动态周期指标参数 */
-    virtual bool supportIndParam() const {
-        return false;
-    }
-
+    /** 动态周期计算，子类可重载该函数，默认不支持动态周期计算 */
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
     /** 是否支持增量计算 */
@@ -174,8 +170,8 @@ public:
     virtual void _increment_calculate(const Indicator& ind, size_t start_pos) {}
 
     /** 是否必须串行计算 */
-    virtual bool isSerial() const {
-        return false;
+    bool isSerial() const {
+        return m_is_serial;
     }
 
     virtual IndicatorImpPtr _clone() {
@@ -295,6 +291,7 @@ protected:
 
     bool m_is_python_object{false};
     bool m_need_self_alike_compare{false};
+    bool m_is_serial{false};
     bool m_need_calculate{true};
     bool m_param_changed{true};
     OPType m_optype{LEAF};
@@ -327,6 +324,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_old_context);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_need_self_alike_compare);
+        ar& BOOST_SERIALIZATION_NVP(m_is_serial);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
         ar& BOOST_SERIALIZATION_NVP(m_param_changed);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
@@ -372,6 +370,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_old_context);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_need_self_alike_compare);
+        ar& BOOST_SERIALIZATION_NVP(m_is_serial);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
         ar& BOOST_SERIALIZATION_NVP(m_param_changed);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
@@ -431,12 +430,9 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
-#define INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE                                                    \
-public:                                                                                        \
-    virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override; \
-    virtual bool supportIndParam() const override {                                            \
-        return true;                                                                           \
-    }
+#define INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE \
+public:                                     \
+    virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override;
 
 #define INDICATOR_IMP_SUPPORT_INCREMENT                                                 \
 public:                                                                                 \

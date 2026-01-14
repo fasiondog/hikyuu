@@ -39,14 +39,6 @@ public:
         PYBIND11_OVERLOAD(void, IndicatorImp, _dyn_run_one_step, ind, curPos, step);
     }
 
-    bool supportIndParam() const override {
-        PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "support_ind_param", supportIndParam, );
-    }
-
-    bool isSerial() const override {
-        PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "is_serial", isSerial, );
-    }
-
     void _dyn_calculate(const Indicator& ind) override {
         PYBIND11_OVERLOAD(void, IndicatorImp, _dyn_calculate, ind);
     }
@@ -102,7 +94,6 @@ void export_IndicatorImp(py::module& m) {
       .def("get_param", &IndicatorImp::getParam<boost::any>)
       .def("set_param", &IndicatorImp::setParam<boost::any>)
       .def("have_ind_param", &IndicatorImp::haveIndParam)
-      .def("support_ind_param", &IndicatorImp::supportIndParam)
       .def("get_ind_param", &IndicatorImp::getIndParam)
       .def("set_ind_param", set_ind_param1)
       .def("set_ind_param", set_ind_param2)

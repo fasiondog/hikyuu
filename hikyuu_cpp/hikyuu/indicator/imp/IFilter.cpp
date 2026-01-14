@@ -16,6 +16,7 @@ BOOST_CLASS_EXPORT(hku::IFilter)
 namespace hku {
 
 IFilter::IFilter() : IndicatorImp("FILTER", 1) {
+    m_is_serial = true;
     setParam<int>("n", 5);
 }
 
