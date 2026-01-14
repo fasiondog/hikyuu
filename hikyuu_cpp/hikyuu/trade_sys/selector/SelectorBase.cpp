@@ -80,6 +80,7 @@ SelectorPtr SelectorBase::clone() {
     SelectorPtr p = _clone();
     p->m_params = m_params;
     p->m_name = m_name;
+    p->m_is_python_object = m_is_python_object;
     p->m_query = m_query;
     p->m_proto_query = m_proto_query;
     p->m_calculated = m_calculated;

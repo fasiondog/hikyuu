@@ -15,9 +15,17 @@ class PyScoresFilterBase : public ScoresFilterBase {
     PY_CLONE(PyScoresFilterBase, ScoresFilterBase)
 
 public:
-    using ScoresFilterBase::ScoresFilterBase;
+    PyScoresFilterBase() : ScoresFilterBase() {
+        m_is_python_object = true;
+    }
 
-    PyScoresFilterBase(const ScoresFilterBase& base) : ScoresFilterBase(base) {}
+    PyScoresFilterBase(const string& name) : ScoresFilterBase(name) {
+        m_is_python_object = true;
+    }
+
+    PyScoresFilterBase(const ScoresFilterBase& base) : ScoresFilterBase(base) {
+        m_is_python_object = true;
+    }
 
     virtual ScoreRecordList _filter(const ScoreRecordList& scores, const Datetime& date,
                                     const KQuery& query) override {

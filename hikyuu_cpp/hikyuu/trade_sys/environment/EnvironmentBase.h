@@ -93,8 +93,8 @@ public:
     /** 子类克隆接口 */
     virtual EnvironmentPtr _clone() = 0;
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 protected:
@@ -103,6 +103,8 @@ protected:
     map<Datetime, size_t> m_date_index;
     vector<price_t> m_values;
     mutable std::shared_mutex m_mutex;
+
+    bool m_is_python_object{false};
 
 //============================================
 // 序列化支持
@@ -118,6 +120,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_values);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }
 
     template <class Archive>
@@ -127,6 +130,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_values);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

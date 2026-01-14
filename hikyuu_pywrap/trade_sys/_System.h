@@ -22,6 +22,14 @@ class HIDDEN PySystem : public System {
     PY_CLONE(PySystem, System)
 
 public:
+    PySystem() : System() {
+        m_is_python_object = true;
+    }
+
+    PySystem(const string& name) : System(name) {
+        m_is_python_object = true;
+    }
+
     using System::System;
     PySystem(const System& base);
     virtual ~PySystem() override;

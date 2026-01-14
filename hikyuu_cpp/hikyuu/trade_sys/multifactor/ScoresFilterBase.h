@@ -49,13 +49,14 @@ public:
 public:
     friend HKU_API ScoresFilterPtr operator|(const ScoresFilterPtr& a, const ScoresFilterPtr& b);
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 protected:
     string m_name;
     ScoresFilterPtr m_child;
+    bool m_is_python_object{false};
 
 //============================================
 // 序列化支持
@@ -68,6 +69,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_child);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }
 
     template <class Archive>
@@ -75,6 +77,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_child);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

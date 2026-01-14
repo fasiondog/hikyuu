@@ -19,8 +19,17 @@ class PyAllocateFundsBase : public AllocateFundsBase {
     PY_CLONE(PyAllocateFundsBase, AllocateFundsBase)
 
 public:
-    using AllocateFundsBase::AllocateFundsBase;
-    PyAllocateFundsBase(const AllocateFundsBase& base) : AllocateFundsBase(base) {}
+    PyAllocateFundsBase() : AllocateFundsBase() {
+        m_is_python_object = true;
+    }
+
+    PyAllocateFundsBase(const string& name) : AllocateFundsBase(name) {
+        m_is_python_object = true;
+    }
+
+    PyAllocateFundsBase(const AllocateFundsBase& base) : AllocateFundsBase(base) {
+        m_is_python_object = true;
+    }
 
     void _reset() override {
         PYBIND11_OVERLOAD(void, AllocateFundsBase, _reset, );

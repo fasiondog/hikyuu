@@ -15,7 +15,13 @@ class PyTradeCostBase : public TradeCostBase {
     PY_CLONE(PyTradeCostBase, TradeCostBase)
 
 public:
-    using TradeCostBase::TradeCostBase;
+    PyTradeCostBase() : TradeCostBase("PyTradeCostBase") {
+        m_is_python_object = true;
+    }
+
+    PyTradeCostBase(const string& name) : TradeCostBase(name) {
+        m_is_python_object = true;
+    }
 
     CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
                           double num) const override {

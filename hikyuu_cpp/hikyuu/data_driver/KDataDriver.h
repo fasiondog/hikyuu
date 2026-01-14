@@ -134,15 +134,16 @@ public:
     }
 
 protected:
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 private:
     bool checkType();
 
-private:
+protected:
     string m_name;
+    bool m_is_python_object{false};
 };
 
 typedef shared_ptr<KDataDriver> KDataDriverPtr;

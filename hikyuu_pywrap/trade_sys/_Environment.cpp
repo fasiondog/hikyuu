@@ -23,8 +23,17 @@ class PyEnvironmentBase : public EnvironmentBase {
     PY_CLONE(PyEnvironmentBase, EnvironmentBase)
 
 public:
-    using EnvironmentBase::EnvironmentBase;
-    PyEnvironmentBase(const EnvironmentBase& base) : EnvironmentBase(base) {}
+    PyEnvironmentBase() : EnvironmentBase() {
+        m_is_python_object = true;
+    }
+
+    PyEnvironmentBase(const string& name) : EnvironmentBase(name) {
+        m_is_python_object = true;
+    }
+
+    PyEnvironmentBase(const EnvironmentBase& base) : EnvironmentBase(base) {
+        m_is_python_object = true;
+    }
 
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, EnvironmentBase, _calculate, );

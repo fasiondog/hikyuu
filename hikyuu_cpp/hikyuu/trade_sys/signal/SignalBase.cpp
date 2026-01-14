@@ -61,6 +61,7 @@ SignalPtr SignalBase::clone() {
 
     p->m_name = m_name;
     p->m_params = m_params;
+    p->m_is_python_object = m_is_python_object;
     p->m_kdata = m_kdata;
     p->m_calculated = m_calculated;
     p->m_hold_long = m_hold_long;

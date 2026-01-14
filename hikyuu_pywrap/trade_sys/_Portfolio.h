@@ -23,6 +23,14 @@ class HIDDEN PyPortfolio : public Portfolio {
     PY_CLONE(PyPortfolio, Portfolio)
 
 public:
+    PyPortfolio() : Portfolio() {
+        m_is_python_object = true;
+    }
+
+    PyPortfolio(const string& name) : Portfolio(name) {
+        m_is_python_object = true;
+    }
+
     using Portfolio::Portfolio;
     PyPortfolio(const Portfolio& base);
     virtual ~PyPortfolio() override;

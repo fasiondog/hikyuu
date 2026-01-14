@@ -39,6 +39,7 @@ TradeCostPtr TradeCostBase::clone() {
     TradeCostBase* p = result.get();
     p->m_params = m_params;
     p->m_name = m_name;
+    p->m_is_python_object = m_is_python_object;
     return result;
 }
 

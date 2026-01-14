@@ -94,11 +94,17 @@ public:
      */
     virtual void remove(const string& category, const string& name) = 0;
 
+protected:
+    bool isPythonObject() const {
+        return m_is_python_object;
+    }
+
 private:
     bool checkType();
 
 protected:
     string m_name;
+    bool m_is_python_object{false};
 };
 
 typedef shared_ptr<BlockInfoDriver> BlockInfoDriverPtr;

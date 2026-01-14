@@ -16,8 +16,17 @@ class PySlippageBase : public SlippageBase {
     PY_CLONE(PySlippageBase, SlippageBase)
 
 public:
-    using SlippageBase::SlippageBase;
-    PySlippageBase(const SlippageBase& base) : SlippageBase(base) {}
+    PySlippageBase() : SlippageBase() {
+        m_is_python_object = true;
+    }
+
+    PySlippageBase(const string& name) : SlippageBase(name) {
+        m_is_python_object = true;
+    }
+
+    PySlippageBase(const SlippageBase& base) : SlippageBase(base) {
+        m_is_python_object = true;
+    }
 
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, SlippageBase, _calculate, );

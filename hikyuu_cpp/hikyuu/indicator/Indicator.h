@@ -213,6 +213,8 @@ public:
 
     string str() const;
 
+    bool isPythonObject() const;
+
 public:
     class Iterator {
     private:
@@ -389,6 +391,10 @@ inline const IndicatorImpPtr Indicator::getIndParamImp(const string& name) const
 
 inline bool Indicator::supportIndParam() const {
     return m_imp ? m_imp->supportIndParam() : false;
+}
+
+inline bool Indicator::isPythonObject() const {
+    return m_imp ? m_imp->isPythonObject() : false;
 }
 
 //--------------------------------------------------------------

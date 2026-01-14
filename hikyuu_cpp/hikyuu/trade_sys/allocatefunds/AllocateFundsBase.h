@@ -101,8 +101,8 @@ public:
     static void adjustWeight(SystemWeightList& sw_list, double can_allocate_weight,
                              bool auto_adjust, bool ignore_zero);
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 private:
@@ -115,6 +115,9 @@ private:
     /* 不调整已在运行中的子系统 */
     void _adjust_without_running(const Datetime& date, const SystemWeightList& se_list,
                                  const std::unordered_set<SYSPtr>& running_list);
+
+protected:
+    bool m_is_python_object{false};
 
 private:
     string m_name;    // 组件名称
@@ -130,6 +133,7 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
@@ -137,6 +141,7 @@ private:
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);

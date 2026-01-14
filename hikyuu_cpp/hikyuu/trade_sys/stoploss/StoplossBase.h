@@ -86,11 +86,12 @@ public:
     /** 子类计算接口，由setTO调用 */
     virtual void _calculate() = 0;
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 protected:
+    bool m_is_python_object{false};
     string m_name;
     TradeManagerPtr m_tm;
     KData m_kdata;
@@ -103,6 +104,7 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         // m_kdata都是系统运行时临时设置，不需要序列化
@@ -111,6 +113,7 @@ private:
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         // m_kdata都是系统运行时临时设置，不需要序列化

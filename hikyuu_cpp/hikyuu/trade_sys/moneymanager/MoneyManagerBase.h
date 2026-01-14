@@ -152,8 +152,8 @@ public:
     /** 子类克隆私有变量接口 */
     virtual MoneyManagerPtr _clone() = 0;
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 protected:
@@ -161,6 +161,7 @@ protected:
     KQuery m_query;
     TradeManagerPtr m_tm;
     unordered_map<Stock, std::pair<size_t, size_t>> m_buy_sell_counts;
+    bool m_is_python_object{false};
 
 //============================================
 // 序列化支持
@@ -172,6 +173,7 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         // m_query、m_tm都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_query);
         // ar & BOOST_SERIALIZATION_NVP(m_tm);
@@ -181,6 +183,7 @@ private:
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

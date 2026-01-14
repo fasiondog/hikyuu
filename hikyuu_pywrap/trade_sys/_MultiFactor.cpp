@@ -21,8 +21,17 @@ class HIDDEN PyMultiFactor : public MultiFactorBase {
     PY_CLONE(PyMultiFactor, MultiFactorBase)
 
 public:
-    using MultiFactorBase::MultiFactorBase;
-    PyMultiFactor(const MultiFactorBase& base) : MultiFactorBase(base) {}
+    PyMultiFactor() : MultiFactorBase() {
+        m_is_python_object = true;
+    }
+
+    PyMultiFactor(const string& name) : MultiFactorBase(name) {
+        m_is_python_object = true;
+    }
+
+    PyMultiFactor(const MultiFactorBase& base) : MultiFactorBase(base) {
+        m_is_python_object = true;
+    }
 
     virtual ~PyMultiFactor() override {}
 

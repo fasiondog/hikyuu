@@ -100,11 +100,6 @@ public:                                                                         
             return std::shared_ptr<classname>(keep_python_state_alive, ptr);     \
         }                                                                        \
         return this->_clone();                                                   \
-    }                                                                            \
-                                                                                 \
-public:                                                                          \
-    inline bool isPythonObject() const override {                                \
-        return true;                                                             \
     }
 
 // 用于检查以 py::object 方式传递的函数参数个数是否符合预期

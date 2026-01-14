@@ -15,8 +15,17 @@ class PyProfitGoalBase : public ProfitGoalBase {
     PY_CLONE(PyProfitGoalBase, ProfitGoalBase)
 
 public:
-    using ProfitGoalBase::ProfitGoalBase;
-    PyProfitGoalBase(const ProfitGoalBase& base) : ProfitGoalBase(base) {}
+    PyProfitGoalBase() : ProfitGoalBase() {
+        m_is_python_object = true;
+    }
+
+    PyProfitGoalBase(const string& name) : ProfitGoalBase(name) {
+        m_is_python_object = true;
+    }
+
+    PyProfitGoalBase(const ProfitGoalBase& base) : ProfitGoalBase(base) {
+        m_is_python_object = true;
+    }
 
     void buyNotify(const TradeRecord& tr) override {
         PYBIND11_OVERLOAD_NAME(void, ProfitGoalBase, "buy_notify", buyNotify, tr);

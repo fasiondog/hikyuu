@@ -37,6 +37,8 @@ class HKU_API TradeManagerBase : public enable_shared_from_this<TradeManagerBase
 public:
     TradeManagerBase() : TradeManagerBase("", TC_Zero()) {}
 
+    explicit TradeManagerBase(const string& name) : TradeManagerBase(name, TC_Zero()) {}
+
     TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
     : m_name(name), m_costfunc(costFunc), m_broker_last_datetime(Datetime::now()) {
         setParam<int>("precision", 2);  // 计算精度
@@ -169,6 +171,7 @@ public:
         HKU_CHECK(p, "Invalid ptr from _clone!");
         p->m_params = m_params;
         p->m_name = m_name;
+        p->m_is_python_object = m_is_python_object;
         p->m_broker_last_datetime = m_broker_last_datetime;
         p->m_costfunc = m_costfunc;
         p->m_broker_list = m_broker_list;
@@ -769,8 +772,8 @@ public:
     std::vector<std::pair<Datetime, double>> getProfitPercentYearly(
       const Datetime& datetime = Datetime::now());
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 protected:
@@ -779,6 +782,8 @@ protected:
 
     Datetime m_broker_last_datetime;     // 订单代理最近一次执行操作的时刻,当前启动运行时间
     list<OrderBrokerPtr> m_broker_list;  // 订单代理列表
+
+    bool m_is_python_object{false};
 
 //============================================
 // 序列化支持
@@ -793,6 +798,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_costfunc);
         ar& BOOST_SERIALIZATION_NVP(m_broker_last_datetime);
         ar& BOOST_SERIALIZATION_NVP(m_broker_list);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }
 
     template <class Archive>
@@ -802,6 +808,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_costfunc);
         ar& BOOST_SERIALIZATION_NVP(m_broker_last_datetime);
         ar& BOOST_SERIALIZATION_NVP(m_broker_list);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

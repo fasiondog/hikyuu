@@ -97,6 +97,7 @@ AFPtr AllocateFundsBase::clone() {
 
     p->m_params = m_params;
     p->m_name = m_name;
+    p->m_is_python_object = m_is_python_object;
     p->m_query = m_query;
 
     /* m_tm, m_cash_tm 由 PF 运行时指定，不需要 clone

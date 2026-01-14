@@ -113,8 +113,8 @@ public:
      */
     virtual json lastSuggestion() const;
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 private:
@@ -139,6 +139,7 @@ protected:
 
     KQuery m_query;         // 关联的查询条件
     bool m_need_calculate;  // 是否需要计算标志
+    bool m_is_python_object{false};
 
     SystemList m_real_sys_list;  // 所有实际运行的子系统列表
 
@@ -160,6 +161,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_query);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }
 
     template <class Archive>
@@ -171,6 +173,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_query);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

@@ -15,8 +15,17 @@ class PySignalBase : public SignalBase {
     PY_CLONE(PySignalBase, SignalBase)
 
 public:
-    using SignalBase::SignalBase;
-    PySignalBase(const SignalBase& base) : SignalBase(base) {}
+    PySignalBase() : SignalBase() {
+        m_is_python_object = true;
+    }
+
+    PySignalBase(const string& name) : SignalBase(name) {
+        m_is_python_object = true;
+    }
+
+    PySignalBase(const SignalBase& base) : SignalBase(base) {
+        m_is_python_object = true;
+    }
 
     void _calculate(const KData& kdata) override {
         PYBIND11_OVERLOAD_PURE(void, SignalBase, _calculate, kdata);

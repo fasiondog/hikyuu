@@ -52,6 +52,8 @@ StoplossPtr StoplossBase::clone() {
         return shared_from_this();
     }
 
+    p->m_is_python_object = m_is_python_object;
+    p->m_name = m_name;
     p->m_params = m_params;
     // p->m_tm = m_tm;
     p->m_kdata = m_kdata;

@@ -125,6 +125,7 @@ PortfolioPtr Portfolio::clone() {
     PortfolioPtr p = _clone();
     p->m_params = m_params;
     p->m_name = m_name;
+    p->m_is_python_object = m_is_python_object;
     p->m_query = m_query;
     p->m_need_calculate = true;
     if (m_se)

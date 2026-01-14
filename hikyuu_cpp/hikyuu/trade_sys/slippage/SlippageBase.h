@@ -71,13 +71,14 @@ public:
     /** 子类计算接口，由setTO调用 */
     virtual void _calculate() = 0;
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 protected:
     string m_name;
     KData m_kdata;
+    bool m_is_python_object{false};
 
 //============================================
 // 序列化支持
@@ -88,12 +89,14 @@ private:
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 
