@@ -16,6 +16,7 @@ BOOST_CLASS_EXPORT(hku::IDropna)
 namespace hku {
 
 IDropna::IDropna() : IndicatorImp("DROPNA", 1) {
+    m_need_self_alike_compare = true;
     setParam<DatetimeList>("align_date_list", DatetimeList());
 }
 

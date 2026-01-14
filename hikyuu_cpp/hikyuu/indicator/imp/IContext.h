@@ -21,9 +21,6 @@ public:
     virtual string formula() const override;
     virtual void _calculate(const Indicator& data) override;
     virtual IndicatorImpPtr _clone() override;
-    virtual bool needSelfAlikeCompare() const noexcept override {
-        return true;
-    }
 
     virtual bool selfAlike(const IndicatorImp& other) const noexcept override;
 

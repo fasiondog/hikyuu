@@ -22,10 +22,6 @@ public:
 
     virtual IndicatorImpPtr _clone() override;
 
-    virtual bool needSelfAlikeCompare() const noexcept override {
-        return true;
-    }
-
     virtual bool selfAlike(const IndicatorImp& other) const noexcept override;
 
     virtual void getSelfInnerNodesWithInputConext(vector<IndicatorImpPtr>& nodes) const override;

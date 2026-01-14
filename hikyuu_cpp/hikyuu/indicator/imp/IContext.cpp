@@ -17,12 +17,14 @@ BOOST_CLASS_EXPORT(hku::IContext)
 namespace hku {
 
 IContext::IContext() : IndicatorImp("CONTEXT") {
+    m_need_self_alike_compare = true;
     setParam<bool>("fill_null", false);
     setParam<bool>("use_self_ktype", false);         // 使用自身独立上下文的K线类型
     setParam<bool>("use_self_recover_type", false);  // 使用自身独立上下文的复权类型
 }
 
 IContext::IContext(const Indicator& ref_ind) : IndicatorImp("CONTEXT"), m_ref_ind(ref_ind) {
+    m_need_self_alike_compare = true;
     setParam<bool>("fill_null", false);
     setParam<bool>("use_self_ktype", false);
     setParam<bool>("use_self_recover_type", false);

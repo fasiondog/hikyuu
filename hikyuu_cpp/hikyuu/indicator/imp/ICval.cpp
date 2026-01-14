@@ -14,11 +14,13 @@ BOOST_CLASS_EXPORT(hku::ICval)
 namespace hku {
 
 ICval::ICval() : IndicatorImp("CVAL", 1) {
+    m_need_self_alike_compare = true;
     setParam<double>("value", 0.0);
     setParam<int>("discard", 0);
 }
 
 ICval::ICval(double value, size_t discard) : IndicatorImp("CVAL", 1) {
+    m_need_self_alike_compare = true;
     setParam<double>("value", value);
     setParam<int>("discard", discard);
 }

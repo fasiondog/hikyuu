@@ -384,6 +384,7 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
+    p->m_need_self_alike_compare = m_need_self_alike_compare;
     p->m_discard = m_discard;
     p->m_result_num = m_result_num;
     p->m_context = m_context;

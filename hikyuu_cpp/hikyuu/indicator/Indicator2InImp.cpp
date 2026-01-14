@@ -18,17 +18,20 @@ BOOST_CLASS_EXPORT(hku::Indicator2InImp)
 namespace hku {
 
 Indicator2InImp::Indicator2InImp() : IndicatorImp("Indicator2InImp") {
+    m_need_self_alike_compare = true;
     setParam<bool>("fill_null", true);
 }
 
 Indicator2InImp::Indicator2InImp(const string& name, size_t result_num)
 : IndicatorImp(name, result_num) {
+    m_need_self_alike_compare = true;
     setParam<bool>("fill_null", true);
 }
 
 Indicator2InImp::Indicator2InImp(const string& name, const Indicator& ref_ind, bool fill_null,
                                  size_t result_num)
 : IndicatorImp(name, result_num), m_ref_ind(ref_ind) {
+    m_need_self_alike_compare = true;
     setParam<bool>("fill_null", fill_null);
 }
 

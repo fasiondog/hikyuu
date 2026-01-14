@@ -221,8 +221,8 @@ public:
     void printLeaves(bool show_long_name = false) const;
 
     /* 特殊指标需自己实现 selfAlike 函数的, needSelfAlikeCompare 应返回 true */
-    virtual bool needSelfAlikeCompare() const noexcept {
-        return false;
+    bool needSelfAlikeCompare() const noexcept {
+        return m_need_self_alike_compare;
     }
 
     // 特殊指标需自己实现 selfAlike 函数，返回true表示两个指标等效
@@ -294,6 +294,7 @@ protected:
     vector<value_t>* m_pBuffer[MAX_RESULT_NUM];
 
     bool m_is_python_object{false};
+    bool m_need_self_alike_compare{false};
     bool m_need_calculate{true};
     bool m_param_changed{true};
     OPType m_optype{LEAF};
@@ -325,6 +326,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_context);
         ar& BOOST_SERIALIZATION_NVP(m_old_context);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        ar& BOOST_SERIALIZATION_NVP(m_need_self_alike_compare);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
         ar& BOOST_SERIALIZATION_NVP(m_param_changed);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
@@ -369,6 +371,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_context);
         ar& BOOST_SERIALIZATION_NVP(m_old_context);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        ar& BOOST_SERIALIZATION_NVP(m_need_self_alike_compare);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
         ar& BOOST_SERIALIZATION_NVP(m_param_changed);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
