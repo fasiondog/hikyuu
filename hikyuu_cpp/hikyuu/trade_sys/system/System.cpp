@@ -325,6 +325,7 @@ SystemPtr System::clone() {
     if (m_sp)
         p->m_sp = getParam<bool>("shared_sp") ? m_sp : m_sp->clone();
 
+    p->m_is_python_object = m_is_python_object;
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_stock = m_stock;

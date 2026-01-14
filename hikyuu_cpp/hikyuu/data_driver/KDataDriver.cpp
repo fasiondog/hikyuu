@@ -37,6 +37,7 @@ shared_ptr<KDataDriver> KDataDriver::clone() {
     shared_ptr<KDataDriver> ptr = _clone();
     ptr->m_params = m_params;
     ptr->m_name = m_name;
+    ptr->m_is_python_object = m_is_python_object;
     ptr->_init();
     return ptr;
 }

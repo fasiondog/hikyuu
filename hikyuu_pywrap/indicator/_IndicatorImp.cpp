@@ -15,7 +15,17 @@ class PyIndicatorImp : public IndicatorImp {
     PY_CLONE(PyIndicatorImp, IndicatorImp)
 
 public:
-    using IndicatorImp::IndicatorImp;
+    PyIndicatorImp() : IndicatorImp() {
+        m_is_python_object = true;
+    }
+
+    PyIndicatorImp(const string& name) : IndicatorImp(name) {
+        m_is_python_object = true;
+    }
+
+    PyIndicatorImp(const string& name, size_t result_num) : IndicatorImp(name, result_num) {
+        m_is_python_object = true;
+    }
 
     void _calculate(const Indicator& ind) override {
         PYBIND11_OVERLOAD(void, IndicatorImp, _calculate, ind);
@@ -27,14 +37,6 @@ public:
 
     void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override {
         PYBIND11_OVERLOAD(void, IndicatorImp, _dyn_run_one_step, ind, curPos, step);
-    }
-
-    bool supportIndParam() const override {
-        PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "support_ind_param", supportIndParam, );
-    }
-
-    bool isSerial() const override {
-        PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "is_serial", isSerial, );
     }
 
     void _dyn_calculate(const Indicator& ind) override {
@@ -92,7 +94,6 @@ void export_IndicatorImp(py::module& m) {
       .def("get_param", &IndicatorImp::getParam<boost::any>)
       .def("set_param", &IndicatorImp::setParam<boost::any>)
       .def("have_ind_param", &IndicatorImp::haveIndParam)
-      .def("support_ind_param", &IndicatorImp::supportIndParam)
       .def("get_ind_param", &IndicatorImp::getIndParam)
       .def("set_ind_param", set_ind_param1)
       .def("set_ind_param", set_ind_param2)

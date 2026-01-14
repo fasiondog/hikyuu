@@ -23,10 +23,6 @@ public:
     IDropna();
     virtual ~IDropna();
 
-    virtual bool needSelfAlikeCompare() const noexcept override {
-        return true;
-    }
-
     // 禁止子节点合并, 上级默认已为 false
     // virtual bool selfAlike(const IndicatorImp& other) const noexcept override {
     //     return false;

@@ -130,8 +130,8 @@ public:
     /** 子类计算接口，在setTO中调用 */
     virtual void _calculate(const KData&) = 0;
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 private:
@@ -140,6 +140,7 @@ private:
 protected:
     string m_name;
     KData m_kdata;
+    bool m_is_python_object{false};
     bool m_calculated{false};  // 仅针对 setTO 时的计算
 
     /* 多头持仓 */
@@ -164,6 +165,7 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_hold_long);
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
@@ -177,6 +179,7 @@ private:
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_hold_long);
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);

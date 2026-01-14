@@ -16,7 +16,18 @@ class PyTradeManagerBase : public TradeManagerBase {
     PY_CLONE(PyTradeManagerBase, TradeManagerBase)
 
 public:
-    using TradeManagerBase::TradeManagerBase;
+    PyTradeManagerBase() : TradeManagerBase() {
+        m_is_python_object = true;
+    }
+
+    PyTradeManagerBase(const string& name) : TradeManagerBase(name) {
+        m_is_python_object = true;
+    }
+
+    PyTradeManagerBase(const string& name, const TradeCostPtr& costFunc)
+    : TradeManagerBase(name, costFunc) {
+        m_is_python_object = true;
+    }
 
     void _reset() override {
         PYBIND11_OVERLOAD(void, TradeManagerBase, _reset, );

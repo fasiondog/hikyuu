@@ -109,8 +109,8 @@ public:
         return m_values.cend();
     }
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 protected:
@@ -120,6 +120,7 @@ protected:
     SGPtr m_sg;
     map<Datetime, size_t> m_date_index;
     vector<price_t> m_values;
+    bool m_is_python_object{false};
 
 //============================================
 // 序列化支持
@@ -133,6 +134,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_values);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
     }
 
@@ -142,6 +144,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_values);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
     }
 

@@ -16,8 +16,17 @@ class PySelectorBase : public SelectorBase {
     PY_CLONE(PySelectorBase, SelectorBase)
 
 public:
-    using SelectorBase::SelectorBase;
-    PySelectorBase(const SelectorBase& base) : SelectorBase(base) {}
+    PySelectorBase() : SelectorBase() {
+        m_is_python_object = true;
+    }
+
+    PySelectorBase(const string& name) : SelectorBase(name) {
+        m_is_python_object = true;
+    }
+
+    PySelectorBase(const SelectorBase& base) : SelectorBase(base) {
+        m_is_python_object = true;
+    }
 
     void _reset() override {
         PYBIND11_OVERLOAD(void, SelectorBase, _reset, );
@@ -60,9 +69,15 @@ class PyOptimalSelector : public OptimalSelectorBase {
     OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    PyOptimalSelector() : OptimalSelectorBase("SE_PyOptimal") {}
+    PyOptimalSelector() : OptimalSelectorBase("SE_PyOptimal") {
+        m_is_python_object = false;
+    }
+
     explicit PyOptimalSelector(const py::function& evalfunc)
-    : OptimalSelectorBase("SE_PyOptimal"), m_evaluate(evalfunc) {}
+    : OptimalSelectorBase("SE_PyOptimal"), m_evaluate(evalfunc) {
+        m_is_python_object = false;
+    }
+
     virtual ~PyOptimalSelector() = default;
 
 public:

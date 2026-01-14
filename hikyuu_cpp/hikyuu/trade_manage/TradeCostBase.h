@@ -107,12 +107,13 @@ public:
     virtual TradeCostPtr _clone() = 0;
 
 protected:
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
-private:
+protected:
     string m_name;
+    bool m_is_python_object{false};
 
 //============================================
 // 序列化支持
@@ -123,6 +124,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */

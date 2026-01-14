@@ -163,8 +163,8 @@ public:
     /** 在已有过滤基础上追加过滤，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤 */
     void addScoresFilter(const ScoresFilterPtr& filter);
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 private:
@@ -176,6 +176,7 @@ protected:
 
 protected:
     string m_name;
+    bool m_is_python_object{false};
     bool m_calculated{false};  // 是否已计算过
     bool m_proto_calculated{false};
     KQuery m_query;
@@ -195,6 +196,7 @@ private:
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
         ar& BOOST_SERIALIZATION_NVP(m_sc_filter);
@@ -204,6 +206,7 @@ private:
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
         ar& BOOST_SERIALIZATION_NVP(m_sc_filter);

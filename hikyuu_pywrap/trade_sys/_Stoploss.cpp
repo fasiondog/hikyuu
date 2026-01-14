@@ -15,8 +15,17 @@ class PyStoplossBase : public StoplossBase {
     PY_CLONE(PyStoplossBase, StoplossBase)
 
 public:
-    using StoplossBase::StoplossBase;
-    PyStoplossBase(const StoplossBase& base) : StoplossBase(base) {}
+    PyStoplossBase() : StoplossBase() {
+        m_is_python_object = true;
+    }
+
+    PyStoplossBase(const string& name) : StoplossBase(name) {
+        m_is_python_object = true;
+    }
+
+    PyStoplossBase(const StoplossBase& base) : StoplossBase(base) {
+        m_is_python_object = true;
+    }
 
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, StoplossBase, _calculate, );

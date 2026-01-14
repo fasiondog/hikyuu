@@ -38,6 +38,7 @@ ScoresFilterPtr ScoresFilterBase::clone() {
     auto p = _clone();
     p->m_params = m_params;
     p->m_name = m_name;
+    p->m_is_python_object = m_is_python_object;
 
     if (m_child) {
         p->m_child = m_child->clone();

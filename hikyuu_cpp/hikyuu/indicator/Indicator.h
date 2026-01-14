@@ -176,7 +176,6 @@ public:
         return m_imp->getParam<ValueType>(name);
     }
 
-    bool supportIndParam() const;
     bool haveIndParam(const string& name) const;
     void setIndParam(const string& name, const Indicator& ind);
     void setIndParam(const string& name, const IndParam& ind);
@@ -212,6 +211,8 @@ public:
     }
 
     string str() const;
+
+    bool isPythonObject() const;
 
 public:
     class Iterator {
@@ -387,8 +388,8 @@ inline const IndicatorImpPtr Indicator::getIndParamImp(const string& name) const
     return m_imp ? m_imp->getIndParamImp(name) : IndicatorImpPtr();
 }
 
-inline bool Indicator::supportIndParam() const {
-    return m_imp ? m_imp->supportIndParam() : false;
+inline bool Indicator::isPythonObject() const {
+    return m_imp ? m_imp->isPythonObject() : false;
 }
 
 //--------------------------------------------------------------

@@ -138,6 +138,11 @@ public:
 
     IndicatorImpPtr clone();
 
+    bool isPythonObject() const;
+
+    /** 仅用于两个结果集数量相同、长度相同的指标交换数据，不交换其他参数。失败抛出异常 */
+    void swap(IndicatorImp* other);
+
     bool haveIndParam(const string& name) const;
     void setIndParam(const string& name, const Indicator& ind);
     void setIndParam(const string& name, const IndParam& ind);
@@ -152,11 +157,7 @@ public:
     // ===================
     virtual void _calculate(const Indicator&);
 
-    /** 是否支持动态周期指标参数 */
-    virtual bool supportIndParam() const {
-        return false;
-    }
-
+    /** 动态周期计算，子类可重载该函数，默认不支持动态周期计算 */
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
     /** 是否支持增量计算 */
@@ -169,8 +170,8 @@ public:
     virtual void _increment_calculate(const Indicator& ind, size_t start_pos) {}
 
     /** 是否必须串行计算 */
-    virtual bool isSerial() const {
-        return false;
+    bool isSerial() const {
+        return m_is_serial;
     }
 
     virtual IndicatorImpPtr _clone() {
@@ -216,8 +217,8 @@ public:
     void printLeaves(bool show_long_name = false) const;
 
     /* 特殊指标需自己实现 selfAlike 函数的, needSelfAlikeCompare 应返回 true */
-    virtual bool needSelfAlikeCompare() const noexcept {
-        return false;
+    bool needSelfAlikeCompare() const noexcept {
+        return m_need_self_alike_compare;
     }
 
     // 特殊指标需自己实现 selfAlike 函数，返回true表示两个指标等效
@@ -280,8 +281,6 @@ protected:
     // 用于动态参数时，更新 discard
     void _update_discard(bool force = false);
 
-    virtual bool isPythonObject() const;
-
 protected:
     string m_name;
     size_t m_discard{0};
@@ -290,6 +289,9 @@ protected:
     KData m_old_context;
     vector<value_t>* m_pBuffer[MAX_RESULT_NUM];
 
+    bool m_is_python_object{false};
+    bool m_need_self_alike_compare{false};
+    bool m_is_serial{false};
     bool m_need_calculate{true};
     bool m_param_changed{true};
     OPType m_optype{LEAF};
@@ -320,6 +322,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_result_num);
         ar& BOOST_SERIALIZATION_NVP(m_context);
         ar& BOOST_SERIALIZATION_NVP(m_old_context);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        ar& BOOST_SERIALIZATION_NVP(m_need_self_alike_compare);
+        ar& BOOST_SERIALIZATION_NVP(m_is_serial);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
         ar& BOOST_SERIALIZATION_NVP(m_param_changed);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
@@ -363,6 +368,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_result_num);
         ar& BOOST_SERIALIZATION_NVP(m_context);
         ar& BOOST_SERIALIZATION_NVP(m_old_context);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        ar& BOOST_SERIALIZATION_NVP(m_need_self_alike_compare);
+        ar& BOOST_SERIALIZATION_NVP(m_is_serial);
         ar& BOOST_SERIALIZATION_NVP(m_need_calculate);
         ar& BOOST_SERIALIZATION_NVP(m_param_changed);
         ar& BOOST_SERIALIZATION_NVP(m_optype);
@@ -422,12 +430,9 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
-#define INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE                                                    \
-public:                                                                                        \
-    virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override; \
-    virtual bool supportIndParam() const override {                                            \
-        return true;                                                                           \
-    }
+#define INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE \
+public:                                     \
+    virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override;
 
 #define INDICATOR_IMP_SUPPORT_INCREMENT                                                 \
 public:                                                                                 \
@@ -514,7 +519,7 @@ inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t disc
 }
 
 inline bool IndicatorImp::isPythonObject() const {
-    return false;
+    return m_is_python_object;
 }
 
 inline IndicatorImpPtr IndicatorImp::getRightNode() const {

@@ -16,6 +16,7 @@ BOOST_CLASS_EXPORT(hku::IBackset)
 namespace hku {
 
 IBackset::IBackset() : IndicatorImp("BACKSET", 1) {
+    m_is_serial = true;
     setParam<int>("n", 2);
 }
 

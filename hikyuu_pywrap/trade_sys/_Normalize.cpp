@@ -15,9 +15,17 @@ class PyNormalizeBase : public NormalizeBase {
     PY_CLONE(PyNormalizeBase, NormalizeBase)
 
 public:
-    using NormalizeBase::NormalizeBase;
+    PyNormalizeBase() : NormalizeBase() {
+        m_is_python_object = true;
+    }
 
-    PyNormalizeBase(const NormalizeBase& base) : NormalizeBase(base) {}
+    PyNormalizeBase(const string& name) : NormalizeBase(name) {
+        m_is_python_object = true;
+    }
+
+    PyNormalizeBase(const NormalizeBase& base) : NormalizeBase(base) {
+        m_is_python_object = true;
+    }
 
     PriceList normalize(const PriceList& data) override {
         PYBIND11_OVERRIDE_PURE(PriceList, NormalizeBase, normalize, data);

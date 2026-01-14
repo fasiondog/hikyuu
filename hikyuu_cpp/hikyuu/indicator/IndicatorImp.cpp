@@ -342,10 +342,10 @@ string IndicatorImp::str() const {
     os << "Indicator{\n"
        << "  name: " << name() << "\n  size: " << size() << "\n  discard: " << discard()
        << "\n  result sets: " << getResultNumber() << "\n  params: " << getParameter()
-       << "\n  support indicator param: " << (supportIndParam() ? "True" : "False");
-    if (supportIndParam()) {
+       << "\n  is python object: " << (isPythonObject() ? "True" : "False");
+    const auto &ind_params = getIndParams();
+    if (!ind_params.empty()) {
         os << "\n  ind params: {";
-        const auto &ind_params = getIndParams();
         for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
             os << iter->first << ": " << iter->second->formula() << ", ";
         }
@@ -366,10 +366,25 @@ string IndicatorImp::str() const {
     return os.str();
 }
 
+void IndicatorImp::swap(IndicatorImp *other) {
+    HKU_ASSERT(other != nullptr);
+    HKU_IF_RETURN(this == other, void());
+    HKU_CHECK(other->m_result_num == m_result_num, "indicator result num not equal!");
+    HKU_CHECK(other->size() == size(), "indicator size not equal!");
+    for (size_t r = 0; r < m_result_num; ++r) {
+        vector<value_t> *tmp = m_pBuffer[r];
+        m_pBuffer[r] = other->m_pBuffer[r];
+        other->m_pBuffer[r] = tmp;
+    }
+}
+
 IndicatorImpPtr IndicatorImp::clone() {
     IndicatorImpPtr p = _clone();
     p->m_params = m_params;
     p->m_name = m_name;
+    p->m_is_python_object = m_is_python_object;
+    p->m_need_self_alike_compare = m_need_self_alike_compare;
+    p->m_is_serial = m_is_serial;
     p->m_discard = m_discard;
     p->m_result_num = m_result_num;
     p->m_context = m_context;

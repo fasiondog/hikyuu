@@ -276,8 +276,8 @@ public:
     // 处理延迟买入请求，仅供 PF 调用
     virtual TradeRecord pfProcessDelayBuyRequest(const Datetime& date);
 
-    virtual bool isPythonObject() const {
-        return false;
+    bool isPythonObject() const {
+        return m_is_python_object;
     }
 
 private:
@@ -351,6 +351,7 @@ protected:
     KData m_kdata;
     KData m_src_kdata;  // 未复权的原始 K 线数据
 
+    bool m_is_python_object{false};
     bool m_calculated;  // 控制是否需要重新计算
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
@@ -393,6 +394,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_kdata);
         ar& BOOST_SERIALIZATION_NVP(m_stock);
 
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_calculated);
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
@@ -427,6 +429,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_kdata);
         ar& BOOST_SERIALIZATION_NVP(m_stock);
 
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_calculated);
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);

@@ -15,8 +15,17 @@ class PyMoneyManagerBase : public MoneyManagerBase {
     PY_CLONE(PyMoneyManagerBase, MoneyManagerBase)
 
 public:
-    using MoneyManagerBase::MoneyManagerBase;
-    PyMoneyManagerBase(const MoneyManagerBase& base) : MoneyManagerBase(base) {}
+    PyMoneyManagerBase() : MoneyManagerBase() {
+        m_is_python_object = true;
+    }
+
+    PyMoneyManagerBase(const string& name) : MoneyManagerBase(name) {
+        m_is_python_object = true;
+    }
+
+    PyMoneyManagerBase(const MoneyManagerBase& base) : MoneyManagerBase(base) {
+        m_is_python_object = true;
+    }
 
     void _reset() override {
         PYBIND11_OVERLOAD(void, MoneyManagerBase, _reset, );

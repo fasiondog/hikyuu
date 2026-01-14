@@ -94,11 +94,13 @@ void KData::tocsv(const string& filename) {
 }
 
 KData KData::getKData(const Datetime& start, const Datetime& end) const {
+    KData ret;
     const Stock& stk = getStock();
-    HKU_IF_RETURN(stk.isNull(), KData());
+    HKU_IF_RETURN(stk.isNull(), ret);
 
     const KQuery& query = getQuery();
-    return KData(stk, KQueryByDate(start, end, query.kType(), query.recoverType()));
+    ret = KData(stk, KQueryByDate(start, end, query.kType(), query.recoverType()));
+    return ret;
 }
 
 KData KData::getKData(int64_t start, int64_t end) const {
@@ -127,19 +129,15 @@ KData KData::getKData(int64_t start, int64_t end) const {
     return KData(getStock(), query);
 }
 
-KData KData::getKData(const KQuery::KType& ktype) const {
-    const Stock& stk = getStock();
-    HKU_IF_RETURN(stk.isNull(), KData());
-
+KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime& end_datetime,
+                                  const KQuery::KType& ktype) const {
     const KQuery& query = getQuery();
-    HKU_IF_RETURN(query.kType() == ktype, *this);
+    if (getStock().isNull()) {
+        return KQueryByDate(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType());
+    }
 
-    if (empty()) {
-        if (query.queryType() == KQuery::INDEX) {
-            return KData(stk, KQuery(0, 0, ktype, query.recoverType()));
-        }
-        return KData(
-          stk, KQuery(query.startDatetime(), query.endDatetime(), ktype, query.recoverType()));
+    if (empty() && query.queryType() == KQuery::INDEX) {
+        return KQuery(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType());
     }
 
     Datetime end;
@@ -148,9 +146,15 @@ KData KData::getKData(const KQuery::KType& ktype) const {
         end = Null<Datetime>();
     } else {
         end = this->back().datetime;
+        if (end_datetime < end) {
+            end = end_datetime;
+        }
     }
 
     Datetime start = this->front().datetime;
+    if (start_datetime > start) {
+        start = start_datetime;
+    }
 
     auto day_ktype_seconds = KQuery::getKTypeInSeconds(KQuery::DAY);
     // 从日线及以上转日线以下
@@ -167,7 +171,15 @@ KData KData::getKData(const KQuery::KType& ktype) const {
         start = start.startOfDay();
     }
 
-    return KData(stk, KQuery(start, end, ktype, query.recoverType()));
+    return KQuery(start, end, ktype, query.recoverType());
+}
+
+KData KData::getKData(const KQuery::KType& ktype) const {
+    KData ret;
+    const Stock& stk = getStock();
+    HKU_IF_RETURN(stk.isNull(), ret);
+    ret = stk.getKData(getOtherQueryByDate(front().datetime, back().datetime, ktype));
+    return ret;
 }
 
 Indicator KData::open() const {

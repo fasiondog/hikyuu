@@ -19,15 +19,6 @@ ITime::ITime() : IndicatorImp("TIME") {
 
 ITime::~ITime() {}
 
-// ITime::ITime(const KData& k, const string& type) : IndicatorImp() {
-//     string type_name(type);
-//     to_upper(type_name);
-//     m_name = type_name;
-//     setParam<string>("type", type_name);
-//     onlySetContext(k);
-//     ITime::_calculate(Indicator());
-// }
-
 void ITime::_checkParam(const string& name) const {
     if ("type" == name) {
         string param_type = getParam<string>("type");

@@ -18,7 +18,13 @@ class PyKDataDriver : public KDataDriver {
     PY_CLONE(PyKDataDriver, KDataDriver)
 
 public:
-    using KDataDriver::KDataDriver;
+    PyKDataDriver() : KDataDriver() {
+        m_is_python_object = true;
+    }
+
+    PyKDataDriver(const string& name) : KDataDriver(name) {
+        m_is_python_object = true;
+    }
 
     bool _init() override {
         PYBIND11_OVERLOAD(bool, KDataDriver, _init, );

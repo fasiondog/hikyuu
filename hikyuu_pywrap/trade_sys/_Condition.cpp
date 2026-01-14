@@ -15,9 +15,17 @@ class PyConditionBase : public ConditionBase {
     PY_CLONE(PyConditionBase, ConditionBase)
 
 public:
-    using ConditionBase::ConditionBase;
+    PyConditionBase() : ConditionBase() {
+        m_is_python_object = true;
+    }
 
-    PyConditionBase(const ConditionBase& base) : ConditionBase(base) {}
+    PyConditionBase(const string& name) : ConditionBase(name) {
+        m_is_python_object = true;
+    }
+
+    PyConditionBase(const ConditionBase& base) : ConditionBase(base) {
+        m_is_python_object = true;
+    }
 
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, ConditionBase, _calculate, );
