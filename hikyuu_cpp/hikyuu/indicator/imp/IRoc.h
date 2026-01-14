@@ -15,6 +15,7 @@
 
 namespace hku {
 
+// 变动率指标 ((price / prevPrice)-1)*100
 class IRoc : public hku::IndicatorImp {
     INDICATOR_IMP(IRoc)
     INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
@@ -24,6 +25,9 @@ public:
     IRoc();
     virtual ~IRoc();
     virtual void _checkParam(const string& name) const override;
+
+    virtual bool supportIncrementCalculate() const override;
+    virtual void _increment_calculate(const Indicator& ind, size_t start_pos) override;
 };
 
 } /* namespace hku */

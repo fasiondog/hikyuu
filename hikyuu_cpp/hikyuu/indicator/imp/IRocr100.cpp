@@ -61,6 +61,23 @@ void IRocr100::_calculate(const Indicator& ind) {
     }
 }
 
+bool IRocr100::supportIncrementCalculate() const {
+    return getParam<int>("n") > 0;
+}
+
+void IRocr100::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    size_t total = ind.size();
+    int n = getParam<int>("n");
+
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
+    for (size_t i = start_pos; i < total; i++) {
+        price_t pre_price = src[i - n];
+        dst[i] = (pre_price != 0.0) ? (src[i] / pre_price) * 100.0 : 0.0;
+    }
+}
+
 void IRocr100::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     size_t start = 0;
     if (0 == step) {
