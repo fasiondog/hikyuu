@@ -369,13 +369,23 @@ string IndicatorImp::str() const {
 void IndicatorImp::swap(IndicatorImp *other) {
     HKU_ASSERT(other != nullptr);
     HKU_IF_RETURN(this == other, void());
-    HKU_CHECK(other->m_result_num == m_result_num, "indicator result num not equal!");
-    HKU_CHECK(other->size() == size(), "indicator size not equal!");
+    HKU_ASSERT(other->m_result_num == m_result_num);
+    HKU_ASSERT(other->size() == size());
     for (size_t r = 0; r < m_result_num; ++r) {
         vector<value_t> *tmp = m_pBuffer[r];
         m_pBuffer[r] = other->m_pBuffer[r];
         other->m_pBuffer[r] = tmp;
     }
+}
+
+void IndicatorImp::swap(IndicatorImp *other, size_t other_result_idx, size_t self_result_idx) {
+    HKU_ASSERT(other != nullptr);
+    HKU_ASSERT(other->size() == size());
+    HKU_ASSERT(other_result_idx < other->m_result_num);
+    HKU_ASSERT(self_result_idx < m_result_num);
+    vector<value_t> *tmp = m_pBuffer[self_result_idx];
+    m_pBuffer[self_result_idx] = other->m_pBuffer[other_result_idx];
+    other->m_pBuffer[other_result_idx] = tmp;
 }
 
 IndicatorImpPtr IndicatorImp::clone() {
@@ -867,25 +877,13 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
         return false;
     }
 
-    if (copy_start_pos < m_discard) {
-        copy_len = m_old_context.size() - m_discard;
-        for (size_t r = 0; r < m_result_num; ++r) {
-            if (m_pBuffer[r] == nullptr) {
-                return false;
-            }
-            m_pBuffer[r]->resize(total, Null<value_t>());
-            auto *dst = this->data(r);
-            memmove(dst + copy_start_pos, dst + m_discard, sizeof(value_t) * (copy_len));
+    for (size_t r = 0; r < m_result_num; ++r) {
+        if (m_pBuffer[r] == nullptr) {
+            return false;
         }
-    } else {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            if (m_pBuffer[r] == nullptr) {
-                return false;
-            }
-            m_pBuffer[r]->resize(total, Null<value_t>());
-            auto *dst = this->data(r);
-            memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
-        }
+        m_pBuffer[r]->resize(total, Null<value_t>());
+        auto *dst = this->data(r);
+        memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
     }
 
     if (start_pos < m_discard) {
