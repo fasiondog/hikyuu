@@ -366,6 +366,18 @@ string IndicatorImp::str() const {
     return os.str();
 }
 
+void IndicatorImp::swap(IndicatorImp *other) {
+    HKU_ASSERT(other != nullptr);
+    HKU_IF_RETURN(this == other, void());
+    HKU_CHECK(other->m_result_num == m_result_num, "indicator result num not equal!");
+    HKU_CHECK(other->size() == size(), "indicator size not equal!");
+    for (size_t r = 0; r < m_result_num; ++r) {
+        vector<value_t> *tmp = m_pBuffer[r];
+        m_pBuffer[r] = other->m_pBuffer[r];
+        other->m_pBuffer[r] = tmp;
+    }
+}
+
 IndicatorImpPtr IndicatorImp::clone() {
     IndicatorImpPtr p = _clone();
     p->m_params = m_params;

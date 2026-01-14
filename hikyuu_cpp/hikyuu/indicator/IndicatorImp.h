@@ -138,6 +138,9 @@ public:
 
     IndicatorImpPtr clone();
 
+    /** 仅用于两个结果集数量相同、长度相同的指标交换数据，不交换其他参数。失败抛出异常 */
+    void swap(IndicatorImp* other);
+
     bool haveIndParam(const string& name) const;
     void setIndParam(const string& name, const Indicator& ind);
     void setIndParam(const string& name, const IndParam& ind);
