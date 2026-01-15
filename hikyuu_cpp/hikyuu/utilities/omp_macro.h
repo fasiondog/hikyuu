@@ -12,7 +12,7 @@
 #if defined(_OPENMP)
 #include <omp.h>
 #define HKU_OMP_PARALLEL_FOR _Pragma("omp parallel for")
-#define OMP_SAFETY_PARALLEL_FOR \
+#define HKU_OMP_SAFETY_PARALLEL_FOR \
     _Pragma("omp parallel for num_threads(omp_get_max_threads()) if (!omp_in_parallel())")
 #define HKU_OMP_CHECK_THRESHOLD(guard, threshold)      \
     if ((guard) > (threshold) && !omp_in_parallel()) { \
@@ -20,6 +20,6 @@
     }
 #else
 #define HKU_OMP_PARALLEL_FOR
-#define OMP_SAFETY_PARALLEL_FOR
+#define HKU_OMP_SAFETY_PARALLEL_FOR
 #define HKU_OMP_CHECK_THRESHOLD(guard, threshold)
 #endif
