@@ -2022,6 +2022,9 @@ void IndicatorImp::_update_discard(bool force) {
             m_discard = discard;
         }
     }
+    if (m_discard > total) {
+        m_discard = total;
+    }
 }
 
 bool IndicatorImp::alike(const IndicatorImp &other) const {

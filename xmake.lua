@@ -190,6 +190,11 @@ add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc 2.11.0", {system = false})
 
+add_requires("openmp", {system = false})
+if is_plat("macosx") then 
+    add_requires("libomp", {system = false})
+end
+
 if has_config("http_client_zip") then
     add_requires("gzip-hpp", {system = false})
 end

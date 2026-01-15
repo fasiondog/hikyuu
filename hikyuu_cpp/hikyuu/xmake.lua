@@ -14,11 +14,15 @@ target("hikyuu")
         end
     end
 
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "xxhash", "eigen")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "xxhash", "eigen", "openmp")
     if is_plat("windows", "linux", "cross", "macosx") then
         if get_config("sqlite") or get_config("hdf5") then
             add_packages("sqlite3")
         end
+    end
+
+    if is_plat("macosx") then
+        add_packages("libomp")
     end
 
     if has_config("http_client_zip") then
@@ -72,7 +76,7 @@ target("hikyuu")
     end
 
     if is_plat("macosx") then
-        add_links("iconv", "sqlite3")
+        add_links("sqlite3")
         add_frameworks("CoreFoundation")
     end
 
