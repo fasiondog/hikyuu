@@ -37,51 +37,6 @@ import os
 BASE_DIR = os.path.dirname(__file__)
 
 
-def check_vcomp_available(vcomp_dll_name: str = "vcomp140.dll") -> tuple[bool, str]:
-    """
-    check if the current Python environment can load the specified vcomp DLL
-    :param vcomp_dll_name: The name of the vcomp DLL to detect (e.g., vcomp140.dll, vcomp143.dll)
-    :return: (Availability, Description of detection results)
-    """
-    search_paths = []
-    search_paths.append(os.getcwd())
-    search_paths.append(os.path.dirname(sys.executable))
-    search_paths.append(os.path.join(os.environ["WINDIR"], "System32"))
-    search_paths.extend(os.environ["PATH"].split(os.pathsep))
-
-    # 步骤3：遍历路径检查DLL文件是否存在
-    dll_full_path = None
-    for path in search_paths:
-        candidate = os.path.join(path, vcomp_dll_name)
-        candidate = os.path.normpath(candidate)
-        if os.path.exists(candidate) and os.path.isfile(candidate):
-            dll_full_path = candidate
-            break
-
-    if not dll_full_path:
-        return (False, f"Not found: {vcomp_dll_name}! serch path: {search_paths}\n")
-
-    try:
-        from ctypes import WinDLL
-        vcomp_dll = WinDLL(dll_full_path)
-        has_core_func = hasattr(vcomp_dll, "_vcomp_get_thread_num")
-        if has_core_func:
-            return (True, f"Success loaded {vcomp_dll_name}! path: {dll_full_path}\n")
-        else:
-            return (False, f"{vcomp_dll_name} The file exists, but there is no core export function (it may be a tampered/incorrect version)")
-    except OSError as e:
-        error_code = e.winerror if hasattr(e, "winerror") else -1
-        if error_code == 126:
-            msg = "The specified module cannot be found (DLL file is corrupted/missing dependencies)"
-        elif error_code == 193:
-            msg = "%1 is not a valid Win32 application (bit mismatch, such as a 32-bit DLL loaded in 64-bit Python)"
-        else:
-            msg = f"Failed to load, Windows error code: {error_code}, description: {e.strerror}"
-        return (False, f"Failed load {vcomp_dll_name}! path: {dll_full_path}\n errmsg: {msg}\n")
-    except Exception as e:
-        return (False, f"Failed load {vcomp_dll_name}! {str(e)}")
-
-
 if sys.platform == 'win32':
     # add_dll_directory() 有时不生效
     os.add_dll_directory(os.path.join(os.path.dirname(__file__), 'cpp'))
@@ -90,11 +45,6 @@ if sys.platform == 'win32':
     dll_directory = os.path.join(BASE_DIR, 'cpp')
     new_path = f"{dll_directory};{current_path}"
     os.environ['PATH'] = new_path
-
-    available, message = check_vcomp_available("vcomp140.dll")
-    if not available:
-        print(message)
-        print("缺失 vcomp140.dll, 需要安装VC运行时, Microsoft 地址：https://aka.ms/vc14/vc_redist.x64.exe")
 else:
     current_path = os.environ.get('LD_LIBRARY_PATH', '')
     dll_directory = os.path.join(BASE_DIR, 'cpp')
