@@ -142,6 +142,7 @@ public:
 
     /** 仅用于两个结果集数量相同、长度相同的指标交换数据，不交换其他参数。失败抛出异常 */
     void swap(IndicatorImp* other);
+    void swap(IndicatorImp* other, size_t other_result_idx, size_t self_result_idx);
 
     bool haveIndParam(const string& name) const;
     void setIndParam(const string& name, const Indicator& ind);
