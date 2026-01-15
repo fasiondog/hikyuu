@@ -21,6 +21,13 @@ target("hikyuu")
         end
     end
 
+    if has_config("omp") then 
+        add_packages("openmp")
+        if is_plat("macosx") then
+            add_packages("libomp")
+        end
+    end
+
     if has_config("http_client_zip") then
         add_packages("gzip-hpp")
     end
@@ -72,7 +79,7 @@ target("hikyuu")
     end
 
     if is_plat("macosx") then
-        add_links("iconv", "sqlite3")
+        add_links("sqlite3")
         add_frameworks("CoreFoundation")
     end
 

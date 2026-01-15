@@ -35,6 +35,8 @@ SOFTWARE.
 import sys
 import os
 BASE_DIR = os.path.dirname(__file__)
+
+
 if sys.platform == 'win32':
     # add_dll_directory() 有时不生效
     os.add_dll_directory(os.path.join(os.path.dirname(__file__), 'cpp'))

@@ -38,6 +38,9 @@ option("log_level", {description = "set log level.", default = 2, values = {1, 2
 option("async_log", {description = "Use async log.", default = false})
 option("leak_check", {description = "Enable leak check for test", default = false})
 
+-- openmp 默认关闭，omp容易在数据不是全部在内存中时容易CPU占满空等，建议调测时使用
+option("omp", {description = "Enable openmp support.", default = false})
+
 -- 不再直接包含 arrow, 此处保留仅作编译兼容，实际不再使用
 option("arrow", {description = "Enable arrow support.(Obsolete, kept only for compatibility)", default = false})
 
@@ -189,6 +192,13 @@ add_requires("nlohmann_json", {system = false})
 add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc 2.11.0", {system = false})
+
+if has_config("omp") then
+    add_requires("openmp", {system = false})
+    if is_plat("macosx") then 
+        add_requires("libomp", {system = false})
+    end
+end
 
 if has_config("http_client_zip") then
     add_requires("gzip-hpp", {system = false})
