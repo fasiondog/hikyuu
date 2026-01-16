@@ -14,6 +14,14 @@
 #include "MQThreadPool.h"
 #include "StealThreadPool.h"
 #include "MQStealThreadPool.h"
+#include "GlobalMQThreadPool.h"
+#include "GlobalStealThreadPool.h"
+#include "GlobalMQStealThreadPool.h"
+#include "GlobalThreadPool.h"
+
+#ifndef HKU_UTILS_API
+#define HKU_UTILS_API
+#endif
 
 //----------------------------------------------------------------
 // Note: 除 ThreadPool/MQThreadPool 外，其他线程池由于使用
@@ -158,6 +166,106 @@ auto parallel_for_index_single(size_t start, size_t end, FunctionType f, size_t 
 
     for (auto& task : tasks) {
         ret.push_back(std::move(task.get()));
+    }
+
+    return ret;
+}
+
+//-------------------------------------------------------
+//-------------------------------------------------------
+void HKU_UTILS_API init_global_task_group(size_t work_num = 0);
+
+void HKU_UTILS_API release_global_task_group();
+
+GlobalStealThreadPool* HKU_UTILS_API get_global_task_group();
+
+size_t HKU_UTILS_API get_global_task_group_work_num();
+
+template <typename FunctionType>
+auto global_parallel_for_void(size_t start, size_t end, FunctionType f) {
+    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+    auto* tg = get_global_task_group();
+    HKU_CHECK(tg, "Global task group is not initialized!");
+
+    size_t work_num = tg->worker_num();
+    auto ranges = parallelIndexRange(start, end, work_num);
+    if (ranges.empty()) {
+        return ret;
+    }
+
+    std::vector<std::future<std::vector<typename std::invoke_result<FunctionType, size_t>::type>>>
+      tasks;
+    for (size_t i = 0, total = ranges.size(); i < total; i++) {
+        tasks.emplace_back(tg->submit([func = f, range = ranges[i]]() {
+            for (size_t ix = range.first; ix < range.second; ix++) {
+                func(ix);
+            }
+        }));
+    }
+
+    for (auto& task : tasks) {
+        task.get();
+    }
+
+    return;
+}
+
+template <typename FunctionType>
+auto global_parallel_for_index(size_t start, size_t end, FunctionType f) {
+    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+    auto* tg = get_global_task_group();
+    HKU_CHECK(tg, "Global task group is not initialized!");
+
+    size_t work_num = tg->worker_num();
+    auto ranges = parallelIndexRange(start, end, work_num);
+    if (ranges.empty()) {
+        return ret;
+    }
+
+    std::vector<std::future<std::vector<typename std::invoke_result<FunctionType, size_t>::type>>>
+      tasks;
+    for (size_t i = 0, total = ranges.size(); i < total; i++) {
+        tasks.emplace_back(tg->submit([func = f, range = ranges[i]]() {
+            std::vector<typename std::invoke_result<FunctionType, size_t>::type> one_ret;
+            for (size_t ix = range.first; ix < range.second; ix++) {
+                one_ret.emplace_back(func(ix));
+            }
+            return one_ret;
+        }));
+    }
+
+    for (auto& task : tasks) {
+        auto one = task.get();
+        for (auto&& value : one) {
+            ret.emplace_back(std::move(value));
+        }
+    }
+
+    return ret;
+}
+
+template <typename FunctionType>
+auto global_parallel_for_range(size_t start, size_t end, FunctionType f) {
+    auto* tg = get_global_task_group();
+    HKU_CHECK(tg, "Global task group is not initialized!");
+
+    typename std::invoke_result<FunctionType, range_t>::type ret;
+    size_t work_num = tg->worker_num();
+    auto ranges = parallelIndexRange(start, end, work_num);
+    if (ranges.empty()) {
+        return ret;
+    }
+
+    std::vector<std::future<typename std::invoke_result<FunctionType, range_t>::type>> tasks;
+    for (size_t i = 0, total = ranges.size(); i < total; i++) {
+        tasks.emplace_back(tg->submit([func = f, range = ranges[i]]() { return func(range); }));
+    }
+
+    for (auto& task : tasks) {
+        auto one = task.get();
+        for (auto&& value : one) {
+            ret.emplace_back(std::move(value));
+        }
     }
 
     return ret;
