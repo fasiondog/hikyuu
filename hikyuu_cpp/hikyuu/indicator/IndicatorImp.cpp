@@ -880,6 +880,7 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
 
     if (copy_len > 0) {
         for (size_t r = 0; r < m_result_num; ++r) {
+            HKU_ASSERT(m_pBuffer[r]);
             m_pBuffer[r]->resize(total, Null<value_t>());
             auto *dst = this->data(r);
             memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
@@ -1825,6 +1826,7 @@ size_t IndicatorImp::increment_execute_if() {
     }
 
     for (size_t r = 0; r < m_result_num; ++r) {
+        HKU_ASSERT(m_pBuffer[r]);
         m_pBuffer[r]->resize(total, Null<value_t>());
         auto *dst = this->data(r);
         memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
