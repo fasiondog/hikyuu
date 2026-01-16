@@ -190,7 +190,11 @@ GlobalStealThreadPool* HKU_UTILS_API get_global_task_group();
 size_t HKU_UTILS_API get_global_task_group_work_num();
 
 // 辅助类，用于确保线程执行状态的正确管理
+#ifdef _MSC_VER
+class ExecutionGuard {
+#else
 class HKU_UTILS_API ExecutionGuard {
+#endif
 private:
     static thread_local bool in_parallel_execution;
     bool* p_flag;
