@@ -37,7 +37,7 @@ Indicator HKU_API POS(const Block& block, KQuery query, SignalPtr sg) {
     }
 
     auto stks = block.getStockList();
-    vector<SGPtr> sgs = parallel_for_index(0, stks.size(), [&](size_t i) {
+    vector<SGPtr> sgs = global_parallel_for_index(0, stks.size(), [&](size_t i) {
         auto tmpsg = sg->clone();
         auto kdata = stks[i].getKData(query);
         tmpsg->setTO(kdata);

@@ -94,7 +94,7 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
 
     } else {
         vector<Indicator> icir =
-          parallel_for_index(0, ind_count, [this, ic_n, ir_n, spearman](size_t ii) {
+          global_parallel_for_index(0, ind_count, [this, ic_n, ir_n, spearman](size_t ii) {
               return ICIR(m_inds[ii], m_stks, m_query, m_ref_stk, ic_n, ir_n, spearman);
           });
 
@@ -105,39 +105,40 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
             }
         }
 
-        return parallel_for_index(0, stk_count, [&, discard, ind_count, days_total](size_t si) {
-            PriceList new_values(days_total, 0.0);
-            PriceList sum_weight(days_total, 0.0);
-            for (size_t di = 0; di < discard; di++) {
-                new_values[di] = Null<price_t>();
-            }
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                const auto* ind_data = all_stk_inds[si][ii].data();
-                const auto* icir_data = icir[ii].data();
-                for (size_t di = discard; di < days_total; di++) {
-                    new_values[di] += ind_data[di] * icir_data[di];
-                    sum_weight[di] += std::abs(icir_data[di]);
-                }
-            }
+        return global_parallel_for_index(
+          0, stk_count, [&, discard, ind_count, days_total](size_t si) {
+              PriceList new_values(days_total, 0.0);
+              PriceList sum_weight(days_total, 0.0);
+              for (size_t di = 0; di < discard; di++) {
+                  new_values[di] = Null<price_t>();
+              }
+              for (size_t ii = 0; ii < ind_count; ii++) {
+                  const auto* ind_data = all_stk_inds[si][ii].data();
+                  const auto* icir_data = icir[ii].data();
+                  for (size_t di = discard; di < days_total; di++) {
+                      new_values[di] += ind_data[di] * icir_data[di];
+                      sum_weight[di] += std::abs(icir_data[di]);
+                  }
+              }
 
-            for (size_t di = discard; di < days_total; di++) {
-                if (!std::isnan(new_values[di]) && sum_weight[di] != 0.0) {
-                    new_values[di] = new_values[di] / sum_weight[di];
-                }
-            }
+              for (size_t di = discard; di < days_total; di++) {
+                  if (!std::isnan(new_values[di]) && sum_weight[di] != 0.0) {
+                      new_values[di] = new_values[di] / sum_weight[di];
+                  }
+              }
 
-            Indicator ret = PRICELIST(new_values);
-            ret.name("ICIR");
+              Indicator ret = PRICELIST(new_values);
+              ret.name("ICIR");
 
-            const auto* data = ret.data();
-            for (size_t di = discard; di < days_total; di++) {
-                if (!std::isnan(data[di])) {
-                    ret.setDiscard(discard);
-                }
-            }
+              const auto* data = ret.data();
+              for (size_t di = discard; di < days_total; di++) {
+                  if (!std::isnan(data[di])) {
+                      ret.setDiscard(discard);
+                  }
+              }
 
-            return ret;
-        });
+              return ret;
+          });
     }
 }
 

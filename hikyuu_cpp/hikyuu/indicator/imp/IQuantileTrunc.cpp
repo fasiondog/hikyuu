@@ -85,11 +85,11 @@ void IQuantileTrunc::_calculate(const Indicator &data) {
     //     dst[i] = quantile_trunc(src, n, quantile_min, quantile_max);
     // }
     const auto *data_ptr = data.data();
-    parallel_for_index_void(m_discard, total,
-                            [n, quantile_min, quantile_max, dst, data_ptr](size_t i) {
-                                auto const *src = data_ptr + 1 + i - n;
-                                dst[i] = quantile_trunc(src, n, quantile_min, quantile_max);
-                            });
+    global_parallel_for_index_void(m_discard, total,
+                                   [n, quantile_min, quantile_max, dst, data_ptr](size_t i) {
+                                       auto const *src = data_ptr + 1 + i - n;
+                                       dst[i] = quantile_trunc(src, n, quantile_min, quantile_max);
+                                   });
 }
 
 Indicator HKU_API QUANTILE_TRUNC(int n, double quantile_min, double quantile_max) {
