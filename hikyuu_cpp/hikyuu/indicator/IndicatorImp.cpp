@@ -105,7 +105,7 @@ string HKU_API getOPTypeName(IndicatorImp::OPType op) {
 }
 
 void IndicatorImp::initDynEngine() {
-    size_t cpu_num = std::thread::hardware_concurrency();
+    size_t cpu_num = std::thread::hardware_concurrency() * 3 / 2;
     if (cpu_num > 64) {
         cpu_num = cpu_num * 10 / 8;
     }

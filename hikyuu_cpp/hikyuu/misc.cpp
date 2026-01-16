@@ -13,7 +13,7 @@ namespace hku {
 
 vector<FundsList> HKU_API parallel_run_sys(const SystemList& system_list, const KQuery& query,
                                            bool reset, bool resetAll) {
-    return global_parallel_for_index(0, system_list.size(), [&](size_t i) {
+    return global_parallel_for_index_single(0, system_list.size(), [&](size_t i) {
         FundsList funds;
         if (system_list[i]) {
             system_list[i]->run(query, reset, resetAll);
@@ -31,7 +31,7 @@ vector<FundsList> HKU_API parallel_run_sys(const SystemList& system_list, const 
 
 vector<FundsList> HKU_API parallel_run_pf(const vector<PFPtr>& pf_list, const KQuery& query,
                                           bool force) {
-    return global_parallel_for_index(0, pf_list.size(), [&](size_t i) {
+    return global_parallel_for_index_single(0, pf_list.size(), [&](size_t i) {
         FundsList funds;
         if (pf_list[i]) {
             pf_list[i]->run(query, force);
