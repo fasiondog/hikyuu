@@ -8,8 +8,6 @@
  */
 
 #pragma once
-#ifndef HIKYUU_UTILITIES_THREAD_STEALTHREADPOOL_H
-#define HIKYUU_UTILITIES_THREAD_STEALTHREADPOOL_H
 
 #include <future>
 #include <thread>
@@ -305,5 +303,3 @@ private:
 };
 
 } /* namespace hku */
-
-#endif /* HIKYUU_UTILITIES_THREAD_STEALTHREADPOOL_H */

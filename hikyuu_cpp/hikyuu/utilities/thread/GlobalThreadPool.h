@@ -8,8 +8,6 @@
  */
 
 #pragma once
-#ifndef HIKYUU_UTILITIES_THREAD_THREADPOOL_H
-#define HIKYUU_UTILITIES_THREAD_THREADPOOL_H
 
 #include <cstdio>
 #include <future>
@@ -220,5 +218,3 @@ private:
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
-
-#endif /* HIKYUU_UTILITIES_THREAD_THREADPOOL_H */
