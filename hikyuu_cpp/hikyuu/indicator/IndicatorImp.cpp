@@ -24,7 +24,7 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 namespace hku {
 
 bool IndicatorImp::ms_enable_increment_calculate{true};
-ThreadPool *IndicatorImp::ms_tg = nullptr;
+GlobalStealThreadPool *IndicatorImp::ms_tg = nullptr;
 
 string HKU_API getOPTypeName(IndicatorImp::OPType op) {
     string name;
@@ -105,25 +105,20 @@ string HKU_API getOPTypeName(IndicatorImp::OPType op) {
 }
 
 void IndicatorImp::initDynEngine() {
-    auto cpu_num = std::thread::hardware_concurrency();
-    if (cpu_num > 32) {
-        cpu_num = 32;
-    } else if (cpu_num >= 4) {
-        cpu_num -= 2;
-    } else if (cpu_num > 1) {
-        cpu_num--;
+    size_t cpu_num = std::thread::hardware_concurrency();
+    if (cpu_num > 64) {
+        cpu_num = cpu_num * 10 / 8;
     }
-    ms_tg = new ThreadPool(cpu_num);
-    HKU_CHECK(ms_tg, "Failed init indicator dynamic engine");
+
+    // 由于 GlobalInitializer 机制，目前借用在此处初始化全局任务组
+    init_global_task_group(cpu_num);
+    ms_tg = get_global_task_group();
 }
 
 void IndicatorImp::releaseDynEngine() {
     HKU_TRACE("releaseDynEngine");
-    if (ms_tg) {
-        ms_tg->stop();
-        delete ms_tg;
-        ms_tg = nullptr;
-    }
+    release_global_task_group();
+    ms_tg = nullptr;
 }
 
 HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {

@@ -77,8 +77,6 @@ void GlobalInitializer::init() {
     TA_Initialize();
 #endif
 
-    init_global_task_group();
-
     DataDriverFactory::init();
     StockManager::instance();
     IndicatorImp::initDynEngine();
@@ -115,8 +113,6 @@ void GlobalInitializer::clean() {
         tg->stop();
     }
 #endif
-
-    release_global_task_group();
 
     sysinfo_clean();
     releaseScheduler();
