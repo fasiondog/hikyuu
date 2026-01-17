@@ -10,6 +10,7 @@
 #include <future>
 #include <functional>
 #include <vector>
+#include <limits>
 #include "ThreadPool.h"
 #include "MQThreadPool.h"
 #include "StealThreadPool.h"
@@ -228,12 +229,14 @@ private:
 };
 
 template <typename FunctionType>
-auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f) {
+auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f,
+                                    size_t threshold = 0) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
+    HKU_IF_RETURN(start >= end, void());
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if (ExecutionGuard::is_executing()) {
+    if ((end - start) < threshold || ExecutionGuard::is_executing()) {
         // 当前线程已经在并行执行环境中，降级为串行执行避免死锁
         for (size_t i = start; i < end; i++) {
             f(i);
@@ -243,8 +246,7 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f) {
 
     ExecutionGuard guard;
 
-    size_t work_num = tg->worker_num();
-    auto ranges = parallelIndexRange(start, end, work_num);
+    auto ranges = parallelIndexRange(start, end, tg->worker_num());
     if (ranges.empty()) {
         return;
     }
@@ -276,13 +278,15 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f) {
 }
 
 template <typename FunctionType>
-auto global_parallel_for_index(size_t start, size_t end, FunctionType f) {
-    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t threshold = 0) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
 
+    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+    HKU_IF_RETURN(start >= end, ret);
+
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if (ExecutionGuard::is_executing()) {
+    if ((end - start) < threshold || ExecutionGuard::is_executing()) {
         // 当前线程已经在并行执行环境中，降级为串行执行避免死锁
         for (size_t i = start; i < end; i++) {
             ret.emplace_back(f(i));
@@ -293,8 +297,7 @@ auto global_parallel_for_index(size_t start, size_t end, FunctionType f) {
     // 使用RAII确保标志位正确清理
     ExecutionGuard guard;
 
-    size_t work_num = tg->worker_num();
-    auto ranges = parallelIndexRange(start, end, work_num);
+    auto ranges = parallelIndexRange(start, end, tg->worker_num());
     if (ranges.empty()) {
         return ret;
     }
@@ -334,13 +337,15 @@ auto global_parallel_for_index(size_t start, size_t end, FunctionType f) {
 }
 
 template <typename FunctionType>
-auto global_parallel_for_range(size_t start, size_t end, FunctionType f) {
+auto global_parallel_for_range(size_t start, size_t end, FunctionType f, size_t threshold = 0) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
 
     typename std::invoke_result<FunctionType, range_t>::type ret;
+    HKU_IF_RETURN(start >= end, ret);
+
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if (ExecutionGuard::is_executing()) {
+    if ((end - start) < threshold || ExecutionGuard::is_executing()) {
         // 当前线程已经在并行执行环境中，降级为串行执行避免死锁
         auto ranges = parallelIndexRange(start, end, tg->worker_num());
         for (size_t i = 0, total = ranges.size(); i < total; i++) {
@@ -354,8 +359,7 @@ auto global_parallel_for_range(size_t start, size_t end, FunctionType f) {
 
     ExecutionGuard guard;
 
-    size_t work_num = tg->worker_num();
-    auto ranges = parallelIndexRange(start, end, work_num);
+    auto ranges = parallelIndexRange(start, end, tg->worker_num());
     if (ranges.empty()) {
         return ret;
     }
@@ -387,14 +391,15 @@ auto global_parallel_for_range(size_t start, size_t end, FunctionType f) {
 }
 
 template <typename FunctionType>
-void global_parallel_for_index_void_single(size_t start, size_t end, FunctionType f) {
+void global_parallel_for_index_void_single(size_t start, size_t end, FunctionType f,
+                                           size_t threshold = 0) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
+    HKU_IF_RETURN(start >= end, void());
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if (ExecutionGuard::is_executing()) {
+    if ((end - start) < threshold || ExecutionGuard::is_executing()) {
         // 当前线程已经在并行执行环境中，降级为串行执行避免死锁
-        HKU_INFO("Current thread is already in parallel execution environment");
         for (size_t i = start; i < end; i++) {
             f(i);
         }
@@ -427,14 +432,16 @@ void global_parallel_for_index_void_single(size_t start, size_t end, FunctionTyp
 }
 
 template <typename FunctionType>
-auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f) {
+auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
+                                      size_t threshold = 0) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
 
     std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+    HKU_IF_RETURN(start >= end, ret);
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if (ExecutionGuard::is_executing()) {
+    if ((end - start) < threshold || ExecutionGuard::is_executing()) {
         // 当前线程已经在并行执行环境中，降级为串行执行避免死锁
         for (size_t i = start; i < end; i++) {
             ret.push_back(f(i));
@@ -444,10 +451,6 @@ auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f) 
 
     // 使用RAII确保标志位正确清理
     ExecutionGuard guard;
-
-    if (start >= end) {
-        return ret;
-    }
 
     std::vector<std::future<typename std::invoke_result<FunctionType, size_t>::type>> tasks;
     for (size_t i = start; i < end; i++) {

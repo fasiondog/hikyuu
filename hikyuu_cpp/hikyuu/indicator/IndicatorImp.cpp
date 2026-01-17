@@ -13,7 +13,6 @@
 #include "Indicator.h"
 #include "IndParam.h"
 #include "../Stock.h"
-#include "../GlobalInitializer.h"
 #include "imp/ICval.h"
 #include "imp/IContext.h"
 
@@ -24,7 +23,6 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 namespace hku {
 
 bool IndicatorImp::ms_enable_increment_calculate{true};
-GlobalStealThreadPool *IndicatorImp::ms_tg = nullptr;
 
 string HKU_API getOPTypeName(IndicatorImp::OPType op) {
     string name;
@@ -102,27 +100,6 @@ string HKU_API getOPTypeName(IndicatorImp::OPType op) {
             break;
     }
     return name;
-}
-
-void IndicatorImp::initDynEngine() {
-    size_t cpu_num = std::thread::hardware_concurrency() * 3 / 2;
-    if (cpu_num > 128) {
-        cpu_num = 128;
-    } else if (cpu_num > 64) {
-        cpu_num = cpu_num * 10 / 8;
-    }
-
-    // 由于 GlobalInitializer 机制，目前借用在此处初始化全局任务组
-    init_global_task_group(cpu_num);
-    ms_tg = get_global_task_group();
-}
-
-void IndicatorImp::releaseDynEngine() {
-    HKU_TRACE("releaseDynEngine");
-    // 目前的 GlobalInitializer 机制，global_task_group 实际可能已经释放
-    // 可能导致 double free, 这里只停止，不负责释放
-    // release_global_task_group();
-    // ms_tg = nullptr;
 }
 
 HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
@@ -1908,10 +1885,8 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     const value_t *param_data = ind_param->data();
 
-    static const size_t minCircleLength = 400;
-    size_t workerNum = ms_tg->worker_num();
-    if (total < minCircleLength || isSerial() || workerNum == 1) {
-        // HKU_INFO("single_thread");
+    static constexpr size_t minCircleLength = 400;
+    if (total < minCircleLength || isSerial()) {
         for (size_t i = ind.discard(); i < total; i++) {
             if (std::isnan(param_data[i])) {
                 _set(Null<value_t>(), i);
@@ -1924,39 +1899,17 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
         return;
     }
 
-    // HKU_INFO("multi_thread");
-    size_t circleLength = minCircleLength;
-    if (minCircleLength * workerNum < total) {
-        size_t tailCount = total % workerNum;
-        circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
-    }
-
-    std::vector<std::future<void>> tasks;
-    for (size_t group = 0; group < workerNum; group++) {
-        size_t first = circleLength * group;
-        if (first >= total) {
-            break;
-        }
-        tasks.push_back(
-          ms_tg->submit([this, &ind, first, circleLength, total, group, param_data]() {
-              size_t endPos = first + circleLength;
-              if (endPos > total) {
-                  endPos = total;
-              }
-              for (size_t i = circleLength * group; i < endPos; i++) {
-                  if (std::isnan(param_data[i])) {
-                      _set(Null<value_t>(), i);
-                  } else {
-                      size_t step = size_t(param_data[i]);
-                      _dyn_run_one_step(ind, i, step);
-                  }
-              }
-          }));
-    }
-
-    for (auto &task : tasks) {
-        task.get();
-    }
+    global_parallel_for_index_void(
+      ind.discard(), total,
+      [&ind, param_data, this](size_t i) {
+          if (std::isnan(param_data[i])) {
+              _set(Null<value_t>(), i);
+          } else {
+              size_t step = size_t(param_data[i]);
+              _dyn_run_one_step(ind, i, step);
+          }
+      },
+      minCircleLength);
 
     _update_discard();
 }
