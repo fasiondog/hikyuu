@@ -309,7 +309,7 @@ public:
 
 protected:
     static bool ms_enable_increment_calculate;
-    static ThreadPool* ms_tg;
+    static GlobalStealThreadPool* ms_tg;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

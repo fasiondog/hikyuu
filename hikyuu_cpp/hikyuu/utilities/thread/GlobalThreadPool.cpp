@@ -22,6 +22,7 @@ thread_local InterruptFlag GlobalMQThreadPool::m_thread_need_stop;
 thread_local WorkStealQueue* GlobalStealThreadPool::m_local_work_queue = nullptr;
 thread_local int GlobalStealThreadPool::m_index = -1;
 thread_local InterruptFlag GlobalStealThreadPool::m_thread_need_stop;
+thread_local std::thread::id GlobalStealThreadPool::m_thread_id;
 
 thread_local MQStealQueue<GlobalMQStealThreadPool::task_type>*
   GlobalMQStealThreadPool::m_local_work_queue = nullptr;

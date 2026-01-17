@@ -42,7 +42,7 @@ void IWinner::_calculate(const Indicator &data) {
     HKU_IF_RETURN(m_discard >= total, void());
     cost_data[0] = cost_list[0].data();
 
-    parallel_for_index_void(1, 101, [&cost_data, &cost_list, &context](size_t i) {
+    global_parallel_for_index_void(1, 101, [&cost_data, &cost_list, &context](size_t i) {
         cost_list[i] = COST(i)(context);
         cost_data[i] = cost_list[i].data();
     });

@@ -186,7 +186,7 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
                                               const DatetimeList& dates, size_t test_len,
                                               bool trace) {
     // SPEND_TIME(OptimalSelectorBase_calculate_parallel);
-    auto sys_list = parallel_for_index(
+    auto sys_list = global_parallel_for_index(
       0, train_ranges.size(), [this, &train_ranges, &dates, query = m_query, trace](size_t i) {
           Datetime start_date = dates[train_ranges[i].first];
           Datetime end_date = dates[train_ranges[i].second];

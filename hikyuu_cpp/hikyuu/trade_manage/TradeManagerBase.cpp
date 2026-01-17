@@ -77,7 +77,7 @@ std::vector<std::pair<Datetime, double>> TradeManagerBase::getProfitPercentYearl
 
 vector<FundsList> HKU_API getFundsList(const vector<TMPtr>& tm_list,
                                        const DatetimeList& ref_dates) {
-    return parallel_for_index(0, tm_list.size(), [&](size_t i) {
+    return global_parallel_for_index(0, tm_list.size(), [&](size_t i) {
         FundsList funds;
         if (tm_list[i]) {
             funds = tm_list[i]->getFundsList(ref_dates);

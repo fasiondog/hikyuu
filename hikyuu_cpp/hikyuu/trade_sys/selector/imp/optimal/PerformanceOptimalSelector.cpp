@@ -169,7 +169,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
   const vector<std::pair<size_t, size_t>>& train_ranges, const DatetimeList& dates,
   const string& key, int mode, size_t test_len, bool trace) {
     // SPEND_TIME(OptimalSelector_calculate_parallel);
-    auto sys_list = parallel_for_index(
+    auto sys_list = global_parallel_for_index(
       0, train_ranges.size(),
       [this, &train_ranges, &dates, query = m_query, trace, key, mode](size_t i) {
           Datetime start_date = dates[train_ranges[i].first];

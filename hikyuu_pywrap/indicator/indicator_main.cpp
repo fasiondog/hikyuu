@@ -32,7 +32,7 @@ void export_indicator_main(py::module& m) {
           HKU_IF_RETURN(len(inds) == 0, ret);
           IndicatorList cinds = python_list_to_vector<Indicator>(inds);
           ret = vector_to_python_list(
-            parallel_for_index(0, cinds.size(), [&](size_t i) { return cinds[i](kdata); }));
+            global_parallel_for_index(0, cinds.size(), [&](size_t i) { return cinds[i](kdata); }));
           return ret;
       },
       R"(batch_calculate_inds(inds, kdata) -> list)

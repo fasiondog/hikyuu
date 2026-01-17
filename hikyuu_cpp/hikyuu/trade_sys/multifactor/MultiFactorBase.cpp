@@ -555,7 +555,7 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
         }
         return all_returns;
     } else {
-        return parallel_for_index(0, m_stks.size(), [this, ndays, fill_null](size_t i) {
+        return global_parallel_for_index(0, m_stks.size(), [this, ndays, fill_null](size_t i) {
             auto k = m_stks[i].getKData(m_query);
             return ALIGN(ROCP(k.close(), ndays), m_ref_dates, fill_null);
         });
@@ -709,7 +709,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
     bool parallel = getParam<bool>("parallel");
     if (parallel) {
-        parallel_for_index_void(
+        global_parallel_for_index_void(
           0, stk_count,
           [this, &all_stk_inds, &null_ind, &use_style_inds, ind_count, fill_null](size_t i) {
               const auto& stk = m_stks[i];
@@ -767,7 +767,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     if (m_norm || !m_special_category.empty() || !m_special_style_inds.empty()) {
         unordered_map<string, PriceList> ind_dummy_dict = _buildDummyIndex();
         if (parallel) {
-            parallel_for_index_void(
+            global_parallel_for_index_void(
               0, days_total,
               [this, stk_count, ind_count, sub_norm = m_norm ? m_norm->clone() : m_norm,
                &all_stk_inds, &ind_dummy_dict, &use_style_inds](size_t di) {

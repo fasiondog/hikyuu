@@ -8,8 +8,6 @@
  */
 
 #pragma once
-#ifndef HIKYUU_UTILITIES_THREAD_STEALTHREADPOOL_H
-#define HIKYUU_UTILITIES_THREAD_STEALTHREADPOOL_H
 
 #include <future>
 #include <thread>
@@ -116,13 +114,16 @@ public:
         typedef typename std::invoke_result<FunctionType>::type result_type;
         std::packaged_task<result_type()> task(f);
         task_handle<result_type> res(task.get_future());
-        if (m_local_work_queue) {
+
+        std::thread::id id = std::this_thread::get_id();
+        if (m_local_work_queue && id == m_thread_id) {
             // 本地线程任务从前部入队列（递归成栈）
             m_local_work_queue->push_front(std::move(task));
         } else {
             m_master_work_queue.push(std::move(task));
             m_cv.notify_one();
         }
+
         return res;
     }
 
@@ -164,6 +165,7 @@ public:
         for (size_t i = 0; i < m_worker_num; i++) {
             m_queues[i]->clear();
         }
+        m_threads.clear();
     }
 
     /**
@@ -223,6 +225,7 @@ public:
         for (size_t i = 0; i < m_worker_num; i++) {
             m_queues[i]->clear();
         }
+        m_threads.clear();
     }
 
 private:
@@ -243,13 +246,16 @@ private:
     inline static thread_local WorkStealQueue* m_local_work_queue = nullptr;  // 本地任务队列
     inline static thread_local int m_index = -1;                              // 在线程池中的序号
     inline static thread_local InterruptFlag m_thread_need_stop;              // 线程停止运行指示
+    inline static thread_local std::thread::id m_thread_id;
 #else
     static thread_local WorkStealQueue* m_local_work_queue;  // 本地任务队列
     static thread_local int m_index;                         // 在线程池中的序号
     static thread_local InterruptFlag m_thread_need_stop;    // 线程停止运行指示
+    static thread_local std::thread::id m_thread_id;
 #endif
 
     void worker_thread(int index) {
+        m_thread_id = std::this_thread::get_id();
         m_interrupt_flags[index] = &m_thread_need_stop;
         m_index = index;
         m_local_work_queue = m_queues[index].get();
@@ -279,6 +285,7 @@ private:
         } else if (pop_task_from_other_thread_queue(task)) {
             task();
         } else {
+            // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
             m_cv.wait(lk, [this] { return this->m_done || !this->m_master_work_queue.empty(); });
         }
@@ -305,5 +312,3 @@ private:
 };
 
 } /* namespace hku */
-
-#endif /* HIKYUU_UTILITIES_THREAD_STEALTHREADPOOL_H */

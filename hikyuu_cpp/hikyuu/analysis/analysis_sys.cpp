@@ -23,7 +23,7 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_li
     HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 
-    result = parallel_for_index(0, total, [&, last_datetime](size_t i) {
+    result = global_parallel_for_index(0, total, [&, last_datetime](size_t i) {
         const auto& sys = sys_list[i];
         const auto& stk = stk_list[i];
 
@@ -60,7 +60,7 @@ vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_li
     HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 
-    result = parallel_for_index(0, total, [&, stk, last_datetime](size_t i) {
+    result = global_parallel_for_index(0, total, [&, stk, last_datetime](size_t i) {
         const auto& sys = sys_list[i];
         AnalysisSystemOutput ret;
         if (!sys || stk.isNull()) {
@@ -148,25 +148,26 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystemMulti(const SystemList& sys_l
     HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 
-    auto all_result = parallel_for_index(0, total, [&, stk, last_datetime, init_val](size_t i) {
-        const auto& sys = sys_list[i];
-        std::pair<double, SYSPtr> ret{init_val, sys};
+    auto all_result =
+      global_parallel_for_index(0, total, [&, stk, last_datetime, init_val](size_t i) {
+          const auto& sys = sys_list[i];
+          std::pair<double, SYSPtr> ret{init_val, sys};
 
-        HKU_ERROR_IF_RETURN(!sys, ret, "sys_list[{}] is null!", i);
+          HKU_ERROR_IF_RETURN(!sys, ret, "sys_list[{}] is null!", i);
 
-        try {
-            sys->run(stk, query);
-            Performance per;
-            per.statistics(sys->getTM(), last_datetime);
-            ret = std::make_pair(per.get(sort_key), sys);
+          try {
+              sys->run(stk, query);
+              Performance per;
+              per.statistics(sys->getTM(), last_datetime);
+              ret = std::make_pair(per.get(sort_key), sys);
 
-        } catch (const std::exception& e) {
-            HKU_ERROR("sys_list[{}] run failed! {}", i, e.what());
-        } catch (...) {
-            HKU_ERROR("sys_list[{}] run failed! Unknown error!", i);
-        }
-        return ret;
-    });
+          } catch (const std::exception& e) {
+              HKU_ERROR("sys_list[{}] run failed! {}", i, e.what());
+          } catch (...) {
+              HKU_ERROR("sys_list[{}] run failed! Unknown error!", i);
+          }
+          return ret;
+      });
 
     if (0 == sort_mode) {
         for (const auto& v : all_result) {

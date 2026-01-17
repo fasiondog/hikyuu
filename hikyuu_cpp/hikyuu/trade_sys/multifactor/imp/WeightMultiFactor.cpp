@@ -72,7 +72,7 @@ vector<Indicator> WeightMultiFactor::_calculate(const vector<vector<Indicator>>&
         return all_factors;
 
     } else {
-        return parallel_for_index(0, stk_count, [&](size_t si) {
+        return global_parallel_for_index(0, stk_count, [&](size_t si) {
             vector<price_t> sumByDate(days_total);
 
             size_t discard = 0;

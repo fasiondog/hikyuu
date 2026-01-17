@@ -22,6 +22,7 @@
 
 #include "utilities/Log.h"
 #include "utilities/os.h"
+#include "utilities/thread/algorithm.h"
 #include "hikyuu.h"
 #include "GlobalInitializer.h"
 #include "StockManager.h"
