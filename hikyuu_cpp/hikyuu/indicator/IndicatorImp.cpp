@@ -123,9 +123,6 @@ void IndicatorImp::releaseDynEngine() {
     // 可能导致 double free, 这里只停止，不负责释放
     // release_global_task_group();
     // ms_tg = nullptr;
-    if (ms_tg) {
-        ms_tg->stop();
-    }
 }
 
 HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
