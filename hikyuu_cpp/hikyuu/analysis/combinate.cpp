@@ -75,8 +75,9 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
     size_t total = stocks.size();
     HKU_IF_RETURN(total == 0, result);
 
-    auto work_num = std::thread::hardware_concurrency();
-    ThreadPool tg(work_num);
+    // auto work_num = std::thread::hardware_concurrency();
+    // ThreadPool tg(work_num);
+    auto* tg = get_global_task_group();
     vector<std::future<vector<CombinateAnalysisOutput>>> tasks;
 
     vector<Stock> buf;
@@ -86,8 +87,8 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
         for (size_t i = range.first; i < range.second; i++) {
             buf.emplace_back(stocks[i]);
         }
-        tasks.emplace_back(tg.submit([sgs, stks = std::move(buf), n_query = query,
-                                      n_tm = tm->clone(), n_sys = sys->clone()]() {
+        tasks.emplace_back(tg->submit([sgs, stks = std::move(buf), n_query = query,
+                                       n_tm = tm->clone(), n_sys = sys->clone()]() {
             vector<CombinateAnalysisOutput> ret;
             Performance per;
             CombinateAnalysisOutput out;
