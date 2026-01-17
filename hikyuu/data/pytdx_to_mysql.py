@@ -523,11 +523,11 @@ def import_data(
             '5MIN': 'MIN5'
         }
         nktype = ktype_dict[ktype]
-        h5_importer = get_mysql_importer(market, nktype)
-        if h5_importer is not None:
+        importer = get_mysql_importer()
+        if importer is not None:
             for r in failed_list:
                 hku_warn("remove {}{} {}: {}", r[0], r[1], nktype, r[2].start_of_day())
-                h5_importer.remove(r[0], r[1], nktype, r[2].start_of_day())
+                importer.remove(r[0], r[1], nktype, r[2].start_of_day())
             hku_warn(f"已清理 {market} {failed_count} 个失败股票的最后记录，建议重新导入")
 
     if failed_count >= failed_limit:
