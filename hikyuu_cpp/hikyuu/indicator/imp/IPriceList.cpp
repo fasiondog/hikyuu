@@ -43,7 +43,7 @@ void IPriceList::_calculate(const Indicator& data) {
 
     DatetimeList align_dates =
       haveParam("align_date_list") ? getParam<DatetimeList>("align_date_list") : DatetimeList();
-    PriceList x = getParam<PriceList>("data");
+    const PriceList& x = getParam<const PriceList&>("data");
     int x_discard = getParam<int>("discard");
     size_t x_total = x.size();
 

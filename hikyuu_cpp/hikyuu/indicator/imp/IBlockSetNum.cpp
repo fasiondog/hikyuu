@@ -35,14 +35,14 @@ void IBlockSetNum::_checkParam(const string& name) const {
 }
 
 void IBlockSetNum::_calculate(const Indicator& ind) {
-    Block block = getParam<Block>("block");
+    const Block block = getParam<const Block&>("block");
     bool ignore_context = getParam<bool>("ignore_context");
     const KData& k = getContext();
     DatetimeList dates;
     if (!ignore_context && !k.empty()) {
         dates = k.getDatetimeList();
     } else {
-        KQuery q = getParam<KQuery>("query");
+        const KQuery& q = getParam<const KQuery&>("query");
         if (q != KQuery(0, 0)) {
             dates = StockManager::instance().getTradingCalendar(q, getParam<string>("market"));
         }

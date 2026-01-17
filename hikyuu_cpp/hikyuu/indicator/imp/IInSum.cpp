@@ -225,7 +225,7 @@ static void insum_rank_asc(const IndicatorList& inds, Indicator::value_t* dst, c
 }
 
 void IInSum::_calculate(const Indicator& ind) {
-    Block block = getParam<Block>("block");
+    const Block block = getParam<const Block&>("block");
     bool ignore_context = getParam<bool>("ignore_context");
     const KData& k = getContext();
     KQuery q;

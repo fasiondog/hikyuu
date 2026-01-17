@@ -39,7 +39,7 @@ void ISlice::_calculate(const Indicator& data) {
     // 如果在叶子节点，直接取自身的data参数
     if (isLeaf()) {
         m_discard = 0;
-        PriceList x = getParam<PriceList>("data");
+        const PriceList& x = getParam<const PriceList&>("data");
         size_t total = x.size();
         int64_t startix = getParam<int64_t>("start");
         if (startix < 0) {

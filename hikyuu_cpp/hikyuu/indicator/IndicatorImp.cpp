@@ -533,7 +533,7 @@ DatetimeList IndicatorImp::getDatetimeList() const {
 
 Datetime IndicatorImp::getDatetime(size_t pos) const {
     if (haveParam("align_date_list")) {
-        DatetimeList dates(getParam<DatetimeList>("align_date_list"));
+        const DatetimeList &dates = getParam<const DatetimeList &>("align_date_list");
         return pos < dates.size() ? dates[pos] : Null<Datetime>();
     }
     const KData &k = getContext();
@@ -547,7 +547,7 @@ IndicatorImp::value_t IndicatorImp::getByDate(Datetime date, size_t num) {
 
 size_t IndicatorImp::getPos(Datetime date) const {
     if (haveParam("align_date_list")) {
-        DatetimeList dates(getParam<DatetimeList>("align_date_list"));
+        const DatetimeList &dates(getParam<const DatetimeList &>("align_date_list"));
         auto iter = std::lower_bound(dates.begin(), dates.end(), date);
         if (iter != dates.end() && *iter == date) {
             return iter - dates.begin();

@@ -39,7 +39,7 @@ void FixedWeightListAllocateFunds::_checkParam(const string& name) const {
 SystemWeightList FixedWeightListAllocateFunds ::_allocateWeight(const Datetime& date,
                                                                 const SystemWeightList& se_list) {
     SystemWeightList result;
-    PriceList weights = getParam<PriceList>("weights");
+    const PriceList& weights = getParam<const PriceList&>("weights");
     size_t w_total = weights.size();
     size_t wi = 0;
     for (auto iter = se_list.begin(); iter != se_list.end() && wi < w_total; ++iter) {
