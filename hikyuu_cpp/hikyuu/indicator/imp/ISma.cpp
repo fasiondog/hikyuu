@@ -79,42 +79,9 @@ void ISma::_dyn_calculate(const Indicator& ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(0 == total || m_discard >= total, void());
 
-    static const size_t minCircleLength = 400;
-    size_t workerNum = ms_tg->worker_num();
-    if (total < minCircleLength || workerNum == 1) {
-        for (size_t i = ind.discard(); i < total; i++) {
-            _dyn_one_circle(ind, i, n[i], m[i]);
-        }
-        _update_discard();
-        return;
-    }
+    global_parallel_for_index_void(
+      ind.discard(), total, [&](size_t i) { _dyn_one_circle(ind, i, n[i], m[i]); }, 400);
 
-    size_t circleLength = minCircleLength;
-    if (minCircleLength * workerNum < total) {
-        size_t tailCount = total % workerNum;
-        circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
-    }
-
-    std::vector<std::future<void>> tasks;
-    for (size_t group = 0; group < workerNum; group++) {
-        size_t first = circleLength * group;
-        if (first >= total) {
-            break;
-        }
-        tasks.push_back(ms_tg->submit([this, &ind, &n, &m, first, circleLength, group, total]() {
-            size_t endPos = first + circleLength;
-            if (endPos > total) {
-                endPos = total;
-            }
-            for (size_t i = circleLength * group; i < endPos; i++) {
-                _dyn_one_circle(ind, i, n[i], m[i]);
-            }
-        }));
-    }
-
-    for (auto& task : tasks) {
-        task.get();
-    }
     _update_discard();
 }
 
