@@ -12,7 +12,9 @@ namespace hku {
 
 static std::unique_ptr<GlobalStealThreadPool> global_steal_thread_pool;
 
+#if CPP_STANDARD < CPP_STANDARD_17 || defined(__clang__)
 thread_local bool ExecutionGuard::in_parallel_execution = false;
+#endif
 
 void HKU_UTILS_API init_global_task_group(size_t work_num) {
     size_t cpu_num = std::thread::hardware_concurrency();
@@ -30,7 +32,7 @@ void HKU_UTILS_API release_global_task_group() {
     }
 }
 
-GlobalStealThreadPool *HKU_UTILS_API get_global_task_group() {
+HKU_UTILS_API GlobalStealThreadPool* get_global_task_group() {
     return global_steal_thread_pool.get();
 }
 

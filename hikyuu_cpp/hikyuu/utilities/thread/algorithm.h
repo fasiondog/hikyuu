@@ -185,7 +185,7 @@ void HKU_UTILS_API init_global_task_group(size_t work_num = 0);
 
 void HKU_UTILS_API release_global_task_group();
 
-GlobalStealThreadPool* HKU_UTILS_API get_global_task_group();
+HKU_UTILS_API GlobalStealThreadPool* get_global_task_group();
 
 size_t HKU_UTILS_API get_global_task_group_work_num();
 
@@ -195,9 +195,6 @@ class ExecutionGuard {
 #else
 class HKU_UTILS_API ExecutionGuard {
 #endif
-private:
-    static thread_local bool in_parallel_execution;
-    bool* p_flag;
 
 public:
     explicit ExecutionGuard(bool initial_value = true) : p_flag(&in_parallel_execution) {
@@ -220,6 +217,14 @@ public:
     static bool is_executing() {
         return in_parallel_execution;
     }
+
+private:
+#if CPP_STANDARD >= CPP_STANDARD_17 && !defined(__clang__)
+    inline static thread_local bool in_parallel_execution{false};
+#else
+    static thread_local bool in_parallel_execution;
+#endif
+    bool* p_flag;
 };
 
 template <typename FunctionType>
