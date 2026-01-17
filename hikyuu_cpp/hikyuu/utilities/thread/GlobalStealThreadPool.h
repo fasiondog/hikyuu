@@ -165,6 +165,7 @@ public:
         for (size_t i = 0; i < m_worker_num; i++) {
             m_queues[i]->clear();
         }
+        m_threads.clear();
     }
 
     /**
@@ -224,6 +225,7 @@ public:
         for (size_t i = 0; i < m_worker_num; i++) {
             m_queues[i]->clear();
         }
+        m_threads.clear();
     }
 
 private:
