@@ -16,7 +16,7 @@ KDataPrivatedBufferImp::KDataPrivatedBufferImp() : KDataImp() {}
 KDataPrivatedBufferImp::KDataPrivatedBufferImp(const Stock& stock, const KQuery& query)
 : KDataImp(stock, query), m_buffer(m_stock.getKRecordList(query)) {
     // 不支持复权时，直接返回
-    if (query.recoverType() == KQuery::NO_RECOVER)
+    if (m_buffer.empty() || query.recoverType() == KQuery::NO_RECOVER)
         return;
 
     // 日线以上复权处理
@@ -405,6 +405,94 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
             m_buffer[i].closePrice = roundEx(k * m_buffer[i].closePrice, m_stock.precision());
         }
     }
+}
+
+KDataImpPtr KDataPrivatedBufferImp::getOtherFromSelf(const KQuery& query) const {
+    KDataImpPtr ret;
+    // if (query == m_query) {
+    //     ret = std::const_pointer_cast<KDataImp>(shared_from_this());
+    //     return ret;
+    // } else if (query.kType() != m_query.kType() || query.queryType() != m_query.queryType() ||
+    //            query.recoverType() != KQuery::NO_RECOVER ||
+    //            m_query.recoverType() != KQuery::NO_RECOVER) {
+    //     ret = std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
+    if (query.queryType() == KQuery::INDEX) {
+        ret = _getOtherFromSelfByIndex(query);
+    } else if (query.queryType() == KQuery::DATE) {
+        ret = _getOtherFromSelfByDate(query);
+    } else {
+        ret = std::make_shared<KDataSharedBufferImp>(m_stock, query);
+    }
+    return ret;
+}
+
+KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByIndex(const KQuery& query) const {
+    size_t new_start_pos = 0, new_end_pos = 0;
+    bool success = m_stock.getIndexRange(query, new_start_pos, new_end_pos);
+    if (!success || new_start_pos == 0) {
+        auto* p = new KDataPrivatedBufferImp;
+        p->m_stock = m_stock;
+        p->m_query = query;
+        return KDataImpPtr(p);
+    }
+
+    size_t new_last_pos = new_end_pos - 1;
+
+    size_t old_start_pos = startPos();
+    size_t old_last_pos = lastPos();
+    if (new_start_pos < old_start_pos || new_start_pos > old_last_pos) {
+        return std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
+    }
+
+    if (new_last_pos <= old_last_pos) {
+        auto* p = new KDataPrivatedBufferImp;
+        p->m_stock = m_stock;
+        p->m_query = query;
+        size_t new_len = new_last_pos + 1 - new_start_pos;
+        p->m_buffer.resize(new_len);
+        std::copy(m_buffer.begin() + new_start_pos - old_start_pos,
+                  m_buffer.begin() + new_last_pos - old_start_pos + 1, p->m_buffer.begin());
+        return KDataImpPtr(p);
+    }
+
+    auto* p = new KDataPrivatedBufferImp;
+    p->m_stock = m_stock;
+    p->m_query = query;
+    size_t new_len = new_last_pos + 1 - new_start_pos;
+    p->m_buffer.resize(new_len);
+    std::copy(m_buffer.begin() + new_start_pos - old_start_pos, m_buffer.end(),
+              p->m_buffer.begin());
+    KRecordList klist =
+      m_stock.getKRecordList(KQuery(old_last_pos + 1, new_end_pos, query.kType()));
+    std::copy(klist.begin(), klist.end(), p->m_buffer.begin() + new_last_pos + 1);
+    return KDataImpPtr(p);
+}
+
+KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByDate(const KQuery& query) const {
+    const auto& old_start_date = m_buffer.front().datetime;
+    const auto& old_last_date = m_buffer.back().datetime;
+    Datetime new_start_date = query.startDatetime();
+    Datetime new_end_date = query.endDatetime();
+    if (new_start_date < old_start_date || new_start_date > old_last_date) {
+        return std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
+    }
+
+    size_t new_start_pos_in_old = getPos(new_start_date);
+    if (new_start_pos_in_old == Null<size_t>()) {
+        return std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
+    }
+
+    KRecordList klist = m_stock.getKRecordList(
+      KQueryByDate(old_last_date + Seconds(KQuery::getKTypeInSeconds(query.kType())), new_end_date,
+                   query.kType()));
+    auto* p = new KDataPrivatedBufferImp;
+    p->m_stock = m_stock;
+    p->m_query = query;
+    p->m_buffer.resize(m_buffer.size() - new_start_pos_in_old + klist.size());
+    std::copy(m_buffer.begin() + new_start_pos_in_old, m_buffer.end(), p->m_buffer.begin());
+    std::copy(klist.begin(), klist.end(),
+              p->m_buffer.begin() + m_buffer.size() - new_start_pos_in_old);
+    return KDataImpPtr(p);
 }
 
 } /* namespace hku */

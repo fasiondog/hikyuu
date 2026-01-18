@@ -59,6 +59,8 @@ public:
 
     virtual DatetimeList getDatetimeList() const override;
 
+    virtual KDataImpPtr getOtherFromSelf(const KQuery& query) const override;
+
 private:
     size_t m_start{0};
     size_t m_end{0};

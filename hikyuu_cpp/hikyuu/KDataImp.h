@@ -11,7 +11,7 @@
 
 namespace hku {
 
-class HKU_API KDataImp {
+class HKU_API KDataImp : public enable_shared_from_this<KDataImp> {
 public:
     KDataImp() = default;
     KDataImp(const Stock& stock, const KQuery& query);
@@ -71,6 +71,11 @@ public:
 
     virtual DatetimeList getDatetimeList() const {
         return DatetimeList();
+    }
+
+    typedef shared_ptr<KDataImp> KDataImpPtr;
+    virtual KDataImpPtr getOtherFromSelf(const KQuery& query) const {
+        return std::make_shared<KDataImp>(m_stock, query);
     }
 
 protected:

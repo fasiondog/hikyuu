@@ -103,31 +103,55 @@ KData KData::getKData(const Datetime& start, const Datetime& end) const {
     return ret;
 }
 
-KData KData::getKData(int64_t start, int64_t end) const {
-    int64_t total = static_cast<int64_t>(size());
-    size_t startix, endix;
-    if (start < 0) {
-        startix = start < -total ? 0 : total + start;
-    } else {
-        startix = start;
-    }
+KData KData::getKData(const KQuery& query) const {
+    KData ret;
+    HKU_ASSERT(m_imp);
 
-    if (end == Null<int64_t>()) {
-        endix = total;
-    } else if (end < 0) {
-        endix = end < -total ? 0 : total + end;
-    } else {
-        endix = end;
-    }
-
-    size_t startpos = startPos();
+    const Stock& stk = getStock();
+    HKU_IF_RETURN(stk.isNull(), ret);
 
     const auto& self_query = getQuery();
-    KQuery query =
-      KQuery(startix + startpos, endix + startpos, self_query.kType(), self_query.recoverType());
+    if (query.kType() != self_query.kType() || query.queryType() != self_query.queryType() ||
+        query.recoverType() != self_query.recoverType()) {
+        ret = KData(stk, query);
+        return ret;
+    }
 
-    return KData(getStock(), query);
+    if (query == self_query) {
+        ret.m_imp = m_imp;
+        return ret;
+    }
+
+    auto imp = m_imp->getOtherFromSelf(query);
+    ret.m_imp = std::move(imp);
+    return ret;
 }
+
+// KData KData::getKData(int64_t start, int64_t end) const {
+//     int64_t total = static_cast<int64_t>(size());
+//     size_t startix, endix;
+//     if (start < 0) {
+//         startix = start < -total ? 0 : total + start;
+//     } else {
+//         startix = start;
+//     }
+
+//     if (end == Null<int64_t>()) {
+//         endix = total;
+//     } else if (end < 0) {
+//         endix = end < -total ? 0 : total + end;
+//     } else {
+//         endix = end;
+//     }
+
+//     size_t startpos = startPos();
+
+//     const auto& self_query = getQuery();
+//     KQuery query =
+//       KQuery(startix + startpos, endix + startpos, self_query.kType(), self_query.recoverType());
+
+//     return KData(getStock(), query);
+// }
 
 KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime& end_datetime,
                                   const KQuery::KType& ktype) const {

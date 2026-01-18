@@ -72,4 +72,8 @@ DatetimeList KDataSharedBufferImp::getDatetimeList() const {
     return result;
 }
 
+KDataImpPtr KDataSharedBufferImp::getOtherFromSelf(const KQuery& query) const {
+    return std::make_shared<KDataSharedBufferImp>(m_stock, query);
+}
+
 } /* namespace hku */

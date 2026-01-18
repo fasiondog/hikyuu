@@ -133,14 +133,11 @@ void export_KData(py::module& m) {
         :param Datetime end: 新的结束日期
         :rtype: KData)")
 
-      .def("get_kdata", py::overload_cast<int64_t, int64_t>(&KData::getKData, py::const_),
-           py::arg("start"), py::arg("end") = null_int64,
-           R"(get_kdata(self, start, end)
-           
-        通过索引获取 KData 子集，相当于切片
-        
-        :param int start: 索引起始位置
-        :param int end: 索引结束位置
+      .def("get_kdata", py::overload_cast<const KQuery&>(&KData::getKData, py::const_),
+           R"(get_kdata(query)
+
+        通过当前 KData 获取获取另一个 KData，不一定是其子集
+
         :rtype: KData)")
 
       .def("tocsv", &KData::tocsv, R"(tocsv(self, filename)

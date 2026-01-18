@@ -138,7 +138,8 @@ Stock::~Stock() {}
 
 Stock::Stock(const Stock& x) : m_data(x.m_data), m_kdataDriver(x.m_kdataDriver) {}
 
-Stock::Stock(Stock&& x) : m_data(std::move(x.m_data)), m_kdataDriver(std::move(x.m_kdataDriver)) {}
+Stock::Stock(Stock&& x) noexcept
+: m_data(std::move(x.m_data)), m_kdataDriver(std::move(x.m_kdataDriver)) {}
 
 Stock& Stock::operator=(const Stock& x) {
     HKU_IF_RETURN(this == &x, *this);
@@ -147,7 +148,7 @@ Stock& Stock::operator=(const Stock& x) {
     return *this;
 }
 
-Stock& Stock::operator=(Stock&& x) {
+Stock& Stock::operator=(Stock&& x) noexcept {
     HKU_IF_RETURN(this == &x, *this);
     m_data = std::move(x.m_data);
     m_kdataDriver = std::move(x.m_kdataDriver);

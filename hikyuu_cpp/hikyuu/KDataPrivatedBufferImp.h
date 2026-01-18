@@ -53,6 +53,8 @@ public:
 
     virtual DatetimeList getDatetimeList() const override;
 
+    virtual KDataImpPtr getOtherFromSelf(const KQuery& query) const override;
+
 private:
     void _getPosInStock() const;
     void _recoverForward();
@@ -61,6 +63,9 @@ private:
     void _recoverEqualBackward();
     void _recoverForUpDay();
 
+    KDataImpPtr _getOtherFromSelfByIndex(const KQuery& query) const;
+    KDataImpPtr _getOtherFromSelfByDate(const KQuery& query) const;
+
 private:
     KRecordList m_buffer;
     mutable size_t m_start{0};
@@ -68,6 +73,6 @@ private:
     mutable bool m_have_pos_in_stock{false};
 };
 
-typedef shared_ptr<KDataPrivatedBufferImp> KDataPrivatedBufferImpPtr;
+// typedef shared_ptr<KDataPrivatedBufferImp> KDataPrivatedBufferImpPtr;
 
 } /* namespace hku */

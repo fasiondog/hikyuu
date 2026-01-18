@@ -59,7 +59,7 @@ public:
     Stock();
 
     Stock(const Stock&);
-    Stock(Stock&&);
+    Stock(Stock&&) noexcept;
     Stock(const string& market, const string& code, const string& name);
 
     Stock(const string& market, const string& code, const string& name, uint32_t type, bool valid,
@@ -69,7 +69,7 @@ public:
           int precision, size_t minTradeNumber, size_t maxTradeNumber);
     virtual ~Stock();
     Stock& operator=(const Stock&);
-    Stock& operator=(Stock&&);
+    Stock& operator=(Stock&&) noexcept;
     bool operator==(const Stock&) const;
     bool operator!=(const Stock&) const;
 
