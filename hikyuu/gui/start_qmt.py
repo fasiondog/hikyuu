@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     # 不使用配置文件中的预加载参数
     preload_param = Parameter()
-    if p in Query.get_all_ktype():
+    if p in Query.get_base_ktype_list():
         preload_param[p] = False
 
     kdata_param = Parameter()
