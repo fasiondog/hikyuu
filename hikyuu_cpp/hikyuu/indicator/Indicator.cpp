@@ -51,11 +51,17 @@ void Indicator::setContext(const KData& k) {
 void Indicator::extend() {
     if (m_imp) {
         auto k = m_imp->getContext();
-        HKU_WARN_IF_RETURN(k.getStock().isNull(), void(), "stock is null!");
-        if (k.empty()) {
-            k = k.getKData(Datetime::today(), Null<Datetime>());
+        const auto& stk = k.getStock();
+        HKU_WARN_IF_RETURN(stk.isNull(), void(), "stock is null!");
+        const auto& query = k.getQuery();
+        if (query.queryType() == KQuery::INDEX) {
+            k = stk.getKData(
+              KQuery(query.start(), Null<int64_t>(), query.kType(), query.recoverType()));
+        } else if (query.queryType() == KQuery::DATE) {
+            k = stk.getKData(KQueryByDate(query.startDatetime(), Null<Datetime>(), query.kType(),
+                                          query.recoverType()));
         } else {
-            k = k.getKData(k[0].datetime, Null<Datetime>());
+            HKU_WARN("query type ({}) error!", static_cast<int>(query.queryType()));
         }
         m_imp->setContext(k);
     }
