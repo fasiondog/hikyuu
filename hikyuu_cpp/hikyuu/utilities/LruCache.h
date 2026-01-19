@@ -10,10 +10,27 @@
 #pragma once
 #include <unordered_map>
 #include <list>
-#include <shared_mutex>
 #include <mutex>
+#include <shared_mutex>
 
 namespace hku {
+
+/*
+ * a noop lockable concept that can be used in place of std::mutex
+ */
+class NullLock {
+public:
+    void lock() noexcept {}
+    void unlock() noexcept {}
+    bool try_lock() noexcept {
+        return true;
+    }
+    void lock_shared() noexcept {}
+    void unlock_shared() noexcept {}
+    bool try_lock_shared() noexcept {
+        return true;
+    }
+};
 
 /**
  * @brief LRU (Least Recently Used) 缓存实现
@@ -24,18 +41,21 @@ namespace hku {
  * 特性：
  * - 线程安全：使用共享互斥锁支持并发读写
  * - 移动语义：支持值的移动插入，避免不必要的拷贝
- * - 溢出容量：允许缓存临时超出设定容量，仅当达到容量+溢出容量时才触发淘汰
+ * - 溢出容量：允许缓存临时超出设定容量，仅当超过容量+溢出容量时才触发淘汰
  * - 动态调整：支持运行时调整容量和溢出容量
  *
  * @tparam KeyType 键的类型，必须支持哈希和相等比较
  * @tparam ValueType 值的类型，必须支持拷贝和移动操作
  */
-template <typename KeyType, typename ValueType>
-class LruCache {
+template <typename KeyType, typename ValueType, class Lock = NullLock>
+class LruCache final {
 public:
     using key_type = KeyType;
     using value_type = ValueType;
     using size_type = size_t;
+    typedef Lock lock_type;
+    using UniqueGuard = std::unique_lock<lock_type>;
+    using SharedGuard = std::shared_lock<lock_type>;
 
     /**
      * @brief 构造函数
@@ -46,7 +66,11 @@ public:
     explicit LruCache(size_type capacity = 64, size_type overflow = 8)
     : m_capacity(capacity), m_overflow(overflow) {}
 
-    ~LruCache() = default;
+    ~LruCache() {
+        UniqueGuard lock(m_mutex);
+        m_cache.clear();
+        m_lru_list.clear();
+    }
 
     /**
      * @brief 插入键值对
@@ -54,19 +78,16 @@ public:
      * @param value 值
      */
     void insert(const key_type& key, const value_type& value) {
-        std::unique_lock<std::shared_mutex> lock(m_mutex);
-
+        UniqueGuard lock(m_mutex);
         auto it = m_cache.find(key);
         if (it != m_cache.end()) {
             // 更新已存在的键
             it->second->second = value;
             m_lru_list.splice(m_lru_list.begin(), m_lru_list, it->second);
         } else {
-            // 先尝试清理空间
-            _prune_if_needed();
-
             m_lru_list.emplace_front(key, value);
             m_cache[key] = m_lru_list.begin();
+            _prune_if_needed();
         }
     }
 
@@ -76,19 +97,16 @@ public:
      * @param value 值（右值引用）
      */
     void insert(const key_type& key, value_type&& value) {
-        std::unique_lock<std::shared_mutex> lock(m_mutex);
-
+        UniqueGuard lock(m_mutex);
         auto it = m_cache.find(key);
         if (it != m_cache.end()) {
             // 更新已存在的键
-            it->second->second = std::forward<value_type>(value);
+            it->second->second = std::move(value);
             m_lru_list.splice(m_lru_list.begin(), m_lru_list, it->second);
         } else {
-            // 先尝试清理空间
-            _prune_if_needed();
-
-            m_lru_list.emplace_front(key, std::forward<value_type>(value));
+            m_lru_list.emplace_front(key, std::move(value));
             m_cache[key] = m_lru_list.begin();
+            _prune_if_needed();
         }
     }
 
@@ -98,15 +116,13 @@ public:
      * @return 存在则返回值，否则返回ValueType的默认构造值
      */
     value_type get(const key_type& key) {
-        std::shared_lock<std::shared_mutex> lock(m_mutex);
-
+        UniqueGuard lock(m_mutex);
         auto it = m_cache.find(key);
         if (it != m_cache.end()) {
             // 移动到列表头部（标记为最近使用）
             m_lru_list.splice(m_lru_list.begin(), m_lru_list, it->second);
             return it->second->second;
         }
-
         return value_type{};
     }
 
@@ -117,8 +133,7 @@ public:
      * @return 如果键存在返回true，否则返回false
      */
     bool tryGet(const key_type& key, value_type& value) {
-        std::shared_lock<std::shared_mutex> lock(m_mutex);
-
+        UniqueGuard lock(m_mutex);
         auto it = m_cache.find(key);
         if (it != m_cache.end()) {
             // 移动到列表头部（标记为最近使用）
@@ -126,7 +141,6 @@ public:
             value = it->second->second;
             return true;
         }
-
         return false;
     }
 
@@ -136,7 +150,7 @@ public:
      * @return 存在返回true，否则返回false
      */
     bool contains(const key_type& key) {
-        std::shared_lock<std::shared_mutex> lock(m_mutex);
+        SharedGuard lock(m_mutex);
         return m_cache.find(key) != m_cache.end();
     }
 
@@ -146,8 +160,7 @@ public:
      * @return 成功删除返回true，不存在返回false
      */
     bool remove(const key_type& key) {
-        std::unique_lock<std::shared_mutex> lock(m_mutex);
-
+        UniqueGuard lock(m_mutex);
         auto it = m_cache.find(key);
         if (it != m_cache.end()) {
             m_lru_list.erase(it->second);
@@ -161,7 +174,7 @@ public:
      * @brief 清空缓存
      */
     void clear() {
-        std::unique_lock<std::shared_mutex> lock(m_mutex);
+        UniqueGuard lock(m_mutex);
         m_cache.clear();
         m_lru_list.clear();
     }
@@ -171,7 +184,7 @@ public:
      * @return 当前缓存元素数量
      */
     size_type size() const {
-        std::shared_lock<std::shared_mutex> lock(m_mutex);
+        SharedGuard lock(m_mutex);
         return m_cache.size();
     }
 
@@ -180,7 +193,7 @@ public:
      * @return 空返回true，否则返回false
      */
     bool empty() const {
-        std::shared_lock<std::shared_mutex> lock(m_mutex);
+        SharedGuard lock(m_mutex);
         return m_cache.empty();
     }
 
@@ -189,6 +202,7 @@ public:
      * @return 缓存容量
      */
     size_type capacity() const {
+        SharedGuard lock(m_mutex);
         return m_capacity;
     }
 
@@ -197,6 +211,7 @@ public:
      * @return 缓存溢出容量
      */
     size_type overflow() const {
+        SharedGuard lock(m_mutex);
         return m_overflow;
     }
 
@@ -205,16 +220,9 @@ public:
      * @param capacity 新的容量，0表示不限制容量
      */
     void resize(size_type capacity) {
-        std::unique_lock<std::shared_mutex> lock(m_mutex);
+        UniqueGuard lock(m_mutex);
         m_capacity = capacity;
-
-        // 如果容量不为0且当前大小超过新容量加上溢出容量，需要移除多余的元素
-        while (m_capacity != 0 && m_cache.size() > m_capacity + m_overflow) {
-            auto last = m_lru_list.end();
-            --last;
-            m_cache.erase(last->first);
-            m_lru_list.pop_back();
-        }
+        _prune_if_needed();
     }
 
     /**
@@ -222,28 +230,25 @@ public:
      * @param overflow 新的溢出容量
      */
     void setOverflow(size_type overflow) {
-        std::unique_lock<std::shared_mutex> lock(m_mutex);
+        UniqueGuard lock(m_mutex);
         m_overflow = overflow;
-
-        // 如果容量不为0且当前大小超过新容量加上溢出容量，需要移除多余的元素
-        while (m_capacity != 0 && m_cache.size() > m_capacity + m_overflow) {
-            auto last = m_lru_list.end();
-            --last;
-            m_cache.erase(last->first);
-            m_lru_list.pop_back();
-        }
+        _prune_if_needed();
     }
 
 private:
     // 如果缓存已满，移除最久未使用的项
-    void _prune_if_needed() {
-        if (m_capacity != 0 && m_cache.size() >= m_capacity + m_overflow) {
-            // 移除最久未使用的项
-            auto last = m_lru_list.end();
-            --last;
-            m_cache.erase(last->first);
-            m_lru_list.pop_back();
+    size_t _prune_if_needed() {
+        size_t maxAllowed = m_capacity + m_overflow;
+        if (m_capacity == 0 || m_cache.size() <= maxAllowed) {
+            return 0;
         }
+        size_t count = 0;
+        while (m_cache.size() > m_capacity) {
+            m_cache.erase(m_lru_list.back().first);
+            m_lru_list.pop_back();
+            ++count;
+        }
+        return count;
     }
 
 private:
@@ -255,7 +260,7 @@ private:
       m_cache;
 
     // 读写锁，保护并发访问
-    mutable std::shared_mutex m_mutex;
+    mutable lock_type m_mutex;
 
     // 缓存容量，0表示不限制容量
     size_type m_capacity;
