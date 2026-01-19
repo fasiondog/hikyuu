@@ -502,7 +502,7 @@ def update_extern_data(connect, market, code, data_type):
         if insert_buffer:
             cur = connect.cursor()
             cur.executemany(
-                "insert into {} (date, open, high, low, close, amount, count) \
+                "replace into {} (date, open, high, low, close, amount, count) \
                  values (%s, %s, %s, %s, %s, %s, %s)".format(index_table), insert_buffer
             )
             connect.commit()
