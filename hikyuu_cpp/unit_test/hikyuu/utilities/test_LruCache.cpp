@@ -35,21 +35,21 @@ TEST_CASE("test_LruCache_basic") {
     CHECK_EQ(cache.get(3), "three");
 
     /** @arg 测试LRU淘汰机制 */
-    cache.insert(4, "four");  // 此时应该淘汰最早插入的元素(1,"one")
+    cache.insert(4, "four");  // 此时链表状态 4,1,3
 
-    CHECK_EQ(cache.get(1), "");       // 已被淘汰
-    CHECK_EQ(cache.get(2), "two");    // 仍存在
+    CHECK_EQ(cache.get(1), "one");    // 非严格LRU模式，仍旧存在
+    CHECK_EQ(cache.get(2), "");       // 非严格LRU模式，已淘汰
     CHECK_EQ(cache.get(3), "three");  // 仍存在
     CHECK_EQ(cache.get(4), "four");   // 最新插入
 
     /** @arg 测试访问更新LRU顺序 */
-    cache.get(2);             // 访问2，使其变为最新
-    cache.insert(5, "five");  // 应该淘汰3
+    cache.get(4);             // 访问4,标记为已读取
+    cache.insert(5, "five");  // 此时链表状态 3,5,4
 
-    CHECK_EQ(cache.get(2), "two");   // 因为被访问过，所以保留
-    CHECK_EQ(cache.get(3), "");      // 被淘汰
-    CHECK_EQ(cache.get(4), "four");  // 仍存在
-    CHECK_EQ(cache.get(5), "five");  // 新插入
+    CHECK_EQ(cache.get(1), "");       // 被淘汰
+    CHECK_EQ(cache.get(3), "three");  // 仍存在
+    CHECK_EQ(cache.get(4), "four");   // 仍存在
+    CHECK_EQ(cache.get(5), "five");   // 新插入
 
     /** @arg 测试容量和大小 */
     CHECK_EQ(cache.capacity(), 3);
@@ -57,8 +57,8 @@ TEST_CASE("test_LruCache_basic") {
     CHECK_UNARY(!cache.empty());
 
     /** @arg 测试更新已存在的键 */
-    cache.insert(2, "two_updated");
-    CHECK_EQ(cache.get(2), "two_updated");
+    cache.insert(1, "two_updated");
+    CHECK_EQ(cache.get(1), "two_updated");
 }
 
 /** @par 检测点: 移动语义功能测试 */

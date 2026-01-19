@@ -3,8 +3,6 @@
  *
  *  Created on: 2026-01-18
  *      Author: fasiondog
- *
- *  注：该代码由 AI 生成
  */
 
 #pragma once
@@ -12,12 +10,10 @@
 #include <list>
 #include <mutex>
 #include <shared_mutex>
+#include <optional>
 
 namespace hku {
 
-/*
- * a noop lockable concept that can be used in place of std::mutex
- */
 class NullLock {
 public:
     void lock() noexcept {}
@@ -33,17 +29,8 @@ public:
 };
 
 /**
- * @brief LRU (Least Recently Used) 缓存实现
- *
- * 该缓存实现基于哈希表和双向链表，能够在O(1)时间内完成插入、删除和访问操作。
- * 当缓存达到容量限制时，会自动淘汰最久未使用的元素。
- *
- * 特性：
- * - 线程安全：使用共享互斥锁支持并发读写
- * - 移动语义：支持值的移动插入，避免不必要的拷贝
- * - 溢出容量：允许缓存临时超出设定容量，仅当超过容量+溢出容量时才触发淘汰
- * - 动态调整：支持运行时调整容量和溢出容量
- *
+ * @brief LRU (Least Recently Used)
+ * 缓存实现(非严格意义LRU以便提升并发读取性能)
  * @tparam KeyType 键的类型，必须支持哈希和相等比较
  * @tparam ValueType 值的类型，必须支持拷贝和移动操作
  */
@@ -56,6 +43,12 @@ public:
     typedef Lock lock_type;
     using UniqueGuard = std::unique_lock<lock_type>;
     using SharedGuard = std::shared_lock<lock_type>;
+
+    // 存储结构：值 + 原子脏标记（标记是否被get访问过，需要更新LRU顺序）
+    using CacheValue = std::pair<value_type, std::atomic<bool>>;
+    using LruList = std::list<key_type>;
+    using CacheMap =
+      std::unordered_map<key_type, std::pair<typename LruList::iterator, CacheValue>>;
 
     /**
      * @brief 构造函数
@@ -79,14 +72,17 @@ public:
      */
     void insert(const key_type& key, const value_type& value) {
         UniqueGuard lock(m_mutex);
+        _batch_update_dirty_nodes();
         auto it = m_cache.find(key);
         if (it != m_cache.end()) {
-            // 更新已存在的键
-            it->second->second = value;
-            m_lru_list.splice(m_lru_list.begin(), m_lru_list, it->second);
+            it->second.second.first = value;
+            it->second.second.second.store(false, std::memory_order_relaxed);
+            m_lru_list.splice(m_lru_list.begin(), m_lru_list, it->second.first);
         } else {
-            m_lru_list.emplace_front(key, value);
-            m_cache[key] = m_lru_list.begin();
+            m_lru_list.emplace_front(key);
+            m_cache.emplace(key, std::make_pair(m_lru_list.begin(),
+                                                std::make_pair(value, false)  // 初始脏标记为false
+                                                ));
             _prune_if_needed();
         }
     }
@@ -98,14 +94,16 @@ public:
      */
     void insert(const key_type& key, value_type&& value) {
         UniqueGuard lock(m_mutex);
+        _batch_update_dirty_nodes();
         auto it = m_cache.find(key);
         if (it != m_cache.end()) {
-            // 更新已存在的键
-            it->second->second = std::move(value);
-            m_lru_list.splice(m_lru_list.begin(), m_lru_list, it->second);
+            it->second.second.first = std::move(value);
+            it->second.second.second.store(false, std::memory_order_relaxed);
+            m_lru_list.splice(m_lru_list.begin(), m_lru_list, it->second.first);
         } else {
-            m_lru_list.emplace_front(key, std::move(value));
-            m_cache[key] = m_lru_list.begin();
+            m_lru_list.emplace_front(key);
+            m_cache.emplace(
+              key, std::make_pair(m_lru_list.begin(), std::make_pair(std::move(value), false)));
             _prune_if_needed();
         }
     }
@@ -116,12 +114,11 @@ public:
      * @return 存在则返回值，否则返回ValueType的默认构造值
      */
     value_type get(const key_type& key) {
-        UniqueGuard lock(m_mutex);
+        SharedGuard lock(m_mutex);
         auto it = m_cache.find(key);
         if (it != m_cache.end()) {
-            // 移动到列表头部（标记为最近使用）
-            m_lru_list.splice(m_lru_list.begin(), m_lru_list, it->second);
-            return it->second->second;
+            it->second.second.second.store(true, std::memory_order_relaxed);
+            return it->second.second.first;
         }
         return value_type{};
     }
@@ -133,12 +130,11 @@ public:
      * @return 如果键存在返回true，否则返回false
      */
     bool tryGet(const key_type& key, value_type& value) {
-        UniqueGuard lock(m_mutex);
+        SharedGuard lock(m_mutex);
         auto it = m_cache.find(key);
         if (it != m_cache.end()) {
-            // 移动到列表头部（标记为最近使用）
-            m_lru_list.splice(m_lru_list.begin(), m_lru_list, it->second);
-            value = it->second->second;
+            it->second.second.second.store(true, std::memory_order_relaxed);
+            value = it->second.second.first;
             return true;
         }
         return false;
@@ -163,7 +159,7 @@ public:
         UniqueGuard lock(m_mutex);
         auto it = m_cache.find(key);
         if (it != m_cache.end()) {
-            m_lru_list.erase(it->second);
+            m_lru_list.erase(it->second.first);
             m_cache.erase(it);
             return true;
         }
@@ -244,29 +240,59 @@ private:
         }
         size_t count = 0;
         while (m_cache.size() > m_capacity) {
-            m_cache.erase(m_lru_list.back().first);
+            m_cache.erase(m_lru_list.back());
             m_lru_list.pop_back();
             ++count;
         }
         return count;
     }
 
+    // 批量更新所有脏节点：移到链表头部，清除脏标记
+    void _batch_update_dirty_nodes() {
+        // 修复点1：避免默认构造，改用指针/引用追踪最新脏节点
+        typename LruList::reverse_iterator latest_dirty_it;
+        bool has_dirty = false;
+
+        // 反向遍历链表：从尾部→头部，找第一个脏节点（最新访问的节点）
+        for (auto it = m_lru_list.rbegin(); it != m_lru_list.rend(); ++it) {
+            const key_type& key = *it;
+            auto cache_it = m_cache.find(key);
+            if (cache_it == m_cache.end()) {
+                continue;
+            }
+
+            auto& dirty_flag = cache_it->second.second.second;
+            // 修复点2：原子加载判断，避免未初始化访问
+            if (dirty_flag.load(std::memory_order_relaxed)) {
+                latest_dirty_it = it;
+                has_dirty = true;
+                break;  // 仅处理最新访问的脏节点，保留1在尾部
+            }
+        }
+
+        // 仅移动最新访问的脏节点到头部（修复点3：反向迭代器转正向迭代器）
+        if (has_dirty) {
+            // C++17：反向迭代器转正向迭代器（base()方法）
+            auto forward_it = latest_dirty_it.base();
+            --forward_it;  // 反向迭代器base()返回的是下一个正向迭代器，需减1
+
+            const key_type& key = *forward_it;
+            auto cache_it = m_cache.find(key);
+            if (cache_it != m_cache.end()) {
+                // 清除脏标记
+                cache_it->second.second.second.store(false, std::memory_order_relaxed);
+                // 移动节点到链表头部（splice仅支持正向迭代器）
+                m_lru_list.splice(m_lru_list.begin(), m_lru_list, forward_it);
+            }
+        }
+    }
+
 private:
-    // 存储键值对的双向链表，用于维护访问顺序
-    std::list<std::pair<key_type, value_type>> m_lru_list;
-
-    // 哈希表，用于快速查找链表节点
-    std::unordered_map<key_type, typename std::list<std::pair<key_type, value_type>>::iterator>
-      m_cache;
-
-    // 读写锁，保护并发访问
-    mutable lock_type m_mutex;
-
-    // 缓存容量，0表示不限制容量
     size_type m_capacity;
-
-    // 缓存溢出容量，在容量为0时不生效
     size_type m_overflow;
+    LruList m_lru_list;
+    CacheMap m_cache;
+    mutable lock_type m_mutex;
 };
 
 }  // namespace hku
