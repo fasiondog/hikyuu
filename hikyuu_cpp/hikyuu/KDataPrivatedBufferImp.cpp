@@ -409,14 +409,14 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
 
 KDataImpPtr KDataPrivatedBufferImp::getOtherFromSelf(const KQuery& query) const {
     KDataImpPtr ret;
-    // if (query == m_query) {
-    //     ret = std::const_pointer_cast<KDataImp>(shared_from_this());
-    //     return ret;
-    // } else if (query.kType() != m_query.kType() || query.queryType() != m_query.queryType() ||
-    //            query.recoverType() != KQuery::NO_RECOVER ||
-    //            m_query.recoverType() != KQuery::NO_RECOVER) {
-    //     ret = std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
-    if (query.queryType() == KQuery::INDEX) {
+    if (query == m_query) {
+        ret = std::const_pointer_cast<KDataImp>(shared_from_this());
+        return ret;
+    } else if (query.kType() != m_query.kType() || query.queryType() != m_query.queryType() ||
+               query.recoverType() != KQuery::NO_RECOVER ||
+               m_query.recoverType() != KQuery::NO_RECOVER) {
+        ret = std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
+    } else if (query.queryType() == KQuery::INDEX) {
         ret = _getOtherFromSelfByIndex(query);
     } else if (query.queryType() == KQuery::DATE) {
         ret = _getOtherFromSelfByDate(query);
@@ -427,6 +427,7 @@ KDataImpPtr KDataPrivatedBufferImp::getOtherFromSelf(const KQuery& query) const 
 }
 
 KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByIndex(const KQuery& query) const {
+    HKU_INFO("KDataPrivatedBufferImp::_getOtherFromSelfByIndex");
     size_t new_start_pos = 0, new_end_pos = 0;
     bool success = m_stock.getIndexRange(query, new_start_pos, new_end_pos);
     if (!success || new_start_pos == 0) {
@@ -464,7 +465,8 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByIndex(const KQuery& query
               p->m_buffer.begin());
     KRecordList klist =
       m_stock.getKRecordList(KQuery(old_last_pos + 1, new_end_pos, query.kType()));
-    std::copy(klist.begin(), klist.end(), p->m_buffer.begin() + new_last_pos + 1);
+    // HKU_ASSERT(klist.size() == new_len - (new_last_pos - old_last_pos));
+    std::copy(klist.begin(), klist.end(), p->m_buffer.begin() + new_last_pos - old_last_pos);
     return KDataImpPtr(p);
 }
 
