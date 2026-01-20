@@ -14,6 +14,13 @@
 
 using namespace hku;
 
+#define CHECK_KDATA_EQUAL(kdata1, kdata2)        \
+    CHECK_EQ(kdata1, kdata2);                    \
+    CHECK_EQ(kdata1.size(), kdata2.size());      \
+    for (size_t i = 0; i < kdata1.size(); i++) { \
+        CHECK_EQ(kdata1[i], kdata2[i]);          \
+    }
+
 /**
  * @defgroup test_hikyuu_KData test_hikyuu_KData
  * @ingroup test_hikyuu_base_suite
@@ -1323,136 +1330,6 @@ TEST_CASE("test_getKData_recover") {
              KRecord(Datetime(200208220000), 18.74, 18.86, 18.59, 18.79, 13101.3, 106872));
 }
 
-/** @par 检测点 */
-TEST_CASE("test_KData_getOtherFromSelf") {
-    StockManager& sm = StockManager::instance();
-    Stock stock = sm.getStock("sh600000");
-
-    // 确保stock有效
-    REQUIRE_FALSE(stock.isNull());
-
-    /** @arg 测试分钟线数据，不同的查询条件 */
-    KQuery query1(0, 10, KQuery::MIN);
-    KData kdata1 = stock.getKData(query1);
-    REQUIRE_FALSE(kdata1.empty());  // 确保有数据
-
-    // 不测试相同查询，而是测试不同但类似的查询，避免shared_from_this可能带来的问题
-    KQuery query_same(0, 10, KQuery::MIN);  // 相同类型的查询，但不是同一个对象
-    KData kdata2 = kdata1.getKData(query_same);
-    CHECK_EQ(kdata1.getStock(), kdata2.getStock());
-    CHECK_EQ(kdata1.size(), kdata2.size());
-
-    /** @arg 测试不同的查询类型，应该创建新的实例 */
-    KQuery query3(0, 10, KQuery::DAY);
-    KData kdata3 = kdata1.getKData(query3);
-    CHECK_EQ(kdata3.getStock(), kdata1.getStock());
-    CHECK_NE(kdata3.getQuery().kType(), kdata1.getQuery().kType());  // 不同的类型
-
-    /** @arg 测试带复权的数据，不同的复权类型，应该创建新的实例 */
-    KQuery query4(0, 10, KQuery::MIN, KQuery::BACKWARD);  // 使用MIN类型
-    KData kdata4 = kdata1.getKData(query4);
-    CHECK_EQ(kdata4.getStock(), kdata1.getStock());
-    CHECK_EQ(kdata4.getQuery().kType(), kdata1.getQuery().kType());              // 应该是MIN类型
-    CHECK_NE(kdata4.getQuery().recoverType(), kdata1.getQuery().recoverType());  // 不同的复权类型
-
-    /** @arg 测试索引查询 */
-    KQuery query5(5, 15, KQuery::MIN);
-    KData kdata5 = kdata1.getKData(query5);
-    CHECK_EQ(kdata5.getStock(), kdata1.getStock());
-    CHECK_EQ(kdata5.getQuery().kType(), kdata1.getQuery().kType());
-    CHECK_NE(kdata5.getQuery(), kdata1.getQuery());  // 不同的查询参数
-
-    /** @arg 测试日期查询 */
-    KQuery query6(Datetime(201001010000), Datetime(201002010000), KQuery::DAY);
-    KData kdata6 = stock.getKData(query6);
-    if (!kdata6.empty()) {  // 如果有数据才继续测试
-        KQuery query7(Datetime(201001010000), Datetime(201002010000), KQuery::DAY);  // 相同类型查询
-        KData kdata7 = kdata6.getKData(query7);  // 不是完全相同的查询对象
-        CHECK_EQ(kdata6.getStock(), kdata7.getStock());
-        CHECK_EQ(kdata6.size(), kdata7.size());
-
-        /** @arg 测试不同查询类型间的转换 */
-        KQuery query8(Datetime(201001010000), Datetime(201002010000), KQuery::WEEK);
-        KData kdata8 = kdata6.getKData(query8);
-
-        CHECK_EQ(kdata8.getStock(), kdata6.getStock());
-        CHECK_NE(kdata8.getQuery().kType(), kdata6.getQuery().kType());  // 不同的类型
-    }
-}
-
-/** @par 检测点 - 覆盖_getOtherFromSelfByIndex和_getOtherFromSelfByDate的分支 */
-TEST_CASE("test_KData_getOtherFromSelf_subfunctions") {
-    StockManager& sm = StockManager::instance();
-    Stock stock = sm.getStock("sh600000");
-
-    /** @arg 测试_getOtherFromSelfByIndex: 新查询的开始位置小于旧数据的开始位置，应创建新的实例 */
-    KQuery query1(10, 20, KQuery::DAY);  // 创建一个基础数据
-    KData kdata1 = stock.getKData(query1);
-    REQUIRE_FALSE(kdata1.empty());
-
-    KQuery query_smaller_start(5, 15, KQuery::DAY);  // 开始位置更小
-    KData kdata2 = kdata1.getKData(query_smaller_start);
-    CHECK_EQ(kdata2.getStock(), kdata1.getStock());
-    CHECK_NE(kdata2.getQuery(), kdata1.getQuery());  // 应该创建新的实例
-
-    /** @arg 测试_getOtherFromSelfByIndex: 新查询的开始位置在旧数据范围内但结束位置超出 */
-    size_t old_size = kdata1.size();
-    KQuery query_extend_end(kdata1.startPos() + 2, kdata1.endPos() + 5, KQuery::DAY);
-    KData kdata3 = stock.getKData(query_extend_end);   // 重新获取以确保数据完整
-    KData kdata4 = kdata3.getKData(query_extend_end);  // 这里会触发_getOtherFromSelfByIndex的分支
-    CHECK_EQ(kdata4.getStock(), kdata3.getStock());
-    CHECK_EQ(kdata4.getQuery(), query_extend_end);
-
-    /** @arg 测试_getOtherFromSelfByIndex: 新查询完全在旧数据范围内 */
-    KQuery query_within(12, 15, KQuery::DAY);
-    KData kdata5 = kdata1.getKData(query_within);
-    CHECK_EQ(kdata5.getStock(), kdata1.getStock());
-    CHECK_EQ(kdata5.getQuery().start(), query_within.start());
-    CHECK_EQ(kdata5.getQuery().end(), query_within.end());
-
-    /** @arg 测试_getOtherFromSelfByDate: 新开始日期小于旧数据开始日期 */
-    KQuery date_query1(Datetime(201001010000), Datetime(201012010000), KQuery::DAY);
-    KData kdata_date1 = stock.getKData(date_query1);
-    REQUIRE_FALSE(kdata_date1.empty());
-
-    KQuery date_query_earlier(Datetime(200901010000), Datetime(201011010000),
-                              KQuery::DAY);  // 更早的开始日期
-    KData kdata_date2 = kdata_date1.getKData(date_query_earlier);
-    CHECK_EQ(kdata_date2.getStock(), kdata_date1.getStock());
-    CHECK_NE(kdata_date2.getQuery(), kdata_date1.getQuery());  // 应该创建新的实例
-
-    /** @arg 测试_getOtherFromSelfByDate: 新开始日期在旧数据范围内 */
-    Datetime mid_date = kdata_date1[kdata_date1.size() / 2].datetime;
-    KQuery date_query_within(mid_date, Datetime(201011010000), KQuery::DAY);
-    KData kdata_date3 = kdata_date1.getKData(date_query_within);
-    CHECK_EQ(kdata_date3.getStock(), kdata_date1.getStock());
-    CHECK_EQ(kdata_date3.getQuery().startDatetime(), mid_date);
-
-    /** @arg 测试_getOtherFromSelfByDate: 日期查询跨越现有数据范围 */
-    Datetime end_date = kdata_date1.back().datetime;
-    Datetime future_date = end_date + TimeDelta(30 * 24 * 3600);  // 30天后，使用TimeDelta
-    KQuery date_query_extend(kdata_date1[2].datetime, future_date, KQuery::DAY);
-    KData kdata_date4 = kdata_date1.getKData(date_query_extend);
-    CHECK_EQ(kdata_date4.getStock(), kdata_date1.getStock());
-    CHECK_GE(kdata_date4.size(), kdata_date1.size());  // 新数据应该不少于原数据
-
-    /** @arg 测试索引转日期查询: 从索引查询转为日期查询 */
-    KQuery idx_query(0, 100, KQuery::DAY);
-    KData kdata_idx = stock.getKData(idx_query);
-    KQuery date_from_idx(Datetime(200001010000), Datetime(200005010000), KQuery::DAY);
-    KData kdata_date_from_idx = kdata_idx.getKData(date_from_idx);
-    CHECK_EQ(kdata_date_from_idx.getStock(), kdata_idx.getStock());
-    CHECK_EQ(kdata_date_from_idx.getQuery().kType(), KQuery::DAY);
-
-    /** @arg 测试日期转索引查询: 从日期查询转为索引查询 */
-    KQuery date_query_orig(Datetime(200001010000), Datetime(200005010000), KQuery::DAY);
-    KData kdata_date_orig = stock.getKData(date_query_orig);
-    KQuery idx_from_date(50, 150, KQuery::DAY);
-    KData kdata_idx_from_date = kdata_date_orig.getKData(idx_from_date);
-    CHECK_EQ(kdata_idx_from_date.getStock(), kdata_date_orig.getStock());
-    CHECK_EQ(kdata_idx_from_date.getQuery().kType(), KQuery::DAY);
-}
-
 /** @} */
 TEST_CASE("test_getKRecord_By_Date") {
     StockManager& sm = StockManager::instance();
@@ -1788,6 +1665,191 @@ TEST_CASE("test_getKRecord_By_Date") {
 }
 
 /** @par 检测点 */
+TEST_CASE("test_KData_getOtherFromSelf") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    // 确保stock有效
+    REQUIRE_FALSE(stock.isNull());
+
+    /** @arg 测试分钟线数据，不同的查询条件 */
+    KQuery query1(0, 10, KQuery::MIN);
+    KData kdata1 = stock.getKData(query1);
+    REQUIRE_FALSE(kdata1.empty());  // 确保有数据
+
+    // 不测试相同查询，而是测试不同但类似的查询，避免shared_from_this可能带来的问题
+    KQuery query_same(0, 10, KQuery::MIN);  // 相同类型的查询，但不是同一个对象
+    KData kdata2 = kdata1.getKData(query_same);
+    CHECK_KDATA_EQUAL(kdata2, kdata1);
+
+    /** @arg 测试不同的查询类型，应该创建新的实例 */
+    KQuery query3(0, 10, KQuery::DAY);
+    KData kdata3 = kdata1.getKData(query3);
+    CHECK_EQ(kdata3.getStock(), kdata1.getStock());
+    CHECK_NE(kdata3.getQuery().kType(), kdata1.getQuery().kType());  // 不同的类型
+    CHECK_UNARY(kdata3 != kdata1);
+
+    /** @arg 测试带复权的数据，不同的复权类型，应该创建新的实例 */
+    KQuery query4(0, 10, KQuery::MIN, KQuery::BACKWARD);  // 使用MIN类型
+    KData kdata4 = kdata1.getKData(query4);
+    KData expect = stock.getKData(query4);
+    CHECK_NE(kdata4.getQuery().recoverType(), kdata1.getQuery().recoverType());  // 不同的复权类型
+    CHECK_KDATA_EQUAL(kdata4, expect);
+
+    /** @arg 测试索引查询 */
+    KQuery query5(5, 15, KQuery::MIN);
+    KData kdata5 = kdata1.getKData(query5);
+    expect = stock.getKData(query5);
+    CHECK_NE(kdata5.getQuery(), kdata1.getQuery());  // 不同的查询参数
+    CHECK_KDATA_EQUAL(kdata5, expect);
+
+    query5 = KQuery(15, 20, KQuery::MIN, KQuery::FORWARD);
+    kdata5 = kdata1.getKData(query5);
+    expect = stock.getKData(query5);
+    CHECK_KDATA_EQUAL(kdata5, expect);
+
+    query5 = KQuery(3, 5, KQuery::MIN, KQuery::FORWARD);
+    kdata5 = kdata1.getKData(query5);
+    expect = stock.getKData(query5);
+    CHECK_KDATA_EQUAL(kdata5, expect);
+
+    query4 = KQuery(3, 5, KQuery::MIN);
+    kdata4 = stock.getKData(query4);
+    query5 = KQuery(0, 10, KQuery::MIN);
+    kdata5 = kdata4.getKData(query5);
+    expect = stock.getKData(query5);
+    CHECK_KDATA_EQUAL(kdata5, expect);
+
+    /** @arg 测试日期查询 */
+    KQuery query6(Datetime(201001010000), Datetime(201002010000), KQuery::DAY);
+    KData kdata6 = stock.getKData(query6);
+    KQuery query7(Datetime(201001010000), Datetime(201002010000), KQuery::DAY);  // 相同类型查询
+    KData kdata7 = kdata6.getKData(query7);  // 不是完全相同的查询对象
+    CHECK_KDATA_EQUAL(kdata7, kdata6);
+
+    /** @arg 测试不同查询类型间的转换 */
+    KQuery query8(Datetime(201001010000), Datetime(201002010000), KQuery::WEEK);
+    KData kdata8 = kdata6.getKData(query8);
+    expect = stock.getKData(query8);
+    CHECK_KDATA_EQUAL(kdata8, expect);
+
+    /** @arg 测试分钟级别查询 */
+    KQuery query9(Datetime(201112050930), Datetime(201112061030), KQuery::MIN);  // 分钟级别查询
+    KData kdata9 = stock.getKData(query9);
+    KQuery query10(Datetime(201112060930), Datetime(201112061030), KQuery::MIN);
+    KData kdata10 = kdata9.getKData(query10);
+    expect = stock.getKData(query10);
+    CHECK_UNARY(!kdata10.empty());
+    CHECK_KDATA_EQUAL(kdata10, expect);
+
+    query10 = KQueryByDate(Datetime(201112060930), Datetime(201112061530), KQuery::MIN);
+    kdata10 = kdata9.getKData(query10);
+    expect = stock.getKData(query10);
+    CHECK_UNARY(!kdata10.empty());
+    CHECK_KDATA_EQUAL(kdata10, expect);
+
+    query10 = KQueryByDate(Datetime(201112010930), Datetime(201112050930), KQuery::MIN);
+    kdata10 = kdata9.getKData(query10);
+    expect = stock.getKData(query10);
+    CHECK_UNARY(!kdata10.empty());
+    CHECK_KDATA_EQUAL(kdata10, expect);
+
+    query10 = KQueryByDate(Datetime(201112061131), Datetime(201112061530), KQuery::MIN);
+    kdata10 = kdata9.getKData(query10);
+    expect = stock.getKData(query10);
+    CHECK_UNARY(!kdata10.empty());
+    CHECK_KDATA_EQUAL(kdata10, expect);
+
+    query10 =
+      KQueryByDate(Datetime(201112060930), Datetime(201112061530), KQuery::MIN, KQuery::BACKWARD);
+    kdata10 = kdata9.getKData(query10);
+    expect = stock.getKData(query10);
+    CHECK_UNARY(!kdata10.empty());
+    CHECK_KDATA_EQUAL(kdata10, expect);
+
+    /** @arg 测试分钟到其他类型的转换 */
+    KQuery query11(Datetime(201001010930), Datetime(201001011030), KQuery::MIN5);
+    KData kdata11 = kdata9.getKData(query11);
+    expect = stock.getKData(query11);
+    CHECK_KDATA_EQUAL(kdata11, expect);
+}
+
+/** @par 检测点 - 覆盖_getOtherFromSelfByIndex和_getOtherFromSelfByDate的分支 */
+TEST_CASE("test_KData_getOtherFromSelf_subfunctions") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg 测试_getOtherFromSelfByIndex: 新查询的开始位置小于旧数据的开始位置，应创建新的实例 */
+    KQuery query1(10, 20, KQuery::DAY);  // 创建一个基础数据
+    KData kdata1 = stock.getKData(query1);
+    REQUIRE_FALSE(kdata1.empty());
+
+    KQuery query_smaller_start(5, 15, KQuery::DAY);  // 开始位置更小
+    KData kdata2 = kdata1.getKData(query_smaller_start);
+    KData expect = stock.getKData(query_smaller_start);
+    CHECK_KDATA_EQUAL(kdata2, expect);
+    CHECK_EQ(kdata2.getStock(), kdata1.getStock());
+    CHECK_NE(kdata2.getQuery(), kdata1.getQuery());  // 应该创建新的实例
+
+    /** @arg 测试_getOtherFromSelfByIndex: 新查询的开始位置在旧数据范围内但结束位置超出 */
+    size_t old_size = kdata1.size();
+    KQuery query_extend_end(kdata1.startPos() + 2, kdata1.endPos() + 5, KQuery::DAY);
+    KData kdata3 = stock.getKData(query_extend_end);   // 重新获取以确保数据完整
+    KData kdata4 = kdata3.getKData(query_extend_end);  // 这里会触发_getOtherFromSelfByIndex的分支
+    CHECK_EQ(kdata4.getStock(), kdata3.getStock());
+    CHECK_EQ(kdata4.getQuery(), query_extend_end);
+
+    /** @arg 测试_getOtherFromSelfByIndex: 新查询完全在旧数据范围内 */
+    KQuery query_within(12, 15, KQuery::DAY);
+    KData kdata5 = kdata1.getKData(query_within);
+    CHECK_EQ(kdata5.getStock(), kdata1.getStock());
+    CHECK_EQ(kdata5.getQuery().start(), query_within.start());
+    CHECK_EQ(kdata5.getQuery().end(), query_within.end());
+
+    /** @arg 测试_getOtherFromSelfByDate: 新开始日期小于旧数据开始日期 */
+    KQuery date_query1(Datetime(201001010000), Datetime(201012010000), KQuery::DAY);
+    KData kdata_date1 = stock.getKData(date_query1);
+    REQUIRE_FALSE(kdata_date1.empty());
+
+    KQuery date_query_earlier(Datetime(200901010000), Datetime(201011010000),
+                              KQuery::DAY);  // 更早的开始日期
+    KData kdata_date2 = kdata_date1.getKData(date_query_earlier);
+    CHECK_EQ(kdata_date2.getStock(), kdata_date1.getStock());
+    CHECK_NE(kdata_date2.getQuery(), kdata_date1.getQuery());  // 应该创建新的实例
+
+    /** @arg 测试_getOtherFromSelfByDate: 新开始日期在旧数据范围内 */
+    Datetime mid_date = kdata_date1[kdata_date1.size() / 2].datetime;
+    KQuery date_query_within(mid_date, Datetime(201011010000), KQuery::DAY);
+    KData kdata_date3 = kdata_date1.getKData(date_query_within);
+    CHECK_EQ(kdata_date3.getStock(), kdata_date1.getStock());
+    CHECK_EQ(kdata_date3.getQuery().startDatetime(), mid_date);
+
+    /** @arg 测试_getOtherFromSelfByDate: 日期查询跨越现有数据范围 */
+    Datetime end_date = kdata_date1.back().datetime;
+    Datetime future_date = end_date + TimeDelta(30 * 24 * 3600);  // 30天后，使用TimeDelta
+    KQuery date_query_extend(kdata_date1[2].datetime, future_date, KQuery::DAY);
+    KData kdata_date4 = kdata_date1.getKData(date_query_extend);
+    CHECK_EQ(kdata_date4.getStock(), kdata_date1.getStock());
+    CHECK_GE(kdata_date4.size(), kdata_date1.size());  // 新数据应该不少于原数据
+
+    /** @arg 测试索引转日期查询: 从索引查询转为日期查询 */
+    KQuery idx_query(0, 100, KQuery::DAY);
+    KData kdata_idx = stock.getKData(idx_query);
+    KQuery date_from_idx(Datetime(200001010000), Datetime(200005010000), KQuery::DAY);
+    KData kdata_date_from_idx = kdata_idx.getKData(date_from_idx);
+    CHECK_EQ(kdata_date_from_idx.getStock(), kdata_idx.getStock());
+    CHECK_EQ(kdata_date_from_idx.getQuery().kType(), KQuery::DAY);
+
+    /** @arg 测试日期转索引查询: 从日期查询转为索引查询 */
+    KQuery date_query_orig(Datetime(200001010000), Datetime(200005010000), KQuery::DAY);
+    KData kdata_date_orig = stock.getKData(date_query_orig);
+    KQuery idx_from_date(50, 150, KQuery::DAY);
+    KData kdata_idx_from_date = kdata_date_orig.getKData(idx_from_date);
+    CHECK_EQ(kdata_idx_from_date.getStock(), kdata_date_orig.getStock());
+    CHECK_EQ(kdata_idx_from_date.getQuery().kType(), KQuery::DAY);
+}
+
+/** @par 检测点 */
 TEST_CASE("test_KData_getKData") {
     KData k1, k2;
 
@@ -1995,6 +2057,47 @@ TEST_CASE("test_KData_getKData") {
     // for (size_t i = 0; i < k2.size(); i++) {
     //     CHECK_EQ(k2[i], k1[i + 3]);
     // }
+}
+
+/** @par 其它覆盖率补充测试 */
+TEST_CASE("test_KData_other") {
+    KData k1 = getKData("sh000001", 0, 2);
+    KData k2 = k1;
+    CHECK_KDATA_EQUAL(k1, k2);
+
+    k1 = k1;
+    CHECK_KDATA_EQUAL(k1, k2);
+
+    size_t count = 0;
+    for (const auto& r : k1) {
+        count++;
+    }
+    CHECK_EQ(count, k1.size());
+
+    count = 0;
+    KData::const_iterator iter = k1.cbegin();
+    CHECK_EQ(iter->datetime, k1[0].datetime);
+    for (; iter != k1.cend(); ++iter) {
+        count++;
+    }
+    CHECK_EQ(count, k1.size());
+
+    k2 = getKData("sh000001", k1[0].datetime, k1[1].datetime + Days(1));
+    CHECK_EQ(k1.size(), k2.size());
+    const KRecord* p1 = k1.data();
+    KRecord* p2 = k2.data();
+    for (size_t i = 0; i < k1.size(); i++) {
+        CHECK_EQ(p1[i], p2[i]);
+    }
+
+    k1 = KData();
+    CHECK_EQ(k1.getKRecord(0), Null<KRecord>());
+    CHECK_EQ(k1.front(), Null<KRecord>());
+    CHECK_EQ(k1.back(), Null<KRecord>());
+    p1 = k1.data();
+    CHECK_EQ(p1, nullptr);
+    p2 = k1.data();
+    CHECK_EQ(p2, nullptr);
 }
 
 /** @} */

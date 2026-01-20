@@ -105,14 +105,18 @@ KData KData::getKData(const Datetime& start, const Datetime& end) const {
 
 KData KData::getKData(const KQuery& query) const {
     KData ret;
-    HKU_ASSERT(m_imp);
-
     const Stock& stk = getStock();
     HKU_IF_RETURN(stk.isNull(), ret);
 
+    auto* p = dynamic_cast<KDataSharedBufferImp*>(m_imp.get());
+    if (p != nullptr) {
+        ret = KData(stk, query);
+        return ret;
+    }
+
     const auto& self_query = getQuery();
-    if (query.kType() != self_query.kType() || query.queryType() != self_query.queryType() ||
-        query.recoverType() != self_query.recoverType()) {
+    if (empty() || self_query.recoverType() != KQuery::NO_RECOVER ||
+        query.kType() != self_query.kType()) {
         ret = KData(stk, query);
         return ret;
     }
