@@ -94,13 +94,8 @@ void KData::tocsv(const string& filename) {
 }
 
 KData KData::getKData(const Datetime& start, const Datetime& end) const {
-    KData ret;
-    const Stock& stk = getStock();
-    HKU_IF_RETURN(stk.isNull(), ret);
-
-    const KQuery& query = getQuery();
-    ret = KData(stk, KQueryByDate(start, end, query.kType(), query.recoverType()));
-    return ret;
+    const auto& self_query = getQuery();
+    return getKData(KQueryByDate(start, end, self_query.kType(), self_query.recoverType()));
 }
 
 KData KData::getKData(const KQuery& query) const {
