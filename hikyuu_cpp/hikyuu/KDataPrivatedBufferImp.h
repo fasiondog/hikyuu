@@ -43,11 +43,11 @@ public:
         return m_buffer.back();
     }
 
-    virtual const KRecord* data() const override {
+    virtual const KRecord* data() const noexcept override {
         return m_buffer.data();
     }
 
-    virtual KRecord* data() override {
+    virtual KRecord* data() noexcept override {
         return m_buffer.data();
     }
 

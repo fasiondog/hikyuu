@@ -61,11 +61,11 @@ public:
         return KRecord::NullKRecord;
     }
 
-    virtual const KRecord* data() const {
+    virtual const KRecord* data() const noexcept {
         return nullptr;
     }
 
-    virtual KRecord* data() {
+    virtual KRecord* data() noexcept {
         return nullptr;
     }
 

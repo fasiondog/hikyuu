@@ -44,6 +44,8 @@ string KData::toString() const {
 
 KData::KData() : m_imp(get_null_kdata_imp()) {}
 
+KData::KData(KDataImpPtr imp) : m_imp(imp ? imp : get_null_kdata_imp()) {}
+
 KData::KData(const Stock& stock, const KQuery& query) {
     // 在重加载或setKDateList时，已存在KData存在数据无效风险（但无内存访问问题)
     if (stock.isNull()) {

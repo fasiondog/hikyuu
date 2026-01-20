@@ -49,11 +49,11 @@ public:
         return m_data[m_size - 1];
     }
 
-    virtual const KRecord* data() const override {
+    virtual const KRecord* data() const noexcept override {
         return m_data;
     }
 
-    virtual KRecord* data() override {
+    virtual KRecord* data() noexcept override {
         return m_data;
     }
 

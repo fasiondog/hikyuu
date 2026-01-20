@@ -24,6 +24,7 @@ public:
     KData();
     KData(const KData&);
     KData(const Stock& stock, const KQuery& query);
+    KData(KDataImpPtr imp);
     virtual ~KData() {}
 
     KData& operator=(const KData&);
@@ -145,8 +146,10 @@ public:
     Indicator amo() const;
 
 public:
-    const KRecord* data() const;
-    KRecord* data();  // 谨慎使用（用于强制调整数据）
+    const KRecord* data() const noexcept;
+    KRecord* data() noexcept;  // 谨慎使用（用于强制调整数据）
+
+    KDataImpPtr getImp() const noexcept;
 
     // 常量迭代器定义
     class const_iterator {
@@ -343,12 +346,16 @@ inline bool KData::operator!=(const KData& other) const {
     return !(*this == other);
 }
 
-inline const KRecord* KData::data() const {
+inline const KRecord* KData::data() const noexcept {
     return m_imp->data();
 }
 
-inline KRecord* KData::data() {
+inline KRecord* KData::data() noexcept {
     return m_imp->data();
+}
+
+inline KDataImpPtr KData::getImp() const noexcept {
+    return m_imp;
 }
 
 } /* namespace hku */
