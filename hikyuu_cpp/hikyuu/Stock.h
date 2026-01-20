@@ -77,52 +77,52 @@ public:
      * 获取内部id，一般用于作为map的键值使用，该id实际为m_data的内存地址
      * @note 非数据库中的stockid
      */
-    uint64_t id() const;
+    uint64_t id() const noexcept;
 
     /** 获取所属市场简称，市场简称是市场的唯一标识 */
-    const string& market() const;
+    const string& market() const noexcept;
 
     /** 获取证券代码 */
-    const string& code() const;
+    const string& code() const noexcept;
 
     /** 市场简称+证券代码，如: sh000001 */
-    const string& market_code() const;
+    const string& market_code() const noexcept;
 
     /** 获取证券名称 */
-    const string& name() const;
+    const string& name() const noexcept;
 
     /** 获取证券类型 */
-    uint32_t type() const;
+    uint32_t type() const noexcept;
 
     /** 该证券当前是否有效 */
-    bool valid() const;
+    bool valid() const noexcept;
 
     /** 获取证券起始日期 */
-    const Datetime& startDatetime() const;
+    const Datetime& startDatetime() const noexcept;
 
     /** 获取证券最后日期 */
-    const Datetime& lastDatetime() const;
+    const Datetime& lastDatetime() const noexcept;
 
     /** 获取最小跳动量 */
-    price_t tick() const;
+    price_t tick() const noexcept;
 
     /** 最小跳动量价值 */
-    price_t tickValue() const;
+    price_t tickValue() const noexcept;
 
     /** 每单位价值 = tickValue / tick */
-    price_t unit() const;
+    price_t unit() const noexcept;
 
     /** 获取价格精度 */
-    int precision() const;
+    int precision() const noexcept;
 
     /** 获取最小交易数量，同minTradeNumber */
-    double atom() const;
+    double atom() const noexcept;
 
     /** 获取最小交易数量 */
-    double minTradeNumber() const;
+    double minTradeNumber() const noexcept;
 
     /** 获取最大交易量 */
-    double maxTradeNumber() const;
+    double maxTradeNumber() const noexcept;
 
     void market(const string& market_);
     void code(const string& code_);
@@ -243,7 +243,7 @@ public:
     bool isPreload(KQuery::KType ktype) const;
 
     /** 是否为Null */
-    bool isNull() const;
+    bool isNull() const noexcept;
 
     /** （临时函数）只用于更新缓存中的K线数据 **/
     void realtimeUpdate(KRecord, const KQuery::KType& ktype = KQuery::DAY);
@@ -347,7 +347,7 @@ inline bool operator<(const Stock& s1, const Stock& s2) {
     return s1.id() < s2.id();
 }
 
-inline uint64_t Stock::id() const {
+inline uint64_t Stock::id() const noexcept {
     return isNull() ? 0 : (int64_t)m_data.get();
 }
 
@@ -355,7 +355,7 @@ inline bool Stock::operator!=(const Stock& stock) const {
     return !(*this == stock);
 }
 
-inline bool Stock::isNull() const {
+inline bool Stock::isNull() const noexcept {
     return !m_data || !m_kdataDriver;
 }
 

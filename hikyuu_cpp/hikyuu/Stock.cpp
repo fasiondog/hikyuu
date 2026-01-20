@@ -180,63 +180,63 @@ bool Stock::operator==(const Stock& stock) const {
             (m_data->m_market == stock.m_data->m_market));
 }
 
-const string& Stock::market() const {
+const string& Stock::market() const noexcept {
     return m_data ? m_data->m_market : default_market;
 }
 
-const string& Stock::code() const {
+const string& Stock::code() const noexcept {
     return m_data ? m_data->m_code : default_code;
 }
 
-const string& Stock::market_code() const {
+const string& Stock::market_code() const noexcept {
     return m_data ? m_data->m_market_code : default_market_code;
 }
 
-const string& Stock::name() const {
+const string& Stock::name() const noexcept {
     return m_data ? m_data->m_name : default_name;
 }
 
-uint32_t Stock::type() const {
+uint32_t Stock::type() const noexcept {
     return m_data ? m_data->m_type : default_type;
 }
 
-bool Stock::valid() const {
+bool Stock::valid() const noexcept {
     return m_data ? m_data->m_valid : default_valid;
 }
 
-const Datetime& Stock::startDatetime() const {
+const Datetime& Stock::startDatetime() const noexcept {
     return m_data ? m_data->m_startDate : default_startDate;
 }
 
-const Datetime& Stock::lastDatetime() const {
+const Datetime& Stock::lastDatetime() const noexcept {
     return m_data ? m_data->m_lastDate : default_lastDate;
 }
 
-price_t Stock::tick() const {
+price_t Stock::tick() const noexcept {
     return m_data ? m_data->m_tick : default_tick;
 }
 
-price_t Stock::tickValue() const {
+price_t Stock::tickValue() const noexcept {
     return m_data ? m_data->m_tickValue : default_tickValue;
 }
 
-price_t Stock::unit() const {
+price_t Stock::unit() const noexcept {
     return m_data ? m_data->m_unit : default_unit;
 }
 
-int Stock::precision() const {
+int Stock::precision() const noexcept {
     return m_data ? m_data->m_precision : default_precision;
 }
 
-double Stock::atom() const {
+double Stock::atom() const noexcept {
     return m_data ? m_data->m_minTradeNumber : default_minTradeNumber;
 }
 
-double Stock::minTradeNumber() const {
+double Stock::minTradeNumber() const noexcept {
     return m_data ? m_data->m_minTradeNumber : default_minTradeNumber;
 }
 
-double Stock::maxTradeNumber() const {
+double Stock::maxTradeNumber() const noexcept {
     return m_data ? m_data->m_maxTradeNumber : default_maxTradeNumber;
 }
 

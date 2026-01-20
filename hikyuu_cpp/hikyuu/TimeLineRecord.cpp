@@ -40,7 +40,7 @@ TimeLineRecord::TimeLineRecord() : datetime(Datetime()), price(0.0), vol(0.0) {}
 TimeLineRecord::TimeLineRecord(const Datetime& datetime, price_t price, price_t vol)
 : datetime(datetime), price(price), vol(vol) {}
 
-bool TimeLineRecord::isValid() const {
+bool TimeLineRecord::isValid() const noexcept {
     return datetime == Null<Datetime>() ? false : true;
 }
 

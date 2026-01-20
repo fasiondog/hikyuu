@@ -26,7 +26,7 @@ public:
     TimeLineRecord();
     TimeLineRecord(const Datetime& datetime, price_t price, price_t vol);
 
-    bool isValid() const;
+    bool isValid() const noexcept;
 };
 
 /**

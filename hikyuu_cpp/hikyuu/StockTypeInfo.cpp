@@ -64,7 +64,7 @@ StockTypeInfo::StockTypeInfo(uint32_t type, const string& description, price_t t
     }
 }
 
-StockTypeInfo::StockTypeInfo(StockTypeInfo&& rhs)
+StockTypeInfo::StockTypeInfo(StockTypeInfo&& rhs) noexcept
 : m_type(rhs.m_type),
   m_description(std::move(rhs.m_description)),
   m_tick(rhs.m_tick),
@@ -75,16 +75,15 @@ StockTypeInfo::StockTypeInfo(StockTypeInfo&& rhs)
   m_maxTradeNumber(rhs.m_maxTradeNumber) {}
 
 StockTypeInfo& StockTypeInfo::operator=(StockTypeInfo&& rhs) noexcept {
-    if (this != &rhs) {
-        m_type = rhs.m_type;
-        m_description = std::move(rhs.m_description);
-        m_tick = rhs.m_tick;
-        m_tickValue = rhs.m_tickValue;
-        m_unit = rhs.m_unit;
-        m_precision = rhs.m_precision;
-        m_minTradeNumber = rhs.m_minTradeNumber;
-        m_maxTradeNumber = rhs.m_maxTradeNumber;
-    }
+    HKU_IF_RETURN(this == &rhs, *this);
+    m_type = rhs.m_type;
+    m_description = std::move(rhs.m_description);
+    m_tick = rhs.m_tick;
+    m_tickValue = rhs.m_tickValue;
+    m_unit = rhs.m_unit;
+    m_precision = rhs.m_precision;
+    m_minTradeNumber = rhs.m_minTradeNumber;
+    m_maxTradeNumber = rhs.m_maxTradeNumber;
     return *this;
 };
 

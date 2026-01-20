@@ -40,7 +40,7 @@ TransRecord::TransRecord() : datetime(Datetime()), price(0.0), vol(0.0), direct(
 TransRecord::TransRecord(const Datetime& datetime, price_t price, price_t vol, int direct)
 : datetime(datetime), price(price), vol(vol), direct(direct) {}
 
-bool TransRecord::isValid() const {
+bool TransRecord::isValid() const noexcept {
     return datetime == Null<Datetime>() ? false : true;
 }
 

@@ -209,12 +209,12 @@ extern template float HKU_UTILS_API roundDown(float number, int ndigits);
 #endif
 
 /** 转小写字符串 */
-inline void to_lower(std::string &s) {
+inline void to_lower(std::string &s) noexcept {
     std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
 }
 
 /** 转大写字符串 */
-inline void to_upper(std::string &s) {
+inline void to_upper(std::string &s) noexcept {
     std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::toupper(c); });
 }
 

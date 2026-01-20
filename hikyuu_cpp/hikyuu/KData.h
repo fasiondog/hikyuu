@@ -83,7 +83,7 @@ public:
      * @param end 结束索引
      * @return KData
      */
-    // KData getKData(int64_t start, int64_t end = Null<int64_t>()) const;
+    KData getSubKData(int64_t start, int64_t end = Null<int64_t>()) const;
 
     /**
      * 特殊用途！谨慎！按当前K线范围，获取指定日期范围的其他类型的按日期查询的 Query 条件

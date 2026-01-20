@@ -23,13 +23,13 @@ struct HKU_API HistoryFinanceInfo {
 
     HistoryFinanceInfo() = default;
     HistoryFinanceInfo(const HistoryFinanceInfo&) = default;
-    HistoryFinanceInfo(HistoryFinanceInfo&& rv)
+    HistoryFinanceInfo(HistoryFinanceInfo&& rv) noexcept
     : fileDate(std::move(rv.fileDate)),
       reportDate(std::move(rv.reportDate)),
       values(std::move(rv.values)) {}
 
-    HistoryFinanceInfo& operator=(const HistoryFinanceInfo&);
-    HistoryFinanceInfo& operator=(HistoryFinanceInfo&&);
+    HistoryFinanceInfo& operator=(const HistoryFinanceInfo&) noexcept;
+    HistoryFinanceInfo& operator=(HistoryFinanceInfo&&) noexcept;
 };
 
 }  // namespace hku

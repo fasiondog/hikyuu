@@ -131,31 +131,31 @@ KData KData::getKData(const KQuery& query) const {
     return ret;
 }
 
-// KData KData::getKData(int64_t start, int64_t end) const {
-//     int64_t total = static_cast<int64_t>(size());
-//     size_t startix, endix;
-//     if (start < 0) {
-//         startix = start < -total ? 0 : total + start;
-//     } else {
-//         startix = start;
-//     }
+KData KData::getSubKData(int64_t start, int64_t end) const {
+    int64_t total = static_cast<int64_t>(size());
+    size_t startix, endix;
+    if (start < 0) {
+        startix = start < -total ? 0 : total + start;
+    } else {
+        startix = start;
+    }
 
-//     if (end == Null<int64_t>()) {
-//         endix = total;
-//     } else if (end < 0) {
-//         endix = end < -total ? 0 : total + end;
-//     } else {
-//         endix = end;
-//     }
+    if (end == Null<int64_t>()) {
+        endix = total;
+    } else if (end < 0) {
+        endix = end < -total ? 0 : total + end;
+    } else {
+        endix = end;
+    }
 
-//     size_t startpos = startPos();
+    size_t startpos = startPos();
 
-//     const auto& self_query = getQuery();
-//     KQuery query =
-//       KQuery(startix + startpos, endix + startpos, self_query.kType(), self_query.recoverType());
+    const auto& self_query = getQuery();
+    KQuery query =
+      KQuery(startix + startpos, endix + startpos, self_query.kType(), self_query.recoverType());
 
-//     return KData(getStock(), query);
-// }
+    return KData(getStock(), query);
+}
 
 KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime& end_datetime,
                                   const KQuery::KType& ktype) const {

@@ -140,6 +140,15 @@ void export_KData(py::module& m) {
 
         :rtype: KData)")
 
+      .def("get_sub_kdata", &KData::getSubKData, py::arg("start"), py::arg("end") = null_int64,
+           R"(get_sub_kdata(start, end = Null<int64_t>)
+
+        通过索引获取自身子集
+
+        :param int start: 起始索引
+        :param int end: 结束索引
+        :rtype: KData)")
+
       .def("tocsv", &KData::tocsv, R"(tocsv(self, filename)
 
         将数据保存至CSV文件

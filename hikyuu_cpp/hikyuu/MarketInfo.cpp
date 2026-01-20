@@ -45,7 +45,7 @@ MarketInfo::MarketInfo(const string& market, const string& name, const string& d
   m_openTime2(openTime2),
   m_closeTime2(closeTime2) {}
 
-MarketInfo::MarketInfo(MarketInfo&& rhs)
+MarketInfo::MarketInfo(MarketInfo&& rhs) noexcept
 : m_market(std::move(rhs.m_market)),
   m_name(std::move(rhs.m_name)),
   m_description(std::move(rhs.m_description)),
