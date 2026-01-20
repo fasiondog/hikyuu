@@ -15,43 +15,7 @@ KDataPrivatedBufferImp::KDataPrivatedBufferImp() : KDataImp() {}
 
 KDataPrivatedBufferImp::KDataPrivatedBufferImp(const Stock& stock, const KQuery& query)
 : KDataImp(stock, query), m_buffer(m_stock.getKRecordList(query)) {
-    // 不支持复权时，直接返回
-    if (query.recoverType() == KQuery::NO_RECOVER)
-        return;
-
-    // 日线以上复权处理
-    if (query.kType() == KQuery::WEEK || query.kType() == KQuery::MONTH ||
-        query.kType() == KQuery::QUARTER || query.kType() == KQuery::HALFYEAR ||
-        query.kType() == KQuery::YEAR) {
-        _recoverForUpDay();
-        return;
-    }
-
-    switch (query.recoverType()) {
-        case KQuery::NO_RECOVER:
-            // do nothing
-            break;
-
-        case KQuery::FORWARD:
-            _recoverForward();
-            break;
-
-        case KQuery::BACKWARD:
-            _recoverBackward();
-            break;
-
-        case KQuery::EQUAL_FORWARD:
-            _recoverEqualForward();
-            break;
-
-        case KQuery::EQUAL_BACKWARD:
-            _recoverEqualBackward();
-            break;
-
-        default:
-            HKU_ERROR("Invalid RecvoerType!");
-            return;
-    }
+    _recover();
 }
 
 KDataPrivatedBufferImp::~KDataPrivatedBufferImp() {}
@@ -95,7 +59,7 @@ void KDataPrivatedBufferImp::_getPosInStock() const {
     m_have_pos_in_stock = true;
 }
 
-size_t KDataPrivatedBufferImp::getPos(const Datetime& datetime) const {
+size_t KDataPrivatedBufferImp::getPos(const Datetime& datetime) const noexcept {
     KRecordList::const_iterator iter;
     KRecord comp_record;
     comp_record.datetime = datetime;
@@ -108,6 +72,46 @@ size_t KDataPrivatedBufferImp::getPos(const Datetime& datetime) const {
     }
 
     return (iter - m_buffer.cbegin());
+}
+
+void KDataPrivatedBufferImp::_recover() {
+    // 不支持复权时，直接返回
+    if (m_buffer.empty() || m_query.recoverType() == KQuery::NO_RECOVER)
+        return;
+
+    // 日线以上复权处理
+    if (m_query.kType() == KQuery::WEEK || m_query.kType() == KQuery::MONTH ||
+        m_query.kType() == KQuery::QUARTER || m_query.kType() == KQuery::HALFYEAR ||
+        m_query.kType() == KQuery::YEAR) {
+        _recoverForUpDay();
+        return;
+    }
+
+    switch (m_query.recoverType()) {
+        case KQuery::NO_RECOVER:
+            // do nothing
+            break;
+
+        case KQuery::FORWARD:
+            _recoverForward();
+            break;
+
+        case KQuery::BACKWARD:
+            _recoverBackward();
+            break;
+
+        case KQuery::EQUAL_FORWARD:
+            _recoverEqualForward();
+            break;
+
+        case KQuery::EQUAL_BACKWARD:
+            _recoverEqualBackward();
+            break;
+
+        default:
+            HKU_ERROR("Invalid RecvoerType!");
+            return;
+    }
 }
 
 void KDataPrivatedBufferImp::_recoverForUpDay() {
@@ -405,6 +409,97 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
             m_buffer[i].closePrice = roundEx(k * m_buffer[i].closePrice, m_stock.precision());
         }
     }
+}
+
+KDataImpPtr KDataPrivatedBufferImp::getOtherFromSelf(const KQuery& query) const {
+    KDataImpPtr ret;
+    // 其它限制由上层保护
+    if (query.queryType() == KQuery::INDEX && m_query.queryType() == KQuery::INDEX) {
+        ret = _getOtherFromSelfByIndex(query);
+    } else {
+        ret = _getOtherFromSelfByDate(query);
+    }
+    if (query.recoverType() != KQuery::NO_RECOVER) {
+        auto* p = dynamic_cast<KDataPrivatedBufferImp*>(ret.get());
+        p->_recover();
+    }
+    return ret;
+}
+
+KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByIndex(const KQuery& query) const {
+    size_t new_start_pos = 0, new_end_pos = 0;
+    bool success = m_stock.getIndexRange(query, new_start_pos, new_end_pos);
+    if (!success || new_end_pos == 0) {
+        auto* p = new KDataPrivatedBufferImp;
+        p->m_stock = m_stock;
+        p->m_query = query;
+        return KDataImpPtr(p);
+    }
+
+    size_t new_last_pos = new_end_pos - 1;
+
+    size_t old_start_pos = startPos();
+    size_t old_last_pos = lastPos();
+    if (new_start_pos < old_start_pos || new_start_pos > old_last_pos) {
+        return std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
+    }
+
+    if (new_last_pos <= old_last_pos) {
+        auto* p = new KDataPrivatedBufferImp;
+        p->m_stock = m_stock;
+        p->m_query = query;
+        size_t new_len = new_last_pos + 1 - new_start_pos;
+        p->m_buffer.resize(new_len);
+        std::copy(m_buffer.begin() + new_start_pos - old_start_pos,
+                  m_buffer.begin() + new_last_pos + 1 - old_start_pos, p->m_buffer.begin());
+        return KDataImpPtr(p);
+    }
+
+    auto* p = new KDataPrivatedBufferImp;
+    p->m_stock = m_stock;
+    p->m_query = query;
+    size_t new_len = new_last_pos + 1 - new_start_pos;
+    p->m_buffer.resize(new_len);
+    std::copy(m_buffer.begin() + new_start_pos - old_start_pos, m_buffer.end(),
+              p->m_buffer.begin());
+    KRecordList klist =
+      m_stock.getKRecordList(KQuery(old_last_pos + 1, new_end_pos, query.kType()));
+    size_t remain_len = new_last_pos - old_last_pos;
+    HKU_ASSERT(klist.size() == remain_len);
+    std::copy(klist.begin(), klist.end(), p->m_buffer.begin() + remain_len);
+    return KDataImpPtr(p);
+}
+
+KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByDate(const KQuery& query) const {
+    const auto& old_start_date = m_buffer.front().datetime;
+    const auto& old_last_date = m_buffer.back().datetime;
+    Datetime new_start_date = query.startDatetime();
+    Datetime new_end_date = query.endDatetime();
+    if (new_start_date > old_last_date ||
+        (new_end_date != Null<Datetime>() && new_end_date <= old_start_date)) {
+        return std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
+    }
+
+    auto iter =
+      std::lower_bound(m_buffer.begin(), m_buffer.end(), KRecord{new_start_date},
+                       [](const KRecord& a, const KRecord& b) { return a.datetime < b.datetime; });
+    if (iter == m_buffer.end()) {
+        return std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
+    }
+
+    size_t new_start_pos_in_old = std::distance(m_buffer.begin(), iter);
+
+    KRecordList klist = m_stock.getKRecordList(
+      KQueryByDate(old_last_date + Seconds(KQuery::getKTypeInSeconds(query.kType())), new_end_date,
+                   query.kType()));
+    auto* p = new KDataPrivatedBufferImp;
+    p->m_stock = m_stock;
+    p->m_query = query;
+    p->m_buffer.resize(m_buffer.size() - new_start_pos_in_old + klist.size());
+    std::copy(m_buffer.begin() + new_start_pos_in_old, m_buffer.end(), p->m_buffer.begin());
+    std::copy(klist.begin(), klist.end(),
+              p->m_buffer.begin() + m_buffer.size() - new_start_pos_in_old);
+    return KDataImpPtr(p);
 }
 
 } /* namespace hku */

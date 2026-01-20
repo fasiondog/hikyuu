@@ -41,46 +41,46 @@ public:
     StockTypeInfo(const StockTypeInfo&) = default;
     StockTypeInfo& operator=(const StockTypeInfo&) = default;
 
-    StockTypeInfo(StockTypeInfo&&);
+    StockTypeInfo(StockTypeInfo&&) noexcept;
     StockTypeInfo& operator=(StockTypeInfo&&) noexcept;
 
     /** 获取证券类型 */
-    uint32_t type() const {
+    uint32_t type() const noexcept {
         return m_type;
     }
 
     /** 获取证券类型描述信息 */
-    const string& description() const {
+    const string& description() const noexcept {
         return m_description;
     }
 
     /** 获取最小跳动量 */
-    price_t tick() const {
+    price_t tick() const noexcept {
         return m_tick;
     }
 
     /** 每tick价格 */
-    price_t tickValue() const {
+    price_t tickValue() const noexcept {
         return m_tickValue;
     }
 
     /** 每单位价格 = tickValue / tick */
-    price_t unit() const {
+    price_t unit() const noexcept {
         return m_unit;
     }
 
     /** 获取价格精度 */
-    int precision() const {
+    int precision() const noexcept {
         return m_precision;
     }
 
     /** 获取每笔最小交易数量 */
-    double minTradeNumber() const {
+    double minTradeNumber() const noexcept {
         return m_minTradeNumber;
     }
 
     /** 获取每笔最大交易数量 */
-    double maxTradeNumber() const {
+    double maxTradeNumber() const noexcept {
         return m_maxTradeNumber;
     }
 

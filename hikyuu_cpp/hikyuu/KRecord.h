@@ -55,7 +55,7 @@ public:
       transAmount(transAmount),
       transCount(transCount) {}
 
-    bool isValid() const {
+    bool isValid() const noexcept {
         return datetime == Null<Datetime>() ? false : true;
     }
 

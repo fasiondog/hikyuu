@@ -40,51 +40,51 @@ public:
     MarketInfo(const MarketInfo&) = default;
     MarketInfo& operator=(const MarketInfo&) = default;
 
-    MarketInfo(MarketInfo&&);
+    MarketInfo(MarketInfo&&) noexcept;
     MarketInfo& operator=(MarketInfo&&) noexcept;
 
     /** 获取市场简称 */
-    const string& market() const {
+    const string& market() const noexcept {
         return m_market;
     }
 
     /** 获取市场名称 */
-    const string& name() const {
+    const string& name() const noexcept {
         return m_name;
     }
 
     /** 获取市场描述 */
-    const string& description() const {
+    const string& description() const noexcept {
         return m_description;
     }
 
     /** 获取该市场对应的指数代码 */
-    const string& code() const {
+    const string& code() const noexcept {
         return m_code;
     }
 
     /** 获取市场数据的最后更新日期 */
-    Datetime lastDate() const {
+    Datetime lastDate() const noexcept {
         return m_lastDate;
     }
 
     /** 开市时间1 */
-    TimeDelta openTime1() const {
+    TimeDelta openTime1() const noexcept {
         return m_openTime1;
     }
 
     /** 闭市时间1 */
-    TimeDelta closeTime1() const {
+    TimeDelta closeTime1() const noexcept {
         return m_closeTime1;
     }
 
     /** 开市时间2 */
-    TimeDelta openTime2() const {
+    TimeDelta openTime2() const noexcept {
         return m_openTime2;
     }
 
     /** 闭市时间2 */
-    TimeDelta closeTime2() const {
+    TimeDelta closeTime2() const noexcept {
         return m_closeTime2;
     }
 

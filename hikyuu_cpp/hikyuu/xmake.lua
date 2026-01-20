@@ -2,6 +2,10 @@
 target("hikyuu")
     set_kind("$(kind)")
 
+    if is_mode("coverage") then 
+        add_cxflags("-fprofile-update=atomic")
+    end
+
     if get_config("leak_check") then
         if is_plat("macosx") then
             set_policy("build.sanitizer.address", true)

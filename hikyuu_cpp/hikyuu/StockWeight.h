@@ -29,47 +29,47 @@ public:
                 price_t freeCount, price_t suogu);
 
     /** 权息日期 */
-    Datetime datetime() const {
+    Datetime datetime() const noexcept {
         return m_datetime;
     }
 
     /** 每10股送X股 */
-    price_t countAsGift() const {
+    price_t countAsGift() const noexcept {
         return m_countAsGift;
     }
 
     /** 每10股配X股 */
-    price_t countForSell() const {
+    price_t countForSell() const noexcept {
         return m_countForSell;
     }
 
     /** 配股价 */
-    price_t priceForSell() const {
+    price_t priceForSell() const noexcept {
         return m_priceForSell;
     }
 
     /** 每10股红利 */
-    price_t bonus() const {
+    price_t bonus() const noexcept {
         return m_bonus;
     }
 
     /** 每10股转增X股 */
-    price_t increasement() const {
+    price_t increasement() const noexcept {
         return m_increasement;
     }
 
     /** 总股本（万股） */
-    price_t totalCount() const {
+    price_t totalCount() const noexcept {
         return m_totalCount;
     }
 
     /** 流通股（万股） */
-    price_t freeCount() const {
+    price_t freeCount() const noexcept {
         return m_freeCount;
     }
 
     /** 扩缩股比例 */
-    price_t suogu() const {
+    price_t suogu() const noexcept {
         return m_suogu;
     }
 

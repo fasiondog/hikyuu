@@ -58,7 +58,7 @@ public:
     static bool isValidKType(const string& ktype);
 
     /** 判断是否为有效 ktype */
-    static bool isBaseKType(const string& ktype);
+    static bool isBaseKType(const string& ktype) noexcept;
 
     /** 判断是否为扩展 ktype */
     static bool isExtraKType(const string& ktype);
@@ -71,7 +71,7 @@ public:
 
     static int32_t getKTypeInMin(const KType& ktype);
 
-    static int32_t getBaseKTypeInMin(const KType& ktype);
+    static int32_t getBaseKTypeInMin(const KType& ktype) noexcept;
 
     static int64_t getKTypeInSeconds(const KType& ktype);
 
@@ -129,14 +129,14 @@ public:
     /**
      * 按索引方式查询时，返回指定的起始索引，否则返回Null<int64_t>()
      */
-    int64_t start() const {
+    int64_t start() const noexcept {
         return m_queryType != INDEX ? Null<int64_t>() : m_start;
     }
 
     /**
      * 按索引方式查询时，返回指定的结束索引，否则返回Null<int64_t>()
      */
-    int64_t end() const {
+    int64_t end() const noexcept {
         return m_queryType != INDEX ? Null<int64_t>() : m_end;
     }
 
@@ -151,18 +151,18 @@ public:
     Datetime endDatetime() const;
 
     /** 获取查询条件类型 */
-    QueryType queryType() const {
+    QueryType queryType() const noexcept {
         return m_queryType;
     }
 
     /** 获取K线数据类型 */
     // KType kType() const { return m_dataType; }
-    const string& kType() const {
+    const string& kType() const noexcept {
         return m_dataType;
     }
 
     /** 获取复权类型 */
-    RecoverType recoverType() const {
+    RecoverType recoverType() const noexcept {
         return m_recoverType;
     }
 

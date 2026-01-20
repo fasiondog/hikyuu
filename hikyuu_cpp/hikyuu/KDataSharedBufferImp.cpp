@@ -27,7 +27,7 @@ KDataSharedBufferImp::KDataSharedBufferImp(const Stock& stock, const KQuery& que
 
 KDataSharedBufferImp::~KDataSharedBufferImp() {}
 
-size_t KDataSharedBufferImp::getPos(const Datetime& datetime) const {
+size_t KDataSharedBufferImp::getPos(const Datetime& datetime) const noexcept {
     KRecord null_record;
     if (empty()) {
         return Null<size_t>();
@@ -35,18 +35,18 @@ size_t KDataSharedBufferImp::getPos(const Datetime& datetime) const {
 
     size_t mid, low = 0, high = size() - 1;
     while (low <= high) {
-        if (datetime > getKRecord(high).datetime) {
+        if (datetime > m_data[high].datetime) {
             mid = high + 1;
             break;
         }
 
-        if (getKRecord(low).datetime >= datetime) {
+        if (m_data[low].datetime >= datetime) {
             mid = low;
             break;
         }
 
         mid = (low + high) / 2;
-        if (datetime > getKRecord(mid).datetime) {
+        if (datetime > m_data[mid].datetime) {
             low = mid + 1;
         } else {
             high = mid - 1;
@@ -57,10 +57,10 @@ size_t KDataSharedBufferImp::getPos(const Datetime& datetime) const {
         return Null<size_t>();
     }
 
-    return getKRecord(mid).datetime == datetime ? mid : Null<size_t>();
+    return m_data[mid].datetime == datetime ? mid : Null<size_t>();
 }
 
-const KRecord& KDataSharedBufferImp::getKRecord(size_t pos) const {
+const KRecord& KDataSharedBufferImp::getKRecord(size_t pos) const noexcept {
     return pos < m_size ? m_data[pos] : KRecord::NullKRecord;
 }
 
@@ -70,6 +70,10 @@ DatetimeList KDataSharedBufferImp::getDatetimeList() const {
         result[i] = m_data[i].datetime;
     }
     return result;
+}
+
+KDataImpPtr KDataSharedBufferImp::getOtherFromSelf(const KQuery& query) const {
+    return std::make_shared<KDataSharedBufferImp>(m_stock, query);
 }
 
 } /* namespace hku */

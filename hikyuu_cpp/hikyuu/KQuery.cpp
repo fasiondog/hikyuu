@@ -90,7 +90,7 @@ int32_t KQuery::getKTypeInMin(const KType& ktype) {
     return sec;
 }
 
-int32_t KQuery::getBaseKTypeInMin(const KType& ktype) {
+int32_t KQuery::getBaseKTypeInMin(const KType& ktype) noexcept {
     string nktype(ktype);
     to_upper(nktype);
     auto iter = g_ktype2min.find(nktype);
@@ -120,7 +120,7 @@ bool KQuery::isValidKType(const string& ktype) {
     return isBaseKType(ktype) || hku::isExtraKType(ktype);
 }
 
-bool KQuery::isBaseKType(const string& ktype) {
+bool KQuery::isBaseKType(const string& ktype) noexcept {
     string nktype(ktype);
     to_upper(nktype);
     auto iter = g_all_base_ktype.find(nktype);

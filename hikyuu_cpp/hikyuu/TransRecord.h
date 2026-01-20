@@ -27,7 +27,7 @@ public:
     TransRecord();
     TransRecord(const Datetime& datetime, price_t price, price_t vol, int32_t direct);
 
-    bool isValid() const;
+    bool isValid() const noexcept;
 };
 
 /**

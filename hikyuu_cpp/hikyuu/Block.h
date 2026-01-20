@@ -43,29 +43,29 @@ public:
         return iter;
     }
 
-    bool isNull() const {
+    bool isNull() const noexcept {
         return !m_data;
     }
 
-    uint64_t id() const {
+    uint64_t id() const noexcept {
         return m_data ? (uint64_t)m_data.get() : 0;
     }
 
-    bool operator==(const Block& blk) const {
+    bool operator==(const Block& blk) const noexcept {
         return m_data == blk.m_data;
     }
 
-    bool operator!=(const Block& blk) const {
+    bool operator!=(const Block& blk) const noexcept {
         return m_data != blk.m_data;
     }
 
     /** 获取板块类别 */
-    string category() const {
+    string category() const noexcept {
         return m_data ? m_data->m_category : "";
     }
 
     /** 获取板块名称 */
-    string name() const {
+    string name() const noexcept {
         return m_data ? m_data->m_name : "";
     }
 
@@ -130,12 +130,12 @@ public:
     bool remove(const Stock& stock);
 
     /** 包含的证券数量 */
-    size_t size() const {
+    size_t size() const noexcept {
         return m_data ? m_data->m_stockDict.size() : 0;
     }
 
     /** 是否为空 */
-    bool empty() const {
+    bool empty() const noexcept {
         return size() ? false : true;
     }
 
@@ -146,7 +146,7 @@ public:
     }
 
     /** 获取对应的指数，可能为空 Stock */
-    Stock getIndexStock() const {
+    Stock getIndexStock() const noexcept {
         return m_data ? m_data->m_indexStock : Stock();
     }
 

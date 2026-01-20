@@ -17,11 +17,11 @@ public:
     KDataPrivatedBufferImp(const Stock& stock, const KQuery& query);
     virtual ~KDataPrivatedBufferImp() override;
 
-    virtual bool empty() const override {
+    virtual bool empty() const noexcept override {
         return m_buffer.empty();
     }
 
-    virtual size_t size() const override {
+    virtual size_t size() const noexcept override {
         return m_buffer.size();
     }
 
@@ -29,9 +29,9 @@ public:
     virtual size_t endPos() const override;
     virtual size_t lastPos() const override;
 
-    virtual size_t getPos(const Datetime& datetime) const override;
+    virtual size_t getPos(const Datetime& datetime) const noexcept override;
 
-    virtual const KRecord& getKRecord(size_t pos) const override {
+    virtual const KRecord& getKRecord(size_t pos) const noexcept override {
         return m_buffer[pos];
     }
 
@@ -53,13 +53,19 @@ public:
 
     virtual DatetimeList getDatetimeList() const override;
 
+    virtual KDataImpPtr getOtherFromSelf(const KQuery& query) const override;
+
 private:
     void _getPosInStock() const;
+    void _recover();
     void _recoverForward();
     void _recoverBackward();
     void _recoverEqualForward();
     void _recoverEqualBackward();
     void _recoverForUpDay();
+
+    KDataImpPtr _getOtherFromSelfByIndex(const KQuery& query) const;
+    KDataImpPtr _getOtherFromSelfByDate(const KQuery& query) const;
 
 private:
     KRecordList m_buffer;
@@ -68,6 +74,6 @@ private:
     mutable bool m_have_pos_in_stock{false};
 };
 
-typedef shared_ptr<KDataPrivatedBufferImp> KDataPrivatedBufferImpPtr;
+// typedef shared_ptr<KDataPrivatedBufferImp> KDataPrivatedBufferImpPtr;
 
 } /* namespace hku */
