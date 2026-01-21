@@ -213,9 +213,6 @@ public:
      */
     DatetimeList getTradingCalendar(const KQuery& query) const;
 
-    /** 设置权息信息, 仅供初始化时调用 */
-    void setWeightList(const StockWeightList&);
-
     /**
      * 判断是否在交易时间段内，忽略日期仅判断时分秒
      * @param time 时间
@@ -296,12 +293,12 @@ struct HKU_API Stock::Data {
     Datetime m_lastDate;   // 证券最后日期
 
     StockWeightList m_weightList;  // 权息信息列表
-    std::mutex m_weight_mutex;
+    std::shared_mutex m_weight_mutex;
 
     mutable vector<HistoryFinanceInfo>
       m_history_finance;  // 历史财务信息 [财务报告日期, 字段1, 字段2, ...]
     mutable std::atomic_bool m_history_finance_ready{false};
-    mutable std::mutex m_history_finance_mutex;
+    mutable std::shared_mutex m_history_finance_mutex;
 
     price_t m_tick;
     price_t m_tickValue;

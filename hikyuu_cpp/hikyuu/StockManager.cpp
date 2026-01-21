@@ -782,8 +782,9 @@ void StockManager::loadAllStockTypeInfo() {
 
 void StockManager::loadAllHolidays() {
     auto holidays = m_baseInfoDriver->getAllHolidays();
+    std::unordered_set<Datetime> tmp_holidays(holidays.begin(), holidays.end());
     std::unique_lock<std::shared_mutex> lock(*m_holidays_mutex);
-    m_holidays = std::move(holidays);
+    m_holidays = std::move(tmp_holidays);
 }
 
 void StockManager::loadAllStockWeights() {
@@ -791,12 +792,15 @@ void StockManager::loadAllStockWeights() {
     HKU_INFO(htr("Loading stock weight..."));
     if (m_context.isAll()) {
         auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
+        for (auto& item : all_stkweight_dict) {
+            item.second.shrink_to_fit();
+        }
         std::shared_lock<std::shared_mutex> lock1(*m_stockDict_mutex);
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             auto weight_iter = all_stkweight_dict.find(iter->first);
             if (weight_iter != all_stkweight_dict.end()) {
                 Stock& stock = iter->second;
-                std::lock_guard<std::mutex> lock2(stock.m_data->m_weight_mutex);
+                std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_weight_mutex);
                 stock.m_data->m_weightList.swap(weight_iter->second);
             }
         }
@@ -806,8 +810,9 @@ void StockManager::loadAllStockWeights() {
             Stock& stock = iter->second;
             auto sw_list = m_baseInfoDriver->getStockWeightList(
               stock.market(), stock.code(), m_context.startDatetime(), Null<Datetime>());
+            sw_list.shrink_to_fit();
             {
-                std::lock_guard<std::mutex> lock2(stock.m_data->m_weight_mutex);
+                std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_weight_mutex);
                 stock.m_data->m_weightList = std::move(sw_list);
             }
         }
@@ -816,6 +821,7 @@ void StockManager::loadAllStockWeights() {
 
 void StockManager::loadAllZhBond10() {
     m_zh_bond10 = m_baseInfoDriver->getAllZhBond10();
+    m_zh_bond10.shrink_to_fit();
 }
 
 void StockManager::loadHistoryFinanceField() {
