@@ -10,6 +10,7 @@
 #include <list>
 #include <mutex>
 #include <shared_mutex>
+#include <atomic>
 #include <optional>
 
 namespace hku {
