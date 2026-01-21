@@ -63,7 +63,7 @@ static unordered_map<string, int32_t> g_ktype2min{
 };
 
 static unordered_map<string, int64_t> g_ktype2sec{
-  {KQuery::TRANS, 60 * 24 * 3},
+  {KQuery::TRANS, 3},
 };
 
 // 获取所有的 KType
