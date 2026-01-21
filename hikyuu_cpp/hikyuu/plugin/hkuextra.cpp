@@ -57,10 +57,13 @@ std::vector<string> getExtraKTypeList() {
 }
 
 KRecordList getExtraKRecordList(const Stock& stk, const KQuery& query) {
+    KRecordList ret;
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
-    HKU_IF_RETURN(!plugin, KRecordList());
-    return plugin->getExtraKRecordList(stk, query);
+    HKU_IF_RETURN(!plugin, ret);
+    ret = plugin->getExtraKRecordList(stk, query);
+    ret.shrink_to_fit();
+    return ret;
 }
 
 size_t getStockExtraCount(const Stock& stk, const string& ktype) {

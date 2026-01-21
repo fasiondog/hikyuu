@@ -500,6 +500,7 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
         m_data->pKData[kType] = ptr_klist;
         if (total != 0) {
             (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code, query);
+            ptr_klist->shrink_to_fit();
             if ((kType == KQuery::TIMELINE || kType == KQuery::TRANS) &&
                 (type() == STOCKTYPE_ETF || type() == STOCKTYPE_FUND || type() == STOCKTYPE_B)) {
                 for (auto& k : *ptr_klist) {
@@ -526,6 +527,7 @@ void Stock::loadKDataToBufferFromKRecordList(const KQuery::KType& inkType, KReco
         }
         KRecordList* ptr_klist = new KRecordList;
         (*ptr_klist) = std::move(ks);
+        ptr_klist->shrink_to_fit();
         m_data->pKData[kType] = ptr_klist;
         m_data->m_lastUpdate[kType] = Datetime::now();
     }
@@ -980,6 +982,7 @@ KRecordList Stock::_getKRecordList(const KQuery& query) const {
             result = m_kdataDriver->getConnect()->getKRecordList(
               m_data->m_market, m_data->m_code, KQuery(start_ix, end_ix, query.kType()));
         }
+        result.shrink_to_fit();
         if ((query.kType() == KQuery::TIMELINE || query.kType() == KQuery::TRANS) &&
             (type() == STOCKTYPE_ETF || type() == STOCKTYPE_FUND || type() == STOCKTYPE_B)) {
             for (auto& k : result) {
