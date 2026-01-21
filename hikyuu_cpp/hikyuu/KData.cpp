@@ -53,16 +53,18 @@ KData::KData(const Stock& stock, const KQuery& query) {
         return;
     }
 
-    if (stock.isPreload(query.kType()) && !stock.isBuffer(query.kType())) {
-        stock.loadKDataToBuffer(query.kType());
+    if (stock.isPreload(query.kType())) {
+        if (!stock.isBuffer(query.kType())) {
+            stock.loadKDataToBuffer(query.kType());
+        }
+        if (query.recoverType() == KQuery::NO_RECOVER) {
+            // 当Stock已缓存了该类型的K线数据，且不进行复权
+            m_imp = make_shared<KDataSharedBufferImp>(stock, query);
+            return;
+        }
     }
 
-    if (query.recoverType() == KQuery::NO_RECOVER && stock.isBuffer(query.kType())) {
-        // 当Stock已缓存了该类型的K线数据，且不进行复权
-        m_imp = make_shared<KDataSharedBufferImp>(stock, query);
-    } else {
-        m_imp = getKDataImp(stock, query);
-    }
+    m_imp = getKDataImp(stock, query);
 }
 
 bool KData::operator==(const KData& thr) const {
@@ -105,8 +107,10 @@ KData KData::getKData(const KQuery& query) const {
     const Stock& stk = getStock();
     HKU_IF_RETURN(stk.isNull(), ret);
 
-    auto* p = dynamic_cast<KDataSharedBufferImp*>(m_imp.get());
-    if (p != nullptr) {
+    if (stk.isPreload(query.kType())) {
+        if (!stk.isBuffer(query.kType())) {
+            stk.loadKDataToBuffer(query.kType());
+        }
         ret = KData(stk, query);
         return ret;
     }

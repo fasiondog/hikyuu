@@ -471,11 +471,12 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByIndex(const KQuery& query
 }
 
 KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByDate(const KQuery& query) const {
-    const auto& old_start_date = m_buffer.front().datetime;
-    const auto& old_last_date = m_buffer.back().datetime;
     Datetime new_start_date = query.startDatetime();
     Datetime new_end_date = query.endDatetime();
-    if (new_start_date > old_last_date ||
+    const auto& old_start_date = m_buffer.front().datetime;
+    const auto& old_last_date = m_buffer.back().datetime;
+    if (new_start_date >= new_end_date || new_start_date < old_start_date ||
+        new_start_date > old_last_date ||
         (new_end_date != Null<Datetime>() && new_end_date <= old_start_date)) {
         return std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
     }
@@ -486,8 +487,25 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByDate(const KQuery& query)
     if (iter == m_buffer.end()) {
         return std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
     }
-
     size_t new_start_pos_in_old = std::distance(m_buffer.begin(), iter);
+
+    size_t new_end_pos_in_old = m_buffer.size();
+    if (new_end_date != Null<Datetime>()) {
+        auto iter = std::lower_bound(
+          m_buffer.begin(), m_buffer.end(), KRecord{new_end_date},
+          [](const KRecord& a, const KRecord& b) { return a.datetime < b.datetime; });
+        if (iter != m_buffer.end()) {
+            new_end_pos_in_old = std::distance(m_buffer.begin(), iter);
+            auto* p = new KDataPrivatedBufferImp;
+            p->m_stock = m_stock;
+            p->m_query = query;
+            size_t copy_len = new_end_pos_in_old - new_start_pos_in_old;
+            p->m_buffer.resize(copy_len);
+            std::copy(m_buffer.begin() + new_start_pos_in_old,
+                      m_buffer.begin() + new_end_pos_in_old, p->m_buffer.begin());
+            return KDataImpPtr(p);
+        }
+    }
 
     KRecordList klist = m_stock.getKRecordList(
       KQueryByDate(old_last_date + Seconds(KQuery::getKTypeInSeconds(query.kType())), new_end_date,
@@ -495,8 +513,11 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByDate(const KQuery& query)
     auto* p = new KDataPrivatedBufferImp;
     p->m_stock = m_stock;
     p->m_query = query;
-    p->m_buffer.resize(m_buffer.size() - new_start_pos_in_old + klist.size());
-    std::copy(m_buffer.begin() + new_start_pos_in_old, m_buffer.end(), p->m_buffer.begin());
+    size_t copy_len = new_end_pos_in_old - new_start_pos_in_old;
+    size_t new_len = copy_len + klist.size();
+    p->m_buffer.resize(new_len);
+    std::copy(m_buffer.begin() + new_start_pos_in_old, m_buffer.begin() + new_end_pos_in_old,
+              p->m_buffer.begin());
     std::copy(klist.begin(), klist.end(),
               p->m_buffer.begin() + m_buffer.size() - new_start_pos_in_old);
     return KDataImpPtr(p);
