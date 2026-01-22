@@ -6,9 +6,7 @@
  */
 
 #include "../test_config.h"
-#include <hikyuu/indicator/Indicator.h>
-#include <hikyuu/indicator/crt/PRICELIST.h>
-#include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/build_in.h>
 #include <hikyuu/StockManager.h>
 
 /**
@@ -872,6 +870,33 @@ TEST_CASE("test_LOGIC_OR") {
     result = data1 | data4;
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.size(), 0);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_indicator_increment_calculate") {
+    auto VAR1 = LLV(LOW(), 13);
+    auto VAR2 = HHV(HIGH(), 13);
+    auto VAR3 = SMA((CLOSE() - VAR1) / (VAR2 - VAR1) * 100, 5, 1);
+    auto VAR4 = SMA((VAR2 - CLOSE()) / (VAR2 - VAR1) * 100, 5, 1);
+    auto AA = VAR3;
+    auto BB = VAR4;
+    auto VAR5 = SMA(MAX(CLOSE() - REF(CLOSE(), 1), 0), 5, 1) /
+                SMA(ABS(CLOSE() - REF(CLOSE(), 1)), 5, 1) * 100;
+    auto CC = EMA(VAR5, 3);
+    auto XG = CROSS(CC, BB) & (CC >= REF(CC, 1)) & (BB <= REF(BB, 3)) & (CC >= 49.5) &
+              (MA(CLOSE(), 3) >= REF(MA(CLOSE(), 3), 1)) &
+              (MA(CLOSE(), 7) >= REF(MA(CLOSE(), 7), 1)) &
+              (MA(CLOSE(), 60) > REF(MA(CLOSE(), 60), 3));
+
+    Stock stk = getStock("sh600000");
+    KData k1 = stk.getKData(KQuery(100, 300));
+    KData k2 = stk.getKData(KQuery(200, 500));
+    auto x = XG(k1);
+    auto y = XG(k2);
+    x.setContext(k2);
+    CHECK_EQ(x.size(), y.size());
+    CHECK_EQ(x[159], 1.0);
+    CHECK_EQ(x[159], y[159]);
 }
 
 /** @} */
