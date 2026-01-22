@@ -300,13 +300,29 @@ void export_Selector(py::module& m) {
       .def("add_sys", &SelectorBase::addSystem)
       .def("add_sys_list", &SelectorBase::addSystemList)
 
-      .def("set_scores_filter", &SelectorBase::setScoresFilter, R"(set_scores_filter(self, filter)
+      .def(
+        "set_scores_filter",
+        [](SelectorBase& self, py::object filter) {
+            py::gil_scoped_acquire gil;
+            auto tmp = filter;
+            self.setScoresFilter(filter.cast<ScoresFilterPtr>());
+            tmp.release();
+        },
+        R"(set_scores_filter(self, filter)
            
     设置 ScoresFilter, 将替换现有的过滤器. 仅适用于 SE_MultiFactor
     
     :param ScoresFilter filter: ScoresFilter)")
 
-      .def("add_scores_filter", &SelectorBase::addScoresFilter, R"(add_scores_filter(self, filter)
+      .def(
+        "add_scores_filter",
+        [](SelectorBase& self, py::object filter) {
+            py::gil_scoped_acquire gil;
+            auto tmp = filter;
+            self.addScoresFilter(filter.cast<ScoresFilterPtr>());
+            tmp.release();
+        },
+        R"(add_scores_filter(self, filter)
         
     在已有过滤基础上新增过滤, 仅适用于 SE_MultiFactor    
 
