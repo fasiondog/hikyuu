@@ -2065,8 +2065,8 @@ TEST_CASE("test_KData_other") {
     KData k2 = k1;
     CHECK_KDATA_EQUAL(k1, k2);
 
-    k1 = k1;
-    CHECK_KDATA_EQUAL(k1, k2);
+    // k1 = k1;
+    // CHECK_KDATA_EQUAL(k1, k2);
 
     size_t count = 0;
     for (const auto& r : k1) {

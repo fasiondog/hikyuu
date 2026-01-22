@@ -163,7 +163,7 @@ use_draw_engine('matplotlib')
 
 def hku_save(var, filename):
     """
-    序列化，将hikyuu内建类型的变量（如Stock、TradeManager等）保存在指定的文件中，格式为XML。
+    序列化，将hikyuu内建类型的变量（如Stock、TradeManager等）保存在指定的文件中，格式为二进制。
 
     :param var: hikyuu内建类型的变量
     :param str filename: 指定的文件名
