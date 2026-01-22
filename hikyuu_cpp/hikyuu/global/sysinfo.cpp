@@ -102,39 +102,31 @@ std::string getVersionWithGit() {
     return HKU_VERSION_GIT;
 }
 
-// cppcheck-suppress constParameterReference
-static bool readUUID(boost::uuids::uuid& out) {
+static boost::uuids::uuid readUUID() {
+    boost::uuids::uuid uid;
     std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
-    FILE* fp = fopen(filename.c_str(), "rb");
-    HKU_IF_RETURN(!fp, false);
-
-    bool ret = true;
-    if (16 != fread((void*)out.data, 1, 16, fp)) {
-        ret = false;
+    if (existFile(filename)) {
+        FILE* fp = fopen(filename.c_str(), "rb");
+        if (fp) {
+            fread((void*)uid.data, 1, 16, fp);
+            fclose(fp);
+        }
+    } else {
+        uid = boost::uuids::random_generator()();
+        FILE* fp = fopen(filename.c_str(), "wb");
+        if (fp) {
+            fwrite(uid.data, 16, 1, fp);
+            fclose(fp);
+        }
     }
 
-    fclose(fp);
-    return ret;
-}
-
-static void saveUUID(const boost::uuids::uuid& uid) {
-    std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
-    FILE* fp = fopen(filename.c_str(), "wb");
-    HKU_IF_RETURN(!fp, void());
-
-    fwrite(uid.data, 16, 1, fp);
-    fclose(fp);
+    return uid;
 }
 
 void sendFeedback() {
-    std::thread t([] {
+    boost::uuids::uuid uid = readUUID();
+    std::thread t([uid] {
         try {
-            boost::uuids::uuid uid;
-            if (!readUUID(uid)) {
-                uid = boost::uuids::random_generator()();
-                saveUUID(uid);
-            }
-
             HttpClient client(FEEDBACK_SERVER_ADDR, 2000);
             json req;
             req["uid"] = boost::uuids::to_string(uid);
