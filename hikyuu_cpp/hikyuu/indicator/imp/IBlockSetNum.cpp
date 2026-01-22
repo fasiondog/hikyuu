@@ -70,6 +70,34 @@ void IBlockSetNum::_calculate(const Indicator& ind) {
     }
 }
 
+bool IBlockSetNum::supportIncrementCalculate() const {
+    return !getParam<bool>("ignore_context");
+}
+
+void IBlockSetNum::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    const Block block = getParam<const Block&>("block");
+    const KData& k = getContext();
+    DatetimeList dates = k.getDatetimeList();
+
+    size_t total = dates.size();
+
+    value_t zero = 0.0;
+    auto* dst = this->data();
+    for (size_t i = start_pos; i < total; i++) {
+        dst[i] = zero;
+    }
+
+    for (auto iter = block.begin(); iter != block.end(); ++iter) {
+        const Datetime& start_date = iter->startDatetime();
+        Datetime last_date = iter->lastDatetime().isNull() ? Datetime::max() : iter->lastDatetime();
+        for (size_t i = start_pos; i < total; i++) {
+            if (dates[i] >= start_date && dates[i] <= last_date) {
+                dst[i]++;
+            }
+        }
+    }
+}
+
 Indicator HKU_API BLOCKSETNUM(const Block& block, const KQuery& query) {
     IndicatorImpPtr p = make_shared<IBlockSetNum>();
     p->setParam<KQuery>("query", query);
