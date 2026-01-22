@@ -53,34 +53,36 @@ TEST_CASE("test_RANK") {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-// TEST_CASE("test_RANK_export") {
-//     StockManager& sm = StockManager::instance();
-//     string filename(sm.tmpdir());
-//     filename += "/RANK.xml";
+TEST_CASE("test_RANK_export") {
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/RANK.xml";
 
-//     Stock stock = sm.getStock("sh000001");
-//     KData kdata = stock.getKData(KQuery(-20));
-//     Indicator x1 = hku::RANK(MA(CLOSE(kdata), 3));
-//     {
-//         std::ofstream ofs(filename);
-//         boost::archive::xml_oarchive oa(ofs);
-//         oa << BOOST_SERIALIZATION_NVP(x1);
-//     }
+    Block blk;
+    blk.add(getStock("sz000001"));
+    blk.add(getStock("sz000002"));
+    auto k = getKData("sz000002", KQuery(-6));
+    Indicator x1 = RANK(blk, CLOSE())(k);
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(x1);
+    }
 
-//     Indicator x2;
-//     {
-//         std::ifstream ifs(filename);
-//         boost::archive::xml_iarchive ia(ifs);
-//         ia >> BOOST_SERIALIZATION_NVP(x2);
-//     }
+    Indicator x2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(x2);
+    }
 
-//     CHECK_UNARY(x1.size() == x2.size());
-//     CHECK_UNARY(x1.discard() == x2.discard());
-//     CHECK_UNARY(x1.getResultNumber() == x2.getResultNumber());
-//     for (size_t i = 0; i < x1.size(); ++i) {
-//         CHECK_EQ(x1[i], doctest::Approx(x2[i]).epsilon(0.00001));
-//     }
-// }
+    CHECK_UNARY(x1.size() == x2.size());
+    CHECK_UNARY(x1.discard() == x2.discard());
+    CHECK_UNARY(x1.getResultNumber() == x2.getResultNumber());
+    for (size_t i = 0; i < x1.size(); ++i) {
+        CHECK_EQ(x1[i], doctest::Approx(x2[i]).epsilon(0.00001));
+    }
+}
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 /** @} */

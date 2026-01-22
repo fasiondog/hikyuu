@@ -89,6 +89,7 @@ target("hikyuu")
             add_defines("HKU_UTILS_API=__attribute__((visibility(\"default\")))")
         end
         add_cxflags("-frtti")
+        add_shflags("-Wl,-flat_namespace,-undefined,dynamic_lookup")
         add_links("sqlite3")
         add_frameworks("CoreFoundation")
     end
