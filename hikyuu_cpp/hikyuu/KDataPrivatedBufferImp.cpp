@@ -491,7 +491,7 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByDate(const KQuery& query)
 
     size_t new_end_pos_in_old = m_buffer.size();
     if (new_end_date != Null<Datetime>()) {
-        auto iter = std::lower_bound(
+        iter = std::lower_bound(
           m_buffer.begin(), m_buffer.end(), KRecord{new_end_date},
           [](const KRecord& a, const KRecord& b) { return a.datetime < b.datetime; });
         if (iter != m_buffer.end()) {

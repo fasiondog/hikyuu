@@ -24,7 +24,7 @@ public:
     KData();
     KData(const KData&);
     KData(const Stock& stock, const KQuery& query);
-    KData(KDataImpPtr imp);
+    explicit KData(KDataImpPtr imp);
     virtual ~KData() {}
 
     KData& operator=(const KData&);
