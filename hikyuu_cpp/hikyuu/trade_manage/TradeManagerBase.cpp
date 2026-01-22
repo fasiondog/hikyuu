@@ -10,6 +10,10 @@
 #include "TradeManagerBase.h"
 #include "Performance.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::TradeManagerBase)
+#endif
+
 namespace hku {
 
 Performance TradeManagerBase::getPerformance(const Datetime& datetime, const KQuery::KType& ktype) {

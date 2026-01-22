@@ -101,6 +101,12 @@ target("unit-test")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
 
+    if is_plat("macosx") then
+        -- boost序列化需要
+        add_cxflags("-frtti -fvisibility=default")
+        add_ldflags("-Wl,-flat_namespace,-undefined,dynamic_lookup")
+    end
+
     -- set_policy("build.optimization.lto", true)
     add_rules("c++.unity_build", {batchsize = 0})
     add_files("./hikyuu/**.cpp|real_data/**|indicator_talib/**.cpp")

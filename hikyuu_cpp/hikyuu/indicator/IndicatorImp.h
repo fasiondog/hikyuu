@@ -408,10 +408,6 @@ private:
 };
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
-#endif
-
-#if HKU_SUPPORT_SERIALIZATION
 #define INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION          \
 private:                                                       \
     friend class boost::serialization::access;                 \
