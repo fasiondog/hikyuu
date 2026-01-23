@@ -103,6 +103,10 @@ std::string getVersionWithGit() {
 }
 
 static boost::uuids::uuid readUUID() {
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+#endif
     boost::uuids::uuid uid;
     std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
     if (existFile(filename)) {
@@ -119,6 +123,10 @@ static boost::uuids::uuid readUUID() {
             fclose(fp);
         }
     }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
     return uid;
 }
