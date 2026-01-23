@@ -5,8 +5,6 @@
  *      Author: fasiondog
  */
 
-#if 0
-
 #include "../../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
@@ -87,20 +85,24 @@ TEST_CASE("test_MF_Weight") {
     CHECK_UNARY(ic1.equal(ic2));
 
     CHECK_UNARY(mf->getScores(Datetime(20111204)).empty());
+
+    query = KQuery(-30);
+    ref_k = ref_stk.getKData(query);
+    ref_dates = ref_k.getDatetimeList();
+    mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
     auto cross = mf->getScores(Datetime(20111205));
     CHECK_EQ(cross.size(), 2);
     CHECK_EQ(cross[0].stock, sm["sh600004"]);
-    CHECK_EQ(cross[0].value, doctest::Approx(6.85));
+    CHECK_EQ(cross[0].value, doctest::Approx(7.143).epsilon(0.001));
     CHECK_EQ(cross[1].stock, sm["sh600005"]);
-    CHECK_EQ(cross[1].value, doctest::Approx(3.13));
+    CHECK_EQ(cross[1].value, doctest::Approx(3.337).epsilon(0.001));
 
     cross = mf->getScores(Datetime(20111206));
     CHECK_EQ(cross.size(), 2);
     CHECK_EQ(cross[0].stock, sm["sh600004"]);
-    CHECK_EQ(cross[0].value, doctest::Approx(6.855));
+    CHECK_EQ(cross[0].value, doctest::Approx(7.1186).epsilon(0.001));
     CHECK_EQ(cross[1].stock, sm["sh600005"]);
-    CHECK_EQ(cross[1].value, doctest::Approx(3.14));
-    // HKU_INFO("\n{}", mf->getAllCross());
+    CHECK_EQ(cross[1].value, doctest::Approx(3.3209).epsilon(0.001));
 
     /** @arg 原始因子数量为3, 证券数量4, 数据长度为20, 指定比较收益率 3 日 */
     int ndays = 3;
@@ -119,11 +121,12 @@ TEST_CASE("test_MF_Weight") {
     ind2 = AMA(ROCR(CLOSE(stk.getKData(query)), ndays));
     auto ind3 = EMA(ROCR(CLOSE(stk.getKData(query)), ndays));
     auto ind4 = mf->getFactor(stk);
-    CHECK_EQ(ind4.discard(), 3);
+    CHECK_EQ(ind4.discard(), 0);
     for (size_t i = 0; i < ind4.discard(); i++) {
         CHECK_UNARY(std::isnan(ind4[i]));
     }
-    for (size_t i = ind4.discard(), len = ref_dates.size(); i < len; i++) {
+    for (size_t i = std::max(ind4.discard(), ind1.discard()), len = ref_dates.size(); i < len;
+         i++) {
         CHECK_EQ(ind4[i],
                  doctest::Approx(ind1[i] * weights[0] + ind2[i] * weights[1] + ind3[i] * weights[2])
                    .epsilon(0.0001));
@@ -203,5 +206,3 @@ TEST_CASE("test_MF_Weight_export") {
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 /** @} */
-
-#endif

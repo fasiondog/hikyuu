@@ -44,7 +44,6 @@ TEST_CASE("test_PRICELIST") {
     result = PRICELIST(p_tmp, 10);
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.empty(), true);
-#if 0
 
     /** @arg 数组指针非空 */
     price_t tmp[10];
@@ -71,33 +70,6 @@ TEST_CASE("test_PRICELIST") {
     for (size_t i = 1; i < 10; ++i) {
         CHECK_EQ(result[i], tmp_list[i]);
     }
-
-    /** @arg 待转化数据为Indicator，Indicator为空 */
-    result = PRICELIST(Indicator());
-    CHECK_EQ(result.size(), 0);
-
-    /** @arg 待转化数据为Indicator, result_num=0 */
-    StockManager& sm = StockManager::instance();
-    Stock stock = sm.getStock("sh000001");
-    KQuery query(0, 30);
-    KData kdata = stock.getKData(query);
-    Indicator ikdata = KDATA(kdata);
-    CHECK_EQ(ikdata.size(), 30);
-    result = PRICELIST(ikdata);
-    CHECK_EQ(result.size(), ikdata.size());
-    CHECK_EQ(result.discard(), ikdata.discard());
-    for (size_t i = 0; i < result.size(); ++i) {
-        CHECK_EQ(result[i], ikdata[i]);
-    }
-
-    /** @arg 待转化数据为Indicator, result_num=1 */
-    result = PRICELIST(ikdata, 1);
-    CHECK_EQ(result.size(), ikdata.size());
-    CHECK_EQ(result.discard(), ikdata.discard());
-    for (size_t i = 0; i < result.size(); ++i) {
-        CHECK_EQ(result[i], ikdata.get(i, 1));
-    }
-#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -5,8 +5,6 @@
  *      Author: fasiondog
  */
 
-#if 0
-
 #include "../../test_config.h"
 #include <fstream>
 #include <cmath>
@@ -36,7 +34,7 @@ TEST_CASE("test_MF_ICWeight") {
     IndicatorList src_inds = {MA(ROCR(CLOSE(), ndays)), AMA(ROCR(CLOSE(), ndays)),
                               EMA(ROCR(CLOSE(), ndays))};
     StockList stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
-    KQuery query = KQuery(-20);
+    KQuery query = KQuery(-50);
     KData ref_k = ref_stk.getKData(query);
     DatetimeList ref_dates = ref_k.getDatetimeList();
     auto mf = MF_ICWeight(src_inds, stks, query, ref_stk, ndays, ic_rolling_n);
@@ -99,5 +97,3 @@ TEST_CASE("test_MF_ICWeight_benchmark") {
 #endif
 
 /** @} */
-
-#endif

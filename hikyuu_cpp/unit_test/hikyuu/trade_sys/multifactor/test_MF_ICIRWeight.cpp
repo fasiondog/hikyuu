@@ -5,8 +5,6 @@
  *      Author: fasiondog
  */
 
-#if 0
-
 #include "../../test_config.h"
 #include <fstream>
 #include <cmath>
@@ -37,7 +35,7 @@ TEST_CASE("test_MF_ICIRWeight") {
     IndicatorList src_inds = {MA(ROCR(CLOSE(), ndays)), AMA(ROCR(CLOSE(), ndays)),
                               EMA(ROCR(CLOSE(), ndays))};
     StockList stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
-    KQuery query = KQuery(-20);
+    KQuery query = KQuery(-50);
     KData ref_k = ref_stk.getKData(query);
     DatetimeList ref_dates = ref_k.getDatetimeList();
 
@@ -46,6 +44,7 @@ TEST_CASE("test_MF_ICIRWeight") {
     CHECK_THROWS_AS(MF_ICIRWeight(src_inds, stks, query, ref_stk, 1, -1), std::exception);
 
     /** @arg 正常计算 */
+    // query = KQuery(-50);
     auto mf = MF_ICIRWeight(src_inds, stks, query, ref_stk, ndays, ic_rolling_n);
     mf->setParam<bool>("save_all_factors", true);
     CHECK_EQ(mf->name(), "MF_ICIRWeight");
@@ -75,7 +74,6 @@ TEST_CASE("test_MF_ICIRWeight") {
         Indicator::value_t w = (ind1[i] * ic1[i] + ind2[i] * ic2[i] + ind3[i] * ic3[i]) /
                                (std::abs(ic1[i]) + std::abs(ic2[i]) + std::abs(ic3[i]));
         // HKU_INFO("{}: {}, {}, {}, {}, {}", i, w, ind4[i], ind1[i], ma_ic1[i], stdev_ic1[i]);
-        // HKU_INFO("{}: {}, {}", i, w, ind4[i]);
         if (!std::isnan(ind4[i]) && !std::isnan(w)) {
             CHECK_EQ(ind4[i], doctest::Approx(w));
         }
@@ -113,5 +111,3 @@ TEST_CASE("test_MF_ICIRWeight_benchmark") {
 #endif
 
 /** @} */
-
-#endif

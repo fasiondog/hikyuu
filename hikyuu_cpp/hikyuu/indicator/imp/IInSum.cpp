@@ -44,21 +44,12 @@ void IInSum::_checkParam(const string& name) const {
 static IndicatorList getAllIndicators(const Block& block, const KQuery& query,
                                       const DatetimeList& dates, const Indicator& ind,
                                       bool fill_null) {
-#if 0
-    IndicatorList ret;
-    for (auto iter = block.begin(); iter != block.end(); ++iter) {
-        auto k = iter->getKData(query);
-        ret.emplace_back(ALIGN(ind, dates, fill_null)(k));
-    }
-    return ret;
-#else
     auto stks = block.getStockList();
     return global_parallel_for_index(
       0, stks.size(), [nind = ind.clone(), fill_null, &stks, &query, &dates](size_t index) {
           auto k = stks[index].getKData(query);
           return ALIGN(nind, dates, fill_null)(k);
       });
-#endif
 }
 
 static void insum_cum(const IndicatorList& inds, Indicator::value_t* dst, size_t len) {
