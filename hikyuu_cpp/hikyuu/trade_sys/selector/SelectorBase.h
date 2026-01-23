@@ -153,6 +153,11 @@ public:
         return m_mf;
     }
 
+    void setMF(const MFPtr& mf) {
+        m_mf = mf;
+        m_calculated = false;
+    }
+
     ScoresFilterPtr getScoresFilter() const {
         return m_sc_filter;
     }
@@ -283,10 +288,12 @@ inline const SystemList& SelectorBase::getProtoSystemList() const {
 
 inline void SelectorBase::setScoresFilter(const ScoresFilterPtr& filter) {
     m_sc_filter = filter;
+    m_calculated = false;
 }
 
 inline void SelectorBase::addScoresFilter(const ScoresFilterPtr& filter) {
     m_sc_filter = m_sc_filter | filter;
+    m_calculated = false;
 }
 
 } /* namespace hku */

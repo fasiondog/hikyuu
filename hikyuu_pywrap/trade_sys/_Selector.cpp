@@ -228,9 +228,17 @@ void export_Selector(py::module& m) {
                              py::return_value_policy::copy, "原型系统列表")
       .def_property_readonly("real_sys_list", &SelectorBase::getRealSystemList,
                              py::return_value_policy::copy, "由 PF 运行时设定的实际运行系统列表")
-
-      .def_property_readonly("mf", &SelectorBase::getMF, "获取关联的 MF")
       .def_property_readonly("scfilter", &SelectorBase::getScoresFilter, "获取 ScoresFilter")
+
+      .def_property(
+        "mf", &SelectorBase::getMF,
+        [](SelectorBase& self, py::object mf) {
+            py::gil_scoped_acquire gil;
+            auto tmp = mf;
+            self.setMF(mf.cast<MFPtr>());
+            tmp.release();
+        },
+        "获取关联的 MF")
 
       .def("get_param", &SelectorBase::getParam<boost::any>, R"(get_param(self, name)
 
