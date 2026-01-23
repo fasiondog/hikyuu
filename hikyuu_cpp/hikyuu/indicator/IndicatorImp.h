@@ -209,8 +209,8 @@ public:
     /** 判断指标公式中是否包含指定名称的指标（特殊用途） */
     bool contains(const string& name) const;
 
-    value_t* data(size_t result_idx = 0);
-    value_t const* data(size_t result_idx = 0) const;
+    value_t* data(size_t result_idx = 0) noexcept;
+    value_t const* data(size_t result_idx = 0) const noexcept;
 
     void getAllSubNodes(vector<IndicatorImpPtr>& nodes) const;
 
@@ -503,11 +503,11 @@ inline bool IndicatorImp::haveIndParam(const string& name) const {
     return m_ind_params.find(name) != m_ind_params.end();
 }
 
-inline IndicatorImp::value_t* IndicatorImp::data(size_t result_idx) {
+inline IndicatorImp::value_t* IndicatorImp::data(size_t result_idx) noexcept {
     return m_pBuffer[result_idx] ? m_pBuffer[result_idx]->data() : nullptr;
 }
 
-inline IndicatorImp::value_t const* IndicatorImp::data(size_t result_idx) const {
+inline IndicatorImp::value_t const* IndicatorImp::data(size_t result_idx) const noexcept {
     return m_pBuffer[result_idx] ? m_pBuffer[result_idx]->data() : nullptr;
 }
 

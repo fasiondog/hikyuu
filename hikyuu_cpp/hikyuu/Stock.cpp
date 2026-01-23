@@ -403,7 +403,7 @@ KDataDriverConnectPoolPtr Stock::getKDataDirver() const {
     return m_kdataDriver;
 }
 
-bool Stock::isBuffer(KQuery::KType ktype) const {
+bool Stock::isBuffer(KQuery::KType ktype) const noexcept {
     HKU_IF_RETURN(!m_data, false);
     string nktype(ktype);
     to_upper(nktype);
@@ -421,7 +421,7 @@ void Stock::setPreload(const vector<KQuery::KType>& preload_ktypes) {
     }
 }
 
-bool Stock::isPreload(KQuery::KType ktype) const {
+bool Stock::isPreload(KQuery::KType ktype) const noexcept {
     HKU_IF_RETURN(!m_data, false);
     to_upper(ktype);
     return m_data->m_ktype_preload.find(ktype) != m_data->m_ktype_preload.end();

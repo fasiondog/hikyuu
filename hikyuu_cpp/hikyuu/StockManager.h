@@ -86,7 +86,7 @@ public:
     string datadir() const;
 
     /** 获取证券数量 */
-    size_t size() const;
+    size_t size() const noexcept;
 
     /** 是否所有数据准备完毕 */
     bool dataReady() const;
@@ -252,7 +252,7 @@ public:
     /**
      * 获取当前执行线程id，主要用于判断 Strategy 是以独立进程还是线程方式运行
      */
-    std::thread::id thread_id() const {
+    std::thread::id thread_id() const noexcept {
         return m_thread_id;
     }
 
@@ -265,7 +265,7 @@ public:
     void setPluginPath(const std::string& path);
 
     /** 获取当前插件路径 */
-    const string& getPluginPath() const {
+    const string& getPluginPath() const noexcept {
         return m_plugin_manager.pluginPath();
     }
 
@@ -273,7 +273,7 @@ public:
     PluginInterfaceT* getPlugin(const std::string& pluginname) noexcept;
 
     /** 设置多语言支持路径（仅在初始化之前有效） */
-    void setLanguagePath(const std::string& path);
+    void setLanguagePath(const std::string& path) noexcept;
 
     /** 取消加载，退出时使用 */
     void cancelLoad() {
@@ -372,7 +372,7 @@ private:
     std::string m_i18n_path;
 };
 
-inline size_t StockManager::size() const {
+inline size_t StockManager::size() const noexcept {
     return m_stockDict.size();
 }
 
@@ -438,7 +438,7 @@ inline PluginInterfaceT* StockManager::getPlugin(const std::string& pluginname) 
     return m_plugin_manager.getPlugin<PluginInterfaceT>(pluginname);
 }
 
-inline void StockManager::setLanguagePath(const std::string& path) {
+inline void StockManager::setLanguagePath(const std::string& path) noexcept {
     m_i18n_path = path;
 }
 

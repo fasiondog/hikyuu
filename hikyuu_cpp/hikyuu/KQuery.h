@@ -64,7 +64,7 @@ public:
     static bool isExtraKType(const string& ktype);
 
     /** 获取所有的 KType */
-    static vector<KType> getBaseKTypeList();
+    static vector<KType> getBaseKTypeList() noexcept;
 
     /** 获取所有扩展 KType */
     static vector<KType> getExtraKTypeList();
@@ -167,7 +167,7 @@ public:
     }
 
     /** 设置复权类型 */
-    void recoverType(RecoverType recoverType) {
+    void recoverType(RecoverType recoverType) noexcept {
         m_recoverType = recoverType;
     }
 
@@ -261,8 +261,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const KQuery& query);
 // 关系比较函数, 不直接在类中定义是为了支持 Null<>() == d，Null可以放在左边
 //
 ///////////////////////////////////////////////////////////////////////////////
-bool HKU_API operator==(const KQuery&, const KQuery&);
-bool HKU_API operator!=(const KQuery&, const KQuery&);
+bool HKU_API operator==(const KQuery&, const KQuery&) noexcept;
+bool HKU_API operator!=(const KQuery&, const KQuery&) noexcept;
 
 /**
  * 提供KQuery的Null值

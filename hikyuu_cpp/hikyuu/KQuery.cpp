@@ -67,7 +67,7 @@ static unordered_map<string, int64_t> g_ktype2sec{
 };
 
 // 获取所有的 KType
-vector<KQuery::KType> KQuery::getBaseKTypeList() {
+vector<KQuery::KType> KQuery::getBaseKTypeList() noexcept {
     vector<KQuery::KType> ret;
     for (const auto& v : g_all_base_ktype) {
         ret.push_back(v);
@@ -243,7 +243,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const KQuery& query) {
     return os;
 }
 
-bool HKU_API operator!=(const KQuery& q1, const KQuery& q2) {
+bool HKU_API operator!=(const KQuery& q1, const KQuery& q2) noexcept {
     // cppcheck-suppress [mismatchingContainerExpression]
     HKU_IF_RETURN(q1.queryType() != q2.queryType(), true);
     if (q1.queryType() == KQuery::DATE) {
@@ -254,7 +254,7 @@ bool HKU_API operator!=(const KQuery& q1, const KQuery& q2) {
            q1.start() != q2.start() || q1.end() != q2.end();
 }
 
-bool HKU_API operator==(const KQuery& q1, const KQuery& q2) {
+bool HKU_API operator==(const KQuery& q1, const KQuery& q2) noexcept {
     // cppcheck-suppress [mismatchingContainerExpression]
     HKU_IF_RETURN(q1.queryType() != q2.queryType(), false);
     if (q1.queryType() == KQuery::DATE) {

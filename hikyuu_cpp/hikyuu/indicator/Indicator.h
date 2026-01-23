@@ -45,13 +45,13 @@ public:
 
 public:
     Indicator() : m_imp(make_shared<IndicatorImp>()) {}
-    Indicator(const IndicatorImpPtr& imp);
-    Indicator(const Indicator& ind);
+    Indicator(const IndicatorImpPtr& imp) noexcept;
+    Indicator(const Indicator& ind) noexcept;
     Indicator(Indicator&& ind) noexcept;
     virtual ~Indicator();
 
-    Indicator& operator=(const Indicator&);
-    Indicator& operator=(Indicator&&);
+    Indicator& operator=(const Indicator&) noexcept;
+    Indicator& operator=(Indicator&&) noexcept;
 
     /** 使用已有参数计算新值，返回全新的Indicator */
     Indicator operator()(const Indicator& ind);
@@ -182,15 +182,15 @@ public:
     IndParam getIndParam(const string& name) const;
     const IndicatorImpPtr getIndParamImp(const string& name) const;
 
-    IndicatorImpPtr getImp() const {
+    IndicatorImpPtr getImp() const noexcept {
         return m_imp;
     }
 
-    value_t* data(size_t result_idx = 0) {
+    value_t* data(size_t result_idx = 0) noexcept {
         return m_imp ? m_imp->data(result_idx) : nullptr;
     }
 
-    value_t const* data(size_t result_idx = 0) const {
+    value_t const* data(size_t result_idx = 0) const noexcept {
         return m_imp ? m_imp->data(result_idx) : nullptr;
     }
 
@@ -198,10 +198,10 @@ public:
      * 判断两个ind的值是否相等
      * @note operator==重载生成新的新的Indicator，此函数用于对两个ind进行值比较
      */
-    bool equal(const Indicator& other) const;
+    bool equal(const Indicator& other) const noexcept;
 
     /** 判断是否是同一个实例 */
-    bool isSame(const Indicator& other) const {
+    bool isSame(const Indicator& other) const noexcept {
         return !m_imp && m_imp == other.m_imp;
     }
 

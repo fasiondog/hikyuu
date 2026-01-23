@@ -22,12 +22,12 @@ class HKU_API Indicator;
 class HKU_API KData {
 public:
     KData();
-    KData(const KData&);
+    KData(const KData&) noexcept;
     KData(const Stock& stock, const KQuery& query);
     explicit KData(KDataImpPtr imp);
     virtual ~KData() {}
 
-    KData& operator=(const KData&);
+    KData& operator=(const KData&) noexcept;
 
     // 移动语义对 KData 没有实际用处，而且会导致 KData 可能存在空 imp 的情况
     // 主要是 boost::any_cast 需要，予以保留，但使用时不要到 KData 执行 std::move
@@ -37,8 +37,8 @@ public:
     size_t size() const noexcept;
     bool empty() const noexcept;
 
-    bool operator==(const KData&) const;
-    bool operator!=(const KData&) const;
+    bool operator==(const KData&) const noexcept;
+    bool operator!=(const KData&) const noexcept;
 
     DatetimeList getDatetimeList() const;
 
@@ -270,13 +270,13 @@ KData HKU_API getKData(const string& market_code, int64_t start = 0, int64_t end
                        const KQuery::KType& ktype = KQuery::DAY,
                        KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
-inline KData::KData(const KData& x) : m_imp(x.m_imp) {}
+inline KData::KData(const KData& x) noexcept : m_imp(x.m_imp) {}
 
 inline KData::KData(KData&& x) : m_imp(std::move(x.m_imp)) {
     x.m_imp = get_null_kdata_imp();
 }
 
-inline KData& KData::operator=(const KData& x) {
+inline KData& KData::operator=(const KData& x) noexcept {
     HKU_IF_RETURN(this == &x, *this);
     m_imp = x.m_imp;
     return *this;
@@ -342,7 +342,7 @@ inline size_t KData::lastPos() const {
     return m_imp->lastPos();
 }
 
-inline bool KData::operator!=(const KData& other) const {
+inline bool KData::operator!=(const KData& other) const noexcept {
     return !(*this == other);
 }
 

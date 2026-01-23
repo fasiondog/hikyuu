@@ -20,9 +20,9 @@ string Indicator::str() const {
     return m_imp ? m_imp->str() : "Indicator{}";
 }
 
-Indicator::Indicator(const IndicatorImpPtr& imp) : m_imp(imp) {}
+Indicator::Indicator(const IndicatorImpPtr& imp) noexcept : m_imp(imp) {}
 
-Indicator::Indicator(const Indicator& indicator) : m_imp(indicator.m_imp) {}
+Indicator::Indicator(const Indicator& indicator) noexcept : m_imp(indicator.m_imp) {}
 
 Indicator::Indicator(Indicator&& ind) noexcept : m_imp(std::move(ind.m_imp)) {}
 
@@ -76,7 +76,7 @@ bool Indicator::alike(const Indicator& other) const {
     return m_imp->alike(*other.m_imp);
 }
 
-bool Indicator::equal(const Indicator& other) const {
+bool Indicator::equal(const Indicator& other) const noexcept {
     HKU_IF_RETURN(this == &other || m_imp == other.m_imp, true);
     HKU_IF_RETURN(size() != other.size() || discard() != other.discard() ||
                     getResultNumber() != other.getResultNumber(),
@@ -97,13 +97,13 @@ bool Indicator::equal(const Indicator& other) const {
     return true;
 }
 
-Indicator& Indicator::operator=(const Indicator& indicator) {
+Indicator& Indicator::operator=(const Indicator& indicator) noexcept {
     HKU_IF_RETURN(this == &indicator, *this);
     m_imp = indicator.m_imp;
     return *this;
 }
 
-Indicator& Indicator::operator=(Indicator&& indicator) {
+Indicator& Indicator::operator=(Indicator&& indicator) noexcept {
     HKU_IF_RETURN(this == &indicator, *this);
     m_imp = std::move(indicator.m_imp);
     return *this;

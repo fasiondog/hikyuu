@@ -26,7 +26,7 @@ public:
     explicit IndParam(const IndicatorImpPtr& ind);
     explicit IndParam(const Indicator& ind);
 
-    IndicatorImpPtr getImp() const {
+    IndicatorImpPtr getImp() const noexcept {
         return m_ind;
     }
 

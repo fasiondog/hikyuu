@@ -235,9 +235,9 @@ public:
     void releaseKDataBuffer(KQuery::KType) const;
 
     /** 指定类型的K线数据是否被缓存 */
-    bool isBuffer(KQuery::KType) const;
+    bool isBuffer(KQuery::KType) const noexcept;
 
-    bool isPreload(KQuery::KType ktype) const;
+    bool isPreload(KQuery::KType ktype) const noexcept;
 
     /** 是否为Null */
     bool isNull() const noexcept;
