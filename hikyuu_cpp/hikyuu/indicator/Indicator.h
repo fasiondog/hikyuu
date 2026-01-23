@@ -212,7 +212,10 @@ public:
 
     string str() const;
 
-    bool isPythonObject() const;
+    bool isPythonObject() const noexcept;
+
+    /** 强制清空所有子节点缓存结果(含支持增量计算节点)，会导致子节点增量计算失效 */
+    Indicator& clearIntermediateResults();
 
 public:
     class Iterator {
@@ -388,8 +391,15 @@ inline const IndicatorImpPtr Indicator::getIndParamImp(const string& name) const
     return m_imp ? m_imp->getIndParamImp(name) : IndicatorImpPtr();
 }
 
-inline bool Indicator::isPythonObject() const {
+inline bool Indicator::isPythonObject() const noexcept {
     return m_imp ? m_imp->isPythonObject() : false;
+}
+
+inline Indicator& Indicator::clearIntermediateResults() {
+    if (m_imp) {
+        m_imp->clearIntermediateResults();
+    }
+    return *this;
 }
 
 //--------------------------------------------------------------

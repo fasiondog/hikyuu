@@ -164,7 +164,7 @@ public:
     virtual MultiFactorPtr _clone() = 0;
     virtual IndicatorList _calculate(const vector<IndicatorList>&) = 0;
 
-    bool isPythonObject() const {
+    bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 

@@ -163,7 +163,7 @@ public:
     /** 在已有过滤基础上追加过滤，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤 */
     void addScoresFilter(const ScoresFilterPtr& filter);
 
-    bool isPythonObject() const {
+    bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 

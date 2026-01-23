@@ -42,7 +42,7 @@ public:
 
     virtual PriceList normalize(const PriceList& data) = 0;
 
-    bool isPythonObject() const {
+    bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 

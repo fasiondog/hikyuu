@@ -101,7 +101,7 @@ public:
     static void adjustWeight(SystemWeightList& sw_list, double can_allocate_weight,
                              bool auto_adjust, bool ignore_zero);
 
-    bool isPythonObject() const {
+    bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 

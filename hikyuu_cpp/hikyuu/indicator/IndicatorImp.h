@@ -138,7 +138,7 @@ public:
 
     IndicatorImpPtr clone();
 
-    bool isPythonObject() const;
+    bool isPythonObject() const noexcept;
 
     /** 仅用于两个结果集数量相同、长度相同的指标交换数据，不交换其他参数。失败抛出异常 */
     void swap(IndicatorImp* other);
@@ -198,6 +198,10 @@ public:
     // ===================
     //  内部特殊用途公共接口
     // ===================
+
+    /** 强制清空所有子节点缓存结果(含支持增量计算节点)，会导致子节点增量计算失效 */
+    void clearIntermediateResults();
+    virtual void _clearIntermediateResults() {}
 
     /** 判断是否和另一个指标等效，即计算效果相同 */
     bool alike(const IndicatorImp& other) const;
@@ -514,7 +518,7 @@ inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t disc
     return step == 0 || pos < discard + step ? discard : pos + 1 - step;
 }
 
-inline bool IndicatorImp::isPythonObject() const {
+inline bool IndicatorImp::isPythonObject() const noexcept {
     return m_is_python_object;
 }
 

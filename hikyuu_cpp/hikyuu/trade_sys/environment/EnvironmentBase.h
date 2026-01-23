@@ -93,7 +93,7 @@ public:
     /** 子类克隆接口 */
     virtual EnvironmentPtr _clone() = 0;
 
-    bool isPythonObject() const {
+    bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 

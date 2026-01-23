@@ -95,7 +95,7 @@ public:
     virtual void remove(const string& category, const string& name) = 0;
 
 protected:
-    bool isPythonObject() const {
+    bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 

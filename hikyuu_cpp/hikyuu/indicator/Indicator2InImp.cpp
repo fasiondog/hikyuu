@@ -78,4 +78,8 @@ Indicator Indicator2InImp::prepare(const Indicator& ind) {
     return ref;
 }
 
+void Indicator2InImp::_clearIntermediateResults() {
+    m_ref_ind.setContext(KData());
+}
+
 }  // namespace hku

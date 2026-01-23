@@ -109,7 +109,7 @@ public:
         return m_values.cend();
     }
 
-    bool isPythonObject() const {
+    bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 

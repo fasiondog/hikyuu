@@ -276,7 +276,7 @@ public:
     // 处理延迟买入请求，仅供 PF 调用
     virtual TradeRecord pfProcessDelayBuyRequest(const Datetime& date);
 
-    bool isPythonObject() const {
+    bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 

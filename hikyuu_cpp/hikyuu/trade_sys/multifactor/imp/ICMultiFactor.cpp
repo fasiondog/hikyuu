@@ -46,101 +46,53 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
     bool spearman = getParam<bool>("use_spearman");
 
     // 计算每个原始因子的滚动IC值
-    if (!getParam<bool>("parallel")) {
-        size_t discard = 0;
-        IndicatorList ic(ind_count);
-        for (size_t ii = 0; ii < ind_count; ii++) {
-            ic[ii] = MA(IC(m_inds[ii], m_stks, m_query, m_ref_stk, ic_n, spearman), ic_rolling_n);
-            if (ic[ii].discard() > discard) {
-                discard = ic[ii].discard();
-            }
-        }
 
-        IndicatorList all_factors(stk_count);
+    IndicatorList ic =
+      global_parallel_for_index(0, ind_count, [this, ic_n, ic_rolling_n, spearman](size_t ii) {
+          return MA(IC(m_inds[ii], m_stks, m_query, m_ref_stk, ic_n, spearman), ic_rolling_n)
+            .clearIntermediateResults();
+      });
+    size_t discard = 0;
+    for (size_t ii = 0; ii < ind_count; ii++) {
+        if (ic[ii].discard() > discard) {
+            discard = ic[ii].discard();
+        }
+    }
+
+    return global_parallel_for_index(0, stk_count, [&, ind_count, days_total, discard](size_t si) {
         PriceList new_values(days_total, 0.0);
         PriceList sum_weight(days_total, 0.0);
-        for (size_t si = 0; si < stk_count; si++) {
-            memset(new_values.data(), 0, sizeof(price_t) * days_total);
-            memset(sum_weight.data(), 0, sizeof(price_t) * days_total);
-            for (size_t di = 0; di < discard; di++) {
-                new_values[di] = Null<price_t>();
-            }
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                const auto* ind_data = all_stk_inds[si][ii].data();
-                const auto* ic_data = ic[ii].data();
-                for (size_t di = discard; di < days_total; di++) {
-                    new_values[di] += ind_data[di] * ic_data[di];
-                    sum_weight[di] += std::abs(ic_data[di]);
-                }
-            }
-
-            for (size_t di = discard; di < days_total; di++) {
-                if (!std::isnan(new_values[di]) && sum_weight[di] != 0.0) {
-                    new_values[di] = new_values[di] / sum_weight[di];
-                }
-            }
-
-            all_factors[si] = PRICELIST(new_values);
-            all_factors[si].name("IC");
-
-            const auto* data = all_factors[si].data();
-            for (size_t di = discard; di < days_total; di++) {
-                if (!std::isnan(data[di])) {
-                    all_factors[si].setDiscard(discard);
-                }
-            }
+        for (size_t di = 0; di < discard; di++) {
+            new_values[di] = Null<price_t>();
         }
 
-        return all_factors;
-
-    } else {
-        IndicatorList ic =
-          global_parallel_for_index(0, ind_count, [this, ic_n, ic_rolling_n, spearman](size_t ii) {
-              return MA(IC(m_inds[ii], m_stks, m_query, m_ref_stk, ic_n, spearman), ic_rolling_n);
-          });
-        size_t discard = 0;
         for (size_t ii = 0; ii < ind_count; ii++) {
-            if (ic[ii].discard() > discard) {
-                discard = ic[ii].discard();
+            const auto* ind_data = all_stk_inds[si][ii].data();
+            const auto* ic_data = ic[ii].data();
+            for (size_t di = discard; di < days_total; di++) {
+                new_values[di] += ind_data[di] * ic_data[di];
+                sum_weight[di] += std::abs(ic_data[di]);
             }
         }
 
-        return global_parallel_for_index(
-          0, stk_count, [&, ind_count, days_total, discard](size_t si) {
-              PriceList new_values(days_total, 0.0);
-              PriceList sum_weight(days_total, 0.0);
-              for (size_t di = 0; di < discard; di++) {
-                  new_values[di] = Null<price_t>();
-              }
+        for (size_t di = discard; di < days_total; di++) {
+            if (!std::isnan(new_values[di]) && sum_weight[di] != 0.0) {
+                new_values[di] = new_values[di] / sum_weight[di];
+            }
+        }
 
-              for (size_t ii = 0; ii < ind_count; ii++) {
-                  const auto* ind_data = all_stk_inds[si][ii].data();
-                  const auto* ic_data = ic[ii].data();
-                  for (size_t di = discard; di < days_total; di++) {
-                      new_values[di] += ind_data[di] * ic_data[di];
-                      sum_weight[di] += std::abs(ic_data[di]);
-                  }
-              }
+        Indicator ret = PRICELIST(new_values);
+        ret.name("IC");
 
-              for (size_t di = discard; di < days_total; di++) {
-                  if (!std::isnan(new_values[di]) && sum_weight[di] != 0.0) {
-                      new_values[di] = new_values[di] / sum_weight[di];
-                  }
-              }
+        const auto* data = ret.data();
+        for (size_t di = discard; di < days_total; di++) {
+            if (!std::isnan(data[di])) {
+                ret.setDiscard(discard);
+            }
+        }
 
-              Indicator ret = PRICELIST(new_values);
-              ret.name("IC");
-
-              const auto* data = ret.data();
-              for (size_t di = discard; di < days_total; di++) {
-                  if (!std::isnan(data[di])) {
-                      ret.setDiscard(discard);
-                  }
-              }
-
-              return ret;
-          });
-    }
+        return ret;
+    });
 }
 
 MultiFactorPtr HKU_API MF_ICWeight() {

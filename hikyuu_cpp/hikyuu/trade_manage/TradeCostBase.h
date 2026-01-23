@@ -107,7 +107,7 @@ public:
     virtual TradeCostPtr _clone() = 0;
 
 protected:
-    bool isPythonObject() const {
+    bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 

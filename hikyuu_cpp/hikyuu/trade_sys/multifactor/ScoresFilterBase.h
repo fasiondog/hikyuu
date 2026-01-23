@@ -49,7 +49,7 @@ public:
 public:
     friend HKU_API ScoresFilterPtr operator|(const ScoresFilterPtr& a, const ScoresFilterPtr& b);
 
-    bool isPythonObject() const {
+    bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 
