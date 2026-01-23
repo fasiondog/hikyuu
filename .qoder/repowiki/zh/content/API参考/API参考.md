@@ -10,10 +10,6 @@
 - [indicator.py](file://hikyuu/indicator/indicator.py)
 - [trade.py](file://hikyuu/trade_manage/trade.py)
 - [trade_sys.py](file://hikyuu/trade_sys/trade_sys.py)
-- [_StockManager.cpp](file://hikyuu_pywrap/_StockManager.cpp)
-- [_Stock.cpp](file://hikyuu_pywrap/_Stock.cpp)
-- [StockManager.cpp](file://hikyuu_cpp/hikyuu/StockManager.cpp)
-- [Stock.cpp](file://hikyuu_cpp/hikyuu/Stock.cpp)
 - [KData.cpp](file://hikyuu_cpp/hikyuu/KData.cpp)
 - [KData.h](file://hikyuu_cpp/hikyuu/KData.h)
 </cite>
@@ -167,8 +163,6 @@ def get_block(self, category: str, name: str) -> Block
 
 **Section sources**
 - [__init__.py](file://hikyuu/__init__.py#L85)
-- [_StockManager.cpp](file://hikyuu_pywrap/_StockManager.cpp#L64-L180)
-- [StockManager.cpp](file://hikyuu_cpp/hikyuu/StockManager.cpp#L437-L473)
 
 ## KData API
 

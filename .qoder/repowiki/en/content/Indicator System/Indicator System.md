@@ -410,11 +410,10 @@ For performance-critical applications, indicators can be implemented directly in
 3. Implementing the indicator class in the `hikyuu/indicator/imp/` directory
 4. Registering the indicator in the build system
 
-The framework provides several macros to simplify this process:
+The framework provides several macros and methods to simplify this process:
 
 - `INDICATOR_IMP(classname)`: Base macro for indicator implementation
 - `INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(classname)`: For indicators that support dynamic step calculation
-- `INDICATOR_NEED_CONTEXT`: For indicators that require context information
 
 ### Development Guidelines
 
