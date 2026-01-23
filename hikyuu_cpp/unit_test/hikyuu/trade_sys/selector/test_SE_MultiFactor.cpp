@@ -31,7 +31,7 @@ TEST_CASE("test_SE_MultiFactor") {
     StockManager& sm = StockManager::instance();
     StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
     Stock ref_stk = sm["sh000001"];
-    KQuery query = KQueryByDate(Datetime(20110712) - Days(22), Datetime(20111206));
+    KQuery query = KQueryByDate(Datetime(20110712) - Days(30), Datetime(20111206));
     IndicatorList src_inds{MA(CLOSE())};
 
     auto sys = SYS_Simple(crtTM(), MM_Nothing());
@@ -53,23 +53,21 @@ TEST_CASE("test_SE_MultiFactor") {
     auto proto_list = ret->getProtoSystemList();
     ret->calculate(proto_list, query);
     auto sw_list = ret->getSelected(Datetime(20110712));
-    CHECK_EQ(sw_list.size(), 0);
+    CHECK_EQ(sw_list.size(), 3);
 
-#if 0
     ret = SE_MultiFactor(src_inds, 10, 5, 120, ref_stk, "MF_EqualWeight");
     ret->addStockList(stks, sys);
     proto_list = ret->getProtoSystemList();
     ret->calculate(proto_list, query);
     sw_list = ret->getSelected(Datetime(20110712));
-    CHECK_EQ(sw_list.size(), 4);
+    CHECK_EQ(sw_list.size(), 3);
 
     ret = SE_MultiFactor(src_inds, 10, 5, 120, ref_stk, "MF_ICWeight");
     ret->addStockList(stks, sys);
     proto_list = ret->getProtoSystemList();
     ret->calculate(proto_list, query);
     sw_list = ret->getSelected(Datetime(20110712));
-    CHECK_EQ(sw_list.size(), 4);
-#endif
+    CHECK_EQ(sw_list.size(), 3);
 
     /** @arg topn = 2 */
     ret = SE_MultiFactor(src_inds, 2, 5, 120, ref_stk);
@@ -77,7 +75,7 @@ TEST_CASE("test_SE_MultiFactor") {
     proto_list = ret->getProtoSystemList();
     ret->calculate(proto_list, query);
     sw_list = ret->getSelected(Datetime(20110712));
-    CHECK_EQ(sw_list.size(), 0);
+    CHECK_EQ(sw_list.size(), 2);
 
     // for (const auto& sw : sw_list) {
     //     HKU_INFO("{} {}", sw.sys->name(), sw.weight);
