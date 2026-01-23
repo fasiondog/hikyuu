@@ -15,6 +15,7 @@ BOOST_CLASS_EXPORT(hku::IAtr)
 namespace hku {
 
 IAtr::IAtr() : IndicatorImp("ATR", 1) {
+    m_need_context = true;
     setParam<int>("n", 14);
 }
 

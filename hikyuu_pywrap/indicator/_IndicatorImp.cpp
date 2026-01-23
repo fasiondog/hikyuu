@@ -31,10 +31,6 @@ public:
         PYBIND11_OVERLOAD(void, IndicatorImp, _calculate, ind);
     }
 
-    bool isNeedContext() const override {
-        PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "is_need_context", isNeedContext, );
-    }
-
     void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override {
         PYBIND11_OVERLOAD(void, IndicatorImp, _dyn_run_one_step, ind, curPos, step);
     }

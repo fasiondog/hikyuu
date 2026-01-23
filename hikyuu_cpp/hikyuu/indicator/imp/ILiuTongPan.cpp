@@ -13,7 +13,9 @@ BOOST_CLASS_EXPORT(hku::ILiuTongPan)
 
 namespace hku {
 
-ILiuTongPan::ILiuTongPan() : IndicatorImp("LIUTONGPAN", 1) {}
+ILiuTongPan::ILiuTongPan() : IndicatorImp("LIUTONGPAN", 1) {
+    m_need_context = true;
+}
 
 ILiuTongPan::~ILiuTongPan() {}
 

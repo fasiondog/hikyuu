@@ -15,6 +15,7 @@ BOOST_CLASS_EXPORT(hku::TaSarext)
 namespace hku {
 
 TaSarext::TaSarext() : IndicatorImp("TA_SAREXT", 1) {
+    m_need_context = true;
     setParam<double>("startvalue", 0.0);
     setParam<double>("offsetonreverse", 0.0);
     setParam<double>("accelerationinitlong", 0.02);
@@ -30,6 +31,7 @@ TaSarext::TaSarext(double startvalue, double offsetonreverse, double acceleratio
                    double accelerationinitshort, double accelerationshort,
                    double accelerationmaxshort)
 : IndicatorImp("TA_SAREXT", 1) {
+    m_need_context = true;
     setParam<double>("startvalue", startvalue);
     setParam<double>("offsetonreverse", offsetonreverse);
     setParam<double>("accelerationinitlong", accelerationinitlong);

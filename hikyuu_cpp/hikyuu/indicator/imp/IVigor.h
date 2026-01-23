@@ -21,12 +21,10 @@ namespace hku {
  */
 class IVigor : public IndicatorImp {
     INDICATOR_IMP(IVigor)
-    INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     IVigor();
-    explicit IVigor(int n);
     virtual ~IVigor();
     virtual void _checkParam(const string& name) const override;
 };

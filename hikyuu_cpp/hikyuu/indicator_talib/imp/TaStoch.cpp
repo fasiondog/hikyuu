@@ -15,6 +15,7 @@ BOOST_CLASS_EXPORT(hku::TaStoch)
 namespace hku {
 
 TaStoch::TaStoch() : IndicatorImp("TA_STOCH", 2) {
+    m_need_context = true;
     setParam<int>("fastk_n", 5);
     setParam<int>("slowk_n", 3);
     setParam<int>("slowk_matype", 0);

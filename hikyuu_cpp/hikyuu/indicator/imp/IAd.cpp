@@ -15,7 +15,9 @@ BOOST_CLASS_EXPORT(hku::IAd)
 
 namespace hku {
 
-IAd::IAd() : IndicatorImp("AD", 1) {}
+IAd::IAd() : IndicatorImp("AD", 1) {
+    m_need_context = true;
+}
 
 IAd::~IAd() {}
 

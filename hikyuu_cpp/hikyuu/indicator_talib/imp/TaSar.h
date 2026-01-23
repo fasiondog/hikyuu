@@ -13,7 +13,6 @@ namespace hku {
 
 class TaSar : public IndicatorImp {
     INDICATOR_IMP(TaSar)
-    INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

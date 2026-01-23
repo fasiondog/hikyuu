@@ -453,7 +453,7 @@ IndicatorImpPtr IndicatorImp::operator()(const Indicator &ind) {
     return result;
 }
 
-void IndicatorImp::setDiscard(size_t discard) {
+void IndicatorImp::setDiscard(size_t discard) noexcept {
     size_t tmp_discard = discard > size() ? size() : discard;
     if (tmp_discard > m_discard) {
         value_t null_price = Null<value_t>();

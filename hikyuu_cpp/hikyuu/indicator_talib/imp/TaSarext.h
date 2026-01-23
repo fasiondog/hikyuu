@@ -13,7 +13,6 @@ namespace hku {
 
 class TaSarext : public IndicatorImp {
     INDICATOR_IMP(TaSarext)
-    INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

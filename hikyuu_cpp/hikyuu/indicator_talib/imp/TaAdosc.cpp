@@ -15,6 +15,7 @@ BOOST_CLASS_EXPORT(hku::TaAdosc)
 namespace hku {
 
 TaAdosc::TaAdosc() : IndicatorImp("TA_ADOSC", 1) {
+    m_need_context = true;
     setParam<int>("fast_n", 3);
     setParam<int>("slow_n", 10);
 }

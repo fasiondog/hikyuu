@@ -13,7 +13,9 @@ BOOST_CLASS_EXPORT(hku::ITr)
 
 namespace hku {
 
-ITr::ITr() : IndicatorImp("TR", 1) {}
+ITr::ITr() : IndicatorImp("TR", 1) {
+    m_need_context = true;
+}
 
 ITr::~ITr() {}
 

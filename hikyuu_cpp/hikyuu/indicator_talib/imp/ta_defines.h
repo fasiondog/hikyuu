@@ -57,7 +57,6 @@
 #define TA_K_OUT_DEF(func)                            \
     class Cls_##func : public IndicatorImp {          \
         INDICATOR_IMP(Cls_##func)                     \
-        INDICATOR_NEED_CONTEXT                        \
         INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION \
     public:                                           \
         Cls_##func();                                 \
@@ -68,7 +67,6 @@
 #define TA_K_OUT_N_DEF(func)                                         \
     class Cls_##func : public IndicatorImp {                         \
         INDICATOR_IMP(Cls_##func)                                    \
-        INDICATOR_NEED_CONTEXT                                       \
         INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION                \
     public:                                                          \
         Cls_##func();                                                \
@@ -80,7 +78,6 @@
 #define TA_K_OUT_P_D_DEF(func)                                       \
     class Cls_##func : public IndicatorImp {                         \
         INDICATOR_IMP(Cls_##func)                                    \
-        INDICATOR_NEED_CONTEXT                                       \
         INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION                \
     public:                                                          \
         Cls_##func();                                                \

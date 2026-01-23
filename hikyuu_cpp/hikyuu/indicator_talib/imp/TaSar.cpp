@@ -15,6 +15,7 @@ BOOST_CLASS_EXPORT(hku::TaSar)
 namespace hku {
 
 TaSar::TaSar() : IndicatorImp("TA_SAR", 1) {
+    m_need_context = true;
     setParam<double>("acceleration", 0.02);
     setParam<double>("maximum", 0.2);
 }

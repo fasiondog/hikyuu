@@ -15,6 +15,7 @@ BOOST_CLASS_EXPORT(hku::TaUltosc)
 namespace hku {
 
 TaUltosc::TaUltosc() : IndicatorImp("TA_ULTOSC", 1) {
+    m_need_context = true;
     setParam<int>("n1", 7);
     setParam<int>("n2", 14);
     setParam<int>("n3", 28);

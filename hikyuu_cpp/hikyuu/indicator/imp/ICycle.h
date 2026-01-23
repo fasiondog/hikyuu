@@ -14,7 +14,6 @@ namespace hku {
 /* 获取换手率，等于 VOL(k) / CAPITAL(k) */
 class ICycle : public IndicatorImp {
     INDICATOR_IMP(ICycle)
-    INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

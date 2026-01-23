@@ -14,6 +14,7 @@ BOOST_CLASS_EXPORT(hku::ITime)
 namespace hku {
 
 ITime::ITime() : IndicatorImp("TIME") {
+    m_need_context = true;
     setParam<string>("type", "TIME");
 }
 

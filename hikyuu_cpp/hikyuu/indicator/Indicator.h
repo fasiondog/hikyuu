@@ -63,10 +63,10 @@ public:
     Indicator operator()();
 
     /** 指标名称 */
-    string name() const;
-    void name(const string& name);
+    string name() const noexcept;
+    void name(const string& name) noexcept;
 
-    IndicatorImp::OPType getOPType() const;
+    IndicatorImp::OPType getOPType() const noexcept;
 
     /** 返回形如：Name(param1_val,param2_val,...) */
     string long_name() const;
@@ -88,19 +88,19 @@ public:
     string formula() const;
 
     /** 结果中需抛弃的个数 */
-    size_t discard() const;
+    size_t discard() const noexcept;
 
     /** 设置抛弃的个数，如果小于原有的discard则无效 */
-    void setDiscard(size_t discard);
+    void setDiscard(size_t discard) noexcept;
 
     /** 返回有几个结果集输出 */
-    size_t getResultNumber() const;
+    size_t getResultNumber() const noexcept;
 
     /** 判断是否为空 **/
-    bool empty() const;
+    bool empty() const noexcept;
 
     /** 获取大小 **/
-    size_t size() const;
+    size_t size() const noexcept;
 
     /** 只获取第一个结果集中相应位置输出，等同于get(pos, 0) */
     value_t operator[](size_t pos) const;
@@ -279,17 +279,17 @@ private:
 /** @ingroup Indicator */
 typedef vector<Indicator> IndicatorList;
 
-inline string Indicator::name() const {
+inline string Indicator::name() const noexcept {
     return m_imp ? m_imp->name() : "IndicatorImp";
 }
 
-inline void Indicator::name(const string& name) {
+inline void Indicator::name(const string& name) noexcept {
     if (m_imp) {
         m_imp->name(name);
     }
 }
 
-inline IndicatorImp::OPType Indicator::getOPType() const {
+inline IndicatorImp::OPType Indicator::getOPType() const noexcept {
     return m_imp ? m_imp->getOPType() : IndicatorImp::INVALID;
 }
 
@@ -297,25 +297,25 @@ inline string Indicator::long_name() const {
     return m_imp ? m_imp->long_name() : "IndicatorImp()";
 }
 
-inline size_t Indicator::discard() const {
+inline size_t Indicator::discard() const noexcept {
     return m_imp ? m_imp->discard() : 0;
 }
 
-inline void Indicator::setDiscard(size_t discard) {
+inline void Indicator::setDiscard(size_t discard) noexcept {
     if (m_imp) {
         m_imp->setDiscard(discard);
     }
 }
 
-inline size_t Indicator::getResultNumber() const {
+inline size_t Indicator::getResultNumber() const noexcept {
     return m_imp ? m_imp->getResultNumber() : 0;
 }
 
-inline bool Indicator::empty() const {
+inline bool Indicator::empty() const noexcept {
     return (!m_imp || m_imp->size() == 0) ? true : false;
 }
 
-inline size_t Indicator::size() const {
+inline size_t Indicator::size() const noexcept {
     return m_imp ? m_imp->size() : 0;
 }
 

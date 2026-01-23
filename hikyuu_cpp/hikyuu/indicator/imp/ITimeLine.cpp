@@ -16,6 +16,7 @@ BOOST_CLASS_EXPORT(hku::ITimeLine)
 namespace hku {
 
 ITimeLine::ITimeLine() : IndicatorImp("TIMELINE", 1) {
+    m_need_context = true;
     setParam<string>("part", "price");
 }
 

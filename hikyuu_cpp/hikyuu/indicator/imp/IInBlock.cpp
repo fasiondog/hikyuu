@@ -15,6 +15,7 @@ BOOST_CLASS_EXPORT(hku::IInBlock)
 namespace hku {
 
 IInBlock::IInBlock() : IndicatorImp("INBLOCK", 1) {
+    m_need_context = true;
     setParam<string>("category", "");
     setParam<string>("name", "");
 }

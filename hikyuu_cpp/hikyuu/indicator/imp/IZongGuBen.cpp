@@ -13,7 +13,9 @@ BOOST_CLASS_EXPORT(hku::IZongGuBen)
 
 namespace hku {
 
-IZongGuBen::IZongGuBen() : IndicatorImp("ZONGGUBEN", 1) {}
+IZongGuBen::IZongGuBen() : IndicatorImp("ZONGGUBEN", 1) {
+    m_need_context = true;
+}
 
 IZongGuBen::~IZongGuBen() {}
 

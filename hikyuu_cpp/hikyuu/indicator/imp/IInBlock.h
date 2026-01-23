@@ -16,7 +16,6 @@ namespace hku {
 /* 已指标形式返回是否在指定板块中 */
 class IInBlock : public IndicatorImp {
     INDICATOR_IMP(IInBlock)
-    INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

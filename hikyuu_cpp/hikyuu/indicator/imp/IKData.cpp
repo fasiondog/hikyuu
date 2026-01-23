@@ -15,6 +15,7 @@ BOOST_CLASS_EXPORT(hku::IKData)
 namespace hku {
 
 IKData::IKData() : IndicatorImp("KDATA") {
+    m_need_context = true;
     setParam<string>("kpart", "KDATA");
 }
 

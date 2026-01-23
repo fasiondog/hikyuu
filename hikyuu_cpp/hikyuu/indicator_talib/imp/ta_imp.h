@@ -558,7 +558,9 @@
     }
 
 #define TA_OHLC_OUT1_IMP(func, func_lookback)                                           \
-    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                 \
+        m_need_context = true;                                                          \
+    }                                                                                   \
                                                                                         \
     void Cls_##func::_calculate(const Indicator &data) {                                \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
@@ -608,7 +610,9 @@
     }
 
 #define TA_OHLC_OUT1_INT_IMP(func, func_lookback)                                       \
-    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                 \
+        m_need_context = true;                                                          \
+    }                                                                                   \
                                                                                         \
     void Cls_##func::_calculate(const Indicator &data) {                                \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
@@ -665,6 +669,7 @@
 #define TA_OHLC_OUT1_INT_P1_D_IMP(func, func_lookback, param1, param1_value, param1_min,          \
                                   param1_max)                                                     \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                           \
+        m_need_context = true;                                                                    \
         setParam<double>(#param1, param1_value);                                                  \
     }                                                                                             \
                                                                                                   \
@@ -732,7 +737,9 @@
     }
 
 #define TA_HLCV_OUT1_IMP(func, func_lookback)                                           \
-    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                 \
+        m_need_context = true;                                                          \
+    }                                                                                   \
                                                                                         \
     void Cls_##func::_calculate(const Indicator &data) {                                \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                         \
@@ -782,7 +789,9 @@
     }
 
 #define TA_HL_OUT1_IMP(func, func_lookback)                                                \
-    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                   \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                    \
+        m_need_context = true;                                                             \
+    }                                                                                      \
                                                                                            \
     void Cls_##func::_calculate(const Indicator &data) {                                   \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                            \
@@ -827,7 +836,9 @@
     }
 
 #define TA_CV_OUT1_IMP(func, func_lookback)                                                 \
-    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                    \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                     \
+        m_need_context = true;                                                              \
+    }                                                                                       \
                                                                                             \
     void Cls_##func::_calculate(const Indicator &data) {                                    \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                             \
@@ -872,7 +883,9 @@
     }
 
 #define TA_HLC_OUT1_IMP(func, func_lookback)                                                      \
-    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {}                                          \
+    Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                           \
+        m_need_context = true;                                                                    \
+    }                                                                                             \
                                                                                                   \
     void Cls_##func::_calculate(const Indicator &data) {                                          \
         HKU_WARN_IF(!isLeaf() && !data.empty(),                                                   \
@@ -920,6 +933,7 @@
 
 #define TA_HLC_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)          \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                 \
+        m_need_context = true;                                                          \
         setParam<int>("n", period);                                                     \
     }                                                                                   \
                                                                                         \
@@ -982,6 +996,7 @@
 
 #define TA_HLCV_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)         \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                 \
+        m_need_context = true;                                                          \
         setParam<int>("n", period);                                                     \
     }                                                                                   \
                                                                                         \
@@ -1047,6 +1062,7 @@
 
 #define TA_HL_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)                 \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                       \
+        m_need_context = true;                                                                \
         setParam<int>("n", period);                                                           \
     }                                                                                         \
                                                                                               \
@@ -1106,6 +1122,7 @@
 
 #define TA_HL_OUT2_N_IMP(func, func_lookback, period, period_min, period_max)                 \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 2) {                                       \
+        m_need_context = true;                                                                \
         setParam<int>("n", period);                                                           \
     }                                                                                         \
                                                                                               \
@@ -1167,6 +1184,7 @@
 
 #define TA_HLC_OUT3_N_IMP(func, func_lookback, period, period_min, period_max)          \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 3) {                                 \
+        m_need_context = true;                                                          \
         setParam<int>("n", period);                                                     \
     }                                                                                   \
                                                                                         \
@@ -1231,6 +1249,7 @@
 
 #define TA_OC_OUT1_N_IMP(func, func_lookback, period, period_min, period_max)                   \
     Cls_##func::Cls_##func() : IndicatorImp(#func, 1) {                                         \
+        m_need_context = true;                                                                  \
         setParam<int>("n", period);                                                             \
     }                                                                                           \
                                                                                                 \

@@ -17,7 +17,6 @@ namespace hku {
 
 class IAd : public IndicatorImp {
     INDICATOR_IMP(IAd)
-    INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

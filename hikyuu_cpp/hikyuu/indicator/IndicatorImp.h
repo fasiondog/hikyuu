@@ -30,7 +30,7 @@ class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
     friend HKU_API std::ostream& operator<<(std::ostream& os, const IndicatorImp& imp);
 
 public:
-    enum OPType {
+    enum OPType : uint8_t {
         LEAF,   ///< 叶子节点
         OP,     /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
         ADD,    ///< 加
@@ -68,14 +68,14 @@ public:
     typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
     IndicatorImpPtr operator()(const Indicator& ind);
 
-    size_t getResultNumber() const;
-    OPType getOPType() const;
+    size_t getResultNumber() const noexcept;
+    OPType getOPType() const noexcept;
 
-    size_t discard() const;
+    size_t discard() const noexcept;
 
-    void setDiscard(size_t discard);
+    void setDiscard(size_t discard) noexcept;
 
-    size_t size() const;
+    size_t size() const noexcept;
 
     value_t get(size_t pos, size_t num = 0) const;
 
@@ -113,8 +113,8 @@ public:
     /** 数据中是否包含 nan 值 */
     bool existNan(size_t result_idx = 0) const;
 
-    const string& name() const;
-    void name(const string& name);
+    const string& name() const noexcept;
+    void name(const string& name) noexcept;
 
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
@@ -122,7 +122,7 @@ public:
     virtual string formula() const;
     virtual string str() const;
 
-    bool isLeaf() const;
+    bool isLeaf() const noexcept;
 
     Indicator calculate();
 
@@ -171,7 +171,7 @@ public:
     virtual void _increment_calculate(const Indicator& ind, size_t start_pos) {}
 
     /** 是否必须串行计算 */
-    bool isSerial() const {
+    bool isSerial() const noexcept {
         return m_is_serial;
     }
 
@@ -179,8 +179,8 @@ public:
         return make_shared<IndicatorImp>();
     }
 
-    virtual bool isNeedContext() const {
-        return false;
+    bool isNeedContext() const noexcept {
+        return m_need_context;
     }
 
     virtual void _dyn_calculate(const Indicator&);
@@ -214,9 +214,9 @@ public:
 
     void getAllSubNodes(vector<IndicatorImpPtr>& nodes) const;
 
-    IndicatorImpPtr getRightNode() const;
-    IndicatorImpPtr getLeftNode() const;
-    IndicatorImpPtr getThreeNode() const;
+    IndicatorImpPtr getRightNode() const noexcept;
+    IndicatorImpPtr getLeftNode() const noexcept;
+    IndicatorImpPtr getThreeNode() const noexcept;
     void printTree(bool show_long_name = false) const;
     void printAllSubTrees(bool show_long_name = false) const;
     void printLeaves(bool show_long_name = false) const;
@@ -294,6 +294,7 @@ protected:
     KData m_old_context;
     vector<value_t>* m_pBuffer[MAX_RESULT_NUM];
 
+    bool m_need_context{false};
     bool m_is_python_object{false};
     bool m_need_self_alike_compare{false};
     bool m_is_serial{false};
@@ -326,6 +327,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_result_num);
         ar& BOOST_SERIALIZATION_NVP(m_context);
         ar& BOOST_SERIALIZATION_NVP(m_old_context);
+        ar& BOOST_SERIALIZATION_NVP(m_need_context);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_need_self_alike_compare);
         ar& BOOST_SERIALIZATION_NVP(m_is_serial);
@@ -372,6 +374,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_result_num);
         ar& BOOST_SERIALIZATION_NVP(m_context);
         ar& BOOST_SERIALIZATION_NVP(m_old_context);
+        ar& BOOST_SERIALIZATION_NVP(m_need_context);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_need_self_alike_compare);
         ar& BOOST_SERIALIZATION_NVP(m_is_serial);
@@ -441,12 +444,6 @@ public:                                                                         
         return true;                                                                    \
     }
 
-#define INDICATOR_NEED_CONTEXT                    \
-public:                                           \
-    virtual bool isNeedContext() const override { \
-        return true;                              \
-    }
-
 /** 获取 OPType 名称字符串 */
 string HKU_API getOPTypeName(IndicatorImp::OPType);
 
@@ -455,31 +452,31 @@ typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 HKU_API std::ostream& operator<<(std::ostream&, const IndicatorImp&);
 HKU_API std::ostream& operator<<(std::ostream&, const IndicatorImpPtr&);
 
-inline IndicatorImp::OPType IndicatorImp::getOPType() const {
+inline IndicatorImp::OPType IndicatorImp::getOPType() const noexcept {
     return m_optype;
 }
 
-inline size_t IndicatorImp::getResultNumber() const {
+inline size_t IndicatorImp::getResultNumber() const noexcept {
     return m_result_num;
 }
 
-inline size_t IndicatorImp::discard() const {
+inline size_t IndicatorImp::discard() const noexcept {
     return m_discard;
 }
 
-inline size_t IndicatorImp::size() const {
+inline size_t IndicatorImp::size() const noexcept {
     return m_pBuffer[0] ? m_pBuffer[0]->size() : 0;
 }
 
-inline const string& IndicatorImp::name() const {
+inline const string& IndicatorImp::name() const noexcept {
     return m_name;
 }
 
-inline void IndicatorImp::name(const string& name) {
+inline void IndicatorImp::name(const string& name) noexcept {
     m_name = name;
 }
 
-inline bool IndicatorImp::isLeaf() const {
+inline bool IndicatorImp::isLeaf() const noexcept {
     return m_optype == LEAF ? true : false;
 }
 
@@ -522,15 +519,15 @@ inline bool IndicatorImp::isPythonObject() const noexcept {
     return m_is_python_object;
 }
 
-inline IndicatorImpPtr IndicatorImp::getRightNode() const {
+inline IndicatorImpPtr IndicatorImp::getRightNode() const noexcept {
     return m_right;
 }
 
-inline IndicatorImpPtr IndicatorImp::getLeftNode() const {
+inline IndicatorImpPtr IndicatorImp::getLeftNode() const noexcept {
     return m_left;
 }
 
-inline IndicatorImpPtr IndicatorImp::getThreeNode() const {
+inline IndicatorImpPtr IndicatorImp::getThreeNode() const noexcept {
     return m_three;
 }
 

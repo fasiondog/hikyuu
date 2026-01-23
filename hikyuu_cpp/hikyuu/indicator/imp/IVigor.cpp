@@ -18,11 +18,8 @@ BOOST_CLASS_EXPORT(hku::IVigor)
 namespace hku {
 
 IVigor::IVigor() : IndicatorImp("VIGOR", 1) {
+    m_need_context = true;
     setParam<int>("n", 2);
-}
-
-IVigor::IVigor(int n) : IndicatorImp("VIGOR") {
-    setParam<int>("n", n);
 }
 
 IVigor::~IVigor() {}
@@ -63,7 +60,9 @@ void IVigor::_calculate(const Indicator& ind) {
 }
 
 Indicator HKU_API VIGOR(int n) {
-    return make_shared<IVigor>(n)->calculate();
+    IndicatorImpPtr p = make_shared<IVigor>();
+    p->setParam<int>("n", n);
+    return p->calculate();
 }
 
 Indicator HKU_API VIGOR(const KData& k, int n) {

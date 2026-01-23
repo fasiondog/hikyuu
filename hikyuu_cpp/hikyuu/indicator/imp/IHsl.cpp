@@ -13,7 +13,9 @@ BOOST_CLASS_EXPORT(hku::IHsl)
 
 namespace hku {
 
-IHsl::IHsl() : IndicatorImp("HSL", 1) {}
+IHsl::IHsl() : IndicatorImp("HSL", 1) {
+    m_need_context = true;
+}
 
 IHsl::~IHsl() {}
 

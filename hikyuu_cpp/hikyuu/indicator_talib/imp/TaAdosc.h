@@ -13,7 +13,6 @@ namespace hku {
 
 class TaAdosc : public IndicatorImp {
     INDICATOR_IMP(TaAdosc)
-    INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

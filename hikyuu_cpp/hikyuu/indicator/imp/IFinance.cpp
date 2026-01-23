@@ -15,6 +15,7 @@ BOOST_CLASS_EXPORT(hku::IFinance)
 namespace hku {
 
 IFinance::IFinance() : IndicatorImp("FINANCE", 1) {
+    m_need_context = true;
     setParam<int>("field_ix", 0);
     setParam<string>("field_name", "");
 

@@ -14,6 +14,7 @@ BOOST_CLASS_EXPORT(hku::ICost)
 namespace hku {
 
 ICost::ICost() : IndicatorImp("COST", 1) {
+    m_need_context = true;
     setParam<double>("percent", 10.0);
 }
 

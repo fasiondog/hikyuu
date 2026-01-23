@@ -16,7 +16,6 @@ namespace hku {
 /* COST(k, X) 表示X%获利盘的价格是多少 */
 class ICost : public IndicatorImp {
     INDICATOR_IMP(ICost)
-    INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

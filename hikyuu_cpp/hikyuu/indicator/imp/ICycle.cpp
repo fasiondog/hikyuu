@@ -16,6 +16,7 @@ BOOST_CLASS_EXPORT(hku::ICycle)
 namespace hku {
 
 ICycle::ICycle() : IndicatorImp("CYCLE", 1) {
+    m_need_context = true;
     _initParams();
 }
 
