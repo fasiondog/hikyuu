@@ -107,11 +107,6 @@ void GlobalInitializer::clean() {
 
     StockManager &sm = StockManager::instance();
     sm.cancelLoad();
-    int count = 0;
-    while (count < 3 && !sm.dataReady()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        count++;
-    }
 
 #if HKU_OS_OSX
     // 主动停止异步数据加载任务组，否则 hdf5 在 linux 下会报关闭异常
@@ -141,6 +136,7 @@ void GlobalInitializer::clean() {
 #endif
 
     DataDriverFactory::release();
+    sm.clearPlugin();
 
 #if HKU_ENABLE_TA_LIB
     TA_Shutdown();

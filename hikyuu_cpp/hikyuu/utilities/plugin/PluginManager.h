@@ -37,6 +37,11 @@ public:
         m_plugin_path = plugin_path;
     }
 
+    void clear() noexcept {
+        std::unique_lock<std::shared_mutex> write_lock(m_mutex);
+        m_plugins.clear();
+    }
+
     template <typename PluginInterfaceT>
     PluginInterfaceT* getPlugin(const std::string& pluginname) noexcept {
         PluginInterfaceT* ret{nullptr};

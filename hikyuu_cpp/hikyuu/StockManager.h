@@ -293,6 +293,10 @@ public:
         return m_stockDict.end();
     }
 
+    void clearPlugin() {
+        m_plugin_manager.clear();
+    }
+
 private:
     /* 加载全部数据 */
     void loadData();
