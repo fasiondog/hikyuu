@@ -34,7 +34,6 @@ void OptimalSelectorBase::_initParams() {
     setParam<int>("index", 0);  // 取排序后的第 index 个结果
     setParam<int>("train_len", 100);
     setParam<int>("test_len", 20);
-    setParam<bool>("parallel", false);
     setParam<bool>("trace", false);
 }
 
@@ -115,71 +114,9 @@ void OptimalSelectorBase::calculate(const SystemList& pf_realSysList, const KQue
         end += test_len;
     }
 
-    if (getParam<bool>("parallel")) {
-        _calculate_parallel(train_ranges, dates, test_len, trace);
-    } else {
-        _calculate_single(train_ranges, dates, test_len, trace);
-    }
+    _calculate_parallel(train_ranges, dates, test_len, trace);
 
     m_calculated = true;
-}
-
-void OptimalSelectorBase::_calculate_single(const vector<std::pair<size_t, size_t>>& train_ranges,
-                                            const DatetimeList& dates, size_t test_len,
-                                            bool trace) {
-    // SPEND_TIME(OptimalSelectorBase_calculate_single);
-    size_t dates_len = dates.size();
-    std::shared_ptr<SystemWeightList> selected_sys_list;
-    for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
-        Datetime start_date = dates[train_ranges[i].first];
-        Datetime end_date = dates[train_ranges[i].second];
-        KQuery q = KQueryByDate(start_date, end_date, m_query.kType(), m_query.recoverType());
-        CLS_INFO_IF(trace, "iteration: {}|{}, range: {}", i + 1, total, q);
-
-        selected_sys_list = std::make_shared<SystemWeightList>();
-        for (const auto& sys : m_pro_sys_list) {
-            try {
-                auto nsys = sys->clone();
-                nsys->run(q, true);
-                double value = evaluate(nsys, end_date);
-                nsys->reset();
-                if (!std::isnan(value)) {
-                    selected_sys_list->emplace_back(SystemWeight(nsys, value));
-                }
-            } catch (const std::exception& e) {
-                CLS_ERROR("{}! {}", e.what(), sys->name());
-            } catch (...) {
-                CLS_ERROR("Unknown error! {}", sys->name());
-            }
-        }
-
-        if (!selected_sys_list->empty()) {
-            // 降序排列，相等时取排在候选前面的
-            std::stable_sort(
-              selected_sys_list->begin(), selected_sys_list->end(),
-              [](const SystemWeight& a, const SystemWeight& b) { return a.weight > b.weight; });
-
-            size_t train_start = train_ranges[i].first;
-            size_t test_start = train_ranges[i].second;
-            size_t test_end = test_start + test_len;
-            if (test_end > dates_len) {
-                test_end = dates_len;
-            }
-
-            for (size_t pos = test_start; pos < test_end; pos++) {
-                m_sys_dict[dates[pos]] = selected_sys_list;
-            }
-
-            if (test_end < dates_len) {
-                m_run_ranges.emplace_back(
-                  RunRanges(dates[train_start], dates[test_start], dates[test_end]));
-            } else {
-                // K线日期只到分钟级，最后一段加1分钟
-                m_run_ranges.emplace_back(RunRanges(dates[train_start], dates[test_start],
-                                                    dates[test_end - 1] + Minutes(1)));
-            }
-        }
-    }
 }
 
 void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, size_t>>& train_ranges,

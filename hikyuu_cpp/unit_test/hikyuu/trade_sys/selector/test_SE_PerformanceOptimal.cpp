@@ -124,7 +124,6 @@ TEST_CASE("test_SE_PerformanceOptimal") {
 
     query = KQueryByIndex(-125);
     // se->setParam<bool>("trace", true);
-    // se->setParam<bool>("parallel", true);
     se->setParam<int>("train_len", 30);
     se->setParam<int>("test_len", 20);
     se->calculate(SystemList(), query);
@@ -162,7 +161,6 @@ TEST_CASE("test_SE_PerformanceOptimal") {
 
     /** @arg 多候选系统，取最小值 */
     // se->setParam<bool>("trace", true);
-    // se->setParam<bool>("parallel", true);
     se->setParam<int>("mode", 1);
     se->reset();
     se->calculate(SystemList(), query);

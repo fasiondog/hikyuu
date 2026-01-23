@@ -87,82 +87,9 @@ void PerformanceOptimalSelector::calculate(const SystemList& pf_realSysList, con
     CLS_INFO_IF(trace, "statistic key: {}, mode: {}", getParam<string>("key"),
                 getParam<int>("mode"));
 
-    if (getParam<bool>("parallel")) {
-        _calculate_parallel(train_ranges, dates, key, mode, test_len, trace);
-    } else {
-        _calculate_single(train_ranges, dates, key, mode, test_len, trace);
-    }
+    _calculate_parallel(train_ranges, dates, key, mode, test_len, trace);
 
     m_calculated = true;
-}
-
-void PerformanceOptimalSelector::_calculate_single(
-  const vector<std::pair<size_t, size_t>>& train_ranges, const DatetimeList& dates,
-  const string& key, int mode, size_t test_len, bool trace) {
-    // SPEND_TIME(OptimalSelector_calculate_single);
-    size_t dates_len = dates.size();
-    Performance per;
-    for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
-        Datetime start_date = dates[train_ranges[i].first];
-        Datetime end_date = dates[train_ranges[i].second];
-        KQuery q = KQueryByDate(start_date, end_date, m_query.kType(), m_query.recoverType());
-        CLS_INFO_IF(trace, "iteration: {}|{}, range: {}", i + 1, total, q);
-        SYSPtr selected_sys;
-        if (m_pro_sys_list.size() == 1) {
-            selected_sys = m_pro_sys_list.back();
-        } else if (0 == mode) {
-            double max_value = std::numeric_limits<double>::lowest();
-            for (const auto& sys : m_pro_sys_list) {
-                sys->run(q, true);
-                per.statistics(sys->getTM(), end_date);
-                double value = per.get(key);
-                CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
-                if (value > max_value) {
-                    max_value = value;
-                    selected_sys = sys;
-                }
-            }
-        } else if (1 == mode) {
-            double min_value = std::numeric_limits<double>::max();
-            for (const auto& sys : m_pro_sys_list) {
-                sys->run(q, true);
-                per.statistics(sys->getTM(), end_date);
-                double value = per.get(key);
-                CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
-                if (value < min_value) {
-                    min_value = value;
-                    selected_sys = sys;
-                }
-            }
-        }
-
-        if (selected_sys) {
-            selected_sys->reset();
-            selected_sys = selected_sys->clone();
-
-            size_t train_start = train_ranges[i].first;
-            size_t test_start = train_ranges[i].second;
-            size_t test_end = test_start + test_len;
-            if (test_end > dates_len) {
-                test_end = dates_len;
-            }
-
-            for (size_t pos = test_start; pos < test_end; pos++) {
-                m_sys_dict[dates[pos]] = selected_sys;
-            }
-
-            if (test_end < dates_len) {
-                m_run_ranges.emplace_back(
-                  RunRanges(dates[train_start], dates[test_start], dates[test_end]));
-            } else {
-                // K线日期只到分钟级，最后一段加1分钟
-                m_run_ranges.emplace_back(RunRanges(dates[train_start], dates[test_start],
-                                                    dates[test_end - 1] + Minutes(1)));
-            }
-
-            CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1, selected_sys->name());
-        }
-    }
 }
 
 void PerformanceOptimalSelector::_calculate_parallel(

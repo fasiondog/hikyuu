@@ -61,7 +61,6 @@ void WalkForwardSystem::initParam() {
     setParam<string>("market", "SH");
     setParam<int>("train_len", 100);
     setParam<int>("test_len", 20);
-    setParam<bool>("parallel", false);
     setParam<bool>("se_trace", false);
 
     // 当前选中的系统和上次的系统不一致时，在开盘时清空已有持仓
@@ -157,7 +156,6 @@ void WalkForwardSystem::readyForRun() {
     m_se->setParam<string>("market", getParam<string>("market"));
     m_se->setParam<int>("train_len", getParam<int>("train_len"));
     m_se->setParam<int>("test_len", getParam<int>("test_len"));
-    m_se->setParam<bool>("parallel", getParam<bool>("parallel"));
     m_se->setParam<bool>("trace", getParam<bool>("se_trace"));
 
     m_se->reset();
