@@ -113,10 +113,14 @@ void IContext::_calculate(const Indicator& ind) {
                 } else {
                     query = KQueryByIndex(in_query.start(), in_query.end(), ktype, recover_type);
                 }
-                ref = m_ref_ind(self_stk.getKData(query));
+                // ref = m_ref_ind(self_stk.getKData(query));
+                // 让其参考指标使用增量计算
+                ref.setContext(self_stk.getKData(query));
 
             } else {
-                ref = m_ref_ind(self_stk.getKData(in_k.getQuery()));
+                // ref = m_ref_ind(self_stk.getKData(in_k.getQuery()));
+                // 让其参考指标使用增量计算
+                ref.setContext(self_stk.getKData(in_k.getQuery()));
             }
             ref = ALIGN(ref, in_k, getParam<bool>("fill_null"));
         } else if (self_dates.size() > 1) {

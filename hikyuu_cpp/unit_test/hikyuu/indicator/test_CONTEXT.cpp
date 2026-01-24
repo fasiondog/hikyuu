@@ -128,14 +128,14 @@ TEST_CASE("test_CONTEXT") {
     check_indicator(result, a);
 
     result = ctx(k1);
-    CHECK_EQ(CONTEXT_K(result), k2);
+    CHECK_EQ(CONTEXT_K(result).getStock(), k2.getStock());
     CHECK_EQ(result.getContext(), k1);
     CHECK_EQ(result.size(), k1.size());
     check_indicator(result, ALIGN(stk2.getKData(q1).close(), k1, false));
 
     a = k1.close();
     result = hku::CONTEXT(a)(k3);
-    CHECK_EQ(CONTEXT_K(result), k1);
+    CHECK_EQ(CONTEXT_K(result).getStock(), k1.getStock());
     CHECK_EQ(result.getContext(), k3);
     CHECK_EQ(result.size(), k3.size());
     check_indicator(result, ALIGN(stk1.getKData(q3).close(), k3, false));

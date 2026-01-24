@@ -678,6 +678,8 @@ void export_Indicator_build_in(py::module& m) {
 
     获取指标上下文。Indicator::getContext()方法获取的是当前的上下文，但对于 CONTEXT 独立上下文指标无法获取其指定的独立上下文，需用此方法获取
 
+    该指标一旦作为公式，参与计算，其上下文可能发生变化，但其stock保持不变，仅query范围发生改变
+
     :param Indicator ind: 指标对象
     :rtype: KData)");
 
