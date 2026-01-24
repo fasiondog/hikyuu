@@ -58,4 +58,6 @@ KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query);
 
 bool canLazyLoad(const KQuery::KType& ktype);
 
+void enableKDataCache(bool enable);
+
 }  // namespace hku

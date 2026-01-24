@@ -37,6 +37,8 @@ public:
     virtual KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query) = 0;
 
     virtual bool canLazyLoad(const KQuery::KType& ktype) = 0;
+
+    virtual void enableKDataCache(bool enable) = 0;
 };
 
 }  // namespace hku

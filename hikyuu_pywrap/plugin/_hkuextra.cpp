@@ -51,4 +51,12 @@ void export_hkuextra(py::module& m) {
     m.def("release_extra_ktype", releaseExtraKType, R"(release_ktype_extra()
         
     释放扩展K线类型, 内部使用。python退出时调用, 防止定义的python转换函数导致退出崩溃)");
+
+    m.def("enable_kdata_cache", enableKDataCache, py::arg("enable"),
+          R"(enable_kdata_cache(enable)
+
+    启用或禁用K线数据缓存
+
+    :param bool enable: 是否启用K线数据缓存
+    :return: None)");
 }
