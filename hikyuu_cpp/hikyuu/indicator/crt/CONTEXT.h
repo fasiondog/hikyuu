@@ -25,6 +25,15 @@ Indicator HKU_API CONTEXT(bool fill_null = false, bool use_self_ktype = false,
                           bool use_self_recover_type = false);
 
 /**
+ * @brief 通过指定股票，设置指标独立上下文指标
+ * @param ind 输入指标公式，如果自身携带上下文，将被忽略
+ * @param stk 指定股票
+ * @param fill_null 是否填充空值，默认为 false
+ * @return Indicator
+ */
+Indicator HKU_API CONTEXT(const Indicator& ind, const Stock& stk, bool fill_null = false);
+
+/**
  * 获取指标上下文
  * @note Indicator::getContext()方法获取的是当前的上下文，但对于 CONTEXT
  * 独立上下文指标无法获取其指定的独立上下文，需用此方法获取。

@@ -164,6 +164,19 @@ Indicator HKU_API CONTEXT(const Indicator& ind, bool fill_null, bool use_self_kt
     return p->calculate();
 }
 
+Indicator HKU_API CONTEXT(const Indicator& ind, const Stock& stk, bool fill_null) {
+    HKU_WARN_IF(ind.getContext() != Null<KData>(),
+                "The context of input indicator will be ignored!");
+    KData kdata = stk.isNull() ? Null<KData>() : stk.getKData(KQuery(0, 0));
+    Indicator ref = ind.clone();
+    ref.setContext(kdata);
+    auto p = make_shared<IContext>(ref);
+    p->setParam<bool>("fill_null", fill_null);
+    p->setParam<bool>("use_self_ktype", false);
+    p->setParam<bool>("use_self_recover_type", false);
+    return p->calculate();
+}
+
 KData HKU_API CONTEXT_K(const Indicator& ind) {
     auto imp = ind.getImp();
     IContext const* p = dynamic_cast<IContext const*>(imp.get());

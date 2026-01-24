@@ -161,6 +161,12 @@ TEST_CASE("test_CONTEXT") {
     result = ind1(k1);
     expect = ind2(k1);
     check_indicator(result, expect);
+
+    /** @arg 直接指定 stock 创建 */
+    ind1 = hku::CONTEXT(CLOSE(), stk1);
+    ind2 = CLOSE(k1);
+    result = ind1(k1);
+    check_indicator(result, ind2);
 }
 
 //-----------------------------------------------------------------------------

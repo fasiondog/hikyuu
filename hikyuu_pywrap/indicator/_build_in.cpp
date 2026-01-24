@@ -674,6 +674,17 @@ void export_Indicator_build_in(py::module& m) {
     :param bool use_self_recover_type: 公式计算时使用自身独立上下文中的RECOVER_TYPE
     :rtype: Indicator)");
 
+    m.def("CONTEXT", py::overload_cast<const Indicator&, const Stock&, bool>(hku::CONTEXT),
+          py::arg("ind"), py::arg("stock"), py::arg("fill_null") = false,
+          R"(CONTEXT(ind, stock[, fill_null=False]) 
+          
+    通过指定股票，设置指标独立上下文指标, 忽略传入ind自身上下文, 直接使用stock的作为上下文
+
+    :param Indicator ind: 指标对象
+    :param Stock stock: 股票对象
+    :param bool fill_null: 日期对齐时，缺失日期对应填充空值，否则使用前值填充。
+    :rtype: Indicator)");
+
     m.def("CONTEXT_K", CONTEXT_K, R"(CONTEXT_K(ind)
 
     获取指标上下文。Indicator::getContext()方法获取的是当前的上下文，但对于 CONTEXT 独立上下文指标无法获取其指定的独立上下文，需用此方法获取
