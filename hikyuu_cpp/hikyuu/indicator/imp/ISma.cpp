@@ -39,14 +39,23 @@ void ISma::_calculate(const Indicator& ind) {
         return;
     }
 
+    _set(ind[m_discard], m_discard);
+    _increment_calculate(ind, m_discard);
+}
+
+size_t ISma::min_increment_start() const {
+    return 1;
+}
+
+void ISma::_increment_calculate(const Indicator& data, size_t start_pos) {
+    size_t total = data.size();
     double n = getParam<int>("n");
     double m = getParam<double>("m");
 
-    auto const* src = ind.data();
+    auto const* src = data.data();
     auto* dst = this->data();
 
     double p = n - m;
-    dst[m_discard] = src[m_discard];
     for (size_t i = m_discard + 1; i < total; i++) {
         dst[i] = (m * src[i] + p * dst[i - 1]) / n;
     }
