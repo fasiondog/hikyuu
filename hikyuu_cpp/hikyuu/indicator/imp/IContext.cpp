@@ -80,13 +80,13 @@ void IContext::_calculate(const Indicator& ind) {
     HKU_IF_RETURN((self_k == in_k || in_k == null_k) && this->size() != 0, void());
 
     auto self_dates = m_ref_ind.getDatetimeList();
-    HKU_WARN_IF((self_k == null_k && m_ref_ind.empty() && self_dates.empty()),
-                "The data length of context is zero! ");
+    // HKU_WARN_IF((self_k == null_k && m_ref_ind.empty() && self_dates.empty()),
+    //             "The data length of context is zero! ");
 
     auto ref = m_ref_ind;
 
     if (in_k != null_k && in_k != self_k) {
-        if (self_dates.empty()) {
+        if (self_dates.empty() && self_k.getStock().isNull()) {
             // 上下文无效且无对齐日期，按时间无关序列计算并对齐
             if (ref.size() > in_k.size()) {
                 ref = SLICE(ref, ref.size() - in_k.size(), ref.size());
