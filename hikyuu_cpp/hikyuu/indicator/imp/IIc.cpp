@@ -84,13 +84,14 @@ void IIc::_calculate(const Indicator& inputInd) {
     vector<Indicator> all_inds(stk_count);     // 保存每支证券对齐后的因子值
     vector<Indicator> all_returns(stk_count);  // 保存每支证券对齐后的 n 日收益率
     Indicator ind = inputInd;
-    for (size_t i = 0; i < stk_count; i++) {
+    global_parallel_for_index_void(0, stk_count, [&, n, fill_null](size_t i) {
+        // for (size_t i = 0; i < stk_count; i++) {
         auto k = m_stks[i].getKData(m_query);
         // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
         // 天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
-        all_inds[i] = ALIGN(REF(ind(k), n), ref_dates, fill_null);
-        all_returns[i] = ALIGN(ROCP(k.close(), n), ref_dates, fill_null);
-    }
+        all_inds[i] = ALIGN(REF(ind(k), n), ref_dates, fill_null).clearIntermediateResults();
+        all_returns[i] = ALIGN(ROCP(k.close(), n), ref_dates, fill_null).clearIntermediateResults();
+    });
 
     m_discard = n;
 
@@ -99,11 +100,14 @@ void IIc::_calculate(const Indicator& inputInd) {
         spearman = hku::CORR;
     }
 
-    PriceList tmp(stk_count, Null<price_t>());
-    PriceList tmp_return(stk_count, Null<price_t>());
+    // PriceList tmp(stk_count, Null<price_t>());
+    // PriceList tmp_return(stk_count, Null<price_t>());
     auto* dst = this->data();
-    for (size_t i = m_discard; i < days_total; i++) {
+    global_parallel_for_index_void(m_discard, days_total, [&, stk_count, dst](size_t i) {
+        // for (size_t i = m_discard; i < days_total; i++) {
         // 计算日截面 spearman 相关系数即 ic 值
+        PriceList tmp(stk_count, Null<price_t>());
+        PriceList tmp_return(stk_count, Null<price_t>());
         for (size_t j = 0; j < stk_count; j++) {
             tmp[j] = all_inds[j][i];
             tmp_return[j] = all_returns[j][i];
@@ -114,7 +118,7 @@ void IIc::_calculate(const Indicator& inputInd) {
         if (ic.size() > 0) {
             dst[i] = ic[ic.size() - 1];
         }
-    }
+    });
 
     if (getParam<bool>("strict")) {
         // 严格模式，即当前时刻对应未来收益计算结果
