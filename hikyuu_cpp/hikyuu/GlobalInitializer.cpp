@@ -77,11 +77,13 @@ void GlobalInitializer::init() {
     TA_Initialize();
 #endif
 
-    size_t cpu_num = std::thread::hardware_concurrency() * 3 / 2;
-    if (cpu_num > 128) {
-        cpu_num = 128;
-    } else if (cpu_num > 64) {
-        cpu_num = cpu_num * 10 / 8;
+    size_t cpu_num = std::thread::hardware_concurrency();
+    if (cpu_num <= 10) {
+        cpu_num = cpu_num * 2;
+    } else if (cpu_num <= 64) {
+        cpu_num = cpu_num * 3 / 2;
+    } else {
+        cpu_num = cpu_num * 5 / 4;
     }
     init_global_task_group(cpu_num);
 
