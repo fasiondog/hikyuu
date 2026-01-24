@@ -37,6 +37,8 @@ void HKU_API registerExtraKType(const string& ktype, const string& basetype, int
  */
 void HKU_API releaseExtraKType();
 
+void HKU_API enableKDataCache(bool enable);
+
 //-------------------------------
 // 以下函数为内部使用，无需引出
 //-------------------------------
@@ -57,7 +59,5 @@ bool getStockExtraIndexRange(const Stock& stk, const KQuery& query, size_t& out_
 KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query);
 
 bool canLazyLoad(const KQuery::KType& ktype);
-
-void enableKDataCache(bool enable);
 
 }  // namespace hku
