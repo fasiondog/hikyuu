@@ -72,6 +72,42 @@ void IStdp::_calculate(const Indicator& data) {
         dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / n) / n);
     }
 }
+bool IStdp::supportIncrementCalculate() const {
+    return getParam<int>("n") != 0;
+}
+
+size_t IStdp::min_increment_start() const {
+    return getParam<int>("n");
+}
+
+void IStdp::_increment_calculate(const Indicator& data, size_t start_pos) {
+    size_t total = data.size();
+    int n = getParam<int>("n");
+    auto const* src = data.data();
+    auto* dst = this->data();
+
+    vector<price_t> pow_buf(data.size() + n - start_pos);
+    price_t ex = 0.0, ex2 = 0.0;
+    price_t k = src[start_pos - n];
+    for (size_t i = start_pos - n; i < start_pos; i++) {
+        price_t d = src[i] - k;
+        ex += d;
+        price_t d_pow = std::pow(d, 2);
+        pow_buf[i + n - start_pos] = d_pow;
+        ex2 += d_pow;
+    }
+
+    for (size_t i = start_pos; i < total; i++) {
+        ex -= src[i - n] - k;
+        ex2 -= pow_buf[i - start_pos];
+        price_t d = src[i] - k;
+        ex += d;
+        price_t d_pow = std::pow(d, 2);
+        pow_buf[i + n - start_pos] = d_pow;
+        ex2 += d_pow;
+        dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / n) / n);
+    }
+}
 
 void IStdp::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     size_t start = _get_step_start(curPos, step, ind.discard());
