@@ -19,12 +19,14 @@ namespace hku {
  */
 class IDma : public Indicator2InImp {
     INDICATOR2IN_IMP(IDma)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR2IN_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     IDma();
     explicit IDma(const Indicator& ref_a, bool fill_null);
     virtual ~IDma();
+    virtual size_t min_increment_start() const override;
 };
 
 }  // namespace hku

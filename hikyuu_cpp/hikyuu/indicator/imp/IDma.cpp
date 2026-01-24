@@ -40,6 +40,25 @@ void IDma::_calculate(const Indicator& ind) {
     }
 }
 
+size_t IDma::min_increment_start() const {
+    return 1;
+}
+
+void IDma::_increment_calculate(const Indicator& data, size_t start_pos) {
+    size_t total = data.size();
+    Indicator ref = prepare(data);
+    auto* y = this->data();
+    const auto* a = ref.data();
+    const auto* x = data.data();
+    for (size_t i = start_pos + 1; i < total; i++) {
+        if (std::isnan(y[i - 1])) {
+            y[i] = x[i];
+        } else {
+            y[i] = a[i] * x[i] + (1 - a[i]) * y[i - 1];
+        }
+    }
+}
+
 Indicator HKU_API DMA(const Indicator& x, const Indicator& a, bool fill_null) {
     auto p = make_shared<IDma>(a, fill_null);
     Indicator result(p);
