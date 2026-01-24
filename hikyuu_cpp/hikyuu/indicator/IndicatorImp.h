@@ -158,9 +158,17 @@ public:
     // ===================
     virtual void _calculate(const Indicator&);
 
+    // ====== start 动态周期计算相关接口 ======
     /** 动态周期计算，子类可重载该函数，默认不支持动态周期计算 */
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
+    /** 是否必须串行计算 */
+    bool isSerial() const noexcept {
+        return m_is_serial;
+    }
+    // ====== end 动态周期计算相关接口 ======
+
+    // ====== start 增量计算相关接口 =======
     /** 是否支持增量计算 */
     virtual bool supportIncrementCalculate() const;
 
@@ -169,11 +177,7 @@ public:
     }
 
     virtual void _increment_calculate(const Indicator& ind, size_t start_pos) {}
-
-    /** 是否必须串行计算 */
-    bool isSerial() const noexcept {
-        return m_is_serial;
-    }
+    // ====== end 增量计算相关接口 =======
 
     virtual IndicatorImpPtr _clone() {
         return make_shared<IndicatorImp>();
