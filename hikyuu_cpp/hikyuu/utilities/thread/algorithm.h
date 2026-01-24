@@ -230,7 +230,7 @@ private:
 
 template <typename FunctionType>
 auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f,
-                                    size_t threshold = 0) {
+                                    size_t threshold = 2) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
     HKU_IF_RETURN(start >= end, void());
@@ -278,7 +278,7 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f,
 }
 
 template <typename FunctionType>
-auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t threshold = 0) {
+auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t threshold = 2) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
 
@@ -337,7 +337,7 @@ auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t 
 }
 
 template <typename FunctionType>
-auto global_parallel_for_range(size_t start, size_t end, FunctionType f, size_t threshold = 0) {
+auto global_parallel_for_range(size_t start, size_t end, FunctionType f, size_t threshold = 2) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
 
@@ -392,7 +392,7 @@ auto global_parallel_for_range(size_t start, size_t end, FunctionType f, size_t 
 
 template <typename FunctionType>
 void global_parallel_for_index_void_single(size_t start, size_t end, FunctionType f,
-                                           size_t threshold = 0) {
+                                           size_t threshold = 2) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
     HKU_IF_RETURN(start >= end, void());
@@ -433,7 +433,7 @@ void global_parallel_for_index_void_single(size_t start, size_t end, FunctionTyp
 
 template <typename FunctionType>
 auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
-                                      size_t threshold = 0) {
+                                      size_t threshold = 2) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
 
