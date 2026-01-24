@@ -469,10 +469,13 @@ Indicator MultiFactorBase::getIC(int ndays) {
         spearman = hku::CORR;
     }
 
-    PriceList tmp(ind_count, Null<price_t>());
-    PriceList tmp_return(ind_count, Null<price_t>());
+    // PriceList tmp(ind_count, Null<price_t>());
+    // PriceList tmp_return(ind_count, Null<price_t>());
     auto* dst = result.data();
-    for (size_t i = discard; i < days_total; i++) {
+    global_parallel_for_index_void(discard, days_total, [&, ind_count, dst](size_t i) {
+        // for (size_t i = discard; i < days_total; i++) {
+        PriceList tmp(ind_count, Null<price_t>());
+        PriceList tmp_return(ind_count, Null<price_t>());
         for (size_t j = 0; j < ind_count; j++) {
             tmp[j] = tmp_ref_inds[j][i];
             tmp_return[j] = all_returns[j][i];
@@ -483,7 +486,7 @@ Indicator MultiFactorBase::getIC(int ndays) {
         if (ic.size() > 0) {
             dst[i] = ic[ic.size() - 1];
         }
-    }
+    });
 
     for (size_t i = discard; i < days_total; i++) {
         if (!std::isnan(dst[i])) {
