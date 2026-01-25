@@ -54,7 +54,7 @@ void IRecover::_calculate(const Indicator& ind) {
     m_name = fmt::format("RECOVER_{}", KQuery::getRecoverTypeName(recover_type));
 
     query.recoverType(recover_type);
-    KData new_k = kdata.getStock().getKData(query);
+    KData new_k = kdata.getKData(query);
     HKU_ASSERT(new_k.size() == ind.size());
 
     size_t total = new_k.size();
@@ -81,6 +81,50 @@ void IRecover::_calculate(const Indicator& ind) {
     } else {
         for (size_t i = 0; i < total; i++) {
             dst[i] = data[i].lowPrice;
+        }
+    }
+}
+
+void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    auto kdata = ind.getContext();
+    auto query = kdata.getQuery();
+
+    KQuery::RecoverType recover_type =
+      static_cast<KQuery::RecoverType>(getParam<int>("recover_type"));
+
+    // 保证从旧的上下文起点到新的上下文终点的数据都被计算到
+    query = KQueryByDate(m_old_context.front().datetime,
+                         kdata.back().datetime + Seconds(KQuery::getKTypeInSeconds(query.kType())),
+                         query.kType(), recover_type);
+    KData new_k = m_old_context.getKData(query);
+
+    size_t pos = new_k.getPos(kdata[start_pos].datetime);
+    // HKU_INFO("{}, {}, {}, {}", new_k.size(), ind.size(), pos, start_pos);
+    HKU_ASSERT(new_k.size() == (pos + ind.size() - start_pos));
+
+    size_t total = ind.size();
+
+    string part_name = ind.getParam<string>("kpart");
+    const auto* data = new_k.data();
+    auto* dst = this->data();
+    if ("CLOSE" == part_name) {
+        for (size_t i = start_pos; i < total; i++) {
+            dst[i] = data[pos++].closePrice;
+        }
+
+    } else if ("OPEN" == part_name) {
+        for (size_t i = start_pos; i < total; i++) {
+            dst[i] = data[pos++].openPrice;
+        }
+
+    } else if ("HIGH" == part_name) {
+        for (size_t i = start_pos; i < total; i++) {
+            dst[i] = data[pos++].highPrice;
+        }
+
+    } else {
+        for (size_t i = start_pos; i < total; i++) {
+            dst[i] = data[pos++].lowPrice;
         }
     }
 }
