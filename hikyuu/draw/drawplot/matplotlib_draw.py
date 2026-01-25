@@ -31,6 +31,8 @@ def set_mpl_params():
     '''设置交互及中文环境参数'''
     if in_interactive_session():
         rcParams['interactive'] = True
+    else:
+        rcParams['interactive'] = False
 
     if sys.platform == 'darwin':
         matplotlib.rcParams['font.sans-serif'] = 'Arial Unicode MS'
