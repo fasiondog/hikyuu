@@ -236,8 +236,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
         }
 
         // 计算实际可用的权重
-        price_t current_weight =
-          iter->weight + sum_weight > 1.0 ? iter->weight + sum_weight - 1.0 : iter->weight;
+        price_t current_weight = iter->weight + sum_weight > 1.0 ? 1.0 - sum_weight : iter->weight;
 
         // 该系统期望分配的资金
         price_t will_cash = roundUp(total_funds * current_weight, precision);
