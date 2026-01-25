@@ -24,6 +24,7 @@ namespace hku {
  */
 class IMacd : public IndicatorImp {
     INDICATOR_IMP(IMacd)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
@@ -32,6 +33,7 @@ public:
 
     virtual void _checkParam(const string& name) const override;
     virtual void _dyn_calculate(const Indicator&) override;
+    virtual size_t min_increment_start() const override;
 
 private:
     void _dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2, int n3);

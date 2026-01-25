@@ -41,15 +41,23 @@ void IMacd::_calculate(const Indicator& data) {
 
     _readyBuffer(total, 3);
 
-    int n1 = getParam<int>("n1");
-    int n2 = getParam<int>("n2");
-    int n3 = getParam<int>("n3");
-
     m_discard = data.discard();
     if (total <= m_discard) {
         m_discard = total;
         return;
     }
+
+    _increment_calculate(data, m_discard + 1);
+}
+
+size_t IMacd::min_increment_start() const {
+    return 1;
+}
+
+void IMacd::_increment_calculate(const Indicator& data, size_t start_pos) {
+    int n1 = getParam<int>("n1");
+    int n2 = getParam<int>("n2");
+    int n3 = getParam<int>("n3");
 
     auto const* src = data.data();
     auto* dst0 = this->data(0);
@@ -59,16 +67,17 @@ void IMacd::_calculate(const Indicator& data) {
     price_t m1 = 2.0 / (n1 + 1);
     price_t m2 = 2.0 / (n2 + 1);
     price_t m3 = 2.0 / (n3 + 1);
-    price_t ema1 = src[0];
-    price_t ema2 = src[0];
+    price_t ema1 = src[start_pos - 1];
+    price_t ema2 = src[start_pos - 1];
     price_t diff = 0.0;
     price_t dea = 0.0;
     price_t bar = 0.0;
-    dst0[0] = bar;
-    dst1[0] = diff;
-    dst2[0] = dea;
+    dst0[start_pos - 1] = bar;
+    dst1[start_pos - 1] = diff;
+    dst2[start_pos - 1] = dea;
 
-    for (size_t i = 1; i < total; ++i) {
+    size_t total = data.size();
+    for (size_t i = start_pos; i < total; ++i) {
         ema1 = (src[i] - ema1) * m1 + ema1;
         ema2 = (src[i] - ema2) * m2 + ema2;
         diff = ema1 - ema2;
