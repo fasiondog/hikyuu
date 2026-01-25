@@ -415,14 +415,16 @@ def iplot(
             axes.hlines(0, 0, len(indicator))
 
     axes.autoscale_view()
-    axes.set_xlim(-1, len(indicator) + 1)
     if kref is not None:
         ax_set_locator_formatter(axes, kref.get_datetime_list(), kref.get_query().ktype)
+        axes.set_xlim(-1, len(kref) + 1)
     else:
         k = indicator.get_context()
         if len(k) > 0:
             ax_set_locator_formatter(axes, k.get_datetime_list(), k.get_query().ktype)
-    # draw()
+            axes.set_xlim(-1, len(k) + 1)
+        else:
+            axes.set_xlim(-1, len(indicator) + 1)
 
 
 def ibar(
