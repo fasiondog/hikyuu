@@ -85,6 +85,7 @@ void IRecover::_calculate(const Indicator& ind) {
     }
 }
 
+#if 0
 void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
     auto kdata = ind.getContext();
     auto query = kdata.getQuery();
@@ -128,6 +129,7 @@ void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
         }
     }
 }
+#endif
 
 Indicator HKU_API RECOVER_FORWARD() {
     return Indicator(make_shared<IRecover>(KQuery::FORWARD));

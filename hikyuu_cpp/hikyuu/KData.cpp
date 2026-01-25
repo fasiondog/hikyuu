@@ -175,7 +175,7 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
         end = Null<Datetime>();
     } else {
         end = this->back().datetime;
-        if (end_datetime < end) {
+        if (end_datetime != Null<Datetime>() && end_datetime < end) {
             end = end_datetime;
         }
     }

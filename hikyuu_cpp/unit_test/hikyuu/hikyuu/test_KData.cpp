@@ -1298,11 +1298,11 @@ TEST_CASE("test_getKData_recover") {
     CHECK_EQ(kdata[151],
              KRecord(Datetime(200007050000), 23.25, 23.47, 23.15, 23.22, 3298.8, 14218));
     CHECK_EQ(kdata[152],
-             KRecord(Datetime(200007060000), 23.30, 23.42, 23.16, 23.23, 3049.5, 13200));
+             KRecord(Datetime(200007060000), 23.30, 23.42, 23.16, 23.23, 306636., 13200.0));
     CHECK_EQ(kdata[657],
-             KRecord(Datetime(200208210000), 18.35, 18.75, 18.18, 18.55, 36409.8, 197640));
+             KRecord(Datetime(200208210000), 18.35, 18.75, 18.18, 18.55, 3666222., 197640.0));
     CHECK_EQ(kdata[658],
-             KRecord(Datetime(200208220000), 18.77, 18.89, 18.62, 18.82, 13101.3, 106872));
+             KRecord(Datetime(200208220000), 18.77, 18.89, 18.62, 18.82, 1340887.36, 71248.));
 
     /** @arg 前向等比复权*/
     query = KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::EQUAL_FORWARD);
@@ -1310,11 +1310,13 @@ TEST_CASE("test_getKData_recover") {
     CHECK_EQ(kdata[2710],
              KRecord(Datetime(201106030000), 10.02, 10.14, 10.0, 10.09, 38726.1, 384820));
     CHECK_EQ(kdata[2709],
-             KRecord(Datetime(201106020000), 10.33, 10.37, 9.93, 10.04, 103909.3, 780543.0));
+             KRecord(Datetime(201106020000), 10.33, 10.37, 9.93, 10.04, 6028196.72, 600418.0));
     CHECK_EQ(kdata[2554],
-             KRecord(Datetime(201010140000), 11.03, 11.40, 10.90, 10.94, 322428.8, 2195006));
-    CHECK_EQ(kdata[2548], KRecord(Datetime(201009290000), 9.27, 9.64, 9.21, 9.49, 99719.8, 799165));
-    CHECK_EQ(kdata[2547], KRecord(Datetime(201009280000), 9.82, 9.82, 9.55, 9.56, 81241.5, 639882));
+             KRecord(Datetime(201010140000), 11.03, 11.40, 10.90, 10.94, 18471818.04, 1688466.0));
+    CHECK_EQ(kdata[2548],
+             KRecord(Datetime(201009290000), 9.27, 9.64, 9.21, 9.49, 5833901.58, 614742.0));
+    CHECK_EQ(kdata[2547],
+             KRecord(Datetime(201009280000), 9.82, 9.82, 9.55, 9.56, 4705594.52, 492217.00));
 
     /** @arg 等比后向复权*/
     query = KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::EQUAL_BACKWARD);
