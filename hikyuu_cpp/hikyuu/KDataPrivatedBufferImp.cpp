@@ -255,7 +255,7 @@ void KDataPrivatedBufferImp::_recoverBackward() {
     auto* raw_buf = raw_data.data();
     size_t raw_total = raw_data.size();
 
-    StockWeightList weightList = m_stock.getWeight(start_date, end_date);
+    StockWeightList weightList = m_stock.getWeight(start_date, m_buffer.back().datetime+Days(1));
     StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
 
     size_t pre_pos = raw_total - 1;
@@ -459,7 +459,7 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
     auto* raw_buf = raw_data.data();
     size_t raw_total = raw_data.size();
 
-    StockWeightList weightList = m_stock.getWeight(start_date, end_date);
+    StockWeightList weightList = m_stock.getWeight(start_date, m_buffer.back().datetime +Days(1));
     StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
 
     size_t pre_pos = raw_total - 1;
