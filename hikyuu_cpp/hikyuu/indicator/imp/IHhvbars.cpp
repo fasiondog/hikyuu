@@ -115,14 +115,14 @@ void IHhvbars::_increment_calculate(const Indicator& ind, size_t start_pos) {
     auto const* src = ind.data();
     auto* dst = this->data();
 
-    price_t max = src[start_pos];
-    size_t pre_pos = start_pos;
-    for (size_t i = start_pos; i < start_pos - n; i++) {
+    price_t max = src[start_pos - n];
+    size_t pre_pos = start_pos - n;
+    for (size_t i = start_pos - n; i < start_pos; i++) {
         if (src[i] >= max) {
             max = src[i];
             pre_pos = i;
         }
-        dst[i] = i - pre_pos;
+        // dst[i] = i - pre_pos;
     }
 
     for (size_t i = start_pos; i < total; i++) {

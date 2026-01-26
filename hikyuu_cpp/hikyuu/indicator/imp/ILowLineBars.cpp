@@ -89,6 +89,62 @@ void ILowLineBars::_calculate(const Indicator& ind) {
     }
 }
 
+bool ILowLineBars::supportIncrementCalculate() const {
+    return getParam<int>("n") > 0;
+}
+
+size_t ILowLineBars::min_increment_start() const {
+    return getParam<int>("n");
+}
+
+void ILowLineBars::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    size_t total = ind.size();
+    if (1 == total) {
+        if (0 == m_discard) {
+            _set(0, 0);
+        }
+        return;
+    }
+
+    int n = getParam<int>("n");
+    if (n > total) {
+        n = total;
+    }
+
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
+    price_t min = src[start_pos - n];
+    size_t pre_pos = start_pos - n;
+    for (size_t i = start_pos - n; i < start_pos; i++) {
+        if (src[i] <= min) {
+            min = src[i];
+            pre_pos = i;
+        }
+        // dst[i] = i - pre_pos;
+    }
+
+    for (size_t i = start_pos; i < total; i++) {
+        size_t j = i + 1 - n;
+        if (pre_pos < j) {
+            pre_pos = j;
+            min = src[j];
+            for (size_t k = pre_pos + 1; k <= i; k++) {
+                if (src[k] <= min) {
+                    min = src[k];
+                    pre_pos = k;
+                }
+            }
+        } else {
+            if (src[i] <= min) {
+                min = src[i];
+                pre_pos = i;
+            }
+        }
+        dst[i] = i - pre_pos;
+    }
+}
+
 void ILowLineBars::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     size_t start = _get_step_start(curPos, step, ind.discard());
     price_t minVal = ind[start];
