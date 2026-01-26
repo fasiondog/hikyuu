@@ -60,7 +60,7 @@ vector<Indicator> WeightMultiFactor::_calculate(const vector<vector<Indicator>>&
                 ret.setDiscard(di);
                 break;
             }
-            if (di == days_total - 1 && std::isnan(ret[di])) {
+            if (di == days_total - 1) {
                 ret.setDiscard(di);
             }
         }
