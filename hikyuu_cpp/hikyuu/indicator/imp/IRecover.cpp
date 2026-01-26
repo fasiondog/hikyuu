@@ -96,7 +96,12 @@ void IRecover::_calculate(const Indicator& ind) {
     }
 }
 
-#if 0
+bool IRecover::supportIncrementCalculate() const {
+    KQuery::RecoverType recover_type =
+      static_cast<KQuery::RecoverType>(getParam<int>("recover_type"));
+    return !(recover_type == KQuery::FORWARD || recover_type == KQuery::EQUAL_FORWARD);
+}
+
 void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
     auto kdata = ind.getContext();
     auto query = kdata.getQuery();
@@ -111,7 +116,6 @@ void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
     KData new_k = m_old_context.getKData(query);
 
     size_t pos = new_k.getPos(kdata[start_pos].datetime);
-    // HKU_INFO("{}, {}, {}, {}", new_k.size(), ind.size(), pos, start_pos);
     HKU_ASSERT(new_k.size() == (pos + ind.size() - start_pos));
 
     size_t total = ind.size();
@@ -134,13 +138,21 @@ void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
             dst[i] = data[pos++].highPrice;
         }
 
-    } else {
+    } else if ("LOW" == part_name) {
         for (size_t i = start_pos; i < total; i++) {
             dst[i] = data[pos++].lowPrice;
         }
+    } else if ("AMO" == part_name) {
+        for (size_t i = start_pos; i < total; i++) {
+            dst[i] = data[pos++].transAmount;
+        }
+
+    } else if ("VOL" == part_name) {
+        for (size_t i = start_pos; i < total; i++) {
+            dst[i] = data[pos++].transCount;
+        }
     }
 }
-#endif
 
 Indicator HKU_API RECOVER_FORWARD() {
     return Indicator(make_shared<IRecover>(KQuery::FORWARD));
