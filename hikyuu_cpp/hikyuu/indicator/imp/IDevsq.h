@@ -17,6 +17,7 @@ namespace hku {
 
 class IDevsq : public hku::IndicatorImp {
     INDICATOR_IMP(IDevsq)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
@@ -24,6 +25,7 @@ public:
     IDevsq();
     virtual ~IDevsq();
     virtual void _checkParam(const string& name) const override;
+    virtual size_t min_increment_start() const override;
 };
 
 } /* namespace hku */

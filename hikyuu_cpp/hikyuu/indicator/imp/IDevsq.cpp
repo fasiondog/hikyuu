@@ -32,13 +32,45 @@ void IDevsq::_calculate(const Indicator& data) {
     size_t total = data.size();
     int n = getParam<int>("n");
 
-    Indicator ma = MA(data, n);
-    m_discard = ma.discard();
+    m_discard = data.discard() + n - 1;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
+    _increment_calculate(data, m_discard);
+}
+
+size_t IDevsq::min_increment_start() const {
+    return getParam<int>("n");
+}
+
+void IDevsq::_increment_calculate(const Indicator& data, size_t start_pos) {
+    size_t total = data.size();
+    int n = getParam<int>("n");
 
     auto const* src = data.data();
+
+    std::vector<price_t> ma(total);
+    size_t start = start_pos + 1 - n;
+    price_t sum = 0.0;
+    for (size_t i = start; i <= start_pos; ++i) {
+        if (!std::isnan(src[i])) {
+            sum += src[i];
+        }
+    }
+
+    ma[start_pos] = sum / n;
+    for (size_t i = start_pos + 1; i < total; ++i) {
+        if (!std::isnan(src[i]) && !std::isnan(src[i - n])) {
+            sum = src[i] + sum - src[i - n];
+            ma[i] = sum / n;
+        }
+    }
+
     auto const* mean = ma.data();
     auto* dst = this->data();
-    for (size_t i = m_discard; i < total; ++i) {
+    for (size_t i = start_pos; i < total; ++i) {
         price_t sum = 0.0;
         size_t start = i + 1 - n;
         for (size_t j = start; j <= i; ++j) {
