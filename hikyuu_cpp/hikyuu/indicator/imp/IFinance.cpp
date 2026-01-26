@@ -37,9 +37,13 @@ void IFinance::_calculate(const Indicator& data) {
     }
 
     _readyBuffer(total, 1);
+    _increment_calculate(data, 0);
+}
 
-    Stock stock = kdata.getStock();
-    auto finances = stock.getHistoryFinance();
+void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
+    const KData& kdata = getContext();
+    size_t total = kdata.size();
+    auto finances = kdata.getStock().getHistoryFinance();
 
     if (getParam<bool>("only_year_report")) {
         vector<HistoryFinanceInfo> tmp_finances;
@@ -68,7 +72,7 @@ void IFinance::_calculate(const Indicator& data) {
     const auto* k = kdata.data();
 
     size_t finances_total = finances.size();
-    size_t cur_kix = 0;
+    size_t cur_kix = start_pos;
     size_t pos = 0;
     while (pos < finances_total && cur_kix < total) {
         auto value = finances[pos].values.at(field_ix);
