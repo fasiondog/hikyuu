@@ -14,6 +14,7 @@
 #include <hikyuu/indicator/crt/IC.h>
 #include <hikyuu/indicator/crt/ROCR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/trade_sys/multifactor/crt/MF_EqualWeight.h>
 #include <hikyuu/trade_sys/multifactor/crt/MF_Weight.h>
 
 using namespace hku;
