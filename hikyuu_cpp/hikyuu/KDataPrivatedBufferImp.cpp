@@ -234,7 +234,6 @@ void KDataPrivatedBufferImp::_recoverForward() {
  * 向前判断，遇到下一个除权日，则再次将除权日到最新日之间（包括除权日）的全部股价通过复权计算升上去。
  *****************************************************************************/
 void KDataPrivatedBufferImp::_recoverBackward() {
-    // SPEND_TIME(_recoverBackward)
     size_t total = m_buffer.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -493,12 +492,10 @@ KDataImpPtr KDataPrivatedBufferImp::getOtherFromSelf(const KQuery& query) const 
     // 其它限制由上层保护
     if (query.queryType() == KQuery::INDEX && m_query.queryType() == KQuery::INDEX) {
         ret = _getOtherFromSelfByIndex(query);
-    } else {
+    } else if (query.queryType() == KQuery::DATE) {
         ret = _getOtherFromSelfByDate(query);
-    }
-    if (query.recoverType() != KQuery::NO_RECOVER) {
-        auto* p = dynamic_cast<KDataPrivatedBufferImp*>(ret.get());
-        p->_recover();
+    } else {
+        ret = std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
     }
     return ret;
 }
@@ -510,6 +507,9 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByIndex(const KQuery& query
         auto* p = new KDataPrivatedBufferImp;
         p->m_stock = m_stock;
         p->m_query = query;
+        if (query.recoverType() != KQuery::NO_RECOVER) {
+            p->_recover();
+        }
         return KDataImpPtr(p);
     }
 
@@ -529,6 +529,9 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByIndex(const KQuery& query
         p->m_buffer.resize(new_len);
         std::copy(m_buffer.begin() + new_start_pos - old_start_pos,
                   m_buffer.begin() + new_last_pos + 1 - old_start_pos, p->m_buffer.begin());
+        if (query.recoverType() != KQuery::NO_RECOVER) {
+            p->_recover();
+        }
         return KDataImpPtr(p);
     }
 
@@ -544,6 +547,9 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByIndex(const KQuery& query
     size_t remain_len = new_last_pos - old_last_pos;
     HKU_ASSERT(klist.size() == remain_len);
     std::copy(klist.begin(), klist.end(), p->m_buffer.begin() + remain_len);
+    if (query.recoverType() != KQuery::NO_RECOVER) {
+        p->_recover();
+    }
     return KDataImpPtr(p);
 }
 
@@ -580,6 +586,9 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByDate(const KQuery& query)
             p->m_buffer.resize(copy_len);
             std::copy(m_buffer.begin() + new_start_pos_in_old,
                       m_buffer.begin() + new_end_pos_in_old, p->m_buffer.begin());
+            if (query.recoverType() != KQuery::NO_RECOVER) {
+                p->_recover();
+            }
             return KDataImpPtr(p);
         }
     }
@@ -597,6 +606,9 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByDate(const KQuery& query)
               p->m_buffer.begin());
     std::copy(klist.begin(), klist.end(),
               p->m_buffer.begin() + m_buffer.size() - new_start_pos_in_old);
+    if (query.recoverType() != KQuery::NO_RECOVER) {
+        p->_recover();
+    }
     return KDataImpPtr(p);
 }
 
