@@ -41,8 +41,9 @@ void IRecover::checkInputIndicator(const Indicator& ind) {
     HKU_CHECK(dynamic_cast<IKData*>(ind.getImp().get()) != nullptr,
               "Only the following indicators are accepted: OPEN|HIGH|CLOSE|LOW");
     string part = ind.getParam<string>("kpart");
-    HKU_CHECK(part == "CLOSE" || part == "OPEN" || part == "HIGH" || part == "LOW",
-              "Only the following indicators are accepted: OPEN|HIGH|CLOSE|LOW");
+    HKU_CHECK(
+      part == "CLOSE" || part == "OPEN" || part == "HIGH" || part == "LOW" || "AMO" || "VOL",
+      "Only the following indicators are accepted: OPEN|HIGH|CLOSE|LOW");
 }
 
 void IRecover::_calculate(const Indicator& ind) {
@@ -78,11 +79,29 @@ void IRecover::_calculate(const Indicator& ind) {
             dst[i] = data[i].highPrice;
         }
 
-    } else {
+    } else if ("LOW" == part_name) {
         for (size_t i = 0; i < total; i++) {
             dst[i] = data[i].lowPrice;
         }
+
+    } else if ("AMO" == part_name) {
+        for (size_t i = 0; i < total; i++) {
+            dst[i] = data[i].transAmount;
+        }
+
+    } else if ("VOL" == part_name) {
+        for (size_t i = 0; i < total; i++) {
+            dst[i] = data[i].transCount;
+        }
     }
+}
+
+#if 0
+// 需要后复权为全量方式才有意义，但全量后复权太慢
+bool IRecover::supportIncrementCalculate() const {
+    KQuery::RecoverType recover_type =
+      static_cast<KQuery::RecoverType>(getParam<int>("recover_type"));
+    return !(recover_type == KQuery::FORWARD || recover_type == KQuery::EQUAL_FORWARD);
 }
 
 void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
@@ -99,7 +118,6 @@ void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
     KData new_k = m_old_context.getKData(query);
 
     size_t pos = new_k.getPos(kdata[start_pos].datetime);
-    // HKU_INFO("{}, {}, {}, {}", new_k.size(), ind.size(), pos, start_pos);
     HKU_ASSERT(new_k.size() == (pos + ind.size() - start_pos));
 
     size_t total = ind.size();
@@ -122,12 +140,22 @@ void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
             dst[i] = data[pos++].highPrice;
         }
 
-    } else {
+    } else if ("LOW" == part_name) {
         for (size_t i = start_pos; i < total; i++) {
             dst[i] = data[pos++].lowPrice;
         }
+    } else if ("AMO" == part_name) {
+        for (size_t i = start_pos; i < total; i++) {
+            dst[i] = data[pos++].transAmount;
+        }
+
+    } else if ("VOL" == part_name) {
+        for (size_t i = start_pos; i < total; i++) {
+            dst[i] = data[pos++].transCount;
+        }
     }
 }
+#endif
 
 Indicator HKU_API RECOVER_FORWARD() {
     return Indicator(make_shared<IRecover>(KQuery::FORWARD));

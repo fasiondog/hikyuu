@@ -136,7 +136,7 @@ Stock::Stock() {}
 
 Stock::~Stock() {}
 
-Stock::Stock(const Stock& x) : m_data(x.m_data), m_kdataDriver(x.m_kdataDriver) {}
+Stock::Stock(const Stock& x) noexcept : m_data(x.m_data), m_kdataDriver(x.m_kdataDriver) {}
 
 Stock::Stock(Stock&& x) noexcept
 : m_data(std::move(x.m_data)), m_kdataDriver(std::move(x.m_kdataDriver)) {}

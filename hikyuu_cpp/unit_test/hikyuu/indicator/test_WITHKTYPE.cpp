@@ -127,6 +127,7 @@ TEST_CASE("test_WITHKTYPE_sample") {
 
 /** @par 检测点 */
 TEST_CASE("test_WITHKTYPE_export") {
+    HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
     filename += "/WITHKTYPE.xml";

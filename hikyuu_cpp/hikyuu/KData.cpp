@@ -53,15 +53,15 @@ KData::KData(const Stock& stock, const KQuery& query) {
         return;
     }
 
-    if (stock.isPreload(query.kType())) {
-        if (!stock.isBuffer(query.kType())) {
-            stock.loadKDataToBuffer(query.kType());
-        }
-        if (query.recoverType() == KQuery::NO_RECOVER) {
-            // 当Stock已缓存了该类型的K线数据，且不进行复权
-            m_imp = make_shared<KDataSharedBufferImp>(stock, query);
-            return;
-        }
+    if (stock.isPreload(query.kType()) && !stock.isBuffer(query.kType())) {
+        stock.loadKDataToBuffer(query.kType());
+    }
+
+    // 非预加载也可能被主动加载至缓存
+    if (query.recoverType() == KQuery::NO_RECOVER && stock.isBuffer(query.kType())) {
+        // 当Stock已缓存了该类型的K线数据，且不进行复权
+        m_imp = make_shared<KDataSharedBufferImp>(stock, query);
+        return;
     }
 
     m_imp = getKDataImp(stock, query);
@@ -107,17 +107,19 @@ KData KData::getKData(const KQuery& query) const {
     const Stock& stk = getStock();
     HKU_IF_RETURN(stk.isNull(), ret);
 
-    if (stk.isPreload(query.kType())) {
-        if (!stk.isBuffer(query.kType())) {
-            stk.loadKDataToBuffer(query.kType());
-        }
+    if (stk.isPreload(query.kType()) && !stk.isBuffer(query.kType())) {
+        stk.loadKDataToBuffer(query.kType());
+    }
+
+    if (query.recoverType() == KQuery::NO_RECOVER && stk.isBuffer(query.kType())) {
         ret = KData(stk, query);
         return ret;
     }
 
     const auto& self_query = getQuery();
-    if (empty() || self_query.recoverType() != KQuery::NO_RECOVER ||
-        query.kType() != self_query.kType()) {
+    if (empty() || self_query.recoverType() != query.recoverType() ||
+        query.kType() != self_query.kType() || self_query.recoverType() == KQuery::FORWARD ||
+        self_query.recoverType() == KQuery::EQUAL_FORWARD) {
         ret = KData(stk, query);
         return ret;
     }
@@ -175,7 +177,7 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
         end = Null<Datetime>();
     } else {
         end = this->back().datetime;
-        if (end_datetime < end) {
+        if (end_datetime != Null<Datetime>() && end_datetime < end) {
             end = end_datetime;
         }
     }
