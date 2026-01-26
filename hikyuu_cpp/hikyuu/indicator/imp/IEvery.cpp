@@ -31,11 +31,10 @@ void IEvery::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(0 == total, void());
 
-    auto const* src = ind.data();
-    auto* dst = this->data();
-
     int n = getParam<int>("n");
     if (0 == n) {
+        auto const* src = ind.data();
+        auto* dst = this->data();
         m_discard = ind.discard();
         for (size_t i = m_discard; i < total; i++) {
             price_t every = 1.0;
@@ -56,17 +55,34 @@ void IEvery::_calculate(const Indicator& ind) {
         return;
     }
 
+    _increment_calculate(ind, m_discard);
+}
+
+bool IEvery::supportIncrementCalculate() const {
+    return getParam<int>("n") != 0;
+}
+
+size_t IEvery::min_increment_start() const {
+    return getParam<int>("n") - 1;
+}
+
+void IEvery::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    size_t total = ind.size();
+    int n = getParam<int>("n");
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
     price_t every = 1;
-    size_t pre_pos = m_discard;
-    for (size_t i = ind.discard(); i <= m_discard; i++) {
+    size_t pre_pos = start_pos + n - 1;
+    for (size_t i = start_pos + 1 - n; i <= start_pos; i++) {
         if (src[i] == 0) {
             pre_pos = i;
             every = 0;
         }
     }
 
-    dst[m_discard] = every;
-    for (size_t i = m_discard + 1; i < total - 1; i++) {
+    dst[start_pos] = every;
+    for (size_t i = start_pos + 1; i < total - 1; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
@@ -79,9 +95,8 @@ void IEvery::_calculate(const Indicator& ind) {
         dst[i] = every;
     }
 
-    size_t start_pos = total - n;
     every = 1;
-    for (size_t i = start_pos; i < total; i++) {
+    for (size_t i = total - n; i < total; i++) {
         if (src[i] == 0) {
             every = 0;
             break;
