@@ -77,6 +77,12 @@ void IQuantileTrunc::_calculate(const Indicator &data) {
         return;
     }
 
+    _increment_calculate(data, m_discard);
+}
+
+void IQuantileTrunc::_increment_calculate(const Indicator &data, size_t start_pos) {
+    size_t total = data.size();
+    int n = getParam<int>("n");
     double quantile_min = getParam<double>("quantile_min");
     double quantile_max = getParam<double>("quantile_max");
     auto *dst = this->data();
@@ -85,7 +91,7 @@ void IQuantileTrunc::_calculate(const Indicator &data) {
     //     dst[i] = quantile_trunc(src, n, quantile_min, quantile_max);
     // }
     const auto *data_ptr = data.data();
-    global_parallel_for_index_void(m_discard, total,
+    global_parallel_for_index_void(start_pos, total,
                                    [n, quantile_min, quantile_max, dst, data_ptr](size_t i) {
                                        auto const *src = data_ptr + 1 + i - n;
                                        dst[i] = quantile_trunc(src, n, quantile_min, quantile_max);
