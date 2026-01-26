@@ -78,6 +78,48 @@ void IVarp::_calculate(const Indicator& data) {
     }
 }
 
+bool IVarp::supportIncrementCalculate() const {
+    return getParam<int>("n") != 0;
+}
+
+size_t IVarp::min_increment_start() const {
+    return getParam<int>("n");
+}
+
+void IVarp::_increment_calculate(const Indicator& data, size_t start_pos) {
+    size_t total = data.size();
+    int n = getParam<int>("n");
+    auto const* src = data.data();
+    auto* dst = this->data();
+
+    vector<price_t> pow_buf(data.size());
+
+    value_t ex = 0.0, ex2 = 0.0;
+    value_t k = src[start_pos];
+    for (size_t i = start_pos - n; i < start_pos; i++) {
+        value_t d = src[i] - k;
+        ex += d;
+        value_t d_pow = d * d;
+        pow_buf[i] = d_pow;
+        ex2 += d_pow;
+    }
+
+    value_t p1 = 1. / n;
+    value_t p2 = 1. / (n * n);
+    // dst[first_end - 1] = ex2 * p1 - ex * ex * p2;
+
+    for (size_t i = start_pos, pre_ix = start_pos - n; i < total; i++, pre_ix++) {
+        ex -= src[pre_ix] - k;
+        ex2 -= pow_buf[pre_ix];
+        value_t d = src[i] - k;
+        ex += d;
+        value_t d_pow = d * d;
+        pow_buf[i] = d_pow;
+        ex2 += d_pow;
+        dst[i] = ex2 * p1 - ex * ex * p2;
+    }
+}
+
 void IVarp::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     HKU_IF_RETURN(step < 2, void());
 

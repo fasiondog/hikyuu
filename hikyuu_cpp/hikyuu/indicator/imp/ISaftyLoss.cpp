@@ -39,7 +39,6 @@ void ISaftyLoss::_calculate(const Indicator& data) {
 
     int n1 = getParam<int>("n1");
     int n2 = getParam<int>("n2");
-    double p = getParam<double>("p");
 
     m_discard = data.discard() + n1 + n2 - 2;
     if (m_discard >= total) {
@@ -47,10 +46,20 @@ void ISaftyLoss::_calculate(const Indicator& data) {
         return;
     }
 
+    _increment_calculate(data, m_discard);
+}
+
+void ISaftyLoss::_increment_calculate(const Indicator& data, size_t start_pos) {
+    size_t total = data.size();
+
+    int n1 = getParam<int>("n1");
+    int n2 = getParam<int>("n2");
+    double p = getParam<double>("p");
+
     auto const* src = data.data();
     auto* dst = this->data();
 
-    size_t start = discard();
+    size_t start = start_pos;
     for (size_t i = start; i < total; ++i) {
         price_t result = 0.0;
         for (size_t j = i + 1 - n2; j <= i; ++j) {

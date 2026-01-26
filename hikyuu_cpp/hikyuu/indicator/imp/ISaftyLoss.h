@@ -27,6 +27,7 @@ namespace hku {
  */
 class ISaftyLoss : public hku::IndicatorImp {
     INDICATOR_IMP(ISaftyLoss)
+    INDICATOR_IMP_SUPPORT_INCREMENT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

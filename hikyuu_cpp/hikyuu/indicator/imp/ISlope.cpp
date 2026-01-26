@@ -64,6 +64,39 @@ void ISlope::_calculate(const Indicator& ind) {
     }
 }
 
+bool ISlope::supportIncrementCalculate() const {
+    return getParam<int>("n") > 1;
+}
+
+size_t ISlope::min_increment_start() const {
+    return getParam<int>("n");
+}
+
+void ISlope::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    size_t total = ind.size();
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
+    int n = getParam<int>("n");
+
+    price_t xsum = 0.0, ysum = 0.0, xysum = 0.0, x2sum = 0.0;
+    for (size_t i = start_pos - n; i < start_pos; i++) {
+        xsum += i;
+        ysum += src[i];
+        xysum += i * src[i];
+        x2sum += std::pow(i, 2);
+        // dst[i] = ((i + 1) * xysum - xsum * ysum) / ((i + 1) * x2sum - xsum * xsum);
+    }
+
+    for (size_t i = start_pos; i < total; i++) {
+        xsum += n;
+        ysum += src[i] - src[i - n];
+        xysum += src[i] * i - src[i - n] * (i - n);
+        x2sum += (2 * i - n) * n;
+        dst[i] = (n * xysum - xsum * ysum) / (n * x2sum - xsum * xsum);
+    }
+}
+
 void ISlope::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     size_t start = _get_step_start(curPos, step, ind.discard());
     if (curPos <= ind.discard()) {
