@@ -31,11 +31,10 @@ void IExist::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     HKU_IF_RETURN(total == 0, void());
 
-    auto const* src = ind.data();
-    auto* dst = this->data();
-
     int n = getParam<int>("n");
     if (n == 0) {
+        auto const* src = ind.data();
+        auto* dst = this->data();
         m_discard = ind.discard();
         for (size_t i = m_discard; i < total; i++) {
             price_t exist = 0.0;
@@ -56,18 +55,35 @@ void IExist::_calculate(const Indicator& ind) {
         return;
     }
 
+    _increment_calculate(ind, m_discard);
+}
+
+bool IExist::supportIncrementCalculate() const {
+    return getParam<int>("n") != 0;
+}
+
+size_t IExist::min_increment_start() const {
+    return getParam<int>("n") - 1;
+}
+
+void IExist::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    size_t total = ind.size();
+    auto const* src = ind.data();
+    auto* dst = this->data();
+    int n = getParam<int>("n");
+
     price_t exist = 0;
-    size_t pre_pos = m_discard;
-    for (size_t i = ind.discard(); i <= m_discard; i++) {
+    size_t pre_pos = start_pos + n - 1;
+    for (size_t i = start_pos + 1 - n; i <= m_discard; i++) {
         if (src[i] != 0) {
             pre_pos = i;
             exist = 1.0;
         }
     }
 
-    dst[m_discard] = exist;
+    dst[start_pos] = exist;
 
-    for (size_t i = m_discard + 1; i < total - 1; i++) {
+    for (size_t i = start_pos + 1; i < total - 1; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
@@ -80,9 +96,8 @@ void IExist::_calculate(const Indicator& ind) {
         dst[i] = exist;
     }
 
-    size_t start_pos = total - n;
     exist = 0;
-    for (size_t i = start_pos; i < total; i++) {
+    for (size_t i = total - n; i < total; i++) {
         if (src[i] != 0) {
             exist = 1;
             break;
