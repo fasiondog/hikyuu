@@ -242,8 +242,9 @@ void KDataPrivatedBufferImp::_recoverBackward() {
     size_t total = m_buffer.size();
     HKU_IF_RETURN(total == 0, void());
 
-#if 1
-    // 后复权全量方式，保证 RECOVER 指标增量是不变
+#if 0
+    // 只要 query 范围的起点不变，后复权形态一致
+    // 后复权全量方式(慢），保证 RECOVER 指标增量是不变
     Datetime start_date(Datetime::min());
     Datetime end_date(m_buffer.back().datetime +
                       Seconds(KQuery::getKTypeInSeconds(m_query.kType())));
@@ -447,7 +448,7 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
     size_t total = m_buffer.size();
     HKU_IF_RETURN(total == 0, void());
 
-#if 1
+#if 0
     // 后复权全量方式，保证 RECOVER 指标增量是不变
     Datetime start_date(Datetime::min());
     Datetime end_date(m_buffer.back().datetime +

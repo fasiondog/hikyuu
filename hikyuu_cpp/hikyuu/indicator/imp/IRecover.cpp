@@ -96,6 +96,8 @@ void IRecover::_calculate(const Indicator& ind) {
     }
 }
 
+#if 0
+// 需要后复权为全量方式才有意义，但全量后复权太慢
 bool IRecover::supportIncrementCalculate() const {
     KQuery::RecoverType recover_type =
       static_cast<KQuery::RecoverType>(getParam<int>("recover_type"));
@@ -153,6 +155,7 @@ void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
         }
     }
 }
+#endif
 
 Indicator HKU_API RECOVER_FORWARD() {
     return Indicator(make_shared<IRecover>(KQuery::FORWARD));

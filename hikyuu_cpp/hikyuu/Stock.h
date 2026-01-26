@@ -58,7 +58,7 @@ private:
 public:
     Stock();
 
-    Stock(const Stock&);
+    Stock(const Stock&) noexcept;
     Stock(Stock&&) noexcept;
     Stock(const string& market, const string& code, const string& name);
 
