@@ -64,6 +64,40 @@ void IWma::_calculate(const Indicator& ind) {
     }
 }
 
+bool IWma::supportIncrementCalculate() const {
+    return getParam<int>("n") > 1;
+}
+
+size_t IWma::min_increment_start() const {
+    return getParam<int>("n") - 1;
+}
+
+void IWma::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    size_t total = ind.size();
+    int n = getParam<int>("n");
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
+    value_t subsum = 0.0, sum = 0.0;
+    for (size_t i = start_pos - n, end = start_pos, count = 1; i < end; i++, count++) {
+        subsum += src[i];
+        sum += src[i] * count;
+    }
+
+    value_t divider = n * (n + 1) / 2.0;
+    // dst[m_discard] = sum / divider;
+
+    size_t trailingIdx = start_pos - n;
+    for (size_t i = start_pos; i < total; i++) {
+        value_t tmp = src[i];
+        sum -= subsum;
+        subsum += tmp;
+        subsum -= src[trailingIdx++];
+        sum += tmp * n;
+        dst[i] = sum / divider;
+    }
+}
+
 void IWma::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     if (step < 1) {
         _set(Null<value_t>(), curPos);
