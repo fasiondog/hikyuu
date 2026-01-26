@@ -47,7 +47,20 @@ void IFilter::_calculate(const Indicator& ind) {
         return;
     }
 
-    size_t i = m_discard;
+    _increment_calculate(ind, m_discard);
+}
+
+bool IFilter::supportIncrementCalculate() const {
+    return getParam<int>("n") > 0;
+}
+
+void IFilter::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    size_t total = ind.size();
+    int n = getParam<int>("n");
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
+    size_t i = start_pos;
     while (i < total) {
         if (src[i] == 0.0) {
             dst[i] = 0.0;
