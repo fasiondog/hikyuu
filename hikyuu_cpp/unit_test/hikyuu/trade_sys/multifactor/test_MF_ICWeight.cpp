@@ -44,11 +44,11 @@ TEST_CASE("test_MF_ICWeight") {
 
     auto stk = sm["sh600004"];
     auto ind1 = MA(ROCR(CLOSE(stk.getKData(query)), ndays));
-    auto ic1 = MA(IC(MA(ROCR(CLOSE(), ndays)), stks, ref_stk, ndays), ic_rolling_n)(ref_k);
+    auto ic1 = MA(IC(MA(ROCR(CLOSE(), ndays)), stks, ndays), ic_rolling_n)(ref_k);
     auto ind2 = AMA(ROCR(CLOSE(stk.getKData(query)), ndays));
-    auto ic2 = MA(IC(AMA(ROCR(CLOSE(), ndays)), stks, ref_stk, ndays), ic_rolling_n)(ref_k);
+    auto ic2 = MA(IC(AMA(ROCR(CLOSE(), ndays)), stks, ndays), ic_rolling_n)(ref_k);
     auto ind3 = EMA(ROCR(CLOSE(stk.getKData(query)), ndays));
-    auto ic3 = MA(IC(EMA(ROCR(CLOSE(), ndays)), stks, ref_stk, ndays), ic_rolling_n)(ref_k);
+    auto ic3 = MA(IC(EMA(ROCR(CLOSE(), ndays)), stks, ndays), ic_rolling_n)(ref_k);
 
     auto ind4 = mf->getFactor(stk);
     for (size_t i = 0; i < ind4.discard(); i++) {

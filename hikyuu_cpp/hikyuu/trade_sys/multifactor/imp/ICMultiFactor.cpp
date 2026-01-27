@@ -50,7 +50,7 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
 
     IndicatorList ic = global_parallel_for_index(
       0, ind_count, [this, ic_n, ic_rolling_n, spearman, &ref_k](size_t ii) {
-          return MA(IC(m_inds[ii], m_stks, m_ref_stk, ic_n, spearman), ic_rolling_n)(ref_k)
+          return MA(IC(m_inds[ii], m_stks, ic_n, spearman), ic_rolling_n)(ref_k)
             .clearIntermediateResults();
       });
     size_t discard = 0;
