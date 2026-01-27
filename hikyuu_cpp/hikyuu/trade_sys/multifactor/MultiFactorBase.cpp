@@ -488,13 +488,14 @@ Indicator MultiFactorBase::getIC(int ndays) {
         }
     });
 
-    for (size_t i = discard; i < days_total; i++) {
+    discard = days_total;
+    for (size_t i = 0; i < days_total; i++) {
         if (!std::isnan(dst[i])) {
             discard = i;
             break;
         }
     }
-    result.setDiscard(discard);
+    result.setDiscard(discard > days_total ? days_total : discard);
 
     // 如果 ndays 和 ic_n 参数相同，缓存计算结果
     if (ic_n == ndays) {

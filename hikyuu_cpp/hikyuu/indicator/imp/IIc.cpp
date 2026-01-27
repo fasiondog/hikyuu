@@ -12,6 +12,7 @@
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "hikyuu/indicator/crt/SPEARMAN.h"
 #include "hikyuu/indicator/crt/CORR.h"
+#include "hikyuu/indicator/crt/KDATA.h"
 #include "IIc.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -100,37 +101,38 @@ void IIc::_calculate(const Indicator& inputInd) {
     // 计算每支证券对齐后的因子值与 n 日收益率
     vector<Indicator> all_inds(stk_count);     // 保存每支证券对齐后的因子值
     vector<Indicator> all_returns(stk_count);  // 保存每支证券对齐后的 n 日收益率
-    Indicator ind = inputInd;
 
     KQuery query = getContext().getQuery();
     Indicator ref_return;
     if (m_ref_stk.isNull()) {
         // 未指定基准参考时，使用绝对收益
-        global_parallel_for_index_void(0, stk_count, [&, n, fill_null](size_t i) {
-            auto k = m_stks[i].getKData(query);
-            // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
-            // 天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
-            all_inds[i] = ALIGN(REF(ind(k), n), ref_dates, fill_null).clearIntermediateResults();
+        global_parallel_for_index_void(
+          0, stk_count, [&, n, fill_null, ind = inputInd.clone()](size_t i) {
+              auto k = m_stks[i].getKData(query);
+              // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
+              // 天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
+              all_inds[i] = ALIGN(REF(ind, n), ref_dates, fill_null)(k).clearIntermediateResults();
 
-            // 计算绝对收益
-            all_returns[i] =
-              ALIGN(ROCP(k.close(), n), ref_dates, fill_null).clearIntermediateResults();
-        });
+              // 计算绝对收益
+              all_returns[i] =
+                ALIGN(ROCP(CLOSE(), n), ref_dates, fill_null)(k).clearIntermediateResults();
+          });
     } else {
         Indicator ref_return =
-          ALIGN(ROCP(m_ref_stk.getKData(query).close(), n), ref_dates, fill_null)
+          ALIGN(ROCP(CLOSE(), n), ref_dates, fill_null)(m_ref_stk.getKData(query))
             .clearIntermediateResults();
-        global_parallel_for_index_void(0, stk_count, [&, n, fill_null](size_t i) {
-            auto k = m_stks[i].getKData(query);
-            // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
-            // 天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
-            all_inds[i] = ALIGN(REF(ind(k), n), ref_dates, fill_null).clearIntermediateResults();
+        global_parallel_for_index_void(
+          0, stk_count, [&, n, fill_null, ind = inputInd.clone()](size_t i) {
+              auto k = m_stks[i].getKData(query);
+              // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
+              // 天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
+              all_inds[i] = ALIGN(REF(ind, n), ref_dates, fill_null)(k).clearIntermediateResults();
 
-            // 计算超额收益
-            all_returns[i] =
-              ALIGN(ROCP(k.close(), n), ref_dates, fill_null).clearIntermediateResults() -
-              ref_return;
-        });
+              // 计算超额收益
+              all_returns[i] =
+                ALIGN(ROCP(CLOSE(), n), ref_dates, fill_null)(k).clearIntermediateResults() -
+                ref_return;
+          });
     }
 
     m_discard = n;
@@ -170,12 +172,7 @@ void IIc::_calculate(const Indicator& inputInd) {
         m_discard = 0;
     }
 
-    for (size_t i = m_discard; i < days_total; i++) {
-        if (!std::isnan(dst[i])) {
-            m_discard = i;
-            break;
-        }
-    }
+    _update_discard();
 }
 
 Indicator HKU_API IC(const StockList& stks, const Stock& ref_stk, int n, bool spearman,

@@ -37,14 +37,13 @@ TEST_CASE("test_IC") {
     result = IC(stks, Stock(), 1)(MA(CLOSE()))(ref_k);
     CHECK_EQ(result.name(), "IC");
     CHECK_EQ(result.size(), ref_k.size());
-    for (size_t i = 0; i < result.size(); i++) {
-        HKU_INFO("{}: {}", i, result[i]);
-    }
-
-#if 0
+    CHECK_EQ(result.discard(), 21);
+    CHECK_EQ(result[21], -1.);
+    CHECK_EQ(result[22], 0.8);
+    CHECK_EQ(result[99], 0.5);
 
     /** @arg 传入空的 stks */
-    result = IC(MA(CLOSE()), StockList(), ref_stk, 1);
+    result = IC(MA(CLOSE()), StockList(), ref_stk, 1)(ref_k);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
@@ -75,7 +74,7 @@ TEST_CASE("test_IC") {
 
     /** @arg 传入的 stks 长度为2，query 的长度为2*/
     result =
-      IC(CLOSE(), {sm["sh600004"], sm["sh600005"]}, ref_stk, 1)(ref_stk.getKData(KQuery(-2)));
+      IC(CLOSE(), {sm["sh600004"], sm["sh600005"]}, Stock(), 1)(ref_stk.getKData(KQuery(-2)));
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), 2);
@@ -84,7 +83,7 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result[1], doctest::Approx(-1.0));
 
     // 严格模式
-    result = IC(CLOSE(), {sm["sh600004"], sm["sh600005"]}, ref_stk, 1, true,
+    result = IC(CLOSE(), {sm["sh600004"], sm["sh600005"]}, Stock(), 1, true,
                 true)(ref_stk.getKData(KQuery(-2)));
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
@@ -94,7 +93,7 @@ TEST_CASE("test_IC") {
     CHECK_UNARY(std::isnan(result[1]));
 
     /** @arg 正常执行 */
-    result = IC(CLOSE(), stks, ref_stk, 1)(ref_k);
+    result = IC(CLOSE(), stks, Stock(), 1)(ref_k);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
@@ -104,7 +103,7 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result[99], doctest::Approx(0.5));
 
     // 严格模式
-    result = IC(CLOSE(), stks, ref_stk, 1, true, true)(ref_k);
+    result = IC(CLOSE(), stks, Stock(), 1, true, true)(ref_k);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
@@ -113,7 +112,16 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result[2], doctest::Approx(0.4));
     CHECK_EQ(result[98], doctest::Approx(0.5));
     CHECK_EQ(result[99], Null<Indicator::value_t>());
-#endif
+
+    /** @arg ref_stock 为空时，和默认为sh000300 时差别 */
+    result = IC(CLOSE(), stks, ref_stk, 1)(ref_k);
+    CHECK_EQ(result.name(), "IC");
+    CHECK_UNARY(!result.empty());
+    CHECK_EQ(result.size(), ref_k.size());
+    CHECK_EQ(result.discard(), 1);
+    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_EQ(result[3], doctest::Approx(0.35));
+    CHECK_EQ(result[99], doctest::Approx(-0.625));
 }
 
 //-----------------------------------------------------------------------------
