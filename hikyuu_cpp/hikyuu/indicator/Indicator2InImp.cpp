@@ -44,8 +44,9 @@ IndicatorImpPtr Indicator2InImp::_clone() {
 }
 
 bool Indicator2InImp::selfAlike(const IndicatorImp& other) const noexcept {
-    const auto& other_ctx = dynamic_cast<const Indicator2InImp&>(other);
-    return m_ref_ind.getImp()->alike(*other_ctx.m_ref_ind.getImp());
+    const auto* other_ctx = dynamic_cast<const Indicator2InImp*>(&other);
+    HKU_IF_RETURN(other_ctx == nullptr, false);
+    return m_ref_ind.getImp()->alike(*(other_ctx->m_ref_ind.getImp()));
 }
 
 void Indicator2InImp::getSelfInnerNodesWithInputConext(vector<IndicatorImpPtr>& nodes) const {
