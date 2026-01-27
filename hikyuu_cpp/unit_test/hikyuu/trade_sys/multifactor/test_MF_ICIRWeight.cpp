@@ -55,12 +55,13 @@ TEST_CASE("test_MF_ICIRWeight") {
     mf->setParam<int>("ic_rolling_n", ic_rolling_n);
 
     auto stk = sm["sh600004"];
+    ref_k = ref_stk.getKData(query);
     auto ind1 = MA(ROCR(CLOSE(stk.getKData(query)), ndays));
-    auto ic1 = ICIR(MA(ROCR(CLOSE(), ndays)), stks, query, ref_stk, ndays, ic_rolling_n);
+    auto ic1 = ICIR(MA(ROCR(CLOSE(), ndays)), stks, ref_stk, ndays, ic_rolling_n)(ref_k);
     auto ind2 = AMA(ROCR(CLOSE(stk.getKData(query)), ndays));
-    auto ic2 = ICIR(AMA(ROCR(CLOSE(), ndays)), stks, query, ref_stk, ndays, ic_rolling_n);
+    auto ic2 = ICIR(AMA(ROCR(CLOSE(), ndays)), stks, ref_stk, ndays, ic_rolling_n)(ref_k);
     auto ind3 = EMA(ROCR(CLOSE(stk.getKData(query)), ndays));
-    auto ic3 = ICIR(EMA(ROCR(CLOSE(), ndays)), stks, query, ref_stk, ndays, ic_rolling_n);
+    auto ic3 = ICIR(EMA(ROCR(CLOSE(), ndays)), stks, ref_stk, ndays, ic_rolling_n)(ref_k);
 
     auto ind4 = mf->getFactor(stk);
     for (size_t i = 0; i < ind4.discard(); i++) {

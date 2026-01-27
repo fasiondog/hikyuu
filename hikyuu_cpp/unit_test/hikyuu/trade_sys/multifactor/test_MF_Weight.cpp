@@ -82,7 +82,7 @@ TEST_CASE("test_MF_Weight") {
     CHECK_UNARY(ind1.equal(ind2));
     CHECK_UNARY(all_factors[0].equal(ind2));
     auto ic1 = mf->getIC(1);
-    auto ic2 = IC(MA(CLOSE()), stks, query, ref_stk, 1);
+    auto ic2 = IC(MA(CLOSE()), stks, ref_stk, 1)(ref_k);
     CHECK_UNARY(ic1.equal(ic2));
 
     CHECK_UNARY(mf->getScores(Datetime(20111204)).empty());

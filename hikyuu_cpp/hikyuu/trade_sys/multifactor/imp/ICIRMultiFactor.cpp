@@ -45,9 +45,11 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
     int ir_n = getParam<int>("ic_rolling_n");
     bool spearman = getParam<bool>("use_spearman");
 
+    auto ref_k = m_ref_stk.getKData(m_query);
+
     vector<Indicator> icir =
-      global_parallel_for_index(0, ind_count, [this, ic_n, ir_n, spearman](size_t ii) {
-          return ICIR(m_inds[ii], m_stks, m_query, m_ref_stk, ic_n, ir_n, spearman)
+      global_parallel_for_index(0, ind_count, [this, ic_n, ir_n, spearman, &ref_k](size_t ii) {
+          return ICIR(m_inds[ii], m_stks, m_ref_stk, ic_n, ir_n, spearman)(ref_k)
             .clearIntermediateResults();
       });
 

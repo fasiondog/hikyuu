@@ -23,4 +23,21 @@ size_t utf8_to_utf32(const std::string& utf8_str, int32_t* out, size_t out_len) 
     return result;
 }
 
+StockList get_stock_list_from_python(const py::object& stks) {
+    StockList ret;
+    HKU_IF_RETURN(stks.is_none(), ret);
+    if (py::isinstance<py::sequence>(stks)) {
+        ret = python_list_to_vector<Stock>(stks);
+    } else if (py::isinstance<Block>(stks)) {
+        const auto& blk = stks.cast<Block&>();
+        ret = blk.getStockList();
+    } else if (py::isinstance<StockManager>(stks)) {
+        const auto& sm = stks.cast<StockManager&>();
+        ret = sm.getStockList();
+    } else {
+        HKU_THROW("Failed get StockList! Input stks must be Block, sm or sequenc(Stock)!");
+    }
+    return ret;
+}
+
 }  // namespace hku

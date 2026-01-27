@@ -14,8 +14,7 @@ namespace hku {
 class IIc : public IndicatorImp {
 public:
     IIc();
-    IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk, bool spearman,
-        bool strict);
+    IIc(const StockList& stks, int n, const Stock& ref_stk, bool spearman, bool strict);
     virtual ~IIc();
 
     virtual void _checkParam(const string& name) const override;
@@ -25,7 +24,6 @@ public:
     virtual bool selfAlike(const IndicatorImp& other) const noexcept override;
 
 private:
-    KQuery m_query;
     Stock m_ref_stk;
     StockList m_stks;
 
@@ -38,7 +36,6 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(IndicatorImp);
-        ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_stks);
     }

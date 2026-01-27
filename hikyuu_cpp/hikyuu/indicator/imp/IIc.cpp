@@ -31,9 +31,8 @@ IIc::IIc() : IndicatorImp("IC", 1) {
     setParam<bool>("strict", false);
 }
 
-IIc::IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk, bool spearman,
-         bool strict)
-: IndicatorImp("IC", 1), m_query(query), m_ref_stk(ref_stk), m_stks(stks) {
+IIc::IIc(const StockList& stks, int n, const Stock& ref_stk, bool spearman, bool strict)
+: IndicatorImp("IC", 1), m_ref_stk(ref_stk), m_stks(stks) {
     m_need_self_alike_compare = true;
     setParam<int>("n", n);
     setParam<bool>("fill_null", true);
@@ -52,7 +51,6 @@ void IIc::_checkParam(const string& name) const {
 IndicatorImpPtr IIc::_clone() {
     auto p = make_shared<IIc>();
     p->m_stks = m_stks;
-    p->m_query = m_query;
     p->m_ref_stk = m_ref_stk;
     return p;
 }
@@ -142,11 +140,8 @@ void IIc::_calculate(const Indicator& inputInd) {
         spearman = hku::CORR;
     }
 
-    // PriceList tmp(stk_count, Null<price_t>());
-    // PriceList tmp_return(stk_count, Null<price_t>());
     auto* dst = this->data();
     global_parallel_for_index_void(m_discard, days_total, [&, stk_count, dst](size_t i) {
-        // for (size_t i = m_discard; i < days_total; i++) {
         // 计算日截面 spearman 相关系数即 ic 值
         PriceList tmp(stk_count, Null<price_t>());
         PriceList tmp_return(stk_count, Null<price_t>());
@@ -183,15 +178,14 @@ void IIc::_calculate(const Indicator& inputInd) {
     }
 }
 
-Indicator HKU_API IC(const StockList& stks, const KQuery& query, const Stock& ref_stk, int n,
-                     bool spearman, bool strict) {
-    return Indicator(make_shared<IIc>(stks, query, n, ref_stk, spearman, strict));
+Indicator HKU_API IC(const StockList& stks, const Stock& ref_stk, int n, bool spearman,
+                     bool strict) {
+    return Indicator(make_shared<IIc>(stks, n, ref_stk, spearman, strict));
 }
 
-Indicator HKU_API IC(const Block& blk, const KQuery& query, const Stock& ref_stk, int n,
-                     bool spearman, bool strict) {
+Indicator HKU_API IC(const Block& blk, const Stock& ref_stk, int n, bool spearman, bool strict) {
     StockList stks = blk.getStockList();
-    return IC(stks, query, ref_stk, n, spearman, strict);
+    return IC(stks, ref_stk, n, spearman, strict);
 }
 
 }  // namespace hku

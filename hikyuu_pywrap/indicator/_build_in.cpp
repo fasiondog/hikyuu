@@ -1876,25 +1876,18 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def(
       "IC",
-      [](const Indicator& ind, const py::object& stks, const KQuery& query, const Stock& ref_stk,
-         int n, bool spearman, bool strict) {
-          if (py::isinstance<Block>(stks)) {
-              const auto& blk = stks.cast<Block&>();
-              return IC(ind, blk, query, ref_stk, n, spearman, strict);
-          }
-
-          if (py::isinstance<py::sequence>(stks)) {
-              StockList c_stks = python_list_to_vector<Stock>(stks);
-              return IC(ind, c_stks, query, ref_stk, n, spearman, strict);
-          }
-
-          HKU_THROW("Input stks must be Block or sequenc(Stock)!");
+      [](const Indicator& ind, const py::object& stks, const Stock& ref_stk, int n, bool spearman,
+         bool strict) {
+          StockList c_stks = get_stock_list_from_python(stks);
+          return IC(ind, c_stks, ref_stk, n, spearman, strict);
       },
-      py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("n") = 1,
+      py::arg("ind"), py::arg("stks"), py::arg("ref_stk"), py::arg("n") = 1,
       py::arg("spearman") = true, py::arg("strict") = false,
-      R"(IC(ind, stks, query, ref_stk[, n=1, spearman=True, strict=False]) -> Indicator
+      R"(IC(ind, stks, ref_stk[, n=1, spearman=True, strict=False]) -> Indicator
 
     计算指定的因子相对于参考证券的 IC (实际为 RankIC)
+
+    指定 ref_stk 时, 为相对于 ref_stk 的超额收益IC, 否则为绝对收益 IC.
 
     IC 原本需要 “t 时刻因子值→t+1 时刻收益”，此处改为计算 “t 时刻因子值→t 时刻之前 N 天的收益”（比如过去 5 天的收益）。
     (否则当前值都会是缺失NA), 相当于原始预测 IC 右移 n 位。
@@ -1903,7 +1896,6 @@ void export_Indicator_build_in(py::module& m) {
     
     :param Indicator ind: 输入因子
     :param sequence(stock)|Block stks 证券组合
-    :param Query query: 查询条件
     :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
     :param int n: 时间窗口
     :param bool spearman: 使用 spearman 相关系数，否则为 pearson
@@ -1911,29 +1903,21 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def(
       "ICIR",
-      [](const Indicator& ind, const py::object& stks, const KQuery& query, const Stock& ref_stk,
-         int n, int rolling_n, bool spearman, bool strict) {
-          if (py::isinstance<Block>(stks)) {
-              const auto& blk = stks.cast<Block&>();
-              return ICIR(ind, blk, query, ref_stk, n, rolling_n, spearman, strict);
-          }
-
-          if (py::isinstance<py::sequence>(stks)) {
-              StockList c_stks = python_list_to_vector<Stock>(stks);
-              return ICIR(ind, c_stks, query, ref_stk, n, rolling_n, spearman, strict);
-          }
-
-          HKU_THROW("Input stks must be Block or sequenc(Stock)!");
+      [](const Indicator& ind, const py::object& stks, const Stock& ref_stk, int n, int rolling_n,
+         bool spearman, bool strict) {
+          StockList c_stks = get_stock_list_from_python(stks);
+          return ICIR(ind, c_stks, ref_stk, n, rolling_n, spearman, strict);
       },
-      py::arg("ind"), py::arg("stks"), py::arg("query"), py::arg("ref_stk"), py::arg("n") = 1,
+      py::arg("ind"), py::arg("stks"), py::arg("ref_stk"), py::arg("n") = 1,
       py::arg("rolling_n") = 120, py::arg("spearman") = true, py::arg("strict") = false,
-      R"(ICIR(ind, stks, query, ref_stk[, n=1, rolling_n=120, spearman=True, strict=False])
+      R"(ICIR(ind, stks, ref_stk[, n=1, rolling_n=120, spearman=True, strict=False])
 
     计算 IC 因子 IR = IC的多周期均值/IC的标准方差
 
+    指定 ref_stk 时, 为相对于 ref_stk 的超额收益IC, 否则为绝对收益 IC.
+
     :param Indicator ind: 输入因子
     :param sequence(stock)|Block stks 证券组合
-    :param Query query: 查询条件
     :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
     :param int n: 计算IC时对应的 n 日收益率
     :param int rolling_n: 滚动周期
