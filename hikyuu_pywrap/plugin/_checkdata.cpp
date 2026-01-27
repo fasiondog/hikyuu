@@ -14,16 +14,9 @@ using namespace hku;
 void export_plugin_checkdata(py::module& m) {
     m.def(
       "check_data",
-      [](const py::sequence& stock_list, Datetime start_date, Datetime end_date,
+      [](const py::object& stock_list, Datetime start_date, Datetime end_date,
          const KQuery::KType& ktype) {
-          StockList stk_list;
-          if (py::isinstance<StockManager>(stock_list)) {
-              stk_list = StockManager::instance().getStockList();
-          } else if (py::isinstance<Block>(stock_list)) {
-              stk_list = stock_list.cast<Block>().getStockList();
-          } else {
-              stk_list = python_list_to_vector<Stock>(stock_list);
-          }
+          StockList stk_list = get_stock_list_from_python(stock_list);
           auto [x, y] = checkData(stk_list, start_date, end_date, ktype);
           py::module_ json_m = py::module_::import("json");
           py::object x_dict = json_m.attr("loads")(x);

@@ -272,8 +272,8 @@ void export_Selector(py::module& m) {
 
       .def(
         "add_stock_list",
-        [](SelectorBase& self, py::sequence stk_list, const SYSPtr& sys) {
-            self.addStockList(python_list_to_vector<Stock>(stk_list), sys);
+        [](SelectorBase& self, py::object stk_list, const SYSPtr& sys) {
+            self.addStockList(get_stock_list_from_python(stk_list), sys);
         },
         py::arg("stk_list"), py::arg("sys"),
         R"(add_stock_list(self, stk_list, sys)
@@ -365,8 +365,8 @@ void export_Selector(py::module& m) {
     m.def("SE_Fixed", [](double weight) { return SE_Fixed(weight); }, py::arg("weight") = 1.0);
     m.def(
       "SE_Fixed",
-      [](const py::sequence& pystks, const SystemPtr& sys, double weight) {
-          StockList stks = python_list_to_vector<Stock>(pystks);
+      [](const py::object& pystks, const SystemPtr& sys, double weight) {
+          StockList stks = get_stock_list_from_python(pystks);
           return SE_Fixed(stks, sys, weight);
       },
       py::arg("stk_list"), py::arg("sys"), py::arg("weight") = 1.0,

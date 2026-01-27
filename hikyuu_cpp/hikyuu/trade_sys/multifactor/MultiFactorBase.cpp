@@ -9,6 +9,7 @@
 #include <Eigen/Dense>
 #include "hikyuu/utilities/thread/algorithm.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
+#include "hikyuu/indicator/crt/KDATA.h"
 #include "hikyuu/indicator/crt/ROCP.h"
 #include "hikyuu/indicator/crt/REF.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
@@ -145,7 +146,6 @@ void MultiFactorBase::paramChanged() {
 }
 
 void MultiFactorBase::_checkData() {
-    HKU_CHECK(!m_ref_stk.isNull(), "The reference stock must be set!");
     HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
 
     // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
@@ -154,6 +154,9 @@ void MultiFactorBase::_checkData() {
     }
 
     // 获取用于对齐的参考日期
+    if (m_ref_stk.isNull()) {
+        m_ref_stk = StockManager::instance().getMarketStock("SH");
+    }
     m_ref_dates = m_ref_stk.getDatetimeList(m_query);
     HKU_CHECK(m_ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
               m_ref_dates.size());
@@ -488,13 +491,14 @@ Indicator MultiFactorBase::getIC(int ndays) {
         }
     });
 
-    for (size_t i = discard; i < days_total; i++) {
+    discard = days_total;
+    for (size_t i = 0; i < days_total; i++) {
         if (!std::isnan(dst[i])) {
             discard = i;
             break;
         }
     }
-    result.setDiscard(discard);
+    result.setDiscard(discard > days_total ? days_total : discard);
 
     // 如果 ndays 和 ic_n 参数相同，缓存计算结果
     if (ic_n == ndays) {
@@ -550,7 +554,7 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     bool fill_null = getParam<bool>("fill_null");
     return global_parallel_for_index(0, m_stks.size(), [this, ndays, fill_null](size_t i) {
         auto k = m_stks[i].getKData(m_query);
-        return ALIGN(ROCP(k.close(), ndays), m_ref_dates, fill_null).clearIntermediateResults();
+        return ALIGN(ROCP(CLOSE(), ndays), m_ref_dates, fill_null)(k).getResult(0);
     });
 }
 
@@ -710,9 +714,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
               if (kdata.size() == 0) {
                   cur_stk_inds[j] = null_ind;
               } else {
-                  cur_stk_inds[j] =
-                    ALIGN(m_inds[j](kdata).clearIntermediateResults(), m_ref_dates, fill_null);
-                  cur_stk_inds[j].clearIntermediateResults();
+                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null)(kdata).getResult(0);
               }
               cur_stk_inds[j].name(m_inds[j].name());
           }
@@ -723,8 +725,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                       cur_style_inds[j] = null_ind;
                   } else {
                       cur_style_inds[j] =
-                        ALIGN(styles[j](kdata).clearIntermediateResults(), m_ref_dates, fill_null);
-                      cur_style_inds[j].clearIntermediateResults();
+                        ALIGN(styles[j], m_ref_dates, fill_null)(kdata).getResult(0);
                   }
               }
           }
@@ -906,10 +907,6 @@ void MultiFactorBase::calculate() {
                 // 计算每支证券调整后的合成因子
                 m_all_factors = _calculate(all_stk_inds);
             }
-        }
-
-        for (auto& ind : m_all_factors) {
-            ind.clearIntermediateResults();
         }
 
         // 计算完成后创建截面索引

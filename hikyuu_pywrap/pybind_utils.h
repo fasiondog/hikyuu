@@ -10,6 +10,7 @@
 #define HIKYUU_PYTHON_BIND_UTILS_H
 
 #include <hikyuu/config.h>
+#include <hikyuu/Stock.h>
 #include <pybind11/pybind11.h>
 
 #include <pybind11/operators.h>
@@ -118,6 +119,9 @@ inline bool check_pyfunction_arg_num(const py::object& func, size_t arg_num) {
  * @return 实际转码点数
  */
 size_t utf8_to_utf32(const std::string& utf8_str, int32_t* out, size_t out_len) noexcept;
+
+// 从 python 对象获取 StockList 列表
+StockList get_stock_list_from_python(const py::object& stks);
 
 }  // namespace hku
 

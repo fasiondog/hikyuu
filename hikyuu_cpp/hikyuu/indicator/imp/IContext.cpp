@@ -38,10 +38,6 @@ IndicatorImpPtr IContext::_clone() {
     return p;
 }
 
-void IContext::_clearIntermediateResults() {
-    m_ref_ind.clearIntermediateResults();
-}
-
 string IContext::str() const {
     std::ostringstream os;
     os << "Indicator{\n"

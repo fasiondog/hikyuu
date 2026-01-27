@@ -26,8 +26,6 @@ public:
 
     virtual void getSelfInnerNodesWithInputConext(vector<IndicatorImpPtr>& nodes) const override;
 
-    virtual void _clearIntermediateResults() override;
-
 protected:
     Indicator prepare(const Indicator& ind);
 
