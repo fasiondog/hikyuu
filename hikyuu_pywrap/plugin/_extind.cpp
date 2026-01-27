@@ -249,17 +249,9 @@ void export_extend_Indicator(py::module& m) {
 
     m.def(
       "RANK",
-      [](const py::sequence stks, int mode, bool fill_null, const string& market) {
+      [](const py::object& stks, int mode, bool fill_null, const string& market) {
           Block blk;
-          if (py::isinstance<Block>(stks)) {
-              blk = py::cast<Block>(stks);
-          } else if (py::isinstance<StockManager>(stks)) {
-              auto& sm = py::cast<StockManager&>(stks);
-              blk.add(sm.getStockList());
-          } else {
-              StockList sl = python_list_to_vector<Stock>(stks);
-              blk.add(sl);
-          }
+          blk.add(get_stock_list_from_python(stks));
           return RANK(blk, mode, fill_null, market);
       },
       py::arg("stks"), py::arg("mode") = 0, py::arg("fill_null") = true, py::arg("market") = "SH");
@@ -268,15 +260,7 @@ void export_extend_Indicator(py::module& m) {
       [](const py::sequence stks, const Indicator& ref_ind, int mode, bool fill_null,
          const string& market) {
           Block blk;
-          if (py::isinstance<Block>(stks)) {
-              blk = py::cast<Block>(stks);
-          } else if (py::isinstance<StockManager>(stks)) {
-              auto& sm = py::cast<StockManager&>(stks);
-              blk.add(sm.getStockList());
-          } else {
-              StockList sl = python_list_to_vector<Stock>(stks);
-              blk.add(sl);
-          }
+          blk.add(get_stock_list_from_python(stks));
           return RANK(blk, ref_ind, mode, fill_null, market);
       },
       py::arg("stks"), py::arg("ref_ind"), py::arg("mode") = 0, py::arg("fill_null") = true,

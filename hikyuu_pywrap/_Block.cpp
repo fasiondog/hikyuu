@@ -65,19 +65,8 @@ void export_Block(py::module& m) {
         [](Block& blk, py::sequence stks) {
             auto total = len(stks);
             HKU_IF_RETURN(total == 0, true);
-
-            if (py::isinstance<Stock>(stks[0])) {
-                StockList cpp_stks = python_list_to_vector<Stock>(stks);
-                return blk.add(cpp_stks);
-            }
-
-            if (py::isinstance<string>(stks[0])) {
-                StringList codes = python_list_to_vector<string>(stks);
-                return blk.add(codes);
-            }
-
-            HKU_ERROR("Not support type!");
-            return false;
+            StockList stks_list = get_stock_list_from_python(stks);
+            return blk.add(stks_list);
         },
         R"(add(self, sequence)
 

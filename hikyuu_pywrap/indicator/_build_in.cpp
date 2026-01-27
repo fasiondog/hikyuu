@@ -1998,17 +1998,17 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def(
       "BLOCKSETNUM",
-      [](const py::sequence& stks) {
+      [](const py::object& stks) {
           Block blk;
-          blk.add(python_list_to_vector<Stock>(stks));
+          blk.add(get_stock_list_from_python(stks));
           return BLOCKSETNUM(blk);
       },
       py::arg("stks"));
     m.def(
       "BLOCKSETNUM",
-      [](const py::sequence& stks, const KQuery& query) {
+      [](const py::object& stks, const KQuery& query) {
           Block blk;
-          blk.add(python_list_to_vector<Stock>(stks));
+          blk.add(get_stock_list_from_python(stks));
           return BLOCKSETNUM(blk, query);
       },
       py::arg("stks"), py::arg("query"), R"(BLOCKSETNUM(block, query)
@@ -2030,7 +2030,7 @@ void export_Indicator_build_in(py::module& m) {
       "INSUM",
       [](const py::sequence stks, int mode, bool fill_null) {
           Block blk;
-          blk.add(python_list_to_vector<Stock>(stks));
+          blk.add(get_stock_list_from_python(stks));
           return INSUM(blk, mode, fill_null);
       },
       py::arg("stks"), py::arg("mode"), py::arg("fill_null") = true);
@@ -2038,7 +2038,7 @@ void export_Indicator_build_in(py::module& m) {
       "INSUM",
       [](const py::sequence stks, const Indicator& ind, int mode, bool fill_null) {
           Block blk;
-          blk.add(python_list_to_vector<Stock>(stks));
+          blk.add(get_stock_list_from_python(stks));
           return INSUM(blk, ind, mode);
       },
       py::arg("stks"), py::arg("ind"), py::arg("mode"), py::arg("fill_null") = true);
@@ -2047,7 +2047,7 @@ void export_Indicator_build_in(py::module& m) {
       [](const py::sequence stks, const KQuery& query, const Indicator& ind, int mode,
          bool fill_null) {
           Block blk;
-          blk.add(python_list_to_vector<Stock>(stks));
+          blk.add(get_stock_list_from_python(stks));
           return INSUM(blk, query, ind, mode);
       },
       py::arg("stks"), py::arg("query"), py::arg("ind"), py::arg("mode"),
