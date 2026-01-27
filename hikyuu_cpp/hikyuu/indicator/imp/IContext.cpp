@@ -67,8 +67,9 @@ KData IContext::getContextKdata() const {
 }
 
 bool IContext::selfAlike(const IndicatorImp& other) const noexcept {
-    const auto& other_ctx = dynamic_cast<const IContext&>(other);
-    return m_ref_ind.getImp()->alike(*other_ctx.m_ref_ind.getImp());
+    const auto* other_ctx = dynamic_cast<const IContext*>(&other);
+    HKU_IF_RETURN(other_ctx == nullptr, false);
+    return m_ref_ind.getImp()->alike(*(other_ctx->m_ref_ind.getImp()));
 }
 
 void IContext::_calculate(const Indicator& ind) {
