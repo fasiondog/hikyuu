@@ -1,7 +1,7 @@
 /*
- *  Copyright (c) 2024 hikyuu.org
+ *  Copyright (c) 2026 hikyuu.org
  *
- *  Created on: 2024-03-09
+ *  Created on: 2026-01-27
  *      Author: fasiondog
  */
 
@@ -12,16 +12,15 @@
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "hikyuu/indicator/crt/SPEARMAN.h"
 #include "hikyuu/indicator/crt/CORR.h"
-#include "IIc.h"
+#include "IIcExcess.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::IIc)
+BOOST_CLASS_EXPORT(hku::IIcExcess)
 #endif
 
 namespace hku {
 
-IIc::IIc() : IndicatorImp("IC", 1) {
-    m_need_self_alike_compare = true;
+IIcExcess::IIcExcess() : IndicatorImp("IC", 1) {
     setParam<int>("n", 1);  // 调仓周期
     // 对齐时是否以 nan 值进行填充，否则以小于当前日期的最后值作为填充
     setParam<bool>("fill_null", true);
@@ -31,60 +30,42 @@ IIc::IIc() : IndicatorImp("IC", 1) {
     setParam<bool>("strict", false);
 }
 
-IIc::IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk, bool spearman,
-         bool strict)
+IIcExcess::IIcExcess(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk,
+                     bool spearman, bool strict)
 : IndicatorImp("IC", 1), m_query(query), m_ref_stk(ref_stk), m_stks(stks) {
-    m_need_self_alike_compare = true;
     setParam<int>("n", n);
     setParam<bool>("fill_null", true);
     setParam<bool>("use_spearman", spearman);
     setParam<bool>("strict", strict);
 }
 
-IIc::~IIc() {}
+IIcExcess::~IIcExcess() {}
 
-void IIc::_checkParam(const string& name) const {
+void IIcExcess::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 1);
     }
 }
 
-IndicatorImpPtr IIc::_clone() {
-    auto p = make_shared<IIc>();
+IndicatorImpPtr IIcExcess::_clone() {
+    auto p = make_shared<IIcExcess>();
     p->m_stks = m_stks;
     p->m_query = m_query;
     p->m_ref_stk = m_ref_stk;
     return p;
 }
 
-bool IIc::selfAlike(const IndicatorImp& other) const noexcept {
-    const auto* other_ind = dynamic_cast<const IIc*>(&other);
-    HKU_IF_RETURN(other_ind == nullptr, false);
-    HKU_IF_RETURN(other_ind->m_ref_stk != m_ref_stk, false);
-    HKU_IF_RETURN(other_ind->m_stks.size() != m_stks.size(), false);
-    std::unordered_set<string> names;
-    names.reserve(m_stks.size());
-    for (const auto& stk : m_stks) {
-        names.insert(stk.market_code());
-    }
-    for (const auto& stk : other_ind->m_stks) {
-        if (names.find(stk.market_code()) == names.end()) {
-            return false;
-        }
-    }
-    return true;
-}
-
-void IIc::_calculate(const Indicator& inputInd) {
+void IIcExcess::_calculate(const Indicator& inputInd) {
     // 先申请内存，保持和参考日期等长
-    // auto ref_dates = m_ref_stk.getDatetimeList(m_query);
-    auto ref_dates = getContext().getDatetimeList();
+    auto ref_dates = m_ref_stk.getDatetimeList(getContext().getQuery());
     size_t days_total = ref_dates.size();
     _readyBuffer(days_total, 1);
 
     // 检测异常输入数据
     m_discard = days_total;
-    HKU_IF_RETURN(days_total < 2, void());
+    HKU_ERROR_IF_RETURN(m_ref_stk.isNull(), void(), "ref_stk is null!");
+    HKU_ERROR_IF_RETURN(days_total < 2, void(),
+                        "The data length(>=2) is insufficient! current data len: {}", days_total);
 
     size_t stk_count = m_stks.size();
     HKU_ERROR_IF_RETURN(stk_count < 2, void(),
@@ -103,37 +84,14 @@ void IIc::_calculate(const Indicator& inputInd) {
     vector<Indicator> all_inds(stk_count);     // 保存每支证券对齐后的因子值
     vector<Indicator> all_returns(stk_count);  // 保存每支证券对齐后的 n 日收益率
     Indicator ind = inputInd;
-
-    KQuery query = getContext().getQuery();
-    Indicator ref_return;
-    if (m_ref_stk.isNull()) {
-        // 未指定基准参考时，使用绝对收益
-        global_parallel_for_index_void(0, stk_count, [&, n, fill_null](size_t i) {
-            auto k = m_stks[i].getKData(query);
-            // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
-            // 天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
-            all_inds[i] = ALIGN(REF(ind(k), n), ref_dates, fill_null).clearIntermediateResults();
-
-            // 计算绝对收益
-            all_returns[i] =
-              ALIGN(ROCP(k.close(), n), ref_dates, fill_null).clearIntermediateResults();
-        });
-    } else {
-        Indicator ref_return =
-          ALIGN(ROCP(m_ref_stk.getKData(query).close(), n), ref_dates, fill_null)
-            .clearIntermediateResults();
-        global_parallel_for_index_void(0, stk_count, [&, n, fill_null](size_t i) {
-            auto k = m_stks[i].getKData(query);
-            // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
-            // 天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
-            all_inds[i] = ALIGN(REF(ind(k), n), ref_dates, fill_null).clearIntermediateResults();
-
-            // 计算超额收益
-            all_returns[i] =
-              ALIGN(ROCP(k.close(), n), ref_dates, fill_null).clearIntermediateResults() -
-              ref_return;
-        });
-    }
+    global_parallel_for_index_void(0, stk_count, [&, n, fill_null](size_t i) {
+        // for (size_t i = 0; i < stk_count; i++) {
+        auto k = m_stks[i].getKData(m_query);
+        // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
+        // 天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
+        all_inds[i] = ALIGN(REF(ind(k), n), ref_dates, fill_null).clearIntermediateResults();
+        all_returns[i] = ALIGN(ROCP(k.close(), n), ref_dates, fill_null).clearIntermediateResults();
+    });
 
     m_discard = n;
 
@@ -183,15 +141,15 @@ void IIc::_calculate(const Indicator& inputInd) {
     }
 }
 
-Indicator HKU_API IC(const StockList& stks, const KQuery& query, const Stock& ref_stk, int n,
-                     bool spearman, bool strict) {
-    return Indicator(make_shared<IIc>(stks, query, n, ref_stk, spearman, strict));
-}
+// Indicator HKU_API IC(const StockList& stks, const KQuery& query, const Stock& ref_stk, int n,
+//                      bool spearman, bool strict) {
+//     return Indicator(make_shared<IIcExcess>(stks, query, n, ref_stk, spearman, strict));
+// }
 
-Indicator HKU_API IC(const Block& blk, const KQuery& query, const Stock& ref_stk, int n,
-                     bool spearman, bool strict) {
-    StockList stks = blk.getStockList();
-    return IC(stks, query, ref_stk, n, spearman, strict);
-}
+// Indicator HKU_API IC(const Block& blk, const KQuery& query, const Stock& ref_stk, int n,
+//                      bool spearman, bool strict) {
+//     StockList stks = blk.getStockList();
+//     return IC(stks, query, ref_stk, n, spearman, strict);
+// }
 
 }  // namespace hku

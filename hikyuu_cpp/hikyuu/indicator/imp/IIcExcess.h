@@ -1,7 +1,7 @@
 /*
- *  Copyright (c) 2024 hikyuu.org
+ *  Copyright (c) 2026 hikyuu.org
  *
- *  Created on: 2024-03-09
+ *  Created on: 2026-01-27
  *      Author: fasiondog
  */
 
@@ -11,18 +11,16 @@
 
 namespace hku {
 
-class IIc : public IndicatorImp {
+class IIcExcess : public IndicatorImp {
 public:
-    IIc();
-    IIc(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk, bool spearman,
-        bool strict);
-    virtual ~IIc();
+    IIcExcess();
+    IIcExcess(const StockList& stks, const KQuery& query, int n, const Stock& ref_stk,
+              bool spearman, bool strict);
+    virtual ~IIcExcess();
 
     virtual void _checkParam(const string& name) const override;
     virtual void _calculate(const Indicator& data) override;
     virtual IndicatorImpPtr _clone() override;
-
-    virtual bool selfAlike(const IndicatorImp& other) const noexcept override;
 
 private:
     KQuery m_query;
