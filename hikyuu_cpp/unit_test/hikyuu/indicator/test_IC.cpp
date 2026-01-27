@@ -33,13 +33,13 @@ TEST_CASE("test_IC") {
     /** @arg 传入非法 n */
     CHECK_THROWS_AS(IC(MA(CLOSE()), stks, -1), std::exception);
 
-    /** @arg 传入的 ref_stk 为 null, 计算绝对收益 */
+    /** @arg n = 1 */
     result = IC(stks, 1)(MA(CLOSE()))(ref_k);
     CHECK_EQ(result.name(), "IC");
     CHECK_EQ(result.size(), ref_k.size());
     CHECK_EQ(result.discard(), 21);
     CHECK_EQ(result[21], -1.);
-    CHECK_EQ(result[22], 0.8);
+    CHECK_EQ(result[22], doctest::Approx(0.8));
     CHECK_EQ(result[99], 0.5);
 
     /** @arg 传入空的 stks */
