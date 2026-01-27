@@ -27,6 +27,7 @@ public:
     void setIndicators(const IndicatorList& inds) {
         HKU_ASSERT(!inds.empty());
         m_inds = inds;
+        m_calculated = false;
     }
 
 private:
