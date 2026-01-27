@@ -25,6 +25,7 @@ MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
     setParam<Stock>("ref_stk", Stock());
     setParam<bool>("use_spearman", true);
     setParam<string>("mode", "MF_ICIRWeight");
+    setParam<int>("mf_recover_type", KQuery::INVALID_RECOVER_TYPE);  // 指定MF的计算时的复权方式
 }
 
 MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
@@ -46,6 +47,7 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     }
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
     setParam<string>("mode", "CUSTOM");
+    setParam<int>("mf_recover_type", KQuery::INVALID_RECOVER_TYPE);  // 指定MF的计算时的复权方式
     setIndicators(mf->getRefIndicators());
 }
 
@@ -187,7 +189,11 @@ void MultiFactorSelector::_calculate() {
         stks.emplace_back(sys->getStock());
     }
 
-    const auto& query = m_query;
+    KQuery query = m_query;
+    if (getParam<int>("mf_recover_type") != KQuery::INVALID_RECOVER_TYPE) {
+        query.recoverType(static_cast<KQuery::RecoverType>(getParam<int>("mf_recover_type")));
+    }
+
     auto ic_n = getParam<int>("ic_n");
     auto ic_rolling_n = getParam<int>("ic_rolling_n");
     bool spearman = getParam<bool>("use_spearman");
@@ -204,7 +210,14 @@ void MultiFactorSelector::_calculate() {
             HKU_THROW("Invalid mode: {}", mode);
         }
     } else {
-        m_mf->setQuery(query);
+        if (getParam<bool>("keep_mf_recover_type")) {
+            auto mf_query = m_mf->getQuery();
+            auto new_query = query;
+            new_query.recoverType(mf_query.recoverType());
+            m_mf->setQuery(new_query);
+        } else {
+            m_mf->setQuery(query);
+        }
         m_mf->setRefIndicators(m_inds);
         m_mf->setRefStock(ref_stk);
         m_mf->setStockList(stks);
