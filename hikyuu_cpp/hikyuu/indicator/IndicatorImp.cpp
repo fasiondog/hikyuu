@@ -271,19 +271,6 @@ void IndicatorImp::setContext(const KData &k) {
     }
 }
 
-void IndicatorImp::clearIntermediateResults() {
-    _clearIntermediateResults();
-    if (!m_parent) {
-        vector<IndicatorImpPtr> nodes;
-        getAllSubNodes(nodes);
-        for (const auto &node : nodes) {
-            if (!node->m_need_calculate) {
-                node->_clearBuffer();
-            }
-        }
-    }
-}
-
 void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
     HKU_CHECK_THROW(result_num <= MAX_RESULT_NUM, std::invalid_argument,
                     "result_num oiverload MAX_RESULT_NUM! {}", name());

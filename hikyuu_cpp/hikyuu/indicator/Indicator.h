@@ -135,7 +135,8 @@ public:
     size_t getPos(Datetime) const;
 
     /**
-     * 以指标的方式获取指定的结果集
+     * 以指标的方式获取指定的结果集,不保留其公式。
+     * 对于不在需要进行运算的指标，可以通过该方法清除已占用的内存。
      * @param num 指定的结果集
      */
     Indicator getResult(size_t num) const;
@@ -213,9 +214,6 @@ public:
     string str() const;
 
     bool isPythonObject() const noexcept;
-
-    /** 强制清空所有子节点缓存结果(含支持增量计算节点)，会导致子节点增量计算失效 */
-    Indicator& clearIntermediateResults();
 
 public:
     class Iterator {
@@ -393,13 +391,6 @@ inline const IndicatorImpPtr Indicator::getIndParamImp(const string& name) const
 
 inline bool Indicator::isPythonObject() const noexcept {
     return m_imp ? m_imp->isPythonObject() : false;
-}
-
-inline Indicator& Indicator::clearIntermediateResults() {
-    if (m_imp) {
-        m_imp->clearIntermediateResults();
-    }
-    return *this;
 }
 
 //--------------------------------------------------------------

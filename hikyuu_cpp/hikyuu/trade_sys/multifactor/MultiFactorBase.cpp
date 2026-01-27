@@ -154,7 +154,10 @@ void MultiFactorBase::_checkData() {
     }
 
     // 获取用于对齐的参考日期
-    m_ref_dates = StockManager::instance().getTradingCalendar(m_query);
+    if (m_ref_stk.isNull()) {
+        m_ref_stk = StockManager::instance().getMarketStock("SH");
+    }
+    m_ref_dates = m_ref_stk.getDatetimeList(m_query);
     HKU_CHECK(m_ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
               m_ref_dates.size());
 
@@ -551,7 +554,7 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     bool fill_null = getParam<bool>("fill_null");
     return global_parallel_for_index(0, m_stks.size(), [this, ndays, fill_null](size_t i) {
         auto k = m_stks[i].getKData(m_query);
-        return ALIGN(ROCP(CLOSE(), ndays), m_ref_dates, fill_null)(k).clearIntermediateResults();
+        return ALIGN(ROCP(CLOSE(), ndays), m_ref_dates, fill_null)(k).getResult(0);
     });
 }
 
@@ -711,8 +714,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
               if (kdata.size() == 0) {
                   cur_stk_inds[j] = null_ind;
               } else {
-                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null)(kdata);
-                  cur_stk_inds[j].clearIntermediateResults();
+                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null)(kdata).getResult(0);
               }
               cur_stk_inds[j].name(m_inds[j].name());
           }
@@ -722,8 +724,8 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   if (kdata.size() == 0) {
                       cur_style_inds[j] = null_ind;
                   } else {
-                      cur_style_inds[j] = ALIGN(styles[j], m_ref_dates, fill_null)(kdata);
-                      cur_style_inds[j].clearIntermediateResults();
+                      cur_style_inds[j] =
+                        ALIGN(styles[j], m_ref_dates, fill_null)(kdata).getResult(0);
                   }
               }
           }
@@ -905,10 +907,6 @@ void MultiFactorBase::calculate() {
                 // 计算每支证券调整后的合成因子
                 m_all_factors = _calculate(all_stk_inds);
             }
-        }
-
-        for (auto& ind : m_all_factors) {
-            ind.clearIntermediateResults();
         }
 
         // 计算完成后创建截面索引

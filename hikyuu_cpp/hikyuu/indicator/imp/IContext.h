@@ -22,7 +22,6 @@ public:
     virtual void _calculate(const Indicator& data) override;
     virtual IndicatorImpPtr _clone() override;
 
-    virtual void _clearIntermediateResults() override;
     virtual bool selfAlike(const IndicatorImp& other) const noexcept override;
 
     KData getContextKdata() const;

@@ -203,10 +203,6 @@ public:
     //  内部特殊用途公共接口
     // ===================
 
-    /** 强制清空所有子节点缓存结果(含支持增量计算节点)，会导致子节点增量计算失效 */
-    void clearIntermediateResults();
-    virtual void _clearIntermediateResults() {}
-
     /** 判断是否和另一个指标等效，即计算效果相同 */
     bool alike(const IndicatorImp& other) const;
 

@@ -190,7 +190,7 @@ protected:
     string m_name;
     IndicatorList m_inds;  // 输入的原始因子列表
     StockList m_stks;      // 证券组合
-    Stock m_ref_stk;       // 指定的参考证券
+    Stock m_ref_stk;       // 指定的参考证券, 仅为对齐日期
     KQuery m_query;        // 计算的日期范围条件
 
     // 以下变量为计算后生成

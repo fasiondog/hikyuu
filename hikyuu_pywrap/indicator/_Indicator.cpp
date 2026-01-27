@@ -203,7 +203,6 @@ set_context(self, stock, query)
     :param str name: 指定的指标名称
     :rtype: bool)")
 
-      .def("clear_intermediate_results", &Indicator::clearIntermediateResults)
       .def("equal", &Indicator::equal)
       .def("is_same", &Indicator::isSame)
       .def("get_imp", &Indicator::getImp)
