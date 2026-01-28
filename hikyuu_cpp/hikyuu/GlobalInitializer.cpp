@@ -55,6 +55,20 @@ void GlobalInitializer::init() {
     _CrtSetBreakAlloc(-1);
 #endif
 
+#if HKU_OS_WINDOWS
+    // 获取进程默认堆
+    HANDLE hHeap = GetProcessHeap();
+    if (hHeap == NULL) {
+        fmt::print("GetProcessHeap failed: {}\n", GetLastError());
+    }
+
+    // 启用LFH（关键：lfhFlag固定为2）
+    ULONG lfhFlag = 2;
+    if (!HeapSetInformation(hHeap, HeapCompatibilityInformation, &lfhFlag, sizeof(lfhFlag))) {
+        fmt::print("Enable LFH failed: {}\n", GetLastError());
+    }
+#endif
+
 #if HKU_USE_LOW_PRECISION
     fmt::print("Initialize hikyuu_{}_low_precision ...\n", getVersionWithBuild());
 #else
