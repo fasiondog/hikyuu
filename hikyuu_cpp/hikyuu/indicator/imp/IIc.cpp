@@ -107,10 +107,10 @@ void IIc::_calculate(const Indicator& inputInd) {
           auto k = m_stks[i].getKData(query);
           // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
           // 天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
-          all_inds[i] = ALIGN(REF(ind, n), ref_dates, fill_null)(k).frozen();
+          all_inds[i] = ALIGN(REF(ind, n), ref_dates, fill_null)(k).getResult(0)();
 
           // 计算绝对收益
-          all_returns[i] = ALIGN(ROCP(CLOSE(), n), ref_dates, fill_null)(k).frozen();
+          all_returns[i] = ALIGN(ROCP(CLOSE(), n), ref_dates, fill_null)(k).getResult(0)();
       });
 
     m_discard = n;

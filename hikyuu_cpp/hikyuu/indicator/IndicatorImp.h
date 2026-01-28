@@ -203,9 +203,6 @@ public:
     //  内部特殊用途公共接口
     // ===================
 
-    // 冻结指标, 释放内部缓存，不能在作为公式计算
-    void frozen() noexcept;
-
     /** 判断是否和另一个指标等效，即计算效果相同 */
     bool alike(const IndicatorImp& other) const;
 
