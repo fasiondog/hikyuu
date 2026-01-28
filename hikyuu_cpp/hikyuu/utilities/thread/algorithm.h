@@ -190,6 +190,8 @@ HKU_UTILS_API GlobalStealThreadPool* get_global_task_group();
 
 size_t HKU_UTILS_API get_global_task_group_work_num();
 
+#if 0
+
 // 辅助类，用于确保线程执行状态的正确管理
 #ifdef _MSC_VER
 class ExecutionGuard {
@@ -472,5 +474,186 @@ auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
 
     return ret;
 }
+
+#else
+
+template <typename FutureContainer>
+void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& futures) {
+    bool all_ready = false;
+
+    while (!all_ready) {
+        // 检查是否所有任务都已完成
+        all_ready = true;
+        for (auto& future : futures) {
+            if (future.wait_for(std::chrono::nanoseconds(0)) != std::future_status::ready) {
+                all_ready = false;
+                break;
+            }
+        }
+
+        // 如果不是所有任务都完成，尝试执行本地任务
+        if (!all_ready) {
+            pool.run_available_task_once();
+            std::this_thread::yield();
+        }
+    }
+}
+
+template <typename FunctionType>
+auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f,
+                                    size_t threshold = 2) {
+    auto* tg = get_global_task_group();
+    HKU_CHECK(tg, "Global task group is not initialized!");
+    HKU_IF_RETURN(start >= end, void());
+
+    auto ranges = parallelIndexRange(start, end, tg->worker_num());
+    if (ranges.empty()) {
+        return;
+    }
+
+    std::vector<std::future<void>> tasks;
+    for (size_t i = 0, total = ranges.size(); i < total; i++) {
+        tasks.emplace_back(tg->submit([func = f, range = ranges[i]]() {
+            for (size_t ix = range.first; ix < range.second; ix++) {
+                func(ix);
+            }
+        }));
+    }
+
+    // 使用非阻塞等待替代阻塞等待
+    wait_for_all_non_blocking(*tg, tasks);
+
+    for (auto& task : tasks) {
+        task.get();
+    }
+
+    return;
+}
+
+template <typename FunctionType>
+auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t threshold = 2) {
+    auto* tg = get_global_task_group();
+    HKU_CHECK(tg, "Global task group is not initialized!");
+
+    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+    HKU_IF_RETURN(start >= end, ret);
+
+    auto ranges = parallelIndexRange(start, end, tg->worker_num());
+    if (ranges.empty()) {
+        return ret;
+    }
+
+    std::vector<std::future<std::vector<typename std::invoke_result<FunctionType, size_t>::type>>>
+      tasks;
+    for (size_t i = 0, total = ranges.size(); i < total; i++) {
+        tasks.emplace_back(tg->submit([func = f, range = ranges[i]]() {
+            std::vector<typename std::invoke_result<FunctionType, size_t>::type> one_ret;
+            for (size_t ix = range.first; ix < range.second; ix++) {
+                one_ret.emplace_back(func(ix));
+            }
+            return one_ret;
+        }));
+    }
+
+    wait_for_all_non_blocking(*tg, tasks);
+
+    for (auto& task : tasks) {
+        auto one = task.get();
+        for (auto&& value : one) {
+            ret.emplace_back(std::move(value));
+        }
+    }
+
+    return ret;
+}
+
+template <typename FunctionType>
+auto global_parallel_for_range(size_t start, size_t end, FunctionType f, size_t threshold = 2) {
+    auto* tg = get_global_task_group();
+    HKU_CHECK(tg, "Global task group is not initialized!");
+
+    typename std::invoke_result<FunctionType, range_t>::type ret;
+    HKU_IF_RETURN(start >= end, ret);
+
+    auto ranges = parallelIndexRange(start, end, tg->worker_num());
+    if (ranges.empty()) {
+        return ret;
+    }
+
+    std::vector<std::future<typename std::invoke_result<FunctionType, range_t>::type>> tasks;
+    for (size_t i = 0, total = ranges.size(); i < total; i++) {
+        tasks.emplace_back(tg->submit([func = f, range = ranges[i]]() ->
+                                      typename std::invoke_result<FunctionType, range_t>::type {
+                                          // 在任务内部也要检查嵌套
+
+                                          return func(range);
+                                      }));
+    }
+
+    wait_for_all_non_blocking(*tg, tasks);
+
+    for (auto& task : tasks) {
+        auto one = task.get();
+        for (auto&& value : one) {
+            ret.emplace_back(std::move(value));
+        }
+    }
+
+    return ret;
+}
+
+template <typename FunctionType>
+void global_parallel_for_index_void_single(size_t start, size_t end, FunctionType f,
+                                           size_t threshold = 2) {
+    auto* tg = get_global_task_group();
+    HKU_CHECK(tg, "Global task group is not initialized!");
+    HKU_IF_RETURN(start >= end, void());
+
+    // 使用RAII确保标志位正确清理
+    ExecutionGuard guard;
+
+    if (start >= end) {
+        return;
+    }
+
+    std::vector<std::future<void>> tasks;
+    for (size_t i = start; i < end; i++) {
+        tasks.push_back(tg->submit([func = f, i]() { func(i); }));
+    }
+
+    wait_for_all_non_blocking(*tg, tasks);
+
+    for (auto& task : tasks) {
+        task.get();
+    }
+    return;
+}
+
+template <typename FunctionType>
+auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
+                                      size_t threshold = 2) {
+    auto* tg = get_global_task_group();
+    HKU_CHECK(tg, "Global task group is not initialized!");
+
+    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+    HKU_IF_RETURN(start >= end, ret);
+
+    std::vector<std::future<typename std::invoke_result<FunctionType, size_t>::type>> tasks;
+    for (size_t i = start; i < end; i++) {
+        tasks.emplace_back(
+          tg->submit([func = f, i]() ->
+                     typename std::invoke_result<FunctionType, size_t>::type { return func(i); }));
+    }
+
+    wait_for_all_non_blocking(*tg, tasks);
+
+    for (auto& task : tasks) {
+        ret.push_back(std::move(task.get()));
+    }
+
+    return ret;
+}
+
+#endif
 
 }  // namespace hku

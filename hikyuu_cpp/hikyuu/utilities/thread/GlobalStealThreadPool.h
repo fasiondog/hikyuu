@@ -228,6 +228,32 @@ public:
         m_threads.clear();
     }
 
+public:
+    void run_available_task_once() {
+        task_type task;
+        if (m_local_work_queue) {
+            HKU_INFO("run_available_task_once: local queue");
+            if (pop_task_from_local_queue(task)) {
+                if (!task.isNullTask()) {
+                    task();
+                } else {
+                    m_thread_need_stop.set();
+                }
+            } else if (pop_task_from_master_queue(task)) {
+                if (!task.isNullTask()) {
+                    task();
+                } else {
+                    m_thread_need_stop.set();
+                }
+            } else if (pop_task_from_other_thread_queue(task)) {
+                task();
+            }
+        } else if (pop_task_from_master_queue(task)) {
+            HKU_INFO("run_available_task_once: master queue");
+            task();
+        }
+    }
+
 private:
     typedef FuncWrapper task_type;
     std::atomic_bool m_done;       // 线程池全局需终止指示
