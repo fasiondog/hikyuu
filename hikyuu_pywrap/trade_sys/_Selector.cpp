@@ -396,7 +396,7 @@ void export_Selector(py::module& m) {
       [](const py::sequence& inds, int topn, int ic_n, int ic_rolling_n, const py::object& ref_stk,
          bool spearman, const string& mode) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
-          Stock c_ref_stk = ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>();
+          Stock c_ref_stk = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
           return SE_MultiFactor(c_inds, topn, ic_n, ic_rolling_n, c_ref_stk, spearman, mode);
       },
       py::arg("inds"), py::arg("topn") = 10, py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
@@ -415,7 +415,7 @@ void export_Selector(py::module& m) {
       :param int topn: 只选取时间截面中前 topn 个系统，小于等于0时代表不限制
       :param int ic_n: 默认 IC 对应的 N 日收益率
       :param int ic_rolling_n: IC 滚动周期
-      :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+      :param Stock ref_stk: 参考证券,用于日期对齐，未指定时为 sh000001
       :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
 
@@ -426,7 +426,7 @@ void export_Selector(py::module& m) {
       [](const py::sequence& inds, int ic_n, int ic_rolling_n, const py::object& ref_stk,
          bool spearman, const string& mode, const SCFilterPtr& filter) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
-          Stock c_ref_stk = ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>();
+          Stock c_ref_stk = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
           return SE_MultiFactor2(c_inds, ic_n, ic_rolling_n, c_ref_stk, spearman, mode, filter);
       },
       py::arg("inds"), py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
@@ -443,7 +443,7 @@ void export_Selector(py::module& m) {
       :param sequense(Indicator) inds: 原始因子列表
       :param int ic_n: 默认 IC 对应的 N 日收益率
       :param int ic_rolling_n: IC 滚动周期
-      :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+      :param Stock ref_stk: 参考证券,用于日期对齐，未指定时为 sh000001
       :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
 

@@ -180,9 +180,6 @@ SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
 
 void MultiFactorSelector::_calculate() {
     Stock ref_stk = getParam<Stock>("ref_stk");
-    if (ref_stk.isNull()) {
-        ref_stk = getStock("sh000300");
-    }
 
     StockList stks;
     for (const auto& sys : m_pro_sys_list) {

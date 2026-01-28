@@ -329,8 +329,8 @@ void export_MultiFactor(py::module& m) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = get_stock_list_from_python(stks);
           return MF_EqualWeight(c_inds, c_stks, query,
-                                ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(),
-                                ic_n, spearman, mode, save_all_factors);
+                                ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>(), ic_n, spearman,
+                                mode, save_all_factors);
       },
       py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
       py::arg("ic_n") = 5, py::arg("spearman") = true, py::arg("mode") = 0,
@@ -342,7 +342,7 @@ void export_MultiFactor(py::module& m) {
     :param sequense(Indicator) inds: 原始因子列表
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
@@ -359,8 +359,8 @@ void export_MultiFactor(py::module& m) {
           StockList c_stks = get_stock_list_from_python(stks);
           PriceList c_weights = python_list_to_vector<price_t>(weights);
           return MF_Weight(c_inds, c_weights, c_stks, query,
-                           ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(), ic_n,
-                           spearman, mode, save_all_factors);
+                           ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>(), ic_n, spearman,
+                           mode, save_all_factors);
       },
       py::arg("inds"), py::arg("stks"), py::arg("weights"), py::arg("query"),
       py::arg("ref_stk") = py::none(), py::arg("ic_n") = 5, py::arg("spearman") = true,
@@ -373,7 +373,7 @@ void export_MultiFactor(py::module& m) {
     :param sequense(stock) stks: 计算证券列表
     :param sequense(float) weights: 权重列表(需和 inds 等长)
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
@@ -389,20 +389,20 @@ void export_MultiFactor(py::module& m) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = get_stock_list_from_python(stks);
           return MF_ICWeight(c_inds, c_stks, query,
-                             ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(), ic_n,
+                             ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>(), ic_n,
                              ic_rolling_n, spearman, mode, save_all_factors);
       },
       py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
       py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120, py::arg("spearman") = true,
       py::arg("mode") = 0, py::arg("save_all_factors") = false,
-      R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
+      R"(MF_ICWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
     滚动IC权重合成因子
 
     :param sequense(Indicator) inds: 原始因子列表
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk:  (未指定时，默认为 sh000300 沪深300)
+    :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
@@ -419,20 +419,20 @@ void export_MultiFactor(py::module& m) {
           IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = get_stock_list_from_python(stks);
           return MF_ICIRWeight(c_inds, c_stks, query,
-                               ref_stk.is_none() ? getStock("sh000300") : ref_stk.cast<Stock>(),
-                               ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+                               ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>(), ic_n,
+                               ic_rolling_n, spearman, mode, save_all_factors);
       },
       py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
       py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120, py::arg("spearman") = true,
       py::arg("mode") = 0, py::arg("save_all_factors") = false,
-      R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
+      R"(MF_ICIRWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
     滚动ICIR权重合成因子
 
     :param sequense(Indicator) inds: 原始因子列表
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
