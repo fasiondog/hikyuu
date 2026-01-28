@@ -554,7 +554,7 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     bool fill_null = getParam<bool>("fill_null");
     return global_parallel_for_index(0, m_stks.size(), [this, ndays, fill_null](size_t i) {
         auto k = m_stks[i].getKData(m_query);
-        return ALIGN(ROCP(CLOSE(), ndays), m_ref_dates, fill_null)(k).getResult(0);
+        return ALIGN(ROCP(CLOSE(), ndays), m_ref_dates, fill_null)(k).frozen();
     });
 }
 
@@ -714,7 +714,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
               if (kdata.size() == 0) {
                   cur_stk_inds[j] = null_ind;
               } else {
-                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null)(kdata).getResult(0);
+                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null)(kdata).frozen();
               }
               cur_stk_inds[j].name(m_inds[j].name());
           }
@@ -724,8 +724,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   if (kdata.size() == 0) {
                       cur_style_inds[j] = null_ind;
                   } else {
-                      cur_style_inds[j] =
-                        ALIGN(styles[j], m_ref_dates, fill_null)(kdata).getResult(0);
+                      cur_style_inds[j] = ALIGN(styles[j], m_ref_dates, fill_null)(kdata).frozen();
                   }
               }
           }

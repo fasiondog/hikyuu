@@ -215,6 +215,9 @@ public:
 
     bool isPythonObject() const noexcept;
 
+    /** 冻结指标，冻结后，将不再计算指标，只返回已经计算好的结果 */
+    Indicator& frozen() noexcept;
+
 public:
     class Iterator {
     private:
@@ -391,6 +394,13 @@ inline const IndicatorImpPtr Indicator::getIndParamImp(const string& name) const
 
 inline bool Indicator::isPythonObject() const noexcept {
     return m_imp ? m_imp->isPythonObject() : false;
+}
+
+inline Indicator& Indicator::frozen() noexcept {
+    if (m_imp) {
+        m_imp->frozen();
+    }
+    return *this;
 }
 
 //--------------------------------------------------------------

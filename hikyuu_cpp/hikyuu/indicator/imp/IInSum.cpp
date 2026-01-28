@@ -48,7 +48,7 @@ static IndicatorList getAllIndicators(const Block& block, const KQuery& query,
     return global_parallel_for_index(
       0, stks.size(), [nind = ind.clone(), fill_null, &stks, &query, &dates](size_t index) {
           auto k = stks[index].getKData(query);
-          return ALIGN(nind, dates, fill_null)(k).getResult(0);
+          return ALIGN(nind, dates, fill_null)(k).frozen();
       });
 }
 

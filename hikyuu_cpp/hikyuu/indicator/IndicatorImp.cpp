@@ -486,6 +486,13 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     return imp;
 }
 
+void IndicatorImp::frozen() noexcept {
+    m_right.reset();
+    m_left.reset();
+    m_three.reset();
+    m_context = KData();
+}
+
 IndicatorImp::value_t IndicatorImp::get(size_t pos, size_t num) const {
 #if CHECK_ACCESS_BOUND
     // cppcheck-suppress [arrayIndexOutOfBoundsCond]
