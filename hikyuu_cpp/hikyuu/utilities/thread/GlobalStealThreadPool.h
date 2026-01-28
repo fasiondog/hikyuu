@@ -229,10 +229,10 @@ public:
     }
 
 public:
-    void run_available_task_once() {
+    bool run_available_task_once() {
+        bool task_run = true;
         task_type task;
         if (m_local_work_queue) {
-            HKU_INFO("run_available_task_once: local queue");
             if (pop_task_from_local_queue(task)) {
                 if (!task.isNullTask()) {
                     task();
@@ -246,12 +246,20 @@ public:
                     m_thread_need_stop.set();
                 }
             } else if (pop_task_from_other_thread_queue(task)) {
-                task();
+                if (!task.isNullTask()) {
+                    task();
+                }
+            } else {
+                task_run = false;
             }
         } else if (pop_task_from_master_queue(task)) {
-            HKU_INFO("run_available_task_once: master queue");
-            task();
+            if (!task.isNullTask()) {
+                task();
+            }
+        } else {
+            task_run = false;
         }
+        return task_run;
     }
 
 private:
@@ -309,7 +317,9 @@ private:
                 m_thread_need_stop.set();
             }
         } else if (pop_task_from_other_thread_queue(task)) {
-            task();
+            if (!task.isNullTask()) {
+                task();
+            }
         } else {
             // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
