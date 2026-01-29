@@ -126,6 +126,8 @@ void MultiFactorSelector2::_calculate() {
         }
     }
 
+    m_mf->calculate();
+
     for (const auto& sys : m_real_sys_list) {
         m_stk_sys_dict.insert({sys->getStock(), sys});
     }
