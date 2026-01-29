@@ -325,7 +325,8 @@ private:
             std::unique_lock<std::mutex> lk(m_cv_mutex);
             m_cv.wait_for(lk, std::chrono::microseconds(10), [this] {
                 return this->m_done || !this->m_master_work_queue.empty() ||
-                       (m_local_work_queue && !m_local_work_queue->empty() || has_remain_task());
+                       (m_local_work_queue && !m_local_work_queue->empty()) ||
+                       has_other_remain_task();
             });
         }
     }
@@ -349,7 +350,7 @@ private:
         return false;
     }
 
-    bool has_remain_task() {
+    bool has_other_remain_task() {
         for (int i = 0; i < m_worker_num; ++i) {
             if (i != m_index && m_queues[i] && !m_queues[i]->empty()) {
                 return true;
