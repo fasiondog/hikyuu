@@ -345,14 +345,11 @@ private:
 
     typedef unordered_map<string, MarketInfo> MarketInfoMap;
     mutable MarketInfoMap m_marketInfoDict;
-    std::shared_mutex* m_marketInfoDict_mutex;
 
     typedef unordered_map<uint32_t, StockTypeInfo> StockTypeInfoMap;
     mutable StockTypeInfoMap m_stockTypeInfo;
-    std::shared_mutex* m_stockTypeInfo_mutex;
 
     std::unordered_set<Datetime> m_holidays;  // 节假日
-    std::shared_mutex* m_holidays_mutex;
 
     ZhBond10List m_zh_bond10;  // 10年期中国国债收益率数据
 
