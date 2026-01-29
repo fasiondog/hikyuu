@@ -557,11 +557,6 @@ KData Stock::getKData(const KQuery& query) const {
     return KData(*this, query);
 }
 
-size_t Stock::_getCountFromBuffer(const KQuery::KType& ktype) const {
-    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-    return m_data->pKData[ktype]->size();
-}
-
 size_t Stock::getCount(KQuery::KType ktype) const {
     HKU_IF_RETURN(isNull(), 0);
     to_upper(ktype);
@@ -572,7 +567,8 @@ size_t Stock::getCount(KQuery::KType ktype) const {
         }
 
         if (isBuffer(ktype)) {
-            return _getCountFromBuffer(ktype);
+            std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+            return m_data->pKData[ktype]->size();
         }
 
         return m_kdataDriver->getConnect()->getCount(market(), code(), ktype);
@@ -602,7 +598,8 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
         if (isBuffer(ktype)) {
             KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
             size_t out_start, out_end;
-            if (getIndexRange(query, out_start, out_end)) {
+
+            if (_getIndexRangeFromBuffer(query, out_start, out_end)) {
                 // 找到的是>=datetime的记录
                 KRecord k = _getKRecordFromBuffer(out_start, ktype);
                 if (k.datetime == datetime) {
@@ -695,15 +692,15 @@ bool Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_en
             loadKDataToBuffer(query.kType());
         }
 
+        if (isBuffer(query.kType())) {
+            return _getIndexRangeFromBuffer(query, out_start, out_end);
+        }
+
         if (KQuery::INDEX == query.queryType())
             return _getIndexRangeByIndex(query, out_start, out_end);
 
         if ((KQuery::DATE != query.queryType()) || query.startDatetime() >= query.endDatetime())
             return false;
-
-        if (isBuffer(query.kType())) {
-            return _getIndexRangeByDateFromBuffer(query, out_start, out_end);
-        }
 
         if (!m_kdataDriver->getConnect()->getIndexRangeByDate(m_data->m_market, m_data->m_code,
                                                               query, out_start, out_end)) {
@@ -729,6 +726,67 @@ bool Stock::_getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t
     out_end = 0;
 
     size_t total = getCount(query.kType());
+    HKU_IF_RETURN(0 == total, false);
+
+    int64_t startix, endix;
+    startix = query.start();
+    if (startix < 0) {
+        startix += total;
+        if (startix < 0)
+            startix = 0;
+    }
+
+    endix = query.end();
+    if (endix < 0) {
+        endix += total;
+        if (endix < 0)
+            endix = 0;
+    }
+
+    size_t null_size_t = Null<size_t>();
+    size_t startpos = 0;
+    size_t endpos = null_size_t;
+
+    try {
+        startpos = boost::numeric_cast<size_t>(startix);
+    } catch (...) {
+        startpos = null_size_t;
+    }
+
+    try {
+        endpos = boost::numeric_cast<size_t>(endix);
+    } catch (...) {
+        endpos = null_size_t;
+    }
+
+    if (endpos > total) {
+        endpos = total;
+    }
+
+    if (startpos >= endpos) {
+        return false;
+    }
+
+    out_start = startpos;
+    out_end = endpos;
+    return true;
+}
+
+bool Stock::_getIndexRangeFromBuffer(const KQuery& query, size_t& out_start,
+                                     size_t& out_end) const {
+    return query.queryType() == KQuery::INDEX
+             ? _getIndexRangeByIndexFromBuffer(query, out_start, out_end)
+             : _getIndexRangeByDateFromBuffer(query, out_start, out_end);
+}
+
+bool Stock::_getIndexRangeByIndexFromBuffer(const KQuery& query, size_t& out_start,
+                                            size_t& out_end) const {
+    assert(query.queryType() == KQuery::INDEX);
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[query.kType()]));
+    out_start = 0;
+    out_end = 0;
+
+    size_t total = m_data->pKData[query.kType()]->size();
     HKU_IF_RETURN(0 == total, false);
 
     int64_t startix, endix;
