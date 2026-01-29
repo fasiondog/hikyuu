@@ -229,7 +229,7 @@ public:
     }
 
 public:
-    bool run_available_task_once() {
+    bool run_available_task() {
         bool task_run = true;
         task_type task;
         if (m_local_work_queue) {
@@ -323,7 +323,10 @@ private:
         } else {
             // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
-            m_cv.wait(lk, [this] { return this->m_done || !this->m_master_work_queue.empty(); });
+            m_cv.wait_for(lk, std::chrono::microseconds(10), [this] {
+                return this->m_done || !this->m_master_work_queue.empty() ||
+                       (m_local_work_queue && !m_local_work_queue->empty() || has_remain_task());
+            });
         }
     }
 
@@ -340,6 +343,15 @@ private:
         for (int i = 0; i < m_worker_num; ++i) {
             int index = (m_index + i + 1) % m_worker_num;
             if (index != m_index && m_queues[index]->try_steal(task)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool has_remain_task() {
+        for (int i = 0; i < m_worker_num; ++i) {
+            if (i != m_index && m_queues[i] && !m_queues[i]->empty()) {
                 return true;
             }
         }
