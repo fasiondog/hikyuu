@@ -195,7 +195,7 @@ void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& fut
     auto delay = init_delay;
     const auto max_delay = std::chrono::microseconds(50000);
 
-    while (!all_ready) {
+    while (!all_ready && !pool.done()) {
         all_ready = true;
         for (auto& future : futures) {
             if (future.wait_for(std::chrono::nanoseconds(0)) != std::future_status::ready) {
@@ -208,6 +208,8 @@ void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& fut
         if (!all_ready) {
             if (!pool.run_available_task_once()) {
                 delay = init_delay;
+            } else if (pool.done()) {
+                break;
             } else {
                 std::this_thread::sleep_for(delay);
                 if (delay < max_delay) {
@@ -224,6 +226,13 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f,
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
     HKU_IF_RETURN(start >= end, void());
+
+    if ((end - start) < threshold) {
+        for (size_t i = start; i < end; i++) {
+            f(i);
+        }
+        return;
+    }
 
     auto ranges = parallelIndexRange(start, end, tg->worker_num());
     if (ranges.empty()) {
@@ -255,6 +264,13 @@ auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t 
 
     std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
     HKU_IF_RETURN(start >= end, ret);
+
+    if ((end - start) < threshold) {
+        for (size_t i = start; i < end; i++) {
+            ret.emplace_back(f(i));
+        }
+        return ret;
+    }
 
     auto ranges = parallelIndexRange(start, end, tg->worker_num());
     if (ranges.empty()) {
@@ -293,6 +309,13 @@ auto global_parallel_for_range(size_t start, size_t end, FunctionType f, size_t 
     typename std::invoke_result<FunctionType, range_t>::type ret;
     HKU_IF_RETURN(start >= end, ret);
 
+    if ((end - start) < threshold) {
+        for (size_t i = start; i < end; i++) {
+            ret.emplace_back(f(i));
+        }
+        return ret;
+    }
+
     auto ranges = parallelIndexRange(start, end, tg->worker_num());
     if (ranges.empty()) {
         return ret;
@@ -327,7 +350,10 @@ void global_parallel_for_index_void_single(size_t start, size_t end, FunctionTyp
     HKU_CHECK(tg, "Global task group is not initialized!");
     HKU_IF_RETURN(start >= end, void());
 
-    if (start >= end) {
+    if ((end - start) < threshold) {
+        for (size_t i = start; i < end; i++) {
+            f(i);
+        }
         return;
     }
 
@@ -352,6 +378,13 @@ auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
 
     std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
     HKU_IF_RETURN(start >= end, ret);
+
+    if ((end - start) < threshold) {
+        for (size_t i = start; i < end; i++) {
+            ret.emplace_back(f(i));
+        }
+        return ret;
+    }
 
     std::vector<std::future<typename std::invoke_result<FunctionType, size_t>::type>> tasks;
     for (size_t i = start; i < end; i++) {
