@@ -229,7 +229,7 @@ public:
     }
 
 public:
-    bool run_available_task() {
+    bool run_available_task_once() {
         bool task_run = true;
         task_type task;
         if (m_local_work_queue) {
