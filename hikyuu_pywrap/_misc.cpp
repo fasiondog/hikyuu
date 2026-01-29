@@ -23,8 +23,15 @@ void export_misc(py::module& m) {
   :param bool reset: 执行前是否依据系统部件共享属性复位
   :param bool reset_all: 强制复位所有部件)");
 
-    m.def("parallel_run_pf", &parallel_run_pf, py::arg("pf_list"), py::arg("query"),
-          py::arg("force") = false, R"(parallel_run_pf(pf_list, query[, force=False])
+    m.def(
+      "parallel_run_pf",
+      [](const vector<PFPtr>& pf_list, const KQuery& query, bool force) {
+          OStreamToPython guard(false);
+          py::gil_scoped_release release;
+          return parallel_run_pf(pf_list, query, force);
+      },
+      py::arg("pf_list"), py::arg("query"), py::arg("force") = false,
+      R"(parallel_run_pf(pf_list, query[, force=False])
 
     并行执行多个投资组合策略, 并返回 list FundsList, 各账户对应资产（按query时间段）
 

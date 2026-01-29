@@ -36,16 +36,10 @@ void StockManager::quit() {
 
 StockManager::StockManager() {
     m_stockDict_mutex = new std::shared_mutex;
-    m_marketInfoDict_mutex = new std::shared_mutex;
-    m_stockTypeInfo_mutex = new std::shared_mutex;
-    m_holidays_mutex = new std::shared_mutex;
 }
 
 StockManager::~StockManager() {
     delete m_stockDict_mutex;
-    delete m_marketInfoDict_mutex;
-    delete m_stockTypeInfo_mutex;
-    delete m_holidays_mutex;
     fmt::print("Quit Hikyuu system!\n\n");
 }
 
@@ -479,7 +473,6 @@ MarketInfo StockManager::getMarketInfo(const string& market) const noexcept {
     string market_tmp = market;
     to_upper(market_tmp);
 
-    std::shared_lock<std::shared_mutex> lock(*m_marketInfoDict_mutex);
     auto iter = m_marketInfoDict.find(market_tmp);
     if (iter != m_marketInfoDict.end()) {
         result = iter->second;
@@ -499,7 +492,6 @@ Stock StockManager::getMarketStock(const string& market) const {
 
 StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
     StockTypeInfo result;
-    std::shared_lock<std::shared_mutex> lock(*m_stockTypeInfo_mutex);
     auto iter = m_stockTypeInfo.find(type);
     if (iter != m_stockTypeInfo.end()) {
         result = iter->second;
@@ -514,7 +506,6 @@ StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
 
 vector<StockTypeInfo> StockManager::getStockTypeInfoList() const {
     vector<StockTypeInfo> result;
-    std::shared_lock<std::shared_mutex> lock(*m_stockTypeInfo_mutex);
     result.reserve(m_stockTypeInfo.size());
     for (auto& item : m_stockTypeInfo) {
         result.push_back(item.second);
@@ -524,7 +515,6 @@ vector<StockTypeInfo> StockManager::getStockTypeInfoList() const {
 
 StringList StockManager::getAllMarket() const {
     StringList result;
-    std::shared_lock<std::shared_mutex> lock(*m_marketInfoDict_mutex);
     auto iter = m_marketInfoDict.begin();
     for (; iter != m_marketInfoDict.end(); ++iter) {
         result.push_back(iter->first);
@@ -589,7 +579,6 @@ const ZhBond10List& StockManager::getZhBond10() const {
 
 bool StockManager::isHoliday(const Datetime& d) const {
     HKU_IF_RETURN(d.dayOfWeek() == 0 || d.dayOfWeek() == 6, true);
-    std::shared_lock<std::shared_mutex> lock(*m_holidays_mutex);
     return m_holidays.count(d.startOfDay());
 }
 
@@ -754,7 +743,6 @@ void StockManager::loadAllStocks() {
 void StockManager::loadAllMarketInfos() {
     HKU_INFO(htr("Loading market information..."));
     auto marketInfos = m_baseInfoDriver->getAllMarketInfo();
-    std::unique_lock<std::shared_mutex> lock(*m_marketInfoDict_mutex);
     m_marketInfoDict.clear();
     m_marketInfoDict.reserve(marketInfos.size());
     for (auto& marketInfo : marketInfos) {
@@ -772,7 +760,6 @@ void StockManager::loadAllMarketInfos() {
 void StockManager::loadAllStockTypeInfo() {
     HKU_INFO(htr("Loading stock type information..."));
     auto stkTypeInfos = m_baseInfoDriver->getAllStockTypeInfo();
-    std::unique_lock<std::shared_mutex> lock(*m_stockTypeInfo_mutex);
     m_stockTypeInfo.clear();
     m_stockTypeInfo.reserve(stkTypeInfos.size());
     for (auto& stkTypeInfo : stkTypeInfos) {
@@ -783,7 +770,6 @@ void StockManager::loadAllStockTypeInfo() {
 void StockManager::loadAllHolidays() {
     auto holidays = m_baseInfoDriver->getAllHolidays();
     std::unordered_set<Datetime> tmp_holidays(holidays.begin(), holidays.end());
-    std::unique_lock<std::shared_mutex> lock(*m_holidays_mutex);
     m_holidays = std::move(tmp_holidays);
 }
 

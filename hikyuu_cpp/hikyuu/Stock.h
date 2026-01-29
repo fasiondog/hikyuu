@@ -262,10 +262,13 @@ private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
 
     // 以下函数属于基础操作添加了读锁
-    size_t _getCountFromBuffer(const KQuery::KType& ktype) const;
     const KRecord& _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
     KRecordList _getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                                           KQuery::KType ktype) const;
+
+    bool _getIndexRangeFromBuffer(const KQuery& query, size_t& out_start, size_t& out_end) const;
+    bool _getIndexRangeByIndexFromBuffer(const KQuery& query, size_t& out_start,
+                                         size_t& out_end) const;
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;
 
     KRecordList _getKRecordList(const KQuery& query) const;

@@ -228,6 +228,40 @@ public:
         m_threads.clear();
     }
 
+public:
+    bool run_available_task_once() {
+        bool task_run = true;
+        task_type task;
+        if (m_local_work_queue) {
+            if (pop_task_from_local_queue(task)) {
+                if (!task.isNullTask()) {
+                    task();
+                } else {
+                    m_thread_need_stop.set();
+                }
+            } else if (pop_task_from_master_queue(task)) {
+                if (!task.isNullTask()) {
+                    task();
+                } else {
+                    m_thread_need_stop.set();
+                }
+            } else if (pop_task_from_other_thread_queue(task)) {
+                if (!task.isNullTask()) {
+                    task();
+                }
+            } else {
+                task_run = false;
+            }
+        } else if (pop_task_from_master_queue(task)) {
+            if (!task.isNullTask()) {
+                task();
+            }
+        } else {
+            task_run = false;
+        }
+        return task_run;
+    }
+
 private:
     typedef FuncWrapper task_type;
     std::atomic_bool m_done;       // 线程池全局需终止指示
@@ -283,11 +317,17 @@ private:
                 m_thread_need_stop.set();
             }
         } else if (pop_task_from_other_thread_queue(task)) {
-            task();
+            if (!task.isNullTask()) {
+                task();
+            }
         } else {
             // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
-            m_cv.wait(lk, [this] { return this->m_done || !this->m_master_work_queue.empty(); });
+            m_cv.wait_for(lk, std::chrono::microseconds(10), [this] {
+                return this->m_done || !this->m_master_work_queue.empty() ||
+                       (m_local_work_queue && !m_local_work_queue->empty()) ||
+                       has_other_remain_task();
+            });
         }
     }
 
@@ -304,6 +344,15 @@ private:
         for (int i = 0; i < m_worker_num; ++i) {
             int index = (m_index + i + 1) % m_worker_num;
             if (index != m_index && m_queues[index]->try_steal(task)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool has_other_remain_task() {
+        for (int i = 0; i < m_worker_num; ++i) {
+            if (i != m_index && m_queues[i] && !m_queues[i]->empty()) {
                 return true;
             }
         }

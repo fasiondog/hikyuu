@@ -168,10 +168,14 @@ public:
         return m_is_python_object;
     }
 
-private:
-    /** 执行计算 */
+    /**
+     * 执行计算。默认取结果时，会自动计算。但并行使用mf时，应主动调用该接口
+     * @note 因获取scores非常频繁，所以为使用锁。
+     * 这样的话，在并行时并不完备。在需要并行计算时可主动调用该接口。
+     */
     void calculate();
 
+private:
     void initParam();
 
     // 构造每个指标构造行业哑变量，以便进行行业中性化处理

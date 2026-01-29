@@ -141,7 +141,6 @@ void MultiFactorBase::baseCheckParam(const string& name) const {
 }
 
 void MultiFactorBase::paramChanged() {
-    std::lock_guard<std::mutex> lock(m_mutex);
     m_calculated = false;
 }
 
@@ -304,21 +303,25 @@ void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
 }
 
 const DatetimeList& MultiFactorBase::getDatetimeList() {
-    calculate();
+    if (!m_calculated) {
+        calculate();
+    }
     return m_ref_dates;
 }
 
 const Indicator& MultiFactorBase::getFactor(const Stock& stk) {
     HKU_CHECK(getParam<bool>("save_all_factors"),
               "param \"save_all_factors\" is false, can't get all factors!");
-    calculate();
+    if (!m_calculated) {
+        calculate();
+    }
     const auto iter = m_stk_map.find(stk);
     HKU_CHECK(iter != m_stk_map.cend(), "Could not find this stock: {}", stk);
     return m_all_factors[iter->second];
 }
 
 const IndicatorList& MultiFactorBase::getAllFactors() {
-    if (getParam<bool>("save_all_factors")) {
+    if (getParam<bool>("save_all_factors") && !m_calculated) {
         calculate();
     } else {
         HKU_WARN("param \"save_all_factors\" is false, can't get all factors!");
@@ -327,7 +330,9 @@ const IndicatorList& MultiFactorBase::getAllFactors() {
 }
 
 ScoreRecordList MultiFactorBase::getScores(const Datetime& d) {
-    calculate();
+    if (!m_calculated) {
+        calculate();
+    }
     ScoreRecordList ret;
     const auto iter = m_date_index.find(d);
     HKU_IF_RETURN(iter == m_date_index.cend(), ret);
@@ -434,12 +439,17 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
 }
 
 const vector<ScoreRecordList>& MultiFactorBase::getAllScores() {
-    calculate();
+    if (!m_calculated) {
+        calculate();
+    }
     return m_stk_factor_by_date;
 }
 
 Indicator MultiFactorBase::getIC(int ndays) {
-    calculate();
+    if (!m_calculated) {
+        calculate();
+    }
+
     std::lock_guard<std::mutex> lock(m_mutex);
 
     // 如果 ndays 和 ic_n 参数相同，优先取缓存的 ic 结果
@@ -729,7 +739,8 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   }
               }
           }
-      });
+      },
+      2, false);
 
     // 时间截面标准化/归一化
     if (m_norm || !m_special_category.empty() || !m_special_style_inds.empty()) {
@@ -886,9 +897,9 @@ void MultiFactorBase::_buildIndexNone() {
 }
 
 void MultiFactorBase::calculate() {
-    std::lock_guard<std::mutex> lock(m_mutex);
     HKU_IF_RETURN(m_calculated, void());
 
+    std::lock_guard<std::mutex> lock(m_mutex);
     _checkData();
 
     try {

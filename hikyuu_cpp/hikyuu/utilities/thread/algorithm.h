@@ -29,7 +29,7 @@
 //       了 thread_local，本质为全局变量，只适合全局单例的方式使用,
 //       否则会出现不同线程池示例互相影响导致出错。
 //       每次会创建独立的线程池计算。
-//       如果都是纯计算(IO较少)，为防止嵌套情况下出现线程数量暴涨，
+//       如果都是纯计算(IO较少)，
 //       建议创建全局线程池，并使用全局线程池进行计算。
 //----------------------------------------------------------------
 
@@ -176,9 +176,7 @@ auto parallel_for_index_single(size_t start, size_t end, FunctionType f, size_t 
 }
 
 //----------------------------------------------------------------
-// 创建全局任务偷取线程池，主要目的用于计算并行，不适合带IO的计算
-// 和前面 parallel_for 系列函数比较，主要目的防止嵌套并行时，
-// 出现线程数量暴涨的情况。
+// 创建全局任务偷取线程池，主要目的用于计算密集或少量混合IO的并行，不适合纯IO的并行
 // 前面 parallel_for 系列每次都会创建独立线程池。
 // note: 程序内全局，初始化一次即可，重复初始化被忽略
 //----------------------------------------------------------------
@@ -189,6 +187,38 @@ void HKU_UTILS_API release_global_task_group();
 HKU_UTILS_API GlobalStealThreadPool* get_global_task_group();
 
 size_t HKU_UTILS_API get_global_task_group_work_num();
+
+template <typename FutureContainer>
+void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& futures) {
+    bool all_ready = false;
+    auto init_delay = std::chrono::microseconds(1);
+    auto delay = init_delay;
+    const auto max_delay = std::chrono::microseconds(50000);
+
+    while (!all_ready && !pool.done()) {
+        all_ready = true;
+        for (auto& future : futures) {
+            if (future.wait_for(std::chrono::nanoseconds(0)) != std::future_status::ready) {
+                all_ready = false;
+                break;
+            }
+        }
+
+        // 如果不是所有任务都完成，尝试执行本地任务
+        if (!all_ready) {
+            if (!pool.run_available_task_once()) {
+                delay = init_delay;
+            } else if (pool.done()) {
+                break;
+            } else {
+                std::this_thread::sleep_for(delay);
+                if (delay < max_delay) {
+                    delay = std::min(delay * 2, max_delay);
+                }
+            }
+        }
+    }
+}
 
 // 辅助类，用于确保线程执行状态的正确管理
 #ifdef _MSC_VER
@@ -229,15 +259,14 @@ private:
 };
 
 template <typename FunctionType>
-auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f,
-                                    size_t threshold = 2) {
+auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f, size_t threshold = 2,
+                                    bool enable_nested = true) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
     HKU_IF_RETURN(start >= end, void());
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if ((end - start) < threshold || ExecutionGuard::is_executing()) {
-        // 当前线程已经在并行执行环境中，降级为串行执行避免死锁
+    if ((end - start) < threshold || (!enable_nested && ExecutionGuard::is_executing())) {
         for (size_t i = start; i < end; i++) {
             f(i);
         }
@@ -252,16 +281,14 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f,
     }
 
     std::vector<std::future<void>> tasks;
+    tasks.reserve(ranges.size());
     for (size_t i = 0, total = ranges.size(); i < total; i++) {
-        tasks.emplace_back(tg->submit([func = f, range = ranges[i]]() {
-            // 在任务内部也要检查嵌套
-            if (ExecutionGuard::is_executing()) {
-                // 如果在任务内部检测到嵌套，直接串行执行
+        tasks.emplace_back(tg->submit([enable_nested, func = f, range = ranges[i]]() {
+            if (!enable_nested && ExecutionGuard::is_executing()) {
                 for (size_t ix = range.first; ix < range.second; ix++) {
                     func(ix);
                 }
             } else {
-                // 否则使用ExecutionGuard来标记嵌套状态
                 ExecutionGuard guard_inner;
                 for (size_t ix = range.first; ix < range.second; ix++) {
                     func(ix);
@@ -269,6 +296,8 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f,
             }
         }));
     }
+
+    wait_for_all_non_blocking(*tg, tasks);
 
     for (auto& task : tasks) {
         task.get();
@@ -278,23 +307,24 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f,
 }
 
 template <typename FunctionType>
-auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t threshold = 2) {
+auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t threshold = 2,
+                               bool enable_nested = true) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
 
     std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
     HKU_IF_RETURN(start >= end, ret);
 
+    ret.reserve(end - start);
+
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if ((end - start) < threshold || ExecutionGuard::is_executing()) {
-        // 当前线程已经在并行执行环境中，降级为串行执行避免死锁
+    if ((end - start) < threshold || (!enable_nested && ExecutionGuard::is_executing())) {
         for (size_t i = start; i < end; i++) {
             ret.emplace_back(f(i));
         }
         return ret;
     }
 
-    // 使用RAII确保标志位正确清理
     ExecutionGuard guard;
 
     auto ranges = parallelIndexRange(start, end, tg->worker_num());
@@ -304,20 +334,18 @@ auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t 
 
     std::vector<std::future<std::vector<typename std::invoke_result<FunctionType, size_t>::type>>>
       tasks;
+    tasks.reserve(ranges.size());
     for (size_t i = 0, total = ranges.size(); i < total; i++) {
-        tasks.emplace_back(tg->submit([func = f, range = ranges[i]]() {
-            // 在任务内部也要检查嵌套
-            if (ExecutionGuard::is_executing()) {
-                // 如果在任务内部检测到嵌套，直接串行执行
-                std::vector<typename std::invoke_result<FunctionType, size_t>::type> one_ret;
+        tasks.emplace_back(tg->submit([enable_nested, func = f, range = ranges[i]]() {
+            std::vector<typename std::invoke_result<FunctionType, size_t>::type> one_ret;
+            one_ret.reserve(range.second - range.first);
+            if (!enable_nested && ExecutionGuard::is_executing()) {
                 for (size_t ix = range.first; ix < range.second; ix++) {
                     one_ret.emplace_back(func(ix));
                 }
                 return one_ret;
             } else {
-                // 否则使用ExecutionGuard来标记嵌套状态
                 ExecutionGuard guard_inner;
-                std::vector<typename std::invoke_result<FunctionType, size_t>::type> one_ret;
                 for (size_t ix = range.first; ix < range.second; ix++) {
                     one_ret.emplace_back(func(ix));
                 }
@@ -326,59 +354,7 @@ auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t 
         }));
     }
 
-    for (auto& task : tasks) {
-        auto one = task.get();
-        for (auto&& value : one) {
-            ret.emplace_back(std::move(value));
-        }
-    }
-
-    return ret;
-}
-
-template <typename FunctionType>
-auto global_parallel_for_range(size_t start, size_t end, FunctionType f, size_t threshold = 2) {
-    auto* tg = get_global_task_group();
-    HKU_CHECK(tg, "Global task group is not initialized!");
-
-    typename std::invoke_result<FunctionType, range_t>::type ret;
-    HKU_IF_RETURN(start >= end, ret);
-
-    // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if ((end - start) < threshold || ExecutionGuard::is_executing()) {
-        // 当前线程已经在并行执行环境中，降级为串行执行避免死锁
-        auto ranges = parallelIndexRange(start, end, tg->worker_num());
-        for (size_t i = 0, total = ranges.size(); i < total; i++) {
-            auto one = f(ranges[i]);
-            for (auto&& value : one) {
-                ret.emplace_back(std::move(value));
-            }
-        }
-        return ret;
-    }
-
-    ExecutionGuard guard;
-
-    auto ranges = parallelIndexRange(start, end, tg->worker_num());
-    if (ranges.empty()) {
-        return ret;
-    }
-
-    std::vector<std::future<typename std::invoke_result<FunctionType, range_t>::type>> tasks;
-    for (size_t i = 0, total = ranges.size(); i < total; i++) {
-        tasks.emplace_back(tg->submit([func = f, range = ranges[i]]() ->
-                                      typename std::invoke_result<FunctionType, range_t>::type {
-                                          // 在任务内部也要检查嵌套
-                                          if (ExecutionGuard::is_executing()) {
-                                              // 如果在任务内部检测到嵌套，直接串行执行
-                                              return func(range);
-                                          } else {
-                                              // 否则使用ExecutionGuard来标记嵌套状态
-                                              ExecutionGuard guard_inner;
-                                              return func(range);
-                                          }
-                                      }));
-    }
+    wait_for_all_non_blocking(*tg, tasks);
 
     for (auto& task : tasks) {
         auto one = task.get();
@@ -392,31 +368,26 @@ auto global_parallel_for_range(size_t start, size_t end, FunctionType f, size_t 
 
 template <typename FunctionType>
 void global_parallel_for_index_void_single(size_t start, size_t end, FunctionType f,
-                                           size_t threshold = 2) {
+                                           size_t threshold = 1, bool enable_nested = true) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
     HKU_IF_RETURN(start >= end, void());
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if ((end - start) < threshold || ExecutionGuard::is_executing()) {
-        // 当前线程已经在并行执行环境中，降级为串行执行避免死锁
+    if ((end - start) < threshold || (!enable_nested && ExecutionGuard::is_executing())) {
         for (size_t i = start; i < end; i++) {
             f(i);
         }
         return;
     }
 
-    // 使用RAII确保标志位正确清理
     ExecutionGuard guard;
 
-    if (start >= end) {
-        return;
-    }
-
     std::vector<std::future<void>> tasks;
+    tasks.reserve(end - start);
     for (size_t i = start; i < end; i++) {
-        tasks.push_back(tg->submit([func = f, i]() {
-            if (ExecutionGuard::is_executing()) {
+        tasks.push_back(tg->submit([enable_nested, func = f, i]() {
+            if (!enable_nested && ExecutionGuard::is_executing()) {
                 func(i);
             } else {
                 ExecutionGuard guard_inner;
@@ -424,6 +395,8 @@ void global_parallel_for_index_void_single(size_t start, size_t end, FunctionTyp
             }
         }));
     }
+
+    wait_for_all_non_blocking(*tg, tasks);
 
     for (auto& task : tasks) {
         task.get();
@@ -433,38 +406,41 @@ void global_parallel_for_index_void_single(size_t start, size_t end, FunctionTyp
 
 template <typename FunctionType>
 auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
-                                      size_t threshold = 2) {
+                                      size_t threshold = 1, bool enable_nested = true) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
 
     std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
     HKU_IF_RETURN(start >= end, ret);
 
+    ret.reserve(end - start);
+
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if ((end - start) < threshold || ExecutionGuard::is_executing()) {
-        // 当前线程已经在并行执行环境中，降级为串行执行避免死锁
+    if ((end - start) < threshold || (!enable_nested && ExecutionGuard::is_executing())) {
         for (size_t i = start; i < end; i++) {
             ret.push_back(f(i));
         }
         return ret;
     }
 
-    // 使用RAII确保标志位正确清理
     ExecutionGuard guard;
 
     std::vector<std::future<typename std::invoke_result<FunctionType, size_t>::type>> tasks;
+    tasks.reserve(end - start);
     for (size_t i = start; i < end; i++) {
-        tasks.emplace_back(
-          tg->submit([func = f, i]() -> typename std::invoke_result<FunctionType, size_t>::type {
-              // 在任务内部也要检查嵌套
-              if (ExecutionGuard::is_executing()) {
-                  return func(i);
-              } else {
-                  ExecutionGuard guard_inner;
-                  return func(i);
-              }
-          }));
+        tasks.emplace_back(tg->submit([func = f, i, enable_nested]() ->
+                                      typename std::invoke_result<FunctionType, size_t>::type {
+                                          // 在任务内部也要检查嵌套
+                                          if (!enable_nested && ExecutionGuard::is_executing()) {
+                                              return func(i);
+                                          } else {
+                                              ExecutionGuard guard_inner;
+                                              return func(i);
+                                          }
+                                      }));
     }
+
+    wait_for_all_non_blocking(*tg, tasks);
 
     for (auto& task : tasks) {
         ret.push_back(std::move(task.get()));
