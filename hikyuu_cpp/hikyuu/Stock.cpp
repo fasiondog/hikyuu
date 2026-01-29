@@ -599,7 +599,22 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
         }
 
         // 如果为内存缓存或者数据驱动为索引优先，则按索引方式获取
-        if (isBuffer(ktype) || m_kdataDriver->getConnect()->isIndexFirst()) {
+        if (isBuffer(ktype)) {
+            KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
+            size_t out_start, out_end;
+            if (getIndexRange(query, out_start, out_end)) {
+                // 找到的是>=datetime的记录
+                KRecord k = _getKRecordFromBuffer(out_start, ktype);
+                if (k.datetime == datetime) {
+                    return k.closePrice;
+                }
+                if (out_start != 0) {
+                    k = _getKRecordFromBuffer(out_start - 1, ktype);
+                    return k.closePrice;
+                }
+            }
+
+        } else if (m_kdataDriver->getConnect()->isIndexFirst()) {
             KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
             size_t out_start, out_end;
             if (getIndexRange(query, out_start, out_end)) {
