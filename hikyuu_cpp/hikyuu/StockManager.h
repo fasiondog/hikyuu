@@ -374,7 +374,7 @@ inline size_t StockManager::size() const noexcept {
 }
 
 inline bool StockManager::dataReady() const {
-    return m_data_ready;
+    return m_data_ready.load(std::memory_order_acquire);
 }
 
 inline bool StockManager::initializing() const {

@@ -163,7 +163,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
 void StockManager::loadData() {
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
-    m_data_ready = false;
+    m_data_ready.store(false, std::memory_order_release);
 
     loadAllHolidays();
     loadAllMarketInfos();
@@ -270,7 +270,7 @@ void StockManager::loadAllKData() {
             tg.join();
         }
 
-        m_data_ready = true;
+        m_data_ready.store(true, std::memory_order_release);
 
     } else {
         // 异步并行加载
@@ -322,7 +322,7 @@ void StockManager::loadAllKData() {
 
             m_load_tg->join();
             m_load_tg.reset();
-            m_data_ready = true;
+            m_data_ready.store(true, std::memory_order_release);
         });
         t.detach();
     }
