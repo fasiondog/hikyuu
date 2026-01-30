@@ -109,16 +109,15 @@ void Portfolio::paramChanged() {
 void Portfolio::reset() {
     if (m_tm)
         m_tm->reset();
-    m_cash_tm.reset();
-    // if (m_cash_tm)
-    //     m_cash_tm->reset();
+    if (m_cash_tm)
+        m_cash_tm->reset();
     if (m_se)
         m_se->reset();
     if (m_af)
         m_af->reset();
     m_need_calculate = true;
-    m_real_sys_list = {};
-    m_running_sys_set = {};
+    m_real_sys_list.clear();
+    m_running_sys_set.clear();
     _reset();
 }
 
@@ -234,12 +233,6 @@ void Portfolio::run(const KQuery& query, bool force) {
     } else {
         _runOnMode(datelist, adjust_cycle, mode);
     }
-
-    m_cash_tm.reset();
-    m_se->reset();
-    m_af->reset();
-    m_real_sys_list = {};
-    m_running_sys_set = {};
 
     m_need_calculate = false;
 }
