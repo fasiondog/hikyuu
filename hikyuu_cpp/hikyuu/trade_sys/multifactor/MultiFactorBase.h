@@ -192,10 +192,16 @@ private:
 protected:
     bool m_is_python_object{false};
     string m_name;
-    IndicatorList m_inds;  // 输入的原始因子列表
+    IndicatorList m_inds;  // 输入的原始因子公式列表
     StockList m_stks;      // 证券组合
     Stock m_ref_stk;       // 指定的参考证券, 仅为对齐日期
     KQuery m_query;        // 计算的日期范围条件
+
+    NormPtr m_norm;                                    // 全局标准化/归一化操作
+    unordered_map<string, NormPtr> m_special_norms;    // 对特定指标执行特定的标准化操作
+    unordered_map<string, string> m_special_category;  // 对特定指标执行行业中性化时指定的板块分类
+    unordered_map<string, IndicatorList>
+      m_special_style_inds;  // 对特定指标执行风格因子中性化时指定的风格因子
 
     // 以下变量为计算后生成
     DatetimeList m_ref_dates;  // 依据参考证券和query计算的参考日期，合成因子和该日期对齐
@@ -204,12 +210,6 @@ protected:
     unordered_map<Datetime, size_t> m_date_index;
     vector<ScoreRecordList> m_stk_factor_by_date;
     Indicator m_ic;
-
-    NormPtr m_norm;                                    // 全局标准化/归一化操作
-    unordered_map<string, NormPtr> m_special_norms;    // 对特定指标执行特定的标准化操作
-    unordered_map<string, string> m_special_category;  // 对特定指标执行行业中性化时指定的板块分类
-    unordered_map<string, IndicatorList>
-      m_special_style_inds;  // 对特定指标执行风格因子中性化时指定的风格因子
 
 private:
     std::mutex m_mutex;
@@ -230,7 +230,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_stks);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_ref_dates);
         ar& BOOST_SERIALIZATION_NVP(m_special_norms);
         ar& BOOST_SERIALIZATION_NVP(m_special_category);
         // 以下不需要保存，加载后重新计算
@@ -251,7 +250,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_stks);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_ref_dates);
         ar& BOOST_SERIALIZATION_NVP(m_special_norms);
         ar& BOOST_SERIALIZATION_NVP(m_special_category);
         // ar& BOOST_SERIALIZATION_NVP(m_stk_map);

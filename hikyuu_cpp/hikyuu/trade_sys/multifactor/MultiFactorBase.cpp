@@ -165,15 +165,17 @@ void MultiFactorBase::_checkData() {
 }
 
 void MultiFactorBase::reset() {
-    std::lock_guard<std::mutex> lock(m_mutex);
     _reset();
-
-    // 仅重置 m_calculated，其他缓存不重置，否则线程不安全
+    m_ref_dates = {};
+    m_stk_map = {};
+    m_all_factors = {};
+    m_date_index = {};
+    m_stk_factor_by_date = {};
+    m_ic = {};
     m_calculated = false;
 }
 
 MultiFactorPtr MultiFactorBase::clone() {
-    std::lock_guard<std::mutex> lock(m_mutex);
     MultiFactorPtr p;
     try {
         p = _clone();
@@ -192,8 +194,8 @@ MultiFactorPtr MultiFactorBase::clone() {
     p->m_is_python_object = m_is_python_object;
     p->m_stks = m_stks;
     p->m_ref_stk = m_ref_stk;
+    // p->m_ref_dates = m_ref_dates;
     p->m_query = m_query;
-    p->m_ref_dates = m_ref_dates;
 
     p->m_inds.reserve(m_inds.size());
     for (const auto& ind : m_inds) {
@@ -220,9 +222,7 @@ MultiFactorPtr MultiFactorBase::clone() {
 }
 
 void MultiFactorBase::setQuery(const KQuery& query) {
-    std::lock_guard<std::mutex> lock(m_mutex);
     m_query = query;
-    _reset();
     m_calculated = false;
 }
 
@@ -231,10 +231,7 @@ void MultiFactorBase::setRefStock(const Stock& stk) {
     DatetimeList ref_dates = stk.getDatetimeList(m_query);
     HKU_CHECK(ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
               ref_dates.size());
-    std::lock_guard<std::mutex> lock(m_mutex);
     m_ref_stk = stk;
-    m_ref_dates = std::move(ref_dates);
-    _reset();
     m_calculated = false;
 }
 
@@ -244,22 +241,17 @@ void MultiFactorBase::setStockList(const StockList& stks) {
         HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
     }
 
-    std::lock_guard<std::mutex> lock(m_mutex);
     m_stks = stks;
-    _reset();
     m_calculated = false;
 }
 
 void MultiFactorBase::setRefIndicators(const IndicatorList& inds) {
     HKU_CHECK(!inds.empty(), "Input source factor list is empty!");
-    std::lock_guard<std::mutex> lock(m_mutex);
     m_inds = inds;
-    _reset();
     m_calculated = false;
 }
 
 void MultiFactorBase::setNormalize(NormPtr norm) {
-    std::lock_guard<std::mutex> lock(m_mutex);
     m_norm = norm;
     m_calculated = false;
 }
@@ -283,9 +275,6 @@ void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
         auto blks = StockManager::instance().getBlockList(category);
         HKU_CHECK(!blks.empty(), "Can't find category block list: {}", category);
     }
-
-    std::lock_guard<std::mutex> lock(m_mutex);
-    _reset();
 
     if (norm) {
         m_special_norms[name] = norm;
