@@ -63,7 +63,7 @@ public:
                 m_threads.emplace_back(&GlobalStealThreadPool::worker_thread, this, i);
             }
         } catch (...) {
-            m_done = true;
+            m_done.store(true, std::memory_order_release);
             throw;
         }
     }
@@ -72,7 +72,7 @@ public:
      * 析构函数，等待并阻塞至线程池内所有任务完成
      */
     ~GlobalStealThreadPool() {
-        if (!m_done) {
+        if (!m_done.load(std::memory_order_acquire)) {
             join();
         }
     }
@@ -84,7 +84,7 @@ public:
 
     /** 剩余任务数 */
     size_t remain_task_count() const {
-        if (m_done) {
+        if (m_done.load(std::memory_order_acquire)) {
             return 0;
         }
         size_t total = m_master_work_queue.size();
@@ -106,7 +106,7 @@ public:
     /** 向线程池提交任务 */
     template <typename FunctionType>
     auto submit(FunctionType f) {
-        if (m_thread_need_stop.isSet() || m_done) {
+        if (m_thread_need_stop.isSet() || m_done.load(std::memory_order_acquire)) {
             throw std::logic_error(
               "You can't submit a task to the stopped GlobalStealThreadPool!!");
         }
@@ -133,18 +133,16 @@ public:
 
     /** 返回线程池结束状态 */
     bool done() const {
-        return m_done;
+        return m_done.load(std::memory_order_acquire);
     }
 
     /**
      * 等待各线程完成当前执行的任务后立即结束退出
      */
     void stop() {
-        if (m_done) {
+        if (m_done.exchange(true, std::memory_order_acq_rel)) {
             return;
         }
-
-        m_done = true;
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -173,7 +171,7 @@ public:
      * @note 至此线程池能工作线程结束不可再使用
      */
     void join() {
-        if (m_done) {
+        if (m_done.load(std::memory_order_acquire)) {
             return;
         }
 
@@ -198,7 +196,7 @@ public:
                 }
             }
 
-            m_done = true;
+            m_done.store(true, std::memory_order_release);
             for (size_t i = 0; i < m_worker_num; i++) {
                 if (m_interrupt_flags[i]) {
                     m_interrupt_flags[i]->set();
@@ -220,7 +218,7 @@ public:
             }
         }
 
-        m_done = true;
+        m_done.store(true, std::memory_order_release);
         m_master_work_queue.clear();
         for (size_t i = 0; i < m_worker_num; i++) {
             m_queues[i]->clear();
@@ -293,7 +291,7 @@ private:
         m_interrupt_flags[index] = &m_thread_need_stop;
         m_index = index;
         m_local_work_queue = m_queues[index].get();
-        while (!m_thread_need_stop.isSet() && !m_done) {
+        while (!m_thread_need_stop.isSet() && !m_done.load(std::memory_order_acquire)) {
             run_pending_task();
         }
         m_local_work_queue = nullptr;
@@ -324,7 +322,8 @@ private:
             // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
             m_cv.wait_for(lk, std::chrono::microseconds(10), [this] {
-                return this->m_done || !this->m_master_work_queue.empty() ||
+                return this->m_done.load(std::memory_order_acquire) ||
+                       !this->m_master_work_queue.empty() ||
                        (m_local_work_queue && !m_local_work_queue->empty()) ||
                        has_other_remain_task();
             });
