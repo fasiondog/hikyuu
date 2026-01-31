@@ -23,24 +23,18 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 namespace hku {
 
 bool IndicatorImp::ms_enable_increment_calculate{true};
-// mi_heap_t *IndicatorImp::ms_mi_heap{nullptr};
-// mi_heap_stl_allocator<IndicatorImp::value_t> *IndicatorImp::ms_mi_heap_stl_allocator{nullptr};
 
 void IndicatorImp::initEngine() {
     mi_option_enable(mi_option_large_os_pages);  // 启用大页面
-    // 移除不再支持的选项 mi_option_pool
-    // 移除不再支持的选项 mi_option_page_protect
     mi_option_enable(mi_option_use_numa_nodes);  // 启用NUMA支持
     mi_option_set(mi_option_purge_delay, 0);
 
     mi_stats_reset();
-    mi_stats_print(NULL);
+    // mi_stats_print(NULL);
 }
 
 void IndicatorImp::releaseEngine() {
-    // delete ms_mi_heap_stl_allocator;
-    // mi_heap_delete(ms_mi_heap);
-    mi_stats_print(NULL);
+    // mi_stats_print(NULL);
 }
 
 string HKU_API getOPTypeName(IndicatorImp::OPType op) {
@@ -262,9 +256,6 @@ void IndicatorImp::setContext(const KData &k) {
     for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
         iter->second->setContext(k);
     }
-
-    // 重设上下文
-    // onlySetContext(k);
 
     // 启动重新计算
     calculate();
