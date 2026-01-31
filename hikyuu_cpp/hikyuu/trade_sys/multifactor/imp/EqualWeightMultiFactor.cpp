@@ -29,42 +29,45 @@ vector<Indicator> EqualWeightMultiFactor::_calculate(
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
 
-    return global_parallel_for_index(0, stk_count, [&](size_t si) {
-        vector<price_t> sumByDate(days_total);
-        vector<size_t> countByDate(days_total);
+    return global_parallel_for_index(
+      0, stk_count,
+      [&](size_t si) {
+          vector<price_t> sumByDate(days_total);
+          vector<size_t> countByDate(days_total);
 
-        const auto& curStkInds = all_stk_inds[si];
-        for (size_t di = 0; di < days_total; di++) {
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                const auto& value = curStkInds[ii][di];
-                if (!std::isnan(value)) {
-                    sumByDate[di] += value;
-                    countByDate[di] += 1;
-                }
-            }
-        }
+          const auto& curStkInds = all_stk_inds[si];
+          for (size_t di = 0; di < days_total; di++) {
+              for (size_t ii = 0; ii < ind_count; ii++) {
+                  const auto& value = curStkInds[ii][di];
+                  if (!std::isnan(value)) {
+                      sumByDate[di] += value;
+                      countByDate[di] += 1;
+                  }
+              }
+          }
 
-        // 均值权重
-        for (size_t di = 0; di < days_total; di++) {
-            sumByDate[di] =
-              (countByDate[di] == 0) ? Null<value_t>() : sumByDate[di] / countByDate[di];
-        }
+          // 均值权重
+          for (size_t di = 0; di < days_total; di++) {
+              sumByDate[di] =
+                (countByDate[di] == 0) ? Null<value_t>() : sumByDate[di] / countByDate[di];
+          }
 
-        Indicator ret = PRICELIST(sumByDate);
-        ret.name("IC");
+          Indicator ret = PRICELIST(sumByDate);
+          ret.name("IC");
 
-        // 更新 discard
-        for (size_t di = 0; di < days_total; di++) {
-            if (!std::isnan(ret[di])) {
-                ret.setDiscard(di);
-                break;
-            }
-            if (di == days_total - 1) {
-                ret.setDiscard(di);
-            }
-        }
-        return ret;
-    });
+          // 更新 discard
+          for (size_t di = 0; di < days_total; di++) {
+              if (!std::isnan(ret[di])) {
+                  ret.setDiscard(di);
+                  break;
+              }
+              if (di == days_total - 1) {
+                  ret.setDiscard(di);
+              }
+          }
+          return ret;
+      },
+      2, false);
 }
 
 MultiFactorPtr HKU_API MF_EqualWeight() {

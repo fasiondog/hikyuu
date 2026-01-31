@@ -181,10 +181,7 @@ private:
     // 构造每个指标构造行业哑变量，以便进行行业中性化处理
     unordered_map<string, PriceList> _buildDummyIndex();
 
-    void _buildIndex();      // 计算完成后创建截面索引
-    void _buildIndexDesc();  // 创建降序排列的索引
-    void _buildIndexAsc();   // 创建升序排列的索引
-    void _buildIndexNone();  // build index when no index
+    void _buildIndex();  // 计算完成后创建截面索引
 
     IndicatorList _getAllReturns(int ndays) const;
     void _checkData();
