@@ -794,33 +794,35 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 void MultiFactorBase::_buildIndex() {
     SPEND_TIME(_buildIndex);
     size_t stk_count = m_stks.size();
-    for (size_t i = 0; i < stk_count; i++) {
-        m_stk_map[m_stks[i]] = i;
-    }
+    // for (size_t i = 0; i < stk_count; i++) {
+    //     m_stk_map[m_stks[i]] = i;
+    // }
 
     size_t days_total = m_ref_dates.size();
-    m_stk_factor_by_date.resize(days_total);
-    for (size_t i = 0; i < days_total; i++) {
-        m_date_index[m_ref_dates[i]] = i;
-        m_stk_factor_by_date[i].resize(stk_count);  // 每个日期预分配股票数量的空间
-    }
-    SPEND_TIME_KEEP(_buildIndex, "1");
+    // m_stk_factor_by_date.resize(days_total);
+    // for (size_t i = 0; i < days_total; i++) {
+    //     m_date_index[m_ref_dates[i]] = i;
+    //     m_stk_factor_by_date[i].resize(stk_count);  // 每个日期预分配股票数量的空间
+    // }
+    // SPEND_TIME_KEEP(_buildIndex, "1");
 
     // 先遍历股票j，再遍历日期i，默认不排序
-    // for (size_t j = 0; j < stk_count; j++) {
-    //     const auto& stk = m_stks[j];
-    //     const auto* data = m_all_factors[j].data();
-    //     for (size_t i = 0; i < days_total; i++) {
-    //         m_stk_factor_by_date[i][j] = ScoreRecord(stk, data[i]);
-    //     }
-    // }
+#if 1
+    for (size_t j = 0; j < stk_count; j++) {
+        const auto& stk = m_stks[j];
+        const auto* data = m_all_factors[j].data();
+        for (size_t i = 0; i < days_total; i++) {
+            m_stk_factor_by_date[i][j] = ScoreRecord(stk, data[i]);
+        }
+    }
+#else
 
     std::vector<Indicator::value_t> factor_stk(stk_count * days_total, Null<Indicator::value_t>());
     // 步骤2：填充因子值（stk在外，日期在内，连续访问，无缓存失效）
     // for (size_t j = 0; j < stk_count; ++j) {
     global_parallel_for_index_void(0, stk_count, [&](size_t j) {
         size_t stk_start = j * days_total;
-        const double* src_data = m_all_factors[j].data();
+        const auto* src_data = m_all_factors[j].data();
         std::copy(src_data, src_data + days_total, &factor_stk[stk_start]);
     });
 
@@ -854,7 +856,7 @@ void MultiFactorBase::_buildIndex() {
             date_records[j] = ScoreRecord(m_stks[j], factor_date[date_start + j]);
         }
     }
-
+#endif
     SPEND_TIME_KEEP(_buildIndex, "2");
 
     int mode = getParam<int>("mode");
@@ -904,9 +906,22 @@ void MultiFactorBase::calculate() {
     SPEND_TIME(MultiFactorBase_calculate);
     _checkData();
 
+    size_t stk_count = m_stks.size();
+    for (size_t i = 0; i < stk_count; i++) {
+        m_stk_map[m_stks[i]] = i;
+    }
+
+    size_t days_total = m_ref_dates.size();
+    m_stk_factor_by_date.resize(days_total);
+    for (size_t i = 0; i < days_total; i++) {
+        m_date_index[m_ref_dates[i]] = i;
+        m_stk_factor_by_date[i].resize(stk_count);  // 每个日期预分配股票数量的空间
+    }
+    HKU_INFO("stk count: {}, days total: {}", stk_count, days_total);
+
     try {
         {  // 获取所有证券所有对齐后的原始因子
-            vector<vector<Indicator>> all_stk_inds = getAllSrcFactors();
+            vector<IndicatorList> all_stk_inds = getAllSrcFactors();
             SPEND_TIME_KEEP(MultiFactorBase_calculate, "getAllSrcFactors");
 
             if (m_inds.size() == 1) {
@@ -935,8 +950,8 @@ void MultiFactorBase::calculate() {
     }
 
     if (!getParam<bool>("save_all_factors")) {
-        IndicatorList().swap(m_all_factors);
-        unordered_map<Stock, size_t>().swap(m_stk_map);
+        m_all_factors = {};
+        m_stk_map = {};
     }
     SPEND_TIME_KEEP(MultiFactorBase_calculate, "free memory");
 
