@@ -794,17 +794,17 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 void MultiFactorBase::_buildIndex() {
     SPEND_TIME(_buildIndex);
     size_t stk_count = m_stks.size();
-    // for (size_t i = 0; i < stk_count; i++) {
-    //     m_stk_map[m_stks[i]] = i;
-    // }
+    for (size_t i = 0; i < stk_count; i++) {
+        m_stk_map[m_stks[i]] = i;
+    }
 
     size_t days_total = m_ref_dates.size();
-    // m_stk_factor_by_date.resize(days_total);
-    // for (size_t i = 0; i < days_total; i++) {
-    //     m_date_index[m_ref_dates[i]] = i;
-    //     m_stk_factor_by_date[i].resize(stk_count);  // 每个日期预分配股票数量的空间
-    // }
-    // SPEND_TIME_KEEP(_buildIndex, "1");
+    m_stk_factor_by_date.resize(days_total);
+    for (size_t i = 0; i < days_total; i++) {
+        m_date_index[m_ref_dates[i]] = i;
+        m_stk_factor_by_date[i].resize(stk_count);  // 每个日期预分配股票数量的空间
+    }
+    SPEND_TIME_KEEP(_buildIndex, "1");
 
     // 先遍历股票j，再遍历日期i，默认不排序
 #if 1
@@ -906,18 +906,18 @@ void MultiFactorBase::calculate() {
     SPEND_TIME(MultiFactorBase_calculate);
     _checkData();
 
-    size_t stk_count = m_stks.size();
-    for (size_t i = 0; i < stk_count; i++) {
-        m_stk_map[m_stks[i]] = i;
-    }
+    // size_t stk_count = m_stks.size();
+    // for (size_t i = 0; i < stk_count; i++) {
+    //     m_stk_map[m_stks[i]] = i;
+    // }
 
-    size_t days_total = m_ref_dates.size();
-    m_stk_factor_by_date.resize(days_total);
-    for (size_t i = 0; i < days_total; i++) {
-        m_date_index[m_ref_dates[i]] = i;
-        m_stk_factor_by_date[i].resize(stk_count);  // 每个日期预分配股票数量的空间
-    }
-    HKU_INFO("stk count: {}, days total: {}", stk_count, days_total);
+    // size_t days_total = m_ref_dates.size();
+    // m_stk_factor_by_date.resize(days_total);
+    // for (size_t i = 0; i < days_total; i++) {
+    //     m_date_index[m_ref_dates[i]] = i;
+    //     m_stk_factor_by_date[i].resize(stk_count);  // 每个日期预分配股票数量的空间
+    // }
+    // HKU_INFO("stk count: {}, days total: {}", stk_count, days_total);
 
     try {
         {  // 获取所有证券所有对齐后的原始因子

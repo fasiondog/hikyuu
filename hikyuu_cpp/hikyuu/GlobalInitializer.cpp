@@ -55,6 +55,8 @@ void GlobalInitializer::init() {
     _CrtSetBreakAlloc(-1);
 #endif
 
+    IndicatorImp::initEngine();
+
 #if HKU_OS_WINDOWS
     // 获取进程默认堆
     HANDLE hHeap = GetProcessHeap();
@@ -152,6 +154,8 @@ void GlobalInitializer::clean() {
 #endif
 
     DataDriverFactory::release();
+    IndicatorImp::releaseEngine();
+
     sm.clearPlugin();
 
 #if HKU_ENABLE_TA_LIB
