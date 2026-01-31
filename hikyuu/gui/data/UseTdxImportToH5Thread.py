@@ -94,8 +94,10 @@ class UseTdxImportToH5Thread(QThread):
             self.tasks.append(
                 ImportHistoryFinanceTask(self.log_queue, self.queue, self.config, dest_dir))
 
-        self.tasks.append(ImportBlockInfoTask(self.log_queue, self.queue,
-                          self.config))  # '概念板块', '地域板块'
+        if self.config.getboolean('block', 'enable', fallback=True):
+            self.tasks.append(ImportBlockInfoTask(self.log_queue, self.queue,
+                                                  self.config))  # '概念板块', '地域板块',
+
         self.tasks.append(ImportZhBond10Task(self.log_queue, self.queue, self.config))
 
         task_count = 0
