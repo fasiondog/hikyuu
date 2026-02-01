@@ -114,7 +114,7 @@
 
 .. py:function:: AGG_FUNC(ind, agg_func[, ktype=Query.MIN, fill_null=False, unit=1]
       
-    使用自定函数聚合其他K线周期的指标。虽然支持python自定义函数, 但python函数需要GIL, 速度较慢慢。建议最好直接使用 C++ 自定义聚合函数。
+    使用自定函数聚合其他K线周期的指标。
     
     示例, 计算日线时聚合分钟线收盘价的和:
 
@@ -616,7 +616,7 @@
 
 .. py:function:: GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1]
       
-    自定义分组累积计算指标。虽然支持python自定义函数, 但python函数需要GIL, 速度较慢。建议最好直接使用 C++ 自定义分组累积函数。
+    自定义分组累积计算指标。
     
     示例, 计算日线时聚合分钟线收盘价的和:
 

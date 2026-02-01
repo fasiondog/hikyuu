@@ -364,19 +364,14 @@ void export_extend_Indicator(py::module& m) {
           HKU_CHECK(py::hasattr(agg_func, "__call__"), "agg_func not callable!");
           HKU_CHECK(check_pyfunction_arg_num(agg_func, 2), "Number of parameters does not match!");
           PyAggFunc agg_func_obj(agg_func.attr("__call__"));
-          Indicator ret;
-          {
-              OStreamToPython guard(false);
-              py::gil_scoped_release release;
-              ret = AGG_FUNC(ind, agg_func_obj, ktype, fill_null, unit);
-          }
+          Indicator ret = AGG_FUNC(ind, agg_func_obj, ktype, fill_null, unit);
           return ret;
       },
       py::arg("ind"), py::arg("agg_func"), py::arg("ktype") = KQuery::MIN,
       py::arg("fill_null") = false, py::arg("unit") = 1,
       R"(AGG_FUNC(ind, agg_func[, ktype=Query.MIN, fill_null=False, unit=1]
       
-    使用自定函数聚合其他K线周期的指标。虽然支持python自定义函数, 但python函数需要GIL, 速度会慢。建议最好直接使用 C++ 自定义聚合函数。
+    使用自定函数聚合其他K线周期的指标。
     
     示例, 计算日线时聚合分钟线收盘价的和:
 
@@ -407,18 +402,13 @@ void export_extend_Indicator(py::module& m) {
           HKU_CHECK(check_pyfunction_arg_num(group_func, 2),
                     "Number of parameters does not match!");
           PyGroupFunc func_obj(group_func.attr("__call__"));
-          Indicator ret;
-          {
-              OStreamToPython guard(false);
-              py::gil_scoped_release release;
-              ret = GROUP_FUNC(ind, func_obj, ktype, unit);
-          }
+          Indicator ret = GROUP_FUNC(ind, func_obj, ktype, unit);
           return ret;
       },
       py::arg("ind"), py::arg("group_func"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1,
       R"(GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1])
       
-    自定义分组累积计算指标。虽然支持python自定义函数, 但python函数需要GIL, 速度较慢。建议最好直接使用 C++ 自定义分组累积函数。
+    自定义分组累积计算指标。
     
     示例, 计算日线时聚合分钟线收盘价的和:
 
