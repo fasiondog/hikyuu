@@ -182,7 +182,7 @@
 
     平均真实波幅(Average True Range), 真实波动幅度 TR 的简单移动均值
 
-    :param KData kdata 待计算的源数据
+    :param KData kdata: 待计算的源数据
     :param int n: 计算均值的周期窗口，必须为大于1的整数
     :rtype: Indicator
 
@@ -675,28 +675,30 @@
     :param KData kdata: k线数据
     :rtype: Indicator
     
-.. py:function:: IC(ind, stks, query, ref_stk[, n=1, spearman=True])
+.. py:function:: IC(ind, stks[, n=1, spearman=True, strict=True])
 
-    计算指定的因子相对于参考证券的 IC （实际为 RankIC）
+    计算指定的因子相对于参考证券的 IC （默认为 RankIC）
+
+    IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
+    天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
+    如需严格“t 时刻因子值→t+1 时刻收益“计算，请设置 strict=True (注意此模式下, 后n位为 NA)
     
-    :param sequence | Block stks 证券组合
-    :param Query query: 查询条件
-    :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
+    :param sequence or Block stks: 证券组合
     :param int n: 时间窗口(对应的 n 日收益率)
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+    :param bool strict: 严格模式， 遵循IC定义“t 时刻因子值→t+1 时刻收益”
     :rtype: Indicator
 
 
-.. py:function:: ICIR(ind, stks, query, ref_stk[, n=1, rolling_n=120, spearman=True])
+.. py:function:: ICIR(ind, stks[, n=1, rolling_n=120, spearman=True])
 
     计算 IC 因子 IR = IC的多周期均值/IC的标准方差
 
-    :param sequence | Block stks 证券组合
-    :param Query query: 查询条件
-    :param Stock ref_stk: 参照证券，通常使用 sh000300 沪深300
+    :param sequence or Block stks: 证券组合
     :param int n: 时间窗口(对应的 n 日收益率)
     :param int rolling_n: 滚动周期
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson    
+    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson  
+    :param bool strict: 严格模式， 遵循IC定义“t 时刻因子值→t+1 时刻收益”  
     :rtype: Indicator
 
 
