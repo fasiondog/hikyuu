@@ -1,6 +1,38 @@
 # 版本发布说明
 
-## 2.7.3 - 2025年1月6日
+## 2.7.5 - 2026年2月2日
+
+**🚀 新增特性**
+
+* feat(indicator): 支持增量计算。如新增 extend 方法，在当前已计算基础上，自动扩展只最新数据并只计算最新数据。主要用于实盘、监控等场景加速。
+* 复权增加成交量、成交金额复权
+* macosx 下序列化支持
+* feat(trade_sys): SE_MFxx 添加多因子选择器的复权方式配置参数(mf_recover_type), 指定MF使用特定的复权方式进行计算
+* feat(KData): KData增加 getKData 方法，部分情况下可加速获取
+
+**⚡️ 优化改进**
+
+* 优化 MF 内存占用过多的问题
+* 优化 windows 下数据量超过一定范围后并行计算性能可能出现的剧烈下降
+* 优化matplotlib交互模式参数设置问题, 当不在交互式会话中时，显式设置interactive参数为False，防止绘图过慢
+* 优化IC实现，使其可以作为普通指标公式使用
+* 优化全局并行计算任务
+
+**🐞 缺陷修复**
+
+* fixed 使用更安全的方式处理python临时对象类型降级问题，防止某些情况崩溃
+* fix(hikyuutdx): 初次使用下载时，板块信息下载报错
+* fixed(data): 调整科创板/北交所最小交易量配置为 100
+* fix(trade_sys): 卖出时通过MM判断卖出数量, 以便分钟级别回测时可以通过MM进行T+1控制
+* fix(allocatefunds): 修正资金分配权重计算逻辑, 确保实际分配的权重不超过可分配权重上限，避免超出预设的资金分配限制，提高资金分配的准确性和安全性
+* fixed MF_ICWeight, MF_ICIRWeight 使用标准化后的原始因子进行IC/ICIR权重计算
+* fix(trade_sys): 修复MultiFactorSelector指标设置后未重置计算状态的问题
+* fixed(importdata): 更新后出现KeyError: 'lazy_preload' error
+* fix(gui): start_qmt 用Query.get_base_ktype_list()替换Query.get_all_ktype()
+* fix(KQuery): 修正TRANS类型的时间转换参数,将g_ktype2sec映射中TRANS类型的值从60*24*3(表示3天)改为3，以确保时间转换逻辑的正确性。
+* fix(draw): 优化matplotlib中指标绘制，以便不同周期范围指标能够正确绘制
+
+## 2.7.3 - 2026年1月6日
 
 **🚀 新增特性**
 
