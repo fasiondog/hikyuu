@@ -151,6 +151,14 @@ Indicator
         :param Stock stock: 指定的 Stock
         :param Query query: 指定的查询条件
 
+    .. py:method:: extend(self)
+
+        在有上下文时，自动将上下文扩展至当前最新数据并进行增量计算
+
+        增量计算时，相当于当前query的起点不变，向后扩展至新的结束点。该特性对部分递归型指标对初值敏感，如AMA等可能存在部分差异
+
+        主要用途：实盘时，快速获取最新数据进行计算
+
     .. py:method:: to_array(self, result_index=0)
 
         将指定结果集转换为 numpy.array

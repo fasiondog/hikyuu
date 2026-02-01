@@ -71,6 +71,8 @@
     - 直接指定 MF: SE_MultiFactor2(mf, filter)
     - 参数直接创建
 
+    SE_MultiFactor2 有一个单独参数 "mf_recover_type", 使用 set_param 设置。指定 mf 使用固定的复权类型进行计算，比如使用固定前复权
+
       :param sequense(Indicator) inds: 原始因子列表
       :param int ic_n: 默认 IC 对应的 N 日收益率
       :param int ic_rolling_n: IC 滚动周期
