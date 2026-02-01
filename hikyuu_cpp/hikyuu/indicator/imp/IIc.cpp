@@ -170,9 +170,10 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
               inds.size(), returns.size());
 
     size_t stk_count = inds.size();
-    size_t days_total = inds[0].size();
-    HKU_CHECK(days_total >= 2, "The number of days is less than 2!");
     HKU_CHECK(stk_count >= 2, "The number of indicators is less than 2!");
+
+    size_t days_total = inds[0].size();
+    HKU_CHECK(days_total >= 2, "The size of ind is less than 2!");
 
     for (size_t i = 0; i < stk_count; i++) {
         HKU_CHECK(
@@ -184,8 +185,6 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
                   days_total, returns[i].size());
     }
 
-    PriceList ret;
-
     Indicator (*spearman)(const Indicator&, const Indicator&, int, bool) = hku::SPEARMAN;
     if (!use_spearman) {
         spearman = hku::CORR;
@@ -194,7 +193,7 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
     IndicatorList ref_inds(stk_count);
     global_parallel_for_index_void(0, stk_count, [&](size_t i) { ref_inds[i] = REF(inds[i], n); });
 
-    ret.resize(days_total, Null<price_t>());
+    PriceList ret(days_total, Null<price_t>());
     auto* dst = ret.data();
     global_parallel_for_index_void(0, days_total, [&, stk_count, dst](size_t i) {
         // 计算日截面 spearman 相关系数即 ic 值
@@ -224,8 +223,8 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
         }
     }
 
-    size_t discard = 0;
-    for (size_t i = discard; i < days_total; i++) {
+    size_t discard = days_total;
+    for (size_t i = 0; i < days_total; i++) {
         if (!std::isnan(dst[i])) {
             discard = i;
             break;

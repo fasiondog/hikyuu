@@ -452,49 +452,10 @@ Indicator MultiFactorBase::getIC(int ndays) {
     }
     HKU_IF_RETURN(ic_n == ndays && !m_ic.empty(), m_ic.clone());
 
-    size_t days_total = m_ref_dates.size();
-    Indicator result = PRICELIST(PriceList(days_total, Null<price_t>()));
-    result.name("IC");
-
-    IndicatorList tmp_ref_inds(m_all_factors.size());
-    for (size_t i = 0; i < m_all_factors.size(); i++) {
-        tmp_ref_inds[i] = REF(m_all_factors[i], ndays);
-    }
-
     auto all_returns = _getAllReturns(ndays);
-
-    size_t discard = ndays;
-    size_t ind_count = m_all_factors.size();
-
-    Indicator (*spearman)(const Indicator&, const Indicator&, int, bool) = hku::SPEARMAN;
-    if (!getParam<bool>("use_spearman")) {
-        spearman = hku::CORR;
-    }
-
-    auto* dst = result.data();
-    global_parallel_for_index_void(discard, days_total, [&, ind_count, dst](size_t i) {
-        PriceList tmp(ind_count, Null<price_t>());
-        PriceList tmp_return(ind_count, Null<price_t>());
-        for (size_t j = 0; j < ind_count; j++) {
-            tmp[j] = tmp_ref_inds[j][i];
-            tmp_return[j] = all_returns[j][i];
-        }
-        auto a = PRICELIST(tmp);
-        auto b = PRICELIST(tmp_return);
-        auto ic = spearman(a, b, ind_count, true);
-        if (ic.size() > 0) {
-            dst[i] = ic[ic.size() - 1];
-        }
-    });
-
-    discard = days_total;
-    for (size_t i = 0; i < days_total; i++) {
-        if (!std::isnan(dst[i])) {
-            discard = i;
-            break;
-        }
-    }
-    result.setDiscard(discard > days_total ? days_total : discard);
+    Indicator result = IC(m_all_factors, all_returns, ndays, getParam<bool>("use_spearman"));
+    result.setParam<DatetimeList>("align_date_list", m_ref_dates);
+    result.name("IC");
 
     // 如果 ndays 和 ic_n 参数相同，缓存计算结果
     if (ic_n == ndays) {
@@ -505,7 +466,7 @@ Indicator MultiFactorBase::getIC(int ndays) {
 
 Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
     Indicator ic = getIC(ic_n);
-    Indicator x = MA(ic, ir_n) / STDEV(ic, ir_n);
+    Indicator x = (MA(ic, ir_n) / STDEV(ic, ir_n)).getResult(0);
     x.name("ICIR");
     x.setParam<int>("n", ic_n);
     x.setParam<int>("rolling_n", ir_n);

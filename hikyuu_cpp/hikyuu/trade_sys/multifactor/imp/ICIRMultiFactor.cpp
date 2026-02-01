@@ -56,8 +56,8 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
               inds_stk.push_back(all_stk_inds[si][ii]);
           }
           Indicator ic = IC(inds_stk, all_returns, ic_n, spearman);
-          Indicator x = MA(ic, ir_n) / STDEV(ic, ir_n).getResult(0);
-          return x;
+          Indicator x = MA(ic, ir_n) / STDEV(ic, ir_n);
+          return x.getResult(0);
       });
 
     size_t discard = 0;

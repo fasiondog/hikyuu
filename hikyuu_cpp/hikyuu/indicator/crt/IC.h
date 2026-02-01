@@ -41,6 +41,7 @@ inline Indicator IC(const Indicator& ind, const Block& blk, int n = 1, bool spea
 /**
  * @brief 计算指定的因子列表相对于指定的收益列表的
  * IC，其中，inds和returns均为已经计算好并按日期对齐后的结果。inds不需要按n右移。
+ * @note 仅为数值计算，返回结果无对齐日期
  * @param inds 因子列表，inds不需要按n右移。
  * @param returns 收益列表
  * @param n 时间窗口 (对应 n 日收益率)
