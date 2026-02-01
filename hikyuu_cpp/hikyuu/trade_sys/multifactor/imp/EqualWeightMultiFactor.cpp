@@ -54,15 +54,14 @@ IndicatorList EqualWeightMultiFactor::_calculate(const vector<IndicatorList>& al
         ret.name("IC");
 
         // 更新 discard
+        size_t discard = days_total;
         for (size_t di = 0; di < days_total; di++) {
             if (!std::isnan(ret[di])) {
-                ret.setDiscard(di);
+                discard = di;
                 break;
             }
-            if (di == days_total - 1) {
-                ret.setDiscard(di);
-            }
         }
+        ret.setDiscard(discard);
         return ret;
     });
 }

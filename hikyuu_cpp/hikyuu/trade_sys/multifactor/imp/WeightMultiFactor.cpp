@@ -32,19 +32,13 @@ vector<Indicator> WeightMultiFactor::_calculate(const vector<IndicatorList>& all
     size_t ind_count = m_inds.size();
 
     return global_parallel_for_index(0, stk_count, [&](size_t si) {
-        vector<price_t> sumByDate(days_total);
-
-        size_t discard = 0;
+        vector<price_t> sumByDate(days_total, 0.0);
         const auto& curStkInds = all_stk_inds[si];
         for (size_t ii = 0; ii < ind_count; ii++) {
-            if (curStkInds[ii].discard() > discard) {
-                discard = curStkInds[ii].discard();
-            }
-        }
-
-        for (size_t di = discard; di < days_total; di++) {
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                const auto& value = curStkInds[ii][di];
+            const auto& curInd = curStkInds[ii];
+            const auto* ind_data = curInd.data();
+            for (size_t di = 0; di < days_total; di++) {
+                auto value = ind_data[di];
                 if (!std::isnan(value)) {
                     sumByDate[di] += value * m_weights[ii];
                 }
@@ -55,15 +49,15 @@ vector<Indicator> WeightMultiFactor::_calculate(const vector<IndicatorList>& all
         ret.name("IC");
 
         // 更新 discard
-        for (size_t di = discard; di < days_total; di++) {
+        size_t discard = days_total;
+        for (size_t di = 0; di < days_total; di++) {
             if (!std::isnan(ret[di])) {
-                ret.setDiscard(di);
+                discard = di;
                 break;
             }
-            if (di == days_total - 1) {
-                ret.setDiscard(di);
-            }
         }
+        ret.setDiscard(discard);
+
         return ret;
     });
 }
