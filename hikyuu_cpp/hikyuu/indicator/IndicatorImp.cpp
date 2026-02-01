@@ -24,6 +24,19 @@ namespace hku {
 
 bool IndicatorImp::ms_enable_increment_calculate{true};
 
+void IndicatorImp::initEngine() {
+    mi_option_enable(mi_option_large_os_pages);  // 启用大页面
+    mi_option_enable(mi_option_use_numa_nodes);  // 启用NUMA支持
+    mi_option_set(mi_option_purge_delay, 0);
+
+    mi_stats_reset();
+    // mi_stats_print(NULL);
+}
+
+void IndicatorImp::releaseEngine() {
+    // mi_stats_print(NULL);
+}
+
 string HKU_API getOPTypeName(IndicatorImp::OPType op) {
     string name;
     switch (op) {
@@ -117,15 +130,15 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
 }
 
 IndicatorImp::IndicatorImp() : m_name("IndicatorImp") {
-    memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(buffer_t *) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string &name) : m_name(name) {
-    memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(buffer_t *) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string &name, size_t result_num) : m_name(name) {
-    memset(m_pBuffer, 0, sizeof(vector<value_t> *) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(buffer_t *) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
     _readyBuffer(0, m_result_num);
 }
@@ -244,9 +257,6 @@ void IndicatorImp::setContext(const KData &k) {
         iter->second->setContext(k);
     }
 
-    // 重设上下文
-    // onlySetContext(k);
-
     // 启动重新计算
     calculate();
 
@@ -279,7 +289,7 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
     value_t null_price = Null<value_t>();
     for (size_t i = 0; i < result_num; ++i) {
         if (!m_pBuffer[i]) {
-            m_pBuffer[i] = new vector<value_t>(len, null_price);
+            m_pBuffer[i] = new buffer_t(len, null_price);
 
         } else {
             m_pBuffer[i]->resize(len);
@@ -349,7 +359,7 @@ void IndicatorImp::swap(IndicatorImp *other) {
     HKU_ASSERT(other->m_result_num == m_result_num);
     HKU_ASSERT(other->size() == size());
     for (size_t r = 0; r < m_result_num; ++r) {
-        vector<value_t> *tmp = m_pBuffer[r];
+        buffer_t *tmp = m_pBuffer[r];
         m_pBuffer[r] = other->m_pBuffer[r];
         other->m_pBuffer[r] = tmp;
     }
@@ -360,7 +370,7 @@ void IndicatorImp::swap(IndicatorImp *other, size_t other_result_idx, size_t sel
     HKU_ASSERT(other->size() == size());
     HKU_ASSERT(other_result_idx < other->m_result_num);
     HKU_ASSERT(self_result_idx < m_result_num);
-    vector<value_t> *tmp = m_pBuffer[self_result_idx];
+    buffer_t *tmp = m_pBuffer[self_result_idx];
     m_pBuffer[self_result_idx] = other->m_pBuffer[other_result_idx];
     other->m_pBuffer[other_result_idx] = tmp;
 }
@@ -468,7 +478,8 @@ PriceList IndicatorImp::getResultAsPriceList(size_t result_num) {
     std::copy(src.begin(), src.end(), result.begin());
     return result;
 #else
-    return (*m_pBuffer[result_num]);
+    // return (*m_pBuffer[result_num]);
+    return PriceList(m_pBuffer[result_num]->begin(), m_pBuffer[result_num]->end());
 #endif
 }
 

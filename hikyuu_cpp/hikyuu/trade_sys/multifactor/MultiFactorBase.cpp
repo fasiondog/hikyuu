@@ -471,11 +471,8 @@ Indicator MultiFactorBase::getIC(int ndays) {
         spearman = hku::CORR;
     }
 
-    // PriceList tmp(ind_count, Null<price_t>());
-    // PriceList tmp_return(ind_count, Null<price_t>());
     auto* dst = result.data();
     global_parallel_for_index_void(discard, days_total, [&, ind_count, dst](size_t i) {
-        // for (size_t i = discard; i < days_total; i++) {
         PriceList tmp(ind_count, Null<price_t>());
         PriceList tmp_return(ind_count, Null<price_t>());
         for (size_t j = 0; j < ind_count; j++) {
@@ -792,96 +789,63 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 }
 
 void MultiFactorBase::_buildIndex() {
+    size_t stk_count = m_stks.size();
+    for (size_t i = 0; i < stk_count; i++) {
+        m_stk_map[m_stks[i]] = i;
+    }
+
+    size_t days_total = m_ref_dates.size();
+    m_stk_factor_by_date.resize(days_total);
+    for (size_t i = 0; i < days_total; i++) {
+        m_date_index[m_ref_dates[i]] = i;
+        m_stk_factor_by_date[i].resize(stk_count);  // 每个日期预分配股票数量的空间
+    }
+
+    // 先遍历股票j，再遍历日期i，默认不排序
+    global_parallel_for_index_void(0, stk_count, [this, days_total](size_t j) {
+        const auto& stk = m_stks[j];
+        const auto* data = m_all_factors[j].data();
+        for (size_t i = 0; i < days_total; i++) {
+            m_stk_factor_by_date[i][j] = ScoreRecord(stk, data[i]);
+        }
+    });
+
     int mode = getParam<int>("mode");
     if (0 == mode) {
-        _buildIndexDesc();
+        global_parallel_for_index_void(
+          0, days_total,
+          [this](size_t i) {
+              std::sort(m_stk_factor_by_date[i].begin(), m_stk_factor_by_date[i].end(),
+                        [](const ScoreRecord& a, const ScoreRecord& b) {
+                            if (std::isnan(a.value) && std::isnan(b.value)) {
+                                return false;
+                            } else if (!std::isnan(a.value) && std::isnan(b.value)) {
+                                return true;
+                            } else if (std::isnan(a.value) && !std::isnan(b.value)) {
+                                return false;
+                            }
+                            return a.value > b.value;
+                        });
+          },
+          100);
+
     } else if (1 == mode) {
-        _buildIndexAsc();
-    } else {
-        _buildIndexNone();
-    }
-}
-
-void MultiFactorBase::_buildIndexDesc() {
-    size_t stk_count = m_stks.size();
-    HKU_ASSERT(stk_count == m_all_factors.size());
-    for (size_t i = 0; i < stk_count; i++) {
-        m_stk_map[m_stks[i]] = i;
-    }
-
-    // 建立每日截面的索引，并每日降序排序
-    size_t days_total = m_ref_dates.size();
-    m_stk_factor_by_date.resize(days_total);
-    ScoreRecordList one_day;
-    for (size_t i = 0; i < days_total; i++) {
-        one_day.resize(stk_count);
-        for (size_t j = 0; j < stk_count; j++) {
-            one_day[j] = ScoreRecord(m_stks[j], m_all_factors[j][i]);
-        }
-        std::sort(one_day.begin(), one_day.end(), [](const ScoreRecord& a, const ScoreRecord& b) {
-            if (std::isnan(a.value) && std::isnan(b.value)) {
-                return false;
-            } else if (!std::isnan(a.value) && std::isnan(b.value)) {
-                return true;
-            } else if (std::isnan(a.value) && !std::isnan(b.value)) {
-                return false;
-            }
-            return a.value > b.value;
-        });
-        m_stk_factor_by_date[i] = std::move(one_day);
-        m_date_index[m_ref_dates[i]] = i;
-    }
-}
-
-void MultiFactorBase::_buildIndexAsc() {
-    size_t stk_count = m_stks.size();
-    HKU_ASSERT(stk_count == m_all_factors.size());
-    for (size_t i = 0; i < stk_count; i++) {
-        m_stk_map[m_stks[i]] = i;
-    }
-
-    // 建立每日截面的索引，并每日升序排序
-    size_t days_total = m_ref_dates.size();
-    m_stk_factor_by_date.resize(days_total);
-    ScoreRecordList one_day;
-    for (size_t i = 0; i < days_total; i++) {
-        one_day.resize(stk_count);
-        for (size_t j = 0; j < stk_count; j++) {
-            one_day[j] = ScoreRecord(m_stks[j], m_all_factors[j][i]);
-        }
-        std::sort(one_day.begin(), one_day.end(), [](const ScoreRecord& a, const ScoreRecord& b) {
-            if (std::isnan(a.value) && std::isnan(b.value)) {
-                return false;
-            } else if (!std::isnan(a.value) && std::isnan(b.value)) {
-                return true;
-            } else if (std::isnan(a.value) && !std::isnan(b.value)) {
-                return false;
-            }
-            return a.value < b.value;
-        });
-        m_stk_factor_by_date[i] = std::move(one_day);
-        m_date_index[m_ref_dates[i]] = i;
-    }
-}
-
-void MultiFactorBase::_buildIndexNone() {
-    size_t stk_count = m_stks.size();
-    HKU_ASSERT(stk_count == m_all_factors.size());
-    for (size_t i = 0; i < stk_count; i++) {
-        m_stk_map[m_stks[i]] = i;
-    }
-
-    // 建立每日截面的索引，不排序
-    size_t days_total = m_ref_dates.size();
-    m_stk_factor_by_date.resize(days_total);
-    ScoreRecordList one_day;
-    for (size_t i = 0; i < days_total; i++) {
-        one_day.resize(stk_count);
-        for (size_t j = 0; j < stk_count; j++) {
-            one_day[j] = ScoreRecord(m_stks[j], m_all_factors[j][i]);
-        }
-        m_stk_factor_by_date[i] = std::move(one_day);
-        m_date_index[m_ref_dates[i]] = i;
+        global_parallel_for_index_void(
+          0, days_total,
+          [this](size_t i) {
+              std::sort(m_stk_factor_by_date[i].begin(), m_stk_factor_by_date[i].end(),
+                        [](const ScoreRecord& a, const ScoreRecord& b) {
+                            if (std::isnan(a.value) && std::isnan(b.value)) {
+                                return false;
+                            } else if (!std::isnan(a.value) && std::isnan(b.value)) {
+                                return true;
+                            } else if (std::isnan(a.value) && !std::isnan(b.value)) {
+                                return false;
+                            }
+                            return a.value < b.value;
+                        });
+          },
+          100);
     }
 }
 
@@ -893,7 +857,7 @@ void MultiFactorBase::calculate() {
 
     try {
         {  // 获取所有证券所有对齐后的原始因子
-            vector<vector<Indicator>> all_stk_inds = getAllSrcFactors();
+            vector<IndicatorList> all_stk_inds = getAllSrcFactors();
 
             if (m_inds.size() == 1) {
                 // 直接使用原始因子
@@ -919,8 +883,8 @@ void MultiFactorBase::calculate() {
     }
 
     if (!getParam<bool>("save_all_factors")) {
-        IndicatorList().swap(m_all_factors);
-        unordered_map<Stock, size_t>().swap(m_stk_map);
+        m_all_factors = {};
+        m_stk_map = {};
     }
 
     // 更新计算状态

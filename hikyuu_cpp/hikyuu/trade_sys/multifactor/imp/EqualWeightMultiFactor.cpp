@@ -23,8 +23,7 @@ EqualWeightMultiFactor::EqualWeightMultiFactor(const vector<Indicator>& inds, co
 : MultiFactorBase(inds, stks, query, ref_stk, "MF_EqualWeight", ic_n, spearman, mode,
                   save_all_factors) {}
 
-vector<Indicator> EqualWeightMultiFactor::_calculate(
-  const vector<vector<Indicator>>& all_stk_inds) {
+IndicatorList EqualWeightMultiFactor::_calculate(const vector<IndicatorList>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
@@ -34,9 +33,10 @@ vector<Indicator> EqualWeightMultiFactor::_calculate(
         vector<size_t> countByDate(days_total);
 
         const auto& curStkInds = all_stk_inds[si];
-        for (size_t di = 0; di < days_total; di++) {
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                const auto& value = curStkInds[ii][di];
+        for (size_t ii = 0; ii < ind_count; ii++) {
+            const auto* curInd = curStkInds[ii].data();
+            for (size_t di = 0; di < days_total; di++) {
+                auto value = curInd[di];
                 if (!std::isnan(value)) {
                     sumByDate[di] += value;
                     countByDate[di] += 1;

@@ -9,6 +9,7 @@
 #ifndef INDICATORIMP_H_
 #define INDICATORIMP_H_
 
+#include <mimalloc.h>
 #include "../config.h"
 #include "../KData.h"
 #include "../utilities/Parameter.h"
@@ -56,6 +57,7 @@ public:
 #else
     typedef double value_t;
 #endif
+    typedef vector<value_t, mi_stl_allocator<value_t>> buffer_t;
 
 public:
     /** 默认构造函数   */
@@ -292,7 +294,8 @@ protected:
     size_t m_result_num{0};
     KData m_context;
     KData m_old_context;
-    vector<value_t>* m_pBuffer[MAX_RESULT_NUM];
+
+    buffer_t* m_pBuffer[MAX_RESULT_NUM];
 
     bool m_need_context{false};
     bool m_is_python_object{false};
@@ -309,8 +312,8 @@ protected:
     IndicatorImp* m_parent{nullptr};  // can't use shared_from_this in python, so not weak_ptr
 
 public:
-    static void initDynEngine();
-    static void releaseDynEngine();
+    static void initEngine();
+    static void releaseEngine();
 
 protected:
     static bool ms_enable_increment_calculate;
@@ -351,7 +354,7 @@ private:
         for (size_t i = 0; i < act_result_num; ++i) {
             size_t count = size();
             ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
-            vector<value_t>& values = *m_pBuffer[i];
+            buffer_t& values = *m_pBuffer[i];
             for (size_t j = 0; j < count; j++) {
                 if (std::isnan(values[j])) {
                     ar& boost::serialization::make_nvp<string>("item", nan);
@@ -392,7 +395,7 @@ private:
         for (size_t i = 0; i < act_result_num; ++i) {
             size_t count = 0;
             ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
-            vector<value_t>& values = *m_pBuffer[i];
+            buffer_t& values = *m_pBuffer[i];
             values.resize(count);
             for (size_t j = 0; j < count; j++) {
                 std::string vstr;
@@ -529,6 +532,27 @@ inline IndicatorImpPtr IndicatorImp::getLeftNode() const noexcept {
 
 inline IndicatorImpPtr IndicatorImp::getThreeNode() const noexcept {
     return m_three;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const IndicatorImp::buffer_t& p) {
+    if (p.empty()) {
+        os << "[]";
+        return os;
+    }
+
+    size_t len = p.size();
+    const size_t print = 3;
+    os << "[";
+    for (size_t i = 0; i < len; i++) {
+        if ((i < print) || (i + print >= len)) {
+            os << p[i];
+            if (i + 1 != len)
+                os << ", ";
+        } else if (i == 3)
+            os << "..., ";
+    }
+    os << "]";
+    return os;
 }
 
 } /* namespace hku */
