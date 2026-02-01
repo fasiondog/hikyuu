@@ -364,7 +364,12 @@ void export_extend_Indicator(py::module& m) {
           HKU_CHECK(py::hasattr(agg_func, "__call__"), "agg_func not callable!");
           HKU_CHECK(check_pyfunction_arg_num(agg_func, 2), "Number of parameters does not match!");
           PyAggFunc agg_func_obj(agg_func.attr("__call__"));
-          auto ret = AGG_FUNC(ind, agg_func_obj, ktype, fill_null, unit);
+          Indicator ret;
+          {
+              OStreamToPython guard(false);
+              py::gil_scoped_release release;
+              ret = AGG_FUNC(ind, agg_func_obj, ktype, fill_null, unit);
+          }
           return ret;
       },
       py::arg("ind"), py::arg("agg_func"), py::arg("ktype") = KQuery::MIN,
@@ -402,7 +407,12 @@ void export_extend_Indicator(py::module& m) {
           HKU_CHECK(check_pyfunction_arg_num(group_func, 2),
                     "Number of parameters does not match!");
           PyGroupFunc func_obj(group_func.attr("__call__"));
-          auto ret = GROUP_FUNC(ind, func_obj, ktype, unit);
+          Indicator ret;
+          {
+              OStreamToPython guard(false);
+              py::gil_scoped_release release;
+              ret = GROUP_FUNC(ind, func_obj, ktype, unit);
+          }
           return ret;
       },
       py::arg("ind"), py::arg("group_func"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1,
