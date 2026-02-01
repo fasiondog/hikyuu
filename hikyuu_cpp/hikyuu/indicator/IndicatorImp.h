@@ -76,6 +76,7 @@ public:
     size_t discard() const noexcept;
 
     void setDiscard(size_t discard) noexcept;
+    void updateDiscard(bool force = false) noexcept;
 
     size_t size() const noexcept;
 
@@ -284,9 +285,6 @@ protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
 
     void onlySetContext(const KData&);
-
-    // 用于动态参数时，更新 discard
-    void _update_discard(bool force = false);
 
 protected:
     string m_name;

@@ -51,17 +51,8 @@ IndicatorList EqualWeightMultiFactor::_calculate(const vector<IndicatorList>& al
         }
 
         Indicator ret = PRICELIST(sumByDate);
+        ret.updateDiscard(true);
         ret.name("IC");
-
-        // 更新 discard
-        size_t discard = days_total;
-        for (size_t di = 0; di < days_total; di++) {
-            if (!std::isnan(ret[di])) {
-                discard = di;
-                break;
-            }
-        }
-        ret.setDiscard(discard);
         return ret;
     });
 }

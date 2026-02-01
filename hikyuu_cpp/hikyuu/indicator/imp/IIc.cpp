@@ -150,7 +150,7 @@ void IIc::_calculate(const Indicator& inputInd) {
         m_discard = 0;
     }
 
-    _update_discard();
+    updateDiscard();
 }
 
 Indicator HKU_API IC(const StockList& stks, int n, bool spearman, bool strict) {

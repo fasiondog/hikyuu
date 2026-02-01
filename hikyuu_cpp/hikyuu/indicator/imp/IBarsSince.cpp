@@ -66,7 +66,7 @@ void IBarsSince::_calculate(const Indicator &ind) {
                 dst[i] = Null<value_t>();
             }
         }
-        _update_discard();
+        updateDiscard();
         return;
     }
 
@@ -83,7 +83,7 @@ void IBarsSince::_calculate(const Indicator &ind) {
         }
         dst[i] = found ? pos : Null<value_t>();
     }
-    _update_discard();
+    updateDiscard();
 }
 
 Indicator HKU_API BARSSINCE() {

@@ -128,7 +128,7 @@ void IMacd::_dyn_calculate(const Indicator& ind) {
     global_parallel_for_index_void(ind.discard(), total,
                                    [&](size_t i) { _dyn_one_circle(ind, i, n1[i], n2[i], n3[i]); });
 
-    _update_discard();
+    updateDiscard();
 }
 
 Indicator HKU_API MACD(int n1, int n2, int n3) {

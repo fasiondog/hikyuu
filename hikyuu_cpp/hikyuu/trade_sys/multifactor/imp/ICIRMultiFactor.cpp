@@ -89,15 +89,8 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
         }
 
         Indicator ret = PRICELIST(new_values);
+        ret.updateDiscard(true);
         ret.name("ICIR");
-
-        const auto* data = ret.data();
-        for (size_t di = discard; di < days_total; di++) {
-            if (!std::isnan(data[di])) {
-                ret.setDiscard(discard);
-            }
-        }
-
         return ret;
     });
 }

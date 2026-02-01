@@ -124,7 +124,7 @@ void ISaftyLoss::_dyn_calculate(const Indicator& ind) {
     global_parallel_for_index_void(
       ind.discard(), total, [&](size_t i) { _dyn_one_circle(ind, i, n1[i], n2[i], p[i]); }, 400);
 
-    _update_discard();
+    updateDiscard();
 }
 
 Indicator HKU_API SAFTYLOSS(int n1, int n2, double p) {

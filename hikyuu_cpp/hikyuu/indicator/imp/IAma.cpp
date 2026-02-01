@@ -186,7 +186,7 @@ void IAma::_dyn_calculate(const Indicator& ind) {
       ind.discard(), total, [&](size_t i) { _dyn_one_circle(ind, i, n[i], fast_n[i], slow_n[i]); },
       400);
 
-    _update_discard();
+    updateDiscard();
 }
 
 Indicator HKU_API AMA(int n, int fast_n, int slow_n) {

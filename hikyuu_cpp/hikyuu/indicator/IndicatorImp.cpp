@@ -884,7 +884,7 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
         _increment_calculate(ind, start_pos);
     }
 
-    _update_discard();
+    updateDiscard();
     return true;
 }
 
@@ -1906,7 +1906,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
                 _dyn_run_one_step(ind, i, step);
             }
         }
-        _update_discard();
+        updateDiscard();
         return;
     }
 
@@ -1922,10 +1922,10 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
       },
       minCircleLength);
 
-    _update_discard();
+    updateDiscard();
 }
 
-void IndicatorImp::_update_discard(bool force) {
+void IndicatorImp::updateDiscard(bool force) noexcept {
     if (force) {
         m_discard = 0;
     }

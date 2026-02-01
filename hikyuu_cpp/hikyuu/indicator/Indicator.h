@@ -93,6 +93,9 @@ public:
     /** 设置抛弃的个数，如果小于原有的discard则无效 */
     void setDiscard(size_t discard) noexcept;
 
+    /** 根据自身数值，更新抛弃的个数, force=true则强制更新, 否则从当前自身的 discard() 开始更新 */
+    void updateDiscard(bool force = false) noexcept;
+
     /** 返回有几个结果集输出 */
     size_t getResultNumber() const noexcept;
 
@@ -302,6 +305,12 @@ inline size_t Indicator::discard() const noexcept {
 inline void Indicator::setDiscard(size_t discard) noexcept {
     if (m_imp) {
         m_imp->setDiscard(discard);
+    }
+}
+
+inline void Indicator::updateDiscard(bool force) noexcept {
+    if (m_imp) {
+        m_imp->updateDiscard(force);
     }
 }
 

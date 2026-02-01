@@ -91,7 +91,7 @@ void ISma::_dyn_calculate(const Indicator& ind) {
     global_parallel_for_index_void(
       ind.discard(), total, [&](size_t i) { _dyn_one_circle(ind, i, n[i], m[i]); }, 400);
 
-    _update_discard();
+    updateDiscard();
 }
 
 Indicator HKU_API SMA(int n, double m) {
