@@ -45,13 +45,18 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
     int ic_rolling_n = getParam<int>("ic_rolling_n");
     bool spearman = getParam<bool>("use_spearman");
 
-    // 计算每个原始因子的滚动IC值
-    auto ref_k = m_ref_stk.getKData(m_query);
-
-    IndicatorList ic = global_parallel_for_index(
-      0, ind_count, [this, ic_n, ic_rolling_n, spearman, &ref_k](size_t ii) {
-          return MA(IC(m_inds[ii], m_stks, ic_n, spearman), ic_rolling_n)(ref_k).getResult(0)();
+    // 计算每个经过标准化/风格化的原始因子的滚动IC值
+    IndicatorList all_returns = _getAllReturns(ic_n);
+    IndicatorList ic =
+      global_parallel_for_index(0, ind_count, [&, ic_n, spearman, ic_rolling_n](size_t ii) {
+          IndicatorList inds_stk;
+          inds_stk.reserve(stk_count);
+          for (size_t si = 0; si < stk_count; si++) {
+              inds_stk.push_back(all_stk_inds[si][ii]);
+          }
+          return MA(IC(inds_stk, all_returns, ic_n, spearman), ic_rolling_n).getResult(0);
       });
+
     size_t discard = 0;
     for (size_t ii = 0; ii < ind_count; ii++) {
         if (ic[ii].discard() > discard) {

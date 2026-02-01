@@ -183,8 +183,10 @@ private:
 
     void _buildIndex();  // 计算完成后创建截面索引
 
-    IndicatorList _getAllReturns(int ndays) const;
     void _checkData();
+
+protected:
+    IndicatorList _getAllReturns(int ndays) const;
 
 protected:
     bool m_is_python_object{false};

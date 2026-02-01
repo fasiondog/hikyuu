@@ -162,4 +162,77 @@ Indicator HKU_API IC(const Block& blk, int n, bool spearman, bool strict) {
     return IC(stks, n, spearman, strict);
 }
 
+Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_spearman,
+                     bool strict) {
+    HKU_CHECK(n >= 1, "The n({}) must be greater than 1!", n);
+    HKU_CHECK(inds.size() == returns.size(),
+              "The number({}) of indicators is not equal to the number({}) of returns!",
+              inds.size(), returns.size());
+
+    size_t stk_count = inds.size();
+    size_t days_total = inds[0].size();
+    HKU_CHECK(days_total >= 2, "The number of days is less than 2!");
+    HKU_CHECK(stk_count >= 2, "The number of indicators is less than 2!");
+
+    for (size_t i = 0; i < stk_count; i++) {
+        HKU_CHECK(
+          inds[i].size() == days_total,
+          "{}: The number of days({}) is not equal to the number of days({}) of indicators!", i,
+          days_total, inds[i].size());
+        HKU_CHECK(returns[i].size() == days_total,
+                  "{} The number of days({}) is not equal to the number of days({}) of returns!", i,
+                  days_total, returns[i].size());
+    }
+
+    PriceList ret;
+
+    Indicator (*spearman)(const Indicator&, const Indicator&, int, bool) = hku::SPEARMAN;
+    if (!use_spearman) {
+        spearman = hku::CORR;
+    }
+
+    IndicatorList ref_inds(stk_count);
+    global_parallel_for_index_void(0, stk_count, [&](size_t i) { ref_inds[i] = REF(inds[i], n); });
+
+    ret.resize(days_total, Null<price_t>());
+    auto* dst = ret.data();
+    global_parallel_for_index_void(0, days_total, [&, stk_count, dst](size_t i) {
+        // 计算日截面 spearman 相关系数即 ic 值
+        PriceList tmp(stk_count, Null<price_t>());
+        PriceList tmp_return(stk_count, Null<price_t>());
+        for (size_t j = 0; j < stk_count; j++) {
+            tmp[j] = ref_inds[j][i];
+            tmp_return[j] = returns[j][i];
+        }
+        auto a = PRICELIST(tmp);
+        auto b = PRICELIST(tmp_return);
+        auto ic = spearman(a, b, stk_count, true);
+        if (ic.size() > 0) {
+            dst[i] = ic[ic.size() - 1];
+        }
+    });
+
+    if (strict) {
+        // 严格模式，即当前时刻对应未来收益计算结果
+        for (size_t i = n; i < days_total; i++) {
+            dst[i - n] = dst[i];
+        }
+        if (days_total > n) {
+            for (size_t i = days_total - n; i < days_total; i++) {
+                dst[i] = Null<price_t>();
+            }
+        }
+    }
+
+    size_t discard = 0;
+    for (size_t i = discard; i < days_total; i++) {
+        if (!std::isnan(dst[i])) {
+            discard = i;
+            break;
+        }
+    }
+
+    return PRICELIST(ret, discard);
+}
+
 }  // namespace hku

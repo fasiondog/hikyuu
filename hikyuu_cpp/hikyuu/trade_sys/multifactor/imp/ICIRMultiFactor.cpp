@@ -47,9 +47,17 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
 
     auto ref_k = m_ref_stk.getKData(m_query);
 
-    vector<Indicator> icir =
-      global_parallel_for_index(0, ind_count, [this, ic_n, ir_n, spearman, &ref_k](size_t ii) {
-          return ICIR(m_inds[ii], m_stks, ic_n, ir_n, spearman)(ref_k).getResult(0)();
+    IndicatorList all_returns = _getAllReturns(ic_n);
+    IndicatorList icir =
+      global_parallel_for_index(0, ind_count, [&, ic_n, ir_n, spearman](size_t ii) {
+          IndicatorList inds_stk;
+          inds_stk.reserve(stk_count);
+          for (size_t si = 0; si < stk_count; si++) {
+              inds_stk.push_back(all_stk_inds[si][ii]);
+          }
+          Indicator ic = IC(inds_stk, all_returns, ic_n, spearman);
+          Indicator x = MA(ic, ir_n) / STDEV(ic, ir_n).getResult(0);
+          return x;
       });
 
     size_t discard = 0;

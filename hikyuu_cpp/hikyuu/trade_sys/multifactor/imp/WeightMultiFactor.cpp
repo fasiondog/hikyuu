@@ -26,7 +26,7 @@ WeightMultiFactor::WeightMultiFactor(const vector<Indicator>& inds, const PriceL
     HKU_ASSERT(inds.size() == weights.size());
 }
 
-vector<Indicator> WeightMultiFactor::_calculate(const vector<vector<Indicator>>& all_stk_inds) {
+vector<Indicator> WeightMultiFactor::_calculate(const vector<IndicatorList>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();
     size_t ind_count = m_inds.size();
