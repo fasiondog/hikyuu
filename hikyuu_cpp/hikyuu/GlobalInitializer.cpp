@@ -156,8 +156,6 @@ void GlobalInitializer::clean() {
     DataDriverFactory::release();
     IndicatorImp::releaseEngine();
 
-    sm.clearPlugin();
-
 #if HKU_ENABLE_TA_LIB
     TA_Shutdown();
 #endif
