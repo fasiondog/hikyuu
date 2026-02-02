@@ -6,7 +6,7 @@ set_project("hikyuu")
 add_rules("mode.debug", "mode.release", "mode.coverage")
 
 -- version
-set_version("2.7.5", {build = "%Y%m%d%H%M"})
+set_version("2.7.6", {build = "%Y%m%d%H%M"})
 
 set_warnings("all")
 
