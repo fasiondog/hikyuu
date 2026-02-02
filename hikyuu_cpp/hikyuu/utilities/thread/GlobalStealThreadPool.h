@@ -321,7 +321,7 @@ private:
         } else {
             // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
-            m_cv.wait_for(lk, std::chrono::microseconds(10), [this] {
+            m_cv.wait(lk, [this] {
                 return this->m_done.load(std::memory_order_acquire) ||
                        !this->m_master_work_queue.empty() ||
                        (m_local_work_queue && !m_local_work_queue->empty()) ||
