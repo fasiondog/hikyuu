@@ -123,8 +123,8 @@ def save_block(stkcodes: list,  filename: str):
     # hku_info(f"已保存至 {filename}")
 
 
-@timeout(60*10)
 @hku_catch(trace=False)
+@timeout(60*10)
 def down_em_all_hybk_info():
     """下载东财所有行业板块列表"""
     save_path = f'{_BLOCK_SAVE_PATH}/行业板块'
@@ -151,8 +151,8 @@ def down_em_all_hybk_info():
             time.sleep(random.uniform(1, 3))
 
 
-@timeout(60*10)
 @hku_catch(trace=False)
+@timeout(60*10)
 def down_em_all_gnbk_info():
     """获取所有概念版本列表"""
     save_path = f'{_BLOCK_SAVE_PATH}/概念板块'
@@ -181,8 +181,8 @@ def down_em_all_gnbk_info():
             time.sleep(random.uniform(1, 3))
 
 
-@timeout(60*10)
 @hku_catch(trace=False)
+@timeout(60*10)
 def down_em_all_dybk_info():
     """获取所有地域板块列表"""
     save_path = f'{_BLOCK_SAVE_PATH}/地域板块'
@@ -245,8 +245,8 @@ def down_em_all_dybk_info():
         hku_info(f'{i+1}|{total} 获取地域板块{blk_name}成分: {len(stk_codes)}')
 
 
-@timeout(60*10)
 @hku_catch(trace=False)
+@timeout(60*10)
 def download_all_zsbk_info():
     """获取所有指数成分股列表"""
     save_path = f'{_BLOCK_SAVE_PATH}/指数板块'
