@@ -247,17 +247,23 @@ def crtSP(get_real_buy_price, get_real_sell_price, params={}, name='crtSP', calc
 # ------------------------------------------------------------------
 # stoploss
 # ------------------------------------------------------------------
-def crtST(func, params={}, name='crtST'):
+def crtST(get_price, params={}, name='crtST', calculate=None, get_short_price=None):
     """
     快速创建止损/止盈策略
 
-    :param func: 止损/止盈策略函数
+    :param get_price: 止损/止盈策略获取止损价接口函数
     :param {} params: 参数字典
     :param str name: 自定义名称
+    :param calculate: 止损/止盈策略初始化计算函数
+    :param get_short_price: 获取空头止损价接口函数
     :return: 止损/止盈策略实例
     """
     meta_x = type(name, (StoplossBase, ), {'__init__': part_init, '_clone': part_clone})
-    meta_x._calculate = func
+    meta_x.get_price = get_price
+    if calculate is not None:
+        meta_x._calculate = calculate
+    if get_short_price is not None:
+        meta_x.get_short_price = get_short_price
     ret = meta_x(name, params)
     globals().update(dict(_=ret))
     return ret

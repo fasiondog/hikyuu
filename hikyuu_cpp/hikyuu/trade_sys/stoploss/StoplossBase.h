@@ -83,8 +83,8 @@ public:
     /** 子类克隆接口 */
     virtual StoplossPtr _clone() = 0;
 
-    /** 子类计算接口，由setTO调用 */
-    virtual void _calculate() = 0;
+    /** 子类初始化计算接口，由setTO调用 */
+    virtual void _calculate() {};
 
     bool isPythonObject() const noexcept {
         return m_is_python_object;

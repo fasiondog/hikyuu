@@ -28,7 +28,7 @@ public:
     }
 
     void _calculate() override {
-        PYBIND11_OVERLOAD_PURE(void, StoplossBase, _calculate, );
+        PYBIND11_OVERLOAD(void, StoplossBase, _calculate, );
     }
 
     void _reset() override {
