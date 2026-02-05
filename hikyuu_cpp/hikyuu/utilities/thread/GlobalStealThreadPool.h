@@ -244,9 +244,7 @@ public:
                     m_thread_need_stop.set();
                 }
             } else if (pop_task_from_other_thread_queue(task)) {
-                if (!task.isNullTask()) {
-                    task();
-                }
+                task();
             } else {
                 task_run = false;
             }
@@ -315,9 +313,7 @@ private:
                 m_thread_need_stop.set();
             }
         } else if (pop_task_from_other_thread_queue(task)) {
-            if (!task.isNullTask()) {
-                task();
-            }
+            task();
         } else {
             // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
