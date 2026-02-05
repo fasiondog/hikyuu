@@ -365,7 +365,7 @@ IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators
     IndicatorList ret;
     ret.reserve(indicators.size());
     for (const auto& ind : indicators) {
-        ret.push_back(ind.clone());
+        ret.push_back(ind);
     }
 
     vector<IndicatorImpPtr> sub_nodes;
