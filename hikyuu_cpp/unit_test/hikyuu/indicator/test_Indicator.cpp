@@ -1,4 +1,4 @@
-﻿/*
+/*
  * test_Indicator.cpp
  *
  *  Created on: 2013-4-11
@@ -897,6 +897,74 @@ TEST_CASE("test_indicator_increment_calculate") {
     CHECK_EQ(x.size(), y.size());
     CHECK_EQ(x[159], 1.0);
     CHECK_EQ(x[159], y[159]);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_combineCalculateIndicators") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KQuery query(0, 20);
+    KData kdata = stock.getKData(query);
+
+    /** @arg 空指标列表 */
+    IndicatorList empty_indicators;
+    IndicatorList result = combineCalculateIndicators(empty_indicators, kdata);
+    CHECK_EQ(result.size(), 0);
+
+    /** @arg 单个简单指标 */
+    Indicator close_ind = CLOSE();
+    IndicatorList single_indicator{close_ind};
+    result = combineCalculateIndicators(single_indicator, kdata);
+    check_indicator(result[0], CLOSE(kdata));
+
+    /** @arg 多个简单指标 */
+    Indicator open_ind = OPEN();
+    Indicator high_ind = HIGH();
+    Indicator low_ind = LOW();
+    IndicatorList multi_indicators{close_ind, open_ind, high_ind, low_ind};
+    result = combineCalculateIndicators(multi_indicators, kdata);
+    CHECK_EQ(result.size(), 4);
+    check_indicator(result[0], CLOSE(kdata));
+    check_indicator(result[1], OPEN(kdata));
+    check_indicator(result[2], HIGH(kdata));
+    check_indicator(result[3], LOW(kdata));
+
+    /** @arg 包含复合指标 */
+    Indicator ma_close = MA(CLOSE(), 5);
+    Indicator rsi_close = RSI(CLOSE(), 14);
+    IndicatorList complex_indicators{ma_close, rsi_close};
+    result = combineCalculateIndicators(complex_indicators, kdata);
+    check_indicator(result[0], MA(CLOSE(kdata), 5));
+    check_indicator(result[1], RSI(CLOSE(kdata), 14));
+
+    /** @arg 测试 tovalue 参数为 true */
+    result = combineCalculateIndicators(complex_indicators, kdata, true);
+    CHECK_EQ(result.size(), 2);
+    // 当 tovalue 为 true 时，应该只返回第一个结果列
+    CHECK_EQ(result[0].getResultNumber(), 1);
+    CHECK_EQ(result[1].getResultNumber(), 1);
+    CHECK_UNARY(result[0].equal(MA(CLOSE(kdata), 5)));
+    CHECK_UNARY(result[1].equal(RSI(CLOSE(kdata), 14)));
+
+    /** @arg 测试不同的 KData 上下文 */
+    KQuery query2(10, 30);
+    KData kdata2 = stock.getKData(query2);
+    result = combineCalculateIndicators(multi_indicators, kdata2);
+    check_indicator(result[0], CLOSE(kdata2));
+    check_indicator(result[1], OPEN(kdata2));
+    check_indicator(result[2], HIGH(kdata2));
+    check_indicator(result[3], LOW(kdata2));
+
+    /** @arg 测试包含相同子节点的指标（应该去重） */
+    Indicator close1 = CLOSE();
+    Indicator close2 = CLOSE();  // 相同的指标
+    IndicatorList duplicate_indicators{close1, close2};
+    result = combineCalculateIndicators(duplicate_indicators, kdata);
+    CHECK_EQ(result.size(), 2);
+    // 虽然是相同的指标，但是会被克隆成不同的实例
+    CHECK_NE(result[0].getImp().get(), result[1].getImp().get());
+    check_indicator(result[0], CLOSE(kdata));
+    check_indicator(result[1], CLOSE(kdata));
 }
 
 /** @} */

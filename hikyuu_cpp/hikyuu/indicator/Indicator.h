@@ -491,6 +491,32 @@ Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, const Indicator& 
 Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t b);
 Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b);
 
+/**
+ * 组合计算多个指标
+ * @details
+ * 将多个指标组合在一起进行统一计算，自动处理指标间的依赖关系和上下文设置。
+ * 该函数会克隆所有输入指标，获取它们的所有子节点并去重，然后为每个指标设置指定的K线数据上下文，
+ * 最后执行计算并返回结果。
+ * 
+ * <pre>
+ * 用法示例：
+ * IndicatorList inds = {MA(CLOSE(), 5), MA(CLOSE(), 10), MACD(CLOSE())};
+ * IndicatorList results = combineCalculateIndicators(inds, kdata);
+ * // results 包含所有计算后的指标结果
+ * 
+ * // 只获取第一个结果列
+ * IndicatorList first_results = combineCalculateIndicators(inds, kdata, true);
+ * </pre>
+ * 
+ * @param indicators 指标列表，需要进行组合计算的指标集合
+ * @param kdata K线数据上下文，用于设置指标计算的环境
+ * @param tovalue 是否只返回第一个结果列，默认为false（返回所有结果列）
+ * @return IndicatorList 计算后的指标结果列表
+ * @ingroup Indicator
+ */
+IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,
+                                                 const KData& kdata, bool tovalue = false);
+
 } /* namespace hku */
 
 namespace std {

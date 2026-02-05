@@ -489,6 +489,7 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     size_t total = size();
     imp->_readyBuffer(total, 1);
     imp->setDiscard(discard());
+    imp->name(name());
     auto const *src = this->data(result_num);
     auto *dst = imp->data(0);
     for (size_t i = discard(); i < total; ++i) {

@@ -21,6 +21,10 @@ namespace hku {
 
 class HKU_API Indicator;
 class HKU_API IndParam;
+class HKU_API IndicatorAssemble;
+
+vector<Indicator> HKU_API combineCalculateIndicators(const vector<Indicator>& indicators,
+                                                     const KData& kdata, bool tovalue);
 
 /**
  * 指标实现类，定义新指标时，应从此类继承
@@ -29,6 +33,11 @@ class HKU_API IndParam;
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
     PARAMETER_SUPPORT_WITH_CHECK
     friend HKU_API std::ostream& operator<<(std::ostream& os, const IndicatorImp& imp);
+
+    typedef vector<Indicator> IndicatorList;
+    friend IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,
+                                                            const KData& kdata, bool tovalue);
+    friend class HKU_API IndicatorAssemble;
 
 public:
     enum OPType : uint8_t {
