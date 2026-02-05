@@ -831,15 +831,6 @@ inline void TradeManagerBase::paramChanged() {}
 typedef shared_ptr<TradeManagerBase> TradeManagerPtr;
 typedef shared_ptr<TradeManagerBase> TMPtr;
 
-/**
- * 从账户列表中一次性获取资金列表
- * @param tm_list
- * @param ref_dates
- * @return vector<FundsList>
- * @ingroup TradeManagerClass
- */
-vector<FundsList> HKU_API getFundsList(const vector<TMPtr>& tm_list, const DatetimeList& ref_dates);
-
 inline std::ostream& operator<<(std::ostream& os, const TradeManagerBase& tm) {
     os << tm.str();
     return os;

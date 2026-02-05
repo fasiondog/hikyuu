@@ -81,14 +81,14 @@ bool Performance::exist(const string& key) {
     return ret;
 }
 
-Performance& Performance::operator=(const Performance& other) {
+Performance& Performance::operator=(const Performance& other) noexcept {
     HKU_IF_RETURN(this == &other, *this);
     m_result = other.m_result;
     m_keys = other.m_keys;
     return *this;
 }
 
-Performance& Performance::operator=(Performance&& other) {
+Performance& Performance::operator=(Performance&& other) noexcept {
     HKU_IF_RETURN(this == &other, *this);
     m_result = std::move(other.m_result);
     m_keys = std::move(other.m_keys);

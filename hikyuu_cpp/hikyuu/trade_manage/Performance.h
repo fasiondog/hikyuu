@@ -25,11 +25,11 @@ public:
     virtual ~Performance();
 
     Performance(const Performance& other) = default;
-    Performance(Performance&& other)
+    Performance(Performance&& other) noexcept
     : m_result(std::move(other.m_result)), m_keys(std::move(other.m_keys)) {}
 
-    Performance& operator=(const Performance& other);
-    Performance& operator=(Performance&& other);
+    Performance& operator=(const Performance& other) noexcept;
+    Performance& operator=(Performance&& other) noexcept;
 
     /** 是否为合法的统计项 */
     bool exist(const string& key);

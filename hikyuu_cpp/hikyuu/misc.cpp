@@ -47,4 +47,27 @@ vector<FundsList> HKU_API parallel_run_pf(const vector<PFPtr>& pf_list, const KQ
     });
 }
 
+vector<FundsList> HKU_API getFundsList(const vector<TMPtr>& tm_list,
+                                       const DatetimeList& ref_dates) {
+    return global_parallel_for_index(0, tm_list.size(), [&](size_t i) {
+        FundsList funds;
+        if (tm_list[i]) {
+            funds = tm_list[i]->getFundsList(ref_dates);
+        }
+        return funds;
+    });
+}
+
+vector<Performance> HKU_API getPerformanceList(const vector<TMPtr>& tm_list,
+                                               const Datetime& datetime,
+                                               const KQuery::KType& ktype) {
+    return global_parallel_for_index(0, tm_list.size(), [&](size_t i) {
+        Performance perf;
+        if (tm_list[i]) {
+            perf = tm_list[i]->getPerformance(datetime, ktype);
+        }
+        return perf;
+    });
+}
+
 }  // namespace hku

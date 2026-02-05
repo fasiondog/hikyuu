@@ -654,13 +654,4 @@ void export_TradeManager(py::module& m) {
     :return: 账户收益百分比（年度）)")
 
         DEF_PICKLE(TradeManagerPtr);
-
-    m.def("get_funds_list", &getFundsList,
-          R"(get_funds_list(tm_list: list, ref_dates: DatetimeList) -> list[Funds])
-    
-    一次性从多个账户中获取多个指定时刻的账户资金信息
-
-    :param list tm_list: 账户列表
-    :param DatetimeList ref_dates: 获取时刻列表
-    :return: 账户资金列表)");
 }

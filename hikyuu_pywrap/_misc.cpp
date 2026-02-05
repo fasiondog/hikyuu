@@ -38,4 +38,25 @@ void export_misc(py::module& m) {
     :param list pf_list: 投资组合列表
     :param Query query: 查询条件
     :param bool force: 强制重新计算)");
+
+    m.def("get_funds_list", &getFundsList,
+          R"(parallel_get_funds_list(tm_list: list, ref_dates: DatetimeList) -> list[Funds])
+    
+    一次性从多个账户中获取多个指定时刻的账户资金信息
+
+    :param list tm_list: 账户列表
+    :param DatetimeList ref_dates: 获取时刻列表
+    :return: 账户资金列表)");
+
+    m.def(
+      "get_performance_list", &getPerformanceList, py::arg("tm_list"),
+      py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
+      R"(get_performance_list(tm_list: list, datetime: Datetime = now(), ktype: KType = DAY) -> list[Performance])
+    
+    一次性获取多个账户的指定时刻的账户表现
+
+    :param list tm_list: 账户列表
+    :param Datetime datetime: 指定时刻
+    :param KType ktype: 指定K线类型
+    )");
 }
