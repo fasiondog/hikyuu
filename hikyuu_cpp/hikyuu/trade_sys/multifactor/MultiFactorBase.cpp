@@ -657,7 +657,8 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
     unordered_map<string, IndicatorList> use_style_inds;
     for (const auto& [name, style_inds] : m_special_style_inds) {
-        use_style_inds[name] = IndicatorList(style_inds.size());
+        // use_style_inds[name] = IndicatorList(style_inds.size());
+        use_style_inds[name] = IndicatorList();
     }
 
     global_parallel_for_index_void(
@@ -665,6 +666,22 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
       [this, &all_stk_inds, &null_ind, &use_style_inds, ind_count, fill_null](size_t i) {
           const auto& stk = m_stks[i];
           auto kdata = stk.getKData(m_query);
+#if 1
+          IndicatorList cur_stk_inds;
+          if (kdata.size() == 0) {
+              cur_stk_inds.resize(ind_count, null_ind);
+              for (size_t j = 0; j < ind_count; j++) {
+                  cur_stk_inds[j].name(m_inds[j].name());
+              }
+          } else {
+              cur_stk_inds.reserve(ind_count);
+              for (size_t j = 0; j < ind_count; j++) {
+                  cur_stk_inds.push_back(ALIGN(m_inds[j], m_ref_dates, fill_null));
+              }
+              cur_stk_inds = combineCalculateIndicators(cur_stk_inds, kdata, true);
+          }
+          all_stk_inds[i] = std::move(cur_stk_inds);
+#else
           auto& cur_stk_inds = all_stk_inds[i];
           cur_stk_inds.resize(ind_count);
           for (size_t j = 0; j < ind_count; j++) {
@@ -675,8 +692,27 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
               }
               cur_stk_inds[j].name(m_inds[j].name());
           }
+#endif
+
           for (auto& [name, styles] : m_special_style_inds) {
+#if 1
+              IndicatorList cur_style_inds;
+              if (kdata.size() == 0) {
+                  cur_style_inds.resize(styles.size(), null_ind);
+                  for (size_t j = 0; j < styles.size(); j++) {
+                      cur_style_inds[j].name(name);
+                  }
+              } else {
+                  cur_style_inds.reserve(styles.size());
+                  for (size_t j = 0; j < styles.size(); j++) {
+                      cur_style_inds.push_back(ALIGN(styles[j], m_ref_dates, fill_null));
+                  }
+                  cur_style_inds = combineCalculateIndicators(cur_style_inds, kdata, true);
+              }
+              use_style_inds[name] = std::move(cur_style_inds);
+#else
               auto& cur_style_inds = use_style_inds[name];
+              cur_style_inds.resize(styles.size());
               for (size_t j = 0; j < styles.size(); j++) {
                   if (kdata.size() == 0) {
                       cur_style_inds[j] = null_ind;
@@ -685,6 +721,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                         ALIGN(styles[j], m_ref_dates, fill_null)(kdata).getResult(0);
                   }
               }
+#endif
           }
       },
       2, false);
