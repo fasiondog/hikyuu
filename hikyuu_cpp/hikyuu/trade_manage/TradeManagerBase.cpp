@@ -16,9 +16,10 @@ BOOST_CLASS_EXPORT(hku::TradeManagerBase)
 
 namespace hku {
 
-Performance TradeManagerBase::getPerformance(const Datetime& datetime, const KQuery::KType& ktype) {
+Performance TradeManagerBase::getPerformance(const Datetime& datetime, const KQuery::KType& ktype,
+                                             bool ext) {
     Performance ret;
-    if (isValidLicense()) {
+    if (ext && isValidLicense()) {
         auto& sm = StockManager::instance();
         auto* plugin = sm.getPlugin<TMReportPluginInterface>(HKU_PLUGIN_TMREPORT);
         HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_TMREPORT);

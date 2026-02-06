@@ -592,12 +592,14 @@ void export_TradeManager(py::module& m) {
 
       .def("get_performance", &TradeManagerBase::getPerformance,
            py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
+           py::arg("ext") = true,
            R"(get_performance(self[, datetime=Datetime.now(), ktype=Query.DAY]) -> Performance)
         
     获取账户指定时刻的账户表现
 
     :param Datetime datetime: 指定时刻
     :param Query.KType ktype: K线类型
+    :param bool ext: 是否获取扩展统计项(需VIP权限)，否则仍旧为基础统计项
     :return: 账户表现)")
 
       .def("get_max_pull_back", &TradeManagerBase::getMaxPullBack,

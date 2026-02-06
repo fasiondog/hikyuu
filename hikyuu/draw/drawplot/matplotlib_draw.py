@@ -859,12 +859,13 @@ def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
         )
 
 
-def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None):
+def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: bool = True):
     """
     绘制系统绩效，即账户累积收益率曲线
 
-    :param SystemBase | PortfolioBase sys: SYS或PF实例
+    :param TradeManager tm: 账户实例
     :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
+    :param bool ext: 是否统计扩展信息（需VIP权限，否则仍为默认统计项）
     :return: None
     """
     if ref_stk is None:
@@ -883,7 +884,7 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None):
     ref_return = ALIGN(ROCR(ref_k.close, 0), ref_dates)
     ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"
 
-    per = tm.get_performance(sh000001_k[-1].datetime)
+    per = tm.get_performance(sh000001_k[-1].datetime, ext=ext)
     text = per.report()
 
     # 计算最大回撤
@@ -939,19 +940,20 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None):
     return ax1  # 返回主图axis
 
 
-def sys_performance(sys, ref_stk=None):
+def sys_performance(sys, ref_stk=None, ext=True):
     """
     绘制系统绩效，即账户累积收益率曲线
 
     :param SystemBase | PortfolioBase sys: SYS或PF实例
     :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
+    :param bool ext: 是否统计扩展信息（需VIP权限，否则仍为默认统计项）
     :return: None
     """
     if ref_stk is None:
         ref_stk = get_stock('sh000300')
 
     query = sys.query
-    return tm_performance(sys.tm, query, ref_stk)
+    return tm_performance(sys.tm, query, ref_stk, ext=ext)
 
 
 def tm_heatmap(tm, start_date, end_date=None, axes=None):

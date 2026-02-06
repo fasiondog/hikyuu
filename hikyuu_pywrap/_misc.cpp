@@ -50,13 +50,14 @@ void export_misc(py::module& m) {
 
     m.def(
       "get_performance_list", &getPerformanceList, py::arg("tm_list"),
-      py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
-      R"(get_performance_list(tm_list: list, datetime: Datetime = now(), ktype: KType = DAY) -> list[Performance])
+      py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY, py::arg("ext") = true,
+      R"(get_performance_list(tm_list: list, datetime: Datetime = now(), ktype: KType = DAY, ext: bool = True) -> list[Performance])
     
     一次性获取多个账户的指定时刻的账户表现
 
     :param list tm_list: 账户列表
     :param Datetime datetime: 指定时刻
     :param KType ktype: 指定K线类型
+    :param bool ext: 是否统计扩展信息（需VIP权限，否则仍为基础统计项）
     )");
 }

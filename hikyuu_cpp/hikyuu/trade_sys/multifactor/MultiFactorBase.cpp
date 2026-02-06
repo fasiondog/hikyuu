@@ -724,8 +724,8 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                       cur_style_inds[j].name(name);
                   }
               }
-#endif
           }
+#endif
       });
 
     // 时间截面标准化/归一化

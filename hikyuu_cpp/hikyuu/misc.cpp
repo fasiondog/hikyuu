@@ -59,12 +59,12 @@ vector<FundsList> HKU_API getFundsList(const vector<TMPtr>& tm_list,
 }
 
 vector<Performance> HKU_API getPerformanceList(const vector<TMPtr>& tm_list,
-                                               const Datetime& datetime,
-                                               const KQuery::KType& ktype) {
-    return global_parallel_for_index(0, tm_list.size(), [&](size_t i) {
+                                               const Datetime& datetime, const KQuery::KType& ktype,
+                                               bool ext) {
+    return global_parallel_for_index(0, tm_list.size(), [&, datetime, ktype, ext](size_t i) {
         Performance perf;
         if (tm_list[i]) {
-            perf = tm_list[i]->getPerformance(datetime, ktype);
+            perf = tm_list[i]->getPerformance(datetime, ktype, ext);
         }
         return perf;
     });

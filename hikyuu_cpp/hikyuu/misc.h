@@ -48,12 +48,15 @@ vector<FundsList> HKU_API getFundsList(const vector<TMPtr>& tm_list, const Datet
 /**
  * 从账户列表中一次性获取资金列表
  * @param tm_list
- * @param ref_dates
+ * @param datetime 截止日期
+ * @param ktype 数据类型
+ * @param ext 是否获取扩展统计信息（需VIP权息，否则仍为基础统计）
  * @return vector<FundsList>
  * @ingroup TradeManagerClass
  */
 vector<Performance> HKU_API getPerformanceList(const vector<TMPtr>& tm_list,
                                                const Datetime& datetime = Datetime::now(),
-                                               const KQuery::KType& ktype = KQuery::DAY);
+                                               const KQuery::KType& ktype = KQuery::DAY,
+                                               bool ext = true);
 
 }  // namespace hku

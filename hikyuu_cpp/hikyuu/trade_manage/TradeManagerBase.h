@@ -724,9 +724,10 @@ public:
      * 以便用于计算当前市值
      * @param datetime 统计截止时刻
      * @param ktype k线类型
+     * @param ext 是否需要扩展统计项(需要VIP扩展插件)
      */
     Performance getPerformance(const Datetime& datetime = Datetime::now(),
-                               const KQuery::KType& ktype = KQuery::DAY);
+                               const KQuery::KType& ktype = KQuery::DAY, bool ext = true);
 
     /**
      * @brief 获取指定时刻时账户的最大回撤百分比（负数）（仅根据收盘价计算）
