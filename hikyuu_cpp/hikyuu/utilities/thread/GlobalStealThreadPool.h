@@ -51,7 +51,7 @@ public:
      * @param until_empty 任务队列为空时，自动停止运行
      */
     explicit GlobalStealThreadPool(size_t n, bool until_empty = true)
-    : m_done(false), m_worker_num(n), m_running_until_empty(until_empty) {
+    : m_done(false), m_worker_num(n), m_running_until_empty(until_empty), m_sleep_count(0) {
         try {
             m_interrupt_flags.resize(m_worker_num, nullptr);
             for (int i = 0; i < m_worker_num; i++) {
@@ -80,6 +80,11 @@ public:
     /** 获取工作线程数 */
     size_t worker_num() const {
         return m_worker_num;
+    }
+
+    /** 获取当前处于休眠状态的工作线程数 */
+    int sleep_count() const {
+        return m_sleep_count.load(std::memory_order_acquire);
     }
 
     /** 剩余任务数 */
@@ -143,6 +148,9 @@ public:
         if (m_done.exchange(true, std::memory_order_acq_rel)) {
             return;
         }
+
+        // 重置休眠计数
+        m_sleep_count.store(0, std::memory_order_release);
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -265,6 +273,7 @@ private:
     bool m_running_until_empty;    // 任务队列为空时，自动停止运行
     std::condition_variable m_cv;  // 信号量，无任务时阻塞线程并等待
     std::mutex m_cv_mutex;         // 配合信号量的互斥量
+    std::atomic<int> m_sleep_count;
 
     std::vector<InterruptFlag*> m_interrupt_flags;           // 工作线程状态
     ThreadSafeQueue<task_type> m_master_work_queue;          // 主线程任务队列
@@ -315,6 +324,9 @@ private:
         } else if (pop_task_from_other_thread_queue(task)) {
             task();
         } else {
+            // 进入等待状态前增加休眠计数
+            m_sleep_count.fetch_add(1, std::memory_order_acq_rel);
+            
             // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
             m_cv.wait(lk, [this] {
@@ -323,6 +335,9 @@ private:
                        (m_local_work_queue && !m_local_work_queue->empty()) ||
                        has_other_remain_task();
             });
+            
+            // 被唤醒后减少休眠计数
+            m_sleep_count.fetch_sub(1, std::memory_order_acq_rel);
         }
     }
 
@@ -356,3 +371,7 @@ private:
 };
 
 } /* namespace hku */
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
