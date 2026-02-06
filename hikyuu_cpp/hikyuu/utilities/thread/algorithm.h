@@ -188,8 +188,15 @@ HKU_UTILS_API GlobalStealThreadPool* get_global_task_group();
 
 size_t HKU_UTILS_API get_global_task_group_work_num();
 
+std::thread::id HKU_UTILS_API get_main_thread_id();
+
 template <typename FutureContainer>
 void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& futures) {
+    if (std::this_thread::get_id() != get_main_thread_id()) {
+        // 只在子线程中执行唤醒，防止子线程嵌套时其他工作线程闲置
+        pool.wake_up();
+    }
+
     bool all_ready = false;
     auto init_delay = std::chrono::microseconds(1);
     auto delay = init_delay;
@@ -264,6 +271,13 @@ auto global_submit_task(FunctionType f, bool enable_nested = true) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
     return tg->submit(f);
+}
+
+inline void global_wake_up() {
+    HKU_IF_RETURN(std::this_thread::get_id() == get_main_thread_id(), void());
+    auto* tg = get_global_task_group();
+    HKU_CHECK(tg, "Global task group is not initialized!");
+    tg->wake_up();
 }
 
 template <typename FutureType>

@@ -87,6 +87,47 @@ public:
         return m_sleep_count.load(std::memory_order_acquire);
     }
 
+    /**
+     * 智能唤醒休眠线程
+     * 根据当前剩余任务数和休眠线程数来自适应判断是否需要唤醒
+     * @return 实际唤醒的线程数量
+     */
+    int wake_up() {
+        int sleeping_count = m_sleep_count.load(std::memory_order_acquire);
+        if (sleeping_count <= 0) {
+            return 0;
+        }
+
+        // 获取当前剩余任务数
+        size_t remaining_tasks = remain_task_count();
+        if (remaining_tasks == 0) {
+            // 没有剩余任务，不需要唤醒
+            return 0;
+        }
+
+        // 智能判断唤醒策略：
+        // 1. 如果任务数大于等于休眠线程数，使用notify_all唤醒所有线程（更高效）
+        // 2. 如果任务数小于休眠线程数，精准唤醒所需数量的线程
+        int threads_to_wake = 0;
+        if (remaining_tasks >= static_cast<size_t>(sleeping_count)) {
+            // 任务充足，使用notify_all唤醒所有休眠线程（性能更优）
+            m_cv.notify_all();
+            threads_to_wake = sleeping_count;
+        } else {
+            // 任务较少，按需精准唤醒
+            threads_to_wake = static_cast<int>(remaining_tasks);
+            // 确保至少唤醒一个线程处理任务
+            threads_to_wake = std::max(threads_to_wake, 1);
+
+            // 精准唤醒指定数量的线程
+            for (int i = 0; i < threads_to_wake; ++i) {
+                m_cv.notify_one();
+            }
+        }
+
+        return threads_to_wake;
+    }
+
     /** 剩余任务数 */
     size_t remain_task_count() const {
         if (m_done.load(std::memory_order_acquire)) {
@@ -326,7 +367,7 @@ private:
         } else {
             // 进入等待状态前增加休眠计数
             m_sleep_count.fetch_add(1, std::memory_order_acq_rel);
-            
+
             // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
             m_cv.wait(lk, [this] {
@@ -335,7 +376,7 @@ private:
                        (m_local_work_queue && !m_local_work_queue->empty()) ||
                        has_other_remain_task();
             });
-            
+
             // 被唤醒后减少休眠计数
             m_sleep_count.fetch_sub(1, std::memory_order_acq_rel);
         }
