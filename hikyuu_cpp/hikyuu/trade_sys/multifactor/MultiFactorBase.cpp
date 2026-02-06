@@ -720,8 +720,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
               }
 #endif
           }
-      },
-      2);
+      });
 
     // 时间截面标准化/归一化
     if (m_norm || !m_special_category.empty() || !m_special_style_inds.empty()) {
