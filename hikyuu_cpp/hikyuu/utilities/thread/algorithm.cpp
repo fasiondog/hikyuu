@@ -11,6 +11,7 @@
 namespace hku {
 
 static std::unique_ptr<GlobalStealThreadPool> global_steal_thread_pool;
+static std::thread::id global_main_thread_id;
 
 #if CPP_STANDARD < CPP_STANDARD_17 || defined(__clang__)
 thread_local bool ExecutionGuard::in_parallel_execution = false;
@@ -23,7 +24,12 @@ void HKU_UTILS_API init_global_task_group(size_t work_num) {
     }
     if (!global_steal_thread_pool) {
         global_steal_thread_pool = std::make_unique<GlobalStealThreadPool>(work_num, false);
+        global_main_thread_id = std::this_thread::get_id();
     }
+}
+
+std::thread::id HKU_UTILS_API get_main_thread_id() {
+    return global_main_thread_id;
 }
 
 void HKU_UTILS_API release_global_task_group() {
