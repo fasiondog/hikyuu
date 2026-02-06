@@ -665,7 +665,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
       [this, &all_stk_inds, &null_ind, &use_style_inds, ind_count, fill_null](size_t i) {
           const auto& stk = m_stks[i];
           auto kdata = stk.getKData(m_query);
-#if 1
+#if 0
           auto& cur_stk_inds = all_stk_inds[i];
           cur_stk_inds.resize(ind_count);
           if (kdata.size() == 0) {
@@ -680,21 +680,8 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
               }
               cur_stk_inds = combineCalculateIndicators(cur_stk_inds, kdata, true);
           }
-#else
-          auto& cur_stk_inds = all_stk_inds[i];
-          cur_stk_inds.resize(ind_count);
-          for (size_t j = 0; j < ind_count; j++) {
-              if (kdata.size() == 0) {
-                  cur_stk_inds[j] = null_ind;
-              } else {
-                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null)(kdata).getResult(0);
-              }
-              cur_stk_inds[j].name(m_inds[j].name());
-          }
-#endif
 
           for (auto& [name, styles] : m_special_style_inds) {
-#if 1
               auto& cur_style_inds = use_style_inds[name];
               if (kdata.size() == 0) {
                   for (size_t j = 0; j < styles.size(); j++) {
@@ -707,15 +694,34 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   }
                   cur_style_inds = combineCalculateIndicators(cur_style_inds, kdata, true);
               }
+          }
 #else
+          auto& cur_stk_inds = all_stk_inds[i];
+          cur_stk_inds.resize(ind_count);
+          if (kdata.size() == 0) {
+              for (size_t j = 0; j < ind_count; j++) {
+                  cur_stk_inds[j] = null_ind;
+                  cur_stk_inds[j].name(m_inds[j].name());
+              }
+          } else {
+              for (size_t j = 0; j < ind_count; j++) {
+                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null)(kdata).getResult(0);
+                  cur_stk_inds[j].name(m_inds[j].name());
+              }
+          }
+
+          for (auto& [name, styles] : m_special_style_inds) {
               auto& cur_style_inds = use_style_inds[name];
-              for (size_t j = 0; j < styles.size(); j++) {
-                  if (kdata.size() == 0) {
+              if (kdata.size() == 0) {
+                  for (size_t j = 0; j < styles.size(); j++) {
                       cur_style_inds[j] = null_ind;
                       cur_style_inds[j].name(name);
-                  } else {
+                  }
+              } else {
+                  for (size_t j = 0; j < styles.size(); j++) {
                       cur_style_inds[j] =
                         ALIGN(styles[j], m_ref_dates, fill_null)(kdata).getResult(0);
+                      cur_style_inds[j].name(name);
                   }
               }
 #endif
