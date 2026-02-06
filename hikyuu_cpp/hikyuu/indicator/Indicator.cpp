@@ -365,7 +365,7 @@ IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators
     IndicatorList ret;
     ret.reserve(indicators.size());
     for (const auto& ind : indicators) {
-        ret.push_back(ind);
+        ret.push_back(ind.clone());
     }
 
     vector<IndicatorImpPtr> sub_nodes;
@@ -376,6 +376,9 @@ IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators
     }
 
     IndicatorImp::inner_repeatALikeNodes(sub_nodes);
+    for (const auto& ind : ret) {
+        ind.getImp()->repeatSeparateKTypeLeafALikeNodes();
+    }
     for (auto& ind : ret) {
         ind.setContext(kdata);
     }
