@@ -258,6 +258,44 @@ private:
     bool* p_flag;
 };
 
+/** 使用global_submit_task提交的任务，必须使用global_wait_task等待，然后get任务结果，否则可能造成卡死 */
+template <typename FunctionType>
+auto global_submit_task(FunctionType f, bool enable_nested = true) {
+    auto* tg = get_global_task_group();
+    HKU_CHECK(tg, "Global task group is not initialized!");
+    return tg->submit(f);
+}
+
+template <typename FutureType>
+void global_wait_task(FutureType& future) {
+    auto* tg = get_global_task_group();
+    bool ready = false;
+    auto init_delay = std::chrono::microseconds(1);
+    auto delay = init_delay;
+    const auto max_delay = std::chrono::microseconds(50000);
+
+    while (!ready && !tg->done()) {
+        ready = true;
+        if (future.wait_for(std::chrono::nanoseconds(0)) != std::future_status::ready) {
+            ready = false;
+        }
+
+        // 如果任务未完成，尝试执行本地任务
+        if (!ready) {
+            if (!tg->run_available_task_once()) {
+                delay = init_delay;
+            } else if (tg->done()) {
+                break;
+            } else {
+                std::this_thread::sleep_for(delay);
+                if (delay < max_delay) {
+                    delay = std::min(delay * 2, max_delay);
+                }
+            }
+        }
+    }
+}
+
 template <typename FunctionType>
 auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f, size_t threshold = 2,
                                     bool enable_nested = true) {
