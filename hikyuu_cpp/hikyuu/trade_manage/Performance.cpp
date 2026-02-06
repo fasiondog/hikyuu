@@ -153,8 +153,7 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     reset();
 
     HKU_INFO_IF_RETURN(!tm, void(), "TradeManagerPtr is Null!");
-    HKU_ERROR_IF_RETURN(datetime.isNull(), void(), "Invalid input datetime");
-    HKU_ERROR_IF_RETURN(datetime < tm->lastDatetime(), void(),
+    HKU_ERROR_IF_RETURN(!datetime.isNull() && datetime < tm->lastDatetime(), void(),
                         "datetime must >= tm->lastDatetime !");
 
     int precision = tm->precision();

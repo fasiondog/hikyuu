@@ -1213,9 +1213,8 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     FundsRecord funds;
     int precision = getParam<int>("precision");
 
-    // // datetime为Null时，直接返回当前账户中的现金和买入时占用的资金，以及累计存取资金
-    // HKU_IF_RETURN(indatetime == Null<Datetime>() || indatetime == lastDatetime(),
-    // getFunds(ktype));
+    // datetime为Null时，直接返回当前账户中的现金和买入时占用的资金，以及累计存取资金
+    HKU_IF_RETURN(indatetime == Null<Datetime>() || indatetime == lastDatetime(), getFunds(ktype));
 
     Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 23, 59);
     price_t market_value = 0.0;
