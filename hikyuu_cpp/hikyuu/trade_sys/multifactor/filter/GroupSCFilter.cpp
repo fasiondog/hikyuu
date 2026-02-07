@@ -57,6 +57,7 @@ ScoreRecordList GroupSCFilter::_filter(const ScoreRecordList& scores, const Date
     }
 
     // 从原始数据中提取当前组的数据
+    ret.reserve(end - start);
     for (size_t i = start; i < end; i++) {
         ret.emplace_back(scores[i]);
     }
