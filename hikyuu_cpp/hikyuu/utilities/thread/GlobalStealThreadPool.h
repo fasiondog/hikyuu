@@ -12,7 +12,6 @@
 #include <future>
 #include <thread>
 #include <vector>
-#include <unordered_set>
 #include "ThreadSafeQueue.h"
 #include "WorkStealQueue.h"
 #include "InterruptFlag.h"
@@ -62,7 +61,6 @@ public:
             // 初始完毕所有线程资源后再启动线程
             for (int i = 0; i < m_worker_num; i++) {
                 m_threads.emplace_back(&GlobalStealThreadPool::worker_thread, this, i);
-                m_thread_ids.insert(m_threads[i].get_id());
             }
         } catch (...) {
             m_done.store(true, std::memory_order_release);
@@ -144,7 +142,7 @@ public:
 
     /** 当前线程是否为工作线程 */
     bool is_work_thread() const {
-        return m_thread_ids.count(std::this_thread::get_id()) > 0;
+        return m_index != 0;
     }
 
     /** 先线程池提交任务后返回的对应 future 的类型 */
@@ -316,13 +314,12 @@ public:
 
 private:
     typedef FuncWrapper task_type;
-    std::atomic_bool m_done;                           // 线程池全局需终止指示
-    size_t m_worker_num;                               // 工作线程数量
-    bool m_running_until_empty;                        // 任务队列为空时，自动停止运行
-    std::condition_variable m_cv;                      // 信号量，无任务时阻塞线程并等待
-    std::mutex m_cv_mutex;                             // 配合信号量的互斥量
-    std::atomic<int> m_sleep_count;                    // 休眠计数
-    std::unordered_set<std::thread::id> m_thread_ids;  // 工作线程ID集合
+    std::atomic_bool m_done;         // 线程池全局需终止指示
+    size_t m_worker_num;             // 工作线程数量
+    bool m_running_until_empty;      // 任务队列为空时，自动停止运行
+    std::condition_variable m_cv;    // 信号量，无任务时阻塞线程并等待
+    std::mutex m_cv_mutex;           // 配合信号量的互斥量
+    std::atomic<int> m_sleep_count;  // 休眠计数
 
     std::vector<InterruptFlag*> m_interrupt_flags;           // 工作线程状态
     ThreadSafeQueue<task_type> m_master_work_queue;          // 主线程任务队列
