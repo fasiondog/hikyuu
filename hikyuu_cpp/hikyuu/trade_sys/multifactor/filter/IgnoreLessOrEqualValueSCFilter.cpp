@@ -28,8 +28,10 @@ ScoreRecordList IgnoreLessOrEqualValueSCFilter::_filter(const ScoreRecordList& s
                                                         const Datetime& date, const KQuery& query) {
     ScoreRecordList ret;
     ret.reserve(scores.size());
+
+    double value = getParam<double>("value");
     for (auto& item : scores) {
-        if (!std::isnan(item.value)) {
+        if (item.value > value) {
             ret.push_back(item);
         }
     }
