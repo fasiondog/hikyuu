@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/trade_sys/multifactor/build_in.h"
+#include "hikyuu/trade_sys/portfolio/Portfolio.h"
 #include "MultiFactorSelector2.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -61,13 +62,13 @@ void MultiFactorSelector2::_reset() {
     if (m_mf) {
         m_mf->reset();
     }
-    m_stk_sys_dict.clear();
+    m_sys_weight_dict.clear();
 }
 
 SelectorPtr MultiFactorSelector2::_clone() {
     auto p = make_shared<MultiFactorSelector2>();
     p->m_mf = m_mf->clone();
-    p->m_stk_sys_dict = m_stk_sys_dict;
+    p->m_sys_weight_dict = m_sys_weight_dict;
     for (const auto& ind : m_inds) {
         p->m_inds.emplace_back(ind.clone());
     }
@@ -79,10 +80,10 @@ bool MultiFactorSelector2::isMatchAF(const AFPtr& af) {
 }
 
 SystemWeightList MultiFactorSelector2::_getSelected(Datetime date) {
-    ScoreRecordList scores = m_mf->getScores(date, 0, Null<size_t>(), m_sc_filter);
     SystemWeightList ret;
-    for (const auto& sc : scores) {
-        ret.emplace_back(m_stk_sys_dict[sc.stock], sc.value);
+    auto iter = m_sys_weight_dict.find(date);
+    if (iter != m_sys_weight_dict.end()) {
+        ret = iter->second;
     }
     return ret;
 }
@@ -128,9 +129,25 @@ void MultiFactorSelector2::_calculate() {
 
     m_mf->calculate();
 
+    unordered_map<Stock, SYSPtr> stk_sys_dict;
     for (const auto& sys : m_real_sys_list) {
-        m_stk_sys_dict.insert({sys->getStock(), sys});
+        stk_sys_dict.insert({sys->getStock(), sys});
     }
+
+    auto pf = getPF();
+    DatetimeList adjust_dates =
+      pf ? pf->getAdjustDates() : StockManager::instance().getTradingCalendar(m_query);
+    global_parallel_for_index_void(0, adjust_dates.size(), [&, this](size_t i) {
+        const auto& date = adjust_dates[i];
+        ScoreRecordList scores = m_mf->getScores(date, 0, Null<size_t>(), m_sc_filter);
+        SystemWeightList weights;
+        for (const auto& sc : scores) {
+            weights.emplace_back(stk_sys_dict[sc.stock], sc.value);
+        }
+        m_sys_weight_dict[date] = std::move(weights);
+    });
+
+    m_mf->reset();
 }
 
 SelectorPtr HKU_API SE_MultiFactor2(const MFPtr& mf, const ScoresFilterPtr& filter) {

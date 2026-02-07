@@ -32,7 +32,7 @@ public:
 
 private:
     IndicatorList m_inds;
-    unordered_map<Stock, SYSPtr> m_stk_sys_dict;
+    unordered_map<Datetime, SystemWeightList> m_sys_weight_dict;
 
     //============================================
     // 序列化支持
