@@ -204,15 +204,7 @@ public:
      * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
      * @return 日资产记录列表
      */
-    FundsList getFundsList(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY) {
-        size_t total = dates.size();
-        FundsList result(total);
-        HKU_IF_RETURN(total == 0, result);
-        for (size_t i = 0; i < total; ++i) {
-            result[i] = getFunds(dates[i], ktype);
-        }
-        return result;
-    }
+    FundsList getFundsList(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * 获取资产净值曲线，含借入的资产

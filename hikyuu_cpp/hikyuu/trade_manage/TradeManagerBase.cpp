@@ -16,6 +16,15 @@ BOOST_CLASS_EXPORT(hku::TradeManagerBase)
 
 namespace hku {
 
+FundsList TradeManagerBase::getFundsList(const DatetimeList& dates, const KQuery::KType& ktype) {
+    size_t total = dates.size();
+    FundsList result;
+    HKU_IF_RETURN(total == 0, result);
+    result = global_parallel_for_index(
+      0, total, [&, this](size_t i) -> FundsRecord { return getFunds(dates[i], ktype); });
+    return result;
+}
+
 Performance TradeManagerBase::getPerformance(const Datetime& datetime, const KQuery::KType& ktype,
                                              bool ext) {
     Performance ret;
