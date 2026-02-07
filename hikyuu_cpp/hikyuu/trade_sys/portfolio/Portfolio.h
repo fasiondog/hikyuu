@@ -95,6 +95,13 @@ public:
 
     void runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust);
 
+    /** 获取运行日期列表 */
+    const DatetimeList& getRunningDates() const noexcept;
+
+    DatetimeList getAdjustDates() const;
+
+    DatetimeList getCycleEndDates() const;
+
     /** 用于打印输出 */
     virtual string str() const;
 
@@ -120,10 +127,10 @@ public:
 private:
     void initParam();
 
-    void _runOnMode(const DatetimeList& datelist, int adjust_cycle, const string& mode);
-
-    void _runOnModeDelayToTradingDay(const DatetimeList& datelist, int adjust_cycle,
-                                     const string& mode);
+    // 计算调仓日
+    void _calculateAdjustDate();
+    void _calculateAdjustDateOnMode(int adjust_cycle, const string& mode);
+    void _calculateAdjustDateOnModeDelayToTradingDay(int adjust_cycle, const string& mode);
 
 protected:
     // 跟踪打印当前TM持仓情况
@@ -145,6 +152,9 @@ protected:
 
     // 用于中间计算的临时数据
     std::unordered_set<SYSPtr> m_running_sys_set;
+    DatetimeList m_dates;            // 运行日期列表
+    vector<uint8_t> m_adjust_flags;  // 调仓日标志
+    DatetimeList m_cycle_end_dates;  // 调仓周期结束日期
 
 //============================================
 // 序列化支持
@@ -253,6 +263,10 @@ inline void Portfolio::setAF(const AFPtr& af) {
 
 inline const SystemList& Portfolio::getRealSystemList() const {
     return m_real_sys_list;
+}
+
+inline const DatetimeList& Portfolio::getRunningDates() const noexcept {
+    return m_dates;
 }
 
 } /* namespace hku */

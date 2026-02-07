@@ -118,6 +118,9 @@ void Portfolio::reset() {
     m_need_calculate = true;
     m_real_sys_list.clear();
     m_running_sys_set.clear();
+    m_dates.clear();
+    m_adjust_flags.clear();
+    m_cycle_end_dates.clear();
     _reset();
 }
 
@@ -143,7 +146,227 @@ void Portfolio::readyForRun() {
     HKU_CHECK(m_se, "m_se is null!");
     HKU_CHECK(m_tm, "m_tm is null!");
     reset();
+    _calculateAdjustDate();
+    m_se->setPF(shared_from_this());
     _readyForRun();
+}
+
+DatetimeList Portfolio::getAdjustDates() const {
+    DatetimeList ret;
+    for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+        if (m_adjust_flags[i]) {
+            ret.push_back(m_dates[i]);
+        }
+    }
+    return ret;
+}
+
+DatetimeList Portfolio::getCycleEndDates() const {
+    DatetimeList ret;
+    for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+        if (m_adjust_flags[i]) {
+            ret.push_back(m_cycle_end_dates[i]);
+        }
+    }
+    return ret;
+}
+
+void Portfolio::_calculateAdjustDate() {
+    int adjust_cycle = getParam<int>("adjust_cycle");
+    string mode = getParam<string>("adjust_mode");
+    bool delay_to_trading_day = getParam<bool>("delay_to_trading_day");
+    to_lower(mode);
+
+    m_dates = StockManager::instance().getTradingCalendar(m_query);
+    HKU_IF_RETURN(m_dates.empty(), void());
+
+    m_adjust_flags.resize(m_dates.size(), 0);
+    m_cycle_end_dates.resize(m_dates.size(), Null<Datetime>());
+
+    if ("query" == mode || "day" == mode) {
+        size_t cur_adjust_ix = 0;
+        Datetime cur_cycle_end;
+        for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+            if (i == cur_adjust_ix) {
+                cur_adjust_ix += adjust_cycle;
+                cur_cycle_end =
+                  cur_adjust_ix < total ? m_dates[cur_adjust_ix] : m_dates.back() + Minutes(1);
+                m_adjust_flags[i] = 1;
+                m_cycle_end_dates[i] = cur_cycle_end;
+            }
+        }
+
+    } else if (delay_to_trading_day) {
+        _calculateAdjustDateOnModeDelayToTradingDay(adjust_cycle, mode);
+    } else {
+        _calculateAdjustDateOnMode(adjust_cycle, mode);
+    }
+}
+
+void Portfolio::_calculateAdjustDateOnMode(int adjust_cycle, const string& mode) {
+    if ("week" == mode) {
+        Datetime cur_cycle_end = m_dates.front().nextWeek();
+        for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+            const auto& date = m_dates[i];
+            bool adjust = (date.dayOfWeek() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextWeek();
+                if (cur_cycle_end >= m_dates.back()) {
+                    cur_cycle_end = m_dates.back() + Minutes(1);
+                }
+                m_adjust_flags[i] = 1;
+                m_cycle_end_dates[i] = cur_cycle_end;
+            }
+        }
+
+    } else if ("month" == mode) {
+        Datetime cur_cycle_end = m_dates.front().nextMonth();
+        for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+            const auto& date = m_dates[i];
+            bool adjust = (date.day() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextMonth();
+                if (cur_cycle_end >= m_dates.back()) {
+                    cur_cycle_end = m_dates.back() + Minutes(1);
+                }
+                m_adjust_flags[i] = 1;
+                m_cycle_end_dates[i] = cur_cycle_end;
+            }
+        }
+
+    } else if ("quarter" == mode) {
+        Datetime cur_cycle_end = m_dates.front().nextQuarter();
+        for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+            const auto& date = m_dates[i];
+            bool adjust = (date.day() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextQuarter();
+                if (cur_cycle_end >= m_dates.back()) {
+                    cur_cycle_end = m_dates.back() + Minutes(1);
+                }
+                m_adjust_flags[i] = 1;
+                m_cycle_end_dates[i] = cur_cycle_end;
+            }
+        }
+    } else if ("year" == mode) {
+        Datetime cur_cycle_end = m_dates.front().nextYear();
+        for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+            const auto& date = m_dates[i];
+            bool adjust = (date.dayOfYear() == adjust_cycle);
+            if (adjust) {
+                cur_cycle_end = date.nextYear();
+                if (cur_cycle_end >= m_dates.back()) {
+                    cur_cycle_end = m_dates.back() + Minutes(1);
+                }
+                m_adjust_flags[i] = 1;
+                m_cycle_end_dates[i] = cur_cycle_end;
+            }
+        }
+    }
+}
+
+void Portfolio::_calculateAdjustDateOnModeDelayToTradingDay(int adjust_cycle, const string& mode) {
+    std::set<Datetime> adjust_date_set;
+    if ("week" == mode) {
+        Datetime cur_cycle_end = m_dates.front().nextWeek();
+        for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+            const auto& date = m_dates[i];
+            Datetime adjust_date = date.startOfWeek() + Days(adjust_cycle - 1);
+            bool adjust = false;
+            if (date == adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            }
+
+            if (adjust) {
+                cur_cycle_end = date.nextWeek();
+                if (cur_cycle_end >= m_dates.back()) {
+                    cur_cycle_end = m_dates.back() + Minutes(1);
+                }
+                m_adjust_flags[i] = 1;
+                m_cycle_end_dates[i] = cur_cycle_end;
+            }
+        }
+
+    } else if ("month" == mode) {
+        Datetime cur_cycle_end = m_dates.front().nextMonth();
+        for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+            const auto& date = m_dates[i];
+            Datetime adjust_date = date.startOfMonth() + Days(adjust_cycle - 1);
+            bool adjust = false;
+            if (date == adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            }
+
+            if (adjust) {
+                cur_cycle_end = date.nextMonth();
+                if (cur_cycle_end >= m_dates.back()) {
+                    cur_cycle_end = m_dates.back() + Minutes(1);
+                }
+                m_adjust_flags[i] = 1;
+                m_cycle_end_dates[i] = cur_cycle_end;
+            }
+        }
+
+    } else if ("quarter" == mode) {
+        Datetime cur_cycle_end = m_dates.front().nextQuarter();
+        for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+            const auto& date = m_dates[i];
+            Datetime adjust_date = date.startOfQuarter() + Days(adjust_cycle - 1);
+            bool adjust = false;
+            if (date == adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            }
+
+            if (adjust) {
+                cur_cycle_end = date.nextQuarter();
+                if (cur_cycle_end >= m_dates.back()) {
+                    cur_cycle_end = m_dates.back() + Minutes(1);
+                }
+                m_adjust_flags[i] = 1;
+                m_cycle_end_dates[i] = cur_cycle_end;
+            }
+        }
+
+    } else if ("year" == mode) {
+        Datetime cur_cycle_end = m_dates.front().nextYear();
+        for (size_t i = 0, total = m_dates.size(); i < total; i++) {
+            const auto& date = m_dates[i];
+            Datetime adjust_date = date.startOfYear() + Days(adjust_cycle - 1);
+            bool adjust = false;
+            if (date == adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
+                       date > adjust_date) {
+                adjust = true;
+                adjust_date_set.emplace(adjust_date);
+            }
+
+            if (adjust) {
+                cur_cycle_end = date.nextYear();
+                if (cur_cycle_end >= m_dates.back()) {
+                    cur_cycle_end = m_dates.back() + Minutes(1);
+                }
+                m_adjust_flags[i] = 1;
+                m_cycle_end_dates[i] = cur_cycle_end;
+            }
+        }
+    }
 }
 
 void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
@@ -209,193 +432,11 @@ void Portfolio::run(const KQuery& query, bool force) {
         return;
     }
 
-    DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
-    HKU_IF_RETURN(datelist.empty(), void());
-
-    if ("query" == mode || "day" == mode) {
-        size_t cur_adjust_ix = 0;
-        Datetime cur_cycle_end;
-        for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            bool adjust = false;
-            if (i == cur_adjust_ix) {
-                adjust = true;
-                cur_adjust_ix += adjust_cycle;
-                cur_cycle_end =
-                  cur_adjust_ix < total ? datelist[cur_adjust_ix] : datelist.back() + Minutes(1);
-            }
-
-            const auto& date = datelist[i];
-            runMoment(date, cur_cycle_end, adjust);
-        }
-
-    } else if (delay_to_trading_day) {
-        _runOnModeDelayToTradingDay(datelist, adjust_cycle, mode);
-    } else {
-        _runOnMode(datelist, adjust_cycle, mode);
+    for (size_t i = 0; i < m_dates.size(); i++) {
+        runMoment(m_dates[i], m_cycle_end_dates[i], m_adjust_flags[i]);
     }
 
     m_need_calculate = false;
-}
-
-void Portfolio::_runOnMode(const DatetimeList& datelist, int adjust_cycle, const string& mode) {
-    if ("week" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextWeek();
-        for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            bool adjust = (date.dayOfWeek() == adjust_cycle);
-            if (adjust) {
-                cur_cycle_end = date.nextWeek();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-            runMoment(date, cur_cycle_end, adjust);
-        }
-    } else if ("month" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextMonth();
-        for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            bool adjust = (date.day() == adjust_cycle);
-            if (adjust) {
-                cur_cycle_end = date.nextMonth();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-            runMoment(date, cur_cycle_end, adjust);
-        }
-    } else if ("quarter" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextQuarter();
-        for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            bool adjust = (date.day() == adjust_cycle);
-            if (adjust) {
-                cur_cycle_end = date.nextQuarter();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-            runMoment(date, cur_cycle_end, adjust);
-        }
-    } else if ("year" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextYear();
-        for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            bool adjust = (date.dayOfYear() == adjust_cycle);
-            if (adjust) {
-                cur_cycle_end = date.nextYear();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-            runMoment(date, cur_cycle_end, adjust);
-        }
-    }
-}
-
-void Portfolio::_runOnModeDelayToTradingDay(const DatetimeList& datelist, int adjust_cycle,
-                                            const string& mode) {
-    std::set<Datetime> adjust_date_set;
-    if ("week" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextWeek();
-        for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            Datetime adjust_date = date.startOfWeek() + Days(adjust_cycle - 1);
-            bool adjust = false;
-            if (date == adjust_date) {
-                adjust = true;
-                adjust_date_set.emplace(adjust_date);
-            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
-                       date > adjust_date) {
-                adjust = true;
-                adjust_date_set.emplace(adjust_date);
-            }
-
-            if (adjust) {
-                cur_cycle_end = date.nextWeek();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-
-            runMoment(date, cur_cycle_end, adjust);
-        }
-
-    } else if ("month" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextMonth();
-        for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            Datetime adjust_date = date.startOfMonth() + Days(adjust_cycle - 1);
-            bool adjust = false;
-            if (date == adjust_date) {
-                adjust = true;
-                adjust_date_set.emplace(adjust_date);
-            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
-                       date > adjust_date) {
-                adjust = true;
-                adjust_date_set.emplace(adjust_date);
-            }
-
-            if (adjust) {
-                cur_cycle_end = date.nextMonth();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-
-            runMoment(date, cur_cycle_end, adjust);
-        }
-
-    } else if ("quarter" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextQuarter();
-        for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            Datetime adjust_date = date.startOfQuarter() + Days(adjust_cycle - 1);
-            bool adjust = false;
-            if (date == adjust_date) {
-                adjust = true;
-                adjust_date_set.emplace(adjust_date);
-            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
-                       date > adjust_date) {
-                adjust = true;
-                adjust_date_set.emplace(adjust_date);
-            }
-
-            if (adjust) {
-                cur_cycle_end = date.nextQuarter();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-
-            runMoment(date, cur_cycle_end, adjust);
-        }
-
-    } else if ("year" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextYear();
-        for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            Datetime adjust_date = date.startOfYear() + Days(adjust_cycle - 1);
-            bool adjust = false;
-            if (date == adjust_date) {
-                adjust = true;
-                adjust_date_set.emplace(adjust_date);
-            } else if (adjust_date_set.find(adjust_date) == adjust_date_set.end() &&
-                       date > adjust_date) {
-                adjust = true;
-                adjust_date_set.emplace(adjust_date);
-            }
-
-            if (adjust) {
-                cur_cycle_end = date.nextYear();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-
-            runMoment(date, cur_cycle_end, adjust);
-        }
-    }
 }
 
 void Portfolio::traceMomentTMAfterRunAtOpen(const Datetime& date) {
