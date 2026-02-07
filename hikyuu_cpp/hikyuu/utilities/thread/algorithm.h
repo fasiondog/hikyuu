@@ -188,12 +188,11 @@ HKU_UTILS_API GlobalStealThreadPool* get_global_task_group();
 
 size_t HKU_UTILS_API get_global_task_group_work_num();
 
-std::thread::id HKU_UTILS_API get_main_thread_id();
-
 template <typename FutureContainer>
 void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& futures) {
-    if (std::this_thread::get_id() != get_main_thread_id()) {
-        // 只在子线程中执行唤醒，防止子线程嵌套时其他工作线程闲置
+    // 如果当前线程是工作线程，其子任务加入的是自身队列前端，其他线程无法获取子任务，需要唤醒
+    // 非工作线程时，其子任务加入的时主队列，无需主动唤醒
+    if (pool.is_work_thread()) {
         pool.wake_up();
     }
 
@@ -265,7 +264,7 @@ private:
     bool* p_flag;
 };
 
-/** 使用global_submit_task提交的任务，必须使用global_wait_task等待，然后get任务结果，否则可能造成卡死 */
+/** 使用global_submit_task提交的任务，必须使用global_wait_task，global_wake_up 配合 */
 template <typename FunctionType>
 auto global_submit_task(FunctionType f, bool enable_nested = true) {
     auto* tg = get_global_task_group();
@@ -274,10 +273,11 @@ auto global_submit_task(FunctionType f, bool enable_nested = true) {
 }
 
 inline void global_wake_up() {
-    HKU_IF_RETURN(std::this_thread::get_id() == get_main_thread_id(), void());
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
-    tg->wake_up();
+    if (tg->is_work_thread()) {
+        tg->wake_up();
+    }
 }
 
 template <typename FutureType>
@@ -317,8 +317,9 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f, si
     HKU_CHECK(tg, "Global task group is not initialized!");
     HKU_IF_RETURN(start >= end, void());
 
-    // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if ((end - start) < threshold || (!enable_nested && ExecutionGuard::is_executing())) {
+    // 如果任务数量小于阈值，或者当前是工作线程且禁止嵌套, 则直接执行
+    if ((end - start) < threshold ||
+        (!enable_nested && ExecutionGuard::is_executing() && tg->is_work_thread())) {
         for (size_t i = start; i < end; i++) {
             f(i);
         }
@@ -370,7 +371,8 @@ auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t 
     ret.reserve(end - start);
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if ((end - start) < threshold || (!enable_nested && ExecutionGuard::is_executing())) {
+    if ((end - start) < threshold ||
+        (!enable_nested && ExecutionGuard::is_executing() && tg->is_work_thread())) {
         for (size_t i = start; i < end; i++) {
             ret.emplace_back(f(i));
         }
@@ -426,7 +428,8 @@ void global_parallel_for_index_void_single(size_t start, size_t end, FunctionTyp
     HKU_IF_RETURN(start >= end, void());
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if ((end - start) < threshold || (!enable_nested && ExecutionGuard::is_executing())) {
+    if ((end - start) < threshold ||
+        (!enable_nested && ExecutionGuard::is_executing() && tg->is_work_thread())) {
         for (size_t i = start; i < end; i++) {
             f(i);
         }
@@ -468,7 +471,8 @@ auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
     ret.reserve(end - start);
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
-    if ((end - start) < threshold || (!enable_nested && ExecutionGuard::is_executing())) {
+    if ((end - start) < threshold ||
+        (!enable_nested && ExecutionGuard::is_executing() && tg->is_work_thread())) {
         for (size_t i = start; i < end; i++) {
             ret.push_back(f(i));
         }
