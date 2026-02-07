@@ -166,6 +166,8 @@ void MultiFactorBase::_checkData() {
 
 void MultiFactorBase::reset() {
     _reset();
+
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_ref_dates = {};
     m_stk_map = {};
     m_all_factors = {};
