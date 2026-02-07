@@ -52,7 +52,7 @@ public:
         return m_queue.empty();
     }
 
-    /** 队列大小，！未加锁，谨慎使用 */
+    /** 队列大小 */
     size_t size() const {
         std::shared_lock<std::shared_mutex> lock(m_mutex);
         return m_queue.size();
