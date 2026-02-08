@@ -192,7 +192,8 @@ template <typename FutureContainer>
 void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& futures) {
     // 如果当前线程是工作线程，其子任务加入的是自身队列前端，其他线程无法获取子任务，需要唤醒
     // 非工作线程时，其子任务加入的时主队列，无需主动唤醒
-    if (pool.is_work_thread()) {
+    bool is_work_thread = pool.is_work_thread();
+    if (is_work_thread) {
         pool.wake_up();
     }
 
@@ -210,13 +211,18 @@ void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& fut
             }
         }
 
-        // 如果不是所有任务都完成，尝试执行本地任务
+        // 如果不是所有任务都完成，尝试执行积累任务
         if (!all_ready) {
+            if (!pool.run_available_task_once()) {
+                return;
+            }
             if (pool.run_available_task_once()) {
                 delay = init_delay;
-            } else if (pool.done()) {
-                break;
+            } else if (!is_work_thread || pool.done()) {
+                // 非工作线程获取不到新任务时直接退出转为阻塞等待
+                return;
             } else {
+                // 工作线程休眠忙等
                 std::this_thread::sleep_for(delay);
                 if (delay < max_delay) {
                     delay = std::min(delay * 2, max_delay);

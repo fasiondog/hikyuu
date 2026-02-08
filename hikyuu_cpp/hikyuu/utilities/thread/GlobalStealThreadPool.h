@@ -93,6 +93,7 @@ public:
      * @return 实际唤醒的线程数量
      */
     int wake_up() {
+        HKU_IF_RETURN(m_done.load(std::memory_order_acquire), 0);
         int sleeping_count = m_sleep_count.load(std::memory_order_acquire);
         if (sleeping_count <= 0) {
             return 0;
@@ -142,7 +143,7 @@ public:
 
     /** 当前线程是否为工作线程 */
     bool is_work_thread() const {
-        return m_index != 0;
+        return m_local_work_queue != nullptr;
     }
 
     /** 先线程池提交任务后返回的对应 future 的类型 */
@@ -282,32 +283,33 @@ public:
 
 public:
     bool run_available_task_once() {
-        bool task_run = true;
+        HKU_IF_RETURN(m_done.load(std::memory_order_acquire) || m_thread_need_stop.isSet(), false);
+        bool task_run = false;
         task_type task;
         if (m_local_work_queue) {
             if (pop_task_from_local_queue(task)) {
                 if (!task.isNullTask()) {
                     task();
-                } else {
-                    m_thread_need_stop.set();
-                }
-            } else if (pop_task_from_master_queue(task)) {
-                if (!task.isNullTask()) {
-                    task();
+                    task_run = true;
                 } else {
                     m_thread_need_stop.set();
                 }
             } else if (pop_task_from_other_thread_queue(task)) {
                 task();
-            } else {
-                task_run = false;
+                task_run = true;
+            } else if (pop_task_from_master_queue(task)) {
+                if (!task.isNullTask()) {
+                    task();
+                    task_run = true;
+                } else {
+                    m_thread_need_stop.set();
+                }
             }
         } else if (pop_task_from_master_queue(task)) {
             if (!task.isNullTask()) {
                 task();
+                task_run = true;
             }
-        } else {
-            task_run = false;
         }
         return task_run;
     }
