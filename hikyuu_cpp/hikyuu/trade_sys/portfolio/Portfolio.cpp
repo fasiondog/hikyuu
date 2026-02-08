@@ -408,9 +408,7 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
 void Portfolio::run(const KQuery& query, bool force) {
     SPEND_TIME(Portfolio_run);
 
-    int adjust_cycle = getParam<int>("adjust_cycle");
     string mode = getParam<string>("adjust_mode");
-    bool delay_to_trading_day = getParam<bool>("delay_to_trading_day");
     to_lower(mode);
     if (mode != "query") {
         HKU_CHECK(query.kType() == KQuery::DAY, "{} {}", query.kType(),
