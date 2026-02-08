@@ -137,15 +137,23 @@ void MultiFactorSelector2::_calculate() {
     auto pf = getPF();
     DatetimeList adjust_dates =
       pf ? pf->getAdjustDates() : StockManager::instance().getTradingCalendar(m_query);
-    global_parallel_for_index_void(0, adjust_dates.size(), [&, this](size_t i) {
-        const auto& date = adjust_dates[i];
-        ScoreRecordList scores = m_mf->getScores(date, 0, Null<size_t>(), m_sc_filter);
-        SystemWeightList weights;
-        for (const auto& sc : scores) {
-            weights.emplace_back(stk_sys_dict[sc.stock], sc.value);
-        }
-        m_sys_weight_dict[date] = std::move(weights);
-    });
+    for (const auto& date : adjust_dates) {
+        m_sys_weight_dict[date];
+    }
+
+    global_parallel_for_index_void(
+      0, adjust_dates.size(), [&, mf = m_mf.get(), filter = m_sc_filter->clone(), this](size_t i) {
+          const auto& date = adjust_dates[i];
+          ScoreRecordList scores = mf->getScores(date, 0, Null<size_t>(), filter);
+          SystemWeightList weights;
+          for (const auto& sc : scores) {
+              weights.emplace_back(stk_sys_dict[sc.stock], sc.value);
+          }
+          auto iter = m_sys_weight_dict.find(date);
+          if (iter != m_sys_weight_dict.end()) {
+              iter->second = std::move(weights);
+          }
+      });
 
     m_mf->reset();
 }
