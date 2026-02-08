@@ -335,7 +335,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    const auto& cross = getScores(date);
+    auto cross = getScores(date);
     if (end == Null<size_t>() || end > cross.size()) {
         end = cross.size();
     }
@@ -353,7 +353,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    const auto& cross = getScores(date);
+    auto cross = getScores(date);
     HKU_IF_RETURN(cross.empty(), ret);
 
     if (end == Null<size_t>() || end > cross.size()) {
@@ -382,7 +382,7 @@ ScoreRecordList MultiFactorBase::getScores(
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    const auto& cross = getScores(date);
+    auto cross = getScores(date);
     HKU_IF_RETURN(cross.empty(), ret);
 
     if (end == Null<size_t>() || end > cross.size()) {
@@ -410,7 +410,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    const auto& cross = getScores(date);
+    auto cross = getScores(date);
     HKU_IF_RETURN(cross.empty(), ret);
 
     if (end == Null<size_t>() || end > cross.size()) {
