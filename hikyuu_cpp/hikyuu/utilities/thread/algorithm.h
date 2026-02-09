@@ -218,8 +218,8 @@ void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& fut
             }
             if (pool.run_available_task_once()) {
                 delay = init_delay;
-            } else if (!is_work_thread || pool.done()) {
-                // 非工作线程获取不到新任务时直接退出转为阻塞等待
+            } else if (pool.done()) {
+                // 非工作线程也要参与忙等，否则在内存不足时更容易发生内存交换
                 return;
             } else {
                 // 工作线程休眠忙等
