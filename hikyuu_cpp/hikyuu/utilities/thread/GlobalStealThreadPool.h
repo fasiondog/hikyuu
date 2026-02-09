@@ -283,24 +283,34 @@ public:
 
 public:
     bool run_available_task_once() {
-        HKU_IF_RETURN(
-          !is_work_thread() || m_done.load(std::memory_order_acquire) || m_thread_need_stop.isSet(),
-          false);
-
+        HKU_IF_RETURN(m_done.load(std::memory_order_acquire) || m_thread_need_stop.isSet(), false);
         bool task_run = false;
         task_type task;
-        if (pop_task_from_local_queue(task)) {
+        if (m_local_work_queue) {
+            if (pop_task_from_local_queue(task)) {
+                if (!task.isNullTask()) {
+                    task();
+                    task_run = true;
+                } else {
+                    m_thread_need_stop.set();
+                }
+            } else if (pop_task_from_other_thread_queue(task)) {
+                task();
+                task_run = true;
+            } else if (pop_task_from_master_queue(task)) {
+                if (!task.isNullTask()) {
+                    task();
+                    task_run = true;
+                } else {
+                    m_thread_need_stop.set();
+                }
+            }
+        } else if (pop_task_from_master_queue(task)) {
             if (!task.isNullTask()) {
                 task();
                 task_run = true;
-            } else {
-                m_thread_need_stop.set();
             }
-        } else if (pop_task_from_other_thread_queue(task)) {
-            task();
-            task_run = true;
         }
-
         return task_run;
     }
 

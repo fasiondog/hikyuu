@@ -190,14 +190,19 @@ size_t HKU_UTILS_API get_global_task_group_work_num();
 
 template <typename FutureContainer>
 void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& futures) {
-    // 如果不是工作线程，则不需要等待，直接阻塞方式等待
-    HKU_IF_RETURN(futures.empty(), void());
-    HKU_IF_RETURN(!pool.is_work_thread(), void());
-
-    pool.wake_up();
+    // 如果当前线程是工作线程，其子任务加入的是自身队列前端，其他线程无法获取子任务，需要唤醒
+    // 非工作线程时，其子任务加入的时主队列，无需主动唤醒
+    bool is_work_thread = pool.is_work_thread();
+    if (is_work_thread) {
+        pool.wake_up();
+    }
 
     bool all_ready = false;
-    while (!all_ready) {
+    auto init_delay = std::chrono::microseconds(1);
+    auto delay = init_delay;
+    const auto max_delay = std::chrono::microseconds(50000);
+
+    while (!all_ready && !pool.done()) {
         all_ready = true;
         for (auto& future : futures) {
             if (future.wait_for(std::chrono::nanoseconds(0)) != std::future_status::ready) {
@@ -206,16 +211,23 @@ void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& fut
             }
         }
 
-        // 如果不是所有任务都完成，尝试执行本地任务
+        // 如果不是所有任务都完成，尝试执行积累任务
         if (!all_ready) {
             if (!pool.run_available_task_once()) {
                 return;
             }
-            // if (pool.run_available_task_once()) {
-            //     pool.wake_up();
-            // } else {
-            //     return;
-            // }
+            if (pool.run_available_task_once()) {
+                delay = init_delay;
+            } else if (!is_work_thread || pool.done()) {
+                // 非工作线程获取不到新任务时直接退出转为阻塞等待
+                return;
+            } else {
+                // 工作线程休眠忙等
+                std::this_thread::sleep_for(delay);
+                if (delay < max_delay) {
+                    delay = std::min(delay * 2, max_delay);
+                }
+            }
         }
     }
 }
@@ -269,9 +281,9 @@ void global_wait_task(FutureType& future) {
 template <typename FunctionType>
 auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f, size_t threshold = 2,
                                     bool enable_nested = true) {
-    HKU_IF_RETURN(start >= end, void());
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
+    HKU_IF_RETURN(start >= end, void());
 
     // 如果任务数量小于阈值，或者当前是工作线程且禁止嵌套, 则直接执行
     if ((end - start) < threshold || (!enable_nested && tg->is_work_thread())) {
@@ -308,12 +320,13 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f, si
 template <typename FunctionType>
 auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t threshold = 2,
                                bool enable_nested = true) {
-    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
-    HKU_IF_RETURN(start >= end, ret);
-    ret.reserve(end - start);
-
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
+
+    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+    HKU_IF_RETURN(start >= end, ret);
+
+    ret.reserve(end - start);
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
     if ((end - start) < threshold || (!enable_nested && tg->is_work_thread())) {
@@ -357,9 +370,9 @@ auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t 
 template <typename FunctionType>
 void global_parallel_for_index_void_single(size_t start, size_t end, FunctionType f,
                                            size_t threshold = 1, bool enable_nested = true) {
-    HKU_IF_RETURN(start >= end, void());
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
+    HKU_IF_RETURN(start >= end, void());
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
     if ((end - start) < threshold || (!enable_nested && tg->is_work_thread())) {
@@ -386,11 +399,11 @@ void global_parallel_for_index_void_single(size_t start, size_t end, FunctionTyp
 template <typename FunctionType>
 auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
                                       size_t threshold = 1, bool enable_nested = true) {
-    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
-    HKU_IF_RETURN(start >= end, ret);
-
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
+
+    std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
+    HKU_IF_RETURN(start >= end, ret);
 
     ret.reserve(end - start);
 
