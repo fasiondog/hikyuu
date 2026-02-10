@@ -27,7 +27,8 @@ bool IndicatorImp::ms_enable_increment_calculate{true};
 void IndicatorImp::initEngine() {
     mi_option_enable(mi_option_large_os_pages);  // 启用大页面
     mi_option_enable(mi_option_use_numa_nodes);  // 启用NUMA支持
-    mi_option_set(mi_option_purge_delay, 0);
+    mi_option_set(mi_option_purge_delay, 100);
+    // mi_option_disable(mi_option_purge_decommits);
 
     mi_stats_reset();
     // mi_stats_print(NULL);
