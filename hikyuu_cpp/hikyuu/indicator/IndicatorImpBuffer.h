@@ -19,7 +19,11 @@
 #include <type_traits>
 #include <utility>
 
-#include "hikyuu/config.h"
+#include "../config.h"
+
+#ifndef HKU_API
+#define HKU_API
+#endif
 
 namespace hku {
 
