@@ -9,11 +9,11 @@
 #ifndef INDICATORIMP_H_
 #define INDICATORIMP_H_
 
-#include <mimalloc.h>
 #include "../config.h"
 #include "../KData.h"
 #include "../utilities/Parameter.h"
 #include "../utilities/thread/thread.h"
+#include "IndicatorImpBuffer.h"
 
 namespace hku {
 
@@ -61,12 +61,8 @@ public:
         INVALID
     };
 
-#if HKU_USE_LOW_PRECISION
-    typedef float value_t;
-#else
-    typedef double value_t;
-#endif
-    typedef vector<value_t, mi_stl_allocator<value_t>> buffer_t;
+    typedef IndicatorImpBuffer::value_type value_t;
+    typedef IndicatorImpBuffer buffer_t;
 
 public:
     /** 默认构造函数   */

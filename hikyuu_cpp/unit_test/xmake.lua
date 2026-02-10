@@ -71,7 +71,7 @@ target("unit-test")
         end
     end
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json", "mimalloc")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json")
     if get_config("mysql") then
         add_packages("mysql")
     end
