@@ -9,11 +9,11 @@
 #ifndef INDICATORIMP_H_
 #define INDICATORIMP_H_
 
-#include <mimalloc.h>
 #include "../config.h"
 #include "../KData.h"
 #include "../utilities/Parameter.h"
 #include "../utilities/thread/thread.h"
+#include "IndicatorImpBuffer.h"
 
 namespace hku {
 
@@ -21,7 +21,6 @@ namespace hku {
 
 class HKU_API Indicator;
 class HKU_API IndParam;
-class HKU_API IndicatorAssemble;
 
 vector<Indicator> HKU_API combineCalculateIndicators(const vector<Indicator>& indicators,
                                                      const KData& kdata, bool tovalue);
@@ -37,7 +36,6 @@ class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
     typedef vector<Indicator> IndicatorList;
     friend IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,
                                                             const KData& kdata, bool tovalue);
-    friend class HKU_API IndicatorAssemble;
 
 public:
     enum OPType : uint8_t {
@@ -61,12 +59,8 @@ public:
         INVALID
     };
 
-#if HKU_USE_LOW_PRECISION
-    typedef float value_t;
-#else
-    typedef double value_t;
-#endif
-    typedef vector<value_t, mi_stl_allocator<value_t>> buffer_t;
+    typedef IndicatorImpBuffer::value_type value_t;
+    typedef IndicatorImpBuffer buffer_t;
 
 public:
     /** 默认构造函数   */

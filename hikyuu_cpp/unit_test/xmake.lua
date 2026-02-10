@@ -71,7 +71,7 @@ target("unit-test")
         end
     end
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json", "mimalloc")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json")
     if get_config("mysql") then
         add_packages("mysql")
     end
@@ -142,7 +142,7 @@ target("small-test")
     set_kind("binary")
     set_default(false)
     
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json", "mimalloc")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json")
     if get_config("mysql") then
         if is_plat("macosx") then
             add_packages("mysqlclient")
@@ -187,7 +187,7 @@ target("real-test")
     set_kind("binary")
     set_default(false)
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "mysql", "nlohmann_json", "mimalloc")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "mysql", "nlohmann_json")
     if get_config("mysql") then
         if is_plat("macosx") then
             add_packages("mysqlclient")

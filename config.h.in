@@ -46,6 +46,8 @@
 // 使用 TA-Lib
 #define HKU_ENABLE_TA_LIB ${HKU_ENABLE_TA_LIB}
 
+#define HKU_ENABLE_MIMALLOC ${HKU_ENABLE_MIMALLOC}
+
 // clang-format on
 
 #endif /* HIKYUU_CONFIG_H_ */
