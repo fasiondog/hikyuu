@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "../config.h"
+#include "hikyuu/DataType.h"
 
 #ifndef HKU_API
 #define HKU_API
