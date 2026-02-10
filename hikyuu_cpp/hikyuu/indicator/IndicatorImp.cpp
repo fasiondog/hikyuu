@@ -16,6 +16,10 @@
 #include "imp/ICval.h"
 #include "imp/IContext.h"
 
+#if HKU_ENABLE_MIMALLOC
+#include <mimalloc.h>
+#endif
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IndicatorImp)
 #endif
@@ -28,7 +32,8 @@ void IndicatorImp::initEngine() {
 #if HKU_ENABLE_MIMALLOC
     mi_option_enable(mi_option_large_os_pages);  // 启用大页面
     mi_option_enable(mi_option_use_numa_nodes);  // 启用NUMA支持
-    mi_option_set(mi_option_purge_delay, 100);
+    // mi_option_set(mi_option_purge_delay, 0);
+    // mi_option_set(mi_option_purge_delay, 100);
     // mi_option_disable(mi_option_purge_decommits);
 
     mi_stats_reset();

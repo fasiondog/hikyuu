@@ -1,7 +1,7 @@
 /*
- * IndicatorImpBuffer.cpp
+ *  Copyright (c) 2026 hikyuu.org
  *
- *  Created on: 2024-01-XX
+ *  Created on: 2026-02-10
  *      Author: fasiondog
  */
 

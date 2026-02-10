@@ -1,15 +1,11 @@
 /*
- * IndicatorImpBuffer.h
+ *  Copyright (c) 2026 hikyuu.org
  *
- *  Created on: 2024-01-XX
+ *  Created on: 2026-02-10
  *      Author: fasiondog
  */
 
 #pragma once
-/**
- * @file IndicatorImpBuffer.h
- * @brief IndicatorImpBuffer类定义文件
- */
 
 #include <algorithm>
 #include <cassert>
@@ -27,20 +23,18 @@
 
 namespace hku {
 
-#if HKU_USE_LOW_PRECISION
-typedef float indicator_value_t;
-#else
-typedef double indicator_value_t;
-#endif
-
 /**
  * IndicatorImpBuffer类，完全自定义内存管理，兼容malloc和mi_malloc
  * 对外提供类似std::vector的接口
  */
-class IndicatorImpBuffer {
+class HKU_API IndicatorImpBuffer {
 public:
-    // 类型定义
-    typedef indicator_value_t value_type;
+// 类型定义
+#if HKU_USE_LOW_PRECISION
+    typedef float value_type;
+#else
+    typedef double value_type;
+#endif
     typedef value_type& reference;
     typedef const value_type& const_reference;
     typedef value_type* pointer;
@@ -144,8 +138,8 @@ public:
                 // 需要重新分配内存
                 Buffer new_buffer;
                 new_buffer.allocate(other.m_buffer.capacity);
-                std::uninitialized_copy(other.m_buffer.data, other.m_buffer.data + other.m_buffer.size,
-                                        new_buffer.data);
+                std::uninitialized_copy(other.m_buffer.data,
+                                        other.m_buffer.data + other.m_buffer.size, new_buffer.data);
                 new_buffer.size = other.m_buffer.size;
 
                 // 清理旧资源并替换
@@ -233,11 +227,12 @@ public:
             if (count > m_buffer.capacity) {
                 reserve(count);
             }
-            std::uninitialized_value_construct(m_buffer.data + m_buffer.size, m_buffer.data + count);
+            std::uninitialized_value_construct(m_buffer.data + m_buffer.size,
+                                               m_buffer.data + count);
             m_buffer.size = count;
         }
     }
-    
+
     void resize(size_type count, const value_type& value) {
         if (count < m_buffer.size) {
             // 缩小
@@ -252,19 +247,19 @@ public:
             m_buffer.size = count;
         }
     }
-    
+
     void reserve(size_type new_cap) {
         if (new_cap > m_buffer.capacity) {
             m_buffer.reallocate(calculate_growth(new_cap));
         }
     }
-    
+
     void shrink_to_fit() {
         if (m_buffer.capacity > m_buffer.size) {
             m_buffer.reallocate(m_buffer.size);
         }
     }
-    
+
     void clear() noexcept {
         destroy_elements(m_buffer.data, m_buffer.data + m_buffer.size);
         m_buffer.size = 0;
@@ -277,14 +272,14 @@ public:
         }
         return m_buffer.data[pos];
     }
-    
+
     const_reference at(size_type pos) const {
         if (pos >= m_buffer.size) {
             throw std::out_of_range("IndicatorImpBuffer::at: position out of range");
         }
         return m_buffer.data[pos];
     }
-    
+
     reference operator[](size_type pos) {
         return m_buffer.data[pos];
     }
@@ -356,7 +351,7 @@ public:
         new (m_buffer.data + m_buffer.size) value_type(value);
         ++m_buffer.size;
     }
-    
+
     void push_back(value_type&& value) {
         if (m_buffer.size >= m_buffer.capacity) {
             reserve(m_buffer.size + 1);
@@ -364,7 +359,7 @@ public:
         new (m_buffer.data + m_buffer.size) value_type(std::move(value));
         ++m_buffer.size;
     }
-    
+
     template <class... Args>
     reference emplace_back(Args&&... args) {
         if (m_buffer.size >= m_buffer.capacity) {
@@ -376,7 +371,7 @@ public:
         ++m_buffer.size;
         return *pos;
     }
-    
+
     void pop_back() {
         if (m_buffer.size > 0) {
             --m_buffer.size;
@@ -387,11 +382,11 @@ public:
     iterator insert(const_iterator pos, const value_type& value) {
         return emplace(pos, value);
     }
-    
+
     iterator insert(const_iterator pos, value_type&& value) {
         return emplace(pos, std::move(value));
     }
-    
+
     iterator insert(const_iterator pos, size_type count, const value_type& value) {
         difference_type pos_offset = pos - m_buffer.data;
 
@@ -414,7 +409,7 @@ public:
 
         return pos_it;
     }
-    
+
     template <class InputIt>
     iterator insert(const_iterator pos, InputIt first, InputIt last) {
         difference_type pos_offset = pos - m_buffer.data;
@@ -439,7 +434,7 @@ public:
 
         return pos_it;
     }
-    
+
     template <class... Args>
     iterator emplace(const_iterator pos, Args&&... args) {
         difference_type pos_offset = pos - m_buffer.data;
@@ -460,7 +455,7 @@ public:
 
         return pos_it;
     }
-    
+
     iterator erase(const_iterator pos) {
         iterator pos_it = const_cast<iterator>(pos);
         // 先销毁要删除的元素
@@ -470,7 +465,7 @@ public:
         --m_buffer.size;
         return pos_it;
     }
-    
+
     iterator erase(const_iterator first, const_iterator last) {
         if (first == last)
             return const_cast<iterator>(first);
@@ -518,11 +513,11 @@ private:
     void construct_elements(pointer first, pointer last, const value_type& value) {
         std::uninitialized_fill(first, last, value);
     }
-    
+
     void destroy_elements(pointer first, pointer last) {
         std::destroy(first, last);
     }
-    
+
     void move_elements_backward(pointer first, pointer last, pointer dest) {
         // 手动实现元素向后移动，避免std::move_backward的复杂性
         difference_type count = last - first;
@@ -534,7 +529,7 @@ private:
             *(dest + i) = std::move(*(first + i));
         }
     }
-    
+
     size_type calculate_growth(size_type new_size) const {
         size_type current_capacity = m_buffer.capacity;
         if (current_capacity == 0) {
@@ -542,7 +537,6 @@ private:
         }
         return std::max(new_size, current_capacity * 2);
     }
-
 };
 
 // 非成员函数

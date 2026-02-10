@@ -25,7 +25,7 @@ target("hikyuu")
         end
     end
 
-    if has_config("mimalloc") then 
+    if is_plat("windows", "linux", "cross") then 
         add_packages("mimalloc")
     end
 
