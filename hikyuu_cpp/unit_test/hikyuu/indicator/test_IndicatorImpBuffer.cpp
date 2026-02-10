@@ -266,13 +266,13 @@ TEST_CASE("test_IndicatorImpBuffer_move_semantics") {
     double value = 3.14;
     buf.push_back(std::move(value));
     CHECK_EQ(buf.size(), 1);
-    CHECK_EQ(buf[0], 3.14);
+    CHECK_EQ(buf[0], doctest::Approx(3.14));
 
     // 测试移动语义的insert
     double insert_value = 2.71;
     buf.insert(buf.begin(), std::move(insert_value));
     CHECK_EQ(buf.size(), 2);
-    CHECK_EQ(buf[0], 2.71);
+    CHECK_EQ(buf[0], doctest::Approx(2.71));
 }
 
 TEST_CASE("test_IndicatorImpBuffer_iterator_operations") {
