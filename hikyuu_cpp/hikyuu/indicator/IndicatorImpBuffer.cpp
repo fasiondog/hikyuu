@@ -9,6 +9,10 @@
 #include <stdexcept>
 #include "IndicatorImpBuffer.h"
 
+#if HKU_ENABLE_MIMALLOC
+#include <mimalloc.h>
+#endif
+
 namespace hku {
 
 // 重载new和delete操作符
