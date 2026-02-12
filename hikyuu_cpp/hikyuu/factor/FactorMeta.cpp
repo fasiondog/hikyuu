@@ -27,11 +27,37 @@ string FactorMeta::str() const {
     return os.str();
 }
 
+static bool isValidName(const string& name) {
+    // 名称规则: 英文字母、数字、_ 组成，且首字母不能为数字
+
+    // 检查名称是否为空
+    if (name.empty()) {
+        return false;
+    }
+
+    // 检查首字符是否为字母或下划线
+    if (!isalpha(name[0]) && name[0] != '_') {
+        return false;
+    }
+
+    // 检查其余字符是否都是字母、数字或下划线
+    for (size_t i = 1; i < name.length(); ++i) {
+        if (!isalnum(name[i]) && name[i] != '_') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 FactorMeta::FactorMeta() : m_data(make_shared<Data>()) {}
 
 FactorMeta::FactorMeta(const string& name, const KQuery::KType& ktype, const string& desc,
                        const Indicator& ind)
 : FactorMeta() {
+    HKU_CHECK(isValidName(name),
+              htr("Illegal name! Naming rules: Only letters, digits and underscores (_) allowed; "
+                  "cannot start with a digit."));
     m_data->name = name;
     m_data->ktype = ktype;
     m_data->description = desc;
