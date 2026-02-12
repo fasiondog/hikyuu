@@ -12,79 +12,75 @@
 namespace hku {
 
 class HKU_API FactorMeta {
+    friend HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta&);
+
 public:
-    FactorMeta() = default;
+    FactorMeta();
+    explicit FactorMeta(const string& name, const KQuery::KType& ktype = KQuery::DAY,
+                        const string& desc = "", const Indicator& ind = Indicator());
+
+    FactorMeta(const FactorMeta& other);
+    FactorMeta(const FactorMeta&& other);
     virtual ~FactorMeta() = default;
 
-    const string& name() const noexcept {
-        return m_name;
-    }
+    FactorMeta& operator=(const FactorMeta& other);
+    FactorMeta& operator=(const FactorMeta&& other);
 
-    void name(const string& name) noexcept {
-        m_name = name;
+    const string& name() const noexcept {
+        return m_data->name;
     }
 
     const string& ktype() const noexcept {
-        return m_ktype;
-    }
-
-    void ktype(const string& ktype) noexcept {
-        m_ktype = ktype;
+        return m_data->ktype;
     }
 
     const string& description() const noexcept {
-        return m_description;
+        return m_data->description;
     }
 
     void description(const string& description) noexcept {
-        m_description = description;
+        m_data->description = description;
     }
 
     const Indicator& indicator() const noexcept {
-        return m_ind;
+        return m_data->ind;
     }
 
     void indicator(const Indicator& ind) noexcept {
-        m_ind = ind;
+        m_data->ind = ind;
     }
 
     const Datetime& createAt() const noexcept {
-        return m_create_at;
-    }
-
-    void createAt(const Datetime& datetime) noexcept {
-        m_create_at = datetime;
+        return m_data->create_at;
     }
 
     const Datetime& updateAt() const noexcept {
-        return m_update_at;
-    }
-
-    void updateAt(const Datetime& datetime) noexcept {
-        m_update_at = datetime;
+        return m_data->update_at;
     }
 
     bool isActive() const noexcept {
-        return m_is_active;
+        return m_data->is_active;
     }
 
     void isActive(bool flag) noexcept {
-        m_is_active = flag;
+        m_data->is_active = flag;
     }
 
-    bool saved() const noexcept {
-        return m_saved;
-    }
+    string str() const;
 
 private:
-    string m_name;
-    string m_ktype;
-    string m_description;
-    Datetime m_create_at;
-    Datetime m_update_at;
-    Indicator m_ind;
-    bool m_is_active{false};
-    bool m_saved{false};
+    struct Data {
+        string name;
+        string ktype;
+        string description;
+        Datetime create_at;
+        Datetime update_at;
+        Indicator ind;
+        bool is_active{false};
+    };
+    shared_ptr<Data> m_data;
 };
+
+HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta&);
 
 }  // namespace hku
