@@ -131,6 +131,4 @@ void IndicatorImpBuffer::Buffer::reallocate(IndicatorImpBuffer::size_type new_ca
     }
 }
 
-// 私有辅助函数实现
-
 }  // namespace hku
