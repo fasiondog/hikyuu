@@ -9,10 +9,11 @@
 #ifndef KDATADRIVER_H_
 #define KDATADRIVER_H_
 
-#include "../utilities/Parameter.h"
-#include "../KQuery.h"
-#include "../TimeLineRecord.h"
-#include "../TransRecord.h"
+#include "hikyuu/utilities/Parameter.h"
+#include "hikyuu/KQuery.h"
+#include "hikyuu/TimeLineRecord.h"
+#include "hikyuu/TransRecord.h"
+#include "hikyuu/factor/FactorMeta.h"
 
 namespace hku {
 
@@ -118,6 +119,8 @@ public:
      * @return
      */
     virtual TransList getTransList(const string& market, const string& code, const KQuery& query);
+
+    virtual void saveFactorMeta(const FactorMeta& factor);
 
     //---------------------------------------------------
     // 以下为列式数据库接口
