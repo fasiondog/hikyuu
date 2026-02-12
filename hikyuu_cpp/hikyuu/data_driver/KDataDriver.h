@@ -129,9 +129,7 @@ public:
     }
 
     virtual std::unordered_map<std::string, KRecordList> getAllKRecordList(
-      const KQuery::KType& ktype, const Datetime& start_date, const std::atomic_bool& cancel_flag) {
-        HKU_THROW("Not support getAllKRecordList");
-    }
+      const KQuery::KType& ktype, const Datetime& start_date, const std::atomic_bool& cancel_flag);
 
 protected:
     bool isPythonObject() const noexcept {

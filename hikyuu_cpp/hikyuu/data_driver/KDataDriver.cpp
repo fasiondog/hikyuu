@@ -97,4 +97,10 @@ TransList KDataDriver::getTransList(const string& market, const string& code, co
     return TransList();
 }
 
+std::unordered_map<std::string, KRecordList> KDataDriver::getAllKRecordList(
+  const KQuery::KType& ktype, const Datetime& start_date, const std::atomic_bool& cancel_flag) {
+    HKU_INFO("The getAllKRecordList method has not been implemented! (KDataDriver: {})", m_name);
+    return std::unordered_map<std::string, KRecordList>();
+}
+
 } /* namespace hku */
