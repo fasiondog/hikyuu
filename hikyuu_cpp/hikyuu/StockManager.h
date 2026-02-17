@@ -249,6 +249,8 @@ public:
      */
     void removeTempCsvStock(const string& code);
 
+    void saveIndicator(const string& name, const Indicator& ind);
+
     /**
      * 获取当前执行线程id，主要用于判断 Strategy 是以独立进程还是线程方式运行
      */

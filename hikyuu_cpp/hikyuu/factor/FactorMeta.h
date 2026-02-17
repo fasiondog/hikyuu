@@ -16,8 +16,9 @@ class HKU_API FactorMeta {
 
 public:
     FactorMeta();
-    explicit FactorMeta(const string& name, const KQuery::KType& ktype = KQuery::DAY,
-                        const string& desc = "", const Indicator& ind = Indicator());
+    explicit FactorMeta(const string& name, const Indicator& formula,
+                        const KQuery::KType& ktype = KQuery::DAY, const string& brief = "",
+                        const string& details = "");
 
     FactorMeta(const FactorMeta& other);
     FactorMeta(const FactorMeta&& other);
@@ -34,20 +35,24 @@ public:
         return m_data->ktype;
     }
 
-    const string& description() const noexcept {
-        return m_data->description;
+    const string& brief() const noexcept {
+        return m_data->brief;
     }
 
-    void description(const string& description) noexcept {
-        m_data->description = description;
+    void brief(const string& brief) noexcept {
+        m_data->brief = brief;
     }
 
-    const Indicator& indicator() const noexcept {
-        return m_data->ind;
+    const string& details() const noexcept {
+        return m_data->details;
     }
 
-    void indicator(const Indicator& ind) noexcept {
-        m_data->ind = ind;
+    void details(const string& details) noexcept {
+        m_data->details = details;
+    }
+
+    const Indicator& formula() const noexcept {
+        return m_data->formula;
     }
 
     const Datetime& createAt() const noexcept {
@@ -72,10 +77,11 @@ private:
     struct Data {
         string name;
         string ktype;
-        string description;
+        string brief;
+        string details;
         Datetime create_at;
         Datetime update_at;
-        Indicator ind;
+        Indicator formula;
         bool is_active{false};
     };
     shared_ptr<Data> m_data;

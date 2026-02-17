@@ -355,6 +355,8 @@ void export_StockManager(py::module& m) {
     
     :param str market_code: 证券市场标识)")
 
+      .def("save_indicator", &StockManager::saveIndicator)
+
       .def("__len__", &StockManager::size, "返回证券数量")
       .def("__getitem__", &StockManager::getStock, "同 get_stock")
       .def(

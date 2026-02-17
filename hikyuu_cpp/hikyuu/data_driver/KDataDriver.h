@@ -122,6 +122,8 @@ public:
 
     virtual void saveFactorMeta(const FactorMeta& factor);
 
+    virtual void saveIndicatorAsFactor(const string& name, const Indicator& ind);
+
     //---------------------------------------------------
     // 以下为列式数据库接口
     //---------------------------------------------------
@@ -204,6 +206,10 @@ public:
 
     TransList getTransList(const string& market, const string& code, const KQuery& query) {
         return m_driver->getTransList(market, code, query);
+    }
+
+    void saveIndicatorAsFactor(const string& name, const Indicator& ind) {
+        m_driver->saveIndicatorAsFactor(name, ind);
     }
 
     bool isColumnFirst() const {

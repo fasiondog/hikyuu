@@ -830,4 +830,9 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
     return ret;
 }
 
+void StockManager::saveIndicator(const string& name, const Indicator& ind) {
+    auto kdriver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+    kdriver->getConnect()->saveIndicatorAsFactor(name, ind);
+}
+
 }  // namespace hku

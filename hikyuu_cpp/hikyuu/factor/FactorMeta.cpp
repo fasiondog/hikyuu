@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/indicator/imp/IPriceList.h"
+#include "hikyuu/indicator/crt/PRICELIST.h"
 #include "FactorMeta.h"
 
 namespace hku {
@@ -16,8 +18,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta& factor) {
        << strip << "is_active: " << factor.m_data->is_active << strip
        << "create_at: " << factor.m_data->create_at.str() << strip
        << "update_at: " << factor.m_data->update_at.str() << strip
-       << "formula: " << factor.m_data->ind << strip
-       << "description: " << factor.m_data->description << ")";
+       << "formula: " << factor.m_data->formula() << strip << "brief: " << factor.m_data->brief
+       << strip << "detail: " << factor.m_data->details << ")";
     return os;
 }
 
@@ -52,16 +54,27 @@ static bool isValidName(const string& name) {
 
 FactorMeta::FactorMeta() : m_data(make_shared<Data>()) {}
 
-FactorMeta::FactorMeta(const string& name, const KQuery::KType& ktype, const string& desc,
-                       const Indicator& ind)
+FactorMeta::FactorMeta(const string& name, const Indicator& formula, const KQuery::KType& ktype,
+                       const string& brief, const string& details)
 : FactorMeta() {
     HKU_CHECK(isValidName(name),
               htr("Illegal name! Naming rules: Only letters, digits and underscores (_) allowed; "
                   "cannot start with a digit."));
+    Indicator ind = formula.clone();
+    ind.setContext(KData());
+    IndicatorImp* imp_ptr = ind.getImp().get();
+    HKU_CHECK(imp_ptr, "Invalid formula indicator!");
+
+    IPriceList* tmp_ptr = dynamic_cast<IPriceList*>(imp_ptr);
+    if (tmp_ptr) {
+        ind = PRICELIST();
+    }
+
     m_data->name = name;
     m_data->ktype = ktype;
-    m_data->description = desc;
-    m_data->ind = ind;
+    m_data->brief = brief;
+    m_data->details = details;
+    m_data->formula = ind;
     m_data->create_at = Datetime::now();
     m_data->is_active = true;
 }
@@ -78,8 +91,9 @@ FactorMeta& FactorMeta::operator=(const FactorMeta& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_data->name = other.m_data->name;
     m_data->ktype = other.m_data->ktype;
-    m_data->description = other.m_data->description;
-    m_data->ind = other.m_data->ind;
+    m_data->brief = other.m_data->brief;
+    m_data->details = other.m_data->details;
+    m_data->formula = other.m_data->formula;
     m_data->create_at = other.m_data->create_at;
     m_data->update_at = other.m_data->update_at;
     m_data->is_active = other.m_data->is_active;
@@ -90,8 +104,9 @@ FactorMeta& FactorMeta::operator=(const FactorMeta&& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_data->name = std::move(other.m_data->name);
     m_data->ktype = std::move(other.m_data->ktype);
-    m_data->description = std::move(other.m_data->description);
-    m_data->ind = std::move(other.m_data->ind);
+    m_data->brief = std::move(other.m_data->brief);
+    m_data->details = std::move(other.m_data->details);
+    m_data->formula = std::move(other.m_data->formula);
     m_data->create_at = std::move(other.m_data->create_at);
     m_data->update_at = std::move(other.m_data->update_at);
     m_data->is_active = other.m_data->is_active;
