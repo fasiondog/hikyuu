@@ -20,8 +20,14 @@ FundsList TradeManagerBase::getFundsList(const DatetimeList& dates, const KQuery
     size_t total = dates.size();
     FundsList result;
     HKU_IF_RETURN(total == 0, result);
+
+    // 先计算最后日期，防止后续并行计算时更新权息涉及线程安全
+    auto last_funds = getFunds(dates.back(), ktype);
+
     result = global_parallel_for_index(
-      0, total, [&, this](size_t i) -> FundsRecord { return getFunds(dates[i], ktype); });
+      0, total - 1, [&, this](size_t i) -> FundsRecord { return getFunds(dates[i], ktype); });
+
+    result.push_back(last_funds);
     return result;
 }
 
