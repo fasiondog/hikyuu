@@ -106,6 +106,11 @@ void KDataDriver::saveIndicatorAsFactor(const string& name, const Indicator& ind
              m_name);
 }
 
+Indicator KDataDriver::loadFactor(const string& name, const Stock& stock, const KQuery& query) {
+    HKU_INFO("The loadFactor method has not been implemented! (KDataDriver: {})", m_name);
+    return Indicator();
+}
+
 std::unordered_map<std::string, KRecordList> KDataDriver::getAllKRecordList(
   const KQuery::KType& ktype, const Datetime& start_date, const std::atomic_bool& cancel_flag) {
     HKU_INFO("The getAllKRecordList method has not been implemented! (KDataDriver: {})", m_name);

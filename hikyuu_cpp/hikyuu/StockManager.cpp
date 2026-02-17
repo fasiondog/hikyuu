@@ -830,9 +830,19 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
     return ret;
 }
 
+void StockManager::saveFactorMeta(const FactorMeta& factor) {
+    DataDriverFactory::getKDataDriverPool(m_kdataDriverParam)->getConnect()->saveFactorMeta(factor);
+}
+
 void StockManager::saveIndicator(const string& name, const Indicator& ind) {
     auto kdriver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
     kdriver->getConnect()->saveIndicatorAsFactor(name, ind);
+}
+
+Indicator StockManager::loadIndicator(const string& name, const Stock& stock, const KQuery& query) {
+    return DataDriverFactory::getKDataDriverPool(m_kdataDriverParam)
+      ->getConnect()
+      ->loadFactor(name, stock, query);
 }
 
 }  // namespace hku

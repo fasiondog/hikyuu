@@ -9,10 +9,10 @@
 #ifndef INDICATORIMP_H_
 #define INDICATORIMP_H_
 
-#include "../config.h"
-#include "../KData.h"
-#include "../utilities/Parameter.h"
-#include "../utilities/thread/thread.h"
+#include "hikyuu/config.h"
+#include "hikyuu/KData.h"
+#include "hikyuu/utilities/Parameter.h"
+#include "hikyuu/utilities/thread/algorithm.h"
 #include "IndicatorImpBuffer.h"
 
 namespace hku {
@@ -209,6 +209,8 @@ public:
     //  内部特殊用途公共接口
     // ===================
 
+    void onlySetContext(const KData&);
+
     /** 判断是否和另一个指标等效，即计算效果相同 */
     bool alike(const IndicatorImp& other) const;
 
@@ -286,8 +288,6 @@ private:
 
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
-
-    void onlySetContext(const KData&);
 
 protected:
     string m_name;

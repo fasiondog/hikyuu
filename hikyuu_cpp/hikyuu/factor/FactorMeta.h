@@ -27,6 +27,10 @@ public:
     FactorMeta& operator=(const FactorMeta& other);
     FactorMeta& operator=(const FactorMeta&& other);
 
+    //------------------------
+    // 只读属性
+    //------------------------
+
     const string& name() const noexcept {
         return m_data->name;
     }
@@ -34,6 +38,22 @@ public:
     const string& ktype() const noexcept {
         return m_data->ktype;
     }
+
+    Indicator formula() const noexcept {
+        return m_data->formula.clone();
+    }
+
+    const Datetime& createAt() const noexcept {
+        return m_data->create_at;
+    }
+
+    const Datetime& updateAt() const noexcept {
+        return m_data->update_at;
+    }
+
+    //------------------------
+    // 可读写属性
+    //------------------------
 
     const string& brief() const noexcept {
         return m_data->brief;
@@ -51,18 +71,6 @@ public:
         m_data->details = details;
     }
 
-    const Indicator& formula() const noexcept {
-        return m_data->formula;
-    }
-
-    const Datetime& createAt() const noexcept {
-        return m_data->create_at;
-    }
-
-    const Datetime& updateAt() const noexcept {
-        return m_data->update_at;
-    }
-
     bool isActive() const noexcept {
         return m_data->is_active;
     }
@@ -70,6 +78,12 @@ public:
     void isActive(bool flag) noexcept {
         m_data->is_active = flag;
     }
+
+    //------------------------
+    // 其他接口
+    //------------------------
+
+    Indicator getIndicator(const Stock&, const KQuery&) const;
 
     string str() const;
 

@@ -61,9 +61,9 @@ FactorMeta::FactorMeta(const string& name, const Indicator& formula, const KQuer
               htr("Illegal name! Naming rules: Only letters, digits and underscores (_) allowed; "
                   "cannot start with a digit."));
     Indicator ind = formula.clone();
-    ind.setContext(KData());
     IndicatorImp* imp_ptr = ind.getImp().get();
     HKU_CHECK(imp_ptr, "Invalid formula indicator!");
+    ind.setContext(KData());
 
     IPriceList* tmp_ptr = dynamic_cast<IPriceList*>(imp_ptr);
     if (tmp_ptr) {
@@ -112,6 +112,20 @@ FactorMeta& FactorMeta::operator=(const FactorMeta&& other) {
     m_data->is_active = other.m_data->is_active;
     other.m_data->is_active = false;
     return *this;
+}
+
+Indicator FactorMeta::getIndicator(const Stock& stk, const KQuery& query) const {
+    HKU_CHECK(!stk.isNull(), "Stock is null!");
+
+    Indicator ret = m_data->formula.clone();
+    auto imp = ret.getImp();
+    HKU_CHECK(imp, "Invalid formula indicator!");
+
+    auto k = stk.getKData(query);
+    imp->onlySetContext(k);
+    imp->_readyBuffer(k.size(), 1);
+
+    return ret;
 }
 
 }  // namespace hku

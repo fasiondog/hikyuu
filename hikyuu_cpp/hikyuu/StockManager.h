@@ -249,7 +249,9 @@ public:
      */
     void removeTempCsvStock(const string& code);
 
+    void saveFactorMeta(const FactorMeta& factor);
     void saveIndicator(const string& name, const Indicator& ind);
+    Indicator loadIndicator(const string& name, const Stock& stock, const KQuery& query);
 
     /**
      * 获取当前执行线程id，主要用于判断 Strategy 是以独立进程还是线程方式运行
