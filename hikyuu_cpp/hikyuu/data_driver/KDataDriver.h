@@ -130,6 +130,9 @@ public:
 
     virtual FactorSet getFactorSet(const string& name, const KQuery::KType& ktype);
 
+    virtual IndicatorList loadFactorValues(const FactorMeta& factor, const StockList& stock,
+                                           const KQuery& query);
+
     //---------------------------------------------------
     // 以下为列式数据库接口
     //---------------------------------------------------
@@ -232,6 +235,11 @@ public:
 
     FactorSet getFactorSet(const string& name, const KQuery::KType& ktype) {
         return m_driver->getFactorSet(name, ktype);
+    }
+
+    IndicatorList loadFactorValues(const FactorMeta& factor, const StockList& stock,
+                                   const KQuery& query) {
+        return m_driver->loadFactorValues(factor, stock, query);
     }
 
     bool isColumnFirst() const {

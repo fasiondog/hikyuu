@@ -211,6 +211,8 @@ public:
 
     void onlySetContext(const KData&);
 
+    void setCalculateFlag(bool flag) noexcept;
+
     /** 判断是否和另一个指标等效，即计算效果相同 */
     bool alike(const IndicatorImp& other) const;
 
@@ -497,6 +499,10 @@ inline void IndicatorImp::onlySetContext(const KData& k) {
         m_old_context = m_context;
         m_context = k;
     }
+}
+
+inline void IndicatorImp::setCalculateFlag(bool flag) noexcept {
+    m_need_calculate = flag;
 }
 
 inline const IndicatorImp::ind_param_map_t& IndicatorImp::getIndParams() const {

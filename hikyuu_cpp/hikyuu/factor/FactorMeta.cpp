@@ -237,6 +237,7 @@ FactorMeta::FactorMeta(const string& name, const Indicator& formula, const KQuer
     m_data->brief = brief;
     m_data->details = details;
     m_data->formula = ind;
+    m_data->formula.name(name);
     m_data->create_at = Datetime::now();
     m_data->need_persist = need_persist;
     m_data->is_active = true;

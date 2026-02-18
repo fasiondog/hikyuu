@@ -188,6 +188,14 @@ public:
     DatetimeList getTradingCalendar(const KQuery& query, const string& market = "SH");
 
     /**
+     * 根据指定的证券列表获取叠加后的交易日历（主要用于包含不同市场证券时）
+     * @param stk_list
+     * @param query
+     * @return DatetimeList
+     */
+    DatetimeList getTradingCalendar(const StockList& stk_list, const KQuery& query);
+
+    /**
      * 获取10年期中国国债收益率
      */
     const ZhBond10List& getZhBond10() const;

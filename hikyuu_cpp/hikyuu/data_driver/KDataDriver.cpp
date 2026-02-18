@@ -126,4 +126,10 @@ FactorSet KDataDriver::getFactorSet(const string& name, const KQuery::KType& kty
     return FactorSet();
 }
 
+IndicatorList KDataDriver::loadFactorValues(const FactorMeta& factor, const StockList& stock,
+                                            const KQuery& query) {
+    HKU_INFO("The loadFactorValues method has not been implemented! (KDataDriver: {})", m_name);
+    return IndicatorList();
+}
+
 } /* namespace hku */
