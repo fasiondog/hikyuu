@@ -85,6 +85,8 @@ public:
 
     Indicator getIndicator(const Stock&, const KQuery&) const;
 
+    uint64_t hash() const noexcept;
+
     string str() const;
 
 private:
@@ -104,3 +106,13 @@ private:
 HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta&);
 
 }  // namespace hku
+
+namespace std {
+template <>
+class hash<hku::FactorMeta> {
+public:
+    size_t operator()(hku::FactorMeta const& factor) const noexcept {
+        return factor.hash();
+    }
+};
+}  // namespace std

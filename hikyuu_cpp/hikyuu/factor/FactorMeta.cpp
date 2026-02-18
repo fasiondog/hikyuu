@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <algorithm>
 #include <cctype>
+#include <xxhash.h>
 #include "hikyuu/indicator/imp/IPriceList.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "FactorMeta.h"
@@ -270,6 +271,21 @@ FactorMeta& FactorMeta::operator=(const FactorMeta&& other) {
     m_data->is_active = other.m_data->is_active;
     other.m_data->is_active = false;
     return *this;
+}
+
+uint64_t FactorMeta::hash() const noexcept {
+    XXH64_state_t* state = XXH64_createState();
+    HKU_IF_RETURN(!state, 0);
+
+    uint64_t seed = 0;
+    XXH64_reset(state, seed);
+
+    XXH64_update(state, m_data->name.data(), m_data->name.size());
+    XXH64_update(state, m_data->ktype.data(), m_data->ktype.size());
+
+    uint64_t result = XXH64_digest(state);
+    XXH64_freeState(state);
+    return result;
 }
 
 Indicator FactorMeta::getIndicator(const Stock& stk, const KQuery& query) const {
