@@ -55,6 +55,7 @@ public:
     //------------------------
 
     void addFactor(const FactorMeta& factor);
+    void addFactor(FactorMeta&& factor);
     void removeFactor(const string& name);
     bool hasFactor(const string& name) const noexcept;
     FactorMeta getFactor(const string& name) const;
@@ -67,20 +68,20 @@ public:
     class const_iterator {
     public:
         using iterator_category = std::forward_iterator_tag;
-        using value_type = const std::pair<const string, FactorMeta>;
+        using value_type = const FactorMeta;
         using difference_type = std::ptrdiff_t;
-        using pointer = const std::pair<const string, FactorMeta>*;
-        using reference = const std::pair<const string, FactorMeta>&;
+        using pointer = const FactorMeta*;
+        using reference = const FactorMeta&;
 
         const_iterator(const typename std::unordered_map<string, FactorMeta>::const_iterator& iter)
         : m_iter(iter) {}
 
         reference operator*() const {
-            return *m_iter;
+            return m_iter->second;
         }
 
         pointer operator->() const {
-            return m_iter.operator->();
+            return &(m_iter->second);
         }
 
         const_iterator& operator++() {

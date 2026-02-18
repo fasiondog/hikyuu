@@ -43,17 +43,27 @@ public:
         return m_data->formula.clone();
     }
 
+    //------------------------
+    // 可读写属性
+    //------------------------
+
     const Datetime& createAt() const noexcept {
         return m_data->create_at;
+    }
+
+    void createAt(const Datetime& datetime) {
+        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
+        m_data->create_at = datetime;
     }
 
     const Datetime& updateAt() const noexcept {
         return m_data->update_at;
     }
 
-    //------------------------
-    // 可读写属性
-    //------------------------
+    void updateAt(const Datetime& datetime) {
+        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
+        m_data->update_at = datetime;
+    }
 
     bool needPersist() const noexcept {
         return m_data->need_persist;

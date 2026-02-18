@@ -41,6 +41,11 @@ void FactorSet::addFactor(const FactorMeta& factor) {
     m_data->m_factorDict[factor.name()] = factor;
 }
 
+void FactorSet::addFactor(FactorMeta&& factor) {
+    HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
+    m_data->m_factorDict[factor.name()] = std::move(factor);
+}
+
 void FactorSet::removeFactor(const string& name) {
     m_data->m_factorDict.erase(name);
 }

@@ -244,33 +244,42 @@ TEST_CASE("test_FactorSet_iterator") {
     CHECK_EQ(fs.size(), 2);
     CHECK_FALSE(fs.empty());
 
-    // 测试基于范围的for循环
+    // 测试基于范围的for循环 - 迭代器应直接返回FactorMeta引用
     size_t count = 0;
-    for (const auto& pair : fs) {
-        const string& name = pair.first;
-        const FactorMeta& factor = pair.second;
-        CHECK_UNARY(name == "MA5" || name == "MA10");
-        CHECK_UNARY(factor.name() == name);
+    for (const FactorMeta& factor : fs) {
+        CHECK_UNARY_FALSE(factor.isNull());
+        CHECK_UNARY_FALSE(factor.name().empty());
+        CHECK_UNARY(factor.name() == "MA5" || factor.name() == "MA10");
         count++;
     }
     CHECK_EQ(count, 2);
 
-    // 测试显式迭代器
+    // 测试显式迭代器 - 解引用应直接返回FactorMeta引用
     auto it = fs.begin();
     auto end = fs.end();
     count = 0;
     while (it != end) {
-        const auto& pair = *it;
-        CHECK_UNARY(pair.first == "MA5" || pair.first == "MA10");
+        const FactorMeta& factor = *it;  // 直接解引用得到FactorMeta引用
+        CHECK_UNARY_FALSE(factor.isNull());
+        CHECK_UNARY(factor.name() == "MA5" || factor.name() == "MA10");
         count++;
         ++it;
     }
     CHECK_EQ(count, 2);
 
+    // 测试迭代器箭头操作符
+    for (auto it = fs.begin(); it != fs.end(); ++it) {
+        const FactorMeta* factor_ptr = it.operator->();  // 箭头操作符应返回FactorMeta指针
+        CHECK_UNARY_FALSE(factor_ptr->isNull());
+        CHECK_UNARY_FALSE(factor_ptr->name().empty());
+    }
+
     // 测试 const_iterator 和 iterator 的等价性
     const FactorSet& const_fs = fs;
     count = 0;
     for (auto it = const_fs.begin(); it != const_fs.end(); ++it) {
+        const FactorMeta& factor = *it;
+        CHECK_UNARY_FALSE(factor.isNull());
         count++;
     }
     CHECK_EQ(count, 2);
@@ -278,6 +287,8 @@ TEST_CASE("test_FactorSet_iterator") {
     // 测试 cbegin/cend
     count = 0;
     for (auto it = fs.cbegin(); it != fs.cend(); ++it) {
+        const FactorMeta& factor = *it;
+        CHECK_UNARY_FALSE(factor.isNull());
         count++;
     }
     CHECK_EQ(count, 2);
@@ -294,14 +305,20 @@ TEST_CASE("test_FactorSet_iterator") {
     CHECK_UNARY(empty_fs.begin() == empty_fs.end());
     CHECK_UNARY(empty_fs.cbegin() == empty_fs.cend());
 
-    // 测试基于迭代器的算法
-    vector<string> names;
-    for (const auto& pair : fs) {
-        names.push_back(pair.first);
+    // 测试基于迭代器的因子收集
+    vector<FactorMeta> factors;
+    for (const FactorMeta& factor : fs) {
+        factors.push_back(factor);
     }
-    CHECK_EQ(names.size(), 2);
-    CHECK_UNARY(std::find(names.begin(), names.end(), "MA5") != names.end());
-    CHECK_UNARY(std::find(names.begin(), names.end(), "MA10") != names.end());
+    CHECK_EQ(factors.size(), 2);
+    // 验证收集到的因子
+    bool has_ma5 = false, has_ma10 = false;
+    for (const auto& factor : factors) {
+        if (factor.name() == "MA5") has_ma5 = true;
+        if (factor.name() == "MA10") has_ma10 = true;
+    }
+    CHECK_UNARY(has_ma5);
+    CHECK_UNARY(has_ma10);
 }
 
 /** @} */
