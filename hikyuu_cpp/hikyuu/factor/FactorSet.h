@@ -14,7 +14,7 @@ namespace hku {
 class HKU_API FactorSet {
 public:
     FactorSet();
-    explicit FactorSet(const string& name);
+    explicit FactorSet(const string& name, const KQuery::KType& ktype = KQuery::DAY);
     FactorSet(const FactorSet& other);
     FactorSet(FactorSet&& other);
     virtual ~FactorSet() = default;
@@ -127,6 +127,7 @@ public:
 private:
     struct HKU_API Data {
         string name;
+        string ktype;
         unordered_map<string, FactorMeta> m_factorDict;
     };
     shared_ptr<Data> m_data;

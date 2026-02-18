@@ -15,9 +15,9 @@ void export_FactorMeta(py::module& m) {
     py::class_<FactorMeta>(m, "FactorMeta", "因子元数据")
       .def(py::init<>())
       .def(py::init<const string&, const Indicator&, const KQuery::KType&, const string&,
-                    const string&>(),
+                    const string&, bool>(),
            py::arg("name"), py::arg("formula"), py::arg("ktype") = KQuery::DAY,
-           py::arg("brief") = "", py::arg("details") = "")
+           py::arg("brief") = "", py::arg("details") = "", py::arg("need_persist") = false)
 
       .def("__str__", &FactorMeta::str)
       .def("__repr__", &FactorMeta::str)

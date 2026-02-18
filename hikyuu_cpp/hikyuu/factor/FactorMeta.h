@@ -11,21 +11,21 @@
 
 namespace hku {
 
-class HKU_API FactorMeta {
+class HKU_API FactorMeta final {
     friend HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta&);
 
 public:
     FactorMeta();
-    explicit FactorMeta(const string& name, const Indicator& formula,
-                        const KQuery::KType& ktype = KQuery::DAY, const string& brief = "",
-                        const string& details = "");
+    FactorMeta(const string& name, const Indicator& formula,
+               const KQuery::KType& ktype = KQuery::DAY, const string& brief = "",
+               const string& details = "", bool need_persist = false);
 
     FactorMeta(const FactorMeta& other);
-    FactorMeta(const FactorMeta&& other);
-    virtual ~FactorMeta() = default;
+    FactorMeta(FactorMeta&& other);
+    ~FactorMeta() = default;
 
     FactorMeta& operator=(const FactorMeta& other);
-    FactorMeta& operator=(const FactorMeta&& other);
+    FactorMeta& operator=(FactorMeta&& other);
 
     //------------------------
     // 只读属性
@@ -39,7 +39,7 @@ public:
         return m_data->ktype;
     }
 
-    Indicator formula() const noexcept {
+    Indicator formula() const {
         return m_data->formula.clone();
     }
 
@@ -55,11 +55,21 @@ public:
     // 可读写属性
     //------------------------
 
+    bool needPersist() const noexcept {
+        return m_data->need_persist;
+    }
+
+    void needPersist(bool flag) {
+        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
+        m_data->need_persist = flag;
+    }
+
     const string& brief() const noexcept {
         return m_data->brief;
     }
 
-    void brief(const string& brief) noexcept {
+    void brief(const string& brief) {
+        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
         m_data->brief = brief;
     }
 
@@ -67,7 +77,8 @@ public:
         return m_data->details;
     }
 
-    void details(const string& details) noexcept {
+    void details(const string& details) {
+        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
         m_data->details = details;
     }
 
@@ -75,13 +86,18 @@ public:
         return m_data->is_active;
     }
 
-    void isActive(bool flag) noexcept {
+    void isActive(bool flag) {
+        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
         m_data->is_active = flag;
     }
 
     //------------------------
     // 其他接口
     //------------------------
+
+    bool isNull() const noexcept {
+        return m_data == ms_null_factor_meta_data;
+    }
 
     Indicator getIndicator(const Stock&, const KQuery&) const;
 
@@ -98,9 +114,13 @@ private:
         Datetime create_at;
         Datetime update_at;
         Indicator formula;
+        bool need_persist{false};
         bool is_active{false};
     };
     shared_ptr<Data> m_data;
+
+private:
+    static shared_ptr<Data> ms_null_factor_meta_data;
 };
 
 HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta&);

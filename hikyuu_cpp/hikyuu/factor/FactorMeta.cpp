@@ -198,6 +198,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta& factor) {
     os << "FactorMeta(";
     os << strip << "name: " << factor.m_data->name << strip << "ktype: " << factor.m_data->ktype
        << strip << "is_active: " << factor.m_data->is_active << strip
+       << "need_persist: " << factor.m_data->need_persist << strip
        << "create_at: " << factor.m_data->create_at.str() << strip
        << "update_at: " << factor.m_data->update_at.str() << strip
        << "formula: " << factor.m_data->formula() << strip << "brief: " << factor.m_data->brief
@@ -211,11 +212,13 @@ string FactorMeta::str() const {
     return os.str();
 }
 
-FactorMeta::FactorMeta() : m_data(make_shared<Data>()) {}
+shared_ptr<FactorMeta::Data> FactorMeta::ms_null_factor_meta_data{make_shared<FactorMeta::Data>()};
+
+FactorMeta::FactorMeta() : m_data(ms_null_factor_meta_data) {}
 
 FactorMeta::FactorMeta(const string& name, const Indicator& formula, const KQuery::KType& ktype,
-                       const string& brief, const string& details)
-: FactorMeta() {
+                       const string& brief, const string& details, bool need_persist)
+: m_data(make_shared<Data>()) {
     HKU_CHECK(isValidName(name),
               htr("Illegal name! Naming rules: Only letters, digits and underscores (_) allowed; "
                   "cannot start with a digit."));
@@ -235,41 +238,29 @@ FactorMeta::FactorMeta(const string& name, const Indicator& formula, const KQuer
     m_data->details = details;
     m_data->formula = ind;
     m_data->create_at = Datetime::now();
+    m_data->need_persist = need_persist;
     m_data->is_active = true;
 }
 
-FactorMeta::FactorMeta(const FactorMeta& other) : FactorMeta() {
+FactorMeta::FactorMeta(const FactorMeta& other) {
     m_data = other.m_data;
 }
 
-FactorMeta::FactorMeta(const FactorMeta&& other) : FactorMeta() {
+FactorMeta::FactorMeta(FactorMeta&& other) {
     m_data = std::move(other.m_data);
+    other.m_data = ms_null_factor_meta_data;
 }
 
 FactorMeta& FactorMeta::operator=(const FactorMeta& other) {
     HKU_IF_RETURN(this == &other, *this);
-    m_data->name = other.m_data->name;
-    m_data->ktype = other.m_data->ktype;
-    m_data->brief = other.m_data->brief;
-    m_data->details = other.m_data->details;
-    m_data->formula = other.m_data->formula;
-    m_data->create_at = other.m_data->create_at;
-    m_data->update_at = other.m_data->update_at;
-    m_data->is_active = other.m_data->is_active;
+    m_data = other.m_data;
     return *this;
 }
 
-FactorMeta& FactorMeta::operator=(const FactorMeta&& other) {
+FactorMeta& FactorMeta::operator=(FactorMeta&& other) {
     HKU_IF_RETURN(this == &other, *this);
-    m_data->name = std::move(other.m_data->name);
-    m_data->ktype = std::move(other.m_data->ktype);
-    m_data->brief = std::move(other.m_data->brief);
-    m_data->details = std::move(other.m_data->details);
-    m_data->formula = std::move(other.m_data->formula);
-    m_data->create_at = std::move(other.m_data->create_at);
-    m_data->update_at = std::move(other.m_data->update_at);
-    m_data->is_active = other.m_data->is_active;
-    other.m_data->is_active = false;
+    m_data = std::move(other.m_data);
+    other.m_data = ms_null_factor_meta_data;
     return *this;
 }
 

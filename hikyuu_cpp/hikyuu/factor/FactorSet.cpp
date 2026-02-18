@@ -11,27 +11,33 @@ namespace hku {
 
 FactorSet::FactorSet() : m_data(std::make_shared<Data>()) {}
 
-FactorSet::FactorSet(const string& name) : m_data(std::make_shared<Data>()) {
+FactorSet::FactorSet(const string& name, const KQuery::KType& ktype)
+: m_data(std::make_shared<Data>()) {
     m_data->name = name;
+    m_data->ktype = ktype;
 }
 
-FactorSet::FactorSet(const FactorSet& other) : m_data(std::make_shared<Data>(*other.m_data)) {}
+FactorSet::FactorSet(const FactorSet& other) : m_data(other.m_data) {}
 
-FactorSet::FactorSet(FactorSet&& other) : m_data(std::move(other.m_data)) {}
+FactorSet::FactorSet(FactorSet&& other) : m_data(std::move(other.m_data)) {
+    other.m_data = std::make_shared<Data>();
+}
 
 FactorSet& FactorSet::operator=(const FactorSet& other) {
     HKU_IF_RETURN(this == &other, *this);
-    *m_data = *other.m_data;
+    m_data = other.m_data;
     return *this;
 }
 
 FactorSet& FactorSet::operator=(FactorSet&& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_data = std::move(other.m_data);
+    other.m_data = std::make_shared<Data>();
     return *this;
 }
 
 void FactorSet::addFactor(const FactorMeta& factor) {
+    HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
     m_data->m_factorDict[factor.name()] = factor;
 }
 
