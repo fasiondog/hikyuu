@@ -13,7 +13,7 @@
 #include "hikyuu/KQuery.h"
 #include "hikyuu/TimeLineRecord.h"
 #include "hikyuu/TransRecord.h"
-#include "hikyuu/factor/FactorMeta.h"
+#include "hikyuu/factor/FactorSet.h"
 
 namespace hku {
 
@@ -126,6 +126,10 @@ public:
 
     virtual Indicator loadFactor(const string& name, const Stock& stock, const KQuery& query);
 
+    virtual void saveFactorSet(const FactorSet& set);
+
+    virtual FactorSet getFactorSet(const string& name, const KQuery::KType& ktype);
+
     //---------------------------------------------------
     // 以下为列式数据库接口
     //---------------------------------------------------
@@ -220,6 +224,14 @@ public:
 
     Indicator loadFactor(const string& name, const Stock& stock, const KQuery& query) {
         return m_driver->loadFactor(name, stock, query);
+    }
+
+    void saveFactorSet(const FactorSet& set) {
+        m_driver->saveFactorSet(set);
+    }
+
+    FactorSet getFactorSet(const string& name, const KQuery::KType& ktype) {
+        return m_driver->getFactorSet(name, ktype);
     }
 
     bool isColumnFirst() const {

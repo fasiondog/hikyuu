@@ -117,4 +117,13 @@ std::unordered_map<std::string, KRecordList> KDataDriver::getAllKRecordList(
     return std::unordered_map<std::string, KRecordList>();
 }
 
+void KDataDriver::saveFactorSet(const FactorSet& set) {
+    HKU_INFO("The saveFactorSet method has not been implemented! (KDataDriver: {})", m_name);
+}
+
+FactorSet KDataDriver::getFactorSet(const string& name, const KQuery::KType& ktype) {
+    HKU_INFO("The getFactorSet method has not been implemented! (KDataDriver: {})", m_name);
+    return FactorSet();
+}
+
 } /* namespace hku */
