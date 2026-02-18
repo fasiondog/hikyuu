@@ -30,8 +30,8 @@ public:
         return m_data->name;
     }
 
-    void name(const string& name) noexcept {
-        m_data->name = name;
+    const string& ktype() const noexcept {
+        return m_data->ktype;
     }
 
     //------------------------
