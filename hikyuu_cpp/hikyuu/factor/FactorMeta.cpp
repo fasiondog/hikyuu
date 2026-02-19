@@ -280,18 +280,4 @@ uint64_t FactorMeta::hash() const noexcept {
     return result;
 }
 
-Indicator FactorMeta::getIndicator(const Stock& stk, const KQuery& query) const {
-    HKU_CHECK(!stk.isNull(), "Stock is null!");
-
-    Indicator ret = m_data->formula.clone();
-    auto imp = ret.getImp();
-    HKU_CHECK(imp, "Invalid formula indicator!");
-
-    auto k = stk.getKData(query);
-    imp->onlySetContext(k);
-    imp->_readyBuffer(k.size(), 1);
-
-    return ret;
-}
-
 }  // namespace hku

@@ -109,8 +109,6 @@ public:
         return m_data == ms_null_factor_meta_data;
     }
 
-    Indicator getIndicator(const Stock&, const KQuery&) const;
-
     uint64_t hash() const noexcept;
 
     string str() const;
