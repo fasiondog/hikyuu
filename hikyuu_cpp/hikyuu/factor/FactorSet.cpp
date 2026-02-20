@@ -13,7 +13,9 @@ FactorSet::FactorSet() : m_data(std::make_shared<Data>()) {}
 
 FactorSet::FactorSet(const string& name, const KQuery::KType& ktype)
 : m_data(std::make_shared<Data>()) {
-    m_data->name = name;
+    string upper_name = name;
+    to_upper(upper_name);
+    m_data->name = upper_name;
     m_data->ktype = ktype;
 }
 

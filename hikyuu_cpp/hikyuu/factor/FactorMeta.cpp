@@ -181,12 +181,8 @@ static bool isValidName(const string& name) {
         }
     }
 
-    // 转换为大写进行关键字检查
-    std::string upper_name = name;
-    std::transform(upper_name.begin(), upper_name.end(), upper_name.begin(), ::toupper);
-
     // 检查是否为数据库关键字
-    if (DATABASE_KEYWORDS.find(upper_name) != DATABASE_KEYWORDS.end()) {
+    if (DATABASE_KEYWORDS.find(name) != DATABASE_KEYWORDS.end()) {
         return false;
     }
 
@@ -219,7 +215,10 @@ FactorMeta::FactorMeta() : m_data(ms_null_factor_meta_data) {}
 FactorMeta::FactorMeta(const string& name, const Indicator& formula, const KQuery::KType& ktype,
                        const string& brief, const string& details, bool need_persist)
 : m_data(make_shared<Data>()) {
-    HKU_CHECK(isValidName(name),
+    string upper_name = name;
+    to_upper(upper_name);
+
+    HKU_CHECK(isValidName(upper_name),
               htr("Illegal name! Naming rules: Only letters, digits and underscores (_) allowed; "
                   "cannot start with a digit."));
     Indicator ind = formula.clone();
@@ -232,12 +231,12 @@ FactorMeta::FactorMeta(const string& name, const Indicator& formula, const KQuer
         ind = PRICELIST();
     }
 
-    m_data->name = name;
+    m_data->name = upper_name;
     m_data->ktype = ktype;
     m_data->brief = brief;
     m_data->details = details;
     m_data->formula = ind;
-    m_data->formula.name(name);
+    m_data->formula.name(upper_name);
     m_data->create_at = Datetime::now();
     m_data->need_persist = need_persist;
     m_data->is_active = true;

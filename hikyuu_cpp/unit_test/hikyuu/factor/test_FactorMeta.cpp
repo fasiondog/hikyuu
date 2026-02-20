@@ -142,10 +142,10 @@ TEST_CASE("test_FactorMeta_hash_edge_cases") {
     FactorMeta factor_under2("_leading_underscore_name", dummy_formula, KQuery::DAY);
     CHECK_EQ(factor_under1.hash(), factor_under2.hash());
 
-    /** @arg 测试混合大小写的名称（应该被视为不同） */
+    /** @arg 测试混合大小写的名称（应该被视为相同） */
     FactorMeta factor_case1("MixedCaseFactorName", dummy_formula, KQuery::DAY);
     FactorMeta factor_case2("mixedcasefactorname", dummy_formula, KQuery::DAY);
-    CHECK_NE(factor_case1.hash(), factor_case2.hash());
+    CHECK_EQ(factor_case1.hash(), factor_case2.hash());
 
     /** @arg 测试边界情况：最小有效名称 */
     FactorMeta factor_min1("a", dummy_formula, KQuery::DAY);
