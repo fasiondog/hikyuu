@@ -9,10 +9,10 @@
 #ifndef INDICATORIMP_H_
 #define INDICATORIMP_H_
 
-#include "../config.h"
-#include "../KData.h"
-#include "../utilities/Parameter.h"
-#include "../utilities/thread/thread.h"
+#include "hikyuu/config.h"
+#include "hikyuu/KData.h"
+#include "hikyuu/utilities/Parameter.h"
+#include "hikyuu/utilities/thread/algorithm.h"
 #include "IndicatorImpBuffer.h"
 
 namespace hku {
@@ -143,6 +143,7 @@ public:
     void add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right);
 
     IndicatorImpPtr clone();
+    IndicatorImpPtr cloneFormula();
 
     bool isPythonObject() const noexcept;
 
@@ -208,6 +209,10 @@ public:
     // ===================
     //  内部特殊用途公共接口
     // ===================
+
+    void onlySetContext(const KData&);
+
+    void setCalculateFlag(bool flag) noexcept;
 
     /** 判断是否和另一个指标等效，即计算效果相同 */
     bool alike(const IndicatorImp& other) const;
@@ -286,8 +291,6 @@ private:
 
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
-
-    void onlySetContext(const KData&);
 
 protected:
     string m_name;
@@ -497,6 +500,10 @@ inline void IndicatorImp::onlySetContext(const KData& k) {
         m_old_context = m_context;
         m_context = k;
     }
+}
+
+inline void IndicatorImp::setCalculateFlag(bool flag) noexcept {
+    m_need_calculate = flag;
 }
 
 inline const IndicatorImp::ind_param_map_t& IndicatorImp::getIndParams() const {

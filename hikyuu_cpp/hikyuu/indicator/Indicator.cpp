@@ -33,8 +33,41 @@ string Indicator::formula() const {
 }
 
 Indicator Indicator::operator()(const KData& k) {
-    Indicator result = clone();
-    result.setContext(k);
+    Indicator result;
+    if (!m_imp) {
+        result.setContext(k);
+        return result;
+    }
+
+    const auto& old_k = m_imp->getContext();
+    if (old_k.getStock() != k.getStock() || k.empty()) {
+        auto new_imp = m_imp->cloneFormula();
+        new_imp->setContext(k);
+        result.m_imp = std::move(new_imp);
+        return result;
+    }
+
+    if (old_k == k) {
+        result.m_imp = m_imp->clone();
+        return result;
+    }
+
+    size_t result_num = m_imp->getResultNumber();
+    size_t old_size = old_k.size();
+    size_t old_discard = m_imp->discard();
+    auto new_imp = m_imp->cloneFormula();
+    new_imp->_readyBuffer(old_size, result_num);
+    new_imp->setDiscard(old_discard);
+    if (old_discard < old_size) {
+        for (size_t r = 0; r < result_num; r++) {
+            const auto* src = m_imp->data(r) + old_discard;
+            auto* dst = new_imp->data(r) + old_discard;
+            memcpy(dst, src, old_size - old_discard);
+        }
+    }
+    new_imp->setCalculateFlag(true);
+    new_imp->setContext(k);
+    result.m_imp = std::move(new_imp);
     return result;
 }
 
