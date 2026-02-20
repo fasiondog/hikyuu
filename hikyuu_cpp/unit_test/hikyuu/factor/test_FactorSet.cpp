@@ -31,7 +31,7 @@ TEST_CASE("test_FactorSet_basic") {
 
     // 测试构造函数和基本属性
     FactorSet fs("TestFactorSet");
-    CHECK_EQ(fs.name(), "TestFactorSet");
+    CHECK_EQ(fs.name(), "TESTFACTORSET");
 
     // 测试空状态
     CHECK_EQ(fs.size(), 0);
@@ -193,7 +193,7 @@ TEST_CASE("test_FactorSet_shallow_copy") {
 
     // 测试拷贝构造（浅拷贝）
     FactorSet fs2(fs1);
-    CHECK_EQ(fs2.name(), "Original");
+    CHECK_EQ(fs2.name(), "ORIGINAL");
     CHECK_EQ(fs2.size(), 2);
     CHECK_UNARY(fs2.hasFactor("MA5"));
     CHECK_UNARY(fs2.hasFactor("MA10"));
@@ -208,18 +208,18 @@ TEST_CASE("test_FactorSet_shallow_copy") {
     // 测试拷贝赋值（浅拷贝）
     FactorSet fs3("Target");
     fs3 = fs1;
-    CHECK_EQ(fs3.name(), "Original");
+    CHECK_EQ(fs3.name(), "ORIGINAL");
     CHECK_EQ(fs3.size(), 1);
 
     // 测试移动语义 - 在浅拷贝情况下，移动构造实际上是拷贝构造
     FactorSet fs4(std::move(fs2));
     // fs4 应该反映最新的状态，因为所有对象共享同一份数据
-    CHECK_EQ(fs4.name(), "Original");
+    CHECK_EQ(fs4.name(), "ORIGINAL");
     CHECK_EQ(fs4.size(), 1);
 
     FactorSet fs5("Target2");
     fs5 = std::move(fs3);
-    CHECK_EQ(fs5.name(), "Original");
+    CHECK_EQ(fs5.name(), "ORIGINAL");
     CHECK_EQ(fs5.size(), 1);
 
     // 测试自赋值（浅拷贝情况下自赋值应该是安全的）
@@ -314,8 +314,10 @@ TEST_CASE("test_FactorSet_iterator") {
     // 验证收集到的因子
     bool has_ma5 = false, has_ma10 = false;
     for (const auto& factor : factors) {
-        if (factor.name() == "MA5") has_ma5 = true;
-        if (factor.name() == "MA10") has_ma10 = true;
+        if (factor.name() == "MA5")
+            has_ma5 = true;
+        if (factor.name() == "MA10")
+            has_ma10 = true;
     }
     CHECK_UNARY(has_ma5);
     CHECK_UNARY(has_ma10);
