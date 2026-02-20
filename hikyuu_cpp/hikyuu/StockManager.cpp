@@ -870,4 +870,11 @@ Indicator StockManager::loadIndicator(const string& name, const Stock& stock, co
       ->loadFactor(name, stock, query);
 }
 
+vector<IndicatorList> StockManager::loadIndicators(const IndicatorList& ind_list,
+                                                   const StockList& stk_list, const KQuery& query) {
+    return DataDriverFactory::getKDataDriverPool(m_kdataDriverParam)
+      ->getConnect()
+      ->loadIndicatorValues(ind_list, stk_list, query);
+}
+
 }  // namespace hku

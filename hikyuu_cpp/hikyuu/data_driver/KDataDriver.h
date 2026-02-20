@@ -133,6 +133,9 @@ public:
     virtual IndicatorList loadFactorValues(const FactorMeta& factor, const StockList& stock,
                                            const KQuery& query);
 
+    virtual vector<IndicatorList> loadIndicatorValues(const IndicatorList& inds,
+                                                      const StockList& stks, const KQuery& query);
+
     //---------------------------------------------------
     // 以下为列式数据库接口
     //---------------------------------------------------
@@ -240,6 +243,11 @@ public:
     IndicatorList loadFactorValues(const FactorMeta& factor, const StockList& stock,
                                    const KQuery& query) {
         return m_driver->loadFactorValues(factor, stock, query);
+    }
+
+    vector<IndicatorList> loadIndicatorValues(const IndicatorList& inds, const StockList& stks,
+                                              const KQuery& query) {
+        return m_driver->loadIndicatorValues(inds, stks, query);
     }
 
     bool isColumnFirst() const {

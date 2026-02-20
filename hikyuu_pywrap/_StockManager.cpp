@@ -371,6 +371,7 @@ void export_StockManager(py::module& m) {
       .def("save_indicator", &StockManager::saveIndicator)
       .def("load_indicator", &StockManager::loadIndicator)
       .def("save_factor_meta", &StockManager::saveFactorMeta)
+      .def("load_indicators", &StockManager::loadIndicators)
 
       .def("__len__", &StockManager::size, "返回证券数量")
       .def("__getitem__", &StockManager::getStock, "同 get_stock")

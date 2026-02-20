@@ -18,6 +18,10 @@ KDataPrivatedBufferImp::KDataPrivatedBufferImp(const Stock& stock, const KQuery&
     _recover();
 }
 
+KDataPrivatedBufferImp::KDataPrivatedBufferImp(const Stock& stock, const KQuery& query,
+                                               const KRecordList& krecords)
+: KDataImp(stock, query), m_buffer(krecords) {}
+
 KDataPrivatedBufferImp::~KDataPrivatedBufferImp() {}
 
 DatetimeList KDataPrivatedBufferImp::getDatetimeList() const {

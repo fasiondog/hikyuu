@@ -132,4 +132,10 @@ IndicatorList KDataDriver::loadFactorValues(const FactorMeta& factor, const Stoc
     return IndicatorList();
 }
 
+vector<IndicatorList> KDataDriver::loadIndicatorValues(const IndicatorList& inds,
+                                                       const StockList& stks, const KQuery& query) {
+    HKU_INFO("The loadIndicatorValues method has not been implemented! (KDataDriver: {})", m_name);
+    return vector<IndicatorList>();
+}
+
 } /* namespace hku */
