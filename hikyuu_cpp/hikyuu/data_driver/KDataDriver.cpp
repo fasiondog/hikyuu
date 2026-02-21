@@ -97,50 +97,10 @@ TransList KDataDriver::getTransList(const string& market, const string& code, co
     return TransList();
 }
 
-void KDataDriver::saveFactor(const Factor& factor) {
-    HKU_INFO("The saveFactor method has not been implemented! (KDataDriver: {})", m_name);
-}
-
-void KDataDriver::saveIndicatorAsFactor(const string& name, const Indicator& ind) {
-    HKU_INFO("The saveIndicatorAsFactor method has not been implemented! (KDataDriver: {})",
-             m_name);
-}
-
-Indicator KDataDriver::loadFactor(const string& name, const Stock& stock, const KQuery& query) {
-    HKU_INFO("The loadFactor method has not been implemented! (KDataDriver: {})", m_name);
-    return Indicator();
-}
-
 std::unordered_map<std::string, KRecordList> KDataDriver::getAllKRecordList(
   const KQuery::KType& ktype, const Datetime& start_date, const std::atomic_bool& cancel_flag) {
     HKU_INFO("The getAllKRecordList method has not been implemented! (KDataDriver: {})", m_name);
     return std::unordered_map<std::string, KRecordList>();
-}
-
-void KDataDriver::saveFactorSet(const FactorSet& set) {
-    HKU_INFO("The saveFactorSet method has not been implemented! (KDataDriver: {})", m_name);
-}
-
-FactorSet KDataDriver::getFactorSet(const string& name, const KQuery::KType& ktype) {
-    HKU_INFO("The getFactorSet method has not been implemented! (KDataDriver: {})", m_name);
-    return FactorSet();
-}
-
-IndicatorList KDataDriver::loadFactorValues(const Factor& factor, const StockList& stock,
-                                            const KQuery& query) {
-    HKU_INFO("The loadFactorValues method has not been implemented! (KDataDriver: {})", m_name);
-    return IndicatorList();
-}
-
-void KDataDriver::saveIndicatorValues(const IndicatorList& inds, bool replace) {
-    HKU_INFO("The saveIndicatorValues method has not been implemented! (KDataDriver: {})", m_name);
-    return;
-}
-
-vector<IndicatorList> KDataDriver::loadIndicatorValues(const IndicatorList& inds,
-                                                       const StockList& stks, const KQuery& query) {
-    HKU_INFO("The loadIndicatorValues method has not been implemented! (KDataDriver: {})", m_name);
-    return vector<IndicatorList>();
 }
 
 } /* namespace hku */

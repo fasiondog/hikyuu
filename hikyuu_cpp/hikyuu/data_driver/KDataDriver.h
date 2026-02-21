@@ -120,24 +120,6 @@ public:
      */
     virtual TransList getTransList(const string& market, const string& code, const KQuery& query);
 
-    virtual void saveFactor(const Factor& factor);
-
-    virtual void saveIndicatorAsFactor(const string& name, const Indicator& ind);
-
-    virtual Indicator loadFactor(const string& name, const Stock& stock, const KQuery& query);
-
-    virtual void saveFactorSet(const FactorSet& set);
-
-    virtual FactorSet getFactorSet(const string& name, const KQuery::KType& ktype);
-
-    virtual IndicatorList loadFactorValues(const Factor& factor, const StockList& stock,
-                                           const KQuery& query);
-
-    virtual void saveIndicatorValues(const IndicatorList& inds, bool replace);
-
-    virtual vector<IndicatorList> loadIndicatorValues(const IndicatorList& inds,
-                                                      const StockList& stks, const KQuery& query);
-
     //---------------------------------------------------
     // 以下为列式数据库接口
     //---------------------------------------------------
@@ -220,40 +202,6 @@ public:
 
     TransList getTransList(const string& market, const string& code, const KQuery& query) {
         return m_driver->getTransList(market, code, query);
-    }
-
-    void saveFactor(const Factor& factor) {
-        m_driver->saveFactor(factor);
-    }
-
-    void saveIndicatorAsFactor(const string& name, const Indicator& ind) {
-        m_driver->saveIndicatorAsFactor(name, ind);
-    }
-
-    Indicator loadFactor(const string& name, const Stock& stock, const KQuery& query) {
-        return m_driver->loadFactor(name, stock, query);
-    }
-
-    void saveFactorSet(const FactorSet& set) {
-        m_driver->saveFactorSet(set);
-    }
-
-    FactorSet getFactorSet(const string& name, const KQuery::KType& ktype) {
-        return m_driver->getFactorSet(name, ktype);
-    }
-
-    IndicatorList loadFactorValues(const Factor& factor, const StockList& stock,
-                                   const KQuery& query) {
-        return m_driver->loadFactorValues(factor, stock, query);
-    }
-
-    void saveIndicatorValues(const IndicatorList& inds, bool replace) {
-        m_driver->saveIndicatorValues(inds, replace);
-    }
-
-    vector<IndicatorList> loadIndicatorValues(const IndicatorList& inds, const StockList& stks,
-                                              const KQuery& query) {
-        return m_driver->loadIndicatorValues(inds, stks, query);
     }
 
     bool isColumnFirst() const {
