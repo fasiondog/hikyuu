@@ -41,4 +41,8 @@ void FactorImp::remove() {
     HKU_WARN("FactorImp::remove() is not supported!");
 }
 
+void FactorImp::load() {
+    HKU_WARN("FactorImp::load() is not supported!");
+}
+
 }  // namespace hku

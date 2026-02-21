@@ -18,9 +18,16 @@ public:
     Factor();
 
     /**
-     * 构造函数
+     * 尝试加载因子
      * @param name 因子名称
-     * @param formula 计算公式指标
+     * @param ktype K线类型
+     */
+    explicit Factor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
+
+    /**
+     * 构造新因子(因子名称 + K线类型 为因子的唯一标识)
+     * @param name 因子名称
+     * @param formula 计算公式指标, 一旦创建不可更改
      * @param ktype K线类型
      * @param brief 简要描述
      * @param details 详细描述
@@ -116,6 +123,10 @@ public:
 
     void remove() {
         m_imp->remove();
+    }
+
+    void load() {
+        m_imp->load();
     }
 
 private:

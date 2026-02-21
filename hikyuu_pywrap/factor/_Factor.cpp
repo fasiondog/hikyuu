@@ -14,6 +14,8 @@ namespace py = pybind11;
 void export_Factor(py::module& m) {
     py::class_<Factor>(m, "Factor", "因子元数据")
       .def(py::init<>())
+      .def(py::init<const string&, const KQuery::KType&>(), py::arg("name"),
+           py::arg("ktype") = KQuery::DAY)
       .def(py::init<const string&, const Indicator&, const KQuery::KType&, const string&,
                     const string&, bool>(),
            py::arg("name"), py::arg("formula"), py::arg("ktype") = KQuery::DAY,

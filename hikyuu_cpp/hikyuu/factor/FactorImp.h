@@ -153,6 +153,8 @@ public:
 
     virtual void remove();
 
+    virtual void load();
+
 protected:
     string m_name;               ///< 因子名称
     string m_ktype;              ///< K线类型

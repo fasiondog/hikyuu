@@ -23,6 +23,9 @@ shared_ptr<FactorImp> Factor::ms_null_factor_imp{make_shared<FactorImp>()};
 
 Factor::Factor() : m_imp(ms_null_factor_imp) {}
 
+Factor::Factor(const string& name, const KQuery::KType& ktype)
+: m_imp(createFactorImp(name, Indicator(), ktype, "", "", false)) {}
+
 Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype,
                const string& brief, const string& details, bool need_persist)
 : m_imp(createFactorImp(name, formula, ktype, brief, details, need_persist)) {}
