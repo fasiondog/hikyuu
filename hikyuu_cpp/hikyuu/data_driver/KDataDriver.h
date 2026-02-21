@@ -133,6 +133,8 @@ public:
     virtual IndicatorList loadFactorValues(const FactorMeta& factor, const StockList& stock,
                                            const KQuery& query);
 
+    virtual void saveIndicatorValues(const IndicatorList& inds, bool replace);
+
     virtual vector<IndicatorList> loadIndicatorValues(const IndicatorList& inds,
                                                       const StockList& stks, const KQuery& query);
 
@@ -243,6 +245,10 @@ public:
     IndicatorList loadFactorValues(const FactorMeta& factor, const StockList& stock,
                                    const KQuery& query) {
         return m_driver->loadFactorValues(factor, stock, query);
+    }
+
+    void saveIndicatorValues(const IndicatorList& inds, bool replace) {
+        m_driver->saveIndicatorValues(inds, replace);
     }
 
     vector<IndicatorList> loadIndicatorValues(const IndicatorList& inds, const StockList& stks,

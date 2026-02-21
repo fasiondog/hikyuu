@@ -132,6 +132,11 @@ IndicatorList KDataDriver::loadFactorValues(const FactorMeta& factor, const Stoc
     return IndicatorList();
 }
 
+void KDataDriver::saveIndicatorValues(const IndicatorList& inds, bool replace) {
+    HKU_INFO("The saveIndicatorValues method has not been implemented! (KDataDriver: {})", m_name);
+    return;
+}
+
 vector<IndicatorList> KDataDriver::loadIndicatorValues(const IndicatorList& inds,
                                                        const StockList& stks, const KQuery& query) {
     HKU_INFO("The loadIndicatorValues method has not been implemented! (KDataDriver: {})", m_name);
