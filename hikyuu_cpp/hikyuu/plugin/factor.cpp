@@ -13,12 +13,23 @@ namespace hku {
 FactorImpPtr HKU_API createFactorImp(const string& name, const Indicator& formula,
                                      const KQuery::KType& ktype, const string& brief,
                                      const string& details, bool need_persist) {
+    FactorImpPtr ret;
     auto& sm = StockManager::instance();
+    const auto& params = sm.getKDataDriverParameter();
+    if (params.tryGet<string>("type", "hdf5") != "clickhouse") {
+        HKU_WARN("Only support clickhouse driver! Will use default FactorImp!");
+        ret = make_shared<FactorImp>(name, formula, ktype, brief, details, need_persist);
+        return ret;
+    }
+
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
-    HKU_ERROR_IF_RETURN(!plugin,
-                        make_shared<FactorImp>(name, formula, ktype, brief, details, need_persist),
-                        htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
-    return plugin->createFactorImp(name, formula, ktype, brief, details, need_persist);
+    if (!plugin) {
+        ret = make_shared<FactorImp>(name, formula, ktype, brief, details, need_persist);
+        return ret;
+    }
+
+    ret = plugin->createFactorImp(name, formula, ktype, brief, details, need_persist);
+    return ret;
 }
 
 }  // namespace hku

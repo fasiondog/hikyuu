@@ -135,20 +135,6 @@ public:
         m_details = details;
     }
 
-    /**
-     * 获取激活状态
-     */
-    bool isActive() const noexcept {
-        return m_is_active;
-    }
-
-    /**
-     * 设置激活状态
-     */
-    void isActive(bool flag) {
-        m_is_active = flag;
-    }
-
     //------------------------
     // 其他接口
     //------------------------
@@ -163,6 +149,10 @@ public:
      */
     string str() const;
 
+    virtual void save();
+
+    virtual void remove();
+
 protected:
     string m_name;               ///< 因子名称
     string m_ktype;              ///< K线类型
@@ -172,7 +162,6 @@ protected:
     Datetime m_update_at;        ///< 更新时间
     Indicator m_formula;         ///< 计算公式指标
     bool m_need_persist{false};  ///< 是否需要持久化
-    bool m_is_active{false};     ///< 是否激活
 };
 
 typedef shared_ptr<FactorImp> FactorImpPtr;

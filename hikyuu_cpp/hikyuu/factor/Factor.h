@@ -96,14 +96,6 @@ public:
         m_imp->details(details);
     }
 
-    bool isActive() const noexcept {
-        return m_imp->isActive();
-    }
-
-    void isActive(bool flag) {
-        m_imp->isActive(flag);
-    }
-
     //------------------------
     // 其他接口
     //------------------------
@@ -117,6 +109,14 @@ public:
     }
 
     string str() const;
+
+    void save() {
+        m_imp->save();
+    }
+
+    void remove() {
+        m_imp->remove();
+    }
 
 private:
     shared_ptr<FactorImp> m_imp;

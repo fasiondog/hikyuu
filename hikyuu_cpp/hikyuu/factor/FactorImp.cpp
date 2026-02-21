@@ -14,10 +14,9 @@ string FactorImp::str() const {
     string strip("  \n");
     os << "FactorImp(";
     os << strip << "name: " << name() << strip << "ktype: " << ktype() << strip
-       << "is_active: " << isActive() << strip << "need_persist: " << needPersist() << strip
-       << "create_at: " << createAt().str() << strip << "update_at: " << updateAt().str() << strip
-       << "formula: " << formula() << strip << "brief: " << brief() << strip
-       << "detail: " << details() << ")";
+       << "need_persist: " << needPersist() << strip << "create_at: " << createAt().str() << strip
+       << "update_at: " << updateAt().str() << strip << "formula: " << formula() << strip
+       << "brief: " << brief() << strip << "detail: " << details() << ")";
     return os.str();
 }
 
@@ -32,6 +31,14 @@ FactorImp::FactorImp(const string& name, const Indicator& formula, const KQuery:
 
 uint64_t FactorImp::hash() const noexcept {
     return (uint64_t)this;
+}
+
+void FactorImp::save() {
+    HKU_WARN("FactorImp::save() is not supported!");
+}
+
+void FactorImp::remove() {
+    HKU_WARN("FactorImp::remove() is not supported!");
 }
 
 }  // namespace hku
