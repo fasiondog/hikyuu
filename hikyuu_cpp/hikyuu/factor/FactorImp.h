@@ -155,6 +155,9 @@ public:
 
     virtual void load();
 
+    virtual IndicatorList getValues(const StockList& stocks, const KQuery& query);
+    virtual void saveValues(const StockList& stocks, const KQuery& query, bool replace);
+
 protected:
     string m_name;               ///< 因子名称
     string m_ktype;              ///< K线类型

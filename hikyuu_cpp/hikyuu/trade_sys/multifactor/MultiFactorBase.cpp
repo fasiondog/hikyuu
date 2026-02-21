@@ -667,7 +667,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
       [this, &all_stk_inds, &null_ind, &use_style_inds, ind_count, fill_null](size_t i) {
           const auto& stk = m_stks[i];
           auto kdata = stk.getKData(m_query);
-#if 0
+#if 1
           auto& cur_stk_inds = all_stk_inds[i];
           cur_stk_inds.resize(ind_count);
           if (kdata.size() == 0) {

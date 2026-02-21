@@ -45,4 +45,13 @@ void FactorImp::load() {
     HKU_WARN("FactorImp::load() is not supported!");
 }
 
+IndicatorList FactorImp::getValues(const StockList& stocks, const KQuery& query) {
+    HKU_WARN("FactorImp::getValues() is not supported!");
+    return IndicatorList();
+}
+
+void FactorImp::saveValues(const StockList& stocks, const KQuery& query, bool replace) {
+    HKU_WARN("FactorImp::saveValues() is not supported!");
+}
+
 }  // namespace hku

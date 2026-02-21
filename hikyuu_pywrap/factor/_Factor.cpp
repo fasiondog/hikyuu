@@ -39,7 +39,24 @@ void export_Factor(py::module& m) {
       .def_property("details", py::overload_cast<>(&Factor::details, py::const_),
                     py::overload_cast<const string&>(&Factor::details),
                     py::return_value_policy::copy, "详细说明")
+      .def_property("need_persist", py::overload_cast<>(&Factor::needPersist, py::const_),
+                    py::overload_cast<bool>(&Factor::needPersist), "是否持久化")
 
       .def("save", &Factor::save, "保存因子元数据")
-      .def("remove", &Factor::remove, "删除因子元数据");
+      .def("remove", &Factor::remove, "删除因子元数据")
+      .def(
+        "get_values",
+        [](Factor& self, const py::object& stks, const KQuery& query) {
+            return self.getValues(get_stock_list_from_python(stks), query);
+        },
+        py::arg("stocks"), py::arg("query"))
+
+      .def(
+        "save_values",
+        [](Factor& self, const py::object& stks, const KQuery& query, bool replace = false) {
+            self.saveValues(get_stock_list_from_python(stks), query, replace);
+        },
+        py::arg("stocks"), py::arg("query"), py::arg("replace") = false)
+
+      ;
 }

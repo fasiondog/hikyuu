@@ -129,6 +129,14 @@ public:
         m_imp->load();
     }
 
+    IndicatorList getValues(const StockList& stocks, const KQuery& query) {
+        return m_imp->getValues(stocks, query);
+    }
+
+    void saveValues(const StockList& stocks, const KQuery& query, bool replace = false) {
+        m_imp->saveValues(stocks, query, replace);
+    }
+
 private:
     shared_ptr<FactorImp> m_imp;
 
