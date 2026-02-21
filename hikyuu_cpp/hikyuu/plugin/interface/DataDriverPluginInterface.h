@@ -11,6 +11,7 @@
 #include "hikyuu/data_driver/BlockInfoDriver.h"
 #include "hikyuu/data_driver/BaseInfoDriver.h"
 #include "hikyuu/utilities/plugin/PluginBase.h"
+#include "hikyuu/factor/FactorImp.h"
 
 namespace hku {
 
@@ -22,6 +23,10 @@ public:
     virtual KDataDriverPtr getKDataDriver() = 0;
     virtual BlockInfoDriverPtr getBlockInfoDriver() = 0;
     virtual BaseInfoDriverPtr getBaseInfoDriver() = 0;
+
+    virtual FactorImpPtr createFactorImp(const string& name, const Indicator& formula,
+                                         const KQuery::KType& ktype, const string& brief,
+                                         const string& details, bool need_persist) = 0;
 };
 
 }  // namespace hku

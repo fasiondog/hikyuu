@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "hikyuu/indicator/Indicator.h"
+#include "FactorImp.h"
 
 namespace hku {
 
@@ -16,6 +16,16 @@ class HKU_API Factor final {
 
 public:
     Factor();
+
+    /**
+     * 构造函数
+     * @param name 因子名称
+     * @param formula 计算公式指标
+     * @param ktype K线类型
+     * @param brief 简要描述
+     * @param details 详细描述
+     * @param need_persist 是否需要持久化
+     */
     Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype = KQuery::DAY,
            const string& brief = "", const string& details = "", bool need_persist = false);
 
@@ -31,15 +41,15 @@ public:
     //------------------------
 
     const string& name() const noexcept {
-        return m_data->name;
+        return m_imp->name();
     }
 
     const string& ktype() const noexcept {
-        return m_data->ktype;
+        return m_imp->ktype();
     }
 
     Indicator formula() const {
-        return m_data->formula.clone();
+        return m_imp->formula();
     }
 
     //------------------------
@@ -47,57 +57,51 @@ public:
     //------------------------
 
     const Datetime& createAt() const noexcept {
-        return m_data->create_at;
+        return m_imp->createAt();
     }
 
     void createAt(const Datetime& datetime) {
-        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
-        m_data->create_at = datetime;
+        m_imp->createAt(datetime);
     }
 
     const Datetime& updateAt() const noexcept {
-        return m_data->update_at;
+        return m_imp->updateAt();
     }
 
     void updateAt(const Datetime& datetime) {
-        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
-        m_data->update_at = datetime;
+        m_imp->updateAt(datetime);
     }
 
     bool needPersist() const noexcept {
-        return m_data->need_persist;
+        return m_imp->needPersist();
     }
 
     void needPersist(bool flag) {
-        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
-        m_data->need_persist = flag;
+        m_imp->needPersist(flag);
     }
 
     const string& brief() const noexcept {
-        return m_data->brief;
+        return m_imp->brief();
     }
 
     void brief(const string& brief) {
-        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
-        m_data->brief = brief;
+        m_imp->brief(brief);
     }
 
     const string& details() const noexcept {
-        return m_data->details;
+        return m_imp->details();
     }
 
     void details(const string& details) {
-        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
-        m_data->details = details;
+        m_imp->details(details);
     }
 
     bool isActive() const noexcept {
-        return m_data->is_active;
+        return m_imp->isActive();
     }
 
     void isActive(bool flag) {
-        HKU_CHECK(m_data == ms_null_factor_meta_data, "Can not be called when m_data is null!");
-        m_data->is_active = flag;
+        m_imp->isActive(flag);
     }
 
     //------------------------
@@ -105,29 +109,20 @@ public:
     //------------------------
 
     bool isNull() const noexcept {
-        return m_data == ms_null_factor_meta_data;
+        return m_imp == ms_null_factor_imp;
     }
 
-    uint64_t hash() const noexcept;
+    uint64_t hash() const noexcept {
+        return m_imp->hash();
+    }
 
     string str() const;
 
 private:
-    struct Data {
-        string name;
-        string ktype;
-        string brief;
-        string details;
-        Datetime create_at;
-        Datetime update_at;
-        Indicator formula;
-        bool need_persist{false};
-        bool is_active{false};
-    };
-    shared_ptr<Data> m_data;
+    shared_ptr<FactorImp> m_imp;
 
 private:
-    static shared_ptr<Data> ms_null_factor_meta_data;
+    static shared_ptr<FactorImp> ms_null_factor_imp;
 };
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Factor&);
