@@ -855,8 +855,8 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
     return ret;
 }
 
-void StockManager::saveFactorMeta(const FactorMeta& factor) {
-    DataDriverFactory::getKDataDriverPool(m_kdataDriverParam)->getConnect()->saveFactorMeta(factor);
+void StockManager::saveFactor(const Factor& factor) {
+    DataDriverFactory::getKDataDriverPool(m_kdataDriverParam)->getConnect()->saveFactor(factor);
 }
 
 void StockManager::saveIndicator(const string& name, const Indicator& ind) {

@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/factor/FactorSet.h>
-#include <hikyuu/factor/FactorMeta.h>
+#include <hikyuu/factor/Factor.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <algorithm>
@@ -22,12 +22,12 @@ using namespace hku;
 
 /** @par 检测点：测试FactorSet基本功能 */
 TEST_CASE("test_FactorSet_basic") {
-    // 创建测试用的 FactorMeta 对象
+    // 创建测试用的 Factor 对象
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
 
-    FactorMeta factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线");
-    FactorMeta factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线");
+    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线");
+    Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线");
 
     // 测试构造函数和基本属性
     FactorSet fs("TestFactorSet");
@@ -50,11 +50,11 @@ TEST_CASE("test_FactorSet_basic") {
     CHECK_FALSE(fs.hasFactor("NONEXIST"));
 
     // 测试获取因子
-    FactorMeta retrieved1 = fs.getFactor("MA5");
+    Factor retrieved1 = fs.getFactor("MA5");
     CHECK_EQ(retrieved1.name(), "MA5");
     CHECK_EQ(retrieved1.brief(), "5日均线因子");
 
-    FactorMeta retrieved2 = fs.getFactor("MA10");
+    Factor retrieved2 = fs.getFactor("MA10");
     CHECK_EQ(retrieved2.name(), "MA10");
     CHECK_EQ(retrieved2.brief(), "10日均线因子");
 
@@ -81,9 +81,9 @@ TEST_CASE("test_FactorSet_ktype_check") {
     Indicator week_ma = MA(CLOSE(), 10);
     Indicator month_ma = MA(CLOSE(), 20);
 
-    FactorMeta day_factor("DAY_MA", day_ma, KQuery::DAY, "日线因子");
-    FactorMeta week_factor("WEEK_MA", week_ma, KQuery::WEEK, "周线因子");
-    FactorMeta month_factor("MONTH_MA", month_ma, KQuery::MONTH, "月线因子");
+    Factor day_factor("DAY_MA", day_ma, KQuery::DAY, "日线因子");
+    Factor week_factor("WEEK_MA", week_ma, KQuery::WEEK, "周线因子");
+    Factor month_factor("MONTH_MA", month_ma, KQuery::MONTH, "月线因子");
 
     // 测试日线 FactorSet
     SUBCASE("DAY FactorSet") {
@@ -153,8 +153,8 @@ TEST_CASE("test_FactorSet_duplicate_name") {
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma5_new = MA(CLOSE(), 5);  // 同名但不同的指标
 
-    FactorMeta factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "原始版本");
-    FactorMeta factor2("MA5", ma5_new, KQuery::DAY, "5日均线因子", "更新版本");
+    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "原始版本");
+    Factor factor2("MA5", ma5_new, KQuery::DAY, "5日均线因子", "更新版本");
 
     FactorSet fs("TestFactorSet");
 
@@ -163,7 +163,7 @@ TEST_CASE("test_FactorSet_duplicate_name") {
     CHECK_EQ(fs.size(), 1);
 
     // 获取并验证第一个因子
-    FactorMeta retrieved1 = fs.getFactor("MA5");
+    Factor retrieved1 = fs.getFactor("MA5");
     CHECK_EQ(retrieved1.brief(), "5日均线因子");
     CHECK_EQ(retrieved1.details(), "原始版本");
 
@@ -172,7 +172,7 @@ TEST_CASE("test_FactorSet_duplicate_name") {
     CHECK_EQ(fs.size(), 1);  // 大小不变，因为是覆盖而不是新增
 
     // 验证被覆盖后的因子
-    FactorMeta retrieved2 = fs.getFactor("MA5");
+    Factor retrieved2 = fs.getFactor("MA5");
     CHECK_EQ(retrieved2.brief(), "5日均线因子");
     CHECK_EQ(retrieved2.details(), "更新版本");  // 应该是新的值
 }
@@ -182,8 +182,8 @@ TEST_CASE("test_FactorSet_shallow_copy") {
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
 
-    FactorMeta factor1("MA5", ma5, KQuery::DAY);
-    FactorMeta factor2("MA10", ma10, KQuery::DAY);
+    Factor factor1("MA5", ma5, KQuery::DAY);
+    Factor factor2("MA10", ma10, KQuery::DAY);
 
     // 创建原始 FactorSet
     FactorSet fs1("Original");
@@ -229,12 +229,12 @@ TEST_CASE("test_FactorSet_shallow_copy") {
 
 /** @par 检测点：测试FactorSet迭代器功能 */
 TEST_CASE("test_FactorSet_iterator") {
-    // 创建测试用的 FactorMeta 对象
+    // 创建测试用的 Factor 对象
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
 
-    FactorMeta factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线");
-    FactorMeta factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线");
+    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线");
+    Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线");
 
     // 创建 FactorSet 并添加因子
     FactorSet fs("TestFactorSet");
@@ -244,9 +244,9 @@ TEST_CASE("test_FactorSet_iterator") {
     CHECK_EQ(fs.size(), 2);
     CHECK_FALSE(fs.empty());
 
-    // 测试基于范围的for循环 - 迭代器应直接返回FactorMeta引用
+    // 测试基于范围的for循环 - 迭代器应直接返回Factor引用
     size_t count = 0;
-    for (const FactorMeta& factor : fs) {
+    for (const Factor& factor : fs) {
         CHECK_UNARY_FALSE(factor.isNull());
         CHECK_UNARY_FALSE(factor.name().empty());
         CHECK_UNARY(factor.name() == "MA5" || factor.name() == "MA10");
@@ -254,12 +254,12 @@ TEST_CASE("test_FactorSet_iterator") {
     }
     CHECK_EQ(count, 2);
 
-    // 测试显式迭代器 - 解引用应直接返回FactorMeta引用
+    // 测试显式迭代器 - 解引用应直接返回Factor引用
     auto it = fs.begin();
     auto end = fs.end();
     count = 0;
     while (it != end) {
-        const FactorMeta& factor = *it;  // 直接解引用得到FactorMeta引用
+        const Factor& factor = *it;  // 直接解引用得到Factor引用
         CHECK_UNARY_FALSE(factor.isNull());
         CHECK_UNARY(factor.name() == "MA5" || factor.name() == "MA10");
         count++;
@@ -269,7 +269,7 @@ TEST_CASE("test_FactorSet_iterator") {
 
     // 测试迭代器箭头操作符
     for (auto it = fs.begin(); it != fs.end(); ++it) {
-        const FactorMeta* factor_ptr = it.operator->();  // 箭头操作符应返回FactorMeta指针
+        const Factor* factor_ptr = it.operator->();  // 箭头操作符应返回Factor指针
         CHECK_UNARY_FALSE(factor_ptr->isNull());
         CHECK_UNARY_FALSE(factor_ptr->name().empty());
     }
@@ -278,7 +278,7 @@ TEST_CASE("test_FactorSet_iterator") {
     const FactorSet& const_fs = fs;
     count = 0;
     for (auto it = const_fs.begin(); it != const_fs.end(); ++it) {
-        const FactorMeta& factor = *it;
+        const Factor& factor = *it;
         CHECK_UNARY_FALSE(factor.isNull());
         count++;
     }
@@ -287,7 +287,7 @@ TEST_CASE("test_FactorSet_iterator") {
     // 测试 cbegin/cend
     count = 0;
     for (auto it = fs.cbegin(); it != fs.cend(); ++it) {
-        const FactorMeta& factor = *it;
+        const Factor& factor = *it;
         CHECK_UNARY_FALSE(factor.isNull());
         count++;
     }
@@ -306,8 +306,8 @@ TEST_CASE("test_FactorSet_iterator") {
     CHECK_UNARY(empty_fs.cbegin() == empty_fs.cend());
 
     // 测试基于迭代器的因子收集
-    vector<FactorMeta> factors;
-    for (const FactorMeta& factor : fs) {
+    vector<Factor> factors;
+    for (const Factor& factor : fs) {
         factors.push_back(factor);
     }
     CHECK_EQ(factors.size(), 2);

@@ -257,7 +257,7 @@ public:
      */
     void removeTempCsvStock(const string& code);
 
-    void saveFactorMeta(const FactorMeta& factor);
+    void saveFactor(const Factor& factor);
     void saveIndicator(const string& name, const Indicator& ind);
     Indicator loadIndicator(const string& name, const Stock& stock, const KQuery& query);
     vector<IndicatorList> loadIndicators(const IndicatorList& ind_list, const StockList& stk_list,

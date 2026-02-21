@@ -120,7 +120,7 @@ public:
      */
     virtual TransList getTransList(const string& market, const string& code, const KQuery& query);
 
-    virtual void saveFactorMeta(const FactorMeta& factor);
+    virtual void saveFactor(const Factor& factor);
 
     virtual void saveIndicatorAsFactor(const string& name, const Indicator& ind);
 
@@ -130,7 +130,7 @@ public:
 
     virtual FactorSet getFactorSet(const string& name, const KQuery::KType& ktype);
 
-    virtual IndicatorList loadFactorValues(const FactorMeta& factor, const StockList& stock,
+    virtual IndicatorList loadFactorValues(const Factor& factor, const StockList& stock,
                                            const KQuery& query);
 
     virtual void saveIndicatorValues(const IndicatorList& inds, bool replace);
@@ -222,8 +222,8 @@ public:
         return m_driver->getTransList(market, code, query);
     }
 
-    void saveFactorMeta(const FactorMeta& factor) {
-        m_driver->saveFactorMeta(factor);
+    void saveFactor(const Factor& factor) {
+        m_driver->saveFactor(factor);
     }
 
     void saveIndicatorAsFactor(const string& name, const Indicator& ind) {
@@ -242,7 +242,7 @@ public:
         return m_driver->getFactorSet(name, ktype);
     }
 
-    IndicatorList loadFactorValues(const FactorMeta& factor, const StockList& stock,
+    IndicatorList loadFactorValues(const Factor& factor, const StockList& stock,
                                    const KQuery& query) {
         return m_driver->loadFactorValues(factor, stock, query);
     }

@@ -11,7 +11,7 @@
 #include <xxhash.h>
 #include "hikyuu/indicator/imp/IPriceList.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
-#include "FactorMeta.h"
+#include "Factor.h"
 
 namespace hku {
 
@@ -189,9 +189,9 @@ static bool isValidName(const string& name) {
     return true;
 }
 
-HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta& factor) {
+HKU_API std::ostream& operator<<(std::ostream& os, const Factor& factor) {
     string strip("  \n");
-    os << "FactorMeta(";
+    os << "Factor(";
     os << strip << "name: " << factor.m_data->name << strip << "ktype: " << factor.m_data->ktype
        << strip << "is_active: " << factor.m_data->is_active << strip
        << "need_persist: " << factor.m_data->need_persist << strip
@@ -202,18 +202,18 @@ HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta& factor) {
     return os;
 }
 
-string FactorMeta::str() const {
+string Factor::str() const {
     std::ostringstream os;
     os << *this;
     return os.str();
 }
 
-shared_ptr<FactorMeta::Data> FactorMeta::ms_null_factor_meta_data{make_shared<FactorMeta::Data>()};
+shared_ptr<Factor::Data> Factor::ms_null_factor_meta_data{make_shared<Factor::Data>()};
 
-FactorMeta::FactorMeta() : m_data(ms_null_factor_meta_data) {}
+Factor::Factor() : m_data(ms_null_factor_meta_data) {}
 
-FactorMeta::FactorMeta(const string& name, const Indicator& formula, const KQuery::KType& ktype,
-                       const string& brief, const string& details, bool need_persist)
+Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype,
+               const string& brief, const string& details, bool need_persist)
 : m_data(make_shared<Data>()) {
     string upper_name = name;
     to_upper(upper_name);
@@ -242,29 +242,29 @@ FactorMeta::FactorMeta(const string& name, const Indicator& formula, const KQuer
     m_data->is_active = true;
 }
 
-FactorMeta::FactorMeta(const FactorMeta& other) {
+Factor::Factor(const Factor& other) {
     m_data = other.m_data;
 }
 
-FactorMeta::FactorMeta(FactorMeta&& other) {
+Factor::Factor(Factor&& other) {
     m_data = std::move(other.m_data);
     other.m_data = ms_null_factor_meta_data;
 }
 
-FactorMeta& FactorMeta::operator=(const FactorMeta& other) {
+Factor& Factor::operator=(const Factor& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_data = other.m_data;
     return *this;
 }
 
-FactorMeta& FactorMeta::operator=(FactorMeta&& other) {
+Factor& Factor::operator=(Factor&& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_data = std::move(other.m_data);
     other.m_data = ms_null_factor_meta_data;
     return *this;
 }
 
-uint64_t FactorMeta::hash() const noexcept {
+uint64_t Factor::hash() const noexcept {
     XXH64_state_t* state = XXH64_createState();
     HKU_IF_RETURN(!state, 0);
 

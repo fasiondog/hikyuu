@@ -97,8 +97,8 @@ TransList KDataDriver::getTransList(const string& market, const string& code, co
     return TransList();
 }
 
-void KDataDriver::saveFactorMeta(const FactorMeta& factor) {
-    HKU_INFO("The saveFactorMeta method has not been implemented! (KDataDriver: {})", m_name);
+void KDataDriver::saveFactor(const Factor& factor) {
+    HKU_INFO("The saveFactor method has not been implemented! (KDataDriver: {})", m_name);
 }
 
 void KDataDriver::saveIndicatorAsFactor(const string& name, const Indicator& ind) {
@@ -126,7 +126,7 @@ FactorSet KDataDriver::getFactorSet(const string& name, const KQuery::KType& kty
     return FactorSet();
 }
 
-IndicatorList KDataDriver::loadFactorValues(const FactorMeta& factor, const StockList& stock,
+IndicatorList KDataDriver::loadFactorValues(const Factor& factor, const StockList& stock,
                                             const KQuery& query) {
     HKU_INFO("The loadFactorValues method has not been implemented! (KDataDriver: {})", m_name);
     return IndicatorList();

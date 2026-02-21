@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "FactorMeta.h"
+#include "Factor.h"
 
 namespace hku {
 
@@ -54,11 +54,11 @@ public:
     // 因子管理接口
     //------------------------
 
-    void addFactor(const FactorMeta& factor);
-    void addFactor(FactorMeta&& factor);
+    void addFactor(const Factor& factor);
+    void addFactor(Factor&& factor);
     void removeFactor(const string& name);
     bool hasFactor(const string& name) const noexcept;
-    FactorMeta getFactor(const string& name) const;
+    Factor getFactor(const string& name) const;
 
     //------------------------
     // 迭代器支持
@@ -68,12 +68,12 @@ public:
     class const_iterator {
     public:
         using iterator_category = std::forward_iterator_tag;
-        using value_type = const FactorMeta;
+        using value_type = const Factor;
         using difference_type = std::ptrdiff_t;
-        using pointer = const FactorMeta*;
-        using reference = const FactorMeta&;
+        using pointer = const Factor*;
+        using reference = const Factor&;
 
-        const_iterator(const typename std::unordered_map<string, FactorMeta>::const_iterator& iter)
+        const_iterator(const typename std::unordered_map<string, Factor>::const_iterator& iter)
         : m_iter(iter) {}
 
         reference operator*() const {
@@ -104,7 +104,7 @@ public:
         }
 
     private:
-        typename std::unordered_map<string, FactorMeta>::const_iterator m_iter;
+        typename std::unordered_map<string, Factor>::const_iterator m_iter;
     };
 
     using iterator = const_iterator;
@@ -129,7 +129,7 @@ private:
     struct HKU_API Data {
         string name;
         string ktype;
-        unordered_map<string, FactorMeta> m_factorDict;
+        unordered_map<string, Factor> m_factorDict;
     };
     shared_ptr<Data> m_data;
 };

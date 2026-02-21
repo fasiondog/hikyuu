@@ -38,12 +38,12 @@ FactorSet& FactorSet::operator=(FactorSet&& other) {
     return *this;
 }
 
-void FactorSet::addFactor(const FactorMeta& factor) {
+void FactorSet::addFactor(const Factor& factor) {
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
     m_data->m_factorDict[factor.name()] = factor;
 }
 
-void FactorSet::addFactor(FactorMeta&& factor) {
+void FactorSet::addFactor(Factor&& factor) {
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
     m_data->m_factorDict[factor.name()] = std::move(factor);
 }
@@ -56,7 +56,7 @@ bool FactorSet::hasFactor(const string& name) const noexcept {
     return m_data->m_factorDict.find(name) != m_data->m_factorDict.end();
 }
 
-FactorMeta FactorSet::getFactor(const string& name) const {
+Factor FactorSet::getFactor(const string& name) const {
     auto it = m_data->m_factorDict.find(name);
     HKU_CHECK(it != m_data->m_factorDict.end(), "Factor '{}' not found!", name);
     return it->second;

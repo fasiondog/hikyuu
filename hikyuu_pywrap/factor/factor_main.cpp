@@ -5,14 +5,14 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/factor/FactorMeta.h>
+#include <hikyuu/factor/Factor.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
 using namespace hku;
 
-void export_FactorMeta(py::module& m);
+void export_Factor(py::module& m);
 
 void export_factor_main(py::module& m) {
-    export_FactorMeta(m);
+    export_Factor(m);
 }

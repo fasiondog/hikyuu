@@ -11,21 +11,20 @@
 
 namespace hku {
 
-class HKU_API FactorMeta final {
-    friend HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta&);
+class HKU_API Factor final {
+    friend HKU_API std::ostream& operator<<(std::ostream& os, const Factor&);
 
 public:
-    FactorMeta();
-    FactorMeta(const string& name, const Indicator& formula,
-               const KQuery::KType& ktype = KQuery::DAY, const string& brief = "",
-               const string& details = "", bool need_persist = false);
+    Factor();
+    Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype = KQuery::DAY,
+           const string& brief = "", const string& details = "", bool need_persist = false);
 
-    FactorMeta(const FactorMeta& other);
-    FactorMeta(FactorMeta&& other);
-    ~FactorMeta() = default;
+    Factor(const Factor& other);
+    Factor(Factor&& other);
+    ~Factor() = default;
 
-    FactorMeta& operator=(const FactorMeta& other);
-    FactorMeta& operator=(FactorMeta&& other);
+    Factor& operator=(const Factor& other);
+    Factor& operator=(Factor&& other);
 
     //------------------------
     // 只读属性
@@ -131,15 +130,15 @@ private:
     static shared_ptr<Data> ms_null_factor_meta_data;
 };
 
-HKU_API std::ostream& operator<<(std::ostream& os, const FactorMeta&);
+HKU_API std::ostream& operator<<(std::ostream& os, const Factor&);
 
 }  // namespace hku
 
 namespace std {
 template <>
-class hash<hku::FactorMeta> {
+class hash<hku::Factor> {
 public:
-    size_t operator()(hku::FactorMeta const& factor) const noexcept {
+    size_t operator()(hku::Factor const& factor) const noexcept {
         return factor.hash();
     }
 };
