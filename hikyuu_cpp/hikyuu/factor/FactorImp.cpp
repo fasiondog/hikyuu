@@ -54,8 +54,4 @@ IndicatorList FactorImp::getValues(const StockList& stocks, const KQuery& query)
     return IndicatorList();
 }
 
-void FactorImp::saveValues(const StockList& stocks, const KQuery& query, bool replace) {
-    HKU_WARN("FactorImp::saveValues() is not supported!");
-}
-
 }  // namespace hku

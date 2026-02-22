@@ -56,12 +56,5 @@ void export_Factor(py::module& m) {
         },
         py::arg("stocks"), py::arg("query"))
 
-      .def(
-        "save_values",
-        [](Factor& self, const py::object& stks, const KQuery& query, bool replace = false) {
-            self.saveValues(get_stock_list_from_python(stks), query, replace);
-        },
-        py::arg("stocks"), py::arg("query"), py::arg("replace") = false)
-
       ;
 }

@@ -149,16 +149,14 @@ public:
         return m_imp->getValues(stocks, query);
     }
 
-    void saveValues(const StockList& stocks, const KQuery& query, bool replace = false) {
-        m_imp->saveValues(stocks, query, replace);
-    }
-
 private:
     shared_ptr<FactorImp> m_imp;
 
 private:
     static shared_ptr<FactorImp> ms_null_factor_imp;
 };
+
+typedef vector<Factor> FactorList;
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Factor&);
 
