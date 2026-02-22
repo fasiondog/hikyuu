@@ -57,7 +57,7 @@ public:
     Indicator operator()(const Indicator& ind);
 
     /** 生成新的克隆，并使用参数 k 作为新实例的上下文 */
-    Indicator operator()(const KData& k);
+    Indicator operator()(const KData& k) const;
 
     /** 生成新的克隆，同 clone */
     Indicator operator()();

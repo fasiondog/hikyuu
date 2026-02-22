@@ -69,7 +69,7 @@ KData::KData(const Stock& stock, const KQuery& query) {
 
 bool KData::operator==(const KData& thr) const noexcept {
     return this == &thr || m_imp == thr.m_imp ||
-           (getStock() == thr.getStock() && getQuery() == thr.getQuery()) ||
+           (getStock() == thr.getStock() && getQuery() == thr.getQuery() && size() == thr.size()) ||
            (getStock().isNull() && thr.getStock().isNull());
 }
 

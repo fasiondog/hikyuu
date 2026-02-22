@@ -32,7 +32,7 @@ string Indicator::formula() const {
     return m_imp ? m_imp->formula() : "Indicator";
 }
 
-Indicator Indicator::operator()(const KData& k) {
+Indicator Indicator::operator()(const KData& k) const {
     Indicator result;
     if (!m_imp) {
         result.setContext(k);
@@ -65,7 +65,7 @@ Indicator Indicator::operator()(const KData& k) {
             memcpy(dst, src, old_size - old_discard);
         }
     }
-    new_imp->setCalculateFlag(true);
+    new_imp->setCalculateFlag(false);
     new_imp->setContext(k);
     result.m_imp = std::move(new_imp);
     return result;
