@@ -13,7 +13,6 @@
 #include "hikyuu/KQuery.h"
 #include "hikyuu/TimeLineRecord.h"
 #include "hikyuu/TransRecord.h"
-#include "hikyuu/factor/FactorSet.h"
 
 namespace hku {
 

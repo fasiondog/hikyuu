@@ -24,11 +24,12 @@ shared_ptr<FactorImp> Factor::ms_null_factor_imp{make_shared<FactorImp>()};
 Factor::Factor() : m_imp(ms_null_factor_imp) {}
 
 Factor::Factor(const string& name, const KQuery::KType& ktype)
-: m_imp(createFactorImp(name, Indicator(), ktype, "", "", false)) {}
+: m_imp(createFactorImp(name, Indicator(), ktype, "", "", false, Datetime::min(), Block())) {}
 
 Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype,
-               const string& brief, const string& details, bool need_persist)
-: m_imp(createFactorImp(name, formula, ktype, brief, details, need_persist)) {}
+               const string& brief, const string& details, bool need_persist,
+               const Datetime& start_date, const Block& block)
+: m_imp(createFactorImp(name, formula, ktype, brief, details, need_persist, start_date, block)) {}
 
 Factor::Factor(const Factor& other) {
     m_imp = other.m_imp;

@@ -13,6 +13,7 @@ namespace hku {
 
 FactorImpPtr HKU_API createFactorImp(const string& name, const Indicator& formula,
                                      const KQuery::KType& ktype, const string& brief,
-                                     const string& details, bool need_persist);
+                                     const string& details, bool need_persist,
+                                     const Datetime& start_date, const Block& block);
 
 }

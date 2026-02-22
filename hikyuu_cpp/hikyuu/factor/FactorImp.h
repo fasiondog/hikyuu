@@ -8,6 +8,7 @@
 #pragma once
 
 #include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/Block.h"
 
 namespace hku {
 
@@ -30,9 +31,9 @@ public:
      * @param details 详细描述
      * @param need_persist 是否需要持久化
      */
-    FactorImp(const string& name, const Indicator& formula,
-              const KQuery::KType& ktype = KQuery::DAY, const string& brief = "",
-              const string& details = "", bool need_persist = false);
+    FactorImp(const string& name, const Indicator& formula, const KQuery::KType& ktype,
+              const string& brief, const string& details, bool need_persist,
+              const Datetime& start_date, const Block& block);
 
     virtual ~FactorImp() = default;
 
@@ -59,6 +60,20 @@ public:
      */
     Indicator formula() const {
         return m_formula.clone();
+    }
+
+    /**
+     * 获取开始日期
+     */
+    const Datetime& startDate() const noexcept {
+        return m_start_date;
+    }
+
+    /**
+     * 获取板块信息
+     */
+    const Block& block() const noexcept {
+        return m_block;
     }
 
     //------------------------
@@ -165,7 +180,9 @@ protected:
     string m_details;            ///< 详细描述
     Datetime m_create_at;        ///< 创建时间
     Datetime m_update_at;        ///< 更新时间
+    Datetime m_start_date;       ///< 开始日期，数据存储时的起始日期
     Indicator m_formula;         ///< 计算公式指标
+    Block m_block;               ///< 板块信息，证券集合，如果为空，为全部
     bool m_need_persist{false};  ///< 是否需要持久化
 };
 

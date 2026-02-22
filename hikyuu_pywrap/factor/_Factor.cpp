@@ -17,9 +17,10 @@ void export_Factor(py::module& m) {
       .def(py::init<const string&, const KQuery::KType&>(), py::arg("name"),
            py::arg("ktype") = KQuery::DAY)
       .def(py::init<const string&, const Indicator&, const KQuery::KType&, const string&,
-                    const string&, bool>(),
+                    const string&, bool, const Datetime&, const Block&>(),
            py::arg("name"), py::arg("formula"), py::arg("ktype") = KQuery::DAY,
-           py::arg("brief") = "", py::arg("details") = "", py::arg("need_persist") = false)
+           py::arg("brief") = "", py::arg("details") = "", py::arg("need_persist") = false,
+           py::arg("start_date") = Datetime::min(), py::arg("block") = Block())
 
       .def("__str__", &Factor::str)
       .def("__repr__", &Factor::str)
@@ -33,6 +34,10 @@ void export_Factor(py::module& m) {
       .def_property_readonly("update_at", py::overload_cast<>(&Factor::updateAt, py::const_),
                              py::return_value_policy::copy, "更改日期")
       .def_property_readonly("formula", &Factor::formula, "因子公式")
+      .def_property_readonly("start_date", py::overload_cast<>(&Factor::startDate, py::const_),
+                             "数据存储起始日期")
+      .def_property_readonly("block", py::overload_cast<>(&Factor::block, py::const_),
+                             py::return_value_policy::copy, "证券集合")
       .def_property("brief", py::overload_cast<>(&Factor::brief, py::const_),
                     py::overload_cast<const string&>(&Factor::brief), py::return_value_policy::copy,
                     "基础说明")

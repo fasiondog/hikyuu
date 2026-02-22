@@ -34,7 +34,8 @@ public:
      * @param need_persist 是否需要持久化
      */
     Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype = KQuery::DAY,
-           const string& brief = "", const string& details = "", bool need_persist = false);
+           const string& brief = "", const string& details = "", bool need_persist = false,
+           const Datetime& start_date = Datetime::min(), const Block& block = Block());
 
     Factor(const Factor& other);
     Factor(Factor&& other);
@@ -57,6 +58,14 @@ public:
 
     Indicator formula() const {
         return m_imp->formula();
+    }
+
+    const Datetime& startDate() const noexcept {
+        return m_imp->startDate();
+    }
+
+    const Block& block() const noexcept {
+        return m_imp->block();
     }
 
     //------------------------
