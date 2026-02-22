@@ -145,7 +145,7 @@ public:
         m_imp->load();
     }
 
-    IndicatorList getValues(const StockList& stocks, const KQuery& query) {
+    IndicatorList getValues(const StockList& stocks, const KQuery& query) const {
         return m_imp->getValues(stocks, query);
     }
 

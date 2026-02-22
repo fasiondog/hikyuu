@@ -18,7 +18,7 @@ void (Indicator::*setContext_1)(const Stock&, const KQuery&) = &Indicator::setCo
 void (Indicator::*setContext_2)(const KData&) = &Indicator::setContext;
 
 Indicator (Indicator::*ind_call_1)(const Indicator&) = &Indicator::operator();
-Indicator (Indicator::*ind_call_2)(const KData&) = &Indicator::operator();
+Indicator (Indicator::*ind_call_2)(const KData&) const = &Indicator::operator();
 Indicator (Indicator::*ind_call_3)() = &Indicator::operator();
 
 void (Indicator::*setIndParam1)(const string&, const Indicator&) = &Indicator::setIndParam;

@@ -36,4 +36,21 @@ FactorImpPtr HKU_API createFactorImp(const string& name, const Indicator& formul
     return ret;
 }
 
+FactorList HKU_API getAllFactors() {
+    FactorList ret;
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    ret = plugin->getAllFactors();
+    return ret;
+}
+
+void HKU_API updateAllFactorsValues(const KQuery::KType& ktype) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, void(),
+                        htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    plugin->updateAllFactorsValues(ktype);
+}
+
 }  // namespace hku

@@ -170,7 +170,7 @@ public:
 
     virtual void load();
 
-    virtual IndicatorList getValues(const StockList& stocks, const KQuery& query);
+    virtual IndicatorList getValues(const StockList& stocks, const KQuery& query) const;
 
 protected:
     string m_name;               ///< 因子名称

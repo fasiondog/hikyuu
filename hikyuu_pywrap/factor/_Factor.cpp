@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/factor/Factor.h>
+#include <hikyuu/plugin/factor.h>
 #include "../pybind_utils.h"
 
 using namespace hku;
@@ -57,4 +58,9 @@ void export_Factor(py::module& m) {
         py::arg("stocks"), py::arg("query"))
 
       ;
+
+    m.def("get_all_factors", &getAllFactors, "获取所有因子元数据");
+
+    m.def("update_all_factors_values", &updateAllFactorsValues, py::arg("ktype") = KQuery::DAY,
+          "更新所有因子值");
 }

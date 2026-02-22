@@ -49,7 +49,7 @@ void FactorImp::load() {
     HKU_WARN("FactorImp::load() is not supported!");
 }
 
-IndicatorList FactorImp::getValues(const StockList& stocks, const KQuery& query) {
+IndicatorList FactorImp::getValues(const StockList& stocks, const KQuery& query) const {
     HKU_WARN("FactorImp::getValues() is not supported!");
     return IndicatorList();
 }
