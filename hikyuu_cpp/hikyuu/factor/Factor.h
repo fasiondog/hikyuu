@@ -37,6 +37,9 @@ public:
            const string& brief = "", const string& details = "", bool need_persist = false,
            const Datetime& start_date = Datetime::min(), const Block& block = Block());
 
+    explicit Factor(const FactorImpPtr& imp) : m_imp(imp) {}
+    explicit Factor(FactorImpPtr&& imp) : m_imp(std::move(imp)) {}
+
     Factor(const Factor& other);
     Factor(Factor&& other);
     ~Factor() = default;
@@ -115,6 +118,10 @@ public:
     //------------------------
     // 其他接口
     //------------------------
+
+    shared_ptr<FactorImp> getImp() const noexcept {
+        return m_imp;
+    }
 
     bool isNull() const noexcept {
         return m_imp == ms_null_factor_imp;
