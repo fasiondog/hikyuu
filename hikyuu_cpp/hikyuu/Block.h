@@ -190,4 +190,9 @@ public:
 };
 }  // namespace std
 
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::Block> : ostream_formatter {};
+#endif
+
 #endif /* BLOCK_H_ */
