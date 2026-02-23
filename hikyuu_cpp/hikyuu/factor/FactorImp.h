@@ -159,7 +159,8 @@ public:
      */
     virtual uint64_t hash() const noexcept;
 
-    virtual IndicatorList getValues(const StockList& stocks, const KQuery& query) const;
+    virtual IndicatorList getValues(const StockList& stocks, const KQuery& query, bool align,
+                                    bool fill_null, bool tovalue) const;
 
 protected:
     string m_name;               ///< 因子名称

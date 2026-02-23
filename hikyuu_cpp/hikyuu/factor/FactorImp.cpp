@@ -29,7 +29,8 @@ uint64_t FactorImp::hash() const noexcept {
     return (uint64_t)this;
 }
 
-IndicatorList FactorImp::getValues(const StockList& stocks, const KQuery& query) const {
+IndicatorList FactorImp::getValues(const StockList& stocks, const KQuery& query, bool align,
+                                   bool fill_null, bool tovalue) const {
     IndicatorList ret;
     HKU_IF_RETURN(stocks.empty(), ret);
     ret = global_parallel_for_index(0, stocks.size(), [&, this](size_t i) {

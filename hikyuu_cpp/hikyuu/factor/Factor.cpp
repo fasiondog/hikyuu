@@ -63,7 +63,8 @@ Factor& Factor::operator=(Factor&& other) {
     return *this;
 }
 
-IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bool check) const {
+IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bool align,
+                                bool fill_null, bool tovalue, bool check) const {
     if (check) {
         const auto& block = this->block();
         if (!block.empty()) {
@@ -72,13 +73,13 @@ IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bo
             }
         }
     }
-    return m_imp->getValues(stocks, query);
+    return m_imp->getValues(stocks, query, align, fill_null, tovalue);
 }
 
-IndicatorList Factor::getAllValues(const KQuery& query) {
+IndicatorList Factor::getAllValues(const KQuery& query, bool align, bool fill_null, bool tovalue) {
     StockList stocks =
       block().empty() ? StockManager::instance().getStockList() : block().getStockList();
-    return m_imp->getValues(stocks, query);
+    return m_imp->getValues(stocks, query, align, fill_null, tovalue);
 }
 
 void Factor::save() {

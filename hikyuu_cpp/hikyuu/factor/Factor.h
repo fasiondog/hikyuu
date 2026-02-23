@@ -53,13 +53,15 @@ public:
      * @param query 查询参数
      * @param check 是否检查股票列表属于自身指定的 block
      */
-    IndicatorList getValues(const StockList& stocks, const KQuery& query, bool check = false) const;
+    IndicatorList getValues(const StockList& stocks, const KQuery& query, bool align = false,
+                            bool fill_null = false, bool tovalue = true, bool check = false) const;
 
     /**
      * 获取指定查询参数的所有计算结果
      * @param query 获取指定查询参数的计算结果
      */
-    IndicatorList getAllValues(const KQuery& query);
+    IndicatorList getAllValues(const KQuery& query, bool align = false, bool fill_null = false,
+                               bool tovalue = true);
 
     //------------------------
     // 只读属性

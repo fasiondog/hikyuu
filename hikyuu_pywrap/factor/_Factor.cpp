@@ -52,10 +52,13 @@ void export_Factor(py::module& m) {
       .def("get_all_values", &Factor::getAllValues)
       .def(
         "get_values",
-        [](Factor& self, const py::object& stks, const KQuery& query, bool check = false) {
-            return self.getValues(get_stock_list_from_python(stks), query);
+        [](Factor& self, const py::object& stks, const KQuery& query, bool align, bool fill_null,
+           bool tovalue, bool check) {
+            return self.getValues(get_stock_list_from_python(stks), query, align, fill_null,
+                                  tovalue, check);
         },
-        py::arg("stocks"), py::arg("query"), py::arg("check") = false)
+        py::arg("stocks"), py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
+        py::arg("tovalue") = true, py::arg("check") = false)
 
       .def(py::hash(py::self))
 
