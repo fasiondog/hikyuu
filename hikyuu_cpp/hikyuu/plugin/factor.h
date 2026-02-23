@@ -22,4 +22,8 @@ FactorSetList HKU_API getAllFactorSets();
 
 void HKU_API updateAllFactorsValues(const KQuery::KType& ktype = KQuery::DAY);
 
+void HKU_API saveFactorSet(const FactorSet& set);
+void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype);
+FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype);
+
 }  // namespace hku

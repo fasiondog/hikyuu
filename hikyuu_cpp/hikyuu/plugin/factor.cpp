@@ -61,4 +61,29 @@ void HKU_API updateAllFactorsValues(const KQuery::KType& ktype) {
     plugin->updateAllFactorsValues(ktype);
 }
 
+void HKU_API saveFactorSet(const FactorSet& set) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, void(),
+                        htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    plugin->saveFactorSet(set);
+}
+
+void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, void(),
+                        htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    plugin->removeFactorSet(name, ktype);
+}
+
+FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype) {
+    FactorSet ret;
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    ret = plugin->getFactorSet(name, ktype);
+    return ret;
+}
+
 }  // namespace hku
