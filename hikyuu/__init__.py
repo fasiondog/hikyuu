@@ -392,41 +392,48 @@ def load_hikyuu(**kwargs):
     for s in sm:
         if s.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_A_BJ):
             blocka.add(s)
+    blocka.index_stock = sm["SH000001"]
     zsbk_a = blocka
 
     blocksh = Block("A", "SH")
     for s in blocka:
         if s.market == "SH":
             blocksh.add(s)
+    blocksh.index_stock = sm["SH000001"]
     zsbk_sh = blocksh
 
     blocksz = Block("A", "SZ")
     for s in blocka:
         if s.market == "SZ":
             blocksz.add(s)
+    blocksz.index_stock = sm["SZ399001"]
     zsbk_sz = blocksz
 
     blockbj = Block("A", "BJ")
     for s in blocka:
         if s.market == "BJ":
             blockbj.add(s)
+    blockbj.index_stock = sm["BJ899050"]
     zsbk_bj = blockbj
 
     blockg = Block("G", "创业板")
     for s in sm:
         if s.type == constant.STOCKTYPE_GEM:
             blockg.add(s)
+    blockg.index_stock = sm["SZ399006"]
     zsbk_cyb = blockg
 
     blockstart = Block("START", "科创板")
     for s in sm:
         if s.type == constant.STOCKTYPE_START:
             blockstart.add(s)
+    blockstart.index_stock = sm["SH000688"]
 
     blockzxb = Block("A", "中小板")
     for s in blocksz:
         if s.code[:3] == "002":
             blockzxb.add(s)
+    blockzxb.index_stock = sm["SZ399005"]
     zsbk_zxb = blockzxb
 
     zsbk_sh50 = sm.get_block("指数板块", "上证50")
@@ -609,3 +616,56 @@ def realtime_update_wrap():
 
 
 realtime_update = realtime_update_wrap()
+
+
+def auto_sync_globals(func):
+    """
+    装饰器：自动同步全局变量到调用者的命名空间
+    """
+    def wrapper(*args, **kwargs):
+        # 执行原始函数
+        result = func(*args, **kwargs)
+
+        # 自动同步全局变量
+        try:
+            import sys
+            import inspect
+
+            # 获取调用栈
+            frame = inspect.currentframe()
+            try:
+                # 向上查找调用栈
+                caller_frame = frame.f_back
+                while caller_frame:
+                    caller_globals = caller_frame.f_globals
+                    # 检查是否是从hikyuu导入的全局变量且值为None
+                    var_names = ['blocka', 'zsbk_a', 'blocksh', 'zsbk_sh', 'blocksz', 'zsbk_sz',
+                                 'blockbj', 'zsbk_bj', 'blockg', 'zsbk_cyb', 'blockstart', 'blockzxb',
+                                 'zsbk_zxb', 'zsbk_sh50', 'zsbk_sh180', 'zsbk_hs300', 'zsbk_zz100']
+
+                    updated_vars = []
+                    for var_name in var_names:
+                        if (var_name in caller_globals and
+                            caller_globals[var_name] is None and
+                            var_name in globals() and
+                                globals()[var_name] is not None):
+                            # 更新调用者的全局变量
+                            caller_globals[var_name] = globals()[var_name]
+                            updated_vars.append(var_name)
+
+                    # if updated_vars:
+                    #     print(f"自动同步全局变量: {', '.join(updated_vars)}")
+
+                    caller_frame = caller_frame.f_back
+            finally:
+                del frame
+        except Exception:
+            # 静默忽略错误
+            pass
+
+        return result
+    return wrapper
+
+
+# 为load_hikyuu函数应用自动同步装饰器
+load_hikyuu = auto_sync_globals(load_hikyuu)
