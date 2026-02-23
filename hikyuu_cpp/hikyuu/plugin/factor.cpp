@@ -10,29 +10,29 @@
 
 namespace hku {
 
-FactorImpPtr HKU_API createFactorImp(const string& name, const Indicator& formula,
-                                     const KQuery::KType& ktype, const string& brief,
-                                     const string& details, bool need_persist,
-                                     const Datetime& start_date, const Block& block) {
-    FactorImpPtr ret;
+Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype) {
+    Factor ret;
     auto& sm = StockManager::instance();
-    const auto& params = sm.getKDataDriverParameter();
-    if (params.tryGet<string>("type", "hdf5") != "clickhouse") {
-        ret = make_shared<FactorImp>(name, formula, ktype, brief, details, need_persist, start_date,
-                                     block);
-        return ret;
-    }
-
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
-    if (!plugin) {
-        ret = make_shared<FactorImp>(name, formula, ktype, brief, details, need_persist, start_date,
-                                     block);
-        return ret;
-    }
-
-    ret = plugin->createFactorImp(name, formula, ktype, brief, details, need_persist, start_date,
-                                  block);
+    HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    ret = plugin->getFactor(name, ktype);
     return ret;
+}
+
+void HKU_API saveFactor(const Factor& factor) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, void(),
+                        htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    plugin->saveFactor(factor);
+}
+
+void HKU_API removeFactor(const string& name, const KQuery::KType& ktype) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, void(),
+                        htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    plugin->removeFactor(name, ktype);
 }
 
 FactorList HKU_API getAllFactors() {

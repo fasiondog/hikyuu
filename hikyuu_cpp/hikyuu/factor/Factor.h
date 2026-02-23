@@ -147,17 +147,11 @@ public:
 
     string str() const;
 
-    void save() {
-        m_imp->save();
-    }
+    void save();
 
-    void remove() {
-        m_imp->remove();
-    }
+    void remove();
 
-    void load() {
-        m_imp->load();
-    }
+    void load();
 
 private:
     shared_ptr<FactorImp> m_imp;

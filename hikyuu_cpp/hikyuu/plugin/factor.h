@@ -11,6 +11,15 @@
 
 namespace hku {
 
+/** 保存因子 */
+void HKU_API saveFactor(const Factor& factor);
+
+/** 获取因子 */
+Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
+
+/** 删除因子 */
+void HKU_API removeFactor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
+
 /** 获取所有因子 */
 FactorList HKU_API getAllFactors();
 
@@ -28,10 +37,5 @@ void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype);
 
 /** 获取因子集合 */
 FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype = KQuery::DAY);
-
-FactorImpPtr HKU_API createFactorImp(const string& name, const Indicator& formula,
-                                     const KQuery::KType& ktype, const string& brief,
-                                     const string& details, bool need_persist,
-                                     const Datetime& start_date, const Block& block);
 
 }  // namespace hku

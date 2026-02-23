@@ -41,18 +41,6 @@ uint64_t FactorImp::hash() const noexcept {
     return (uint64_t)this;
 }
 
-void FactorImp::save() {
-    HKU_WARN("FactorImp::save() is not supported!");
-}
-
-void FactorImp::remove() {
-    HKU_WARN("FactorImp::remove() is not supported!");
-}
-
-void FactorImp::load() {
-    HKU_WARN("FactorImp::load() is not supported!");
-}
-
 IndicatorList FactorImp::getValues(const StockList& stocks, const KQuery& query) const {
     IndicatorList ret;
     HKU_IF_RETURN(stocks.empty(), ret);

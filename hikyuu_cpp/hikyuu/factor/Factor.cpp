@@ -24,12 +24,14 @@ shared_ptr<FactorImp> Factor::ms_null_factor_imp{make_shared<FactorImp>()};
 Factor::Factor() : m_imp(ms_null_factor_imp) {}
 
 Factor::Factor(const string& name, const KQuery::KType& ktype)
-: m_imp(createFactorImp(name, Indicator(), ktype, "", "", false, Datetime::min(), Block())) {}
+: m_imp(make_shared<FactorImp>(name, Indicator(), ktype, "", "", false, Datetime::min(), Block())) {
+}
 
 Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype,
                const string& brief, const string& details, bool need_persist,
                const Datetime& start_date, const Block& block)
-: m_imp(createFactorImp(name, formula, ktype, brief, details, need_persist, start_date, block)) {}
+: m_imp(make_shared<FactorImp>(name, formula, ktype, brief, details, need_persist, start_date,
+                               block)) {}
 
 Factor::Factor(const Factor& other) {
     m_imp = other.m_imp;
@@ -69,6 +71,19 @@ IndicatorList Factor::getAllValues(const KQuery& query) {
     StockList stocks =
       block().empty() ? StockManager::instance().getStockList() : block().getStockList();
     return m_imp->getValues(stocks, query);
+}
+
+void Factor::save() {
+    saveFactor(*this);
+}
+
+void Factor::remove() {
+    removeFactor(name(), ktype());
+}
+
+void Factor::load() {
+    Factor tmp = getFactor(name(), ktype());
+    m_imp = std::move(tmp.m_imp);
 }
 
 }  // namespace hku

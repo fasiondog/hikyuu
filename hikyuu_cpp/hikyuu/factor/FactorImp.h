@@ -164,12 +164,6 @@ public:
      */
     string str() const;
 
-    virtual void save();
-
-    virtual void remove();
-
-    virtual void load();
-
     virtual IndicatorList getValues(const StockList& stocks, const KQuery& query) const;
 
 protected:
