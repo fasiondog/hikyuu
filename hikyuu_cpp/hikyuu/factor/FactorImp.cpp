@@ -29,9 +29,13 @@ FactorImp::FactorImp(const string& name, const Indicator& formula, const KQuery:
   m_brief(brief),
   m_details(details),
   m_start_date(start_date),
-  m_formula(formula),
+  m_formula(formula.clone()),
   m_block(block),
-  m_need_persist(need_persist) {}
+  m_need_persist(need_persist) {
+    to_upper(m_name);
+    m_formula.setContext(KData());
+    m_formula.name(m_name);
+}
 
 uint64_t FactorImp::hash() const noexcept {
     return (uint64_t)this;
