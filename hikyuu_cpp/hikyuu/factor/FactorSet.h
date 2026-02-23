@@ -153,6 +153,9 @@ private:
         unordered_map<string, Factor> m_factorDict;
     };
     shared_ptr<Data> m_data;
+
+private:
+    static shared_ptr<Data> ms_null_factorset_set;
 };
 
 }  // namespace hku

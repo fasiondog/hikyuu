@@ -9,7 +9,9 @@
 
 namespace hku {
 
-FactorSet::FactorSet() : m_data(std::make_shared<Data>()) {}
+shared_ptr<FactorSet::Data> FactorSet::ms_null_factorset_set{make_shared<FactorSet::Data>()};
+
+FactorSet::FactorSet() : m_data(ms_null_factorset_set) {}
 
 FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block& block)
 : m_data(std::make_shared<Data>()) {
@@ -23,7 +25,7 @@ FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block
 FactorSet::FactorSet(const FactorSet& other) : m_data(other.m_data) {}
 
 FactorSet::FactorSet(FactorSet&& other) : m_data(std::move(other.m_data)) {
-    other.m_data = std::make_shared<Data>();
+    other.m_data = ms_null_factorset_set;
 }
 
 FactorSet& FactorSet::operator=(const FactorSet& other) {
@@ -35,7 +37,7 @@ FactorSet& FactorSet::operator=(const FactorSet& other) {
 FactorSet& FactorSet::operator=(FactorSet&& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_data = std::move(other.m_data);
-    other.m_data = std::make_shared<Data>();
+    other.m_data = ms_null_factorset_set;
     return *this;
 }
 
