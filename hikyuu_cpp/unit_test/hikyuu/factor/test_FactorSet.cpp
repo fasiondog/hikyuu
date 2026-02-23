@@ -175,6 +175,15 @@ TEST_CASE("test_FactorSet_duplicate_name") {
     Factor retrieved2 = fs.getFactor("MA5");
     CHECK_EQ(retrieved2.brief(), "5日均线因子");
     CHECK_EQ(retrieved2.details(), "更新版本");  // 应该是新的值
+    
+    // 验证迭代顺序（应该只有一个元素）
+    size_t count = 0;
+    for (const auto& factor : fs) {
+        CHECK_EQ(factor.name(), "MA5");
+        CHECK_EQ(factor.details(), "更新版本");
+        count++;
+    }
+    CHECK_EQ(count, 1);
 }
 
 /** @par 检测点：测试FactorSet浅拷贝语义 */
@@ -473,6 +482,106 @@ TEST_CASE("test_FactorSet_block_check") {
         // 添加新的匹配因子应该成功
         CHECK_NOTHROW(fs.addFactor(factor2));
         CHECK_EQ(fs.size(), 2);
+    }
+}
+
+/** @par 检测点：测试FactorSet因子顺序保持功能 */
+TEST_CASE("test_FactorSet_order_preservation") {
+    // 创建测试用的 Indicator
+    Indicator ma5 = MA(CLOSE(), 5);
+    Indicator ma10 = MA(CLOSE(), 10);
+    Indicator ma20 = MA(CLOSE(), 20);
+    
+    // 创建 Factor 对象
+    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子");
+    Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子");
+    Factor factor3("MA20", ma20, KQuery::DAY, "20日均线因子");
+    
+    // 创建 FactorSet 并按特定顺序添加因子
+    FactorSet fs("ORDER_TEST", KQuery::DAY);
+    fs.addFactor(factor1);  // 第1个添加
+    fs.addFactor(factor2);  // 第2个添加
+    fs.addFactor(factor3);  // 第3个添加
+    
+    CHECK_EQ(fs.size(), 3);
+    
+    // 验证迭代顺序与添加顺序一致
+    vector<string> expected_order{"MA5", "MA10", "MA20"};
+    size_t index = 0;
+    for (const auto& factor : fs) {
+        CHECK_EQ(factor.name(), expected_order[index]);
+        index++;
+    }
+    CHECK_EQ(index, 3);
+    
+    // 测试重复添加相同名称的因子
+    SUBCASE("Duplicate factor name handling") {
+        Factor duplicate_factor("MA5", ma5, KQuery::DAY, "重复的5日均线");
+        fs.addFactor(duplicate_factor);
+        // 大小应该保持不变
+        CHECK_EQ(fs.size(), 3);
+        // 顺序应该保持不变
+        index = 0;
+        for (const auto& factor : fs) {
+            CHECK_EQ(factor.name(), expected_order[index]);
+            index++;
+        }
+        CHECK_EQ(index, 3);
+    }
+    
+    // 测试删除最后一个因子
+    SUBCASE("Remove last factor") {
+        fs.removeFactor("MA20");  // 删除最后一个因子
+        CHECK_EQ(fs.size(), 2);
+        
+        vector<string> expected_after_removal{"MA5", "MA10"};
+        index = 0;
+        for (const auto& factor : fs) {
+            CHECK_EQ(factor.name(), expected_after_removal[index]);
+            index++;
+        }
+        CHECK_EQ(index, 2);
+        
+        // 验证剩余因子仍可正常访问
+        CHECK_UNARY(fs.hasFactor("MA5"));
+        CHECK_UNARY(fs.hasFactor("MA10"));
+        CHECK_FALSE(fs.hasFactor("MA20"));
+    }
+    
+    // 测试删除中间因子（关键测试点）
+    SUBCASE("Remove middle factor") {
+        fs.removeFactor("MA10");  // 删除中间的因子
+        CHECK_EQ(fs.size(), 2);
+        
+        // 验证顺序：第一个和第三个因子应该保持，第二个被移除
+        vector<string> expected_after_removal{"MA5", "MA20"};
+        index = 0;
+        for (const auto& factor : fs) {
+            CHECK_EQ(factor.name(), expected_after_removal[index]);
+            index++;
+        }
+        CHECK_EQ(index, 2);
+        
+        // 验证剩余因子仍可正常访问
+        CHECK_UNARY(fs.hasFactor("MA5"));
+        CHECK_UNARY(fs.hasFactor("MA20"));
+        CHECK_FALSE(fs.hasFactor("MA10"));
+        
+        // 验证可以通过名称获取因子
+        Factor retrieved_factor = fs.getFactor("MA20");
+        CHECK_EQ(retrieved_factor.name(), "MA20");
+    }
+    
+    // 测试删除所有因子
+    SUBCASE("Remove all factors") {
+        fs.removeFactor("MA5");
+        fs.removeFactor("MA10");
+        fs.removeFactor("MA20");
+        CHECK_EQ(fs.size(), 0);
+        CHECK_UNARY(fs.empty());
+        CHECK_FALSE(fs.hasFactor("MA5"));
+        CHECK_FALSE(fs.hasFactor("MA10"));
+        CHECK_FALSE(fs.hasFactor("MA20"));
     }
 }
 

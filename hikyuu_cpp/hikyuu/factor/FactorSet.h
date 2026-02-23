@@ -59,15 +59,16 @@ public:
     //------------------------
 
     size_t size() const noexcept {
-        return m_data->m_factorDict.size();
+        return m_data->m_factors.size();
     }
 
     bool empty() const noexcept {
-        return m_data->m_factorDict.empty();
+        return m_data->m_factors.empty();
     }
 
     void clear() noexcept {
-        m_data->m_factorDict.clear();
+        m_data->m_factors.clear();
+        m_data->m_nameIndexMap.clear();
     }
 
     bool isNull() const noexcept {
@@ -97,15 +98,15 @@ public:
         using pointer = const Factor*;
         using reference = const Factor&;
 
-        const_iterator(const typename std::unordered_map<string, Factor>::const_iterator& iter)
+        const_iterator(const typename vector<Factor>::const_iterator& iter)
         : m_iter(iter) {}
 
         reference operator*() const {
-            return m_iter->second;
+            return *m_iter;
         }
 
         pointer operator->() const {
-            return &(m_iter->second);
+            return &(*m_iter);
         }
 
         const_iterator& operator++() {
@@ -128,25 +129,25 @@ public:
         }
 
     private:
-        typename std::unordered_map<string, Factor>::const_iterator m_iter;
+        typename vector<Factor>::const_iterator m_iter;
     };
 
     using iterator = const_iterator;
 
     const_iterator begin() const {
-        return const_iterator(m_data->m_factorDict.begin());
+        return const_iterator(m_data->m_factors.begin());
     }
 
     const_iterator end() const {
-        return const_iterator(m_data->m_factorDict.end());
+        return const_iterator(m_data->m_factors.end());
     }
 
     const_iterator cbegin() const {
-        return const_iterator(m_data->m_factorDict.cbegin());
+        return const_iterator(m_data->m_factors.cbegin());
     }
 
     const_iterator cend() const {
-        return const_iterator(m_data->m_factorDict.cend());
+        return const_iterator(m_data->m_factors.cend());
     }
 
 private:
@@ -154,7 +155,8 @@ private:
         string name;
         string ktype;
         Block block;
-        unordered_map<string, Factor> m_factorDict;
+        vector<Factor> m_factors;                           // 保持插入顺序
+        unordered_map<string, size_t> m_nameIndexMap;       // 名称到索引的映射，用于快速查找
     };
     shared_ptr<Data> m_data;
 
