@@ -110,7 +110,7 @@ bool FactorSet::hasFactor(const string& name) const noexcept {
     return m_data->m_nameIndexMap.find(name) != m_data->m_nameIndexMap.end();
 }
 
-Factor FactorSet::getFactor(const string& name) const {
+const Factor& FactorSet::getFactor(const string& name) const {
     auto it = m_data->m_nameIndexMap.find(name);
     HKU_CHECK(it != m_data->m_nameIndexMap.end(), "Factor '{}' not found!", name);
     return m_data->m_factors[it->second];
@@ -144,6 +144,12 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
     });
 
     return result;
+}
+
+vector<IndicatorList> FactorSet::getAllValues(const KQuery& query) const {
+    StockList stocks =
+      block().empty() ? StockManager::instance().getStockList() : block().getStockList();
+    return getValues(stocks, query);
 }
 
 }  // namespace hku

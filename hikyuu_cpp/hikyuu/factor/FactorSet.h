@@ -34,6 +34,13 @@ public:
     vector<IndicatorList> getValues(const StockList& stocks, const KQuery& query,
                                     bool check = false) const;
 
+    /**
+     * 获取所有因子的指定查询参数的计算结果
+     * @param query 查询参数
+     * @return 所有因子的计算结果
+     */
+    vector<IndicatorList> getAllValues(const KQuery& query) const;
+
     //------------------------
     // 基本属性
     //------------------------
@@ -83,7 +90,12 @@ public:
     void addFactor(Factor&& factor);
     void removeFactor(const string& name);
     bool hasFactor(const string& name) const noexcept;
-    Factor getFactor(const string& name) const;
+
+    const Factor& getFactor(const string& name) const;
+
+    const FactorList& getAllFactors() const {
+        return m_data->m_factors;
+    }
 
     //------------------------
     // 迭代器支持
@@ -98,8 +110,7 @@ public:
         using pointer = const Factor*;
         using reference = const Factor&;
 
-        const_iterator(const typename vector<Factor>::const_iterator& iter)
-        : m_iter(iter) {}
+        const_iterator(const typename vector<Factor>::const_iterator& iter) : m_iter(iter) {}
 
         reference operator*() const {
             return *m_iter;
@@ -155,8 +166,8 @@ private:
         string name;
         string ktype;
         Block block;
-        vector<Factor> m_factors;                           // 保持插入顺序
-        unordered_map<string, size_t> m_nameIndexMap;       // 名称到索引的映射，用于快速查找
+        vector<Factor> m_factors;                      // 保持插入顺序
+        unordered_map<string, size_t> m_nameIndexMap;  // 名称到索引的映射，用于快速查找
     };
     shared_ptr<Data> m_data;
 
