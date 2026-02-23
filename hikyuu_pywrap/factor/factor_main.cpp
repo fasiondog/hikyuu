@@ -24,7 +24,8 @@ void export_factor_main(py::module& m) {
           "更新所有因子值");
 
     m.def("save_factor_set", &saveFactorSet, py::arg("set"), "保存因子集");
-    m.def("get_factor_set", &getFactorSet, py::arg("name"), py::arg("ktype"), "获取因子集");
+    m.def("get_factor_set", &getFactorSet, py::arg("name"), py::arg("ktype") = KQuery::DAY,
+          "获取因子集");
     m.def("remove_factor_set", &removeFactorSet, py::arg("name"), py::arg("ktype"), "删除因子集");
     m.def("get_all_factor_sets", &getAllFactorSets, "获取所有因子集");
 }
