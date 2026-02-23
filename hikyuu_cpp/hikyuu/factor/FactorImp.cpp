@@ -15,7 +15,7 @@ string FactorImp::str() const {
     os << "FactorImp(";
     os << strip << "name: " << name() << strip << "ktype: " << ktype() << strip
        << "need_persist: " << needPersist() << strip << "create_at: " << createAt().str() << strip
-       << "update_at: " << updateAt().str() << strip << "formula: " << formula() << strip
+       << "update_at: " << updateAt().str() << strip << "formula: " << formula().formula() << strip
        << "brief: " << brief() << strip << "detail: " << details() << strip
        << "start_date: " << startDate() << strip << "block: " << block() << ")";
     return os.str();
