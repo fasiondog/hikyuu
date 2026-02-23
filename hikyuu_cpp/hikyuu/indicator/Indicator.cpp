@@ -412,13 +412,15 @@ IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators
     for (const auto& ind : ret) {
         ind.getImp()->repeatSeparateKTypeLeafALikeNodes();
     }
-    for (auto& ind : ret) {
-        ind.setContext(kdata);
-    }
 
     if (tovalue) {
         for (auto& ind : ret) {
+            ind.setContext(kdata);
             ind = ind.getResult(0);
+        }
+    } else {
+        for (auto& ind : ret) {
+            ind.setContext(kdata);
         }
     }
 
