@@ -47,6 +47,20 @@ public:
     Factor& operator=(const Factor& other);
     Factor& operator=(Factor&& other);
 
+    /**
+     * 获取指定股票列表的指定查询参数的计算结果
+     * @param stocks 证券列表
+     * @param query 查询参数
+     * @param check 是否检查股票列表属于自身指定的 block
+     */
+    IndicatorList getValues(const StockList& stocks, const KQuery& query, bool check = false) const;
+
+    /**
+     * 获取指定查询参数的所有计算结果
+     * @param query 获取指定查询参数的计算结果
+     */
+    IndicatorList getAllValues(const KQuery& query);
+
     //------------------------
     // 只读属性
     //------------------------
@@ -143,10 +157,6 @@ public:
 
     void load() {
         m_imp->load();
-    }
-
-    IndicatorList getValues(const StockList& stocks, const KQuery& query) const {
-        return m_imp->getValues(stocks, query);
     }
 
 private:

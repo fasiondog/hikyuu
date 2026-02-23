@@ -53,4 +53,22 @@ Factor& Factor::operator=(Factor&& other) {
     return *this;
 }
 
+IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bool check) const {
+    if (check) {
+        const auto& block = this->block();
+        if (!block.empty()) {
+            for (auto& stock : stocks) {
+                HKU_CHECK(block.have(stock), "Stock not belong to block! {}", stock);
+            }
+        }
+    }
+    return m_imp->getValues(stocks, query);
+}
+
+IndicatorList Factor::getAllValues(const KQuery& query) {
+    StockList stocks =
+      block().empty() ? StockManager::instance().getStockList() : block().getStockList();
+    return m_imp->getValues(stocks, query);
+}
+
 }  // namespace hku

@@ -52,10 +52,10 @@ void export_Factor(py::module& m) {
       .def("remove", &Factor::remove, "删除因子元数据")
       .def(
         "get_values",
-        [](Factor& self, const py::object& stks, const KQuery& query) {
+        [](Factor& self, const py::object& stks, const KQuery& query, bool check = false) {
             return self.getValues(get_stock_list_from_python(stks), query);
         },
-        py::arg("stocks"), py::arg("query"))
+        py::arg("stocks"), py::arg("query"), py::arg("check") = false)
 
       ;
 
