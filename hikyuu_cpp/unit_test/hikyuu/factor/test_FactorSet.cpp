@@ -40,40 +40,40 @@ TEST_CASE("test_FactorSet_basic") {
     CHECK_UNARY(fs.empty());
 
     // 添加因子
-    fs.addFactor(factor1);
-    fs.addFactor(factor2);
+    fs.add(factor1);
+    fs.add(factor2);
 
     CHECK_EQ(fs.size(), 2);
     CHECK_FALSE(fs.empty());
 
     // 测试因子查询
-    CHECK_UNARY(fs.hasFactor("MA5"));
-    CHECK_UNARY(fs.hasFactor("MA10"));
-    CHECK_FALSE(fs.hasFactor("NONEXIST"));
+    CHECK_UNARY(fs.have("MA5"));
+    CHECK_UNARY(fs.have("MA10"));
+    CHECK_FALSE(fs.have("NONEXIST"));
 
     // 测试获取因子
-    Factor retrieved1 = fs.getFactor("MA5");
+    Factor retrieved1 = fs.get("MA5");
     CHECK_EQ(retrieved1.name(), "MA5");
     CHECK_EQ(retrieved1.brief(), "5日均线因子");
 
-    Factor retrieved2 = fs.getFactor("MA10");
+    Factor retrieved2 = fs.get("MA10");
     CHECK_EQ(retrieved2.name(), "MA10");
     CHECK_EQ(retrieved2.brief(), "10日均线因子");
 
     // 测试不存在的因子
-    CHECK_THROWS(fs.getFactor("NONEXIST"));
+    CHECK_THROWS(fs.get("NONEXIST"));
 
     // 测试移除因子
-    fs.removeFactor("MA5");
+    fs.remove("MA5");
     CHECK_EQ(fs.size(), 1);
-    CHECK_FALSE(fs.hasFactor("MA5"));
-    CHECK_UNARY(fs.hasFactor("MA10"));
+    CHECK_FALSE(fs.have("MA5"));
+    CHECK_UNARY(fs.have("MA10"));
 
     // 测试清空
     fs.clear();
     CHECK_EQ(fs.size(), 0);
     CHECK_UNARY(fs.empty());
-    CHECK_FALSE(fs.hasFactor("MA10"));
+    CHECK_FALSE(fs.have("MA10"));
 }
 
 /** @par 检测点：测试FactorSet ktype 匹配检查 */
@@ -92,15 +92,15 @@ TEST_CASE("test_FactorSet_ktype_check") {
         FactorSet day_fs("DayFactors", KQuery::DAY);
 
         // 应该能正常添加日线因子
-        CHECK_NOTHROW(day_fs.addFactor(day_factor));
+        CHECK_NOTHROW(day_fs.add(day_factor));
         CHECK_EQ(day_fs.size(), 1);
 
         // 添加周线因子应该抛出异常
-        CHECK_THROWS(day_fs.addFactor(week_factor));
+        CHECK_THROWS(day_fs.add(week_factor));
         CHECK_EQ(day_fs.size(), 1);  // 大小应该不变
 
         // 添加月线因子也应该抛出异常
-        CHECK_THROWS(day_fs.addFactor(month_factor));
+        CHECK_THROWS(day_fs.add(month_factor));
         CHECK_EQ(day_fs.size(), 1);  // 大小应该不变
     }
 
@@ -109,15 +109,15 @@ TEST_CASE("test_FactorSet_ktype_check") {
         FactorSet week_fs("WeekFactors", KQuery::WEEK);
 
         // 应该能正常添加周线因子
-        CHECK_NOTHROW(week_fs.addFactor(week_factor));
+        CHECK_NOTHROW(week_fs.add(week_factor));
         CHECK_EQ(week_fs.size(), 1);
 
         // 添加日线因子应该抛出异常
-        CHECK_THROWS(week_fs.addFactor(day_factor));
+        CHECK_THROWS(week_fs.add(day_factor));
         CHECK_EQ(week_fs.size(), 1);  // 大小应该不变
 
         // 添加月线因子也应该抛出异常
-        CHECK_THROWS(week_fs.addFactor(month_factor));
+        CHECK_THROWS(week_fs.add(month_factor));
         CHECK_EQ(week_fs.size(), 1);  // 大小应该不变
     }
 
@@ -126,15 +126,15 @@ TEST_CASE("test_FactorSet_ktype_check") {
         FactorSet month_fs("MonthFactors", KQuery::MONTH);
 
         // 应该能正常添加月线因子
-        CHECK_NOTHROW(month_fs.addFactor(month_factor));
+        CHECK_NOTHROW(month_fs.add(month_factor));
         CHECK_EQ(month_fs.size(), 1);
 
         // 添加日线因子应该抛出异常
-        CHECK_THROWS(month_fs.addFactor(day_factor));
+        CHECK_THROWS(month_fs.add(day_factor));
         CHECK_EQ(month_fs.size(), 1);  // 大小应该不变
 
         // 添加周线因子也应该抛出异常
-        CHECK_THROWS(month_fs.addFactor(week_factor));
+        CHECK_THROWS(month_fs.add(week_factor));
         CHECK_EQ(month_fs.size(), 1);  // 大小应该不变
     }
 
@@ -142,10 +142,10 @@ TEST_CASE("test_FactorSet_ktype_check") {
     SUBCASE("Default FactorSet") {
         FactorSet default_fs("DefaultFactors");
         // 默认应该是 DAY 类型
-        CHECK_NOTHROW(default_fs.addFactor(day_factor));
+        CHECK_NOTHROW(default_fs.add(day_factor));
         CHECK_EQ(default_fs.size(), 1);
 
-        CHECK_THROWS(default_fs.addFactor(week_factor));
+        CHECK_THROWS(default_fs.add(week_factor));
         CHECK_EQ(default_fs.size(), 1);
     }
 }
@@ -161,20 +161,20 @@ TEST_CASE("test_FactorSet_duplicate_name") {
     FactorSet fs("TestFactorSet");
 
     // 添加第一个因子
-    fs.addFactor(factor1);
+    fs.add(factor1);
     CHECK_EQ(fs.size(), 1);
 
     // 获取并验证第一个因子
-    Factor retrieved1 = fs.getFactor("MA5");
+    Factor retrieved1 = fs.get("MA5");
     CHECK_EQ(retrieved1.brief(), "5日均线因子");
     CHECK_EQ(retrieved1.details(), "原始版本");
 
     // 添加同名因子，应该覆盖原有的
-    fs.addFactor(factor2);
+    fs.add(factor2);
     CHECK_EQ(fs.size(), 1);  // 大小不变，因为是覆盖而不是新增
 
     // 验证被覆盖后的因子
-    Factor retrieved2 = fs.getFactor("MA5");
+    Factor retrieved2 = fs.get("MA5");
     CHECK_EQ(retrieved2.brief(), "5日均线因子");
     CHECK_EQ(retrieved2.details(), "更新版本");  // 应该是新的值
 
@@ -198,23 +198,23 @@ TEST_CASE("test_FactorSet_shallow_copy") {
 
     // 创建原始 FactorSet
     FactorSet fs1("Original");
-    fs1.addFactor(factor1);
-    fs1.addFactor(factor2);
+    fs1.add(factor1);
+    fs1.add(factor2);
     CHECK_EQ(fs1.size(), 2);
 
     // 测试拷贝构造（浅拷贝）
     FactorSet fs2(fs1);
     CHECK_EQ(fs2.name(), "ORIGINAL");
     CHECK_EQ(fs2.size(), 2);
-    CHECK_UNARY(fs2.hasFactor("MA5"));
-    CHECK_UNARY(fs2.hasFactor("MA10"));
+    CHECK_UNARY(fs2.have("MA5"));
+    CHECK_UNARY(fs2.have("MA10"));
 
     // 由于是浅拷贝，修改拷贝会影响原对象
-    fs2.removeFactor("MA5");
+    fs2.remove("MA5");
 
     // 验证原对象也被修改了（浅拷贝特性）
-    CHECK_EQ(fs1.size(), 1);            // 原对象大小也被修改
-    CHECK_FALSE(fs1.hasFactor("MA5"));  // 原对象因子被移除
+    CHECK_EQ(fs1.size(), 1);       // 原对象大小也被修改
+    CHECK_FALSE(fs1.have("MA5"));  // 原对象因子被移除
 
     // 测试拷贝赋值（浅拷贝）
     FactorSet fs3("Target");
@@ -249,8 +249,8 @@ TEST_CASE("test_FactorSet_iterator") {
 
     // 创建 FactorSet 并添加因子
     FactorSet fs("TestFactorSet");
-    fs.addFactor(factor1);
-    fs.addFactor(factor2);
+    fs.add(factor1);
+    fs.add(factor2);
 
     CHECK_EQ(fs.size(), 2);
     CHECK_FALSE(fs.empty());
@@ -403,14 +403,14 @@ TEST_CASE("test_FactorSet_block_check") {
         FactorSet fs("TestFS", KQuery::DAY, block1);
 
         // 应该能正常添加匹配 block1 的因子
-        CHECK_NOTHROW(fs.addFactor(factor1));
+        CHECK_NOTHROW(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);
 
         // 添加不匹配 block1 的因子应该抛出异常
-        CHECK_THROWS(fs.addFactor(factor2));
+        CHECK_THROWS(fs.add(factor2));
         CHECK_EQ(fs.size(), 1);  // 大小应该不变
 
-        CHECK_THROWS(fs.addFactor(factor3));
+        CHECK_THROWS(fs.add(factor3));
         CHECK_EQ(fs.size(), 1);  // 大小应该不变
     }
 
@@ -419,14 +419,14 @@ TEST_CASE("test_FactorSet_block_check") {
         FactorSet fs("TestFS", KQuery::DAY, block2);
 
         // 应该能正常添加匹配 block2 的因子
-        CHECK_NOTHROW(fs.addFactor(factor2));
+        CHECK_NOTHROW(fs.add(factor2));
         CHECK_EQ(fs.size(), 1);
 
         // 添加不匹配 block2 的因子应该抛出异常
-        CHECK_THROWS(fs.addFactor(factor1));
+        CHECK_THROWS(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);  // 大小应该不变
 
-        CHECK_THROWS(fs.addFactor(factor3));
+        CHECK_THROWS(fs.add(factor3));
         CHECK_EQ(fs.size(), 1);  // 大小应该不变
     }
 
@@ -435,14 +435,14 @@ TEST_CASE("test_FactorSet_block_check") {
         FactorSet fs("TestFS", KQuery::DAY, block3);
 
         // 应该能正常添加匹配 block3 的因子
-        CHECK_NOTHROW(fs.addFactor(factor3));
+        CHECK_NOTHROW(fs.add(factor3));
         CHECK_EQ(fs.size(), 1);
 
         // 添加不匹配 block3 的因子应该抛出异常
-        CHECK_THROWS(fs.addFactor(factor1));
+        CHECK_THROWS(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);  // 大小应该不变
 
-        CHECK_THROWS(fs.addFactor(factor2));
+        CHECK_THROWS(fs.add(factor2));
         CHECK_EQ(fs.size(), 1);  // 大小应该不变
     }
 
@@ -456,17 +456,17 @@ TEST_CASE("test_FactorSet_block_check") {
                             empty_block);
 
         // 应该能正常添加空 Block 的因子
-        CHECK_NOTHROW(fs.addFactor(factor_empty));
+        CHECK_NOTHROW(fs.add(factor_empty));
         CHECK_EQ(fs.size(), 1);
 
         // 添加非空 Block 的因子应该抛出异常
-        CHECK_THROWS(fs.addFactor(factor1));
+        CHECK_THROWS(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);
 
-        CHECK_THROWS(fs.addFactor(factor2));
+        CHECK_THROWS(fs.add(factor2));
         CHECK_EQ(fs.size(), 1);
 
-        CHECK_THROWS(fs.addFactor(factor3));
+        CHECK_THROWS(fs.add(factor3));
         CHECK_EQ(fs.size(), 1);
     }
 
@@ -475,18 +475,18 @@ TEST_CASE("test_FactorSet_block_check") {
         FactorSet fs("TestFS", KQuery::DAY, block1);
 
         // 先添加一个匹配的因子
-        CHECK_NOTHROW(fs.addFactor(factor1));
+        CHECK_NOTHROW(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);
 
         // 修改 FactorSet 的 Block
         fs.block(block2);
 
         // 现在添加原来匹配但现在不匹配的因子应该失败
-        CHECK_THROWS(fs.addFactor(factor1));
+        CHECK_THROWS(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);
 
         // 添加新的匹配因子应该成功
-        CHECK_NOTHROW(fs.addFactor(factor2));
+        CHECK_NOTHROW(fs.add(factor2));
         CHECK_EQ(fs.size(), 2);
     }
 }
@@ -505,9 +505,9 @@ TEST_CASE("test_FactorSet_order_preservation") {
 
     // 创建 FactorSet 并按特定顺序添加因子
     FactorSet fs("ORDER_TEST", KQuery::DAY);
-    fs.addFactor(factor1);  // 第1个添加
-    fs.addFactor(factor2);  // 第2个添加
-    fs.addFactor(factor3);  // 第3个添加
+    fs.add(factor1);  // 第1个添加
+    fs.add(factor2);  // 第2个添加
+    fs.add(factor3);  // 第3个添加
 
     CHECK_EQ(fs.size(), 3);
 
@@ -523,7 +523,7 @@ TEST_CASE("test_FactorSet_order_preservation") {
     // 测试重复添加相同名称的因子
     SUBCASE("Duplicate factor name handling") {
         Factor duplicate_factor("MA5", ma5, KQuery::DAY, "重复的5日均线");
-        fs.addFactor(duplicate_factor);
+        fs.add(duplicate_factor);
         // 大小应该保持不变
         CHECK_EQ(fs.size(), 3);
         // 顺序应该保持不变
@@ -537,7 +537,7 @@ TEST_CASE("test_FactorSet_order_preservation") {
 
     // 测试删除最后一个因子
     SUBCASE("Remove last factor") {
-        fs.removeFactor("MA20");  // 删除最后一个因子
+        fs.remove("MA20");  // 删除最后一个因子
         CHECK_EQ(fs.size(), 2);
 
         vector<string> expected_after_removal{"MA5", "MA10"};
@@ -549,14 +549,14 @@ TEST_CASE("test_FactorSet_order_preservation") {
         CHECK_EQ(index, 2);
 
         // 验证剩余因子仍可正常访问
-        CHECK_UNARY(fs.hasFactor("MA5"));
-        CHECK_UNARY(fs.hasFactor("MA10"));
-        CHECK_FALSE(fs.hasFactor("MA20"));
+        CHECK_UNARY(fs.have("MA5"));
+        CHECK_UNARY(fs.have("MA10"));
+        CHECK_FALSE(fs.have("MA20"));
     }
 
     // 测试删除中间因子（关键测试点）
     SUBCASE("Remove middle factor") {
-        fs.removeFactor("MA10");  // 删除中间的因子
+        fs.remove("MA10");  // 删除中间的因子
         CHECK_EQ(fs.size(), 2);
 
         // 验证顺序：第一个和第三个因子应该保持，第二个被移除
@@ -569,25 +569,25 @@ TEST_CASE("test_FactorSet_order_preservation") {
         CHECK_EQ(index, 2);
 
         // 验证剩余因子仍可正常访问
-        CHECK_UNARY(fs.hasFactor("MA5"));
-        CHECK_UNARY(fs.hasFactor("MA20"));
-        CHECK_FALSE(fs.hasFactor("MA10"));
+        CHECK_UNARY(fs.have("MA5"));
+        CHECK_UNARY(fs.have("MA20"));
+        CHECK_FALSE(fs.have("MA10"));
 
         // 验证可以通过名称获取因子
-        Factor retrieved_factor = fs.getFactor("MA20");
+        Factor retrieved_factor = fs.get("MA20");
         CHECK_EQ(retrieved_factor.name(), "MA20");
     }
 
     // 测试删除所有因子
     SUBCASE("Remove all factors") {
-        fs.removeFactor("MA5");
-        fs.removeFactor("MA10");
-        fs.removeFactor("MA20");
+        fs.remove("MA5");
+        fs.remove("MA10");
+        fs.remove("MA20");
         CHECK_EQ(fs.size(), 0);
         CHECK_UNARY(fs.empty());
-        CHECK_FALSE(fs.hasFactor("MA5"));
-        CHECK_FALSE(fs.hasFactor("MA10"));
-        CHECK_FALSE(fs.hasFactor("MA20"));
+        CHECK_FALSE(fs.have("MA5"));
+        CHECK_FALSE(fs.have("MA10"));
+        CHECK_FALSE(fs.have("MA20"));
     }
 }
 
@@ -603,8 +603,8 @@ TEST_CASE("test_FactorSet_getValues") {
 
     // 创建 FactorSet
     FactorSet fs("TEST_SET", KQuery::DAY);
-    fs.addFactor(factor1);
-    fs.addFactor(factor2);
+    fs.add(factor1);
+    fs.add(factor2);
 
     CHECK_EQ(fs.size(), 2);
 
@@ -677,7 +677,7 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
             string name = "FACTOR_" + std::to_string(i);
             Indicator ind = MA(base_indicator, static_cast<int>(i + 5));
             Factor factor(name, ind, KQuery::DAY);
-            CHECK_NOTHROW(fs.addFactor(factor));
+            CHECK_NOTHROW(fs.add(factor));
         }
 
         CHECK_EQ(fs.size(), factor_count);
@@ -685,8 +685,8 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
         // 测试随机访问
         for (size_t i = 0; i < factor_count; i += 10) {
             string name = "FACTOR_" + std::to_string(i);
-            CHECK_UNARY(fs.hasFactor(name));
-            const Factor& factor = fs.getFactor(name);
+            CHECK_UNARY(fs.have(name));
+            const Factor& factor = fs.get(name);
             CHECK_EQ(factor.name(), name);
         }
 
@@ -707,13 +707,13 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
 
         const size_t iterations = 1000;
         for (size_t i = 0; i < iterations; ++i) {
-            CHECK_NOTHROW(fs.addFactor(base_factor));
+            CHECK_NOTHROW(fs.add(base_factor));
             // 大小应该始终保持为1
             CHECK_EQ(fs.size(), 1);
         }
 
         CHECK_EQ(fs.size(), 1);
-        CHECK_UNARY(fs.hasFactor("SAME_NAME"));
+        CHECK_UNARY(fs.have("SAME_NAME"));
     }
 
     // 测试并发访问（模拟多线程环境）
@@ -726,22 +726,22 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
         Factor factor2("MA10", ma10, KQuery::DAY);
 
         // 模拟并发添加
-        fs.addFactor(factor1);
-        fs.addFactor(factor2);
+        fs.add(factor1);
+        fs.add(factor2);
 
         // 模拟并发读取
-        CHECK_UNARY(fs.hasFactor("MA5"));
-        CHECK_UNARY(fs.hasFactor("MA10"));
+        CHECK_UNARY(fs.have("MA5"));
+        CHECK_UNARY(fs.have("MA10"));
 
-        const Factor& f1 = fs.getFactor("MA5");
-        const Factor& f2 = fs.getFactor("MA10");
+        const Factor& f1 = fs.get("MA5");
+        const Factor& f2 = fs.get("MA10");
 
         CHECK_EQ(f1.name(), "MA5");
         CHECK_EQ(f2.name(), "MA10");
 
         // 模拟并发删除
-        fs.removeFactor("MA5");
-        CHECK_FALSE(fs.hasFactor("MA5"));
+        fs.remove("MA5");
+        CHECK_FALSE(fs.have("MA5"));
         CHECK_EQ(fs.size(), 1);
     }
 }
@@ -755,31 +755,31 @@ TEST_CASE("test_FactorSet_performance_features") {
         // 日线FactorSet
         FactorSet day_fs("DAY_PERF", KQuery::DAY);
         Factor day_factor("DAY_MA5", ma5, KQuery::DAY);
-        CHECK_NOTHROW(day_fs.addFactor(day_factor));
+        CHECK_NOTHROW(day_fs.add(day_factor));
         CHECK_EQ(day_fs.size(), 1);
 
         // 周线FactorSet
         FactorSet week_fs("WEEK_PERF", KQuery::WEEK);
         Factor week_factor("WEEK_MA5", ma5, KQuery::WEEK);
-        CHECK_NOTHROW(week_fs.addFactor(week_factor));
+        CHECK_NOTHROW(week_fs.add(week_factor));
         CHECK_EQ(week_fs.size(), 1);
 
         // 月线FactorSet
         FactorSet month_fs("MONTH_PERF", KQuery::MONTH);
         Factor month_factor("MONTH_MA5", ma5, KQuery::MONTH);
-        CHECK_NOTHROW(month_fs.addFactor(month_factor));
+        CHECK_NOTHROW(month_fs.add(month_factor));
         CHECK_EQ(month_fs.size(), 1);
 
         // 季线FactorSet
         FactorSet quarter_fs("QUARTER_PERF", KQuery::QUARTER);
         Factor quarter_factor("QUARTER_MA5", ma5, KQuery::QUARTER);
-        CHECK_NOTHROW(quarter_fs.addFactor(quarter_factor));
+        CHECK_NOTHROW(quarter_fs.add(quarter_factor));
         CHECK_EQ(quarter_fs.size(), 1);
 
         // 年线FactorSet
         FactorSet year_fs("YEAR_PERF", KQuery::YEAR);
         Factor year_factor("YEAR_MA5", ma5, KQuery::YEAR);
-        CHECK_NOTHROW(year_fs.addFactor(year_factor));
+        CHECK_NOTHROW(year_fs.add(year_factor));
         CHECK_EQ(year_fs.size(), 1);
     }
 
@@ -804,15 +804,15 @@ TEST_CASE("test_FactorSet_performance_features") {
 
         for (const auto& item : indicators) {
             Factor factor(item.first, item.second, KQuery::DAY);
-            CHECK_NOTHROW(fs.addFactor(factor));
+            CHECK_NOTHROW(fs.add(factor));
         }
 
         CHECK_EQ(fs.size(), indicators.size());
 
         // 验证所有因子都能正确访问
         for (const auto& item : indicators) {
-            CHECK_UNARY(fs.hasFactor(item.first));
-            const Factor& factor = fs.getFactor(item.first);
+            CHECK_UNARY(fs.have(item.first));
+            const Factor& factor = fs.get(item.first);
             CHECK_EQ(factor.name(), item.first);
         }
     }
@@ -835,7 +835,7 @@ TEST_CASE("test_FactorSet_memory_management") {
                 string factor_name = "FACTOR_" + std::to_string(j);
                 Indicator ind = MA(CLOSE(), static_cast<int>(j + 5));
                 Factor factor(factor_name, ind, KQuery::DAY);
-                fs.addFactor(factor);
+                fs.add(factor);
             }
 
             factor_sets.push_back(std::move(fs));
@@ -862,8 +862,8 @@ TEST_CASE("test_FactorSet_memory_management") {
         Factor factor1("MA5_1", ma5, KQuery::DAY);
         Factor factor2("MA5_2", ma5, KQuery::DAY);
 
-        CHECK_NOTHROW(fs1.addFactor(factor1));
-        CHECK_NOTHROW(fs2.addFactor(factor2));
+        CHECK_NOTHROW(fs1.add(factor1));
+        CHECK_NOTHROW(fs2.add(factor2));
 
         // 验证两个FactorSet互相独立
         CHECK_EQ(fs1.size(), 1);
@@ -880,7 +880,7 @@ TEST_CASE("test_FactorSet_integration") {
         Indicator ma5 = MA(CLOSE(), 5);
         Factor factor("MA5_INTEGRATION", ma5, KQuery::DAY);
 
-        CHECK_NOTHROW(fs.addFactor(factor));
+        CHECK_NOTHROW(fs.add(factor));
         CHECK_EQ(fs.size(), 1);
 
         // 测试getAllValues（会调用StockManager）

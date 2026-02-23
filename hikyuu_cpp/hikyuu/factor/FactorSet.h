@@ -82,16 +82,29 @@ public:
         return m_data == ms_null_factorset;
     }
 
+    string str() const;
+
     //------------------------
     // 因子管理接口
     //------------------------
 
-    void addFactor(const Factor& factor);
-    void addFactor(Factor&& factor);
-    void removeFactor(const string& name);
-    bool hasFactor(const string& name) const noexcept;
+    void add(const Factor& factor);
+    void add(Factor&& factor);
+    void remove(const string& name);
+    bool have(const string& name) const noexcept;
 
-    const Factor& getFactor(const string& name) const;
+    const Factor& get(const string& name) const;
+    const Factor& get(size_t i) const {
+        return m_data->m_factors[i];
+    }
+
+    const Factor& operator[](const string& name) const {
+        return get(name);
+    }
+
+    const Factor& operator[](size_t i) const {
+        return m_data->m_factors[i];
+    }
 
     const FactorList& getAllFactors() const {
         return m_data->m_factors;
@@ -174,5 +187,9 @@ private:
 private:
     static shared_ptr<Data> ms_null_factorset;
 };
+
+typedef vector<FactorSet> FactorSetList;
+
+HKU_API std::ostream& operator<<(std::ostream& os, const FactorSet&);
 
 }  // namespace hku

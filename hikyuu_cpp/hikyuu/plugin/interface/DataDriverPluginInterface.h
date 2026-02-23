@@ -11,7 +11,7 @@
 #include "hikyuu/data_driver/BlockInfoDriver.h"
 #include "hikyuu/data_driver/BaseInfoDriver.h"
 #include "hikyuu/utilities/plugin/PluginBase.h"
-#include "hikyuu/factor/Factor.h"
+#include "hikyuu/factor/FactorSet.h"
 
 namespace hku {
 
@@ -29,6 +29,7 @@ public:
                                          const string& details, bool need_persist,
                                          const Datetime& start_date, const Block& block) = 0;
     virtual FactorList getAllFactors() = 0;
+    virtual FactorSetList getAllFactorSets() = 0;
     virtual void updateAllFactorsValues(const KQuery::KType& ktype) = 0;
 };
 

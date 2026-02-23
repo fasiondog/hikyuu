@@ -44,6 +44,15 @@ FactorList HKU_API getAllFactors() {
     return ret;
 }
 
+FactorSetList HKU_API getAllFactorSets() {
+    FactorSetList ret;
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    ret = plugin->getAllFactorSets();
+    return ret;
+}
+
 void HKU_API updateAllFactorsValues(const KQuery::KType& ktype) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);

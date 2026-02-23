@@ -11,6 +11,15 @@ namespace hku {
 
 shared_ptr<FactorSet::Data> FactorSet::ms_null_factorset{make_shared<FactorSet::Data>()};
 
+HKU_API std::ostream& operator<<(std::ostream& os, const FactorSet& set) {
+    os << set.str();
+    return os;
+}
+
+string FactorSet::str() const {
+    return fmt::format("FactorSet({}, {}, {}, {})", name(), ktype(), size(), block());
+}
+
 FactorSet::FactorSet() : m_data(ms_null_factorset) {}
 
 FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block& block)
@@ -41,7 +50,7 @@ FactorSet& FactorSet::operator=(FactorSet&& other) {
     return *this;
 }
 
-void FactorSet::addFactor(const Factor& factor) {
+void FactorSet::add(const Factor& factor) {
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
     HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
 
@@ -62,7 +71,7 @@ void FactorSet::addFactor(const Factor& factor) {
     }
 }
 
-void FactorSet::addFactor(Factor&& factor) {
+void FactorSet::add(Factor&& factor) {
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
     HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
 
@@ -83,7 +92,7 @@ void FactorSet::addFactor(Factor&& factor) {
     }
 }
 
-void FactorSet::removeFactor(const string& name) {
+void FactorSet::remove(const string& name) {
     auto it = m_data->m_nameIndexMap.find(name);
     if (it == m_data->m_nameIndexMap.end()) {
         return;  // 因子不存在
@@ -106,11 +115,11 @@ void FactorSet::removeFactor(const string& name) {
     m_data->m_nameIndexMap.erase(it);
 }
 
-bool FactorSet::hasFactor(const string& name) const noexcept {
+bool FactorSet::have(const string& name) const noexcept {
     return m_data->m_nameIndexMap.find(name) != m_data->m_nameIndexMap.end();
 }
 
-const Factor& FactorSet::getFactor(const string& name) const {
+const Factor& FactorSet::get(const string& name) const {
     auto it = m_data->m_nameIndexMap.find(name);
     HKU_CHECK(it != m_data->m_nameIndexMap.end(), "Factor '{}' not found!", name);
     return m_data->m_factors[it->second];

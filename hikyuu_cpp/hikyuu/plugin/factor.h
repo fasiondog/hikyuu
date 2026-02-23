@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "hikyuu/factor/Factor.h"
+#include "hikyuu/factor/FactorSet.h"
 
 namespace hku {
 
@@ -17,6 +17,8 @@ FactorImpPtr HKU_API createFactorImp(const string& name, const Indicator& formul
                                      const Datetime& start_date, const Block& block);
 
 FactorList HKU_API getAllFactors();
+
+FactorSetList HKU_API getAllFactorSets();
 
 void HKU_API updateAllFactorsValues(const KQuery::KType& ktype = KQuery::DAY);
 
