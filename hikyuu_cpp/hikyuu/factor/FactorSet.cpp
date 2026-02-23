@@ -11,12 +11,13 @@ namespace hku {
 
 FactorSet::FactorSet() : m_data(std::make_shared<Data>()) {}
 
-FactorSet::FactorSet(const string& name, const KQuery::KType& ktype)
+FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block& block)
 : m_data(std::make_shared<Data>()) {
     string upper_name = name;
     to_upper(upper_name);
     m_data->name = upper_name;
     m_data->ktype = ktype;
+    m_data->block = block;
 }
 
 FactorSet::FactorSet(const FactorSet& other) : m_data(other.m_data) {}
@@ -40,11 +41,13 @@ FactorSet& FactorSet::operator=(FactorSet&& other) {
 
 void FactorSet::addFactor(const Factor& factor) {
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
+    HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
     m_data->m_factorDict[factor.name()] = factor;
 }
 
 void FactorSet::addFactor(Factor&& factor) {
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
+    HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
     m_data->m_factorDict[factor.name()] = std::move(factor);
 }
 

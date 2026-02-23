@@ -323,4 +323,157 @@ TEST_CASE("test_FactorSet_iterator") {
     CHECK_UNARY(has_ma10);
 }
 
+/** @par 检测点：测试FactorSet Block属性功能 */
+TEST_CASE("test_FactorSet_block") {
+    // 测试默认构造函数的 Block
+    FactorSet fs1;
+    CHECK_UNARY(fs1.block().isNull());
+    CHECK_EQ(fs1.block().size(), 0);
+
+    // 测试带参数的构造函数（使用默认 Block）
+    FactorSet fs2("TestSet", KQuery::DAY);
+    CHECK_EQ(fs2.name(), "TESTSET");
+    CHECK_EQ(fs2.ktype(), KQuery::DAY);
+    CHECK_UNARY(fs2.block().isNull());
+    CHECK_EQ(fs2.block().size(), 0);
+
+    // 创建测试用的 Block
+    Block test_block("行业", "测试板块");
+    
+    // 测试带显式 Block 参数的构造函数
+    FactorSet fs3("TestWithBlock", KQuery::WEEK, test_block);
+    CHECK_EQ(fs3.name(), "TESTWITHBLOCK");
+    CHECK_EQ(fs3.ktype(), KQuery::WEEK);
+    CHECK_FALSE(fs3.block().isNull());
+    CHECK_EQ(fs3.block().category(), "行业");
+    CHECK_EQ(fs3.block().name(), "测试板块");
+    CHECK_EQ(fs3.block().size(), 0);  // 新创建的 Block 应该是空的
+
+    // 测试 Block setter/getter
+    Block new_block("概念", "新概念板块");
+    fs1.block(new_block);
+    CHECK_FALSE(fs1.block().isNull());
+    CHECK_EQ(fs1.block().category(), "概念");
+    CHECK_EQ(fs1.block().name(), "新概念板块");
+
+    // 测试拷贝语义下的 Block 共享
+    FactorSet fs4(fs3);
+    CHECK_EQ(fs4.block().category(), "行业");
+    CHECK_EQ(fs4.block().name(), "测试板块");
+    
+    // 修改拷贝的 Block 应该影响原对象（浅拷贝）
+    Block modified_block = fs4.block();
+    modified_block.category("地域");
+    modified_block.name("修改后的板块");
+    fs4.block(modified_block);
+    
+    CHECK_EQ(fs3.block().category(), "地域");
+    CHECK_EQ(fs3.block().name(), "修改后的板块");
+}
+
+/** @par 检测点：测试FactorSet block匹配检查 */
+TEST_CASE("test_FactorSet_block_check") {
+    // 创建测试用的 Blocks
+    Block block1("行业", "科技板块");
+    Block block2("行业", "金融板块");
+    Block block3("概念", "新能源概念");
+    
+    // 创建测试因子（注意Block参数在最后）
+    Indicator ma5 = MA(CLOSE(), 5);
+    Factor factor1("MA5_B1", ma5, KQuery::DAY, "MA5因子", "block1测试", false, Datetime::min(), block1);
+    Factor factor2("MA5_B2", ma5, KQuery::DAY, "MA5因子", "block2测试", false, Datetime::min(), block2);
+    Factor factor3("MA5_B3", ma5, KQuery::DAY, "MA5因子", "block3测试", false, Datetime::min(), block3);
+    
+    // 测试使用 block1 构造的 FactorSet
+    SUBCASE("FactorSet with block1") {
+        FactorSet fs("TestFS", KQuery::DAY, block1);
+        
+        // 应该能正常添加匹配 block1 的因子
+        CHECK_NOTHROW(fs.addFactor(factor1));
+        CHECK_EQ(fs.size(), 1);
+        
+        // 添加不匹配 block1 的因子应该抛出异常
+        CHECK_THROWS(fs.addFactor(factor2));
+        CHECK_EQ(fs.size(), 1);  // 大小应该不变
+        
+        CHECK_THROWS(fs.addFactor(factor3));
+        CHECK_EQ(fs.size(), 1);  // 大小应该不变
+    }
+    
+    // 测试使用 block2 构造的 FactorSet
+    SUBCASE("FactorSet with block2") {
+        FactorSet fs("TestFS", KQuery::DAY, block2);
+        
+        // 应该能正常添加匹配 block2 的因子
+        CHECK_NOTHROW(fs.addFactor(factor2));
+        CHECK_EQ(fs.size(), 1);
+        
+        // 添加不匹配 block2 的因子应该抛出异常
+        CHECK_THROWS(fs.addFactor(factor1));
+        CHECK_EQ(fs.size(), 1);  // 大小应该不变
+        
+        CHECK_THROWS(fs.addFactor(factor3));
+        CHECK_EQ(fs.size(), 1);  // 大小应该不变
+    }
+    
+    // 测试使用 block3 构造的 FactorSet
+    SUBCASE("FactorSet with block3") {
+        FactorSet fs("TestFS", KQuery::DAY, block3);
+        
+        // 应该能正常添加匹配 block3 的因子
+        CHECK_NOTHROW(fs.addFactor(factor3));
+        CHECK_EQ(fs.size(), 1);
+        
+        // 添加不匹配 block3 的因子应该抛出异常
+        CHECK_THROWS(fs.addFactor(factor1));
+        CHECK_EQ(fs.size(), 1);  // 大小应该不变
+        
+        CHECK_THROWS(fs.addFactor(factor2));
+        CHECK_EQ(fs.size(), 1);  // 大小应该不变
+    }
+    
+    // 测试默认构造的 FactorSet（空 Block）
+    SUBCASE("FactorSet with default empty block") {
+        FactorSet fs("TestFS");
+        
+        // 创建一个空 Block 的因子
+        Block empty_block;
+        Factor factor_empty("EMPTY", ma5, KQuery::DAY, "空Block因子", "", false, Datetime::min(), empty_block);
+        
+        // 应该能正常添加空 Block 的因子
+        CHECK_NOTHROW(fs.addFactor(factor_empty));
+        CHECK_EQ(fs.size(), 1);
+        
+        // 添加非空 Block 的因子应该抛出异常
+        CHECK_THROWS(fs.addFactor(factor1));
+        CHECK_EQ(fs.size(), 1);
+        
+        CHECK_THROWS(fs.addFactor(factor2));
+        CHECK_EQ(fs.size(), 1);
+        
+        CHECK_THROWS(fs.addFactor(factor3));
+        CHECK_EQ(fs.size(), 1);
+    }
+    
+    // 测试运行时修改 Block 的情况
+    SUBCASE("FactorSet with runtime block modification") {
+        FactorSet fs("TestFS", KQuery::DAY, block1);
+        
+        // 先添加一个匹配的因子
+        CHECK_NOTHROW(fs.addFactor(factor1));
+        CHECK_EQ(fs.size(), 1);
+        
+        // 修改 FactorSet 的 Block
+        fs.block(block2);
+        
+        // 现在添加原来匹配但现在不匹配的因子应该失败
+        CHECK_THROWS(fs.addFactor(factor1));
+        CHECK_EQ(fs.size(), 1);
+        
+        // 添加新的匹配因子应该成功
+        CHECK_NOTHROW(fs.addFactor(factor2));
+        CHECK_EQ(fs.size(), 2);
+    }
+}
+
 /** @} */

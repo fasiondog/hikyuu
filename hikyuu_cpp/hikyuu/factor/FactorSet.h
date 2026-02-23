@@ -8,13 +8,15 @@
 #pragma once
 
 #include "Factor.h"
+#include "hikyuu/Block.h"
 
 namespace hku {
 
 class HKU_API FactorSet {
 public:
     FactorSet();
-    explicit FactorSet(const string& name, const KQuery::KType& ktype = KQuery::DAY);
+    explicit FactorSet(const string& name, const KQuery::KType& ktype = KQuery::DAY,
+                       const Block& block = Block());
     FactorSet(const FactorSet& other);
     FactorSet(FactorSet&& other);
     virtual ~FactorSet() = default;
@@ -32,6 +34,14 @@ public:
 
     const string& ktype() const noexcept {
         return m_data->ktype;
+    }
+
+    const Block& block() const noexcept {
+        return m_data->block;
+    }
+
+    void block(const Block& blk) {
+        m_data->block = blk;
     }
 
     //------------------------
@@ -129,6 +139,7 @@ private:
     struct HKU_API Data {
         string name;
         string ktype;
+        Block block;
         unordered_map<string, Factor> m_factorDict;
     };
     shared_ptr<Data> m_data;
