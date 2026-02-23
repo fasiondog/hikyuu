@@ -44,9 +44,9 @@ FactorSet& FactorSet::operator=(FactorSet&& other) {
 void FactorSet::addFactor(const Factor& factor) {
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
     HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
-    
+
     const string& factor_name = factor.name();
-    
+
     // 检查是否已存在同名因子
     auto it = m_data->m_nameIndexMap.find(factor_name);
     if (it != m_data->m_nameIndexMap.end()) {
@@ -65,9 +65,9 @@ void FactorSet::addFactor(const Factor& factor) {
 void FactorSet::addFactor(Factor&& factor) {
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
     HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
-    
+
     const string& factor_name = factor.name();
-    
+
     // 检查是否已存在同名因子
     auto it = m_data->m_nameIndexMap.find(factor_name);
     if (it != m_data->m_nameIndexMap.end()) {
@@ -86,12 +86,12 @@ void FactorSet::addFactor(Factor&& factor) {
 void FactorSet::removeFactor(const string& name) {
     auto it = m_data->m_nameIndexMap.find(name);
     if (it == m_data->m_nameIndexMap.end()) {
-        return; // 因子不存在
+        return;  // 因子不存在
     }
-    
+
     size_t index_to_remove = it->second;
     size_t last_index = m_data->m_factors.size() - 1;
-    
+
     // 如果要删除的不是最后一个元素，需要调整后续元素的索引
     if (index_to_remove != last_index) {
         // 将最后一个元素移动到要删除的位置
@@ -100,7 +100,7 @@ void FactorSet::removeFactor(const string& name) {
         const string& moved_factor_name = m_data->m_factors[index_to_remove].name();
         m_data->m_nameIndexMap[moved_factor_name] = index_to_remove;
     }
-    
+
     // 删除最后一个元素和 map 中的条目
     m_data->m_factors.pop_back();
     m_data->m_nameIndexMap.erase(it);
@@ -128,18 +128,20 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
     }
 
     // 创建结果容器，每个股票对应一个 IndicatorList
-    vector<IndicatorList> result(stocks.size());
-
-    // 按添加顺序遍历所有因子
-    for (const auto& factor : m_data->m_factors) {
-        // 获取该因子对所有股票的计算结果
-        IndicatorList factor_values = factor.getValues(stocks, query, false);
-
-        // 将结果按股票顺序分配到对应位置
-        for (size_t i = 0; i < stocks.size() && i < factor_values.size(); ++i) {
-            result[i].push_back(std::move(factor_values[i]));
-        }
+    size_t stk_total = stocks.size();
+    size_t factor_total = m_data->m_factors.size();
+    vector<IndicatorList> result(stk_total);
+    for (size_t i = 0; i < stk_total; ++i) {
+        result[i].resize(factor_total);
     }
+
+    const auto& factors = m_data->m_factors;
+    global_parallel_for_index_void(0, factor_total, [&](size_t i) {
+        IndicatorList factor_values = factors[i].getValues(stocks, query, false);
+        for (size_t j = 0; j < stk_total; ++j) {
+            result[j][i] = std::move(factor_values[j]);
+        }
+    });
 
     return result;
 }
