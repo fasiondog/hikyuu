@@ -16,7 +16,15 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Factor& factor) {
 }
 
 string Factor::str() const {
-    return m_imp->str();
+    std::ostringstream os;
+    string strip("  \n");
+    os << "Factor(";
+    os << strip << "name: " << name() << strip << "ktype: " << ktype() << strip
+       << "need_persist: " << needPersist() << strip << "create_at: " << createAt().str() << strip
+       << "update_at: " << updateAt().str() << strip << "formula: " << formula().formula() << strip
+       << "brief: " << brief() << strip << "detail: " << details() << strip
+       << "start_date: " << startDate() << strip << "block: " << block() << ")";
+    return os.str();
 }
 
 shared_ptr<FactorImp> Factor::ms_null_factor_imp{make_shared<FactorImp>()};

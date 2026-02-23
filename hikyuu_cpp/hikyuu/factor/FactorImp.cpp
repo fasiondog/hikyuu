@@ -9,18 +9,6 @@
 
 namespace hku {
 
-string FactorImp::str() const {
-    std::ostringstream os;
-    string strip("  \n");
-    os << "FactorImp(";
-    os << strip << "name: " << name() << strip << "ktype: " << ktype() << strip
-       << "need_persist: " << needPersist() << strip << "create_at: " << createAt().str() << strip
-       << "update_at: " << updateAt().str() << strip << "formula: " << formula().formula() << strip
-       << "brief: " << brief() << strip << "detail: " << details() << strip
-       << "start_date: " << startDate() << strip << "block: " << block() << ")";
-    return os.str();
-}
-
 FactorImp::FactorImp(const string& name, const Indicator& formula, const KQuery::KType& ktype,
                      const string& brief, const string& details, bool need_persist,
                      const Datetime& start_date, const Block& block)

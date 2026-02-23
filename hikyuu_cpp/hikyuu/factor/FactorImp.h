@@ -159,11 +159,6 @@ public:
      */
     virtual uint64_t hash() const noexcept;
 
-    /**
-     * 转换为字符串表示
-     */
-    string str() const;
-
     virtual IndicatorList getValues(const StockList& stocks, const KQuery& query) const;
 
 protected:
