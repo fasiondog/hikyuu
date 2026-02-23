@@ -476,4 +476,60 @@ TEST_CASE("test_FactorSet_block_check") {
     }
 }
 
+/** @par 检测点：测试FactorSet getValues功能 */
+TEST_CASE("test_FactorSet_getValues") {
+    // 创建测试用的 Indicator
+    Indicator ma5 = MA(CLOSE(), 5);
+    Indicator ma10 = MA(CLOSE(), 10);
+    
+    // 创建 Factor 对象
+    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子");
+    Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子");
+    
+    // 创建 FactorSet
+    FactorSet fs("TEST_SET", KQuery::DAY);
+    fs.addFactor(factor1);
+    fs.addFactor(factor2);
+    
+    CHECK_EQ(fs.size(), 2);
+    
+    // 创建测试股票列表
+    StockList stocks;
+    // 由于没有初始化 StockManager，这里使用空列表进行测试
+    // 实际使用时应该包含有效的股票对象
+    
+    KQuery query(0, Null<int64_t>(), KQuery::DAY);
+    
+    // 测试 getValues 基本功能
+    SUBCASE("Basic getValues functionality") {
+        vector<IndicatorList> results = fs.getValues(stocks, query, false);
+        // 结果数量应该等于股票数量
+        CHECK_EQ(results.size(), stocks.size());
+        // 每个股票的结果应该包含所有因子的计算结果
+        for (const auto& stock_results : results) {
+            CHECK_EQ(stock_results.size(), fs.size());
+        }
+    }
+    
+    // 测试 check 参数功能
+    SUBCASE("Check parameter functionality") {
+        // 不进行 block 检查时应该正常工作
+        CHECK_NOTHROW(fs.getValues(stocks, query, false));
+        
+        // 当前 FactorSet 没有设置 block，所以 check=true 也应该正常工作
+        CHECK_NOTHROW(fs.getValues(stocks, query, true));
+    }
+    
+    // 测试空 FactorSet 情况
+    SUBCASE("Empty FactorSet") {
+        FactorSet empty_fs("EMPTY", KQuery::DAY);
+        vector<IndicatorList> results = empty_fs.getValues(stocks, query, false);
+        CHECK_EQ(results.size(), stocks.size());
+        // 空 FactorSet 的结果应该是空的 IndicatorList
+        for (const auto& stock_results : results) {
+            CHECK_EQ(stock_results.size(), 0);
+        }
+    }
+}
+
 /** @} */

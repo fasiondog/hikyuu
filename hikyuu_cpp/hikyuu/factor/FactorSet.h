@@ -24,6 +24,16 @@ public:
     FactorSet& operator=(const FactorSet& other);
     FactorSet& operator=(FactorSet&& other);
 
+    /**
+     * 获取指定证券列表的指定查询参数的计算结果
+     * @param stocks 证券列表
+     * @param query 查询参数
+     * @param check 是否检查股票列表属于自身指定的 block
+     * @return stocks * inds 的列表, 按证券顺序
+     */
+    vector<IndicatorList> getValues(const StockList& stocks, const KQuery& query,
+                                    bool check = false) const;
+
     //------------------------
     // 基本属性
     //------------------------

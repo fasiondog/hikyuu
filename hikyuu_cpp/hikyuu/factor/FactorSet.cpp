@@ -65,4 +65,33 @@ Factor FactorSet::getFactor(const string& name) const {
     return it->second;
 }
 
+vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery& query,
+                                           bool check) const {
+    if (check) {
+        const auto& block = this->block();
+        if (!block.empty()) {
+            for (auto& stock : stocks) {
+                HKU_CHECK(block.have(stock), "Stock not belong to block! {}", stock);
+            }
+        }
+    }
+    
+    // 创建结果容器，每个股票对应一个 IndicatorList
+    vector<IndicatorList> result(stocks.size());
+    
+    // 遍历所有因子
+    for (const auto& factor_pair : m_data->m_factorDict) {
+        const Factor& factor = factor_pair.second;
+        // 获取该因子对所有股票的计算结果
+        IndicatorList factor_values = factor.getValues(stocks, query, false);
+        
+        // 将结果按股票顺序分配到对应位置
+        for (size_t i = 0; i < stocks.size() && i < factor_values.size(); ++i) {
+            result[i].push_back(std::move(factor_values[i]));
+        }
+    }
+    
+    return result;
+}
+
 }  // namespace hku
