@@ -50,8 +50,13 @@ void FactorImp::load() {
 }
 
 IndicatorList FactorImp::getValues(const StockList& stocks, const KQuery& query) const {
-    HKU_WARN("FactorImp::getValues() is not supported!");
-    return IndicatorList();
+    IndicatorList ret;
+    HKU_IF_RETURN(stocks.empty(), ret);
+    ret = global_parallel_for_index(0, stocks.size(), [&, this](size_t i) {
+        auto k = stocks[i].getKData(query);
+        return m_formula(k);
+    });
+    return ret;
 }
 
 }  // namespace hku
