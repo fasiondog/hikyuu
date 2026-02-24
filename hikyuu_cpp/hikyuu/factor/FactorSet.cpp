@@ -163,7 +163,7 @@ void FactorSet::load_from_db() {
 
 vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery& query, bool align,
                                            bool fill_null, bool tovalue, bool check) const {
-    SPEND_TIME(FactorSet_getValues);
+    // SPEND_TIME(FactorSet_getValues);
     if (check) {
         const auto& block = this->block();
         if (!block.empty()) {

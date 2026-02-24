@@ -25,7 +25,8 @@ EqualWeightMultiFactor::EqualWeightMultiFactor(const StockList& stks, const KQue
 IndicatorList EqualWeightMultiFactor::_calculate(const vector<IndicatorList>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();
-    size_t ind_count = m_inds.size();
+    // 修改：正确处理FactorSet和IndicatorList两种情况
+    size_t ind_count = m_inds.empty() ? m_factorset.size() : m_inds.size();
 
     return global_parallel_for_index(0, stk_count, [&](size_t si) {
         vector<price_t> sumByDate(days_total);

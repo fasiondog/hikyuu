@@ -901,7 +901,9 @@ void MultiFactorBase::calculate() {
         {  // 获取所有证券所有对齐后的原始因子
             vector<IndicatorList> all_stk_inds = getAllSrcFactors();
 
-            if (m_inds.size() == 1) {
+            // 修改：正确处理FactorSet和IndicatorList两种情况
+            size_t factor_count = m_inds.empty() ? m_factorset.size() : m_inds.size();
+            if (factor_count == 1) {
                 // 直接使用原始因子
                 size_t stk_count = m_stks.size();
                 m_all_factors.resize(stk_count);

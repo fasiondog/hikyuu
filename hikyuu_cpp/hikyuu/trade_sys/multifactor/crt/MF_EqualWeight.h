@@ -34,10 +34,10 @@ inline MultiFactorPtr MF_EqualWeight(const IndicatorList& inds, const StockList&
                                      int ic_n = 5, bool spearman = true, int mode = 0,
                                      bool save_all_factors = false) {
     auto ret = MF_EqualWeight(stks, query, ref_stk, ic_n, spearman, mode, save_all_factors);
-    ret->setRefIndicators(inds);
-    // FactorSet tmp("tmp");
-    // tmp.add(inds);
-    // ret->setRefFactorSet(tmp);
+    // ret->setRefIndicators(inds);
+    FactorSet tmp("tmp", query.kType());
+    tmp.add(inds);
+    ret->setRefFactorSet(tmp);
     return ret;
 }
 

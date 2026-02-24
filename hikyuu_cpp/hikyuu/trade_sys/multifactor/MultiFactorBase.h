@@ -232,8 +232,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_stks);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
+        ar& BOOST_SERIALIZATION_NVP(m_norm);
         ar& BOOST_SERIALIZATION_NVP(m_special_norms);
         ar& BOOST_SERIALIZATION_NVP(m_special_category);
+        ar& BOOST_SERIALIZATION_NVP(m_special_style_inds);
         // 以下不需要保存，加载后重新计算
         // ar& BOOST_SERIALIZATION_NVP(m_stk_map);
         // ar& BOOST_SERIALIZATION_NVP(m_all_factors);
@@ -253,14 +255,17 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_stks);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
+        ar& BOOST_SERIALIZATION_NVP(m_norm);
         ar& BOOST_SERIALIZATION_NVP(m_special_norms);
         ar& BOOST_SERIALIZATION_NVP(m_special_category);
+        ar& BOOST_SERIALIZATION_NVP(m_special_style_inds);
         // ar& BOOST_SERIALIZATION_NVP(m_stk_map);
         // ar& BOOST_SERIALIZATION_NVP(m_all_factors);
         // ar& BOOST_SERIALIZATION_NVP(m_date_index);
         // ar& BOOST_SERIALIZATION_NVP(m_ic);
         // ar& BOOST_SERIALIZATION_NVP(m_calculated);
         // ar& BOOST_SERIALIZATION_NVP(m_stk_factor_by_date);
+        m_calculated = false;
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
