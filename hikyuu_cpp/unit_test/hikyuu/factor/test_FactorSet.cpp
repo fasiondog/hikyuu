@@ -648,6 +648,477 @@ TEST_CASE("test_FactorSet_getValues") {
     }
 }
 
+/** @par 检测点：测试FactorSet getValues方法的完整参数组合 */
+TEST_CASE("test_FactorSet_getValues_complete_params") {
+    // 准备测试数据
+    StockManager& sm = StockManager::instance();
+    Stock stock1 = sm.getStock("sh000001");  // 上证指数
+    Stock stock2 = sm.getStock("sz000001");  // 深证成指
+    CHECK_FALSE(stock1.isNull());
+    CHECK_FALSE(stock2.isNull());
+    
+    StockList stocks = {stock1, stock2};
+    KQuery query(0, 10, KQuery::DAY);  // 获取前10天数据
+    
+    // 创建测试 FactorSet
+    Indicator ma5 = MA(CLOSE(), 5);
+    Indicator ma10 = MA(CLOSE(), 10);
+    
+    Factor factor1("MA5", ma5, KQuery::DAY);
+    Factor factor2("MA10", ma10, KQuery::DAY);
+    
+    FactorSet factorset("PARAM_TEST", KQuery::DAY);
+    factorset.add(factor1);
+    factorset.add(factor2);
+    
+    CHECK_EQ(factorset.size(), 2);
+
+    // 测试不同的参数组合
+    SUBCASE("Default parameters") {
+        vector<IndicatorList> result = factorset.getValues(stocks, query);
+        // 验证返回结果不为空
+        CHECK_FALSE(result.empty());
+        // 验证每个股票都有对应的指标结果
+        CHECK_EQ(result.size(), stocks.size());
+        // 验证每个股票的结果包含所有因子
+        for (const auto& stock_result : result) {
+            CHECK_EQ(stock_result.size(), factorset.size());
+        }
+    }
+
+    SUBCASE("Align=true") {
+        vector<IndicatorList> result = factorset.getValues(stocks, query, true);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+        for (const auto& stock_result : result) {
+            CHECK_EQ(stock_result.size(), factorset.size());
+        }
+    }
+
+    SUBCASE("Fill null=true") {
+        vector<IndicatorList> result = factorset.getValues(stocks, query, false, true);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+        for (const auto& stock_result : result) {
+            CHECK_EQ(stock_result.size(), factorset.size());
+        }
+    }
+
+    SUBCASE("To value=true") {
+        vector<IndicatorList> result = factorset.getValues(stocks, query, false, false, true);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+        for (const auto& stock_result : result) {
+            CHECK_EQ(stock_result.size(), factorset.size());
+        }
+    }
+
+    SUBCASE("Check=true") {
+        vector<IndicatorList> result = factorset.getValues(stocks, query, false, false, false, true);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+        for (const auto& stock_result : result) {
+            CHECK_EQ(stock_result.size(), factorset.size());
+        }
+    }
+
+    SUBCASE("All parameters true") {
+        vector<IndicatorList> result = factorset.getValues(stocks, query, true, true, true, true);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+        for (const auto& stock_result : result) {
+            CHECK_EQ(stock_result.size(), factorset.size());
+        }
+    }
+
+    SUBCASE("Mixed parameter combinations") {
+        // 测试各种参数组合
+        vector<IndicatorList> result1 = factorset.getValues(stocks, query, true, false, false, false);
+        vector<IndicatorList> result2 = factorset.getValues(stocks, query, false, true, false, true);
+        vector<IndicatorList> result3 = factorset.getValues(stocks, query, false, false, true, false);
+        
+        CHECK_FALSE(result1.empty());
+        CHECK_FALSE(result2.empty());
+        CHECK_FALSE(result3.empty());
+        
+        CHECK_EQ(result1.size(), stocks.size());
+        CHECK_EQ(result2.size(), stocks.size());
+        CHECK_EQ(result3.size(), stocks.size());
+        
+        for (size_t i = 0; i < stocks.size(); ++i) {
+            CHECK_EQ(result1[i].size(), factorset.size());
+            CHECK_EQ(result2[i].size(), factorset.size());
+            CHECK_EQ(result3[i].size(), factorset.size());
+        }
+    }
+}
+
+/** @par 检测点：测试FactorSet getValues方法的check参数功能 */
+TEST_CASE("test_FactorSet_getValues_check") {
+    StockManager& sm = StockManager::instance();
+    Stock stock1 = sm.getStock("sh000001");
+    Stock stock2 = sm.getStock("sz000001");
+    CHECK_FALSE(stock1.isNull());
+    CHECK_FALSE(stock2.isNull());
+    
+    StockList test_stocks{stock1, stock2};
+    KQuery query(0, Null<int64_t>(), KQuery::DAY);  // 使用默认查询范围
+    
+    // 创建不带 Block 的 FactorSet
+    SUBCASE("FactorSet without block") {
+        // 创建测试用的 Indicator
+        Indicator ma5 = MA(CLOSE(), 5);
+        Factor factor("TEST_FACTOR", ma5, KQuery::DAY);
+        
+        FactorSet factorset("NO_BLOCK_SET", KQuery::DAY);
+        factorset.add(factor);
+        
+        // check=false 时应该正常工作
+        CHECK_NOTHROW(factorset.getValues(test_stocks, query, false, false, false, false));
+        
+        // check=true 时也应该正常工作（因为没有 Block 限制）
+        CHECK_NOTHROW(factorset.getValues(test_stocks, query, false, false, false, true));
+    }
+    
+    // 创建带 Block 的 FactorSet
+    SUBCASE("FactorSet with block") {
+        Block test_block("行业", "测试板块");
+        test_block.add(stock1);  // 只添加第一个股票
+        
+        FactorSet factorset("BLOCK_SET", KQuery::DAY, test_block);
+        
+        // 创建使用相同 Block 的 Factor
+        Indicator ma5 = MA(CLOSE(), 5);
+        Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "测试因子", "", false, Datetime::min(), test_block);
+        
+        factorset.add(factor);
+        
+        // 验证 Block 设置正确
+        CHECK_EQ(factorset.block().size(), 1);
+        CHECK_UNARY(factorset.block().have(stock1));
+        CHECK_FALSE(factorset.block().have(stock2));
+        
+        // check=false 时应该正常工作
+        CHECK_NOTHROW(factorset.getValues(test_stocks, query, false, false, false, false));
+        
+        // check=true 时，只包含 Block 内股票应该正常工作
+        StockList block_stocks{stock1};
+        CHECK_NOTHROW(factorset.getValues(block_stocks, query, false, false, false, true));
+        
+        // check=true 时，包含 Block 外股票应该抛出异常
+        CHECK_THROWS(factorset.getValues(test_stocks, query, false, false, false, true));
+    }
+}
+
+/** @par 检测点：测试FactorSet getValues方法的边界条件 */
+TEST_CASE("test_FactorSet_getValues_edge_cases") {
+    StockManager& sm = StockManager::instance();
+    Stock stock1 = sm.getStock("sh000001");
+    Stock stock2 = sm.getStock("sz000001");
+    CHECK_FALSE(stock1.isNull());
+    CHECK_FALSE(stock2.isNull());
+    
+    StockList stocks = {stock1, stock2};
+    KQuery query(0, 10, KQuery::DAY);
+
+    // 创建测试 FactorSet
+    Indicator ma5 = MA(CLOSE(), 5);
+    Factor factor("EDGE_TEST", ma5, KQuery::DAY);
+    
+    FactorSet factorset("EDGE_TEST_SET", KQuery::DAY);
+    factorset.add(factor);
+
+    // 测试空股票列表
+    SUBCASE("Empty stock list") {
+        StockList empty_stocks;
+        vector<IndicatorList> result = factorset.getValues(empty_stocks, query);
+        // 空股票列表应该返回空结果
+        CHECK_UNARY(result.empty());
+    }
+
+    // 测试无效查询范围
+    SUBCASE("Invalid query range") {
+        KQuery invalid_query(1000000, 1000010, KQuery::DAY);  // 超出实际数据范围
+        vector<IndicatorList> result = factorset.getValues(stocks, invalid_query);
+        // 应该返回空的指标结果容器
+        CHECK_FALSE(result.empty());  // 容器不为空
+        CHECK_EQ(result.size(), stocks.size());  // 但每个股票的结果为空
+        for (const auto& stock_result : result) {
+            CHECK_EQ(stock_result.size(), factorset.size());
+            for (const auto& ind : stock_result) {
+                CHECK_UNARY(ind.empty());  // 指标数据为空
+            }
+        }
+    }
+
+    // 测试不同K线类型
+    SUBCASE("Different KType") {
+        // 日线查询
+        KQuery day_query(0, 5, KQuery::DAY);
+        vector<IndicatorList> day_result = factorset.getValues(stocks, day_query);
+        CHECK_FALSE(day_result.empty());
+        CHECK_EQ(day_result.size(), stocks.size());
+
+        // 周线查询
+        KQuery week_query(0, 5, KQuery::WEEK);
+        vector<IndicatorList> week_result = factorset.getValues(stocks, week_query);
+        CHECK_FALSE(week_result.empty());
+        CHECK_EQ(week_result.size(), stocks.size());
+
+        // 月线查询
+        KQuery month_query(0, 5, KQuery::MONTH);
+        vector<IndicatorList> month_result = factorset.getValues(stocks, month_query);
+        CHECK_FALSE(month_result.empty());
+        CHECK_EQ(month_result.size(), stocks.size());
+    }
+
+    // 测试空FactorSet
+    SUBCASE("Empty FactorSet") {
+        FactorSet empty_set("EMPTY", KQuery::DAY);
+        vector<IndicatorList> result = empty_set.getValues(stocks, query);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+        // 空 FactorSet 的结果应该是空的 IndicatorList
+        for (const auto& stock_result : result) {
+            CHECK_EQ(stock_result.size(), 0);
+        }
+    }
+}
+
+/** @par 检测点：测试FactorSet getValues方法的结果正确性 */
+TEST_CASE("test_FactorSet_getValues_result_correctness") {
+    StockManager& sm = StockManager::instance();
+    Stock stock1 = sm.getStock("sh000001");  // 上证指数
+    Stock stock2 = sm.getStock("sz000001");  // 深证成指
+    CHECK_FALSE(stock1.isNull());
+    CHECK_FALSE(stock2.isNull());
+    
+    StockList stocks = {stock1, stock2};
+    KQuery query(0, 20, KQuery::DAY);  // 获取20天数据进行验证
+
+    // 创建测试因子集
+    Indicator ma5 = MA(CLOSE(), 5);
+    Indicator ma10 = MA(CLOSE(), 10);
+    
+    Factor factor1("MA5_TEST", ma5, KQuery::DAY);
+    Factor factor2("MA10_TEST", ma10, KQuery::DAY);
+    
+    FactorSet factorset("RESULT_TEST", KQuery::DAY);
+    factorset.add(factor1);
+    factorset.add(factor2);
+
+    CHECK_EQ(factorset.size(), 2);
+
+    SUBCASE("Basic functionality and result validation") {
+        // 测试基本功能并验证计算结果
+        vector<IndicatorList> result = factorset.getValues(stocks, query);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), 2);  // 两个股票的结果
+        
+        // 验证每个股票的结果
+        for (size_t stock_idx = 0; stock_idx < result.size(); ++stock_idx) {
+            const IndicatorList& stock_result = result[stock_idx];
+            CHECK_EQ(stock_result.size(), 2);  // 每个股票有两个因子的结果
+            
+            // 验证每个因子的结果
+            for (size_t factor_idx = 0; factor_idx < stock_result.size(); ++factor_idx) {
+                const Indicator& ind = stock_result[factor_idx];
+                CHECK_FALSE(ind.empty());
+                CHECK_EQ(ind.size(), 20);
+                CHECK_GE(ind.discard(), 0);
+                CHECK_EQ(ind.getResultNumber(), 1);
+                
+                // 验证数值合理性（跳过discard部分）
+                for (size_t i = ind.discard(); i < ind.size(); ++i) {
+                    if (!std::isnan(ind[i]) && !std::isinf(ind[i])) {
+                        CHECK_GT(ind[i], 0.0);
+                    }
+                }
+                
+                // 验证discard部分确实是NaN
+                for (size_t i = 0; i < ind.discard(); ++i) {
+                    CHECK_UNARY(std::isnan(ind[i]));
+                }
+            }
+        }
+    }
+
+    SUBCASE("Parameter combinations validation") {
+        // 测试不同参数组合的功能性验证
+        vector<IndicatorList> result1 = factorset.getValues(stocks, query, false, false, false, false);
+        vector<IndicatorList> result2 = factorset.getValues(stocks, query, true, false, false, false);
+        vector<IndicatorList> result3 = factorset.getValues(stocks, query, false, true, false, false);
+        vector<IndicatorList> result4 = factorset.getValues(stocks, query, false, false, true, false);
+        
+        // 所有结果都应该有效
+        CHECK_FALSE(result1.empty());
+        CHECK_FALSE(result2.empty());
+        CHECK_FALSE(result3.empty());
+        CHECK_FALSE(result4.empty());
+        
+        // 验证基本属性
+        CHECK_EQ(result1.size(), 2);
+        CHECK_EQ(result2.size(), 2);
+        CHECK_EQ(result3.size(), 2);
+        CHECK_EQ(result4.size(), 2);
+        
+        // 验证每个结果都有正确的因子数量
+        for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
+            CHECK_EQ(result1[stock_idx].size(), 2);
+            CHECK_EQ(result2[stock_idx].size(), 2);
+            CHECK_EQ(result3[stock_idx].size(), 2);
+            CHECK_EQ(result4[stock_idx].size(), 2);
+            
+            // 验证每个因子结果的基本属性
+            for (size_t factor_idx = 0; factor_idx < 2; ++factor_idx) {
+                const Indicator& ind1 = result1[stock_idx][factor_idx];
+                const Indicator& ind2 = result2[stock_idx][factor_idx];
+                const Indicator& ind3 = result3[stock_idx][factor_idx];
+                const Indicator& ind4 = result4[stock_idx][factor_idx];
+                
+                CHECK_FALSE(ind1.empty());
+                CHECK_FALSE(ind2.empty());
+                CHECK_FALSE(ind3.empty());
+                CHECK_FALSE(ind4.empty());
+                
+                CHECK_EQ(ind1.size(), 20);
+                CHECK_EQ(ind2.size(), 20);
+                CHECK_EQ(ind3.size(), 20);
+                CHECK_EQ(ind4.size(), 20);
+            }
+        }
+    }
+
+    SUBCASE("Edge case handling validation") {
+        // 测试边界情况
+        StockList empty_stocks;
+        vector<IndicatorList> empty_result = factorset.getValues(empty_stocks, query);
+        CHECK_UNARY(empty_result.empty());
+        
+        // 测试无效查询范围
+        KQuery invalid_query(1000000, 1000010, KQuery::DAY);
+        vector<IndicatorList> invalid_result = factorset.getValues(stocks, invalid_query);
+        CHECK_FALSE(invalid_result.empty());
+        CHECK_EQ(invalid_result.size(), 2);
+        for (const auto& stock_result : invalid_result) {
+            CHECK_EQ(stock_result.size(), 2);
+            for (const auto& ind : stock_result) {
+                CHECK_UNARY(ind.empty());
+                CHECK_EQ(ind.size(), 0);
+            }
+        }
+    }
+    
+    SUBCASE("Multiple KType validation") {
+        // 测试不同K线类型
+        KQuery day_query(0, 10, KQuery::DAY);
+        KQuery week_query(0, 10, KQuery::WEEK);
+        KQuery month_query(0, 10, KQuery::MONTH);
+        
+        vector<IndicatorList> day_result = factorset.getValues(stocks, day_query);
+        vector<IndicatorList> week_result = factorset.getValues(stocks, week_query);
+        vector<IndicatorList> month_result = factorset.getValues(stocks, month_query);
+        
+        CHECK_FALSE(day_result.empty());
+        CHECK_FALSE(week_result.empty());
+        CHECK_FALSE(month_result.empty());
+        
+        CHECK_EQ(day_result.size(), 2);
+        CHECK_EQ(week_result.size(), 2);
+        CHECK_EQ(month_result.size(), 2);
+        
+        // 验证都有合理的数据
+        for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
+            CHECK_GT(day_result[stock_idx].size(), 0);
+            CHECK_GT(week_result[stock_idx].size(), 0);
+            CHECK_GT(month_result[stock_idx].size(), 0);
+            
+            for (const auto& ind : day_result[stock_idx]) {
+                CHECK_GT(ind.size(), 0);
+            }
+            for (const auto& ind : week_result[stock_idx]) {
+                CHECK_GT(ind.size(), 0);
+            }
+            for (const auto& ind : month_result[stock_idx]) {
+                CHECK_GT(ind.size(), 0);
+            }
+        }
+    }
+    
+    SUBCASE("Result consistency validation") {
+        // 测试多次调用结果的一致性
+        vector<IndicatorList> result1 = factorset.getValues(stocks, query);
+        vector<IndicatorList> result2 = factorset.getValues(stocks, query);
+        
+        CHECK_FALSE(result1.empty());
+        CHECK_FALSE(result2.empty());
+        CHECK_EQ(result1.size(), result2.size());
+        CHECK_EQ(result1.size(), 2);
+        
+        // 验证每只股票的结果一致性
+        for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
+            const IndicatorList& stock_result1 = result1[stock_idx];
+            const IndicatorList& stock_result2 = result2[stock_idx];
+            
+            CHECK_EQ(stock_result1.size(), stock_result2.size());
+            CHECK_EQ(stock_result1.size(), 2);
+            
+            // 验证每个因子结果的一致性
+            for (size_t factor_idx = 0; factor_idx < 2; ++factor_idx) {
+                const Indicator& ind1 = stock_result1[factor_idx];
+                const Indicator& ind2 = stock_result2[factor_idx];
+                
+                CHECK_EQ(ind1.size(), ind2.size());
+                CHECK_EQ(ind1.discard(), ind2.discard());
+                
+                // 验证有效数据一致
+                for (size_t i = std::max(ind1.discard(), ind2.discard()); 
+                     i < std::min(ind1.size(), ind2.size()); ++i) {
+                    if (!std::isnan(ind1[i]) && !std::isnan(ind2[i])) {
+                        CHECK_EQ(ind1[i], doctest::Approx(ind2[i]).epsilon(0.0001));
+                    }
+                }
+            }
+        }
+    }
+    
+    SUBCASE("Align parameter validation") {
+        // 测试align参数的效果
+        vector<IndicatorList> result_false = factorset.getValues(stocks, query, false);
+        vector<IndicatorList> result_true = factorset.getValues(stocks, query, true);
+        
+        CHECK_FALSE(result_false.empty());
+        CHECK_FALSE(result_true.empty());
+        CHECK_EQ(result_false.size(), result_true.size());
+        CHECK_EQ(result_false.size(), 2);
+        
+        // 获取交易日历验证align=true的效果
+        DatetimeList trading_dates = sm.getTradingCalendar(query);
+        CHECK_FALSE(trading_dates.empty());
+        
+        // 验证align=true时结果大小与交易日历匹配
+        for (size_t stock_idx = 0; stock_idx < result_true.size(); ++stock_idx) {
+            for (size_t factor_idx = 0; factor_idx < result_true[stock_idx].size(); ++factor_idx) {
+                const Indicator& ind_aligned = result_true[stock_idx][factor_idx];
+                CHECK_EQ(ind_aligned.size(), trading_dates.size());
+            }
+        }
+        
+        // 验证基本结构
+        for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
+            for (size_t factor_idx = 0; factor_idx < 2; ++factor_idx) {
+                const Indicator& ind_false = result_false[stock_idx][factor_idx];
+                const Indicator& ind_true = result_true[stock_idx][factor_idx];
+                
+                CHECK_FALSE(ind_false.empty());
+                CHECK_FALSE(ind_true.empty());
+                CHECK_GT(ind_false.size(), 0);
+                CHECK_GT(ind_true.size(), 0);
+            }
+        }
+    }
+}
+
 /** @par 检测点：测试FactorSet边界条件和异常处理 */
 TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
     // 测试空名称构造
