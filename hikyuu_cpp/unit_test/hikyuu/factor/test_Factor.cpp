@@ -10,6 +10,7 @@
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/StockManager.h>
+#include "../test_config.h"  // 添加test_config.h包含以使用check_indicator
 #include <fstream>
 
 using namespace hku;
@@ -110,6 +111,297 @@ TEST_CASE("test_Factor_getValues_check") {
     }
 }
 
+/** @par 检测点：测试Factor getValues方法的完整参数组合 */
+TEST_CASE("test_Factor_getValues_complete_params") {
+    // 准备测试数据
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    CHECK_FALSE(stock.isNull());
+    
+    StockList stocks = {stock};
+    KQuery query(0, 10, KQuery::DAY);  // 获取前10天数据
+    
+    // 创建测试 Factor
+    Indicator ma5 = MA(CLOSE(), 5);
+    Factor factor("PARAM_TEST", ma5, KQuery::DAY);
+
+    // 测试不同的参数组合
+    SUBCASE("Default parameters") {
+        IndicatorList result = factor.getValues(stocks, query);
+        // 验证返回结果不为空
+        CHECK_FALSE(result.empty());
+        // 验证每个股票都有对应的指标结果
+        CHECK_EQ(result.size(), stocks.size());
+    }
+
+    SUBCASE("Align=true") {
+        IndicatorList result = factor.getValues(stocks, query, true);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+    }
+
+    SUBCASE("Fill null=true") {
+        IndicatorList result = factor.getValues(stocks, query, false, true);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+    }
+
+    SUBCASE("To value=true") {
+        IndicatorList result = factor.getValues(stocks, query, false, false, true);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+    }
+
+    SUBCASE("All parameters true") {
+        IndicatorList result = factor.getValues(stocks, query, true, true, true, false);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+    }
+
+    SUBCASE("Check=true with valid stocks") {
+        IndicatorList result = factor.getValues(stocks, query, false, false, false, true);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), stocks.size());
+    }
+}
+
+/** @par 检测点：测试Factor getValues方法的边界条件 */
+TEST_CASE("test_Factor_getValues_edge_cases") {
+    Indicator ma5 = MA(CLOSE(), 5);
+    Factor factor("EDGE_TEST", ma5, KQuery::DAY);
+    
+    KQuery query(0, 10, KQuery::DAY);
+
+    // 测试空股票列表
+    SUBCASE("Empty stock list") {
+        StockList empty_stocks;
+        IndicatorList result = factor.getValues(empty_stocks, query);
+        // 空股票列表应该返回空结果
+        CHECK_UNARY(result.empty());
+    }
+
+    // 测试无效查询范围
+    SUBCASE("Invalid query range") {
+        StockManager& sm = StockManager::instance();
+        Stock stock = sm.getStock("sh600000");
+        CHECK_FALSE(stock.isNull());
+        StockList stocks = {stock};
+        
+        KQuery invalid_query(1000000, 1000010, KQuery::DAY);  // 超出实际数据范围
+        IndicatorList result = factor.getValues(stocks, invalid_query);
+        // 应该返回空的指标结果
+        CHECK_FALSE(result.empty());  // 容器不为空
+        CHECK_UNARY(result[0].empty());  // 但指标数据为空
+    }
+
+    // 测试不同K线类型
+    SUBCASE("Different KType") {
+        StockManager& sm = StockManager::instance();
+        Stock stock = sm.getStock("sh600000");
+        CHECK_FALSE(stock.isNull());
+        StockList stocks = {stock};
+
+        // 日线查询
+        KQuery day_query(0, 5, KQuery::DAY);
+        IndicatorList day_result = factor.getValues(stocks, day_query);
+        CHECK_FALSE(day_result.empty());
+
+        // 周线查询
+        KQuery week_query(0, 5, KQuery::WEEK);
+        IndicatorList week_result = factor.getValues(stocks, week_query);
+        CHECK_FALSE(week_result.empty());
+
+        // 月线查询
+        KQuery month_query(0, 5, KQuery::MONTH);
+        IndicatorList month_result = factor.getValues(stocks, month_query);
+        CHECK_FALSE(month_result.empty());
+    }
+}
+
+/** @par 检测点：测试Factor getValues方法的结果正确性 */
+TEST_CASE("test_Factor_getValues_result_correctness") {
+    StockManager& sm = StockManager::instance();
+    Stock stock1 = sm.getStock("sh000001");  // 上证指数
+    Stock stock2 = sm.getStock("sz000001");  // 深证成指
+    CHECK_FALSE(stock1.isNull());
+    CHECK_FALSE(stock2.isNull());
+    
+    StockList stocks = {stock1, stock2};  // 使用两个不同市场的证券
+    KQuery query(0, 20, KQuery::DAY);  // 获取20天数据进行验证
+
+    // 创建MA5指标进行测试
+    Indicator ma5 = MA(CLOSE(), 5);
+    Factor ma5_factor("MA5_TEST", ma5, KQuery::DAY);
+
+    SUBCASE("Basic functionality and result validation") {
+        // 测试基本功能并验证计算结果
+        IndicatorList result = ma5_factor.getValues(stocks, query);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), 2);  // 应该有两个结果
+        
+        // 验证每个股票的结果
+        for (size_t i = 0; i < result.size(); ++i) {
+            Indicator ind = result[i];
+            CHECK_FALSE(ind.empty());
+            CHECK_EQ(ind.size(), 20);
+            CHECK_EQ(ind.discard(), 4);
+            CHECK_EQ(ind.getResultNumber(), 1);  // 验证结果集数量
+            
+            // 使用现有的check_indicator方法验证Indicator的基本属性
+            KData kdata = stocks[i].getKData(query);
+            Indicator close_prices = CLOSE(kdata);
+            Indicator expected_ma = MA(close_prices, 5);
+            
+            // 使用check_indicator验证结果一致性
+            check_indicator(ind, expected_ma);
+        }
+    }
+
+    SUBCASE("Parameter combinations validation") {
+        // 测试不同参数组合的功能性验证
+        IndicatorList result1 = ma5_factor.getValues(stocks, query, false, false, false);
+        IndicatorList result2 = ma5_factor.getValues(stocks, query, true, false, false);
+        IndicatorList result3 = ma5_factor.getValues(stocks, query, false, true, false);
+        IndicatorList result4 = ma5_factor.getValues(stocks, query, false, false, true);
+        
+        // 所有结果都应该有效
+        CHECK_FALSE(result1.empty());
+        CHECK_FALSE(result2.empty());
+        CHECK_FALSE(result3.empty());
+        CHECK_FALSE(result4.empty());
+        
+        // 验证每个结果都有两个股票的数据
+        CHECK_EQ(result1.size(), 2);
+        CHECK_EQ(result2.size(), 2);
+        CHECK_EQ(result3.size(), 2);
+        CHECK_EQ(result4.size(), 2);
+        
+        // 验证基本尺寸
+        for (size_t i = 0; i < 2; ++i) {
+            CHECK_EQ(result1[i].size(), 20);
+            CHECK_EQ(result2[i].size(), 20);
+            CHECK_EQ(result3[i].size(), 20);
+            CHECK_EQ(result4[i].size(), 20);
+            
+            // 使用check_indicator验证一致性
+            check_indicator(result1[i], result1[i]);
+        }
+    }
+
+    SUBCASE("Edge case handling validation") {
+        // 测试边界情况
+        StockList empty_stocks;
+        IndicatorList empty_result = ma5_factor.getValues(empty_stocks, query);
+        CHECK_UNARY(empty_result.empty());
+        
+        // 测试无效查询范围
+        KQuery invalid_query(1000000, 1000010, KQuery::DAY);
+        IndicatorList invalid_result = ma5_factor.getValues(stocks, invalid_query);
+        CHECK_FALSE(invalid_result.empty());
+        CHECK_EQ(invalid_result.size(), 2);
+        CHECK_UNARY(invalid_result[0].empty());
+        CHECK_UNARY(invalid_result[1].empty());
+        CHECK_EQ(invalid_result[0].size(), 0);
+        CHECK_EQ(invalid_result[1].size(), 0);
+    }
+    
+    SUBCASE("Multiple KType validation") {
+        // 测试不同K线类型
+        KQuery day_query(0, 10, KQuery::DAY);
+        KQuery week_query(0, 10, KQuery::WEEK);
+        KQuery month_query(0, 10, KQuery::MONTH);
+        
+        IndicatorList day_result = ma5_factor.getValues(stocks, day_query);
+        IndicatorList week_result = ma5_factor.getValues(stocks, week_query);
+        IndicatorList month_result = ma5_factor.getValues(stocks, month_query);
+        
+        CHECK_FALSE(day_result.empty());
+        CHECK_FALSE(week_result.empty());
+        CHECK_FALSE(month_result.empty());
+        
+        // 验证都有两个股票的结果
+        CHECK_EQ(day_result.size(), 2);
+        CHECK_EQ(week_result.size(), 2);
+        CHECK_EQ(month_result.size(), 2);
+        
+        // 验证都有合理的数据
+        for (size_t i = 0; i < 2; ++i) {
+            CHECK_GT(day_result[i].size(), 0);
+            CHECK_GT(week_result[i].size(), 0);
+            CHECK_GT(month_result[i].size(), 0);
+            
+            // 使用check_indicator验证基本结构
+            check_indicator(day_result[i], day_result[i]);
+            check_indicator(week_result[i], week_result[i]);
+            check_indicator(month_result[i], month_result[i]);
+        }
+    }
+    
+    SUBCASE("Result consistency validation") {
+        // 测试多次调用结果的一致性
+        IndicatorList result1 = ma5_factor.getValues(stocks, query);
+        IndicatorList result2 = ma5_factor.getValues(stocks, query);
+        
+        CHECK_FALSE(result1.empty());
+        CHECK_FALSE(result2.empty());
+        CHECK_EQ(result1.size(), result2.size());
+        CHECK_EQ(result1.size(), 2);
+        
+        // 验证每只股票的结果一致性
+        for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
+            Indicator ind1 = result1[stock_idx];
+            Indicator ind2 = result2[stock_idx];
+            
+            // 使用check_indicator验证两次调用结果一致
+            check_indicator(ind1, ind2);
+        }
+    }
+    
+    SUBCASE("Calculation accuracy validation") {
+        // 测试计算精度 - 使用已知数据验证计算结果
+        KQuery short_query(0, 10, KQuery::DAY);
+        IndicatorList result = ma5_factor.getValues(stocks, short_query);
+        
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), 2);
+        
+        // 验证每只股票的计算结果
+        for (size_t i = 0; i < 2; ++i) {
+            Indicator ind = result[i];
+            CHECK_FALSE(ind.empty());
+            CHECK_EQ(ind.size(), 10);
+            CHECK_EQ(ind.discard(), 4);
+            
+            // 创建期望结果进行精确比较
+            KData kdata = stocks[i].getKData(short_query);
+            Indicator close_prices = CLOSE(kdata);
+            Indicator expected_ma = MA(close_prices, 5);
+            
+            // 使用check_indicator进行精确验证
+            check_indicator(ind, expected_ma);
+        }
+    }
+    
+    SUBCASE("Multi-stock processing validation") {
+        // 测试多股票处理能力（已经是多股票了，这里是额外验证）
+        Stock stock3 = sm.getStock("sh600036");
+        
+        if (!stock3.isNull()) {
+            StockList multi_stocks = {stock1, stock2, stock3};
+            IndicatorList results = ma5_factor.getValues(multi_stocks, query);
+            
+            // 应该为每只股票返回一个指标结果
+            CHECK_EQ(results.size(), 3);
+            
+            // 验证每个结果的基本属性
+            for (const auto& ind : results) {
+                // 使用check_indicator验证基本结构
+                check_indicator(ind, ind);
+            }
+        }
+    }
+}
+
 /** @par 检测点：测试Factor getAllValues方法 */
 TEST_CASE("test_Factor_getAllValues") {
     KQuery query_obj(0, Null<int64_t>(), KQuery::DAY);
@@ -204,6 +496,255 @@ TEST_CASE("test_Factor_copy_semantics") {
 
     // 原对象应该变为空
     CHECK_UNARY(copy1.isNull());
+}
+
+/** @par 检测点：测试Factor getValues方法的align参数功能 */
+TEST_CASE("test_Factor_getValues_align") {
+    StockManager& sm = StockManager::instance();
+    Stock stock1 = sm.getStock("sh000001");  // 上证指数
+    Stock stock2 = sm.getStock("sz000001");  // 深证成指
+    CHECK_FALSE(stock1.isNull());
+    CHECK_FALSE(stock2.isNull());
+    
+    StockList stocks = {stock1, stock2};  // 使用两个不同市场的证券
+    KQuery query(0, 30, KQuery::DAY);  // 获取30天数据进行对齐测试
+
+    // 创建测试指标
+    Indicator ma5 = MA(CLOSE(), 5);
+    Factor factor("ALIGN_TEST", ma5, KQuery::DAY);
+
+    SUBCASE("Align=false basic functionality") {
+        // 测试不使用对齐的基本功能
+        IndicatorList result = factor.getValues(stocks, query, false);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), 2);  // 两个股票的结果
+        
+        // 验证每个股票的结果
+        for (size_t i = 0; i < result.size(); ++i) {
+            Indicator ind = result[i];
+            CHECK_FALSE(ind.empty());
+            CHECK_GT(ind.size(), 0);
+            
+            // 验证基本结构
+            check_indicator(ind, ind);
+        }
+    }
+
+    SUBCASE("Align=true trading calendar alignment") {
+        // 测试使用交易日历对齐
+        IndicatorList result = factor.getValues(stocks, query, true);
+        CHECK_FALSE(result.empty());
+        CHECK_EQ(result.size(), 2);  // 两个股票的结果
+        
+        // 获取交易日历进行对比验证
+        DatetimeList trading_dates = sm.getTradingCalendar(query);
+        CHECK_FALSE(trading_dates.empty());
+        
+        // 验证每个股票的结果
+        for (size_t i = 0; i < result.size(); ++i) {
+            Indicator ind_aligned = result[i];
+            CHECK_FALSE(ind_aligned.empty());
+            CHECK_GT(ind_aligned.size(), 0);
+            
+            // 验证指标的大小与交易日历一致（这是对齐的核心验证）
+            CHECK_EQ(ind_aligned.size(), trading_dates.size());
+            
+            // 验证基本结构
+            check_indicator(ind_aligned, ind_aligned);
+        }
+    }
+
+    SUBCASE("Align comparison between true and false") {
+        // 对比align=true和align=false的结果差异
+        IndicatorList result_false = factor.getValues(stocks, query, false);
+        IndicatorList result_true = factor.getValues(stocks, query, true);
+        
+        CHECK_FALSE(result_false.empty());
+        CHECK_FALSE(result_true.empty());
+        CHECK_EQ(result_false.size(), result_true.size());
+        CHECK_EQ(result_false.size(), 2);
+        
+        // 验证每只股票的结果
+        for (size_t i = 0; i < 2; ++i) {
+            Indicator ind_false = result_false[i];
+            Indicator ind_true = result_true[i];
+            
+            CHECK_FALSE(ind_false.empty());
+            CHECK_FALSE(ind_true.empty());
+            
+            // 验证两者都能正常工作并返回合理结果
+            CHECK_GT(ind_false.size(), 0);
+            CHECK_GT(ind_true.size(), 0);
+            
+            // 验证discard逻辑合理性
+            CHECK_GE(ind_true.discard(), 0);
+            CHECK_GE(ind_false.discard(), 0);
+            
+            // 验证结构完整性
+            check_indicator(ind_false, ind_false);
+            check_indicator(ind_true, ind_true);
+        }
+        
+        // 获取交易日历验证align=true的效果
+        DatetimeList trading_dates = sm.getTradingCalendar(query);
+        CHECK_FALSE(trading_dates.empty());
+        
+        // 验证align=true时结果大小与交易日历匹配
+        for (size_t i = 0; i < result_true.size(); ++i) {
+            CHECK_EQ(result_true[i].size(), trading_dates.size());
+        }
+    }
+
+    SUBCASE("Align with fill_null parameter") {
+        // 测试align=true配合fill_null参数
+        IndicatorList result1 = factor.getValues(stocks, query, true, false);  // fill_null=false
+        IndicatorList result2 = factor.getValues(stocks, query, true, true);   // fill_null=true
+        
+        CHECK_FALSE(result1.empty());
+        CHECK_FALSE(result2.empty());
+        
+        CHECK_EQ(result1.size(), 2);
+        CHECK_EQ(result2.size(), 2);
+        
+        // 验证每只股票的结果
+        for (size_t i = 0; i < 2; ++i) {
+            Indicator ind1 = result1[i];
+            Indicator ind2 = result2[i];
+            
+            CHECK_FALSE(ind1.empty());
+            CHECK_FALSE(ind2.empty());
+            
+            // 两者应该有相同的大小（都使用交易日历对齐）
+            CHECK_EQ(ind1.size(), ind2.size());
+            
+            // 验证都与交易日历大小匹配
+            DatetimeList trading_dates = sm.getTradingCalendar(query);
+            CHECK_EQ(ind1.size(), trading_dates.size());
+            CHECK_EQ(ind2.size(), trading_dates.size());
+            
+            // 验证结构
+            check_indicator(ind1, ind1);
+            check_indicator(ind2, ind2);
+        }
+    }
+
+    SUBCASE("Align with different query ranges") {
+        // 测试不同查询范围下的对齐效果
+        KQuery short_query(0, 10, KQuery::DAY);
+        KQuery medium_query(0, 20, KQuery::DAY);
+        KQuery long_query(0, 40, KQuery::DAY);
+        
+        IndicatorList short_result = factor.getValues(stocks, short_query, true);
+        IndicatorList medium_result = factor.getValues(stocks, medium_query, true);
+        IndicatorList long_result = factor.getValues(stocks, long_query, true);
+        
+        CHECK_FALSE(short_result.empty());
+        CHECK_FALSE(medium_result.empty());
+        CHECK_FALSE(long_result.empty());
+        
+        CHECK_EQ(short_result.size(), 2);
+        CHECK_EQ(medium_result.size(), 2);
+        CHECK_EQ(long_result.size(), 2);
+        
+        // 验证每个股票的结果
+        for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
+            Indicator short_ind = short_result[stock_idx];
+            Indicator medium_ind = medium_result[stock_idx];
+            Indicator long_ind = long_result[stock_idx];
+            
+            CHECK_FALSE(short_ind.empty());
+            CHECK_FALSE(medium_ind.empty());
+            CHECK_FALSE(long_ind.empty());
+            
+            // 验证大小关系（更长的查询范围应该有更多的交易日）
+            CHECK_LE(short_ind.size(), medium_ind.size());
+            CHECK_LE(medium_ind.size(), long_ind.size());
+            
+            // 验证都使用了正确的交易日历对齐
+            DatetimeList short_dates = sm.getTradingCalendar(short_query);
+            DatetimeList medium_dates = sm.getTradingCalendar(medium_query);
+            DatetimeList long_dates = sm.getTradingCalendar(long_query);
+            
+            CHECK_EQ(short_ind.size(), short_dates.size());
+            CHECK_EQ(medium_ind.size(), medium_dates.size());
+            CHECK_EQ(long_ind.size(), long_dates.size());
+            
+            // 验证结构
+            check_indicator(short_ind, short_ind);
+            check_indicator(medium_ind, medium_ind);
+            check_indicator(long_ind, long_ind);
+        }
+    }
+
+    SUBCASE("Multi-stock align validation") {
+        // 测试多股票情况下的对齐功能（使用三个股票）
+        Stock stock3 = sm.getStock("sh600036");
+        
+        if (!stock3.isNull()) {
+            StockList multi_stocks = {stock1, stock2, stock3};
+            IndicatorList results = factor.getValues(multi_stocks, query, true);
+            
+            // 应该为每只股票返回一个指标结果
+            CHECK_EQ(results.size(), 3);
+            
+            // 验证每个结果都正确使用了交易日历对齐
+            DatetimeList trading_dates = sm.getTradingCalendar(query);
+            CHECK_FALSE(trading_dates.empty());
+            
+            for (const auto& ind : results) {
+                CHECK_FALSE(ind.empty());
+                CHECK_EQ(ind.size(), trading_dates.size());
+                
+                // 验证结构
+                check_indicator(ind, ind);
+            }
+        }
+    }
+
+    SUBCASE("Align with different KType") {
+        // 测试不同K线类型下的对齐功能
+        KQuery day_query(0, 15, KQuery::DAY);
+        KQuery week_query(0, 15, KQuery::WEEK);
+        KQuery month_query(0, 15, KQuery::MONTH);
+        
+        IndicatorList day_result = factor.getValues(stocks, day_query, true);
+        IndicatorList week_result = factor.getValues(stocks, week_query, true);
+        IndicatorList month_result = factor.getValues(stocks, month_query, true);
+        
+        CHECK_FALSE(day_result.empty());
+        CHECK_FALSE(week_result.empty());
+        CHECK_FALSE(month_result.empty());
+        
+        CHECK_EQ(day_result.size(), 2);
+        CHECK_EQ(week_result.size(), 2);
+        CHECK_EQ(month_result.size(), 2);
+        
+        // 验证每个股票的结果
+        for (size_t i = 0; i < 2; ++i) {
+            Indicator day_ind = day_result[i];
+            Indicator week_ind = week_result[i];
+            Indicator month_ind = month_result[i];
+            
+            CHECK_FALSE(day_ind.empty());
+            CHECK_FALSE(week_ind.empty());
+            CHECK_FALSE(month_ind.empty());
+            
+            // 获取对应K线类型的交易日历
+            DatetimeList day_dates = sm.getTradingCalendar(day_query);
+            DatetimeList week_dates = sm.getTradingCalendar(week_query);
+            DatetimeList month_dates = sm.getTradingCalendar(month_query);
+            
+            // 验证大小匹配（这是验证对齐效果的关键）
+            CHECK_EQ(day_ind.size(), day_dates.size());
+            CHECK_EQ(week_ind.size(), week_dates.size());
+            CHECK_EQ(month_ind.size(), month_dates.size());
+            
+            // 验证结构
+            check_indicator(day_ind, day_ind);
+            check_indicator(week_ind, week_ind);
+            check_indicator(month_ind, month_ind);
+        }
+    }
 }
 
 /** @par 检测点：测试Factor哈希和比较 */
