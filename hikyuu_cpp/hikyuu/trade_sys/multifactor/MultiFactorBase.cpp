@@ -199,6 +199,7 @@ MultiFactorPtr MultiFactorBase::clone() {
     // p->m_ref_dates = m_ref_dates;
     p->m_query = m_query;
 
+    p->m_factorset = m_factorset;
     p->m_inds.reserve(m_inds.size());
     for (const auto& ind : m_inds) {
         p->m_inds.emplace_back(ind.clone());
@@ -250,6 +251,13 @@ void MultiFactorBase::setStockList(const StockList& stks) {
 void MultiFactorBase::setRefIndicators(const IndicatorList& inds) {
     HKU_CHECK(!inds.empty(), "Input source factor list is empty!");
     m_inds = inds;
+    m_calculated = false;
+}
+
+void MultiFactorBase::setFactorSet(const FactorSet& factorset) {
+    HKU_CHECK(!factorset.isNull(), "Input factor set is null!");
+    m_factorset = factorset;
+    m_inds.clear();
     m_calculated = false;
 }
 

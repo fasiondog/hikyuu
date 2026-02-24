@@ -83,6 +83,7 @@ public:
 
     /** 设置因子列表 */
     void setRefIndicators(const IndicatorList& inds);
+    void setFactorSet(const FactorSet& factorset);
 
     /** 获取指定证券合成因子 */
     const Indicator& getFactor(const Stock&);
@@ -228,6 +229,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_inds);
+        ar& BOOST_SERIALIZATION_NVP(m_factorset);
         ar& BOOST_SERIALIZATION_NVP(m_stks);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
@@ -248,6 +250,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_inds);
+        ar& BOOST_SERIALIZATION_NVP(m_factorset);
         ar& BOOST_SERIALIZATION_NVP(m_stks);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
