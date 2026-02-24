@@ -6,6 +6,8 @@
  */
 
 #include "FactorImp.h"
+#include "hikyuu/indicator/crt/PRICELIST.h"
+#include "hikyuu/indicator/crt/ALIGN.h"
 
 namespace hku {
 
