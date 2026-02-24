@@ -7,6 +7,7 @@
 
 #include "FactorSet.h"
 #include "hikyuu/plugin/factor.h"
+#include "hikyuu/plugin/device.h"
 
 namespace hku {
 
@@ -185,13 +186,16 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
         }
     }
 
-#if 0
-    return hku::getValues(*this, stocks, query, align, fill_null, tovalue);
-#else
+    vector<IndicatorList> result;
+    if (isValidLicense()) {
+        result = hku::getValues(*this, stocks, query, align, fill_null, tovalue);
+        return result;
+    }
+
     // 创建结果容器，每个股票对应一个 IndicatorList
     size_t stk_total = stocks.size();
     size_t factor_total = m_data->m_factors.size();
-    vector<IndicatorList> result(stk_total);
+    result.resize(stk_total);
     for (size_t i = 0; i < stk_total; ++i) {
         result[i].resize(factor_total);
     }
@@ -206,7 +210,6 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
     });
 
     return result;
-#endif
 }
 
 vector<IndicatorList> FactorSet::getAllValues(const KQuery& query, bool align, bool fill_null,
