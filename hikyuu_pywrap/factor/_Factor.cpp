@@ -47,9 +47,10 @@ void export_Factor(py::module& m) {
       .def_property("need_persist", py::overload_cast<>(&Factor::needPersist, py::const_),
                     py::overload_cast<bool>(&Factor::needPersist), "是否持久化")
 
-      .def("save", &Factor::save, "保存因子元数据")
-      .def("remove", &Factor::remove, "删除因子元数据")
-      .def("get_all_values", &Factor::getAllValues)
+      .def("save_to_db", &Factor::save_to_db, "保存因子元数据")
+      .def("remove_from_db", &Factor::remove_from_db, "删除因子元数据")
+      .def("get_all_values", &Factor::getAllValues, py::arg("query"), py::arg("align") = false,
+           py::arg("fill_null") = false, py::arg("tovalue") = true)
       .def(
         "get_values",
         [](Factor& self, const py::object& stks, const KQuery& query, bool align, bool fill_null,

@@ -47,14 +47,18 @@ void export_FactorSet(py::module& m) {
 
       .def("get_factors", &FactorSet::getAllFactors, py::return_value_policy::copy)
 
-      .def("get_all_values", &FactorSet::getAllValues)
+      .def("get_all_values", &FactorSet::getAllValues, py::arg("query"), py::arg("align") = false,
+           py::arg("fill_null") = false, py::arg("tovalue") = true)
 
       .def(
         "get_values",
-        [](FactorSet& self, const py::object& stks, const KQuery& query, bool check = false) {
-            return self.getValues(get_stock_list_from_python(stks), query);
+        [](FactorSet& self, const py::object& stks, const KQuery& query, bool align = false,
+           bool fill_null = false, bool tovalue = true, bool check = false) {
+            return self.getValues(get_stock_list_from_python(stks), query, align, fill_null,
+                                  tovalue, check);
         },
-        py::arg("stocks"), py::arg("query"), py::arg("check") = false)
+        py::arg("stocks"), py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
+        py::arg("tovalue") = true, py::arg("check") = false)
 
       .def("__getitem__", py::overload_cast<const string&>(&FactorSet::get, py::const_),
            py::return_value_policy::copy)

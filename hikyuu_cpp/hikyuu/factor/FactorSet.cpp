@@ -6,6 +6,7 @@
  */
 
 #include "FactorSet.h"
+#include "hikyuu/plugin/factor.h"
 
 namespace hku {
 
@@ -51,6 +52,7 @@ FactorSet& FactorSet::operator=(FactorSet&& other) {
 }
 
 void FactorSet::add(const Factor& factor) {
+    HKU_CHECK(!factor.isNull(), "Factor is null!");
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
     HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
 
@@ -72,6 +74,7 @@ void FactorSet::add(const Factor& factor) {
 }
 
 void FactorSet::add(Factor&& factor) {
+    HKU_CHECK(!factor.isNull(), "Factor is null!");
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
     HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
 
@@ -89,6 +92,12 @@ void FactorSet::add(Factor&& factor) {
         m_data->m_factors.push_back(std::move(factor));
         // 在 map 中记录名称到索引的映射
         m_data->m_nameIndexMap[factor_name] = index;
+    }
+}
+
+void FactorSet::add(const FactorList& factors) {
+    for (const auto& factor : factors) {
+        add(factor);
     }
 }
 
@@ -125,8 +134,25 @@ const Factor& FactorSet::get(const string& name) const {
     return m_data->m_factors[it->second];
 }
 
-vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery& query,
-                                           bool check) const {
+void FactorSet::save_to_db() const {
+    saveFactorSet(*this);
+}
+
+void FactorSet::remove_from_db() const {
+    removeFactorSet(name(), ktype());
+}
+
+void FactorSet::load_from_db() {
+    FactorSet loaded_set = getFactorSet(name(), ktype());
+    // getFactorSet 返回的对象是 Null, Null为全局
+    if (!loaded_set.isNull()) {
+        m_data = std::move(loaded_set.m_data);
+    }
+}
+
+vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery& query, bool align,
+                                           bool fill_null, bool tovalue, bool check) const {
+    SPEND_TIME(FactorSet_getValues);
     if (check) {
         const auto& block = this->block();
         if (!block.empty()) {
@@ -136,6 +162,9 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
         }
     }
 
+#if 1
+    return hku::getValues(*this, stocks, query, align, fill_null, tovalue);
+#else
     // 创建结果容器，每个股票对应一个 IndicatorList
     size_t stk_total = stocks.size();
     size_t factor_total = m_data->m_factors.size();
@@ -153,12 +182,14 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
     });
 
     return result;
+#endif
 }
 
-vector<IndicatorList> FactorSet::getAllValues(const KQuery& query) const {
+vector<IndicatorList> FactorSet::getAllValues(const KQuery& query, bool align, bool fill_null,
+                                              bool tovalue) const {
     StockList stocks =
       block().empty() ? StockManager::instance().getStockList() : block().getStockList();
-    return getValues(stocks, query);
+    return getValues(stocks, query, align, fill_null, tovalue);
 }
 
 }  // namespace hku

@@ -82,17 +82,19 @@ IndicatorList Factor::getAllValues(const KQuery& query, bool align, bool fill_nu
     return m_imp->getValues(stocks, query, align, fill_null, tovalue);
 }
 
-void Factor::save() {
+void Factor::save_to_db() {
     saveFactor(*this);
 }
 
-void Factor::remove() {
+void Factor::remove_from_db() {
     removeFactor(name(), ktype());
 }
 
-void Factor::load() {
+void Factor::load_from_db() {
     Factor tmp = getFactor(name(), ktype());
-    m_imp = std::move(tmp.m_imp);
+    if (!tmp.isNull()) {
+        m_imp = std::move(tmp.m_imp);
+    }
 }
 
 }  // namespace hku

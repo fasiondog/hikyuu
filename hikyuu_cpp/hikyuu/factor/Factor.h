@@ -149,17 +149,63 @@ public:
 
     string str() const;
 
-    void save();
+    void save_to_db();
 
-    void remove();
+    void remove_from_db();
 
-    void load();
+    void load_from_db();
 
 private:
     shared_ptr<FactorImp> m_imp;
 
 private:
     static shared_ptr<FactorImp> ms_null_factor_imp;
+
+#if HKU_SUPPORT_SERIALIZATION
+private:
+    friend class boost::serialization::access;
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
+        ar& BOOST_SERIALIZATION_NVP(name());
+        ar& BOOST_SERIALIZATION_NVP(ktype());
+        Indicator formula = this->formula();
+        ar& BOOST_SERIALIZATION_NVP(formula);
+        ar& BOOST_SERIALIZATION_NVP(startDate());
+        ar& BOOST_SERIALIZATION_NVP(block());
+        ar& BOOST_SERIALIZATION_NVP(createAt());
+        ar& BOOST_SERIALIZATION_NVP(updateAt());
+        ar& BOOST_SERIALIZATION_NVP(brief());
+        ar& BOOST_SERIALIZATION_NVP(details());
+        bool needPersist = this->needPersist();
+        ar& BOOST_SERIALIZATION_NVP(needPersist);
+    }
+
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        string name;
+        string ktype;
+        Indicator formula;
+        Datetime start_date;
+        Block block;
+        Datetime create_at;
+        Datetime update_at;
+        string brief;
+        string details;
+        bool need_persist;
+        ar& BOOST_SERIALIZATION_NVP(name);
+        ar& BOOST_SERIALIZATION_NVP(ktype);
+        ar& BOOST_SERIALIZATION_NVP(formula);
+        ar& BOOST_SERIALIZATION_NVP(start_date);
+        ar& BOOST_SERIALIZATION_NVP(block);
+        ar& BOOST_SERIALIZATION_NVP(create_at);
+        ar& BOOST_SERIALIZATION_NVP(update_at);
+        ar& BOOST_SERIALIZATION_NVP(brief);
+        ar& BOOST_SERIALIZATION_NVP(details);
+        ar& BOOST_SERIALIZATION_NVP(need_persist);
+        *this = Factor(name, formula, ktype, brief, details, need_persist, start_date, block);
+        this->load_from_db();
+    }
+#endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
 typedef vector<Factor> FactorList;

@@ -10,6 +10,7 @@
 #include "hikyuu/KData.h"
 #include "ScoresFilterBase.h"
 #include "buildin_norm.h"
+#include "hikyuu/factor/FactorSet.h"
 
 namespace hku {
 
@@ -191,10 +192,11 @@ protected:
 protected:
     bool m_is_python_object{false};
     string m_name;
-    IndicatorList m_inds;  // 输入的原始因子公式列表
-    StockList m_stks;      // 证券组合
-    Stock m_ref_stk;       // 指定的参考证券, 仅为对齐日期
-    KQuery m_query;        // 计算的日期范围条件
+    IndicatorList m_inds;   // 输入的原始因子公式列表
+    FactorSet m_factorset;  // 输入的原始因子集（在 m_inds 为空时，尝试使用 m_factorset 中的因子）
+    StockList m_stks;       // 证券组合
+    Stock m_ref_stk;        // 指定的参考证券, 仅为对齐日期
+    KQuery m_query;         // 计算的日期范围条件
 
     NormPtr m_norm;                                    // 全局标准化/归一化操作
     unordered_map<string, NormPtr> m_special_norms;    // 对特定指标执行特定的标准化操作

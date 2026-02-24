@@ -32,6 +32,7 @@ public:
      * @return stocks * inds 的列表, 按证券顺序
      */
     vector<IndicatorList> getValues(const StockList& stocks, const KQuery& query,
+                                    bool align = false, bool fill_null = false, bool tovalue = true,
                                     bool check = false) const;
 
     /**
@@ -39,7 +40,8 @@ public:
      * @param query 查询参数
      * @return 所有因子的计算结果
      */
-    vector<IndicatorList> getAllValues(const KQuery& query) const;
+    vector<IndicatorList> getAllValues(const KQuery& query, bool align = false,
+                                       bool fill_null = false, bool tovalue = true) const;
 
     //------------------------
     // 基本属性
@@ -90,6 +92,7 @@ public:
 
     void add(const Factor& factor);
     void add(Factor&& factor);
+    void add(const FactorList&);
     void remove(const string& name);
     bool have(const string& name) const noexcept;
 
@@ -109,6 +112,10 @@ public:
     const FactorList& getAllFactors() const {
         return m_data->m_factors;
     }
+
+    void save_to_db() const;
+    void remove_from_db() const;
+    void load_from_db();
 
     //------------------------
     // 迭代器支持
