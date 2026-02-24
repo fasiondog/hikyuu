@@ -101,6 +101,17 @@ void FactorSet::add(const FactorList& factors) {
     }
 }
 
+void FactorSet::add(const Indicator& ind) {
+    add(Factor(fmt::format("{}_{}", ind.name(), size()), ind, m_data->ktype, "", "", false,
+               Datetime::min(), m_data->block));
+}
+
+void FactorSet::add(const IndicatorList& inds) {
+    for (const auto& ind : inds) {
+        add(ind);
+    }
+}
+
 void FactorSet::remove(const string& name) {
     auto it = m_data->m_nameIndexMap.find(name);
     if (it == m_data->m_nameIndexMap.end()) {
@@ -162,7 +173,7 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
         }
     }
 
-#if 1
+#if 0
     return hku::getValues(*this, stocks, query, align, fill_null, tovalue);
 #else
     // 创建结果容器，每个股票对应一个 IndicatorList

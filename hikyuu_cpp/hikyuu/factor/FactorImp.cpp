@@ -23,6 +23,9 @@ FactorImp::FactorImp(const string& name, const Indicator& formula, const KQuery:
     to_upper(m_name);
     m_formula.setContext(KData());
     m_formula.name(m_name);
+    if (m_start_date == Null<Datetime>()) {
+        m_start_date = Datetime::min();
+    }
 }
 
 uint64_t FactorImp::hash() const noexcept {

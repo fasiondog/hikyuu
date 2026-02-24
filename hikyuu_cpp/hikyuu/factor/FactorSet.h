@@ -93,6 +93,9 @@ public:
     void add(const Factor& factor);
     void add(Factor&& factor);
     void add(const FactorList&);
+    void add(const Indicator& ind);
+    void add(const IndicatorList& inds);
+
     void remove(const string& name);
     bool have(const string& name) const noexcept;
 
