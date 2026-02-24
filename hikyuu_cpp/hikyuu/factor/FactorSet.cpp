@@ -23,6 +23,15 @@ string FactorSet::str() const {
 
 FactorSet::FactorSet() : m_data(ms_null_factorset) {}
 
+FactorSet::FactorSet(const IndicatorList& inds, const KQuery::KType& ktype)
+: m_data(std::make_shared<Data>()) {
+    m_data->name = fmt::format("FSET_{}", Datetime::now().ticks());
+    m_data->ktype = ktype;
+    for (auto& factor : inds) {
+        add(factor);
+    }
+}
+
 FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block& block)
 : m_data(std::make_shared<Data>()) {
     string upper_name = name;
@@ -64,6 +73,8 @@ void FactorSet::add(const Factor& factor) {
         // 存在同名因子，覆盖之
         size_t index = it->second;
         m_data->m_factors[index] = factor;
+        HKU_WARN("Factor '{}' already exists, it will be overwritten!", factor_name);
+
     } else {
         // 添加新因子到 vector 末尾
         size_t index = m_data->m_factors.size();
@@ -86,6 +97,8 @@ void FactorSet::add(Factor&& factor) {
         // 存在同名因子，覆盖之
         size_t index = it->second;
         m_data->m_factors[index] = std::move(factor);
+        HKU_WARN("Factor '{}' already exists, it will be overwritten!", factor_name);
+
     } else {
         // 添加新因子到 vector 末尾
         size_t index = m_data->m_factors.size();
@@ -102,8 +115,7 @@ void FactorSet::add(const FactorList& factors) {
 }
 
 void FactorSet::add(const Indicator& ind) {
-    add(Factor(fmt::format("{}_{}", ind.name(), size()), ind, m_data->ktype, "", "", false,
-               Datetime::min(), m_data->block));
+    add(Factor(ind.name(), ind, m_data->ktype, "", "", false, Datetime::min(), m_data->block));
 }
 
 void FactorSet::add(const IndicatorList& inds) {

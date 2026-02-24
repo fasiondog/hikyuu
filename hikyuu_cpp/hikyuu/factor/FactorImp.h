@@ -58,8 +58,8 @@ public:
     /**
      * 获取计算公式指标（返回克隆副本）
      */
-    Indicator formula() const {
-        return m_formula.clone();
+    const Indicator& formula() const noexcept {
+        return m_formula;
     }
 
     /**

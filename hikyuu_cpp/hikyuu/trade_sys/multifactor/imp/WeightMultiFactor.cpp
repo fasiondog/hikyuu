@@ -26,7 +26,7 @@ WeightMultiFactor::WeightMultiFactor(const PriceList& weights, const StockList& 
 vector<Indicator> WeightMultiFactor::_calculate(const vector<IndicatorList>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();
-    size_t ind_count = m_inds.size();
+    size_t ind_count = m_factorset.size();
 
     return global_parallel_for_index(0, stk_count, [&](size_t si) {
         vector<price_t> sumByDate(days_total, 0.0);

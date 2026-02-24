@@ -75,7 +75,7 @@ public:
         return m_imp->ktype();
     }
 
-    Indicator formula() const {
+    const Indicator& formula() const noexcept {
         return m_imp->formula();
     }
 

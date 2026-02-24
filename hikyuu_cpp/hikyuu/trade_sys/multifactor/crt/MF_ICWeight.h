@@ -31,16 +31,6 @@ MultiFactorPtr HKU_API MF_ICWeight(const StockList& stks, const KQuery& query,
                                    int ic_rolling_n = 120, bool spearman = true, int mode = 0,
                                    bool save_all_factors = false);
 
-inline MultiFactorPtr MF_ICWeight(const IndicatorList& inds, const StockList& stks,
-                                  const KQuery& query, const Stock& ref_stk = Stock(), int ic_n = 5,
-                                  int ic_rolling_n = 120, bool spearman = true, int mode = 0,
-                                  bool save_all_factors = false) {
-    auto ret =
-      MF_ICWeight(stks, query, ref_stk, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
-    ret->setRefIndicators(inds);
-    return ret;
-}
-
 inline MultiFactorPtr MF_ICWeight(const FactorSet& factorset, const StockList& stks,
                                   const KQuery& query, const Stock& ref_stk = Stock(), int ic_n = 5,
                                   int ic_rolling_n = 120, bool spearman = true, int mode = 0,
@@ -49,6 +39,14 @@ inline MultiFactorPtr MF_ICWeight(const FactorSet& factorset, const StockList& s
       MF_ICWeight(stks, query, ref_stk, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
     ret->setRefFactorSet(factorset);
     return ret;
+}
+
+inline MultiFactorPtr MF_ICWeight(const IndicatorList& inds, const StockList& stks,
+                                  const KQuery& query, const Stock& ref_stk = Stock(), int ic_n = 5,
+                                  int ic_rolling_n = 120, bool spearman = true, int mode = 0,
+                                  bool save_all_factors = false) {
+    return MF_ICWeight(FactorSet(inds, query.kType()), stks, query, ref_stk, ic_n, ic_rolling_n,
+                       spearman, mode, save_all_factors);
 }
 
 }  // namespace hku

@@ -29,18 +29,6 @@ MultiFactorPtr HKU_API MF_EqualWeight(const StockList& stks, const KQuery& query
                                       const Stock& ref_stk, int ic_n, bool spearman, int mode,
                                       bool save_all_factors);
 
-inline MultiFactorPtr MF_EqualWeight(const IndicatorList& inds, const StockList& stks,
-                                     const KQuery& query, const Stock& ref_stk = Stock(),
-                                     int ic_n = 5, bool spearman = true, int mode = 0,
-                                     bool save_all_factors = false) {
-    auto ret = MF_EqualWeight(stks, query, ref_stk, ic_n, spearman, mode, save_all_factors);
-    // ret->setRefIndicators(inds);
-    FactorSet tmp("tmp", query.kType());
-    tmp.add(inds);
-    ret->setRefFactorSet(tmp);
-    return ret;
-}
-
 inline MultiFactorPtr MF_EqualWeight(const FactorSet& factset, const StockList& stks,
                                      const KQuery& query, const Stock& ref_stk = Stock(),
                                      int ic_n = 5, bool spearman = true, int mode = 0,
@@ -48,6 +36,14 @@ inline MultiFactorPtr MF_EqualWeight(const FactorSet& factset, const StockList& 
     auto ret = MF_EqualWeight(stks, query, ref_stk, ic_n, spearman, mode, save_all_factors);
     ret->setRefFactorSet(factset);
     return ret;
+}
+
+inline MultiFactorPtr MF_EqualWeight(const IndicatorList& inds, const StockList& stks,
+                                     const KQuery& query, const Stock& ref_stk = Stock(),
+                                     int ic_n = 5, bool spearman = true, int mode = 0,
+                                     bool save_all_factors = false) {
+    return MF_EqualWeight(FactorSet(inds, query.kType()), stks, query, ref_stk, ic_n, spearman,
+                          mode, save_all_factors);
 }
 
 }  // namespace hku

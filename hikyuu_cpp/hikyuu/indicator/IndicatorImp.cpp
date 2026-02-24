@@ -562,7 +562,7 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     imp->name(name());
     auto const *src = this->data(result_num);
     auto *dst = imp->data(0);
-    for (size_t i = discard(); i < total; ++i) {
+    for (size_t i = imp->discard(); i < total; ++i) {
         dst[i] = src[i];
     }
     return imp;

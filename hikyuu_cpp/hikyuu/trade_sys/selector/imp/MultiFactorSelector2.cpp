@@ -36,7 +36,8 @@ MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf) : SelectorBase("SE_M
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
     setParam<string>("mode", "CUSTOM");
     setParam<int>("mf_recover_type", KQuery::INVALID_RECOVER_TYPE);  // 指定MF的计算时的复权方式
-    setIndicators(mf->getRefIndicators());
+    // setIndicators(mf->getRefIndicators());
+    setFactorSet(mf->getRefFactorSet());
 }
 
 MultiFactorSelector2::~MultiFactorSelector2() {}
@@ -68,9 +69,7 @@ SelectorPtr MultiFactorSelector2::_clone() {
     auto p = make_shared<MultiFactorSelector2>();
     p->m_mf = m_mf->clone();
     p->m_stk_sys_dict = m_stk_sys_dict;
-    for (const auto& ind : m_inds) {
-        p->m_inds.emplace_back(ind.clone());
-    }
+    p->m_factorset = m_factorset;
     return p;
 }
 
@@ -106,17 +105,17 @@ void MultiFactorSelector2::_calculate() {
 
     if (!m_mf) {
         if ("MF_ICIRWeight" == mode) {
-            m_mf = MF_ICIRWeight(m_inds, stks, query, ref_stk, ic_n, ic_rolling_n, spearman);
+            m_mf = MF_ICIRWeight(m_factorset, stks, query, ref_stk, ic_n, ic_rolling_n, spearman);
         } else if ("MF_ICWeight" == mode) {
-            m_mf = MF_ICWeight(m_inds, stks, query, ref_stk, ic_n, ic_rolling_n, spearman);
+            m_mf = MF_ICWeight(m_factorset, stks, query, ref_stk, ic_n, ic_rolling_n, spearman);
         } else if ("MF_EqualWeight" == mode) {
-            m_mf = MF_EqualWeight(m_inds, stks, query, ref_stk, ic_n, spearman);
+            m_mf = MF_EqualWeight(m_factorset, stks, query, ref_stk, ic_n, spearman);
         } else {
             HKU_THROW("Invalid mode: {}", mode);
         }
     } else {
         m_mf->setQuery(query);
-        m_mf->setRefIndicators(m_inds);
+        m_mf->setRefFactorSet(m_factorset);
         m_mf->setRefStock(ref_stk);
         m_mf->setStockList(stks);
         m_mf->setParam<int>("ic_n", ic_n);
@@ -143,7 +142,7 @@ SelectorPtr HKU_API SE_MultiFactor2(const IndicatorList& src_inds, int ic_n, int
                                     const Stock& ref_stk, bool spearman, const string& mode,
                                     const ScoresFilterPtr& filter) {
     auto p = make_shared<MultiFactorSelector2>();
-    p->setIndicators(src_inds);
+    p->setFactorSet(FactorSet(src_inds));
     p->setParam<int>("ic_n", ic_n);
     p->setParam<int>("ic_rolling_n", ic_rolling_n);
     p->setParam<Stock>("ref_stk", ref_stk);

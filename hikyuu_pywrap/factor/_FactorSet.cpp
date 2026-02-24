@@ -16,6 +16,8 @@ void export_FactorSet(py::module& m) {
       .def(py::init<>())
       .def(py::init<const string&, const KQuery::KType&, const Block&>(), py::arg("name"),
            py::arg("ktype") = KQuery::DAY, py::arg("block") = Block())
+      .def(py::init<const IndicatorList&, const KQuery::KType&>(), py::arg("inds"),
+           py::arg("ktype") = KQuery::DAY)
 
       .def("__str__", &FactorSet::str)
       .def("__repr__", &FactorSet::str)

@@ -29,19 +29,6 @@ MultiFactorPtr HKU_API MF_Weight(const PriceList& weights, const StockList& stks
                                  const KQuery& query, const Stock& ref_stk = Stock(), int ic_n = 5,
                                  bool spearman = true, int mode = 0, bool save_all_factors = false);
 
-inline MultiFactorPtr MF_Weight(const IndicatorList& inds, const PriceList& weights,
-                                const StockList& stks, const KQuery& query,
-                                const Stock& ref_stk = Stock(), int ic_n = 5, bool spearman = true,
-                                int mode = 0, bool save_all_factors = false) {
-    HKU_CHECK(
-      weights.size() == inds.size(),
-      "The size of weight is not equal to the size of inds! weights.size()={}, inds.size()={}",
-      weights.size(), inds.size());
-    auto ret = MF_Weight(weights, stks, query, ref_stk, ic_n, spearman, mode, save_all_factors);
-    ret->setRefIndicators(inds);
-    return ret;
-}
-
 inline MultiFactorPtr MF_Weight(const FactorSet& factorset, const PriceList& weights,
                                 const StockList& stks, const KQuery& query,
                                 const Stock& ref_stk = Stock(), int ic_n = 5, bool spearman = true,
@@ -53,6 +40,14 @@ inline MultiFactorPtr MF_Weight(const FactorSet& factorset, const PriceList& wei
     auto ret = MF_Weight(weights, stks, query, ref_stk, ic_n, spearman, mode, save_all_factors);
     ret->setRefFactorSet(factorset);
     return ret;
+}
+
+inline MultiFactorPtr MF_Weight(const IndicatorList& inds, const PriceList& weights,
+                                const StockList& stks, const KQuery& query,
+                                const Stock& ref_stk = Stock(), int ic_n = 5, bool spearman = true,
+                                int mode = 0, bool save_all_factors = false) {
+    return MF_Weight(FactorSet(inds, query.kType()), weights, stks, query, ref_stk, ic_n, spearman,
+                     mode, save_all_factors);
 }
 
 }  // namespace hku

@@ -199,15 +199,15 @@ void export_MultiFactor(py::module& m) {
       .def("get_stock_list_num", &MultiFactorBase::getStockListNumber,
            "获取创建时指定的证券列表中证券数量")
 
-      .def("get_ref_indicators", &MultiFactorBase::getRefIndicators, py::return_value_policy::copy,
-           "获取创建时输入的原始因子列表")
+      .def("get_ref_factorset", &MultiFactorBase::getRefFactorSet, py::return_value_policy::copy,
+           "获取创建时输入的原始因子集合")
 
-      .def("set_ref_indicators", &MultiFactorBase::setRefIndicators,
-           R"(set_ref_indicators(self, inds)
+      .def("set_ref_factorset", &MultiFactorBase::setRefFactorSet,
+           R"(set_ref_factorset(self, factorset)
       
-    设置原始因子列表
+    设置原始因子集合
     
-    :param list inds: 新的原始因子列表)")
+    :param FactorSet factorset: 新的原始因子集合)")
 
       .def("get_factor", &MultiFactorBase::getFactor, py::return_value_policy::copy,
            py::arg("stock"), R"(get_factor(self, stock)
