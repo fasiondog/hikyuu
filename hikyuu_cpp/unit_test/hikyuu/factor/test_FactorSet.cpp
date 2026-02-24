@@ -10,6 +10,7 @@
 #include <hikyuu/factor/Factor.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/StockManager.h>
 #include <algorithm>
 #include <utility>  // for std::pair
 #include <string>   // for std::to_string
@@ -905,5 +906,193 @@ TEST_CASE("test_FactorSet_integration") {
         CHECK_EQ(fs.block().name(), "新概念");
     }
 }
+
+#if HKU_SUPPORT_SERIALIZATION
+
+/** @par 检测点：测试FactorSet序列化功能 */
+TEST_CASE("test_FactorSet_serialization") {
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/FactorSet.xml";
+
+    // 创建测试用的 Factor 对象
+    Indicator ma5 = MA(CLOSE(), 5);
+    Indicator ma10 = MA(CLOSE(), 10);
+
+    // 创建测试用的 Block
+    Block test_block("行业", "测试板块");
+
+    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线", false, Datetime::min(),
+                   test_block);
+    Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线", false,
+                   Datetime::min(), test_block);
+
+    // 测试基本序列化 - 空FactorSet
+    SUBCASE("Empty FactorSet serialization") {
+        FactorSet fs1("EMPTY_TEST", KQuery::DAY, test_block);
+
+        {
+            std::ofstream ofs(filename);
+            boost::archive::xml_oarchive oa(ofs);
+            oa << BOOST_SERIALIZATION_NVP(fs1);
+        }
+
+        FactorSet fs2;
+        {
+            std::ifstream ifs(filename);
+            boost::archive::xml_iarchive ia(ifs);
+            ia >> BOOST_SERIALIZATION_NVP(fs2);
+        }
+
+        CHECK_EQ(fs1.name(), fs2.name());
+        CHECK_EQ(fs1.ktype(), fs2.ktype());
+        CHECK_EQ(fs1.size(), fs2.size());
+        CHECK_EQ(fs1.block().category(), fs2.block().category());
+        CHECK_EQ(fs1.block().name(), fs2.block().name());
+    }
+
+    // 测试带因子的序列化
+    SUBCASE("FactorSet with factors serialization") {
+        FactorSet fs1("FACTORS_TEST", KQuery::DAY, test_block);
+        fs1.add(factor1);
+        fs1.add(factor2);
+
+        {
+            std::ofstream ofs(filename);
+            boost::archive::xml_oarchive oa(ofs);
+            oa << BOOST_SERIALIZATION_NVP(fs1);
+        }
+
+        FactorSet fs2;
+        {
+            std::ifstream ifs(filename);
+            boost::archive::xml_iarchive ia(ifs);
+            ia >> BOOST_SERIALIZATION_NVP(fs2);
+        }
+
+        CHECK_EQ(fs1.name(), fs2.name());
+        CHECK_EQ(fs1.ktype(), fs2.ktype());
+        CHECK_EQ(fs1.size(), fs2.size());
+        CHECK_EQ(fs1.block().category(), fs2.block().category());
+        CHECK_EQ(fs1.block().name(), fs2.block().name());
+
+        // 验证因子也被正确序列化
+        CHECK_UNARY(fs2.have("MA5"));
+        CHECK_UNARY(fs2.have("MA10"));
+
+        Factor retrieved_ma5 = fs2.get("MA5");
+        CHECK_EQ(retrieved_ma5.name(), "MA5");
+        CHECK_EQ(retrieved_ma5.brief(), "5日均线因子");
+
+        Factor retrieved_ma10 = fs2.get("MA10");
+        CHECK_EQ(retrieved_ma10.name(), "MA10");
+        CHECK_EQ(retrieved_ma10.brief(), "10日均线因子");
+    }
+
+    // 测试不同K线类型的序列化
+    SUBCASE("Different KType serialization") {
+        Indicator week_ma = MA(CLOSE(), 5);
+        Factor week_factor("WEEK_MA", week_ma, KQuery::WEEK, "周线因子");
+
+        FactorSet fs1("WEEK_TEST", KQuery::WEEK);
+        fs1.add(week_factor);
+
+        {
+            std::ofstream ofs(filename);
+            boost::archive::xml_oarchive oa(ofs);
+            oa << BOOST_SERIALIZATION_NVP(fs1);
+        }
+
+        FactorSet fs2;
+        {
+            std::ifstream ifs(filename);
+            boost::archive::xml_iarchive ia(ifs);
+            ia >> BOOST_SERIALIZATION_NVP(fs2);
+        }
+
+        CHECK_EQ(fs1.name(), fs2.name());
+        CHECK_EQ(fs1.ktype(), fs2.ktype());
+        CHECK_EQ(fs1.size(), fs2.size());
+        CHECK_UNARY(fs2.have("WEEK_MA"));
+    }
+
+    // 测试空名称的序列化
+    SUBCASE("Empty name serialization") {
+        FactorSet fs1("", KQuery::DAY, test_block);
+        fs1.add(factor1);
+
+        {
+            std::ofstream ofs(filename);
+            boost::archive::xml_oarchive oa(ofs);
+            oa << BOOST_SERIALIZATION_NVP(fs1);
+        }
+
+        FactorSet fs2;
+        {
+            std::ifstream ifs(filename);
+            boost::archive::xml_iarchive ia(ifs);
+            ia >> BOOST_SERIALIZATION_NVP(fs2);
+        }
+
+        CHECK_EQ(fs1.name(), fs2.name());
+        CHECK_EQ(fs1.ktype(), fs2.ktype());
+        CHECK_EQ(fs1.size(), fs2.size());
+        CHECK_UNARY(fs2.have("MA5"));
+    }
+
+    // 测试修改后的序列化
+    SUBCASE("Modified FactorSet serialization") {
+        FactorSet fs1("MODIFY_TEST", KQuery::DAY, test_block);
+        fs1.add(factor1);
+
+        {
+            std::ofstream ofs(filename);
+            boost::archive::xml_oarchive oa(ofs);
+            oa << BOOST_SERIALIZATION_NVP(fs1);
+        }
+
+        // 修改原始对象
+        fs1.add(factor2);
+        fs1.remove("MA5");
+
+        FactorSet fs2;
+        {
+            std::ifstream ifs(filename);
+            boost::archive::xml_iarchive ia(ifs);
+            ia >> BOOST_SERIALIZATION_NVP(fs2);
+        }
+
+        // 验证反序列化的对象是保存时的状态，不受后续修改影响
+        CHECK_EQ(fs2.name(), "MODIFY_TEST");
+        CHECK_EQ(fs2.size(), 1);
+        CHECK_UNARY(fs2.have("MA5"));
+        CHECK_FALSE(fs2.have("MA10"));
+    }
+
+    // 测试Block为空的序列化
+    SUBCASE("Empty Block serialization") {
+        FactorSet fs1("NO_BLOCK_TEST", KQuery::DAY);
+
+        {
+            std::ofstream ofs(filename);
+            boost::archive::xml_oarchive oa(ofs);
+            oa << BOOST_SERIALIZATION_NVP(fs1);
+        }
+
+        FactorSet fs2;
+        {
+            std::ifstream ifs(filename);
+            boost::archive::xml_iarchive ia(ifs);
+            ia >> BOOST_SERIALIZATION_NVP(fs2);
+        }
+
+        CHECK_EQ(fs1.name(), fs2.name());
+        CHECK_EQ(fs1.ktype(), fs2.ktype());
+        CHECK_EQ(fs1.size(), fs2.size());
+        CHECK_UNARY(fs2.block().isNull());
+    }
+}
+
+#endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 /** @} */

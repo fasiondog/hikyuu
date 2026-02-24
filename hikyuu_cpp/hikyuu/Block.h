@@ -136,7 +136,7 @@ public:
 
     /** 是否为空 */
     bool empty() const noexcept {
-        return size() ? false : true;
+        return size() == 0;
     }
 
     /** 清除包含的所有证券 */

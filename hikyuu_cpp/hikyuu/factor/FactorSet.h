@@ -193,6 +193,43 @@ private:
 
 private:
     static shared_ptr<Data> ms_null_factorset;
+
+#if HKU_SUPPORT_SERIALIZATION
+private:
+    friend class boost::serialization::access;
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
+        string name = this->name();
+        ar& BOOST_SERIALIZATION_NVP(name);
+        string ktype = this->ktype();
+        ar& BOOST_SERIALIZATION_NVP(ktype);
+        Block block = this->block();
+        ar& BOOST_SERIALIZATION_NVP(block);
+        FactorList factors = this->getAllFactors();
+        ar& BOOST_SERIALIZATION_NVP(factors);
+    }
+
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        string name;
+        string ktype;
+        Block block;
+        ar& BOOST_SERIALIZATION_NVP(name);
+        ar& BOOST_SERIALIZATION_NVP(ktype);
+        ar& BOOST_SERIALIZATION_NVP(block);
+        FactorList factors;
+        ar& BOOST_SERIALIZATION_NVP(factors);
+        this->m_data = make_shared<Data>();
+        this->m_data->name = name;
+        this->m_data->ktype = ktype;
+        this->m_data->block = block;
+        for (auto& factor : factors) {
+            this->add(std::move(factor));
+        }
+    }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
 typedef vector<FactorSet> FactorSetList;
