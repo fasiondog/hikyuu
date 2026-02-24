@@ -204,6 +204,9 @@ MultiFactorPtr MultiFactorBase::clone() {
         p->m_inds.emplace_back(ind.clone());
     }
 
+    if (m_norm) {
+        p->m_norm = m_norm->clone();
+    }
     for (const auto& [name, norm] : m_special_norms) {
         p->m_special_norms[name] = norm->clone();
     }

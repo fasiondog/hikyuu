@@ -229,6 +229,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_stks);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
+        ar& BOOST_SERIALIZATION_NVP(m_norm);
         ar& BOOST_SERIALIZATION_NVP(m_special_norms);
         ar& BOOST_SERIALIZATION_NVP(m_special_category);
         // 以下不需要保存，加载后重新计算
@@ -249,6 +250,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_stks);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
+        ar& BOOST_SERIALIZATION_NVP(m_norm);
         ar& BOOST_SERIALIZATION_NVP(m_special_norms);
         ar& BOOST_SERIALIZATION_NVP(m_special_category);
         // ar& BOOST_SERIALIZATION_NVP(m_stk_map);
