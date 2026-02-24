@@ -11,6 +11,8 @@
 
 namespace hku {
 
+MultiFactorPtr HKU_API MF_ICWeight();
+
 /**
  * @brief 滚动IC权重合成因子
  * @param inds 原始因子列表
@@ -24,10 +26,29 @@ namespace hku {
  * @param save_all_factors 是否保留因子数据
  * @return MultiFactorPtr
  */
-MultiFactorPtr HKU_API MF_ICWeight(const IndicatorList& inds, const StockList& stks,
-                                   const KQuery& query, const Stock& ref_stk = Stock(),
-                                   int ic_n = 5, int ic_rolling_n = 120, bool spearman = true,
-                                   int mode = 0, bool save_all_factors = false);
-MultiFactorPtr HKU_API MF_ICWeight();
+MultiFactorPtr HKU_API MF_ICWeight(const StockList& stks, const KQuery& query,
+                                   const Stock& ref_stk = Stock(), int ic_n = 5,
+                                   int ic_rolling_n = 120, bool spearman = true, int mode = 0,
+                                   bool save_all_factors = false);
+
+inline MultiFactorPtr MF_ICWeight(const IndicatorList& inds, const StockList& stks,
+                                  const KQuery& query, const Stock& ref_stk = Stock(), int ic_n = 5,
+                                  int ic_rolling_n = 120, bool spearman = true, int mode = 0,
+                                  bool save_all_factors = false) {
+    auto ret =
+      MF_ICWeight(stks, query, ref_stk, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+    ret->setRefIndicators(inds);
+    return ret;
+}
+
+inline MultiFactorPtr MF_ICWeight(const FactorSet& factorset, const StockList& stks,
+                                  const KQuery& query, const Stock& ref_stk = Stock(), int ic_n = 5,
+                                  int ic_rolling_n = 120, bool spearman = true, int mode = 0,
+                                  bool save_all_factors = false) {
+    auto ret =
+      MF_ICWeight(stks, query, ref_stk, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+    ret->setRefFactorSet(factorset);
+    return ret;
+}
 
 }  // namespace hku

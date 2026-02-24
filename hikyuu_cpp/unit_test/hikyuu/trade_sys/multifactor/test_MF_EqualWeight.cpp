@@ -66,10 +66,10 @@ TEST_CASE("test_MF_EqualWeight") {
     CHECK_THROWS_AS(MF_EqualWeight(src_inds, {Null<Stock>()}, query, ref_stk), std::exception);
 
     /** @arg 输入的原始因子列表为空 */
-    CHECK_THROWS_AS(MF_EqualWeight({}, stks, query, ref_stk), std::exception);
+    CHECK_THROWS_AS(MF_EqualWeight(IndicatorList{}, stks, query, ref_stk), std::exception);
 
     /** @arg 输入的参考证券为空 */
-    CHECK_THROWS_AS(MF_EqualWeight({}, stks, query, Null<Stock>()), std::exception);
+    CHECK_THROWS_AS(MF_EqualWeight(IndicatorList{}, stks, query, Null<Stock>()), std::exception);
 
     /** @arg 数据长度不足 */
     CHECK_THROWS_AS(MF_EqualWeight(src_inds, stks, KQuery(-1), ref_stk), std::exception);

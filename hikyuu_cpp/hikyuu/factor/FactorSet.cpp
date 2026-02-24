@@ -175,7 +175,8 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
 
     const auto& factors = m_data->m_factors;
     global_parallel_for_index_void(0, factor_total, [&](size_t i) {
-        IndicatorList factor_values = factors[i].getValues(stocks, query, false);
+        IndicatorList factor_values =
+          factors[i].getValues(stocks, query, align, fill_null, tovalue);
         for (size_t j = 0; j < stk_total; ++j) {
             result[j][i] = std::move(factor_values[j]);
         }

@@ -19,9 +19,9 @@ class WeightMultiFactor : public MultiFactorBase {
 
 public:
     WeightMultiFactor();
-    WeightMultiFactor(const vector<Indicator>& inds, const PriceList& weights,
-                      const StockList& stks, const KQuery& query, const Stock& ref_stk, int ic_n,
-                      bool spearman, int mode, bool save_all_factors);
+    WeightMultiFactor(const PriceList& weights, const StockList& stks, const KQuery& query,
+                      const Stock& ref_stk, int ic_n, bool spearman, int mode,
+                      bool save_all_factors);
     virtual ~WeightMultiFactor() override = default;
 
 private:

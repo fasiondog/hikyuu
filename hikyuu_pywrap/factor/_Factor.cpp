@@ -50,7 +50,7 @@ void export_Factor(py::module& m) {
       .def("save_to_db", &Factor::save_to_db, "保存因子元数据")
       .def("remove_from_db", &Factor::remove_from_db, "删除因子元数据")
       .def("get_all_values", &Factor::getAllValues, py::arg("query"), py::arg("align") = false,
-           py::arg("fill_null") = false, py::arg("tovalue") = true)
+           py::arg("fill_null") = false, py::arg("tovalue") = false)
       .def(
         "get_values",
         [](Factor& self, const py::object& stks, const KQuery& query, bool align, bool fill_null,
@@ -59,7 +59,7 @@ void export_Factor(py::module& m) {
                                   tovalue, check);
         },
         py::arg("stocks"), py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
-        py::arg("tovalue") = true, py::arg("check") = false)
+        py::arg("tovalue") = false, py::arg("check") = false)
 
       .def(py::hash(py::self))
 

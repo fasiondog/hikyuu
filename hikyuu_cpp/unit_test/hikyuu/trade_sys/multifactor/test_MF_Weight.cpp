@@ -40,10 +40,11 @@ TEST_CASE("test_MF_Weight") {
     CHECK_THROWS_AS(MF_Weight(src_inds, weights, {Null<Stock>()}, query, ref_stk), std::exception);
 
     /** @arg 输入的原始因子列表为空 */
-    CHECK_THROWS_AS(MF_Weight({}, weights, stks, query, ref_stk), std::exception);
+    CHECK_THROWS_AS(MF_Weight(IndicatorList{}, weights, stks, query, ref_stk), std::exception);
 
     /** @arg 输入的参考证券为空 */
-    CHECK_THROWS_AS(MF_Weight({}, weights, stks, query, Null<Stock>()), std::exception);
+    CHECK_THROWS_AS(MF_Weight(IndicatorList{}, weights, stks, query, Null<Stock>()),
+                    std::exception);
 
     /** @arg 数据长度不足 */
     CHECK_THROWS_AS(MF_Weight(src_inds, weights, stks, KQuery(-1), ref_stk), std::exception);

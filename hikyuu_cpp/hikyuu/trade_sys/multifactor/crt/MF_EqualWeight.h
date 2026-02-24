@@ -10,6 +10,8 @@
 
 namespace hku {
 
+MultiFactorPtr HKU_API MF_EqualWeight();
+
 /**
  * @brief 等权重合成因子
  * @param inds 原始因子列表
@@ -22,11 +24,27 @@ namespace hku {
  * @param save_all_factors 是否保留因子数据
  * @return MultiFactorPtr
  */
-MultiFactorPtr HKU_API MF_EqualWeight(const IndicatorList& inds, const StockList& stks,
-                                      const KQuery& query, const Stock& ref_stk = Stock(),
-                                      int ic_n = 5, bool spearman = true, int mode = 0,
-                                      bool save_all_factors = false);
 
-MultiFactorPtr HKU_API MF_EqualWeight();
+MultiFactorPtr HKU_API MF_EqualWeight(const StockList& stks, const KQuery& query,
+                                      const Stock& ref_stk, int ic_n, bool spearman, int mode,
+                                      bool save_all_factors);
+
+inline MultiFactorPtr MF_EqualWeight(const IndicatorList& inds, const StockList& stks,
+                                     const KQuery& query, const Stock& ref_stk = Stock(),
+                                     int ic_n = 5, bool spearman = true, int mode = 0,
+                                     bool save_all_factors = false) {
+    auto ret = MF_EqualWeight(stks, query, ref_stk, ic_n, spearman, mode, save_all_factors);
+    ret->setRefIndicators(inds);
+    return ret;
+}
+
+inline MultiFactorPtr MF_EqualWeight(const FactorSet& factset, const StockList& stks,
+                                     const KQuery& query, const Stock& ref_stk = Stock(),
+                                     int ic_n = 5, bool spearman = true, int mode = 0,
+                                     bool save_all_factors = false) {
+    auto ret = MF_EqualWeight(stks, query, ref_stk, ic_n, spearman, mode, save_all_factors);
+    ret->setRefFactorSet(factset);
+    return ret;
+}
 
 }  // namespace hku

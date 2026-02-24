@@ -33,10 +33,24 @@ IndicatorList FactorImp::getValues(const StockList& stocks, const KQuery& query,
                                    bool fill_null, bool tovalue) const {
     IndicatorList ret;
     HKU_IF_RETURN(stocks.empty(), ret);
-    ret = global_parallel_for_index(0, stocks.size(), [&, this](size_t i) {
-        auto k = stocks[i].getKData(query);
-        return m_formula(k);
-    });
+    if (align) {
+        DatetimeList dates = StockManager::instance().getTradingCalendar(query);
+        HKU_IF_RETURN(dates.empty(), ret);
+        auto null_ind = PRICELIST(PriceList(dates.size(), Null<price_t>()), dates);
+        ret = global_parallel_for_index(0, stocks.size(), [&, tovalue, this](size_t i) {
+            Indicator cur_ind;
+            auto k = stocks[i].getKData(query);
+            HKU_IF_RETURN(k.empty(), null_ind);
+            return tovalue ? ALIGN(m_formula, dates, fill_null)(k).getResult(0)
+                           : ALIGN(m_formula, dates, fill_null)(k);
+        });
+
+    } else {
+        ret = global_parallel_for_index(0, stocks.size(), [&, tovalue, this](size_t i) {
+            auto k = stocks[i].getKData(query);
+            return tovalue ? m_formula(k).getResult(0) : m_formula(k);
+        });
+    }
     return ret;
 }
 

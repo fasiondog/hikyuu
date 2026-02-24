@@ -106,10 +106,10 @@ MultiFactorBase::MultiFactorBase(const MultiFactorBase& base)
   m_ref_stk(base.m_ref_stk),
   m_query(base.m_query) {}
 
-MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stks,
-                                 const KQuery& query, const Stock& ref_stk, const string& name,
-                                 int ic_n, bool spearman, int mode, bool save_all_factors)
-: m_name(name), m_inds(inds), m_stks(stks), m_ref_stk(ref_stk), m_query(query) {
+MultiFactorBase::MultiFactorBase(const StockList& stks, const KQuery& query, const Stock& ref_stk,
+                                 const string& name, int ic_n, bool spearman, int mode,
+                                 bool save_all_factors)
+: m_name(name), m_stks(stks), m_ref_stk(ref_stk), m_query(query) {
     initParam();
     setParam<bool>("use_spearman", spearman);
     setParam<int>("ic_n", ic_n);
@@ -117,7 +117,7 @@ MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stk
     setParam<bool>("save_all_factors", save_all_factors);
     checkParam("ic_n");
     checkParam("mode");
-    _checkData();
+    // _checkData();
 }
 
 void MultiFactorBase::initParam() {
@@ -145,7 +145,7 @@ void MultiFactorBase::paramChanged() {
 }
 
 void MultiFactorBase::_checkData() {
-    HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
+    HKU_CHECK(!m_inds.empty() || !m_factorset.empty(), "Input source factor list is empty!");
 
     // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
     for (const auto& stk : m_stks) {
@@ -252,13 +252,15 @@ void MultiFactorBase::setRefIndicators(const IndicatorList& inds) {
     HKU_CHECK(!inds.empty(), "Input source factor list is empty!");
     m_inds = inds;
     m_calculated = false;
+    _checkData();
 }
 
-void MultiFactorBase::setFactorSet(const FactorSet& factorset) {
-    HKU_CHECK(!factorset.isNull(), "Input factor set is null!");
+void MultiFactorBase::setRefFactorSet(const FactorSet& factorset) {
+    HKU_CHECK(!factorset.isNull() && !factorset.empty(), "Input factor set is null or empty!");
     m_factorset = factorset;
     m_inds.clear();
     m_calculated = false;
+    _checkData();
 }
 
 void MultiFactorBase::setNormalize(NormPtr norm) {
@@ -659,67 +661,98 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     HKU_IF_RETURN(stk_count == 0, all_stk_inds);
     all_stk_inds.resize(stk_count);
 
+    bool use_factorset = m_inds.empty();
+    size_t ind_count = use_factorset ? m_factorset.size() : m_inds.size();
+    HKU_IF_RETURN(ind_count == 0, all_stk_inds);
+
     size_t days_total = m_ref_dates.size();
     auto null_ind = PRICELIST(PriceList(days_total, Null<price_t>()), m_ref_dates);
 
     bool fill_null = getParam<bool>("fill_null");
-    size_t ind_count = m_inds.size();
+
+    if (use_factorset) {
+        // getValues(const StockList& stocks, const KQuery& query, bool align = false,
+        //           bool fill_null = false, bool tovalue = true, bool check = false) const;
+        all_stk_inds = m_factorset.getValues(m_stks, m_query, true, fill_null, true, true);
+
+    } else {
+        global_parallel_for_index_void(
+          0, stk_count, [this, &all_stk_inds, &null_ind, ind_count, fill_null](size_t i) {
+              const auto& stk = m_stks[i];
+              auto kdata = stk.getKData(m_query);
+#if 1
+              auto& cur_stk_inds = all_stk_inds[i];
+              cur_stk_inds.resize(ind_count);
+              if (kdata.size() == 0) {
+                  for (size_t j = 0; j < ind_count; j++) {
+                      cur_stk_inds[j] = null_ind;
+                      cur_stk_inds[j].name(m_inds[j].name());
+                  }
+              } else {
+                  cur_stk_inds.resize(ind_count);
+                  for (size_t j = 0; j < ind_count; j++) {
+                      cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null);
+                  }
+                  cur_stk_inds = combineCalculateIndicators(cur_stk_inds, kdata, true);
+              }
+
+            //   for (auto& [name, styles] : m_special_style_inds) {
+            //       auto& cur_style_inds = use_style_inds[name];
+            //       if (kdata.size() == 0) {
+            //           for (size_t j = 0; j < styles.size(); j++) {
+            //               cur_style_inds[j] = null_ind;
+            //               cur_style_inds[j].name(name);
+            //           }
+            //       } else {
+            //           for (size_t j = 0; j < styles.size(); j++) {
+            //               cur_style_inds[j] = ALIGN(styles[j], m_ref_dates, fill_null);
+            //           }
+            //           cur_style_inds = combineCalculateIndicators(cur_style_inds, kdata, true);
+            //       }
+            //   }
+#else
+              auto& cur_stk_inds = all_stk_inds[i];
+              cur_stk_inds.resize(ind_count);
+              if (kdata.size() == 0) {
+                  for (size_t j = 0; j < ind_count; j++) {
+                      cur_stk_inds[j] = null_ind;
+                      cur_stk_inds[j].name(m_inds[j].name());
+                  }
+              } else {
+                  for (size_t j = 0; j < ind_count; j++) {
+                      cur_stk_inds[j] =
+                        ALIGN(m_inds[j], m_ref_dates, fill_null)(kdata).getResult(0);
+                      cur_stk_inds[j].name(m_inds[j].name());
+                  }
+              }
+
+              for (auto& [name, styles] : m_special_style_inds) {
+                  auto& cur_style_inds = use_style_inds[name];
+                  if (kdata.size() == 0) {
+                      for (size_t j = 0; j < styles.size(); j++) {
+                          cur_style_inds[j] = null_ind;
+                          cur_style_inds[j].name(name);
+                      }
+                  } else {
+                      for (size_t j = 0; j < styles.size(); j++) {
+                          cur_style_inds[j] =
+                            ALIGN(styles[j], m_ref_dates, fill_null)(kdata).getResult(0);
+                          cur_style_inds[j].name(name);
+                      }
+                  }
+              }
+#endif
+          });
+    }
 
     unordered_map<string, IndicatorList> use_style_inds;
     for (const auto& [name, style_inds] : m_special_style_inds) {
         use_style_inds[name] = IndicatorList(style_inds.size());
     }
-
     global_parallel_for_index_void(
-      0, stk_count,
-      [this, &all_stk_inds, &null_ind, &use_style_inds, ind_count, fill_null](size_t i) {
+      0, stk_count, [this, &null_ind, &use_style_inds, fill_null](size_t i) {
           const auto& stk = m_stks[i];
           auto kdata = stk.getKData(m_query);
-#if 1
-          auto& cur_stk_inds = all_stk_inds[i];
-          cur_stk_inds.resize(ind_count);
-          if (kdata.size() == 0) {
-              for (size_t j = 0; j < ind_count; j++) {
-                  cur_stk_inds[j] = null_ind;
-                  cur_stk_inds[j].name(m_inds[j].name());
-              }
-          } else {
-              cur_stk_inds.resize(ind_count);
-              for (size_t j = 0; j < ind_count; j++) {
-                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null);
-              }
-              cur_stk_inds = combineCalculateIndicators(cur_stk_inds, kdata, true);
-          }
-
-          for (auto& [name, styles] : m_special_style_inds) {
-              auto& cur_style_inds = use_style_inds[name];
-              if (kdata.size() == 0) {
-                  for (size_t j = 0; j < styles.size(); j++) {
-                      cur_style_inds[j] = null_ind;
-                      cur_style_inds[j].name(name);
-                  }
-              } else {
-                  for (size_t j = 0; j < styles.size(); j++) {
-                      cur_style_inds[j] = ALIGN(styles[j], m_ref_dates, fill_null);
-                  }
-                  cur_style_inds = combineCalculateIndicators(cur_style_inds, kdata, true);
-              }
-          }
-#else
-          auto& cur_stk_inds = all_stk_inds[i];
-          cur_stk_inds.resize(ind_count);
-          if (kdata.size() == 0) {
-              for (size_t j = 0; j < ind_count; j++) {
-                  cur_stk_inds[j] = null_ind;
-                  cur_stk_inds[j].name(m_inds[j].name());
-              }
-          } else {
-              for (size_t j = 0; j < ind_count; j++) {
-                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null)(kdata).getResult(0);
-                  cur_stk_inds[j].name(m_inds[j].name());
-              }
-          }
-
           for (auto& [name, styles] : m_special_style_inds) {
               auto& cur_style_inds = use_style_inds[name];
               if (kdata.size() == 0) {
@@ -735,7 +768,6 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   }
               }
           }
-#endif
       });
 
     // 时间截面标准化/归一化

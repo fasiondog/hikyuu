@@ -32,8 +32,8 @@ public:
      * @return stocks * inds 的列表, 按证券顺序
      */
     vector<IndicatorList> getValues(const StockList& stocks, const KQuery& query,
-                                    bool align = false, bool fill_null = false, bool tovalue = true,
-                                    bool check = false) const;
+                                    bool align = false, bool fill_null = false,
+                                    bool tovalue = false, bool check = false) const;
 
     /**
      * 获取所有因子的指定查询参数的计算结果
@@ -41,7 +41,7 @@ public:
      * @return 所有因子的计算结果
      */
     vector<IndicatorList> getAllValues(const KQuery& query, bool align = false,
-                                       bool fill_null = false, bool tovalue = true) const;
+                                       bool fill_null = false, bool tovalue = false) const;
 
     //------------------------
     // 基本属性

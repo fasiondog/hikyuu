@@ -28,9 +28,8 @@ public:
 public:
     MultiFactorBase();
     explicit MultiFactorBase(const string& name);
-    MultiFactorBase(const IndicatorList& inds, const StockList& stks, const KQuery& query,
-                    const Stock& ref_stk, const string& name, int ic_n, bool spearman, int mode,
-                    bool save_all_factors);
+    MultiFactorBase(const StockList& stks, const KQuery& query, const Stock& ref_stk,
+                    const string& name, int ic_n, bool spearman, int mode, bool save_all_factors);
     MultiFactorBase(const MultiFactorBase&);
     virtual ~MultiFactorBase() = default;
 
@@ -83,7 +82,7 @@ public:
 
     /** 设置因子列表 */
     void setRefIndicators(const IndicatorList& inds);
-    void setFactorSet(const FactorSet& factorset);
+    void setRefFactorSet(const FactorSet& factorset);
 
     /** 获取指定证券合成因子 */
     const Indicator& getFactor(const Stock&);

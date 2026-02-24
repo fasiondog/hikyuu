@@ -58,7 +58,7 @@ void export_FactorSet(py::module& m) {
                                   tovalue, check);
         },
         py::arg("stocks"), py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
-        py::arg("tovalue") = true, py::arg("check") = false)
+        py::arg("tovalue") = false, py::arg("check") = false)
 
       .def("__getitem__", py::overload_cast<const string&>(&FactorSet::get, py::const_),
            py::return_value_policy::copy)

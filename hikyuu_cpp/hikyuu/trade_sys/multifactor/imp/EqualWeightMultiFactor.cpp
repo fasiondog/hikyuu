@@ -17,11 +17,10 @@ namespace hku {
 
 EqualWeightMultiFactor::EqualWeightMultiFactor() : MultiFactorBase("MF_EqualWeight") {}
 
-EqualWeightMultiFactor::EqualWeightMultiFactor(const vector<Indicator>& inds, const StockList& stks,
-                                               const KQuery& query, const Stock& ref_stk, int ic_n,
-                                               bool spearman, int mode, bool save_all_factors)
-: MultiFactorBase(inds, stks, query, ref_stk, "MF_EqualWeight", ic_n, spearman, mode,
-                  save_all_factors) {}
+EqualWeightMultiFactor::EqualWeightMultiFactor(const StockList& stks, const KQuery& query,
+                                               const Stock& ref_stk, int ic_n, bool spearman,
+                                               int mode, bool save_all_factors)
+: MultiFactorBase(stks, query, ref_stk, "MF_EqualWeight", ic_n, spearman, mode, save_all_factors) {}
 
 IndicatorList EqualWeightMultiFactor::_calculate(const vector<IndicatorList>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
@@ -61,10 +60,10 @@ MultiFactorPtr HKU_API MF_EqualWeight() {
     return make_shared<EqualWeightMultiFactor>();
 }
 
-MultiFactorPtr HKU_API MF_EqualWeight(const IndicatorList& inds, const StockList& stks,
-                                      const KQuery& query, const Stock& ref_stk, int ic_n,
-                                      bool spearman, int mode, bool save_all_factors) {
-    return make_shared<EqualWeightMultiFactor>(inds, stks, query, ref_stk, ic_n, spearman, mode,
+MultiFactorPtr HKU_API MF_EqualWeight(const StockList& stks, const KQuery& query,
+                                      const Stock& ref_stk, int ic_n, bool spearman, int mode,
+                                      bool save_all_factors) {
+    return make_shared<EqualWeightMultiFactor>(stks, query, ref_stk, ic_n, spearman, mode,
                                                save_all_factors);
 }
 
