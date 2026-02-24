@@ -200,7 +200,11 @@ MultiFactorPtr MultiFactorBase::clone() {
     p->m_query = m_query;
 
     p->m_factorset = m_factorset;
-    p->m_norm = m_norm->clone();
+
+    if (m_norm) {
+        p->m_norm = m_norm->clone();
+    }
+
     for (const auto& [name, norm] : m_special_norms) {
         p->m_special_norms[name] = norm->clone();
     }
