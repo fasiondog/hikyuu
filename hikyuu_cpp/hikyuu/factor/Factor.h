@@ -166,16 +166,24 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
-        ar& BOOST_SERIALIZATION_NVP(name());
-        ar& BOOST_SERIALIZATION_NVP(ktype());
+        string name = this->name();
+        ar& BOOST_SERIALIZATION_NVP(name);
+        string ktype = this->ktype();
+        ar& BOOST_SERIALIZATION_NVP(ktype);
         Indicator formula = this->formula();
         ar& BOOST_SERIALIZATION_NVP(formula);
-        ar& BOOST_SERIALIZATION_NVP(startDate());
-        ar& BOOST_SERIALIZATION_NVP(block());
-        ar& BOOST_SERIALIZATION_NVP(createAt());
-        ar& BOOST_SERIALIZATION_NVP(updateAt());
-        ar& BOOST_SERIALIZATION_NVP(brief());
-        ar& BOOST_SERIALIZATION_NVP(details());
+        Datetime startDate = this->startDate();
+        ar& BOOST_SERIALIZATION_NVP(startDate);
+        Block block = this->block();
+        ar& BOOST_SERIALIZATION_NVP(block);
+        Datetime createAt = this->createAt();
+        ar& BOOST_SERIALIZATION_NVP(createAt);
+        Datetime updateAt = this->updateAt();
+        ar& BOOST_SERIALIZATION_NVP(updateAt);
+        string brief = this->brief();
+        ar& BOOST_SERIALIZATION_NVP(brief);
+        string details = this->details();
+        ar& BOOST_SERIALIZATION_NVP(details);
         bool needPersist = this->needPersist();
         ar& BOOST_SERIALIZATION_NVP(needPersist);
     }
@@ -185,26 +193,34 @@ private:
         string name;
         string ktype;
         Indicator formula;
-        Datetime start_date;
+        Datetime startDate;
         Block block;
-        Datetime create_at;
-        Datetime update_at;
+        Datetime createAt;
+        Datetime updateAt;
         string brief;
         string details;
-        bool need_persist;
+        bool needPersist;
         ar& BOOST_SERIALIZATION_NVP(name);
         ar& BOOST_SERIALIZATION_NVP(ktype);
         ar& BOOST_SERIALIZATION_NVP(formula);
-        ar& BOOST_SERIALIZATION_NVP(start_date);
+        ar& BOOST_SERIALIZATION_NVP(startDate);
         ar& BOOST_SERIALIZATION_NVP(block);
-        ar& BOOST_SERIALIZATION_NVP(create_at);
-        ar& BOOST_SERIALIZATION_NVP(update_at);
+        ar& BOOST_SERIALIZATION_NVP(createAt);
+        ar& BOOST_SERIALIZATION_NVP(updateAt);
         ar& BOOST_SERIALIZATION_NVP(brief);
         ar& BOOST_SERIALIZATION_NVP(details);
-        ar& BOOST_SERIALIZATION_NVP(need_persist);
-        *this = Factor(name, formula, ktype, brief, details, need_persist, start_date, block);
-        this->load_from_db();
+        ar& BOOST_SERIALIZATION_NVP(needPersist);
+        if (name.empty() || ktype.empty()) {
+            m_imp = ms_null_factor_imp;
+            return;
+        }
+        this->m_imp = make_shared<FactorImp>(name, formula, ktype, brief, details, needPersist,
+                                             startDate, block);
+        this->createAt(createAt);
+        this->updateAt(updateAt);
     }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
