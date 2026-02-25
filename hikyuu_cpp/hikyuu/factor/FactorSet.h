@@ -117,7 +117,8 @@ public:
         using pointer = const Factor*;
         using reference = const Factor&;
 
-        const_iterator(const typename vector<Factor>::const_iterator& iter) : m_iter(iter) {}
+        explicit const_iterator(const typename vector<Factor>::const_iterator& iter)
+        : m_iter(iter) {}
 
         reference operator*() const {
             return *m_iter;
@@ -132,11 +133,11 @@ public:
             return *this;
         }
 
-        const_iterator operator++(int) {
-            const_iterator temp = *this;
-            ++m_iter;
-            return temp;
-        }
+        // const_iterator operator++(int) {
+        //     const_iterator temp = *this;
+        //     ++m_iter;
+        //     return temp;
+        // }
 
         bool operator==(const const_iterator& other) const {
             return m_iter == other.m_iter;

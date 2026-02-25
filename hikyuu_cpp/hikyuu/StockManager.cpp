@@ -425,11 +425,11 @@ void StockManager::reload() {
     m_initializing = false;
 }
 
-string StockManager::tmpdir() const {
+const string& StockManager::tmpdir() const {
     return m_tmpdir;
 }
 
-string StockManager::datadir() const {
+const string& StockManager::datadir() const {
     return m_datadir;
 }
 
@@ -507,7 +507,7 @@ StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
 vector<StockTypeInfo> StockManager::getStockTypeInfoList() const {
     vector<StockTypeInfo> result;
     result.reserve(m_stockTypeInfo.size());
-    for (auto& item : m_stockTypeInfo) {
+    for (const auto& item : m_stockTypeInfo) {
         result.push_back(item.second);
     }
     return result;
@@ -555,7 +555,7 @@ BlockList StockManager::getBlockList() {
 BlockList StockManager::getBlockListByIndexStock(const Stock& stk) {
     BlockList all = getBlockList();
     BlockList result;
-    for (auto& blk : all) {
+    for (const auto& blk : all) {
         if (blk.getIndexStock() == stk) {
             result.push_back(blk);
         }
@@ -575,14 +575,14 @@ DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string&
 
 DatetimeList StockManager::getTradingCalendar(const StockList& stk_list, const KQuery& query) {
     std::unordered_set<string> markets;
-    for (auto& stk : stk_list) {
+    for (const auto& stk : stk_list) {
         if (!stk.isNull()) {
             markets.insert(stk.market());
         }
     }
 
     std::set<Datetime> date_set;
-    for (auto& market : markets) {
+    for (const auto& market : markets) {
         DatetimeList temp = getTradingCalendar(query, market);
         if (temp.size() > 0) {
             date_set.insert(temp.begin(), temp.end());
@@ -591,7 +591,7 @@ DatetimeList StockManager::getTradingCalendar(const StockList& stk_list, const K
 
     DatetimeList result;
     result.reserve(date_set.size());
-    for (auto& date : date_set) {
+    for (const auto& date : date_set) {
         result.push_back(date);
     }
 
@@ -690,7 +690,7 @@ void StockManager::loadAllStocks() {
 
     auto base_ktypes = KQuery::getBaseKTypeList();
     vector<KQuery::KType> preload_ktypes;
-    for (auto& ktype : base_ktypes) {
+    for (const auto& ktype : base_ktypes) {
         auto nktype = ktype;
         to_lower(nktype);
         if (m_preloadParam.tryGet<bool>(nktype, false)) {

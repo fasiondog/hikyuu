@@ -80,10 +80,10 @@ public:
      * 获取用于保存零时变量等的临时目录，如为配置则为当前目录
      * 由m_config中的“tmpdir”指定
      */
-    string tmpdir() const;
+    const string& tmpdir() const;
 
     /** 获取数据目录 */
-    string datadir() const;
+    const string& datadir() const;
 
     /** 获取证券数量 */
     size_t size() const noexcept;

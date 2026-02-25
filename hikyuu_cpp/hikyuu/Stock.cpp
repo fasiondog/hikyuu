@@ -427,10 +427,9 @@ bool Stock::isPreload(KQuery::KType ktype) const noexcept {
     return m_data->m_ktype_preload.find(ktype) != m_data->m_ktype_preload.end();
 }
 
-void Stock::releaseKDataBuffer(KQuery::KType inkType) const {
+void Stock::releaseKDataBuffer(KQuery::KType ktype) const {
     HKU_IF_RETURN(!m_data, void());
 
-    string ktype(inkType);
     to_upper(ktype);
     HKU_IF_RETURN(m_data->pMutex.find(ktype) == m_data->pMutex.end(), void());
 
@@ -452,14 +451,12 @@ void Stock::releaseKDataBuffer(KQuery::KType inkType) const {
 }
 
 // 仅在初始化时调用
-void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
+void Stock::loadKDataToBuffer(KQuery::KType kType) const {
     HKU_IF_RETURN(!m_data || !m_kdataDriver, void());
 
-    string kType(inkType);
     to_upper(kType);
     HKU_IF_RETURN(m_data->pMutex.find(kType) == m_data->pMutex.end(), void());
 
-    int64_t start = 0;
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
 
@@ -473,7 +470,7 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) const {
         int64_t max_num = param.tryGet<int64_t>(preload_type, 4096);
         HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type,
                             max_num);
-        start = total <= (size_t)max_num ? 0 : total - max_num;
+        int64_t start = total <= (size_t)max_num ? 0 : total - max_num;
         query = KQuery(start, Null<int64_t>(), kType);
         if (driver->isColumnFirst() && market_code() != "SH000001") {
             Stock sh000001 = StockManager::instance().getStock("SH000001");
@@ -582,11 +579,10 @@ size_t Stock::getCount(KQuery::KType ktype) const {
     return 0;
 }
 
-price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) const {
+price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) const {
     HKU_IF_RETURN(isNull(), 0.0);
     HKU_IF_RETURN(!valid() && datetime > lastDatetime(), 0.0);
 
-    string ktype(inktype);
     to_upper(ktype);
 
     if (KQuery::isBaseKType(ktype)) {
@@ -1071,7 +1067,7 @@ DatetimeList Stock::getDatetimeList(const KQuery& query) const {
     DatetimeList result;
     KRecordList k_list = getKRecordList(query);
     result.reserve(k_list.size());
-    for (auto& k : k_list) {
+    for (const auto& k : k_list) {
         result.push_back(k.datetime);  // cppcheck-suppress useStlAlgorithm
     }
     return result;

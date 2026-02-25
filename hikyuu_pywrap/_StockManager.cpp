@@ -38,11 +38,12 @@ void export_StockManager(py::module& m) {
 
       .def("reload", &StockManager::reload, "重新加载所有证券数据")
 
-      .def("tmpdir", &StockManager::tmpdir, R"(tmpdir(self) -> str
+      .def("tmpdir", &StockManager::tmpdir, py::return_value_policy::copy, R"(tmpdir(self) -> str
 
     获取用于保存零时变量等的临时目录，如未配置则为当前目录 由m_config中的“tmpdir”指定)")
 
-      .def("datadir", &StockManager::datadir, R"(datadir(self) -> str
+      .def("datadir", &StockManager::datadir, py::return_value_policy::copy,
+           R"(datadir(self) -> str
 
     获取财务数据存放路径)")
 

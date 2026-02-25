@@ -142,7 +142,7 @@ public:
     }
 
     /** 当前线程是否为工作线程 */
-    bool is_work_thread() const {
+    static bool is_work_thread() {
         return m_local_work_queue != nullptr;
     }
 

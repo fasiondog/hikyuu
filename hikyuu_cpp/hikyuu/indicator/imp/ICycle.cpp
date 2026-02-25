@@ -237,7 +237,7 @@ void ICycle::_calculate(const Indicator& data) {
     PriceList buf(datelist.size());
     if ("query" == adjust_mode || "day" == adjust_mode) {
         size_t cur_adjust_ix = 0;
-        for (size_t i = 0, total = datelist.size(); i < total; i++) {
+        for (size_t i = 0, len = datelist.size(); i < len; i++) {
             bool adjust = false;
             if (i == cur_adjust_ix) {
                 adjust = true;

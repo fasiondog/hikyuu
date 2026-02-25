@@ -41,9 +41,9 @@ void IRecover::checkInputIndicator(const Indicator& ind) {
     HKU_CHECK(dynamic_cast<IKData*>(ind.getImp().get()) != nullptr,
               "Only the following indicators are accepted: OPEN|HIGH|CLOSE|LOW");
     string part = ind.getParam<string>("kpart");
-    HKU_CHECK(
-      part == "CLOSE" || part == "OPEN" || part == "HIGH" || part == "LOW" || "AMO" || "VOL",
-      "Only the following indicators are accepted: OPEN|HIGH|CLOSE|LOW");
+    HKU_CHECK(part == "CLOSE" || part == "OPEN" || part == "HIGH" || part == "LOW" ||
+                part == "AMO" || part == "VOL",
+              "Only the following indicators are accepted: OPEN|HIGH|CLOSE|LOW");
 }
 
 void IRecover::_calculate(const Indicator& ind) {

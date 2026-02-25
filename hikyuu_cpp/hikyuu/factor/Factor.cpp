@@ -50,12 +50,9 @@ Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType
 : m_data(make_shared<Data>(name, formula, ktype, brief, details, need_persist, start_date, block)) {
 }
 
-Factor::Factor(const Factor& other) {
-    m_data = other.m_data;
-}
+Factor::Factor(const Factor& other) : m_data(other.m_data) {}
 
-Factor::Factor(Factor&& other) {
-    m_data = std::move(other.m_data);
+Factor::Factor(Factor&& other) : m_data(std::move(other.m_data)) {
     other.m_data = ms_null_data;
 }
 
