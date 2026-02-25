@@ -12,22 +12,99 @@
 namespace hku {
 
 /**
- * @brief 滚动IC权重合成因子
- * @param inds 原始因子列表
- * @param stks 计算证券列表
- * @param query 日期范围
- * @param ref_stk 参考证券,用于日期对齐，未指定时为 sh000001
- * @param ic_n 默认 IC 对应的 N 日收益率
- * @param ic_rolling_n IC 滚动窗口
- * @param spearman 默认使用 spearman 计算相关系数，否则为 pearson
- * @param mode 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
- * @param save_all_factors 是否保留因子数据
- * @return MultiFactorPtr
+ * @brief 创建滚动IC权重多因子模型实例
+ * @ingroup MultiFactor
+ * @return MultiFactorPtr 滚动IC权重多因子模型指针
+ * @details 创建一个空的滚动IC权重多因子模型，需要后续设置因子集合
  */
-MultiFactorPtr HKU_API MF_ICWeight(const IndicatorList& inds, const StockList& stks,
-                                   const KQuery& query, const Stock& ref_stk = Stock(),
-                                   int ic_n = 5, int ic_rolling_n = 120, bool spearman = true,
-                                   int mode = 0, bool save_all_factors = false);
 MultiFactorPtr HKU_API MF_ICWeight();
+
+/**
+ * @brief 创建滚动IC权重多因子模型实例（完整参数版本）
+ * @ingroup MultiFactor
+ * @param stks 计算证券列表
+ * @param query 日期范围查询条件
+ * @param ref_stk 参考证券，用于日期对齐，默认为空（相当于SH000001）
+ * @param ic_n 默认IC对应的N日收益率周期，默认为5
+ * @param ic_rolling_n IC滚动窗口大小，默认为120
+ * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
+ * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
+ * @param save_all_factors 是否保留所有因子数据，默认为false
+ * @return MultiFactorPtr 滚动IC权重多因子模型指针
+ * @details 
+ * 创建滚动IC权重多因子模型实例，使用指定参数进行因子合成计算。
+ * 该模型基于滚动窗口内的IC值计算权重，适用于动态调整因子权重的场景。
+ * <pre>
+ * 示例：
+ * // 创建滚动IC权重模型
+ * auto mf = MF_ICWeight(stocks, query, Stock("SH000001"), 5, 120, true, 0, false);
+ * </pre>
+ */
+MultiFactorPtr HKU_API MF_ICWeight(const StockList& stks, const KQuery& query,
+                                   const Stock& ref_stk = Stock(), int ic_n = 5,
+                                   int ic_rolling_n = 120, bool spearman = true, int mode = 0,
+                                   bool save_all_factors = false);
+
+/**
+ * @brief 创建滚动IC权重多因子模型实例（使用因子集版本）
+ * @ingroup MultiFactor
+ * @param factorset 因子集合
+ * @param stks 计算证券列表
+ * @param query 日期范围查询条件
+ * @param ref_stk 参考证券，用于日期对齐，默认为空
+ * @param ic_n 默认IC对应的N日收益率周期，默认为5
+ * @param ic_rolling_n IC滚动窗口大小，默认为120
+ * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
+ * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
+ * @param save_all_factors 是否保留所有因子数据，默认为false
+ * @return MultiFactorPtr 滚动IC权重多因子模型指针
+ * @details 
+ * 创建滚动IC权重多因子模型实例，使用指定的因子集合进行计算。
+ * 该模型基于滚动窗口内的IC值计算权重，适用于动态调整因子权重的场景。
+ * <pre>
+ * 示例：
+ * // 使用因子集创建滚动IC权重模型
+ * auto mf = MF_ICWeight(factor_set, stocks, query);
+ * </pre>
+ */
+inline MultiFactorPtr MF_ICWeight(const FactorSet& factorset, const StockList& stks,
+                                  const KQuery& query, const Stock& ref_stk = Stock(), int ic_n = 5,
+                                  int ic_rolling_n = 120, bool spearman = true, int mode = 0,
+                                  bool save_all_factors = false) {
+    auto ret =
+      MF_ICWeight(stks, query, ref_stk, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+    ret->setRefFactorSet(factorset);
+    return ret;
+}
+
+/**
+ * @brief 创建滚动IC权重多因子模型实例（使用指标列表版本）
+ * @ingroup MultiFactor
+ * @param inds 指标列表，将自动转换为因子集
+ * @param stks 计算证券列表
+ * @param query 日期范围查询条件
+ * @param ref_stk 参考证券，用于日期对齐，默认为空
+ * @param ic_n 默认IC对应的N日收益率周期，默认为5
+ * @param ic_rolling_n IC滚动窗口大小，默认为120
+ * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
+ * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
+ * @param save_all_factors 是否保留所有因子数据，默认为false
+ * @return MultiFactorPtr 滚动IC权重多因子模型指针
+ * @details 
+ * 创建滚动IC权重多因子模型实例，使用指标列表自动构建因子集进行计算。
+ * 该模型基于滚动窗口内的IC值计算权重，适用于动态调整因子权重的场景。
+ * <pre>
+ * 示例：
+ * // 使用指标列表创建滚动IC权重模型
+ * auto mf = MF_ICWeight(indicators, stocks, query);
+ * </pre>
+ */
+inline MultiFactorPtr MF_ICWeight(const IndicatorList& inds, const StockList& stks,
+                                  const KQuery& query, const Stock& ref_stk = Stock(), int ic_n = 5,
+                                  int ic_rolling_n = 120, bool spearman = true, int mode = 0,
+                                  bool save_all_factors = false) {
+    return MF_ICWeight(FactorSet(inds, query.kType()), stks, query, ref_stk, ic_n, ic_rolling_n,
+                       spearman, mode, save_all_factors);
+}
 
 }  // namespace hku

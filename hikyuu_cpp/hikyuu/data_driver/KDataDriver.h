@@ -9,10 +9,10 @@
 #ifndef KDATADRIVER_H_
 #define KDATADRIVER_H_
 
-#include "../utilities/Parameter.h"
-#include "../KQuery.h"
-#include "../TimeLineRecord.h"
-#include "../TransRecord.h"
+#include "hikyuu/utilities/Parameter.h"
+#include "hikyuu/KQuery.h"
+#include "hikyuu/TimeLineRecord.h"
+#include "hikyuu/TransRecord.h"
 
 namespace hku {
 

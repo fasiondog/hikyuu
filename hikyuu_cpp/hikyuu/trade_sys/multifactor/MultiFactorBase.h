@@ -10,6 +10,7 @@
 #include "hikyuu/KData.h"
 #include "ScoresFilterBase.h"
 #include "buildin_norm.h"
+#include "hikyuu/factor/FactorSet.h"
 
 namespace hku {
 
@@ -27,9 +28,8 @@ public:
 public:
     MultiFactorBase();
     explicit MultiFactorBase(const string& name);
-    MultiFactorBase(const IndicatorList& inds, const StockList& stks, const KQuery& query,
-                    const Stock& ref_stk, const string& name, int ic_n, bool spearman, int mode,
-                    bool save_all_factors);
+    MultiFactorBase(const StockList& stks, const KQuery& query, const Stock& ref_stk,
+                    const string& name, int ic_n, bool spearman, int mode, bool save_all_factors);
     MultiFactorBase(const MultiFactorBase&);
     virtual ~MultiFactorBase() = default;
 
@@ -75,13 +75,13 @@ public:
         return m_stks.size();
     }
 
-    /** 获取原始因子公式列表 */
-    const IndicatorList& getRefIndicators() const {
-        return m_inds;
+    /** 获取原始因子集合 */
+    const FactorSet& getRefFactorSet() const {
+        return m_factorset;
     }
 
-    /** 设置因子列表 */
-    void setRefIndicators(const IndicatorList& inds);
+    /** 设置原始因子集合 */
+    void setRefFactorSet(const FactorSet& factorset);
 
     /** 获取指定证券合成因子 */
     const Indicator& getFactor(const Stock&);
@@ -191,10 +191,10 @@ protected:
 protected:
     bool m_is_python_object{false};
     string m_name;
-    IndicatorList m_inds;  // 输入的原始因子公式列表
-    StockList m_stks;      // 证券组合
-    Stock m_ref_stk;       // 指定的参考证券, 仅为对齐日期
-    KQuery m_query;        // 计算的日期范围条件
+    FactorSet m_factorset;  // 输入的原始因子集
+    StockList m_stks;       // 证券组合
+    Stock m_ref_stk;        // 指定的参考证券, 仅为对齐日期
+    KQuery m_query;         // 计算的日期范围条件
 
     NormPtr m_norm;                                    // 全局标准化/归一化操作
     unordered_map<string, NormPtr> m_special_norms;    // 对特定指标执行特定的标准化操作
@@ -225,13 +225,14 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_inds);
+        ar& BOOST_SERIALIZATION_NVP(m_factorset);
         ar& BOOST_SERIALIZATION_NVP(m_stks);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_norm);
         ar& BOOST_SERIALIZATION_NVP(m_special_norms);
         ar& BOOST_SERIALIZATION_NVP(m_special_category);
+        ar& BOOST_SERIALIZATION_NVP(m_special_style_inds);
         // 以下不需要保存，加载后重新计算
         // ar& BOOST_SERIALIZATION_NVP(m_stk_map);
         // ar& BOOST_SERIALIZATION_NVP(m_all_factors);
@@ -246,19 +247,21 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_inds);
+        ar& BOOST_SERIALIZATION_NVP(m_factorset);
         ar& BOOST_SERIALIZATION_NVP(m_stks);
         ar& BOOST_SERIALIZATION_NVP(m_ref_stk);
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_norm);
         ar& BOOST_SERIALIZATION_NVP(m_special_norms);
         ar& BOOST_SERIALIZATION_NVP(m_special_category);
+        ar& BOOST_SERIALIZATION_NVP(m_special_style_inds);
         // ar& BOOST_SERIALIZATION_NVP(m_stk_map);
         // ar& BOOST_SERIALIZATION_NVP(m_all_factors);
         // ar& BOOST_SERIALIZATION_NVP(m_date_index);
         // ar& BOOST_SERIALIZATION_NVP(m_ic);
         // ar& BOOST_SERIALIZATION_NVP(m_calculated);
         // ar& BOOST_SERIALIZATION_NVP(m_stk_factor_by_date);
+        m_calculated = false;
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

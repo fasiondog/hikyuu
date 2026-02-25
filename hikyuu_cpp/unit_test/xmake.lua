@@ -86,7 +86,7 @@ target("unit-test")
         add_cxflags("-wd4267", "-wd4996", "-wd4251", "-wd4244", "-wd4805", "-wd4566")
     else
         add_cxflags("-Wno-unused-variable",  "-Wno-missing-braces")
-        add_cxflags("-Wno-sign-compare")
+        add_cxflags("-Wno-sign-compare", "-Wno-self-assign-overloaded")
     end
     
     if is_plat("windows") and get_config("kind") == "shared" then
@@ -114,6 +114,7 @@ target("unit-test")
     add_files("./hikyuu/analysis/**.cpp", {unity_group="analysis"})
     add_files("./hikyuu/hikyuu/**.cpp", {unity_group="hikyuu"})
     add_files("./hikyuu/indicator/**.cpp", {unity_group="indicator"})
+    add_files("./hikyuu/factor/**.cpp", {unity_group="factor"})
     add_files("./hikyuu/serialization/**.cpp", {unity_group="serialization"})
     add_files("./hikyuu/trade_manage/**.cpp", {unity_group="trade_manage"})
     add_files("./hikyuu/trade_sys/allocatefunds/**.cpp", {unity_group="allocatefunds"})

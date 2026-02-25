@@ -27,14 +27,14 @@ HKU_API std::ostream& operator<<(std::ostream& out, const MultiFactorBase& mf) {
     out << "MultiFactor{" << "\n  name: " << mf.name() << "\n  params: " << mf.getParameter()
         << "\n  query: " << mf.getQuery() << "\n  ref stock: " << mf.m_ref_stk;
 
-    out << "\n  src inds count: " << mf.m_inds.size() << " [";
-    if (mf.m_inds.size() <= 5) {
-        for (const auto& ind : mf.m_inds) {
+    out << "\n  src inds count: " << mf.m_factorset.size() << " [";
+    if (mf.m_factorset.size() <= 5) {
+        for (const auto& ind : mf.m_factorset) {
             out << ind.name() << ", ";
         }
     } else {
         for (size_t i = 0; i < 5; i++) {
-            out << mf.m_inds[i].name() << ", ";
+            out << mf.m_factorset[i].name() << ", ";
         }
         out << "......";
     }
@@ -101,15 +101,15 @@ MultiFactorBase::MultiFactorBase(const string& name) : m_name(name) {
 MultiFactorBase::MultiFactorBase(const MultiFactorBase& base)
 : m_params(base.m_params),
   m_name(base.m_name),
-  m_inds(base.m_inds),
+  m_factorset(base.m_factorset),
   m_stks(base.m_stks),
   m_ref_stk(base.m_ref_stk),
   m_query(base.m_query) {}
 
-MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stks,
-                                 const KQuery& query, const Stock& ref_stk, const string& name,
-                                 int ic_n, bool spearman, int mode, bool save_all_factors)
-: m_name(name), m_inds(inds), m_stks(stks), m_ref_stk(ref_stk), m_query(query) {
+MultiFactorBase::MultiFactorBase(const StockList& stks, const KQuery& query, const Stock& ref_stk,
+                                 const string& name, int ic_n, bool spearman, int mode,
+                                 bool save_all_factors)
+: m_name(name), m_stks(stks), m_ref_stk(ref_stk), m_query(query) {
     initParam();
     setParam<bool>("use_spearman", spearman);
     setParam<int>("ic_n", ic_n);
@@ -117,7 +117,7 @@ MultiFactorBase::MultiFactorBase(const IndicatorList& inds, const StockList& stk
     setParam<bool>("save_all_factors", save_all_factors);
     checkParam("ic_n");
     checkParam("mode");
-    _checkData();
+    // _checkData();
 }
 
 void MultiFactorBase::initParam() {
@@ -145,7 +145,7 @@ void MultiFactorBase::paramChanged() {
 }
 
 void MultiFactorBase::_checkData() {
-    HKU_CHECK(!m_inds.empty(), "Input source factor list is empty!");
+    HKU_CHECK(!m_factorset.empty(), "Input factor set is empty!");
 
     // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
     for (const auto& stk : m_stks) {
@@ -199,14 +199,12 @@ MultiFactorPtr MultiFactorBase::clone() {
     // p->m_ref_dates = m_ref_dates;
     p->m_query = m_query;
 
-    p->m_inds.reserve(m_inds.size());
-    for (const auto& ind : m_inds) {
-        p->m_inds.emplace_back(ind.clone());
-    }
+    p->m_factorset = m_factorset;
 
     if (m_norm) {
         p->m_norm = m_norm->clone();
     }
+
     for (const auto& [name, norm] : m_special_norms) {
         p->m_special_norms[name] = norm->clone();
     }
@@ -250,10 +248,11 @@ void MultiFactorBase::setStockList(const StockList& stks) {
     m_calculated = false;
 }
 
-void MultiFactorBase::setRefIndicators(const IndicatorList& inds) {
-    HKU_CHECK(!inds.empty(), "Input source factor list is empty!");
-    m_inds = inds;
+void MultiFactorBase::setRefFactorSet(const FactorSet& factorset) {
+    HKU_CHECK(!factorset.isNull() && !factorset.empty(), "Input factor set is null or empty!");
+    m_factorset = factorset;
     m_calculated = false;
+    _checkData();
 }
 
 void MultiFactorBase::setNormalize(NormPtr norm) {
@@ -268,7 +267,7 @@ void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
                 "No special handling is specified!");
 
     bool found = false;
-    for (const auto& ind : m_inds) {
+    for (const auto& ind : m_factorset) {
         if (ind.name() == name) {
             found = true;
             break;
@@ -654,67 +653,24 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     HKU_IF_RETURN(stk_count == 0, all_stk_inds);
     all_stk_inds.resize(stk_count);
 
+    size_t ind_count = m_factorset.size();
+    HKU_IF_RETURN(ind_count == 0, all_stk_inds);
+
     size_t days_total = m_ref_dates.size();
     auto null_ind = PRICELIST(PriceList(days_total, Null<price_t>()), m_ref_dates);
 
     bool fill_null = getParam<bool>("fill_null");
-    size_t ind_count = m_inds.size();
+
+    all_stk_inds = m_factorset.getValues(m_stks, m_query, true, fill_null, true, true);
 
     unordered_map<string, IndicatorList> use_style_inds;
     for (const auto& [name, style_inds] : m_special_style_inds) {
         use_style_inds[name] = IndicatorList(style_inds.size());
     }
-
     global_parallel_for_index_void(
-      0, stk_count,
-      [this, &all_stk_inds, &null_ind, &use_style_inds, ind_count, fill_null](size_t i) {
+      0, stk_count, [this, &null_ind, &use_style_inds, fill_null](size_t i) {
           const auto& stk = m_stks[i];
           auto kdata = stk.getKData(m_query);
-#if 0
-          auto& cur_stk_inds = all_stk_inds[i];
-          cur_stk_inds.resize(ind_count);
-          if (kdata.size() == 0) {
-              for (size_t j = 0; j < ind_count; j++) {
-                  cur_stk_inds[j] = null_ind;
-                  cur_stk_inds[j].name(m_inds[j].name());
-              }
-          } else {
-              cur_stk_inds.resize(ind_count);
-              for (size_t j = 0; j < ind_count; j++) {
-                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null);
-              }
-              cur_stk_inds = combineCalculateIndicators(cur_stk_inds, kdata, true);
-          }
-
-          for (auto& [name, styles] : m_special_style_inds) {
-              auto& cur_style_inds = use_style_inds[name];
-              if (kdata.size() == 0) {
-                  for (size_t j = 0; j < styles.size(); j++) {
-                      cur_style_inds[j] = null_ind;
-                      cur_style_inds[j].name(name);
-                  }
-              } else {
-                  for (size_t j = 0; j < styles.size(); j++) {
-                      cur_style_inds[j] = ALIGN(styles[j], m_ref_dates, fill_null);
-                  }
-                  cur_style_inds = combineCalculateIndicators(cur_style_inds, kdata, true);
-              }
-          }
-#else
-          auto& cur_stk_inds = all_stk_inds[i];
-          cur_stk_inds.resize(ind_count);
-          if (kdata.size() == 0) {
-              for (size_t j = 0; j < ind_count; j++) {
-                  cur_stk_inds[j] = null_ind;
-                  cur_stk_inds[j].name(m_inds[j].name());
-              }
-          } else {
-              for (size_t j = 0; j < ind_count; j++) {
-                  cur_stk_inds[j] = ALIGN(m_inds[j], m_ref_dates, fill_null)(kdata).getResult(0);
-                  cur_stk_inds[j].name(m_inds[j].name());
-              }
-          }
-
           for (auto& [name, styles] : m_special_style_inds) {
               auto& cur_style_inds = use_style_inds[name];
               if (kdata.size() == 0) {
@@ -730,7 +686,6 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   }
               }
           }
-#endif
       });
 
     // 时间截面标准化/归一化
@@ -738,8 +693,8 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
         unordered_map<string, PriceList> ind_dummy_dict = _buildDummyIndex();
         global_parallel_for_index_void(
           0, days_total,
-          [this, stk_count, ind_count, sub_norm = m_norm ? m_norm->clone() : m_norm, &all_stk_inds,
-           &ind_dummy_dict, &use_style_inds](size_t di) {
+          [this, stk_count, ind_count, &all_stk_inds, &ind_dummy_dict, &use_style_inds](size_t di) {
+              auto sub_norm = m_norm ? m_norm->clone() : m_norm;
               NormPtr special_norm;
               PriceList one_day(stk_count, Null<price_t>());
               PriceList new_value;
@@ -864,14 +819,14 @@ void MultiFactorBase::calculate() {
         {  // 获取所有证券所有对齐后的原始因子
             vector<IndicatorList> all_stk_inds = getAllSrcFactors();
 
-            if (m_inds.size() == 1) {
+            size_t factor_count = m_factorset.size();
+            if (factor_count == 1) {
                 // 直接使用原始因子
                 size_t stk_count = m_stks.size();
                 m_all_factors.resize(stk_count);
                 for (size_t i = 0; i < stk_count; i++) {
                     m_all_factors[i] = std::move(all_stk_inds[i][0]);
                 }
-
             } else {
                 // 计算每支证券调整后的合成因子
                 m_all_factors = _calculate(all_stk_inds);
@@ -880,7 +835,6 @@ void MultiFactorBase::calculate() {
 
         // 计算完成后创建截面索引
         _buildIndex();
-
     } catch (const std::exception& e) {
         HKU_ERROR(e.what());
     } catch (...) {

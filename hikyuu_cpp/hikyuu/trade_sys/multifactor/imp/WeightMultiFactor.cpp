@@ -17,19 +17,16 @@ namespace hku {
 
 WeightMultiFactor::WeightMultiFactor() : MultiFactorBase("MF_Weight") {}
 
-WeightMultiFactor::WeightMultiFactor(const vector<Indicator>& inds, const PriceList& weights,
-                                     const StockList& stks, const KQuery& query,
-                                     const Stock& ref_stk, int ic_n, bool spearman, int mode,
-                                     bool save_all_factors)
-: MultiFactorBase(inds, stks, query, ref_stk, "MF_Weight", ic_n, spearman, mode, save_all_factors),
-  m_weights(weights) {
-    HKU_ASSERT(inds.size() == weights.size());
-}
+WeightMultiFactor::WeightMultiFactor(const PriceList& weights, const StockList& stks,
+                                     const KQuery& query, const Stock& ref_stk, int ic_n,
+                                     bool spearman, int mode, bool save_all_factors)
+: MultiFactorBase(stks, query, ref_stk, "MF_Weight", ic_n, spearman, mode, save_all_factors),
+  m_weights(weights) {}
 
 vector<Indicator> WeightMultiFactor::_calculate(const vector<IndicatorList>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();
-    size_t ind_count = m_inds.size();
+    size_t ind_count = m_factorset.size();
 
     return global_parallel_for_index(0, stk_count, [&](size_t si) {
         vector<price_t> sumByDate(days_total, 0.0);
@@ -66,14 +63,10 @@ MultiFactorPtr HKU_API MF_Weight() {
     return make_shared<WeightMultiFactor>();
 }
 
-MultiFactorPtr HKU_API MF_Weight(const IndicatorList& inds, const PriceList& weights,
-                                 const StockList& stks, const KQuery& query, const Stock& ref_stk,
-                                 int ic_n, bool spearman, int mode, bool save_all_factors) {
-    HKU_CHECK(
-      weights.size() == inds.size(),
-      "The size of weight is not equal to the size of inds! weights.size()={}, inds.size()={}",
-      weights.size(), inds.size());
-    return make_shared<WeightMultiFactor>(inds, weights, stks, query, ref_stk, ic_n, spearman, mode,
+MultiFactorPtr HKU_API MF_Weight(const PriceList& weights, const StockList& stks,
+                                 const KQuery& query, const Stock& ref_stk, int ic_n, bool spearman,
+                                 int mode, bool save_all_factors) {
+    return make_shared<WeightMultiFactor>(weights, stks, query, ref_stk, ic_n, spearman, mode,
                                           save_all_factors);
 }
 

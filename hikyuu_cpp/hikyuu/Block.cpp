@@ -14,7 +14,7 @@ namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Block& blk) {
     string strip(", ");
-    os << "Block(" << blk.category() << strip << blk.name() << ")";
+    os << "Block(" << blk.category() << strip << blk.name() << strip << blk.size() << ")";
     return os;
 }
 

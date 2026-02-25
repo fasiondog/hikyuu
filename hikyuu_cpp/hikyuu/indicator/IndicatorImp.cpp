@@ -338,6 +338,7 @@ string IndicatorImp::str() const {
     std::ostringstream os;
     os << "Indicator{\n"
        << "  name: " << name() << "\n  size: " << size() << "\n  discard: " << discard()
+       << "\n  stock: " << getContext().getStock().market_code()
        << "\n  result sets: " << getResultNumber() << "\n  params: " << getParameter()
        << "\n  is python object: " << (isPythonObject() ? "True" : "False");
     const auto &ind_params = getIndParams();
@@ -561,7 +562,7 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     imp->name(name());
     auto const *src = this->data(result_num);
     auto *dst = imp->data(0);
-    for (size_t i = discard(); i < total; ++i) {
+    for (size_t i = imp->discard(); i < total; ++i) {
         dst[i] = src[i];
     }
     return imp;

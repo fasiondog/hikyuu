@@ -573,6 +573,31 @@ DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string&
       .getDatetimeList(query);
 }
 
+DatetimeList StockManager::getTradingCalendar(const StockList& stk_list, const KQuery& query) {
+    std::unordered_set<string> markets;
+    for (auto& stk : stk_list) {
+        if (!stk.isNull()) {
+            markets.insert(stk.market());
+        }
+    }
+
+    std::set<Datetime> date_set;
+    for (auto& market : markets) {
+        DatetimeList temp = getTradingCalendar(query, market);
+        if (temp.size() > 0) {
+            date_set.insert(temp.begin(), temp.end());
+        }
+    }
+
+    DatetimeList result;
+    result.reserve(date_set.size());
+    for (auto& date : date_set) {
+        result.push_back(date);
+    }
+
+    return result;
+}
+
 const ZhBond10List& StockManager::getZhBond10() const {
     return m_zh_bond10;
 }

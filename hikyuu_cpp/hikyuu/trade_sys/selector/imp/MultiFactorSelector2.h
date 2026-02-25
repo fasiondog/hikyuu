@@ -24,14 +24,14 @@ public:
     virtual bool isMatchAF(const AFPtr& af) override;
     virtual void _calculate() override;
 
-    void setIndicators(const IndicatorList& inds) {
-        HKU_ASSERT(!inds.empty());
-        m_inds = inds;
+    void setFactorSet(const FactorSet& factorset) {
+        HKU_ASSERT(!factorset.empty());
+        m_factorset = factorset;
         m_calculated = false;
     }
 
 private:
-    IndicatorList m_inds;
+    FactorSet m_factorset;
     unordered_map<Stock, SYSPtr> m_stk_sys_dict;
 
     //============================================
@@ -42,7 +42,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase);
-        ar& BOOST_SERIALIZATION_NVP(m_inds);
+        ar& BOOST_SERIALIZATION_NVP(m_factorset);
     }
 #endif
 };

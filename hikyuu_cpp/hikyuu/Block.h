@@ -136,7 +136,7 @@ public:
 
     /** 是否为空 */
     bool empty() const noexcept {
-        return size() ? false : true;
+        return size() == 0;
     }
 
     /** 清除包含的所有证券 */
@@ -189,5 +189,10 @@ public:
     }
 };
 }  // namespace std
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::Block> : ostream_formatter {};
+#endif
 
 #endif /* BLOCK_H_ */

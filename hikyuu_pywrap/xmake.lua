@@ -48,7 +48,7 @@ target("core")
     add_rules("c++.unity_build", {batchsize = 0})
     add_files("./**.cpp")
 
-    add_files("./*.cpp", {unity_group="base"})
+    add_files("./*.cpp", "./factor/**.cpp", {unity_group="base"})
     add_files("./analysis/**.cpp", {unity_group="analysis"})
     add_files("./data_driver/**.cpp", {unity_group="data_driver"})
     add_files("./global/**.cpp", {unity_group="global"})
