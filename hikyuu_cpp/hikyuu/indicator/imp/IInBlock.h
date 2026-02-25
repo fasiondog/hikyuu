@@ -21,7 +21,7 @@ class IInBlock : public IndicatorImp {
 
 public:
     IInBlock();
-    virtual ~IInBlock();
+    virtual ~IInBlock() override;
 };
 
 } /* namespace hku */

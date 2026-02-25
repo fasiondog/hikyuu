@@ -25,7 +25,7 @@ class ICeil : public IndicatorImp {
 
 public:
     ICeil();
-    virtual ~ICeil();
+    virtual ~ICeil() override;
 };
 
 } /* namespace hku */

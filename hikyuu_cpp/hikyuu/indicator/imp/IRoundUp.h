@@ -25,7 +25,7 @@ class IRoundUp : public IndicatorImp {
 
 public:
     IRoundUp();
-    virtual ~IRoundUp();
+    virtual ~IRoundUp() override;
     virtual void _checkParam(const string& name) const override;
 };
 

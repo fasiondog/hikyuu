@@ -25,7 +25,7 @@ class ICount : public IndicatorImp {
 
 public:
     ICount();
-    virtual ~ICount();
+    virtual ~ICount() override;
     virtual void _checkParam(const string& name) const override;
 };
 

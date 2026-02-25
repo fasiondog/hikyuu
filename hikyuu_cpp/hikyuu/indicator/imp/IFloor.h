@@ -25,7 +25,7 @@ class IFloor : public IndicatorImp {
 
 public:
     IFloor();
-    virtual ~IFloor();
+    virtual ~IFloor() override;
 };
 
 } /* namespace hku */

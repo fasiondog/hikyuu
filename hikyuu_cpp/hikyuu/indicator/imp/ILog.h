@@ -22,7 +22,7 @@ class ILog : public IndicatorImp {
 
 public:
     ILog();
-    virtual ~ILog();
+    virtual ~ILog() override;
 };
 
 } /* namespace hku */

@@ -22,7 +22,7 @@ class ISin : public IndicatorImp {
 
 public:
     ISin();
-    virtual ~ISin();
+    virtual ~ISin() override;
 };
 
 } /* namespace hku */

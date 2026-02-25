@@ -19,7 +19,7 @@ public:
     IRecover();
     explicit IRecover(int recoverType);
     IRecover(const KData&, int recoverType);
-    virtual ~IRecover();
+    virtual ~IRecover() override;
 
     virtual void _checkParam(const string& name) const override;
 

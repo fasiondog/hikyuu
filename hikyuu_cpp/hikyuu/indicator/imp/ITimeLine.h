@@ -21,7 +21,7 @@ class ITimeLine : public IndicatorImp {
 
 public:
     ITimeLine();
-    virtual ~ITimeLine();
+    virtual ~ITimeLine() override;
     virtual void _checkParam(const string& name) const override;
 };
 

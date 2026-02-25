@@ -22,7 +22,7 @@ class IReverse : public IndicatorImp {
 
 public:
     IReverse();
-    virtual ~IReverse();
+    virtual ~IReverse() override;
 };
 
 } /* namespace hku */

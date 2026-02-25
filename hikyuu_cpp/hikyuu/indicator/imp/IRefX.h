@@ -17,7 +17,7 @@ class IRefX : public IndicatorImp {
 
 public:
     IRefX();
-    virtual ~IRefX();
+    virtual ~IRefX() override;
 };
 
 } /* namespace hku */

@@ -20,7 +20,7 @@ class IHsl : public IndicatorImp {
 
 public:
     IHsl();
-    virtual ~IHsl();
+    virtual ~IHsl() override;
 };
 
 } /* namespace hku */

@@ -22,7 +22,7 @@ class IRocr : public hku::IndicatorImp {
 
 public:
     IRocr();
-    virtual ~IRocr();
+    virtual ~IRocr() override;
     virtual void _checkParam(const string& name) const override;
 
     virtual bool supportIncrementCalculate() const override;

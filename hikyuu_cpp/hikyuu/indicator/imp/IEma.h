@@ -24,7 +24,7 @@ class IEma : public IndicatorImp {
 
 public:
     IEma();
-    virtual ~IEma();
+    virtual ~IEma() override;
     virtual void _checkParam(const string& name) const override;
 };
 

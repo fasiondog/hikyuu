@@ -20,7 +20,7 @@ class ICost : public IndicatorImp {
 
 public:
     ICost();
-    virtual ~ICost();
+    virtual ~ICost() override;
     virtual void _checkParam(const string& name) const override;
 };
 

@@ -85,33 +85,9 @@ void FactorSet::add(const Factor& factor) {
     }
 }
 
-void FactorSet::add(Factor&& factor) {
-    HKU_CHECK(!factor.isNull(), "Factor is null!");
-    HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
-    HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
-
-    const string& factor_name = factor.name();
-
-    // 检查是否已存在同名因子
-    auto it = m_data->nameIndexMap.find(factor_name);
-    if (it != m_data->nameIndexMap.end()) {
-        // 存在同名因子，覆盖之
-        size_t index = it->second;
-        m_data->factors[index] = std::move(factor);
-        HKU_WARN("Factor '{}' already exists, it will be overwritten!", factor_name);
-
-    } else {
-        // 添加新因子到 vector 末尾
-        size_t index = m_data->factors.size();
-        m_data->factors.push_back(std::move(factor));
-        // 在 map 中记录名称到索引的映射
-        m_data->nameIndexMap[factor_name] = index;
-    }
-}
-
 void FactorSet::add(const FactorList& factors) {
     for (const auto& factor : factors) {
-        add(factor);
+        this->add(factor);
     }
 }
 

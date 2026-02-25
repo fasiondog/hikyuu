@@ -22,7 +22,7 @@ class ICos : public IndicatorImp {
 
 public:
     ICos();
-    virtual ~ICos();
+    virtual ~ICos() override;
 };
 
 } /* namespace hku */

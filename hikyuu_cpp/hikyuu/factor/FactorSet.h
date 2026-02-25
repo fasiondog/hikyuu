@@ -83,7 +83,6 @@ public:
     //------------------------
 
     void add(const Factor& factor);
-    void add(Factor&& factor);
     void add(const FactorList&);
     void add(const Indicator& ind);
     void add(const IndicatorList& inds);

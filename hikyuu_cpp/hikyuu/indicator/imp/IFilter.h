@@ -22,7 +22,7 @@ class IFilter : public IndicatorImp {
 
 public:
     IFilter();
-    virtual ~IFilter();
+    virtual ~IFilter() override;
 
     virtual void _checkParam(const string& name) const override;
     virtual bool supportIncrementCalculate() const override;

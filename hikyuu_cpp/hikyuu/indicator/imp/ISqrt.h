@@ -25,7 +25,7 @@ class ISqrt : public IndicatorImp {
 
 public:
     ISqrt();
-    virtual ~ISqrt();
+    virtual ~ISqrt() override;
 };
 
 } /* namespace hku */

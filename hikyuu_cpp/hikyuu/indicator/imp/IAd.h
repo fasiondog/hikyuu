@@ -21,7 +21,7 @@ class IAd : public IndicatorImp {
 
 public:
     IAd();
-    virtual ~IAd();
+    virtual ~IAd() override;
 };
 
 } /* namespace hku */

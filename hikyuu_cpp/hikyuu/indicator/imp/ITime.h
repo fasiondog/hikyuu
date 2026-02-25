@@ -23,7 +23,7 @@ class ITime : public IndicatorImp {
 
 public:
     ITime();
-    virtual ~ITime();
+    virtual ~ITime() override;
     virtual void _checkParam(const string& name) const override;
 };
 

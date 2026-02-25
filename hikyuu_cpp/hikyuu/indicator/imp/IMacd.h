@@ -29,7 +29,7 @@ class IMacd : public IndicatorImp {
 
 public:
     IMacd();
-    virtual ~IMacd();
+    virtual ~IMacd() override;
 
     virtual void _checkParam(const string& name) const override;
     virtual void _dyn_calculate(const Indicator&) override;

@@ -18,7 +18,7 @@ public:
     explicit Indicator2InImp(const string& name, size_t result_num = 1);
     Indicator2InImp(const string& name, const Indicator& ref_a, bool fill_null = false,
                     size_t result_num = 1);
-    virtual ~Indicator2InImp();
+    virtual ~Indicator2InImp() override;
 
     virtual IndicatorImpPtr _clone() override;
 

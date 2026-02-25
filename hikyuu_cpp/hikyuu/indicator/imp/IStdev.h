@@ -25,7 +25,7 @@ class IStdev : public hku::IndicatorImp {
 
 public:
     IStdev();
-    virtual ~IStdev();
+    virtual ~IStdev() override;
     virtual void _checkParam(const string& name) const override;
     virtual bool supportIncrementCalculate() const override;
     virtual size_t min_increment_start() const override;

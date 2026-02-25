@@ -17,7 +17,7 @@ class IMrr : public IndicatorImp {
 
 public:
     IMrr();
-    virtual ~IMrr();
+    virtual ~IMrr() override;
 };
 
 }  // namespace hku

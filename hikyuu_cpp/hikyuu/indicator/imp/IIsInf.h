@@ -20,7 +20,7 @@ class IIsInf : public IndicatorImp {
 
 public:
     IIsInf();
-    virtual ~IIsInf();
+    virtual ~IIsInf() override;
 };
 
 } /* namespace hku */

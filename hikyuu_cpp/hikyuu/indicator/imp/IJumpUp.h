@@ -19,7 +19,7 @@ class IJumpUp : public IndicatorImp {
 
 public:
     IJumpUp();
-    virtual ~IJumpUp();
+    virtual ~IJumpUp() override;
 };
 
 } /* namespace hku */

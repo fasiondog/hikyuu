@@ -25,7 +25,7 @@ class IIntpart : public IndicatorImp {
 
 public:
     IIntpart();
-    virtual ~IIntpart();
+    virtual ~IIntpart() override;
 };
 
 } /* namespace hku */

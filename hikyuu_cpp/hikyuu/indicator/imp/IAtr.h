@@ -20,7 +20,7 @@ class IAtr : public IndicatorImp {
 
 public:
     IAtr();
-    virtual ~IAtr();
+    virtual ~IAtr() override;
     virtual void _checkParam(const string& name) const override;
 };
 

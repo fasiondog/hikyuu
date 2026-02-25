@@ -23,7 +23,7 @@ class IDiff : public hku::IndicatorImp {
 
 public:
     IDiff();
-    virtual ~IDiff();
+    virtual ~IDiff() override;
 };
 
 } /* namespace hku */

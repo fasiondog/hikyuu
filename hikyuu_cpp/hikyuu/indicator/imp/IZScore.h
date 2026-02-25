@@ -18,7 +18,7 @@ class IZScore : public IndicatorImp {
 public:
     IZScore();
     IZScore(bool outExtreme, double nsigma, bool recursive);
-    virtual ~IZScore();
+    virtual ~IZScore() override;
     virtual void _checkParam(const string& name) const override;
 };
 

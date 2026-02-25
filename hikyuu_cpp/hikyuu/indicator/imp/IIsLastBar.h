@@ -19,7 +19,7 @@ class IIsLastBar : public IndicatorImp {
 
 public:
     IIsLastBar();
-    virtual ~IIsLastBar();
+    virtual ~IIsLastBar() override;
 };
 
 } /* namespace hku */

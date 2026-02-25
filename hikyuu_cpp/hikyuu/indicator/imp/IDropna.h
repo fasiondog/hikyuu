@@ -21,7 +21,7 @@ class IDropna : public IndicatorImp {
 
 public:
     IDropna();
-    virtual ~IDropna();
+    virtual ~IDropna() override;
 
     // 禁止子节点合并, 上级默认已为 false
     // virtual bool selfAlike(const IndicatorImp& other) const noexcept override {

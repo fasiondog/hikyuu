@@ -26,7 +26,7 @@ class IBarsSince : public IndicatorImp {
 
 public:
     IBarsSince();
-    virtual ~IBarsSince();
+    virtual ~IBarsSince() override;
     virtual void _checkParam(const string& name) const override;
 };
 

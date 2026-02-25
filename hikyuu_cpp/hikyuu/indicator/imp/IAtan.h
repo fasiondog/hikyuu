@@ -22,7 +22,7 @@ class IAtan : public IndicatorImp {
 
 public:
     IAtan();
-    virtual ~IAtan();
+    virtual ~IAtan() override;
 };
 
 } /* namespace hku */

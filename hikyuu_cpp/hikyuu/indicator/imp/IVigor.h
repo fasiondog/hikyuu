@@ -25,7 +25,7 @@ class IVigor : public IndicatorImp {
 
 public:
     IVigor();
-    virtual ~IVigor();
+    virtual ~IVigor() override;
     virtual void _checkParam(const string& name) const override;
 };
 

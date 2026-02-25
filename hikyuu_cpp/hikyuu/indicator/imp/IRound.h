@@ -25,7 +25,7 @@ class IRound : public IndicatorImp {
 
 public:
     IRound();
-    virtual ~IRound();
+    virtual ~IRound() override;
     virtual void _checkParam(const string& name) const override;
 };
 

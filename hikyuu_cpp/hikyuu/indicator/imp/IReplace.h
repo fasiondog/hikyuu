@@ -20,7 +20,7 @@ class IReplace : public IndicatorImp {
 
 public:
     IReplace();
-    virtual ~IReplace();
+    virtual ~IReplace() override;
 };
 
 } /* namespace hku */

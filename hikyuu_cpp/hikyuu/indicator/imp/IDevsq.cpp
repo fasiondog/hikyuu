@@ -72,7 +72,7 @@ void IDevsq::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto* dst = this->data();
     for (size_t i = start_pos; i < total; ++i) {
         sum = 0.0;
-        size_t start = i + 1 - n;
+        start = i + 1 - n;
         for (size_t j = start; j <= i; ++j) {
             sum += std::pow(src[j] - mean[i], 2);
         }

@@ -18,7 +18,7 @@ class IFinance : public IndicatorImp {
 
 public:
     IFinance();
-    virtual ~IFinance() = default;
+    virtual ~IFinance() override = default;
 };
 
 }  // namespace hku

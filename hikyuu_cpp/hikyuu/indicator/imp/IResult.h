@@ -19,7 +19,7 @@ class IResult : public IndicatorImp {
 public:
     IResult();
     explicit IResult(int reuslt_ix);
-    virtual ~IResult() = default;
+    virtual ~IResult() override = default;
 
     virtual void _checkParam(const string& name) const override;
 };

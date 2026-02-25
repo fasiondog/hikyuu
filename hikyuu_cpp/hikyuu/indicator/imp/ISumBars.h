@@ -21,7 +21,7 @@ class ISumBars : public IndicatorImp {
 
 public:
     ISumBars();
-    virtual ~ISumBars();
+    virtual ~ISumBars() override;
 
     virtual void _dyn_calculate(const Indicator&) override;
 };

@@ -25,7 +25,7 @@ class IDma : public Indicator2InImp {
 public:
     IDma();
     explicit IDma(const Indicator& ref_a, bool fill_null);
-    virtual ~IDma();
+    virtual ~IDma() override;
     virtual size_t min_increment_start() const override;
 };
 

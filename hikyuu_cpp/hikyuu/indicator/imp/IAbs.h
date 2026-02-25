@@ -20,7 +20,7 @@ class IAbs : public IndicatorImp {
 
 public:
     IAbs();
-    virtual ~IAbs();
+    virtual ~IAbs() override;
 };
 
 } /* namespace hku */

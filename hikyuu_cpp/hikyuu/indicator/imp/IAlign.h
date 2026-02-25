@@ -21,7 +21,7 @@ class IAlign : public IndicatorImp {
 
 public:
     IAlign();
-    virtual ~IAlign();
+    virtual ~IAlign() override;
 };
 
 } /* namespace hku */

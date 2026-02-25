@@ -18,7 +18,7 @@ class ICycle : public IndicatorImp {
 
 public:
     ICycle();
-    virtual ~ICycle();
+    virtual ~ICycle() override;
     virtual void _checkParam(const string& name) const override;
 
 private:

@@ -20,7 +20,7 @@ class IIsNa : public IndicatorImp {
 
 public:
     IIsNa();
-    virtual ~IIsNa();
+    virtual ~IIsNa() override;
 };
 
 } /* namespace hku */

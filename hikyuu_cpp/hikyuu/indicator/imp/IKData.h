@@ -20,7 +20,7 @@ class IKData : public IndicatorImp {
 
 public:
     IKData();
-    virtual ~IKData();
+    virtual ~IKData() override;
     virtual void _checkParam(const string& name) const override;
 };
 

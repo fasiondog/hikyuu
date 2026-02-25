@@ -21,7 +21,7 @@ class IBarsCount : public IndicatorImp {
 
 public:
     IBarsCount();
-    virtual ~IBarsCount();
+    virtual ~IBarsCount() override;
 };
 
 } /* namespace hku */

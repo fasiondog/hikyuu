@@ -22,7 +22,7 @@ class IAsin : public IndicatorImp {
 
 public:
     IAsin();
-    virtual ~IAsin();
+    virtual ~IAsin() override;
 };
 
 } /* namespace hku */

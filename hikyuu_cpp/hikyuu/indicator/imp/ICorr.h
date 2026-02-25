@@ -18,7 +18,7 @@ class ICorr : public Indicator2InImp {
 public:
     ICorr();
     ICorr(const Indicator& ref_ind, int n, bool fill_null);
-    virtual ~ICorr();
+    virtual ~ICorr() override;
 
     virtual void _checkParam(const string& name) const override;
     virtual bool supportIncrementCalculate() const override;

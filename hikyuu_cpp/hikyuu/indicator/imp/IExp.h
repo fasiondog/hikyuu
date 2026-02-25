@@ -22,7 +22,7 @@ class IExp : public IndicatorImp {
 
 public:
     IExp();
-    virtual ~IExp();
+    virtual ~IExp() override;
 };
 
 } /* namespace hku */

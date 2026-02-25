@@ -27,7 +27,7 @@ class IRef : public IndicatorImp {
 
 public:
     IRef();
-    virtual ~IRef();
+    virtual ~IRef() override;
     virtual void _checkParam(const string& name) const override;
 };
 

@@ -22,7 +22,7 @@ class ITan : public IndicatorImp {
 
 public:
     ITan();
-    virtual ~ITan();
+    virtual ~ITan() override;
 };
 
 } /* namespace hku */

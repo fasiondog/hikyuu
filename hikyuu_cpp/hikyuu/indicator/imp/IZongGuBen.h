@@ -18,7 +18,7 @@ class IZongGuBen : public IndicatorImp {
 
 public:
     IZongGuBen();
-    virtual ~IZongGuBen();
+    virtual ~IZongGuBen() override;
 };
 
 } /* namespace hku */

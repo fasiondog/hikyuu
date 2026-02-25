@@ -19,7 +19,7 @@ class IQuantileTrunc : public IndicatorImp {
 
 public:
     IQuantileTrunc();
-    virtual ~IQuantileTrunc();
+    virtual ~IQuantileTrunc() override;
     virtual void _checkParam(const string& name) const override;
 };
 

@@ -20,7 +20,7 @@ class INot : public IndicatorImp {
 
 public:
     INot();
-    virtual ~INot();
+    virtual ~INot() override;
 };
 
 } /* namespace hku */

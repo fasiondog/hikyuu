@@ -22,7 +22,7 @@ class IBackset : public IndicatorImp {
 
 public:
     IBackset();
-    virtual ~IBackset();
+    virtual ~IBackset() override;
 
     virtual void _checkParam(const string& name) const override;
 };

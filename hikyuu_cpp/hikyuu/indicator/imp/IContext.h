@@ -15,7 +15,7 @@ class IContext : public IndicatorImp {
 public:
     IContext();
     explicit IContext(const Indicator& ref_ind);
-    virtual ~IContext();
+    virtual ~IContext() override;
 
     virtual string str() const override;
     virtual string formula() const override;

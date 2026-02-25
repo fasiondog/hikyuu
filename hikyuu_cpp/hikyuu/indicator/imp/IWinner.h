@@ -19,7 +19,7 @@ class IWinner : public IndicatorImp {
 
 public:
     IWinner();
-    virtual ~IWinner();
+    virtual ~IWinner() override;
 };
 
 } /* namespace hku */

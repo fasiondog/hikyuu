@@ -19,7 +19,7 @@ class ILastValue : public IndicatorImp {
 
 public:
     ILastValue();
-    virtual ~ILastValue();
+    virtual ~ILastValue() override;
 };
 
 } /* namespace hku */

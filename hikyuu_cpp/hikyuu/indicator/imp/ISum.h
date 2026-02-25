@@ -20,7 +20,7 @@ class ISum : public IndicatorImp {
 
 public:
     ISum();
-    virtual ~ISum();
+    virtual ~ISum() override;
     virtual void _checkParam(const string& name) const override;
 
     virtual bool supportIncrementCalculate() const override;

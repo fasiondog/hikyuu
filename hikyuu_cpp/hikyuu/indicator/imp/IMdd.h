@@ -17,7 +17,7 @@ class IMdd : public IndicatorImp {
 
 public:
     IMdd();
-    virtual ~IMdd();
+    virtual ~IMdd() override;
 };
 
 }  // namespace hku

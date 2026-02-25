@@ -20,7 +20,7 @@ class IBarsLastCount : public IndicatorImp {
 
 public:
     IBarsLastCount();
-    virtual ~IBarsLastCount();
+    virtual ~IBarsLastCount() override;
 };
 
 } /* namespace hku */

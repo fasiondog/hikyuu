@@ -20,7 +20,7 @@ class IKalman : public IndicatorImp {
 
 public:
     IKalman();
-    virtual ~IKalman();
+    virtual ~IKalman() override;
 };
 
 } /* namespace hku */

@@ -18,7 +18,7 @@ class IIndex : public IndicatorImp {
 public:
     IIndex();
     IIndex(const string& kpart, bool fill_null);
-    virtual ~IIndex();
+    virtual ~IIndex() override;
 
     virtual void _checkParam(const string& name) const override;
 };

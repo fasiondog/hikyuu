@@ -22,7 +22,7 @@ class ILn : public IndicatorImp {
 
 public:
     ILn();
-    virtual ~ILn();
+    virtual ~ILn() override;
 };
 
 } /* namespace hku */

@@ -15,7 +15,7 @@ class IIc : public IndicatorImp {
 public:
     IIc();
     IIc(const StockList& stks, int n, bool spearman, bool strict);
-    virtual ~IIc();
+    virtual ~IIc() override;
 
     virtual void _checkParam(const string& name) const override;
     virtual void _calculate(const Indicator& data) override;

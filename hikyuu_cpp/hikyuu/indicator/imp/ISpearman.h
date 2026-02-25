@@ -18,7 +18,7 @@ class ISpearman : public Indicator2InImp {
 public:
     ISpearman();
     ISpearman(const Indicator& ref_ind, int n, bool fill_null);
-    virtual ~ISpearman();
+    virtual ~ISpearman() override;
 
     virtual void _checkParam(const string& name) const override;
     virtual bool supportIncrementCalculate() const override;

@@ -19,7 +19,7 @@ class ILiuTongPan : public IndicatorImp {
 
 public:
     ILiuTongPan();
-    virtual ~ILiuTongPan();
+    virtual ~ILiuTongPan() override;
 };
 
 } /* namespace hku */

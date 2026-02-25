@@ -24,7 +24,7 @@ class IZhBond10 : public IndicatorImp {
 public:
     IZhBond10();
     explicit IZhBond10(const DatetimeList& dates, double default_val = 4.0);
-    virtual ~IZhBond10();
+    virtual ~IZhBond10() override;
 };
 
 }  // namespace hku

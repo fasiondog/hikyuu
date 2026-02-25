@@ -26,7 +26,7 @@ class ITr : public IndicatorImp {
 
 public:
     ITr();
-    virtual ~ITr();
+    virtual ~ITr() override;
 };
 
 } /* namespace hku */

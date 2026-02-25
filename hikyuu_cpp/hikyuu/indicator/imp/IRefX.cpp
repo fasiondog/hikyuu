@@ -50,11 +50,10 @@ void IRefX::_calculate(const Indicator &data) {
         }
 
         int64_t startix = data.discard() - absn;
-        int64_t endix = total - absn;
         size_t len = total - data.discard();
         if (startix < 0) {
             m_discard = 0;
-            len = endix;
+            len = total - absn;
         } else {
             m_discard = startix;
         }

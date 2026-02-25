@@ -20,7 +20,7 @@ class IDiscard : public IndicatorImp {
 
 public:
     IDiscard();
-    virtual ~IDiscard();
+    virtual ~IDiscard() override;
     virtual void _checkParam(const string& name) const override;
 };
 

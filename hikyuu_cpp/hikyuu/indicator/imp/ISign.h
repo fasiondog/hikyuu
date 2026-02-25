@@ -22,7 +22,7 @@ class ISign : public IndicatorImp {
 
 public:
     ISign();
-    virtual ~ISign();
+    virtual ~ISign() override;
 };
 
 } /* namespace hku */

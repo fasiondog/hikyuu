@@ -22,7 +22,7 @@ class IAcos : public IndicatorImp {
 
 public:
     IAcos();
-    virtual ~IAcos();
+    virtual ~IAcos() override;
 };
 
 } /* namespace hku */
