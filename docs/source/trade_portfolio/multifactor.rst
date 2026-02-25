@@ -20,45 +20,66 @@
 内建对因子合成算法
 --------------------------------
 
-.. py:function:: MF_Weight(inds, stks, weights, query, ref_stk[, ic_n=5, spearman=True, mode=0, save_all_factors=False])
+.. py:function:: MF_Weight(input, stks, weights, query, ref_stk[, ic_n=5, spearman=True, mode=0, save_all_factors=False])
 
-    按指定权重合成因子 = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn
+    按指定权重合成因子 = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn，支持多种输入类型
 
-    :param sequense(Indicator) inds: 原始因子列表
+    :param input: 因子输入，可以是FactorSet对象或Indicator序列
     :param sequense(stock) stks: 计算证券列表
-    :param sequense(float) weights: 权重列表(需和 inds 等长)
+    :param sequense(float) weights: 权重列表(需和因子数量等长)
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
     :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
     :rtype: MultiFactorBase
 
+    .. code-block:: python
+    
+        # 使用Indicator列表
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        weights = [0.6, 0.4]
+        mf1 = MF_Weight(indicators, stocks, weights, query)
+        
+        # 使用FactorSet
+        factor_set = FactorSet(indicators)
+        mf2 = MF_Weight(factor_set, stocks, weights, query)
 
-.. py:function:: MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5, spearman=True])
 
-    等权重合成因子
+.. py:function:: MF_EqualWeight(input, stks, query, ref_stk[, ic_n=5])
 
-    :param sequense(Indicator) inds: 原始因子列表
+    等权重合成因子，支持多种输入类型
+
+    :param input: 因子输入，可以是FactorSet对象或Indicator序列
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券
+    :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
     :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法    
     :rtype: MultiFactorBase
 
+    .. code-block:: python
+    
+        # 使用Indicator列表
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        mf1 = MF_EqualWeight(indicators, stocks, query)
+        
+        # 使用FactorSet
+        factor_set = FactorSet(indicators)
+        mf2 = MF_EqualWeight(factor_set, stocks, query)
 
-.. py:function:: MF_ICWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120, spearman=True])
 
-    滚动IC权重合成因子
+.. py:function:: MF_ICWeight(input, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
-    :param sequense(Indicator) inds: 原始因子列表
+    滚动IC权重合成因子，支持多种输入类型
+
+    :param input: 因子输入，可以是FactorSet对象或Indicator序列
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券
+    :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
@@ -66,21 +87,41 @@
     :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法    
     :rtype: MultiFactorBase
 
+    .. code-block:: python
+    
+        # 使用Indicator列表
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        mf1 = MF_ICWeight(indicators, stocks, query)
+        
+        # 使用FactorSet
+        factor_set = FactorSet(indicators)
+        mf2 = MF_ICWeight(factor_set, stocks, query)
 
-.. py:function:: MF_ICIRWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120, spearman=True])
 
-    滚动ICIR权重合成因子
+.. py:function:: MF_ICIRWeight(input, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
-    :param sequense(Indicator) inds: 原始因子列表
+    滚动ICIR权重合成因子，支持多种输入类型
+
+    :param input: 因子输入，可以是FactorSet对象或Indicator序列
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券
+    :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
     :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法    
     :rtype: MultiFactorBase
+
+    .. code-block:: python
+    
+        # 使用Indicator列表
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        mf1 = MF_ICIRWeight(indicators, stocks, query)
+        
+        # 使用FactorSet
+        factor_set = FactorSet(indicators)
+        mf2 = MF_ICIRWeight(factor_set, stocks, query)
 
 
 自定义多因子合成算法基类
@@ -160,21 +201,21 @@
 
         获取创建时输入的原始因子列表
 
-    .. py::method:: set_ref_indicators(self, inds)
+    .. py:method:: set_ref_indicators(self, inds)
 
         重新设置原始因子列表
 
-        :param list Indicator: 原始因子列表
+        :param list inds: 新的原始因子列表
 
     .. py:method:: get_factor(self, stock)
 
-        获取指定证券合成后的新因子, 仅在 save_all_factors=True 时有效
+        获取指定证券合成后的新因子
 
         :param Stock stock: 指定证券
 
     .. py:method:: get_all_factors(self)
 
-        获取所有证券合成后的因子列表, 仅在 save_all_factors=True 时有效
+        获取所有证券合成后的因子列表
 
         :return: [factor1, factor2, ...] 顺序与参考证券顺序相同
 
@@ -203,18 +244,27 @@
         :param Datetime date: 指定日期
         :param int start: 取当日排名开始
         :param int end: 取当日排名结束(不包含本身)
+        :param function func: (ScoreRecord)->bool 或 (Datetime, ScoreRecord)->bool 为原型的可调用对象
         :rtype: ScoreRecordList
 
     .. py:method:: get_all_scores(self)
 
         获取所有日期的所有评分，长度与参考日期相同
 
-        :return: 每日 ScoreRecordList 结果的 list
+        :return: ScoreRecordList
 
+    .. py:method:: get_all_src_factors(self)
+
+        获取所有原始因子列表(如果指定了标准化、行业中性化, 返回为已处理的因子列表)
+
+        :rtype: list
+        :return: list IndicatorList stks x inds
 
     .. py:method:: set_normalize(self, norm)
 
         设置标准化或归一化方法（影响全部因子）
+    
+        :param NormalizeBase norm: 标准化或归一化方法实例
 
     
     .. py:method:: add_special_normalize(self, name[, norm=None, category="", style_inds=[]])
@@ -237,7 +287,3 @@
 
         :param list stks_inds: 与证券列表顺序相同已经计算好的所有证券的原始因子列表
         :return: 按证券列表顺序存放的所有新的因子
-
-
-
-    

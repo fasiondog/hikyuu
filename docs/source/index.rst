@@ -25,6 +25,7 @@ Welcome to Hikyuu's documentation!
    trade_manage/trade_manage
    trade_sys/trade_sys
    trade_portfolio/trade_portfolio
+   factor.md
    trade_sys/walkforward
    strategy
    others
