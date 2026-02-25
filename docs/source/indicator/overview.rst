@@ -51,6 +51,8 @@
 * :py:func:`TIMELINEVOL`   - 分时成交量
 * :py:func:`ZHBOND10` - 10年期中国国债收益率
 * :py:func:`ZONGGUBEN` - 总股本
+* :py:func:`ISLIMITUP` - 判断是否涨停
+* :py:func:`ISLIMITDOWN` - 判断是否跌停
     
 
 **大盘指标**
@@ -131,6 +133,7 @@
 
 **技术指标**
 
+* :py:func:`AMA` - 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
 * :py:func:`AD` - 累积/派发线
 * :py:func:`ATR` - 平均真实波动幅度，真实波动幅度 TR 的简单移动均值
 * :py:func:`BACKSET` - 向前赋值将当前位置到若干周期前的数据设为1
@@ -142,6 +145,7 @@
 * :py:func:`COST` - 成本分布
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
 * :py:func:`DMA` - 动态移动平均
+* :py:func:`EMA` - 指数移动平均线(Exponential Moving Average)
 * :py:func:`FILTER` - 信号过滤, 过滤连续出现的信号
 * :py:func:`HHV` - N日内最高价
 * :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
@@ -151,8 +155,6 @@
 * :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
 * :py:func:`MA`  - 简单移动平均数
 * :py:func:`MACD` - 平滑异同移动平均线
-* :py:func:`AMA` - 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
-* :py:func:`EMA` - 指数移动平均线(Exponential Moving Average)
 * :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
 * :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
 * :py:func:`ROCR` - 变动率指标: (price / prevPrice)
