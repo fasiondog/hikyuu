@@ -61,8 +61,9 @@ void export_Factor(py::module& m) {
       .def_property("update_at", py::overload_cast<>(&Factor::updateAt, py::const_),
                     py::overload_cast<const Datetime&>(&Factor::updateAt),
                     py::return_value_policy::copy, "更改日期")
-      .def_property("formula", &Factor::formula,
-                    py::overload_cast<const Indicator&>(&Factor::formula), "因子公式")
+      .def_property("formula", py::overload_cast<>(&Factor::formula, py::const_),
+                    py::overload_cast<const Indicator&>(&Factor::formula),
+                    py::return_value_policy::copy, "因子公式")
       .def_property("start_date", py::overload_cast<>(&Factor::startDate, py::const_),
                     py::overload_cast<const Datetime&>(&Factor::startDate), "数据存储起始日期")
       .def_property("block", py::overload_cast<>(&Factor::block, py::const_),
