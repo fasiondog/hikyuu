@@ -86,6 +86,16 @@ FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype) {
     return ret;
 }
 
+IndicatorList getValues(const Factor& factor, const StockList& stocks, const KQuery& query,
+                        bool align, bool fill_null, bool tovalue) {
+    IndicatorList ret;
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    ret = plugin->getValues(factor, stocks, query, align, fill_null, tovalue);
+    return ret;
+}
+
 vector<IndicatorList> getValues(const FactorSet& factor_set, const StockList& stocks,
                                 const KQuery& query, bool align, bool fill_null, bool tovalue) {
     vector<IndicatorList> ret;

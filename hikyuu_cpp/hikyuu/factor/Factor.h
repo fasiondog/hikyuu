@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "FactorImp.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/Block.h"
 
 namespace hku {
 
@@ -18,7 +19,7 @@ public:
     Factor();
 
     /**
-     * 尝试加载因子
+     * 只指定因子名称 (+ k线类型)，将尝试自动从数据库加载因子
      * @param name 因子名称
      * @param ktype K线类型
      */
@@ -36,9 +37,6 @@ public:
     Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype = KQuery::DAY,
            const string& brief = "", const string& details = "", bool need_persist = false,
            const Datetime& start_date = Datetime::min(), const Block& block = Block());
-
-    explicit Factor(const FactorImpPtr& imp) : m_imp(imp) {}
-    explicit Factor(FactorImpPtr&& imp) : m_imp(std::move(imp)) {}
 
     Factor(const Factor& other);
     Factor(Factor&& other);
@@ -63,103 +61,105 @@ public:
     IndicatorList getAllValues(const KQuery& query, bool align = false, bool fill_null = false,
                                bool tovalue = false);
 
-    //------------------------
-    // 只读属性
-    //------------------------
+    const string& name() const noexcept;
 
-    const string& name() const noexcept {
-        return m_imp->name();
-    }
+    void name(const string& name);
 
-    const string& ktype() const noexcept {
-        return m_imp->ktype();
-    }
+    const string& ktype() const noexcept;
 
-    const Indicator& formula() const noexcept {
-        return m_imp->formula();
-    }
+    void ktype(const string& ktype);
 
-    const Datetime& startDate() const noexcept {
-        return m_imp->startDate();
-    }
+    const Indicator& formula() const noexcept;
 
-    const Block& block() const noexcept {
-        return m_imp->block();
-    }
+    void formula(const Indicator& formula);
 
-    //------------------------
-    // 可读写属性
-    //------------------------
+    const Datetime& startDate() const noexcept;
 
-    const Datetime& createAt() const noexcept {
-        return m_imp->createAt();
-    }
+    void startDate(const Datetime& datetime);
 
-    void createAt(const Datetime& datetime) {
-        m_imp->createAt(datetime);
-    }
+    const Block& block() const noexcept;
 
-    const Datetime& updateAt() const noexcept {
-        return m_imp->updateAt();
-    }
+    void block(const Block& block);
 
-    void updateAt(const Datetime& datetime) {
-        m_imp->updateAt(datetime);
-    }
+    const Datetime& createAt() const noexcept;
 
-    bool needPersist() const noexcept {
-        return m_imp->needPersist();
-    }
+    void createAt(const Datetime& datetime);
 
-    void needPersist(bool flag) {
-        m_imp->needPersist(flag);
-    }
+    const Datetime& updateAt() const noexcept;
 
-    const string& brief() const noexcept {
-        return m_imp->brief();
-    }
+    void updateAt(const Datetime& datetime);
 
-    void brief(const string& brief) {
-        m_imp->brief(brief);
-    }
+    bool needPersist() const noexcept;
 
-    const string& details() const noexcept {
-        return m_imp->details();
-    }
+    void needPersist(bool flag);
 
-    void details(const string& details) {
-        m_imp->details(details);
-    }
+    const string& brief() const noexcept;
 
-    //------------------------
-    // 其他接口
-    //------------------------
+    void brief(const string& brief);
 
-    shared_ptr<FactorImp> getImp() const noexcept {
-        return m_imp;
-    }
+    const string& details() const noexcept;
 
-    bool isNull() const noexcept {
-        return m_imp == ms_null_factor_imp;
-    }
+    void details(const string& details);
 
-    uint64_t hash() const noexcept {
-        return m_imp->hash();
-    }
+    uint64_t hash() const noexcept;
+
+    bool isNull() const noexcept;
 
     string str() const;
 
+    /**
+     * 保存因子即其所有计算结果到数据库，如果因子已存在则更新，否则插入新记录
+     * @note 因子名称不区分大小写，以 name + ktype 作为唯一标识
+     */
     void save_to_db();
 
+    /**
+     * 从数据库中删除因子及其数据
+     */
     void remove_from_db();
 
+    /**
+     * 从数据库中加载因子，以 name + ktype 作为唯一标识，如果不存在则不修改当前对象
+     */
     void load_from_db();
 
 private:
-    shared_ptr<FactorImp> m_imp;
+    struct Data {
+        string name;               ///< 因子名称
+        string ktype;              ///< K线类型
+        string brief;              ///< 简要描述
+        string details;            ///< 详细描述
+        Datetime create_at;        ///< 创建时间
+        Datetime update_at;        ///< 更新时间
+        Datetime start_date;       ///< 开始日期，数据存储时的起始日期
+        Indicator formula;         ///< 计算公式指标
+        Block block;               ///< 板块信息，证券集合，如果为空，为全部
+        bool need_persist{false};  ///< 是否需要持久化
+
+        Data() = default;
+        Data(const string& name, const Indicator& formula, const KQuery::KType& ktype,
+             const string& brief, const string& details, bool need_persist,
+             const Datetime& start_date, const Block& block)
+        : name(name),
+          ktype(ktype),
+          brief(brief),
+          details(details),
+          start_date(start_date),
+          formula(formula.clone()),
+          block(block),
+          need_persist(need_persist) {
+            to_upper(this->name);
+            this->formula.setContext(KData());
+            this->formula.name(this->name);
+            if (this->start_date == Null<Datetime>()) {
+                this->start_date = Datetime::min();
+            }
+        }
+    };
+    shared_ptr<Data> m_data;
 
 private:
-    static shared_ptr<FactorImp> ms_null_factor_imp;
+    static shared_ptr<Data> ms_null_data;  // 全局空数据，避免重复创建
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -210,12 +210,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(brief);
         ar& BOOST_SERIALIZATION_NVP(details);
         ar& BOOST_SERIALIZATION_NVP(needPersist);
-        if (name.empty() || ktype.empty()) {
-            m_imp = ms_null_factor_imp;
-            return;
-        }
-        this->m_imp = make_shared<FactorImp>(name, formula, ktype, brief, details, needPersist,
-                                             startDate, block);
+        this->m_data =
+          make_shared<Data>(name, formula, ktype, brief, details, needPersist, startDate, block);
         this->createAt(createAt);
         this->updateAt(updateAt);
     }
@@ -223,6 +219,102 @@ private:
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// inline impl
+///////////////////////////////////////////////////////////////////////////////
+
+inline const string& Factor::name() const noexcept {
+    return m_data->name;
+}
+
+inline void Factor::name(const string& name) {
+    m_data->name = name;
+    to_upper(m_data->name);
+    m_data->formula.name(m_data->name);
+}
+
+inline const string& Factor::ktype() const noexcept {
+    return m_data->ktype;
+}
+
+inline void Factor::ktype(const string& ktype) {
+    m_data->ktype = ktype;
+}
+
+inline const Indicator& Factor::formula() const noexcept {
+    return m_data->formula;
+}
+
+inline void Factor::formula(const Indicator& formula) {
+    m_data->formula = formula.clone();
+    m_data->formula.name(m_data->name);
+    m_data->formula.setContext(KData());
+}
+
+inline const Datetime& Factor::startDate() const noexcept {
+    return m_data->start_date;
+}
+
+inline void Factor::startDate(const Datetime& datetime) {
+    m_data->start_date = datetime == Null<Datetime>() ? Datetime::min() : datetime;
+}
+
+inline const Block& Factor::block() const noexcept {
+    return m_data->block;
+}
+
+inline void Factor::block(const Block& block) {
+    m_data->block = block;
+}
+
+inline const Datetime& Factor::createAt() const noexcept {
+    return m_data->create_at;
+}
+
+inline void Factor::createAt(const Datetime& datetime) {
+    m_data->create_at = datetime;
+}
+
+inline const Datetime& Factor::updateAt() const noexcept {
+    return m_data->update_at;
+}
+
+inline void Factor::updateAt(const Datetime& datetime) {
+    m_data->update_at = datetime;
+}
+
+inline bool Factor::needPersist() const noexcept {
+    return m_data->need_persist;
+}
+
+inline void Factor::needPersist(bool flag) {
+    m_data->need_persist = flag;
+}
+
+inline const string& Factor::brief() const noexcept {
+    return m_data->brief;
+}
+
+inline void Factor::brief(const string& brief) {
+    m_data->brief = brief;
+}
+
+inline const string& Factor::details() const noexcept {
+    return m_data->details;
+}
+
+inline void Factor::details(const string& details) {
+    m_data->details = details;
+}
+
+inline uint64_t Factor::hash() const noexcept {
+    return m_data ? (uint64_t)m_data.get() : 0;
+}
+
+inline bool Factor::isNull() const noexcept {
+    return m_data == ms_null_data;
+}
 
 typedef vector<Factor> FactorList;
 

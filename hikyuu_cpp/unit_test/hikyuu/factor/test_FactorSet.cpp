@@ -11,6 +11,7 @@
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/StockManager.h>
+#include "../plugin_valid.h"
 #include <algorithm>
 #include <utility>  // for std::pair
 #include <string>   // for std::to_string
@@ -594,6 +595,7 @@ TEST_CASE("test_FactorSet_order_preservation") {
 
 /** @par 检测点：测试FactorSet getValues功能 */
 TEST_CASE("test_FactorSet_getValues") {
+    HKU_IF_RETURN(!pluginValid(), void());
     // 创建测试用的 Indicator
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
@@ -650,6 +652,7 @@ TEST_CASE("test_FactorSet_getValues") {
 
 /** @par 检测点：测试FactorSet getValues方法的完整参数组合 */
 TEST_CASE("test_FactorSet_getValues_complete_params") {
+    HKU_IF_RETURN(!pluginValid(), void());
     // 准备测试数据
     StockManager& sm = StockManager::instance();
     Stock stock1 = sm.getStock("sh000001");  // 上证指数
@@ -759,6 +762,7 @@ TEST_CASE("test_FactorSet_getValues_complete_params") {
 
 /** @par 检测点：测试FactorSet getValues方法的check参数功能 */
 TEST_CASE("test_FactorSet_getValues_check") {
+    HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();
     Stock stock1 = sm.getStock("sh000001");
     Stock stock2 = sm.getStock("sz000001");
@@ -817,6 +821,7 @@ TEST_CASE("test_FactorSet_getValues_check") {
 
 /** @par 检测点：测试FactorSet getValues方法的边界条件 */
 TEST_CASE("test_FactorSet_getValues_edge_cases") {
+    HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();
     Stock stock1 = sm.getStock("sh000001");
     Stock stock2 = sm.getStock("sz000001");
@@ -892,6 +897,7 @@ TEST_CASE("test_FactorSet_getValues_edge_cases") {
 
 /** @par 检测点：测试FactorSet getValues方法的结果正确性 */
 TEST_CASE("test_FactorSet_getValues_result_correctness") {
+    HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();
     Stock stock1 = sm.getStock("sh000001");  // 上证指数
     Stock stock2 = sm.getStock("sz000001");  // 深证成指
