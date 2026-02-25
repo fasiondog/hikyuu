@@ -17,7 +17,7 @@ IReplace::IReplace() : IndicatorImp("REPLACE", 1) {
     setParam<double>("old_value", Null<double>());
     setParam<double>("new_value", 0.0);
     setParam<bool>("ignore_discard",
-                   false);  // 忽略传入指标的 discard, 如果替换nan值，新结果 discard 将为 0
+                   false);  // 忽略传入指标的 discard, 即对所有数据进行替换处理
 }
 
 IReplace::~IReplace() {}
@@ -55,12 +55,7 @@ void IReplace::_calculate(const Indicator &data) {
     }
 
     // 重新更新 m_discard
-    for (size_t i = m_discard; i < total; ++i) {
-        if (!std::isnan(dst[i])) {
-            m_discard = i;
-            break;
-        }
-    }
+    updateDiscard();
 }
 
 Indicator HKU_API REPLACE(double old_value, double new_value, bool ignore_discard) {

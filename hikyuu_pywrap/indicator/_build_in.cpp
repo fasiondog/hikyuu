@@ -32,6 +32,12 @@ Indicator (*AMO3)() = AMO;
 Indicator (*VOL1)(const KData&) = VOL;
 Indicator (*VOL3)() = VOL;
 
+Indicator (*ISLIMITUP1)() = ISLIMITUP;
+Indicator (*ISLIMITUP2)(const KData&) = ISLIMITUP;
+
+Indicator (*ISLIMITDOWN1)() = ISLIMITDOWN;
+Indicator (*ISLIMITDOWN2)(const KData&) = ISLIMITDOWN;
+
 Indicator (*KDATA_PART1)(const KData& kdata, const string& part) = KDATA_PART;
 Indicator (*KDATA_PART3)(const string& part) = KDATA_PART;
 
@@ -2271,4 +2277,48 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator ind: 指标
     :param int n: 周期数)");
+
+    // ISLIMITUP 涨停判断指标绑定
+    m.def("ISLIMITUP", ISLIMITUP1, R"(ISLIMITUP()
+
+    判断股票是否涨停指标
+
+    根据不同股票类型判断当日收盘价是否达到涨停板价格：
+    - A股普通股票：涨停幅度为10%
+    - 北交所股票：涨停幅度为30%
+    - 创业板/科创板股票：涨停幅度为20%
+    - ST股票涨停幅度为5%，但由于缺乏ST标识的历史日期信息，暂未处理
+
+    涨停判断逻辑：当日收盘价 >= 前一日收盘价 × (1 + 涨停幅度)
+
+    :rtype: Indicator)");
+
+    m.def("ISLIMITUP", ISLIMITUP2, py::arg("kdata"), R"(ISLIMITUP(kdata)
+
+    判断指定K线数据中的股票是否涨停
+
+    :param KData kdata: K线数据
+    :rtype: Indicator)");
+
+    // ISLIMITDOWN 跌停判断指标绑定
+    m.def("ISLIMITDOWN", ISLIMITDOWN1, R"(ISLIMITDOWN()
+
+    判断股票是否跌停指标
+
+    根据不同股票类型判断当日收盘价是否达到跌停板价格：
+    - A股普通股票：跌停幅度为10%
+    - 北交所股票：跌停幅度为30%
+    - 创业板/科创板股票：跌停幅度为20%
+    - ST股票跌停幅度为5%，但由于缺乏ST标识的历史日期信息，暂未处理
+
+    跌停判断逻辑：当日收盘价 <= 前一日收盘价 × (1 - 跌停幅度)
+
+    :rtype: Indicator)");
+
+    m.def("ISLIMITDOWN", ISLIMITDOWN2, py::arg("kdata"), R"(ISLIMITDOWN(kdata)
+
+    判断指定K线数据中的股票是否跌停
+
+    :param KData kdata: K线数据
+    :rtype: Indicator)");
 }

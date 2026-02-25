@@ -64,6 +64,8 @@
 #include "crt/ISINF.h"
 #include "crt/ISINFA.h"
 #include "crt/ISLASTBAR.h"
+#include "crt/ISLIMITUP.h"
+#include "crt/ISLIMITDOWN.h"
 #include "crt/ISNA.h"
 #include "crt/JUMPUP.h"
 #include "crt/JUMPDOWN.h"
