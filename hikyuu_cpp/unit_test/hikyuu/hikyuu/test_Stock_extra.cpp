@@ -31,14 +31,10 @@ static bool _pluginValid() {
 
 /** @par 检测点 */
 TEST_CASE("test_Stock_extra_ktype") {
-    HKU_INFO("0");
     HKU_IF_RETURN(!_pluginValid(), void());
-    HKU_INFO("1");
 
     /** @arg 检查扩展K线类型对应的分钟数 */
     CHECK_EQ(KQuery::getKTypeInMin(KQuery::DAY) * 3, KQuery::getKTypeInMin(KQuery::DAY3));
-
-    HKU_INFO("2");
 
     /** @arg 检测 nbar 类别的扩展K线数据 */
     auto stk = getStock("sh000001");
