@@ -324,22 +324,32 @@ void export_MultiFactor(py::module& m) {
     m.def("MF_EqualWeight", py::overload_cast<>(MF_EqualWeight));
     m.def(
       "MF_EqualWeight",
-      [](const py::sequence& inds, const py::object& stks, const KQuery& query,
+      [](const py::object& input, const py::object& stks, const KQuery& query,
          const py::object& ref_stk, int ic_n, bool spearman, int mode, bool save_all_factors) {
-          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = get_stock_list_from_python(stks);
-          return MF_EqualWeight(c_inds, c_stks, query,
-                                ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>(), ic_n, spearman,
-                                mode, save_all_factors);
+          Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
+          
+          // 判断输入类型
+          if (py::isinstance<FactorSet>(input)) {
+              // 输入是FactorSet
+              FactorSet factset = input.cast<FactorSet>();
+              return MF_EqualWeight(factset, c_stks, query, ref_stock, ic_n, spearman, mode, save_all_factors);
+          } else if (py::isinstance<py::sequence>(input)) {
+              // 输入是序列（假设为Indicator列表）
+              IndicatorList c_inds = python_list_to_vector<Indicator>(input);
+              return MF_EqualWeight(c_inds, c_stks, query, ref_stock, ic_n, spearman, mode, save_all_factors);
+          } else {
+              throw std::invalid_argument("First parameter must be either FactorSet or sequence of Indicator");
+          }
       },
-      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
+      py::arg("input"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
       py::arg("ic_n") = 5, py::arg("spearman") = true, py::arg("mode") = 0,
       py::arg("save_all_factors") = false,
-      R"(MF_EqualWeight(inds, stks, query, ref_stk[, ic_n=5])
+      R"(MF_EqualWeight(input, stks, query, ref_stk[, ic_n=5])
 
-    等权重合成因子
+    等权重合成因子，支持多种输入类型
 
-    :param sequense(Indicator) inds: 原始因子列表
+    :param input: 因子输入，可以是FactorSet对象或Indicator序列
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
     :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
@@ -347,59 +357,101 @@ void export_MultiFactor(py::module& m) {
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
     :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
-    :rtype: MultiFactorBase)");
+    :rtype: MultiFactorBase
+
+    .. code-block:: python
+    
+        # 使用Indicator列表
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        mf1 = MF_EqualWeight(indicators, stocks, query)
+        
+        # 使用FactorSet
+        factor_set = FactorSet(indicators)
+        mf2 = MF_EqualWeight(factor_set, stocks, query))");
+
 
     m.def("MF_Weight", py::overload_cast<>(MF_Weight));
     m.def(
       "MF_Weight",
-      [](const py::sequence& inds, const py::object& stks, const py::sequence& weights,
+      [](const py::object& input, const py::object& stks, const py::object& weights_obj,
          const KQuery& query, const py::object& ref_stk, int ic_n, bool spearman, int mode,
          bool save_all_factors) {
-          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = get_stock_list_from_python(stks);
-          PriceList c_weights = python_list_to_vector<price_t>(weights);
-          return MF_Weight(c_inds, c_weights, c_stks, query,
-                           ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>(), ic_n, spearman,
-                           mode, save_all_factors);
+          Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
+          PriceList c_weights = python_list_to_vector<price_t>(weights_obj);
+          
+          // 判断输入类型
+          if (py::isinstance<FactorSet>(input)) {
+              // 输入是FactorSet
+              FactorSet factset = input.cast<FactorSet>();
+              return MF_Weight(factset, c_weights, c_stks, query, ref_stock, ic_n, spearman, mode, save_all_factors);
+          } else if (py::isinstance<py::sequence>(input)) {
+              // 输入是序列（假设为Indicator列表）
+              IndicatorList c_inds = python_list_to_vector<Indicator>(input);
+              return MF_Weight(c_inds, c_weights, c_stks, query, ref_stock, ic_n, spearman, mode, save_all_factors);
+          } else {
+              throw std::invalid_argument("First parameter must be either FactorSet or sequence of Indicator");
+          }
       },
-      py::arg("inds"), py::arg("stks"), py::arg("weights"), py::arg("query"),
+      py::arg("input"), py::arg("stks"), py::arg("weights"), py::arg("query"),
       py::arg("ref_stk") = py::none(), py::arg("ic_n") = 5, py::arg("spearman") = true,
       py::arg("mode") = 0, py::arg("save_all_factors") = false,
-      R"(MF_Weight(inds, stks, weights, query, ref_stk[, ic_n=5, spearman=True, mode=0, save_all_factors=False])
+      R"(MF_Weight(input, stks, weights, query, ref_stk[, ic_n=5, spearman=True, mode=0, save_all_factors=False])
 
-    按指定权重合成因子 = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn
+    按指定权重合成因子 = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn，支持多种输入类型
 
-    :param sequense(Indicator) inds: 原始因子列表
+    :param input: 因子输入，可以是FactorSet对象或Indicator序列
     :param sequense(stock) stks: 计算证券列表
-    :param sequense(float) weights: 权重列表(需和 inds 等长)
+    :param sequense(float) weights: 权重列表(需和因子数量等长)
     :param Query query: 日期范围
     :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
     :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
-    :rtype: MultiFactorBase)");
+    :rtype: MultiFactorBase
+
+    .. code-block:: python
+    
+        # 使用Indicator列表
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        weights = [0.6, 0.4]
+        mf1 = MF_Weight(indicators, stocks, weights, query)
+        
+        # 使用FactorSet
+        factor_set = FactorSet(indicators)
+        mf2 = MF_Weight(factor_set, stocks, weights, query))");
 
     m.def("MF_ICWeight", py::overload_cast<>(MF_ICWeight));
     m.def(
       "MF_ICWeight",
-      [](const py::sequence& inds, const py::object& stks, const KQuery& query,
+      [](const py::object& input, const py::object& stks, const KQuery& query,
          const py::object& ref_stk, int ic_n, int ic_rolling_n, bool spearman, int mode,
          bool save_all_factors) {
-          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = get_stock_list_from_python(stks);
-          return MF_ICWeight(c_inds, c_stks, query,
-                             ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>(), ic_n,
-                             ic_rolling_n, spearman, mode, save_all_factors);
+          Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
+          
+          // 判断输入类型
+          if (py::isinstance<FactorSet>(input)) {
+              // 输入是FactorSet
+              FactorSet factset = input.cast<FactorSet>();
+              return MF_ICWeight(factset, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+          } else if (py::isinstance<py::sequence>(input)) {
+              // 输入是序列（假设为Indicator列表）
+              IndicatorList c_inds = python_list_to_vector<Indicator>(input);
+              return MF_ICWeight(c_inds, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+          } else {
+              throw std::invalid_argument("First parameter must be either FactorSet or sequence of Indicator");
+          }
       },
-      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
+      py::arg("input"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
       py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120, py::arg("spearman") = true,
       py::arg("mode") = 0, py::arg("save_all_factors") = false,
-      R"(MF_ICWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
+      R"(MF_ICWeight(input, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
-    滚动IC权重合成因子
+    滚动IC权重合成因子，支持多种输入类型
 
-    :param sequense(Indicator) inds: 原始因子列表
+    :param input: 因子输入，可以是FactorSet对象或Indicator序列
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
     :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
@@ -408,28 +460,48 @@ void export_MultiFactor(py::module& m) {
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
     :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
-    :rtype: MultiFactorBase)");
+    :rtype: MultiFactorBase
+
+    .. code-block:: python
+    
+        # 使用Indicator列表
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        mf1 = MF_ICWeight(indicators, stocks, query)
+        
+        # 使用FactorSet
+        factor_set = FactorSet(indicators)
+        mf2 = MF_ICWeight(factor_set, stocks, query))");
 
     m.def("MF_ICIRWeight", py::overload_cast<>(MF_ICIRWeight));
     m.def(
       "MF_ICIRWeight",
-      [](const py::sequence& inds, const py::object& stks, const KQuery& query,
+      [](const py::object& input, const py::object& stks, const KQuery& query,
          const py::object& ref_stk, int ic_n, int ic_rolling_n, bool spearman, int mode,
          bool save_all_factors) {
-          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           StockList c_stks = get_stock_list_from_python(stks);
-          return MF_ICIRWeight(c_inds, c_stks, query,
-                               ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>(), ic_n,
-                               ic_rolling_n, spearman, mode, save_all_factors);
+          Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
+          
+          // 判断输入类型
+          if (py::isinstance<FactorSet>(input)) {
+              // 输入是FactorSet
+              FactorSet factset = input.cast<FactorSet>();
+              return MF_ICIRWeight(factset, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+          } else if (py::isinstance<py::sequence>(input)) {
+              // 输入是序列（假设为Indicator列表）
+              IndicatorList c_inds = python_list_to_vector<Indicator>(input);
+              return MF_ICIRWeight(c_inds, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+          } else {
+              throw std::invalid_argument("First parameter must be either FactorSet or sequence of Indicator");
+          }
       },
-      py::arg("inds"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
+      py::arg("input"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
       py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120, py::arg("spearman") = true,
       py::arg("mode") = 0, py::arg("save_all_factors") = false,
-      R"(MF_ICIRWeight(inds, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
+      R"(MF_ICIRWeight(input, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
-    滚动ICIR权重合成因子
+    滚动ICIR权重合成因子，支持多种输入类型
 
-    :param sequense(Indicator) inds: 原始因子列表
+    :param input: 因子输入，可以是FactorSet对象或Indicator序列
     :param sequense(stock) stks: 计算证券列表
     :param Query query: 日期范围
     :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
@@ -438,5 +510,15 @@ void export_MultiFactor(py::module& m) {
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
     :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
-    :rtype: MultiFactorBase)");
+    :rtype: MultiFactorBase
+
+    .. code-block:: python
+    
+        # 使用Indicator列表
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        mf1 = MF_ICIRWeight(indicators, stocks, query)
+        
+        # 使用FactorSet
+        factor_set = FactorSet(indicators)
+        mf2 = MF_ICIRWeight(factor_set, stocks, query))");
 }
