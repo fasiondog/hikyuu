@@ -8,6 +8,9 @@
 #include "Factor.h"
 #include "hikyuu/plugin/factor.h"
 #include "hikyuu/plugin/device.h"
+#include "hikyuu/StockManager.h"
+#include "hikyuu/indicator/crt/PRICELIST.h"
+#include "hikyuu/indicator/crt/ALIGN.h"
 
 namespace hku {
 
