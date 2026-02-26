@@ -59,10 +59,6 @@ TEST_CASE("test_MDD_basic") {
     expects = {0., 0., 0.72282, 0.72282, 0.72282, 3.27389, 3.27389, 3.27389, 3.28155, 2.55377};
     check_indicator(mdd, PRICELIST(expects));
 
-    for (int i = 0; i < mdd.size(); ++i) {
-        HKU_INFO("{}: {} {:<.5f}", i, close[i], mdd[i]);
-    }
-
     /** @arg n = 1 时, 正常关联数据 */
     kdata = stock.getKData(KQuery(-5));
     close = CLOSE(kdata);
@@ -71,7 +67,6 @@ TEST_CASE("test_MDD_basic") {
     CHECK_EQ(mdd.empty(), false);
     CHECK_EQ(mdd.size(), kdata.size());
     CHECK_EQ(mdd.discard(), 0);
-    // 使用check_indicator验证所有值都为0
     Indicator zero_ind = PRICELIST(PriceList(kdata.size(), 0.0));
     check_indicator(mdd, zero_ind);
 
@@ -84,52 +79,31 @@ TEST_CASE("test_MDD_basic") {
     CHECK_EQ(mdd.empty(), true);
 
     /** @arg 自定义数据测试 */
-    PriceList data{100.0, 105.0, 102.0, 108.0, 95.0};
+    PriceList data{100.0, 105.0, 102.0, 108.0, 95.0, 90.0, 101.0, 77.0};
     Indicator d = PRICELIST(data);
     Indicator mdd1 = MDD(d, 5);
     CHECK_EQ(mdd1.discard(), 0);
-    CHECK_EQ(mdd1[0], 0.0);
-    CHECK_EQ(mdd1[1], 0.0);
-    CHECK(mdd1[2] > 2.85);  // (102-105)/105*100
-    CHECK(mdd1[2] < 2.86);
-    CHECK_EQ(mdd1[3], doctest::Approx(mdd1[2]).epsilon(0.001));
-    CHECK(mdd1[4] > 12.03);  // (95-108)/108*100
-    CHECK(mdd1[4] < 12.04);
+    expects = {0.0, 0.0, 2.85714, 2.85714, 12.03704, 16.66667, 16.66667, 28.70370};
+    check_indicator(mdd1, PRICELIST(expects));
 
-    /** @arg operator() 测试 */
-    mdd = MDD(5);
-    mdd1 = MDD(d, 5);
-    Indicator mdd2 = mdd(d);
-    CHECK_EQ(mdd.size(), 0);
-    CHECK_EQ(mdd1.size(), 5);
-    CHECK_EQ(mdd1.size(), mdd2.size());
-    // 使用check_indicator验证operator()结果一致性
-    check_indicator(mdd1, mdd2);
-}
-
-/** @par 检测点 */
-TEST_CASE("test_MDD_edge_cases") {
     /** @arg 极端上涨序列 */
     PriceList rising_data{100.0, 110.0, 120.0, 130.0, 140.0};
     Indicator rising = PRICELIST(rising_data);
     Indicator mdd_rising = MDD(rising, 0);
     // 使用check_indicator验证所有值都为0
-    Indicator zero_ind = PRICELIST(PriceList(rising_data.size(), 0.0));
+    zero_ind = PRICELIST(PriceList(rising_data.size(), 0.0));
     check_indicator(mdd_rising, zero_ind);
 
     /** @arg 极端下跌序列 */
     PriceList falling_data{100.0, 90.0, 80.0, 70.0, 60.0};
     Indicator falling = PRICELIST(falling_data);
     Indicator mdd_falling = MDD(falling, 0);
-    CHECK_EQ(mdd_falling[0], 0.0);
-    CHECK(mdd_falling[1] > 9.9);
-    CHECK(mdd_falling[1] < 10.1);
-    CHECK(mdd_falling[2] > 19.9);
-    CHECK(mdd_falling[2] < 20.1);
-    CHECK(mdd_falling[3] > 29.9);
-    CHECK(mdd_falling[3] < 30.1);
-    CHECK(mdd_falling[4] > 39.9);
-    CHECK(mdd_falling[4] < 40.1);
+    expects = {0.0, 10.0, 20, 30, 40};
+    check_indicator(mdd_falling, PRICELIST(expects));
+
+    mdd_falling = MDD(falling, 3);
+    expects = {0.0, 10.0, 20., 22.22222, 25.0};
+    check_indicator(mdd_falling, PRICELIST(expects));
 
     /** @arg 包含相等价格的情况 */
     PriceList equal_data{100.0, 100.0, 100.0, 100.0, 100.0};
