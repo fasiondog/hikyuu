@@ -281,8 +281,6 @@ void global_wait_task(FutureType& future) {
 template <typename FunctionType>
 auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f, size_t threshold = 2,
                                     bool enable_nested = true) {
-    auto* tg = get_global_task_group();
-    HKU_CHECK(tg, "Global task group is not initialized!");
     HKU_IF_RETURN(start >= end, void());
 
     // 如果任务数量小于阈值，或者当前是工作线程且禁止嵌套, 则直接执行
@@ -292,6 +290,9 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f, si
         }
         return;
     }
+
+    auto* tg = get_global_task_group();
+    HKU_ASSERT(tg);
 
     auto ranges = parallelIndexRange(start, end, tg->worker_num());
     if (ranges.empty()) {
@@ -320,9 +321,6 @@ auto global_parallel_for_index_void(size_t start, size_t end, FunctionType f, si
 template <typename FunctionType>
 auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t threshold = 2,
                                bool enable_nested = true) {
-    auto* tg = get_global_task_group();
-    HKU_CHECK(tg, "Global task group is not initialized!");
-
     std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
     HKU_IF_RETURN(start >= end, ret);
 
@@ -335,6 +333,9 @@ auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t 
         }
         return ret;
     }
+
+    auto* tg = get_global_task_group();
+    HKU_ASSERT(tg);
 
     auto ranges = parallelIndexRange(start, end, tg->worker_num());
     if (ranges.empty()) {
@@ -370,8 +371,6 @@ auto global_parallel_for_index(size_t start, size_t end, FunctionType f, size_t 
 template <typename FunctionType>
 void global_parallel_for_index_void_single(size_t start, size_t end, FunctionType f,
                                            size_t threshold = 1, bool enable_nested = true) {
-    auto* tg = get_global_task_group();
-    HKU_CHECK(tg, "Global task group is not initialized!");
     HKU_IF_RETURN(start >= end, void());
 
     // 检查当前线程是否已经在执行某个任务，如果是则降级为串行执行
@@ -381,6 +380,9 @@ void global_parallel_for_index_void_single(size_t start, size_t end, FunctionTyp
         }
         return;
     }
+
+    auto* tg = get_global_task_group();
+    HKU_ASSERT(tg);
 
     std::vector<std::future<void>> tasks;
     tasks.reserve(end - start);
@@ -399,9 +401,6 @@ void global_parallel_for_index_void_single(size_t start, size_t end, FunctionTyp
 template <typename FunctionType>
 auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
                                       size_t threshold = 1, bool enable_nested = true) {
-    auto* tg = get_global_task_group();
-    HKU_CHECK(tg, "Global task group is not initialized!");
-
     std::vector<typename std::invoke_result<FunctionType, size_t>::type> ret;
     HKU_IF_RETURN(start >= end, ret);
 
@@ -414,6 +413,9 @@ auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
         }
         return ret;
     }
+
+    auto* tg = get_global_task_group();
+    HKU_ASSERT(tg);
 
     std::vector<std::future<typename std::invoke_result<FunctionType, size_t>::type>> tasks;
     tasks.reserve(end - start);
