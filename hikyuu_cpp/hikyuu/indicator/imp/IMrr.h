@@ -18,6 +18,10 @@ class IMrr : public IndicatorImp {
 public:
     IMrr();
     virtual ~IMrr() override;
+    virtual void _checkParam(const string& name) const override;
+    virtual bool supportIncrementCalculate() const override;
+    virtual size_t min_increment_start() const override;
+    virtual void _increment_calculate(const Indicator& ind, size_t start_pos) override;
 };
 
 }  // namespace hku

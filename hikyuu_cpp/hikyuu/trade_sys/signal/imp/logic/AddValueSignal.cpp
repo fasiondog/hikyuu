@@ -25,7 +25,6 @@ void AddValueSignal::_calculate(const KData& kdata) {
             _addSignal(ks[i].datetime, m_sg->getValue(ks[i].datetime));
         }
     } else {
-        HKU_INFO("m_value: {}", m_value);
         for (size_t i = 0; i < total; ++i) {
             double buy_value = m_sg->getBuyValue(ks[i].datetime);
             if (buy_value > 0.0) {

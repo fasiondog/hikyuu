@@ -12,18 +12,18 @@
 namespace hku {
 
 /**
- * 当前价格相对历史最低值的盈利百分比
+ * 最大盈利百分比(和MDD向对应的相反方向计算)
  * @ingroup Indicator
  */
-Indicator HKU_API MRR();
+Indicator HKU_API MRR(int n = 0);
 
 /**
- * 当前价格相对历史最低值的盈利百分比
+ * 最大盈利百分比
  * @param ind 待计算的数据
  * @ingroup Indicator
  */
-inline Indicator MRR(const Indicator& ind) {
-    return MRR()(ind);
+inline Indicator MRR(const Indicator& ind, int n = 0) {
+    return MRR(n)(ind);
 }
 
 }  // namespace hku

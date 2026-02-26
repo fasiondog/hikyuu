@@ -1049,7 +1049,7 @@
     :rtype: Indicator
 
 
-.. py:function:: MDD([ind])
+.. py:function:: MDD([ind, n=0])
 
     最大回撤百分比(n=0 则无时间窗口限制), 按行业惯例为正值
 
@@ -1092,9 +1092,9 @@
     :rtype: Indicator
 
 
-.. py:function:: MRR([ind])
+.. py:function:: MRR([ind, n=0])
 
-    当前价格相对历史最低值的盈利百分比
+    最大盈利百分比(和MDD向对应的相反方向计算)
 
 
 .. py:function:: NDAY(x, y[, n=3])

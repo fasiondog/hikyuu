@@ -21,7 +21,7 @@ using namespace hku;
  */
 
 /** @par 检测点 */
-TEST_CASE("test_MDD_basic") {
+TEST_CASE("test_MDD") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
     KData kdata;

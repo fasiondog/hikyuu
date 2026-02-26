@@ -477,9 +477,6 @@ Indicator (*SLOPE3)(const Indicator&, int) = SLOPE;
 Indicator (*SLOPE4)(const Indicator&, const IndParam&) = SLOPE;
 Indicator (*SLOPE5)(const Indicator&, const Indicator&) = SLOPE;
 
-Indicator (*MRR_1)() = MRR;
-Indicator (*MRR_2)(const Indicator&) = MRR;
-
 Indicator (*ZHBOND10_1)(double) = ZHBOND10;
 Indicator (*ZHBOND10_2)(const DatetimeList&, double) = ZHBOND10;
 Indicator (*ZHBOND10_3)(const KData& k, double) = ZHBOND10;
@@ -1834,10 +1831,15 @@ void export_Indicator_build_in(py::module& m) {
     :param int n: 时间窗口
     :rtype: Indicator)");
 
-    m.def("MRR", MRR_1);
-    m.def("MRR", MRR_2, R"(MRR([data])
+    m.def("MRR", py::overload_cast<int>(&MRR), py::arg("n") = 0);
+    m.def("MRR", py::overload_cast<const Indicator&, int>(&MRR), py::arg("data"), py::arg("n"),
+          R"(MRR([data])
     
-    当前价格相对历史最低值的盈利百分比，可用于计算历史最高盈利比例)");
+    最大盈利百分比(和MDD向对应的相反方向计算)
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     m.def("ZHBOND10", ZHBOND10_1, py::arg("default_val") = 0.4);
     m.def("ZHBOND10", ZHBOND10_2, py::arg("data"), py::arg("default_val") = 0.4);
