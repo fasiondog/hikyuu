@@ -887,8 +887,8 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     per = tm.get_performance(sh000001_k[-1].datetime, ext=ext)
     text = per.report()
 
-    # 计算最大回撤
-    max_pullback = min(MDD(funds))
+    # 计算最大回撤百分比
+    max_pullback = MDD(funds)[-1]
 
     # 计算 sharp
     bond = ZHBOND10(ref_dates)

@@ -477,9 +477,6 @@ Indicator (*SLOPE3)(const Indicator&, int) = SLOPE;
 Indicator (*SLOPE4)(const Indicator&, const IndParam&) = SLOPE;
 Indicator (*SLOPE5)(const Indicator&, const Indicator&) = SLOPE;
 
-Indicator (*MDD_1)() = MDD;
-Indicator (*MDD_2)(const Indicator&) = MDD;
-
 Indicator (*MRR_1)() = MRR;
 Indicator (*MRR_2)(const Indicator&) = MRR;
 
@@ -1827,10 +1824,15 @@ void export_Indicator_build_in(py::module& m) {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    m.def("MDD", MDD_1);
-    m.def("MDD", MDD_2, R"(MDD([data])
+    m.def("MDD", py::overload_cast<int>(&MDD), py::arg("n") = 0);
+    m.def("MDD", py::overload_cast<const Indicator&, int>(&MDD), py::arg("data"), py::arg("n") = 0,
+          R"(MDD([data, n=0])
     
-    当前价格相对历史最高值的回撤百分比，通常用于计算最大回撤)");
+    最大回撤百分比(n=0 则无时间窗口限制), 按行业惯例为正值
+    
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     m.def("MRR", MRR_1);
     m.def("MRR", MRR_2, R"(MRR([data])

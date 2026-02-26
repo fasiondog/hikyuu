@@ -547,7 +547,7 @@ def sys_performance(sys, ref_stk=None):
     text = per.report(sys.tm, sh000001_k[-1].datetime)
 
     # 计算最大回撤
-    max_pullback = min(MDD(funds))
+    max_pullback = MDD(funds)[-1]
 
     # 计算 sharp
     bond = ZHBOND10(ref_dates)
