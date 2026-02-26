@@ -83,7 +83,7 @@ public:
     //------------------------
 
     void add(const Factor& factor);
-    void add(const FactorList&);
+    void add(const FactorList& factors);
     void add(const Indicator& ind);
     void add(const IndicatorList& inds);
 
@@ -258,6 +258,18 @@ inline void FactorSet::clear() noexcept {
 
 inline bool FactorSet::isNull() const noexcept {
     return m_data == ms_null_factorset;
+}
+
+inline void FactorSet::add(const FactorList& factors) {
+    for (const auto& factor : factors) {
+        add(factor);
+    }
+}
+
+inline void FactorSet::add(const IndicatorList& inds) {
+    for (const auto& ind : inds) {
+        add(ind);
+    }
 }
 
 inline const Factor& FactorSet::get(size_t i) const {

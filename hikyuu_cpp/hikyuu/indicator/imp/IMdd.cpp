@@ -96,7 +96,6 @@ void IMdd::_increment_calculate(const Indicator& ind, size_t start_pos) {
     Indicator::value_t window_max_val = 0.0;  // 当前窗口最大值
     size_t window_max_idx = 0;                // 当前窗口最大值的索引
     Indicator::value_t window_max_dd = 0.0;   // 当前窗口最大回撤
-    size_t window_left = start_pos + 1 - n;   // 窗口左边界
 
     for (size_t i = start_pos; i < total; ++i) {
         Indicator::value_t current_nav = src[i];
@@ -107,11 +106,10 @@ void IMdd::_increment_calculate(const Indicator& ind, size_t start_pos) {
             window_max_val = 0.0;
             window_max_idx = i + 1;
             window_max_dd = 0.0;
-            window_left = i + 1;
             continue;
         }
 
-        window_left = i + 1 - n;
+        size_t window_left = i + 1 - n;
 
         bool need_rescan_max = false;
         // 若最大值索引被移出窗口 → 需要重新扫描窗口找最大值

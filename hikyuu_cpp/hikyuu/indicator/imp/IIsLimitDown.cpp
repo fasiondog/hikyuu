@@ -51,7 +51,7 @@ void IIsLimitDown::_increment_calculate(const Indicator& data, size_t start_pos)
     auto* dst = this->data();
     if (limit_down > 0.0) {
         for (size_t i = start_pos; i < total; ++i) {
-            dst[i] = ks[i].closePrice <= roundEx(ks[i - 1].closePrice * limit_down);
+            dst[i] = value_t(ks[i].closePrice <= roundEx(ks[i - 1].closePrice * limit_down));
         }
     } else {
         for (size_t i = start_pos; i < total; ++i) {
