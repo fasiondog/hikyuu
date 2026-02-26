@@ -32,8 +32,8 @@ TEST_CASE("test_MDD") {
     CHECK_EQ(m.empty(), false);
     CHECK_EQ(m.size(), kdata.size());
     CHECK_EQ(m.discard(), 0);
-    std::vector<price_t> expects{0.,       0.,      -0.72282, -0.60562, 0.,
-                                 -3.27389, -1.0584, -2.1443,  -3.2816,  -3.5852};
+    std::vector<price_t> expects{0.,       0.,       -0.72282, -0.72282, -0.72282,
+                                 -3.27389, -3.27389, -3.27389, -3.2816,  -3.5852};
     for (size_t i = 0, len = m.size(); i < len; i++) {
         CHECK_EQ(m[i], doctest::Approx(expects[i]).epsilon(0.0001));
     }
