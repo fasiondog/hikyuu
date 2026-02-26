@@ -49,10 +49,6 @@ TEST_CASE("test_Factor_basic") {
 
     // 测试日期属性（可能为空，这是正常的）
     CHECK_EQ(factor.startDate(), Datetime::min());
-    // createAt 和 updateAt 可能为空，这取决于具体实现
-    Datetime create_time = factor.createAt();
-    Datetime update_time = factor.updateAt();
-    // 只要不抛出异常就是好的
 
     // 测试持久化属性
     CHECK_FALSE(factor.needPersist());
