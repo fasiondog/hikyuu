@@ -48,14 +48,15 @@
     :param System sys: 系统策略原型
     :return: SE选择器实例
 
-.. py:function:: SE_MultiFactor(inds[, topn=10, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight"])
+.. py:function:: SE_MultiFactor(input[, topn=10, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight"])
 
-    创建基于多因子评分的选择器，两种创建方式:
+    创建基于多因子评分的选择器，支持多种创建方式:
 
-    - 直接指定 MF: SE_MultiFactor(mf, topn=10)
-    - 参数直接创建: SE_MultiFactor(inds, topn=10, ic_n=5, ic_rolling_n=120, ref_stk=None, mode="MF_ICIRWeight")
+    - 直接指定 MF: ``SE_MultiFactor(mf, topn=10)``
+    - 使用 FactorSet: ``SE_MultiFactor(factor_set, topn=10, ic_n=5, ic_rolling_n=120, ref_stk=None, mode="MF_ICIRWeight")``
+    - 使用 Indicator 序列: ``SE_MultiFactor(indicators, topn=10, ic_n=5, ic_rolling_n=120, ref_stk=None, mode="MF_ICIRWeight")``
       
-    :param sequense(Indicator) inds: 原始因子列表
+    :param input: 因子输入，可以是 MultiFactorBase 对象、FactorSet 对象或 Indicator 序列
     :param int topn: 只选取时间截面中前 topn 个系统, 小于等于0时代表不限制
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
@@ -64,23 +65,57 @@
     :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
     :return: SE选择器实例
 
-.. py:function:: SE_MultiFactor2([inds, ic_n, ic_rolling_n, ref_stk, spearman, mode, filter])
+    .. code-block:: python
+    
+        # 使用Indicator列表（原有方式）
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        selector1 = SE_MultiFactor(indicators, topn=10)
+        
+        # 使用FactorSet（新增方式）
+        factor_set = FactorSet("my_factors")
+        factor_set.add(MA(CLOSE(), 5))
+        factor_set.add(MA(CLOSE(), 10))
+        selector2 = SE_MultiFactor(factor_set, topn=10)
+        
+        # 直接使用预创建的MultiFactor对象
+        mf = MF_ICIRWeight(factor_set, stocks, query)
+        selector3 = SE_MultiFactor(mf, topn=10)
 
-    创建基于多因子评分的选择器，两种创建方式。:doc:`scfilter`
+.. py:function:: SE_MultiFactor2(input[, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight", filter=SCFilter_IgnoreNan()])
 
-    - 直接指定 MF: SE_MultiFactor2(mf, filter)
-    - 参数直接创建
+    创建基于多因子评分的选择器，支持多种创建方式。:doc:`scfilter`
+
+    - 直接指定 MF: ``SE_MultiFactor2(mf, filter)``
+    - 使用 FactorSet: ``SE_MultiFactor2(factor_set, ic_n=5, ic_rolling_n=120, ref_stk=None, mode="MF_ICIRWeight", filter=SCFilter_IgnoreNan())``
+    - 使用 Indicator 序列: ``SE_MultiFactor2(indicators, ic_n=5, ic_rolling_n=120, ref_stk=None, mode="MF_ICIRWeight", filter=SCFilter_IgnoreNan())``
 
     SE_MultiFactor2 有一个单独参数 "mf_recover_type", 使用 set_param 设置。指定 mf 使用固定的复权类型进行计算，比如使用固定前复权
 
-      :param sequense(Indicator) inds: 原始因子列表
-      :param int ic_n: 默认 IC 对应的 N 日收益率
-      :param int ic_rolling_n: IC 滚动周期
-      :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
-      :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)
+    :param input: 因子输入，可以是 MultiFactorBase 对象、FactorSet 对象或 Indicator 序列
+    :param int ic_n: 默认 IC 对应的 N 日收益率
+    :param int ic_rolling_n: IC 滚动周期
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+    :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
+    :param ScoresFilter filter: 评分过滤器
+    :return: SE选择器实例
 
-
+    .. code-block:: python
+    
+        # 使用Indicator列表
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        selector1 = SE_MultiFactor2(indicators)
+        
+        # 使用FactorSet
+        factor_set = FactorSet("my_factors")
+        factor_set.add(MA(CLOSE(), 5))
+        factor_set.add(MA(CLOSE(), 10))
+        selector2 = SE_MultiFactor2(factor_set)
+        
+        # 直接使用预创建的MultiFactor对象
+        mf = MF_ICIRWeight(factor_set, stocks, query)
+        selector3 = SE_MultiFactor2(mf)
+        
 自定义选择器策略
 --------------------
 

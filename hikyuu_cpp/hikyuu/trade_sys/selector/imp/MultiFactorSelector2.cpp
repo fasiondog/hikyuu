@@ -138,11 +138,11 @@ SelectorPtr HKU_API SE_MultiFactor2(const MFPtr& mf, const ScoresFilterPtr& filt
     return p;
 }
 
-SelectorPtr HKU_API SE_MultiFactor2(const IndicatorList& src_inds, int ic_n, int ic_rolling_n,
+SelectorPtr HKU_API SE_MultiFactor2(const FactorSet& factorset, int ic_n, int ic_rolling_n,
                                     const Stock& ref_stk, bool spearman, const string& mode,
                                     const ScoresFilterPtr& filter) {
     auto p = make_shared<MultiFactorSelector2>();
-    p->setFactorSet(FactorSet(src_inds));
+    p->setFactorSet(factorset);
     p->setParam<int>("ic_n", ic_n);
     p->setParam<int>("ic_rolling_n", ic_rolling_n);
     p->setParam<Stock>("ref_stk", ref_stk);

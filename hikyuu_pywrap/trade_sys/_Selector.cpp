@@ -391,61 +391,136 @@ void export_Selector(py::module& m) {
 
     m.def("SE_MultiFactor", py::overload_cast<const MFPtr&, int>(SE_MultiFactor), py::arg("mf"),
           py::arg("topn") = 10);
+    // 添加支持FactorSet和Indicator序列的重载函数
     m.def(
       "SE_MultiFactor",
-      [](const py::sequence& inds, int topn, int ic_n, int ic_rolling_n, const py::object& ref_stk,
+      [](const py::object& input, int topn, int ic_n, int ic_rolling_n, const py::object& ref_stk,
          bool spearman, const string& mode) {
-          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
           Stock c_ref_stk = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
-          return SE_MultiFactor(c_inds, topn, ic_n, ic_rolling_n, c_ref_stk, spearman, mode);
+
+          // 判断输入类型
+          if (py::isinstance<FactorSet>(input)) {
+              // 输入是FactorSet
+              FactorSet factset = input.cast<FactorSet>();
+              return SE_MultiFactor(factset, topn, ic_n, ic_rolling_n, c_ref_stk, spearman, mode);
+          } else if (py::isinstance<py::sequence>(input)) {
+              // 输入是序列（假设为Indicator列表）
+              IndicatorList c_inds = python_list_to_vector<Indicator>(input);
+              return SE_MultiFactor(c_inds, topn, ic_n, ic_rolling_n, c_ref_stk, spearman, mode);
+          } else {
+              throw std::invalid_argument(
+                "First parameter must be either FactorSet or sequence of Indicator");
+          }
       },
-      py::arg("inds"), py::arg("topn") = 10, py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
+      py::arg("input"), py::arg("topn") = 10, py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
       py::arg("ref_stk") = py::none(), py::arg("spearman") = true,
       py::arg("mode") = "MF_ICIRWeight",
       R"(SE_MultiFactor
 
-    创建基于多因子评分的选择器，两种创建方式
+    创建基于多因子评分的选择器，支持多种创建方式
 
     - 直接指定 MF:
       :param MultiFactorBase mf: 直接指定的多因子合成算法
       :param int topn: 只选取时间截面中前 topn 个系统
 
-    - 参数直接创建:
-      :param sequense(Indicator) inds: 原始因子列表
+    - 使用FactorSet:
+      :param FactorSet input: 因子集合
       :param int topn: 只选取时间截面中前 topn 个系统，小于等于0时代表不限制
       :param int ic_n: 默认 IC 对应的 N 日收益率
       :param int ic_rolling_n: IC 滚动周期
       :param Stock ref_stk: 参考证券,用于日期对齐，未指定时为 sh000001
       :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
 
-    m.def("SE_MultiFactor2", py::overload_cast<const MFPtr&, const SCFilterPtr&>(SE_MultiFactor2),
-          py::arg("mf"), py::arg("filter") = SCFilter_IgnoreNan());
-    m.def(
-      "SE_MultiFactor2",
-      [](const py::sequence& inds, int ic_n, int ic_rolling_n, const py::object& ref_stk,
-         bool spearman, const string& mode, const SCFilterPtr& filter) {
-          IndicatorList c_inds = python_list_to_vector<Indicator>(inds);
-          Stock c_ref_stk = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
-          return SE_MultiFactor2(c_inds, ic_n, ic_rolling_n, c_ref_stk, spearman, mode, filter);
-      },
-      py::arg("inds"), py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
-      py::arg("ref_stk") = py::none(), py::arg("spearman") = true,
-      py::arg("mode") = "MF_ICIRWeight", py::arg("filter") = SCFilter_IgnoreNan(),
-      R"(SE_MultiFactor2([inds, ic_n, ic_rolling_n, ref_stk, spearman, mode, filter])
-
-    创建基于多因子评分的选择器，两种创建方式
-
-    - 直接指定 MF:
-      :param MultiFactorBase mf: 直接指定的多因子合成算法
-
-    - 参数直接创建:
-      :param sequense(Indicator) inds: 原始因子列表
+    - 使用Indicator序列:
+      :param sequense(Indicator) input: 原始因子列表
+      :param int topn: 只选取时间截面中前 topn 个系统，小于等于0时代表不限制
       :param int ic_n: 默认 IC 对应的 N 日收益率
       :param int ic_rolling_n: IC 滚动周期
       :param Stock ref_stk: 参考证券,用于日期对齐，未指定时为 sh000001
       :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称)");
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
+
+    .. code-block:: python
+    
+        # 使用Indicator列表（原有方式）
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        selector1 = SE_MultiFactor(indicators, topn=10)
+        
+        # 使用FactorSet（新增方式）
+        factor_set = FactorSet(indicators)
+        selector2 = SE_MultiFactor(factor_set, topn=10)
+        
+        # 直接使用MultiFactor对象
+        mf = MF_ICIRWeight(factor_set, stocks, query)
+        selector3 = SE_MultiFactor(mf, topn=10))");
+
+    m.def("SE_MultiFactor2", py::overload_cast<const MFPtr&, const SCFilterPtr&>(SE_MultiFactor2),
+          py::arg("mf"), py::arg("filter") = SCFilter_IgnoreNan());
+    // 添加支持FactorSet和Indicator序列的重载函数
+    m.def(
+      "SE_MultiFactor2",
+      [](const py::object& input, int ic_n, int ic_rolling_n, const py::object& ref_stk,
+         bool spearman, const string& mode, const SCFilterPtr& filter) {
+          Stock c_ref_stk = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
+
+          // 判断输入类型
+          if (py::isinstance<FactorSet>(input)) {
+              // 输入是FactorSet
+              FactorSet factset = input.cast<FactorSet>();
+              return SE_MultiFactor2(factset, ic_n, ic_rolling_n, c_ref_stk, spearman, mode,
+                                     filter);
+          } else if (py::isinstance<py::sequence>(input)) {
+              // 输入是序列（假设为Indicator列表）
+              IndicatorList c_inds = python_list_to_vector<Indicator>(input);
+              return SE_MultiFactor2(c_inds, ic_n, ic_rolling_n, c_ref_stk, spearman, mode, filter);
+          } else {
+              throw std::invalid_argument(
+                "First parameter must be either FactorSet or sequence of Indicator");
+          }
+      },
+      py::arg("input"), py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
+      py::arg("ref_stk") = py::none(), py::arg("spearman") = true,
+      py::arg("mode") = "MF_ICIRWeight", py::arg("filter") = SCFilter_IgnoreNan(),
+      R"(SE_MultiFactor2
+
+    创建基于多因子评分的选择器，支持多种创建方式
+
+    - 直接指定 MF:
+      :param MultiFactorBase mf: 直接指定的多因子合成算法
+      :param ScoresFilterBase filter: 评分过滤器
+
+    - 使用FactorSet:
+      :param FactorSet input: 因子集合
+      :param int ic_n: 默认 IC 对应的 N 日收益率
+      :param int ic_rolling_n: IC 滚动周期
+      :param Stock ref_stk: 参考证券,用于日期对齐，未指定时为 sh000001
+      :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
+      :param ScoresFilterBase filter: 评分过滤器
+
+    - 使用Indicator序列:
+      :param sequense(Indicator) input: 原始因子列表
+      :param int ic_n: 默认 IC 对应的 N 日收益率
+      :param int ic_rolling_n: IC 滚动周期
+      :param Stock ref_stk: 参考证券,用于日期对齐，未指定时为 sh000001
+      :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
+      :param ScoresFilterBase filter: 评分过滤器
+
+    .. code-block:: python
+    
+        # 使用Indicator列表
+        indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
+        selector1 = SE_MultiFactor2(indicators)
+        
+        # 使用FactorSet
+        factor_set = FactorSet(indicators)
+        selector2 = SE_MultiFactor2(factor_set)
+        
+        # 直接使用MultiFactor对象
+        mf = MF_ICIRWeight(factor_set, stocks, query)
+        selector3 = SE_MultiFactor2(mf))");
 
     m.def("crtSEOptimal", crtSEOptimal, R"(crtSEOptimal(func)
     
