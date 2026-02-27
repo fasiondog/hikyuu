@@ -165,7 +165,26 @@ target("core")
                 os.run(format("install_name_tool -change @loader_path/../lib/libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_dir .. filename))
                 os.run(format("install_name_tool -change @loader_path/../lib/libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_dir .. filename))
             end
-        end
+
+            -- 添加 macosx 签名
+            local projectdir = os.projectdir() 
+            local scan_dir = path.join(projectdir, "hikyuu/cpp")
+            print("Start signing dynamic libraries in: " .. scan_dir)
+            local ok, err = os.execv("find", {
+                scan_dir,
+                "-type", "f",
+                "(", 
+                "-name", "*.dylib", 
+                "-o", 
+                "-name", "*.so", 
+                ")",
+                "-exec", "codesign", "-s", "-", "--force", "--deep", "{}", ";"
+            })
+            if not ok then
+                raise("Failed to sign libraries: " .. (err or "unknown error"))
+            end
+            print("Signing completed.")
+         end
 
         os.cp("$(projectdir)/i18n/zh_CN/*.mo", "$(projectdir)/hikyuu/cpp/i18n/zh_CN/")
     end)
