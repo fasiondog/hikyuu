@@ -11,6 +11,7 @@
 #include "hikyuu/StockManager.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
+#include "hikyuu/indicator/imp/IPriceList.h"
 
 namespace hku {
 
@@ -46,19 +47,27 @@ Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType
                const string& brief, const string& details, bool need_persist,
                const Datetime& start_date, const Block& block)
 : m_data(make_shared<Data>(name, formula, ktype, brief, details, need_persist, start_date, block)) {
+    checkFormula();
 }
 
-Factor::Factor(const Factor& other) : m_data(other.m_data) {}
+void Factor::checkFormula() const {
+    auto imp = formula().getImp();
+    HKU_ERROR_IF(!imp, "Factor formula is null!");
+    IPriceList* pl = dynamic_cast<IPriceList*>(imp.get());
+    HKU_ERROR_IF(pl, "Factor formula can not be PRICLISE!");
+}
 
-Factor::Factor(Factor&& other) : m_data(std::move(other.m_data)) {}
+Factor::Factor(const Factor& other) noexcept : m_data(other.m_data) {}
 
-Factor& Factor::operator=(const Factor& other) {
+Factor::Factor(Factor&& other) noexcept : m_data(std::move(other.m_data)) {}
+
+Factor& Factor::operator=(const Factor& other) noexcept {
     HKU_IF_RETURN(this == &other, *this);
     m_data = other.m_data;
     return *this;
 }
 
-Factor& Factor::operator=(Factor&& other) {
+Factor& Factor::operator=(Factor&& other) noexcept {
     HKU_IF_RETURN(this == &other, *this);
     m_data = std::move(other.m_data);
     return *this;

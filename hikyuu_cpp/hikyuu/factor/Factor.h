@@ -38,12 +38,12 @@ public:
            const string& brief = "", const string& details = "", bool need_persist = false,
            const Datetime& start_date = Datetime::min(), const Block& block = Block());
 
-    Factor(const Factor& other);
-    Factor(Factor&& other);
+    Factor(const Factor& other) noexcept;
+    Factor(Factor&& other) noexcept;
     ~Factor() = default;
 
-    Factor& operator=(const Factor& other);
-    Factor& operator=(Factor&& other);
+    Factor& operator=(const Factor& other) noexcept;
+    Factor& operator=(Factor&& other) noexcept;
 
     /**
      * 获取指定股票列表的指定查询参数的计算结果
@@ -133,6 +133,10 @@ public:
      * 从数据库中加载因子，以 name + ktype 作为唯一标识，如果不存在则不修改当前对象
      */
     void load_from_db();
+
+private:
+    // 检查是否指标原型是否可作为因子
+    void checkFormula() const;
 
 private:
     struct Data {
