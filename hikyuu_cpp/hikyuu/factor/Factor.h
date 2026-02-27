@@ -156,11 +156,10 @@ private:
           brief(brief),
           details(details),
           start_date(start_date),
-          formula(formula.clone()),
+          formula(formula),
           block(block),
           need_persist(need_persist) {
             to_upper(this->name);
-            this->formula.setContext(KData());
             this->formula.name(this->name);
             if (this->start_date == Null<Datetime>()) {
                 this->start_date = Datetime::min();
@@ -255,9 +254,8 @@ inline const Indicator& Factor::formula() const noexcept {
 }
 
 inline void Factor::formula(const Indicator& formula) {
-    m_data->formula = formula.clone();
+    m_data->formula = formula;
     m_data->formula.name(m_data->name);
-    m_data->formula.setContext(KData());
 }
 
 inline const Datetime& Factor::startDate() const noexcept {
