@@ -343,16 +343,25 @@ void export_extend_Indicator(py::module& m) {
     :return: 指标数据
     :rtype: Indicator)");
 
+    m.def("AGG_VWAP", py::overload_cast<const KData&, const KQuery::KType&, bool, int>(&AGG_VWAP),
+          py::arg("k"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,
+          py::arg("unit") = 1);
     m.def("AGG_VWAP", py::overload_cast<const KQuery::KType&, bool, int>(&AGG_VWAP),
           py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
           R"(AGG_VWAP([ktype=Query.MIN, fill_null=False, unit=1])
 
     聚合其他K线成交量加权平均价格(Volume Weighted Average Price)
-    VWAP 是成交量加权的平均价格，计算方式是将每一分钟（或单位时间）的成交量乘以该分钟的成交价格，然后对所有乘积求和，最后除以总成交量。
+    
+    VWAP 是成交量加权的平均价格，计算方式是将每一分钟（或单位时间）的成交量乘以该分钟的成交价格，
+    然后对所有乘积求和，最后除以总成交量。
 
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
+    用法：AGG_VWAP([ktype, fill_null, unit])
+    
+    例如：AGG_VWAP(Query.MIN) 计算分钟线的VWAP值
+
+    :param KQuery.KType ktype: 聚合的K线周期类型
+    :param bool fill_null: 是否填充缺失值，默认为False
+    :param int unit: 聚合周期单位，默认为1。上下文K线分组单位，使用日线计算分钟线聚合时，unit=2代表聚合2天的分钟线
     :return: 指标数据
     :rtype: Indicator)");
 
