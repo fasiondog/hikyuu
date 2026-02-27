@@ -143,7 +143,6 @@ public:
     void add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right);
 
     IndicatorImpPtr clone();
-    IndicatorImpPtr cloneFormula();
 
     bool isPythonObject() const noexcept;
 

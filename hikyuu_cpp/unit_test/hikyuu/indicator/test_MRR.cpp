@@ -5,13 +5,12 @@
  *      Author: fasiondog
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MRR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
-#include "../test_config.h"
 
 using namespace hku;
 
@@ -107,6 +106,15 @@ TEST_CASE("test_MRR") {
     Indicator mrr_empty = MRR(empty, 0);
     CHECK_EQ(mrr_empty.size(), 0);
     CHECK_EQ(mrr_empty.empty(), true);
+
+    /** @arg 增量计算 */
+    kdata = stock.getKData(KQuery(-20, -10));
+    m = MRR(CLOSE(), 3)(kdata);
+    mrr = m(stock.getKData(-15));
+    m = MRR(CLOSE(), 3)(stock.getKData(-15));
+    for (size_t i = 10; i < mrr.size(); i++) {
+        CHECK_EQ(mrr[i], doctest::Approx(m[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------

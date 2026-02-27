@@ -4,13 +4,12 @@
  *  Created on: 2023-12-24
  *      Author: fasiondog
  */
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MDD.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
-#include "../test_config.h"
 
 using namespace hku;
 
@@ -126,6 +125,17 @@ TEST_CASE("test_MDD") {
     Indicator mdd_empty = MDD(empty, 0);
     CHECK_EQ(mdd_empty.size(), 0);
     CHECK_EQ(mdd_empty.empty(), true);
+
+    /** @arg 增量计算 */
+    kdata = stock.getKData(KQuery(-20, -10));
+    m = MDD(CLOSE(), 3)(kdata);
+    mdd1 = m(stock.getKData(-15));
+    m = MDD(CLOSE(), 3)(stock.getKData(-15));
+    CHECK_EQ(mdd1[0], doctest::Approx(2.4825).epsilon(0.0001));
+    CHECK_EQ(mdd1[1], doctest::Approx(2.6372).epsilon(0.0001));
+    for (size_t i = 2; i < mdd1.size(); i++) {
+        CHECK_EQ(mdd1[i], doctest::Approx(m[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------
