@@ -661,7 +661,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
     bool fill_null = getParam<bool>("fill_null");
 
-    all_stk_inds = m_factorset.getValues(m_stks, m_query, true, fill_null, true, true);
+    all_stk_inds = m_factorset.getValues(m_stks, m_query, true, fill_null, true, true, m_ref_dates);
 
     unordered_map<string, IndicatorList> use_style_inds;
     for (const auto& [name, style_inds] : m_special_style_inds) {

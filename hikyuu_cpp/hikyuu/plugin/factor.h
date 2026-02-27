@@ -39,9 +39,10 @@ void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype);
 FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype = KQuery::DAY);
 
 IndicatorList getValues(const Factor& factor, const StockList& stocks, const KQuery& query,
-                        bool align, bool fill_null, bool tovalue);
+                        bool align, bool fill_null, bool tovalue, const DatetimeList& align_dates);
 
 vector<IndicatorList> getValues(const FactorSet& factor_set, const StockList& stocks,
-                                const KQuery& query, bool align, bool fill_null, bool tovalue);
+                                const KQuery& query, bool align, bool fill_null, bool tovalue,
+                                const DatetimeList& align_dates);
 
 }  // namespace hku

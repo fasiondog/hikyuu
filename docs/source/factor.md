@@ -82,10 +82,10 @@ factor.load_from_db()
 
 ```
 # 获取所有计算结果 ⚠️ VIP功能
-results = factor.get_all_values(query, align=False, fill_null=False, tovalue=False)
+results = factor.get_all_values(query, align=False, fill_null=False, tovalue=False, align_dates=DatetimeList())
 
 # 获取指定证券列表的计算结果 ⚠️ VIP功能
-results = factor.get_values(stocks, query)
+results = factor.get_values(stocks, query, align=False, fill_null=False, tovalue=False, check=False, align_dates=DatetimeList())
 
 # 保存计算结果到数据库 ⚠️ VIP功能
 factor.save_values(stocks, query, replace=False)
@@ -97,6 +97,8 @@ factor.save_values(stocks, query, replace=False)
 - `align` (bool): 是否对齐日期，默认False
 - `fill_null` (bool): 是否填充空值，默认False
 - `tovalue` (bool): 是否转换为数值，默认False
+- `check` (bool): 是否检查股票列表属于自身指定的block，默认False（仅get_values方法）
+- `align_dates` (DatetimeList): 对齐日期列表，默认为空
 - `stocks` (sequence): 证券列表
 - `replace` (bool): 是否替换已有数据，默认False
 
@@ -199,11 +201,21 @@ factors = factor_set.get_factors()
 
 ```
 # 获取所有因子的计算结果
-all_results = factor_set.get_all_values(query, align=False, fill_null=False, tovalue=False)
+all_results = factor_set.get_all_values(query, align=False, fill_null=False, tovalue=False, align_dates=DatetimeList())
 
 # 获取指定证券列表的计算结果
-results = factor_set.get_values(stocks, query, check=False)
+results = factor_set.get_values(stocks, query, align=False, fill_null=False, tovalue=False, check=False, align_dates=DatetimeList())
 ```
+
+**参数说明:**
+
+- `query` (Query): 查询参数
+- `align` (bool): 是否对齐日期，默认False
+- `fill_null` (bool): 是否填充空值，默认False
+- `tovalue` (bool): 是否转换为数值，默认False
+- `check` (bool): 是否检查股票列表属于自身指定的block，默认False
+- `align_dates` (DatetimeList): 对齐日期列表，默认为空
+- `stocks` (sequence): 证券列表
 
 ### 迭代器支持
 

@@ -72,38 +72,44 @@ void export_FactorSet(py::module& m) {
 
       .def("get_factors", &FactorSet::getAllFactors, py::return_value_policy::copy, "获取因子列表")
 
-      .def("get_all_values", &FactorSet::getAllValues, py::arg("query"), py::arg("align") = false,
-           py::arg("fill_null") = false, py::arg("tovalue") = true,
-           R"(get_all_values(self, query[, align=False[, fill_null=False[, tovalue=True]]])
+      .def(
+        "get_all_values", &FactorSet::getAllValues, py::arg("query"), py::arg("align") = false,
+        py::arg("fill_null") = false, py::arg("tovalue") = true,
+        py::arg("align_dates") = DatetimeList{},
+        R"(get_all_values(self, query[, align=False[, fill_null=False[, tovalue=True[, align_dates=DatetimeList()]]]])
     
     获取所有因子的指定查询参数的计算结果
 
     :param Query query: 查询参数
-    :param bool align: 是否使用交易日历对齐，默认 False
+    :param bool align: 是否进行日期对齐(如按指定align_dates或默认交易日历)，默认 False
     :param bool fill_null: 是否填充空值，默认 False
     :param bool tovalue: 是否转换为数值，默认 True
+    :param DatetimeList align_dates: 对齐日期列表，默认为空
     :return: 所有因子的计算结果列表
     :rtype: list)")
 
       .def(
         "get_values",
         [](FactorSet& self, const py::object& stks, const KQuery& query, bool align = false,
-           bool fill_null = false, bool tovalue = true, bool check = false) {
+           bool fill_null = false, bool tovalue = true, bool check = false,
+           const DatetimeList& align_dates = DatetimeList{}) {
             return self.getValues(get_stock_list_from_python(stks), query, align, fill_null,
-                                  tovalue, check);
+                                  tovalue, check, align_dates);
         },
         py::arg("stocks"), py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
         py::arg("tovalue") = false, py::arg("check") = false,
-        R"(get_values(self, stocks, query[, align=False[, fill_null=False[, tovalue=False[, check=False]]]])
+        py::arg("align_dates") = DatetimeList{},
+        R"(get_values(self, stocks, query[, align=False[, fill_null=False[, tovalue=False[, check=False[, align_dates=DatetimeList()]]]]])
     
     获取指定股票列表的指定查询参数的计算结果
 
     :param list stocks: 证券列表
     :param Query query: 查询参数
-    :param bool align: 是否使用交易日历对齐，默认 False
+    :param bool align: 是否进行日期对齐(如按指定align_dates或默认交易日历)，默认 False
     :param bool fill_null: 是否填充空值，默认 False
     :param bool tovalue: 是否转换为数值，默认 False
     :param bool check: 是否检查股票列表属于自身指定的 block，默认 False
+    :param DatetimeList align_dates: 对齐日期列表，默认为空
     :return: 按股票顺序排列的计算结果列表
     :rtype: list)")
 

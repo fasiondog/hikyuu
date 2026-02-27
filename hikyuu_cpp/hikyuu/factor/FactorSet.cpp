@@ -134,7 +134,8 @@ void FactorSet::load_from_db() {
 }
 
 vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery& query, bool align,
-                                           bool fill_null, bool tovalue, bool check) const {
+                                           bool fill_null, bool tovalue, bool check,
+                                           const DatetimeList& align_dates) const {
     // SPEND_TIME(FactorSet_getValues);
     if (check) {
         const auto& block = this->block();
@@ -147,7 +148,7 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
 
     vector<IndicatorList> result;
     if (isValidLicense()) {
-        result = hku::getValues(*this, stocks, query, align, fill_null, tovalue);
+        result = hku::getValues(*this, stocks, query, align, fill_null, tovalue, align_dates);
         return result;
     }
 
@@ -162,7 +163,7 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
     const auto& factors = m_data->factors;
     global_parallel_for_index_void(0, factor_total, [&](size_t i) {
         IndicatorList factor_values =
-          factors[i].getValues(stocks, query, align, fill_null, tovalue);
+          factors[i].getValues(stocks, query, align, fill_null, tovalue, false, align_dates);
         for (size_t j = 0; j < stk_total; ++j) {
             result[j][i] = std::move(factor_values[j]);
         }
@@ -172,10 +173,10 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
 }
 
 vector<IndicatorList> FactorSet::getAllValues(const KQuery& query, bool align, bool fill_null,
-                                              bool tovalue) const {
+                                              bool tovalue, const DatetimeList& align_dates) const {
     StockList stocks =
       block().empty() ? StockManager::instance().getStockList() : block().getStockList();
-    return getValues(stocks, query, align, fill_null, tovalue);
+    return getValues(stocks, query, align, fill_null, tovalue, false, align_dates);
 }
 
 }  // namespace hku

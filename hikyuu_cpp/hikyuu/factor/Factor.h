@@ -49,17 +49,28 @@ public:
      * 获取指定股票列表的指定查询参数的计算结果
      * @param stocks 证券列表
      * @param query 查询参数
-     * @param check 是否检查股票列表属于自身指定的 block
+     * @param align 是否对齐日期（按指定align_dates或默认交易日历)，默认 false
+     * @param fill_null 是否填充空值，默认 false
+     * @param tovalue 是否转换为数值，默认 false
+     * @param check 是否检查股票列表属于自身指定的 block，默认 false
+     * @param align_dates 对齐日期列表，默认为空
+     * @return 按股票顺序排列的计算结果列表
      */
     IndicatorList getValues(const StockList& stocks, const KQuery& query, bool align = false,
-                            bool fill_null = false, bool tovalue = false, bool check = false) const;
+                            bool fill_null = false, bool tovalue = false, bool check = false,
+                            const DatetimeList& align_dates = {}) const;
 
     /**
      * 获取指定查询参数的所有计算结果
-     * @param query 获取指定查询参数的计算结果
+     * @param query 查询参数
+     * @param align 是否对齐日期（按指定align_dates或默认交易日历)，默认 false
+     * @param fill_null 是否填充空值，默认 false
+     * @param tovalue 是否转换为数值，默认 false
+     * @param align_dates 对齐日期列表，默认为空
+     * @return 所有股票的计算结果列表
      */
     IndicatorList getAllValues(const KQuery& query, bool align = false, bool fill_null = false,
-                               bool tovalue = false);
+                               bool tovalue = false, const DatetimeList& align_dates = {});
 
     const string& name() const noexcept;
 

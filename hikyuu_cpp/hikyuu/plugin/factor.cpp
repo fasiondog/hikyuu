@@ -87,22 +87,23 @@ FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype) {
 }
 
 IndicatorList getValues(const Factor& factor, const StockList& stocks, const KQuery& query,
-                        bool align, bool fill_null, bool tovalue) {
+                        bool align, bool fill_null, bool tovalue, const DatetimeList& align_dates) {
     IndicatorList ret;
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
-    ret = plugin->getValues(factor, stocks, query, align, fill_null, tovalue);
+    ret = plugin->getValues(factor, stocks, query, align, fill_null, tovalue, align_dates);
     return ret;
 }
 
 vector<IndicatorList> getValues(const FactorSet& factor_set, const StockList& stocks,
-                                const KQuery& query, bool align, bool fill_null, bool tovalue) {
+                                const KQuery& query, bool align, bool fill_null, bool tovalue,
+                                const DatetimeList& align_dates) {
     vector<IndicatorList> ret;
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
-    ret = plugin->getValues(factor_set, stocks, query, align, fill_null, tovalue);
+    ret = plugin->getValues(factor_set, stocks, query, align, fill_null, tovalue, align_dates);
     return ret;
 }
 

@@ -65,7 +65,8 @@ Factor& Factor::operator=(Factor&& other) {
 }
 
 IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bool align,
-                                bool fill_null, bool tovalue, bool check) const {
+                                bool fill_null, bool tovalue, bool check,
+                                const DatetimeList& align_dates) const {
     if (check) {
         const auto& block = this->block();
         if (!block.empty()) {
@@ -79,12 +80,13 @@ IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bo
     HKU_IF_RETURN(stocks.empty(), ret);
 
     if (isValidLicense()) {
-        ret = hku::getValues(*this, stocks, query, align, fill_null, tovalue);
+        ret = hku::getValues(*this, stocks, query, align, fill_null, tovalue, align_dates);
         return ret;
     }
 
     if (align) {
-        DatetimeList dates = StockManager::instance().getTradingCalendar(query);
+        DatetimeList dates =
+          align_dates.empty() ? StockManager::instance().getTradingCalendar(query) : align_dates;
         HKU_IF_RETURN(dates.empty(), ret);
         auto null_ind = PRICELIST(PriceList(dates.size(), Null<price_t>()), dates);
         ret = global_parallel_for_index(0, stocks.size(), [&, tovalue, this](size_t i) {
@@ -104,10 +106,11 @@ IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bo
     return ret;
 }
 
-IndicatorList Factor::getAllValues(const KQuery& query, bool align, bool fill_null, bool tovalue) {
+IndicatorList Factor::getAllValues(const KQuery& query, bool align, bool fill_null, bool tovalue,
+                                   const DatetimeList& align_dates) {
     StockList stocks =
       block().empty() ? StockManager::instance().getStockList() : block().getStockList();
-    return getValues(stocks, query, align, fill_null, tovalue, false);
+    return getValues(stocks, query, align, fill_null, tovalue, false, align_dates);
 }
 
 void Factor::save_to_db() {

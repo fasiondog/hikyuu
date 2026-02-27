@@ -37,11 +37,11 @@ public:
     virtual void removeFactorSet(const string& name, const KQuery::KType& ktype) = 0;
 
     virtual IndicatorList getValues(const Factor& factor, const StockList& stocks,
-                                    const KQuery& query, bool align, bool fill_null,
-                                    bool tovalue) = 0;
+                                    const KQuery& query, bool align, bool fill_null, bool tovalue,
+                                    const DatetimeList& align_dates) = 0;
     virtual vector<IndicatorList> getValues(const FactorSet& factor_set, const StockList& stocks,
                                             const KQuery& query, bool align, bool fill_null,
-                                            bool tovalue) = 0;
+                                            bool tovalue, const DatetimeList& align_dates) = 0;
 };
 
 }  // namespace hku

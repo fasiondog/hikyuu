@@ -99,38 +99,43 @@ void export_Factor(py::module& m) {
     
     :note: 以 name + ktype 作为唯一标识进行加载)")
 
-      .def("get_all_values", &Factor::getAllValues, py::arg("query"), py::arg("align") = false,
-           py::arg("fill_null") = false, py::arg("tovalue") = false,
-           R"(get_all_values(self, query[, align=False[, fill_null=False[, tovalue=False]]])
+      .def(
+        "get_all_values", &Factor::getAllValues, py::arg("query"), py::arg("align") = false,
+        py::arg("fill_null") = false, py::arg("tovalue") = false,
+        py::arg("align_dates") = DatetimeList{},
+        R"(get_all_values(self, query[, align=False[, fill_null=False[, tovalue=False[, align_dates=DatetimeList()]]]])
     
     获取指定查询参数的所有计算结果
 
     :param Query query: 查询参数
-    :param bool align: 是否使用交易日历对齐，默认 False
+    :param bool align: 是否进行日期对齐(如按指定align_dates或默认交易日历)，默认 False
     :param bool fill_null: 是否填充空值，默认 False
     :param bool tovalue: 是否转换为数值，默认 False
+    :param DatetimeList align_dates: 对齐日期列表，默认为空
     :return: 所有股票的计算结果列表
     :rtype: list)")
 
       .def(
         "get_values",
         [](Factor& self, const py::object& stks, const KQuery& query, bool align, bool fill_null,
-           bool tovalue, bool check) {
+           bool tovalue, bool check, const DatetimeList& align_dates) {
             return self.getValues(get_stock_list_from_python(stks), query, align, fill_null,
-                                  tovalue, check);
+                                  tovalue, check, align_dates);
         },
         py::arg("stocks"), py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
         py::arg("tovalue") = false, py::arg("check") = false,
-        R"(get_values(self, stocks, query[, align=False[, fill_null=False[, tovalue=False[, check=False]]]])
+        py::arg("align_dates") = DatetimeList{},
+        R"(get_values(self, stocks, query[, align=False[, fill_null=False[, tovalue=False[, check=False[, align_dates=DatetimeList()]]]]])
     
     获取指定股票列表的指定查询参数的计算结果
 
     :param list stocks: 证券列表
     :param Query query: 查询参数
-    :param bool align: 是否使用交易日历对齐，默认 False
+    :param bool align: 是否进行日期对齐(如按指定align_dates或默认交易日历)，默认 False
     :param bool fill_null: 是否填充空值，默认 False
     :param bool tovalue: 是否转换为数值，默认 False
     :param bool check: 是否检查股票列表属于自身指定的 block，默认 False
+    :param DatetimeList align_dates: 对齐日期列表，默认为空
     :return: 按股票顺序排列的计算结果列表
     :rtype: list)")
 
