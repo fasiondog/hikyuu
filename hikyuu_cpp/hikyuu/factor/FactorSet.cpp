@@ -11,8 +11,6 @@
 
 namespace hku {
 
-shared_ptr<FactorSet::Data> FactorSet::ms_null_factorset{make_shared<FactorSet::Data>()};
-
 HKU_API std::ostream& operator<<(std::ostream& os, const FactorSet& set) {
     os << set.str();
     return os;
@@ -22,10 +20,10 @@ string FactorSet::str() const {
     return fmt::format("FactorSet({}, {}, {}, {})", name(), ktype(), size(), block());
 }
 
-FactorSet::FactorSet() : m_data(ms_null_factorset) {}
+FactorSet::FactorSet() : m_data(make_shared<Data>()) {}
 
 FactorSet::FactorSet(const IndicatorList& inds, const KQuery::KType& ktype)
-: m_data(std::make_shared<Data>()) {
+: m_data(make_shared<Data>()) {
     m_data->name = fmt::format("FSET_{}", Datetime::now().ticks());
     m_data->ktype = ktype;
     for (auto& factor : inds) {
@@ -34,7 +32,7 @@ FactorSet::FactorSet(const IndicatorList& inds, const KQuery::KType& ktype)
 }
 
 FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block& block)
-: m_data(std::make_shared<Data>()) {
+: m_data(make_shared<Data>()) {
     string upper_name = name;
     to_upper(upper_name);
     m_data->name = upper_name;
@@ -44,9 +42,7 @@ FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block
 
 FactorSet::FactorSet(const FactorSet& other) : m_data(other.m_data) {}
 
-FactorSet::FactorSet(FactorSet&& other) : m_data(std::move(other.m_data)) {
-    other.m_data = ms_null_factorset;
-}
+FactorSet::FactorSet(FactorSet&& other) : m_data(std::move(other.m_data)) {}
 
 FactorSet& FactorSet::operator=(const FactorSet& other) {
     HKU_IF_RETURN(this == &other, *this);
@@ -57,7 +53,6 @@ FactorSet& FactorSet::operator=(const FactorSet& other) {
 FactorSet& FactorSet::operator=(FactorSet&& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_data = std::move(other.m_data);
-    other.m_data = ms_null_factorset;
     return *this;
 }
 

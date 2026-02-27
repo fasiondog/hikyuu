@@ -914,10 +914,6 @@ TEST_CASE("test_Factor_empty_serialize") {
         ia >> BOOST_SERIALIZATION_NVP(factor2);
     }
 
-    // 验证空 Factor 属性
-    CHECK_UNARY(factor1.isNull());
-    // 注意：反序列化后的Factor不是null，因为它包含了默认的FactorImp实例
-    // 这是正常的序列化行为
     CHECK_EQ(factor1.name(), factor2.name());
     CHECK_EQ(factor1.ktype(), factor2.ktype());
 

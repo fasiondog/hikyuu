@@ -158,9 +158,6 @@ private:
     };
     shared_ptr<Data> m_data;
 
-private:
-    static shared_ptr<Data> ms_null_data;  // 全局空数据，避免重复创建
-
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
@@ -309,11 +306,11 @@ inline void Factor::details(const string& details) {
 }
 
 inline uint64_t Factor::hash() const noexcept {
-    return m_data ? (uint64_t)m_data.get() : 0;
+    return (uint64_t)m_data.get();
 }
 
 inline bool Factor::isNull() const noexcept {
-    return m_data == ms_null_data;
+    return !m_data || m_data->name.empty() || m_data->ktype.empty();
 }
 
 typedef vector<Factor> FactorList;

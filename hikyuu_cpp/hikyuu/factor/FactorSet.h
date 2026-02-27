@@ -170,9 +170,6 @@ private:
     };
     shared_ptr<Data> m_data;
 
-private:
-    static shared_ptr<Data> ms_null_factorset;
-
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
@@ -257,7 +254,7 @@ inline void FactorSet::clear() noexcept {
 }
 
 inline bool FactorSet::isNull() const noexcept {
-    return m_data == ms_null_factorset;
+    return !m_data || m_data->name.empty() || m_data->ktype.empty();
 }
 
 inline void FactorSet::add(const FactorList& factors) {

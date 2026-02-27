@@ -31,9 +31,7 @@ string Factor::str() const {
     return os.str();
 }
 
-shared_ptr<Factor::Data> Factor::ms_null_data{make_shared<Factor::Data>()};
-
-Factor::Factor() : m_data(ms_null_data) {}
+Factor::Factor() : m_data(make_shared<Factor::Data>()) {}
 
 Factor::Factor(const string& name, const KQuery::KType& ktype)
 : m_data(make_shared<Data>(name, Indicator(), ktype, "", "", false, Datetime::min(), Block())) {
@@ -52,9 +50,7 @@ Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType
 
 Factor::Factor(const Factor& other) : m_data(other.m_data) {}
 
-Factor::Factor(Factor&& other) : m_data(std::move(other.m_data)) {
-    other.m_data = ms_null_data;
-}
+Factor::Factor(Factor&& other) : m_data(std::move(other.m_data)) {}
 
 Factor& Factor::operator=(const Factor& other) {
     HKU_IF_RETURN(this == &other, *this);
@@ -65,7 +61,6 @@ Factor& Factor::operator=(const Factor& other) {
 Factor& Factor::operator=(Factor&& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_data = std::move(other.m_data);
-    other.m_data = ms_null_data;
     return *this;
 }
 
@@ -125,9 +120,7 @@ void Factor::remove_from_db() {
 
 void Factor::load_from_db() {
     Factor tmp = getFactor(name(), ktype());
-    if (!tmp.isNull()) {
-        m_data = std::move(tmp.m_data);
-    }
+    m_data = std::move(tmp.m_data);
 }
 
 }  // namespace hku
