@@ -27,6 +27,16 @@ void HKU_API saveFactor(const Factor& factor) {
     plugin->saveFactor(factor);
 }
 
+void HKU_API saveSpecialFactorValues(const Factor& factor, const Stock& stock,
+                                     const DatetimeList& dates, const PriceList& values,
+                                     bool replace) {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, void(),
+                        htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    plugin->saveSpecialFactorValues(factor, stock, dates, values, replace);
+}
+
 void HKU_API removeFactor(const string& name, const KQuery::KType& ktype) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);

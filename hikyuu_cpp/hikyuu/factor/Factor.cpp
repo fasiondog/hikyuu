@@ -47,14 +47,6 @@ Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType
                const string& brief, const string& details, bool need_persist,
                const Datetime& start_date, const Block& block)
 : m_data(make_shared<Data>(name, formula, ktype, brief, details, need_persist, start_date, block)) {
-    checkFormula();
-}
-
-void Factor::checkFormula() const {
-    auto imp = formula().getImp();
-    HKU_ERROR_IF(!imp, "Factor formula is null!");
-    IPriceList* pl = dynamic_cast<IPriceList*>(imp.get());
-    HKU_ERROR_IF(pl, "Factor formula can not be PRICLISE!");
 }
 
 Factor::Factor(const Factor& other) noexcept : m_data(other.m_data) {}
@@ -124,6 +116,11 @@ IndicatorList Factor::getAllValues(const KQuery& query, bool align, bool fill_nu
 
 void Factor::save_to_db() {
     saveFactor(*this);
+}
+
+void Factor::save_special_values_to_db(const Stock& stock, const DatetimeList& dates,
+                                       const PriceList& values, bool replace) {
+    saveSpecialFactorValues(*this, stock, dates, values, replace);
 }
 
 void Factor::remove_from_db() {

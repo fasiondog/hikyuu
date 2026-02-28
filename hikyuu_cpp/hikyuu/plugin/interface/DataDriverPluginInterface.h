@@ -31,6 +31,9 @@ public:
     virtual Factor getFactor(const string& name, const KQuery::KType& ktype) = 0;
     virtual void saveFactor(const Factor& factor) = 0;
     virtual void removeFactor(const string& name, const KQuery::KType& ktype) = 0;
+    virtual void saveSpecialFactorValues(const Factor& factor, const Stock& stock,
+                                         const DatetimeList& dates, const PriceList& values,
+                                         bool replace) = 0;
 
     virtual FactorSet getFactorSet(const string& name, const KQuery::KType& ktype) = 0;
     virtual void saveFactorSet(const FactorSet& set) = 0;

@@ -5,11 +5,11 @@ hikyuu提供了完善的因子管理体系，包括单个因子 Factor 和因子
 ## 最佳实践
 
 1. **命名规范**: 因子名称应具有描述性且不区分大小写
-2. **因子公式**: 因子公式为 `Indicator` 对象且不能为 `PRICELIST`。通常不使用截面值，截面、标准化等由 MF 计算时处理。
-3. **因子集组织**: 将相关的因子组织到同一个FactorSet中便于管理
-4. **数据验证**: 使用 `check=True` 参数验证股票列表是否属于指定板块
-5. **因子更新**: 每日行情数据下载完成后，应及时调用 `update_all_factors_values()` 更新所有存储的因子值，确保因子数据与行情数据同步。该方法未集成到 HikyuuTdx 和 importdata 中，需要自行手工调用，原因是有时需要进行数据检查，确认数据无误后再进行因子值保存。
-6. **持久化管理**: 对于高频聚合的因子值或高频因子值，建议设置 `need_persist=True` 并保存到数据库。由于 Hikyuu的超高计算速度，普通的日频因子值，通常不建议保存到数据库，因为从存储中读取因子值速度更慢。可以自行测试决定。
+2. **因子集组织**: 将相关的因子组织到同一个FactorSet中便于管理
+3. **数据验证**: 使用 `check=True` 参数验证股票列表是否属于指定板块
+4. **因子更新**: 每日行情数据下载完成后，应及时调用 `update_all_factors_values()` 更新所有存储的因子值，确保因子数据与行情数据同步。该方法未集成到 HikyuuTdx 和 importdata 中，需要自行手工调用，原因是有时需要进行数据检查，确认数据无误后再进行因子值保存。
+5. **因子值保存**: 对于高频聚合的因子值或高频因子值，建议设置 `need_persist=True` 并保存到数据库。由于 Hikyuu的超高计算速度，普通的日频因子值，通常不建议保存到数据库，因为从存储中读取因子值速度更慢。可以自行测试决定。通常直接保存原始因子值，不需要进行截面、标准化等处理，可以由 MF 完成。对需要截面值的因子，通常需要指定对应的证券集，Factor和FactorSet直接指定。
+6. **特殊因子值保存**: 对于不通过指标计算的特殊因子值（如PRICELIST或Indicator()），可以使用 `save_special_values_to_db()` 方法直接保存预计算的因子值
 7. **VIP功能使用**: ⚠️ 因子相关的数据库存储和读取操作均为VIP功能，数据库引擎仅支持ClickHouse。使用前请确认已获得相应权限。包括但不限于：`save_to_db()`、`load_from_db()`、`remove_from_db()`、`save_values()`、`get_all_values()`、`get_values()` 等涉及数据库的操作方法。
 
 ## 注意事项
@@ -83,6 +83,9 @@ factor.remove_from_db()
 
 # 从数据库中加载因子元数据 ⚠️ VIP功能
 factor.load_from_db()
+
+# 特殊因子保存值到数据库 ⚠️ VIP功能
+factor.save_special_values_to_db(stock, dates, values, replace=False)
 ```
 
 #### 数据获取 ⚠️ VIP功能
@@ -114,6 +117,35 @@ factor.save_values(stocks, query, replace=False)
 - `stocks` (sequence): 证券列表
 - `replace` (bool): 是否替换已有数据，默认False
 
+#### 特殊因子值保存方法 ⚠️ VIP功能
+
+对于某些特殊因子，其值不是通过指标公式计算得出，而是预先准备好的数据，可以使用特殊因子值保存方法：
+
+```
+# 保存特殊因子值到数据库 ⚠️ VIP功能
+factor.save_special_values_to_db(stock, dates, values, replace=False)
+```
+
+**参数说明:**
+
+- `stock` (Stock): 证券对象
+- `dates` (DatetimeList): 因子值对应的日期列表
+- `values` (PriceList): 因子值列表
+- `replace` (bool): 是否替换已有数据，默认False
+
+**使用场景:**
+
+- 保存预计算的价格数据（如PRICELIST）
+- 保存外部导入的财务比率数据
+- 保存人工标注的特殊因子值
+- 保存从其他数据源获取的因子数据
+- 保存Indicator对象的结果数据（需先提取日期和值）
+
+**注意:**
+
+- 日期列表和值列表长度必须相等
+- Indicator对象可以通过 `.getDateList()`和 `.getResult(0)`方法提取所需数据
+
 ### Factor使用示例
 
 ```
@@ -135,6 +167,36 @@ ma5_factor.save_to_db()
 stocks = [sm['sh600000'], sm['sz000001']]
 query = Query(Datetime(20240101), Datetime(20241231))
 results = ma5_factor.get_values(stocks, query)
+
+# 特殊因子值保存示例
+# 假设我们有一个预计算的因子值列表
+stock = sm['sh600000']
+dates = DatetimeList([Datetime(20240101), Datetime(20240102), Datetime(20240103)])
+values = PriceList([1.2, 1.5, 1.3])
+
+# 保存特殊因子值
+special_factor = Factor("SPECIAL_FACTOR", Indicator(), KQuery.DAY, "特殊因子", "预计算因子值")
+special_factor.save_to_db()
+special_factor.save_special_values_to_db(stock, dates, values)
+
+# 从Indicator提取数据保存示例
+# 假设我们有一个已经计算好的复杂指标
+k_data = stock.getKData(Query(Datetime(20240101), Datetime(20240110)))
+complex_indicator = MA(CLOSE(), 10)(k_data) + RSI(CLOSE(), 14)(k_data) * 0.1
+
+# 提取Indicator的日期和值数据
+indicator_dates = complex_indicator.getDateList()
+indicator_values = complex_indicator.getResult(0)
+
+# 保存提取的数据作为特殊因子值
+indicator_factor = Factor("INDICATOR_FACTOR", PRICELIST(), KQuery.DAY, "指标因子", "复合指标结果")
+indicator_factor.save_to_db()
+indicator_factor.save_special_values_to_db(stock, indicator_dates, indicator_values)
+
+# 验证保存结果
+query_test = Query(Datetime(20240101), Datetime(20240110))
+saved_values = indicator_factor.get_values([stock], query_test)
+print(f"保存的因子值: {saved_values[0].getResult(0)}")
 ```
 
 ## FactorSet类

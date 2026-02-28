@@ -14,6 +14,11 @@ namespace hku {
 /** 保存因子 */
 void HKU_API saveFactor(const Factor& factor);
 
+/** 保存特殊因子值 */
+void HKU_API saveSpecialFactorValues(const Factor& factor, const Stock& stock,
+                                     const DatetimeList& dates, const PriceList& values,
+                                     bool replace);
+
 /** 获取因子 */
 Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
 

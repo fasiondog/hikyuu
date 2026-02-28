@@ -85,6 +85,16 @@ void export_Factor(py::module& m) {
     
     :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识)")
 
+      .def("save_special_values_to_db", &Factor::save_special_values_to_db, py::arg("stock"),
+           py::arg("dates"), py::arg("values"), py::arg("replace") = false,
+           R"(save_special_values_to_db(self, stock, dates, values[, replace=False])
+    
+    特殊因子保存值到数据库, 其值不是不通过指标计算，如: PRICELIST，需要自行指定设置
+    
+    :param Stock stock: 证券对象
+    :param DatetimeList dates: 特殊因子日期列表
+    :param PriceList values: 特殊因子值列表)")
+
       .def("remove_from_db", &Factor::remove_from_db,
            R"(remove_from_db(self)
     

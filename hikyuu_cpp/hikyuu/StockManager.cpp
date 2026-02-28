@@ -109,6 +109,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 注册扩展K线处理
     registerPredefinedExtraKType();
 
+    // 先尝试加载扩展指标插件，防止无法直接反序列化扩展指标
+    getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
+
     string basedrivername = m_baseInfoDriverParam.tryGet<string>("type", "");
     to_lower(basedrivername);
     if (basedrivername == "clickhouse") {

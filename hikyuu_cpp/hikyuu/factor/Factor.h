@@ -125,6 +125,12 @@ public:
     void save_to_db();
 
     /**
+     * 特殊因子保存值到数据库, 其值不是不通过指标计算，如: PRICELIST，需要自行指定设置
+     */
+    void save_special_values_to_db(const Stock& stock, const DatetimeList& dates,
+                                   const PriceList& values, bool replace = false);
+
+    /**
      * 从数据库中删除因子及其数据
      */
     void remove_from_db();
@@ -133,10 +139,6 @@ public:
      * 从数据库中加载因子，以 name + ktype 作为唯一标识，如果不存在则不修改当前对象
      */
     void load_from_db();
-
-private:
-    // 检查是否指标原型是否可作为因子
-    void checkFormula() const;
 
 private:
     struct Data {
