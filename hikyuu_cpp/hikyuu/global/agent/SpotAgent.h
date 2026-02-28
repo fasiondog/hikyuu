@@ -127,6 +127,7 @@ private:
 private:
     enum STATUS { WAITING, RECEIVING };    // 等待新的批次数据，正在接收批次数据中
     enum STATUS m_status = WAITING;        // 当前内部状态
+    std::mutex m_run_mutex;                // 防止多线程启停
     std::atomic_bool m_stop = true;        // 结束代理工作标识
     std::atomic_bool m_connected = false;  // 是否已连接数据服务
 

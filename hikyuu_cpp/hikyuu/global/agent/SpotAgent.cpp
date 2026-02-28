@@ -38,6 +38,8 @@ void SpotAgent::setQuotationServer(const string& server) {
 void SpotAgent::start() {
     HKU_INFO(htr("Start spot agent."));
     stop();
+
+    std::lock_guard<std::mutex> lock(m_run_mutex);
     if (m_stop) {
         m_stop = false;
         m_receive_data_tg = std::make_unique<ThreadPool>(1);
@@ -47,6 +49,7 @@ void SpotAgent::start() {
 }
 
 void SpotAgent::stop() {
+    std::lock_guard<std::mutex> lock(m_run_mutex);
     m_stop = true;
     if (m_receive_data_tg) {
         m_receive_data_tg->stop();
