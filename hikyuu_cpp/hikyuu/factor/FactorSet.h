@@ -94,8 +94,15 @@ public:
 
     void add(const Factor& factor);
     void add(const FactorList& factors);
+
+    /** 便捷方法：添加一个指标，并以指定的名称作为因子名称 */
+    void add(const string& name, const Indicator& ind);
+
+    /** 便捷方法：添加一个指标, 以指标名作为因子名称。容易出现存在同名的指标抛出异常 */
     void add(const Indicator& ind);
+
     void add(const IndicatorList& inds);
+    void add(const std::map<string, Indicator>& inds);
 
     void remove(const string& name);
     bool have(const string& name) const noexcept;
@@ -265,18 +272,6 @@ inline void FactorSet::clear() noexcept {
 
 inline bool FactorSet::isNull() const noexcept {
     return !m_data || m_data->name.empty() || m_data->ktype.empty();
-}
-
-inline void FactorSet::add(const FactorList& factors) {
-    for (const auto& factor : factors) {
-        add(factor);
-    }
-}
-
-inline void FactorSet::add(const IndicatorList& inds) {
-    for (const auto& ind : inds) {
-        add(ind);
-    }
 }
 
 inline const Factor& FactorSet::get(size_t i) const {

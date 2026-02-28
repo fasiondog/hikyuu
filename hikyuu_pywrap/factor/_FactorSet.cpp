@@ -66,9 +66,11 @@ void export_FactorSet(py::module& m) {
       .def("have", &FactorSet::have)
       .def("remove", &FactorSet::remove)
       .def("add", py::overload_cast<const Factor&>(&FactorSet::add))
+      .def("add", py::overload_cast<const string&, const Indicator&>(&FactorSet::add))
       .def("add", py::overload_cast<const Indicator&>(&FactorSet::add))
       .def("add", py::overload_cast<const IndicatorList&>(&FactorSet::add))
       .def("add", py::overload_cast<const FactorList&>(&FactorSet::add))
+      .def("add", py::overload_cast<const std::map<string, Indicator>&>(&FactorSet::add))
 
       .def("get_factors", &FactorSet::getAllFactors, py::return_value_policy::copy, "获取因子列表")
 

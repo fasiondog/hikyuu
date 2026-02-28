@@ -80,8 +80,30 @@ void FactorSet::add(const Factor& factor) {
     }
 }
 
+void FactorSet::add(const string& name, const Indicator& ind) {
+    add(Factor(name, ind, m_data->ktype, "", "", false, Datetime::min(), m_data->block));
+}
+
 void FactorSet::add(const Indicator& ind) {
     add(Factor(ind.name(), ind, m_data->ktype, "", "", false, Datetime::min(), m_data->block));
+}
+
+void FactorSet::add(const FactorList& factors) {
+    for (const auto& factor : factors) {
+        add(factor);
+    }
+}
+
+void FactorSet::add(const IndicatorList& inds) {
+    for (const auto& ind : inds) {
+        add(ind);
+    }
+}
+
+void FactorSet::add(const std::map<string, Indicator>& inds) {
+    for (auto& ind : inds) {
+        add(ind.first, ind.second);
+    }
 }
 
 void FactorSet::remove(const string& name) {
