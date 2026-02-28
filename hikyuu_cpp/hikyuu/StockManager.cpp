@@ -23,6 +23,7 @@
 #include "plugin/interface/plugins.h"
 #include "plugin/device.h"
 #include "plugin/hkuextra.h"
+#include "plugin/extind.h"
 
 namespace hku {
 StockManager* StockManager::m_sm = nullptr;
@@ -101,16 +102,12 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 设置插件路径
     auto plugin_path = getPluginPath();
     if (plugin_path.empty() || plugin_path == ".") {
-        m_plugin_manager.pluginPath(m_hikyuuParam.tryGet<string>(
-          "plugindir", fmt::format("{}/.hikyuu/plugin", getUserDir())));
+        m_plugin_manager.pluginPath("./plugin");
     }
     HKU_INFO(htr("Plugin path: {}", getPluginPath()));
 
     // 注册扩展K线处理
     registerPredefinedExtraKType();
-
-    // 先尝试加载扩展指标插件，防止无法直接反序列化扩展指标
-    getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
 
     string basedrivername = m_baseInfoDriverParam.tryGet<string>("type", "");
     to_lower(basedrivername);
