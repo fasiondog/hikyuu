@@ -130,8 +130,11 @@ public:
     void save_special_values_to_db(const Stock& stock, const DatetimeList& dates,
                                    const PriceList& values, bool replace = false);
 
+    void save_special_values_to_db(const Stock& stock, const Indicator& values,
+                                   bool replace = false);
+
     /**
-     * 从数据库中删除因子及其数据
+     * 从数据库中删除因子及其数据, 注：为防止误操作，特殊因子的值不会删除，需自行手工删除
      */
     void remove_from_db();
 
@@ -151,7 +154,7 @@ private:
         Datetime start_date;       ///< 开始日期，数据存储时的起始日期
         Indicator formula;         ///< 计算公式指标
         Block block;               ///< 板块信息，证券集合，如果为空，为全部
-        bool need_persist{false};  ///< 是否需要持久化
+        bool need_persist{false};  ///< 是否需要持久化因子值数据
 
         Data() = default;
         Data(const string& name, const Indicator& formula, const KQuery::KType& ktype,

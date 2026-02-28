@@ -52,18 +52,18 @@ Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_persist=False
 
 ### Factor属性
 
-| 属性             | 类型         | 描述             |
-| ---------------- | ------------ | ---------------- |
-| `name`         | str          | 因子名称         |
-| `ktype`        | KQuery.KType | 因子频率类型     |
-| `create_at`    | Datetime     | 创建日期         |
-| `update_at`    | Datetime     | 更改日期         |
-| `formula`      | Indicator    | 因子计算公式     |
-| `start_date`   | Datetime     | 数据存储起始日期 |
-| `block`        | Block        | 证券集合         |
-| `brief`        | str          | 基础说明         |
-| `details`      | str          | 详细说明         |
-| `need_persist` | bool         | 是否持久化       |
+| 属性             | 类型         | 描述                 |
+| ---------------- | ------------ | -------------------- |
+| `name`         | str          | 因子名称             |
+| `ktype`        | KQuery.KType | 因子频率类型         |
+| `create_at`    | Datetime     | 创建日期             |
+| `update_at`    | Datetime     | 更改日期             |
+| `formula`      | Indicator    | 因子计算公式         |
+| `start_date`   | Datetime     | 数据存储起始日期     |
+| `block`        | Block        | 证券集合             |
+| `brief`        | str          | 基础说明             |
+| `details`      | str          | 详细说明             |
+| `need_persist` | bool         | 是否持久化保存值数据 |
 
 ### 方法
 
@@ -92,7 +92,7 @@ factor.save_special_values_to_db(stock, dates, values, replace=False)
 
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>以下数据获取方法涉及数据库操作，均为VIP功能，仅支持ClickHouse数据库引擎。</p>
+<p>以下数据获取方法，如因子值本身存储在数据库中，则需VIP权限，仅支持ClickHouse数据库引擎。</p>
 </div>
 
 ```
@@ -119,10 +119,25 @@ factor.save_values(stocks, query, replace=False)
 
 #### 特殊因子值保存方法 ⚠️ VIP功能
 
-对于某些特殊因子，其值不是通过指标公式计算得出，而是预先准备好的数据，可以使用特殊因子值保存方法：
+对于某些特殊因子，其值不是通过指标公式计算得出，而是预先准备好的数据，可以使用特殊因子值保存方法。该方法支持两种输入格式：
+
+##### 重载版本1：保存Indicator对象
 
 ```
-# 保存特殊因子值到数据库 ⚠️ VIP功能
+# 保存Indicator对象的结果数据 ⚠️ VIP功能
+factor.save_special_values_to_db(stock, indicator, replace=False)
+```
+
+**参数说明:**
+
+- `stock` (Stock): 证券对象
+- `indicator` (Indicator): 已计算好的指标对象（必须已绑定K线数据）
+- `replace` (bool): 是否替换已有数据，默认False
+
+##### 重载版本2：保存预计算数据
+
+```
+# 保存预计算的日期-值对数据 ⚠️ VIP功能
 factor.save_special_values_to_db(stock, dates, values, replace=False)
 ```
 
@@ -135,15 +150,16 @@ factor.save_special_values_to_db(stock, dates, values, replace=False)
 
 **使用场景:**
 
-- 保存预计算的价格数据（如PRICELIST）
-- 保存外部导入的财务比率数据
+- 保存复合指标计算结果
+- 保存外部导入的财务数据
+- 保存机器学习模型预测结果
 - 保存人工标注的特殊因子值
 - 保存从其他数据源获取的因子数据
-- 保存Indicator对象的结果数据（需先提取日期和值）
 
-**注意:**
+**注意事项:**
 
-- 日期列表和值列表长度必须相等
+- 当使用Indicator对象时，该对象必须已经绑定了具体的K线数据（即有有效的context）
+- 当使用日期-值对时，日期列表和值列表长度必须相等
 - Indicator对象可以通过 `.getDateList()`和 `.getResult(0)`方法提取所需数据
 
 ### Factor使用示例
@@ -151,51 +167,30 @@ factor.save_special_values_to_db(stock, dates, values, replace=False)
 ```
 from hikyuu import *
 
-# 创建简单的移动平均因子
-ma5 = MA(CLOSE(), 5)
-ma5_factor = Factor("MA5", ma5, KQuery.DAY, "5日均线因子", "简单移动平均线指标")
+# 创建因子对象
+special_factor = Factor("SPECIAL_FACTOR", PRICELIST(), KQuery.DAY, "特殊因子", "预计算因子值")
+special_factor.save_to_db()
 
-# 查看因子信息
-print(f"因子名称: {ma5_factor.name}")
-print(f"因子类型: {ma5_factor.ktype}")
-print(f"简要说明: {ma5_factor.brief}")
-
-# 保存到数据库
-ma5_factor.save_to_db()
-
-# 获取计算结果
-stocks = [sm['sh600000'], sm['sz000001']]
-query = Query(Datetime(20240101), Datetime(20241231))
-results = ma5_factor.get_values(stocks, query)
-
-# 特殊因子值保存示例
-# 假设我们有一个预计算的因子值列表
 stock = sm['sh600000']
+
+# 方式1：保存Indicator对象
+k_data = stock.getKData(Query(Datetime(20240101), Datetime(20240110)))
+complex_indicator = MA(CLOSE(), 10)(k_data) + RSI(CLOSE(), 14)(k_data) * 0.1
+special_factor.save_special_values_to_db(stock, complex_indicator)
+
+# 方式2：保存预计算的日期-值对
 dates = DatetimeList([Datetime(20240101), Datetime(20240102), Datetime(20240103)])
 values = PriceList([1.2, 1.5, 1.3])
-
-# 保存特殊因子值
-special_factor = Factor("SPECIAL_FACTOR", Indicator(), KQuery.DAY, "特殊因子", "预计算因子值")
-special_factor.save_to_db()
 special_factor.save_special_values_to_db(stock, dates, values)
 
 # 从Indicator提取数据保存示例
-# 假设我们有一个已经计算好的复杂指标
-k_data = stock.getKData(Query(Datetime(20240101), Datetime(20240110)))
-complex_indicator = MA(CLOSE(), 10)(k_data) + RSI(CLOSE(), 14)(k_data) * 0.1
-
-# 提取Indicator的日期和值数据
-indicator_dates = complex_indicator.getDateList()
-indicator_values = complex_indicator.getResult(0)
-
-# 保存提取的数据作为特殊因子值
-indicator_factor = Factor("INDICATOR_FACTOR", PRICELIST(), KQuery.DAY, "指标因子", "复合指标结果")
-indicator_factor.save_to_db()
-indicator_factor.save_special_values_to_db(stock, indicator_dates, indicator_values)
+extracted_dates = complex_indicator.getDateList()
+extracted_values = complex_indicator.getResult(0)
+special_factor.save_special_values_to_db(stock, extracted_dates, extracted_values)
 
 # 验证保存结果
 query_test = Query(Datetime(20240101), Datetime(20240110))
-saved_values = indicator_factor.get_values([stock], query_test)
+saved_values = special_factor.get_values([stock], query_test)
 print(f"保存的因子值: {saved_values[0].getResult(0)}")
 ```
 

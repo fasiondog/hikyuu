@@ -123,6 +123,11 @@ void Factor::save_special_values_to_db(const Stock& stock, const DatetimeList& d
     saveSpecialFactorValues(*this, stock, dates, values, replace);
 }
 
+void Factor::save_special_values_to_db(const Stock& stock, const Indicator& values, bool replace) {
+    saveSpecialFactorValues(*this, stock, values.getDatetimeList(), values.getResultAsPriceList(0),
+                            replace);
+}
+
 void Factor::remove_from_db() {
     removeFactor(name(), ktype());
 }

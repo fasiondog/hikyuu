@@ -41,7 +41,7 @@ void export_Factor(py::module& m) {
     :param KQuery.KType ktype: K线类型，默认为日线
     :param str brief: 简要描述，默认为空
     :param str details: 详细描述，默认为空
-    :param bool need_persist: 是否需要持久化，默认为False
+    :param bool need_persist: 是否需要持久化保存因子值数据，默认为False
     :param Datetime start_date: 开始日期，数据存储时的起始日期，默认为最小日期
     :param Block block: 板块信息，证券集合，如果为空则为全部，默认为空
     :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识)")
@@ -76,7 +76,7 @@ void export_Factor(py::module& m) {
                     py::overload_cast<const string&>(&Factor::details),
                     py::return_value_policy::copy, "详细说明")
       .def_property("need_persist", py::overload_cast<>(&Factor::needPersist, py::const_),
-                    py::overload_cast<bool>(&Factor::needPersist), "是否持久化")
+                    py::overload_cast<bool>(&Factor::needPersist), "是否持久化保存因子值数据")
 
       .def("save_to_db", &Factor::save_to_db,
            R"(save_to_db(self)
@@ -85,20 +85,37 @@ void export_Factor(py::module& m) {
     
     :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识)")
 
-      .def("save_special_values_to_db", &Factor::save_special_values_to_db, py::arg("stock"),
-           py::arg("dates"), py::arg("values"), py::arg("replace") = false,
-           R"(save_special_values_to_db(self, stock, dates, values[, replace=False])
+      .def(
+        "save_special_values_to_db",
+        py::overload_cast<const Stock&, const Indicator&, bool>(&Factor::save_special_values_to_db),
+        py::arg("stock"), py::arg("values"), py::arg("replace") = false,
+        R"(save_special_values_to_db(self, stock, values[, replace=False])
     
-    特殊因子保存值到数据库, 其值不是不通过指标计算，如: PRICELIST，需要自行指定设置
+    特殊因子保存值到数据库, 支持两种输入格式：
+    1. 直接保存Indicator对象的结果数据
+    2. 保存预计算的日期-值对数据
     
+    重载版本1 - 保存Indicator对象, 通常为PRICELIST:
     :param Stock stock: 证券对象
+    :param Indicator values: 已计算好的指标对象（必须已绑定K线数据）
+    :param bool replace: 是否替换已有数据，默认False
+    
+    重载版本2 - 保存预计算数据:
+    :param Stock stock: 证券对象  
     :param DatetimeList dates: 特殊因子日期列表
-    :param PriceList values: 特殊因子值列表)")
+    :param PriceList values: 特殊因子值列表
+    :param bool replace: 是否替换已有数据，默认False
+    
+    使用场景:
+    - 保存复合指标计算结果
+    - 保存外部导入的财务数据
+    - 保存机器学习模型预测结果
+    - 保存人工标注的特殊因子值)")
 
       .def("remove_from_db", &Factor::remove_from_db,
            R"(remove_from_db(self)
     
-    从数据库中删除因子及其数据
+    从数据库中删除因子及其数据。注：为防止误操作，特殊因子的值不会删除，需自行手工删除。
     
     :note: 以 name + ktype 作为唯一标识进行删除)")
 
