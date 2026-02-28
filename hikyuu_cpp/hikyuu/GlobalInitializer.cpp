@@ -30,6 +30,7 @@
 #include "global/schedule/scheduler.h"
 #include "indicator/IndicatorImp.h"
 #include "global/sysinfo.h"
+#include "plugin/interface/plugins.h"
 #include "debug.h"
 
 #if HKU_ENABLE_TA_LIB

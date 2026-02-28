@@ -71,6 +71,7 @@ static void registerPredefinedExtraKType() {
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam, const StrategyContext& context) {
+    std::lock_guard<std::mutex> lock(m_init_mutex);
     HKU_WARN_IF_RETURN(m_initializing, void(),
                        "The last initialization has not finished. Please try again later!");
 

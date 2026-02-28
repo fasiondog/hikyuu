@@ -339,7 +339,8 @@ private:
 
 private:
     static StockManager* m_sm;
-    std::atomic_bool m_initializing{false};
+    std::mutex m_init_mutex;
+    bool m_initializing{false};
     std::atomic_bool m_cancel_load{false};  // 取消加载, 用于退出指示
     std::atomic_bool m_data_ready{true};    // 用于指示是否所有数据准备完毕, 如果未初始化则为 true
     std::thread::id m_thread_id;  // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
