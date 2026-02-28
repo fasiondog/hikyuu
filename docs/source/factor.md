@@ -8,7 +8,7 @@ hikyuu提供了完善的因子管理体系，包括单个因子 Factor 和因子
 2. **因子公式**: 因子公式为 `Indicator` 对象且不能为 `PRICELIST`。通常不使用截面值，截面、标准化等由 MF 计算时处理。
 3. **因子集组织**: 将相关的因子组织到同一个FactorSet中便于管理
 4. **数据验证**: 使用 `check=True` 参数验证股票列表是否属于指定板块
-5. **因子更新**: 每日行情数据下载完成后，应及时调用 `update_all_factors_values()` 更新所有存储的因子值，确保因子数据与行情数据同步
+5. **因子更新**: 每日行情数据下载完成后，应及时调用 `update_all_factors_values()` 更新所有存储的因子值，确保因子数据与行情数据同步。该方法未集成到 HikyuuTdx 和 importdata 中，需要自行手工调用，原因是有时需要进行数据检查，确认数据无误后再进行因子值保存。
 6. **持久化管理**: 对于高频聚合的因子值或高频因子值，建议设置 `need_persist=True` 并保存到数据库。由于 Hikyuu的超高计算速度，普通的日频因子值，通常不建议保存到数据库，因为从存储中读取因子值速度更慢。可以自行测试决定。
 7. **VIP功能使用**: ⚠️ 因子相关的数据库存储和读取操作均为VIP功能，数据库引擎仅支持ClickHouse。使用前请确认已获得相应权限。包括但不限于：`save_to_db()`、`load_from_db()`、`remove_from_db()`、`save_values()`、`get_all_values()`、`get_values()` 等涉及数据库的操作方法。
 
@@ -24,7 +24,7 @@ hikyuu提供了完善的因子管理体系，包括单个因子 Factor 和因子
 
 Factor 类用于表示单个因子，包含了因子的基本信息、计算公式和相关属性。
 
-### 构造函数
+### Factor构造函数
 
 ```
 # 默认构造函数
@@ -50,7 +50,7 @@ Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_persist=False
 
 **注意:** 因子名称不区分大小写，以 `name + ktype` 作为唯一标识
 
-### 属性
+### Factor属性
 
 | 属性             | 类型         | 描述             |
 | ---------------- | ------------ | ---------------- |
@@ -114,7 +114,7 @@ factor.save_values(stocks, query, replace=False)
 - `stocks` (sequence): 证券列表
 - `replace` (bool): 是否替换已有数据，默认False
 
-### 使用示例
+### Factor使用示例
 
 ```
 from hikyuu import *
@@ -141,7 +141,7 @@ results = ma5_factor.get_values(stocks, query)
 
 `FactorSet` 类用于管理一组相关的因子，提供批量操作和集合管理功能。
 
-### 构造函数
+### FactorSet构造函数
 
 ```
 # 默认构造函数
@@ -163,7 +163,7 @@ FactorSet(inds, ktype=KQuery.DAY)
 
 **注意:** 使用指标列表创建时，同名的指标会被覆盖，最终保留最后一个同名指标
 
-### 属性
+### FactorSet属性
 
 | 属性      | 类型         | 描述             |
 | --------- | ------------ | ---------------- |
@@ -241,7 +241,7 @@ first_factor = factor_set[0]
 named_factor = factor_set["MA5"]
 ```
 
-### 使用示例
+### FactorSet使用示例
 
 ```
 from hikyuu import *
@@ -474,7 +474,7 @@ for factor_set in all_sets:
 
 **返回值:** 所有因子集对象列表
 
-### 使用示例
+### 全局因子管理使用示例
 
 ```
 from hikyuu import *
@@ -489,6 +489,8 @@ rsi.name = "RSI"
 rsi_factor = Factor("RSI", rsi, brief="14日相对强弱指数")
 
 # 保存到数据库
+# 也可以不保存，保存到数据库的优势：后续可以直接: ma5 = Factor('MA5) , 会自动从数据库加载获取因子定义
+# 默认创建的因子 need_persist=False，如需同时保存因子值，需将 need_persis=True，保存时将自动计算所有因子值并存储
 save_factor(ma5_factor)
 save_factor(rsi_factor)
 
