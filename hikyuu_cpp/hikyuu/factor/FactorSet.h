@@ -98,7 +98,7 @@ public:
     /** 便捷方法：添加一个指标，并以指定的名称作为因子名称 */
     void add(const string& name, const Indicator& ind);
 
-    /** 便捷方法：添加一个指标, 以指标名作为因子名称。容易出现存在同名的指标抛出异常 */
+    /** 便捷方法：添加一个指标, 以指标名作为因子名称。注意：同名指标后者会覆盖先加入的指标 */
     void add(const Indicator& ind);
 
     void add(const IndicatorList& inds);
