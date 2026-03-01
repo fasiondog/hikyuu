@@ -130,8 +130,12 @@ PYBIND11_MODULE(core, m) {
     m.def("close_spend_time", close_spend_time, "全局关闭 c++ 部分耗时打印");
     m.def("open_spend_time", close_spend_time, "全局开启 c++ 部分耗时打印");
 
-    m.def("hikyuu_init", hikyuu_init, py::arg("filename"), py::arg("ignore_preload") = false,
+    m.def("hikyuu_init",
+          py::overload_cast<const string&, bool, const StrategyContext&>(&hikyuu_init),
+          py::arg("filename"), py::arg("ignore_preload") = false,
           py::arg("context") = StrategyContext({"all"}));
+    m.def("hikyuu_init", py::overload_cast<const StrategyContext&, bool>(&hikyuu_init),
+          py::arg("context"), py::arg("ignore_preload") = false);
     m.def("get_version", getVersion, R"(getVersion()
 
         :return: hikyuu 当前版本

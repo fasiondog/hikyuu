@@ -18,13 +18,28 @@
 namespace hku {
 
 std::atomic_bool Strategy::ms_keep_running = true;
+std::atomic<bool> Strategy::ms_sig_registered = false;
 
 void Strategy::sig_handler(int sig) {
     if (sig == SIGINT || sig == SIGTERM) {
-        ms_keep_running = false;
-        auto* scheduler = getScheduler();
-        scheduler->stop();
-        exit(0);
+        try {
+            ms_keep_running = false;
+            auto* scheduler = getScheduler();
+            scheduler->stop();
+        } catch (...) {
+            // 忽略异常
+        }
+        std::exit(EXIT_SUCCESS);
+    }
+}
+
+void Strategy::register_signal() {
+    // 确保只注册一次
+    bool expected = false;
+    if (ms_sig_registered.compare_exchange_strong(expected, true)) {
+        if (std::signal(SIGINT, sig_handler) == SIG_ERR) {
+            ms_sig_registered.store(false);
+        }
     }
 }
 
@@ -90,7 +105,8 @@ void Strategy::_init() {
     if (sm.thread_id() == std::thread::id()) {
         // 注册 ctrl-c 终止信号
         if (!runningInPython()) {
-            std::signal(SIGINT, sig_handler);
+            // std::signal(SIGINT, sig_handler);
+            register_signal();
         }
 
         CLS_INFO("{} is running! You can press Ctrl-C to terminte ...", m_name);
@@ -100,6 +116,10 @@ void Strategy::_init() {
 
     } else {
         m_context = sm.getStrategyContext();
+    }
+
+    if (!runningInPython()) {
+        register_signal();
     }
 
     CLS_CHECK(!m_context.getStockCodeList().empty(), "The context does not contain any stocks!");
