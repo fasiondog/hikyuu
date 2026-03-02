@@ -36,6 +36,15 @@ void HKU_API hikyuu_init(const string& config_file_name, bool ignore_preload = f
                          const StrategyContext& context = StrategyContext({"all"}));
 
 /**
+ * @brief 尝试从默认配置文件获取配置参数进行初始化
+ * @param context 策略上下文
+ * @param ignore_preload 忽略配置信息中的预加载设置，即不加载数据至内存。
+ *                       用于某些场合启动hikyuu，但仅用于获取数据库的基本信息。
+ */
+void HKU_API hikyuu_init(const StrategyContext& context = StrategyContext({"all"}),
+                         bool ignore_preload = false);
+
+/**
  * @brief 尝试从 ini 文件获取配置参数
  * @param config_file_name ini 文件名
  * @param baseParam [out]

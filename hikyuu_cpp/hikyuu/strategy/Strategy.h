@@ -208,6 +208,8 @@ private:
 
 private:
     static void sig_handler(int sig);
+    static void register_signal();
+    static std::atomic<bool> ms_sig_registered;
 
     typedef FuncWrapper event_type;
     ThreadSafeQueue<event_type> m_event_queue;  // 消息队列

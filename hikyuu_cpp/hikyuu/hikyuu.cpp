@@ -34,6 +34,17 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload,
     sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, context);
 }
 
+void HKU_API hikyuu_init(const StrategyContext& context, bool ignore_preload) {
+    string home = getUserDir();
+    HKU_ERROR_IF(home == "", "Failed get user home path!");
+#if HKU_OS_WINOWS
+    string config_file = format("{}\\{}", home, ".hikyuu\\hikyuu.ini");
+#else
+    string config_file = format("{}/{}", home, ".hikyuu/hikyuu.ini");
+#endif
+    hikyuu_init(config_file, ignore_preload, context);
+}
+
 void HKU_API getConfigFromIni(const string& config_file_name, Parameter& baseParam,
                               Parameter& blockParam, Parameter& kdataParam, Parameter& preloadParam,
                               Parameter& hkuParam) {

@@ -52,6 +52,9 @@ int main(int argc, char* argv[]) {
     // 注意：同一进程内的所有 strategy 共享的是同一个上下文！！！
     StrategyContext context({"sh000001", "sz000001"}, {KQuery::DAY});
 
+    // macosx 下如果多线程执行多策略，需要主动初始化，防止异步线程中加载插件导致失败
+    hikyuu_init(context, true);
+
     Strategy stg(context, "test");
 
     // stock 数据变化接收，通常用于调测，直接一般不需要
