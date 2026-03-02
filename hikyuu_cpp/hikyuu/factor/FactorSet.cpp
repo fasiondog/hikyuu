@@ -101,7 +101,7 @@ void FactorSet::add(const IndicatorList& inds) {
 }
 
 void FactorSet::add(const std::map<string, Indicator>& inds) {
-    for (auto& ind : inds) {
+    for (const auto& ind : inds) {
         add(ind.first, ind.second);
     }
 }
