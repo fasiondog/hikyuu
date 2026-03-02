@@ -145,6 +145,23 @@ void export_Factor(py::module& m) {
     :return: 所有股票的计算结果列表
     :rtype: list)")
 
+      .def("get_value", &Factor::getValue, py::arg("stock"), py::arg("query"),
+           py::arg("align") = false, py::arg("fill_null") = false, py::arg("tovalue") = false,
+           py::arg("check") = false, py::arg("align_dates") = DatetimeList{},
+           R"(get_value(self, stock, query[, align=False[, fill_null=False[, tovalue=False[, check=False[, align_dates=DatetimeList()]]]]])
+    
+    获取指定股票的指定查询参数的计算结果
+
+    :param Stock stock: 证券对象
+    :param Query query: 查询参数
+    :param bool align: 是否进行日期对齐 (如按指定 align_dates 或默认交易日历)，默认 False
+    :param bool fill_null: 是否填充空值，默认 False
+    :param bool tovalue: 是否转换为数值，默认 False
+    :param bool check: 是否检查股票属于自身指定的 block，默认 False
+    :param DatetimeList align_dates: 对齐日期列表，默认为空
+    :return: 计算结果指标
+    :rtype: Indicator)")
+
       .def(
         "get_values",
         [](Factor& self, const py::object& stks, const KQuery& query, bool align, bool fill_null,

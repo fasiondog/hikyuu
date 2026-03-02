@@ -117,10 +117,13 @@ factor.save_special_values_to_db(stock, dates, values, replace=False)
 
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>以下数据获取方法，如因子值本身存储在数据库中，则需VIP权限，仅支持ClickHouse数据库引擎。</p>
+<p>以下数据获取方法，如因子值本身存储在数据库中，则需 VIP 权限，仅支持 ClickHouse 数据库引擎。</p>
 </div>
 
 ```
+# 获取单个证券的计算结果 ⚠️ VIP功能
+result = factor.get_value(stock, query, align=False, fill_null=False, tovalue=False, check=False, align_dates=DatetimeList())
+
 # 获取所有计算结果 ⚠️ VIP功能
 results = factor.get_all_values(query, align=False, fill_null=False, tovalue=False, align_dates=DatetimeList())
 
@@ -133,14 +136,21 @@ factor.save_values(stocks, query, replace=False)
 
 **参数说明:**
 
+- `stock` (Stock): 证券对象（仅 get_value 方法）
 - `query` (Query): 查询参数
-- `align` (bool): 是否对齐日期，默认False
-- `fill_null` (bool): 是否填充空值，默认False
-- `tovalue` (bool): 是否转换为数值，默认False
-- `check` (bool): 是否检查股票列表属于自身指定的block，默认False（仅get_values方法）
+- `align` (bool): 是否对齐日期，默认 False
+- `fill_null` (bool): 是否填充空值，默认 False
+- `tovalue` (bool): 是否转换为数值，默认 False
+- `check` (bool): 是否检查股票属于自身指定的 block，默认 False（仅 get_value 和 get_values 方法）
 - `align_dates` (DatetimeList): 对齐日期列表，默认为空
 - `stocks` (sequence): 证券列表
-- `replace` (bool): 是否替换已有数据，默认False
+- `replace` (bool): 是否替换已有数据，默认 False
+
+**返回值:**
+
+- `get_value`: 返回单个 Indicator 对象，表示指定证券的计算结果
+- `get_all_values`: 返回 Indicator 列表，包含所有证券的计算结果
+- `get_values`: 返回 Indicator 列表，按股票顺序排列的计算结果
 
 #### 特殊因子值保存方法 ⚠️ VIP功能
 

@@ -50,6 +50,21 @@ public:
     Factor& operator=(Factor&& other) noexcept;
 
     /**
+     * 获取指定股票的指定查询参数的计算结果
+     * @param stock 证券
+     * @param query 查询参数
+     * @param align 是否对齐日期（按指定 align_dates 或默认交易日历)，默认 false
+     * @param fill_null 是否填充空值，默认 false
+     * @param tovalue 是否转换为数值，默认 false
+     * @param check 是否检查股票属于自身指定的 block，默认 false
+     * @param align_dates 对齐日期列表，默认为空
+     * @return 计算结果指标
+     */
+    Indicator getValue(const Stock& stock, const KQuery& query, bool align = false,
+                       bool fill_null = false, bool tovalue = false, bool check = false,
+                       const DatetimeList& align_dates = {}) const;
+
+    /**
      * 获取指定股票列表的指定查询参数的计算结果
      * @param stocks 证券列表
      * @param query 查询参数

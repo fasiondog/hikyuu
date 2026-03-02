@@ -67,6 +67,12 @@ Factor& Factor::operator=(Factor&& other) noexcept {
     return *this;
 }
 
+Indicator Factor::getValue(const Stock& stock, const KQuery& query, bool align, bool fill_null,
+                           bool tovalue, bool check, const DatetimeList& align_dates) const {
+    auto inds = getValues({stock}, query, align, fill_null, tovalue, check, align_dates);
+    return inds.empty() ? Indicator() : inds.front();
+}
+
 IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bool align,
                                 bool fill_null, bool tovalue, bool check,
                                 const DatetimeList& align_dates) const {
