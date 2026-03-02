@@ -325,6 +325,74 @@ void serialize(Archive& ar, std::unordered_set<Key, Hash, KeyEqual, Alloc>& s,
 }  // namespace serialization
 }  // namespace boost
 
+#if 0
+// 进入 boost::serialization 命名空间进行“埋雷”
+namespace boost {
+namespace serialization {
+
+// ============================================================
+// 1. 针对 'long' 的毒药特化
+// ============================================================
+template <class Archive>
+void serialize(Archive& ar, long& t, const unsigned int version) {
+    // 只要编译器尝试实例化这个函数（即尝试序列化 long），就会触发此断言
+    static_assert(
+      sizeof(long) == -1,
+      "🚨 FATAL ERROR: 禁止直接序列化 'long' 类型！\n"
+      "原因：'long' 在 Linux (8字节) 和 Windows (4字节) 上大小不同，会导致跨平台崩溃。\n"
+      "解决：请将成员变量类型改为 'int32_t' 或 'int64_t'。\n"
+      "位置：请查看调用栈上方报错的变量。");
+}
+
+// 针对 const long (防止 const 成员变量绕过)
+template <class Archive>
+void serialize(Archive& ar, const long& t, const unsigned int version) {
+    static_assert(sizeof(long) == -1,
+                  "🚨 FATAL ERROR: 禁止序列化 'const long'！请改为 int32_t/int64_t。");
+}
+
+// ============================================================
+// 2. 针对 'unsigned long' 的毒药特化
+// ============================================================
+template <class Archive>
+void serialize(Archive& ar, unsigned long& t, const unsigned int version) {
+    static_assert(sizeof(unsigned long) == -1,
+                  "🚨 FATAL ERROR: 禁止直接序列化 'unsigned long' 类型！\n"
+                  "原因：跨平台大小不一致 (Linux 8字节 vs Windows 4字节)。\n"
+                  "解决：请改为 'uint32_t' 或 'uint64_t'。");
+}
+
+// ============================================================
+// 3. 针对 'size_t' 的警告 (可选，视严格程度而定)
+// ============================================================
+// 如果你确定只在 64 位系统间传输，可以注释掉下面这段。
+// 如果要绝对安全（兼容 32 位），则开启。
+/*
+template<class Archive>
+void serialize(Archive& ar, std::size_t& t, const unsigned int version) {
+    static_assert(sizeof(std::size_t) == -1,
+        "⚠️ WARNING: 检测到序列化 'size_t'。\n"
+        "虽然 64 位系统间通常安全，但为了绝对跨平台兼容，建议改为 uint32_t 或 uint64_t。"
+    );
+}
+*/
+
+// ============================================================
+// 4. 针对 'time_t' 的毒药特化 (常见隐患)
+// ============================================================
+// #include <ctime>
+// template <class Archive>
+// void serialize(Archive& ar, std::time_t& t, const unsigned int version) {
+//     static_assert(sizeof(std::time_t) == -1,
+//                   "🚨 FATAL ERROR: 禁止直接序列化 'time_t'！\n"
+//                   "原因：'time_t' 在不同平台/编译器下实现不同 (可能是 long, long long, 或
+//                   int)。\n" "解决：请转换为 'int64_t' (秒时间戳) 后再序列化。");
+// }
+
+}  // namespace serialization
+}  // namespace boost
+#endif
+
 #endif /* HKU_SUPPORT_SERIALIZATION */
 
 #endif /* DATATYPE_H_ */

@@ -105,8 +105,7 @@ void GlobalInitializer::init() {
     init_global_task_group(cpu_num);
 
     DataDriverFactory::init();
-    StockManager::instance().getPlugin<ExtendIndicatorsPluginInterface>(
-      HKU_PLUGIN_EXTEND_INDICATOR);
+    StockManager::instance();
 
     getGlobalSpotAgent();
 }
