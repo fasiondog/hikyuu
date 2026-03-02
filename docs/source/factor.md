@@ -8,7 +8,25 @@ hikyuu提供了完善的因子管理体系，包括单个因子 Factor 和因子
 2. **因子集组织**: 将相关的因子组织到同一个FactorSet中便于管理
 3. **数据验证**: 使用 `check=True` 参数验证股票列表是否属于指定板块
 4. **因子更新**: 每日行情数据下载完成后，应及时调用 `update_all_factors_values()` 更新所有存储的因子值，确保因子数据与行情数据同步。该方法未集成到 HikyuuTdx 和 importdata 中，需要自行手工调用，原因是有时需要进行数据检查，确认数据无误后再进行因子值保存。
-5. **因子值保存**: 对于高频聚合的因子值或高频因子值，建议设置 `need_save_value=True` 并保存到数据库。由于 Hikyuu的超高计算速度，普通的日频因子值(如MA5)，通常不建议保存到数据库，因为从存储中读取因子值速度更慢，**这和其他的量化框架依赖因子存储来提升速度的习惯有所不同**。建议自行根据需要测试决定。通常直接保存原始因子值，不需要进行截面、标准化等处理，可以由 MF 完成。对需要截面值的因子，通常需要指定对应的证券集，Factor和FactorSet直接指定。
+5. **因子值保存**: 对于高频聚合的因子值或高频因子值，建议设置 `need_save_value=True` 并保存到数据库。由于 Hikyuu的超高计算速度，普通的日频因子值(如MA5)，通常不建议保存到数据库，因为从存储中读取因子值速度更更慢，**这和其他的量化框架依赖因子存储来提升速度的习惯有所不同**。建议自行根据需要测试决定。通常直接保存原始因子值，不需要进行截面、标准化等处理，可以由 MF 完成。对需要截面值的因子，通常需要指定对应的证券集，Factor和FactorSet直接指定。
+
+<div class="admonition warning">
+<p class="admonition-title">⚠️ 重要提醒：因子值精度与范围限制</p>
+<p>因子值在数据库中使用 int32 类型存储，保留4位小数精度。具体存储方式为：实际值 × 10000 后转换为整数存储。</p>
+<p><strong>数值范围限制：</strong></p>
+<ul>
+<li>int32 取值范围：-2,147,483,648 到 2,147,483,647</li>
+<li>对应因子值范围：-214,748.3648 到 214,748.3647</li>
+</ul>
+<p><strong>特别注意事项：</strong></p>
+<ul>
+<li><strong>市值类因子</strong>：如总市值、流通市值等通常数值较大，容易超出存储范围</li>
+<li><strong>解决方案</strong>：对于大数值因子，建议存储单位调整后的值（如亿元、万股等）</li>
+<li><strong>示例</strong>：总市值存储为 亿元单位，流通股本存储为 万股单位</li>
+</ul>
+<p>超出范围的因子值将导致存储失败或数据截断，请务必在设计因子时考虑数值范围问题。</p>
+</div>
+
 6. **特殊因子值保存**: 对于不通过指标计算的特殊因子值（如PRICELIST或Indicator()），可以使用 `save_special_values_to_db()` 方法直接保存预计算的因子值
 7. **VIP功能使用**: ⚠️ 因子相关的数据库存储和读取操作均为VIP功能，数据库引擎仅支持ClickHouse。使用前请确认已获得相应权限。包括但不限于：`save_to_db()`、`load_from_db()`、`remove_from_db()`、`save_values()`、`get_all_values()`、`get_values()` 等涉及数据库的操作方法。
 
@@ -45,6 +63,13 @@ Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_save_value=Fa
 - `brief` (str): 简要描述，默认为空
 - `details` (str): 详细描述，默认为空
 - `need_save_value` (bool): 是否需要持久化保存因子值数据，默认为False。设置为True时，将因子指定股票集合从start_date开始的计算值保存到数据库中。由于Hikyuu的计算速度远快于数据库存储，通常日频因子计算的各证券值不建议保存到数据库，需要保存到数据库的通常为高频聚合到日频的因子值或高频因子值
+
+<div class="admonition warning">
+<p class="admonition-title">⚠️ 数值范围警告</p>
+<p>因子值存储使用int32类型，保留4位小数精度。有效数值范围为 -214,748.3648 到 214,748.3647。</p>
+<p>对于市值类因子等大数值因子，请务必进行单位调整（如存储亿元而非元）以避免超出存储范围。</p>
+</div>
+
 - `start_date` (Datetime): 开始日期，数据存储时的起始日期，默认为最小日期
 - `block` (Block): 板块信息，证券集合，如果为空则为全部，默认为空
 
@@ -147,6 +172,45 @@ factor.save_special_values_to_db(stock, dates, values, replace=False)
 - `dates` (DatetimeList): 因子值对应的日期列表
 - `values` (PriceList): 因子值列表
 - `replace` (bool): 是否替换已有数据，默认False
+
+<div class="admonition warning">
+<p class="admonition-title">⚠️ 数值处理重要提醒</p>
+<p><strong>因子值范围限制：</strong></p>
+<ul>
+<li>存储类型：int32（4字节整数）</li>
+<li>精度：保留4位小数</li>
+<li>存储方式：实际值 × 10000 转换为整数存储</li>
+<li>有效范围：-214,748.3648 到 214,748.3647</li>
+</ul>
+
+<p><strong>大数值因子处理示例：</strong></p>
+
+```python
+# ❌ 错误示例：市值因子直接存储（容易超出范围）
+market_value_yuan = PriceList([200000000000, 150000000000, 300000000000])  # 元为单位
+factor.save_special_values_to_db(stock, dates, market_value_yuan)  # 可能超出范围
+
+# ✅ 正确示例：调整单位后存储
+market_value_yi_yuan = PriceList([2000, 1500, 3000])  # 亿元为单位
+factor.save_special_values_to_db(stock, dates, market_value_yi_yuan)
+
+# ❌ 错误示例：股本因子直接存储
+total_shares = PriceList([10000000000, 8000000000, 12000000000])  # 股为单位
+factor.save_special_values_to_db(stock, dates, total_shares)  # 可能超出范围
+
+# ✅ 正确示例：调整单位后存储  
+total_shares_wan_gu = PriceList([100000, 80000, 120000])  # 万股为单位
+factor.save_special_values_to_db(stock, dates, total_shares_wan_gu)
+```
+
+<p><strong>常见需要单位调整的因子类型：</strong></p>
+<ul>
+<li>市值类：总市值、流通市值（建议存储单位：亿元）</li>
+<li>股本类：总股本、流通股本（建议存储单位：万股）</li>
+<li>成交额：日成交金额（建议存储单位：万元）</li>
+<li>其他大数值指标：根据实际情况调整单位</li>
+</ul>
+</div>
 
 **使用场景:**
 
@@ -577,3 +641,71 @@ if not loaded_set.is_null():
 # remove_factor("MA5", KQuery.DAY)
 # remove_factorset("技术指标集", KQuery.DAY)
 ```
+
+## 常见问题 FAQ
+
+### Q: 为什么我的因子值保存失败了？
+
+**A:** 最常见的原因是因子值超出了int32的存储范围。请检查：
+- 因子值是否在 -214,748.3648 到 214,748.3647 范围内
+- 市值类因子是否进行了单位调整（建议存储亿元而非元）
+- 大数值因子是否适当缩放
+
+### Q: 如何处理市值类因子的存储问题？
+
+**A:** 市值类因子通常数值很大，建议的处理方式：
+
+```python
+# 总市值因子示例
+def create_market_value_factor():
+    # ❌ 不推荐：直接使用元为单位
+    # market_value_in_yuan = get_market_value_in_yuan()  # 数值可能达到千亿级别
+    
+    # ✅ 推荐：使用亿元为单位
+    market_value_in_yi_yuan = get_market_value_in_yuan() / 100000000  # 转换为亿元
+    mv_factor = Factor("MARKET_VALUE", PRICELIST(), brief="总市值(亿元)")
+    mv_factor.save_special_values_to_db(stock, dates, market_value_in_yi_yuan)
+    return mv_factor
+```
+
+### Q: 因子值的精度是如何保证的？
+
+**A:** 系统使用int32存储，通过乘以10000的方式保留4位小数精度：
+- 存储前：实际值 × 10000
+- 存储后：转换为int32整数
+- 读取时：int32值 ÷ 10000.0 转换回浮点数
+
+这种方式既保证了精度，又节省了存储空间。
+
+### Q: 如何验证因子值是否在有效范围内？
+
+**A:** 可以使用以下代码进行验证：
+
+```python
+def validate_factor_values(values):
+    """验证因子值是否在有效范围内"""
+    min_val, max_val = -214748.3648, 214748.3647
+    
+    invalid_count = 0
+    for val in values:
+        if val < min_val or val > max_val:
+            invalid_count += 1
+            print(f"警告：发现超出范围的值 {val}")
+    
+    if invalid_count > 0:
+        print(f"共发现 {invalid_count} 个超出范围的因子值")
+        return False
+    return True
+
+# 使用示例
+values = get_my_factor_values()
+if not validate_factor_values(values):
+    print("请调整因子值范围后再保存")
+```
+
+### Q: 对于高频因子值有什么特殊考虑吗？
+
+**A:** 高频因子值通常波动较小，但仍需注意：
+- 确保缩放后的值仍在有效范围内
+- 考虑是否真的需要保存到数据库（Hikyuu计算速度很快）
+- 如果保存，建议使用合适的单位以充分利用精度
