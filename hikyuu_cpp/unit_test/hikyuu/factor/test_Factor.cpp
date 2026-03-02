@@ -51,9 +51,9 @@ TEST_CASE("test_Factor_basic") {
     CHECK_EQ(factor.startDate(), Datetime::min());
 
     // 测试持久化属性
-    CHECK_FALSE(factor.needPersist());
-    factor.needPersist(true);
-    CHECK_UNARY(factor.needPersist());
+    CHECK_FALSE(factor.needSaveValue());
+    factor.needSaveValue(true);
+    CHECK_UNARY(factor.needSaveValue());
 }
 
 /** @par 检测点：测试Factor带Block构造 */
@@ -464,7 +464,7 @@ TEST_CASE("test_Factor_copy_semantics") {
     CHECK_EQ(copy1.ktype(), KQuery::DAY);
     CHECK_EQ(copy1.brief(), "拷贝测试");
     CHECK_EQ(copy1.details(), "详细描述");
-    CHECK_UNARY(copy1.needPersist());
+    CHECK_UNARY(copy1.needSaveValue());
     CHECK_EQ(copy1.startDate(), Datetime(202001010000LL));
     CHECK_EQ(copy1.block().category(), "行业");
     CHECK_EQ(copy1.block().name(), "测试板块");
@@ -476,7 +476,7 @@ TEST_CASE("test_Factor_copy_semantics") {
     CHECK_EQ(copy2.ktype(), KQuery::DAY);
     CHECK_EQ(copy2.brief(), "拷贝测试");
     CHECK_EQ(copy2.details(), "详细描述");
-    CHECK_UNARY(copy2.needPersist());
+    CHECK_UNARY(copy2.needSaveValue());
     CHECK_EQ(copy2.startDate(), Datetime(202001010000LL));
     CHECK_EQ(copy2.block().category(), "行业");
     CHECK_EQ(copy2.block().name(), "测试板块");
@@ -807,7 +807,7 @@ TEST_CASE("test_Factor_basic_serialize") {
     CHECK_EQ(factor1.ktype(), factor2.ktype());
     CHECK_EQ(factor1.brief(), factor2.brief());
     CHECK_EQ(factor1.details(), factor2.details());
-    CHECK_EQ(factor1.needPersist(), factor2.needPersist());
+    CHECK_EQ(factor1.needSaveValue(), factor2.needSaveValue());
     CHECK_EQ(factor1.createAt(), factor2.createAt());
     CHECK_EQ(factor1.updateAt(), factor2.updateAt());
 
@@ -858,7 +858,7 @@ TEST_CASE("test_Factor_with_block_serialize") {
     CHECK_EQ(factor1.ktype(), factor2.ktype());
     CHECK_EQ(factor1.brief(), factor2.brief());
     CHECK_EQ(factor1.details(), factor2.details());
-    CHECK_EQ(factor1.needPersist(), factor2.needPersist());
+    CHECK_EQ(factor1.needSaveValue(), factor2.needSaveValue());
     CHECK_EQ(factor1.startDate(), factor2.startDate());
 
     // 验证 Block 属性
@@ -921,7 +921,7 @@ TEST_CASE("test_Factor_empty_serialize") {
     CHECK_EQ(factor2.name(), "");
     // ktype对于默认构造的Factor可能是空字符串
     CHECK_EQ(factor2.ktype(), "");  // 修改为期望的空字符串
-    CHECK_FALSE(factor2.needPersist());
+    CHECK_FALSE(factor2.needSaveValue());
 }
 
 /** @par 检测点：测试多个Factor序列化 */
@@ -941,11 +941,11 @@ TEST_CASE("test_Factor_list_serialize") {
     factors1.emplace_back("FACTOR_3", ma20, KQuery::MONTH, "因子3", "第三个测试因子");
 
     // 设置不同的属性
-    factors1[0].needPersist(true);
+    factors1[0].needSaveValue(true);
     factors1[0].createAt(Datetime(202001010000LL));
-    factors1[1].needPersist(false);
+    factors1[1].needSaveValue(false);
     factors1[1].createAt(Datetime(202001020000LL));
-    factors1[2].needPersist(true);
+    factors1[2].needSaveValue(true);
     factors1[2].createAt(Datetime(202001030000LL));
 
     // 序列化到文件
@@ -972,7 +972,7 @@ TEST_CASE("test_Factor_list_serialize") {
         CHECK_EQ(factors1[i].ktype(), factors2[i].ktype());
         CHECK_EQ(factors1[i].brief(), factors2[i].brief());
         CHECK_EQ(factors1[i].details(), factors2[i].details());
-        CHECK_EQ(factors1[i].needPersist(), factors2[i].needPersist());
+        CHECK_EQ(factors1[i].needSaveValue(), factors2[i].needSaveValue());
         CHECK_EQ(factors1[i].createAt(), factors2[i].createAt());
 
         // 验证 formula

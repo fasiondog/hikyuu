@@ -32,10 +32,10 @@ public:
      * @param ktype K线类型
      * @param brief 简要描述
      * @param details 详细描述
-     * @param need_persist 是否需要持久化
+     * @param need_save_value 是否需要持久化保存因子值数据
      */
     Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype = KQuery::DAY,
-           const string& brief = "", const string& details = "", bool need_persist = false,
+           const string& brief = "", const string& details = "", bool need_save_value = false,
            const Datetime& start_date = Datetime::min(), const Block& block = Block());
 
     Factor(const Factor& other) noexcept;
@@ -100,9 +100,9 @@ public:
 
     void updateAt(const Datetime& datetime);
 
-    bool needPersist() const noexcept;
+    bool needSaveValue() const noexcept;
 
-    void needPersist(bool flag);
+    void needSaveValue(bool flag);
 
     const string& brief() const noexcept;
 
@@ -154,21 +154,22 @@ private:
         Datetime start_date;       ///< 开始日期，数据存储时的起始日期
         Indicator formula;         ///< 计算公式指标
         Block block;               ///< 板块信息，证券集合，如果为空，为全部
-        bool need_persist{false};  ///< 是否需要持久化因子值数据
+        bool need_save_value{false};  ///< 是否需要持久化保存因子值数据
 
         Data() = default;
         Data(const string& name, const Indicator& formula, const KQuery::KType& ktype,
-             const string& brief, const string& details, bool need_persist,
+             const string& brief, const string& details, bool need_save_value,
              const Datetime& start_date, const Block& block)
         : name(name),
           ktype(ktype),
           brief(brief),
           details(details),
           start_date(start_date),
-          formula(formula),
+          formula(formula.clone()),
           block(block),
-          need_persist(need_persist) {
+          need_save_value(need_save_value) {
             to_upper(this->name);
+            this->formula.setContext(KData());
             this->formula.name(this->name);
             if (this->start_date == Null<Datetime>()) {
                 this->start_date = Datetime::min();
@@ -200,8 +201,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(brief);
         string details = this->details();
         ar& BOOST_SERIALIZATION_NVP(details);
-        bool needPersist = this->needPersist();
-        ar& BOOST_SERIALIZATION_NVP(needPersist);
+        bool needSaveValue = this->needSaveValue();
+        ar& BOOST_SERIALIZATION_NVP(needSaveValue);
     }
 
     template <class Archive>
@@ -215,7 +216,7 @@ private:
         Datetime updateAt;
         string brief;
         string details;
-        bool needPersist;
+        bool needSaveValue;
         ar& BOOST_SERIALIZATION_NVP(name);
         ar& BOOST_SERIALIZATION_NVP(ktype);
         ar& BOOST_SERIALIZATION_NVP(formula);
@@ -225,9 +226,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(updateAt);
         ar& BOOST_SERIALIZATION_NVP(brief);
         ar& BOOST_SERIALIZATION_NVP(details);
-        ar& BOOST_SERIALIZATION_NVP(needPersist);
+        ar& BOOST_SERIALIZATION_NVP(needSaveValue);
         this->m_data =
-          make_shared<Data>(name, formula, ktype, brief, details, needPersist, startDate, block);
+          make_shared<Data>(name, formula, ktype, brief, details, needSaveValue, startDate, block);
         this->createAt(createAt);
         this->updateAt(updateAt);
     }
@@ -299,12 +300,12 @@ inline void Factor::updateAt(const Datetime& datetime) {
     m_data->update_at = datetime;
 }
 
-inline bool Factor::needPersist() const noexcept {
-    return m_data->need_persist;
+inline bool Factor::needSaveValue() const noexcept {
+    return m_data->need_save_value;
 }
 
-inline void Factor::needPersist(bool flag) {
-    m_data->need_persist = flag;
+inline void Factor::needSaveValue(bool flag) {
+    m_data->need_save_value = flag;
 }
 
 inline const string& Factor::brief() const noexcept {

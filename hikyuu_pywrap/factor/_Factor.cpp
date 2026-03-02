@@ -30,9 +30,9 @@ void export_Factor(py::module& m) {
         py::init<const string&, const Indicator&, const KQuery::KType&, const string&,
                  const string&, bool, const Datetime&, const Block&>(),
         py::arg("name"), py::arg("formula"), py::arg("ktype") = KQuery::DAY, py::arg("brief") = "",
-        py::arg("details") = "", py::arg("need_persist") = false,
+        py::arg("details") = "", py::arg("need_save_value") = false,
         py::arg("start_date") = Datetime::min(), py::arg("block") = Block(),
-        R"(__init__(self, name, formula[, ktype=KQuery.DAY[, brief=""[, details=""[, need_persist=False[, start_date=Datetime.min()[, block=Block()]]]]]])
+        R"(__init__(self, name, formula[, ktype=KQuery.DAY[, brief=""[, details=""[, need_save_value=False[, start_date=Datetime.min()[, block=Block()]]]]]])
     
     构造函数，创建新的因子对象（因子名称 + K线类型 为因子的唯一标识）
 
@@ -41,7 +41,7 @@ void export_Factor(py::module& m) {
     :param KQuery.KType ktype: K线类型，默认为日线
     :param str brief: 简要描述，默认为空
     :param str details: 详细描述，默认为空
-    :param bool need_persist: 是否需要持久化保存因子值数据，默认为False
+    :param bool need_save_value: 是否需要持久化保存因子值数据，默认为False
     :param Datetime start_date: 开始日期，数据存储时的起始日期，默认为最小日期
     :param Block block: 板块信息，证券集合，如果为空则为全部，默认为空
     :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识)")
@@ -75,8 +75,8 @@ void export_Factor(py::module& m) {
       .def_property("details", py::overload_cast<>(&Factor::details, py::const_),
                     py::overload_cast<const string&>(&Factor::details),
                     py::return_value_policy::copy, "详细说明")
-      .def_property("need_persist", py::overload_cast<>(&Factor::needPersist, py::const_),
-                    py::overload_cast<bool>(&Factor::needPersist), "是否持久化保存因子值数据")
+      .def_property("need_save_value", py::overload_cast<>(&Factor::needSaveValue, py::const_),
+                    py::overload_cast<bool>(&Factor::needSaveValue), "是否持久化保存因子值数据")
 
       .def("save_to_db", &Factor::save_to_db,
            R"(save_to_db(self)
