@@ -25,6 +25,9 @@ Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype = KQuery
 /** 删除因子 */
 void HKU_API removeFactor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
 
+/** 删除因子值 */
+void HKU_API removeFactorValue(const string& name, const KQuery::KType& ktype = KQuery::DAY);
+
 /** 获取所有因子 */
 FactorList HKU_API getAllFactors();
 

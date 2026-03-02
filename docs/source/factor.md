@@ -28,7 +28,7 @@ hikyuu提供了完善的因子管理体系，包括单个因子 Factor 和因子
 </div>
 
 6. **特殊因子值保存**: 对于不通过指标计算的特殊因子值（如PRICELIST或Indicator()），可以使用 `save_special_values_to_db()` 方法直接保存预计算的因子值
-7. **VIP功能使用**: ⚠️ 因子相关的数据库存储和读取操作均为VIP功能，数据库引擎仅支持ClickHouse。使用前请确认已获得相应权限。包括但不限于：`save_to_db()`、`load_from_db()`、`remove_from_db()`、`save_values()`、`get_all_values()`、`get_values()` 等涉及数据库的操作方法。
+7. **VIP功能使用**: ⚠️ 因子相关的数据库存储和读取操作均为VIP功能，数据库引擎仅支持ClickHouse。使用前请确认已获得相应权限。包括但不限于：`save_to_db()`、`remove_from_db()`、`save_values()`、`get_all_values()`、`get_values()` 等涉及数据库的操作方法。
 
 ## 注意事项
 
@@ -105,9 +105,6 @@ factor.save_to_db()
 
 # 从数据库中删除因子及其数据 ⚠️ VIP功能
 factor.remove_from_db()
-
-# 从数据库中加载因子元数据 ⚠️ VIP功能
-factor.load_from_db()
 
 # 特殊因子保存值到数据库 ⚠️ VIP功能
 factor.save_special_values_to_db(stock, dates, values, replace=False)

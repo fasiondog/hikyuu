@@ -142,6 +142,10 @@ void Factor::remove_from_db() {
     removeFactor(name(), ktype());
 }
 
+void Factor::remove_values_from_db() {
+    removeFactorValue(name(), ktype());
+}
+
 void Factor::load_from_db() {
     Factor tmp = getFactor(name(), ktype());
     m_data = std::move(tmp.m_data);

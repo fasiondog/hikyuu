@@ -57,6 +57,17 @@ void HKU_API removeFactor(const string& name, const KQuery::KType& ktype) {
     plugin->removeFactor(name, ktype);
 }
 
+void HKU_API removeFactorValue(const string& name, const KQuery::KType& ktype) {
+    auto& sm = StockManager::instance();
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", void(), "Not support {} driver!", driver_type);
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, void(),
+                        htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    plugin->removeFactorValue(name, ktype);
+}
+
 FactorList HKU_API getAllFactors() {
     FactorList ret;
     auto& sm = StockManager::instance();

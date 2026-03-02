@@ -162,6 +162,11 @@ public:
     void remove_from_db();
 
     /**
+     * 从数据库中删除因子值数据, 注：为防止误操作，特殊因子的值不会删除，需自行手工删除
+     */
+    void remove_values_from_db();
+
+    /**
      * 从数据库中加载因子，以 name + ktype 作为唯一标识，如果不存在则不修改当前对象
      */
     void load_from_db();
