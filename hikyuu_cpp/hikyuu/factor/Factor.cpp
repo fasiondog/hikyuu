@@ -25,17 +25,19 @@ string Factor::str() const {
     string strip("  \n");
     os << "Factor(";
     os << strip << "name: " << name() << strip << "ktype: " << ktype() << strip
-       << "need_save_value: " << needSaveValue() << strip << "create_at: " << createAt().str() << strip
-       << "update_at: " << updateAt().str() << strip << "formula: " << formula().formula() << strip
-       << "brief: " << brief() << strip << "detail: " << details() << strip
-       << "start_date: " << startDate() << strip << "block: " << block() << ")";
+       << "recover_type: " << recoverType() << strip << "need_save_value: " << needSaveValue()
+       << strip << "create_at: " << createAt().str() << strip << "update_at: " << updateAt().str()
+       << strip << "formula: " << formula().formula() << strip << "brief: " << brief() << strip
+       << "detail: " << details() << strip << "start_date: " << startDate() << strip
+       << "block: " << block() << ")";
     return os.str();
 }
 
 Factor::Factor() : m_data(make_shared<Factor::Data>()) {}
 
 Factor::Factor(const string& name, const KQuery::KType& ktype)
-: m_data(make_shared<Data>(name, Indicator(), ktype, "", "", false, Datetime::min(), Block())) {
+: m_data(make_shared<Data>(name, Indicator(), ktype, "", "", false, Datetime::min(), Block(),
+                           KQuery::RecoverType::NO_RECOVER)) {
     try {
         load_from_db();
     } catch (const std::exception& e) {
@@ -45,9 +47,9 @@ Factor::Factor(const string& name, const KQuery::KType& ktype)
 
 Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype,
                const string& brief, const string& details, bool need_save_value,
-               const Datetime& start_date, const Block& block)
-: m_data(make_shared<Data>(name, formula, ktype, brief, details, need_save_value, start_date, block)) {
-}
+               const Datetime& start_date, const Block& block, KQuery::RecoverType recover_type)
+: m_data(make_shared<Data>(name, formula, ktype, brief, details, need_save_value, start_date, block,
+                           recover_type)) {}
 
 Factor::Factor(const Factor& other) noexcept : m_data(other.m_data) {}
 

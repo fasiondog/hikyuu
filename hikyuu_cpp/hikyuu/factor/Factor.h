@@ -32,11 +32,15 @@ public:
      * @param ktype K线类型
      * @param brief 简要描述
      * @param details 详细描述
-     * @param need_save_value 是否需要持久化保存因子值数据
+     * @param start_date 因子数据起始日期
+     * @param save_value 是否需要持久化保存因子值数据
+     * @param block 板块信息，证券集合，如果为空，为全部
+     * @param recover_type 复权方式
      */
     Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype = KQuery::DAY,
-           const string& brief = "", const string& details = "", bool need_save_value = false,
-           const Datetime& start_date = Datetime::min(), const Block& block = Block());
+           const string& brief = "", const string& details = "", bool save_value = false,
+           const Datetime& start_date = Datetime::min(), const Block& block = Block(),
+           KQuery::RecoverType recover_type = KQuery::RecoverType::NO_RECOVER);
 
     Factor(const Factor& other) noexcept;
     Factor(Factor&& other) noexcept;
@@ -74,43 +78,47 @@ public:
 
     const string& name() const noexcept;
 
-    void name(const string& name);
+    Factor& name(const string& name);
 
     const string& ktype() const noexcept;
 
-    void ktype(const string& ktype);
+    Factor& ktype(const string& ktype);
+
+    KQuery::RecoverType recoverType() const noexcept;
+
+    Factor& recoverType(KQuery::RecoverType recover_type);
 
     const Indicator& formula() const noexcept;
 
-    void formula(const Indicator& formula);
+    Factor& formula(const Indicator& formula);
 
     const Datetime& startDate() const noexcept;
 
-    void startDate(const Datetime& datetime);
+    Factor& startDate(const Datetime& datetime);
 
     const Block& block() const noexcept;
 
-    void block(const Block& block);
+    Factor& block(const Block& block);
 
     const Datetime& createAt() const noexcept;
 
-    void createAt(const Datetime& datetime);
+    Factor& createAt(const Datetime& datetime);
 
     const Datetime& updateAt() const noexcept;
 
-    void updateAt(const Datetime& datetime);
+    Factor& updateAt(const Datetime& datetime);
 
     bool needSaveValue() const noexcept;
 
-    void needSaveValue(bool flag);
+    Factor& needSaveValue(bool flag);
 
     const string& brief() const noexcept;
 
-    void brief(const string& brief);
+    Factor& brief(const string& brief);
 
     const string& details() const noexcept;
 
-    void details(const string& details);
+    Factor& details(const string& details);
 
     uint64_t hash() const noexcept;
 
@@ -145,21 +153,22 @@ public:
 
 private:
     struct Data {
-        string name;               ///< 因子名称
-        string ktype;              ///< K线类型
-        string brief;              ///< 简要描述
-        string details;            ///< 详细描述
-        Datetime create_at;        ///< 创建时间
-        Datetime update_at;        ///< 更新时间
-        Datetime start_date;       ///< 开始日期，数据存储时的起始日期
-        Indicator formula;         ///< 计算公式指标
-        Block block;               ///< 板块信息，证券集合，如果为空，为全部
+        string name;                  ///< 因子名称
+        string ktype;                 ///< K线类型
+        string brief;                 ///< 简要描述
+        string details;               ///< 详细描述
+        Datetime create_at;           ///< 创建时间
+        Datetime update_at;           ///< 更新时间
+        Datetime start_date;          ///< 开始日期，数据存储时的起始日期
+        Indicator formula;            ///< 计算公式指标
+        Block block;                  ///< 板块信息，证券集合，如果为空，为全部
         bool need_save_value{false};  ///< 是否需要持久化保存因子值数据
+        KQuery::RecoverType recover_type{KQuery::RecoverType::NO_RECOVER};
 
         Data() = default;
         Data(const string& name, const Indicator& formula, const KQuery::KType& ktype,
              const string& brief, const string& details, bool need_save_value,
-             const Datetime& start_date, const Block& block)
+             const Datetime& start_date, const Block& block, KQuery::RecoverType recover_type)
         : name(name),
           ktype(ktype),
           brief(brief),
@@ -167,7 +176,8 @@ private:
           start_date(start_date),
           formula(formula.clone()),
           block(block),
-          need_save_value(need_save_value) {
+          need_save_value(need_save_value),
+          recover_type(recover_type) {
             to_upper(this->name);
             this->formula.setContext(KData());
             this->formula.name(this->name);
@@ -203,6 +213,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(details);
         bool needSaveValue = this->needSaveValue();
         ar& BOOST_SERIALIZATION_NVP(needSaveValue);
+        KQuery::RecoverType recover_type = this->recoverType();
+        ar& BOOST_SERIALIZATION_NVP(recover_type);
     }
 
     template <class Archive>
@@ -217,6 +229,7 @@ private:
         string brief;
         string details;
         bool needSaveValue;
+        KQuery::RecoverType recover_type;
         ar& BOOST_SERIALIZATION_NVP(name);
         ar& BOOST_SERIALIZATION_NVP(ktype);
         ar& BOOST_SERIALIZATION_NVP(formula);
@@ -227,8 +240,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(brief);
         ar& BOOST_SERIALIZATION_NVP(details);
         ar& BOOST_SERIALIZATION_NVP(needSaveValue);
-        this->m_data =
-          make_shared<Data>(name, formula, ktype, brief, details, needSaveValue, startDate, block);
+        ar& BOOST_SERIALIZATION_NVP(recover_type);
+        this->m_data = make_shared<Data>(name, formula, ktype, brief, details, needSaveValue,
+                                         startDate, block, recover_type);
         this->createAt(createAt);
         this->updateAt(updateAt);
     }
@@ -245,83 +259,102 @@ inline const string& Factor::name() const noexcept {
     return m_data->name;
 }
 
-inline void Factor::name(const string& name) {
+inline Factor& Factor::name(const string& name) {
     m_data->name = name;
     to_upper(m_data->name);
     m_data->formula.name(m_data->name);
+    return *this;
 }
 
 inline const string& Factor::ktype() const noexcept {
     return m_data->ktype;
 }
 
-inline void Factor::ktype(const string& ktype) {
+inline Factor& Factor::ktype(const string& ktype) {
     m_data->ktype = ktype;
+    return *this;
+}
+
+inline KQuery::RecoverType Factor::recoverType() const noexcept {
+    return m_data->recover_type;
+}
+
+inline Factor& Factor::recoverType(KQuery::RecoverType recover_type) {
+    m_data->recover_type = recover_type;
+    return *this;
 }
 
 inline const Indicator& Factor::formula() const noexcept {
     return m_data->formula;
 }
 
-inline void Factor::formula(const Indicator& formula) {
+inline Factor& Factor::formula(const Indicator& formula) {
     m_data->formula = formula;
     m_data->formula.name(m_data->name);
+    return *this;
 }
 
 inline const Datetime& Factor::startDate() const noexcept {
     return m_data->start_date;
 }
 
-inline void Factor::startDate(const Datetime& datetime) {
+inline Factor& Factor::startDate(const Datetime& datetime) {
     m_data->start_date = datetime == Null<Datetime>() ? Datetime::min() : datetime;
+    return *this;
 }
 
 inline const Block& Factor::block() const noexcept {
     return m_data->block;
 }
 
-inline void Factor::block(const Block& block) {
+inline Factor& Factor::block(const Block& block) {
     m_data->block = block;
+    return *this;
 }
 
 inline const Datetime& Factor::createAt() const noexcept {
     return m_data->create_at;
 }
 
-inline void Factor::createAt(const Datetime& datetime) {
+inline Factor& Factor::createAt(const Datetime& datetime) {
     m_data->create_at = datetime;
+    return *this;
 }
 
 inline const Datetime& Factor::updateAt() const noexcept {
     return m_data->update_at;
 }
 
-inline void Factor::updateAt(const Datetime& datetime) {
+inline Factor& Factor::updateAt(const Datetime& datetime) {
     m_data->update_at = datetime;
+    return *this;
 }
 
 inline bool Factor::needSaveValue() const noexcept {
     return m_data->need_save_value;
 }
 
-inline void Factor::needSaveValue(bool flag) {
+inline Factor& Factor::needSaveValue(bool flag) {
     m_data->need_save_value = flag;
+    return *this;
 }
 
 inline const string& Factor::brief() const noexcept {
     return m_data->brief;
 }
 
-inline void Factor::brief(const string& brief) {
+inline Factor& Factor::brief(const string& brief) {
     m_data->brief = brief;
+    return *this;
 }
 
 inline const string& Factor::details() const noexcept {
     return m_data->details;
 }
 
-inline void Factor::details(const string& details) {
+inline Factor& Factor::details(const string& details) {
     m_data->details = details;
+    return *this;
 }
 
 inline uint64_t Factor::hash() const noexcept {

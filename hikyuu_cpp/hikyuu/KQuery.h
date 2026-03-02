@@ -20,7 +20,7 @@ namespace hku {
 class HKU_API KQuery {
 public:
     /// 查询方式：索引或日期
-    enum QueryType {
+    enum QueryType : uint8_t {
         INDEX = 0,  ///< 按索引方式查询
         DATE = 1,   ///< 按日期方式查询
         INVALID = 2
@@ -79,7 +79,7 @@ public:
      * 复权类型
      * @note 日线以上，如周线/月线不支持复权
      */
-    enum RecoverType {
+    enum RecoverType : uint8_t {
         NO_RECOVER = 0,      ///< 不复权
         FORWARD = 1,         ///< 前向复权
         BACKWARD = 2,        ///< 后向复权

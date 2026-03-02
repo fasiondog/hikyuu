@@ -49,34 +49,29 @@ void export_Factor(py::module& m) {
       .def("__str__", &Factor::str)
       .def("__repr__", &Factor::str)
 
-      .def_property("name", py::overload_cast<>(&Factor::name, py::const_),
-                    py::overload_cast<const string&>(&Factor::name), py::return_value_policy::copy,
-                    "因子名称")
-      .def_property("ktype", py::overload_cast<>(&Factor::ktype, py::const_),
-                    py::overload_cast<const string&>(&Factor::ktype), py::return_value_policy::copy,
-                    "因子频率类型")
-      .def_property("create_at", py::overload_cast<>(&Factor::createAt, py::const_),
-                    py::overload_cast<const Datetime&>(&Factor::createAt),
-                    py::return_value_policy::copy, "创建日期")
-      .def_property("update_at", py::overload_cast<>(&Factor::updateAt, py::const_),
-                    py::overload_cast<const Datetime&>(&Factor::updateAt),
-                    py::return_value_policy::copy, "更改日期")
-      .def_property("formula", py::overload_cast<>(&Factor::formula, py::const_),
-                    py::overload_cast<const Indicator&>(&Factor::formula),
-                    py::return_value_policy::copy, "因子公式")
-      .def_property("start_date", py::overload_cast<>(&Factor::startDate, py::const_),
-                    py::overload_cast<const Datetime&>(&Factor::startDate), "数据存储起始日期")
-      .def_property("block", py::overload_cast<>(&Factor::block, py::const_),
-                    py::overload_cast<const Block&>(&Factor::block), py::return_value_policy::copy,
-                    "证券集合")
-      .def_property("brief", py::overload_cast<>(&Factor::brief, py::const_),
-                    py::overload_cast<const string&>(&Factor::brief), py::return_value_policy::copy,
-                    "基础说明")
-      .def_property("details", py::overload_cast<>(&Factor::details, py::const_),
-                    py::overload_cast<const string&>(&Factor::details),
-                    py::return_value_policy::copy, "详细说明")
-      .def_property("need_save_value", py::overload_cast<>(&Factor::needSaveValue, py::const_),
-                    py::overload_cast<bool>(&Factor::needSaveValue), "是否持久化保存因子值数据")
+      // 属性访问器 - 拆分为独立的 getter 和 setter 方法
+      .def("get_name", [](const Factor& self) { return self.name(); }, py::return_value_policy::copy, "获取因子名称")
+      .def("set_name", [](Factor& self, const string& name) { self.name(name); }, "设置因子名称")
+      .def("get_ktype", [](const Factor& self) { return self.ktype(); }, py::return_value_policy::copy, "获取因子频率类型")
+      .def("set_ktype", [](Factor& self, const string& ktype) { self.ktype(ktype); }, "设置因子频率类型")
+      .def("get_create_at", [](const Factor& self) { return self.createAt(); }, py::return_value_policy::copy, "获取创建日期")
+      .def("set_create_at", [](Factor& self, const Datetime& datetime) { self.createAt(datetime); }, "设置创建日期")
+      .def("get_update_at", [](const Factor& self) { return self.updateAt(); }, py::return_value_policy::copy, "获取更改日期")
+      .def("set_update_at", [](Factor& self, const Datetime& datetime) { self.updateAt(datetime); }, "设置更改日期")
+      .def("get_formula", [](const Factor& self) { return self.formula(); }, py::return_value_policy::copy, "获取因子公式")
+      .def("set_formula", [](Factor& self, const Indicator& formula) { self.formula(formula); }, "设置因子公式")
+      .def("get_start_date", [](const Factor& self) { return self.startDate(); }, "获取数据存储起始日期")
+      .def("set_start_date", [](Factor& self, const Datetime& datetime) { self.startDate(datetime); }, "设置数据存储起始日期")
+      .def("get_block", [](const Factor& self) { return self.block(); }, py::return_value_policy::copy, "获取证券集合")
+      .def("set_block", [](Factor& self, const Block& block) { self.block(block); }, "设置证券集合")
+      .def("get_brief", [](const Factor& self) { return self.brief(); }, py::return_value_policy::copy, "获取基础说明")
+      .def("set_brief", [](Factor& self, const string& brief) { self.brief(brief); }, "设置基础说明")
+      .def("get_details", [](const Factor& self) { return self.details(); }, py::return_value_policy::copy, "获取详细说明")
+      .def("set_details", [](Factor& self, const string& details) { self.details(details); }, "设置详细说明")
+      .def("get_need_save_value", [](const Factor& self) { return self.needSaveValue(); }, "获取是否持久化保存因子值数据")
+      .def("set_need_save_value", [](Factor& self, bool flag) { self.needSaveValue(flag); }, "设置是否持久化保存因子值数据")
+      .def("get_recover_type", [](const Factor& self) { return self.recoverType(); }, "获取复权类型")
+      .def("set_recover_type", [](Factor& self, KQuery::RecoverType recover_type) { self.recoverType(recover_type); }, "设置复权类型")
 
       .def("save_to_db", &Factor::save_to_db,
            R"(save_to_db(self)
