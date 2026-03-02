@@ -59,6 +59,11 @@ struct HKU_API LatestVersionInfo {
 
 LatestVersionInfo HKU_API getLatestVersionInfo();
 
+void updateSysInfoExpiredTime(Datetime time);
+
+// 许可过期提醒
+void HKU_API reminderLicenseExpiration();
+
 /** 发送反馈信息 */
 void HKU_API sendFeedback();
 

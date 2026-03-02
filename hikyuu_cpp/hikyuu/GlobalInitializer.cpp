@@ -125,6 +125,8 @@ void GlobalInitializer::clean() {
     }
 #endif
 
+    reminderLicenseExpiration();
+
     StockManager &sm = StockManager::instance();
     sm.cancelLoad();
 

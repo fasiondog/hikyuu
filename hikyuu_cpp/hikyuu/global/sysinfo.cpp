@@ -26,6 +26,7 @@ using json = nlohmann::json;
 namespace hku {
 
 struct InnerSysInfo {
+    Datetime expire_time{Datetime::max()};
     bool runningInPython{false};      // 是否是在 python 中运行
     bool pythonInInteractive{false};  // python 是否运行在交互模式下
     bool pythonInJupyter{false};      // python 是否运行在 Jupyter中
@@ -129,6 +130,16 @@ static boost::uuids::uuid readUUID() {
 #endif
 
     return uid;
+}
+
+void updateSysInfoExpiredTime(Datetime time) {
+    g_sys_info->expire_time = time;
+}
+
+void HKU_API reminderLicenseExpiration() {
+    auto remain = g_sys_info->expire_time - Datetime::now();
+    // 不可使用 htr, 因为翻译已经被释放
+    HKU_WARN_IF(remain < Days(10), "Note! Your license will expire in {} days.", remain.days());
 }
 
 void sendFeedback() {

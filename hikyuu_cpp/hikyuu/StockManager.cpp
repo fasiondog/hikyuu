@@ -24,6 +24,7 @@
 #include "plugin/device.h"
 #include "plugin/hkuextra.h"
 #include "plugin/extind.h"
+#include "global/sysinfo.h"
 
 namespace hku {
 StockManager* StockManager::m_sm = nullptr;
@@ -161,6 +162,8 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     // 初始化内部定时任务（重加载）
     initInnerTask();
+
+    updateSysInfoExpiredTime(getExpireDate());
 
     m_initializing = false;
 }
