@@ -86,7 +86,7 @@ else
 end
 set_configvar("CHECK_ACCESS_BOUND", 1)
 set_configvar("SUPPORT_SERIALIZATION", get_config("serialize") and 1 or 0)
-set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
+set_configvar("SUPPORT_TEXT_ARCHIVE", 1)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
 set_configvar("ENABLE_MSVC_LEAK_DETECT", 0)
