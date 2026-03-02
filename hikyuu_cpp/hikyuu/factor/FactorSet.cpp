@@ -169,7 +169,9 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
     }
 
     vector<IndicatorList> result;
-    if (StockManager::instance().getKDataDriverParameter().get<string>("type") == "clickhouse") {
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    if (driver_type == "clickhouse") {
         result = hku::getValues(*this, stocks, query, align, fill_null, tovalue, align_dates);
         return result;
     }

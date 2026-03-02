@@ -8,7 +8,7 @@ hikyuu提供了完善的因子管理体系，包括单个因子 Factor 和因子
 2. **因子集组织**: 将相关的因子组织到同一个FactorSet中便于管理
 3. **数据验证**: 使用 `check=True` 参数验证股票列表是否属于指定板块
 4. **因子更新**: 每日行情数据下载完成后，应及时调用 `update_all_factors_values()` 更新所有存储的因子值，确保因子数据与行情数据同步。该方法未集成到 HikyuuTdx 和 importdata 中，需要自行手工调用，原因是有时需要进行数据检查，确认数据无误后再进行因子值保存。
-5. **因子值保存**: 对于高频聚合的因子值或高频因子值，建议设置 `need_save_value=True` 并保存到数据库。由于 Hikyuu的超高计算速度，普通的日频因子值，通常不建议保存到数据库，因为从存储中读取因子值速度更慢。可以自行测试决定。通常直接保存原始因子值，不需要进行截面、标准化等处理，可以由 MF 完成。对需要截面值的因子，通常需要指定对应的证券集，Factor和FactorSet直接指定。
+5. **因子值保存**: 对于高频聚合的因子值或高频因子值，建议设置 `need_save_value=True` 并保存到数据库。由于 Hikyuu的超高计算速度，普通的日频因子值(如MA5)，通常不建议保存到数据库，因为从存储中读取因子值速度更慢，**这和其他的量化框架依赖因子存储来提升速度的习惯有所不同**。建议自行根据需要测试决定。通常直接保存原始因子值，不需要进行截面、标准化等处理，可以由 MF 完成。对需要截面值的因子，通常需要指定对应的证券集，Factor和FactorSet直接指定。
 6. **特殊因子值保存**: 对于不通过指标计算的特殊因子值（如PRICELIST或Indicator()），可以使用 `save_special_values_to_db()` 方法直接保存预计算的因子值
 7. **VIP功能使用**: ⚠️ 因子相关的数据库存储和读取操作均为VIP功能，数据库引擎仅支持ClickHouse。使用前请确认已获得相应权限。包括但不限于：`save_to_db()`、`load_from_db()`、`remove_from_db()`、`save_values()`、`get_all_values()`、`get_values()` 等涉及数据库的操作方法。
 
@@ -52,17 +52,17 @@ Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_save_value=Fa
 
 ### Factor属性
 
-| 属性             | 类型         | 描述                 |
-| ---------------- | ------------ | -------------------- |
-| `name`         | str          | 因子名称             |
-| `ktype`        | KQuery.KType | 因子频率类型         |
-| `create_at`    | Datetime     | 创建日期             |
-| `update_at`    | Datetime     | 更改日期             |
-| `formula`      | Indicator    | 因子计算公式         |
-| `start_date`   | Datetime     | 数据存储起始日期     |
-| `block`        | Block        | 证券集合             |
-| `brief`        | str          | 基础说明             |
-| `details`      | str          | 详细说明             |
+| 属性                | 类型         | 描述                     |
+| ------------------- | ------------ | ------------------------ |
+| `name`            | str          | 因子名称                 |
+| `ktype`           | KQuery.KType | 因子频率类型             |
+| `create_at`       | Datetime     | 创建日期                 |
+| `update_at`       | Datetime     | 更改日期                 |
+| `formula`         | Indicator    | 因子计算公式             |
+| `start_date`      | Datetime     | 数据存储起始日期         |
+| `block`           | Block        | 证券集合                 |
+| `brief`           | str          | 基础说明                 |
+| `details`         | str          | 详细说明                 |
 | `need_save_value` | bool         | 是否持久化保存因子值数据 |
 
 ### 方法
@@ -576,3 +576,4 @@ if not loaded_set.is_null():
 # 4. 清理不需要的因子
 # remove_factor("MA5", KQuery.DAY)
 # remove_factorset("技术指标集", KQuery.DAY)
+```

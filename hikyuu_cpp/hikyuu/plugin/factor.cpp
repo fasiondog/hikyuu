@@ -13,8 +13,9 @@ namespace hku {
 Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype) {
     Factor ret;
     auto& sm = StockManager::instance();
-    HKU_INFO_IF_RETURN(sm.getKDataDriverParameter().get<string>("type") != "clickhouse", ret,
-                       "Not support current data driver!");
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", ret, "Not support {} driver!", driver_type);
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
     ret = plugin->getFactor(name, ktype);
@@ -23,8 +24,9 @@ Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype) {
 
 void HKU_API saveFactor(const Factor& factor) {
     auto& sm = StockManager::instance();
-    HKU_INFO_IF_RETURN(sm.getKDataDriverParameter().get<string>("type") != "clickhouse", void(),
-                       "Not support current data driver!");
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", void(), "Not support {} driver!", driver_type);
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, void(),
                         htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
@@ -35,8 +37,9 @@ void HKU_API saveSpecialFactorValues(const Factor& factor, const Stock& stock,
                                      const DatetimeList& dates, const PriceList& values,
                                      bool replace) {
     auto& sm = StockManager::instance();
-    HKU_INFO_IF_RETURN(sm.getKDataDriverParameter().get<string>("type") != "clickhouse", void(),
-                       "Not support current data driver!");
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", void(), "Not support {} driver!", driver_type);
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, void(),
                         htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
@@ -45,8 +48,9 @@ void HKU_API saveSpecialFactorValues(const Factor& factor, const Stock& stock,
 
 void HKU_API removeFactor(const string& name, const KQuery::KType& ktype) {
     auto& sm = StockManager::instance();
-    HKU_INFO_IF_RETURN(sm.getKDataDriverParameter().get<string>("type") != "clickhouse", void(),
-                       "Not support current data driver!");
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", void(), "Not support {} driver!", driver_type);
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, void(),
                         htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
@@ -56,8 +60,9 @@ void HKU_API removeFactor(const string& name, const KQuery::KType& ktype) {
 FactorList HKU_API getAllFactors() {
     FactorList ret;
     auto& sm = StockManager::instance();
-    HKU_INFO_IF_RETURN(sm.getKDataDriverParameter().get<string>("type") != "clickhouse", ret,
-                       "Not support current data driver!");
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", ret, "Not support {} driver!", driver_type);
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
     ret = plugin->getAllFactors();
@@ -67,8 +72,9 @@ FactorList HKU_API getAllFactors() {
 FactorSetList HKU_API getAllFactorSets() {
     FactorSetList ret;
     auto& sm = StockManager::instance();
-    HKU_INFO_IF_RETURN(sm.getKDataDriverParameter().get<string>("type") != "clickhouse", ret,
-                       "Not support current data driver!");
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", ret, "Not support {} driver!", driver_type);
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
     ret = plugin->getAllFactorSets();
@@ -77,8 +83,9 @@ FactorSetList HKU_API getAllFactorSets() {
 
 void HKU_API updateAllFactorsValues(const KQuery::KType& ktype) {
     auto& sm = StockManager::instance();
-    HKU_INFO_IF_RETURN(sm.getKDataDriverParameter().get<string>("type") != "clickhouse", void(),
-                       "Not support current data driver!");
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", void(), "Not support {} driver!", driver_type);
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, void(),
                         htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
@@ -87,8 +94,9 @@ void HKU_API updateAllFactorsValues(const KQuery::KType& ktype) {
 
 void HKU_API saveFactorSet(const FactorSet& set) {
     auto& sm = StockManager::instance();
-    HKU_INFO_IF_RETURN(sm.getKDataDriverParameter().get<string>("type") != "clickhouse", void(),
-                       "Not support current data driver!");
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", void(), "Not support {} driver!", driver_type);
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, void(),
                         htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
@@ -97,8 +105,9 @@ void HKU_API saveFactorSet(const FactorSet& set) {
 
 void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype) {
     auto& sm = StockManager::instance();
-    HKU_INFO_IF_RETURN(sm.getKDataDriverParameter().get<string>("type") != "clickhouse", void(),
-                       "Not support current data driver!");
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", void(), "Not support {} driver!", driver_type);
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, void(),
                         htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
@@ -108,8 +117,9 @@ void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype) {
 FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype) {
     FactorSet ret;
     auto& sm = StockManager::instance();
-    HKU_INFO_IF_RETURN(sm.getKDataDriverParameter().get<string>("type") != "clickhouse", ret,
-                       "Not support current data driver!");
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", ret, "Not support {} driver!", driver_type);
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, ret, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
     ret = plugin->getFactorSet(name, ktype);
