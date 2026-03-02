@@ -80,7 +80,7 @@ IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bo
     IndicatorList ret;
     HKU_IF_RETURN(stocks.empty(), ret);
 
-    if (isValidLicense()) {
+    if (StockManager::instance().getKDataDriverParameter().get<string>("type") == "clickhouse") {
         ret = hku::getValues(*this, stocks, query, align, fill_null, tovalue, align_dates);
         return ret;
     }
