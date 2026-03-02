@@ -262,13 +262,13 @@ void serialize(Archive& ar, std::unordered_map<Key, Value, Compare, Alloc>& m,
 }  // namespace boost
 
 //-----------------------
-// std::set 特化
+// std::set unordered_set 特化
 //-----------------------
 
 namespace boost {
 namespace serialization {
-template <class Archive>
-void save(Archive& ar, const std::set& s, const unsigned int version) {
+template <class Archive, class Key, class Compare, class Alloc>
+void save(Archive& ar, const std::set<Key, Compare, Alloc>& s, const unsigned int version) {
     uint32_t count = static_cast<uint32_t>(s.size());
     ar& ::boost::make_nvp("count", count);
     for (const auto& item : s) {
@@ -276,36 +276,26 @@ void save(Archive& ar, const std::set& s, const unsigned int version) {
     }
 }
 
-template <class Archive>
-void load(Archive& ar, std::set& s, const unsigned int version) {
+template <class Archive, class Key, class Compare, class Alloc>
+void load(Archive& ar, std::set<Key, Compare, Alloc>& s, const unsigned int version) {
     s.clear();
-
     uint32_t count;
     ar& ::boost::make_nvp("count", count);
-
     for (uint32_t i = 0; i < count; ++i) {
-        typename std::set::key_type item;  // Set 的 key_type 就是元素类型
+        Key item;  // 自动推导 Key 类型
         ar& ::boost::make_nvp("item", item);
         s.insert(item);
     }
 }
 
-//-----------------------
-// std::unordered_set 特化
-//-----------------------
-
-template <class Archive>
-void serialize(Archive& ar, std::unordered_set& s, const unsigned int version) {
-    boost::serialization::split_free(ar, s, version);
+template <class Archive, class Key, class Compare, class Alloc>
+void serialize(Archive& ar, std::set<Key, Compare, Alloc>& s, const unsigned int version) {
+    split_free(ar, s, version);
 }
 
-}  // namespace serialization
-}  // namespace boost
-
-namespace boost {
-namespace serialization {
-template <class Archive>
-void save(Archive& ar, const std::unordered_set& s, const unsigned int version) {
+template <class Archive, class Key, class Hash, class KeyEqual, class Alloc>
+void save(Archive& ar, const std::unordered_set<Key, Hash, KeyEqual, Alloc>& s,
+          const unsigned int version) {
     uint32_t count = static_cast<uint32_t>(s.size());
     ar& ::boost::make_nvp("count", count);
     for (const auto& item : s) {
@@ -313,23 +303,23 @@ void save(Archive& ar, const std::unordered_set& s, const unsigned int version) 
     }
 }
 
-template <class Archive>
-void load(Archive& ar, std::unordered_set& s, const unsigned int version) {
+template <class Archive, class Key, class Hash, class KeyEqual, class Alloc>
+void load(Archive& ar, std::unordered_set<Key, Hash, KeyEqual, Alloc>& s,
+          const unsigned int version) {
     s.clear();
-
     uint32_t count;
     ar& ::boost::make_nvp("count", count);
-
     for (uint32_t i = 0; i < count; ++i) {
-        typename std::unordered_set::key_type item;  // Set 的 key_type 就是元素类型
+        Key item;
         ar& ::boost::make_nvp("item", item);
         s.insert(item);
     }
 }
 
-template <class Archive>
-void serialize(Archive& ar, std::unordered_set& s, const unsigned int version) {
-    boost::serialization::split_free(ar, s, version);
+template <class Archive, class Key, class Hash, class KeyEqual, class Alloc>
+void serialize(Archive& ar, std::unordered_set<Key, Hash, KeyEqual, Alloc>& s,
+               const unsigned int version) {
+    split_free(ar, s, version);
 }
 
 }  // namespace serialization
