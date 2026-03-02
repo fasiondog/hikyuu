@@ -55,10 +55,6 @@
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/list.hpp>
-#include <boost/serialization/map.hpp>
-#include <boost/serialization/unordered_map.hpp>
-#include <boost/serialization/set.hpp>
-#include <boost/serialization/unordered_set.hpp>
 
 #if HKU_SUPPORT_XML_ARCHIVE
 #include <boost/archive/xml_oarchive.hpp>
@@ -163,5 +159,182 @@ using fmt::format;
 /** @} */
 
 }  // namespace hku
+
+#if HKU_SUPPORT_SERIALIZATION
+// 跨平台序列化支持
+//-------------------
+// std::map 特化
+//-------------------
+namespace boost {
+namespace serialization {
+template <class Archive, class Key, class Value, class Compare, class Alloc>
+void serialize(Archive& ar, std::map<Key, Value, Compare, Alloc>& m, const unsigned int version);
+}
+}  // namespace boost
+
+namespace boost {
+namespace serialization {
+
+template <class Archive, class Key, class Value, class Compare, class Alloc>
+void save(Archive& ar, const std::map<Key, Value, Compare, Alloc>& m, const unsigned int version) {
+    uint32_t count = static_cast<uint32_t>(m.size());
+    ar& make_nvp("count", count);
+    for (const auto& kv : m) {
+        ar& make_nvp("key", kv.first);
+        ar& make_nvp("value", kv.second);
+    }
+}
+
+template <class Archive, class Key, class Value, class Compare, class Alloc>
+void load(Archive& ar, std::map<Key, Value, Compare, Alloc>& m, const unsigned int version) {
+    m.clear();
+
+    uint32_t count;
+    ar& boost::make_nvp("count", count);
+
+    for (uint32_t i = 0; i < count; ++i) {
+        Key k;
+        Value v;
+        ar& make_nvp("key", k);
+        ar& make_nvp("value", v);
+        m.insert(std::make_pair(k, v));
+    }
+}
+
+template <class Archive, class Key, class Value, class Compare, class Alloc>
+void serialize(Archive& ar, std::map<Key, Value, Compare, Alloc>& m, const unsigned int version) {
+    split_free(ar, m, version);
+}
+
+}  // namespace serialization
+}  // namespace boost
+
+//-----------------------
+// std::unordered_map 特化
+//-----------------------
+
+namespace boost {
+namespace serialization {
+template <class Archive, class Key, class Value, class Compare, class Alloc>
+void serialize(Archive& ar, std::unordered_map<Key, Value, Compare, Alloc>& m,
+               const unsigned int version);
+}
+}  // namespace boost
+
+namespace boost {
+namespace serialization {
+
+template <class Archive, class Key, class Value, class Compare, class Alloc>
+void save(Archive& ar, const std::unordered_map<Key, Value, Compare, Alloc>& m,
+          const unsigned int version) {
+    uint32_t count = static_cast<uint32_t>(m.size());
+    ar& make_nvp("count", count);
+    for (const auto& kv : m) {
+        ar& make_nvp("key", kv.first);
+        ar& make_nvp("value", kv.second);
+    }
+}
+
+template <class Archive, class Key, class Value, class Compare, class Alloc>
+void load(Archive& ar, std::unordered_map<Key, Value, Compare, Alloc>& m,
+          const unsigned int version) {
+    m.clear();
+
+    uint32_t count;
+    ar& boost::make_nvp("count", count);
+
+    for (uint32_t i = 0; i < count; ++i) {
+        Key k;
+        Value v;
+        ar& make_nvp("key", k);
+        ar& make_nvp("value", v);
+        m.insert(std::make_pair(k, v));
+    }
+}
+
+template <class Archive, class Key, class Value, class Compare, class Alloc>
+void serialize(Archive& ar, std::unordered_map<Key, Value, Compare, Alloc>& m,
+               const unsigned int version) {
+    split_free(ar, m, version);
+}
+
+}  // namespace serialization
+}  // namespace boost
+
+//-----------------------
+// std::set 特化
+//-----------------------
+
+namespace boost {
+namespace serialization {
+template <class Archive>
+void save(Archive& ar, const std::set& s, const unsigned int version) {
+    uint32_t count = static_cast<uint32_t>(s.size());
+    ar& ::boost::make_nvp("count", count);
+    for (const auto& item : s) {
+        ar& ::boost::make_nvp("item", item);
+    }
+}
+
+template <class Archive>
+void load(Archive& ar, std::set& s, const unsigned int version) {
+    s.clear();
+
+    uint32_t count;
+    ar& ::boost::make_nvp("count", count);
+
+    for (uint32_t i = 0; i < count; ++i) {
+        typename std::set::key_type item;  // Set 的 key_type 就是元素类型
+        ar& ::boost::make_nvp("item", item);
+        s.insert(item);
+    }
+}
+
+//-----------------------
+// std::unordered_set 特化
+//-----------------------
+
+template <class Archive>
+void serialize(Archive& ar, std::unordered_set& s, const unsigned int version) {
+    boost::serialization::split_free(ar, s, version);
+}
+
+}  // namespace serialization
+}  // namespace boost
+
+namespace boost {
+namespace serialization {
+template <class Archive>
+void save(Archive& ar, const std::unordered_set& s, const unsigned int version) {
+    uint32_t count = static_cast<uint32_t>(s.size());
+    ar& ::boost::make_nvp("count", count);
+    for (const auto& item : s) {
+        ar& ::boost::make_nvp("item", item);
+    }
+}
+
+template <class Archive>
+void load(Archive& ar, std::unordered_set& s, const unsigned int version) {
+    s.clear();
+
+    uint32_t count;
+    ar& ::boost::make_nvp("count", count);
+
+    for (uint32_t i = 0; i < count; ++i) {
+        typename std::unordered_set::key_type item;  // Set 的 key_type 就是元素类型
+        ar& ::boost::make_nvp("item", item);
+        s.insert(item);
+    }
+}
+
+template <class Archive>
+void serialize(Archive& ar, std::unordered_set& s, const unsigned int version) {
+    boost::serialization::split_free(ar, s, version);
+}
+
+}  // namespace serialization
+}  // namespace boost
+
+#endif /* HKU_SUPPORT_SERIALIZATION */
 
 #endif /* DATATYPE_H_ */
