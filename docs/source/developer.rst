@@ -116,32 +116,14 @@ Windows 下，习惯用 msvc 调试的，可以使用  xmake project -k vsxmake 
 在 VS 内，可以将 demo 设为启动工程，进行调试。
 
 
-5、Macosx 下编译注意事项
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-mac 下 conda 编译：
-
-1. base 环境下 python setup.py build -j 10
-
-2. 切换到需要的虚拟环境下，不要用 python setup.py build 去编译，直接执行 xmake -b core 编译
-
-3. 切回 base 环境，重新执行 xmake -b core
-
-4. 再切换至虚拟环境，python3 -m pip install -r requirements.txt
-
-5. 导入环境变量，如：export PYTHONPATH="path/to/hikyuu:$PYTHONPATH"
-
-就可以用了（不要再执行 xmake -b core, 只要在虚拟环境下 xmake -b core 了，都要回 base 下重新 xmake -b core)
-
-
-6、IDE无法正常提示
+5、IDE无法正常提示
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. 安装 pybind11-stubgen，使用命令 pip install pybind11-stubgen
 2. 运行 pybind11-stubgen hikyuu -o . 命令，即可正常提示帮助信息。
 
 
-7、使用插件
+6、使用插件
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 如自行编译的希望使用 hikyuu 插件的，请安装独立的插件包 pip install hikyuu-plugin
