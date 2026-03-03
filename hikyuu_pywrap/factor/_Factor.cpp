@@ -122,13 +122,6 @@ void export_Factor(py::module& m) {
     
     :note: 以 name + ktype 作为唯一标识进行删除)")
 
-      .def("remove_values_from_db", &Factor::remove_values_from_db,
-           R"(remove_values_from_db(self)
-    
-    从数据库中删除因子值数据。注：为防止误操作，特殊因子的值不会删除，需自行手工删除。
-    
-    :note: 以 name + ktype 作为唯一标识进行删除)")
-
       .def(
         "get_all_values", &Factor::getAllValues, py::arg("query"), py::arg("align") = false,
         py::arg("fill_null") = false, py::arg("tovalue") = false,
