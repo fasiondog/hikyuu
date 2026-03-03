@@ -412,6 +412,15 @@ public:
         return PositionRecordList();
     }
 
+    /** 获取当前全部持仓记录字典 */
+    std::unordered_map<Stock, PositionRecord> getPositionDict() const {
+        std::unordered_map<Stock, PositionRecord> ret;
+        for (const auto& pos : getPositionList()) {
+            ret[pos.stock] = pos;
+        }
+        return ret;
+    }
+
     /** 获取全部历史持仓记录，即已平仓记录 */
     virtual PositionRecordList getHistoryPositionList() const {
         HKU_WARN("The subclass does not implement this method");

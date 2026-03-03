@@ -377,6 +377,12 @@ void export_TradeManager(py::module& m) {
 
     :rtype: PositionRecordList)")
 
+      .def("get_positions", &TradeManagerBase::getPositionDict, R"(get_positions(self)
+
+    以字典方式获取当前全部持仓记录，stock为key，PositionRecord为value
+
+    :rtype: dict)")
+
       .def("get_history_position_list", &TradeManagerBase::getHistoryPositionList,
            R"(get_history_position_list(self)
 
