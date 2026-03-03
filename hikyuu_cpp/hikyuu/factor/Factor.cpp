@@ -25,11 +25,11 @@ string Factor::str() const {
     string strip("  \n");
     os << "Factor(";
     os << strip << "name: " << name() << strip << "ktype: " << ktype() << strip
-       << "recover_type: " << recoverType() << strip << "need_save_value: " << needSaveValue()
-       << strip << "create_at: " << createAt().str() << strip << "update_at: " << updateAt().str()
-       << strip << "formula: " << formula().formula() << strip << "brief: " << brief() << strip
-       << "detail: " << details() << strip << "start_date: " << startDate() << strip
-       << "block: " << block() << ")";
+       << "recover_type: " << KQuery::getRecoverTypeName(recoverType()) << strip
+       << "need_save_value: " << needSaveValue() << strip << "create_at: " << createAt().str()
+       << strip << "update_at: " << updateAt().str() << strip << "formula: " << formula().formula()
+       << strip << "brief: " << brief() << strip << "detail: " << details() << strip
+       << "start_date: " << startDate() << strip << "block: " << block() << ")";
     return os.str();
 }
 
