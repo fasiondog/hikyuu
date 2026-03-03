@@ -180,7 +180,7 @@ public:
 private:
     struct HKU_API Data {
         string name;
-        string ktype;
+        string ktype{KQuery::DAY};
         Block block;
         vector<Factor> factors;                      // 保持插入顺序
         unordered_map<string, size_t> nameIndexMap;  // 名称到索引的映射，用于快速查找
@@ -271,7 +271,7 @@ inline void FactorSet::clear() noexcept {
 }
 
 inline bool FactorSet::isNull() const noexcept {
-    return !m_data || m_data->name.empty() || m_data->ktype.empty();
+    return !m_data;
 }
 
 inline const Factor& FactorSet::get(size_t i) const {
