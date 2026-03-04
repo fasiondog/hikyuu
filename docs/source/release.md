@@ -21,6 +21,7 @@
 * feat(core): 添加许可证过期提醒功能
 * feat(plugin): 添加 AGG_VWAP 指标的 KData 重载版本
 * feat(hikyuu): 添加基于策略上下文的初始化函数
+* 发布版本支持 python 3.14
 
 **⚡️ 优化改进**
 
