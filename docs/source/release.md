@@ -1,4 +1,40 @@
+# release.md
+
 # 版本发布说明
+
+## 2.7.7 - 2026年3月5日
+
+**🚀 新增特性**
+
+* feat(factor): 新增完整的因子管理系统，支持因子的创建、存储、查询和批量计算
+  - 添加 Factor 类支持因子值存储、复权类型配置和序列化
+  - 添加 FactorSet 类支持批量管理多个因子，支持索引操作符和迭代器
+  - 支持获取单个证券或批量证券的因子计算结果
+  - 支持删除因子值数据功能
+  - 支持因子公式检查和 align_dates 日期对齐参数
+  - 支持特殊因子值保存
+  - 支持 Block 属性进行因子匹配验证
+  - 支持 FactorSet 作为多因子合成函数的输入参数
+* feat(indicator): 新增涨跌停判断指标ISLIMITUP/ISLIMITDOWN支持
+* feat(indicator): 重构 MDD/MRR指标实现，添加时间窗口参数支持和增量计算测试
+* feat(trade_manage): 新增 getPositionDict 方法用于获取当前全部持仓记录字典
+* feat(core): 添加许可证过期提醒功能
+* feat(plugin): 添加 AGG_VWAP 指标的 KData 重载版本
+* feat(hikyuu): 添加基于策略上下文的初始化函数
+* 发布版本支持 python 3.14
+
+**⚡️ 优化改进**
+
+* refactor(hikyuu/utilities/thread): 优化并行计算
+* feat(misc): 添加批量获取账户资金和性能数据的功能
+* feat(stock): StockManager 添加互斥锁防止初始化冲突，支持加载扩展指标插件
+* feat(agent): 添加多线程控制的互斥锁防止代理启停冲突
+
+**🐞 缺陷修复**
+
+* fix(trade_sys): crtST和现有接口不符无法使用
+* fix(factor): 修复 MultiFactorBase 克隆和序列化中缺失 m_norm 的问题
+* feat(HikyuuTdx): 优化板块信息下载，添加超时处理，防止卡死
 
 ## 2.7.6 - 2026年2月3日
 
