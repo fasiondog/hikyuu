@@ -87,6 +87,10 @@
 
 示例2 (使用 StrategyContext)
 
+.. note::
+
+    该方式下, 无法在 stg 外获取像 sm['sz000001'] 这样获取股票对象，仅能在 stg 内部获取。如需在 stg 外部获取，参考示例3。
+
 ::
 
     from hikyuu import *
@@ -122,8 +126,10 @@
         # 回测
         start_date = Datetime(2024, 1, 1)
         end_date = Datetime(2025, 1, 1)
-        stk = sm['sz000001']
-        k = stk.get_kdata(Query(start_date, end_date, ktype=Config.ktype))
+        
+        # 该方式下，此处获取不大实际的 stk !!!
+        # stk = sm['sz000001']
+        # k = stk.get_kdata(Query(start_date, end_date, ktype=Config.ktype))
 
         tm = crtTM()
         backtest(s.context, on_bar, tm, start_date, end_date, Config.ktype)
@@ -131,3 +137,68 @@
         tm.performance(Query(start_date, end_date, Config.ktype))
         from matplotlib import pyplot as plt
         plt.show()
+
+
+示例3  (使用 load_hikyuu 加载函数)
+
+该方式一般用于回测或调试
+
+::
+
+    from hikyuu import *
+
+
+    class Config:
+        ktype = Query.DAY
+        stock = 'sz000001'  # 注意此时不能使用 sm['sz000001']
+        ma1 = MA(CLOSE(), 10)
+        ma2 = MA(CLOSE(), 30)
+
+
+    def on_bar(stg: Strategy):
+        stk = sm[Config.stock]
+        k = stg.get_last_kdata(stk, 100, Config.ktype)
+        # hku_info("{}, 当前价: {:<.2f}", stg.today(), k[-1].close)
+        if len(k) < 30 or k[-1].datetime != stg.today():
+            return
+        ind = CROSS(Config.ma1, Config.ma2)(k)
+        if ind[-1] >= 1 and not stg.tm.have(stk):
+            hku_info("{} 触发买入", stg.today())
+            stg.buy(stk, k[-1].close, 100)
+            hku_info("{}", stg.tm.get_position(stg.today(), stk))
+        elif ind[-1] < 1 and stg.tm.have(stk):
+            stg.sell(stk, k[-1].close, 100)
+
+
+    if __name__ == '__main__':
+        import os
+        import sys
+        if sys.platform == 'win32':
+            os.system('chcp 65001')
+
+        options = {
+            "stock_list": [Config.stock],
+            "ktype_list": [Config.ktype],
+            "load_history_finance": False,
+            "load_weight": False,
+            "start_spot": False
+        }
+        load_hikyuu(**options)
+
+        s = Strategy()
+
+        # 实盘
+        # s.run_daily(my_func2, Minutes(1))  # , ignore_market=True)
+        # s.start()
+
+        # 回测
+        start_date = Datetime(2023, 1, 1)
+        end_date = Datetime(2025, 1, 1)
+        print(sm['sz000001'])
+
+        tm = crtTM()
+        backtest(on_bar, tm, start_date, end_date, Config.ktype)
+
+        tm.performance(Query(start_date, end_date, Config.ktype))
+        from matplotlib import pyplot as plt
+        plt.show()    
