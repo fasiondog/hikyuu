@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2026-02-13 06:28+0800\n"
-"PO-Revision-Date: 2026-02-13 06:29+0800\n"
+"POT-Creation-Date: 2026-03-05 15:33+0800\n"
+"PO-Revision-Date: 2026-03-05 15:34+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -19,75 +19,73 @@ msgstr ""
 "X-Poedit-SearchPath-1: hikyuu_pywrap\n"
 "X-Poedit-SearchPathExcluded-0: hikyuu_cpp/hikyuu/utilities\n"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:107
+#: hikyuu_cpp/hikyuu/StockManager.cpp:109
 #, c++-format
 msgid "Plugin path: {}"
 msgstr "插件路径: {}"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:116
-#: hikyuu_cpp/hikyuu/StockManager.cpp:126
-#: hikyuu_cpp/hikyuu/StockManager.cpp:136
+#: hikyuu_cpp/hikyuu/StockManager.cpp:121
+#: hikyuu_cpp/hikyuu/StockManager.cpp:131
+#: hikyuu_cpp/hikyuu/StockManager.cpp:141
 msgid "Can not find plugin"
 msgstr "找不到插件"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:118
-#: hikyuu_cpp/hikyuu/StockManager.cpp:128
-#: hikyuu_cpp/hikyuu/StockManager.cpp:138
+#: hikyuu_cpp/hikyuu/StockManager.cpp:123
+#: hikyuu_cpp/hikyuu/StockManager.cpp:133
+#: hikyuu_cpp/hikyuu/StockManager.cpp:143
 msgid "Can not get clickhouse driver! Check your license!"
 msgstr "获取 clickhouse 驱动失败！ 请检查你的授权许可!"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:176
+#: hikyuu_cpp/hikyuu/StockManager.cpp:181
 msgid "Loading block..."
 msgstr "加载板块信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:180
+#: hikyuu_cpp/hikyuu/StockManager.cpp:185
 msgid "Loading KData..."
 msgstr "加载K线数据……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:187
+#: hikyuu_cpp/hikyuu/StockManager.cpp:195
 #, c++-format
 msgid "{:<.2f}s Loaded Data."
 msgstr "{:<.2f} 秒数据加载完毕."
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:228
+#: hikyuu_cpp/hikyuu/StockManager.cpp:236
 #, c++-format
 msgid "Preloading {} kdata to buffer (max: no limit)!"
 msgstr "预加载 {} K线数据至缓存 (最大数量: 无限制)!"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:231
+#: hikyuu_cpp/hikyuu/StockManager.cpp:239
 #, c++-format
 msgid "Preloading {} kdata to buffer (max: {})!"
 msgstr "预加载 {} K线数据至缓存 (最大数量: {})!"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:236
+#: hikyuu_cpp/hikyuu/StockManager.cpp:244
 msgid "Use lazy preload!"
 msgstr "使用懒加载模式进行数据预加载！"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:589
+#: hikyuu_cpp/hikyuu/StockManager.cpp:443
+msgid "The new context is empty, use the original context"
+msgstr "新上下文为空，继续使用原有上下文"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:637
 msgid "Not found market info"
 msgstr "找不到指定的市场信息"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:642
+#: hikyuu_cpp/hikyuu/StockManager.cpp:690
 msgid "Loading stock information..."
 msgstr "加载证券信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:744
+#: hikyuu_cpp/hikyuu/StockManager.cpp:792
 msgid "Loading market information..."
 msgstr "加载市场信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:761
+#: hikyuu_cpp/hikyuu/StockManager.cpp:809
 msgid "Loading stock type information..."
 msgstr "加载证券类型信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:778
+#: hikyuu_cpp/hikyuu/StockManager.cpp:826
 msgid "Loading stock weight..."
 msgstr "加载权息数据……"
-
-#: hikyuu_cpp/hikyuu/factor/FactorMeta.cpp:59
-msgid ""
-"Illegal name! Naming rules: Only letters, digits and underscores (_) "
-"allowed; cannot start with a digit."
-msgstr "非法名称! 名称规则: 英文字母、数字、_ 组成，且首字母不能为数字."
 
 #: hikyuu_cpp/hikyuu/global/agent/SpotAgent.cpp:39
 msgid "Start spot agent."
@@ -105,6 +103,18 @@ msgstr "启动行情接收."
 #: hikyuu_cpp/hikyuu/plugin/device.cpp:72
 #: hikyuu_cpp/hikyuu/plugin/extind.cpp:19
 #: hikyuu_cpp/hikyuu/plugin/extind.cpp:28
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:20
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:32
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:45
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:56
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:67
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:79
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:91
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:102
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:113
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:124
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:134
+#: hikyuu_cpp/hikyuu/plugin/factor.cpp:145
 #: hikyuu_cpp/hikyuu/plugin/hkuextra.cpp:18
 #: hikyuu_cpp/hikyuu/plugin/hkuextra.cpp:25
 #: hikyuu_cpp/hikyuu/plugin/hkuextra.cpp:53
@@ -297,8 +307,7 @@ msgid "[PF] remove system: {}"
 msgstr "[PF] 移除系统: {}"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:273
-msgid ""
-"You are using forward or equal_forward kdata, which is a future function!"
+msgid "You are using forward or equal_forward kdata, which is a future function!"
 msgstr "你正在使用前复权或等比前向数据运行系统，这相当于使用了未来函数!"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:498
@@ -524,31 +533,31 @@ msgstr "[{}] 因一字跌停板，延迟至下一开盘卖空"
 msgid "[{}] delay to sell short, current amount == 0 or count == 0"
 msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时卖空"
 
-#: hikyuu_pywrap/_StockManager.cpp:157
+#: hikyuu_pywrap/_StockManager.cpp:158
 msgid "type"
 msgstr "证券类型"
 
-#: hikyuu_pywrap/_StockManager.cpp:158
+#: hikyuu_pywrap/_StockManager.cpp:159
 msgid "description"
 msgstr "描述说明"
 
-#: hikyuu_pywrap/_StockManager.cpp:161
+#: hikyuu_pywrap/_StockManager.cpp:162
 msgid "tick_value"
 msgstr "每tick价格"
 
-#: hikyuu_pywrap/_StockManager.cpp:162
+#: hikyuu_pywrap/_StockManager.cpp:163
 msgid "unit"
 msgstr "每单位价格"
 
-#: hikyuu_pywrap/_StockManager.cpp:163
+#: hikyuu_pywrap/_StockManager.cpp:164
 msgid "precision"
 msgstr "价格精度"
 
-#: hikyuu_pywrap/_StockManager.cpp:164
+#: hikyuu_pywrap/_StockManager.cpp:165
 msgid "minTradeNumber"
 msgstr "每笔最小交易数量"
 
-#: hikyuu_pywrap/_StockManager.cpp:165
+#: hikyuu_pywrap/_StockManager.cpp:166
 msgid "maxTradeNumber"
 msgstr "每笔最大交易数量"
 
@@ -735,6 +744,9 @@ msgstr "系统名称"
 msgid "weight"
 msgstr "权重"
 
+#~ msgid "Illegal name! Naming rules: Only letters, digits and underscores (_) allowed; cannot start with a digit."
+#~ msgstr "非法名称! 名称规则: 英文字母、数字、_ 组成，且首字母不能为数字."
+
 #~ msgid "date"
 #~ msgstr "日期"
 
@@ -781,8 +793,7 @@ msgstr "权重"
 #~ msgstr "市净率"
 
 #, c++-format
-#~ msgid ""
-#~ "[PF] total asset: {:.2f}, current cash: {:<.2f}, market value: {:<.2f}"
+#~ msgid "[PF] total asset: {:.2f}, current cash: {:<.2f}, market value: {:<.2f}"
 #~ msgstr "[PF] 总资产: {:.2f}, 现金: {:<.2f}, 市值: {:<.2f}"
 
 #, c++-format
@@ -798,8 +809,7 @@ msgstr "权重"
 #~ msgstr "[PF] [调仓后] - 总资产: {},  现金: {}, 市值: {}"
 
 #, c++-format
-#~ msgid ""
-#~ "[PF] [after run at close] - total funds: {},  cash: {}, market_value: {}"
+#~ msgid "[PF] [after run at close] - total funds: {},  cash: {}, market_value: {}"
 #~ msgstr "[PF] [收盘时执行后] - 总资产: {}, 现金: {}, 市值: {}"
 
 #, c++-format

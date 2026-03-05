@@ -194,9 +194,19 @@ StockManager/Block/Stock
         :return: 获取当前上下文
         :rtype: StrategyContext
     
+    .. py:method:: reload(self)
+    
+        重新加载所有证券数据
+        
+    .. py:method:: reload_with(self, context)
+    
+        带策略上下文参数的重新加载，如果 context 中证券列表为空，将沿用原有 context
+        
+        :param StrategyContext context: 策略上下文
+    
     .. py:method:: tmpdir(self)
     
-        获取用于保存零时变量等的临时目录，如未配置则为当前目录 由m_config中的“tmpdir”指定
+        获取用于保存零时变量等的临时目录，如未配置则为当前目录 由 m_config 中的"tmpdir"指定
 
     .. py:method:: datadir(self)
 

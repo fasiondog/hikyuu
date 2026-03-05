@@ -38,6 +38,13 @@ void export_StockManager(py::module& m) {
 
       .def("reload", &StockManager::reload, "重新加载所有证券数据")
 
+      .def("reload_with", &StockManager::reloadWith, py::arg("context"),
+           R"(reload_with(self, context)
+
+    带策略上下文参数的重新加载, 如果context中证券列表为空，将沿用原有context
+    
+    :param StrategyContext context: 策略上下文)")
+
       .def("tmpdir", &StockManager::tmpdir, py::return_value_policy::copy, R"(tmpdir(self) -> str
 
     获取用于保存零时变量等的临时目录，如未配置则为当前目录 由m_config中的“tmpdir”指定)")

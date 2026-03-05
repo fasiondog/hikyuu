@@ -52,6 +52,12 @@ public:
     /** 重新加载 */
     void reload();
 
+    /**
+     * 带策略上下文参数的重新加载, 如果context中证券列表为空，将沿用原有context
+     * @param context 策略上下文
+     */
+    void reloadWith(const StrategyContext& context);
+
     /** 主动退出并释放资源 */
     static void quit();
 

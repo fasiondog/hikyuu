@@ -163,8 +163,6 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 初始化内部定时任务（重加载）
     initInnerTask();
 
-    updateSysInfoExpiredTime(getExpireDate());
-
     m_initializing = false;
 }
 
@@ -188,6 +186,9 @@ void StockManager::loadData() {
 
     // 加载K线及历史财务信息
     loadAllKData();
+
+    // 更新 license expire time
+    updateSysInfoExpiredTime(getExpireDate());
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     auto seconds = sec.count();
@@ -426,6 +427,21 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
 void StockManager::reload() {
     HKU_IF_RETURN(m_initializing, void());
     m_initializing = true;
+
+    HKU_INFO("start reload ...");
+    loadData();
+    m_initializing = false;
+}
+
+void StockManager::reloadWith(const StrategyContext& context) {
+    HKU_IF_RETURN(m_initializing, void());
+    m_initializing = true;
+
+    if (!context.empty()) {
+        m_context = context;
+    } else {
+        HKU_INFO(htr("The new context is empty, use the original context"));
+    }
 
     HKU_INFO("start reload ...");
     loadData();
