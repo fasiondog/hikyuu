@@ -75,6 +75,16 @@ std::vector<PositionExtInfo> TradeManagerBase::getPositionExtInfoList(const Date
     return ret;
 }
 
+std::unordered_map<Stock, PositionExtInfo> TradeManagerBase::getPositionExtInfoDict(
+  const Datetime& datetime, const KQuery::KType& ktype, int trade_mode) {
+    auto ext_info_list = getPositionExtInfoList(datetime, ktype, trade_mode);
+    std::unordered_map<Stock, PositionExtInfo> ret;
+    for (auto& info : ext_info_list) {
+        ret.insert(std::make_pair(info.position.stock, info));
+    }
+    return ret;
+}
+
 std::vector<std::pair<Datetime, double>> TradeManagerBase::getProfitPercentMonthly(
   const Datetime& datetime) {
     std::vector<std::pair<Datetime, double>> ret;

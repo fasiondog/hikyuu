@@ -759,6 +759,16 @@ public:
       int trade_mode = 0);
 
     /**
+     * 获取账户最后交易时刻后持仓详情, 以 Stock 为 key, PositionExtInfo 为 value
+     * @param current_time 当前时刻（需大于等于最后交易时刻）
+     * @param ktype k线类型
+     * @param trade_mode 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+     */
+    std::unordered_map<Stock, PositionExtInfo> getPositionExtInfoDict(
+      const Datetime& datetime = Datetime::now(), const KQuery::KType& ktype = KQuery::DAY,
+      int trade_mode = 0);
+
+    /**
      * @brief 获取指定截止时间前各月的收益百分比
      * @param datetime
      * @return std::vector<std::pair<Datetime, double>>
