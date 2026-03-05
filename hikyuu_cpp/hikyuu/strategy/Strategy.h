@@ -120,6 +120,9 @@ public:
         m_sp = slippage;
     }
 
+    // 获取当前价格，无效返回 Null<price_t>()
+    price_t getCurrentPrice(const Stock& stk, const KQuery::KType& ktype) const;
+
     KData getLastKData(const Stock& stk, const Datetime& start_date, const KQuery::KType& ktype,
                        KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const {
         return getKData(stk, start_date, Null<Datetime>(), ktype, recover_type);

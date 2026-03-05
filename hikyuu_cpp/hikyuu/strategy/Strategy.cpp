@@ -359,6 +359,13 @@ void Strategy::_startEventLoop() {
     }
 }
 
+price_t Strategy::getCurrentPrice(const Stock& stk, const KQuery::KType& ktype) const {
+    KData k = getLastKData(stk, 1, ktype);
+    HKU_IF_RETURN(k.empty(), Null<price_t>());
+    const auto& kr = k.front();
+    return kr.datetime.startOfDay() != today() ? Null<price_t>() : kr.closePrice;
+}
+
 KData Strategy::getKData(const Stock& stk, const Datetime& start_date, const Datetime& end_date,
                          const KQuery::KType& ktype, KQuery::RecoverType recover_type) const {
     Datetime new_end_date = end_date;

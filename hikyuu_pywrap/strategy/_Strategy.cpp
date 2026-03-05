@@ -225,6 +225,9 @@ void export_Strategy(py::module& m) {
 
     下一交易时间点（回测使用）)")
 
+      .def("get_current_price", &Strategy::getCurrentPrice, py::arg("stk"), py::arg("ktype"),
+           "获取当前价格，无效时返回 constant.null_price")
+
       .def("get_kdata", &Strategy::getKData, py::arg("stk"), py::arg("start_date"),
            py::arg("end_date"), py::arg("ktype"), py::arg("recover_type") = KQuery::NO_RECOVER,
            R"(get_kdata(self, stk, start_date, end_date, ktype, recover_type)
