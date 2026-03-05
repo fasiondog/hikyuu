@@ -37,6 +37,8 @@ void export_PositionRecord(py::module& m) {
       .def_readwrite("total_risk", &PositionRecord::totalRisk,
                      "累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本")
       .def_readwrite("sell_money", &PositionRecord::sellMoney, "累计卖出资金（float）")
+      .def_readwrite("buy_count", &PositionRecord::buyCount, "累计买入次数（size_t）")
+      .def_readwrite("sell_count", &PositionRecord::sellCount, "累计卖出次数（size_t）")
       .def_property_readonly("total_profit", &PositionRecord::totalProfit,
                              R"(total_profit(self):
 
@@ -44,6 +46,38 @@ void export_PositionRecord(py::module& m) {
     注意: 只对已清仓的记录有效, 未清仓的记录返回0  )")
 
         DEF_PICKLE(PositionRecord);
+
+    py::class_<PositionExtInfo>(m, "PositionExtInfo", "扩展持仓信息")
+      .def(py::init<>())
+      .def_readwrite("position", &PositionExtInfo::position, "PositionRecord")
+      .def_readwrite("current_close_price", &PositionExtInfo::currentClosePrice,
+                     "当前收盘价（float）")
+      .def_readwrite("max_high_price", &PositionExtInfo::maxHighPrice, "期间最高价最大值")
+      .def_readwrite("min_low_price", &PositionExtInfo::minLowPrice, "期间最低价最小值")
+      .def_readwrite("max_close_price", &PositionExtInfo::maxClosePrice, "期间收盘价最高值")
+      .def_readwrite("min_close_price", &PositionExtInfo::minClosePrice, "期间收盘价最低值")
+      .def_readwrite("current_close_price", &PositionExtInfo::currentClosePrice, "当前收盘价")
+      .def_readwrite("max_pull_back1", &PositionExtInfo::maxPullBack1,
+                     "最大回撤比例1(仅使用最大收盘价和最低收盘价计算)(负数)")
+      .def_readwrite("max_pull_back2", &PositionExtInfo::maxPullBack2,
+                     "最大回撤比例2(使用期间最高价最大值和最低价最小值计算)（负数）")
+      .def_readwrite("current_profit", &PositionExtInfo::currentProfit,
+                     "当前浮动盈亏(不含预计卖出成本)")
+
+      .def("current_pull_back1", &PositionExtInfo::currentPullBack1,
+           "当前回撤百分比1(仅使用最大收盘价和当前收盘价计算)")
+      .def("current_pull_back2", &PositionExtInfo::currentPullBack2,
+           "当前回撤百分比2(使用期间最高价最大值和最低价最小值计算)")
+      .def("max_floating_profit1", &PositionExtInfo::maxFloatingProfit1,
+           "期间最大浮盈1 (正数, 仅使用收盘价计算, 不含预计卖出成本, 多次买卖时统计不准)")
+      .def("max_floating_profit2", &PositionExtInfo::maxFloatingProfit2,
+           "期间最大浮盈2 (正数, 使用最高值最大值进行计算,不含预计卖出成本，多次买卖时统计不准)")
+      .def("min_loss_profit1", &PositionExtInfo::minLossProfit1,
+           "期间最大浮亏1（负数，仅使用收盘价计算, 不含预计卖出成本，多次买卖时统计不准)")
+      .def("min_loss_profit2", &PositionExtInfo::minLossProfit2,
+           "期间最大浮亏2（负数，仅期间最低价计算, 不含预计卖出成本，多次买卖时统计不准)")
+
+        DEF_PICKLE(PositionExtInfo);
 
     m.def(
       "positions_to_np",

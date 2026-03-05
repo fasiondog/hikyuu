@@ -20,7 +20,7 @@ namespace hku {
  */
 class HKU_API PositionRecord {
 public:
-    PositionRecord();
+    PositionRecord() = default;
     PositionRecord(const Stock& stock, const Datetime& takeDatetime, const Datetime& cleanDatetime,
                    double number, price_t stoploss, price_t goalPrice, double totalNumber,
                    price_t buyMoney, price_t totalCost, price_t totalRisk, price_t sellMoney);
@@ -51,6 +51,8 @@ public:
     price_t totalCost{0.0};   ///< 累计交易总成本
     price_t totalRisk{0.0};   ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
     price_t sellMoney{0.0};   ///< 累计卖出资金
+    size_t buyCount{0};       ///< 买入次数
+    size_t sellCount{0};      ///< 卖出次数
 
 //===================
 // 序列化支持
@@ -74,6 +76,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(totalCost);
         ar& BOOST_SERIALIZATION_NVP(totalRisk);
         ar& BOOST_SERIALIZATION_NVP(sellMoney);
+        ar& BOOST_SERIALIZATION_NVP(buyCount);
+        ar& BOOST_SERIALIZATION_NVP(sellCount);
     }
 
     template <class Archive>
@@ -93,6 +97,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(totalCost);
         ar& BOOST_SERIALIZATION_NVP(totalRisk);
         ar& BOOST_SERIALIZATION_NVP(sellMoney);
+        ar& BOOST_SERIALIZATION_NVP(buyCount);
+        ar& BOOST_SERIALIZATION_NVP(sellCount);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

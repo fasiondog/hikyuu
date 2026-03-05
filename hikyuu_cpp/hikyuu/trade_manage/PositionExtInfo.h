@@ -18,11 +18,11 @@ struct HKU_API PositionExtInfo final {
     price_t maxClosePrice{0.};      // 期间收盘价最高值
     price_t minClosePrice{0.0};     // 期间收盘价最低值
     price_t currentClosePrice{0.};  // 当前收盘价
-    price_t maxPullBack1{0.};       // 最大回撤百分比1(仅使用最大收盘价和最低收盘价计算)(负数)
-    price_t maxPullBack2{0.};   // 最大回撤百分比2(使用期间最高价最大值和最低价最小值计算)（负数）
-    price_t currentProfit{0.};  // 当前浮动盈亏(不含预计卖出成本)
+    price_t maxPullBack1{0.};       // 最大回撤比例1(仅使用最大收盘价和最低收盘价计算)(负数)
+    price_t maxPullBack2{0.};       // 最大回撤比例2(使用期间最高价最大值和最低价最小值计算)（负数）
+    price_t currentProfit{0.};      // 当前浮动盈亏(不含预计卖出成本)
 
-    /** 当前回撤百分比1(仅使用最大收盘价和当前收盘价计算) */
+    /** 当前回撤比例1(仅使用最大收盘价和当前收盘价计算) */
     price_t currentPullBack1() const {
         price_t ret = (maxClosePrice - currentClosePrice) / maxClosePrice;
         return ret > 0. ? 0. : ret;
@@ -87,6 +87,41 @@ struct HKU_API PositionExtInfo final {
         }
         return *this;
     }
+
+//===================
+// 序列化支持
+//===================
+#if HKU_SUPPORT_SERIALIZATION
+private:
+    friend class boost::serialization::access;
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
+        ar& BOOST_SERIALIZATION_NVP(position);
+        ar& BOOST_SERIALIZATION_NVP(maxHighPrice);
+        ar& BOOST_SERIALIZATION_NVP(minLowPrice);
+        ar& BOOST_SERIALIZATION_NVP(maxClosePrice);
+        ar& BOOST_SERIALIZATION_NVP(minClosePrice);
+        ar& BOOST_SERIALIZATION_NVP(currentClosePrice);
+        ar& BOOST_SERIALIZATION_NVP(maxPullBack1);
+        ar& BOOST_SERIALIZATION_NVP(maxPullBack2);
+        ar& BOOST_SERIALIZATION_NVP(currentProfit);
+    }
+
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(position);
+        ar& BOOST_SERIALIZATION_NVP(maxHighPrice);
+        ar& BOOST_SERIALIZATION_NVP(minLowPrice);
+        ar& BOOST_SERIALIZATION_NVP(maxClosePrice);
+        ar& BOOST_SERIALIZATION_NVP(minClosePrice);
+        ar& BOOST_SERIALIZATION_NVP(currentClosePrice);
+        ar& BOOST_SERIALIZATION_NVP(maxPullBack1);
+        ar& BOOST_SERIALIZATION_NVP(maxPullBack2);
+        ar& BOOST_SERIALIZATION_NVP(currentProfit);
+    }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
 }  // namespace hku
