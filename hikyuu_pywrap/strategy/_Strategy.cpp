@@ -276,7 +276,7 @@ void export_Strategy(py::module& m) {
 
       .def("order_value",
            py::overload_cast<const Stock&, price_t, const string&>(&Strategy::orderValue),
-           py::arg("stock"), py::arg("price"), py::arg("remark") = "",
+           py::arg("stock"), py::arg("value"), py::arg("remark") = "",
            R"(order_value(self, stk, value, remark='')
 
     按预期的证劵市值下单，即希望买入多少钱的证券（正数为买入，负数为卖出）
