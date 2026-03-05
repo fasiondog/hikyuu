@@ -1696,7 +1696,8 @@ void TradeManager::tocsv(const string& path) {
     file.open(filename2.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename2);
     file << "#建仓日期,平仓日期,证券代码,证券名称,累计持仓数量,"
-            "累计花费资金,累计交易成本,已转化资金,总盈利,累积风险,赢亏比率,持仓天数"
+            "累计花费资金,累计交易成本,已转化资金,总盈利,累积风险,赢亏比率,持仓天数,累计买入次数,"
+            "累计卖出次数"
          << std::endl;
     PositionRecordList::const_iterator history_iter = m_position_history.begin();
     for (; history_iter != m_position_history.end(); ++history_iter) {
@@ -1707,7 +1708,8 @@ void TradeManager::tocsv(const string& path) {
              << record.sellMoney << sep << record.sellMoney - record.totalCost - record.buyMoney
              << sep << record.totalRisk << sep
              << record.totalProfit() / (record.buyMoney + record.totalCost) << sep
-             << (record.cleanDatetime - record.takeDatetime).days() << std::endl;
+             << (record.cleanDatetime - record.takeDatetime).days() << sep << record.buyCount << sep
+             << record.sellCount << std::endl;
     }
     file.close();
 
@@ -1715,7 +1717,7 @@ void TradeManager::tocsv(const string& path) {
     file.open(filename3.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename3);
     file << "#建仓日期,平仓日期,证券代码,证券名称,当前持仓数量,累计持仓数量,"
-            "累计花费资金,累计交易成本,已转化资金,累积风险,"
+            "累计花费资金,累计交易成本,已转化资金,累积风险,累计买入次数,累计卖出次数,"
             "累计浮动盈亏,当前盈亏成本价, 浮动盈亏比率"
          << std::endl;
     position_map_type::const_iterator position_iter = m_position.begin();
@@ -1724,7 +1726,8 @@ void TradeManager::tocsv(const string& path) {
         file << record.takeDatetime << sep << record.cleanDatetime << sep
              << record.stock.market_code() << sep << record.stock.name() << sep << record.number
              << sep << record.totalNumber << sep << record.buyMoney << sep << record.totalCost
-             << sep << record.sellMoney << sep << record.totalRisk << sep;
+             << sep << record.sellMoney << sep << record.totalRisk << sep << record.buyCount << sep
+             << record.sellCount << sep;
         size_t pos = record.stock.getCount(KQuery::DAY);
         if (pos != 0) {
             KRecord krecord = record.stock.getKRecord(pos - 1, KQuery::DAY);
