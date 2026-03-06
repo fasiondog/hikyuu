@@ -50,7 +50,7 @@ vector<FundsList> HKU_API getFundsList(const vector<TMPtr>& tm_list, const Datet
  * @param tm_list
  * @param datetime 截止日期
  * @param ktype 数据类型
- * @param ext 是否获取扩展统计信息（需VIP权息，否则仍为基础统计）
+ * @param ext 是否获取扩展统计信息（捐赠用户，否则仍为基础统计）
  * @return vector<FundsList>
  * @ingroup TradeManagerClass
  */

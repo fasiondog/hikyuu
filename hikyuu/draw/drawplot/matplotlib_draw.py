@@ -865,7 +865,7 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
 
     :param TradeManager tm: 账户实例
     :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
-    :param bool ext: 是否统计扩展信息（需VIP权限，否则仍为默认统计项）
+    :param bool ext: 是否统计扩展信息（捐赠用户，否则仍为默认统计项）
     :return: None
     """
     if ref_stk is None:
@@ -946,7 +946,7 @@ def sys_performance(sys, ref_stk=None, ext=True):
 
     :param SystemBase | PortfolioBase sys: SYS或PF实例
     :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
-    :param bool ext: 是否统计扩展信息（需VIP权限，否则仍为默认统计项）
+    :param bool ext: 是否统计扩展信息（需捐赠用户权限，否则仍为默认统计项）
     :return: None
     """
     if ref_stk is None:

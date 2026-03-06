@@ -58,6 +58,6 @@ void export_misc(py::module& m) {
     :param list tm_list: 账户列表
     :param Datetime datetime: 指定时刻
     :param KType ktype: 指定K线类型
-    :param bool ext: 是否统计扩展信息（需VIP权限，否则仍为基础统计项）
+    :param bool ext: 是否统计扩展信息（需捐赠用户权限，否则仍为基础统计项）
     )");
 }

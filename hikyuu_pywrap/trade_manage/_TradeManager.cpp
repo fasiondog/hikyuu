@@ -605,7 +605,7 @@ void export_TradeManager(py::module& m) {
 
     :param Datetime datetime: 指定时刻
     :param Query.KType ktype: K线类型
-    :param bool ext: 是否获取扩展统计项(需VIP权限)，否则仍旧为基础统计项
+    :param bool ext: 是否获取扩展统计项(捐赠用户)，否则仍旧为基础统计项
     :return: 账户表现)")
 
       .def("get_max_pull_back", &TradeManagerBase::getMaxPullBack,

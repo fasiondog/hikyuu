@@ -718,14 +718,14 @@ public:
     }
 
     //-------------------------------------------------------------
-    // 以下为可能需要授权的功能
+    // 以下为捐赠功能
     //-------------------------------------------------------------
     /**
      * 统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime，
      * 以便用于计算当前市值
      * @param datetime 统计截止时刻
      * @param ktype k线类型
-     * @param ext 是否需要扩展统计项(需要VIP扩展插件)
+     * @param ext 是否需要扩展统计项(捐赠用户)
      */
     Performance getPerformance(const Datetime& datetime = Datetime::now(),
                                const KQuery::KType& ktype = KQuery::DAY, bool ext = true);
