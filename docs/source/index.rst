@@ -34,8 +34,8 @@ Welcome to Hikyuu's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: VIP捐赠
-   :name: VIP features
+   :caption: 捐赠用户捐赠
+   :name: 捐赠用户 features
 
    vip/index.rst
 

@@ -26,7 +26,7 @@
 * :py:func:`RESULT` - 以指标公式的方式返回指定指标中相应的结果集
 * :py:func:`SLICE` - 获取某指标中指定范围 [start, end) 的数据，生成新的指标
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
-* :py:func:`WITHKTYPE` - [VIP]将指标数据转换到指定的K线类型。相关便捷函数: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
+* :py:func:`WITHKTYPE` - [捐赠用户]将指标数据转换到指定的K线类型。相关便捷函数: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
 * :py:func:`ZSCORE` - ZScore 标准化
 
 
@@ -129,7 +129,7 @@
 
 * :py:func:`BLOCKSETNUM` - 返回板块股个数
 * :py:func:`INSUM` - 返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-排名(1对应指标值最低), 5-排名(从1开始对应指标值最高).
-* :py:func:`RANK` - [VIP]计算指标值在指定板块中的排名
+* :py:func:`RANK` - [捐赠用户]计算指标值在指定板块中的排名
 
 **技术指标**
 
@@ -186,7 +186,7 @@
 * :py:func:`ICIR` - 计算因子 IC 的 IR 值
 
 
-**聚合指标[VIP]**
+**聚合指标[捐赠用户]**
 
 * :py:func:`AGG_COUNT` - 聚合函数: 非空值计数
 * :py:func:`AGG_MAD` - 聚合函数: 平均绝对偏差
@@ -202,7 +202,7 @@
 * :py:func:`AGG_VWAP` - 聚合函数: 成交量加权平均价
 * :py:func:`AGG_FUNC` - 聚合函数: 自定义聚合函数
 
-**分组指标[VIP]**
+**分组指标[捐赠用户]**
 
 * :py:func:`GROUP_COUNT` - 分组函数: 非空值计数
 * :py:func:`GROUP_MAX` - 分组函数: 分组累计最大值

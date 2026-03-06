@@ -28,7 +28,7 @@ hikyuu提供了完善的因子管理体系，包括单个因子 Factor 和因子
 </div>
 
 6. **特殊因子值保存**: 对于不通过指标计算的特殊因子值（如PRICELIST或Indicator()），可以使用 `save_special_values_to_db()` 方法直接保存预计算的因子值
-7. **VIP功能使用**: ⚠️ 因子相关的数据库存储和读取操作均为VIP功能，数据库引擎仅支持ClickHouse。使用前请确认已获得相应权限。包括但不限于：`save_to_db()`、`remove_from_db()`、`save_values()`、`get_all_values()`、`get_values()` 等涉及数据库的操作方法。
+7. **捐赠用户功能使用**: ⚠️ 因子相关的数据库存储和读取操作均为捐赠用户功能，数据库引擎仅支持ClickHouse。使用前请确认已获得相应权限。包括但不限于：`save_to_db()`、`remove_from_db()`、`save_values()`、`get_all_values()`、`get_values()` 等涉及数据库的操作方法。
 
 ## 注意事项
 
@@ -36,7 +36,7 @@ hikyuu提供了完善的因子管理体系，包括单个因子 Factor 和因子
 - FactorSet 添加同名因子时会覆盖原有的因子
 - 因子集中的因子保持添加顺序
 - 因子计算结果的日期对齐需要参考证券进行同步
-- ⚠️ 所有涉及数据库的操作方法均为VIP功能，仅支持ClickHouse数据库引擎
+- ⚠️ 所有涉及数据库的操作方法均为捐赠用户功能，仅支持ClickHouse数据库引擎
 
 ## Factor类
 
@@ -92,42 +92,42 @@ Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_save_value=Fa
 
 ### 方法
 
-#### 数据库操作 ⚠️ VIP功能
+#### 数据库操作 ⚠️ 捐赠用户功能
 
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>以下数据库操作方法均为VIP功能，仅支持ClickHouse数据库引擎。</p>
+<p>以下数据库操作方法均为捐赠用户功能，仅支持ClickHouse数据库引擎。</p>
 </div>
 
 ```
-# 保存因子元数据到数据库 ⚠️ VIP功能
+# 保存因子元数据到数据库 ⚠️ 捐赠用户功能
 factor.save_to_db()
 
-# 从数据库中删除因子及其数据 ⚠️ VIP功能
+# 从数据库中删除因子及其数据 ⚠️ 捐赠用户功能
 factor.remove_from_db()
 
-# 特殊因子保存值到数据库 ⚠️ VIP功能
+# 特殊因子保存值到数据库 ⚠️ 捐赠用户功能
 factor.save_special_values_to_db(stock, dates, values, replace=False)
 ```
 
-#### 数据获取 ⚠️ VIP功能
+#### 数据获取 ⚠️ 捐赠用户功能
 
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>以下数据获取方法，如因子值本身存储在数据库中，则需 VIP 权限，仅支持 ClickHouse 数据库引擎。</p>
+<p>以下数据获取方法，如因子值本身存储在数据库中，则需 捐赠用户 权限，仅支持 ClickHouse 数据库引擎。</p>
 </div>
 
 ```
-# 获取单个证券的计算结果 ⚠️ VIP功能
+# 获取单个证券的计算结果 ⚠️ 捐赠用户功能
 result = factor.get_value(stock, query, align=False, fill_null=False, tovalue=False, check=False, align_dates=DatetimeList())
 
-# 获取所有计算结果 ⚠️ VIP功能
+# 获取所有计算结果 ⚠️ 捐赠用户功能
 results = factor.get_all_values(query, align=False, fill_null=False, tovalue=False, align_dates=DatetimeList())
 
-# 获取指定证券列表的计算结果 ⚠️ VIP功能
+# 获取指定证券列表的计算结果 ⚠️ 捐赠用户功能
 results = factor.get_values(stocks, query, align=False, fill_null=False, tovalue=False, check=False, align_dates=DatetimeList())
 
-# 保存计算结果到数据库 ⚠️ VIP功能
+# 保存计算结果到数据库 ⚠️ 捐赠用户功能
 factor.save_values(stocks, query, replace=False)
 ```
 
@@ -149,14 +149,14 @@ factor.save_values(stocks, query, replace=False)
 - `get_all_values`: 返回 Indicator 列表，包含所有证券的计算结果
 - `get_values`: 返回 Indicator 列表，按股票顺序排列的计算结果
 
-#### 特殊因子值保存方法 ⚠️ VIP功能
+#### 特殊因子值保存方法 ⚠️ 捐赠用户功能
 
 对于某些特殊因子，其值不是通过指标公式计算得出，而是预先准备好的数据，可以使用特殊因子值保存方法。该方法支持两种输入格式：
 
 ##### 重载版本1：保存Indicator对象
 
 ```
-# 保存Indicator对象的结果数据 ⚠️ VIP功能
+# 保存Indicator对象的结果数据 ⚠️ 捐赠用户功能
 factor.save_special_values_to_db(stock, indicator, replace=False)
 ```
 
@@ -169,7 +169,7 @@ factor.save_special_values_to_db(stock, indicator, replace=False)
 ##### 重载版本2：保存预计算数据
 
 ```
-# 保存预计算的日期-值对数据 ⚠️ VIP功能
+# 保存预计算的日期-值对数据 ⚠️ 捐赠用户功能
 factor.save_special_values_to_db(stock, dates, values, replace=False)
 ```
 
@@ -433,27 +433,27 @@ mf2 = MF_Weight(factor_set, stocks, weights, query)
 mf_equal = MF_EqualWeight(factor_set, stocks, query)
 ```
 
-## 全局因子管理函数 ⚠️ VIP功能
+## 全局因子管理函数 ⚠️ 捐赠用户功能
 
 <div class="admonition warning">
 <p class="admonition-title">⚠️ 重要提醒</p>
-<p>以下所有全局因子管理函数均为VIP功能，数据库引擎仅支持ClickHouse。</p>
+<p>以下所有全局因子管理函数均为捐赠用户功能，数据库引擎仅支持ClickHouse。</p>
 </div>
 
 除了Factor和FactorSet类的方法外，hikyuu还提供了一系列全局函数用于因子的数据库管理和批量操作。
 
-### 因子数据库操作 ⚠️ VIP功能
+### 因子数据库操作 ⚠️ 捐赠用户功能
 
-#### get_factor(name[, ktype=KQuery.DAY]) ⚠️ VIP功能
+#### get_factor(name[, ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
 
 获取指定名称和类型的因子元数据
 
 ```python
 from hikyuu import *
 
-# 获取日线因子 ⚠️ VIP功能
+# 获取日线因子 ⚠️ 捐赠用户功能
 factor = get_factor("MA5")
-# 获取周线因子 ⚠️ VIP功能
+# 获取周线因子 ⚠️ 捐赠用户功能
 weekly_factor = get_factor("MA5", KQuery.WEEK)
 ```
 
@@ -464,12 +464,12 @@ weekly_factor = get_factor("MA5", KQuery.WEEK)
 
 **返回值:** 因子对象，如果不存在则返回空因子
 
-#### save_factor(factor) ⚠️ VIP功能
+#### save_factor(factor) ⚠️ 捐赠用户功能
 
 保存因子到数据库
 
 ```python
-# 创建并保存因子 ⚠️ VIP功能
+# 创建并保存因子 ⚠️ 捐赠用户功能
 ma5 = MA(CLOSE(), 5)
 ma5.name = "MA5"
 ma5_factor = Factor("MA5", ma5)
@@ -482,12 +482,12 @@ save_factor(ma5_factor)
 
 **注意:** 以 `name + ktype` 作为唯一标识
 
-#### remove_factor(name, ktype) ⚠️ VIP功能
+#### remove_factor(name, ktype) ⚠️ 捐赠用户功能
 
 从数据库中删除因子
 
 ```python
-# 删除指定因子 ⚠️ VIP功能
+# 删除指定因子 ⚠️ 捐赠用户功能
 remove_factor("MA5", KQuery.DAY)
 ```
 
@@ -498,12 +498,12 @@ remove_factor("MA5", KQuery.DAY)
 
 **注意:** 以 `name + ktype` 作为唯一标识
 
-#### get_all_factors() ⚠️ VIP功能
+#### get_all_factors() ⚠️ 捐赠用户功能
 
 获取所有因子元数据
 
 ```python
-# 获取所有因子 ⚠️ VIP功能
+# 获取所有因子 ⚠️ 捐赠用户功能
 all_factors = get_all_factors()
 print(f"共有 {len(all_factors)} 个因子")
 
@@ -514,15 +514,15 @@ for factor in all_factors:
 
 **返回值:** 所有因子对象列表
 
-#### update_all_factors_values([ktype=KQuery.DAY]) ⚠️ VIP功能
+#### update_all_factors_values([ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
 
 更新所有因子值（增量更新）
 
 ```python
-# 更新所有日线因子值 ⚠️ VIP功能
+# 更新所有日线因子值 ⚠️ 捐赠用户功能
 update_all_factors_values()
 
-# 更新所有周线因子值 ⚠️ VIP功能
+# 更新所有周线因子值 ⚠️ 捐赠用户功能
 update_all_factors_values(KQuery.WEEK)
 ```
 
@@ -532,14 +532,14 @@ update_all_factors_values(KQuery.WEEK)
 
 **使用场景:** 每日行情数据下载完成后，可以调用此函数更新所有存储的因子值。该操作为增量更新，只计算新增数据部分，提高更新效率。
 
-### 因子集数据库操作 ⚠️ VIP功能
+### 因子集数据库操作 ⚠️ 捐赠用户功能
 
-#### save_factorset(set) ⚠️ VIP功能
+#### save_factorset(set) ⚠️ 捐赠用户功能
 
 保存因子集到数据库
 
 ```python
-# 创建并保存因子集 ⚠️ VIP功能
+# 创建并保存因子集 ⚠️ 捐赠用户功能
 indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
 factor_set = FactorSet(indicators)
 factor_set.name = "均线因子集"
@@ -552,14 +552,14 @@ save_factorset(factor_set)
 
 **注意:** 以 `name + ktype` 作为唯一标识
 
-#### get_factorset(name[, ktype=KQuery.DAY]) ⚠️ VIP功能
+#### get_factorset(name[, ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
 
 获取因子集
 
 ```python
-# 获取因子集 ⚠️ VIP功能
+# 获取因子集 ⚠️ 捐赠用户功能
 factor_set = get_factorset("均线因子集")
-# 获取周线因子集 ⚠️ VIP功能
+# 获取周线因子集 ⚠️ 捐赠用户功能
 weekly_set = get_factorset("均线因子集", KQuery.WEEK)
 ```
 
@@ -570,12 +570,12 @@ weekly_set = get_factorset("均线因子集", KQuery.WEEK)
 
 **返回值:** 因子集对象，如果不存在则返回空因子集
 
-#### remove_factorset(name, ktype) ⚠️ VIP功能
+#### remove_factorset(name, ktype) ⚠️ 捐赠用户功能
 
 从数据库中删除因子集
 
 ```python
-# 删除指定因子集 ⚠️ VIP功能
+# 删除指定因子集 ⚠️ 捐赠用户功能
 remove_factorset("均线因子集", KQuery.DAY)
 ```
 
@@ -586,12 +586,12 @@ remove_factorset("均线因子集", KQuery.DAY)
 
 **注意:** 以 `name + ktype` 作为唯一标识
 
-#### get_all_factorsets() ⚠️ VIP功能
+#### get_all_factorsets() ⚠️ 捐赠用户功能
 
 获取所有因子集
 
 ```python
-# 获取所有因子集 ⚠️ VIP功能
+# 获取所有因子集 ⚠️ 捐赠用户功能
 all_sets = get_all_factorsets()
 print(f"共有 {len(all_sets)} 个因子集")
 

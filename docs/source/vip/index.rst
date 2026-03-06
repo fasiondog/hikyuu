@@ -1,9 +1,9 @@
-VIP功能
-========
+捐赠用户功能
+============
 
 .. toctree::
 
-   vip-plan.md
+   donate-plan.md
    indicator
    backtest
    dataserver

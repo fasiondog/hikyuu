@@ -420,17 +420,16 @@
         :rtype: CostRecord
      
     .. py:method:: get_funds(self[, ktype = Query.DAY])
-    
-        获取当前时刻的资产市值详情
-        
-        :param Query.KType ktype: K 线类型
-        :rtype: FundsRecord
 
-    .. py:method:: get_funds(self, datetime[, ktype = Query.DAY])
+        获取指定时刻的资产市值详情
     
+        方式1:get_funds(self[, ktype = Query.DAY])
+
+        方式2：get_funds(self, datetime[, ktype = Query.DAY])
+    
+        get_funds(self, datetime[, ktype = Query.DAY])
         获取指定时刻的资产市值详情
         
-        :param Datetime datetime:  指定时刻
         :param Query.KType ktype: K 线类型
         :rtype: FundsRecord
 
@@ -535,7 +534,7 @@
 
         :param Datetime datetime: 指定时刻
         :param Query.KType ktype: K 线类型
-        :param bool ext: 是否获取扩展统计项 (需 VIP 权限)，否则仅为基础统计项
+        :param bool ext: 是否获取扩展统计项 (需 捐赠用户 权限)，否则仅为基础统计项
         :return: 账户表现
         :rtype: Performance
 

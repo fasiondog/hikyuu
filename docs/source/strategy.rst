@@ -142,25 +142,20 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
 
     .. py:method:: get_last_kdata(self, stk, start_date, ktype, recover_type)
 
-        获取指定证券从指定日期开始到当前时间的对应 K 线数据 (为保证实盘和回测一致，请使用本方法获取 K 线数据)
+        方法1：获取指定证券从指定日期开始到当前时间的对应 K 线数据 (为保证实盘和回测一致，请使用本方法获取 K 线数据)
+        get_last_kdata(self, stk, start_date, ktype, recover_type)
+
+        方法2：获取指定证券当前能获取到的最后 last_num 条 K 线数据 (为保证实盘和回测一致，请使用本方法获取 K 线数据)
+        get_last_kdata(self, stk, lastnum, ktype, recover_type)
 
         :param Stock stk: 指定的证券
+        :param int lastnum: 最后 N 条数据
         :param Datetime start_date: 开始日期
         :param KQuery.KType ktype: K 线类型
         :param KQuery.RecoverType recover_type: 恢复方式，默认为 KQuery.NO_RECOVER
         :return: K 线数据
         :rtype: KData
 
-    .. py:method:: get_last_kdata(self, stk, lastnum, ktype, recover_type)
-
-        获取指定证券当前能获取到的最后 last_num 条 K 线数据 (为保证实盘和回测一致，请使用本方法获取 K 线数据)
-
-        :param Stock stk: 指定的证券
-        :param int lastnum: 最后 N 条数据
-        :param KQuery.KType ktype: K 线类型
-        :param KQuery.RecoverType recover_type: 恢复方式，默认为 KQuery.NO_RECOVER
-        :return: K 线数据
-        :rtype: KData
 
     .. py:method:: get_kdata(self, stk, start_date, end_date, ktype, recover_type)
 
@@ -273,8 +268,9 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
 
 .. py:function:: run_in_strategy(sys, stock, query, broker, costfunc, other_brokers=[])
           
-    在策略运行时执行系统交易 SYS
-    
+    方式1：在策略运行时执行系统交易 SYS
+
+    run_in_strategy(sys, stock, query, broker, costfunc, other_brokers=[])   
     目前仅支持 buy_delay|sell_delay 均为 false 的系统，即 close 时执行交易
      
     :param sys: 交易系统
@@ -284,10 +280,7 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     :param costfunc: 成本函数
     :param list other_brokers: 其他的订单代理，默认为空列表
 
-
-.. py:function:: run_in_strategy(pf, query, broker, costfunc, other_brokers=[])
-          
-    在策略运行时执行组合策略 PF
+    方式2: 在策略运行时执行组合策略 PF
     
     目前仅支持 buy_delay|sell_delay 均为 false 的系统，即 close 时执行交易
 
