@@ -85,6 +85,17 @@ std::unordered_map<Stock, PositionExtInfo> TradeManagerBase::getPositionExtInfoD
     return ret;
 }
 
+PositionExtInfo TradeManagerBase::getPositionExtInfo(const Stock& stock,
+                                                     const Datetime& current_time,
+                                                     const KQuery::KType& ktype, int trade_mode) {
+    PositionExtInfo ret;
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<TMReportPluginInterface>(HKU_PLUGIN_TMREPORT);
+    HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_TMREPORT);
+    ret = plugin->getPositionExtInfo(shared_from_this(), stock, current_time, ktype, trade_mode);
+    return ret;
+}
+
 std::vector<std::pair<Datetime, double>> TradeManagerBase::getProfitPercentMonthly(
   const Datetime& datetime) {
     std::vector<std::pair<Datetime, double>> ret;

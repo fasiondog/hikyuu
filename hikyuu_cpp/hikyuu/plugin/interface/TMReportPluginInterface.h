@@ -50,11 +50,23 @@ public:
                                                                 int trade_mode) = 0;
 
     /**
+     * @brief 获取账户指定时刻的指定证券的持仓详情
+     * @param tm 账户
+     * @param stock 持仓的股票
+     * @param current_time 当前时刻（需大于等于最后交易时刻）
+     * @param ktype k线类型
+     * @param trade_mode 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+     * @return PositionExtInfo
+     */
+    virtual PositionExtInfo getPositionExtInfo(const TMPtr& tm, const Stock& stock,
+                                               const Datetime& current_time,
+                                               const KQuery::KType& ktype, int trade_mode) = 0;
+
+    /**
      * 统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime，
      * 以便用于计算当前市值
      * @param tm 指定的交易管理实例
      * @param datetime 统计截止时刻
-     * @param ktype k线类型
      */
     virtual Performance getExtPerformance(const TMPtr& tm, const Datetime& datetime,
                                           const KQuery::KType& ktype) = 0;

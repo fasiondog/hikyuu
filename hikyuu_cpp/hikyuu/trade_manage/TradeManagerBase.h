@@ -769,6 +769,14 @@ public:
       int trade_mode = 0);
 
     /**
+     * 获取账户最后交易时刻后持仓详情
+     */
+    PositionExtInfo getPositionExtInfo(const Stock& stock,
+                                       const Datetime& current_time = Datetime::now(),
+                                       const KQuery::KType& ktype = KQuery::DAY,
+                                       int trade_mode = 0);
+
+    /**
      * @brief 获取指定截止时间前各月的收益百分比
      * @param datetime
      * @return std::vector<std::pair<Datetime, double>>
