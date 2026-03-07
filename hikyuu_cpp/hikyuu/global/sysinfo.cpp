@@ -139,7 +139,8 @@ void updateSysInfoExpiredTime(Datetime time) {
 void HKU_API reminderLicenseExpiration() {
     auto remain = g_sys_info->expire_time - Datetime::now();
     // 不可使用 htr, 因为翻译已经被释放
-    HKU_WARN_IF(remain < Days(10), "Note! Your license will expire in {} days.", remain.days());
+    HKU_WARN_IF(remain > Days(0) && remain < Days(10), "Note! Your license will expire in {} days.",
+                remain.days());
 }
 
 void sendFeedback() {
