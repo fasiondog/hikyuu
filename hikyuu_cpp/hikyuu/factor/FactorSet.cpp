@@ -26,8 +26,17 @@ FactorSet::FactorSet(const IndicatorList& inds, const KQuery::KType& ktype)
 : m_data(make_shared<Data>()) {
     m_data->name = fmt::format("FSET_{}", Datetime::now().ticks());
     m_data->ktype = ktype;
-    for (auto& factor : inds) {
+    for (const auto& factor : inds) {
         add(factor);
+    }
+}
+
+FactorSet::FactorSet(const std::unordered_map<string, Indicator>& inds, const KQuery::KType& ktype)
+: m_data(make_shared<Data>()) {
+    m_data->name = fmt::format("FSET_{}", Datetime::now().ticks());
+    m_data->ktype = ktype;
+    for (const auto& item : inds) {
+        add(item.first, item.second);
     }
 }
 

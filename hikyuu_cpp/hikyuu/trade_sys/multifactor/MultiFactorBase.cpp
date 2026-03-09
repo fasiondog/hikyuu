@@ -252,7 +252,6 @@ void MultiFactorBase::setRefFactorSet(const FactorSet& factorset) {
     HKU_CHECK(!factorset.isNull() && !factorset.empty(), "Input factor set is null or empty!");
     m_factorset = factorset;
     m_calculated = false;
-    _checkData();
 }
 
 void MultiFactorBase::setNormalize(NormPtr norm) {

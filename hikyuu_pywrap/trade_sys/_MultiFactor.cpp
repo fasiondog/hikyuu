@@ -212,6 +212,17 @@ void export_MultiFactor(py::module& m) {
         py::arg("inds"), py::arg("ktype") = KQuery::DAY)
       .def(
         "set_ref_factorset",
+        [](MultiFactorBase& self, const py::dict& inds, const KQuery::KType& ktype) {
+            std::unordered_map<string, Indicator> inds_dict;
+            for (auto iter = inds.begin(); iter != inds.end(); ++iter) {
+                inds_dict[iter->first.cast<string>()] = iter->second.cast<Indicator>();
+            }
+            FactorSet factorset = FactorSet(inds_dict, ktype);
+            self.setRefFactorSet(factorset);
+        },
+        py::arg("inds"), py::arg("ktype") = KQuery::DAY)
+      .def(
+        "set_ref_factorset",
         [](MultiFactorBase& self, FactorSet factorset) { self.setRefFactorSet(factorset); },
         R"(set_ref_factorset(self, factorset)
       

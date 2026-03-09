@@ -26,6 +26,15 @@ public:
      */
     explicit FactorSet(const IndicatorList& inds, const KQuery::KType& ktype = KQuery::DAY);
 
+    /**
+     * 构造函数，使用指定的指标映射表创建因子集合
+     * @note 同名的指标会被覆盖，最终保留最后一个同名指标
+     * @param inds 指标映射表，key 为因子名称，value 为对应的指标
+     * @param ktype 因子集合的 K 线类型，默认为日线
+     */
+   explicit FactorSet(const std::unordered_map<string, Indicator>& inds,
+                       const KQuery::KType& ktype = KQuery::DAY);
+
     FactorSet(const FactorSet& other);
     FactorSet(FactorSet&& other);
     virtual ~FactorSet() = default;
