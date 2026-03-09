@@ -202,8 +202,18 @@ void export_MultiFactor(py::module& m) {
       .def("get_ref_factorset", &MultiFactorBase::getRefFactorSet, py::return_value_policy::copy,
            "获取创建时输入的原始因子集合")
 
-      .def("set_ref_factorset", &MultiFactorBase::setRefFactorSet,
-           R"(set_ref_factorset(self, factorset)
+      .def(
+        "set_ref_factorset",
+        [](MultiFactorBase& self, const py::sequence& inds, const KQuery::KType& ktype) {
+            IndicatorList ind_list = python_list_to_vector<Indicator>(inds);
+            FactorSet factorset = FactorSet(ind_list, ktype);
+            self.setRefFactorSet(factorset);
+        },
+        py::arg("inds"), py::arg("ktype") = KQuery::DAY)
+      .def(
+        "set_ref_factorset",
+        [](MultiFactorBase& self, FactorSet factorset) { self.setRefFactorSet(factorset); },
+        R"(set_ref_factorset(self, factorset)
       
     设置原始因子集合
     
@@ -328,18 +338,21 @@ void export_MultiFactor(py::module& m) {
          const py::object& ref_stk, int ic_n, bool spearman, int mode, bool save_all_factors) {
           StockList c_stks = get_stock_list_from_python(stks);
           Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
-          
+
           // 判断输入类型
           if (py::isinstance<FactorSet>(input)) {
               // 输入是FactorSet
               FactorSet factset = input.cast<FactorSet>();
-              return MF_EqualWeight(factset, c_stks, query, ref_stock, ic_n, spearman, mode, save_all_factors);
+              return MF_EqualWeight(factset, c_stks, query, ref_stock, ic_n, spearman, mode,
+                                    save_all_factors);
           } else if (py::isinstance<py::sequence>(input)) {
               // 输入是序列（假设为Indicator列表）
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
-              return MF_EqualWeight(c_inds, c_stks, query, ref_stock, ic_n, spearman, mode, save_all_factors);
+              return MF_EqualWeight(c_inds, c_stks, query, ref_stock, ic_n, spearman, mode,
+                                    save_all_factors);
           } else {
-              throw std::invalid_argument("First parameter must be either FactorSet or sequence of Indicator");
+              throw std::invalid_argument(
+                "First parameter must be either FactorSet or sequence of Indicator");
           }
       },
       py::arg("input"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
@@ -369,7 +382,6 @@ void export_MultiFactor(py::module& m) {
         factor_set = FactorSet(indicators)
         mf2 = MF_EqualWeight(factor_set, stocks, query))");
 
-
     m.def("MF_Weight", py::overload_cast<>(MF_Weight));
     m.def(
       "MF_Weight",
@@ -379,18 +391,21 @@ void export_MultiFactor(py::module& m) {
           StockList c_stks = get_stock_list_from_python(stks);
           Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
           PriceList c_weights = python_list_to_vector<price_t>(weights_obj);
-          
+
           // 判断输入类型
           if (py::isinstance<FactorSet>(input)) {
               // 输入是FactorSet
               FactorSet factset = input.cast<FactorSet>();
-              return MF_Weight(factset, c_weights, c_stks, query, ref_stock, ic_n, spearman, mode, save_all_factors);
+              return MF_Weight(factset, c_weights, c_stks, query, ref_stock, ic_n, spearman, mode,
+                               save_all_factors);
           } else if (py::isinstance<py::sequence>(input)) {
               // 输入是序列（假设为Indicator列表）
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
-              return MF_Weight(c_inds, c_weights, c_stks, query, ref_stock, ic_n, spearman, mode, save_all_factors);
+              return MF_Weight(c_inds, c_weights, c_stks, query, ref_stock, ic_n, spearman, mode,
+                               save_all_factors);
           } else {
-              throw std::invalid_argument("First parameter must be either FactorSet or sequence of Indicator");
+              throw std::invalid_argument(
+                "First parameter must be either FactorSet or sequence of Indicator");
           }
       },
       py::arg("input"), py::arg("stks"), py::arg("weights"), py::arg("query"),
@@ -430,18 +445,21 @@ void export_MultiFactor(py::module& m) {
          bool save_all_factors) {
           StockList c_stks = get_stock_list_from_python(stks);
           Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
-          
+
           // 判断输入类型
           if (py::isinstance<FactorSet>(input)) {
               // 输入是FactorSet
               FactorSet factset = input.cast<FactorSet>();
-              return MF_ICWeight(factset, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+              return MF_ICWeight(factset, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman,
+                                 mode, save_all_factors);
           } else if (py::isinstance<py::sequence>(input)) {
               // 输入是序列（假设为Indicator列表）
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
-              return MF_ICWeight(c_inds, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+              return MF_ICWeight(c_inds, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman,
+                                 mode, save_all_factors);
           } else {
-              throw std::invalid_argument("First parameter must be either FactorSet or sequence of Indicator");
+              throw std::invalid_argument(
+                "First parameter must be either FactorSet or sequence of Indicator");
           }
       },
       py::arg("input"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
@@ -480,18 +498,21 @@ void export_MultiFactor(py::module& m) {
          bool save_all_factors) {
           StockList c_stks = get_stock_list_from_python(stks);
           Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
-          
+
           // 判断输入类型
           if (py::isinstance<FactorSet>(input)) {
               // 输入是FactorSet
               FactorSet factset = input.cast<FactorSet>();
-              return MF_ICIRWeight(factset, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+              return MF_ICIRWeight(factset, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman,
+                                   mode, save_all_factors);
           } else if (py::isinstance<py::sequence>(input)) {
               // 输入是序列（假设为Indicator列表）
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
-              return MF_ICIRWeight(c_inds, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman, mode, save_all_factors);
+              return MF_ICIRWeight(c_inds, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman,
+                                   mode, save_all_factors);
           } else {
-              throw std::invalid_argument("First parameter must be either FactorSet or sequence of Indicator");
+              throw std::invalid_argument(
+                "First parameter must be either FactorSet or sequence of Indicator");
           }
       },
       py::arg("input"), py::arg("stks"), py::arg("query"), py::arg("ref_stk") = py::none(),
