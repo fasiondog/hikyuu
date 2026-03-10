@@ -391,6 +391,9 @@ inline void DBConnectBase::batchSave(Container &container, bool autotrans) {
 
 template <class InputIterator>
 void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool autotrans) {
+    size_t count = std::distance(first, last);
+    HKU_IF_RETURN(count == 0, void());
+
     SQLStatementPtr st = getStatement(InputIterator::value_type::getInsertSQL());
     if (autotrans) {
         transaction();
@@ -493,6 +496,9 @@ inline void DBConnectBase::batchUpdate(Container &container, bool autotrans) {
 
 template <class InputIterator>
 void DBConnectBase::batchUpdate(InputIterator first, InputIterator last, bool autotrans) {
+    size_t count = std::distance(first, last);
+    HKU_IF_RETURN(count == 0, void());
+
     SQLStatementPtr st = getStatement(InputIterator::value_type::getUpdateSQL());
     if (autotrans) {
         transaction();
@@ -586,6 +592,9 @@ inline void DBConnectBase::batchRemove(Container &container, bool autotrans) {
 
 template <class InputIterator>
 void DBConnectBase::batchRemove(InputIterator first, InputIterator last, bool autotrans) {
+    size_t count = std::distance(first, last);
+    HKU_IF_RETURN(count == 0, void());
+
     if (autotrans) {
         transaction();
     }
