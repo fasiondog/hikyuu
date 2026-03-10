@@ -399,20 +399,21 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
     double min_trade_num = stk.minTradeNumber();
     double max_trade_num = stk.maxTradeNumber();
     if (num > 0.0) {
-        HKU_WARN_IF_RETURN(num < min_trade_num, ret,
-                           "{} {} order num({}) is less than min trade number({})!",
-                           stk.market_code(), stk.name(), num, min_trade_num);
-        double buy_num = num;
+        // HKU_WARN_IF_RETURN(num < min_trade_num, ret,
+        //                    "Ignore! {} {} order num({}) is less than min trade number({})!",
+        //                    stk.market_code(), stk.name(), num, min_trade_num);
+        HKU_IF_RETURN(num < min_trade_num, ret);
+        double buy_num = int64_t(num / min_trade_num) * min_trade_num;
         if (buy_num > max_trade_num) {
             buy_num = max_trade_num;
         }
         ret = buy(stk, 0.0, num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
 
     } else {
-        double sell_num = std::abs(num);
+        double sell_num = int64_t(std::abs(num) / min_trade_num) * min_trade_num;
         if (sell_num > max_trade_num && sell_num != MAX_DOUBLE) {
             sell_num = max_trade_num;
-        } else if (sell_num < min_trade_num) {
+        } else if ((sell_num + num) < min_trade_num) {
             sell_num = MAX_DOUBLE;  // 指示卖出剩余全部
         }
         ret = sell(stk, 0.0, sell_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
