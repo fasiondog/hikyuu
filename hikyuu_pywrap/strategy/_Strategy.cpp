@@ -20,7 +20,7 @@ using namespace hku;
 
 void export_Strategy(py::module& m) {
     Datetime null_date;
-    py::class_<Strategy, StrategyPtr>(m, "Strategy")
+    py::class_<Strategy, StrategyPtr>(m, "Strategy", py::dynamic_attr())
       .def(py::init<>())
       .def(
         py::init<const vector<string>&, const vector<KQuery::KType>&,
