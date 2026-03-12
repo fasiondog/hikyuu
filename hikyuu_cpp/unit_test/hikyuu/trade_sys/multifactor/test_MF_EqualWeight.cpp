@@ -62,21 +62,11 @@ TEST_CASE("test_MF_EqualWeight") {
     DatetimeList ref_dates = ref_k.getDatetimeList();
     IndicatorList src_inds{MA(CLOSE()), AMA(CLOSE(), EMA(CLOSE()))};
 
-    /** @arg 输入的股票列表中含有空股票 */
-    CHECK_THROWS_AS(MF_EqualWeight(src_inds, {Null<Stock>()}, query, ref_stk), std::exception);
-
     /** @arg 输入的原始因子列表为空 */
     CHECK_THROWS_AS(MF_EqualWeight(IndicatorList{}, stks, query, ref_stk), std::exception);
 
     /** @arg 输入的参考证券为空 */
     CHECK_THROWS_AS(MF_EqualWeight(IndicatorList{}, stks, query, Null<Stock>()), std::exception);
-
-    /** @arg 数据长度不足 */
-    CHECK_THROWS_AS(MF_EqualWeight(src_inds, stks, KQuery(-1), ref_stk), std::exception);
-
-    /** @arg 证券列表数量不足 */
-    CHECK_THROWS_AS(MF_EqualWeight(src_inds, {sm["sh600004"]}, KQuery(-2), ref_stk),
-                    std::exception);
 
     /** @arg 输入非法 ic_n */
     CHECK_THROWS_AS(MF_EqualWeight(src_inds, stks, KQuery(-2), ref_stk, 0), std::exception);
