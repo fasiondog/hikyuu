@@ -176,6 +176,19 @@ public:
         m_master_work_queue.clear();
     }
 
+    struct ExecutorWrapper {
+        GlobalThreadPool* pool;
+        template <typename Function>
+        void execute(Function f) {
+            pool->submit(std::move(f));
+        }
+    };
+
+    /** 协程执行器 */
+    ExecutorWrapper executor() {
+        return ExecutorWrapper{this};
+    }
+
 private:
     typedef FuncWrapper task_type;
     std::atomic_bool m_done;     // 线程池全局需终止指示
