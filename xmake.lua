@@ -11,7 +11,7 @@ set_version("2.7.7", {build = "%Y%m%d%H%M"})
 set_warnings("all")
 
 -- set language: C99, c++ standard
-set_languages("c++17")
+set_languages("c++20")
 
 
 option("mysql")
@@ -154,6 +154,7 @@ if is_plat("windows") then
             serialization = get_config("serialize"),
             system = true,
             python = false,
+            asio = true,
             cmake = false,
     }}
 else
@@ -180,6 +181,7 @@ else
             regex = true,
             random = true,
             thread = true,
+            asio = true,
             cmake = true,
     }}
 end

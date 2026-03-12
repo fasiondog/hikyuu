@@ -15,6 +15,7 @@
 #include "ThreadSafeQueue.h"
 #include "WorkStealQueue.h"
 #include "InterruptFlag.h"
+#include "../Log.h"
 #include "../cppdef.h"
 
 #ifdef __GNUC__
@@ -279,6 +280,19 @@ public:
             m_queues[i]->clear();
         }
         m_threads.clear();
+    }
+
+    struct ExecutorWrapper {
+        GlobalStealThreadPool* pool;
+        template <typename Function>
+        void execute(Function f) {
+            pool->submit(std::move(f));
+        }
+    };
+
+    /** 协程执行器 */
+    ExecutorWrapper executor() {
+        return ExecutorWrapper{this};
     }
 
 public:
