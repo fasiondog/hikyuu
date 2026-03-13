@@ -109,7 +109,7 @@ public:
 
     /** 向线程池提交任务 */
     template <typename FunctionType>
-    auto submit(FunctionType f) {
+    auto submit(FunctionType&& f) {
         if (m_done) {
             throw std::logic_error("You can't submit a task to the stopped StealThreadPool!!");
         }
@@ -121,7 +121,7 @@ public:
         }
 
         typedef typename std::invoke_result<FunctionType>::type result_type;
-        std::packaged_task<result_type()> task(f);
+        std::packaged_task<result_type()> task(std::forward<FunctionType>(f));
         task_handle<result_type> res(task.get_future());
         if (index != -1 && !m_interrupt_flags[index]) {
             // 本地线程任务从前部入队列（递归成栈）

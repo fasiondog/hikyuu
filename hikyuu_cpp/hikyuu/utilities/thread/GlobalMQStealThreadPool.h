@@ -104,14 +104,14 @@ public:
 
     /** 向线程池提交任务 */
     template <typename FunctionType>
-    auto submit(FunctionType f) {
+    auto submit(FunctionType&& f) {
         if (m_thread_need_stop.isSet() || m_done) {
             throw std::logic_error(
               "You can't submit a task to the stopped GlobalMQStealThreadPool!");
         }
 
         typedef typename std::invoke_result<FunctionType>::type result_type;
-        std::packaged_task<result_type()> task(f);
+        std::packaged_task<result_type()> task(std::forward<FunctionType>(f));
         task_handle<result_type> res(task.get_future());
 
         // 如果是本地线程且线程仍未终止，则加入自身队列
