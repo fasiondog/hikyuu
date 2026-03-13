@@ -447,287 +447,6 @@ auto global_parallel_for_index_single(size_t start, size_t end, FunctionType f,
 namespace asio = boost::asio;
 
 /**
- * @brief 等待 Future 的协程适配器
- */
-template <typename T>
-struct FutureAwaiter {
-    std::future<T> fut;
-
-    bool await_ready() const noexcept {
-        return fut.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
-    }
-
-    void await_suspend(std::coroutine_handle<> h) {
-        std::thread([fut = std::move(fut), h]() mutable {
-            fut.wait();
-            h.resume();
-        }).detach();
-    }
-
-    T await_resume() {
-        return fut.get();
-    }
-};
-
-struct VoidEvent {
-    std::atomic<bool> done{false};
-    std::exception_ptr ex{nullptr};
-    std::coroutine_handle<> handle;
-
-    void signal() {
-        done.store(true, std::memory_order_release);
-        if (handle) {
-            handle.resume();
-        }
-    }
-};
-
-struct VoidAwaiter {
-    std::shared_ptr<VoidEvent> event;
-
-    VoidAwaiter() : event(std::make_shared<VoidEvent>()) {}
-    explicit VoidAwaiter(std::shared_ptr<VoidEvent> e) : event(std::move(e)) {}
-
-    bool await_ready() const noexcept {
-        return event->done.load(std::memory_order_acquire);
-    }
-
-    void await_suspend(std::coroutine_handle<> h) {
-        event->handle = h;
-        if (event->done.load(std::memory_order_acquire)) {
-            h.resume();
-        }
-    }
-
-    void await_resume() {
-        if (event->ex) {
-            std::rethrow_exception(event->ex);
-        }
-    }
-};
-
-/**
- * @brief co_dispatch 返回的可等待任务对象（本身就是一个 awaitable）
- *
- * dispatch_task 设计为可阻塞等待的任务句柄，适用于以下场景：
- * 1. 在线程中同步等待结果：task.wait()
- * 2. 在协程中通过 await_future 异步等待：co_await await_future(std::move(task.fut))
- *
- * @note 如果需要在协程中使用，推荐模式是：
- *   auto task = co_dispatch(exec, []() { return compute(); });
- *   // ... 做其他事情
- *   auto result = co_await await_future(std::move(task.fut));  // 需要时再等待
- *
- * @note fire-and-forget 模式（不等待）：
- *   co_dispatch(exec, []() { background_work(); });  // 忽略返回值，不等待
- */
-template <typename T>
-struct dispatch_task {
-    std::future<T> fut;
-
-    /**
-     * @brief 等待并获取结果（阻塞版本）
-     */
-    T wait() {
-        return fut.get();
-    }
-
-    // Awaitable 概念所需的成员函数
-    bool await_ready() const noexcept {
-        return fut.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
-    }
-
-    void await_suspend(std::coroutine_handle<> h) {
-        // 在后台线程中等待 future
-        std::thread([fut = std::move(fut), h]() mutable {
-            fut.wait();
-            h.resume();
-        }).detach();
-    }
-
-    T await_resume() {
-        return fut.get();  // 可能抛出异常
-    }
-};
-
-template <>
-struct dispatch_task<void> {
-    std::shared_ptr<VoidEvent> event;
-
-    /**
-     * @brief 等待任务完成（阻塞版本）
-     */
-    void wait() {
-        while (!event->done.load(std::memory_order_acquire)) {
-            std::this_thread::yield();
-        }
-        if (event->ex) {
-            std::rethrow_exception(event->ex);
-        }
-    }
-
-    // Awaitable 概念所需的成员函数
-    bool await_ready() const noexcept {
-        return event->done.load(std::memory_order_acquire);
-    }
-
-    void await_suspend(std::coroutine_handle<> h) {
-        event->handle = h;
-        if (event->done.load(std::memory_order_acquire)) {
-            h.resume();
-        }
-    }
-
-    void await_resume() {
-        if (event->ex) {
-            std::rethrow_exception(event->ex);
-        }
-    }
-};
-
-// --- 分支 A: 有返回值 (T != void) ---
-template <typename Executor, typename Func>
-auto co_dispatch_impl(Executor exec, Func&& func, std::true_type)
-  -> dispatch_task<typename std::invoke_result_t<Func>> {
-    using R = typename std::invoke_result_t<Func>;
-
-    auto p = std::make_shared<std::promise<R>>();
-    auto f = p->get_future();
-
-    exec.execute([p, func = std::forward<Func>(func)]() mutable {
-        try {
-            if constexpr (!std::is_void_v<R>) {
-                p->set_value(func());
-            }
-        } catch (...) {
-            p->set_exception(std::current_exception());
-        }
-    });
-
-    return dispatch_task<R>{std::move(f)};
-}
-
-// --- 分支 B: 无返回值 (T == void) ---
-template <typename Executor, typename Func>
-auto co_dispatch_impl(Executor exec, Func&& func, std::false_type) -> dispatch_task<void> {
-    auto event = std::make_shared<VoidEvent>();
-
-    exec.execute([event, func = std::forward<Func>(func)]() mutable {
-        try {
-            func();
-        } catch (...) {
-            event->ex = std::current_exception();
-        }
-        event->signal();
-    });
-
-    return dispatch_task<void>{event};
-}
-
-// --- 主函数 ---
-/**
- * @brief 在指定 executor 上异步执行函数，返回 dispatch_task
- *
- * co_dispatch 提供灵活的异步任务提交机制，支持多种使用模式：
- *
- * ## 使用模式
- *
- * ### 1. 阻塞等待（在线程中）
- * @code
- *   ThreadPool pool(4);
- *   auto task = co_dispatch(pool.executor(), []() -> int {
- *       return compute_value();
- *   });
- *
- *   // ... 做其他事情
- *   int result = task.wait();  // 阻塞等待结果
- * @endcode
- *
- * ### 2. 异步等待（在协程中）- 推荐
- * @code
- *   asio::awaitable<void> coroutine() {
- *       ThreadPool pool(4);
- *
- *       auto task = co_dispatch(pool.executor(), []() -> int {
- *           return compute_value();
- *       });
- *
- *       // ... 做其他事情
- *       int result = co_await await_future(std::move(task.fut));  // 异步等待
- *   }
- * @endcode
- *
- * ### 3. Fire-and-forget（不等待）
- * @code
- *   // 不关心返回值，不等待完成
- *   co_dispatch(pool.executor(), []() {
- *       background_log("Task completed");
- *   });
- *   // task 被销毁，任务继续执行但不等待
- * @endcode
- *
- * @param exec 执行器
- * @param func 要执行的函数
- * @return dispatch_task<typename std::invoke_result_t<Func>> 可等待的任务对象
- */
-template <typename Executor, typename Func>
-auto co_dispatch(Executor exec, Func&& func) -> dispatch_task<typename std::invoke_result_t<Func>> {
-    using R = typename std::invoke_result_t<Func>;
-    return co_dispatch_impl(exec, std::forward<Func>(func),
-                            std::bool_constant<!std::is_void_v<R>>{});
-}
-
-/**
- * @brief 为 dispatch_task 添加 co_await 支持
- * 支持左值和右值引用
- */
-
-// 左值引用版本 - 对于非void类型，创建future的shared_ptr副本
-template <typename T>
-auto operator_co_await(dispatch_task<T>& task) -> asio::awaitable<T> {
-    // 创建 future 的 shared_ptr 副本用于等待
-    auto fut_ptr = std::make_shared<std::future<T>>(std::move(task.fut));
-    co_return co_await await_future(fut_ptr);
-}
-
-// 右值引用版本 - 对于非void类型，直接移动future
-template <typename T>
-auto operator_co_await(dispatch_task<T>&& task) -> asio::awaitable<T> {
-    co_return co_await await_future(std::move(task.fut));
-}
-
-// 左值引用版本 - 对于void类型
-inline auto operator_co_await(dispatch_task<void>& task) -> asio::awaitable<void> {
-    // 使用 timer 轮询方式等待
-    auto executor = co_await asio::this_coro::executor;
-    asio::steady_timer timer(executor);
-
-    while (!task.event->done.load(std::memory_order_acquire)) {
-        timer.expires_after(std::chrono::microseconds(100));
-        co_await timer.async_wait(asio::use_awaitable);
-    }
-
-    if (task.event->ex) {
-        std::rethrow_exception(task.event->ex);
-    }
-}
-
-// 右值引用版本 - 对于void类型
-inline auto operator_co_await(dispatch_task<void>&& task) -> asio::awaitable<void> {
-    auto executor = co_await asio::this_coro::executor;
-    asio::steady_timer timer(executor);
-
-    while (!task.event->done.load(std::memory_order_acquire)) {
-        timer.expires_after(std::chrono::microseconds(100));
-        co_await timer.async_wait(asio::use_awaitable);
-    }
-
-    if (task.event->ex) {
-        std::rethrow_exception(task.event->ex);
-    }
-}
-
-/**
  * @brief 在协程中等待 std::future 的适配器函数
  *
  * 这是推荐的使用方式，用于在 boost::asio 协程中优雅地等待传统的 std::future。
@@ -792,7 +511,7 @@ inline auto operator_co_await(dispatch_task<void>&& task) -> asio::awaitable<voi
  * @param fut std::future<T> 对象（右值引用）
  * @return asio::awaitable<T> 可在协程中 co_await 的对象
  *
- * @see co_dispatch - 灵活的异步任务提交
+ * @see co_run - 标准的异步协程任务执行接口
  * @see co_dispatch_no_wait - fire-and-forget 模式
  */
 template <typename T>
@@ -911,7 +630,8 @@ inline auto await_future<void>(std::future<void> fut) -> asio::awaitable<void> {
  * @return asio::awaitable<T> 可在协程中 co_await 的对象
  *
  * @see await_future(std::future<T>) - 直接 future 版本
- * @see co_dispatch - 推荐的替代方案，更高效的异步任务提交
+ * @see co_run - 标准的异步协程任务执行接口
+ * @see co_dispatch_no_wait - fire-and-forget 模式
  */
 template <typename T>
 auto await_future(std::shared_ptr<std::future<T>> fut_ptr) -> asio::awaitable<T> {
@@ -965,111 +685,195 @@ inline auto await_future<void>(std::shared_ptr<std::future<void>> fut_ptr)
 }
 
 /**
- * @brief 在指定 executor 上异步执行函数，不等待任务完成（fire-and-forget）
- *
- * 这是最轻量级的异步执行方式，适用于完全不关心任务执行结果和状态的场景。
- * 任务提交后立即返回，不会创建任何同步对象（如 promise/future），性能开销最小。
- *
- * ## 使用场景
- *
- * ### 1. 后台日志记录
+ * @brief 在指定 executor 上异步执行函数，允许异常穿透（保留原始异常类型）
+ * 
+ * 此函数不会将异常转换为 error_code，而是通过 std::exception_ptr 在协程中重新抛出原始异常。
+ * 适用于需要精确捕获特定异常类型的场景。
+ * 
+ * ## 使用示例
  * @code
- *   asio::awaitable<void> logging_example() {
- *       ThreadPool pool(4);
- *
- *       // 提交日志写入任务，不等待完成
- *       co_dispatch_no_wait(pool.executor(), []() {
- *           HKU_INFO("Background task completed");
+ *   // 正常情况
+ *   try {
+ *       int result = co_await co_run(pool.executor(), []() -> int { return 42; });
+ *       HKU_INFO("Result: {}", result);
+ *   } catch (const std::exception& e) {
+ *       HKU_ERROR("Error: {}", e.what());
+ *   }
+ *   
+ *   // 异常情况 - 可以捕获原始异常类型
+ *   try {
+ *       int result = co_await co_run(pool.executor(), []() -> int {
+ *           throw std::runtime_error("Specific error");
+ *           return 0;
  *       });
- *
- *       // 继续执行其他操作，不阻塞
- *       do_other_work();
+ *   } catch (const std::runtime_error& e) {
+ *       // 可以直接捕获 std::runtime_error
+ *       HKU_ERROR("Runtime error: {}", e.what());
+ *   } catch (const std::logic_error& e) {
+ *       HKU_ERROR("Logic error: {}", e.what());
  *   }
  * @endcode
- *
- * ### 2. 监控数据上报
- * @code
- *   asio::awaitable<void> metrics_example() {
- *       ThreadPool pool(4);
- *       auto metrics = collect_metrics();
- *
- *       // 异步上报监控数据
- *       co_dispatch_no_wait(pool.executor(), [metrics]() {
- *           send_metrics(metrics);
- *       });
- *
- *       // 立即返回，不等待上报完成
- *   }
- * @endcode
- *
- * ### 3. 批量提交独立任务
- * @code
- *   asio::awaitable<void> batch_example() {
- *       ThreadPool pool(8);
- *
- *       // 批量处理独立任务，无需等待
- *       for (int i = 0; i < 1000; ++i) {
- *           co_dispatch_no_wait(pool.executor(), [i]() {
- *               process_item(i);
- *           });
- *       }
- *
- *       // 所有任务已提交，立即返回
- *   }
- * @endcode
- *
- * ### 4. 事件触发通知
- * @code
- *   asio::awaitable<void> event_example() {
- *       // 触发事件通知，不关心订阅者处理结果
- *       co_dispatch_no_wait(executor, [&event]() {
- *           notify_subscribers(event);
- *       });
- *   }
- * @endcode
- *
- * ## 性能对比
- *
- * | 模式 | 创建开销 | 内存占用 | 适用场景 |
- * |------|---------|---------|---------|
- * | `co_dispatch_no_wait` | **最低** | **最小** | fire-and-forget |
- * | `co_dispatch` | 中等 | 中等 | 需要灵活控制 |
- * | `await_future` | 低（已有 future） | 低 | 包装现有 API |
- *
- * ## 注意事项
- *
- * 1. **无法获取返回值**：如果需要一个结果，请使用 `co_dispatch`
- * 2. **无法等待完成**：任务在后台执行，无法同步等待
- * 3. **异常处理**：内部会捕获并忽略所有异常
- * 4. **生命周期管理**：确保捕获的对象在任务执行期间仍然有效
- * 5. **批量提交**：适合大量独立任务的批量提交，性能最优
- *
- * ## 与 std::async 的对比
- *
- * ```cpp
- * // std::async - 会创建 future，有同步开销
- * auto fut = std::async(std::launch::async, background_task);
- * fut.detach();  // 即使 detach 也创建了 future
- *
- * // co_dispatch_no_wait - 零开销，直接执行
- * co_dispatch_no_wait(exec, background_task);
- * ```
- *
+ * 
  * @param exec 执行器
- * @param func 要执行的函数（可调用对象）
- *
- * @see co_dispatch - 需要等待或获取返回值的场景
- * @see await_future - 在协程中等待 std::future
+ * @param func 要执行的函数
+ * @return boost::asio::awaitable<T> 异步操作的结果（可能抛出原始异常类型）
+ * 
+ * @see co_run_ec - 将异常转换为 error_code 的版本，适用于统一错误处理
  */
 template <typename Executor, typename Func>
-void co_dispatch_no_wait(Executor exec, Func&& func) {
-    exec.execute([func = std::forward<Func>(func)]() mutable {
-        try {
-            func();
-        } catch (...) {
-            // fire-and-forget 模式下忽略异常
-        }
-    });
+auto co_run(Executor exec, Func&& func)
+  -> boost::asio::awaitable<typename std::invoke_result_t<Func>> {
+    using ResultType = typename std::invoke_result_t<Func>;
+
+    if constexpr (std::is_void_v<ResultType>) {
+        // void 返回类型：completion signature 为 void(std::exception_ptr)
+        return boost::asio::async_initiate<decltype(boost::asio::use_awaitable),
+                                           void(std::exception_ptr)>(
+          [exec, func = std::forward<Func>(func)](auto handler) mutable {
+              auto io_exec = boost::asio::get_associated_executor(handler);
+
+              exec.execute(
+                [func = std::move(func), handler = std::move(handler), io_exec]() mutable {
+                    std::exception_ptr e_ptr = nullptr;
+                    try {
+                        func();
+                    } catch (...) {
+                        e_ptr = std::current_exception();
+                    }
+
+                    boost::asio::post(
+                      io_exec, [handler = std::move(handler), e_ptr = std::move(e_ptr)]() mutable {
+                          // Asio 会自动处理 exception_ptr，在 co_await 点抛出
+                          handler(e_ptr);
+                      });
+                });
+          },
+          boost::asio::use_awaitable);
+    } else {
+        // 非 void 返回类型：completion signature 必须包含异常场景
+        // 正确签名：void(std::exception_ptr, ResultType)
+        return boost::asio::async_initiate<decltype(boost::asio::use_awaitable),
+                                           void(std::exception_ptr,
+                                                ResultType)  // 关键修复：增加 exception_ptr
+                                           >(
+          [exec, func = std::forward<Func>(func)](auto handler) mutable {
+              auto io_exec = boost::asio::get_associated_executor(handler);
+
+              exec.execute(
+                [func = std::move(func), handler = std::move(handler), io_exec]() mutable {
+                    std::exception_ptr e_ptr = nullptr;
+                    ResultType result{};
+
+                    try {
+                        result = func();
+                    } catch (...) {
+                        e_ptr = std::current_exception();
+                    }
+
+                    boost::asio::post(io_exec,
+                                      [handler = std::move(handler), e_ptr = std::move(e_ptr),
+                                       result = std::move(result)]() mutable {
+                                          // 关键修复：通过 handler 传递异常/结果，而非直接抛出
+                                          handler(e_ptr, std::move(result));
+                                      });
+                });
+          },
+          boost::asio::use_awaitable);
+    }
+}
+
+/**
+ * @brief 在指定 executor 上异步执行函数，异常会转换为 boost::system::error_code
+ * 
+ * 此函数将异常转换为 error_code 传递错误状态，适用于不希望异常中断协程执行的场景。
+ * 当发生异常时，Boost.Asio 框架会自动将非空的 error_code 转换为 boost::system::system_error 抛出。
+ * 
+ * ## 使用示例
+ * @code
+ *   // 正常情况
+ *   try {
+ *       int result = co_await co_run_ec(pool.executor(), []() -> int { return 42; });
+ *       HKU_INFO("Result: {}", result);
+ *   } catch (const std::exception& e) {
+ *       HKU_ERROR("Error: {}", e.what());
+ *   }
+ *   
+ *   // 异常情况 - 会被转换为 system_error
+ *   try {
+ *       int result = co_await co_run_ec(pool.executor(), []() -> int {
+ *           throw std::runtime_error("Error");
+ *           return 0;
+ *       });
+ *   } catch (const boost::system::system_error& e) {
+ *       HKU_ERROR("Error code: {}", e.code().message());
+ *   }
+ * @endcode
+ * 
+ * @param exec 执行器
+ * @param func 要执行的函数
+ * @return boost::asio::awaitable<T> 异步操作的结果（错误时抛出 boost::system::system_error）
+ * 
+ * @see co_run - 允许异常穿透的标准版本，保留原始异常类型
+ */
+template <typename Executor, typename Func>
+auto co_run_ec(Executor exec, Func&& func)
+  -> boost::asio::awaitable<typename std::invoke_result_t<Func>> {
+    using ResultType = typename std::invoke_result_t<Func>;
+
+    if constexpr (std::is_void_v<ResultType>) {
+        // void 返回类型的特化版本
+        return boost::asio::async_initiate<decltype(boost::asio::use_awaitable),
+                                           void(boost::system::error_code)>(
+          [exec, func = std::forward<Func>(func)](auto&& handler) mutable {
+              auto io_exec = boost::asio::get_associated_executor(handler);
+
+              exec.execute([func = std::move(func),
+                            handler = std::forward<decltype(handler)>(handler), io_exec]() mutable {
+                  boost::system::error_code ec;
+
+                  try {
+                      func();
+                  } catch (const std::exception& e) {
+                      ec = boost::system::errc::make_error_code(boost::system::errc::io_error);
+                  } catch (...) {
+                      ec =
+                        boost::system::errc::make_error_code(boost::system::errc::invalid_argument);
+                  }
+
+                  boost::asio::post(io_exec,
+                                    [handler = std::move(handler), ec]() mutable { handler(ec); });
+              });
+          },
+          boost::asio::use_awaitable);
+    } else {
+        // 非 void 返回类型的普通版本
+        return boost::asio::async_initiate<decltype(boost::asio::use_awaitable),
+                                           void(boost::system::error_code, ResultType)>(
+          [exec, func = std::forward<Func>(func)](auto&& handler) mutable {
+              auto io_exec = boost::asio::get_associated_executor(handler);
+
+              exec.execute([func = std::move(func),
+                            handler = std::forward<decltype(handler)>(handler), io_exec]() mutable {
+                  ResultType result{};
+                  boost::system::error_code ec;
+
+                  try {
+                      result = func();
+                  } catch (const std::exception& e) {
+                      ec = boost::system::errc::make_error_code(boost::system::errc::io_error);
+                  } catch (...) {
+                      ec =
+                        boost::system::errc::make_error_code(boost::system::errc::invalid_argument);
+                  }
+
+                  boost::asio::post(io_exec, [handler = std::move(handler), ec,
+                                              result = std::move(result)]() mutable {
+                      handler(ec, std::move(result));
+                  });
+              });
+          },
+          boost::asio::use_awaitable);
+    }
 }
 
 #endif  // CPP_STANDARD >= CPP_STANDARD_20
