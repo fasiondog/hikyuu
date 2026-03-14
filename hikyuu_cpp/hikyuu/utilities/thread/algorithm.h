@@ -686,10 +686,10 @@ inline auto await_future<void>(std::shared_ptr<std::future<void>> fut_ptr)
 
 /**
  * @brief 在指定 executor 上异步执行函数，允许异常穿透（保留原始异常类型）
- * 
+ *
  * 此函数不会将异常转换为 error_code，而是通过 std::exception_ptr 在协程中重新抛出原始异常。
  * 适用于需要精确捕获特定异常类型的场景。
- * 
+ *
  * ## 使用示例
  * @code
  *   // 正常情况
@@ -699,7 +699,7 @@ inline auto await_future<void>(std::shared_ptr<std::future<void>> fut_ptr)
  *   } catch (const std::exception& e) {
  *       HKU_ERROR("Error: {}", e.what());
  *   }
- *   
+ *
  *   // 异常情况 - 可以捕获原始异常类型
  *   try {
  *       int result = co_await co_run(pool.executor(), []() -> int {
@@ -713,24 +713,22 @@ inline auto await_future<void>(std::shared_ptr<std::future<void>> fut_ptr)
  *       HKU_ERROR("Logic error: {}", e.what());
  *   }
  * @endcode
- * 
+ *
  * @param exec 执行器
  * @param func 要执行的函数
- * @return boost::asio::awaitable<T> 异步操作的结果（可能抛出原始异常类型）
- * 
+ * @return asio::awaitable<T> 异步操作的结果（可能抛出原始异常类型）
+ *
  * @see co_run_ec - 将异常转换为 error_code 的版本，适用于统一错误处理
  */
 template <typename Executor, typename Func>
-auto co_run(Executor exec, Func&& func)
-  -> boost::asio::awaitable<typename std::invoke_result_t<Func>> {
+auto co_run(Executor exec, Func&& func) -> asio::awaitable<typename std::invoke_result_t<Func>> {
     using ResultType = typename std::invoke_result_t<Func>;
 
     if constexpr (std::is_void_v<ResultType>) {
         // void 返回类型：completion signature 为 void(std::exception_ptr)
-        return boost::asio::async_initiate<decltype(boost::asio::use_awaitable),
-                                           void(std::exception_ptr)>(
+        return asio::async_initiate<decltype(asio::use_awaitable), void(std::exception_ptr)>(
           [exec, func = std::forward<Func>(func)](auto handler) mutable {
-              auto io_exec = boost::asio::get_associated_executor(handler);
+              auto io_exec = asio::get_associated_executor(handler);
 
               exec.execute(
                 [func = std::move(func), handler = std::move(handler), io_exec]() mutable {
@@ -741,23 +739,23 @@ auto co_run(Executor exec, Func&& func)
                         e_ptr = std::current_exception();
                     }
 
-                    boost::asio::post(
-                      io_exec, [handler = std::move(handler), e_ptr = std::move(e_ptr)]() mutable {
-                          // Asio 会自动处理 exception_ptr，在 co_await 点抛出
-                          handler(e_ptr);
-                      });
+                    asio::post(io_exec,
+                               [handler = std::move(handler), e_ptr = std::move(e_ptr)]() mutable {
+                                   // Asio 会自动处理 exception_ptr，在 co_await 点抛出
+                                   handler(e_ptr);
+                               });
                 });
           },
-          boost::asio::use_awaitable);
+          asio::use_awaitable);
     } else {
         // 非 void 返回类型：completion signature 必须包含异常场景
         // 正确签名：void(std::exception_ptr, ResultType)
-        return boost::asio::async_initiate<decltype(boost::asio::use_awaitable),
-                                           void(std::exception_ptr,
-                                                ResultType)  // 关键修复：增加 exception_ptr
-                                           >(
+        return asio::async_initiate<decltype(asio::use_awaitable),
+                                    void(std::exception_ptr,
+                                         ResultType)  // 关键修复：增加 exception_ptr
+                                    >(
           [exec, func = std::forward<Func>(func)](auto handler) mutable {
-              auto io_exec = boost::asio::get_associated_executor(handler);
+              auto io_exec = asio::get_associated_executor(handler);
 
               exec.execute(
                 [func = std::move(func), handler = std::move(handler), io_exec]() mutable {
@@ -770,24 +768,23 @@ auto co_run(Executor exec, Func&& func)
                         e_ptr = std::current_exception();
                     }
 
-                    boost::asio::post(io_exec,
-                                      [handler = std::move(handler), e_ptr = std::move(e_ptr),
-                                       result = std::move(result)]() mutable {
-                                          // 关键修复：通过 handler 传递异常/结果，而非直接抛出
-                                          handler(e_ptr, std::move(result));
-                                      });
+                    asio::post(io_exec, [handler = std::move(handler), e_ptr = std::move(e_ptr),
+                                         result = std::move(result)]() mutable {
+                        // 关键修复：通过 handler 传递异常/结果，而非直接抛出
+                        handler(e_ptr, std::move(result));
+                    });
                 });
           },
-          boost::asio::use_awaitable);
+          asio::use_awaitable);
     }
 }
 
 /**
  * @brief 在指定 executor 上异步执行函数，异常会转换为 boost::system::error_code
- * 
+ *
  * 此函数将异常转换为 error_code 传递错误状态，适用于不希望异常中断协程执行的场景。
  * 当发生异常时，Boost.Asio 框架会自动将非空的 error_code 转换为 boost::system::system_error 抛出。
- * 
+ *
  * ## 使用示例
  * @code
  *   // 正常情况
@@ -797,7 +794,7 @@ auto co_run(Executor exec, Func&& func)
  *   } catch (const std::exception& e) {
  *       HKU_ERROR("Error: {}", e.what());
  *   }
- *   
+ *
  *   // 异常情况 - 会被转换为 system_error
  *   try {
  *       int result = co_await co_run_ec(pool.executor(), []() -> int {
@@ -808,24 +805,22 @@ auto co_run(Executor exec, Func&& func)
  *       HKU_ERROR("Error code: {}", e.code().message());
  *   }
  * @endcode
- * 
+ *
  * @param exec 执行器
  * @param func 要执行的函数
  * @return boost::asio::awaitable<T> 异步操作的结果（错误时抛出 boost::system::system_error）
- * 
+ *
  * @see co_run - 允许异常穿透的标准版本，保留原始异常类型
  */
 template <typename Executor, typename Func>
-auto co_run_ec(Executor exec, Func&& func)
-  -> boost::asio::awaitable<typename std::invoke_result_t<Func>> {
+auto co_run_ec(Executor exec, Func&& func) -> asio::awaitable<typename std::invoke_result_t<Func>> {
     using ResultType = typename std::invoke_result_t<Func>;
 
     if constexpr (std::is_void_v<ResultType>) {
         // void 返回类型的特化版本
-        return boost::asio::async_initiate<decltype(boost::asio::use_awaitable),
-                                           void(boost::system::error_code)>(
+        return asio::async_initiate<decltype(asio::use_awaitable), void(boost::system::error_code)>(
           [exec, func = std::forward<Func>(func)](auto&& handler) mutable {
-              auto io_exec = boost::asio::get_associated_executor(handler);
+              auto io_exec = asio::get_associated_executor(handler);
 
               exec.execute([func = std::move(func),
                             handler = std::forward<decltype(handler)>(handler), io_exec]() mutable {
