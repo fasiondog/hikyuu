@@ -48,6 +48,13 @@ int main(int argc, char* argv[]) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
+    // 插件路径设置：
+    // 方法1：初始化前，设置插件路径为 "." 或 "", 将自动从 hikyuu.ini 中的 plugindir
+    // 配置获取插件路径 StockManager::instance().setPluginPath(".");
+    // 方法2：初始化前，自己设定插件路径（如果需要的话）
+    // 否则，默认为用户目录下 .hikyuu/plugin 目录，可自行copy插件到该目录
+    // StockManager::instance().setPluginPath("./plugin");
+
     // 以多线程的方式执行多个策略
     // 注意：同一进程内的所有 strategy 共享的是同一个上下文！！！
     StrategyContext context({"sh000001", "sz000001"}, {KQuery::DAY});
