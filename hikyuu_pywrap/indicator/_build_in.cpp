@@ -383,6 +383,12 @@ Indicator (*BARSLAST_1)() = BARSLAST;
 Indicator (*BARSLAST_2)(const Indicator&) = BARSLAST;
 Indicator (*BARSLAST_3)(Indicator::value_t) = BARSLAST;
 
+
+Indicator (*BARSLASTS_1)(int) = BARSLASTS;
+Indicator (*BARSLASTS_2)(const Indicator&) = BARSLASTS;
+Indicator (*BARSLASTS_3)(const Indicator&, int) = BARSLASTS;
+Indicator (*BARSLASTS_4)(const Indicator&, const Indicator&) = BARSLASTS;
+
 Indicator (*SUMBARS_1)(double) = SUMBARS;
 Indicator (*SUMBARS_2)(const IndParam&) = SUMBARS;
 Indicator (*SUMBARS_3)(const Indicator&, const IndParam&) = SUMBARS;
@@ -1574,8 +1580,24 @@ void export_Indicator_build_in(py::module& m) {
     :rtype: Indicator)");
 
     m.def("SUMBARS", SUMBARS_1, py::arg("a"));
-    m.def("SUMBARS", SUMBARS_2, py::arg("a"));
-    m.def("SUMBARS", SUMBARS_3, py::arg("data"), py::arg("a"));
+
+
+    m.def("BARSLASTS", BARSLASTS_1, py::arg("n"));
+    m.def("BARSLASTS", BARSLASTS_2, py::arg("n"));
+    m.def("BARSLASTS", BARSLASTS_3, py::arg("data"), py::arg("n"));
+    m.def("BARSLASTS", BARSLASTS_4, py::arg("data"), py::arg("n"), R"(BARSLASTS([data, n])
+
+    第N次条件成立位置到当前的周期数。
+
+    用法：BARSLASTS(X, N): 第N次 X 不为 0 到现在的天数。
+
+    例如：BARSLASTS(CLOSE/REF(CLOSE,1)>=1.1, 2) 表示第2个涨停板到当前的周期数。
+
+    注意：当N=1时，BARSLASTS(X, 1) 等价于 BARSLAST(X)。
+
+    :param Indicator data: 输入数据
+    :param int|Indicator n: 第N次条件成立
+    :rtype: Indicator)");
     m.def("SUMBARS", SUMBARS_4, py::arg("data"), py::arg("a"));
     m.def("SUMBARS", SUMBARS_5, py::arg("data"), py::arg("a"), R"(SUMBARS([data,] a)
 
