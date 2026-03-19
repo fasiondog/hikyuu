@@ -586,7 +586,7 @@ def merge_files_by_market(data_dir, dest_dir, market, data_type, table_desc):
             pass
 
 
-def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, table_desc, stop_flag=None):
+def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, table_desc, stop_flag=None, progress_callback=None, market_index=0, total_markets=1):
     """
     合并特定市场和数据类型的所有年份文件（支持进度更新和可中断）
     
@@ -597,6 +597,9 @@ def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, t
         data_type: 数据类型
         table_desc: 表结构描述类
         stop_flag: 停止标志检查函数
+        progress_callback: 进度回调函数，接收 (current, total, message) 参数
+        market_index: 当前市场索引（用于计算总体进度）
+        total_markets: 总市场数量
         
     返回:
         bool: 是否成功完成
@@ -658,6 +661,16 @@ def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, t
             
             progress.update(i + 1, len(year_files), 
                           sub_description=f"{os.path.basename(year_file)}")
+            
+            # 调用进度回调，更新 GUI 进度
+            if progress_callback:
+                # 计算总体进度：市场进度 + 年份进度
+                market_progress = market_index / total_markets * 100
+                year_progress = (i + 1) / len(year_files) / total_markets * 100
+                overall_progress = int(market_progress + year_progress)
+                
+                progress_callback(overall_progress, 100, 
+                                f"处理年份 {i+1}/{len(year_files)} - {os.path.basename(year_file)}")
             
             try:
                 src_hdf5 = tables.open_file(year_file, mode='r')
@@ -907,7 +920,13 @@ def merge_all_data_from_split(src_dir, dest_dir, data_types, stop_flag=None, pro
     success_count = 0
     task_index = 0
     
-    for (market, data_type), year_files in merge_tasks.items():
+    # 将 merge_tasks 转换为列表以便获取索引
+    tasks_list = list(merge_tasks.items())
+    total_tasks = len(tasks_list)
+    
+    print(f"\n总计：{total_tasks} 个合并任务")
+    
+    for market_index, ((market, data_type), year_files) in enumerate(tasks_list):
         task_index += 1
         
         # 检查停止标志
@@ -915,19 +934,22 @@ def merge_all_data_from_split(src_dir, dest_dir, data_types, stop_flag=None, pro
             print(f"\n用户取消处理，已完成 {task_index-1}/{total_tasks} 个任务")
             break
         
-        # 更新进度
-        progress = int((task_index - 1) / total_tasks * 100)
+        # 更新进度（使用市场索引计算总体进度）
+        progress = int(market_index / total_tasks * 100)
         if progress_callback:
-            progress_callback(progress, total_tasks, f"处理中：{task_index}/{total_tasks} - {market}_{data_type}")
+            progress_callback(progress, total_tasks, f"准备处理：{market_index+1}/{total_tasks} - {market}_{data_type}")
         
         print(f"\n[{task_index}/{total_tasks}] 合并 {market} 市场的 {data_type} 数据")
         
         try:
             table_desc = get_table_desc(data_type)
             
-            # 使用增强版的合并函数，支持增量合并和停止检查
+            # 使用增强版的合并函数，支持增量合并、停止检查和进度回调
             if merge_files_by_market_with_progress(src_dir, dest_dir, market, data_type, table_desc, 
-                                                   stop_flag=stop_flag):
+                                                   stop_flag=stop_flag,
+                                                   progress_callback=progress_callback,
+                                                   market_index=market_index,
+                                                   total_markets=total_tasks):
                 success_count += 1
                 
         except Exception as e:
