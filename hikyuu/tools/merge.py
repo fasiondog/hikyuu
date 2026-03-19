@@ -174,19 +174,24 @@ def get_table_desc(data_type):
 
 
 def get_existing_stocks_in_merged_file(dest_filepath):
-    """获取已存在合并文件中的股票列表及其最后日期
+    """获取已存在合并文件中的股票列表及其最大 datetime 值
     
     参数:
         dest_filepath: 目标文件路径
         
     返回:
-        dict: {stock_name: last_datetime}，如果文件不存在则返回空字典
+        dict: {stock_name: max_datetime}，如果文件不存在则返回空字典
+        
+    重要说明:
+        必须遍历所有记录找出每只股票的最大 datetime 值，
+        因为不能假设"最后一条记录"就是"时间上最新的数据"。
+        特别是当数据可能乱序或部分更新时。
     """
-    stock_last_dates = {}
+    stock_max_dates = {}
     
     # 检查文件是否存在
     if not os.path.exists(dest_filepath):
-        return stock_last_dates
+        return stock_max_dates
     
     try:
         f = tables.open_file(dest_filepath, 'r')
@@ -198,23 +203,27 @@ def get_existing_stocks_in_merged_file(dest_filepath):
                 if isinstance(table, tables.Table):
                     stock_name = table._v_name
                     
-                    # 获取该表的最后一条记录
+                    # 读取该股票表的所有记录，找出最大 datetime
                     if table.nrows > 0:
-                        last_row = table[table.nrows - 1]
-                        last_datetime = last_row['datetime']
-                        stock_last_dates[stock_name] = last_datetime
+                        max_datetime = 0
+                        for row in table:
+                            dt = row['datetime']
+                            if dt > max_datetime:
+                                max_datetime = dt
+                        
+                        stock_max_dates[stock_name] = max_datetime
         except Exception as e:
             print(f"  警告：无法访问/data 组：{e}")
         
         f.close()
         
-        if stock_last_dates:
-            print(f"  检测到已存在文件，包含 {len(stock_last_dates)} 只股票")
+        if stock_max_dates:
+            print(f"  检测到已存在文件，包含 {len(stock_max_dates)} 只股票")
         
     except Exception as e:
         print(f"  读取已有文件时出错：{e}")
     
-    return stock_last_dates
+    return stock_max_dates
 
 
 def find_year_files(src_dir, market_prefix, data_type):

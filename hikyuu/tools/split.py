@@ -49,6 +49,24 @@ class GUILogRedirector:
         sys.stderr = self.original_stderr
 
 
+class ProgressCallback:
+    """进度回调类，用于从底层函数更新 GUI 进度"""
+    
+    def __init__(self, update_func):
+        """
+        初始化进度回调
+        
+        参数:
+            update_func: 更新函数，签名：update_func(current, total, stock_name)
+        """
+        self.update_func = update_func
+    
+    def update(self, current, total, stock_name=""):
+        """更新进度"""
+        if self.update_func:
+            self.update_func(current, total, stock_name)
+
+
 class ProgressBar:
     """增强的进度条类，支持显示详细信息和自适应宽度"""
     
@@ -165,76 +183,119 @@ def extract_year_month_day(datetime_value):
     return year, month, day
 
 
-def get_existing_stock_dates(dest_dir, market_prefix, data_type):
-    """获取拆分目录下已有文件中每只股票的最后日期
+def get_existing_stock_dates(dest_dir, market_prefix, data_type, stop_flag=None):
+    """获取拆分目录下已有文件中每只股票的最大 datetime 值
     
     参数:
         dest_dir: 目标目录
         market_prefix: 市场前缀（如 sh, sz, bj）
         data_type: 数据类型（如 day, 5min, trans 等）
+        stop_flag: 停止标志检查函数，返回 True 表示应该停止
         
     返回:
-        dict: {stock_name: last_datetime}，如果目录为空则返回空字典
+        dict: {stock_name: max_datetime}，如果目录为空则返回空字典
+        
+    重要说明:
+        必须遍历所有年份文件，找到每只股票的最大 datetime 值，
+        因为某些年份文件可能不完整（如只有部分月份的数据）。
+        不能假设"某年的最后一条记录"就是"该年的最大 datetime"。
     """
     import re
     
-    stock_last_dates = {}
+    stock_max_dates = {}
     
     # 检查目标目录是否存在
     if not os.path.exists(dest_dir):
-        return stock_last_dates
+        return stock_max_dates
     
     # 查找所有匹配的文件
     pattern = re.compile(rf'^{market_prefix}_{data_type}_\d{{4}}\.h5$')
     existing_files = []
     
     for filename in os.listdir(dest_dir):
+        # 在扫描文件列表时也要检查停止标志
+        if stop_flag and stop_flag():
+            print(f"\n用户取消扫描已存在文件")
+            raise InterruptedError("用户取消拆分操作")
+        
         if pattern.match(filename):
             existing_files.append(os.path.join(dest_dir, filename))
     
     if not existing_files:
-        return stock_last_dates
+        return stock_max_dates
     
     print(f"\n发现 {len(existing_files)} 个已存在的拆分文件")
     
-    # 打开每个文件，读取每只股票的最后日期
+    # 打开每个文件，读取每只股票的所有记录的 datetime 值，找出最大值
+    files_processed = 0
     for file_path in existing_files:
+        # 在打开每个文件前检查停止标志
+        if stop_flag and stop_flag():
+            print(f"\n用户取消扫描已存在文件，已处理 {files_processed}/{len(existing_files)} 个文件")
+            raise InterruptedError("用户取消拆分操作")
+        
         try:
             f = tables.open_file(file_path, 'r')
             
             # 遍历/data 组下的所有股票表
             try:
                 data_group = f.get_node('/data')
+                stocks_in_file = 0
+                
                 for table in data_group:
                     if isinstance(table, tables.Table):
                         stock_name = table._v_name
+                        stocks_in_file += 1
                         
-                        # 获取该表的最后一条记录
+                        # 每处理 10 只股票检查一次停止标志
+                        if stocks_in_file % 10 == 0 and stop_flag and stop_flag():
+                            print(f"\n用户取消扫描，当前文件：{os.path.basename(file_path)}，已处理 {stocks_in_file} 只股票")
+                            f.close()
+                            raise InterruptedError("用户取消拆分操作")
+                        
+                        # 读取该股票表的所有记录，找出最大 datetime
                         if table.nrows > 0:
-                            last_row = table[table.nrows - 1]
-                            last_datetime = last_row['datetime']
+                            max_datetime = 0
+                            records_checked = 0
                             
-                            # 更新该股票的最后日期（取最大值）
-                            if stock_name not in stock_last_dates or last_datetime > stock_last_dates[stock_name]:
-                                stock_last_dates[stock_name] = last_datetime
+                            for row in table:
+                                dt = row['datetime']
+                                if dt > max_datetime:
+                                    max_datetime = dt
+                                
+                                records_checked += 1
+                                # 每处理 1000 条记录检查一次停止标志
+                                if records_checked % 1000 == 0 and stop_flag and stop_flag():
+                                    print(f"\n用户取消扫描，当前股票：{stock_name}，已检查 {records_checked} 条记录")
+                                    f.close()
+                                    raise InterruptedError("用户取消拆分操作")
+                            
+                            # 更新该股票的最大日期（取所有年份文件中的最大值）
+                            if stock_name not in stock_max_dates or max_datetime > stock_max_dates[stock_name]:
+                                stock_max_dates[stock_name] = max_datetime
             except Exception as e:
                 print(f"  警告：无法访问/data 组：{e}")
             
             f.close()
+            files_processed += 1
+            
+            # 每处理完一个文件，打印进度
+            if files_processed % 5 == 0 or files_processed == len(existing_files):
+                print(f"  已扫描 {files_processed}/{len(existing_files)} 个文件...")
             
         except Exception as e:
             print(f"读取文件 {os.path.basename(file_path)} 时出错：{e}")
             continue
     
-    if stock_last_dates:
-        print(f"已加载 {len(stock_last_dates)} 只股票的历史最后日期")
+    if stock_max_dates:
+        print(f"已加载 {len(stock_max_dates)} 只股票的最大 datetime 值（跨所有年份文件）")
     
-    return stock_last_dates
+    return stock_max_dates
 
 
 
 
-def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc):
+def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_flag=None, progress_callback=None):
     """
     通用的按年份拆分数据函数
     
@@ -243,6 +304,8 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc):
         dest_dir: 目标目录
         data_type: 数据类型字符串，用于文件名
         table_desc: 表结构描述类
+        stop_flag: 停止标志检查函数
+        progress_callback: 进度回调对象，用于更新 GUI
     """
     print(f"正在进行，请稍候.....")
     print(f"源文件：{src_file_name}")
@@ -257,8 +320,8 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc):
     
     # 获取已存在文件中股票的最后日期（增量拆分）
     print(f"\n检查增量拆分...")
-    existing_stock_dates = get_existing_stock_dates(dest_dir, market_prefix, data_type)
-    
+    existing_stock_dates = get_existing_stock_dates(dest_dir, market_prefix, data_type, stop_flag=stop_flag)
+
     if existing_stock_dates:
         print(f"将进行增量拆分，只提取新增数据")
     else:
@@ -291,6 +354,15 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc):
             stock_name = src_table._v_name
             
             stock_processed += 1
+            
+            # ✓ 新增：更新进度回调
+            if progress_callback:
+                progress_callback.update(stock_processed, total_stocks, stock_name)
+            
+            # 检查停止标志
+            if stop_flag and stop_flag():
+                print(f"\n用户取消处理，当前股票：{stock_name}")
+                raise InterruptedError("用户取消拆分操作")
             
             # 获取该股票在已存在文件中的最后日期
             existing_last_date = existing_stock_dates.get(stock_name, 0)
@@ -328,12 +400,27 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc):
                     if year not in year_data:
                         year_data[year] = []
                     
-                    year_data[year].append(row)
+                    # 重要：复制记录的所有字段值，而不是直接保存引用
+                    # 因为 row 是一个可变的对象引用，如果不复制，所有添加的记录都会指向同一个对象
+                    record_copy = {}
+                    for col_name in src_table.colnames:
+                        record_copy[col_name] = row[col_name]
+                    
+                    year_data[year].append(record_copy)
                     new_records_count += 1
                     
+                    # 每处理 100 条记录，检查一次停止标志
+                    if new_records_count % 100 == 0 and stop_flag and stop_flag():
+                        print(f"\n用户取消处理，当前股票：{stock_name}，已处理 {new_records_count} 条记录")
+                        raise InterruptedError("用户取消拆分操作")
+                    
+                except InterruptedError:
+                    # 重新抛出 InterruptedError，不要被 Exception 捕获
+                    raise
                 except Exception:
+                    # 其他异常才忽略
                     continue
-            
+
             # 打印该股票的读取情况
             if existing_last_date > 0:
                 print(f"  股票 {stock_name}: 新增 {new_records_count:,} 条记录，跳过 {skipped_records_count:,} 条已有记录")
@@ -346,6 +433,11 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc):
                 
                 # 为每个年份创建/追加文件
                 for year, records in sorted(year_data.items()):
+                    # 在开始写入每个年份文件前检查停止标志
+                    if stop_flag and stop_flag():
+                        print(f"\n用户取消处理，当前股票：{stock_name}，准备写入 {year} 年数据")
+                        raise InterruptedError("用户取消拆分操作")
+                    
                     # 构建目标文件名
                     dest_file_name = os.path.join(dest_dir, f"{market_prefix}_{data_type}_{year}.h5")
                     
@@ -399,7 +491,7 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc):
                         
                         # 打印该股票的处理结果
                         print(f"  ✓ {stock_name} ({year}): {len(records):,} 条记录 -> {os.path.basename(dest_file_name)}")
-                    
+
                     finally:
                         dest_hdf5.close()
                 
@@ -412,20 +504,33 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc):
         print(f"\n{'='*80}")
         print(f"拆分完成！共处理 {stock_processed} 只股票")
         
+    except InterruptedError:
+        # 重新抛出 InterruptedError，让外层处理
+        raise
+    except Exception as e:
+        # 记录其他异常
+        print(f"\n处理过程中发生错误：{type(e).__name__}: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        raise
     finally:
+        # 确保无论是否发生异常，都会关闭文件
         src_hdf5.close()
 
 
-def split_kdata_by_year(src_file_name, dest_dir, data_type='day'):
+def split_kdata_by_year(src_file_name, dest_dir, data_type='day', stop_flag=None, progress_callback=None):
     """
-    将 K 线数据按年份拆分成独立文件
+    将 K 线数据文件（日 K、分钟线）按年份拆分
     
     参数:
-        src_file_name: 源 HDF5 文件路径
+        src_file_name: 源文件路径
         dest_dir: 目标目录
-        data_type: 数据类型 ('day', '5min', '1min' 等)
+        data_type: 数据类型（'day', '1min', '5min'）
+        stop_flag: 停止标志检查函数
+        progress_callback: 进度回调对象，用于更新 GUI
     """
-    print(f"\n正在进行，请稍候.....")
+    print(f"\n{'='*80}")
+    print(f"正在进行 K 线数据拆分...")
     print(f"源文件：{src_file_name}")
     print(f"目标目录：{dest_dir}")
     print(f"数据类型：{data_type}")
@@ -438,7 +543,7 @@ def split_kdata_by_year(src_file_name, dest_dir, data_type='day'):
     
     # 获取已存在文件中股票的最后日期（增量拆分）
     print(f"\n检查增量拆分...")
-    existing_stock_dates = get_existing_stock_dates(dest_dir, market_prefix, data_type)
+    existing_stock_dates = get_existing_stock_dates(dest_dir, market_prefix, data_type, stop_flag=stop_flag)
     
     if existing_stock_dates:
         print(f"将进行增量拆分，只提取新增数据")
@@ -483,6 +588,10 @@ def split_kdata_by_year(src_file_name, dest_dir, data_type='day'):
             
             stock_processed += 1
             
+            # ✓ 新增：更新进度回调
+            if progress_callback:
+                progress_callback.update(stock_processed, total_stocks, stock_name)
+            
             # 获取该股票在已存在文件中的最后日期
             existing_last_date = existing_stock_dates.get(stock_name, 0)
             
@@ -519,10 +628,25 @@ def split_kdata_by_year(src_file_name, dest_dir, data_type='day'):
                     if year not in year_data:
                         year_data[year] = []
                     
-                    year_data[year].append(row)
+                    # 重要：复制记录的所有字段值，而不是直接保存引用
+                    # 因为 row 是一个可变的对象引用，如果不复制，所有添加的记录都会指向同一个对象
+                    record_copy = {}
+                    for col_name in src_table.colnames:
+                        record_copy[col_name] = row[col_name]
+                    
+                    year_data[year].append(record_copy)
                     new_records_count += 1
                     
+                    # 每处理 100 条记录，检查一次停止标志
+                    if new_records_count % 100 == 0 and stop_flag and stop_flag():
+                        print(f"\n用户取消处理，当前股票：{stock_name}，已处理 {new_records_count} 条记录")
+                        raise InterruptedError("用户取消拆分操作")
+                    
+                except InterruptedError:
+                    # 重新抛出 InterruptedError，不要被 Exception 捕获
+                    raise
                 except Exception:
+                    # 其他异常才忽略
                     continue
             
             # 打印该股票的读取情况
@@ -607,27 +731,30 @@ def split_kdata_by_year(src_file_name, dest_dir, data_type='day'):
         src_hdf5.close()
 
 
-def split_timeline_by_year(src_file_name, dest_dir):
+def split_timeline_by_year(src_file_name, dest_dir, stop_flag=None, progress_callback=None):
     """
     将分时线数据文件按年份拆分
     
     参数:
         src_file_name: 源文件路径
         dest_dir: 目标目录
+        stop_flag: 停止标志检查函数
+        progress_callback: 进度回调对象，用于更新 GUI
     """
-    _split_data_by_year(src_file_name, dest_dir, 'timeline', TimeLineRecordH5File)
+    _split_data_by_year(src_file_name, dest_dir, 'timeline', TimeLineRecordH5File, stop_flag=stop_flag, progress_callback=progress_callback)
 
 
-def split_trans_by_year(src_file_name, dest_dir):
+def split_trans_by_year(src_file_name, dest_dir, stop_flag=None, progress_callback=None):
     """
     将分笔成交数据文件按年份拆分
     
     参数:
         src_file_name: 源文件路径
         dest_dir: 目标目录
+        stop_flag: 停止标志检查函数
+        progress_callback: 进度回调对象，用于更新 GUI
     """
-    _split_data_by_year(src_file_name, dest_dir, 'trans', TransRecordH5File)
-
+    _split_data_by_year(src_file_name, dest_dir, 'trans', TransRecordH5File, stop_flag=stop_flag, progress_callback=progress_callback)
 
 # 移除了 split_single_file 函数，因为我们现在统一按年份合并所有股票
 
@@ -772,35 +899,51 @@ class SplitApp:
         self.log_queue.put(message)
     
     def _start_log_processor(self):
-        """启动日志处理器"""
+        """启动日志处理器（批量处理，提高响应性）"""
         def process_logs():
             try:
+                messages = []
+                # 批量获取队列中的所有消息
                 while True:
-                    message = self.log_queue.get_nowait()
+                    try:
+                        message = self.log_queue.get_nowait()
+                        messages.append(message)
+                    except queue.Empty:
+                        break
+                
+                # 批量更新 GUI
+                if messages:
                     self.log_text.configure(state=tk.NORMAL)
-                    self.log_text.insert(tk.END, message + "\n")
+                    for message in messages:
+                        self.log_text.insert(tk.END, message + "\n")
                     self.log_text.see(tk.END)
                     self.log_text.configure(state=tk.DISABLED)
-            except queue.Empty:
-                pass
-            self.root.after(100, process_logs)
+                    
+            except Exception:
+                pass  # 忽略错误
+            
+            # 缩短检查间隔，提高响应性
+            self.root.after(50, process_logs)
         
-        self.root.after(100, process_logs)
+        self.root.after(50, process_logs)
     
     def _update_progress(self, value, status="", detail=""):
-        """更新进度
-        
-        参数:
-            value: 进度值 (0-100)
-            status: 状态文本
-            detail: 详细信息（如当前处理的股票名称等）
-        """
-        self.progress_var.set(value)
-        if status:
-            self.status_label.config(text=status)
-        if detail:
-            self.detail_label.config(text=detail)
+        """更新进度（确保在主线程执行）"""
+        # 使用 after 确保在主线程更新
+        self.root.after(0, lambda: self._do_update_progress(value, status, detail))
     
+    def _do_update_progress(self, value, status="", detail=""):
+        """实际执行进度更新（内部方法）"""
+        try:
+            self.progress_var.set(value)
+            if status:
+                self.status_label.config(text=status)
+            if detail:
+                self.detail_label.config(text=detail)
+        except Exception:
+            # 忽略 GUI 更新错误，避免影响处理流程
+            pass
+
     def _validate_selection(self):
         """验证选择"""
         if not self.src_dir.get():
@@ -849,8 +992,8 @@ class SplitApp:
         
         return files
     
-    def _process_file(self, src_file, dest_dir, data_type):
-        """处理单个文件"""
+    def _process_file(self, src_file, dest_dir, data_type, stop_flag=None, progress_callback=None):
+        """处理单个文件（支持可中断和日志重定向）"""
         try:
             self._log(f"\n处理文件：{src_file.name}")
             
@@ -860,17 +1003,21 @@ class SplitApp:
             
             try:
                 if data_type == 'timeline':
-                    split_timeline_by_year(str(src_file), str(dest_dir))
+                    split_timeline_by_year(str(src_file), str(dest_dir), stop_flag=stop_flag, progress_callback=progress_callback)
                 elif data_type == 'trans':
-                    split_trans_by_year(str(src_file), str(dest_dir))
+                    split_trans_by_year(str(src_file), str(dest_dir), stop_flag=stop_flag, progress_callback=progress_callback)
                 else:
-                    split_kdata_by_year(str(src_file), str(dest_dir), data_type=data_type)
+                    split_kdata_by_year(str(src_file), str(dest_dir), data_type=data_type, stop_flag=stop_flag, progress_callback=progress_callback)
                 
                 self._log(f"✓ {src_file.name} 处理完成")
                 return True
             finally:
                 redirector.stop()
             
+        except InterruptedError:
+            # 用户主动取消
+            self._log(f"✗ {src_file.name} 处理已取消")
+            return False
         except Exception as e:
             self._log(f"✗ {src_file.name} 处理失败：{str(e)}")
             import traceback
@@ -895,7 +1042,7 @@ class SplitApp:
         thread.start()
     
     def _run_split(self):
-        """运行拆分任务"""
+        """运行拆分任务（支持可中断和实时进度）"""
         try:
             self._log("=" * 60)
             self._log("开始处理...")
@@ -907,7 +1054,8 @@ class SplitApp:
             if not files:
                 self._log("未找到任何数据文件！")
                 self._update_progress(100, "未找到文件")
-                messagebox.showinfo("提示", "源目录中未找到任何数据文件！")
+                # 在主线程显示对话框
+                self.root.after(0, lambda: messagebox.showinfo("提示", "源目录中未找到任何数据文件！"))
                 return
             
             # 统计要处理的文件
@@ -929,7 +1077,7 @@ class SplitApp:
             if total_files == 0:
                 self._log("没有需要处理的文件！")
                 self._update_progress(100, "无需处理")
-                messagebox.showinfo("提示", "没有需要处理的文件！")
+                self.root.after(0, lambda: messagebox.showinfo("提示", "没有需要处理的文件！"))
                 return
             
             self._log(f"找到 {total_files} 个文件需要处理")
@@ -937,41 +1085,77 @@ class SplitApp:
             # 处理每个文件
             success_count = 0
             for i, (src_file, data_type) in enumerate(to_process):
+                # 检查停止标志
                 if not self.is_processing:
                     self._log("\n用户取消处理")
                     break
                 
-                progress = int((i / total_files) * 100)
-                self._update_progress(progress, f"处理中：{i+1}/{total_files}")
+                # 更新进度（每 5% 更新一次，避免过于频繁）
+                progress = int(((i + 1) / total_files) * 100)
+                self._update_progress(progress, f"处理中：{i+1}/{total_files}", f"{src_file.name}")
                 
                 # 创建目标目录（按市场）
                 market = src_file.stem.split('_')[0]
                 dest_subdir = Path(self.dest_dir.get()) / market / data_type
                 dest_subdir.mkdir(parents=True, exist_ok=True)
                 
-                # 处理文件
-                if self._process_file(src_file, dest_subdir, data_type):
+                # 处理文件（传入停止标志检查函数和进度回调）
+                # 注意：必须在循环外部定义 lambda，避免闭包问题
+                stop_check = lambda: not self.is_processing
+                
+                # ✓ 修复：使用默认参数捕获当前 i 的值，避免闭包问题
+                current_file_index = i
+                
+                # 创建进度回调函数，用于更新股票进度
+                def on_stock_progress(current, total, stock_name="", file_index=current_file_index):
+                    if stock_name and total > 0:
+                        # 显示股票进度
+                        stock_progress_pct = int((current / total) * 100)
+                        file_progress_base = int((file_index / total_files) * 100)
+                        # 将股票进度叠加到文件进度上
+                        overall_progress = file_progress_base + (stock_progress_pct / total_files)
+                        self._update_progress(
+                            int(overall_progress),
+                            f"股票 {current}/{total}",
+                            f"{src_file.name} - {stock_name}"
+                        )
+                    else:
+                        # 只显示文件进度
+                        self._update_progress(progress, f"处理中：{i+1}/{total_files}", f"{src_file.name}")
+                
+                callback = ProgressCallback(on_stock_progress)
+                
+                if self._process_file(src_file, dest_subdir, data_type, stop_flag=stop_check, progress_callback=callback):
                     success_count += 1
+
+                # 每处理完一个文件，让出一点时间给 GUI
+                import time
+                time.sleep(0.001)  # 仅 1 毫秒
             
             # 完成
             if self.is_processing:
                 self._update_progress(100, "处理完成")
                 self._log("=" * 60)
                 self._log(f"处理完成！成功：{success_count}/{total_files}")
-                messagebox.showinfo("完成", f"数据拆分完成！\n成功：{success_count}/{total_files} 文件")
+                # 在主线程显示对话框
+                self.root.after(0, lambda: messagebox.showinfo("完成", f"数据拆分完成！\n成功：{success_count}/{total_files} 文件"))
             else:
                 self._update_progress(0, "已取消")
                 self._log("=" * 60)
                 self._log(f"处理已取消！成功：{success_count}/{total_files}")
-                messagebox.showinfo("取消", f"处理已取消！\n成功：{success_count}/{total_files} 文件")
+                self.root.after(0, lambda: messagebox.showinfo("取消", f"处理已取消！\n成功：{success_count}/{total_files} 文件"))
         
         except Exception as e:
             self._log(f"\n发生错误：{str(e)}")
             self._update_progress(0, "错误")
-            messagebox.showerror("错误", f"处理过程中发生错误：\n{str(e)}")
+            import traceback
+            self._log(traceback.format_exc())
+            # 在主线程显示对话框
+            self.root.after(0, lambda: messagebox.showerror("错误", f"处理过程中发生错误：\n{str(e)}"))
         
         finally:
             self.is_processing = False
+            # 恢复按钮状态
             self.root.after(0, lambda: self.start_button.config(state=tk.NORMAL))
             self.root.after(0, lambda: self.stop_button.config(state=tk.DISABLED))
     
