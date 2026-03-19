@@ -94,7 +94,12 @@ void FactorSet::add(const string& name, const Indicator& ind) {
 }
 
 void FactorSet::add(const Indicator& ind) {
-    add(Factor(ind.name(), ind, m_data->ktype, "", "", false, Datetime::min(), m_data->block));
+    auto it = m_data->nameIndexMap.find(ind.name());
+    if (it != m_data->nameIndexMap.end()) {
+        add(fmt::format("{}_{}", ind.name(), Datetime::now().ticks()), ind);
+    } else {
+        add(ind.name(), ind);
+    }
 }
 
 void FactorSet::add(const FactorList& factors) {
