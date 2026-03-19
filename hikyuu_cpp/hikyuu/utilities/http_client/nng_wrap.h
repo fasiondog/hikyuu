@@ -12,19 +12,16 @@
 #include <string>
 #include <nng/nng.h>
 #include <nng/supplemental/http/http.h>
-#include "hikyuu/utilities/Log.h"
 
 #include "hikyuu/utilities/config.h"
 #if HKU_ENABLE_HTTP_CLIENT_SSL
 #include <nng/supplemental/tls/tls.h>
 #endif
 
-namespace hku {
+#include "hikyuu/utilities/Log.h"
+#include "HttpException.h"
 
-struct HttpTimeoutException : hku::exception {
-    HttpTimeoutException() : hku::exception("Http timeout!") {}
-    virtual ~HttpTimeoutException() noexcept = default;
-};
+namespace hku {
 
 using HttpHeaders = std::map<std::string, std::string>;
 using HttpParams = std::map<std::string, std::string>;
