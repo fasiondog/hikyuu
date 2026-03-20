@@ -161,7 +161,7 @@ def extract_year_month_day(datetime_value):
     """从 datetime 值中提取年月日
 
     支持不同长度的 datetime 格式：
-    - 12 位：YYYYMMDDHHmm（日线、分钟线）
+    - 12 位：YYYYMMDDHHmm（日线、分钟线、分时）
     - 14 位：YYYYMMDDHHmmss（分笔数据）
 
     参数:
@@ -182,6 +182,27 @@ def extract_year_month_day(datetime_value):
     else:
         year, month, day = 0, 0, 0
     return year, month, day
+
+
+def extract_year(datetime_value, data_type='time'):
+    """从 datetime 值中提取年份
+    
+    支持不同长度的 datetime 格式：
+    - 12 位：YYYYMMDDHHmm（日线、分钟线、分时）→ 直接除 100000000
+    - 14 位：YYYYMMDDHHmmss（分笔数据）→ 直接除 10000000000
+    
+    参数:
+        datetime_value: datetime 值
+        data_type: 数据类型 ('time', 'trans', 'day', '1min', '5min')
+        
+    返回:
+        int: 年份
+    """
+    # 对于分笔数据（14 位），使用不同的除数
+    if data_type == 'trans':
+        return datetime_value // 10000000000  # 14 位：YYYYMMDDHHmmss
+    else:
+        return datetime_value // 100000000    # 12 位：YYYYMMDDHHmm
 
 
 def get_existing_stock_dates(dest_dir, market_prefix, data_type, stop_flag=None):
@@ -317,175 +338,198 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
     # 获取市场前缀
     market_prefix = os.path.basename(src_file_name).split('_')[0]
 
-    # 获取已存在文件中股票的最后日期（增量拆分）
-    print(f"\n检查增量拆分...")
-    existing_stock_dates = get_existing_stock_dates(dest_dir, market_prefix, data_type, stop_flag=stop_flag)
-
-    if existing_stock_dates:
-        print(f"将进行增量拆分，只提取新增数据")
-    else:
-        print(f"未发现历史数据，将进行完整拆分")
+    # 直接进行完整拆分
+    print(f"\n将进行完整拆分")
+    existing_stock_dates = {}
 
     # 打开源文件
     src_hdf5 = tables.open_file(src_file_name, mode='r',
                                 filters=tables.Filters(complevel=9, complib='zlib', shuffle=True))
 
     try:
-        # 使用 walk_nodes 迭代器遍历所有股票表，避免一次性加载到内存
-        # walk_nodes 返回迭代器，惰性求值，按需加载每个节点
+        # 第一步：统计股票总数（使用 walk_nodes 迭代器，惰性求值）
+        # walk_nodes 返回生成器，不会一次性加载所有节点到内存
         stock_tables_iter = src_hdf5.walk_nodes('/data')
         
         # 跳过 /data 组本身（第一个节点）
-        next(stock_tables_iter, None)
+        first_node = next(stock_tables_iter, None)
         
-        # 先统计总数（用于进度显示）- 需要消耗迭代器
+        # 统计总数（这会消耗一次遍历）
         total_stocks = sum(1 for _ in stock_tables_iter)
+        
+        # 如果第一个节点不是/data 组，说明它是股票表，需要计入总数
+        if first_node is not None and not (hasattr(first_node, '_v_name') and first_node._v_name == 'data'):
+            total_stocks += 1
         
         print(f"共找到 {total_stocks} 个股票数据表")
         
-        # 重新创建迭代器进行实际处理
+        # 第二步：按年份分组处理（外层循环是年份，内层循环是股票）
+        # 这样每个年份文件只打开一次！
+        
+        # 先收集所有需要处理的年份范围
+        print(f"\n分析数据年份范围...")
+        min_year = float('inf')
+        max_year = float('-inf')
+        
+        # 重新创建迭代器遍历年份范围
         stock_tables_iter = src_hdf5.walk_nodes('/data')
+        next(stock_tables_iter, None)  # 跳过 /data 组
         
-        # 跳过 /data 组本身（第一个节点）
-        next(stock_tables_iter, None)
-        
-        # 统计总体进度
-        stock_processed = 0
-
-        # 使用迭代器遍历所有股票表，每次只处理一只股票
         for src_table in stock_tables_iter:
-            # 使用 _v_name 属性获取节点名称（股票代码）
+            if hasattr(src_table, '_v_name') and src_table._v_name == 'data':
+                continue  # 跳过 /data 组
+            
             stock_name = src_table._v_name
-
-            stock_processed += 1
-
-            # ✓ 新增：更新进度回调
-            if progress_callback:
-                progress_callback.update(stock_processed, total_stocks, stock_name)
-
-            # 检查停止标志
-            if stop_flag and stop_flag():
-                print(f"\n用户取消处理，当前股票：{stock_name}")
-                raise InterruptedError("用户取消拆分操作")
-
-            # 获取该股票在已存在文件中的最后日期
             existing_last_date = existing_stock_dates.get(stock_name, 0)
-
-            # 打印该股票的处理情况
-            if existing_last_date > 0:
-                print(f"\n处理股票 {stock_name} ({stock_processed}/{total_stocks})，将进行增量拆分...")
+            
+            # 快速扫描该股票的年份范围（只检查首尾记录）
+            if len(src_table) > 0:
+                # 第一条记录的年份
+                first_datetime = src_table[0]['datetime']
+                first_year = extract_year(first_datetime, data_type)
+                
+                # 最后一条记录的年份
+                last_datetime = src_table[-1]['datetime']
+                last_year = extract_year(last_datetime, data_type)
+                
+                # 考虑增量更新
+                if existing_last_date > 0:
+                    existing_last_year = extract_year(existing_last_date, data_type)
+                    if first_year >= existing_last_year:
+                        continue  # 所有数据都已存在
+                    # 只需要处理到 existing_last_year 之前的数据
+                    last_year = min(last_year, existing_last_year - 1)
+                
+                min_year = min(min_year, first_year)
+                max_year = max(max_year, last_year)
+        
+        if min_year == float('inf'):
+            print(f"没有需要处理的数据")
+            return
+        
+        print(f"数据年份范围：{min_year} - {max_year}")
+        
+        # 第三步：按年份处理（外层循环）
+        processed_stocks = set()
+        stock_processed = 0
+        
+        for year in range(min_year, max_year + 1):
+            print(f"\n{'='*80}")
+            print(f"处理年份：{year}")
+            
+            # 打开/创建该年份的文件（整个年份只打开一次！）
+            dest_file_name = os.path.join(dest_dir, f"{market_prefix}_{data_type}_{year}.h5")
+            file_exists = os.path.exists(dest_file_name)
+            
+            if file_exists:
+                dest_hdf5 = tables.open_file(dest_file_name, mode="a",
+                                             filters=tables.Filters(complevel=9, complib='zlib', shuffle=True))
             else:
-                print(f"\n处理股票 {stock_name} ({stock_processed}/{total_stocks})...")
-
-            # 优化：由于原表数据已按日期排序，相同年份的数据连续存储
-            # 直接逐条处理并写入，不占用内存存储
-            start_row_index = 0
-            if existing_last_date > 0:
-                # 二分查找定位第一个大于 existing_last_date 的位置
-                left, right = 0, len(src_table)
-                while left < right:
-                    mid = (left + right) // 2
-                    mid_datetime = src_table[mid]['datetime']
-                    if mid_datetime <= existing_last_date:
-                        left = mid + 1
-                    else:
-                        right = mid
-                start_row_index = left
-
-                # 如果所有数据都已存在，直接跳过
-                if start_row_index >= len(src_table):
-                    print(f"  股票 {stock_name}: 所有数据已存在，跳过")
-                    continue
-
-            # 直接逐条处理并写入，不占用内存存储
-            new_records_count = 0
-            skipped_records_count = 0
-            current_year = None
-            dest_hdf5 = None  # 当前打开的年份文件
-
+                dest_hdf5 = tables.open_file(dest_file_name, mode="w",
+                                             filters=tables.Filters(complevel=9, complib='zlib', shuffle=True))
+                # 创建 /data 组
+                dest_group = dest_hdf5.create_group("/", "data", "Stock Data")
+            
             try:
-                for idx in range(start_row_index, len(src_table)):
-                    row = src_table[idx]
+                # 内层循环：遍历所有股票，处理该年份的数据
+                # 注意：需要重新创建迭代器，因为 walk_nodes 是消耗型的
+                stock_tables_iter_inner = src_hdf5.walk_nodes('/data')
+                next(stock_tables_iter_inner, None)  # 跳过 /data 组
+                
+                for src_table in stock_tables_iter_inner:
+                    if hasattr(src_table, '_v_name') and src_table._v_name == 'data':
+                        continue  # 跳过 /data 组
+                    
+                    stock_name = src_table._v_name
+                    
+                    # 从头开始处理所有数据
+                    start_row_index = 0
+                    
+                    # 检查停止标志
+                    if stop_flag and stop_flag():
+                        print(f"\n用户取消处理，当前股票：{stock_name}")
+                        raise InterruptedError("用户取消拆分操作")
+                    
+                    # 获取或创建股票表
                     try:
-                        datetime_val = row['datetime']
-                        year, month, day = extract_year_month_day(datetime_val)
-
-                        # 验证日期有效性
+                        dest_table = dest_hdf5.get_node("/data", stock_name)
+                    except tables.NoSuchNodeError:
+                        # 新建股票表
+                        table_title = f"{table_desc.__doc__ or 'Stock Data'}"
+                        dest_table = dest_hdf5.create_table("/data", name=stock_name,
+                                                            description=table_desc, title=table_title)
+                    
+                    # 处理该股票在该年份的数据
+                    new_records_count = 0
+                    for idx in range(start_row_index, len(src_table)):
+                        row = src_table[idx]
                         try:
-                            datetime.date(year, month, day)
-                        except ValueError:
-                            continue
-
-                        # 当年份变化时，关闭之前的文件
-                        if year != current_year and dest_hdf5 is not None:
-                            dest_hdf5.close()
-                            dest_hdf5 = None
-                            current_year = None
-
-                        # 如果是新年份，打开/创建文件
-                        if year != current_year:
-                            dest_file_name = os.path.join(dest_dir, f"{market_prefix}_{data_type}_{year}.h5")
-                            file_exists = os.path.exists(dest_file_name)
-
-                            if file_exists:
-                                dest_hdf5 = tables.open_file(dest_file_name, mode="a",
-                                                             filters=tables.Filters(complevel=9, complib='zlib', shuffle=True))
-                            else:
-                                dest_hdf5 = tables.open_file(dest_file_name, mode="w",
-                                                             filters=tables.Filters(complevel=9, complib='zlib', shuffle=True))
-                                # 创建 /data 组
-                                dest_group = dest_hdf5.create_group("/", "data", "Stock Data")
-
-                            current_year = year
-
-                        # 获取或创建股票表
-                        try:
-                            dest_table = dest_hdf5.get_node("/data", stock_name)
-                        except tables.NoSuchNodeError:
-                            # 新建股票表
-                            table_title = f"{table_desc.__doc__ or 'Stock Data'}"
-                            dest_table = dest_hdf5.create_table("/data", name=stock_name,
-                                                                description=table_desc, title=table_title)
-
-                        # 复制记录的所有字段值
-                        dest_row = dest_table.row
-                        for col_name in src_table.colnames:
+                            datetime_val = row['datetime']
+                            row_year = extract_year(datetime_val, data_type)
+                            
+                            # 只处理当前年份的数据
+                            if row_year != year:
+                                continue
+                            
+                            # 提取月日并验证日期有效性
+                            month = (datetime_val % 10000) // 100
+                            day = datetime_val % 100
+                            
                             try:
-                                dest_row[col_name] = row[col_name]
-                            except KeyError:
-                                # 如果目标表没有该列，跳过
-                                pass
-                        dest_row.append()
-
-                        new_records_count += 1
-
-                        # 每处理 100 条记录，检查一次停止标志
-                        if new_records_count % 100 == 0 and stop_flag and stop_flag():
-                            print(f"\n用户取消处理，当前股票：{stock_name}，已处理 {new_records_count} 条记录")
-                            raise InterruptedError("用户取消拆分操作")
-
-                    except InterruptedError:
-                        # 重新抛出 InterruptedError，不要被 Exception 捕获
-                        raise
-                    except Exception:
-                        # 其他异常才忽略
-                        continue
+                                datetime.date(row_year, month, day)
+                            except ValueError:
+                                continue
+                            
+                            # 复制记录的所有字段值
+                            dest_row = dest_table.row
+                            for col_name in src_table.colnames:
+                                try:
+                                    dest_row[col_name] = row[col_name]
+                                except KeyError:
+                                    pass
+                            dest_row.append()
+                            
+                            new_records_count += 1
+                            
+                            # 每处理 100 条记录，检查一次停止标志
+                            if new_records_count % 100 == 0 and stop_flag and stop_flag():
+                                print(f"\n用户取消处理，当前股票：{stock_name}，已处理 {new_records_count} 条记录")
+                                raise InterruptedError("用户取消拆分操作")
+                        
+                        except InterruptedError:
+                            raise
+                        except Exception:
+                            continue
+                    
+                    # 标记该股票已处理
+                    is_new_stock = stock_name not in processed_stocks
+                    if is_new_stock:
+                        processed_stocks.add(stock_name)
+                    
+                    # 更新进度显示
+                    # 对于新处理的股票，立即更新进度
+                    # 对于已处理过的股票（不同年份），每处理一定数量更新一次
+                    if is_new_stock:
+                        stock_processed += 1
+                        
+                        # ✓ 更新进度回调
+                        if progress_callback:
+                            progress_callback.update(stock_processed, total_stocks, stock_name)
+                        
+                        # 打印该股票的处理情况（仅当年有数据时）
+                        if new_records_count > 0:
+                            if existing_last_date > 0:
+                                print(f"  股票 {stock_name}: 新增 {new_records_count:,} 条记录 ({year})")
+                            else:
+                                print(f"  股票 {stock_name}: 处理 {new_records_count:,} 条记录 ({year})")
+                
             finally:
-                # 确保关闭最后打开的文件
+                # 关闭该年份文件
                 if dest_hdf5 is not None:
                     dest_hdf5.close()
-
-            # 打印该股票的处理情况
-            if existing_last_date > 0:
-                print(f"  股票 {stock_name}: 新增 {new_records_count:,} 条记录")
-            else:
-                print(f"  股票 {stock_name}: 处理 {new_records_count:,} 条记录")
-
-            # 打印完成消息
-            print(f"  ✓ 股票 {stock_name} 处理完成")
-
+        
         print(f"\n{'='*80}")
-        print(f"拆分完成！共处理 {stock_processed} 只股票")
+        print(f"拆分完成！共处理 {len(processed_stocks)} 只股票")
         gc.collect()
 
     except InterruptedError:
