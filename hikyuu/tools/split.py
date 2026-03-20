@@ -13,6 +13,7 @@ from tkinter import ttk, filedialog, messagebox
 import threading
 import queue
 import time
+import gc
 
 
 class GUILogRedirector:
@@ -330,24 +331,29 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                                 filters=tables.Filters(complevel=9, complib='zlib', shuffle=True))
 
     try:
-        # 获取所有表
-        all_tables = [x for x in src_hdf5.walk_nodes("/data")]
-        total_tables = len(all_tables)
-
-        # 特殊情况：如果是根目录下有 /data 节点，则显示其子节点数
-        try:
-            data_nodes = [node._v_name for node in src_hdf5.list_nodes('/data')]
-            print(f"共找到 {len(data_nodes)} 个股票数据表")
-        except:
-            print(f"共找到 {total_tables - 1} 个股票数据表")
-
+        # 使用 walk_nodes 迭代器遍历所有股票表，避免一次性加载到内存
+        # walk_nodes 返回迭代器，惰性求值，按需加载每个节点
+        stock_tables_iter = src_hdf5.walk_nodes('/data')
+        
+        # 跳过 /data 组本身（第一个节点）
+        next(stock_tables_iter, None)
+        
+        # 先统计总数（用于进度显示）- 需要消耗迭代器
+        total_stocks = sum(1 for _ in stock_tables_iter)
+        
+        print(f"共找到 {total_stocks} 个股票数据表")
+        
+        # 重新创建迭代器进行实际处理
+        stock_tables_iter = src_hdf5.walk_nodes('/data')
+        
+        # 跳过 /data 组本身（第一个节点）
+        next(stock_tables_iter, None)
+        
         # 统计总体进度
-        total_stocks = total_tables - 1  # 减去/data 组本身
         stock_processed = 0
 
-        # 遍历所有股票表，每次只处理一只股票
-        for i in range(1, total_tables):
-            src_table = all_tables[i]
+        # 使用迭代器遍历所有股票表，每次只处理一只股票
+        for src_table in stock_tables_iter:
             # 使用 _v_name 属性获取节点名称（股票代码）
             stock_name = src_table._v_name
 
@@ -480,6 +486,7 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
 
         print(f"\n{'='*80}")
         print(f"拆分完成！共处理 {stock_processed} 只股票")
+        gc.collect()
 
     except InterruptedError:
         # 重新抛出 InterruptedError，让外层处理
