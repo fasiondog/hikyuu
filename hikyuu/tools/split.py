@@ -299,7 +299,18 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
             print(f"没有需要处理的数据")
             return
         
+        # ✓ 优化：提前获取每只股票的年份范围，后续年份循环时可直接跳过无数据的股票
+        stock_year_ranges = {}  # {stock_name: (min_year, max_year)}
+        for src_table in src_hdf5.walk_nodes('/data'):
+            if hasattr(src_table, '_v_name') and src_table._v_name != 'data' and len(src_table) > 0:
+                first_datetime = src_table[0]['datetime']
+                last_datetime = src_table[-1]['datetime']
+                first_year = extract_year(first_datetime, data_type)
+                last_year = extract_year(last_datetime, data_type)
+                stock_year_ranges[src_table._v_name] = (first_year, last_year)
+        
         print(f"数据年份范围：{min_year} - {max_year}")
+        print(f"共 {len(stock_year_ranges)} 只股票有数据")
         
         # 第三步：按年份处理（外层循环）
         processed_stocks = set()
@@ -317,6 +328,25 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
         for year in range(min_year, max_year + 1):
             print(f"\n{'='*80}")
             print(f"处理年份：{year}")
+            
+            # ✓ 优化：如果没有任何股票包含该年份的数据，直接跳过整个年份
+            has_data_for_year = any(
+                stock_range[1] >= year  # max_year >= year
+                for stock_range in stock_year_ranges.values()
+            )
+            
+            if not has_data_for_year:
+                print(f"  没有股票包含 {year} 年的数据，跳过整个年份")
+                # 但仍然需要更新进度
+                for stock_name in stock_current_index.keys():
+                    total_process_count += 1
+                    if progress_callback:
+                        progress_callback.update(
+                            total_process_count,
+                            estimated_total_tasks,
+                            f"{stock_name} ({year}) - 无数据"
+                        )
+                continue
             
             # 打开/创建该年份的文件（整个年份只打开一次！）
             dest_file_name = os.path.join(dest_dir, f"{market_prefix}_{data_type}_{year}.h5")
@@ -343,7 +373,31 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                     
                     stock_name = src_table._v_name
                     
-                    # ✓ 优化：从上轮结束位置开始，而不是从头开始
+                    # ✓ 优化：使用预计算的年份范围快速判断，避免每年重复检查最后记录
+                    if stock_name in stock_year_ranges:
+                        stock_min_year, stock_max_year = stock_year_ranges[stock_name]
+                        
+                        # 如果这只股票不包含当前年份的数据，直接跳过
+                        if stock_max_year < year or stock_min_year > year:
+                            # 更新 stock_current_index 到末尾，下次直接从末尾开始
+                            stock_current_index[stock_name] = len(src_table)
+                            
+                            # 更新进度但不处理数据
+                            total_process_count += 1
+                            is_new_stock = stock_name not in processed_stocks
+                            if is_new_stock:
+                                processed_stocks.add(stock_name)
+                                stock_processed += 1
+                            
+                            if progress_callback:
+                                progress_callback.update(
+                                    total_process_count,
+                                    estimated_total_tasks,
+                                    f"{stock_name} ({year}) - 无数据"
+                                )
+                            continue
+                    
+                    # 从头开始处理所有数据（如果之前没有记录位置）
                     start_row_index = stock_current_index.get(stock_name, 0)
                     
                     # 检查停止标志
