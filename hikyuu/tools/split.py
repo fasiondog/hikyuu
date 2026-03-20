@@ -412,6 +412,10 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
         # 第三步：按年份处理（外层循环）
         processed_stocks = set()
         stock_processed = 0
+        total_process_count = 0  # 记录总处理次数（包括同一股票的不同年份）
+        
+        # 计算预计的总任务数（年份数 × 股票数）
+        estimated_total_tasks = (max_year - min_year + 1) * total_stocks
         
         for year in range(min_year, max_year + 1):
             print(f"\n{'='*80}")
@@ -471,15 +475,6 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                             if row_year != year:
                                 continue
                             
-                            # 提取月日并验证日期有效性
-                            month = (datetime_val % 10000) // 100
-                            day = datetime_val % 100
-                            
-                            try:
-                                datetime.date(row_year, month, day)
-                            except ValueError:
-                                continue
-                            
                             # 复制记录的所有字段值
                             dest_row = dest_table.row
                             for col_name in src_table.colnames:
@@ -501,27 +496,42 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                         except Exception:
                             continue
                     
-                    # 标记该股票已处理
+                    # ✓ 修复：无论是否为新股票，都要更新进度显示
+                    # 原始问题：只有第一年（新股票）才更新进度，导致后续年份进度条不动
+                    # 修复方案：每次处理股票都更新进度，让用户看到持续的进度反馈
+                    
+                    # 增加总处理计数
+                    total_process_count += 1
+                    
+                    # 如果是新股票，增加已处理股票计数
                     is_new_stock = stock_name not in processed_stocks
                     if is_new_stock:
                         processed_stocks.add(stock_name)
-                    
-                    # 更新进度显示
-                    # 对于新处理的股票，立即更新进度
-                    # 对于已处理过的股票（不同年份），每处理一定数量更新一次
-                    if is_new_stock:
                         stock_processed += 1
+                    
+                    # 更新进度回调（显示当前处理的股票和年份）
+                    # 使用 total_process_count 计算进度百分比，确保进度条持续增长
+                    if progress_callback:
+                        # 计算当前进度的百分比（基于总处理次数）
+                        current_progress_pct = int((total_process_count / estimated_total_tasks) * 100) if estimated_total_tasks > 0 else 0
                         
-                        # ✓ 更新进度回调
-                        if progress_callback:
-                            progress_callback.update(stock_processed, total_stocks, stock_name)
-                        
-                        # 打印该股票的处理情况（仅当年有数据时）
-                        if new_records_count > 0:
+                        # 调用回调，传入基于实际处理次数的进度
+                        progress_callback.update(
+                            total_process_count,           # 当前已处理的总次数
+                            estimated_total_tasks,         # 预计的总任务数
+                            f"{stock_name} ({year})"      # 显示股票名和年份
+                        )
+                    
+                    # 打印该股票的处理情况（仅当年有数据时）
+                    if new_records_count > 0:
+                        if is_new_stock:
                             if existing_last_date > 0:
                                 print(f"  股票 {stock_name}: 新增 {new_records_count:,} 条记录 ({year})")
                             else:
                                 print(f"  股票 {stock_name}: 处理 {new_records_count:,} 条记录 ({year})")
+                        else:
+                            # 已处理过的股票（不同年份）
+                            print(f"  {year}年 - {stock_name}: {new_records_count:,} 条记录")
                 
             finally:
                 # 关闭该年份文件
@@ -972,20 +982,28 @@ class SplitApp:
 
                 # 创建进度回调函数，用于更新股票进度
                 def on_stock_progress(current, total, stock_name="", file_index=current_file_index):
-                    if stock_name and total > 0:
-                        # 显示股票进度
-                        stock_progress_pct = int((current / total) * 100)
-                        file_progress_base = int((file_index / total_files) * 100)
-                        # 将股票进度叠加到文件进度上
-                        overall_progress = file_progress_base + (stock_progress_pct / total_files)
+                    if current > 0 and total > 0:
+                        # ✓ 修复：使用传入的 current 和 total 计算进度
+                        # current: 当前已处理的总次数（包括不同年份）
+                        # total: 预计的总任务数（年份数 × 股票数）
+                        progress_pct = int((current / total) * 100)
+                        
+                        # 限制最大进度为 99%，避免提前显示 100%
+                        display_progress = min(progress_pct, 99)
+                        
                         self._update_progress(
-                            int(overall_progress),
-                            f"股票 {current}/{total}",
+                            display_progress,
+                            f"处理 {current}/{total}",
                             f"{src_file.name} - {stock_name}"
                         )
                     else:
-                        # 只显示文件进度
-                        self._update_progress(progress, f"处理中：{i+1}/{total_files}", f"{src_file.name}")
+                        # 回退到文件进度
+                        current_progress = int(((file_index + 1) / total_files) * 100)
+                        self._update_progress(
+                            current_progress,
+                            f"处理中：{file_index+1}/{total_files}",
+                            f"{src_file.name}"
+                        )
 
                 callback = ProgressCallback(on_stock_progress)
 
