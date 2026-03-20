@@ -154,7 +154,7 @@ def get_table_desc(data_type):
     """根据数据类型获取表结构描述类
     
     参数:
-        data_type: 数据类型 ('day', '5min', '1min', 'timeline', 'trans')
+        data_type: 数据类型 ('day', '5min', '1min', 'time', 'trans')
         
     返回:
         tables.IsDescription: 表结构描述类
@@ -163,7 +163,7 @@ def get_table_desc(data_type):
         'day': DayDataRecordH5File,
         '5min': FiveMinDataRecordH5File,
         '1min': OneMinDataRecordH5File,
-        'timeline': TimeLineRecordH5File,
+        'time': TimeLineRecordH5File,
         'trans': TransRecordH5File
     }
     
@@ -1035,7 +1035,7 @@ class MergeApp:
         ttk.Checkbutton(type_frame, text="日线 (day)", variable=self.process_day).grid(row=0, column=0, padx=10)
         ttk.Checkbutton(type_frame, text="1 分钟线 (1min)", variable=self.process_1min).grid(row=0, column=1, padx=10)
         ttk.Checkbutton(type_frame, text="5 分钟线 (5min)", variable=self.process_5min).grid(row=0, column=2, padx=10)
-        ttk.Checkbutton(type_frame, text="分时 (timeline)", variable=self.process_timeline).grid(row=0, column=3, padx=10)
+        ttk.Checkbutton(type_frame, text="分时 (time)", variable=self.process_timeline).grid(row=0, column=3, padx=10)
         ttk.Checkbutton(type_frame, text="分笔 (trans)", variable=self.process_trans).grid(row=0, column=4, padx=10)
         
         # 全选/全不选按钮
@@ -1295,7 +1295,7 @@ class MergeApp:
         if self.process_5min.get():
             data_types.append('5min')
         if self.process_timeline.get():
-            data_types.append('timeline')
+            data_types.append('time')
         if self.process_trans.get():
             data_types.append('trans')
         
