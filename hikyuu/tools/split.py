@@ -284,13 +284,19 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                 last_datetime = src_table[-1]['datetime']
                 last_year = extract_year(last_datetime, data_type)
                 
-                # 考虑增量更新
+                # ✓ 修复：考虑增量更新，只处理新增的数据
                 if existing_last_date > 0:
                     existing_last_year = extract_year(existing_last_date, data_type)
-                    if first_year >= existing_last_year:
-                        continue  # 所有数据都已存在
-                    # 只需要处理到 existing_last_year 之前的数据
-                    last_year = min(last_year, existing_last_year - 1)
+                    
+                    # 如果所有数据都已存在，跳过这只股票
+                    if last_year <= existing_last_year:
+                        continue
+                    
+                    # 如果只有部分数据已存在，只处理新增的部分
+                    if first_year <= existing_last_year:
+                        first_year = existing_last_year + 1
+                    
+                    # 如果所有数据都是新的，正常处理（不需要修改 first_year）
                 
                 min_year = min(min_year, first_year)
                 max_year = max(max_year, last_year)
@@ -300,7 +306,8 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
             return
         
         # ✓ 优化：提前获取每只股票的年份范围，后续年份循环时可直接跳过无数据的股票
-        stock_year_ranges = {}  # {stock_name: (min_year, max_year)}
+        # 注意：这里存储的是源文件的原始年份范围，不是实际需要处理的年份范围
+        stock_year_ranges = {}  # {stock_name: (first_year, last_year)}
         for src_table in src_hdf5.walk_nodes('/data'):
             if hasattr(src_table, '_v_name') and src_table._v_name != 'data' and len(src_table) > 0:
                 first_datetime = src_table[0]['datetime']
