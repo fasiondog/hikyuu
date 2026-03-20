@@ -205,114 +205,6 @@ def extract_year(datetime_value, data_type='time'):
         return datetime_value // 100000000    # 12 位：YYYYMMDDHHmm
 
 
-def get_existing_stock_dates(dest_dir, market_prefix, data_type, stop_flag=None):
-    """获取拆分目录下已有文件中每只股票的最大 datetime 值
-
-    参数:
-        dest_dir: 目标目录
-        market_prefix: 市场前缀（如 sh, sz, bj）
-        data_type: 数据类型（如 day, 5min, trans 等）
-        stop_flag: 停止标志检查函数，返回 True 表示应该停止
-
-    返回:
-        dict: {stock_name: max_datetime}，如果目录为空则返回空字典
-
-    重要说明:
-        必须遍历所有年份文件，找到每只股票的最大 datetime 值，
-        因为某些年份文件可能不完整（如只有部分月份的数据）。
-        不能假设"某年的最后一条记录"就是"该年的最大 datetime"。
-    """
-    import re
-
-    stock_max_dates = {}
-
-    # 检查目标目录是否存在
-    if not os.path.exists(dest_dir):
-        return stock_max_dates
-
-    # 查找所有匹配的文件
-    pattern = re.compile(rf'^{market_prefix}_{data_type}_\d{{4}}\.h5$')
-    existing_files = []
-
-    for filename in os.listdir(dest_dir):
-        # 在扫描文件列表时也要检查停止标志
-        if stop_flag and stop_flag():
-            print(f"\n用户取消扫描已存在文件")
-            raise InterruptedError("用户取消拆分操作")
-
-        if pattern.match(filename):
-            existing_files.append(os.path.join(dest_dir, filename))
-
-    if not existing_files:
-        return stock_max_dates
-
-    print(f"\n发现 {len(existing_files)} 个已存在的拆分文件")
-
-    # 打开每个文件，读取每只股票的所有记录的 datetime 值，找出最大值
-    files_processed = 0
-    for file_path in existing_files:
-        # 在打开每个文件前检查停止标志
-        if stop_flag and stop_flag():
-            print(f"\n用户取消扫描已存在文件，已处理 {files_processed}/{len(existing_files)} 个文件")
-            raise InterruptedError("用户取消拆分操作")
-
-        try:
-            f = tables.open_file(file_path, 'r')
-
-            # 遍历/data 组下的所有股票表
-            try:
-                data_group = f.get_node('/data')
-                stocks_in_file = 0
-
-                for table in data_group:
-                    if isinstance(table, tables.Table):
-                        stock_name = table._v_name
-                        stocks_in_file += 1
-
-                        # 每处理 10 只股票检查一次停止标志
-                        if stocks_in_file % 10 == 0 and stop_flag and stop_flag():
-                            print(f"\n用户取消扫描，当前文件：{os.path.basename(file_path)}，已处理 {stocks_in_file} 只股票")
-                            f.close()
-                            raise InterruptedError("用户取消拆分操作")
-
-                        # 读取该股票表的所有记录，找出最大 datetime
-                        if table.nrows > 0:
-                            max_datetime = 0
-                            records_checked = 0
-
-                            for row in table:
-                                dt = row['datetime']
-                                if dt > max_datetime:
-                                    max_datetime = dt
-
-                                records_checked += 1
-                                # 每处理 1000 条记录检查一次停止标志
-                                if records_checked % 1000 == 0 and stop_flag and stop_flag():
-                                    print(f"\n用户取消扫描，当前股票：{stock_name}，已检查 {records_checked} 条记录")
-                                    f.close()
-                                    raise InterruptedError("用户取消拆分操作")
-
-                            # 更新该股票的最大日期（取所有年份文件中的最大值）
-                            if stock_name not in stock_max_dates or max_datetime > stock_max_dates[stock_name]:
-                                stock_max_dates[stock_name] = max_datetime
-            except Exception as e:
-                print(f"  警告：无法访问/data 组：{e}")
-
-            f.close()
-            files_processed += 1
-
-            # 每处理完一个文件，打印进度
-            if files_processed % 5 == 0 or files_processed == len(existing_files):
-                print(f"  已扫描 {files_processed}/{len(existing_files)} 个文件...")
-
-        except Exception as e:
-            print(f"读取文件 {os.path.basename(file_path)} 时出错：{e}")
-            continue
-
-    if stock_max_dates:
-        print(f"已加载 {len(stock_max_dates)} 只股票的最大 datetime 值（跨所有年份文件）")
-
-    return stock_max_dates
 
 
 def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_flag=None, progress_callback=None):
@@ -417,6 +309,11 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
         # 计算预计的总任务数（年份数 × 股票数）
         estimated_total_tasks = (max_year - min_year + 1) * total_stocks
         
+        # ✓ 新增：记录每只股票的当前处理位置，利用数据有序性优化性能
+        stock_current_index = {stock_name: 0 for stock_name in 
+                              (src_table._v_name for src_table in src_hdf5.walk_nodes('/data') 
+                               if hasattr(src_table, '_v_name') and src_table._v_name != 'data')}
+        
         for year in range(min_year, max_year + 1):
             print(f"\n{'='*80}")
             print(f"处理年份：{year}")
@@ -446,8 +343,8 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                     
                     stock_name = src_table._v_name
                     
-                    # 从头开始处理所有数据
-                    start_row_index = 0
+                    # ✓ 优化：从上轮结束位置开始，而不是从头开始
+                    start_row_index = stock_current_index.get(stock_name, 0)
                     
                     # 检查停止标志
                     if stop_flag and stop_flag():
@@ -457,7 +354,14 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                     # 获取或创建股票表
                     try:
                         dest_table = dest_hdf5.get_node("/data", stock_name)
+                        # 表已存在：获取最后一条记录的 datetime，用于增量追加
+                        if len(dest_table) > 0:
+                            existing_last_datetime = dest_table[-1]['datetime']
+                        else:
+                            existing_last_datetime = 0
                     except tables.NoSuchNodeError:
+                        # 新表：该股票在该年份的文件中不存在，需要创建
+                        existing_last_datetime = 0
                         # 新建股票表
                         table_title = f"{table_desc.__doc__ or 'Stock Data'}"
                         dest_table = dest_hdf5.create_table("/data", name=stock_name,
@@ -465,15 +369,37 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                     
                     # 处理该股票在该年份的数据
                     new_records_count = 0
+                    found_target_year = False  # 标记是否找到目标年份的数据
+                    
+                    # ✓ 优化：从 start_row_index 开始遍历，而不是从 0 开始
                     for idx in range(start_row_index, len(src_table)):
                         row = src_table[idx]
                         try:
                             datetime_val = row['datetime']
+                            
+                            # ✓ 增量追加：跳过已有数据（小于等于现有最后记录的都不需要）
+                            if datetime_val <= existing_last_datetime:
+                                # 更新起始位置，下次从这个位置开始
+                                stock_current_index[stock_name] = idx + 1
+                                continue
+                            
                             row_year = extract_year(datetime_val, data_type)
                             
-                            # 只处理当前年份的数据
-                            if row_year != year:
-                                continue
+                            # 如果还没找到目标年份的数据
+                            if not found_target_year:
+                                # 如果当前记录年份小于目标年份，继续往后找
+                                if row_year < year:
+                                    # 更新起始位置，下次从这个位置开始
+                                    stock_current_index[stock_name] = idx + 1
+                                    continue
+                                # 找到了目标年份或超过目标年份
+                                found_target_year = True
+                            
+                            # 如果已经超过目标年份，后续的记录都不需要处理了
+                            if row_year > year:
+                                # 更新起始位置，下次从这个位置开始（已经找到目标年份）
+                                stock_current_index[stock_name] = idx
+                                break
                             
                             # 复制记录的所有字段值
                             dest_row = dest_table.row
@@ -496,34 +422,38 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                         except Exception:
                             continue
                     
-                    # ✓ 修复：无论是否为新股票，都要更新进度显示
-                    # 原始问题：只有第一年（新股票）才更新进度，导致后续年份进度条不动
-                    # 修复方案：每次处理股票都更新进度，让用户看到持续的进度反馈
+                    # 如果一直没找到目标年份的数据，更新到末尾
+                    if not found_target_year:
+                        stock_current_index[stock_name] = len(src_table)
                     
-                    # 增加总处理计数
-                    total_process_count += 1
-                    
-                    # 如果是新股票，增加已处理股票计数
-                    is_new_stock = stock_name not in processed_stocks
-                    if is_new_stock:
-                        processed_stocks.add(stock_name)
-                        stock_processed += 1
-                    
-                    # 更新进度回调（显示当前处理的股票和年份）
-                    # 使用 total_process_count 计算进度百分比，确保进度条持续增长
-                    if progress_callback:
-                        # 计算当前进度的百分比（基于总处理次数）
-                        current_progress_pct = int((total_process_count / estimated_total_tasks) * 100) if estimated_total_tasks > 0 else 0
-                        
-                        # 调用回调，传入基于实际处理次数的进度
-                        progress_callback.update(
-                            total_process_count,           # 当前已处理的总次数
-                            estimated_total_tasks,         # 预计的总任务数
-                            f"{stock_name} ({year})"      # 显示股票名和年份
-                        )
-                    
-                    # 打印该股票的处理情况（仅当年有数据时）
+                    # ✓ 修复：只有当实际处理了数据时，才更新进度
+                    # 原始问题：即使 new_records_count = 0，进度也会增加
+                    # 修复方案：将 total_process_count 的递增移到 new_records_count > 0 的条件内
+                            
                     if new_records_count > 0:
+                        # 增加总处理计数
+                        total_process_count += 1
+                                
+                        # 如果是新股票，增加已处理股票计数
+                        is_new_stock = stock_name not in processed_stocks
+                        if is_new_stock:
+                            processed_stocks.add(stock_name)
+                            stock_processed += 1
+                                
+                        # 更新进度回调（显示当前处理的股票和年份）
+                        # 使用 total_process_count 计算进度百分比，确保进度条持续增长
+                        if progress_callback:
+                            # 计算当前进度的百分比（基于总处理次数）
+                            current_progress_pct = int((total_process_count / estimated_total_tasks) * 100) if estimated_total_tasks > 0 else 0
+                                    
+                            # 调用回调，传入基于实际处理次数的进度
+                            progress_callback.update(
+                                total_process_count,           # 当前已处理的总次数
+                                estimated_total_tasks,         # 预计的总任务数
+                                f"{stock_name} ({year})"      # 显示股票名和年份
+                            )
+                                
+                        # 打印该股票的处理情况（仅当年有数据时）
                         if is_new_stock:
                             if existing_last_date > 0:
                                 print(f"  股票 {stock_name}: 新增 {new_records_count:,} 条记录 ({year})")
