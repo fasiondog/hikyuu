@@ -426,34 +426,31 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                     if not found_target_year:
                         stock_current_index[stock_name] = len(src_table)
                     
-                    # ✓ 修复：只有当实际处理了数据时，才更新进度
-                    # 原始问题：即使 new_records_count = 0，进度也会增加
-                    # 修复方案：将 total_process_count 的递增移到 new_records_count > 0 的条件内
-                            
+                    # ✓ 修复：无论是否有新数据，都要更新进度显示
+                    # 原始问题：只有 new_records_count > 0 时才更新进度，导致进度条停滞
+                    # 修复方案：每次处理股票都更新进度，确保进度反馈连续性
+                    
+                    # 如果是新股票，增加已处理股票计数
+                    is_new_stock = stock_name not in processed_stocks
+                    if is_new_stock:
+                        processed_stocks.add(stock_name)
+                        stock_processed += 1
+                    
+                    # 增加总处理计数（反映实际处理的股票 - 年份组合数）
+                    total_process_count += 1
+                    
+                    # 更新进度回调（显示当前处理的股票和年份）
+                    # 使用 total_process_count 计算进度百分比，确保进度条持续增长
+                    if progress_callback:
+                        # 调用回调，传入基于实际处理次数的进度
+                        progress_callback.update(
+                            total_process_count,           # 当前已处理的总次数
+                            estimated_total_tasks,         # 预计的总任务数
+                            f"{stock_name} ({year})"      # 显示股票名和年份
+                        )
+                    
+                    # 打印该股票的处理情况（仅当年有数据时）
                     if new_records_count > 0:
-                        # 增加总处理计数
-                        total_process_count += 1
-                                
-                        # 如果是新股票，增加已处理股票计数
-                        is_new_stock = stock_name not in processed_stocks
-                        if is_new_stock:
-                            processed_stocks.add(stock_name)
-                            stock_processed += 1
-                                
-                        # 更新进度回调（显示当前处理的股票和年份）
-                        # 使用 total_process_count 计算进度百分比，确保进度条持续增长
-                        if progress_callback:
-                            # 计算当前进度的百分比（基于总处理次数）
-                            current_progress_pct = int((total_process_count / estimated_total_tasks) * 100) if estimated_total_tasks > 0 else 0
-                                    
-                            # 调用回调，传入基于实际处理次数的进度
-                            progress_callback.update(
-                                total_process_count,           # 当前已处理的总次数
-                                estimated_total_tasks,         # 预计的总任务数
-                                f"{stock_name} ({year})"      # 显示股票名和年份
-                            )
-                                
-                        # 打印该股票的处理情况（仅当年有数据时）
                         if is_new_stock:
                             if existing_last_date > 0:
                                 print(f"  股票 {stock_name}: 新增 {new_records_count:,} 条记录 ({year})")
