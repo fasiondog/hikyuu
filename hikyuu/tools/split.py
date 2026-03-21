@@ -683,6 +683,9 @@ class SplitApp:
         # 变量
         self.src_dir = tk.StringVar()
         self.dest_dir = tk.StringVar()
+        self.market_sh = tk.BooleanVar(value=False)  # 新增：上证市场
+        self.market_sz = tk.BooleanVar(value=False)  # 新增：深证市场
+        self.market_bj = tk.BooleanVar(value=False)  # 新增：北证市场
         self.process_day = tk.BooleanVar(value=True)
         self.process_1min = tk.BooleanVar(value=False)
         self.process_5min = tk.BooleanVar(value=False)
@@ -715,9 +718,23 @@ class SplitApp:
         ttk.Entry(dest_frame, textvariable=self.dest_dir, width=60).grid(row=0, column=0, padx=5)
         ttk.Button(dest_frame, text="浏览...", command=self._browse_dest).grid(row=0, column=1)
 
+        # 市场选择
+        market_frame = ttk.LabelFrame(main_frame, text="市场选择", padding="5")
+        market_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=5)
+
+        ttk.Checkbutton(market_frame, text="上证 (SH)", variable=self.market_sh).grid(row=0, column=0, padx=15)
+        ttk.Checkbutton(market_frame, text="深证 (SZ)", variable=self.market_sz).grid(row=0, column=1, padx=15)
+        ttk.Checkbutton(market_frame, text="北证 (BJ)", variable=self.market_bj).grid(row=0, column=2, padx=15)
+
+        # 全选/全不选按钮
+        select_market_frame = ttk.Frame(market_frame)
+        select_market_frame.grid(row=1, column=0, columnspan=3, pady=5)
+        ttk.Button(select_market_frame, text="全选市场", command=self._select_all_markets).pack(side=tk.LEFT, padx=5)
+        ttk.Button(select_market_frame, text="全不选市场", command=self._select_none_markets).pack(side=tk.LEFT, padx=5)
+
         # 数据类型选择
         type_frame = ttk.LabelFrame(main_frame, text="数据类型", padding="5")
-        type_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=5)
+        type_frame.grid(row=3, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=5)
 
         ttk.Checkbutton(type_frame, text="日线 (day)", variable=self.process_day).grid(row=0, column=0, padx=10)
         ttk.Checkbutton(type_frame, text="1 分钟线 (1min)", variable=self.process_1min).grid(row=0, column=1, padx=10)
@@ -734,7 +751,7 @@ class SplitApp:
 
         # 开始按钮
         button_frame = ttk.Frame(main_frame)
-        button_frame.grid(row=3, column=0, columnspan=3, pady=10)
+        button_frame.grid(row=4, column=0, columnspan=3, pady=10)
 
         self.start_button = ttk.Button(button_frame, text="开始拆分", command=self._start_split, width=20)
         self.start_button.pack(side=tk.LEFT, padx=5)
@@ -744,7 +761,7 @@ class SplitApp:
 
         # 进度条
         progress_frame = ttk.LabelFrame(main_frame, text="进度", padding="5")
-        progress_frame.grid(row=4, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=5)
+        progress_frame.grid(row=5, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=5)
 
         self.progress_var = tk.DoubleVar()
         self.progress_bar = ttk.Progressbar(progress_frame, variable=self.progress_var, maximum=100, mode='determinate')
@@ -759,7 +776,7 @@ class SplitApp:
 
         # 日志窗口
         log_frame = ttk.LabelFrame(main_frame, text="处理日志", padding="5")
-        log_frame.grid(row=5, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
+        log_frame.grid(row=6, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
 
         self.log_text = tk.Text(log_frame, height=15, width=80, state=tk.DISABLED)
         self.log_text.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
@@ -772,7 +789,7 @@ class SplitApp:
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
         main_frame.columnconfigure(0, weight=1)
-        main_frame.rowconfigure(5, weight=1)
+        main_frame.rowconfigure(6, weight=1)
         log_frame.columnconfigure(0, weight=1)
         log_frame.rowconfigure(0, weight=1)
         progress_frame.columnconfigure(0, weight=1)
@@ -806,6 +823,18 @@ class SplitApp:
         self.process_5min.set(False)
         self.process_timeline.set(False)
         self.process_trans.set(False)
+
+    def _select_all_markets(self):
+        """全选市场"""
+        self.market_sh.set(True)
+        self.market_sz.set(True)
+        self.market_bj.set(True)
+
+    def _select_none_markets(self):
+        """全不选市场"""
+        self.market_sh.set(False)
+        self.market_sz.set(False)
+        self.market_bj.set(False)
 
     def _log(self, message):
         """添加日志"""
@@ -878,12 +907,32 @@ class SplitApp:
             messagebox.showerror("错误", "请至少选择一种数据类型！")
             return False
 
+        # 检查是否至少选择了一个市场（如果选择了市场选项）
+        selected_markets = self._get_selected_markets()
+        if selected_markets:
+            # 如果用户勾选了任何市场复选框，则只处理这些市场
+            pass  # 允许空市场选择，表示处理所有市场
+
         return True
+
+    def _get_selected_markets(self):
+        """获取选中的市场列表"""
+        markets = []
+        if self.market_sh.get():
+            markets.append('SH')
+        if self.market_sz.get():
+            markets.append('SZ')
+        if self.market_bj.get():
+            markets.append('BJ')
+        return markets
 
     def _find_data_files(self):
         """查找源目录下的数据文件（仅扫描源目录本身，不递归子目录）"""
         files = {}
         src_path = Path(self.src_dir.get())
+
+        # 获取选中的市场列表
+        selected_markets = self._get_selected_markets()
 
         # 查找各种类型的数据文件（只扫描源目录本身）
         patterns = {
@@ -899,6 +948,15 @@ class SplitApp:
                 # 使用 iterdir() 只遍历源目录本身，不递归子目录
                 for item in src_path.iterdir():
                     if item.is_file() and item.match(pattern):
+                        # 提取市场前缀
+                        file_market = item.stem.split('_')[0].upper()
+
+                        # 如果选择了市场，则只处理匹配的文件
+                        if selected_markets:
+                            # 检查文件市场是否在选中市场中
+                            if file_market not in selected_markets:
+                                continue  # 跳过未选中的市场
+
                         if data_type not in files:
                             files[data_type] = []
                         files[data_type].append(item)
