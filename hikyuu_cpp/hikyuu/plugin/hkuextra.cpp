@@ -28,7 +28,7 @@ void HKU_API registerExtraKType(const string& ktype, const string& basetype, int
 
 void HKU_API releaseExtraKType() {
     auto& sm = StockManager::instance();
-    auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
+    auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA, false);
     HKU_IF_RETURN(!plugin, void());
     plugin->releaseKExtra();
 }

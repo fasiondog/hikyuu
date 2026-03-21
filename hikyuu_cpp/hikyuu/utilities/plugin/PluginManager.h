@@ -43,7 +43,7 @@ public:
     }
 
     template <typename PluginInterfaceT>
-    PluginInterfaceT* getPlugin(const std::string& pluginname) noexcept {
+    PluginInterfaceT* getPlugin(const std::string& pluginname, bool print = true) noexcept {
         PluginInterfaceT* ret{nullptr};
         try {
             {
@@ -56,7 +56,7 @@ public:
             }
 
             std::unique_ptr<PluginLoader> loader = std::make_unique<PluginLoader>(m_plugin_path);
-            if (!loader->load(pluginname)) {
+            if (!loader->load(pluginname, print)) {
                 HKU_DEBUG("Load plugin {} failed: {}", pluginname, loader->getFileName(pluginname));
                 return ret;
             }
@@ -78,10 +78,10 @@ public:
                 return ret;
             }
         } catch (const std::exception& e) {
-            HKU_ERROR("Load plugin {} failed: {}", pluginname, e.what());
+            HKU_ERROR_IF(print, "Load plugin {} failed: {}", pluginname, e.what());
             ret = nullptr;
         } catch (...) {
-            HKU_ERROR("Load plugin {} failed: unknown exception", pluginname);
+            HKU_ERROR_IF(print, "Load plugin {} failed: unknown exception", pluginname);
             ret = nullptr;
         }
         return ret;

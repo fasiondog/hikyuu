@@ -52,14 +52,7 @@ std::string HKU_API fetchTrialLicense(const std::string& email) {
 
 bool HKU_API isValidLicense() {
     auto& sm = StockManager::instance();
-    const auto& plugin_path = sm.getPluginPath();
-    PluginLoader loader(plugin_path);
-    auto plugin_name = loader.getFileName(HKU_PLUGIN_DEVICE);
-    if (!existFile(plugin_name)) {
-        return false;
-    }
-
-    auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
+    auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE, false);
     if (!plugin) {
         return false;
     }
@@ -68,8 +61,8 @@ bool HKU_API isValidLicense() {
 
 Datetime HKU_API getExpireDate() {
     auto& sm = StockManager::instance();
-    auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE);
-    HKU_ERROR_IF_RETURN(!plugin, Datetime::min(), htr("Can't find {} plugin!", HKU_PLUGIN_DEVICE));
+    auto* plugin = sm.getPlugin<DevicePluginInterface>(HKU_PLUGIN_DEVICE, false);
+    HKU_IF_RETURN(!plugin, Datetime::min());
     return plugin->getExpireDate();
 }
 

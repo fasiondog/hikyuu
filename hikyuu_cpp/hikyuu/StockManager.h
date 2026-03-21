@@ -284,7 +284,7 @@ public:
     }
 
     template <typename PluginInterfaceT>
-    PluginInterfaceT* getPlugin(const std::string& pluginname) noexcept;
+    PluginInterfaceT* getPlugin(const std::string& pluginname, bool print = true) noexcept;
 
     /** 设置多语言支持路径（仅在初始化之前有效） */
     void setLanguagePath(const std::string& path) noexcept;
@@ -446,8 +446,9 @@ inline void StockManager::setPluginPath(const std::string& path) {
 }
 
 template <typename PluginInterfaceT>
-inline PluginInterfaceT* StockManager::getPlugin(const std::string& pluginname) noexcept {
-    return m_plugin_manager.getPlugin<PluginInterfaceT>(pluginname);
+inline PluginInterfaceT* StockManager::getPlugin(const std::string& pluginname,
+                                                 bool print) noexcept {
+    return m_plugin_manager.getPlugin<PluginInterfaceT>(pluginname, print);
 }
 
 inline void StockManager::setLanguagePath(const std::string& path) noexcept {

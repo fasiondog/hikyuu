@@ -44,29 +44,31 @@ public:
         return dynamic_cast<T*>(m_plugin.get());
     }
 
-    bool load(const std::string& pluginname) noexcept {
+    bool load(const std::string& pluginname, bool print = true) noexcept {
         std::string filename = getFileName(pluginname);
         // HKU_WARN_IF_RETURN(!existFile(filename), false, "file({}) not exist!", filename);
         HKU_DEBUG_IF_RETURN(!existFile(filename), false, "file({}) not exist!", filename);
 
 #if HKU_OS_WINDOWS
         m_handle = LoadLibrary(HKU_PATH(filename).c_str());
-        HKU_WARN_IF_RETURN(!m_handle, false, "load plugin({}) failed! errcode: {}", filename,
-                           GetLastError());
+        HKU_WARN_IF_RETURN(print && !m_handle, false, "load plugin({}) failed! errcode: {}",
+                           filename, GetLastError());
 
 #else
         m_handle = dlopen(filename.c_str(), RTLD_LAZY);
-        HKU_WARN_IF_RETURN(!m_handle, false, "load plugin({}) failed! {}", filename, dlerror());
+        HKU_WARN_IF_RETURN(print && !m_handle, false, "load plugin({}) failed! {}", filename,
+                           dlerror());
 #endif
 
         typedef PluginBase* (*CreateFunction)();
         CreateFunction createFunction =
           reinterpret_cast<CreateFunction>(getFunciton("createPlugin"));
-        HKU_WARN_IF_RETURN(!createFunction, false, "Failed to get plugin({}) handle!", filename);
+        HKU_WARN_IF_RETURN(print && !createFunction, false, "Failed to get plugin({}) handle!",
+                           filename);
 
         m_plugin.reset(createFunction());
         if (!m_plugin) {
-            HKU_ERROR("Failed to create plugin ({})!", filename);
+            HKU_ERROR_IF(print, "Failed to create plugin ({})!", filename);
             unload();
             m_plugin.reset();
             return false;
