@@ -205,7 +205,7 @@ def extract_year(datetime_value, data_type='time'):
         return datetime_value // 100000000    # 12 位：YYYYMMDDHHmm
 
 
-def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_flag=None, progress_callback=None):
+def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_flag=None, progress_callback=None, specified_year=None):
     """
     通用的按年份拆分数据函数（流式处理版本）
 
@@ -216,11 +216,16 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
         table_desc: 表结构描述类
         stop_flag: 停止标志检查函数
         progress_callback: 进度回调对象，用于更新 GUI
+        specified_year: 指定的年份（如果为 None，则自动扫描所有年份）
     """
     print(f"正在进行，请稍候.....")
     print(f"源文件：{src_file_name}")
     print(f"目标目录：{dest_dir}")
     print(f"数据类型：{data_type}")
+    if specified_year:
+        print(f"指定年份：{specified_year}")
+    else:
+        print(f"将自动扫描所有年份")
 
     # 确保目标目录存在
     os.makedirs(dest_dir, exist_ok=True)
@@ -229,7 +234,10 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
     market_prefix = os.path.basename(src_file_name).split('_')[0]
 
     # 直接进行完整拆分
-    print(f"\n将进行完整拆分")
+    if specified_year:
+        print(f"\n将仅处理 {specified_year} 年的数据")
+    else:
+        print(f"\n将进行完整拆分")
     existing_stock_dates = {}
 
     # 打开源文件
@@ -298,6 +306,15 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                     if first_year <= existing_last_year:
                         first_year = existing_last_year + 1
 
+                # ✓ 修改：如果指定了年份，只保留包含该年份的股票
+                if specified_year is not None:
+                    # 如果股票数据不包含指定年份，跳过
+                    if last_year < specified_year or first_year > specified_year:
+                        continue
+                    # 限定范围为指定年份
+                    first_year = specified_year
+                    last_year = specified_year
+
                 # 更新全局年份范围
                 min_year = min(min_year, first_year)
                 max_year = max(max_year, last_year)
@@ -309,9 +326,16 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                 stock_year_ranges[stock_name] = (year, year)
 
         if min_year == float('inf'):
+            if specified_year is not None:
+                print(f"未找到 {specified_year} 年的数据")
+            else:
+                print(f"未找到任何数据")
             return
 
-        print(f"数据年份范围：{min_year} - {max_year}")
+        if specified_year is not None:
+            print(f"处理指定年份：{specified_year}")
+        else:
+            print(f"数据年份范围：{min_year} - {max_year}")
         print(f"共 {len(stock_year_ranges)} 只股票有数据")
 
         # 第三步：按年份处理（外层循环）
@@ -320,16 +344,26 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
         total_process_count = 0  # 记录总处理次数（包括同一股票的不同年份）
 
         # 计算预计的总任务数（年份数 × 股票数）
-        estimated_total_tasks = (max_year - min_year + 1) * total_stocks
+        if specified_year is not None:
+            # 指定年份模式：只处理一个年份
+            years_to_process = [specified_year]
+            estimated_total_tasks = len(stock_year_ranges)  # 只需要处理有数据的股票数
+        else:
+            # 自动扫描模式：处理所有年份
+            years_to_process = range(min_year, max_year + 1)
+            estimated_total_tasks = (max_year - min_year + 1) * total_stocks
 
         # ✓ 新增：记录每只股票的当前处理位置，利用数据有序性优化性能
         stock_current_index = {stock_name: 0 for stock_name in
                                (src_table._v_name for src_table in src_hdf5.walk_nodes('/data')
                                 if hasattr(src_table, '_v_name') and src_table._v_name != 'data')}
 
-        for year in range(min_year, max_year + 1):
+        for year in years_to_process:
             print(f"\n{'='*80}")
-            print(f"处理年份：{year}")
+            if specified_year is not None:
+                print(f"处理指定年份：{year}")
+            else:
+                print(f"处理年份：{year}")
 
             # ✓ 优化：如果没有任何股票包含该年份的数据，直接跳过整个年份
             has_data_for_year = any(
@@ -598,7 +632,7 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
         src_hdf5.close()
 
 
-def split_kdata_by_year(src_file_name, dest_dir, data_type='day', stop_flag=None, progress_callback=None):
+def split_kdata_by_year(src_file_name, dest_dir, data_type='day', stop_flag=None, progress_callback=None, specified_year=None):
     """
     将 K 线数据文件（日 K、分钟线）按年份拆分（流式处理版本）
 
@@ -608,12 +642,15 @@ def split_kdata_by_year(src_file_name, dest_dir, data_type='day', stop_flag=None
         data_type: 数据类型（'day', '1min', '5min'）
         stop_flag: 停止标志检查函数
         progress_callback: 进度回调对象，用于更新 GUI
+        specified_year: 指定的年份（如果为 None，则自动扫描所有年份）
     """
     print(f"\n{'='*80}")
     print(f"正在进行 K 线数据拆分...")
     print(f"源文件：{src_file_name}")
     print(f"目标目录：{dest_dir}")
     print(f"数据类型：{data_type}")
+    if specified_year:
+        print(f"指定年份：{specified_year}")
 
     # 确保目标目录存在
     os.makedirs(dest_dir, exist_ok=True)
@@ -638,11 +675,12 @@ def split_kdata_by_year(src_file_name, dest_dir, data_type='day', stop_flag=None
         data_type=data_type,
         table_desc=table_desc,
         stop_flag=stop_flag,
-        progress_callback=progress_callback
+        progress_callback=progress_callback,
+        specified_year=specified_year
     )
 
 
-def split_timeline_by_year(src_file_name, dest_dir, stop_flag=None, progress_callback=None):
+def split_timeline_by_year(src_file_name, dest_dir, stop_flag=None, progress_callback=None, specified_year=None):
     """
     将分时线数据文件按年份拆分
 
@@ -651,12 +689,13 @@ def split_timeline_by_year(src_file_name, dest_dir, stop_flag=None, progress_cal
         dest_dir: 目标目录
         stop_flag: 停止标志检查函数
         progress_callback: 进度回调对象，用于更新 GUI
+        specified_year: 指定的年份（如果为 None，则自动扫描所有年份）
     """
     _split_data_by_year(src_file_name, dest_dir, 'time', TimeLineRecordH5File,
-                        stop_flag=stop_flag, progress_callback=progress_callback)
+                        stop_flag=stop_flag, progress_callback=progress_callback, specified_year=specified_year)
 
 
-def split_trans_by_year(src_file_name, dest_dir, stop_flag=None, progress_callback=None):
+def split_trans_by_year(src_file_name, dest_dir, stop_flag=None, progress_callback=None, specified_year=None):
     """
     将分笔成交数据文件按年份拆分
 
@@ -665,9 +704,10 @@ def split_trans_by_year(src_file_name, dest_dir, stop_flag=None, progress_callba
         dest_dir: 目标目录
         stop_flag: 停止标志检查函数
         progress_callback: 进度回调对象，用于更新 GUI
+        specified_year: 指定的年份（如果为 None，则自动扫描所有年份）
     """
     _split_data_by_year(src_file_name, dest_dir, 'trans', TransRecordH5File,
-                        stop_flag=stop_flag, progress_callback=progress_callback)
+                        stop_flag=stop_flag, progress_callback=progress_callback, specified_year=specified_year)
 
 # 移除了 split_single_file 函数，因为我们现在统一按年份合并所有股票
 
@@ -691,6 +731,10 @@ class SplitApp:
         self.process_5min = tk.BooleanVar(value=False)
         self.process_timeline = tk.BooleanVar(value=False)
         self.process_trans = tk.BooleanVar(value=False)
+
+        # 新增：年份限定选项
+        self.limit_year = tk.BooleanVar(value=False)  # 是否只导入指定年份
+        self.year_input = tk.StringVar()  # 年份输入框
 
         self.log_queue = queue.Queue()
         self.is_processing = False
@@ -718,9 +762,17 @@ class SplitApp:
         ttk.Entry(dest_frame, textvariable=self.dest_dir, width=60).grid(row=0, column=0, padx=5)
         ttk.Button(dest_frame, text="浏览...", command=self._browse_dest).grid(row=0, column=1)
 
-        # 市场选择
-        market_frame = ttk.LabelFrame(main_frame, text="市场选择", padding="5")
-        market_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=5)
+        # 市场选择和年份限定（同一行）
+        market_year_frame = ttk.Frame(main_frame)
+        market_year_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=5)
+
+        # 配置父容器的列权重，使左右两侧都能扩展
+        market_year_frame.columnconfigure(0, weight=1)  # 左侧市场选择
+        market_year_frame.columnconfigure(1, weight=1)  # 右侧年份限定
+
+        # 左侧：市场选择
+        market_frame = ttk.LabelFrame(market_year_frame, text="市场选择", padding="5")
+        market_frame.grid(row=0, column=0, sticky=(tk.W, tk.E), padx=(0, 10))
 
         ttk.Checkbutton(market_frame, text="上证 (SH)", variable=self.market_sh).grid(row=0, column=0, padx=15)
         ttk.Checkbutton(market_frame, text="深证 (SZ)", variable=self.market_sz).grid(row=0, column=1, padx=15)
@@ -731,6 +783,24 @@ class SplitApp:
         select_market_frame.grid(row=1, column=0, columnspan=3, pady=5)
         ttk.Button(select_market_frame, text="全选市场", command=self._select_all_markets).pack(side=tk.LEFT, padx=5)
         ttk.Button(select_market_frame, text="全不选市场", command=self._select_none_markets).pack(side=tk.LEFT, padx=5)
+
+        # 右侧：年份限定
+        year_frame = ttk.LabelFrame(market_year_frame, text="年份限定", padding="5")
+        year_frame.grid(row=0, column=1, sticky=(tk.W, tk.E))
+
+        ttk.Checkbutton(year_frame, text="只导入指定年份（不勾选则自动扫描所有年份）",
+                        variable=self.limit_year).grid(row=0, column=0, padx=10, sticky=tk.W)
+
+        year_input_frame = ttk.Frame(year_frame)
+        year_input_frame.grid(row=1, column=0, sticky=tk.W, pady=(5, 0))
+
+        ttk.Label(year_input_frame, text="年份:").pack(side=tk.LEFT, padx=5)
+        self.year_entry = ttk.Entry(year_input_frame, textvariable=self.year_input, width=10)
+        self.year_entry.pack(side=tk.LEFT, padx=5)
+        ttk.Label(year_input_frame, text="(4 位数字，如：2023)", foreground='gray').pack(side=tk.LEFT, padx=5)
+
+        # 绑定验证函数，限制只能输入 4 位数字
+        self.year_entry.bind('<KeyRelease>', self._validate_year_input)
 
         # 数据类型选择
         type_frame = ttk.LabelFrame(main_frame, text="数据类型", padding="5")
@@ -789,7 +859,9 @@ class SplitApp:
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
         main_frame.columnconfigure(0, weight=1)
-        main_frame.rowconfigure(6, weight=1)
+        main_frame.columnconfigure(1, weight=1)
+        main_frame.columnconfigure(2, weight=1)
+        main_frame.rowconfigure(6, weight=1)  # 日志框所在行
         log_frame.columnconfigure(0, weight=1)
         log_frame.rowconfigure(0, weight=1)
         progress_frame.columnconfigure(0, weight=1)
@@ -835,6 +907,40 @@ class SplitApp:
         self.market_sh.set(False)
         self.market_sz.set(False)
         self.market_bj.set(False)
+
+    def _validate_year_input(self, event=None):
+        """验证年份输入，确保为 4 位数字"""
+        year_text = self.year_input.get()
+
+        # 只保留数字字符
+        filtered = ''.join(c for c in year_text if c.isdigit())
+
+        # 限制为 4 位
+        if len(filtered) > 4:
+            filtered = filtered[:4]
+
+        # 更新输入框内容（如果发生了变化）
+        if filtered != year_text:
+            self.year_entry.delete(0, tk.END)
+            self.year_entry.insert(0, filtered)
+
+        return True
+
+    def _get_specified_year(self):
+        """获取用户指定的年份（如果有效）"""
+        if not self.limit_year.get():
+            return None
+
+        year_text = self.year_input.get().strip()
+
+        # 验证是否为 4 位数字
+        if len(year_text) == 4 and year_text.isdigit():
+            year = int(year_text)
+            # 可选：验证年份范围（如 1990-2030）
+            if 1900 <= year <= 2100:
+                return year
+
+        return None
 
     def _log(self, message):
         """添加日志"""
@@ -907,6 +1013,13 @@ class SplitApp:
             messagebox.showerror("错误", "请至少选择一种数据类型！")
             return False
 
+        # 如果选择了限定年份，验证年份输入
+        if self.limit_year.get():
+            specified_year = self._get_specified_year()
+            if specified_year is None:
+                messagebox.showerror("错误", "请输入有效的 4 位年份数字（如：2023）！")
+                return False
+
         # 检查是否至少选择了一个市场（如果选择了市场选项）
         selected_markets = self._get_selected_markets()
         if selected_markets:
@@ -963,10 +1076,12 @@ class SplitApp:
 
         return files
 
-    def _process_file(self, src_file, dest_dir, data_type, stop_flag=None, progress_callback=None):
+    def _process_file(self, src_file, dest_dir, data_type, stop_flag=None, progress_callback=None, specified_year=None):
         """处理单个文件（支持可中断和日志重定向）"""
         try:
             self._log(f"\n处理文件：{src_file.name}")
+            if specified_year:
+                self._log(f"指定年份：{specified_year}")
 
             # 创建日志重定向器
             redirector = GUILogRedirector(self._log)
@@ -975,13 +1090,13 @@ class SplitApp:
             try:
                 if data_type == 'time':
                     split_timeline_by_year(str(src_file), str(dest_dir), stop_flag=stop_flag,
-                                           progress_callback=progress_callback)
+                                           progress_callback=progress_callback, specified_year=specified_year)
                 elif data_type == 'trans':
                     split_trans_by_year(str(src_file), str(dest_dir), stop_flag=stop_flag,
-                                        progress_callback=progress_callback)
+                                        progress_callback=progress_callback, specified_year=specified_year)
                 else:
                     split_kdata_by_year(str(src_file), str(dest_dir), data_type=data_type,
-                                        stop_flag=stop_flag, progress_callback=progress_callback)
+                                        stop_flag=stop_flag, progress_callback=progress_callback, specified_year=specified_year)
 
                 self._log(f"✓ {src_file.name} 处理完成")
                 return True
@@ -1073,6 +1188,9 @@ class SplitApp:
                 dest_subdir = Path(self.dest_dir.get()) / market / data_type
                 dest_subdir.mkdir(parents=True, exist_ok=True)
 
+                # 获取指定的年份（如果有）
+                specified_year = self._get_specified_year()
+
                 # 处理文件（传入停止标志检查函数和进度回调）
                 # 注意：必须在循环外部定义 lambda，避免闭包问题
                 def stop_check(): return not self.is_processing
@@ -1107,7 +1225,7 @@ class SplitApp:
 
                 callback = ProgressCallback(on_stock_progress)
 
-                if self._process_file(src_file, dest_subdir, data_type, stop_flag=stop_check, progress_callback=callback):
+                if self._process_file(src_file, dest_subdir, data_type, stop_flag=stop_check, progress_callback=callback, specified_year=specified_year):
                     success_count += 1
 
                 # 每处理完一个文件，让出一点时间给 GUI
