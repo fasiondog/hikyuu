@@ -369,6 +369,40 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                 dest_group = dest_hdf5.create_group("/", "data", "Stock Data")
             
             try:
+                # ✓ 新增：提前检查并清理所有已存在的有问题的表和空表（在处理任何股票之前）
+                # 这样可以确保即使某只股票没有该年份的数据，也不会留下问题表或空表
+                try:
+                    data_group = dest_hdf5.get_node("/data")
+                    for node in data_group:
+                        if isinstance(node, tables.Table):
+                            stock_name_check = node._v_name
+                            should_delete = False
+                            delete_reason = ""
+                            
+                            # 检查 1：表结构是否匹配
+                            try:
+                                required_cols = ['datetime']
+                                for col_name in required_cols:
+                                    if col_name not in node.colnames:
+                                        raise ValueError(f"表结构不匹配：缺少 {col_name} 字段")
+                            except (ValueError, KeyError) as e:
+                                should_delete = True
+                                delete_reason = f"结构错误：{e}"
+                            
+                            # 检查 2：表是否为空
+                            if not should_delete and len(node) == 0:
+                                should_delete = True
+                                delete_reason = "空表"
+                            
+                            # 如果发现问题，删除该表
+                            if should_delete:
+                                print(f"  发现并删除问题表：{stock_name_check} ({year}) - {delete_reason}")
+                                dest_hdf5.remove_node("/data", stock_name_check)
+                                    
+                except Exception as e:
+                    # 检查过程中出错，忽略（可能是/data 组不存在等）
+                    print(f"  检查已有表结构时出错：{e}")
+                
                 # 内层循环：遍历所有股票，处理该年份的数据
                 # 注意：需要重新创建迭代器，因为 walk_nodes 是消耗型的
                 stock_tables_iter_inner = src_hdf5.walk_nodes('/data')
@@ -413,6 +447,7 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                         raise InterruptedError("用户取消拆分操作")
                     
                     # 获取或创建股票表
+                    table_existed = False  # 标记表是否已存在
                     try:
                         dest_table = dest_hdf5.get_node("/data", stock_name)
                         # 表已存在：获取最后一条记录的 datetime，用于增量追加
@@ -420,10 +455,15 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                             existing_last_datetime = dest_table[-1]['datetime']
                         else:
                             existing_last_datetime = 0
+                        table_existed = True
+                        # 注意：表结构检查已在年份级别提前完成，这里不再重复检查
+                        
                     except tables.NoSuchNodeError:
-                        # 新表：该股票在该年份的文件中不存在，需要创建
-                        existing_last_datetime = 0
-                        # 新建股票表
+                        # 新表：该股票在该年份的文件中不存在
+                        dest_table = None
+                    
+                    # 如果表不存在或已被删除，创建新表
+                    if dest_table is None:
                         table_title = f"{table_desc.__doc__ or 'Stock Data'}"
                         dest_table = dest_hdf5.create_table("/data", name=stock_name,
                                                             description=table_desc, title=table_title)
@@ -483,9 +523,25 @@ def _split_data_by_year(src_file_name, dest_dir, data_type, table_desc, stop_fla
                         except Exception:
                             continue
                     
-                    # 如果一直没找到目标年份的数据，更新到末尾
-                    if not found_target_year:
-                        stock_current_index[stock_name] = len(src_table)
+                    # 如果一直没找到目标年份的数据，不要修改 stock_current_index
+                    # 因为后续年份可能还有数据，保持当前位置即可
+                    
+                    # ✓ 新增：如果该股票在该年份文件中最终没有任何数据，则删除空表
+                    # 无论表是新建的还是已存在的，只要最终没有数据就删除
+                    if new_records_count == 0:
+                        try:
+                            # 尝试获取表节点
+                            dest_table_check = dest_hdf5.get_node("/data", stock_name)
+                            # 如果表存在且为空，删除它
+                            if len(dest_table_check) == 0:
+                                dest_hdf5.remove_node("/data", stock_name)
+                                if table_existed:
+                                    print(f"  删除已存在的空表：{stock_name} ({year})")
+                                else:
+                                    print(f"  删除新建的空表：{stock_name} ({year})")
+                        except tables.NoSuchNodeError:
+                            # 表不存在，正常（可能已被删除）
+                            pass
                     
                     # ✓ 修复：无论是否有新数据，都要更新进度显示
                     # 原始问题：只有 new_records_count > 0 时才更新进度，导致进度条停滞
