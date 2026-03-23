@@ -12,6 +12,7 @@ from tkinter import ttk, filedialog, messagebox
 import threading
 import queue
 import re
+import bisect
 
 
 class GUILogRedirector:
@@ -171,6 +172,70 @@ def get_table_desc(data_type):
         raise ValueError(f"不支持的数据类型：{data_type}")
 
     return table_map[data_type]
+
+
+def binary_search_insert_position(table, datetime_value, start=0, end=None):
+    """使用二分查找确定 datetime_value 应该插入的位置
+    
+    参数:
+        table: tables.Table 对象，必须按 datetime 字段升序排序
+        datetime_value: 要查找插入位置的 datetime 值
+        start: 搜索起始位置（默认从 0 开始）
+        end: 搜索结束位置（默认为表长度）
+    
+    返回:
+        int: 应该插入的位置索引，使得插入后仍保持有序
+        
+    说明:
+        返回的位置是第一个大于等于 datetime_value 的记录位置。
+        如果所有记录都小于 datetime_value，返回 table.nrows。
+    """
+    if end is None:
+        end = table.nrows
+    
+    # 使用 bisect 模块进行二分查找
+    # 我们需要创建一个代理类来支持 bisect 对 table 的访问
+    class TableProxy:
+        def __init__(self, table, start, end):
+            self.table = table
+            self.start = start
+            self.end = end
+            
+        def __len__(self):
+            return self.end - self.start
+            
+        def __getitem__(self, idx):
+            row_idx = self.start + idx
+            if 0 <= row_idx < self.table.nrows:
+                return self.table[row_idx]['datetime']
+            raise IndexError("索引超出范围")
+    
+    proxy = TableProxy(table, start, end)
+    position = bisect.bisect_left(proxy, datetime_value)
+    
+    return start + position
+
+
+def find_first_newer_record_index(table, cutoff_datetime):
+    """使用二分查找定位第一条大于 cutoff_datetime 的记录索引
+    
+    参数:
+        table: PyTables Table 对象，数据已按 datetime 排序
+        cutoff_datetime: 截止时间，只处理 datetime > cutoff_datetime 的记录
+        
+    返回:
+        int: 第一条需要处理的记录索引，若所有记录都 <= cutoff_datetime 则返回 table.nrows
+    """
+    if table.nrows == 0 or cutoff_datetime <= 0:
+        return 0
+    
+    # 提取所有 datetime 值用于二分查找
+    datetimes = table.read(field='datetime')
+    
+    # 使用 bisect_right 找到第一个大于 cutoff_datetime 的位置
+    index = bisect.bisect_right(datetimes, cutoff_datetime)
+    
+    return index
 
 
 def get_existing_stocks_in_merged_file(dest_filepath):
@@ -477,15 +542,16 @@ def merge_files_by_market(data_dir, dest_dir, market, data_type, table_desc):
                                 # 表已在本次合并中创建或追加过
                                 dest_table = dest_hdf5.get_node(dest_group, stock_name)
 
-                                # 追加记录（如果有新数据）
-                                for row in src_table:
-                                    datetime_val = row['datetime']
+                                # 使用二分查找定位第一条需要处理的记录
+                                start_index = 0
+                                if existing_last_date > 0:
+                                    start_index = find_first_newer_record_index(src_table, existing_last_date)
+                                    skipped_records_count = start_index
 
-                                    # 增量检查：跳过已有的数据
-                                    if existing_last_date > 0 and datetime_val <= existing_last_date:
-                                        skipped_records_count += 1
-                                        continue
-
+                                # 从定位到的位置开始追加记录
+                                new_records_count = 0
+                                for i in range(start_index, src_table.nrows):
+                                    row = src_table[i]
                                     dest_row = dest_table.row
                                     for col_name in dest_table.colnames:
                                         try:
@@ -504,15 +570,16 @@ def merge_files_by_market(data_dir, dest_dir, market, data_type, table_desc):
                                     # 股票表已存在，需要追加
                                     dest_table = dest_hdf5.get_node(dest_group, stock_name)
 
-                                    # 追加记录（跳过已有数据）
-                                    for row in src_table:
-                                        datetime_val = row['datetime']
+                                    # 使用二分查找定位第一条需要处理的记录
+                                    start_index = 0
+                                    if existing_last_date > 0:
+                                        start_index = find_first_newer_record_index(src_table, existing_last_date)
+                                        skipped_records_count = start_index
 
-                                        # 增量检查：跳过已有的数据
-                                        if existing_last_date > 0 and datetime_val <= existing_last_date:
-                                            skipped_records_count += 1
-                                            continue
-
+                                    # 从定位到的位置开始追加记录
+                                    new_records_count = 0
+                                    for i in range(start_index, src_table.nrows):
+                                        row = src_table[i]
                                         dest_row = dest_table.row
                                         for col_name in dest_table.colnames:
                                             try:
@@ -711,15 +778,16 @@ def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, t
                                 # 表已在本次合并中创建或追加过
                                 dest_table = dest_hdf5.get_node(dest_group, stock_name)
 
-                                # 追加记录（如果有新数据）
-                                for row in src_table:
-                                    datetime_val = row['datetime']
+                                # 使用二分查找定位第一条需要处理的记录
+                                start_index = 0
+                                if existing_last_date > 0:
+                                    start_index = find_first_newer_record_index(src_table, existing_last_date)
+                                    skipped_records_count = start_index
 
-                                    # 增量检查：跳过已有的数据
-                                    if existing_last_date > 0 and datetime_val <= existing_last_date:
-                                        skipped_records_count += 1
-                                        continue
-
+                                # 从定位到的位置开始追加记录
+                                new_records_count = 0
+                                for i in range(start_index, src_table.nrows):
+                                    row = src_table[i]
                                     dest_row = dest_table.row
                                     for col_name in dest_table.colnames:
                                         try:
@@ -738,15 +806,16 @@ def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, t
                                     # 股票表已存在，需要追加
                                     dest_table = dest_hdf5.get_node(dest_group, stock_name)
 
-                                    # 追加记录（跳过已有数据）
-                                    for row in src_table:
-                                        datetime_val = row['datetime']
+                                    # 使用二分查找定位第一条需要处理的记录
+                                    start_index = 0
+                                    if existing_last_date > 0:
+                                        start_index = find_first_newer_record_index(src_table, existing_last_date)
+                                        skipped_records_count = start_index
 
-                                        # 增量检查：跳过已有的数据
-                                        if existing_last_date > 0 and datetime_val <= existing_last_date:
-                                            skipped_records_count += 1
-                                            continue
-
+                                    # 从定位到的位置开始追加记录
+                                    new_records_count = 0
+                                    for i in range(start_index, src_table.nrows):
+                                        row = src_table[i]
                                         dest_row = dest_table.row
                                         for col_name in dest_table.colnames:
                                             try:
