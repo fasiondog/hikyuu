@@ -187,6 +187,7 @@ def get_existing_stocks_in_merged_file(dest_filepath):
         因为不能假设"最后一条记录"就是"时间上最新的数据"。
         特别是当数据可能乱序或部分更新时。
     """
+    print(f"正在检查已存在的合并文件：{dest_filepath}")
     stock_max_dates = {}
 
     # 检查文件是否存在
