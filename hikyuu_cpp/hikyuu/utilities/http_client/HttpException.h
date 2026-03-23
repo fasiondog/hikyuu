@@ -13,9 +13,9 @@ namespace hku {
 
 struct HttpTimeoutException : hku::exception {
     HttpTimeoutException() : hku::exception("Http timeout!") {}
-    HttpTimeoutException(const char* msg) : hku::exception(msg) {}
-    HttpTimeoutException(const std::string& msg) : hku::exception(msg) {}
-    virtual ~HttpTimeoutException() noexcept = default;
+    explicit HttpTimeoutException(const char* msg) : hku::exception(msg) {}
+    explicit HttpTimeoutException(const std::string& msg) : hku::exception(msg) {}
+    virtual ~HttpTimeoutException() noexcept override = default;
 };
 
 }  // namespace hku

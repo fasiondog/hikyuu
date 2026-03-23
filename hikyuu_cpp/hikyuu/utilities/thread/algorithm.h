@@ -828,7 +828,7 @@ auto co_run_ec(Executor exec, Func&& func) -> asio::awaitable<typename std::invo
 
                   try {
                       func();
-                  } catch (const std::exception& e) {
+                  } catch (const std::exception&) {
                       ec = boost::system::errc::make_error_code(boost::system::errc::io_error);
                   } catch (...) {
                       ec =
@@ -854,7 +854,7 @@ auto co_run_ec(Executor exec, Func&& func) -> asio::awaitable<typename std::invo
 
                   try {
                       result = func();
-                  } catch (const std::exception& e) {
+                  } catch (const std::exception&) {
                       ec = boost::system::errc::make_error_code(boost::system::errc::io_error);
                   } catch (...) {
                       ec =
