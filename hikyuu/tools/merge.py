@@ -204,15 +204,10 @@ def get_existing_stocks_in_merged_file(dest_filepath):
                 if isinstance(table, tables.Table):
                     stock_name = table._v_name
 
-                    # 读取该股票表的所有记录，找出最大 datetime
+                    # 数据已按 datetime 排序，直接读取最后一条记录获取最大 datetime
                     if table.nrows > 0:
-                        max_datetime = 0
-                        for row in table:
-                            dt = row['datetime']
-                            if dt > max_datetime:
-                                max_datetime = dt
-
-                        stock_max_dates[stock_name] = max_datetime
+                        last_row = table[table.nrows - 1]
+                        stock_max_dates[stock_name] = last_row['datetime']
         except Exception as e:
             print(f"  警告：无法访问/data 组：{e}")
 
