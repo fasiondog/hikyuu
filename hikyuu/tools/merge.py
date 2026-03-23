@@ -176,23 +176,23 @@ def get_table_desc(data_type):
 
 def binary_search_insert_position(table, datetime_value, start=0, end=None):
     """使用二分查找确定 datetime_value 应该插入的位置
-    
+
     参数:
         table: tables.Table 对象，必须按 datetime 字段升序排序
         datetime_value: 要查找插入位置的 datetime 值
         start: 搜索起始位置（默认从 0 开始）
         end: 搜索结束位置（默认为表长度）
-    
+
     返回:
         int: 应该插入的位置索引，使得插入后仍保持有序
-        
+
     说明:
         返回的位置是第一个大于等于 datetime_value 的记录位置。
         如果所有记录都小于 datetime_value，返回 table.nrows。
     """
     if end is None:
         end = table.nrows
-    
+
     # 使用 bisect 模块进行二分查找
     # 我们需要创建一个代理类来支持 bisect 对 table 的访问
     class TableProxy:
@@ -200,41 +200,41 @@ def binary_search_insert_position(table, datetime_value, start=0, end=None):
             self.table = table
             self.start = start
             self.end = end
-            
+
         def __len__(self):
             return self.end - self.start
-            
+
         def __getitem__(self, idx):
             row_idx = self.start + idx
             if 0 <= row_idx < self.table.nrows:
                 return self.table[row_idx]['datetime']
             raise IndexError("索引超出范围")
-    
+
     proxy = TableProxy(table, start, end)
     position = bisect.bisect_left(proxy, datetime_value)
-    
+
     return start + position
 
 
 def find_first_newer_record_index(table, cutoff_datetime):
     """使用二分查找定位第一条大于 cutoff_datetime 的记录索引
-    
+
     参数:
         table: PyTables Table 对象，数据已按 datetime 排序
         cutoff_datetime: 截止时间，只处理 datetime > cutoff_datetime 的记录
-        
+
     返回:
         int: 第一条需要处理的记录索引，若所有记录都 <= cutoff_datetime 则返回 table.nrows
     """
     if table.nrows == 0 or cutoff_datetime <= 0:
         return 0
-    
+
     # 提取所有 datetime 值用于二分查找
     datetimes = table.read(field='datetime')
-    
+
     # 使用 bisect_right 找到第一个大于 cutoff_datetime 的位置
     index = bisect.bisect_right(datetimes, cutoff_datetime)
-    
+
     return index
 
 
@@ -455,209 +455,6 @@ def scan_split_directory(src_dir, data_types):
     return result
 
 
-def merge_files_by_market(data_dir, dest_dir, market, data_type, table_desc):
-    """
-    合并特定市场和数据类型的所有年份文件（支持增量合并）
-
-    参数:
-        data_dir: 数据目录
-        dest_dir: 目标目录
-        market: 市场前缀（如 sh, sz, bj）
-        data_type: 数据类型
-        table_desc: 表结构描述类
-    """
-    print(f"\n开始合并市场 {market} 的 {data_type} 数据...")
-
-    # 查找所有年份文件
-    year_files = find_year_files_recursive(data_dir, market, data_type)
-
-    if not year_files:
-        print(f"  未找到 {market}_{data_type}_*.h5 文件")
-        return False
-
-    print(f"  找到 {len(year_files)} 个年份文件")
-
-    # 构建目标文件名
-    dest_filename = f"{market}_{data_type}.h5"
-    dest_filepath = os.path.join(dest_dir, dest_filename)
-
-    print(f"  目标文件：{dest_filename}")
-
-    # 获取已存在的股票信息（增量合并）
-    existing_stocks = get_existing_stocks_in_merged_file(dest_filepath)
-
-    if existing_stocks:
-        print(f"  将进行增量合并，只处理新增或更新的股票")
-    else:
-        print(f"  创建新文件进行完整合并")
-
-    # 创建或打开目标文件
-    mode = "a" if os.path.exists(dest_filepath) else "w"
-    dest_hdf5 = tables.open_file(dest_filepath, mode=mode,
-                                 filters=tables.Filters(complevel=9, complib='zlib', shuffle=True))
-
-    try:
-        # 获取或创建 data 组
-        if os.path.exists(dest_filepath):
-            try:
-                dest_group = dest_hdf5.get_node("/data")
-            except Exception:
-                dest_group = dest_hdf5.create_group("/", "data", title="Stock Data")
-        else:
-            dest_group = dest_hdf5.create_group("/", "data", title="Stock Data")
-
-        # 统计信息
-        total_stocks = 0
-        total_records = 0
-        stocks_merged = set()
-        stocks_appended = 0
-        stocks_created = 0
-
-        # 进度条
-        progress = ProgressBar("    处理年份", 60)
-
-        # 逐个处理年份文件
-        for i, year_file in enumerate(year_files):
-            progress.update(i + 1, len(year_files),
-                            sub_description=f"{os.path.basename(year_file)}")
-
-            try:
-                src_hdf5 = tables.open_file(year_file, mode='r')
-
-                # 遍历/data 组下的所有股票表
-                try:
-                    data_group = src_hdf5.get_node('/data')
-
-                    for src_table in data_group:
-                        if isinstance(src_table, tables.Table):
-                            stock_name = src_table._v_name
-
-                            # 获取该股票在已存在文件中的最后日期
-                            existing_last_date = existing_stocks.get(stock_name, 0)
-                            new_records_count = 0
-                            skipped_records_count = 0
-
-                            # 如果该股票表已存在，则追加新增数据；否则创建新表
-                            if stock_name in stocks_merged:
-                                # 表已在本次合并中创建或追加过
-                                dest_table = dest_hdf5.get_node(dest_group, stock_name)
-
-                                # 使用二分查找定位第一条需要处理的记录
-                                start_index = 0
-                                if existing_last_date > 0:
-                                    start_index = find_first_newer_record_index(src_table, existing_last_date)
-                                    skipped_records_count = start_index
-
-                                # 从定位到的位置开始追加记录
-                                new_records_count = 0
-                                for i in range(start_index, src_table.nrows):
-                                    row = src_table[i]
-                                    dest_row = dest_table.row
-                                    for col_name in dest_table.colnames:
-                                        try:
-                                            dest_row[col_name] = row[col_name]
-                                        except KeyError:
-                                            pass
-                                    dest_row.append()
-                                    new_records_count += 1
-
-                                dest_table.flush()
-                                total_records += new_records_count
-
-                            else:
-                                # 第一次遇到该股票
-                                if stock_name in existing_stocks:
-                                    # 股票表已存在，需要追加
-                                    dest_table = dest_hdf5.get_node(dest_group, stock_name)
-
-                                    # 使用二分查找定位第一条需要处理的记录
-                                    start_index = 0
-                                    if existing_last_date > 0:
-                                        start_index = find_first_newer_record_index(src_table, existing_last_date)
-                                        skipped_records_count = start_index
-
-                                    # 从定位到的位置开始追加记录
-                                    new_records_count = 0
-                                    for i in range(start_index, src_table.nrows):
-                                        row = src_table[i]
-                                        dest_row = dest_table.row
-                                        for col_name in dest_table.colnames:
-                                            try:
-                                                dest_row[col_name] = row[col_name]
-                                            except KeyError:
-                                                pass
-                                        dest_row.append()
-                                        new_records_count += 1
-
-                                    dest_table.flush()
-                                    total_records += new_records_count
-                                    stocks_appended += 1
-
-                                else:
-                                    # 创建新表
-                                    dest_table = dest_hdf5.create_table(dest_group, stock_name, table_desc,
-                                                                        title=stock_name)
-
-                                    # 复制记录
-                                    for row in src_table:
-                                        dest_row = dest_table.row
-                                        for col_name in dest_table.colnames:
-                                            try:
-                                                dest_row[col_name] = row[col_name]
-                                            except KeyError:
-                                                pass
-                                        dest_row.append()
-
-                                    dest_table.flush()
-                                    total_stocks += 1
-                                    total_records += src_table.nrows
-                                    stocks_created += 1
-                                    new_records_count = src_table.nrows
-
-                            stocks_merged.add(stock_name)
-
-                            # 打印该股票的处理情况
-                            if existing_last_date > 0 and (skipped_records_count > 0 or new_records_count > 0):
-                                print(f"      ✓ {stock_name}: 新增 {new_records_count:,} 条，跳过 {skipped_records_count:,} 条")
-                            elif stock_name in existing_stocks:
-                                print(f"      ✓ {stock_name}: 追加 {new_records_count:,} 条记录")
-                            else:
-                                print(f"      ✓ {stock_name}: 创建 {new_records_count:,} 条记录")
-
-                except Exception as e:
-                    print(f"      警告：无法访问/data 组：{e}")
-
-                src_hdf5.close()
-
-            except Exception as e:
-                print(f"    读取文件 {os.path.basename(year_file)} 时出错：{e}")
-                continue
-
-        # 完成
-        progress.finish(message=f"\n    ✓ 合并完成：{len(stocks_merged)} 只股票，{total_records:,} 条记录")
-        print(f"  ✓ {market}_{data_type} 合并完成 -> {dest_filename}")
-        print(f"    - 新建股票表：{stocks_created} 只")
-        print(f"    - 追加数据：{stocks_appended} 只")
-
-        return True
-
-    except Exception as e:
-        print(f"  写入目标文件时出错：{e}")
-        import traceback
-        traceback.print_exc()
-        dest_hdf5.close()
-        # 如果出错，删除不完整的目标文件
-        if os.path.exists(dest_filepath):
-            os.remove(dest_filepath)
-        return False
-
-    finally:
-        try:
-            dest_hdf5.close()
-        except:
-            pass
-
-
 def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, table_desc, stop_flag=None, progress_callback=None, market_index=0, total_markets=1):
     """
     合并特定市场和数据类型的所有年份文件（支持进度更新和可中断）
@@ -747,6 +544,12 @@ def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, t
             try:
                 src_hdf5 = tables.open_file(year_file, mode='r')
 
+                # 再次检查停止标志（IO 操作后）
+                if stop_flag and stop_flag():
+                    print(f"\n  用户取消处理年份文件：{os.path.basename(year_file)}")
+                    src_hdf5.close()
+                    return False
+
                 # 遍历/data 组下的所有股票表
                 try:
                     data_group = src_hdf5.get_node('/data')
@@ -786,16 +589,24 @@ def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, t
 
                                 # 从定位到的位置开始追加记录
                                 new_records_count = 0
+                                record_count = 0
                                 for i in range(start_index, src_table.nrows):
-                                    row = src_table[i]
-                                    dest_row = dest_table.row
-                                    for col_name in dest_table.colnames:
-                                        try:
-                                            dest_row[col_name] = row[col_name]
-                                        except KeyError:
-                                            pass
-                                    dest_row.append()
-                                    new_records_count += 1
+                                    # 每处理 100 条记录检查一次停止标志
+                                    record_count += 1
+                                    if record_count % 100 == 0:
+                                        if stop_flag and stop_flag():
+                                            print(f"\n  用户取消处理，当前股票：{stock_name}，已处理 {record_count} 条记录")
+                                            raise InterruptedError("用户取消处理")
+
+                                        row = src_table[i]
+                                        dest_row = dest_table.row
+                                        for col_name in dest_table.colnames:
+                                            try:
+                                                dest_row[col_name] = row[col_name]
+                                            except KeyError:
+                                                pass
+                                        dest_row.append()
+                                        new_records_count += 1
 
                                 dest_table.flush()
                                 total_records += new_records_count
@@ -814,20 +625,28 @@ def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, t
 
                                     # 从定位到的位置开始追加记录
                                     new_records_count = 0
+                                    record_count = 0
                                     for i in range(start_index, src_table.nrows):
-                                        row = src_table[i]
-                                        dest_row = dest_table.row
-                                        for col_name in dest_table.colnames:
-                                            try:
-                                                dest_row[col_name] = row[col_name]
-                                            except KeyError:
-                                                pass
-                                        dest_row.append()
-                                        new_records_count += 1
+                                        # 每处理 100 条记录检查一次停止标志
+                                        record_count += 1
+                                        if record_count % 100 == 0:
+                                            if stop_flag and stop_flag():
+                                                print(f"\n  用户取消处理，当前股票：{stock_name}，已处理 {record_count} 条记录")
+                                                raise InterruptedError("用户取消处理")
 
-                                    dest_table.flush()
-                                    total_records += new_records_count
-                                    stocks_appended += 1
+                                            row = src_table[i]
+                                            dest_row = dest_table.row
+                                            for col_name in dest_table.colnames:
+                                                try:
+                                                    dest_row[col_name] = row[col_name]
+                                                except KeyError:
+                                                    pass
+                                            dest_row.append()
+                                            new_records_count += 1
+
+                                        dest_table.flush()
+                                        total_records += new_records_count
+                                        stocks_appended += 1
 
                                 else:
                                     # 创建新表
@@ -835,30 +654,39 @@ def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, t
                                                                         title=stock_name)
 
                                     # 复制记录
+                                    record_count = 0
                                     for row in src_table:
-                                        dest_row = dest_table.row
-                                        for col_name in dest_table.colnames:
-                                            try:
-                                                dest_row[col_name] = row[col_name]
-                                            except KeyError:
-                                                pass
-                                        dest_row.append()
+                                        # 每处理 100 条记录检查一次停止标志
+                                        record_count += 1
+                                        if record_count % 100 == 0:
+                                            if stop_flag and stop_flag():
+                                                print(f"\n  用户取消处理，当前股票：{stock_name}，已处理 {record_count} 条记录")
+                                                raise InterruptedError("用户取消处理")
 
-                                    dest_table.flush()
-                                    total_stocks += 1
-                                    total_records += src_table.nrows
-                                    stocks_created += 1
-                                    new_records_count = src_table.nrows
+                                            dest_row = dest_table.row
+                                            for col_name in dest_table.colnames:
+                                                try:
+                                                    dest_row[col_name] = row[col_name]
+                                                except KeyError:
+                                                    pass
+                                            dest_row.append()
 
-                            stocks_merged.add(stock_name)
+                                        dest_table.flush()
+                                        total_stocks += 1
+                                        total_records += src_table.nrows
+                                        stocks_created += 1
+                                        new_records_count = src_table.nrows
 
-                            # 打印该股票的处理情况
-                            if existing_last_date > 0 and (skipped_records_count > 0 or new_records_count > 0):
-                                print(f"      ✓ {stock_name}: 新增 {new_records_count:,} 条，跳过 {skipped_records_count:,} 条")
-                            elif stock_name in existing_stocks:
-                                print(f"      ✓ {stock_name}: 追加 {new_records_count:,} 条记录")
-                            else:
-                                print(f"      ✓ {stock_name}: 创建 {new_records_count:,} 条记录")
+                                stocks_merged.add(stock_name)
+
+                                # 打印该股票的处理情况
+                                if existing_last_date > 0 and (skipped_records_count > 0 or new_records_count > 0):
+                                    print(
+                                        f"      ✓ {stock_name}: 新增 {new_records_count:,} 条，跳过 {skipped_records_count:,} 条")
+                                elif stock_name in existing_stocks:
+                                    print(f"      ✓ {stock_name}: 追加 {new_records_count:,} 条记录")
+                                else:
+                                    print(f"      ✓ {stock_name}: 创建 {new_records_count:,} 条记录")
 
                 except Exception as e:
                     print(f"      警告：无法访问/data 组：{e}")
@@ -892,69 +720,6 @@ def merge_files_by_market_with_progress(data_dir, dest_dir, market, data_type, t
             dest_hdf5.close()
         except:
             pass
-
-
-def merge_all_data(src_dir, dest_dir, data_types):
-    """
-    合并所有选定数据类型的数据
-
-    参数:
-        src_dir: 源目录
-        dest_dir: 目标目录
-        data_types: 要合并的数据类型列表
-    """
-    print(f"\n{'='*80}")
-    print(f"开始批量合并数据")
-    print(f"源目录：{src_dir}")
-    print(f"目标目录：{dest_dir}")
-    print(f"数据类型：{', '.join(data_types)}")
-
-    # 确保目标目录存在
-    os.makedirs(dest_dir, exist_ok=True)
-
-    # 查找所有市场
-    markets = set()
-    for data_type in data_types:
-        pattern = re.compile(rf'^[a-z]{{2,4}}_{data_type}_\d{{4}}\.h5$')
-        for filename in os.listdir(src_dir):
-            match = pattern.match(filename)
-            if match:
-                market = filename.split('_')[0]
-                markets.add(market)
-
-    if not markets:
-        print("\n未找到任何匹配的数据文件！")
-        return False
-
-    print(f"\n发现市场：{', '.join(sorted(markets))}")
-
-    # 为每个市场创建子目录
-    success_count = 0
-    total_tasks = len(markets) * len(data_types)
-    task_count = 0
-
-    for market in sorted(markets):
-        # 创建市场子目录
-        market_dest_dir = os.path.join(dest_dir, market)
-        os.makedirs(market_dest_dir, exist_ok=True)
-
-        for data_type in data_types:
-            task_count += 1
-            print(f"\n[{task_count}/{total_tasks}] 处理 {market} 市场的 {data_type} 数据")
-
-            try:
-                table_desc = get_table_desc(data_type)
-
-                if merge_files_by_market(src_dir, market_dest_dir, market, data_type, table_desc):
-                    success_count += 1
-            except Exception as e:
-                print(f"处理 {market}_{data_type} 时出错：{e}")
-                continue
-
-    print(f"\n{'='*80}")
-    print(f"批量合并完成！成功：{success_count}/{total_tasks}")
-
-    return success_count > 0
 
 
 def merge_all_data_from_split(src_dir, dest_dir, data_types, selected_markets=None, stop_flag=None, progress_callback=None):
