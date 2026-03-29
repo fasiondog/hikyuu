@@ -257,6 +257,10 @@ if is_plat("linux", "cross", "macosx") then
   add_ldflags("-pthread")
 end
 
+if is_plat("linux", "cross") then
+    add_cxflags("-fcoroutines")
+end    
+
 if is_plat("macosx") then
     add_cxflags("-Wno-deprecated-declarations")
 end

@@ -20,7 +20,6 @@
 #include <thread>
 #include <nlohmann/json.hpp>
 #include <boost/asio.hpp>
-#include <boost/asio/awaitable.hpp>
 #include <boost/beast.hpp>
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/Parameter.h"
