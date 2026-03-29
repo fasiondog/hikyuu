@@ -20,6 +20,7 @@
 #include <thread>
 #include <nlohmann/json.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/awaitable.hpp>
 #include <boost/beast.hpp>
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/Parameter.h"
@@ -324,9 +325,9 @@ public:
 
     /// @brief 默认超时时间（毫秒）
     static constexpr int32_t DEFAULT_TIMEOUT_MS = 30000;  // 30 秒
-    
+
     /// @brief 最大超时时间（毫秒），当传入<=0 时使用此值
-    static constexpr int32_t MAX_TIMEOUT_MS = 60000;      // 60 秒
+    static constexpr int32_t MAX_TIMEOUT_MS = 60000;  // 60 秒
 
     /**
      * @brief 构造函数（内部 io_context 模式）
@@ -985,7 +986,7 @@ private:
     net::awaitable<std::vector<tcp::endpoint>> _resolveDNS();
 
     struct SocketVariant;
-    
+
     /**
      * @brief 建立 TCP 连接
      *
@@ -1006,21 +1007,33 @@ private:
      */
     net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> _getConnection();
 
+    /**
+     * @brief 构建完整的 URI（路径 + 查询参数）
+     *
+     * 负责将基础路径、资源路径和查询参数组合成合法的 URI。
+     * 自动处理路径分段 URL 编码、斜杠拼接去重等逻辑。
+     *
+     * @param path 资源路径（如 "api/v1/users" 或 "/api/v1/users"）
+     * @param params 查询参数映射
+     * @return 构建好的完整 URI 字符串
+     */
+    std::string _buildURI(const std::string& path, const HttpParams& params);
+
 private:
 #if HKU_ENABLE_HTTP_CLIENT_SSL
     struct SslContext;
     std::unique_ptr<SslContext> m_ssl_ctx;  // SSL 上下文（仅在启用 SSL 时使用）
 #endif
 
-    bool m_is_valid_url{false};      // URL 是否有效
-    bool m_is_https{false};          // 是否使用 HTTPS 协议
-    std::string m_url;               // 完整的 URL
-    std::string m_base_path;         // URL 的基础路径部分
-    std::string m_host;              // 主机名
-    std::string m_port;              // 端口号
+    bool m_is_valid_url{false};                               // URL 是否有效
+    bool m_is_https{false};                                   // 是否使用 HTTPS 协议
+    std::string m_url;                                        // 完整的 URL
+    std::string m_base_path;                                  // URL 的基础路径部分
+    std::string m_host;                                       // 主机名
+    std::string m_port;                                       // 端口号
     std::chrono::milliseconds m_timeout{DEFAULT_TIMEOUT_MS};  // 超时时间
     std::map<std::string, std::string> m_default_headers;     // 默认请求头
-    std::string m_ca_file;  // 自定义 CA 证书文件路径
+    std::string m_ca_file;                                    // 自定义 CA 证书文件路径
 
     // 连接池相关成员
     std::unique_ptr<ResourceAsioVersionPool<HttpConnection>> m_connection_pool;  // 带版本的连接池

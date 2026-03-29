@@ -365,6 +365,77 @@ void AsioHttpClient::_parseUrl() noexcept {
     m_port = std::to_string(port);
 }
 
+// URI 构建辅助方法
+std::string AsioHttpClient::_buildURI(const std::string& path, const HttpParams& params) {
+    std::ostringstream uri_stream;
+
+    // 处理 base_path：如果为空或仅为 "/"，则不添加
+    if (!m_base_path.empty() && m_base_path != "/") {
+        uri_stream << m_base_path;
+    }
+
+    if (!path.empty()) {
+        // 判断是否需要添加分隔符 /
+        bool need_separator = false;
+        if (!m_base_path.empty() && m_base_path != "/") {
+            // base_path 不为空且不是单斜杠时，检查是否需要添加分隔符
+            need_separator = (m_base_path.back() != '/' && path.front() != '/');
+        } else {
+            // base_path 为空或单斜杠时，仅当 path 不以 '/' 开头才需要添加
+            need_separator = (path.front() != '/');
+        }
+
+        if (need_separator) {
+            uri_stream << '/';
+        }
+
+        // 对 path 进行分段 URL 编码（保持 / 作为路径分隔符不编码）
+        // 例如："ipquery/index" → 编码为 "ipquery/index"
+        //      "/api/v1/users" → 编码为 "/api/v1/users"
+        std::string_view path_view = path;
+        size_t pos = 0;
+
+        while (pos < path_view.size()) {
+            // 找到下一个 / 的位置
+            size_t slash_pos = path_view.find('/', pos);
+
+            if (slash_pos == std::string_view::npos) {
+                // 最后一个段（或整个 path 没有 /）
+                std::string segment = std::string(path_view.substr(pos));
+                if (!segment.empty()) {
+                    uri_stream << url_escape(segment.c_str());
+                }
+                break;
+            } else {
+                // 提取并编码当前段（不包括 /）
+                if (slash_pos > pos) {
+                    std::string segment = std::string(path_view.substr(pos, slash_pos - pos));
+                    uri_stream << url_escape(segment.c_str());
+                }
+                // 保留原始的 / 分隔符
+                uri_stream << '/';
+                pos = slash_pos + 1;
+            }
+        }
+
+        // 处理末尾的 /
+        if (!path.empty() && path.back() == '/') {
+            uri_stream << '/';
+        }
+    }
+
+    // 添加查询参数
+    bool first = true;
+    for (const auto& [key, value] : params) {
+        uri_stream << (first ? "?" : "&");
+        // 对 key 和 value 分别进行 URL 编码
+        uri_stream << url_escape(key.c_str()) << "=" << url_escape(value.c_str());
+        first = false;
+    }
+
+    return uri_stream.str();
+}
+
 // 异步 DNS 解析方法
 net::awaitable<std::vector<tcp::endpoint>> AsioHttpClient::_resolveDNS() {
 #if HKU_OS_OSX || HKU_OS_IOS
@@ -918,58 +989,7 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
 #endif
 
     // 构建完整的 URI
-    std::ostringstream uri_stream;
-    uri_stream << m_base_path;
-    if (!path.empty()) {
-        if (m_base_path.back() != '/' && path.front() != '/') {
-            uri_stream << '/';
-        }
-        // 对 path 进行分段 URL 编码（保持 / 作为路径分隔符不编码）
-        // 例如："/api/v1/users" → 分别编码 "api", "v1", "users"，保留 "/"
-        std::string_view path_view = path;
-        size_t pos = 0;
-
-        while (pos < path_view.size()) {
-            // 找到下一个 / 的位置
-            size_t slash_pos = path_view.find('/', pos);
-
-            if (slash_pos == std::string_view::npos) {
-                // 最后一个段（或整个 path 没有 /）
-                std::string segment = std::string(path_view.substr(pos));
-                if (!segment.empty()) {
-                    uri_stream << url_escape(segment.c_str());
-                }
-                break;
-            } else {
-                // 添加路径分隔符 /
-                uri_stream << '/';
-
-                // 提取并编码当前段
-                if (slash_pos > pos) {
-                    std::string segment = std::string(path_view.substr(pos, slash_pos - pos));
-                    uri_stream << url_escape(segment.c_str());
-                }
-
-                pos = slash_pos + 1;
-            }
-        }
-
-        // 处理末尾的 /
-        if (!path.empty() && path.back() == '/') {
-            uri_stream << '/';
-        }
-    }
-
-    // 添加查询参数
-    bool first = true;
-    for (const auto& [key, value] : params) {
-        uri_stream << (first ? "?" : "&");
-        // 对 key 和 value 分别进行 URL 编码
-        uri_stream << url_escape(key.c_str()) << "=" << url_escape(value.c_str());
-        first = false;
-    }
-
-    std::string uri = uri_stream.str();
+    std::string uri = _buildURI(path, params);
 
     AsioHttpResponse response;
 
@@ -1254,58 +1274,7 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
 #endif
 
     // 构建完整的 URI
-    std::ostringstream uri_stream;
-    uri_stream << m_base_path;
-    if (!path.empty()) {
-        if (m_base_path.back() != '/' && path.front() != '/') {
-            uri_stream << '/';
-        }
-        // 对 path 进行分段 URL 编码（保持 / 作为路径分隔符不编码）
-        // 例如："/api/v1/users" → 分别编码 "api", "v1", "users"，保留 "/"
-        std::string_view path_view = path;
-        size_t pos = 0;
-
-        while (pos < path_view.size()) {
-            // 找到下一个 / 的位置
-            size_t slash_pos = path_view.find('/', pos);
-
-            if (slash_pos == std::string_view::npos) {
-                // 最后一个段（或整个 path 没有 /）
-                std::string segment = std::string(path_view.substr(pos));
-                if (!segment.empty()) {
-                    uri_stream << url_escape(segment.c_str());
-                }
-                break;
-            } else {
-                // 添加路径分隔符 /
-                uri_stream << '/';
-
-                // 提取并编码当前段
-                if (slash_pos > pos) {
-                    std::string segment = std::string(path_view.substr(pos, slash_pos - pos));
-                    uri_stream << url_escape(segment.c_str());
-                }
-
-                pos = slash_pos + 1;
-            }
-        }
-
-        // 处理末尾的 /
-        if (!path.empty() && path.back() == '/') {
-            uri_stream << '/';
-        }
-    }
-
-    // 添加查询参数
-    bool first = true;
-    for (const auto& [key, value] : params) {
-        uri_stream << (first ? "?" : "&");
-        // 对 key 和 value 分别进行 URL 编码
-        uri_stream << url_escape(key.c_str()) << "=" << url_escape(value.c_str());
-        first = false;
-    }
-
-    std::string uri = uri_stream.str();
+    std::string uri = _buildURI(path, params);
 
     AsioHttpStreamResponse response;
 
