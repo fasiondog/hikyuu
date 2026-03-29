@@ -48,12 +48,14 @@ public:
     /**
      * 构造函数
      * @param param 连接参数
+     * @param max_count 最大资源上限，0 表示无限制
      */
-    explicit ResourceAsioPool(const Parameter &param)
+    explicit ResourceAsioPool(const Parameter &param, size_t max_count = 128)
     : m_count(0),
       m_idleCount(0),
-      m_resourceList(128),  // 初始队列大小
-      m_param(param) {}
+      m_maxCount(max_count),
+      m_param(param),
+      m_resourceList(max_count == 0 ? 128 : max_count) {}
 
     /**
      * 析构函数，释放所有缓存的资源
@@ -77,37 +79,95 @@ public:
     typedef std::shared_ptr<ResourceType> ResourcePtr;
 
     /**
-     * 协程方式获取可用资源
+     * 协程方式获取可用资源（带超时）
+     * @param timeout 超时时间
      * @return awaitable<ResourcePtr> 可等待的资源指针
      * @exception CreateResourceException 新资源创建可能抛出异常
      */
-    awaitable<ResourcePtr> get() {
+    awaitable<ResourcePtr> get(
+      std::chrono::steady_clock::duration timeout = std::chrono::seconds(3)) {
+        auto executor = co_await this_coro::executor;
+
+        // 1. 尝试从空闲队列获取资源
         ResourceType *p = nullptr;
-
-        // 尝试从空闲队列获取资源
         if (m_resourceList.pop(p)) {
-            m_idleCount.fetch_sub(1);  // 空闲计数减 1,活动资源数不变
-            co_return ResourcePtr(p, ResourceCloser(this));
+            m_idleCount.fetch_sub(1);
+            auto result = ResourcePtr(p, ResourceCloser(this));
+            co_return result;
         }
 
-        // 创建新资源
-        try {
-            p = new ResourceType(m_param);
-        } catch (const std::exception &e) {
-            HKU_THROW_EXCEPTION(CreateResourceException, "Failed create a new Resource! {}",
-                                e.what());
-        } catch (...) {
-            HKU_THROW_EXCEPTION(CreateResourceException,
-                                "Failed create a new Resource! Unknown error!");
+        // 2. 无空闲但未达上限 → 创建新资源
+        if (m_maxCount == 0 || m_count.load() < m_maxCount.load()) {
+            try {
+                p = new ResourceType(m_param);
+            } catch (const std::exception &e) {
+                HKU_THROW_EXCEPTION(CreateResourceException, "Failed create a new Resource! {}",
+                                    e.what());
+            } catch (...) {
+                HKU_THROW_EXCEPTION(CreateResourceException,
+                                    "Failed create a new Resource! Unknown error!");
+            }
+            m_count.fetch_add(1);
+            auto result = ResourcePtr(p, ResourceCloser(this));
+            {
+                std::lock_guard<std::mutex> lock(m_closer_mutex);
+                m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
+            }
+            co_return result;
         }
 
-        m_count.fetch_add(1);  // 活动资源数加 1
-        auto result = ResourcePtr(p, ResourceCloser(this));
+        // 3. 已达上限 → 进入等待队列
+        auto timer = std::make_shared<boost::asio::steady_timer>(executor);
+        timer->expires_after(timeout);
+
+        // 加入等待队列
         {
-            std::lock_guard<std::mutex> lock(m_closer_mutex);
-            m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
+            std::lock_guard<std::mutex> lock(m_waiterMutex);
+            m_waiters.push(timer);
         }
-        co_return result;
+
+        // 等待被唤醒或超时
+        boost::system::error_code ec;
+        try {
+            co_await timer->async_wait(boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+        } catch (...) {
+            ec = boost::asio::error::operation_aborted;
+        }
+
+        // 从等待队列移除
+        {
+            std::lock_guard<std::mutex> lock(m_waiterMutex);
+            if (!m_waiters.empty() && m_waiters.front() == timer) {
+                m_waiters.pop();
+            } else {
+                // 如果不是队首，需要查找并移除（超时情况）
+                std::queue<std::shared_ptr<boost::asio::steady_timer>> temp;
+                while (!m_waiters.empty()) {
+                    auto t = m_waiters.front();
+                    m_waiters.pop();
+                    if (t != timer) {
+                        temp.push(t);
+                    }
+                }
+                m_waiters = std::move(temp);
+            }
+        }
+
+        if (ec == boost::asio::error::operation_aborted) {
+            // 被唤醒，一定能拿到资源
+            if (!m_resourceList.pop(p)) {
+                HKU_THROW_EXCEPTION(CreateResourceException,
+                                    "Unexpected error: no available resource after wakeup");
+            }
+            m_idleCount.fetch_sub(1);
+            auto result = ResourcePtr(p, ResourceCloser(this));
+            co_return result;
+        } else {
+            // 超时
+            HKU_THROW_EXCEPTION(CreateResourceException,
+                                "ResourceAsioPool get timeout, max_count={}, current_count={}",
+                                m_maxCount.load(), m_count.load());
+        }
     }
 
     /** 当前活动的资源数, 即全部资源数（含空闲及被使用的资源） */
@@ -138,6 +198,7 @@ public:
 private:
     std::atomic<size_t> m_count;      // 当前活动的资源数
     std::atomic<size_t> m_idleCount;  // 当前空闲的资源数
+    std::atomic<size_t> m_maxCount;   // 最大资源上限
     Parameter m_param;
     boost::lockfree::queue<ResourceType *> m_resourceList;
 
@@ -168,29 +229,39 @@ private:
     /** 归还至资源池 */
     void returnResource(ResourceType *p, ResourceCloser *closer) {
         if (p) {
-            // 始终将资源归还到池中，不限制空闲数量
             if (m_resourceList.push(p)) {
-                // 推入成功，增加空闲计数
                 m_idleCount.fetch_add(1);
-                // 活动资源数不变，资源仍在池中
             } else {
-                // 推入失败（极罕见），删除资源
                 delete p;
-                m_count.fetch_sub(1);  // 活动资源数减 1
+                m_count.fetch_sub(1);
             }
         } else {
-            // p 为 nullptr，只减少活动资源数
             m_count.fetch_sub(1);
+        }
+
+        // 唤醒一个等待者
+        std::shared_ptr<boost::asio::steady_timer> timer;
+        {
+            std::lock_guard<std::mutex> lock(m_waiterMutex);
+            if (!m_waiters.empty()) {
+                timer = m_waiters.front();
+                m_waiters.pop();
+            }
+        }
+        if (timer) {
+            timer->cancel();
         }
 
         if (closer) {
             std::lock_guard<std::mutex> lock(m_closer_mutex);
-            m_closer_set.erase(closer);  // 移除该 closer
+            m_closer_set.erase(closer);
         }
     }
 
-    std::mutex m_closer_mutex;                          // 保护 closer_set 的互斥锁
-    std::unordered_set<ResourceCloser *> m_closer_set;  // 占用资源的 closer
+    std::mutex m_closer_mutex;                                         // 保护 closer_set 的互斥锁
+    std::unordered_set<ResourceCloser *> m_closer_set;                 // 占用资源的 closer
+    std::mutex m_waiterMutex;                                          // 保护等待队列的互斥锁
+    std::queue<std::shared_ptr<boost::asio::steady_timer>> m_waiters;  // 等待队列
 };
 
 /**
@@ -237,9 +308,15 @@ public:
     /**
      * 构造函数
      * @param param 连接参数
+     * @param max_count 最大资源上限，0 表示无限制
      */
-    explicit ResourceAsioVersionPool(const Parameter &param)
-    : m_count(0), m_idleCount(0), m_param(param), m_resourceList(128), m_version(0) {}
+    explicit ResourceAsioVersionPool(const Parameter &param, size_t max_count = 0)
+    : m_count(0),
+      m_idleCount(0),
+      m_param(param),
+      m_resourceList(128),
+      m_version(0),
+      m_maxCount(max_count) {}
 
     /**
      * 析构函数，释放所有缓存的资源
@@ -332,48 +409,121 @@ public:
      * @exception CreateResourceException 新资源创建可能抛出异常
      */
     awaitable<ResourcePtr> get() {
-        ResourceType *p = nullptr;
+        return get(std::chrono::seconds(3));
+    }
 
-        // 尝试从空闲队列获取资源
+    /**
+     * 协程方式获取可用资源（带超时）
+     * @param timeout 超时时间
+     * @return awaitable<ResourcePtr> 可等待的资源指针
+     * @exception CreateResourceException 新资源创建可能抛出异常
+     */
+    awaitable<ResourcePtr> get(std::chrono::steady_clock::duration timeout) {
+        auto executor = co_await this_coro::executor;
+
+        // 1. 尝试从空闲队列获取资源
+        ResourceType *p = nullptr;
         if (m_resourceList.pop(p)) {
-            m_idleCount.fetch_sub(1);  // 空闲计数减 1
+            m_idleCount.fetch_sub(1);
 
             // 检查资源版本，如果版本过旧则销毁，下面会创建新资源
             if (p->getVersion() != m_version.load()) {
                 delete p;
-                m_count.fetch_sub(1);  // 活动资源数减 1
-                p = nullptr;           // 标记需要创建新资源
+                m_count.fetch_sub(1);
+                p = nullptr;
             } else {
-                // 版本匹配，直接返回
                 co_return ResourcePtr(p, ResourceCloser(this));
             }
         }
 
-        try {
-            Parameter current_param;
-            {
-                // 加锁保护参数读取，确保获取完整的最新参数
-                std::lock_guard<std::mutex> lock(m_mutex);
-                current_param = m_param;
+        // 2. 未达上限，创建新资源
+        if (m_maxCount == 0 || m_count.load() < m_maxCount.load()) {
+            try {
+                Parameter current_param;
+                {
+                    std::lock_guard<std::mutex> lock(m_mutex);
+                    current_param = m_param;
+                }
+
+                p = new ResourceType(current_param);
+                p->setVersion(m_version.load());
+            } catch (const std::exception &e) {
+                HKU_THROW_EXCEPTION(CreateResourceException, "Failed create a new Resource! {}",
+                                    e.what());
+            } catch (...) {
+                HKU_THROW_EXCEPTION(CreateResourceException,
+                                    "Failed create a new Resource! Unknown error!");
             }
 
-            p = new ResourceType(current_param);
-            p->setVersion(m_version.load());
-        } catch (const std::exception &e) {
-            HKU_THROW_EXCEPTION(CreateResourceException, "Failed create a new Resource! {}",
-                                e.what());
-        } catch (...) {
-            HKU_THROW_EXCEPTION(CreateResourceException,
-                                "Failed create a new Resource! Unknown error!");
+            m_count.fetch_add(1);
+            auto result = ResourcePtr(p, ResourceCloser(this));
+            {
+                std::lock_guard<std::mutex> lock(m_closer_mutex);
+                m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
+            }
+            co_return result;
         }
 
-        m_count.fetch_add(1);  // 活动资源数加 1
-        auto result = ResourcePtr(p, ResourceCloser(this));
+        // 3. 已达上限，进入等待队列
+        auto timer = std::make_shared<boost::asio::steady_timer>(executor);
+        timer->expires_after(timeout);
+
+        // 加入等待队列
         {
-            std::lock_guard<std::mutex> lock(m_closer_mutex);
-            m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
+            std::lock_guard<std::mutex> lock(m_waiterMutex);
+            m_waiters.push(timer);
         }
-        co_return result;
+
+        // 等待被唤醒或超时
+        boost::system::error_code ec;
+        try {
+            co_await timer->async_wait(boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+        } catch (...) {
+            ec = boost::asio::error::operation_aborted;
+        }
+
+        // 从等待队列移除
+        {
+            std::lock_guard<std::mutex> lock(m_waiterMutex);
+            if (!m_waiters.empty() && m_waiters.front() == timer) {
+                m_waiters.pop();
+            } else {
+                std::queue<std::shared_ptr<boost::asio::steady_timer>> temp;
+                while (!m_waiters.empty()) {
+                    auto t = m_waiters.front();
+                    m_waiters.pop();
+                    if (t != timer) {
+                        temp.push(t);
+                    }
+                }
+                m_waiters = std::move(temp);
+            }
+        }
+
+        if (ec == boost::asio::error::operation_aborted) {
+            // 被唤醒，一定能拿到资源
+            if (!m_resourceList.pop(p)) {
+                HKU_THROW_EXCEPTION(CreateResourceException,
+                                    "Unexpected error: no available resource after wakeup");
+            }
+            m_idleCount.fetch_sub(1);
+
+            // 检查资源版本
+            if (p->getVersion() != m_version.load()) {
+                delete p;
+                m_count.fetch_sub(1);
+                // 需要创建新资源，但此时已经没有空闲资源，这里可能需要递归或重新获取
+                HKU_THROW_EXCEPTION(CreateResourceException,
+                                    "Resource version mismatch after wakeup");
+            }
+
+            co_return ResourcePtr(p, ResourceCloser(this));
+        } else {
+            HKU_THROW_EXCEPTION(
+              CreateResourceException,
+              "ResourceAsioVersionPool get timeout, max_count={}, current_count={}",
+              m_maxCount.load(), m_count.load());
+        }
     }
 
     /** 当前活动的资源数，即全部资源数（含空闲及被使用的资源） */
@@ -438,33 +588,44 @@ private:
             // 当前归还资源的版本和资源池版本相等，才接受归还
             if (p->getVersion() == m_version.load()) {
                 if (m_resourceList.push(p)) {
-                    // 推入成功，增加空闲计数
                     m_idleCount.fetch_add(1);
-                    // 活动资源数不变，资源仍在池中
                 } else {
-                    // 推入失败（极罕见），删除资源
                     delete p;
-                    m_count.fetch_sub(1);  // 活动资源数减 1
+                    m_count.fetch_sub(1);
+                }
+
+                // 唤醒一个等待者
+                std::shared_ptr<boost::asio::steady_timer> timer;
+                {
+                    std::lock_guard<std::mutex> lock(m_waiterMutex);
+                    if (!m_waiters.empty()) {
+                        timer = m_waiters.front();
+                        m_waiters.pop();
+                    }
+                }
+                if (timer) {
+                    timer->cancel();
                 }
             } else {
-                // 版本不匹配，直接删除
                 delete p;
-                m_count.fetch_sub(1);  // 活动资源数减 1
+                m_count.fetch_sub(1);
             }
         } else {
-            // p 为 nullptr，只减少活动资源数
             m_count.fetch_sub(1);
         }
 
         if (closer) {
             std::lock_guard<std::mutex> lock(m_closer_mutex);
-            m_closer_set.erase(closer);  // 移除该 closer
+            m_closer_set.erase(closer);
         }
     }
 
-    std::mutex m_closer_mutex;                          // 保护 closer_set 的互斥锁
-    std::unordered_set<ResourceCloser *> m_closer_set;  // 占用资源的 closer
-    mutable std::mutex m_mutex;                         // 保护参数访问的互斥锁
+    std::mutex m_closer_mutex;                                         // 保护 closer_set 的互斥锁
+    std::unordered_set<ResourceCloser *> m_closer_set;                 // 占用资源的 closer
+    mutable std::mutex m_mutex;                                        // 保护参数访问的互斥锁
+    std::atomic<size_t> m_maxCount;                                    // 最大资源上限
+    std::mutex m_waiterMutex;                                          // 保护等待队列的互斥锁
+    std::queue<std::shared_ptr<boost::asio::steady_timer>> m_waiters;  // 等待队列
 };
 
 }  // namespace hku
