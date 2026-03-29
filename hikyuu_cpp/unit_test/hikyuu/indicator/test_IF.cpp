@@ -20,6 +20,11 @@ using namespace hku;
  * @{
  */
 
+#if defined(__clang__) || defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#endif
+
 /** @par 检测点 */
 TEST_CASE("test_IF") {
     KData kdata = getStock("SH600000").getKData(KQuery(-10));
@@ -80,6 +85,10 @@ TEST_CASE("test_IF") {
         }
     }
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 //-----------------------------------------------------------------------------
 // test export

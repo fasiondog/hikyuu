@@ -13,6 +13,10 @@
 
 namespace hku {
 
+#if defined(MAX)
+#undef MAX
+#endif
+
 /**
  * 求最大值
  * @details

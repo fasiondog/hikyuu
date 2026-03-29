@@ -81,7 +81,7 @@ PriceList HistoryFinanceReader ::getHistoryFinanceInfo(Datetime date, const stri
         result.reserve(report_fields_count);
         price_t null_price = Null<price_t>();
         for (int i = 0; i < report_fields_count; i++) {
-            if (result_buffer[i] == 0xf8f8f8f8) {
+            if (static_cast<unsigned int>(result_buffer[i]) == 0xf8f8f8f8) {
                 result.push_back(null_price);
             } else {
                 result.push_back(result_buffer[i]);

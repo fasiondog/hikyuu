@@ -1493,7 +1493,11 @@ json System::lastSuggestion() const {
     json result;
     json sys_json;
     sys_json["name"] = name();
-    sys_json["stock"] = m_stock.isNull() ? nullptr : m_stock.market_code();
+    if (m_stock.isNull()) {
+        sys_json["stock"] = nullptr;
+    } else {
+        sys_json["stock"] = m_stock.market_code();
+    }
 
     if (!m_tm) {
         sys_json["suggestion"] = nullptr;

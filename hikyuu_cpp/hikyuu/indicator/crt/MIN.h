@@ -13,6 +13,10 @@
 
 namespace hku {
 
+#if defined(MIN)
+#undef MIN
+#endif
+
 /**
  * 求最小值
  * @details
