@@ -327,14 +327,22 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
                     hku_error(
                         f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord close: {last_krecord['closePrice']*0.001}, bar: {bar['close']}")
                     return (0, False, Datetime(last_datetime))
-                if ktype == 'DAY' and last_krecord['transAmount'] != 0 and (abs(float(last_krecord['transAmount']) - round(bar["amount"]*0.001))) > 10000:
-                    hku_error(
-                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord amount: {float(last_krecord['transAmount'])}, bar: {round(bar['amount']*0.001)}")
-                    return (0, False, Datetime(last_datetime))
-                if ktype == 'DAY' and last_krecord['transCount'] != 0 and abs(float(last_krecord['transCount']) - bar["vol"]) > 10000:
-                    hku_error(
-                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord count: {last_krecord['transCount']}, bar: {bar['vol']}")
-                    return (0, False, Datetime(last_datetime))
+                if ktype == 'DAY' and last_krecord['transAmount'] != 0:
+                    # 成交额检查：根据数值大小分档次进行相对百分比比较
+                    amount_diff_ratio = abs(float(last_krecord['transAmount']) - round(bar["amount"]*0.001)) / float(last_krecord['transAmount'])
+                    amount_threshold = 0.5 if float(last_krecord['transAmount']) >= 1e8 else (0.8 if float(last_krecord['transAmount']) >= 1e6 else 1.0)
+                    if amount_diff_ratio > amount_threshold:
+                        hku_error(
+                            f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord amount: {float(last_krecord['transAmount'])}, bar: {round(bar['amount']*0.001)}, diff_ratio: {amount_diff_ratio:.4f}")
+                        return (0, False, Datetime(last_datetime))
+                if ktype == 'DAY' and last_krecord['transCount'] != 0:
+                    # 成交量检查：根据数值大小分档次进行相对百分比比较
+                    vol_diff_ratio = abs(float(last_krecord['transCount']) - bar["vol"]) / float(last_krecord['transCount'])
+                    vol_threshold = 0.5 if float(last_krecord['transCount']) >= 1e7 else (0.8 if float(last_krecord['transCount']) >= 1e5 else 1.0)
+                    if vol_diff_ratio > vol_threshold:
+                        hku_error(
+                            f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord count: {last_krecord['transCount']}, bar: {bar['vol']}, diff_ratio: {vol_diff_ratio:.4f}")
+                        return (0, False, Datetime(last_datetime))
                 continue
 
             if today_datetime >= bar_datetime > last_datetime \
