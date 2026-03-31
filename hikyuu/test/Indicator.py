@@ -9,7 +9,7 @@
 
 import unittest
 
-from test_init import *
+from .test_init import *
 
 
 class AddIndicator(IndicatorImp):
@@ -226,6 +226,137 @@ class IndicatorTest(unittest.TestCase):
         for i in range(len(a)):
             self.assertEqual(a[i], b[i])
         """
+
+    def test_BARSLASTS(self):
+        data = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]
+        ind = PRICELIST(data)
+
+        # 测试N=1，应该与BARSLAST一致
+        result1 = BARSLASTS(ind, 1)
+        expected1 = BARSLAST(ind)
+
+        # print(f"数据: {data}")
+        # print(f"BARSLASTS(ind, 1): {[result1[i] for i in range(len(result1))]}")
+        # print(f"BARSLAST(ind):     {[expected1[i] for i in range(len(expected1))]}")
+
+        # 验证N=1时与BARSLAST一致
+        for i in range(len(result1)):
+            if np.isnan(expected1[i]):
+                self.assertTrue(np.isnan(result1[i]))
+            else:
+                self.assertTrue(result1[i] == expected1[i])
+
+        # print("✓ N=1时与BARSLAST一致")
+
+        # 测试N=2
+        result2 = BARSLASTS(ind, 2)
+        # print(f"BARSLASTS(ind, 2): {[result2[i] for i in range(len(result2))]}")
+        # print(f"BARSLASTS(ind, 2) discard: {result2.discard}")
+
+        # 验证N=2的结果
+        # 位置0-3：条件只成立1次，不足2次，应为NaN
+        for i in range(4):
+            self.assertTrue(np.isnan(result2[i]))
+
+        # 位置4：条件第2次成立，距离第1次成立(位置0)为4
+        self.assertTrue(result2[4] == 4)
+
+        # 位置5-7：条件已成立2次，距离第1次成立(位置0)分别为5,6,7
+        for i in range(5, 8):
+            self.assertTrue(result2[i] == i)
+
+        # 位置8：条件第3次成立，距离第2次成立(位置4)为4
+        self.assertTrue(result2[8] == 4)
+
+        # print("✓ N=2测试通过")
+
+        # 测试N=3
+        result3 = BARSLASTS(ind, 3)
+        # print(f"BARSLASTS(ind, 3): {[result3[i] for i in range(len(result3))]}")
+
+        # 验证N=3的结果
+        # 位置0-7：条件只成立2次，不足3次，应为NaN
+        for i in range(8):
+            self.assertTrue(np.isnan(result3[i]))
+
+        # 位置8：条件第3次成立，距离第1次成立(位置0)为8
+        self.assertTrue(result3[8] == 8)
+
+        # 位置9-11：条件已成立3次，距离第1次成立(位置0)分别为9,10,11
+        for i in range(9, 12):
+            self.assertTrue(result3[i] == i)
+
+        """测试边界情况"""
+        # print("\n测试边界情况...")
+
+        # 测试N <= 0
+        data = [1, 0, 1, 0, 1]
+        ind = PRICELIST(data)
+
+        result0 = BARSLASTS(ind, 0)
+        # print(f"BARSLASTS(ind, 0): {[result0[i] for i in range(len(result0))]}")
+        self.assertTrue(result0.discard == len(data))
+        # print("✓ N=0测试通过")
+
+        result_neg = BARSLASTS(ind, -1)
+        # print(f"BARSLASTS(ind, -1): {[result_neg[i] for i in range(len(result_neg))]}")
+        self.assertTrue(result_neg.discard == len(data))
+        # print("✓ N=-1测试通过")
+
+        # 测试空数据
+        empty_ind = PRICELIST([])
+        result_empty = BARSLASTS(empty_ind, 1)
+        # print(f"BARSLASTS(空数据, 1): 长度={len(result_empty)}")
+        self.assertTrue(len(result_empty) == 0)
+        # print("✓ 空数据测试通过")
+
+        # 测试全0数据
+        zeros = [0, 0, 0, 0, 0]
+        ind_zeros = PRICELIST(zeros)
+        result_zeros = BARSLASTS(ind_zeros, 1)
+        # print(f"BARSLASTS(全0数据, 1): discard={result_zeros.discard}")
+        self.assertTrue(result_zeros.discard == len(zeros))
+        # print("✓ 全0数据测试通过")
+
+
+        """测试与K线数据结合使用"""
+        # print("\n测试与K线数据结合使用...")
+
+        # 获取股票数据
+        sm = StockManager.instance()
+        stock = sm['sh000001']
+
+        if stock.is_null():
+            print("⚠ 无法获取股票数据，跳过此测试")
+            return
+
+        kdata = stock.get_kdata(Query(-100))
+
+        if len(kdata) == 0:
+            print("⚠ K线数据为空，跳过此测试")
+            return
+
+        # 测试收盘价上涨
+        close = CLOSE(kdata)
+        up = close > REF(close, 1)
+
+        # 计算第1次上涨到现在的天数
+        result1 = BARSLASTS(up, 1)
+        # print(f"BARSLASTS(上涨, 1)前5个值: {[result1[i] for i in range(min(5, len(result1)))]}")
+
+        # 计算第2次上涨到现在的天数
+        result2 = BARSLASTS(up, 2)
+        # print(f"BARSLASTS(上涨, 2)前5个值: {[result2[i] for i in range(min(5, len(result2)))]}")
+
+        # 验证N=1时与BARSLAST一致
+        expected = BARSLAST(up)
+        for i in range(min(10, len(result1))):
+            if np.isnan(expected[i]):
+                self.assertTrue(np.isnan(result1[i]))
+            else:
+                self.assertTrue(result1[i] == expected[i])
+
+        # print("✓ K线数据测试通过")
 
 
 def suite():
