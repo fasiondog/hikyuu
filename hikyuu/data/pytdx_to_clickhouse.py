@@ -295,6 +295,9 @@ def import_one_stock_data(
     )
 
     buf = []
+    # 用于去重的集合，记录已处理的 (market, code, date) 组合
+    seen_keys = set()
+
     while n >= 0:
         bar_list = get_bars(pytdx_kline_type, pytdx_market, code, n * 800, step)
         n -= 1
@@ -355,11 +358,12 @@ def import_one_stock_data(
                 continue
 
             if (
-                today_datetime >= bar_datetime > last_datetime
-                and bar["high"] >= bar["open"] >= bar["low"] > 0
-                and bar["high"] >= bar["close"] >= bar["low"] > 0
-                and bar["vol"] >= 0
-                and bar["amount"] >= 0
+                bar_datetime not in seen_keys
+                    and today_datetime >= bar_datetime > last_datetime
+                    and bar["high"] >= bar["open"] >= bar["low"] > 0
+                    and bar["high"] >= bar["close"] >= bar["low"] > 0
+                    and bar["vol"] >= 0
+                    and bar["amount"] >= 0
             ):
                 try:
                     buf.append(
@@ -375,6 +379,8 @@ def import_one_stock_data(
                             # bar['vol'] if stktype == 2 else round(bar['vol'] * 0.01)
                         )
                     )
+                    # 标记为已处理
+                    seen_keys.add(bar_datetime)
                 except Exception as e:
                     hku_error("Can't trans record({}), {}".format(bar, e))
                 last_datetime = bar_datetime
@@ -561,6 +567,53 @@ def import_data(
         hku_error(f"{market} {ktype} 连续失败20个股票，已停止导入, 建议重新导入")
         return add_record_count
 
+    # 导入完成后检查重复数据（仅警告，不删除）- 在 OPTIMIZE 之前执行
+    try:
+        table_info = get_table(connect, market, '000001', ktype)
+        full_table_name = table_info[0]  # 完整表名，如 'hku_data.day_k'
+
+        # 只检查当前 market 和 ktype 的股票是否有重复（仅检查最近 5 天）
+        check_sql = f"""
+            SELECT
+                code,
+                count(distinct_dates) as duplicate_date_count,
+                sum(dup_count) as total_duplicate_records
+            FROM (
+                SELECT
+                    code,
+                    `date` as distinct_dates,
+                    count(*) as dup_count
+                FROM {full_table_name}
+                WHERE market = '{market}'
+                  AND `date` >= toInt32(toUnixTimestamp(now() - INTERVAL 5 DAY))
+                GROUP BY code, `date`
+                HAVING count() > 1
+            )
+            GROUP BY code
+            ORDER BY duplicate_date_count DESC, total_duplicate_records DESC
+        """
+
+        result = connect.query(check_sql)
+        dup_list = result.result_rows
+
+        if len(dup_list) > 0:
+            total_dups = sum(row[2] for row in dup_list)
+            hku_warn(f"\n{'='*80}")
+            hku_warn(f"【重复数据警告】{market}市场 {ktype}K 线存在重复数据！（近 5 天）")
+            hku_warn(f"共发现 {len(dup_list)} 只股票存在重复")
+            hku_warn(f"总计 {total_dups} 条重复记录")
+            hku_warn(f"\n前 20 只重复股票列表:")
+            for i, row in enumerate(dup_list[:20], 1):
+                hku_warn(f"  {i:2d}. {market}{row[0]}: {row[1]}个重复日期，{row[2]}条记录")
+            if len(dup_list) > 20:
+                hku_warn(f"  ... 还有 {len(dup_list) - 20} 只股票未显示")
+            hku_warn(f"{'='*80}\n")
+        else:
+            hku_debug(f"{market}市场 {ktype}K 线近 5 天未发现重复数据")
+
+    except Exception as e:
+        hku_error(f"检查重复数据失败：{e}")
+
     cur_year = Datetime.today().year
     if ktype == "DAY":
         update_stock_info(connect, market)
@@ -593,7 +646,8 @@ def import_data(
     if ktype == "1MIN":
         hku_run_ignore_exception(connect.command,
                                  f"OPTIMIZE TABLE hku_data.min_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
-        hku_info(f"优化 {market} 1分钟线表数据完毕")
+        hku_info(f"优化 {market} 1 分钟线表数据完毕")
+
     return add_record_count
 
 
@@ -633,6 +687,9 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
     date_list.reverse()
 
     trans_buf = []
+    # 用于去重的集合，记录已处理的 datetime
+    seen_datetimes = set()
+
     for cur_date in date_list:
         buf = pytdx_get_day_trans(api, pytdx_market, code, cur_date)
         if not buf:
@@ -652,16 +709,21 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
                 if second > 59:
                     continue
 
-                if record['price'] > 0.0 and record['vol'] >= 0.0:
+                # 构建完整的 datetime 值作为去重键值
+                bar_datetime = cur_date * 1000000 + minute * 100 + second
+
+                if bar_datetime not in seen_datetimes and record['price'] > 0.0 and record['vol'] >= 0.0:
                     trans_buf.append(
                         (
                             market, code,
-                            Datetime(cur_date * 1000000 + minute * 100 + second).timestamp_utc()//1000000,
+                            Datetime(bar_datetime).timestamp_utc()//1000000,
                             int(roundEx(record["price"], 3) * 1000.0),
                             int(record["vol"]),
                             record["buyorsell"],
                         )
                     )
+                    # 标记为已处理
+                    seen_datetimes.add(bar_datetime)
             except Exception as e:
                 hku_error("Failed trans to record! {}", e)
 
@@ -703,7 +765,54 @@ def import_trans(
         ic = connect.create_insert_context(table='hku_data.transdata', data=buf)
         connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
         buf.clear()
-        # hku_info(f"写入 {market} hku_data.transdata 分笔数据: {len(buf)} ...")
+        # hku_info(f"写入 {market} hku_data.transdata 分笔数据：{len(buf)} ...")
+
+    # 导入完成后检查重复数据（仅警告，不删除）- 在 OPTIMIZE 之前执行
+    try:
+        table_info = get_trans_table(connect, market, '000001')
+        full_table_name = table_info[0]  # 完整表名，如 'hku_data.transdata'
+
+        # 只检查当前 market 的股票是否有重复（仅检查最近 5 天）
+        check_sql = f"""
+            SELECT
+                code,
+                count(distinct_dates) as duplicate_datetime_count,
+                sum(dup_count) as total_duplicate_records
+            FROM (
+                SELECT
+                    code,
+                    `date` as distinct_dates,
+                    count(*) as dup_count
+                FROM {full_table_name}
+                WHERE market = '{market}'
+                  AND `date` >= toInt32(toUnixTimestamp(now() - INTERVAL 5 DAY))
+                GROUP BY code, `date`
+                HAVING count() > 1
+            )
+            GROUP BY code
+            ORDER BY duplicate_datetime_count DESC, total_duplicate_records DESC
+        """
+
+        result = connect.query(check_sql)
+        dup_list = result.result_rows
+
+        if len(dup_list) > 0:
+            total_dups = sum(row[2] for row in dup_list)
+            hku_warn(f"\n{'='*80}")
+            hku_warn(f"【重复数据警告】{market}市场 分笔数据存在重复数据！（近 5 天）")
+            hku_warn(f"共发现 {len(dup_list)} 只股票存在重复")
+            hku_warn(f"总计 {total_dups} 条重复记录")
+            hku_warn(f"\n前 20 只重复股票列表:")
+            for i, row in enumerate(dup_list[:20], 1):
+                hku_warn(f"  {i:2d}. {market}{row[0]}: {row[1]}个重复时间点，{row[2]}条记录")
+            if len(dup_list) > 20:
+                hku_warn(f"  ... 还有 {len(dup_list) - 20} 只股票未显示")
+            hku_warn(f"{'='*80}\n")
+        else:
+            hku_debug(f"{market}市场 分笔数据近 5 天未发现重复数据")
+
+    except Exception as e:
+        hku_error(f"检查重复数据失败：{e}")
 
     cur_year = Datetime.today().year
     hku_run_ignore_exception(connect.command,
@@ -745,10 +854,13 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
 
     ticks = 1000000
     time_buf = []
+    # 用于去重的集合，记录已处理的 datetime
+    seen_datetimes = set()
+
     for cur_date in date_list:
         buf = api.get_history_minute_time_data(pytdx_market, code, cur_date)
         if buf is None or len(buf) != 240:
-            # print(cur_date, "获取的分时线长度不为240!", stock_record[1], stock_record[2])
+            # print(cur_date, "获取的分时线长度不为 240!", stock_record[1], stock_record[2])
             continue
         this_date = cur_date * 10000
         time = 930
@@ -763,8 +875,15 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
                 time = 1400
             try:
                 if record['price'] > 0.0 and record['vol'] >= 0.0:
-                    time_buf.append((market, code, Datetime(this_date + time).timestamp_utc() //
-                                     ticks, int(roundEx(record['price'], 3) * 1000.0), int(record['vol'])))
+                    # 构建完整的 datetime 值作为去重键值
+                    bar_datetime = this_date + time
+
+                    # 检查是否重复
+                    if bar_datetime not in seen_datetimes:
+                        time_buf.append((market, code, Datetime(bar_datetime).timestamp_utc() //
+                                         ticks, int(roundEx(record['price'], 3) * 1000.0), int(record['vol'])))
+                        # 标记为已处理
+                        seen_datetimes.add(bar_datetime)
                 time += 1
             except Exception as e:
                 hku_error("Failed trans record {}! {}".format(record, e))
@@ -805,7 +924,53 @@ def import_time(connect, market, quotations, api, dest_dir, max_days=9000, progr
         ic = connect.create_insert_context(table='hku_data.timeline', data=buf)
         connect.insert(context=ic, settings={"prefer_warmed_unmerged_parts_seconds": 86400})
         buf.clear()
-        # hku_info(f"写入 {market} hku_data.timeline 分时数据: {len(buf)} ...")
+        # hku_info(f"写入 {market} hku_data.timeline 分时数据：{len(buf)} ...")
+
+    # 导入完成后检查重复数据（仅警告，不删除）- 在 OPTIMIZE 之前执行
+    try:
+        table_info = get_time_table(connect, market, '000001')
+        full_table_name = table_info[0]  # 完整表名，如 'hku_data.timeline'
+
+        check_sql = f"""
+            SELECT 
+                code, 
+                count(distinct_dates) as duplicate_datetime_count,
+                sum(dup_count) as total_duplicate_records
+            FROM (
+                SELECT 
+                    code, 
+                    `date` as distinct_dates,
+                    count(*) as dup_count
+                FROM {full_table_name}
+                WHERE market = '{market}'
+                  AND `date` >= toInt32(toUnixTimestamp(now() - INTERVAL 5 DAY))
+                GROUP BY code, `date`
+                HAVING count() > 1
+            )
+            GROUP BY code
+            ORDER BY duplicate_datetime_count DESC, total_duplicate_records DESC
+        """
+
+        result = connect.query(check_sql)
+        dup_list = result.result_rows
+
+        if len(dup_list) > 0:
+            total_dups = sum(row[2] for row in dup_list)
+            hku_warn(f"\n{'='*80}")
+            hku_warn(f"【重复数据警告】{market}市场 分时数据存在重复数据！（近 5 天）")
+            hku_warn(f"共发现 {len(dup_list)} 只股票存在重复")
+            hku_warn(f"总计 {total_dups} 条重复记录")
+            hku_warn(f"\n前 20 只重复股票列表:")
+            for i, row in enumerate(dup_list[:20], 1):
+                hku_warn(f"  {i:2d}. {market}{row[0]}: {row[1]}个重复时间点，{row[2]}条记录")
+            if len(dup_list) > 20:
+                hku_warn(f"  ... 还有 {len(dup_list) - 20} 只股票未显示")
+            hku_warn(f"{'='*80}\n")
+        else:
+            hku_debug(f"{market}市场 分时数据近 5 天未发现重复数据")
+
+    except Exception as e:
+        hku_error(f"检查重复数据失败：{e}")
 
     cur_year = Datetime.today().year
     hku_run_ignore_exception(connect.command,
