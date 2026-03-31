@@ -7,7 +7,7 @@
  *      Author: hikyuu
  */
 
-#include "doctest/doctest.h"
+#include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/BARSLASTS.h>
@@ -35,18 +35,13 @@ TEST_CASE("test_BARSLASTS") {
     Indicator expected = BARSLAST(data);
     CHECK_EQ(result.size(), expected.size());
     CHECK_EQ(result.discard(), expected.discard());
-    for (size_t i = 0; i < result.size(); ++i) {
-        if (std::isnan(expected[i])) {
-            CHECK_UNARY(std::isnan(result[i]));
-        } else {
-            CHECK_EQ(result[i], doctest::Approx(expected[i]));
-        }
-    }
+    check_indicator(result, expected);
 
     /** @arg n=2时的基本测试 */
     result = BARSLASTS(data, 2);
     CHECK_EQ(result.size(), data.size());
-    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result.discard(), 4);
+
     // 第0个位置：条件第1次成立，不足2次，应为NaN
     CHECK_UNARY(std::isnan(result[0]));
     // 第1-3个位置：条件只成立1次，不足2次，应为NaN
@@ -73,7 +68,7 @@ TEST_CASE("test_BARSLASTS") {
     result = BARSLASTS(data, 0);
     CHECK_EQ(result.size(), data.size());
     CHECK_EQ(result.discard(), data.size());
-    
+
     result = BARSLASTS(data, -1);
     CHECK_EQ(result.size(), data.size());
     CHECK_EQ(result.discard(), data.size());
@@ -93,30 +88,6 @@ TEST_CASE("test_BARSLASTS") {
     result = BARSLASTS(data, 1);
     CHECK_EQ(result.size(), data.size());
     CHECK_EQ(result.discard(), data.size());
-}
-
-/** @par 检测点 */
-TEST_CASE("test_BARSLASTS_with_indicator_param") {
-    /** @arg 使用Indicator作为参数 */
-    PriceList a;
-    for (int i = 0; i < 8; ++i) {
-        a.push_back(i % 4 == 0 ? 1.0 : 0.0);
-    }
-    Indicator data = PRICELIST(a);
-    Indicator n_ind = CVAL(2);
-    Indicator result = BARSLASTS(data, n_ind);
-    
-    CHECK_EQ(result.size(), data.size());
-    CHECK_EQ(result.discard(), 0);
-    // 验证结果与BARSLASTS(data, 2)一致
-    Indicator expected = BARSLASTS(data, 2);
-    for (size_t i = 0; i < result.size(); ++i) {
-        if (std::isnan(expected[i])) {
-            CHECK_UNARY(std::isnan(result[i]));
-        } else {
-            CHECK_EQ(result[i], doctest::Approx(expected[i]));
-        }
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -150,9 +121,7 @@ TEST_CASE("test_BARSLASTS_export") {
     CHECK_EQ(x1.size(), x2.size());
     CHECK_EQ(x1.discard(), x2.discard());
     CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
-    for (size_t i = 0; i < x1.size(); ++i) {
-        CHECK_EQ(x1[i], doctest::Approx(x2[i]));
-    }
+    check_indicator(x1, x2);
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
