@@ -9,7 +9,7 @@
 
 import unittest
 
-from .test_init import *
+from test_init import *
 
 
 class AddIndicator(IndicatorImp):
@@ -317,7 +317,6 @@ class IndicatorTest(unittest.TestCase):
         # print(f"BARSLASTS(全0数据, 1): discard={result_zeros.discard}")
         self.assertTrue(result_zeros.discard == len(zeros))
         # print("✓ 全0数据测试通过")
-
 
         """测试与K线数据结合使用"""
         # print("\n测试与K线数据结合使用...")

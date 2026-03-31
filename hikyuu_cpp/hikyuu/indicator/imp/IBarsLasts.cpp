@@ -15,7 +15,9 @@ BOOST_CLASS_EXPORT(hku::IBarsLasts)
 
 namespace hku {
 
-IBarsLasts::IBarsLasts() : IndicatorImp("BARSLASTS", 1) {}
+IBarsLasts::IBarsLasts() : IndicatorImp("BARSLASTS", 1) {
+    setParam<int>("n", 0);
+}
 
 IBarsLasts::~IBarsLasts() {}
 

@@ -383,11 +383,9 @@ Indicator (*BARSLAST_1)() = BARSLAST;
 Indicator (*BARSLAST_2)(const Indicator&) = BARSLAST;
 Indicator (*BARSLAST_3)(Indicator::value_t) = BARSLAST;
 
-
 Indicator (*BARSLASTS_1)(int) = BARSLASTS;
-Indicator (*BARSLASTS_2)(const Indicator&) = BARSLASTS;
-Indicator (*BARSLASTS_3)(const Indicator&, int) = BARSLASTS;
-Indicator (*BARSLASTS_4)(const Indicator&, const Indicator&) = BARSLASTS;
+Indicator (*BARSLASTS_2)(const Indicator&, int) = BARSLASTS;
+Indicator (*BARSLASTS_3)(Indicator::value_t, int) = BARSLASTS;
 
 Indicator (*SUMBARS_1)(double) = SUMBARS;
 Indicator (*SUMBARS_2)(const IndParam&) = SUMBARS;
@@ -1579,13 +1577,9 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    m.def("SUMBARS", SUMBARS_1, py::arg("a"));
-
-
-    m.def("BARSLASTS", BARSLASTS_1, py::arg("n"));
-    m.def("BARSLASTS", BARSLASTS_2, py::arg("n"));
-    m.def("BARSLASTS", BARSLASTS_3, py::arg("data"), py::arg("n"));
-    m.def("BARSLASTS", BARSLASTS_4, py::arg("data"), py::arg("n"), R"(BARSLASTS([data, n])
+    m.def("BARSLASTS", BARSLASTS_1);
+    m.def("BARSLASTS", BARSLASTS_2);
+    m.def("BARSLASTS", BARSLASTS_3, py::arg("data"), py::arg("n"), R"(BARSLASTS([data, n])
 
     第N次条件成立位置到当前的周期数。
 
@@ -1598,6 +1592,10 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator data: 输入数据
     :param int|Indicator n: 第N次条件成立
     :rtype: Indicator)");
+
+    m.def("SUMBARS", SUMBARS_1, py::arg("a"));
+    m.def("SUMBARS", SUMBARS_2, py::arg("a"));
+    m.def("SUMBARS", SUMBARS_3, py::arg("data"), py::arg("a"));
     m.def("SUMBARS", SUMBARS_4, py::arg("data"), py::arg("a"));
     m.def("SUMBARS", SUMBARS_5, py::arg("data"), py::arg("a"), R"(SUMBARS([data,] a)
 
