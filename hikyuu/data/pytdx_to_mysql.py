@@ -619,6 +619,9 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
     date_list.reverse()
 
     trans_buf = []
+    # 用于去重的集合，记录已处理的 datetime
+    seen_datetimes = set()
+
     for cur_date in date_list:
         buf = pytdx_get_day_trans(api, pytdx_market, stock_record[2], cur_date)
         if not buf:
@@ -639,14 +642,21 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
                     continue
 
                 if record['price'] > 0.0 and record['vol'] >= 0.0:
-                    trans_buf.append(
-                        (
-                            cur_date * 1000000 + minute * 100 + second,
-                            record["price"],
-                            record["vol"],
-                            record["buyorsell"],
+                    # 构建完整的 datetime 值作为去重键值
+                    bar_datetime = cur_date * 1000000 + minute * 100 + second
+
+                    # 检查是否重复
+                    if bar_datetime not in seen_datetimes:
+                        trans_buf.append(
+                            (
+                                bar_datetime,
+                                record["price"],
+                                record["vol"],
+                                record["buyorsell"],
+                            )
                         )
-                    )
+                        # 标记为已处理
+                        seen_datetimes.add(bar_datetime)
             except Exception as e:
                 hku_error("Failed trans to record! {}", e)
 
@@ -755,10 +765,13 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
     date_list.reverse()
 
     time_buf = []
+    # 用于去重的集合，记录已处理的 datetime
+    seen_datetimes = set()
+
     for cur_date in date_list:
         buf = api.get_history_minute_time_data(pytdx_market, stock_record[2], cur_date)
         if buf is None or len(buf) != 240:
-            # print(cur_date, "获取的分时线长度不为240!", stock_record[1], stock_record[2])
+            # print(cur_date, "获取的分时线长度不为 240!", stock_record[1], stock_record[2])
             continue
         this_date = cur_date * 10000
         time = 930
@@ -773,7 +786,14 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
                 time = 1400
             try:
                 if record['price'] > 0.0 and record['vol'] >= 0.0:
-                    time_buf.append((this_date + time, record['price'], record['vol']))
+                    # 构建完整的 datetime 值作为去重键值
+                    bar_datetime = this_date + time
+
+                    # 检查是否重复
+                    if bar_datetime not in seen_datetimes:
+                        time_buf.append((bar_datetime, record['price'], record['vol']))
+                        # 标记为已处理
+                        seen_datetimes.add(bar_datetime)
                 time += 1
             except Exception as e:
                 hku_error("Failed trans record {}! {}".format(record, e))
