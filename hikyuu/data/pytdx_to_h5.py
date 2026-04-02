@@ -349,10 +349,16 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
                         return (0, False, Datetime(last_datetime))
                 continue
 
-            if today_datetime >= bar_datetime > last_datetime \
-                    and bar['high'] >= bar['open'] >= bar['low'] > 0 \
-                    and bar['high'] >= bar['close'] >= bar['low'] > 0 \
-                    and int(bar['vol']) >= 0 and int(bar['amount']*0.001) >= 0:
+            if (today_datetime >= bar_datetime > last_datetime
+                    and bar['high'] >= bar['open'] >= bar['low'] > 0
+                    and bar['high'] >= bar['close'] >= bar['low'] > 0
+                    and int(bar['vol']) >= 0 and int(bar['amount']*0.001) >= 0):
+                if ktype == "DAY":
+                    if bar["amount"] == 0:
+                        continue
+                else:
+                    if bar["amount"] == 0 or round(bar['vol']) == 0:
+                        continue
                 try:
                     row['datetime'] = bar_datetime
                     row['openPrice'] = bar['open'] * 1000
