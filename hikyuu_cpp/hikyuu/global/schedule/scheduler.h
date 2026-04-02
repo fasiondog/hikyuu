@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "hikyuu/DataType.h"
 #include "../../utilities/TimerManager.h"
 
 namespace hku {
