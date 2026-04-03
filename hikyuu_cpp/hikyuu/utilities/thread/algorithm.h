@@ -11,6 +11,7 @@
 #include <functional>
 #include <vector>
 #include <limits>
+#include <memory>
 #include "ThreadPool.h"
 #include "MQThreadPool.h"
 #include "StealThreadPool.h"
@@ -186,11 +187,15 @@ auto parallel_for_index_single(size_t start, size_t end, FunctionType f, size_t 
 // 前面 parallel_for 系列每次都会创建独立线程池。
 // note: 程序内全局，初始化一次即可，重复初始化被忽略
 //----------------------------------------------------------------
+extern std::unique_ptr<GlobalStealThreadPool> global_steal_thread_pool;
+
 void HKU_UTILS_API init_global_task_group(size_t work_num = 0);
 
 void HKU_UTILS_API release_global_task_group();
 
-HKU_UTILS_API GlobalStealThreadPool* get_global_task_group();
+inline GlobalStealThreadPool* get_global_task_group() {
+    return global_steal_thread_pool.get();
+}
 
 size_t HKU_UTILS_API get_global_task_group_work_num();
 
@@ -240,7 +245,7 @@ void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& fut
 
 /** 使用global_submit_task提交的任务，必须使用global_wait_task，global_wake_up 配合 */
 template <typename FunctionType>
-auto global_submit_task(FunctionType f, bool enable_nested = true) {
+auto global_submit_task(FunctionType f) {
     auto* tg = get_global_task_group();
     HKU_CHECK(tg, "Global task group is not initialized!");
     return tg->submit(f);

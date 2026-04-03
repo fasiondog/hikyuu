@@ -5,12 +5,11 @@
  *      Author: fasiondog
  */
 
-#include <memory>
 #include "algorithm.h"
 
 namespace hku {
 
-static std::unique_ptr<GlobalStealThreadPool> global_steal_thread_pool;
+std::unique_ptr<GlobalStealThreadPool> global_steal_thread_pool;
 
 void HKU_UTILS_API init_global_task_group(size_t work_num) {
     size_t cpu_num = std::thread::hardware_concurrency();
@@ -26,10 +25,6 @@ void HKU_UTILS_API release_global_task_group() {
     if (global_steal_thread_pool) {
         global_steal_thread_pool.reset();
     }
-}
-
-HKU_UTILS_API GlobalStealThreadPool* get_global_task_group() {
-    return global_steal_thread_pool.get();
 }
 
 }  // namespace hku
