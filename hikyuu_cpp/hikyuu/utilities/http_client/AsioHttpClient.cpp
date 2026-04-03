@@ -37,7 +37,7 @@ namespace hku {
 namespace ssl = net::ssl;
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsubobject-linkage"
 #endif
@@ -1609,8 +1609,8 @@ AsioHttpStreamResponse AsioHttpClient::requestStream(
     return future.get();
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
+#if defined(__GNUC__) && !defined(__clang__)
+#push GCC diagnostic pop
 #endif
 
 }  // namespace hku
