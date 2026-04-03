@@ -17,6 +17,7 @@
 
 #include "hikyuu/utilities/ini_parser/IniParser.h"
 #include "hikyuu/utilities/thread/ThreadPool.h"
+#include "hikyuu/utilities/thread/algorithm.h"
 #include "StockManager.h"
 #include "global/schedule/inner_tasks.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
@@ -111,8 +112,10 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 注册扩展K线处理
     registerPredefinedExtraKType();
 
-    StockManager::instance().getPlugin<ExtendIndicatorsPluginInterface>(
-      HKU_PLUGIN_EXTEND_INDICATOR);
+    global_submit_task([this]() {
+        getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
+        getPlugin<TMReportPluginInterface>(HKU_PLUGIN_TMREPORT);
+    });
 
     string basedrivername = m_baseInfoDriverParam.tryGet<string>("type", "");
     to_lower(basedrivername);
