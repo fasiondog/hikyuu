@@ -1610,7 +1610,7 @@ AsioHttpStreamResponse AsioHttpClient::requestStream(
 }
 
 #if defined(__GNUC__) && !defined(__clang__)
-#push GCC diagnostic pop
+#pragma GCC diagnostic pop
 #endif
 
 }  // namespace hku
