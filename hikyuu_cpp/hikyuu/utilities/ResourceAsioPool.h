@@ -31,14 +31,27 @@ using boost::asio::detached;
 using boost::asio::use_awaitable;
 namespace this_coro = boost::asio::this_coro;
 
+namespace rap {
+class NullLock {
+public:
+    void lock() {}
+    void unlock() {}
+    bool try_lock() {
+        return true;
+    }
+};
+
+}  // namespace rap
+
 /**
  * 通用共享资源池 - 适用于协程环境
  * 使用 boost 无锁队列，在协程中异步获取资源
  * @ingroup Utilities
  *
  * @tparam ResourceType 资源类型，必须支持构造函数 ResourceType(const Parameter&)
+ * @tparam MutexType 互斥锁类型，默认为 NullLock（适用于单线程 io_context）
  */
-template <typename ResourceType>
+template <typename ResourceType, typename MutexType = rap::NullLock>
 class ResourceAsioPool {
 public:
     ResourceAsioPool() = delete;
@@ -110,7 +123,7 @@ public:
             m_count.fetch_add(1);
             auto result = ResourcePtr(p, ResourceCloser(this));
             {
-                std::lock_guard<std::mutex> lock(m_closer_mutex);
+                std::lock_guard<MutexType> lock(m_closer_mutex);
                 m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
             }
             co_return result;
@@ -122,7 +135,7 @@ public:
 
         // 加入等待队列
         {
-            std::lock_guard<std::mutex> lock(m_waiterMutex);
+            std::lock_guard<MutexType> lock(m_waiterMutex);
             m_waiters.push(timer);
         }
 
@@ -136,7 +149,7 @@ public:
 
         // 从等待队列移除
         {
-            std::lock_guard<std::mutex> lock(m_waiterMutex);
+            std::lock_guard<MutexType> lock(m_waiterMutex);
             if (!m_waiters.empty() && m_waiters.front() == timer) {
                 m_waiters.pop();
             } else {
@@ -242,7 +255,7 @@ private:
         // 唤醒一个等待者
         std::shared_ptr<boost::asio::steady_timer> timer;
         {
-            std::lock_guard<std::mutex> lock(m_waiterMutex);
+            std::lock_guard<MutexType> lock(m_waiterMutex);
             if (!m_waiters.empty()) {
                 timer = m_waiters.front();
                 m_waiters.pop();
@@ -253,14 +266,14 @@ private:
         }
 
         if (closer) {
-            std::lock_guard<std::mutex> lock(m_closer_mutex);
+            std::lock_guard<MutexType> lock(m_closer_mutex);
             m_closer_set.erase(closer);
         }
     }
 
-    std::mutex m_closer_mutex;                                         // 保护 closer_set 的互斥锁
+    MutexType m_closer_mutex;                                         // 保护 closer_set 的互斥锁
     std::unordered_set<ResourceCloser *> m_closer_set;                 // 占用资源的 closer
-    std::mutex m_waiterMutex;                                          // 保护等待队列的互斥锁
+    MutexType m_waiterMutex;                                          // 保护等待队列的互斥锁
     std::queue<std::shared_ptr<boost::asio::steady_timer>> m_waiters;  // 等待队列
 };
 
@@ -291,14 +304,15 @@ protected:
 };
 
 /**
- * 通用版本的共享资源池（协程版本），当资源池参数变更时，保证新资源使用新参数，老版本的资源在使用完毕后被自动回收
- * @details 要求资源类具备 int getVersion() 和 void setVersion(int) 两个接口函数，建议继承
+ * 通用版本的共享资源池(协程版本),当资源池参数变更时,保证新资源使用新参数,老版本的资源在使用完毕后被自动回收
+ * @details 要求资源类具备 int getVersion() 和 void setVersion(int) 两个接口函数,建议继承
  * AsyncResourceWithVersion
- * @tparam ResourceType 资源类型，必须支持构造函数 ResourceType(const Parameter&) 且继承
+ * @tparam ResourceType 资源类型,必须支持构造函数 ResourceType(const Parameter&) 且继承
  * AsyncResourceWithVersion
+ * @tparam MutexType 互斥锁类型,默认为 NullLock(适用于单线程 io_context)
  * @ingroup Utilities
  */
-template <typename ResourceType>
+template <typename ResourceType, typename MutexType = rap::NullLock>
 class ResourceAsioVersionPool {
 public:
     ResourceAsioVersionPool() = delete;
@@ -338,14 +352,14 @@ public:
 
     /** 指定参数是否存在 */
     bool haveParam(const std::string &name) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<MutexType> lock(m_mutex);
         return m_param.have(name);
     }
 
     /** 获取指定参数的值，如参数不存在或类型不匹配抛出异常 */
     template <typename ValueType>
     ValueType getParam(const std::string &name) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<MutexType> lock(m_mutex);
         return m_param.get<ValueType>(name);
     }
 
@@ -358,7 +372,7 @@ public:
      */
     template <typename ValueType>
     void setParam(const std::string &name, const ValueType &value) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<MutexType> lock(m_mutex);
         // 如果参数未实际发送变化，则直接返回
         if (m_param.have(name) && value == m_param.get<ValueType>(name)) {
             return;
@@ -373,7 +387,7 @@ public:
      * @param param 参数对象
      */
     void setParameter(const Parameter &param) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<MutexType> lock(m_mutex);
         m_param = param;
         m_version.fetch_add(1);
         releaseIdleResource();  // 释放当前空闲资源，以便新参数值生效
@@ -384,7 +398,7 @@ public:
      * @param param 参数对象
      */
     void setParameter(Parameter &&param) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<MutexType> lock(m_mutex);
         m_param = std::move(param);
         m_version.fetch_add(1);
         releaseIdleResource();  // 释放当前空闲资源，以便新参数值生效
@@ -441,7 +455,7 @@ public:
             try {
                 Parameter current_param;
                 {
-                    std::lock_guard<std::mutex> lock(m_mutex);
+                    std::lock_guard<MutexType> lock(m_mutex);
                     current_param = m_param;
                 }
 
@@ -458,7 +472,7 @@ public:
             m_count.fetch_add(1);
             auto result = ResourcePtr(p, ResourceCloser(this));
             {
-                std::lock_guard<std::mutex> lock(m_closer_mutex);
+                std::lock_guard<MutexType> lock(m_closer_mutex);
                 m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
             }
             co_return result;
@@ -470,7 +484,7 @@ public:
 
         // 加入等待队列
         {
-            std::lock_guard<std::mutex> lock(m_waiterMutex);
+            std::lock_guard<MutexType> lock(m_waiterMutex);
             m_waiters.push(timer);
         }
 
@@ -484,7 +498,7 @@ public:
 
         // 从等待队列移除
         {
-            std::lock_guard<std::mutex> lock(m_waiterMutex);
+            std::lock_guard<MutexType> lock(m_waiterMutex);
             if (!m_waiters.empty() && m_waiters.front() == timer) {
                 m_waiters.pop();
             } else {
@@ -597,7 +611,7 @@ private:
                 // 唤醒一个等待者
                 std::shared_ptr<boost::asio::steady_timer> timer;
                 {
-                    std::lock_guard<std::mutex> lock(m_waiterMutex);
+                    std::lock_guard<MutexType> lock(m_waiterMutex);
                     if (!m_waiters.empty()) {
                         timer = m_waiters.front();
                         m_waiters.pop();
@@ -615,16 +629,16 @@ private:
         }
 
         if (closer) {
-            std::lock_guard<std::mutex> lock(m_closer_mutex);
+            std::lock_guard<MutexType> lock(m_closer_mutex);
             m_closer_set.erase(closer);
         }
     }
 
-    std::mutex m_closer_mutex;                                         // 保护 closer_set 的互斥锁
+    MutexType m_closer_mutex;                                         // 保护 closer_set 的互斥锁
     std::unordered_set<ResourceCloser *> m_closer_set;                 // 占用资源的 closer
-    mutable std::mutex m_mutex;                                        // 保护参数访问的互斥锁
+    mutable MutexType m_mutex;                                        // 保护参数访问的互斥锁
     std::atomic<size_t> m_maxCount;                                    // 最大资源上限
-    std::mutex m_waiterMutex;                                          // 保护等待队列的互斥锁
+    MutexType m_waiterMutex;                                          // 保护等待队列的互斥锁
     std::queue<std::shared_ptr<boost::asio::steady_timer>> m_waiters;  // 等待队列
 };
 

@@ -24,6 +24,7 @@
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/Parameter.h"
 #include "HttpException.h"
+#include "hikyuu/utilities/ResourceAsioPool.h"
 
 #ifndef HKU_UTILS_API
 #define HKU_UTILS_API
@@ -59,10 +60,6 @@ class HKU_UTILS_API AsioHttpClient;
 
 // HttpConnection 前向声明
 struct HttpConnection;
-
-// 连接池类型前向声明（避免在头文件中暴露完整模板定义）
-template <typename T>
-class ResourceAsioVersionPool;
 
 /**
  * @brief HTTP 响应类
@@ -1035,7 +1032,7 @@ private:
     std::string m_ca_file;                                    // 自定义 CA 证书文件路径
 
     // 连接池相关成员
-    std::unique_ptr<ResourceAsioVersionPool<HttpConnection>> m_connection_pool;  // 带版本的连接池
+    std::unique_ptr<ResourceAsioVersionPool<HttpConnection, std::mutex>> m_connection_pool;
 
     // io_context 管理
     std::unique_ptr<net::io_context> m_own_ctx;  // 内部 io_context

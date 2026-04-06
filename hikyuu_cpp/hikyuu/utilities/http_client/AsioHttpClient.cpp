@@ -189,8 +189,8 @@ AsioHttpClient::AsioHttpClient(int32_t thread_count, size_t max_concurrency)
 #endif
 
     // 初始化连接池
-    m_connection_pool =
-      std::make_unique<ResourceAsioVersionPool<HttpConnection>>(Parameter(), max_concurrency);
+    m_connection_pool = std::make_unique<ResourceAsioVersionPool<HttpConnection, std::mutex>>(
+      Parameter(), max_concurrency);
 
     // 使用内部 io_context，启动工作线程池运行事件循环
     m_worker_threads.reserve(thread_count);
@@ -216,9 +216,9 @@ AsioHttpClient::AsioHttpClient(const std::string& url, int32_t timeout, int32_t 
         m_work_guard = std::make_unique<net::executor_work_guard<net::io_context::executor_type>>(
           m_own_ctx->get_executor());
 
-        // 初始化连接池参数
-        m_connection_pool =
-          std::make_unique<ResourceAsioVersionPool<HttpConnection>>(Parameter(), max_concurrency);
+        // 初始化连接池参数（AsioHttpClient 可能使用多线程，统一使用 std::mutex 保证安全）
+        m_connection_pool = std::make_unique<ResourceAsioVersionPool<HttpConnection, std::mutex>>(
+          Parameter(), max_concurrency);
 
         // 启动后台线程池运行 io_context
         m_worker_threads.reserve(thread_count);
@@ -241,9 +241,9 @@ AsioHttpClient::AsioHttpClient(net::io_context& ctx, const std::string& url, int
         m_ssl_ctx = std::make_unique<SslContext>();
 #endif
 
-        // 初始化连接池参数
-        m_connection_pool =
-          std::make_unique<ResourceAsioVersionPool<HttpConnection>>(Parameter(), max_concurrency);
+        // 初始化连接池参数（使用外部 io_context，由调用方保证线程安全，这里保守使用 std::mutex）
+        m_connection_pool = std::make_unique<ResourceAsioVersionPool<HttpConnection, std::mutex>>(
+          Parameter(), max_concurrency);
     }
 }
 
