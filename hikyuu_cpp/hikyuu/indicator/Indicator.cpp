@@ -244,6 +244,10 @@ HKU_API Indicator operator-(Indicator::value_t val, const Indicator& ind) {
     return CVAL(ind, val) - ind;
 }
 
+HKU_API Indicator operator-(const Indicator& ind) {
+    return CVAL(ind, -1.0) * ind;
+}
+
 HKU_API Indicator operator*(const Indicator& ind, Indicator::value_t val) {
     return ind * CVAL(ind, val);
 }

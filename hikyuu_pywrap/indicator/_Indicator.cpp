@@ -458,10 +458,12 @@ set_context(self, stock, query)
         },
         "转换为 DataFrame, 仅包含值")
 
+      .def(+py::self)
       .def(py::self + py::self)
       .def(py::self + Indicator::value_t())
       .def(Indicator::value_t() + py::self)
 
+      .def(-py::self)
       .def(py::self - py::self)
       .def(py::self - Indicator::value_t())
       .def(Indicator::value_t() - py::self)

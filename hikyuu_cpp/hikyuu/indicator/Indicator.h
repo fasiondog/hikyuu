@@ -421,9 +421,13 @@ HKU_API Indicator operator|(const Indicator&, const Indicator&);
 
 HKU_API Indicator operator+(const Indicator&, Indicator::value_t);
 HKU_API Indicator operator+(Indicator::value_t, const Indicator&);
+inline Indicator operator+(const Indicator& ind) {
+    return ind;
+}
 
 HKU_API Indicator operator-(const Indicator&, Indicator::value_t);
 HKU_API Indicator operator-(Indicator::value_t, const Indicator&);
+HKU_API Indicator operator-(const Indicator& ind);
 
 HKU_API Indicator operator*(const Indicator&, Indicator::value_t);
 HKU_API Indicator operator*(Indicator::value_t, const Indicator&);
