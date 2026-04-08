@@ -15,6 +15,7 @@
 
 #include "config.h"
 #include "exception.h"
+#include "cppdef.h"
 
 #ifndef HKU_LOG_ACTIVE_LEVEL
 #define HKU_LOG_ACTIVE_LEVEL 0
@@ -105,13 +106,14 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
 #endif
 
 #if !HKU_ENABLE_STACK_TRACE
+#if CPP_STANDARD >= CPP_STANDARD_20
 /**
  * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
  * @note 用于外部入参及结果检查
  */
 #define HKU_CHECK(expr, ...)                                                                   \
     do {                                                                                       \
-        if (!(expr)) {                                                                         \
+        if (!(expr)) [[unlikely]] {                                                            \
             throw hku::exception(fmt::format("HKU_CHECK({}) {} [{}] ({}:{})", #expr,           \
                                              fmt::format(__VA_ARGS__), HKU_FUNCTION, __FILE__, \
                                              __LINE__));                                       \
@@ -124,12 +126,29 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
  */
 #define HKU_CHECK_THROW(expr, except, ...)                                                         \
     do {                                                                                           \
+        if (!(expr)) [[unlikely]] {                                                                \
+            throw except(fmt::format("HKU_CHECK({}) {} [{}] ({}:{})", #expr,                       \
+                                     fmt::format(__VA_ARGS__), HKU_FUNCTION, __FILE__, __LINE__)); \
+        }                                                                                          \
+    } while (0)
+#else
+#define HKU_CHECK(expr, ...)                                                                   \
+    do {                                                                                       \
+        if (!(expr)) {                                                                         \
+            throw hku::exception(fmt::format("HKU_CHECK({}) {} [{}] ({}:{})", #expr,           \
+                                             fmt::format(__VA_ARGS__), HKU_FUNCTION, __FILE__, \
+                                             __LINE__));                                       \
+        }                                                                                      \
+    } while (0)
+
+#define HKU_CHECK_THROW(expr, except, ...)                                                         \
+    do {                                                                                           \
         if (!(expr)) {                                                                             \
             throw except(fmt::format("HKU_CHECK({}) {} [{}] ({}:{})", #expr,                       \
                                      fmt::format(__VA_ARGS__), HKU_FUNCTION, __FILE__, __LINE__)); \
         }                                                                                          \
     } while (0)
-
+#endif  // CPP_STANDARD >= CPP_STANDARD_20
 #else
 #define HKU_CHECK(expr, ...)                                                                     \
     do {                                                                                         \
@@ -168,6 +187,16 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     } while (0)
 
 #else
+#if CPP_STANDARD >= CPP_STANDARD_20
+#define HKU_ASSERT(expr)                                                                  \
+    do {                                                                                  \
+        if (!(expr)) [[unlikely]] {                                                       \
+            std::string err_msg(fmt::format("HKU_ASSERT({})", #expr));                    \
+            throw hku::exception(                                                         \
+              fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__)); \
+        }                                                                                 \
+    } while (0)
+#else
 #define HKU_ASSERT(expr)                                                                  \
     do {                                                                                  \
         if (!(expr)) {                                                                    \
@@ -176,7 +205,7 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
               fmt::format("{} [{}] ({}:{})", err_msg, HKU_FUNCTION, __FILE__, __LINE__)); \
         }                                                                                 \
     } while (0)
-
+#endif  // CPP_STANDARD >= CPP_STANDARD_20
 #endif  // #if HKU_ENABLE_STACK_TRACE
 
 #if !HKU_ENABLE_STACK_TRACE
@@ -400,6 +429,24 @@ protected:                    \
 
 #define CLS_ASSERT HKU_ASSERT
 
+#if CPP_STANDARD >= CPP_STANDARD_20
+#define CLS_CHECK(expr, ...)                                                                  \
+    do {                                                                                      \
+        if (!(expr)) [[unlikely]] {                                                           \
+            throw hku::exception(fmt::format("[{}] CLS_CHECK({}) {} [{}] ({}:{})", ms_logger, \
+                                             #expr, fmt::format(__VA_ARGS__), HKU_FUNCTION,   \
+                                             __FILE__, __LINE__));                            \
+        }                                                                                     \
+    } while (0)
+
+#define CLS_CHECK_THROW(expr, except, ...)                                                         \
+    do {                                                                                           \
+        if (!(expr)) [[unlikely]] {                                                                \
+            throw except(fmt::format("[{}] CLS_CHECK({}) {} [{}] ({}:{})", ms_logger, #expr,       \
+                                     fmt::format(__VA_ARGS__), HKU_FUNCTION, __FILE__, __LINE__)); \
+        }                                                                                          \
+    } while (0)
+#else
 #define CLS_CHECK(expr, ...)                                                                  \
     do {                                                                                      \
         if (!(expr)) {                                                                        \
@@ -416,6 +463,7 @@ protected:                    \
                                      fmt::format(__VA_ARGS__), HKU_FUNCTION, __FILE__, __LINE__)); \
         }                                                                                          \
     } while (0)
+#endif  // CPP_STANDARD >= CPP_STANDARD_20
 
 #define CLS_THROW(...)                                                                     \
     do {                                                                                   \
