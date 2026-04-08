@@ -164,15 +164,25 @@ public:
     // ===================
     virtual void _calculate(const Indicator&);
 
-    // ====== start 动态周期计算相关接口 ======
-    /** 动态周期计算，子类可重载该函数，默认不支持动态周期计算 */
+    // ====== start 动态参数计算相关接口 ======
+    /**
+     * 动态参数计算接口
+     * @note 如果只有一个动态参数，且该参数代表计算窗口周期，可以直接重载_dyn_run_one_step
+     * 配合isSerial
+     */
+    virtual void _dyn_calculate(const Indicator&);
+
+    /**
+     * 如果只有一个动态参数，且该参数代表计算窗口周期，则可使用该宏定义动态周期计算接口，否则需要自己重载
+     * _dyn_calculate 函数实现动态参数计算
+     */
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
     /** 是否必须串行计算 */
     bool isSerial() const noexcept {
         return m_is_serial;
     }
-    // ====== end 动态周期计算相关接口 ======
+    // ====== end 动态参数计算相关接口 ======
 
     // ====== start 增量计算相关接口 =======
     /** 是否支持增量计算 */
@@ -192,8 +202,6 @@ public:
     bool isNeedContext() const noexcept {
         return m_need_context;
     }
-
-    virtual void _dyn_calculate(const Indicator&);
 
 public:
     static void enableIncrementCalculate(bool flag) {
@@ -439,6 +447,8 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
+// 如果只有一个动态参数，且该参数代表计算窗口周期，则可使用该宏定义动态周期计算接口，否则需要自己重载
+// _dyn_calculate 函数实现动态参数计算
 #define INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE \
 public:                                     \
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override;
