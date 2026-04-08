@@ -79,7 +79,7 @@ void IBarsLasts::_calculate(const Indicator& ind) {
             size_t target_idx = true_positions.size() - count;
 
             size_t target_pos = true_positions[target_idx];
-            size_t base_pos = true_positions[target_idx - n + 1];
+            size_t base_pos = true_positions[target_idx + 1 - n];
             size_t target_pos_end =
               (target_idx + 1) >= true_positions.size() ? pos : true_positions[target_idx + 1];
             size_t pos_diff = target_pos - base_pos;
@@ -97,9 +97,72 @@ void IBarsLasts::_calculate(const Indicator& ind) {
     updateDiscard();
 }
 
+void IBarsLasts::_dyn_calculate(const Indicator& ind) {
+    // 获取动态参数 n
+    Indicator ind_param(getIndParamImp("n"));
+    HKU_CHECK(ind_param.size() == ind.size(), "ind_param->size()={}, ind.size()={}!",
+              ind_param.size(), ind.size());
+
+    size_t total = ind.size();
+    size_t ind_discard = ind.discard();
+    m_discard = std::max(ind_discard, ind_param.discard());
+
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
+    auto const* src = ind.data();
+    auto* dst = this->data();
+    auto const* n_data = ind_param.data();
+
+    // 对每个位置单独计算
+    for (size_t i = m_discard; i < total; i++) {
+        int n = static_cast<int>(n_data[i]);
+
+        // 参数验证：如果n <= 0，返回NaN
+        if (n <= 0) {
+            dst[i] = Null<price_t>();
+            continue;
+        }
+
+        // 从当前位置向前查找第 n 次条件成立的位置
+        int count = 0;
+        size_t target_pos = Null<size_t>();
+
+        for (size_t j = i; j >= ind_discard; j--) {
+            if (src[j] != 0.0) {
+                count++;
+                if (count == n) {
+                    target_pos = j;
+                    break;
+                }
+            }
+            if (j == ind_discard) {
+                break;
+            }
+        }
+
+        // 如果找到了第 n 次条件成立的位置，计算距离
+        if (target_pos != Null<size_t>()) {
+            dst[i] = static_cast<price_t>(i - target_pos);
+        } else {
+            dst[i] = Null<price_t>();
+        }
+    }
+
+    updateDiscard();
+}
+
 Indicator HKU_API BARSLASTS(int n) {
     auto p = make_shared<IBarsLasts>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API BARSLASTS(const IndParam& n) {
+    auto p = make_shared<IBarsLasts>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

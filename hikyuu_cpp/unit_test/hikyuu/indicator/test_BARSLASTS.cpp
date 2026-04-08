@@ -12,8 +12,12 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/BARSLASTS.h>
 #include <hikyuu/indicator/crt/BARSLAST.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator/crt/REF.h>
+#include <hikyuu/indicator/crt/SLICE.h>
+#include <hikyuu/indicator/Indicator.h>
 
 using namespace hku;
 
@@ -88,6 +92,95 @@ TEST_CASE("test_BARSLASTS") {
     result = BARSLASTS(data, 1);
     CHECK_EQ(result.size(), data.size());
     CHECK_EQ(result.discard(), data.size());
+}
+
+/** @par 检测点 - 动态参数测试 */
+TEST_CASE("test_BARSLASTS_dyn") {
+    /** @arg 动态参数n与静态参数n=2的结果对比 */
+    PriceList a;
+    for (int i = 0; i < 10; ++i) {
+        a.push_back(i % 3 == 0 ? 1.0 : 0.0);
+    }
+    Indicator data = PRICELIST(a);
+
+    // 静态参数版本
+    Indicator expect_static = BARSLASTS(data, 2);
+
+    // 动态参数版本（使用CVAL创建常量指标）
+    Indicator result_dyn = BARSLASTS(data, CVAL(data, 2));
+
+    CHECK_EQ(expect_static.size(), result_dyn.size());
+    CHECK_EQ(expect_static.discard(), result_dyn.discard());
+    for (size_t i = 0; i < result_dyn.size(); ++i) {
+        if (std::isnan(expect_static[i])) {
+            CHECK_UNARY(std::isnan(result_dyn[i]));
+        } else {
+            CHECK_EQ(expect_static[i], doctest::Approx(result_dyn[i]));
+        }
+    }
+
+    /** @arg 动态参数n与IndParam版本对比 */
+    Indicator result_indparam = BARSLASTS(data, IndParam(CVAL(data, 2)));
+    CHECK_EQ(expect_static.size(), result_indparam.size());
+    CHECK_EQ(expect_static.discard(), result_indparam.discard());
+    for (size_t i = 0; i < result_indparam.size(); ++i) {
+        if (std::isnan(expect_static[i])) {
+            CHECK_UNARY(std::isnan(result_indparam[i]));
+        } else {
+            CHECK_EQ(expect_static[i], doctest::Approx(result_indparam[i]));
+        }
+    }
+
+    /** @arg 动态参数变化的情况 */
+    // 构造一个变化的n值指标：前半部分n=1，后半部分n=2
+    PriceList n_values;
+    for (int i = 0; i < 10; ++i) {
+        n_values.push_back(i < 5 ? 1.0 : 2.0);
+    }
+    Indicator n_param = PRICELIST(n_values);
+
+    result_dyn = BARSLASTS(data, n_param);
+    CHECK_EQ(result_dyn.size(), data.size());
+
+    // 验证前5个位置使用n=1的逻辑（应该与BARSLAST一致）
+    Indicator expect_first_half = BARSLAST(SLICE(data, 0, 5));
+    for (size_t i = 0; i < 5; ++i) {
+        if (std::isnan(expect_first_half[i])) {
+            CHECK_UNARY(std::isnan(result_dyn[i]));
+        } else {
+            CHECK_EQ(expect_first_half[i], doctest::Approx(result_dyn[i]));
+        }
+    }
+
+    /** @arg 动态参数n<=0的情况 */
+    PriceList zero_n;
+    for (int i = 0; i < 10; ++i) {
+        zero_n.push_back(0.0);
+    }
+    Indicator zero_param = PRICELIST(zero_n);
+    result_dyn = BARSLASTS(data, zero_param);
+    CHECK_EQ(result_dyn.size(), data.size());
+    CHECK_EQ(result_dyn.discard(), data.size());
+
+    /** @arg 真实股票数据测试 */
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    Indicator c = CLOSE(kdata);
+    Indicator cond = c > REF(c, 1);  // 上涨条件
+
+    // 静态参数
+    expect_static = BARSLASTS(cond, 2);
+
+    // 动态参数（常量）
+    result_dyn = BARSLASTS(cond, CVAL(cond, 2));
+    CHECK_EQ(expect_static.size(), result_dyn.size());
+    for (size_t i = 0; i < result_dyn.size(); ++i) {
+        if (std::isnan(expect_static[i])) {
+            CHECK_UNARY(std::isnan(result_dyn[i]));
+        } else {
+            CHECK_EQ(expect_static[i], doctest::Approx(result_dyn[i]));
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------

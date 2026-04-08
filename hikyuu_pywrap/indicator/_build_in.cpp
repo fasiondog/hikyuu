@@ -384,8 +384,13 @@ Indicator (*BARSLAST_2)(const Indicator&) = BARSLAST;
 Indicator (*BARSLAST_3)(Indicator::value_t) = BARSLAST;
 
 Indicator (*BARSLASTS_1)(int) = BARSLASTS;
-Indicator (*BARSLASTS_2)(const Indicator&, int) = BARSLASTS;
-Indicator (*BARSLASTS_3)(Indicator::value_t, int) = BARSLASTS;
+Indicator (*BARSLASTS_2)(const IndParam&) = BARSLASTS;
+Indicator (*BARSLASTS_3)(const Indicator&, int) = BARSLASTS;
+Indicator (*BARSLASTS_4)(const Indicator&, const IndParam&) = BARSLASTS;
+Indicator (*BARSLASTS_5)(const Indicator&, const Indicator&) = BARSLASTS;
+Indicator (*BARSLASTS_6)(Indicator::value_t, int) = BARSLASTS;
+Indicator (*BARSLASTS_7)(Indicator::value_t, const IndParam&) = BARSLASTS;
+Indicator (*BARSLASTS_8)(Indicator::value_t, const Indicator&) = BARSLASTS;
 
 Indicator (*SUMBARS_1)(double) = SUMBARS;
 Indicator (*SUMBARS_2)(const IndParam&) = SUMBARS;
@@ -1578,8 +1583,13 @@ void export_Indicator_build_in(py::module& m) {
     :rtype: Indicator)");
 
     m.def("BARSLASTS", BARSLASTS_1);
-    m.def("BARSLASTS", BARSLASTS_2);
-    m.def("BARSLASTS", BARSLASTS_3, py::arg("data"), py::arg("n"), R"(BARSLASTS([data, n])
+    m.def("BARSLASTS", BARSLASTS_2, py::arg("n"));
+    m.def("BARSLASTS", BARSLASTS_3, py::arg("data"), py::arg("n"));
+    m.def("BARSLASTS", BARSLASTS_4, py::arg("data"), py::arg("n"));
+    m.def("BARSLASTS", BARSLASTS_5, py::arg("data"), py::arg("n"));
+    m.def("BARSLASTS", BARSLASTS_6, py::arg("val"), py::arg("n"));
+    m.def("BARSLASTS", BARSLASTS_7, py::arg("val"), py::arg("n"));
+    m.def("BARSLASTS", BARSLASTS_8, py::arg("val"), py::arg("n"), R"(BARSLASTS([data|val,] n)
 
     第N次条件成立位置到当前的周期数。
 
@@ -1589,8 +1599,9 @@ void export_Indicator_build_in(py::module& m) {
 
     注意：当N=1时，BARSLASTS(X, 1) 等价于 BARSLAST(X)。
 
-    :param Indicator data: 输入数据
-    :param int|Indicator n: 第N次条件成立
+    :param Indicator data: 输入数据（可选）
+    :param float val: 输入值（可选，与data二选一）
+    :param int|Indicator|IndParam n: 第N次条件成立，支持动态参数
     :rtype: Indicator)");
 
     m.def("SUMBARS", SUMBARS_1, py::arg("a"));

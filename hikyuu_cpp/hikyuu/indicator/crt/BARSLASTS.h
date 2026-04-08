@@ -27,13 +27,30 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API BARSLASTS(int n);
+Indicator HKU_API BARSLASTS(const IndParam& n);
 
 inline Indicator BARSLASTS(const Indicator& ind, int n) {
     return BARSLASTS(n)(ind);
 }
 
+inline Indicator BARSLASTS(const Indicator& ind, const IndParam& n) {
+    return BARSLASTS(n)(ind);
+}
+
+inline Indicator BARSLASTS(const Indicator& ind, const Indicator& n) {
+    return BARSLASTS(IndParam(n))(ind);
+}
+
 inline Indicator BARSLASTS(Indicator::value_t val, int n) {
     return BARSLASTS(CVAL(val), n);
+}
+
+inline Indicator BARSLASTS(Indicator::value_t val, const IndParam& n) {
+    return BARSLASTS(CVAL(val), n);
+}
+
+inline Indicator BARSLASTS(Indicator::value_t val, const Indicator& n) {
+    return BARSLASTS(CVAL(val), IndParam(n));
 }
 
 }  // namespace hku

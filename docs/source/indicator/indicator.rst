@@ -233,6 +233,38 @@
     :rtype: Indicator
 
 
+.. py:function:: BARSLASTS([data|val,] n)
+
+    第N次条件成立位置到当前的周期数。
+
+    用法：BARSLASTS(X, N): 第N次 X 不为 0 到现在的天数。
+
+    例如：BARSLASTS(CLOSE/REF(CLOSE,1)>=1.1, 2) 表示第2个涨停板到当前的周期数。
+
+    注意：当N=1时，BARSLASTS(X, 1) 等价于 BARSLAST(X)。
+
+    支持动态参数，n 可以是整数、Indicator 或 IndParam。
+
+    使用示例::
+
+        # 静态参数
+        result = BARSLASTS(cond, 2)
+        
+        # 动态参数 - 使用 CVAL
+        result = BARSLASTS(cond, CVAL(cond, 2))
+        
+        # 动态参数 - 使用 IndParam
+        result = BARSLASTS(cond, IndParam(n_indicator))
+        
+        # 动态参数 - 直接使用 Indicator
+        result = BARSLASTS(cond, n_indicator)
+
+    :param Indicator data: 输入数据（可选）
+    :param float val: 输入值（可选，与data二选一）
+    :param int|Indicator|IndParam n: 第N次条件成立，支持动态参数
+    :rtype: Indicator
+
+
 .. py:function:: BARSLASTCOUNT([data])
 
     统计连续满足条件的周期数
