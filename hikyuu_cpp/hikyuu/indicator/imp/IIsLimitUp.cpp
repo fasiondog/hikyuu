@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/StockTypeInfo.h"
 #include "IIsLimitUp.h"
 
 #if HKU_SUPPORT_SERIALIZATION
