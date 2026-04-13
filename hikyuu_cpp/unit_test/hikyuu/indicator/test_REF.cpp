@@ -80,6 +80,28 @@ TEST_CASE("test_REF_dyn") {
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
+    
+    auto temp = IF(CVAL(1), 9, 10);
+    result = REF(CLOSE(), temp + 1);
+    result.setContext(kdata);
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    result = REF(c, IndParam(CVAL(c, 9) + 1));
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+
 }
 
 //-----------------------------------------------------------------------------
