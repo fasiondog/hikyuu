@@ -357,6 +357,103 @@ class IndicatorTest(unittest.TestCase):
 
         # print("✓ K线数据测试通过")
 
+    def test_CODELIKE_NAMELIKE(self):
+        """测试CODELIKE和NAMELIKE指标"""
+        # 获取测试股票
+        stock = sm['sh000001']
+        k = stock.get_kdata(Query(-10))
+        
+        # 测试CODELIKE - 精确匹配
+        result = CODELIKE(k, "000001")
+        self.assertEqual(len(result), len(k))
+        # sh000001的代码是000001，应该匹配成功，返回全1
+        for i in range(len(result)):
+            self.assertEqual(result[i], 1.0)
+        
+        # 测试CODELIKE - 包含匹配（无通配符时自动包含匹配）
+        result = CODELIKE(k, "000")
+        self.assertEqual(len(result), len(k))
+        for i in range(len(result)):
+            self.assertEqual(result[i], 1.0)
+        
+        # 测试CODELIKE - 通配符?匹配
+        result = CODELIKE(k, "??????")
+        self.assertEqual(len(result), len(k))
+        for i in range(len(result)):
+            self.assertEqual(result[i], 1.0)
+        
+        # 测试CODELIKE - 不匹配的情况
+        result = CODELIKE(k, "01")
+        self.assertEqual(len(result), len(k))
+        for i in range(len(result)):
+            self.assertEqual(result[i], 0.0)
+        
+        # 测试NAMELIKE - 包含匹配（无通配符时自动包含匹配）
+        result = NAMELIKE(k, "上证")
+        self.assertEqual(len(result), len(k))
+        # sh000001的名称包含"上证"，应该匹配成功
+        for i in range(len(result)):
+            self.assertEqual(result[i], 1.0)
+        
+        # 测试NAMELIKE - 不匹配的情况
+        result = NAMELIKE(k, "*不存在的名称*")
+        self.assertEqual(len(result), len(k))
+        for i in range(len(result)):
+            self.assertEqual(result[i], 0.0)
+        
+        # 测试深圳股票
+        stock2 = sm['sz00001']
+        if not stock2.is_null():
+            k2 = stock2.get_kdata(Query(-10))
+            
+            # 测试CODELIKE
+            result = CODELIKE(k2, "000")
+            self.assertEqual(len(result), len(k2))
+            for i in range(len(result)):
+                self.assertEqual(result[i], 1.0)
+
+            result = CODELIKE(k2, "600")
+            self.assertEqual(len(result), len(k2))
+            for i in range(len(result)):
+                self.assertEqual(result[i], 0.0)
+        
+        # 测试深圳股票NAMELIKE
+        stock3 = sm['sz000955']
+        if not stock3.is_null():
+            k3 = stock3.get_kdata(Query(-10))
+            
+            result = NAMELIKE(k3, "欣龙")
+            self.assertEqual(len(result), len(k3))
+            for i in range(len(result)):
+                self.assertEqual(result[i], 1.0)
+    
+    def test_CODELIKE_NAMELIKE_wildcard(self):
+        """测试CODELIKE和NAMELIKE的通配符功能"""
+        stock = sm['sh000001']
+        k = stock.get_kdata(Query(-10))
+        
+        # 测试通配符*匹配任意序列
+        result = CODELIKE(k, "*")
+        self.assertEqual(len(result), len(k))
+        for i in range(len(result)):
+            self.assertEqual(result[i], 1.0)
+        
+        result = NAMELIKE(k, "*")
+        self.assertEqual(len(result), len(k))
+        for i in range(len(result)):
+            self.assertEqual(result[i], 1.0)
+        
+        # 测试通配符组合
+        result = CODELIKE(k, "0*1")
+        self.assertEqual(len(result), len(k))
+        for i in range(len(result)):
+            self.assertEqual(result[i], 1.0)
+        
+        result = CODELIKE(k, "0????1")
+        self.assertEqual(len(result), len(k))
+        for i in range(len(result)):
+            self.assertEqual(result[i], 1.0)
+
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(IndicatorTest)

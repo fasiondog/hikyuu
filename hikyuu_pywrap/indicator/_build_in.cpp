@@ -2220,6 +2220,28 @@ void export_Indicator_build_in(py::module& m) {
     :param string name: 板块名称
     :rtype: Indicator)");
 
+    m.def("CODELIKE", py::overload_cast<const string&>(CODELIKE), py::arg("pattern"));
+    m.def("CODELIKE", py::overload_cast<const KData&, const string&>(CODELIKE), py::arg("data"),
+          py::arg("pattern"),
+          R"(CODELIKE(data, pattern)
+
+    当前上下文证券代码是否匹配指定模式。
+
+    :param KData data: 指定的K线数据(上下文)
+    :param string pattern: 匹配模式，支持通配符*和?
+    :rtype: Indicator)");
+
+    m.def("NAMELIKE", py::overload_cast<const string&>(NAMELIKE), py::arg("pattern"));
+    m.def("NAMELIKE", py::overload_cast<const KData&, const string&>(NAMELIKE), py::arg("data"),
+          py::arg("pattern"),
+          R"(NAMELIKE(data, pattern)
+
+    当前上下文证券名称是否匹配指定模式。
+
+    :param KData data: 指定的K线数据(上下文)
+    :param string pattern: 匹配模式，支持通配符*和?
+    :rtype: Indicator)");
+
     m.def("DISCARD", py::overload_cast<int>(DISCARD), py::arg("discard"));
     m.def("DISCARD", py::overload_cast<const Indicator&, int>(DISCARD), py::arg("ind"),
           py::arg("discard"), R"(DISCARD(data, discard)
