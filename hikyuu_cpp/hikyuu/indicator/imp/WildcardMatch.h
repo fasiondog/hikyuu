@@ -1,8 +1,8 @@
 /*
  *  Copyright (c) 2025 hikyuu.org
  *
- *  Created on: 2025-04-10
- *      Author: fasiondog
+ *  Created on: 2026-04-10
+ *      Author: Jet
  */
 
 #pragma once
@@ -19,43 +19,53 @@ namespace hku {
  * @param text 待匹配的文本
  * @param pattern 匹配模式，支持通配符*和?
  * @return 是否匹配成功
- * 
+ *
  * 通配符说明：
  * - * 匹配任意字符序列（包括空序列）
  * - ? 匹配任意单个字符
+ *
+ * 算法说明：
+ * - 使用贪心回溯算法，平均时间复杂度 O(m+n)，最坏 O(m*n)
+ * - 空间复杂度 O(1)，仅使用常数个额外变量
+ * - 相比 DP 方法，在实际场景中通常更快且内存占用更低
  */
 inline bool wildcardMatchImpl(const std::string& text, const std::string& pattern) {
     size_t m = text.length();
     size_t n = pattern.length();
 
-    // DP表，dp[i][j]表示text前i个字符是否匹配pattern前j个字符
-    std::vector<std::vector<bool>> dp(m + 1, std::vector<bool>(n + 1, false));
+    size_t i = 0;                        // text 的当前索引
+    size_t j = 0;                        // pattern 的当前索引
+    size_t starIdx = std::string::npos;  // 最近一个 '*' 的位置
+    size_t matchIdx = 0;                 // '*' 开始匹配 text 的位置
 
-    // 空字符串匹配空模式
-    dp[0][0] = true;
-
-    // 处理模式开头连续的*，它们可以匹配空字符串
-    for (size_t j = 1; j <= n; ++j) {
-        if (pattern[j - 1] == '*') {
-            dp[0][j] = dp[0][j - 1];
+    while (i < m) {
+        if (j < n && (pattern[j] == '?' || pattern[j] == text[i])) {
+            // 当前字符匹配或遇到 '?'
+            ++i;
+            ++j;
+        } else if (j < n && pattern[j] == '*') {
+            // 遇到 '*'，记录位置并尝试匹配空字符串
+            starIdx = j;
+            matchIdx = i;
+            ++j;  // 移动 pattern 指针，'*' 先尝试匹配空串
+        } else if (starIdx != std::string::npos) {
+            // 匹配失败且有 '*' 可以回溯
+            // '*' 多匹配一个字符
+            ++matchIdx;
+            i = matchIdx;
+            j = starIdx + 1;  // pattern 回到 '*' 之后的位置
+        } else {
+            // 匹配失败且无法回溯
+            return false;
         }
     }
 
-    // 填充DP表
-    for (size_t i = 1; i <= m; ++i) {
-        for (size_t j = 1; j <= n; ++j) {
-            if (pattern[j - 1] == '*') {
-                // *可以匹配任意字符序列（包括空序列）
-                dp[i][j] = dp[i][j - 1]      // *匹配空序列
-                        || dp[i - 1][j];     // *匹配至少一个字符
-            } else if (pattern[j - 1] == '?' || pattern[j - 1] == text[i - 1]) {
-                // ?匹配任意单个字符，或者字符精确匹配
-                dp[i][j] = dp[i - 1][j - 1];
-            }
-        }
+    // 处理 pattern 末尾剩余的 '*'
+    while (j < n && pattern[j] == '*') {
+        ++j;
     }
 
-    return dp[m][n];
+    return j == n;
 }
 
 /**
@@ -63,20 +73,20 @@ inline bool wildcardMatchImpl(const std::string& text, const std::string& patter
  * @param text 待匹配的文本
  * @param pattern 匹配模式，支持通配符*和?
  * @return 是否匹配成功
- * 
+ *
  * 通配符说明：
  * - * 匹配任意字符序列（包括空序列）
  * - ? 匹配任意单个字符
- * 
+ *
  * 特殊规则：
  * - 如果pattern中不包含通配符(*或?)，则自动进行开头匹配（等价于pattern*）
  * - 如果pattern中包含通配符，则进行完全匹配
  */
 inline bool wildcardMatch(const std::string& text, const std::string& pattern) {
     // 检查pattern中是否包含通配符
-    bool hasWildcard = (pattern.find('*') != std::string::npos) || 
-                       (pattern.find('?') != std::string::npos);
-    
+    bool hasWildcard =
+      (pattern.find('*') != std::string::npos) || (pattern.find('?') != std::string::npos);
+
     if (hasWildcard) {
         // 包含通配符，使用完全匹配
         return wildcardMatchImpl(text, pattern);
