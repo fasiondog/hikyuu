@@ -409,6 +409,38 @@
     :rtype: Indicator
 
 
+.. py:function:: CODELIKE([data,] pattern)
+
+    证券代码模式匹配
+    
+    返回当前上下文中的证券代码是否匹配指定的模式。支持通配符匹配：
+    
+    - ``*`` ：匹配任意长度的任意字符序列（包括空序列）
+    - ``?`` ：匹配单个任意字符
+    
+    返回值：匹配成功返回 1.0，否则返回 0.0。所有周期的返回值相同。
+    
+    使用示例::
+    
+        # 匹配以"600"开头的股票代码
+        kdata = get_kdata('sh600000', Query(-10))
+        result = CODELIKE(kdata, "600*")
+        
+        # 匹配6位数字的股票代码
+        result = CODELIKE(kdata, "??????")
+        
+        # 匹配以"000"开头且以"1"结尾的代码
+        result = CODELIKE(kdata, "000*1")
+        
+        # 精确匹配特定代码
+        result = CODELIKE(kdata, "600000")
+
+    :param KData data: K线数据（可选，当存在上下文时可省略）
+    :param str pattern: 匹配模式，支持通配符 * 和 ?
+    :return: 匹配结果指标，所有周期值相同（1.0 或 0.0）
+    :rtype: Indicator
+
+
 .. py:function:: COUNT([data, n=20])
 
     统计满足条件的周期数。
@@ -1127,6 +1159,38 @@
 .. py:function:: MRR([ind, n=0])
 
     最大盈利百分比(和MDD向对应的相反方向计算)
+
+
+.. py:function:: NAMELIKE([data,] pattern)
+
+    证券名称模式匹配
+    
+    返回当前上下文中的证券名称是否匹配指定的模式。支持通配符匹配：
+    
+    - ``*`` ：匹配任意长度的任意字符序列（包括空序列）
+    - ``?`` ：匹配单个任意字符
+    
+    返回值：匹配成功返回 1.0，否则返回 0.0。所有周期的返回值相同。
+    
+    使用示例::
+    
+        # 匹配以"上证"开头的指数名称
+        kdata = get_kdata('sh000001', Query(-10))
+        result = NAMELIKE(kdata, "上证*")
+        
+        # 匹配包含"指数"的名称
+        result = NAMELIKE(kdata, "*指数*")
+        
+        # 匹配4个字符的名称
+        result = NAMELIKE(kdata, "????")
+        
+        # 精确匹配特定名称
+        result = NAMELIKE(kdata, "上证指数")
+
+    :param KData data: K线数据（可选，当存在上下文时可省略）
+    :param str pattern: 匹配模式，支持通配符 * 和 ?
+    :return: 匹配结果指标，所有周期值相同（1.0 或 0.0）
+    :rtype: Indicator
 
 
 .. py:function:: NDAY(x, y[, n=3])
