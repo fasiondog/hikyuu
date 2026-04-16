@@ -71,20 +71,16 @@ Hikyuu Quant Framework是一款基于C++/Python的开源超高速量化交易研
 
 🎁 [**捐赠计划与附赠参见**：https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html](https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html)
 
-| 说明                   | 捐赠链接（与下方二维码同）                                      |
-| ---------------------- | --------------------------------------------------------------- |
-| 请作者加个🍗（10元）   | [https://pay.ldxp.cn/item/bet8w6](https://pay.ldxp.cn/item/bet8w6) |
-| 请作者喝杯☕️（30元） | [https://pay.ldxp.cn/item/gflv3v](https://pay.ldxp.cn/item/gflv3v) |
-| 订阅180天（50元）      | [https://pay.ldxp.cn/item/du4h8s](https://pay.ldxp.cn/item/du4h8s) |
-| 订阅365天（100元）     | [https://pay.ldxp.cn/item/ehbz9b](https://pay.ldxp.cn/item/ehbz9b) |
+| 说明                                                       | 捐赠链接（与下方二维码同）                                      |
+| ---------------------------------------------------------- | --------------------------------------------------------------- |
+| 请作者喝杯☕️（30元）                                     | [https://pay.ldxp.cn/item/gflv3v](https://pay.ldxp.cn/item/gflv3v) |
+| 订阅180天（50元）                                          | [https://pay.ldxp.cn/item/du4h8s](https://pay.ldxp.cn/item/du4h8s) |
+| 订阅365天（100元）                                         | [https://pay.ldxp.cn/item/ehbz9b](https://pay.ldxp.cn/item/ehbz9b) |
+| 加入星球<br />(3台设备及其他，<br />首年300元， 续费半价） | [https://t.zsxq.com/YSATD](https://t.zsxq.com/YSATD)               |
 
 ![img](docs/source/_static/dingyue.png)
 
-**👉👉👉 或者加入知识星球，获取更多 👉👉👉**
-
-![知识星球](docs/source/_static/zhishixingqiu.png)
-
-## ⭐️ 来，点亮你的 star
+## ⭐️ 支持项目，点亮你的星
 
 ![img](https://api.star-history.com/svg?repos=fasiondog/hikyuu&type=Date "Star History Chart")
 
