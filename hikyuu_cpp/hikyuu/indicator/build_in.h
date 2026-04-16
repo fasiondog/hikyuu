@@ -117,6 +117,7 @@
 #include "crt/SQRT.h"
 #include "crt/STDEV.h"
 #include "crt/STDP.h"
+#include "crt/STKTYPE.h"
 #include "crt/SUM.h"
 #include "crt/SUMBARS.h"
 #include "crt/TAN.h"

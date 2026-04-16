@@ -1454,6 +1454,26 @@
     :rtype: Indicator
 
 
+.. py:function:: STKTYPE([k])
+
+    获取股票类型指标
+
+    返回当前股票的类型值（StockType枚举值）
+
+    示例::
+
+        # 使用默认上下文
+        stktype = STKTYPE()
+        
+        # 指定K线数据
+        stock = sm.getStock("sh000001")
+        kdata = stock.getKData(Query(0, 100))
+        stktype = STKTYPE(kdata)
+
+    :param KData k: K线数据上下文
+    :rtype: Indicator
+
+
 .. py:function:: SUM([data, n=20])
 
     求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。

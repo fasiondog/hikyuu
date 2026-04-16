@@ -49,6 +49,9 @@ Indicator (*RECOVER_BACKWARD_1)() = RECOVER_BACKWARD;
 Indicator (*RECOVER_BACKWARD_2)(const Indicator&) = RECOVER_BACKWARD;
 Indicator (*RECOVER_BACKWARD_3)(const KData&) = RECOVER_BACKWARD;
 
+Indicator (*STKTYPE1)() = STKTYPE;
+Indicator (*STKTYPE2)(const KData&) = STKTYPE;
+
 Indicator (*RECOVER_EQUAL_FORWARD_1)() = RECOVER_EQUAL_FORWARD;
 Indicator (*RECOVER_EQUAL_FORWARD_2)(const Indicator&) = RECOVER_EQUAL_FORWARD;
 Indicator (*RECOVER_EQUAL_FORWARD_3)(const KData&) = RECOVER_EQUAL_FORWARD;
@@ -1724,6 +1727,16 @@ void export_Indicator_build_in(py::module& m) {
 
     :param data: 输入数据
     :param int n: 时间窗口
+    :rtype: Indicator)");
+
+    m.def("STKTYPE", STKTYPE1);
+    m.def("STKTYPE", STKTYPE2, py::arg("k"), R"(STKTYPE(k)
+
+    获取股票类型指标
+
+    返回当前股票的类型值（StockType枚举值）
+
+    :param KData k: K线数据上下文
     :rtype: Indicator)");
 
     m.def("ROCR", ROCR_1, py::arg("n") = 10);

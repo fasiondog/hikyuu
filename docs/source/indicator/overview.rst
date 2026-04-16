@@ -51,6 +51,7 @@
 * :py:func:`TIMELINEVOL`   - 分时成交量
 * :py:func:`ZHBOND10` - 10年期中国国债收益率
 * :py:func:`ZONGGUBEN` - 总股本
+* :py:func:`STKTYPE` - 股票类型指标
 * :py:func:`ISLIMITUP` - 判断是否涨停
 * :py:func:`ISLIMITDOWN` - 判断是否跌停
     
