@@ -2,6 +2,45 @@
 
 # 版本发布说明
 
+## 2.7.8 - 2026年
+
+**🚀 新增特性**
+
+* feat(indicator): 新增STKTYPE股票类型指标，支持获取股票类型信息
+* feat(indicator): 新增CODELIKE和NAMELIKE通配符匹配函数，支持股票代码和名称的模式匹配
+* feat(indicator): 添加BARSLASTS指标, 支持动态参数
+* feat(indicator): 添加指标的一元正负运算符支持（如 -MA(CLOSE(), 20)）
+* feat(factor): 添加基于指标映射表的FactorSet构造函数，支持更灵活的因子创建方式
+* feat(factor): 添加因子重名处理逻辑，避免因子命名冲突
+* feat(trade_manage): 新增getPositionExtInfoDict方法，获取扩展持仓详情字典
+* feat(trade_manage): 添加持仓记录的买卖次数统计功能
+* feat(trade_manage): 增加买卖次数统计到CSV导出功能
+* feat(trade_manager): 添加按股票获取扩展持仓详情功能
+* feat(strategy): 为Strategy类添加动态属性支持，允许在Python中动态添加属性到Strategy实例
+* feat(strategy): 调整订单数量处理逻辑以符合最小交易单位要求
+* feat(strategy): 完善策略类文档并添加获取当前价格功能
+* feat(StockManager): 异步加载插件以提升初始化性能
+* feat(StockManager): 添加带策略上下文参数的重新加载功能
+* feat(data): 强化数据去重功能并优化代码格式
+* feat(data): 过滤无实际交易数据提升数据质量
+* feat(data): 优化pytdx数据导入时的成交额和成交量验证逻辑
+* feat(Log): 添加C++20标准支持优化断言宏性能
+
+**⚡️ 优化改进**
+
+* refactor(thread): 修改并行算法模板函数参数为右值引用，提升性能
+* refactor(thread): 调整全局任务组实现细节
+* refactor(thread): 优化线程池submit函数参数传递
+
+**🐞 缺陷修复**
+
+* fix(trade_sys): 修复多因子系统中参考股票为空时的异常处理
+* fix(indicator): 修复涨跌停判断中的精度问题
+* fix(indicator): 解决IIsLimitDown和IIsLimitUp指标中缺少StockTypeInfo头文件的问题
+* fix(strategy): 修正Strategy.order_value方法的参数名，将"price"更正为"value"
+* fix(sysinfo): 修复许可证过期提醒逻辑
+* fixed: macOS Xcode升级后编译错误及告警处理
+
 ## 2.7.7 - 2026年3月5日
 
 **🚀 新增特性**
