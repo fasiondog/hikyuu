@@ -23,7 +23,7 @@ IBarsLasts::~IBarsLasts() {}
 
 void IBarsLasts::_calculate(const Indicator& ind) {
     // 获取参数N
-    size_t n = getParam<int>("n");
+    int n = getParam<int>("n");
 
     // 参数验证：如果n <= 0，返回全NaN序列
     if (n <= 0) {

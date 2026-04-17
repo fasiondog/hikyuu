@@ -21,7 +21,7 @@ class IBarsLasts : public IndicatorImp {
 
 public:
     IBarsLasts();
-    virtual ~IBarsLasts();
+    virtual ~IBarsLasts() override;
 
     virtual void _dyn_calculate(const Indicator&) override;
 };
