@@ -64,6 +64,8 @@ target("unit-test")
             set_policy("build.sanitizer.address", true)
         elseif is_plat("linux") then
             -- 需要 export LD_PRELOAD=libasan.so
+            -- 也可能需要抑制 openssl 泄露告警：export LSAN_OPTIONS="suppressions=asan.sup"
+            -- asan.sup 需要copy到 unit-test执行目录
             set_policy("build.sanitizer.address", true)
             set_policy("build.sanitizer.leak", true)
             -- set_policy("build.sanitizer.memory", true)
