@@ -230,11 +230,11 @@ void MultiFactorBase::setQuery(const KQuery& query) {
 }
 
 void MultiFactorBase::setRefStock(const Stock& stk) {
-    HKU_CHECK(!stk.isNull(), "The reference stock must be set!");
-    DatetimeList ref_dates = stk.getDatetimeList(m_query);
+    Stock tmp_stk = stk.isNull() ? StockManager::instance().getMarketStock("SH") : stk;
+    DatetimeList ref_dates = tmp_stk.getDatetimeList(m_query);
     HKU_CHECK(ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
               ref_dates.size());
-    m_ref_stk = stk;
+    m_ref_stk = tmp_stk;
     m_calculated = false;
 }
 
