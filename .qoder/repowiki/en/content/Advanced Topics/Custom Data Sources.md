@@ -2,7 +2,7 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [HttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/HttpClient.h)
+- [AsioHttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/AsioHttpClient.h)
 - [IniParser.h](file://hikyuu_cpp/hikyuu/utilities/ini_parser/IniParser.h)
 - [DataDriverPluginInterface.h](file://hikyuu_cpp/hikyuu/plugin/interface/DataDriverPluginInterface.h)
 - [DataDriverFactory.cpp](file://hikyuu_cpp/hikyuu/data_driver/DataDriverFactory.cpp)
@@ -34,21 +34,21 @@ This document provides comprehensive guidance on implementing custom data source
 The Hikyuu framework employs a modular architecture for data source integration, with distinct components handling HTTP communication, database connectivity, configuration management, and data driver registration. The system is designed to support both real-time market data fetching and historical data storage through various database backends. The architecture separates concerns between data acquisition (fetcher module), data storage (data driver), and configuration management (IniParser), enabling flexible integration of new data sources.
 
 **Section sources**
-- [HttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/HttpClient.h)
+- [AsioHttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/AsioHttpClient.h)
 - [IniParser.h](file://hikyuu_cpp/hikyuu/utilities/ini_parser/IniParser.h)
 - [DataDriverPluginInterface.h](file://hikyuu_cpp/hikyuu/plugin/interface/DataDriverPluginInterface.h)
 
 ## HTTP Client for REST API Integration
-The HttpClient class provides a robust interface for connecting to REST APIs and web services for financial data. Implemented using the NNG library, it supports synchronous HTTP requests with configurable timeouts, headers, and SSL/TLS settings. The client handles various HTTP methods including GET, POST, and JSON payloads, making it suitable for interacting with modern financial data APIs.
+The AsioHttpClient class provides a robust interface for connecting to REST APIs and web services for financial data. Implemented using the NNG library, it supports synchronous HTTP requests with configurable timeouts, headers, and SSL/TLS settings. The client handles various HTTP methods including GET, POST, and JSON payloads, making it suitable for interacting with modern financial data APIs.
 
 The HttpResponse class encapsulates the response from HTTP requests, providing access to the response body, status code, headers, and JSON parsing capabilities. This allows for easy extraction of financial data from API responses in various formats.
 
 ```mermaid
 classDiagram
-class HttpClient {
-+HttpClient()
-+HttpClient(string url, int32_t timeout_ms)
-+~HttpClient()
+class AsioHttpClient {
++AsioHttpClient()
++AsioHttpClient(string url, int32_t timeout_ms)
++~AsioHttpClient()
 +valid() bool
 +url() string
 +setUrl(string url)
@@ -68,14 +68,14 @@ class HttpResponse {
 +getHeader(string key) string
 +getContentLength() size_t
 }
-HttpClient --> HttpResponse : "returns"
+AsioHttpClient --> HttpResponse : "returns"
 ```
 
 **Diagram sources**
-- [HttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/HttpClient.h)
+- [AsioHttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/AsioHttpClient.h)
 
 **Section sources**
-- [HttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/HttpClient.h)
+- [AsioHttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/AsioHttpClient.h)
 
 ## Database Connectivity Utilities
 Hikyuu provides database connectivity utilities through a connection pool mechanism that supports multiple database types including MySQL, SQLite, and ClickHouse. The ConnectPool class manages database connections efficiently, reducing the overhead of establishing new connections for each data operation.
@@ -222,7 +222,7 @@ Authentication credentials should be managed securely through configuration file
 
 **Section sources**
 - [zh_stock_a_sina_qq.py](file://hikyuu/fetcher/stock/zh_stock_a_sina_qq.py)
-- [HttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/HttpClient.h)
+- [AsioHttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/AsioHttpClient.h)
 
 ## Integration with Data Driver Architecture
 Custom data sources integrate with the existing data driver architecture through the DataDriverFactory, which acts as a registry and factory for different data drivers. When a data source is configured in the system, the StockManager reads the configuration parameters and requests the appropriate driver from the factory.
@@ -278,5 +278,5 @@ When implementing custom data sources in Hikyuu, follow these best practices:
 
 **Section sources**
 - [zh_stock_a_sina_qq.py](file://hikyuu/fetcher/stock/zh_stock_a_sina_qq.py)
-- [HttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/HttpClient.h)
+- [AsioHttpClient.h](file://hikyuu_cpp/hikyuu/utilities/http_client/AsioHttpClient.h)
 - [IniParser.h](file://hikyuu_cpp/hikyuu/utilities/ini_parser/IniParser.h)

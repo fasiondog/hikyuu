@@ -36,6 +36,10 @@ target("hikyuu")
         end
     end
 
+    if has_config("http_client_ssl") then
+        add_packages("openssl3")
+    end
+
     if has_config("http_client_zip") then
         add_packages("gzip-hpp")
     end

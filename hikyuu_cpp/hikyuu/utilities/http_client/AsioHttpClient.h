@@ -10,7 +10,7 @@
 #define HKU_UTILS_ASIO_HTTP_CLIENT_H
 
 #include "hikyuu/utilities/config.h"
-#if !HKU_ENABLE_AISO_HTTP_CLIENT
+#if !HKU_ENABLE_HTTP_CLIENT
 #error "Don't enable http client, please config with --http_client=y"
 #endif
 

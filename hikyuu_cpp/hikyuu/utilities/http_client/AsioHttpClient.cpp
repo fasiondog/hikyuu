@@ -615,7 +615,7 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
 
                 // 启动定时器和连接操作
                 timer.async_wait(
-                  [&timer, &connect_completed, &conn_ptr](const boost::system::error_code& ec) {
+                  [&connect_completed, &conn_ptr](const boost::system::error_code& ec) {
                       if (!ec && !connect_completed && conn_ptr->ssl_socket.has_value()) {
                           conn_ptr->ssl_socket->lowest_layer().cancel();
                       }
@@ -675,7 +675,7 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
 
                 // 启动定时器和握手操作
                 timer.async_wait(
-                  [&timer, &handshake_completed, &conn_ptr](const boost::system::error_code& ec) {
+                  [&handshake_completed, &conn_ptr](const boost::system::error_code& ec) {
                       if (!ec && !handshake_completed && conn_ptr->ssl_socket.has_value()) {
                           conn_ptr->ssl_socket->lowest_layer().cancel();
                       }
@@ -683,7 +683,7 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
 
                 SslHandshakeOp handshake_op{&conn_ptr->ssl_socket.value(), handshake_completed,
                                             captured_ec};
-                auto handshake_result = co_await handshake_op.run();
+                co_await handshake_op.run();
 
                 // 取消定时器
                 timer.cancel();
@@ -950,14 +950,14 @@ net::awaitable<void> AsioHttpClient::_connect(SocketVariant& socket_variant,
 
         // 启动定时器和握手操作
         timer.async_wait(
-          [&timer, &handshake_completed, &socket_variant](const boost::system::error_code& ec) {
+          [&handshake_completed, &socket_variant](const boost::system::error_code& ec) {
               if (!ec && !handshake_completed && socket_variant.ssl.has_value()) {
                   socket_variant.ssl->lowest_layer().cancel();
               }
           });
 
         SslHandshakeOp handshake_op{&socket_variant.ssl.value(), handshake_completed, captured_ec};
-        auto handshake_result = co_await handshake_op.run();
+        co_await handshake_op.run();
 
         // 取消定时器
         timer.cancel();
@@ -1068,12 +1068,11 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
                 };
 
                 // 启动定时器和写操作
-                timer.async_wait(
-                  [&timer, &write_completed, &conn](const boost::system::error_code& ec) {
-                      if (!ec && !write_completed && conn->is_open()) {
-                          conn->lowest_layer().cancel();
-                      }
-                  });
+                timer.async_wait([&write_completed, &conn](const boost::system::error_code& ec) {
+                    if (!ec && !write_completed && conn->is_open()) {
+                        conn->lowest_layer().cancel();
+                    }
+                });
 
                 auto write_op = WriteOp{*conn->ssl_socket, req, write_completed};
                 auto [write_ec, bytes_transferred] = co_await write_op.run();
@@ -1160,12 +1159,11 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
                 };
 
                 // 启动定时器和读操作
-                timer.async_wait(
-                  [&timer, &read_completed, &conn](const boost::system::error_code& ec) {
-                      if (!ec && !read_completed && conn->is_open()) {
-                          conn->lowest_layer().cancel();
-                      }
-                  });
+                timer.async_wait([&read_completed, &conn](const boost::system::error_code& ec) {
+                    if (!ec && !read_completed && conn->is_open()) {
+                        conn->lowest_layer().cancel();
+                    }
+                });
 
                 auto read_op = ReadOp{*conn->ssl_socket, buffer, res, read_completed, captured_ec};
                 co_await read_op.run();
