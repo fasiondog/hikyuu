@@ -53,8 +53,6 @@ target("hikyuu")
     add_configfiles("$(projectdir)/version.h.in")
     add_configfiles("$(projectdir)/config_utils.h.in", {prefixdir="utilities", filename="config.h"})
 
-    add_defines("CPPHTTPLIB_OPENSSL_SUPPORT", "CPPHTTPLIB_ZLIB_SUPPORT")
-
     if is_plat("windows") then
         add_cxflags("/bigobj")
         add_cxflags("-wd4819")
