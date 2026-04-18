@@ -214,7 +214,7 @@ if has_config("http_client_zip") then
 end
 
 if has_config("http_client_ssl") then
-    add_requires("openssl3", {system = false})
+    add_requires("openssl3")
 end
 
 if has_config("ta_lib") then
