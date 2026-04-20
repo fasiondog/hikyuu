@@ -1247,10 +1247,10 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
         // 不关闭连接，让连接池自动管理
 
     } catch (const boost::system::system_error& e) {
-        HKU_ERROR("HTTP request system error! {}", e.what());
+        HKU_DEBUG("HTTP request system error! {}", e.what());
         throw;
     } catch (const std::exception& e) {
-        HKU_ERROR("HTTP request failed! {}", e.what());
+        HKU_DEBUG("HTTP request failed! {}", e.what());
         throw;
     }
 
@@ -1559,10 +1559,10 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
         // 不关闭连接，让连接池自动管理（连接会被归还到池中）
 
     } catch (const boost::system::system_error& e) {
-        HKU_ERROR("HTTP stream request system error! {}", e.what());
+        HKU_DEBUG("HTTP stream request system error! {}", e.what());
         throw;
     } catch (const std::exception& e) {
-        HKU_ERROR("HTTP stream request failed! {}", e.what());
+        HKU_DEBUG("HTTP stream request failed! {}", e.what());
         throw;
     }
 
