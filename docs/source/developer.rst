@@ -128,7 +128,7 @@ Windows 下，习惯用 msvc 调试的，可以使用  xmake project -k vsxmake 
 
 如自行编译的希望使用 hikyuu 插件的，请安装独立的插件包 pip install hikyuu-plugin
 
-但请注意插件版本需要配套，最好使用 release 分支进行编译，避免版本不匹配无法使用。
+但请注意插件版本需要配套，最好使用 release 分支（或标签）进行编译，避免版本不匹配无法使用。
 
 
 Docker 构建
