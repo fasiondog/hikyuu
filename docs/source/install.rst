@@ -4,7 +4,7 @@
 安装前准备
 ----------
 
-支持的操作系统：64位 Windows7及以上版本、Ubuntu、MacOSX(arm架构)，其他建议使用源码编译安装
+支持的操作系统：64位 Windows7(x86 cpu)及以上版本、Ubuntu、MacOSX(arm)，其他建议使用源码编译安装
 
 
 1. Python环境：>= Python3.10)。 推荐使用安装时 python 的主流版本或低一个版本，比如截止 2025年4月1日, python主流版本为 3.12, 建议使用3.12或3.11, 避免因 python 版本低可能导致的其他依赖包互不兼容导致的错误。
@@ -42,4 +42,4 @@ pip 安装
 源码编译安装
 ----------------
 
-Ubuntu24.04及以上支持 pip 安装，其他Linux及macsox上建议使用源码方式安装，参见 :ref:`developer` 。
+Windows(x86 cpu),Ubuntu24.04及以上、mac(arm cpu)支持 pip 安装，其他建议使用源码方式安装，参见 :ref:`developer` 。
