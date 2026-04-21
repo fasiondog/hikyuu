@@ -89,10 +89,6 @@ Maybe，你已经注意到了，上面没有“选股策略”？！是的，选
     </thead>
     <tbody>
     <tr>
-    <td>请作者加个🍗（10元)</td>
-    <td><a href="https://pay.ldxp.cn/item/bet8w6" rel="nofollow">https://pay.ldxp.cn/item/bet8w6</a></td>
-    </tr>
-    <tr>
     <td>请作者喝杯☕️（30元)</td>
     <td><a href="https://pay.ldxp.cn/item/gflv3v" rel="nofollow">https://pay.ldxp.cn/item/gflv3v</a></td>
     </tr>
@@ -103,6 +99,10 @@ Maybe，你已经注意到了，上面没有“选股策略”？！是的，选
     <tr>
     <td>订阅365天（100元)</td>
     <td><a href="https://pay.ldxp.cn/item/ehbz9b" rel="nofollow">https://pay.ldxp.cn/item/ehbz9b</a></td>
+    </tr>
+    <tr>
+    <td>加入知识星球365天（首年300元，续费半价，3台授权，其他工具)</td>
+    <td><a href="https://t.zsxq.com/YSATD" rel="nofollow">https://t.zsxq.com/YSATD</a></td>
     </tr>
     </tbody>
     </table>
