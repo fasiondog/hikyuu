@@ -206,10 +206,12 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
 
     // 加入当前运行系统集合，并设置调仓周期
     for (auto& sys : m_selected_list) {
-        m_running_sys_set.insert(sys);
-        m_running_sys_list.emplace_back(sys);
-        auto sg = sys->getSG();
-        sg->startCycle(date, nextCycle);
+        auto [it, ok] = m_running_sys_set.insert(sys);
+        if (ok) {
+            m_running_sys_list.emplace_back(sys);
+            auto sg = sys->getSG();
+            sg->startCycle(date, nextCycle);
+        }
     }
 
     //----------------------------------------------------------------------------
@@ -319,10 +321,12 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
 
     // 加入当前运行系统集合，并设置调仓周期
     for (auto& sys : m_selected_list) {
-        m_running_sys_set.insert(sys);
-        m_running_sys_list.emplace_back(sys);
-        auto sg = sys->getSG();
-        sg->startCycle(date, nextCycle);
+        auto [it, ok] = m_running_sys_set.insert(sys);
+        if (ok) {
+            m_running_sys_list.emplace_back(sys);
+            auto sg = sys->getSG();
+            sg->startCycle(date, nextCycle);
+        }
     }
 
     //----------------------------------------------------------------------------
@@ -417,10 +421,12 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
 
     // 加入当前运行系统集合，并设置调仓周期
     for (auto& sys : m_selected_list) {
-        m_running_sys_set.insert(sys);
-        m_running_sys_list.emplace_back(sys);
-        auto sg = sys->getSG();
-        sg->startCycle(date, nextCycle);
+        auto [it, ok] = m_running_sys_set.insert(sys);
+        if (ok) {
+            m_running_sys_list.emplace_back(sys);
+            auto sg = sys->getSG();
+            sg->startCycle(date, nextCycle);
+        }
     }
     //----------------------------------------------------------------------------
     // 依次执行运行中所有系统
