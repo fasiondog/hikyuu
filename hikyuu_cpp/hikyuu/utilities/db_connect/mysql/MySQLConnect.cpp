@@ -60,10 +60,10 @@ void MySQLConnect::connect() {
                   mysql_errno(m_mysql), "Failed set reconnect options, {}", mysql_error(m_mysql));
 #endif
 
-        // 20220314: 新版 mysqlclient 默认 ssl 可能被开启，这里强制设为关闭
-        unsigned int ssl_mode = SSL_MODE_DISABLED;
-        SQL_CHECK(mysql_options(m_mysql, MYSQL_OPT_SSL_MODE, &ssl_mode) == 0, mysql_errno(m_mysql),
-                  "Failed set ssl_mode options, {}", mysql_error(m_mysql));
+#if MYSQL_VERSION_ID >= 80000
+        my_bool opt_true = 1;
+        mysql_options(m_mysql, MYSQL_OPT_GET_SERVER_PUBLIC_KEY, &opt_true);
+#endif
 
         SQL_CHECK(mysql_real_connect(m_mysql, host.c_str(), usr.c_str(), pwd.c_str(),
                                      database.c_str(), port, NULL, CLIENT_MULTI_STATEMENTS) != NULL,
