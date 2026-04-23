@@ -15,10 +15,12 @@
 
 namespace hku {
 
+#define HKU_IND_ALIGN_SIZE 64
+
 // 重载new和delete操作符
 void* IndicatorImpBuffer::operator new(size_t size) {
 #if HKU_ENABLE_MIMALLOC
-    void* ptr = mi_malloc(size);
+    void* ptr = mi_malloc_aligned(size, HKU_IND_ALIGN_SIZE);
     if (!ptr) {
         throw std::bad_alloc();
     }
@@ -46,7 +48,7 @@ void IndicatorImpBuffer::operator delete(void* ptr) noexcept {
 
 void* IndicatorImpBuffer::operator new[](size_t size) {
 #if HKU_ENABLE_MIMALLOC
-    void* ptr = mi_malloc(size);
+    void* ptr = mi_malloc_aligned(size, HKU_IND_ALIGN_SIZE);
     if (!ptr) {
         throw std::bad_alloc();
     }
@@ -82,7 +84,8 @@ void IndicatorImpBuffer::Buffer::allocate(IndicatorImpBuffer::size_type new_capa
     }
 
 #if HKU_ENABLE_MIMALLOC
-    data = static_cast<value_type*>(mi_malloc(new_capacity * sizeof(value_type)));
+    data = static_cast<value_type*>(
+      mi_malloc_aligned(new_capacity * sizeof(value_type), HKU_IND_ALIGN_SIZE));
 #else
     data = static_cast<value_type*>(std::malloc(new_capacity * sizeof(value_type)));
 #endif
