@@ -1577,6 +1577,7 @@ AsioHttpResponse AsioHttpClient::request(const std::string& method, const std::s
                                          const HttpParams& params, const HttpHeaders& headers,
                                          const char* body, size_t body_len,
                                          const std::string& content_type) {
+    HKU_CHECK(m_is_valid_url, "Invalid url: {}", m_url);
     HKU_ASSERT(m_ctx);
     if (m_ctx->stopped()) {
         m_ctx->restart();
