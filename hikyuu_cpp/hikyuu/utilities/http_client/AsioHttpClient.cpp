@@ -445,38 +445,80 @@ std::string AsioHttpClient::_buildURI(const std::string& path, const HttpParams&
 net::awaitable<std::vector<tcp::endpoint>> AsioHttpClient::_resolveDNS() {
 #if HKU_OS_OSX || HKU_OS_IOS
     // macOS 使用原生 getaddrinfo 方式（beast 解析存在已知问题会卡死）
-    struct addrinfo hints, *res = nullptr;
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
+    struct ResolveResult {
+        std::vector<tcp::endpoint> endpoints;
+        boost::system::error_code ec;
+        bool done = false;
+    };
 
-    int ret = getaddrinfo(m_host.c_str(), m_port.c_str(), &hints, &res);
-    HKU_CHECK(ret == 0, "DNS resolve failed!");
+    auto result = std::make_shared<ResolveResult>();
 
-    std::vector<tcp::endpoint> dns_endpoints;
-    for (struct addrinfo* ai = res; ai != nullptr; ai = ai->ai_next) {
-        if (ai->ai_family == AF_INET) {
-            auto* sin = reinterpret_cast<sockaddr_in*>(ai->ai_addr);
-            net::ip::address_v4::bytes_type v4_bytes;
-            std::memcpy(&v4_bytes, &(sin->sin_addr.s_addr), sizeof(v4_bytes));
-            dns_endpoints.push_back(
-              tcp::endpoint(net::ip::make_address_v4(v4_bytes), ntohs(sin->sin_port)));
-        } else if (ai->ai_family == AF_INET6) {
-            auto* sin6 = reinterpret_cast<sockaddr_in6*>(ai->ai_addr);
-            net::ip::address_v6::bytes_type v6_bytes;
-            std::memcpy(&v6_bytes, &(sin6->sin6_addr.s6_addr), sizeof(v6_bytes));
-            dns_endpoints.push_back(
-              tcp::endpoint(net::ip::make_address_v6(v6_bytes), ntohs(sin6->sin6_port)));
+    // 创建定时器用于超时控制
+    auto timer = std::make_shared<net::steady_timer>(*m_ctx);
+    timer->expires_after(m_timeout);
+
+    // 在独立线程中执行 getaddrinfo
+    std::thread resolve_thread([this, result, timer]() {
+        struct addrinfo hints, *res = nullptr;
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_UNSPEC;
+        hints.ai_socktype = SOCK_STREAM;
+
+        int ret = getaddrinfo(m_host.c_str(), m_port.c_str(), &hints, &res);
+        if (ret != 0) {
+            result->ec = boost::system::error_code(ret, boost::system::generic_category());
+            result->done = true;
+            // 通知协程操作已完成，取消定时器
+            net::post(timer->get_executor(), [timer]() { timer->cancel(); });
+            return;
         }
+
+        for (struct addrinfo* ai = res; ai != nullptr; ai = ai->ai_next) {
+            if (ai->ai_family == AF_INET) {
+                auto* sin = reinterpret_cast<sockaddr_in*>(ai->ai_addr);
+                net::ip::address_v4::bytes_type v4_bytes;
+                std::memcpy(&v4_bytes, &(sin->sin_addr.s_addr), sizeof(v4_bytes));
+                result->endpoints.push_back(
+                  tcp::endpoint(net::ip::make_address_v4(v4_bytes), ntohs(sin->sin_port)));
+            } else if (ai->ai_family == AF_INET6) {
+                auto* sin6 = reinterpret_cast<sockaddr_in6*>(ai->ai_addr);
+                net::ip::address_v6::bytes_type v6_bytes;
+                std::memcpy(&v6_bytes, &(sin6->sin6_addr.s6_addr), sizeof(v6_bytes));
+                result->endpoints.push_back(
+                  tcp::endpoint(net::ip::make_address_v6(v6_bytes), ntohs(sin6->sin6_port)));
+            }
+        }
+
+        freeaddrinfo(res);
+        result->done = true;
+        // 通知协程操作已完成，取消定时器
+        net::post(timer->get_executor(), [timer]() { timer->cancel(); });
+    });
+
+    // 等待定时器超时或手动取消
+    boost::system::error_code timer_ec;
+    co_await timer->async_wait(boost::asio::redirect_error(boost::asio::use_awaitable, timer_ec));
+
+    // 检查是否超时（定时器正常触发表示超时）
+    if (!timer_ec && !result->done) {
+        // 超时，分离线程让其后台完成
+        resolve_thread.detach();
+        HKU_THROW_EXCEPTION(HttpTimeoutException, "DNS resolve timeout");
     }
 
-    freeaddrinfo(res);
+    // 操作已完成，等待线程完成
+    resolve_thread.join();
 
-    if (dns_endpoints.empty()) {
+    // 检查错误
+    if (result->ec) {
+        HKU_THROW("DNS resolve failed: {}", result->ec.message());
+    }
+
+    if (result->endpoints.empty()) {
         HKU_THROW("No valid endpoints from DNS resolve");
     }
 
-    co_return dns_endpoints;
+    co_return result->endpoints;
 
 #else
     // 其他平台使用 Boost.ASIO 异步 DNS解析
@@ -1577,16 +1619,31 @@ AsioHttpResponse AsioHttpClient::request(const std::string& method, const std::s
                                          const HttpParams& params, const HttpHeaders& headers,
                                          const char* body, size_t body_len,
                                          const std::string& content_type) {
+    // 提前验证 URL，避免进入异步协程后才发现问题
     HKU_CHECK(m_is_valid_url, "Invalid url: {}", m_url);
     HKU_ASSERT(m_ctx);
+
+    // 确保 io_context 处于运行状态
     if (m_ctx->stopped()) {
         m_ctx->restart();
     }
 
+    // 使用 use_future 将协程结果转换为 std::future
     auto future =
       co_spawn(*m_ctx, async_request(method, path, params, headers, body, body_len, content_type),
-               boost::asio::use_future);  // 使用use_future代替detached以更好地管理future
+               boost::asio::use_future);
 
+    // 带超时保护的等待，防止因 URL 非法或其他原因导致的永久阻塞
+    // 超时时间设置为当前超时时间的 1.5 倍，给异步操作留出足够时间
+    auto timeout_duration = m_timeout * 3 / 2;
+    if (future.wait_for(timeout_duration) == std::future_status::timeout) {
+        HKU_THROW_EXCEPTION(
+          HttpTimeoutException,
+          "HTTP request timed out after {} ms (possibly due to invalid URL or network issues)",
+          std::chrono::duration_cast<std::chrono::milliseconds>(timeout_duration).count());
+    }
+
+    // 获取结果，如果协程中抛出了异常，这里会重新抛出
     return future.get();
 }
 
@@ -1594,18 +1651,33 @@ AsioHttpStreamResponse AsioHttpClient::requestStream(
   const std::string& method, const std::string& path, const HttpParams& params,
   const HttpHeaders& headers, const char* body, size_t body_len, const std::string& content_type,
   const HttpChunkCallback& chunk_callback) {
+    // 提前验证 URL 和回调函数
     HKU_CHECK(m_is_valid_url, "Invalid url: {}", m_url);
+    HKU_CHECK(chunk_callback != nullptr, "Chunk callback must not be null");
     HKU_ASSERT(m_ctx);
+
+    // 确保 io_context 处于运行状态
     if (m_ctx->stopped()) {
         m_ctx->restart();
     }
 
-    auto future =
-      co_spawn(*m_ctx,
-               async_requestStream(method, path, params, headers, body, body_len, content_type,
-                                   chunk_callback),
-               boost::asio::use_future);  // 使用use_future代替detached以更好地管理future
+    // 使用 use_future 将协程结果转换为 std::future
+    auto future = co_spawn(*m_ctx,
+                           async_requestStream(method, path, params, headers, body, body_len,
+                                               content_type, chunk_callback),
+                           boost::asio::use_future);
 
+    // 带超时保护的等待
+    auto timeout_duration = m_timeout * 3 / 2;
+    if (future.wait_for(timeout_duration) == std::future_status::timeout) {
+        HKU_THROW_EXCEPTION(
+          HttpTimeoutException,
+          "HTTP stream request timed out after {} ms (possibly due to invalid URL or network "
+          "issues)",
+          std::chrono::duration_cast<std::chrono::milliseconds>(timeout_duration).count());
+    }
+
+    // 获取结果，如果协程中抛出了异常，这里会重新抛出
     return future.get();
 }
 
