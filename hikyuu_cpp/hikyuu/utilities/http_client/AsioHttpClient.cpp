@@ -443,82 +443,52 @@ std::string AsioHttpClient::_buildURI(const std::string& path, const HttpParams&
 
 // 异步 DNS 解析方法
 net::awaitable<std::vector<tcp::endpoint>> AsioHttpClient::_resolveDNS() {
+    // 先判断host是否为IP地址，是的话直接构造endpoint返回，避免不必要的DNS查询
+    boost::system::error_code ec;
+    auto addr = net::ip::make_address(m_host, ec);
+    if (!ec) {
+        // host是有效的IP地址，直接构造endpoint
+        std::vector<tcp::endpoint> endpoints;
+        uint16_t port_num = static_cast<uint16_t>(std::stoi(m_port));
+        if (addr.is_v4()) {
+            endpoints.emplace_back(tcp::endpoint(addr.to_v4(), port_num));
+        } else if (addr.is_v6()) {
+            endpoints.emplace_back(tcp::endpoint(addr.to_v6(), port_num));
+        }
+        co_return endpoints;
+    }
+
 #if HKU_OS_OSX || HKU_OS_IOS
     // macOS 使用原生 getaddrinfo 方式（beast 解析存在已知问题会卡死）
-    struct ResolveResult {
-        std::vector<tcp::endpoint> endpoints;
-        boost::system::error_code ec;
-        bool done = false;
-    };
+    struct addrinfo hints, *res = nullptr;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_ADDRCONFIG;  // 只查本机支持的地址类型
 
-    auto result = std::make_shared<ResolveResult>();
+    int ret = getaddrinfo(m_host.c_str(), m_port.c_str(), &hints, &res);
+    HKU_CHECK(ret == 0, "DNS resolve failed! {}:{}", m_host, m_port);
 
-    // 创建定时器用于超时控制
-    auto timer = std::make_shared<net::steady_timer>(*m_ctx);
-    timer->expires_after(m_timeout);
-
-    // 在独立线程中执行 getaddrinfo
-    std::thread resolve_thread([this, result, timer]() {
-        struct addrinfo hints, *res = nullptr;
-        memset(&hints, 0, sizeof(hints));
-        hints.ai_family = AF_UNSPEC;
-        hints.ai_socktype = SOCK_STREAM;
-
-        int ret = getaddrinfo(m_host.c_str(), m_port.c_str(), &hints, &res);
-        if (ret != 0) {
-            result->ec = boost::system::error_code(ret, boost::system::generic_category());
-            result->done = true;
-            // 通知协程操作已完成，取消定时器
-            net::post(timer->get_executor(), [timer]() { timer->cancel(); });
-            return;
+    std::vector<tcp::endpoint> dns_endpoints;
+    for (struct addrinfo* ai = res; ai != nullptr; ai = ai->ai_next) {
+        if (ai->ai_family == AF_INET) {
+            auto* sin = reinterpret_cast<sockaddr_in*>(ai->ai_addr);
+            net::ip::address_v4::bytes_type v4_bytes;
+            std::memcpy(&v4_bytes, &(sin->sin_addr.s_addr), sizeof(v4_bytes));
+            dns_endpoints.push_back(
+              tcp::endpoint(net::ip::make_address_v4(v4_bytes), ntohs(sin->sin_port)));
+        } else if (ai->ai_family == AF_INET6) {
+            auto* sin6 = reinterpret_cast<sockaddr_in6*>(ai->ai_addr);
+            net::ip::address_v6::bytes_type v6_bytes;
+            std::memcpy(&v6_bytes, &(sin6->sin6_addr.s6_addr), sizeof(v6_bytes));
+            dns_endpoints.push_back(
+              tcp::endpoint(net::ip::make_address_v6(v6_bytes), ntohs(sin6->sin6_port)));
         }
-
-        for (struct addrinfo* ai = res; ai != nullptr; ai = ai->ai_next) {
-            if (ai->ai_family == AF_INET) {
-                auto* sin = reinterpret_cast<sockaddr_in*>(ai->ai_addr);
-                net::ip::address_v4::bytes_type v4_bytes;
-                std::memcpy(&v4_bytes, &(sin->sin_addr.s_addr), sizeof(v4_bytes));
-                result->endpoints.push_back(
-                  tcp::endpoint(net::ip::make_address_v4(v4_bytes), ntohs(sin->sin_port)));
-            } else if (ai->ai_family == AF_INET6) {
-                auto* sin6 = reinterpret_cast<sockaddr_in6*>(ai->ai_addr);
-                net::ip::address_v6::bytes_type v6_bytes;
-                std::memcpy(&v6_bytes, &(sin6->sin6_addr.s6_addr), sizeof(v6_bytes));
-                result->endpoints.push_back(
-                  tcp::endpoint(net::ip::make_address_v6(v6_bytes), ntohs(sin6->sin6_port)));
-            }
-        }
-
-        freeaddrinfo(res);
-        result->done = true;
-        // 通知协程操作已完成，取消定时器
-        net::post(timer->get_executor(), [timer]() { timer->cancel(); });
-    });
-
-    // 等待定时器超时或手动取消
-    boost::system::error_code timer_ec;
-    co_await timer->async_wait(boost::asio::redirect_error(boost::asio::use_awaitable, timer_ec));
-
-    // 检查是否超时（定时器正常触发表示超时）
-    if (!timer_ec && !result->done) {
-        // 超时，分离线程让其后台完成
-        resolve_thread.detach();
-        HKU_THROW_EXCEPTION(HttpTimeoutException, "DNS resolve timeout");
     }
 
-    // 操作已完成，等待线程完成
-    resolve_thread.join();
-
-    // 检查错误
-    if (result->ec) {
-        HKU_THROW("DNS resolve failed: {}", result->ec.message());
-    }
-
-    if (result->endpoints.empty()) {
-        HKU_THROW("No valid endpoints from DNS resolve");
-    }
-
-    co_return result->endpoints;
+    freeaddrinfo(res);
+    HKU_CHECK(!dns_endpoints.empty(), "DNS resolve failed! {}:{}", m_host, m_port);
+    co_return dns_endpoints;
 
 #else
     // 其他平台使用 Boost.ASIO 异步 DNS解析
