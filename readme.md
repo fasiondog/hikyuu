@@ -4,7 +4,7 @@
 
 ![img](https://static.pepy.tech/badge/hikyuu) ![img](https://static.pepy.tech/badge/hikyuu/month) ![img](https://static.pepy.tech/badge/hikyuu/week) ![img](https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg) ![img](https://github.com/fasiondog/hikyuu/workflows/ubuntu-build/badge.svg) ![License](https://img.shields.io/github/license/fasiondog/hikyuu.svg)
 
-Hikyuu Quant Framework 是一款遵循 Apache-2.0 协议、基于 C++/Python 开发的**开源超高速量化研究框架**，免费开放、无使用限制。项目深耕国内量化金融技术研究，深度适配 A 股市场数据体系，聚焦策略建模、量化模拟回测与金融数据分析，核心能力覆盖量化模型研发、高速金融计算、标准化回测体系、研究能力拓展四大方向。
+Hikyuu Quant Framework 是一款基于 C++/Python 开发的**开源超高速量化研究框架**，免费开放、无使用限制。项目深耕国内量化金融技术研究，深度适配 A 股市场数据体系，聚焦策略建模、量化模拟回测与金融数据分析，核心能力覆盖量化模型研发、高速金融计算、标准化回测体系、研究能力拓展四大方向。
 
 框架依托成熟的系统化交易研究理念，将量化分析体系拆解为**市场环境研判、策略生效条件判定、信号指标解析、盈亏风控模型、资金配比模型、收益目标测算、滑点模拟算法、多因子建模、投资组合分析、资金分配**等独立模块化组件。用户可自由组合模块、搭建专属策略模型库，通过模拟回测验证策略稳定性与有效性，完成量化策略研究与数据分析工作。同时框架预留拓展接口，支持开发者自主开发、对接合规的第三方交易接口（如 QMT 等官方合规终端接口），满足个性化技术拓展与私有适配需求。
 
