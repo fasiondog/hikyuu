@@ -73,6 +73,8 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
 
     size_t finances_total = finances.size();
 
+    // Fixed #25(gitee) 季报和年报在同一天发布可能冲突
+    // 公式FINANCE(kdata, 231) 和FINANCE(kdata,95)中没有年报（231为第四季度）的数据的问题
     for (size_t i = finances_total - 1; i > 0; --i) {
         if (finances[i - 1].reportDate >= finances[i].reportDate) {
             finances[i - 1].reportDate = finances[i].reportDate - TimeDelta(1);
@@ -88,12 +90,16 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
                 if (dynamic) {
                     long month = finances[pos].fileDate.month();
                     if (3L == month) {
+                        // 一季报
                         dst[cur_kix] = value * 4;
                     } else if (6L == month) {
+                        // 半年报
                         dst[cur_kix] = value * 2;
                     } else if (9L == month) {
+                        // 三季报
                         dst[cur_kix] = value / 3.0 * 4.0;
                     } else {
+                        // 年报
                         dst[cur_kix] = value;
                     }
                 } else {
