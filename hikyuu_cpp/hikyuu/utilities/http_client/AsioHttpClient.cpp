@@ -58,6 +58,20 @@ AsioHttpResponse& AsioHttpResponse::operator=(AsioHttpResponse&& rhs) noexcept {
     return *this;
 }
 
+json AsioHttpResponse::json() const {
+    auto content_type = getHeader("Content-Type");
+    if (content_type.find("application/json") != std::string::npos) {
+        return json::parse(m_body);
+    }
+    if (content_type.find("application/msgpack") != std::string::npos) {
+        return json::from_msgpack(m_body);
+    }
+    if (content_type.find("application/cbor") != std::string::npos) {
+        return json::from_cbor(m_body);
+    }
+    return json::parse(m_body);
+}
+
 AsioHttpStreamResponse::AsioHttpStreamResponse(AsioHttpStreamResponse&& rhs)
 : m_status(rhs.m_status),
   m_reason(std::move(rhs.m_reason)),

@@ -95,9 +95,7 @@ public:
      * @return JSON 对象
      * @throws nlohmann::json::exception 当响应体不是合法 JSON 时
      */
-    hku::json json() const {
-        return json::parse(m_body);
-    }
+    hku::json json() const;
 
     /**
      * @brief 获取 HTTP 状态码
