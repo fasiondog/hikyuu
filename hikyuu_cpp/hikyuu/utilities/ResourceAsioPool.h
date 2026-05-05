@@ -18,7 +18,7 @@
 #include <chrono>
 #include <vector>
 #include <atomic>
-#include <unordered_set>
+#include <condition_variable>
 #include "Parameter.h"
 #include "Log.h"
 #include "ResourcePool.h"
@@ -74,12 +74,26 @@ public:
      * 析构函数，释放所有缓存的资源
      */
     virtual ~ResourceAsioPool() {
-        // 将所有已分配资源的 closer 和 pool 解绑
-        for (auto iter = m_closer_set.begin(); iter != m_closer_set.end(); ++iter) {
-            (*iter)->unbind();
+        // 清空等待队列，取消所有等待的定时器
+        {
+            std::lock_guard<MutexType> lock(m_waiterMutex);
+            for (auto &timer : m_waiters) {
+                if (timer) {
+                    timer->cancel();
+                }
+            }
+            m_waiters.clear();
         }
 
-        // 释放所有空闲资源
+        // 标记正在析构，阻止新的资源获取
+        m_is_destroying.store(true);
+
+        // 等待所有活跃资源归还
+        // 当 m_count == m_idleCount 时，说明所有资源都已归还到空闲队列
+        std::unique_lock<MutexType> lock(m_destroy_mutex);
+        m_destroy_cv.wait(lock, [this]() { return m_count.load() == m_idleCount.load(); });
+
+        // 此时所有资源都在空闲队列中，释放它们
         ResourceType *p = nullptr;
         while (m_resourceList.pop(p)) {
             if (p) {
@@ -99,14 +113,11 @@ public:
      */
     awaitable<ResourcePtr> get(
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(3)) {
-        auto executor = co_await this_coro::executor;
-
         // 1. 尝试从空闲队列获取资源
         ResourceType *p = nullptr;
         if (m_resourceList.pop(p)) {
             m_idleCount.fetch_sub(1);
-            auto result = ResourcePtr(p, ResourceCloser(this));
-            co_return result;
+            co_return ResourcePtr(p, ResourceCloser(this));
         }
 
         // 2. 无空闲但未达上限 → 创建新资源
@@ -121,22 +132,18 @@ public:
                                     "Failed create a new Resource! Unknown error!");
             }
             m_count.fetch_add(1);
-            auto result = ResourcePtr(p, ResourceCloser(this));
-            {
-                std::lock_guard<MutexType> lock(m_closer_mutex);
-                m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
-            }
-            co_return result;
+            co_return ResourcePtr(p, ResourceCloser(this));
         }
 
         // 3. 已达上限 → 进入等待队列
+        auto executor = co_await this_coro::executor;
         auto timer = std::make_shared<boost::asio::steady_timer>(executor);
         timer->expires_after(timeout);
 
         // 加入等待队列
         {
             std::lock_guard<MutexType> lock(m_waiterMutex);
-            m_waiters.push(timer);
+            m_waiters.push_back(timer);
         }
 
         // 等待被唤醒或超时
@@ -150,19 +157,11 @@ public:
         // 从等待队列移除
         {
             std::lock_guard<MutexType> lock(m_waiterMutex);
-            if (!m_waiters.empty() && m_waiters.front() == timer) {
-                m_waiters.pop();
+            if (!m_waiters.empty() && m_waiters.back() == timer) {
+                m_waiters.pop_back();
             } else {
                 // 如果不是队首，需要查找并移除（超时情况）
-                std::queue<std::shared_ptr<boost::asio::steady_timer>> temp;
-                while (!m_waiters.empty()) {
-                    auto t = m_waiters.front();
-                    m_waiters.pop();
-                    if (t != timer) {
-                        temp.push(t);
-                    }
-                }
-                m_waiters = std::move(temp);
+                m_waiters.remove(timer);
             }
         }
 
@@ -173,8 +172,7 @@ public:
                                     "Unexpected error: no available resource after wakeup");
             }
             m_idleCount.fetch_sub(1);
-            auto result = ResourcePtr(p, ResourceCloser(this));
-            co_return result;
+            co_return ResourcePtr(p, ResourceCloser(this));
         } else {
             // 超时
             HKU_THROW_EXCEPTION(CreateResourceException,
@@ -204,6 +202,9 @@ public:
                 m_idleCount.fetch_sub(1);  // 减少空闲计数
                 delete p;
                 m_count.fetch_sub(1);  // 减少计数
+
+                // 通知析构函数：资源计数已变化
+                m_destroy_cv.notify_one();
             }
         }
     }
@@ -241,16 +242,25 @@ private:
 
     /** 归还至资源池 */
     void returnResource(ResourceType *p, ResourceCloser *closer) {
-        if (p) {
-            if (m_resourceList.push(p)) {
-                m_idleCount.fetch_add(1);
-            } else {
-                delete p;
-                m_count.fetch_sub(1);
-            }
-        } else {
-            m_count.fetch_sub(1);
+        if (!p) [[unlikely]] {
+            HKU_WARN("ResourceAsioPool::returnResource: nullptr");
+            return;
         }
+
+        if (!m_resourceList.push(p)) {
+            // 队列已满（即最大限制），直接删除
+            delete p;
+            m_count.fetch_sub(1);
+
+            // 通知析构函数：资源计数已变化
+            m_destroy_cv.notify_one();
+            return;
+        }
+
+        m_idleCount.fetch_add(1);
+
+        // 通知析构函数：可能有资源已完全归还
+        m_destroy_cv.notify_one();
 
         // 唤醒一个等待者
         std::shared_ptr<boost::asio::steady_timer> timer;
@@ -258,23 +268,19 @@ private:
             std::lock_guard<MutexType> lock(m_waiterMutex);
             if (!m_waiters.empty()) {
                 timer = m_waiters.front();
-                m_waiters.pop();
+                m_waiters.pop_front();
             }
         }
         if (timer) {
             timer->cancel();
         }
-
-        if (closer) {
-            std::lock_guard<MutexType> lock(m_closer_mutex);
-            m_closer_set.erase(closer);
-        }
     }
 
-    MutexType m_closer_mutex;                                         // 保护 closer_set 的互斥锁
-    std::unordered_set<ResourceCloser *> m_closer_set;                 // 占用资源的 closer
     MutexType m_waiterMutex;                                          // 保护等待队列的互斥锁
-    std::queue<std::shared_ptr<boost::asio::steady_timer>> m_waiters;  // 等待队列
+    std::list<std::shared_ptr<boost::asio::steady_timer>> m_waiters;  // 等待队列
+    std::atomic<bool> m_is_destroying{false};                         // 标记是否正在析构
+    MutexType m_destroy_mutex;                                        // 保护析构等待的条件变量
+    std::condition_variable_any m_destroy_cv;                         // 用于通知析构函数资源已归还
 };
 
 /**
@@ -336,12 +342,27 @@ public:
      * 析构函数，释放所有缓存的资源
      */
     virtual ~ResourceAsioVersionPool() {
-        // 将所有已分配资源的 closer 和 pool 解绑
-        for (auto iter = m_closer_set.begin(); iter != m_closer_set.end(); ++iter) {
-            (*iter)->unbind();
+        // 清空等待队列，取消所有等待的定时器
+        {
+            std::lock_guard<MutexType> lock(m_waiterMutex);
+            while (!m_waiters.empty()) {
+                auto timer = m_waiters.front();
+                m_waiters.pop();
+                if (timer) {
+                    timer->cancel();
+                }
+            }
         }
 
-        // 释放所有空闲资源
+        // 标记正在析构，阻止新的资源获取
+        m_is_destroying.store(true);
+
+        // 等待所有活跃资源归还
+        // 当 m_count == m_idleCount 时，说明所有资源都已归还到空闲队列
+        std::unique_lock<MutexType> lock(m_destroy_mutex);
+        m_destroy_cv.wait(lock, [this]() { return m_count.load() == m_idleCount.load(); });
+
+        // 此时所有资源都在空闲队列中，释放它们
         ResourceType *p = nullptr;
         while (m_resourceList.pop(p)) {
             if (p) {
@@ -470,12 +491,7 @@ public:
             }
 
             m_count.fetch_add(1);
-            auto result = ResourcePtr(p, ResourceCloser(this));
-            {
-                std::lock_guard<MutexType> lock(m_closer_mutex);
-                m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
-            }
-            co_return result;
+            co_return ResourcePtr(p, ResourceCloser(this));
         }
 
         // 3. 已达上限，进入等待队列
@@ -561,6 +577,9 @@ public:
                 m_idleCount.fetch_sub(1);  // 减少空闲计数
                 delete p;
                 m_count.fetch_sub(1);  // 减少计数
+
+                // 通知析构函数：资源计数已变化
+                m_destroy_cv.notify_one();
             }
         }
     }
@@ -603,9 +622,15 @@ private:
             if (p->getVersion() == m_version.load()) {
                 if (m_resourceList.push(p)) {
                     m_idleCount.fetch_add(1);
+
+                    // 通知析构函数：可能有资源已完全归还
+                    m_destroy_cv.notify_one();
                 } else {
                     delete p;
                     m_count.fetch_sub(1);
+
+                    // 通知析构函数：资源计数已变化
+                    m_destroy_cv.notify_one();
                 }
 
                 // 唤醒一个等待者
@@ -623,23 +648,25 @@ private:
             } else {
                 delete p;
                 m_count.fetch_sub(1);
+
+                // 通知析构函数：资源计数已变化
+                m_destroy_cv.notify_one();
             }
         } else {
             m_count.fetch_sub(1);
-        }
 
-        if (closer) {
-            std::lock_guard<MutexType> lock(m_closer_mutex);
-            m_closer_set.erase(closer);
+            // 通知析构函数：资源计数已变化
+            m_destroy_cv.notify_one();
         }
     }
 
-    MutexType m_closer_mutex;                                         // 保护 closer_set 的互斥锁
-    std::unordered_set<ResourceCloser *> m_closer_set;                 // 占用资源的 closer
-    mutable MutexType m_mutex;                                        // 保护参数访问的互斥锁
+    mutable MutexType m_mutex;                                         // 保护参数访问的互斥锁
     std::atomic<size_t> m_maxCount;                                    // 最大资源上限
-    MutexType m_waiterMutex;                                          // 保护等待队列的互斥锁
+    MutexType m_waiterMutex;                                           // 保护等待队列的互斥锁
     std::queue<std::shared_ptr<boost::asio::steady_timer>> m_waiters;  // 等待队列
+    std::atomic<bool> m_is_destroying{false};                          // 标记是否正在析构
+    MutexType m_destroy_mutex;                                         // 保护析构等待的条件变量
+    std::condition_variable_any m_destroy_cv;                          // 用于通知析构函数资源已归还
 };
 
 }  // namespace hku
