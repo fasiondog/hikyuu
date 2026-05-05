@@ -72,6 +72,13 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
     const auto* k = kdata.data();
 
     size_t finances_total = finances.size();
+
+    for (size_t i = finances_total - 1; i > 0; --i) {
+        if (finances[i - 1].reportDate >= finances[i].reportDate) {
+            finances[i - 1].reportDate = finances[i].reportDate - TimeDelta(1);
+        }
+    }
+
     size_t cur_kix = start_pos;
     size_t pos = 0;
     while (pos < finances_total && cur_kix < total) {
@@ -81,16 +88,12 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
                 if (dynamic) {
                     long month = finances[pos].fileDate.month();
                     if (3L == month) {
-                        // 一季报
                         dst[cur_kix] = value * 4;
                     } else if (6L == month) {
-                        // 半年报
                         dst[cur_kix] = value * 2;
                     } else if (9L == month) {
-                        // 三季报
                         dst[cur_kix] = value / 3.0 * 4.0;
                     } else {
-                        // 年报
                         dst[cur_kix] = value;
                     }
                 } else {
@@ -104,16 +107,12 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
                 if (dynamic) {
                     long month = finances[pos].fileDate.month();
                     if (3L == month) {
-                        // 一季报
                         dst[cur_kix] = value * 4;
                     } else if (6L == month) {
-                        // 半年报
                         dst[cur_kix] = value * 2;
                     } else if (9L == month) {
-                        // 三季报
                         dst[cur_kix] = value / 3.0 * 4.0;
                     } else {
-                        // 年报
                         dst[cur_kix] = value;
                     }
                 } else {
