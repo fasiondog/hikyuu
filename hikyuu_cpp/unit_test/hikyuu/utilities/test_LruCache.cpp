@@ -7,6 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/utilities/LruCache.h>
+#include <memory>
 #include <string>
 #include <thread>
 #include <chrono>
