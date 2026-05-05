@@ -113,12 +113,16 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
                 if (dynamic) {
                     long month = finances[pos].fileDate.month();
                     if (3L == month) {
+                        // 一季报
                         dst[cur_kix] = value * 4;
                     } else if (6L == month) {
+                        // 半年报
                         dst[cur_kix] = value * 2;
                     } else if (9L == month) {
+                        // 三季报
                         dst[cur_kix] = value / 3.0 * 4.0;
                     } else {
+                        // 年报
                         dst[cur_kix] = value;
                     }
                 } else {
