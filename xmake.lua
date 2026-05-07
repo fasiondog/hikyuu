@@ -131,27 +131,7 @@ add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.gi
         add_requires("hdf5 " .. hdf5_version, { system = false })
  end
 
-local boost_config
-if is_plat("windows") then
-    boost_config = {
-        system = false,
-        debug = is_mode("debug"),
-        configs = {
-            shared = true,
-            runtimes = get_config("runtimes"),
-            multi = true,
-            date_time = true,
-            filesystem = false,
-            serialization = get_config("serialize"),
-            system = true,
-            python = false,
-            asio = true,
-            openssl = has_config("mysql"),
-            mysql = has_config("mysql"),
-            cmake = false,
-    }}
-else
-    boost_config = {
+local boost_config = {
         system = false,
         configs = {
             shared = true, -- is_plat("windows"),
@@ -179,9 +159,6 @@ else
             mysql = has_config("mysql"),            
             cmake = true,
     }}
-end
-
-
 
 add_requires("boost", boost_config)
 add_requireconfs("boost", {
