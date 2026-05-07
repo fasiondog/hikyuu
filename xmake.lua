@@ -181,7 +181,16 @@ else
     }}
 end
 
+
+
 add_requires("boost", boost_config)
+add_requireconfs("boost", {
+    deps = {
+        -- 尝试将包名映射为 openssl3
+        openssl = { name = "openssl3",  override = true }
+    }
+})
+
 add_requires("fmt", {system = false, configs = {header_only = true}})
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
 add_requireconfs("spdlog.fmt", {override = true, system = false, configs = {header_only = true}})
