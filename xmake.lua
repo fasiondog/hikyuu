@@ -124,20 +124,11 @@ if is_plat("windows") then
     hdf5_version = "1.13.3"
 end
 local flatbuffers_version = "25.2.10"
-local mysql_version = "8.0.31"
-if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
-    mysql_version = "8.0.21" 
-elseif is_plat("macosx") then
-    mysql_version = "8.0.40"
-end
 
 add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.git")
 -- add_repositories("hikyuu-repo https://gitee.com/fasiondog/hikyuu_extern_libs.git")
  if get_config("hdf5") then
         add_requires("hdf5 " .. hdf5_version, { system = false })
- end
- if get_config("mysql") then
-     add_requires("mysql " .. mysql_version, { system = false })
  end
 
 local boost_config
@@ -155,6 +146,8 @@ if is_plat("windows") then
             system = true,
             python = false,
             asio = true,
+            openssl = has_config("mysql"),
+            mysql = has_config("mysql"),
             cmake = false,
     }}
 else
@@ -182,6 +175,8 @@ else
             random = true,
             thread = true,
             asio = true,
+            openssl = has_config("mysql"),
+            mysql = has_config("mysql"),            
             cmake = true,
     }}
 end
@@ -213,8 +208,8 @@ if has_config("http_client_zip") then
     add_requires("gzip-hpp", {system = false})
 end
 
-if has_config("http_client_ssl") then
-    add_requires("openssl3")
+if has_config("http_client_ssl") or has_config("mysql") then
+    add_requires("openssl3", {system = is_plat("linux"), configs = {shared = true}})
 end
 
 if has_config("ta_lib") then
@@ -222,6 +217,7 @@ if has_config("ta_lib") then
 end
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
+add_defines("BOOST_ASIO_DISABLE_DEPRECATED")
 
 set_objectdir("$(builddir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(builddir)/$(mode)/$(plat)/$(arch)/lib")

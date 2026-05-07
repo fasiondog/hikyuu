@@ -74,9 +74,6 @@ target("unit-test")
     end
 
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json")
-    if get_config("mysql") then
-        add_packages("mysql")
-    end
     if has_config("ta_lib") then
         add_packages("ta-lib")
     end
@@ -139,6 +136,13 @@ target("unit-test")
 
     before_run(prepare_run)
     after_run(coverage_report)
+    on_config(function(target)
+        -- 未指定 C++标准时，设置最低要求
+        local x = target:get("languages")
+        if x == nil then
+            target:set("languages", "c++20")
+        end
+    end)    
 target_end()
 
 target("small-test")
@@ -146,13 +150,6 @@ target("small-test")
     set_default(false)
     
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json")
-    if get_config("mysql") then
-        if is_plat("macosx") then
-            add_packages("mysqlclient")
-        else
-            add_packages("mysql")
-        end
-    end
 
     add_includedirs("..")
 
@@ -184,6 +181,13 @@ target("small-test")
 
     before_run(prepare_run)
     after_run(coverage_report)
+    on_config(function(target)
+        -- 未指定 C++标准时，设置最低要求
+        local x = target:get("languages")
+        if x == nil then
+            target:set("languages", "c++20")
+        end
+    end)    
 target_end()
 
 target("real-test")
@@ -191,13 +195,6 @@ target("real-test")
     set_default(false)
 
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "mysql", "nlohmann_json")
-    if get_config("mysql") then
-        if is_plat("macosx") then
-            add_packages("mysqlclient")
-        else
-            add_packages("mysql")
-        end
-    end
     
     add_includedirs("..")
 
@@ -227,4 +224,11 @@ target("real-test")
 
     before_run(prepare_run)
     after_run(coverage_report)
+    on_config(function(target)
+        -- 未指定 C++标准时，设置最低要求
+        local x = target:get("languages")
+        if x == nil then
+            target:set("languages", "c++20")
+        end
+    end)    
 target_end()

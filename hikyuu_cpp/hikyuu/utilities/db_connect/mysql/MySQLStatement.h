@@ -13,18 +13,8 @@
 
 #include <string>
 #include <vector>
-#include <boost/any.hpp>
+#include <memory>
 #include "../SQLStatementBase.h"
-
-#if defined(_MSC_VER)
-#include <mysql.h>
-#else
-#include <mysql/mysql.h>
-#endif
-
-#if MYSQL_VERSION_ID >= 80000
-typedef bool my_bool;
-#endif
 
 #ifndef HKU_UTILS_API
 #define HKU_UTILS_API
@@ -60,28 +50,13 @@ public:
     virtual void sub_getColumnAsBlob(int idx, std::vector<char> &item) override;
 
 private:
-    void _prepare(DBConnectBase *driver);
+    void _prepare();
     void _reset();
-    void _bindResult();
 
 private:
-    MYSQL *m_db;
-    MYSQL_STMT *m_stmt;
-    MYSQL_RES *m_meta_result;
-    bool m_needs_reset;
-    bool m_has_bind_result;
-    std::vector<MYSQL_BIND> m_param_bind;
-    std::vector<MYSQL_BIND> m_result_bind;
-    std::vector<boost::any> m_param_buffer;
-    std::vector<boost::any> m_result_buffer;
-    std::vector<unsigned long> m_result_length;
-    std::vector<char> m_result_is_null;
-    std::vector<char> m_result_error;
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
-
-inline uint64_t MySQLStatement::sub_getLastRowid() {
-    return mysql_stmt_insert_id(m_stmt);
-}
 
 }  // namespace hku
 

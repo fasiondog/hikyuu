@@ -33,6 +33,10 @@
 
 namespace hku {
 
+namespace beast = boost::beast;
+namespace http = boost::beast::http;
+using tcp = net::ip::tcp;
+
 #if HKU_ENABLE_HTTP_CLIENT_SSL
 namespace ssl = net::ssl;
 #endif
@@ -109,12 +113,12 @@ struct HttpConnection : public AsyncResourceWithVersion {
 
     void close() {
         if (ssl_socket) {
-            boost::system::error_code ec;
+            net::error_code ec;
             ssl_socket->lowest_layer().close(ec);
             ssl_socket.reset();
         }
         if (socket) {
-            boost::system::error_code ec;
+            net::error_code ec;
             socket->close(ec);
             socket.reset();
         }
@@ -148,7 +152,7 @@ struct HttpConnection : public AsyncResourceWithVersion {
 
     void close() {
         if (socket) {
-            boost::system::error_code ec;
+            net::error_code ec;
             socket->close(ec);
             socket.reset();
         }
@@ -458,7 +462,7 @@ std::string AsioHttpClient::_buildURI(const std::string& path, const HttpParams&
 // 异步 DNS 解析方法
 net::awaitable<std::vector<tcp::endpoint>> AsioHttpClient::_resolveDNS() {
     // 先判断host是否为IP地址，是的话直接构造endpoint返回，避免不必要的DNS查询
-    boost::system::error_code ec;
+    net::error_code ec;
     auto addr = net::ip::make_address(m_host, ec);
     if (!ec) {
         // host是有效的IP地址，直接构造endpoint
@@ -512,13 +516,13 @@ net::awaitable<std::vector<tcp::endpoint>> AsioHttpClient::_resolveDNS() {
         tcp::resolver& resolver;
         std::string host, port;
         tcp::resolver::results_type endpoints;
-        boost::system::error_code ec;
+        net::error_code ec;
         bool done = false;
 
         ResolveOp(tcp::resolver& r, const std::string& h, const std::string& p)
         : resolver(r), host(h), port(p) {}
 
-        net::awaitable<boost::system::error_code> run() {
+        net::awaitable<net::error_code> run() {
             auto [e, eps] =
               co_await resolver.async_resolve(host, port, net::as_tuple(net::use_awaitable));
             ec = e;
@@ -534,7 +538,7 @@ net::awaitable<std::vector<tcp::endpoint>> AsioHttpClient::_resolveDNS() {
     auto timer = net::steady_timer{*m_ctx};
     timer.expires_after(m_timeout);
 
-    timer.async_wait([&resolver, &op](const boost::system::error_code& ec) {
+    timer.async_wait([&resolver, &op](const net::error_code& ec) {
         if (!ec && !op->done) {
             // 超时后取消 resolver 的所有异步操作
             resolver.cancel();
@@ -617,35 +621,32 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
                 timer.expires_after(m_timeout);
 
                 bool connect_completed = false;
-                boost::system::error_code captured_ec;
+                net::error_code captured_ec;
 
                 struct ConnectOp {
                     tcp::socket* socket;
                     tcp::endpoint endpoint;
                     bool& completed_flag;
-                    boost::system::error_code& captured_ec;
+                    net::error_code& captured_ec;
 
-                    net::awaitable<boost::system::error_code> run() {
+                    net::awaitable<net::error_code> run() {
                         auto [ec] = co_await socket->async_connect(
                           endpoint, net::as_tuple(net::use_awaitable));
                         completed_flag = true;
                         captured_ec = ec;
-                        co_return ec
-                          ? ec
-                          : (socket->is_open()
-                               ? boost::system::errc::make_error_code(boost::system::errc::success)
-                               : boost::system::errc::make_error_code(
-                                   boost::system::errc::not_connected));
+                        co_return ec ? ec
+                                     : (socket->is_open()
+                                          ? net::error_code()
+                                          : net::error::make_error_code(net::error::not_connected));
                     }
                 };
 
                 // 启动定时器和连接操作
-                timer.async_wait(
-                  [&connect_completed, &conn_ptr](const boost::system::error_code& ec) {
-                      if (!ec && !connect_completed && conn_ptr->ssl_socket.has_value()) {
-                          conn_ptr->ssl_socket->lowest_layer().cancel();
-                      }
-                  });
+                timer.async_wait([&connect_completed, &conn_ptr](const net::error_code& ec) {
+                    if (!ec && !connect_completed && conn_ptr->ssl_socket.has_value()) {
+                        conn_ptr->ssl_socket->lowest_layer().cancel();
+                    }
+                });
 
                 ConnectOp connect_op{&conn_ptr->ssl_socket->next_layer(), endpoint,
                                      connect_completed, captured_ec};
@@ -683,14 +684,14 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
                 timer.expires_after(m_timeout);
 
                 bool handshake_completed = false;
-                boost::system::error_code captured_ec;
+                net::error_code captured_ec;
 
                 struct SslHandshakeOp {
                     ssl::stream<tcp::socket>* stream;
                     bool& completed_flag;
-                    boost::system::error_code& captured_ec;
+                    net::error_code& captured_ec;
 
-                    net::awaitable<boost::system::error_code> run() {
+                    net::awaitable<net::error_code> run() {
                         auto [ec] = co_await stream->async_handshake(
                           ssl::stream_base::client, net::as_tuple(net::use_awaitable));
                         completed_flag = true;
@@ -700,12 +701,11 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
                 };
 
                 // 启动定时器和握手操作
-                timer.async_wait(
-                  [&handshake_completed, &conn_ptr](const boost::system::error_code& ec) {
-                      if (!ec && !handshake_completed && conn_ptr->ssl_socket.has_value()) {
-                          conn_ptr->ssl_socket->lowest_layer().cancel();
-                      }
-                  });
+                timer.async_wait([&handshake_completed, &conn_ptr](const net::error_code& ec) {
+                    if (!ec && !handshake_completed && conn_ptr->ssl_socket.has_value()) {
+                        conn_ptr->ssl_socket->lowest_layer().cancel();
+                    }
+                });
 
                 SslHandshakeOp handshake_op{&conn_ptr->ssl_socket.value(), handshake_completed,
                                             captured_ec};
@@ -734,35 +734,32 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
                 timer.expires_after(m_timeout);
 
                 bool connect_completed = false;
-                boost::system::error_code captured_ec;
+                net::error_code captured_ec;
 
                 struct ConnectOp {
                     tcp::socket* socket;
                     tcp::endpoint endpoint;
                     bool& completed_flag;
-                    boost::system::error_code& captured_ec;
+                    net::error_code& captured_ec;
 
-                    net::awaitable<boost::system::error_code> run() {
+                    net::awaitable<net::error_code> run() {
                         auto [ec] = co_await socket->async_connect(
                           endpoint, net::as_tuple(net::use_awaitable));
                         completed_flag = true;
                         captured_ec = ec;
-                        co_return ec
-                          ? ec
-                          : (socket->is_open()
-                               ? boost::system::errc::make_error_code(boost::system::errc::success)
-                               : boost::system::errc::make_error_code(
-                                   boost::system::errc::not_connected));
+                        co_return ec ? ec
+                                     : (socket->is_open()
+                                          ? net::error_code()
+                                          : net::error::make_error_code(net::error::not_connected));
                     }
                 };
 
                 // 启动定时器和连接操作
-                timer.async_wait(
-                  [&connect_completed, &conn_ptr](const boost::system::error_code& ec) {
-                      if (!ec && !connect_completed && conn_ptr->socket.has_value()) {
-                          conn_ptr->socket->cancel();
-                      }
-                  });
+                timer.async_wait([&connect_completed, &conn_ptr](const net::error_code& ec) {
+                    if (!ec && !connect_completed && conn_ptr->socket.has_value()) {
+                        conn_ptr->socket->cancel();
+                    }
+                });
 
                 ConnectOp connect_op{&conn_ptr->socket.value(), endpoint, connect_completed,
                                      captured_ec};
@@ -785,7 +782,7 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
                 // 连接失败但未超时，继续尝试下一个 endpoint
 
                 // 关闭并重置 socket 以便下一次尝试
-                boost::system::error_code ec;
+                net::error_code ec;
                 conn_ptr->socket->close(ec);
                 conn_ptr->socket.reset();
             }
@@ -819,7 +816,7 @@ struct AsioHttpClient::SocketVariant {
 #if HKU_ENABLE_HTTP_CLIENT_SSL
     std::optional<ssl::stream<tcp::socket>> ssl;
 
-    void close(boost::system::error_code& ec) {
+    void close(net::error_code& ec) {
         if (plain) {
             plain->close(ec);
             plain.reset();
@@ -843,7 +840,7 @@ struct AsioHttpClient::SocketVariant {
         HKU_THROW("Socket not initialized");
     }
 #else
-    void close(boost::system::error_code& ec) {
+    void close(net::error_code& ec) {
         if (plain) {
             plain->close(ec);
             plain.reset();
@@ -866,7 +863,7 @@ struct AsioHttpClient::SocketVariant {
 net::awaitable<void> AsioHttpClient::_connect(SocketVariant& socket_variant,
                                               const std::vector<tcp::endpoint>& dns_endpoints) {
     // 连接（带超时）
-    boost::system::error_code connect_ec;
+    net::error_code connect_ec;
     bool connected = false;
 
     for (const auto& endpoint : dns_endpoints) {
@@ -881,35 +878,32 @@ net::awaitable<void> AsioHttpClient::_connect(SocketVariant& socket_variant,
             timer.expires_after(m_timeout);
 
             bool connect_completed = false;
-            boost::system::error_code captured_ec;
+            net::error_code captured_ec;
 
             struct ConnectOp {
                 tcp::socket* socket;
                 tcp::endpoint endpoint;
                 bool& completed_flag;
-                boost::system::error_code& captured_ec;
+                net::error_code& captured_ec;
 
-                net::awaitable<boost::system::error_code> run() {
+                net::awaitable<net::error_code> run() {
                     auto [ec] =
                       co_await socket->async_connect(endpoint, net::as_tuple(net::use_awaitable));
                     completed_flag = true;
                     captured_ec = ec;
-                    co_return ec
-                      ? ec
-                      : (socket->is_open()
-                           ? boost::system::errc::make_error_code(boost::system::errc::success)
-                           : boost::system::errc::make_error_code(
-                               boost::system::errc::not_connected));
+                    co_return ec ? ec
+                                 : (socket->is_open()
+                                      ? net::error_code()
+                                      : net::error::make_error_code(net::error::not_connected));
                 }
             };
 
             // 启动定时器和连接操作
-            timer.async_wait(
-              [&connect_completed, &socket_variant](const boost::system::error_code& ec) {
-                  if (!ec && !connect_completed && socket_variant.plain.has_value()) {
-                      socket_variant.plain->cancel();
-                  }
-              });
+            timer.async_wait([&connect_completed, &socket_variant](const net::error_code& ec) {
+                if (!ec && !connect_completed && socket_variant.plain.has_value()) {
+                    socket_variant.plain->cancel();
+                }
+            });
 
             ConnectOp connect_op{&socket_variant.plain.value(), endpoint, connect_completed,
                                  captured_ec};
@@ -958,14 +952,14 @@ net::awaitable<void> AsioHttpClient::_connect(SocketVariant& socket_variant,
         timer.expires_after(m_timeout);
 
         bool handshake_completed = false;
-        boost::system::error_code captured_ec;
+        net::error_code captured_ec;
 
         struct SslHandshakeOp {
             ssl::stream<tcp::socket>* stream;
             bool& completed_flag;
-            boost::system::error_code& captured_ec;
+            net::error_code& captured_ec;
 
-            net::awaitable<boost::system::error_code> run() {
+            net::awaitable<net::error_code> run() {
                 auto [ec] = co_await stream->async_handshake(ssl::stream_base::client,
                                                              net::as_tuple(net::use_awaitable));
                 completed_flag = true;
@@ -975,12 +969,11 @@ net::awaitable<void> AsioHttpClient::_connect(SocketVariant& socket_variant,
         };
 
         // 启动定时器和握手操作
-        timer.async_wait(
-          [&handshake_completed, &socket_variant](const boost::system::error_code& ec) {
-              if (!ec && !handshake_completed && socket_variant.ssl.has_value()) {
-                  socket_variant.ssl->lowest_layer().cancel();
-              }
-          });
+        timer.async_wait([&handshake_completed, &socket_variant](const net::error_code& ec) {
+            if (!ec && !handshake_completed && socket_variant.ssl.has_value()) {
+                socket_variant.ssl->lowest_layer().cancel();
+            }
+        });
 
         SslHandshakeOp handshake_op{&socket_variant.ssl.value(), handshake_completed, captured_ec};
         co_await handshake_op.run();
@@ -1085,7 +1078,7 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
                     http::request<http::string_body>& req;
                     bool& completed_flag;
 
-                    net::awaitable<std::pair<boost::system::error_code, std::size_t>> run() {
+                    net::awaitable<std::pair<net::error_code, std::size_t>> run() {
                         auto [ec, bytes] = co_await http::async_write(
                           stream, req, net::as_tuple(net::use_awaitable));
                         completed_flag = true;
@@ -1094,7 +1087,7 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
                 };
 
                 // 启动定时器和写操作
-                timer.async_wait([&write_completed, &conn](const boost::system::error_code& ec) {
+                timer.async_wait([&write_completed, &conn](const net::error_code& ec) {
                     if (!ec && !write_completed && conn->is_open()) {
                         conn->lowest_layer().cancel();
                     }
@@ -1121,7 +1114,7 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
                     http::request<http::string_body>& req;
                     bool& completed_flag;
 
-                    net::awaitable<std::pair<boost::system::error_code, std::size_t>> run() {
+                    net::awaitable<std::pair<net::error_code, std::size_t>> run() {
                         auto [ec, bytes] =
                           co_await http::async_write(sock, req, net::as_tuple(net::use_awaitable));
                         completed_flag = true;
@@ -1130,7 +1123,7 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
                 };
 
                 // 启动定时器和写操作
-                timer.async_wait([&write_completed, &conn](const boost::system::error_code& ec) {
+                timer.async_wait([&write_completed, &conn](const net::error_code& ec) {
                     if (!ec && !write_completed) {
                         conn->lowest_layer().cancel();
                     }
@@ -1164,7 +1157,7 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
             timer.expires_after(m_timeout);
 
             bool read_completed = false;
-            boost::system::error_code captured_ec;
+            net::error_code captured_ec;
 
 #if HKU_ENABLE_HTTP_CLIENT_SSL
             if (conn->ssl_socket) {
@@ -1173,9 +1166,9 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
                     beast::flat_buffer& buffer;
                     http::response<http::string_body>& response;
                     bool& completed_flag;
-                    boost::system::error_code& captured_ec;
+                    net::error_code& captured_ec;
 
-                    net::awaitable<std::pair<boost::system::error_code, std::size_t>> run() {
+                    net::awaitable<std::pair<net::error_code, std::size_t>> run() {
                         auto [ec, bytes] = co_await http::async_read(
                           stream, buffer, response, net::as_tuple(net::use_awaitable));
                         completed_flag = true;
@@ -1185,7 +1178,7 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
                 };
 
                 // 启动定时器和读操作
-                timer.async_wait([&read_completed, &conn](const boost::system::error_code& ec) {
+                timer.async_wait([&read_completed, &conn](const net::error_code& ec) {
                     if (!ec && !read_completed && conn->is_open()) {
                         conn->lowest_layer().cancel();
                     }
@@ -1212,9 +1205,9 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
                     beast::flat_buffer& buffer;
                     http::response<http::string_body>& response;
                     bool& completed_flag;
-                    boost::system::error_code& captured_ec;
+                    net::error_code& captured_ec;
 
-                    net::awaitable<std::pair<boost::system::error_code, std::size_t>> run() {
+                    net::awaitable<std::pair<net::error_code, std::size_t>> run() {
                         auto [ec, bytes] = co_await http::async_read(
                           sock, buffer, response, net::as_tuple(net::use_awaitable));
                         completed_flag = true;
@@ -1224,7 +1217,7 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
                 };
 
                 // 启动定时器和读操作
-                timer.async_wait([&read_completed, &conn](const boost::system::error_code& ec) {
+                timer.async_wait([&read_completed, &conn](const net::error_code& ec) {
                     if (!ec && !read_completed) {
                         conn->lowest_layer().cancel();
                     }
@@ -1272,7 +1265,7 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
 
         // 不关闭连接，让连接池自动管理
 
-    } catch (const boost::system::system_error& e) {
+    } catch (const net::system_error& e) {
         HKU_DEBUG("HTTP request system error! {}", e.what());
         throw;
     } catch (const std::exception& e) {
@@ -1364,7 +1357,7 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
                     http::request<http::string_body>& req;
                     bool& completed_flag;
 
-                    net::awaitable<std::pair<boost::system::error_code, std::size_t>> run() {
+                    net::awaitable<std::pair<net::error_code, std::size_t>> run() {
                         auto [ec, bytes] = co_await http::async_write(
                           stream, req, net::as_tuple(net::use_awaitable));
                         completed_flag = true;
@@ -1390,7 +1383,7 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
                     http::request<http::string_body>& req;
                     bool& completed_flag;
 
-                    net::awaitable<std::pair<boost::system::error_code, std::size_t>> run() {
+                    net::awaitable<std::pair<net::error_code, std::size_t>> run() {
                         auto [ec, bytes] =
                           co_await http::async_write(sock, req, net::as_tuple(net::use_awaitable));
                         completed_flag = true;
@@ -1433,7 +1426,7 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
                 timer.expires_after(m_timeout);
 
                 // 启动定时器，超时则取消底层 socket
-                timer.async_wait([&conn](const boost::system::error_code& ec) {
+                timer.async_wait([&conn](const net::error_code& ec) {
                     if (!ec) {
                         conn->lowest_layer().cancel();
                     }
@@ -1446,7 +1439,7 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
                         beast::flat_buffer& buffer;
                         http::response_parser<http::buffer_body>& parser;
 
-                        net::awaitable<std::pair<boost::system::error_code, std::size_t>> run() {
+                        net::awaitable<std::pair<net::error_code, std::size_t>> run() {
                             auto [ec, bytes] = co_await http::async_read_header(
                               stream, buffer, parser, net::as_tuple(net::use_awaitable));
                             co_return std::make_pair(ec, bytes);
@@ -1469,7 +1462,7 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
                         beast::flat_buffer& buffer;
                         http::response_parser<http::buffer_body>& parser;
 
-                        net::awaitable<std::pair<boost::system::error_code, std::size_t>> run() {
+                        net::awaitable<std::pair<net::error_code, std::size_t>> run() {
                             auto [ec, bytes] = co_await http::async_read_header(
                               sock, buffer, parser, net::as_tuple(net::use_awaitable));
                             co_return std::make_pair(ec, bytes);
@@ -1501,14 +1494,14 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
             // 循环读取响应体数据块
             while (!parser.is_done()) {
                 std::size_t bytes_transferred = 0;
-                boost::system::error_code read_ec;
+                net::error_code read_ec;
 
                 // 设置超时定时器（每次读取块都重置）
                 auto timer = net::steady_timer{*m_ctx};
                 timer.expires_after(m_timeout);
 
                 // 启动定时器，超时则取消底层 socket
-                timer.async_wait([&conn](const boost::system::error_code& ec) {
+                timer.async_wait([&conn](const net::error_code& ec) {
                     if (!ec) {
                         conn->lowest_layer().cancel();
                     }
@@ -1521,7 +1514,7 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
                         beast::flat_buffer& buffer;
                         http::response_parser<http::buffer_body>& parser;
 
-                        net::awaitable<std::pair<boost::system::error_code, std::size_t>> run() {
+                        net::awaitable<std::pair<net::error_code, std::size_t>> run() {
                             auto [ec, bytes] = co_await http::async_read(
                               stream, buffer, parser, net::as_tuple(net::use_awaitable));
                             co_return std::make_pair(ec, bytes);
@@ -1547,7 +1540,7 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
                         beast::flat_buffer& buffer;
                         http::response_parser<http::buffer_body>& parser;
 
-                        net::awaitable<std::pair<boost::system::error_code, std::size_t>> run() {
+                        net::awaitable<std::pair<net::error_code, std::size_t>> run() {
                             auto [ec, bytes] = co_await http::async_read(
                               sock, buffer, parser, net::as_tuple(net::use_awaitable));
                             co_return std::make_pair(ec, bytes);
@@ -1584,7 +1577,7 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
 
         // 不关闭连接，让连接池自动管理（连接会被归还到池中）
 
-    } catch (const boost::system::system_error& e) {
+    } catch (const net::system_error& e) {
         HKU_DEBUG("HTTP stream request system error! {}", e.what());
         throw;
     } catch (const std::exception& e) {

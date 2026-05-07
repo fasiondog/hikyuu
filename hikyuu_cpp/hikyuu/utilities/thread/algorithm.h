@@ -22,7 +22,7 @@
 #include "GlobalThreadPool.h"
 
 #if CPP_STANDARD >= CPP_STANDARD_20
-#include <boost/asio.hpp>
+#include "hikyuu/utilities/net.h"
 #include <type_traits>
 #include <exception>
 #endif
@@ -813,7 +813,7 @@ auto co_run(Executor exec, Func&& func) -> asio::awaitable<typename std::invoke_
  *
  * @param exec 执行器
  * @param func 要执行的函数
- * @return boost::asio::awaitable<T> 异步操作的结果（错误时抛出 boost::system::system_error）
+ * @return net::awaitable<T> 异步操作的结果（错误时抛出 boost::system::system_error）
  *
  * @see co_run - 允许异常穿透的标准版本，保留原始异常类型
  */
@@ -840,17 +840,16 @@ auto co_run_ec(Executor exec, Func&& func) -> asio::awaitable<typename std::invo
                         boost::system::errc::make_error_code(boost::system::errc::invalid_argument);
                   }
 
-                  boost::asio::post(io_exec,
-                                    [handler = std::move(handler), ec]() mutable { handler(ec); });
+                  net::post(io_exec, [handler = std::move(handler), ec]() mutable { handler(ec); });
               });
           },
-          boost::asio::use_awaitable);
+          net::use_awaitable);
     } else {
         // 非 void 返回类型的普通版本
-        return boost::asio::async_initiate<decltype(boost::asio::use_awaitable),
-                                           void(boost::system::error_code, ResultType)>(
+        return net::async_initiate<decltype(net::use_awaitable),
+                                   void(boost::system::error_code, ResultType)>(
           [exec, func = std::forward<Func>(func)](auto&& handler) mutable {
-              auto io_exec = boost::asio::get_associated_executor(handler);
+              auto io_exec = net::get_associated_executor(handler);
 
               exec.execute([func = std::move(func),
                             handler = std::forward<decltype(handler)>(handler), io_exec]() mutable {
@@ -866,13 +865,13 @@ auto co_run_ec(Executor exec, Func&& func) -> asio::awaitable<typename std::invo
                         boost::system::errc::make_error_code(boost::system::errc::invalid_argument);
                   }
 
-                  boost::asio::post(io_exec, [handler = std::move(handler), ec,
-                                              result = std::move(result)]() mutable {
+                  net::post(io_exec, [handler = std::move(handler), ec,
+                                      result = std::move(result)]() mutable {
                       handler(ec, std::move(result));
                   });
               });
           },
-          boost::asio::use_awaitable);
+          net::use_awaitable);
     }
 }
 

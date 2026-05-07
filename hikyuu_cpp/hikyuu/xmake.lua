@@ -36,7 +36,7 @@ target("hikyuu")
         end
     end
 
-    if has_config("http_client_ssl") then
+    if has_config("http_client_ssl") or has_config("mysql") then
         add_packages("openssl3")
     end
 
@@ -72,9 +72,6 @@ target("hikyuu")
 
     if get_config("hdf5") then
         add_packages("hdf5")
-    end
-    if get_config("mysql") then
-        add_packages("mysql")
     end
 
     if is_plat("windows") then
@@ -170,6 +167,14 @@ target("hikyuu")
     if has_config("ta_lib") then
         add_files("./indicator_talib/**.cpp", {unity_group="talib"})
     end
+
+    on_config(function(target)
+        -- 未指定 C++标准时，设置最低要求
+        local x = target:get("languages")
+        if x == nil then
+            target:set("languages", "c++20")
+        end
+    end)
 
     after_build(function(target)
         local destpath = get_config("builddir") .. "/" .. get_config("mode") .. "/" .. get_config("plat") .. "/" .. get_config("arch")
