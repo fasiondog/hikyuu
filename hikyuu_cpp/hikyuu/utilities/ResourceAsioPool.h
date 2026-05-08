@@ -11,10 +11,7 @@
 #define HKU_UTILS_RESOURCE_ASIO_POOL_H
 
 #include <boost/lockfree/queue.hpp>
-#include <boost/asio.hpp>
-#include <boost/asio/co_spawn.hpp>
-#include <boost/asio/detached.hpp>
-#include <boost/asio/awaitable.hpp>
+#include "hikyuu/utilities/net.h"
 #include <chrono>
 #include <vector>
 #include <atomic>
@@ -25,11 +22,11 @@
 
 namespace hku {
 
-using boost::asio::awaitable;
-using boost::asio::co_spawn;
-using boost::asio::detached;
-using boost::asio::use_awaitable;
-namespace this_coro = boost::asio::this_coro;
+using net::awaitable;
+using net::co_spawn;
+using net::detached;
+using net::use_awaitable;
+namespace this_coro = net::this_coro;
 
 namespace rap {
 class NullLock {
@@ -137,7 +134,7 @@ public:
 
         // 3. 已达上限 → 进入等待队列
         auto executor = co_await this_coro::executor;
-        auto timer = std::make_shared<boost::asio::steady_timer>(executor);
+        auto timer = std::make_shared<net::steady_timer>(executor);
         timer->expires_after(timeout);
 
         // 加入等待队列
@@ -147,11 +144,11 @@ public:
         }
 
         // 等待被唤醒或超时
-        boost::system::error_code ec;
+        net::error_code ec;
         try {
-            co_await timer->async_wait(boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+            co_await timer->async_wait(net::redirect_error(net::use_awaitable, ec));
         } catch (...) {
-            ec = boost::asio::error::operation_aborted;
+            ec = net::error::operation_aborted;
         }
 
         // 从等待队列移除
@@ -165,7 +162,7 @@ public:
             }
         }
 
-        if (ec == boost::asio::error::operation_aborted) {
+        if (ec == net::error::operation_aborted) {
             // 被唤醒，一定能拿到资源
             if (!m_resourceList.pop(p)) {
                 HKU_THROW_EXCEPTION(CreateResourceException,
@@ -263,7 +260,7 @@ private:
         m_destroy_cv.notify_one();
 
         // 唤醒一个等待者
-        std::shared_ptr<boost::asio::steady_timer> timer;
+        std::shared_ptr<net::steady_timer> timer;
         {
             std::lock_guard<MutexType> lock(m_waiterMutex);
             if (!m_waiters.empty()) {
@@ -276,11 +273,11 @@ private:
         }
     }
 
-    MutexType m_waiterMutex;                                          // 保护等待队列的互斥锁
-    std::list<std::shared_ptr<boost::asio::steady_timer>> m_waiters;  // 等待队列
-    std::atomic<bool> m_is_destroying{false};                         // 标记是否正在析构
-    MutexType m_destroy_mutex;                                        // 保护析构等待的条件变量
-    std::condition_variable_any m_destroy_cv;                         // 用于通知析构函数资源已归还
+    MutexType m_waiterMutex;                                  // 保护等待队列的互斥锁
+    std::list<std::shared_ptr<net::steady_timer>> m_waiters;  // 等待队列
+    std::atomic<bool> m_is_destroying{false};                 // 标记是否正在析构
+    MutexType m_destroy_mutex;                                // 保护析构等待的条件变量
+    std::condition_variable_any m_destroy_cv;                 // 用于通知析构函数资源已归还
 };
 
 /**
@@ -495,7 +492,7 @@ public:
         }
 
         // 3. 已达上限，进入等待队列
-        auto timer = std::make_shared<boost::asio::steady_timer>(executor);
+        auto timer = std::make_shared<net::steady_timer>(executor);
         timer->expires_after(timeout);
 
         // 加入等待队列
@@ -505,11 +502,11 @@ public:
         }
 
         // 等待被唤醒或超时
-        boost::system::error_code ec;
+        net::error_code ec;
         try {
-            co_await timer->async_wait(boost::asio::redirect_error(boost::asio::use_awaitable, ec));
+            co_await timer->async_wait(net::redirect_error(net::use_awaitable, ec));
         } catch (...) {
-            ec = boost::asio::error::operation_aborted;
+            ec = net::error::operation_aborted;
         }
 
         // 从等待队列移除
@@ -518,7 +515,7 @@ public:
             if (!m_waiters.empty() && m_waiters.front() == timer) {
                 m_waiters.pop();
             } else {
-                std::queue<std::shared_ptr<boost::asio::steady_timer>> temp;
+                std::queue<std::shared_ptr<net::steady_timer>> temp;
                 while (!m_waiters.empty()) {
                     auto t = m_waiters.front();
                     m_waiters.pop();
@@ -530,7 +527,7 @@ public:
             }
         }
 
-        if (ec == boost::asio::error::operation_aborted) {
+        if (ec == net::error::operation_aborted) {
             // 被唤醒，一定能拿到资源
             if (!m_resourceList.pop(p)) {
                 HKU_THROW_EXCEPTION(CreateResourceException,
@@ -634,7 +631,7 @@ private:
                 }
 
                 // 唤醒一个等待者
-                std::shared_ptr<boost::asio::steady_timer> timer;
+                std::shared_ptr<net::steady_timer> timer;
                 {
                     std::lock_guard<MutexType> lock(m_waiterMutex);
                     if (!m_waiters.empty()) {
@@ -660,13 +657,13 @@ private:
         }
     }
 
-    mutable MutexType m_mutex;                                         // 保护参数访问的互斥锁
-    std::atomic<size_t> m_maxCount;                                    // 最大资源上限
-    MutexType m_waiterMutex;                                           // 保护等待队列的互斥锁
-    std::queue<std::shared_ptr<boost::asio::steady_timer>> m_waiters;  // 等待队列
-    std::atomic<bool> m_is_destroying{false};                          // 标记是否正在析构
-    MutexType m_destroy_mutex;                                         // 保护析构等待的条件变量
-    std::condition_variable_any m_destroy_cv;                          // 用于通知析构函数资源已归还
+    mutable MutexType m_mutex;                                 // 保护参数访问的互斥锁
+    std::atomic<size_t> m_maxCount;                            // 最大资源上限
+    MutexType m_waiterMutex;                                   // 保护等待队列的互斥锁
+    std::queue<std::shared_ptr<net::steady_timer>> m_waiters;  // 等待队列
+    std::atomic<bool> m_is_destroying{false};                  // 标记是否正在析构
+    MutexType m_destroy_mutex;                                 // 保护析构等待的条件变量
+    std::condition_variable_any m_destroy_cv;                  // 用于通知析构函数资源已归还
 };
 
 }  // namespace hku
