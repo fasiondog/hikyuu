@@ -18,6 +18,11 @@ target("hikyuu")
         end
     end
 
+    -- openssl3 保证在 boost 之前
+    if has_config("http_client_ssl") then
+        add_packages("openssl3")
+    end
+
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "xxhash", "eigen")
     if is_plat("windows", "linux", "cross", "macosx") then
         if get_config("sqlite") or get_config("hdf5") then
@@ -34,10 +39,6 @@ target("hikyuu")
         if is_plat("macosx") then
             add_packages("libomp")
         end
-    end
-
-    if has_config("http_client_ssl") then
-        add_packages("openssl3")
     end
 
     if has_config("http_client_zip") then

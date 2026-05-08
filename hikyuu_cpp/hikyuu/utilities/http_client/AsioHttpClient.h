@@ -19,8 +19,8 @@
 #include <functional>
 #include <thread>
 #include <nlohmann/json.hpp>
-#include <boost/asio.hpp>
 #include <boost/beast.hpp>
+#include "hikyuu/utilities/net.h"
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/Parameter.h"
 #include "HttpException.h"
@@ -36,8 +36,7 @@ using json = nlohmann::json;
 
 namespace beast = boost::beast;
 namespace http = beast::http;
-namespace net = boost::asio;
-using tcp = net::ip::tcp;
+using tcp = net::tcp;
 
 using HttpHeaders = std::map<std::string, std::string>;
 using HttpParams = std::map<std::string, std::string>;
@@ -315,7 +314,7 @@ private:
  */
 class HKU_UTILS_API AsioHttpClient {
 public:
-    using executor_type = net::any_io_executor;
+    using executor_type = boost::asio::any_io_executor;
 
     /// @brief 默认超时时间（毫秒）
     static constexpr int32_t DEFAULT_TIMEOUT_MS = 30000;  // 30 秒
