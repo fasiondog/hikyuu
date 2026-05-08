@@ -17,8 +17,8 @@
 namespace hku {
 
 struct MySQLStatement::Impl {
-    boost::mysql::tcp_connection* conn{nullptr};
-    boost::mysql::statement stmt;
+    MySQLConnect* connect{nullptr};
+    std::shared_ptr<boost::mysql::statement> stmt;
     boost::mysql::results results;
     std::vector<boost::mysql::field> params;
     size_t current_row{0};
@@ -28,10 +28,9 @@ struct MySQLStatement::Impl {
 
 MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_statement)
 : SQLStatementBase(driver, sql_statement), m_impl(std::make_unique<Impl>()) {
-    MySQLConnect* connect = dynamic_cast<MySQLConnect*>(driver);
-    SQL_CHECK(connect, -1, "Failed create statement: {}! Failed dynamic_cast<MySQLConnect*>!",
-              sql_statement);
-    m_impl->conn = static_cast<boost::mysql::tcp_connection*>(connect->getRawConnection());
+    m_impl->connect = dynamic_cast<MySQLConnect*>(driver);
+    SQL_CHECK(m_impl->connect, -1,
+              "Failed create statement: {}! Failed dynamic_cast<MySQLConnect*>!", sql_statement);
     _prepare();
 }
 
@@ -44,7 +43,9 @@ void MySQLStatement::_prepare() {
         boost::mysql::error_code ec;
         boost::mysql::diagnostics diag;
         _reset();
-        m_impl->stmt = m_impl->conn->prepare_statement(m_sql_string, ec, diag);
+
+        // 使用 MySQLConnect 的 impl 里的 get_statement 方法
+        m_impl->stmt = m_impl->connect->m_impl->get_statement(m_sql_string, ec, diag);
         m_impl->needs_reset = true;
 
         if (ec) [[unlikely]] {
@@ -92,12 +93,9 @@ void MySQLStatement::_prepare() {
             // 只在连接层错误时尝试重连
             if (is_connection_error) {
                 _reset();
-                MySQLConnect* connect = dynamic_cast<MySQLConnect*>(m_driver);
-                if (connect && connect->ping()) {
-                    // ping 成功（已自动重连），重新获取连接并再次准备
-                    m_impl->conn =
-                      static_cast<boost::mysql::tcp_connection*>(connect->getRawConnection());
-                    m_impl->stmt = m_impl->conn->prepare_statement(m_sql_string, ec, diag);
+                if (m_impl->connect->ping()) {
+                    // ping 成功（已自动重连），再次获取 statement
+                    m_impl->stmt = m_impl->connect->m_impl->get_statement(m_sql_string, ec, diag);
                     m_impl->needs_reset = true;
 
                     if (ec) [[unlikely]] {
@@ -113,6 +111,9 @@ void MySQLStatement::_prepare() {
             // 非连接错误或重连失败，直接抛出原始错误
             SQL_THROW(ec.value(), "Failed prepare statement! {}", m_sql_string);
         }
+
+        HKU_ASSERT(m_impl->stmt);
+
     } catch (const hku::exception&) {
         throw;
     } catch (const std::exception& e) {
@@ -124,8 +125,7 @@ void MySQLStatement::_prepare() {
 
 void MySQLStatement::_reset() {
     if (m_impl->needs_reset) {
-        m_impl->conn->close_statement(m_impl->stmt);
-        m_impl->stmt = {};
+        m_impl->stmt.reset();
         m_impl->results = {};
         m_impl->params.clear();
         m_impl->params.shrink_to_fit();
@@ -139,9 +139,12 @@ void MySQLStatement::sub_exec() {
     boost::mysql::error_code ec;
     boost::mysql::diagnostics diag;
 
+    // 获取底层连接用于执行
+    auto* conn = static_cast<boost::mysql::tcp_connection*>(m_impl->connect->getRawConnection());
+
     if (m_impl->params.empty()) {
         // 没有参数，直接执行
-        m_impl->conn->execute(m_sql_string, m_impl->results, ec, diag);
+        conn->execute(m_sql_string, m_impl->results, ec, diag);
     } else {
         // 有参数，使用预处理语句（统一使用 field_view 迭代器）
         std::vector<boost::mysql::field_view> param_views;
@@ -149,8 +152,8 @@ void MySQLStatement::sub_exec() {
         for (const auto& f : m_impl->params) {
             param_views.push_back(boost::mysql::field_view(f));
         }
-        auto bound = m_impl->stmt.bind(param_views.begin(), param_views.end());
-        m_impl->conn->execute(bound, m_impl->results, ec, diag);
+        auto bound = m_impl->stmt->bind(param_views.begin(), param_views.end());
+        conn->execute(bound, m_impl->results, ec, diag);
     }
 
     if (ec) [[unlikely]] {

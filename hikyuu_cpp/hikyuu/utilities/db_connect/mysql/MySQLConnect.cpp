@@ -10,8 +10,10 @@
 #include "hikyuu/utilities/config.h"
 #include "MySQLConnect.h"
 
+#include <memory>
 #include <boost/mysql.hpp>
 #include <boost/asio.hpp>
+#include "hikyuu/utilities/LruCache.h"
 
 namespace hku {
 
@@ -31,6 +33,37 @@ static void printDiagHelper(const boost::mysql::error_code& ec,
 struct MySQLConnect::Impl {
     boost::asio::io_context io_context;
     std::unique_ptr<boost::mysql::tcp_connection> conn;
+    LruCache<std::string, std::shared_ptr<boost::mysql::statement>> statement_cache{15};
+
+    std::shared_ptr<boost::mysql::statement> get_statement(const std::string& sql,
+                                                           boost::mysql::error_code& ec,
+                                                           boost::mysql::diagnostics& diag) {
+        std::shared_ptr<boost::mysql::statement> ret;
+        if (statement_cache.tryGet(sql, ret)) {
+            return ret;
+        }
+
+        // 创建 statement 并准备关闭的 lambda
+        auto* connection_ptr = conn.get();
+        auto deleter = [connection_ptr](boost::mysql::statement* stmt) {
+            if (stmt && connection_ptr) {
+                connection_ptr->close_statement(*stmt);
+                // 忽略关闭时的错误，因为连接可能已经断开
+            }
+            delete stmt;
+        };
+
+        ret = std::shared_ptr<boost::mysql::statement>(
+          new boost::mysql::statement(conn->prepare_statement(sql, ec, diag)), deleter);
+
+        if (!ec) {
+            statement_cache.insert(sql, ret);
+        } else {
+            ret.reset();
+        }
+
+        return ret;
+    }
 };
 
 MySQLConnect::MySQLConnect(const Parameter& param)
@@ -100,6 +133,7 @@ void MySQLConnect::connect() {
 
 void MySQLConnect::close() {
     if (m_impl && m_impl->conn) {
+        m_impl->statement_cache.clear();
         m_impl->conn->close();
         m_impl->conn.reset();
     }
