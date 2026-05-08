@@ -124,6 +124,7 @@ void MySQLStatement::_prepare() {
 
 void MySQLStatement::_reset() {
     if (m_impl->needs_reset) {
+        m_impl->conn->close_statement(m_impl->stmt);
         m_impl->stmt = {};
         m_impl->results = {};
         m_impl->params.clear();
