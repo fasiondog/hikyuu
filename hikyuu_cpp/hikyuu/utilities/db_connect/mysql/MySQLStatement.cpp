@@ -43,36 +43,75 @@ void MySQLStatement::_prepare() {
     try {
         boost::mysql::error_code ec;
         boost::mysql::diagnostics diag;
+        _reset();
         m_impl->stmt = m_impl->conn->prepare_statement(m_sql_string, ec, diag);
+        m_impl->needs_reset = true;
 
         if (ec) [[unlikely]] {
-            // 准备语句失败，尝试通过 ping 自动重连
-            MySQLConnect* connect = dynamic_cast<MySQLConnect*>(m_driver);
-            if (connect && connect->ping()) {
-                // ping 成功（已自动重连），重新获取连接并再次准备
-                m_impl->conn =
-                  static_cast<boost::mysql::tcp_connection*>(connect->getRawConnection());
-                m_impl->stmt = m_impl->conn->prepare_statement(m_sql_string, ec, diag);
+            _reset();
 
-                if (ec) [[unlikely]] {
-                    // 打印错误信息（使用辅助函数）
-                    if (!diag.server_message().empty()) {
-                        HKU_ERROR("Failed prepare statement after reconnect! Server error: {}",
-                                  diag.server_message());
-                    } else if (!diag.client_message().empty()) {
-                        HKU_ERROR("Failed prepare statement after reconnect! Client error: {}",
-                                  diag.client_message());
-                    } else {
-                        HKU_ERROR("Failed prepare statement after reconnect! Error code {}: {}",
-                                  ec.value(), ec.message());
-                    }
-                    SQL_THROW(ec.value(), "Failed prepare statement after reconnect!");
+            // 判断是否为连接层错误（需要重连），而非 SQL 应用层错误
+            // MySQL 客户端连接错误码:
+            // - 2013 (CR_SERVER_LOST): 查询过程中丢失连接
+            // - 2006 (CR_SERVER_GONE_ERROR): 服务器已断开
+            // - 2003 (CR_CONN_HOST_ERROR): 无法连接到服务器
+            // - 2002 (CR_CONNECTION_ERROR): 本地连接失败
+            // - 2005 (CR_UNKNOWN_HOST): 未知主机
+            bool is_connection_error = false;
+
+            // 通过错误码判断（Boost.MySQL 使用 boost::system::error_code）
+            int error_value = ec.value();
+
+            // MySQL 客户端错误范围是 2000-2999
+            if (error_value >= 2000 && error_value <= 2999) {
+                // 常见的连接相关错误码
+                switch (error_value) {
+                    case 2002:  // CR_CONNECTION_ERROR
+                    case 2003:  // CR_CONN_HOST_ERROR
+                    case 2005:  // CR_UNKNOWN_HOST
+                    case 2006:  // CR_SERVER_GONE_ERROR
+                    case 2013:  // CR_SERVER_LOST
+                        is_connection_error = true;
+                        break;
+                    default:
+                        // 其他客户端错误，检查消息中是否包含连接相关关键词
+                        if (!diag.server_message().empty()) {
+                            const auto& msg = diag.server_message();
+                            is_connection_error =
+                              (msg.find("Lost connection") != std::string::npos ||
+                               msg.find("gone away") != std::string::npos);
+                        } else if (!diag.client_message().empty()) {
+                            const auto& msg = diag.client_message();
+                            is_connection_error = (msg.find("connection") != std::string::npos ||
+                                                   msg.find("timeout") != std::string::npos);
+                        }
+                        break;
                 }
-                return;
             }
 
-            // 重连失败或无需重连，抛出原始错误
-            SQL_THROW(ec.value(), "Failed prepare statement!");
+            // 只在连接层错误时尝试重连
+            if (is_connection_error) {
+                _reset();
+                MySQLConnect* connect = dynamic_cast<MySQLConnect*>(m_driver);
+                if (connect && connect->ping()) {
+                    // ping 成功（已自动重连），重新获取连接并再次准备
+                    m_impl->conn =
+                      static_cast<boost::mysql::tcp_connection*>(connect->getRawConnection());
+                    m_impl->stmt = m_impl->conn->prepare_statement(m_sql_string, ec, diag);
+                    m_impl->needs_reset = true;
+
+                    if (ec) [[unlikely]] {
+                        // 重连后仍然失败，打印错误日志
+                        HKU_ERROR("Failed prepare statement after reconnect! Error code {}: {}",
+                                  ec.value(), ec.message());
+                        SQL_THROW(ec.value(), "Failed prepare statement after reconnect!");
+                    }
+                    return;
+                }
+            }
+
+            // 非连接错误或重连失败，直接抛出原始错误
+            SQL_THROW(ec.value(), "Failed prepare statement! {}", m_sql_string);
         }
     } catch (const hku::exception&) {
         throw;
@@ -85,6 +124,8 @@ void MySQLStatement::_prepare() {
 
 void MySQLStatement::_reset() {
     if (m_impl->needs_reset) {
+        m_impl->stmt = {};
+        m_impl->results = {};
         m_impl->params.clear();
         m_impl->params.shrink_to_fit();
         m_impl->current_row = 0;
@@ -94,8 +135,6 @@ void MySQLStatement::_reset() {
 }
 
 void MySQLStatement::sub_exec() {
-    _reset();
-
     boost::mysql::error_code ec;
     boost::mysql::diagnostics diag;
 
@@ -122,9 +161,17 @@ void MySQLStatement::sub_exec() {
 }
 
 bool MySQLStatement::sub_moveNext() {
-    HKU_IF_RETURN(!m_impl->has_result, false);
+    if (!m_impl->has_result) {
+        _reset();
+        return false;
+    }
+
     const auto& rows = m_impl->results.rows();
-    HKU_IF_RETURN(m_impl->current_row >= rows.size(), false);
+    if (m_impl->current_row >= rows.size()) {
+        _reset();
+        return false;
+    }
+
     m_impl->current_row++;
     return true;
 }
