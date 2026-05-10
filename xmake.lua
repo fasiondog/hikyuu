@@ -134,10 +134,10 @@ end
 add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.git")
 -- add_repositories("hikyuu-repo https://gitee.com/fasiondog/hikyuu_extern_libs.git")
  if get_config("hdf5") then
-        add_requires("hdf5 " .. hdf5_version, { system = false })
+    add_requires("hdf5 " .. hdf5_version, { system = false })
  end
  if get_config("mysql") then
-     add_requires("mysql " .. mysql_version, { system = false })
+    add_requires("mysql " .. mysql_version, { system = false })
  end
 
 local boost_config
