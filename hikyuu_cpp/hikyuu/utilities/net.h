@@ -38,15 +38,6 @@
 #define HKU_USE_BOOST_ASIO 1
 #endif
 
-#if HKU_ENABLE_HTTP_CLIENT_SSL || HKU_ENABLE_MYSQL
-#ifndef BOOST_ASIO_HAS_SSL
-#define BOOST_ASIO_HAS_SSL 1
-#endif
-#ifndef ASIO_HAS_SSL
-#define ASIO_HAS_SSL 1
-#endif
-#endif
-
 #if HKU_USE_BOOST_ASIO
 // 使用 Boost.Asio
 #include <boost/asio.hpp>
@@ -64,11 +55,6 @@
 #include <boost/asio/strand.hpp>
 #include <boost/asio/executor_work_guard.hpp>
 #include <boost/asio/any_io_executor.hpp>
-
-// SSL 相关（如果启用）- 必须在命名空间外部包含
-#if defined(BOOST_ASIO_HAS_SSL)
-#include <boost/asio/ssl.hpp>
-#endif
 
 namespace hku {
 namespace net {
@@ -154,13 +140,6 @@ using tcp_resolver = boost::asio::ip::tcp::resolver;
 using udp_socket = boost::asio::ip::udp::socket;
 using udp_resolver = boost::asio::ip::udp::resolver;
 
-// SSL 相关（如果启用）
-#if defined(BOOST_ASIO_HAS_SSL)
-using ssl_context = boost::asio::ssl::context;
-template <typename Stream>
-using ssl_stream = boost::asio::ssl::stream<Stream>;
-#endif
-
 }  // namespace net
 }  // namespace hku
 
@@ -181,11 +160,6 @@ using ssl_stream = boost::asio::ssl::stream<Stream>;
 #include <asio/strand.hpp>
 #include <asio/executor_work_guard.hpp>
 #include <asio/any_io_executor.hpp>
-
-// SSL 相关（如果启用）- 必须在命名空间外部包含
-#if defined(ASIO_HAS_SSL)
-#include <asio/ssl.hpp>
-#endif
 
 namespace hku {
 namespace net {
@@ -269,13 +243,6 @@ using tcp_resolver = asio::ip::tcp::resolver;
 
 using udp_socket = asio::ip::udp::socket;
 using udp_resolver = asio::ip::udp::resolver;
-
-// SSL 相关（如果启用）
-#if defined(ASIO_HAS_SSL)
-using ssl_context = asio::ssl::context;
-template <typename Stream>
-using ssl_stream = asio::ssl::stream<Stream>;
-#endif
 
 }  // namespace net
 }  // namespace hku

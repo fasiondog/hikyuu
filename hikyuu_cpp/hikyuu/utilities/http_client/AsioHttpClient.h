@@ -21,6 +21,7 @@
 #include <nlohmann/json.hpp>
 #include <boost/beast.hpp>
 #include "hikyuu/utilities/net.h"
+#include "hikyuu/utilities/net.h"
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/Parameter.h"
 #include "HttpException.h"
@@ -314,7 +315,7 @@ private:
  */
 class HKU_UTILS_API AsioHttpClient {
 public:
-    using executor_type = net::executor_type;
+    using executor_type = boost::asio::any_io_executor;
 
     /// @brief 默认超时时间（毫秒）
     static constexpr int32_t DEFAULT_TIMEOUT_MS = 30000;  // 30 秒

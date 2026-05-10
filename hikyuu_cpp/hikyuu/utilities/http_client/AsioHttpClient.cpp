@@ -6,6 +6,7 @@
  */
 
 #include "AsioHttpClient.h"
+#include "hikyuu/utilities/net.h"
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/os.h"
 #include "hikyuu/utilities/ResourceAsioPool.h"
@@ -38,7 +39,7 @@ namespace http = boost::beast::http;
 using tcp = net::ip::tcp;
 
 #if HKU_ENABLE_HTTP_CLIENT_SSL
-namespace ssl = net::ssl;
+namespace ssl = boost::asio::ssl;
 #endif
 
 #if defined(__GNUC__) && !defined(__clang__)
@@ -173,13 +174,13 @@ struct HttpConnection : public AsyncResourceWithVersion {
 
 #if HKU_ENABLE_HTTP_CLIENT_SSL
 struct AsioHttpClient::SslContext {
-    net::ssl::context ssl_ctx;
+    ssl::context ssl_ctx;
 
-    SslContext() : ssl_ctx(net::ssl::context::tls_client) {
+    SslContext() : ssl_ctx(ssl::context::tls_client) {
         ssl_ctx.set_default_verify_paths();
-        ssl_ctx.set_options(net::ssl::context::default_workarounds | net::ssl::context::no_sslv2 |
-                            net::ssl::context::no_sslv3 | net::ssl::context::no_tlsv1 |
-                            net::ssl::context::no_tlsv1_1);
+        ssl_ctx.set_options(ssl::context::default_workarounds | ssl::context::no_sslv2 |
+                            ssl::context::no_sslv3 | ssl::context::no_tlsv1 |
+                            ssl::context::no_tlsv1_1);
         // 使用 OpenSSL 原生 API 设置最低 TLS 版本
         SSL_CTX_set_min_proto_version(ssl_ctx.native_handle(), TLS1_2_VERSION);
     }
