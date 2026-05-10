@@ -248,6 +248,7 @@ public:
                 m_index = Null<size_t>();
             }
         }
+        co_return;
     }
 
     AsyncSQLResultSetIterator(const AsyncSQLResultSetIterator& other)

@@ -181,7 +181,7 @@ net::awaitable<bool> AsyncMySQLConnect::ping() {
     try {
         co_await m_impl->conn->async_execute("SELECT 1", results, diag, boost::asio::use_awaitable);
         co_return true;
-    } catch (const boost::mysql::error_with_diagnostics& e) {
+    } catch (const boost::mysql::error_with_diagnostics&) {
         need_reconnect = true;
     } catch (const boost::system::system_error&) {
         need_reconnect = true;

@@ -3,10 +3,10 @@
     <builddir>cppcheck-cppcheck-build-dir</builddir>
     <analyze-all-vs-configs>false</analyze-all-vs-configs>
     <check-headers>true</check-headers>
-    <check-unused-templates>false</check-unused-templates>
+    <check-unused-templates>true</check-unused-templates>
     <inline-suppression>true</inline-suppression>
-    <max-ctu-depth>10</max-ctu-depth>
-    <max-template-recursion>1000</max-template-recursion>
+    <max-ctu-depth>2</max-ctu-depth>
+    <max-template-recursion>100</max-template-recursion>
     <defines>
         <define name="BOOST_SERIALIZATION_ASSUME_ABSTRACT"/>
         <define name="TABLE_BIND6"/>
@@ -45,31 +45,31 @@
     </paths>
     <suppressions>
         <suppression>unusedFunction</suppression>
-        <suppression>ConfigurationNotChecked</suppression>
-        <suppression>toomanyconfigs</suppression>
+        <suppression>useStlAlgorithm</suppression>
+        <suppression>cstyleCast</suppression>
         <suppression>unknownMacro</suppression>
         <suppression>missingIncludeSystem</suppression>
         <suppression>missingInclude</suppression>
-        <suppression>cstyleCast</suppression>
-        <suppression>shadowFunction</suppression>
-        <suppression>useStlAlgorithm</suppression>
-        <suppression fileName="hikyuu/utilities/string_view.h">noExplicitConstructor</suppression>
-        <suppression fileName="hikyuu/utilities/datetime/Datetime.cpp">shadowFunction</suppression>
-        <suppression fileName="hikyuu/utilities/datetime/TimeDelta.cpp">shadowFunction</suppression>
-        <suppression fileName="hikyuu/utilities/datetime/TimeDelta.cpp">knownConditionTrueFalse</suppression>
-        <suppression fileName="hikyuu/utilities/datetime/TimeDelta.cpp">knownArgument</suppression>
-        <suppression fileName="hikyuu/utilities/datetime/TimeDelta.cpp" lineNumber="209">uninitvar</suppression>
-        <suppression fileName="hikyuu/utilities/datetime/TimeDelta.cpp" lineNumber="209">AssignmentAddressToInteger</suppression>
-        <suppression fileName="hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="65">unreadVariable</suppression>
-        <suppression fileName="hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="85">unreadVariable</suppression>
-        <suppression fileName="hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="167">unreadVariable</suppression>
-        <suppression fileName="hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="187">unreadVariable</suppression>
-        <suppression fileName="hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="67">knownConditionTrueFalse</suppression>
-        <suppression fileName="hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="77">knownConditionTrueFalse</suppression>
-        <suppression fileName="hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="169">knownConditionTrueFalse</suppression>
-        <suppression fileName="hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="179">knownConditionTrueFalse</suppression>
-        <suppression fileName="hikyuu/utilities/db_connect/sqlite/AsyncSQLiteConnect.cpp" lineNumber="20">constParameterCallback</suppression>
-        <suppression fileName="hikyuu/utilities/db_connect/sqlite/SQLiteConnect.cpp" lineNumber="19">constParameterCallback</suppression>        
+        <suppression>syntaxError</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/string_view.h">noExplicitConstr</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/datetime/Datetime.cpp">shadowFunction</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/datetime/TimeDelta.cpp">shadowFunction</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/datetime/TimeDelta.cpp">knownConditionTrueFalse</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/datetime/TimeDelta.cpp">knownConditionTrueFalse</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/datetime/TimeDelta.cpp">knownArgument</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/datetime/TimeDelta.cpp" lineNumber="209">uninitvar</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/datetime/TimeDelta.cpp" lineNumber="209">AssignmentAddressToInteger</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="65">unreadVariable</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="85">unreadVariable</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="167">unreadVariable</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="187">unreadVariable</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="67">knownConditionTrueFalse</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="77">knownConditionTrueFalse</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="169">knownConditionTrueFalse</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/db_connect/DBUpgrade.cpp" lineNumber="179">knownConditionTrueFalse</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/db_connect/sqlite/AsyncSQLiteConnect.cpp" lineNumber="20">constParameterCallback</suppression>
+        <suppression fileName="hikyuu_cpp/hikyuu/utilities/db_connect/sqlite/SQLiteConnect.cpp" lineNumber="19">constParameterCallback</suppression>
     </suppressions>
     <check-level-exhaustive/>
+    <project-name>hikyuu</project-name>
 </project>

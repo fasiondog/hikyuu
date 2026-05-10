@@ -107,6 +107,7 @@ inline net::awaitable<void> AsyncAutoTransAction::commit() {
         // 重新抛出原始异常
         std::rethrow_exception(original_exception);
     }
+    co_return;
 }
 
 inline AsyncAutoTransAction::~AsyncAutoTransAction() {
@@ -202,6 +203,7 @@ inline net::awaitable<void> AsyncTransAction::begin() {
         m_started = true;
         m_committed = false;
     }
+    co_return;
 }
 
 inline net::awaitable<void> AsyncTransAction::end() {
@@ -212,6 +214,7 @@ inline net::awaitable<void> AsyncTransAction::end() {
         m_committed = true;
         m_started = false;
     }
+    co_return;
 }
 
 inline net::awaitable<void> AsyncTransAction::rollback() {
@@ -220,6 +223,7 @@ inline net::awaitable<void> AsyncTransAction::rollback() {
         m_started = false;
         m_committed = false;
     }
+    co_return;
 }
 
 inline AsyncTransAction::~AsyncTransAction() {
