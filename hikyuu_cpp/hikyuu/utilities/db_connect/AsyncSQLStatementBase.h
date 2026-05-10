@@ -12,7 +12,8 @@
 
 #include <type_traits>
 #include <sstream>
-#include <yas/serialize.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include "hikyuu/utilities/config.h"
 #include "hikyuu/utilities/datetime/Datetime.h"
 #include "hikyuu/utilities/exception.h"
@@ -259,9 +260,9 @@ typename std::enable_if<!std::numeric_limits<T>::is_integer>::type AsyncSQLState
     } catch (null_blob_exception &) {
         return;
     }
-    std::istringstream istream(tmp);
-    yas::std_istream_adapter is(istream);
-    yas::load<yas::file | yas::binary>(is, YAS_OBJECT_NVP("obj", ("d", item)));
+    std::istringstream sin(tmp);
+    boost::archive::binary_iarchive ia(sin);
+    ia >> BOOST_SERIALIZATION_NVP(item);
 }
 
 template <typename T, typename... Args>
@@ -320,10 +321,9 @@ template <typename T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer>::type AsyncSQLStatementBase::bind(
   int idx, const T &item) {
     std::ostringstream sout;
-    yas::std_ostream_adapter os(sout);
-    yas::save<yas::file | yas::binary>(os, YAS_OBJECT_NVP("obj", ("d", item)));
-    const std::string &str = sout.str();
-    sub_bindBlob(idx, str);
+    boost::archive::binary_oarchive oa(sout);
+    oa << BOOST_SERIALIZATION_NVP(item);
+    sub_bindBlob(idx, sout.str());
 }
 
 template <typename T, typename... Args>
