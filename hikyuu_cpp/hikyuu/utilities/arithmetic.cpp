@@ -141,6 +141,9 @@ std::string HKU_UTILS_API utf8_to_gb(const std::string &szinput) {
     size_t inlen = strlen(inbuf);
     size_t outlen = inlen;
     char *outbuf = (char *)malloc(outlen);
+    if (!outbuf) [[unlikely]] {
+        return std::string();
+    }
     memset(outbuf, 0, outlen);
     char *in = inbuf;
     char *out = outbuf;
@@ -157,6 +160,9 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput) {
     size_t inlen = strlen(inbuf);
     size_t outlen = inlen * 2;
     char *outbuf = (char *)malloc(outlen);
+    if (!outbuf) [[unlikely]] {
+        return std::string();
+    }
     memset(outbuf, 0, outlen);
     char *in = inbuf;
     char *out = outbuf;

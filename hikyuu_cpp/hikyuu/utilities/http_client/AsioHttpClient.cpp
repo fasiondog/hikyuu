@@ -106,7 +106,8 @@ struct HttpConnection : public AsyncResourceWithVersion {
 #if HKU_ENABLE_HTTP_CLIENT_SSL
     std::optional<ssl::stream<tcp::socket>> ssl_socket;
 
-    HttpConnection(const Parameter& params) : last_used_time(std::chrono::steady_clock::now()) {}
+    explicit HttpConnection(const Parameter& params)
+    : last_used_time(std::chrono::steady_clock::now()) {}
 
     ~HttpConnection() {
         close();
@@ -143,9 +144,8 @@ struct HttpConnection : public AsyncResourceWithVersion {
         HKU_THROW("Socket not initialized");
     }
 #else
-    HttpConnection(const Parameter& params) {
-        last_used_time = std::chrono::steady_clock::now();
-    }
+    explicit HttpConnection(const Parameter& params)
+    : last_used_time(std::chrono::steady_clock::now()) {}
 
     ~HttpConnection() {
         close();
@@ -370,7 +370,7 @@ void AsioHttpClient::_parseUrl() noexcept {
     pos = host.find('/');
     if (pos != std::string::npos) {
         base_path = host.substr(pos);
-        host = host.substr(0, pos);
+        host.resize(pos);
     }
     pos = host.find(':');
     if (pos != std::string::npos) {
@@ -381,7 +381,7 @@ void AsioHttpClient::_parseUrl() noexcept {
             HKU_ERROR("Invalid port: {}", host.substr(pos + 1));
             return;
         }
-        host = host.substr(0, pos);
+        host.resize(pos);
     }
 
     m_base_path = std::move(base_path);
@@ -828,10 +828,6 @@ struct AsioHttpClient::SocketVariant {
         }
     }
 
-    bool is_ssl() const {
-        return ssl.has_value();
-    }
-
     tcp::socket& socket() {
         if (ssl) {
             return ssl->next_layer();
@@ -846,10 +842,6 @@ struct AsioHttpClient::SocketVariant {
             plain->close(ec);
             plain.reset();
         }
-    }
-
-    bool is_ssl() const {
-        return false;
     }
 
     tcp::socket& socket() {
@@ -1005,7 +997,6 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
     if (m_ctx == nullptr) {
         auto exec = co_await net::this_coro::executor;
         m_ctx = &static_cast<net::io_context&>(exec.context());
-        HKU_CHECK(m_ctx != nullptr, "Cannot get io_context from execution context");
     }
 
 #if !HKU_ENABLE_HTTP_CLIENT_SSL
@@ -1288,7 +1279,6 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
     if (m_ctx == nullptr) {
         auto exec = co_await net::this_coro::executor;
         m_ctx = &static_cast<net::io_context&>(exec.context());
-        HKU_CHECK(m_ctx != nullptr, "Cannot get io_context from execution context");
     }
 
 #if !HKU_ENABLE_HTTP_CLIENT_SSL
@@ -1615,6 +1605,12 @@ AsioHttpResponse AsioHttpClient::request(const std::string& method, const std::s
     // 超时时间设置为当前超时时间的 1.5 倍，给异步操作留出足够时间
     auto timeout_duration = m_timeout * 3 / 2;
     if (future.wait_for(timeout_duration) == std::future_status::timeout) {
+        // 超时后主动停止 io_context，取消所有待处理的异步操作
+        // 这样可以让后台线程快速退出，避免析构时死锁
+        if (m_own_ctx) {
+            m_own_ctx->stop();
+        }
+
         HKU_THROW_EXCEPTION(
           HttpTimeoutException,
           "HTTP request timed out after {} ms (possibly due to invalid URL or network issues)",
@@ -1648,6 +1644,12 @@ AsioHttpStreamResponse AsioHttpClient::requestStream(
     // 带超时保护的等待
     auto timeout_duration = m_timeout * 3 / 2;
     if (future.wait_for(timeout_duration) == std::future_status::timeout) {
+        // 超时后主动停止 io_context，取消所有待处理的异步操作
+        // 这样可以让后台线程快速退出，避免析构时死锁
+        if (m_own_ctx) {
+            m_own_ctx->stop();
+        }
+
         HKU_THROW_EXCEPTION(
           HttpTimeoutException,
           "HTTP stream request timed out after {} ms (possibly due to invalid URL or network "

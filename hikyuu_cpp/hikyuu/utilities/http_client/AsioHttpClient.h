@@ -21,7 +21,6 @@
 #include <nlohmann/json.hpp>
 #include <boost/beast.hpp>
 #include "hikyuu/utilities/net.h"
-#include "hikyuu/utilities/net.h"
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/Parameter.h"
 #include "HttpException.h"
@@ -109,7 +108,7 @@ public:
      * @brief 获取 HTTP 状态描述
      * @return 状态描述文本（如 "OK", "Not Found" 等）
      */
-    std::string reason() const noexcept {
+    const std::string& reason() const noexcept {
         return m_reason;
     }
 
@@ -194,7 +193,7 @@ public:
      * @brief 获取 HTTP 状态描述
      * @return 状态描述文本（如 "OK", "Not Found" 等）
      */
-    std::string reason() const noexcept {
+    const std::string& reason() const noexcept {
         return m_reason;
     }
 
