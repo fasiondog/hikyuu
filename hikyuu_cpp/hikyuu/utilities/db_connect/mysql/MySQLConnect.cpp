@@ -33,13 +33,14 @@ static void printDiagHelper(const boost::mysql::error_code& ec,
 struct MySQLConnect::Impl {
     boost::asio::io_context io_context;
     std::unique_ptr<boost::mysql::tcp_connection> conn;
-    LruCache<std::string, std::shared_ptr<boost::mysql::statement>> statement_cache{15};
+    std::unique_ptr<LruCache<std::string, std::shared_ptr<boost::mysql::statement>>>
+      statement_cache;
 
     std::shared_ptr<boost::mysql::statement> get_statement(const std::string& sql,
                                                            boost::mysql::error_code& ec,
                                                            boost::mysql::diagnostics& diag) {
         std::shared_ptr<boost::mysql::statement> ret;
-        if (statement_cache.tryGet(sql, ret)) {
+        if (statement_cache->tryGet(sql, ret)) {
             return ret;
         }
 
@@ -57,7 +58,7 @@ struct MySQLConnect::Impl {
           new boost::mysql::statement(conn->prepare_statement(sql, ec, diag)), deleter);
 
         if (!ec) {
-            statement_cache.insert(sql, ret);
+            statement_cache->insert(sql, ret);
         } else {
             ret.reset();
         }
@@ -68,6 +69,11 @@ struct MySQLConnect::Impl {
 
 MySQLConnect::MySQLConnect(const Parameter& param)
 : DBConnectBase(param), m_impl(std::make_unique<Impl>()) {
+    // 获取预处理语句缓存大小，并创建缓存
+    int64_t cache_size = tryGetParam<int64_t>("statement_cache_size", 3);
+    m_params.set("statement_cache_size", cache_size);
+    m_impl->statement_cache =
+      std::make_unique<LruCache<std::string, std::shared_ptr<boost::mysql::statement>>>(cache_size);
     connect();
 }
 
@@ -133,7 +139,7 @@ void MySQLConnect::connect() {
 
 void MySQLConnect::close() {
     if (m_impl && m_impl->conn) {
-        m_impl->statement_cache.clear();
+        m_impl->statement_cache->clear();
         m_impl->conn->close();
         m_impl->conn.reset();
     }

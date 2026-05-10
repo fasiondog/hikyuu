@@ -385,39 +385,41 @@ void MySQLStatement::sub_getColumnAsText(int idx, std::string& item) {
     }
 
     try {
-        // 尝试直接转换为字符串
+        // 尝试直接作为字符串读取
         item = value.as_string();
     } catch (...) {
-        // 如果失败，尝试其他类型转换
+        // 如果失败，可能是日期时间类型，需要特殊处理
         try {
-            // 尝试 date 类型
-            auto d = value.as_date();
-            char buffer[20];
-            snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d", d.year(),
-                     static_cast<int>(d.month()), static_cast<int>(d.day()));
-            item = std::string(buffer);
+            // 尝试作为 datetime 读取
+            auto dt = value.as_datetime();
+            // 格式化为字符串：YYYY-MM-DD HH:MM:SS
+            char buffer[64];
+            snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d",
+                     dt.year(), dt.month(), dt.day(),
+                     dt.hour(), dt.minute(), dt.second());
+            item = buffer;
         } catch (...) {
             try {
-                // 尝试 datetime 类型
-                auto dt = value.as_datetime();
-                char buffer[30];
-                snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d", dt.year(),
-                         static_cast<int>(dt.month()), static_cast<int>(dt.day()),
-                         static_cast<int>(dt.hour()), static_cast<int>(dt.minute()),
-                         static_cast<int>(dt.second()));
-                item = std::string(buffer);
+                // 尝试作为 date 读取
+                auto d = value.as_date();
+                // 格式化为字符串：YYYY-MM-DD
+                char buffer[32];
+                snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d",
+                         d.year(), d.month(), d.day());
+                item = buffer;
             } catch (...) {
                 try {
-                    // 尝试 time 类型（boost.mysql 的 time 是 std::chrono::microseconds）
-                    auto t = value.as_time();
-                    auto total_seconds =
-                      std::chrono::duration_cast<std::chrono::seconds>(t).count();
-                    int hours = total_seconds / 3600;
-                    int minutes = (total_seconds % 3600) / 60;
-                    int seconds = total_seconds % 60;
-                    char buffer[20];
-                    snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d", hours, minutes, seconds);
-                    item = std::string(buffer);
+                // 最后尝试作为 time 读取（boost::mysql::time 是 duration 类型）
+                auto t = value.as_time();
+                // 将 duration 转换为小时、分钟、秒
+                auto total_seconds = std::chrono::duration_cast<std::chrono::seconds>(t).count();
+                int hours = total_seconds / 3600;
+                int minutes = (total_seconds % 3600) / 60;
+                int seconds = total_seconds % 60;
+                // 格式化为字符串：HH:MM:SS
+                char buffer[32];
+                snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d", hours, minutes, seconds);
+                item = buffer;
                 } catch (...) {
                     SQL_THROW(-1, "Failed to convert column {} to string", idx);
                 }
@@ -443,10 +445,11 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, std::string& item) {
     }
 
     try {
-        const auto& blob = value.as_blob();
+        auto blob = value.as_blob();
         item.assign(blob.begin(), blob.end());
     } catch (...) {
-        SQL_THROW(-1, "Failed to convert column {} to blob", idx);
+        // 如果不是 blob 类型，尝试作为字符串读取
+        item = value.as_string();
     }
 }
 
@@ -470,7 +473,9 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, std::vector<char>& item) {
         const auto& blob = value.as_blob();
         item.assign(blob.begin(), blob.end());
     } catch (...) {
-        SQL_THROW(-1, "Failed to convert column {} to blob", idx);
+        // 如果不是 blob 类型，尝试作为字符串读取
+        std::string str = value.as_string();
+        item.assign(str.begin(), str.end());
     }
 }
 
