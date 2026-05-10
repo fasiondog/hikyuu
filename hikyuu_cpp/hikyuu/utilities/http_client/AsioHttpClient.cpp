@@ -1038,17 +1038,17 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
         // 添加请求体
         if (body != nullptr && body_len > 0) {
 #if HKU_ENABLE_HTTP_CLIENT_ZIP
-            auto content_type = req["Content-Type"];
-            if (content_type == "gzip") {
+            req.set(http::field::content_type, content_type);
+            auto content_encoding = req["Content-Encoding"];
+            if (content_encoding == "gzip") {
                 gzip::Compressor comp(Z_DEFAULT_COMPRESSION);
                 std::string output;
                 comp.compress(output, body, body_len);
                 req.body() = std::move(output);
             } else {
-                req.set(http::field::content_type, content_type);
                 req.body() = std::string(body, body_len);
-                req.prepare_payload();
             }
+            req.prepare_payload();
 #else
             req.set(http::field::content_type, content_type);
             req.body() = std::string(body, body_len);
@@ -1257,11 +1257,11 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
 
         // 不关闭连接，让连接池自动管理
 
-    } catch (const net::system_error& e) {
-        HKU_DEBUG("HTTP request system error! {}", e.what());
+    } catch (const net::system_error&) {
+        // HKU_DEBUG("HTTP request system error! {}", e.what());
         throw;
-    } catch (const std::exception& e) {
-        HKU_DEBUG("HTTP request failed! {}", e.what());
+    } catch (const std::exception&) {
+        // HKU_DEBUG("HTTP request failed! {}", e.what());
         throw;
     }
 
@@ -1316,17 +1316,17 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
 
         if (body != nullptr && body_len > 0) {
 #if HKU_ENABLE_HTTP_CLIENT_ZIP
-            auto content_type = req["Content-Type"];
-            if (content_type == "gzip") {
+            req.set(http::field::content_type, content_type);
+            auto content_encoding = req["Content-Type"];
+            if (content_encoding == "gzip") {
                 gzip::Compressor comp(Z_DEFAULT_COMPRESSION);
                 std::string output;
                 comp.compress(output, body, body_len);
                 req.body() = std::move(output);
             } else {
-                req.set(http::field::content_type, content_type);
                 req.body() = std::string(body, body_len);
-                req.prepare_payload();
             }
+            req.prepare_payload();
 #else
             req.set(http::field::content_type, content_type);
             req.body() = std::string(body, body_len);
@@ -1568,11 +1568,11 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
 
         // 不关闭连接，让连接池自动管理（连接会被归还到池中）
 
-    } catch (const net::system_error& e) {
-        HKU_DEBUG("HTTP stream request system error! {}", e.what());
+    } catch (const net::system_error&) {
+        // HKU_DEBUG("HTTP stream request system error! {}", e.what());
         throw;
-    } catch (const std::exception& e) {
-        HKU_DEBUG("HTTP stream request failed! {}", e.what());
+    } catch (const std::exception&) {
+        // HKU_DEBUG("HTTP stream request failed! {}", e.what());
         throw;
     }
 
