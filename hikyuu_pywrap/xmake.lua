@@ -58,14 +58,6 @@ target("core")
     add_files("./trade_manage/**.cpp", {unity_group="trade_manage"})
     add_files("./trade_sys/**.cpp", {unity_group="trade_sys"})
 
-    on_config(function(target)
-        -- 未指定 C++标准时，设置最低要求
-        local x = target:get("languages")
-        if x == nil then
-            target:set("languages", "c++20")
-        end
-    end)    
-
     on_load("windows", "linux", "macosx", function(target)
         import("lib.detect.find_tool")
         if is_plat("windows") then
@@ -159,7 +151,21 @@ target("core")
             end
             os.run(format("install_name_tool -change libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_obj))
             os.run(format("install_name_tool -change libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_obj))
- 
+
+            if get_config("mysql") then
+                if get_config("kind") == "shared" then
+                    dst_obj = dst_dir .. "libhikyuu.dylib"
+                    os.run(format("install_name_tool -change libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_obj))
+                    os.run(format("install_name_tool -change libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_obj))
+                else
+                    os.cp(target:targetdir() .. '/*.a', dst_dir)
+                end
+
+                filename = "libmysqlclient.21.dylib"
+                os.run(format("install_name_tool -change @loader_path/../lib/libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_dir .. filename))
+                os.run(format("install_name_tool -change @loader_path/../lib/libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_dir .. filename))
+            end
+
             -- 添加 macosx 签名
             local projectdir = os.projectdir() 
             local scan_dir = path.join(projectdir, "hikyuu/cpp")

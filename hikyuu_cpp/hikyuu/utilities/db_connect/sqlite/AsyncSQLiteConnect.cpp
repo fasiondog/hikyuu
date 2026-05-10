@@ -17,7 +17,7 @@
 namespace hku {
 
 // sqlite3 多线程处理时，等待其他锁释放回调处理
-static int sqlite_busy_call_back(void *ptr, int count) {
+static int sqlite_busy_call_back_in_async(void *ptr, int count) {
     std::this_thread::yield();
     return 1;
 }
@@ -94,7 +94,7 @@ net::awaitable<void> AsyncSQLiteConnect::connect() {
 #endif
 
         // 3. 设置 busy handler
-        sqlite3_busy_handler(m_impl->m_db, sqlite_busy_call_back, (void *)m_impl->m_db);
+        sqlite3_busy_handler(m_impl->m_db, sqlite_busy_call_back_in_async, (void *)m_impl->m_db);
 
         // 4. 启用扩展错误码
         if (sqlite3_libversion_number() >= 3003008) {

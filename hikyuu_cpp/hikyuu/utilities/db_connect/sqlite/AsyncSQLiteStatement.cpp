@@ -25,7 +25,7 @@ struct AsyncSQLiteStatement::Impl {
     AsyncSQLiteConnect *m_connect = nullptr;  // 持有连接指针以获取线程池执行器
 
     Impl(AsyncSQLiteConnect *connect, sqlite3 *db, sqlite3_stmt *stmt)
-    : m_connect(connect), m_db(db), m_stmt(stmt) {}
+    : m_db(db), m_stmt(stmt), m_connect(connect) {}
 
     ~Impl() {
         if (m_stmt) {

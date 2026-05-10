@@ -24,6 +24,9 @@ option("mysql")
     end        
 option_end()
 
+-- boost mysql 同步模式下大数据量批量获取比 libmysqlclient 慢很多，可根据场景自行配置
+option("disable_libmysqlclient", {description = "Disable use libmysqlclient", default = false})
+
 option("hdf5", {description = "Enable hdf5 kdata engine.", default = true})
 option("sqlite", {description = "Enable sqlite kdata engine.", default = true})
 option("tdx", {description = "Enable tdx kdata engine.", default = true})
@@ -95,6 +98,7 @@ set_configvar("HKU_ENABLE_SEND_FEEDBACK", get_config("feedback") and 1 or 0)
 
 set_configvar("HKU_ENABLE_HDF5_KDATA", get_config("hdf5") and 1 or 0)
 set_configvar("HKU_ENABLE_MYSQL", get_config("mysql") and 1 or 0)
+set_configvar("HKU_DISABLE_LIBMYSQLCLIENT", has_config("disable_libmysqlclient") and 1 or 0)
 set_configvar("HKU_ENABLE_MYSQL_KDATA", get_config("mysql") and 1 or 0)
 set_configvar("HKU_ENABLE_SQLITE", (get_config("sqlite") or get_config("hdf5")) and 1 or 0)
 set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
@@ -127,9 +131,23 @@ local flatbuffers_version = "25.2.10"
 
 add_repositories("hikyuu-repo https://github.com/fasiondog/hikyuu_extern_libs.git")
 -- add_repositories("hikyuu-repo https://gitee.com/fasiondog/hikyuu_extern_libs.git")
- if get_config("hdf5") then
-        add_requires("hdf5 " .. hdf5_version, { system = false })
- end
+if get_config("hdf5") then
+    add_requires("hdf5 " .. hdf5_version, { system = false })
+end
+
+if has_config("mysql") then 
+    add_requires("openssl3", {system = false, configs = {shared = true}})
+    if not has_config("disable_libmysqlclient") then 
+        local mysql_version = "8.0.31"
+        if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
+            mysql_version = "8.0.21" 
+        elseif is_plat("macosx") then
+            mysql_version = "8.0.40"
+        end
+        add_requires("mysql " .. mysql_version, { system = false })
+    end
+end  
+
 
 local boost_config = {
         system = false,
@@ -145,7 +163,7 @@ local boost_config = {
             -- 以下为兼容 arrow 等其他组件
             thread = true,   -- parquet need
             chrono = true,   -- parquet need
-            charconv = true, -- parquet need
+            charconv = true, -- parquet, boost.mysql need
             atomic = true,
             container = true,
             math = true,
@@ -161,12 +179,6 @@ local boost_config = {
     }}
 
 add_requires("boost", boost_config)
-add_requireconfs("boost", {
-    deps = {
-        -- 尝试将包名映射为 openssl3
-        openssl = { name = "openssl3",  override = true }
-    }
-})
 
 add_requires("fmt", {system = false, configs = {header_only = true}})
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
@@ -197,6 +209,7 @@ end
 if has_config("http_client_ssl") or has_config("mysql") then
     add_requires("openssl3", {system = is_plat("linux"), configs = {shared = true}})
 end
+
 
 if has_config("ta_lib") then
     add_requires("ta-lib", {system = false})

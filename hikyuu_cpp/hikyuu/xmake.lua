@@ -1,6 +1,7 @@
 
 target("hikyuu")
-    set_kind("$(kind)")
+    -- set_kind("$(kind)")
+    set_kind("shared")
 
     if is_mode("coverage") then 
         add_cxflags("-fprofile-update=atomic")
@@ -28,6 +29,10 @@ target("hikyuu")
             add_packages("sqlite3")
         end
     end
+
+    if has_config("mysql") and not has_config("disable_libmysqlclient") then
+        add_packages("mysql")
+    end    
 
     if is_plat("windows", "linux", "cross") then 
         add_packages("mimalloc")
@@ -84,6 +89,11 @@ target("hikyuu")
     if is_plat("linux", "cross") then
         add_cxflags("-fPIC")
     end
+
+    -- boost.mysql 依赖的 charconv 会自动检测包含__float128
+    if is_plat("linux") then 
+        add_syslinks("quadmath")
+    end    
 
     if is_plat("macosx") then
         -- macosx下boost序列化需要
@@ -162,19 +172,11 @@ target("hikyuu")
         add_files("./data_driver/kdata/tdx/**.cpp", {unity_group="tdx"})
     end
     if get_config("mysql") then
-        add_files("./utilities/db_connect/mysql/**.cpp", {unity_group="mysql"})
+        add_files("./utilities/db_connect/mysql/mysql_imp.cpp")
     end
     if has_config("ta_lib") then
         add_files("./indicator_talib/**.cpp", {unity_group="talib"})
     end
-
-    on_config(function(target)
-        -- 未指定 C++标准时，设置最低要求
-        local x = target:get("languages")
-        if x == nil then
-            target:set("languages", "c++20")
-        end
-    end)
 
     after_build(function(target)
         local destpath = get_config("builddir") .. "/" .. get_config("mode") .. "/" .. get_config("plat") .. "/" .. get_config("arch")
