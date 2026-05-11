@@ -249,19 +249,19 @@ end
 
 if is_plat("linux", "cross", "macosx") then
   -- disable some compiler errors
-  add_cxflags("-Wno-error=deprecated-declarations", "-Wno-subobject-linkage")
+  add_cxflags("-Wno-error=deprecated-declarations")
   add_cxflags("-fno-strict-aliasing", "-ftemplate-depth=1023", "-pthread")
   add_shflags("-pthread")
   add_ldflags("-pthread")
 end
 
+if is_plat("linux") then
+    add_cxflags("-Wno-subobject-linkage")
+end
+
 if is_plat("linux", "cross") then
     add_cxflags("-fcoroutines")
 end    
-
-if is_plat("macosx") then
-    add_cxflags("-Wno-deprecated-declarations")
-end
 
 -- if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
 --   -- fedora或者ubuntu，并且不是交叉编译
