@@ -14,11 +14,7 @@
 #include "../DBConnectBase.h"
 #include "MySQLStatement.h"
 
-#if defined(_MSC_VER)
-#include <mysql.h>
-#else
-#include <mysql/mysql.h>
-#endif
+#include <memory>
 
 namespace hku {
 
@@ -41,18 +37,20 @@ public:
     virtual void commit() override;
     virtual void rollback() noexcept override;
 
-public:
-    MYSQL *getRawMYSQL() const noexcept {
-        return m_mysql;
-    }
-
 private:
+    friend class MySQLStatement;
+
+    // 提供给 MySQLStatement 访问原始连接的方法
+    void *getRawConnection() const noexcept;
+
+    // 内部辅助方法
     bool tryConnect() noexcept;
     void connect();
     void close();
 
 private:
-    MYSQL *m_mysql;
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
 
 }  // namespace hku

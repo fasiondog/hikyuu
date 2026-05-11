@@ -205,8 +205,8 @@ MultiFactorPtr MultiFactorBase::clone() {
         p->m_norm = m_norm->clone();
     }
 
-    for (const auto& [name, norm] : m_special_norms) {
-        p->m_special_norms[name] = norm->clone();
+    for (const auto& [norm_name, norm] : m_special_norms) {
+        p->m_special_norms[norm_name] = norm->clone();
     }
 
     p->m_special_category = m_special_category;
@@ -663,25 +663,25 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     all_stk_inds = m_factorset.getValues(m_stks, m_query, true, fill_null, true, true, m_ref_dates);
 
     unordered_map<string, IndicatorList> use_style_inds;
-    for (const auto& [name, style_inds] : m_special_style_inds) {
-        use_style_inds[name] = IndicatorList(style_inds.size());
+    for (const auto& [style_ind_name, style_inds] : m_special_style_inds) {
+        use_style_inds[style_ind_name] = IndicatorList(style_inds.size());
     }
     global_parallel_for_index_void(
       0, stk_count, [this, &null_ind, &use_style_inds, fill_null](size_t i) {
           const auto& stk = m_stks[i];
           auto kdata = stk.getKData(m_query);
-          for (auto& [name, styles] : m_special_style_inds) {
-              auto& cur_style_inds = use_style_inds[name];
+          for (auto& [style_ind_name, styles] : m_special_style_inds) {
+              auto& cur_style_inds = use_style_inds[style_ind_name];
               if (kdata.size() == 0) {
                   for (size_t j = 0; j < styles.size(); j++) {
                       cur_style_inds[j] = null_ind;
-                      cur_style_inds[j].name(name);
+                      cur_style_inds[j].name(style_ind_name);
                   }
               } else {
                   for (size_t j = 0; j < styles.size(); j++) {
                       cur_style_inds[j] =
                         ALIGN(styles[j], m_ref_dates, fill_null)(kdata).getResult(0);
-                      cur_style_inds[j].name(name);
+                      cur_style_inds[j].name(style_ind_name);
                   }
               }
           }

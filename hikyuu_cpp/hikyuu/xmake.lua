@@ -1,6 +1,7 @@
 
 target("hikyuu")
-    set_kind("$(kind)")
+    -- set_kind("$(kind)")
+    set_kind("shared")
 
     if is_mode("coverage") then 
         add_cxflags("-fprofile-update=atomic")
@@ -18,8 +19,7 @@ target("hikyuu")
         end
     end
 
-    -- openssl3 保证在 boost 之前
-    if has_config("http_client_ssl") then
+    if has_config("http_client_ssl") or has_config("mysql") then
         add_packages("openssl3")
     end
 
@@ -29,6 +29,10 @@ target("hikyuu")
             add_packages("sqlite3")
         end
     end
+
+    if has_config("mysql") and not has_config("disable_libmysqlclient") then
+        add_packages("mysql")
+    end    
 
     if is_plat("windows", "linux", "cross") then 
         add_packages("mimalloc")
@@ -74,9 +78,6 @@ target("hikyuu")
     if get_config("hdf5") then
         add_packages("hdf5")
     end
-    if get_config("mysql") then
-        add_packages("mysql")
-    end
 
     if is_plat("windows") then
         if is_kind("shared") then
@@ -88,6 +89,11 @@ target("hikyuu")
     if is_plat("linux", "cross") then
         add_cxflags("-fPIC")
     end
+
+    -- boost.mysql 依赖的 charconv 会自动检测包含__float128
+    if is_plat("linux") then 
+        add_syslinks("quadmath")
+    end    
 
     if is_plat("macosx") then
         -- macosx下boost序列化需要
@@ -166,7 +172,7 @@ target("hikyuu")
         add_files("./data_driver/kdata/tdx/**.cpp", {unity_group="tdx"})
     end
     if get_config("mysql") then
-        add_files("./utilities/db_connect/mysql/**.cpp", {unity_group="mysql"})
+        add_files("./utilities/db_connect/mysql/mysql_imp.cpp")
     end
     if has_config("ta_lib") then
         add_files("./indicator_talib/**.cpp", {unity_group="talib"})

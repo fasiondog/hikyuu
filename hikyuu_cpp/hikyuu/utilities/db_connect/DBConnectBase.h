@@ -366,7 +366,7 @@ void DBConnectBase::save(T &item, bool autotrans) {
         if (autotrans) {
             commit();
         }
-    } catch (hku::SQLException &e) {
+    } catch (::hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
@@ -409,7 +409,7 @@ void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool auto
         if (autotrans) {
             commit();
         }
-    } catch (hku::SQLException &e) {
+    } catch (::hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
@@ -513,7 +513,7 @@ void DBConnectBase::batchUpdate(InputIterator first, InputIterator last, bool au
         if (autotrans) {
             commit();
         }
-    } catch (hku::SQLException &e) {
+    } catch (::hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
@@ -567,7 +567,7 @@ void DBConnectBase::remove(T &item, bool autotrans) {
             commit();
         }
         item.rowid(0);
-    } catch (hku::SQLException &e) {
+    } catch (::hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
@@ -607,7 +607,7 @@ void DBConnectBase::batchRemove(InputIterator first, InputIterator last, bool au
         if (autotrans) {
             commit();
         }
-    } catch (hku::SQLException &e) {
+    } catch (::hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
@@ -639,7 +639,7 @@ inline void DBConnectBase::remove(const std::string &tablename, const std::strin
         if (autotrans) {
             commit();
         }
-    } catch (hku::SQLException &e) {
+    } catch (::hku::SQLException &e) {
         if (autotrans) {
             rollback();
         }
