@@ -208,58 +208,58 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
-        string name = this->name();
-        ar& BOOST_SERIALIZATION_NVP(name);
-        string ktype = this->ktype();
-        ar& BOOST_SERIALIZATION_NVP(ktype);
-        Indicator formula = this->formula();
-        ar& BOOST_SERIALIZATION_NVP(formula);
-        Datetime startDate = this->startDate();
-        ar& BOOST_SERIALIZATION_NVP(startDate);
-        Block block = this->block();
-        ar& BOOST_SERIALIZATION_NVP(block);
-        Datetime createAt = this->createAt();
-        ar& BOOST_SERIALIZATION_NVP(createAt);
-        Datetime updateAt = this->updateAt();
-        ar& BOOST_SERIALIZATION_NVP(updateAt);
-        string brief = this->brief();
-        ar& BOOST_SERIALIZATION_NVP(brief);
-        string details = this->details();
-        ar& BOOST_SERIALIZATION_NVP(details);
-        bool needSaveValue = this->needSaveValue();
-        ar& BOOST_SERIALIZATION_NVP(needSaveValue);
-        KQuery::RecoverType recover_type = this->recoverType();
-        ar& BOOST_SERIALIZATION_NVP(recover_type);
+        string tmp_name = name();
+        ar& BOOST_SERIALIZATION_NVP(tmp_name);
+        string tmp_ktype = ktype();
+        ar& BOOST_SERIALIZATION_NVP(tmp_ktype);
+        Indicator tmp_formula = formula();
+        ar& BOOST_SERIALIZATION_NVP(tmp_formula);
+        Datetime tmp_startDate = startDate();
+        ar& BOOST_SERIALIZATION_NVP(tmp_startDate);
+        Block tmp_block = block();
+        ar& BOOST_SERIALIZATION_NVP(tmp_block);
+        Datetime tmp_createAt = createAt();
+        ar& BOOST_SERIALIZATION_NVP(tmp_createAt);
+        Datetime tmp_updateAt = updateAt();
+        ar& BOOST_SERIALIZATION_NVP(tmp_updateAt);
+        string tmp_brief = brief();
+        ar& BOOST_SERIALIZATION_NVP(tmp_brief);
+        string tmp_details = details();
+        ar& BOOST_SERIALIZATION_NVP(tmp_details);
+        bool tmp_needSaveValue = needSaveValue();
+        ar& BOOST_SERIALIZATION_NVP(tmp_needSaveValue);
+        KQuery::RecoverType tmp_recover_type = recoverType();
+        ar& BOOST_SERIALIZATION_NVP(tmp_recover_type);
     }
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
-        string name;
-        string ktype;
-        Indicator formula;
-        Datetime startDate;
-        Block block;
-        Datetime createAt;
-        Datetime updateAt;
-        string brief;
-        string details;
-        bool needSaveValue;
-        KQuery::RecoverType recover_type;
-        ar& BOOST_SERIALIZATION_NVP(name);
-        ar& BOOST_SERIALIZATION_NVP(ktype);
-        ar& BOOST_SERIALIZATION_NVP(formula);
-        ar& BOOST_SERIALIZATION_NVP(startDate);
-        ar& BOOST_SERIALIZATION_NVP(block);
-        ar& BOOST_SERIALIZATION_NVP(createAt);
-        ar& BOOST_SERIALIZATION_NVP(updateAt);
-        ar& BOOST_SERIALIZATION_NVP(brief);
-        ar& BOOST_SERIALIZATION_NVP(details);
-        ar& BOOST_SERIALIZATION_NVP(needSaveValue);
-        ar& BOOST_SERIALIZATION_NVP(recover_type);
-        this->m_data = make_shared<Data>(name, formula, ktype, brief, details, needSaveValue,
-                                         startDate, block, recover_type);
-        this->createAt(createAt);
-        this->updateAt(updateAt);
+        string tmp_name;
+        string tmp_ktype;
+        Indicator tmp_formula;
+        Datetime tmp_startDate;
+        Block tmp_block;
+        Datetime tmp_createAt;
+        Datetime tmp_updateAt;
+        string tmp_brief;
+        string tmp_details;
+        bool tmp_needSaveValue;
+        KQuery::RecoverType tmp_recover_type;
+        ar& BOOST_SERIALIZATION_NVP(tmp_name);
+        ar& BOOST_SERIALIZATION_NVP(tmp_ktype);
+        ar& BOOST_SERIALIZATION_NVP(tmp_formula);
+        ar& BOOST_SERIALIZATION_NVP(tmp_startDate);
+        ar& BOOST_SERIALIZATION_NVP(tmp_block);
+        ar& BOOST_SERIALIZATION_NVP(tmp_createAt);
+        ar& BOOST_SERIALIZATION_NVP(tmp_updateAt);
+        ar& BOOST_SERIALIZATION_NVP(tmp_brief);
+        ar& BOOST_SERIALIZATION_NVP(tmp_details);
+        ar& BOOST_SERIALIZATION_NVP(tmp_needSaveValue);
+        ar& BOOST_SERIALIZATION_NVP(tmp_recover_type);
+        m_data = make_shared<Data>(tmp_name, tmp_formula, tmp_ktype, tmp_brief, tmp_details,
+                                   tmp_needSaveValue, tmp_startDate, tmp_block, tmp_recover_type);
+        createAt(tmp_createAt);
+        updateAt(tmp_updateAt);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

@@ -32,7 +32,7 @@ public:
      * @param inds 指标映射表，key 为因子名称，value 为对应的指标
      * @param ktype 因子集合的 K 线类型，默认为日线
      */
-   explicit FactorSet(const std::unordered_map<string, Indicator>& inds,
+    explicit FactorSet(const std::unordered_map<string, Indicator>& inds,
                        const KQuery::KType& ktype = KQuery::DAY);
 
     FactorSet(const FactorSet& other);
@@ -201,32 +201,32 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
-        string name = this->name();
-        ar& BOOST_SERIALIZATION_NVP(name);
-        string ktype = this->ktype();
-        ar& BOOST_SERIALIZATION_NVP(ktype);
-        Block block = this->block();
-        ar& BOOST_SERIALIZATION_NVP(block);
-        FactorList factors = this->getAllFactors();
-        ar& BOOST_SERIALIZATION_NVP(factors);
+        string tmp_name = name();
+        ar& BOOST_SERIALIZATION_NVP(tmp_name);
+        string tmp_ktype = ktype();
+        ar& BOOST_SERIALIZATION_NVP(tmp_ktype);
+        Block tmp_block = block();
+        ar& BOOST_SERIALIZATION_NVP(tmp_block);
+        FactorList tmp_factors = getAllFactors();
+        ar& BOOST_SERIALIZATION_NVP(tmp_factors);
     }
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
-        string name;
-        string ktype;
-        Block block;
-        ar& BOOST_SERIALIZATION_NVP(name);
-        ar& BOOST_SERIALIZATION_NVP(ktype);
-        ar& BOOST_SERIALIZATION_NVP(block);
-        FactorList factors;
-        ar& BOOST_SERIALIZATION_NVP(factors);
-        this->m_data = make_shared<Data>();
-        this->m_data->name = name;
-        this->m_data->ktype = ktype;
-        this->m_data->block = block;
-        for (auto& factor : factors) {
-            this->add(std::move(factor));
+        string tmp_name;
+        string tmp_ktype;
+        Block tmp_block;
+        ar& BOOST_SERIALIZATION_NVP(tmp_name);
+        ar& BOOST_SERIALIZATION_NVP(tmp_ktype);
+        ar& BOOST_SERIALIZATION_NVP(tmp_block);
+        FactorList tmp_factors;
+        ar& BOOST_SERIALIZATION_NVP(tmp_factors);
+        m_data = make_shared<Data>();
+        m_data->name = tmp_name;
+        m_data->ktype = tmp_ktype;
+        m_data->block = tmp_block;
+        for (auto& factor : tmp_factors) {
+            add(std::move(factor));
         }
     }
 

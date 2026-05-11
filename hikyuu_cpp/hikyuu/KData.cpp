@@ -171,14 +171,14 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
         return KQuery(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType());
     }
 
-    Datetime end;
+    Datetime end_;
     if ((query.queryType() == KQuery::INDEX && query.end() == Null<int64_t>()) ||
         (query.queryType() == KQuery::DATE && query.endDatetime() == Null<Datetime>())) {
-        end = Null<Datetime>();
+        end_ = Null<Datetime>();
     } else {
-        end = this->back().datetime;
-        if (end_datetime != Null<Datetime>() && end_datetime < end) {
-            end = end_datetime;
+        end_ = this->back().datetime;
+        if (end_datetime != Null<Datetime>() && end_datetime < end_) {
+            end_ = end_datetime;
         }
     }
 
@@ -191,8 +191,8 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
     // 从日线及以上转日线以下
     if (KQuery::getKTypeInSeconds(ktype) < day_ktype_seconds &&
         KQuery::getKTypeInSeconds(query.kType()) >= day_ktype_seconds) {
-        if (end != Null<Datetime>()) {
-            end = end.endOfDay();
+        if (end_ != Null<Datetime>()) {
+            end_ = end_.endOfDay();
         }
     }
 
@@ -202,7 +202,7 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
         start = start.startOfDay();
     }
 
-    return KQuery(start, end, ktype, query.recoverType());
+    return KQuery(start, end_, ktype, query.recoverType());
 }
 
 KData KData::getKData(const KQuery::KType& ktype) const {
