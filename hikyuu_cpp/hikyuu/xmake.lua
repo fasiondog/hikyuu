@@ -90,11 +90,6 @@ target("hikyuu")
         add_cxflags("-fPIC")
     end
 
-    -- boost.mysql 依赖的 charconv 会自动检测包含__float128
-    if is_plat("linux") then 
-        add_syslinks("quadmath")
-    end    
-
     if is_plat("macosx") then
         -- macosx下boost序列化需要
         if is_kind("shared") then 
@@ -177,6 +172,17 @@ target("hikyuu")
     if has_config("ta_lib") then
         add_files("./indicator_talib/**.cpp", {unity_group="talib"})
     end
+
+    on_config(function(target)
+        import("lib.detect.find_library")
+        if target:is_plat("linux") then
+            -- boost.mysql 依赖的 charconv 会自动检测包含__float128
+            local quadmath = find_library("quadmath", {"/usr/lib", "/usr/lib64", "/usr/local/lib"})
+            if quadmath ~= nil then
+                add_syslinks("quadmath")
+            end
+        end
+    end)
 
     after_build(function(target)
         local destpath = get_config("builddir") .. "/" .. get_config("mode") .. "/" .. get_config("plat") .. "/" .. get_config("arch")

@@ -249,8 +249,8 @@ end
 
 if is_plat("linux", "cross", "macosx") then
   -- disable some compiler errors
-  add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
-  add_cxflags("-ftemplate-depth=1023", "-pthread")
+  add_cxflags("-Wno-error=deprecated-declarations", "-Wno-subobject-linkage")
+  add_cxflags("-fno-strict-aliasing", "-ftemplate-depth=1023", "-pthread")
   add_shflags("-pthread")
   add_ldflags("-pthread")
 end
