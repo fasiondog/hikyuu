@@ -394,9 +394,8 @@ void MySQLStatement::sub_getColumnAsText(int idx, std::string& item) {
             auto dt = value.as_datetime();
             // 格式化为字符串：YYYY-MM-DD HH:MM:SS
             char buffer[64];
-            snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d",
-                     dt.year(), dt.month(), dt.day(),
-                     dt.hour(), dt.minute(), dt.second());
+            snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d", dt.year(), dt.month(),
+                     dt.day(), dt.hour(), dt.minute(), dt.second());
             item = buffer;
         } catch (...) {
             try {
@@ -404,22 +403,22 @@ void MySQLStatement::sub_getColumnAsText(int idx, std::string& item) {
                 auto d = value.as_date();
                 // 格式化为字符串：YYYY-MM-DD
                 char buffer[32];
-                snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d",
-                         d.year(), d.month(), d.day());
+                snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d", d.year(), d.month(), d.day());
                 item = buffer;
             } catch (...) {
                 try {
-                // 最后尝试作为 time 读取（boost::mysql::time 是 duration 类型）
-                auto t = value.as_time();
-                // 将 duration 转换为小时、分钟、秒
-                auto total_seconds = std::chrono::duration_cast<std::chrono::seconds>(t).count();
-                int hours = total_seconds / 3600;
-                int minutes = (total_seconds % 3600) / 60;
-                int seconds = total_seconds % 60;
-                // 格式化为字符串：HH:MM:SS
-                char buffer[32];
-                snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d", hours, minutes, seconds);
-                item = buffer;
+                    // 最后尝试作为 time 读取（boost::mysql::time 是 duration 类型）
+                    auto t = value.as_time();
+                    // 将 duration 转换为小时、分钟、秒
+                    auto total_seconds =
+                      std::chrono::duration_cast<std::chrono::seconds>(t).count();
+                    int hours = total_seconds / 3600;
+                    int minutes = (total_seconds % 3600) / 60;
+                    int seconds = total_seconds % 60;
+                    // 格式化为字符串：HH:MM:SS
+                    char buffer[32];
+                    snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d", hours, minutes, seconds);
+                    item = buffer;
                 } catch (...) {
                     SQL_THROW(-1, "Failed to convert column {} to string", idx);
                 }

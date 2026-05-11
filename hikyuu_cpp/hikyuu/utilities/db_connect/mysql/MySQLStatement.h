@@ -52,6 +52,7 @@ public:
 private:
     void _prepare();
     void _reset();
+    void _bindResult();
 
 private:
     struct Impl;

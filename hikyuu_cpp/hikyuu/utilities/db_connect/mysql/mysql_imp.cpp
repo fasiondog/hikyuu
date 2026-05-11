@@ -5,9 +5,10 @@
 #include "AsyncMySQLStatement.cpp"
 
 #if HKU_DISABLE_LIBMYSQLCLIENT
-#include "MySQLConnect.cpp"
-#include "MySQLStatement.cpp"
+#include "MySQLConnect_boost.cpp"
+#include "MySQLStatement_boost.cpp"
 #else
-#include "libmysqlclient/MySQLConnect.cpp"
-#include "libmysqlclient/MySQLStatement.cpp"
+#include "MySQLConnect_libmysqlclient.cpp"
+#include "MySQLStatement_libmysqlclient.cpp"
 #endif
+
