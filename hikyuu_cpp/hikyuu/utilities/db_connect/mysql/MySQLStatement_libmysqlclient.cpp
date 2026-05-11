@@ -480,7 +480,7 @@ void MySQLStatement::sub_getColumnAsText(int idx, std::string& item) {
                 item = Datetime(tm->year, tm->month, tm->day).str();
             } else if (tm->time_type == MYSQL_TIMESTAMP_TIME) {
                 char buf[16];
-                sprintf(buf, "%02d:%02d:%02d", tm->hour, tm->minute, tm->second);
+                snprintf(buf, sizeof(buf), "%02d:%02d:%02d", tm->hour, tm->minute, tm->second);
                 item = std::string(buf);
             } else {
                 HKU_THROW("Unsupported type: {}, Field type mismatch! idx: {}",
