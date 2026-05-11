@@ -173,13 +173,24 @@ target("hikyuu")
         add_files("./indicator_talib/**.cpp", {unity_group="talib"})
     end
 
-    on_config(function(target)
+    before_build(function(target)
         import("lib.detect.find_library")
-        if target:is_plat("linux") then
+        if is_plat("linux") then
             -- boost.mysql 依赖的 charconv 会自动检测包含__float128
-            local quadmath = find_library("quadmath", {"/usr/lib", "/usr/lib64", "/usr/local/lib"})
+            local quadmath = find_library("quadmath*",{
+                "/usr/lib",
+                "/usr/lib64",
+                "/usr/local/lib",
+                "/usr/lib/x86_64-linux-gnu",
+                "/usr/lib/aarch64-linux-gnu",
+                "/usr/lib/arm-linux-gnueabihf",
+                "/usr/lib/gcc/x86_64-linux-gnu/**",
+                "/usr/lib/gcc/aarch64-linux-gnu/**",
+                "/usr/lib/gcc/arm-linux-gnueabihf/**"
+            })
+            -- print(quadmath)
             if quadmath ~= nil then
-                add_syslinks("quadmath")
+                target:add("syslinks", "quadmath")
             end
         end
     end)
