@@ -62,6 +62,7 @@ namespace net {
 using io_context = boost::asio::io_context;
 using executor_type = boost::asio::any_io_executor;
 using strand = boost::asio::strand<boost::asio::io_context::executor_type>;
+namespace asio = boost::asio;
 
 // Work guard
 template <typename Executor>

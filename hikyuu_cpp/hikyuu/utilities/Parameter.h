@@ -113,6 +113,8 @@ public:
 
     Parameter& operator=(const Parameter&);
 
+    Parameter& operator=(Parameter&&);
+
     /** 判断输入对象是否属于支持的类型 */
     static bool support(const boost::any&);
 

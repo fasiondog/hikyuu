@@ -13,12 +13,6 @@
 #include "../../../utilities/db_connect/mysql/MySQLConnect.h"
 #include "../../KDataDriver.h"
 
-#if defined(_MSC_VER)
-#include <mysql.h>
-#else
-#include <mysql/mysql.h>
-#endif
-
 namespace hku {
 
 class MySQLKDataDriver : public KDataDriver {

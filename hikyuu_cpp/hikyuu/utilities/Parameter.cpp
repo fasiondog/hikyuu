@@ -77,6 +77,15 @@ Parameter& Parameter::operator=(const Parameter& p) {
     return *this;
 }
 
+Parameter& Parameter::operator=(Parameter&& p) {
+    if (this == &p) {
+        return *this;
+    }
+
+    m_params = std::move(p.m_params);
+    return *this;
+}
+
 bool Parameter::support(const boost::any& value) {
     return value.type() == typeid(int) || value.type() == typeid(int64_t) ||
            value.type() == typeid(bool) || value.type() == typeid(double) ||

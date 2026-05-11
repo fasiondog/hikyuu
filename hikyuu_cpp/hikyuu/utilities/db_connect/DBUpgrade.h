@@ -9,6 +9,7 @@
 
 #include <vector>
 #include "DBConnectBase.h"
+#include "AsyncDBConnectBase.h"
 
 namespace hku {
 
@@ -24,5 +25,11 @@ namespace hku {
 void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
                              const std::vector<std::string> &upgrade_scripts, int start_version = 2,
                              const char *create_script = nullptr);
+
+net::awaitable<void> HKU_UTILS_API DBUpgrade(const AsyncDBConnectPtr &driver,
+                                             const char *module_name,
+                                             const std::vector<std::string> &upgrade_scripts,
+                                             int start_version = 2,
+                                             const char *create_script = nullptr);
 
 }  // namespace hku

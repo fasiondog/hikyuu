@@ -161,9 +161,11 @@ target("core")
                     os.cp(target:targetdir() .. '/*.a', dst_dir)
                 end
 
-                filename = "libmysqlclient.21.dylib"
-                os.run(format("install_name_tool -change @loader_path/../lib/libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_dir .. filename))
-                os.run(format("install_name_tool -change @loader_path/../lib/libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_dir .. filename))
+                if not get_config("disable_libmysqlclient") then
+                    filename = "libmysqlclient.21.dylib"
+                    os.run(format("install_name_tool -change @loader_path/../lib/libssl.3.dylib @loader_path/libssl.3.dylib %s", dst_dir .. filename))
+                    os.run(format("install_name_tool -change @loader_path/../lib/libcrypto.3.dylib @loader_path/libcrypto.3.dylib %s", dst_dir .. filename))
+                end
             end
 
             -- 添加 macosx 签名

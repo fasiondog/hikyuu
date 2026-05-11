@@ -77,10 +77,9 @@ IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bo
                                 bool fill_null, bool tovalue, bool check,
                                 const DatetimeList& align_dates) const {
     if (check) {
-        const auto& block = this->block();
-        if (!block.empty()) {
+        if (!block().empty()) {
             for (auto& stock : stocks) {
-                HKU_CHECK(block.have(stock), "Stock not belong to block! {}", stock);
+                HKU_CHECK(block().have(stock), "Stock not belong to block! {}", stock);
             }
         }
     }

@@ -73,10 +73,12 @@ target("unit-test")
         end
     end
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json")
-    if get_config("mysql") then
+    if has_config("mysql") and not has_config("disable_libmysqlclient") then
         add_packages("mysql")
-    end
+    end    
+
+
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json")
     if has_config("ta_lib") then
         add_packages("ta-lib")
     end
@@ -145,14 +147,11 @@ target("small-test")
     set_kind("binary")
     set_default(false)
     
+    if has_config("mysql") and not has_config("disable_libmysqlclient") then
+        add_packages("mysql")
+    end    
+
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json")
-    if get_config("mysql") then
-        if is_plat("macosx") then
-            add_packages("mysqlclient")
-        else
-            add_packages("mysql")
-        end
-    end
 
     add_includedirs("..")
 
@@ -190,14 +189,11 @@ target("real-test")
     set_kind("binary")
     set_default(false)
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "mysql", "nlohmann_json")
-    if get_config("mysql") then
-        if is_plat("macosx") then
-            add_packages("mysqlclient")
-        else
-            add_packages("mysql")
-        end
+    if has_config("mysql") and not has_config("disable_libmysqlclient") then
+        add_packages("mysql")
     end
+    
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "mysql", "nlohmann_json")
     
     add_includedirs("..")
 

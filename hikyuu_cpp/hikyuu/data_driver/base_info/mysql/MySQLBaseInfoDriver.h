@@ -13,12 +13,6 @@
 #include "../../../utilities/db_connect/mysql/MySQLConnect.h"
 #include "../../BaseInfoDriver.h"
 
-#if defined(_MSC_VER)
-#include <mysql.h>
-#else
-#include <mysql/mysql.h>
-#endif
-
 namespace hku {
 
 class MySQLBaseInfoDriver : public BaseInfoDriver {

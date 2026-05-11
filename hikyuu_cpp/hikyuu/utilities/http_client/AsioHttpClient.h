@@ -108,7 +108,7 @@ public:
      * @brief 获取 HTTP 状态描述
      * @return 状态描述文本（如 "OK", "Not Found" 等）
      */
-    std::string reason() const noexcept {
+    const std::string& reason() const noexcept {
         return m_reason;
     }
 
@@ -193,7 +193,7 @@ public:
      * @brief 获取 HTTP 状态描述
      * @return 状态描述文本（如 "OK", "Not Found" 等）
      */
-    std::string reason() const noexcept {
+    const std::string& reason() const noexcept {
         return m_reason;
     }
 

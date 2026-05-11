@@ -174,10 +174,9 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
                                            const DatetimeList& align_dates) const {
     // SPEND_TIME(FactorSet_getValues);
     if (check) {
-        const auto& block = this->block();
-        if (!block.empty()) {
+        if (!block().empty()) {
             for (auto& stock : stocks) {
-                HKU_CHECK(block.have(stock), "Stock not belong to block! {}", stock);
+                HKU_CHECK(block().have(stock), "Stock not belong to block! {}", stock);
             }
         }
     }
