@@ -597,6 +597,17 @@
     :rtype: Indicator
 
 
+.. py:function:: FACTOR(factor)
+
+    因子指标转换
+
+    将Factor对象转换为Indicator，使其可以在指标系统中使用。
+    该指标需要设置K线上下文才能进行计算。
+
+    :param Factor factor: 因子对象
+    :rtype: Indicator
+
+
 .. py:function:: FILTER([data, n=5])
 
     信号过滤, 过滤连续出现的信号。

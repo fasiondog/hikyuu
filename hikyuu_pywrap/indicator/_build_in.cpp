@@ -2391,4 +2391,14 @@ void export_Indicator_build_in(py::module& m) {
 
     :param KData kdata: K线数据
     :rtype: Indicator)");
+
+    m.def("FACTOR", &FACTOR, py::arg("factor"), R"(FACTOR(factor)
+
+    因子指标转换
+
+    将Factor对象转换为Indicator，使其可以在指标系统中使用。
+    该指标需要设置K线上下文才能进行计算。
+
+    :param Factor factor: 因子对象
+    :rtype: Indicator)");
 }

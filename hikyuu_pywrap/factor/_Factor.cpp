@@ -138,10 +138,19 @@ void export_Factor(py::module& m) {
     :return: 所有股票的计算结果列表
     :rtype: list)")
 
+      .def("get_value",
+           py::overload_cast<const KData&, bool, bool, bool, bool, const DatetimeList&>(
+             &Factor::getValue, py::const_),
+           py::arg("kdata"), py::arg("align") = false, py::arg("fill_null") = false,
+           py::arg("tovalue") = false, py::arg("check") = false,
+           py::arg("align_dates") = DatetimeList{})
       .def(
-        "get_value", &Factor::getValue, py::arg("stock"), py::arg("query"),
-        py::arg("align") = false, py::arg("fill_null") = false, py::arg("tovalue") = false,
-        py::arg("check") = false, py::arg("align_dates") = DatetimeList{},
+        "get_value",
+        py::overload_cast<const Stock&, const KQuery&, bool, bool, bool, bool, const DatetimeList&>(
+          &Factor::getValue, py::const_),
+        py::arg("stock"), py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
+        py::arg("tovalue") = false, py::arg("check") = false,
+        py::arg("align_dates") = DatetimeList{},
         R"(get_value(self, stock, query[, align=False[, fill_null=False[, tovalue=False[, check=False[, align_dates=DatetimeList()]]]]])
     
     获取指定股票的指定查询参数的计算结果

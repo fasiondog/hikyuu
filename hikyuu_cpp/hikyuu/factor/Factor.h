@@ -64,6 +64,13 @@ public:
                        bool fill_null = false, bool tovalue = false, bool check = false,
                        const DatetimeList& align_dates = {}) const;
 
+    Indicator getValue(const KData& kdata, bool align = false, bool fill_null = false,
+                       bool tovalue = false, bool check = false,
+                       const DatetimeList& align_dates = {}) const {
+        return getValue(kdata.getStock(), kdata.getQuery(), align, fill_null, tovalue, check,
+                        align_dates);
+    }
+
     /**
      * 获取指定股票列表的指定查询参数的计算结果
      * @param stocks 证券列表
@@ -383,4 +390,10 @@ public:
         return factor.hash();
     }
 };
+
 }  // namespace std
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::Factor> : ostream_formatter {};
+#endif

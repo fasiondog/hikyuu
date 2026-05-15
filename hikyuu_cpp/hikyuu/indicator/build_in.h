@@ -50,6 +50,7 @@
 #include "crt/EXP.h"
 #include "crt/EXIST.h"
 #include "crt/EVERY.h"
+#include "crt/FACTOR.h"
 #include "crt/FILTER.h"
 #include "crt/FINANCE.h"
 #include "crt/FLOOR.h"
