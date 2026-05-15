@@ -173,8 +173,7 @@ local boost_config = {
             random = true,
             thread = true,
             asio = true,
-            openssl = has_config("mysql"),
-            mysql = has_config("mysql"),            
+            openssl = has_config("mysql"),            
             cmake = true,
     }}
 
