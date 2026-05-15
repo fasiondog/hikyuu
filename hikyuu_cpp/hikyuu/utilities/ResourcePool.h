@@ -18,6 +18,7 @@
 #include <unordered_set>
 #include "Parameter.h"
 #include "Log.h"
+#include "ResourceVersionTraits.h"
 
 namespace hku {
 
@@ -291,39 +292,24 @@ private:
 };
 
 /**
- * @brief 带版本的资源接口，可由需要版本管理的资源继承
- * @details 自带的 getVersion 和 setVerion 方法由 ResourceVersionPool 调用，不建议带有其他用途
- */
-class ResourceWithVersion {
-public:
-    /** 默认构造函数 */
-    ResourceWithVersion() : m_version(0) {}
-
-    /** 析构函数 */
-    virtual ~ResourceWithVersion() {}
-
-    /** 获取资源版本 */
-    int getVersion() const {
-        return m_version;
-    }
-
-    /** 设置资源版本 **/
-    void setVersion(int version) {
-        m_version = version;
-    }
-
-protected:
-    int m_version;
-};
-
-/**
- * 通用版本的共享资源池，当资源池参数变更时，保证新资源使用新参数，老版本的资源再使用完毕后被自动回收
- * @details 要求资源类具备 int getVersion() 和 void setVersion(int) 另个接口函数
+ * @brief 带版本的资源池（强制要求资源类型支持版本接口）
+ * @details 要求资源类具备 int getVersion() 和 void setVersion(int) 两个接口函数。
+ *          当参数发生变化时，自动递增版本号并释放所有空闲的旧版本资源。
+ *
+ *          **重要约束**：ResourceType 必须实现 getVersion() 和 setVersion(int) 方法。
+ *
+ * @tparam ResourceType 资源类型，必须实现 getVersion() 和 setVersion(int) 方法
  * @ingroup Utilities
  */
 template <typename ResourceType>
 class ResourceVersionPool {
 public:
+    // 编译期检查：ResourceType 必须支持 getVersion 和 setVersion
+    static_assert(hku::detail::has_resource_getVersion_v<ResourceType>,
+                  "ResourceType must implement getVersion() method.");
+    static_assert(hku::detail::has_resource_setVersion_v<ResourceType>,
+                  "ResourceType must implement setVersion(int) method.");
+
     ResourceVersionPool() = delete;
     ResourceVersionPool(const ResourceVersionPool &) = delete;
     ResourceVersionPool &operator=(const ResourceVersionPool &) = delete;

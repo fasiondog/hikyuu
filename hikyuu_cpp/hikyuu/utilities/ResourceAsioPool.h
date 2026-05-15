@@ -10,15 +10,19 @@
 #ifndef HKU_UTILS_RESOURCE_ASIO_POOL_H
 #define HKU_UTILS_RESOURCE_ASIO_POOL_H
 
-#include <boost/lockfree/queue.hpp>
-#include "hikyuu/utilities/net.h"
+#include <memory>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
 #include <chrono>
 #include <vector>
-#include <atomic>
-#include <condition_variable>
+#include <boost/lockfree/queue.hpp>
+
+#include "ResourceVersionTraits.h"
 #include "Parameter.h"
 #include "Log.h"
-#include "ResourcePool.h"
+#include "net.h"
+#include "expected.h"
 
 namespace hku {
 
@@ -103,18 +107,36 @@ public:
     typedef std::shared_ptr<ResourceType> ResourcePtr;
 
     /**
-     * 协程方式获取可用资源（带超时）
-     * @param timeout 超时时间
-     * @return awaitable<ResourcePtr> 可等待的资源指针
-     * @exception CreateResourceException 新资源创建可能抛出异常
+     * 同步获取可用资源（不等待，无空闲资源直接返回失败）
+     *
+     * @return std::expected<ResourcePtr, std::string>
+     *         成功时包含资源指针，失败时包含错误信息
+     *
+     * @note 获取策略：
+     *       1. 优先从空闲队列获取资源并检查版本
+     *       2. 如果资源版本过旧，销毁该资源并尝试创建新资源
+     *       3. 如果无空闲但未达上限，创建新版本资源
+     *       4. 如果已达上限且无空闲，立即返回失败（不等待）
+     *       5. 如需异步等待，请使用 asyncGet()
+     *
+     * @example
+     * @code
+     * auto result = pool.get();
+     * if (result) {
+     *     auto resource = result.value();
+     *     // 资源保证是当前最新版本
+     *     resource->doWork();
+     * } else {
+     *     HKU_ERROR("Failed to get resource: {}", result.error());
+     * }
+     * @endcode
      */
-    awaitable<ResourcePtr> get(
-      std::chrono::steady_clock::duration timeout = std::chrono::seconds(3)) {
+    stdx::expected<ResourcePtr, std::string> get() {
         // 1. 尝试从空闲队列获取资源
         ResourceType *p = nullptr;
         if (m_resourceList.pop(p)) {
             m_idleCount.fetch_sub(1);
-            co_return ResourcePtr(p, ResourceCloser(this));
+            return stdx::expected<ResourcePtr, std::string>(ResourcePtr(p, ResourceCloser(this)));
         }
 
         // 2. 无空闲但未达上限 → 创建新资源
@@ -122,17 +144,54 @@ public:
             try {
                 p = new ResourceType(m_param);
             } catch (const std::exception &e) {
-                HKU_THROW_EXCEPTION(CreateResourceException, "Failed create a new Resource! {}",
-                                    e.what());
+                return stdx::unexpected(
+                  std::string(fmt::format("Failed create a new Resource! {}", e.what())));
             } catch (...) {
-                HKU_THROW_EXCEPTION(CreateResourceException,
-                                    "Failed create a new Resource! Unknown error!");
+                return stdx::unexpected(
+                  std::string("Failed create a new Resource! Unknown error!"));
             }
             m_count.fetch_add(1);
-            co_return ResourcePtr(p, ResourceCloser(this));
+            return stdx::expected<ResourcePtr, std::string>(ResourcePtr(p, ResourceCloser(this)));
         }
 
-        // 3. 已达上限 → 进入等待队列
+        // 3. 已达上限且无空闲资源 → 直接返回失败
+        return stdx::unexpected(fmt::format("No available resource, max_count={}, current_count={}",
+                                            m_maxCount.load(), m_count.load()));
+    }
+
+    /**
+     * 协程方式获取可用资源（带超时）
+     * @param timeout 超时时间
+     * @return awaitable<std::expected<ResourcePtr, std::string>>
+     * 可等待的结果，成功时包含资源指针，失败时包含错误信息
+     */
+    awaitable<stdx::expected<ResourcePtr, std::string>> asyncGet(
+      std::chrono::steady_clock::duration timeout = std::chrono::seconds(5)) {
+        // 尝试从空闲队列获取资源
+        ResourceType *p = nullptr;
+        if (m_resourceList.pop(p)) {
+            m_idleCount.fetch_sub(1);
+            co_return stdx::expected<ResourcePtr, std::string>(
+              ResourcePtr(p, ResourceCloser(this)));
+        }
+
+        // 无空闲但未达上限 → 创建新资源
+        if (m_maxCount == 0 || m_count.load() < m_maxCount.load()) {
+            try {
+                p = new ResourceType(m_param);
+            } catch (const std::exception &e) {
+                co_return stdx::unexpected(
+                  std::string(fmt::format("Failed create a new Resource! {}", e.what())));
+            } catch (...) {
+                co_return stdx::unexpected(
+                  std::string("Failed create a new Resource! Unknown error!"));
+            }
+            m_count.fetch_add(1);
+            co_return stdx::expected<ResourcePtr, std::string>(
+              ResourcePtr(p, ResourceCloser(this)));
+        }
+
+        // 已达上限 → 进入等待队列
         auto executor = co_await this_coro::executor;
         auto timer = std::make_shared<net::steady_timer>(executor);
         timer->expires_after(timeout);
@@ -154,27 +213,23 @@ public:
         // 从等待队列移除
         {
             std::lock_guard<MutexType> lock(m_waiterMutex);
-            if (!m_waiters.empty() && m_waiters.back() == timer) {
-                m_waiters.pop_back();
-            } else {
-                // 如果不是队首，需要查找并移除（超时情况）
-                m_waiters.remove(timer);
-            }
+            m_waiters.remove(timer);
         }
 
         if (ec == net::error::operation_aborted) {
             // 被唤醒，一定能拿到资源
             if (!m_resourceList.pop(p)) {
-                HKU_THROW_EXCEPTION(CreateResourceException,
-                                    "Unexpected error: no available resource after wakeup");
+                co_return stdx::unexpected(
+                  std::string("Unexpected error: no available resource after wakeup"));
             }
             m_idleCount.fetch_sub(1);
-            co_return ResourcePtr(p, ResourceCloser(this));
+            co_return stdx::expected<ResourcePtr, std::string>(
+              ResourcePtr(p, ResourceCloser(this)));
         } else {
             // 超时
-            HKU_THROW_EXCEPTION(CreateResourceException,
-                                "ResourceAsioPool get timeout, max_count={}, current_count={}",
-                                m_maxCount.load(), m_count.load());
+            co_return stdx::unexpected(
+              fmt::format("ResourceAsioPool get timeout, max_count={}, current_count={}",
+                          m_maxCount.load(), m_count.load()));
         }
     }
 
@@ -281,43 +336,25 @@ private:
 };
 
 /**
- * @brief 带版本的资源接口，可由需要版本管理的资源继承
- * @details 自带的 getVersion 和 setVerion 方法由 ResourceAsioVersionPool 调用，不建议带有其他用途
- */
-class AsyncResourceWithVersion {
-public:
-    /** 默认构造函数 */
-    AsyncResourceWithVersion() : m_version(0) {}
-
-    /** 析构函数 */
-    virtual ~AsyncResourceWithVersion() {}
-
-    /** 获取资源版本 */
-    int getVersion() const {
-        return m_version;
-    }
-
-    /** 设置资源版本 **/
-    void setVersion(int version) {
-        m_version = version;
-    }
-
-protected:
-    int m_version;
-};
-
-/**
- * 通用版本的共享资源池(协程版本),当资源池参数变更时,保证新资源使用新参数,老版本的资源在使用完毕后被自动回收
- * @details 要求资源类具备 int getVersion() 和 void setVersion(int) 两个接口函数,建议继承
- * AsyncResourceWithVersion
- * @tparam ResourceType 资源类型,必须支持构造函数 ResourceType(const Parameter&) 且继承
- * AsyncResourceWithVersion
- * @tparam MutexType 互斥锁类型,默认为 NullLock(适用于单线程 io_context)
+ * @brief 带版本的资源池（强制要求资源类型支持版本接口）
+ * @details 使用 boost::lockfree::queue 实现无锁空闲队列，支持协程异步获取资源。
+ *          当参数发生变化时，自动递增版本号并释放所有空闲的旧版本资源。
+ *
+ *          **重要约束**：ResourceType 必须实现 getVersion() 和 setVersion(int) 方法。
+ *
+ * @tparam ResourceType 资源类型，必须实现 getVersion() 和 setVersion(int) 方法
+ * @tparam MutexType 互斥锁类型，默认 std::mutex
  * @ingroup Utilities
  */
-template <typename ResourceType, typename MutexType = rap::NullLock>
+template <typename ResourceType, typename MutexType = std::mutex>
 class ResourceAsioVersionPool {
 public:
+    // 编译期检查：ResourceType 必须支持 getVersion 和 setVersion
+    static_assert(hku::detail::has_resource_getVersion_v<ResourceType>,
+                  "ResourceType must implement getVersion() method.");
+    static_assert(hku::detail::has_resource_setVersion_v<ResourceType>,
+                  "ResourceType must implement setVersion(int) method.");
+
     ResourceAsioVersionPool() = delete;
     ResourceAsioVersionPool(const ResourceAsioVersionPool &) = delete;
     ResourceAsioVersionPool &operator=(const ResourceAsioVersionPool &) = delete;
@@ -342,20 +379,18 @@ public:
         // 清空等待队列，取消所有等待的定时器
         {
             std::lock_guard<MutexType> lock(m_waiterMutex);
-            while (!m_waiters.empty()) {
-                auto timer = m_waiters.front();
-                m_waiters.pop();
+            for (auto &timer : m_waiters) {
                 if (timer) {
                     timer->cancel();
                 }
             }
+            m_waiters.clear();
         }
 
         // 标记正在析构，阻止新的资源获取
         m_is_destroying.store(true);
 
         // 等待所有活跃资源归还
-        // 当 m_count == m_idleCount 时，说明所有资源都已归还到空闲队列
         std::unique_lock<MutexType> lock(m_destroy_mutex);
         m_destroy_cv.wait(lock, [this]() { return m_count.load() == m_idleCount.load(); });
 
@@ -436,35 +471,24 @@ public:
     typedef std::shared_ptr<ResourceType> ResourcePtr;
 
     /**
-     * 协程方式获取可用资源
-     * @return awaitable<ResourcePtr> 可等待的资源指针
-     * @exception CreateResourceException 新资源创建可能抛出异常
+     * 同步获取可用资源（不等待，无空闲资源直接返回失败）
+     * @return std::expected<ResourcePtr, std::string>
+     * 成功时包含资源指针，失败时包含错误信息
      */
-    awaitable<ResourcePtr> get() {
-        return get(std::chrono::seconds(3));
-    }
-
-    /**
-     * 协程方式获取可用资源（带超时）
-     * @param timeout 超时时间
-     * @return awaitable<ResourcePtr> 可等待的资源指针
-     * @exception CreateResourceException 新资源创建可能抛出异常
-     */
-    awaitable<ResourcePtr> get(std::chrono::steady_clock::duration timeout) {
-        auto executor = co_await this_coro::executor;
-
+    stdx::expected<ResourcePtr, std::string> get() {
         // 1. 尝试从空闲队列获取资源
         ResourceType *p = nullptr;
         if (m_resourceList.pop(p)) {
             m_idleCount.fetch_sub(1);
 
-            // 检查资源版本，如果版本过旧则销毁，下面会创建新资源
+            // 检查资源版本，如果版本过旧则销毁
             if (p->getVersion() != m_version.load()) {
                 delete p;
                 m_count.fetch_sub(1);
                 p = nullptr;
             } else {
-                co_return ResourcePtr(p, ResourceCloser(this));
+                return stdx::expected<ResourcePtr, std::string>(
+                  ResourcePtr(p, ResourceCloser(this)));
             }
         }
 
@@ -480,25 +504,89 @@ public:
                 p = new ResourceType(current_param);
                 p->setVersion(m_version.load());
             } catch (const std::exception &e) {
-                HKU_THROW_EXCEPTION(CreateResourceException, "Failed create a new Resource! {}",
-                                    e.what());
+                return stdx::unexpected(
+                  std::string(fmt::format("Failed create a new Resource! {}", e.what())));
             } catch (...) {
-                HKU_THROW_EXCEPTION(CreateResourceException,
-                                    "Failed create a new Resource! Unknown error!");
+                return stdx::unexpected(
+                  std::string("Failed create a new Resource! Unknown error!"));
             }
 
             m_count.fetch_add(1);
-            co_return ResourcePtr(p, ResourceCloser(this));
+            return stdx::expected<ResourcePtr, std::string>(ResourcePtr(p, ResourceCloser(this)));
         }
 
-        // 3. 已达上限，进入等待队列
+        // 3. 已达上限且无空闲资源 → 直接返回失败
+        return stdx::unexpected(fmt::format("No available resource, max_count={}, current_count={}",
+                                            m_maxCount.load(), m_count.load()));
+    }
+
+    /**
+     * 协程方式获取可用资源
+     * @return awaitable<std::expected<ResourcePtr, std::string>>
+     * 可等待的结果，成功时包含资源指针，失败时包含错误信息
+     */
+    awaitable<stdx::expected<ResourcePtr, std::string>> asyncGet() {
+        return asyncGet(std::chrono::seconds(3));
+    }
+
+    /**
+     * 协程方式获取可用资源（带超时）
+     * @param timeout 超时时间
+     * @return awaitable<std::expected<ResourcePtr, std::string>>
+     * 可等待的结果，成功时包含资源指针，失败时包含错误信息
+     */
+    awaitable<stdx::expected<ResourcePtr, std::string>> asyncGet(
+      std::chrono::steady_clock::duration timeout) {
+        auto executor = co_await this_coro::executor;
+
+        // 尝试从空闲队列获取资源
+        ResourceType *p = nullptr;
+        if (m_resourceList.pop(p)) {
+            m_idleCount.fetch_sub(1);
+
+            // 检查资源版本，如果版本过旧则销毁，下面会创建新资源
+            if (p->getVersion() != m_version.load()) {
+                delete p;
+                m_count.fetch_sub(1);
+                p = nullptr;
+            } else {
+                co_return stdx::expected<ResourcePtr, std::string>(
+                  ResourcePtr(p, ResourceCloser(this)));
+            }
+        }
+
+        // 未达上限，创建新资源
+        if (m_maxCount == 0 || m_count.load() < m_maxCount.load()) {
+            try {
+                Parameter current_param;
+                {
+                    std::lock_guard<MutexType> lock(m_mutex);
+                    current_param = m_param;
+                }
+
+                p = new ResourceType(current_param);
+                p->setVersion(m_version.load());
+            } catch (const std::exception &e) {
+                co_return stdx::unexpected(
+                  std::string(fmt::format("Failed create a new Resource! {}", e.what())));
+            } catch (...) {
+                co_return stdx::unexpected(
+                  std::string("Failed create a new Resource! Unknown error!"));
+            }
+
+            m_count.fetch_add(1);
+            co_return stdx::expected<ResourcePtr, std::string>(
+              ResourcePtr(p, ResourceCloser(this)));
+        }
+
+        // 已达上限，进入等待队列
         auto timer = std::make_shared<net::steady_timer>(executor);
         timer->expires_after(timeout);
 
         // 加入等待队列
         {
             std::lock_guard<MutexType> lock(m_waiterMutex);
-            m_waiters.push(timer);
+            m_waiters.push_back(timer);
         }
 
         // 等待被唤醒或超时
@@ -512,26 +600,14 @@ public:
         // 从等待队列移除
         {
             std::lock_guard<MutexType> lock(m_waiterMutex);
-            if (!m_waiters.empty() && m_waiters.front() == timer) {
-                m_waiters.pop();
-            } else {
-                std::queue<std::shared_ptr<net::steady_timer>> temp;
-                while (!m_waiters.empty()) {
-                    auto t = m_waiters.front();
-                    m_waiters.pop();
-                    if (t != timer) {
-                        temp.push(t);
-                    }
-                }
-                m_waiters = std::move(temp);
-            }
+            m_waiters.remove(timer);
         }
 
         if (ec == net::error::operation_aborted) {
             // 被唤醒，一定能拿到资源
             if (!m_resourceList.pop(p)) {
-                HKU_THROW_EXCEPTION(CreateResourceException,
-                                    "Unexpected error: no available resource after wakeup");
+                co_return stdx::unexpected(
+                  std::string("Unexpected error: no available resource after wakeup"));
             }
             m_idleCount.fetch_sub(1);
 
@@ -539,17 +615,15 @@ public:
             if (p->getVersion() != m_version.load()) {
                 delete p;
                 m_count.fetch_sub(1);
-                // 需要创建新资源，但此时已经没有空闲资源，这里可能需要递归或重新获取
-                HKU_THROW_EXCEPTION(CreateResourceException,
-                                    "Resource version mismatch after wakeup");
+                co_return stdx::unexpected(std::string("Resource version mismatch after wakeup"));
             }
 
-            co_return ResourcePtr(p, ResourceCloser(this));
+            co_return stdx::expected<ResourcePtr, std::string>(
+              ResourcePtr(p, ResourceCloser(this)));
         } else {
-            HKU_THROW_EXCEPTION(
-              CreateResourceException,
-              "ResourceAsioVersionPool get timeout, max_count={}, current_count={}",
-              m_maxCount.load(), m_count.load());
+            co_return stdx::unexpected(
+              fmt::format("ResourceAsioVersionPool get timeout, max_count={}, current_count={}",
+                          m_maxCount.load(), m_count.load()));
         }
     }
 
@@ -636,7 +710,7 @@ private:
                     std::lock_guard<MutexType> lock(m_waiterMutex);
                     if (!m_waiters.empty()) {
                         timer = m_waiters.front();
-                        m_waiters.pop();
+                        m_waiters.pop_front();
                     }
                 }
                 if (timer) {
@@ -657,13 +731,13 @@ private:
         }
     }
 
-    mutable MutexType m_mutex;                                 // 保护参数访问的互斥锁
-    std::atomic<size_t> m_maxCount;                            // 最大资源上限
-    MutexType m_waiterMutex;                                   // 保护等待队列的互斥锁
-    std::queue<std::shared_ptr<net::steady_timer>> m_waiters;  // 等待队列
-    std::atomic<bool> m_is_destroying{false};                  // 标记是否正在析构
-    MutexType m_destroy_mutex;                                 // 保护析构等待的条件变量
-    std::condition_variable_any m_destroy_cv;                  // 用于通知析构函数资源已归还
+    mutable MutexType m_mutex;                                // 保护参数访问的互斥锁
+    std::atomic<size_t> m_maxCount;                           // 最大资源上限
+    MutexType m_waiterMutex;                                  // 保护等待队列的互斥锁
+    std::list<std::shared_ptr<net::steady_timer>> m_waiters;  // 等待队列
+    std::atomic<bool> m_is_destroying{false};                 // 标记是否正在析构
+    MutexType m_destroy_mutex;                                // 保护析构等待的条件变量
+    std::condition_variable_any m_destroy_cv;                 // 用于通知析构函数资源已归还
 };
 
 }  // namespace hku

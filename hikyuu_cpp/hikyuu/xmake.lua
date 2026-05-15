@@ -23,7 +23,8 @@ target("hikyuu")
         add_packages("openssl3")
     end
 
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "xxhash", "eigen")
+    add_packages("boost", "fmt", "spdlog", "tl_expected", "nlohmann_json", "xxhash", "eigen")
+    add_packages("flatbuffers", "nng")
     if is_plat("windows", "linux", "cross", "macosx") then
         if get_config("sqlite") or get_config("hdf5") then
             add_packages("sqlite3")

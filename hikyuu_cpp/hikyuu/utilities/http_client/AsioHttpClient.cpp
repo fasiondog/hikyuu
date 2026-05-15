@@ -94,14 +94,24 @@ AsioHttpStreamResponse& AsioHttpStreamResponse::operator=(AsioHttpStreamResponse
 }
 
 // HttpConnection 类定义 - 用于连接池的可复用连接
-struct HttpConnection : public AsyncResourceWithVersion {
+struct HttpConnection {
     using SocketType = tcp::socket;
 
     std::vector<tcp::endpoint> endpoints;                  // DNS 解析结果缓存
     std::chrono::steady_clock::time_point last_used_time;  // 最后使用时间
+    int m_version = 0;                                     // 版本号
 
     // socket 在连接被获取时创建
     std::optional<SocketType> socket;
+
+    // 版本管理接口
+    int getVersion() const {
+        return m_version;
+    }
+
+    void setVersion(int version) {
+        m_version = version;
+    }
 
 #if HKU_ENABLE_HTTP_CLIENT_SSL
     std::optional<ssl::stream<tcp::socket>> ssl_socket;
@@ -581,7 +591,12 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
     HKU_ASSERT(m_connection_pool != nullptr);
 
     // 从池中获取连接（资源池自动进行版本检查，旧版本连接会被自动淘汰）
-    auto conn_ptr = co_await m_connection_pool->get();
+    auto conn_result = co_await m_connection_pool->asyncGet();
+    if (!conn_result) {
+        HKU_THROW_EXCEPTION(HttpTimeoutException, "Failed to get connection from pool: {}",
+                            conn_result.error());
+    }
+    auto conn_ptr = std::move(conn_result.value());
     HKU_CHECK(conn_ptr != nullptr, "Failed to get connection from pool");
 
     bool is_new_connection = false;

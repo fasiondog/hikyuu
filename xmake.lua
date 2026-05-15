@@ -175,11 +175,12 @@ local boost_config = {
             asio = true,
             openssl = has_config("mysql"),
             mysql = has_config("mysql"),            
-            cmake = true,
+            cmake = false,
     }}
 
 add_requires("boost", boost_config)
 
+add_requires("tl_expected", {system = false})
 add_requires("fmt", {system = false, configs = {header_only = true}})
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true}})
 add_requireconfs("spdlog.fmt", {override = true, system = false, configs = {header_only = true}})

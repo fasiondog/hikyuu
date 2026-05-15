@@ -11,6 +11,7 @@
 #include <functional>
 #include <forward_list>
 #include <unordered_map>
+#include <shared_mutex>
 #include "thread/ThreadPool.h"
 #include "any_to_string.h"
 #include "Log.h"
@@ -67,6 +68,10 @@ public:
         return m_exclusive;
     }
 
+    /**
+     * @brief 设置排他模式
+     * @param exclusive true: 只执行第一个匹配的子节点；false: 执行所有匹配的子节点
+     */
     void exclusive(bool exclusive) {
         m_exclusive = exclusive;
     }
@@ -131,9 +136,9 @@ private:
         try {
             return filter(data);
         } catch (const std::exception& e) {
-            HKU_WARN("Node filter exist error! {}", e.what());
+            HKU_WARN("Exception in node filter: {}", e.what());
         } catch (...) {
-            HKU_WARN("Node filter exist unknown error!");
+            HKU_WARN("Unknown exception in node filter!");
         }
         return false;
     }
@@ -142,9 +147,9 @@ private:
         try {
             process(data);
         } catch (const std::exception& e) {
-            HKU_WARN("Node process exist error! {}", e.what());
+            HKU_WARN("Exception in node process: {}", e.what());
         } catch (...) {
-            HKU_WARN("Node process exist unknown error!");
+            HKU_WARN("Unknown exception in node process!");
         }
     }
 
@@ -165,6 +170,8 @@ typedef std::shared_ptr<FilterNode> FilterNodePtr;
 
 /**
  * @brief 绑定过滤节点，通过 std::function 绑定自定义的 filter 和 process 处理函数
+ * @note 使用默认构造函数创建时，m_filter 和 m_process 为空，filter() 返回 true，process()
+ * 不执行任何操作
  */
 class BindFilterNode : public FilterNode {
 public:
@@ -201,7 +208,8 @@ private:
 
 /**
  * @brief 异步串行事件处理器
- * @tparam EventT
+ * @tparam EventT 事件类型，需要支持哈希和相等比较
+ * @note 所有事件处理在单线程池中串行执行，保证同一时刻只有一个事件在处理
  */
 template <class EventT>
 class AsyncSerialEventProcessor {
@@ -232,7 +240,7 @@ public:
      */
     FilterNodePtr addAction(const EventT& event, const FilterNodePtr& action) {
         HKU_CHECK(action, "Input action is null!");
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<std::shared_mutex> lock(m_mutex);
         auto iter = m_trees.find(event);
         if (iter != m_trees.end()) {
             iter->second->addChild(action);
@@ -250,15 +258,23 @@ public:
      */
     void dispatch(const EventT& event, const any_t& data) {
         m_tg->submit([this, event, data] {
-            auto iter = m_trees.find(event);
-            HKU_WARN_IF_RETURN(iter == m_trees.end(), void(),
-                               "There is no matching handling method for the event({})!", event);
-            iter->second->run(data);
+            try {
+                std::shared_lock<std::shared_mutex> lock(m_mutex);
+                auto iter = m_trees.find(event);
+                HKU_WARN_IF_RETURN(iter == m_trees.end(), void(),
+                                   "There is no matching handling method for the event({})!",
+                                   event);
+                iter->second->run(data);
+            } catch (const std::exception& e) {
+                HKU_WARN("Exception in event dispatch: {}", e.what());
+            } catch (...) {
+                HKU_WARN("Unknown exception in event dispatch!");
+            }
         });
     }
 
 private:
-    mutable std::mutex m_mutex;
+    mutable std::shared_mutex m_mutex;
     std::unordered_map<EventT, FilterNodePtr> m_trees;
     std::unique_ptr<ThreadPool> m_tg;
     bool m_quit_wait = true;
