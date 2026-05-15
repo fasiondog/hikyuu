@@ -20,8 +20,7 @@ target("core")
     end
 
     if is_plat("windows") and get_config("kind") == "shared" then
-        add_defines("HKU_API=__declspec(dllimport)")
-        add_defines("HKU_UTILS_API=__declspec(dllimport)")
+        add_cxflags("/DHKU_API=__declspec(dllimport)", "/DHKU_UTILS_API=__declspec(dllimport)")
         add_cxflags("-wd4566")
     end
     

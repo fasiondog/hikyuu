@@ -81,8 +81,7 @@ target("hikyuu")
 
     if is_plat("windows") then
         if is_kind("shared") then
-            add_defines("HKU_API=__declspec(dllexport)")
-            add_defines("HKU_UTILS_API=__declspec(dllexport)")
+            add_cxflags("/DHKU_API=__declspec(dllexport)", "/DHKU_UTILS_API=__declspec(dllexport)")
         end
     end
 
