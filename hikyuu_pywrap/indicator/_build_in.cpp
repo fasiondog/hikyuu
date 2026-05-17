@@ -1771,6 +1771,37 @@ void export_Indicator_build_in(py::module& m) {
    :param KData kdata: k线数据
    :rtype: Indicator)");
 
+    m.def("ADJ_FACTOR", py::overload_cast<const KData&>(&ADJ_FACTOR));
+    m.def("ADJ_FACTOR", py::overload_cast<>(&ADJ_FACTOR), R"(ADJ_FACTOR()
+
+    计算复权因子指标
+
+    基于股票的权息数据（送股、配股、转增、现金分红等）计算后复权因子序列。
+    复权因子表示如果上市时持有1股，经过所有送股、配股、转增后，现在持有多少股。
+    采用累乘方式计算，确保价格、成交量和成交金额的复权处理一致性。
+
+    该指标需要设置 KData 上下文才能正常工作，通过 setContext() 方法设置。
+
+    :return: 复权因子指标对象
+    :rtype: Indicator
+
+    .. code-block:: python
+
+        # 获取某只股票的复权因子
+        stock = sm['sh000001']
+        kdata = stock.get_kdata(Query(-100))
+        adj_factor = ADJ_FACTOR()
+        adj_factor.set_context(kdata)
+
+    .. seealso::
+
+        - `ADJ_OPEN` - 复权开盘价
+        - `ADJ_HIGH` - 复权最高价
+        - `ADJ_LOW` - 复权最低价
+        - `ADJ_CLOSE` - 复权收盘价
+        - `ADJ_VOL` - 复权成交量
+    )");
+
     m.def("COST", COST_1, py::arg("x") = 10.0);
     m.def("COST", COST_2, py::arg("k"), py::arg("x") = 10.0, R"(COST(k[, x=10.0])
 
