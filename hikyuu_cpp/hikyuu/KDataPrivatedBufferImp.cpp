@@ -84,9 +84,8 @@ void KDataPrivatedBufferImp::_recover() {
         return;
 
     // 日线以上复权处理
-    if (m_query.kType() == KQuery::WEEK || m_query.kType() == KQuery::MONTH ||
-        m_query.kType() == KQuery::QUARTER || m_query.kType() == KQuery::HALFYEAR ||
-        m_query.kType() == KQuery::YEAR) {
+    int64_t secs = KQuery::getKTypeInSeconds(m_query.kType());
+    if (secs > KQuery::getKTypeInSeconds(KQuery::DAY)) {
         _recoverForUpDay();
         return;
     }
