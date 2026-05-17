@@ -1802,6 +1802,209 @@ void export_Indicator_build_in(py::module& m) {
         - `ADJ_VOL` - 复权成交量
     )");
 
+    m.def("ADJ_OPEN", &ADJ_OPEN, R"(ADJ_OPEN()
+
+    计算复权开盘价指标
+
+    将开盘价按复权因子进行后复权处理，得到复权后的开盘价序列。
+    计算公式：ADJ_OPEN = ADJ_FACTOR * OPEN
+
+    **设计目的**：
+    ADJ_系列指标主要是为了配合因子管理系统快速计算后向等比复权因子而设计。
+    在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算。
+
+    **重要限制**：
+    - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
+    - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
+    - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
+    - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+
+    该指标需要设置 KData 上下文才能正常工作，通过 setContext() 方法设置。
+
+    :return: 复权开盘价指标对象
+    :rtype: Indicator
+
+    .. code-block:: python
+
+        # 获取某只股票的复权开盘价（因子管理场景）
+        stock = sm['sh000001']
+        kdata = stock.get_kdata(Query(-100))
+        adj_open = ADJ_OPEN()
+        adj_open.set_context(kdata)
+
+    .. seealso::
+
+        - `ADJ_FACTOR` - 复权因子
+        - `ADJ_HIGH` - 复权最高价
+        - `ADJ_LOW` - 复权最低价
+        - `ADJ_CLOSE` - 复权收盘价
+        - `ADJ_VOL` - 复权成交量
+        - `RECOVER_EQUAL_FORWARD` - 等比前复权（非因子管理场景推荐使用）
+    )");
+
+    m.def("ADJ_HIGH", &ADJ_HIGH, R"(ADJ_HIGH()
+
+    计算复权最高价指标
+
+    将最高价按复权因子进行后复权处理，得到复权后的最高价序列。
+    计算公式：ADJ_HIGH = ADJ_FACTOR * HIGH
+
+    **设计目的**：
+    ADJ_系列指标主要是为了配合因子管理系统快速计算后向等比复权因子而设计。
+    在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算。
+
+    **重要限制**：
+    - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
+    - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
+    - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
+    - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+
+    该指标需要设置 KData 上下文才能正常工作，通过 setContext() 方法设置。
+
+    :return: 复权最高价指标对象
+    :rtype: Indicator
+
+    .. code-block:: python
+
+        # 获取某只股票的复权最高价（因子管理场景）
+        stock = sm['sh000001']
+        kdata = stock.get_kdata(Query(-100))
+        adj_high = ADJ_HIGH()
+        adj_high.set_context(kdata)
+
+    .. seealso::
+
+        - `ADJ_FACTOR` - 复权因子
+        - `ADJ_OPEN` - 复权开盘价
+        - `ADJ_LOW` - 复权最低价
+        - `ADJ_CLOSE` - 复权收盘价
+        - `ADJ_VOL` - 复权成交量
+        - `RECOVER_EQUAL_FORWARD` - 等比前复权（非因子管理场景推荐使用）
+    )");
+
+    m.def("ADJ_LOW", &ADJ_LOW, R"(ADJ_LOW()
+
+    计算复权最低价指标
+
+    将最低价按复权因子进行后复权处理，得到复权后的最低价序列。
+    计算公式：ADJ_LOW = ADJ_FACTOR * LOW
+
+    **设计目的**：
+    ADJ_系列指标主要是为了配合因子管理系统快速计算后向等比复权因子而设计。
+    在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算。
+
+    **重要限制**：
+    - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
+    - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
+    - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
+    - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+
+    该指标需要设置 KData 上下文才能正常工作，通过 setContext() 方法设置。
+
+    :return: 复权最低价指标对象
+    :rtype: Indicator
+
+    .. code-block:: python
+
+        # 获取某只股票的复权最低价（因子管理场景）
+        stock = sm['sh000001']
+        kdata = stock.get_kdata(Query(-100))
+        adj_low = ADJ_LOW()
+        adj_low.set_context(kdata)
+
+    .. seealso::
+
+        - `ADJ_FACTOR` - 复权因子
+        - `ADJ_OPEN` - 复权开盘价
+        - `ADJ_HIGH` - 复权最高价
+        - `ADJ_CLOSE` - 复权收盘价
+        - `ADJ_VOL` - 复权成交量
+        - `RECOVER_EQUAL_FORWARD` - 等比前复权（非因子管理场景推荐使用）
+    )");
+
+    m.def("ADJ_CLOSE", &ADJ_CLOSE, R"(ADJ_CLOSE()
+
+    计算复权收盘价指标
+
+    将收盘价按复权因子进行后复权处理，得到复权后的收盘价序列。
+    计算公式：ADJ_CLOSE = ADJ_FACTOR * CLOSE
+
+    **设计目的**：
+    ADJ_系列指标主要是为了配合因子管理系统快速计算后向等比复权因子而设计。
+    在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算。
+
+    **重要限制**：
+    - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
+    - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
+    - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
+    - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+
+    该指标需要设置 KData 上下文才能正常工作，通过 setContext() 方法设置。
+
+    :return: 复权收盘价指标对象
+    :rtype: Indicator
+
+    .. code-block:: python
+
+        # 获取某只股票的复权收盘价（因子管理场景）
+        stock = sm['sh000001']
+        kdata = stock.get_kdata(Query(-100))
+        adj_close = ADJ_CLOSE()
+        adj_close.set_context(kdata)
+
+    .. seealso::
+
+        - `ADJ_FACTOR` - 复权因子
+        - `ADJ_OPEN` - 复权开盘价
+        - `ADJ_HIGH` - 复权最高价
+        - `ADJ_LOW` - 复权最低价
+        - `ADJ_VOL` - 复权成交量
+        - `RECOVER_EQUAL_FORWARD` - 等比前复权（非因子管理场景推荐使用）
+    )");
+
+    m.def("ADJ_VOL", &ADJ_VOL, R"(ADJ_VOL()
+
+    计算复权成交量指标
+
+    将成交量按复权因子进行后复权处理，得到复权后的成交量序列。
+    计算公式：ADJ_VOL = VOL / ADJ_FACTOR
+
+    **设计目的**：
+    ADJ_系列指标主要是为了配合因子管理系统快速计算后向等比复权因子而设计。
+    在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算。
+
+    **注意**：成交量复权使用除法，与价格复权使用乘法相反。
+    这是因为当股本增加时，每股对应的成交量应该相应减少。
+
+    **重要限制**：
+    - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
+    - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
+    - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
+    - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+
+    该指标需要设置 KData 上下文才能正常工作，通过 setContext() 方法设置。
+
+    :return: 复权成交量指标对象
+    :rtype: Indicator
+
+    .. code-block:: python
+
+        # 获取某只股票的复权成交量（因子管理场景）
+        stock = sm['sh000001']
+        kdata = stock.get_kdata(Query(-100))
+        adj_vol = ADJ_VOL()
+        adj_vol.set_context(kdata)
+
+    .. seealso::
+
+        - `ADJ_FACTOR` - 复权因子
+        - `ADJ_OPEN` - 复权开盘价
+        - `ADJ_HIGH` - 复权最高价
+        - `ADJ_LOW` - 复权最低价
+        - `ADJ_CLOSE` - 复权收盘价
+        - `RECOVER_EQUAL_FORWARD` - 等比前复权（非因子管理场景推荐使用）
+    )");
+
     m.def("COST", COST_1, py::arg("x") = 10.0);
     m.def("COST", COST_2, py::arg("k"), py::arg("x") = 10.0, R"(COST(k[, x=10.0])
 
