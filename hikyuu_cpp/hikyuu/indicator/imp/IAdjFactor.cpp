@@ -83,8 +83,9 @@ static vector<std::pair<Datetime, Indicator::value_t>> cum_adj_factor(const KDat
                         price_t R = weight.countForSell() / 10.0;
                         price_t P_r = weight.priceForSell();
 
-                        price_t numerator = ref_price - D + P_r * R;
-                        price_t denominator = ref_price * (1.0 + S + Z + R);
+                        // 后复权调整系数（理论除权价公式的倒数）
+                        price_t numerator = ref_price * (1.0 + S + Z + R);
+                        price_t denominator = ref_price - D + P_r * R;
 
                         if (denominator > 0.0) {
                             adjustment_ratio = numerator / denominator;
