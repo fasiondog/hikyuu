@@ -110,10 +110,7 @@ public:
 
     void recoverType(KQuery::RecoverType recover_type);
 
-    Indicator formula() const {
-        // clone, 防止被误用篡改
-        return m_data->formula.clone();
-    }
+    const Indicator& formula() const noexcept;
 
     void formula(const Indicator& formula);
 
@@ -304,6 +301,10 @@ inline KQuery::RecoverType Factor::recoverType() const noexcept {
 
 inline void Factor::recoverType(KQuery::RecoverType recover_type) {
     m_data->recover_type = recover_type;
+}
+
+inline const Indicator& Factor::formula() const noexcept {
+    return m_data->formula;
 }
 
 inline void Factor::formula(const Indicator& formula) {
