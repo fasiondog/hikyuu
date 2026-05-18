@@ -265,14 +265,20 @@ void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
     HKU_WARN_IF(!norm && category.empty() && style_inds.empty(),
                 "No special handling is specified!");
 
+    string upper_name = name;
+    to_upper(upper_name);
     bool found = false;
+    string found_name;
     for (const auto& ind : m_factorset) {
-        if (ind.name() == name) {
+        string ind_name = ind.name();
+        to_upper(ind_name);
+        if (ind_name == upper_name) {
             found = true;
+            fount_name = ind.name();
             break;
         }
     }
-    HKU_CHECK(found, "Can't find factor: {}", name);
+    HKU_CHECK(found, "Can't find factor ({}) in MF!", name);
 
     if (!category.empty()) {
         auto blks = StockManager::instance().getBlockList(category);
@@ -280,15 +286,15 @@ void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
     }
 
     if (norm) {
-        m_special_norms[name] = norm;
+        m_special_norms[fount_name] = norm;
     }
 
     if (!category.empty()) {
-        m_special_category[name] = category;
+        m_special_category[fount_name] = category;
     }
 
     if (!style_inds.empty()) {
-        m_special_style_inds[name] = style_inds;
+        m_special_style_inds[fount_name] = style_inds;
     }
 
     m_calculated = false;
