@@ -274,7 +274,7 @@ void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
         to_upper(ind_name);
         if (ind_name == upper_name) {
             found = true;
-            fount_name = ind.name();
+            found_name = ind.name();
             break;
         }
     }
@@ -286,15 +286,15 @@ void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
     }
 
     if (norm) {
-        m_special_norms[fount_name] = norm;
+        m_special_norms[found_name] = norm;
     }
 
     if (!category.empty()) {
-        m_special_category[fount_name] = category;
+        m_special_category[found_name] = category;
     }
 
     if (!style_inds.empty()) {
-        m_special_style_inds[fount_name] = style_inds;
+        m_special_style_inds[found_name] = style_inds;
     }
 
     m_calculated = false;
