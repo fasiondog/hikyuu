@@ -8,16 +8,33 @@
 #include "expected.h"
 #include "Parameter.h"
 #include "Log.h"
-#include "net.h"
 #include "ResourceVersionTraits.h"
 
 /**
  * 线程局部版本资源池 - 支持轻量级版本管理的无锁设计（Ring Buffer 实现）
  *
  * @details 使用 thread_local 存储，每个线程拥有独立的资源池实例。
- *          内部使用固定数组 + Ring Buffer 管理空闲资源，避免动态内存分配。
- *          适用于协程环境，同一线程内的所有协程共享该线程的资源池。
+ *          内部使用固定数组 + Ring Buffer 管理空闲资源，避免动态内存分配和锁竞争。
  *          由于资源完全隔离在线程内部，不需要任何锁或原子操作，性能最优。
+ *
+ *          **核心特性**：
+ *          - 完全无锁：基于 thread_local，无需同步机制
+ *          - Ring Buffer：使用固定数组实现循环队列，O(1) 时间复杂度的资源获取和归还
+ *          - 零动态分配：编译期确定容量，运行时无需 malloc/free
+ *          - 线程隔离：每个线程独立实例，避免跨线程竞争
+ *          - 版本管理：支持参数变更检测，旧版本资源自动销毁
+ *
+ *          **重要限制**：
+ *          - 不适用于协程环境：协程可能在不同的线程间迁移执行，导致资源跨线程归还
+ *          - 跨线程归还时资源会被直接删除并输出警告日志，无法实现资源复用
+ *          - 如果需要在协程环境中使用资源池，建议使用全局共享池（如 ResourceAsioVersionPool）
+ *          - 仅适用于传统多线程模型，确保资源在同一线程内获取和释放
+ *
+ *          **跨线程安全检查机制**：
+ *          - 资源获取时会记录所有者线程 ID
+ *          - 资源归还时检查当前线程是否与所有者线程一致
+ *          - 如果不一致：直接删除资源并输出警告日志，避免访问 thread_local 变量引发未定义行为
+ *          - 如果一致：正常归还到池中实现复用
  *
  *          与 ResourceTlsPool 的主要区别：
  *          - 支持版本号管理，可检测参数变更
@@ -26,13 +43,13 @@
  *          - 通过 syncVersion() 方法同步全局版本和参数
  *
  * @brief TLS 版本资源池（线程局部存储 + 版本号管理）
- * @details 每个线程拥有独立的资源池实例，支持协程异步获取资源。
+ * @details 每个线程拥有独立的资源池实例。
  *          当参数发生变化时，自动递增版本号并释放所有空闲的旧版本资源。
  *
  *          **重要约束**：ResourceType 必须实现 getVersion() 和 setVersion(int) 方法。
  *
  * @tparam ResourceType 资源类型，必须实现 getVersion() 和 setVersion(int) 方法
- * @tparam MAX_POOL_SIZE_LIMIT 物理容量上限（编译期固定），默认 32
+ * @tparam MAX_POOL_SIZE_LIMIT 物理容量上限（编译期固定），默认 2
  * @ingroup Utilities
  *
  * @par 使用示例
@@ -46,34 +63,28 @@
  * // 步骤2：获取线程局部资源池实例
  * auto& pool = ResourceTlsVersionPool<MyResource>::getInstance();
  *
- * // 步骤3a：同步获取资源
+ * // 步骤3a：同步获取资源（推荐用法）
  * auto resource = pool.get();
  * if (resource) {
  *     resource->doWork();
  * } // 离开作用域时自动归还到池
  *
- * // 步骤3b：协程中异步获取资源（带超时控制）
- * co_spawn(io_ctx, [&]() -> asio::awaitable<void> {
- *     auto& pool = ResourceTlsVersionPool<MyResource>::getInstance();
- *     auto result = co_await pool.asyncGet(std::chrono::seconds(5));
- *     if (result) {
- *         result.value()->doWork();
- *     }
- * }, asio::detached);
+ * // 步骤3b：创建独立资源（不归入池管理）
+ * auto standalone = pool.createStandalone();
+ * if (standalone) {
+ *     standalone.value()->doWork();
+ * } // 离开作用域时自动 delete
  * @endcode
  *
  * @note 构造函数为私有，必须通过 init() + getInstance() 模式使用
  * @note 每个线程有独立的资源池实例，线程间不共享资源
- * @note 同一线程内的所有协程共享该线程的资源池
  * @note 内部使用 Ring Buffer 管理空闲资源指针，避免 std::vector 的动态扩容
  * @note 版本号是线程局部的，不会跨线程同步
+ * @warning 不建议在协程环境中使用，协程的线程迁移会导致资源无法复用
  */
 namespace hku {
 
-// 使用 net 命名空间中的 asio 别名
-namespace asio = net::asio;
-
-template <typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 32>
+template <typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2>
 class ResourceTlsVersionPool {
 public:
     // 编译期检查：ResourceType 必须支持 getVersion 和 setVersion
@@ -147,11 +158,25 @@ public:
     /** 资源删除器，用于 shared_ptr 自动归还资源 */
     struct ResourceDeleter {
         ResourceTlsVersionPool *pool;
+        std::thread::id owner_thread_id;  // 记录获取资源时的线程ID
 
         void operator()(ResourceType *resource) const {
-            if (resource && pool) {
+            if (!resource) {
+                return;
+            }
+
+            auto current_thread = std::this_thread::get_id();
+            if (current_thread != owner_thread_id) {
+                // 跨线程归还：直接删除资源，避免访问 thread_local 变量
+                HKU_WARN(
+                  "Resource returned from different thread, deleting directly to avoid "
+                  "undefined behavior");
+                delete resource;
+            } else if (pool) {
+                // 同线程归还：正常归还到池
                 pool->returnResource(resource);
-            } else if (resource) {
+            } else {
+                // pool 为空（可能在析构期间），直接删除
                 delete resource;
             }
         }
@@ -221,7 +246,7 @@ public:
                         p = new ResourceType(m_param);
                         p->setVersion(m_version);
                         m_count++;
-                        return ResourcePtr(p, ResourceDeleter{this});
+                        return ResourcePtr(p, ResourceDeleter{this, std::this_thread::get_id()});
                     } catch (const std::exception &e) {
                         return stdx::unexpected(
                           fmt::format("Failed to create resource: {}", e.what()));
@@ -234,7 +259,7 @@ public:
             }
 
             // 版本匹配，正常返回
-            return ResourcePtr(p, ResourceDeleter{this});
+            return ResourcePtr(p, ResourceDeleter{this, std::this_thread::get_id()});
         }
 
         // 2. 无空闲资源，检查是否可以创建新资源
@@ -254,7 +279,7 @@ public:
         }
 
         m_count++;
-        return ResourcePtr(p, ResourceDeleter{this});
+        return ResourcePtr(p, ResourceDeleter{this, std::this_thread::get_id()});
     }
 
     /**

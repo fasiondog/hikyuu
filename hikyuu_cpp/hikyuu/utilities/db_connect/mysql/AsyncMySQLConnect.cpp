@@ -118,7 +118,7 @@ net::awaitable<bool> AsyncMySQLConnect::tryConnect() {
         co_await connect();
         co_return true;
     } catch (const std::exception& e) {
-        SPDLOG_LOGGER_WARN(getHikyuuLogger(), "{}", e.what());
+        HKU_WARN("{}", e.what());
         co_return false;
     }
 }

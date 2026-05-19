@@ -59,79 +59,70 @@ AsyncMySQLStatement::~AsyncMySQLStatement() {
 }
 
 net::awaitable<void> AsyncMySQLStatement::sub_exec() {
-    // 首先准备语句（获取预处理语句对象）
-    // 保存参数，因为 _prepare 会调用 _reset 清空参数
-    auto saved_params = std::move(m_impl->params);
-
-    // 准备语句
-    boost::mysql::error_code ec;
-    boost::mysql::diagnostics diag;
-    _reset();
-
     auto* conn = static_cast<boost::mysql::tcp_connection*>(m_impl->connect->getRawConnection());
-    m_impl->stmt = co_await m_impl->connect->m_impl->get_statement(m_sql_string, ec, diag);
-    m_impl->needs_reset = true;
 
-    if (ec) {
-        _reset();
+    // 如果还没有prepared statement，则准备语句
+    if (!m_impl->stmt) {
+        boost::mysql::error_code ec;
+        boost::mysql::diagnostics diag;
 
-        // 判断是否为连接层错误
-        int error_value = ec.value();
-        bool is_connection_error = false;
+        m_impl->stmt = co_await m_impl->connect->m_impl->get_statement(m_sql_string, ec, diag);
+        m_impl->needs_reset = true;
 
-        if (error_value >= 2000 && error_value <= 2999) {
-            switch (error_value) {
-                case 2002:  // CR_CONNECTION_ERROR
-                case 2003:  // CR_CONN_HOST_ERROR
-                case 2005:  // CR_UNKNOWN_HOST
-                case 2006:  // CR_SERVER_GONE_ERROR
-                case 2013:  // CR_SERVER_LOST
-                    is_connection_error = true;
-                    break;
+        if (ec) {
+            // 判断是否为连接层错误
+            int error_value = ec.value();
+            bool is_connection_error = false;
+
+            if (error_value >= 2000 && error_value <= 2999) {
+                switch (error_value) {
+                    case 2002:  // CR_CONNECTION_ERROR
+                    case 2003:  // CR_CONN_HOST_ERROR
+                    case 2005:  // CR_UNKNOWN_HOST
+                    case 2006:  // CR_SERVER_GONE_ERROR
+                    case 2013:  // CR_SERVER_LOST
+                        is_connection_error = true;
+                        break;
+                }
+            }
+
+            if (!is_connection_error || !co_await m_impl->connect->tryConnect()) {
+                HKU_ERROR(
+                  "Failed prepare statement! Error code: {}|{}, Server message: {}, Client "
+                  "message: {}",
+                  ec.value(), ec.message(), diag.server_message(), diag.client_message());
+                SQL_THROW(ec.value(), "Failed prepare statement! {}", m_sql_string);
+            }
+
+            // 重连后重新准备
+            m_impl->stmt = co_await m_impl->connect->m_impl->get_statement(m_sql_string, ec, diag);
+            if (ec) {
+                HKU_ERROR(
+                  "Failed prepare statement after reconnect! Error code: {}, Server message: {}, "
+                  "Client message: {}",
+                  ec.value(), diag.server_message(), diag.client_message());
+                SQL_THROW(ec.value(), "Failed prepare statement! {}", m_sql_string);
             }
         }
-
-        if (!is_connection_error || !co_await m_impl->connect->tryConnect()) {
-            HKU_ERROR(
-              "Failed prepare statement! Error code: {}|{}, Server message: {}, Client message: {}",
-              ec.value(), ec.message(), diag.server_message(), diag.client_message());
-            SQL_THROW(ec.value(), "Failed prepare statement! {}", m_sql_string);
-        }
-
-        // 重连后重新准备
-        m_impl->stmt = co_await m_impl->connect->m_impl->get_statement(m_sql_string, ec, diag);
-        if (ec) {
-            HKU_ERROR(
-              "Failed prepare statement after reconnect! Error code: {}, Server message: {}, "
-              "Client message: {}",
-              ec.value(), diag.server_message(), diag.client_message());
-            SQL_THROW(ec.value(), "Failed prepare statement! {}", m_sql_string);
-        }
+    } else {
+        // 复用已有的prepared statement，只重置执行状态
+        m_impl->results = {};           // 重置 results
+        m_impl->exec_state = {};        // 重置执行状态
+        m_impl->current_batch.clear();  // 清空当前批次
+        // 注意：不要在这里清空 params，因为 bind 已经在 exec 之前调用了
+        // m_impl->params.clear();
+        m_impl->current_row = 0;
+        m_impl->total_rows_read = 0;
+        m_impl->has_result = false;
+        m_impl->is_streaming = false;
     }
 
-    // 恢复参数
-    m_impl->params = std::move(saved_params);
-
     try {
+        boost::mysql::diagnostics diag;
         if (m_impl->params.empty()) {
             // 没有参数，使用流式执行
             co_await conn->async_start_execution(m_sql_string, m_impl->exec_state, diag,
                                                  boost::asio::use_awaitable);
-
-            m_impl->is_streaming = true;
-            m_impl->current_row = 0;
-            m_impl->total_rows_read = 0;
-
-            // 如果需要读取结果集，读取第一批数据
-            if (m_impl->exec_state.should_read_rows()) {
-                boost::mysql::diagnostics read_diag;
-                boost::mysql::rows_view batch_view = co_await conn->async_read_some_rows(
-                  m_impl->exec_state, read_diag, boost::asio::use_awaitable);
-
-                // 将 rows_view 转换为 vector<row> 以拥有数据所有权
-                m_impl->current_batch.assign(batch_view.begin(), batch_view.end());
-                m_impl->total_rows_read += m_impl->current_batch.size();
-            }
         } else {
             // 有参数，使用预处理语句执行
             std::vector<boost::mysql::field_view> param_views;
@@ -146,21 +137,21 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
             // 使用流式执行，与无参数的情况保持一致
             co_await conn->async_start_execution(bound, m_impl->exec_state, diag,
                                                  boost::asio::use_awaitable);
+        }
 
-            m_impl->is_streaming = true;
-            m_impl->current_row = 0;
-            m_impl->total_rows_read = 0;
+        m_impl->is_streaming = true;
+        m_impl->current_row = 0;
+        m_impl->total_rows_read = 0;
 
-            // 如果需要读取结果集，读取第一批数据
-            if (m_impl->exec_state.should_read_rows()) {
-                boost::mysql::diagnostics read_diag;
-                boost::mysql::rows_view batch_view = co_await conn->async_read_some_rows(
-                  m_impl->exec_state, read_diag, boost::asio::use_awaitable);
+        // 如果需要读取结果集，读取第一批数据
+        if (m_impl->exec_state.should_read_rows()) {
+            boost::mysql::diagnostics read_diag;
+            boost::mysql::rows_view batch_view = co_await conn->async_read_some_rows(
+              m_impl->exec_state, read_diag, boost::asio::use_awaitable);
 
-                // 将 rows_view 转换为 vector<row>
-                m_impl->current_batch.assign(batch_view.begin(), batch_view.end());
-                m_impl->total_rows_read += m_impl->current_batch.size();
-            }
+            // 将 rows_view 转换为 vector<row> 以拥有数据所有权
+            m_impl->current_batch.assign(batch_view.begin(), batch_view.end());
+            m_impl->total_rows_read += m_impl->current_batch.size();
         }
     } catch (const boost::mysql::error_with_diagnostics& e) {
         HKU_ERROR("Execute failed! Error code: {}, Server message: {}, Client message: {}",
@@ -175,6 +166,9 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
 
     m_impl->has_result = true;
     m_impl->needs_reset = true;
+
+    // 清空参数，以便下次绑定时索引从0开始
+    m_impl->params.clear();
 }
 
 net::awaitable<bool> AsyncMySQLStatement::sub_moveNext() {
@@ -242,7 +236,6 @@ uint64_t AsyncMySQLStatement::sub_getLastRowid() {
 
 void AsyncMySQLStatement::_reset() {
     if (m_impl->needs_reset) {
-        m_impl->stmt.reset();
         m_impl->results = {};           // 重置 results
         m_impl->exec_state = {};        // 重置执行状态
         m_impl->current_batch.clear();  // 清空当前批次
@@ -252,7 +245,6 @@ void AsyncMySQLStatement::_reset() {
         m_impl->total_rows_read = 0;
         m_impl->has_result = false;
         m_impl->is_streaming = false;
-        m_impl->needs_reset = false;
     }
 }
 

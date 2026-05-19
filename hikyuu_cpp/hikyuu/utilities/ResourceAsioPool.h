@@ -380,7 +380,7 @@ private:
  * @tparam MutexType 互斥锁类型，默认 std::mutex
  * @ingroup Utilities
  */
-template <typename ResourceType, typename MutexType = std::mutex>
+template <typename ResourceType, typename MutexType = rap::NullLock>
 class ResourceAsioVersionPool {
 private:
     struct WaiterNode {

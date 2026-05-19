@@ -11,18 +11,34 @@
 #include "Parameter.h"
 #include "Log.h"
 #include "exception.h"
-#include "net.h"
 
 /**
  * 线程局部资源池 - 完全无锁设计（Ring Buffer 实现）
  *
  * @details 使用 thread_local 存储，每个线程拥有独立的资源池实例。
- *          内部使用固定数组 + Ring Buffer 管理空闲资源，避免动态内存分配。
- *          适用于协程环境，同一线程内的所有协程共享该线程的资源池。
+ *          内部使用固定数组 + Ring Buffer 管理空闲资源，避免动态内存分配和锁竞争。
  *          由于资源完全隔离在线程内部，不需要任何锁或原子操作，性能最优。
  *
+ *          **核心特性**：
+ *          - 完全无锁：基于 thread_local，无需同步机制
+ *          - Ring Buffer：使用固定数组实现循环队列，O(1) 时间复杂度的资源获取和归还
+ *          - 零动态分配：编译期确定容量，运行时无需 malloc/free
+ *          - 线程隔离：每个线程独立实例，避免跨线程竞争
+ *
+ *          **重要限制**：
+ *          - 不适用于协程环境：协程可能在不同的线程间迁移执行，导致资源跨线程归还
+ *          - 跨线程归还时资源会被直接删除并输出警告日志，无法实现资源复用
+ *          - 如果需要在协程环境中使用资源池，建议使用全局共享池（如 ResourceAsioPool）
+ *          - 仅适用于传统多线程模型，确保资源在同一线程内获取和释放
+ *
+ *          **跨线程安全检查机制**：
+ *          - 资源获取时会记录所有者线程 ID
+ *          - 资源归还时检查当前线程是否与所有者线程一致
+ *          - 如果不一致：直接删除资源并输出警告日志，避免访问 thread_local 变量引发未定义行为
+ *          - 如果一致：正常归还到池中实现复用
+ *
  * @tparam ResourceType 资源类型，必须支持构造函数 ResourceType(const Parameter&)
- * @tparam MAX_POOL_SIZE_LIMIT 物理容量上限（编译期固定），默认值为 32
+ * @tparam MAX_POOL_SIZE_LIMIT 物理容量上限（编译期固定），默认值为 2
  * @ingroup Utilities
  *
  * @par 使用示例
@@ -36,33 +52,28 @@
  * // 步骤2：获取线程局部资源池实例
  * auto& pool = ResourceTlsPool<MyResource>::getInstance();
  *
- * // 步骤3a：同步获取资源
+ * // 步骤3a：同步获取资源（推荐用法）
  * auto resource = pool.get();
  * if (resource) {
  *     resource->doWork();
  * } // 离开作用域时自动归还到池
  *
- * // 步骤3b：协程中异步获取资源（带超时控制）
- * co_spawn(io_ctx, [&]() -> asio::awaitable<void> {
- *     auto& pool = ResourceTlsPool<MyResource>::getInstance();
- *     auto result = co_await pool.asyncGet(std::chrono::seconds(5));
- *     if (result) {
- *         result.value()->doWork();
- *     }
- * }, asio::detached);
+ * // 步骤3b：创建独立资源（不归入池管理）
+ * auto standalone = pool.createStandalone();
+ * if (standalone) {
+ *     standalone.value()->doWork();
+ * } // 离开作用域时自动 delete
  * @endcode
  *
  * @note 构造函数为私有，必须通过 init() + getInstance() 模式使用
  * @note 每个线程有独立的资源池实例，线程间不共享资源
- * @note 同一线程内的所有协程共享该线程的资源池
  * @note 内部使用 Ring Buffer 管理空闲资源指针，避免 std::vector 的动态扩容
+ * @note 不支持 asyncGet() 等异步方法，因为 TLS 资源获取本身就是同步且快速的
+ * @warning 不建议在协程环境中使用，协程的线程迁移会导致资源无法复用
  */
 namespace hku {
 
-// 使用 net 命名空间中的 asio 别名
-namespace asio = net::asio;
-
-template <typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 32>
+template <typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2>
 class ResourceTlsPool {
 public:
     /**
@@ -130,11 +141,25 @@ public:
     /** 资源删除器，用于 shared_ptr 自动归还资源 */
     struct ResourceDeleter {
         ResourceTlsPool *pool;
+        std::thread::id owner_thread_id;  // 记录获取资源时的线程ID
 
         void operator()(ResourceType *resource) const {
-            if (resource && pool) {
+            if (!resource) {
+                return;
+            }
+
+            auto current_thread = std::this_thread::get_id();
+            if (current_thread != owner_thread_id) {
+                // 跨线程归还：直接删除资源，避免访问 thread_local 变量
+                HKU_WARN(
+                  "Resource returned from different thread, deleting directly to avoid "
+                  "undefined behavior");
+                delete resource;
+            } else if (pool) {
+                // 同线程归还：正常归还到池
                 pool->returnResource(resource);
-            } else if (resource) {
+            } else {
+                // pool 为空（可能在析构期间），直接删除
                 delete resource;
             }
         }
@@ -144,13 +169,22 @@ public:
     typedef std::shared_ptr<ResourceType> ResourcePtr;
 
     /**
-     * 获取可用资源
+     * 获取可用资源（同步操作）
      *
      * @return ResourcePtr 的 expected 对象，成功时包含资源指针，失败时包含错误信息
      *
-     * @note 完全无锁操作，性能极高
+     * @note 完全无锁操作，性能极高（O(1) 时间复杂度）
      * @note 返回的 shared_ptr 在析构时会自动归还资源到池（通过自定义删除器）
      * @note 如果当前资源数已达上限且无空闲资源，返回错误信息
+     * @note 这是同步方法，在同一线程内调用立即返回，无需等待
+     * @note 优先从 Ring Buffer 的空闲列表获取资源，若无则创建新资源
+     *
+     * @par 执行流程
+     * 1. 检查 Ring Buffer 是否有空闲资源（m_freeCount > 0）
+     *    - 有：从头部出队，返回资源指针
+     * 2. 若无空闲资源，检查是否达到最大资源数限制（m_count >= m_maxCount）
+     *    - 是：返回错误
+     * 3. 创建新资源并增加计数
      */
     stdx::expected<ResourcePtr, std::string> get() {
         // 1. 尝试从空闲列表获取（Ring Buffer 头部出队）
@@ -159,7 +193,7 @@ public:
             m_resourceList[m_head] = nullptr;
             m_head = (m_head + 1) % MAX_POOL_SIZE_LIMIT;
             m_freeCount--;
-            return ResourcePtr(p, ResourceDeleter{this});
+            return ResourcePtr(p, ResourceDeleter{this, std::this_thread::get_id()});
         }
 
         // 2. 无空闲资源，检查是否可以创建新资源
@@ -178,7 +212,7 @@ public:
         }
 
         m_count++;
-        return ResourcePtr(p, ResourceDeleter{this});
+        return ResourcePtr(p, ResourceDeleter{this, std::this_thread::get_id()});
     }
 
     /**
@@ -241,7 +275,14 @@ public:
         }
     }
 
-    /** 释放当前所有的空闲资源 */
+    /**
+     * 释放当前所有的空闲资源
+     *
+     * @note 遍历 Ring Buffer 中的所有空闲资源并删除，将 m_count 减去 m_freeCount
+     * @note 此操作会立即释放所有未被使用的资源，但不会影响正在使用的资源
+     * @note 适用于需要主动回收内存的场景（如程序空闲期）
+     * @note 时间复杂度：O(m_freeCount)，需要遍历所有空闲资源
+     */
     void releaseIdleResource() {
         for (size_t i = 0; i < m_freeCount; ++i) {
             size_t idx = (m_head + i) % MAX_POOL_SIZE_LIMIT;
@@ -275,7 +316,24 @@ private:
     }
 
 private:
-    /** 归还资源到池（Ring Buffer 尾部入队） */
+    /**
+     * 归还资源到池（Ring Buffer 尾部入队）
+     *
+     * @param p 待归还的资源指针
+     *
+     * @note 此方法由 ResourceDeleter 自动调用，用户无需手动调用
+     * @note Ring Buffer 实现：将资源指针放入尾部位置，然后移动 tail 索引
+     * @note 如果 Ring Buffer 已满（m_freeCount == MAX_POOL_SIZE_LIMIT），直接删除资源
+     * @note 时间复杂度：O(1)，无锁操作
+     *
+     * @par Ring Buffer 工作原理
+     * - 使用固定大小的数组 m_resourceList[MAX_POOL_SIZE_LIMIT]
+     * - m_head 指向下一个可出队的位置（获取资源时从这里取）
+     * - m_tail 指向下一个可入队的位置（归还资源时放到这里）
+     * - 通过模运算实现循环：index = (index + 1) % MAX_POOL_SIZE_LIMIT
+     * - 当 head == tail 且 m_freeCount == 0 时，表示空队列
+     * - 当 m_freeCount == MAX_POOL_SIZE_LIMIT 时，表示满队列
+     */
     void returnResource(ResourceType *p) {
         if (p && m_freeCount < MAX_POOL_SIZE_LIMIT) {
             m_resourceList[m_tail] = p;

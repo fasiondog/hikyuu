@@ -52,7 +52,7 @@ public:
     AsyncSQLResultSet(const AsyncDBConnectPtr& connect, const std::string& sql)
     : m_connect(connect),
       m_where(sql),
-      m_sql_template("id IN (SELECT id FROM {} WHERE {} {} LIMIT {} OFFSET {}) {}") {
+      m_sql_template("SELECT * FROM {} WHERE {} {} LIMIT {} OFFSET {}") {
         trim(m_where);
         if (m_where.empty()) {
             m_where = "1=1";
@@ -144,7 +144,7 @@ public:
     net::awaitable<size_t> getPageCount() {
         size_t total = co_await size();
         size_t n = total / page_size;
-        co_return n* page_size > total ? n : n + 1;
+        co_return n* page_size >= total ? n : n + 1;
     }
 
     /**
@@ -154,9 +154,18 @@ public:
      */
     net::awaitable<std::vector<TableT>> getPage(size_t page) {
         std::vector<TableT> result;
-        co_await m_connect->batchLoad(
-          result, fmt::format(m_sql_template, TableT::getTableName(), m_where, m_orderby_inner,
-                              page_size, page * page_size, m_orderby_outer));
+        std::string sql = fmt::format(fmt::runtime(m_sql_template), TableT::getTableName(), m_where,
+                                      m_orderby_inner, page_size, page * page_size);
+
+        auto st = co_await m_connect->getStatement(sql);
+        co_await st->exec();
+
+        while (co_await st->moveNext()) {
+            TableT tmp;
+            tmp.load(st);
+            result.push_back(tmp);
+        }
+
         co_return result;
     }
 
@@ -195,9 +204,18 @@ private:
         size_t page = index / page_size;
         if (m_connect && page != m_current_page) {
             m_buffer.clear();
-            co_await m_connect->batchLoad(
-              m_buffer, fmt::format(fmt::runtime(m_sql_template), TableT::getTableName(), m_where,
-                                    m_orderby_inner, page_size, page * page_size, m_orderby_outer));
+            std::string sql = fmt::format(fmt::runtime(m_sql_template), TableT::getTableName(),
+                                          m_where, m_orderby_inner, page_size, page * page_size);
+
+            auto st = co_await m_connect->getStatement(sql);
+            co_await st->exec();
+
+            while (co_await st->moveNext()) {
+                TableT tmp;
+                tmp.load(st);
+                m_buffer.push_back(tmp);
+            }
+
             m_current_page = page;
         }
 
@@ -281,9 +299,9 @@ public:
 
     /**
      * @brief 前置递增运算符
-     * @return 自引用
+     * @return 新的迭代器
      */
-    net::awaitable<AsyncSQLResultSetIterator&> operator_pre_increment() {
+    net::awaitable<AsyncSQLResultSetIterator> operator_pre_increment() {
         HKU_CHECK_THROW(m_index != Null<size_t>(), std::logic_error,
                         "Cannot increment an end iterator.");
         m_index++;
