@@ -50,9 +50,9 @@ public:
  * @ingroup Utilities
  *
  * @tparam ResourceType 资源类型，必须支持构造函数 ResourceType(const Parameter&)
- * @tparam MutexType 互斥锁类型，默认为 NullLock（适用于单线程 io_context）
+ * @tparam MutexType 互斥锁类型，默认为 std::mutex（线程安全）
  */
-template <typename ResourceType, typename MutexType = rap::NullLock>
+template <typename ResourceType, typename MutexType = std::mutex>
 class ResourceAsioPool {
 private:
     struct WaiterNode {
@@ -377,10 +377,10 @@ private:
  *          **重要约束**：ResourceType 必须实现 getVersion() 和 setVersion(int) 方法。
  *
  * @tparam ResourceType 资源类型，必须实现 getVersion() 和 setVersion(int) 方法
- * @tparam MutexType 互斥锁类型，默认 std::mutex
+ * @tparam MutexType 互斥锁类型，默认为 std::mutex（线程安全）
  * @ingroup Utilities
  */
-template <typename ResourceType, typename MutexType = rap::NullLock>
+template <typename ResourceType, typename MutexType = std::mutex>
 class ResourceAsioVersionPool {
 private:
     struct WaiterNode {

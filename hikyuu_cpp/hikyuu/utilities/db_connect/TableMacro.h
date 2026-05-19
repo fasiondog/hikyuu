@@ -142,9 +142,9 @@ public:                                                                         
         if (this == &rv)                                                              \
             return *this;                                                             \
         m_id = rv.m_id;                                                               \
-        rv.m_id = 0;                                                                  \
         f1 = std::move(rv.f1);                                                        \
         f2 = std::move(rv.f2);                                                        \
+        rv.m_id = 0;                                                                  \
         return *this;                                                                 \
     }                                                                                 \
                                                                                       \

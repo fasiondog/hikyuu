@@ -73,8 +73,12 @@ private:
     // 提供给 AsyncSQLiteStatement 访问线程池执行器的方法
     ThreadPool::ExecutorWrapper getThreadPoolExecutor() const noexcept;
 
-    // 内部辅助方法
+    // 内部辅助方法 - 异步版本
     net::awaitable<void> connect();
+
+    // 内部辅助方法 - 同步版本（用于 Statement 构造时确保连接已初始化）
+    void _connect();
+
     void close();
 
 private:

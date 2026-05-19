@@ -52,6 +52,8 @@ struct AsyncMySQLStatement::Impl {
 AsyncMySQLStatement::AsyncMySQLStatement(AsyncMySQLConnect* connect, const std::string& sql)
 : AsyncSQLStatementBase(connect, sql), m_impl(std::make_unique<Impl>()) {
     m_impl->connect = connect;
+    SQL_CHECK(m_impl->connect, -1,
+              "Failed create statement: {}! Failed dynamic_cast<AsyncMySQLConnect*>!", sql);
 }
 
 AsyncMySQLStatement::~AsyncMySQLStatement() {
@@ -59,12 +61,15 @@ AsyncMySQLStatement::~AsyncMySQLStatement() {
 }
 
 net::awaitable<void> AsyncMySQLStatement::sub_exec() {
-    auto* conn = static_cast<boost::mysql::tcp_connection*>(m_impl->connect->getRawConnection());
-
     // 如果还没有prepared statement，则准备语句
     if (!m_impl->stmt) {
         boost::mysql::error_code ec;
         boost::mysql::diagnostics diag;
+
+        // 异步连接在构造时无法主动连接，这里需要先建立连接
+        if (!m_impl->connect->m_impl->initialized) {
+            co_await m_impl->connect->connect();
+        }
 
         m_impl->stmt = co_await m_impl->connect->m_impl->get_statement(m_sql_string, ec, diag);
         m_impl->needs_reset = true;
@@ -116,6 +121,8 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
         m_impl->has_result = false;
         m_impl->is_streaming = false;
     }
+
+    auto* conn = static_cast<boost::mysql::tcp_connection*>(m_impl->connect->getRawConnection());
 
     try {
         boost::mysql::diagnostics diag;

@@ -9,7 +9,6 @@
 #include "hikyuu/utilities/net.h"
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/os.h"
-#include "hikyuu/utilities/ResourceAsioPool.h"
 #include "url.h"
 
 #include <sstream>

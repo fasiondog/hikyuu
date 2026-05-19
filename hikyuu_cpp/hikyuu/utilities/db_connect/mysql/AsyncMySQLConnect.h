@@ -42,7 +42,7 @@ private:
     friend class AsyncMySQLStatement;
 
     // 提供给 AsyncMySQLStatement 访问原始连接的方法（使用 void* 避免暴露 boost.mysql 类型）
-    void *getRawConnection() const noexcept;
+    void *getRawConnection() const;
 
     // 内部辅助方法
     net::awaitable<bool> tryConnect();

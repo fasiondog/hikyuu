@@ -108,7 +108,8 @@ AsyncMySQLConnect::~AsyncMySQLConnect() {
     close();
 }
 
-void* AsyncMySQLConnect::getRawConnection() const noexcept {
+void* AsyncMySQLConnect::getRawConnection() const {
+    HKU_ASSERT(m_impl->initialized);
     return m_impl->conn.get();
 }
 

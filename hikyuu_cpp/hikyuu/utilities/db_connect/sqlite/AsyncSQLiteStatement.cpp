@@ -54,6 +54,11 @@ struct AsyncSQLiteStatement::Impl {
 
 AsyncSQLiteStatement::AsyncSQLiteStatement(AsyncSQLiteConnect *connect, const std::string &sql)
 : AsyncSQLStatementBase(connect, sql), m_impl(nullptr) {
+    HKU_CHECK(connect != nullptr, "Invalid AsyncSQLiteConnect");
+
+    // 确保连接已初始化（同步操作）
+    connect->_connect();
+
     // 在构造函数中准备 statement（同步操作，因为只是本地内存操作）
     auto *raw_conn = connect->getRawConnection();
     sqlite3 *db = static_cast<sqlite3 *>(raw_conn);

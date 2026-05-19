@@ -58,6 +58,27 @@ net::awaitable<void> AsyncSQLiteConnect::connect() {
         co_return;
     }
 
+    // 在线程池中执行同步初始化操作
+    auto init_func = [this]() -> int {
+        try {
+            _connect();
+            return SQLITE_OK;
+        } catch (const SQLException &e) {
+            return e.errcode();
+        }
+    };
+
+    int rc = co_await co_run(m_impl->m_thread_pool.executor(), init_func);
+
+    SQL_CHECK(rc == SQLITE_OK, rc, "{}",
+              m_impl->m_db ? sqlite3_errmsg(m_impl->m_db) : "Failed to open database");
+}
+
+void AsyncSQLiteConnect::_connect() {
+    if (m_impl->initialized) {
+        return;
+    }
+
     int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
     if (haveParam("flags")) {
         flags = getParam<int>("flags");
@@ -70,44 +91,26 @@ net::awaitable<void> AsyncSQLiteConnect::connect() {
     }
 #endif
 
-    // 将所有初始化操作合并到一个 co_run 中
-    auto init_func = [this, flags
-#if HKU_ENABLE_SQLCIPHER
-                      ,
-                      &key
-#endif
-    ]() -> int {
-        // 1. 打开数据库
-        int rc = sqlite3_open_v2(m_impl->m_dbname.c_str(), &m_impl->m_db, flags, NULL);
-        if (rc != SQLITE_OK) {
-            return rc;
-        }
-
-#if HKU_ENABLE_SQLCIPHER
-        // 2. 设置密钥（如果需要）
-        if (!key.empty()) {
-            rc = sqlite3_key(m_impl->m_db, key.c_str(), static_cast<int>(key.size()));
-            if (rc != SQLITE_OK) {
-                return rc;
-            }
-        }
-#endif
-
-        // 3. 设置 busy handler
-        sqlite3_busy_handler(m_impl->m_db, sqlite_busy_call_back_in_async, (void *)m_impl->m_db);
-
-        // 4. 启用扩展错误码
-        if (sqlite3_libversion_number() >= 3003008) {
-            sqlite3_extended_result_codes(m_impl->m_db, true);
-        }
-
-        return SQLITE_OK;
-    };
-
-    int rc = co_await co_run(m_impl->m_thread_pool.executor(), init_func);
-
+    // 1. 打开数据库
+    int rc = sqlite3_open_v2(m_impl->m_dbname.c_str(), &m_impl->m_db, flags, NULL);
     SQL_CHECK(rc == SQLITE_OK, rc, "{}",
               m_impl->m_db ? sqlite3_errmsg(m_impl->m_db) : "Failed to open database");
+
+#if HKU_ENABLE_SQLCIPHER
+    // 2. 设置密钥（如果需要）
+    if (!key.empty()) {
+        rc = sqlite3_key(m_impl->m_db, key.c_str(), static_cast<int>(key.size()));
+        SQL_CHECK(rc == SQLITE_OK, rc, "{}", sqlite3_errmsg(m_impl->m_db));
+    }
+#endif
+
+    // 3. 设置 busy handler
+    sqlite3_busy_handler(m_impl->m_db, sqlite_busy_call_back_in_async, (void *)m_impl->m_db);
+
+    // 4. 启用扩展错误码
+    if (sqlite3_libversion_number() >= 3003008) {
+        sqlite3_extended_result_codes(m_impl->m_db, true);
+    }
 
     m_impl->initialized = true;
 }
