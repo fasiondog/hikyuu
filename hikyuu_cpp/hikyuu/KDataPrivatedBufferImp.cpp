@@ -188,8 +188,8 @@ void KDataPrivatedBufferImp::_recoverForward() {
     size_t total = m_buffer.size();
     HKU_IF_RETURN(total == 0, void());
 
-    Datetime start_date(m_buffer.front().datetime.date());
-    Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
+    Datetime start_date(m_buffer.front().datetime.startOfDay());
+    Datetime end_date(m_buffer.back().datetime + m_query.kTypeInSeconds());
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_iterator weightIter = weightList.begin();
 
@@ -317,8 +317,8 @@ void KDataPrivatedBufferImp::_recoverBackward() {
     std::copy(raw_buf + pos, raw_buf + pos + total, dst);
 
 #else
-    Datetime start_date(m_buffer.front().datetime.date());
-    Datetime end_date(m_buffer.back().datetime + Days(1));
+    Datetime start_date(m_buffer.front().datetime.startOfDay());
+    Datetime end_date(m_buffer.back().datetime + m_query.kTypeInSeconds());
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
 
@@ -382,8 +382,8 @@ void KDataPrivatedBufferImp::_recoverEqualForward() {
     size_t total = m_buffer.size();
     HKU_IF_RETURN(total == 0, void());
 
-    Datetime start_date(m_buffer.front().datetime.date());
-    Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
+    Datetime start_date(m_buffer.front().datetime.startOfDay());
+    Datetime end_date(m_buffer.back().datetime + m_query.kTypeInSeconds());
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     if (weightList.empty()) {
         return;
@@ -520,8 +520,8 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
 
 #else
 
-    Datetime start_date(m_buffer.front().datetime.date());
-    Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
+    Datetime start_date(m_buffer.front().datetime.startOfDay());
+    Datetime end_date(m_buffer.back().datetime + m_query.kTypeInSeconds());
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
 
