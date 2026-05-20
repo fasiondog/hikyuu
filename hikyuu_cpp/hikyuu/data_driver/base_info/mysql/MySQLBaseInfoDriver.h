@@ -9,9 +9,9 @@
 #ifndef MYSQLBASEINFODRIVER_H_
 #define MYSQLBASEINFODRIVER_H_
 
-#include "../../../utilities/ConnectPool.h"
-#include "../../../utilities/db_connect/mysql/MySQLConnect.h"
-#include "../../BaseInfoDriver.h"
+#include "hikyuu/utilities/ResourcePool.h"
+#include "hikyuu/utilities/db_connect/mysql/MySQLConnect.h"
+#include "hikyuu/data_driver/BaseInfoDriver.h"
 
 namespace hku {
 
@@ -40,7 +40,7 @@ public:
                                                          Datetime start, Datetime end) override;
 
 private:
-    ConnectPool<MySQLConnect>* m_pool;
+    ResourcePool<MySQLConnect>* m_pool;
 };
 
 } /* namespace hku */

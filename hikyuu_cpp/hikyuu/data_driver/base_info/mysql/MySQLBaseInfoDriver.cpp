@@ -40,7 +40,7 @@ bool MySQLBaseInfoDriver::_init() {
     string port_str = getParamFromOther<string>(m_params, "port", "3306");
     unsigned int port = boost::lexical_cast<unsigned int>(port_str);
     connect_param.set<int>("port", port);
-    m_pool = new ConnectPool<MySQLConnect>(connect_param);
+    m_pool = new ResourcePool<MySQLConnect>(connect_param);
     HKU_CHECK(m_pool, "Failed malloc ConnectPool!");
     return true;
 }
@@ -50,7 +50,7 @@ vector<MarketInfo> MySQLBaseInfoDriver::getAllMarketInfo() {
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
 
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         vector<MarketInfoTable> infoTables;
         con->batchLoad(infoTables);
         for (auto &info : infoTables) {
@@ -79,7 +79,7 @@ vector<StockTypeInfo> MySQLBaseInfoDriver::getAllStockTypeInfo() {
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
 
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         vector<StockTypeInfoTable> infoTables;
         con->batchLoad(infoTables);
         for (auto &info : infoTables) {
@@ -102,7 +102,7 @@ StockWeightList MySQLBaseInfoDriver::getStockWeightList(const string &market, co
     HKU_ASSERT(m_pool);
 
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         HKU_CHECK(con, "Failed fetch connect!");
 
         vector<StockWeightTable> table;
@@ -146,7 +146,7 @@ unordered_map<string, StockWeightList> MySQLBaseInfoDriver::getAllStockWeightLis
     HKU_ASSERT(m_pool);
 
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         HKU_CHECK(con, "Failed fetch connect!");
 
         vector<StockWeightTableView> view;
@@ -188,7 +188,7 @@ vector<StockInfo> MySQLBaseInfoDriver::getAllStockInfo() {
     vector<StockInfo> result;
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         con->batchLoad(result);
     } catch (...) {
     }
@@ -200,7 +200,7 @@ StockInfo MySQLBaseInfoDriver::getStockInfo(string market, const string &code) {
     StockInfo result;
     try {
         to_upper(market);
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         string sql =
           format("{} and a.code='{}' and c.market='{}'", StockInfo::getSelectSQL(), code, market);
         SQLStatementPtr st = con->getStatement(sql);
@@ -216,7 +216,7 @@ StockInfo MySQLBaseInfoDriver::getStockInfo(string market, const string &code) {
 MarketInfo MySQLBaseInfoDriver::getMarketInfo(const string &market) {
     MarketInfo result;
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
     try {
         MarketInfoTable info;
         string new_market(market);
@@ -235,7 +235,7 @@ MarketInfo MySQLBaseInfoDriver::getMarketInfo(const string &market) {
 StockTypeInfo MySQLBaseInfoDriver::getStockTypeInfo(uint32_t type) {
     StockTypeInfo result;
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
     try {
         StockTypeInfoTable info;
         con->load(info, format("type={}", type));
@@ -252,7 +252,7 @@ std::unordered_set<Datetime> MySQLBaseInfoDriver::getAllHolidays() {
     HKU_ASSERT(m_pool);
     std::unordered_set<Datetime> result;
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         std::vector<HolidayTable> holidays;
         con->batchLoad(holidays);
         for (const auto &holiday : holidays) {
@@ -286,7 +286,7 @@ Parameter MySQLBaseInfoDriver::getFinanceInfo(const string &market, const string
         << " and s.code = '" << code << "'" << " and s.marketid = m.marketid"
         << " and f.stockid = s.stockid" << " order by updated_date DESC limit 1";
 
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
 
     auto st = con->getStatement(buf.str());
     st->exec();
@@ -352,7 +352,7 @@ Parameter MySQLBaseInfoDriver::getFinanceInfo(const string &market, const string
 
 ZhBond10List MySQLBaseInfoDriver::getAllZhBond10() {
     ZhBond10List result;
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
     try {
         vector<ZhBond10Table> records;
         con->batchLoad(records, "1=1 order by date asc");
@@ -370,7 +370,7 @@ ZhBond10List MySQLBaseInfoDriver::getAllZhBond10() {
 
 vector<std::pair<size_t, string>> MySQLBaseInfoDriver::getHistoryFinanceField() {
     vector<std::pair<size_t, string>> result;
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
     try {
         vector<HistoryFinanceFieldTable> fields;
         con->batchLoad(fields);
@@ -395,7 +395,7 @@ vector<HistoryFinanceInfo> MySQLBaseInfoDriver::getHistoryFinance(const string &
     Datetime new_end = end.isNull() ? Datetime::max() : end;
     HKU_IF_RETURN(start >= end, result);
 
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
     try {
         string market_code(fmt::format("{}{}", market, code));
         to_upper(market_code);

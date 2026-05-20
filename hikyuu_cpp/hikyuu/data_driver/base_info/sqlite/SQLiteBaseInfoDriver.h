@@ -11,9 +11,9 @@
 #ifndef HIKYUU_DATA_DRIVER_BASE_INFO_SQLITE_SQLITEBASEINFODRIVER_H
 #define HIKYUU_DATA_DRIVER_BASE_INFO_SQLITE_SQLITEBASEINFODRIVER_H
 
-#include "../../../utilities/db_connect/sqlite/SQLiteConnect.h"
-#include "../../../utilities/ConnectPool.h"
-#include "../../BaseInfoDriver.h"
+#include "hikyuu/utilities/db_connect/sqlite/SQLiteConnect.h"
+#include "hikyuu/utilities/ResourcePool.h"
+#include "hikyuu/data_driver/BaseInfoDriver.h"
 
 namespace hku {
 
@@ -43,7 +43,7 @@ public:
 
 private:
     // 股票基本信息数据库实例
-    ConnectPool<SQLiteConnect>* m_pool;
+    ResourcePool<SQLiteConnect>* m_pool;
 };
 
 } /* namespace hku */

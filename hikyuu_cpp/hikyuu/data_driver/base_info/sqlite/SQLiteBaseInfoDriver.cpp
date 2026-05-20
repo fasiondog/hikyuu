@@ -33,7 +33,7 @@ bool SQLiteBaseInfoDriver::_init() {
     string dbname = tryGetParam<string>("db", "");
     HKU_ERROR_IF_RETURN(dbname == "", false, "Can't get Sqlite3 filename!");
     HKU_TRACE("SQLITE3: {}", dbname);
-    m_pool = new ConnectPool<SQLiteConnect>(m_params);
+    m_pool = new ResourcePool<SQLiteConnect>(m_params);
     HKU_CHECK(m_pool, "Failed malloc ConnectPool!");
     return true;
 }
@@ -43,7 +43,7 @@ vector<MarketInfo> SQLiteBaseInfoDriver::getAllMarketInfo() {
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
 
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         vector<MarketInfoTable> infoTables;
         con->batchLoad(infoTables);
         for (auto& info : infoTables) {
@@ -72,7 +72,7 @@ vector<StockTypeInfo> SQLiteBaseInfoDriver::getAllStockTypeInfo() {
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
 
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         vector<StockTypeInfoTable> infoTables;
         con->batchLoad(infoTables);
         for (auto& info : infoTables) {
@@ -92,7 +92,7 @@ vector<StockInfo> SQLiteBaseInfoDriver::getAllStockInfo() {
     vector<StockInfo> result;
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         con->batchLoad(result);
     } catch (...) {
     }
@@ -104,7 +104,7 @@ StockInfo SQLiteBaseInfoDriver::getStockInfo(string market, const string& code) 
     StockInfo result;
     try {
         to_upper(market);
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         string sql =
           format("{} and a.code='{}' and c.market='{}'", StockInfo::getSelectSQL(), code, market);
         SQLStatementPtr st = con->getStatement(sql);
@@ -123,7 +123,7 @@ StockWeightList SQLiteBaseInfoDriver::getStockWeightList(const string& market, c
     StockWeightList result;
 
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         HKU_CHECK(con, "Failed fetch connect!");
 
         vector<StockWeightTable> table;
@@ -165,7 +165,7 @@ unordered_map<string, StockWeightList> SQLiteBaseInfoDriver::getAllStockWeightLi
     HKU_ASSERT(m_pool);
 
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         HKU_CHECK(con, "Failed fetch connect!");
 
         vector<StockWeightTableView> view;
@@ -223,7 +223,7 @@ Parameter SQLiteBaseInfoDriver ::getFinanceInfo(const string& market, const stri
         << " and f.stockid = s.stockid"
         << " order by updated_date DESC limit 1";
 
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
 
     auto st = con->getStatement(buf.str());
     st->exec();
@@ -290,7 +290,7 @@ Parameter SQLiteBaseInfoDriver ::getFinanceInfo(const string& market, const stri
 MarketInfo SQLiteBaseInfoDriver::getMarketInfo(const string& market) {
     MarketInfo result;
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
     try {
         MarketInfoTable info;
         string new_market(market);
@@ -309,7 +309,7 @@ MarketInfo SQLiteBaseInfoDriver::getMarketInfo(const string& market) {
 StockTypeInfo SQLiteBaseInfoDriver::getStockTypeInfo(uint32_t type) {
     StockTypeInfo result;
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
     try {
         StockTypeInfoTable info;
         con->load(info, format("type={}", type));
@@ -326,7 +326,7 @@ std::unordered_set<Datetime> SQLiteBaseInfoDriver::getAllHolidays() {
     HKU_ASSERT(m_pool);
     std::unordered_set<Datetime> result;
     try {
-        auto con = m_pool->getConnect();
+        auto con = m_pool->get();
         std::vector<HolidayTable> holidays;
         con->batchLoad(holidays);
         for (const auto& holiday : holidays) {
@@ -345,7 +345,7 @@ std::unordered_set<Datetime> SQLiteBaseInfoDriver::getAllHolidays() {
 
 ZhBond10List SQLiteBaseInfoDriver::getAllZhBond10() {
     ZhBond10List result;
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
     try {
         vector<ZhBond10Table> records;
         con->batchLoad(records, "1=1 order by date asc");
@@ -363,7 +363,7 @@ ZhBond10List SQLiteBaseInfoDriver::getAllZhBond10() {
 
 vector<std::pair<size_t, string>> SQLiteBaseInfoDriver::getHistoryFinanceField() {
     vector<std::pair<size_t, string>> result;
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
     try {
         vector<HistoryFinanceFieldTable> fields;
         con->batchLoad(fields);
@@ -388,7 +388,7 @@ vector<HistoryFinanceInfo> SQLiteBaseInfoDriver::getHistoryFinance(const string&
     Datetime new_end = end.isNull() ? Datetime::max() : end;
     HKU_IF_RETURN(start >= end, result);
 
-    auto con = m_pool->getConnect();
+    auto con = m_pool->get();
     try {
         string market_code(fmt::format("{}{}", market, code));
         to_upper(market_code);
