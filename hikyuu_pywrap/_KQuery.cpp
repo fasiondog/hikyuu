@@ -30,6 +30,7 @@ void export_KQuery(py::module& m) {
                              "查询的K线类型")
       .def_property_readonly("recover_type", py::overload_cast<>(&KQuery::recoverType, py::const_),
                              "复权类别")
+      .def_property_readonly("ktype_in_sec", &KQuery::kTypeInSeconds, "获取ktype对应的秒数")
       .def("is_right_opening", &KQuery::isRightOpening, "判断是否为右开区间，即未指定结束时间")
       .def_static("is_valid_ktype", &KQuery::isValidKType, "判断KType是否有效")
       .def_static("is_base_ktype", &KQuery::isBaseKType, "判断是否为基础KType")

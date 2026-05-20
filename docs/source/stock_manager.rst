@@ -60,6 +60,12 @@
     .. py:attribute:: recover_type
     
         查询的复权类型
+        
+    .. py:attribute:: ktype_in_sec
+    
+        获取ktype对应的秒数，返回 TimeDelta 对象
+        
+        :rtype: TimeDelta
     
     .. py:data:: QueryType
     

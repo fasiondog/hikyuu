@@ -161,6 +161,11 @@ public:
         return m_dataType;
     }
 
+    /** 获取K线数据类型所对应的秒数 */
+    TimeDelta kTypeInSeconds() const {
+        return Seconds(getKTypeInSeconds(m_dataType));
+    }
+
     /** 获取复权类型 */
     RecoverType recoverType() const noexcept {
         return m_recoverType;
