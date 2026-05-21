@@ -169,8 +169,8 @@ void KDataPrivatedBufferImp::_recoverForUpDay() {
             m_buffer[i].highPrice = record.highPrice;
             m_buffer[i].lowPrice = record.lowPrice;
             m_buffer[i].closePrice = record.closePrice;
-            m_buffer[i].transCount = roundEx(record.transCount, 0);
-            m_buffer[i].transAmount = roundEx(record.transAmount, m_stock.precision());
+            m_buffer[i].transCount = record.transCount;
+            m_buffer[i].transAmount = record.transAmount;
         }
     }
 
@@ -224,17 +224,12 @@ void KDataPrivatedBufferImp::_recoverForward() {
         price_t volume_k = 1.0 / denominator;
 
         for (i = 0; i < pre_pos; ++i) {
-            m_buffer[i].openPrice =
-              roundEx((m_buffer[i].openPrice + temp) / denominator, m_stock.precision());
-            m_buffer[i].highPrice =
-              roundEx((m_buffer[i].highPrice + temp) / denominator, m_stock.precision());
-            m_buffer[i].lowPrice =
-              roundEx((m_buffer[i].lowPrice + temp) / denominator, m_stock.precision());
-            m_buffer[i].closePrice =
-              roundEx((m_buffer[i].closePrice + temp) / denominator, m_stock.precision());
-            m_buffer[i].transCount = roundEx(m_buffer[i].transCount * volume_k, 0);
-            m_buffer[i].transAmount =
-              roundEx(m_buffer[i].closePrice * m_buffer[i].transCount, m_stock.precision());
+            m_buffer[i].openPrice = (m_buffer[i].openPrice + temp) / denominator;
+            m_buffer[i].highPrice = (m_buffer[i].highPrice + temp) / denominator;
+            m_buffer[i].lowPrice = (m_buffer[i].lowPrice + temp) / denominator;
+            m_buffer[i].closePrice = (m_buffer[i].closePrice + temp) / denominator;
+            m_buffer[i].transCount = m_buffer[i].transCount * volume_k;
+            m_buffer[i].transAmount = m_buffer[i].closePrice * m_buffer[i].transCount;
         }
     }
 }
@@ -354,17 +349,12 @@ void KDataPrivatedBufferImp::_recoverBackward() {
         price_t volume_multiplier = 1.0 / denominator;  // 成交量调整倍数
 
         for (i = pre_pos; i < total; ++i) {
-            m_buffer[i].openPrice =
-              roundEx(m_buffer[i].openPrice * denominator + temp, m_stock.precision());
-            m_buffer[i].highPrice =
-              roundEx(m_buffer[i].highPrice * denominator + temp, m_stock.precision());
-            m_buffer[i].lowPrice =
-              roundEx(m_buffer[i].lowPrice * denominator + temp, m_stock.precision());
-            m_buffer[i].closePrice =
-              roundEx(m_buffer[i].closePrice * denominator + temp, m_stock.precision());
-            m_buffer[i].transCount = roundEx(m_buffer[i].transCount * volume_multiplier, 0);
-            m_buffer[i].transAmount =
-              roundEx(m_buffer[i].closePrice * m_buffer[i].transCount, m_stock.precision());
+            m_buffer[i].openPrice = m_buffer[i].openPrice * denominator + temp;
+            m_buffer[i].highPrice = m_buffer[i].highPrice * denominator + temp;
+            m_buffer[i].lowPrice = m_buffer[i].lowPrice * denominator + temp;
+            m_buffer[i].closePrice = m_buffer[i].closePrice * denominator + temp;
+            m_buffer[i].transCount = m_buffer[i].transCount * volume_multiplier;
+            m_buffer[i].transAmount = m_buffer[i].closePrice * m_buffer[i].transCount;
         }
     }
 #endif
@@ -433,13 +423,12 @@ void KDataPrivatedBufferImp::_recoverEqualForward() {
         price_t volume_k = 1.0 / denominator;  // 成交量修正因子（股本变动的倒数）
 
         for (i = 0; i < pre_pos; ++i) {
-            m_buffer[i].openPrice = roundEx(k * m_buffer[i].openPrice, m_stock.precision());
-            m_buffer[i].highPrice = roundEx(k * m_buffer[i].highPrice, m_stock.precision());
-            m_buffer[i].lowPrice = roundEx(k * m_buffer[i].lowPrice, m_stock.precision());
-            m_buffer[i].closePrice = roundEx(k * m_buffer[i].closePrice, m_stock.precision());
-            m_buffer[i].transCount = roundEx(m_buffer[i].transCount * volume_k, 0);
-            m_buffer[i].transAmount =
-              roundEx(m_buffer[i].closePrice * m_buffer[i].transCount, m_stock.precision());
+            m_buffer[i].openPrice = k * m_buffer[i].openPrice;
+            m_buffer[i].highPrice = k * m_buffer[i].highPrice;
+            m_buffer[i].lowPrice = k * m_buffer[i].lowPrice;
+            m_buffer[i].closePrice = k * m_buffer[i].closePrice;
+            m_buffer[i].transCount = m_buffer[i].transCount * volume_k;
+            m_buffer[i].transAmount = m_buffer[i].closePrice * m_buffer[i].transCount;
         }
     }
 }
@@ -559,13 +548,12 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
         price_t volume_k = denominator;
 
         for (i = pre_pos; i < total; ++i) {
-            m_buffer[i].openPrice = roundEx(k * m_buffer[i].openPrice, m_stock.precision());
-            m_buffer[i].highPrice = roundEx(k * m_buffer[i].highPrice, m_stock.precision());
-            m_buffer[i].lowPrice = roundEx(k * m_buffer[i].lowPrice, m_stock.precision());
-            m_buffer[i].closePrice = roundEx(k * m_buffer[i].closePrice, m_stock.precision());
-            m_buffer[i].transCount = roundEx(m_buffer[i].transCount * volume_k, 0);
-            m_buffer[i].transAmount =
-              roundEx(m_buffer[i].closePrice * m_buffer[i].transCount, m_stock.precision());
+            m_buffer[i].openPrice = k * m_buffer[i].openPrice;
+            m_buffer[i].highPrice = k * m_buffer[i].highPrice;
+            m_buffer[i].lowPrice = k * m_buffer[i].lowPrice;
+            m_buffer[i].closePrice = k * m_buffer[i].closePrice;
+            m_buffer[i].transCount = m_buffer[i].transCount * volume_k;
+            m_buffer[i].transAmount = m_buffer[i].closePrice * m_buffer[i].transCount;
         }
     }
 #endif
