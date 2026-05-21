@@ -76,6 +76,25 @@ public:
      */
     static Datetime fromTimestampUTC(int64_t timestamp);
 
+    /**
+     * @brief 从 std::chrono::local_time 创建 Datetime 对象
+     * @tparam Duration chrono duration 类型
+     * @param local_time chrono local_time
+     * @return Datetime
+     */
+    template <typename Duration>
+    static Datetime fromLocalTime(std::chrono::local_time<Duration> local_time);
+
+    /**
+     * @brief 从 std::chrono::time_point 创建 Datetime 对象，并加上本地UTC时间偏差
+     * @tparam Clock 时钟类型
+     * @tparam Duration chrono duration 类型
+     * @param time_point chrono time_point（通常表示 UTC 时间）
+     * @return Datetime
+     */
+    template <typename Clock, typename Duration>
+    static Datetime fromTimePointUTC(std::chrono::time_point<Clock, Duration> time_point);
+
 public:
     /** 默认构造函数，Null<Datetime> */
     Datetime();
@@ -162,6 +181,26 @@ public:
     Datetime operator-(TimeDelta d) const;
 
     /**
+     * 日期运算，加 chrono duration
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param duration chrono duration
+     * @return Datetime
+     */
+    template <typename Rep, typename Period>
+    Datetime operator+(std::chrono::duration<Rep, Period> duration) const;
+
+    /**
+     * 日期运算，减 chrono duration
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param duration chrono duration
+     * @return Datetime
+     */
+    template <typename Rep, typename Period>
+    Datetime operator-(std::chrono::duration<Rep, Period> duration) const;
+
+    /**
      * 返回如YYYYMMDDhhmm格式的数字，方便比较操作
      * Null<Datetime>()对应的 number 为 Null<unsigned long long>
      * @note 精度到分钟
@@ -221,6 +260,14 @@ public:
 
     /** 返回 std::time_t */
     std::time_t to_time_t() const;
+
+    /**
+     * 转换为 std::chrono::local_time
+     * @tparam Duration 目标 chrono duration 类型，默认为 microseconds
+     * @return chrono local_time
+     */
+    template <typename Duration = std::chrono::microseconds>
+    std::chrono::local_time<Duration> to_local_time() const;
 
     /** 返回一周中的第几天，周日为0，周一为1 */
     int dayOfWeek() const;
@@ -372,6 +419,11 @@ inline Datetime operator+(const TimeDelta &delta, const Datetime &date) {
     return date + delta;
 }
 
+template <typename Rep, typename Period>
+inline Datetime operator+(std::chrono::duration<Rep, Period> duration, const Datetime &date) {
+    return date + TimeDelta(duration);
+}
+
 inline TimeDelta operator-(const Datetime &d1, const Datetime &d2) {
     return TimeDelta(d1.ptime() - d2.ptime());
 }
@@ -393,6 +445,26 @@ inline Datetime::Datetime(const bd::date &d) : m_data(bt::ptime(d, bt::time_dura
 
 inline Datetime::Datetime(const bt::ptime &d) : m_data(d) {}
 
+template <typename Duration>
+inline Datetime Datetime::fromLocalTime(std::chrono::local_time<Duration> local_time) {
+    if (local_time == std::chrono::local_time<Duration>::max()) {
+        return Datetime();
+    }
+    auto duration_us =
+      std::chrono::duration_cast<std::chrono::microseconds>(local_time.time_since_epoch());
+    return fromTimestamp(static_cast<int64_t>(duration_us.count()));
+}
+
+template <typename Clock, typename Duration>
+inline Datetime Datetime::fromTimePointUTC(std::chrono::time_point<Clock, Duration> time_point) {
+    if (time_point == std::chrono::time_point<Clock, Duration>::max()) {
+        return Datetime();
+    }
+    auto duration_us =
+      std::chrono::duration_cast<std::chrono::microseconds>(time_point.time_since_epoch());
+    return fromTimestampUTC(static_cast<int64_t>(duration_us.count()));
+}
+
 inline bt::ptime Datetime::ptime() const {
     return m_data;
 }
@@ -404,6 +476,17 @@ inline bd::date Datetime::date() const {
 inline std::time_t Datetime::to_time_t() const {
     std::tm tt = bt::to_tm(m_data);
     return std::mktime(&tt);
+}
+
+template <typename Duration>
+inline std::chrono::local_time<Duration> Datetime::to_local_time() const {
+    if (isNull()) {
+        return std::chrono::local_time<Duration>::max();
+    }
+    auto timestamp_us = static_cast<int64_t>(timestamp());
+    auto target_duration =
+      std::chrono::duration_cast<Duration>(std::chrono::microseconds(timestamp_us));
+    return std::chrono::local_time<Duration>(target_duration);
 }
 
 inline int Datetime::dayOfWeek() const {
@@ -424,6 +507,16 @@ inline Datetime Datetime::operator+(TimeDelta d) const {
 
 inline Datetime Datetime::operator-(TimeDelta d) const {
     return Datetime(m_data - d.time_duration());
+}
+
+template <typename Rep, typename Period>
+inline Datetime Datetime::operator+(std::chrono::duration<Rep, Period> duration) const {
+    return *this + TimeDelta(duration);
+}
+
+template <typename Rep, typename Period>
+inline Datetime Datetime::operator-(std::chrono::duration<Rep, Period> duration) const {
+    return *this - TimeDelta(duration);
 }
 
 } /* namespace hku */

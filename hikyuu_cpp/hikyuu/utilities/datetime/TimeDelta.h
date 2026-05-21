@@ -16,6 +16,8 @@
 #endif
 
 #include <cstdint>
+#include <chrono>
+#include <stdexcept>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -57,6 +59,23 @@ public:
 
     /** 通过 boost::posix_time::time_duration 构造 */
     explicit TimeDelta(bt::time_duration td);
+
+    /**
+     * 从 std::chrono::duration 构造
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param dur chrono duration 对象
+     */
+    template <typename Rep, typename Period>
+    explicit TimeDelta(std::chrono::duration<Rep, Period> dur) {
+        // 转换为微秒
+        auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(dur);
+        int64_t total = microseconds.count();
+        if (total < m_min_micro_seconds || total > m_max_micro_seconds) {
+            throw std::out_of_range("TimeDelta value out of range");
+        }
+        m_duration = bt::time_duration(0, 0, 0, total);
+    }
 
     /** 从字符串构造，格式：-1 days, hh:mm:ss.000000) */
     explicit TimeDelta(const std::string &delta);
@@ -133,6 +152,16 @@ public:
     /** 转换为 boost::posix_time::time_duration */
     bt::time_duration time_duration() const {
         return m_duration;
+    }
+
+    /**
+     * 转换为 std::chrono::duration
+     * @tparam Duration 目标 chrono duration 类型，默认为 microseconds
+     * @return 转换后的 chrono duration
+     */
+    template <typename Duration = std::chrono::microseconds>
+    Duration duration() const {
+        return std::chrono::duration_cast<Duration>(std::chrono::microseconds(m_duration.ticks()));
     }
 
     /** 转换为字符串，格式：-1 days hh:mm:ss.000000) */
@@ -220,6 +249,111 @@ public:
         return m_duration <= td.m_duration;
     }
 
+    /**
+     * 时长加 chrono duration
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param duration chrono duration
+     * @return TimeDelta
+     */
+    template <typename Rep, typename Period>
+    TimeDelta operator+(std::chrono::duration<Rep, Period> duration) const {
+        auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+        auto total_ticks = ticks() + duration_us.count();
+        return TimeDelta::fromTicks(total_ticks);
+    }
+
+    /**
+     * 时长减 chrono duration
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param duration chrono duration
+     * @return TimeDelta
+     */
+    template <typename Rep, typename Period>
+    TimeDelta operator-(std::chrono::duration<Rep, Period> duration) const {
+        auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+        auto total_ticks = ticks() - duration_us.count();
+        return TimeDelta::fromTicks(total_ticks);
+    }
+
+    /**
+     * 比较是否等于 chrono duration
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param duration chrono duration
+     * @return bool
+     */
+    template <typename Rep, typename Period>
+    bool operator==(std::chrono::duration<Rep, Period> duration) const {
+        auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+        return ticks() == duration_us.count();
+    }
+
+    /**
+     * 比较是否不等于 chrono duration
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param duration chrono duration
+     * @return bool
+     */
+    template <typename Rep, typename Period>
+    bool operator!=(std::chrono::duration<Rep, Period> duration) const {
+        return !(*this == duration);
+    }
+
+    /**
+     * 比较是否大于 chrono duration
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param duration chrono duration
+     * @return bool
+     */
+    template <typename Rep, typename Period>
+    bool operator>(std::chrono::duration<Rep, Period> duration) const {
+        auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+        return ticks() > duration_us.count();
+    }
+
+    /**
+     * 比较是否小于 chrono duration
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param duration chrono duration
+     * @return bool
+     */
+    template <typename Rep, typename Period>
+    bool operator<(std::chrono::duration<Rep, Period> duration) const {
+        auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+        return ticks() < duration_us.count();
+    }
+
+    /**
+     * 比较是否大于等于 chrono duration
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param duration chrono duration
+     * @return bool
+     */
+    template <typename Rep, typename Period>
+    bool operator>=(std::chrono::duration<Rep, Period> duration) const {
+        auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+        return ticks() >= duration_us.count();
+    }
+
+    /**
+     * 比较是否小于等于 chrono duration
+     * @tparam Rep 表示类型
+     * @tparam Period 周期类型
+     * @param duration chrono duration
+     * @return bool
+     */
+    template <typename Rep, typename Period>
+    bool operator<=(std::chrono::duration<Rep, Period> duration) const {
+        auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+        return ticks() <= duration_us.count();
+    }
+
     /////////////////////////////////////////////////////////////////
     //
     // 静态成员函数
@@ -266,6 +400,112 @@ std::ostream &operator<<(std::ostream &out, TimeDelta td);
 inline std::ostream &operator<<(std::ostream &out, TimeDelta td) {
     out << td.str();
     return out;
+}
+
+/**
+ * chrono duration + TimeDelta 反向运算符
+ * @tparam Rep 表示类型
+ * @tparam Period 周期类型
+ * @param duration chrono duration
+ * @param td TimeDelta
+ * @return TimeDelta
+ */
+template <typename Rep, typename Period>
+inline TimeDelta operator+(std::chrono::duration<Rep, Period> duration, TimeDelta td) {
+    return td + duration;
+}
+
+/**
+ * chrono duration - TimeDelta 反向运算符
+ * @tparam Rep 表示类型
+ * @tparam Period 周期类型
+ * @param duration chrono duration
+ * @param td TimeDelta
+ * @return TimeDelta
+ */
+template <typename Rep, typename Period>
+inline TimeDelta operator-(std::chrono::duration<Rep, Period> duration, TimeDelta td) {
+    auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+    auto total_ticks = duration_us.count() - td.ticks();
+    return TimeDelta::fromTicks(total_ticks);
+}
+
+/**
+ * chrono duration == TimeDelta 反向比较
+ * @tparam Rep 表示类型
+ * @tparam Period 周期类型
+ * @param duration chrono duration
+ * @param td TimeDelta
+ * @return bool
+ */
+template <typename Rep, typename Period>
+inline bool operator==(std::chrono::duration<Rep, Period> duration, TimeDelta td) {
+    return td == duration;
+}
+
+/**
+ * chrono duration != TimeDelta 反向比较
+ * @tparam Rep 表示类型
+ * @tparam Period 周期类型
+ * @param duration chrono duration
+ * @param td TimeDelta
+ * @return bool
+ */
+template <typename Rep, typename Period>
+inline bool operator!=(std::chrono::duration<Rep, Period> duration, TimeDelta td) {
+    return td != duration;
+}
+
+/**
+ * chrono duration < TimeDelta 反向比较
+ * @tparam Rep 表示类型
+ * @tparam Period 周期类型
+ * @param duration chrono duration
+ * @param td TimeDelta
+ * @return bool
+ */
+template <typename Rep, typename Period>
+inline bool operator<(std::chrono::duration<Rep, Period> duration, TimeDelta td) {
+    return td > duration;
+}
+
+/**
+ * chrono duration > TimeDelta 反向比较
+ * @tparam Rep 表示类型
+ * @tparam Period 周期类型
+ * @param duration chrono duration
+ * @param td TimeDelta
+ * @return bool
+ */
+template <typename Rep, typename Period>
+inline bool operator>(std::chrono::duration<Rep, Period> duration, TimeDelta td) {
+    return td < duration;
+}
+
+/**
+ * chrono duration <= TimeDelta 反向比较
+ * @tparam Rep 表示类型
+ * @tparam Period 周期类型
+ * @param duration chrono duration
+ * @param td TimeDelta
+ * @return bool
+ */
+template <typename Rep, typename Period>
+inline bool operator<=(std::chrono::duration<Rep, Period> duration, TimeDelta td) {
+    return td >= duration;
+}
+
+/**
+ * chrono duration >= TimeDelta 反向比较
+ * @tparam Rep 表示类型
+ * @tparam Period 周期类型
+ * @param duration chrono duration
+ * @param td TimeDelta
+ * @return bool
+ */
+template <typename Rep, typename Period>
+inline bool operator>=(std::chrono::duration<Rep, Period> duration, TimeDelta td) {
+    return td <= duration;
 }
 
 /**
