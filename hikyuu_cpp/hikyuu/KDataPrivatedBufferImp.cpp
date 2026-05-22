@@ -244,74 +244,6 @@ void KDataPrivatedBufferImp::_recoverBackward() {
     size_t total = m_buffer.size();
     HKU_IF_RETURN(total == 0, void());
 
-#if 0
-    // 只要 query 范围的起点不变，后复权形态一致
-    // 后复权全量方式(慢），保证 RECOVER 指标增量是不变
-    Datetime start_date(Datetime::min());
-    Datetime end_date(m_buffer.back().datetime +
-                      Seconds(KQuery::getKTypeInSeconds(m_query.kType())));
-
-    KData raw_k = m_stock.getKData(KQueryByDate(start_date, end_date, m_query.kType()));
-    KRecordList raw_data(raw_k.size());
-    std::copy(raw_k.begin(), raw_k.end(), raw_data.begin());
-    auto* raw_buf = raw_data.data();
-    size_t raw_total = raw_data.size();
-
-    StockWeightList weightList = m_stock.getWeight(start_date, m_buffer.back().datetime+Days(1));
-    StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
-
-    size_t pre_pos = raw_total - 1;
-    for (; weightIter != weightList.rend(); ++weightIter) {
-        // 计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
-        if ((weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
-             weightIter->priceForSell() == 0.0 && weightIter->bonus() == 0.0 &&
-             weightIter->increasement() == 0.0 && weightIter->suogu() == 0.0))
-            continue;
-
-        size_t i = pre_pos;
-        while (i > 0 && raw_buf[i].datetime > weightIter->datetime()) {
-            i--;
-        }
-        pre_pos = i;
-
-        price_t denominator = 1.0, temp = 0.0;
-        if (weightIter->suogu() != 0.0) {
-            denominator = weightIter->suogu();
-        } else {
-            // 流通股份变动比例
-            price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
-                                    weightIter->increasement());
-            // change 小于 0 时为缩股
-            denominator = 1.0 + change;  //(1+流通股份变动比例)
-            temp = 0.1 * weightIter->bonus() - weightIter->priceForSell() * change;
-        }
-
-        if (denominator == 1.0 && temp == 0.0)
-            continue;
-
-        price_t volume_multiplier = 1.0 / denominator;  // 成交量调整倍数
-
-        for (i = pre_pos; i < raw_total; ++i) {
-            raw_buf[i].openPrice =
-              roundEx(raw_buf[i].openPrice * denominator + temp, m_stock.precision());
-            raw_buf[i].highPrice =
-              roundEx(raw_buf[i].highPrice * denominator + temp, m_stock.precision());
-            raw_buf[i].lowPrice =
-              roundEx(raw_buf[i].lowPrice * denominator + temp, m_stock.precision());
-            raw_buf[i].closePrice =
-              roundEx(raw_buf[i].closePrice * denominator + temp, m_stock.precision());
-            raw_buf[i].transCount = roundEx(raw_buf[i].transCount * volume_multiplier, 0);
-            raw_buf[i].transAmount =
-              roundEx(raw_buf[i].closePrice * raw_buf[i].transCount, m_stock.precision());
-        }
-    }
-
-    size_t pos = raw_k.getPos(m_buffer.front().datetime);
-    auto* dst = m_buffer.data();
-    HKU_ASSERT(((pos + total) <= raw_total));
-    std::copy(raw_buf + pos, raw_buf + pos + total, dst);
-
-#else
     Datetime start_date(m_buffer.front().datetime.startOfDay());
     Datetime end_date(m_buffer.back().datetime + m_query.kTypeInSeconds());
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
@@ -329,6 +261,12 @@ void KDataPrivatedBufferImp::_recoverBackward() {
         while (i > 0 && m_buffer[i].datetime > weightIter->datetime()) {
             i--;
         }
+
+        // 分钟数据，需要跳过第一个时间点
+        if (i != pre_pos && m_buffer[i].datetime != m_buffer[i].datetime.startOfDay()) {
+            i++;
+        }
+
         pre_pos = i;
 
         price_t denominator = 1.0, temp = 0.0;
@@ -357,7 +295,6 @@ void KDataPrivatedBufferImp::_recoverBackward() {
             m_buffer[i].transAmount = m_buffer[i].closePrice * m_buffer[i].transCount;
         }
     }
-#endif
 }
 
 /******************************************************************************
@@ -444,71 +381,6 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
     size_t total = m_buffer.size();
     HKU_IF_RETURN(total == 0, void());
 
-#if 0
-    // 后复权全量方式，保证 RECOVER 指标增量是不变
-    Datetime start_date(Datetime::min());
-    Datetime end_date(m_buffer.back().datetime +
-                      Seconds(KQuery::getKTypeInSeconds(m_query.kType())));
-    auto raw_k = m_stock.getKData(KQueryByDate(start_date, end_date, m_query.kType()));
-    KRecordList raw_data(raw_k.size());
-    std::copy(raw_k.begin(), raw_k.end(), raw_data.begin());
-    auto* raw_buf = raw_data.data();
-    size_t raw_total = raw_data.size();
-
-    StockWeightList weightList = m_stock.getWeight(start_date, m_buffer.back().datetime +Days(1));
-    StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
-
-    size_t pre_pos = raw_total - 1;
-    for (; weightIter != weightList.rend(); ++weightIter) {
-        size_t i = pre_pos;
-        while (i > 0 && raw_buf[i].datetime > weightIter->datetime()) {
-            i--;
-        }
-        pre_pos = i;  // 除权日
-
-        // 股权登记日（即除权日的前一天数据）收盘价
-        if (pre_pos == 0) {
-            continue;
-        }
-
-        price_t closePrice = raw_buf[pre_pos - 1].closePrice;
-
-        price_t denominator = 0.0, temp = closePrice;
-        if (weightIter->suogu() != 0.0) {
-            denominator = weightIter->suogu();
-        } else {
-            // 流通股份变动比例
-            price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
-                                    weightIter->increasement());
-            // change 小于 0 时为缩股
-            denominator = 1.0 + change;  //(1+流通股份变动比例)
-            temp = closePrice + weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
-        }
-
-        if (temp == 0.0 || denominator == 0.0) {
-            continue;
-        }
-        price_t k = (denominator * closePrice) / temp;
-        price_t volume_k = denominator;
-
-        for (i = pre_pos; i < raw_total; ++i) {
-            raw_buf[i].openPrice = roundEx(k * raw_buf[i].openPrice, m_stock.precision());
-            raw_buf[i].highPrice = roundEx(k * raw_buf[i].highPrice, m_stock.precision());
-            raw_buf[i].lowPrice = roundEx(k * raw_buf[i].lowPrice, m_stock.precision());
-            raw_buf[i].closePrice = roundEx(k * raw_buf[i].closePrice, m_stock.precision());
-            raw_buf[i].transCount = roundEx(raw_buf[i].transCount * volume_k, 0);
-            raw_buf[i].transAmount =
-              roundEx(raw_buf[i].closePrice * raw_buf[i].transCount, m_stock.precision());
-        }
-    }
-
-    size_t pos = raw_k.getPos(m_buffer.front().datetime);
-    auto* dst = m_buffer.data();
-    HKU_ASSERT(((pos + total) <= raw_total));
-    std::copy(raw_buf + pos, raw_buf + pos + total, dst);
-
-#else
-
     Datetime start_date(m_buffer.front().datetime.startOfDay());
     Datetime end_date(m_buffer.back().datetime + m_query.kTypeInSeconds());
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
@@ -520,6 +392,12 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
         while (i > 0 && m_buffer[i].datetime > weightIter->datetime()) {
             i--;
         }
+
+        // 分钟数据，需要跳过第一个时间点
+        if (i != pre_pos && m_buffer[i].datetime != m_buffer[i].datetime.startOfDay()) {
+            i++;
+        }
+
         pre_pos = i;  // 除权日
 
         // 股权登记日（即除权日的前一天数据）收盘价
@@ -556,7 +434,6 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
             m_buffer[i].transAmount = m_buffer[i].closePrice * m_buffer[i].transCount;
         }
     }
-#endif
 }
 
 KDataImpPtr KDataPrivatedBufferImp::getOtherFromSelf(const KQuery& query) const {
