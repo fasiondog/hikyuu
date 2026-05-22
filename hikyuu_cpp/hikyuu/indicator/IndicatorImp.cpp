@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <forward_list>
 #include <stack>
+#include <xsimd/xsimd.hpp>
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/global/sysinfo.h"
 #include "Indicator.h"
@@ -26,6 +27,8 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 
 namespace hku {
 
+namespace xs = xsimd;
+
 bool IndicatorImp::ms_enable_increment_calculate{true};
 
 void IndicatorImp::initEngine() {
@@ -39,6 +42,25 @@ void IndicatorImp::initEngine() {
     mi_stats_reset();
 // mi_stats_print(NULL);
 #endif
+
+    fmt::print("IndicatorImp::initEngine()\n");
+
+    xs::dispatch([](auto const &arch) {
+        // 打印当前检测到的指令集信息
+        // std::cout << "xsimd detected architecture: " << arch.name() << std::endl;
+        fmt::print("xsimd detected architecture: {}\n", arch.name());
+
+        // // 可以检查特定指令集是否支持
+        // if (arch >= xs::avx2) {
+        //     HKU_INFO("AVX2 supported");
+        // }
+        // if (arch >= xs::avx) {
+        //     HKU_INFO("AVX supported");
+        // }
+        // if (arch >= xs::sse4_1) {
+        //     HKU_INFO("SSE4.1 supported");
+        // }
+    })();
 }
 
 void IndicatorImp::releaseEngine() {
@@ -1171,12 +1193,44 @@ void IndicatorImp::execute_add() {
     setDiscard(discard);
 
     for (size_t r = 0; r < m_result_num; ++r) {
-        auto const *data1 = maxp->data(r);
-        auto const *data2 = minp->data(r);
-        auto *result = this->data(r);
-        for (size_t i = start_pos; i < total; ++i) {
-            result[i] = data1[i] + data2[i - diff];
+        auto const *data1 = maxp->data(r) + start_pos;
+        auto const *data2 = minp->data(r) + start_pos - diff;
+        auto *result = this->data(r) + start_pos;
+        for (size_t i = 0, len = total - start_pos; i < len; ++i) {
+            result[i] = data1[i] + data2[i];
         }
+
+        // size_t len = total - start_pos;
+        // size_t i = 0;
+        // size_t n = xs::batch<Indicator::value_t>::size;
+        // for (; i + n <= len; i += n) {
+        //     auto v1 = xs::load_aligned(data1 + i);
+        //     auto v2 = xs::load_aligned(data2 + i);
+        //     xs::store_aligned(result + i, v1 + v2);
+        // }
+        // for (; i < len; ++i) {
+        //     result[i] = data1[i] + data2[i];
+        // }
+
+        // size_t len = total - start_pos;
+        // xs::dispatch([=](auto const &arch) {
+        //     fmt::print("value_t size: {}\n", sizeof(Indicator::value_t));
+        //     fmt::print("Architecture: {}\n", arch.name());
+        //     // fmt::print("Batch size: {}\n", arch.batch_size());
+        //     // using batch_type = xs::batch<Indicator::value_t, decltype(arch)>;
+        //     using batch_type = xs::batch<Indicator::value_t>;
+        //     size_t n = batch_type::size;
+        //     fmt::print("Batch size: {}\n", n);
+        //     size_t i = 0;
+        //     for (; i + n <= len; i += n) {
+        //         auto v1 = xs::load_aligned(data1 + i);
+        //         auto v2 = xs::load_aligned(data2 + i);
+        //         xs::store_aligned(result + i, v1 + v2);
+        //     }
+        //     for (; i < len; ++i) {
+        //         result[i] = data1[i] + data2[i];
+        //     }
+        // })();
     }
 }
 
