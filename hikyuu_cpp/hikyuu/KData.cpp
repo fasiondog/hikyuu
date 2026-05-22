@@ -209,6 +209,9 @@ KData KData::getKData(const KQuery::KType& ktype) const {
     KData ret;
     const Stock& stk = getStock();
     HKU_IF_RETURN(stk.isNull(), ret);
+    if (ktype == getQuery().kType()) {
+        return KData(m_imp);
+    }
     ret = stk.getKData(getOtherQueryByDate(front().datetime, back().datetime, ktype));
     return ret;
 }
