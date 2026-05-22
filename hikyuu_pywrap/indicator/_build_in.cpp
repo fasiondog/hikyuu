@@ -1802,7 +1802,8 @@ void export_Indicator_build_in(py::module& m) {
         - `ADJ_VOL` - 复权成交量
     )");
 
-    m.def("ADJ_OPEN", &ADJ_OPEN, R"(ADJ_OPEN()
+    m.def("ADJ_OPEN", py::overload_cast<const KData&>(&ADJ_OPEN));
+    m.def("ADJ_OPEN", py::overload_cast<>(&ADJ_OPEN), R"(ADJ_OPEN()
 
     计算复权开盘价指标
 
@@ -1842,7 +1843,8 @@ void export_Indicator_build_in(py::module& m) {
         - `RECOVER_EQUAL_FORWARD` - 等比前复权（非因子管理场景推荐使用）
     )");
 
-    m.def("ADJ_HIGH", &ADJ_HIGH, R"(ADJ_HIGH()
+    m.def("ADJ_HIGH", py::overload_cast<const KData&>(&ADJ_HIGH));
+    m.def("ADJ_HIGH", py::overload_cast<>(&ADJ_HIGH), R"(ADJ_HIGH()
 
     计算复权最高价指标
 
@@ -1882,7 +1884,8 @@ void export_Indicator_build_in(py::module& m) {
         - `RECOVER_EQUAL_FORWARD` - 等比前复权（非因子管理场景推荐使用）
     )");
 
-    m.def("ADJ_LOW", &ADJ_LOW, R"(ADJ_LOW()
+    m.def("ADJ_LOW", py::overload_cast<const KData&>(&ADJ_LOW));
+    m.def("ADJ_LOW", py::overload_cast<>(&ADJ_LOW), R"(ADJ_LOW()
 
     计算复权最低价指标
 
@@ -1922,7 +1925,8 @@ void export_Indicator_build_in(py::module& m) {
         - `RECOVER_EQUAL_FORWARD` - 等比前复权（非因子管理场景推荐使用）
     )");
 
-    m.def("ADJ_CLOSE", &ADJ_CLOSE, R"(ADJ_CLOSE()
+    m.def("ADJ_CLOSE", py::overload_cast<const KData&>(&ADJ_CLOSE));
+    m.def("ADJ_CLOSE", py::overload_cast<>(&ADJ_CLOSE), R"(ADJ_CLOSE()
 
     计算复权收盘价指标
 
@@ -1962,7 +1966,8 @@ void export_Indicator_build_in(py::module& m) {
         - `RECOVER_EQUAL_FORWARD` - 等比前复权（非因子管理场景推荐使用）
     )");
 
-    m.def("ADJ_VOL", &ADJ_VOL, R"(ADJ_VOL()
+    m.def("ADJ_VOL", py::overload_cast<const KData&>(&ADJ_VOL));
+    m.def("ADJ_VOL", py::overload_cast<>(&ADJ_VOL), R"(ADJ_VOL()
 
     计算复权成交量指标
 

@@ -56,8 +56,10 @@ Indicator HKU_API ADJ_FACTOR(const KData& kdata);
  *
  * @warning 重要限制：
  * - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
- * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
- * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
+ * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values()
+ * 更新保存因子值以保证准确性
+ * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD
+ * 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
  * - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
  *
  * @see ADJ_FACTOR 复权因子
@@ -65,6 +67,10 @@ Indicator HKU_API ADJ_FACTOR(const KData& kdata);
  */
 inline Indicator ADJ_OPEN() {
     return ADJ_FACTOR() * OPEN();
+}
+
+inline Indicator ADJ_OPEN(const KData& kdata) {
+    return ADJ_OPEN()(kdata);
 }
 
 /**
@@ -81,8 +87,10 @@ inline Indicator ADJ_OPEN() {
  *
  * @warning 重要限制：
  * - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
- * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
- * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
+ * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values()
+ * 更新保存因子值以保证准确性
+ * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD
+ * 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
  * - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
  *
  * @see ADJ_FACTOR 复权因子
@@ -90,6 +98,10 @@ inline Indicator ADJ_OPEN() {
  */
 inline Indicator ADJ_HIGH() {
     return ADJ_FACTOR() * HIGH();
+}
+
+inline Indicator ADJ_HIGH(const KData& kdata) {
+    return ADJ_HIGH()(kdata);
 }
 
 /**
@@ -106,8 +118,10 @@ inline Indicator ADJ_HIGH() {
  *
  * @warning 重要限制：
  * - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
- * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
- * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
+ * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values()
+ * 更新保存因子值以保证准确性
+ * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD
+ * 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
  * - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
  *
  * @see ADJ_FACTOR 复权因子
@@ -115,6 +129,10 @@ inline Indicator ADJ_HIGH() {
  */
 inline Indicator ADJ_LOW() {
     return ADJ_FACTOR() * LOW();
+}
+
+inline Indicator ADJ_LOW(const KData& kdata) {
+    return ADJ_LOW()(kdata);
 }
 
 /**
@@ -131,8 +149,10 @@ inline Indicator ADJ_LOW() {
  *
  * @warning 重要限制：
  * - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
- * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
- * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
+ * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values()
+ * 更新保存因子值以保证准确性
+ * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD
+ * 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
  * - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
  *
  * @see ADJ_FACTOR 复权因子
@@ -140,6 +160,10 @@ inline Indicator ADJ_LOW() {
  */
 inline Indicator ADJ_CLOSE() {
     return ADJ_FACTOR() * CLOSE();
+}
+
+inline Indicator ADJ_CLOSE(const KData& kdata) {
+    return ADJ_CLOSE()(kdata);
 }
 
 /**
@@ -153,12 +177,15 @@ inline Indicator ADJ_CLOSE() {
  * @details 设计目的：
  * - 本系列指标（ADJ_*）主要是为了配合因子管理系统快速计算后向等比复权因子而设计
  * - 在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算
- * - 注意：成交量复权使用除法，与价格复权使用乘法相反。这是因为当股本增加时，每股对应的成交量应该相应减少
+ * -
+ * 注意：成交量复权使用除法，与价格复权使用乘法相反。这是因为当股本增加时，每股对应的成交量应该相应减少
  *
  * @warning 重要限制：
  * - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
- * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
- * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
+ * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values()
+ * 更新保存因子值以保证准确性
+ * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD
+ * 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
  * - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
  *
  * @see ADJ_FACTOR 复权因子
@@ -166,6 +193,10 @@ inline Indicator ADJ_CLOSE() {
  */
 inline Indicator ADJ_VOL() {
     return VOL() / ADJ_FACTOR();
+}
+
+inline Indicator ADJ_VOL(const KData& kdata) {
+    return ADJ_VOL()(kdata);
 }
 
 }  // namespace hku
