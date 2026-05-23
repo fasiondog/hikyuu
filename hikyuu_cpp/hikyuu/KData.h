@@ -86,21 +86,6 @@ public:
      */
     KData getSubKData(int64_t start, int64_t end = Null<int64_t>()) const;
 
-    /**
-     * 特殊用途！谨慎！按当前K线范围，获取指定日期范围的其他类型的按日期查询的 Query 条件
-     * @note
-     *  1. 指定日期范围必须在当前K线数据范围内，否则截断在 K 线范围内
-     *  2. start_datetime/end_datetime 的精度应和当前 KData 一致
-     *  3. 如果原截止条件为 Null<Datetime>()且未指定end_datetime, 则返回的查询条件为
-     * Null<Datetime>()
-     * @param start_datetime
-     * @param end_datetime
-     * @param ktype
-     * @return KData
-     */
-    KQuery getOtherQueryByDate(const Datetime& start_datetime, const Datetime& end_datetime,
-                               const KQuery::KType& ktype) const;
-
     /** 按日期查询对应的索引位置，注：是 KData 中的位置，不是在 Stock 中原始K记录的位置 */
     size_t getPos(const Datetime& datetime) const noexcept;
 
@@ -144,6 +129,21 @@ public:
 
     /** 成交金额 */
     Indicator amo() const;
+
+    /**
+     * 特殊用途！谨慎！按当前K线范围，获取指定日期范围的其他类型的按日期查询的 Query 条件
+     * @note
+     *  1. 指定日期范围必须在当前K线数据范围内，否则截断在 K 线范围内
+     *  2. start_datetime/end_datetime 的精度应和当前 KData 一致
+     *  3. 如果原截止条件为 Null<Datetime>()且未指定end_datetime, 则返回的查询条件为
+     * Null<Datetime>()
+     * @param start_datetime
+     * @param end_datetime
+     * @param ktype
+     * @return KData
+     */
+    KQuery getOtherQueryByDate(const Datetime& start_datetime, const Datetime& end_datetime,
+                               const KQuery::KType& ktype) const;
 
 public:
     const KRecord* data() const noexcept;

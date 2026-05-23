@@ -24,6 +24,7 @@ IAdjFactor::~IAdjFactor() {}
 // 计算对应日线复权因子(非严格上市日期，仅从 in_kdata 包含的数据开始计算)
 // 注意，因为内部函数，在无权息数据清空下，直接返回空结果
 // base_factor: 基准因子值，用于增量计算（默认为 1.0，表示从头开始计算）
+// 参考 KDataPrivatedBufferImp::_recoverEqualBackward() 的实现
 static vector<std::pair<Datetime, Indicator::value_t>> cum_adj_factor(const KData& in_kdata,
                                                                       price_t base_factor = 1.0) {
     // 获取对应日线范围K线数据
@@ -37,73 +38,67 @@ static vector<std::pair<Datetime, Indicator::value_t>> cum_adj_factor(const KDat
     auto* krecords = kdata.data();
 
     // 获取所有权息数据（已按日期排序）
-    StockWeightList sw_list =
-      kdata.getStock().getWeight(krecords[0].datetime, krecords[total - 1].datetime + Days(1));
+    Datetime start_date = krecords[0].datetime;
+    Datetime end_date = krecords[total - 1].datetime + Days(1);
+    StockWeightList sw_list = kdata.getStock().getWeight(start_date, end_date);
 
-    if (sw_list.empty()) {
-        // 没有权息数据，返回空结果
-        return result;
-    }
+    // if (sw_list.empty()) {
+    //     // 没有权息数据，返回空结果
+    //     return result;
+    // }
 
-    // 双指针同步遍历：K线指针 i，权息指针 w_idx
-    price_t cumulative_factor = base_factor;  // 使用基准因子作为起点
-    size_t w_idx = 0;                         // 当前处理的权息事件索引
+    // 初始化所有因子为基准因子
+    vector<price_t> factors(total, base_factor);
 
-    for (size_t i = 0; i < total; ++i) {
-        const Datetime& k_date = krecords[i].datetime;
+    StockWeightList::const_reverse_iterator weightIter = sw_list.rbegin();
+    size_t pre_pos = total - 1;
 
-        // 处理所有在当前K线日期之前或当天的权息事件
-        while (w_idx < sw_list.size() && sw_list[w_idx].datetime() <= k_date) {
-            const auto& weight = sw_list[w_idx];
-
-            // 检查是否有任何权息事件
-            bool has_dividend = (weight.bonus() != 0.0);
-            bool has_stock_change = (weight.countAsGift() != 0.0 || weight.increasement() != 0.0 ||
-                                     weight.countForSell() != 0.0 || weight.suogu() != 0.0);
-
-            if (has_dividend || has_stock_change) {
-                // 获取参考价格（权息日前一交易日收盘价）
-                price_t ref_price = 0.0;
-                if (i > 0) {
-                    ref_price = krecords[i - 1].closePrice;
-                } else {
-                    ref_price = krecords[i].openPrice;
-                }
-
-                if (ref_price > 0.0) {
-                    // 计算调整系数
-                    price_t adjustment_ratio = 1.0;
-
-                    if (weight.suogu() != 0.0) {
-                        adjustment_ratio = 1.0 / weight.suogu();
-                    } else {
-                        price_t D = weight.bonus() / 10.0;
-                        price_t S = weight.countAsGift() / 10.0;
-                        price_t Z = weight.increasement() / 10.0;
-                        price_t R = weight.countForSell() / 10.0;
-                        price_t P_r = weight.priceForSell();
-
-                        // 后复权调整系数（理论除权价公式的倒数）
-                        price_t numerator = ref_price * (1.0 + S + Z + R);
-                        price_t denominator = ref_price - D + P_r * R;
-
-                        if (denominator > 0.0) {
-                            adjustment_ratio = numerator / denominator;
-                        }
-                    }
-
-                    // 应用调整系数（累乘）
-                    if (adjustment_ratio > 0.0 && adjustment_ratio != 1.0) {
-                        cumulative_factor *= adjustment_ratio;
-                    }
-                }
-            }
-
-            ++w_idx;  // 移动到下一个权息事件
+    for (; weightIter != sw_list.rend(); ++weightIter) {
+        // 找到除权日在K线中的位置
+        size_t i = pre_pos;
+        while (i > 0 && krecords[i].datetime > weightIter->datetime()) {
+            i--;
         }
 
-        // 添加当前日的日期和复权因子
-        result.emplace_back(k_date, cumulative_factor);
+        pre_pos = i;  // 除权日位置
+
+        // 获取股权登记日（除权日前一天）的收盘价
+        if (pre_pos == 0) {
+            continue;  // 没有前一天的数据，无法计算
+        }
+
+        price_t closePrice = krecords[pre_pos - 1].closePrice;
+        if (closePrice <= 0.0) {
+            continue;
+        }
+
+        price_t denominator = 0.0, temp = closePrice;
+        if (weightIter->suogu() != 0.0) {
+            denominator = weightIter->suogu();
+        } else {
+            // 流通股份变动比例 = 0.1 × (送股 + 配股 + 转增)
+            price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
+                                    weightIter->increasement());
+            denominator = 1.0 + change;
+            temp = closePrice + weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
+        }
+
+        if (temp == 0.0 || denominator == 0.0) {
+            continue;
+        }
+
+        // 计算后复权系数
+        price_t k = (denominator * closePrice) / temp;
+
+        // 将除权日到最新日之间的所有因子乘以 k
+        for (size_t j = pre_pos; j < total; ++j) {
+            factors[j] *= k;
+        }
+    }
+
+    // 构建结果
+    for (size_t i = 0; i < total; ++i) {
+        result.emplace_back(krecords[i].datetime, factors[i]);
     }
 
     return result;
@@ -159,7 +154,7 @@ void IAdjFactor::_increment_calculate(const Indicator& ind, size_t start_pos) {
         calc_start_date = kdata[0].datetime.startOfDay();
     }
 
-    Datetime calc_end_date = kdata[total - 1].datetime.startOfDay();
+    Datetime calc_end_date = kdata[total - 1].datetime + k.getQuery().kTypeInSeconds();
 
     // 2. 获取增量部分对应的K线数据（从 calc_start_date 开始）
     KData inc_kdata = k.getStock().getKData(KQueryByDate(calc_start_date, calc_end_date));
@@ -174,6 +169,12 @@ void IAdjFactor::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
     // 3. 计算增量部分的日线复权因子（传入基准因子）
     auto daily_factors = cum_adj_factor(inc_kdata, base_factor);
+    if (k.getQuery().kType() == KQuery::DAY) {
+        for (size_t i = start_pos; i < total; ++i) {
+            dst[i] = daily_factors[i - start_pos].second;
+        }
+        return;
+    }
 
     if (daily_factors.empty()) {
         // 无权息数据，增量部分全部使用基准因子
