@@ -17,7 +17,7 @@ namespace hku {
 class IFactor : public IndicatorImp {
 public:
     IFactor();
-    IFactor(const Factor& factor);
+    explicit IFactor(const Factor& factor);
     virtual ~IFactor() override;
 
     virtual string formula() const override;
