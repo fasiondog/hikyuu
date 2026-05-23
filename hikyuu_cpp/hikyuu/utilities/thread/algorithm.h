@@ -16,10 +16,7 @@
 #include "MQThreadPool.h"
 #include "StealThreadPool.h"
 #include "MQStealThreadPool.h"
-#include "GlobalMQThreadPool.h"
 #include "GlobalStealThreadPool.h"
-#include "GlobalMQStealThreadPool.h"
-#include "GlobalThreadPool.h"
 
 #if CPP_STANDARD >= CPP_STANDARD_20
 #include "hikyuu/utilities/net.h"
@@ -847,7 +844,8 @@ auto co_run_ec(Executor exec, Func&& func) -> asio::awaitable<typename std::invo
           asio::use_awaitable);
     } else {
         // 非 void 返回类型的普通版本
-        return asio::async_initiate<decltype(asio::use_awaitable), void(net::error_code, ResultType)>(
+        return asio::async_initiate<decltype(asio::use_awaitable),
+                                    void(net::error_code, ResultType)>(
           [exec, func = std::forward<Func>(func)](auto&& handler) mutable {
               auto io_exec = asio::get_associated_executor(handler);
 
