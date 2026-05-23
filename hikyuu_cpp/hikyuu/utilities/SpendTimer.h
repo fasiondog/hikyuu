@@ -137,7 +137,7 @@ namespace hku {
  * @param ... 输出信息
  */
 #define BENCHMARK_TIME_MSG(id, cycle, ...)                                               \
-    std::string msg_##id(fmt::format(__VA_ARGS__));                                      \
+    std::string msg_##id = fmt::format(fmt::runtime(__VA_ARGS__));                       \
     hku::SpendTimer test_spend_timer_##id(#id, msg_##id.c_str(), GET_FILENAME(__FILE__), \
                                           __LINE__);                                     \
     test_spend_timer_##id.setCycle(cycle);

@@ -15,6 +15,20 @@ using namespace hku;
 
 #define ENABLE_BENCHMARK_TEST 0  // 是否开启性能测试相关用例执行，默认不开启
 
+// 跨编译器：强制编译器不优化、不删除指定变量
+// 用于 benchmark，防止编译器把“没用”的中间计算删掉
+#if defined(_MSC_VER)
+#define DO_NOT_OPTIMIZE(var)                                             \
+    do {                                                                 \
+        auto p = const_cast<void*>(reinterpret_cast<const void*>(&var)); \
+        __asm__ volatile("" : : "r"(p));                                 \
+    } while (0)
+#elif defined(__GNUC__) || defined(__clang__)
+#define DO_NOT_OPTIMIZE(var) __asm__ volatile("" : : "g"(&var) : "memory");
+#else
+#define DO_NOT_OPTIMIZE(var)
+#endif
+
 inline void check_indicator(const Indicator& result, const Indicator& expect) {
     CHECK_EQ(result.size(), expect.size());
     CHECK_EQ(result.discard(), expect.discard());

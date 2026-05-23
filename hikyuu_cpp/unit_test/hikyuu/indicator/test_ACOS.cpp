@@ -68,6 +68,7 @@ TEST_CASE("test_ACOS_benchmark") {
         for (int i = 0; i < cycle; i++) {
             Indicator ind = ACOS();
             Indicator result = ind(c);
+            DO_NOT_OPTIMIZE(result);
         }
     }
 }

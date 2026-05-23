@@ -105,6 +105,7 @@ TEST_CASE("test_MF_ICIRWeight_benchmark") {
         SPEND_TIME_CONTROL(false);
         for (int i = 0; i < cycle; i++) {
             auto mf = MF_ICIRWeight(src_inds, stks, query, ref_stk);
+            mf->setParam<bool>("save_all_factors", true);
             auto ic = mf->getIC();
         }
     }
